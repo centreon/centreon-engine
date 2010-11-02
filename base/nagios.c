@@ -284,7 +284,7 @@ int main(int argc, char **argv){
 	int display_license=FALSE;
 	int display_help=FALSE;
 	int c=0;
-	struct tm *tm;
+	struct tm *tm, tm_s;
 	time_t now;
 	char datestring[256];
 	nagios_macros *mac;
@@ -676,7 +676,7 @@ int main(int argc, char **argv){
 
 			/* log the local time - may be different than clock time due to timezone offset */
 			now=time(NULL);
-			tm=localtime(&now);
+			tm=localtime_r(&now, &tm_s);
 			strftime(datestring,sizeof(datestring),"%a %b %d %H:%M:%S %Z %Y",tm);
 			logit(NSLOG_PROCESS_INFO,TRUE,"Local time is %s",datestring);
 
