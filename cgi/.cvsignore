@@ -1,0 +1,4 @@
+*.o
+*.cgi
+Makefile
+*.dSYM

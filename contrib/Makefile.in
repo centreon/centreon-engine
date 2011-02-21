@@ -1,0 +1,87 @@
+###############################
+# Makefile for contrib software
+#
+# Last Modified: 05-19-2008
+###############################
+
+CC=@CC@
+CFLAGS=@CFLAGS@ @DEFS@
+LDFLAGS=@LDFLAGS@ @LIBS@
+
+# Source code directories
+SRC_COMMON=../common
+SRC_CGI=../cgi
+
+# Generated automatically from configure script
+SNPRINTF_O=@SNPRINTF_O@
+INSTALL=@INSTALL@
+INSTALL_OPTS=@INSTALL_OPTS@
+
+
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+CGIDIR=@sbindir@
+BINDIR=@bindir@
+
+CGIS=traceroute.cgi
+UTILS=mini_epn new_mini_epn convertcfg
+ALL=$(CGIS) $(UTILS)
+
+
+CGI_C=$(SRC_CGI)/getcgi.c
+CGI_O=$(SRC_CGI)/getcgi.o $(SNPRINTF_O)
+CGI_H=$(SRC_CGI)/getcgi.h
+COMMON_H=$(SRC_COMMON)/config.h $(SRC_COMMON)/common.h $(SRC_COMMON)/locations.h
+
+##############################################################################
+# standard targets (all, clean, distclean, devclean, install)
+
+all: $(ALL)
+
+clean:
+	rm -f convertcfg daemonchk.cgi mini_epn new_mini_epn core *.o
+	rm -f */*/*~
+	rm -f */*~
+	rm -f *~
+
+distclean: clean
+	rm -f Makefile
+
+devclean: distclean
+
+install:
+	$(INSTALL) -m 775 $(INSTALL_OPTS) -d $(DESTDIR)$(CGIDIR)
+	$(INSTALL) -m 775 $(INSTALL_OPTS) -d $(DESTDIR)$(BINDIR)
+	for f in $(CGIS); do $(INSTALL) -m 775 $(INSTALL_OPTS) $$f $(DESTDIR)$(CGIDIR); done
+	for f in $(UTILS); do $(INSTALL) -m 775 $(INSTALL_OPTS) $$f $(DESTDIR)$(BINDIR); done
+
+##############################################################################
+# rules and dependencies for actual target programs
+
+daemonchk.cgi: 
+	@echo "This doesn't work with Nagios 2.x yet..."
+#	daemonchk.c $(CGI_O) $(CGI_H) $(COMMON_H)
+
+mini_epn: mini_epn.c
+	perl -MExtUtils::Embed -e xsinit
+	$(CC) $(CFLAGS) -c perlxsi.c  `perl -MExtUtils::Embed -e ccopts`
+	$(CC) $(CFLAGS) -c mini_epn.c `perl -MExtUtils::Embed -e ccopts`
+	$(CC) $(CFLAGS) $(LDFLAGS) perlxsi.o mini_epn.o `perl -MExtUtils::Embed -e ccopts -e ldopts` -o $@
+
+new_mini_epn: new_mini_epn.c
+	perl -MExtUtils::Embed -e xsinit
+	$(CC) $(CFLAGS) -c perlxsi.c  `perl -MExtUtils::Embed -e ccopts`
+	$(CC) $(CFLAGS) -c new_mini_epn.c `perl -MExtUtils::Embed -e ccopts`
+	$(CC) $(CFLAGS) $(LDFLAGS) perlxsi.o new_mini_epn.o `perl -MExtUtils::Embed -e ccopts -e ldopts` -o $@
+
+##############################################################################
+# dependencies
+
+$(CGI_O): $(CGI_C)
+	cd $(SRC_CGI) && make $(CGI_O)
+
+##############################################################################
+# implicit rules
+
+%.cgi : %.c
+	$(CC) $(CFLAGS) $(LDFLAGS) $< $(CGI_O) -o $@
