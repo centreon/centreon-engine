@@ -548,7 +548,7 @@ static int comment_compar(const void *p1, const void *p2){
 	comment *c2 = *(comment **)p2;
 
 	if (c1->comment_id < c2->comment_id)
-	  return -1;
+		return -1;
 	return c1->comment_id - c2->comment_id;
 	}
 

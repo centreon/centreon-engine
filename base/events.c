@@ -584,7 +584,7 @@ void init_timing_loop(void){
 
 	/* add a log rotation event if necessary */
 	if(log_rotation_method!=LOG_ROTATION_NONE)
-	  schedule_new_event(EVENT_LOG_ROTATION,TRUE,get_next_log_rotation_time(),TRUE,0,get_next_log_rotation_time,TRUE,NULL,NULL,0);
+		schedule_new_event(EVENT_LOG_ROTATION,TRUE,get_next_log_rotation_time(),TRUE,0,get_next_log_rotation_time,TRUE,NULL,NULL,0);
 
 	/* add a retention data save event if needed */
 	if(retain_state_information==TRUE && retention_update_interval>0)
@@ -802,7 +802,7 @@ void reschedule_event(timed_event *event, timed_event **event_list, timed_event 
 
 		/* use custom timing function */
 		if(event->timing_func!=NULL){
-		  *(void **)(&timingfunc)=event->timing_func;
+			*(void **)(&timingfunc)=event->timing_func;
 			event->run_time=(*timingfunc)();
 		        }
 
@@ -1411,7 +1411,7 @@ int handle_timed_event(timed_event *event){
 
 		/* run a user-defined function */
 		if(event->event_data!=NULL){
-		  *(void **)(&userfunc)=event->event_data;
+			*(void **)(&userfunc)=event->event_data;
 			(*userfunc)(event->event_args);
 		        }
 		break;
@@ -1671,7 +1671,7 @@ void compensate_for_system_time_change(unsigned long last_time, unsigned long cu
 
 		/* use custom timing function */
 		if(temp_event->timing_func!=NULL){
-		  *(void **)(&timingfunc)=temp_event->timing_func;
+			*(void **)(&timingfunc)=temp_event->timing_func;
 			temp_event->run_time=(*timingfunc)();
 		        }
 
@@ -1692,7 +1692,7 @@ void compensate_for_system_time_change(unsigned long last_time, unsigned long cu
 
 		/* use custom timing function */
 		if(temp_event->timing_func!=NULL){
-		  *(void **)(&timingfunc)=temp_event->timing_func;
+			*(void **)(&timingfunc)=temp_event->timing_func;
 			temp_event->run_time=(*timingfunc)();
 		        }
 

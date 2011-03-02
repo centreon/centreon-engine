@@ -84,7 +84,7 @@ int xcddefault_initialize_comment_data(char *main_config_file){
 
 /* removes invalid and old comments from the comment file */
 int xcddefault_cleanup_comment_data(char *main_config_file){
-  (void)main_config_file;
+	(void)main_config_file;
 
 	/* nothing to do anymore */
 
@@ -156,7 +156,7 @@ int xcddefault_add_new_service_comment(int entry_type, char *host_name, char *sv
 
 /* deletes a host comment */
 int xcddefault_delete_host_comment(unsigned long comment_id){
-  (void)comment_id;
+	(void)comment_id;
 
 	/* update comment file */
 	xcddefault_save_comment_data();
@@ -167,7 +167,7 @@ int xcddefault_delete_host_comment(unsigned long comment_id){
 
 /* deletes a service comment */
 int xcddefault_delete_service_comment(unsigned long comment_id){
-  (void)comment_id;
+	(void)comment_id;
 
 	/* update comment file */
 	xcddefault_save_comment_data();

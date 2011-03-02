@@ -348,7 +348,7 @@ int xpddefault_initialize_performance_data(char *config_file){
 /* cleans up performance data */
 int xpddefault_cleanup_performance_data(char *config_file){
 
-  (void)config_file;
+	(void)config_file;
 
 	/* free memory */
 	my_free(xpddefault_host_perfdata_command);
