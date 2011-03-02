@@ -60,10 +60,6 @@
 #include "../include/nagios.h"
 #endif
 
-#ifdef NSCGI
-#include "../include/cgiutils.h"
-#endif
-
 /**** DATA INPUT-SPECIFIC HEADER FILES ****/
 
 #include "xodtemplate.h"
@@ -313,11 +309,6 @@ int xodtemplate_read_config_data(char *main_config_file, int options, int cache,
 
 	if(test_scheduling==TRUE)
 		gettimeofday(&tv[1],NULL);
-#endif
-
-#ifdef NSCGI
-	/* CGIs process only one file - the cached objects file */
-	result=xodtemplate_process_config_file(xodtemplate_cache_file,options);
 #endif
 
 #ifdef NSCORE

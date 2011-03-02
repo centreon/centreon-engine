@@ -36,11 +36,6 @@
 #include "../include/nagios.h"
 #endif
 
-#ifdef NSCGI
-#include "../include/cgiutils.h"
-#endif
-
-
 /**** IMPLEMENTATION SPECIFIC HEADER FILES ****/
 #include "xdddefault.h"
 

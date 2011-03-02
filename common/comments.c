@@ -38,11 +38,6 @@
 #include "../include/broker.h"
 #endif
 
-#ifdef NSCGI
-#include "../include/cgiutils.h"
-#endif
-
-
 comment     *comment_list=NULL;
 int	    defer_comment_sorting = 0;
 comment     **comment_hashlist=NULL;

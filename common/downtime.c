@@ -40,11 +40,6 @@
 #include "../include/broker.h"
 #endif
 
-#ifdef NSCGI
-#include "../include/cgiutils.h"
-#endif
-
-
 scheduled_downtime *scheduled_downtime_list=NULL;
 int		   defer_downtime_sorting = 0;
 
