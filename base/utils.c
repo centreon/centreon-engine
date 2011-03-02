@@ -56,9 +56,6 @@ extern char	*log_archive_path;
 extern char     *auth_file;
 extern char	*p1_file;
 
-extern char     *nagios_user;
-extern char     *nagios_group;
-
 extern char     *macro_x[MACRO_X_COUNT];
 extern char     *macro_x_names[MACRO_X_COUNT];
 extern char     *macro_argv[MAX_COMMAND_ARGUMENTS];
@@ -2123,97 +2120,6 @@ int daemon_init(void){
 
 	return OK;
 	}
-
-
-
-/******************************************************************/
-/*********************** SECURITY FUNCTIONS ***********************/
-/******************************************************************/
-
-/* drops privileges */
-int drop_privileges(char *user, char *group){
-	uid_t uid=-1;
-	gid_t gid=-1;
-	struct group *grp=NULL;
-	struct passwd *pw=NULL;
-	int result=OK;
-
-	log_debug_info(DEBUGL_FUNCTIONS,0,"drop_privileges() start\n");
-	log_debug_info(DEBUGL_PROCESS,0,"Original UID/GID: %d/%d\n",(int)getuid(),(int)getgid());
-
-	/* only drop privileges if we're running as root, so we don't interfere with being debugged while running as some random user */
-	if(getuid()!=0)
-		return OK;
-
-	/* set effective group ID */
-	if(group!=NULL){
-		
-		/* see if this is a group name */
-		if(strspn(group,"0123456789")<strlen(group)){
-			grp=(struct group *)getgrnam(group);
-			if(grp!=NULL)
-				gid=(gid_t)(grp->gr_gid);
-			else
-				logit(NSLOG_RUNTIME_WARNING,TRUE,"Warning: Could not get group entry for '%s'",group);
-		        }
-
-		/* else we were passed the GID */
-		else
-			gid=(gid_t)atoi(group);
-
-		/* set effective group ID if other than current EGID */
-		if(gid!=getegid()){
-
-			if(setgid(gid)==-1){
-				logit(NSLOG_RUNTIME_WARNING,TRUE,"Warning: Could not set effective GID=%d",(int)gid);
-				result=ERROR;
-			        }
-		        }
-	        }
-
-
-	/* set effective user ID */
-	if(user!=NULL){
-		
-		/* see if this is a user name */
-		if(strspn(user,"0123456789")<strlen(user)){
-			pw=(struct passwd *)getpwnam(user);
-			if(pw!=NULL)
-				uid=(uid_t)(pw->pw_uid);
-			else
-				logit(NSLOG_RUNTIME_WARNING,TRUE,"Warning: Could not get passwd entry for '%s'",user);
-		        }
-
-		/* else we were passed the UID */
-		else
-			uid=(uid_t)atoi(user);
-			
-#ifdef HAVE_INITGROUPS
-
-		if(uid!=geteuid()){
-
-			/* initialize supplementary groups */
-			if(initgroups(user,gid)==-1){
-				if(errno==EPERM)
-					logit(NSLOG_RUNTIME_WARNING,TRUE,"Warning: Unable to change supplementary groups using initgroups() -- I hope you know what you're doing");
-				else{
-					logit(NSLOG_RUNTIME_WARNING,TRUE,"Warning: Possibly root user failed dropping privileges with initgroups()");
-					return ERROR;
-			                }
-	                        }
-		        }
-#endif
-		if(setuid(uid)==-1){
-			logit(NSLOG_RUNTIME_WARNING,TRUE,"Warning: Could not set effective UID=%d",(int)uid);
-			result=ERROR;
-		        }
-	        }
-
-	log_debug_info(DEBUGL_PROCESS,0,"New UID/GID: %d/%d\n",(int)getuid(),(int)getgid());
-
-	return result;
-        }
-
 
 
 
@@ -4689,10 +4595,6 @@ void free_memory(void){
 	my_free(illegal_object_chars);
 	my_free(illegal_output_chars);
 
-	/* free nagios user and group */
-	my_free(nagios_user);
-	my_free(nagios_group);
-
 	/* free version strings */
 	my_free(last_program_version);
 	my_free(new_program_version);
@@ -4745,9 +4647,6 @@ int reset_variables(void){
 	p1_file=(char *)strdup(DEFAULT_P1_FILE);
 	log_archive_path=(char *)strdup(DEFAULT_LOG_ARCHIVE_PATH);
 	debug_file=(char *)strdup(DEFAULT_DEBUG_FILE);
-
-	nagios_user=(char *)strdup(DEFAULT_NAGIOS_USER);
-	nagios_group=(char *)strdup(DEFAULT_NAGIOS_GROUP);
 
 	use_regexp_matches=FALSE;
 	use_true_regexp_matching=FALSE;

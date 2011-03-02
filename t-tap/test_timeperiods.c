@@ -56,8 +56,6 @@ char            *lock_file=NULL;
 char            *log_archive_path=NULL;
 char            *p1_file=NULL;    /**** EMBEDDED PERL ****/
 char            *auth_file=NULL;  /**** EMBEDDED PERL INTERPRETER AUTH FILE ****/
-char            *nagios_user=NULL;
-char            *nagios_group=NULL;
 
 extern char     *macro_x[MACRO_X_COUNT];
 

@@ -32,7 +32,7 @@ define contact{
 	use				generic-contact		; Inherit default values from generic-contact template (defined above)
         alias                           Nagios Admin		; Full name of user
 
-        email                           @nagios_user@@localhost	; <<***** CHANGE THIS TO YOUR EMAIL ADDRESS ******
+        email                           root@localhost	; <<***** CHANGE THIS TO YOUR EMAIL ADDRESS ******
         }
 
 

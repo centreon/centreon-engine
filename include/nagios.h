@@ -491,7 +491,6 @@ void init_timing_loop(void);                         		/* setup the initial sche
 void setup_sighandler(void);                         		/* trap signals */
 void reset_sighandler(void);                         		/* reset signals to default action */
 int daemon_init(void);				     		/* switches to daemon mode */
-int drop_privileges(char *,char *);				/* drops privileges before startup */
 void display_scheduling_info(void);				/* displays service check scheduling information */
 
 

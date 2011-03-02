@@ -42,9 +42,6 @@ extern char	*log_archive_path;
 extern char     *auth_file;
 extern char	*p1_file;
 
-extern char     *nagios_user;
-extern char     *nagios_group;
-
 extern char     *macro_x[MACRO_X_COUNT];
 extern char     *macro_user[MAX_USER_MACROS];
 
@@ -487,16 +484,6 @@ int read_main_config_file(char *main_config_file){
 		else if(!strcmp(variable,"ochp_command")){
 			my_free(ochp_command);
 			ochp_command=(char *)strdup(value);
-		        }
-
-		else if(!strcmp(variable,"nagios_user")){
-			my_free(nagios_user);
-			nagios_user=(char *)strdup(value);
-		        }
-
-		else if(!strcmp(variable,"nagios_group")){
-			my_free(nagios_group);
-			nagios_group=(char *)strdup(value);
 		        }
 
 		else if(!strcmp(variable,"admin_email")){

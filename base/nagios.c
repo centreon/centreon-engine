@@ -66,8 +66,6 @@ char            *lock_file=NULL;
 char            *log_archive_path=NULL;
 char            *p1_file=NULL;    /**** EMBEDDED PERL ****/
 char            *auth_file=NULL;  /**** EMBEDDED PERL INTERPRETER AUTH FILE ****/
-char            *nagios_user=NULL;
-char            *nagios_group=NULL;
 
 extern char     *macro_x[MACRO_X_COUNT];
 
@@ -487,17 +485,12 @@ int main(int argc, char **argv){
 
 			printf("   Read main config file okay...\n");
 
-			/* drop privileges */
-			if((result=drop_privileges(nagios_user,nagios_group))==ERROR)
-				printf("   Failed to drop privileges.  Aborting.");
-			else{
-				/* read object config files */
-				if((result=read_all_object_data(config_file))==OK)
-					printf("   Read object config files okay...\n");
-				else
-					printf("   Error processing object config files!\n");
-				}
-		        }
+			/* read object config files */
+			if((result=read_all_object_data(config_file))==OK)
+				printf("   Read object config files okay...\n");
+			else
+				printf("   Error processing object config files!\n");
+			}
 		else
 			printf("   Error processing main config file!\n\n");
 
@@ -566,11 +559,6 @@ int main(int argc, char **argv){
 
 		/* read in the configuration files (main config file and all host config files) */
 		result=read_main_config_file(config_file);
-
-		/* drop privileges */
-		if(result==OK)
-			if((result=drop_privileges(nagios_user,nagios_group))==ERROR)
-				printf("Failed to drop privileges.  Aborting.");
 
 		/* read object config files */
 		if(result==OK)
@@ -654,15 +642,6 @@ int main(int argc, char **argv){
 
 			/* open debug log */
 			open_debug_log();
-
-			/* drop privileges */
-			if(drop_privileges(nagios_user,nagios_group)==ERROR){
-
-				logit(NSLOG_PROCESS_INFO | NSLOG_RUNTIME_ERROR | NSLOG_CONFIG_ERROR,TRUE,"Failed to drop privileges.  Aborting.");
-
-				cleanup();
-				exit(ERROR);
-			        }
 
 #ifdef USE_EVENT_BROKER
 			/* initialize modules */
