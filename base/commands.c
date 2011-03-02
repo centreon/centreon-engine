@@ -1156,6 +1156,8 @@ int process_host_command(int cmd, time_t entry_time, char *args){
 	char *buf[2]={NULL,NULL};
 	int intval=0;
 
+	(void)entry_time;
+
 	printf("ARGS: %s\n",args);
 
 	/* get the host name */
@@ -1293,6 +1295,8 @@ int process_hostgroup_command(int cmd, time_t entry_time, char *args){
 	service *temp_service=NULL;
 	servicesmember *temp_servicesmember=NULL;
 
+	(void)entry_time;
+
 	/* get the hostgroup name */
 	if((hostgroup_name=my_strtok(args,";"))==NULL)
 		return ERROR;
@@ -1389,6 +1393,8 @@ int process_service_command(int cmd, time_t entry_time, char *args){
 	char *str=NULL;
 	char *buf[2]={NULL,NULL};
 	int intval=0;
+
+	(void)entry_time;
 
 	/* get the host name */
 	if((host_name=my_strtok(args,";"))==NULL)
@@ -1488,6 +1494,8 @@ int process_servicegroup_command(int cmd, time_t entry_time, char *args){
 	host *temp_host=NULL;
 	host *last_host=NULL;
 	service *temp_service=NULL;
+
+	(void)entry_time;
 
 	/* get the servicegroup name */
 	if((servicegroup_name=my_strtok(args,";"))==NULL)
@@ -1612,6 +1620,8 @@ int process_contact_command(int cmd, time_t entry_time, char *args){
 	char *contact_name=NULL;
 	contact *temp_contact=NULL;
 
+	(void)entry_time;
+
 	/* get the contact name */
 	if((contact_name=my_strtok(args,";"))==NULL)
 		return ERROR;
@@ -1652,6 +1662,8 @@ int process_contactgroup_command(int cmd, time_t entry_time, char *args){
 	contactgroup *temp_contactgroup=NULL;
 	contactsmember *temp_member=NULL;
 	contact *temp_contact=NULL;
+
+	(void)entry_time;
 
 	/* get the contactgroup name */
 	if((contactgroup_name=my_strtok(args,";"))==NULL)
@@ -1940,6 +1952,8 @@ int cmd_schedule_host_service_checks(int cmd,char *args, int force){
 	char *host_name=NULL;
 	time_t delay_time=0L;
 
+	(void)cmd;
+
 	/* get the host name */
 	if((host_name=my_strtok(args,";"))==NULL)
 		return ERROR;
@@ -1994,6 +2008,8 @@ int cmd_process_service_check_result(int cmd,time_t check_time,char *args){
 	int return_code=0;
 	char *output=NULL;
 	int result=0;
+
+	(void)cmd;
 
 	/* get the host name */
 	if((temp_ptr=my_strtok(args,";"))==NULL)
@@ -2142,6 +2158,8 @@ int cmd_process_host_check_result(int cmd,time_t check_time,char *args){
 	int return_code=0;
 	char *output=NULL;
 	int result=0;
+
+	(void)cmd;
 
 	/* get the host name */
 	if((temp_ptr=my_strtok(args,";"))==NULL)
@@ -3355,6 +3373,8 @@ int cmd_process_external_commands_from_file(int cmd, char *args){
 	char *fname=NULL;
 	char *temp_ptr=NULL;
 	int delete_file=FALSE;
+
+	(void)cmd;
 
 	/* get the file name */
 	if((temp_ptr=my_strtok(args,";"))==NULL)

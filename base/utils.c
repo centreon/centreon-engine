@@ -682,7 +682,7 @@ int get_raw_command_line(command *cmd_ptr, char *cmd, char **full_command, int m
 	char temp_arg[MAX_COMMAND_BUFFER]="";
 	char *arg_buffer=NULL;
 	register int x=0;
-	register int y=0;
+	register unsigned int y=0;
 	register int arg_index=0;
 	register int escaped=FALSE;
 
@@ -719,7 +719,7 @@ int get_raw_command_line(command *cmd_ptr, char *cmd, char **full_command, int m
 			/* get the next argument */
 			/* can't use strtok(), as that's used in process_macros... */
 			for(arg_index++,y=0;y<sizeof(temp_arg)-1;arg_index++){
-				
+
 				/* backslashes escape */
 				if(cmd[arg_index]=='\\' && escaped==FALSE){
 					escaped=TRUE;
@@ -1022,7 +1022,7 @@ int check_time_against_period(time_t test_time, timeperiod *tperiod){
 #endif
 
 			/* time falls into the range of days */
-			if(midnight>=start_time && midnight<=end_time)
+			if((time_t)midnight>=start_time && (time_t)midnight<=end_time)
 				found_match=TRUE;
 
 			/* found a day match, so see if time ranges are good */
@@ -1908,6 +1908,8 @@ void sighandler(int sig){
 void service_check_sighandler(int sig){
 	struct timeval end_time;
 
+	(void)sig;
+
 	/* get the current time */
 	gettimeofday(&end_time,NULL);
 
@@ -1952,6 +1954,8 @@ void service_check_sighandler(int sig){
 void host_check_sighandler(int sig){
 	struct timeval end_time;
 
+	(void)sig;
+
 	/* get the current time */
 	gettimeofday(&end_time,NULL);
 
@@ -1989,6 +1993,8 @@ void host_check_sighandler(int sig){
 
 /* handle timeouts when executing commands via my_system() */
 void my_system_sighandler(int sig){
+
+	(void)sig;
 
 	/* force the child process to exit... */
 	_exit(STATE_CRITICAL);
@@ -3721,7 +3727,8 @@ int init_embedded_perl(char **env){
 	exitstatus=perl_parse(my_perl,xs_init,2,(char **)embedding,env);
 	if(!exitstatus)
 		exitstatus=perl_run(my_perl);
-
+#else
+	(void)env;
 #endif
 	return OK;
         }
@@ -3807,6 +3814,8 @@ int file_uses_embedded_perl(char *fname){
 			fclose(fp);
 			}
 		}
+#else
+	(void)fname;
 #endif
 
 	return use_epn;
@@ -3884,6 +3893,8 @@ int shutdown_command_file_worker_thread(void){
 void cleanup_command_file_worker_thread(void *arg){
 	register int x=0;
 
+	(void)arg;
+
 	/* release memory allocated to circular buffer */
 	for(x=external_command_buffer.tail;x!=external_command_buffer.head;x=(x+1) % external_command_buffer_slots){
 		my_free(((char **)external_command_buffer.buffer)[x]);
@@ -3903,6 +3914,8 @@ void * command_file_worker_thread(void *arg){
 	struct timeval tv;
 	int buffer_items=0;
 	int result=0;
+
+	(void)arg;
 
 	/* specify cleanup routine */
 	pthread_cleanup_push(cleanup_command_file_worker_thread,NULL);

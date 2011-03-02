@@ -254,7 +254,7 @@ int run_scheduled_service_check(service *svc, int check_options, double latency)
 		return ERROR;
 
 	log_debug_info(DEBUGL_FUNCTIONS,0,"run_scheduled_service_check() start\n");
-	log_debug_info(DEBUGL_CHECKS,0,"Attempting to run scheduled check of service '%s' on host '%s': check options=%d, latency=%lf\n",svc->description,svc->host_name,check_options,latency);
+	log_debug_info(DEBUGL_CHECKS,0,"Attempting to run scheduled check of service '%s' on host '%s': check options=%d, latency=%f\n",svc->description,svc->host_name,check_options,latency);
 
 	/* attempt to run the check */
 	result=run_async_service_check(svc,check_options,latency,TRUE,TRUE,&time_is_valid,&preferred_time);
@@ -2792,7 +2792,7 @@ int run_scheduled_host_check_3x(host *hst, int check_options, double latency){
 	if(hst==NULL)
 		return ERROR;
 
-	log_debug_info(DEBUGL_CHECKS,0,"Attempting to run scheduled check of host '%s': check options=%d, latency=%lf\n",hst->name,check_options,latency);
+	log_debug_info(DEBUGL_CHECKS,0,"Attempting to run scheduled check of host '%s': check options=%d, latency=%f\n",hst->name,check_options,latency);
 
 	/* attempt to run the check */
 	result=run_async_host_check_3x(hst,check_options,latency,TRUE,TRUE,&time_is_valid,&preferred_time);

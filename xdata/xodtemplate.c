@@ -458,23 +458,23 @@ int xodtemplate_read_config_data(char *main_config_file, int options, int cache,
 
 		printf("OBJECT CONFIG PROCESSING TIMES      (* = Potential for precache savings with -u option)\n");
 		printf("----------------------------------\n");
-		printf("Read:                 %.6lf sec\n",runtime[0]);
-		printf("Resolve:              %.6lf sec  *\n",runtime[1]);
-		printf("Recomb Contactgroups: %.6lf sec  *\n",runtime[2]);
-		printf("Recomb Hostgroups:    %.6lf sec  *\n",runtime[3]);
-		printf("Dup Services:         %.6lf sec  *\n",runtime[4]);
-		printf("Recomb Servicegroups: %.6lf sec  *\n",runtime[5]);
-		printf("Duplicate:            %.6lf sec  *\n",runtime[6]);
-		printf("Inherit:              %.6lf sec  *\n",runtime[7]);
-		printf("Recomb Contacts:      %.6lf sec  *\n",runtime[8]);
-		printf("Sort:                 %.6lf sec  *\n",runtime[9]);
-/*		printf("Cache:                %.6lf sec\n",runtime[10]);*/
-		printf("Register:             %.6lf sec\n",runtime[11]);
-		printf("Free:                 %.6lf sec\n",runtime[12]);
+		printf("Read:                 %.6f sec\n",runtime[0]);
+		printf("Resolve:              %.6f sec  *\n",runtime[1]);
+		printf("Recomb Contactgroups: %.6f sec  *\n",runtime[2]);
+		printf("Recomb Hostgroups:    %.6f sec  *\n",runtime[3]);
+		printf("Dup Services:         %.6f sec  *\n",runtime[4]);
+		printf("Recomb Servicegroups: %.6f sec  *\n",runtime[5]);
+		printf("Duplicate:            %.6f sec  *\n",runtime[6]);
+		printf("Inherit:              %.6f sec  *\n",runtime[7]);
+		printf("Recomb Contacts:      %.6f sec  *\n",runtime[8]);
+		printf("Sort:                 %.6f sec  *\n",runtime[9]);
+/*		printf("Cache:                %.6f sec\n",runtime[10]);*/
+		printf("Register:             %.6f sec\n",runtime[11]);
+		printf("Free:                 %.6f sec\n",runtime[12]);
 		printf("                      ============\n");
-		printf("TOTAL:                %.6lf sec  ",runtime[13]);
+		printf("TOTAL:                %.6f sec  ",runtime[13]);
 		if(use_precached_objects==FALSE)
-			printf("* = %.6lf sec (%.2f%%) estimated savings",runtime[13]-runtime[12]-runtime[11]-runtime[0],((runtime[13]-runtime[12]-runtime[11]-runtime[0])/runtime[13])*100.0);
+			printf("* = %.6f sec (%.2f%%) estimated savings",runtime[13]-runtime[12]-runtime[11]-runtime[0],((runtime[13]-runtime[12]-runtime[11]-runtime[0])/runtime[13])*100.0);
 		printf("\n");
 		printf("\n\n");
 	        }
@@ -4753,6 +4753,7 @@ int xodtemplate_add_object_property(char *input, int options){
 int xodtemplate_end_object_definition(int options){
 	int result=OK;
 
+	(void)options;
 
 	xodtemplate_current_object=NULL;
 	xodtemplate_current_object_type=XODTEMPLATE_NONE;
@@ -13674,6 +13675,9 @@ int xodtemplate_add_contactgroup_members_to_memberlist(xodtemplate_memberlist **
 	if(list==NULL || temp_contactgroup==NULL)
 		return ERROR;
 
+	(void)_config_file;
+	(void)_start_line;
+
 	/* skip contactgroups with no defined members */
 	if(temp_contactgroup->members==NULL){
 #ifdef NSCORE
@@ -14023,6 +14027,9 @@ int xodtemplate_add_hostgroup_members_to_memberlist(xodtemplate_memberlist **lis
 
 	if(list==NULL || temp_hostgroup==NULL)
 		return ERROR;
+
+	(void)_config_file;
+	(void)_start_line;
 
 	/* skip hostgroups with no defined members */
 	if(temp_hostgroup->members==NULL){
@@ -14407,6 +14414,9 @@ int xodtemplate_add_servicegroup_members_to_memberlist(xodtemplate_memberlist **
 
 	if(list==NULL || temp_servicegroup==NULL)
 		return ERROR;
+
+	(void)_config_file;
+	(void)_start_line;
 
 	/* skip servicegroups with no defined members */
 	if(temp_servicegroup->members==NULL){

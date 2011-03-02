@@ -282,7 +282,7 @@ int neb_load_module(nebmodule *mod){
 	        }
 
 	/* run the module's init function */
-	initfunc=mod->init_func;
+	*(void**)(&initfunc)=mod->init_func;
 	result=(*initfunc)(NEBMODULE_NORMAL_LOAD,mod->args,mod->module_handle);
 
 	/* if the init function returned an error, unload the module */
@@ -348,7 +348,7 @@ int neb_unload_module(nebmodule *mod, int flags, int reason){
 	/* call the de-initialization function if available (and the module was initialized) */
 	if(mod->deinit_func && reason!=NEBMODULE_ERROR_BAD_INIT){
 
-		deinitfunc=mod->deinit_func;
+	  *(void**)(&deinitfunc)=mod->deinit_func;
 
 		/* module can opt to not be unloaded */
 		result=(*deinitfunc)(flags,reason);
@@ -456,10 +456,10 @@ int neb_register_callback(int callback_type, void *mod_handle, int priority, int
 	new_callback=(nebcallback *)malloc(sizeof(nebcallback));
 	if(new_callback==NULL)
 		return NEBERROR_NOMEM;
-	
+
 	new_callback->priority=priority;
 	new_callback->module_handle=(void *)mod_handle;
-	new_callback->callback_func=(void *)callback_func;
+	new_callback->callback_func=*(void **)(&callback_func);
 
 	/* add new function to callback list, sorted by priority (first come, first served for same priority) */
 	new_callback->next=NULL;
@@ -535,7 +535,7 @@ int neb_deregister_callback(int callback_type, int (*callback_func)(int,void *))
 		next_callback=temp_callback->next;
 
 		/* we found it */
-		if(temp_callback->callback_func==(void *)callback_func)
+		if(temp_callback->callback_func==*(void **)(&callback_func))
 			break;
 
 		last_callback=temp_callback;
@@ -578,7 +578,7 @@ int neb_make_callbacks(int callback_type, void *data){
 
 	/* make the callbacks... */
 	for(temp_callback=neb_callback_list[callback_type];temp_callback!=NULL;temp_callback=temp_callback->next){
-		callbackfunc=temp_callback->callback_func;
+	  *(void**)(&callbackfunc)=temp_callback->callback_func;
 		cbresult=callbackfunc(callback_type,data);
 
 		total_callbacks++;

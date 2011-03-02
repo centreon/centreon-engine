@@ -306,6 +306,8 @@ int xsddefault_initialize_status_data(char *config_file){
 /* cleanup status data before terminating */
 int xsddefault_cleanup_status_data(char *config_file, int delete_status_data){
 
+  (void)config_file;
+
 	/* delete the status log */
 	if(delete_status_data==TRUE && xsddefault_status_log){
 		if(unlink(xsddefault_status_log))
