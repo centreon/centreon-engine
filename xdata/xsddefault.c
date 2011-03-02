@@ -35,16 +35,13 @@
 #include "../include/macros.h"
 #include "../include/skiplist.h"
 
-#ifdef NSCORE
 #include "../include/nagios.h"
-#endif
 
 /**** IMPLEMENTATION SPECIFIC HEADER FILES ****/
 #include "xsddefault.h"
 
 
 
-#ifdef NSCORE
 extern time_t program_start;
 extern int nagios_pid;
 extern int daemon_mode;
@@ -97,7 +94,6 @@ extern char           *global_host_event_handler;
 extern char           *global_service_event_handler;
 
 extern check_stats    check_statistics[MAX_CHECK_STATS_TYPES];
-#endif
 
 
 char *xsddefault_status_log=NULL;
@@ -137,10 +133,8 @@ int xsddefault_grab_config_info(char *config_file){
 		if(input[0]=='#' || input[0]=='\x0')
 			continue;
 
-#ifdef NSCORE
 		/* core reads variables directly from the main config file */
 		xsddefault_grab_config_directives(input);
-#endif
 	        }
 
 	/* free memory and close the file */
@@ -159,12 +153,10 @@ int xsddefault_grab_config_info(char *config_file){
 	if(xsddefault_temp_file==NULL)
 		return ERROR;
 
-#ifdef NSCORE
 	/* save the status file macro */
 	my_free(macro_x[MACRO_STATUSDATAFILE]);
 	if((macro_x[MACRO_STATUSDATAFILE]=(char *)strdup(xsddefault_status_log)))
 		strip(macro_x[MACRO_STATUSDATAFILE]);
-#endif
 
 	return OK;
         }
@@ -208,8 +200,6 @@ int xsddefault_grab_config_directives(char *input){
         }
 
 
-
-#ifdef NSCORE
 
 /******************************************************************/
 /********************* INIT/CLEANUP FUNCTIONS *********************/
@@ -284,9 +274,7 @@ int xsddefault_save_status_data(void){
 	if((fd=mkstemp(temp_file))==-1){
 
 		/* log an error */
-#ifdef NSCORE
 		logit(NSLOG_RUNTIME_ERROR,TRUE,"Error: Unable to create temp file for writing status data!\n");
-#endif
 
 		/* free memory */
 		my_free(temp_file);
@@ -300,9 +288,7 @@ int xsddefault_save_status_data(void){
 		unlink(temp_file);
 
 		/* log an error */
-#ifdef NSCORE
 		logit(NSLOG_RUNTIME_ERROR,TRUE,"Error: Unable to open temp file '%s' for writing status data!\n",temp_file);
-#endif
 
 		/* free memory */
 		my_free(temp_file);
@@ -627,9 +613,7 @@ int xsddefault_save_status_data(void){
 		/* move the temp file to the status log (overwrite the old status log) */
 		if(my_rename(temp_file,xsddefault_status_log)){
 			unlink(temp_file);
-#ifdef NSCORE
 			logit(NSLOG_RUNTIME_ERROR,TRUE,"Error: Unable to update status data file '%s': %s",xsddefault_status_log,strerror(errno));
-#endif
 			result=ERROR;
 			}
 		}
@@ -649,5 +633,3 @@ int xsddefault_save_status_data(void){
 
 	return result;
         }
-
-#endif

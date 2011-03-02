@@ -782,7 +782,6 @@ int xodtemplate_grab_config_info(char *);                   /* grabs variables f
 int xodtemplate_process_config_file(char *,int);            /* process data in a specific config file */
 int xodtemplate_process_config_dir(char *,int);             /* process all files in a specific config directory */
 
-#ifdef NSCORE
 char *xodtemplate_config_file_name(int);                    /* returns the name of a numbered config file */
 
 xodtemplate_memberlist *xodtemplate_expand_contactgroups_and_contacts(char *,char *,int,int);
@@ -812,7 +811,6 @@ int xodtemplate_get_servicegroup_names(xodtemplate_memberlist **,xodtemplate_mem
 int xodtemplate_add_member_to_memberlist(xodtemplate_memberlist **,char *,char *);
 int xodtemplate_free_memberlist(xodtemplate_memberlist **);
 void xodtemplate_remove_memberlist_item(xodtemplate_memberlist *,xodtemplate_memberlist **);
-#endif
 
 
 int xodtemplate_begin_object_definition(char *,int,int,int);
@@ -833,7 +831,6 @@ xodtemplate_customvariablesmember *xodtemplate_add_custom_variable_to_object(xod
 int xodtemplate_register_objects(void);
 int xodtemplate_free_memory(void);
 
-#ifdef NSCORE
 int xodtemplate_duplicate_objects(void);
 int xodtemplate_duplicate_services(void);
 
@@ -919,7 +916,6 @@ xodtemplate_serviceextinfo *xodtemplate_find_serviceextinfo(char *);
 int xodtemplate_get_inherited_string(int *,char **,int *,char **);
 int xodtemplate_clean_additive_string(char **);
 int xodtemplate_clean_additive_strings(void);
-#endif
 
 int xodtemplate_register_timeperiod(xodtemplate_timeperiod *);
 int xodtemplate_get_time_ranges(char *,unsigned long *,unsigned long *);

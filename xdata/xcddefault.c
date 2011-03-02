@@ -31,24 +31,18 @@
 #include "../include/comments.h"
 #include "../include/macros.h"
 
-#ifdef NSCORE
 #include "../include/objects.h"
 #include "../include/nagios.h"
-#endif
 
 /**** IMPLEMENTATION SPECIFIC HEADER FILES ****/
 #include "xcddefault.h"
 
 
-#ifdef NSCORE
 extern unsigned long next_comment_id;
 extern comment *comment_list;
 extern char *macro_x[MACRO_X_COUNT];
-#endif
 
 
-
-#ifdef NSCORE
 
 /******************************************************************/
 /************ COMMENT INITIALIZATION/CLEANUP FUNCTIONS ************/
@@ -182,6 +176,3 @@ int xcddefault_save_comment_data(void){
 
 	return OK;
         }
-
-#endif
-

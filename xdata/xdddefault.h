@@ -30,7 +30,6 @@
 #define XDDDEFAULT_HOST_DATA        2
 #define XDDDEFAULT_SERVICE_DATA     3
 
-#ifdef NSCORE
 int xdddefault_initialize_downtime_data(char *);
 int xdddefault_validate_downtime_data(void);
 int xdddefault_cleanup_downtime_data(char *);
@@ -42,6 +41,5 @@ int xdddefault_add_new_service_downtime(char *,char *,time_t,char *,char *,time_
 int xdddefault_delete_host_downtime(unsigned long);
 int xdddefault_delete_service_downtime(unsigned long);
 int xdddefault_delete_downtime(int,unsigned long);
-#endif
 
 #endif

@@ -31,26 +31,18 @@
 #include "../include/downtime.h"
 #include "../include/macros.h"
 
-#ifdef NSCORE
 #include "../include/objects.h"
 #include "../include/nagios.h"
-#endif
 
 /**** IMPLEMENTATION SPECIFIC HEADER FILES ****/
 #include "xdddefault.h"
 
 
 
-#ifdef NSCORE
 extern unsigned long next_downtime_id;
 extern scheduled_downtime *scheduled_downtime_list;
 extern char *macro_x[MACRO_X_COUNT];
-#endif
 
-
-
-
-#ifdef NSCORE
 
 
 /******************************************************************/
@@ -254,7 +246,3 @@ int xdddefault_save_downtime_data(void){
 
 	return OK;
         }
-
-#endif
-
-
