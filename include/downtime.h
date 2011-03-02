@@ -48,18 +48,15 @@ typedef struct scheduled_downtime_struct{
 	unsigned long downtime_id;
 	char *author;
 	char *comment;
-#ifdef NSCORE
 	unsigned long comment_id;
 	int is_in_effect;
 	int start_flex_downtime;
 	int incremented_pending_downtime;
-#endif
 	struct scheduled_downtime_struct *next;
 	}scheduled_downtime;
 
 
 
-#ifdef NSCORE
 int initialize_downtime_data(char *);                                /* initializes scheduled downtime data */
 int cleanup_downtime_data(char *);                                   /* cleans up scheduled downtime data */
 
@@ -82,7 +79,6 @@ int check_pending_flex_host_downtime(host *);
 int check_pending_flex_service_downtime(service *);
 
 int check_for_expired_downtime(void);
-#endif
 
 int add_host_downtime(char *,time_t,char *,char *,time_t,time_t,int,unsigned long,unsigned long,unsigned long);
 int add_service_downtime(char *,char *,time_t,char *,char *,time_t,time_t,int,unsigned long,unsigned long,unsigned long);

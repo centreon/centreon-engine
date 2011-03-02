@@ -84,7 +84,6 @@ typedef struct comment_struct{
         }comment;
 
 
-#ifdef NSCORE
 int initialize_comment_data(char *);                                /* initializes comment data */
 int cleanup_comment_data(char *);                                   /* cleans up comment data */
 int add_new_comment(int,int,char *,char *,time_t,char *,char *,int,int,int,time_t,unsigned long *);       /* adds a new host or service comment */
@@ -100,7 +99,6 @@ int delete_all_service_comments(char *,char *);                     /* deletes a
 int delete_service_acknowledgement_comments(service *);             /* deletes all non-persistent ack comments for a specific service */
 
 int check_for_expired_comment(unsigned long);                       /* expires a comment */
-#endif
 
 comment *find_comment(unsigned long,int);                             /* finds a specific comment */
 comment *find_service_comment(unsigned long);                         /* finds a specific service comment */

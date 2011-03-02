@@ -251,13 +251,11 @@ int grab_standard_contactgroup_macro(int,contactgroup *,char **);
 int grab_custom_object_macro(char *,customvariablesmember *,char **);
 
 
-#ifdef NSCORE
 int set_all_macro_environment_vars(int);
 int set_macrox_environment_vars(int);
 int set_argv_macro_environment_vars(int);
 int set_custom_macro_environment_vars(int);
 int set_contact_address_environment_vars(int);
 int set_macro_environment_var(char *,char *,int);
-#endif
 
 #endif

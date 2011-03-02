@@ -30,13 +30,11 @@
 
 
 /* daemon is thread safe */
-#ifdef NSCORE
 #ifndef _REENTRANT
 #define _REENTRANT
 #endif
 #ifndef _THREAD_SAFE
 #define _THREAD_SAFE
-#endif
 #endif
 
 /* Experimental performance tweaks - use with caution */
