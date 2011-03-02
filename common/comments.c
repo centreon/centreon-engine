@@ -33,19 +33,14 @@
 #include "../xdata/xcddefault.h"
 #endif
 
-#ifdef NSCORE
 #include "../include/nagios.h"
 #include "../include/broker.h"
-#endif
 
 comment     *comment_list=NULL;
 int	    defer_comment_sorting = 0;
 comment     **comment_hashlist=NULL;
 
 
-
-
-#ifdef NSCORE
 
 /******************************************************************/
 /**************** INITIALIZATION/CLEANUP FUNCTIONS ****************/
@@ -361,10 +356,6 @@ int check_for_expired_comment(unsigned long comment_id){
         }
 
 
-#endif
-
-
-
 
 
 /******************************************************************/
@@ -528,11 +519,9 @@ int add_comment(int comment_type, int entry_type, char *host_name, char *svc_des
 			}
 		}
 
-#ifdef NSCORE
 #ifdef USE_EVENT_BROKER
 	/* send data to event broker */
 	broker_comment_data(NEBTYPE_COMMENT_LOAD,NEBFLAG_NONE,NEBATTR_NONE,comment_type,entry_type,host_name,svc_description,entry_time,author,comment_data,persistent,source,expires,expire_time,comment_id,NULL);
-#endif
 #endif
 
 	return OK;

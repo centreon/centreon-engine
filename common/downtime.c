@@ -35,22 +35,16 @@
 #include "../xdata/xdddefault.h"
 #endif
 
-#ifdef NSCORE
 #include "../include/nagios.h"
 #include "../include/broker.h"
-#endif
 
 scheduled_downtime *scheduled_downtime_list=NULL;
 int		   defer_downtime_sorting = 0;
 
-#ifdef NSCORE
 extern timed_event *event_list_high;
 extern timed_event *event_list_high_tail;
-#endif
 
 
-
-#ifdef NSCORE
 
 /******************************************************************/
 /**************** INITIALIZATION/CLEANUP FUNCTIONS ****************/
@@ -831,9 +825,6 @@ int delete_service_downtime(unsigned long downtime_id){
 	return result;
         }
 
-#endif
-
-
 
 
 
@@ -920,12 +911,10 @@ int add_downtime(int downtime_type, char *host_name, char *svc_description, time
 	new_downtime->triggered_by=triggered_by;
 	new_downtime->duration=duration;
 	new_downtime->downtime_id=downtime_id;
-#ifdef NSCORE
 	new_downtime->comment_id=0;
 	new_downtime->is_in_effect=FALSE;
 	new_downtime->start_flex_downtime=FALSE;
 	new_downtime->incremented_pending_downtime=FALSE;
-#endif
 
 	if(defer_downtime_sorting){
 		new_downtime->next=scheduled_downtime_list;
@@ -955,11 +944,9 @@ int add_downtime(int downtime_type, char *host_name, char *svc_description, time
 			last_downtime->next=new_downtime;
 			}
 		}
-#ifdef NSCORE
 #ifdef USE_EVENT_BROKER
 	/* send data to event broker */
 	broker_downtime_data(NEBTYPE_DOWNTIME_LOAD,NEBFLAG_NONE,NEBATTR_NONE,downtime_type,host_name,svc_description,entry_time,author,comment_data,start_time,end_time,fixed,triggered_by,duration,downtime_id,NULL);
-#endif
 #endif
 
 	return OK;

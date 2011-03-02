@@ -29,10 +29,8 @@
 #include "../include/objects.h"
 #include "../include/statusdata.h"
 
-#ifdef NSCORE
 #include "../include/nagios.h"
 #include "../include/broker.h"
-#endif
 
 /**** IMPLEMENTATION SPECIFIC HEADER FILES ****/
 
@@ -41,11 +39,8 @@
 #endif
 
 
-#ifdef NSCORE
 extern int      aggregate_status_updates;
-#endif
 
-#ifdef NSCORE
 
 /******************************************************************/
 /****************** TOP-LEVEL OUTPUT FUNCTIONS ********************/
@@ -181,4 +176,3 @@ int update_contact_status(contact *cntct,int aggregated_dump){
 
 	return OK;
         }
-#endif

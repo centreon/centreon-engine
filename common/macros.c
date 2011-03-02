@@ -28,16 +28,10 @@
 #include "../include/objects.h"
 #include "../include/statusdata.h"
 #include "../include/comments.h"
-#ifdef NSCORE
 #include "../include/nagios.h"
-#else
-#include "../include/cgiutils.h"
-#endif
 
-#ifdef NSCORE
 extern int      use_large_installation_tweaks;
 extern int      enable_environment_macros;
-#endif
 
 extern char     *illegal_output_chars;
 
@@ -93,9 +87,7 @@ int process_macros(char *input_buffer, char **output_buffer, int options){
 	int macro_options=0;
 
 
-#ifdef NSCORE
 	log_debug_info(DEBUGL_FUNCTIONS,0,"process_macros()\n");
-#endif
 
 	if(output_buffer==NULL)
 		return ERROR;
@@ -107,10 +99,8 @@ int process_macros(char *input_buffer, char **output_buffer, int options){
 
 	in_macro=FALSE;
 
-#ifdef NSCORE
 	log_debug_info(DEBUGL_MACROS,1,"**** BEGIN MACRO PROCESSING ***********\n");
 	log_debug_info(DEBUGL_MACROS,1,"Processing: '%s'\n",input_buffer);
-#endif
 
 	/* use a duplicate of original buffer, so we don't modify the original */
 	save_buffer=buf_ptr=(input_buffer?strdup(input_buffer):NULL);
@@ -129,9 +119,7 @@ int process_macros(char *input_buffer, char **output_buffer, int options){
 		else
 			buf_ptr=NULL;
 
-#ifdef NSCORE
 		log_debug_info(DEBUGL_MACROS,2,"  Processing part: '%s'\n",temp_buffer);
-#endif
 
 		selected_macro=NULL;
 		found_macro_x=FALSE;
@@ -144,9 +132,7 @@ int process_macros(char *input_buffer, char **output_buffer, int options){
 			*output_buffer=(char *)realloc(*output_buffer,strlen(*output_buffer)+strlen(temp_buffer)+1);
 			strcat(*output_buffer,temp_buffer);
 
-#ifdef NSCORE
 			log_debug_info(DEBUGL_MACROS,2,"  Not currently in macro.  Running output (%zd): '%s'\n",strlen(*output_buffer),*output_buffer);
-#endif
 
 			in_macro=TRUE;
 			}
@@ -159,15 +145,11 @@ int process_macros(char *input_buffer, char **output_buffer, int options){
 
 			/* grab the macro value */
 			result=grab_macro_value(temp_buffer,&selected_macro,&clean_options,&free_macro);
-#ifdef NSCORE
 			log_debug_info(DEBUGL_MACROS,2,"  Processed '%s', Clean Options: %d, Free: %d\n",temp_buffer,clean_options,free_macro);
-#endif
 
 			/* an error occurred - we couldn't parse the macro, so continue on */
 			if(result==ERROR){
-#ifdef NSCORE
 				log_debug_info(DEBUGL_MACROS,0," WARNING: An error occurred processing macro '%s'!\n",temp_buffer);
-#endif
 				if(free_macro==TRUE)
 					my_free(selected_macro);
 				}
@@ -179,9 +161,7 @@ int process_macros(char *input_buffer, char **output_buffer, int options){
 			/* an escaped $ is done by specifying two $$ next to each other */
 			else if(!strcmp(temp_buffer,"")){
 
-#ifdef NSCORE
 				log_debug_info(DEBUGL_MACROS,2,"  Escaped $.  Running output (%zd): '%s'\n",strlen(*output_buffer),*output_buffer);
-#endif
 
 				*output_buffer=(char *)realloc(*output_buffer,strlen(*output_buffer)+2);
 				strcat(*output_buffer,"$");
@@ -190,9 +170,7 @@ int process_macros(char *input_buffer, char **output_buffer, int options){
 			/* a non-macro, just some user-defined string between two $s */
 			else{
 
-#ifdef NSCORE
 				log_debug_info(DEBUGL_MACROS,2,"  Non-macro.  Running output (%zd): '%s'\n",strlen(*output_buffer),*output_buffer);
-#endif
 
 				/* add the plain text to the end of the already processed buffer */
 				*output_buffer=(char *)realloc(*output_buffer,strlen(*output_buffer)+strlen(temp_buffer)+3);
@@ -204,16 +182,12 @@ int process_macros(char *input_buffer, char **output_buffer, int options){
 			/* insert macro */
 			if(selected_macro!=NULL){
 
-#ifdef NSCORE
 				log_debug_info(DEBUGL_MACROS,2,"  Processed '%s', Clean Options: %d, Free: %d\n",temp_buffer,clean_options,free_macro);
-#endif
 
 				/* include any cleaning options passed back to us */
 				macro_options=(options | clean_options);
 
-#ifdef NSCORE
 				log_debug_info(DEBUGL_MACROS,2,"  Cleaning options: global=%d, local=%d, effective=%d\n",options,clean_options,macro_options);
-#endif
 
 				/* URL encode the macro if requested - this allocates new memory */
 				if(macro_options & URL_ENCODE_MACRO_CHARS){
@@ -233,9 +207,7 @@ int process_macros(char *input_buffer, char **output_buffer, int options){
 						*output_buffer=(char *)realloc(*output_buffer,strlen(*output_buffer)+strlen(cleaned_macro)+1);
 						strcat(*output_buffer,cleaned_macro);
 
-#ifdef NSCORE
 						log_debug_info(DEBUGL_MACROS,2,"  Cleaned macro.  Running output (%zd): '%s'\n",strlen(*output_buffer),*output_buffer);
-#endif
 						}
 					}
 
@@ -246,9 +218,7 @@ int process_macros(char *input_buffer, char **output_buffer, int options){
 						*output_buffer=(char *)realloc(*output_buffer,strlen(*output_buffer)+strlen(selected_macro)+1);
 						strcat(*output_buffer,selected_macro);
 
-#ifdef NSCORE
 						log_debug_info(DEBUGL_MACROS,2,"  Uncleaned macro.  Running output (%zd): '%s'\n",strlen(*output_buffer),*output_buffer);
-#endif
 						}
 					}
 
@@ -256,9 +226,7 @@ int process_macros(char *input_buffer, char **output_buffer, int options){
 				if(free_macro==TRUE)
 					my_free(selected_macro);
 
-#ifdef NSCORE
 				log_debug_info(DEBUGL_MACROS,2,"  Just finished macro.  Running output (%zd): '%s'\n",strlen(*output_buffer),*output_buffer);
-#endif
 				}
 
 			in_macro=FALSE;
@@ -268,10 +236,8 @@ int process_macros(char *input_buffer, char **output_buffer, int options){
 	/* free copy of input buffer */
 	my_free(save_buffer);
 
-#ifdef NSCORE
 	log_debug_info(DEBUGL_MACROS,1,"  Done.  Final output: '%s'\n",*output_buffer);
 	log_debug_info(DEBUGL_MACROS,1,"**** END MACRO PROCESSING *************\n");
-#endif
 
 	return OK;
 	}
@@ -296,11 +262,9 @@ int grab_host_macros(host *hst){
 	if(hst==NULL)
 		return ERROR;
 
-#ifdef NSCORE
 	/* save pointer to host's first/primary hostgroup */
 	if(hst->hostgroups_ptr)
 		macro_hostgroup_ptr=(hostgroup *)hst->hostgroups_ptr->object_ptr;
-#endif
 
 	return OK;
         }
@@ -336,11 +300,9 @@ int grab_service_macros(service *svc){
 	if(svc==NULL)
 		return ERROR;
 
-#ifdef NSCORE
 	/* save first/primary servicegroup pointer for later */
 	if(svc->servicegroups_ptr)
 		macro_servicegroup_ptr=(servicegroup *)svc->servicegroups_ptr->object_ptr;
-#endif
 
 	return OK;
         }
@@ -378,11 +340,9 @@ int grab_contact_macros(contact *cntct){
 	if(cntct==NULL)
 		return ERROR;
 
-#ifdef NSCORE
 	/* save pointer to first/primary contactgroup for later */
 	if(cntct->contactgroups_ptr)
 		macro_contactgroup_ptr=(contactgroup *)cntct->contactgroups_ptr->object_ptr;
-#endif
 
 	return OK;
 	}
@@ -473,9 +433,7 @@ int grab_macro_value(char *macro_buffer, char **output, int *clean_options, int 
 
 		if(!strcmp(macro_name,macro_x_names[x])){
 
-#ifdef NSCORE
 			log_debug_info(DEBUGL_MACROS,2,"  macro_x[%d] (%s) match.\n",x,macro_x_names[x]);
-#endif
 
 			/* get the macro value */
 			result=grab_macrox_value(x,arg[0],arg[1],output,free_macro);
@@ -484,16 +442,12 @@ int grab_macro_value(char *macro_buffer, char **output, int *clean_options, int 
 			/* host/service output/perfdata and author/comment macros should get cleaned */
 			if((x>=16 && x<=19) ||(x>=49 && x<=52) || (x>=99 && x<=100) || (x>=124 && x<=127)){
 				*clean_options|=(STRIP_ILLEGAL_MACRO_CHARS|ESCAPE_MACRO_CHARS);
-#ifdef NSCORE
 				log_debug_info(DEBUGL_MACROS,2,"  New clean options: %d\n",*clean_options);
-#endif
 				}
 			/* url macros should get cleaned */
 			if((x>=125 && x<=126) ||(x>=128 && x<=129) || (x>=77 && x<=78) || (x>=74 && x<=75)){
 				*clean_options|=URL_ENCODE_MACRO_CHARS;
-#ifdef NSCORE
 				log_debug_info(DEBUGL_MACROS,2,"  New clean options: %d\n",*clean_options);
-#endif
 				}
 
 
@@ -573,12 +527,10 @@ int grab_macro_value(char *macro_buffer, char **output, int *clean_options, int 
 				/* concatenate macro values for all contactgroup members */
 				for(temp_contactsmember=temp_contactgroup->members;temp_contactsmember!=NULL;temp_contactsmember=temp_contactsmember->next){
 
-#ifdef NSCORE
 					if((temp_contact=temp_contactsmember->contact_ptr)==NULL)
 						continue;
 					if((temp_contact=find_contact(temp_contactsmember->contact_name))==NULL)
 						continue;
-#endif
 
 					/* get the macro value for this contact */
 					grab_contact_address_macro(x,temp_contact,&temp_buffer);
@@ -630,9 +582,7 @@ int grab_macro_value(char *macro_buffer, char **output, int *clean_options, int 
 
 	/* no macro matched... */
 	else{
-#ifdef NSCORE
 		log_debug_info(DEBUGL_MACROS,0," WARNING: Could not find a macro matching '%s'!\n",macro_name);
-#endif
 		result=ERROR;
 		}
 	
@@ -658,7 +608,6 @@ int grab_macrox_value(int macro_type, char *arg1, char *arg2, char **output, int
 	int result=OK;
 	int delimiter_len=0;
 	int free_sub_macro=FALSE;
-#ifdef NSCORE
 	register int x;
 	int authorized=TRUE;
 	int problem=TRUE;
@@ -678,7 +627,6 @@ int grab_macrox_value(int macro_type, char *arg1, char *arg2, char **output, int
 	int services_critical_unhandled=0;
 	int service_problems=0;
 	int service_problems_unhandled=0;
-#endif
 
 
 	if(output==NULL || free_macro==NULL)
@@ -768,13 +716,8 @@ int grab_macrox_value(int macro_type, char *arg1, char *arg2, char **output, int
 			/* concatenate macro values for all hostgroup members */
 			for(temp_hostsmember=temp_hostgroup->members;temp_hostsmember!=NULL;temp_hostsmember=temp_hostsmember->next){
 
-#ifdef NSCORE
 				if((temp_host=temp_hostsmember->host_ptr)==NULL)
 					continue;
-#else
-				if((temp_host=find_host(temp_hostsmember->host_name))==NULL)
-					continue;
-#endif
 
 				/* get the macro value for this host */
 				grab_standard_host_macro(macro_type,temp_host,&temp_buffer,&free_sub_macro);
@@ -912,13 +855,8 @@ int grab_macrox_value(int macro_type, char *arg1, char *arg2, char **output, int
 				/* concatenate macro values for all servicegroup members */
 				for(temp_servicesmember=temp_servicegroup->members;temp_servicesmember!=NULL;temp_servicesmember=temp_servicesmember->next){
 
-#ifdef NSCORE
 					if((temp_service=temp_servicesmember->service_ptr)==NULL)
 						continue;
-#else
-					if((temp_service=find_service(temp_servicesmember->host_name,temp_servicesmember->service_description))==NULL)
-						continue;
-#endif
 
 					/* get the macro value for this service */
 					grab_standard_service_macro(macro_type,temp_service,&temp_buffer,&free_sub_macro);
@@ -1006,13 +944,8 @@ int grab_macrox_value(int macro_type, char *arg1, char *arg2, char **output, int
 			/* concatenate macro values for all contactgroup members */
 			for(temp_contactsmember=temp_contactgroup->members;temp_contactsmember!=NULL;temp_contactsmember=temp_contactsmember->next){
 
-#ifdef NSCORE
 				if((temp_contact=temp_contactsmember->contact_ptr)==NULL)
 					continue;
-#else
-				if((temp_contact=find_contact(temp_contactsmember->contact_name))==NULL)
-					continue;
-#endif
 
 				/* get the macro value for this contact */
 				grab_standard_contact_macro(macro_type,temp_contact,&temp_buffer);
@@ -1133,7 +1066,6 @@ int grab_macrox_value(int macro_type, char *arg1, char *arg2, char **output, int
 	case MACRO_TOTALSERVICEPROBLEMS:
 	case MACRO_TOTALSERVICEPROBLEMSUNHANDLED:
 
-#ifdef NSCORE
 		/* generate summary macros if needed */
 		if(macro_x[MACRO_TOTALHOSTSUP]==NULL){
 
@@ -1263,13 +1195,10 @@ int grab_macrox_value(int macro_type, char *arg1, char *arg2, char **output, int
 
 		/* tell caller to NOT free memory when done */
 		*free_macro=FALSE;
-#endif
 		break;
 
 	default:
-#ifdef NSCORE
 		log_debug_info(DEBUGL_MACROS,0,"UNHANDLED MACRO #%d! THIS IS A BUG!\n",macro_type);
-#endif
 		return ERROR;
 		break;
 		}
@@ -1327,13 +1256,8 @@ int grab_custom_macro_value(char *macro_name, char *arg1, char *arg2, char **out
 			/* concatenate macro values for all hostgroup members */
 			for(temp_hostsmember=temp_hostgroup->members;temp_hostsmember!=NULL;temp_hostsmember=temp_hostsmember->next){
 
-#ifdef NSCORE
 				if((temp_host=temp_hostsmember->host_ptr)==NULL)
 					continue;
-#else
-				if((temp_host=find_host(temp_hostsmember->host_name))==NULL)
-					continue;
-#endif
 
 				/* get the macro value for this host */
 				grab_custom_macro_value(macro_name,temp_host->name,NULL,&temp_buffer);
@@ -1391,13 +1315,8 @@ int grab_custom_macro_value(char *macro_name, char *arg1, char *arg2, char **out
 				/* concatenate macro values for all servicegroup members */
 				for(temp_servicesmember=temp_servicegroup->members;temp_servicesmember!=NULL;temp_servicesmember=temp_servicesmember->next){
 
-#ifdef NSCORE
 					if((temp_service=temp_servicesmember->service_ptr)==NULL)
 						continue;
-#else
-					if((temp_service=find_service(temp_servicesmember->host_name,temp_servicesmember->service_description))==NULL)
-						continue;
-#endif
 
 					/* get the macro value for this service */
 					grab_custom_macro_value(macro_name,temp_service->host_name,temp_service->description,&temp_buffer);
@@ -1451,13 +1370,8 @@ int grab_custom_macro_value(char *macro_name, char *arg1, char *arg2, char **out
 			/* concatenate macro values for all contactgroup members */
 			for(temp_contactsmember=temp_contactgroup->members;temp_contactsmember!=NULL;temp_contactsmember=temp_contactsmember->next){
 
-#ifdef NSCORE
 				if((temp_contact=temp_contactsmember->contact_ptr)==NULL)
 					continue;
-#else
-				if((temp_contact=find_contact(temp_contactsmember->contact_name))==NULL)
-					continue;
-#endif
 
 				/* get the macro value for this contact */
 				grab_custom_macro_value(macro_name,temp_contact->name,NULL,&temp_buffer);
@@ -1492,9 +1406,7 @@ int grab_datetime_macro(int macro_type, char *arg1, char *arg2, char **output){
 	time_t current_time=0L;
 	timeperiod *temp_timeperiod=NULL;
 	time_t test_time=0L;
-#ifdef NSCORE
 	time_t next_valid_time=0L;
-#endif
 
 	if(output==NULL)
 		return ERROR;
@@ -1558,7 +1470,6 @@ int grab_datetime_macro(int macro_type, char *arg1, char *arg2, char **output){
 		asprintf(output,"%lu",(unsigned long)current_time);
 		break;
 
-#ifdef NSCORE
 	case MACRO_ISVALIDTIME:
 		asprintf(output,"%d",(check_time_against_period(test_time,temp_timeperiod)==OK)?1:0);
 		break;
@@ -1569,7 +1480,6 @@ int grab_datetime_macro(int macro_type, char *arg1, char *arg2, char **output){
 			next_valid_time=(time_t)0L;
 		asprintf(output,"%lu",(unsigned long)next_valid_time);
 		break;
-#endif
 
 	default:
 		return ERROR;
@@ -1584,7 +1494,6 @@ int grab_datetime_macro(int macro_type, char *arg1, char *arg2, char **output){
 /* calculates a host macro */
 int grab_standard_host_macro(int macro_type, host *temp_host, char **output, int *free_macro){
 	char *temp_buffer=NULL;
-#ifdef NSCORE
 	hostgroup *temp_hostgroup=NULL;
 	servicesmember *temp_servicesmember=NULL;
 	service *temp_service=NULL;
@@ -1602,7 +1511,6 @@ int grab_standard_host_macro(int macro_type, host *temp_host, char **output, int
 	int total_host_services_warning=0;
 	int total_host_services_unknown=0;
 	int total_host_services_critical=0;
-#endif
 
 	if(temp_host==NULL || output==NULL || free_macro==NULL)
 		return ERROR;
@@ -1626,7 +1534,6 @@ int grab_standard_host_macro(int macro_type, host *temp_host, char **output, int
 	case MACRO_HOSTADDRESS:
 		*output=(char *)strdup(temp_host->address);
 		break;
-#ifdef NSCORE
 	case MACRO_HOSTSTATE:
 		if(temp_host->current_state==HOST_DOWN)
 			*output=(char *)strdup("DOWN");
@@ -1667,12 +1574,10 @@ int grab_standard_host_macro(int macro_type, host *temp_host, char **output, int
 		if(temp_host->perf_data)
 			*output=(char *)strdup(temp_host->perf_data);
 		break;
-#endif
 	case MACRO_HOSTCHECKCOMMAND:
 		if(temp_host->host_check_command)
 			*output=(char *)strdup(temp_host->host_check_command);
 		break;
-#ifdef NSCORE
 	case MACRO_HOSTATTEMPT:
 		asprintf(output,"%d",temp_host->current_attempt);
 		break;
@@ -1743,7 +1648,6 @@ int grab_standard_host_macro(int macro_type, host *temp_host, char **output, int
 	case MACRO_LASTHOSTPROBLEMID:
 		asprintf(output,"%lu",temp_host->last_problem_id);
 		break;
-#endif
 	case MACRO_HOSTACTIONURL:
 		if(temp_host->action_url)
 			*output=(char *)strdup(temp_host->action_url);
@@ -1756,7 +1660,6 @@ int grab_standard_host_macro(int macro_type, host *temp_host, char **output, int
 		if(temp_host->notes)
 			*output=(char *)strdup(temp_host->notes);
 		break;
-#ifdef NSCORE
 	case MACRO_HOSTGROUPNAMES:
 		/* find all hostgroups this host is associated with */
 		for(temp_objectlist=temp_host->hostgroups_ptr;temp_objectlist!=NULL;temp_objectlist=temp_objectlist->next){
@@ -1825,7 +1728,6 @@ int grab_standard_host_macro(int macro_type, host *temp_host, char **output, int
 		/* tell caller to NOT free memory when done */
 		*free_macro=FALSE;
 		break;
-#endif
 		/***************/
 		/* MISC MACROS */
 		/***************/
@@ -1840,9 +1742,7 @@ int grab_standard_host_macro(int macro_type, host *temp_host, char **output, int
 		break;
 
 	default:
-#ifdef NSCORE
 		log_debug_info(DEBUGL_MACROS,0,"UNHANDLED HOST MACRO #%d! THIS IS A BUG!\n",macro_type);
-#endif
 		return ERROR;
 		break;
 		}
@@ -1913,9 +1813,7 @@ int grab_standard_hostgroup_macro(int macro_type, hostgroup *temp_hostgroup, cha
 			*output=(char *)strdup(temp_hostgroup->notes);
 		break;
 	default:
-#ifdef NSCORE
 		log_debug_info(DEBUGL_MACROS,0,"UNHANDLED HOSTGROUP MACRO #%d! THIS IS A BUG!\n",macro_type);
-#endif
 		return ERROR;
 		break;
 		}
@@ -1946,7 +1844,6 @@ int grab_standard_hostgroup_macro(int macro_type, hostgroup *temp_hostgroup, cha
 /* computes a service macro */
 int grab_standard_service_macro(int macro_type, service *temp_service, char **output, int *free_macro){
 	char *temp_buffer=NULL;
-#ifdef NSCORE
 	servicegroup *temp_servicegroup=NULL;
 	objectlist *temp_objectlist=NULL;
 	time_t current_time=0L;
@@ -1957,7 +1854,6 @@ int grab_standard_service_macro(int macro_type, service *temp_service, char **ou
 	int seconds=0;
 	char *buf1=NULL;
 	char *buf2=NULL;
-#endif
 
 	if(temp_service==NULL || output==NULL)
 		return ERROR;
@@ -1974,7 +1870,6 @@ int grab_standard_service_macro(int macro_type, service *temp_service, char **ou
 		if(temp_service->display_name)
 			*output=(char *)strdup(temp_service->display_name);
 		break;
-#ifdef NSCORE
 	case MACRO_SERVICEOUTPUT:
 		if(temp_service->plugin_output)
 			*output=(char *)strdup(temp_service->plugin_output);
@@ -1987,12 +1882,10 @@ int grab_standard_service_macro(int macro_type, service *temp_service, char **ou
 		if(temp_service->perf_data)
 			*output=(char *)strdup(temp_service->perf_data);
 		break;
-#endif
 	case MACRO_SERVICECHECKCOMMAND:
 		if(temp_service->service_check_command)
 			*output=(char *)strdup(temp_service->service_check_command);
 		break;
-#ifdef NSCORE
 	case MACRO_SERVICECHECKTYPE:
 		*output=(char *)strdup((temp_service->check_type==SERVICE_CHECK_PASSIVE)?"PASSIVE":"ACTIVE");
 		break;
@@ -2025,11 +1918,9 @@ int grab_standard_service_macro(int macro_type, service *temp_service, char **ou
 	case MACRO_LASTSERVICESTATEID:
 		asprintf(output,"%d",temp_service->last_state);
 		break;
-#endif
 	case MACRO_SERVICEISVOLATILE:
 		asprintf(output,"%d",temp_service->is_volatile);
 		break;
-#ifdef NSCORE
 	case MACRO_SERVICEATTEMPT:
 		asprintf(output,"%d",temp_service->current_attempt);
 		break;
@@ -2106,7 +1997,6 @@ int grab_standard_service_macro(int macro_type, service *temp_service, char **ou
 	case MACRO_LASTSERVICEPROBLEMID:
 		asprintf(output,"%lu",temp_service->last_problem_id);
 		break;
-#endif
 	case MACRO_SERVICEACTIONURL:
 		if(temp_service->action_url)
 			*output=(char *)strdup(temp_service->action_url);
@@ -2119,7 +2009,6 @@ int grab_standard_service_macro(int macro_type, service *temp_service, char **ou
 		if(temp_service->notes)
 			*output=(char *)strdup(temp_service->notes);
 		break;
-#ifdef NSCORE
 	case MACRO_SERVICEGROUPNAMES:
 		/* find all servicegroups this service is associated with */
 		for(temp_objectlist=temp_service->servicegroups_ptr;temp_objectlist!=NULL;temp_objectlist=temp_objectlist->next){
@@ -2136,7 +2025,6 @@ int grab_standard_service_macro(int macro_type, service *temp_service, char **ou
 			my_free(buf2);
 			}
 		break;
-#endif
 		/***************/
 		/* MISC MACROS */
 		/***************/
@@ -2151,9 +2039,7 @@ int grab_standard_service_macro(int macro_type, service *temp_service, char **ou
 		break;
 
 	default:
-#ifdef NSCORE
 		log_debug_info(DEBUGL_MACROS,0,"UNHANDLED SERVICE MACRO #%d! THIS IS A BUG!\n",macro_type);
-#endif
 		return ERROR;
 		break;
 		}
@@ -2229,9 +2115,7 @@ int grab_standard_servicegroup_macro(int macro_type, servicegroup *temp_serviceg
 			*output=(char *)strdup(temp_servicegroup->notes);
 		break;
 	default:
-#ifdef NSCORE
 		log_debug_info(DEBUGL_MACROS,0,"UNHANDLED SERVICEGROUP MACRO #%d! THIS IS A BUG!\n",macro_type);
-#endif
 		return ERROR;
 		break;
 		}
@@ -2261,12 +2145,10 @@ int grab_standard_servicegroup_macro(int macro_type, servicegroup *temp_serviceg
 
 /* computes a contact macro */
 int grab_standard_contact_macro(int macro_type, contact *temp_contact, char **output){
-#ifdef NSCORE
 	contactgroup *temp_contactgroup=NULL;
 	objectlist *temp_objectlist=NULL;
 	char *buf1=NULL;
 	char *buf2=NULL;
-#endif
 
 	if(temp_contact==NULL || output==NULL)
 		return ERROR;
@@ -2287,7 +2169,6 @@ int grab_standard_contact_macro(int macro_type, contact *temp_contact, char **ou
 		if(temp_contact->pager)
 			*output=(char *)strdup(temp_contact->pager);
 		break;
-#ifdef NSCORE
 	case MACRO_CONTACTGROUPNAMES:
 		/* get the contactgroup names */
 		/* find all contactgroups this contact is a member of */
@@ -2305,11 +2186,8 @@ int grab_standard_contact_macro(int macro_type, contact *temp_contact, char **ou
 			my_free(buf2);
 			}
 		break;
-#endif
 	default:
-#ifdef NSCORE
 		log_debug_info(DEBUGL_MACROS,0,"UNHANDLED CONTACT MACRO #%d! THIS IS A BUG!\n",macro_type);
-#endif
 		return ERROR;
 		break;
 		}
@@ -2367,9 +2245,7 @@ int grab_standard_contactgroup_macro(int macro_type, contactgroup *temp_contactg
 			}
 		break;
 	default:
-#ifdef NSCORE
 		log_debug_info(DEBUGL_MACROS,0,"UNHANDLED CONTACTGROUP MACRO #%d! THIS IS A BUG!\n",macro_type);
-#endif
 		return ERROR;
 		break;
 		}
@@ -3122,8 +2998,6 @@ int clear_summary_macros(void){
 /****************** ENVIRONMENT MACRO FUNCTIONS *******************/
 /******************************************************************/
 
-#ifdef NSCORE
-
 /* sets or unsets all macro environment variables */
 int set_all_macro_environment_vars(int set){
 
@@ -3284,7 +3158,3 @@ int set_macro_environment_var(char *name, char *value, int set){
 
 	return OK;
         }
-
-#endif
-
-
