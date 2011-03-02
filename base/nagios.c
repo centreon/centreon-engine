@@ -62,7 +62,6 @@ char            *command_file=NULL;
 char            *temp_file=NULL;
 char            *temp_path=NULL;
 char            *check_result_path=NULL;
-char            *lock_file=NULL;
 char            *log_archive_path=NULL;
 char            *p1_file=NULL;    /**** EMBEDDED PERL ****/
 char            *auth_file=NULL;  /**** EMBEDDED PERL INTERPRETER AUTH FILE ****/
@@ -186,9 +185,6 @@ int             test_scheduling=FALSE;
 int             precache_objects=FALSE;
 int             use_precached_objects=FALSE;
 
-int             daemon_mode=FALSE;
-int             daemon_dumps_core=TRUE;
-
 int             max_parallel_service_checks=DEFAULT_MAX_PARALLEL_SERVICE_CHECKS;
 int             currently_running_service_checks=0;
 int             currently_running_host_checks=0;
@@ -298,7 +294,6 @@ int main(int argc, char **argv){
 		{"version",no_argument,0,'V'},
 		{"license",no_argument,0,'V'},
 		{"verify-config",no_argument,0,'v'},
-		{"daemon",no_argument,0,'d'},
 		{"test-scheduling",no_argument,0,'s'},
 		{"dont-verify-objects",no_argument,0,'o'},
 		{"dont-verify-paths",no_argument,0,'x'},
@@ -317,9 +312,9 @@ int main(int argc, char **argv){
 	while(1){
 
 #ifdef HAVE_GETOPT_H
-		c=getopt_long(argc,argv,"+hVvdsoxpu",long_options,&option_index);
+		c=getopt_long(argc,argv,"+hVvsoxpu",long_options,&option_index);
 #else
-		c=getopt(argc,argv,"+hVvdsoxpu");
+		c=getopt(argc,argv,"+hVvsoxpu");
 #endif
 
 		if(c==-1 || c==EOF)
@@ -342,10 +337,6 @@ int main(int argc, char **argv){
 
 		case 's': /* scheduling check */
 			test_scheduling=TRUE;
-			break;
-
-		case 'd': /* daemon mode */
-			daemon_mode=TRUE;
 			break;
 
 		case 'o': /* don't verify objects */
@@ -382,15 +373,6 @@ int main(int argc, char **argv){
 	mtrace();
 #endif
 
-	if(daemon_mode==FALSE){
-		printf("\nNagios Core %s\n",PROGRAM_VERSION);
-		printf("Copyright (c) 2009-2010 Nagios Core Development Team and Community Contributors\n");
-		printf("Copyright (c) 1999-2009 Ethan Galstad\n");
-		printf("Last Modified: %s\n",PROGRAM_MODIFICATION_DATE);
-		printf("License: GPL\n\n");
-		printf("Website: http://www.nagios.org\n");
-	        }
-
 	/* just display the license */
 	if(display_license==TRUE){
 
@@ -426,7 +408,6 @@ int main(int argc, char **argv){
 		printf("  -x, --dont-verify-paths      Don't check for circular object paths - USE WITH CAUTION!\n");
 		printf("  -p, --precache-objects       Precache object configuration - use with -v or -s options\n");
 		printf("  -u, --use-precached-objects  Use precached object config file\n");
-		printf("  -d, --daemon                 Starts Nagios in daemon mode, instead of as a foreground process\n");
 		printf("\n");
 		printf("Visit the Nagios website at http://www.nagios.org/ for bug fixes, new\n");
 		printf("releases, online documentation, FAQs, information on subscribing to\n");
@@ -739,31 +720,6 @@ int main(int argc, char **argv){
 			broker_program_state(NEBTYPE_PROCESS_START,NEBFLAG_NONE,NEBATTR_NONE,NULL);
 #endif
 
-			/* enter daemon mode (unless we're restarting...) */
-			if(daemon_mode==TRUE && sigrestart==FALSE){
-
-				result=daemon_init();
-
-				/* we had an error daemonizing, so bail... */
-				if(result==ERROR){
-					logit(NSLOG_PROCESS_INFO | NSLOG_RUNTIME_ERROR,TRUE,"Bailing out due to failure to daemonize. (PID=%d)",(int)getpid());
-
-#ifdef USE_EVENT_BROKER
-					/* send program data to broker */
-					broker_program_state(NEBTYPE_PROCESS_SHUTDOWN,NEBFLAG_PROCESS_INITIATED,NEBATTR_SHUTDOWN_ABNORMAL,NULL);
-#endif
-					cleanup();
-					exit(ERROR);
-					}
-
-				asprintf(&buffer,"Finished daemonizing... (New PID=%d)\n",(int)getpid());
-				write_to_all_logs(buffer,NSLOG_PROCESS_INFO);
-				my_free(buffer);
-
-				/* get new PID */
-				nagios_pid=(int)getpid();
-			        }
-
 			/* open the command file (named pipe) for reading */
 			result=open_command_file();
 			if(result!=OK){
@@ -829,13 +785,12 @@ int main(int argc, char **argv){
 			event_execution_loop();
 
 			/* 03/01/2007 EG Moved from sighandler() to prevent FUTEX locking problems under NPTL */
-			/* 03/21/2007 EG SIGSEGV signals are still logged in sighandler() so we don't loose them */
 			/* did we catch a signal? */
 			if(caught_signal==TRUE){
 
 				if(sig_id==SIGHUP)
 					asprintf(&buffer,"Caught SIGHUP, restarting...\n");
-				else if(sig_id!=SIGSEGV)
+				else
 					asprintf(&buffer,"Caught SIG%s, shutting down...\n",sigs[sig_id]);
 
 				write_to_all_logs(buffer,NSLOG_PROCESS_INFO);
@@ -880,10 +835,6 @@ int main(int argc, char **argv){
 
 			/* shutdown stuff... */
 			if(sigshutdown==TRUE){
-
-				/* make sure lock file has been removed - it may not have been if we received a shutdown command */
-				if(daemon_mode==TRUE)
-					unlink(lock_file);
 
 				/* log a shutdown message */
 				logit(NSLOG_PROCESS_INFO,TRUE,"Successfully shutdown... (PID=%d)\n",(int)getpid());

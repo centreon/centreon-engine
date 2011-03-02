@@ -51,7 +51,6 @@ extern char     *temp_file;
 extern char     *temp_path;
 extern char     *check_result_path;
 extern char     *check_result_path;
-extern char     *lock_file;
 extern char	*log_archive_path;
 extern char     *auth_file;
 extern char	*p1_file;
@@ -94,9 +93,6 @@ extern int      sigrestart;
 extern char     *sigs[35];
 extern int      caught_signal;
 extern int      sig_id;
-
-extern int      daemon_mode;
-extern int      daemon_dumps_core;
 
 extern int      nagios_pid;
 
@@ -1843,8 +1839,6 @@ void setup_sighandler(void){
 	signal(SIGQUIT,sighandler);
 	signal(SIGTERM,sighandler);
 	signal(SIGHUP,sighandler);
-	if(daemon_dumps_core==FALSE || daemon_mode==FALSE)
-		signal(SIGSEGV,sighandler);
 
 	return;
         }
@@ -1857,7 +1851,6 @@ void reset_sighandler(void){
 	signal(SIGQUIT,SIG_DFL);
 	signal(SIGTERM,SIG_DFL);
 	signal(SIGHUP,SIG_DFL);
-	signal(SIGSEGV,SIG_DFL);
 	signal(SIGPIPE,SIG_DFL);
 
 	return;
@@ -1868,11 +1861,6 @@ void reset_sighandler(void){
 void sighandler(int sig){
 	int x=0;
 
-	/* if shutdown is already true, we're in a signal trap loop! */
-	/* changed 09/07/06 to only exit on segfaults */
-	if(sigshutdown==TRUE && sig==SIGSEGV)
-		exit(ERROR);
-
 	caught_signal=TRUE;
 
 	if(sig<0)
@@ -1882,11 +1870,6 @@ void sighandler(int sig){
 	sig%=x;
 
 	sig_id=sig;
-
-	/* log errors about segfaults now, as we might not get a chance to later */
-	/* all other signals are logged at a later point in main() to prevent problems with NPTL */
-	if(sig==SIGSEGV)
-		logit(NSLOG_PROCESS_INFO,TRUE,"Caught SIG%s, shutting down...\n",sigs[sig]);
 
 	/* we received a SIGHUP, so restart... */
 	if(sig==SIGHUP)
@@ -1991,135 +1974,6 @@ void my_system_sighandler(int sig){
 	_exit(STATE_CRITICAL);
         }
 
-
-
-
-/******************************************************************/
-/************************ DAEMON FUNCTIONS ************************/
-/******************************************************************/
-
-int daemon_init(void){
-	pid_t pid=-1;
-	int pidno=0;
-	int lockfile=0;
-	int val=0;
-	char buf[256];
-	struct flock lock;
-	char *homedir=NULL;
-
-#ifdef RLIMIT_CORE
-	struct rlimit limit;
-#endif
-
-	/* change working directory. scuttle home if we're dumping core */
-	homedir=getenv("HOME");
-	if(daemon_dumps_core==TRUE && homedir!=NULL)
-		chdir(homedir);
-	else
-		chdir("/");
-
-	umask(S_IWGRP|S_IWOTH);
-
-	lockfile=open(lock_file,O_RDWR | O_CREAT, S_IWUSR | S_IRUSR | S_IRGRP | S_IROTH);
-
-	if(lockfile<0){
-		logit(NSLOG_RUNTIME_ERROR,TRUE,"Failed to obtain lock on file %s: %s\n", lock_file, strerror(errno));
-		logit(NSLOG_PROCESS_INFO | NSLOG_RUNTIME_ERROR,TRUE,"Bailing out due to errors encountered while attempting to daemonize... (PID=%d)",(int)getpid());
-
-		cleanup();
-		exit(ERROR);
-	        }
-
-	/* see if we can read the contents of the lockfile */
-	if((val=read(lockfile,buf,(size_t)10))<0){
-		logit(NSLOG_RUNTIME_ERROR,TRUE,"Lockfile exists but cannot be read");
-		cleanup();
-		exit(ERROR);
-	        }
-
-	/* we read something - check the PID */
-	if(val>0){
-		if((val=sscanf(buf,"%d",&pidno))<1){
-			logit(NSLOG_RUNTIME_ERROR,TRUE,"Lockfile '%s' does not contain a valid PID (%s)",lock_file,buf);
-			cleanup();
-			exit(ERROR);
-		        }
-	        }
-
-	/* check for SIGHUP */
-	if(val==1 && (pid=(pid_t)pidno)==getpid()){
-		close(lockfile);
-		return OK;
-	        }
-
-	/* exit on errors... */
-	if((pid=fork())<0)
-		return(ERROR);
-
-	/* parent process goes away.. */
-	else if((int)pid!=0)
-		exit(OK);
-
-	/* child continues... */
-
-	/* child becomes session leader... */
-	setsid();
-
-	/* place a file lock on the lock file */
-	lock.l_type=F_WRLCK;
-	lock.l_start=0;
-	lock.l_whence=SEEK_SET;
-	lock.l_len=0;
-	if(fcntl(lockfile,F_SETLK,&lock)<0){
-		if(errno==EACCES || errno==EAGAIN){
-			fcntl(lockfile,F_GETLK,&lock);
-			logit(NSLOG_RUNTIME_ERROR,TRUE,"Lockfile '%s' looks like its already held by another instance of Nagios (PID %d).  Bailing out...",lock_file,(int)lock.l_pid);
-		        }
-		else
-			logit(NSLOG_RUNTIME_ERROR,TRUE,"Cannot lock lockfile '%s': %s. Bailing out...",lock_file,strerror(errno));
-
-		cleanup();
-		exit(ERROR);
-	        }
-
-	/* prevent daemon from dumping a core file... */
-#ifdef RLIMIT_CORE
-	if(daemon_dumps_core==FALSE){
-		getrlimit(RLIMIT_CORE,&limit);
-		limit.rlim_cur=0;
-		setrlimit(RLIMIT_CORE,&limit);
-	        }
-#endif
-
-	/* write PID to lockfile... */
-	lseek(lockfile,0,SEEK_SET);
-	ftruncate(lockfile,0);
-	sprintf(buf,"%d\n",(int)getpid());
-	write(lockfile,buf,strlen(buf));
-
-	/* make sure lock file stays open while program is executing... */
-	val=fcntl(lockfile,F_GETFD,0);
-	val|=FD_CLOEXEC;
-	fcntl(lockfile,F_SETFD,val);
-
-        /* close existing stdin, stdout, stderr */
-	close(0);
-	close(1);
-	close(2);
-
-	/* THIS HAS TO BE DONE TO AVOID PROBLEMS WITH STDERR BEING REDIRECTED TO SERVICE MESSAGE PIPE! */
-	/* re-open stdin, stdout, stderr with known values */
-	open("/dev/null",O_RDONLY);
-	open("/dev/null",O_WRONLY);
-	open("/dev/null",O_WRONLY);
-
-#ifdef USE_EVENT_BROKER
-	/* send program data to broker */
-	broker_program_state(NEBTYPE_PROCESS_DAEMONIZE,NEBFLAG_NONE,NEBATTR_NONE,NULL);
-#endif
-
-	return OK;
-	}
 
 
 
@@ -4606,7 +4460,6 @@ void free_memory(void){
 	my_free(temp_path);
 	my_free(check_result_path);
 	my_free(command_file);
-	my_free(lock_file);
 	my_free(auth_file);
 	my_free(p1_file);
 	my_free(log_archive_path);
@@ -4642,7 +4495,6 @@ int reset_variables(void){
 	temp_path=(char *)strdup(DEFAULT_TEMP_PATH);
 	check_result_path=(char *)strdup(DEFAULT_CHECK_RESULT_PATH);
 	command_file=(char *)strdup(DEFAULT_COMMAND_FILE);
-	lock_file=(char *)strdup(DEFAULT_LOCK_FILE);
 	auth_file=(char *)strdup(DEFAULT_AUTH_FILE);
 	p1_file=(char *)strdup(DEFAULT_P1_FILE);
 	log_archive_path=(char *)strdup(DEFAULT_LOG_ARCHIVE_PATH);

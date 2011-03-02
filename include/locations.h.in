@@ -30,7 +30,6 @@
 #define DEFAULT_RETENTION_FILE			"@localstatedir@/retention.dat"
 #define DEFAULT_COMMAND_FILE			"@localstatedir@/rw/nagios.cmd"
 #define DEFAULT_CONFIG_FILE			"@sysconfdir@/nagios.cfg"
-#define DEFAULT_LOCK_FILE			"@lockfile@"
 #define DEFAULT_OBJECT_CACHE_FILE		"@localstatedir@/objects.cache"
 #define DEFAULT_PRECACHED_OBJECT_FILE		"@localstatedir@/objects.precache"
 #define DEFAULT_EVENT_BROKER_FILE		"@localstatedir@/broker.socket"

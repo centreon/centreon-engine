@@ -44,7 +44,6 @@
 
 extern time_t program_start;
 extern int nagios_pid;
-extern int daemon_mode;
 extern time_t last_command_check;
 extern time_t last_log_rotation;
 extern int enable_notifications;
@@ -336,7 +335,6 @@ int xsddefault_save_status_data(void){
 	fprintf(fp,"\tmodified_host_attributes=%lu\n",modified_host_process_attributes);
 	fprintf(fp,"\tmodified_service_attributes=%lu\n",modified_service_process_attributes);
 	fprintf(fp,"\tnagios_pid=%d\n",nagios_pid);
-	fprintf(fp,"\tdaemon_mode=%d\n",daemon_mode);
 	fprintf(fp,"\tprogram_start=%lu\n",program_start);
 	fprintf(fp,"\tlast_command_check=%lu\n",last_command_check);
 	fprintf(fp,"\tlast_log_rotation=%lu\n",last_log_rotation);

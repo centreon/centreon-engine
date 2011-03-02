@@ -36,7 +36,6 @@ int verify_config;
 int test_scheduling;
 time_t last_log_rotation;
 int log_rotation_method;
-int daemon_mode=TRUE;
 char *debug_file="";
 int debug_level;
 int debug_verbosity;

@@ -18,7 +18,6 @@ programstatus {
 	modified_host_attributes=0
 	modified_service_attributes=0
 	nagios_pid=48451
-	daemon_mode=0
 	program_start=1242341791
 	last_command_check=0
 	last_log_rotation=0

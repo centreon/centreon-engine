@@ -52,8 +52,6 @@ extern int      test_scheduling;
 extern time_t   last_log_rotation;
 extern int      log_rotation_method;
 
-extern int      daemon_mode;
-
 extern char     *debug_file;
 extern int      debug_level;
 extern int      debug_verbosity;
@@ -123,7 +121,7 @@ int write_to_logs_and_console(char *buffer, unsigned long data_type, int display
 int write_to_console(char *buffer){
 
 	/* should we print to the console? */
-	if(daemon_mode==FALSE)
+	if(!FALSE)
 		printf("%s\n",buffer);
 
 	return OK;
@@ -174,7 +172,7 @@ int write_to_log(char *buffer, unsigned long data_type, time_t *timestamp){
 
 	fp=fopen(log_file,"a+");
 	if(fp==NULL){
-		if(daemon_mode==FALSE)
+		if(!FALSE)
 			printf("Warning: Cannot open log file '%s' for writing\n",log_file);
 		return ERROR;
 		}

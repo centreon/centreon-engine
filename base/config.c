@@ -37,7 +37,6 @@ extern char     *command_file;
 extern char     *temp_file;
 extern char     *temp_path;
 extern char     *check_result_path;
-extern char     *lock_file;
 extern char	*log_archive_path;
 extern char     *auth_file;
 extern char	*p1_file;
@@ -77,9 +76,6 @@ extern int      ocsp_timeout;
 extern int      ochp_timeout;
 
 extern int      log_initial_states;
-
-extern int      daemon_mode;
-extern int      daemon_dumps_core;
 
 extern int      verify_config;
 extern int      verify_object_relationships;
@@ -453,18 +449,6 @@ int read_main_config_file(char *main_config_file){
 
 		else if(!strcmp(variable,"max_check_result_file_age"))
 			max_check_result_file_age=strtoul(value,NULL,0);
-
-		else if(!strcmp(variable,"lock_file")){
-
-			if(strlen(value)>MAX_FILENAME_LENGTH-1){
-				asprintf(&error_message,"Lock file is too long");
-				error=TRUE;
-				break;
-				}
-
-			my_free(lock_file);
-			lock_file=(char *)strdup(value);
-			}
 
 		else if(!strcmp(variable,"global_host_event_handler")){
 			my_free(global_host_event_handler);
@@ -1216,17 +1200,6 @@ int read_main_config_file(char *main_config_file){
 		else if(!strcmp(variable,"use_true_regexp_matching"))
 			use_true_regexp_matching=(atoi(value)>0)?TRUE:FALSE;
 
-		else if(!strcmp(variable,"daemon_dumps_core")){
-
-			if(strlen(value)!=1||value[0]<'0'||value[0]>'1'){
-				asprintf(&error_message,"Illegal value for daemon_dumps_core");
-				error=TRUE;
-				break;
-				}
-
-			daemon_dumps_core=(atoi(value)>0)?TRUE:FALSE;
-			}
-
 		else if(!strcmp(variable,"use_large_installation_tweaks")){
 
 			if(strlen(value)!=1||value[0]<'0'||value[0]>'1'){
@@ -1365,7 +1338,7 @@ int read_main_config_file(char *main_config_file){
 	/* make sure a log file has been specified */
 	strip(log_file);
 	if(!strcmp(log_file,"")){
-		if(daemon_mode==FALSE)
+		if(!FALSE)
 			printf("Error: Log file is not specified anywhere in main config file '%s'!\n",main_config_file);
 		return ERROR;
 		}

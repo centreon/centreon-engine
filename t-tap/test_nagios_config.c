@@ -52,7 +52,6 @@ char            *command_file=NULL;
 char            *temp_file=NULL;
 char            *temp_path=NULL;
 char            *check_result_path=NULL;
-char            *lock_file=NULL;
 char            *log_archive_path=NULL;
 char            *p1_file=NULL;    /**** EMBEDDED PERL ****/
 char            *auth_file=NULL;  /**** EMBEDDED PERL INTERPRETER AUTH FILE ****/
@@ -174,9 +173,6 @@ int             verify_circular_paths=TRUE;
 int             test_scheduling=FALSE;
 int             precache_objects=FALSE;
 int             use_precached_objects=FALSE;
-
-int             daemon_mode=FALSE;
-int             daemon_dumps_core=TRUE;
 
 int             max_parallel_service_checks=DEFAULT_MAX_PARALLEL_SERVICE_CHECKS;
 int             currently_running_service_checks=0;

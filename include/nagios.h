@@ -490,7 +490,6 @@ int pre_flight_circular_check(int *,int *);             	/* detects circular dep
 void init_timing_loop(void);                         		/* setup the initial scheduling queue */
 void setup_sighandler(void);                         		/* trap signals */
 void reset_sighandler(void);                         		/* reset signals to default action */
-int daemon_init(void);				     		/* switches to daemon mode */
 void display_scheduling_info(void);				/* displays service check scheduling information */
 
 

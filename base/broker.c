@@ -36,7 +36,6 @@ extern unsigned long event_broker_options;
 
 extern time_t program_start;
 extern int nagios_pid;
-extern int daemon_mode;
 extern time_t last_command_check;
 extern time_t last_log_rotation;
 extern int enable_notifications;
@@ -487,7 +486,6 @@ void broker_program_status(int type, int flags, int attr, struct timeval *timest
 
 	ds.program_start=program_start;
 	ds.pid=nagios_pid;
-	ds.daemon_mode=daemon_mode;
 	ds.last_command_check=last_command_check;
 	ds.last_log_rotation=last_log_rotation;
 	ds.notifications_enabled=enable_notifications;
