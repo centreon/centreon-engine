@@ -7,8 +7,6 @@
 
 # Source code directories
 SRC_BASE=@srcdir@/base
-SRC_CGI=@srcdir@/cgi
-SRC_HTM=@srcdir@/html
 SRC_MODULE=@srcdir@/module
 SRC_INCLUDE=@srcdir@/include
 SRC_COMMON=@srcdir@/common
@@ -26,24 +24,18 @@ LOGDIR=@localstatedir@
 CHECKRESULTDIR=@CHECKRESULTDIR@
 CFGDIR=@sysconfdir@
 BINDIR=@bindir@
-CGIDIR=@sbindir@
 LIBEXECDIR=@libexecdir@
-HTMLDIR=@datarootdir@
 INSTALL=@INSTALL@
 INSTALL_OPTS=@INSTALL_OPTS@
 COMMAND_OPTS=@COMMAND_OPTS@
-HTTPD_CONF=@HTTPD_CONF@
 INIT_DIR=@init_dir@
 INIT_OPTS=-o root -g root
-CGICFGDIR=$(CGIDIR)
 PERLDIR=@PERLDIR@
 
 USE_EVENTBROKER=@USE_EVENTBROKER@
 USE_LIBTAP=@USE_LIBTAP@
 
 INSTALLPERLSTUFF=@INSTALLPERLSTUFF@
-
-CGIEXTRAS=@CGIEXTRAS@
 
 SNPRINTF_O=@SNPRINTF_O@
 
@@ -53,17 +45,15 @@ CP=@CP@
 
 none:
 		@echo "Please supply a command line argument (i.e. 'make all').  Other targets are:"
-		@echo "   nagios cgis contrib modules"
+		@echo "   nagios contrib modules"
 		@echo "   clean"
-		@echo "   install install-base install-cgis install-html install-config install-init install-commandmode fullinstall"
+		@echo "   install install-base install-config install-init install-commandmode fullinstall"
 #		@echo "   uninstall"
 
 # FreeBSD make does not support -C option, so we'll use the Apache style... (patch by Stanley Hopcroft 12/27/1999)
 
 all:
 	cd $(SRC_BASE) && $(MAKE)
-	cd $(SRC_CGI) && $(MAKE)
-	cd $(SRC_HTM) && $(MAKE)
 	if [ x$(USE_EVENTBROKER) = xyes ]; then \
 		cd $(SRC_MODULE) && $(MAKE); \
 	fi
@@ -71,12 +61,12 @@ all:
 	@echo ""
 	@echo "*** Compile finished ***"
 	@echo ""
-	@echo "If the main program and CGIs compiled without any errors, you"
+	@echo "If the main program compiled without any errors, you"
 	@echo "can continue with installing Nagios as follows (type 'make'"
 	@echo "without any arguments for a list of all possible options):"
 	@echo ""
 	@echo "  make install"
-	@echo "     - This installs the main program, CGIs, and HTML files"
+	@echo "     - This installs the main program."
 	@echo ""
 	@echo "  make install-init"
 	@echo "     - This installs the init script in $(DESTDIR)$(INIT_DIR)"
@@ -92,10 +82,6 @@ all:
 	@echo "       on doing this.  Pay particular attention to the docs on"
 	@echo "       object configuration files, as they determine what/how"
 	@echo "       things get monitored!"
-	@echo ""
-	@echo "  make install-webconf"
-	@echo "     - This installs the Apache config file for the Nagios"
-	@echo "       web interface"
 	@echo ""
 	@echo ""
 	@echo "*** Support Notes *******************************************"
@@ -133,12 +119,6 @@ config:
 	@echo "configure script.  You can install the sample config files on your"
 	@echo "system by using the 'make install-config' command."
 
-cgis:
-	cd $(SRC_CGI) && $(MAKE)
-
-html:
-	cd $(SRC_HTM) && $(MAKE)
-
 contrib:
 	cd $(SRC_CONTRIB) && $(MAKE)
 
@@ -147,10 +127,8 @@ modules:
 
 clean:
 	cd $(SRC_BASE) && $(MAKE) $@
-	cd $(SRC_CGI) && $(MAKE) $@
 	cd $(SRC_COMMON) && $(MAKE) $@
 	cd $(SRC_XDATA) && $(MAKE) $@
-	cd $(SRC_HTM) && $(MAKE) $@
 	cd $(SRC_INCLUDE) && $(MAKE) $@
 	cd $(SRC_CONTRIB) && $(MAKE) $@
 	cd $(SRC_MODULE) && $(MAKE) $@
@@ -160,10 +138,8 @@ clean:
 
 distclean: clean
 	cd $(SRC_BASE) && $(MAKE) $@
-	cd $(SRC_CGI) && $(MAKE) $@
 	cd $(SRC_COMMON) && $(MAKE) $@
 	cd $(SRC_XDATA) && $(MAKE) $@
-	cd $(SRC_HTM) && $(MAKE) $@
 	cd $(SRC_INCLUDE) && $(MAKE) $@
 	cd $(SRC_CONTRIB) && $(MAKE) $@
 	cd $(SRC_MODULE) && $(MAKE) $@
@@ -192,25 +168,15 @@ tap/src/tap.o:
 test-perl:
 	cd t && $(MAKE) test
 
-install-html:
-	cd $(SRC_HTM) && $(MAKE) install
-
 install-base:
 	cd $(SRC_BASE) && $(MAKE) install
 
-install-cgis:
-	cd $(SRC_CGI) && $(MAKE) install
-
 install:
 	cd $(SRC_BASE) && $(MAKE) $@
-	cd $(SRC_CGI) && $(MAKE) $@
-	cd $(SRC_HTM) && $(MAKE) $@
 	$(MAKE) install-basic
 
 install-unstripped:
 	cd $(SRC_BASE) && $(MAKE) $@
-	cd $(SRC_CGI) && $(MAKE) $@
-	cd $(SRC_HTM) && $(MAKE) $@
 	$(MAKE) install-basic
 
 install-basic:
@@ -223,7 +189,7 @@ install-basic:
 	fi;
 
 	@echo ""
-	@echo "*** Main program, CGIs and HTML files installed ***"
+	@echo "*** Main program files installed ***"
 	@echo ""
 	@echo "You can continue with installing Nagios as follows (type 'make'"
 	@echo "without any arguments for a list of all possible options):"
@@ -244,7 +210,6 @@ install-config:
 	$(INSTALL) -m 775 $(INSTALL_OPTS) -d $(DESTDIR)$(CFGDIR)
 	$(INSTALL) -m 775 $(INSTALL_OPTS) -d $(DESTDIR)$(CFGDIR)/objects
 	$(INSTALL) -b -m 664 $(INSTALL_OPTS) sample-config/nagios.cfg $(DESTDIR)$(CFGDIR)/nagios.cfg
-	$(INSTALL) -b -m 664 $(INSTALL_OPTS) sample-config/cgi.cfg $(DESTDIR)$(CFGDIR)/cgi.cfg
 	$(INSTALL) -b -m 660 $(INSTALL_OPTS) sample-config/resource.cfg $(DESTDIR)$(CFGDIR)/resource.cfg
 	$(INSTALL) -b -m 664 $(INSTALL_OPTS) sample-config/template-object/templates.cfg $(DESTDIR)$(CFGDIR)/objects/templates.cfg
 	$(INSTALL) -b -m 664 $(INSTALL_OPTS) sample-config/template-object/commands.cfg $(DESTDIR)$(CFGDIR)/objects/commands.cfg
@@ -261,13 +226,6 @@ install-config:
 	@echo "Remember, these are *SAMPLE* config files.  You'll need to read"
 	@echo "the documentation for more information on how to actually define"
 	@echo "services, hosts, etc. to fit your particular needs."
-	@echo ""
-
-install-webconf:
-	$(INSTALL) -m 644 sample-config/httpd.conf $(DESTDIR)$(HTTPD_CONF)/nagios.conf
-
-	@echo ""
-	@echo "*** Nagios/Apache conf file installed ***"
 	@echo ""
 
 install-init: install-daemoninit
@@ -290,11 +248,11 @@ install-commandmode:
 	@echo ""
 
 
-fullinstall: install install-init install-commandmode install-webconf
+fullinstall: install install-init install-commandmode
 
 # Uninstall is too destructive if base install directory is /usr, etc.
 #uninstall:
-#	rm -rf $(DESTDIR)$(BINDIR)/nagios $(DESTDIR)$(CGIDIR)/*.cgi $(DESTDIR)$(CFGDIR)/*.cfg $(DESTDIR)$(HTMLDIR)
+#	rm -rf $(DESTDIR)$(BINDIR)/nagios $(DESTDIR)$(CFGDIR)/*.cfg
 
 #
 # Targets for creating packages on various architectures
@@ -312,7 +270,6 @@ Prototype:
 	$(MAKE) all
 	$(MAKE) DESTDIR=$(PACKDIR) INIT_OPTS='' INSTALL_OPTS='' COMMAND_OPTS='' nagios_grp='' nagios_usr='' fullinstall
 	$(INSTALL) -m 644 sample-config/nagios.cfg $(PACKDIR)$(CFGDIR)/nagios.cfg.$(VERSION)
-	$(INSTALL) -m 644 sample-config/cgi.cfg $(PACKDIR)$(CFGDIR)/cgi.cfg.$(VERSION)
 	$(INSTALL) -m 640 sample-config/resource.cfg $(PACKDIR)$(CFGDIR)/resource.cfg.$(VERSION)
 	$(INSTALL) -m 664 sample-config/template-object/bigger.cfg $(PACKDIR)$(CFGDIR)/bigger.cfg.$(VERSION)
 	$(INSTALL) -m 664 sample-config/template-object/minimal.cfg $(PACKDIR)$(CFGDIR)/minimal.cfg.$(VERSION)

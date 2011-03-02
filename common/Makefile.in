@@ -6,7 +6,6 @@
 
 # Source code directories
 SRC_BASE=../common
-SRC_CGI=../cgi
 
 CC=@CC@
 CFLAGS=@CFLAGS@ @DEFS@
@@ -17,8 +16,6 @@ exec_prefix=@exec_prefix@
 LOGDIR=@localstatedir@
 CFGDIR=@sysconfdir@
 BINDIR=@bindir@
-CGIDIR=@sbindir@
-HTMLDIR=@datarootdir@
 INSTALL=@INSTALL@
 INSTALL_OPTS=@INSTALL_OPTS@
 COMMAND_OPTS=@COMMAND_OPTS@
