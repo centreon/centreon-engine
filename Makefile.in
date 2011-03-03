@@ -11,7 +11,6 @@ SRC_MODULE=@srcdir@/module
 SRC_INCLUDE=@srcdir@/include
 SRC_COMMON=@srcdir@/common
 SRC_XDATA=@srcdir@/xdata
-SRC_CONTRIB=@srcdir@/contrib
 SRC_TTAP=@srcdir@/t-tap
 
 CC=@CC@
@@ -45,7 +44,7 @@ CP=@CP@
 
 none:
 		@echo "Please supply a command line argument (i.e. 'make all').  Other targets are:"
-		@echo "   nagios contrib modules"
+		@echo "   nagios modules"
 		@echo "   clean"
 		@echo "   install install-base install-config install-init install-commandmode fullinstall"
 #		@echo "   uninstall"
@@ -119,9 +118,6 @@ config:
 	@echo "configure script.  You can install the sample config files on your"
 	@echo "system by using the 'make install-config' command."
 
-contrib:
-	cd $(SRC_CONTRIB) && $(MAKE)
-
 modules:
 	cd $(SRC_MODULE) && $(MAKE)
 
@@ -130,7 +126,6 @@ clean:
 	cd $(SRC_COMMON) && $(MAKE) $@
 	cd $(SRC_XDATA) && $(MAKE) $@
 	cd $(SRC_INCLUDE) && $(MAKE) $@
-	cd $(SRC_CONTRIB) && $(MAKE) $@
 	cd $(SRC_MODULE) && $(MAKE) $@
 	cd $(SRC_TTAP) && $(MAKE) $@
 	rm -f *.cfg core
@@ -141,7 +136,6 @@ distclean: clean
 	cd $(SRC_COMMON) && $(MAKE) $@
 	cd $(SRC_XDATA) && $(MAKE) $@
 	cd $(SRC_INCLUDE) && $(MAKE) $@
-	cd $(SRC_CONTRIB) && $(MAKE) $@
 	cd $(SRC_MODULE) && $(MAKE) $@
 	cd $(SRC_TTAP) && $(MAKE) $@
 	rm -f sample-config/*.cfg  sample-config/*.conf sample-config/template-object/*.cfg
@@ -275,7 +269,6 @@ Prototype:
 	$(INSTALL) -m 664 sample-config/template-object/minimal.cfg $(PACKDIR)$(CFGDIR)/minimal.cfg.$(VERSION)
 	$(INSTALL) -m 664 sample-config/template-object/checkcommands.cfg $(PACKDIR)$(CFGDIR)/checkcommands.cfg.$(VERSION)
 	$(INSTALL) -m 664 sample-config/template-object/misccommands.cfg $(PACKDIR)$(CFGDIR)/misccommands.cfg.$(VERSION)
-	cd contrib; $(MAKE) all; $(MAKE) DESTDIR=$(PACKDIR) INIT_OPTS='' INSTALL_OPTS='' COMMAND_OPTS='' nagios_grp='' nagios_usr='' install
 	echo i pkginfo> Prototype
 	if [ -f checkinstall ] ; then echo i checkinstall>> Prototype; fi
 	if [ -f preinstall ] ; then echo i preinstall>> Prototype; fi

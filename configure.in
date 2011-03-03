@@ -594,7 +594,7 @@ AC_SUBST(USE_EVENTBROKER)
 
 AC_PATH_PROG(PERL,perl)
 
-AC_OUTPUT(Makefile subst pkginfo base/Makefile common/Makefile contrib/Makefile module/Makefile xdata/Makefile daemon-init t/Makefile t-tap/Makefile)
+AC_OUTPUT(Makefile subst pkginfo base/Makefile common/Makefile module/Makefile xdata/Makefile daemon-init t/Makefile t-tap/Makefile)
 
 
 perl subst include/locations.h
