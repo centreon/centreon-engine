@@ -530,7 +530,10 @@ int add_comment(int comment_type, int entry_type, char *host_name, char *svc_des
 static int comment_compar(const void *p1, const void *p2){
 	comment *c1 = *(comment **)p1;
 	comment *c2 = *(comment **)p2;
-	return (c1->comment_id < c2->comment_id) ? -1 : (c1->comment_id - c2->comment_id);
+
+	if (c1->comment_id < c2->comment_id)
+		return -1;
+	return c1->comment_id - c2->comment_id;
 	}
 
 int sort_comments(void){

@@ -54,6 +54,8 @@ extern char *macro_x[MACRO_X_COUNT];
 int xdddefault_initialize_downtime_data(char *main_config_file){
 	scheduled_downtime *temp_downtime=NULL;
 
+	(void)main_config_file;
+
 	/* clean up the old downtime data */
 	xdddefault_validate_downtime_data();
 
@@ -136,6 +138,8 @@ int xdddefault_validate_downtime_data(void){
 
 /* removes invalid and old downtime entries from the downtime file */
 int xdddefault_cleanup_downtime_data(char *main_config_file){
+
+	(void)main_config_file;
 
 	/* we don't need to do any cleanup... */
 	return OK;
@@ -222,6 +226,8 @@ int xdddefault_delete_service_downtime(unsigned long downtime_id){
 
 /* deletes a scheduled host or service downtime entry */
 int xdddefault_delete_downtime(int type, unsigned long downtime_id){
+	(void)type;
+	(void)downtime_id;
 
 	/* rewrite the downtime file (downtime was already removed from memory) */
 	xdddefault_save_downtime_data();

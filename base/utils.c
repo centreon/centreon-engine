@@ -373,13 +373,13 @@ int my_system(char *cmd,int timeout,int *early_timeout,double *exectime,char **o
 			 */
 			(void) POPs ;
 
-			asprintf(&temp_buffer,"%s", SvPVX(ERRSV));
-
-			log_debug_info(DEBUGL_COMMANDS,0,"Embedded perl failed to compile %s, compile error %s\n",fname,temp_buffer);
-
-			logit(NSLOG_RUNTIME_WARNING,TRUE,"%s\n",temp_buffer);
-
-			my_free(temp_buffer);
+			if(asprintf(&temp_buffer,"%s", SvPVX(ERRSV))==-1)
+				logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
+			else{
+				log_debug_info(DEBUGL_COMMANDS,0,"Embedded perl failed to compile %s, compile error %s\n",fname,temp_buffer);
+				logit(NSLOG_RUNTIME_WARNING,TRUE,"%s\n",temp_buffer);
+				my_free(temp_buffer);
+			}
 
 			return STATE_UNKNOWN;
 			}
@@ -396,7 +396,10 @@ int my_system(char *cmd,int timeout,int *early_timeout,double *exectime,char **o
 #endif 
 
 	/* create a pipe */
-	pipe(fd);
+	if(pipe(fd)==-1){
+		logit(NSLOG_RUNTIME_WARNING,TRUE,"Warning: pipe() in my_system() failed for command \"%s\"\n",cmd);
+		return STATE_UNKNOWN;
+		}
 
 	/* make the pipe non-blocking */
 	fcntl(fd[0],F_SETFL,O_NONBLOCK);
@@ -490,7 +493,8 @@ int my_system(char *cmd,int timeout,int *early_timeout,double *exectime,char **o
 			log_debug_info(DEBUGL_COMMANDS,0,"Embedded perl ran command %s with output %d, %s\n",fname,status,buffer);
 
 			/* write the output back to the parent process */
-			write(fd[1],buffer,strlen(buffer)+1);
+			if(write(fd[1],buffer,strlen(buffer)+1)==-1)
+				logit(NSLOG_RUNTIME_WARNING,FALSE,"Warning: Write failed. %s\n", strerror(errno));
 
 			/* close pipe for writing */
 			close(fd[1]);
@@ -500,13 +504,13 @@ int my_system(char *cmd,int timeout,int *early_timeout,double *exectime,char **o
 
 			_exit(status);
 		        }
-#endif  
+#endif
 		/******** END EMBEDDED PERL CODE EXECUTION ********/
 
 
 		/* run the command */
 		fp=(FILE *)popen(cmd,"r");
-		
+
 		/* report an error if we couldn't run the command */
 		if(fp==NULL){
 
@@ -514,7 +518,8 @@ int my_system(char *cmd,int timeout,int *early_timeout,double *exectime,char **o
 			buffer[sizeof(buffer)-1]='\x0';
 
 			/* write the error back to the parent process */
-			write(fd[1],buffer,strlen(buffer)+1);
+			if(write(fd[1],buffer,strlen(buffer)+1)==-1)
+				logit(NSLOG_RUNTIME_WARNING,FALSE,"Warning: Write failed. %s\n", strerror(errno));
 
 			result=STATE_CRITICAL;
 		        }
@@ -522,11 +527,12 @@ int my_system(char *cmd,int timeout,int *early_timeout,double *exectime,char **o
 
 			/* write all the lines of output back to the parent process */
 			while(fgets(buffer,sizeof(buffer)-1,fp))
-				write(fd[1],buffer,strlen(buffer));
+				if(write(fd[1],buffer,strlen(buffer))==-1)
+					logit(NSLOG_RUNTIME_WARNING,FALSE,"Warning: Write failed. %s\n", strerror(errno));
 
 			/* close the command and get termination status */
 			status=pclose(fp);
-			
+
 			/* report an error if we couldn't close the command */
 			if(status==-1)
 				result=STATE_CRITICAL;
@@ -675,7 +681,7 @@ int get_raw_command_line(command *cmd_ptr, char *cmd, char **full_command, int m
 	char temp_arg[MAX_COMMAND_BUFFER]="";
 	char *arg_buffer=NULL;
 	register int x=0;
-	register int y=0;
+	register unsigned int y=0;
 	register int arg_index=0;
 	register int escaped=FALSE;
 
@@ -712,7 +718,7 @@ int get_raw_command_line(command *cmd_ptr, char *cmd, char **full_command, int m
 			/* get the next argument */
 			/* can't use strtok(), as that's used in process_macros... */
 			for(arg_index++,y=0;y<sizeof(temp_arg)-1;arg_index++){
-				
+
 				/* backslashes escape */
 				if(cmd[arg_index]=='\\' && escaped==FALSE){
 					escaped=TRUE;
@@ -771,7 +777,10 @@ int set_environment_var(char *name, char *value, int set){
 #else
 		/* needed for Solaris and systems that don't have setenv() */
 		/* this will leak memory, but in a "controlled" way, since lost memory should be freed when the child process exits */
-		asprintf(&env_string,"%s=%s",name,(value==NULL)?"":value);
+		if(asprintf(&env_string,"%s=%s",name,(value==NULL)?"":value)==-1){
+			logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
+			return ERROR;
+			}
 		if(env_string)
 			putenv(env_string);
 #endif
@@ -1015,7 +1024,7 @@ int check_time_against_period(time_t test_time, timeperiod *tperiod){
 #endif
 
 			/* time falls into the range of days */
-			if(midnight>=start_time && midnight<=end_time)
+			if((time_t)midnight>=start_time && (time_t)midnight<=end_time)
 				found_match=TRUE;
 
 			/* found a day match, so see if time ranges are good */
@@ -1888,6 +1897,8 @@ void sighandler(int sig){
 void service_check_sighandler(int sig){
 	struct timeval end_time;
 
+	(void)sig;
+
 	/* get the current time */
 	gettimeofday(&end_time,NULL);
 
@@ -1932,6 +1943,8 @@ void service_check_sighandler(int sig){
 void host_check_sighandler(int sig){
 	struct timeval end_time;
 
+	(void)sig;
+
 	/* get the current time */
 	gettimeofday(&end_time,NULL);
 
@@ -1970,6 +1983,8 @@ void host_check_sighandler(int sig){
 /* handle timeouts when executing commands via my_system() */
 void my_system_sighandler(int sig){
 
+	(void)sig;
+
 	/* force the child process to exit... */
 	_exit(STATE_CRITICAL);
         }
@@ -1994,7 +2009,10 @@ int move_check_result_to_queue(char *checkresult_file){
 	old_umask=umask(new_umask);
 
 	/* create a safe temp file */
-	asprintf(&output_file,"%s/cXXXXXX",check_result_path);
+	if(asprintf(&output_file,"%s/cXXXXXX",check_result_path)==-1){
+		logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
+		return ERROR;
+		}
 	output_file_fd=mkstemp(output_file);
 
 	/* file created okay */
@@ -2017,7 +2035,15 @@ int move_check_result_to_queue(char *checkresult_file){
 #endif
 
 		/* create an ok-to-go indicator file */
-		asprintf(&temp_buffer,"%s.ok",output_file);
+		if(asprintf(&temp_buffer,"%s.ok",output_file)==-1){
+			logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
+			/* free memory */
+			my_free(output_file);
+			/* delete the original file if it couldn't be moved */
+			if(result!=0)
+			  unlink(checkresult_file);
+			return ERROR;
+		}
 		if((output_file_fd=open(temp_buffer,O_CREAT|O_WRONLY|O_TRUNC,S_IRUSR|S_IWUSR))>0)
 			close(output_file_fd);
 		my_free(temp_buffer);
@@ -2102,7 +2128,11 @@ int process_check_result_queue(char *dirname){
 			/* at this point we have a regular file... */
 
 			/* can we find the associated ok-to-go file ? */
-			asprintf(&temp_buffer,"%s.ok",file);
+			if(asprintf(&temp_buffer,"%s.ok",file)==-1){
+				logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
+				closedir(dirp);
+				return ERROR;
+				}
 			result=stat(temp_buffer,&ok_stat_buf);
 			my_free(temp_buffer);
 			if(result==-1)
@@ -2308,7 +2338,10 @@ int delete_check_result_file(char *fname){
 	unlink(fname);
 
 	/* delete the ok-to-go file */
-	asprintf(&temp_buffer,"%s.ok",fname);
+	if(asprintf(&temp_buffer,"%s.ok",fname)==-1){
+		logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
+		return ERROR;
+		}
 	unlink(temp_buffer);
 	my_free(temp_buffer);
 
@@ -3111,10 +3144,11 @@ int my_fcopy(char *source, char *dest){
 
 		/* open source file for reading */
 		if((source_fd=open(source,O_RDONLY,0644))>0){
-			
+
 			/* copy file contents */
 			while((bytes_read=read(source_fd,buffer,sizeof(buffer)))>0)
-				write(dest_fd,buffer,bytes_read);
+				if(write(dest_fd,buffer,bytes_read)==-1)
+					logit(NSLOG_RUNTIME_WARNING,FALSE,"Warning: Write failed. %s\n", strerror(errno));
 
 			close(source_fd);
 			close(dest_fd);
@@ -3481,7 +3515,8 @@ int init_embedded_perl(char **env){
 	exitstatus=perl_parse(my_perl,xs_init,2,(char **)embedding,env);
 	if(!exitstatus)
 		exitstatus=perl_run(my_perl);
-
+#else
+	(void)env;
 #endif
 	return OK;
         }
@@ -3567,6 +3602,8 @@ int file_uses_embedded_perl(char *fname){
 			fclose(fp);
 			}
 		}
+#else
+	(void)fname;
 #endif
 
 	return use_epn;
@@ -3644,6 +3681,8 @@ int shutdown_command_file_worker_thread(void){
 void cleanup_command_file_worker_thread(void *arg){
 	register int x=0;
 
+	(void)arg;
+
 	/* release memory allocated to circular buffer */
 	for(x=external_command_buffer.tail;x!=external_command_buffer.head;x=(x+1) % external_command_buffer_slots){
 		my_free(((char **)external_command_buffer.buffer)[x]);
@@ -3663,6 +3702,8 @@ void * command_file_worker_thread(void *arg){
 	struct timeval tv;
 	int buffer_items=0;
 	int result=0;
+
+	(void)arg;
 
 	/* specify cleanup routine */
 	pthread_cleanup_push(cleanup_command_file_worker_thread,NULL);
@@ -3841,7 +3882,10 @@ int submit_raw_external_command(char *cmd, time_t *ts, int *buffer_items){
 		time(&timestamp);
 
 	/* create the command string */
-	asprintf(&newcmd,"[%lu] %s",(unsigned long)timestamp,cmd);
+	if(asprintf(&newcmd,"[%lu] %s",(unsigned long)timestamp,cmd)==-1){
+		logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
+		return ERROR;
+		}
 
 	/* submit the command */
 	result=submit_external_command(newcmd,buffer_items);
@@ -4231,25 +4275,48 @@ int query_update_api(void){
 	if(last_program_version==NULL || strcmp(PROGRAM_VERSION,last_program_version))
 		report_install=TRUE;
 	if(report_install==TRUE){
-		asprintf(&api_query_opts,"&firstcheck=1");
-		if(last_program_version!=NULL)
-			asprintf(&api_query_opts,"%s&last_version=%s",api_query_opts,last_program_version);
+		if(asprintf(&api_query_opts,"&firstcheck=1")==-1){
+			logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
+			return ERROR;
+			}
+		if(last_program_version!=NULL && asprintf(&api_query_opts,"%s&last_version=%s",api_query_opts,last_program_version)==-1){
+			logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
+			/* cleanup */
+			my_free(api_query_opts);
+			return ERROR;
+			}
 		}
 
 	/* generate the query */
-	asprintf(&api_query,"v=1&product=nagios&tinycheck=1&stableonly=1&uid=%lu",update_uid);
-	if(bare_update_check==FALSE)
-		asprintf(&api_query,"%s&version=%s%s",api_query,PROGRAM_VERSION,(api_query_opts==NULL)?"":api_query_opts);
+	if(asprintf(&api_query,"v=1&product=nagios&tinycheck=1&stableonly=1&uid=%lu",update_uid)==-1){
+			logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
+			/* cleanup */
+			my_free(api_query_opts);
+			return ERROR;
+			}
+	if(bare_update_check==FALSE && asprintf(&api_query,"%s&version=%s%s",api_query,PROGRAM_VERSION,(api_query_opts==NULL)?"":api_query_opts)==-1){
+			logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
+			/* cleanup */
+			my_free(api_query_opts);
+			my_free(api_query);
+			return ERROR;
+			}
 
 	/* generate the HTTP request */
-	asprintf(&buf,"POST %s HTTP/1.0\r\n",api_path);
-	asprintf(&buf,"%sUser-Agent: Nagios/%s\r\n",buf,PROGRAM_VERSION);
-	asprintf(&buf,"%sConnection: close\r\n",buf);
-	asprintf(&buf,"%sHost: %s\r\n",buf,api_server);
-	asprintf(&buf,"%sContent-Type: application/x-www-form-urlencoded\r\n",buf);
-	asprintf(&buf,"%sContent-Length: %zd\r\n",buf,strlen(api_query));
-	asprintf(&buf,"%s\r\n",buf);
-	asprintf(&buf,"%s%s\r\n",buf,api_query);
+	if(asprintf(&buf,"POST %s HTTP/1.0\r\n",api_path)==-1 ||
+	   asprintf(&buf,"%sUser-Agent: Nagios/%s\r\n",buf,PROGRAM_VERSION)==-1 ||
+	   asprintf(&buf,"%sConnection: close\r\n",buf)==-1 ||
+	   asprintf(&buf,"%sHost: %s\r\n",buf,api_server)==-1 ||
+	   asprintf(&buf,"%sContent-Type: application/x-www-form-urlencoded\r\n",buf)==-1 ||
+	   asprintf(&buf,"%sContent-Length: %zd\r\n",buf,strlen(api_query))==-1 ||
+	   asprintf(&buf,"%s\r\n",buf)==-1 ||
+	   asprintf(&buf,"%s%s\r\n",buf,api_query)==-1){
+		logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
+		/* cleanup */
+		my_free(api_query_opts);
+		my_free(api_query);
+		return ERROR;
+		}
 
 	/*
 	printf("SENDING...\n");
@@ -4257,7 +4324,7 @@ int query_update_api(void){
 	printf("%s",buf);
 	printf("\n");
 	*/
-	
+
 
 	result=my_tcp_connect(api_server,80,&sd,2);
 	/*printf("CONN RESULT: %d, SD: %d\n",result,sd);*/

@@ -45,7 +45,8 @@ int my_tcp_connect(char *host_name, int port, int *sd, int timeout){
 	hints.ai_family=PF_INET;
 	hints.ai_socktype=SOCK_STREAM;
 
-	asprintf(&port_str,"%d",port);
+	if(asprintf(&port_str,"%d",port)==-1)
+		return ERROR;
 	result=getaddrinfo(host_name,port_str,&hints,&res);
 	if(result!=0){
 		/*printf("GETADDRINFO: %s (%s) = %s\n",host_name,port_str,gai_strerror(result));*/

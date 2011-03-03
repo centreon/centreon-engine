@@ -225,6 +225,8 @@ int xsddefault_initialize_status_data(char *config_file){
 /* cleanup status data before terminating */
 int xsddefault_cleanup_status_data(char *config_file, int delete_status_data){
 
+	(void)config_file;
+
 	/* delete the status log */
 	if(delete_status_data==TRUE && xsddefault_status_log){
 		if(unlink(xsddefault_status_log))
@@ -264,7 +266,10 @@ int xsddefault_save_status_data(void){
 	/* open a safe temp file for output */
 	if(xsddefault_temp_file==NULL)
 		return ERROR;
-	asprintf(&temp_file,"%sXXXXXX",xsddefault_temp_file);
+	if(asprintf(&temp_file,"%sXXXXXX",xsddefault_temp_file)==-1){
+		logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
+		return ERROR;
+		}
 	if(temp_file==NULL)
 		return ERROR;
 

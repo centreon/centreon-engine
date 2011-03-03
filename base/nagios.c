@@ -439,7 +439,11 @@ int main(int argc, char **argv){
 		        }
 
 		/* get absolute path of current working directory */
-		getcwd(config_file,MAX_FILENAME_LENGTH);
+		if(getcwd(config_file,MAX_FILENAME_LENGTH) == NULL){
+			perror("Error ");
+			exit(ERROR);
+			}
+
 
 		/* append a forward slash */
 		strncat(config_file,"/",1);
@@ -619,7 +623,6 @@ int main(int argc, char **argv){
 			/* get program (re)start time and save as macro */
 			program_start=time(NULL);
 			my_free(macro_x[MACRO_PROCESSSTARTTIME]);
-			asprintf(&macro_x[MACRO_PROCESSSTARTTIME],"%lu",(unsigned long)program_start);
 
 			/* open debug log */
 			open_debug_log();
@@ -637,7 +640,12 @@ int main(int argc, char **argv){
 			now=time(NULL);
 			tm=localtime(&now);
 			strftime(datestring,sizeof(datestring),"%a %b %d %H:%M:%S %Z %Y",tm);
-			asprintf(&buffer,"Local time is %s\n",datestring);
+			if(asprintf(&buffer,"Local time is %s\n",datestring)==-1){
+				logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.  Aborting.\n");
+
+				cleanup();
+				exit(ERROR);
+				}
 			write_to_logs_and_console(buffer,NSLOG_PROCESS_INFO,TRUE);
 			my_free(buffer);
 
@@ -744,16 +752,16 @@ int main(int argc, char **argv){
 
 			/* initialize comment data */
 			initialize_comment_data(config_file);
-			
+
 			/* initialize scheduled downtime data */
 			initialize_downtime_data(config_file);
-			
+
 			/* initialize performance data */
 			initialize_performance_data(config_file);
 
 		        /* initialize the event timing loop */
 			init_timing_loop();
-			
+
 			/* initialize check statistics */
 			init_check_stats();
 
@@ -778,7 +786,17 @@ int main(int argc, char **argv){
 			/* get event start time and save as macro */
 			event_start=time(NULL);
 			my_free(macro_x[MACRO_EVENTSTARTTIME]);
-			asprintf(&macro_x[MACRO_EVENTSTARTTIME],"%lu",(unsigned long)event_start);
+			if(asprintf(&macro_x[MACRO_EVENTSTARTTIME],"%lu",(unsigned long)event_start)==-1){
+				logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.  Aborting.\n");
+
+#ifdef USE_EVENT_BROKER
+				/* send program data to broker */
+				broker_program_state(NEBTYPE_PROCESS_SHUTDOWN,NEBFLAG_PROCESS_INITIATED,NEBATTR_SHUTDOWN_ABNORMAL,NULL);
+#endif
+
+				cleanup();
+				exit(ERROR);
+				}
 
 		        /***** start monitoring all services *****/
 			/* (doesn't return until a restart or shutdown signal is encountered) */
@@ -788,10 +806,29 @@ int main(int argc, char **argv){
 			/* did we catch a signal? */
 			if(caught_signal==TRUE){
 
-				if(sig_id==SIGHUP)
-					asprintf(&buffer,"Caught SIGHUP, restarting...\n");
-				else
-					asprintf(&buffer,"Caught SIG%s, shutting down...\n",sigs[sig_id]);
+				if(sig_id==SIGHUP){
+					if(asprintf(&buffer,"Caught SIGHUP, restarting...\n")==-1){
+						logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.  Aborting.\n");
+#ifdef USE_EVENT_BROKER
+						/* send program data to broker */
+						broker_program_state(NEBTYPE_PROCESS_SHUTDOWN,NEBFLAG_PROCESS_INITIATED,NEBATTR_SHUTDOWN_ABNORMAL,NULL);
+#endif
+
+						cleanup();
+						exit(ERROR);
+						}
+					}
+				else if(asprintf(&buffer,"Caught SIG%s, shutting down...\n",sigs[sig_id])==-1){
+					logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.  Aborting.\n");
+
+#ifdef USE_EVENT_BROKER
+					/* send program data to broker */
+					broker_program_state(NEBTYPE_PROCESS_SHUTDOWN,NEBFLAG_PROCESS_INITIATED,NEBATTR_SHUTDOWN_ABNORMAL,NULL);
+#endif
+
+					cleanup();
+					exit(ERROR);
+					}
 
 				write_to_all_logs(buffer,NSLOG_PROCESS_INFO);
 				my_free(buffer);

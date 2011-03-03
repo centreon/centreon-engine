@@ -230,6 +230,8 @@ int xrddefault_initialize_retention_data(char *config_file){
 /* cleanup retention data before terminating */
 int xrddefault_cleanup_retention_data(char *config_file){
 
+	(void)config_file;
+
 	/* free memory */
 	my_free(xrddefault_retention_file);
 	my_free(xrddefault_temp_file);
@@ -275,7 +277,10 @@ int xrddefault_save_state_information(void){
 	        }
 
 	/* open a safe temp file for output */
-	asprintf(&temp_file,"%sXXXXXX",xrddefault_temp_file);
+	if(asprintf(&temp_file,"%sXXXXXX",xrddefault_temp_file)==-1){
+		logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
+		return (ERROR);
+		}
 	if(temp_file==NULL)
 		return ERROR;
 	if((fd=mkstemp(temp_file))==-1)
@@ -1893,9 +1898,9 @@ int xrddefault_read_state_information(void){
 
 		printf("RETENTION DATA TIMES\n");
 		printf("----------------------------------\n");
-		printf("Read and Process:     %.6lf sec\n",runtime[0]);
+		printf("Read and Process:     %.6f sec\n",runtime[0]);
 		printf("                      ============\n");
-		printf("TOTAL:                %.6lf sec\n",runtime[1]);
+		printf("TOTAL:                %.6f sec\n",runtime[1]);
 		printf("\n\n");
 		}
 

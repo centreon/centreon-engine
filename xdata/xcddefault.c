@@ -53,6 +53,8 @@ extern char *macro_x[MACRO_X_COUNT];
 int xcddefault_initialize_comment_data(char *main_config_file){
 	comment *temp_comment=NULL;
 
+	(void)main_config_file;
+
 	/* find the new starting index for comment id if its missing*/
 	if(next_comment_id==0L){
 		for(temp_comment=comment_list;temp_comment!=NULL;temp_comment=temp_comment->next){
@@ -71,6 +73,7 @@ int xcddefault_initialize_comment_data(char *main_config_file){
 
 /* removes invalid and old comments from the comment file */
 int xcddefault_cleanup_comment_data(char *main_config_file){
+	(void)main_config_file;
 
 	/* nothing to do anymore */
 
@@ -142,6 +145,7 @@ int xcddefault_add_new_service_comment(int entry_type, char *host_name, char *sv
 
 /* deletes a host comment */
 int xcddefault_delete_host_comment(unsigned long comment_id){
+	(void)comment_id;
 
 	/* update comment file */
 	xcddefault_save_comment_data();
@@ -152,6 +156,7 @@ int xcddefault_delete_host_comment(unsigned long comment_id){
 
 /* deletes a service comment */
 int xcddefault_delete_service_comment(unsigned long comment_id){
+	(void)comment_id;
 
 	/* update comment file */
 	xcddefault_save_comment_data();

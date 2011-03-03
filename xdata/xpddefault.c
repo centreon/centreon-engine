@@ -348,6 +348,8 @@ int xpddefault_initialize_performance_data(char *config_file){
 /* cleans up performance data */
 int xpddefault_cleanup_performance_data(char *config_file){
 
+	(void)config_file;
+
 	/* free memory */
 	my_free(xpddefault_host_perfdata_command);
 	my_free(xpddefault_service_perfdata_command);
@@ -597,8 +599,8 @@ int xpddefault_close_service_perfdata_file(void){
 /* processes delimiter characters in templates */
 int xpddefault_preprocess_file_templates(char *template){
 	char *tempbuf;
-	int x=0;
-	int y=0;
+	size_t x=0;
+	size_t y=0;
 
 	if(template==NULL)
 		return OK;
