@@ -257,7 +257,10 @@ int log_service_event(service *svc){
 	grab_host_macros(temp_host);
 	grab_service_macros(svc);
 
-	asprintf(&temp_buffer,"SERVICE ALERT: %s;%s;$SERVICESTATE$;$SERVICESTATETYPE$;$SERVICEATTEMPT$;%s\n",svc->host_name,svc->description,(svc->plugin_output==NULL)?"":svc->plugin_output);
+	if(asprintf(&temp_buffer,"SERVICE ALERT: %s;%s;$SERVICESTATE$;$SERVICESTATETYPE$;$SERVICEATTEMPT$;%s\n",svc->host_name,svc->description,(svc->plugin_output==NULL)?"":svc->plugin_output)==-1){
+		logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
+		return ERROR;
+		}
 	process_macros(temp_buffer,&processed_buffer,0);
 
 	write_to_all_logs(processed_buffer,log_options);
@@ -288,7 +291,10 @@ int log_host_event(host *hst){
 		log_options=NSLOG_HOST_UP;
 
 
-	asprintf(&temp_buffer,"HOST ALERT: %s;$HOSTSTATE$;$HOSTSTATETYPE$;$HOSTATTEMPT$;%s\n",hst->name,(hst->plugin_output==NULL)?"":hst->plugin_output);
+	if(asprintf(&temp_buffer,"HOST ALERT: %s;$HOSTSTATE$;$HOSTSTATETYPE$;$HOSTATTEMPT$;%s\n",hst->name,(hst->plugin_output==NULL)?"":hst->plugin_output)==-1){
+		logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
+		return ERROR;
+		}
 	process_macros(temp_buffer,&processed_buffer,0);
 
 	write_to_all_logs(processed_buffer,log_options);
@@ -316,7 +322,10 @@ int log_host_states(int type, time_t *timestamp){
 		clear_volatile_macros();
 		grab_host_macros(temp_host);
 
-		asprintf(&temp_buffer,"%s HOST STATE: %s;$HOSTSTATE$;$HOSTSTATETYPE$;$HOSTATTEMPT$;%s\n",(type==INITIAL_STATES)?"INITIAL":"CURRENT",temp_host->name,(temp_host->plugin_output==NULL)?"":temp_host->plugin_output);
+		if(asprintf(&temp_buffer,"%s HOST STATE: %s;$HOSTSTATE$;$HOSTSTATETYPE$;$HOSTATTEMPT$;%s\n",(type==INITIAL_STATES)?"INITIAL":"CURRENT",temp_host->name,(temp_host->plugin_output==NULL)?"":temp_host->plugin_output)==-1){
+			logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
+			return ERROR;
+			}
 		process_macros(temp_buffer,&processed_buffer,0);
 		
 		write_to_all_logs_with_timestamp(processed_buffer,NSLOG_INFO_MESSAGE,timestamp);
@@ -351,7 +360,10 @@ int log_service_states(int type, time_t *timestamp){
 		grab_host_macros(temp_host);
 		grab_service_macros(temp_service);
 
-		asprintf(&temp_buffer,"%s SERVICE STATE: %s;%s;$SERVICESTATE$;$SERVICESTATETYPE$;$SERVICEATTEMPT$;%s\n",(type==INITIAL_STATES)?"INITIAL":"CURRENT",temp_service->host_name,temp_service->description,temp_service->plugin_output);
+		if(asprintf(&temp_buffer,"%s SERVICE STATE: %s;%s;$SERVICESTATE$;$SERVICESTATETYPE$;$SERVICEATTEMPT$;%s\n",(type==INITIAL_STATES)?"INITIAL":"CURRENT",temp_service->host_name,temp_service->description,temp_service->plugin_output)==-1){
+			logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
+			return ERROR;
+			}
 		process_macros(temp_buffer,&processed_buffer,0);
 
 		write_to_all_logs_with_timestamp(processed_buffer,NSLOG_INFO_MESSAGE,timestamp);
@@ -373,6 +385,7 @@ int rotate_log_file(time_t rotation_time){
 	int rename_result=0;
 	int stat_result=-1;
 	struct stat log_file_stat;
+	int ret;
 
 	if(log_rotation_method==LOG_ROTATION_NONE){
 		return OK;
@@ -397,7 +410,10 @@ int rotate_log_file(time_t rotation_time){
 	stat_result = stat(log_file, &log_file_stat);
 
 	/* get the archived filename to use */
-	asprintf(&log_archive,"%s%snagios-%02d-%02d-%d-%02d.log",log_archive_path,(log_archive_path[strlen(log_archive_path)-1]=='/')?"":"/",t->tm_mon+1,t->tm_mday,t->tm_year+1900,t->tm_hour);
+	if(asprintf(&log_archive,"%s%snagios-%02d-%02d-%d-%02d.log",log_archive_path,(log_archive_path[strlen(log_archive_path)-1]=='/')?"":"/",t->tm_mon+1,t->tm_mday,t->tm_year+1900,t->tm_hour)==-1){
+		logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
+		return ERROR;
+		}
 
 	/* rotate the log file */
 	rename_result=my_rename(log_file,log_archive);
@@ -416,7 +432,11 @@ int rotate_log_file(time_t rotation_time){
 #endif
 
 	/* record the log rotation after it has been done... */
-	asprintf(&temp_buffer,"LOG ROTATION: %s\n",method_string);
+	if(asprintf(&temp_buffer,"LOG ROTATION: %s\n",method_string)==-1){
+		logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
+		my_free(log_archive);
+		return ERROR;
+		}
 	write_to_all_logs_with_timestamp(temp_buffer,NSLOG_PROCESS_INFO,&rotation_time);
 	my_free(temp_buffer);
 
@@ -425,7 +445,7 @@ int rotate_log_file(time_t rotation_time){
 
 	if(stat_result==0){
 		chmod(log_file, log_file_stat.st_mode);
-		chown(log_file, log_file_stat.st_uid, log_file_stat.st_gid);
+		ret = chown(log_file, log_file_stat.st_uid, log_file_stat.st_gid);
 		}
 
 	/* log current host and service state */
@@ -444,7 +464,11 @@ int write_log_file_info(time_t *timestamp){
 	char *temp_buffer=NULL;
 
 	/* write log version */
-	asprintf(&temp_buffer,"LOG VERSION: %s\n",LOG_VERSION_2);
+	if(asprintf(&temp_buffer,"LOG VERSION: %s\n",LOG_VERSION_2)==-1){
+		logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
+		return ERROR;
+		}
+
 	write_to_all_logs_with_timestamp(temp_buffer,NSLOG_PROCESS_INFO,timestamp);
 	my_free(temp_buffer);
 
@@ -514,9 +538,13 @@ int log_debug_info(int level, int verbosity, const char *fmt, ...){
 
 		/* close the file */
 		close_debug_log();
-		
+
 		/* rotate the log file */
-		asprintf(&temp_path,"%s.old",debug_file);
+		if(asprintf(&temp_path,"%s.old",debug_file)==-1){
+			logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
+			return ERROR;
+			}
+
 		if(temp_path){
 
 			/* unlink the old debug file */

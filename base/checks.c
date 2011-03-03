@@ -477,7 +477,13 @@ int run_async_service_check(service *svc, int check_options, double latency, int
 
 	/* open a temp file for storing check output */
 	old_umask=umask(new_umask);
-	asprintf(&output_file,"%s/checkXXXXXX",temp_path);
+	if(asprintf(&output_file,"%s/checkXXXXXX",temp_path)==-1){
+		logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
+		svc->latency=old_latency;
+		my_free(processed_command);
+		my_free(raw_command);
+		return ERROR;
+		}
 	check_result_info.output_file_fd=mkstemp(output_file);
 	if(check_result_info.output_file_fd>0)
 		check_result_info.output_file_fp=fdopen(check_result_info.output_file_fd,"w");
@@ -1010,9 +1016,15 @@ int handle_async_service_check_result(service *temp_service, check_result *queue
 
 		logit(NSLOG_RUNTIME_WARNING,TRUE,"Warning: Return code of %d for check of service '%s' on host '%s' was out of bounds.%s\n",queued_check_result->return_code,temp_service->description,temp_service->host_name,(queued_check_result->return_code==126 ? "Make sure the plugin you're trying to run is executable." : (queued_check_result->return_code==127?" Make sure the plugin you're trying to run actually exists.":"")));
 
-		asprintf(&temp_plugin_output,"\x73\x6f\x69\x67\x61\x6e\x20\x74\x68\x67\x69\x72\x79\x70\x6f\x63\x20\x6e\x61\x68\x74\x65\x20\x64\x61\x74\x73\x6c\x61\x67");
+		if(asprintf(&temp_plugin_output,"\x73\x6f\x69\x67\x61\x6e\x20\x74\x68\x67\x69\x72\x79\x70\x6f\x63\x20\x6e\x61\x68\x74\x65\x20\x64\x61\x74\x73\x6c\x61\x67")==-1){
+			logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
+			return ERROR;
+			}
 		my_free(temp_plugin_output);
-		asprintf(&temp_service->plugin_output,"(Return code of %d is out of bounds%s)",queued_check_result->return_code,(queued_check_result->return_code==126 ? " - plugin may not be executable" : (queued_check_result->return_code==127 ?" - plugin may be missing":"")));
+		if(asprintf(&temp_service->plugin_output,"(Return code of %d is out of bounds%s)",queued_check_result->return_code,(queued_check_result->return_code==126 ? " - plugin may not be executable" : (queued_check_result->return_code==127 ?" - plugin may be missing":"")))==-1){
+			logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
+			return ERROR;
+			}
 
 		temp_service->current_state=STATE_CRITICAL;
 	        }
@@ -2714,8 +2726,14 @@ int execute_sync_host_check_3x(host *hst){
 	if(early_timeout==TRUE){
 
 		my_free(temp_plugin_output);
-		asprintf(&temp_plugin_output,"Host check timed out after %d seconds\n",host_check_timeout);
-
+		if(asprintf(&temp_plugin_output,"Host check timed out after %d seconds\n",host_check_timeout)==-1){
+			logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
+			/* free memory */
+			my_free(temp_plugin_output);
+			my_free(raw_command);
+			my_free(processed_command);
+			return ERROR;
+			}
 		/* log the timeout */
 		logit(NSLOG_RUNTIME_WARNING,TRUE,"Warning: Host check command '%s' for host '%s' timed out after %d seconds\n",processed_command,hst->name,host_check_timeout);
 	        }
@@ -2967,7 +2985,10 @@ int run_async_host_check_3x(host *hst, int check_options, double latency, int sc
 
 	/* open a temp file for storing check output */
 	old_umask=umask(new_umask);
-	asprintf(&output_file,"%s/checkXXXXXX",temp_path);
+	if(asprintf(&output_file,"%s/checkXXXXXX",temp_path)==-1){
+		logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
+		return ERROR;
+		}
 	check_result_info.output_file_fd=mkstemp(output_file);
 	if(check_result_info.output_file_fd>0)
 		check_result_info.output_file_fp=fdopen(check_result_info.output_file_fd,"w");
@@ -3222,7 +3243,7 @@ int handle_async_host_check_result_3x(host *temp_host, check_result *queued_chec
 		return ERROR;
 
 	time(&current_time);
-	
+
 	log_debug_info(DEBUGL_CHECKS,1,"** Handling async check result for host '%s'...\n",temp_host->name);
 
 	log_debug_info(DEBUGL_CHECKS,2,"\tCheck Type:         %s\n",(queued_check_result->check_type==HOST_CHECK_ACTIVE)?"Active":"Passive");
@@ -3359,8 +3380,13 @@ int handle_async_host_check_result_3x(host *temp_host, check_result *queued_chec
 			my_free(temp_host->long_plugin_output);
 			my_free(temp_host->perf_data);
 
-			asprintf(&temp_host->plugin_output,"(Return code of %d is out of bounds%s)",queued_check_result->return_code,(queued_check_result->return_code==126 || queued_check_result->return_code==127)?" - plugin may be missing":"");
-			
+			if(asprintf(&temp_host->plugin_output,"(Return code of %d is out of bounds%s)",queued_check_result->return_code,(queued_check_result->return_code==126 || queued_check_result->return_code==127)?" - plugin may be missing":"")==-1){
+				logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
+				/* free memory */
+				my_free(old_plugin_output);
+				return ERROR;
+				}
+
 			result=STATE_CRITICAL;
 			}
 

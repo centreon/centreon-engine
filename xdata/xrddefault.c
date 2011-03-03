@@ -279,7 +279,10 @@ int xrddefault_save_state_information(void){
 	        }
 
 	/* open a safe temp file for output */
-	asprintf(&temp_file,"%sXXXXXX",xrddefault_temp_file);
+	if(asprintf(&temp_file,"%sXXXXXX",xrddefault_temp_file)==-1){
+		logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
+		return (ERROR);
+		}
 	if(temp_file==NULL)
 		return ERROR;
 	if((fd=mkstemp(temp_file))==-1)

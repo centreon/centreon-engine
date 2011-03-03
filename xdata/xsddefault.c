@@ -347,7 +347,10 @@ int xsddefault_save_status_data(void){
 	/* open a safe temp file for output */
 	if(xsddefault_temp_file==NULL)
 		return ERROR;
-	asprintf(&temp_file,"%sXXXXXX",xsddefault_temp_file);
+	if(asprintf(&temp_file,"%sXXXXXX",xsddefault_temp_file)==-1){
+		logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
+		return ERROR;
+		}
 	if(temp_file==NULL)
 		return ERROR;
 

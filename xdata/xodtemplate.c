@@ -255,19 +255,24 @@ int xodtemplate_read_config_data(char *main_config_file, int options, int cache,
 			/* skip blank lines and comments */
 			if(input[0]=='#' || input[0]==';' || input[0]=='\x0')
 				continue;
-			
+
 			if((var=strtok(input,"="))==NULL)
 				continue;
-			
+
 			if((val=strtok(NULL,"\n"))==NULL)
 				continue;
-			
+
 			/* process a single config file */
 			if(!strcmp(var,"xodtemplate_config_file") || !strcmp(var,"cfg_file")){
 
 				temp_buffer=(char *)strdup(val);
-				if(config_base_dir!=NULL && val[0]!='/')
-					asprintf(&config_file,"%s/%s",config_base_dir,temp_buffer);
+				if(config_base_dir!=NULL && val[0]!='/'){
+					if(asprintf(&config_file,"%s/%s",config_base_dir,temp_buffer)==-1){
+						logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
+						result=ERROR;
+						break;
+						}
+					}
 				else
 					config_file=temp_buffer;
 
@@ -275,7 +280,7 @@ int xodtemplate_read_config_data(char *main_config_file, int options, int cache,
 				result=xodtemplate_process_config_file(config_file,options);
 
 				my_free(config_file);
-				
+
 				/* if there was an error processing the config file, break out of loop */
 				if(result==ERROR)
 					break;
@@ -283,10 +288,15 @@ int xodtemplate_read_config_data(char *main_config_file, int options, int cache,
 
 			/* process all files in a config directory */
 			else if(!strcmp(var,"xodtemplate_config_dir") || !strcmp(var,"cfg_dir")){
-				
+
 				temp_buffer=(char *)strdup(val);
-				if(config_base_dir!=NULL && val[0]!='/')
-					asprintf(&config_file,"%s/%s",config_base_dir,temp_buffer);
+				if(config_base_dir!=NULL && val[0]!='/'){
+					if(asprintf(&config_file,"%s/%s",config_base_dir,temp_buffer)==-1){
+						logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
+						result=ERROR;
+						break;
+						}
+					}
 				else
 					config_file=temp_buffer;
 

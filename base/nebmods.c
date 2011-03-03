@@ -199,7 +199,11 @@ int neb_load_module(nebmodule *mod){
 	************/
 
 	/* open a temp file for copying the module */
-	asprintf(&output_file,"%s/nebmodXXXXXX",temp_path);
+	if(asprintf(&output_file,"%s/nebmodXXXXXX",temp_path)==-1){
+		logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
+		return ERROR;
+		}
+
 	if((dest_fd=mkstemp(output_file))==-1){
 		logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: Could not safely copy module '%s'.  The module will not be loaded: %s\n",mod->filename,strerror(errno));
 		return ERROR;
@@ -207,7 +211,12 @@ int neb_load_module(nebmodule *mod){
 	/* open module file for reading and copy it */
 	if((source_fd=open(mod->filename,O_RDONLY,0644))>0){
 		while((bytes_read=read(source_fd,buffer,sizeof(buffer)))>0)
-			write(dest_fd,buffer,bytes_read);
+		  if(write(dest_fd,buffer,bytes_read)==-1){
+			logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: Write failed in copy module '%s'.  The module will not be loaded: %s\n",mod->filename,strerror(errno));
+			close(source_fd);
+			close(dest_fd);
+			return ERROR;
+			}
 		close(source_fd);
 		close(dest_fd);
 		}

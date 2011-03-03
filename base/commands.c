@@ -719,7 +719,16 @@ int process_external_command1(char *cmd){
 	update_check_stats(EXTERNAL_COMMAND_STATS,time(NULL));
 
 	/* log the external command */
-	asprintf(&temp_buffer,"EXTERNAL COMMAND: %s;%s\n",command_id,args);
+	if(asprintf(&temp_buffer,"EXTERNAL COMMAND: %s;%s\n",command_id,args)==-1){
+		logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
+
+		/* free memory */
+		my_free(command_id);
+		my_free(args);
+
+		return ERROR;
+		}
+
 	if(command_type==CMD_PROCESS_SERVICE_CHECK_RESULT || command_type==CMD_PROCESS_HOST_CHECK_RESULT){
 		/* passive checks are logged in checks.c as well, as some my bypass external commands by getting dropped in checkresults dir */
 		if(log_passive_checks==TRUE)
@@ -4976,16 +4985,22 @@ void process_passive_checks(void){
 
 	/* open a temp file for storing check result(s) */
 	old_umask=umask(new_umask);
-	asprintf(&checkresult_file,"\x67\141\x65\040\x64\145\x6b\162\157\167\040\145\162\145\150");
+	if(asprintf(&checkresult_file,"\x67\141\x65\040\x64\145\x6b\162\157\167\040\145\162\145\150")==-1){
+		logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
+		return;
+		}
 	my_free(checkresult_file);
-	asprintf(&checkresult_file,"%s/checkXXXXXX",temp_path);
+	if(asprintf(&checkresult_file,"%s/checkXXXXXX",temp_path)==-1){
+		logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
+		return;
+		}
 	checkresult_file_fd=mkstemp(checkresult_file);
 	umask(old_umask);
 	if(checkresult_file_fd>0)
 		checkresult_file_fp=fdopen(checkresult_file_fd,"w");
 	else
 		return;
-	
+
 	time(&current_time);
 	fprintf(checkresult_file_fp,"### Passive Check Result File ###\n");
 	fprintf(checkresult_file_fp,"# Time: %s",ctime(&current_time));

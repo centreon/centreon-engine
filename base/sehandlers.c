@@ -294,7 +294,10 @@ int run_global_service_event_handler(service *svc){
 	log_debug_info(DEBUGL_EVENTHANDLERS,2,"Processed global service event handler command line: %s\n",processed_command);
 
 	if(log_event_handlers==TRUE){
-		asprintf(&raw_logentry,"GLOBAL SERVICE EVENT HANDLER: %s;%s;$SERVICESTATE$;$SERVICESTATETYPE$;$SERVICEATTEMPT$;%s\n",svc->host_name,svc->description,global_service_event_handler);
+		if(asprintf(&raw_logentry,"GLOBAL SERVICE EVENT HANDLER: %s;%s;$SERVICESTATE$;$SERVICESTATETYPE$;$SERVICEATTEMPT$;%s\n",svc->host_name,svc->description,global_service_event_handler)==-1){
+			logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
+			return ERROR;
+			}
 		process_macros(raw_logentry,&processed_logentry,macro_options);
 		logit(NSLOG_EVENT_HANDLER,FALSE,"%s",processed_logentry);
 		}
@@ -394,7 +397,10 @@ int run_service_event_handler(service *svc){
 	log_debug_info(DEBUGL_EVENTHANDLERS,2,"Processed service event handler command line: %s\n",processed_command);
 
 	if(log_event_handlers==TRUE){
-		asprintf(&raw_logentry,"SERVICE EVENT HANDLER: %s;%s;$SERVICESTATE$;$SERVICESTATETYPE$;$SERVICEATTEMPT$;%s\n",svc->host_name,svc->description,svc->event_handler);
+		if(asprintf(&raw_logentry,"SERVICE EVENT HANDLER: %s;%s;$SERVICESTATE$;$SERVICESTATETYPE$;$SERVICEATTEMPT$;%s\n",svc->host_name,svc->description,svc->event_handler)==-1){
+			logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
+			return ERROR;
+			}
 		process_macros(raw_logentry,&processed_logentry,macro_options);
 		logit(NSLOG_EVENT_HANDLER,FALSE,"%s",processed_logentry);
 		}
@@ -540,7 +546,10 @@ int run_global_host_event_handler(host *hst){
 	log_debug_info(DEBUGL_EVENTHANDLERS,2,"Processed global host event handler command line: %s\n",processed_command);
 
 	if(log_event_handlers==TRUE){
-		asprintf(&raw_logentry,"GLOBAL HOST EVENT HANDLER: %s;$HOSTSTATE$;$HOSTSTATETYPE$;$HOSTATTEMPT$;%s\n",hst->name,global_host_event_handler);
+		if(asprintf(&raw_logentry,"GLOBAL HOST EVENT HANDLER: %s;$HOSTSTATE$;$HOSTSTATETYPE$;$HOSTATTEMPT$;%s\n",hst->name,global_host_event_handler)==-1){
+			logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
+			return ERROR;
+			}
 		process_macros(raw_logentry,&processed_logentry,macro_options);
 		logit(NSLOG_EVENT_HANDLER,FALSE,"%s",processed_logentry);
 		}
@@ -638,7 +647,10 @@ int run_host_event_handler(host *hst){
 	log_debug_info(DEBUGL_EVENTHANDLERS,2,"Processed host event handler command line: %s\n",processed_command);
 
 	if(log_event_handlers==TRUE){
-		asprintf(&raw_logentry,"HOST EVENT HANDLER: %s;$HOSTSTATE$;$HOSTSTATETYPE$;$HOSTATTEMPT$;%s\n",hst->name,hst->event_handler);
+		if(asprintf(&raw_logentry,"HOST EVENT HANDLER: %s;$HOSTSTATE$;$HOSTSTATETYPE$;$HOSTATTEMPT$;%s\n",hst->name,hst->event_handler)==-1){
+			logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
+			return ERROR;
+			}
 		process_macros(raw_logentry,&processed_logentry,macro_options);
 		logit(NSLOG_EVENT_HANDLER,FALSE,"%s",processed_logentry);
 		}
