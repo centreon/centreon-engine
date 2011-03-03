@@ -182,23 +182,26 @@ int process_macros(char *input_buffer, char **output_buffer, int options){
 #ifdef NSCORE
 				log_debug_info(DEBUGL_MACROS,2,"  Escaped $.  Running output (%zd): '%s'\n",strlen(*output_buffer),*output_buffer);
 #endif
-
+				/*
 				*output_buffer=(char *)realloc(*output_buffer,strlen(*output_buffer)+2);
 				strcat(*output_buffer,"$");
+				*/
 				}
 
 			/* a non-macro, just some user-defined string between two $s */
 			else{
 
 #ifdef NSCORE
-				log_debug_info(DEBUGL_MACROS,2,"  Non-macro.  Running output (%zd): '%s'\n",strlen(*output_buffer),*output_buffer);
+				log_debug_info(DEBUGL_MACROS,2,"  Macro doesn't exist.  Running output (%zd): '%s'\n",strlen(*output_buffer),*output_buffer);
 #endif
 
 				/* add the plain text to the end of the already processed buffer */
+				/*
 				*output_buffer=(char *)realloc(*output_buffer,strlen(*output_buffer)+strlen(temp_buffer)+3);
 				strcat(*output_buffer,"$");
 				strcat(*output_buffer,temp_buffer);
 				strcat(*output_buffer,"$");
+				*/
 				}
 
 			/* insert macro */
