@@ -4482,14 +4482,16 @@ int query_update_api(void){
 		asprintf(&api_query,"%s&version=%s%s",api_query,PROGRAM_VERSION,(api_query_opts==NULL)?"":api_query_opts);
 
 	/* generate the HTTP request */
-	asprintf(&buf,"POST %s HTTP/1.0\r\n",api_path);
-	asprintf(&buf,"%sUser-Agent: Nagios/%s\r\n",buf,PROGRAM_VERSION);
-	asprintf(&buf,"%sConnection: close\r\n",buf);
-	asprintf(&buf,"%sHost: %s\r\n",buf,api_server);
-	asprintf(&buf,"%sContent-Type: application/x-www-form-urlencoded\r\n",buf);
-	asprintf(&buf,"%sContent-Length: %zd\r\n",buf,strlen(api_query));
-	asprintf(&buf,"%s\r\n",buf);
-	asprintf(&buf,"%s%s\r\n",buf,api_query);
+	asprintf(&buf,
+		 "POST %s HTTP/1.0\r\n"
+		 "User-Agent: Nagios/%s\r\n"
+		 "Connection: close\r\n"
+		 "Host: %s\r\n"
+		 "Content-Type: application/x-www-form-urlencoded\r\n"
+		 "Content-Length: %zd\r\n"
+		 "\r\n"
+		 "%s\r\n",
+		 api_path,PROGRAM_VERSION,api_server,strlen(api_query),api_query);
 
 	/*
 	printf("SENDING...\n");
@@ -4497,7 +4499,6 @@ int query_update_api(void){
 	printf("%s",buf);
 	printf("\n");
 	*/
-	
 
 	result=my_tcp_connect(api_server,80,&sd,2);
 	/*printf("CONN RESULT: %d, SD: %d\n",result,sd);*/
