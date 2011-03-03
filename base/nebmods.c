@@ -357,7 +357,7 @@ int neb_unload_module(nebmodule *mod, int flags, int reason){
 	/* call the de-initialization function if available (and the module was initialized) */
 	if(mod->deinit_func && reason!=NEBMODULE_ERROR_BAD_INIT){
 
-	  *(void**)(&deinitfunc)=mod->deinit_func;
+		*(void**)(&deinitfunc)=mod->deinit_func;
 
 		/* module can opt to not be unloaded */
 		result=(*deinitfunc)(flags,reason);
@@ -587,7 +587,7 @@ int neb_make_callbacks(int callback_type, void *data){
 
 	/* make the callbacks... */
 	for(temp_callback=neb_callback_list[callback_type];temp_callback!=NULL;temp_callback=temp_callback->next){
-	  *(void**)(&callbackfunc)=temp_callback->callback_func;
+		*(void**)(&callbackfunc)=temp_callback->callback_func;
 		cbresult=callbackfunc(callback_type,data);
 
 		total_callbacks++;

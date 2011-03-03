@@ -230,7 +230,7 @@ int xrddefault_initialize_retention_data(char *config_file){
 /* cleanup retention data before terminating */
 int xrddefault_cleanup_retention_data(char *config_file){
 
-  (void)config_file;
+	(void)config_file;
 
 	/* free memory */
 	my_free(xrddefault_retention_file);
