@@ -1605,11 +1605,12 @@ int handle_async_service_check_result(service *temp_service, check_result *queue
 	broker_service_check(NEBTYPE_SERVICECHECK_PROCESSED,NEBFLAG_NONE,NEBATTR_NONE,temp_service,temp_service->check_type,queued_check_result->start_time,queued_check_result->finish_time,NULL,temp_service->latency,temp_service->execution_time,service_check_timeout,queued_check_result->early_timeout,queued_check_result->return_code,NULL,NULL);
 #endif
 
-	/* set the checked flag */
-	temp_service->has_been_checked=TRUE;
-
-	/* update the current service status log */
-	update_service_status(temp_service,FALSE);
+	if(!(reschedule_check==TRUE && temp_service->should_be_scheduled==TRUE && temp_service->has_been_checked==TRUE)){
+		/* set the checked flag */
+		temp_service->has_been_checked=TRUE;
+		/* update the current service status log */
+		update_service_status(temp_service,FALSE);
+		}
 
 	/* check to see if the service and/or associate host is flapping */
 	if(flapping_check_done==FALSE){
