@@ -182,10 +182,8 @@ int process_macros(char *input_buffer, char **output_buffer, int options){
 #ifdef NSCORE
 				log_debug_info(DEBUGL_MACROS,2,"  Escaped $.  Running output (%zd): '%s'\n",strlen(*output_buffer),*output_buffer);
 #endif
-				/*
 				*output_buffer=(char *)realloc(*output_buffer,strlen(*output_buffer)+2);
 				strcat(*output_buffer,"$");
-				*/
 				}
 
 			/* a non-macro, just some user-defined string between two $s */
