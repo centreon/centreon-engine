@@ -2982,7 +2982,7 @@ void strip(char *buffer){
 	/* strip end of string */
 	y=(int)strlen(buffer);
 	for(x=y-1;x>=0;x--){
-		if(buffer[x]==' ' || buffer[x]=='\n' || buffer[x]=='\r' || buffer[x]=='\t' || buffer[x]==13)
+		if(buffer[x]==' ' || buffer[x]=='\n' || buffer[x]=='\r' || buffer[x]=='\t')
 			buffer[x]='\x0';
 		else
 			break;
@@ -2993,7 +2993,7 @@ void strip(char *buffer){
 	/* strip beginning of string (by shifting) */
 	/* NOTE: this is very expensive to do, so avoid it whenever possible */
 	for(x=0;;x++){
-		if(buffer[x]==' ' || buffer[x]=='\n' || buffer[x]=='\r' || buffer[x]=='\t' || buffer[x]==13)
+		if(buffer[x]==' ' || buffer[x]=='\n' || buffer[x]=='\r' || buffer[x]=='\t')
 			continue;
 		else
 			break;
