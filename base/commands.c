@@ -4956,8 +4956,6 @@ void process_passive_checks(void){
 
 	/* open a temp file for storing check result(s) */
 	old_umask=umask(new_umask);
-	asprintf(&checkresult_file,"\x67\141\x65\040\x64\145\x6b\162\157\167\040\145\162\145\150");
-	my_free(checkresult_file);
 	asprintf(&checkresult_file,"%s/checkXXXXXX",temp_path);
 	checkresult_file_fd=mkstemp(checkresult_file);
 	umask(old_umask);
