@@ -5594,7 +5594,7 @@ fi
 
 
 
-ac_config_files="$ac_config_files Makefile subst pkginfo base/Makefile common/Makefile contrib/Makefile module/Makefile xdata/Makefile daemon-init t/Makefile t-tap/Makefile"
+ac_config_files="$ac_config_files Makefile subst pkginfo base/Makefile common/Makefile module/Makefile xdata/Makefile daemon-init t/Makefile t-tap/Makefile"
 
 
 
@@ -6220,7 +6220,6 @@ do
     "pkginfo") CONFIG_FILES="$CONFIG_FILES pkginfo" ;;
     "base/Makefile") CONFIG_FILES="$CONFIG_FILES base/Makefile" ;;
     "common/Makefile") CONFIG_FILES="$CONFIG_FILES common/Makefile" ;;
-    "contrib/Makefile") CONFIG_FILES="$CONFIG_FILES contrib/Makefile" ;;
     "module/Makefile") CONFIG_FILES="$CONFIG_FILES module/Makefile" ;;
     "xdata/Makefile") CONFIG_FILES="$CONFIG_FILES xdata/Makefile" ;;
     "daemon-init") CONFIG_FILES="$CONFIG_FILES daemon-init" ;;
