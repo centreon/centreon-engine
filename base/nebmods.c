@@ -162,16 +162,16 @@ int neb_load_all_modules(void){
         }
 
 
+#ifndef PATH_MAX
+# define PATH_MAX 4096
+#endif
 /* load a particular module */
-int neb_load_module(nebmodule *mod){
+int neb_load_module(nebmodule *mod)
+{
 	int (*initfunc)(int,char *,void *);
 	int *module_version_ptr=NULL;
-	char *output_file=NULL;
-	int dest_fd=-1;
-	int source_fd=-1;
-	char buffer[MAX_INPUT_BUFFER]={0};
-	int bytes_read=0;
-	int result=OK;
+	char output_file[PATH_MAX];
+	int dest_fd, result=OK;
 
 	if(mod==NULL || mod->filename==NULL)
 		return ERROR;
@@ -198,23 +198,19 @@ int neb_load_module(nebmodule *mod){
 	   So... the trick is to (1) copy the module to a temp file, (2) dlopen() the temp file, and (3) immediately delete the temp file. 
 	************/
 
-	/* open a temp file for copying the module */
-	asprintf(&output_file,"%s/nebmodXXXXXX",temp_path);
-	if((dest_fd=mkstemp(output_file))==-1){
-		logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: Could not safely copy module '%s'.  The module will not be loaded: %s\n",mod->filename,strerror(errno));
+	/*
+	 * open a temp file for copying the module. We use my_fdcopy() so
+	 * we re-use the destination file descriptor returned by mkstemp(3),
+	 * which we have to close ourselves.
+	 */
+	snprintf(output_file, sizeof(output_file) - 1, "%s/nebmodXXXXXX",temp_path);
+	dest_fd = mkstemp(output_file);
+	result = my_fdcopy(mod->filename, output_file, dest_fd);
+	close(dest_fd);
+	if (result == ERROR) {
+		logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: Failed to safely copy module '%s'. The module will not be loaded\n", mod->filename);
 		return ERROR;
-		}
-	/* open module file for reading and copy it */
-	if((source_fd=open(mod->filename,O_RDONLY,0644))>0){
-		while((bytes_read=read(source_fd,buffer,sizeof(buffer)))>0)
-			write(dest_fd,buffer,bytes_read);
-		close(source_fd);
-		close(dest_fd);
-		}
-	else{
-		logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: Could not safely copy module '%s'.  The module will not be loaded: %s\n",mod->filename,strerror(errno));
-		return ERROR;
-		}
+	}
 
 	/* load the module (use the temp copy we just made) */
 #ifdef USE_LTDL
@@ -561,7 +557,7 @@ int neb_deregister_callback(int callback_type, int (*callback_func)(int,void *))
 
 /* make callbacks to modules */
 int neb_make_callbacks(int callback_type, void *data){
-	nebcallback *temp_callback=NULL;
+	nebcallback *temp_callback, *next_callback;
 	int (*callbackfunc)(int,void *);
 	register int cbresult=0;
 	int total_callbacks=0;
@@ -577,9 +573,11 @@ int neb_make_callbacks(int callback_type, void *data){
 	log_debug_info(DEBUGL_EVENTBROKER,1,"Making callbacks (type %d)...\n",callback_type);
 
 	/* make the callbacks... */
-	for(temp_callback=neb_callback_list[callback_type];temp_callback!=NULL;temp_callback=temp_callback->next){
+	for(temp_callback = neb_callback_list[callback_type];temp_callback;temp_callback=next_callback) {
+		next_callback = temp_callback->next;
 		callbackfunc=temp_callback->callback_func;
 		cbresult=callbackfunc(callback_type,data);
+		temp_callback = next_callback;
 
 		total_callbacks++;
 		log_debug_info(DEBUGL_EVENTBROKER,2,"Callback #%d (type %d) return code = %d\n",total_callbacks,callback_type,cbresult);

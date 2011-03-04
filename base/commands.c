@@ -3285,15 +3285,18 @@ int cmd_change_object_custom_var(int cmd, char *args){
 	/* find the object */
 	switch(cmd){
 	case CMD_CHANGE_CUSTOM_HOST_VAR:
-		temp_host=find_host(name1);
+		if((temp_host=find_host(name1))==NULL)
+			return ERROR;
 		temp_customvariablesmember=temp_host->custom_variables;
 		break;
 	case CMD_CHANGE_CUSTOM_SVC_VAR:
-		temp_service=find_service(name1,name2);
+		if((temp_service=find_service(name1,name2))==NULL)
+			return ERROR;
 		temp_customvariablesmember=temp_service->custom_variables;
 		break;
 	case CMD_CHANGE_CUSTOM_CONTACT_VAR:
-		temp_contact=find_contact(name1);
+		if((temp_contact=find_contact(name1))==NULL)
+			return ERROR;
 		temp_customvariablesmember=temp_contact->custom_variables;
 		break;
 	default:
@@ -4961,10 +4964,13 @@ void process_passive_checks(void){
 	asprintf(&checkresult_file,"%s/checkXXXXXX",temp_path);
 	checkresult_file_fd=mkstemp(checkresult_file);
 	umask(old_umask);
-	if(checkresult_file_fd>0)
-		checkresult_file_fp=fdopen(checkresult_file_fd,"w");
-	else
+	if(checkresult_file_fd < 0) {
+		logit(NSLOG_RUNTIME_ERROR,TRUE,"Failed to open checkresult file '%s': %s\n", checkresult_file, strerror(errno));
+		free(checkresult_file);
 		return;
+	}
+
+	checkresult_file_fp=fdopen(checkresult_file_fd,"w");
 	
 	time(&current_time);
 	fprintf(checkresult_file_fp,"### Passive Check Result File ###\n");

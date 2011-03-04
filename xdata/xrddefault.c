@@ -50,8 +50,6 @@ extern scheduled_downtime *scheduled_downtime_list;
 extern char           *global_host_event_handler;
 extern char           *global_service_event_handler;
 
-extern char           *macro_x[MACRO_X_COUNT];
-
 extern int            enable_notifications;
 extern int            execute_service_checks;
 extern int            accept_passive_service_checks;
@@ -108,9 +106,13 @@ char *xrddefault_temp_file=NULL;
 /********************* CONFIG INITIALIZATION  *********************/
 /******************************************************************/
 
-int xrddefault_grab_config_info(char *main_config_file){
+int xrddefault_grab_config_info(char *main_config_file)
+{
 	char *input=NULL;
 	mmapfile *thefile=NULL;
+	nagios_macros *mac;
+
+	mac = get_global_macros();
 							      
 
 	/* open the main config file for reading */
@@ -160,12 +162,12 @@ int xrddefault_grab_config_info(char *main_config_file){
 		return ERROR;
 
 	/* save the retention file macro */
-	my_free(macro_x[MACRO_RETENTIONDATAFILE]);
-	if((macro_x[MACRO_RETENTIONDATAFILE]=(char *)strdup(xrddefault_retention_file)))
-		strip(macro_x[MACRO_RETENTIONDATAFILE]);
+	my_free(mac->x[MACRO_RETENTIONDATAFILE]);
+	if((mac->x[MACRO_RETENTIONDATAFILE]=(char *)strdup(xrddefault_retention_file)))
+		strip(mac->x[MACRO_RETENTIONDATAFILE]);
 
 	return OK;
-        }
+}
 
 
 
@@ -268,11 +270,7 @@ int xrddefault_save_state_information(void){
 
 	/* make sure we have everything */
 	if(xrddefault_retention_file==NULL || xrddefault_temp_file==NULL){
-
-#ifdef NSCORE
 		logit(NSLOG_RUNTIME_ERROR,TRUE,"Error: We don't have the required file names to store retention data!\n");
-#endif
-
 		return ERROR;
 	        }
 
@@ -291,9 +289,7 @@ int xrddefault_save_state_information(void){
 		close(fd);
 		unlink(temp_file);
 
-#ifdef NSCORE
 		logit(NSLOG_RUNTIME_ERROR,TRUE,"Error: Could not open temp state retention file '%s' for writing!\n",temp_file);
-#endif
 
 		my_free(temp_file);
 
@@ -670,9 +666,7 @@ int xrddefault_read_state_information(void){
 	/* make sure we have what we need */
 	if(xrddefault_retention_file==NULL){
 
-#ifdef NSCORE
 		logit(NSLOG_RUNTIME_ERROR,TRUE,"Error: We don't have a filename for retention data!\n");
-#endif
 
 		return ERROR;
 	        }
@@ -712,12 +706,6 @@ int xrddefault_read_state_information(void){
 		/* far better than strip()ing */
 		if(input[0]=='\t')
 			input++;
-
-#ifdef REMOVED_022008
-		/* skip blank lines and comments */
-		if(input[0]=='#' || input[0]=='\n' || input[0]=='\x0')
-			continue;
-#endif
 
 		strip(input);
 
@@ -1008,12 +996,6 @@ int xrddefault_read_state_information(void){
 
 		else if(data_type!=XRDDEFAULT_NO_DATA){
 
-#ifdef REMOVED_022008
-			var=strtok(input,"=");
-			val=strtok(NULL,"\n");
-			if(val==NULL)
-				continue;
-#endif
 			/* slightly faster than strtok () */
 			var=input;
 			if((val=strchr(input,'='))==NULL)

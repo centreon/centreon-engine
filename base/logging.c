@@ -34,8 +34,6 @@ extern char	*log_file;
 extern char     *temp_file;
 extern char	*log_archive_path;
 
-extern char     *macro_x[MACRO_X_COUNT];
-
 extern host     *host_list;
 extern service  *service_list;
 
@@ -60,6 +58,36 @@ extern int      debug_verbosity;
 extern unsigned long max_debug_file_size;
 FILE            *debug_file_fp=NULL;
 
+static pthread_mutex_t debug_fp_lock;
+
+/*
+ * since we don't want child processes to hang indefinitely
+ * in case they inherit a locked lock, we use soft-locking
+ * here, which basically tries to acquire the lock for a
+ * short while and then gives up, returning -1 to signal
+ * the error
+ */
+static inline int soft_lock(pthread_mutex_t *lock)
+{
+	int i;
+
+	for (i = 0; i < 5; i++) {
+		if (!pthread_mutex_trylock(lock)) {
+			/* success */
+			return 0;
+		}
+
+		if (errno == EDEADLK) {
+			/* we already have the lock */
+			return 0;
+		}
+
+		/* sleep briefly */
+		usleep(30);
+	}
+
+	return -1; /* we failed to get the lock. Nothing to do */
+}
 
 
 
@@ -67,29 +95,18 @@ FILE            *debug_file_fp=NULL;
 /************************ LOGGING FUNCTIONS ***********************/
 /******************************************************************/
 
-/* This needs to be a function rather than a macro. C99 introduces
- * variadic macros, but we need to support compilers that aren't
- * C99 compliant in that area, so a function it is. Hopefully most
- * compilers will just optimize this call away, as it's easily
- * recognizable as not doing anything at all */
-void logit(int data_type, int display, const char *fmt, ...){
-	int len;
-	va_list ap;
-	char *buffer=NULL;
-
-	va_start(ap,fmt);
-	if((len=vasprintf(&buffer,fmt,ap))>0){
-		write_to_logs_and_console(buffer,data_type,display);
-		free(buffer);
-		}
-	va_end(ap);
-
-	return;
-	}
+/* write something to the console */
+static void write_to_console(char *buffer)
+{
+	/* should we print to the console? */
+	if(daemon_mode==FALSE)
+		printf("%s\n",buffer);
+}
 
 
 /* write something to the log file, syslog, and possibly the console */
-int write_to_logs_and_console(char *buffer, unsigned long data_type, int display){
+static void write_to_logs_and_console(char *buffer, unsigned long data_type, int display)
+{
 	register int len=0;
 	register int x=0;
 
@@ -110,24 +127,26 @@ int write_to_logs_and_console(char *buffer, unsigned long data_type, int display
 
 		/* don't display warnings if we're just testing scheduling */
 		if(test_scheduling==TRUE && data_type==NSLOG_VERIFICATION_WARNING)
-			return OK;
+			return;
 
 		write_to_console(buffer);
-	        }
-
-	return OK;
-        }
+	}
+}
 
 
-/* write something to the console */
-int write_to_console(char *buffer){
+/* The main logging function */
+void logit(int data_type, int display, const char *fmt, ...)
+{
+	va_list ap;
+	char *buffer=NULL;
 
-	/* should we print to the console? */
-	if(daemon_mode==FALSE)
-		printf("%s\n",buffer);
-
-	return OK;
-        }
+	va_start(ap,fmt);
+	if (vasprintf(&buffer, fmt, ap) > 0) {
+		write_to_logs_and_console(buffer,data_type,display);
+		free(buffer);
+	}
+	va_end(ap);
+}
 
 
 /* write something to the log file and syslog facility */
@@ -144,16 +163,14 @@ int write_to_all_logs(char *buffer, unsigned long data_type){
 
 
 /* write something to the log file and syslog facility */
-int write_to_all_logs_with_timestamp(char *buffer, unsigned long data_type, time_t *timestamp){
-
+static void write_to_all_logs_with_timestamp(char *buffer, unsigned long data_type, time_t *timestamp)
+{
 	/* write to syslog */
 	write_to_syslog(buffer,data_type);
 
 	/* write to main log */
 	write_to_log(buffer,data_type,timestamp);
-
-	return OK;
-        }
+}
 
 
 /* write something to the nagios log file */
@@ -228,11 +245,13 @@ int write_to_syslog(char *buffer, unsigned long data_type){
 
 
 /* write a service problem/recovery to the nagios log file */
-int log_service_event(service *svc){
+int log_service_event(service *svc)
+{
 	char *temp_buffer=NULL;
 	char *processed_buffer=NULL;
 	unsigned long log_options=0L;
 	host *temp_host=NULL;
+	nagios_macros mac;
 
 	/* don't log soft errors if the user doesn't want to */
 	if(svc->state_type==SOFT_STATE && !log_service_retries)
@@ -253,12 +272,15 @@ int log_service_event(service *svc){
 		return ERROR;
 
 	/* grab service macros */
-	clear_volatile_macros();
-	grab_host_macros(temp_host);
-	grab_service_macros(svc);
+	memset(&mac, 0, sizeof(mac));
+	grab_host_macros(&mac, temp_host);
+	grab_service_macros(&mac, svc);
 
+	/* XXX: replace the macro madness with some simple helpers instead */
 	asprintf(&temp_buffer,"SERVICE ALERT: %s;%s;$SERVICESTATE$;$SERVICESTATETYPE$;$SERVICEATTEMPT$;%s\n",svc->host_name,svc->description,(svc->plugin_output==NULL)?"":svc->plugin_output);
-	process_macros(temp_buffer,&processed_buffer,0);
+	process_macros_r(&mac, temp_buffer,&processed_buffer,0);
+	clear_host_macros(&mac);
+	clear_service_macros(&mac);
 
 	write_to_all_logs(processed_buffer,log_options);
 
@@ -266,18 +288,20 @@ int log_service_event(service *svc){
 	my_free(processed_buffer);
 
 	return OK;
-	}
+}
 
 
 /* write a host problem/recovery to the log file */
-int log_host_event(host *hst){
+int log_host_event(host *hst)
+{
 	char *temp_buffer=NULL;
 	char *processed_buffer=NULL;
 	unsigned long log_options=0L;
+	nagios_macros mac;
 
 	/* grab the host macros */
-	clear_volatile_macros();
-	grab_host_macros(hst);
+	memset(&mac, 0, sizeof(mac));
+	grab_host_macros(&mac, hst);
 
 	/* get the log options */
 	if(hst->current_state==HOST_DOWN)
@@ -287,59 +311,68 @@ int log_host_event(host *hst){
 	else
 		log_options=NSLOG_HOST_UP;
 
-
+	/* XXX: replace the macro madness with some simple helpers instead */
 	asprintf(&temp_buffer,"HOST ALERT: %s;$HOSTSTATE$;$HOSTSTATETYPE$;$HOSTATTEMPT$;%s\n",hst->name,(hst->plugin_output==NULL)?"":hst->plugin_output);
-	process_macros(temp_buffer,&processed_buffer,0);
+	process_macros_r(&mac, temp_buffer,&processed_buffer,0);
 
 	write_to_all_logs(processed_buffer,log_options);
 
+	clear_host_macros(&mac);
 	my_free(temp_buffer);
 	my_free(processed_buffer);
 
 	return OK;
-        }
+}
 
 
 /* logs host states */
-int log_host_states(int type, time_t *timestamp){
+int log_host_states(int type, time_t *timestamp)
+{
 	char *temp_buffer=NULL;
 	char *processed_buffer=NULL;
 	host *temp_host=NULL;;
+	nagios_macros mac;
 
 	/* bail if we shouldn't be logging initial states */
 	if(type==INITIAL_STATES && log_initial_states==FALSE)
 		return OK;
 
+	memset(&mac, 0, sizeof(mac));
 	for(temp_host=host_list;temp_host!=NULL;temp_host=temp_host->next){
 
 		/* grab the host macros */
-		clear_volatile_macros();
-		grab_host_macros(temp_host);
+		grab_host_macros(&mac, temp_host);
 
+		/* XXX: macro madness */
 		asprintf(&temp_buffer,"%s HOST STATE: %s;$HOSTSTATE$;$HOSTSTATETYPE$;$HOSTATTEMPT$;%s\n",(type==INITIAL_STATES)?"INITIAL":"CURRENT",temp_host->name,(temp_host->plugin_output==NULL)?"":temp_host->plugin_output);
-		process_macros(temp_buffer,&processed_buffer,0);
+		process_macros_r(&mac, temp_buffer,&processed_buffer,0);
 		
 		write_to_all_logs_with_timestamp(processed_buffer,NSLOG_INFO_MESSAGE,timestamp);
+
+		clear_host_macros(&mac);
 
 		my_free(temp_buffer);
 		my_free(processed_buffer);
 	        }
 
 	return OK;
-        }
+}
 
 
 /* logs service states */
-int log_service_states(int type, time_t *timestamp){
+int log_service_states(int type, time_t *timestamp)
+{
 	char *temp_buffer=NULL;
 	char *processed_buffer=NULL;
 	service *temp_service=NULL;
 	host *temp_host=NULL;;
+	nagios_macros mac;
 
 	/* bail if we shouldn't be logging initial states */
 	if(type==INITIAL_STATES && log_initial_states==FALSE)
 		return OK;
 
+	memset(&mac, 0, sizeof(mac));
 	for(temp_service=service_list;temp_service!=NULL;temp_service=temp_service->next){
 
 		/* find the associated host */
@@ -347,21 +380,24 @@ int log_service_states(int type, time_t *timestamp){
 			continue;
 
 		/* grab service macros */
-		clear_volatile_macros();
-		grab_host_macros(temp_host);
-		grab_service_macros(temp_service);
+		grab_host_macros(&mac, temp_host);
+		grab_service_macros(&mac, temp_service);
 
+		/* XXX: macro madness */
 		asprintf(&temp_buffer,"%s SERVICE STATE: %s;%s;$SERVICESTATE$;$SERVICESTATETYPE$;$SERVICEATTEMPT$;%s\n",(type==INITIAL_STATES)?"INITIAL":"CURRENT",temp_service->host_name,temp_service->description,temp_service->plugin_output);
-		process_macros(temp_buffer,&processed_buffer,0);
+		process_macros_r(&mac, temp_buffer,&processed_buffer,0);
 
 		write_to_all_logs_with_timestamp(processed_buffer,NSLOG_INFO_MESSAGE,timestamp);
+
+		clear_host_macros(&mac);
+		clear_service_macros(&mac);
 
 		my_free(temp_buffer);
 		my_free(processed_buffer);
 	        }
 
 	return OK;
-        }
+}
 
 
 /* rotates the main log file */
@@ -369,7 +405,7 @@ int rotate_log_file(time_t rotation_time){
 	char *temp_buffer=NULL;
 	char method_string[16]="";
 	char *log_archive=NULL;
-	struct tm *t;
+	struct tm *t, tm_s;
 	int rename_result=0;
 	int stat_result=-1;
 	struct stat log_file_stat;
@@ -392,7 +428,7 @@ int rotate_log_file(time_t rotation_time){
 	last_log_rotation=time(NULL);
 	update_program_status(FALSE);
 
-	t=localtime(&rotation_time);
+	t = localtime_r(&rotation_time, &tm_s);
 
 	stat_result = stat(log_file, &log_file_stat);
 
@@ -406,14 +442,6 @@ int rotate_log_file(time_t rotation_time){
 		my_free(log_archive);
 		return ERROR;
 	        }
-
-#ifdef USE_EVENT_BROKER
-	/* REMOVED - log rotation events are already handled by NEBTYPE_TIMEDEVENT_EXECUTE... */
-	/* send data to the event broker */
-        /*
-	broker_log_data(NEBTYPE_LOG_ROTATION,NEBFLAG_NONE,NEBATTR_NONE,log_archive,log_rotation_method,0,NULL);
-	*/
-#endif
 
 	/* record the log rotation after it has been done... */
 	asprintf(&temp_buffer,"LOG ROTATION: %s\n",method_string);
@@ -497,6 +525,15 @@ int log_debug_info(int level, int verbosity, const char *fmt, ...){
 	if(debug_file_fp==NULL)
 		return ERROR;
 
+	/*
+	 * lock it so concurrent threads don't stomp on each other's
+	 * writings. We maintain the lock until we've (optionally)
+	 * renamed the file.
+	 * If soft_lock() fails we return early.
+	 */
+	if (soft_lock(&debug_fp_lock) < 0)
+		return ERROR;
+
 	/* write the timestamp */
 	gettimeofday(&current_time,NULL);
 	fprintf(debug_file_fp,"[%lu.%06lu] [%03d.%d] [pid=%lu] ",current_time.tv_sec,current_time.tv_usec,level,verbosity,(unsigned long)getpid());
@@ -532,6 +569,8 @@ int log_debug_info(int level, int verbosity, const char *fmt, ...){
 		/* open a new file */
 		open_debug_log();
 		}
+
+	pthread_mutex_unlock(&debug_fp_lock);
 
 	return OK;
 	}

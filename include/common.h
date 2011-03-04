@@ -20,6 +20,7 @@
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  ************************************************************************/
 
+#include "shared.h"
 
 #define PROGRAM_VERSION "3.2.3"
 #define PROGRAM_MODIFICATION_DATE "10-03-2010"
@@ -43,7 +44,7 @@
 #undef USE_MEMORY_PERFORMANCE_TWEAKS
 
 /* my_free has been freed from bondage as a function */
-#define my_free(ptr) { if(ptr) { free(ptr); ptr = NULL; } }
+#define my_free(ptr) do { if(ptr) { free(ptr); ptr = NULL; } } while(0)
 
 
 

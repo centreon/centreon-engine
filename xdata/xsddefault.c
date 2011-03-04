@@ -103,8 +103,6 @@ extern char           *new_program_version;
 extern int external_command_buffer_slots;
 extern circular_buffer external_command_buffer;
 
-extern char *macro_x[MACRO_X_COUNT];
-
 extern host *host_list;
 extern service *service_list;
 extern contact *contact_list;
@@ -138,13 +136,16 @@ char *xsddefault_temp_file=NULL;
 /******************************************************************/
 
 /* grab configuration information */
-int xsddefault_grab_config_info(char *config_file){
+int xsddefault_grab_config_info(char *config_file)
+{
 	char *input=NULL;
 	mmapfile *thefile;
 #ifdef NSCGI
 	char *input2=NULL;
 	mmapfile *thefile2;
 	char *temp_buffer;
+#else
+	nagios_macros *mac;
 #endif
 
 
@@ -230,14 +231,15 @@ int xsddefault_grab_config_info(char *config_file){
 		return ERROR;
 
 #ifdef NSCORE
+	mac = get_global_macros();
 	/* save the status file macro */
-	my_free(macro_x[MACRO_STATUSDATAFILE]);
-	if((macro_x[MACRO_STATUSDATAFILE]=(char *)strdup(xsddefault_status_log)))
-		strip(macro_x[MACRO_STATUSDATAFILE]);
+	my_free(mac->x[MACRO_STATUSDATAFILE]);
+	if((mac->x[MACRO_STATUSDATAFILE]=(char *)strdup(xsddefault_status_log)))
+		strip(mac->x[MACRO_STATUSDATAFILE]);
 #endif
 
 	return OK;
-        }
+}
 
 
 /* processes a single directive */
@@ -354,9 +356,7 @@ int xsddefault_save_status_data(void){
 	if((fd=mkstemp(temp_file))==-1){
 
 		/* log an error */
-#ifdef NSCORE
-		logit(NSLOG_RUNTIME_ERROR,TRUE,"Error: Unable to create temp file for writing status data!\n");
-#endif
+		logit(NSLOG_RUNTIME_ERROR,TRUE,"Error: Unable to create temp file for writing status data: %s\n", strerror(errno));
 
 		/* free memory */
 		my_free(temp_file);
@@ -370,9 +370,7 @@ int xsddefault_save_status_data(void){
 		unlink(temp_file);
 
 		/* log an error */
-#ifdef NSCORE
-		logit(NSLOG_RUNTIME_ERROR,TRUE,"Error: Unable to open temp file '%s' for writing status data!\n",temp_file);
-#endif
+		logit(NSLOG_RUNTIME_ERROR,TRUE,"Error: Unable to open temp file '%s' for writing status data: %s\n",temp_file, strerror(errno));
 
 		/* free memory */
 		my_free(temp_file);
@@ -697,9 +695,7 @@ int xsddefault_save_status_data(void){
 		/* move the temp file to the status log (overwrite the old status log) */
 		if(my_rename(temp_file,xsddefault_status_log)){
 			unlink(temp_file);
-#ifdef NSCORE
 			logit(NSLOG_RUNTIME_ERROR,TRUE,"Error: Unable to update status data file '%s': %s",xsddefault_status_log,strerror(errno));
-#endif
 			result=ERROR;
 			}
 		}

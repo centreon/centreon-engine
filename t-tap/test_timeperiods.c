@@ -120,6 +120,7 @@ int             auto_reschedule_checks=DEFAULT_AUTO_RESCHEDULE_CHECKS;
 int             auto_rescheduling_window=DEFAULT_AUTO_RESCHEDULING_WINDOW;
 
 int             additional_freshness_latency=DEFAULT_ADDITIONAL_FRESHNESS_LATENCY;
+int             allow_empty_hostgroup_assignment=DEFAULT_ALLOW_EMPTY_HOSTGROUP_ASSIGNMENT;
 
 int             check_for_updates=DEFAULT_CHECK_FOR_UPDATES;
 int             bare_update_check=DEFAULT_BARE_UPDATE_CHECK;
@@ -346,7 +347,7 @@ int main(int argc, char **argv){
 	ok( is_valid_time==OK, "Fine because 24x7" );
 
 	get_next_valid_time( current_time, &next_valid_time, temp_timeperiod);
-	ok( current_time == next_valid_time, "Current time should be the next valid time");
+	ok( (next_valid_time-current_time) <= 2, "Next valid time should be the current_time, but with a 2 second tolerance");
 
 
 	/* 2009-10-25 is the day when clocks go back an hour in Europe. Bug happens during 23:00 to 00:00 */
