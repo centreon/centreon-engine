@@ -1589,13 +1589,13 @@ int handle_async_service_check_result(service *temp_service, check_result *queue
 
 		if((temp_service->current_state==STATE_OK && temp_service->stalk_on_ok==TRUE))
 			log_service_event(temp_service);
-			
+
 		else if((temp_service->current_state==STATE_WARNING && temp_service->stalk_on_warning==TRUE))
 			log_service_event(temp_service);
-			
+
 		else if((temp_service->current_state==STATE_UNKNOWN && temp_service->stalk_on_unknown==TRUE))
 			log_service_event(temp_service);
-			
+
 		else if((temp_service->current_state==STATE_CRITICAL && temp_service->stalk_on_critical==TRUE))
 			log_service_event(temp_service);
 	        }
@@ -1605,7 +1605,8 @@ int handle_async_service_check_result(service *temp_service, check_result *queue
 	broker_service_check(NEBTYPE_SERVICECHECK_PROCESSED,NEBFLAG_NONE,NEBATTR_NONE,temp_service,temp_service->check_type,queued_check_result->start_time,queued_check_result->finish_time,NULL,temp_service->latency,temp_service->execution_time,service_check_timeout,queued_check_result->early_timeout,queued_check_result->return_code,NULL,NULL);
 #endif
 
-	if(!(reschedule_check==TRUE && temp_service->should_be_scheduled==TRUE && temp_service->has_been_checked==TRUE)){
+	if(!(reschedule_check==TRUE && temp_service->should_be_scheduled==TRUE && temp_service->has_been_checked==TRUE) ||
+	   temp_service->checks_enabled==FALSE){
 		/* set the checked flag */
 		temp_service->has_been_checked=TRUE;
 		/* update the current service status log */
@@ -1673,15 +1674,6 @@ void schedule_service_check(service *svc, time_t check_time, int options){
 		return;
 		}
 
-	/* allocate memory for a new event item */
-	new_event=(timed_event *)malloc(sizeof(timed_event));
-	if(new_event==NULL){
-
-		logit(NSLOG_RUNTIME_WARNING,TRUE,"Warning: Could not reschedule check of service '%s' on host '%s'!\n",svc->description,svc->host_name);
-
-		return;
-	        }
-
 	/* default is to use the new event */
 	use_original_event=FALSE;
 	found=FALSE;
@@ -1710,7 +1702,7 @@ void schedule_service_check(service *svc, time_t check_time, int options){
 
 		/* the original event is a forced check... */
 		if((temp_event->event_options & CHECK_OPTION_FORCE_EXECUTION)){
-			
+
 			/* the new event is also forced and its execution time is earlier than the original, so use it instead */
 			if((options & CHECK_OPTION_FORCE_EXECUTION) && (check_time < temp_event->run_time)){
 				use_original_event=FALSE;
@@ -1739,11 +1731,6 @@ void schedule_service_check(service *svc, time_t check_time, int options){
 				}
 		        }
 
-		/* the originally queued event won the battle, so keep it */
-		if(use_original_event==TRUE){
-			my_free(new_event);
-			}
-
 		/* else we're using the new event, so remove the old one */
 		else{
 			remove_event(temp_event,&event_list_low,&event_list_low_tail);
@@ -1758,6 +1745,15 @@ void schedule_service_check(service *svc, time_t check_time, int options){
 	if(use_original_event==FALSE){
 
 		log_debug_info(DEBUGL_CHECKS,2,"Scheduling new service check event.\n");
+
+		/* allocate memory for a new event item */
+		new_event=(timed_event *)malloc(sizeof(timed_event));
+		if(new_event==NULL){
+			logit(NSLOG_RUNTIME_WARNING,TRUE,"Warning: Could not reschedule check of service '%s' on host '%s'!\n",svc->description,svc->host_name);
+			/* update the status log */
+			update_service_status(svc,FALSE);
+			return;
+			}
 
 		/* set the next service check time */
 		svc->next_check=check_time;
