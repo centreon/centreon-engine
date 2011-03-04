@@ -27,7 +27,9 @@
 #include "common.h"
 #include "objects.h"
 
-
+#ifdef __cplusplus
+  extern "C" {
+#endif
 
 /****************** LENGTH LIMITATIONS ****************/
 
@@ -257,5 +259,9 @@ int set_argv_macro_environment_vars(int);
 int set_custom_macro_environment_vars(int);
 int set_contact_address_environment_vars(int);
 int set_macro_environment_var(char *,char *,int);
+
+#ifdef __cplusplus
+  }
+#endif
 
 #endif

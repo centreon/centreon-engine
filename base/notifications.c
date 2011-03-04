@@ -236,13 +236,13 @@ int service_notification(service *svc, int type, char *not_author, char *not_dat
 		for(temp_notification=notification_list;temp_notification!=NULL;temp_notification=temp_notification->next){
 
 			/* grab the macro variables for this contact */
-			grab_contact_macros(temp_notification->contact);
+			grab_contact_macros(temp_notification->cntct);
 
 			/* clear summary macros (they are customized for each contact) */
 			clear_summary_macros();
 
 			/* notify this contact */
-			result=notify_contact_of_service(temp_notification->contact,svc,type,not_author,not_data,options,escalated);
+			result=notify_contact_of_service(temp_notification->cntct,svc,type,not_author,not_data,options,escalated);
 
 			/* keep track of how many contacts were notified */
 			if(result==OK)
@@ -737,11 +737,11 @@ int notify_contact_of_service(contact *cntct, service *svc, int type, char *not_
 		/* send data to event broker */
 		method_end_time.tv_sec=0L;
 		method_end_time.tv_usec=0L;
-		broker_contact_notification_method_data(NEBTYPE_CONTACTNOTIFICATIONMETHOD_START,NEBFLAG_NONE,NEBATTR_NONE,SERVICE_NOTIFICATION,type,method_start_time,method_end_time,(void *)svc,cntct,temp_commandsmember->command,not_author,not_data,escalated,NULL);
+		broker_contact_notification_method_data(NEBTYPE_CONTACTNOTIFICATIONMETHOD_START,NEBFLAG_NONE,NEBATTR_NONE,SERVICE_NOTIFICATION,type,method_start_time,method_end_time,(void *)svc,cntct,temp_commandsmember->cmd,not_author,not_data,escalated,NULL);
 #endif
 
 		/* get the raw command line */
-		get_raw_command_line(temp_commandsmember->command_ptr,temp_commandsmember->command,&raw_command,macro_options);
+		get_raw_command_line(temp_commandsmember->command_ptr,temp_commandsmember->cmd,&raw_command,macro_options);
 		if(raw_command==NULL)
 			continue;
 
@@ -753,7 +753,7 @@ int notify_contact_of_service(contact *cntct, service *svc, int type, char *not_
 			continue;
 
 		/* get the command name */
-		command_name=(char *)strdup(temp_commandsmember->command);
+		command_name=(char *)strdup(temp_commandsmember->cmd);
 		command_name_ptr=strtok(command_name,"!");
 
 		/* run the notification command... */
@@ -828,7 +828,7 @@ int notify_contact_of_service(contact *cntct, service *svc, int type, char *not_
 
 #ifdef USE_EVENT_BROKER
 		/* send data to event broker */
-		broker_contact_notification_method_data(NEBTYPE_CONTACTNOTIFICATIONMETHOD_END,NEBFLAG_NONE,NEBATTR_NONE,SERVICE_NOTIFICATION,type,method_start_time,method_end_time,(void *)svc,cntct,temp_commandsmember->command,not_author,not_data,escalated,NULL);
+		broker_contact_notification_method_data(NEBTYPE_CONTACTNOTIFICATIONMETHOD_END,NEBFLAG_NONE,NEBATTR_NONE,SERVICE_NOTIFICATION,type,method_start_time,method_end_time,(void *)svc,cntct,temp_commandsmember->cmd,not_author,not_data,escalated,NULL);
 #endif
 	        }
 
@@ -1194,13 +1194,13 @@ int host_notification(host *hst, int type, char *not_author, char *not_data, int
 		for(temp_notification=notification_list;temp_notification!=NULL;temp_notification=temp_notification->next){
 
 			/* grab the macro variables for this contact */
-			grab_contact_macros(temp_notification->contact);
+			grab_contact_macros(temp_notification->cntct);
 
 			/* clear summary macros (they are customized for each contact) */
 			clear_summary_macros();
 
 			/* notify this contact */
-			result=notify_contact_of_host(temp_notification->contact,hst,type,not_author,not_data,options,escalated);
+			result=notify_contact_of_host(temp_notification->cntct,hst,type,not_author,not_data,options,escalated);
 
 			/* keep track of how many contacts were notified */
 			if(result==OK)
@@ -1653,11 +1653,11 @@ int notify_contact_of_host(contact *cntct, host *hst, int type, char *not_author
 		/* send data to event broker */
 		method_end_time.tv_sec=0L;
 		method_end_time.tv_usec=0L;
-		broker_contact_notification_method_data(NEBTYPE_CONTACTNOTIFICATIONMETHOD_START,NEBFLAG_NONE,NEBATTR_NONE,HOST_NOTIFICATION,type,method_start_time,method_end_time,(void *)hst,cntct,temp_commandsmember->command,not_author,not_data,escalated,NULL);
+		broker_contact_notification_method_data(NEBTYPE_CONTACTNOTIFICATIONMETHOD_START,NEBFLAG_NONE,NEBATTR_NONE,HOST_NOTIFICATION,type,method_start_time,method_end_time,(void *)hst,cntct,temp_commandsmember->cmd,not_author,not_data,escalated,NULL);
 #endif
 
 		/* get the raw command line */
-		get_raw_command_line(temp_commandsmember->command_ptr,temp_commandsmember->command,&raw_command,macro_options);
+		get_raw_command_line(temp_commandsmember->command_ptr,temp_commandsmember->cmd,&raw_command,macro_options);
 		if(raw_command==NULL)
 			continue;
 
@@ -1669,7 +1669,7 @@ int notify_contact_of_host(contact *cntct, host *hst, int type, char *not_author
 			continue;
 
 		/* get the command name */
-		command_name=(char *)strdup(temp_commandsmember->command);
+		command_name=(char *)strdup(temp_commandsmember->cmd);
 		command_name_ptr=strtok(command_name,"!");
 
 		/* run the notification command... */
@@ -1744,7 +1744,7 @@ int notify_contact_of_host(contact *cntct, host *hst, int type, char *not_author
 
 #ifdef USE_EVENT_BROKER
 		/* send data to event broker */
-		broker_contact_notification_method_data(NEBTYPE_CONTACTNOTIFICATIONMETHOD_END,NEBFLAG_NONE,NEBATTR_NONE,HOST_NOTIFICATION,type,method_start_time,method_end_time,(void *)hst,cntct,temp_commandsmember->command,not_author,not_data,escalated,NULL);
+		broker_contact_notification_method_data(NEBTYPE_CONTACTNOTIFICATIONMETHOD_END,NEBFLAG_NONE,NEBATTR_NONE,HOST_NOTIFICATION,type,method_start_time,method_end_time,(void *)hst,cntct,temp_commandsmember->cmd,not_author,not_data,escalated,NULL);
 #endif
 	        }
 
@@ -2077,7 +2077,7 @@ notification * find_notification(contact *cntct){
 		return NULL;
 	
 	for(temp_notification=notification_list;temp_notification!=NULL;temp_notification=temp_notification->next){
-		if(temp_notification->contact==cntct)
+		if(temp_notification->cntct==cntct)
 			return temp_notification;
 	        }
 
@@ -2108,7 +2108,7 @@ int add_notification(contact *cntct){
 		return ERROR;
 
 	/* fill in the contact info */
-	new_notification->contact=cntct;
+	new_notification->cntct=cntct;
 
 	/* add new notification to head of list */
 	new_notification->next=notification_list;

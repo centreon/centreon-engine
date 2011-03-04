@@ -2138,7 +2138,7 @@ int pre_flight_object_check(int *w, int *e){
 		else for(temp_commandsmember=temp_contact->service_notification_commands;temp_commandsmember!=NULL;temp_commandsmember=temp_commandsmember->next){
 
 			/* check the host notification command */
-			buf=(char *)strdup(temp_commandsmember->command);
+			buf=(char *)strdup(temp_commandsmember->cmd);
 
 			/* get the command name, leave any arguments behind */
 			temp_command_name=my_strtok(buf,"!");
@@ -2163,7 +2163,7 @@ int pre_flight_object_check(int *w, int *e){
 		else for(temp_commandsmember=temp_contact->host_notification_commands;temp_commandsmember!=NULL;temp_commandsmember=temp_commandsmember->next){
 
 			/* check the host notification command */
-			buf=(char *)strdup(temp_commandsmember->command);
+			buf=(char *)strdup(temp_commandsmember->cmd);
 
 			/* get the command name, leave any arguments behind */
 			temp_command_name=my_strtok(buf,"!");

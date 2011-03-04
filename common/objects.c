@@ -1472,16 +1472,16 @@ commandsmember *add_host_notification_command_to_contact(contact *cntct,char *co
 		return NULL;
 
 	/* initialize vars */
-	new_commandsmember->command=NULL;
+	new_commandsmember->cmd=NULL;
 	new_commandsmember->command_ptr=NULL;
 
 	/* duplicate vars */
-	if((new_commandsmember->command=(char *)strdup(command_name))==NULL)
+	if((new_commandsmember->cmd=(char *)strdup(command_name))==NULL)
 		result=ERROR;
 
 	/* handle errors */
 	if(result==ERROR){
-		my_free(new_commandsmember->command);
+		my_free(new_commandsmember->cmd);
 		my_free(new_commandsmember);
 		return NULL;
 	        }
@@ -1511,16 +1511,16 @@ commandsmember *add_service_notification_command_to_contact(contact *cntct,char 
 		return NULL;
 
 	/* initialize vars */
-	new_commandsmember->command=NULL;
+	new_commandsmember->cmd=NULL;
 	new_commandsmember->command_ptr=NULL;
 
 	/* duplicate vars */
-	if((new_commandsmember->command=(char *)strdup(command_name))==NULL)
+	if((new_commandsmember->cmd=(char *)strdup(command_name))==NULL)
 		result=ERROR;
 
 	/* handle errors */
 	if(result==ERROR){
-		my_free(new_commandsmember->command);
+		my_free(new_commandsmember->cmd);
 		my_free(new_commandsmember);
 		return NULL;
 	        }
@@ -3529,8 +3529,8 @@ int free_object_data(void){
 		this_commandsmember=this_contact->host_notification_commands;
 		while(this_commandsmember!=NULL){
 			next_commandsmember=this_commandsmember->next;
-			if(this_commandsmember->command!=NULL)
-				my_free(this_commandsmember->command);
+			if(this_commandsmember->cmd!=NULL)
+				my_free(this_commandsmember->cmd);
 			my_free(this_commandsmember);
 			this_commandsmember=next_commandsmember;
 		        }
@@ -3539,8 +3539,8 @@ int free_object_data(void){
 		this_commandsmember=this_contact->service_notification_commands;
 		while(this_commandsmember!=NULL){
 			next_commandsmember=this_commandsmember->next;
-			if(this_commandsmember->command!=NULL)
-				my_free(this_commandsmember->command);
+			if(this_commandsmember->cmd!=NULL)
+				my_free(this_commandsmember->cmd);
 			my_free(this_commandsmember);
 			this_commandsmember=next_commandsmember;
 		        }

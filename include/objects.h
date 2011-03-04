@@ -173,7 +173,7 @@ typedef struct command_struct{
 
 /* COMMANDSMEMBER structure */
 typedef struct commandsmember_struct{
-	char	*command;
+	char	*cmd;
 	command *command_ptr;
 	struct	commandsmember_struct *next;
 	}commandsmember;

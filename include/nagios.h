@@ -350,7 +350,7 @@ typedef struct timed_event_struct{
 
 /* NOTIFY_LIST structure */
 typedef struct notify_list_struct{
-	contact *contact;
+	contact *cntct;
 	struct notify_list_struct *next;
         }notification;
 
