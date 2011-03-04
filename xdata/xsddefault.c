@@ -62,7 +62,6 @@ extern int process_performance_data;
 extern int aggregate_status_updates;
 extern int check_external_commands;
 
-extern time_t         last_update_check;
 extern char           *last_program_version;
 extern int            update_available;
 extern char           *last_program_version;
@@ -324,7 +323,6 @@ int xsddefault_save_status_data(void){
 	fprintf(fp,"info {\n");
 	fprintf(fp,"\tcreated=%lu\n",current_time);
 	fprintf(fp,"\tversion=%s\n",PROGRAM_VERSION);
-	fprintf(fp,"\tlast_update_check=%lu\n",last_update_check);
 	fprintf(fp,"\tupdate_available=%d\n",update_available);
 	fprintf(fp,"\tlast_version=%s\n",(last_program_version==NULL)?"":last_program_version);
 	fprintf(fp,"\tnew_version=%s\n",(new_program_version==NULL)?"":new_program_version);

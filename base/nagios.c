@@ -128,9 +128,6 @@ int             auto_rescheduling_window=DEFAULT_AUTO_RESCHEDULING_WINDOW;
 
 int             additional_freshness_latency=DEFAULT_ADDITIONAL_FRESHNESS_LATENCY;
 
-int             check_for_updates=DEFAULT_CHECK_FOR_UPDATES;
-int             bare_update_check=DEFAULT_BARE_UPDATE_CHECK;
-time_t          last_update_check=0L;
 unsigned long   update_uid=0L;
 int             update_available=FALSE;
 char            *last_program_version=NULL;
@@ -744,21 +741,18 @@ int main(int argc, char **argv){
 
 			/* initialize comment data */
 			initialize_comment_data(config_file);
-			
+
 			/* initialize scheduled downtime data */
 			initialize_downtime_data(config_file);
-			
+
 			/* initialize performance data */
 			initialize_performance_data(config_file);
 
 		        /* initialize the event timing loop */
 			init_timing_loop();
-			
+
 			/* initialize check statistics */
 			init_check_stats();
-
-			/* check for updates */
-			check_for_nagios_updates(FALSE,TRUE);
 
 			/* update all status data (with retained information) */
 			update_all_status_data();

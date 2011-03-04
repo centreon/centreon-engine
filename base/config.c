@@ -115,9 +115,6 @@ extern int      auto_reschedule_checks;
 
 extern int      additional_freshness_latency;
 
-extern int      check_for_updates;
-extern int      bare_update_check;
-
 extern int      use_aggressive_host_checking;
 extern unsigned long cached_host_check_horizon;
 extern unsigned long cached_service_check_horizon;
@@ -1244,12 +1241,6 @@ int read_main_config_file(char *main_config_file){
 
 		else if(!strcmp(variable,"external_command_buffer_slots"))
 			external_command_buffer_slots=atoi(value);
-
-		else if(!strcmp(variable,"check_for_updates"))
-			check_for_updates=(atoi(value)>0)?TRUE:FALSE;
-
-		else if(!strcmp(variable,"bare_update_check"))
-			bare_update_check=(atoi(value)>0)?TRUE:FALSE;
 
 		/*** AUTH_FILE VARIABLE USED BY EMBEDDED PERL INTERPRETER ***/
 		else if(!strcmp(variable,"auth_file")){
