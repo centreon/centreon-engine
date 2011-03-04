@@ -21,14 +21,11 @@
 
 /***** NAGIOS STUFF *****/
 
-#define DEFAULT_NAGIOS_USER nagios
-#define DEFAULT_NAGIOS_GROUP nagios
-
 /* stop gcc from bitching about implicit asprintf declarations */
 #define _GNU_SOURCE 1
 
 /* Event broker integration */
-#undef USE_EVENT_BROKER
+#cmakedefine USE_EVENT_BROKER
 
 /* Embed a PERL interpreter into Nagios with optional cache for compiled code (contributed by Stephen Davies) */
 #undef EMBEDDEDPERL
@@ -36,71 +33,47 @@
 /* 0 = cache, 1 = do not cache */
 #define DO_CLEAN		"1"
 
-/* commands used by CGIs */
-#undef TRACEROUTE_COMMAND
-#undef PING_COMMAND
-#undef PING_PACKETS_FIRST
-
-/* Debugging options */
-/* function entry and exit */
-#undef DEBUG0
-/* general info messages */
-#undef DEBUG1
-/* warning messages */
-#undef DEBUG2
-/* service and host checks, other events */
-#undef DEBUG3
-/* service and host notifications */
-#undef DEBUG4
-/* SQL queries (defunct) */
-#undef DEBUG5
-
 /* I/O implementations */
-#undef USE_XSDDEFAULT
-#undef USE_XCDDEFAULT
-#undef USE_XRDDEFAULT
-#undef USE_XODTEMPLATE
-#undef USE_XPDDEFAULT
-#undef USE_XDDDEFAULT
+#define USE_XSDDEFAULT
+#define USE_XCDDEFAULT
+#define USE_XRDDEFAULT
+#define USE_XODTEMPLATE
+#define USE_XPDDEFAULT
+#define USE_XDDDEFAULT
 
 
 
 /***** FUNCTION DEFINITIONS *****/
 
-#undef HAVE_SETENV
-#undef HAVE_UNSETENV
-#undef HAVE_SOCKET
-#undef HAVE_STRDUP
-#undef HAVE_STRSTR
-#undef HAVE_STRTOUL
-#undef HAVE_INITGROUPS
-#undef HAVE_GETLOADAVG
-#undef HAVE_GDIMAGECREATETRUECOLOR
+#cmakedefine HAVE_SETENV
+#cmakedefine HAVE_UNSETENV
+#cmakedefine HAVE_SOCKET
+#cmakedefine HAVE_STRDUP
+#cmakedefine HAVE_STRSTR
+#cmakedefine HAVE_STRTOUL
+#cmakedefine HAVE_INITGROUPS
+#cmakedefine HAVE_GETLOADAVG
 
 
 
 /***** ASPRINTF() AND FRIENDS *****/
 
-#undef HAVE_VSNPRINTF
-#undef HAVE_SNPRINTF
-#undef HAVE_ASPRINTF
-#undef HAVE_VASPRINTF
-#undef HAVE_C99_VSNPRINTF
-#undef HAVE_VA_COPY
-#undef HAVE___VA_COPY
+#cmakedefine HAVE_VSNPRINTF
+#cmakedefine HAVE_SNPRINTF
+#cmakedefine HAVE_ASPRINTF
+#cmakedefine HAVE_VASPRINTF
+#cmakedefine HAVE_C99_VSNPRINTF
+#cmakedefine HAVE_VA_COPY
+#cmakedefine HAVE___VA_COPY
 
 
 
 /***** MISC DEFINITIONS *****/
 
-#undef USE_NANOSLEEP
-#undef STDC_HEADERS
-#undef HAVE_TM_ZONE
-#undef HAVE_TZNAME
-#undef USE_PROC
-#define SOCKET_SIZE_TYPE ""
-#define GETGROUPS_T ""
-#define RETSIGTYPE ""
+#cmakedefine USE_NANOSLEEP
+#cmakedefine STDC_HEADERS
+#cmakedefine HAVE_STRUCT_TM_TM_ZONE
+#cmakedefine HAVE_TZNAME
 
 
 
@@ -111,184 +84,177 @@
 
 /* needed for the time_t structures we use later... */
 /* this include must come before sys/resource.h or we can have problems on some OSes */
-#undef TIME_WITH_SYS_TIME
-#undef HAVE_SYS_TIME_H
-#if TIME_WITH_SYS_TIME
+#cmakedefine HAVE_SYS_TIME_H
+#ifdef HAVE_SYS_TIME_H
 #include <sys/time.h>
-#include <time.h>
-#else
-#if HAVE_SYS_TIME_H
-#include <sys/time.h>
-#else
-#include <time.h>
 #endif
-#endif
+#include <time.h>
 
-#undef HAVE_SYS_RESOURCE_H
+#cmakedefine HAVE_SYS_RESOURCE_H
 #ifdef HAVE_SYS_RESOURCE_H
 #include <sys/resource.h>
 #endif
 
-#undef HAVE_LIMITS_H
+#cmakedefine HAVE_LIMITS_H
 #ifdef HAVE_LIMITS_H
 #include <limits.h>
 #endif
 
-#undef HAVE_PWD_H
+#cmakedefine HAVE_PWD_H
 #ifdef HAVE_PWD_H
 #include <pwd.h>
 #endif
  
-#undef HAVE_GRP_H
+#cmakedefine HAVE_GRP_H
 #ifdef HAVE_GRP_H
 #include <grp.h>
 #endif
 
-#undef HAVE_STRINGS_H
+#cmakedefine HAVE_STRINGS_H
 #ifdef HAVE_STRINGS_H
 #include <strings.h>
 #endif
 
-#undef HAVE_STRING_H
+#cmakedefine HAVE_STRING_H
 #ifdef HAVE_STRINGS_H
 #include <string.h>
 #endif
 
-#undef HAVE_UNISTD_H
+#cmakedefine HAVE_UNISTD_H
 #ifdef HAVE_UNISTD_H
 #include <unistd.h>
 #endif
 
-#undef HAVE_SYSLOG_H
+#cmakedefine HAVE_SYSLOG_H
 #ifdef HAVE_SYSLOG_H
 #include <syslog.h>
 #endif
 
-#undef HAVE_SIGNAL_H
+#cmakedefine HAVE_SIGNAL_H
 #ifdef HAVE_SIGNAL_H
 #include <signal.h>
 #endif
 
-#undef HAVE_SYS_STAT_H
+#cmakedefine HAVE_SYS_STAT_H
 #ifdef HAVE_SYS_STAT_H
 #include <sys/stat.h>
 #endif
 
-#undef HAVE_SYS_MMAN_H
+#cmakedefine HAVE_SYS_MMAN_H
 #ifdef HAVE_SYS_MMAN_H
 #include <sys/mman.h>
 #endif
 
-#undef HAVE_FCNTL_H
+#cmakedefine HAVE_FCNTL_H
 #ifdef HAVE_FCNTL_H
 #include <fcntl.h>
 #endif
 
-#undef HAVE_STDARG_H
+#cmakedefine HAVE_STDARG_H
 #ifdef HAVE_STDARG_H
 #include <stdarg.h>
 #endif
 
-#undef HAVE_SYS_TYPES_H
+#cmakedefine HAVE_SYS_TYPES_H
 #ifdef HAVE_SYS_TYPES_H
 #include <sys/types.h>
 #endif
 
-#undef HAVE_SYS_WAIT_H
+#cmakedefine HAVE_SYS_WAIT_H
 #ifdef HAVE_SYS_WAIT_H
 #include <sys/wait.h>
 #endif
 
-#undef HAVE_ERRNO_H
+#cmakedefine HAVE_ERRNO_H
 #ifdef HAVE_ERRNO_H
 #include <errno.h>
 #endif
 
-#undef HAVE_SYS_TIMEB_H
-#if HAVE_SYS_TIMEB_H
+#cmakedefine HAVE_SYS_TIMEB_H
+#ifdef HAVE_SYS_TIMEB_H
 #include <sys/timeb.h>
 #endif
 
-#undef HAVE_SYS_IPC_H
+#cmakedefine HAVE_SYS_IPC_H
 #ifdef HAVE_SYS_IPC_H
 #include <sys/ipc.h>
 #endif
 
-#undef HAVE_SYS_MSG_H
+#cmakedefine HAVE_SYS_MSG_H
 #ifdef HAVE_SYS_MSG_H
 #include <sys/msg.h>
 #endif
 
-#undef HAVE_MATH_H
+#cmakedefine HAVE_MATH_H
 #ifdef HAVE_MATH_H
 #include <math.h>
 #endif
 
-#undef HAVE_CTYPE_H
+#cmakedefine HAVE_CTYPE_H
 #ifdef HAVE_CTYPE_H
 #include <ctype.h>
 #endif
 
-#undef HAVE_DIRENT_H
+#cmakedefine HAVE_DIRENT_H
 #ifdef HAVE_DIRENT_H
 #include <dirent.h>
 #endif
 
-#undef HAVE_PTHREAD_H
+#cmakedefine HAVE_PTHREAD_H
 #ifdef HAVE_PTHREAD_H
 #include <pthread.h>
 #endif
 
-#undef HAVE_REGEX_H
+#cmakedefine HAVE_REGEX_H
 #ifdef HAVE_REGEX_H
 #include <regex.h>
 
-#undef HAVE_SYS_SOCKET_H
+#cmakedefine HAVE_SYS_SOCKET_H
 #ifdef HAVE_SYS_SOCKET_H
 #include <sys/socket.h>
 #endif
 
-#undef HAVE_SOCKET
+#cmakedefine HAVE_SOCKET
 #ifdef HAVE_SOCKET_H
 #include <socket.h>
 #endif
 
-#undef HAVE_NETINET_IN_H
+#cmakedefine HAVE_NETINET_IN_H
 #ifdef HAVE_NETINET_IN_H
 #include <netinet/in.h>
 #endif
 
-#undef HAVE_ARPA_INET_H
+#cmakedefine HAVE_ARPA_INET_H
 #ifdef HAVE_ARPA_INET_H
 #include <arpa/inet.h>
 #endif
 
-#undef HAVE_NETDB_H
+#cmakedefine HAVE_NETDB_H
 #ifdef HAVE_NETDB_H
 #include <netdb.h>
 #endif
 
-#undef HAVE_LIBGEN_H
+#cmakedefine HAVE_LIBGEN_H
 #ifdef HAVE_LIBGEN_H
 #include <libgen.h>
 #endif
 
-#undef HAVE_SYS_UN_H
+#cmakedefine HAVE_SYS_UN_H
 #ifdef HAVE_SYS_UN_H
 #include <sys/un.h>
 #endif
 
-#undef HAVE_SYS_POLL_H
+#cmakedefine HAVE_SYS_POLL_H
 #ifdef HAVE_SYS_POLL_H
 #include <sys/poll.h>
 #endif
 
-#undef HAVE_GETOPT_H
+#cmakedefine HAVE_GETOPT_H
 #ifdef HAVE_GETOPT_H
 #include <getopt.h>
 #endif
 
-#undef HAVE_LINUX_MODULE_H
+#cmakedefine HAVE_LINUX_MODULE_H
 #ifdef HAVE_LINUX_MODULE_H
 #include <linux/module.h>
 #endif
@@ -303,7 +269,7 @@
 #ifdef USE_LTDL
 #include <ltdl.h>
 #else
-#undef HAVE_DLFCN_H
+#cmakedefine HAVE_DLFCN_H
 #ifdef HAVE_DLFCN_H
 #include <dlfcn.h>
 #endif
@@ -320,7 +286,7 @@
 #endif
 
 
-/***** MARO DEFINITIONS *****/
+/***** MACRO DEFINITIONS *****/
 
 /* this needs to come after all system include files, so we don't accidentally attempt to redefine it */
 #ifndef WEXITSTATUS
