@@ -263,7 +263,7 @@ configure_file("${INCLUDE_DIR}/snprintf.h.in"
   "${INCLUDE_DIR}/snprintf.h")
 
 # scheduler target.
-add_executable("scheduler"
+add_executable("centscheduler"
   "${BASE_DIR}/broker.c"
   "${BASE_DIR}/checks.c"
   "${BASE_DIR}/commands.c"
@@ -293,7 +293,7 @@ add_executable("scheduler"
   "${XDATA_DIR}/xrddefault.c"
   "${XDATA_DIR}/xsddefault.c"
 )
-target_link_libraries("scheduler"
+target_link_libraries("centscheduler"
   ${DL_LIBRARIES}
   ${MATH_LIBRARIES}
   ${SOCKET_LIBRARIES}
