@@ -1,49 +1,22 @@
-/*****************************************************************************
- *
- * XODTEMPLATE.C - Template-based object configuration data input routines
- *
- * Copyright (c) 2001-2009 Ethan Galstad (egalstad@nagios.org)
- * Last Modified: 01-01-2009
- *
- * Description:
- *
- * Routines for parsing and resolving template-based object definitions.
- * Basic steps involved in this in the daemon are as follows:
- *
- *    1) Read
- *    2) Resolve
- *    3) Duplicate
- *    4) Recombobulate
- *    5) Cache
- *    7) Register
- *    8) Cleanup
- *
- * The steps involved for the CGIs differ a bit, since they read the cached
- * definitions which are already resolved, recombobulated and duplicated.  In
- * otherwords, they've already been "flattened"...
- *
- *    1) Read
- *    2) Register
- *    3) Cleanup
- *
- *
- * License:
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2 as
- * published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
- *
- *****************************************************************************/
-
+/*
+** Copyright 2001-2009 Ethan Galstad
+** Copyright 2011      Merethis
+**
+** This file is part of Centreon Scheduler.
+**
+** Centreon Scheduler is free software: you can redistribute it and/or
+** modify it under the terms of the GNU General Public License version 2
+** as published by the Free Software Foundation.
+**
+** Centreon Scheduler is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+** General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with Centreon Scheduler. If not, see
+** <http://www.gnu.org/licenses/>.
+*/
 
 /*********** COMMON HEADER FILES ***********/
 

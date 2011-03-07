@@ -1,37 +1,22 @@
-/************************************************************************
- *
- * SKIPLIST.C - Skiplist functions for use in Nagios event/object lists
- *
- * Copyright (c) 2008 Ethan Galstad
- * Last Modified: 02-28-2008
- *
- * Notes:
- * 
- * These function implement a slightly modified skiplist from that
- * described by William Pugh (ftp://ftp.cs.umd.edu/pub/skipLists/skiplists.pdf).
- * The structures and function were modified to allow the list to act
- * like a priority queue for the Nagios event list/queue(s).  Multiple nodes with
- * the same key value are allowed on the list to accomodate multiple events
- * occurring at the same (second) point in time.  Implemented peek() and pop()
- * functions to allow for quick event queue processing, and a method to delete
- * a specific list item, based on its pointer, rather than its data value.  Again,
- * this is useful for the Nagios event queue.
- *
- * License:
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2 as
- * published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
- ************************************************************************/
+/*
+** Copyright 2008 Ethan Galstad
+** Copyright 2011 Merethis
+**
+** This file is part of Centreon Scheduler.
+**
+** Centreon Scheduler is free software: you can redistribute it and/or
+** modify it under the terms of the GNU General Public License version 2
+** as published by the Free Software Foundation.
+**
+** Centreon Scheduler is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+** General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with Centreon Scheduler. If not, see
+** <http://www.gnu.org/licenses/>.
+*/
 
 #include "../include/config.h"
 #include "../include/common.h"

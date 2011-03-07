@@ -1,40 +1,23 @@
-/*****************************************************************************
- *
- * NAGIOS.C - Core Program Code For Nagios
- *
- * Program: Nagios Core
- * Version: 3.2.3
- * License: GPL
- * Copyright (c) 2009-2010 Nagios Core Development Team and Community Contributors
- * Copyright (c) 1999-2009 Ethan Galstad
- *
- * First Written:   01-28-1999 (start of development)
- * Last Modified:   10-03-2010
- *
- * Description:
- *
- * Nagios is a network monitoring tool that will check hosts and services
- * that you specify.  It has the ability to notify contacts via email, pager,
- * or other user-defined methods when a service or host goes down and
- * recovers.  Service and host monitoring is done through the use of external
- * plugins which can be developed independently of Nagios.
- *
- * License:
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2 as
- * published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
- *
- *****************************************************************************/
+/*
+** Copyright 1999-2009 Ethan Galstad
+** Copyright 2009-2010 Nagios Core Development Team and Community Contributors
+** Copyright 2011      Merethis
+**
+** This file is part of Centreon Scheduler.
+**
+** Centreon Scheduler is free software: you can redistribute it and/or
+** modify it under the terms of the GNU General Public License version 2
+** as published by the Free Software Foundation.
+**
+** Centreon Scheduler is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+** General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with Centreon Scheduler. If not, see
+** <http://www.gnu.org/licenses/>.
+*/
 
 #include "../include/config.h"
 #include "../include/common.h"
