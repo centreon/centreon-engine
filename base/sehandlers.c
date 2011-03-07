@@ -305,12 +305,13 @@ int run_global_service_event_handler(service *svc){
 	neb_result=broker_event_handler(NEBTYPE_EVENTHANDLER_START,NEBFLAG_NONE,NEBATTR_NONE,GLOBAL_SERVICE_EVENTHANDLER,(void *)svc,svc->current_state,svc->state_type,start_time,end_time,exectime,event_handler_timeout,early_timeout,result,global_service_event_handler,processed_command,NULL,NULL);
 
 	/* neb module wants to override (or cancel) the event handler - perhaps it will run the eventhandler itself */
-	if(neb_result==NEBERROR_CALLBACKOVERRIDE) {
+	if((neb_result==NEBERROR_CALLBACKCANCEL)
+	   ||(neb_result==NEBERROR_CALLBACKOVERRIDE)) {
 		my_free(processed_command);
 		my_free(raw_command);
 		my_free(raw_logentry);
 		my_free(processed_logentry);
-		return OK;
+		return (neb_result==NEBERROR_CALLBACKCANCEL)?ERROR:OK;
 	}
 #endif
 
@@ -408,12 +409,13 @@ int run_service_event_handler(service *svc){
 	neb_result=broker_event_handler(NEBTYPE_EVENTHANDLER_START,NEBFLAG_NONE,NEBATTR_NONE,SERVICE_EVENTHANDLER,(void *)svc,svc->current_state,svc->state_type,start_time,end_time,exectime,event_handler_timeout,early_timeout,result,svc->event_handler,processed_command,NULL,NULL);
 
 	/* neb module wants to override (or cancel) the event handler - perhaps it will run the eventhandler itself */
-	if(neb_result==NEBERROR_CALLBACKOVERRIDE) {
+	if((neb_result==NEBERROR_CALLBACKCANCEL)
+	   ||(neb_result==NEBERROR_CALLBACKOVERRIDE)) {
 		my_free(processed_command);
 		my_free(raw_command);
 		my_free(raw_logentry);
 		my_free(processed_logentry);
-		return OK;
+		return (neb_result==NEBERROR_CALLBACKCANCEL)?ERROR:OK;
 	}
 #endif
 
@@ -557,12 +559,13 @@ int run_global_host_event_handler(host *hst){
 	neb_result=broker_event_handler(NEBTYPE_EVENTHANDLER_START,NEBFLAG_NONE,NEBATTR_NONE,GLOBAL_HOST_EVENTHANDLER,(void *)hst,hst->current_state,hst->state_type,start_time,end_time,exectime,event_handler_timeout,early_timeout,result,global_host_event_handler,processed_command,NULL,NULL);
 
 	/* neb module wants to override (or cancel) the event handler - perhaps it will run the eventhandler itself */
-	if(neb_result==NEBERROR_CALLBACKOVERRIDE) {
+	if((neb_result==NEBERROR_CALLBACKCANCEL)
+	   ||(neb_result==NEBERROR_CALLBACKOVERRIDE)) {
 		my_free(processed_command);
 		my_free(raw_command);
 		my_free(raw_logentry);
 		my_free(processed_logentry);
-		return OK;
+		return (neb_result==NEBERROR_CALLBACKCANCEL)?ERROR:OK;
 	}
 #endif
 
@@ -658,12 +661,13 @@ int run_host_event_handler(host *hst){
 	neb_result=broker_event_handler(NEBTYPE_EVENTHANDLER_START,NEBFLAG_NONE,NEBATTR_NONE,HOST_EVENTHANDLER,(void *)hst,hst->current_state,hst->state_type,start_time,end_time,exectime,event_handler_timeout,early_timeout,result,hst->event_handler,processed_command,NULL,NULL);
 
 	/* neb module wants to override (or cancel) the event handler - perhaps it will run the eventhandler itself */
-	if(neb_result==NEBERROR_CALLBACKOVERRIDE) {
+	if((neb_result==NEBERROR_CALLBACKCANCEL)
+	   ||(neb_result==NEBERROR_CALLBACKOVERRIDE)) {
 		my_free(processed_command);
 		my_free(raw_command);
 		my_free(raw_logentry);
 		my_free(processed_logentry);
-		return OK;
+		return (neb_result==NEBERROR_CALLBACKCANCEL)?ERROR:OK;
 	}
 #endif
 
