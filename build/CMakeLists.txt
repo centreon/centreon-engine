@@ -253,6 +253,7 @@ set(BASE_DIR "${PROJECT_SOURCE_DIR}/base")
 set(COMMON_DIR "${PROJECT_SOURCE_DIR}/common")
 set(INCLUDE_DIR "${PROJECT_SOURCE_DIR}/include")
 set(XDATA_DIR "${PROJECT_SOURCE_DIR}/xdata")
+set(TEST_DIR "${PROJECT_SOURCE_DIR}/test")
 
 # Configure files.
 configure_file("${INCLUDE_DIR}/config.h.in"
@@ -262,40 +263,76 @@ configure_file("${INCLUDE_DIR}/locations.h.in"
 configure_file("${INCLUDE_DIR}/snprintf.h.in"
   "${INCLUDE_DIR}/snprintf.h")
 
-# scheduler target.
-add_executable("scheduler"
-  "${BASE_DIR}/broker.c"
-  "${BASE_DIR}/checks.c"
-  "${BASE_DIR}/commands.c"
-  "${BASE_DIR}/config.c"
-  "${BASE_DIR}/events.c"
-  "${BASE_DIR}/flapping.c"
-  "${BASE_DIR}/logging.c"
-  "${BASE_DIR}/nagios.c"
-  "${BASE_DIR}/nebmods.c"
-  "${BASE_DIR}/netutils.c"
-  "${BASE_DIR}/notifications.c"
-  "${BASE_DIR}/perfdata.c"
-  "${BASE_DIR}/sehandlers.c"
-  "${BASE_DIR}/sretention.c"
-  "${BASE_DIR}/utils.c"
-  "${COMMON_DIR}/comments.c"
-  "${COMMON_DIR}/downtime.c"
-  "${COMMON_DIR}/macros.c"
-  "${COMMON_DIR}/objects.c"
-  "${COMMON_DIR}/skiplist.c"
-  "${COMMON_DIR}/snprintf.c"
-  "${COMMON_DIR}/statusdata.c"
-  "${XDATA_DIR}/xcddefault.c"
-  "${XDATA_DIR}/xdddefault.c"
-  "${XDATA_DIR}/xodtemplate.c"
-  "${XDATA_DIR}/xpddefault.c"
-  "${XDATA_DIR}/xrddefault.c"
-  "${XDATA_DIR}/xsddefault.c"
+# Set nagios sources
+set(NAGIOS_SRC
+  ${BASE_DIR}/broker.c
+  ${BASE_DIR}/checks.c
+  ${BASE_DIR}/commands.c
+  ${BASE_DIR}/config.c
+  ${BASE_DIR}/events.c
+  ${BASE_DIR}/flapping.c
+  ${BASE_DIR}/logging.c
+  ${BASE_DIR}/nebmods.c
+  ${BASE_DIR}/netutils.c
+  ${BASE_DIR}/notifications.c
+  ${BASE_DIR}/perfdata.c
+  ${BASE_DIR}/sehandlers.c
+  ${BASE_DIR}/sretention.c
+  ${BASE_DIR}/utils.c
+  ${COMMON_DIR}/comments.c
+  ${COMMON_DIR}/downtime.c
+  ${COMMON_DIR}/macros.c
+  ${COMMON_DIR}/objects.c
+  ${COMMON_DIR}/skiplist.c
+  ${COMMON_DIR}/snprintf.c
+  ${COMMON_DIR}/statusdata.c
+  ${XDATA_DIR}/xcddefault.c
+  ${XDATA_DIR}/xdddefault.c
+  ${XDATA_DIR}/xodtemplate.c
+  ${XDATA_DIR}/xpddefault.c
+  ${XDATA_DIR}/xrddefault.c
+  ${XDATA_DIR}/xsddefault.c
 )
-target_link_libraries("scheduler"
+
+set(NAGIOS_LIB
   ${DL_LIBRARIES}
   ${MATH_LIBRARIES}
   ${SOCKET_LIBRARIES}
   ${THREAD_LIBRARIES}
+)
+
+# scheduler target.
+add_executable("scheduler"
+  "${BASE_DIR}/nagios.c"
+  ${NAGIOS_SRC}
+)
+target_link_libraries("scheduler"
+  ${NAGIOS_LIB}
+)
+
+# Unit test.
+include_directories("${PROJECT_SOURCE_DIR}/include")
+
+add_executable("common_macros_process_macros"
+  "${TEST_DIR}/common/macros/process_macros.c"
+  "${TEST_DIR}/globals.c"
+  ${NAGIOS_SRC}
+)
+target_link_libraries("common_macros_process_macros"
+  ${NAGIOS_LIB}
+)
+add_test("test_function_process_macros"
+  "common_macros_process_macros"
+)
+
+add_executable("base_logging"
+  "${TEST_DIR}/base/logging.c"
+  "${TEST_DIR}/globals.c"
+  ${NAGIOS_SRC}
+)
+target_link_libraries("base_logging"
+  ${NAGIOS_LIB}
+)
+add_test("test_file_base_logging"
+  "base_logging"
 )
