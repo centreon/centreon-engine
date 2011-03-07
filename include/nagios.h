@@ -301,7 +301,6 @@ extern "C" {
 #define EVENT_HFRESHNESS_CHECK          13      /* checks host result "freshness" */
 #define EVENT_RESCHEDULE_CHECKS		14      /* adjust scheduling of host and service checks */
 #define EVENT_EXPIRE_COMMENT            15      /* removes expired comments */
-#define EVENT_CHECK_PROGRAM_UPDATE      16      /* checks for new version of Nagios */
 #define EVENT_SLEEP                     98      /* asynchronous sleep event that occurs when event queues are empty */
 #define EVENT_USER_FUNCTION             99      /* USER-defined function (modules) */
 
@@ -687,8 +686,6 @@ int dbuf_init(dbuf *,int);
 int dbuf_free(dbuf *);
 int dbuf_strcat(dbuf *,char *);
 int set_environment_var(char *,char *,int);             /* sets/clears and environment variable */
-int check_for_nagios_updates(int,int);                  /* checks to see if new version of Nagios are available */
-int query_update_api(void);                             /* checks to see if new version of Nagios are available */
 
 
 /**** External Command Functions ****/

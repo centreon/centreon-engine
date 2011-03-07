@@ -74,7 +74,6 @@ extern int            use_retained_program_state;
 extern int            use_retained_scheduling_info;
 extern int            retention_scheduling_horizon;
 
-extern time_t         last_update_check;
 extern unsigned long  update_uid;
 extern char           *last_program_version;
 extern int            update_available;
@@ -324,7 +323,6 @@ int xrddefault_save_state_information(void){
 	fprintf(fp,"info {\n");
 	fprintf(fp,"created=%lu\n",current_time);
 	fprintf(fp,"version=%s\n",PROGRAM_VERSION);
-	fprintf(fp,"last_update_check=%lu\n",last_update_check);
 	fprintf(fp,"update_available=%d\n",update_available);
 	fprintf(fp,"update_uid=%lu\n",update_uid);
 	fprintf(fp,"last_version=%s\n",(last_program_version==NULL)?"":last_program_version);
@@ -1038,8 +1036,6 @@ int xrddefault_read_state_information(void){
 					if(last_program_version==NULL)
 						last_program_version=(char *)strdup(val);
 					}
-				else if(!strcmp(var,"last_update_check"))
-					last_update_check=strtoul(val,NULL,10);
 				else if(!strcmp(var,"update_available"))
 					update_available=atoi(val);
 				else if(!strcmp(var,"update_uid"))
