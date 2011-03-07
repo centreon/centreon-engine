@@ -299,3 +299,24 @@ target_link_libraries("scheduler"
   ${SOCKET_LIBRARIES}
   ${THREAD_LIBRARIES}
 )
+
+# Package.
+set(CPACK_PACKAGE_VENDOR "Merethis")
+set(CPACK_PACKAGE_VERSION_MAJOR 1)
+set(CPACK_PACKAGE_VERSION_MINOR 0)
+set(CPACK_PACKAGE_VERSION_PATCH "0beta")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY
+  "Centreon Scheduler monitors your IT infrastructure.")
+set(CPACK_PACKAGE_FILE_NAME
+  "centreon-scheduler-${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}")
+set(CPACK_PACKAGE_INSTALL_DIRECTORY "Centreon-Scheduler")
+set(CPACK_RESOURCE_FILE_LICENSE "${PROJECT_SOURCE_DIR}/license.txt")
+set(CPACK_PACKAGE_CONTACT "Matthieu Kermagoret <mkermagoret@merethis.com>")
+if (CPACK_BINARY_DEB)
+  set(CPACK_DEBIAN_PACKAGE_SECTION "net")
+endif ()
+if (CPACK_BINARY_RPM)
+  set(CPACK_RPM_PACKAGE_RELEASE 1)
+  set(CPACK_RPM_PACKAGE_LICENSE "GPLv2")
+endif ()
+include(CPack)
