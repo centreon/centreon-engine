@@ -253,6 +253,7 @@ set(BASE_DIR "${PROJECT_SOURCE_DIR}/base")
 set(COMMON_DIR "${PROJECT_SOURCE_DIR}/common")
 set(INCLUDE_DIR "${PROJECT_SOURCE_DIR}/include")
 set(XDATA_DIR "${PROJECT_SOURCE_DIR}/xdata")
+set(TEST_DIR "${PROJECT_SOURCE_DIR}/test")
 
 # Configure files.
 configure_file("${INCLUDE_DIR}/config.h.in"
