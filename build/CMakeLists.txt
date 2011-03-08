@@ -25,6 +25,13 @@ project("Centreon Scheduler" C)
 set(PROJECT_SOURCE_DIR "${PROJECT_SOURCE_DIR}/..")
 include(CTest)
 
+# Set directories.
+set(BASE_DIR "${PROJECT_SOURCE_DIR}/base")
+set(COMMON_DIR "${PROJECT_SOURCE_DIR}/common")
+set(INCLUDE_DIR "${PROJECT_SOURCE_DIR}/include")
+set(XDATA_DIR "${PROJECT_SOURCE_DIR}/xdata")
+set(TEST_DIR "${PROJECT_SOURCE_DIR}/test")
+
 # Check headers.
 include(CheckIncludeFiles)
 include(CheckCSourceCompiles)
@@ -298,12 +305,53 @@ endif ()
 # Lock file location.
 # XXX
 
-# Set directories.
-set(BASE_DIR "${PROJECT_SOURCE_DIR}/base")
-set(COMMON_DIR "${PROJECT_SOURCE_DIR}/common")
-set(INCLUDE_DIR "${PROJECT_SOURCE_DIR}/include")
-set(XDATA_DIR "${PROJECT_SOURCE_DIR}/xdata")
-set(TEST_DIR "${PROJECT_SOURCE_DIR}/test")
+# Embedded Perl.
+option(WITH_EMBEDDED_PERL "Enable embedded Perl" OFF)
+option(WITH_PERL_CACHE "Enable cacheing of internally compiled Perl scripts.")
+if (WITH_EMBEDDED_PERL)
+  message(STATUS "Embedded Perl is being compiled in.")
+  set(EMBEDDEDPERL TRUE)
+  set(EMBEDDED_PERL "Yes")
+  if (WITH_PERL_CACHE)
+    message(STATUS "Internally compiled Perl scripts will be cached.")
+    set(DOCLEAN 0)
+  else ()
+    message(STATUS "Internally compiled Perl scripts will NOT be cached.")
+    set(DOCLEAN 1)
+  endif ()
+  execute_process(COMMAND "perl" "-e" "use Config;exit -1 unless (\$Config{usethreads});"
+    RESULT_VARIABLE RETVAL)
+  if (RETVAL EQUAL 0)
+    message(STATUS "Using threaded Perl.")
+    set(THREADEDPERL TRUE)
+    set(THREADED_PERL "Yes")
+  else ()
+    message(STATUS "NOT using threaded Perl.")
+    set(THREADEDPERL FALSE)
+    set(THREADED_PERL "No")
+  endif ()
+  execute_process(COMMAND "perl" "-MExtUtils::Embed" "-e" "ccopts"
+    RESULT_VARIABLE RETVAL
+    OUTPUT_VARIABLE PERL_COMPILE_FLAGS)
+  if (NOT RETVAL EQUAL 0)
+    message(FATAL_ERROR "Could not retrieve embedded Perl compile flags.")
+  endif ()
+  execute_process(COMMAND "perl" "-MExtUtils::Embed" "-e" "ldopts"
+    RESULT_VARIABLE RETVAL
+    OUTPUT_VARIABLE PERL_LINK_FLAGS)
+  if (NOT RETVAL EQUAL 0)
+    message(FATAL_ERROR "Could not retrieve embedded Perl link flags.")
+  endif ()
+  string(STRIP "${PERL_LINK_FLAGS}" PERL_LINK_FLAGS)
+  set(PERL_SOURCES "${BASE_DIR}/perlxsi.c")
+  execute_process(COMMAND "perl" "-MExtUtils::Embed" "-e" "xsinit" "--" "-o" "${PERL_SOURCES}"
+    RESULT_VARIABLE RETVAL)
+  if (NOT RETVAL EQUAL 0)
+    message(FATAL_ERROR "Could not generate embedded Perl source file.")
+  endif ()
+else ()
+  set(EMBEDDED_PERL "No")
+endif ()
 
 # Configure files.
 configure_file("${INCLUDE_DIR}/config.h.in"
@@ -313,7 +361,7 @@ configure_file("${INCLUDE_DIR}/locations.h.in"
 configure_file("${INCLUDE_DIR}/snprintf.h.in"
   "${INCLUDE_DIR}/snprintf.h")
 
-# scheduler target.
+# centscheduler target.
 add_executable("centscheduler"
   "${BASE_DIR}/broker.c"
   "${BASE_DIR}/checks.c"
@@ -343,12 +391,25 @@ add_executable("centscheduler"
   "${XDATA_DIR}/xpddefault.c"
   "${XDATA_DIR}/xrddefault.c"
   "${XDATA_DIR}/xsddefault.c"
+  "${PERL_SOURCES}"
 )
+get_property(SCHEDULER_COMPILE_FLAGS
+  TARGET "centscheduler"
+  PROPERTY COMPILE_FLAGS)
+set(SCHEDULER_COMPILE_FLAGS "${SCHEDULER_COMPILE_FLAGS} ${PERL_COMPILE_FLAGS}")
+set_target_properties("centscheduler" PROPERTIES
+  COMPILE_FLAGS "${SCHEDULER_COMPILE_FLAGS}")
 target_link_libraries("centscheduler"
   ${DL_LIBRARIES}
   ${MATH_LIBRARIES}
   ${SOCKET_LIBRARIES}
   ${THREAD_LIBRARIES}
+  ${PERL_LINK_FLAGS}
+)
+
+# centschedulerstats target.
+add_executable("centschedulerstats"
+  "${BASE_DIR}/nagiostats.c"
 )
 
 # Package.
@@ -387,11 +448,16 @@ message(STATUS "")
 message(STATUS "    Version:                 ${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}")
 message(STATUS "    Nanosleep enabled:       ${NANOSLEEP}")
 message(STATUS "    Event-broker enabled:    ${EVENT_BROKER}")
-message(STATUS "    Compilation Flags:       ${CMAKE_CXX_FLAGS}")
+message(STATUS "    Embedded Perl:           ${EMBEDDED_PERL}")
+if (EMBEDDEDPERL)
+  message(STATUS "    Threaded Perl:           ${THREADED_PERL}")
+endif ()
+message(STATUS "    Extra Compilation Flags: ${CMAKE_CXX_FLAGS}")
 message(STATUS "    Prefix:                  ${localstatedir}")
 message(STATUS "    Binary Directory:        ${bindir}")
 message(STATUS "    Configuration Directory: ${sysconfdir}")
 message(STATUS "    Check Result Directory:  ${CHECK_RESULT_DIR}")
+message(STATUS "    Temporary Directory:     ${TMPDIR}")
 message(STATUS "    Startup Script:          ${STARTUP_SCRIPT}")
 message(STATUS "    User:                    ${USER}")
 message(STATUS "    Group:                   ${GROUP}")
