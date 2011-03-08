@@ -123,7 +123,10 @@ check_c_source_compiles("
 # Should we use nanosleep.
 option(WITH_NANOSLEEP "Use nanosleep instead of sleep." ON)
 if (WITH_NANOSLEEP)
+  set(NANOSLEEP "Yes")
   check_function_exists("nanosleep" USE_NANOSLEEP)
+else ()
+  set(NANOSLEEP "No")
 endif ()
 
 # Check timezone informations.
@@ -217,7 +220,10 @@ set(THREAD_LIBRARIES "${CMAKE_THREAD_LIBS_INIT}")
 # Event broker option.
 option(WITH_EVENT_BROKER "Allow event broker modules use." ON)
 if (WITH_EVENT_BROKER)
+  set(EVENT_BROKER "Yes")
   set(USE_EVENT_BROKER TRUE)
+else ()
+  set(EVENT_BROKER "No")  
 endif ()
 
 # localstatedir is the prefix.
@@ -243,8 +249,51 @@ else ()
   set(TMPDIR "/tmp")
 endif ()
 
-# Check for location of init scripts.
-# XXX 
+# User used to run Centreon Scheduler.
+if (WITH_USER)
+  set(USER "${WITH_USER}")
+else ()
+  set(USER "root")
+endif ()
+
+# Group used to run Centreon Scheduler.
+if (WITH_GROUP)
+  set(GROUP "${WITH_GROUP}")
+else ()
+  set(GROUP "root")
+endif ()
+
+# Check which startup script to use.
+option(WITH_STARTUP_SCRIPT "Generate and install startup script." ON)
+set(STARTUP_SCRIPT "No")
+if (WITH_STARTUP_SCRIPT)
+  if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    message(STATUS "Attempting to determine OS distributor.")
+    execute_process(COMMAND "lsb_release" "-i"
+      RESULT_VARIABLE RETCODE
+      OUTPUT_VARIABLE OS_DISTRIBUTOR
+      ERROR_QUIET)
+    if (RETCODE EQUAL 0)
+      string(LENGTH "${OS_DISTRIBUTOR}" OS_DISTRIBUTOR_LEN)
+      math(EXPR OS_DISTRIBUTOR_LEN "${OS_DISTRIBUTOR_LEN}-17")
+      string(SUBSTRING "${OS_DISTRIBUTOR}" 16 "${OS_DISTRIBUTOR_LEN}" OS_DISTRIBUTOR)
+      if (OS_DISTRIBUTOR STREQUAL "CentOS")
+        message(STATUS "Generating CentOS startup script.")
+        set(STARTUP_SCRIPT "CentOS init script")
+      elseif (OS_DISTRIBUTOR STREQUAL "Ubuntu")
+        message(STATUS "Generating Ubuntu startup script.")
+        set(STARTUP_SCRIPT "Ubuntu upstart script")
+      else ()
+        message(STATUS "Unsupported distributor: ${OS_DISTRIBUTOR}")
+      endif ()
+    else ()
+      message(STATUS "Could not get Linux distributor name, not startup script will be installed.")
+    endif ()
+  else ()
+    message(STATUS "Centreon Scheduler does not provide startup script for ${CMAKE_SYSTEM_NAME}")
+    set(OS_DISTRIBUTOR "${CMAKE_SYSTEM_NAME}")
+  endif ()
+endif ()
 
 # Lock file location.
 # XXX
@@ -315,10 +364,38 @@ set(CPACK_PACKAGE_INSTALL_DIRECTORY "Centreon-Scheduler")
 set(CPACK_RESOURCE_FILE_LICENSE "${PROJECT_SOURCE_DIR}/license.txt")
 set(CPACK_PACKAGE_CONTACT "Matthieu Kermagoret <mkermagoret@merethis.com>")
 if (CPACK_BINARY_DEB)
+  set(DEB_PACKAGE "Yes")
   set(CPACK_DEBIAN_PACKAGE_SECTION "net")
+else ()
+  set(DEB_PACKAGE "No")
 endif ()
 if (CPACK_BINARY_RPM)
+  set(RPM_PACKAGE "Yes")
   set(CPACK_RPM_PACKAGE_RELEASE 1)
   set(CPACK_RPM_PACKAGE_LICENSE "GPLv2")
+else ()
+  set(RPM_PACKAGE "No")
 endif ()
 include(CPack)
+
+# Print summary.
+message(STATUS "")
+message(STATUS "")
+message(STATUS "Configuration Summary")
+message(STATUS "---------------------")
+message(STATUS "")
+message(STATUS "    Version:                 ${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}")
+message(STATUS "    Nanosleep enabled:       ${NANOSLEEP}")
+message(STATUS "    Event-broker enabled:    ${EVENT_BROKER}")
+message(STATUS "    Compilation Flags:       ${CMAKE_CXX_FLAGS}")
+message(STATUS "    Prefix:                  ${localstatedir}")
+message(STATUS "    Binary Directory:        ${bindir}")
+message(STATUS "    Configuration Directory: ${sysconfdir}")
+message(STATUS "    Check Result Directory:  ${CHECK_RESULT_DIR}")
+message(STATUS "    Startup Script:          ${STARTUP_SCRIPT}")
+message(STATUS "    User:                    ${USER}")
+message(STATUS "    Group:                   ${GROUP}")
+message(STATUS "    Deb Package Creation:    ${DEB_PACKAGE}")
+message(STATUS "    RPM Package Creation:    ${RPM_PACKAGE}")
+message(STATUS "")
+message(STATUS "")
