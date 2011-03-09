@@ -3463,7 +3463,7 @@ int dbuf_strcat(dbuf *db, char *buf){
 /* initializes embedded perl interpreter */
 int init_embedded_perl(char **env){
 #ifdef EMBEDDEDPERL
-	void **embedding;
+	char **embedding;
 	int exitstatus=0;
 	char *temp_buffer=NULL;
 	int argc=2;
@@ -3479,7 +3479,7 @@ int init_embedded_perl(char **env){
 
 	else{
 
-		embedding=(void **)malloc(2*sizeof(char *));
+		embedding=malloc(2*sizeof(char *));
 		if(embedding==NULL)
 			return ERROR;
 		*embedding=strdup("");

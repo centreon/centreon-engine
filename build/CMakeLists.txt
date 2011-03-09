@@ -25,12 +25,20 @@ project("Centreon Scheduler" C)
 set(PROJECT_SOURCE_DIR "${PROJECT_SOURCE_DIR}/..")
 include(CTest)
 
+# Set directories.
+set(BASE_DIR "${PROJECT_SOURCE_DIR}/base")
+set(COMMON_DIR "${PROJECT_SOURCE_DIR}/common")
+set(INCLUDE_DIR "${PROJECT_SOURCE_DIR}/include")
+set(XDATA_DIR "${PROJECT_SOURCE_DIR}/xdata")
+set(TEST_DIR "${PROJECT_SOURCE_DIR}/test")
+
 # Check headers.
 include(CheckIncludeFiles)
 include(CheckCSourceCompiles)
 check_include_files("arpa/inet.h" HAVE_ARPA_INET_H)
 check_include_files("ctype.h" HAVE_CTYPE_H)
 check_include_files("dirent.h" HAVE_DIRENT_H)
+check_include_files("dlfcn.h" HAVE_DLFCN_H)
 check_include_files("errno.h" HAVE_ERRNO_H)
 check_include_files("fcntl.h" HAVE_FCNTL_H)
 check_include_files("float.h" HAVE_FLOAT_H)
@@ -122,7 +130,10 @@ check_c_source_compiles("
 # Should we use nanosleep.
 option(WITH_NANOSLEEP "Use nanosleep instead of sleep." ON)
 if (WITH_NANOSLEEP)
+  set(NANOSLEEP "Yes")
   check_function_exists("nanosleep" USE_NANOSLEEP)
+else ()
+  set(NANOSLEEP "No")
 endif ()
 
 # Check timezone informations.
@@ -216,7 +227,10 @@ set(THREAD_LIBRARIES "${CMAKE_THREAD_LIBS_INIT}")
 # Event broker option.
 option(WITH_EVENT_BROKER "Allow event broker modules use." ON)
 if (WITH_EVENT_BROKER)
+  set(EVENT_BROKER "Yes")
   set(USE_EVENT_BROKER TRUE)
+else ()
+  set(EVENT_BROKER "No")  
 endif ()
 
 # localstatedir is the prefix.
@@ -242,17 +256,102 @@ else ()
   set(TMPDIR "/tmp")
 endif ()
 
-# Check for location of init scripts.
-# XXX 
+# User used to run Centreon Scheduler.
+if (WITH_USER)
+  set(USER "${WITH_USER}")
+else ()
+  set(USER "root")
+endif ()
+
+# Group used to run Centreon Scheduler.
+if (WITH_GROUP)
+  set(GROUP "${WITH_GROUP}")
+else ()
+  set(GROUP "root")
+endif ()
+
+# Check which startup script to use.
+option(WITH_STARTUP_SCRIPT "Generate and install startup script." ON)
+set(STARTUP_SCRIPT "No")
+if (WITH_STARTUP_SCRIPT)
+  if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    message(STATUS "Attempting to determine OS distributor.")
+    execute_process(COMMAND "lsb_release" "-i"
+      RESULT_VARIABLE RETCODE
+      OUTPUT_VARIABLE OS_DISTRIBUTOR
+      ERROR_QUIET)
+    if (RETCODE EQUAL 0)
+      string(LENGTH "${OS_DISTRIBUTOR}" OS_DISTRIBUTOR_LEN)
+      math(EXPR OS_DISTRIBUTOR_LEN "${OS_DISTRIBUTOR_LEN}-17")
+      string(SUBSTRING "${OS_DISTRIBUTOR}" 16 "${OS_DISTRIBUTOR_LEN}" OS_DISTRIBUTOR)
+      if (OS_DISTRIBUTOR STREQUAL "CentOS")
+        message(STATUS "Generating CentOS startup script.")
+        set(STARTUP_SCRIPT "CentOS init script")
+      elseif (OS_DISTRIBUTOR STREQUAL "Ubuntu")
+        message(STATUS "Generating Ubuntu startup script.")
+        set(STARTUP_SCRIPT "Ubuntu upstart script")
+      else ()
+        message(STATUS "Unsupported distributor: ${OS_DISTRIBUTOR}")
+      endif ()
+    else ()
+      message(STATUS "Could not get Linux distributor name, not startup script will be installed.")
+    endif ()
+  else ()
+    message(STATUS "Centreon Scheduler does not provide startup script for ${CMAKE_SYSTEM_NAME}")
+    set(OS_DISTRIBUTOR "${CMAKE_SYSTEM_NAME}")
+  endif ()
+endif ()
 
 # Lock file location.
 # XXX
 
-# Set directories.
-set(BASE_DIR "${PROJECT_SOURCE_DIR}/base")
-set(COMMON_DIR "${PROJECT_SOURCE_DIR}/common")
-set(INCLUDE_DIR "${PROJECT_SOURCE_DIR}/include")
-set(XDATA_DIR "${PROJECT_SOURCE_DIR}/xdata")
+# Embedded Perl.
+option(WITH_EMBEDDED_PERL "Enable embedded Perl" OFF)
+option(WITH_PERL_CACHE "Enable cacheing of internally compiled Perl scripts.")
+if (WITH_EMBEDDED_PERL)
+  message(STATUS "Embedded Perl is being compiled in.")
+  set(EMBEDDEDPERL TRUE)
+  set(EMBEDDED_PERL "Yes")
+  if (WITH_PERL_CACHE)
+    message(STATUS "Internally compiled Perl scripts will be cached.")
+    set(DOCLEAN 0)
+  else ()
+    message(STATUS "Internally compiled Perl scripts will NOT be cached.")
+    set(DOCLEAN 1)
+  endif ()
+  execute_process(COMMAND "perl" "-e" "use Config;exit -1 unless (\$Config{usethreads});"
+    RESULT_VARIABLE RETVAL)
+  if (RETVAL EQUAL 0)
+    message(STATUS "Using threaded Perl.")
+    set(THREADEDPERL TRUE)
+    set(THREADED_PERL "Yes")
+  else ()
+    message(STATUS "NOT using threaded Perl.")
+    set(THREADEDPERL FALSE)
+    set(THREADED_PERL "No")
+  endif ()
+  execute_process(COMMAND "perl" "-MExtUtils::Embed" "-e" "ccopts"
+    RESULT_VARIABLE RETVAL
+    OUTPUT_VARIABLE PERL_COMPILE_FLAGS)
+  if (NOT RETVAL EQUAL 0)
+    message(FATAL_ERROR "Could not retrieve embedded Perl compile flags.")
+  endif ()
+  execute_process(COMMAND "perl" "-MExtUtils::Embed" "-e" "ldopts"
+    RESULT_VARIABLE RETVAL
+    OUTPUT_VARIABLE PERL_LINK_FLAGS)
+  if (NOT RETVAL EQUAL 0)
+    message(FATAL_ERROR "Could not retrieve embedded Perl link flags.")
+  endif ()
+  string(STRIP "${PERL_LINK_FLAGS}" PERL_LINK_FLAGS)
+  set(PERL_SOURCES "${BASE_DIR}/perlxsi.c")
+  execute_process(COMMAND "perl" "-MExtUtils::Embed" "-e" "xsinit" "--" "-o" "${PERL_SOURCES}"
+    RESULT_VARIABLE RETVAL)
+  if (NOT RETVAL EQUAL 0)
+    message(FATAL_ERROR "Could not generate embedded Perl source file.")
+  endif ()
+else ()
+  set(EMBEDDED_PERL "No")
+endif ()
 
 # Configure files.
 configure_file("${INCLUDE_DIR}/config.h.in"
@@ -262,7 +361,7 @@ configure_file("${INCLUDE_DIR}/locations.h.in"
 configure_file("${INCLUDE_DIR}/snprintf.h.in"
   "${INCLUDE_DIR}/snprintf.h")
 
-# scheduler target.
+# centscheduler target.
 add_executable("centscheduler"
   "${BASE_DIR}/broker.c"
   "${BASE_DIR}/checks.c"
@@ -292,12 +391,25 @@ add_executable("centscheduler"
   "${XDATA_DIR}/xpddefault.c"
   "${XDATA_DIR}/xrddefault.c"
   "${XDATA_DIR}/xsddefault.c"
+  "${PERL_SOURCES}"
 )
+get_property(SCHEDULER_COMPILE_FLAGS
+  TARGET "centscheduler"
+  PROPERTY COMPILE_FLAGS)
+set(SCHEDULER_COMPILE_FLAGS "${SCHEDULER_COMPILE_FLAGS} ${PERL_COMPILE_FLAGS}")
+set_target_properties("centscheduler" PROPERTIES
+  COMPILE_FLAGS "${SCHEDULER_COMPILE_FLAGS}")
 target_link_libraries("centscheduler"
   ${DL_LIBRARIES}
   ${MATH_LIBRARIES}
   ${SOCKET_LIBRARIES}
   ${THREAD_LIBRARIES}
+  ${PERL_LINK_FLAGS}
+)
+
+# centschedulerstats target.
+add_executable("centschedulerstats"
+  "${BASE_DIR}/nagiostats.c"
 )
 
 # Package.
@@ -313,10 +425,43 @@ set(CPACK_PACKAGE_INSTALL_DIRECTORY "Centreon-Scheduler")
 set(CPACK_RESOURCE_FILE_LICENSE "${PROJECT_SOURCE_DIR}/license.txt")
 set(CPACK_PACKAGE_CONTACT "Matthieu Kermagoret <mkermagoret@merethis.com>")
 if (CPACK_BINARY_DEB)
+  set(DEB_PACKAGE "Yes")
   set(CPACK_DEBIAN_PACKAGE_SECTION "net")
+else ()
+  set(DEB_PACKAGE "No")
 endif ()
 if (CPACK_BINARY_RPM)
+  set(RPM_PACKAGE "Yes")
   set(CPACK_RPM_PACKAGE_RELEASE 1)
   set(CPACK_RPM_PACKAGE_LICENSE "GPLv2")
+else ()
+  set(RPM_PACKAGE "No")
 endif ()
 include(CPack)
+
+# Print summary.
+message(STATUS "")
+message(STATUS "")
+message(STATUS "Configuration Summary")
+message(STATUS "---------------------")
+message(STATUS "")
+message(STATUS "    Version:                 ${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}")
+message(STATUS "    Nanosleep enabled:       ${NANOSLEEP}")
+message(STATUS "    Event-broker enabled:    ${EVENT_BROKER}")
+message(STATUS "    Embedded Perl:           ${EMBEDDED_PERL}")
+if (EMBEDDEDPERL)
+  message(STATUS "    Threaded Perl:           ${THREADED_PERL}")
+endif ()
+message(STATUS "    Extra Compilation Flags: ${CMAKE_CXX_FLAGS}")
+message(STATUS "    Prefix:                  ${localstatedir}")
+message(STATUS "    Binary Directory:        ${bindir}")
+message(STATUS "    Configuration Directory: ${sysconfdir}")
+message(STATUS "    Check Result Directory:  ${CHECK_RESULT_DIR}")
+message(STATUS "    Temporary Directory:     ${TMPDIR}")
+message(STATUS "    Startup Script:          ${STARTUP_SCRIPT}")
+message(STATUS "    User:                    ${USER}")
+message(STATUS "    Group:                   ${GROUP}")
+message(STATUS "    Deb Package Creation:    ${DEB_PACKAGE}")
+message(STATUS "    RPM Package Creation:    ${RPM_PACKAGE}")
+message(STATUS "")
+message(STATUS "")
