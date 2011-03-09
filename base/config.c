@@ -1252,12 +1252,20 @@ int read_main_config_file(char *main_config_file){
 		        }
 
 		/* warn about old variables */
-		else if(!strcmp(variable,"comment_file") || !strcmp(variable,"xcddefault_comment_file")){
-			logit(NSLOG_CONFIG_WARNING,TRUE,"Warning: comment_file variable ignored.  Comments are now stored in the status and retention files.");
-		        }
-		else if(!strcmp(variable,"downtime_file") || !strcmp(variable,"xdddefault_downtime_file")){
-			logit(NSLOG_CONFIG_WARNING,TRUE,"Warning: downtime_file variable ignored.  Downtime entries are now stored in the status and retention files.");
-		        }
+		else if(!strcmp(variable,"comment_file") || !strcmp(variable,"xcddefault_comment_file"))
+			logit(NSLOG_CONFIG_WARNING,TRUE,"Warning: comment_file variable ignored. Comments are now stored in the status and retention files.");
+
+		else if(!strcmp(variable,"downtime_file") || !strcmp(variable,"xdddefault_downtime_file"))
+			logit(NSLOG_CONFIG_WARNING,TRUE,"Warning: downtime_file variable ignored. Downtime entries are now stored in the status and retention files.");
+
+		else if(!strcmp(variable,"lock_file"))
+			logit(NSLOG_CONFIG_WARNING,TRUE,"Warning: lock_file variable ignored. Priviledge drop should be handled by startup script.");
+
+		else if(!strcmp(variable,"nagios_user"))
+			logit(NSLOG_CONFIG_WARNING,TRUE,"Warning: nagios_user varible ignored. Priviledge drop should be handled by startup script.");
+
+		else if(!strcmp(variable,"nagios_group"))
+			logit(NSLOG_CONFIG_WARNING,TRUE,"Warning: nagios_group variable ignored. Priviledge drop should be handled by startup script.");
 
 		/* skip external data directives */
 		else if(strstr(input,"x")==input)
