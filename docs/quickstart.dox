@@ -1,0 +1,583 @@
+/**
+ *  @page quickstartinstallationguides Quickstart Installation Guides
+ *  @section installationintroduction Installation Introduction
+ *
+ *  These quickstart guides are intended to provide you with simple
+ *  instructions on how to install Centreon Scheduler from source (code)
+ *  and have it monitoring your local machine inside of 20 minutes. No
+ *  advanced installation options are discussed here - just the basics
+ *  that will work for 95% of users who want to get started.
+ *
+ *  @section installationguides Installation Guides
+ *
+ *  Quickstart installation guides are currently available for the
+ *  following Linux distributions:
+ *  - @link fedoraquickstart Fedora Quickstart @endlink
+ *  - @link opensusequickstart openSUSE Quickstart @endlink
+ *  - @link ubuntuquickstart Ubuntu Quickstart @endlink
+ *
+ *  If you are installing Centreon Scheduler on an operating system or
+ *  Linux distribution that isn't listed above, read the Fedora
+ *  quickstart for an overview of what you'll need to do. Command names,
+ *  paths, etc. vary widely across different OSes/distributions, so
+ *  you'll likely need to tweak the installation docs a bit to work for
+ *  your particular case.
+ *
+ *  @section postinstallationmodifications Post-Installation Modifications
+ *
+ *  Once you get Centreon Scheduler installed and running properly,
+ *  you'll no doubt want to start monitoring more than just your local
+ *  machine. Check out the following docs for how to go about monitoring
+ *  other things...
+ *
+ *  - @link monitoringwindowsmachines Monitoring Windows machines @endlink
+ *  - @link monitoringlinuxunixmachines Monitoring Linux/Unix machines @endlink
+ *  - @link monitoringnetwareservers Monitoring Netware servers @endlink
+ *  - @link monitoringroutersswitches Monitoring routers/switches @endlink
+ *  - @link monitoringnetworkprinters Monitoring network printers @endlink
+ *  - @link monitoringpubliclyavailableservices Monitoring publicly
+ *    available services (HTTP, FTP, SSH, etc.) @endlink
+ *
+ *  @section fedoraquickstart Fedora Quickstart
+ *
+ *  @subsection fedoraquickstartintroduction Introduction
+ *
+ *  This guide is intended to provide you with simple instructions on
+ *  how to install Centron Scheduler from source (code) on Fedora and
+ *  have it monitoring your local machine inside of 20 minutes. No
+ *  advanced installation options are discussed here - just the basics
+ *  that will work for 95% of users who want to get started.
+ *
+ *  These instructions were written based on a standard Fedora Core 6
+ *  Linux distribution.
+ *
+ *  @subsection fedoraquickstartwhatyoullendup What You'll End Up With
+ *
+ *  - Centron Scheduler and the plugins will be installed underneath
+ *    /usr/local/centscheduler
+ *  - Centron Scheduler will be configured to monitor a few aspects of
+ *    your local system (CPU load, disk usage, etc.)
+ *
+ *  @subsection fedoraquickstartprerequisites Prerequisites
+ *
+ *  During portions of the installation you'll need to have root access
+ *  to your machine.
+ *
+ *  Make sure you've installed the following packages on your Fedora
+ *  installation before continuing.
+ *
+ *  - GCC compiler
+ *
+ *  You can use yum to install these packages by running the following
+ *  commands (as root):
+ *
+ *  @code
+ *  yum install gcc glibc glibc-common cmake
+ *  @endcode
+ *
+ *  @subsection fedoraquickstartcreateaccountinformation Create Account Information
+ *
+ *  Become the root user.
+ *
+ *  @code
+ *  su -l
+ *  @endcode
+ *
+ *  Create a new Centron Scheduler user account and give it a password.
+ *
+ *  @code
+ *  /usr/sbin/useradd -m centscheduler
+ *  passwd centscheduler
+ *  @endcode
+ *
+ *  @subsection fedoraquickstartdownloadcentronschedulerandtheplugins Download Centron Scheduler and the Plugins
+ *
+ *  Create a directory for storing the downloads.
+ *
+ *  @code
+ *  mkdir ~/downloads
+ *  cd ~/downloads
+ *  @endcode
+ *
+ *  Download the source code tarballs of both Centron Scheduler and the
+ *  Centron Scheduler plugins (visit XXX for links to the latest
+ *  versions). These directions were tested with Centron Scheduler XXX
+ *  and Centron Scheduler Plugins XXX.
+ *
+ *  @code
+ *  wget http://XXX/centron-scheduler.tar.gz
+ *  wget http://XXX/centron-scheduler-plugins.tar.gz
+ *  @endcode
+ *
+ *  @subsection fedoraquickstartcompileandinstallcentronscheduler Compile and Install Centron Scheduler
+ *  Extract the Centron Scheduler source code tarball.
+ *
+ *  @code
+ *  cd ~/downloads
+ *  tar xzf centron-scheduler.tar.gz
+ *  cd centron-scheduler
+ *  @endcode
+ *
+ *  Run the Centron Scheduler configure script, passing the name of the
+ *  group you created earlier like so:
+ *
+ *  @code
+ *  cmake .
+ *  @endcode
+ *
+ *  Compile the Centron Scheduler source code.
+ *
+ *  @code
+ *  make all
+ *  @endcode
+ *
+ *  Install binaries, init script, sample config files and set
+ *  permissions on the external command directory.
+ *
+ *  @code
+ *  make install
+ *  make install-init
+ *  make install-config
+ *  make install-commandmode
+ *  @endcode
+ *
+ *  Don't start Centron Scheduler yet - there's still more that needs to
+ *  be done...
+ *
+ *  @subsection fedoraquickstartcustomizeconfiguration Customize Configuration
+ *
+ *  Sample configuration files have now been installed in the
+ *  /usr/local/centscheduler/etc directory. These sample files should
+ *  work fine for getting started with Centron Scheduler. You'll need to
+ *  make just one change before you proceed...
+ *
+ *  Edit the /usr/local/centscheduler/etc/objects/contacts.cfg config
+ *  file with your favorite editor and change the email address
+ *  associated with the centscheduleradmin contact definition to the
+ *  address you'd like to use for receiving alerts.
+ *
+ *  @code
+ *  vi /usr/local/centscheduler/etc/objects/contacts.cfg
+ *  @endcode
+ *
+ *  @subsection fedoraquickstartcompileandinstallthecentronschedulerplugins Compile and Install the Centron Scheduler Plugins
+ *
+ *  Extract the Centron Scheduler plugins source code tarball.
+ *
+ *  @code
+ *  cd ~/downloads
+ *  tar xzf centscheduler-plugins.tar.gz
+ *  cd centscheduler-plugins
+ *  @endcode
+ *
+ *  Compile and install the plugins.
+ *
+ *  @code
+ *  # XXX ./configure --with-user=centscheduler --with-group=centscheduler
+ *  cmake .
+ *  make
+ *  make install
+ *  @endcode
+ *
+ *  @subsection fedoraquickstartcentronscheduler Start Centron Scheduler
+ *
+ *  Add Centron Scheduler to the list of system services and have it
+ *  automatically start when the system boots.
+ *
+ *  @code
+ *  chkconfig --add centscheduler
+ *  chkconfig centscheduler on
+ *  @endcode
+ *
+ *  Verify the sample Centron Scheduler configuration files.
+ *
+ *  @code
+ *  /usr/local/centscheduler/bin/centscheduler -v /usr/local/centscheduler/etc/centscheduler.cfg
+ *  @endcode
+ *
+ * If there are no errors, start Centron Scheduler.
+ *
+ *  @code
+ *  service centscheduler start
+ *  @endcode
+ *
+ *  @subsection fedoraquickstartothermodifications Other Modifications
+ *
+ *  Configuring email notifications is out of the scope of this
+ *  documentation. While Centron Scheduler is currently configured to
+ *  send you email notifications, your system may not yet have a mail
+ *  program properly installed or configured. Refer to your system
+ *  documentation, search the web for specific instructions on
+ *  configuring your system to send email messages to external
+ *  addresses. More information on notifications can be found here.
+ *
+ *  @subsection fedoraquickstartyouredone You're Done
+ *
+ *  Congratulations! You sucessfully installed Centron Scheduler. Your
+ *  journey into monitoring is just beginning. You'll no doubt want to
+ *  monitor more than just your local machine, so check out the
+ *  monitoring docs.
+ *
+ *  @section opensusequickstartintroduction OpenSUSE Quickstart
+ *
+ *  @subsection opensusequickstartintroduction Introduction
+ *
+ *  This guide is intended to provide you with simple instructions on
+ *  how to install Centron Scheduler from source (code) on openSUSE and
+ *  have it monitoring your local machine inside of 20 minutes. No
+ *  advanced installation options are discussed here - just the basics
+ *  that will work for 95% of users who want to get started.
+ *
+ *  These instructions were written based on an openSUSE 10.2 installation.
+ *
+ *  @subsection fedoraquickstartprerequisites Prerequisites
+ *
+ *  Make sure you've installed the following packages on your openSUSE
+ *  installation before continuing. You can use yast to install packages
+ *  under openSUSE.
+ *
+ *  C/C++ development libraries and cmake
+ *
+ *  @subsection opensusequickstartcreateaccountinformation Create Account Information
+ *
+ *  Become the root user.
+ *
+ *  @code
+ *  su -l
+ *  @endcode
+ *
+ *  Create a new Centron Scheduler user account and give it a password.
+ *
+ *  @code
+ *  /usr/sbin/useradd -m centscheduler
+ *  passwd centscheduler
+ *  @endcode
+ *
+ *  Create a new Centron Scheduler group. Add the Centron Scheduler user
+ *  to the group.
+ *
+ *  @code
+ *  /usr/sbin/groupadd centscheduler
+ *  /usr/sbin/usermod -G centscheduler centscheduler
+ *  @endcode
+ *
+ *  @subsection opensusequickstartdownloadcentronschedulerandtheplugins Download Centron Scheduler and the Plugins
+ *
+ *  Create a directory for storing the downloads.
+ *
+ *  @code
+ *  mkdir ~/downloads
+ *  cd ~/downloads
+ *  @endcode
+ *
+ *  Download the source code tarballs of both Centron Scheduler and the
+ *  Centron Scheduler plugins (visit http://XXX/download for links to
+ *  the latest versions). These directions were tested with Centron
+ *  Scheduler XXX and Centron Scheduler Plugins XXX.
+ *
+ *  @code
+ *  wget http://XXX/centscheduler.tar.gz
+ *  wget http://XXX/centscheduler-plugins.tar.gz
+ *  @endcode
+ *
+ *  @subsection opensusequickstartcompileandinstallcentronscheduler Compile and Install Centron Scheduler
+ *
+ *  Extract the Centron Scheduler source code tarball.
+ *
+ *  @code
+ *  cd ~/downloads
+ *  tar xzf centscheduler.tar.gz
+ *  cd centscheduler
+ *  @endcode
+ *
+ *  Run the Centron Scheduler configure script, passing the name of the
+ *  group you created earlier like so:
+ *
+ *  @code
+ *  cmake .
+ *  @endcode
+ *
+ *  Compile the Centron Scheduler source code.
+ *
+ *  @code
+ *  make all
+ *  @endcode
+ *
+ *  Install binaries, init script, sample config files and set
+ *  permissions on the external command directory.
+ *
+ *  @code
+ *  make install
+ *  make install-init
+ *  make install-config
+ *  make install-commandmode
+ *  @endcode
+ *
+ *  Don't start Centron Scheduler yet - there's still more that needs to
+ *  be done...
+ *
+ *  @subsection opensusequickstartcustomizeconfiguration Customize Configuration
+ *
+ *  Sample configuration files have now been installed in the
+ *  /usr/local/centscheduler/etc directory. These sample files should
+ *  work fine for getting started with Centron Scheduler. You'll need to
+ *  make just one change before you proceed...
+ *
+ *  Edit the /usr/local/centscheduler/etc/objects/contacts.cfg config
+ *  file with your favorite editor and change the email address
+ *  associated with the centscheduleradmin contact definition to the
+ *  address you'd like to use for receiving alerts.
+ *
+ *  @code
+ *  vi /usr/local/centscheduler/etc/objects/contacts.cfg
+ *  @endcode
+ *
+ *  @subsection opensusequickstartcompileandinstallthecentronschedulerplugins Compile and Install the Centron Scheduler Plugins
+ *
+ *  Extract the Centron Scheduler plugins source code tarball.
+ *
+ *  @code
+ *  cd ~/downloads
+ *  tar xzf centscheduler-plugins.tar.gz
+ *  cd centscheduler-plugins
+ *  @endcode
+ *
+ *  Compile and install the plugins.
+ *
+ *  @code
+ *  # XXX ./configure --with-user=centscheduler --with-group=centscheduler
+ *  cmake .
+ *  make
+ *  make install
+ *  @endcode
+ *
+ *  @subsection opensusequickstartstartcentronscheduler Start Centron Scheduler
+ *
+ *  Add Centron Scheduler to the list of system services and have it
+ *  automatically start when the system boots.
+ *
+ *  @code
+ *  chkconfig --add centscheduler
+ *  chkconfig centscheduler on
+ *  @endcode
+ *
+ *  Verify the sample Centron Scheduler configuration files.
+ *
+ *  @code
+ *  /usr/local/centscheduler/bin/centscheduler -v /usr/local/centscheduler/etc/centscheduler.cfg
+ *  @endcode
+ *
+ *  If there are no errors, start Centron Scheduler.
+ *
+ *  @code
+ *  service centscheduler start
+ *  @endcode
+ *
+ *  @subsection opensusequickstartothermodifications Other Modifications
+ *
+ *  Configuring email notifications is out of the scope of this
+ *  documentation. While Centron Scheduler is currently configured to
+ *  send you email notifications, your system may not yet have a mail
+ *  program properly installed or configured. Refer to your system
+ *  documentation, search the web for specific instructions on
+ *  configuring your system to send email messages to external
+ *  addresses. More information on notifications can be found here.
+ *
+ *  @section ubuntuquickstartintroduction Introduction
+ *
+ *  This guide is intended to provide you with simple instructions on
+ *  how to install Centron Scheduler from source (code) on Ubuntu and
+ *  have it monitoring your local machine inside of 20 minutes. No
+ *  advanced installation options are discussed here - just the basics
+ *  that will work for 95% of users who want to get started.
+ *
+ *  These instructions were written based on an Ubuntu 6.10 (desktop)
+ *  installation. They should work for an Ubuntu 7.10 install as well.
+ *
+ *  @subsection ubuntuquickstartwhatyoullendupwith What You'll End Up With
+ *
+ *  If you follow these instructions, here's what you'll end up with:
+ *
+ *  - Centron Scheduler and the plugins will be installed underneath
+ *    /usr/local/centscheduler
+ *  - Centron Scheduler will be configured to monitor a few aspects of
+ *    your local system (CPU load, disk usage, etc.)
+ *
+ *  @subsection ubuntuquickstartprerequisites Prerequisites
+ *
+ *  Make sure you've installed the following packages on your Ubuntu
+ *  installation before continuing.
+ *
+ *  - GCC compiler and development libraries
+ *
+ *  You can use apt-get to install these packages by running the
+ *  following commands:
+ *
+ *  @code
+ *  sudo apt-get install build-essential cmake
+ *  @endcode
+ *
+ *  @subsection ubuntuquickstartcreateaccountinformation Create Account Information
+ *
+ *  Become the root user.
+ *
+ *  @code
+ *  sudo -s
+ *  @endcode
+ *
+ *  Create a new centscheduler user account and give it a password.
+ *
+ *  @code
+ *  /usr/sbin/useradd -m -s /bin/bash centscheduler
+ *  passwd centscheduler
+ *  @endcode
+ *
+ *  On older Ubuntu server editions (6.01 and earlier), you will need to
+ *  also add a centscheduler group (it's not created by default). You
+ *  should be able to skip this step on desktop, or newer server
+ *  editions of Ubuntu.
+ *
+ *  @code
+ *  /usr/sbin/groupadd centscheduler
+ *  /usr/sbin/usermod -G centscheduler centscheduler
+ *  @endcode
+ *
+ *  @subsection ubuntuquickstartdownloadcentronschedulerandtheplugins Download Centron Scheduler and the Plugins
+ *
+ *  Create a directory for storing the downloads.
+ *
+ *  @code
+ *  mkdir ~/downloads
+ *  cd ~/downloads
+ *  @endcode
+ *
+ *  Download the source code tarballs of both Centron Scheduler and the
+ *  Centron Scheduler plugins (visit http://XXX/download/ for links to
+ *  the latest versions). These directions were tested with Centron
+ *  Scheduler XXX and Centron Scheduler Plugins XXX.
+ *
+ *  @code
+ *  wget http://XXX/centscheduler.tar.gz
+ *  wget http://XXX/centscheduler-plugins.tar.gz
+ *  @endcode
+ *
+ *  @subsection ubuntuquickstartcompileandinstallcentronscheduler Compile and Install Centron Scheduler
+ *
+ *  Extract the Centron Scheduler source code tarball.
+ *
+ *  @code
+ *  cd ~/downloads
+ *  tar xzf centscheduler.tar.gz
+ *  cd centscheduler
+ *  @endcode
+ *
+ *  Run the Centron Scheduler configure script, passing the name of the
+ *  group you created earlier like so:
+ *
+ *  @code
+ *  cmake .
+ *  @endcode
+ *
+ *  Compile the Centron Scheduler source code.
+ *
+ *  @code
+ *  make all
+ *  @endcode
+ *
+ *  Install binaries, init script, sample config files and set
+ *  permissions on the external command directory.
+ *
+ *  @code
+ *  make install
+ *  make install-init
+ *  make install-config
+ *  make install-commandmode
+ *  @endcode
+ *
+ *  Don't start Centron Scheduler yet - there's still more that needs to
+ *  be done...
+ *
+ *  @subsection ubuntuquickstartcustomizeconfiguration Customize Configuration
+ *
+ *  Sample configuration files have now been installed in the
+ *  /usr/local/centscheduler/etc directory. These sample files should
+ *  work fine for getting started with Centron Scheduler. You'll need to
+ *  make just one change before you proceed...
+ *
+ *  Edit the /usr/local/centscheduler/etc/objects/contacts.cfg config
+ *  file with your favorite editor and change the email address
+ *  associated with the centscheduleradmin contact definition to the
+ *  address you'd like to use for receiving alerts.
+ *
+ *  @code
+ *  vi /usr/local/centscheduler/etc/objects/contacts.cfg
+ *  @endcode
+ *
+ *  @subsection ubuntuquickstartcompileandinstallthecentronschedulerplugins Compile and Install the Centron Scheduler Plugins
+ *
+ *  Extract the Centron Scheduler plugins source code tarball.
+ *
+ *  @code
+ *  cd ~/downloads
+ *  tar xzf centscheduler-plugins.tar.gz
+ *  cd centscheduler-plugins
+ *  @endcode
+ *
+ *  Compile and install the plugins.
+ *
+ *  @code
+ *  # XXX ./configure --with-user=centscheduler --with-group=centscheduler
+ *  cmake .
+ *  make
+ *  make install
+ *  @endcode
+ *
+ *  @subsection ubuntuquickstartstartcentronscheduler Start Centron Scheduler
+ *
+ *  Configure Centron Scheduler to automatically start when the system boots.
+ *
+ *  @code
+ *  ln -s /etc/init.d/centscheduler /etc/rcS.d/S99centscheduler
+ *  @endcode
+ *
+ *  Verify the sample Centron Scheduler configuration files.
+ *
+ *  @code
+ *  /usr/local/centscheduler/bin/centscheduler -v /usr/local/centscheduler/etc/centscheduler.cfg
+ *  @endcode
+ *
+ * If there are no errors, start Centron Scheduler.
+ *
+ *  @code
+ *  /etc/init.d/centscheduler start
+ *  @endcode
+ *
+ *  @subsection ubuntuquickstartothermodifications Other Modifications
+ *
+ *  If you want to receive email notifications for Centron Scheduler
+ *  alerts, you need to install the mailx (Postfix) package.
+ *
+ *  @code
+ *  sudo apt-get install mailx
+ *  sudo apt-get install postfix
+ *  @endcode
+ *
+ *  You'll have to edit the Centron Scheduler email notification
+ *  commands found in /usr/local/centscheduler/etc/objects/commands.cfg
+ *  and change any '/bin/mail' references to '/usr/bin/mail'. Once you
+ *  do that you'll need to restart Centron Scheduler to make the
+ *  configuration changes live.
+ *
+ *  @code
+ *  sudo /etc/init.d/centscheduler restart
+ *  @endcode
+ *
+ *  Configuring email notifications is out of the scope of this
+ *  documentation. While Centron Scheduler is currently configured to
+ *  send you email notifications, your system may not yet have a mail
+ *  program properly installed or configured. Refer to your system
+ *  documentation, search the web for specific instructions on
+ *  configuring your system to send email messages to external
+ *  addresses. More information on notifications can be found here.
+ *
+ */
