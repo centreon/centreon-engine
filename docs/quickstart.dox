@@ -27,8 +27,8 @@
  *
  *  Once you get Centreon Scheduler installed and running properly,
  *  you'll no doubt want to start monitoring more than just your local
- *  machine. Check out the following docs for how to go about monitoring
- *  other things...
+ *  machine. Check out the following docs for how to go about @link
+ *  monitoring monitoring @endlink other things...
  *
  *  - @link monitoringwindowsmachines Monitoring Windows machines @endlink
  *  - @link monitoringlinuxunixmachines Monitoring Linux/Unix machines @endlink
