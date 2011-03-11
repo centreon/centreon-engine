@@ -1,0 +1,45 @@
+/**
+ *  @page integrationoverview Integration Overview
+ *  @section integrationoverviewintroduction Introduction
+ *
+ *  One of the reasons that Centron Scheduler is such a popular
+ *  monitoring application is the fact that it can be easily integrated
+ *  in your existing infrastructure. There are several methods of
+ *  integrating Centron Scheduler with the management software you're
+ *  already using and you can monitor almost any type of new or custom
+ *  hardware, service, or application that you might have.
+ *
+ *  Integration Points
+ *
+ *  @dotfile integrationoverview.png
+ *
+ *  To monitor new hardware, services, or applications, check out the
+ *  docs on:
+ *  - @link plugins Plugins @endlink
+ *  - @link pluginapi Plugin API @endlink
+ *  - @link passivechecks Passive Checks @endlink
+ *  - @link eventhandlers Event Handlers @endlink
+ *
+ *  To get data into Centron Scheduler from external applications,
+ *  check out the docs on:
+ *
+ *  - @link passivechecks Passive Checks @endlink
+ *  - @link extcommands External Commands @endlink
+ *
+ *  To send status, performance, or notification information from
+ *  Centron Scheduler to external applications, check out the docs on:
+ *  - @link eventhandlers Event Handlers @endlink
+ *  - @link configmainocsp_command OCSP @endlink and @link
+ *  configmainochp_command OCHP @endlink Commands
+ *  - @link perfdata Performance Data @endlink
+ *  - @link notifications Notifications @endlink
+ *
+ *  Integration Examples
+ *
+ *  I've documented some examples on how to integrate Centron Scheduler
+ *  with external applications:
+ *
+ *  - @link TCP Wrappers @endlink (security alerts)
+ *  - @link SNMP Traps @endlink (Arcserve backup job status)
+ */
+

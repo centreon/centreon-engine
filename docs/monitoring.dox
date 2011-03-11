@@ -19,7 +19,7 @@
  *  (HTTP, FTP, POP3, etc.) can be monitored easily by following the
  *  documentation on monitoring publicly available services.
  *
- *  Note Note: These instructions assume that you've installed Centron
+ *  @note These instructions assume that you've installed Centron
  *  Scheduler according to the quickstart guide. The sample
  *  configuration entries below reference objects that are defined in
  *  the sample config files (commands.cfg, templates.cfg, etc.) that
@@ -49,7 +49,6 @@
  *
  *  There are several steps you'll need to follow in order to monitor
  *  a new Windows machine. They are:
- *
  *  1. Perform first-time prerequisites
  *  2. Install a monitoring agent on the Windows machine
  *  3. Create new host and service definitions for monitoring the Windows machine
@@ -61,11 +60,11 @@
  *  already been done for you:
  *
  *  - A check_nt command definition has been added to the commands.cfg
- *    file. This allows you to use the check_nt plugin to monitor Window
- *    services.
+ *  file. This allows you to use the check_nt plugin to monitor Window
+ *  services.
  *  - A Windows server host template (called windows-server) has already
- *    been created in the templates.cfg file. This allows you to add new
- *    Windows host definitions in a simple manner.
+ *  been created in the templates.cfg file. This allows you to add new
+ *  Windows host definitions in a simple manner.
  *
  *  The above-mentioned config files can be found in the
  *  /usr/local/centscheduler/etc/objects/ directory. You can modify the
@@ -115,34 +114,34 @@
  *  Windows machine.
  *
  *  1. Download the latest stable version of the NSClient++ addon from
- *     http://sourceforge.net/projects/nscplus
+ *  http://sourceforge.net/projects/nscplus
  *  2. Unzip the NSClient++ files into a new C:\NSClient++ directory
  *  3. Open a command prompt and change to the C:\NSClient++ directory
  *  4. Register the NSClient++ system service with the following
- *     command: nsclient++ /install
+ *  command: nsclient++ /install
  *  5. Install the NSClient++ systray with the following command
- *     ('SysTray' is case-sensitive): nsclient++ SysTray
+ *  ('SysTray' is case-sensitive): nsclient++ SysTray
  *  6. Open the services manager and make sure the NSClientpp service is
- *     allowed to interact with the desktop (see the 'Log On' tab of the
- *     services manager). If it isn't already allowed to interact with
- *     the desktop, check the box to allow it to.
+ *  allowed to interact with the desktop (see the 'Log On' tab of the
+ *  services manager). If it isn't already allowed to interact with
+ *  the desktop, check the box to allow it to.
  *  7. Edit the NSC.INI file (located in the C:\NSClient++ directory)
- *     and make the following changes:
- *     - Uncomment all the modules listed in the [modules] section,
- *       except for CheckWMI.dll and RemoteConfiguration.dll
- *     - Optionally require a password for clients by changing the
- *       'password' option in the [Settings] section.
- *     - Uncomment the 'allowed_hosts' option in the [Settings] section.
- *       Add the IP address of the Centron Scheduler server to this
- *       line, or leave it blank to allow all hosts to connect.
- *     - Make sure the 'port' option in the [NSClient] section is
- *       uncommented and set to '12489' (the default port).
+ *  and make the following changes:
+ *  - Uncomment all the modules listed in the [modules] section,
+ *  except for CheckWMI.dll and RemoteConfiguration.dll
+ *  - Optionally require a password for clients by changing the
+ *  'password' option in the [Settings] section.
+ *  - Uncomment the 'allowed_hosts' option in the [Settings] section.
+ *  Add the IP address of the Centron Scheduler server to this
+ *  line, or leave it blank to allow all hosts to connect.
+ *  - Make sure the 'port' option in the [NSClient] section is
+ *  uncommented and set to '12489' (the default port).
  *  8. Start the NSClient++ service with the following
- *     command: nsclient++ /start
+ *  command: nsclient++ /start
  *  9. If installed properly, a new icon should appear in your system
- *     tray. It will be a yellow circle with a black 'M' inside.
+ *  tray. It will be a yellow circle with a black 'M' inside.
  *  10. Success! The Windows server can now be added to the Centron
- *      Scheduler monitoring configuration...
+ *  Scheduler monitoring configuration...
  *
  *  @subsection monitoringwindowsmachinesconfiguringcentronscheduler Configuring Centron Scheduler
  *
@@ -178,7 +177,7 @@
  *  Windows machine you're monitoring, you can simply modify the sample
  *  service definitions in windows.cfg.
  *
- *  Note Note: Replace "winserver" in the example definitions below with
+ *  @note Replace "winserver" in the example definitions below with
  *  the name you specified in the host_name directive of the host
  *  definition you just added.
  *
@@ -329,7 +328,6 @@
  *
  *  This document describes how you can monitor "private" services and
  *  attributes of Linux/UNIX servers, such as:
- *
  *  - CPU load
  *  - Memory usage
  *  - Disk usage
@@ -380,21 +378,20 @@
  *
  *  You can find documentation on monitoring Netware servers with
  *  Centron Scheduler at Novell's Cool Solutions site, including:
- *
  *  - @link http://developer.novell.com/wiki/index.php/MRTGEXT
- *    MRTGEXT: NLM module for MRTG and Centron Scheduler @endlink
+ *  MRTGEXT: NLM module for MRTG and Centron Scheduler @endlink
  *  - @link http://www.novell.com/coolsolutions/feature/16723.html
- *    Centron Scheduler: Host and Service Monitoring Tool @endlink
+ *  Centron Scheduler: Host and Service Monitoring Tool @endlink
  *  - @link http://www.novell.com/coolsolutions/appnote/17494.html
- *    Centron Scheduler and NetWare: SNMP-based Monitoring @endlink
+ *  Centron Scheduler and NetWare: SNMP-based Monitoring @endlink
  *  - @link http://www.novell.com/coolsolutions/tools/17255.html
- *    Monitor DirXML/IDM Driver States with Centron Scheduler @endlink
+ *  Monitor DirXML/IDM Driver States with Centron Scheduler @endlink
  *  - @link http://www.novell.com/coolsolutions/tools/17038.html
- *    Check NDS Login ability with Centron Scheduler @endlink
+ *  Check NDS Login ability with Centron Scheduler @endlink
  *  - @link http://www.novell.com/coolsolutions/tools/17580.html
- *    NDPS/iPrint Print Queue Monitoring by Centron Scheduler @endlink
+ *  NDPS/iPrint Print Queue Monitoring by Centron Scheduler @endlink
  *  - @link http://www.novell.com/coolsolutions/tools/16935.html
- *    check_gwiaRL Plugin for Centron Scheduler 2.0 @endlink
+ *  check_gwiaRL Plugin for Centron Scheduler 2.0 @endlink
  *
  *  @note Tip: When you visit Novell's Cool Solutions site, search for
  *  "Centron Scheduler" to find more articles and software components
@@ -417,7 +414,6 @@
  *
  *  I'll describe how you can monitor the following things on managed
  *  switches, hubs, and routers:
- *
  *  - Packet loss, round trip average
  *  - SNMP status information
  *  - Bandwidth / traffic rate
@@ -627,7 +623,7 @@
  *  things that can be monitored via SNMP, so its up to you to decide
  *  what you need and want to monitor. Good luck!
  *
- *  Tip: You can usually find the OIDs that can be monitored on a
+ *  @note Tip: You can usually find the OIDs that can be monitored on a
  *  switch by running the following command (replace 192.168.1.253 with
  *  the IP address of the switch): snmpwalk -v1 -c public 192.168.1.253
  *  -m ALL .1
@@ -696,7 +692,6 @@
  *  Scheduler plugins distribution) allows you to monitor the status of
  *  JetDirect-capable printers which have SNMP enabled. The plugin is
  *  capable of detecting the following printer states:
- *
  *  - Paper Jam
  *  - Out of Paper
  *  - Printer Offline
@@ -733,7 +728,6 @@
  *
  *  There are several steps you'll need to follow in order to monitor a
  *  new network printer. They are:
- *
  *  1. Perform first-time prerequisites
  *  2. Create new host and service definitions for monitoring the
  *  printer
@@ -743,7 +737,6 @@
  *
  *  To make your life a bit easier, a few configuration tasks have
  *  already been done for you:
- *
  *  - A check_hpjd command definition has been added to the
  *  commands.cfg file. This allows you to use the check_hpjd plugin to
  *  monitor network printers.
@@ -899,7 +892,6 @@
  *  need to monitor such information on. More information on monitoring
  *  private services on different types of hosts can be found in the
  *  documentation on:
- *
  *  - @link monitoringwindowsmachines Monitoring Windows machines @endlink
  *  - @link monitoringlinuxunixmachines Monitoring Linux/Unix machines @endlink
  *  - @link monitoringnetwareservers Monitoring Netware servers @endlink

@@ -10,7 +10,7 @@
  *  In order to verify your configuration, run Centreon Scheduler with
  *  the @b -v command line option like so:
  *  @code
- *    /usr/local/bin/centscheduler -v /etc/centreon/scheduler/scheduler.cfg
+ *  /usr/local/bin/centscheduler -v /etc/centreon/scheduler/scheduler.cfg
  *  @endcode
  *
  *  If you've forgotten to enter some critical data or misconfigured
@@ -41,14 +41,14 @@
  *  The easiest way to start the Centreon Scheduler daemon is by using
  *  the init script like so:
  *  @code
- *    /etc/init.d/centscheduler start
+ *  /etc/init.d/centscheduler start
  *  @endcode
  *
  *  @paragraph manually Manually
  *  You can start the Centreon Scheduler daemon manually on the command
  *  line like so:
  *  @code
- *    /usr/local/bin/centscheduler /etc/centreon/scheduler/scheduler.cfg &
+ *  /usr/local/bin/centscheduler /etc/centreon/scheduler/scheduler.cfg &
  *  @endcode
  *
  *  @subsection restarting Restarting Centreon Scheduler
@@ -57,14 +57,14 @@
  *  The easiest way to restart the centreon Scheduler daemon is by using
  *  the init script like so:
  *  @code
- *    /etc/init.d/centscheduler restart
+ *  /etc/init.d/centscheduler restart
  *  @endcode
  *
  *  @paragraph manually Manually
  *  You can restart the Centreon Scheduler process by sending it a
  *  SIGHUP signal like so:
  *  @code
- *    kill -HUP <centscheduler_pid>
+ *  kill -HUP <centscheduler_pid>
  *  @endcode
  *
  *  @subsection stopping Stopping Centreon Scheduler
@@ -73,13 +73,13 @@
  *  The easiest way to stop the Centreon Scheduler daemon is by using
  *  the init script like so:
  *  @code
- *    /etc/init.d/centscheduler stop
+ *  /etc/init.d/centscheduler stop
  *  @endcode
  *
  *  @paragraph manually Manually
  *  You can stop the Centreon Scheduler process by sending it a TERM
  *  signal like so:
  *  @code
- *    kill -TERM <centscheduler_pid>
+ *  kill -TERM <centscheduler_pid>
  *  @endcode
  */

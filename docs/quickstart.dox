@@ -36,7 +36,7 @@
  *  - @link monitoringroutersswitches Monitoring routers/switches @endlink
  *  - @link monitoringnetworkprinters Monitoring network printers @endlink
  *  - @link monitoringpubliclyavailableservices Monitoring publicly
- *    available services (HTTP, FTP, SSH, etc.) @endlink
+ *  available services (HTTP, FTP, SSH, etc.) @endlink
  *
  *  @section fedoraquickstart Fedora Quickstart
  *
@@ -54,9 +54,9 @@
  *  @subsection fedoraquickstartwhatyoullendup What You'll End Up With
  *
  *  - Centron Scheduler and the plugins will be installed underneath
- *    /usr/local/centscheduler
+ *  /usr/local/centscheduler
  *  - Centron Scheduler will be configured to monitor a few aspects of
- *    your local system (CPU load, disk usage, etc.)
+ *  your local system (CPU load, disk usage, etc.)
  *
  *  @subsection fedoraquickstartprerequisites Prerequisites
  *
@@ -399,9 +399,9 @@
  *  If you follow these instructions, here's what you'll end up with:
  *
  *  - Centron Scheduler and the plugins will be installed underneath
- *    /usr/local/centscheduler
+ *  /usr/local/centscheduler
  *  - Centron Scheduler will be configured to monitor a few aspects of
- *    your local system (CPU load, disk usage, etc.)
+ *  your local system (CPU load, disk usage, etc.)
  *
  *  @subsection ubuntuquickstartprerequisites Prerequisites
  *
@@ -579,5 +579,4 @@
  *  documentation, search the web for specific instructions on
  *  configuring your system to send email messages to external
  *  addresses. More information on notifications can be found here.
- *
  */
