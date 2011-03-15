@@ -26,8 +26,8 @@
  *  high-availability (clustering) solution, I would consider those to
  *  be a host cluster. If one particular host fails, another will step
  *  in to take over all the duties of the failed server. As a side
- *  note, check out the @link http://www.linux-ha.org High-Availability
- *  Linux Project @endlink for information on providing host and
+ *  note, check out the <a href="http://www.linux-ha.org">High-Availability
+ *  Linux Project</a> for information on providing host and
  *  service redundancy with Linux.
  *
  *  @section monitoringserviceandhostclustersplanofattack Plan of Attack
@@ -60,8 +60,9 @@
  *  elements of the cluster to determine the cluster's status, why
  *  waste bandwidth and resources when you already have the results
  *  cached? Where are the results cached? Cached results for cluster
- *  elements can be found in the @link configmain.html#status_file
- *  status file @endlink (assuming you are monitoring each element).
+ *  elements can be found in the
+ *  @ref mainconfigurationfileoptionsconfigurationfilevariablesstatusfile
+ *  "status file" (assuming you are monitoring each element).
  *  The check_cluster plugin is designed specifically for checking
  *  cached host and service states in the status file. Important:
  *  Although you didn't enable notifications for individual elements of
@@ -121,7 +122,7 @@
  *  @endcode
  *
  *  It is important to notice that we are passing a comma-delimited
- *  list of on-demand service state @link macros.html macros @endlink
+ *  list of on-demand service state @link understandingmacrosandhowtheywork macros @endlink
  *  to the $ARG4$ macro in the cluster check command. That's important!
  *  Centron Scheduler will fill those on-demand macros in with the
  *  current service state IDs (numerical values, rather than text
@@ -140,7 +141,7 @@
  *  Scheduler is running on. After all, if the host that Centron
  *  Scheduler is running on goes down, then Centron Scheduler isn't
  *  running anymore, so there isn't anything you can do as far as
- *  monitoring (unless you've setup @link redundancy.html redundant
+ *  monitoring (unless you've setup @link redundantandfailovernetworkmonitoring redundant
  *  monitoring hosts @endlink)...
  *
  *  Anyway, let's assume that you have a check_host_cluster command
@@ -170,7 +171,7 @@
  *  @endcode
  *
  *  It is important to notice that we are passing a comma-delimited
- *  list of on-demand host state @link macros.html macros @endlink to
+ *  list of on-demand host state @link understandingmacrosandhowtheywork macros @endlink to
  *  the $ARG4$ macro in the cluster check command. That's important!
  *  Centron Scheduler will fill those on-demand macros in with the
  *  current host state IDs (numerical values, rather than text strings)

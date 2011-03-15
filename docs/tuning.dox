@@ -18,13 +18,13 @@
  *  graphing several important statistics with MRTG. This is really,
  *  really, really useful when it comes to tuning the performance of a
  *  Centron Scheduler installation. Really. Information on how to do
- *  this can be found @link mrtggraphs.html here @endlink.
+ *  this can be found @link graphingperformanceinfowithmrtg here @endlink.
  *
- *  - Use large installation tweaks. Enabling the @link
- *  configmain.html#use_large_installation_tweaks
- *  use_large_installation_tweaks @endlink option may provide you with
+ *  - Use large installation tweaks. Enabling the
+ *  @ref mainconfigurationfileoptionsconfigurationfilevariableslargeinstallationtweaksoption
+ *  "use_large_installation_tweaks" option may provide you with
  *  better performance. Read more about what this option does @link
- *  largeinstalltweaks.html here @endlink.
+ *  largeinstallationtweaks here @endlink.
  *
  *  - Disable environment macros. Macros are normally made available to
  *  check, notification, event handler, etc. commands as environment
@@ -34,12 +34,12 @@
  *  macros as environment variables (e.g. you pass all necessary macros
  *  on the command line), you don't need this feature. You can prevent
  *  macros from being made available as environment variables by using
- *  the @link configmain.html#enable_environment_macros
- *  enable_environment_macros @endlink option.
+ *  the @ref mainconfigurationfileoptionsconfigurationfilevariablesenvironmentmacrosoption
+ *  "enable_environment_macros" option.
  *
- *  - Check Result Reaper Frequency. The @link
- *  configmain.html#check_result_reaper_frequency
- *  check_result_reaper_frequency @endlink variable determines how
+ *  - Check Result Reaper Frequency. The
+ *  @ref mainconfigurationfileoptionsconfigurationfilevariablescheckresultreaperfrequency
+ *  "check_result_reaper_frequency" variable determines how
  *  often Centron Scheduler should check for host and service check
  *  results that need to be processed. The maximum amount of time it
  *  can spend processing those results is determined by the max reaper
@@ -47,29 +47,29 @@
  *  infrequent), you might see high latencies for host and service
  *  checks.
  *
- *  - Max Reaper Time. The @link
- *  configmain.html#max_check_result_reaper_time
- *  max_check_result_reaper_time @endlink variables determines the
+ *  - Max Reaper Time. The
+ *  @ref mainconfigurationfileoptionsconfigurationfilevariablesmaximumcheckresultreapertime
+ *  "max_check_result_reaper_time" variables determines the
  *  maximum amount of time the Centron Scheduler daemon can spend
  *  processing the results of host and service checks before moving on
  *  to other things - like executing new host and service checks. Too
  *  high of a value can result in large latencies for your host and
  *  service checks. Too low of a value can have the same effect. If
  *  you're experiencing high latencies, adjust this variable and see
- *  what effect it has. Again, you should be @link mrtggraphs.html
+ *  what effect it has. Again, you should be @link graphingperformanceinfowithmrtg
  *  graphing statistics @endlink in order to make this determination.
  *
  *  - Adjust buffer slots. You may need to adjust the value of the
- *  @link configmain.html#external_command_buffer_slots
- *  external_command_buffer_slots @endlink option. Graphing buffer slot
- *  statistics with @link mrtggraphs.html MRTG @endlink (see above) is
+ *  @ref mainconfigurationfileoptionsconfigurationfilevariablesexternalcommandbufferslots
+ *  "external_command_buffer_slots" option. Graphing buffer slot
+ *  statistics with @link graphingperformanceinfowithmrtg MRTG @endlink (see above) is
  *  critical in determining what values you should use for this option.
  *
  *  - Check service latencies to determine best value for maximum
  *  concurrent checks. Centron Scheduler can restrict the number of
  *  maximum concurrently executing service checks to the value you
- *  specify with the @link configmain.html#max_concurrent_checks
- *  max_concurrent_checks @endlink option. This is good because it
+ *  specify with the @ref mainconfigurationfileoptionsconfigurationfilevariablesmaximumconcurrentservicechecks
+ *  "max_concurrent_checks" option. This is good because it
  *  gives you some control over how much load Centron Scheduler will
  *  impose on your monitoring host, but it can also slow things down.
  *  If you are seeing high latency values (> 10 or 15 seconds) for the
@@ -83,7 +83,7 @@
  *  checks reported when running Centron Scheduler with the -s command
  *  line argument and doubling it. Keep increasing it until the average
  *  check latency for your services is fairly low. More information on
- *  service check scheduling can be found @link checkscheduling.html
+ *  service check scheduling can be found @link serviceandhostcheckscheduling
  *  here @endlink.
  *
  *  - Use passive checks when possible. The overhead needed to process
@@ -109,7 +109,7 @@
  *
  *  - Use the embedded Perl interpreter. If you're using a lot of Perl
  *  scripts for service checks, etc., you will probably find that
- *  compiling the @link embeddedperl.html embedded Perl interpreter
+ *  compiling the @link usingtheembeddedperlinterpreter embedded Perl interpreter
  *  @endlink into the Centron Scheduler binary will speed things up.
  *
  *  - Optimize host check commands. If you're checking host states
@@ -134,7 +134,7 @@
  *  scheduled host checks used to result in a big performance hit. This
  *  is no longer the case, as host checks are run in parallel - just
  *  like service checks. To schedule regular checks of a host, set the
- *  check_interval directive in the @link objectdefinitions.html#host
+ *  check_interval directive in the @link objectdefinitions#host
  *  host definition @endlink to something greater than 0.
  *
  *  - Enable cached host checks. Beginning in Centron Scheduler 3,
@@ -153,9 +153,9 @@
  *
  *  - Don't use agressive host checking. Unless you're having problems
  *  with Centron Scheduler recognizing host recoveries, I would
- *  recommend not enabling the @link
- *  configmain.html#use_agressive_host_checking
- *  use_aggressive_host_checking @endlink option. With this option
+ *  recommend not enabling the
+ *  @ref mainconfigurationfileoptionsconfigurationfilevariablesaggressivehostcheckingoption
+ *  "use_aggressive_host_checking" option. With this option
  *  turned off host checks will execute much faster, resulting in
  *  speedier processing of service check results. However, host
  *  recoveries can be missed under certain circumstances when this it
@@ -167,27 +167,27 @@
  *  it unless you find it necessary...
  *
  *  - External command optimizations. If you're processing a lot of
- *  external commands (i.e. passive checks in a @link distributed.html
- *  distributed setup @endlink, you'll probably want to set the @link
- *  configmain.html#command_check_interval command_check_interval
- *  @endlink variable to -1. This will cause Centron Scheduler to check
+ *  external commands (i.e. passive checks in a @link distributedmonitoring
+ *  distributed setup @endlink, you'll probably want to set the
+ *  @ref mainconfigurationfileoptionsconfigurationfilevariablesexternalcommandcheckinterval
+ *  "command_check_interval" variable to -1. This will cause Centron Scheduler to check
  *  for external commands as often as possible. You should also
- *  consider increasing the number of available @link
- *  configmain.html#external_command_buffer_slots external command
- *  buffer slots @endlink. Buffers slots are used to hold external
- *  commands that have been read from the @link
- *  configmain.html#command_file external command file @endlink (by a
- *  separate thread) before they are processed by the Centron Scheduler
- *  daemon. If your Centron Scheduler daemon is receiving a lot of
- *  passive checks or external commands, you could end up in a
- *  situation where the buffers are always full. This results in child
- *  processes (external scripts, NSCA daemon, etc.) blocking when they
- *  attempt to write to the external command file. I would highly
- *  recommend that you graph external command buffer slot usage using
- *  MRTG and the centschedulertats utility as described @link
- *  mrtggraphs.html here @endlink, so you understand the typical
- *  external command buffer usage of your Centron Scheduler
- *  installation.
+ *  consider increasing the number of available
+ *  @ref mainconfigurationfileoptionsconfigurationfilevariablesexternalcommandbufferslots
+ *  "external command buffer slots". Buffers slots are used to hold external
+ *  commands that have been read from the
+ *  @ref mainconfigurationfileoptionsconfigurationfilevariablesexternalcommandfile
+ *  "external command file" (by a separate thread) before they are
+ *  processed by the Centron Scheduler daemon. If your Centron Scheduler
+ *  daemon is receiving a lot of passive checks or external commands,
+ *  you could end up in a situation where the buffers are always full.
+ *  This results in child processes (external scripts, NSCA daemon,
+ *  etc.) blocking when they attempt to write to the external command
+ *  file. I would highly recommend that you graph external command
+ *  buffer slot usage using MRTG and the centschedulertats utility as
+ *  described @link graphingperformanceinfowithmrtg here @endlink, so
+ *  you understand the typical external command buffer usage of your
+ *  Centron Scheduler installation.
  *
  *  - Optimize hardware for maximum performance. NOTE: Hardware
  *  performance shouldn't be an issue unless: 1) you're monitoring

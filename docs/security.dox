@@ -67,14 +67,14 @@
  *  @link configmain.html#centscheduler_group centscheduler_group
  *  @endlink directives in the main config file. If you need to execute
  *  event handlers or plugins which require root access, you might want
- *  to try using @link http://www.courtesan.com/sudo/sudo.html sudo
- *  @endlink.
+ *  to try using <a href="http://www.courtesan.com/sudo/sudo.html">sudo
+ *  </a>.
  *
  *  @subsection securityconsiderationsbestpracticesLockdownthecheckresultdirectory Down The Check Result Directory
  *
  *  Make sure that only the centscheduler user is able to read/write in
- *  the @link configmain.html#check_result_path check result path
- *  @endlink. If users other than centscheduler (or root) are able to
+ *  the @ref mainconfigurationfileoptionsconfigurationfilevariablescheckresultpath
+ *  "check result path". If users other than centscheduler (or root) are able to
  *  write to this directory, they could send fake host/service check
  *  results to the Centron Scheduler daemon. This could result in
  *  annoyances (bogus notifications) or security problems (event
@@ -82,7 +82,7 @@
  *
  *  @subsection securityconsiderationsbestpracticeslockdowntheexternalcommandfile Lock Down The External Command File
  *
- *  If you enable @link extcommands.html external commands @endlink,
+ *  If you enable @link externalcommands external commands @endlink,
  *  make sure you set proper permissions on the /usr/local/centscheduler/var/rw
  *  directory. You only want the Centron Scheduler user (usually
  *  centscheduler) and the web server user (usually nobody, httpd,
@@ -102,8 +102,8 @@
  *
  *  @subsection securityconsiderationsbestpracticesstripdangerouscharactersfrommacros Strip Dangerous Characters From Macros
  *
- *  Use the @link configmain.html#illegal_macro_output_chars
- *  illegal_macro_output_chars @endlink directive to strip dangerous
+ *  Use the @ref mainconfigurationfileoptionsconfigurationfilevariablesillegalmacrooutputcharacters
+ *  "illegal_macro_output_chars" directive to strip dangerous
  *  characters from the $HOSTOUTPUT$, $SERVICEOUTPUT$, $HOSTPERFDATA$,
  *  and $SERVICEPERFDATA$ macros before they're used in notifications,
  *  etc. Dangerous characters can be anything that might be interpreted

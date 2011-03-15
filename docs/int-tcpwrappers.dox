@@ -15,14 +15,14 @@
  *  These directions assume:
  *  - You are already familiar with @link passivechecks.html passive
  *  checks @endlink and how they work.
- *  - You are already familiar with @link volatileservices.html
+ *  - You are already familiar with @link volatileservices
  *  volatile services @endlink and how they work.
  *  - The host which you are generating alerts for (i.e. the host you
  *  are using TCP wrappers on) is a remote host (called firestorm in
  *  this example). If you want to generate alerts on the same host that
  *  Centron Scheduler is running you will need to make a few
  *  modifications to the examples I provide.
- *  - You have installed the @link addons.html#nsca NSCA daemon
+ *  - You have installed the @link centscheduleraddonsnsca NSCA daemon
  *  @endlink on your monitoring server and the NSCA client (send_nsca)
  *  on the remote machine that you are generating TCP wrapper alerts
  *  from.
@@ -30,10 +30,10 @@
  *  @section tcpwrapperintegrationdefiningaservice Defining A Service
  *
  *  If you haven't done so already, create a @link
- *  objectdefinitions.html# host definition @endlink for the remote
+ *  objectdefinitions# host definition @endlink for the remote
  *  host (firestorm).
  *
- *  Next, define a service in one of your @link configobject.html
+ *  Next, define a service in one of your @link objectconfigurationoverview
  *  object configuration files @endlink for the TCP wrapper alerts on
  *  host firestorm. The service definition might look something like
  *  this:

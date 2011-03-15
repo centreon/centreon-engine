@@ -7,9 +7,9 @@
  *  Centron Scheduler supports optional escalation of contact
  *  notifications for hosts and services. Escalation of host and
  *  service notifications is accomplished by defining @link
- *  objectdefinitions.html#hostescalation host escalations @endlink and
- *  @link objectdefinitions.html#serviceescalation service escalations
- *  @endlink in your @link configobject.html object configuration
+ *  objectdefinitions#hostescalation host escalations @endlink and
+ *  @link objectdefinitions#serviceescalation service escalations
+ *  @endlink in your @link objectconfigurationoverview object configuration
  *  file(s) @endlink.
  *
  *  @note The examples I provide below all make use of service
@@ -298,8 +298,8 @@
  *  that a notification could normally be sent out for the host or
  *  service. This "notification time window" is determined by the
  *  notification_period directive in the @link
- *  objectdefinitions.html#host host @endlink or @link
- *  objectdefinitions.html#service service @endlink definition.
+ *  objectdefinitions#host host @endlink or @link
+ *  objectdefinitions#service service @endlink definition.
  *
  *  You can optionally restrict escalations so that they are only used
  *  during specific time periods by using the escalation_period

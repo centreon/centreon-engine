@@ -8,12 +8,12 @@
  *
  *  Hosts are checked by the Centron Scheduler daemon:
  *  - At regular intervals, as defined by the check_interval and
- *  retry_interval options in your @link objectdefinitions.html#host
+ *  retry_interval options in your @link objectdefinitions#host
  *  host definitions @endlink.
  *  - On-demand when a service associated with the host changes state.
- *  - On-demand as needed as part of the @link networkreachability.html
+ *  - On-demand as needed as part of the @link determiningstatusandreachabilityofnetworkhosts
  *  host reachability @endlink logic.
- *  - On-demand as needed for @link dependencychecks.html predictive
+ *  - On-demand as needed for @link hostandservicedependencies predictive
  *  host dependency checks @endlink.
  *
  *  Regularly scheduled host checks are optional. If you set the
@@ -32,14 +32,14 @@
  *  now back up and running.
  *
  *  On-demand checks of hosts are also made as part of the @link
- *  networkreachability.html host reachability @endlink logic. Centron
+ *  determiningstatusandreachabilityofnetworkhosts host reachability @endlink logic. Centron
  *  Scheduler is designed to detect network outages as quickly as
  *  possible, and distinguish between DOWN and UNREACHABLE host states.
  *  These are very different states and can help an admin quickly
  *  locate the cause of a network outage.
  *
  *  On-demand checks are also performed as part of the @link
- *  dependencychecks.html predictive host dependency check @endlink
+ *  hostandservicedependencies predictive host dependency check @endlink
  *  logic. These checks help ensure that the dependency logic is as
  *  accurate as possible.
  *
@@ -54,11 +54,11 @@
  *
  *  @section hostchecksdependenciesandchecks Dependencies and Checks
  *
- *  You can define @link objectdefinitions.html#hostdependency host
+ *  You can define @link objectdefinitions#hostdependency host
  *  execution dependencies @endlink that prevent Centron Scheduler from
  *  checking the status of a host depending on the state of one or more
  *  other hosts. More information on dependencies can be found @link
- *  dependencies.html here @endlink.
+ *  hostandservicedependencies here @endlink.
  *
  *  @section hostchecksparallelizationofhostchecks Parallelization of
  *  Host Checks
@@ -82,9 +82,9 @@
  *  When Centron Scheduler processes the results of scheduled and
  *  on-demand host checks, it may initiate (secondary) checks of other
  *  hosts. These checks can be initated for two reasons: @link
- *  dependencychecks.html predictive dependency checks @endlink and to
+ *  hostandservicedependencies predictive dependency checks @endlink and to
  *  determining the status of the host using the @link
- *  networkreachability.html network reachability @endlink logic. The
+ *  determiningstatusandreachabilityofnetworkhosts network reachability @endlink logic. The
  *  secondary checks that are initiated are usually run in parallel.
  *  However, there is one big exception that you should be aware of, as
  *  it can have negative effect on performance...
@@ -92,7 +92,7 @@
  *  @note Hosts which have their max_check_attempts value set to 1 can
  *  cause serious performance problems. The reason? If Centron Scheduler
  *  needs to determine their true state using the @link
- *  networkreachability.html network reachability @endlink logic (to
+ *  determiningstatusandreachabilityofnetworkhosts network reachability @endlink logic (to
  *  see if they're DOWN or UNREACHABLE), it will have to launch serial
  *  checks of all of the host's immediate parents. Just to reiterate,
  *  those checks are run serially, rather than in parallel, so it can
@@ -143,8 +143,8 @@
  *
  *  @note WARNING results usually means the host is UP. However,
  *  WARNING results are interpreted to mean the host is DOWN if the
- *  @link configmain.html#use_aggressive_host_checking
- *  use_aggressive_host_checking @endlink option is enabled.
+ *  @ref mainconfigurationfileoptionsconfigurationfilevariablesaggressivehostcheckingoption
+ *  "use_aggressive_host_checking" option is enabled.
  *
  *  If the preliminary host state is DOWN, Centron Scheduler will
  *  attempt to see if the host is really DOWN or if it is UNREACHABLE.
@@ -175,7 +175,7 @@
  *
  *  More information on how Centron Scheduler distinguishes between
  *  DOWN and UNREACHABLE states can be found @link
- *  networkreachability.html here @endlink.
+ *  determiningstatusandreachabilityofnetworkhosts here @endlink.
  *
  *  @section hostcheckshoststatechanges Host State Changes
  *
@@ -197,6 +197,6 @@
  *  Scheduler can detect when hosts start flapping, and can suppress
  *  notifications until flapping stops and the host's state stabilizes.
  *  More information on the flap detection logic can be found @link
- *  flapping.html here @endlink.
+ *  detectionandhandlingofstateflapping here @endlink.
  */
 

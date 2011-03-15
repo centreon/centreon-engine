@@ -12,9 +12,9 @@
  *
  *  Quickstart installation guides are currently available for the
  *  following Linux distributions:
- *  - @link fedoraquickstart Fedora Quickstart @endlink
- *  - @link opensusequickstart openSUSE Quickstart @endlink
- *  - @link ubuntuquickstart Ubuntu Quickstart @endlink
+ *  - @ref fedoraquickstart "Fedora Quickstart"
+ *  - @ref opensusequickstart "openSUSE Quickstart"
+ *  - @ref ubuntuquickstart "Ubuntu Quickstart"
  *
  *  If you are installing Centreon Scheduler on an operating system or
  *  Linux distribution that isn't listed above, read the Fedora
@@ -30,13 +30,13 @@
  *  machine. Check out the following docs for how to go about @link
  *  monitoring monitoring @endlink other things...
  *
- *  - @link monitoringwindowsmachines Monitoring Windows machines @endlink
- *  - @link monitoringlinuxunixmachines Monitoring Linux/Unix machines @endlink
- *  - @link monitoringnetwareservers Monitoring Netware servers @endlink
- *  - @link monitoringroutersswitches Monitoring routers/switches @endlink
- *  - @link monitoringnetworkprinters Monitoring network printers @endlink
- *  - @link monitoringpubliclyavailableservices Monitoring publicly
- *  available services (HTTP, FTP, SSH, etc.) @endlink
+ *  - @ref monitoringwindowsmachines "Monitoring Windows machines"
+ *  - @ref monitoringlinuxunixmachines "Monitoring Linux/Unix machines"
+ *  - @ref monitoringnetwareservers "Monitoring Netware servers"
+ *  - @ref monitoringroutersswitches "Monitoring routers/switches"
+ *  - @ref monitoringnetworkprinters "Monitoring network printers"
+ *  - @ref monitoringpubliclyavailableservices "Monitoring publicly
+ *  available services (HTTP, FTP, SSH, etc.)"
  *
  *  @section fedoraquickstart Fedora Quickstart
  *
@@ -218,7 +218,7 @@
  *  monitor more than just your local machine, so check out the
  *  monitoring docs.
  *
- *  @section opensusequickstartintroduction OpenSUSE Quickstart
+ *  @section opensusequickstart OpenSUSE Quickstart
  *
  *  @subsection opensusequickstartintroduction Introduction
  *
@@ -383,7 +383,8 @@
  *  configuring your system to send email messages to external
  *  addresses. More information on notifications can be found here.
  *
- *  @section ubuntuquickstartintroduction Introduction
+ *  @section ubuntuquickstart Ubuntu Quickstart
+ *  @subsection ubuntuquickstartintroduction Introduction
  *
  *  This guide is intended to provide you with simple instructions on
  *  how to install Centron Scheduler from source (code) on Ubuntu and

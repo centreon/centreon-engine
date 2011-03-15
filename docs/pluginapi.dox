@@ -4,10 +4,10 @@
  *
  *  If you're looking at writing your own plugins for Centron
  *  Scheduler, please make sure to visit these other resources:
- *  - The official @link http://XX/ Centron Scheduler plugin project
- *  website @endlink
- *  - The official @link http://XXX/developer-guidelines.html
- *  Centron Scheduler plugin development guidelines @endlink
+ *  - The official <a href="http://XX/">Centron Scheduler plugin project
+ *  website</a>
+ *  - The official <a href="http://XXX/developer-guidelines.html">
+ *  Centron Scheduler plugin development guidelines</a>
  *
  *  @section centschedulerpluginapipluginoverview Plugin Overview
  *
@@ -58,13 +58,13 @@
  *    </tr>
  *  </table>
  *
- *  @note: If the @link configmain.html#use_aggressive_host_checking
- *  use_aggressive_host_checking @endlink option is enabled, return
+ *  @note: If the @ref mainconfigurationfileoptionsconfigurationfilevariablesaggressivehostcheckingoption
+ *  "use_aggressive_host_checking" option is enabled, return
  *  codes of 1 will result in a host state of DOWN or UNREACHABLE.
  *  Otherwise return codes of 1 will result in a host state of UP. The
  *  process by which Centron Scheduler determines whether or not a host
- *  is DOWN or UNREACHABLE is discussed @link networkreachability.html
- *  here @endlink.
+ *  is DOWN or UNREACHABLE is discussed @link
+ *  determiningstatusandreachabilityofnetworkhosts here toto @endlink .
  *
  *  @section centschedulerpluginapipluginoutputspec Plugin Output Spec
  *
@@ -101,7 +101,7 @@
  *  DISK OK - free space: / 3326 MB (56%);
  *
  *  If this plugin was used to perform a service check, the entire line
- *  of output will be stored in the @link macrolist.html#serviceoutput
+ *  of output will be stored in the @link standardmacrosincentscheduler#serviceoutput
  *  $SERVICEOUTPUT$ @endlink macro.
  *
  *  Case 2: One line of output (text and perfdata)
@@ -114,9 +114,9 @@
  *
  *  If this plugin was used to perform a service check, the first
  *  portion of output (left of the pipe separator) will be stored in
- *  the @link macrolist.html#serviceoutput $SERVICEOUTPUT$ @endlink
+ *  the @link standardmacrosincentscheduler#serviceoutput $SERVICEOUTPUT$ @endlink
  *  macro and the second portion of output (right of the pipe separator)
- *  will be stored in the @link macrolist.html#serviceperfdata
+ *  will be stored in the @link standardmacrosincentscheduler#serviceperfdata
  *  $SERVICEPERFDATA$ @endlink macro.
  *
  *  Case 3: Multiple lines of output (text and perfdata)
@@ -134,15 +134,15 @@
  *
  *  If this plugin was used to perform a service check, the red portion
  *  of first line of output (left of the pipe separator) will be stored
- *  in the @link macrolist.html#serviceoutput $SERVICEOUTPUT$ @endlink
+ *  in the @link standardmacrosincentscheduler#serviceoutput $SERVICEOUTPUT$ @endlink
  *  macro.
  *
  *  The orange portions of the first and subsequent lines are
  *  concatenated (with spaces) are stored in the @link
- *  macrolist.html#serviceperfdata $SERVICEPERFDATA$ @endlink macro.
+ *  standardmacrosincentscheduler#serviceperfdata $SERVICEPERFDATA$ @endlink macro.
  *  The blue portions of the 2nd - 5th lines of output will be
  *  concatenated (with escaped newlines) and stored in @link
- *  macrolist.html#longserviceoutput $LONGSERVICEOUTPUT$ @endlink the
+ *  standardmacrosincentscheduler#longserviceoutput $LONGSERVICEOUTPUT$ @endlink the
  *  macro.
  *
  *  The final contents of each macro are listed below:
@@ -196,10 +196,10 @@
  *
  *  @section centschedulerpluginapiperlplugins Perl Plugins
  *
- *  Centron Scheduler features an optional @link embeddedperl.html
+ *  Centron Scheduler features an optional @link usingtheembeddedperlinterpreter
  *  embedded Perl interpreter @endlink which can speed up the execution
  *  of Perl plugins. More information on developing Perl plugins for
  *  use with the embedded Perl interpreter can be found @link
- *  embeddedperl.html here @endlink.
+ *  usingtheembeddedperlinterpreter here @endlink.
  */
 

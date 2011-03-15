@@ -24,9 +24,9 @@
  *
  *  @section hostandservicedependenciesdefiningservicedependencies Defining Service Dependencies
  *
- *  First, the basics. You create service dependencies by adding @link
- *  objectdefinitions.html#servicedependency service dependency
- *  definitions @endlink in your @link configobject.html object config
+ *  First, the basics. You create service dependencies by adding @ref
+ *  objectdefinitionsobjecttypesservicedependencydefinition "service dependency
+ *  definitions" in your @link objectconfigurationoverview object config
  *  file(s) @endlink. In each definition you specify the dependent
  *  service, the service you are depending on, and the criteria (if
  *  any) that cause the execution and notification dependencies to fail
@@ -123,8 +123,7 @@
  *  normally would be. If the service does have one or more
  *  dependencies, Centron Scheduler will check each dependency entry as
  *  follows:
- *  - Centron Scheduler gets the current status<sup>@link
- *  #hard_dependencies * @endlink</sup> of the service that is being
+ *  - Centron Scheduler gets the current status of the service that is being
  *  depended upon.
  *  - Centron Scheduler compares the current status of the service that
  *  is being depended upon against either the execution or notification
@@ -147,9 +146,9 @@
  *  hard state @endlink of the service(s) that is/are being depended
  *  upon when it does the dependeny checks. If you want Centron
  *  Scheduler to use the most current state of the services (regardless
- *  of whether its a soft or hard state), enable the @link
- *  configmain.html#soft_state_dependencies soft_state_dependencies
- *  @endlink option.
+ *  of whether its a soft or hard state), enable the
+ *  @ref mainconfigurationfileoptionsconfigurationfilevariablessoftstatedependenciesoption
+ *  "soft_state_dependencies" option.
  *
  *  @section hostandservicedependenciesexecutiondependencies Execution Dependencies
  *
@@ -166,7 +165,7 @@
  *  the future the execution dependency tests for the service may all
  *  pass. If this happens, Centron Scheduler will start checking the
  *  service again as it normally would. More information on the check
- *  scheduling logic can be found @link checkscheduling.html here
+ *  scheduling logic can be found @link serviceandhostcheckscheduling here
  *  @endlink.
  *
  *  In the example above, Service E would have failed execution
@@ -204,9 +203,9 @@
  *  Service B, so Service F is not dependent on Service B.
  *
  *  If you do wish to make service dependencies inheritable, you must
- *  use the inherits_parent directive in the @link
- *  objectdefinitions.html#servicedependency service dependency
- *  @endlink definition. When this directive is enabled, it indicates
+ *  use the inherits_parent directive in the @ref
+ *  objectdefinitionsobjecttypesservicedependencydefinition "service dependency
+ *  definition". When this directive is enabled, it indicates
  *  that the dependency inherits dependencies of the service that is
  *  being depended upon (also referred to as the master service). In
  *  other words, if the master service is dependent upon other services
@@ -252,10 +251,10 @@
  *  @note Tip: Do not confuse host dependencies with parent/child host
  *  relationships. You should be using parent/child host relationships
  *  (defined with the parents directive in @link
- *  objectdefinitions.html#host host @endlink definitions) for most
+ *  objectdefinitions#host host @endlink definitions) for most
  *  cases, rather than host dependencies. A description of how
  *  parent/child host relationships work can be found in the
- *  documentation on @link networkreachability.html network
+ *  documentation on @link determiningstatusandreachabilityofnetworkhosts network
  *  reachability @endlink.
  *
  *  Here are the basics about host dependencies:

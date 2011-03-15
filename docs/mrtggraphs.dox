@@ -2,10 +2,10 @@
  *  @page graphingperformanceinfowithmrtg Graphing Performance Info With MRTG
  *  @section graphingperformanceinfowithmrtgintroduction Introduction
  *
- *  The @link centschedulertats.html centschedulertats @endlink utility
+ *  The @link usingthecentschedulertatsutility centschedulertats @endlink utility
  *  allows you to graph various Centron Scheduler performance
- *  statistics over time using @link http://oss.oetiker.ch/mrtg/ MRTG
- *  @endlink. This is important because it can help you:
+ *  statistics over time using <a href="http://oss.oetiker.ch/mrtg/">
+ *  MRTG</a>. This is important because it can help you:
  *  - Ensure Centron Scheduler is operating efficiently
  *  - Locate problem areas in the monitoring process
  *  - Observe the performance impacts of changes in your Centron
@@ -35,7 +35,7 @@
  *  (regularly scheduled and on-demand) have occurred over time. Useful
  *  for understanding:
  *  - @link hostchecks.html Host checks @endlink
- *  - @link dependencychecks.html Predictive host dependency checks
+ *  - @link hostandservicedependencies Predictive host dependency checks
  *  @endlink
  *  - @link cachedchecks.html Cached checks @endlink
  *
@@ -45,7 +45,7 @@
  *  checks (reguarly scheduled and on-demand) have occurred over time.
  *  Useful for understanding:
  *  - @link servicechecks.html Service checks @endlink
- *  - @link dependencychecks.html Predictive service dependency checks
+ *  - @link hostandservicedependencies Predictive service dependency checks
  *  @endlink
  *  - @link cachedchecks.html Cached checks @endlink
  *
@@ -55,7 +55,7 @@
  *  host and service checks have occurred over time. Useful for
  *  understanding:
  *  - @link cachedchecks.html Cached checks @endlink
- *  - @link dependencychecks.html Predictive host and service
+ *  - @link hostandservicedependencies Predictive host and service
  *  dependency checks @endlink
  *
  *  @dotfile mrtg-cachedchecks.png
@@ -85,16 +85,16 @@
  *  average service check latency and execution times over time. Useful
  *  for understanding:
  *  - @link servicechecks.html Service checks @endlink
- *  - @link tuning.html Performance tuning @endlink
+ *  - @link tuningcentschedulerformaximumperformance Performance tuning @endlink
  *
  *  Consistently high latencies can be an indication that one of more
  *  of the following variables need tweaking:
- *  - @link configmain.html#max_concurrent_checks max_concurrent_checks
- *  @endlink
- *  - @link configmain.html#check_result_reaper_frequency
- *  check_result_reaper_frequency @endlink
- *  - @link configmain.html#max_check_result_reaper_time
- *  max_check_result_reaper_time @endlink
+ *  - @ref mainconfigurationfileoptionsconfigurationfilevariablesmaximumconcurrentservicechecks
+ *  "max_concurrent_checks"
+ *  - @ref mainconfigurationfileoptionsconfigurationfilevariablescheckresultreaperfrequency
+ *  "check_result_reaper_frequency"
+ *  - @ref mainconfigurationfileoptionsconfigurationfilevariablesmaximumcheckresultreapertime
+ *  "max_check_result_reaper_time"
  *
  *  @dotfile mrtg-serviceperfstats.png
  *
@@ -102,7 +102,7 @@
  *  state change (a measure of volatility) for services over time,
  *  broken down by services that were last checked either actively or
  *  passively. Useful for understanding:
- *  - @link flapping.html Flap detection @endlink
+ *  - @link detectionandhandlingofstateflapping Flap detection @endlink
  *
  *  @dotfile mrtg-servicestatechange.png
  *
@@ -110,16 +110,16 @@
  *  average host check latency and execution times over time. Useful
  *  for understanding:
  *  - @link hostchecks.html Host checks @endlink
- *  - @link tuning.html Performance tuning @endlink
+ *  - @link tuningcentschedulerformaximumperformance Performance tuning @endlink
  *
  *  Consistently high latencies can be an indication that one of more
  *  of the following variables need tweaking:
- *  - @link configmain.html#max_concurrent_checks max_concurrent_checks
- *  @endlink
- *  - @link configmain.html#check_result_reaper_frequency
- *  check_result_reaper_frequency @endlink
- *  - @link configmain.html#max_check_result_reaper_time
- *  max_check_result_reaper_time @endlink
+ *  - @ref mainconfigurationfileoptionsconfigurationfilevariablesmaximumconcurrentservicechecks
+ *  "max_concurrent_checks"
+ *  - @ref mainconfigurationfileoptionsconfigurationfilevariablescheckresultreaperfrequency
+ *  "check_result_reaper_frequency"
+ *  - @ref mainconfigurationfileoptionsconfigurationfilevariablesmaximumcheckresultreapertime
+ *  "max_check_result_reaper_time"
  *
  *  @dotfile mrtg-hostperfstats.png
  *
@@ -127,7 +127,7 @@
  *  state change (a measure of volatility) for hosts over time, broken
  *  down by hosts that were last checked either actively or passively.
  *  Useful for understanding:
- *  - @link flapping.html Flap detection @endlink
+ *  - @link detectionandhandlingofstateflapping Flap detection @endlink
  *
  *  @dotfile mrtg-hoststatechange.png
  *
@@ -138,20 +138,21 @@
  *  mostly empty. Monitoring external commands can be useful for
  *  understanding the impacts of:
  *  - @link passivechecks.html Passive checks @endlink
- *  - @link distributed.html Distributed monitoring @endlink
- *  - @link redundancy.html Redundant/failover monitoring @endlink
+ *  - @link distributedmonitoring Distributed monitoring @endlink
+ *  - @link redundantandfailovernetworkmonitoring Redundant/failover monitoring @endlink
  *
  *  @dotfile mrtg-externalcommands.png
  *
  *  External Command Buffers - This graph shows how may external
  *  command buffer slots are in use over time. If the number of used
  *  buffers is near the number of available buffers on a regular basis,
- *  it is likely you need to increase the available @link
- *  configmain.html#external_command_buffer_slots external command
- *  buffer slots @endlink. Each buffer slot can hold one external
+ *  it is likely you need to increase the available
+ *  @ref mainconfigurationfileoptionsconfigurationfilevariablesexternalcommandbufferslots
+ *  "external command buffer slots". Each buffer slot can hold one external
  *  command. Buffers are used for temporarily holding external commands
- *  from the time they are read from the @link
- *  configmain.html#command_file external command file @endlink to the
+ *  from the time they are read from the @ref
+ *  mainconfigurationfileoptionsconfigurationfilevariablesexternalcommandfile
+ *  "external command file" to the
  *  time they are processed by the Centron Scheduler daemon.
  *
  *  @dotfile mrtg-commandbuffers.png

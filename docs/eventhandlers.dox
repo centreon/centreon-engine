@@ -44,17 +44,17 @@
  *  Global host and service event handlers are run for every host or
  *  service state change that occurs, immediately prior to any host- or
  *  service-specific event handler that may be run. You can specify
- *  global event handler commands by using the @link
- *  configmain.html#global_host_event_handler global_host_event_handler
- *  @endlink and @link configmain.html#global_service_event_handler
- *  global_service_event_handler @endlink options in your main
- *  configuration file.
+ *  global event handler commands by using the
+ *  @ref mainconfigurationfileoptionsconfigurationfilevariablesglobalhosteventhandleroption
+ *  "global_host_event_handler" and
+ *  @ref mainconfigurationfileoptionsconfigurationfilevariablesglobalserviceeventhandleroption
+ *  "global_service_event_handler" options in your main configuration file.
  *
  *  Individual hosts and services can have their own event handler
  *  command that should be run to handle state changes. You can specify
  *  an event handler that should be run by using the event_handler
- *  directive in your @link objectdefinitions.html#host host @endlink
- *  and @link objectdefinitions.html#service service @endlink
+ *  directive in your @link objectdefinitions#host host @endlink
+ *  and @link objectdefinitions#service service @endlink
  *  definitions. These host- and service-specific event handlers are
  *  executed immediately after the (optional) global host or service
  *  event handler is executed.
@@ -62,16 +62,16 @@
  *  @section eventhandlersenablingeventhandlers Enabling Event Handlers
  *
  *  Event handlers can be enabled or disabled on a program-wide basis
- *  by using the @link configmain.html#enable_event_handlers
- *  enable_event_handlers @endlink in your main configuration file.
+ *  by using the @ref mainconfigurationfileoptionsconfigurationfilevariableseventhandleroption
+ *  "enable_event_handlers" in your main configuration file.
  *
  *  Host- and service-specific event handlers can be enabled or
  *  disabled by using the event_handler_enabled directive in your @link
- *  objectdefinitions.html#host host @endlink and @link
- *  objectdefinitions.html#service service @endlink definitions. Host-
+ *  objectdefinitions#host host @endlink and @link
+ *  objectdefinitions#service service @endlink definitions. Host-
  *  and service-specific event handlers will not be executed if the
- *  global @link configmain.html#enable_event_handlers
- *  enable_event_handlers @endlink option is disabled.
+ *  global @ref mainconfigurationfileoptionsconfigurationfilevariableseventhandleroption
+ *  "enable_event_handlers" option is disabled.
  *
  *  @section eventhandlerseventhandlerexecutionorder Event Handler Execution Order
  *
@@ -87,16 +87,16 @@
  *  Event handler commands will likely be shell or perl scripts, but
  *  they can be any type of executable that can run from a command
  *  prompt. At a minimum, the scripts should take the following @link
- *  macros.html macros @endlink as arguments:
+ *  understandingmacrosandhowtheywork macros @endlink as arguments:
  *
- *  For Services: @link macrolist.html#servicestate $SERVICESTATE$
- *  @endlink, @link macrolist.html#servicestatetype $SERVICESTATETYPE$
- *  @endlink, @link macrolist.html#serviceattempt $SERVICEATTEMPT$
+ *  For Services: @link standardmacrosincentscheduler#servicestate $SERVICESTATE$
+ *  @endlink, @link standardmacrosincentscheduler#servicestatetype $SERVICESTATETYPE$
+ *  @endlink, @link standardmacrosincentscheduler#serviceattempt $SERVICEATTEMPT$
  *  @endlink
  *
- *  For Hosts: @link macrolist.html#hoststate $HOSTSTATE$ @endlink,
- *  @link macrolist.html#hoststatetype $HOSTSTATETYPE$ @endlink, @link
- *  macrolist.html#hostattempt $HOSTATTEMPT$ @endlink
+ *  For Hosts: @link standardmacrosincentscheduler#hoststate $HOSTSTATE$ @endlink,
+ *  @link standardmacrosincentscheduler#hoststatetype $HOSTSTATETYPE$ @endlink, @link
+ *  standardmacrosincentscheduler#hostattempt $HOSTATTEMPT$ @endlink
  *
  *  The scripts should examine the values of the arguments passed to it
  *  and take any necessary action based upon those values. The best way
@@ -106,8 +106,8 @@
  *  @note Tip: Additional sample event handler scripts can be found in the
  *  contrib/eventhandlers/ subdirectory of the Centron Scheduler
  *  distribution. Some of these sample scripts demonstrate the use of
- *  @link extcommands.html external commands @endlink to implement a
- *  @link redundancy.html redundant @endlink and @link distributed.html
+ *  @link externalcommands external commands @endlink to implement a
+ *  @link redundantandfailovernetworkmonitoring redundant @endlink and @link distributedmonitoring
  *  distributed @endlink monitoring environments.
  *
  *  @section eventhandlerspermissionsforeventhandlercommands Permissions For Event Handler Commands
@@ -121,8 +121,8 @@
  *  Ideally you should evaluate the types of event handlers you will be
  *  implementing and grant just enough permissions to the Centron
  *  Scheduler user for executing the necessary system commands. You
- *  might want to try using @link http://www.courtesan.com/sudo/sudo.html
- *  sudo @endlink to accomplish this.
+ *  might want to try using <a href="http://www.courtesan.com/sudo/sudo.html">
+ *  sudo</a> to accomplish this.
  *
  *  @section eventhandlersserviceeventhandlerexample Service Event Handler Example
  *

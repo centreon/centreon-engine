@@ -1,9 +1,10 @@
 /**
- *  Introduction
+ *  @page snmpwrapperintegration SNMP Wrapper Integration
+ *  @section snmpwrapperintegrationintroduction Introduction
  *
  *  @note Centron Scheduler is not designed to be a replacement
  *  for a full-blown SNMP management application like HP OpenView or
- *  @link http://www.opennms.org/ OpenNMS @endlink. However, you can
+ *  <a href="http://www.opennms.org/">OpenNMS</a>. However, you can
  *  set things up so that SNMP traps received by a host on your network
  *  can generate alerts in Centron Scheduler.
  *

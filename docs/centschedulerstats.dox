@@ -6,7 +6,7 @@
  *  Scheduler distribution. It is compiled and installed along with the
  *  main Centron Scheduler daemon. The centschedulertats utility allows
  *  you to obtain various information about a running Centron Scheduler
- *  process that can be very helpful in @link tuning.html tuning
+ *  process that can be very helpful in @link tuningcentschedulerformaximumperformance tuning
  *  performance @endlink. You can obtain information either in
  *  human-readable or MRTG-compatible format.
  *
@@ -101,6 +101,6 @@
  *
  *  @note Information on using the centschedulertats utility to
  *  generate MRTG graphs for Centron Scheduler performance statistics
- *  can be found @link mrtggraphs.html here @endlink.
+ *  can be found @link graphingperformanceinfowithmrtg here @endlink.
  */
 

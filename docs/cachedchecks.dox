@@ -23,13 +23,13 @@
  *
  *  For reference, on-demand host checks occur...
  *  - When a service associated with the host changes state.
- *  - As needed as part of the @link networkreachability.html host
+ *  - As needed as part of the @link determiningstatusandreachabilityofnetworkhosts host
  *  reachability @endlink logic.
- *  - As needed for @link dependencychecks.html predictive host
+ *  - As needed for @link hostandservicedependencies predictive host
  *  dependency checks @endlink.
  *
  *  And on-demand service checks occur...
- *  - As needed for @link dependencychecks.html predictive service
+ *  - As needed for @link hostandservicedependencies predictive service
  *  dependency checks @endlink.
  *
  *  @note Unless you make use of service dependencies, Centron
@@ -115,11 +115,11 @@
  *  The following variables determine the timeframes in which a
  *  previous host or service check result may be used as a cached host
  *  or service check result:
- *  - The @link configmain.html#cached_host_check_horizon
- *  cached_host_check_horizon @endlink variable controls cached host
+ *  - The @ref mainconfigurationfileoptionsconfigurationfilevariablescachedhostcheckhorizon
+ *  "cached_host_check_horizon" variable controls cached host
  *  checks.
- *  - The @link configmain.html#cached_service_check_horizon
- *  cached_service_check_horizon @endlink variable controls cached
+ *  - The @ref mainconfigurationfileoptionsconfigurationfilevariablescachedservicecheckhorizon
+ *  "cached_service_check_horizon" variable controls cached
  *  service checks.
  *
  *  @section cachedchecksoptimizingcacheeffectiveness Optimizing Cache Effectiveness
@@ -132,8 +132,8 @@
  *  - Adjust cached check horizon variables to fit your needs
  *
  *  You can schedule regular checks of your hosts by specifying a value
- *  greater than 0 for check_interval option in your @link
- *  objectdefinitions.html#host host definitions @endlink. If you do
+ *  greater than 0 for check_interval option in your @ref
+ *  objectdefinitionsobjecttypeshostdefinition "host definitions". If you do
  *  this, make sure that you set the max_check_attempts option to a
  *  value greater than 1, or it will cause a big performance hit. This
  *  potential performance hit is describe in detail @link
@@ -144,9 +144,9 @@
  *  A good way to determine the proper value for the cached check
  *  horizon options is to compare how many on-demand checks Centron
  *  Scheduler has to actually run versus how may it can use cached
- *  values for. The @link centschedulertats.html centschedulertats
+ *  values for. The @link usingthecentschedulertatsutility centschedulertats
  *  @endlink utility can produce information on cached checks, which
- *  can then be @link mrtggraphs.html graphed with MRTG @endlink.
+ *  can then be @link graphingperformanceinfowithmrtg graphed with MRTG @endlink.
  *  Example MRTG graphs that show cached vs. actual on-demand checks
  *  are shown to the right.
  *
@@ -154,8 +154,8 @@
  *  - A total of 44 hosts, all of which were checked at regular
  *  intervals
  *  - An average (regularly scheduled) host check interval of 5 minutes
- *  - A @link configmain.html#cached_host_check_horizon
- *  cached_host_check_horizon @endlink of 15 seconds
+ *  - A @ref mainconfigurationfileoptionsconfigurationfilevariablescachedhostcheckhorizon
+ *  "cached_host_check_horizon" of 15 seconds
  *
  *  The first MRTG graph shows how many regularly scheduled host checks
  *  compared to how many cached host checks have occured. In this

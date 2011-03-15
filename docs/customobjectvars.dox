@@ -34,7 +34,7 @@
  *  - Custom variables are @link objectinheritance.html inherited
  *  @endlink from object templates like normal variables
  *  - Scripts can reference custom variable values with @link
- *  macros.html macros and environment variables @endlink
+ *  understandingmacrosandhowtheywork macros and environment variables @endlink
  *
  *  @section customobjectvariablesexamples Examples
  *
@@ -72,7 +72,7 @@
  *
  *  Custom variable values can be referenced in scripts and executables
  *  that Centron Scheduler runs for checks, notifications, etc. by
- *  using @link macros.html macros @endlink or environment variables.
+ *  using @link understandingmacrosandhowtheywork macros @endlink or environment variables.
  *  Custom variable macros are trusted (because you define them) and
  *  therefore not cleaned/sanitized before they are made available to
  *  scripts.

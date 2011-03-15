@@ -43,17 +43,17 @@
  *  - Event handlers are executed to handle the SOFT state.
  *
  *  SOFT states are only logged if you enabled the @link
- *  configmain.html#log_service_retries log_service_retries @endlink or
- *  @link configmain.html#log_host_retries log_host_retries @endlink
- *  options in your main configuration file.
+ *   log_service_retries @endlink or
+ *  @ref mainconfigurationfileoptionsconfigurationfilevariableshostcheckretryloggingoption
+ *  "log_host_retries" options in your main configuration file.
  *
  *  The only important thing that really happens during a soft state is
  *  the execution of event handlers. Using event handlers can be
  *  particularly useful if you want to try and proactively fix a
  *  problem before it turns into a HARD state.
  *
- *  The @link macrolist.html#hoststatetype $HOSTSTATETYPE$ @endlink or
- *  @link macrolist.html#servicestatetype $SERVICESTATETYPE$ @endlink
+ *  The @link standardmacrosincentscheduler#hoststatetype $HOSTSTATETYPE$ @endlink or
+ *  @link standardmacrosincentscheduler#servicestatetype $SERVICESTATETYPE$ @endlink
  *  macros will have a value of "SOFT" when event handlers are
  *  executed, which allows your event handler scripts to know when they
  *  should take corrective action. More information on event handlers
@@ -74,9 +74,9 @@
  *  - When a host or service recovers from a hard error state. This is
  *  considered to be a hard recovery.
  *  - When a @link passivechecks.html passive host check @endlink is
- *  received. Passive host checks are treated as HARD unless the @link
- *  configmain.html#passive_host_checks_are_soft
- *  passive_host_checks_are_soft @endlink option is enabled.
+ *  received. Passive host checks are treated as HARD unless the
+ *  @ref mainconfigurationfileoptionsconfigurationfilevariablespassivehostchecksaresoftoption
+ *  "passive_host_checks_are_soft" option is enabled.
  *
  *  The following things occur when hosts or services experience HARD
  *  state changes:
@@ -85,8 +85,8 @@
  *  - Contacts are notifified of the host or service problem or
  *  recovery.
  *
- *  The @link macrolist.html#hoststatetype $HOSTSTATETYPE$ @endlink or
- *  @link macrolist.html#servicestatetype $SERVICESTATETYPE$ @endlink
+ *  The @link standardmacrosincentscheduler#hoststatetype $HOSTSTATETYPE$ @endlink or
+ *  @link standardmacrosincentscheduler#servicestatetype $SERVICESTATETYPE$ @endlink
  *  macros will have a value of "HARD" when event handlers are
  *  executed, which allows your event handler scripts to know when they
  *  should take corrective action. More information on event handlers
@@ -205,7 +205,7 @@
  *      <td>Yes</td>
  *      <td>
  *  	  Service experiences a SOFT recovery. Event handlers execute, but
- *  	  notification are not sent, as this wasn't a \"real\" problem. State
+ *  	  notification are not sent, as this wasn't a "real" problem. State
  *  	  type is set HARD and check # is reset to 1 immediately after this
  *  	  happens.
  *      </td>

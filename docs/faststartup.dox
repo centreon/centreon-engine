@@ -127,8 +127,8 @@
  *  When you run Centron Scheduler with the -p command line option,
  *  Centron Scheduler will read your config files in, process them,
  *  and save them to a pre-cached object config file (specified by the
- *  @link configmain.html#precached_object_file precached_object_file
- *  @endlink directive). This pre-cached config file will contain
+ *  @ref mainconfigurationfileoptionsconfigurationfilevariablesprecachedobjectfile
+ *  "precached_object_file" directive). This pre-cached config file will contain
  *  pre-processed configuration entries that are easier/faster for
  *  Centron Scheduler to process in the future.
  *

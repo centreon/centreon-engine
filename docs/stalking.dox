@@ -50,29 +50,29 @@
  *      <td>x+2</td>
  *      <td>WARNING</td>
  *      <td>RAID array degraded (1 drive bad, 1 hot spare rebuilding)</td>
- *      <td>@dotfile checkmark.png</td>
- *      <td>@dotfile checkmark.png</td>
+ *      <td>@b Yes</td>
+ *      <td>@b Yes</td>
  *    </tr>
  *    <tr>
  *      <td>x+3</td>
  *      <td>CRITICAL</td>
  *      <td>RAID array degraded (2 drives bad, 1 host spare online, 1 hot spare rebuilding)</td>
- *      <td>@dotfile checkmark.png</td>
- *      <td>@dotfile checkmark.png</td>
+ *      <td>@b Yes</td>
+ *      <td>@b Yes</td>
  *    </tr>
  *    <tr>
  *      <td>x+4</td>
  *      <td>CRITICAL</td>
  *      <td>RAID array degraded (3 drives bad, 2 hot spares online)</td>
  *      <td>-</td>
- *      <td>@dotfile checkmark.png</td>
+ *      <td>@b Yes</td>
  *    </tr>
  *    <tr>
  *      <td>x+5</td>
  *      <td>CRITICAL</td>
  *      <td>RAID array failed</td>
  *      <td>-</td>
- *      <td>@dotfile checkmark.png</td>
+ *      <td>@b Yes</td>
  *    </tr>
  *    <tr>
  *      <td>x+6</td>
@@ -140,12 +140,12 @@
  *  @section statestalkinghowdoienablestalking How Do I Enable Stalking?
  *
  *  You can enable state stalking for hosts and services by using the
- *  stalking_options directive in @link configobject.html host and
+ *  stalking_options directive in @link objectconfigurationoverview host and
  *  service definitions @endlink.
  *
  *  @section statestalkinghowdoesstalkingdifferfromvolatileservices How Does Stalking Differ From Volatile Services?
  *
- *  @link volatileservices.html Volatile services @endlink are similar,
+ *  @link volatileservices Volatile services @endlink are similar,
  *  but will cause notifications and event handlers to run. Stalking is
  *  purely for logging purposes.
  *

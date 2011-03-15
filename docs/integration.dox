@@ -15,31 +15,32 @@
  *
  *  To monitor new hardware, services, or applications, check out the
  *  docs on:
- *  - @link plugins Plugins @endlink
- *  - @link pluginapi Plugin API @endlink
- *  - @link passivechecks Passive Checks @endlink
- *  - @link eventhandlers Event Handlers @endlink
+ *  - @ref plugins "Plugins"
+ *  - @ref centschedulerpluginapi "Plugin API"
+ *  - @ref passivechecks "Passive Checks"
+ *  - @ref eventhandlers "Event Handlers"
  *
  *  To get data into Centron Scheduler from external applications,
  *  check out the docs on:
  *
- *  - @link passivechecks Passive Checks @endlink
- *  - @link extcommands External Commands @endlink
+ *  - @ref passivechecks "Passive Checks"
+ *  - @ref externalcommands "External Commands"
  *
  *  To send status, performance, or notification information from
  *  Centron Scheduler to external applications, check out the docs on:
- *  - @link eventhandlers Event Handlers @endlink
- *  - @link configmainocsp_command OCSP @endlink and @link
- *  configmainochp_command OCHP @endlink Commands
- *  - @link perfdata Performance Data @endlink
- *  - @link notifications Notifications @endlink
+ *  - @ref eventhandlers "Event Handlers"
+ *  - @ref mainconfigurationfileoptionsconfigurationfilevariablesobsessivecompulsiveserviceprocessorcommand
+ *  "OCSP" and @ref mainconfigurationfileoptionsconfigurationfilevariablesobsessivecompulsivehostprocessorcommand
+ *  "OCHP" Commands
+ *  - @ref performancedata "Performance Data"
+ *  - @ref notifications "Notifications"
  *
  *  Integration Examples
  *
  *  I've documented some examples on how to integrate Centron Scheduler
  *  with external applications:
  *
- *  - @link TCP Wrappers @endlink (security alerts)
- *  - @link SNMP Traps @endlink (Arcserve backup job status)
+ *  - @ref tcpwrapperintegration "TCP Wrappers" (security alerts)
+ *  - @ref snmpwrapperintegration "SNMP Traps" (Arcserve backup job status)
  */
 

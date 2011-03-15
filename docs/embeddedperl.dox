@@ -82,11 +82,10 @@
  *  plugins and scripts, here's what you'll need to do:
  *  - Compile Centron Scheduler with support for the embedded Perl
  *  interpreter (see instructions below).
- *  - Enable the @link configmain.html#enable_embedded_perl
- *  enable_embedded_perl @endlink option in the main configuration
- *  file.
- *  - Set the @link configmain.html#use_embedded_perl_implicitly
- *  use_embedded_perl_implicitly @endlink option to fit your needs.
+ *  - Enable the @ref mainconfigurationfileoptionsconfigurationfilevariablesembeddedperlinterpreteroption
+ *  "enable_embedded_perl" option in the main configuration file.
+ *  - Set the @ref mainconfigurationfileoptionsconfigurationfilevariablesembeddedperlimplicituseoption
+ *  "use_embedded_perl_implicitly" option to fit your needs.
  *  This option determines whether or not the Perl interpreter should
  *  be used by default for individual Perl plugins and scripts.
  *  - Optionally enable or disable certain Perl plugins and scripts
@@ -144,9 +143,9 @@
  *  @note Tip: If you do not explicitly use the method above to tell
  *  Centron Scheduler whether an individual plugin can be run under the
  *  Perl interpreter, Centron Scheduler will make will a decision for
- *  you. This decision process is controlled by the @link
- *  configmain.html#use_embedded_perl_implicitly
- *  use_embedded_perl_implicitly @endlink variable. If the value is set
+ *  you. This decision process is controlled by the
+ *  @ref mainconfigurationfileoptionsconfigurationfilevariablesembeddedperlimplicituseoption
+ *  "use_embedded_perl_implicitly" variable. If the value is set
  *  to 1, all Perl plugins/scripts (that do not explicitly
  *  enable/disable the ePN) will be run under the Perl interpreter. If
  *  the value is 0, they will NOT be run under the Perl interpreter.
@@ -154,6 +153,6 @@
  *  @section usingtheembeddedperlinterpreterdevelopingpluginsforusewithembeddedperl Developing Plugins For Use With Embedded Perl
  *
  *  Information on developing plugins for use with the embedded Perl
- *  interpreter can be found @link epnplugins.html here @endlink.
+ *  interpreter can be found @link developingpluginsforusewithembeddedperl here @endlink.
  */
 

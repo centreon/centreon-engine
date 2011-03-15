@@ -3,7 +3,7 @@
  *  @section timesavingtricksforobjectdefinitionsintroduction Introduction
  *
  *  This documentation attempts to explain how you can exploit the
- *  (somewhat) hidden features of @link objectdefinitions.html
+ *  (somewhat) hidden features of @link objectdefinitions
  *  template-based object definitions @endlink to save your sanity. How
  *  so, you ask? Several types of objects allow you to specify multiple
  *  host names and/or hostgroup names in definitions, allowing you to
@@ -11,12 +11,12 @@
  *  cover each type of object that supports these features seperately.
  *  For starters, the object types which support this time-saving
  *  feature are as follows:
- *  - @link #service Services @endlink
- *  - @link #serviceescalation Service escalations @endlink
- *  - @link #servicedependency Service dependencies @endlink
- *  - @link #hostescalation Host escalations @endlink
- *  - @link #hostdependency Host dependencies @endlink
- *  - @link #hostgroup Hostgroups @endlink
+ *  - @ref timesavingtricksforobjectdefinitionsservicedefinitions "Services"
+ *  - @ref timesavingtricksforobjectdefinitionsserviceescalationdefinitions "Service escalations"
+ *  - @ref timesavingtricksforobjectdefinitionsservicedependencydefinitions "Service dependencies"
+ *  - @ref timesavingtricksforobjectdefinitionshostescalationdefinitions "Host escalations"
+ *  - @ref timesavingtricksforobjectdefinitionshostdependencydefinitions "Host dependencies"
+ *  - @ref timesavingtricksforobjectdefinitionshostgroups "Hostgroups"
  *
  *  Object types that are not listed above (i.e. timeperiods, commands,
  *  etc.) do not support the features I'm about to describe.
@@ -25,17 +25,17 @@
  *
  *  The examples I give below use "standard" matching of object names
  *
- *  and *require* @link configmain.html#use_regexp_matching
- *  use_regexp_matching @endlink to be *disabled*.
+ *  and *require* @ref mainconfigurationfileoptionsconfigurationfilevariablesregularexpressionmatchingoption
+ *  "use_regexp_matching" to be *disabled*.
  *
  *  If you wish, you can enable regular expression matching for object
- *  names by using the @link configmain.html#use_regexp_matching
- *  use_regexp_matching @endlink config option. By default, regular
+ *  names by using the @ref mainconfigurationfileoptionsconfigurationfilevariablesregularexpressionmatchingoption
+ *  "use_regexp_matching" config option. By default, regular
  *  expression matching will only be used in object names that contain
  *  -, ?, +, or \.. If you want regular expression matching to be used
- *  on all object names, enable the @link
- *  configmain.html#use_true_regexp_matching use_true_regexp_matching
- *  @endlink config option. Regular expressions can be used in any of
+ *  on all object names, enable the
+ *  @ref mainconfigurationfileoptionsconfigurationfilevariablestrueregularexpressionmatchingoption
+ *  "use_true_regexp_matching" config option. Regular expressions can be used in any of
  *  the fields used in the examples below (host names, hostgroup names,
  *  service names, and servicegroup names).
  *
@@ -49,7 +49,7 @@
  *
  *  Multiple Hosts:
  *  If you want to create identical @link
- *  objectdefinitions.html#service services @endlink that are assigned
+ *  objectdefinitions#service services @endlink that are assigned
  *  to multiple hosts, you can specify multiple hosts in the host_name
  *  directive. The definition below would create a service called
  *  SOMESERVICE on hosts HOST1 through HOSTN. All the instances of the
@@ -123,7 +123,7 @@
  *
  *  Multiple Hosts:
  *  If you want to create @link
- *  objectdefinitions.html#serviceescalation service escalations
+ *  objectdefinitions#serviceescalation service escalations
  *  @endlink for services of the same name/description that are
  *  assigned to multiple hosts, you can specify multiple hosts in the
  *  host_name directive. The definition below would create a service
@@ -197,7 +197,7 @@
  *
  *  All Services On Same Host:
  *  If you want to create @link
- *  objectdefinitions.html#serviceescalation service escalations
+ *  objectdefinitions#serviceescalation service escalations
  *  @endlink for all services assigned to a particular host, you can
  *  use a wildcard in the service_description directive. The definition
  *  below would create a service escalation for all services on host
@@ -221,7 +221,7 @@
  *
  *  Multiple Services On Same Host:
  *  If you want to create @link
- *  objectdefinitions.html#serviceescalation service escalations
+ *  objectdefinitions#serviceescalation service escalations
  *  @endlink for all multiple services assigned to a particular host,
  *  you can use a specify more than one service description in the
  *  service_description directive. The definition below would create a
@@ -259,9 +259,8 @@
  *  @section timesavingtricksforobjectdefinitionsservicedependencydefinitions Service Dependency Definitions
  *
  *  Multiple Hosts:
- *  If you want to create @link
- *  objectdefinitions.html#servicedependency service dependencies
- *  @endlink for services of the same name/description that are
+ *  If you want to create @ref objectdefinitionsobjecttypesservicedependencydefinition
+ *  "service dependencies" for services of the same name/description that are
  *  assigned to multiple hosts, you can specify multiple hosts in the
  *  host_name and or dependent_host_name directives. In the example
  *  below, service SERVICE2 on hosts HOST3 and HOST4 would be dependent
@@ -380,7 +379,7 @@
  *  @section timesavingtricksforobjectdefinitionshostescalationdefinitions Host Escalation Definitions
  *
  *  Multiple Hosts:
- *  If you want to create @link objectdefinitions.html#hostescalation
+ *  If you want to create @link objectdefinitions#hostescalation
  *  host escalations @endlink for multiple hosts, you can specify
  *  multiple hosts in the host_name directive. The definition below
  *  would create a host escalation for hosts HOST1 through HOSTN. All
@@ -446,7 +445,7 @@
  *  @section timesavingtricksforobjectdefinitionshostdependencydefinitions Host Dependency Definitions
  *
  *  Multiple Hosts:
- *  If you want to create @link objectdefinitions.html#hostdependency
+ *  If you want to create @link objectdefinitions#hostdependency
  *  host dependencies @endlink for multiple hosts, you can specify
  *  multiple hosts in the host_name and/or dependent_host_name
  *  directives. The definition below would be equivalent to creating

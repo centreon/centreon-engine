@@ -72,8 +72,8 @@
  *  hosts.
  *
  *  In order to facilitate the submission of passive check results to a
- *  remote host, I've written the @link addons.html#nsca nsca addon
- *  @endlink. The addon consists of two pieces. The first is a client
+ *  remote host, I've written the @ref centscheduleraddonsnsca "nsca addon".
+ *  The addon consists of two pieces. The first is a client
  *  program (send_nsca) which is run from a remote host and is used to
  *  send the service check results to another server. The second piece
  *  is the nsca daemon (nsca) which either runs as a standalone daemon
@@ -81,9 +81,9 @@
  *  Upon receiving service check information from a client, the daemon
  *  will sumbit the check information to Centron Scheduler (on the
  *  central server) by inserting a PROCESS_SVC_CHECK_RESULT command
- *  into the @link configmain.html#command_file external command file
- *  @endlink, along with the check results. The next time Centron
- *  Scheduler checks for @link extcommands.html external commands
+ *  into the @ref mainconfigurationfileoptionsconfigurationfilevariablesexternalcommandfile
+ *  "external command file", along with the check results. The next time Centron
+ *  Scheduler checks for @link externalcommands external commands
  *  @endlink, it will find the passive service check information that
  *  was sent from the distributed server and process it. Easy, huh?
  *
@@ -97,15 +97,17 @@
  *  Key configuration changes:
  *  - Only those services and hosts which are being monitored directly
  *  by the distributed server are defined in the @link
- *  configobject.html object configuration file @endlink.
- *  - The distributed server has its @link
- *  configmain.html#enable_notifications enable_notifications @endlink
+ *  objectconfigurationoverview object configuration file @endlink.
+ *  - The distributed server has its
+ *  @ref mainconfigurationfileoptionsconfigurationfilevariablesnotificationsoption
+ *  "enable_notifications"
  *  directive set to 0. This will prevent any notifications from being
  *  sent out by the server.
- *  - The distributed server is configured to @link
- *  configmain.html#obsess_over_services obsess over services @endlink.
- *  - The distributed server has an @link configmain.html#ocsp_command
- *  ocsp command @endlink defined (as described below).
+ *  - The distributed server is configured to
+ *  @ref mainconfigurationfileoptionsconfigurationfilevariablesobsessoverservicesoption
+ *  "obsess over services".
+ *  - The distributed server has an @ref mainconfigurationfileoptionsconfigurationfilevariablesobsessivecompulsiveserviceprocessorcommand
+ *  "ocsp command" defined (as described below).
  *
  *  In order to make everything come together and work properly, we
  *  want the distributed server to report the results of all service
@@ -113,10 +115,10 @@
  *  event handlers @endlink to report changes in the state of a
  *  service, but that just doesn't cut it. In order to force the
  *  distributed server to report all service check results, you must
- *  enabled the @link configmain.html#obsess_over_services
- *  obsess_over_services @endlink option in the main configuration file
- *  and provide a @link configmain.html#ocsp_command ocsp_command
- *  @endlink to be run after every service check. We will use the ocsp
+ *  enabled the @ref mainconfigurationfileoptionsconfigurationfilevariablesobsessoverservicesoption
+ *  "obsess_over_services" option in the main configuration file
+ *  and provide a @ref mainconfigurationfileoptionsconfigurationfilevariablesobsessivecompulsiveserviceprocessorcommand
+ *  "ocsp_command" to be run after every service check. We will use the ocsp
  *  command to send the results of all service checks to the central
  *  server, making use of the send_nsca client and nsca daemon (as
  *  described above) to handle the tranmission.
@@ -190,8 +192,9 @@
  *  outlined below correspond to the numbers in the reference diagram
  *  above):
  *  - After the distributed server finishes executing a service check,
- *  it executes the command you defined by the @link
- *  configmain.html#ocsp_command ocsp_command @endlink variable. In our
+ *  it executes the command you defined by the
+ *  @ref mainconfigurationfileoptionsconfigurationfilevariablesobsessivecompulsiveserviceprocessorcommand
+ *  "ocsp_command" variable. In our
  *  example, this is the
  *  /usr/local/centscheduler/libexec/eventhandlers/submit_check_result
  *  script. Note that the definition for the submit_check_result
@@ -219,19 +222,20 @@
  *  a standalone server. It is setup as follows:
  *  - The central server has the web interface installed (optional, but
  *  recommended)
- *  - The central server has its @link
- *  configmain.html#enable_notifications enable_notifications @endlink
+ *  - The central server has its
+ *  @ref mainconfigurationfileoptionsconfigurationfilevariablesnotificationsoption
+ *  "enable_notifications"
  *  directive set to 1. This will enable notifications. (optional, but
  *  recommended)
- *  - The central server has @link
- *  configmain.html#execute_service_checks active service checks
- *  @endlink disabled (optional, but recommended - see notes below)
- *  - The central server has @link
- *  configmain.html#check_external_commands external command checks
- *  @endlink enabled (required)
- *  - The central server has @link
- *  configmain.html#accept_passive_service_checks passive service
- *  checks @endlink enabled (required)
+ *  - The central server has
+ *  @ref mainconfigurationfileoptionsconfigurationfilevariablesservicecheckexecutionoption
+ *  "active service checks" disabled (optional, but recommended - see notes below)
+ *  - The central server has
+ *  @ref mainconfigurationfileoptionsconfigurationfilevariablesexternalcommandcheckoption
+ *  "external command checks" enabled (required)
+ *  - The central server has
+ *  @ref mainconfigurationfileoptionsconfigurationfilevariablespassiveservicecheckacceptanceoption
+ *  "passive service checks" enabled (required)
  *  There are three other very important things that you need to keep
  *  in mind when configuring the central server:
  *  - The central server must have service definitions for all services
@@ -241,8 +245,8 @@
  *  - If you're only using the central server to process services whose
  *  results are going to be provided by distributed hosts, you can
  *  simply disable all active service checks on a program-wide basis by
- *  setting the @link configmain.html#execute_service_checks
- *  execute_service_checks @endlink directive to 0. If you're using the
+ *  setting the @ref mainconfigurationfileoptionsconfigurationfilevariablesservicecheckexecutionoption
+ *  "execute_service_checks" directive to 0. If you're using the
  *  central server to actively monitor a few services on its own
  *  (without the aid of distributed servers), the enable_active_checks
  *  option of the defintions for service being monitored by distributed
@@ -279,7 +283,7 @@
  *
  *  Centron Scheduler supports a feature that does "freshness" checking
  *  on the results of service checks. More information freshness
- *  checking can be found @link freshness.html here @endlink. This
+ *  checking can be found @link serviceandhostfreshnesschecks here @endlink. This
  *  features gives some protection against situations where remote
  *  hosts may stop sending passive service checks into the central
  *  monitoring server. The purpose of "freshness" checking is to ensure
@@ -378,19 +382,21 @@
  *
  *  If you do want to send passive host checks to a central server in
  *  your distributed monitoring setup, make sure:
- *  - The central server has @link
- *  configmain.html#accept_passive_host_checks passive host checks
- *  @endlink enabled (required)
- *  - The distributed server is configured to @link
- *  configmain.html#obsess_over_hosts obsess over hosts @endlink.
- *  - The distributed server has an @link configmain.html#ochp_command
- *  ochp command @endlink defined.
+ *  - The central server has
+ *  @ref mainconfigurationfileoptionsconfigurationfilevariablespassivehostcheckacceptanceoption
+ *  "passive host checks" enabled (required)
+ *  - The distributed server is configured to
+ *  @ref mainconfigurationfileoptionsconfigurationfilevariablesobsessoverhostsoption
+ *  "obsess over hosts".
+ *  - The distributed server has an
+ *  @ref mainconfigurationfileoptionsconfigurationfilevariablesobsessivecompulsivehostprocessorcommand
+ *  "ochp command" defined.
  *
  *  The ochp command, which is used for processing host check results,
  *  works in a similiar manner to the ocsp command, which is used for
  *  processing service check results (see documentation above). In
  *  order to make sure passive host check results are up to date,
- *  you'll want to enable @link freshness.html freshness checking
+ *  you'll want to enable @link serviceandhostfreshnesschecks freshness checking
  *  @endlink for hosts (similiar to what is described above for
  *  services).
  */

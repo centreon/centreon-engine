@@ -8,17 +8,17 @@
  *
  *  Services are checked by the Centron Scheduler daemon:
  *  - At regular intervals, as defined by the check_interval and
- *  retry_interval options in your @link objectdefinitions.html#service
+ *  retry_interval options in your @link objectdefinitions#service
  *  service definitions @endlink.
- *  - On-demand as needed for @link dependencychecks.html predictive
+ *  - On-demand as needed for @link hostandservicedependencies predictive
  *  service dependency checks @endlink.
  *
  *  On-demand checks are performed as part of the @link
- *  dependencychecks.html predictive service dependency check @endlink
+ *  hostandservicedependencies predictive service dependency check @endlink
  *  logic. These checks help ensure that the dependency logic is as
- *  accurate as possible. If you don't make use of @link
- *  objectdefinitions.html#servicedependency service dependencies
- *  @endlink, Centron Scheduler won't perform any on-demand service
+ *  accurate as possible. If you don't make use of
+ *  @ref objectdefinitionsobjecttypesservicedependencydefinition
+ *  "service dependencies", Centron Scheduler won't perform any on-demand service
  *  checks.
  *
  *  @section servicecheckscachedservicechecks Cached Service Checks
@@ -28,17 +28,17 @@
  *  Centron Scheduler to forgo executing a service check if it
  *  determines a relatively recent check result will do instead. Cached
  *  checks will only provide a performance increase if you are making
- *  use of @link objectdefinitions.html#servicedependency service
- *  dependencies @endlink. More information on cached checks can be
- *  found @link cachedchecks.html here @endlink.
+ *  use of @ref objectdefinitionsobjecttypesservicedependencydefinition
+ *  "service dependencies". More information on cached checks can be
+ *  found @ref cachedchecks "here".
  *
  *  @section servicechecksdependenciesandchecks Dependencies and Checks
  *
- *  You can define @link objectdefinitions.html#servicedependency
- *  service execution dependencies @endlink that prevent Centron
+ *  You can define @ref objectdefinitionsobjecttypesservicedependencydefinition
+ *  "service execution dependencies" that prevent Centron
  *  Scheduler from checking the status of a service depending on the
  *  state of one or more other services. More information on
- *  dependencies can be found @link dependencies.html here @endlink.
+ *  dependencies can be found @link hostandservicedependencies here @endlink.
  *
  *  @section servicechecksparallelizationofservicechecks Parallelization of Service Checks
  *
@@ -91,6 +91,6 @@
  *  "flapping". Centron Scheduler can detect when services start
  *  flapping, and can suppress notifications until flapping stops and
  *  the service's state stabilizes. More information on the flap
- *  detection logic can be found @link flapping.html here @endlink.
+ *  detection logic can be found @link detectionandhandlingofstateflapping here @endlink.
  */
 

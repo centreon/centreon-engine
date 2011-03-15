@@ -10,7 +10,7 @@
  *  with object inheritence once you read over the documentation
  *  presented below, as it will make the job of creating and
  *  maintaining object definitions much easier than it otherwise would
- *  be. Also, read up on the @link objecttricks.html object tricks
+ *  be. Also, read up on the @link timesavingtricksforobjectdefinitions object tricks
  *  @endlink that offer shortcuts for otherwise tedious configuration
  *  tasks.
  *
@@ -28,15 +28,15 @@
  *  service, and contact definitions may not be picked up by Centron
  *  Scheduler when you change them in your configuration files. Object
  *  directives that can exhibit this behavior are marked with an
- *  asterisk (@link #retention_notes * @endlink). The reason for this
+ *  asterisk (@ref objectdefinitionsretentionnotes "*"). The reason for this
  *  behavior is due to the fact that Centron Scheduler chooses to honor
- *  values stored in the @link #state_retention_file state retention
- *  file @endlink over values found in the config files, assuming you
- *  have @link #retain_state_information state retention @endlink
+ *  values stored in the @ref mainconfigurationfileoptionsconfigurationfilevariablesstateretentionfile
+ *  "state retention file" over values found in the config files, assuming you
+ *  have @ref mainconfigurationfileoptionsconfigurationfilevariablesstateretentionoption "state retention"
  *  enabled on a program-wide basis and the value of the directive is
- *  changed during runtime with an @link
- *  configmain.html#check_external_commands external command @endlink.
- *
+ *  changed during runtime with an
+ *  @ref mainconfigurationfileoptionsconfigurationfilevariablesexternalcommandcheckoption
+ *  "external command".
  *  One way to get around this problem is to disable the retention of
  *  non-status information using the retain_nonstatus_information
  *  directive in the host, service, and contact definitions. Disabling
@@ -44,29 +44,28 @@
  *  values for these directives from your config files, rather than
  *  from the state retention file when it (re)starts.
  *
- *  @section objectdefinitionssampleconfigurationfiles Sample
- *  Configuration Files
+ *  @section objectdefinitionssampleconfigurationfiles Sample Configuration Files
  *
  *  @note Sample object configuration files are installed in the
  *  /usr/local/centscheduler/etc/ directory when you follow the @link
- *  quickstart.html quickstart installation guide @endlink.
+ *  quickstartinstallationguides quickstart installation guide @endlink.
  *
  *  @section objectdefinitionsobjecttypes Object Types
  *
- *  @link #host Host definitions @endlink
- *  @link #hostgroup Host group definitions @endlink
- *  @link #service Service definitions @endlink
- *  @link #servicegroup Service group definitions @endlink
- *  @link #contact Contact definitions @endlink
- *  @link #contactgroup Contact group definitions @endlink
- *  @link #timeperiod Time period definitions @endlink
- *  @link #command Command definitions @endlink
- *  @link #servicedependency Service dependency definitions @endlink
- *  @link #serviceescalation Service escalation definitions @endlink
- *  @link #hostdependency Host dependency definitions @endlink
- *  @link #hostescalation Host escalation definitions @endlink
- *  @link #hostextinfo Extended host information definitions @endlink
- *  @link #serviceextinfo Extended service information definitions @endlink
+ *  @ref objectdefinitionsobjecttypeshostdefinition "Host definitions"
+ *  @ref objectdefinitionsobjecttypeshostgroupdefinition "Host group definitions"
+ *  @ref objectdefinitionsobjecttypesservicedefinitionservice "Service definitions"
+ *  @ref objectdefinitionsobjecttypesservicegroupdefinition "Service group definitions"
+ *  @ref objectdefinitionsobjecttypescontactdefinition "Contact definitions"
+ *  @ref objectdefinitionsobjecttypescontactgroupdefinition "Contact group definitions"
+ *  @ref objectdefinitionsobjecttypestimeperioddefinition "Time period definitions"
+ *  @ref objectdefinitionsobjecttypescommanddefinition "Command definitions"
+ *  @ref objectdefinitionsobjecttypesservicedependencydefinition "Service dependency definitions"
+ *  @ref objectdefinitionsobjecttypesserviceescalationdefinition "Service escalation definitions"
+ *  @ref objectdefinitionsobjecttypeshostdefinitiondependency "Host dependency definitions"
+ *  @ref objectdefinitionsobjecttypeshostescalationdefinition "Host escalation definitions"
+ *  @ref objectdefinitionsobjecttypeshostdefinitionextinfo "Extended host information definitions"
+ *  @ref objectdefinitionsobjecttypesextendedserviceinformationdefinition "Extended service information definitions"
  *
  *  @subsection objectdefinitionsobjecttypeshostdefinition Host Definition
  *
@@ -156,24 +155,26 @@
  *
  *  <table>
  *    <tr>
- *      <td valign="top"> host_name</td>
+ *      <td> host_name</td>
  *      <td>
  *  	  This directive is used to define a short name used to identify the
  *  	  host. It is used in host group and service definitions to reference
  *  	  this particular host. Hosts can have multiple services (which are
  *  	  monitored) associated with them. When used properly, the $HOSTNAME$
- *  	  @link macros.html macro @endlink will contain this short name.
+ *  	  @link understandingmacrosandhowtheywork macro @endlink will contain this short name.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>alias</td>
  *      <td>
  *  	  This directive is used to define a longer name or description used
  *  	  to identify the host. It is provided in order to allow you to more
  *  	  easily identify a particular host. When used properly, the
- *  	  $HOSTALIAS$ @link macros.html macro @endlink will contain this
+ *  	  $HOSTALIAS$ @link understandingmacrosandhowtheywork macro @endlink will contain this
  *  	  alias/description.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>address</td>
  *      <td>
  *  	  This directive is used to define the address of the host. Normally,
@@ -181,7 +182,7 @@
  *  	  want (so long as it can be used to check the status of the host).
  *  	  You can use a FQDN to identify the host instead of an IP address,
  *  	  but if DNS services are not available this could cause problems.
- *  	  When used properly, the $HOSTADDRESS$ @link macros.html macro
+ *  	  When used properly, the $HOSTADDRESS$ @link understandingmacrosandhowtheywork macro
  *  	  @endlink will contain this address. Note: If you do not specify an
  *  	  address directive in a host definition, the name of the host will
  *  	  be used as its address. A word of caution about doing this, however
@@ -189,6 +190,7 @@
  *  	  plugins will be unable to resolve the host name.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>display_name</td>
  *      <td>
  *  	  This directive is used to define an alternate name that should be
@@ -196,6 +198,7 @@
  *  	  this defaults to the value you specify for the host_name directive.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>parents</td>
  *      <td>
  *  	  This directive is used to define a comma-delimited list of short
@@ -204,7 +207,7 @@
  *  	  between the monitoring host and a remote hosts. A router, switch,
  *  	  etc. which is closest to the remote host is considered to be that
  *  	  host's "parent". Read the "Determining Status and Reachability
- *  	  of Network Hosts" document located @link networkreachability.html
+ *  	  of Network Hosts" document located @link determiningstatusandreachabilityofnetworkhosts
  *  	  here @endlink for more information. If this host is on the same
  *  	  network segment as the host doing the monitoring (without any
  *  	  intermediate routers, etc.) the host is considered to be on the
@@ -214,19 +217,22 @@
  *  	  specify parent hosts has no effect on how things are monitored.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>hostgroups</td>
  *      <td>
- *  	  This directive is used to identify the short name(s) of the @link
- *  	  #hostgroup hostgroup(s) @endlink that the host belongs to. Multiple
+ *  	  This directive is used to identify the short name(s) of the @ref
+ *  	  objectdefinitionsobjecttypeshostgroupdefinition "hostgroup(s)"
+ * 	  that the host belongs to. Multiple
  *  	  hostgroups should be separated by commas. This directive may be
  *  	  used as an alternative to (or in addition to) using the members
- *  	  directive in @link #hostgroup hostgroup @endlink definitions.
+ *  	  directive in @ref objectdefinitionsobjecttypeshostgroupdefinition "hostgroup" definitions.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>check_command</td>
  *      <td>
- *  	  This directive is used to specify the short name of the @link
- *  	  #command command @endlink that should be used to check if the host
+ *  	  This directive is used to specify the short name of the @ref
+ *  	  objectdefinitionsobjecttypescommanddefinition "command" that should be used to check if the host
  *  	  is up or down. Typically, this command would try and ping the host
  *  	  to see if it is "alive". The command must return a status of OK
  *  	  (0) or Centron Scheduler will assume the host is down. If you leave
@@ -235,11 +241,12 @@
  *  	  show up as being in a "PENDING" state in the web interface). This
  *  	  is useful if you are monitoring printers or other devices that are
  *  	  frequently turned off. The maximum amount of time that the
- *  	  notification command can run is controlled by the @link
- *  	  configmain.html#host_check_timeout host_check_timeout @endlink
- *  	  option.
+ *  	  notification command can run is controlled by the
+ *  	  @ref mainconfigurationfileoptionsconfigurationfilevariableshostchecktimeout
+ *     	  "host_check_timeout" option.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>initial_state</td>
  *      <td>
  *  	  By default Centron Scheduler will assume that all hosts are in UP
@@ -248,6 +255,7 @@
  *  	  and u = UNREACHABLE.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>max_check_attempts</td>
  *      <td>
  *  	  This directive is used to define the number of times that Centron
@@ -260,16 +268,18 @@
  *  	  just leave the check_command option blank.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>check_interval</td>
  *      <td>
  *  	  This directive is used to define the number of "time units"
  *  	  between regularly scheduled checks of the host. Unless you've
- *  	  changed the @link configmain.html#interval_length interval_length
- *  	  @endlink directive from the default value of 60, this number will
+ *  	  changed the @ref mainconfigurationfileoptionsconfigurationfilevariablestimingintervallength
+ *        "interval_length" directive from the default value of 60, this number will
  *  	  mean minutes. More information on this value can be found in the
- *  	  @link checkscheduling.html check scheduling @endlink documentation.
+ *  	  @link serviceandhostcheckscheduling check scheduling @endlink documentation.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>retry_interval</td>
  *      <td>
  *  	  This directive is used to define the number of "time units" to
@@ -278,14 +288,15 @@
  *  	  non-UP state. Once the host has been retried max_check_attempts
  *  	  times without a change in its status, it will revert to being
  *  	  scheduled at its "normal" rate as defined by the check_interval
- *  	  value. Unless you've changed the @link
- *  	  configmain.html#interval_length interval_length @endlink directive
+ *  	  value. Unless you've changed the @ref mainconfigurationfileoptionsconfigurationfilevariablestimingintervallength
+ *        "interval_length" directive
  *  	  from the default value of 60, this number will mean minutes. More
  *  	  information on this value can be found in the @link
- *  	  checkscheduling.html check scheduling @endlink documentation.
+ *  	  serviceandhostcheckscheduling check scheduling @endlink documentation.
  *      </td>
  *    </tr>
- *      <td>active_checks_enabled @link #retention_notes * @endlink</td>
+ *    <tr>
+ *      <td>active_checks_enabled @ref objectdefinitionsretentionnotes "*"</td>
  *      <td>
  *  	  This directive is used to determine whether or not active checks
  *  	  (either regularly scheduled or on-demand) of this host are enabled.
@@ -293,35 +304,41 @@
  *  	  checks (default).
  *      </td>
  *    </tr>
- *      <td>passive_checks_enabled @link #retention_notes * @endlink</td>
+ *    <tr>
+ *      <td>passive_checks_enabled @ref objectdefinitionsretentionnotes "*"</td>
  *      <td>
  *        This directive is used to determine whether or not passive checks
  *        are enabled for this host. Values: 0 = disable passive host checks,
  *        1 = enable passive host checks (default).
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>check_period</td>
  *      <td>
- *        This directive is used to specify the short name of the @link
- *        #timeperiod time period @endlink during which active checks of this
+ *        This directive is used to specify the short name of the
+ *        @ref objectdefinitionsobjecttypestimeperioddefinition "time period"
+ *	  during which active checks of this
  *        host can be made.
  *      </td>
  *    </tr>
- *      <td>obsess_over_host @link #retention_notes * @endlink</td>
+ *    <tr>
+ *      <td>obsess_over_host @ref objectdefinitionsretentionnotes "*"</td>
  *      <td>
  *        This directive determines whether or not checks for the host will
- *        be "obsessed" over using the @link configmain.html#ochp_command
- *        ochp_command @endlink.
+ *        be "obsessed" over using the @ref mainconfigurationfileoptionsconfigurationfilevariablesobsessivecompulsivehostprocessorcommand
+ *        "ochp_command".
  *      </td>
  *    </tr>
- *      <td>check_freshness @link #retention_notes * @endlink</td>
+ *    <tr>
+ *      <td>check_freshness @ref objectdefinitionsretentionnotes "*"</td>
  *      <td>
  *        This directive is used to determine whether or not @link
- *        freshness.html freshness checks @endlink are enabled for this host.
+ *        serviceandhostfreshnesschecks freshness checks @endlink are enabled for this host.
  *        Values: 0 = disable freshness checks, 1 = enable freshness checks
  *        (default).
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>freshness_threshold</td>
  *      <td>
  *        This directive is used to specify the freshness threshold (in
@@ -330,64 +347,72 @@
  *        automatically.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>event_handler</td>
  *      <td>
- *        This directive is used to specify the short name of the @link
- *        #command command @endlink that should be run whenever a change in
+ *        This directive is used to specify the short name of the
+ *        @ref objectdefinitionsobjecttypescommanddefinition "command"
+ * 	  that should be run whenever a change in
  *        the state of the host is detected (i.e. whenever it goes down or
  *        recovers). Read the documentation on
  *
  *        @link eventhandlers.html event handlers @endlink for a more
  *        detailed explanation of how to write scripts for handling events.
  *        The maximum amount of time that the event handler command can run
- *        is controlled by the @link configmain.html#event_handler_timeout
- *        event_handler_timeout @endlink option.
+ *        is controlled by the @ref mainconfigurationfileoptionsconfigurationfilevariableseventhandlertimeout
+ *        "event_handler_timeout" option.
  *      </td>
  *    </tr>
- *      <td>event_handler_enabled @link #retention_notes * @endlink</td>
+ *    <tr>
+ *      <td>event_handler_enabled @ref objectdefinitionsretentionnotes "*"</td>
  *      <td>
  *        This directive is used to determine whether or not the event
  *        handler for this host is enabled. Values: 0 = disable host event
  *        handler, 1 = enable host event handler.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>low_flap_threshold</td>
  *      <td>
  *        This directive is used to specify the low state change threshold
  *        used in flap detection for this host. More information on flap
- *        detection can be found @link flapping.html here @endlink. If you
+ *        detection can be found @link detectionandhandlingofstateflapping here @endlink. If you
  *        set this directive to a value of 0, the program-wide value
- *        specified by the @link configmain.html#low_host_flap_threshold
- *        low_host_flap_threshold @endlink directive will be used.
+ *        specified by the @ref mainconfigurationfileoptionsconfigurationfilevariableslowhostflapthreshold
+ *        "low_host_flap_threshold" directive will be used.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>high_flap_threshold</td>
  *      <td>
  *        This directive is used to specify the high state change threshold
  *        used in flap detection for this host. More information on flap
- *        detection can be found @link flapping.html here @endlink. If you
+ *        detection can be found @link detectionandhandlingofstateflapping here @endlink. If you
  *        set this directive to a value of 0, the program-wide value
- *        specified by the @link configmain.html#high_host_flap_threshold
- *        high_host_flap_threshold @endlink directive will be used.
+ *        specified by the @ref mainconfigurationfileoptionsconfigurationfilevariableshighhostflapthreshold
+ *        "high_host_flap_threshold" directive will be used.
  *      </td>
  *    </tr>
- *      <td>flap_detection_enabled @link #retention_notes * @endlink</td>
+ *    <tr>
+ *      <td>flap_detection_enabled @ref objectdefinitionsretentionnotes "*"</td>
  *      <td>
  *        This directive is used to determine whether or not flap detection
  *        is enabled for this host. More information on flap detection can be
- *        found @link flapping.html here @endlink. Values: 0 = disable host
+ *        found @link detectionandhandlingofstateflapping here @endlink. Values: 0 = disable host
  *        flap detection, 1 = enable host flap detection.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>flap_detection_options</td>
  *      <td>
  *        This directive is used to determine what host states the @link
- *        flapping.html flap detection logic @endlink will use for this host.
+ *        detectionandhandlingofstateflapping flap detection logic @endlink will use for this host.
  *        Valid options are a combination of one or more of the following: o
  *        = UP states, d = DOWN states, u = UNREACHABLE states.
  *      </td>
  *    </tr>
- *      <td>process_perf_data @link #retention_notes * @endlink</td>
+ *    <tr>
+ *      <td>process_perf_data @ref objectdefinitionsretentionnotes "*"</td>
  *      <td>
  *        This directive is used to determine whether or not the processing
  *        of performance data is enabled for this host. Values: 0 = disable
@@ -395,80 +420,91 @@
  *        processing.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>retain_status_information</td>
  *      <td>
  *        This directive is used to determine whether or not status-related
  *        information about the host is retained across program restarts.
  *        This is only useful if you have enabled state retention using the
- *        @link configmain.html#retain_state_information
- *        retain_state_information @endlink directive. Value: 0 = disable
+ *        @ref mainconfigurationfileoptionsconfigurationfilevariablesstateretentionoption
+ *        "retain_state_information" directive. Value: 0 = disable
  *        status information retention, 1 = enable status information
  *        retention.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>retain_nonstatus_information</td>
  *      <td>
  *        This directive is used to determine whether or not non-status
  *        information about the host is retained across program restarts.
  *        This is only useful if you have enabled state retention using the
- *        @link configmain.html#retain_state_information
- *        retain_state_information @endlink directive. Value: 0 = disable
+ *        @ref mainconfigurationfileoptionsconfigurationfilevariablesstateretentionoption
+ *        "retain_state_information" directive. Value: 0 = disable
  *        non-status information retention, 1 = enable non-status information
  *        retention.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>contacts</td>
  *      <td>
- *        This is a list of the short names of the @link #contact contacts
- *        @endlink that should be notified whenever there are problems (or
+ *        This is a list of the short names of the @ref objectdefinitionsobjecttypescontactdefinition
+ *	  "contacts" that should be notified whenever there are problems (or
  *        recoveries) with this host. Multiple contacts should be separated
  *        by commas. Useful if you want notifications to go to just a few
- *        people and don't want to configure @link #contactgroup contact
- *        groups @endlink. You must specify at least one contact or contact
+ *        people and don't want to configure @ref objectdefinitionsobjecttypescontactgroupdefinition
+ *	  "contact groups". You must specify at least one contact or contact
  *        group in each host definition.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>contact_groups</td>
  *      <td>
- *        This is a list of the short names of the @link #contactgroup
- *        contact groups @endlink that should be notified whenever there are
+ *        This is a list of the short names of the @ref objectdefinitionsobjecttypescontactgroupdefinition
+ *        "contact groups" that should be notified whenever there are
  *        problems (or recoveries) with this host. Multiple contact groups
  *        should be separated by commas. You must specify at least one
  *        contact or contact group in each host definition.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>notification_interval</td>
  *      <td>
  *        This directive is used to define the number of "time units" to
  *        wait before re-notifying a contact that this service is still down
- *        or unreachable. Unless you've changed the @link
- *        configmain.html#interval_length interval_length @endlink directive
+ *        or unreachable. Unless you've changed the
+ *        @ref mainconfigurationfileoptionsconfigurationfilevariablestimingintervallength
+ * 	  "interval_length" directive
  *        from the default value of 60, this number will mean minutes. If you
  *        set this value to 0, Centron Scheduler will not re-notify contacts
  *        about problems for this host - only one problem notification will
  *        be sent out.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>first_notification_delay</td>
  *      <td>
  *        This directive is used to define the number of "time units" to
  *        wait before sending out the first problem notification when this
- *        host enters a non-UP state. Unless you've changed the @link
- *        configmain.html#interval_length interval_length @endlink directive
+ *        host enters a non-UP state. Unless you've changed the
+ *	  @ref mainconfigurationfileoptionsconfigurationfilevariablestimingintervallength
+ * 	  "interval_length" directive
  *        from the default value of 60, this number will mean minutes. If you
  *        set this value to 0, Centron Scheduler will start sending out
  *        notifications immediately.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>notification_period</td>
  *      <td>
- *        This directive is used to specify the short name of the @link
- *        #timeperiod time period @endlink during which notifications of
+ *        This directive is used to specify the short name of the
+ *        @ref objectdefinitionsobjecttypestimeperioddefinition "time period"
+ *	  during which notifications of
  *        events for this host can be sent out to contacts. If a host goes
  *        down, becomes unreachable, or recoveries during a time which is not
  *        covered by the time period, no notifications will be sent out.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>notification_options</td>
  *      <td>
  *        This directive is used to determine when notifications for the host
@@ -476,8 +512,8 @@
  *        of the following: d = send notifications on a DOWN state, u = send
  *        notifications on an UNREACHABLE state, r = send notifications on
  *        recoveries (OK state), f = send notifications when the host starts
- *        and stops @link flapping.html flapping @endlink, and s = send
- *        notifications when @link downtime.html scheduled downtime @endlink
+ *        and stops @link detectionandhandlingofstateflapping flapping @endlink, and s = send
+ *        notifications when @link scheduleddowntime scheduled downtime @endlink
  *        starts and ends. If you specify n (none) as an option, no host
  *        notifications will be sent out. If you do not specify any
  *        notification options, Centron Scheduler will assume that you want
@@ -486,22 +522,25 @@
  *        when the host goes DOWN and when it recovers from a DOWN state.
  *      </td>
  *    </tr>
- *      <td>notifications_enabled @link #retention_notes * @endlink</td>
+ *    <tr>
+ *      <td>notifications_enabled @ref objectdefinitionsretentionnotes "*"</td>
  *      <td>
  *        This directive is used to determine whether or not notifications
  *        for this host are enabled. Values: 0 = disable host notifications,
  *        1 = enable host notifications.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>stalking_options</td>
  *      <td>
  *        This directive determines which host states "stalking" is enabled
  *        for. Valid options are a combination of one or more of the
  *        following: o = stalk on UP states, d = stalk on DOWN states, and u
  *        = stalk on UNREACHABLE states. More information on state stalking
- *        can be found @link stalking.html here @endlink.
+ *        can be found @link statestalking here @endlink.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>notes</td>
  *      <td>
  *        This directive is used to define an optional string of notes
@@ -511,6 +550,7 @@
  *        host).
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>notes_url</td>
  *      <td>
  *        This variable is used to define an optional URL that can be used to
@@ -524,6 +564,7 @@
  *        etc. available to other support staff.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>action_url</td>
  *      <td>
  *        This directive is used to define an optional URL that can be used
@@ -535,6 +576,7 @@
  *        (i.e. /cgi-bin/centscheduler/).
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>icon_image</td>
  *      <td>
  *        This variable is used to define the name of a GIF, PNG, or JPG
@@ -545,26 +587,29 @@
  *        /usr/local/centscheduler/share/images/logos).
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>icon_image_alt</td>
  *      <td>
  *        This variable is used to define an optional string that is used in
- *        the ALT tag of the image specified by the <icon_image>
+ *        the ALT tag of the image specified by the \<icon_image\>
  *        argument.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>vrml_image</td>
  *      <td>
  *        This variable is used to define the name of a GIF, PNG, or JPG
  *        image that should be associated with this host. This image will be
  *        used as the texture map for the specified host in the @link
  *        cgis.html#statuswrl_cgi statuswrl @endlink CGI. Unlike the image
- *        you use for the <icon_image> variable, this one should
+ *        you use for the \<icon_image\> variable, this one should
  *        probably not have any transparency. If it does, the host object
  *        will look a bit wierd. Images for hosts are assumed to be in the
  *        logos/ subdirectory in your HTML images directory (i.e.
  *        /usr/local/centscheduler/share/images/logos).
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>statusmap_image</td>
  *      <td>
  *        This variable is used to define the name of an image that should be
@@ -574,8 +619,8 @@
  *        image, as other image formats will result in a lot of wasted CPU
  *        time when the statusmap image is generated. GD2 images can be
  *        created from PNG images by using the pngtogd2 utility supplied with
- *        Thomas Boutell's @link http://www.boutell.com/gd/ gd library
- *        @endlink. The GD2 images should be created in uncompressed format
+ *        Thomas Boutell's <a href="http://www.boutell.com/gd/">gd
+ *        library</a>. The GD2 images should be created in uncompressed format
  *        in order to minimize CPU load when the statusmap CGI is generating
  *        the network map image. The image will look best if it is 40x40
  *        pixels in size. You can leave these option blank if you are not
@@ -584,6 +629,7 @@
  *        /usr/local/centscheduler/share/images/logos).
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>2d_coords</td>
  *      <td>
  *        This variable is used to define coordinates to use when drawing the
@@ -602,6 +648,7 @@
  *        creates based on the largest x and y coordinates you specify.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>3d_coords</td>
  *      <td>
  *        This variable is used to define coordinates to use when drawing the
@@ -620,7 +667,7 @@
  *  @subsubsection objectdefinitionsobjecttypeshostgroupdefinitiondescription Description
  *
  *  A host group definition is used to group one or more hosts together
- *  for simplifying configuration with @link objecttricks.html object
+ *  for simplifying configuration with @link timesavingtricksforobjectdefinitions object
  *  tricks @endlink or display purposes in the @link cgis.html CGIs
  *  @endlink.
  *
@@ -663,6 +710,7 @@
  *        host group.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>alias</td>
  *      <td>
  *        This directive is used to define is a longer name or description
@@ -670,15 +718,17 @@
  *        you to more easily identify a particular host group.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>members</td>
  *      <td>
- *        This is a list of the short names of @link #host hosts @endlink
+ *        This is a list of the short names of @ref objectdefinitionsobjecttypeshostdefinition "hosts"
  *        that should be included in this group. Multiple host names should
  *        be separated by commas. This directive may be used as an
  *        alternative to (or in addition to) the hostgroups directive in
- *        @link #host host definitions @endlink.
+ *        @ref objectdefinitionsobjecttypeshostdefinition "host definitions".
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>hostgroup_members</td>
  *      <td>
  *        This optional directive can be used to include hosts from other
@@ -687,6 +737,7 @@
  *        included in this group.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>notes</td>
  *      <td>
  *        This directive is used to define an optional string of notes
@@ -696,6 +747,7 @@
  *        host).
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>notes_url</td>
  *      <td>
  *        This variable is used to define an optional URL that can be used to
@@ -709,6 +761,7 @@
  *        contact methods, etc. available to other support staff.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>action_url</td>
  *      <td>
  *        This directive is used to define an optional URL that can be used
@@ -722,7 +775,7 @@
  *    </tr>
  *  </table>
  *
- *  @subsection objectdefinitionsobjecttypesservicedefinitionservice Definition
+ *  @subsection objectdefinitionsobjecttypesservicedefinitionservice Definition Service
  *
  *  @subsubsection objectdefinitionsobjecttypesservicedefinitionservicedescription Description
  *
@@ -808,20 +861,23 @@
  *    <tr>
  *      <td>host_name</td>
  *      <td>
- *        This directive is used to specify the short name(s) of the @link
- *        #host host(s) @endlink that the service "runs" on or is
+ *        This directive is used to specify the short name(s) of the
+ *        @ref objectdefinitionsobjecttypeshostdefinition "host(s)" that the service "runs" on or is
  *        associated with. Multiple hosts should be separated by commas.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>hostgroup_name</td>
  *      <td>
- *        This directive is used to specify the short name(s) of the @link
- *        #hostgroup hostgroup(s) @endlink that the service "runs" on or is
+ *        This directive is used to specify the short name(s) of the
+ *        @ref objectdefinitionsobjecttypeshostgroupdefinition "hostgroup(s)"
+ *	  that the service "runs" on or is
  *        associated with. Multiple hostgroups should be separated by commas.
  *        The hostgroup_name may be used instead of, or in addition to, the
  *        host_name directive.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>service_description;</td>
  *      <td>
  *        This directive is used to define the description of the service,
@@ -832,6 +888,7 @@
  *        and service_description directives.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>display_name</td>
  *      <td>
  *        This directive is used to define an alternate name that should be
@@ -841,34 +898,38 @@
  *        future versions of the web interface will.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>servicegroups</td>
  *      <td>
- *        This directive is used to identify the short name(s) of the @link
- *        #servicegroup servicegroup(s) @endlink that the service belongs to.
+ *        This directive is used to identify the short name(s) of the
+ *        @ref objectdefinitionsobjecttypesservicegroupdefinition "servicegroup(s)" that the service belongs to.
  *        Multiple servicegroups should be separated by commas. This
  *        directive may be used as an alternative to using the members
- *        directive in @link #servicegroup servicegroup @endlink definitions.
+ *        directive in @ref objectdefinitionsobjecttypesservicegroupdefinition "servicegroup" definitions.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>is_volatile</td>
  *      <td>
  *        This directive is used to denote whether the service is
  *        "volatile". Services are normally not volatile. More information
  *        on volatile service and how they differ from normal services can be
- *        found @link volatileservices.html here @endlink. Value: 0 = service
+ *        found @link volatileservices here @endlink. Value: 0 = service
  *        is not volatile, 1 = service is volatile.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>check_command</td>
  *      <td>
- *        This directive is used to specify the short name of the @link
- *        #command command @endlink that Centron Scheduler will run in order
+ *        This directive is used to specify the short name of the
+ *        @ref objectdefinitionsobjecttypescommanddefinition "command" that Centron Scheduler will run in order
  *        to check the status of the service. The maximum amount of time that
- *        the service check command can run is controlled by the @link
- *        configmain.html#service_check_timeout service_check_timeout
- *        @endlink option.
+ *        the service check command can run is controlled by the
+ *        @ref mainconfigurationfileoptionsconfigurationfilevariablesservicechecktimeout
+ *    	  "service_check_timeout" option.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>initial_state</td>
  *      <td>
  *        By default Centron Scheduler will assume that all services are in
@@ -877,6 +938,7 @@
  *        WARNING, u = UNKNOWN, and c = CRITICAL.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>max_check_attempts</td>
  *      <td>
  *        This directive is used to define the number of times that Centron
@@ -886,6 +948,7 @@
  *        check again.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>check_interval</td>
  *      <td>
  *        This directive is used to define the number of "time units" to
@@ -893,12 +956,13 @@
  *        "Regular" checks are those that occur when the service is in an
  *        OK state or when the service is in a non-OK state, but has already
  *        been rechecked max_check_attempts number of times. Unless you've
- *        changed the @link configmain.html#interval_length interval_length
- *        @endlink directive from the default value of 60, this number will
+ *        changed the @ref mainconfigurationfileoptionsconfigurationfilevariablestimingintervallength
+ * 	  "interval_length" directive from the default value of 60, this number will
  *        mean minutes. More information on this value can be found in the
- *        @link checkscheduling.html check scheduling @endlink documentation.
+ *        @link serviceandhostcheckscheduling check scheduling @endlink documentation.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>retry_interval</td>
  *      <td>
  *        This directive is used to define the number of "time units" to
@@ -907,49 +971,55 @@
  *        non-OK state. Once the service has been retried max_check_attempts
  *        times without a change in its status, it will revert to being
  *        scheduled at its "normal" rate as defined by the check_interval
- *        value. Unless you've changed the @link
- *        configmain.html#interval_length interval_length @endlink directive
+ *        value. Unless you've changed the @ref mainconfigurationfileoptionsconfigurationfilevariablestimingintervallength
+ *	  "interval_length" directive
  *        from the default value of 60, this number will mean minutes. More
  *        information on this value can be found in the @link
- *        checkscheduling.html check scheduling @endlink documentation.
+ *        serviceandhostcheckscheduling check scheduling @endlink documentation.
  *      </td>
  *    </tr>
- *      <td>active_checks_enabled @link #retention_notes * @endlink</td>
+ *    <tr>
+ *      <td>active_checks_enabled @ref objectdefinitionsretentionnotes "*"</td>
  *      <td>
  *        This directive is used to determine whether or not active checks of
  *        this service are enabled. Values: 0 = disable active service
  *        checks, 1 = enable active service checks (default).
  *      </td>
  *    </tr>
- *      <td>passive_checks_enabled @link #retention_notes * @endlink</td>
+ *    <tr>
+ *      <td>passive_checks_enabled @ref objectdefinitionsretentionnotes "*"</td>
  *      <td>
  *        This directive is used to determine whether or not passive checks
  *        of this service are enabled. Values: 0 = disable passive service
  *        checks, 1 = enable passive service checks (default).
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>check_period</td>
  *      <td>
- *        This directive is used to specify the short name of the @link
- *        #timeperiod time period @endlink during which active checks of this
+ *        This directive is used to specify the short name of the
+ *        @ref objectdefinitionsobjecttypestimeperioddefinition "time period" during which active checks of this
  *        service can be made.
  *      </td>
  *    </tr>
- *      <td>obsess_over_service @link #retention_notes * @endlink</td>
+ *    <tr>
+ *      <td>obsess_over_service @ref objectdefinitionsretentionnotes "*"</td>
  *      <td>
  *        This directive determines whether or not checks for the service
- *        will be "obsessed" over using the @link
- *        configmain.html#ocsp_command ocsp_command @endlink.
+ *        will be "obsessed" over using the @ref mainconfigurationfileoptionsconfigurationfilevariablesobsessivecompulsiveserviceprocessorcommand
+ *	  "ocsp_command".
  *      </td>
  *    </tr>
- *      <td>check_freshness @link #retention_notes * @endlink</td>
+ *    <tr>
+ *      <td>check_freshness @ref objectdefinitionsretentionnotes "*"</td>
  *      <td>
  *        This directive is used to determine whether or not @link
- *        freshness.html freshness checks @endlink are enabled for this
+ *        serviceandhostfreshnesschecks freshness checks @endlink are enabled for this
  *        service. Values: 0 = disable freshness checks, 1 = enable freshness
  *        checks (default).
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>freshness_threshold</td>
  *      <td>
  *        This directive is used to specify the freshness threshold (in
@@ -958,64 +1028,72 @@
  *        automatically.
  *      </td>
  *    </tr>
- *    <td>event_handler</td>
- *    <td>
- *        This directive is used to specify the short name of the @link
- *        #command command @endlink that should be run whenever a change in
+ *    <tr>
+ *      <td>event_handler</td>
+ *      <td>
+ *        This directive is used to specify the short name of the
+ *        @ref objectdefinitionsobjecttypescommanddefinition "command" that should be run whenever a change in
  *        the state of the service is detected (i.e. whenever it goes down or
  *        recovers). Read the documentation on
  *
  *        @link eventhandlers.html event handlers @endlink for a more
  *        detailed explanation of how to write scripts for handling events.
  *        The maximum amount of time that the event handler command can run
- *        is controlled by the @link configmain.html#event_handler_timeout
- *        event_handler_timeout @endlink option.
- *    </td>
- *      <td>event_handler_enabled @link #retention_notes * @endlink</td>
+ *        is controlled by the @ref mainconfigurationfileoptionsconfigurationfilevariableseventhandlertimeout
+ *        "event_handler_timeout" option.
+ *      </td>
+ *    </tr>
+ *    <tr>
+ *      <td>event_handler_enabled</td>
  *      <td>
  *        This directive is used to determine whether or not the event
  *        handler for this service is enabled. Values: 0 = disable service
  *        event handler, 1 = enable service event handler.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>low_flap_threshold</td>
  *      <td>
  *        This directive is used to specify the low state change threshold
  *        used in flap detection for this service. More information on flap
- *        detection can be found @link flapping.html here @endlink. If you
+ *        detection can be found @link detectionandhandlingofstateflapping here @endlink. If you
  *        set this directive to a value of 0, the program-wide value
- *        specified by the @link configmain.html#low_service_flap_threshold
- *        low_service_flap_threshold @endlink directive will be used.
+ *        specified by the @ref mainconfigurationfileoptionsconfigurationfilevariableslowserviceflapthreshold
+ *        "low_service_flap_threshold" directive will be used.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>high_flap_threshold</td>
  *      <td>
  *        This directive is used to specify the high state change threshold
  *        used in flap detection for this service. More information on flap
- *        detection can be found @link flapping.html here @endlink. If you
+ *        detection can be found @link detectionandhandlingofstateflapping here @endlink. If you
  *        set this directive to a value of 0, the program-wide value
- *        specified by the @link configmain.html#high_service_flap_threshold
- *        high_service_flap_threshold @endlink directive will be used.
+ *        specified by the @ref mainconfigurationfileoptionsconfigurationfilevariableshighserviceflapthreshold
+ *        "high_service_flap_threshold" directive will be used.
  *      </td>
  *    </tr>
- *      <td>flap_detection_enabled @link #retention_notes * @endlink</td>
+ *    <tr>
+ *      <td>flap_detection_enabled @ref objectdefinitionsretentionnotes "*"</td>
  *      <td>
  *        This directive is used to determine whether or not flap detection
  *        is enabled for this service. More information on flap detection can
- *        be found @link flapping.html here @endlink. Values: 0 = disable
+ *        be found @link detectionandhandlingofstateflapping here @endlink. Values: 0 = disable
  *        service flap detection, 1 = enable service flap detection.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>flap_detection_options</td>
  *      <td>
  *        This directive is used to determine what service states the @link
- *        flapping.html flap detection logic @endlink will use for this
+ *        detectionandhandlingofstateflapping flap detection logic @endlink will use for this
  *        service. Valid options are a combination of one or more of the
  *        following: o = OK states, w = WARNING states, c = CRITICAL states,
  *        u = UNKNOWN states.
  *      </td>
  *    </tr>
- *      <td>process_perf_data @link #retention_notes * @endlink</td>
+ *    <tr>
+ *      <td>process_perf_data @ref objectdefinitionsretentionnotes "*"</td>
  *      <td>
  *        This directive is used to determine whether or not the processing
  *        of performance data is enabled for this service. Values: 0 =
@@ -1023,60 +1101,68 @@
  *        processing.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>retain_status_information</td>
  *      <td>
  *        This directive is used to determine whether or not status-related
  *        information about the service is retained across program restarts.
  *        This is only useful if you have enabled state retention using the
- *        @link configmain.html#retain_state_information
- *        retain_state_information @endlink directive. Value: 0 = disable
+ *        @ref mainconfigurationfileoptionsconfigurationfilevariablesstateretentionoption
+ *        "retain_state_information" directive. Value: 0 = disable
  *        status information retention, 1 = enable status information
  *        retention.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>retain_nonstatus_information</td>
  *      <td>
  *        This directive is used to determine whether or not non-status
  *        information about the service is retained across program restarts.
  *        This is only useful if you have enabled state retention using the
- *        @link configmain.html#retain_state_information
- *        retain_state_information @endlink directive. Value: 0 = disable
+ *        @ref mainconfigurationfileoptionsconfigurationfilevariablesstateretentionoption
+ *        "retain_state_information" directive. Value: 0 = disable
  *        non-status information retention, 1 = enable non-status information
  *        retention.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>notification_interval</td>
  *      <td>
  *        This directive is used to define the number of "time units" to
  *        wait before re-notifying a contact that this service is still in a
- *        non-OK state. Unless you've changed the @link
- *        configmain.html#interval_length interval_length @endlink directive
+ *        non-OK state. Unless you've changed the
+ *        @ref mainconfigurationfileoptionsconfigurationfilevariablestimingintervallength
+ * 	  "interval_length" directive
  *        from the default value of 60, this number will mean minutes. If you
  *        set this value to 0, Centron Scheduler will not re-notify contacts
  *        about problems for this service - only one problem notification
  *        will be sent out.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>first_notification_delay</td>
  *      <td>
  *        This directive is used to define the number of "time units" to
  *        wait before sending out the first problem notification when this
- *        service enters a non-OK state. Unless you've changed the @link
- *        configmain.html#interval_length interval_length @endlink directive
+ *        service enters a non-OK state. Unless you've changed the
+ *	  @ref mainconfigurationfileoptionsconfigurationfilevariablestimingintervallength
+ *	  "interval_length" directive
  *        from the default value of 60, this number will mean minutes. If you
  *        set this value to 0, Centron Scheduler will start sending out
  *        notifications immediately.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>notification_period</td>
  *      <td>
- *        This directive is used to specify the short name of the @link
- *        #timeperiod time period @endlink during which notifications of
+ *        This directive is used to specify the short name of the
+ *        @ref objectdefinitionsobjecttypestimeperioddefinition "time period" during which notifications of
  *        events for this service can be sent out to contacts. No service
  *        notifications will be sent out during times which is not covered by
  *        the time period.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>notification_options</td>
  *      <td>
  *        This directive is used to determine when notifications for the
@@ -1085,8 +1171,8 @@
  *        state, u = send notifications on an UNKNOWN state, c = send
  *        notifications on a CRITICAL state, r = send notifications on
  *        recoveries (OK state), f = send notifications when the service
- *        starts and stops @link flapping.html flapping @endlink, and s =
- *        send notifications when @link downtime.html scheduled downtime
+ *        starts and stops @link detectionandhandlingofstateflapping flapping @endlink, and s =
+ *        send notifications when @link scheduleddowntime scheduled downtime
  *        @endlink starts and ends. If you specify n (none) as an option, no
  *        service notifications will be sent out. If you do not specify any
  *        notification options, Centron Scheduler will assume that you want
@@ -1096,43 +1182,48 @@
  *        from a WARNING state.
  *      </td>
  *    </tr>
- *      <td>notifications_enabled @link #retention_notes * @endlink</td>
+ *    <tr>
+ *      <td>notifications_enabled @ref objectdefinitionsretentionnotes "*"</td>
  *      <td>
  *        This directive is used to determine whether or not notifications
  *        for this service are enabled. Values: 0 = disable service
  *        notifications, 1 = enable service notifications.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>contacts</td>
  *      <td>
- *        This is a list of the short names of the @link #contact contacts
- *        @endlink that should be notified whenever there are problems (or
+ *        This is a list of the short names of the @ref objectdefinitionsobjecttypescontactdefinition "contacts"
+ *        that should be notified whenever there are problems (or
  *        recoveries) with this service. Multiple contacts should be
  *        separated by commas. Useful if you want notifications to go to just
- *        a few people and don't want to configure @link #contactgroup
- *        contact groups @endlink. You must specify at least one contact or
+ *        a few people and don't want to configure @ref objectdefinitionsobjecttypescontactgroupdefinition
+ *        "contact groups". You must specify at least one contact or
  *        contact group in each service definition.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>contact_groups</td>
  *      <td>
- *        This is a list of the short names of the @link #contactgroup
- *        contact groups @endlink that should be notified whenever there are
+ *        This is a list of the short names of the @ref objectdefinitionsobjecttypescontactgroupdefinition
+ *        "contact groups" that should be notified whenever there are
  *        problems (or recoveries) with this service. Multiple contact groups
  *        should be separated by commas. You must specify at least one
  *        contact or contact group in each service definition.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>stalking_options</td>
  *      <td>
  *        This directive determines which service states "stalking" is
  *        enabled for. Valid options are a combination of one or more of the
  *        following: o = stalk on OK states, w = stalk on WARNING states, u =
  *        stalk on UNKNOWN states, and c = stalk on CRITICAL states. More
- *        information on state stalking can be found @link stalking.html here
+ *        information on state stalking can be found @link statestalking here
  *        @endlink.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>notes</td>
  *      <td>
  *        This directive is used to define an optional string of notes
@@ -1142,6 +1233,7 @@
  *        service).
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>notes_url</td>
  *      <td>
  *        This directive is used to define an optional URL that can be used
@@ -1155,6 +1247,7 @@
  *        contact methods, etc. available to other support staff.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>action_url</td>
  *      <td>
  *        This directive is used to define an optional URL that can be used
@@ -1166,6 +1259,7 @@
  *        access the CGIs (i.e. /cgi-bin/centscheduler/).
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>icon_image</td>
  *      <td>
  *        This variable is used to define the name of a GIF, PNG, or JPG
@@ -1178,10 +1272,11 @@
  *        /usr/local/centscheduler/share/images/logos).
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>icon_image_alt</td>
  *      <td>
  *        This variable is used to define an optional string that is used in
- *        the ALT tag of the image specified by the <icon_image>
+ *        the ALT tag of the image specified by the \<icon_image\>
  *        argument. The ALT tag is used in the @link cgis.html#status_cgi
  *        status @endlink, @link cgis.html#extinfo_cgi extended information
  *        @endlink and @link cgis.html#statusmap_cgi statusmap @endlink CGIs.
@@ -1194,7 +1289,7 @@
  *  @subsubsection objectdefinitionsobjecttypesservicegroupdefinitiondescription Description
  *
  *  A service group definition is used to group one or more services
- *  together for simplifying configuration with @link objecttricks.html
+ *  together for simplifying configuration with @link timesavingtricksforobjectdefinitions
  *  object tricks @endlink or display purposes in the @link cgis.html
  *  CGIs @endlink.
  *
@@ -1237,6 +1332,7 @@
  *  	  service group.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>alias</td>
  *      <td>
  *  	  This directive is used to define is a longer name or description
@@ -1244,20 +1340,22 @@
  *  	  allow you to more easily identify a particular service group.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>members</td>
  *      <td>
- *  	  This is a list of the descriptions of @link #service services
- *  	  @endlink (and the names of their corresponding hosts) that should
+ *  	  This is a list of the descriptions of @ref objectdefinitionsobjecttypesservicedefinitionservice "services"
+ *  	  (and the names of their corresponding hosts) that should
  *  	  be included in this group. Host and service names should be
  *  	  separated by commas. This directive may be used as an alternative
- *  	  to the servicegroups directive in @link #service service
- *  	  definitions @endlink. The format of the member directive is as
+ *  	  to the servicegroups directive in @ref objectdefinitionsobjecttypesservicedefinitionservice "service
+ *  	  definitions". The format of the member directive is as
  *  	  follows (note that a host name must precede a service
  *  	  name/description):
  *
- *	  members=<host1>,<service1>,<host2>,<service2>,...,<hostn>,<servicen>
+ *	  members=\<host1\>,\<service1\>,\<host2\>,\<service2\>,...,\<hostn\>,\<servicen\>
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>servicegroup_members</td>
  *      <td>
  *        This optional directive can be used to include services from other
@@ -1266,6 +1364,7 @@
  *        members should be included in this group.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>notes</td>
  *      <td>
  *        This directive is used to define an optional string of notes
@@ -1275,6 +1374,7 @@
  *        the specified service group).
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>notes_url</td>
  *      <td>
  *        This directive is used to define an optional URL that can be used
@@ -1289,6 +1389,7 @@
  *        staff.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>action_url</td>
  *      <td>
  *        This directive is used to define an optional URL that can be used
@@ -1370,30 +1471,33 @@
  *      <td>contact_name</td>
  *      <td>
  *  	  This directive is used to define a short name used to identify the
- *        contact. It is referenced in @link #contactgroup contact group
- *        @endlink definitions. Under the right circumstances, the
- *        $CONTACTNAME$ @link macros.html macro @endlink will contain this
+ *        contact. It is referenced in @ref objectdefinitionsobjecttypescontactgroupdefinition "contact group"
+ *        definitions. Under the right circumstances, the
+ *        $CONTACTNAME$ @link understandingmacrosandhowtheywork macro @endlink will contain this
  *        value.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>alias</td>
  *      <td>
  *        This directive is used to define a longer name or description for
  *        the contact. Under the rights circumstances, the $CONTACTALIAS$
- *        @link macros.html macro @endlink will contain this value. If not
+ *        @link understandingmacrosandhowtheywork macro @endlink will contain this value. If not
  *        specified, the contact_name will be used as the alias.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>contactgroups</td>
  *      <td>
- *        This directive is used to identify the short name(s) of the @link
- *        #contactgroup contactgroup(s) @endlink that the contact belongs to.
+ *        This directive is used to identify the short name(s) of the
+ *        @ref objectdefinitionsobjecttypescontactgroupdefinition "contactgroup(s)" that the contact belongs to.
  *        Multiple contactgroups should be separated by commas. This
  *        directive may be used as an alternative to (or in addition to)
- *        using the members directive in @link #contactgroup contactgroup
- *        @endlink definitions.
+ *        using the members directive in @ref objectdefinitionsobjecttypescontactgroupdefinition "contactgroup"
+ *        definitions.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>host_notifications_enabled</td>
  *      <td>
  *        This directive is used to determine whether or not the contact will
@@ -1401,6 +1505,7 @@
  *        = don't send notifications, 1 = send notifications.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>service_notifications_enabled</td>
  *      <td>
  *        This directive is used to determine whether or not the contact will
@@ -1408,10 +1513,11 @@
  *        Values: 0 = don't send notifications, 1 = send notifications.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>host_notification_period</td>
  *      <td>
- *        This directive is used to specify the short name of the @link
- *        #timeperiod time period @endlink during which the contact can be
+ *        This directive is used to specify the short name of the
+ *        @ref objectdefinitionsobjecttypestimeperioddefinition "time period" during which the contact can be
  *        notified about host problems or recoveries. You can think of this
  *        as an "on call" time for host notifications for the contact. Read
  *        the documentation on @link timeperiods.html time periods @endlink
@@ -1419,10 +1525,11 @@
  *        may result from improper use.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>service_notification_period</td>
  *      <td>
- *        This directive is used to specify the short name of the @link
- *        #timeperiod time period @endlink during which the contact can be
+ *        This directive is used to specify the short name of the
+ *        @ref objectdefinitionsobjecttypestimeperioddefinition "time period" during which the contact can be
  *        notified about service problems or recoveries. You can think of
  *        this as an "on call" time for service notifications for the
  *        contact. Read the documentation on @link timeperiods.html time
@@ -1430,18 +1537,20 @@
  *        potential problems that may result from improper use.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>host_notification_commands</td>
  *      <td>
  *        This directive is used to define a list of the short names of the
- *        @link #command commands @endlink used to notify the contact of a
+ *        @ref objectdefinitionsobjecttypescommanddefinition "commands" used to notify the contact of a
  *        host problem or recovery. Multiple notification commands should be
  *        separated by commas. All notification commands are executed when
  *	  the contact needs to be notified. The maximum amount of time that
- * 	  a notification command can run is controlled by the @link
- *        configmain.html#notification_timeout notification_timeout @endlink
- *        option.
+ * 	  a notification command can run is controlled by the
+ *        @ref mainconfigurationfileoptionsconfigurationfilevariablesnotificationtimeout
+ * 	  "notification_timeout" option.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>host_notification_options</td>
  *      <td>
  *        This directive is used to define the host states for which
@@ -1449,13 +1558,14 @@
  *        combination of one or more of the following: d = notify on DOWN
  *        host states, u = notify on UNREACHABLE host states, r = notify on
  *        host recoveries (UP states), f = notify when the host starts and
- *        stops @link flapping.html flapping @endlink, and s = send
- *        notifications when host or service @link downtime.html scheduled
+ *        stops @link detectionandhandlingofstateflapping flapping @endlink, and s = send
+ *        notifications when host or service @link scheduleddowntime scheduled
  *        downtime @endlink starts and ends. If you specify n (none) as an
  *        option, the contact will not receive any type of host
  *        notifications.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>service_notification_options</td>
  *      <td>
  *        This directive is used to define the service states for which
@@ -1464,32 +1574,35 @@
  *        service states, u = notify on UNKNOWN service states, c = notify on
  *        CRITICAL service states, r = notify on service recoveries (OK
  *        states), and f = notify when the service starts and stops @link
- *        flapping.html flapping @endlink. If you specify n (none) as an
+ *        detectionandhandlingofstateflapping flapping @endlink. If you specify n (none) as an
  *        option, the contact will not receive any type of service
  *        notifications.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>service_notification_commands</td>
  *      <td>
  *        This directive is used to define a list of the short names of the
- *        @link #command commands @endlink used to notify the contact of a
+ *        @ref objectdefinitionsobjecttypescommanddefinition "commands" used to notify the contact of a
  *        service problem or recovery. Multiple notification commands should
  *        be separated by commas. All notification commands are executed when
  *	  the contact needs to be notified. The maximum amount of time that a
- *	  notification command can run is controlled by the @link
- *        configmain.html#notification_timeout notification_timeout @endlink
- *        option.
+ *	  notification command can run is controlled by the
+ *        @ref mainconfigurationfileoptionsconfigurationfilevariablesnotificationtimeout
+ * 	  "notification_timeout" option.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>email</td>
  *      <td>
  *        This directive is used to define an email address for the contact.
  *        Depending on how you configure your notification commands, it can
  *        be used to send out an alert email to the contact. Under the right
- *        circumstances, the $CONTACTEMAIL$ @link macros.html macro @endlink
+ *        circumstances, the $CONTACTEMAIL$ @link understandingmacrosandhowtheywork macro @endlink
  *        will contain this value.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>pager</td>
  *      <td>
  *        This directive is used to define a pager number for the contact. It
@@ -1497,9 +1610,10 @@
  *        (i.e. pagejoe@pagenet.com). Depending on how you configure your
  *        notification commands, it can be used to send out an alert page to
  *        the contact. Under the right circumstances, the $CONTACTPAGER$
- *        @link macros.html macro @endlink will contain this value.
+ *        @link understandingmacrosandhowtheywork macro @endlink will contain this value.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>addressx</td>
  *      <td>
  *        Address directives are used to define additional "addresses" for
@@ -1508,35 +1622,38 @@
  *        your notification commands, they can be used to send out an alert
  *        to the contact. Up to six addresses can be defined using these
  *        directives (address1 through address6). The $CONTACTADDRESSx$ @link
- *        macros.html macro @endlink will contain this value.
+ *        understandingmacrosandhowtheywork macro @endlink will contain this value.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>can_submit_commands</td>
  *      <td>
  *        This directive is used to determine whether or not the contact can
- *        submit @link extcommands.html external commands @endlink to Centron
+ *        submit @link externalcommands external commands @endlink to Centron
  *        Scheduler from the CGIs. Values: 0 = don't allow contact to submit
  *        commands, 1 = allow contact to submit commands.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>retain_status_information</td>
  *      <td>
  *        This directive is used to determine whether or not status-related
  *        information about the contact is retained across program restarts.
  *        This is only useful if you have enabled state retention using the
- *        @link configmain.html#retain_state_information
- *        retain_state_information @endlink directive. Value: 0 = disable
+ *        @ref mainconfigurationfileoptionsconfigurationfilevariablesstateretentionoption
+ *        "retain_state_information" directive. Value: 0 = disable
  *        status information retention, 1 = enable status information
  *        retention.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>retain_nonstatus_information</td>
  *      <td>
  *        This directive is used to determine whether or not non-status
  *        information about the contact is retained across program restarts.
  *        This is only useful if you have enabled state retention using the
- *        @link configmain.html#retain_state_information
- *        retain_state_information @endlink directive. Value: 0 = disable
+ *        @ref mainconfigurationfileoptionsconfigurationfilevariablesstateretentionoption
+ *        "retain_state_information" directive. Value: 0 = disable
  *        non-status information retention, 1 = enable non-status information
  *        retention.
  *      </td>
@@ -1547,8 +1664,8 @@
  *
  *  @subsubsection objectdefinitionsobjecttypesdescription Description
  *
- *  A contact group definition is used to group one or more @link
- *  #contact contacts @endlink together for the purpose of sending out
+ *  A contact group definition is used to group one or more
+ *  @ref objectdefinitionsobjecttypescontactdefinition "contacts" together for the purpose of sending out
  *  alert/recovery @link notifications.html notifications @endlink.
  *
  *  @subsubsection objectdefinitionsobjecttypesdefinitionformat Definition Format
@@ -1586,22 +1703,25 @@
  *  	  This directive is a short name used to identify the contact group.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>alias</td>
  *      <td>
  *        This directive is used to define a longer name or description used
  *        to identify the contact group.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>members</td>
  *      <td>
  *        This optional directive is used to define a list of the short names
- *        of @link #contact contacts @endlink that should be included in this
+ *        of @ref objectdefinitionsobjecttypescontactdefinition "contacts" that should be included in this
  *        group. Multiple contact names should be separated by commas. This
  *        directive may be used as an alternative to (or in addition to)
- *        using the contactgroups directive in @link #contact contact
- *        @endlink definitions.
+ *        using the contactgroups directive in @ref objectdefinitionsobjecttypescontactdefinition "contact"
+ *        definitions.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>contactgroup_members</td>
  *      <td>
  *        This optional directive can be used to include contacts from other
@@ -1704,12 +1824,14 @@
  *  	  This directives is the short name used to identify the time period.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>alias</td>
  *      <td>
  *        This directive is a longer name or description used to identify the
  *        time period.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>[weekday]</td>
  *      <td>
  *        The weekday directives ("sunday" through "saturday")are
@@ -1724,6 +1846,7 @@
  *        timeperiod definition.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>[exception]</td>
  *      <td>
  *        You can specify several different types of exceptions to the
@@ -1741,6 +1864,7 @@
  *        on @link timeperiods.html timeperiods @endlink.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>exclude</td>
  *      <td>
  *        This directive is used to specify the short names of other
@@ -1758,11 +1882,11 @@
  *  A command definition is just that. It defines a command. Commands
  *  that can be defined include service checks, service notifications,
  *  service event handlers, host checks, host notifications, and host
- *  event handlers. Command definitions can contain @link macros.html
+ *  event handlers. Command definitions can contain @link understandingmacrosandhowtheywork
  *  macros @endlink, but you must make sure that you include only those
  *  macros that are "valid" for the circumstances when the command will
  *  be used. More information on what macros are available and when
- *  they are "valid" can be found @link macros.html here @endlink. The
+ *  they are "valid" can be found @link understandingmacrosandhowtheywork here @endlink. The
  *  different arguments to a command definition are outlined below.
  *
  *  @subsubsection objectdefinitionsobjecttypescommanddefinitiondefinitionformat Definition Format
@@ -1795,19 +1919,21 @@
  *      <td>command_name</td>
  *      <td>
  *  	  This directive is the short name used to identify the command. It
- *        is referenced in @link #contact contact @endlink, @link #host host
- *        @endlink, and @link #service service @endlink definitions (in
+ *        is referenced in @ref objectdefinitionsobjecttypescontactdefinition "contact",
+ *	  @ref objectdefinitionsobjecttypeshostdefinition "host", and
+ *	  @ref objectdefinitionsobjecttypesservicedefinitionservice "service" definitions (in
  *        notification, check, and event handler directives), among other
  *        places.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>command_line</td>
  *      <td>
  *        This directive is used to define what is actually executed by
  *        Centron Scheduler when the command is used for service or host
  *        checks, notifications, or @link eventhandlers.html event handlers
  *        @endlink. Before the command line is executed, all valid @link
- *        macros.html macros @endlink are replaced with their respective
+ *        understandingmacrosandhowtheywork macros @endlink are replaced with their respective
  *        values. See the documentation on macros for determining when you
  *        can use different macros. Note that the command line is not
  *        surrounded in quotes. Also, if you want to pass a dollar sign ($)
@@ -1817,20 +1943,20 @@
  *        @note You may not include a semicolon (;) in the command_line
  *        directive, because everything after it will be ignored as a config
  *        file comment. You can work around this limitation by setting one of
- *        the @link macros.html#user $USER$ @endlink macros in your
- *        @link configmain.html#resource_file resource file @endlink
- *        to a semicolon and then referencing the appropriate $USER$ macro in
+ *        the @link understandingmacrosandhowtheywork#user $USER$ @endlink macros in your
+ *        @ref mainconfigurationfileoptionsconfigurationfilevariablesresourcefile
+ * 	  "resource file" to a semicolon and then referencing the appropriate $USER$ macro in
  *        the command_line directive in place of the semicolon.
  *
  *        If you want to pass arguments to commands during runtime, you can
- *        use @link macros.html#arg $ARGn$ macros @endlink in the
+ *        use @link understandingmacrosandhowtheywork#arg $ARGn$ macros @endlink in the
  *        command_line directive of the command definition and then separate
  *        individual arguments from the command name (and from each other)
  *        using bang (!) characters in the object definition directive (host
  *        check command, service event handler command, etc) that references
  *        the command. More information on how arguments in command
  *        definitions are processed during runtime can be found in the
- *        documentation on @link macros.html macros @endlink.
+ *        documentation on @link understandingmacrosandhowtheywork macros @endlink.
  *    </td>
  *  </tr>
  *  </table>
@@ -1845,7 +1971,7 @@
  *  dependencies are optional and are mainly targeted at advanced users
  *  who have complicated monitoring setups. More information on how
  *  service dependencies work (read this!) can be found @link
- *  dependencies.html here @endlink.
+ *  hostandservicedependencies here @endlink.
  *
  *  @subsubsection objectdefinitionsobjecttypesservicedependencydefinitiondefinitionformat Definition Format
  *
@@ -1889,54 +2015,60 @@
  *    <tr>
  *      <td>dependent_host_name</td>
  *      <td>
- *        This directive is used to identify the short name(s) of the @link
- *        #host host(s) @endlink that the dependent service "runs" on or is
+ *        This directive is used to identify the short name(s) of the
+ *        @ref objectdefinitionsobjecttypeshostdefinition "host(s)" that the dependent service "runs" on or is
  *        associated with. Multiple hosts should be separated by commas.
  *        Leaving this directive blank can be used to create @link
- *        objecttricks.html#same_host_dependency "same host" dependencies
+ *        timesavingtricksforobjectdefinitions#same_host_dependency "same host" dependencies
  *        @endlink.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>dependent_hostgroup_name</td>
  *      <td>
- *        This directive is used to specify the short name(s) of the @link
- *        #hostgroup hostgroup(s) @endlink that the dependent service
+ *        This directive is used to specify the short name(s) of the
+ *        @ref objectdefinitionsobjecttypeshostgroupdefinition "hostgroup(s)" that the dependent service
  *        "runs" on or is associated with. Multiple hostgroups should be
  *        separated by commas. The dependent_hostgroup may be used instead
  *        of, or in addition to, the dependent_host directive.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>dependent_service_description</td>
  *      <td>
  *        This directive is used to identify the description of the dependent
- *        @link #service service @endlink.
+ *        @ref objectdefinitionsobjecttypesservicedefinitionservice "service".
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>host_name</td>
  *      <td>
- *        This directive is used to identify the short name(s) of the @link
- *        #host host(s) @endlink that the service that is being depended upon
+ *        This directive is used to identify the short name(s) of the
+ *        @ref objectdefinitionsobjecttypeshostdefinition "host(s)" that the service that is being depended upon
  *        (also referred to as the master service) "runs" on or is
  *        associated with. Multiple hosts should be separated by commas.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>hostgroup_name</td>
  *      <td>
- *        This directive is used to identify the short name(s) of the @link
- *        #host hostgroup(s) @endlink that the service that is being depended
+ *        This directive is used to identify the short name(s) of the
+ *        @ref objectdefinitionsobjecttypeshostdefinition "hostgroup(s)" that the service that is being depended
  *        upon (also referred to as the master service) "runs" on or is
  *        associated with. Multiple hostgroups should be separated by commas.
  *        The hostgroup_name may be used instead of, or in addition to, the
  *        host_name directive.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>service_description</td>
  *      <td>
- *        This directive is used to identify the description of the @link
- *        #service service @endlink that is being depended upon (also
+ *        This directive is used to identify the description of the
+ *        @ref objectdefinitionsobjecttypesservicedefinitionservice "service" that is being depended upon (also
  *        referred to as the master service).
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>inherits_parent</td>
  *      <td>
  *        This directive indicates whether or not the dependency inherits
@@ -1946,6 +2078,7 @@
  *        dependencies fail, this dependency will also fail.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>execution_failure_criteria</td>
  *      <td>
  *        This directive is used to specify the criteria that determine when
@@ -1964,6 +2097,7 @@
  *        service is in either an OK, a CRITICAL, or an UNKNOWN state.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>notification_failure_criteria</td>
  *      <td>
  *        This directive is used to define the criteria that determine when
@@ -1981,10 +2115,11 @@
  *        out if the master service is in a WARNING state.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>dependency_period</td>
  *      <td>
- *        This directive is used to specify the short name of the @link
- *        #timeperiod time period @endlink during which this dependency is
+ *        This directive is used to specify the short name of the
+ *        @ref objectdefinitionsobjecttypestimeperioddefinition "time period" during which this dependency is
  *        valid. If this directive is not specified, the dependency is
  *        considered to be valid during all times.
  *      </td>
@@ -1998,7 +2133,7 @@
  *  Service escalations are completely optional and are used to
  *  escalate notifications for a particular service. More information
  *  on how notification escalations work can be found @link
- *  escalations.html here @endlink.
+ *  notificationescalations here @endlink.
  *
  *  @subsubsection objectdefinitionsobjecttypesserviceescalationdefinitiondefinitionformat Definition Format
  *
@@ -2041,26 +2176,30 @@
  *    <tr>
  *      <td>host_name</td>
  *      <td>
- *        This directive is used to identify the short name(s) of the @link
- *        #host host(s) @endlink that the @link #service service @endlink
+ *        This directive is used to identify the short name(s) of the
+ *        @ref objectdefinitionsobjecttypeshostdefinition "host(s)" that
+ * 	  the @ref objectdefinitionsobjecttypesservicedefinitionservice "service"
  *        escalation should apply to or is associated with.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>hostgroup_name</td>
  *      <td>
- *        This directive is used to specify the short name(s) of the @link
- *        #hostgroup hostgroup(s) @endlink that the service escalation should
+ *        This directive is used to specify the short name(s) of the
+ *        @ref objectdefinitionsobjecttypeshostgroupdefinition "hostgroup(s)" that the service escalation should
  *        apply to or is associated with. Multiple hostgroups should be
  *        separated by commas. The hostgroup_name may be used instead of, or
  *        in addition to, the host_name directive.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>service_description</td>
  *      <td>
- *        This directive is used to identify the description of the @link
- *        #service service @endlink the escalation should apply to.
+ *        This directive is used to identify the description of the @ref
+ *        objectdefinitionsobjecttypesservicedefinitionservice "service" the escalation should apply to.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>first_notification</td>
  *      <td>
  *        This directive is a number that identifies the first notification
@@ -2070,6 +2209,7 @@
  *        out.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>last_notification</td>
  *      <td>
  *        This directive is a number that identifies the last notification
@@ -2080,26 +2220,29 @@
  *        many notifications go out).
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>contacts</td>
  *      <td>
- *        This is a list of the short names of the @link #contact contacts
- *        @endlink that should be notified whenever there are problems (or
+ *        This is a list of the short names of the @ref objectdefinitionsobjecttypescontactdefinition "contacts"
+ *        that should be notified whenever there are problems (or
  *        recoveries) with this service. Multiple contacts should be
  *        separated by commas. Useful if you want notifications to go to just
- *        a few people and don't want to configure @link #contactgroup
- *        contact groups @endlink. You must specify at least one contact or
+ *        a few people and don't want to configure @ref objectdefinitionsobjecttypescontactgroupdefinition
+ *        "contact groups". You must specify at least one contact or
  *        contact group in each service escalation definition.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>contact_groups</td>
  *      <td>
- *        This directive is used to identify the short name of the @link
- *        #contactgroup contact group @endlink that should be notified when
+ *        This directive is used to identify the short name of the @ref
+ *        objectdefinitionsobjecttypescontactgroupdefinition "contact group" that should be notified when
  *        the service notification is escalated. Multiple contact groups
  *        should be separated by commas. You must specify at least one
  *        contact or contact group in each service escalation definition.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>notification_interval</td>
  *      <td>
  *        This directive is used to determine the interval at which
@@ -2115,14 +2258,16 @@
  *        escalation entries is used.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>escalation_period</td>
  *      <td>
- *        This directive is used to specify the short name of the @link
- *        #timeperiod time period @endlink during which this escalation is
+ *        This directive is used to specify the short name of the @ref
+ *        objectdefinitionsobjecttypestimeperioddefinition "time period" during which this escalation is
  *        valid. If this directive is not specified, the escalation is
  *        considered to be valid during all times.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>escalation_options</td>
  *      <td>
  *        This directive is used to define the criteria that determine when
@@ -2148,7 +2293,7 @@
  *  of one or more other hosts. Host dependencies are optional and are
  *  mainly targeted at advanced users who have complicated monitoring
  *  setups. More information on how host dependencies work (read this!)
- *  can be found @link dependencies.html here @endlink.
+ *  can be found @link hostandservicedependencies here @endlink.
  *
  *  @subsubsection objectdefinitionsobjecttypeshostdependencydefinitiondefinitionformat Definition Format
  *
@@ -2187,36 +2332,40 @@
  *      <td>dependent_host_name</td>
  *      <td>
  *        This directive is used to identify the short name(s) of the
- *        dependent @link #host host(s) @endlink. Multiple hosts should be
+ *        dependent @ref objectdefinitionsobjecttypeshostdefinition "host(s)". Multiple hosts should be
  *        separated by commas.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>dependent_hostgroup_name</td>
  *      <td>
  *        This directive is used to identify the short name(s) of the
- *        dependent @link #host hostgroup(s) @endlink. Multiple hostgroups
+ *        dependent @ref objectdefinitionsobjecttypeshostdefinition "hostgroup(s)". Multiple hostgroups
  *        should be separated by commas. The dependent_hostgroup_name may be
  *        used instead of, or in addition to, the dependent_host_name
  *        directive.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>host_name</td>
  *      <td>
- *        This directive is used to identify the short name(s) of the @link
- *        #host host(s) @endlink that is being depended upon (also referred
+ *        This directive is used to identify the short name(s) of the
+ *        @ref objectdefinitionsobjecttypeshostdefinition "host(s)" that is being depended upon (also referred
  *        to as the master host). Multiple hosts should be separated by
  *        commas.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>hostgroup_name</td>
  *      <td>
- *        This directive is used to identify the short name(s) of the @link
- *        #host hostgroup(s) @endlink that is being depended upon (also
+ *        This directive is used to identify the short name(s) of the
+ *        @ref objectdefinitionsobjecttypeshostdefinition "hostgroup(s)" that is being depended upon (also
  *        referred to as the master host). Multiple hostgroups should be
  *        separated by commas. The hostgroup_name may be used instead of, or
  *        in addition to, the host_name directive.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>inherits_parent</td>
  *      <td>
  *        This directive indicates whether or not the dependency inherits
@@ -2226,6 +2375,7 @@
  *        this dependency will also fail.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>execution_failure_criteria</td>
  *      <td>
  *        This directive is used to specify the criteria that determine when
@@ -2243,6 +2393,7 @@
  *        an UNREACHABLE or DOWN state.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>notification_failure_criteria</td>
  *      <td>
  *        This directive is used to define the criteria that determine when
@@ -2259,10 +2410,11 @@
  *        be sent out if the master host is in a DOWN state.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>dependency_period</td>
  *      <td>
- *        This directive is used to specify the short name of the @link
- *        #timeperiod time period @endlink during which this dependency is
+ *        This directive is used to specify the short name of the
+ *        @ref objectdefinitionsobjecttypestimeperioddefinition "time period" during which this dependency is
  *        valid. If this directive is not specified, the dependency is
  *        considered to be valid during all times.
  *      </td>
@@ -2271,14 +2423,14 @@
  *
  *  @subsection objectdefinitionsobjecttypeshostescalationdefinition Host Escalation Definition
  *
- *  @susubbsection objectdefinitionsobjecttypeshostescalationdefinitiondescription Description
+ *  @subsubsection objectdefinitionsobjecttypeshostescalationdefinitiondescription Description
  *
  *  Host escalations are completely optional and are used to escalate
  *  notifications for a particular host. More information on how
- *  notification escalations work can be found @link escalations.html
+ *  notification escalations work can be found @link notificationescalations
  *  here @endlink.
  *
- *  @subbsection objectdefinitionsobjecttypeshostescalationdefinitiondefinitionformat Definition Format
+ *  @subsubsection objectdefinitionsobjecttypeshostescalationdefinitiondefinitionformat Definition Format
  *
  *  @note Directives using a bold font are required, while those are
  *  optional.
@@ -2298,7 +2450,7 @@
  *  }
  *  @endcode
  *
- *  @subbsection objectdefinitionsobjecttypeshostescalationdefinitionexampledefinition Example Definition
+ *  @subsubsection objectdefinitionsobjecttypeshostescalationdefinitionexampledefinition Example Definition
  *
  *  @code
  *  define hostescalation
@@ -2311,25 +2463,27 @@
  *  }
  *  @endcode
  *
- *  @subbsection objectdefinitionsobjecttypeshostescalationdefinitiondirectivedescriptions Directive Descriptions
+ *  @subsubsection objectdefinitionsobjecttypeshostescalationdefinitiondirectivedescriptions Directive Descriptions
  *
  *  <table>
  *    <tr>
  *      <td>host_name</td>
  *      <td>
- *        This directive is used to identify the short name of the @link
- *        #host host @endlink that the escalation should apply to.
+ *        This directive is used to identify the short name of the
+ *        @ref objectdefinitionsobjecttypeshostdefinition "host" that the escalation should apply to.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>hostgroup_name</td>
  *      <td>
- *        This directive is used to identify the short name(s) of the @link
- *        #hostgroup hostgroup(s) @endlink that the escalation should apply
+ *        This directive is used to identify the short name(s) of the
+ *        @ref objectdefinitionsobjecttypeshostgroupdefinition "hostgroup(s)" that the escalation should apply
  *        to. Multiple hostgroups should be separated by commas. If this is
  *        used, the escalation will apply to all hosts that are members of
  *        the specified hostgroup(s).
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>first_notification</td>
  *      <td>
  *        This directive is a number that identifies the first notification
@@ -2338,6 +2492,7 @@
  *        down or unreachable long enough for a third notification to go out.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>last_notification</td>
  *      <td>
  *        This directive is a number that identifies the last notification
@@ -2348,26 +2503,29 @@
  *        many notifications go out).
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>contacts</td>
  *      <td>
- *        This is a list of the short names of the @link #contact contacts
- *        @endlink that should be notified whenever there are problems (or
+ *        This is a list of the short names of the @ref objectdefinitionsobjecttypescontactdefinition "contacts"
+ *        that should be notified whenever there are problems (or
  *        recoveries) with this host. Multiple contacts should be separated
  *        by commas. Useful if you want notifications to go to just a few
- *        people and don't want to configure @link #contactgroup contact
- *        groups @endlink. You must specify at least one contact or contact
+ *        people and don't want to configure @ref objectdefinitionsobjecttypescontactgroupdefinition "contact
+ *        groups". You must specify at least one contact or contact
  *        group in each host escalation definition.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>contact_groups</td>
  *      <td>
- *        This directive is used to identify the short name of the @link
- *        #contactgroup contact group @endlink that should be notified when
+ *        This directive is used to identify the short name of the
+ *        @ref objectdefinitionsobjecttypescontactgroupdefinition "contact group" that should be notified when
  *        the host notification is escalated. Multiple contact groups should
  *        be separated by commas. You must specify at least one contact or
  *        contact group in each host escalation definition.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>notification_interval</td>
  *      <td>
  *        This directive is used to determine the interval at which
@@ -2383,14 +2541,16 @@
  *        escalation entries is used.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>escalation_period</td>
  *      <td>
- *        This directive is used to specify the short name of the @link
- *        #timeperiod time period @endlink during which this escalation is
+ *        This directive is used to specify the short name of the
+ *        @ref objectdefinitionsobjecttypestimeperioddefinition "time period" during which this escalation is
  *        valid. If this directive is not specified, the escalation is
  *        considered to be valid during all times.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>escalation_options</td>
  *      <td>
  *        This directive is used to define the criteria that determine when
@@ -2418,8 +2578,8 @@
  *  no effect on monitoring and are completely optional.
  *
  *  @note Tip: As of Centron Scheduler 3.x, all directives contained in
- *  extended host information definitions are also available in @link
- *  #host host definitions @endlink. Thus, you can choose to define the
+ *  extended host information definitions are also available in
+ *  @ref objectdefinitionsobjecttypeshostdefinition "host definitions". Thus, you can choose to define the
  *  directives below in your host definitions if it makes your
  *  configuration simpler. Separate extended host information
  *  definitions will continue to be supported for backward
@@ -2470,10 +2630,11 @@
  *    <tr>
  *      <td>host_name</td>
  *      <td>
- *        This variable is used to identify the short name of the @link #host
- *        host @endlink which the data is associated with.
+ *        This variable is used to identify the short name of the @ref objectdefinitionsobjecttypeshostdefinition
+ *        "host" which the data is associated with.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>notes</td>
  *      <td>
  *        This directive is used to define an optional string of notes
@@ -2483,6 +2644,7 @@
  *        host).
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>notes_url</td>
  *      <td>
  *        This variable is used to define an optional URL that can be used to
@@ -2497,6 +2659,7 @@
  *        etc. available to other support staff.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>action_url</td>
  *      <td>
  *        This directive is used to define an optional URL that can be used
@@ -2509,6 +2672,7 @@
  *        /cgi-bin/centscheduler/).
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>icon_image</td>
  *      <td>
  *        This variable is used to define the name of a GIF, PNG, or JPG
@@ -2521,28 +2685,31 @@
  *        /usr/local/centscheduler/share/images/logos).
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>icon_image_alt</td>
  *      <td>
  *        This variable is used to define an optional string that is used in
- *        the ALT tag of the image specified by the <icon_image>
+ *        the ALT tag of the image specified by the \<icon_image\>
  *        argument. The ALT tag is used in the @link cgis.html#status_cgi
  *        status @endlink, @link cgis.html#extinfo_cgi extended information
  *        @endlink and @link cgis.html#statusmap_cgi statusmap @endlink CGIs.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>vrml_image</td>
  *      <td>
  *        This variable is used to define the name of a GIF, PNG, or JPG
  *        image that should be associated with this host. This image will be
  *        used as the texture map for the specified host in the @link
  *        cgis.html#statuswrl_cgi statuswrl @endlink CGI. Unlike the image
- *        you use for the <icon_image> variable, this one should
+ *        you use for the \<icon_image\> variable, this one should
  *        probably not have any transparency. If it does, the host object
  *        will look a bit wierd. Images for hosts are assumed to be in the
  *        logos/ subdirectory in your HTML images directory (i.e.
  *        /usr/local/centscheduler/share/images/logos).
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>statusmap_image</td>
  *      <td>
  *        This variable is used to define the name of an image that should be
@@ -2552,8 +2719,8 @@
  *        image, as other image formats will result in a lot of wasted CPU
  *        time when the statusmap image is generated. GD2 images can be
  *        created from PNG images by using the pngtogd2 utility supplied with
- *        Thomas Boutell's @link http://www.boutell.com/gd/ gd library
- *        @endlink. The GD2 images should be created in uncompressed format
+ *        Thomas Boutell's <a href="http://www.boutell.com/gd/">gd library</a>.
+ *        The GD2 images should be created in uncompressed format
  *        in order to minimize CPU load when the statusmap CGI is generating
  *        the network map image. The image will look best if it is 40x40
  *        pixels in size. You can leave these option blank if you are not
@@ -2562,6 +2729,7 @@
  *        /usr/local/centscheduler/share/images/logos).
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>2d_coords</td>
  *      <td>
  *        This variable is used to define coordinates to use when drawing the
@@ -2580,6 +2748,7 @@
  *        creates based on the largest x and y coordinates you specify.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>3d_coords</td>
  *      <td>
  *        This variable is used to define coordinates to use when drawing the
@@ -2604,7 +2773,7 @@
  *
  *  @note Tip: As of Centron Scheduler 3.x, all directives contained in
  *  extended service information definitions are also available in
- *  @link #service service definitions @endlink. Thus, you can choose
+ *  @ref objectdefinitionsobjecttypesservicedefinitionservice "service definitions". Thus, you can choose
  *  to define the directives below in your service definitions if it
  *  makes your configuration simpler. Separate extended service
  *  information definitions will continue to be supported for backward
@@ -2650,15 +2819,17 @@
  *      <td>host_name</td>
  *      <td>
  *        This directive is used to identify the short name of the host that
- *        the @link #service service @endlink is associated with.
+ *        the @ref objectdefinitionsobjecttypesservicedefinitionservice "service" is associated with.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>service_description</td>
  *      <td>
- *        This directive is description of the @link #service service
- *        @endlink which the data is associated with.
+ *        This directive is description of the @ref objectdefinitionsobjecttypesservicedefinitionservice
+ *        "service" which the data is associated with.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>notes</td>
  *      <td>
  *        This directive is used to define an optional string of notes
@@ -2668,6 +2839,7 @@
  *        service).
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>notes_url</td>
  *      <td>
  *        This directive is used to define an optional URL that can be used
@@ -2682,6 +2854,7 @@
  *        methods, etc. available to other support staff.
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>action_url</td>
  *      <td>
  *        This directive is used to define an optional URL that can be used
@@ -2694,6 +2867,7 @@
  *        the CGIs (i.e. /cgi-bin/centscheduler/).
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>icon_image</td>
  *      <td>
  *        This variable is used to define the name of a GIF, PNG, or JPG
@@ -2706,10 +2880,11 @@
  *        /usr/local/centscheduler/share/images/logos).
  *      </td>
  *    </tr>
+ *    <tr>
  *      <td>icon_image_alt</td>
  *      <td>
  *        This variable is used to define an optional string that is used in
- *        the ALT tag of the image specified by the <icon_image>
+ *        the ALT tag of the image specified by the \<icon_image\>
  *        argument. The ALT tag is used in the @link cgis.html#status_cgi
  *        status @endlink, @link cgis.html#extinfo_cgi extended information
  *        @endlink and @link cgis.html#statusmap_cgi statusmap @endlink CGIs.

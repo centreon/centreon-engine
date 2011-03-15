@@ -3,7 +3,7 @@
  *  @section objectinheritanceintroduction Introduction
  *
  *  This documentation attempts to explain object inheritance and how
- *  it can be used in your @link objectdefinitions.html object
+ *  it can be used in your @link objectdefinitions object
  *  definitions @endlink.
  *
  *  If you are confused about how recursion and inheritance work after
@@ -104,7 +104,7 @@
  *
  *  @note Tip: If you would like local string variables to be appended to
  *  inherited string values, you can do so. Read more about how to
- *  accomplish this @link #add_string below @endlink.
+ *  accomplish this @ref objectinheritanceadditiveinheritanceofstringvalues "below".
  *
  *  @section objectinheritanceinheritancechaining Inheritance Chaining
  *
@@ -251,7 +251,7 @@
  *  @section objectinheritancecustomobjectvariables Custom Object
  *  Variables
  *
- *  Any @link customobjectvars.html custom object variables @endlink
+ *  Any @link customobjectvariables custom object variables @endlink
  *  that you define in your host, service, or contact definition
  *  templates will be inherited just like other standard variables.
  *  Take the following example:
@@ -393,10 +393,12 @@
  *      <td>contact_groups in the associated host definition</td>
  *    </tr>
  *    <tr>
+ *      <td>Services</td>
  *      <td>notification_interval</td>
  *      <td>notification_interval in the associated host definition</td>
  *    </tr>
  *    <tr>
+ *      <td>Services</td>
  *      <td>notification_period</td>
  *      <td>notification_period in the associated host definition</td>
  *    </tr>
@@ -406,10 +408,12 @@
  *      <td>contact_groups in the associated host definition</td>
  *    </tr>
  *    <tr>
+ *      <td>Host Escalations</td>
  *      <td>notification_interval</td>
  *      <td>notification_interval in the associated host definition</td>
  *    </tr>
  *    <tr>
+ *      <td>Host Escalations</td>
  *      <td>escalation_period</td>
  *      <td>notification_period in the associated host definition</td>
  *    </tr>
@@ -419,10 +423,12 @@
  *      <td>contact_groups in the associated service definition</td>
  *    </tr>
  *    <tr>
+ *      <td>Service Escalations</td>
  *      <td>notification_interval</td>
  *      <td>notification_interval in the associated service definition</td>
  *    </tr>
  *    <tr>
+ *      <td>Service Escalations</td>
  *      <td>escalation_period</td>
  *      <td>notification_period in the associated service definition</td>
  *    </tr>

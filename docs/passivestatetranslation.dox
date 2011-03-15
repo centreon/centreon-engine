@@ -62,9 +62,9 @@
  *  to enable this feature if you need and want it.
  *
  *  The automatic translation of passive host check states is
- *  controlled by the @link
- *  configmain.html#translate_passive_host_checks
- *  translate_passive_host_checks @endlink variable. Enable it and
+ *  controlled by the @ref
+ *  mainconfigurationfileoptionsconfigurationfilevariablestranslatepassivehostchecksoption
+ *  "translate_passive_host_checks" variable. Enable it and
  *  Centron Scheduler will automatically translate DOWN and UNREACHABLE
  *  states from remote sources to their correct state for the local
  *  instance of Centron Scheduler.

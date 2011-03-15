@@ -2,7 +2,7 @@
  *  @page predictivedependencychecks Predictive Dependency Checks
  *  @section predictivedependencychecksintroduction Introduction
  *
- *  Host and service @link dependencies.html dependencies @endlink can
+ *  Host and service @link hostandservicedependencies dependencies @endlink can
  *  be defined to allow you greater control over when checks are
  *  executed and when notifications are sent out. As dependencies are
  *  used to control basic aspects of the monitoring process, it is
@@ -26,7 +26,7 @@
  *  whether the host is DOWN or UNREACHABLE, so it will launch parallel
  *  checks of Switch2's immediate parents (Firewall1) and children
  *  (Comp1, Comp2, and Switch3). This is a normal function of the @link
- *  networkreachability.html host reachability @endlink logic.
+ *  determiningstatusandreachabilityofnetworkhosts host reachability @endlink logic.
  *
  *  You will also notice that Switch2 is depending on Monitor1 and
  *  File1 for either notifications or check execution (which one is
@@ -55,12 +55,12 @@
  *  the extra overhead imposed by these checks.
  *
  *  Enabling predictive dependency checks is easy:
- *  - Predictive host dependency checks are controlled by the @link
- *  configmain.html#enable_predictive_host_dependency_checks
- *  enable_predictive_host_dependency_checks @endlink option.
- *  - Predictive service dependency checks are controlled by the @link
- *  configmain.html#enable_predictive_service_dependency_checks
- *  enable_predictive_service_dependency_checks @endlink option.
+ *  - Predictive host dependency checks are controlled by the
+ *  @ref mainconfigurationfileoptionsconfigurationfilevariablespredictivehostdependencychecksoption
+ *  "enable_predictive_host_dependency_checks" option.
+ *  - Predictive service dependency checks are controlled by the @ref
+ *  mainconfigurationfileoptionsconfigurationfilevariablespredictiveservicedependencychecksoption
+ *  "enable_predictive_service_dependency_checks" option.
  *
  *  @section predictivedependencycheckscachedchecks Cached Checks
  *

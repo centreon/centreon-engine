@@ -22,12 +22,12 @@
  *  from its scheduled execution time) and the number of seconds a host
  *  or service check took to execute. This type of performance data is
  *  available for all checks that are performed. The @link
- *  macrolist.html#hostexecutiontime $HOSTEXECUTIONTIME$ @endlink and
- *  @link macrolist.html#serviceexecutiontime $SERVICEEXECUTIONTIME$
- *  @endlink @link macros.html macros @endlink can be used to determine
+ *  standardmacrosincentscheduler#hostexecutiontime $HOSTEXECUTIONTIME$ @endlink and
+ *  @link standardmacrosincentscheduler#serviceexecutiontime $SERVICEEXECUTIONTIME$
+ *  @endlink @link understandingmacrosandhowtheywork macros @endlink can be used to determine
  *  the number of seconds a host or service check was running and the
- *  @link macrolist.html#hostlatency $HOSTLATENCY$ @endlink and @link
- *  macrolist.html#servicelatency $SERVICELATENCY$ @endlink macros can
+ *  @link standardmacrosincentscheduler#hostlatency $HOSTLATENCY$ @endlink and @link
+ *  standardmacrosincentscheduler#servicelatency $SERVICELATENCY$ @endlink macros can
  *  be used to determine how "late" a regularly-scheduled host or
  *  service check was.
  *
@@ -38,9 +38,9 @@
  *  that the plugin is measuring when it executes. Plugin-specific
  *  performance data is optional and may not be supported by all
  *  plugins. Plugin-specific performance data (if available) can be
- *  obtained by using the @link macrolist.html#hostperfdata
- *  $HOSTPERFDATA$ @endlink and @link macrolist.html#serviceperfdata
- *  $SERVICEPERFDATA$ @endlink @link macros.html macros @endlink. Read
+ *  obtained by using the @link standardmacrosincentscheduler#hostperfdata
+ *  $HOSTPERFDATA$ @endlink and @link standardmacrosincentscheduler#serviceperfdata
+ *  $SERVICEPERFDATA$ @endlink @link understandingmacrosandhowtheywork macros @endlink. Read
  *  on for more information on how plugins can return performance data
  *  to Centron Scheduler for inclusion in the $HOSTPERFDATA$ and
  *  $SERVICEPERFDATA$ macros.
@@ -57,7 +57,7 @@
  *  @endcode
  *
  *  With this simple type of output, the entire line of text is
- *  available in the $HOSTOUTPUT$ or $SERVICEOUTPUT$ @link macros.html
+ *  available in the $HOSTOUTPUT$ or $SERVICEOUTPUT$ @link understandingmacrosandhowtheywork
  *  macros @endlink (depending on whether this plugin was used as a
  *  host check or service check).
  *
@@ -90,7 +90,7 @@
  *
  *  Multiple lines of performace data (as well as normal text output)
  *  can be obtained from plugins, as described in the @link
- *  pluginapi.html plugin API documentation @endlink.
+ *  centschedulerpluginapi plugin API documentation @endlink.
  *
  *  @note The Centron Scheduler daemon doesn't directly process plugin
  *  performance data, so it doesn't really care what the performance
@@ -105,8 +105,8 @@
  *
  *  If you want to process the performance data that is available from
  *  Centron Scheduler and the plugins, you'll need to do the following:
- *  - Enable the @link configmain.html#process_performance_data
- *  process_performance_data @endlink option.
+ *  - Enable the @ref mainconfigurationfileoptionsconfigurationfilevariablesperformancedataprocessingoption
+ *  "process_performance_data" option.
  *  - Configure Centron Scheduler so that performance data is either
  *  written to files and/or processed by executing commands.
  *
@@ -119,10 +119,10 @@
  *  Centron Scheduler execute commands (that you specify) to process or
  *  redirect the data for later processing by external applications.
  *  The commands that Centron Scheduler executes to process host and
- *  service performance data are determined by the @link
- *  configmain.html#host_perfdata_command host_perfdata_command
- *  @endlink and @link configmain.html#service_perfdata_command
- *  service_perfdata_command @endlink options, respectively.
+ *  service performance data are determined by the
+ *  @ref mainconfigurationfileoptionsconfigurationfilevariableshostperformancedataprocessingcommand
+ *  "host_perfdata_command" and @ref mainconfigurationfileoptionsconfigurationfilevariablesserviceperformancedataprocessingcommand
+ *  "service_perfdata_command" options, respectively.
  *
  *  An example command definition that redirects service check
  *  performance data to a text file for later processing by another
@@ -145,15 +145,16 @@
  *  @section performancedatawritingperformancedatatofiles Writing Performance Data To Files
  *
  *  You can have Centron Scheduler write all host and service
- *  performance data directly to text files using the @link
- *  configmain.html#host_perfdata_file host_perfdata_file @endlink and
- *  @link configmain.html#service_perfdata_file service_perfdata_file
- *  @endlink options. The format in which host and service performance
- *  data is written to those files is determined by the @link
- *  configmain.html#host_perfdata_file_template
- *  host_perfdata_file_template @endlink and @link
- *  configmain.html#service_perfdata_file_template
- *  service_perfdata_file_template @endlink options.
+ *  performance data directly to text files using the
+ *  @ref mainconfigurationfileoptionsconfigurationfilevariableshostperformancedatafile
+ *  "host_perfdata_file" and
+ *  @ref mainconfigurationfileoptionsconfigurationfilevariablesserviceperformancedatafile
+ *  "service_perfdata_file" options. The format in which host and service performance
+ *  data is written to those files is determined by the
+ *  @ref mainconfigurationfileoptionsconfigurationfilevariableshostperformancedatafile
+ *  "template host_perfdata_file_template" and
+ *  @ref mainconfigurationfileoptionsconfigurationfilevariablesserviceperformancedatafiletemplate
+ *  "service_perfdata_file_template" options.
  *
  *  An example file format template for service performance data might
  *  look like this:
@@ -164,23 +165,23 @@
  *
  *  By default, the text files will be opened in "append" mode. If you
  *  need to change the modes to "write" or "non-blocking read/write"
- *  (useful when writing to pipes), you can use the @link
- *  configmain.html#host_perfdata_file_mode host_perfdata_file_mode
- *  @endlink and @link configmain.html#service_perfdata_file_mode
- *  service_perfdata_file_mode @endlink options.
+ *  (useful when writing to pipes), you can use the
+ *  @ref mainconfigurationfileoptionsconfigurationfilevariableshostperformancedatafilemode
+ *  "host_perfdata_file_mode" and
+ *  @ref mainconfigurationfileoptionsconfigurationfilevariablesserviceperformancedatafilemode
+ *  "service_perfdata_file_mode" options.
  *
  *  Additionally, you can have Centron Scheduler periodically execute
  *  commands to periocially process the performance data files (e.g.
- *  rotate them) using the @link
- *  configmain.html#host_perfdata_file_processing_command
- *  host_perfdata_file_processing_command @endlink and @link
- *  configmain.html#service_perfdata_file_processing_command
- *  service_perfdata_file_processing_command @endlink options. The
+ *  rotate them) using the
+ *  @ref mainconfigurationfileoptionsconfigurationfilevariableshostperformancedatafileprocessingcommand
+ *  "host_perfdata_file_processing_command" and
+ *  @ref mainconfigurationfileoptionsconfigurationfilevariablesserviceperformancedatafileprocessingcommand
+ *  "service_perfdata_file_processing_command" options. The
  *  interval at which these commands are executed are governed by the
- *  @link configmain.html#host_perfdata_file_processing_interval
- *  host_perfdata_file_processing_interval @endlink and @link
- *  configmain.html#service_perfdata_file_processing_interval
- *  service_perfdata_file_processing_interval @endlink options,
- *  respectively.
+ *  @ref mainconfigurationfileoptionsconfigurationfilevariableshostperformancedatafileprocessinginterval
+ *  "host_perfdata_file_processing_interval" and
+ *  @ref mainconfigurationfileoptionsconfigurationfilevariablesserviceperformancedatafileprocessinginterval
+ *  "service_perfdata_file_processing_interval" options, respectively.
  */
 

@@ -37,7 +37,7 @@
  *
  *  @section developingpluginsforusewithembeddedperlthingsyoumustdotodevelopaperlpluginforepn Things you must do to develop a Perl plugin for ePN
  *
- *  1. <DATA> can not be used; use here documents instead e.g.
+ *  1. \<DATA\> can not be used; use here documents instead e.g.
  *
  *  @code
  *  my $data = <<DATA;
@@ -66,9 +66,9 @@
  *  when the check is run. Such subroutines act as 'closures' that lock
  *  the global lexicals first value into subsequent calls of the
  *  subroutine. If however, your global is read-only (a complicated
- *  structure for example) this is not a problem. What Bekman @link
- *  http://perl.apache.org/docs/1.0/guide/ recommends you do instead
- *  @endlink, is any of the following:
+ *  structure for example) this is not a problem. What Bekman
+ *  <a href="http://perl.apache.org/docs/1.0/guide/">recommends you do
+ *  instead</a>, is any of the following:
  *
  *  - make the subroutine anonymous and call it via a code ref e.g.
  *
@@ -136,10 +136,10 @@
  *
  *  As you can see below p1.pl rewrites your plugin as a subroutine
  *  called 'hndlr' in the package named
- *  'Embed::<something_related_to_your_plugin_file_name>'.
+ *  'Embed::\<something_related_to_your_plugin_file_name\>'.
  *
- *  Your plugin may be expecting command line arguments in @ARGV so
- *  pl.pl also assigns @_ to @ARGV.
+ *  Your plugin may be expecting command line arguments in \@ARGV so
+ *  pl.pl also assigns \@_ to \@ARGV.
  *
  *  This in turn gets 'eval' ed and if the eval raises an error (any
  *  parse error and run error), the plugin gets chucked out.

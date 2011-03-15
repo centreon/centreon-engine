@@ -38,8 +38,8 @@
  *  Scheduler. There are already a lot of plugins that have been
  *  created in order to monitor basic resources such as processor load,
  *  disk usage, ping rates, etc. If you want to monitor something else,
- *  take a look at the documentation on @link pluginapi writing plugins
- *  @endlink and roll your own. Its simple!
+ *  take a look at the documentation on @link centschedulerpluginapi
+ *  writing plugins @endlink and roll your own. Its simple!
  *
  *  The downside to this type of plugin architecture is the fact that
  *  Centron Scheduler has absolutely no idea what it is that you're
@@ -90,6 +90,6 @@
  *
  *  You can find information on the technical aspects of plugins, as
  *  well as how to go about creating your own custom plugins @link
- *  pluginapi here @endlink.
+ *  centschedulerpluginapi here @endlink.
  */
 

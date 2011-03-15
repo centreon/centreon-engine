@@ -1,6 +1,6 @@
 /**
  *  @page activechecks Active Checks
- *  @subsection activechecksintroduction Introduction
+ *  @section activechecksintroduction Introduction
  *
  *  Centron Scheduler is capable of monitoring hosts and services in
  *  two ways: actively and passively. Passive checks are described
@@ -14,7 +14,7 @@
  *
  *  @dotfile activechecks.png
  *
- *  @subsection activecheckshowareactivechecksperformed How Are Active Checks Performed?
+ *  @section activecheckshowareactivechecksperformed How Are Active Checks Performed?
  *
  *  Active checks are initiated by the check logic in the Centron
  *  Scheduler daemon. When Centron Scheduler needs to check the status
@@ -29,7 +29,7 @@
  *  More information on how plugins work can be found @link plugins here
  *  @endlink.
  *
- *  @subsection activecheckswhenareactivechecksexecuted When Are Active Checks Executed?
+ *  @section activecheckswhenareactivechecksexecuted When Are Active Checks Executed?
  *
  *  Active check are executed:
  *
@@ -48,10 +48,10 @@
  *  On-demand checks are performed whenever Centron Scheduler sees a
  *  need to obtain the latest status information about a particular
  *  host or service. For example, when Centron Scheduler is determining
- *  the @link networkreachability reachability @endlink of a host, it
+ *  the @link determiningstatusandreachabilityofnetworkhosts reachability @endlink of a host, it
  *  will often perform on-demand checks of parent and child hosts to
  *  accurately determine the status of a particular network segment.
- *  On-demand checks also occur in the @link dependencychecks predictive
+ *  On-demand checks also occur in the @link predictivedependencychecks predictive
  *  dependency check @endlink logic in order to ensure Centron Scheduler
  *  has the most accurate status information.
  */

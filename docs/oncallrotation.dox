@@ -318,7 +318,7 @@
  *
  *  There are a lot of other on-call notification rotation scenarios
  *  that you might have. The date exception directive in @link
- *  objectdefinitions.html#timeperiod timeperiod definitions @endlink
+ *  objectdefinitions#timeperiod timeperiod definitions @endlink
  *  is capable of handling most dates and date ranges that you might
  *  need to use, so check out the different formats that you can use.
  *  If you make a mistake when creating timeperiod definitions, always

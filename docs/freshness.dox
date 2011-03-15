@@ -10,7 +10,7 @@
  *  Freshness checking is useful when you want to ensure that @link
  *  passivechecks.html passive checks @endlink are being received as
  *  frequently as you want. This can be very useful in @link
- *  distributed.html distributed @endlink and @link redundancy.html
+ *  distributedmonitoring distributed @endlink and @link redundantandfailovernetworkmonitoring
  *  failover @endlink monitoring environments.
  *
  *  @dotfile freshness.png
@@ -39,14 +39,14 @@
  *  @section serviceandhostfreshnesschecksenablingfreshnesschecking Enabling Freshness Checking
  *
  *  Here's what you need to do to enable freshness checking...
- *  - Enable freshness checking on a program-wide basis with the @link
- *  configmain.html#check_service_freshness check_service_freshness
- *  @endlink and @link configmain.html#check_host_freshness
- *  check_host_freshness @endlink directives.
- *  - Use @link configmain.html#service_freshness_check_interval
- *  service_freshness_check_interval @endlink and @link
- *  configmain.html#host_freshness_check_interval
- *  host_freshness_check_interval @endlink options to tell Centron
+ *  - Enable freshness checking on a program-wide basis with the
+ *  @ref mainconfigurationfileoptionsconfigurationfilevariablesservicefreshnesscheckingoption
+ *  "check_service_freshness" and @ref mainconfigurationfileoptionsconfigurationfilevariableshostfreshnesscheckingoption
+ *  "check_host_freshness" directives.
+ *  - Use @ref mainconfigurationfileoptionsconfigurationfilevariablesservicefreshnesscheckinterval
+ *  "service_freshness_check_interval" and
+ *  @ref mainconfigurationfileoptionsconfigurationfilevariableshostfreshnesscheckinterval
+ *  "host_freshness_check_interval" options to tell Centron
  *  Scheduler how often in should check the freshness of service and
  *  host results.
  *  - Enable freshness checking on a host- and service-specific basis

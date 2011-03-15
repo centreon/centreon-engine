@@ -15,9 +15,9 @@
  *  - ...and much more
  *
  *  You can find many addons for Centron Scheduler by visiting:
- *  - @link http://XXX/ Centron Scheduler.org @endlink
- *  - @link http://XXX SourceForge.net @endlink
- *  - @link http://XXX Centron SchedulerExchange.org @endlink
+ *  - <a href="http://XXX">Centron Scheduler.org</a>
+ *  - <a href="http://XXX">SourceForge.net</a>
+ *  - <a href="http://XXX">Centron SchedulerExchange.org</a>
  *
  *  I'll give a brief introduction to a few of the addons that I've
  *  developed for Centron Scheduler...
@@ -44,9 +44,9 @@
  *  NSCA is an addon that allows you to send @link passivechecks.html
  *  passive check @endlink results from remote Linux/Unix hosts to the
  *  Centron Scheduler daemon running on the monitoring server. This is
- *  very useful in @link distributed.html distributed @endlink and
- *  @link redundancy.html redundant/failover @endlink monitoring
- *  setups.
+ *  very useful in @link distributedmonitoring distributed @endlink and
+ *  @link redundantandfailovernetworkmonitoring redundant/failover
+ *  @endlink monitoring setups.
  *
  *  The NSCA addon can be found at http://XXX/.
  *
@@ -67,8 +67,7 @@
  *  @section centscheduleraddonscentschedulerexchangehundredsofotheraddons Centron Scheduler Exchange - Hundreds of Other Addons
  *
  *  Hundreds of community-developed Centron Scheduler addons can be
- *  found on the Centron Scheduler Exchange website at @link
- *  http://XXX exchange.centscheduler.org
- *  @endlink.
+ *  found on the Centron Scheduler Exchange website at
+ *  <a hre="http://XXX">exchange.centscheduler.org</a>
  */
 

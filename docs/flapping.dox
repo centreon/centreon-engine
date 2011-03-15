@@ -154,23 +154,24 @@
  *    <tr>
  *      <td>Host</td>
  *      <td>
- *        @link configmain.html#low_host_flap_threshold low_host_flap_threshold @endlink
- *        @link configmain.html#high_host_flap_threshold high_host_flap_threshold @endlink
+ *        @ref mainconfigurationfileoptionsconfigurationfilevariableslowhostflapthreshold "low_host_flap_threshold"
+ *        @ref mainconfigurationfileoptionsconfigurationfilevariableshighhostflapthreshold "high_host_flap_threshold"
  *      </td>
  *      <td>
- *        @link objectdefinitions.html#host low_flap_threshold @endlink
- *        @link objectdefinitions.html#host high_flap_threshold @endlink
+ *        @link objectdefinitions#host low_flap_threshold @endlink
+ *        @link objectdefinitions#host high_flap_threshold @endlink
  *      </td>
  *    </tr>
  *    <tr>
  *      <td>Service</td>
  *      <td>
- *        @link configmain.html#low_service_flap_threshold low_service_flap_threshold @endlink
- *        @link configmain.html#high_service_flap_threshold high_service_flap_threshold @endlink
+ *        @ref mainconfigurationfileoptionsconfigurationfilevariableslowserviceflapthreshold "low_service_flap_threshold"
+ *        @ref mainconfigurationfileoptionsconfigurationfilevariableshighserviceflapthreshold
+ * 	  "high_service_flap_threshold"
  *      </td>
  *      <td>
- *        @link objectdefinitions.html#service low_flap_threshold @endlink
- *        @link objectdefinitions.html#service high_flap_threshold @endlink
+ *        @link objectdefinitions#service low_flap_threshold @endlink
+ *        @link objectdefinitions#service high_flap_threshold @endlink
  *      </td>
  *    </tr>
  *  </table>
@@ -217,14 +218,14 @@
  *
  *  In order to enable the flap detection features in Centron
  *  Scheduler, you'll need to:
- *  - Set @link configmain.html#enable_flap_detection
- *  enable_flap_detection @endlink directive is set to 1.
+ *  - Set @ref mainconfigurationfileoptionsconfigurationfilevariablesflapdetectionoption
+ *  "enable_flap_detection" directive is set to 1.
  *  - Set the flap_detection_enabled directive in your host and service
  *  definitions is set to 1.
  *
  *  If you want to disable flap detection on a global basis, set the
- *  @link configmain.html#enable_flap_detection enable_flap_detection
- *  @endlink directive to 0.
+ *  @ref mainconfigurationfileoptionsconfigurationfilevariablesflapdetectionoption
+ *  "enable_flap_detection" directive to 0.
  *
  *  If you would like to disable flap detection for just a few hosts or
  *  services, use the flap_detection_enabled directive in the host

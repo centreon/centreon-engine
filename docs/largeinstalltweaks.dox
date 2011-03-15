@@ -3,22 +3,22 @@
  *  @section largeinstallationtweaksintroduction Introduction
  *
  *  Users with large Centron Scheduler installations may benefit from
- *  the @link configmain.html#use_large_installation_tweaks
- *  use_large_installation_tweaks @endlink configuration option.
+ *  the @ref mainconfigurationfileoptionsconfigurationfilevariableslargeinstallationtweaksoption
+ *  "use_large_installation_tweaks" configuration option.
  *  Enabling this option allows the Centron Scheduler daemon to take
  *  certain shortcuts which result in lower system load and better
  *  performance.
  *
  *  @section largeinstallationtweakseffects Effects
  *
- *  When you enable the @link
- *  configmain.html#use_large_installation_tweaks
- *  use_large_installation_tweaks @endlink option in your main Centron
+ *  When you enable the
+ *  @ref mainconfigurationfileoptionsconfigurationfilevariableslargeinstallationtweaksoption
+ *  "use_large_installation_tweaks" option in your main Centron
  *  Scheduler config file, several changes are made to the way the
  *  Centron Scheduler daemon operates:
  *
  *  - No Summary Macros In Environment Variables - The @link
- *  macrolist.html#summary_macros summary macros @endlink will not be
+ *  standardmacrosincentscheduler#summary_macros summary macros @endlink will not be
  *  available to you as environment variables. Calculating the values
  *  of these macros can be quite time-intensive in large
  *  configurations, so they are not available as environment variables

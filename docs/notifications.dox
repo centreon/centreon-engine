@@ -8,7 +8,7 @@
  *  This will attempt to explain exactly when and how host and service
  *  notifications are sent out, as well as who receives them.
  *
- *  Notification escalations are explained @link escalations.html here
+ *  Notification escalations are explained @link notificationescalations here
  *  @endlink.
  *
  *  @section notificationswhendonotificationsoccur When Do Notifications Occur?
@@ -52,8 +52,9 @@
  *
  *  The first filter that notifications must pass is a test of whether
  *  or not notifications are enabled on a program-wide basis. This is
- *  initially determined by the @link
- *  configmain.html#enable_notifications enable_notifications @endlink
+ *  initially determined by the
+ *  @ref mainconfigurationfileoptionsconfigurationfilevariablesnotificationsoption
+ *  "enable_notifications"
  *  directive in the main config file, but may be changed during
  *  runtime from the web interface. If notifications are disabled on a
  *  program-wide basis, no host or service notifications can be sent
@@ -63,7 +64,7 @@
  *  @section notificationsserviceandhostfilters Service and Host Filters:
  *
  *  The first filter for host or service notifications is a check to
- *  see if the host or service is in a period of @link downtime.html
+ *  see if the host or service is in a period of @link scheduleddowntime
  *  scheduled downtime @endlink. If it is in a scheduled downtime, no
  *  one gets notified. If it isn't in a period of downtime, it gets
  *  passed on to the next filter. As a side note, notifications for
@@ -71,7 +72,7 @@
  *  period of scheduled downtime.
  *
  *  The second filter for host or service notification is a check to
- *  see if the host or service is @link flapping.html flapping @endlink
+ *  see if the host or service is @link detectionandhandlingofstateflapping flapping @endlink
  *  (if you enabled flap detection). If the service or host is
  *  currently flapping, no one gets notified. Otherwise it gets passed
  *  to the next filter.
@@ -123,7 +124,7 @@
  *
  *  At this point the notification has passed the program mode filter
  *  and all host or service filters and Centron Scheduler starts to
- *  notify @link objectdefinitions.html#contact all the people it
+ *  notify @link objectdefinitions#contact all the people it
  *  should @endlink. Does this mean that each contact is going to
  *  receive the notification? No! Each contact has their own set of
  *  filters that the notification must pass before they receive it.
@@ -159,12 +160,12 @@
  *  recoveries pretty much anyway you want: pager, cellphone, email,
  *  instant message, audio alert, electric shocker, etc. How
  *  notifications are sent depend on the @link
- *  objectdefinitions.html#command notification commands @endlink that
- *  are defined in your @link config.html object definition files
+ *  objectdefinitions#command notification commands @endlink that
+ *  are defined in your @link configurationoverview object definition files
  *  @endlink.
  *
  *  @note If you install Centron Scheduler according to the @link
- *  quickstart.html quickstart guide @endlink, it should be configured
+ *  quickstartinstallationguides quickstart guide @endlink, it should be configured
  *  to send email notifications. You can see the email notification
  *  commands that are used by viewing the contents of the following
  *  file: /usr/local/centscheduler/etc/objects/commands.cfg.
@@ -187,7 +188,7 @@
  *
  *  When crafting your notification commands, you need to take into
  *  account what type of notification is occurring. The @link
- *  macrolist.html#notificationtype $NOTIFICATIONTYPE$ @endlink macro
+ *  standardmacrosincentscheduler#notificationtype $NOTIFICATIONTYPE$ @endlink macro
  *  contains a string that identifies exactly that. The table below
  *  lists the possible values for the macro and their respective
  *  descriptions:
@@ -228,21 +229,21 @@
  *    <tr>
  *      <td>FLAPPINGSTART</td>
  *      <td>
- *        The host or service has just started @link flapping.html
+ *        The host or service has just started @link detectionandhandlingofstateflapping
  *        flapping @endlink.
  *      </td>
  *    </tr>
  *    <tr>
  *      <td>FLAPPINGSTOP</td>
  *      <td>
- *        The host or service has just stopped @link flapping.html
+ *        The host or service has just stopped @link detectionandhandlingofstateflapping
  *        flapping @endlink.
  *      </td>
  *    </tr>
  *    <tr>
  *      <td>FLAPPINGDISABLED</td>
  *      <td>
- *        The host or service has just stopped @link flapping.html
+ *        The host or service has just stopped @link detectionandhandlingofstateflapping
  *        flapping @endlink because flap detection was disabled..
  *      </td>
  *    </tr>
@@ -250,7 +251,7 @@
  *      <td>DOWNTIMESTART</td>
  *      <td>
  *        The host or service has just entereda period of @link
- *        downtime.html scheduled downtime @endlink. Future
+ *        scheduleddowntime scheduled downtime @endlink. Future
  *        notifications will be supressed.
  *      </td>
  *    </tr>
@@ -258,14 +259,14 @@
  *      <td>DOWNTIMESTOP</td>
  *      <td>
  *        The host or service has just exited from a period of @link
- *        downtime.html scheduled downtime @endlink. Notifications about
+ *        scheduleddowntime scheduled downtime @endlink. Notifications about
  *        problems can now resume.
  *      </td>
  *    </tr>
  *    <tr>
  *      <td>DOWNTIMECANCELLED</td>
  *      <td>
- *        The period of @link downtime.html scheduled downtime @endlink
+ *        The period of @link scheduleddowntime scheduled downtime @endlink
  *        for the host or service was just cancelled. Notifications
  *        about problems can now resume.
  *      </td>
@@ -302,23 +303,22 @@
  *  there are network problems). I haven't actually tried these
  *  packages myself, but others have reported success using them...
  *
- *  - @link http://www.gnokii.org/ Gnokii @endlink (SMS software for
+ *  - <a href="http://www.gnokii.org/">Gnokii</a> (SMS software for
  *  contacting Nokia phones via GSM network)
- *  - @link http://www.qpage.org/ QuickPage @endlink (alphanumeric
+ *  - <a href="http://www.qpage.org/">QuickPage</a> (alphanumeric
  *  pager software)
- *  - @link http://www.sendpage.org/ Sendpage @endlink (paging
+ *  - <a href="http://www.sendpage.org/">Sendpage</a> (paging
  *  software)
- *  - @link http://www.smsclient.org/ SMS Client @endlink (command line
+ *  - <a href="http://www.smsclient.org/">SMS Client</a> (command line
  *  utility for sending messages to pagers and mobile phones)
  *
  *  If you want to try out a non-traditional method of notification,
  *  you might want to mess around with audio alerts. If you want to
  *  have audio alerts played on the monitoring server (with synthesized
- *  speech), check out @link
- *  http://www.cstr.ed.ac.uk/projects/festival/ Festival @endlink. If
- *  you'd rather leave the monitoring box alone and have audio alerts
- *  played on another box, check out the @link
- *  http://radscan.com/nas.html Network Audio System (NAS) @endlink and
- *  @link http://rplay.doit.org/ rplay @endlink projects.
+ *  speech), check out <a href="http://www.cstr.ed.ac.uk/projects/festival/">
+ *  Festival</a>. If you'd rather leave the monitoring box alone and
+ *  have audio alerts played on another box, check out the
+ *  <a href="http://radscan.com/nas.html">Network Audio System (NAS)</a>
+ *  and <a href="http://rplay.doit.org/">rplay</a> projects.
  */
 

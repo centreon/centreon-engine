@@ -16,10 +16,10 @@
  *  global service event handler
  *  - Host @link eventhandlers.html event handlers @endlink and/or a
  *  global host event handler
- *  - @link configmain.html#ocsp_command OCSP @endlink command
- *  - @link configmain.html#ochp_command OCHP @endlink command
- *  - Service @link perfdata.html performance data @endlink commands
- *  - Host @link perfdata.html performance data @endlink commands
+ *  - @ref mainconfigurationfileoptionsconfigurationfilevariablesobsessivecompulsiveserviceprocessorcommand "OCSP" command
+ *  - @ref mainconfigurationfileoptionsconfigurationfilevariablesobsessivecompulsivehostprocessorcommand "OCHP" command
+ *  - Service @link performancedata performance data @endlink commands
+ *  - Host @link performancedata performance data @endlink commands
  *
  *  The tables below list all macros currently available in Centron
  *  Scheduler, along with a brief description of each and the types of
@@ -30,8 +30,10 @@
  *
  *  @section standardmacrosincentschedulermacroavailabilitychart Macro Availability Chart
  *
- *  Legend:
  *  <table>
+ *    <tr>
+ *      <th>Legend:</th>
+ *    </tr>
  *    <tr>
  *      <td>No</td>
  *      <td>The macro is not available</td>
@@ -49,8 +51,8 @@
  *      <th>Service Notifications</th>
  *      <th>Host Checks</th>
  *      <th>Host Notifications</th>
- *      <th>Service Event Handlers and @link configmain.html#ocsp_command OCSP @endlink</th>
- *      <th>Host Event Handlers and @link configmain.html#ochp_command OCHP@endlink</th>
+ *      <th>Service Event Handlers and @ref mainconfigurationfileoptionsconfigurationfilevariablesobsessivecompulsiveserviceprocessorcommand "OCSP"</th>
+ *      <th>Host Event Handlers and @ref mainconfigurationfileoptionsconfigurationfilevariablesobsessivecompulsivehostprocessorcommand "OCHP"</th>
  *      <th>Service Perf Data</th>
  *      <th>Host Perf Data</th>
  *    </tr>
@@ -550,8 +552,8 @@
  *      <th>Service Notifications</th>
  *      <th>Host Checks</th>
  *      <th>Host Notifications</th>
- *      <th>Service Event Handlers and @link configmain.html#ocsp_command OCSP @endlink</th>
- *      <th>Host Event Handlers and @link configmain.html#ochp_command OCHP @endlink</th>
+ *      <th>Service Event Handlers and @ref mainconfigurationfileoptionsconfigurationfilevariablesobsessivecompulsiveserviceprocessorcommand "OCSP"</th>
+ *      <th>Host Event Handlers and @ref mainconfigurationfileoptionsconfigurationfilevariablesobsessivecompulsivehostprocessorcommand "OCHP"</th>
  *      <th>Service Perf Data</th>
  *      <th>Host Perf Data</th>
  *    </tr>
@@ -622,8 +624,8 @@
  *      <th>Service Notifications</th>
  *      <th>Host Checks</th>
  *      <th>Host Notifications</th>
- *      <th>Service Event Handlers and @link configmain.html#ocsp_command OCSP @endlink</th>
- *      <th>Host Event Handlers and @link configmain.html#ochp_command OCHP @endlink</th>
+ *      <th>Service Event Handlers and @ref mainconfigurationfileoptionsconfigurationfilevariablesobsessivecompulsiveserviceprocessorcommand "OCSP"</th>
+ *      <th>Host Event Handlers and @ref mainconfigurationfileoptionsconfigurationfilevariablesobsessivecompulsivehostprocessorcommand "OCHP"</th>
  *      <th>Service Perf Data</th>
  *      <th>Host Perf Data</th>
  *    </tr>
@@ -1059,7 +1061,6 @@
  *      <td>@b Yes</td>
  *      <td>No</td>
  *    </tr>
- *    <tr>
  *  </table>
  *
  *  <table>
@@ -1069,8 +1070,8 @@
  *      <th>Service Notifications</th>
  *      <th>Host Checks</th>
  *      <th>Host Notifications</th>
- *      <th>Service Event Handlers and @link configmain.html#ocsp_command OCSP @endlink</th>
- *      <th>Host Event Handlers and @link configmain.html#ochp_command OCHP @endlink</th>
+ *      <th>Service Event Handlers and @ref mainconfigurationfileoptionsconfigurationfilevariablesobsessivecompulsiveserviceprocessorcommand "OCSP"</th>
+ *      <th>Host Event Handlers and @ref mainconfigurationfileoptionsconfigurationfilevariablesobsessivecompulsivehostprocessorcommand "OCHP"</th>
  *      <th>Service Perf Data</th>
  *      <th>Host Perf Data</th>
  *    </tr>
@@ -1141,8 +1142,8 @@
  *      <th>Service Notifications</th>
  *      <th>Host Checks</th>
  *      <th>Host Notifications</th>
- *      <th>Service Event Handlers and @link configmain.html#ocsp_command OCSP @endlink</th>
- *      <th>Host Event Handlers and @link configmain.html#ochp_command OCHP @endlink</th>
+ *      <th>Service Event Handlers and @ref mainconfigurationfileoptionsconfigurationfilevariablesobsessivecompulsiveserviceprocessorcommand "OCSP"</th>
+ *      <th>Host Event Handlers and @ref mainconfigurationfileoptionsconfigurationfilevariablesobsessivecompulsivehostprocessorcommand "OCHP"</th>
  *      <th>Service Perf Data</th>
  *      <th>Host Perf Data</th>
  *    </tr>
@@ -1206,15 +1207,15 @@
  *    </tr>
  *  </table>
  *
- *  </table>
+ *  <table>
  *    <tr>
  *      <th>Macro Name</th>
  *      <th>Service Checks</th>
  *      <th>Service Notifications</th>
  *      <th>Host Checks</th>
  *      <th>Host Notifications</th>
- *      <th>Service Event Handlers and @link configmain.html#ocsp_command OCSP @endlink</th>
- *      <th>Host Event Handlers and @link configmain.html#ochp_command OCHP @endlink</th>
+ *      <th>Service Event Handlers and @ref mainconfigurationfileoptionsconfigurationfilevariablesobsessivecompulsiveserviceprocessorcommand "OCSP"</th>
+ *      <th>Host Event Handlers and @ref mainconfigurationfileoptionsconfigurationfilevariablesobsessivecompulsivehostprocessorcommand "OCHP"</th>
  *      <th>Service Perf Data</th>
  *      <th>Host Perf Data</th>
  *    </tr>
@@ -1245,15 +1246,15 @@
  *    </tr>
  *  </table>
  *
- *  </table>
+ *  <table>
  *    <tr>
  *      <th>Macro Name</th>
  *      <th>Service Checks</th>
  *      <th>Service Notifications</th>
  *      <th>Host Checks</th>
  *      <th>Host Notifications</th>
- *      <th>Service Event Handlers and @link configmain.html#ocsp_command OCSP @endlink</th>
- *      <th>Host Event Handlers and @link configmain.html#ochp_command OCHP @endlink</th>
+ *      <th>Service Event Handlers and @ref mainconfigurationfileoptionsconfigurationfilevariablesobsessivecompulsiveserviceprocessorcommand "OCSP"</th>
+ *      <th>Host Event Handlers and @ref mainconfigurationfileoptionsconfigurationfilevariablesobsessivecompulsivehostprocessorcommand "OCHP"</th>
  *      <th>Service Perf Data</th>
  *      <th>Host Perf Data</th>
  *    </tr>
@@ -1445,8 +1446,8 @@
  *  	<th>Service Notifications</th>
  *  	<th>Host Checks</th>
  *  	<th>Host Notifications</th>
- *  	<th>Service Event Handlers and @link configmain.html#ocsp_command OCSP @endlink</th>
- *  	<th>Host Event Handlers and @link configmain.html#ochp_command OCHP @endlink</th>
+ *  	<th>Service Event Handlers and @ref mainconfigurationfileoptionsconfigurationfilevariablesobsessivecompulsiveserviceprocessorcommand "OCSP"</th>
+ *  	<th>Host Event Handlers and @ref mainconfigurationfileoptionsconfigurationfilevariablesobsessivecompulsivehostprocessorcommand "OCHP"</th>
  *  	<th>Service Perf Data</th>
  *  	<th>Host Perf Data</th>
  *    </tr>
@@ -1583,8 +1584,8 @@
  *      <th>Service Notifications</th>
  *      <th>Host Checks</th>
  *  	<th>Host Notifications</th>
- *  	<th>Service Event Handlers and @link configmain.html#ocsp_command OCSP @endlink</th>
- *    	<th>Host Event Handlers and @link configmain.html#ochp_command OCHP @endlink</th>
+ *  	<th>Service Event Handlers and @ref mainconfigurationfileoptionsconfigurationfilevariablesobsessivecompulsiveserviceprocessorcommand "OCSP"</th>
+ *    	<th>Host Event Handlers and @ref mainconfigurationfileoptionsconfigurationfilevariablesobsessivecompulsivehostprocessorcommand "OCHP"</th>
  *      <th>Service Perf Data</th>
  *      <th>Host Perf Data</th>
  *    </tr>
@@ -1677,8 +1678,8 @@
  *  	<th>Service Notifications</th>
  *  	<th>Host Checks</th>
  *  	<th>Host Notifications</th>
- *  	<th>Service Event Handlers and @link configmain.html#ocsp_command OCSP @endlink</th>
- *  	<th>Host Event Handlers and @link configmain.html#ochp_command OCHP @endlink</th>
+ *  	<th>Service Event Handlers and @ref mainconfigurationfileoptionsconfigurationfilevariablesobsessivecompulsiveserviceprocessorcommand "OCSP"</th>
+ *  	<th>Host Event Handlers and @ref mainconfigurationfileoptionsconfigurationfilevariablesobsessivecompulsivehostprocessorcommand "OCHP"</th>
  *  	<th>Service Perf Data</th>
  *  	<th>Host Perf Data</th>
  *    </tr>
@@ -1837,8 +1838,8 @@
  *  	<th>Service Notifications</th>
  *  	<th>Host Checks</th>
  *  	<th>Host Notifications</th>
- *  	<th>Service Event Handlers and @link configmain.html#ocsp_command OCSP @endlink</th>
- *  	<th>Host Event Handlers and @link configmain.html#ochp_command OCHP @endlink</th>
+ *  	<th>Service Event Handlers and @ref mainconfigurationfileoptionsconfigurationfilevariablesobsessivecompulsiveserviceprocessorcommand "OCSP"</th>
+ *  	<th>Host Event Handlers and @ref mainconfigurationfileoptionsconfigurationfilevariablesobsessivecompulsivehostprocessorcommand "OCHP"</th>
  *  	<th>Service Perf Data</th>
  *  	<th>Host Perf Data</th>
  *    </tr>
@@ -1922,16 +1923,16 @@
  *    <tr>
  *      <td>$HOSTNAME$</td>
  *      <td>
- *  	  Short name for the host (i.e. \"biglinuxbox\"). This value is taken
+ *  	  Short name for the host (i.e. "biglinuxbox"). This value is taken
  *  	  from the host_name directive in the @link
- *  	  objectdefinitions.html#host host definition @endlink.
+ *  	  objectdefinitions#host host definition @endlink.
  *      </td>
  *    </tr>
  *    <tr>
  *      <td>$HOSTDISPLAYNAME$</td>
  *      <td>
  *  	  An alternate display name for the host. This value is taken from
- *  	  the display_name directive in the @link objectdefinitions.html#host
+ *  	  the display_name directive in the @link objectdefinitions#host
  *  	  host definition @endlink.
  *      </td>
  *    </tr>
@@ -1939,7 +1940,7 @@
  *      <td>$HOSTALIAS$</td>
  *      <td>
  *  	  Long name/description for the host. This value is taken from the
- *  	  alias directive in the @link objectdefinitions.html#host host
+ *  	  alias directive in the @link objectdefinitions#host host
  *  	  definition @endlink.
  *      </td>
  *    </tr>
@@ -1947,7 +1948,7 @@
  *      <td>$HOSTADDRESS$</td>
  *      <td>
  *  	  Address of the host. This value is taken from the address directive
- *  	  in the @link objectdefinitions.html#host host definition @endlink.
+ *  	  in the @link objectdefinitions#host host definition @endlink.
  *      </td>
  *    </tr>
  *    <tr>
@@ -2083,7 +2084,7 @@
  *      <td>$HOSTDOWNTIME$</td>
  *      <td>
  *        A number indicating the current "downtime depth" for the host. If
- *        this host is currently in a period of @link downtime.html scheduled
+ *        this host is currently in a period of @link scheduleddowntime scheduled
  *        downtime @endlink, the value will be greater than zero. If the host
  *        is not currently in a period of downtime, this value will be zero.
  *      </td>
@@ -2093,7 +2094,7 @@
  *      <td>
  *        A (floating point) number indicating the percent state change the
  *        host has undergone. Percent state change is used by the @link
- *        flapping.html flap detection @endlink algorithm.
+ *        detectionandhandlingofstateflapping flap detection @endlink algorithm.
  *      </td>
  *    </tr>
  *    <tr>
@@ -2101,7 +2102,7 @@
  *      <td>
  *        The short name of the hostgroup that this host belongs to. This
  *        value is taken from the hostgroup_name directive in the @link
- *        objectdefinitions.html#hostgroup hostgroup definition @endlink. If
+ *        objectdefinitions#hostgroup hostgroup definition @endlink. If
  *        the host belongs to more than one hostgroup this macro will contain
  *        the name of just one of them.
  *      </td>
@@ -2169,7 +2170,7 @@
  *    <tr>
  *      <td>$HOSTPERFDATA$</td>
  *      <td>
- *        This macro contains any @link perfdata.html performance data
+ *        This macro contains any @link performancedata performance data
  *        @endlink that may have been returned by the last host check.
  *      </td>
  *    </tr>
@@ -2286,7 +2287,7 @@
  *        on-demand macro argument or 2) the primary hostgroup associated
  *        with the current host (if not used in the context of an on-demand
  *        macro). This value is taken from the alias directive in the @link
- *        objectdefinitions.html#hostgroup hostgroup definition @endlink.
+ *        objectdefinitions#hostgroup hostgroup definition @endlink.
  *      </td>
  *    </tr>
  *    <tr>
@@ -2305,7 +2306,7 @@
  *        on-demand macro argument or 2) the primary hostgroup associated
  *        with the current host (if not used in the context of an on-demand
  *        macro). This value is taken from the notes directive in the @link
- *        objectdefinitions.html#hostgroup hostgroup definition @endlink.
+ *        objectdefinitions#hostgroup hostgroup definition @endlink.
  *      </td>
  *    </tr>
  *    <tr>
@@ -2315,7 +2316,7 @@
  *        as an on-demand macro argument or 2) the primary hostgroup
  *        associated with the current host (if not used in the context of an
  *        on-demand macro). This value is taken from the notes_url directive
- *        in the @link objectdefinitions.html#hostgroup hostgroup definition
+ *        in the @link objectdefinitions#hostgroup hostgroup definition
  *        @endlink.
  *      </td>
  *    </tr>
@@ -2326,7 +2327,7 @@
  *        as an on-demand macro argument or 2) the primary hostgroup
  *        associated with the current host (if not used in the context of an
  *        on-demand macro). This value is taken from the action_url directive
- *        in the @link objectdefinitions.html#hostgroup hostgroup definition
+ *        in the @link objectdefinitions#hostgroup hostgroup definition
  *        @endlink.
  *      </td>
  *    </tr>
@@ -2341,7 +2342,7 @@
  *      <td>
  *        The long name/description of the service (i.e. "Main Website").
  *        This value is taken from the service_description directive of the
- *        @link objectdefinitions.html#service service definition @endlink.
+ *        @link objectdefinitions#service service definition @endlink.
  *      </td>
  *    </tr>
  *    <tr>
@@ -2349,7 +2350,7 @@
  *      <td>
  *        An alternate display name for the service. This value is taken from
  *        the display_name directive in the @link
- *        objectdefinitions.html#service service definition @endlink.
+ *        objectdefinitions#service service definition @endlink.
  *      </td>
  *    </tr>
  *    <tr>
@@ -2493,7 +2494,7 @@
  *      <td>$SERVICEDOWNTIME$</td>
  *      <td>
  *        A number indicating the current "downtime depth" for the service.
- *        If this service is currently in a period of @link downtime.html
+ *        If this service is currently in a period of @link scheduleddowntime
  *        scheduled downtime @endlink, the value will be greater than zero.
  *        If the service is not currently in a period of downtime, this value
  *        will be zero.
@@ -2504,7 +2505,7 @@
  *      <td>
  *        A (floating point) number indicating the percent state change the
  *        service has undergone. Percent state change is used by the @link
- *        flapping.html flap detection @endlink algorithm.
+ *        detectionandhandlingofstateflapping flap detection @endlink algorithm.
  *      </td>
  *    </tr>
  *    <tr>
@@ -2512,7 +2513,7 @@
  *      <td>
  *        The short name of the servicegroup that this service belongs to.
  *        This value is taken from the servicegroup_name directive in the
- *        @link objectdefinitions.html#servicegroup servicegroup @endlink
+ *        @link objectdefinitions#servicegroup servicegroup @endlink
  *        definition. If the service belongs to more than one servicegroup
  *        this macro will contain the name of just one of them.
  *      </td>
@@ -2588,7 +2589,7 @@
  *    <tr>
  *      <td>$SERVICEPERFDATA$</td>
  *      <td>
- *        This macro contains any @link perfdata.html performance data
+ *        This macro contains any @link performancedata performance data
  *        @endlink that may have been returned by the last service check.
  *      </td>
  *    </tr>
@@ -2671,7 +2672,7 @@
  *        an on-demand macro argument or 2) the primary servicegroup
  *        associated with the current service (if not used in the context of
  *        an on-demand macro). This value is taken from the alias directive
- *        in the @link objectdefinitions.html#servicegroup servicegroup
+ *        in the @link objectdefinitions#servicegroup servicegroup
  *        definition @endlink.
  *      </td>
  *    </tr>
@@ -2691,7 +2692,7 @@
  *        an on-demand macro argument or 2) the primary servicegroup
  *        associated with the current service (if not used in the context of
  *        an on-demand macro). This value is taken from the notes directive
- *        in the @link objectdefinitions.html#servicegroup servicegroup
+ *        in the @link objectdefinitions#servicegroup servicegroup
  *        definition @endlink.
  *      </td>
  *    </tr>
@@ -2703,7 +2704,7 @@
  *        servicegroup associated with the current service (if not used in
  *        the context of an on-demand macro). This value is taken from the
  *        notes_url directive in the @link
- *        objectdefinitions.html#servicegroup servicegroup definition
+ *        objectdefinitions#servicegroup servicegroup definition
  *        @endlink.
  *      </td>
  *    </tr>
@@ -2715,7 +2716,7 @@
  *        servicegroup associated with the current service (if not used in
  *        the context of an on-demand macro). This value is taken from the
  *        action_url directive in the @link
- *        objectdefinitions.html#servicegroup servicegroup definition
+ *        objectdefinitions#servicegroup servicegroup definition
  *        @endlink.
  *      </td>
  *    </tr>
@@ -2730,7 +2731,7 @@
  *      <td>
  *        Short name for the contact (i.e. "jdoe") that is being notified
  *        of a host or service problem. This value is taken from the
- *        contact_name directive in the @link objectdefinitions.html#contact
+ *        contact_name directive in the @link objectdefinitions#contact
  *        contact definition @endlink.
  *      </td>
  *    </tr>
@@ -2739,7 +2740,7 @@
  *      <td>
  *        Long name/description for the contact (i.e. "John Doe") being
  *        notified. This value is taken from the alias directive in the @link
- *        objectdefinitions.html#contact contact definition @endlink.
+ *        objectdefinitions#contact contact definition @endlink.
  *      </td>
  *    </tr>
  *    <tr>
@@ -2747,7 +2748,7 @@
  *      <td>
  *        Email address of the contact being notified. This value is taken
  *        from the email directive in the @link
- *        objectdefinitions.html#contact contact definition @endlink.
+ *        objectdefinitions#contact contact definition @endlink.
  *      </td>
  *    </tr>
  *    <tr>
@@ -2755,7 +2756,7 @@
  *      <td>
  *        Pager number/address of the contact being notified. This value is
  *        taken from the pager directive in the @link
- *        objectdefinitions.html#contact contact definition @endlink.
+ *        objectdefinitions#contact contact definition @endlink.
  *      </td>
  *    </tr>
  *    <tr>
@@ -2765,7 +2766,7 @@
  *        different addresses (in addition to email address and pager
  *        number). The macros for these addresses are $CONTACTADDRESS1$ -
  *        $CONTACTADDRESS6$. This value is taken from the addressx directive
- *        in the @link objectdefinitions.html#contact contact definition
+ *        in the @link objectdefinitions#contact contact definition
  *        @endlink.
  *      </td>
  *    </tr>
@@ -2774,7 +2775,7 @@
  *      <td>
  *        The short name of the contactgroup that this contact is a member
  *        of. This value is taken from the contactgroup_name directive in the
- *        @link objectdefinitions.html#contactgroup contactgroup @endlink
+ *        @link objectdefinitions#contactgroup contactgroup @endlink
  *        definition. If the contact belongs to more than one contactgroup
  *        this macro will contain the name of just one of them.
  *      </td>
@@ -2799,7 +2800,7 @@
  *        an on-demand macro argument or 2) the primary contactgroup
  *        associated with the current contact (if not used in the context of
  *        an on-demand macro). This value is taken from the alias directive
- *        in the @link objectdefinitions.html#contactgroup contactgroup
+ *        in the @link objectdefinitions#contactgroup contactgroup
  *        definition @endlink.
  *      </td>
  *    </tr>
@@ -3119,9 +3120,9 @@
  *        This is a special on-demand macro that returns a 1 or 0 depending
  *        on whether or not a particular time is valid within a specified
  *        timeperiod. There are two ways of using this macro:
- *        - $ISVALIDTIME:24x7$ will be set to "1" if the current time is
+ *        - \$ISVALIDTIME:24x7$ will be set to "1" if the current time is
  *        valid within the "24x7" timeperiod. If not, it will be set to "0".
- *        - $ISVALIDTIME:24x7:timestamp$ will be set to "1" if the time
+ *        - \$ISVALIDTIME:24x7:timestamp$ will be set to "1" if the time
  *        specified by the "timestamp" argument (which must be in time_t
  *        format) is valid within the "24x7" timeperiod. If not, it will be
  *        set to "0".
@@ -3133,9 +3134,9 @@
  *  	  This is a special on-demand macro that returns the next valid time
  *  	  (in time_t format) for a specified timeperiod. There are two ways
  *  	  of using this macro:
- *  	  - $NEXTVALIDTIME:24x7$ will return the next valid time - from and
+ *  	  - \$NEXTVALIDTIME:24x7$ will return the next valid time - from and
  *        including the current time - in the "24x7" timeperiod.
- *        - $NEXTVALIDTIME:24x7:timestamp$ will return the next valid time -
+ *        - \$NEXTVALIDTIME:24x7:timestamp$ will return the next valid time -
  *        from and including the time specified by the "timestamp" argument
  *        (which must be specified in time_t format) - in the "24x7" timeperiod.
  *
@@ -3152,7 +3153,7 @@
  *    <tr>
  *      <td>$MAINCONFIGFILE$</td>
  *      <td>
- *        The location of the @link configmain.html main config file
+ *        The location of the @link mainconfigurationfileoptions main config file
  *        @endlink.
  *      </td>
  *    </tr>
@@ -3178,8 +3179,8 @@
  *    <tr>
  *      <td>$RETENTIONDATAFILE$</td>
  *      <td>
- *        The location of the @link configmain.html#state_retention_file
- *        retention data file @endlink.
+ *        The location of the @ref mainconfigurationfileoptionsconfigurationfilevariablesstateretentionfile
+ *        "retention data file".
  *      </td>
  *    </tr>
  *    <tr>
@@ -3213,15 +3214,16 @@
  *    <tr>
  *      <td>$RESOURCEFILE$</td>
  *      <td>
- *        The location of the @link configmain.html#resource_file resource
+ *        The location of the @link mainconfigurationfileoptionsconfigurationfilevariablesresourcefile resource
  *        file @endlink.
  *      </td>
  *    </tr>
  *    <tr>
  *      <td>$COMMANDFILE$</td>
  *      <td>
- *        The location of the @link configmain.html#command_file command file
- *        @endlink.
+ *        The location of the
+ *        @ref mainconfigurationfileoptionsconfigurationfilevariablesexternalcommandfile
+ *        "command file".
  *      </td>
  *    </tr>
  *    <tr>
@@ -3289,7 +3291,7 @@
  *      <td>$USERn$</td>
  *      <td>
  *        The nth user-definable macro. User macros can be defined in one or
- *        more @link configmain.html#resource_file resource files @endlink.
+ *        more @link mainconfigurationfileoptionsconfigurationfilevariablesresourcefile resource files @endlink.
  *        Centron Scheduler supports up to 256 user macros ($USER1$ through
  *        $USER32$).
  *      </td>
@@ -3322,7 +3324,7 @@
  *  these macros are not available as on-demand host macros. Instead,
  *  they can be used as on-demand hostgroup macros when you pass the
  *  name of a hostgroup to the macro. For example:
- *  $HOSTGROUPMEMBERS:hg1$ would return a comma-delimited list of all
+ *  \$HOSTGROUPMEMBERS:hg1$ would return a comma-delimited list of all
  *  (host) members of the hostgroup hg1.
  *
  *  <sup>6</sup> These macros are normally associated with the
@@ -3331,7 +3333,7 @@
  *  However, these macros are not available as on-demand service
  *  macros. Instead, they can be used as on-demand servicegroup macros
  *  when you pass the name of a servicegroup to the macro. For example:
- *  $SERVICEGROUPMEMBERS:sg1$ would return a comma-delimited list of
+ *  \$SERVICEGROUPMEMBERS:sg1$ would return a comma-delimited list of
  *  all (service) members of the servicegroup sg1.
  *
  *  <sup>7</sup> These macros are normally associated with the
@@ -3340,12 +3342,12 @@
  *  However, these macros are not available as on-demand contact
  *  macros. Instead, they can be used as on-demand contactgroup macros
  *  when you pass the name of a contactgroup to the macro. For example:
- *  $CONTACTGROUPMEMBERS:cg1$ would return a comma-delimited list of
+ *  \$CONTACTGROUPMEMBERS:cg1$ would return a comma-delimited list of
  *  all (contact) members of the contactgroup cg1.
  *
  *  <sup>8</sup> These acknowledgement macros are deprecated. Use the
  *  more generic $NOTIFICATIONAUTHOR$, $NOTIFICATIONAUTHORNAME$,
- *  $NOTIFICATIONAUTHORALIAS$ or $NOTIFICATIONAUTHORCOMMENT$ macros
+ *  \$NOTIFICATIONAUTHORALIAS$ or $NOTIFICATIONAUTHORCOMMENT$ macros
  *  instead.
  *
  *  <sup>9</sup> These macro are only available as on-demand macros -
@@ -3353,9 +3355,9 @@
  *  use them. These macros are not available as environment variables.
  *
  *  <sup>10</sup> Summary macros are not available as environment
- *  variables if the @link
- *  configmain.html#use_large_installation_tweaks
- *  use_large_installation_tweaks @endlink option is enabled, as they
+ *  variables if the
+ *  @ref mainconfigurationfileoptionsconfigurationfilevariableslargeinstallationtweaksoption
+ *  "use_large_installation_tweaks" option is enabled, as they
  *  are quite CPU-intensive to calculate.
  */
 

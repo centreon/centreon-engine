@@ -74,7 +74,7 @@
  *  @endcode
  *
  *  In the example above, the service check command has two arguments
- *  (which can be referenced with @link macrolist.html#arg $ARGn$
+ *  (which can be referenced with @link standardmacrosincentscheduler#arg $ARGn$
  *  @endlink macros). The $ARG1$ macro will be "200.0,80%" and $ARG2$
  *  will be "400.0,40%" (both without quotes). Assuming we are using the
  *  host definition given earlier and a check_ping command defined like
@@ -106,7 +106,7 @@
  *  definitions, they refer to values for the host or service for which
  *  the command is being run. For instance, if a host check command is
  *  being executed for a host named "linuxbox", all the @link
- *  macrolist.html standard host macros @endlink will refer to values
+ *  standardmacrosincentscheduler standard host macros @endlink will refer to values
  *  for that host ("linuxbox").
  *
  *  If you would like to reference values for another host or service
@@ -119,7 +119,7 @@
  *  - $SERVICEMACRONAME:host_name:service_description$
  *
  *  Replace HOSTMACRONAME and SERVICEMACRONAME with the name of one of
- *  the standard host of service macros found @link macrolist.html here
+ *  the standard host of service macros found @link standardmacrosincentscheduler here
  *  @endlink.
  *
  *  Note that the macro name is separated from the host or service
@@ -162,7 +162,7 @@
  *
  *  Replace HOSTMACRONAME, SERVICEMACRONAME, and CONTACTMACRONAME with
  *  the name of one of the standard host, service, or contact macros
- *  found @link macrolist.html here @endlink. The delimiter you specify
+ *  found @link standardmacrosincentscheduler here @endlink. The delimiter you specify
  *  is used to separate macro values for each group member.
  *
  *  For example, the following macro will return a comma-separated list
@@ -180,7 +180,7 @@
  *
  *  @section understandingmacrosandhowtheyworkcustomvariablemacros Custom Variable Macros
  *
- *  Any @link customobjectvars.html custom object variables @endlink
+ *  Any @link customobjectvariables custom object variables @endlink
  *  that you define in host, service, or contact definitions are also
  *  available as macros. Custom variable macros are named as follows:
  *  - $_HOSTvarname$
@@ -203,28 +203,28 @@
  *  The _MACADDRESS custom variable would be available in a macro
  *  called $_HOSTMACADDRESS$. More information on custom object
  *  variables and how they can be used in macros can
- *  be found @link customobjectvars.html here @endlink.
+ *  be found @link customobjectvariables here @endlink.
  *
  *  @section understandingmacrosandhowtheyworkmacrocleansing Macro Cleansing
  *
  *  Some macros are stripped of potentially dangerous shell
  *  metacharacters before being substituted into commands to be
  *  executed. Which characters are stripped from the macros depends on
- *  the setting of the @link configmain.html#illegal_macro_output_chars
- *  illegal_macro_output_chars @endlink directive. The following macros
+ *  the setting of the @ref mainconfigurationfileoptionsconfigurationfilevariablesillegalmacrooutputcharacters
+ *  "illegal_macro_output_chars" directive. The following macros
  *  are stripped of potentially dangerous characters:
- *  - @link macrolist.html#hostoutput $HOSTOUTPUT$ @endlink
- *  - @link macrolist.html#longhostoutput $LONGHOSTOUTPUT$ @endlink
- *  - @link macrolist.html#hostperfdata $HOSTPERFDATA$ @endlink
- *  - @link macrolist.html#hostackauthor $HOSTACKAUTHOR$ @endlink
- *  - @link macrolist.html#hostackcomment $HOSTACKCOMMENT$ @endlink
- *  - @link macrolist.html#serviceoutput $SERVICEOUTPUT$ @endlink
- *  - @link macrolist.html#longserviceoutput $LONGSERVICEOUTPUT$ @endlink
- *  - @link macrolist.html#serviceperfdata $SERVICEPERFDATA$ @endlink
- *  - @link macrolist.html#serviceackauthor $SERVICEACKAUTHOR$ @endlink
- *  - @link macrolist.html#serviceackcomment $SERVICEACKCOMMENT$ @endlink
+ *  - @link standardmacrosincentscheduler#hostoutput $HOSTOUTPUT$ @endlink
+ *  - @link standardmacrosincentscheduler#longhostoutput $LONGHOSTOUTPUT$ @endlink
+ *  - @link standardmacrosincentscheduler#hostperfdata $HOSTPERFDATA$ @endlink
+ *  - @link standardmacrosincentscheduler#hostackauthor $HOSTACKAUTHOR$ @endlink
+ *  - @link standardmacrosincentscheduler#hostackcomment $HOSTACKCOMMENT$ @endlink
+ *  - @link standardmacrosincentscheduler#serviceoutput $SERVICEOUTPUT$ @endlink
+ *  - @link standardmacrosincentscheduler#longserviceoutput $LONGSERVICEOUTPUT$ @endlink
+ *  - @link standardmacrosincentscheduler#serviceperfdata $SERVICEPERFDATA$ @endlink
+ *  - @link standardmacrosincentscheduler#serviceackauthor $SERVICEACKAUTHOR$ @endlink
+ *  - @link standardmacrosincentscheduler#serviceackcomment $SERVICEACKCOMMENT$ @endlink
  *
- *  Additionally, any macros that contain @link customobjectvars.html
+ *  Additionally, any macros that contain @link customobjectvariables
  *  custom variables @endlink are stripped for safety and security.
  *
  *  @section understandingmacrosandhowtheyworkmacrosasenvironmentvariables Macros as Environment Variables
@@ -232,13 +232,13 @@
  *  Most macros are made available as environment variables for easy
  *  reference by scripts or commands that are executed by Centron
  *  Scheduler. For purposes of security and sanity, @link
- *  macrolist.html#user $USERn$ @endlink and "on-demand" host and
+ *  standardmacrosincentscheduler#user $USERn$ @endlink and "on-demand" host and
  *  service macros are not made available as environment variables.
  *
  *  Environment variables that contain standard macros are named the
  *  same as their corresponding macro names (listed @link
- *  macrolist.html here @endlink), with "NAGIOS_" prepended to their
- *  names. For example, the @link macrolist.html#hostname $HOSTNAME$
+ *  standardmacrosincentscheduler here @endlink), with "NAGIOS_" prepended to their
+ *  names. For example, the @link standardmacrosincentscheduler#hostname $HOSTNAME$
  *  @endlink macro would be available as an environment variable named
  *  "NAGIOS_HOSTNAME".
  *
@@ -246,6 +246,6 @@
  *
  *  A list of all the macros that are available in Centron Scheduler,
  *  as well as a chart of when they can be used, can be found @link
- *  macrolist.html here @endlink.
+ *  standardmacrosincentscheduler here @endlink.
  */
 

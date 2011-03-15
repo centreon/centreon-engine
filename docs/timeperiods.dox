@@ -2,7 +2,7 @@
  *  @page timeperiods Time Periods
  *  @section timeperiodsintroduction Introduction
  *
- *  @link objectdefinitionstimeperiod Timeperiod @endlink definitions
+ *  @ref objectdefinitionsobjecttypestimeperioddefinition "Timeperiod" definitions
  *  allow you to control when various aspects of the monitoring and
  *  alerting logic can operate. For instance, you can restrict:
  *
@@ -13,7 +13,7 @@
  *
  *  @section timeperiodsprecedenceintimeperiods Precedence in Time Periods
  *
- *  Timeperod @link objectdefinitionstimeperiod definitions @endlink may
+ *  Timeperod @ref objectdefinitionsobjecttypestimeperioddefinition "definitions" may
  *  contain multiple types of directives, including weekdays, days of
  *  the month, and calendar dates. Different types of directives have
  *  different precendence levels and may override other directives in
@@ -27,8 +27,8 @@
  *  - Offset weekday (3rd Monday)
  *  - Normal weekday (Tuesday)
  *
- *  Examples of different timeperiod directives can be found @link
- *  objectdefinitionstimeperiod here @endlink.
+ *  Examples of different timeperiod directives can be found @ref
+ *  objectdefinitionsobjecttypestimeperioddefinition "here".
  *
  *  @section timeperiodshowtimeperiodsworkwithhostandservicechecks How Time Periods Work With Host and Service Checks
  *
@@ -84,7 +84,7 @@
  *  You can also use timeperiods to control when notifications can be
  *  sent out to individual contacts. By using the
  *  service_notification_period and host_notification_period directives
- *  in @link objectdefinitionscontact contact definitions @endlink,
+ *  in @ref objectdefinitionsobjecttypescontactdefinition "contact definitions",
  *  you're able to essentially define an "on call" period for each
  *  contact. Contacts will only receive host and service notifications
  *  during the times you specify in the notification period directives.
@@ -123,11 +123,11 @@
  *  notification period directives.
  *
  *  Examples of how to create timeperiod definitions for use for
- *  on-call rotations can be found @link oncallrotation here @endlink.
+ *  on-call rotations can be found @link oncallrotations here @endlink.
  *
  *  @section timeperiodshowtimeperiodsworkwithnotificationescalations How Time Periods Work With Notification Escalations
  *
- *  Service and host @link escalations notification escalations @endlink
+ *  Service and host @link notificationescalations notification escalations @endlink
  *  have an optional escalation_period directive that allows you to
  *  specify a timeperiod when the escalation is valid and can be used.
  *  If you do not use the escalation_period directive in an escalation
@@ -138,7 +138,7 @@
  *
  *  @section timeperiodshowtimeperiodsworkwithdependencies How Time Periods Work With Dependencies
  *
- *  Service and host @link dependencies dependencies @endlink have an
+ *  Service and host @link hostandservicedependencies dependencies @endlink have an
  *  optional dependency_period directive that allows you to specify a
  *  timeperiod when the dependendies are valid and can be used. If you
  *  do not use the dependency_period directive in a dependency

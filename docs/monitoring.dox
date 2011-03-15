@@ -115,8 +115,8 @@
  *
  *  1. Download the latest stable version of the NSClient++ addon from
  *  http://sourceforge.net/projects/nscplus
- *  2. Unzip the NSClient++ files into a new C:\NSClient++ directory
- *  3. Open a command prompt and change to the C:\NSClient++ directory
+ *  2. Unzip the NSClient++ files into a new C:\\NSClient++ directory
+ *  3. Open a command prompt and change to the C:\\NSClient++ directory
  *  4. Register the NSClient++ system service with the following
  *  command: nsclient++ /install
  *  5. Install the NSClient++ systray with the following command
@@ -125,7 +125,7 @@
  *  allowed to interact with the desktop (see the 'Log On' tab of the
  *  services manager). If it isn't already allowed to interact with
  *  the desktop, check the box to allow it to.
- *  7. Edit the NSC.INI file (located in the C:\NSClient++ directory)
+ *  7. Edit the NSC.INI file (located in the C:\\NSClient++ directory)
  *  and make the following changes:
  *  - Uncomment all the modules listed in the [modules] section,
  *  except for CheckWMI.dll and RemoteConfiguration.dll
@@ -241,7 +241,7 @@
  *  @endcode
  *
  *  Add the following service definition to monitor usage of the
- *  C:\drive on the Windows server and generate a CRITICAL alert if disk
+ *  C:\\drive on the Windows server and generate a CRITICAL alert if disk
  *  usage is 90% or more or a WARNING alert if disk usage is 80% or
  *  greater.
  *
@@ -378,20 +378,20 @@
  *
  *  You can find documentation on monitoring Netware servers with
  *  Centron Scheduler at Novell's Cool Solutions site, including:
- *  - @link http://developer.novell.com/wiki/index.php/MRTGEXT
- *  MRTGEXT: NLM module for MRTG and Centron Scheduler @endlink
- *  - @link http://www.novell.com/coolsolutions/feature/16723.html
- *  Centron Scheduler: Host and Service Monitoring Tool @endlink
- *  - @link http://www.novell.com/coolsolutions/appnote/17494.html
- *  Centron Scheduler and NetWare: SNMP-based Monitoring @endlink
- *  - @link http://www.novell.com/coolsolutions/tools/17255.html
- *  Monitor DirXML/IDM Driver States with Centron Scheduler @endlink
- *  - @link http://www.novell.com/coolsolutions/tools/17038.html
- *  Check NDS Login ability with Centron Scheduler @endlink
- *  - @link http://www.novell.com/coolsolutions/tools/17580.html
- *  NDPS/iPrint Print Queue Monitoring by Centron Scheduler @endlink
- *  - @link http://www.novell.com/coolsolutions/tools/16935.html
- *  check_gwiaRL Plugin for Centron Scheduler 2.0 @endlink
+ *  - <a href="http://developer.novell.com/wiki/index.php/MRTGEXT"
+ *  MRTGEXT: NLM module for MRTG and Centron Scheduler</a>
+ *  - <a href="http://www.novell.com/coolsolutions/feature/16723.html
+ *  Centron Scheduler: Host and Service Monitoring Tool</a>
+ *  - <a href="http://www.novell.com/coolsolutions/appnote/17494.html
+ *  Centron Scheduler and NetWare: SNMP-based Monitoring</a>
+ *  - <a href="http://www.novell.com/coolsolutions/tools/17255.html
+ *  Monitor DirXML/IDM Driver States with Centron Scheduler</a>
+ *  - <a href="http://www.novell.com/coolsolutions/tools/17038.html
+ *  Check NDS Login ability with Centron Scheduler</a>
+ *  - <a href="http://www.novell.com/coolsolutions/tools/17580.html
+ *  NDPS/iPrint Print Queue Monitoring by Centron Scheduler</a>
+ *  - <a href="http://www.novell.com/coolsolutions/tools/16935.html
+ *  check_gwiaRL Plugin for Centron Scheduler 2.0</a>
  *
  *  @note Tip: When you visit Novell's Cool Solutions site, search for
  *  "Centron Scheduler" to find more articles and software components
@@ -518,7 +518,7 @@
  *  vi /usr/local/centscheduler/etc/objects/switch.cfg
  *  @endcode
  *
- *  Add a new @link objectdefinitionshost host @endlink definition for
+ *  Add a new @ref objectdefinitionsobjecttypeshostdefinition "host" definition for
  *  the switch that you're going to monitor. If this is the *first*
  *  switch you're monitoring, you can simply modify the sample host
  *  definition in switch.cfg. Change the host_name, alias, and address
@@ -631,7 +631,7 @@
  *  @subsection monitoringroutersswitchesmonitoringbandwidthtrafficrate Monitoring Bandwidth / Traffic Rate
  *
  *  If you're monitoring bandwidth usage on your switches or routers
- *  using @link http://oss.oetiker.ch/mrtg/ MRTG @endlink, you can have
+ *  using <a href="http://oss.oetiker.ch/mrtg/">MRTG</a>, you can have
  *  Centron Scheduler alert you when traffic rates exceed thresholds you
  *  specify. The check_mrtgtraf plugin (which is included in the Centron
  *  Scheduler plugins distribution) allows you to do this.
@@ -670,7 +670,7 @@
  *  Once you've added the new host and service definitions to the
  *  switch.cfg file, you're ready to start monitoring the
  *  router/switch. To do this, you'll need to
- *  @link verifyyourconfiguration verify your configuration @endlink
+ *  @ref verifyconfig "verify your configuration"
  *  and @link startstop restart Centron Scheduler @endlink.
  *
  *  If the verification process produces any errors messages, fix your
@@ -793,7 +793,7 @@
  *  vi /usr/local/centscheduler/etc/objects/printer.cfg
  *  @endcode
  *
- *  Add a new @link objectdefinitionshost host @endlink definition for
+ *  Add a new @ref objectdefinitionsobjecttypeshostdefinition "host" definition for
  *  the networked printer that you're going to monitor. If this is the
  *  *first* printer you're monitoring, you can simply modify the sample
  *  host definition in printer.cfg. Change the host_name, alias, and
@@ -859,7 +859,7 @@
  *  Once you've added the new host and service definitions to the
  *  printer.cfg file, you're ready to start monitoring the printer. To
  *  do this, you'll need to
- *  @link verifyyourconfiguration verify your configuration @endlink
+ *  @ref verifyconfig "verify your configuration"
  *  and @link startstop restart Centron Scheduler @endlink.
  *
  *  If the verification process produces any errors messages, fix your
