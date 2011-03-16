@@ -40,6 +40,7 @@
  *  take part in the dependency.
  *
  *  @image html predictive-dependency-checks.png
+ *  @image latex predictive-dependency-checks.eps
  *
  *  That's how predictive dependency checks work. Simple, eh?
  *

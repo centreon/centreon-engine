@@ -3,6 +3,7 @@
  *  @section securityconsiderationsintroduction Introduction
  *
  *  @image html security.png
+ *  @image latex security.eps
  *
  *  This is intended to be a brief overview of some things you should
  *  keep in mind when installing Centron Scheduler, so as set it up in
@@ -57,6 +58,7 @@
  *  security hole if you have a local account on a box.
  *
  *  @image html security3.png
+ *  @image latex security3.eps
  *
  *  @subsection securityconsiderationsbestpracticesdontruncentronschedulerasroot Don't Run Centron Scheduler As Root
  *
@@ -124,6 +126,7 @@
  *  to go unnoticed.
  *
  *  @image html security1.png
+ *  @image latex security1.eps
  *
  *  @subsection securityconsiderationsbestpracticessecurecommunicationchannels Secure Communication Channels
  *
@@ -135,6 +138,7 @@
  *  the best times to go unnoticed.
  *
  *  @image html security2.png
+ *  @image latex security2.eps
  *
  */
 

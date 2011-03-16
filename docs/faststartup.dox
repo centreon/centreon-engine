@@ -145,6 +145,7 @@
  *  config files. This is normal and by design.
  *
  *  @image html fast-startup1.png
+ *  @image latex fast-startup1.eps
  *
  *  Once the precached object configuration file have been created, you
  *  can start Centron Scheduler and tell it to use the precached config
@@ -163,6 +164,7 @@
  *  source configuration files.
  *
  *  @image html fast-startup2.png
+ *  @image latex fast-startup2.eps
  *
  *  @section faststartupoptionsskippingcircularpathtests Skipping Circular Path Tests
  *

@@ -13,6 +13,7 @@
  *  quickstartinstallationguides quickstart installation guide @endlink.
  *
  *  @image html configoverview.png
+ *  @image latex configoverview.eps
  *
  *  @section configurationoverviewmainconfigurationfile Main
  *  Configuration File

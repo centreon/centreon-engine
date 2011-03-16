@@ -28,6 +28,7 @@
  *  and running on the Centron Scheduler host.
  *
  *  @image html reachability1.png
+ *  @image latex reachability1.eps
  *
  *  @section determiningstatusandreachabilityofnetworkhostsdefiningparentchildrelationships Defining Parent/Child Relationships
  *
@@ -44,6 +45,7 @@
  *  Centron Scheduler:
  *
  *  @image html reachability2.png
+ *  @image latex reachability2.eps
  *
  *  Now that you know what the parent/child relationships look like for
  *  hosts that are being monitored, how do you configure Centron
@@ -121,6 +123,7 @@
  *  offline...
  *
  *  @image html reachability3.png
+ *  @image latex reachability3.eps
  *
  *  When hosts change state (i.e. from UP to DOWN), the host
  *  reachability logic in Centron Scheduler kicks in. The reachability
@@ -130,6 +133,7 @@
  *  when changes occur.
  *
  *  @image html reachability4.png
+ *  @image latex reachability4.eps
  *
  *  In this example, Centron Scheduler will determine that Web and
  *  Router1 are both in DOWN states because the "path" to those hosts

@@ -3,6 +3,7 @@
  *  @section tcpwrapperintegrationintroduction Introduction
  *
  *  @image html tcpwrappers.png
+ *  @image latex tcpwrappers.eps
  *
  *  This document explains how to easily generate alerts in Centron
  *  Scheduler for connection attempts that are rejected by TCP

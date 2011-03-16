@@ -25,6 +25,7 @@
  *  @section centscheduleraddonsnrpe NRPE
  *
  *  @image html nrpe.png
+ *  @image latex nrpe.eps
  *
  *  NRPE is an addon that allows you to execute @link plugins.html
  *  plugins @endlink on remote Linux/Unix hosts. This is useful if you
@@ -40,6 +41,7 @@
  *  @section centscheduleraddonsnsca NSCA
  *
  *  @image html nsca.png
+ *  @image latex nsca.eps
  *
  *  NSCA is an addon that allows you to send @link passivechecks.html
  *  passive check @endlink results from remote Linux/Unix hosts to the
@@ -53,6 +55,7 @@
  *  @section centscheduleraddonsndoutils NDOUtils
  *
  *  @image html ndoutils.png
+ *  @image latex ndoutils.eps
  *
  *  NDOUtils is an addon that allows you to store all status
  *  information from Centron Scheduler in a MySQL database. Multiple

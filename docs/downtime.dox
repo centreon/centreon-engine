@@ -8,6 +8,7 @@
  *  taking a server down for an upgrade, etc.
  *
  *  @image html downtime.png
+ *  @image latex downtime.eps
  *
  *  @section scheduleddowntimeschedulingdowntime Scheduling Downtime
  *

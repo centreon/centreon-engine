@@ -67,6 +67,7 @@
  *  the "slave" host.
  *
  *  @image html redundancy.png
+ *  @image latex redundancy.eps
  *
  *  @subsection redundantandfailovernetworkmonitoringscenario1redundantmonitoringinitialprogramsettings Initial Program Settings
  *

@@ -1,4 +1,4 @@
-/**
+x/**
  *  @page serviceandhostfreshnesschecks Service and Host Freshness Checks
  *  @section serviceandhostfreshnesschecksintroduction Introduction
  *
@@ -14,6 +14,7 @@
  *  failover @endlink monitoring environments.
  *
  *  @image html freshness.png
+ *  @image latex freshness.eps
  *
  *  @section serviceandhostfreshnesscheckshowdoesfreshnesscheckingwork How Does Freshness Checking Work?
  *

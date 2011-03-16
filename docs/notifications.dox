@@ -3,6 +3,7 @@
  *  @section notificationsintroduction Introduction
  *
  *  @image html objects-contacts.png
+ *  @image latex objects-contacts.eps
  *
  *  I've had a lot of questions as to exactly how notifications work.
  *  This will attempt to explain exactly when and how host and service

@@ -72,6 +72,7 @@
  *  @link timesavingtricksforobjectdefinitions object tricks @endlink.
  *
  *  @image html objects-hosts.png
+ *  @image latex objects-hosts.eps
  *
  *  @ref objectdefinitionsobjecttypesservicedefinitionservice "Services" are one of
  *  the central objects in the monitoring logic. Services are associated
@@ -87,6 +88,7 @@
  *  the use of @link timesavingtricksforobjectdefinitions object tricks @endlink.
  *
  *  @image html objects-services.png
+ *  @image latex objects-services.eps
  *
  *  @ref objectdefinitionsobjecttypescontactdefinition "Contacts" are people
  *  involved in the notification process:
@@ -101,6 +103,7 @@
  *  or service problems occur.
  *
  *  @image html objects-contacts.png
+ *  @image latex objects-contacts.eps
  *
  *  @ref objectdefinitionsobjecttypestimeperioddefinition "Timeperiods" are are
  *  used to control:
@@ -111,6 +114,7 @@
  *  timeperiods.html here @endlink.
  *
  *  @image html objects-timeperiods.png
+ *  @image latex objects-timeperiods.eps
  *
  *  @ref objectdefinitionsobjecttypescommanddefinition "Commands" are used to
  *  tell Centron Scheduler what programs, scripts, etc. it should
@@ -121,5 +125,6 @@
  *  - and more...
  *
  *  @image html objects-commands.png
+ *  @image latex objects-commands.eps
  */
 

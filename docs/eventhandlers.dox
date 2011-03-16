@@ -3,6 +3,7 @@
  *  @section eventhandlersintroduction Introduction
  *
  *  @image html eventhandlers.png
+ *  @image latex eventhandlers.eps
  *
  *  Event handlers are optional system commands (scripts or
  *  executables) that are run whenever a host or service state change

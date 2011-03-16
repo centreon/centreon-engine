@@ -3,6 +3,7 @@
  *  @section notificationescalationsintroduction Introduction
  *
  *  @image html objects-contacts.png
+ *  @image latex objects-contacts.eps
  *
  *  Centron Scheduler supports optional escalation of contact
  *  notifications for hosts and services. Escalation of host and

@@ -13,6 +13,7 @@
  *  - Active checks are run on a regularly scheduled basis
  *
  *  @image html activechecks.png
+ *  @image latex activechecks.eps
  *
  *  @section activecheckshowareactivechecksperformed How Are Active Checks Performed?
  *

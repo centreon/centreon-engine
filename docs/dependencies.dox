@@ -43,6 +43,7 @@
  *  dependent on other services for notifications and check execution.
  *
  *  @image html service-dependencies.png
+ *  @image latex service-dependencies.eps
  *
  *  In this example, the dependency definitions for Service F on Host C
  *  would be defined as follows:
@@ -274,6 +275,7 @@
  *  hosts for notifications.
  *
  *  @image html host-dependencies.png
+ *  @image latex host-dependencies.eps
  *
  *  In the example above, the dependency definitions for Host C would
  *  be defined as follows:

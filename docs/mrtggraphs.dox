@@ -40,6 +40,7 @@
  *  - @link cachedchecks.html Cached checks @endlink
  *
  *  @image html mrtg-activehostchecks.png
+ *  @image latex mrtg-activehostchecks.eps
  *
  *  Active Service Checks - This graph shows how may active service
  *  checks (reguarly scheduled and on-demand) have occurred over time.
@@ -50,6 +51,7 @@
  *  - @link cachedchecks.html Cached checks @endlink
  *
  *  @image html mrtg-activeservicechecks.png
+ *  @image latex mrtg-activeservicechecks.eps
  *
  *  Cached Host and Service Checks - This graph shows how may cached
  *  host and service checks have occurred over time. Useful for
@@ -59,6 +61,7 @@
  *  dependency checks @endlink
  *
  *  @image html mrtg-cachedchecks.png
+ *  @image latex mrtg-cachedchecks.eps
  *
  *  Passive Host and Service Checks - This graph shows how may passive
  *  host and service checks have occurred over time. Useful for
@@ -66,6 +69,7 @@
  *  - @link passivechecks.html Passive checks @endlink
  *
  *  @image html mrtg-passivechecks.png
+ *  @image latex mrtg-passivechecks.eps
  *
  *  Hosts/Services Actively Checked - This graph shows how many (of the
  *  total number of) hosts and services were last checked actively over
@@ -73,6 +77,7 @@
  *  - @link activechecks.html Active checks @endlink
  *
  *  @image html mrtg-activelychecked.png
+ *  @image latex mrtg-activelychecked.eps
  *
  *  Hosts/Services Passively Checked - This graph shows how many (of
  *  the total number of) hosts and services were last checked passively
@@ -80,6 +85,7 @@
  *  - @link passivechecks.html Passive checks @endlink
  *
  *  @image html mrtg-passivelychecked.png
+ *  @image latex mrtg-passivelychecked.eps
  *
  *  Average Service Check Latency and Execution Time - This graph shows
  *  average service check latency and execution times over time. Useful
@@ -97,6 +103,7 @@
  *  "max_check_result_reaper_time"
  *
  *  @image html mrtg-serviceperfstats.png
+ *  @image latex mrtg-serviceperfstats.eps
  *
  *  Average Service State Change - This graph shows the average percent
  *  state change (a measure of volatility) for services over time,
@@ -105,6 +112,7 @@
  *  - @link detectionandhandlingofstateflapping Flap detection @endlink
  *
  *  @image html mrtg-servicestatechange.png
+ *  @image latex mrtg-servicestatechange.eps
  *
  *  Average Host Check Latency and Execution Time - This graph shows
  *  average host check latency and execution times over time. Useful
@@ -122,6 +130,7 @@
  *  "max_check_result_reaper_time"
  *
  *  @image html mrtg-hostperfstats.png
+ *  @image latex mrtg-hostperfstats.eps
  *
  *  Average Host State Change - This graph shows the average percent
  *  state change (a measure of volatility) for hosts over time, broken
@@ -130,6 +139,7 @@
  *  - @link detectionandhandlingofstateflapping Flap detection @endlink
  *
  *  @image html mrtg-hoststatechange.png
+ *  @image latex mrtg-hoststatechange.eps
  *
  *  External Commands - This graph shows how may external commands have
  *  been processed by the Centron Scheduler daemon over time. Unless
@@ -142,6 +152,7 @@
  *  - @link redundantandfailovernetworkmonitoring Redundant/failover monitoring @endlink
  *
  *  @image html mrtg-externalcommands.png
+ *  @image latex mrtg-externalcommands.eps
  *
  *  External Command Buffers - This graph shows how may external
  *  command buffer slots are in use over time. If the number of used
@@ -156,5 +167,6 @@
  *  time they are processed by the Centron Scheduler daemon.
  *
  *  @image html mrtg-commandbuffers.png
+ *  @image latex mrtg-commandbuffers.eps
  */
 

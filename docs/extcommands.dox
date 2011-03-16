@@ -11,6 +11,7 @@
  *  daemon.
  *
  *  @image html externalcommands.png
+ *  @image latex externalcommands.eps
  *
  *  @section externalcommandsenablingexternalcommands Enabling External Commands
  *

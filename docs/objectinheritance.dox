@@ -562,6 +562,7 @@
  *  @endcode
  *
  *  @image html multiple-templates1.png
+ *  @image latex multiple-templates1.eps
  *
  *  In the example above, devweb1 is inheriting variables/values from
  *  two sources: generic-host and development-server. You'll notice
@@ -615,4 +616,5 @@
  *  how things work in complex inheritance situations like this. :-)
  *
  *  @image html multiple-templates2.png
+ *  @image latex multiple-templates2.eps
  */

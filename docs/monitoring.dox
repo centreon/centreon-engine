@@ -360,6 +360,7 @@
  *  is the cause of this.
  *
  *  @image html nrpe.png
+ *  @image latex nrpe.eps
  *
  *  Another common method of monitoring remote Linux/Unix hosts is to
  *  use the NRPE addon. NRPE allows you to execute plugins on remote
@@ -428,6 +429,7 @@
  *  @subsection monitoringroutersswitchesoverview Overview
  *
  *  @image html monitoring-routers.png
+ *  @image latex monitoring-routers.eps
  *
  *  Monitoring switches and routers can either be easy or more involved
  *  - depending on what equipment you have and what you want to
@@ -711,6 +713,7 @@
  *  @subsection monitoringnetworkprintersoverview Overview
  *
  *  @image html monitoring-printers.png
+ *  @image latex monitoring-printers.eps
  *
  *  Monitoring the status of a networked printer is pretty simple.
  *  JetDirect-enabled printers usually have SNMP enabled, which allows

@@ -4,6 +4,7 @@
  *  @section cachedchecksintroduction Introduction
  *
  *  @image html cachedchecks1.png
+ *  @image latex cachedchecks1.eps
  *
  *  The performance of Centron Scheduler' monitoring logic can be
  *  significantly improved by implementing the use of cached checks.
@@ -41,6 +42,7 @@
  *  @section cachedcheckshowcachingworks How Caching Works
  *
  *  @image html cachedchecks.png
+ *  @image latex cachedchecks.eps
  *
  *  When Centron Scheduler needs to perform an on-demand host or
  *  service check, it will make a determination as to whether it can
@@ -140,6 +142,7 @@
  *  hostchecks.html here @endlink.
  *
  *  @image html cachedcheckgraphs.png
+ *  @image latex cachedcheckgraphs.eps
  *
  *  A good way to determine the proper value for the cached check
  *  horizon options is to compare how many on-demand checks Centron
