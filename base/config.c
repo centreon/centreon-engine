@@ -1252,6 +1252,9 @@ int read_main_config_file(char *main_config_file){
 		        }
 
 		/* warn about old variables */
+		else if(!strcmp(variable,"bare_update_check"))
+			logit(NSLOG_CONFIG_WARNING,TRUE,"Warning: bare_update_check variable ignored. Centreon Scheduler does not check for updates.");
+
 		else if(!strcmp(variable,"check_for_updates"))
 			logit(NSLOG_CONFIG_WARNING,TRUE,"Warning: check_for_updates variable ignored. Centreon Scheduler does not check for updates.");
 
