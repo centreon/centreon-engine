@@ -1261,6 +1261,9 @@ int read_main_config_file(char *main_config_file){
 		else if(!strcmp(variable,"comment_file") || !strcmp(variable,"xcddefault_comment_file"))
 			logit(NSLOG_CONFIG_WARNING,TRUE,"Warning: comment_file variable ignored. Comments are now stored in the status and retention files.");
 
+		else if(!strcmp(variable,"daemon_dumps_core"))
+			logit(NSLOG_CONFIG_WARNING,TRUE,"Warning: daemon_dumps_core variable ignored. Core dumping has to be handled by Centreon Scheduler user.");
+
 		else if(!strcmp(variable,"downtime_file") || !strcmp(variable,"xdddefault_downtime_file"))
 			logit(NSLOG_CONFIG_WARNING,TRUE,"Warning: downtime_file variable ignored. Downtime entries are now stored in the status and retention files.");
 
