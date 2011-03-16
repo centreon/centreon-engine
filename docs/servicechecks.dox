@@ -8,8 +8,8 @@
  *
  *  Services are checked by the Centron Scheduler daemon:
  *  - At regular intervals, as defined by the check_interval and
- *  retry_interval options in your @link objectdefinitions#service
- *  service definitions @endlink.
+ *  retry_interval options in your @ref objectdefinitionsobjecttypesservicedefinitionservice
+ *  "service definitions".
  *  - On-demand as needed for @link hostandservicedependencies predictive
  *  service dependency checks @endlink.
  *

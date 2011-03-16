@@ -144,7 +144,7 @@
  *  significantly larger than the sum of the sizes of your object
  *  config files. This is normal and by design.
  *
- *  @dotfile fast-startup1.png
+ *  @image html fast-startup1.png
  *
  *  Once the precached object configuration file have been created, you
  *  can start Centron Scheduler and tell it to use the precached config
@@ -162,7 +162,7 @@
  *  because it is now reading from the precached file, rather than your
  *  source configuration files.
  *
- *  @dotfile fast-startup2.png
+ *  @image html fast-startup2.png
  *
  *  @section faststartupoptionsskippingcircularpathtests Skipping Circular Path Tests
  *

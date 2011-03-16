@@ -2,15 +2,15 @@
  *  @page notificationescalations Notification Escalations
  *  @section notificationescalationsintroduction Introduction
  *
- *  @dotfile objects-contacts.png
+ *  @image html objects-contacts.png
  *
  *  Centron Scheduler supports optional escalation of contact
  *  notifications for hosts and services. Escalation of host and
- *  service notifications is accomplished by defining @link
- *  objectdefinitions#hostescalation host escalations @endlink and
- *  @link objectdefinitions#serviceescalation service escalations
- *  @endlink in your @link objectconfigurationoverview object configuration
- *  file(s) @endlink.
+ *  service notifications is accomplished by defining
+ *  @ref objectdefinitionsobjecttypeshostescalationdefinition "host escalations" and
+ *  @ref objectdefinitionsobjecttypesserviceescalationdefinition "service escalations"
+ *  in your @ref objectconfigurationoverview "object configuration
+ *  file(s)".
  *
  *  @note The examples I provide below all make use of service
  *  escalation definitions, but host escalations work the same way.
@@ -31,7 +31,7 @@
  *    host_name             webserver
  *    service_description   HTTP
  *    first_notification    3
- *    last_notification	    5
+ *    last_notification     5
  *    notification_interval 90
  *    contact_groups        nt-admins,managers
  *  }
@@ -41,7 +41,7 @@
  *    host_name             webserver
  *    service_description   HTTP
  *    first_notification    6
- *    last_notification	    10
+ *    last_notification     10
  *    notification_interval 60
  *    contact_groups        nt-admins,managers,everyone
  *  }
@@ -68,10 +68,10 @@
  *  @code
  *  define serviceescalation
  *  {
- *    host_name		    webserver
+ *    host_name             webserver
  *    service_description   HTTP
  *    first_notification    3
- *    last_notification	    5
+ *    last_notification     5
  *    notification_interval 90
  *    contact_groups        nt-admins,managers
  *  }
@@ -144,12 +144,12 @@
  *  @code
  *  define serviceescalation
  *  {
- *    host_name		webserver
- *  service_description	HTTP
- *  first_notification	3
- *  last_notification	5
- *  notification_interval	20
- *  contact_groups		nt-admins,managers
+ *    host_name             webserver
+ *    service_description   HTTP
+ *    first_notification    3
+ *    last_notification	    5
+ *    notification_interval 20
+ *    contact_groups        nt-admins,managers
  *  }
  *
  *  define serviceescalation
@@ -157,7 +157,7 @@
  *    host_name             webserver
  *    service_description   HTTP
  *    first_notification    4
- *    last_notification	    0
+ *    last_notification     0
  *    notification_interval 30
  *    contact_groups        on-call-support
  *  }
@@ -194,7 +194,7 @@
  *    host_name             webserver
  *    service_description   HTTP
  *    first_notification    6
- *    last_notification	    0
+ *    last_notification     0
  *    notification_interval 60
  *    contact_groups        nt-admins,managers,everyone
  *  }
@@ -257,7 +257,7 @@
  *    host_name             webserver
  *    service_description   HTTP
  *    first_notification    3
- *    last_notification	    5
+ *    last_notification     5
  *    notification_interval 45
  *    contact_groups        nt-admins,managers
  *  }
@@ -277,7 +277,7 @@
  *    host_name             webserver
  *    service_description   HTTP
  *    first_notification    7
- *    last_notification	    0
+ *    last_notification     0
  *    notification_interval 30
  *    contact_groups        nt-admins,managers
  *  }
@@ -297,9 +297,9 @@
  *  Under normal circumstances, escalations can be used at any time
  *  that a notification could normally be sent out for the host or
  *  service. This "notification time window" is determined by the
- *  notification_period directive in the @link
- *  objectdefinitions#host host @endlink or @link
- *  objectdefinitions#service service @endlink definition.
+ *  notification_period directive in the
+ *  @ref objectdefinitionsobjecttypeshostdefinition "host" or
+ *  @ref objectdefinitionsobjecttypesservicedefinitionservice "service" definition.
  *
  *  You can optionally restrict escalations so that they are only used
  *  during specific time periods by using the escalation_period

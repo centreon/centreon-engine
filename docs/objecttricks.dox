@@ -24,7 +24,6 @@
  *  @section timesavingtricksforobjectdefinitionsregularexpressionmatching Regular Expression Matching
  *
  *  The examples I give below use "standard" matching of object names
- *
  *  and *require* @ref mainconfigurationfileoptionsconfigurationfilevariablesregularexpressionmatchingoption
  *  "use_regexp_matching" to be *disabled*.
  *
@@ -48,8 +47,8 @@
  *  @section timesavingtricksforobjectdefinitionsservicedefinitions Service Definitions
  *
  *  Multiple Hosts:
- *  If you want to create identical @link
- *  objectdefinitions#service services @endlink that are assigned
+ *  If you want to create identical
+ *  @ref objectdefinitionsobjecttypesservicedefinitionservice "services" that are assigned
  *  to multiple hosts, you can specify multiple hosts in the host_name
  *  directive. The definition below would create a service called
  *  SOMESERVICE on hosts HOST1 through HOSTN. All the instances of the
@@ -122,9 +121,9 @@
  *  @section timesavingtricksforobjectdefinitionsserviceescalationdefinitions Service Escalation Definitions
  *
  *  Multiple Hosts:
- *  If you want to create @link
- *  objectdefinitions#serviceescalation service escalations
- *  @endlink for services of the same name/description that are
+ *  If you want to create
+ *  @ref objectdefinitionsobjecttypesserviceescalationdefinition "service escalations"
+ *  for services of the same name/description that are
  *  assigned to multiple hosts, you can specify multiple hosts in the
  *  host_name directive. The definition below would create a service
  *  escalation for services called SOMESERVICE on hosts HOST1 through
@@ -196,9 +195,9 @@
  *  @endcode
  *
  *  All Services On Same Host:
- *  If you want to create @link
- *  objectdefinitions#serviceescalation service escalations
- *  @endlink for all services assigned to a particular host, you can
+ *  If you want to create
+ *  @ref objectdefinitionsobjecttypesserviceescalationdefinition "service escalations"
+ *  for all services assigned to a particular host, you can
  *  use a wildcard in the service_description directive. The definition
  *  below would create a service escalation for all services on host
  *  HOST1. All the instances of the service escalation would be
@@ -220,9 +219,9 @@
  *  @endcode
  *
  *  Multiple Services On Same Host:
- *  If you want to create @link
- *  objectdefinitions#serviceescalation service escalations
- *  @endlink for all multiple services assigned to a particular host,
+ *  If you want to create
+ *  @ref objectdefinitionsobjecttypesserviceescalationdefinition "service escalations"
+ *  for all multiple services assigned to a particular host,
  *  you can use a specify more than one service description in the
  *  service_description directive. The definition below would create a
  *  service escalation for services SERVICE1 through SERVICEN on host
@@ -379,8 +378,8 @@
  *  @section timesavingtricksforobjectdefinitionshostescalationdefinitions Host Escalation Definitions
  *
  *  Multiple Hosts:
- *  If you want to create @link objectdefinitions#hostescalation
- *  host escalations @endlink for multiple hosts, you can specify
+ *  If you want to create @ref objectdefinitionsobjecttypeshostescalationdefinition
+ *  "host escalations" for multiple hosts, you can specify
  *  multiple hosts in the host_name directive. The definition below
  *  would create a host escalation for hosts HOST1 through HOSTN. All
  *  the instances of the host escalation would be identical (i.e. have
@@ -428,10 +427,9 @@
  *
  *  Excluding Hosts:
  *  If you want to create identical host escalations on numerous hosts
- *  or hostgroups, but would like to
- *
- *  exclude some hosts from the definition, this can be accomplished by
- *  preceding the host or hostgroup with a ! symbol.
+ *  or hostgroups, but would like to exclude some hosts from the
+ *  definition, this can be accomplished by preceding the host or
+ *  hostgroup with a ! symbol.
  *
  *  @code
  *  define hostescalation
@@ -445,8 +443,8 @@
  *  @section timesavingtricksforobjectdefinitionshostdependencydefinitions Host Dependency Definitions
  *
  *  Multiple Hosts:
- *  If you want to create @link objectdefinitions#hostdependency
- *  host dependencies @endlink for multiple hosts, you can specify
+ *  If you want to create @ref objectdefinitionsobjecttypeshostdependencydefinition
+ *  "host dependencies" for multiple hosts, you can specify
  *  multiple hosts in the host_name and/or dependent_host_name
  *  directives. The definition below would be equivalent to creating
  *  six seperate host dependencies. In the example above, hosts HOST3,

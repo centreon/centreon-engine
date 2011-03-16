@@ -235,7 +235,7 @@
  *
  *  define host
  *  {
- *    host_name		   bighost2
+ *    host_name            bighost2
  *    address              192.168.1.4
  *    check_command        check-host-alive
  *    notification_options d,u,r
@@ -259,10 +259,10 @@
  *  @code
  *  define host
  *  {
- *    _customvar1 somevalue  ; <-- Custom host variable
+ *    _customvar1     somevalue  ; <-- Custom host variable
  *    _snmp_community public ; <-- Custom host variable
- *    name generichosttemplate
- *    register 0
+ *    name            generichosttemplate
+ *    register        0
  *  }
  *
  *  define host
@@ -434,8 +434,7 @@
  *    </tr>
  *  </table>
  *
- *  @section objectinheritanceimpliedadditiveinheritanceinescalations
- *  Implied/Additive Inheritance in Escalations
+ *  @section objectinheritanceimpliedadditiveinheritanceinescalations Implied/Additive Inheritance in Escalations
  *
  *  Service and host escalation definitions can make use of a special
  *  rule that combines the features of implied and additive
@@ -544,12 +543,13 @@
  *  }
  *
  *  # Development web server template
- *  define host{
- *  name                 development-server
- *  check_interval       15
- *  notification_options d,u,r
- *  ...
- *  register             0
+ *  define host
+ *  {
+ *    name                 development-server
+ *    check_interval       15
+ *    notification_options d,u,r
+ *    ...
+ *    register             0
  *  }
  *
  *  # Development web server
@@ -561,7 +561,7 @@
  *  }
  *  @endcode
  *
- *  @dotfile multiple-templates1.png
+ *  @image html multiple-templates1.png
  *
  *  In the example above, devweb1 is inheriting variables/values from
  *  two sources: generic-host and development-server. You'll notice
@@ -614,5 +614,5 @@
  *  Testing, trial, and error will help you better understand exactly
  *  how things work in complex inheritance situations like this. :-)
  *
- *  @dotfile multiple-templates2.png
+ *  @image html multiple-templates2.png
  */

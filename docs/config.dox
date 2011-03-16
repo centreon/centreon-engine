@@ -12,7 +12,7 @@
  *  /usr/local/centscheduler/etc/ directory when you follow the @link
  *  quickstartinstallationguides quickstart installation guide @endlink.
  *
- *  @dotfile configoverview.png
+ *  @image html configoverview.png
  *
  *  @section configurationoverviewmainconfigurationfile Main
  *  Configuration File

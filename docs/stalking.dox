@@ -153,10 +153,9 @@
  *
  *  You should be aware that there are some potential pitfalls with
  *  enabling stalking. These all relate to the reporting functions
- *  found in various @link cgis.html CGIs @endlink (histogram, alert
- *  summary, etc.). Because state stalking will cause additional alert
- *  entries to be logged, the data produced by the reports will show
- *  evidence of inflated numbers of alerts.
+ *  (histogram, alert summary, etc.). Because state stalking will cause
+ *  additional alert entries to be logged, the data produced by the
+ *  reports will show evidence of inflated numbers of alerts.
  *
  *  As a general rule, I would suggest that you not enable stalking for
  *  hosts and services without thinking things through. Still, it's

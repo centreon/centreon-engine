@@ -29,15 +29,15 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariableslogfile Log File
  *
- *  Format: log_file=\<file_name\>
+ *  @code
+ *  Format:  log_file=<file_name>
  *  Example: log_file=/usr/local/centscheduler/var/centscheduler.log
+ *  @endcode
  *
  *  This variable specifies where Centron Scheduler should create its
  *  main log file. This should be the first
- *
  *  variable that you define in your configuration file, as Centron
  *  Scheduler will try to write errors that it
- *
  *  finds in the rest of your configuration data to this file. If you
  *  have @ref mainconfigurationfileoptionsconfigurationfilevariableslogrotationmethod
  *  "log rotation" enabled, this file will automatically be rotated
@@ -45,10 +45,12 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariablesobjectconfigurationfile Object Configuration File
  *
- *  Format: cfg_file=\<file_name\>
+ *  @code
+ *  Format:  cfg_file=<file_name>
  *  Example: cfg_file=/usr/local/centscheduler/etc/hosts.cfg
- *  cfg_file=/usr/local/centscheduler/etc/services.cfg
- *  cfg_file=/usr/local/centscheduler/etc/commands.cfg
+ *           cfg_file=/usr/local/centscheduler/etc/services.cfg
+ *           cfg_file=/usr/local/centscheduler/etc/commands.cfg
+ *  @endcode
  *
  *  This directive is used to specify an @link objectconfigurationoverview object
  *  configuration file @endlink containing object definitions that
@@ -60,10 +62,12 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariablesobjectconfigurationdirectory Object Configuration Directory
  *
- *  Format: cfg_dir=\<directory_name\>
+ *  @code
+ *  Format:  cfg_dir=<directory_name>
  *  Example: cfg_dir=/usr/local/centscheduler/etc/commands
- *  cfg_dir=/usr/local/centscheduler/etc/services
- *  cfg_dir=/usr/local/centscheduler/etc/hosts
+ *           cfg_dir=/usr/local/centscheduler/etc/services
+ *           cfg_dir=/usr/local/centscheduler/etc/hosts
+ *  @endcode
  *
  *  This directive is used to specify a directory which contains @link
  *  objectconfigurationoverview object configuration files @endlink that Centron
@@ -77,22 +81,26 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariablesobjectcachefile Object Cache File
  *
- *  Format: object_cache_file=\<file_name\>
+ *  @code
+ *  Format:  object_cache_file=<file_name>
  *  Example: object_cache_file=/usr/local/centscheduler/var/objects.cache
+ *  @endcode
  *
  *  This directive is used to specify a file in which a cached copy of
  *  @link objectconfigurationoverview object definitions @endlink should be
  *  stored. The cache file is (re)created every time Centron Scheduler
- *  is (re)started and is used by the CGIs. It is intended to speed up
- *  config file caching in the CGIs and allow you to edit the source
+ *  is (re)started. It is intended to speed up config file caching and
+ *  allow you to edit the source
  *  @ref mainconfigurationfileoptionsconfigurationfilevariablesobjectconfigurationfile
  *  "object config files" while Centron Scheduler is running without
- *  affecting the output displayed in the CGIs.
+ *  affecting the output displayed.
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariablesprecachedobjectfile Precached Object File
  *
- *  Format: precached_object_file=\<file_name\>
+ *  @code
+ *  Format:  precached_object_file=<file_name>
  *  Example: precached_object_file=/usr/local/centscheduler/var/objects.precache
+ *  @endcode
  *
  *  This directive is used to specify a file in which a pre-processed,
  *  pre-cached copy of @link objectconfigurationoverview object definitions
@@ -103,16 +111,16 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariablesresourcefile Resource File
  *
- *  Format: resource_file=\<file_name\>
+ *  @code
+ *  Format:  resource_file=<file_name>
  *  Example: resource_file=/usr/local/centscheduler/etc/resource.cfg
+ *  @endcode
  *
  *  This is used to specify an optional resource file that can contain
  *  $USERn$ @link understandingmacrosandhowtheywork macro @endlink definitions. $USERn$
  *  macros are useful for storing usernames, passwords, and items
- *  commonly used in command definitions (like directory paths). The
- *  CGIs will not attempt to read resource files, so you can set
- *  restrictive permissions (600 or 660) on them to protect sensitive
- *  information. You can include multiple resource files by adding
+ *  commonly used in command definitions (like directory paths).
+ *  You can include multiple resource files by adding
  *  multiple resource_file statements to the main config file - Centron
  *  Scheduler will process them all. See the sample resource.cfg file
  *  in the sample-config/ subdirectory of the Centron Scheduler
@@ -120,8 +128,10 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariablestempfile Temp File
  *
- *  Format: temp_file=\<file_name\>
+ *  @code
+ *  Format:  temp_file=<file_name>
  *  Example: temp_file=/usr/local/centscheduler/var/centscheduler.tmp
+ *  @endcode
  *
  *  This is a temporary file that Centron Scheduler periodically
  *  creates to use when updating comment data, status data, etc. The
@@ -129,8 +139,10 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariablestemppath Temp Path
  *
- *  Format: temp_path=\<dir_name\>
+ *  @code
+ *  Format:  temp_path=<dir_name>
  *  Example: temp_path=/tmp
+ *  @endcode
  *
  *  This is a directory that Centron Scheduler can use as scratch space
  *  for creating temporary files used during the monitoring process.
@@ -139,20 +151,21 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariablesstatusfile Status File
  *
- *  Format: status_file=\<file_name\>
+ *  @code
+ *  Format:  status_file=<file_name>
  *  Example: status_file=/usr/local/centscheduler/var/status.dat
+ *  @endcode
  *
  *  This is the file that Centron Scheduler uses to store the current
- *  status, comment, and downtime information. This file is used by the
- *  CGIs so that current monitoring status can be reported via a web
- *  interface. The CGIs must have read access to this file in order to
- *  function properly. This file is deleted every time Centron
- *  Scheduler stops and recreated when it starts.
+ *  status, comment, and downtime information. This file is deleted
+ *  every time Centron Scheduler stops and recreated when it starts.
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariablesstatusfileupdateinterval Status File Update Interval
  *
- *  Format: status_update_interval=\<seconds\>
+ *  @code
+ *  Format:  status_update_interval=<seconds>
  *  Example: status_update_interval=15
+ *  @endcode
  *
  *  This setting determines how often (in seconds) that Centron
  *  Scheduler will update status data in the @ref
@@ -161,8 +174,10 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariablescentronscheduleruser Centron Scheduler User
  *
- *  Format: centscheduler_user=<username/UID>
+ *  @code
+ *  Format:  centscheduler_user=<username/UID>
  *  Example: centscheduler_user=centscheduler
+ *  @endcode
  *
  *  This is used to set the effective user that the Centron Scheduler
  *  process should run as. After initial program startup and before
@@ -172,8 +187,10 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariablescentronschedulergroup Centron Scheduler Group
  *
- *  Format: centscheduler_group=<groupname/GID>
+ *  @code
+ *  Format:  centscheduler_group=<groupname/GID>
  *  Example: centscheduler_group=centscheduler
+ *  @endcode
  *
  *  This is used to set the effective group that the Centron Scheduler
  *  process should run as. After initial program startup and before
@@ -183,8 +200,10 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariablesnotificationsoption Notifications Option
  *
- *  Format: enable_notifications=<0/1>
+ *  @code
+ *  Format:  enable_notifications=<0/1>
  *  Example: enable_notifications=1
+ *  @endcode
  *
  *  This option determines whether or not Centron Scheduler will send
  *  out @link notifications.html notifications @endlink when it
@@ -209,8 +228,10 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariablesservicecheckexecutionoption Service Check Execution Option
  *
- *  Format: execute_service_checks=<0/1>
+ *  @code
+ *  Format:  execute_service_checks=<0/1>
  *  Example: execute_service_checks=1
+ *  @endcode
  *
  *  This option determines whether or not Centron Scheduler will
  *  execute service checks when it initially (re)starts. If this option
@@ -241,8 +262,10 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariablespassiveservicecheckacceptanceoption Passive Service Check Acceptance Option
  *
- *  Format: accept_passive_service_checks=<0/1>
+ *  @code
+ *  Format:  accept_passive_service_checks=<0/1>
  *  Example: accept_passive_service_checks=1
+ *  @endcode
  *
  *  This option determines whether or not Centron Scheduler will accept
  *  @link passivechecks.html passive service checks @endlink when it
@@ -267,8 +290,10 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariableshostcheckexecutionoption Host Check Execution Option
  *
- *  Format: execute_host_checks=<0/1>
+ *  @code
+ *  Format:  execute_host_checks=<0/1>
  *  Example: execute_host_checks=1
+ *  @endcode
  *
  *  This option determines whether or not Centron Scheduler will
  *  execute on-demand and regularly scheduled host checks when it
@@ -300,15 +325,17 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariablespassivehostcheckacceptanceoption Passive Host Check Acceptance Option
  *
+ *  @code
  *  Format: accept_passive_host_checks=<0/1>
  *  Example: accept_passive_host_checks=1
+ *  @endcode
  *
  *  This option determines whether or not Centron Scheduler will accept
  *  @link passivechecks.html passive host checks @endlink when it
  *  initially (re)starts. If this option is disabled, Centron Scheduler
  *  will not accept any passive host checks.
  *
- *  @note: If you have @ref mainconfigurationfileoptionsconfigurationfilevariablesstateretentionoption
+ *  @note If you have @ref mainconfigurationfileoptionsconfigurationfilevariablesstateretentionoption
  *  "state retention" enabled, Centron Scheduler will ignore this setting when it
  *  (re)starts and use the last known setting for this option (as stored
  *  in the @ref mainconfigurationfileoptionsconfigurationfilevariablesstateretentionfile
@@ -327,15 +354,17 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariableseventhandleroption Event Handler Option
  *
- *  Format: enable_event_handlers=<0/1>
+ *  @code
+ *  Format:  enable_event_handlers=<0/1>
  *  Example: enable_event_handlers=1
+ *  @endcode
  *
  *  This option determines whether or not Centron Scheduler will run
  *  @link eventhandlers.html event handlers @endlink when it initially
  *  (re)starts. If this option is disabled, Centron Scheduler will not
  *  run any host or service event handlers.
  *
- *  @note: If you have @ref mainconfigurationfileoptionsconfigurationfilevariablesstateretentionoption
+ *  @note If you have @ref mainconfigurationfileoptionsconfigurationfilevariablesstateretentionoption
  *  "state retention" enabled, Centron Scheduler will ignore this setting when it
  *  (re)starts and use the last known setting for this option (as stored
  *  in the @ref mainconfigurationfileoptionsconfigurationfilevariablesstateretentionfile
@@ -354,8 +383,10 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariableslogrotationmethod Log Rotation Method
  *
- *  Format: log_rotation_method=<n/h/d/w/m>
+ *  @code
+ *  Format:  log_rotation_method=<n/h/d/w/m>
  *  Example: log_rotation_method=d
+ *  @endcode
  *
  *  This is the rotation method that you would like Centron Scheduler
  *  to use for your log file. Values are as follows:
@@ -368,8 +399,10 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariableslogarchivepath Log Archive Path
  *
- *  Format: log_archive_path=\<path\>
+ *  @code
+ *  Format:  log_archive_path=<path>
  *  Example: log_archive_path=/usr/local/centscheduler/var/archives/
+ *  @endcode
  *
  *  This is the directory where Centron Scheduler should place log
  *  files that have been rotated. This option is ignored if you choose
@@ -378,23 +411,25 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariablesexternalcommandcheckoption External Command Check Option
  *
- *  Format: check_external_commands=\<0/1\>
+ *  @code
+ *  Format:  check_external_commands=<0/1>
  *  Example: check_external_commands=1
+ *  @endcode
  *
  *  This option determines whether or not Centron Scheduler will check
  *  the @ref mainconfigurationfileoptionsconfigurationfilevariablesexternalcommandfile "command file" for commands that
- *  should be executed. This option must be enabled if you plan on
- *  using the @link cgis.html#cmd_cgi command CGI @endlink to issue
- *  commands via the web interface. More information on external
- *  commands can be found @link externalcommands here @endlink.
+ *  should be executed. More information on external commands can be
+ *  found @link externalcommands here @endlink.
  *
  *  - 0 = Don't check external commands
  *  - 1 = Check external commands (default)
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariablesexternalcommandcheckinterval External Command Check Interval
  *
- *  Format: command_check_interval=\<xxx\>[s]
+ *  @code
+ *  Format:  command_check_interval=<xxx>[s]
  *  Example: command_check_interval=1
+ *  @endcode
  *
  *  If you specify a number with an "s" appended to it (i.e. 30s), this
  *  is the number of seconds to wait between external command checks.
@@ -412,12 +447,13 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariablesexternalcommandfile External Command File
  *
- *  Format: command_file=\<file_name\>
+ *  @code
+ *  Format:  command_file=<file_name>
  *  Example: command_file=/usr/local/centscheduler/var/rw/centscheduler.cmd
+ *  @endcode
  *
  *  This is the file that Centron Scheduler will check for external
- *  commands to process. The @link cgis.html#cmd_cgi command CGI
- *  @endlink writes commands to this file. The external command file is
+ *  commands to process. The external command file is
  *  implemented as a named pipe (FIFO), which is created when Centron
  *  Scheduler starts and removed when it shuts down. If the file exists
  *  when Centron Scheduler starts, the Centron Scheduler process will
@@ -426,8 +462,10 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariablesexternalcommandbufferslots External Command Buffer Slots
  *
- *  Format: external_command_buffer_slots=<#>
+ *  @code
+ *  Format:  external_command_buffer_slots=<#>
  *  Example: external_command_buffer_slots=512
+ *  @endcode
  *
  *  @note This is an advanced feature. This option determines how many
  *  buffer slots Centron Scheduler will reserve for caching external
@@ -444,8 +482,10 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariablesupdatechecks Update Checks
  *
- *  Format: check_for_updates=<0/1>
+ *  @code
+ *  Format:  check_for_updates=<0/1>
  *  Example: check_for_updates=1
+ *  @endcode
  *
  *  This option determines whether Centron Scheduler will automatically
  *  check to see if new updates (releases) are available. It is
@@ -459,8 +499,10 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariablesbareupdatechecks Bare Update Checks
  *
- *  Format: bare_update_checks=<0/1>
+ *  @code
+ *  Format:  bare_update_checks=<0/1>
  *  Example: bare_update_checks
+ *  @endcode
  *
  *  This option deterines what data Centron Scheduler will send to
  *  api.centscheduler.org when it checks for updates. By default,
@@ -473,8 +515,10 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariableslockfile Lock File
  *
- *  Format: lock_file=\<file_name\>
+ *  @code
+ *  Format:  lock_file=<file_name>
  *  Example: lock_file=/tmp/centscheduler.lock
+ *  @endcode
  *
  *  This option specifies the location of the lock file that Centron
  *  Scheduler should create when it runs as a daemon (when started with
@@ -483,8 +527,10 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariablesstateretentionoption State Retention Option
  *
- *  Format: retain_state_information=<0/1>
+ *  @code
+ *  Format:  retain_state_information=<0/1>
  *  Example: retain_state_information=1
+ *  @endcode
  *
  *  This option determines whether or not Centron Scheduler will retain
  *  state information for hosts and services between program restarts.
@@ -500,8 +546,10 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariablesstateretentionfile State Retention File
  *
- *  Format: state_retention_file=\<file_name\>
+ *  @code
+ *  Format:  state_retention_file=<file_name>
  *  Example: state_retention_file=/usr/local/centscheduler/var/retention.dat
+ *  @endcode
  *
  *  This is the file that Centron Scheduler will use for storing
  *  status, downtime, and comment information before it shuts down.
@@ -514,8 +562,10 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariablesautomaticstateretentionupdateinterval Automatic State Retention Update Interval
  *
- *  Format: retention_update_interval=\<minutes\>
+ *  @code
+ *  Format:  retention_update_interval=<minutes>
  *  Example: retention_update_interval=60
+ *  @endcode
  *
  *  This setting determines how often (in minutes) that Centron
  *  Scheduler will automatically save retention data during normal
@@ -528,8 +578,10 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariablesuseretainedprogramstateoption Use Retained Program State Option
  *
- *  Format: use_retained_program_state=<0/1>
+ *  @code
+ *  Format:  use_retained_program_state=<0/1>
  *  Example: use_retained_program_state=1
+ *  @endcode
  *
  *  This setting determines whether or not Centron Scheduler will set
  *  various program-wide state variables based on the values saved in
@@ -549,8 +601,10 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariablesuseretainedschedulinginfooption Use Retained Scheduling Info Option
  *
- *  Format: use_retained_scheduling_info=<0/1>
+ *  @code
+ *  Format:  use_retained_scheduling_info=<0/1>
  *  Example: use_retained_scheduling_info=1
+ *  @endcode
  *
  *  This setting determines whether or not Centron Scheduler will
  *  retain scheduling info (next check times) for hosts and services
@@ -565,10 +619,12 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariablesretainedhostandserviceattributemasks Retained Host and Service Attribute Masks
  *
- *  Format: retained_host_attribute_mask=\<number\>
- *  retained_service_attribute_mask=\<number\>
+ *  @code
+ *  Format:  retained_host_attribute_mask=<number>
+ *           retained_service_attribute_mask=<number>
  *  Example: retained_host_attribute_mask=0
- *  retained_service_attribute_mask=0
+ *           retained_service_attribute_mask=0
+ *  @endcode
  *
  *  @warning This is an advanced feature. You'll need to read the
  *  Centron Scheduler source code to use this option effectively.
@@ -581,10 +637,12 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariablesretainedprocessattributemasks Retained Process Attribute Masks
  *
- *  Format: retained_process_host_attribute_mask=\<number\>
- *  retained_process_service_attribute_mask=\<number\>
+ *  @code
+ *  Format:  retained_process_host_attribute_mask=<number>
+ *           retained_process_service_attribute_mask=<number>
  *  Example: retained_process_host_attribute_mask=0
- *  retained_process_service_attribute_mask=0
+ *           retained_process_service_attribute_mask=0
+ *  @endcode
  *
  *  @warning This is an advanced feature. You'll need to read the
  *  Centron Scheduler source code to use this option effectively.
@@ -600,10 +658,12 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariablesretainedcontactattributemasks Retained Contact Attribute Masks
  *
- *  Format: retained_contact_host_attribute_mask=\<number\>
- *  retained_contact_service_attribute_mask=\<number\>
+ *  @code
+ *  Format:  retained_contact_host_attribute_mask=<number>
+ *           retained_contact_service_attribute_mask=<number>
  *  Example: retained_contact_host_attribute_mask=0
- *  retained_contact_service_attribute_mask=0
+ *           retained_contact_service_attribute_mask=0
+ *  @endcode
  *
  *  @warning This is an advanced feature. You'll need to read the
  *  Centron Scheduler source code to use this option effectively.
@@ -617,8 +677,10 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariablessyslogloggingoption Syslog Logging Option
  *
- *  Format: use_syslog=<0/1>
+ *  @code
+ *  Format:  use_syslog=<0/1>
  *  Example: use_syslog=1
+ *  @endcode
  *
  *  This variable determines whether messages are logged to the syslog
  *  facility on your local host. Values are as follows:
@@ -627,8 +689,10 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariablesnotificationloggingoption Notification Logging Option
  *
- *  Format: log_notifications=<0/1>
+ *  @code
+ *  Format:  log_notifications=<0/1>
  *  Example: log_notifications=1
+ *  @endcode
  *
  *  This variable determines whether or not notification messages are
  *  logged. If you have a lot of contacts or regular service failures
@@ -640,8 +704,10 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariablesservicecheckretryloggingoption Service Check Retry Logging Option
  *
- *  Format: log_service_retries=<0/1>
+ *  @code
+ *  Format:  log_service_retries=<0/1>
  *  Example: log_service_retries=1
+ *  @endcode
  *
  *  This variable determines whether or not service check retries are
  *  logged. Service check retries occur when a service check results in
@@ -657,8 +723,10 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariableshostcheckretryloggingoption Host Check Retry Logging Option
  *
- *  Format: log_host_retries=<0/1>
+ *  @code
+ *  Format:  log_host_retries=<0/1>
  *  Example: log_host_retries=1
+ *  @endcode
  *
  *  This variable determines whether or not host check retries are
  *  logged. Logging host check retries is mostly useful when attempting
@@ -670,8 +738,10 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariableseventhandlerloggingoption Event Handler Logging Option
  *
- *  Format: log_event_handlers=<0/1>
+ *  @code
+ *  Format:  log_event_handlers=<0/1>
  *  Example: log_event_handlers=1
+ *  @endcode
  *
  *  This variable determines whether or not service and host @link
  *  eventhandlers.html event handlers @endlink are logged.
@@ -686,8 +756,10 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariablesinitialstatesloggingoption Initial States Logging Option
  *
- *  Format: log_initial_states=<0/1>
+ *  @code
+ *  Format:  log_initial_states=<0/1>
  *  Example: log_initial_states=1
+ *  @endcode
  *
  *  This variable determines whether or not Centron Scheduler will
  *  force all initial host and service states to be logged, even if
@@ -702,8 +774,10 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariablesexternalcommandloggingoption External Command Logging Option
  *
- *  Format: log_external_commands=<0/1>
+ *  @code
+ *  Format:  log_external_commands=<0/1>
  *  Example: log_external_commands=1
+ *  @endcode
  *
  *  This variable determines whether or not Centron Scheduler will log
  *  @link externalcommands external commands @endlink that it receives
@@ -720,8 +794,10 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariablespassivecheckloggingoption Passive Check Logging Option
  *
- *  Format: log_passive_checks=<0/1>
+ *  @code
+ *  Format:  log_passive_checks=<0/1>
  *  Example: log_passive_checks=1
+ *  @endcode
  *
  *  This variable determines whether or not Centron Scheduler will log
  *  @link passivechecks.html passive host and service checks @endlink
@@ -736,8 +812,10 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariablesglobalhosteventhandleroption Global Host Event Handler Option
  *
- *  Format: global_host_event_handler=\<command\>
+ *  @code
+ *  Format:  global_host_event_handler=<command>
  *  Example: global_host_event_handler=log-host-event-to-db
+ *  @endcode
  *
  *  This option allows you to specify a host event handler command that
  *  is to be run for every host state change. The global event handler
@@ -752,8 +830,10 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariablesglobalserviceeventhandleroption Global Service Event Handler Option
  *
- *  Format: global_service_event_handler=\<command\>
+ *  @code
+ *  Format:  global_service_event_handler=<command>
  *  Example: global_service_event_handler=log-service-event-to-db
+ *  @endcode
  *
  *  This option allows you to specify a service event handler command
  *  that is to be run for every service state change. The global event
@@ -768,8 +848,10 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariablesinterchecksleeptime Inter-Check Sleep Time
  *
- *  Format: sleep_time=\<seconds\>
+ *  @code
+ *  Format:  sleep_time=<seconds>
  *  Example: sleep_time=1
+ *  @endcode
  *
  *  This is the number of seconds that Centron Scheduler will sleep
  *  before checking to see if the next service or host check in the
@@ -780,8 +862,10 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariablesserviceintercheckdelaymethod Service Inter-Check Delay Method
  *
- *  Format: service_inter_check_delay_method=<n/d/s/x.xx>
+ *  @code
+ *  Format:  service_inter_check_delay_method=<n/d/s/x.xx>
  *  Example: service_inter_check_delay_method=s
+ *  @endcode
  *
  *  This option allows you to control how service checks are initially
  *  "spread out" in the event queue. Using a "smart" delay calculation
@@ -793,7 +877,7 @@
  *  that you will generally have large CPU spikes when the services are
  *  all executed in parallel. More information on how to estimate how
  *  the inter-check delay affects service check scheduling can be found
- *  @link serviceandhostcheckscheduling#service_inter_check_delay here @endlink.
+ *  @ref serviceandhostcheckscheduling "here".
  *  Values are as follows:
  *  - n = Don't use any delay - schedule all service checks to run
  *  immediately (i.e. at the same time!)
@@ -804,8 +888,10 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariablesmaximumservicecheckspread Maximum Service Check Spread
  *
- *  Format: max_service_check_spread=\<minutes\>
+ *  @code
+ *  Format:  max_service_check_spread=<minutes>
  *  Example: max_service_check_spread=30
+ *  @endcode
  *
  *  This option determines the maximum number of minutes from when
  *  Centron Scheduler starts that all services (that are scheduled to
@@ -821,8 +907,10 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariablesserviceinterleavefactor Service Interleave Factor
  *
- *  Format: service_interleave_factor=<s|x>
+ *  @code
+ *  Format:  service_interleave_factor=<s|x>
  *  Example: service_interleave_factor=s
+ *  @endcode
  *
  *  This variable determines how service checks are interleaved.
  *  Interleaving allows for a more even distribution of service checks,
@@ -831,13 +919,10 @@
  *  the service checks (this is how versions of Centron Scheduler
  *  previous to 0.0.5 worked). Set this value to s (smart) for
  *  automatic calculation of the interleave factor unless you have a
- *  specific reason to change it. The best way to understand how
- *  interleaving works is to watch the @link cgis.html#status_cgi
- *  status CGI @endlink (detailed view) when Centron Scheduler is just
- *  starting. You should see that the service check results are spread
- *  out as they begin to appear. More information on how interleaving
- *  works can be found @link serviceandhostcheckscheduling#service_interleaving
- *  here @endlink.
+ *  specific reason to change it. You should see that the service check
+ *  results are spread out as they begin to appear. More information on
+ *  how interleaving works can be found @link
+ *  serviceandhostcheckscheduling here @endlink.
  *
  *  - x = A number greater than or equal to 1 that specifies the
  *  interleave factor to use. An interleave factor of 1 is equivalent
@@ -847,8 +932,10 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariablesmaximumconcurrentservicechecks Maximum Concurrent Service Checks
  *
- *  Format: max_concurrent_checks=\<max_checks\>
+ *  @code
+ *  Format:  max_concurrent_checks=<max_checks>
  *  Example: max_concurrent_checks=20
+ *  @endcode
  *
  *  This option allows you to specify the maximum number of service
  *  checks that can be run in parallel at any given time. Specifying a
@@ -861,12 +948,14 @@
  *  will be imposed on the system (processor utilization, memory,
  *  etc.). More information on how to estimate how many concurrent
  *  checks you should allow can be found @link
- *  serviceandhostcheckscheduling#max_concurrent_checks here @endlink.
+ *  serviceandhostcheckscheduling here @endlink.
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariablescheckresultreaperfrequency Check Result Reaper Frequency
  *
- *  Format: check_result_reaper_frequency=\<frequency_in_seconds\>
+ *  @code
+ *  Format:  check_result_reaper_frequency=<frequency_in_seconds>
  *  Example: check_result_reaper_frequency=5
+ *  @endcode
  *
  *  This option allows you to control the frequency in seconds of check
  *  result "reaper" events. "Reaper" events process the results from
@@ -875,8 +964,10 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariablesmaximumcheckresultreapertime Maximum Check Result Reaper Time
  *
- *  Format: max_check_result_reaper_time=\<seconds\>
+ *  @code
+ *  Format:  max_check_result_reaper_time=<seconds>
  *  Example: max_check_result_reaper_time=30
+ *  @endcode
  *
  *  This option allows you to control the maximum amount of time in
  *  seconds that host and service check result "reaper" events are
@@ -890,8 +981,10 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariablescheckresultpath Check Result Path
  *
- *  Format: check_result_path=\<path\>
+ *  @code
+ *  Format:  check_result_path=<path>
  *  Example: check_result_path=/var/spool/centscheduler/checkresults
+ *  @endcode
  *
  *  This options determines which directory Centron Scheduler will use
  *  to temporarily store host and service check results before they are
@@ -908,8 +1001,10 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariablesmaxcheckresultfileage Max Check Result File Age
  *
- *  Format: max_check_result_file_age=\<seconds\>
+ *  @code
+ *  Format:  max_check_result_file_age=<seconds>
  *  Example: max_check_result_file_age=3600
+ *  @endcode
  *
  *  This options determines the maximum age in seconds that Centron
  *  Scheduler will consider check result files found in the
@@ -922,8 +1017,10 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariableshostintercheckdelaymethod Host Inter-Check Delay Method
  *
- *  Format: host_inter_check_delay_method=<n/d/s/x.xx>
+ *  @code
+ *  Format:  host_inter_check_delay_method=<n/d/s/x.xx>
  *  Example: host_inter_check_delay_method=s
+ *  @endcode
  *
  *  This option allows you to control how host checks that are
  *  scheduled to be checked on a regular basis are initially "spread
@@ -935,7 +1032,7 @@
  *  host checks to be scheduled for execution at the same time. More
  *  information on how to estimate how the inter-check delay affects
  *  host check scheduling can be found @link
- *  serviceandhostcheckscheduling#host_inter_check_delay here @endlink.Values
+ *  serviceandhostcheckscheduling here @endlink.Values
  *  are as follows:
  *  - n = Don't use any delay - schedule all host checks to run
  *  immediately (i.e. at the same time!)
@@ -946,8 +1043,10 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariablesmaximumhostcheckspread Maximum Host Check Spread
  *
- *  Format: max_host_check_spread=\<minutes\>
+ *  @code
+ *  Format:  max_host_check_spread=<minutes>
  *  Example: max_host_check_spread=30
+ *  @endcode
  *
  *  This option determines the maximum number of minutes from when
  *  Centron Scheduler starts that all hosts (that are scheduled to be
@@ -962,15 +1061,17 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariablestimingintervallength Timing Interval Length
  *
- *  Format: interval_length=\<seconds\>
+ *  @code
+ *  Format:  interval_length=<seconds>
  *  Example: interval_length=60
+ *  @endcode
  *
  *  This is the number of seconds per "unit interval" used for timing
  *  in the scheduling queue, re-notifications, etc. "Units intervals"
  *  are used in the object configuration file to determine how often to
  *  run a service check, how often to re-notify a contact, etc.
  *
- *  @note Important: The default value for this is set to
+ *  @attention The default value for this is set to
  *  60, which means that a "unit value" of 1 in the object
  *  configuration file will mean 60 seconds (1 minute). I have not
  *  really tested other values for this variable, so proceed at your
@@ -978,8 +1079,10 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariablesautoreschedulingoption Auto-Rescheduling Option
  *
- *  Format: auto_reschedule_checks=<0/1>
+ *  @code
+ *  Format:  auto_reschedule_checks=<0/1>
  *  Example: auto_reschedule_checks=1
+ *  @endcode
  *
  *  This option determines whether or not Centron Scheduler will
  *  attempt to automatically reschedule active host and service checks
@@ -994,8 +1097,10 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariablesautoreschedulinginterval Auto-Rescheduling Interval
  *
- *  Format: auto_rescheduling_interval=\<seconds\>
+ *  @code
+ *  Format:  auto_rescheduling_interval=<seconds>
  *  Example: auto_rescheduling_interval=30
+ *  @endcode
  *
  *  This option determines how often (in seconds) Centron Scheduler
  *  will attempt to automatically reschedule checks. This option only
@@ -1010,8 +1115,10 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariablesautoreschedulingwindow Auto-Rescheduling Window
  *
- *  Format: auto_rescheduling_window=\<seconds\>
+ *  @code
+ *  Format:  auto_rescheduling_window=<seconds>
  *  Example: auto_rescheduling_window=180
+ *  @endcode
  *
  *  This option determines the "window" of time (in seconds) that
  *  Centron Scheduler will look at when automatically rescheduling
@@ -1028,8 +1135,10 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariablesaggressivehostcheckingoption Aggressive Host Checking Option
  *
- *  Format: use_aggressive_host_checking=<0/1>
+ *  @code
+ *  Format:  use_aggressive_host_checking=<0/1>
  *  Example: use_aggressive_host_checking=0
+ *  @endcode
  *
  *  Centron Scheduler tries to be smart about how and when it checks
  *  the status of hosts. In general, disabling this option will allow
@@ -1044,8 +1153,10 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariablestranslatepassivehostchecksoption Translate Passive Host Checks Option
  *
- *  Format: translate_passive_host_checks=<0/1>
+ *  @code
+ *  Format:  translate_passive_host_checks=<0/1>
  *  Example: translate_passive_host_checks=1
+ *  @endcode
  *
  *  This option determines whether or not Centron Scheduler will
  *  translate DOWN/UNREACHABLE passive host check results to their
@@ -1060,8 +1171,10 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariablespassivehostchecksaresoftoption Passive Host Checks Are SOFT Option
  *
- *  Format: passive_host_checks_are_soft=<0/1>
+ *  @code
+ *  Format:  passive_host_checks_are_soft=<0/1>
  *  Example: passive_host_checks_are_soft=1
+ *  @endcode
  *
  *  This option determines whether or not Centron Scheduler will treat
  *  @link passivechecks.html passive host checks @endlink as HARD
@@ -1074,13 +1187,15 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariablespredictivehostdependencychecksoption Predictive Host Dependency Checks Option
  *
- *  Format: enable_predictive_host_dependency_checks=<0/1>
+ *  @code
+ *  Format:  enable_predictive_host_dependency_checks=<0/1>
  *  Example: enable_predictive_host_dependency_checks=1
+ *  @endcode
  *
  *  This option determines whether or not Centron Scheduler will
  *  execute predictive checks of hosts that are being depended upon (as
- *  defined in @link objectdefinitions#hostdependency host
- *  dependencies @endlink) for a particular host when it changes state.
+ *  defined in @ref objectdefinitionsobjecttypeshostdependencydefinition "host
+ *  dependencies") for a particular host when it changes state.
  *  Predictive checks help ensure that the dependency logic is as
  *  accurate as possible. More information on how predictive checks
  *  work can be found @link hostandservicedependencies here @endlink.
@@ -1090,8 +1205,10 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariablespredictiveservicedependencychecksoption Predictive Service Dependency Checks Option
  *
- *  Format: enable_predictive_service_dependency_checks=<0/1>
+ *  @code
+ *  Format:  enable_predictive_service_dependency_checks=<0/1>
  *  Example: enable_predictive_service_dependency_checks=1
+ *  @endcode
  *
  *  This option determines whether or not Centron Scheduler will
  *  execute predictive checks of services that are being depended upon
@@ -1107,8 +1224,10 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariablescachedhostcheckhorizon Cached Host Check Horizon
  *
- *  Format: cached_host_check_horizon=\<seconds\>
+ *  @code
+ *  Format:  cached_host_check_horizon=<seconds>
  *  Example: cached_host_check_horizon=15
+ *  @endcode
  *
  *  This option determines the maximum amount of time (in seconds) that
  *  the state of a previous host check is considered current. Cached
@@ -1122,8 +1241,10 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariablescachedservicecheckhorizon Cached Service Check Horizon
  *
- *  Format: cached_service_check_horizon=\<seconds\>
+ *  @code
+ *  Format:  cached_service_check_horizon=<seconds>
  *  Example: cached_service_check_horizon=15
+ *  @endcode
  *
  *  This option determines the maximum amount of time (in seconds) that
  *  the state of a previous service check is considered current. Cached
@@ -1138,8 +1259,10 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariableslargeinstallationtweaksoption Large Installation Tweaks Option
  *
- *  Format: use_large_installation_tweaks=<0/1>
+ *  @code
+ *  Format:  use_large_installation_tweaks=<0/1>
  *  Example: use_large_installation_tweaks=0
+ *  @endcode
  *
  *  This option determines whether or not the Centron Scheduler daemon
  *  will take several shortcuts to improve performance. These shortcuts
@@ -1153,8 +1276,10 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariableschildprocessmemoryoption Child Process Memory Option
  *
- *  Format: free_child_process_memory=<0/1>
+ *  @code
+ *  Format:  free_child_process_memory=<0/1>
  *  Example: free_child_process_memory=0
+ *  @endcode
  *
  *  This option determines whether or not Centron Scheduler will free
  *  memory in child processes when they are fork()ed off from the main
@@ -1169,8 +1294,10 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariableschildprocessesforktwice Child Processes Fork Twice
  *
- *  Format: child_processes_fork_twice=<0/1>
+ *  @code
+ *  Format:  child_processes_fork_twice=<0/1>
  *  Example: child_processes_fork_twice=0
+ *  @endcode
  *
  *  This option determines whether or not Centron Scheduler will fork()
  *  child processes twice when it executes host and service checks. By
@@ -1185,8 +1312,10 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariablesenvironmentmacrosoption Environment Macros Option
  *
- *  Format: enable_environment_macros=<0/1>
+ *  @code
+ *  Format:  enable_environment_macros=<0/1>
  *  Example: enable_environment_macros=0
+ *  @endcode
  *
  *  This option determines whether or not the Centron Scheduler daemon
  *  will make all standard @link standardmacrosincentscheduler macros @endlink
@@ -1201,8 +1330,10 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariablesflapdetectionoption Flap Detection Option
  *
- *  Format: enable_flap_detection=<0/1>
+ *  @code
+ *  Format:  enable_flap_detection=<0/1>
  *  Example: enable_flap_detection=0
+ *  @endcode
  *
  *  This option determines whether or not Centron Scheduler will try
  *  and detect hosts and services that are "flapping". Flapping occurs
@@ -1234,8 +1365,10 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariableslowserviceflapthreshold Low Service Flap Threshold
  *
- *  Format: low_service_flap_threshold=\<percent\>
+ *  @code
+ *  Format:  low_service_flap_threshold=<percent>
  *  Example: low_service_flap_threshold=25.0
+ *  @endcode
  *
  *  This option is used to set the low threshold for detection of
  *  service flapping. For more information on how flap detection and
@@ -1244,8 +1377,10 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariableshighserviceflapthreshold High Service Flap Threshold
  *
- *  Format: high_service_flap_threshold=\<percent\>
+ *  @code
+ *  Format:  high_service_flap_threshold=<percent>
  *  Example: high_service_flap_threshold=50.0
+ *  @endcode
  *
  *  This option is used to set the high threshold for detection of
  *  service flapping. For more information on how flap detection and
@@ -1254,8 +1389,10 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariableslowhostflapthreshold Low Host Flap Threshold
  *
- *  Format: low_host_flap_threshold=\<percent\>
+ *  @code
+ *  Format:  low_host_flap_threshold=<percent>
  *  Example: low_host_flap_threshold=25.0
+ *  @endcode
  *
  *  This option is used to set the low threshold for detection of host
  *  flapping. For more information on how flap detection and handling
@@ -1264,8 +1401,10 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariableshighhostflapthreshold High Host Flap Threshold
  *
- *  Format: high_host_flap_threshold=\<percent\>
+ *  @code
+ *  Format:  high_host_flap_threshold=<percent>
  *  Example: high_host_flap_threshold=50.0
+ *  @endcode
  *
  *  This option is used to set the high threshold for detection of host
  *  flapping. For more information on how flap detection and handling
@@ -1274,8 +1413,10 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariablessoftstatedependenciesoption Soft State Dependencies Option
  *
- *  Format: soft_state_dependencies=<0/1>
+ *  @code
+ *  Format:  soft_state_dependencies=<0/1>
  *  Example: soft_state_dependencies=0
+ *  @endcode
  *
  *  This option determines whether or not Centron Scheduler will use
  *  soft state information when checking @link hostandservicedependencies host
@@ -1290,8 +1431,10 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariablesservicechecktimeout Service Check Timeout
  *
- *  Format: service_check_timeout=\<seconds\>
+ *  @code
+ *  Format:  service_check_timeout=<seconds>
  *  Example: service_check_timeout=60
+ *  @endcode
  *
  *  This is the maximum number of seconds that Centron Scheduler will
  *  allow service checks to run. If checks exceed this limit, they are
@@ -1308,8 +1451,10 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariableshostchecktimeout Host Check Timeout
  *
- *  Format: host_check_timeout=\<seconds\>
+ *  @code
+ *  Format:  host_check_timeout=<seconds>
  *  Example: host_check_timeout=60
+ *  @endcode
  *
  *  This is the maximum number of seconds that Centron Scheduler will
  *  allow host checks to run. If checks exceed this limit, they are
@@ -1326,8 +1471,10 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariableseventhandlertimeout Event Handler Timeout
  *
- *  Format: event_handler_timeout=\<seconds\>
+ *  @code
+ *  Format:  event_handler_timeout=<seconds>
  *  Example: event_handler_timeout=60
+ *  @endcode
  *
  *  This is the maximum number of seconds that Centron Scheduler will
  *  allow @link eventhandlers.html event handlers @endlink to be run.
@@ -1345,8 +1492,10 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariablesnotificationtimeout Notification Timeout
  *
- *  Format: notification_timeout=\<seconds\>
+ *  @code
+ *  Format:  notification_timeout=<seconds>
  *  Example: notification_timeout=60
+ *  @endcode
  *
  *  This is the maximum number of seconds that Centron Scheduler will
  *  allow notification commands to be run. If a notification command
@@ -1364,8 +1513,10 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariablesobsessivecompulsiveserviceprocessortimeout Obsessive Compulsive Service Processor Timeout
  *
- *  Format: ocsp_timeout=\<seconds\>
+ *  @code
+ *  Format:  ocsp_timeout=<seconds>
  *  Example: ocsp_timeout=5
+ *  @endcode
  *
  *  This is the maximum number of seconds that Centron Scheduler will
  *  allow an @ref mainconfigurationfileoptionsconfigurationfilevariablesobsessivecompulsiveserviceprocessorcommand "obsessive compulsive service processor
@@ -1374,8 +1525,10 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariablesobsessivecompulsivehostprocessortimeout Obsessive Compulsive Host Processor Timeout
  *
- *  Format: ochp_timeout=\<seconds\>
+ *  @code
+ *  Format:  ochp_timeout=<seconds>
  *  Example: ochp_timeout=5
+ *  @endcode
  *
  *  This is the maximum number of seconds that Centron Scheduler will
  *  allow an @ref mainconfigurationfileoptionsconfigurationfilevariablesobsessivecompulsivehostprocessorcommand "obsessive compulsive host processor
@@ -1384,8 +1537,10 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariablesperformancedataprocessorcommandtimeout Performance Data Processor Command Timeout
  *
- *  Format: perfdata_timeout=\<seconds\>
+ *  @code
+ *  Format:  perfdata_timeout=<seconds>
  *  Example: perfdata_timeout=5
+ *  @endcode
  *
  *  This is the maximum number of seconds that Centron Scheduler will
  *  allow a @ref mainconfigurationfileoptionsconfigurationfilevariableshostperformancedataprocessingcommand "host performance data
@@ -1396,8 +1551,10 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariablesobsessoverservicesoption Obsess Over Services Option
  *
- *  Format: obsess_over_services=<0/1>
+ *  @code
+ *  Format:  obsess_over_services=<0/1>
  *  Example: obsess_over_services=1
+ *  @endcode
  *
  *  This value determines whether or not Centron Scheduler will
  *  "obsess" over service checks results and run the
@@ -1412,16 +1569,18 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariablesobsessivecompulsiveserviceprocessorcommand Obsessive Compulsive Service Processor Command
  *
- *  Format: ocsp_command=\<command\>
+ *  @code
+ *  Format:  ocsp_command=<command>
  *  Example: ocsp_command=obsessive_service_handler
+ *  @endcode
  *
  *  This option allows you to specify a command to be run after every
  *  service check, which can be useful in @link distributedmonitoring
  *  distributed monitoring @endlink. This command is executed after any
  *  @link eventhandlers.html event handler @endlink or @link
  *  notifications.html notification @endlink commands. The command
- *  argument is the short name of a @link
- *  objectdefinitions#command command definition @endlink that you
+ *  argument is the short name of a @ref
+ *  objectdefinitionsobjecttypescommanddefinition "command definition" that you
  *  define in your object configuration file. The maximum amount of
  *  time that this command can run is controlled by the
  *  @ref mainconfigurationfileoptionsconfigurationfilevariablesobsessivecompulsiveserviceprocessortimeout "ocsp_timeout" option. More information on
@@ -1429,13 +1588,15 @@
  *  @endlink. This command is only executed if the
  *  @ref mainconfigurationfileoptionsconfigurationfilevariablesobsessoverservicesoption "obsess_over_services" option is
  *  enabled globally and if the obsess_over_service directive in the
- *  @link objectdefinitions#service service definition @endlink is
+ *  @ref objectdefinitionsobjecttypesservicedefinitionservice "service definition" is
  *  enabled.
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariablesobsessoverhostsoption Obsess Over Hosts Option
  *
- *  Format: obsess_over_hosts=<0/1>
+ *  @code
+ *  Format:  obsess_over_hosts=<0/1>
  *  Example: obsess_over_hosts=1
+ *  @endcode
  *
  *  This value determines whether or not Centron Scheduler will
  *  "obsess" over host checks results and run the @ref mainconfigurationfileoptionsconfigurationfilevariablesobsessivecompulsivehostprocessorcommand
@@ -1450,29 +1611,33 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariablesobsessivecompulsivehostprocessorcommand Obsessive Compulsive Host Processor Command
  *
- *  Format: ochp_command=\<command\>
+ *  @code
+ *  Format:  ochp_command=<command>
  *  Example: ochp_command=obsessive_host_handler
+ *  @endcode
  *
  *  This option allows you to specify a command to be run after every
  *  host check, which can be useful in @link distributedmonitoring
  *  distributed monitoring @endlink. This command is executed after any
  *  @link eventhandlers.html event handler @endlink or @link
  *  notifications.html notification @endlink commands. The command
- *  argument is the short name of a @link
- *  objectdefinitions#command command definition @endlink that you
+ *  argument is the short name of a
+ *  @ref objectdefinitionsobjecttypescommanddefinition "command definition" that you
  *  define in your object configuration file. The maximum amount of
  *  time that this command can run is controlled by the
  *  @ref mainconfigurationfileoptionsconfigurationfilevariablesobsessivecompulsivehostprocessortimeout "ochp_timeout" option. More information on
  *  distributed monitoring can be found @link distributedmonitoring here
  *  @endlink. This command is only executed if the
  *  @ref mainconfigurationfileoptionsconfigurationfilevariablesobsessoverhostsoption "obsess_over_hosts" option is enabled
- *  globally and if the obsess_over_host directive in the @link
- *  objectdefinitions#host host definition @endlink is enabled.
+ *  globally and if the obsess_over_host directive in the
+ *  @ref objectdefinitionsobjecttypeshostdefinition "host definition" is enabled.
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariablesperformancedataprocessingoption Performance Data Processing Option
  *
- *  Format: process_performance_data=<0/1>
+ *  @code
+ *  Format:  process_performance_data=<0/1>
  *  Example: process_performance_data=1
+ *  @endcode
  *
  *  This value determines whether or not Centron Scheduler will process
  *  host and service check @link performancedata performance data
@@ -1483,41 +1648,47 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariableshostperformancedataprocessingcommand Host Performance Data Processing Command
  *
- *  Format: host_perfdata_command=\<command\>
+ *  @code
+ *  Format:  host_perfdata_command=<command>
  *  Example: host_perfdata_command=process-host-perfdata
+ *  @endcode
  *
  *  This option allows you to specify a command to be run after every
  *  host check to process host @link performancedata performance data
  *  @endlink that may be returned from the check. The command argument
- *  is the short name of a @link objectdefinitions#command command
- *  definition @endlink that you define in your object configuration
+ *  is the short name of a @ref objectdefinitionsobjecttypescommanddefinition "command
+ *  definition" that you define in your object configuration
  *  file. This command is only executed if the
  *  @ref mainconfigurationfileoptionsconfigurationfilevariablesperformancedataprocessingoption "process_performance_data" option
  *  is enabled globally and if the process_perf_data directive in the
- *  @link objectdefinitions#host host definition @endlink is
+ *  @ref objectdefinitionsobjecttypeshostdefinition "host definition" is
  *  enabled.
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariablesserviceperformancedataprocessingcommand Service Performance Data Processing Command
  *
- *  Format: service_perfdata_command=\<command\>
+ *  @code
+ *  Format:  service_perfdata_command=<command>
  *  Example: service_perfdata_command=process-service-perfdata
+ *  @endcode
  *
  *  This option allows you to specify a command to be run after every
  *  service check to process service @link performancedata performance
  *  data @endlink that may be returned from the check. The command
- *  argument is the short name of a @link
- *  objectdefinitions#command command definition @endlink that you
+ *  argument is the short name of a
+ *  @ref objectdefinitionsobjecttypescommanddefinition "command definition" that you
  *  define in your object configuration file. This command is only
  *  executed if the @ref mainconfigurationfileoptionsconfigurationfilevariablesperformancedataprocessingoption
  *  "process_performance_data" option is enabled globally and if
- *  the process_perf_data directive in the @link
- *  objectdefinitions#service service definition @endlink is
+ *  the process_perf_data directive in the
+ *  @ref objectdefinitionsobjecttypesservicedefinitionservice "service definition" is
  *  enabled.
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariableshostperformancedatafile Host Performance Data File
  *
- *  Format: host_perfdata_file=\<file_name\>
+ *  @code
+ *  Format:  host_perfdata_file=<file_name>
  *  Example: host_perfdata_file=/usr/local/centscheduler/var/host-perfdata.dat
+ *  @endcode
  *
  *  This option allows you to specify a file to which host @link
  *  performancedata performance data @endlink will be written after every
@@ -1526,13 +1697,15 @@
  *  "host_perfdata_file_template" option. Performance data is
  *  only written to this file if the @ref mainconfigurationfileoptionsconfigurationfilevariablesperformancedataprocessingoption
  *  "process_performance_data" option is enabled globally and if
- *  the process_perf_data directive in the @link
- *  objectdefinitions#host host definition @endlink is enabled.
+ *  the process_perf_data directive in the
+ *  @ref objectdefinitionsobjecttypeshostdefinition "host definition" is enabled.
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariablesserviceperformancedatafile Service Performance Data File
  *
- *  Format: service_perfdata_file=\<file_name\>
+ *  @code
+ *  Format:  service_perfdata_file=<file_name>
  *  Example: service_perfdata_file=/usr/local/centscheduler/var/service-perfdata.dat
+ *  @endcode
  *
  *  This option allows you to specify a file to which service @link
  *  performancedata performance data @endlink will be written after every
@@ -1541,14 +1714,16 @@
  *  "service_perfdata_file_template" option. Performance data is
  *  only written to this file if the @ref mainconfigurationfileoptionsconfigurationfilevariablesperformancedataprocessingoption
  *  "process_performance_data" option is enabled globally and if
- *  the process_perf_data directive in the @link
- *  objectdefinitions#service service definition @endlink is
+ *  the process_perf_data directive in the
+ *  @ref objectdefinitionsobjecttypesservicedefinitionservice "service definition" is
  *  enabled.
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariableshostperformancedatafiletemplate Host Performance Data File Template
  *
- *  Format: host_perfdata_file_template=\<template\>
+ *  @code
+ *  Format:  host_perfdata_file_template=<template>
  *  Example: host_perfdata_file_template=[HOSTPERFDATA]\\t$TIMET$\\t$HOSTNAME$\\t$HOSTEXECUTIONTIME$\\t$HOSTOUTPUT$\\t$HOSTPERFDATA$
+ *  @endcode
  *
  *  This option determines what (and how) data is written to the
  *  @ref mainconfigurationfileoptionsconfigurationfilevariableshostperformancedatafile "host performance data file". The
@@ -1559,8 +1734,10 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariablesserviceperformancedatafiletemplate Service Performance Data File Template
  *
- *  Format: service_perfdata_file_template=\<template\>
+ *  @code
+ *  Format:  service_perfdata_file_template=<template>
  *  Example: service_perfdata_file_template=[SERVICEPERFDATA]\\t$TIMET$\\t$HOSTNAME$\\t$SERVICEDESC$\\t$SERVICEEXECUTIONTIME$\\t$SERVICELATENCY$\\t$SERVICEOUTPUT$\\t$SERVICEPERFDATA$
+ *  @endcode
  *
  *  This option determines what (and how) data is written to the
  *  @ref mainconfigurationfileoptionsconfigurationfilevariablesserviceperformancedatafile "service performance data file". The
@@ -1571,8 +1748,10 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariableshostperformancedatafilemode Host Performance Data File Mode
  *
- *  Format: host_perfdata_file_mode=\<mode\>
+ *  @code
+ *  Format:  host_perfdata_file_mode=<mode>
  *  Example: host_perfdata_file_mode=a
+ *  @endcode
  *
  *  This option determines how the @ref mainconfigurationfileoptionsconfigurationfilevariableshostperformancedatafile "host
  *  performance data file" is opened. Unless the file is a
@@ -1585,8 +1764,10 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariablesserviceperformancedatafilemode Service Performance Data File Mode
  *
- *  Format: service_perfdata_file_mode=\<mode\>
+ *  @code
+ *  Format:  service_perfdata_file_mode=<mode>
  *  Example: service_perfdata_file_mode=a
+ *  @endcode
  *
  *  This option determines how the @ref mainconfigurationfileoptionsconfigurationfilevariablesserviceperformancedatafile "service
  *  performance data file" is opened. Unless the file is a
@@ -1599,8 +1780,10 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariableshostperformancedatafileprocessinginterval Host Performance Data File Processing Interval
  *
- *  Format: host_perfdata_file_processing_interval=\<seconds\>
+ *  @code
+ *  Format:  host_perfdata_file_processing_interval=<seconds>
  *  Example: host_perfdata_file_processing_interval=0
+ *  @endcode
  *
  *  This option allows you to specify the interval (in seconds) at
  *  which the @ref mainconfigurationfileoptionsconfigurationfilevariableshostperformancedatafile "host performance data file"
@@ -1611,8 +1794,10 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariablesserviceperformancedatafileprocessinginterval Service Performance Data File Processing Interval
  *
- *  Format: service_perfdata_file_processing_interval=\<seconds\>
+ *  @code
+ *  Format:  service_perfdata_file_processing_interval=<seconds>
  *  Example: service_perfdata_file_processing_interval=0
+ *  @endcode
  *
  *  This option allows you to specify the interval (in seconds) at
  *  which the @ref mainconfigurationfileoptionsconfigurationfilevariablesserviceperformancedatafile "service performance data
@@ -1623,13 +1808,15 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariableshostperformancedatafileprocessingcommand Host Performance Data File Processing Command
  *
- *  Format: host_perfdata_file_processing_command=\<command\>
+ *  @code
+ *  Format:  host_perfdata_file_processing_command=<command>
  *  Example: host_perfdata_file_processing_command=process-host-perfdata-file
+ *  @endcode
  *
  *  This option allows you to specify the command that should be
  *  executed to process the @ref mainconfigurationfileoptionsconfigurationfilevariableshostperformancedatafile "host performance
  *  data file". The command argument is the short name of a
- *  @link objectdefinitions#command command definition @endlink
+ *  @ref objectdefinitionsobjecttypescommanddefinition "command definition"
  *  that you define in your object configuration file. The interval at
  *  which this command is executed is determined by the
  *  @ref mainconfigurationfileoptionsconfigurationfilevariableshostperformancedatafileprocessinginterval
@@ -1637,22 +1824,26 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariablesserviceperformancedatafileprocessingcommand Service Performance Data File Processing Command
  *
- *  Format: service_perfdata_file_processing_command=\<command\>
+ *  @code
+ *  Format:  service_perfdata_file_processing_command=<command>
  *  Example: service_perfdata_file_processing_command=process-service-perfdata-file
+ *  @endcode
  *
  *  This option allows you to specify the command that should be
  *  executed to process the @ref mainconfigurationfileoptionsconfigurationfilevariablesserviceperformancedatafile "service
  *  performance data file". The command argument is the short
- *  name of a @link objectdefinitions#command command definition
- *  @endlink that you define in your object configuration file. The
+ *  name of a @ref objectdefinitionsobjecttypescommanddefinition "command definition"
+ *  that you define in your object configuration file. The
  *  interval at which this command is executed is determined by the
- *  @re mainconfigurationfileoptionsconfigurationfilevariablesserviceperformancedatafileprocessinginterval
+ *  @ref mainconfigurationfileoptionsconfigurationfilevariablesserviceperformancedatafileprocessinginterval
  *  "service_perfdata_file_processing_interval" directive.
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariablesorphanedservicecheckoption Orphaned Service Check Option
  *
- *  Format: check_for_orphaned_services=<0/1>
+ *  @code
+ *  Format:  check_for_orphaned_services=<0/1>
  *  Example: check_for_orphaned_services=1
+ *  @endcode
  *
  *  This option allows you to enable or disable checks for orphaned
  *  service checks. Orphaned service checks are checks which have been
@@ -1674,8 +1865,10 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariablesorphanedhostcheckoption Orphaned Host Check Option
  *
- *  Format: check_for_orphaned_hosts=<0/1>
+ *  @code
+ *  Format:  check_for_orphaned_hosts=<0/1>
  *  Example: check_for_orphaned_hosts=1
+ *  @endcode
  *
  *  This option allows you to enable or disable checks for orphaned
  *  hoste checks. Orphaned host checks are checks which have been
@@ -1697,8 +1890,10 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariablesservicefreshnesscheckingoption Service Freshness Checking Option
  *
- *  Format: check_service_freshness=<0/1>
+ *  @code
+ *  Format:  check_service_freshness=<0/1>
  *  Example: check_service_freshness=0
+ *  @endcode
  *
  *  This option determines whether or not Centron Scheduler will
  *  periodically check the "freshness" of service checks. Enabling this
@@ -1712,8 +1907,10 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariablesservicefreshnesscheckinterval Service Freshness Check Interval
  *
- *  Format: service_freshness_check_interval=\<seconds\>
+ *  @code
+ *  Format:  service_freshness_check_interval=<seconds>
  *  Example: service_freshness_check_interval=60
+ *  @endcode
  *
  *  This setting determines how often (in seconds) Centron Scheduler
  *  will periodically check the "freshness" of service check results.
@@ -1724,8 +1921,10 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariableshostfreshnesscheckingoption Host Freshness Checking Option
  *
- *  Format: check_host_freshness=<0/1>
+ *  @code
+ *  Format:  check_host_freshness=<0/1>
  *  Example: check_host_freshness=0
+ *  @endcode
  *
  *  This option determines whether or not Centron Scheduler will
  *  periodically check the "freshness" of host checks. Enabling this
@@ -1739,8 +1938,10 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariableshostfreshnesscheckinterval Host Freshness Check Interval
  *
- *  Format: host_freshness_check_interval=\<seconds\>
+ *  @code
+ *  Format:  host_freshness_check_interval=<seconds>
  *  Example: host_freshness_check_interval=60
+ *  @endcode
  *
  *  This setting determines how often (in seconds) Centron Scheduler
  *  will periodically check the "freshness" of host check results. If
@@ -1751,8 +1952,10 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariablesadditionalfreshnessthresholdlatencyoption Additional Freshness Threshold Latency Option
  *
- *  Format: additional_freshness_latency=<#>
+ *  @code
+ *  Format:  additional_freshness_latency=<#>
  *  Example: additional_freshness_latency=15
+ *  @endcode
  *
  *  This option determines the number of seconds Centron Scheduler will
  *  add to any host or services freshness threshold it automatically
@@ -1762,8 +1965,10 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariablesembeddedperlinterpreteroption Embedded Perl Interpreter Option
  *
- *  Format: enable_embedded_perl=<0/1>
+ *  @code
+ *  Format:  enable_embedded_perl=<0/1>
  *  Example: enable_embedded_perl=1
+ *  @endcode
  *
  *  This setting determines whether or not the embedded Perl
  *  interpreter is enabled on a program-wide basis. Centron Scheduler
@@ -1773,8 +1978,10 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariablesembeddedperlimplicituseoption Embedded Perl Implicit Use Option
  *
- *  Format: use_embedded_perl_implicitly=<0/1>
+ *  @code
+ *  Format:  use_embedded_perl_implicitly=<0/1>
  *  Example: use_embedded_perl_implicitly=1
+ *  @endcode
  *
  *  This setting determines whether or not the embedded Perl
  *  interpreter should be used for Perl plugins/scripts that do not
@@ -1785,8 +1992,10 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariablesdateformat Date Format
  *
- *  Format: date_format=\<option\>
+ *  @code
+ *  Format:  date_format=<option>
  *  Example: date_format=us
+ *  @endcode
  *
  *  This option allows you to specify what kind of date/time format
  *  Centron Scheduler should use in the web interface and date/time
@@ -1823,8 +2032,10 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariablestimezoneoption Timezone Option
  *
- *  Format: use_timezone=\<tz\>
+ *  @code
+ *  Format:  use_timezone=<tz>
  *  Example: use_timezone=US/Mountain
+ *  @endcode
  *
  *  This option allows you to override the default timezone that this
  *  instance of Centron Scheduler runs in. Useful if you have multiple
@@ -1833,21 +2044,12 @@
  *  specified, Centron Scheduler will use the system configured
  *  timezone.
  *
- *  @note If you use this option to specify a custom timezone, you will
- *  also need to alter the Apache configuration directives for the CGIs
- *  to specify the timezone you want. Example:
- *
- *  @code
- *  <Directory "/usr/local/centscheduler/sbin/">
- *  SetEnv TZ "US/Mountain"
- *  ...
- *  </Directory>
- *  @endcode
- *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariablesillegalobjectnamecharacters Illegal Object Name Characters
  *
- *  Format: illegal_object_name_chars=<chars...>
+ *  @code
+ *  Format:  illegal_object_name_chars=<chars...>
  *  Example: illegal_object_name_chars=`~!$%^&amp;*"|'<>?,()=
+ *  @endcode
  *
  *  This option allows you to specify illegal characters that cannot be
  *  used in host names, service descriptions, or names of other object
@@ -1858,8 +2060,10 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariablesillegalmacrooutputcharacters Illegal Macro Output Characters
  *
- *  Format: illegal_macro_output_chars=<chars...>
+ *  @code
+ *  Format:  illegal_macro_output_chars=<chars...>
  *  Example: illegal_macro_output_chars=`~$^&amp;"|'<>
+ *  @endcode
  *
  *  This option allows you to specify illegal characters that should be
  *  stripped from @link understandingmacrosandhowtheywork macros @endlink before being used
@@ -1877,8 +2081,10 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariablesregularexpressionmatchingoption Regular Expression Matching Option
  *
- *  Format: use_regexp_matching=<0/1>
+ *  @code
+ *  Format:  use_regexp_matching=<0/1>
  *  Example: use_regexp_matching=0
+ *  @endcode
  *
  *  This option determines whether or not various directives in your
  *  @link objectconfigurationoverview object definitions @endlink will be
@@ -1890,8 +2096,10 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariablestrueregularexpressionmatchingoption True Regular Expression Matching Option
  *
- *  Format: use_true_regexp_matching=<0/1>
+ *  @code
+ *  Format:  use_true_regexp_matching=<0/1>
  *  Example: use_true_regexp_matching=0
+ *  @endcode
  *
  *  If you've enabled regular expression matching of various object
  *  directives using the @ref mainconfigurationfileoptionsconfigurationfilevariablesregularexpressionmatchingoption "use_regexp_matching"
@@ -1908,8 +2116,10 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariablesadministratoremailaddress Administrator Email Address
  *
- *  Format: admin_email=\<email_address\>
- *  Example: admin_email=root\@localhost.localdomain
+ *  @code
+ *  Format:  admin_email=<email_address>
+ *  Example: admin_email=root@localhost.localdomain
+ *  @endcode
  *
  *  This is the email address for the administrator of the local
  *  machine (i.e. the one that Centron Scheduler is running on).
@@ -1919,8 +2129,10 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariablesadministratorpager Administrator Pager
  *
- *  Format: admin_pager=\<pager_number_or_pager_email_gateway\>
- *  Example: admin_pager=pageroot\@localhost.localdomain
+ *  @code
+ *  Format:  admin_pager=<pager_number_or_pager_email_gateway>
+ *  Example: admin_pager=pageroot@localhost.localdomain
+ *  @endcode
  *
  *  This is the pager number (or pager email gateway) for the
  *  administrator of the local machine (i.e. the one that Centron
@@ -1930,8 +2142,10 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariableseventbrokeroptions Event Broker Options
  *
- *  Format: event_broker_options=\<#\>
+ *  @code
+ *  Format:  event_broker_options=<#>
  *  Example: event_broker_options=-1
+ *  @endcode
  *
  *  This option controls what (if any) data gets sent to the event
  *  broker and, in turn, to any loaded event broker modules. This is an
@@ -1946,9 +2160,11 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariableseventbrokermodules Event Broker Modules
  *
- *  Format: broker_module=\<modulepath\> [moduleargs]
+ *  @code
+ *  Format:  broker_module=<modulepath> [moduleargs]
  *  Example: broker_module=/usr/local/centscheduler/bin/ndomod.o
- *  cfg_file=/usr/local/centscheduler/etc/ndomod.cfg
+ *           cfg_file=/usr/local/centscheduler/etc/ndomod.cfg
+ *  @endcode
  *
  *  This directive is used to specify an event broker module that
  *  should by loaded by Centron Scheduler at startup. Use multiple
@@ -1971,8 +2187,10 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariables Debug File
  *
- *  Format: debug_file=\<file_name\>
+ *  @code
+ *  Format:  debug_file=<file_name>
  *  Example: debug_file=/usr/local/centscheduler/var/centscheduler.debug
+ *  @endcode
  *
  *  This option determines where Centron Scheduler should write
  *  debugging information. What (if any) information is written is
@@ -1984,8 +2202,10 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariables Debug Level
  *
- *  Format: debug_level=<#>
+ *  @code
+ *  Format:  debug_level=<#>
  *  Example: debug_level=24
+ *  @endcode
  *
  *  This option determines what type of information Centron Scheduler
  *  should write to the @ref mainconfigurationfileoptionsconfigurationfilevariables "debug_file". This
@@ -2003,8 +2223,10 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariables Debug Verbosity
  *
- *  Format: debug_verbosity=<#>
+ *  @code
+ *  Format:  debug_verbosity=<#>
  *  Example: debug_verbosity=1
+ *  @endcode
  *
  *  This option determines how much debugging information Centron
  *  Scheduler should write to the @ref mainconfigurationfileoptionsconfigurationfilevariables "debug_file".
@@ -2015,8 +2237,10 @@
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariables Maximum Debug File Size
  *
- *  Format: max_debug_file_size=<#>
+ *  @code
+ *  Format:  max_debug_file_size=<#>
  *  Example: max_debug_file_size=1000000
+ *  @endcode
  *
  *  This option determines the maximum size (in bytes) of the
  *  @ref mainconfigurationfileoptionsconfigurationfilevariables "debug file". If the file grows larger than this

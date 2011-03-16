@@ -23,7 +23,7 @@
  *  - Both Router-C and Router-D have suffered failures and are
  *  offline.
  *
- *  @dotfile passivehosttranslation.png
+ *  @image html passivehosttranslation.png
  *
  *  What states are Router-C and Router-D currently in? The answer
  *  depends on which Centron Scheduler instance you ask.

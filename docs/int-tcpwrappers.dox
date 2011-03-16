@@ -2,7 +2,7 @@
  *  @page tcpwrapperintegration TCP Wrapper Integration
  *  @section tcpwrapperintegrationintroduction Introduction
  *
- *  @dotfile tcpwrappers.png
+ *  @image html tcpwrappers.png
  *
  *  This document explains how to easily generate alerts in Centron
  *  Scheduler for connection attempts that are rejected by TCP
@@ -22,15 +22,15 @@
  *  this example). If you want to generate alerts on the same host that
  *  Centron Scheduler is running you will need to make a few
  *  modifications to the examples I provide.
- *  - You have installed the @link centscheduleraddonsnsca NSCA daemon
- *  @endlink on your monitoring server and the NSCA client (send_nsca)
+ *  - You have installed the @ref centscheduleraddonsnsca "NSCA daemon"
+ *  on your monitoring server and the NSCA client (send_nsca)
  *  on the remote machine that you are generating TCP wrapper alerts
  *  from.
  *
  *  @section tcpwrapperintegrationdefiningaservice Defining A Service
  *
  *  If you haven't done so already, create a @link
- *  objectdefinitions# host definition @endlink for the remote
+ *  objectdefinitions host definition @endlink for the remote
  *  host (firestorm).
  *
  *  Next, define a service in one of your @link objectconfigurationoverview

@@ -26,7 +26,7 @@
  *
  *  @section pluginspluginsasanabstractionlayer Plugins As An Abstraction Layer
  *
- *  @dotfile plugins.png
+ *  @image html plugins.png
  *
  *  Plugins act as an abstraction layer between the monitoring logic
  *  present in the Centron Scheduler daemon and the actual services and

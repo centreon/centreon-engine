@@ -48,12 +48,7 @@
  *  the cluster (you'll also have to define at least one service to be
  *  monitored for each of the hosts). Important: You're going to want
  *  to disable notifications for the individual cluster elements (host
- *  or service definitions). Even though no notifications will be sent
- *  about the individual elements, you'll still get a visual display of
- *  the individual host or service status in the @link
- *  cgis.html#status_cgi status CGI @endlink. This will be useful for
- *  pinpointing the source of problems within the cluster in the
- *  future.
+ *  or service definitions).
  *
  *  Monitoring the overall cluster can be done by using the previously
  *  cached results of cluster elements. Although you could re-check all
@@ -79,8 +74,7 @@
  *  contrib directory of the Centron Scheduler Plugins release at
  *  http://XXX/.
  *
- *  @section monitoringserviceandhostclustersmonitoringserviceclusters
- *  Monitoring Service Clusters
+ *  @section monitoringserviceandhostclustersmonitoringserviceclusters Monitoring Service Clusters
  *
  *  Let's say you have three DNS servers that provide redundant
  *  services on your network. First off, you need to be monitoring each

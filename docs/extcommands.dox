@@ -10,7 +10,7 @@
  *  "command file", which is periodically processed by the Centron Scheduler
  *  daemon.
  *
- *  @dotfile externalcommands.png
+ *  @image html externalcommands.png
  *
  *  @section externalcommandsenablingexternalcommands Enabling External Commands
  *

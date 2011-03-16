@@ -74,8 +74,8 @@
  *  @endcode
  *
  *  In the example above, the service check command has two arguments
- *  (which can be referenced with @link standardmacrosincentscheduler#arg $ARGn$
- *  @endlink macros). The $ARG1$ macro will be "200.0,80%" and $ARG2$
+ *  (which can be referenced with @ref standardmacrosincentschedulermacroavailabilitychartarg "$ARGn$"
+ *  macros). The $ARG1$ macro will be "200.0,80%" and $ARG2$
  *  will be "400.0,40%" (both without quotes). Assuming we are using the
  *  host definition given earlier and a check_ping command defined like
  *  this:
@@ -105,8 +105,8 @@
  *  Normally when you use host and service macros in command
  *  definitions, they refer to values for the host or service for which
  *  the command is being run. For instance, if a host check command is
- *  being executed for a host named "linuxbox", all the @link
- *  standardmacrosincentscheduler standard host macros @endlink will refer to values
+ *  being executed for a host named "linuxbox", all the @ref
+ *  standardmacrosincentscheduler "standard host macros" will refer to values
  *  for that host ("linuxbox").
  *
  *  If you would like to reference values for another host or service
@@ -119,8 +119,7 @@
  *  - $SERVICEMACRONAME:host_name:service_description$
  *
  *  Replace HOSTMACRONAME and SERVICEMACRONAME with the name of one of
- *  the standard host of service macros found @link standardmacrosincentscheduler here
- *  @endlink.
+ *  the standard host of service macros found @ref standardmacrosincentscheduler "here".
  *
  *  Note that the macro name is separated from the host or service
  *  identifier by a colon (:). For on-demand service macros, the
@@ -162,7 +161,7 @@
  *
  *  Replace HOSTMACRONAME, SERVICEMACRONAME, and CONTACTMACRONAME with
  *  the name of one of the standard host, service, or contact macros
- *  found @link standardmacrosincentscheduler here @endlink. The delimiter you specify
+ *  found @ref standardmacrosincentscheduler "here". The delimiter you specify
  *  is used to separate macro values for each group member.
  *
  *  For example, the following macro will return a comma-separated list
@@ -213,16 +212,16 @@
  *  the setting of the @ref mainconfigurationfileoptionsconfigurationfilevariablesillegalmacrooutputcharacters
  *  "illegal_macro_output_chars" directive. The following macros
  *  are stripped of potentially dangerous characters:
- *  - @link standardmacrosincentscheduler#hostoutput $HOSTOUTPUT$ @endlink
- *  - @link standardmacrosincentscheduler#longhostoutput $LONGHOSTOUTPUT$ @endlink
- *  - @link standardmacrosincentscheduler#hostperfdata $HOSTPERFDATA$ @endlink
- *  - @link standardmacrosincentscheduler#hostackauthor $HOSTACKAUTHOR$ @endlink
- *  - @link standardmacrosincentscheduler#hostackcomment $HOSTACKCOMMENT$ @endlink
- *  - @link standardmacrosincentscheduler#serviceoutput $SERVICEOUTPUT$ @endlink
- *  - @link standardmacrosincentscheduler#longserviceoutput $LONGSERVICEOUTPUT$ @endlink
- *  - @link standardmacrosincentscheduler#serviceperfdata $SERVICEPERFDATA$ @endlink
- *  - @link standardmacrosincentscheduler#serviceackauthor $SERVICEACKAUTHOR$ @endlink
- *  - @link standardmacrosincentscheduler#serviceackcomment $SERVICEACKCOMMENT$ @endlink
+ *  - @ref standardmacrosincentschedulermacroavailabilitycharthostoutput "$HOSTOUTPUT$"
+ *  - @ref standardmacrosincentschedulermacroavailabilitychartlonghostoutput "$LONGHOSTOUTPUT$"
+ *  - @ref standardmacrosincentschedulermacroavailabilitycharthostperfdata "$HOSTPERFDATA$"
+ *  - @ref standardmacrosincentschedulermacroavailabilitycharthostackauthor "$HOSTACKAUTHOR$"
+ *  - @ref standardmacrosincentschedulermacroavailabilitycharthostcheckcommand "$HOSTACKCOMMENT$"
+ *  - @ref standardmacrosincentschedulermacroavailabilitychartserviceoutput "$SERVICEOUTPUT$"
+ *  - @ref standardmacrosincentschedulermacroavailabilitychartlongserviceoutput "$LONGSERVICEOUTPUT$"
+ *  - @ref standardmacrosincentschedulermacroavailabilitychartserviceperfdata "$SERVICEPERFDATA$"
+ *  - @ref standardmacrosincentschedulermacroavailabilitychartserviceackauthor "$SERVICEACKAUTHOR$"
+ *  - @ref standardmacrosincentschedulermacroavailabilitychartserviceackcomment "$SERVICEACKCOMMENT$"
  *
  *  Additionally, any macros that contain @link customobjectvariables
  *  custom variables @endlink are stripped for safety and security.
@@ -231,15 +230,15 @@
  *
  *  Most macros are made available as environment variables for easy
  *  reference by scripts or commands that are executed by Centron
- *  Scheduler. For purposes of security and sanity, @link
- *  standardmacrosincentscheduler#user $USERn$ @endlink and "on-demand" host and
+ *  Scheduler. For purposes of security and sanity,
+ *  @ref standardmacrosincentschedulermacroavailabilitychartuser "$USERn$" and "on-demand" host and
  *  service macros are not made available as environment variables.
  *
  *  Environment variables that contain standard macros are named the
- *  same as their corresponding macro names (listed @link
- *  standardmacrosincentscheduler here @endlink), with "NAGIOS_" prepended to their
- *  names. For example, the @link standardmacrosincentscheduler#hostname $HOSTNAME$
- *  @endlink macro would be available as an environment variable named
+ *  same as their corresponding macro names (listed
+ *  @link standardmacrosincentscheduler here @endlink), with "NAGIOS_" prepended to their
+ *  names. For example, the @ref standardmacrosincentschedulermacroavailabilitycharthostname "$HOSTNAME$"
+ *  macro would be available as an environment variable named
  *  "NAGIOS_HOSTNAME".
  *
  *  @section understandingmacrosandhowtheyworkavailablemacros Available Macros

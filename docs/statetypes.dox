@@ -42,8 +42,8 @@
  *  - The SOFT state is logged.
  *  - Event handlers are executed to handle the SOFT state.
  *
- *  SOFT states are only logged if you enabled the @link
- *   log_service_retries @endlink or
+ *  SOFT states are only logged if you enabled the @ref
+ *  mainconfigurationfileoptionsconfigurationfilevariablesservicecheckretryloggingoption "log_service_retries" or
  *  @ref mainconfigurationfileoptionsconfigurationfilevariableshostcheckretryloggingoption
  *  "log_host_retries" options in your main configuration file.
  *
@@ -52,8 +52,8 @@
  *  particularly useful if you want to try and proactively fix a
  *  problem before it turns into a HARD state.
  *
- *  The @link standardmacrosincentscheduler#hoststatetype $HOSTSTATETYPE$ @endlink or
- *  @link standardmacrosincentscheduler#servicestatetype $SERVICESTATETYPE$ @endlink
+ *  The @ref standardmacrosincentschedulermacroavailabilitycharthoststatetype "$HOSTSTATETYPE$" or
+ *  @ref standardmacrosincentschedulermacroavailabilitychartservicestatetype "$SERVICESTATETYPE$"
  *  macros will have a value of "SOFT" when event handlers are
  *  executed, which allows your event handler scripts to know when they
  *  should take corrective action. More information on event handlers
@@ -85,8 +85,8 @@
  *  - Contacts are notifified of the host or service problem or
  *  recovery.
  *
- *  The @link standardmacrosincentscheduler#hoststatetype $HOSTSTATETYPE$ @endlink or
- *  @link standardmacrosincentscheduler#servicestatetype $SERVICESTATETYPE$ @endlink
+ *  The @ref standardmacrosincentschedulermacroavailabilitycharthoststatetype "$HOSTSTATETYPE$" or
+ *  @ref standardmacrosincentschedulermacroavailabilitychartservicestatetype "$SERVICESTATETYPE$"
  *  macros will have a value of "HARD" when event handlers are
  *  executed, which allows your event handler scripts to know when they
  *  should take corrective action. More information on event handlers

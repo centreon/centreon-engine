@@ -53,7 +53,7 @@
  *  Some of the main object types are explained in greater detail
  *  below...
  *
- *  @link objectdefinitions#host Host @endlink are one of the
+ *  @ref objectdefinitionsobjecttypeshostdefinition "Host" are one of the
  *  central objects in the monitoring logic. Important attributes of
  *  hosts are as follows:
  *  - Hosts are usually physical devices on your network (servers,
@@ -65,44 +65,44 @@
  *  @link determiningstatusandreachabilityofnetworkhosts network reachability @endlink
  *  logic.
  *
- *  @link objectdefinitions#hostgroup Host Groups @endlink are
+ *  @ref objectdefinitionsobjecttypeshostgroupdefinition "Host Groups" are
  *  groups of one or more hosts. Host groups can make it easier to
  *  (1) view the status of related hosts in the Centron Scheduler web
  *  interface and (2) simplify your configuration through the use of
  *  @link timesavingtricksforobjectdefinitions object tricks @endlink.
  *
- *  @dotfile objects-hosts.png
+ *  @image html objects-hosts.png
  *
- *  @link objectdefinitions#services Services @endlink are one of
+ *  @ref objectdefinitionsobjecttypesservicedefinitionservice "Services" are one of
  *  the central objects in the monitoring logic. Services are associated
  *  with hosts and can be:
  *  - Attributes of a host (CPU load, disk usage, uptime, etc.)
  *  - Services provided by the host (HTTP, POP3, FTP, SSH, etc.)
  *  - Other things associated with the host (DNS records, etc.)
  *
- *  @link objectdefinitions#servicesgroup Services Groups @endlink
+ *  @ref objectdefinitionsobjecttypesservicegroupdefinition "Services Groups"
  *  are groups of one or more services. Service groups can make it
  *  easier to (1) view the status of related services in the Centron
  *  Scheduler web interface and (2) simplify your configuration through
  *  the use of @link timesavingtricksforobjectdefinitions object tricks @endlink.
  *
- *  @dotfile objects-services.png
+ *  @image html objects-services.png
  *
- *  @link objectdefinitions#contact Contacts @endlink are people
+ *  @ref objectdefinitionsobjecttypescontactdefinition "Contacts" are people
  *  involved in the notification process:
  *  - Contacts have one or more notification methods (cellphone, pager,
  *  email, instant messaging, etc.)
  *  - Contacts receive notifications for hosts and service they are
  *  responsible for
  *
- *  @link objectdefinitions#contactgroup Contacts Groups @endlink
+ *  @ref objectdefinitionsobjecttypescontactgroupdefinition "Contacts Groups"
  *  are groups of one or more contacts. Contact groups can make it
  *  easier to define all the people who get notified when certain host
  *  or service problems occur.
  *
- *  @dotfile objects-contacts.png
+ *  @image html objects-contacts.png
  *
- *  @link objectdefinitions#timeperiod Timeperiods @endlink are are
+ *  @ref objectdefinitionsobjecttypestimeperioddefinition "Timeperiods" are are
  *  used to control:
  *  - When hosts and services can be monitored
  *  - When contacts can receive notifications
@@ -110,9 +110,9 @@
  *  Information on how timeperiods work can be found @link
  *  timeperiods.html here @endlink.
  *
- *  @dotfile objects-timeperiods.png
+ *  @image html objects-timeperiods.png
  *
- *  @link objectdefinitions#command Commands @endlink are used to
+ *  @ref objectdefinitionsobjecttypescommanddefinition "Commands" are used to
  *  tell Centron Scheduler what programs, scripts, etc. it should
  *  execute to perform:
  *  - Host and service checks
@@ -120,6 +120,6 @@
  *  - Event handlers
  *  - and more...
  *
- *  @dotfile objects-commands.png
+ *  @image html objects-commands.png
  */
 

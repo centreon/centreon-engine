@@ -42,7 +42,7 @@
  *  notification and execution dependencies. Different services are
  *  dependent on other services for notifications and check execution.
  *
- *  @dotfile service-dependencies.png
+ *  @image html service-dependencies.png
  *
  *  In this example, the dependency definitions for Service F on Host C
  *  would be defined as follows:
@@ -250,8 +250,8 @@
  *
  *  @note Tip: Do not confuse host dependencies with parent/child host
  *  relationships. You should be using parent/child host relationships
- *  (defined with the parents directive in @link
- *  objectdefinitions#host host @endlink definitions) for most
+ *  (defined with the parents directive in
+ *  @ref objectdefinitionsobjecttypeshostdefinition "host" definitions) for most
  *  cases, rather than host dependencies. A description of how
  *  parent/child host relationships work can be found in the
  *  documentation on @link determiningstatusandreachabilityofnetworkhosts network
@@ -273,7 +273,7 @@
  *  notification dependencies. Different hosts are dependent on other
  *  hosts for notifications.
  *
- *  @dotfile host-dependencies.png
+ *  @image html host-dependencies.png
  *
  *  In the example above, the dependency definitions for Host C would
  *  be defined as follows:

@@ -39,7 +39,7 @@
  *  sure it has the most current status information for the hosts that
  *  take part in the dependency.
  *
- *  @dotfile predictive-dependency-checks.png
+ *  @image html predictive-dependency-checks.png
  *
  *  That's how predictive dependency checks work. Simple, eh?
  *

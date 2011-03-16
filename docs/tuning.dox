@@ -134,8 +134,8 @@
  *  scheduled host checks used to result in a big performance hit. This
  *  is no longer the case, as host checks are run in parallel - just
  *  like service checks. To schedule regular checks of a host, set the
- *  check_interval directive in the @link objectdefinitions#host
- *  host definition @endlink to something greater than 0.
+ *  check_interval directive in the @ref objectdefinitionsobjecttypeshostdefinition
+ *  "host definition" to something greater than 0.
  *
  *  - Enable cached host checks. Beginning in Centron Scheduler 3,
  *  on-demand host checks can benefit from caching. On-demand host

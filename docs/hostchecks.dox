@@ -8,13 +8,13 @@
  *
  *  Hosts are checked by the Centron Scheduler daemon:
  *  - At regular intervals, as defined by the check_interval and
- *  retry_interval options in your @link objectdefinitions#host
- *  host definitions @endlink.
+ *  retry_interval options in your @ref objectdefinitionsobjecttypeshostdefinition
+ *  "host definitions".
  *  - On-demand when a service associated with the host changes state.
- *  - On-demand as needed as part of the @link determiningstatusandreachabilityofnetworkhosts
- *  host reachability @endlink logic.
- *  - On-demand as needed for @link hostandservicedependencies predictive
- *  host dependency checks @endlink.
+ *  - On-demand as needed as part of the @ref determiningstatusandreachabilityofnetworkhosts
+ *  "host reachability" logic.
+ *  - On-demand as needed for @ref hostandservicedependencies "predictive
+ *  host dependency checks".
  *
  *  Regularly scheduled host checks are optional. If you set the
  *  check_interval option in your host definition to zero (0), Centron
@@ -54,8 +54,8 @@
  *
  *  @section hostchecksdependenciesandchecks Dependencies and Checks
  *
- *  You can define @link objectdefinitions#hostdependency host
- *  execution dependencies @endlink that prevent Centron Scheduler from
+ *  You can define @ref objectdefinitionsobjecttypeshostdependencydefinition "host
+ *  execution dependencies" that prevent Centron Scheduler from
  *  checking the status of a host depending on the state of one or more
  *  other hosts. More information on dependencies can be found @link
  *  hostandservicedependencies here @endlink.

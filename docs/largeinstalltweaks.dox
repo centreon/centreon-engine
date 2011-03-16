@@ -17,8 +17,8 @@
  *  Scheduler config file, several changes are made to the way the
  *  Centron Scheduler daemon operates:
  *
- *  - No Summary Macros In Environment Variables - The @link
- *  standardmacrosincentscheduler#summary_macros summary macros @endlink will not be
+ *  - No Summary Macros In Environment Variables - The
+ *  @ref standardmacrosincentschedulermacroavailabilitycharttotalhostsup "summary macros" will not be
  *  available to you as environment variables. Calculating the values
  *  of these macros can be quite time-intensive in large
  *  configurations, so they are not available as environment variables

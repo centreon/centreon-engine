@@ -13,7 +13,7 @@
  *  distributedmonitoring distributed @endlink and @link redundantandfailovernetworkmonitoring
  *  failover @endlink monitoring environments.
  *
- *  @dotfile freshness.png
+ *  @image html freshness.png
  *
  *  @section serviceandhostfreshnesscheckshowdoesfreshnesscheckingwork How Does Freshness Checking Work?
  *

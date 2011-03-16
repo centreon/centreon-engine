@@ -12,7 +12,7 @@
  *  - Active checks are initiated by the Centron Scheduler process
  *  - Active checks are run on a regularly scheduled basis
  *
- *  @dotfile activechecks.png
+ *  @image html activechecks.png
  *
  *  @section activecheckshowareactivechecksperformed How Are Active Checks Performed?
  *

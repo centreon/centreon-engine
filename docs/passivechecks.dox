@@ -40,7 +40,7 @@
  *
  *  @section passivecheckshowpassivecheckswork How Passive Checks Work
  *
- *  @dotfile passivechecks.png
+ *  @image html passivechecks.png
  *
  *  Here's how passive checks work in more detail...
  *  - An external application checks the status of a host or service.
@@ -108,7 +108,7 @@
  *  - plugin_output is the text output of the service check (i.e. the
  *  plugin output)
  *
- *  @note: A service must be defined in Centron Scheduler before you can
+ *  @note A service must be defined in Centron Scheduler before you can
  *  submit passive check results for it! Centron Scheduler will ignore
  *  all check results for services that had not been configured before
  *  it was last (re)started.
@@ -140,7 +140,7 @@
  *  2=UNREACHABLE)
  *  - plugin_output is the text output of the host check
  *
- *  @note: A host must be defined in Centron Scheduler before you can
+ *  @note A host must be defined in Centron Scheduler before you can
  *  submit passive check results for it! Centron Scheduler will ignore
  *  all check results for hosts that had not been configured before it
  *  was last (re)started.
@@ -172,7 +172,7 @@
  *
  *  @section passivecheckssubmittingpassivecheckresultsfromremotehosts Submitting Passive Check Results From Remote Hosts
  *
- *  @dotfile nsca.png
+ *  @image html nsca.png
  *
  *  If an application that resides on the same host as Centron
  *  Scheduler is sending passive host or service check results, it can

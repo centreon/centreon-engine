@@ -158,8 +158,8 @@
  *        @ref mainconfigurationfileoptionsconfigurationfilevariableshighhostflapthreshold "high_host_flap_threshold"
  *      </td>
  *      <td>
- *        @link objectdefinitions#host low_flap_threshold @endlink
- *        @link objectdefinitions#host high_flap_threshold @endlink
+ *        @ref objectdefinitionsobjecttypeshostdefinition "low_flap_threshold"
+ *        @ref objectdefinitionsobjecttypeshostdefinition "high_flap_threshold"
  *      </td>
  *    </tr>
  *    <tr>
@@ -170,8 +170,8 @@
  * 	  "high_service_flap_threshold"
  *      </td>
  *      <td>
- *        @link objectdefinitions#service low_flap_threshold @endlink
- *        @link objectdefinitions#service high_flap_threshold @endlink
+ *        @ref objectdefinitionsobjecttypesservicedefinitionservice "low_flap_threshold"
+ *        @ref objectdefinitionsobjecttypesservicedefinitionservice "high_flap_threshold"
  *      </td>
  *    </tr>
  *  </table>

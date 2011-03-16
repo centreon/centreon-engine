@@ -2,7 +2,7 @@
  *  @page notifications Notifications
  *  @section notificationsintroduction Introduction
  *
- *  @dotfile objects-contacts.png
+ *  @image html objects-contacts.png
  *
  *  I've had a lot of questions as to exactly how notifications work.
  *  This will attempt to explain exactly when and how host and service
@@ -124,8 +124,8 @@
  *
  *  At this point the notification has passed the program mode filter
  *  and all host or service filters and Centron Scheduler starts to
- *  notify @link objectdefinitions#contact all the people it
- *  should @endlink. Does this mean that each contact is going to
+ *  notify @ref objectdefinitionsobjecttypescontactdefinition "all the people it
+ *  should". Does this mean that each contact is going to
  *  receive the notification? No! Each contact has their own set of
  *  filters that the notification must pass before they receive it.
  *  Note: Contact filters are specific to each contact and do not
@@ -159,8 +159,8 @@
  *  You can have Centron Scheduler notify you of problems and
  *  recoveries pretty much anyway you want: pager, cellphone, email,
  *  instant message, audio alert, electric shocker, etc. How
- *  notifications are sent depend on the @link
- *  objectdefinitions#command notification commands @endlink that
+ *  notifications are sent depend on the
+ *  @ref objectdefinitionsobjecttypescommanddefinition "notification commands" that
  *  are defined in your @link configurationoverview object definition files
  *  @endlink.
  *
@@ -187,8 +187,8 @@
  *  @section notificationsnotificationtypemacro Notification Type Macro
  *
  *  When crafting your notification commands, you need to take into
- *  account what type of notification is occurring. The @link
- *  standardmacrosincentscheduler#notificationtype $NOTIFICATIONTYPE$ @endlink macro
+ *  account what type of notification is occurring. The
+ *  @ref standardmacrosincentschedulermacroavailabilitychartnotificationtype "$NOTIFICATIONTYPE$" macro
  *  contains a string that identifies exactly that. The table below
  *  lists the possible values for the macro and their respective
  *  descriptions:

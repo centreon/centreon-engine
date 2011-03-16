@@ -21,13 +21,13 @@
  *  like service check latency (i.e. how "late" was the service check
  *  from its scheduled execution time) and the number of seconds a host
  *  or service check took to execute. This type of performance data is
- *  available for all checks that are performed. The @link
- *  standardmacrosincentscheduler#hostexecutiontime $HOSTEXECUTIONTIME$ @endlink and
- *  @link standardmacrosincentscheduler#serviceexecutiontime $SERVICEEXECUTIONTIME$
- *  @endlink @link understandingmacrosandhowtheywork macros @endlink can be used to determine
+ *  available for all checks that are performed. The
+ *  @ref standardmacrosincentschedulermacroavailabilitycharthostexecutiontime "$HOSTEXECUTIONTIME$" and
+ *  @ref standardmacrosincentschedulermacroavailabilitychartserviceexecutiontime "$SERVICEEXECUTIONTIME$"
+ *  @ref understandingmacrosandhowtheywork "macros" can be used to determine
  *  the number of seconds a host or service check was running and the
- *  @link standardmacrosincentscheduler#hostlatency $HOSTLATENCY$ @endlink and @link
- *  standardmacrosincentscheduler#servicelatency $SERVICELATENCY$ @endlink macros can
+ *  @ref standardmacrosincentschedulermacroavailabilitycharthostlatency "$HOSTLATENCY$" and
+ *  @ref standardmacrosincentschedulermacroavailabilitychartservicelatency "$SERVICELATENCY$" macros can
  *  be used to determine how "late" a regularly-scheduled host or
  *  service check was.
  *
@@ -38,9 +38,9 @@
  *  that the plugin is measuring when it executes. Plugin-specific
  *  performance data is optional and may not be supported by all
  *  plugins. Plugin-specific performance data (if available) can be
- *  obtained by using the @link standardmacrosincentscheduler#hostperfdata
- *  $HOSTPERFDATA$ @endlink and @link standardmacrosincentscheduler#serviceperfdata
- *  $SERVICEPERFDATA$ @endlink @link understandingmacrosandhowtheywork macros @endlink. Read
+ *  obtained by using the @ref standardmacrosincentschedulermacroavailabilitycharthostperfdata
+ *  "$HOSTPERFDATA$" and @ref standardmacrosincentschedulermacroavailabilitychartserviceperfdata
+ *  "$SERVICEPERFDATA$" @ref understandingmacrosandhowtheywork "macros". Read
  *  on for more information on how plugins can return performance data
  *  to Centron Scheduler for inclusion in the $HOSTPERFDATA$ and
  *  $SERVICEPERFDATA$ macros.

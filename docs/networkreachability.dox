@@ -27,7 +27,7 @@
  *  switches, etc) that are pictured. Centron Scheduler is installed
  *  and running on the Centron Scheduler host.
  *
- *  @dotfile reachability1.png
+ *  @image html reachability1.png
  *
  *  @section determiningstatusandreachabilityofnetworkhostsdefiningparentchildrelationships Defining Parent/Child Relationships
  *
@@ -43,12 +43,12 @@
  *  the host parent/child relationships look like from the viewpoint of
  *  Centron Scheduler:
  *
- *  @dotfile reachability2.png
+ *  @image html reachability2.png
  *
  *  Now that you know what the parent/child relationships look like for
  *  hosts that are being monitored, how do you configure Centron
- *  Scheduler to reflect them? The parents directive in your @link
- *  objectdefinitions#host host definitions @endlink allows you to
+ *  Scheduler to reflect them? The parents directive in your
+ *  @ref objectdefinitionsobjecttypeshostdefinition "host definitions" allows you to
  *  do this. Here's what the (abbreviated) host definitions with
  *  parent/child relationships would look like for this example:
  *
@@ -120,7 +120,7 @@
  *  when problems arise. Assume that two hosts - Web and Router1 - go
  *  offline...
  *
- *  @dotfile reachability3.png
+ *  @image html reachability3.png
  *
  *  When hosts change state (i.e. from UP to DOWN), the host
  *  reachability logic in Centron Scheduler kicks in. The reachability
@@ -129,7 +129,7 @@
  *  quickly determine the current status of your network infrastructure
  *  when changes occur.
  *
- *  @dotfile reachability4.png
+ *  @image html reachability4.png
  *
  *  In this example, Centron Scheduler will determine that Web and
  *  Router1 are both in DOWN states because the "path" to those hosts
@@ -155,8 +155,8 @@
  *  If you want to spare yourself from a flood of UNREACHABLE
  *  notifications during network outages, you can exclude the
  *  unreachable (u) option from the notification_options directive in
- *  your @link objectdefinitions#host host @endlink definitions
- *  and/or the host_notification_options directive in your @link
- *  objectdefinitions#contact contact @endlink definitions.
+ *  your @ref objectdefinitionsobjecttypeshostdefinition "host" definitions
+ *  and/or the host_notification_options directive in your
+ *  @ref objectdefinitionsobjecttypescontactdefinition "contact" definitions.
  */
 

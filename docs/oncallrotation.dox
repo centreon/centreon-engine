@@ -2,7 +2,7 @@
  *  @page oncallrotations On-Call Rotations
  *  @section oncallrotationsintroduction Introduction
  *
- *  @dotfile objects-contacts.png
+ *  @image html objects-contacts.png
  *
  *  Admins often have to shoulder the burden of answering pagers, cell
  *  phone calls, etc. when they least desire them. No one likes to be
@@ -157,7 +157,7 @@
  *  {
  *    contact_name                john
  *    ...
- *    host_notification_period	  john-oncall
+ *    host_notification_period    john-oncall
  *    service_notification_period john-oncall
  *  }
  *  @endcode
@@ -317,8 +317,8 @@
  *  @section oncallrotationsotherscenarios Other Scenarios
  *
  *  There are a lot of other on-call notification rotation scenarios
- *  that you might have. The date exception directive in @link
- *  objectdefinitions#timeperiod timeperiod definitions @endlink
+ *  that you might have. The date exception directive in
+ *  @ref objectdefinitionsobjecttypestimeperioddefinition "timeperiod definitions"
  *  is capable of handling most dates and date ranges that you might
  *  need to use, so check out the different formats that you can use.
  *  If you make a mistake when creating timeperiod definitions, always

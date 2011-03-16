@@ -2,7 +2,7 @@
  *  @page securityconsiderations Security Considerations
  *  @section securityconsiderationsintroduction Introduction
  *
- *  @dotfile security.png
+ *  @image html security.png
  *
  *  This is intended to be a brief overview of some things you should
  *  keep in mind when installing Centron Scheduler, so as set it up in
@@ -56,16 +56,16 @@
  *  Remember, its always easier to gain root access through a system
  *  security hole if you have a local account on a box.
  *
- *  @dotfile security3.png
+ *  @image html security3.png
  *
  *  @subsection securityconsiderationsbestpracticesdontruncentronschedulerasroot Don't Run Centron Scheduler As Root
  *
  *  Centron Centron Scheduler doesn't need to run as root, so don't do
  *  it. You can tell Centron Scheduler to drop privileges after startup
- *  and run as another user/group by using the @link
- *  configmain.html#centscheduler_user centscheduler_user @endlink and
- *  @link configmain.html#centscheduler_group centscheduler_group
- *  @endlink directives in the main config file. If you need to execute
+ *  and run as another user/group by using the @ref mainconfigurationfileoptionsconfigurationfilevariablescentronscheduleruser
+ *  "centscheduler_user" and
+ *  @ref mainconfigurationfileoptionsconfigurationfilevariablescentronschedulergroup
+ *  "centscheduler_group" directives in the main config file. If you need to execute
  *  event handlers or plugins which require root access, you might want
  *  to try using <a href="http://www.courtesan.com/sudo/sudo.html">sudo
  *  </a>.
@@ -123,7 +123,7 @@
  *  execute remote event handler scripts or to determine the best times
  *  to go unnoticed.
  *
- *  @dotfile security1.png
+ *  @image html security1.png
  *
  *  @subsection securityconsiderationsbestpracticessecurecommunicationchannels Secure Communication Channels
  *
@@ -134,7 +134,7 @@
  *  network. This information could be used by an attacker to determine
  *  the best times to go unnoticed.
  *
- *  @dotfile security2.png
+ *  @image html security2.png
  *
  */
 

@@ -37,14 +37,14 @@
  *
  *  @subsection starting Starting Centreon Scheduler
  *
- *  @paragraph initscript Init Script
+ *  @subsubsection initscript Init Script
  *  The easiest way to start the Centreon Scheduler daemon is by using
  *  the init script like so:
  *  @code
  *  /etc/init.d/centscheduler start
  *  @endcode
  *
- *  @paragraph manually Manually
+ *  @subsubsection manually Manually
  *  You can start the Centreon Scheduler daemon manually on the command
  *  line like so:
  *  @code
@@ -53,14 +53,14 @@
  *
  *  @subsection restarting Restarting Centreon Scheduler
  *
- *  @paragraph initscript Init Script
+ *  @subsubsection initscript Init Script
  *  The easiest way to restart the centreon Scheduler daemon is by using
  *  the init script like so:
  *  @code
  *  /etc/init.d/centscheduler restart
  *  @endcode
  *
- *  @paragraph manually Manually
+ *  @subsubsection manually Manually
  *  You can restart the Centreon Scheduler process by sending it a
  *  SIGHUP signal like so:
  *  @code
@@ -69,14 +69,14 @@
  *
  *  @subsection stopping Stopping Centreon Scheduler
  *
- *  @paragraph initscript Init Script
+ *  @subsubsection initscript Init Script
  *  The easiest way to stop the Centreon Scheduler daemon is by using
  *  the init script like so:
  *  @code
  *  /etc/init.d/centscheduler stop
  *  @endcode
  *
- *  @paragraph manually Manually
+ *  @subsubsection manually Manually
  *  You can stop the Centreon Scheduler process by sending it a TERM
  *  signal like so:
  *  @code

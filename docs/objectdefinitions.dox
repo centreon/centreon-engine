@@ -52,20 +52,20 @@
  *
  *  @section objectdefinitionsobjecttypes Object Types
  *
- *  @ref objectdefinitionsobjecttypeshostdefinition "Host definitions"
- *  @ref objectdefinitionsobjecttypeshostgroupdefinition "Host group definitions"
- *  @ref objectdefinitionsobjecttypesservicedefinitionservice "Service definitions"
- *  @ref objectdefinitionsobjecttypesservicegroupdefinition "Service group definitions"
- *  @ref objectdefinitionsobjecttypescontactdefinition "Contact definitions"
- *  @ref objectdefinitionsobjecttypescontactgroupdefinition "Contact group definitions"
- *  @ref objectdefinitionsobjecttypestimeperioddefinition "Time period definitions"
- *  @ref objectdefinitionsobjecttypescommanddefinition "Command definitions"
- *  @ref objectdefinitionsobjecttypesservicedependencydefinition "Service dependency definitions"
- *  @ref objectdefinitionsobjecttypesserviceescalationdefinition "Service escalation definitions"
- *  @ref objectdefinitionsobjecttypeshostdefinitiondependency "Host dependency definitions"
- *  @ref objectdefinitionsobjecttypeshostescalationdefinition "Host escalation definitions"
- *  @ref objectdefinitionsobjecttypeshostdefinitionextinfo "Extended host information definitions"
- *  @ref objectdefinitionsobjecttypesextendedserviceinformationdefinition "Extended service information definitions"
+ *  - @ref objectdefinitionsobjecttypeshostdefinition "Host definitions"
+ *  - @ref objectdefinitionsobjecttypeshostgroupdefinition "Host group definitions"
+ *  - @ref objectdefinitionsobjecttypesservicedefinitionservice "Service definitions"
+ *  - @ref objectdefinitionsobjecttypesservicegroupdefinition "Service group definitions"
+ *  - @ref objectdefinitionsobjecttypescontactdefinition "Contact definitions"
+ *  - @ref objectdefinitionsobjecttypescontactgroupdefinition "Contact group definitions"
+ *  - @ref objectdefinitionsobjecttypestimeperioddefinition "Time period definitions"
+ *  - @ref objectdefinitionsobjecttypescommanddefinition "Command definitions"
+ *  - @ref objectdefinitionsobjecttypesservicedependencydefinition "Service dependency definitions"
+ *  - @ref objectdefinitionsobjecttypesserviceescalationdefinition "Service escalation definitions"
+ *  - @ref objectdefinitionsobjecttypeshostdependencydefinition "Host dependency definitions"
+ *  - @ref objectdefinitionsobjecttypeshostescalationdefinition "Host escalation definitions"
+ *  - @ref objectdefinitionsobjecttypesextendedhostinformationdefinition "Extended host information definitions"
+ *  - @ref objectdefinitionsobjecttypesextendedserviceinformationdefinition "Extended service information definitions"
  *
  *  @subsection objectdefinitionsobjecttypeshostdefinition Host Definition
  *
@@ -83,48 +83,48 @@
  *  define host
  *  {
  *    @b host_name                 host_name
- *    @b alias         	     	   alias
- *    display_name  	     	   display_name
- *    @b address	       	   address
- *    parents	    	     	   host_names
- *    hostgroups    	     	   hostgroup_names
- *    check_command 	     	   command_name
- *    initial_state 	     	   [o,d,u]
- *    @b max_check_attempts    	   #
- *    check_interval 	     	   #
- *    retry_interval         	   #
- *    active_checks_enabled  	   [0/1]
- *    passive_checks_enabled 	   [0/1]
- *    @b check_period 	     	   timeperiod_name
- *    obsess_over_host 	     	   [0/1]
- *    check_freshness 	     	   [0/1]
- *    freshness_threshold    	   #
- *    event_handler 	     	   command_name
- *    event_handler_enabled  	   [0/1]
- *    low_flap_threshold     	   #
- *    high_flap_threshold    	   #
- *    flap_detection_enabled 	   [0/1]
- *    flap_detection_options 	   [o,d,u]
- *    process_perf_data 	   [0/1]
+ *    @b alias                     alias
+ *    display_name                 display_name
+ *    @b address                   address
+ *    parents                      host_names
+ *    hostgroups                   hostgroup_names
+ *    check_command                command_name
+ *    initial_state                [o,d,u]
+ *    @b max_check_attempts        #
+ *    check_interval               #
+ *    retry_interval               #
+ *    active_checks_enabled        [0/1]
+ *    passive_checks_enabled       [0/1]
+ *    @b check_period              timeperiod_name
+ *    obsess_over_host             [0/1]
+ *    check_freshness              [0/1]
+ *    freshness_threshold          #
+ *    event_handler                command_name
+ *    event_handler_enabled        [0/1]
+ *    low_flap_threshold           #
+ *    high_flap_threshold          #
+ *    flap_detection_enabled       [0/1]
+ *    flap_detection_options       [o,d,u]
+ *    process_perf_data            [0/1]
  *    retain_status_information    [0/1]
  *    retain_nonstatus_information [0/1]
- *    @b contacts 		   contacts
- *    @b contact_groups		   contact_groups
- *    @b notification_interval 	   #
- *    first_notification_delay 	   #
- *    @e notification_period	   timeperiod_name
- *    notification_options	   [d,u,r,f,s]
- *    notifications_enabled	   [0/1]
- *    stalking_options		   [o,d,u]
- *    notes			   note_string
- *    notes_url			   url
- *    action_url 		   url
- *    icon_image 		   image_file
- *    icon_image_alt 		   alt_string
- *    vrml_image 		   image_file
- *    statusmap_image		   image_file
- *    2d_coords			   x_coord,y_coord
- *    3d_coords			   x_coord,y_coord,z_coord
+ *    @b contacts                  contacts
+ *    @b contact_groups            contact_groups
+ *    @b notification_interval     #
+ *    first_notification_delay     #
+ *    @e notification_period       timeperiod_name
+ *    notification_options         [d,u,r,f,s]
+ *    notifications_enabled        [0/1]
+ *    stalking_options             [o,d,u]
+ *    notes                        note_string
+ *    notes_url                    url
+ *    action_url                   url
+ *    icon_image                   image_file
+ *    icon_image_alt               alt_string
+ *    vrml_image                   image_file
+ *    statusmap_image              image_file
+ *    2d_coords                    x_coord,y_coord
+ *    3d_coords                    x_coord,y_coord,z_coord
  *  }
  *  @endcode
  *
@@ -134,20 +134,20 @@
  *  define host
  *  {
  *    host_name                    bogus-router
- *    alias           		   Bogus Router #1
- *    address 			   192.168.1.254
- *    parents 			   server-backbone
- *    check_command 		   check-host-alive
- *    check_interval 		   5
- *    retry_interval 		   1
+ *    alias                        Bogus Router #1
+ *    address                      192.168.1.254
+ *    parents                      server-backbone
+ *    check_command                check-host-alive
+ *    check_interval               5
+ *    retry_interval               1
  *    max_check_attempts           5
- *    check_period 		   24x7
- *    process_perf_data 	   0
+ *    check_period                 24x7
+ *    process_perf_data            0
  *    retain_nonstatus_information 0
- *    contact_groups 		   router-admins
- *    notification_interval 	   30
- *    notification_period 	   24x7
- *    notification_options 	   d,u,r
+ *    contact_groups               router-admins
+ *    notification_interval        30
+ *    notification_period          24x7
+ *    notification_options         d,u,r
  *  }
  *  @endcode
  *
@@ -544,22 +544,15 @@
  *      <td>notes</td>
  *      <td>
  *        This directive is used to define an optional string of notes
- *        pertaining to the host. If you specify a note here, you will see
- *        the it in the @link cgis.html#extinfo_cgi extended information
- *        @endlink CGI (when you are viewing information about the specified
- *        host).
+ *        pertaining to the host.
  *      </td>
  *    </tr>
  *    <tr>
  *      <td>notes_url</td>
  *      <td>
  *        This variable is used to define an optional URL that can be used to
- *        provide more information about the host. If you specify an URL, you
- *        will see a red folder icon in the CGIs (when you are viewing host
- *        information) that links to the URL you specify here. Any valid URL
- *        can be used. If you plan on using relative paths, the base path
- *        will the the same as what is used to access the CGIs (i.e.
- *        /cgi-bin/centscheduler/). This can be very useful if you want to
+ *        provide more information about the host. Any valid URL
+ *        can be used. This can be very useful if you want to
  *        make detailed information on the host, emergency contact methods,
  *        etc. available to other support staff.
  *      </td>
@@ -568,20 +561,15 @@
  *      <td>action_url</td>
  *      <td>
  *        This directive is used to define an optional URL that can be used
- *        to provide more actions to be performed on the host. If you specify
- *        an URL, you will see a red "splat" icon in the CGIs (when you are
- *        viewing host information) that links to the URL you specify here.
- *        Any valid URL can be used. If you plan on using relative paths, the
- *        base path will the the same as what is used to access the CGIs
- *        (i.e. /cgi-bin/centscheduler/).
+ *        to provide more actions to be performed on the host.
+ *        Any valid URL can be used.
  *      </td>
  *    </tr>
  *    <tr>
  *      <td>icon_image</td>
  *      <td>
  *        This variable is used to define the name of a GIF, PNG, or JPG
- *        image that should be associated with this host. This image will be
- *        displayed in the various places in the CGIs. The image will look
+ *        image that should be associated with this host. The image will look
  *        best if it is 40x40 pixels in size. Images for hosts are assumed to
  *        be in the logos/ subdirectory in your HTML images directory (i.e.
  *        /usr/local/centscheduler/share/images/logos).
@@ -600,8 +588,7 @@
  *      <td>
  *        This variable is used to define the name of a GIF, PNG, or JPG
  *        image that should be associated with this host. This image will be
- *        used as the texture map for the specified host in the @link
- *        cgis.html#statuswrl_cgi statuswrl @endlink CGI. Unlike the image
+ *        used as the texture map for the specified host. Unlike the image
  *        you use for the \<icon_image\> variable, this one should
  *        probably not have any transparency. If it does, the host object
  *        will look a bit wierd. Images for hosts are assumed to be in the
@@ -613,19 +600,15 @@
  *      <td>statusmap_image</td>
  *      <td>
  *        This variable is used to define the name of an image that should be
- *        associated with this host in the @link cgis.html#statusmap_cgi
- *        statusmap @endlink CGI. You can specify a JPEG, PNG, and GIF image
+ *        associated with this host. You can specify a JPEG, PNG, and GIF image
  *        if you want, although I would strongly suggest using a GD2 format
  *        image, as other image formats will result in a lot of wasted CPU
  *        time when the statusmap image is generated. GD2 images can be
  *        created from PNG images by using the pngtogd2 utility supplied with
  *        Thomas Boutell's <a href="http://www.boutell.com/gd/">gd
  *        library</a>. The GD2 images should be created in uncompressed format
- *        in order to minimize CPU load when the statusmap CGI is generating
- *        the network map image. The image will look best if it is 40x40
- *        pixels in size. You can leave these option blank if you are not
- *        using the statusmap CGI. Images for hosts are assumed to be in the
- *        logos/ subdirectory in your HTML images directory (i.e.
+ *        in order to minimize CPU load. Images for hosts are assumed to be in
+ *        the logos/ subdirectory in your HTML images directory (i.e.
  *        /usr/local/centscheduler/share/images/logos).
  *      </td>
  *    </tr>
@@ -633,8 +616,7 @@
  *      <td>2d_coords</td>
  *      <td>
  *        This variable is used to define coordinates to use when drawing the
- *        host in the @link cgis.html#statusmap_cgi statusmap @endlink CGI.
- *        Coordinates should be given in positive integers, as they
+ *        host. Coordinates should be given in positive integers, as they
  *        correspond to physical pixels in the generated image. The origin
  *        for drawing (0,0) is in the upper left hand corner of the image and
  *        extends in the positive x direction (to the right) along the top of
@@ -643,17 +625,14 @@
  *        is usually about 40x40 pixels (text takes a little extra space).
  *        The coordinates you specify here are for the upper left hand corner
  *        of the host icon that is drawn. Note: Don't worry about what the
- *        maximum x and y coordinates that you can use are. The CGI will
- *        automatically calculate the maximum dimensions of the image it
- *        creates based on the largest x and y coordinates you specify.
+ *        maximum x and y coordinates that you can use are.
  *      </td>
  *    </tr>
  *    <tr>
  *      <td>3d_coords</td>
  *      <td>
  *        This variable is used to define coordinates to use when drawing the
- *        host in the @link cgis.html#statuswrl_cgi statuswrl @endlink CGI.
- *        Coordinates can be positive or negative real numbers. The origin
+ *        host. Coordinates can be positive or negative real numbers. The origin
  *        for drawing is (0.0,0.0,0.0). For reference, the size of the host
  *        cubes drawn is 0.5 units on each side (text takes a little more
  *        space). The coordinates you specify here are used as the center of
@@ -668,8 +647,7 @@
  *
  *  A host group definition is used to group one or more hosts together
  *  for simplifying configuration with @link timesavingtricksforobjectdefinitions object
- *  tricks @endlink or display purposes in the @link cgis.html CGIs
- *  @endlink.
+ *  tricks @endlink.
  *
  *  @subsubsection objectdefinitionsobjecttypeshostgroupdefinitiondefinitionformat Definition Format
  *
@@ -680,12 +658,12 @@
  *  define hostgroup
  *  {
  *    @b hostgroup_name hostgroup_name
- *    @b alias 		alias
- *    members 		hosts
+ *    @b alias          alias
+ *    members           hosts
  *    hostgroup_members hostgroups
- *    notes 		note_string
- *    notes_url 	url
- *    action_url 	url
+ *    notes             note_string
+ *    notes_url         url
+ *    action_url        url
  *  }
  *  @endcode
  *
@@ -696,7 +674,7 @@
  *  {
  *    hostgroup_name novell-servers
  *    alias          Novell Servers
- *    members 	     netware1,netware2,netware3,netware4
+ *    members        netware1,netware2,netware3,netware4
  *  }
  *  @endcode
  *
@@ -742,35 +720,25 @@
  *      <td>
  *        This directive is used to define an optional string of notes
  *        pertaining to the host. If you specify a note here, you will see
- *        the it in the @link cgis.html#extinfo_cgi extended information
- *        @endlink CGI (when you are viewing information about the specified
- *        host).
+ *        the it.
  *      </td>
  *    </tr>
  *    <tr>
  *      <td>notes_url</td>
  *      <td>
  *        This variable is used to define an optional URL that can be used to
- *        provide more information about the host group. If you specify an
- *        URL, you will see a red folder icon in the CGIs (when you are
- *        viewing hostgroup information) that links to the URL you specify
- *        here. Any valid URL can be used. If you plan on using relative
- *        paths, the base path will the the same as what is used to access
- *        the CGIs (i.e. /cgi-bin/centscheduler/). This can be very useful if
- *        you want to make detailed information on the host group, emergency
- *        contact methods, etc. available to other support staff.
+ *        provide more information about the host group. Any valid URL can be
+ * 	  used. This can be very useful if you want to make detailed information
+ * 	  on the host group, emergency contact methods, etc. available to other
+ * 	  support staff.
  *      </td>
  *    </tr>
  *    <tr>
  *      <td>action_url</td>
  *      <td>
  *        This directive is used to define an optional URL that can be used
- *        to provide more actions to be performed on the host group. If you
- *        specify an URL, you will see a red "splat" icon in the CGIs (when
- *        you are viewing hostgroup information) that links to the URL you
- *        specify here. Any valid URL can be used. If you plan on using
- *        relative paths, the base path will the the same as what is used to
- *        access the CGIs (i.e. /cgi-bin/centscheduler/).
+ *        to provide more actions to be performed on the host group. Any
+ *	  valid URL can be used.
  *      </td>
  *    </tr>
  *  </table>
@@ -795,46 +763,46 @@
  *  define service
  *  {
  *    @b host_name                 host_name
- *    hostgroup_name 		   hostgroup_name
- *    @b service_description 	   service_description
- *    display_name 		   display_name
- *    servicegroups 		   servicegroup_names
- *    is_volatile 		   [0/1]
- *    @b check_command 		   command_name
- *    initial_state 		   [o,w,u,c]
- *    @b max_check_attempts 	   #
- *    @b check_interval		   #
- *    @b retry_interval		   #
- *    active_checks_enabled 	   [0/1]
- *    passive_checks_enabled 	   [0/1]
- *    @b check_period 		   timeperiod_name
- *    obsess_over_service 	   [0/1]
- *    check_freshness 		   [0/1]
- *    freshness_threshold 	   #
- *    event_handler 		   command_name
- *    event_handler_enabled 	   [0/1]
- *    low_flap_threshold 	   #
- *    high_flap_threshold 	   #
- *    flap_detection_enabled 	   [0/1]
- *    flap_detection_options 	   [o,w,c,u]
- *    process_perf_data 	   [0/1]
+ *    hostgroup_name               hostgroup_name
+ *    @b service_description       service_description
+ *    display_name                 display_name
+ *    servicegroups                servicegroup_names
+ *    is_volatile                  [0/1]
+ *    @b check_command             command_name
+ *    initial_state                [o,w,u,c]
+ *    @b max_check_attempts        #
+ *    @b check_interval            #
+ *    @b retry_interval            #
+ *    active_checks_enabled        [0/1]
+ *    passive_checks_enabled       [0/1]
+ *    @b check_period              timeperiod_name
+ *    obsess_over_service          [0/1]
+ *    check_freshness              [0/1]
+ *    freshness_threshold          #
+ *    event_handler                command_name
+ *    event_handler_enabled        [0/1]
+ *    low_flap_threshold           #
+ *    high_flap_threshold          #
+ *    flap_detection_enabled       [0/1]
+ *    flap_detection_options       [o,w,c,u]
+ *    process_perf_data            [0/1]
  *    retain_status_information    [0/1]
  *    retain_nonstatus_information [0/1]
- *    @b notification_interval 	   #
- *    first_notification_delay 	   #
- *    @b notification_period 	   timeperiod_name
- *    notification_options 	   [w,u,c,r,f,s]
- *    notifications_enabled 	   [0/1]
- *    @b contacts 		   contacts
- *    @b contact_groups		   contact_groups
- *    stalking_options 		   [o,w,u,c]
- *    notes 			   note_string
- *    notes_url 		   url
- *    action_url 		   url
- *    icon_image 		   image_file
- *    icon_image_alt 		   alt_string
+ *    @b notification_interval     #
+ *    first_notification_delay     #
+ *    @b notification_period       timeperiod_name
+ *    notification_options         [w,u,c,r,f,s]
+ *    notifications_enabled        [0/1]
+ *    @b contacts                  contacts
+ *    @b contact_groups            contact_groups
+ *    stalking_options             [o,w,u,c]
+ *    notes                        note_string
+ *    notes_url                    url
+ *    action_url                   url
+ *    icon_image                   image_file
+ *    icon_image_alt               alt_string
  *  }
- *  #endcode
+ *  @endcode
  *
  *  @subsubsection objectdefinitionsobjecttypesservicedefinitionserviceexampledefinition Example Definition
  *
@@ -843,15 +811,15 @@
  *  {
  *    host_name             linux-server
  *    service_description   check-disk-sda1
- *    check_command	    check-disk!/dev/sda1
+ *    check_command         check-disk!/dev/sda1
  *    max_check_attempts    5
- *    check_interval	    5
- *    retry_interval	    3
- *    check_period	    24x7
+ *    check_interval        5
+ *    retry_interval        3
+ *    check_period          24x7
  *    notification_interval 30
  *    notification_period   24x7
  *    notification_options  w,c,r
- *    contact_groups	    linux-admins
+ *    contact_groups        linux-admins
  *  }
  *  @endcode
  *
@@ -894,8 +862,7 @@
  *        This directive is used to define an alternate name that should be
  *        displayed in the web interface for this service. If not specified,
  *        this defaults to the value you specify for the service_description
- *        directive. Note: The current CGIs do not use this option, although
- *        future versions of the web interface will.
+ *        directive.
  *      </td>
  *    </tr>
  *    <tr>
@@ -1227,49 +1194,35 @@
  *      <td>notes</td>
  *      <td>
  *        This directive is used to define an optional string of notes
- *        pertaining to the service. If you specify a note here, you will see
- *        the it in the @link cgis.html#extinfo_cgi extended information
- *        @endlink CGI (when you are viewing information about the specified
- *        service).
+ *        pertaining to the service.
  *      </td>
  *    </tr>
  *    <tr>
  *      <td>notes_url</td>
  *      <td>
  *        This directive is used to define an optional URL that can be used
- *        to provide more information about the service. If you specify an
- *        URL, you will see a red folder icon in the CGIs (when you are
- *        viewing service information) that links to the URL you specify
- *        here. Any valid URL can be used. If you plan on using relative
- *        paths, the base path will the the same as what is used to access
- *        the CGIs (i.e. /cgi-bin/centscheduler/). This can be very useful if
- *        you want to make detailed information on the service, emergency
- *        contact methods, etc. available to other support staff.
+ *        to provide more information about the service. Any valid URL can
+ * 	  be used. This can be very useful if you want to make detailed
+ *	  information on the service, emergency contact methods, etc.
+ *	  available to other support staff.
  *      </td>
  *    </tr>
  *    <tr>
  *      <td>action_url</td>
  *      <td>
  *        This directive is used to define an optional URL that can be used
- *        to provide more actions to be performed on the service. If you
- *        specify an URL, you will see a red "splat" icon in the CGIs (when
- *        you are viewing service information) that links to the URL you
- *        specify here. Any valid URL can be used. If you plan on using
- *        relative paths, the base path will the the same as what is used to
- *        access the CGIs (i.e. /cgi-bin/centscheduler/).
+ *        to provide more actions to be performed on the service. Any valid
+ * 	  URL can be used.
  *      </td>
  *    </tr>
  *    <tr>
  *      <td>icon_image</td>
  *      <td>
  *        This variable is used to define the name of a GIF, PNG, or JPG
- *        image that should be associated with this service. This image will
- *        be displayed in the @link cgis.html#status_cgi status @endlink and
- *        @link cgis.html#extinfo_cgi extended information @endlink CGIs. The
+ *        image that should be associated with this service. The
  *        image will look best if it is 40x40 pixels in size. Images for
  *        services are assumed to be in the logos/ subdirectory in your HTML
- *        images directory (i.e.
- *        /usr/local/centscheduler/share/images/logos).
+ *        images directory (i.e. /usr/local/centscheduler/share/images/logos).
  *      </td>
  *    </tr>
  *    <tr>
@@ -1277,9 +1230,7 @@
  *      <td>
  *        This variable is used to define an optional string that is used in
  *        the ALT tag of the image specified by the \<icon_image\>
- *        argument. The ALT tag is used in the @link cgis.html#status_cgi
- *        status @endlink, @link cgis.html#extinfo_cgi extended information
- *        @endlink and @link cgis.html#statusmap_cgi statusmap @endlink CGIs.
+ *        argument.
  *      </td>
  *    </tr>
  *  </table>
@@ -1290,8 +1241,7 @@
  *
  *  A service group definition is used to group one or more services
  *  together for simplifying configuration with @link timesavingtricksforobjectdefinitions
- *  object tricks @endlink or display purposes in the @link cgis.html
- *  CGIs @endlink.
+ *  object tricks @endlink.
  *
  *  @subsubsection objectdefinitionsobjecttypesservicegroupdefinitiondefinitionformat Definition Format
  *
@@ -1302,12 +1252,12 @@
  *  define servicegroup
  *  {
  *    @b servicegroup_name servicegroup_name
- *    @b alias 		   alias
- *    members 		   services
+ *    @b alias             alias
+ *    members              services
  *    servicegroup_members servicegroups
- *    notes 		   note_string
- *    notes_url 	   url
- *    action_url 	   url
+ *    notes                note_string
+ *    notes_url            url
+ *    action_url           url
  *  }
  * @endcode
  *
@@ -1316,9 +1266,9 @@
  *  @code
  *  define servicegroup
  *  {
- *    servicegroup_name	dbservices
- *    alias  		Database Services
- *    members 		ms1,SQL Server,ms1,SQL Server Agent,ms1,SQL DTC
+ *    servicegroup_name dbservices
+ *    alias             Database Services
+ *    members           ms1,SQL Server,ms1,SQL Server Agent,ms1,SQL DTC
  *  }
  *  @endcode
  *
@@ -1368,37 +1318,25 @@
  *      <td>notes</td>
  *      <td>
  *        This directive is used to define an optional string of notes
- *        pertaining to the service group. If you specify a note here, you
- *        will see the it in the @link cgis.html#extinfo_cgi extended
- *        information @endlink CGI (when you are viewing information about
- *        the specified service group).
+ *        pertaining to the service group.
  *      </td>
  *    </tr>
  *    <tr>
  *      <td>notes_url</td>
  *      <td>
  *        This directive is used to define an optional URL that can be used
- *        to provide more information about the service group. If you specify
- *        an URL, you will see a red folder icon in the CGIs (when you are
- *        viewing service group information) that links to the URL you
- *        specify here. Any valid URL can be used. If you plan on using
- *        relative paths, the base path will the the same as what is used to
- *        access the CGIs (i.e. /cgi-bin/centscheduler/). This can be very
- *        useful if you want to make detailed information on the service
- *        group, emergency contact methods, etc. available to other support
- *        staff.
+ *        to provide more information about the service group. Any valid URL
+ *	  can be used. This can be very useful if you want to make detailed
+ * 	  information on the service group, emergency contact methods, etc.
+ * 	  available to other support staff.
  *      </td>
  *    </tr>
  *    <tr>
  *      <td>action_url</td>
  *      <td>
  *        This directive is used to define an optional URL that can be used
- *        to provide more actions to be performed on the service group. If
- *        you specify an URL, you will see a red "splat" icon in the CGIs
- *        (when you are viewing service group information) that links to the
- *        URL you specify here. Any valid URL can be used. If you plan on
- *        using relative paths, the base path will the the same as what is
- *        used to access the CGIs (i.e. /cgi-bin/centscheduler/).
+ *        to provide more actions to be performed on the service group.
+ *	  Any valid URL can be used.
  *      </td>
  *    </tr>
  *  </table>
@@ -1421,9 +1359,9 @@
  *  @code
  *  define contact
  *  {
- *    @b contact_name		       contact_name
- *    alias 			       alias
- *    @b contactgroups 		       contactgroup_names
+ *    @b contact_name                  contact_name
+ *    alias                            alias
+ *    @b contactgroups                 contactgroup_names
  *    @b host_notifications_enabled    [0/1]
  *    @b service_notifications_enabled [0/1]
  *    @b host_notification_period      timeperiod_name
@@ -1432,10 +1370,10 @@
  *    @b service_notification_options  [w,u,c,r,f,s,n]
  *    @b host_notification_commands    command_name
  *    @b service_notification_commands command_name
- *    email 			       email_address
- *    pager 			       pager_number or pager_email_gateway
- *    addressx 			       additional_contact_address
- *    can_submit_commands 	       [0/1]
+ *    email                            email_address
+ *    pager                            pager_number or pager_email_gateway
+ *    addressx                         additional_contact_address
+ *    can_submit_commands              [0/1]
  *    retain_status_information        [0/1]
  *    retain_nonstatus_information     [0/1]
  *  }
@@ -1447,20 +1385,20 @@
  *  define contact
  *  {
  *    contact_name                  jdoe
- *    alias 			    John Doe
+ *    alias                         John Doe
  *    host_notifications_enabled    1
  *    service_notifications_enabled 1
  *    service_notification_period   24x7
- *    host_notification_period 	    24x7
+ *    host_notification_period      24x7
  *    service_notification_options  w,u,c,r
  *    host_notification_options     d,u,r
  *    service_notification_commands notify-by-email
  *    host_notification_commands    host-notify-by-email
- *    email 			    jdoe@localhost.localdomain
- *    pager 			    555-5555@pagergateway.localhost.localdomain
- *    address1 			    xxxxx.xyyy@icq.com
- *    address2 			    555-555-5555
- *    can_submit_commands	    1
+ *    email                         jdoe@localhost.localdomain
+ *    pager                         555-5555@pagergateway.localhost.localdomain
+ *    address1                      xxxxx.xyyy@icq.com
+ *    address2                      555-555-5555
+ *    can_submit_commands           1
  *  }
  *  @endcode
  *
@@ -1630,7 +1568,7 @@
  *      <td>
  *        This directive is used to determine whether or not the contact can
  *        submit @link externalcommands external commands @endlink to Centron
- *        Scheduler from the CGIs. Values: 0 = don't allow contact to submit
+ *        Scheduler. Values: 0 = don't allow contact to submit
  *        commands, 1 = allow contact to submit commands.
  *      </td>
  *    </tr>
@@ -1677,8 +1615,8 @@
  *  define contactgroup
  *  {
  *    @b contactgroup_name contactgroup_name
- *    @b alias 		   alias
- *    members 		   contacts
+ *    @b alias             alias
+ *    members              contacts
  *    contactgroup_members contactgroups
  *  }
  *  @endcode
@@ -1689,8 +1627,8 @@
  *  define contactgroup
  *  {
  *    contactgroup_name novell-admins
- *    alias 		Novell Administrators
- *    members 		jdoe,rtobert,tzach
+ *    alias             Novell Administrators
+ *    members           jdoe,rtobert,tzach
  *  }
  *  @endcode
  *
@@ -1753,10 +1691,10 @@
  *  define timeperiod
  *  {
  *    @b timeperiod_name timeperiod_name
- *    @b alias 	      	 alias
- *    [weekday]       	 timeranges
- *    [exception]     	 timeranges
- *    exclude 	      	 [timeperiod1,timeperiod2,...,timeperiodn]
+ *    @b alias           alias
+ *    [weekday]          timeranges
+ *    [exception]        timeranges
+ *    exclude            [timeperiod1,timeperiod2,...,timeperiodn]
  *  }
  *  @endcode
  *
@@ -1766,51 +1704,51 @@
  *  define timeperiod
  *  {
  *    timeperiod_name nonworkhours
- *    alias 	      Non-Work Hours
- *    sunday 	      00:00-24:00             ; Every Sunday of every week
- *    monday 	      00:00-09:00,17:00-24:00 ; Every Monday of every week
- *    tuesday 	      00:00-09:00,17:00-24:00 ; Every Tuesday of every week
+ *    alias           Non-Work Hours
+ *    sunday          00:00-24:00             ; Every Sunday of every week
+ *    monday          00:00-09:00,17:00-24:00 ; Every Monday of every week
+ *    tuesday         00:00-09:00,17:00-24:00 ; Every Tuesday of every week
  *    wednesday       00:00-09:00,17:00-24:00 ; Every Wednesday of every week
- *    thursday 	      00:00-09:00,17:00-24:00 ; Every Thursday of every week
- *    friday 	      00:00-09:00,17:00-24:00 ; Every Friday of every week
- *    saturday 	      00:00-24:00             ; Every Saturday of every week
+ *    thursday        00:00-09:00,17:00-24:00 ; Every Thursday of every week
+ *    friday          00:00-09:00,17:00-24:00 ; Every Friday of every week
+ *    saturday        00:00-24:00             ; Every Saturday of every week
  *  }
  *
  *  define timeperiod
  *  {
  *    timeperiod_name      misc-single-days
- *    alias 	      	   Misc Single Days
- *    1999-01-28      	   00:00-24:00 ; January 28th, 1999
- *    monday 3 	      	   00:00-24:00 ; 3rd Monday of every month
- *    day 2  	      	   00:00-24:00 ; 2nd day of every month
- *    february 10     	   00:00-24:00 ; February 10th of every year
- *    february -1     	   00:00-24:00 ; Last day in February of every year
- *    friday -2       	   00:00-24:00 ; 2nd to last Friday of every month
+ *    alias                Misc Single Days
+ *    1999-01-28           00:00-24:00 ; January 28th, 1999
+ *    monday 3             00:00-24:00 ; 3rd Monday of every month
+ *    day 2                00:00-24:00 ; 2nd day of every month
+ *    february 10          00:00-24:00 ; February 10th of every year
+ *    february -1          00:00-24:00 ; Last day in February of every year
+ *    friday -2            00:00-24:00 ; 2nd to last Friday of every month
  *    thursday -1 november 00:00-24:00 ; Last Thursday in November of every year
  *  }
  *
  *  define timeperiod
  *  {
  *    timeperiod_name                misc-date-ranges
- *    alias	      	      	     Misc Date Ranges
- *    2007-01-01 - 2008-02-01 	     00:00-24:00 ; January 1st, 2007 to February 1st, 2008
- *    monday 3 - thursday 4   	     00:00-24:00 ; 3rd Monday to 4th Thursday of every month
- *    day 1 - 15 	      	     00:00-24:00 ; 1st to 15th day of every month
- *    day 20 - -1 	      	     00:00-24:00 ; 20th to the last day of every month
- *    july 10 - 15 	      	     00:00-24:00 ; July 10th to July 15th of every year
- *    april 10 - may 15       	     00:00-24:00 ; April 10th to May 15th of every year
+ *    alias                          Misc Date Ranges
+ *    2007-01-01 - 2008-02-01        00:00-24:00 ; January 1st, 2007 to February 1st, 2008
+ *    monday 3 - thursday 4          00:00-24:00 ; 3rd Monday to 4th Thursday of every month
+ *    day 1 - 15                     00:00-24:00 ; 1st to 15th day of every month
+ *    day 20 - -1                    00:00-24:00 ; 20th to the last day of every month
+ *    july 10 - 15                   00:00-24:00 ; July 10th to July 15th of every year
+ *    april 10 - may 15              00:00-24:00 ; April 10th to May 15th of every year
  *    tuesday 1 april - friday 2 may 00:00-24:00 ; 1st Tuesday in April to 2nd Friday in May of every year
  *  }
  *
  *  define timeperiod
  *  {
  *    timeperiod_name                    misc-skip-ranges
- *    alias 	                  	 Misc Skip Ranges
- *    2007-01-01 - 2008-02-01 / 3 	 00:00-24:00 ; Every 3 days from January 1st, 2007 to February 1st, 2008
- *    2008-04-01 / 7 	      	  	 00:00-24:00 ; Every 7 days from April 1st, 2008 (continuing forever)
- *    monday 3 - thursday 4 / 2   	 00:00-24:00 ; Every other day from 3rd Monday to 4th Thursday of every month
- *    day 1 - 15 / 5 	      	  	 00:00-24:00 ; Every 5 days from the 1st to the 15th day of every month
- *    july 10 - 15 / 2 		         00:00-24:00 ; Every other day from July 10th to July 15th of every year
+ *    alias                              Misc Skip Ranges
+ *    2007-01-01 - 2008-02-01 / 3        00:00-24:00 ; Every 3 days from January 1st, 2007 to February 1st, 2008
+ *    2008-04-01 / 7                     00:00-24:00 ; Every 7 days from April 1st, 2008 (continuing forever)
+ *    monday 3 - thursday 4 / 2          00:00-24:00 ; Every other day from 3rd Monday to 4th Thursday of every month
+ *    day 1 - 15 / 5                     00:00-24:00 ; Every 5 days from the 1st to the 15th day of every month
+ *    july 10 - 15 / 2                   00:00-24:00 ; Every other day from July 10th to July 15th of every year
  *    tuesday 1 april - friday 2 may / 6 00:00-24:00 ; Every 6 days from the 1st Tuesday in April to the 2nd Friday in May of every year
  *  }
  *  @endcode
@@ -1943,13 +1881,13 @@
  *        @note You may not include a semicolon (;) in the command_line
  *        directive, because everything after it will be ignored as a config
  *        file comment. You can work around this limitation by setting one of
- *        the @link understandingmacrosandhowtheywork#user $USER$ @endlink macros in your
+ *        the @ref understandingmacrosandhowtheyworkmacrosasenvironmentvariables "$USER$" macros in your
  *        @ref mainconfigurationfileoptionsconfigurationfilevariablesresourcefile
  * 	  "resource file" to a semicolon and then referencing the appropriate $USER$ macro in
  *        the command_line directive in place of the semicolon.
  *
  *        If you want to pass arguments to commands during runtime, you can
- *        use @link understandingmacrosandhowtheywork#arg $ARGn$ macros @endlink in the
+ *        use @ref understandingmacrosandhowtheyworkexample2commandargumentmacros "$ARGn$ macros" in the
  *        command_line directive of the command definition and then separate
  *        individual arguments from the command name (and from each other)
  *        using bang (!) characters in the object definition directive (host
@@ -1982,16 +1920,16 @@
  *  @code
  *  define servicedependency
  *  {
- *    @b dependent_host_name        host_name
- *    dependent_hostgroup_name      hostgroup_name
+ *    @b dependent_host_name           host_name
+ *    dependent_hostgroup_name         hostgroup_name
  *    @b dependent_service_description service_description
- *    @b host_name 		    host_name
- *    hostgroup_name 		    hostgroup_name
- *    @b service_description 	    service_description
- *    inherits_parent 		    [0/1]
- *    execution_failure_criteria    [o,w,u,c,p,n]
- *    notification_failure_criteria [o,w,u,c,p,n]
- *    dependency_period 	    timeperiod_name
+ *    @b host_name                     host_name
+ *    hostgroup_name                   hostgroup_name
+ *    @b service_description           service_description
+ *    inherits_parent                  [0/1]
+ *    execution_failure_criteria       [o,w,u,c,p,n]
+ *    notification_failure_criteria    [o,w,u,c,p,n]
+ *    dependency_period                timeperiod_name
  *  }
  *  @endcode
  *
@@ -2001,8 +1939,8 @@
  *  define servicedependency
  *  {
  *    host_name                     WWW1
- *    service_description 	    Apache Web Server
- *    dependent_host_name 	    WWW1
+ *    service_description           Apache Web Server
+ *    dependent_host_name           WWW1
  *    dependent_service_description Main Web Site
  *    execution_failure_criteria    n
  *    notification_failure_criteria w,u,c
@@ -2018,9 +1956,6 @@
  *        This directive is used to identify the short name(s) of the
  *        @ref objectdefinitionsobjecttypeshostdefinition "host(s)" that the dependent service "runs" on or is
  *        associated with. Multiple hosts should be separated by commas.
- *        Leaving this directive blank can be used to create @link
- *        timesavingtricksforobjectdefinitions#same_host_dependency "same host" dependencies
- *        @endlink.
  *      </td>
  *    </tr>
  *    <tr>
@@ -2144,9 +2079,9 @@
  *  define serviceescalation
  *  {
  *    @b host_name             host_name
- *    hostgroup_name 	       hostgroup_name
+ *    hostgroup_name           hostgroup_name
  *    @b service_description   service_description
- *    @b contacts 	       contacts
+ *    @b contacts              contacts
  *    @b contact_groups        contactgroup_name
  *    @b first_notification    #
  *    @b last_notification     #
@@ -2161,12 +2096,12 @@
  *  @code
  *  define serviceescalation
  *  {
- *    host_name		     nt-3
- *    service_description    Processor Load
- *    first_notification     4
- *    last_notification	     0
+ *    host_name             nt-3
+ *    service_description   Processor Load
+ *    first_notification    4
+ *    last_notification     0
  *    notification_interval 30
- *    contact_groups	    all-nt-admins,themanagers
+ *    contact_groups        all-nt-admins,themanagers
  *  }
  *  @endcode
  *
@@ -2304,13 +2239,13 @@
  *  define hostdependency
  *  {
  *    @b dependent_host_name        host_name
- *    dependent_hostgroup_name 	    hostgroup_name
- *    @b host_name 		    host_name
- *    hostgroup_name 		    hostgroup_name
- *    inherits_parent 		    [0/1]
+ *    dependent_hostgroup_name      hostgroup_name
+ *    @b host_name                  host_name
+ *    hostgroup_name                hostgroup_name
+ *    inherits_parent               [0/1]
  *    execution_failure_criteria    [o,d,u,p,n]
  *    notification_failure_criteria [o,d,u,p,n]
- *    dependency_period 	    timeperiod_name
+ *    dependency_period             timeperiod_name
  *  }
  *  @endcode
  *
@@ -2320,7 +2255,7 @@
  *  define hostdependency
  *  {
  *    host_name                     WWW1
- *    dependent_host_name	    DBASE1
+ *    dependent_host_name           DBASE1
  *    notification_failure_criteria d,u
  *  }
  *  @endcode
@@ -2439,8 +2374,8 @@
  *  define hostescalation
  *  {
  *    @b host_name             host_name
- *    hostgroup_name 	       hostgroup_name
- *    @b contacts 	       contacts
+ *    hostgroup_name           hostgroup_name
+ *    @b contacts              contacts
  *    @b contact_groups        contactgroup_name
  *    @b first_notification    #
  *    @b last_notification     #
@@ -2455,11 +2390,11 @@
  *  @code
  *  define hostescalation
  *  {
- *    host_name	            router-34
+ *    host_name             router-34
  *    first_notification    5
- *    last_notification	    8
+ *    last_notification     8
  *    notification_interval 60
- *    contact_groups	    all-router-admins
+ *    contact_groups        all-router-admins
  *  }
  *  @endcode
  *
@@ -2571,11 +2506,7 @@
  *  @subsubsection objectdefinitionsobjecttypesextendedhostinformationdefinitiondescription Description
  *
  *  Extended host information entries are basically used to make the
- *  output from the @link cgis.html#status_cgi status @endlink, @link
- *  cgis.html#statusmap_cgi statusmap @endlink, @link
- *  cgis.html#statuswrl_cgi statuswrl @endlink, and @link
- *  cgis.html#extinfo_cgi extinfo @endlink CGIs look pretty. They have
- *  no effect on monitoring and are completely optional.
+ *  output. They have no effect on monitoring and are completely optional.
  *
  *  @note Tip: As of Centron Scheduler 3.x, all directives contained in
  *  extended host information definitions are also available in
@@ -2595,7 +2526,7 @@
  *  define hostextinfo
  *  {
  *    @b host_name    host_name
- *    notes 	      note_string
+ *    notes           note_string
  *    notes_url       url
  *    action_url      url
  *    icon_image      image_file
@@ -2612,15 +2543,15 @@
  *  @code
  *  define hostextinfo
  *  {
- *    host_name	      netware1
- *    notes	      This is the primary Netware file server
- *    notes_url	      http://webserver.localhost.localdomain/hostinfo.pl?host=netware1
+ *    host_name       netware1
+ *    notes           This is the primary Netware file server
+ *    notes_url       http://webserver.localhost.localdomain/hostinfo.pl?host=netware1
  *    icon_image      novell40.png
  *    icon_image_alt  IntranetWare 4.11
  *    vrml_image      novell40.png
  *    statusmap_image novell40.gd2
- *    2d_coords	      100,250
- *    3d_coords	      100.0,50.0,75.0
+ *    2d_coords       100,250
+ *    3d_coords       100.0,50.0,75.0
  *  }
  *  @endcode
  *
@@ -2638,23 +2569,15 @@
  *      <td>notes</td>
  *      <td>
  *        This directive is used to define an optional string of notes
- *        pertaining to the host. If you specify a note here, you will see
- *        the it in the @link cgis.html#extinfo_cgi extended information
- *        @endlink CGI (when you are viewing information about the specified
- *        host).
+ *        pertaining to the host.
  *      </td>
  *    </tr>
  *    <tr>
  *      <td>notes_url</td>
  *      <td>
  *        This variable is used to define an optional URL that can be used to
- *        provide more information about the host. If you specify an URL, you
- *        will see a link that says "Extra Host Notes" in the @link
- *        cgis.html#extinfo_cgi extended information @endlink CGI (when you
- *        are viewing information about the specified host). Any valid URL
- *        can be used. If you plan on using relative paths, the base path
- *        will the the same as what is used to access the CGIs (i.e.
- *        /cgi-bin/centscheduler/). This can be very useful if you want to
+ *        provide more information about the host. Any valid URL
+ *        can be used. This can be very useful if you want to
  *        make detailed information on the host, emergency contact methods,
  *        etc. available to other support staff.
  *      </td>
@@ -2663,26 +2586,18 @@
  *      <td>action_url</td>
  *      <td>
  *        This directive is used to define an optional URL that can be used
- *        to provide more actions to be performed on the host. If you specify
- *        an URL, you will see a link that says "Extra Host Actions" in the
- *        @link cgis.html#extinfo_cgi extended information @endlink CGI (when
- *        you are viewing information about the specified host). Any valid
- *        URL can be used. If you plan on using relative paths, the base path
- *        will the the same as what is used to access the CGIs (i.e.
- *        /cgi-bin/centscheduler/).
+ *        to provide more actions to be performed on the host. Any valid
+ *        URL can be used.
  *      </td>
  *    </tr>
  *    <tr>
  *      <td>icon_image</td>
  *      <td>
  *        This variable is used to define the name of a GIF, PNG, or JPG
- *        image that should be associated with this host. This image will be
- *        displayed in the @link cgis.html#status_cgi status @endlink and
- *        @link cgis.html#extinfo_cgi extended information @endlink CGIs. The
+ *        image that should be associated with this host. The
  *        image will look best if it is 40x40 pixels in size. Images for
  *        hosts are assumed to be in the logos/ subdirectory in your HTML
- *        images directory (i.e.
- *        /usr/local/centscheduler/share/images/logos).
+ *        images directory (i.e. /usr/local/centscheduler/share/images/logos).
  *      </td>
  *    </tr>
  *    <tr>
@@ -2690,9 +2605,7 @@
  *      <td>
  *        This variable is used to define an optional string that is used in
  *        the ALT tag of the image specified by the \<icon_image\>
- *        argument. The ALT tag is used in the @link cgis.html#status_cgi
- *        status @endlink, @link cgis.html#extinfo_cgi extended information
- *        @endlink and @link cgis.html#statusmap_cgi statusmap @endlink CGIs.
+ *        argument.
  *      </td>
  *    </tr>
  *    <tr>
@@ -2700,8 +2613,7 @@
  *      <td>
  *        This variable is used to define the name of a GIF, PNG, or JPG
  *        image that should be associated with this host. This image will be
- *        used as the texture map for the specified host in the @link
- *        cgis.html#statuswrl_cgi statuswrl @endlink CGI. Unlike the image
+ *        used as the texture map for the specified host. Unlike the image
  *        you use for the \<icon_image\> variable, this one should
  *        probably not have any transparency. If it does, the host object
  *        will look a bit wierd. Images for hosts are assumed to be in the
@@ -2713,18 +2625,15 @@
  *      <td>statusmap_image</td>
  *      <td>
  *        This variable is used to define the name of an image that should be
- *        associated with this host in the @link cgis.html#statusmap_cgi
- *        statusmap @endlink CGI. You can specify a JPEG, PNG, and GIF image
+ *        associated with this host. You can specify a JPEG, PNG, and GIF image
  *        if you want, although I would strongly suggest using a GD2 format
  *        image, as other image formats will result in a lot of wasted CPU
  *        time when the statusmap image is generated. GD2 images can be
  *        created from PNG images by using the pngtogd2 utility supplied with
  *        Thomas Boutell's <a href="http://www.boutell.com/gd/">gd library</a>.
  *        The GD2 images should be created in uncompressed format
- *        in order to minimize CPU load when the statusmap CGI is generating
- *        the network map image. The image will look best if it is 40x40
- *        pixels in size. You can leave these option blank if you are not
- *        using the statusmap CGI. Images for hosts are assumed to be in the
+ *        in order to minimize CPU load. The image will look best if it is 40x40
+ *        pixels in size. Images for hosts are assumed to be in the
  *        logos/ subdirectory in your HTML images directory (i.e.
  *        /usr/local/centscheduler/share/images/logos).
  *      </td>
@@ -2733,8 +2642,7 @@
  *      <td>2d_coords</td>
  *      <td>
  *        This variable is used to define coordinates to use when drawing the
- *        host in the @link cgis.html#statusmap_cgi statusmap @endlink CGI.
- *        Coordinates should be given in positive integers, as they
+ *        host. Coordinates should be given in positive integers, as they
  *        correspond to physical pixels in the generated image. The origin
  *        for drawing (0,0) is in the upper left hand corner of the image and
  *        extends in the positive x direction (to the right) along the top of
@@ -2743,17 +2651,14 @@
  *        is usually about 40x40 pixels (text takes a little extra space).
  *        The coordinates you specify here are for the upper left hand corner
  *        of the host icon that is drawn. Note: Don't worry about what the
- *        maximum x and y coordinates that you can use are. The CGI will
- *        automatically calculate the maximum dimensions of the image it
- *        creates based on the largest x and y coordinates you specify.
+ *        maximum x and y coordinates that you can use are.
  *      </td>
  *    </tr>
  *    <tr>
  *      <td>3d_coords</td>
  *      <td>
  *        This variable is used to define coordinates to use when drawing the
- *        host in the @link cgis.html#statuswrl_cgi statuswrl @endlink CGI.
- *        Coordinates can be positive or negative real numbers. The origin
+ *        host. Coordinates can be positive or negative real numbers. The origin
  *        for drawing is (0.0,0.0,0.0). For reference, the size of the host
  *        cubes drawn is 0.5 units on each side (text takes a little more
  *        space). The coordinates you specify here are used as the center of
@@ -2767,9 +2672,7 @@
  *  @subsubsection objectdefinitionsobjecttypesextendedserviceinformationdefinitiondescription Description
  *
  *  Extended service information entries are basically used to make the
- *  output from the @link cgis.html#status_cgi status @endlink and
- *  @link cgis.html#extinfo_cgi extinfo @endlink CGIs look pretty. They
- *  have no effect on monitoring and are completely optional.
+ *  output. They have no effect on monitoring and are completely optional.
  *
  *  @note Tip: As of Centron Scheduler 3.x, all directives contained in
  *  extended service information definitions are also available in
@@ -2790,11 +2693,11 @@
  *  {
  *    @b host_name           host_name
  *    @b service_description service_description
- *    notes 		     note_string
- *    notes_url 	     url
- *    action_url 	     url
- *    icon_image 	     image_file
- *    icon_image_alt 	     alt_string
+ *    notes                  note_string
+ *    notes_url              url
+ *    action_url             url
+ *    icon_image             image_file
+ *    icon_image_alt         alt_string
  *  }
  *  @endcode
  *
@@ -2806,9 +2709,9 @@
  *    host_name              linux2
  *    service_description    Log Anomalies
  *    notes Security-related log anomalies on secondary Linux server
- *    notes_url		     http://webserver.localhost.localdomain/serviceinfo.pl?host=linux2&amp;service=Log+Anomalies
- *    icon_image	     security.png
- *    icon_image_alt	     Security-Related Alerts
+ *    notes_url              http://webserver.localhost.localdomain/serviceinfo.pl?host=linux2&amp;service=Log+Anomalies
+ *    icon_image             security.png
+ *    icon_image_alt         Security-Related Alerts
  *  }
  *  @endcode
  *
@@ -2833,23 +2736,15 @@
  *      <td>notes</td>
  *      <td>
  *        This directive is used to define an optional string of notes
- *        pertaining to the service. If you specify a note here, you will see
- *        the it in the @link cgis.html#extinfo_cgi extended information
- *        @endlink CGI (when you are viewing information about the specified
- *        service).
+ *        pertaining to the service.
  *      </td>
  *    </tr>
  *    <tr>
  *      <td>notes_url</td>
  *      <td>
  *        This directive is used to define an optional URL that can be used
- *        to provide more information about the service. If you specify an
- *        URL, you will see a link that says "Extra Service Notes" in the
- *        @link cgis.html#extinfo_cgi extended information @endlink CGI (when
- *        you are viewing information about the specified service). Any valid
- *        URL can be used. If you plan on using relative paths, the base path
- *        will the the same as what is used to access the CGIs (i.e.
- *        /cgi-bin/centscheduler/). This can be very useful if you want to
+ *        to provide more information about the service. Any valid
+ *        URL can be used. This can be very useful if you want to
  *        make detailed information on the service, emergency contact
  *        methods, etc. available to other support staff.
  *      </td>
@@ -2858,26 +2753,18 @@
  *      <td>action_url</td>
  *      <td>
  *        This directive is used to define an optional URL that can be used
- *        to provide more actions to be performed on the service. If you
- *        specify an URL, you will see a link that says "Extra Service
- *        Actions" in the @link cgis.html#extinfo_cgi extended information
- *        @endlink CGI (when you are viewing information about the specified
- *        service). Any valid URL can be used. If you plan on using relative
- *        paths, the base path will the the same as what is used to access
- *        the CGIs (i.e. /cgi-bin/centscheduler/).
+ *        to provide more actions to be performed on the service. Any valid
+ * 	  URL can be used.
  *      </td>
  *    </tr>
  *    <tr>
  *      <td>icon_image</td>
  *      <td>
  *        This variable is used to define the name of a GIF, PNG, or JPG
- *        image that should be associated with this host. This image will be
- *        displayed in the @link cgis.html#status_cgi status @endlink and
- *        @link cgis.html#extinfo_cgi extended information @endlink CGIs. The
+ *        image that should be associated with this host. The
  *        image will look best if it is 40x40 pixels in size. Images for
  *        hosts are assumed to be in the logos/ subdirectory in your HTML
- *        images directory (i.e.
- *        /usr/local/centscheduler/share/images/logos).
+ *        images directory (i.e. /usr/local/centscheduler/share/images/logos).
  *      </td>
  *    </tr>
  *    <tr>
@@ -2885,9 +2772,7 @@
  *      <td>
  *        This variable is used to define an optional string that is used in
  *        the ALT tag of the image specified by the \<icon_image\>
- *        argument. The ALT tag is used in the @link cgis.html#status_cgi
- *        status @endlink, @link cgis.html#extinfo_cgi extended information
- *        @endlink and @link cgis.html#statusmap_cgi statusmap @endlink CGIs.
+ *        argument.
  *      </td>
  *    </tr>
  *  </table>

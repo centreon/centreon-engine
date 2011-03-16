@@ -2,7 +2,7 @@
  *  @page eventhandlers Event Handlers
  *  @section eventhandlersintroduction Introduction
  *
- *  @dotfile eventhandlers.png
+ *  @image html eventhandlers.png
  *
  *  Event handlers are optional system commands (scripts or
  *  executables) that are run whenever a host or service state change
@@ -53,8 +53,8 @@
  *  Individual hosts and services can have their own event handler
  *  command that should be run to handle state changes. You can specify
  *  an event handler that should be run by using the event_handler
- *  directive in your @link objectdefinitions#host host @endlink
- *  and @link objectdefinitions#service service @endlink
+ *  directive in your @ref objectdefinitionsobjecttypeshostdefinition "host"
+ *  and @ref objectdefinitionsobjecttypesservicedefinitionservice "service"
  *  definitions. These host- and service-specific event handlers are
  *  executed immediately after the (optional) global host or service
  *  event handler is executed.
@@ -66,9 +66,9 @@
  *  "enable_event_handlers" in your main configuration file.
  *
  *  Host- and service-specific event handlers can be enabled or
- *  disabled by using the event_handler_enabled directive in your @link
- *  objectdefinitions#host host @endlink and @link
- *  objectdefinitions#service service @endlink definitions. Host-
+ *  disabled by using the event_handler_enabled directive in your
+ *  @ref objectdefinitionsobjecttypeshostdefinition "host" and
+ *  @ref objectdefinitionsobjecttypesservicedefinitionservice "service" definitions. Host-
  *  and service-specific event handlers will not be executed if the
  *  global @ref mainconfigurationfileoptionsconfigurationfilevariableseventhandleroption
  *  "enable_event_handlers" option is disabled.
@@ -89,19 +89,18 @@
  *  prompt. At a minimum, the scripts should take the following @link
  *  understandingmacrosandhowtheywork macros @endlink as arguments:
  *
- *  For Services: @link standardmacrosincentscheduler#servicestate $SERVICESTATE$
- *  @endlink, @link standardmacrosincentscheduler#servicestatetype $SERVICESTATETYPE$
- *  @endlink, @link standardmacrosincentscheduler#serviceattempt $SERVICEATTEMPT$
- *  @endlink
+ *  For Services: @ref standardmacrosincentschedulermacroavailabilitychartservicestate "$SERVICESTATE$",
+ *  @ref standardmacrosincentschedulermacroavailabilitychartservicestatetype "$SERVICESTATETYPE$",
+ *  @ref standardmacrosincentschedulermacroavailabilitychartserviceattempt "$SERVICEATTEMPT$",
  *
- *  For Hosts: @link standardmacrosincentscheduler#hoststate $HOSTSTATE$ @endlink,
- *  @link standardmacrosincentscheduler#hoststatetype $HOSTSTATETYPE$ @endlink, @link
- *  standardmacrosincentscheduler#hostattempt $HOSTATTEMPT$ @endlink
+ *  For Hosts: @ref standardmacrosincentschedulermacroavailabilitycharthoststate "$HOSTSTATE$",
+ *  @ref standardmacrosincentschedulermacroavailabilitycharthoststatetype "$HOSTSTATETYPE$",
+ *  @ref standardmacrosincentschedulermacroavailabilitycharthostattempt "$HOSTATTEMPT$"
  *
  *  The scripts should examine the values of the arguments passed to it
  *  and take any necessary action based upon those values. The best way
  *  to understand how event handlers work is to see an example. Lucky
- *  for you, one is provided @link #example below @endlink.
+ *  for you, one is provided @ref eventhandlersserviceeventhandlerexample "below".
  *
  *  @note Tip: Additional sample event handler scripts can be found in the
  *  contrib/eventhandlers/ subdirectory of the Centron Scheduler

@@ -58,7 +58,7 @@
  *    </tr>
  *  </table>
  *
- *  @note: If the @ref mainconfigurationfileoptionsconfigurationfilevariablesaggressivehostcheckingoption
+ *  @note If the @ref mainconfigurationfileoptionsconfigurationfilevariablesaggressivehostcheckingoption
  *  "use_aggressive_host_checking" option is enabled, return
  *  codes of 1 will result in a host state of DOWN or UNREACHABLE.
  *  Otherwise return codes of 1 will result in a host state of UP. The
@@ -93,37 +93,42 @@
  *
  *  Let's see some examples of possible plugin output...
  *
- *  Case 1: One line of output (text only)
+ *  - Case 1: One line of output (text only)
  *
  *  Assume we have a plugin that returns one line of output that looks
  *  like this:
  *
+ *  @code
  *  DISK OK - free space: / 3326 MB (56%);
+ *  @endcode
  *
  *  If this plugin was used to perform a service check, the entire line
- *  of output will be stored in the @link standardmacrosincentscheduler#serviceoutput
- *  $SERVICEOUTPUT$ @endlink macro.
+ *  of output will be stored in the @ref standardmacrosincentschedulermacroavailabilitychartserviceoutput
+ *  "$SERVICEOUTPUT$" macro.
  *
- *  Case 2: One line of output (text and perfdata)
+ *  - Case 2: One line of output (text and perfdata)
  *
  *  A plugin can return optional performance data for use by external
  *  applications. To do this, the performance data must be separated
  *  from the text output with a pipe (|) symbol like such:
  *
+ *  @code
  *  DISK OK - free space: / 3326 MB (56%);|/=2643MB;5948;5958;0;5968
+ *  @endcode
  *
  *  If this plugin was used to perform a service check, the first
  *  portion of output (left of the pipe separator) will be stored in
- *  the @link standardmacrosincentscheduler#serviceoutput $SERVICEOUTPUT$ @endlink
+ *  the @ref standardmacrosincentschedulermacroavailabilitychartserviceoutput "$SERVICEOUTPUT$"
  *  macro and the second portion of output (right of the pipe separator)
- *  will be stored in the @link standardmacrosincentscheduler#serviceperfdata
- *  $SERVICEPERFDATA$ @endlink macro.
+ *  will be stored in the @ref standardmacrosincentschedulermacroavailabilitychartserviceperfdata
+ *  "$SERVICEPERFDATA$" macro.
  *
- *  Case 3: Multiple lines of output (text and perfdata)
+ *  - Case 3: Multiple lines of output (text and perfdata)
  *
  *  A plugin optionally return multiple lines of both text output and
  *  perfdata, like such:
  *
+ *  @code
  *  DISK OK - free space: / 3326 MB (56%);|/=2643MB;5948;5958;0;5968
  *  / 15272 MB (77%);
  *  /boot 68 MB (69%);
@@ -131,18 +136,19 @@
  *  /var/log 819 MB (84%);|/boot=68MB;88;93;0;98
  *  /home=69357MB;253404;253409;0;253414
  *  /var/log=818MB;970;975;0;980
+ *  @endcode
  *
  *  If this plugin was used to perform a service check, the red portion
  *  of first line of output (left of the pipe separator) will be stored
- *  in the @link standardmacrosincentscheduler#serviceoutput $SERVICEOUTPUT$ @endlink
+ *  in the @ref standardmacrosincentschedulermacroavailabilitychartserviceoutput "$SERVICEOUTPUT$"
  *  macro.
  *
  *  The orange portions of the first and subsequent lines are
- *  concatenated (with spaces) are stored in the @link
- *  standardmacrosincentscheduler#serviceperfdata $SERVICEPERFDATA$ @endlink macro.
+ *  concatenated (with spaces) are stored in the
+ *  @ref standardmacrosincentschedulermacroavailabilitychartserviceperfdata "$SERVICEPERFDATA$" macro.
  *  The blue portions of the 2nd - 5th lines of output will be
- *  concatenated (with escaped newlines) and stored in @link
- *  standardmacrosincentscheduler#longserviceoutput $LONGSERVICEOUTPUT$ @endlink the
+ *  concatenated (with escaped newlines) and stored in
+ *  @ref standardmacrosincentschedulermacroavailabilitychartlongserviceoutput "$LONGSERVICEOUTPUT$" the
  *  macro.
  *
  *  The final contents of each macro are listed below:
