@@ -1252,6 +1252,9 @@ int read_main_config_file(char *main_config_file){
 		        }
 
 		/* warn about old variables */
+		else if(!strcmp(variable,"check_for_updates"))
+			logit(NSLOG_CONFIG_WARNING,TRUE,"Warning: check_for_updates variable ignored. Centreon Scheduler does not check for updates.");
+
 		else if(!strcmp(variable,"comment_file") || !strcmp(variable,"xcddefault_comment_file"))
 			logit(NSLOG_CONFIG_WARNING,TRUE,"Warning: comment_file variable ignored. Comments are now stored in the status and retention files.");
 
