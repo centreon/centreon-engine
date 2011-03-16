@@ -88,8 +88,7 @@ x/**
  *  required options are omitted)...
  *
  *  @code
- *  define service
- *  {
+ *  define service{
  *    host_name              backup-server
  *    service_description    ArcServe Backup Job
  *    active_checks_enabled  0                ; active checks are NOT enabled
@@ -113,8 +112,7 @@ x/**
  *  like this...
  *
  *  @code
- *  define command
- *  {
+ *  define command{
  *    command_name no-backup-report
  *    command_line /usr/local/centscheduler/libexec/check_dummy 2 "CRITICAL: Results of backup job were not reported!"
  *  }

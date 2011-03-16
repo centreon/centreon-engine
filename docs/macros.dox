@@ -27,16 +27,14 @@
  *  definition and a check_ping command defined like this:
  *
  *  @code
- *  define host
- *  {
+ *  define host{
  *    host_name     linuxbox
  *    address       192.168.1.2
  *    check_command check_ping
  *    ...
  *  }
  *
- *  define command
- *  {
+ *  define command{
  *    command_name check_ping
  *    command_line /usr/local/centscheduler/libexec/check_ping -H $HOSTADDRESS$ -w 100.0,90% -c 200.0,60%
  *  }
@@ -64,8 +62,7 @@
  *  exclamation points (!) like so:
  *
  *  @code
- *  define service
- *  {
+ *  define service{
  *    host_name           linuxbox
  *    service_description PING
  *    check_command       check_ping!200.0,80%!400.0,40%
@@ -81,8 +78,7 @@
  *  this:
  *
  *  @code
- *  define command
- *  {
+ *  define command{
  *    command_name check_ping
  *    command_line /usr/local/centscheduler/libexec/check_ping -H $HOSTADDRESS$ -w $ARG1$ -c $ARG2$
  *  }
@@ -190,8 +186,7 @@
  *  "_MACADDRESS"...
  *
  *  @code
- *  define host
- *  {
+ *  define host{
  *    host_name linuxbox
  *    address   192.168.1.1
  *    _MACADDRESS 00:01:02:03:04:05

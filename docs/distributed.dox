@@ -134,8 +134,7 @@
  *  something like this:
  *
  *  @code
- *  define command
- *  {
+ *  define command{
  *    command_name submit_check_result
  *    command_line /usr/local/centscheduler/libexec/eventhandlers/submit_check_result $HOSTNAME$ '$SERVICEDESC$' $SERVICESTATE$ '$SERVICEOUTPUT$'
  *  }
@@ -343,8 +342,7 @@
  *  would look like...
  *
  *  @code
- *  define command
- *  {
+ *  define command{
  *    command_name service-is-stale
  *    command_line /usr/local/centscheduler/libexec/check_dummy 2 "CRITICAL: Service results are stale"
  *  }

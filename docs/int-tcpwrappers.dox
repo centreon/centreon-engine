@@ -40,8 +40,7 @@
  *  this:
  *
  *  @code
- *  define service
- *  {
+ *  define service{
  *    host_name              firestorm
  *    service_description    TCP Wrappers
  *    is_volatile            1

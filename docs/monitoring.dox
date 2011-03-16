@@ -162,8 +162,7 @@
  *  appropriate values for the Windows box.
  *
  *  @code
- *  define host
- *  {
+ *  define host{
  *    use       windows-server    ; Inherit default values from a Windows server template (make sure you keep this line!)
  *    host_name winserver
  *    alias     My Windows Server
@@ -189,8 +188,7 @@
  *  NSClient++.
  *
  *  @code
- *  define service
- *  {
+ *  define service{
  *    use                 generic-service
  *    host_name           winserver
  *    service_description NSClient++ Version
@@ -202,8 +200,7 @@
  *  Windows server.
  *
  *  @code
- *  define service
- *  {
+ *  define service{
  *    use                 generic-service
  *    host_name           winserver
  *    service_description Uptime
@@ -217,8 +214,7 @@
  *  80% or greater.
  *
  *  @code
- *  define service
- *  {
+ *  define service{
  *    use                 generic-service
  *    host_name           winserver
  *    service_description CPU Load
@@ -231,8 +227,7 @@
  *  or more or a WARNING alert if memory usage is 80% or greater.
  *
  *  @code
- *  define service
- *  {
+ *  define service{
  *    use                 generic-service
  *    host_name           winserver
  *    service_description Memory Usage
@@ -246,8 +241,7 @@
  *  greater.
  *
  *  @code
- *  define service
- *  {
+ *  define service{
  *    use                 generic-service
  *    host_name           winserver
  *    service_description C:\ Drive Space
@@ -260,8 +254,7 @@
  *  service is stopped.
  *
  *  @code
- *  define service
- *  {
+ *  define service{
  *    use                 generic-service
  *    host_name           winserver
  *    service_description W3SVC
@@ -274,8 +267,7 @@
  *  process is not running.
  *
  *  @code
- *  define service
- *  {
+ *  define service{
  *    use                 generic-service
  *    host_name           winserver
  *    service_description Explorer
@@ -302,8 +294,7 @@
  *  specified on the Windows machine) like this:
  *
  *  @code
- *  define command
- *  {
+ *  define command{
  *    command_name check_nt
  *    command_line $USER1$/check_nt -H $HOSTADDRESS$ -p 12489 -s PASSWORD -v $ARG1$ $ARG2$
  *  }
@@ -527,8 +518,7 @@
  *  fields to appropriate values for the switch.
  *
  *  @code
- *  define host
- *  {
+ *  define host{
  *    use        generic-switch         ; Inherit default values from a template
  *    host_name  linksys-srw224         ; The name we're giving to this switch
  *    alias      Linksys SRW224P Switch ; A longer name associated with the switch
@@ -555,8 +545,7 @@
  *  the switch every 5 minutes under normal conditions.
  *
  *  @code
- *  define service
- *  {
+ *  define service{
  *    use                   generic-service                ; Inherit values from a template
  *    host_name             linksys-srw224p                ; The name of the host the service is associated with
  *    service_description   PING                           ; The service description
@@ -585,8 +574,7 @@
  *  switch.
  *
  *  @code
- *  define service
- *  {
+ *  define service{
  *    use                 generic-service ; Inherit values from a template
  *    host_name           linksys-srw224p
  *    service_description Uptime
@@ -603,8 +591,7 @@
  *  is in an up state, you could add a service definition like this:
  *
  *  @code
- *  define service
- *  {
+ *  define service{
  *    use                 generic-service ; Inherit values from a template
  *    host_name           linksys-srw224p
  *    service_description Port 1 Link Status
@@ -646,8 +633,7 @@
  *  that's stored in the log file...
  *
  *  @code
- *  define service
- *  {
+ *  define service{
  *    use                 generic-service ; Inherit values from a template
  *    host_name           linksys-srw224p
  *    service_description Port 1 Bandwidth Usage
@@ -803,8 +789,7 @@
  *  address fields to appropriate values for the printer.
  *
  *  @code
- *  define host
- *  {
+ *  define host{
  *    use        generic-printer    ; Inherit default values from a template
  *    host_name  hplj2605dn         ; The name we're giving to this printer
  *    alias      HP LaserJet 2605dn ; A longer name associated with the printer
@@ -828,8 +813,7 @@
  *  string used to query the printer is "public" in this example.
  *
  *  @code
- *  define service
- *  {
+ *  define service{
  *    use                   generic-service      ; Inherit values from a template
  *    host_name             hplj2605dn           ; The name of the host the service is associated with
  *    service_description   Printer Status       ; The service description
@@ -844,8 +828,7 @@
  *  and general network connectivity.
  *
  *  @code
- *  define service
- *  {
+ *  define service{
  *    use                   generic-service
  *    host_name             hplj2605dn
  *    service_description   PING
@@ -949,8 +932,7 @@
  *  already exiting object configuration file. Here's what the host
  *  definition for remotehost might look like:
  *
- *  define host
- *  {
+ *  define host{
  *    use        generic-host     ; Inherit default values from a template
  *    host_name  remotehost       ; The name we're giving to this host
  *    alias      Some Remote Host ; A longer name associated with the host
@@ -988,8 +970,7 @@
  *  check_http plugin. It looks like this:
  *
  *  @code
- *  define command
- *  {
+ *  define command{
  *    name         check_http
  *    command_name check_http
  *    command_line $USER1$/check_http -I $HOSTADDRESS$ $ARG1$
@@ -1000,8 +981,7 @@
  *  remotehost machine might look like this:
  *
  *  @code
- *  define service
- *  {
+ *  define service{
  *    use                 generic-service ; Inherit default values from a template
  *    host_name           remotehost
  *    service_description HTTP
@@ -1028,8 +1008,7 @@
  *  than 5 seconds to respond.
  *
  *  @code
- *  define service
- *  {
+ *  define service{
  *    use                 generic-service ; Inherit default values from a template
  *    host_name           remotehost
  *    service_description Product Download Link
@@ -1044,8 +1023,7 @@
  *  using the check_ftp plugin, which looks like this:
  *
  *  @code
- *  define command
- *  {
+ *  define command{
  *    command_name check_ftp
  *    command_line $USER1$/check_ftp -H $HOSTADDRESS$ $ARG1$
  *  }
@@ -1055,8 +1033,7 @@
  *  remotehost would look like this:
  *
  *  @code
- *  define service
- *  {
+ *  define service{
  *    use                 generic-service ; Inherit default values from a template
  *    host_name           remotehost
  *    service_description FTP
@@ -1074,8 +1051,7 @@
  *  "Pure-FTPd [TLS]".
  *
  *  @code
- *  define service
- *  {
+ *  define service{
  *    use                 generic-service ; Inherit default values from a template
  *    host_name           remotehost
  *    service_description Special FTP
@@ -1090,8 +1066,7 @@
  *  using the check_ssh plugin, which looks like this:
  *
  *  @code
- *  define command
- *  {
+ *  define command{
  *    command_name check_ssh
  *    command_line $USER1$/check_ssh $ARG1$ $HOSTADDRESS$
  *  }
@@ -1101,8 +1076,7 @@
  *  remotehost would look like this:
  *
  *  @code
- *  define service
- *  {
+ *  define service{
  *    use                 generic-service ; Inherit default values from a template
  *    host_name           remotehost
  *    service_description SSH
@@ -1119,8 +1093,7 @@
  *  string doesn't match "OpenSSH_4.2".
  *
  *  @code
- *  define service
- *  {
+ *  define service{
  *    use                 generic-service ; Inherit default values from a template
  *    host_name           remotehost
  *    service_description SSH Version Check
@@ -1135,8 +1108,7 @@
  *  using the check_smtp plugin, which looks like this:
  *
  *  @code
- *  define command
- *  {
+ *  define command{
  *    command_name check_smtp
  *    command_line $USER1$/check_smtp -H $HOSTADDRESS$ $ARG1$
  *  }
@@ -1146,8 +1118,7 @@
  *  remotehost would look like this:
  *
  *  @code
- *  define service
- *  {
+ *  define service{
  *    use                 generic-service ; Inherit default values from a template
  *    host_name           remotehost
  *    service_description SMTP
@@ -1164,8 +1135,7 @@
  *  doesn't contain "mygreatmailserver.com".
  *
  *  @code
- *  define service
- *  {
+ *  define service{
  *    use                 generic-service ; Inherit default values from a template
  *    host_name           remotehost
  *    service_description SMTP Response Check
@@ -1180,8 +1150,7 @@
  *  definition for using the check_pop plugin, which looks like this:
  *
  *  @code
- *  define command
- *  {
+ *  define command{
  *    command_name check_pop
  *    command_line $USER1$/check_pop -H $HOSTADDRESS$ $ARG1$
  *  }
@@ -1191,8 +1160,7 @@
  *  remotehost would look like this:
  *
  *  @code
- *  define service
- *  {
+ *  define service{
  *    use                 generic-service ; Inherit default values from a template
  *    host_name           remotehost
  *    service_description POP3
@@ -1209,8 +1177,7 @@
  *  doesn't contain "mygreatmailserver.com".
  *
  *  @code
- *  define service
- *  {
+ *  define service{
  *    use                 generic-service ; Inherit default values from a template
  *    host_name           remotehost
  *    service_description POP3 Response Check
@@ -1225,8 +1192,7 @@
  *  definition for using the check_imap plugin, which looks like this:
  *
  *  @code
- *  define command
- *  {
+ *  define command{
  *    command_name check_imap
  *    command_line $USER1$/check_imap -H $HOSTADDRESS$ $ARG1$
  *  }
@@ -1236,8 +1202,7 @@
  *  remotehost would look like this:
  *
  *  @code
- *  define service
- *  {
+ *  define service{
  *    use                 generic-service ; Inherit default values from a template
  *    host_name           remotehost
  *    service_description IMAP
@@ -1254,8 +1219,7 @@
  *  doesn't contain "mygreatmailserver.com".
  *
  *  @code
- *  define service
- *  {
+ *  define service{
  *    use                 generic-service ; Inherit default values from a template
  *    host_name           remotehost
  *    service_description IMAP4 Response Check

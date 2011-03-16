@@ -49,8 +49,7 @@
  *  would be defined as follows:
  *
  *  @code
- *  define servicedependency
- *  {
+ *  define servicedependency{
  *    host_name                     Host B
  *    service_description           Service D
  *    dependent_host_name           Host C
@@ -59,8 +58,7 @@
  *    notification_failure_criteria w,u
  *  }
  *
- *  define servicedependency
- *  {
+ *  define servicedependency{
  *    host_name                     Host B
  *    service_description           Service E
  *    dependent_host_name           Host C
@@ -69,8 +67,7 @@
  *    notification_failure_criteria w,u,c
  *  }
  *
- *  define servicedependency
- *  {
+ *  define servicedependency{
  *    host_name                     Host B
  *    service_description           Service C
  *    dependent_host_name           Host C
@@ -84,8 +81,7 @@
  *  defined as follows:
  *
  *  @code
- *  define servicedependency
- *  {
+ *  define servicedependency{
  *    host_name                     Host A
  *    service_description           Service A
  *    dependent_host_name           Host B
@@ -94,8 +90,7 @@
  *    notification_failure_criteria n
  *  }
  *
- *  define servicedependency
- *  {
+ *  define servicedependency{
  *    host_name                     Host A
  *    service_description           Service B
  *    dependent_host_name           Host B
@@ -104,8 +99,7 @@
  *    notification_failure_criteria c
  *  }
  *
- *  define servicedependency
- *  {
+ *  define servicedependency{
  *    host_name                     Host B
  *    service_description           Service C
  *    dependent_host_name           Host B
@@ -221,8 +215,7 @@
  *  dependency definition for services D and F to look like this:
  *
  *  @code
- *  define servicedependency
- *  {
+ *  define servicedependency{
  *    host_name                     Host B
  *    service_description           Service D
  *    dependent_host_name           Host C
@@ -281,15 +274,13 @@
  *  be defined as follows:
  *
  *  @code
- *  define hostdependency
- *  {
+ *  define hostdependency{
  *    host_name                     Host A
  *    dependent_host_name           Host C
  *    notification_failure_criteria d
  *  }
  *
- *  define hostdependency
- *  {
+ *  define hostdependency{
  *    host_name                     Host B
  *    dependent_host_name           Host C
  *    notification_failure_criteria d,u

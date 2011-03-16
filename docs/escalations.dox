@@ -27,8 +27,7 @@
  *  used for the notification. Look at the example below:
  *
  *  @code
- *  define serviceescalation
- *  {
+ *  define serviceescalation{
  *    host_name             webserver
  *    service_description   HTTP
  *    first_notification    3
@@ -37,8 +36,7 @@
  *    contact_groups        nt-admins,managers
  *  }
  *
- *  define serviceescalation
- *  {
+ *  define serviceescalation{
  *    host_name             webserver
  *    service_description   HTTP
  *    first_notification    6
@@ -67,8 +65,7 @@
  *  continues to get notified as the problem is escalated. Example:
  *
  *  @code
- *  define serviceescalation
- *  {
+ *  define serviceescalation{
  *    host_name             webserver
  *    service_description   HTTP
  *    first_notification    3
@@ -77,8 +74,7 @@
  *    contact_groups        nt-admins,managers
  *  }
  *
- *  define serviceescalation
- *  {
+ *  define serviceescalation{
  *    host_name             webserver
  *    service_description   HTTP
  *    first_notification    6
@@ -107,8 +103,7 @@
  *  that overlap. Take the following example:
  *
  *  @code
- *  define serviceescalation
- *  {
+ *  define serviceescalation{
  *    host_name             webserver
  *    service_description   HTTP
  *    first_notification    3
@@ -117,8 +112,7 @@
  *    contact_groups        nt-admins,managers
  *  }
  *
- *  define serviceescalation
- *  {
+ *  define serviceescalation{
  *    host_name             webserver
  *    service_description   HTTP
  *    first_notification    4
@@ -143,8 +137,7 @@
  *  example:
  *
  *  @code
- *  define serviceescalation
- *  {
+ *  define serviceescalation{
  *    host_name             webserver
  *    service_description   HTTP
  *    first_notification    3
@@ -153,8 +146,7 @@
  *    contact_groups        nt-admins,managers
  *  }
  *
- *  define serviceescalation
- *  {
+ *  define serviceescalation{
  *    host_name             webserver
  *    service_description   HTTP
  *    first_notification    4
@@ -180,8 +172,7 @@
  *  definition. Example:
  *
  *  @code
- *  define serviceescalation
- *  {
+ *  define serviceescalation{
  *    host_name             webserver
  *    service_description   HTTP
  *    first_notification    3
@@ -190,8 +181,7 @@
  *    contact_groups        nt-admins,managers
  *  }
  *
- *  define serviceescalation
- *  {
+ *  define serviceescalation{
  *    host_name             webserver
  *    service_description   HTTP
  *    first_notification    6
@@ -219,8 +209,7 @@
  *  notification interval. Take the following example:
  *
  *  @code
- *  define serviceescalation
- *  {
+ *  define serviceescalation{
  *    host_name             webserver
  *    service_description   HTTP
  *    first_notification    3
@@ -229,8 +218,7 @@
  *    contact_groups        nt-admins,managers
  *  }
  *
- *  define serviceescalation
- *  {
+ *  define serviceescalation{
  *    host_name             webserver
  *    service_description   HTTP
  *    first_notification    4
@@ -253,8 +241,7 @@
  *  hostgroup or service will be suppressed. Take this example:
  *
  *  @code
- *  define serviceescalation
- *  {
+ *  define serviceescalation{
  *    host_name             webserver
  *    service_description   HTTP
  *    first_notification    3
@@ -263,8 +250,7 @@
  *    contact_groups        nt-admins,managers
  *  }
  *
- *  define serviceescalation
- *  {
+ *  define serviceescalation{
  *    host_name             webserver
  *    service_description   HTTP
  *    first_notification    4
@@ -273,8 +259,7 @@
  *    contact_groups        nt-admins,managers,everyone
  *  }
  *
- *  define serviceescalation
- *  {
+ *  define serviceescalation{
  *    host_name             webserver
  *    service_description   HTTP
  *    first_notification    7

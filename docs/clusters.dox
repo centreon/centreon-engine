@@ -90,8 +90,7 @@
  *  as follows:
  *
  *  @code
- *  define command
- *  {
+ *  define command{
  *    command_name check_service_cluster
  *    command_line /usr/local/centscheduler/libexec/check_cluster --service -l $ARG1$ -w $ARG2$ -c $ARG3$ -d $ARG4$
  *  }
@@ -107,8 +106,7 @@
  *  will return an OK state as well.
  *
  *  @code
- *  define service
- *  {
+ *  define service{
  *    ...
  *    check_command check_service_cluster!"DNS Cluster"!1!2!$SERVICESTATEID:host1:DNS Service$,$SERVICESTATEID:host2:DNS Service$,$SERVICESTATEID:host3:DNS Service$
  *    ...
@@ -142,8 +140,7 @@
  *  defined as follows:
  *
  *  @code
- *  define command
- *  {
+ *  define command{
  *    command_name check_host_cluster
  *    command_line /usr/local/centscheduler/libexec/check_cluster --host -l $ARG1$ -w $ARG2$ -c $ARG3$ -d $ARG4$
  *  }
@@ -156,8 +153,7 @@
  *  to monitor the host cluster might look something like this:
  *
  *  @code
- *  define service
- *  {
+ *  define service{
  *    ...
  *    check_command check_host_cluster!"Super Host Cluster"!1!2!$HOSTSTATEID:host1$,$HOSTSTATEID:host2$,$HOSTSTATEID:host3$
  *    ...

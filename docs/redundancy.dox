@@ -119,14 +119,12 @@
  *  Here is an example...
  *
  *  @code
- *  define command
- *  {
+ *  define command{
  *    command_name handle-master-host-event
  *    command_line /usr/local/centscheduler/libexec/eventhandlers/handle-master-host-event $HOSTSTATE$ $HOSTSTATETYPE$
  *  }
  *
- *  define command
- *  {
+ *  define command{
  *    command_name handle-master-proc-event
  *    command_line /usr/local/centscheduler/libexec/eventhandlers/handle-master-proc-event $SERVICESTATE$ $SERVICESTATETYPE$
  *  }

@@ -129,8 +129,7 @@
  *  application is shown below:
  *
  *  @code
- *  define command
- *  {
+ *  define command{
  *    command_name store-service-perfdata
  *    command_line /bin/echo -e "$LASTSERVICECHECK$\t$HOSTNAME$\t$SERVICEDESC$\t$SERVICESTATE$\t$SERVICEATTEMPT$\t$SERVICESTATETYPE$\t$SERVICEEXECUTIONTIME$\t$SERVICELATENCY$\t$SERVICEOUTPUT$\t$SERVICEPERFDATA$" << /usr/local/centscheduler/var/service-perfdata.dat
  *  }

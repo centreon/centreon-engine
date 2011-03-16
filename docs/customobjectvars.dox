@@ -42,16 +42,14 @@
  *  different types of object definitions:
  *
  *  @code
- *  define host
- *  {
+ *  define host{
  *    host_name	   linuxserver
  *    _mac_address 00:06:5B:A6:AD:AA ; <-- Custom MAC_ADDRESS variable
  *    _rack_number R32               ; <-- Custom RACK_NUMBER variable
  *    ...
  *  }
  *
- *  define service
- *  {
+ *  define service{
  *    host_name       linuxserver
  *    description     Memory Usage
  *    _SNMP_community public   ; <-- Custom SNMP_COMMUNITY variable
@@ -59,8 +57,7 @@
  *    ....
  *  }
  *
- *  define contact
- *  {
+ *  define contact{
  *    contact_name  john
  *    _AIM_username john16 ; <-- Custom AIM_USERNAME variable
  *    _YahooID      john32 ; <-- Custom YAHOOID variable

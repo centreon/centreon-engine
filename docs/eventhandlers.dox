@@ -135,8 +135,7 @@
  *  abbreviated example service definition might look like this...
  *
  *  @code
- *  define service
- *  {
+ *  define service{
  *    host_name           somehost
  *    service_description HTTP
  *    max_check_attempts  4
@@ -152,8 +151,7 @@
  *  these are important!
  *
  *  @code
- *  define command
- *  {
+ *  define command{
  *    command_name restart-httpd
  *    command_line /usr/local/centscheduler/libexec/eventhandlers/restart-httpd $SERVICESTATE$ $SERVICESTATETYPE$ $SERVICEATTEMPT$
  *  }

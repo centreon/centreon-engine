@@ -56,8 +56,7 @@
  *  command, max check attempts, notification period, etc.).
  *
  *  @code
- *  define service
- *  {
+ *  define service{
  *    host_name           HOST1,HOST2,HOST3,...,HOSTN
  *    service_description SOMESERVICE
  *    other service directives ...
@@ -76,8 +75,7 @@
  *  attempts, notification period, etc.).
  *
  *  @code
- *  define service
- *  {
+ *  define service{
  *    hostgroup_name      HOSTGROUP1,HOSTGROUP2,...,HOSTGROUPN
  *    service_description SOMESERVICE
  *    other service directives ...
@@ -94,8 +92,7 @@
  *  check attempts, notification period, etc.).
  *
  *  @code
- *  define service
- *  {
+ *  define service{
  *    host_name           *
  *    service_description SOMESERVICE
  *    other service directives ...
@@ -109,8 +106,7 @@
  *  hostgroup with a ! symbol.
  *
  *  @code
- *  define service
- *  {
+ *  define service{
  *    host_name           HOST1,HOST2,!HOST3,!HOST4,...,HOSTN
  *    hostgroup_name      HOSTGROUP1,HOSTGROUP2,!HOSTGROUP3,!HOSTGROUP4,...,HOSTGROUPN
  *    service_description SOMESERVICE
@@ -132,8 +128,7 @@
  *  interval, etc.).
  *
  *  @code
- *  define serviceescalation
- *  {
+ *  define serviceescalation{
  *    host_name           HOST1,HOST2,HOST3,...,HOSTN
  *    service_description SOMESERVICE
  *    other escalation directives ...
@@ -151,8 +146,7 @@
  *  notification interval, etc.).
  *
  *  @code
- *  define serviceescalation
- *  {
+ *  define serviceescalation{
  *    hostgroup_name      HOSTGROUP1,HOSTGROUP2,...,HOSTGROUPN
  *    service_description SOMESERVICE
  *    other escalation directives ...
@@ -170,8 +164,7 @@
  *  groups, notification interval, etc.).
  *
  *  @code
- *  define serviceescalation
- *  {
+ *  define serviceescalation{
  *    host_name           *
  *    service_description SOMESERVICE
  *    other escalation directives ...
@@ -185,8 +178,7 @@
  *  host or hostgroup with a ! symbol.
  *
  *  @code
- *  define serviceescalation
- *  {
+ *  define serviceescalation{
  *    host_name           HOST1,HOST2,!HOST3,!HOST4,...,HOSTN
  *    hostgroup_name      HOSTGROUP1,HOSTGROUP2,!HOSTGROUP3,!HOSTGROUP4,...,HOSTGROUPN
  *    service_description SOMESERVICE
@@ -210,8 +202,7 @@
  *  you've defined in your configuration files.
  *
  *  @code
- *  define serviceescalation
- *  {
+ *  define serviceescalation{
  *    host_name           HOST1
  *    service_description *
  *    other escalation directives ...
@@ -230,8 +221,7 @@
  *  interval, etc.).
  *
  *  @code
- *  define serviceescalation
- *  {
+ *  define serviceescalation{
  *    host_name           HOST1
  *    service_description SERVICE1,SERVICE2,...,SERVICEN
  *    other escalation directives ...
@@ -248,8 +238,7 @@
  *  the same contact groups, notification interval, etc.).
  *
  *  @code
- *  define serviceescalation
- *  {
+ *  define serviceescalation{
  *    servicegroup_name SERVICEGROUP1,SERVICEGROUP2,...,SERVICEGROUPN
  *    other escalation directives ...
  *  }
@@ -268,8 +257,7 @@
  *  names (i.e. have the same notification failure criteria, etc.).
  *
  *  @code
- *  define servicedependency
- *  {
+ *  define servicedependency{
  *    host_name                     HOST1,HOST2
  *    service_description           SERVICE1
  *    dependent_host_name           HOST3,HOST4
@@ -292,8 +280,7 @@
  *  (i.e. have the same notification failure criteria, etc.).
  *
  *  @code
- *  define servicedependency
- *  {
+ *  define servicedependency{
  *    hostgroup_name                HOSTGROUP1,HOSTGROUP2
  *    service_description           SERVICE1
  *    dependent_hostgroup_name      HOSTGROUP3,HOSTGROUP4
@@ -312,8 +299,7 @@
  *  notification failure criteria, etc.).
  *
  *  @code
- *  define servicedependency
- *  {
+ *  define servicedependency{
  *    host_name                     HOST1
  *    service_description           *
  *    dependent_host_name           HOST2
@@ -329,8 +315,7 @@
  *  dependent_service_description directives as follows:
  *
  *  @code
- *  define servicedependency
- *  {
+ *  define servicedependency{
  *    host_name                     HOST1
  *    service_description           SERVICE1,SERVICE2,...,SERVICEN
  *    dependent_host_name           HOST2
@@ -346,8 +331,7 @@
  *  follows:
  *
  *  @code
- *  define servicedependency
- *  {
+ *  define servicedependency{
  *    servicegroup_name           SERVICEGROUP1,SERVICEGROUP2,...,SERVICEGROUPN
  *    dependent_servicegroup_name SERVICEGROUP3,SERVICEGROUP4,...SERVICEGROUPN
  *    other dependency directives ...
@@ -366,8 +350,7 @@
  *  dependent on both SERVICE1 and SERVICE2 on HOST2.
  *
  *  @code
- *  define servicedependency
- *  {
+ *  define servicedependency{
  *    host_name                     HOST1,HOST2
  *    service_description           SERVICE1,SERVICE2
  *    dependent_service_description SERVICE3,SERVICE4
@@ -386,8 +369,7 @@
  *  the same contact groups, notification interval, etc.).
  *
  *  @code
- *  define hostescalation
- *  {
+ *  define hostescalation{
  *    host_name HOST1,HOST2,HOST3,...,HOSTN
  *    other escalation directives ...
  *  }
@@ -402,8 +384,7 @@
  *  same contact groups, notification interval, etc.).
  *
  *  @code
- *  define hostescalation
- *  {
+ *  define hostescalation{
  *    hostgroup_name HOSTGROUP1,HOSTGROUP2,...,HOSTGROUPN
  *    other escalation directives ...
  *  }
@@ -418,8 +399,7 @@
  *  (i.e. have the same contact groups, notification interval, etc.).
  *
  *  @code
- *  define hostescalation
- *  {
+ *  define hostescalation{
  *    host_name *
  *    other escalation directives ...
  *  }
@@ -432,8 +412,7 @@
  *  hostgroup with a ! symbol.
  *
  *  @code
- *  define hostescalation
- *  {
+ *  define hostescalation{
  *    host_name      HOST1,HOST2,!HOST3,!HOST4,...,HOSTN
  *    hostgroup_name HOSTGROUP1,HOSTGROUP2,!HOSTGROUP3,!HOSTGROUP4,...,HOSTGROUPN
  *    other escalation directives ...
@@ -454,8 +433,7 @@
  *  criteria, etc.).
  *
  *  @code
- *  define hostdependency
- *  {
+ *  define hostdependency{
  *    host_name           HOST1,HOST2
  *    dependent_host_name HOST3,HOST4,HOST5
  *    other dependency directives ...
@@ -473,8 +451,7 @@
  *  etc.).
  *
  *  @code
- *  define hostdependency
- *  {
+ *  define hostdependency{
  *    hostgroup_name           HOSTGROUP1,HOSTGROUP2
  *    dependent_hostgroup_name HOSTGROUP3,HOSTGROUP4
  *    other dependency directives ...
@@ -491,8 +468,7 @@
  *  defined in your configuration files as members.
  *
  *  @code
- *  define hostgroup
- *  {
+ *  define hostgroup{
  *    hostgroup_name HOSTGROUP1
  *    members        *
  *    other hostgroup directives ...

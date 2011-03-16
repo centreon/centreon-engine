@@ -36,8 +36,7 @@
  *  weekdays, and weekends:
  *
  *  @code
- *  define timeperiod
- *  {
+ *  define timeperiod{
  *    name            weekdays
  *    timeperiod_name weekdays
  *    monday          00:00-24:00
@@ -47,16 +46,14 @@
  *    friday          00:00-24:00
  *  }
  *
- *  define timeperiod
- *  {
+ *  define timeperiod{
  *    name            weekends
  *    timeperiod_name weekends
  *    saturday        00:00-24:00
  *    sunday          00:00-24:00
  *  }
  *
- *  define timeperiod
- *  {
+ *  define timeperiod{
  *    name                holidays
  *    timeperiod_name     holidays
  *    january 1           00:00-24:00 ; New Year's Day
@@ -76,8 +73,7 @@
  *  timeperiod above:
  *
  *  @code
- *  define timeperiod
- *  {
+ *  define timeperiod{
  *    timeperiod_name john-oncall
  *    use             weekdays ; Include weekdays
  *    exclude         holidays ; Exclude holiday dates/times defined elsewhere
@@ -87,8 +83,7 @@
  *  You can now reference this timeperiod in John's contact definition:
  *
  *  @code
- *  define contact
- *  {
+ *  define contact{
  *    contact_name                john
  *    ...
  *    host_notification_period    john-oncall
@@ -101,8 +96,7 @@
  *  above:
  *
  *  @code
- *  define timeperiod
- *  {
+ *  define timeperiod{
  *    timeperiod_name bob-oncall
  *    use             weekends,holidays	; Include weekend and holiday date/times defined elsewhere
  *  }
@@ -111,8 +105,7 @@
  *  You can now reference this timeperiod in Bob's contact definition:
  *
  *  @code
- *  define contact
- *  {
+ *  define contact{
  *    contact_name                bob
  *    ...
  *    host_notification_period    bob-oncall
@@ -130,8 +123,7 @@
  *  notifications starting today, the definition would look like this:
  *
  *  @code
- *  define timeperiod
- *  {
+ *  define timeperiod{
  *    timeperiod_name john-oncall
  *    2007-08-01 / 2  00:00-24:00 ; Every two days, starting August 1st,
  *    2007
@@ -143,8 +135,7 @@
  *  on-call day starts tomorrow (August 2nd, 2007).
  *
  *  @code
- *  define timeperiod
- *  {
+ *  define timeperiod{
  *    timeperiod_name bob-oncall
  *    2007-08-02 / 2  00:00-24:00 ; Every two days, starting August 2nd, 2007
  *  }
@@ -154,8 +145,7 @@
  *  contact definitions for John and Bob:
  *
  *  @code
- *  define contact
- *  {
+ *  define contact{
  *    contact_name                john
  *    ...
  *    host_notification_period    john-oncall
@@ -164,8 +154,7 @@
  *  @endcode
  *
  *  @code
- *  define contact
- *  {
+ *  define contact{
  *    contact_name                bob
  *    ...
  *    host_notification_period    bob-oncall
@@ -186,8 +175,7 @@
  *  would look like this:
  *
  *  @code
- *  define timeperiod
- *  {
+ *  define timeperiod{
  *    timeperiod_name john-oncall
  *    2007-07-29 / 14 00:00-24:00 ; Every 14 days (two weeks), starting Sunday, July 29th, 2007
  *    2007-07-30 / 14 00:00-24:00 ; Every other Monday starting July 30th, 2007
@@ -204,8 +192,7 @@
  *  on-call day starts next Sunday (August 5th, 2007).
  *
  *  @code
- *  define timeperiod
- *  {
+ *  define timeperiod{
  *    timeperiod_name bob-oncall
  *    2007-08-05 / 14 00:00-24:00 ; Every 14 days (two weeks), starting Sunday, August 5th, 2007
  *    2007-08-06 / 14 00:00-24:00 ; Every other Monday starting August 6th, 2007
@@ -221,8 +208,7 @@
  *  contact definitions for John and Bob:
  *
  *  @code
- *  define contact
- *  {
+ *  define contact{
  *    contact_name                john
  *    ...
  *    host_notification_period    john-oncall
@@ -231,8 +217,7 @@
  *  @endcode
  *
  *  @code
- *  define contact
- *  {
+ *  define contact{
  *    contact_name                bob
  *    ...
  *    host_notification_period    bob-oncall
@@ -251,8 +236,7 @@
  *  vacation days and days off:
  *
  *  @code
- *  define timeperiod
- *  {
+ *  define timeperiod{
  *    name                    john-out-of-office
  *    timeperiod_name         john-out-of-office
  *    day 15                  00:00-24:00 ; 15th day of each month
@@ -268,8 +252,7 @@
  *  the dates/times defined in the timeperiod above:
  *
  *  @code
- *  define timeperiod
- *  {
+ *  define timeperiod{
  *    timeperiod_name john-oncall
  *    monday          00:00-24:00
  *    tuesday         00:00-24:00
@@ -283,8 +266,7 @@
  *  You can now reference this timeperiod in John's contact definition:
  *
  *  @code
- *  define contact
- *  {
+ *  define contact{
  *    contact_name                john
  *    ...
  *    host_notification_period    john-oncall
@@ -296,8 +278,7 @@
  *  dates/times that John is out of the office:
  *
  *  @code
- *  define timeperiod
- *  {
+ *  define timeperiod{
  *    timeperod_name bob-oncall
  *    use            john-out-of-office ; Include holiday date/times that John is out
  *  }
@@ -306,8 +287,7 @@
  *  You can now reference this timeperiod in Bob's contact definition:
  *
  *  @code
- *  define contact
- *  {
+ *  define contact{
  *    contact_name                bob
  *    ...
  *    host_notification_period    bob-oncall

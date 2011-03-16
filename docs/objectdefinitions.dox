@@ -80,8 +80,7 @@
  *  optional.
  *
  *  @code
- *  define host
- *  {
+ *  define host{
  *    @b host_name                 host_name
  *    @b alias                     alias
  *    display_name                 display_name
@@ -131,8 +130,7 @@
  *  @subsubsection objectdefinitionsobjecttypeshostdefinitionexampledefinition Example Definition
  *
  *  @code
- *  define host
- *  {
+ *  define host{
  *    host_name                    bogus-router
  *    alias                        Bogus Router #1
  *    address                      192.168.1.254
@@ -655,8 +653,7 @@
  *  optional.
  *
  *  @code
- *  define hostgroup
- *  {
+ *  define hostgroup{
  *    @b hostgroup_name hostgroup_name
  *    @b alias          alias
  *    members           hosts
@@ -670,8 +667,7 @@
  *  @subsubsection objectdefinitionsobjecttypeshostgroupdefinitionexampledefinition Example Definition
  *
  *  @code
- *  define hostgroup
- *  {
+ *  define hostgroup{
  *    hostgroup_name novell-servers
  *    alias          Novell Servers
  *    members        netware1,netware2,netware3,netware4
@@ -760,8 +756,7 @@
  *  optional.
  *
  *  @code
- *  define service
- *  {
+ *  define service{
  *    @b host_name                 host_name
  *    hostgroup_name               hostgroup_name
  *    @b service_description       service_description
@@ -807,8 +802,7 @@
  *  @subsubsection objectdefinitionsobjecttypesservicedefinitionserviceexampledefinition Example Definition
  *
  *  @code
- *  define service
- *  {
+ *  define service{
  *    host_name             linux-server
  *    service_description   check-disk-sda1
  *    check_command         check-disk!/dev/sda1
@@ -1249,8 +1243,7 @@
  *  optional.
  *
  *  @code
- *  define servicegroup
- *  {
+ *  define servicegroup{
  *    @b servicegroup_name servicegroup_name
  *    @b alias             alias
  *    members              services
@@ -1264,8 +1257,7 @@
  *  @subsubsection objectdefinitionsobjecttypesservicegroupdefinitionexampledefinition Example Definition
  *
  *  @code
- *  define servicegroup
- *  {
+ *  define servicegroup{
  *    servicegroup_name dbservices
  *    alias             Database Services
  *    members           ms1,SQL Server,ms1,SQL Server Agent,ms1,SQL DTC
@@ -1357,8 +1349,7 @@
  *  optional.
  *
  *  @code
- *  define contact
- *  {
+ *  define contact{
  *    @b contact_name                  contact_name
  *    alias                            alias
  *    @b contactgroups                 contactgroup_names
@@ -1382,8 +1373,7 @@
  *  @subsubsection objectdefinitionsobjecttypescontactdefinitionexampledefinition Example Definition
  *
  *  @code
- *  define contact
- *  {
+ *  define contact{
  *    contact_name                  jdoe
  *    alias                         John Doe
  *    host_notifications_enabled    1
@@ -1612,8 +1602,7 @@
  *  optional.
  *
  *  @code
- *  define contactgroup
- *  {
+ *  define contactgroup{
  *    @b contactgroup_name contactgroup_name
  *    @b alias             alias
  *    members              contacts
@@ -1624,8 +1613,7 @@
  *  @subsubsection objectdefinitionsobjecttypesexampledefinition Example Definition
  *
  *  @code
- *  define contactgroup
- *  {
+ *  define contactgroup{
  *    contactgroup_name novell-admins
  *    alias             Novell Administrators
  *    members           jdoe,rtobert,tzach
@@ -1688,8 +1676,7 @@
  *  optional.
  *
  *  @code
- *  define timeperiod
- *  {
+ *  define timeperiod{
  *    @b timeperiod_name timeperiod_name
  *    @b alias           alias
  *    [weekday]          timeranges
@@ -1701,8 +1688,7 @@
  *  @subsubsection objectdefinitionsobjecttypestimeperioddefinitionexampledefinitions Example Definitions
  *
  *  @code
- *  define timeperiod
- *  {
+ *  define timeperiod{
  *    timeperiod_name nonworkhours
  *    alias           Non-Work Hours
  *    sunday          00:00-24:00             ; Every Sunday of every week
@@ -1714,8 +1700,7 @@
  *    saturday        00:00-24:00             ; Every Saturday of every week
  *  }
  *
- *  define timeperiod
- *  {
+ *  define timeperiod{
  *    timeperiod_name      misc-single-days
  *    alias                Misc Single Days
  *    1999-01-28           00:00-24:00 ; January 28th, 1999
@@ -1727,8 +1712,7 @@
  *    thursday -1 november 00:00-24:00 ; Last Thursday in November of every year
  *  }
  *
- *  define timeperiod
- *  {
+ *  define timeperiod{
  *    timeperiod_name                misc-date-ranges
  *    alias                          Misc Date Ranges
  *    2007-01-01 - 2008-02-01        00:00-24:00 ; January 1st, 2007 to February 1st, 2008
@@ -1740,8 +1724,7 @@
  *    tuesday 1 april - friday 2 may 00:00-24:00 ; 1st Tuesday in April to 2nd Friday in May of every year
  *  }
  *
- *  define timeperiod
- *  {
+ *  define timeperiod{
  *    timeperiod_name                    misc-skip-ranges
  *    alias                              Misc Skip Ranges
  *    2007-01-01 - 2008-02-01 / 3        00:00-24:00 ; Every 3 days from January 1st, 2007 to February 1st, 2008
@@ -1833,8 +1816,7 @@
  *  optional.
  *
  *  @code
- *  define command
- *  {
+ *  define command{
  *    @b command_name command_name
  *    @b command_line command_line
  *  }
@@ -1843,8 +1825,7 @@
  *  @subsubsection objectdefinitionsobjecttypescommanddefinitionexampledefinition Example Definition
  *
  *  @code
- *  define command
- *  {
+ *  define command{
  *    command_name check_pop
  *    command_line /usr/local/centscheduler/libexec/check_pop -H $HOSTADDRESS$
  *  }
@@ -1918,8 +1899,7 @@
  *  for the definition to be of much use.
  *
  *  @code
- *  define servicedependency
- *  {
+ *  define servicedependency{
  *    @b dependent_host_name           host_name
  *    dependent_hostgroup_name         hostgroup_name
  *    @b dependent_service_description service_description
@@ -1936,8 +1916,7 @@
  *  @subsubsection objectdefinitionsobjecttypesservicedependencydefinitionexampledefinition Example Definition
  *
  *  @code
- *  define servicedependency
- *  {
+ *  define servicedependency{
  *    host_name                     WWW1
  *    service_description           Apache Web Server
  *    dependent_host_name           WWW1
@@ -2076,8 +2055,7 @@
  *  optional.
  *
  *  @code
- *  define serviceescalation
- *  {
+ *  define serviceescalation{
  *    @b host_name             host_name
  *    hostgroup_name           hostgroup_name
  *    @b service_description   service_description
@@ -2094,8 +2072,7 @@
  *  @subsubsection objectdefinitionsobjecttypesserviceescalationdefinitionexampledefinition Example Definition
  *
  *  @code
- *  define serviceescalation
- *  {
+ *  define serviceescalation{
  *    host_name             nt-3
  *    service_description   Processor Load
  *    first_notification    4
@@ -2236,8 +2213,7 @@
  *  optional.
  *
  *  @code
- *  define hostdependency
- *  {
+ *  define hostdependency{
  *    @b dependent_host_name        host_name
  *    dependent_hostgroup_name      hostgroup_name
  *    @b host_name                  host_name
@@ -2252,8 +2228,7 @@
  *  @subsubsection objectdefinitionsobjecttypeshostdependencydefinitionexampledefinition Example Definition
  *
  *  @code
- *  define hostdependency
- *  {
+ *  define hostdependency{
  *    host_name                     WWW1
  *    dependent_host_name           DBASE1
  *    notification_failure_criteria d,u
@@ -2371,8 +2346,7 @@
  *  optional.
  *
  *  @code
- *  define hostescalation
- *  {
+ *  define hostescalation{
  *    @b host_name             host_name
  *    hostgroup_name           hostgroup_name
  *    @b contacts              contacts
@@ -2388,8 +2362,7 @@
  *  @subsubsection objectdefinitionsobjecttypeshostescalationdefinitionexampledefinition Example Definition
  *
  *  @code
- *  define hostescalation
- *  {
+ *  define hostescalation{
  *    host_name             router-34
  *    first_notification    5
  *    last_notification     8
@@ -2523,8 +2496,7 @@
  *  variable in each definition for it to be of much use.
  *
  *  @code
- *  define hostextinfo
- *  {
+ *  define hostextinfo{
  *    @b host_name    host_name
  *    notes           note_string
  *    notes_url       url
@@ -2541,8 +2513,7 @@
  *  @subsubsection objectdefinitionsobjecttypesextendedhostinformationdefinitionexampledefinition Example Definition
  *
  *  @code
- *  define hostextinfo
- *  {
+ *  define hostextinfo{
  *    host_name       netware1
  *    notes           This is the primary Netware file server
  *    notes_url       http://webserver.localhost.localdomain/hostinfo.pl?host=netware1
@@ -2689,8 +2660,7 @@
  *  variable in each definition for it to be of much use.
  *
  *  @code
- *  define serviceextinfo
- *  {
+ *  define serviceextinfo{
  *    @b host_name           host_name
  *    @b service_description service_description
  *    notes                  note_string
@@ -2704,8 +2674,7 @@
  *  @subsubsection objectdefinitionsobjecttypesextendedserviceinformationdefinitionexampledefinition Example Definition
  *
  *  @code
- *  define serviceextinfo
- *  {
+ *  define serviceextinfo{
  *    host_name              linux2
  *    service_description    Log Anomalies
  *    notes Security-related log anomalies on secondary Linux server
