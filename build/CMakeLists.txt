@@ -31,6 +31,7 @@ set(COMMON_DIR "${PROJECT_SOURCE_DIR}/common")
 set(INCLUDE_DIR "${PROJECT_SOURCE_DIR}/include")
 set(XDATA_DIR "${PROJECT_SOURCE_DIR}/xdata")
 set(TEST_DIR "${PROJECT_SOURCE_DIR}/test")
+set(SCRIPT_DIR "${PROJECT_SOURCE_DIR}/scripts")
 
 # Check headers.
 include(CheckIncludeFiles)
@@ -105,7 +106,7 @@ check_function_exists("vsnprintf" HAVE_VSNPRINTF)
 check_c_source_compiles("
   #include <sys/types.h>
   #include <stdarg.h>
-  void foo(const char *format, ...) { 
+  void foo(const char *format, ...) {
     va_list ap;
     int len;
     char buf[5];
@@ -230,7 +231,7 @@ if (WITH_EVENT_BROKER)
   set(EVENT_BROKER "Yes")
   set(USE_EVENT_BROKER TRUE)
 else ()
-  set(EVENT_BROKER "No")  
+  set(EVENT_BROKER "No")
 endif ()
 
 # localstatedir is the prefix.
@@ -413,6 +414,7 @@ add_executable("centschedulerstats"
 )
 
 # Package.
+set(CPACK_PACKAGE_NAME "Centreon-Scheduler")
 set(CPACK_PACKAGE_VENDOR "Merethis")
 set(CPACK_PACKAGE_VERSION_MAJOR 1)
 set(CPACK_PACKAGE_VERSION_MINOR 0)
@@ -425,15 +427,23 @@ set(CPACK_PACKAGE_INSTALL_DIRECTORY "Centreon-Scheduler")
 set(CPACK_RESOURCE_FILE_LICENSE "${PROJECT_SOURCE_DIR}/license.txt")
 set(CPACK_PACKAGE_CONTACT "Matthieu Kermagoret <mkermagoret@merethis.com>")
 if (CPACK_BINARY_DEB)
+  # Configure files.
+  configure_file("${SCRIPT_DIR}/deb/postinst.in" "${SCRIPT_DIR}/deb/postinst")
+
   set(DEB_PACKAGE "Yes")
   set(CPACK_DEBIAN_PACKAGE_SECTION "net")
+  set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${SCRIPT_DIR}/deb/postinst" )
 else ()
   set(DEB_PACKAGE "No")
 endif ()
 if (CPACK_BINARY_RPM)
+  # Configure files.
+  configure_file("${SCRIPT_DIR}/rpm/postinst.in" "${SCRIPT_DIR}/rpm/postinst")
+
   set(RPM_PACKAGE "Yes")
   set(CPACK_RPM_PACKAGE_RELEASE 1)
   set(CPACK_RPM_PACKAGE_LICENSE "GPLv2")
+  set(CPACK_RPM_POST_INSTALL_SCRIPT_FILE "${SCRIPT_DIR}/rpm/postinst")
 else ()
   set(RPM_PACKAGE "No")
 endif ()
