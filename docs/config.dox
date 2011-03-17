@@ -1,0 +1,56 @@
+/**
+ *  @page configurationoverview Configuration Overview
+ *  @section configurationoverviewintroduction Introduction
+ *
+ *  There are several different configuration files that you're going
+ *  to need to create or edit before you start monitoring anything. Be
+ *  patient! Configuring Centron Scheduler can take quite a while,
+ *  especially if you're first-time user. Once you figure out how
+ *  things work, it'll all be well worth your time. :-)
+ *
+ *  @note Sample configuration files are installed in the
+ *  /usr/local/centscheduler/etc/ directory when you follow the @link
+ *  quickstartinstallationguides quickstart installation guide @endlink.
+ *
+ *  @image html configoverview.png
+ *  @image latex configoverview.eps
+ *
+ *  @section configurationoverviewmainconfigurationfile Main
+ *  Configuration File
+ *
+ *  The main configuration file contains a number of directives that
+ *  affect how the Centron Scheduler daemon operates. This is where
+ *  you're going to want to get started in your configuration
+ *  adventures.
+ *
+ *  Documentation for the main configuration file can be found @link
+ *  mainconfigurationfileoptions here @endlink.
+ *
+ *  @section configurationoverviewresourcefiles Resource File(s)
+ *
+ *  Resource files can be used to store user-defined macros. The main
+ *  point of having resource files is to use them to store sensitive
+ *  configuration information (like passwords).
+ *
+ *  You can specify one or more optional resource files by using the
+ *  @ref mainconfigurationfileoptionsconfigurationfilevariablesresourcefile
+ *  "resource_file" directive in your main configuration file.
+ *
+ *  @section configurationoverviewobjectdefinitionfiles Object
+ *  Definition Files
+ *
+ *  Object definition files are used to define hosts, services,
+ *  hostgroups, contacts, contactgroups, commands, etc. This is where
+ *  you define all the things you want monitor and how you want to
+ *  monitor them.
+ *
+ *  You can specify one or more object definition files by using the
+ *  @ref mainconfigurationfileoptionsconfigurationfilevariablesobjectconfigurationfile
+ *  "cfg_file" and/or
+ *  @ref mainconfigurationfileoptionsconfigurationfilevariablesobjectconfigurationdirectory
+ *  "cfg_dir" directives in your main configuration file.
+ *
+ *  An introduction to object definitions, and how they relate to each
+ *  other, can be found @link objectconfigurationoverview here @endlink.
+ */
+
