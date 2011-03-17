@@ -5,10 +5,10 @@
  *  @image html tcpwrappers.png
  *  @image latex tcpwrappers.eps
  *
- *  This document explains how to easily generate alerts in Centron
+ *  This document explains how to easily generate alerts in Centreon
  *  Scheduler for connection attempts that are rejected by TCP
  *  wrappers. For example, if an unauthorized host attempts to connect
- *  to your SSH server, you can receive an alert in Centron Scheduler
+ *  to your SSH server, you can receive an alert in Centreon Scheduler
  *  that contains the name of the host that was rejected. If you
  *  implement this on your Linux/Unix boxes, you'll be surprised how
  *  many port scans you can detect across your network.
@@ -21,7 +21,7 @@
  *  - The host which you are generating alerts for (i.e. the host you
  *  are using TCP wrappers on) is a remote host (called firestorm in
  *  this example). If you want to generate alerts on the same host that
- *  Centron Scheduler is running you will need to make a few
+ *  Centreon Scheduler is running you will need to make a few
  *  modifications to the examples I provide.
  *  - You have installed the @ref centscheduleraddonsnsca "NSCA daemon"
  *  on your monitoring server and the NSCA client (send_nsca)
@@ -59,7 +59,7 @@
  *  in.
  *  - Active checks of the service as disabled, while passive checks
  *  are enabled. This means that the service will never be actively
- *  checked by Centron Scheduler - all alert information will have to
+ *  checked by Centreon Scheduler - all alert information will have to
  *  be received passively from an external source.
  *  - The max_check_attempts value is set to 1. This guarantees you
  *  will get a notification when the first alert is generated.
@@ -82,7 +82,7 @@
  *  @section tcpwrapperintegrationwritingthescript Writing The Script
  *
  *  The last thing you need to do is write the handle_tcp_wrapper
- *  script on firestorm that will send the alert back to the Centron
+ *  script on firestorm that will send the alert back to the Centreon
  *  Scheduler server. It might look something like this:
  *
  *  @code
@@ -92,7 +92,7 @@
  *
  *  Notice that the handle_tcp_wrapper script calls the
  *  submit_check_result script to actually send the alert back to the
- *  monitoring host. Assuming your Centron Scheduler server is called
+ *  monitoring host. Assuming your Centreon Scheduler server is called
  *  monitor, the submit check_result script might look like this:
  *
  *  @code
@@ -109,10 +109,10 @@
  *  @section tcpwrapperintegrationfinishingup Finishing Up
  *
  *  You've now configured everything you need to, so all you have to do
- *  is restart the inetd process on firestorm and restart Centron
+ *  is restart the inetd process on firestorm and restart Centreon
  *  Scheduler on your monitoring server. That's it! When the TCP
  *  wrappers on firestorm deny a connection attempt, you should be
- *  getting alerts in Centron Scheduler. The plugin output for the
+ *  getting alerts in Centreon Scheduler. The plugin output for the
  *  alert will look something like the following:
  *
  *  @code

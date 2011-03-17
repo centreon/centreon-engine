@@ -9,7 +9,7 @@
  *  executables) that are run whenever a host or service state change
  *  occurs.
  *
- *  An obvious use for event handlers is the ability for Centron
+ *  An obvious use for event handlers is the ability for Centreon
  *  Scheduler to proactively fix problems before anyone is notified.
  *  Some other uses for event handlers include:
  *
@@ -104,7 +104,7 @@
  *  for you, one is provided @ref eventhandlersserviceeventhandlerexample "below".
  *
  *  @note Tip: Additional sample event handler scripts can be found in the
- *  contrib/eventhandlers/ subdirectory of the Centron Scheduler
+ *  contrib/eventhandlers/ subdirectory of the Centreon Scheduler
  *  distribution. Some of these sample scripts demonstrate the use of
  *  @link externalcommands external commands @endlink to implement a
  *  @link redundantandfailovernetworkmonitoring redundant @endlink and @link distributedmonitoring
@@ -113,13 +113,13 @@
  *  @section eventhandlerspermissionsforeventhandlercommands Permissions For Event Handler Commands
  *
  *  Event handler commands will normally execute with the same
- *  permissions as the user under which Centron Scheduler is running on
+ *  permissions as the user under which Centreon Scheduler is running on
  *  your machine. This can present a problem if you want to write an
  *  event handler that restarts system services, as root privileges are
  *  generally required to do these sorts of tasks.
  *
  *  Ideally you should evaluate the types of event handlers you will be
- *  implementing and grant just enough permissions to the Centron
+ *  implementing and grant just enough permissions to the Centreon
  *  Scheduler user for executing the necessary system commands. You
  *  might want to try using <a href="http://www.courtesan.com/sudo/sudo.html">
  *  sudo</a> to accomplish this.
@@ -185,7 +185,7 @@
  *      # Aha! The HTTP service appears to have a problem - perhaps we should restart the server...
  *  	# Is this a "soft" or a "hard" state?
  *  	case "$2" in
- *  	  # We're in a "soft" state, meaning that Centron Scheduler is in the middle of retrying the
+ *  	  # We're in a "soft" state, meaning that Centreon Scheduler is in the middle of retrying the
  *  	  # check before it turns into a "hard" state and contacts get notified...
  *  	  SOFT)
  *  	    # What check attempt are we on? We don't want to restart the web server on the first
@@ -231,7 +231,7 @@
  *  include a fallback case in the event it doesn't work the first
  *  time. It should be noted that the event handler will only be
  *  executed the first time that the service falls into a HARD problem
- *  state. This prevents Centron Scheduler from continuously executing
+ *  state. This prevents Centreon Scheduler from continuously executing
  *  the script to restart the web server if the service remains in a
  *  HARD problem state. You don't want that. :-)
  *

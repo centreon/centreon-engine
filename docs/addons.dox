@@ -1,10 +1,10 @@
 /**
- *  @page centscheduleraddons Centron Scheduler Addons
+ *  @page centscheduleraddons Centreon Scheduler Addons
  *  @section centscheduleraddonsintroduction Introduction
  *
  *  There are a lot of "addon" software packages that are available for
- *  Centron Scheduler. Addons can be used to extend Centron Scheduler'
- *  functionality or integrate Centron Scheduler with other
+ *  Centreon Scheduler. Addons can be used to extend Centreon Scheduler'
+ *  functionality or integrate Centreon Scheduler with other
  *  applications.
  *
  *  Addons are available for:
@@ -14,13 +14,13 @@
  *  - Simplifying/extending the notification logic
  *  - ...and much more
  *
- *  You can find many addons for Centron Scheduler by visiting:
- *  - <a href="http://XXX">Centron Scheduler.org</a>
+ *  You can find many addons for Centreon Scheduler by visiting:
+ *  - <a href="http://XXX">Centreon Scheduler.org</a>
  *  - <a href="http://XXX">SourceForge.net</a>
- *  - <a href="http://XXX">Centron SchedulerExchange.org</a>
+ *  - <a href="http://XXX">Centreon SchedulerExchange.org</a>
  *
  *  I'll give a brief introduction to a few of the addons that I've
- *  developed for Centron Scheduler...
+ *  developed for Centreon Scheduler...
  *
  *  @section centscheduleraddonsnrpe NRPE
  *
@@ -45,7 +45,7 @@
  *
  *  NSCA is an addon that allows you to send @link passivechecks.html
  *  passive check @endlink results from remote Linux/Unix hosts to the
- *  Centron Scheduler daemon running on the monitoring server. This is
+ *  Centreon Scheduler daemon running on the monitoring server. This is
  *  very useful in @link distributedmonitoring distributed @endlink and
  *  @link redundantandfailovernetworkmonitoring redundant/failover
  *  @endlink monitoring setups.
@@ -58,19 +58,19 @@
  *  @image latex ndoutils.eps
  *
  *  NDOUtils is an addon that allows you to store all status
- *  information from Centron Scheduler in a MySQL database. Multiple
- *  instances of Centron Scheduler can all store their information in a
+ *  information from Centreon Scheduler in a MySQL database. Multiple
+ *  instances of Centreon Scheduler can all store their information in a
  *  central database for centralized reporting. This will likely serve
- *  as the basis for a new PHP-based web interface for Centron
+ *  as the basis for a new PHP-based web interface for Centreon
  *  Scheduler in the future.
  *
  *  The NDOUtils addon and documentation can be found at
  *  http://XXX/.
  *
- *  @section centscheduleraddonscentschedulerexchangehundredsofotheraddons Centron Scheduler Exchange - Hundreds of Other Addons
+ *  @section centscheduleraddonscentschedulerexchangehundredsofotheraddons Centreon Scheduler Exchange - Hundreds of Other Addons
  *
- *  Hundreds of community-developed Centron Scheduler addons can be
- *  found on the Centron Scheduler Exchange website at
+ *  Hundreds of community-developed Centreon Scheduler addons can be
+ *  found on the Centreon Scheduler Exchange website at
  *  <a hre="http://XXX">exchange.centscheduler.org</a>
  */
 

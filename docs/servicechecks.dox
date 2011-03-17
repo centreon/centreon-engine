@@ -6,7 +6,7 @@
  *
  *  @section servicecheckswhenareservicechecksperformed When Are Service Checks Performed?
  *
- *  Services are checked by the Centron Scheduler daemon:
+ *  Services are checked by the Centreon Scheduler daemon:
  *  - At regular intervals, as defined by the check_interval and
  *  retry_interval options in your @ref objectdefinitionsobjecttypesservicedefinitionservice
  *  "service definitions".
@@ -18,14 +18,14 @@
  *  logic. These checks help ensure that the dependency logic is as
  *  accurate as possible. If you don't make use of
  *  @ref objectdefinitionsobjecttypesservicedependencydefinition
- *  "service dependencies", Centron Scheduler won't perform any on-demand service
+ *  "service dependencies", Centreon Scheduler won't perform any on-demand service
  *  checks.
  *
  *  @section servicecheckscachedservicechecks Cached Service Checks
  *
  *  The performance of on-demand service checks can be significantly
  *  improved by implementing the use of cached checks, which allow
- *  Centron Scheduler to forgo executing a service check if it
+ *  Centreon Scheduler to forgo executing a service check if it
  *  determines a relatively recent check result will do instead. Cached
  *  checks will only provide a performance increase if you are making
  *  use of @ref objectdefinitionsobjecttypesservicedependencydefinition
@@ -35,26 +35,26 @@
  *  @section servicechecksdependenciesandchecks Dependencies and Checks
  *
  *  You can define @ref objectdefinitionsobjecttypesservicedependencydefinition
- *  "service execution dependencies" that prevent Centron
+ *  "service execution dependencies" that prevent Centreon
  *  Scheduler from checking the status of a service depending on the
  *  state of one or more other services. More information on
  *  dependencies can be found @link hostandservicedependencies here @endlink.
  *
  *  @section servicechecksparallelizationofservicechecks Parallelization of Service Checks
  *
- *  Scheduled service checks are run in parallel. When Centron
+ *  Scheduled service checks are run in parallel. When Centreon
  *  Scheduler needs to run a scheduled service check, it will initiate
  *  the service check and then return to doing other work (running host
  *  checks, etc). The service check runs in a child process that was
- *  fork()ed from the main Centron Scheduler daemon. When the service
- *  check has completed, the child process will inform the main Centron
+ *  fork()ed from the main Centreon Scheduler daemon. When the service
+ *  check has completed, the child process will inform the main Centreon
  *  Scheduler process (its parent) of the check results. The main
- *  Centron Scheduler process then handles the check results and takes
+ *  Centreon Scheduler process then handles the check results and takes
  *  appropriate action (running event handlers, sending notifications,
  *  etc.).
  *
  *  On-demand service checks are also run in parallel if needed. As
- *  mentioned earlier, Centron Scheduler can forgo the actual execution
+ *  mentioned earlier, Centreon Scheduler can forgo the actual execution
  *  of an on-demand service check if it can use the cached results from
  *  a relatively recent service check.
  *
@@ -76,7 +76,7 @@
  *
  *  @section servicechecksservicesstatechanges Services State Changes
  *
- *  When Centron Scheduler checks the status of services, it will be
+ *  When Centreon Scheduler checks the status of services, it will be
  *  able to detect when a service changes between OK, WARNING, UNKNOWN,
  *  and CRITICAL states and take appropriate action. These state
  *  changes result in different @link statetypes.html state types
@@ -84,11 +84,11 @@
  *  event handlers @endlink to be run and @link notifications.html
  *  notifications @endlink to be sent out. Service state changes can
  *  also trigger on-demand @link hostchecks.html host checks @endlink.
- *  Detecting and dealing with state changes is what Centron Scheduler
+ *  Detecting and dealing with state changes is what Centreon Scheduler
  *  is all about.
  *
  *  When services change state too frequently they are considered to be
- *  "flapping". Centron Scheduler can detect when services start
+ *  "flapping". Centreon Scheduler can detect when services start
  *  flapping, and can suppress notifications until flapping stops and
  *  the service's state stabilizes. More information on the flap
  *  detection logic can be found @link detectionandhandlingofstateflapping here @endlink.

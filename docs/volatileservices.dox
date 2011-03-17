@@ -2,7 +2,7 @@
  *  @page volatileservices Volatile Services
  *  @section volatileservicesintroduction Introduction
  *
- *  Centron Scheduler has the ability to distinguish between "normal"
+ *  Centreon Scheduler has the ability to distinguish between "normal"
  *  services and "volatile" services. The is_volatile option in each
  *  service definition allows you to specify whether a specific service
  *  is volatile or not. For most people, the majority of all monitored
@@ -51,18 +51,18 @@
  *  <a href="http://sourceforge.net/projects/sentrytools/">
  *  PortSentry</a> to detect port scans on your machine and
  *  automatically firewall potential intruders. If you want to let
- *  Centron Scheduler know about port scans, you could do the
+ *  Centreon Scheduler know about port scans, you could do the
  *  following...
  *
- *  Centron Scheduler Configuration:
+ *  Centreon Scheduler Configuration:
  *  - Create a service definition called Port Scans and associate it
  *  with the host that PortSentry is running on.
  *  - Set the max_check_attempts directive in the service definition to
- *  1. This will tell Centron Scheduler to immediate force the service
+ *  1. This will tell Centreon Scheduler to immediate force the service
  *  into a @link statetypes.html hard state @endlink when a non-OK
  *  state is reported.
  *  - Set the active_checks_enabled directive in the service definition
- *  to 0. This prevents Centron Scheduler from actively checking the
+ *  to 0. This prevents Centreon Scheduler from actively checking the
  *  service.
  *  - Set the passive_checks_enabled directive in the service
  *  definition to 1. This enables passive checks for the service.
@@ -74,7 +74,7 @@
  *  define a command for the KILL_RUN_CMD directive as follows:
  *
  *  @code
- *  KILL_RUN_CMD="/usr/local/Centron Scheduler/libexec/eventhandlers/submit_check_result host_name 'Port Scans' 2 'Port scan from host $TARGET$ on port $PORT$. Host has been firewalled.'"
+ *  KILL_RUN_CMD="/usr/local/Centreon Scheduler/libexec/eventhandlers/submit_check_result host_name 'Port Scans' 2 'Port scan from host $TARGET$ on port $PORT$. Host has been firewalled.'"
  *  @endcode
  *
  *  Make sure to replace host_name with the short name of the host that
@@ -89,7 +89,7 @@
  *
  *  @code
  *  #!/bin/sh
- *  # Write a command to the Centron Scheduler command file to cause
+ *  # Write a command to the Centreon Scheduler command file to cause
  *  # it to process a service check result
  *  echocmd="/bin/echo"
  *  CommandFile="/usr/local/centscheduler/var/rw/centscheduler.cmd"
@@ -106,10 +106,10 @@
  *  - PortSentry will firewall the host (this is a function of the
  *  PortSentry software)
  *  - PortSentry will execute the submit_check_result shell script and
- *  send a passive check result to Centron Scheduler
- *  - Centron Scheduler will read the external command file and see the
+ *  send a passive check result to Centreon Scheduler
+ *  - Centreon Scheduler will read the external command file and see the
  *  passive service check submitted by PortSentry
- *  - Centron Scheduler will put the Port Scans service in a hard
+ *  - Centreon Scheduler will put the Port Scans service in a hard
  *  CRITICAL state and send notifications to contacts
  *
  *  Pretty neat, huh?

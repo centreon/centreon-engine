@@ -2,14 +2,14 @@
  *  @page activechecks Active Checks
  *  @section activechecksintroduction Introduction
  *
- *  Centron Scheduler is capable of monitoring hosts and services in
+ *  Centreon Scheduler is capable of monitoring hosts and services in
  *  two ways: actively and passively. Passive checks are described
  *  @link passivechecks elsewhere @endlink, so we'll focus on active
  *  checks here. Active checks are the most common method for monitoring
  *  hosts and services. The main features of actives checks as as
  *  follows:
  *
- *  - Active checks are initiated by the Centron Scheduler process
+ *  - Active checks are initiated by the Centreon Scheduler process
  *  - Active checks are run on a regularly scheduled basis
  *
  *  @image html activechecks.png
@@ -17,12 +17,12 @@
  *
  *  @section activecheckshowareactivechecksperformed How Are Active Checks Performed?
  *
- *  Active checks are initiated by the check logic in the Centron
- *  Scheduler daemon. When Centron Scheduler needs to check the status
+ *  Active checks are initiated by the check logic in the Centreon
+ *  Scheduler daemon. When Centreon Scheduler needs to check the status
  *  of a host or service it will execute a plugin and pass it
  *  information about what needs to be checked. The plugin will then
  *  check the operational state of the host or service and report the
- *  results back to the Centron Scheduler daemon. Centron Scheduler
+ *  results back to the Centreon Scheduler daemon. Centreon Scheduler
  *  will process the results of the host or service check and take
  *  appropriate action as necessary (e.g. send notifications, run event
  *  handlers, etc).
@@ -46,13 +46,13 @@
  *  check_interval option. If it is in a SOFT state, it will be checked
  *  at intervals equal to the retry_interval option.
  *
- *  On-demand checks are performed whenever Centron Scheduler sees a
+ *  On-demand checks are performed whenever Centreon Scheduler sees a
  *  need to obtain the latest status information about a particular
- *  host or service. For example, when Centron Scheduler is determining
+ *  host or service. For example, when Centreon Scheduler is determining
  *  the @link determiningstatusandreachabilityofnetworkhosts reachability @endlink of a host, it
  *  will often perform on-demand checks of parent and child hosts to
  *  accurately determine the status of a particular network segment.
  *  On-demand checks also occur in the @link predictivedependencychecks predictive
- *  dependency check @endlink logic in order to ensure Centron Scheduler
+ *  dependency check @endlink logic in order to ensure Centreon Scheduler
  *  has the most accurate status information.
  */

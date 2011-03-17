@@ -19,7 +19,7 @@
  *  (HTTP, FTP, POP3, etc.) can be monitored easily by following the
  *  documentation on monitoring publicly available services.
  *
- *  @note These instructions assume that you've installed Centron
+ *  @note These instructions assume that you've installed Centreon
  *  Scheduler according to the quickstart guide. The sample
  *  configuration entries below reference objects that are defined in
  *  the sample config files (commands.cfg, templates.cfg, etc.) that
@@ -29,15 +29,15 @@
  *
  *  Monitoring private services or attributes of a Windows machine
  *  requires that you install an agent on it. This agent acts as a
- *  proxy between the Centron Scheduler plugin that does the monitoring
+ *  proxy between the Centreon Scheduler plugin that does the monitoring
  *  and the actual service or attribute of the Windows machine. Without
- *  installing an agent on the Windows box, Centron Scheduler would be
+ *  installing an agent on the Windows box, Centreon Scheduler would be
  *  unable to monitor private services or attributes of the Windows box.
  *
  *  For this example, we will be installing the NSClient++ addon on the
  *  Windows machine and using the check_nt plugin to communicate with
  *  the NSClient++ addon. The check_nt plugin should already be
- *  installed on the Centron Scheduler server if you followed the
+ *  installed on the Centreon Scheduler server if you followed the
  *  quickstart guide.
  *
  *  Other Windows agents (like NC_Net) could be used instead of
@@ -52,7 +52,7 @@
  *  1. Perform first-time prerequisites
  *  2. Install a monitoring agent on the Windows machine
  *  3. Create new host and service definitions for monitoring the Windows machine
- *  4. Restart the Centron Scheduler daemon
+ *  4. Restart the Centreon Scheduler daemon
  *
  *  @subsection monitoringwindowsmachineswhatsalreadydoneforyou What's Already Done For You
  *
@@ -70,17 +70,17 @@
  *  /usr/local/centscheduler/etc/objects/ directory. You can modify the
  *  definitions in these and other definitions to suit your needs better
  *  if you'd like. However, I'd recommend waiting until you're more
- *  familiar with configuring Centron Scheduler before doing so. For the
+ *  familiar with configuring Centreon Scheduler before doing so. For the
  *  time being, just follow the directions outlined below and you'll be
  *  monitoring your Windows boxes in no time.
  *
  *  @subsection monitoringwindowsmachinesprerequisites Prerequisites
  *
- *  The first time you configure Centron Scheduler to monitor a Windows
+ *  The first time you configure Centreon Scheduler to monitor a Windows
  *  machine, you'll need to do a bit of extra work. Remember, you only
  *  need to do this for the *first* Windows machine you monitor.
  *
- *  Edit the main Centron Scheduler config file.
+ *  Edit the main Centreon Scheduler config file.
  *
  *  @code
  *  vi /usr/local/centscheduler/etc/centscheduler.cfg
@@ -95,7 +95,7 @@
  *
  *  Save the file and exit.
  *
- *  What did you just do? You told Centron Scheduler to look to the
+ *  What did you just do? You told Centreon Scheduler to look to the
  *  /usr/local/centscheduler/etc/objects/windows.cfg to find additional
  *  object definitions. That's where you'll be adding Windows host and
  *  service definitions. That configuration file already contains some
@@ -110,7 +110,7 @@
  *  I recommend using the NSClient++ addon, which can be found at
  *  http://sourceforge.net/projects/nscplus. These instructions will
  *  take you through a basic installation of the NSClient++ addon, as
- *  well as the configuration of Centron Scheduler for monitoring the
+ *  well as the configuration of Centreon Scheduler for monitoring the
  *  Windows machine.
  *
  *  1. Download the latest stable version of the NSClient++ addon from
@@ -132,7 +132,7 @@
  *  - Optionally require a password for clients by changing the
  *  'password' option in the [Settings] section.
  *  - Uncomment the 'allowed_hosts' option in the [Settings] section.
- *  Add the IP address of the Centron Scheduler server to this
+ *  Add the IP address of the Centreon Scheduler server to this
  *  line, or leave it blank to allow all hosts to connect.
  *  - Make sure the 'port' option in the [NSClient] section is
  *  uncommented and set to '12489' (the default port).
@@ -140,12 +140,12 @@
  *  command: nsclient++ /start
  *  9. If installed properly, a new icon should appear in your system
  *  tray. It will be a yellow circle with a black 'M' inside.
- *  10. Success! The Windows server can now be added to the Centron
+ *  10. Success! The Windows server can now be added to the Centreon
  *  Scheduler monitoring configuration...
  *
- *  @subsection monitoringwindowsmachinesconfiguringcentronscheduler Configuring Centron Scheduler
+ *  @subsection monitoringwindowsmachinesconfiguringcentreonscheduler Configuring Centreon Scheduler
  *
- *  Now it's time to define some object definitions in your Centron
+ *  Now it's time to define some object definitions in your Centreon
  *  Scheduler configuration files in order to monitor the new Windows
  *  machine.
  *
@@ -171,7 +171,7 @@
  *  @endcode
  *
  *  Good. Now you can add some service definitions (to the same
- *  configuration file) in order to tell Centron Scheduler to monitor
+ *  configuration file) in order to tell Centreon Scheduler to monitor
  *  different aspects of the Windows machine. If this is the *first*
  *  Windows machine you're monitoring, you can simply modify the sample
  *  service definitions in windows.cfg.
@@ -302,15 +302,15 @@
  *
  *  Save the file.
  *
- *  @subsection monitoringwindowsmachinesrestartingcentronscheduler Restarting Centron Scheduler
+ *  @subsection monitoringwindowsmachinesrestartingcentreonscheduler Restarting Centreon Scheduler
  *
- *  You're done with modifying the Centron Scheduler configuration, so
- *  you'll need to verify your configuration files and restart Centron
+ *  You're done with modifying the Centreon Scheduler configuration, so
+ *  you'll need to verify your configuration files and restart Centreon
  *  Scheduler.
  *
  *  If the verification process produces any errors messages, fix your
  *  configuration file before continuing. Make sure that you don't
- *  (re)start Centron Scheduler until the verification process completes
+ *  (re)start Centreon Scheduler until the verification process completes
  *  without any errors!
  *
  *  @section monitoringlinuxunixmachines Monitoring Linux/Unix machines
@@ -330,7 +330,7 @@
  *  (HTTP, FTP, SSH, SMTP, etc.) can be monitored easily by following
  *  the documentation on monitoring publicly available services.
  *
- *  @note These instructions assume that you've installed Centron
+ *  @note These instructions assume that you've installed Centreon
  *  Scheduler according to the quickstart guide. The sample
  *  configuration entries below reference objects that are defined in
  *  the sample config files (commands.cfg, templates.cfg, etc.) that
@@ -369,28 +369,28 @@
  *  @subsection monitoringnetwareserversexternalresources External Resources
  *
  *  You can find documentation on monitoring Netware servers with
- *  Centron Scheduler at Novell's Cool Solutions site, including:
+ *  Centreon Scheduler at Novell's Cool Solutions site, including:
  *  - <a href="http://developer.novell.com/wiki/index.php/MRTGEXT">
- *  MRTGEXT: NLM module for MRTG and Centron Scheduler</a>
+ *  MRTGEXT: NLM module for MRTG and Centreon Scheduler</a>
  *  - <a href="http://www.novell.com/coolsolutions/feature/16723.html">
- *  Centron Scheduler: Host and Service Monitoring Tool</a>
+ *  Centreon Scheduler: Host and Service Monitoring Tool</a>
  *  - <a href="http://www.novell.com/coolsolutions/appnote/17494.html">
- *  Centron Scheduler and NetWare: SNMP-based Monitoring</a>
+ *  Centreon Scheduler and NetWare: SNMP-based Monitoring</a>
  *  - <a href="http://www.novell.com/coolsolutions/tools/17255.html">
- *  Monitor DirXML/IDM Driver States with Centron Scheduler</a>
+ *  Monitor DirXML/IDM Driver States with Centreon Scheduler</a>
  *  - <a href="http://www.novell.com/coolsolutions/tools/17038.html">
- *  Check NDS Login ability with Centron Scheduler</a>
+ *  Check NDS Login ability with Centreon Scheduler</a>
  *  - <a href="http://www.novell.com/coolsolutions/tools/17580.html">
- *  NDPS/iPrint Print Queue Monitoring by Centron Scheduler</a>
+ *  NDPS/iPrint Print Queue Monitoring by Centreon Scheduler</a>
  *  - <a href="http://www.novell.com/coolsolutions/tools/16935.html">
- *  check_gwiaRL Plugin for Centron Scheduler 2.0</a>
+ *  check_gwiaRL Plugin for Centreon Scheduler 2.0</a>
  *
  *  @note Tip: When you visit Novell's Cool Solutions site, search for
- *  "Centron Scheduler" to find more articles and software components
+ *  "Centreon Scheduler" to find more articles and software components
  *  related to monitoring.
  *
  *  Thanks to Christian Mies, Rainer Brunold, and others for
- *  contributing Centron Scheduler and Netware documentation, addons,
+ *  contributing Centreon Scheduler and Netware documentation, addons,
  *  etc. on the Novell site!
  *
  *  @section monitoringroutersswitches Monitoring routers/switches
@@ -410,7 +410,7 @@
  *  - SNMP status information
  *  - Bandwidth / traffic rate
  *
- *  @note These instructions assume that you've installed Centron
+ *  @note These instructions assume that you've installed Centreon
  *  Scheduler according to the @link quickstartinstallationguides
  *  quickstart guide @endlink. The sample configuration entries below
  *  reference objects that are defined in the sample config files
@@ -437,7 +437,7 @@
  *  system. Make sure the plugin exists in
  *  /usr/local/centscheduler/libexec before you continue. If it
  *  doesn't, install net-snmp and net-snmp-utils and
- *  recompile/reinstall the Centron Scheduler plugins.
+ *  recompile/reinstall the Centreon Scheduler plugins.
  *
  *  @subsection monitoringroutersswitchessteps Steps
  *
@@ -447,7 +447,7 @@
  *  - 1. Perform first-time prerequisites
  *  - 2. Create new host and service definitions for monitoring the
  *  device
- *  - 3. Restart the Centron Scheduler daemon
+ *  - 3. Restart the Centreon Scheduler daemon
  *
  *  @subsection monitoringroutersswitcheswhatsalreadydoneforyou What's Already Done For You
  *
@@ -466,17 +466,17 @@
  *  /usr/local/centscheduler/etc/objects/ directory. You can modify the
  *  definitions in these and other definitions to suit your needs
  *  better if you'd like. However, I'd recommend waiting until you're
- *  more familiar with configuring Centron Scheduler before doing so.
+ *  more familiar with configuring Centreon Scheduler before doing so.
  *  For the time being, just follow the directions outlined below and
  *  you'll be monitoring your network routers/switches in no time.
  *
  *  @subsection monitoringroutersswitchesprerequisites Prerequisites
  *
- *  The first time you configure Centron Scheduler to monitor a network
+ *  The first time you configure Centreon Scheduler to monitor a network
  *  switch, you'll need to do a bit of extra work. Remember, you only
  *  need to do this for the *first* switch you monitor.
  *
- *  Edit the main Centron Scheduler config file.
+ *  Edit the main Centreon Scheduler config file.
  *
  *  @code
  *  vi /usr/local/centscheduler/etc/centscheduler.cfg
@@ -491,7 +491,7 @@
  *
  *  Save the file and exit.
  *
- *  What did you just do? You told Centron Scheduler to look to the
+ *  What did you just do? You told Centreon Scheduler to look to the
  *  /usr/local/centscheduler/etc/objects/switch.cfg to find additional
  *  object definitions. That's where you'll be adding host and service
  *  definitions for routers and switches. That configuration file
@@ -500,7 +500,7 @@
  *  simply modify the sample host and service definitions in that file,
  *  rather than creating new ones.
  *
- *  @subsection monitoringroutersswitchesconfiguringcentronscheduler Configuring Centron Scheduler
+ *  @subsection monitoringroutersswitchesconfiguringcentreonscheduler Configuring Centreon Scheduler
  *
  *  You'll need to create some @link objectdefinitions object
  *  definitions @endlink in order to monitor a new router/switch.
@@ -541,7 +541,7 @@
  *  @subsection monitoringroutersswitchesmonitoringpacketlossandrta Monitoring Packet Loss and RTA
  *
  *  Add the following service definition in order to monitor packet
- *  loss and round trip average between the Centron Scheduler host and
+ *  loss and round trip average between the Centreon Scheduler host and
  *  the switch every 5 minutes under normal conditions.
  *
  *  @code
@@ -621,8 +621,8 @@
  *
  *  If you're monitoring bandwidth usage on your switches or routers
  *  using <a href="http://oss.oetiker.ch/mrtg/">MRTG</a>, you can have
- *  Centron Scheduler alert you when traffic rates exceed thresholds you
- *  specify. The check_mrtgtraf plugin (which is included in the Centron
+ *  Centreon Scheduler alert you when traffic rates exceed thresholds you
+ *  specify. The check_mrtgtraf plugin (which is included in the Centreon
  *  Scheduler plugins distribution) allows you to do this.
  *
  *  You'll need to let the check_mrtgtraf plugin know what log file the
@@ -653,17 +653,17 @@
  *
  *  Save the file.
  *
- *  @subsection monitoringroutersswitchesrestartingcentronscheduler Restarting Centron Scheduler
+ *  @subsection monitoringroutersswitchesrestartingcentreonscheduler Restarting Centreon Scheduler
  *
  *  Once you've added the new host and service definitions to the
  *  switch.cfg file, you're ready to start monitoring the
  *  router/switch. To do this, you'll need to
  *  @ref verifyconfig "verify your configuration"
- *  and @link startingandstoppingcentronscheduler restart Centron Scheduler @endlink.
+ *  and @link startingandstoppingcentreonscheduler restart Centreon Scheduler @endlink.
  *
  *  If the verification process produces any errors messages, fix your
  *  configuration file before continuing. Make sure that you don't
- *  (re)start Centron Scheduler until the verification process
+ *  (re)start Centreon Scheduler until the verification process
  *  completes without any errors!
  *
  *  @section monitoringnetworkprinters Monitoring Network Printers
@@ -676,7 +676,7 @@
  *  PocketPro 100S or the Netgear PS101) that support the JetDirect
  *  protocol.
  *
- *  The check_hpjd plugin (which is part of the standard Centron
+ *  The check_hpjd plugin (which is part of the standard Centreon
  *  Scheduler plugins distribution) allows you to monitor the status of
  *  JetDirect-capable printers which have SNMP enabled. The plugin is
  *  capable of detecting the following printer states:
@@ -690,7 +690,7 @@
  *  - Output Tray is Full
  *  - and more...
  *
- *  @note These instructions assume that you've installed Centron
+ *  @note These instructions assume that you've installed Centreon
  *  Scheduler according to the quickstart guide. The sample
  *  configuration entries below reference objects that are defined in
  *  the sample config files (commands.cfg, templates.cfg, etc.) that
@@ -703,7 +703,7 @@
  *
  *  Monitoring the status of a networked printer is pretty simple.
  *  JetDirect-enabled printers usually have SNMP enabled, which allows
- *  Centron Scheduler to monitor their status using the check_hpjd
+ *  Centreon Scheduler to monitor their status using the check_hpjd
  *  plugin.
  *
  *  The check_hpjd plugin will only get compiled and installed if you
@@ -711,7 +711,7 @@
  *  system. Make sure the plugin exists in
  *  /usr/local/centscheduler/libexec before you continue. If it
  *  doesn't, install net-snmp and net-snmp-utils and
- *  recompile/reinstall the Centron Scheduler plugins.
+ *  recompile/reinstall the Centreon Scheduler plugins.
  *
  *  @subsection monitoringnetworkprinterssteps Steps
  *
@@ -720,7 +720,7 @@
  *  1. Perform first-time prerequisites
  *  2. Create new host and service definitions for monitoring the
  *  printer
- *  3. Restart the Centron Scheduler daemon
+ *  3. Restart the Centreon Scheduler daemon
  *
  *  @subsection monitoringnetworkprinterswhatsalreadydoneforyou What's Already Done For You
  *
@@ -737,17 +737,17 @@
  *  /usr/local/centscheduler/etc/objects/ directory. You can modify the
  *  definitions in these and other definitions to suit your needs
  *  better if you'd like. However, I'd recommend waiting until you're
- *  more familiar with configuring Centron Scheduler before doing so.
+ *  more familiar with configuring Centreon Scheduler before doing so.
  *  For the time being, just follow the directions outlined below and
  *  you'll be monitoring your network printers in no time.
  *
  *  @subsection monitoringnetworkprintersprerequisites Prerequisites
  *
- *  The first time you configure Centron Scheduler to monitor a network
+ *  The first time you configure Centreon Scheduler to monitor a network
  *  printer, you'll need to do a bit of extra work. Remember, you only
  *  need to do this for the *first* printer you monitor.
  *
- *  Edit the main Centron Scheduler config file.
+ *  Edit the main Centreon Scheduler config file.
  *
  *  @code
  *  vi /usr/local/centscheduler/etc/centscheduler.cfg
@@ -762,7 +762,7 @@
  *
  *  Save the file and exit.
  *
- *  What did you just do? You told Centron Scheduler to look to the
+ *  What did you just do? You told Centreon Scheduler to look to the
  *  /usr/local/centscheduler/etc/objects/printer.cfg to find additional
  *  object definitions. That's where you'll be adding host and service
  *  definitions for the printer. That configuration file already
@@ -771,7 +771,7 @@
  *  host and service definitions in that file, rather than creating new
  *  ones.
  *
- *  @subsection monitoringnetworkprintersconfiguringcentronscheduler Configuring Centron Scheduler
+ *  @subsection monitoringnetworkprintersconfiguringcentreonscheduler Configuring Centreon Scheduler
  *
  *  You'll need to create some @link objectdefinitions object
  *  definitions @endlink in order to monitor a new printer.
@@ -840,17 +840,17 @@
  *
  *  Save the file.
  *
- *  @subsection monitoringnetworkprintersrestartingcentronscheduler Restarting Centron Scheduler
+ *  @subsection monitoringnetworkprintersrestartingcentreonscheduler Restarting Centreon Scheduler
  *
  *  Once you've added the new host and service definitions to the
  *  printer.cfg file, you're ready to start monitoring the printer. To
  *  do this, you'll need to
  *  @ref verifyconfig "verify your configuration"
- *  and @link startingandstoppingcentronscheduler restart Centron Scheduler @endlink.
+ *  and @link startingandstoppingcentreonscheduler restart Centreon Scheduler @endlink.
  *
  *  If the verification process produces any errors messages, fix your
  *  configuration file before continuing. Make sure that you don't
- *  (re)start Centron Scheduler until the verification process
+ *  (re)start Centreon Scheduler until the verification process
  *  completes without any errors!
  *
  *  @section monitoringpubliclyavailableservices Monitoring publicly available services (HTTP, FTP, SSH, etc.)
@@ -864,9 +864,9 @@
  *  POP3, IMAP, FTP, and SSH. There are many more public services that
  *  you probably use on a daily basis. These services and applications,
  *  as well as their underlying protocols, can usually be monitored by
- *  Centron Scheduler without any special access requirements.
+ *  Centreon Scheduler without any special access requirements.
  *
- *  Private services, in contrast, cannot be monitored with Centron
+ *  Private services, in contrast, cannot be monitored with Centreon
  *  Scheduler without an intermediary agent of some kind. Examples of
  *  private services associated with hosts are things like CPU load,
  *  memory usage, disk usage, current user count, process information,
@@ -887,7 +887,7 @@
  *  about monitoring services using SNMP, check out the documentation on
  *  @ref monitoringroutersswitches "monitoring routers/switches".
  *
- *  @note These instructions assume that you've installed Centron
+ *  @note These instructions assume that you've installed Centreon
  *  Scheduler according to the @link quickstartinstallationguides
  *  quickstart guide @endlink. The sample configuration entries below
  *  reference objects that are defined in the sample commands.cfg and
@@ -897,7 +897,7 @@
  *
  *  When you find yourself needing to monitor a particular application,
  *  service, or protocol, chances are good that a @link plugins plugin
- *  @endlink exists to monitor it. The official Centron Scheduler
+ *  @endlink exists to monitor it. The official Centreon Scheduler
  *  plugins distribution comes with plugins that can be used to monitor
  *  a variety of services and protocols. There are also a large number
  *  of contributed plugins that can be found in the contrib/
@@ -914,7 +914,7 @@
  *  I'll walk you through monitoring some basic services that you'll
  *  probably use sooner or later. Each of these services can be
  *  monitored using one of the plugins that gets installed as part of
- *  the Centron Scheduler plugins distribution. Let's get started...
+ *  the Centreon Scheduler plugins distribution. Let's get started...
  *
  *  @subsection monitoringpubliclyavailableservicescreatingahostdefinition Creating A Host Definition
  *
@@ -948,7 +948,7 @@
  *  @subsection monitoringpubliclyavailableservicescreatingservicedefinitions Creating Service Definitions
  *
  *  For each service you want to monitor, you need to define a
- *  @ref objectdefinitionsobjecttypesservicedefinitionservice "service" in Centron Scheduler
+ *  @ref objectdefinitionsobjecttypesservicedefinitionservice "service" in Centreon Scheduler
  *  that is associated with the host definition you just created. You
  *  can place service definitions in any object configuration file
  *  specified by a @ref mainconfigurationfileoptionsconfigurationfilevariablesobjectconfigurationfile "cfg_file"
@@ -1227,17 +1227,17 @@
  *  }
  *  @endcode
  *
- *  @subsection monitoringpubliclyavailableservicesrestartingcentronscheduler Restarting Centron Scheduler
+ *  @subsection monitoringpubliclyavailableservicesrestartingcentreonscheduler Restarting Centreon Scheduler
  *
  *  Once you've added the new host and service definitions to your
  *  object configuration file(s), you're ready to start monitoring
  *  them. To do this, you'll need to @ref verifyconfig
- *  "verify your configuration" and @link startingandstoppingcentronscheduler restart
- *  Centron Scheduler @endlink.
+ *  "verify your configuration" and @link startingandstoppingcentreonscheduler restart
+ *  Centreon Scheduler @endlink.
  *
  *  If the verification process produces any errors messages, fix your
  *  configuration file before continuing. Make sure that you don't
- *  (re)start Centron Scheduler until the verification process
+ *  (re)start Centreon Scheduler until the verification process
  *  completes without any errors!
  */
 

@@ -6,7 +6,7 @@
  *
  *  @section hostcheckswhenarehostchecksperformed When Are Host Checks Performed?
  *
- *  Hosts are checked by the Centron Scheduler daemon:
+ *  Hosts are checked by the Centreon Scheduler daemon:
  *  - At regular intervals, as defined by the check_interval and
  *  retry_interval options in your @ref objectdefinitionsobjecttypeshostdefinition
  *  "host definitions".
@@ -17,22 +17,22 @@
  *  host dependency checks".
  *
  *  Regularly scheduled host checks are optional. If you set the
- *  check_interval option in your host definition to zero (0), Centron
+ *  check_interval option in your host definition to zero (0), Centreon
  *  Scheduler will not perform checks of the hosts on a regular basis.
  *  It will, however, still perform on-demand checks of the host as
  *  needed for other parts of the monitoring logic.
  *
  *  On-demand checks are made when a service associated with the host
- *  changes state because Centron Scheduler needs to know whether the
+ *  changes state because Centreon Scheduler needs to know whether the
  *  host has also changed state. Services that change state are often
  *  an indicator that the host may have also changed state. For
- *  example, if Centron Scheduler detects that the HTTP service
+ *  example, if Centreon Scheduler detects that the HTTP service
  *  associated with a host just changed from a CRITICAL to an OK state,
  *  it may indicate that the host just recovered from a reboot and is
  *  now back up and running.
  *
  *  On-demand checks of hosts are also made as part of the @link
- *  determiningstatusandreachabilityofnetworkhosts host reachability @endlink logic. Centron
+ *  determiningstatusandreachabilityofnetworkhosts host reachability @endlink logic. Centreon
  *  Scheduler is designed to detect network outages as quickly as
  *  possible, and distinguish between DOWN and UNREACHABLE host states.
  *  These are very different states and can help an admin quickly
@@ -47,7 +47,7 @@
  *
  *  The performance of on-demand host checks can be significantly
  *  improved by implementing the use of cached checks, which allow
- *  Centron Scheduler to forgo executing a host check if it determines
+ *  Centreon Scheduler to forgo executing a host check if it determines
  *  a relatively recent check result will do instead. More information
  *  on cached checks can be found @link cachedchecks.html here
  *  @endlink.
@@ -55,7 +55,7 @@
  *  @section hostchecksdependenciesandchecks Dependencies and Checks
  *
  *  You can define @ref objectdefinitionsobjecttypeshostdependencydefinition "host
- *  execution dependencies" that prevent Centron Scheduler from
+ *  execution dependencies" that prevent Centreon Scheduler from
  *  checking the status of a host depending on the state of one or more
  *  other hosts. More information on dependencies can be found @link
  *  hostandservicedependencies here @endlink.
@@ -63,23 +63,23 @@
  *  @section hostchecksparallelizationofhostchecks Parallelization of
  *  Host Checks
  *
- *  Scheduled host checks are run in parallel. When Centron Scheduler
+ *  Scheduled host checks are run in parallel. When Centreon Scheduler
  *  needs to run a scheduled host check, it will initiate the host
  *  check and then return to doing other work (running service checks,
  *  etc). The host check runs in a child process that was fork()ed from
- *  the main Centron Scheduler daemon. When the host check has
- *  completed, the child process will inform the main Centron Scheduler
- *  process (its parent) of the check results. The main Centron
+ *  the main Centreon Scheduler daemon. When the host check has
+ *  completed, the child process will inform the main Centreon Scheduler
+ *  process (its parent) of the check results. The main Centreon
  *  Scheduler process then handles the check results and takes
  *  appropriate action (running event handlers, sending notifications,
  *  etc.).
  *
  *  On-demand host checks are also run in parallel if needed. As
- *  mentioned earlier, Centron Scheduler can forgo the actual execution
+ *  mentioned earlier, Centreon Scheduler can forgo the actual execution
  *  of an on-demand host check if it can use the cached results from a
  *  relatively recent host check.
  *
- *  When Centron Scheduler processes the results of scheduled and
+ *  When Centreon Scheduler processes the results of scheduled and
  *  on-demand host checks, it may initiate (secondary) checks of other
  *  hosts. These checks can be initated for two reasons: @link
  *  hostandservicedependencies predictive dependency checks @endlink and to
@@ -90,7 +90,7 @@
  *  it can have negative effect on performance...
  *
  *  @note Hosts which have their max_check_attempts value set to 1 can
- *  cause serious performance problems. The reason? If Centron Scheduler
+ *  cause serious performance problems. The reason? If Centreon Scheduler
  *  needs to determine their true state using the @link
  *  determiningstatusandreachabilityofnetworkhosts network reachability @endlink logic (to
  *  see if they're DOWN or UNREACHABLE), it will have to launch serial
@@ -111,7 +111,7 @@
  *
  *  Host checks are performed by @link plugins.html plugins @endlink,
  *  which can return a state of OK, WARNING, UNKNOWN, or CRITICAL. How
- *  does Centron Scheduler translate these plugin return codes into
+ *  does Centreon Scheduler translate these plugin return codes into
  *  host states of UP, DOWN, or UNREACHABLE? Lets see...
  *
  *  The table below shows how plugin return codes correspond with
@@ -146,11 +146,11 @@
  *  @ref mainconfigurationfileoptionsconfigurationfilevariablesaggressivehostcheckingoption
  *  "use_aggressive_host_checking" option is enabled.
  *
- *  If the preliminary host state is DOWN, Centron Scheduler will
+ *  If the preliminary host state is DOWN, Centreon Scheduler will
  *  attempt to see if the host is really DOWN or if it is UNREACHABLE.
  *  The distinction between DOWN and UNREACHABLE host states is
  *  important, as it allows admins to determine root cause of network
- *  outages faster. The following table shows how Centron Scheduler
+ *  outages faster. The following table shows how Centreon Scheduler
  *  makes a final state determination based on the state of the hosts
  *  parent(s). A host's parents are defined in the parents directive in
  *  host definition.
@@ -173,7 +173,7 @@
  *    </tr>
  *  </table>
  *
- *  More information on how Centron Scheduler distinguishes between
+ *  More information on how Centreon Scheduler distinguishes between
  *  DOWN and UNREACHABLE states can be found @link
  *  determiningstatusandreachabilityofnetworkhosts here @endlink.
  *
@@ -181,19 +181,19 @@
  *
  *  As you are probably well aware, hosts don't always stay in one
  *  state. Things break, patches get applied, and servers need to be
- *  rebooted. When Centron Scheduler checks the status of hosts, it
+ *  rebooted. When Centreon Scheduler checks the status of hosts, it
  *  will be able to detect when a host changes between UP, DOWN, and
  *  UNREACHABLE states and take appropriate action. These state changes
  *  result in different @link statetypes.html state types @endlink
  *  (HARD or SOFT), which can trigger @link eventhandlers.html event
  *  handlers @endlink to be run and @link notifications.html
  *  notifications @endlink to be sent out. Detecting and dealing with
- *  state changes is what Centron Scheduler is all about.
+ *  state changes is what Centreon Scheduler is all about.
  *
  *  When hosts change state too frequently they are considered to be
  *  "flapping". A good example of a flapping host would be server that
  *  keeps spontaneously rebooting as soon as the operating system
- *  loads. That's always a fun scenario to have to deal with. Centron
+ *  loads. That's always a fun scenario to have to deal with. Centreon
  *  Scheduler can detect when hosts start flapping, and can suppress
  *  notifications until flapping stops and the host's state stabilizes.
  *  More information on the flap detection logic can be found @link

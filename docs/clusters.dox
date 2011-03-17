@@ -71,7 +71,7 @@
  *  each individual host or service cluster elements.
  *
  *  More to come... The check_cluster plugin can be found in the
- *  contrib directory of the Centron Scheduler Plugins release at
+ *  contrib directory of the Centreon Scheduler Plugins release at
  *  http://XXX/.
  *
  *  @section monitoringserviceandhostclustersmonitoringserviceclusters Monitoring Service Clusters
@@ -116,7 +116,7 @@
  *  It is important to notice that we are passing a comma-delimited
  *  list of on-demand service state @link understandingmacrosandhowtheywork macros @endlink
  *  to the $ARG4$ macro in the cluster check command. That's important!
- *  Centron Scheduler will fill those on-demand macros in with the
+ *  Centreon Scheduler will fill those on-demand macros in with the
  *  current service state IDs (numerical values, rather than text
  *  strings) of the individual members of the cluster.
  *
@@ -129,9 +129,9 @@
  *  check_cluster plugin. The service should not be associated with any
  *  of the hosts in the cluster, as this will cause problems with
  *  notifications for the cluster if that host goes down. A good idea
- *  might be to associate the service with the host that Centron
- *  Scheduler is running on. After all, if the host that Centron
- *  Scheduler is running on goes down, then Centron Scheduler isn't
+ *  might be to associate the service with the host that Centreon
+ *  Scheduler is running on. After all, if the host that Centreon
+ *  Scheduler is running on goes down, then Centreon Scheduler isn't
  *  running anymore, so there isn't anything you can do as far as
  *  monitoring (unless you've setup @link redundantandfailovernetworkmonitoring redundant
  *  monitoring hosts @endlink)...
@@ -147,7 +147,7 @@
  *  @endcode
  *
  *  Let's say you have three hosts (named "host1", "host2" and "host3")
- *  in the host cluster. If you want Centron Scheduler to generate a
+ *  in the host cluster. If you want Centreon Scheduler to generate a
  *  warning alert if one host in the cluster is not UP or a critical
  *  alert if two or more hosts are not UP, the the service you define
  *  to monitor the host cluster might look something like this:
@@ -163,11 +163,11 @@
  *  It is important to notice that we are passing a comma-delimited
  *  list of on-demand host state @link understandingmacrosandhowtheywork macros @endlink to
  *  the $ARG4$ macro in the cluster check command. That's important!
- *  Centron Scheduler will fill those on-demand macros in with the
+ *  Centreon Scheduler will fill those on-demand macros in with the
  *  current host state IDs (numerical values, rather than text strings)
  *  of the individual members of the cluster.
  *
- *  That's it! Centron Scheduler will periodically check the status of
+ *  That's it! Centreon Scheduler will periodically check the status of
  *  the host cluster and send notifications to you when its status is
  *  degraded (assuming you've enabled notification for the service).
  *  Note that for thehost definitions of each cluster member, you will
