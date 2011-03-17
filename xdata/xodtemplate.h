@@ -1,27 +1,22 @@
-/*****************************************************************************
- *
- * XODTEMPLATE.H - Template-based object configuration data header file
- *
- * Copyright (c) 2001-2008 Ethan Galstad (egalstad@nagios.org)
- * Last Modified:   02-17-2008
- *
- * License:
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2 as
- * published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
- *
- *****************************************************************************/
-
+/*
+** Copyright 2001-2008 Ethan Galstad
+** Copyright 2011      Merethis
+**
+** This file is part of Centreon Scheduler.
+**
+** Centreon Scheduler is free software: you can redistribute it and/or
+** modify it under the terms of the GNU General Public License version 2
+** as published by the Free Software Foundation.
+**
+** Centreon Scheduler is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+** General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with Centreon Scheduler. If not, see
+** <http://www.gnu.org/licenses/>.
+*/
 
 #ifndef _XODTEMPLATE_H
 #define _XODTEMPLATE_H
@@ -782,7 +777,6 @@ int xodtemplate_grab_config_info(char *);                   /* grabs variables f
 int xodtemplate_process_config_file(char *,int);            /* process data in a specific config file */
 int xodtemplate_process_config_dir(char *,int);             /* process all files in a specific config directory */
 
-#ifdef NSCORE
 xodtemplate_memberlist *xodtemplate_expand_contactgroups_and_contacts(char *,char *,int,int);
 int xodtemplate_expand_contactgroups(xodtemplate_memberlist **,xodtemplate_memberlist **,char *,int,int);
 int xodtemplate_expand_contacts(xodtemplate_memberlist **,xodtemplate_memberlist **,char *,int,int);
@@ -810,7 +804,6 @@ int xodtemplate_get_servicegroup_names(xodtemplate_memberlist **,xodtemplate_mem
 int xodtemplate_add_member_to_memberlist(xodtemplate_memberlist **,char *,char *);
 int xodtemplate_free_memberlist(xodtemplate_memberlist **);
 void xodtemplate_remove_memberlist_item(xodtemplate_memberlist *,xodtemplate_memberlist **);
-#endif
 
 
 int xodtemplate_begin_object_definition(char *,int,int,int);
@@ -831,7 +824,6 @@ xodtemplate_customvariablesmember *xodtemplate_add_custom_variable_to_object(xod
 int xodtemplate_register_objects(void);
 int xodtemplate_free_memory(void);
 
-#ifdef NSCORE
 int xodtemplate_duplicate_objects(void);
 int xodtemplate_duplicate_services(void);
 
@@ -917,7 +909,6 @@ xodtemplate_serviceextinfo *xodtemplate_find_serviceextinfo(char *);
 int xodtemplate_get_inherited_string(int *,char **,int *,char **);
 int xodtemplate_clean_additive_string(char **);
 int xodtemplate_clean_additive_strings(void);
-#endif
 
 int xodtemplate_register_timeperiod(xodtemplate_timeperiod *);
 int xodtemplate_get_time_ranges(char *,unsigned long *,unsigned long *);

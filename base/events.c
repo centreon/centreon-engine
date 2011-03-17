@@ -1,26 +1,22 @@
-/*****************************************************************************
- *
- * EVENTS.C - Timed event functions for Nagios
- *
- * Copyright (c) 1999-2010 Ethan Galstad (egalstad@nagios.org)
- * Last Modified: 08-28-2010
- *
- * License:
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2 as
- * published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
- *
- *****************************************************************************/
+/*
+** Copyright 1999-2010 Ethan Galstad
+** Copyright 2011      Merethis
+**
+** This file is part of Centreon Scheduler.
+**
+** Centreon Scheduler is free software: you can redistribute it and/or
+** modify it under the terms of the GNU General Public License version 2
+** as published by the Free Software Foundation.
+**
+** Centreon Scheduler is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+** General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with Centreon Scheduler. If not, see
+** <http://www.gnu.org/licenses/>.
+*/
 
 #include "../include/config.h"
 #include "../include/common.h"
@@ -584,7 +580,7 @@ void init_timing_loop(void){
 
 	/* add a log rotation event if necessary */
 	if(log_rotation_method!=LOG_ROTATION_NONE)
-		schedule_new_event(EVENT_LOG_ROTATION,TRUE,get_next_log_rotation_time(),TRUE,0,(void *)get_next_log_rotation_time,TRUE,NULL,NULL,0);
+		schedule_new_event(EVENT_LOG_ROTATION,TRUE,get_next_log_rotation_time(),TRUE,0,get_next_log_rotation_time,TRUE,NULL,NULL,0);
 
 	/* add a retention data save event if needed */
 	if(retain_state_information==TRUE && retention_update_interval>0)
@@ -605,16 +601,16 @@ void init_timing_loop(void){
 
 		printf("EVENT SCHEDULING TIMES\n");
 		printf("-------------------------------------\n");
-		printf("Get service info:        %.6lf sec\n",runtime[0]);
-		printf("Get host info info:      %.6lf sec\n",runtime[1]);
-		printf("Get service params:      %.6lf sec\n",runtime[2]);
-		printf("Schedule service times:  %.6lf sec\n",runtime[3]);
-		printf("Schedule service events: %.6lf sec\n",runtime[4]);
-		printf("Get host params:         %.6lf sec\n",runtime[5]);
-		printf("Schedule host times:     %.6lf sec\n",runtime[6]);
-		printf("Schedule host events:    %.6lf sec\n",runtime[7]);
+		printf("Get service info:        %.6f sec\n",runtime[0]);
+		printf("Get host info info:      %.6f sec\n",runtime[1]);
+		printf("Get service params:      %.6f sec\n",runtime[2]);
+		printf("Schedule service times:  %.6f sec\n",runtime[3]);
+		printf("Schedule service events: %.6f sec\n",runtime[4]);
+		printf("Get host params:         %.6f sec\n",runtime[5]);
+		printf("Schedule host times:     %.6f sec\n",runtime[6]);
+		printf("Schedule host events:    %.6f sec\n",runtime[7]);
 		printf("                         ============\n");
-		printf("TOTAL:                   %.6lf sec\n",runtime[8]);
+		printf("TOTAL:                   %.6f sec\n",runtime[8]);
 		printf("\n\n");
 		}
 
@@ -802,7 +798,7 @@ void reschedule_event(timed_event *event, timed_event **event_list, timed_event 
 
 		/* use custom timing function */
 		if(event->timing_func!=NULL){
-			timingfunc=event->timing_func;
+			*(void **)(&timingfunc)=event->timing_func;
 			event->run_time=(*timingfunc)();
 		        }
 
@@ -1397,21 +1393,13 @@ int handle_timed_event(timed_event *event){
 		check_for_expired_comment((unsigned long)event->event_data);
 		break;
 
-	case EVENT_CHECK_PROGRAM_UPDATE:
-
-		log_debug_info(DEBUGL_EVENTS,0,"** Check For Program Update\n");
-
-		/* check for new versions of Nagios */
-		check_for_nagios_updates(FALSE,TRUE);
-		break;
-
 	case EVENT_USER_FUNCTION:
 
 		log_debug_info(DEBUGL_EVENTS,0,"** User Function Event\n");
 
 		/* run a user-defined function */
 		if(event->event_data!=NULL){
-			userfunc=event->event_data;
+			*(void **)(&userfunc)=event->event_data;
 			(*userfunc)(event->event_args);
 		        }
 		break;
@@ -1671,7 +1659,7 @@ void compensate_for_system_time_change(unsigned long last_time, unsigned long cu
 
 		/* use custom timing function */
 		if(temp_event->timing_func!=NULL){
-			timingfunc=temp_event->timing_func;
+			*(void **)(&timingfunc)=temp_event->timing_func;
 			temp_event->run_time=(*timingfunc)();
 		        }
 
@@ -1692,7 +1680,7 @@ void compensate_for_system_time_change(unsigned long last_time, unsigned long cu
 
 		/* use custom timing function */
 		if(temp_event->timing_func!=NULL){
-			timingfunc=temp_event->timing_func;
+			*(void **)(&timingfunc)=temp_event->timing_func;
 			temp_event->run_time=(*timingfunc)();
 		        }
 

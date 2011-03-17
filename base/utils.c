@@ -1,26 +1,22 @@
-/*****************************************************************************
- *
- * UTILS.C - Miscellaneous utility functions for Nagios
- *
- * Copyright (c) 1999-2009 Ethan Galstad (egalstad@nagios.org)
- * Last Modified: 06-16-2009
- *
- * License:
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2 as
- * published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
- *
- *****************************************************************************/
+/*
+** Copyright 1999-2009 Ethan Galstad
+** Copyright 2011      Merethis
+**
+** This file is part of Centreon Scheduler.
+**
+** Centreon Scheduler is free software: you can redistribute it and/or
+** modify it under the terms of the GNU General Public License version 2
+** as published by the Free Software Foundation.
+**
+** Centreon Scheduler is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+** General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with Centreon Scheduler. If not, see
+** <http://www.gnu.org/licenses/>.
+*/
 
 #include "../include/config.h"
 #include "../include/common.h"
@@ -48,13 +44,9 @@ extern char     *temp_file;
 extern char     *temp_path;
 extern char     *check_result_path;
 extern char     *check_result_path;
-extern char     *lock_file;
 extern char	*log_archive_path;
 extern char     *auth_file;
 extern char	*p1_file;
-
-extern char     *nagios_user;
-extern char     *nagios_group;
 
 extern char     *macro_x_names[MACRO_X_COUNT];
 extern char     *macro_user[MAX_USER_MACROS];
@@ -90,9 +82,6 @@ extern int      sigrestart;
 extern char     *sigs[35];
 extern int      caught_signal;
 extern int      sig_id;
-
-extern int      daemon_mode;
-extern int      daemon_dumps_core;
 
 extern int      nagios_pid;
 
@@ -141,9 +130,6 @@ extern int      auto_reschedule_checks;
 
 extern int      additional_freshness_latency;
 
-extern int      check_for_updates;
-extern int      bare_update_check;
-extern time_t   last_update_check;
 extern unsigned long update_uid;
 extern char     *last_program_version;
 extern int      update_available;
@@ -373,13 +359,13 @@ int my_system_r(nagios_macros *mac, char *cmd,int timeout,int *early_timeout,dou
 			 */
 			(void) POPs ;
 
-			asprintf(&temp_buffer,"%s", SvPVX(ERRSV));
-
-			log_debug_info(DEBUGL_COMMANDS,0,"Embedded perl failed to compile %s, compile error %s\n",fname,temp_buffer);
-
-			logit(NSLOG_RUNTIME_WARNING,TRUE,"%s\n",temp_buffer);
-
-			my_free(temp_buffer);
+			if(asprintf(&temp_buffer,"%s", SvPVX(ERRSV))==-1)
+				logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
+			else{
+				log_debug_info(DEBUGL_COMMANDS,0,"Embedded perl failed to compile %s, compile error %s\n",fname,temp_buffer);
+				logit(NSLOG_RUNTIME_WARNING,TRUE,"%s\n",temp_buffer);
+				my_free(temp_buffer);
+			}
 
 			return STATE_UNKNOWN;
 			}
@@ -396,7 +382,10 @@ int my_system_r(nagios_macros *mac, char *cmd,int timeout,int *early_timeout,dou
 #endif 
 
 	/* create a pipe */
-	pipe(fd);
+	if(pipe(fd)==-1){
+		logit(NSLOG_RUNTIME_WARNING,TRUE,"Warning: pipe() in my_system() failed for command \"%s\"\n",cmd);
+		return STATE_UNKNOWN;
+		}
 
 	/* make the pipe non-blocking */
 	fcntl(fd[0],F_SETFL,O_NONBLOCK);
@@ -490,7 +479,8 @@ int my_system_r(nagios_macros *mac, char *cmd,int timeout,int *early_timeout,dou
 			log_debug_info(DEBUGL_COMMANDS,0,"Embedded perl ran command %s with output %d, %s\n",fname,status,buffer);
 
 			/* write the output back to the parent process */
-			write(fd[1],buffer,strlen(buffer)+1);
+			if(write(fd[1],buffer,strlen(buffer)+1)==-1)
+				logit(NSLOG_RUNTIME_WARNING,FALSE,"Warning: Write failed. %s\n", strerror(errno));
 
 			/* close pipe for writing */
 			close(fd[1]);
@@ -500,13 +490,13 @@ int my_system_r(nagios_macros *mac, char *cmd,int timeout,int *early_timeout,dou
 
 			_exit(status);
 		        }
-#endif  
+#endif
 		/******** END EMBEDDED PERL CODE EXECUTION ********/
 
 
 		/* run the command */
 		fp=(FILE *)popen(cmd,"r");
-		
+
 		/* report an error if we couldn't run the command */
 		if(fp==NULL){
 
@@ -514,7 +504,8 @@ int my_system_r(nagios_macros *mac, char *cmd,int timeout,int *early_timeout,dou
 			buffer[sizeof(buffer)-1]='\x0';
 
 			/* write the error back to the parent process */
-			write(fd[1],buffer,strlen(buffer)+1);
+			if(write(fd[1],buffer,strlen(buffer)+1)==-1)
+				logit(NSLOG_RUNTIME_WARNING,FALSE,"Warning: Write failed. %s\n", strerror(errno));
 
 			result=STATE_CRITICAL;
 		        }
@@ -522,11 +513,12 @@ int my_system_r(nagios_macros *mac, char *cmd,int timeout,int *early_timeout,dou
 
 			/* write all the lines of output back to the parent process */
 			while(fgets(buffer,sizeof(buffer)-1,fp))
-				write(fd[1],buffer,strlen(buffer));
+				if(write(fd[1],buffer,strlen(buffer))==-1)
+					logit(NSLOG_RUNTIME_WARNING,FALSE,"Warning: Write failed. %s\n", strerror(errno));
 
 			/* close the command and get termination status */
 			status=pclose(fp);
-			
+
 			/* report an error if we couldn't close the command */
 			if(status==-1)
 				result=STATE_CRITICAL;
@@ -685,7 +677,7 @@ int get_raw_command_line_r(nagios_macros *mac, command *cmd_ptr, char *cmd, char
 	char temp_arg[MAX_COMMAND_BUFFER]="";
 	char *arg_buffer=NULL;
 	register int x=0;
-	register int y=0;
+	register unsigned int y=0;
 	register int arg_index=0;
 	register int escaped=FALSE;
 
@@ -723,7 +715,7 @@ int get_raw_command_line_r(nagios_macros *mac, command *cmd_ptr, char *cmd, char
 			/* get the next argument */
 			/* can't use strtok(), as that's used in process_macros... */
 			for(arg_index++,y=0;y<sizeof(temp_arg)-1;arg_index++){
-				
+
 				/* backslashes escape */
 				if(cmd[arg_index]=='\\' && escaped==FALSE){
 					escaped=TRUE;
@@ -792,7 +784,10 @@ int set_environment_var(char *name, char *value, int set){
 #else
 		/* needed for Solaris and systems that don't have setenv() */
 		/* this will leak memory, but in a "controlled" way, since lost memory should be freed when the child process exits */
-		asprintf(&env_string,"%s=%s",name,(value==NULL)?"":value);
+		if(asprintf(&env_string,"%s=%s",name,(value==NULL)?"":value)==-1){
+			logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
+			return ERROR;
+			}
 		if(env_string)
 			putenv(env_string);
 #endif
@@ -1036,7 +1031,7 @@ int check_time_against_period(time_t test_time, timeperiod *tperiod){
 #endif
 
 			/* time falls into the range of days */
-			if(midnight>=start_time && midnight<=end_time)
+			if((time_t)midnight>=start_time && (time_t)midnight<=end_time)
 				found_match=TRUE;
 
 			/* found a day match, so see if time ranges are good */
@@ -1752,8 +1747,6 @@ void setup_sighandler(void){
 	signal(SIGQUIT,sighandler);
 	signal(SIGTERM,sighandler);
 	signal(SIGHUP,sighandler);
-	if(daemon_dumps_core==FALSE && daemon_mode==TRUE)
-		signal(SIGSEGV,sighandler);
 
 	return;
         }
@@ -1766,7 +1759,6 @@ void reset_sighandler(void){
 	signal(SIGQUIT,SIG_DFL);
 	signal(SIGTERM,SIG_DFL);
 	signal(SIGHUP,SIG_DFL);
-	signal(SIGSEGV,SIG_DFL);
 	signal(SIGPIPE,SIG_DFL);
 
 	return;
@@ -1777,11 +1769,6 @@ void reset_sighandler(void){
 void sighandler(int sig){
 	int x=0;
 
-	/* if shutdown is already true, we're in a signal trap loop! */
-	/* changed 09/07/06 to only exit on segfaults */
-	if(sigshutdown==TRUE && sig==SIGSEGV)
-		exit(ERROR);
-
 	caught_signal=TRUE;
 
 	if(sig<0)
@@ -1791,11 +1778,6 @@ void sighandler(int sig){
 	sig%=x;
 
 	sig_id=sig;
-
-	/* log errors about segfaults now, as we might not get a chance to later */
-	/* all other signals are logged at a later point in main() to prevent problems with NPTL */
-	if(sig==SIGSEGV)
-		logit(NSLOG_PROCESS_INFO,TRUE,"Caught SIG%s, shutting down...\n",sigs[sig]);
 
 	/* we received a SIGHUP, so restart... */
 	if(sig==SIGHUP)
@@ -1813,6 +1795,8 @@ void sighandler(int sig){
 /* 07/16/08 EG also called when parent process gets a TERM signal */
 void service_check_sighandler(int sig){
 	struct timeval end_time;
+
+	(void)sig;
 
 	/* get the current time */
 	gettimeofday(&end_time,NULL);
@@ -1858,6 +1842,8 @@ void service_check_sighandler(int sig){
 void host_check_sighandler(int sig){
 	struct timeval end_time;
 
+	(void)sig;
+
 	/* get the current time */
 	gettimeofday(&end_time,NULL);
 
@@ -1896,228 +1882,10 @@ void host_check_sighandler(int sig){
 /* handle timeouts when executing commands via my_system_r() */
 void my_system_sighandler(int sig){
 
+	(void)sig;
+
 	/* force the child process to exit... */
 	_exit(STATE_CRITICAL);
-        }
-
-
-
-
-/******************************************************************/
-/************************ DAEMON FUNCTIONS ************************/
-/******************************************************************/
-
-int daemon_init(void){
-	pid_t pid=-1;
-	int pidno=0;
-	int lockfile=0;
-	int val=0;
-	char buf[256];
-	struct flock lock;
-	char *homedir=NULL;
-
-#ifdef RLIMIT_CORE
-	struct rlimit limit;
-#endif
-
-	/* change working directory. scuttle home if we're dumping core */
-	homedir=getenv("HOME");
-	if(daemon_dumps_core==TRUE && homedir!=NULL)
-		chdir(homedir);
-	else
-		chdir("/");
-
-	umask(S_IWGRP|S_IWOTH);
-
-	lockfile=open(lock_file,O_RDWR | O_CREAT, S_IWUSR | S_IRUSR | S_IRGRP | S_IROTH);
-
-	if(lockfile<0){
-		logit(NSLOG_RUNTIME_ERROR,TRUE,"Failed to obtain lock on file %s: %s\n", lock_file, strerror(errno));
-		logit(NSLOG_PROCESS_INFO | NSLOG_RUNTIME_ERROR,TRUE,"Bailing out due to errors encountered while attempting to daemonize... (PID=%d)",(int)getpid());
-
-		cleanup();
-		exit(ERROR);
-	        }
-
-	/* see if we can read the contents of the lockfile */
-	if((val=read(lockfile,buf,(size_t)10))<0){
-		logit(NSLOG_RUNTIME_ERROR,TRUE,"Lockfile exists but cannot be read");
-		cleanup();
-		exit(ERROR);
-	        }
-
-	/* we read something - check the PID */
-	if(val>0){
-		if((val=sscanf(buf,"%d",&pidno))<1){
-			logit(NSLOG_RUNTIME_ERROR,TRUE,"Lockfile '%s' does not contain a valid PID (%s)",lock_file,buf);
-			cleanup();
-			exit(ERROR);
-		        }
-	        }
-
-	/* check for SIGHUP */
-	if(val==1 && (pid=(pid_t)pidno)==getpid()){
-		close(lockfile);
-		return OK;
-	        }
-
-	/* exit on errors... */
-	if((pid=fork())<0)
-		return(ERROR);
-
-	/* parent process goes away.. */
-	else if((int)pid!=0)
-		exit(OK);
-
-	/* child continues... */
-
-	/* child becomes session leader... */
-	setsid();
-
-	/* place a file lock on the lock file */
-	lock.l_type=F_WRLCK;
-	lock.l_start=0;
-	lock.l_whence=SEEK_SET;
-	lock.l_len=0;
-	if(fcntl(lockfile,F_SETLK,&lock)<0){
-		if(errno==EACCES || errno==EAGAIN){
-			fcntl(lockfile,F_GETLK,&lock);
-			logit(NSLOG_RUNTIME_ERROR,TRUE,"Lockfile '%s' looks like its already held by another instance of Nagios (PID %d).  Bailing out...",lock_file,(int)lock.l_pid);
-		        }
-		else
-			logit(NSLOG_RUNTIME_ERROR,TRUE,"Cannot lock lockfile '%s': %s. Bailing out...",lock_file,strerror(errno));
-
-		cleanup();
-		exit(ERROR);
-	        }
-
-	/* prevent daemon from dumping a core file... */
-#ifdef RLIMIT_CORE
-	if(daemon_dumps_core==FALSE){
-		getrlimit(RLIMIT_CORE,&limit);
-		limit.rlim_cur=0;
-		setrlimit(RLIMIT_CORE,&limit);
-	        }
-#endif
-
-	/* write PID to lockfile... */
-	lseek(lockfile,0,SEEK_SET);
-	ftruncate(lockfile,0);
-	sprintf(buf,"%d\n",(int)getpid());
-	write(lockfile,buf,strlen(buf));
-
-	/* make sure lock file stays open while program is executing... */
-	val=fcntl(lockfile,F_GETFD,0);
-	val|=FD_CLOEXEC;
-	fcntl(lockfile,F_SETFD,val);
-
-        /* close existing stdin, stdout, stderr */
-	close(0);
-	close(1);
-	close(2);
-
-	/* THIS HAS TO BE DONE TO AVOID PROBLEMS WITH STDERR BEING REDIRECTED TO SERVICE MESSAGE PIPE! */
-	/* re-open stdin, stdout, stderr with known values */
-	open("/dev/null",O_RDONLY);
-	open("/dev/null",O_WRONLY);
-	open("/dev/null",O_WRONLY);
-
-#ifdef USE_EVENT_BROKER
-	/* send program data to broker */
-	broker_program_state(NEBTYPE_PROCESS_DAEMONIZE,NEBFLAG_NONE,NEBATTR_NONE,NULL);
-#endif
-
-	return OK;
-	}
-
-
-
-/******************************************************************/
-/*********************** SECURITY FUNCTIONS ***********************/
-/******************************************************************/
-
-/* drops privileges */
-int drop_privileges(char *user, char *group){
-	uid_t uid=-1;
-	gid_t gid=-1;
-	struct group *grp=NULL;
-	struct passwd *pw=NULL;
-	int result=OK;
-
-	log_debug_info(DEBUGL_FUNCTIONS,0,"drop_privileges() start\n");
-	log_debug_info(DEBUGL_PROCESS,0,"Original UID/GID: %d/%d\n",(int)getuid(),(int)getgid());
-
-	/* only drop privileges if we're running as root, so we don't interfere with being debugged while running as some random user */
-	if(getuid()!=0)
-		return OK;
-
-	/* set effective group ID */
-	if(group!=NULL){
-		
-		/* see if this is a group name */
-		if(strspn(group,"0123456789")<strlen(group)){
-			grp=(struct group *)getgrnam(group);
-			if(grp!=NULL)
-				gid=(gid_t)(grp->gr_gid);
-			else
-				logit(NSLOG_RUNTIME_WARNING,TRUE,"Warning: Could not get group entry for '%s'",group);
-		        }
-
-		/* else we were passed the GID */
-		else
-			gid=(gid_t)atoi(group);
-
-		/* set effective group ID if other than current EGID */
-		if(gid!=getegid()){
-
-			if(setgid(gid)==-1){
-				logit(NSLOG_RUNTIME_WARNING,TRUE,"Warning: Could not set effective GID=%d",(int)gid);
-				result=ERROR;
-			        }
-		        }
-	        }
-
-
-	/* set effective user ID */
-	if(user!=NULL){
-		
-		/* see if this is a user name */
-		if(strspn(user,"0123456789")<strlen(user)){
-			pw=(struct passwd *)getpwnam(user);
-			if(pw!=NULL)
-				uid=(uid_t)(pw->pw_uid);
-			else
-				logit(NSLOG_RUNTIME_WARNING,TRUE,"Warning: Could not get passwd entry for '%s'",user);
-		        }
-
-		/* else we were passed the UID */
-		else
-			uid=(uid_t)atoi(user);
-			
-#ifdef HAVE_INITGROUPS
-
-		if(uid!=geteuid()){
-
-			/* initialize supplementary groups */
-			if(initgroups(user,gid)==-1){
-				if(errno==EPERM)
-					logit(NSLOG_RUNTIME_WARNING,TRUE,"Warning: Unable to change supplementary groups using initgroups() -- I hope you know what you're doing");
-				else{
-					logit(NSLOG_RUNTIME_WARNING,TRUE,"Warning: Possibly root user failed dropping privileges with initgroups()");
-					return ERROR;
-			                }
-	                        }
-		        }
-#endif
-		if(setuid(uid)==-1){
-			logit(NSLOG_RUNTIME_WARNING,TRUE,"Warning: Could not set effective UID=%d",(int)uid);
-			result=ERROR;
-		        }
-	        }
-
-	log_debug_info(DEBUGL_PROCESS,0,"New UID/GID: %d/%d\n",(int)getuid(),(int)getgid());
-
-	return result;
         }
 
 
@@ -2140,7 +1908,10 @@ int move_check_result_to_queue(char *checkresult_file){
 	old_umask=umask(new_umask);
 
 	/* create a safe temp file */
-	asprintf(&output_file,"%s/cXXXXXX",check_result_path);
+	if(asprintf(&output_file,"%s/cXXXXXX",check_result_path)==-1){
+		logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
+		return ERROR;
+		}
 	output_file_fd=mkstemp(output_file);
 
 	/* file created okay */
@@ -2163,8 +1934,16 @@ int move_check_result_to_queue(char *checkresult_file){
 #endif
 
 		/* create an ok-to-go indicator file */
-		asprintf(&temp_buffer,"%s.ok",output_file);
-		if((output_file_fd=open(temp_buffer,O_CREAT|O_WRONLY|O_TRUNC,S_IRUSR|S_IWUSR))>=0)
+		if(asprintf(&temp_buffer,"%s.ok",output_file)==-1){
+			logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
+			/* free memory */
+			my_free(output_file);
+			/* delete the original file if it couldn't be moved */
+			if(result!=0)
+			  unlink(checkresult_file);
+			return ERROR;
+		}
+		if((output_file_fd=open(temp_buffer,O_CREAT|O_WRONLY|O_TRUNC,S_IRUSR|S_IWUSR))>0)
 			close(output_file_fd);
 		my_free(temp_buffer);
 
@@ -2248,7 +2027,11 @@ int process_check_result_queue(char *dirname){
 			/* at this point we have a regular file... */
 
 			/* can we find the associated ok-to-go file ? */
-			asprintf(&temp_buffer,"%s.ok",file);
+			if(asprintf(&temp_buffer,"%s.ok",file)==-1){
+				logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
+				closedir(dirp);
+				return ERROR;
+				}
 			result=stat(temp_buffer,&ok_stat_buf);
 			my_free(temp_buffer);
 			if(result==-1)
@@ -2454,7 +2237,10 @@ int delete_check_result_file(char *fname){
 	unlink(fname);
 
 	/* delete the ok-to-go file */
-	asprintf(&temp_buffer,"%s.ok",fname);
+	if(asprintf(&temp_buffer,"%s.ok",fname)==-1){
+		logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
+		return ERROR;
+		}
 	unlink(temp_buffer);
 	my_free(temp_buffer);
 
@@ -3260,7 +3046,8 @@ int init_embedded_perl(char **env){
 	exitstatus=perl_parse(my_perl,xs_init,2,(char **)embedding,env);
 	if(!exitstatus)
 		exitstatus=perl_run(my_perl);
-
+#else
+	(void)env;
 #endif
 	return OK;
         }
@@ -3346,6 +3133,8 @@ int file_uses_embedded_perl(char *fname){
 			fclose(fp);
 			}
 		}
+#else
+	(void)fname;
 #endif
 
 	return use_epn;
@@ -3431,6 +3220,8 @@ int shutdown_command_file_worker_thread(void){
 void cleanup_command_file_worker_thread(void *arg){
 	register int x=0;
 
+	(void)arg;
+
 	/* release memory allocated to circular buffer */
 	for(x=external_command_buffer.tail;x!=external_command_buffer.head;x=(x+1) % external_command_buffer_slots){
 		my_free(((char **)external_command_buffer.buffer)[x]);
@@ -3450,6 +3241,8 @@ void * command_file_worker_thread(void *arg){
 	struct timeval tv;
 	int buffer_items=0;
 	int result=0;
+
+	(void)arg;
 
 	/* specify cleanup routine */
 	pthread_cleanup_push(cleanup_command_file_worker_thread,NULL);
@@ -3628,7 +3421,10 @@ int submit_raw_external_command(char *cmd, time_t *ts, int *buffer_items){
 		time(&timestamp);
 
 	/* create the command string */
-	asprintf(&newcmd,"[%lu] %s",(unsigned long)timestamp,cmd);
+	if(asprintf(&newcmd,"[%lu] %s",(unsigned long)timestamp,cmd)==-1){
+		logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
+		return ERROR;
+		}
 
 	/* submit the command */
 	result=submit_external_command(newcmd,buffer_items);
@@ -3890,248 +3686,6 @@ int generate_check_stats(void){
 
 
 /******************************************************************/
-/************************ UPDATE FUNCTIONS ************************/
-/******************************************************************/
-
-/* check for new releases of Nagios */
-int check_for_nagios_updates(int force, int reschedule){
-	time_t current_time;
-	int result=OK;
-	int api_result=OK;
-	int do_check=TRUE;
-	time_t next_check=0L;
-	unsigned int rand_seed=0;
-	int randnum=0;
-
-	time(&current_time);
-
-	/*
-	printf("NOW: %s",ctime(&current_time));
-	printf("LAST CHECK: %s",ctime(&last_update_check));
-	*/
-
-	/* seed the random generator */
-	rand_seed=(unsigned int)(current_time+nagios_pid);
-	srand(rand_seed);
-
-	/* generate a (probably) unique ID for this nagios install */
-	/* the server api currently sees thousands of nagios installs behind single ip addresses, so this help determine if there are really thousands of servers out there, or if some nagios installs are misbehaving */
-	if(update_uid==0L)
-		update_uid=current_time;
-
-	/* update chekcs are disabled */
-	if(check_for_updates==FALSE)
-		do_check=FALSE;
-	/* we checked for updates recently, so don't do it again */
-	if((current_time-last_update_check)<MINIMUM_UPDATE_CHECK_INTERVAL)
-		do_check=FALSE;
-	/* the check is being forced */
-	if(force==TRUE)
-		do_check=TRUE;
-
-	/* do a check */
-	if(do_check==TRUE){
-
-		/*printf("RUNNING QUERY...\n");*/
-
-		/* query api */
-		api_result=query_update_api();
-		}
-
-	/* should we reschedule the update check? */
-	if(reschedule==TRUE){
-
-		/*printf("RESCHEDULING...\n");*/
-
-		randnum=rand();
-		/*
-		printf("RAND: %d\n",randnum);
-		printf("RANDMAX: %d\n",RAND_MAX);
-		printf("UCIW: %d\n",UPDATE_CHECK_INTERVAL_WOBBLE);
-		printf("MULT: %f\n",(float)randnum/RAND_MAX);
-		*/
-		
-
-
-		/* we didn't do an update, so calculate next possible update time */
-		if(do_check==FALSE){
-			next_check=last_update_check+BASE_UPDATE_CHECK_INTERVAL;
-			next_check=next_check+(unsigned long)( ((float)randnum/RAND_MAX) * UPDATE_CHECK_INTERVAL_WOBBLE);
-			}
-
-		/* we tried to check for an update */
-		else{
-
-			/* api query was okay */
-			if(api_result==OK){
-				next_check=current_time+BASE_UPDATE_CHECK_INTERVAL;
-				next_check+=(unsigned long)( ((float)randnum/RAND_MAX) * UPDATE_CHECK_INTERVAL_WOBBLE);
-				}
-			
-			/* query resulted in an error - retry at a shorter interval */
-			else{
-				next_check=current_time+BASE_UPDATE_CHECK_RETRY_INTERVAL;
-				next_check+=(unsigned long)( ((float)randnum/RAND_MAX) * UPDATE_CHECK_RETRY_INTERVAL_WOBBLE);
-				}
-			}
-
-		/* make sure next check isn't in the past - if it is, schedule a check in 1 minute */
-		if(next_check<current_time)
-			next_check=current_time+60;
-
-		/*printf("NEXT CHECK: %s",ctime(&next_check));*/
-
-		/* schedule the next update event */
-		schedule_new_event(EVENT_CHECK_PROGRAM_UPDATE,TRUE,next_check,FALSE,BASE_UPDATE_CHECK_INTERVAL,NULL,TRUE,NULL,NULL,0);
-		}
-
-	return result;
-	}
-
-
-
-/* checks for updates at api.nagios.org */
-int query_update_api(void){
-	char *api_server="api.nagios.org";
-	char *api_path="/versioncheck/";
-	char *api_query=NULL;
-	char *api_query_opts=NULL;
-	char *buf=NULL;
-	char recv_buf[1024];
-	int report_install=FALSE;
-	int result=OK;
-	char *ptr=NULL;
-	int current_line=0;
-	int buf_index=0;
-	int in_header=TRUE;
-	char *var=NULL;
-	char *val=NULL;
-	int sd=0;
-	int send_len=0;
-	int recv_len=0;
-	int update_check_succeeded=FALSE;
-
-	/* report a new install, upgrade, or rollback */
-	/* Nagios monitors the world and we monitor Nagios taking over the world. :-) */
-	if(last_update_check==(time_t)0L)
-		report_install=TRUE;
-	if(last_program_version==NULL || strcmp(PROGRAM_VERSION,last_program_version))
-		report_install=TRUE;
-	if(report_install==TRUE){
-		asprintf(&api_query_opts,"&firstcheck=1");
-		if(last_program_version!=NULL){
-			asprintf(&buf,"%s&last_version=%s",api_query_opts,last_program_version);
-			my_free(api_query_opts);
-			api_query_opts=buf;
-			}
-		}
-
-	/* generate the query */
-	asprintf(&api_query,"v=1&product=nagios&tinycheck=1&stableonly=1&uid=%lu",update_uid);
-	if(bare_update_check==FALSE){
-		asprintf(&buf,"%s&version=%s%s",api_query,PROGRAM_VERSION,(api_query_opts==NULL)?"":api_query_opts);
-		my_free(api_query);
-		api_query=buf;
-		}
-	/* generate the HTTP request */
-	asprintf(&buf,
-		 "POST %s HTTP/1.0\r\n"
-		 "User-Agent: Nagios/%s\r\n"
-		 "Connection: close\r\n"
-		 "Host: %s\r\n"
-		 "Content-Type: application/x-www-form-urlencoded\r\n"
-		 "Content-Length: %zd\r\n"
-		 "\r\n"
-		 "%s\r\n",
-		 api_path,PROGRAM_VERSION,api_server,strlen(api_query),api_query);
-
-	/*
-	printf("SENDING...\n");
-	printf("==========\n");
-	printf("%s",buf);
-	printf("\n");
-	*/
-
-	result=my_tcp_connect(api_server,80,&sd,2);
-	/*printf("CONN RESULT: %d, SD: %d\n",result,sd);*/
-	if(sd>0){
-
-		/* send request */
-		send_len=strlen(buf);
-		result=my_sendall(sd,buf,&send_len,2);
-		/*printf("SEND RESULT: %d, SENT: %d\n",result,send_len);*/
-
-		/* get response */
-		recv_len=sizeof(recv_buf);
-		result=my_recvall(sd,recv_buf,&recv_len,2);
-		recv_buf[sizeof(recv_buf)-1]='\x0';
-		/*printf("RECV RESULT: %d, RECEIVED: %d\n",result,recv_len);*/
-
-		/*
-		printf("\n");
-		printf("RECEIVED...\n");
-		printf("===========\n");
-		printf("%s",recv_buf);
-		printf("\n");
-		*/
-
-		/* close connection */
-		close(sd);
-
-		/* parse the result */
-		in_header=TRUE;
-		while((ptr=get_next_string_from_buf(recv_buf,&buf_index,sizeof(recv_buf)))){
-
-			strip(ptr);
-			current_line++;
-
-			if(!strcmp(ptr,"")){
-				in_header=FALSE;
-				continue;
-				}
-			if(in_header==TRUE)
-				continue;
-
-			var=strtok(ptr,"=");
-			val=strtok(NULL,"\n");
-			/*printf("VAR: %s, VAL: %s\n",var,val);*/
-
-			if(!strcmp(var,"UPDATE_AVAILABLE")){
-				update_available=atoi(val);
-				/* we were successful */
-				update_check_succeeded=TRUE;
-				}
-			else if(!strcmp(var,"UPDATE_VERSION")){
-				if(new_program_version)
-					my_free(new_program_version);
-				new_program_version=strdup(val);
-				}
-			else if(!strcmp(var,"UPDATE_RELEASEDATE")){
-				}
-			}
-		}
-
-	/* cleanup */
-	my_free(buf);
-	my_free(api_query);
-	my_free(api_query_opts);
-
-	/* we were successful! */
-	if(update_check_succeeded==TRUE){
-
-		time(&last_update_check);
-		if(last_program_version)
-			free(last_program_version);
-		last_program_version=(char *)strdup(PROGRAM_VERSION);
-		}
-
-	return OK;
-	}
-
-
-
-
-/******************************************************************/
 /************************* MISC FUNCTIONS *************************/
 /******************************************************************/
 
@@ -4238,10 +3792,6 @@ void free_memory(nagios_macros *mac)
 	my_free(illegal_object_chars);
 	my_free(illegal_output_chars);
 
-	/* free nagios user and group */
-	my_free(nagios_user);
-	my_free(nagios_group);
-
 	/* free version strings */
 	my_free(last_program_version);
 	my_free(new_program_version);
@@ -4253,7 +3803,6 @@ void free_memory(nagios_macros *mac)
 	my_free(temp_path);
 	my_free(check_result_path);
 	my_free(command_file);
-	my_free(lock_file);
 	my_free(auth_file);
 	my_free(p1_file);
 	my_free(log_archive_path);
@@ -4289,14 +3838,10 @@ int reset_variables(void){
 	temp_path=(char *)strdup(DEFAULT_TEMP_PATH);
 	check_result_path=(char *)strdup(DEFAULT_CHECK_RESULT_PATH);
 	command_file=(char *)strdup(DEFAULT_COMMAND_FILE);
-	lock_file=(char *)strdup(DEFAULT_LOCK_FILE);
 	auth_file=(char *)strdup(DEFAULT_AUTH_FILE);
 	p1_file=(char *)strdup(DEFAULT_P1_FILE);
 	log_archive_path=(char *)strdup(DEFAULT_LOG_ARCHIVE_PATH);
 	debug_file=(char *)strdup(DEFAULT_DEBUG_FILE);
-
-	nagios_user=(char *)strdup(DEFAULT_NAGIOS_USER);
-	nagios_group=(char *)strdup(DEFAULT_NAGIOS_GROUP);
 
 	use_regexp_matches=FALSE;
 	use_true_regexp_matching=FALSE;

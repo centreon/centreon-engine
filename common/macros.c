@@ -1,26 +1,22 @@
-/*****************************************************************************
- *
- * MACROS.C - Common macro functions for Nagios
- *
- * Copyright (c) 1999-2010 Ethan Galstad (egalstad@nagios.org)
- * Last Modified: 08-06-2010
- *
- * License:
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2 as
- * published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
- *
- *****************************************************************************/
+/*
+** Copyright 1999-2010 Ethan Galstad
+** Copyright 2011      Merethis
+**
+** This file is part of Centreon Scheduler.
+**
+** Centreon Scheduler is free software: you can redistribute it and/or
+** modify it under the terms of the GNU General Public License version 2
+** as published by the Free Software Foundation.
+**
+** Centreon Scheduler is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+** General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with Centreon Scheduler. If not, see
+** <http://www.gnu.org/licenses/>.
+*/
 
 #include "../include/macros.h"
 #include "../include/config.h"
@@ -28,16 +24,10 @@
 #include "../include/objects.h"
 #include "../include/statusdata.h"
 #include "../include/comments.h"
-#ifdef NSCORE
 #include "../include/nagios.h"
-#else
-#include "../include/cgiutils.h"
-#endif
 
-#ifdef NSCORE
 extern int      use_large_installation_tweaks;
 extern int      enable_environment_macros;
-#endif
 
 extern char     *illegal_output_chars;
 
@@ -180,7 +170,7 @@ int process_macros_r(nagios_macros *mac, char *input_buffer, char **output_buffe
 
 			/* a non-macro, just some user-defined string between two $s */
 			else{
-				log_debug_info(DEBUGL_MACROS,2,"  Macro doesn't exist.  Running output (%d): '%s'\n",strlen(*output_buffer),*output_buffer);
+				log_debug_info(DEBUGL_MACROS,2,"  Non-macro.  Running output (%zd): '%s'\n",strlen(*output_buffer),*output_buffer);
 
 				/* add the plain text to the end of the already processed buffer */
 				/*
@@ -218,7 +208,7 @@ int process_macros_r(nagios_macros *mac, char *input_buffer, char **output_buffe
 						*output_buffer=(char *)realloc(*output_buffer,strlen(*output_buffer)+strlen(cleaned_macro)+1);
 						strcat(*output_buffer,cleaned_macro);
 
-						log_debug_info(DEBUGL_MACROS,2,"  Cleaned macro.  Running output (%d): '%s'\n",strlen(*output_buffer),*output_buffer);
+						log_debug_info(DEBUGL_MACROS,2,"  Cleaned macro.  Running output (%zd): '%s'\n",strlen(*output_buffer),*output_buffer);
 						}
 					}
 
@@ -229,7 +219,7 @@ int process_macros_r(nagios_macros *mac, char *input_buffer, char **output_buffe
 						*output_buffer=(char *)realloc(*output_buffer,strlen(*output_buffer)+strlen(selected_macro)+1);
 						strcat(*output_buffer,selected_macro);
 
-						log_debug_info(DEBUGL_MACROS,2,"  Uncleaned macro.  Running output (%d): '%s'\n",strlen(*output_buffer),*output_buffer);
+						log_debug_info(DEBUGL_MACROS,2,"  Uncleaned macro.  Running output (%zd): '%s'\n",strlen(*output_buffer),*output_buffer);
 						}
 					}
 
@@ -237,7 +227,7 @@ int process_macros_r(nagios_macros *mac, char *input_buffer, char **output_buffe
 				if(free_macro==TRUE)
 					my_free(selected_macro);
 
-				log_debug_info(DEBUGL_MACROS,2,"  Just finished macro.  Running output (%d): '%s'\n",strlen(*output_buffer),*output_buffer);
+				log_debug_info(DEBUGL_MACROS,2,"  Just finished macro.  Running output (%zd): '%s'\n",strlen(*output_buffer),*output_buffer);
 				}
 
 			in_macro=FALSE;
@@ -276,11 +266,9 @@ int grab_host_macros(nagios_macros *mac, host *hst)
 	if(hst==NULL)
 		return ERROR;
 
-#ifdef NSCORE
 	/* save pointer to host's first/primary hostgroup */
 	if(hst->hostgroups_ptr)
 		mac->hostgroup_ptr=(hostgroup *)hst->hostgroups_ptr->object_ptr;
-#endif
 
 	return OK;
 }
@@ -317,11 +305,9 @@ int grab_service_macros(nagios_macros *mac, service *svc)
 	if(svc==NULL)
 		return ERROR;
 
-#ifdef NSCORE
 	/* save first/primary servicegroup pointer for later */
 	if(svc->servicegroups_ptr)
 		mac->servicegroup_ptr=(servicegroup *)svc->servicegroups_ptr->object_ptr;
-#endif
 
 	return OK;
 }
@@ -359,11 +345,9 @@ int grab_contact_macros(nagios_macros *mac, contact *cntct)
 	if(cntct==NULL)
 		return ERROR;
 
-#ifdef NSCORE
 	/* save pointer to first/primary contactgroup for later */
 	if(cntct->contactgroups_ptr)
 		mac->contactgroup_ptr=(contactgroup *)cntct->contactgroups_ptr->object_ptr;
-#endif
 
 	return OK;
 }
@@ -531,12 +515,10 @@ int grab_macro_value(nagios_macros *mac, char *macro_buffer, char **output, int 
 				/* concatenate macro values for all contactgroup members */
 				for(temp_contactsmember=temp_contactgroup->members;temp_contactsmember!=NULL;temp_contactsmember=temp_contactsmember->next){
 
-#ifdef NSCORE
 					if((temp_contact=temp_contactsmember->contact_ptr)==NULL)
 						continue;
 					if((temp_contact=find_contact(temp_contactsmember->contact_name))==NULL)
 						continue;
-#endif
 
 					/* get the macro value for this contact */
 					grab_contact_address_macro(x,temp_contact,&temp_buffer);
@@ -608,7 +590,6 @@ int grab_macrox_value(nagios_macros *mac, int macro_type, char *arg1, char *arg2
 	int result=OK;
 	int delimiter_len=0;
 	int free_sub_macro=FALSE;
-#ifdef NSCORE
 	register int x;
 	int authorized=TRUE;
 	int problem=TRUE;
@@ -628,7 +609,6 @@ int grab_macrox_value(nagios_macros *mac, int macro_type, char *arg1, char *arg2
 	int services_critical_unhandled=0;
 	int service_problems=0;
 	int service_problems_unhandled=0;
-#endif
 
 
 	if(output==NULL || free_macro==NULL)
@@ -718,13 +698,8 @@ int grab_macrox_value(nagios_macros *mac, int macro_type, char *arg1, char *arg2
 			/* concatenate macro values for all hostgroup members */
 			for(temp_hostsmember=temp_hostgroup->members;temp_hostsmember!=NULL;temp_hostsmember=temp_hostsmember->next){
 
-#ifdef NSCORE
 				if((temp_host=temp_hostsmember->host_ptr)==NULL)
 					continue;
-#else
-				if((temp_host=find_host(temp_hostsmember->host_name))==NULL)
-					continue;
-#endif
 
 				/* get the macro value for this host */
 				grab_standard_host_macro(mac, macro_type,temp_host,&temp_buffer,&free_sub_macro);
@@ -862,13 +837,8 @@ int grab_macrox_value(nagios_macros *mac, int macro_type, char *arg1, char *arg2
 				/* concatenate macro values for all servicegroup members */
 				for(temp_servicesmember=temp_servicegroup->members;temp_servicesmember!=NULL;temp_servicesmember=temp_servicesmember->next){
 
-#ifdef NSCORE
 					if((temp_service=temp_servicesmember->service_ptr)==NULL)
 						continue;
-#else
-					if((temp_service=find_service(temp_servicesmember->host_name,temp_servicesmember->service_description))==NULL)
-						continue;
-#endif
 
 					/* get the macro value for this service */
 					grab_standard_service_macro(mac, macro_type,temp_service,&temp_buffer,&free_sub_macro);
@@ -956,13 +926,8 @@ int grab_macrox_value(nagios_macros *mac, int macro_type, char *arg1, char *arg2
 			/* concatenate macro values for all contactgroup members */
 			for(temp_contactsmember=temp_contactgroup->members;temp_contactsmember!=NULL;temp_contactsmember=temp_contactsmember->next){
 
-#ifdef NSCORE
 				if((temp_contact=temp_contactsmember->contact_ptr)==NULL)
 					continue;
-#else
-				if((temp_contact=find_contact(temp_contactsmember->contact_name))==NULL)
-					continue;
-#endif
 
 				/* get the macro value for this contact */
 				grab_standard_contact_macro(mac, macro_type,temp_contact,&temp_buffer);
@@ -1083,7 +1048,6 @@ int grab_macrox_value(nagios_macros *mac, int macro_type, char *arg1, char *arg2
 	case MACRO_TOTALSERVICEPROBLEMS:
 	case MACRO_TOTALSERVICEPROBLEMSUNHANDLED:
 
-#ifdef NSCORE
 		/* generate summary macros if needed */
 		if(mac->x[MACRO_TOTALHOSTSUP]==NULL){
 
@@ -1096,7 +1060,7 @@ int grab_macrox_value(nagios_macros *mac, int macro_type, char *arg1, char *arg2
 
 				if(authorized==TRUE){
 					problem=TRUE;
-			
+
 					if(temp_host->current_state==HOST_UP && temp_host->has_been_checked==TRUE)
 						hosts_up++;
 					else if(temp_host->current_state==HOST_DOWN){
@@ -1190,22 +1154,27 @@ int grab_macrox_value(nagios_macros *mac, int macro_type, char *arg1, char *arg2
 			/* these macros are time-intensive to compute, and will likely be used together, so save them all for future use */
 			for(x=MACRO_TOTALHOSTSUP;x<=MACRO_TOTALSERVICEPROBLEMSUNHANDLED;x++)
 				my_free(mac->x[x]);
-			asprintf(&mac->x[MACRO_TOTALHOSTSUP],"%d",hosts_up);
-			asprintf(&mac->x[MACRO_TOTALHOSTSDOWN],"%d",hosts_down);
-			asprintf(&mac->x[MACRO_TOTALHOSTSUNREACHABLE],"%d",hosts_unreachable);
-			asprintf(&mac->x[MACRO_TOTALHOSTSDOWNUNHANDLED],"%d",hosts_down_unhandled);
-			asprintf(&mac->x[MACRO_TOTALHOSTSUNREACHABLEUNHANDLED],"%d",hosts_unreachable_unhandled);
-			asprintf(&mac->x[MACRO_TOTALHOSTPROBLEMS],"%d",host_problems);
-			asprintf(&mac->x[MACRO_TOTALHOSTPROBLEMSUNHANDLED],"%d",host_problems_unhandled);
-			asprintf(&mac->x[MACRO_TOTALSERVICESOK],"%d",services_ok);
-			asprintf(&mac->x[MACRO_TOTALSERVICESWARNING],"%d",services_warning);
-			asprintf(&mac->x[MACRO_TOTALSERVICESCRITICAL],"%d",services_critical);
-			asprintf(&mac->x[MACRO_TOTALSERVICESUNKNOWN],"%d",services_unknown);
-			asprintf(&mac->x[MACRO_TOTALSERVICESWARNINGUNHANDLED],"%d",services_warning_unhandled);
-			asprintf(&mac->x[MACRO_TOTALSERVICESCRITICALUNHANDLED],"%d",services_critical_unhandled);
-			asprintf(&mac->x[MACRO_TOTALSERVICESUNKNOWNUNHANDLED],"%d",services_unknown_unhandled);
-			asprintf(&mac->x[MACRO_TOTALSERVICEPROBLEMS],"%d",service_problems);
-			asprintf(&mac->x[MACRO_TOTALSERVICEPROBLEMSUNHANDLED],"%d",service_problems_unhandled);
+			if(asprintf(&mac->x[MACRO_TOTALHOSTSUP],"%d",hosts_up)==-1 ||
+			   asprintf(&mac->x[MACRO_TOTALHOSTSDOWN],"%d",hosts_down)==-1 ||
+			   asprintf(&mac->x[MACRO_TOTALHOSTSUNREACHABLE],"%d",hosts_unreachable)==-1 ||
+			   asprintf(&mac->x[MACRO_TOTALHOSTSDOWNUNHANDLED],"%d",hosts_down_unhandled)==-1 ||
+			   asprintf(&mac->x[MACRO_TOTALHOSTSUNREACHABLEUNHANDLED],"%d",hosts_unreachable_unhandled)==-1 ||
+			   asprintf(&mac->x[MACRO_TOTALHOSTPROBLEMS],"%d",host_problems)==-1 ||
+			   asprintf(&mac->x[MACRO_TOTALHOSTPROBLEMSUNHANDLED],"%d",host_problems_unhandled)==-1 ||
+			   asprintf(&mac->x[MACRO_TOTALSERVICESOK],"%d",services_ok)==-1 ||
+			   asprintf(&mac->x[MACRO_TOTALSERVICESWARNING],"%d",services_warning)==-1 ||
+			   asprintf(&mac->x[MACRO_TOTALSERVICESCRITICAL],"%d",services_critical)==-1 ||
+			   asprintf(&mac->x[MACRO_TOTALSERVICESUNKNOWN],"%d",services_unknown)==-1 ||
+			   asprintf(&mac->x[MACRO_TOTALSERVICESWARNINGUNHANDLED],"%d",services_warning_unhandled)==-1 ||
+			   asprintf(&mac->x[MACRO_TOTALSERVICESCRITICALUNHANDLED],"%d",services_critical_unhandled)==-1 ||
+			   asprintf(&mac->x[MACRO_TOTALSERVICESUNKNOWNUNHANDLED],"%d",services_unknown_unhandled)==-1 ||
+			   asprintf(&mac->x[MACRO_TOTALSERVICEPROBLEMS],"%d",service_problems)==-1 ||
+			   asprintf(&mac->x[MACRO_TOTALSERVICEPROBLEMSUNHANDLED],"%d",service_problems_unhandled)==-1){
+				logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
+				for(x=MACRO_TOTALHOSTSUP;x<=MACRO_TOTALSERVICEPROBLEMSUNHANDLED;x++)
+					my_free(mac->x[x]);
+				return ERROR;
+				}
 			}
 
 		/* return only the macro the user requested */
@@ -1213,7 +1182,6 @@ int grab_macrox_value(nagios_macros *mac, int macro_type, char *arg1, char *arg2
 
 		/* tell caller to NOT free memory when done */
 		*free_macro=FALSE;
-#endif
 		break;
 
 	default:
@@ -1275,13 +1243,8 @@ int grab_custom_macro_value(nagios_macros *mac, char *macro_name, char *arg1, ch
 			/* concatenate macro values for all hostgroup members */
 			for(temp_hostsmember=temp_hostgroup->members;temp_hostsmember!=NULL;temp_hostsmember=temp_hostsmember->next){
 
-#ifdef NSCORE
 				if((temp_host=temp_hostsmember->host_ptr)==NULL)
 					continue;
-#else
-				if((temp_host=find_host(temp_hostsmember->host_name))==NULL)
-					continue;
-#endif
 
 				/* get the macro value for this host */
 				grab_custom_macro_value(mac, macro_name,temp_host->name,NULL,&temp_buffer);
@@ -1339,13 +1302,8 @@ int grab_custom_macro_value(nagios_macros *mac, char *macro_name, char *arg1, ch
 				/* concatenate macro values for all servicegroup members */
 				for(temp_servicesmember=temp_servicegroup->members;temp_servicesmember!=NULL;temp_servicesmember=temp_servicesmember->next){
 
-#ifdef NSCORE
 					if((temp_service=temp_servicesmember->service_ptr)==NULL)
 						continue;
-#else
-					if((temp_service=find_service(temp_servicesmember->host_name,temp_servicesmember->service_description))==NULL)
-						continue;
-#endif
 
 					/* get the macro value for this service */
 					grab_custom_macro_value(mac, macro_name,temp_service->host_name,temp_service->description,&temp_buffer);
@@ -1399,13 +1357,8 @@ int grab_custom_macro_value(nagios_macros *mac, char *macro_name, char *arg1, ch
 			/* concatenate macro values for all contactgroup members */
 			for(temp_contactsmember=temp_contactgroup->members;temp_contactsmember!=NULL;temp_contactsmember=temp_contactsmember->next){
 
-#ifdef NSCORE
 				if((temp_contact=temp_contactsmember->contact_ptr)==NULL)
 					continue;
-#else
-				if((temp_contact=find_contact(temp_contactsmember->contact_name))==NULL)
-					continue;
-#endif
 
 				/* get the macro value for this contact */
 				grab_custom_macro_value(mac, macro_name,temp_contact->name,NULL,&temp_buffer);
@@ -1441,9 +1394,7 @@ int grab_datetime_macro(nagios_macros *mac, int macro_type, char *arg1, char *ar
 	time_t current_time=0L;
 	timeperiod *temp_timeperiod=NULL;
 	time_t test_time=0L;
-#ifdef NSCORE
 	time_t next_valid_time=0L;
-#endif
 
 	if(output==NULL)
 		return ERROR;
@@ -1504,21 +1455,28 @@ int grab_datetime_macro(nagios_macros *mac, int macro_type, char *arg1, char *ar
 		break;
 
 	case MACRO_TIMET:
-		asprintf(output,"%lu",(unsigned long)current_time);
+		if(asprintf(output,"%lu",(unsigned long)current_time)==-1){
+			logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
+			return ERROR;
+			}
 		break;
 
-#ifdef NSCORE
 	case MACRO_ISVALIDTIME:
-		asprintf(output,"%d",(check_time_against_period(test_time,temp_timeperiod)==OK)?1:0);
+		if(asprintf(output,"%d",(check_time_against_period(test_time,temp_timeperiod)==OK)?1:0)==-1){
+			logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
+			return ERROR;
+			}
 		break;
 
 	case MACRO_NEXTVALIDTIME:
 		get_next_valid_time(test_time,&next_valid_time,temp_timeperiod);
 		if(next_valid_time==test_time && check_time_against_period(test_time,temp_timeperiod)==ERROR)
 			next_valid_time=(time_t)0L;
-		asprintf(output,"%lu",(unsigned long)next_valid_time);
+		if(asprintf(output,"%lu",(unsigned long)next_valid_time)==-1){
+			logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
+			return ERROR;
+			}
 		break;
-#endif
 
 	default:
 		return ERROR;
@@ -1534,7 +1492,6 @@ int grab_datetime_macro(nagios_macros *mac, int macro_type, char *arg1, char *ar
 int grab_standard_host_macro(nagios_macros *mac, int macro_type, host *temp_host, char **output, int *free_macro)
 {
 	char *temp_buffer=NULL;
-#ifdef NSCORE
 	hostgroup *temp_hostgroup=NULL;
 	servicesmember *temp_servicesmember=NULL;
 	service *temp_service=NULL;
@@ -1552,7 +1509,7 @@ int grab_standard_host_macro(nagios_macros *mac, int macro_type, host *temp_host
 	int total_host_services_warning=0;
 	int total_host_services_unknown=0;
 	int total_host_services_critical=0;
-#endif
+	int ret;
 
 	if(temp_host==NULL || output==NULL || free_macro==NULL)
 		return ERROR;
@@ -1576,7 +1533,6 @@ int grab_standard_host_macro(nagios_macros *mac, int macro_type, host *temp_host
 	case MACRO_HOSTADDRESS:
 		*output=(char *)strdup(temp_host->address);
 		break;
-#ifdef NSCORE
 	case MACRO_HOSTSTATE:
 		if(temp_host->current_state==HOST_DOWN)
 			*output=(char *)strdup("DOWN");
@@ -1586,7 +1542,7 @@ int grab_standard_host_macro(nagios_macros *mac, int macro_type, host *temp_host
 			*output=(char *)strdup("UP");
 		break;
 	case MACRO_HOSTSTATEID:
-		asprintf(output,"%d",temp_host->current_state);
+		ret=asprintf(output,"%d",temp_host->current_state);
 		break;
 	case MACRO_LASTHOSTSTATE:
 		if(temp_host->last_state==HOST_DOWN)
@@ -1597,13 +1553,13 @@ int grab_standard_host_macro(nagios_macros *mac, int macro_type, host *temp_host
 			*output=(char *)strdup("UP");
 		break;
 	case MACRO_LASTHOSTSTATEID:
-		asprintf(output,"%d",temp_host->last_state);
+		ret=asprintf(output,"%d",temp_host->last_state);
 		break;
 	case MACRO_HOSTCHECKTYPE:
-		asprintf(output,"%s",(temp_host->check_type==HOST_CHECK_PASSIVE)?"PASSIVE":"ACTIVE");
+		ret=asprintf(output,"%s",(temp_host->check_type==HOST_CHECK_PASSIVE)?"PASSIVE":"ACTIVE");
 		break;
 	case MACRO_HOSTSTATETYPE:
-		asprintf(output,"%s",(temp_host->state_type==HARD_STATE)?"HARD":"SOFT");
+		ret=asprintf(output,"%s",(temp_host->state_type==HARD_STATE)?"HARD":"SOFT");
 		break;
 	case MACRO_HOSTOUTPUT:
 		if(temp_host->plugin_output)
@@ -1617,23 +1573,21 @@ int grab_standard_host_macro(nagios_macros *mac, int macro_type, host *temp_host
 		if(temp_host->perf_data)
 			*output=(char *)strdup(temp_host->perf_data);
 		break;
-#endif
 	case MACRO_HOSTCHECKCOMMAND:
 		if(temp_host->host_check_command)
 			*output=(char *)strdup(temp_host->host_check_command);
 		break;
-#ifdef NSCORE
 	case MACRO_HOSTATTEMPT:
-		asprintf(output,"%d",temp_host->current_attempt);
+		ret=asprintf(output,"%d",temp_host->current_attempt);
 		break;
 	case MACRO_MAXHOSTATTEMPTS:
-		asprintf(output,"%d",temp_host->max_attempts);
+		ret=asprintf(output,"%d",temp_host->max_attempts);
 		break;
 	case MACRO_HOSTDOWNTIME:
-		asprintf(output,"%d",temp_host->scheduled_downtime_depth);
+		ret=asprintf(output,"%d",temp_host->scheduled_downtime_depth);
 		break;
 	case MACRO_HOSTPERCENTCHANGE:
-		asprintf(output,"%.2f",temp_host->percent_state_change);
+		ret=asprintf(output,"%.2f",temp_host->percent_state_change);
 		break;
 	case MACRO_HOSTDURATIONSEC:
 	case MACRO_HOSTDURATION:
@@ -1641,7 +1595,7 @@ int grab_standard_host_macro(nagios_macros *mac, int macro_type, host *temp_host
 		duration=(unsigned long)(current_time-temp_host->last_state_change);
 
 		if(macro_type==MACRO_HOSTDURATIONSEC)
-			asprintf(output,"%lu",duration);
+			ret=asprintf(output,"%lu",duration);
 		else{
 
 			days=duration/86400;
@@ -1651,49 +1605,48 @@ int grab_standard_host_macro(nagios_macros *mac, int macro_type, host *temp_host
 			minutes=duration/60;
 			duration-=(minutes*60);
 			seconds=duration;
-			asprintf(output,"%dd %dh %dm %ds",days,hours,minutes,seconds);
+			ret=asprintf(output,"%dd %dh %dm %ds",days,hours,minutes,seconds);
 			}
 		break;
 	case MACRO_HOSTEXECUTIONTIME:
-		asprintf(output,"%.3f",temp_host->execution_time);
+		ret=asprintf(output,"%.3f",temp_host->execution_time);
 		break;
 	case MACRO_HOSTLATENCY:
-		asprintf(output,"%.3f",temp_host->latency);
+		ret=asprintf(output,"%.3f",temp_host->latency);
 		break;
 	case MACRO_LASTHOSTCHECK:
-		asprintf(output,"%lu",(unsigned long)temp_host->last_check);
+		ret=asprintf(output,"%lu",(unsigned long)temp_host->last_check);
 		break;
 	case MACRO_LASTHOSTSTATECHANGE:
-		asprintf(output,"%lu",(unsigned long)temp_host->last_state_change);
+		ret=asprintf(output,"%lu",(unsigned long)temp_host->last_state_change);
 		break;
 	case MACRO_LASTHOSTUP:
-		asprintf(output,"%lu",(unsigned long)temp_host->last_time_up);
+		ret=asprintf(output,"%lu",(unsigned long)temp_host->last_time_up);
 		break;
 	case MACRO_LASTHOSTDOWN:
-		asprintf(output,"%lu",(unsigned long)temp_host->last_time_down);
+		ret=asprintf(output,"%lu",(unsigned long)temp_host->last_time_down);
 		break;
 	case MACRO_LASTHOSTUNREACHABLE:
-		asprintf(output,"%lu",(unsigned long)temp_host->last_time_unreachable);
+		ret=asprintf(output,"%lu",(unsigned long)temp_host->last_time_unreachable);
 		break;
 	case MACRO_HOSTNOTIFICATIONNUMBER:
-		asprintf(output,"%d",temp_host->current_notification_number);
+		ret=asprintf(output,"%d",temp_host->current_notification_number);
 		break;
 	case MACRO_HOSTNOTIFICATIONID:
-		asprintf(output,"%lu",temp_host->current_notification_id);
+		ret=asprintf(output,"%lu",temp_host->current_notification_id);
 		break;
 	case MACRO_HOSTEVENTID:
-		asprintf(output,"%lu",temp_host->current_event_id);
+		ret=asprintf(output,"%lu",temp_host->current_event_id);
 		break;
 	case MACRO_LASTHOSTEVENTID:
-		asprintf(output,"%lu",temp_host->last_event_id);
+		ret=asprintf(output,"%lu",temp_host->last_event_id);
 		break;
 	case MACRO_HOSTPROBLEMID:
-		asprintf(output,"%lu",temp_host->current_problem_id);
+		ret=asprintf(output,"%lu",temp_host->current_problem_id);
 		break;
 	case MACRO_LASTHOSTPROBLEMID:
-		asprintf(output,"%lu",temp_host->last_problem_id);
+		ret=asprintf(output,"%lu",temp_host->last_problem_id);
 		break;
-#endif
 	case MACRO_HOSTACTIONURL:
 		if(temp_host->action_url)
 			*output=(char *)strdup(temp_host->action_url);
@@ -1706,7 +1659,6 @@ int grab_standard_host_macro(nagios_macros *mac, int macro_type, host *temp_host
 		if(temp_host->notes)
 			*output=(char *)strdup(temp_host->notes);
 		break;
-#ifdef NSCORE
 	case MACRO_HOSTGROUPNAMES:
 		/* find all hostgroups this host is associated with */
 		for(temp_objectlist=temp_host->hostgroups_ptr;temp_objectlist!=NULL;temp_objectlist=temp_objectlist->next){
@@ -1714,7 +1666,7 @@ int grab_standard_host_macro(nagios_macros *mac, int macro_type, host *temp_host
 			if((temp_hostgroup=(hostgroup *)temp_objectlist->object_ptr)==NULL)
 				continue;
 
-			asprintf(&buf1,"%s%s%s",(buf2)?buf2:"",(buf2)?",":"",temp_hostgroup->group_name);
+			ret=asprintf(&buf1,"%s%s%s",(buf2)?buf2:"",(buf2)?",":"",temp_hostgroup->group_name);
 			my_free(buf2);
 			buf2=buf1;
 			}
@@ -1758,15 +1710,24 @@ int grab_standard_host_macro(nagios_macros *mac, int macro_type, host *temp_host
 
 			/* these macros are time-intensive to compute, and will likely be used together, so save them all for future use */
 			my_free(mac->x[MACRO_TOTALHOSTSERVICES]);
-			asprintf(&mac->x[MACRO_TOTALHOSTSERVICES],"%d",total_host_services);
+			ret=asprintf(&mac->x[MACRO_TOTALHOSTSERVICES],"%d",total_host_services);
 			my_free(mac->x[MACRO_TOTALHOSTSERVICESOK]);
-			asprintf(&mac->x[MACRO_TOTALHOSTSERVICESOK],"%d",total_host_services_ok);
+			ret=asprintf(&mac->x[MACRO_TOTALHOSTSERVICESOK],"%d",total_host_services_ok);
 			my_free(mac->x[MACRO_TOTALHOSTSERVICESWARNING]);
-			asprintf(&mac->x[MACRO_TOTALHOSTSERVICESWARNING],"%d",total_host_services_warning);
+			ret=asprintf(&mac->x[MACRO_TOTALHOSTSERVICESWARNING],"%d",total_host_services_warning);
 			my_free(mac->x[MACRO_TOTALHOSTSERVICESUNKNOWN]);
-			asprintf(&mac->x[MACRO_TOTALHOSTSERVICESUNKNOWN],"%d",total_host_services_unknown);
+			ret=asprintf(&mac->x[MACRO_TOTALHOSTSERVICESUNKNOWN],"%d",total_host_services_unknown);
 			my_free(mac->x[MACRO_TOTALHOSTSERVICESCRITICAL]);
-			asprintf(&mac->x[MACRO_TOTALHOSTSERVICESCRITICAL],"%d",total_host_services_critical);
+			ret=asprintf(&mac->x[MACRO_TOTALHOSTSERVICESCRITICAL],"%d",total_host_services_critical);
+			if(ret==-1){
+				logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
+				my_free(mac->x[MACRO_TOTALHOSTSERVICES]);
+				my_free(mac->x[MACRO_TOTALHOSTSERVICESOK]);
+				my_free(mac->x[MACRO_TOTALHOSTSERVICESWARNING]);
+				my_free(mac->x[MACRO_TOTALHOSTSERVICESUNKNOWN]);
+				my_free(mac->x[MACRO_TOTALHOSTSERVICESCRITICAL]);
+				return ERROR;
+				}
 			}
 
 		/* return only the macro the user requested */
@@ -1775,7 +1736,6 @@ int grab_standard_host_macro(nagios_macros *mac, int macro_type, host *temp_host
 		/* tell caller to NOT free memory when done */
 		*free_macro=FALSE;
 		break;
-#endif
 		/***************/
 		/* MISC MACROS */
 		/***************/
@@ -1793,6 +1753,11 @@ int grab_standard_host_macro(nagios_macros *mac, int macro_type, host *temp_host
 		log_debug_info(DEBUGL_MACROS,0,"UNHANDLED HOST MACRO #%d! THIS IS A BUG!\n",macro_type);
 		return ERROR;
 		break;
+		}
+
+	if(ret==-1){
+		logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
+		return ERROR;
 		}
 
 	/* post-processing */
@@ -1915,7 +1880,6 @@ int grab_standard_hostgroup_macro(nagios_macros *mac, int macro_type, hostgroup 
 int grab_standard_service_macro(nagios_macros *mac, int macro_type, service *temp_service, char **output, int *free_macro)
 {
 	char *temp_buffer=NULL;
-#ifdef NSCORE
 	servicegroup *temp_servicegroup=NULL;
 	objectlist *temp_objectlist=NULL;
 	time_t current_time=0L;
@@ -1926,7 +1890,7 @@ int grab_standard_service_macro(nagios_macros *mac, int macro_type, service *tem
 	int seconds=0;
 	char *buf1=NULL;
 	char *buf2=NULL;
-#endif
+	int ret;
 
 	if(temp_service==NULL || output==NULL)
 		return ERROR;
@@ -1943,7 +1907,6 @@ int grab_standard_service_macro(nagios_macros *mac, int macro_type, service *tem
 		if(temp_service->display_name)
 			*output=(char *)strdup(temp_service->display_name);
 		break;
-#ifdef NSCORE
 	case MACRO_SERVICEOUTPUT:
 		if(temp_service->plugin_output)
 			*output=(char *)strdup(temp_service->plugin_output);
@@ -1956,12 +1919,10 @@ int grab_standard_service_macro(nagios_macros *mac, int macro_type, service *tem
 		if(temp_service->perf_data)
 			*output=(char *)strdup(temp_service->perf_data);
 		break;
-#endif
 	case MACRO_SERVICECHECKCOMMAND:
 		if(temp_service->service_check_command)
 			*output=(char *)strdup(temp_service->service_check_command);
 		break;
-#ifdef NSCORE
 	case MACRO_SERVICECHECKTYPE:
 		*output=(char *)strdup((temp_service->check_type==SERVICE_CHECK_PASSIVE)?"PASSIVE":"ACTIVE");
 		break;
@@ -1979,7 +1940,7 @@ int grab_standard_service_macro(nagios_macros *mac, int macro_type, service *tem
 			*output=(char *)strdup("UNKNOWN");
 		break;
 	case MACRO_SERVICESTATEID:
-		asprintf(output,"%d",temp_service->current_state);
+		ret=asprintf(output,"%d",temp_service->current_state);
 		break;
 	case MACRO_LASTSERVICESTATE:
 		if(temp_service->last_state==STATE_OK)
@@ -1992,48 +1953,46 @@ int grab_standard_service_macro(nagios_macros *mac, int macro_type, service *tem
 			*output=(char *)strdup("UNKNOWN");
 		break;
 	case MACRO_LASTSERVICESTATEID:
-		asprintf(output,"%d",temp_service->last_state);
+		ret=asprintf(output,"%d",temp_service->last_state);
 		break;
-#endif
 	case MACRO_SERVICEISVOLATILE:
-		asprintf(output,"%d",temp_service->is_volatile);
+		ret=asprintf(output,"%d",temp_service->is_volatile);
 		break;
-#ifdef NSCORE
 	case MACRO_SERVICEATTEMPT:
-		asprintf(output,"%d",temp_service->current_attempt);
+		ret=asprintf(output,"%d",temp_service->current_attempt);
 		break;
 	case MACRO_MAXSERVICEATTEMPTS:
-		asprintf(output,"%d",temp_service->max_attempts);
+		ret=asprintf(output,"%d",temp_service->max_attempts);
 		break;
 	case MACRO_SERVICEEXECUTIONTIME:
-		asprintf(output,"%.3f",temp_service->execution_time);
+		ret=asprintf(output,"%.3f",temp_service->execution_time);
 		break;
 	case MACRO_SERVICELATENCY:
-		asprintf(output,"%.3f",temp_service->latency);
+		ret=asprintf(output,"%.3f",temp_service->latency);
 		break;
 	case MACRO_LASTSERVICECHECK:
-		asprintf(output,"%lu",(unsigned long)temp_service->last_check);
+		ret=asprintf(output,"%lu",(unsigned long)temp_service->last_check);
 		break;
 	case MACRO_LASTSERVICESTATECHANGE:
-		asprintf(output,"%lu",(unsigned long)temp_service->last_state_change);
+		ret=asprintf(output,"%lu",(unsigned long)temp_service->last_state_change);
 		break;
 	case MACRO_LASTSERVICEOK:
-		asprintf(output,"%lu",(unsigned long)temp_service->last_time_ok);
+		ret=asprintf(output,"%lu",(unsigned long)temp_service->last_time_ok);
 		break;
 	case MACRO_LASTSERVICEWARNING:
-		asprintf(output,"%lu",(unsigned long)temp_service->last_time_warning);
+		ret=asprintf(output,"%lu",(unsigned long)temp_service->last_time_warning);
 		break;
 	case MACRO_LASTSERVICEUNKNOWN:
-		asprintf(output,"%lu",(unsigned long)temp_service->last_time_unknown);
+		ret=asprintf(output,"%lu",(unsigned long)temp_service->last_time_unknown);
 		break;
 	case MACRO_LASTSERVICECRITICAL:
-		asprintf(output,"%lu",(unsigned long)temp_service->last_time_critical);
+		ret=asprintf(output,"%lu",(unsigned long)temp_service->last_time_critical);
 		break;
 	case MACRO_SERVICEDOWNTIME:
-		asprintf(output,"%d",temp_service->scheduled_downtime_depth);
+		ret=asprintf(output,"%d",temp_service->scheduled_downtime_depth);
 		break;
 	case MACRO_SERVICEPERCENTCHANGE:
-		asprintf(output,"%.2f",temp_service->percent_state_change);
+		ret=asprintf(output,"%.2f",temp_service->percent_state_change);
 		break;
 	case MACRO_SERVICEDURATIONSEC:
 	case MACRO_SERVICEDURATION:
@@ -2043,7 +2002,7 @@ int grab_standard_service_macro(nagios_macros *mac, int macro_type, service *tem
 
 		/* get the state duration in seconds */
 		if(macro_type==MACRO_SERVICEDURATIONSEC)
-			asprintf(output,"%lu",duration);
+			ret=asprintf(output,"%lu",duration);
 
 		/* get the state duration */
 		else{
@@ -2054,28 +2013,27 @@ int grab_standard_service_macro(nagios_macros *mac, int macro_type, service *tem
 			minutes=duration/60;
 			duration-=(minutes*60);
 			seconds=duration;
-			asprintf(output,"%dd %dh %dm %ds",days,hours,minutes,seconds);
+			ret=asprintf(output,"%dd %dh %dm %ds",days,hours,minutes,seconds);
 			}
 		break;
 	case MACRO_SERVICENOTIFICATIONNUMBER:
-		asprintf(output,"%d",temp_service->current_notification_number);
+		ret=asprintf(output,"%d",temp_service->current_notification_number);
 		break;
 	case MACRO_SERVICENOTIFICATIONID:
-		asprintf(output,"%lu",temp_service->current_notification_id);
+		ret=asprintf(output,"%lu",temp_service->current_notification_id);
 		break;
 	case MACRO_SERVICEEVENTID:
-		asprintf(output,"%lu",temp_service->current_event_id);
+		ret=asprintf(output,"%lu",temp_service->current_event_id);
 		break;
 	case MACRO_LASTSERVICEEVENTID:
-		asprintf(output,"%lu",temp_service->last_event_id);
+		ret=asprintf(output,"%lu",temp_service->last_event_id);
 		break;
 	case MACRO_SERVICEPROBLEMID:
-		asprintf(output,"%lu",temp_service->current_problem_id);
+		ret=asprintf(output,"%lu",temp_service->current_problem_id);
 		break;
 	case MACRO_LASTSERVICEPROBLEMID:
-		asprintf(output,"%lu",temp_service->last_problem_id);
+		ret=asprintf(output,"%lu",temp_service->last_problem_id);
 		break;
-#endif
 	case MACRO_SERVICEACTIONURL:
 		if(temp_service->action_url)
 			*output=(char *)strdup(temp_service->action_url);
@@ -2088,7 +2046,6 @@ int grab_standard_service_macro(nagios_macros *mac, int macro_type, service *tem
 		if(temp_service->notes)
 			*output=(char *)strdup(temp_service->notes);
 		break;
-#ifdef NSCORE
 	case MACRO_SERVICEGROUPNAMES:
 		/* find all servicegroups this service is associated with */
 		for(temp_objectlist=temp_service->servicegroups_ptr;temp_objectlist!=NULL;temp_objectlist=temp_objectlist->next){
@@ -2096,7 +2053,7 @@ int grab_standard_service_macro(nagios_macros *mac, int macro_type, service *tem
 			if((temp_servicegroup=(servicegroup *)temp_objectlist->object_ptr)==NULL)
 				continue;
 
-			asprintf(&buf1,"%s%s%s",(buf2)?buf2:"",(buf2)?",":"",temp_servicegroup->group_name);
+			ret=asprintf(&buf1,"%s%s%s",(buf2)?buf2:"",(buf2)?",":"",temp_servicegroup->group_name);
 			my_free(buf2);
 			buf2=buf1;
 			}
@@ -2105,7 +2062,6 @@ int grab_standard_service_macro(nagios_macros *mac, int macro_type, service *tem
 			my_free(buf2);
 			}
 		break;
-#endif
 		/***************/
 		/* MISC MACROS */
 		/***************/
@@ -2123,6 +2079,11 @@ int grab_standard_service_macro(nagios_macros *mac, int macro_type, service *tem
 		log_debug_info(DEBUGL_MACROS,0,"UNHANDLED SERVICE MACRO #%d! THIS IS A BUG!\n",macro_type);
 		return ERROR;
 		break;
+		}
+
+	if(ret==-1){
+		logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
+		return ERROR;
 		}
 
 	/* post-processing */
@@ -2241,14 +2202,11 @@ int grab_standard_servicegroup_macro(nagios_macros *mac, int macro_type, service
 
 
 /* computes a contact macro */
-int grab_standard_contact_macro(nagios_macros *mac, int macro_type, contact *temp_contact, char **output)
-{
-#ifdef NSCORE
+int grab_standard_contact_macro(nagios_macros *mac, int macro_type, contact *temp_contact, char **output){
 	contactgroup *temp_contactgroup=NULL;
 	objectlist *temp_objectlist=NULL;
 	char *buf1=NULL;
 	char *buf2=NULL;
-#endif
 
 	if(temp_contact==NULL || output==NULL)
 		return ERROR;
@@ -2269,7 +2227,6 @@ int grab_standard_contact_macro(nagios_macros *mac, int macro_type, contact *tem
 		if(temp_contact->pager)
 			*output=(char *)strdup(temp_contact->pager);
 		break;
-#ifdef NSCORE
 	case MACRO_CONTACTGROUPNAMES:
 		/* get the contactgroup names */
 		/* find all contactgroups this contact is a member of */
@@ -2278,7 +2235,11 @@ int grab_standard_contact_macro(nagios_macros *mac, int macro_type, contact *tem
 			if((temp_contactgroup=(contactgroup *)temp_objectlist->object_ptr)==NULL)
 				continue;
 
-			asprintf(&buf1,"%s%s%s",(buf2)?buf2:"",(buf2)?",":"",temp_contactgroup->group_name);
+			if(asprintf(&buf1,"%s%s%s",(buf2)?buf2:"",(buf2)?",":"",temp_contactgroup->group_name)==-1){
+				logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
+				my_free(buf2);
+				return ERROR;
+				}
 			my_free(buf2);
 			buf2=buf1;
 			}
@@ -2287,7 +2248,6 @@ int grab_standard_contact_macro(nagios_macros *mac, int macro_type, contact *tem
 			my_free(buf2);
 			}
 		break;
-#endif
 	default:
 		log_debug_info(DEBUGL_MACROS,0,"UNHANDLED CONTACT MACRO #%d! THIS IS A BUG!\n",macro_type);
 		return ERROR;
@@ -3108,8 +3068,6 @@ int clear_summary_macros(nagios_macros *mac)
 /****************** ENVIRONMENT MACRO FUNCTIONS *******************/
 /******************************************************************/
 
-#ifdef NSCORE
-
 /* sets or unsets all macro environment variables */
 int set_all_macro_environment_vars(nagios_macros *mac, int set)
 {
@@ -3169,7 +3127,10 @@ int set_argv_macro_environment_vars(nagios_macros *mac, int set)
 
 	/* set each of the argv macro environment variables */
 	for(x=0;x<MAX_COMMAND_ARGUMENTS;x++){
-		asprintf(&macro_name,"ARG%d",x+1);
+		if(asprintf(&macro_name,"ARG%d",x+1)==-1){
+			logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
+			return ERROR;
+		}
 		set_macro_environment_var(macro_name,mac->argv[x],set);
 		my_free(macro_name);
 	        }
@@ -3192,7 +3153,10 @@ int set_custom_macro_environment_vars(nagios_macros *mac, int set)
 	/* generate variables and save them for later */
 	if((temp_host=mac->host_ptr) && set==TRUE){
 		for(temp_customvariablesmember=temp_host->custom_variables;temp_customvariablesmember!=NULL;temp_customvariablesmember=temp_customvariablesmember->next){
-			asprintf(&customvarname,"_HOST%s",temp_customvariablesmember->variable_name);
+			if(asprintf(&customvarname,"_HOST%s",temp_customvariablesmember->variable_name)==-1){
+				logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
+				return ERROR;
+				}
 			add_custom_variable_to_object(&mac->custom_host_vars,customvarname,temp_customvariablesmember->variable_value);
 			my_free(customvarname);
 			}
@@ -3206,7 +3170,10 @@ int set_custom_macro_environment_vars(nagios_macros *mac, int set)
 	/* generate variables and save them for later */
 	if((temp_service=mac->service_ptr) && set==TRUE){
 		for(temp_customvariablesmember=temp_service->custom_variables;temp_customvariablesmember!=NULL;temp_customvariablesmember=temp_customvariablesmember->next){
-			asprintf(&customvarname,"_SERVICE%s",temp_customvariablesmember->variable_name);
+			if(asprintf(&customvarname,"_SERVICE%s",temp_customvariablesmember->variable_name)==-1){
+				logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
+				return ERROR;
+				}
 			add_custom_variable_to_object(&mac->custom_service_vars,customvarname,temp_customvariablesmember->variable_value);
 			my_free(customvarname);
 			}
@@ -3219,7 +3186,10 @@ int set_custom_macro_environment_vars(nagios_macros *mac, int set)
 	/* generate variables and save them for later */
 	if((temp_contact=mac->contact_ptr) && set==TRUE){
 		for(temp_customvariablesmember=temp_contact->custom_variables;temp_customvariablesmember!=NULL;temp_customvariablesmember=temp_customvariablesmember->next){
-			asprintf(&customvarname,"_CONTACT%s",temp_customvariablesmember->variable_name);
+			if(asprintf(&customvarname,"_CONTACT%s",temp_customvariablesmember->variable_name)==-1){
+				logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
+				return ERROR;
+				}
 			add_custom_variable_to_object(&mac->custom_contact_vars,customvarname,temp_customvariablesmember->variable_value);
 			my_free(customvarname);
 			}
@@ -3244,7 +3214,10 @@ int set_contact_address_environment_vars(nagios_macros *mac, int set)
 		return OK;
 
 	for(x=0;x<MAX_CONTACT_ADDRESSES;x++){
-		asprintf(&varname,"CONTACTADDRESS%d",x);
+		if(asprintf(&varname,"CONTACTADDRESS%d",x)==-1){
+			logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
+			return ERROR;
+			}
 		set_macro_environment_var(varname,mac->contact_ptr->address[x],set);
 		my_free(varname);
 		}
@@ -3264,7 +3237,10 @@ int set_macro_environment_var(char *name, char *value, int set)
 		return ERROR;
 
 	/* create environment var name */
-	asprintf(&env_macro_name,"%s%s",MACRO_ENV_VAR_PREFIX,name);
+	if(asprintf(&env_macro_name,"%s%s",MACRO_ENV_VAR_PREFIX,name)==-1){
+		logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
+		return ERROR;
+		}
 
 	/* set or unset the environment variable */
 	set_environment_var(env_macro_name,value,set);
@@ -3274,5 +3250,3 @@ int set_macro_environment_var(char *name, char *value, int set)
 
 	return OK;
 }
-
-#endif

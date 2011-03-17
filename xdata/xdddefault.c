@@ -1,27 +1,22 @@
-/*****************************************************************************
- *
- * XDDDEFAULT.C - Default scheduled downtime data routines for Nagios
- *
- * Copyright (c) 2001-2007 Ethan Galstad (egalstad@nagios.org)
- * Last Modified:   09-04-2007
- *
- * License:
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2 as
- * published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
- *
- *****************************************************************************/
-
+/*
+** Copyright 2001-2007 Ethan Galstad
+** Copyright 2011      Merethis
+**
+** This file is part of Centreon Scheduler.
+**
+** Centreon Scheduler is free software: you can redistribute it and/or
+** modify it under the terms of the GNU General Public License version 2
+** as published by the Free Software Foundation.
+**
+** Centreon Scheduler is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+** General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with Centreon Scheduler. If not, see
+** <http://www.gnu.org/licenses/>.
+*/
 
 /*********** COMMON HEADER FILES ***********/
 
@@ -31,30 +26,17 @@
 #include "../include/downtime.h"
 #include "../include/macros.h"
 
-#ifdef NSCORE
 #include "../include/objects.h"
 #include "../include/nagios.h"
-#endif
-
-#ifdef NSCGI
-#include "../include/cgiutils.h"
-#endif
-
 
 /**** IMPLEMENTATION SPECIFIC HEADER FILES ****/
 #include "xdddefault.h"
 
 
 
-#ifdef NSCORE
 extern unsigned long next_downtime_id;
 extern scheduled_downtime *scheduled_downtime_list;
-#endif
 
-
-
-
-#ifdef NSCORE
 
 
 /******************************************************************/
@@ -65,6 +47,8 @@ extern scheduled_downtime *scheduled_downtime_list;
 /* initialize downtime data */
 int xdddefault_initialize_downtime_data(char *main_config_file){
 	scheduled_downtime *temp_downtime=NULL;
+
+	(void)main_config_file;
 
 	/* clean up the old downtime data */
 	xdddefault_validate_downtime_data();
@@ -148,6 +132,8 @@ int xdddefault_validate_downtime_data(void){
 
 /* removes invalid and old downtime entries from the downtime file */
 int xdddefault_cleanup_downtime_data(char *main_config_file){
+
+	(void)main_config_file;
 
 	/* we don't need to do any cleanup... */
 	return OK;
@@ -234,6 +220,8 @@ int xdddefault_delete_service_downtime(unsigned long downtime_id){
 
 /* deletes a scheduled host or service downtime entry */
 int xdddefault_delete_downtime(int type, unsigned long downtime_id){
+	(void)type;
+	(void)downtime_id;
 
 	/* rewrite the downtime file (downtime was already removed from memory) */
 	xdddefault_save_downtime_data();
@@ -253,7 +241,3 @@ int xdddefault_save_downtime_data(void){
 	/* don't update the status file now (too inefficent), let aggregated status updates do it */
 	return OK;
         }
-
-#endif
-
-

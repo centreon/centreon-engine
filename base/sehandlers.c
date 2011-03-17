@@ -1,26 +1,22 @@
-/*****************************************************************************
- *
- * SEHANDLERS.C - Service and host event and state handlers for Nagios
- *
- * Copyright (c) 1999-2010 Ethan Galstad (egalstad@nagios.org)
- * Last Modified:   08-05-2010
- *
- * License:
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2 as
- * published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
- *
- *****************************************************************************/
+/*
+** Copyright 1999-2010 Ethan Galstad
+** Copyright 2011      Merethis
+**
+** This file is part of Centreon Scheduler.
+**
+** Centreon Scheduler is free software: you can redistribute it and/or
+** modify it under the terms of the GNU General Public License version 2
+** as published by the Free Software Foundation.
+**
+** Centreon Scheduler is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+** General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with Centreon Scheduler. If not, see
+** <http://www.gnu.org/licenses/>.
+*/
 
 #include "../include/config.h"
 #include "../include/comments.h"
@@ -312,7 +308,10 @@ int run_global_service_event_handler(nagios_macros *mac, service *svc)
 	log_debug_info(DEBUGL_EVENTHANDLERS,2,"Processed global service event handler command line: %s\n",processed_command);
 
 	if(log_event_handlers==TRUE){
-		asprintf(&raw_logentry,"GLOBAL SERVICE EVENT HANDLER: %s;%s;$SERVICESTATE$;$SERVICESTATETYPE$;$SERVICEATTEMPT$;%s\n",svc->host_name,svc->description,global_service_event_handler);
+		if(asprintf(&raw_logentry,"GLOBAL SERVICE EVENT HANDLER: %s;%s;$SERVICESTATE$;$SERVICESTATETYPE$;$SERVICEATTEMPT$;%s\n",svc->host_name,svc->description,global_service_event_handler)==-1){
+			logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
+			return ERROR;
+			}
 		process_macros_r(mac, raw_logentry,&processed_logentry,macro_options);
 		logit(NSLOG_EVENT_HANDLER,FALSE,"%s",processed_logentry);
 		}
@@ -324,12 +323,13 @@ int run_global_service_event_handler(nagios_macros *mac, service *svc)
 	neb_result=broker_event_handler(NEBTYPE_EVENTHANDLER_START,NEBFLAG_NONE,NEBATTR_NONE,GLOBAL_SERVICE_EVENTHANDLER,(void *)svc,svc->current_state,svc->state_type,start_time,end_time,exectime,event_handler_timeout,early_timeout,result,global_service_event_handler,processed_command,NULL,NULL);
 
 	/* neb module wants to override (or cancel) the event handler - perhaps it will run the eventhandler itself */
-	if(neb_result==NEBERROR_CALLBACKOVERRIDE) {
+	if((neb_result==NEBERROR_CALLBACKCANCEL)
+	   ||(neb_result==NEBERROR_CALLBACKOVERRIDE)) {
 		my_free(processed_command);
 		my_free(raw_command);
 		my_free(raw_logentry);
 		my_free(processed_logentry);
-		return OK;
+		return (neb_result==NEBERROR_CALLBACKCANCEL)?ERROR:OK;
 	}
 #endif
 
@@ -413,7 +413,10 @@ int run_service_event_handler(nagios_macros *mac, service *svc)
 	log_debug_info(DEBUGL_EVENTHANDLERS,2,"Processed service event handler command line: %s\n",processed_command);
 
 	if(log_event_handlers==TRUE){
-		asprintf(&raw_logentry,"SERVICE EVENT HANDLER: %s;%s;$SERVICESTATE$;$SERVICESTATETYPE$;$SERVICEATTEMPT$;%s\n",svc->host_name,svc->description,svc->event_handler);
+		if(asprintf(&raw_logentry,"SERVICE EVENT HANDLER: %s;%s;$SERVICESTATE$;$SERVICESTATETYPE$;$SERVICEATTEMPT$;%s\n",svc->host_name,svc->description,svc->event_handler)==-1){
+			logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
+			return ERROR;
+			}
 		process_macros_r(mac, raw_logentry,&processed_logentry,macro_options);
 		logit(NSLOG_EVENT_HANDLER,FALSE,"%s",processed_logentry);
 		}
@@ -425,12 +428,13 @@ int run_service_event_handler(nagios_macros *mac, service *svc)
 	neb_result=broker_event_handler(NEBTYPE_EVENTHANDLER_START,NEBFLAG_NONE,NEBATTR_NONE,SERVICE_EVENTHANDLER,(void *)svc,svc->current_state,svc->state_type,start_time,end_time,exectime,event_handler_timeout,early_timeout,result,svc->event_handler,processed_command,NULL,NULL);
 
 	/* neb module wants to override (or cancel) the event handler - perhaps it will run the eventhandler itself */
-	if(neb_result==NEBERROR_CALLBACKOVERRIDE) {
+	if((neb_result==NEBERROR_CALLBACKCANCEL)
+	   ||(neb_result==NEBERROR_CALLBACKOVERRIDE)) {
 		my_free(processed_command);
 		my_free(raw_command);
 		my_free(raw_logentry);
 		my_free(processed_logentry);
-		return OK;
+		return (neb_result==NEBERROR_CALLBACKCANCEL)?ERROR:OK;
 	}
 #endif
 
@@ -562,7 +566,10 @@ int run_global_host_event_handler(nagios_macros *mac, host *hst)
 	log_debug_info(DEBUGL_EVENTHANDLERS,2,"Processed global host event handler command line: %s\n",processed_command);
 
 	if(log_event_handlers==TRUE){
-		asprintf(&raw_logentry,"GLOBAL HOST EVENT HANDLER: %s;$HOSTSTATE$;$HOSTSTATETYPE$;$HOSTATTEMPT$;%s\n",hst->name,global_host_event_handler);
+		if(asprintf(&raw_logentry,"GLOBAL HOST EVENT HANDLER: %s;$HOSTSTATE$;$HOSTSTATETYPE$;$HOSTATTEMPT$;%s\n",hst->name,global_host_event_handler)==-1){
+			logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
+			return ERROR;
+			}
 		process_macros_r(mac, raw_logentry,&processed_logentry,macro_options);
 		logit(NSLOG_EVENT_HANDLER,FALSE,"%s",processed_logentry);
 		}
@@ -574,12 +581,13 @@ int run_global_host_event_handler(nagios_macros *mac, host *hst)
 	neb_result=broker_event_handler(NEBTYPE_EVENTHANDLER_START,NEBFLAG_NONE,NEBATTR_NONE,GLOBAL_HOST_EVENTHANDLER,(void *)hst,hst->current_state,hst->state_type,start_time,end_time,exectime,event_handler_timeout,early_timeout,result,global_host_event_handler,processed_command,NULL,NULL);
 
 	/* neb module wants to override (or cancel) the event handler - perhaps it will run the eventhandler itself */
-	if(neb_result==NEBERROR_CALLBACKOVERRIDE) {
+	if((neb_result==NEBERROR_CALLBACKCANCEL)
+	   ||(neb_result==NEBERROR_CALLBACKOVERRIDE)) {
 		my_free(processed_command);
 		my_free(raw_command);
 		my_free(raw_logentry);
 		my_free(processed_logentry);
-		return OK;
+		return (neb_result==NEBERROR_CALLBACKCANCEL)?ERROR:OK;
 	}
 #endif
 
@@ -661,7 +669,10 @@ int run_host_event_handler(nagios_macros *mac, host *hst)
 	log_debug_info(DEBUGL_EVENTHANDLERS,2,"Processed host event handler command line: %s\n",processed_command);
 
 	if(log_event_handlers==TRUE){
-		asprintf(&raw_logentry,"HOST EVENT HANDLER: %s;$HOSTSTATE$;$HOSTSTATETYPE$;$HOSTATTEMPT$;%s\n",hst->name,hst->event_handler);
+		if(asprintf(&raw_logentry,"HOST EVENT HANDLER: %s;$HOSTSTATE$;$HOSTSTATETYPE$;$HOSTATTEMPT$;%s\n",hst->name,hst->event_handler)==-1){
+			logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
+			return ERROR;
+			}
 		process_macros_r(mac, raw_logentry,&processed_logentry,macro_options);
 		logit(NSLOG_EVENT_HANDLER,FALSE,"%s",processed_logentry);
 		}
@@ -673,12 +684,13 @@ int run_host_event_handler(nagios_macros *mac, host *hst)
 	neb_result=broker_event_handler(NEBTYPE_EVENTHANDLER_START,NEBFLAG_NONE,NEBATTR_NONE,HOST_EVENTHANDLER,(void *)hst,hst->current_state,hst->state_type,start_time,end_time,exectime,event_handler_timeout,early_timeout,result,hst->event_handler,processed_command,NULL,NULL);
 
 	/* neb module wants to override (or cancel) the event handler - perhaps it will run the eventhandler itself */
-	if(neb_result==NEBERROR_CALLBACKOVERRIDE) {
+	if((neb_result==NEBERROR_CALLBACKCANCEL)
+	   ||(neb_result==NEBERROR_CALLBACKOVERRIDE)) {
 		my_free(processed_command);
 		my_free(raw_command);
 		my_free(raw_logentry);
 		my_free(processed_logentry);
-		return OK;
+		return (neb_result==NEBERROR_CALLBACKCANCEL)?ERROR:OK;
 	}
 #endif
 

@@ -1,39 +1,29 @@
-/*****************************************************************************
- *
- * OBJECTS.C - Object addition and search functions for Nagios
- *
- * Copyright (c) 1999-2008 Ethan Galstad (egalstad@nagios.org)
- * Last Modified: 11-30-2008
- *
- * License:
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2 as
- * published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
- *
- *****************************************************************************/
+/*
+** Copyright 1999-2008 Ethan Galstad
+** Copyright 2011      Merethis
+**
+** This file is part of Centreon Scheduler.
+**
+** Centreon Scheduler is free software: you can redistribute it and/or
+** modify it under the terms of the GNU General Public License version 2
+** as published by the Free Software Foundation.
+**
+** Centreon Scheduler is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+** General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with Centreon Scheduler. If not, see
+** <http://www.gnu.org/licenses/>.
+*/
 
 #include "../include/config.h"
 #include "../include/common.h"
 #include "../include/objects.h"
 #include "../include/skiplist.h"
 
-#ifdef NSCORE
 #include "../include/nagios.h"
-#endif
-
-#ifdef NSCGI
-#include "../include/cgiutils.h"
-#endif
 
 /**** IMPLEMENTATION-SPECIFIC HEADER FILES ****/
 
@@ -58,10 +48,8 @@ hostescalation  *hostescalation_list=NULL,*hostescalation_list_tail=NULL;
 skiplist *object_skiplists[NUM_OBJECT_SKIPLISTS];
 
 
-#ifdef NSCORE
 int __nagios_object_structure_version=CURRENT_OBJECT_STRUCTURE_VERSION;
 extern int use_precached_objects;
-#endif
 
 
 
@@ -498,11 +486,11 @@ timerange *add_timerange_to_timeperiod(timeperiod *period, int day, unsigned lon
 		logit(NSLOG_CONFIG_ERROR,TRUE,"Error: Day %d is not valid for timeperiod '%s'\n",day,period->name);
 		return NULL;
 	        }
-	if(start_time<0 || start_time>86400){
+	if(start_time>86400){
 		logit(NSLOG_CONFIG_ERROR,TRUE,"Error: Start time %lu on day %d is not valid for timeperiod '%s'\n",start_time,day,period->name);
 		return NULL;
 	        }
-	if(end_time<0 || end_time>86400){
+	if(end_time>86400){
 		logit(NSLOG_CONFIG_ERROR,TRUE,"Error: End time %lu on day %d is not value for timeperiod '%s'\n",end_time,day,period->name);
 		return NULL;
 	        }
@@ -567,11 +555,11 @@ timerange *add_timerange_to_daterange(daterange *drange, unsigned long start_tim
 	if(drange==NULL)
 		return NULL;
 
-	if(start_time<0 || start_time>86400){
+	if(start_time>86400){
 		logit(NSLOG_CONFIG_ERROR,TRUE,"Error: Start time %lu is not valid for timeperiod\n",start_time);
 		return NULL;
 	        }
-	if(end_time<0 || end_time>86400){
+	if(end_time>86400){
 		logit(NSLOG_CONFIG_ERROR,TRUE,"Error: End time %lu is not value for timeperiod\n",end_time);
 		return NULL;
 	        }
@@ -596,9 +584,7 @@ timerange *add_timerange_to_daterange(daterange *drange, unsigned long start_tim
 host *add_host(char *name, char *display_name, char *alias, char *address, char *check_period, int initial_state, double check_interval, double retry_interval, int max_attempts, int notify_up, int notify_down, int notify_unreachable, int notify_flapping, int notify_downtime, double notification_interval, double first_notification_delay, char *notification_period, int notifications_enabled, char *check_command, int checks_enabled, int accept_passive_checks, char *event_handler, int event_handler_enabled, int flap_detection_enabled, double low_flap_threshold, double high_flap_threshold, int flap_detection_on_up, int flap_detection_on_down, int flap_detection_on_unreachable, int stalk_on_up, int stalk_on_down, int stalk_on_unreachable, int process_perfdata, int failure_prediction_enabled, char *failure_prediction_options, int check_freshness, int freshness_threshold, char *notes, char *notes_url, char *action_url, char *icon_image, char *icon_image_alt, char *vrml_image, char *statusmap_image, int x_2d, int y_2d, int have_2d_coords, double x_3d, double y_3d, double z_3d, int have_3d_coords, int should_be_drawn, int retain_status_information, int retain_nonstatus_information, int obsess_over_host){
 	host *new_host=NULL;
 	int result=OK;
-#ifdef NSCORE
 	int x=0;
-#endif
 
 	/* make sure we have the data we need */
 	if((name==NULL || !strcmp(name,"")) || (address==NULL || !strcmp(address,""))){
@@ -729,7 +715,6 @@ host *add_host(char *name, char *display_name, char *alias, char *address, char 
 	new_host->obsess_over_host=(obsess_over_host>0)?TRUE:FALSE;
 	new_host->retain_status_information=(retain_status_information>0)?TRUE:FALSE;
 	new_host->retain_nonstatus_information=(retain_nonstatus_information>0)?TRUE:FALSE;
-#ifdef NSCORE
 	new_host->current_state=initial_state;
 	new_host->current_event_id=0L;
 	new_host->last_event_id=0L;
@@ -779,7 +764,6 @@ host *add_host(char *name, char *display_name, char *alias, char *address, char 
 	new_host->modified_attributes=MODATTR_NONE;
 	new_host->circular_path_checked=FALSE;
 	new_host->contains_circular_path=FALSE;
-#endif
 
 	/* add new host to skiplist */
 	if(result==OK){
@@ -801,11 +785,9 @@ host *add_host(char *name, char *display_name, char *alias, char *address, char 
 
 	/* handle errors */
 	if(result==ERROR){
-#ifdef NSCORE
 		my_free(new_host->plugin_output);
 		my_free(new_host->long_plugin_output);
 		my_free(new_host->perf_data);
-#endif
 		my_free(new_host->statusmap_image);
 		my_free(new_host->vrml_image);
 		my_free(new_host->icon_image_alt);
@@ -894,9 +876,7 @@ hostsmember *add_child_link_to_host(host *hst, host *child_ptr){
 
 	/* initialize values */
 	new_hostsmember->host_name=NULL;
-#ifdef NSCORE
 	new_hostsmember->host_ptr=child_ptr;
-#endif
 
 	/* add the child entry to the host definition */
 	new_hostsmember->next=hst->child_hosts;
@@ -919,9 +899,7 @@ servicesmember *add_service_link_to_host(host *hst, service *service_ptr){
 		return NULL;
 
 	/* initialize values */
-#ifdef NSCORE
 	new_servicesmember->service_ptr=service_ptr;
-#endif
 
 	/* add the child entry to the host definition */
 	new_servicesmember->next=hst->services;
@@ -1315,7 +1293,6 @@ contact *add_contact(char *name,char *alias, char *email, char *pager, char **ad
 	new_contact->can_submit_commands=(can_submit_commands>0)?TRUE:FALSE;
 	new_contact->retain_status_information=(retain_status_information>0)?TRUE:FALSE;
 	new_contact->retain_nonstatus_information=(retain_nonstatus_information>0)?TRUE:FALSE;
-#ifdef NSCORE
 	new_contact->last_host_notification=(time_t)0L;
 	new_contact->last_service_notification=(time_t)0L;
 	new_contact->modified_attributes=MODATTR_NONE;
@@ -1325,7 +1302,6 @@ contact *add_contact(char *name,char *alias, char *email, char *pager, char **ad
 	new_contact->host_notification_period_ptr=NULL;
 	new_contact->service_notification_period_ptr=NULL;
 	new_contact->contactgroups_ptr=NULL;
-#endif
 
 	/* add new contact to skiplist */
 	if(result==OK){
@@ -1390,12 +1366,12 @@ commandsmember *add_host_notification_command_to_contact(contact *cntct,char *co
 		return NULL;
 
 	/* duplicate vars */
-	if((new_commandsmember->command=(char *)strdup(command_name))==NULL)
+	if((new_commandsmember->cmd=(char *)strdup(command_name))==NULL)
 		result=ERROR;
 
 	/* handle errors */
 	if(result==ERROR){
-		my_free(new_commandsmember->command);
+		my_free(new_commandsmember->cmd);
 		my_free(new_commandsmember);
 		return NULL;
 	        }
@@ -1425,12 +1401,12 @@ commandsmember *add_service_notification_command_to_contact(contact *cntct,char 
 		return NULL;
 
 	/* duplicate vars */
-	if((new_commandsmember->command=(char *)strdup(command_name))==NULL)
+	if((new_commandsmember->cmd=(char *)strdup(command_name))==NULL)
 		result=ERROR;
 
 	/* handle errors */
 	if(result==ERROR){
-		my_free(new_commandsmember->command);
+		my_free(new_commandsmember->cmd);
 		my_free(new_commandsmember);
 		return NULL;
 	        }
@@ -1553,9 +1529,7 @@ contactsmember *add_contact_to_contactgroup(contactgroup *grp, char *contact_nam
 service *add_service(char *host_name, char *description, char *display_name, char *check_period, int initial_state, int max_attempts, int parallelize, int accept_passive_checks, double check_interval, double retry_interval, double notification_interval, double first_notification_delay, char *notification_period, int notify_recovery, int notify_unknown, int notify_warning, int notify_critical, int notify_flapping, int notify_downtime, int notifications_enabled, int is_volatile, char *event_handler, int event_handler_enabled, char *check_command, int checks_enabled, int flap_detection_enabled, double low_flap_threshold, double high_flap_threshold, int flap_detection_on_ok, int flap_detection_on_warning, int flap_detection_on_unknown, int flap_detection_on_critical, int stalk_on_ok, int stalk_on_warning, int stalk_on_unknown, int stalk_on_critical, int process_perfdata, int failure_prediction_enabled, char *failure_prediction_options, int check_freshness, int freshness_threshold, char *notes, char *notes_url, char *action_url, char *icon_image, char *icon_image_alt, int retain_status_information, int retain_nonstatus_information, int obsess_over_service){
 	service *new_service=NULL;
 	int result=OK;
-#ifdef NSCORE
 	int x=0;
-#endif
 
 	/* make sure we have everything we need */
 	if((host_name==NULL || !strcmp(host_name,"")) || (description==NULL || !strcmp(description,"")) || (check_command==NULL || !strcmp(check_command,""))){
@@ -1659,7 +1633,6 @@ service *add_service(char *host_name, char *description, char *display_name, cha
 	new_service->notifications_enabled=(notifications_enabled>0)?TRUE:FALSE;
 	new_service->obsess_over_service=(obsess_over_service>0)?TRUE:FALSE;
 	new_service->failure_prediction_enabled=(failure_prediction_enabled>0)?TRUE:FALSE;
-#ifdef NSCORE
 	new_service->problem_has_been_acknowledged=FALSE;
 	new_service->acknowledgement_type=ACKNOWLEDGEMENT_NONE;
 	new_service->check_type=SERVICE_CHECK_ACTIVE;
@@ -1706,7 +1679,6 @@ service *add_service(char *host_name, char *description, char *display_name, cha
 	new_service->flapping_comment_id=0;
 	new_service->percent_state_change=0.0;
 	new_service->modified_attributes=MODATTR_NONE;
-#endif
 
 	/* add new service to skiplist */
 	if(result==OK){
@@ -1728,11 +1700,9 @@ service *add_service(char *host_name, char *description, char *display_name, cha
 
 	/* handle errors */
 	if(result==ERROR){
-#ifdef NSCORE
 		my_free(new_service->perf_data);
 		my_free(new_service->plugin_output);
 		my_free(new_service->long_plugin_output);
-#endif
 		my_free(new_service->failure_prediction_options);
 		my_free(new_service->notification_period);
 		my_free(new_service->event_handler);
@@ -2028,10 +1998,8 @@ servicedependency *add_service_dependency(char *dependent_host_name, char *depen
 	new_servicedependency->fail_on_unknown=(fail_on_unknown==1)?TRUE:FALSE;
 	new_servicedependency->fail_on_critical=(fail_on_critical==1)?TRUE:FALSE;
 	new_servicedependency->fail_on_pending=(fail_on_pending==1)?TRUE:FALSE;
-#ifdef NSCORE
 	new_servicedependency->circular_path_checked=FALSE;
 	new_servicedependency->contains_circular_path=FALSE;
-#endif
 
 	/* add new service dependency to skiplist */
 	if(result==OK){
@@ -2102,10 +2070,8 @@ hostdependency *add_host_dependency(char *dependent_host_name, char *host_name, 
 	new_hostdependency->fail_on_down=(fail_on_down==1)?TRUE:FALSE;
 	new_hostdependency->fail_on_unreachable=(fail_on_unreachable==1)?TRUE:FALSE;
 	new_hostdependency->fail_on_pending=(fail_on_pending==1)?TRUE:FALSE;
-#ifdef NSCORE
 	new_hostdependency->circular_path_checked=FALSE;
 	new_hostdependency->contains_circular_path=FALSE;
-#endif
 
 	/* add new host dependency to skiplist */
 	if(result==OK){
@@ -2285,9 +2251,7 @@ contactsmember *add_contact_to_object(contactsmember **object_ptr, char *contact
 	        }
 
 	/* set initial values */
-#ifdef NSCORE
 	new_contactsmember->contact_ptr=NULL;
-#endif
 
 	/* add the new contact to the head of the contact list */
 	new_contactsmember->next=*object_ptr;
@@ -2564,7 +2528,6 @@ servicedependency *get_next_servicedependency_by_dependent_service(char *host_na
         }
 
 
-#ifdef NSCORE
 /* adds a object to a list of objects */
 int add_object_to_objectlist(objectlist **list, void *object_ptr){
 	objectlist *temp_item=NULL;
@@ -2615,7 +2578,6 @@ int free_objectlist(objectlist **temp_list){
 
 	return OK;
         }
-#endif
 
 
 
@@ -2641,13 +2603,8 @@ int is_host_immediate_child_of_host(host *parent_host,host *child_host){
 	else{
 
 		for(temp_hostsmember=child_host->parent_hosts;temp_hostsmember!=NULL;temp_hostsmember=temp_hostsmember->next){
-#ifdef NSCORE
 			if(temp_hostsmember->host_ptr==parent_host)
 				return TRUE;
-#else
-			if(!strcmp(temp_hostsmember->host_name,parent_host->name))
-				return TRUE;
-#endif
 		        }
 	        }
 
@@ -2736,13 +2693,8 @@ int is_host_member_of_hostgroup(hostgroup *group, host *hst){
 		return FALSE;
 
 	for(temp_hostsmember=group->members;temp_hostsmember!=NULL;temp_hostsmember=temp_hostsmember->next){
-#ifdef NSCORE
 		if(temp_hostsmember->host_ptr==hst)
 			return TRUE;
-#else
-		if(!strcmp(temp_hostsmember->host_name,hst->name))
-			return TRUE;
-#endif
 	        }
 
 	return FALSE;
@@ -2758,13 +2710,8 @@ int is_host_member_of_servicegroup(servicegroup *group, host *hst){
 		return FALSE;
 
 	for(temp_servicesmember=group->members;temp_servicesmember!=NULL;temp_servicesmember=temp_servicesmember->next){
-#ifdef NSCORE
 		if(temp_servicesmember->service_ptr!=NULL && temp_servicesmember->service_ptr->host_ptr==hst)
 			return TRUE;
-#else
-		if(!strcmp(temp_servicesmember->host_name,hst->name))
-			return TRUE;
-#endif
 	        }
 
 	return FALSE;
@@ -2780,13 +2727,8 @@ int is_service_member_of_servicegroup(servicegroup *group, service *svc){
 		return FALSE;
 
 	for(temp_servicesmember=group->members;temp_servicesmember!=NULL;temp_servicesmember=temp_servicesmember->next){
-#ifdef NSCORE
 		if(temp_servicesmember->service_ptr==svc)
 			return TRUE;
-#else
-		if(!strcmp(temp_servicesmember->host_name,svc->host_name) && !strcmp(temp_servicesmember->service_description,svc->description))
-			return TRUE;
-#endif
 	        }
 
 	return FALSE;
@@ -2810,11 +2752,7 @@ int is_contact_member_of_contactgroup(contactgroup *group, contact *cntct)
 
 	/* search all contacts in this contact group */
 	for (member = group->members; member; member = member->next) {
-#ifdef NSCORE
 		temp_contact=member->contact_ptr;
-#else
-		temp_contact=find_contact(member->contact_name);
-#endif
 		if(temp_contact==NULL)
 			continue;
 		if (temp_contact == cntct)
@@ -2837,11 +2775,7 @@ int is_contact_for_host(host *hst, contact *cntct){
 
 	/* search all individual contacts of this host */
 	for(temp_contactsmember=hst->contacts;temp_contactsmember!=NULL;temp_contactsmember=temp_contactsmember->next){
-#ifdef NSCORE
 		temp_contact=temp_contactsmember->contact_ptr;
-#else
-		temp_contact=find_contact(temp_contactsmember->contact_name);
-#endif
 		if(temp_contact==NULL)
 			continue;
 		if(temp_contact==cntct)
@@ -2850,11 +2784,7 @@ int is_contact_for_host(host *hst, contact *cntct){
 
 	/* search all contactgroups of this host */
 	for(temp_contactgroupsmember=hst->contact_groups;temp_contactgroupsmember!=NULL;temp_contactgroupsmember=temp_contactgroupsmember->next){
-#ifdef NSCORE
 		temp_contactgroup=temp_contactgroupsmember->group_ptr;
-#else
-		temp_contactgroup=find_contactgroup(temp_contactgroupsmember->group_name);
-#endif
 		if(temp_contactgroup==NULL)
 			continue;
 		if(is_contact_member_of_contactgroup(temp_contactgroup,cntct))
@@ -2881,11 +2811,7 @@ int is_escalated_contact_for_host(host *hst, contact *cntct){
 
 		/* search all contacts of this host escalation */
 		for(temp_contactsmember=temp_hostescalation->contacts;temp_contactsmember!=NULL;temp_contactsmember=temp_contactsmember->next){
-#ifdef NSCORE
 			temp_contact=temp_contactsmember->contact_ptr;
-#else
-			temp_contact=find_contact(temp_contactsmember->contact_name);
-#endif
 			if(temp_contact==NULL)
 				continue;
 			if(temp_contact==cntct)
@@ -2894,11 +2820,7 @@ int is_escalated_contact_for_host(host *hst, contact *cntct){
 		
 		/* search all contactgroups of this host escalation */
 		for(temp_contactgroupsmember=temp_hostescalation->contact_groups;temp_contactgroupsmember!=NULL;temp_contactgroupsmember=temp_contactgroupsmember->next){
-#ifdef NSCORE
 			temp_contactgroup=temp_contactgroupsmember->group_ptr;
-#else
-			temp_contactgroup=find_contactgroup(temp_contactgroupsmember->group_name);
-#endif
 			if(temp_contactgroup==NULL)
 				continue;
 			if(is_contact_member_of_contactgroup(temp_contactgroup,cntct))
@@ -2923,11 +2845,7 @@ int is_contact_for_service(service *svc, contact *cntct){
 
 	/* search all individual contacts of this service */
 	for(temp_contactsmember=svc->contacts;temp_contactsmember!=NULL;temp_contactsmember=temp_contactsmember->next){
-#ifdef NSCORE
 		temp_contact=temp_contactsmember->contact_ptr;
-#else
-		temp_contact=find_contact(temp_contactsmember->contact_name);
-#endif
 		
 		if(temp_contact==cntct)
 			return TRUE;
@@ -2935,11 +2853,7 @@ int is_contact_for_service(service *svc, contact *cntct){
 
 	/* search all contactgroups of this service */
 	for(temp_contactgroupsmember=svc->contact_groups;temp_contactgroupsmember!=NULL;temp_contactgroupsmember=temp_contactgroupsmember->next){
-#ifdef NSCORE
 		temp_contactgroup=temp_contactgroupsmember->group_ptr;
-#else
-		temp_contactgroup=find_contactgroup(temp_contactgroupsmember->group_name);
-#endif
 		if(temp_contactgroup==NULL)
 			continue;
 		if(is_contact_member_of_contactgroup(temp_contactgroup,cntct))
@@ -2966,11 +2880,7 @@ int is_escalated_contact_for_service(service *svc, contact *cntct){
 
 		/* search all contacts of this service escalation */
 		for(temp_contactsmember=temp_serviceescalation->contacts;temp_contactsmember!=NULL;temp_contactsmember=temp_contactsmember->next){
-#ifdef NSCORE
 			temp_contact=temp_contactsmember->contact_ptr;
-#else
-			temp_contact=find_contact(temp_contactsmember->contact_name);
-#endif
 			if(temp_contact==NULL)
 				continue;
 			if(temp_contact==cntct)
@@ -2979,11 +2889,7 @@ int is_escalated_contact_for_service(service *svc, contact *cntct){
 		
 		/* search all contactgroups of this service escalation */
 		for(temp_contactgroupsmember=temp_serviceescalation->contact_groups;temp_contactgroupsmember!=NULL;temp_contactgroupsmember=temp_contactgroupsmember->next){
-#ifdef NSCORE
 			temp_contactgroup=temp_contactgroupsmember->group_ptr;
-#else
-			temp_contactgroup=find_contactgroup(temp_contactgroupsmember->group_name);
-#endif
 			if(temp_contactgroup==NULL)
 				continue;
 			if(is_contact_member_of_contactgroup(temp_contactgroup,cntct))
@@ -2994,8 +2900,6 @@ int is_escalated_contact_for_service(service *svc, contact *cntct){
 	return FALSE;
         }
 
-
-#ifdef NSCORE
 
 /* checks to see if there exists a circular dependency for a service */
 int check_for_circular_servicedependency_path(servicedependency *root_dep, servicedependency *dep, int dependency_type){
@@ -3097,8 +3001,6 @@ int check_for_circular_hostdependency_path(hostdependency *root_dep, hostdepende
 
 	return FALSE;
         }
-
-#endif
 
 
 
@@ -3266,13 +3168,11 @@ int free_object_data(void){
 		my_free(this_host->display_name);
 		my_free(this_host->alias);
 		my_free(this_host->address);
-#ifdef NSCORE
 		my_free(this_host->plugin_output);
 		my_free(this_host->long_plugin_output);
 		my_free(this_host->perf_data);
 
 		free_objectlist(&this_host->hostgroups_ptr);
-#endif
 		my_free(this_host->check_period);
 		my_free(this_host->host_check_command);
 		my_free(this_host->event_handler);
@@ -3356,8 +3256,8 @@ int free_object_data(void){
 		this_commandsmember=this_contact->host_notification_commands;
 		while(this_commandsmember!=NULL){
 			next_commandsmember=this_commandsmember->next;
-			if(this_commandsmember->command!=NULL)
-				my_free(this_commandsmember->command);
+			if(this_commandsmember->cmd!=NULL)
+				my_free(this_commandsmember->cmd);
 			my_free(this_commandsmember);
 			this_commandsmember=next_commandsmember;
 		        }
@@ -3366,8 +3266,8 @@ int free_object_data(void){
 		this_commandsmember=this_contact->service_notification_commands;
 		while(this_commandsmember!=NULL){
 			next_commandsmember=this_commandsmember->next;
-			if(this_commandsmember->command!=NULL)
-				my_free(this_commandsmember->command);
+			if(this_commandsmember->cmd!=NULL)
+				my_free(this_commandsmember->cmd);
 			my_free(this_commandsmember);
 			this_commandsmember=next_commandsmember;
 		        }
@@ -3392,9 +3292,7 @@ int free_object_data(void){
 		my_free(this_contact->host_notification_period);
 		my_free(this_contact->service_notification_period);
 
-#ifdef NSCORE
 		free_objectlist(&this_contact->contactgroups_ptr);
-#endif
 
 		my_free(this_contact);
 		this_contact=next_contact;
@@ -3466,7 +3364,6 @@ int free_object_data(void){
 		my_free(this_service->description);
 		my_free(this_service->display_name);
 		my_free(this_service->service_check_command);
-#ifdef NSCORE
 		my_free(this_service->plugin_output);
 		my_free(this_service->long_plugin_output);
 		my_free(this_service->perf_data);
@@ -3475,7 +3372,6 @@ int free_object_data(void){
 		my_free(this_service->check_command_args);
 
 		free_objectlist(&this_service->servicegroups_ptr);
-#endif
 		my_free(this_service->notification_period);
 		my_free(this_service->check_period);
 		my_free(this_service->event_handler);

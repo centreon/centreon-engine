@@ -16,7 +16,6 @@
 * 
 *****************************************************************************/
 
-#define NSCORE 1
 #include "config.h"
 #include "nagios.h"
 #include "objects.h"

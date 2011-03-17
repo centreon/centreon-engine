@@ -1,27 +1,22 @@
-/*****************************************************************************
- *
- * XCDDEFAULT.C - Default external comment data routines for Nagios
- *
- * Copyright (c) 2000-2007 Ethan Galstad (egalstad@nagios.org)
- * Last Modified:   09-04-2007
- *
- * License:
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2 as
- * published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
- *
- *****************************************************************************/
-
+/*
+** Copyright 2000-2007 Ethan Galstad
+** Copyright 2011      Merethis
+**
+** This file is part of Centreon Scheduler.
+**
+** Centreon Scheduler is free software: you can redistribute it and/or
+** modify it under the terms of the GNU General Public License version 2
+** as published by the Free Software Foundation.
+**
+** Centreon Scheduler is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+** General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with Centreon Scheduler. If not, see
+** <http://www.gnu.org/licenses/>.
+*/
 
 /*********** COMMON HEADER FILES ***********/
 
@@ -31,28 +26,17 @@
 #include "../include/comments.h"
 #include "../include/macros.h"
 
-#ifdef NSCORE
 #include "../include/objects.h"
 #include "../include/nagios.h"
-#endif
-
-#ifdef NSCGI
-#include "../include/cgiutils.h"
-#endif
-
 
 /**** IMPLEMENTATION SPECIFIC HEADER FILES ****/
 #include "xcddefault.h"
 
 
-#ifdef NSCORE
 extern unsigned long next_comment_id;
 extern comment *comment_list;
-#endif
 
 
-
-#ifdef NSCORE
 
 /******************************************************************/
 /************ COMMENT INITIALIZATION/CLEANUP FUNCTIONS ************/
@@ -62,6 +46,8 @@ extern comment *comment_list;
 /* initialize comment data */
 int xcddefault_initialize_comment_data(char *main_config_file){
 	comment *temp_comment=NULL;
+
+	(void)main_config_file;
 
 	/* find the new starting index for comment id if its missing*/
 	if(next_comment_id==0L){
@@ -81,6 +67,7 @@ int xcddefault_initialize_comment_data(char *main_config_file){
 
 /* removes invalid and old comments from the comment file */
 int xcddefault_cleanup_comment_data(char *main_config_file){
+	(void)main_config_file;
 
 	/* nothing to do anymore */
 
@@ -152,6 +139,7 @@ int xcddefault_add_new_service_comment(int entry_type, char *host_name, char *sv
 
 /* deletes a host comment */
 int xcddefault_delete_host_comment(unsigned long comment_id){
+	(void)comment_id;
 
 	/* update comment file */
 	xcddefault_save_comment_data();
@@ -162,6 +150,7 @@ int xcddefault_delete_host_comment(unsigned long comment_id){
 
 /* deletes a service comment */
 int xcddefault_delete_service_comment(unsigned long comment_id){
+	(void)comment_id;
 
 	/* update comment file */
 	xcddefault_save_comment_data();
@@ -181,6 +170,3 @@ int xcddefault_save_comment_data(void){
 	/* don't update the status file now (too inefficent), let aggregated status updates do it */
 	return OK;
         }
-
-#endif
-

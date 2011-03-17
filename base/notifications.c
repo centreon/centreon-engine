@@ -1,27 +1,23 @@
-/*****************************************************************************
- *
- * NOTIFICATIONS.C - Service and host notification functions for Nagios
- *
- * Copyright (c) 2009-2010 Nagios Core Development Team and Community Contributors
- * Copyright (c) 1999-2008 Ethan Galstad (egalstad@nagios.org)
- * Last Modified: 08-04-2010
- *
- * License:
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2 as
- * published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
- *
- *****************************************************************************/
+/*
+** Copyright 1999-2008 Ethan Galstad
+** Copyright 2009-2010 Nagios Core Development Team and Community Contributors
+** Copyright 2011      Merethis
+**
+** This file is part of Centreon Scheduler.
+**
+** Centreon Scheduler is free software: you can redistribute it and/or
+** modify it under the terms of the GNU General Public License version 2
+** as published by the Free Software Foundation.
+**
+** Centreon Scheduler is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+** General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with Centreon Scheduler. If not, see
+** <http://www.gnu.org/licenses/>.
+*/
 
 #include "../include/config.h"
 #include "../include/common.h"
@@ -205,7 +201,19 @@ int service_notification(service *svc, int type, char *not_author, char *not_dat
 
 		/* set the notification number macro */
 		my_free(mac->x[MACRO_SERVICENOTIFICATIONNUMBER]);
-		asprintf(&mac->x[MACRO_SERVICENOTIFICATIONNUMBER],"%d",svc->current_notification_number);
+		if(asprintf(&mac->x[MACRO_SERVICENOTIFICATIONNUMBER],"%d",svc->current_notification_number)==-1){
+			logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
+			my_free(mac->x[MACRO_NOTIFICATIONAUTHOR]);
+			my_free(mac->x[MACRO_NOTIFICATIONAUTHORNAME]);
+			my_free(mac->x[MACRO_NOTIFICATIONAUTHORALIAS]);
+			my_free(mac->x[MACRO_NOTIFICATIONCOMMENT]);
+			my_free(mac->x[MACRO_SERVICEACKAUTHOR]);
+			my_free(mac->x[MACRO_SERVICEACKCOMMENT]);
+			my_free(mac->x[MACRO_SERVICEACKAUTHORNAME]);
+			my_free(mac->x[MACRO_SERVICEACKAUTHORALIAS]);
+			my_free(mac->x[MACRO_NOTIFICATIONTYPE]);
+			return ERROR;
+			}
 
 		/* the $NOTIFICATIONNUMBER$ macro is maintained for backward compatability */
 		my_free(mac->x[MACRO_NOTIFICATIONNUMBER]);
@@ -213,19 +221,32 @@ int service_notification(service *svc, int type, char *not_author, char *not_dat
 
 		/* set the notification id macro */
 		my_free(mac->x[MACRO_SERVICENOTIFICATIONID]);
-		asprintf(&mac->x[MACRO_SERVICENOTIFICATIONID],"%lu",svc->current_notification_id);
+		if(asprintf(&mac->x[MACRO_SERVICENOTIFICATIONID],"%lu",svc->current_notification_id)==-1){
+			logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
+			my_free(mac->x[MACRO_NOTIFICATIONAUTHOR]);
+			my_free(mac->x[MACRO_NOTIFICATIONAUTHORNAME]);
+			my_free(mac->x[MACRO_NOTIFICATIONAUTHORALIAS]);
+			my_free(mac->x[MACRO_NOTIFICATIONCOMMENT]);
+			my_free(mac->x[MACRO_SERVICEACKAUTHOR]);
+			my_free(mac->x[MACRO_SERVICEACKCOMMENT]);
+			my_free(mac->x[MACRO_SERVICEACKAUTHORNAME]);
+			my_free(mac->x[MACRO_SERVICEACKAUTHORALIAS]);
+			my_free(mac->x[MACRO_NOTIFICATIONTYPE]);
+			my_free(mac->x[MACRO_NOTIFICATIONNUMBER]);
+			return ERROR;
+			}
 
 		/* notify each contact (duplicates have been removed) */
 		for(temp_notification=notification_list;temp_notification!=NULL;temp_notification=temp_notification->next){
 
 			/* grab the macro variables for this contact */
-			grab_contact_macros(mac, temp_notification->contact);
+			grab_contact_macros(mac, temp_notification->cntct);
 
 			/* clear summary macros (they are customized for each contact) */
 			clear_summary_macros(mac);
 
 			/* notify this contact */
-			result=notify_contact_of_service(mac, temp_notification->contact,svc,type,not_author,not_data,options,escalated);
+			result=notify_contact_of_service(mac, temp_notification->cntct,svc,type,not_author,not_data,options,escalated);
 
 			/* keep track of how many contacts were notified */
 			if(result==OK)
@@ -689,6 +710,7 @@ int notify_contact_of_service(nagios_macros *mac, contact *cntct, service *svc, 
 	struct timeval method_start_time,method_end_time;
 	int macro_options=STRIP_ILLEGAL_MACRO_CHARS|ESCAPE_MACRO_CHARS;
 	int neb_result;
+	int ret = 0;
 
 
 	log_debug_info(DEBUGL_FUNCTIONS,0,"notify_contact_of_service()\n");
@@ -725,7 +747,7 @@ int notify_contact_of_service(nagios_macros *mac, contact *cntct, service *svc, 
 		/* send data to event broker */
 		method_end_time.tv_sec=0L;
 		method_end_time.tv_usec=0L;
-		neb_result=broker_contact_notification_method_data(NEBTYPE_CONTACTNOTIFICATIONMETHOD_START,NEBFLAG_NONE,NEBATTR_NONE,SERVICE_NOTIFICATION,type,method_start_time,method_end_time,(void *)svc,cntct,temp_commandsmember->command,not_author,not_data,escalated,NULL);
+		neb_result=broker_contact_notification_method_data(NEBTYPE_CONTACTNOTIFICATIONMETHOD_START,NEBFLAG_NONE,NEBATTR_NONE,SERVICE_NOTIFICATION,type,method_start_time,method_end_time,(void *)svc,cntct,temp_commandsmember->cmd,not_author,not_data,escalated,NULL);
 		if(NEBERROR_CALLBACKCANCEL==neb_result)
 			break ;
 		else if(NEBERROR_CALLBACKOVERRIDE==neb_result)
@@ -733,7 +755,7 @@ int notify_contact_of_service(nagios_macros *mac, contact *cntct, service *svc, 
 #endif
 
 		/* get the raw command line */
-		get_raw_command_line_r(mac, temp_commandsmember->command_ptr,temp_commandsmember->command,&raw_command,macro_options);
+		get_raw_command_line_r(mac, temp_commandsmember->command_ptr,temp_commandsmember->cmd,&raw_command,macro_options);
 		if(raw_command==NULL)
 			continue;
 
@@ -745,7 +767,7 @@ int notify_contact_of_service(nagios_macros *mac, contact *cntct, service *svc, 
 			continue;
 
 		/* get the command name */
-		command_name=(char *)strdup(temp_commandsmember->command);
+		command_name=(char *)strdup(temp_commandsmember->cmd);
 		command_name_ptr=strtok(command_name,"!");
 
 		/* run the notification command... */
@@ -756,32 +778,43 @@ int notify_contact_of_service(nagios_macros *mac, contact *cntct, service *svc, 
 		if(log_notifications==TRUE){
 			switch(type){
 			case NOTIFICATION_CUSTOM:
-				asprintf(&temp_buffer,"SERVICE NOTIFICATION: %s;%s;%s;CUSTOM ($SERVICESTATE$);%s;$SERVICEOUTPUT$;$NOTIFICATIONAUTHOR$;$NOTIFICATIONCOMMENT$\n",cntct->name,svc->host_name,svc->description,command_name_ptr);
+				ret=asprintf(&temp_buffer,"SERVICE NOTIFICATION: %s;%s;%s;CUSTOM ($SERVICESTATE$);%s;$SERVICEOUTPUT$;$NOTIFICATIONAUTHOR$;$NOTIFICATIONCOMMENT$\n",cntct->name,svc->host_name,svc->description,command_name_ptr);
 				break;
 			case NOTIFICATION_ACKNOWLEDGEMENT:
-				asprintf(&temp_buffer,"SERVICE NOTIFICATION: %s;%s;%s;ACKNOWLEDGEMENT ($SERVICESTATE$);%s;$SERVICEOUTPUT$;$NOTIFICATIONAUTHOR$;$NOTIFICATIONCOMMENT$\n",cntct->name,svc->host_name,svc->description,command_name_ptr);
+				ret=asprintf(&temp_buffer,"SERVICE NOTIFICATION: %s;%s;%s;ACKNOWLEDGEMENT ($SERVICESTATE$);%s;$SERVICEOUTPUT$;$NOTIFICATIONAUTHOR$;$NOTIFICATIONCOMMENT$\n",cntct->name,svc->host_name,svc->description,command_name_ptr);
 				break;
 			case NOTIFICATION_FLAPPINGSTART:
-				asprintf(&temp_buffer,"SERVICE NOTIFICATION: %s;%s;%s;FLAPPINGSTART ($SERVICESTATE$);%s;$SERVICEOUTPUT$\n",cntct->name,svc->host_name,svc->description,command_name_ptr);
+				ret=asprintf(&temp_buffer,"SERVICE NOTIFICATION: %s;%s;%s;FLAPPINGSTART ($SERVICESTATE$);%s;$SERVICEOUTPUT$\n",cntct->name,svc->host_name,svc->description,command_name_ptr);
 				break;
 			case NOTIFICATION_FLAPPINGSTOP:
-				asprintf(&temp_buffer,"SERVICE NOTIFICATION: %s;%s;%s;FLAPPINGSTOP ($SERVICESTATE$);%s;$SERVICEOUTPUT$\n",cntct->name,svc->host_name,svc->description,command_name_ptr);
+				ret=asprintf(&temp_buffer,"SERVICE NOTIFICATION: %s;%s;%s;FLAPPINGSTOP ($SERVICESTATE$);%s;$SERVICEOUTPUT$\n",cntct->name,svc->host_name,svc->description,command_name_ptr);
 				break;
 			case NOTIFICATION_FLAPPINGDISABLED:
-				asprintf(&temp_buffer,"SERVICE NOTIFICATION: %s;%s;%s;FLAPPINGDISABLED ($SERVICESTATE$);%s;$SERVICEOUTPUT$\n",cntct->name,svc->host_name,svc->description,command_name_ptr);
+				ret=asprintf(&temp_buffer,"SERVICE NOTIFICATION: %s;%s;%s;FLAPPINGDISABLED ($SERVICESTATE$);%s;$SERVICEOUTPUT$\n",cntct->name,svc->host_name,svc->description,command_name_ptr);
 				break;
 			case NOTIFICATION_DOWNTIMESTART:
-				asprintf(&temp_buffer,"SERVICE NOTIFICATION: %s;%s;%s;DOWNTIMESTART ($SERVICESTATE$);%s;$SERVICEOUTPUT$\n",cntct->name,svc->host_name,svc->description,command_name_ptr);
+				ret=asprintf(&temp_buffer,"SERVICE NOTIFICATION: %s;%s;%s;DOWNTIMESTART ($SERVICESTATE$);%s;$SERVICEOUTPUT$\n",cntct->name,svc->host_name,svc->description,command_name_ptr);
 				break;
 			case NOTIFICATION_DOWNTIMEEND:
-				asprintf(&temp_buffer,"SERVICE NOTIFICATION: %s;%s;%s;DOWNTIMEEND ($SERVICESTATE$);%s;$SERVICEOUTPUT$\n",cntct->name,svc->host_name,svc->description,command_name_ptr);
+				ret=asprintf(&temp_buffer,"SERVICE NOTIFICATION: %s;%s;%s;DOWNTIMEEND ($SERVICESTATE$);%s;$SERVICEOUTPUT$\n",cntct->name,svc->host_name,svc->description,command_name_ptr);
 				break;
 			case NOTIFICATION_DOWNTIMECANCELLED:
-				asprintf(&temp_buffer,"SERVICE NOTIFICATION: %s;%s;%s;DOWNTIMECANCELLED ($SERVICESTATE$);%s;$SERVICEOUTPUT$\n",cntct->name,svc->host_name,svc->description,command_name_ptr);
+				ret=asprintf(&temp_buffer,"SERVICE NOTIFICATION: %s;%s;%s;DOWNTIMECANCELLED ($SERVICESTATE$);%s;$SERVICEOUTPUT$\n",cntct->name,svc->host_name,svc->description,command_name_ptr);
 				break;
 			default:
-				asprintf(&temp_buffer,"SERVICE NOTIFICATION: %s;%s;%s;$SERVICESTATE$;%s;$SERVICEOUTPUT$\n",cntct->name,svc->host_name,svc->description,command_name_ptr);
+				ret=asprintf(&temp_buffer,"SERVICE NOTIFICATION: %s;%s;%s;$SERVICESTATE$;%s;$SERVICEOUTPUT$\n",cntct->name,svc->host_name,svc->description,command_name_ptr);
 				break;
+				}
+
+			if (ret == -1){
+				logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
+				/* free memory */
+				my_free(command_name);
+				my_free(raw_command);
+				my_free(processed_command);
+				my_free(temp_buffer);
+				my_free(processed_buffer);
+				return ERROR;
 				}
 
 			process_macros_r(mac, temp_buffer,&processed_buffer,0);
@@ -809,7 +842,7 @@ int notify_contact_of_service(nagios_macros *mac, contact *cntct, service *svc, 
 
 #ifdef USE_EVENT_BROKER
 		/* send data to event broker */
-		broker_contact_notification_method_data(NEBTYPE_CONTACTNOTIFICATIONMETHOD_END,NEBFLAG_NONE,NEBATTR_NONE,SERVICE_NOTIFICATION,type,method_start_time,method_end_time,(void *)svc,cntct,temp_commandsmember->command,not_author,not_data,escalated,NULL);
+		broker_contact_notification_method_data(NEBTYPE_CONTACTNOTIFICATIONMETHOD_END,NEBFLAG_NONE,NEBATTR_NONE,SERVICE_NOTIFICATION,type,method_start_time,method_end_time,(void *)svc,cntct,temp_commandsmember->cmd,not_author,not_data,escalated,NULL);
 #endif
 	        }
 
@@ -920,13 +953,16 @@ int create_notification_list_from_service(nagios_macros *mac, service *svc, int 
 
 	/* see if this notification should be escalated */
 	escalate_notification=should_service_notification_be_escalated(svc);
-	
+
 	/* set the escalation flag */
 	*escalated=escalate_notification;
 
 	/* set the escalation macro */
 	my_free(mac->x[MACRO_NOTIFICATIONISESCALATED]);
-	asprintf(&mac->x[MACRO_NOTIFICATIONISESCALATED],"%d",escalate_notification);
+	if(asprintf(&mac->x[MACRO_NOTIFICATIONISESCALATED],"%d",escalate_notification)==-1){
+		logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
+		return ERROR;
+		}
 
 	if(options & NOTIFICATION_OPTION_BROADCAST)
 		log_debug_info(DEBUGL_NOTIFICATIONS,1,"This notification will be BROADCAST to all (escalated and normal) contacts...\n");
@@ -1146,7 +1182,19 @@ int host_notification(host *hst, int type, char *not_author, char *not_data, int
 
 		/* set the notification number macro */
 		my_free(mac->x[MACRO_HOSTNOTIFICATIONNUMBER]);
-		asprintf(&mac->x[MACRO_HOSTNOTIFICATIONNUMBER],"%d",hst->current_notification_number);
+		if(asprintf(&mac->x[MACRO_HOSTNOTIFICATIONNUMBER],"%d",hst->current_notification_number)==-1){
+			logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
+			my_free(mac->x[MACRO_NOTIFICATIONAUTHOR]);
+			my_free(mac->x[MACRO_NOTIFICATIONAUTHORNAME]);
+			my_free(mac->x[MACRO_NOTIFICATIONAUTHORALIAS]);
+			my_free(mac->x[MACRO_NOTIFICATIONCOMMENT]);
+			my_free(mac->x[MACRO_HOSTACKAUTHOR]);
+			my_free(mac->x[MACRO_HOSTACKCOMMENT]);
+			my_free(mac->x[MACRO_SERVICEACKAUTHORNAME]);
+			my_free(mac->x[MACRO_SERVICEACKAUTHORALIAS]);
+			my_free(mac->x[MACRO_NOTIFICATIONTYPE]);
+			return ERROR;
+			}
 
 		/* the $NOTIFICATIONNUMBER$ macro is maintained for backward compatability */
 		my_free(mac->x[MACRO_NOTIFICATIONNUMBER]);
@@ -1154,19 +1202,32 @@ int host_notification(host *hst, int type, char *not_author, char *not_data, int
 
 		/* set the notification id macro */
 		my_free(mac->x[MACRO_HOSTNOTIFICATIONID]);
-		asprintf(&mac->x[MACRO_HOSTNOTIFICATIONID],"%lu",hst->current_notification_id);
+		if(asprintf(&mac->x[MACRO_HOSTNOTIFICATIONID],"%lu",hst->current_notification_id)==-1){
+			logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
+			my_free(mac->x[MACRO_NOTIFICATIONAUTHOR]);
+			my_free(mac->x[MACRO_NOTIFICATIONAUTHORNAME]);
+			my_free(mac->x[MACRO_NOTIFICATIONAUTHORALIAS]);
+			my_free(mac->x[MACRO_NOTIFICATIONCOMMENT]);
+			my_free(mac->x[MACRO_HOSTACKAUTHOR]);
+			my_free(mac->x[MACRO_HOSTACKCOMMENT]);
+			my_free(mac->x[MACRO_SERVICEACKAUTHORNAME]);
+			my_free(mac->x[MACRO_SERVICEACKAUTHORALIAS]);
+			my_free(mac->x[MACRO_NOTIFICATIONTYPE]);
+			my_free(mac->x[MACRO_NOTIFICATIONNUMBER]);
+			return ERROR;
+			}
 
 		/* notify each contact (duplicates have been removed) */
 		for(temp_notification=notification_list;temp_notification!=NULL;temp_notification=temp_notification->next){
 
 			/* grab the macro variables for this contact */
-			grab_contact_macros(mac, temp_notification->contact);
+			grab_contact_macros(mac, temp_notification->cntct);
 
 			/* clear summary macros (they are customized for each contact) */
 			clear_summary_macros(mac);
 
 			/* notify this contact */
-			result=notify_contact_of_host(mac, temp_notification->contact,hst,type,not_author,not_data,options,escalated);
+			result=notify_contact_of_host(mac, temp_notification->cntct,hst,type,not_author,not_data,options,escalated);
 
 			/* keep track of how many contacts were notified */
 			if(result==OK)
@@ -1588,6 +1649,7 @@ int notify_contact_of_host(nagios_macros *mac, contact *cntct, host *hst, int ty
 	struct timeval method_end_time;
 	int macro_options=STRIP_ILLEGAL_MACRO_CHARS|ESCAPE_MACRO_CHARS;
 	int neb_result;
+	int ret = 0;
 
 
 	log_debug_info(DEBUGL_FUNCTIONS,0,"notify_contact_of_host()\n");
@@ -1624,7 +1686,7 @@ int notify_contact_of_host(nagios_macros *mac, contact *cntct, host *hst, int ty
 		/* send data to event broker */
 		method_end_time.tv_sec=0L;
 		method_end_time.tv_usec=0L;
-		neb_result=broker_contact_notification_method_data(NEBTYPE_CONTACTNOTIFICATIONMETHOD_START,NEBFLAG_NONE,NEBATTR_NONE,HOST_NOTIFICATION,type,method_start_time,method_end_time,(void *)hst,cntct,temp_commandsmember->command,not_author,not_data,escalated,NULL);
+		neb_result=broker_contact_notification_method_data(NEBTYPE_CONTACTNOTIFICATIONMETHOD_START,NEBFLAG_NONE,NEBATTR_NONE,HOST_NOTIFICATION,type,method_start_time,method_end_time,(void *)hst,cntct,temp_commandsmember->cmd,not_author,not_data,escalated,NULL);
 		if(NEBERROR_CALLBACKCANCEL==neb_result)
 			break ;
 		else if(NEBERROR_CALLBACKOVERRIDE==neb_result)
@@ -1632,7 +1694,7 @@ int notify_contact_of_host(nagios_macros *mac, contact *cntct, host *hst, int ty
 #endif
 
 		/* get the raw command line */
-		get_raw_command_line_r(mac, temp_commandsmember->command_ptr,temp_commandsmember->command,&raw_command,macro_options);
+		get_raw_command_line_r(mac, temp_commandsmember->command_ptr,temp_commandsmember->cmd,&raw_command,macro_options);
 		if(raw_command==NULL)
 			continue;
 
@@ -1644,7 +1706,7 @@ int notify_contact_of_host(nagios_macros *mac, contact *cntct, host *hst, int ty
 			continue;
 
 		/* get the command name */
-		command_name=(char *)strdup(temp_commandsmember->command);
+		command_name=(char *)strdup(temp_commandsmember->cmd);
 		command_name_ptr=strtok(command_name,"!");
 
 		/* run the notification command... */
@@ -1655,32 +1717,43 @@ int notify_contact_of_host(nagios_macros *mac, contact *cntct, host *hst, int ty
 		if(log_notifications==TRUE){
 			switch(type){
 			case NOTIFICATION_CUSTOM:
-				asprintf(&temp_buffer,"HOST NOTIFICATION: %s;%s;CUSTOM ($HOSTSTATE$);%s;$HOSTOUTPUT$;$NOTIFICATIONAUTHOR$;$NOTIFICATIONCOMMENT$\n",cntct->name,hst->name,command_name_ptr);
+				ret = asprintf(&temp_buffer,"HOST NOTIFICATION: %s;%s;CUSTOM ($HOSTSTATE$);%s;$HOSTOUTPUT$;$NOTIFICATIONAUTHOR$;$NOTIFICATIONCOMMENT$\n",cntct->name,hst->name,command_name_ptr);
 				break;
 			case NOTIFICATION_ACKNOWLEDGEMENT:
-				asprintf(&temp_buffer,"HOST NOTIFICATION: %s;%s;ACKNOWLEDGEMENT ($HOSTSTATE$);%s;$HOSTOUTPUT$;$NOTIFICATIONAUTHOR$;$NOTIFICATIONCOMMENT$\n",cntct->name,hst->name,command_name_ptr);
+				ret = asprintf(&temp_buffer,"HOST NOTIFICATION: %s;%s;ACKNOWLEDGEMENT ($HOSTSTATE$);%s;$HOSTOUTPUT$;$NOTIFICATIONAUTHOR$;$NOTIFICATIONCOMMENT$\n",cntct->name,hst->name,command_name_ptr);
 				break;
 			case NOTIFICATION_FLAPPINGSTART:
-				asprintf(&temp_buffer,"HOST NOTIFICATION: %s;%s;FLAPPINGSTART ($HOSTSTATE$);%s;$HOSTOUTPUT$\n",cntct->name,hst->name,command_name_ptr);
+				ret = asprintf(&temp_buffer,"HOST NOTIFICATION: %s;%s;FLAPPINGSTART ($HOSTSTATE$);%s;$HOSTOUTPUT$\n",cntct->name,hst->name,command_name_ptr);
 				break;
 			case NOTIFICATION_FLAPPINGSTOP:
-				asprintf(&temp_buffer,"HOST NOTIFICATION: %s;%s;FLAPPINGSTOP ($HOSTSTATE$);%s;$HOSTOUTPUT$\n",cntct->name,hst->name,command_name_ptr);
+				ret = asprintf(&temp_buffer,"HOST NOTIFICATION: %s;%s;FLAPPINGSTOP ($HOSTSTATE$);%s;$HOSTOUTPUT$\n",cntct->name,hst->name,command_name_ptr);
 				break;
 			case NOTIFICATION_FLAPPINGDISABLED:
-				asprintf(&temp_buffer,"HOST NOTIFICATION: %s;%s;FLAPPINGDISABLED ($HOSTSTATE$);%s;$HOSTOUTPUT$\n",cntct->name,hst->name,command_name_ptr);
+				ret = asprintf(&temp_buffer,"HOST NOTIFICATION: %s;%s;FLAPPINGDISABLED ($HOSTSTATE$);%s;$HOSTOUTPUT$\n",cntct->name,hst->name,command_name_ptr);
 				break;
 			case NOTIFICATION_DOWNTIMESTART:
-				asprintf(&temp_buffer,"HOST NOTIFICATION: %s;%s;DOWNTIMESTART ($HOSTSTATE$);%s;$HOSTOUTPUT$\n",cntct->name,hst->name,command_name_ptr);
+				ret = asprintf(&temp_buffer,"HOST NOTIFICATION: %s;%s;DOWNTIMESTART ($HOSTSTATE$);%s;$HOSTOUTPUT$\n",cntct->name,hst->name,command_name_ptr);
 				break;
 			case NOTIFICATION_DOWNTIMEEND:
-				asprintf(&temp_buffer,"HOST NOTIFICATION: %s;%s;DOWNTIMEEND ($HOSTSTATE$);%s;$HOSTOUTPUT$\n",cntct->name,hst->name,command_name_ptr);
+				ret = asprintf(&temp_buffer,"HOST NOTIFICATION: %s;%s;DOWNTIMEEND ($HOSTSTATE$);%s;$HOSTOUTPUT$\n",cntct->name,hst->name,command_name_ptr);
 				break;
 			case NOTIFICATION_DOWNTIMECANCELLED:
-				asprintf(&temp_buffer,"HOST NOTIFICATION: %s;%s;DOWNTIMECANCELLED ($HOSTSTATE$);%s;$HOSTOUTPUT$\n",cntct->name,hst->name,command_name_ptr);
+				ret = asprintf(&temp_buffer,"HOST NOTIFICATION: %s;%s;DOWNTIMECANCELLED ($HOSTSTATE$);%s;$HOSTOUTPUT$\n",cntct->name,hst->name,command_name_ptr);
 				break;
 			default:
-				asprintf(&temp_buffer,"HOST NOTIFICATION: %s;%s;$HOSTSTATE$;%s;$HOSTOUTPUT$\n",cntct->name,hst->name,command_name_ptr);
+				ret = asprintf(&temp_buffer,"HOST NOTIFICATION: %s;%s;$HOSTSTATE$;%s;$HOSTOUTPUT$\n",cntct->name,hst->name,command_name_ptr);
 				break;
+				}
+
+			if (ret == -1){
+				logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
+				/* free memory */
+				my_free(command_name);
+				my_free(raw_command);
+				my_free(processed_command);
+				my_free(temp_buffer);
+				my_free(processed_buffer);
+				return ERROR;
 				}
 
 			process_macros_r(mac, temp_buffer,&processed_buffer,0);
@@ -1708,7 +1781,7 @@ int notify_contact_of_host(nagios_macros *mac, contact *cntct, host *hst, int ty
 
 #ifdef USE_EVENT_BROKER
 		/* send data to event broker */
-		broker_contact_notification_method_data(NEBTYPE_CONTACTNOTIFICATIONMETHOD_END,NEBFLAG_NONE,NEBATTR_NONE,HOST_NOTIFICATION,type,method_start_time,method_end_time,(void *)hst,cntct,temp_commandsmember->command,not_author,not_data,escalated,NULL);
+		broker_contact_notification_method_data(NEBTYPE_CONTACTNOTIFICATIONMETHOD_END,NEBFLAG_NONE,NEBATTR_NONE,HOST_NOTIFICATION,type,method_start_time,method_end_time,(void *)hst,cntct,temp_commandsmember->cmd,not_author,not_data,escalated,NULL);
 #endif
 	        }
 
@@ -1824,7 +1897,10 @@ int create_notification_list_from_host(nagios_macros *mac, host *hst, int option
 
 	/* set the escalation macro */
 	my_free(mac->x[MACRO_NOTIFICATIONISESCALATED]);
-	asprintf(&mac->x[MACRO_NOTIFICATIONISESCALATED],"%d",escalate_notification);
+	if(asprintf(&mac->x[MACRO_NOTIFICATIONISESCALATED],"%d",escalate_notification)==-1){
+		logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
+		return ERROR;
+		}
 
 	if(options & NOTIFICATION_OPTION_BROADCAST)
 		log_debug_info(DEBUGL_NOTIFICATIONS,1,"This notification will be BROADCAST to all (escalated and normal) contacts...\n");
@@ -2040,7 +2116,7 @@ notification * find_notification(contact *cntct){
 		return NULL;
 	
 	for(temp_notification=notification_list;temp_notification!=NULL;temp_notification=temp_notification->next){
-		if(temp_notification->contact==cntct)
+		if(temp_notification->cntct==cntct)
 			return temp_notification;
 	        }
 
@@ -2072,7 +2148,7 @@ int add_notification(nagios_macros *mac, contact *cntct)
 		return ERROR;
 
 	/* fill in the contact info */
-	new_notification->contact=cntct;
+	new_notification->cntct=cntct;
 
 	/* add new notification to head of list */
 	new_notification->next=notification_list;

@@ -1,26 +1,22 @@
-/*****************************************************************************
- *
- * DOWNTIME.C - Scheduled downtime functions for Nagios
- *
- * Copyright (c) 2000-2008 Ethan Galstad (egalstad@nagios.org)
- * Last Modified: 02-17-2008
- *
- * License:
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2 as
- * published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
- *
- *****************************************************************************/
+/*
+** Copyright 2000-2008 Ethan Galstad
+** Copyright 2011      Merethis
+**
+** This file is part of Centreon Scheduler.
+**
+** Centreon Scheduler is free software: you can redistribute it and/or
+** modify it under the terms of the GNU General Public License version 2
+** as published by the Free Software Foundation.
+**
+** Centreon Scheduler is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+** General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with Centreon Scheduler. If not, see
+** <http://www.gnu.org/licenses/>.
+*/
 
 #include "../include/config.h"
 #include "../include/common.h"
@@ -35,27 +31,16 @@
 #include "../xdata/xdddefault.h"
 #endif
 
-#ifdef NSCORE
 #include "../include/nagios.h"
 #include "../include/broker.h"
-#endif
-
-#ifdef NSCGI
-#include "../include/cgiutils.h"
-#endif
-
 
 scheduled_downtime *scheduled_downtime_list=NULL;
 int		   defer_downtime_sorting = 0;
 
-#ifdef NSCORE
 extern timed_event *event_list_high;
 extern timed_event *event_list_high_tail;
-#endif
 
 
-
-#ifdef NSCORE
 
 /******************************************************************/
 /**************** INITIALIZATION/CLEANUP FUNCTIONS ****************/
@@ -269,10 +254,18 @@ int register_downtime(int type, unsigned long downtime_id){
 		type_string="host";
 	else
 		type_string="service";
-	if(temp_downtime->fixed==TRUE)
-		asprintf(&temp_buffer,"This %s has been scheduled for fixed downtime from %s to %s.  Notifications for the %s will not be sent out during that time period.",type_string,start_time_string,end_time_string,type_string);
-	else
-		asprintf(&temp_buffer,"This %s has been scheduled for flexible downtime starting between %s and %s and lasting for a period of %d hours and %d minutes.  Notifications for the %s will not be sent out during that time period.",type_string,start_time_string,end_time_string,hours,minutes,type_string);
+	if(temp_downtime->fixed==TRUE){
+		if(asprintf(&temp_buffer,"This %s has been scheduled for fixed downtime from %s to %s.  Notifications for the %s will not be sent out during that time period.",type_string,start_time_string,end_time_string,type_string)==-1){
+			logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
+			return ERROR;
+			}
+		}
+	else{
+		if(asprintf(&temp_buffer,"This %s has been scheduled for flexible downtime starting between %s and %s and lasting for a period of %d hours and %d minutes.  Notifications for the %s will not be sent out during that time period.",type_string,start_time_string,end_time_string,hours,minutes,type_string)==-1){
+			logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
+			return (ERROR);
+			}
+		}
 
 
 	log_debug_info(DEBUGL_DOWNTIME,0,"Scheduled Downtime Details:\n");
@@ -836,9 +829,6 @@ int delete_service_downtime(unsigned long downtime_id){
 	return result;
         }
 
-#endif
-
-
 
 
 
@@ -948,11 +938,9 @@ int add_downtime(int downtime_type, char *host_name, char *svc_description, time
 			last_downtime->next=new_downtime;
 			}
 		}
-#ifdef NSCORE
 #ifdef USE_EVENT_BROKER
 	/* send data to event broker */
 	broker_downtime_data(NEBTYPE_DOWNTIME_LOAD,NEBFLAG_NONE,NEBATTR_NONE,downtime_type,host_name,svc_description,entry_time,author,comment_data,start_time,end_time,fixed,triggered_by,duration,downtime_id,NULL);
-#endif
 #endif
 
 	return OK;

@@ -1,28 +1,23 @@
-/*****************************************************************************
- *
- * XRDDEFAULT.C - Default external state retention routines for Nagios
- *
- * Copyright (c) 2009 Nagios Core Development Team and Community Contributors
- * Copyright (c) 1999-2010 Ethan Galstad (egalstad@nagios.org)
- * Last Modified: 09-01-2010
- *
- * License:
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2 as
- * published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
- *
- *****************************************************************************/
-
+/*
+** Copyright 1999-2010 Ethan Galstad
+** Copyright 2009      Nagios Core Development Team and Community Contributors
+** Copyright 2011      Merethis
+**
+** This file is part of Centreon Scheduler.
+**
+** Centreon Scheduler is free software: you can redistribute it and/or
+** modify it under the terms of the GNU General Public License version 2
+** as published by the Free Software Foundation.
+**
+** Centreon Scheduler is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+** General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with Centreon Scheduler. If not, see
+** <http://www.gnu.org/licenses/>.
+*/
 
 /*********** COMMON HEADER FILES ***********/
 
@@ -72,7 +67,6 @@ extern int            use_retained_program_state;
 extern int            use_retained_scheduling_info;
 extern int            retention_scheduling_horizon;
 
-extern time_t         last_update_check;
 extern unsigned long  update_uid;
 extern char           *last_program_version;
 extern int            update_available;
@@ -232,6 +226,8 @@ int xrddefault_initialize_retention_data(char *config_file){
 /* cleanup retention data before terminating */
 int xrddefault_cleanup_retention_data(char *config_file){
 
+	(void)config_file;
+
 	/* free memory */
 	my_free(xrddefault_retention_file);
 	my_free(xrddefault_temp_file);
@@ -275,7 +271,10 @@ int xrddefault_save_state_information(void){
 	        }
 
 	/* open a safe temp file for output */
-	asprintf(&temp_file,"%sXXXXXX",xrddefault_temp_file);
+	if(asprintf(&temp_file,"%sXXXXXX",xrddefault_temp_file)==-1){
+		logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
+		return (ERROR);
+		}
 	if(temp_file==NULL)
 		return ERROR;
 	if((fd=mkstemp(temp_file))==-1)
@@ -319,7 +318,6 @@ int xrddefault_save_state_information(void){
 	fprintf(fp,"info {\n");
 	fprintf(fp,"created=%lu\n",current_time);
 	fprintf(fp,"version=%s\n",PROGRAM_VERSION);
-	fprintf(fp,"last_update_check=%lu\n",last_update_check);
 	fprintf(fp,"update_available=%d\n",update_available);
 	fprintf(fp,"update_uid=%lu\n",update_uid);
 	fprintf(fp,"last_version=%s\n",(last_program_version==NULL)?"":last_program_version);
@@ -1021,8 +1019,6 @@ int xrddefault_read_state_information(void){
 					if(last_program_version==NULL)
 						last_program_version=(char *)strdup(val);
 					}
-				else if(!strcmp(var,"last_update_check"))
-					last_update_check=strtoul(val,NULL,10);
 				else if(!strcmp(var,"update_available"))
 					update_available=atoi(val);
 				else if(!strcmp(var,"update_uid"))
@@ -1881,9 +1877,9 @@ int xrddefault_read_state_information(void){
 
 		printf("RETENTION DATA TIMES\n");
 		printf("----------------------------------\n");
-		printf("Read and Process:     %.6lf sec\n",runtime[0]);
+		printf("Read and Process:     %.6f sec\n",runtime[0]);
 		printf("                      ============\n");
-		printf("TOTAL:                %.6lf sec\n",runtime[1]);
+		printf("TOTAL:                %.6f sec\n",runtime[1]);
 		printf("\n\n");
 		}
 

@@ -1,22 +1,24 @@
-/************************************************************************
- *
- * Nagios Main Header File
- * Written By: Ethan Galstad (egalstad@nagios.org)
- * Last Modified: 12-14-2008
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2 as
- * published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
- ************************************************************************/
+/*
+** Copyright 2007-2008 Ethan Galstad
+** Copyright 2007,2010 Andreas Ericsson
+** Copyright 2010      Max Schubert
+** Copyright 2011      Merethis
+**
+** This file is part of Centreon Scheduler.
+**
+** Centreon Scheduler is free software: you can redistribute it and/or
+** modify it under the terms of the GNU General Public License version 2
+** as published by the Free Software Foundation.
+**
+** Centreon Scheduler is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+** General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with Centreon Scheduler. If not, see
+** <http://www.gnu.org/licenses/>.
+*/
 
 #ifndef _NAGIOS_H
 #define _NAGIOS_H
@@ -246,7 +248,6 @@ extern "C" {
 #define EVENT_HFRESHNESS_CHECK          13      /* checks host result "freshness" */
 #define EVENT_RESCHEDULE_CHECKS		14      /* adjust scheduling of host and service checks */
 #define EVENT_EXPIRE_COMMENT            15      /* removes expired comments */
-#define EVENT_CHECK_PROGRAM_UPDATE      16      /* checks for new version of Nagios */
 #define EVENT_SLEEP                     98      /* asynchronous sleep event that occurs when event queues are empty */
 #define EVENT_USER_FUNCTION             99      /* USER-defined function (modules) */
 
@@ -295,7 +296,7 @@ typedef struct timed_event_struct{
 
 /* NOTIFY_LIST structure */
 typedef struct notify_list_struct{
-	contact *contact;
+	contact *cntct;
 	struct notify_list_struct *next;
         }notification;
 
@@ -423,8 +424,6 @@ int pre_flight_circular_check(int *,int *);             	/* detects circular dep
 void init_timing_loop(void);                         		/* setup the initial scheduling queue */
 void setup_sighandler(void);                         		/* trap signals */
 void reset_sighandler(void);                         		/* reset signals to default action */
-int daemon_init(void);				     		/* switches to daemon mode */
-int drop_privileges(char *,char *);				/* drops privileges before startup */
 void display_scheduling_info(void);				/* displays service check scheduling information */
 
 
@@ -598,8 +597,6 @@ int dbuf_init(dbuf *,int);
 int dbuf_free(dbuf *);
 int dbuf_strcat(dbuf *,char *);
 int set_environment_var(char *,char *,int);             /* sets/clears and environment variable */
-int check_for_nagios_updates(int,int);                  /* checks to see if new version of Nagios are available */
-int query_update_api(void);                             /* checks to see if new version of Nagios are available */
 
 
 /**** External Command Functions ****/

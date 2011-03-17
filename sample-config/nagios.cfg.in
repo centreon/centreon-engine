@@ -116,22 +116,6 @@ status_update_interval=10
 
 
 
-# NAGIOS USER
-# This determines the effective user that Nagios should run as.  
-# You can either supply a username or a UID.
-
-nagios_user=@nagios_user@
-
-
-
-# NAGIOS GROUP
-# This determines the effective group that Nagios should run as.  
-# You can either supply a group name or a GID.
-
-nagios_group=@nagios_grp@
-
-
-
 # EXTERNAL COMMAND OPTION
 # This option allows you to specify whether or not Nagios should check
 # for external commands (in the command file defined below).  By default
@@ -181,14 +165,6 @@ command_file=@localstatedir@/rw/nagios.cmd
 # are processed by the daemon, they are removed from the buffer.  
 
 external_command_buffer_slots=4096
-
-
-
-# LOCK FILE
-# This is the lockfile that Nagios will use to store its PID number
-# in when it is running in daemon mode.
-
-lock_file=@lockfile@
 
 
 
@@ -719,31 +695,6 @@ interval_length=60
 
 
 
-# CHECK FOR UPDATES
-# This option determines whether Nagios will automatically check to
-# see if new updates (releases) are available.  It is recommend that you
-# enable this option to ensure that you stay on top of the latest critical
-# patches to Nagios.  Nagios is critical to you - make sure you keep it in
-# good shape.  Nagios will check once a day for new updates. Data collected
-# by Nagios Enterprises from the update check is processed in accordance 
-# with our privacy policy - see http://api.nagios.org for details.
-
-check_for_updates=1
-
-
-
-# BARE UPDATE CHECK
-# This option deterines what data Nagios will send to api.nagios.org when
-# it checks for updates.  By default, Nagios will send information on the 
-# current version of Nagios you have installed, as well as an indicator as
-# to whether this was a new installation or not.  Nagios Enterprises uses
-# this data to determine the number of users running specific version of 
-# Nagios.  Enable this option if you do not want this information to be sent.
-
-bare_update_check=0
-
-
-
 # AGGRESSIVE HOST CHECKING OPTION
 # If you don't want to turn on aggressive host checking features, set
 # this value to 0 (the default).  Otherwise set this value to 1 to
@@ -1198,21 +1149,8 @@ use_true_regexp_matching=0
 # using the $ADMINEMAIL$ and $ADMINPAGER$ macros in your notification
 # commands.
 
-admin_email=@nagios_user@@localhost
-admin_pager=page@nagios_user@@localhost
-
-
-
-# DAEMON CORE DUMP OPTION
-# This option determines whether or not Nagios is allowed to create
-# a core dump when it runs as a daemon.  Note that it is generally
-# considered bad form to allow this, but it may be useful for
-# debugging purposes.  Enabling this option doesn't guarantee that
-# a core file will be produced, but that's just life...
-# Values: 1 - Allow core dumps
-#         0 - Do not allow core dumps (default)
-
-daemon_dumps_core=0
+admin_email=root@localhost
+admin_pager=pageroot@localhost
 
 
 

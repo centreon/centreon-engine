@@ -52,12 +52,9 @@ char            *command_file=NULL;
 char            *temp_file=NULL;
 char            *temp_path=NULL;
 char            *check_result_path=NULL;
-char            *lock_file=NULL;
 char            *log_archive_path=NULL;
 char            *p1_file=NULL;    /**** EMBEDDED PERL ****/
 char            *auth_file=NULL;  /**** EMBEDDED PERL INTERPRETER AUTH FILE ****/
-char            *nagios_user=NULL;
-char            *nagios_group=NULL;
 
 extern char     *macro_x[MACRO_X_COUNT];
 
@@ -122,9 +119,6 @@ int             auto_rescheduling_window=DEFAULT_AUTO_RESCHEDULING_WINDOW;
 int             additional_freshness_latency=DEFAULT_ADDITIONAL_FRESHNESS_LATENCY;
 int             allow_empty_hostgroup_assignment=DEFAULT_ALLOW_EMPTY_HOSTGROUP_ASSIGNMENT;
 
-int             check_for_updates=DEFAULT_CHECK_FOR_UPDATES;
-int             bare_update_check=DEFAULT_BARE_UPDATE_CHECK;
-time_t          last_update_check=0L;
 int             update_available=FALSE;
 char            *last_program_version=NULL;
 char            *new_program_version=NULL;
@@ -177,9 +171,6 @@ int             verify_circular_paths=TRUE;
 int             test_scheduling=FALSE;
 int             precache_objects=FALSE;
 int             use_precached_objects=FALSE;
-
-int             daemon_mode=FALSE;
-int             daemon_dumps_core=TRUE;
 
 int             max_parallel_service_checks=DEFAULT_MAX_PARALLEL_SERVICE_CHECKS;
 int             currently_running_service_checks=0;

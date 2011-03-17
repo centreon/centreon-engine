@@ -1,25 +1,22 @@
-/************************************************************************
- *
- * SKIPLIST.H - Skiplist data structures and functions
- *
- * Copyright (c) 2008 Ethan Galstad
- * Last Modified: 02-24-2008
- *
- * License:
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2 as
- * published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
- ************************************************************************/
+/*
+** Copyright 2008 Ethan Galstad
+** Copyright 2011 Merethis
+**
+** This file is part of Centreon Scheduler.
+**
+** Centreon Scheduler is free software: you can redistribute it and/or
+** modify it under the terms of the GNU General Public License version 2
+** as published by the Free Software Foundation.
+**
+** Centreon Scheduler is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+** General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with Centreon Scheduler. If not, see
+** <http://www.gnu.org/licenses/>.
+*/
 
 #ifndef _SKIPLIST_H
 #define _SKIPLIST_H
@@ -28,6 +25,10 @@
 #define SKIPLIST_ERROR_ARGS      1
 #define SKIPLIST_ERROR_MEMORY    2
 #define SKIPLIST_ERROR_DUPLICATE 3
+
+#ifdef __cplusplus
+  extern "C" {
+#endif
 
 
 typedef struct skiplistnode_struct{
@@ -63,5 +64,9 @@ int skiplist_delete(skiplist *list, void *data);
 int skiplist_delete_first(skiplist *list, void *data);
 int skiplist_delete_all(skiplist *list, void *data);
 int skiplist_delete_node(skiplist *list, void *node_ptr);
+
+#ifdef __cplusplus
+  }
+#endif
 
 #endif

@@ -1,26 +1,22 @@
-/*****************************************************************************
- *
- * FLAPPING.C - State flap detection and handling routines for Nagios
- *
- * Copyright (c) 2001-2009 Ethan Galstad (egalstad@nagios.org)
- * Last Modified: 05-15-2009
- *
- * License:
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2 as
- * published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
- *
- *****************************************************************************/
+/*
+** Copyright 2001-2009 Ethan Galstad
+** Copyright 2011      Merethis
+**
+** This file is part of Centreon Scheduler.
+**
+** Centreon Scheduler is free software: you can redistribute it and/or
+** modify it under the terms of the GNU General Public License version 2
+** as published by the Free Software Foundation.
+**
+** Centreon Scheduler is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+** General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with Centreon Scheduler. If not, see
+** <http://www.gnu.org/licenses/>.
+*/
 
 /*********** COMMON HEADER FILES ***********/
 
@@ -334,7 +330,10 @@ void set_service_flap(service *svc, double percent_change, double high_threshold
 	logit(NSLOG_RUNTIME_WARNING,FALSE,"SERVICE FLAPPING ALERT: %s;%s;STARTED; Service appears to have started flapping (%2.1f%% change >= %2.1f%% threshold)\n",svc->host_name,svc->description,percent_change,high_threshold);
 
 	/* add a non-persistent comment to the service */
-	asprintf(&temp_buffer,"Notifications for this service are being suppressed because it was detected as having been flapping between different states (%2.1f%% change >= %2.1f%% threshold).  When the service state stabilizes and the flapping stops, notifications will be re-enabled.",percent_change,high_threshold);
+	if(asprintf(&temp_buffer,"Notifications for this service are being suppressed because it was detected as having been flapping between different states (%2.1f%% change >= %2.1f%% threshold).  When the service state stabilizes and the flapping stops, notifications will be re-enabled.",percent_change,high_threshold)==-1){
+		logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
+		return;
+		}
 	add_new_service_comment(FLAPPING_COMMENT,svc->host_name,svc->description,time(NULL),"(Nagios Process)",temp_buffer,0,COMMENTSOURCE_INTERNAL,FALSE,(time_t)0,&(svc->flapping_comment_id));
 	my_free(temp_buffer);
 
@@ -415,7 +414,10 @@ void set_host_flap(host *hst, double percent_change, double high_threshold, doub
 	logit(NSLOG_RUNTIME_WARNING,FALSE,"HOST FLAPPING ALERT: %s;STARTED; Host appears to have started flapping (%2.1f%% change > %2.1f%% threshold)\n",hst->name,percent_change,high_threshold);
 
 	/* add a non-persistent comment to the host */
-	asprintf(&temp_buffer,"Notifications for this host are being suppressed because it was detected as having been flapping between different states (%2.1f%% change > %2.1f%% threshold).  When the host state stabilizes and the flapping stops, notifications will be re-enabled.",percent_change,high_threshold);
+	if(asprintf(&temp_buffer,"Notifications for this host are being suppressed because it was detected as having been flapping between different states (%2.1f%% change > %2.1f%% threshold).  When the host state stabilizes and the flapping stops, notifications will be re-enabled.",percent_change,high_threshold)==-1){
+		logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
+		return;
+		}
 	add_new_host_comment(FLAPPING_COMMENT,hst->name,time(NULL),"(Nagios Process)",temp_buffer,0,COMMENTSOURCE_INTERNAL,FALSE,(time_t)0,&(hst->flapping_comment_id));
 	my_free(temp_buffer);
 

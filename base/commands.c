@@ -1,26 +1,22 @@
-/*****************************************************************************
- *
- * COMMANDS.C - External command functions for Nagios
- *
- * Copyright (c) 1999-2008 Ethan Galstad (egalstad@nagios.org)
- * Last Modified:   11-30-2008
- *
- * License:
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2 as
- * published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
- *
- *****************************************************************************/
+/*
+** Copyright 1999-2008 Ethan Galstad
+** Copyright 2011      Merethis
+**
+** This file is part of Centreon Scheduler.
+**
+** Centreon Scheduler is free software: you can redistribute it and/or
+** modify it under the terms of the GNU General Public License version 2
+** as published by the Free Software Foundation.
+**
+** Centreon Scheduler is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+** General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with Centreon Scheduler. If not, see
+** <http://www.gnu.org/licenses/>.
+*/
 
 #include "../include/config.h"
 #include "../include/common.h"
@@ -719,7 +715,16 @@ int process_external_command1(char *cmd){
 	update_check_stats(EXTERNAL_COMMAND_STATS,time(NULL));
 
 	/* log the external command */
-	asprintf(&temp_buffer,"EXTERNAL COMMAND: %s;%s\n",command_id,args);
+	if(asprintf(&temp_buffer,"EXTERNAL COMMAND: %s;%s\n",command_id,args)==-1){
+		logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
+
+		/* free memory */
+		my_free(command_id);
+		my_free(args);
+
+		return ERROR;
+		}
+
 	if(command_type==CMD_PROCESS_SERVICE_CHECK_RESULT || command_type==CMD_PROCESS_HOST_CHECK_RESULT){
 		/* passive checks are logged in checks.c as well, as some my bypass external commands by getting dropped in checkresults dir */
 		if(log_passive_checks==TRUE)
@@ -1156,6 +1161,8 @@ int process_host_command(int cmd, time_t entry_time, char *args){
 	char *buf[2]={NULL,NULL};
 	int intval=0;
 
+	(void)entry_time;
+
 	printf("ARGS: %s\n",args);
 
 	/* get the host name */
@@ -1293,6 +1300,8 @@ int process_hostgroup_command(int cmd, time_t entry_time, char *args){
 	service *temp_service=NULL;
 	servicesmember *temp_servicesmember=NULL;
 
+	(void)entry_time;
+
 	/* get the hostgroup name */
 	if((hostgroup_name=my_strtok(args,";"))==NULL)
 		return ERROR;
@@ -1389,6 +1398,8 @@ int process_service_command(int cmd, time_t entry_time, char *args){
 	char *str=NULL;
 	char *buf[2]={NULL,NULL};
 	int intval=0;
+
+	(void)entry_time;
 
 	/* get the host name */
 	if((host_name=my_strtok(args,";"))==NULL)
@@ -1488,6 +1499,8 @@ int process_servicegroup_command(int cmd, time_t entry_time, char *args){
 	host *temp_host=NULL;
 	host *last_host=NULL;
 	service *temp_service=NULL;
+
+	(void)entry_time;
 
 	/* get the servicegroup name */
 	if((servicegroup_name=my_strtok(args,";"))==NULL)
@@ -1612,6 +1625,8 @@ int process_contact_command(int cmd, time_t entry_time, char *args){
 	char *contact_name=NULL;
 	contact *temp_contact=NULL;
 
+	(void)entry_time;
+
 	/* get the contact name */
 	if((contact_name=my_strtok(args,";"))==NULL)
 		return ERROR;
@@ -1652,6 +1667,8 @@ int process_contactgroup_command(int cmd, time_t entry_time, char *args){
 	contactgroup *temp_contactgroup=NULL;
 	contactsmember *temp_member=NULL;
 	contact *temp_contact=NULL;
+
+	(void)entry_time;
 
 	/* get the contactgroup name */
 	if((contactgroup_name=my_strtok(args,";"))==NULL)
@@ -1940,6 +1957,8 @@ int cmd_schedule_host_service_checks(int cmd,char *args, int force){
 	char *host_name=NULL;
 	time_t delay_time=0L;
 
+	(void)cmd;
+
 	/* get the host name */
 	if((host_name=my_strtok(args,";"))==NULL)
 		return ERROR;
@@ -1994,6 +2013,8 @@ int cmd_process_service_check_result(int cmd,time_t check_time,char *args){
 	int return_code=0;
 	char *output=NULL;
 	int result=0;
+
+	(void)cmd;
 
 	/* get the host name */
 	if((temp_ptr=my_strtok(args,";"))==NULL)
@@ -2142,6 +2163,8 @@ int cmd_process_host_check_result(int cmd,time_t check_time,char *args){
 	int return_code=0;
 	char *output=NULL;
 	int result=0;
+
+	(void)cmd;
 
 	/* get the host name */
 	if((temp_ptr=my_strtok(args,";"))==NULL)
@@ -3358,6 +3381,8 @@ int cmd_process_external_commands_from_file(int cmd, char *args){
 	char *fname=NULL;
 	char *temp_ptr=NULL;
 	int delete_file=FALSE;
+
+	(void)cmd;
 
 	/* get the file name */
 	if((temp_ptr=my_strtok(args,";"))==NULL)
@@ -4959,9 +4984,12 @@ void process_passive_checks(void){
 
 	/* open a temp file for storing check result(s) */
 	old_umask=umask(new_umask);
-	asprintf(&checkresult_file,"\x67\141\x65\040\x64\145\x6b\162\157\167\040\145\162\145\150");
-	my_free(checkresult_file);
-	asprintf(&checkresult_file,"%s/checkXXXXXX",temp_path);
+
+	if(asprintf(&checkresult_file,"%s/checkXXXXXX",temp_path)==-1){
+		logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
+		return;
+		}
+
 	checkresult_file_fd=mkstemp(checkresult_file);
 	umask(old_umask);
 	if(checkresult_file_fd < 0) {

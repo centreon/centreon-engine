@@ -1,26 +1,22 @@
-/*****************************************************************************
- *
- * COMMENTS.C - Comment functions for Nagios
- *
- * Copyright (c) 1999-2010 Ethan Galstad (egalstad@nagios.org)
- * Last Modified: 08-28-2010
- *
- * License:
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2 as
- * published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
- *
- *****************************************************************************/
+/*
+** Copyright 1999-2010 Ethan Galstad
+** Copyright 2011      Merethis
+**
+** This file is part of Centreon Scheduler.
+**
+** Centreon Scheduler is free software: you can redistribute it and/or
+** modify it under the terms of the GNU General Public License version 2
+** as published by the Free Software Foundation.
+**
+** Centreon Scheduler is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+** General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with Centreon Scheduler. If not, see
+** <http://www.gnu.org/licenses/>.
+*/
 
 #include "../include/config.h"
 #include "../include/common.h"
@@ -33,24 +29,14 @@
 #include "../xdata/xcddefault.h"
 #endif
 
-#ifdef NSCORE
 #include "../include/nagios.h"
 #include "../include/broker.h"
-#endif
-
-#ifdef NSCGI
-#include "../include/cgiutils.h"
-#endif
-
 
 comment     *comment_list=NULL;
 int	    defer_comment_sorting = 0;
 comment     **comment_hashlist=NULL;
 
 
-
-
-#ifdef NSCORE
 
 /******************************************************************/
 /**************** INITIALIZATION/CLEANUP FUNCTIONS ****************/
@@ -370,10 +356,6 @@ int check_for_expired_comment(unsigned long comment_id){
         }
 
 
-#endif
-
-
-
 
 
 /******************************************************************/
@@ -529,11 +511,9 @@ int add_comment(int comment_type, int entry_type, char *host_name, char *svc_des
 			}
 		}
 
-#ifdef NSCORE
 #ifdef USE_EVENT_BROKER
 	/* send data to event broker */
 	broker_comment_data(NEBTYPE_COMMENT_LOAD,NEBFLAG_NONE,NEBATTR_NONE,comment_type,entry_type,host_name,svc_description,entry_time,author,comment_data,persistent,source,expires,expire_time,comment_id,NULL);
-#endif
 #endif
 
 	return OK;
@@ -542,7 +522,10 @@ int add_comment(int comment_type, int entry_type, char *host_name, char *svc_des
 static int comment_compar(const void *p1, const void *p2){
 	comment *c1 = *(comment **)p1;
 	comment *c2 = *(comment **)p2;
-	return (c1->comment_id < c2->comment_id) ? -1 : (c1->comment_id - c2->comment_id);
+
+	if (c1->comment_id < c2->comment_id)
+		return -1;
+	return c1->comment_id - c2->comment_id;
 	}
 
 int sort_comments(void){

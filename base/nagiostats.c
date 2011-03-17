@@ -1,30 +1,22 @@
-/*****************************************************************************
- *
- * NAGIOSTATS.C - Displays Nagios Statistics
- *
- * Program: Nagiostats
- * Version: 3.2.3
- * License: GPL
- * Copyright (c) 2003-2008 Ethan Galstad (egalstad@nagios.org)
- *
- * Last Modified: 12-20-2008
- *
- * License:
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2 as
- * published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
- *
- *****************************************************************************/
+/*
+** Copyright 2003-2008 Ethan Galstad
+** Copyright 2011      Merethis
+**
+** This file is part of Centreon Scheduler.
+**
+** Centreon Scheduler is free software: you can redistribute it and/or
+** modify it under the terms of the GNU General Public License version 2
+** as published by the Free Software Foundation.
+**
+** Centreon Scheduler is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+** General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with Centreon Scheduler. If not, see
+** <http://www.gnu.org/licenses/>.
+*/
 
 #include "../include/config.h"
 #include "../include/common.h"
@@ -431,7 +423,7 @@ int main(int argc, char **argv){
 	else
 		display_mrtg_values();
 
-	if(nagiostats_file);
+	if(nagiostats_file)
 		free(nagiostats_file);
 
 	/* Opsera patch - return based on error, because mrtg_mode was always returning OK */

@@ -1,27 +1,22 @@
-/*****************************************************************************
- *
- * COMMENTS.H - Header file for comment functions
- *
- * Copyright (c) 1999-2006 Ethan Galstad (egalstad@nagios.org)
- * Last Modified:   12-26-2006
- *
- * License:
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2 as
- * published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
- *
- *****************************************************************************/
-
+/*
+** Copyright 1999-2006 Ethan Galstad
+** Copyright 2011      Merethis
+**
+** This file is part of Centreon Scheduler.
+**
+** Centreon Scheduler is free software: you can redistribute it and/or
+** modify it under the terms of the GNU General Public License version 2
+** as published by the Free Software Foundation.
+**
+** Centreon Scheduler is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+** General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with Centreon Scheduler. If not, see
+** <http://www.gnu.org/licenses/>.
+*/
 
 #ifndef _COMMENTS_H
 #define _COMMENTS_H
@@ -84,7 +79,6 @@ typedef struct comment_struct{
         }comment;
 
 
-#ifdef NSCORE
 int initialize_comment_data(char *);                                /* initializes comment data */
 int cleanup_comment_data(char *);                                   /* cleans up comment data */
 int add_new_comment(int,int,char *,char *,time_t,char *,char *,int,int,int,time_t,unsigned long *);       /* adds a new host or service comment */
@@ -100,7 +94,6 @@ int delete_all_service_comments(char *,char *);                     /* deletes a
 int delete_service_acknowledgement_comments(service *);             /* deletes all non-persistent ack comments for a specific service */
 
 int check_for_expired_comment(unsigned long);                       /* expires a comment */
-#endif
 
 comment *find_comment(unsigned long,int);                             /* finds a specific comment */
 comment *find_service_comment(unsigned long);                         /* finds a specific service comment */

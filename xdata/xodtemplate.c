@@ -1,49 +1,22 @@
-/*****************************************************************************
- *
- * XODTEMPLATE.C - Template-based object configuration data input routines
- *
- * Copyright (c) 2001-2009 Ethan Galstad (egalstad@nagios.org)
- * Last Modified: 01-01-2009
- *
- * Description:
- *
- * Routines for parsing and resolving template-based object definitions.
- * Basic steps involved in this in the daemon are as follows:
- *
- *    1) Read
- *    2) Resolve
- *    3) Duplicate
- *    4) Recombobulate
- *    5) Cache
- *    7) Register
- *    8) Cleanup
- *
- * The steps involved for the CGIs differ a bit, since they read the cached
- * definitions which are already resolved, recombobulated and duplicated.  In
- * otherwords, they've already been "flattened"...
- *
- *    1) Read
- *    2) Register
- *    3) Cleanup
- *
- *
- * License:
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2 as
- * published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
- *
- *****************************************************************************/
-
+/*
+** Copyright 2001-2009 Ethan Galstad
+** Copyright 2011      Merethis
+**
+** This file is part of Centreon Scheduler.
+**
+** Centreon Scheduler is free software: you can redistribute it and/or
+** modify it under the terms of the GNU General Public License version 2
+** as published by the Free Software Foundation.
+**
+** Centreon Scheduler is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+** General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with Centreon Scheduler. If not, see
+** <http://www.gnu.org/licenses/>.
+*/
 
 /*********** COMMON HEADER FILES ***********/
 
@@ -56,26 +29,18 @@
 
 /**** CORE OR CGI SPECIFIC HEADER FILES ****/
 
-#ifdef NSCORE
 #include "../include/nagios.h"
-#endif
-
-#ifdef NSCGI
-#include "../include/cgiutils.h"
-#endif
 
 /**** DATA INPUT-SPECIFIC HEADER FILES ****/
 
 #include "xodtemplate.h"
 
 
-#ifdef NSCORE
 extern int use_regexp_matches;
 extern int use_true_regexp_matching;
 extern int verify_config;
 extern int test_scheduling;
 extern int use_precached_objects;
-#endif
 
 xodtemplate_timeperiod *xodtemplate_timeperiod_list=NULL;
 xodtemplate_command *xodtemplate_command_list=NULL;
@@ -157,7 +122,6 @@ static char *xodtemplate_config_file_name(int config_file)
 
 /* process all config files - both core and CGIs pass in name of main config file */
 int xodtemplate_read_config_data(char *main_config_file, int options, int cache, int precache){
-#ifdef NSCORE
 	char *config_file=NULL;
 	char *config_base_dir=NULL;
 	char *input=NULL;
@@ -167,14 +131,11 @@ int xodtemplate_read_config_data(char *main_config_file, int options, int cache,
 	struct timeval tv[14];
 	double runtime[14];
 	mmapfile *thefile=NULL;
-#endif
 	int result=OK;
 
 
 	if(main_config_file==NULL){
-#ifdef NSCORE
 		printf("Error: No main config file passed to object routines!\n");
-#endif
 		return ERROR;
 		}
 
@@ -207,19 +168,13 @@ int xodtemplate_read_config_data(char *main_config_file, int options, int cache,
 	xodtemplate_current_config_file=0;
 	xodtemplate_config_files=(char **)malloc(256*sizeof(char **));
 	if(xodtemplate_config_files==NULL){
-#ifdef NSCORE
 		printf("Unable to allocate memory!\n");
-#endif
 		return ERROR;
 		}
 
 	/* are the objects we're reading already pre-sorted? */
 	presorted_objects=FALSE;
-#ifdef NSCORE
 	presorted_objects=(use_precached_objects==TRUE)?TRUE:FALSE;
-#endif
-
-#ifdef NSCORE
 	if(test_scheduling==TRUE)
 		gettimeofday(&tv[0],NULL);
 
@@ -233,9 +188,7 @@ int xodtemplate_read_config_data(char *main_config_file, int options, int cache,
 		/* determine the directory of the main config file */
 		if((config_file=(char *)strdup(main_config_file))==NULL){
 			my_free(xodtemplate_config_files);
-#ifdef NSCORE
 			printf("Unable to allocate memory!\n");
-#endif
 			return ERROR;
 			}
 		config_base_dir=(char *)strdup(dirname(config_file));
@@ -245,9 +198,7 @@ int xodtemplate_read_config_data(char *main_config_file, int options, int cache,
 		if((thefile=mmap_fopen(main_config_file))==NULL){
 			my_free(config_base_dir);
 			my_free(xodtemplate_config_files);
-#ifdef NSCORE
 			printf("Unable to open main config file '%s'\n",main_config_file);
-#endif
 			return ERROR;
 	                }
 
@@ -268,19 +219,24 @@ int xodtemplate_read_config_data(char *main_config_file, int options, int cache,
 			/* skip blank lines and comments */
 			if(input[0]=='#' || input[0]==';' || input[0]=='\x0')
 				continue;
-			
+
 			if((var=strtok(input,"="))==NULL)
 				continue;
-			
+
 			if((val=strtok(NULL,"\n"))==NULL)
 				continue;
-			
+
 			/* process a single config file */
 			if(!strcmp(var,"xodtemplate_config_file") || !strcmp(var,"cfg_file")){
 
 				temp_buffer=(char *)strdup(val);
-				if(config_base_dir!=NULL && val[0]!='/')
-					asprintf(&config_file,"%s/%s",config_base_dir,temp_buffer);
+				if(config_base_dir!=NULL && val[0]!='/'){
+					if(asprintf(&config_file,"%s/%s",config_base_dir,temp_buffer)==-1){
+						logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
+						result=ERROR;
+						break;
+						}
+					}
 				else
 					config_file=temp_buffer;
 
@@ -288,7 +244,7 @@ int xodtemplate_read_config_data(char *main_config_file, int options, int cache,
 				result=xodtemplate_process_config_file(config_file,options);
 
 				my_free(config_file);
-				
+
 				/* if there was an error processing the config file, break out of loop */
 				if(result==ERROR)
 					break;
@@ -296,10 +252,15 @@ int xodtemplate_read_config_data(char *main_config_file, int options, int cache,
 
 			/* process all files in a config directory */
 			else if(!strcmp(var,"xodtemplate_config_dir") || !strcmp(var,"cfg_dir")){
-				
+
 				temp_buffer=(char *)strdup(val);
-				if(config_base_dir!=NULL && val[0]!='/')
-					asprintf(&config_file,"%s/%s",config_base_dir,temp_buffer);
+				if(config_base_dir!=NULL && val[0]!='/'){
+					if(asprintf(&config_file,"%s/%s",config_base_dir,temp_buffer)==-1){
+						logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
+						result=ERROR;
+						break;
+						}
+					}
 				else
 					config_file=temp_buffer;
 
@@ -326,14 +287,6 @@ int xodtemplate_read_config_data(char *main_config_file, int options, int cache,
 
 	if(test_scheduling==TRUE)
 		gettimeofday(&tv[1],NULL);
-#endif
-
-#ifdef NSCGI
-	/* CGIs process only one file - the cached objects file */
-	result=xodtemplate_process_config_file(xodtemplate_cache_file,options);
-#endif
-
-#ifdef NSCORE
 
 	/* only perform intensive operations if we're not using the precached object file */
 	if(use_precached_objects==FALSE){
@@ -409,28 +362,21 @@ int xodtemplate_read_config_data(char *main_config_file, int options, int cache,
 	if(test_scheduling==TRUE)
 		gettimeofday(&tv[11],NULL);
 
-#endif
-
 	/* register objects */
 	if(result==OK)
 		result=xodtemplate_register_objects();
-#ifdef NSCORE
 	if(test_scheduling==TRUE)
 		gettimeofday(&tv[12],NULL);
-#endif
 
 	/* cleanup */
 	xodtemplate_free_memory();
-#ifdef NSCORE
 	if(test_scheduling==TRUE)
 		gettimeofday(&tv[13],NULL);
-#endif
 
 	/* free memory */
 	my_free(xodtemplate_cache_file);
 	my_free(xodtemplate_precache_file);
 
-#ifdef NSCORE
 	if(test_scheduling==TRUE){
 
 		runtime[0]=(double)((double)(tv[1].tv_sec-tv[0].tv_sec)+(double)((tv[1].tv_usec-tv[0].tv_usec)/1000.0)/1000.0);
@@ -471,27 +417,26 @@ int xodtemplate_read_config_data(char *main_config_file, int options, int cache,
 
 		printf("OBJECT CONFIG PROCESSING TIMES      (* = Potential for precache savings with -u option)\n");
 		printf("----------------------------------\n");
-		printf("Read:                 %.6lf sec\n",runtime[0]);
-		printf("Resolve:              %.6lf sec  *\n",runtime[1]);
-		printf("Recomb Contactgroups: %.6lf sec  *\n",runtime[2]);
-		printf("Recomb Hostgroups:    %.6lf sec  *\n",runtime[3]);
-		printf("Dup Services:         %.6lf sec  *\n",runtime[4]);
-		printf("Recomb Servicegroups: %.6lf sec  *\n",runtime[5]);
-		printf("Duplicate:            %.6lf sec  *\n",runtime[6]);
-		printf("Inherit:              %.6lf sec  *\n",runtime[7]);
-		printf("Recomb Contacts:      %.6lf sec  *\n",runtime[8]);
-		printf("Sort:                 %.6lf sec  *\n",runtime[9]);
-/*		printf("Cache:                %.6lf sec\n",runtime[10]);*/
-		printf("Register:             %.6lf sec\n",runtime[11]);
-		printf("Free:                 %.6lf sec\n",runtime[12]);
+		printf("Read:                 %.6f sec\n",runtime[0]);
+		printf("Resolve:              %.6f sec  *\n",runtime[1]);
+		printf("Recomb Contactgroups: %.6f sec  *\n",runtime[2]);
+		printf("Recomb Hostgroups:    %.6f sec  *\n",runtime[3]);
+		printf("Dup Services:         %.6f sec  *\n",runtime[4]);
+		printf("Recomb Servicegroups: %.6f sec  *\n",runtime[5]);
+		printf("Duplicate:            %.6f sec  *\n",runtime[6]);
+		printf("Inherit:              %.6f sec  *\n",runtime[7]);
+		printf("Recomb Contacts:      %.6f sec  *\n",runtime[8]);
+		printf("Sort:                 %.6f sec  *\n",runtime[9]);
+/*		printf("Cache:                %.6f sec\n",runtime[10]);*/
+		printf("Register:             %.6f sec\n",runtime[11]);
+		printf("Free:                 %.6f sec\n",runtime[12]);
 		printf("                      ============\n");
-		printf("TOTAL:                %.6lf sec  ",runtime[13]);
+		printf("TOTAL:                %.6f sec  ",runtime[13]);
 		if(use_precached_objects==FALSE)
-			printf("* = %.6lf sec (%.2f%%) estimated savings",runtime[13]-runtime[12]-runtime[11]-runtime[0],((runtime[13]-runtime[12]-runtime[11]-runtime[0])/runtime[13])*100.0);
+			printf("* = %.6f sec (%.2f%%) estimated savings",runtime[13]-runtime[12]-runtime[11]-runtime[0],((runtime[13]-runtime[12]-runtime[11]-runtime[0])/runtime[13])*100.0);
 		printf("\n");
 		printf("\n\n");
 	        }
-#endif
 
 	return result;
 	}
@@ -558,13 +503,11 @@ int xodtemplate_grab_config_info(char *main_config_file)
 	if(xodtemplate_cache_file==NULL || xodtemplate_precache_file==NULL)
 		return ERROR;
 
-#ifdef NSCORE
 	mac = get_global_macros();
 	/* save the object cache file macro */
 	my_free(mac->x[MACRO_OBJECTCACHEFILE]);
 	if((mac->x[MACRO_OBJECTCACHEFILE]=(char *)strdup(xodtemplate_cache_file)))
 		strip(mac->x[MACRO_OBJECTCACHEFILE]);
-#endif
 
 	return OK;
         }
@@ -580,10 +523,8 @@ int xodtemplate_process_config_dir(char *dirname, int options){
 	register int x=0;
 	struct stat stat_buf;
 
-#ifdef NSCORE
 	if(verify_config==TRUE)
 		printf("Processing object config directory '%s'...\n",dirname);
-#endif
 
 	/* open the directory for reading */
 	dirp=opendir(dirname);
@@ -662,10 +603,8 @@ int xodtemplate_process_config_file(char *filename, int options){
 	char *ptr=NULL;
 
 
-#ifdef NSCORE
 	if(verify_config==TRUE)
 		printf("Processing object config file '%s'...\n",filename);
-#endif
 
 	/* save config file name */
 	xodtemplate_config_files[xodtemplate_current_config_file++]=(char *)strdup(filename);
@@ -1146,12 +1085,8 @@ int xodtemplate_add_object_property(char *input, int options){
 
 
 	/* should some object definitions be added to skiplists immediately? */
-#ifdef NSCORE
 	if(use_precached_objects==TRUE)
 		force_skiplists=TRUE;
-#else
-	force_skiplists=TRUE;
-#endif
 
 	/* check to see if we should process this type of object */
 	switch(xodtemplate_current_object_type){
@@ -3687,6 +3622,7 @@ int xodtemplate_add_object_property(char *input, int options){
 int xodtemplate_end_object_definition(int options){
 	int result=OK;
 
+	(void)options;
 
 	xodtemplate_current_object=NULL;
 	xodtemplate_current_object_type=XODTEMPLATE_NONE;
@@ -4016,9 +3952,7 @@ int xodtemplate_parse_timeperiod_directive(xodtemplate_timeperiod *tperiod, char
 	my_free(input);
 
 	if(result==ERROR){
-#ifdef NSCORE
 		printf("Error: Could not parse timeperiod directive '%s'!\n",input);
-#endif
 		return ERROR;
 		}
 
@@ -4106,8 +4040,6 @@ int xodtemplate_get_weekday_from_string(char *str, int *weekday){
 /******************************************************************/
 /***************** OBJECT DUPLICATION FUNCTIONS *******************/
 /******************************************************************/
-
-#ifdef NSCORE
 
 /* duplicates service definitions */
 int xodtemplate_duplicate_services(void){
@@ -5810,14 +5742,10 @@ int xodtemplate_duplicate_serviceextinfo(xodtemplate_serviceextinfo *this_servic
 	return OK;
         }
 
-#endif
-
 
 /******************************************************************/
 /***************** OBJECT RESOLUTION FUNCTIONS ********************/
 /******************************************************************/
-
-#ifdef NSCORE
 
 /* inherit object properties */
 /* some missing defaults (notification options, etc.) are also applied here */
@@ -5993,14 +5921,10 @@ int xodtemplate_inherit_object_properties(void){
 	return OK;
 	}
 
-#endif
-
 
 /******************************************************************/
 /***************** OBJECT RESOLUTION FUNCTIONS ********************/
 /******************************************************************/
-
-#ifdef NSCORE
 
 /* resolves object definitions */
 int xodtemplate_resolve_objects(void){
@@ -7560,16 +7484,11 @@ int xodtemplate_resolve_serviceextinfo(xodtemplate_serviceextinfo *this_servicee
 	return OK;
         }
 
-#endif
-
 
 
 /******************************************************************/
 /*************** OBJECT RECOMBOBULATION FUNCTIONS *****************/
 /******************************************************************/
-
-#ifdef NSCORE
-
 
 /* recombobulates contactgroup definitions */
 int xodtemplate_recombobulate_contactgroups(void){
@@ -8179,15 +8098,10 @@ int xodtemplate_recombobulate_servicegroup_subgroups(xodtemplate_servicegroup *t
 	return OK;
 	}
 
-#endif
-
-
 
 /******************************************************************/
 /******************* OBJECT SEARCH FUNCTIONS **********************/
 /******************************************************************/
-
-#ifdef NSCORE
 
 /* finds a specific timeperiod object */
 xodtemplate_timeperiod *xodtemplate_find_timeperiod(char *name){
@@ -8448,9 +8362,6 @@ xodtemplate_service *xodtemplate_find_real_service(char *host_name, char *servic
 
 	return skiplist_find_first(xobject_skiplists[X_SERVICE_SKIPLIST],&temp_service,NULL);
         }
-
-#endif
-
 
 
 /******************************************************************/
@@ -9294,8 +9205,6 @@ int xodtemplate_register_hostescalation(xodtemplate_hostescalation *this_hostesc
 /********************** SORTING FUNCTIONS *************************/
 /******************************************************************/
 
-#ifdef NSCORE
-
 /* sorts all objects by name */
 int xodtemplate_sort_objects(void){
 
@@ -10049,16 +9958,11 @@ int xodtemplate_sort_hostdependencies(){
 	return OK;
 	}
 
-#endif
-
-
 
 
 /******************************************************************/
 /*********************** MERGE FUNCTIONS **************************/
 /******************************************************************/
-
-#ifdef NSCORE
 
 /* merge extinfo definitions */
 int xodtemplate_merge_extinfo_ojects(void){
@@ -10158,15 +10062,11 @@ int xodtemplate_merge_host_extinfo_object(xodtemplate_host *this_host, xodtempla
 	return OK;
         }
 
-#endif
-
 
 
 /******************************************************************/
 /*********************** CACHE FUNCTIONS **************************/
 /******************************************************************/
-
-#ifdef NSCORE
 
 /* writes cached object definitions for use by web interface */
 int xodtemplate_cache_objects(char *cache_file){
@@ -10861,7 +10761,7 @@ int xodtemplate_cache_objects(char *cache_file){
 	return OK;
         }
 
-#endif
+
 
 /******************************************************************/
 /******************** SKIPLIST FUNCTIONS **************************/
@@ -11796,8 +11696,6 @@ int xodtemplate_free_memory(void){
 
 
 
-
-#ifdef NSCORE
 /* adds a member to a list */
 int xodtemplate_add_member_to_memberlist(xodtemplate_memberlist **list, char *name1, char *name2){
 	xodtemplate_memberlist *temp_item=NULL;
@@ -11902,14 +11800,11 @@ void xodtemplate_remove_memberlist_item(xodtemplate_memberlist *item,xodtemplate
 
 	return;
         }
-#endif
 
 
 /******************************************************************/
 /********************** UTILITY FUNCTIONS *************************/
 /******************************************************************/
-
-#ifdef NSCORE
 
 /* expands a comma-delimited list of contactgroups and/or contacts to member contact names */
 xodtemplate_memberlist *xodtemplate_expand_contactgroups_and_contacts(char *contactgroups, char *contacts, int _config_file, int _start_line){
@@ -12210,13 +12105,15 @@ int xodtemplate_add_contactgroup_members_to_memberlist(xodtemplate_memberlist **
 	char *member_name=NULL;
 	char *member_ptr=NULL;
 
+	(void)_config_file;
+	(void)_start_line;
+
 	if(list==NULL || temp_contactgroup==NULL)
 		return ERROR;
 
 	/* if we have no members, just return. Empty contactgroups are ok */
-	if(temp_contactgroup->members==NULL){
+	if(temp_contactgroup->members==NULL)
 		return OK;
-		}
 
 	/* save a copy of the members */
 	if((group_members=(char *)strdup(temp_contactgroup->members))==NULL)
@@ -12550,6 +12447,9 @@ int xodtemplate_add_hostgroup_members_to_memberlist(xodtemplate_memberlist **lis
 	char *group_members=NULL;
 	char *member_name=NULL;
 	char *member_ptr=NULL;
+
+	(void)_config_file;
+	(void)_start_line;
 
 	if(list==NULL || temp_hostgroup==NULL)
 		return ERROR;
@@ -12925,6 +12825,9 @@ int xodtemplate_add_servicegroup_members_to_memberlist(xodtemplate_memberlist **
 	char *member_name=NULL;
 	char *host_name=NULL;
 	char *member_ptr=NULL;
+
+	(void)_config_file;
+	(void)_start_line;
 
 	if(list==NULL || temp_servicegroup==NULL)
 		return ERROR;
@@ -13498,7 +13401,6 @@ int xodtemplate_get_servicegroup_names(xodtemplate_memberlist **list, xodtemplat
 	return OK;
         }
 
-#ifdef NSCORE
 
 /******************************************************************/
 /****************** ADDITIVE INHERITANCE STUFF ********************/
@@ -13667,8 +13569,3 @@ int xodtemplate_clean_additive_strings(void){
 
 	return OK;
         }
-#endif
-
-#endif
-
-

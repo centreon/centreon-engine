@@ -1,24 +1,23 @@
-/************************************************************************
- *
- * MACROS.H - Common macro functions
- * Written By: Ethan Galstad (egalstad@nagios.org)
- * Last Modified: 10-28-2007
- *
- * License:
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2 as
- * published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
- ************************************************************************/
+/*
+** Copyright 2007-2008 Ethan Galstad
+** Copyright 2010      Andreas Ericsson
+** Copyright 2011      Merethis
+**
+** This file is part of Centreon Scheduler.
+**
+** Centreon Scheduler is free software: you can redistribute it and/or
+** modify it under the terms of the GNU General Public License version 2
+** as published by the Free Software Foundation.
+**
+** Centreon Scheduler is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+** General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with Centreon Scheduler. If not, see
+** <http://www.gnu.org/licenses/>.
+*/
 
 #ifndef _MACROS_H
 #define _MACROS_H
@@ -41,6 +40,25 @@
 #define MAX_USER_MACROS				256	/* maximum number of $USERx$ macros */
 
 #define MACRO_X_COUNT				153	/* size of macro_x[] array */
+
+struct nagios_macros {
+	char *x[MACRO_X_COUNT];
+	char *argv[MAX_COMMAND_ARGUMENTS];
+	char *contactaddress[MAX_CONTACT_ADDRESSES];
+	char *ondemand;
+	host *host_ptr;
+	hostgroup *hostgroup_ptr;
+	service *service_ptr;
+	servicegroup *servicegroup_ptr;
+	contact *contact_ptr;
+	contactgroup *contactgroup_ptr;
+	customvariablesmember *custom_host_vars;
+	customvariablesmember *custom_service_vars;
+	customvariablesmember *custom_contact_vars;
+};
+typedef struct nagios_macros nagios_macros;
+
+
 
 #define MACRO_HOSTNAME				0
 #define MACRO_HOSTALIAS				1
@@ -208,14 +226,30 @@
 
 /****************** MACRO FUNCTIONS ******************/
 
-int process_macros(char *,char **,int);             	/* replace macros with their actual values */
-char *clean_macro_chars(char *,int);                    /* cleans macros characters before insertion into output string */
+nagios_macros *get_global_macros(void);
 
-int grab_service_macros(service *);                  	/* updates the service macro data */
-int grab_host_macros(host *);                        	/* updates the host macro data */
-int grab_servicegroup_macros(servicegroup *);           /* updates servicegroup macros */
-int grab_hostgroup_macros(hostgroup *);                 /* updates hostgroup macros */
-int grab_contact_macros(contact *);                  	/* updates the contact macro data */
+/*
+ * Replace macros with their actual values
+ * This function modifies the global_macros struct and is thus
+ * not thread-safe.
+ */
+int process_macros(char *, char **, int);
+
+/* thread-safe version of the above */
+int process_macros_r(nagios_macros *mac, char *,char **,int);
+
+/* cleans macros characters before insertion into output string */
+char *clean_macro_chars(char *,int);
+
+/*
+ * These functions updates **macros with the values from
+ * their respective object type.
+ */
+int grab_service_macros(nagios_macros *mac, service *);
+int grab_host_macros(nagios_macros *mac, host *);
+int grab_servicegroup_macros(nagios_macros *mac, servicegroup *);
+int grab_hostgroup_macros(nagios_macros *mac, hostgroup *);
+int grab_contact_macros(nagios_macros *mac, contact *);
 
 char *get_url_encoded_string(char *);			/* URL encode a string */
 
@@ -223,36 +257,38 @@ int init_macros(void);
 int init_macrox_names(void);
 int free_macrox_names(void);
 
-int clear_argv_macros(void);
-int clear_volatile_macros(void);
-int clear_host_macros(void);
-int clear_service_macros(void);
-int clear_hostgroup_macros(void);
-int clear_servicegroup_macros(void);
-int clear_contact_macros(void);
-int clear_contactgroup_macros(void);
-int clear_summary_macros(void);
+extern void copy_constant_macros(char **dest);
 
-int grab_macro_value(char *,char **,int *,int *);
-int grab_macrox_value(int,char *,char *,char **,int *);
-int grab_custom_macro_value(char *,char *,char *,char **);
-int grab_datetime_macro(int,char *,char *,char **);
-int grab_standard_host_macro(int,host *,char **,int *);
-int grab_standard_hostgroup_macro(int,hostgroup *,char **);
-int grab_standard_service_macro(int,service *,char **,int *);
-int grab_standard_servicegroup_macro(int,servicegroup *,char **);
-int grab_standard_contact_macro(int,contact *,char **);
+int clear_argv_macros(nagios_macros *mac);
+int clear_volatile_macros(nagios_macros *mac);
+int clear_host_macros(nagios_macros *mac);
+int clear_service_macros(nagios_macros *mac);
+int clear_hostgroup_macros(nagios_macros *mac);
+int clear_servicegroup_macros(nagios_macros *mac);
+int clear_contact_macros(nagios_macros *mac);
+int clear_contactgroup_macros(nagios_macros *mac);
+int clear_summary_macros(nagios_macros *mac);
+
+int grab_macro_value(nagios_macros *mac, char *,char **,int *,int *);
+int grab_macrox_value(nagios_macros *mac, int,char *,char *,char **,int *);
+int grab_custom_macro_value(nagios_macros *mac, char *,char *,char *,char **);
+int grab_datetime_macro(nagios_macros *mac, int,char *,char *,char **);
+int grab_standard_host_macro(nagios_macros *mac, int,host *,char **,int *);
+int grab_standard_hostgroup_macro(nagios_macros *mac, int,hostgroup *,char **);
+int grab_standard_service_macro(nagios_macros *mac, int,service *,char **,int *);
+int grab_standard_servicegroup_macro(nagios_macros *mac, int,servicegroup *,char **);
+int grab_standard_contact_macro(nagios_macros *mac, int,contact *,char **);
 int grab_contact_address_macro(int,contact *,char **);
 int grab_standard_contactgroup_macro(int,contactgroup *,char **);
-int grab_custom_object_macro(char *,customvariablesmember *,char **);
+int grab_custom_object_macro(nagios_macros *mac, char *,customvariablesmember *,char **);
 
 
 #ifdef NSCORE
-int set_all_macro_environment_vars(int);
-int set_macrox_environment_vars(int);
-int set_argv_macro_environment_vars(int);
-int set_custom_macro_environment_vars(int);
-int set_contact_address_environment_vars(int);
+int set_all_macro_environment_vars(nagios_macros *mac, int);
+int set_macrox_environment_vars(nagios_macros *mac, int);
+int set_argv_macro_environment_vars(nagios_macros *mac, int);
+int set_custom_macro_environment_vars(nagios_macros *mac, int);
+int set_contact_address_environment_vars(nagios_macros *mac, int);
 int set_macro_environment_var(char *,char *,int);
 #endif
 

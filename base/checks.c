@@ -1,27 +1,22 @@
-/*****************************************************************************
- *
- * CHECKS.C - Service and host check functions for Nagios
- *
- * Copyright (c) 2011 Nagios Core Development Team
- * Copyright (c) 1999-2010 Ethan Galstad (egalstad@nagios.org)
- * Last Modified: 01-20-2011
- *
- * License:
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2 as
- * published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
- *
- *****************************************************************************/
+/*
+** Copyright 1999-2010 Ethan Galstad
+** Copyright 2011      Merethis
+**
+** This file is part of Centreon Scheduler.
+**
+** Centreon Scheduler is free software: you can redistribute it and/or
+** modify it under the terms of the GNU General Public License version 2
+** as published by the Free Software Foundation.
+**
+** Centreon Scheduler is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+** General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with Centreon Scheduler. If not, see
+** <http://www.gnu.org/licenses/>.
+*/
 
 #include "../include/config.h"
 #include "../include/comments.h"
@@ -36,6 +31,7 @@
 /*#define DEBUG_CHECKS*/
 /*#define DEBUG_HOST_CHECKS 1*/
 
+#define MAX_CMD_ARGS 4096
 
 #ifdef EMBEDDEDPERL
 #include "../include/epn_nagios.h"
@@ -124,6 +120,122 @@ extern int      use_embedded_perl;
 
 
 
+
+/******************************************************************/
+/********************* MISCELLANEOUS FUNCTIONS ********************/
+/******************************************************************/
+
+/* extract check result */
+static void extract_check_result(FILE *fp,dbuf *checkresult_dbuf){
+	char output_buffer[MAX_INPUT_BUFFER]="";
+	char *temp_buffer;
+
+	/* initialize buffer */
+	strcpy(output_buffer,"");
+
+	/* get all lines of plugin output - escape newlines */
+	while(fgets(output_buffer,sizeof(output_buffer)-1,fp)){
+		temp_buffer=escape_newlines(output_buffer);
+		dbuf_strcat(checkresult_dbuf,temp_buffer);
+		my_free(temp_buffer);
+		}
+	}
+
+/* convert a command line to an array of arguments, suitable for exec* functions */
+static int parse_command_line(char *cmd, char *argv[MAX_CMD_ARGS]){
+	unsigned int argc=0;
+	char *parsed_cmd;
+
+	/* Skip initial white-space characters. */
+	for(parsed_cmd=cmd;isspace(*cmd);++cmd)
+		;
+
+	/* Parse command line. */
+	while(*cmd&&(argc<MAX_CMD_ARGS-1)){
+		argv[argc++]=parsed_cmd;
+		switch(*cmd){
+		case '\'':
+			++cmd;
+			while((*cmd)&&(*cmd!='\''))
+				*(parsed_cmd++)=*(cmd++);
+			if(*cmd)
+				++cmd;
+			break;
+		case '"':
+			++cmd;
+			while((*cmd)&&(*cmd!='"')){
+				if((*cmd=='\\')&&cmd[1]&&strchr("\"\\\n",cmd[1]))
+					++cmd;
+				*(parsed_cmd++)=*(cmd++);
+				}
+			if(*cmd)
+				++cmd;
+			break;
+		default:
+			while((*cmd)&&!isspace(*cmd)){
+				if((*cmd=='\\')&&cmd[1])
+					++cmd;
+				*(parsed_cmd++)=*(cmd++);
+				}
+			}
+		while(isspace(*cmd))
+			++cmd;
+		*(parsed_cmd++)='\0';
+		}
+	argv[argc]=NULL;
+
+	return OK;
+	}
+
+/* run a check */
+static int run_check(char *processed_command,dbuf *checkresult_dbuf){
+	char *argv[MAX_CMD_ARGS];
+	FILE *fp;
+	pid_t pid;
+	int pipefds[2];
+	int retval;
+
+	/* execute check with execvp */
+	if(pipe(pipefds)){
+		logit(NSLOG_RUNTIME_WARNING,TRUE,"error creating pipe: %s\n", strerror(errno));
+		_exit(STATE_UNKNOWN);
+		}
+	if((pid=fork())<0){
+		logit(NSLOG_RUNTIME_WARNING,TRUE,"fork error: %s\n", strerror(errno));
+		_exit(STATE_UNKNOWN);
+		}
+	else if(!pid){
+		if((dup2(pipefds[1],STDOUT_FILENO)<0)||(dup2(pipefds[1],STDERR_FILENO)<0)){
+			logit(NSLOG_RUNTIME_WARNING,TRUE,"dup2 error: %s\n", strerror(errno));
+			_exit(STATE_UNKNOWN);
+			}
+		close(pipefds[1]);
+		parse_command_line(processed_command,argv);
+		if(!argv[0])
+			_exit(STATE_UNKNOWN);
+		execvp(argv[0], argv);
+		_exit(STATE_UNKNOWN);
+		}
+
+	/* prepare pipe reading */
+	close(pipefds[1]);
+	fp=fdopen(pipefds[0],"r");
+	if(!fp){
+		logit(NSLOG_RUNTIME_WARNING,TRUE,"fdopen error: %s\n", strerror(errno));
+		_exit(STATE_UNKNOWN);
+		}
+
+	/* extract check result */
+	extract_check_result(fp,checkresult_dbuf);
+
+	/* close the process */
+	fclose(fp);
+	close(pipefds[0]);
+	if(waitpid(pid,&retval,0)!=pid)
+		retval=-1;
+
+	return retval;
+	}
 
 
 /******************************************************************/
@@ -255,7 +367,7 @@ int run_scheduled_service_check(service *svc, int check_options, double latency)
 		return ERROR;
 
 	log_debug_info(DEBUGL_FUNCTIONS,0,"run_scheduled_service_check() start\n");
-	log_debug_info(DEBUGL_CHECKS,0,"Attempting to run scheduled check of service '%s' on host '%s': check options=%d, latency=%lf\n",svc->description,svc->host_name,check_options,latency);
+	log_debug_info(DEBUGL_CHECKS,0,"Attempting to run scheduled check of service '%s' on host '%s': check options=%d, latency=%f\n",svc->description,svc->host_name,check_options,latency);
 
 	/* attempt to run the check */
 	result=run_async_service_check(svc,check_options,latency,TRUE,TRUE,&time_is_valid,&preferred_time);
@@ -333,14 +445,12 @@ int run_async_service_check(service *svc, int check_options, double latency, int
 	nagios_macros mac;
 	char *raw_command=NULL;
 	char *processed_command=NULL;
-	char output_buffer[MAX_INPUT_BUFFER]="";
 	char *temp_buffer=NULL;
 	struct timeval start_time,end_time;
 	pid_t pid=0;
 	int fork_error=FALSE;
 	int wait_result=0;
 	host *temp_host=NULL;
-	FILE *fp=NULL;
 	int pclose_result=0;
 	mode_t new_umask=077;
 	mode_t old_umask;
@@ -482,7 +592,13 @@ int run_async_service_check(service *svc, int check_options, double latency, int
 
 	/* open a temp file for storing check output */
 	old_umask=umask(new_umask);
-	asprintf(&output_file,"%s/checkXXXXXX",temp_path);
+	if(asprintf(&output_file,"%s/checkXXXXXX",temp_path)==-1){
+		logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
+		svc->latency=old_latency;
+		my_free(processed_command);
+		my_free(raw_command);
+		return ERROR;
+		}
 	check_result_info.output_file_fd=mkstemp(output_file);
 	if(check_result_info.output_file_fd>=0)
 		check_result_info.output_file_fp=fdopen(check_result_info.output_file_fd,"w");
@@ -775,22 +891,7 @@ int run_async_service_check(service *svc, int check_options, double latency, int
 
      
 			/* run the plugin check command */
-			fp=popen(processed_command,"r");
-			if(fp==NULL)
-				_exit(STATE_UNKNOWN);
-
-			/* initialize buffer */
-			strcpy(output_buffer,"");
-
-			/* get all lines of plugin output - escape newlines */
-			while(fgets(output_buffer,sizeof(output_buffer)-1,fp)){
-				temp_buffer=escape_newlines(output_buffer);
-				dbuf_strcat(&checkresult_dbuf,temp_buffer);
-				my_free(temp_buffer);
-				}
-
-			/* close the process */
-			pclose_result=pclose(fp);
+			pclose_result=run_check(processed_command,&checkresult_dbuf);
 
 			/* reset the alarm */
 			alarm(0);
@@ -1009,9 +1110,10 @@ int handle_async_service_check_result(service *temp_service, check_result *queue
 
 		logit(NSLOG_RUNTIME_WARNING,TRUE,"Warning: Return code of %d for check of service '%s' on host '%s' was out of bounds.%s\n",queued_check_result->return_code,temp_service->description,temp_service->host_name,(queued_check_result->return_code==126 ? "Make sure the plugin you're trying to run is executable." : (queued_check_result->return_code==127?" Make sure the plugin you're trying to run actually exists.":"")));
 
-		asprintf(&temp_plugin_output,"\x73\x6f\x69\x67\x61\x6e\x20\x74\x68\x67\x69\x72\x79\x70\x6f\x63\x20\x6e\x61\x68\x74\x65\x20\x64\x61\x74\x73\x6c\x61\x67");
-		my_free(temp_plugin_output);
-		asprintf(&temp_service->plugin_output,"(Return code of %d is out of bounds%s)",queued_check_result->return_code,(queued_check_result->return_code==126 ? " - plugin may not be executable" : (queued_check_result->return_code==127 ?" - plugin may be missing":"")));
+		if(asprintf(&temp_service->plugin_output,"(Return code of %d is out of bounds%s)",queued_check_result->return_code,(queued_check_result->return_code==126 ? " - plugin may not be executable" : (queued_check_result->return_code==127 ?" - plugin may be missing":"")))==-1){
+			logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
+			return ERROR;
+			}
 
 		temp_service->current_state=STATE_CRITICAL;
 	        }
@@ -1733,14 +1835,14 @@ void schedule_service_check(service *svc, time_t check_time, int options){
 			else{
 				log_debug_info(DEBUGL_CHECKS,2,"New service check event occurs after the existing event, so we'll ignore it.\n");
 				}
-		        }
-
-		/* else we're using the new event, so remove the old one */
-		else{
-			remove_event(temp_event,&event_list_low,&event_list_low_tail);
-			my_free(temp_event);
 			}
-	        }
+		}
+
+	/* else we're using the new event, so remove the old one */
+	else{
+		remove_event(temp_event,&event_list_low,&event_list_low_tail);
+		my_free(temp_event);
+		}
 
 	/* save check options for retention purposes */
 	svc->check_options=options;
@@ -2722,8 +2824,14 @@ int execute_sync_host_check_3x(host *hst)
 	if(early_timeout==TRUE){
 
 		my_free(temp_plugin_output);
-		asprintf(&temp_plugin_output,"Host check timed out after %d seconds\n",host_check_timeout);
-
+		if(asprintf(&temp_plugin_output,"Host check timed out after %d seconds\n",host_check_timeout)==-1){
+			logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
+			/* free memory */
+			my_free(temp_plugin_output);
+			my_free(raw_command);
+			my_free(processed_command);
+			return ERROR;
+			}
 		/* log the timeout */
 		logit(NSLOG_RUNTIME_WARNING,TRUE,"Warning: Host check command '%s' for host '%s' timed out after %d seconds\n",processed_command,hst->name,host_check_timeout);
 	        }
@@ -2800,7 +2908,7 @@ int run_scheduled_host_check_3x(host *hst, int check_options, double latency){
 	if(hst==NULL)
 		return ERROR;
 
-	log_debug_info(DEBUGL_CHECKS,0,"Attempting to run scheduled check of host '%s': check options=%d, latency=%lf\n",hst->name,check_options,latency);
+	log_debug_info(DEBUGL_CHECKS,0,"Attempting to run scheduled check of host '%s': check options=%d, latency=%f\n",hst->name,check_options,latency);
 
 	/* attempt to run the check */
 	result=run_async_host_check_3x(hst,check_options,latency,TRUE,TRUE,&time_is_valid,&preferred_time);
@@ -2871,13 +2979,11 @@ int run_async_host_check_3x(host *hst, int check_options, double latency, int sc
 	nagios_macros mac;
 	char *raw_command=NULL;
 	char *processed_command=NULL;
-	char output_buffer[MAX_INPUT_BUFFER]="";
 	char *temp_buffer=NULL;
 	struct timeval start_time,end_time;
 	pid_t pid=0;
 	int fork_error=FALSE;
 	int wait_result=0;
-	FILE *fp=NULL;
 	int pclose_result=0;
 	mode_t new_umask=077;
 	mode_t old_umask;
@@ -2979,7 +3085,10 @@ int run_async_host_check_3x(host *hst, int check_options, double latency, int sc
 
 	/* open a temp file for storing check output */
 	old_umask=umask(new_umask);
-	asprintf(&output_file,"%s/checkXXXXXX",temp_path);
+	if(asprintf(&output_file,"%s/checkXXXXXX",temp_path)==-1){
+		logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
+		return ERROR;
+		}
 	check_result_info.output_file_fd=mkstemp(output_file);
 	if(check_result_info.output_file_fd>=0)
 		check_result_info.output_file_fp=fdopen(check_result_info.output_file_fd,"w");
@@ -3103,22 +3212,7 @@ int run_async_host_check_3x(host *hst, int check_options, double latency, int sc
 			max_debug_file_size=0L;
 
 			/* run the plugin check command */
-			fp=popen(processed_command,"r");
-			if(fp==NULL)
-				_exit(STATE_UNKNOWN);
-
-			/* initialize buffer */
-			strcpy(output_buffer,"");
-
-			/* get all lines of plugin output - escape newlines */
-			while(fgets(output_buffer,sizeof(output_buffer)-1,fp)){
-				temp_buffer=escape_newlines(output_buffer);
-				dbuf_strcat(&checkresult_dbuf,temp_buffer);
-				my_free(temp_buffer);
-				}
-
-			/* close the process */
-			pclose_result=pclose(fp);
+			pclose_result=run_check(processed_command,&checkresult_dbuf);
 
 			/* reset the alarm */
 			alarm(0);
@@ -3235,7 +3329,7 @@ int handle_async_host_check_result_3x(host *temp_host, check_result *queued_chec
 		return ERROR;
 
 	time(&current_time);
-	
+
 	log_debug_info(DEBUGL_CHECKS,1,"** Handling async check result for host '%s'...\n",temp_host->name);
 
 	log_debug_info(DEBUGL_CHECKS,2,"\tCheck Type:         %s\n",(queued_check_result->check_type==HOST_CHECK_ACTIVE)?"Active":"Passive");
@@ -3372,8 +3466,13 @@ int handle_async_host_check_result_3x(host *temp_host, check_result *queued_chec
 			my_free(temp_host->long_plugin_output);
 			my_free(temp_host->perf_data);
 
-			asprintf(&temp_host->plugin_output,"(Return code of %d is out of bounds%s)",queued_check_result->return_code,(queued_check_result->return_code==126 || queued_check_result->return_code==127)?" - plugin may be missing":"");
-			
+			if(asprintf(&temp_host->plugin_output,"(Return code of %d is out of bounds%s)",queued_check_result->return_code,(queued_check_result->return_code==126 || queued_check_result->return_code==127)?" - plugin may be missing":"")==-1){
+				logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
+				/* free memory */
+				my_free(old_plugin_output);
+				return ERROR;
+				}
+
 			result=STATE_CRITICAL;
 			}
 

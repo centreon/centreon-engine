@@ -1,40 +1,23 @@
-/*****************************************************************************
- *
- * NAGIOS.C - Core Program Code For Nagios
- *
- * Program: Nagios Core
- * Version: 3.2.3
- * License: GPL
- * Copyright (c) 2009-2010 Nagios Core Development Team and Community Contributors
- * Copyright (c) 1999-2009 Ethan Galstad
- *
- * First Written:   01-28-1999 (start of development)
- * Last Modified:   10-03-2010
- *
- * Description:
- *
- * Nagios is a network monitoring tool that will check hosts and services
- * that you specify.  It has the ability to notify contacts via email, pager,
- * or other user-defined methods when a service or host goes down and
- * recovers.  Service and host monitoring is done through the use of external
- * plugins which can be developed independently of Nagios.
- *
- * License:
- *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License version 2 as
- * published by the Free Software Foundation.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
- *
- *****************************************************************************/
+/*
+** Copyright 1999-2009 Ethan Galstad
+** Copyright 2009-2010 Nagios Core Development Team and Community Contributors
+** Copyright 2011      Merethis
+**
+** This file is part of Centreon Scheduler.
+**
+** Centreon Scheduler is free software: you can redistribute it and/or
+** modify it under the terms of the GNU General Public License version 2
+** as published by the Free Software Foundation.
+**
+** Centreon Scheduler is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+** General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with Centreon Scheduler. If not, see
+** <http://www.gnu.org/licenses/>.
+*/
 
 #include "../include/config.h"
 #include "../include/common.h"
@@ -62,12 +45,9 @@ char            *command_file=NULL;
 char            *temp_file=NULL;
 char            *temp_path=NULL;
 char            *check_result_path=NULL;
-char            *lock_file=NULL;
 char            *log_archive_path=NULL;
 char            *p1_file=NULL;    /**** EMBEDDED PERL ****/
 char            *auth_file=NULL;  /**** EMBEDDED PERL INTERPRETER AUTH FILE ****/
-char            *nagios_user=NULL;
-char            *nagios_group=NULL;
 
 char            *global_host_event_handler=NULL;
 char            *global_service_event_handler=NULL;
@@ -129,9 +109,6 @@ int             auto_rescheduling_window=DEFAULT_AUTO_RESCHEDULING_WINDOW;
 
 int             additional_freshness_latency=DEFAULT_ADDITIONAL_FRESHNESS_LATENCY;
 
-int             check_for_updates=DEFAULT_CHECK_FOR_UPDATES;
-int             bare_update_check=DEFAULT_BARE_UPDATE_CHECK;
-time_t          last_update_check=0L;
 unsigned long   update_uid=0L;
 int             update_available=FALSE;
 char            *last_program_version=NULL;
@@ -185,9 +162,6 @@ int             verify_circular_paths=TRUE;
 int             test_scheduling=FALSE;
 int             precache_objects=FALSE;
 int             use_precached_objects=FALSE;
-
-int             daemon_mode=FALSE;
-int             daemon_dumps_core=TRUE;
 
 int             max_parallel_service_checks=DEFAULT_MAX_PARALLEL_SERVICE_CHECKS;
 int             currently_running_service_checks=0;
@@ -303,7 +277,6 @@ int main(int argc, char **argv){
 		{"version",no_argument,0,'V'},
 		{"license",no_argument,0,'V'},
 		{"verify-config",no_argument,0,'v'},
-		{"daemon",no_argument,0,'d'},
 		{"test-scheduling",no_argument,0,'s'},
 		{"dont-verify-objects",no_argument,0,'o'},
 		{"dont-verify-paths",no_argument,0,'x'},
@@ -322,9 +295,9 @@ int main(int argc, char **argv){
 	while(1){
 
 #ifdef HAVE_GETOPT_H
-		c=getopt_long(argc,argv,"+hVvdsoxpu",long_options,&option_index);
+		c=getopt_long(argc,argv,"+hVvsoxpu",long_options,&option_index);
 #else
-		c=getopt(argc,argv,"+hVvdsoxpu");
+		c=getopt(argc,argv,"+hVvsoxpu");
 #endif
 
 		if(c==-1 || c==EOF)
@@ -347,10 +320,6 @@ int main(int argc, char **argv){
 
 		case 's': /* scheduling check */
 			test_scheduling=TRUE;
-			break;
-
-		case 'd': /* daemon mode */
-			daemon_mode=TRUE;
 			break;
 
 		case 'o': /* don't verify objects */
@@ -387,15 +356,6 @@ int main(int argc, char **argv){
 	mtrace();
 #endif
 
-	if(daemon_mode==FALSE){
-		printf("\nNagios Core %s\n",PROGRAM_VERSION);
-		printf("Copyright (c) 2009-2010 Nagios Core Development Team and Community Contributors\n");
-		printf("Copyright (c) 1999-2009 Ethan Galstad\n");
-		printf("Last Modified: %s\n",PROGRAM_MODIFICATION_DATE);
-		printf("License: GPL\n\n");
-		printf("Website: http://www.nagios.org\n");
-	        }
-
 	/* just display the license */
 	if(display_license==TRUE){
 
@@ -431,7 +391,6 @@ int main(int argc, char **argv){
 		printf("  -x, --dont-verify-paths      Don't check for circular object paths - USE WITH CAUTION!\n");
 		printf("  -p, --precache-objects       Precache object configuration - use with -v or -s options\n");
 		printf("  -u, --use-precached-objects  Use precached object config file\n");
-		printf("  -d, --daemon                 Starts Nagios in daemon mode, instead of as a foreground process\n");
 		printf("\n");
 		printf("Visit the Nagios website at http://www.nagios.org/ for bug fixes, new\n");
 		printf("releases, online documentation, FAQs, information on subscribing to\n");
@@ -463,7 +422,11 @@ int main(int argc, char **argv){
 		        }
 
 		/* get absolute path of current working directory */
-		getcwd(config_file,MAX_FILENAME_LENGTH);
+		if(getcwd(config_file,MAX_FILENAME_LENGTH) == NULL){
+			perror("Error ");
+			exit(ERROR);
+			}
+
 
 		/* append a forward slash */
 		strncat(config_file,"/",1);
@@ -490,17 +453,12 @@ int main(int argc, char **argv){
 
 			printf("   Read main config file okay...\n");
 
-			/* drop privileges */
-			if((result=drop_privileges(nagios_user,nagios_group))==ERROR)
-				printf("   Failed to drop privileges.  Aborting.");
-			else{
-				/* read object config files */
-				if((result=read_all_object_data(config_file))==OK)
-					printf("   Read object config files okay...\n");
-				else
-					printf("   Error processing object config files!\n");
-				}
-		        }
+			/* read object config files */
+			if((result=read_all_object_data(config_file))==OK)
+				printf("   Read object config files okay...\n");
+			else
+				printf("   Error processing object config files!\n");
+			}
 		else
 			printf("   Error processing main config file!\n\n");
 
@@ -569,11 +527,6 @@ int main(int argc, char **argv){
 
 		/* read in the configuration files (main config file and all host config files) */
 		result=read_main_config_file(config_file);
-
-		/* drop privileges */
-		if(result==OK)
-			if((result=drop_privileges(nagios_user,nagios_group))==ERROR)
-				printf("Failed to drop privileges.  Aborting.");
 
 		/* read object config files */
 		if(result==OK)
@@ -653,19 +606,14 @@ int main(int argc, char **argv){
 			/* get program (re)start time and save as macro */
 			program_start=time(NULL);
 			my_free(mac->x[MACRO_PROCESSSTARTTIME]);
-			asprintf(&mac->x[MACRO_PROCESSSTARTTIME],"%lu",(unsigned long)program_start);
+			if(asprintf(&mac->x[MACRO_PROCESSSTARTTIME],"%lu",(unsigned long)program_start)==-1){
+				logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf. Aborting.\n");
+				cleanup();
+				exit(ERROR);
+				}
 
 			/* open debug log */
 			open_debug_log();
-
-			/* drop privileges */
-			if(drop_privileges(nagios_user,nagios_group)==ERROR){
-
-				logit(NSLOG_PROCESS_INFO | NSLOG_RUNTIME_ERROR | NSLOG_CONFIG_ERROR,TRUE,"Failed to drop privileges.  Aborting.");
-
-				cleanup();
-				exit(ERROR);
-			        }
 
 #ifdef USE_EVENT_BROKER
 			/* initialize modules */
@@ -761,31 +709,6 @@ int main(int argc, char **argv){
 			broker_program_state(NEBTYPE_PROCESS_START,NEBFLAG_NONE,NEBATTR_NONE,NULL);
 #endif
 
-			/* enter daemon mode (unless we're restarting...) */
-			if(daemon_mode==TRUE && sigrestart==FALSE){
-
-				result=daemon_init();
-
-				/* we had an error daemonizing, so bail... */
-				if(result==ERROR){
-					logit(NSLOG_PROCESS_INFO | NSLOG_RUNTIME_ERROR,TRUE,"Bailing out due to failure to daemonize. (PID=%d)",(int)getpid());
-
-#ifdef USE_EVENT_BROKER
-					/* send program data to broker */
-					broker_program_state(NEBTYPE_PROCESS_SHUTDOWN,NEBFLAG_PROCESS_INITIATED,NEBATTR_SHUTDOWN_ABNORMAL,NULL);
-#endif
-					cleanup();
-					exit(ERROR);
-					}
-
-				asprintf(&buffer,"Finished daemonizing... (New PID=%d)\n",(int)getpid());
-				write_to_all_logs(buffer,NSLOG_PROCESS_INFO);
-				my_free(buffer);
-
-				/* get new PID */
-				nagios_pid=(int)getpid();
-			        }
-
 			/* open the command file (named pipe) for reading */
 			result=open_command_file();
 			if(result!=OK){
@@ -810,21 +733,18 @@ int main(int argc, char **argv){
 
 			/* initialize comment data */
 			initialize_comment_data(config_file);
-			
+
 			/* initialize scheduled downtime data */
 			initialize_downtime_data(config_file);
-			
+
 			/* initialize performance data */
 			initialize_performance_data(config_file);
 
 		        /* initialize the event timing loop */
 			init_timing_loop();
-			
+
 			/* initialize check statistics */
 			init_check_stats();
-
-			/* check for updates */
-			check_for_nagios_updates(FALSE,TRUE);
 
 			/* update all status data (with retained information) */
 			update_all_status_data();
@@ -844,21 +764,49 @@ int main(int argc, char **argv){
 			/* get event start time and save as macro */
 			event_start=time(NULL);
 			my_free(mac->x[MACRO_EVENTSTARTTIME]);
-			asprintf(&mac->x[MACRO_EVENTSTARTTIME],"%lu",(unsigned long)event_start);
+			if(asprintf(&mac->x[MACRO_EVENTSTARTTIME],"%lu",(unsigned long)event_start)==-1){
+				logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.  Aborting.\n");
+
+#ifdef USE_EVENT_BROKER
+				/* send program data to broker */
+				broker_program_state(NEBTYPE_PROCESS_SHUTDOWN,NEBFLAG_PROCESS_INITIATED,NEBATTR_SHUTDOWN_ABNORMAL,NULL);
+#endif
+
+				cleanup();
+				exit(ERROR);
+				}
 
 		        /***** start monitoring all services *****/
 			/* (doesn't return until a restart or shutdown signal is encountered) */
 			event_execution_loop();
 
 			/* 03/01/2007 EG Moved from sighandler() to prevent FUTEX locking problems under NPTL */
-			/* 03/21/2007 EG SIGSEGV signals are still logged in sighandler() so we don't loose them */
 			/* did we catch a signal? */
 			if(caught_signal==TRUE){
 
-				if(sig_id==SIGHUP)
-					asprintf(&buffer,"Caught SIGHUP, restarting...\n");
-				else if(sig_id!=SIGSEGV)
-					asprintf(&buffer,"Caught SIG%s, shutting down...\n",sigs[sig_id]);
+				if(sig_id==SIGHUP){
+					if(asprintf(&buffer,"Caught SIGHUP, restarting...\n")==-1){
+						logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.  Aborting.\n");
+#ifdef USE_EVENT_BROKER
+						/* send program data to broker */
+						broker_program_state(NEBTYPE_PROCESS_SHUTDOWN,NEBFLAG_PROCESS_INITIATED,NEBATTR_SHUTDOWN_ABNORMAL,NULL);
+#endif
+
+						cleanup();
+						exit(ERROR);
+						}
+					}
+				else if(asprintf(&buffer,"Caught SIG%s, shutting down...\n",sigs[sig_id])==-1){
+					logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.  Aborting.\n");
+
+#ifdef USE_EVENT_BROKER
+					/* send program data to broker */
+					broker_program_state(NEBTYPE_PROCESS_SHUTDOWN,NEBFLAG_PROCESS_INITIATED,NEBATTR_SHUTDOWN_ABNORMAL,NULL);
+#endif
+
+					cleanup();
+					exit(ERROR);
+					}
 
 				write_to_all_logs(buffer,NSLOG_PROCESS_INFO);
 				my_free(buffer);
@@ -902,10 +850,6 @@ int main(int argc, char **argv){
 
 			/* shutdown stuff... */
 			if(sigshutdown==TRUE){
-
-				/* make sure lock file has been removed - it may not have been if we received a shutdown command */
-				if(daemon_mode==TRUE)
-					unlink(lock_file);
 
 				/* log a shutdown message */
 				logit(NSLOG_PROCESS_INFO,TRUE,"Successfully shutdown... (PID=%d)\n",(int)getpid());
