@@ -1,0 +1,158 @@
+/**
+ *  @page usingtheembeddedperlinterpreter Using The Embedded Perl Interpreter
+ *  @section usingtheembeddedperlinterpreterintroduction Introduction
+ *
+ *  Centreon Scheduler can be compiled with support for an embedded Perl
+ *  interpreter. This allows Centreon Scheduler to execute Perl plugins
+ *  much more efficiently that it otherwise would, so it may be of
+ *  interest to you if you rely heavily on plugins written in Perl.
+ *
+ *  Without the embedded Perl interpreter, Centreon Scheduler executes
+ *  Perl (and non-Perl) plugins by forking and executing the plugins as
+ *  an external command. When the embedded Perl interpreter is used,
+ *  Centreon Scheduler can execute Perl plugins by simply making a
+ *  library call.
+ *
+ *  @note Tip: The embedded Perl interpreter works with all Perl scripts
+ *  that Centreon Scheduler executes - not just plugins. This
+ *  documentation discusses the embedded Perl interpreter in relation to
+ *  plugins used for host and service checks, but it applies just the
+ *  same to other types of Perl scripts you may be using for other types
+ *  of commands (e.g. notification scripts, event handler scripts, etc.).
+ *
+ *  Stephen Davies contributed the original embedded Perl interpreter
+ *  code several years back. Stanley Hopcroft has been the primary
+ *  person helping to improve the embedded Perl interpreter code quite
+ *  a bit and has commented on the advantages/disadvanges of using it.
+ *  He has also given several helpful hints on creating Perl plugins
+ *  that work properly with the embedded interpreter.
+ *
+ *  It should be noted that "ePN", as used in this documentation,
+ *  refers to embedded Perl Centreon Scheduler, or if you prefer,
+ *  Centreon Scheduler compiled with an embedded Perl interpreter.
+ *
+ *  @section usingtheembeddedperlinterpreteradvantages Advantages
+ *
+ *  Some advantages of ePN (embedded Perl Centreon Scheduler) include:
+ *  - Centreon Scheduler will spend much less time running your Perl
+ *  plugins because it no longer forks to execute the plugin (each
+ *  time loading the Perl interpreter). Instead, it executes your
+ *  plugin by making a library call.
+ *  - It greatly reduces the system impact of Perl plugins and/or
+ *  allows you to run more checks with Perl plugin than you otherwise
+ *  would be able to. In other words, you have less incentive to write
+ *  plugins in other languages such as C/C++, or Expect/TCL, that are
+ *  generally recognised to have development times at least an order
+ *  of magnitude slower than Perl (although they do run about ten
+ *  times faster also - TCL being an exception).
+ *  - If you are not a C programmer, then you can still get a huge
+ *  amount of mileage out of Centreon Scheduler by letting Perl do all
+ *  the heavy lifting without having Centreon Scheduler slow right
+ *  down. Note however, that the ePN will not speed up your plugin
+ *  (apart from eliminating the interpreter load time). If you want
+ *  fast plugins then consider Perl XSUBs (XS), or C after you are
+ *  sure that your Perl is tuned and that you have a suitable
+ *  algorithm (Benchmark.pm is invaluable for comparing the
+ *  performance of Perl language elements).
+ *  - Using the ePN is an excellent opportunity to learn more about
+ *  Perl.
+ *
+ *  @section usingtheembeddedperlinterpreterdisadvantages Disadvantages
+ *
+ *  The disadvantages of ePN (embedded Perl Centreon Scheduler) are much
+ *  the same as Apache mod_perl (i.e. Apache with an embedded
+ *  interpreter) compared to a plain Apache:
+ *  - A Perl program that works fine with plain Centreon Scheduler may
+ *  not work with the ePN. You may have to modify your plugins to get
+ *  them to work.
+ *  - Perl plugins are harder to debug under an ePN than under a plain
+ *  Centreon Scheduler.
+ *  - Your ePN will have a larger SIZE (memory footprint) than a plain
+ *  Centreon Scheduler.
+ *  - Some Perl constructs cannot be used or may behave differently
+ *  than what you would expect.
+ *  - You may have to be aware of 'more than one way to do it' and
+ *  choose a way that seems less attractive or obvious.
+ *  - You will need greater Perl knowledge (but nothing very esoteric
+ *  or stuff about Perl internals - unless your plugin uses XSUBS).
+ *
+ *  @section usingtheembeddedperlinterpreterusingtheembeddedperlinterpreter Using The Embedded Perl Interpreter
+ *
+ *  If you want to use the embedded Perl interpreter to run your Perl
+ *  plugins and scripts, here's what you'll need to do:
+ *  - Compile Centreon Scheduler with support for the embedded Perl
+ *  interpreter (see instructions below).
+ *  - Enable the @ref mainconfigurationfileoptionsconfigurationfilevariablesembeddedperlinterpreteroption
+ *  "enable_embedded_perl" option in the main configuration file.
+ *  - Set the @ref mainconfigurationfileoptionsconfigurationfilevariablesembeddedperlimplicituseoption
+ *  "use_embedded_perl_implicitly" option to fit your needs.
+ *  This option determines whether or not the Perl interpreter should
+ *  be used by default for individual Perl plugins and scripts.
+ *  - Optionally enable or disable certain Perl plugins and scripts
+ *  from being run using the embedded Perl interpreter. This can be
+ *  useful if certain Perl scripts have problems being running under
+ *  the Perl interpreter. See instructions below for more information
+ *  on doing this.
+ *
+ *  @section usingtheembeddedperlinterpretercompilingcentschedulerwithembeddedperl Compiling Centreon Scheduler With Embedded Perl
+ *
+ *  If you want to use the embedded Perl interpreter, you'll first need
+ *  to compile Centreon Scheduler with support for it.
+ *
+ *  To do this, simply run the configure script with the addition of
+ *  the --enable-embedded-perl option. If you want the embedded
+ *  interpreter to cache internally compiled scripts, add the
+ *  --with-perlcache option as well. Example:
+ *
+ *  @code
+ *  ./configure --enable-embedded-perl --with-perlcache otheroptions...
+ *  @endcode
+ *
+ *  Once you've rerun the configure script with the new options, make
+ *  sure to recompile Centreon Scheduler.
+ *
+ *  @section usingtheembeddedperlinterpreterpluginspecificuseoftheperlinterpreter Plugin-Specific Use of the Perl Interpreter
+ *
+ *  Beginning with Centreon Scheduler 3, you can specify which Perl
+ *  plugins or scripts should or should not be run under the embedded
+ *  Perl interpreter. This is particularly useful if you have
+ *  troublesome Perl scripts which do not work well with the Perl
+ *  interpreter.
+ *
+ *  To explicitly tell Centreon Scheduler whether or not to use the
+ *  embedded Perl interpreter for a particular perl script, add one of
+ *  the following entries to your Perl script/plugin...
+ *
+ *  To tell Centreon Scheduler to use the Perl interpreter for a
+ *  particular script, add this line to the Perl script:
+ *
+ *  @code
+ *  # centscheduler: +epn
+ *  @endcode
+ *
+ *  To tell Centreon Scheduler to NOT use the embedded Perl interpreter
+ *  for a particular script, add this line to the Perl script:
+ *
+ *  @code
+ *  # centscheduler: -epn
+ *  @endcode
+ *
+ *  Either line must be located within the first 10 lines of a script
+ *  for Centreon Scheduler to detect it.
+ *
+ *  @note Tip: If you do not explicitly use the method above to tell
+ *  Centreon Scheduler whether an individual plugin can be run under the
+ *  Perl interpreter, Centreon Scheduler will make will a decision for
+ *  you. This decision process is controlled by the
+ *  @ref mainconfigurationfileoptionsconfigurationfilevariablesembeddedperlimplicituseoption
+ *  "use_embedded_perl_implicitly" variable. If the value is set
+ *  to 1, all Perl plugins/scripts (that do not explicitly
+ *  enable/disable the ePN) will be run under the Perl interpreter. If
+ *  the value is 0, they will NOT be run under the Perl interpreter.
+ *
+ *  @section usingtheembeddedperlinterpreterdevelopingpluginsforusewithembeddedperl Developing Plugins For Use With Embedded Perl
+ *
+ *  Information on developing plugins for use with the embedded Perl
+ *  interpreter can be found @link developingpluginsforusewithembeddedperl here @endlink.
+ */
+

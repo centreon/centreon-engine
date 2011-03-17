@@ -1,0 +1,8 @@
+/**
+ *  @page startingandstoppingcentreonscheduler Starting and Stopping Centreon Scheduler
+ *  @section startingandstoppingcentreonschedulertodo TODO
+ *
+ *  There's more than one way to start, stop, and restart Centreon
+ *  Scheduler. Here are some of the more common ones...
+ */
+

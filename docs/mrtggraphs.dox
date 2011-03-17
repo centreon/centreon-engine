@@ -1,0 +1,172 @@
+/**
+ *  @page graphingperformanceinfowithmrtg Graphing Performance Info With MRTG
+ *  @section graphingperformanceinfowithmrtgintroduction Introduction
+ *
+ *  The @link usingthecentschedulertatsutility centschedulertats @endlink utility
+ *  allows you to graph various Centreon Scheduler performance
+ *  statistics over time using <a href="http://oss.oetiker.ch/mrtg/">
+ *  MRTG</a>. This is important because it can help you:
+ *  - Ensure Centreon Scheduler is operating efficiently
+ *  - Locate problem areas in the monitoring process
+ *  - Observe the performance impacts of changes in your Centreon
+ *  Scheduler configuration
+ *
+ *  @section graphingperformanceinfowithmrtgsamplemrtgconfiguration
+ *  Sample MRTG Configuration
+ *
+ *  Sample MRTG configuration file snippets for graphing various
+ *  Centreon Scheduler performance statistics can be found in the
+ *  mrtg.cfg file located in the sample-config/ subdirectory of the
+ *  Centreon Scheduler distribution. You can create graphs of other
+ *  performance information if you'd like - the samples just provide
+ *  you with a good starting point.
+ *
+ *  Once you copy these sample entries into your MRTG config file
+ *  (/etc/mrtg/mrtg.cfg) you should have some new graphs the next time
+ *  MRTG runs.
+ *
+ *  @section graphingperformanceinfowithmrtgexamplegraphs Example
+ *  Graphs
+ *
+ *  I'll describe what a few of the sample MRTG graphs mean and what
+ *  they can be used for...
+ *
+ *  Active Host Checks - This graph shows how may active host checks
+ *  (regularly scheduled and on-demand) have occurred over time. Useful
+ *  for understanding:
+ *  - @link hostchecks.html Host checks @endlink
+ *  - @link hostandservicedependencies Predictive host dependency checks
+ *  @endlink
+ *  - @link cachedchecks.html Cached checks @endlink
+ *
+ *  @image html mrtg-activehostchecks.png
+ *  @image latex mrtg-activehostchecks.eps
+ *
+ *  Active Service Checks - This graph shows how may active service
+ *  checks (reguarly scheduled and on-demand) have occurred over time.
+ *  Useful for understanding:
+ *  - @link servicechecks.html Service checks @endlink
+ *  - @link hostandservicedependencies Predictive service dependency checks
+ *  @endlink
+ *  - @link cachedchecks.html Cached checks @endlink
+ *
+ *  @image html mrtg-activeservicechecks.png
+ *  @image latex mrtg-activeservicechecks.eps
+ *
+ *  Cached Host and Service Checks - This graph shows how may cached
+ *  host and service checks have occurred over time. Useful for
+ *  understanding:
+ *  - @link cachedchecks.html Cached checks @endlink
+ *  - @link hostandservicedependencies Predictive host and service
+ *  dependency checks @endlink
+ *
+ *  @image html mrtg-cachedchecks.png
+ *  @image latex mrtg-cachedchecks.eps
+ *
+ *  Passive Host and Service Checks - This graph shows how may passive
+ *  host and service checks have occurred over time. Useful for
+ *  understanding:
+ *  - @link passivechecks.html Passive checks @endlink
+ *
+ *  @image html mrtg-passivechecks.png
+ *  @image latex mrtg-passivechecks.eps
+ *
+ *  Hosts/Services Actively Checked - This graph shows how many (of the
+ *  total number of) hosts and services were last checked actively over
+ *  time. Useful for understanding:
+ *  - @link activechecks.html Active checks @endlink
+ *
+ *  @image html mrtg-activelychecked.png
+ *  @image latex mrtg-activelychecked.eps
+ *
+ *  Hosts/Services Passively Checked - This graph shows how many (of
+ *  the total number of) hosts and services were last checked passively
+ *  over time. Useful for understanding:
+ *  - @link passivechecks.html Passive checks @endlink
+ *
+ *  @image html mrtg-passivelychecked.png
+ *  @image latex mrtg-passivelychecked.eps
+ *
+ *  Average Service Check Latency and Execution Time - This graph shows
+ *  average service check latency and execution times over time. Useful
+ *  for understanding:
+ *  - @link servicechecks.html Service checks @endlink
+ *  - @link tuningcentschedulerformaximumperformance Performance tuning @endlink
+ *
+ *  Consistently high latencies can be an indication that one of more
+ *  of the following variables need tweaking:
+ *  - @ref mainconfigurationfileoptionsconfigurationfilevariablesmaximumconcurrentservicechecks
+ *  "max_concurrent_checks"
+ *  - @ref mainconfigurationfileoptionsconfigurationfilevariablescheckresultreaperfrequency
+ *  "check_result_reaper_frequency"
+ *  - @ref mainconfigurationfileoptionsconfigurationfilevariablesmaximumcheckresultreapertime
+ *  "max_check_result_reaper_time"
+ *
+ *  @image html mrtg-serviceperfstats.png
+ *  @image latex mrtg-serviceperfstats.eps
+ *
+ *  Average Service State Change - This graph shows the average percent
+ *  state change (a measure of volatility) for services over time,
+ *  broken down by services that were last checked either actively or
+ *  passively. Useful for understanding:
+ *  - @link detectionandhandlingofstateflapping Flap detection @endlink
+ *
+ *  @image html mrtg-servicestatechange.png
+ *  @image latex mrtg-servicestatechange.eps
+ *
+ *  Average Host Check Latency and Execution Time - This graph shows
+ *  average host check latency and execution times over time. Useful
+ *  for understanding:
+ *  - @link hostchecks.html Host checks @endlink
+ *  - @link tuningcentschedulerformaximumperformance Performance tuning @endlink
+ *
+ *  Consistently high latencies can be an indication that one of more
+ *  of the following variables need tweaking:
+ *  - @ref mainconfigurationfileoptionsconfigurationfilevariablesmaximumconcurrentservicechecks
+ *  "max_concurrent_checks"
+ *  - @ref mainconfigurationfileoptionsconfigurationfilevariablescheckresultreaperfrequency
+ *  "check_result_reaper_frequency"
+ *  - @ref mainconfigurationfileoptionsconfigurationfilevariablesmaximumcheckresultreapertime
+ *  "max_check_result_reaper_time"
+ *
+ *  @image html mrtg-hostperfstats.png
+ *  @image latex mrtg-hostperfstats.eps
+ *
+ *  Average Host State Change - This graph shows the average percent
+ *  state change (a measure of volatility) for hosts over time, broken
+ *  down by hosts that were last checked either actively or passively.
+ *  Useful for understanding:
+ *  - @link detectionandhandlingofstateflapping Flap detection @endlink
+ *
+ *  @image html mrtg-hoststatechange.png
+ *  @image latex mrtg-hoststatechange.eps
+ *
+ *  External Commands - This graph shows how may external commands have
+ *  been processed by the Centreon Scheduler daemon over time. Unless
+ *  you're processing a large number of external commands (as in the
+ *  case with distributed monitoring setups), this graph may appear
+ *  mostly empty. Monitoring external commands can be useful for
+ *  understanding the impacts of:
+ *  - @link passivechecks.html Passive checks @endlink
+ *  - @link distributedmonitoring Distributed monitoring @endlink
+ *  - @link redundantandfailovernetworkmonitoring Redundant/failover monitoring @endlink
+ *
+ *  @image html mrtg-externalcommands.png
+ *  @image latex mrtg-externalcommands.eps
+ *
+ *  External Command Buffers - This graph shows how may external
+ *  command buffer slots are in use over time. If the number of used
+ *  buffers is near the number of available buffers on a regular basis,
+ *  it is likely you need to increase the available
+ *  @ref mainconfigurationfileoptionsconfigurationfilevariablesexternalcommandbufferslots
+ *  "external command buffer slots". Each buffer slot can hold one external
+ *  command. Buffers are used for temporarily holding external commands
+ *  from the time they are read from the @ref
+ *  mainconfigurationfileoptionsconfigurationfilevariablesexternalcommandfile
+ *  "external command file" to the
+ *  time they are processed by the Centreon Scheduler daemon.
+ *
+ *  @image html mrtg-commandbuffers.png
+ *  @image latex mrtg-commandbuffers.eps
+ */
+

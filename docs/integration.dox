@@ -1,0 +1,47 @@
+/**
+ *  @page integrationoverview Integration Overview
+ *  @section integrationoverviewintroduction Introduction
+ *
+ *  One of the reasons that Centreon Scheduler is such a popular
+ *  monitoring application is the fact that it can be easily integrated
+ *  in your existing infrastructure. There are several methods of
+ *  integrating Centreon Scheduler with the management software you're
+ *  already using and you can monitor almost any type of new or custom
+ *  hardware, service, or application that you might have.
+ *
+ *  Integration Points
+ *
+ *  @image html integrationoverview.png
+ *  @image latex integrationoverview.eps
+ *
+ *  To monitor new hardware, services, or applications, check out the
+ *  docs on:
+ *  - @ref plugins "Plugins"
+ *  - @ref centschedulerpluginapi "Plugin API"
+ *  - @ref passivechecks "Passive Checks"
+ *  - @ref eventhandlers "Event Handlers"
+ *
+ *  To get data into Centreon Scheduler from external applications,
+ *  check out the docs on:
+ *
+ *  - @ref passivechecks "Passive Checks"
+ *  - @ref externalcommands "External Commands"
+ *
+ *  To send status, performance, or notification information from
+ *  Centreon Scheduler to external applications, check out the docs on:
+ *  - @ref eventhandlers "Event Handlers"
+ *  - @ref mainconfigurationfileoptionsconfigurationfilevariablesobsessivecompulsiveserviceprocessorcommand
+ *  "OCSP" and @ref mainconfigurationfileoptionsconfigurationfilevariablesobsessivecompulsivehostprocessorcommand
+ *  "OCHP" Commands
+ *  - @ref performancedata "Performance Data"
+ *  - @ref notifications "Notifications"
+ *
+ *  Integration Examples
+ *
+ *  I've documented some examples on how to integrate Centreon Scheduler
+ *  with external applications:
+ *
+ *  - @ref tcpwrapperintegration "TCP Wrappers" (security alerts)
+ *  - @ref snmpwrapperintegration "SNMP Traps" (Arcserve backup job status)
+ */
+
