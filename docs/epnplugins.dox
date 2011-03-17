@@ -9,8 +9,8 @@
  *  majority of this documentation comes from his comments.
  *
  *  It should be noted that "ePN", as used in this documentation,
- *  refers to embedded Perl Centron Scheduler, or if you prefer,
- *  Centron Scheduler compiled with an embedded Perl interpreter.
+ *  refers to embedded Perl Centreon Scheduler, or if you prefer,
+ *  Centreon Scheduler compiled with an embedded Perl interpreter.
  *
  *  @section developingpluginsforusewithembeddedperltargetaudience Target Audience
  *
@@ -102,7 +102,7 @@
  *  mod_perl guide at http://perl.apache.org/guide/.
  *
  *  This wonderful book sized document has nothing whatsoever about
- *  Centron Scheduler, but all about writing Perl programs for the
+ *  Centreon Scheduler, but all about writing Perl programs for the
  *  embedded Perl interpreter in Apache (ie Doug MacEacherns mod_perl).
  *
  *  The perlembed manpage is essential for context and encouragement.
@@ -160,7 +160,7 @@
  *
  *  #! /usr/bin/perl -w
  *  #
- *  # check_rpc plugin for Centron Scheduler
+ *  # check_rpc plugin for Centreon Scheduler
  *  #
  *  # usage:
  *  # check_rpc host service
@@ -187,10 +187,10 @@
  *  plugin. This is not sufficient to guarantee your plugin will
  *  perform Ok with an ePN but if the plugin fails this test it will
  *  certainly fail with your ePN. [ A sample mini ePN is included in
- *  the contrib/ directory of the Centron Scheduler distribution for use
+ *  the contrib/ directory of the Centreon Scheduler distribution for use
  *  in testing Perl plugins. Change to the contrib/ directory and type
  *  'make mini_epn' to compile it. It must be executed from the same
  *  directory that the p1.pl file resides in (this file is distributed
- *  with Centron Scheduler). ]
+ *  with Centreon Scheduler). ]
  */
 

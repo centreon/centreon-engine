@@ -36,7 +36,7 @@
  *  @section objectconfigurationoverviewhowareobjectsdefined How Are Objects Defined?
  *
  *  Objects are defined in a flexible template format, which can make
- *  it much easier to manage your Centron Scheduler configuration in
+ *  it much easier to manage your Centreon Scheduler configuration in
  *  the long term. Basic information on how to define objects in your
  *  configuration files can be found @link objectdefinitions here
  *  @endlink.
@@ -67,7 +67,7 @@
  *
  *  @ref objectdefinitionsobjecttypeshostgroupdefinition "Host Groups" are
  *  groups of one or more hosts. Host groups can make it easier to
- *  (1) view the status of related hosts in the Centron Scheduler web
+ *  (1) view the status of related hosts in the Centreon Scheduler web
  *  interface and (2) simplify your configuration through the use of
  *  @link timesavingtricksforobjectdefinitions object tricks @endlink.
  *
@@ -83,7 +83,7 @@
  *
  *  @ref objectdefinitionsobjecttypesservicegroupdefinition "Services Groups"
  *  are groups of one or more services. Service groups can make it
- *  easier to (1) view the status of related services in the Centron
+ *  easier to (1) view the status of related services in the Centreon
  *  Scheduler web interface and (2) simplify your configuration through
  *  the use of @link timesavingtricksforobjectdefinitions object tricks @endlink.
  *
@@ -117,7 +117,7 @@
  *  @image latex objects-timeperiods.eps
  *
  *  @ref objectdefinitionsobjecttypescommanddefinition "Commands" are used to
- *  tell Centron Scheduler what programs, scripts, etc. it should
+ *  tell Centreon Scheduler what programs, scripts, etc. it should
  *  execute to perform:
  *  - Host and service checks
  *  - Notifications

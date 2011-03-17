@@ -6,18 +6,18 @@
  *  and contact definitions. These include variables for SNMP
  *  community, MAC address, AIM username, Skype number, and street
  *  address. The list is endless. The problem that I see with doing
- *  this is that it makes Centron Scheduler less generic and more
- *  infrastructure-specific. Centron Scheduler was intended to be
+ *  this is that it makes Centreon Scheduler less generic and more
+ *  infrastructure-specific. Centreon Scheduler was intended to be
  *  flexible, which meant things needed to be designed in a generic
- *  manner. Host definitions in Centron Scheduler, for example, have a
+ *  manner. Host definitions in Centreon Scheduler, for example, have a
  *  generic "address" variable that can contain anything from an IP
  *  address to human-readable driving directions - whatever is
  *  appropriate for the user's setup.
  *
  *  Still, there needs to be a method for admins to store information
- *  about their infrastructure components in their Centron Scheduler
+ *  about their infrastructure components in their Centreon Scheduler
  *  configuration without imposing a set of specific variables on
- *  others. Centron Scheduler attempts to solve this problem by
+ *  others. Centreon Scheduler attempts to solve this problem by
  *  allowing users to define custom variables in their object
  *  definitions. Custom variables allow users to define additional
  *  properties in their host, service, and contact definitions, and use
@@ -68,14 +68,14 @@
  *  @section customobjectvariablescustomvariablesasmacros Custom Variables As Macros
  *
  *  Custom variable values can be referenced in scripts and executables
- *  that Centron Scheduler runs for checks, notifications, etc. by
+ *  that Centreon Scheduler runs for checks, notifications, etc. by
  *  using @link understandingmacrosandhowtheywork macros @endlink or environment variables.
  *  Custom variable macros are trusted (because you define them) and
  *  therefore not cleaned/sanitized before they are made available to
  *  scripts.
  *
  *  In order to prevent name collision among custom variables from
- *  different object types, Centron Scheduler prepends "_HOST",
+ *  different object types, Centreon Scheduler prepends "_HOST",
  *  "_SERVICE", or "_CONTACT" to the beginning of custom host, service,
  *  or contact variables, respectively, in macro and environment
  *  variable names. The table below shows the corresponding macro and

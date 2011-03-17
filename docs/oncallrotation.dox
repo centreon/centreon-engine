@@ -27,7 +27,7 @@
  *  @section oncallrotationsscenario1holidaysandweekends Scenario 1: Holidays and Weekends
  *
  *  Two admins - John and Bob - are responsible for responding to
- *  Centron Scheduler alerts. John receives all notifications for
+ *  Centreon Scheduler alerts. John receives all notifications for
  *  weekdays (with 24 hour days), excluding holidays; Bob handles
  *  notifications during the weekends and holidays. Lucky Bob. Here's
  *  how you can define this type of rotation using timeperiods...

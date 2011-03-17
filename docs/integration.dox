@@ -2,10 +2,10 @@
  *  @page integrationoverview Integration Overview
  *  @section integrationoverviewintroduction Introduction
  *
- *  One of the reasons that Centron Scheduler is such a popular
+ *  One of the reasons that Centreon Scheduler is such a popular
  *  monitoring application is the fact that it can be easily integrated
  *  in your existing infrastructure. There are several methods of
- *  integrating Centron Scheduler with the management software you're
+ *  integrating Centreon Scheduler with the management software you're
  *  already using and you can monitor almost any type of new or custom
  *  hardware, service, or application that you might have.
  *
@@ -21,14 +21,14 @@
  *  - @ref passivechecks "Passive Checks"
  *  - @ref eventhandlers "Event Handlers"
  *
- *  To get data into Centron Scheduler from external applications,
+ *  To get data into Centreon Scheduler from external applications,
  *  check out the docs on:
  *
  *  - @ref passivechecks "Passive Checks"
  *  - @ref externalcommands "External Commands"
  *
  *  To send status, performance, or notification information from
- *  Centron Scheduler to external applications, check out the docs on:
+ *  Centreon Scheduler to external applications, check out the docs on:
  *  - @ref eventhandlers "Event Handlers"
  *  - @ref mainconfigurationfileoptionsconfigurationfilevariablesobsessivecompulsiveserviceprocessorcommand
  *  "OCSP" and @ref mainconfigurationfileoptionsconfigurationfilevariablesobsessivecompulsivehostprocessorcommand
@@ -38,7 +38,7 @@
  *
  *  Integration Examples
  *
- *  I've documented some examples on how to integrate Centron Scheduler
+ *  I've documented some examples on how to integrate Centreon Scheduler
  *  with external applications:
  *
  *  - @ref tcpwrapperintegration "TCP Wrappers" (security alerts)

@@ -3,21 +3,21 @@
  *  @section graphingperformanceinfowithmrtgintroduction Introduction
  *
  *  The @link usingthecentschedulertatsutility centschedulertats @endlink utility
- *  allows you to graph various Centron Scheduler performance
+ *  allows you to graph various Centreon Scheduler performance
  *  statistics over time using <a href="http://oss.oetiker.ch/mrtg/">
  *  MRTG</a>. This is important because it can help you:
- *  - Ensure Centron Scheduler is operating efficiently
+ *  - Ensure Centreon Scheduler is operating efficiently
  *  - Locate problem areas in the monitoring process
- *  - Observe the performance impacts of changes in your Centron
+ *  - Observe the performance impacts of changes in your Centreon
  *  Scheduler configuration
  *
  *  @section graphingperformanceinfowithmrtgsamplemrtgconfiguration
  *  Sample MRTG Configuration
  *
  *  Sample MRTG configuration file snippets for graphing various
- *  Centron Scheduler performance statistics can be found in the
+ *  Centreon Scheduler performance statistics can be found in the
  *  mrtg.cfg file located in the sample-config/ subdirectory of the
- *  Centron Scheduler distribution. You can create graphs of other
+ *  Centreon Scheduler distribution. You can create graphs of other
  *  performance information if you'd like - the samples just provide
  *  you with a good starting point.
  *
@@ -142,7 +142,7 @@
  *  @image latex mrtg-hoststatechange.eps
  *
  *  External Commands - This graph shows how may external commands have
- *  been processed by the Centron Scheduler daemon over time. Unless
+ *  been processed by the Centreon Scheduler daemon over time. Unless
  *  you're processing a large number of external commands (as in the
  *  case with distributed monitoring setups), this graph may appear
  *  mostly empty. Monitoring external commands can be useful for
@@ -164,7 +164,7 @@
  *  from the time they are read from the @ref
  *  mainconfigurationfileoptionsconfigurationfilevariablesexternalcommandfile
  *  "external command file" to the
- *  time they are processed by the Centron Scheduler daemon.
+ *  time they are processed by the Centreon Scheduler daemon.
  *
  *  @image html mrtg-commandbuffers.png
  *  @image latex mrtg-commandbuffers.eps

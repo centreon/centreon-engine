@@ -1,12 +1,12 @@
 /**
- *  @page standardmacrosincentscheduler Standard Macros in Centron Scheduler
+ *  @page standardmacrosincentscheduler Standard Macros in Centreon Scheduler
  *  @section standardmacrosincentschedulermacrovalidity Macro Validity
  *
  *  Although macros can be used in all commands you define, not all
  *  macros may be "valid" in a particular type of command. For example,
  *  some macros may only be valid during service notification commands,
  *  whereas other may only be valid during host check commands. There
- *  are ten types of commands that Centron Scheduler recognizes and
+ *  are ten types of commands that Centreon Scheduler recognizes and
  *  treats differently. They are as follows:
  *  - Service checks
  *  - Service notifications
@@ -21,7 +21,7 @@
  *  - Service @link performancedata performance data @endlink commands
  *  - Host @link performancedata performance data @endlink commands
  *
- *  The tables below list all macros currently available in Centron
+ *  The tables below list all macros currently available in Centreon
  *  Scheduler, along with a brief description of each and the types of
  *  commands in which they are valid. If a macro is used in a command
  *  in which it is invalid, it is replaced with an empty string. It
@@ -2997,7 +2997,7 @@
  *        numbers are unique across both hosts and service notifications, so
  *        you could potentially use this unique number as a primary key in a
  *        notification database. Notification ID numbers should remain unique
- *        across restarts of the Centron Scheduler process, so long as you
+ *        across restarts of the Centreon Scheduler process, so long as you
  *        have state retention enabled. The notification ID number is
  *        incremented by one (1) each time a new host notification is sent
  *        out, and regardless of how many contacts are notified.
@@ -3022,7 +3022,7 @@
  *        numbers are unique across both hosts and service notifications, so
  *        you could potentially use this unique number as a primary key in a
  *        notification database. Notification ID numbers should remain unique
- *        across restarts of the Centron Scheduler process, so long as you
+ *        across restarts of the Centreon Scheduler process, so long as you
  *        have state retention enabled. The notification ID number is
  *        incremented by one (1) each time a new service notification is sent
  *        out, and regardless of how many contacts are notified.
@@ -3190,8 +3190,8 @@
  *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefprocessstarttime $PROCESSSTARTTIME$</td>
  *      <td>
  *        Time stamp in time_t format (seconds since the UNIX epoch)
- *        indicating when the Centron Scheduler process was last (re)started.
- *        You can determine the number of seconds that Centron Scheduler has
+ *        indicating when the Centreon Scheduler process was last (re)started.
+ *        You can determine the number of seconds that Centreon Scheduler has
  *        been running (since it was last restarted) by subtracting
  *        $PROCESSSTARTTIME$ from @ref standardmacrosincentschedulermacroavailabilitycharttimet
  *	  "$TIMET$".
@@ -3201,9 +3201,9 @@
  *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefeventstarttime $EVENTSTARTTIME$</td>
  *      <td>
  *        Time stamp in time_t format (seconds since the UNIX epoch)
- *        indicating when the Centron Scheduler process starting process
+ *        indicating when the Centreon Scheduler process starting process
  *        events (checks, etc.). You can determine the number of seconds that
- *        it took for Centron Scheduler to startup by subtracting
+ *        it took for Centreon Scheduler to startup by subtracting
  *        $PROCESSSTARTTIME$ from $EVENTSTARTTIME$.
  *      </td>
  *    </tr>
@@ -3226,7 +3226,7 @@
  *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefargn $ARGn$</td>
  *      <td>
  *        The nth argument passed to the command (notification, event
- *        handler, service check, etc.). Centron Scheduler supports up to 32
+ *        handler, service check, etc.). Centreon Scheduler supports up to 32
  *        argument macros ($ARG1$ through $ARG32$).
  *      </td>
  *    </tr>
@@ -3236,7 +3236,7 @@
  *        The nth user-definable macro. User macros can be defined in one or
  *        more @ref mainconfigurationfileoptionsconfigurationfilevariablesresourcefile
  *	  "resource files".
- *        Centron Scheduler supports up to 256 user macros ($USER1$ through
+ *        Centreon Scheduler supports up to 256 user macros ($USER1$ through
  *        $USER32$).
  *      </td>
  *    </tr>

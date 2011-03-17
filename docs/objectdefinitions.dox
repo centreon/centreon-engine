@@ -2,7 +2,7 @@
  *  @page objectdefinitions Object Definitions
  *  @section objectdefinitionsintroduction Introduction
  *
- *  One of the features of Centron Scheduler' object configuration
+ *  One of the features of Centreon Scheduler' object configuration
  *  format is that you can create object definitions that inherit
  *  properties from other object definitions. An explanation of how
  *  object inheritence works can be found @link objectinheritance.html
@@ -25,11 +25,11 @@
  *  @section objectdefinitionsretentionnotes Retention Notes
  *
  *  It is important to point out that several directives in host,
- *  service, and contact definitions may not be picked up by Centron
+ *  service, and contact definitions may not be picked up by Centreon
  *  Scheduler when you change them in your configuration files. Object
  *  directives that can exhibit this behavior are marked with an
  *  asterisk (@ref objectdefinitionsretentionnotes "*"). The reason for this
- *  behavior is due to the fact that Centron Scheduler chooses to honor
+ *  behavior is due to the fact that Centreon Scheduler chooses to honor
  *  values stored in the @ref mainconfigurationfileoptionsconfigurationfilevariablesstateretentionfile
  *  "state retention file" over values found in the config files, assuming you
  *  have @ref mainconfigurationfileoptionsconfigurationfilevariablesstateretentionoption "state retention"
@@ -40,7 +40,7 @@
  *  One way to get around this problem is to disable the retention of
  *  non-status information using the retain_nonstatus_information
  *  directive in the host, service, and contact definitions. Disabling
- *  this directive will cause Centron Scheduler to take the initial
+ *  this directive will cause Centreon Scheduler to take the initial
  *  values for these directives from your config files, rather than
  *  from the state retention file when it (re)starts.
  *
@@ -211,7 +211,7 @@
  *  	  intermediate routers, etc.) the host is considered to be on the
  *  	  local network and will not have a parent host. Leave this value
  *  	  blank if the host does not have a parent host (i.e. it is on the
- *  	  same segment as the Centron Scheduler host). The order in which you
+ *  	  same segment as the Centreon Scheduler host). The order in which you
  *  	  specify parent hosts has no effect on how things are monitored.
  *      </td>
  *    </tr>
@@ -233,9 +233,9 @@
  *  	  objectdefinitionsobjecttypescommanddefinition "command" that should be used to check if the host
  *  	  is up or down. Typically, this command would try and ping the host
  *  	  to see if it is "alive". The command must return a status of OK
- *  	  (0) or Centron Scheduler will assume the host is down. If you leave
+ *  	  (0) or Centreon Scheduler will assume the host is down. If you leave
  *  	  this argument blank, the host will not be actively checked. Thus,
- *  	  Centron Scheduler will likely always assume the host is up (it may
+ *  	  Centreon Scheduler will likely always assume the host is up (it may
  *  	  show up as being in a "PENDING" state in the web interface). This
  *  	  is useful if you are monitoring printers or other devices that are
  *  	  frequently turned off. The maximum amount of time that the
@@ -247,7 +247,7 @@
  *    <tr>
  *      <td>initial_state</td>
  *      <td>
- *  	  By default Centron Scheduler will assume that all hosts are in UP
+ *  	  By default Centreon Scheduler will assume that all hosts are in UP
  *  	  states when it starts. You can override the initial state for a
  *  	  host by using this directive. Valid options are: o = UP, d = DOWN,
  *  	  and u = UNREACHABLE.
@@ -256,9 +256,9 @@
  *    <tr>
  *      <td>max_check_attempts</td>
  *      <td>
- *  	  This directive is used to define the number of times that Centron
+ *  	  This directive is used to define the number of times that Centreon
  *  	  Scheduler will retry the host check command if it returns any state
- *  	  other than an OK state. Setting this value to 1 will cause Centron
+ *  	  other than an OK state. Setting this value to 1 will cause Centreon
  *  	  Scheduler to generate an alert without retrying the host check.
  *
  *	  @note If you do not want to check the status of the host, you must
@@ -341,7 +341,7 @@
  *      <td>
  *        This directive is used to specify the freshness threshold (in
  *        seconds) for this host. If you set this directive to a value of 0,
- *        Centron Scheduler will determine a freshness threshold to use
+ *        Centreon Scheduler will determine a freshness threshold to use
  *        automatically.
  *      </td>
  *    </tr>
@@ -473,7 +473,7 @@
  *        @ref mainconfigurationfileoptionsconfigurationfilevariablestimingintervallength
  * 	  "interval_length" directive
  *        from the default value of 60, this number will mean minutes. If you
- *        set this value to 0, Centron Scheduler will not re-notify contacts
+ *        set this value to 0, Centreon Scheduler will not re-notify contacts
  *        about problems for this host - only one problem notification will
  *        be sent out.
  *      </td>
@@ -487,7 +487,7 @@
  *	  @ref mainconfigurationfileoptionsconfigurationfilevariablestimingintervallength
  * 	  "interval_length" directive
  *        from the default value of 60, this number will mean minutes. If you
- *        set this value to 0, Centron Scheduler will start sending out
+ *        set this value to 0, Centreon Scheduler will start sending out
  *        notifications immediately.
  *      </td>
  *    </tr>
@@ -514,7 +514,7 @@
  *        notifications when @link scheduleddowntime scheduled downtime @endlink
  *        starts and ends. If you specify n (none) as an option, no host
  *        notifications will be sent out. If you do not specify any
- *        notification options, Centron Scheduler will assume that you want
+ *        notification options, Centreon Scheduler will assume that you want
  *        notifications to be sent out for all possible states. Example: If
  *        you specify d,r in this field, notifications will only be sent out
  *        when the host goes DOWN and when it recovers from a DOWN state.
@@ -883,7 +883,7 @@
  *      <td>check_command</td>
  *      <td>
  *        This directive is used to specify the short name of the
- *        @ref objectdefinitionsobjecttypescommanddefinition "command" that Centron Scheduler will run in order
+ *        @ref objectdefinitionsobjecttypescommanddefinition "command" that Centreon Scheduler will run in order
  *        to check the status of the service. The maximum amount of time that
  *        the service check command can run is controlled by the
  *        @ref mainconfigurationfileoptionsconfigurationfilevariablesservicechecktimeout
@@ -893,7 +893,7 @@
  *    <tr>
  *      <td>initial_state</td>
  *      <td>
- *        By default Centron Scheduler will assume that all services are in
+ *        By default Centreon Scheduler will assume that all services are in
  *        OK states when it starts. You can override the initial state for a
  *        service by using this directive. Valid options are: o = OK, w =
  *        WARNING, u = UNKNOWN, and c = CRITICAL.
@@ -902,10 +902,10 @@
  *    <tr>
  *      <td>max_check_attempts</td>
  *      <td>
- *        This directive is used to define the number of times that Centron
+ *        This directive is used to define the number of times that Centreon
  *        Scheduler will retry the service check command if it returns any
  *        state other than an OK state. Setting this value to 1 will cause
- *        Centron Scheduler to generate an alert without retrying the service
+ *        Centreon Scheduler to generate an alert without retrying the service
  *        check again.
  *      </td>
  *    </tr>
@@ -985,7 +985,7 @@
  *      <td>
  *        This directive is used to specify the freshness threshold (in
  *        seconds) for this service. If you set this directive to a value of
- *        0, Centron Scheduler will determine a freshness threshold to use
+ *        0, Centreon Scheduler will determine a freshness threshold to use
  *        automatically.
  *      </td>
  *    </tr>
@@ -1095,7 +1095,7 @@
  *        @ref mainconfigurationfileoptionsconfigurationfilevariablestimingintervallength
  * 	  "interval_length" directive
  *        from the default value of 60, this number will mean minutes. If you
- *        set this value to 0, Centron Scheduler will not re-notify contacts
+ *        set this value to 0, Centreon Scheduler will not re-notify contacts
  *        about problems for this service - only one problem notification
  *        will be sent out.
  *      </td>
@@ -1109,7 +1109,7 @@
  *	  @ref mainconfigurationfileoptionsconfigurationfilevariablestimingintervallength
  *	  "interval_length" directive
  *        from the default value of 60, this number will mean minutes. If you
- *        set this value to 0, Centron Scheduler will start sending out
+ *        set this value to 0, Centreon Scheduler will start sending out
  *        notifications immediately.
  *      </td>
  *    </tr>
@@ -1136,7 +1136,7 @@
  *        send notifications when @link scheduleddowntime scheduled downtime
  *        @endlink starts and ends. If you specify n (none) as an option, no
  *        service notifications will be sent out. If you do not specify any
- *        notification options, Centron Scheduler will assume that you want
+ *        notification options, Centreon Scheduler will assume that you want
  *        notifications to be sent out for all possible states. Example: If
  *        you specify w,r in this field, notifications will only be sent out
  *        when the service goes into a WARNING state and when it recovers
@@ -1557,7 +1557,7 @@
  *      <td>can_submit_commands</td>
  *      <td>
  *        This directive is used to determine whether or not the contact can
- *        submit @link externalcommands external commands @endlink to Centron
+ *        submit @link externalcommands external commands @endlink to Centreon
  *        Scheduler. Values: 0 = don't allow contact to submit
  *        commands, 1 = allow contact to submit commands.
  *      </td>
@@ -1849,7 +1849,7 @@
  *      <td>command_line</td>
  *      <td>
  *        This directive is used to define what is actually executed by
- *        Centron Scheduler when the command is used for service or host
+ *        Centreon Scheduler when the command is used for service or host
  *        checks, notifications, or @link eventhandlers.html event handlers
  *        @endlink. Before the command line is executed, all valid @link
  *        understandingmacrosandhowtheywork macros @endlink are replaced with their respective
@@ -1884,7 +1884,7 @@
  *
  *  @subsubsection objectdefinitionsobjecttypesservicedependencydefinitiondescription Description
  *
- *  Service dependencies are an advanced feature of Centron Scheduler
+ *  Service dependencies are an advanced feature of Centreon Scheduler
  *  that allow you to suppress notifications and active checks of
  *  services based on the status of one or more other services. Service
  *  dependencies are optional and are mainly targeted at advanced users
@@ -2159,7 +2159,7 @@
  *      <td>
  *        This directive is used to determine the interval at which
  *        notifications should be made while this escalation is valid. If you
- *        specify a value of 0 for the interval, Centron Scheduler will send
+ *        specify a value of 0 for the interval, Centreon Scheduler will send
  *        the first notification when this escalation definition is valid,
  *        but will then prevent any more problem notifications from being
  *        sent out for the host. Notifications are sent out again until the
@@ -2200,7 +2200,7 @@
  *
  *  @subsubsection objectdefinitionsobjecttypeshostdependencydefinitiondescription Description
  *
- *  Host dependencies are an advanced feature of Centron Scheduler that
+ *  Host dependencies are an advanced feature of Centreon Scheduler that
  *  allow you to suppress notifications for hosts based on the status
  *  of one or more other hosts. Host dependencies are optional and are
  *  mainly targeted at advanced users who have complicated monitoring
@@ -2438,7 +2438,7 @@
  *      <td>
  *        This directive is used to determine the interval at which
  *        notifications should be made while this escalation is valid. If you
- *        specify a value of 0 for the interval, Centron Scheduler will send
+ *        specify a value of 0 for the interval, Centreon Scheduler will send
  *        the first notification when this escalation definition is valid,
  *        but will then prevent any more problem notifications from being
  *        sent out for the host. Notifications are sent out again until the
@@ -2481,7 +2481,7 @@
  *  Extended host information entries are basically used to make the
  *  output. They have no effect on monitoring and are completely optional.
  *
- *  @note Tip: As of Centron Scheduler 3.x, all directives contained in
+ *  @note Tip: As of Centreon Scheduler 3.x, all directives contained in
  *  extended host information definitions are also available in
  *  @ref objectdefinitionsobjecttypeshostdefinition "host definitions". Thus, you can choose to define the
  *  directives below in your host definitions if it makes your
@@ -2645,7 +2645,7 @@
  *  Extended service information entries are basically used to make the
  *  output. They have no effect on monitoring and are completely optional.
  *
- *  @note Tip: As of Centron Scheduler 3.x, all directives contained in
+ *  @note Tip: As of Centreon Scheduler 3.x, all directives contained in
  *  extended service information definitions are also available in
  *  @ref objectdefinitionsobjecttypesservicedefinitionservice "service definitions". Thus, you can choose
  *  to define the directives below in your service definitions if it

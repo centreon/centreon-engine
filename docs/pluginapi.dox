@@ -1,22 +1,22 @@
 /**
- *  @page centschedulerpluginapi Centron Scheduler Plugin API
+ *  @page centschedulerpluginapi Centreon Scheduler Plugin API
  *  @section centschedulerpluginapiotherresources Other Resources
  *
- *  If you're looking at writing your own plugins for Centron
+ *  If you're looking at writing your own plugins for Centreon
  *  Scheduler, please make sure to visit these other resources:
- *  - The official <a href="http://XX/">Centron Scheduler plugin project
+ *  - The official <a href="http://XX/">Centreon Scheduler plugin project
  *  website</a>
  *  - The official <a href="http://XXX/developer-guidelines.html">
- *  Centron Scheduler plugin development guidelines</a>
+ *  Centreon Scheduler plugin development guidelines</a>
  *
  *  @section centschedulerpluginapipluginoverview Plugin Overview
  *
  *  Scripts and executables must do two things (at a minimum) in order
- *  to function as Centron Scheduler plugins:
+ *  to function as Centreon Scheduler plugins:
  *  - Exit with one of several possible return values
  *  - Return at least one line of text output to STDOUT
  *
- *  The inner workings of your plugin are unimportant to Centron
+ *  The inner workings of your plugin are unimportant to Centreon
  *  Scheduler. Your plugin could check the status of a TCP port, run a
  *  database query, check disk free space, or do whatever else it needs
  *  to check something. The details will depend on what needs to be
@@ -24,7 +24,7 @@
  *
  *  @section centschedulerpluginapireturncode Return Code
  *
- *  Centron Scheduler determines the status of a host or service by
+ *  Centreon Scheduler determines the status of a host or service by
  *  evaluating the return code from plugins. The following tables shows
  *  a list of valid return codes, along with their corresponding
  *  service or host states.
@@ -62,14 +62,14 @@
  *  "use_aggressive_host_checking" option is enabled, return
  *  codes of 1 will result in a host state of DOWN or UNREACHABLE.
  *  Otherwise return codes of 1 will result in a host state of UP. The
- *  process by which Centron Scheduler determines whether or not a host
+ *  process by which Centreon Scheduler determines whether or not a host
  *  is DOWN or UNREACHABLE is discussed @link
  *  determiningstatusandreachabilityofnetworkhosts here toto @endlink .
  *
  *  @section centschedulerpluginapipluginoutputspec Plugin Output Spec
  *
  *  At a minimum, plugins should return at least one of text output.
- *  Beginning with Centron Scheduler 3, plugins can optionally return
+ *  Beginning with Centreon Scheduler 3, plugins can optionally return
  *  multiple lines of output. Plugins may also return optional
  *  performance data that can be processed by external applications.
  *  The basic format for plugin output is shown below:
@@ -183,26 +183,26 @@
  *
  *  @section centschedulerpluginapipluginoutputlengthrestrictions Plugin Output Length Restrictions
  *
- *  Centron Scheduler will only read the first 4 KB of data that a
+ *  Centreon Scheduler will only read the first 4 KB of data that a
  *  plugin returns. This is done in order to prevent runaway plugins
- *  from dumping megs or gigs of data back to Centron Scheduler. This 4
+ *  from dumping megs or gigs of data back to Centreon Scheduler. This 4
  *  KB output limit is fairly easy to change if you need. Simply edit
  *  the value of the MAX_PLUGIN_OUTPUT_LENGTH definition in the
  *  include/centscheduler.h.in file of the source code distribution and
- *  recompile Centron Scheduler. There's nothing else you need to
+ *  recompile Centreon Scheduler. There's nothing else you need to
  *  change!
  *
  *  @section centschedulerpluginapiexamples Examples
  *
  *  If you're looking for some example plugins to study, I would
- *  recommend that you download the official Centron Scheduler plugins
+ *  recommend that you download the official Centreon Scheduler plugins
  *  and look through the code for various C, Perl, and shell script
- *  plugins. Information on obtaining the official Centron Scheduler
+ *  plugins. Information on obtaining the official Centreon Scheduler
  *  plugins can be found @link plugins.html here @endlink.
  *
  *  @section centschedulerpluginapiperlplugins Perl Plugins
  *
- *  Centron Scheduler features an optional @link usingtheembeddedperlinterpreter
+ *  Centreon Scheduler features an optional @link usingtheembeddedperlinterpreter
  *  embedded Perl interpreter @endlink which can speed up the execution
  *  of Perl plugins. More information on developing Perl plugins for
  *  use with the embedded Perl interpreter can be found @link

@@ -1,32 +1,32 @@
 /**
  *  @page adviceforbeginners Advice for Beginners
  *
- *  Congratulations on choosing Centron Scheduler! Centron Scheduler is
+ *  Congratulations on choosing Centreon Scheduler! Centreon Scheduler is
  *  quite powerful and flexible, but it can take a lot of work to get
  *  it configured just the way you'd like. Once you become familiar
  *  with how it works and what it can do for you, you'll never want to
  *  be without it. :-) Here are some important things to keep in mind
- *  for first-time Centron Scheduler users:
+ *  for first-time Centreon Scheduler users:
  *
  *  1. Relax - it's going to take some time. Don't expect to be able to
  *  get things working exactly the way you want them right off the bat.
- *  it's not that easy. Setting up Centron Scheduler can involve a bit
- *  of work - partly because of the options that Centron Scheduler
+ *  it's not that easy. Setting up Centreon Scheduler can involve a bit
+ *  of work - partly because of the options that Centreon Scheduler
  *  offers, partly because you need to know what to monitor on your
  *  network (and how best to do it).
  *
  *  2. Use the quickstart instructions. The @link
  *  quickstartinstallationguides quickstart installation guide @endlink
  *  is designed to get most new users up and running with a basic
- *  Centron Scheduler setup fairly quickly. Within 20 minutes you can
- *  have Centron Scheduler installed and monitoring your local system.
+ *  Centreon Scheduler setup fairly quickly. Within 20 minutes you can
+ *  have Centreon Scheduler installed and monitoring your local system.
  *  Once that's complete, you can move on to learning how to configure
- *  Centron Scheduler to do more.
+ *  Centreon Scheduler to do more.
  *
- *  3. Read the documentation. Centron Scheduler can be tricky to
+ *  3. Read the documentation. Centreon Scheduler can be tricky to
  *  configure when you've got a good grasp of what's going on, and
  *  nearly impossible if you don't. Make sure you read the
- *  documentation (particularly the sections on "Configuring Centron
+ *  documentation (particularly the sections on "Configuring Centreon
  *  Scheduler" and "The Basics"). Save the advanced topics for when
  *  you've got a good understanding of the basics.
  *

@@ -2,7 +2,7 @@
  *  @page hostandservicedependencies Host and Service Dependencies
  *  @section hostandservicedependenciesintroduction Introduction
  *
- *  Service and host dependencies are an advanced feature of Centron
+ *  Service and host dependencies are an advanced feature of Centreon
  *  Scheduler that allow you to control the behavior of hosts and
  *  services based on the status of one or more other hosts or
  *  services. I'll explain how dependencies work, along with the
@@ -111,35 +111,35 @@
  *
  *  @section hostandservicedependencieshowservicedependenciesaretested How Service Dependencies Are Tested
  *
- *  Before Centron Scheduler executes a service check or sends
+ *  Before Centreon Scheduler executes a service check or sends
  *  notifications out for a service, it will check to see if the
  *  service has any dependencies. If it doesn't have any dependencies,
  *  the check is executed or the notification is sent out as it
  *  normally would be. If the service does have one or more
- *  dependencies, Centron Scheduler will check each dependency entry as
+ *  dependencies, Centreon Scheduler will check each dependency entry as
  *  follows:
- *  - Centron Scheduler gets the current status of the service that is being
+ *  - Centreon Scheduler gets the current status of the service that is being
  *  depended upon.
- *  - Centron Scheduler compares the current status of the service that
+ *  - Centreon Scheduler compares the current status of the service that
  *  is being depended upon against either the execution or notification
  *  failure options in the dependency definition (whichever one is
  *  relevant at the time).
  *  - If the current status of the service that is being depended upon
  *  matches one of the failure options, the dependency is said to have
- *  failed and Centron Scheduler will break out of the dependency check
+ *  failed and Centreon Scheduler will break out of the dependency check
  *  loop.
  *  - If the current state of the service that is being depended upon
  *  does not match any of the failure options for the dependency entry,
- *  the dependency is said to have passed and Centron Scheduler will go
+ *  the dependency is said to have passed and Centreon Scheduler will go
  *  on and check the next dependency entry.
  *
  *  This cycle continues until either all dependencies for the service
  *  have been checked or until one dependency check fails.
  *
  *  @note One important thing to note is that by default,
- *  Centron Scheduler will use the most current @link statetypes.html
+ *  Centreon Scheduler will use the most current @link statetypes.html
  *  hard state @endlink of the service(s) that is/are being depended
- *  upon when it does the dependeny checks. If you want Centron
+ *  upon when it does the dependeny checks. If you want Centreon
  *  Scheduler to use the most current state of the services (regardless
  *  of whether its a soft or hard state), enable the
  *  @ref mainconfigurationfileoptionsconfigurationfilevariablessoftstatedependenciesoption
@@ -153,12 +153,12 @@
  *  restricted by execution dependencies.
  *
  *  If all of the execution dependency tests for the service passed,
- *  Centron Scheduler will execute the check of the service as it
+ *  Centreon Scheduler will execute the check of the service as it
  *  normally would. If even just one of the execution dependencies for
- *  a service fails, Centron Scheduler will temporarily prevent the
+ *  a service fails, Centreon Scheduler will temporarily prevent the
  *  execution of checks for that (dependent) service. At some point in
  *  the future the execution dependency tests for the service may all
- *  pass. If this happens, Centron Scheduler will start checking the
+ *  pass. If this happens, Centreon Scheduler will start checking the
  *  service again as it normally would. More information on the check
  *  scheduling logic can be found @link serviceandhostcheckscheduling here
  *  @endlink.
@@ -171,12 +171,12 @@
  *  @section hostandservicedependenciesnotificationdependencies Notification Dependencies
  *
  *  If all of the notification dependency tests for the service passed,
- *  Centron Scheduler will send notifications out for the service as it
+ *  Centreon Scheduler will send notifications out for the service as it
  *  normally would. If even just one of the notification dependencies
- *  for a service fails, Centron Scheduler will temporarily repress
+ *  for a service fails, Centreon Scheduler will temporarily repress
  *  notifications for that (dependent) service. At some point in the
  *  future the notification dependency tests for the service may all
- *  pass. If this happens, Centron Scheduler will start sending out
+ *  pass. If this happens, Centreon Scheduler will start sending out
  *  notifications again as it normally would for the service. More
  *  information on the notification logic can be found @link
  *  notifications.html here @endlink.
@@ -294,12 +294,12 @@
  *
  *  Host notification dependencies work in a similiar manner to service
  *  notification dependencies. If all of the notification dependency
- *  tests for the host pass, Centron Scheduler will send notifications
+ *  tests for the host pass, Centreon Scheduler will send notifications
  *  out for the host as it normally would. If even just one of the
- *  notification dependencies for a host fails, Centron Scheduler will
+ *  notification dependencies for a host fails, Centreon Scheduler will
  *  temporarily repress notifications for that (dependent) host. At
  *  some point in the future the notification dependency tests for the
- *  host may all pass. If this happens, Centron Scheduler will start
+ *  host may all pass. If this happens, Centreon Scheduler will start
  *  sending out notifications again as it normally would for the host.
  *  More information on the notification logic can be found @link
  *  notifications.html here @endlink.

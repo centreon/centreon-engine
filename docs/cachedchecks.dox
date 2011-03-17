@@ -6,9 +6,9 @@
  *  @image html cachedchecks1.png
  *  @image latex cachedchecks1.eps
  *
- *  The performance of Centron Scheduler' monitoring logic can be
+ *  The performance of Centreon Scheduler' monitoring logic can be
  *  significantly improved by implementing the use of cached checks.
- *  Cached checks allow Centron Scheduler to forgo executing a host or
+ *  Cached checks allow Centreon Scheduler to forgo executing a host or
  *  service check command if it determines a relatively recent check
  *  result will do instead.
  *
@@ -33,7 +33,7 @@
  *  - As needed for @link hostandservicedependencies predictive service
  *  dependency checks @endlink.
  *
- *  @note Unless you make use of service dependencies, Centron
+ *  @note Unless you make use of service dependencies, Centreon
  *  Scheduler will not be able to use cached check results to improve
  *  the performance of service checks. Don't worry about that - its
  *  normal. Cached host checks are where the big performance
@@ -44,7 +44,7 @@
  *  @image html cachedchecks.png
  *  @image latex cachedchecks.eps
  *
- *  When Centron Scheduler needs to perform an on-demand host or
+ *  When Centreon Scheduler needs to perform an on-demand host or
  *  service check, it will make a determination as to whether it can
  *  used a cached check result or if it needs to perform an actual
  *  check by executing a plugin. It does this by checking to see if the
@@ -52,30 +52,30 @@
  *  minutes, where X is the cached host or service check horizon.
  *
  *  If the last check was performed within the timeframe specified by
- *  the cached check horizon variable, Centron Scheduler will use the
+ *  the cached check horizon variable, Centreon Scheduler will use the
  *  result of the last host or service check and will not execute a new
  *  check. If the host or service has not yet been checked, or if the
  *  last check falls outside of the cached check horizon timeframe,
- *  Centron Scheduler will execute a new host or service check by
+ *  Centreon Scheduler will execute a new host or service check by
  *  running a plugin.
  *
  *  @section cachedcheckswhatthisreallymeans What This Really Means
  *
- *  Centron Scheduler performs on-demand checks because it need to know
+ *  Centreon Scheduler performs on-demand checks because it need to know
  *  the current state of a host or service at that exact moment in
- *  time. Utilizing cached checks allows you to make Centron Scheduler
+ *  time. Utilizing cached checks allows you to make Centreon Scheduler
  *  think that recent check results are "good enough" for determining
  *  the current state of hosts, and that it doesn't need to go out and
  *  actually re-check the status of that host or service.
  *
- *  The cached check horizon tells Centron Scheduler how recent check
+ *  The cached check horizon tells Centreon Scheduler how recent check
  *  results must be in order to reliably reflect the current state of a
  *  host or service. For example, with a cached check horizon of 30
- *  seconds, you are telling Centron Scheduler that if a host's state
+ *  seconds, you are telling Centreon Scheduler that if a host's state
  *  was checked sometime in the last 30 seconds, the result of that
  *  check should still be considered the current state of the host.
  *
- *  The number of cached check results that Centron Scheduler can use
+ *  The number of cached check results that Centreon Scheduler can use
  *  versus the number of on-demand checks it has to actually execute
  *  can be considered the cached check "hit" rate. By increasing the
  *  cached check horizon to equal the regular check interval of a host,
@@ -93,16 +93,16 @@
  *  you have a large cached check horizon, you risk having unreliable
  *  check result values being used in the monitoring logic.
  *
- *  Centron Scheduler will eventually determine the correct state of
+ *  Centreon Scheduler will eventually determine the correct state of
  *  all hosts and services, so even if cached check results prove to
- *  unreliably represent their true value, Centron Scheduler will only
+ *  unreliably represent their true value, Centreon Scheduler will only
  *  work with incorrect information for a short period of time. Even
  *  short periods of unreliable status information can prove to be a
  *  nuisance for admins, as they may receive notifications about
  *  problems which no longer exist.
  *
  *  There is no standard cached check horizon or cache hit rate that
- *  will be acceptable to every Centron Scheduler users. Some people
+ *  will be acceptable to every Centreon Scheduler users. Some people
  *  will want a short horizon timeframe and a low cache hit rate, while
  *  others will want a larger horizon timeframe and a larger cache hit
  *  rate (with a low reliability rate). Some users may even want to
@@ -145,7 +145,7 @@
  *  @image latex cachedcheckgraphs.eps
  *
  *  A good way to determine the proper value for the cached check
- *  horizon options is to compare how many on-demand checks Centron
+ *  horizon options is to compare how many on-demand checks Centreon
  *  Scheduler has to actually run versus how may it can use cached
  *  values for. The @link usingthecentschedulertatsutility centschedulertats
  *  @endlink utility can produce information on cached checks, which
@@ -170,7 +170,7 @@
  *  checks occurs every five minutes.
  *
  *  Remember, cached checks are only available for on-demand checks.
- *  Based on the 5 minute averages from the graphs, we see that Centron
+ *  Based on the 5 minute averages from the graphs, we see that Centreon
  *  Scheduler is able to used cached host check results every 2 out of
  *  9 times an on-demand check has to be run. That may not seem much,
  *  but these graphs represent a small monitoring environment. Consider

@@ -9,7 +9,7 @@
  *  crucial to ensure that status information used in the dependency
  *  logic is as up to date as possible.
  *
- *  Centron Scheduler allows you to enable predictive dependency checks
+ *  Centreon Scheduler allows you to enable predictive dependency checks
  *  for hosts and services to ensure that the dependency logic will
  *  have the most up-to-date status information when it comes to making
  *  decisions about whether to send out notifications or allow active
@@ -18,11 +18,11 @@
  *  @section predictivedependencycheckshowdopredictivecheckswork How Do Predictive Checks Work?
  *
  *  The image below shows a basic diagram of hosts that are being
- *  monitored by Centron Scheduler, along with their parent/child
+ *  monitored by Centreon Scheduler, along with their parent/child
  *  relationships and dependencies.
  *
  *  The Switch2 host in this example has just changed state from an UP
- *  state to a problem state. Centron Scheduler needs to determine
+ *  state to a problem state. Centreon Scheduler needs to determine
  *  whether the host is DOWN or UNREACHABLE, so it will launch parallel
  *  checks of Switch2's immediate parents (Firewall1) and children
  *  (Comp1, Comp2, and Switch3). This is a normal function of the @link
@@ -31,9 +31,9 @@
  *  You will also notice that Switch2 is depending on Monitor1 and
  *  File1 for either notifications or check execution (which one is
  *  unimportant in this example). If predictive host dependency checks
- *  are enabled, Centron Scheduler will launch parallel checks of
+ *  are enabled, Centreon Scheduler will launch parallel checks of
  *  Monitor1 and File1 at the same time it launches checks of Switch2's
- *  immediate parents and children. Centron Scheduler does this because
+ *  immediate parents and children. Centreon Scheduler does this because
  *  it knows that it will have to test the dependency logic in the near
  *  future (e.g. for purposes of notification) and it wants to make
  *  sure it has the most current status information for the hosts that
@@ -68,7 +68,7 @@
  *  Predictive dependency checks are on-demand checks and are therefore
  *  subject to the rules of @link cachedchecks.html cached checks
  *  @endlink. Cached checks can provide you with performance
- *  improvements by allowing Centron Scheduler to forgo running an
+ *  improvements by allowing Centreon Scheduler to forgo running an
  *  actual host or service check if it can use a relatively recent
  *  check result instead. More information on cached checks can be
  *  found @link cachedchecks.html here @endlink.

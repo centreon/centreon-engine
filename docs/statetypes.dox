@@ -8,7 +8,7 @@
  *  etc.)
  *  - Tye type of state the service or host is in
  *
- *  There are two state types in Centron Scheduler - SOFT states and
+ *  There are two state types in Centreon Scheduler - SOFT states and
  *  HARD states. These state types are a crucial part of the monitoring
  *  logic, as they are used to determine when @link eventhandlers.html
  *  event handlers @endlink are executed and when @link
@@ -19,7 +19,7 @@
  *
  *  @section statetypesserviceandhostcheckretries Service and Host Check Retries
  *
- *  In order to prevent false alarms from transient problems, Centron
+ *  In order to prevent false alarms from transient problems, Centreon
  *  Scheduler allows you to define how many times a service or host
  *  should be (re)checked before it is considered to have a "real"
  *  problem. This is controlled by the max_check_attempts option in the
