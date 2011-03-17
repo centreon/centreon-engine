@@ -1,0 +1,25 @@
+#!/bin/sh
+
+# Abort if any command returns an error value
+set -e
+
+case "$1" in
+    configure)
+	if [ @GROUP@ != "root" ]; then
+	    groupadd -f @GROUP@
+	fi
+	if [ @USER@ != "root" ]; then
+	    useradd -M -N -G @GROUP@ @USER@
+	fi
+	;;
+
+    abort-upgrade|abort-remove|abort-deconfigure)
+	;;
+
+    *)
+	echo "$0: called with unknown argument" 1>&2
+	exit 0
+	;;
+esac
+
+exit 0

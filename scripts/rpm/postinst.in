@@ -1,0 +1,13 @@
+#!/bin/sh
+
+# Abort if any command returns an error value
+set -e
+
+if [ @GROUP@ != "root" ]; then
+    groupadd -f @GROUP@
+fi
+if [ @USER@ != "root" ]; then
+    useradd -M -N -G @GROUP@ @USER@
+fi
+
+exit 0
