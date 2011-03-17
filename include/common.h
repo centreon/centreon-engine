@@ -19,8 +19,11 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#define PROGRAM_VERSION "3.2.3"
-#define PROGRAM_MODIFICATION_DATE "10-03-2010"
+#define PROGRAM_NAME "Centreon Scheduler"
+#define PROGRAM_NAME_UC "CENTREON SCHEDULER"
+#define PROGRAM_NAME_LC "centreon scheduler"
+#define PROGRAM_VERSION "1.0.0"
+#define PROGRAM_MODIFICATION_DATE "01-01-1970"
 
 /*#define DEBUG_CHECK_IPC 1 */
 /*#define DEBUG_CHECK_IPC2 1*/
