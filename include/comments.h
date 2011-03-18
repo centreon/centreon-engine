@@ -81,9 +81,9 @@ typedef struct comment_struct{
 
 int initialize_comment_data(char *);                                /* initializes comment data */
 int cleanup_comment_data(char *);                                   /* cleans up comment data */
-int add_new_comment(int,int,char *,char *,time_t,char *,char *,int,int,int,time_t,unsigned long *);       /* adds a new host or service comment */
-int add_new_host_comment(int,char *,time_t,char *,char *,int,int,int,time_t,unsigned long *);             /* adds a new host comment */
-int add_new_service_comment(int,char *,char *,time_t,char *,char *,int,int,int,time_t,unsigned long *);   /* adds a new service comment */
+int add_new_comment(int,int,char const *,char const *,time_t,char const *,char *,int,int,int,time_t,unsigned long *);       /* adds a new host or service comment */
+int add_new_host_comment(int,char const *,time_t,char const *,char *,int,int,int,time_t,unsigned long *);             /* adds a new host comment */
+int add_new_service_comment(int,char const *,char const *,time_t,char const *,char *,int,int,int,time_t,unsigned long *);   /* adds a new service comment */
 int delete_comment(int,unsigned long);                              /* deletes a host or service comment */
 int delete_host_comment(unsigned long);                             /* deletes a host comment */
 int delete_service_comment(unsigned long);                          /* deletes a service comment */
@@ -110,10 +110,10 @@ int number_of_service_comments(char *, char *);		              /* returns the nu
    sort_comments afterwards. Things will go MUCH faster. */
 
 extern int defer_comment_sorting;
-int add_comment(int,int,char *,char *,time_t,char *,char *,unsigned long,int,int,time_t,int);      /* adds a comment (host or service) */
+int add_comment(int,int,char const *,char const *,time_t,char const *,char *,unsigned long,int,int,time_t,int);      /* adds a comment (host or service) */
 int sort_comments(void);
-int add_host_comment(int,char *,time_t,char *,char *,unsigned long,int,int,time_t,int);            /* adds a host comment */
-int add_service_comment(int,char *,char *,time_t,char *,char *,unsigned long,int,int,time_t,int);  /* adds a service comment */
+int add_host_comment(int,char const *,time_t,char const *,char *,unsigned long,int,int,time_t,int);            /* adds a host comment */
+int add_service_comment(int,char const *,char const *,time_t,char const *,char *,unsigned long,int,int,time_t,int);  /* adds a service comment */
 
 int add_comment_to_hashlist(comment *);
 

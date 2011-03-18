@@ -106,7 +106,7 @@ extern int allow_empty_hostgroup_assignment;
 
 
 /* returns the name of a numbered config file */
-static char *xodtemplate_config_file_name(int config_file)
+static char const *xodtemplate_config_file_name(int config_file)
 {
 	if(config_file<=xodtemplate_current_config_file)
 		return xodtemplate_config_files[config_file-1];
@@ -3997,7 +3997,7 @@ xodtemplate_daterange *xodtemplate_add_exception_to_timeperiod(xodtemplate_timep
 
 
 int xodtemplate_get_month_from_string(char *str, int *month){
-	char *months[12]={"january","february","march","april","may","june","july","august","september","october","november","december"};
+	char const *months[12]={"january","february","march","april","may","june","july","august","september","october","november","december"};
 	int x=0;
 
 	if(str==NULL || month==NULL)
@@ -4017,7 +4017,7 @@ int xodtemplate_get_month_from_string(char *str, int *month){
 
 
 int xodtemplate_get_weekday_from_string(char *str, int *weekday){
-	char *days[7]={"sunday","monday","tuesday","wednesday","thursday","friday","saturday"};
+	char const *days[7]={"sunday","monday","tuesday","wednesday","thursday","friday","saturday"};
 	int x=0;
 
 	if(str==NULL || weekday==NULL)
@@ -10070,8 +10070,8 @@ int xodtemplate_merge_host_extinfo_object(xodtemplate_host *this_host, xodtempla
 int xodtemplate_cache_objects(char *cache_file){
 	FILE *fp=NULL;
 	register int x=0;
-	char *days[7]={"sunday","monday","tuesday","wednesday","thursday","friday","saturday"};
-	char *months[12]={"january","february","march","april","may","june","july","august","september","october","november","december"};
+	char const *days[7]={"sunday","monday","tuesday","wednesday","thursday","friday","saturday"};
+	char const *months[12]={"january","february","march","april","may","june","july","august","september","october","november","december"};
 	xodtemplate_timeperiod *temp_timeperiod=NULL;
 	xodtemplate_daterange *temp_daterange=NULL;
 	xodtemplate_command *temp_command=NULL;

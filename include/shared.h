@@ -16,7 +16,7 @@ typedef struct mmapfile_struct {
 /* only usable on compile-time initialized arrays, for obvious reasons */
 # define ARRAY_SIZE(ary) (sizeof(ary) / sizeof(ary[0]))
 
-extern char *my_strtok(char *buffer, char *tokens);
+extern char *my_strtok(char *buffer, char const *tokens);
 extern char *my_strsep(char **stringp, const char *delim);
 extern mmapfile *mmap_fopen(char *filename);
 extern int mmap_fclose(mmapfile *temp_mmapfile);

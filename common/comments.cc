@@ -76,7 +76,7 @@ int cleanup_comment_data(char *config_file){
 
 
 /* adds a new host or service comment */
-int add_new_comment(int type, int entry_type, char *host_name, char *svc_description, time_t entry_time, char *author_name, char *comment_data, int persistent, int source, int expires, time_t expire_time, unsigned long *comment_id){
+int add_new_comment(int type, int entry_type, char const *host_name, char const *svc_description, time_t entry_time, char const *author_name, char *comment_data, int persistent, int source, int expires, time_t expire_time, unsigned long *comment_id){
 	int result=OK;
 	unsigned long new_comment_id=0L;
 
@@ -98,7 +98,7 @@ int add_new_comment(int type, int entry_type, char *host_name, char *svc_descrip
 
 
 /* adds a new host comment */
-int add_new_host_comment(int entry_type, char *host_name, time_t entry_time, char *author_name, char *comment_data, int persistent, int source, int expires, time_t expire_time, unsigned long *comment_id){
+int add_new_host_comment(int entry_type, char const *host_name, time_t entry_time, char const *author_name, char *comment_data, int persistent, int source, int expires, time_t expire_time, unsigned long *comment_id){
 	int result=OK;
 	unsigned long new_comment_id=0L;
 
@@ -121,7 +121,7 @@ int add_new_host_comment(int entry_type, char *host_name, time_t entry_time, cha
 
 
 /* adds a new service comment */
-int add_new_service_comment(int entry_type, char *host_name, char *svc_description, time_t entry_time, char *author_name, char *comment_data, int persistent, int source, int expires, time_t expire_time, unsigned long *comment_id){
+int add_new_service_comment(int entry_type, char const *host_name, char const *svc_description, time_t entry_time, char const *author_name, char *comment_data, int persistent, int source, int expires, time_t expire_time, unsigned long *comment_id){
 	int result=OK;
 	unsigned long new_comment_id=0L;
 
@@ -409,7 +409,7 @@ int add_comment_to_hashlist(comment *new_comment){
 
 
 /* adds a host comment to the list in memory */
-int add_host_comment(int entry_type, char *host_name, time_t entry_time, char *author, char *comment_data, unsigned long comment_id, int persistent, int expires, time_t expire_time, int source){
+int add_host_comment(int entry_type, char const *host_name, time_t entry_time, char const *author, char *comment_data, unsigned long comment_id, int persistent, int expires, time_t expire_time, int source){
 	int result=OK;
 
 	result=add_comment(HOST_COMMENT,entry_type,host_name,NULL,entry_time,author,comment_data,comment_id,persistent,expires,expire_time,source);
@@ -420,7 +420,7 @@ int add_host_comment(int entry_type, char *host_name, time_t entry_time, char *a
 
 
 /* adds a service comment to the list in memory */
-int add_service_comment(int entry_type, char *host_name, char *svc_description, time_t entry_time, char *author, char *comment_data, unsigned long comment_id, int persistent, int expires, time_t expire_time, int source){
+int add_service_comment(int entry_type, char const *host_name, char const *svc_description, time_t entry_time, char const *author, char *comment_data, unsigned long comment_id, int persistent, int expires, time_t expire_time, int source){
 	int result=OK;
 
 	result=add_comment(SERVICE_COMMENT,entry_type,host_name,svc_description,entry_time,author,comment_data,comment_id,persistent,expires,expire_time,source);
@@ -431,7 +431,7 @@ int add_service_comment(int entry_type, char *host_name, char *svc_description, 
 
 
 /* adds a comment to the list in memory */
-int add_comment(int comment_type, int entry_type, char *host_name, char *svc_description, time_t entry_time, char *author, char *comment_data, unsigned long comment_id, int persistent, int expires, time_t expire_time, int source){
+int add_comment(int comment_type, int entry_type, char const *host_name, char const *svc_description, time_t entry_time, char const *author, char *comment_data, unsigned long comment_id, int persistent, int expires, time_t expire_time, int source){
 	comment *new_comment=NULL;
 	comment *last_comment=NULL;
 	comment *temp_comment=NULL;

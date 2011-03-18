@@ -185,10 +185,10 @@ typedef struct nebstruct_comment_struct{
 	struct timeval  timestamp;
 
 	int             comment_type;
-	char            *host_name;
-	char            *service_description;
+	char const      *host_name;
+	char const      *service_description;
 	time_t          entry_time;
-	char            *author_name;
+	char const      *author_name;
 	char            *comment_data;
 	int             persistent;
 	int             source;

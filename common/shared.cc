@@ -8,7 +8,7 @@
 extern int date_format;
 
 /* fix the problem with strtok() skipping empty options between tokens */
-char *my_strtok(char *buffer, char *tokens)
+char *my_strtok(char *buffer, char const *tokens)
 {
 	char *token_position = NULL;
 	char *sequence_head = NULL;
@@ -400,11 +400,10 @@ void get_datetime_string(time_t * raw_time, char *buffer, int buffer_length,
 	int month;
 	int day;
 	int year;
-	char *weekdays[7] = { "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" };
-	char *months[12] =
-	    { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sept",
-     "Oct", "Nov", "Dec" };
-	char *tzone = "";
+	char const *weekdays[7] = { "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" };
+	char const *months[12] =
+	    { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sept", "Oct", "Nov", "Dec" };
+	char const *tzone = "";
 
 	if (raw_time == NULL)
 		time(&t);

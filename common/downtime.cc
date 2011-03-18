@@ -221,7 +221,7 @@ int register_downtime(int type, unsigned long downtime_id){
 	scheduled_downtime *temp_downtime=NULL;
 	host *hst=NULL;
 	service *svc=NULL;
-	char *type_string=NULL;
+	char const *type_string=NULL;
 	int hours=0;
 	int minutes=0;
 	int seconds=0;
@@ -255,7 +255,7 @@ int register_downtime(int type, unsigned long downtime_id){
 	else
 		type_string="service";
 	if(temp_downtime->fixed==TRUE){
-		if(asprintf(&temp_buffer,"This %s has been scheduled for fixed downtime from %s to %s.  Notifications for the %s will not be sent out during that time period.",type_string,start_time_string,end_time_string,type_string)==-1){
+		if(asprintf(&temp_buffer,"This %s has been scheduled for fixed downtime from %s to %s.  Notifications for the %s will not be sent out during that time period.",(char*)type_string,start_time_string,end_time_string,type_string)==-1){
 			logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
 			return ERROR;
 			}

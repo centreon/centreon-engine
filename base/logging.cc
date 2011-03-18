@@ -90,7 +90,7 @@ static inline int soft_lock(pthread_mutex_t *lock)
 /******************************************************************/
 
 /* write something to the console */
-static void write_to_console(char *buffer)
+static void write_to_console(char const *buffer)
 {
 	printf("%s\n",buffer);
 }
@@ -212,7 +212,7 @@ int write_to_log(char *buffer, unsigned long data_type, time_t *timestamp){
 
 
 /* write something to the syslog facility */
-int write_to_syslog(char *buffer, unsigned long data_type){
+int write_to_syslog(char const *buffer, unsigned long data_type){
 
 	if(buffer==NULL)
 		return ERROR;

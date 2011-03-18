@@ -592,8 +592,8 @@ int deinit_embedded_perl(void);				/* cleans up embedded perl */
 int file_uses_embedded_perl(char *);			/* tests whether or not the embedded perl interpreter should be used on a file */
 int dbuf_init(dbuf *,int);
 int dbuf_free(dbuf *);
-int dbuf_strcat(dbuf *,char *);
-int set_environment_var(char *,char *,int);             /* sets/clears and environment variable */
+int dbuf_strcat(dbuf *,char const *);
+int set_environment_var(char const *,char const *,int);             /* sets/clears and environment variable */
 
 
 /**** External Command Functions ****/

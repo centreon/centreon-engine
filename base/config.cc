@@ -1466,7 +1466,7 @@ int pre_flight_check(void){
 	char *buf=NULL;
 	service *temp_service=NULL;
 	command *temp_command=NULL;
-	char *temp_command_name="";
+	char *temp_command_name=NULL;
 	int warnings=0;
 	int errors=0;
 	struct timeval tv[4];
@@ -1694,7 +1694,7 @@ int pre_flight_object_check(int *w, int *e){
 	servicedependency *temp_sd=NULL;
 	hostdependency *temp_hd=NULL;
 	char *buf=NULL;
-	char *temp_command_name="";
+	char *temp_command_name=NULL;
 	int found=FALSE;
 	int total_objects=0;
 	int warnings=0;
