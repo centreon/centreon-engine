@@ -1,7 +1,7 @@
 #ifndef LOGGING_H_
 # define LOGGING_H
 
-# include "objects.h"
+# include "objects.hh"
 
 /******************* LOGGING TYPES ********************/
 

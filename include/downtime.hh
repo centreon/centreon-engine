@@ -21,9 +21,9 @@
 #ifndef DOWNTIME_H
 # define DOWNTIME_H
 
-# include "config.h"
-# include "common.h"
-# include "objects.h"
+# include "config.hh"
+# include "common.hh"
+# include "objects.hh"
 
 # ifdef __cplusplus
   extern "C" {

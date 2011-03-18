@@ -105,10 +105,10 @@
 
 #ifndef NO_CONFIG_H
 /* 02/28/2006 EG changed path to config.h to match Nagios distro */
-#include "../include/config.h"
+# include "../include/config.hh"
 #else
-#define NULL 0
-#endif 
+# define NULL 0
+#endif
 
 #ifdef TEST_SNPRINTF /* need math library headers for testing */
 

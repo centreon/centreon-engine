@@ -18,17 +18,17 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include "../include/config.h"
-#include "../include/common.h"
-#include "../include/objects.h"
-#include "../include/skiplist.h"
+#include "../include/config.hh"
+#include "../include/common.hh"
+#include "../include/objects.hh"
+#include "../include/skiplist.hh"
 
-#include "../include/nagios.h"
+#include "../include/nagios.hh"
 
 /**** IMPLEMENTATION-SPECIFIC HEADER FILES ****/
 
 #ifdef USE_XODTEMPLATE                          /* template-based routines */
-# include "../xdata/xodtemplate.h"
+# include "../xdata/xodtemplate.hh"
 #endif
 
 

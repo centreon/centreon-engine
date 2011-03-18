@@ -20,18 +20,18 @@
 
 /*********** COMMON HEADER FILES ***********/
 
-#include "../include/config.h"
-#include "../include/common.h"
-#include "../include/objects.h"
-#include "../include/statusdata.h"
+#include "../include/config.hh"
+#include "../include/common.hh"
+#include "../include/objects.hh"
+#include "../include/statusdata.hh"
 
-#include "../include/nagios.h"
-#include "../include/broker.h"
+#include "../include/nagios.hh"
+#include "../include/broker.hh"
 
 /**** IMPLEMENTATION SPECIFIC HEADER FILES ****/
 
 #ifdef USE_XSDDEFAULT
-#include "../xdata/xsddefault.h"		/* default routines */
+#include "../xdata/xsddefault.hh"		/* default routines */
 #endif
 
 

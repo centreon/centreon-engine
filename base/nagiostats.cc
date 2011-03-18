@@ -18,10 +18,10 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include "../include/config.h"
-#include "../include/common.h"
-#include "../include/nagios.h"
-#include "../include/locations.h"
+#include "../include/config.hh"
+#include "../include/common.hh"
+#include "../include/nagios.hh"
+#include "../include/locations.hh"
 
 #define STATUS_NO_DATA             0
 #define STATUS_INFO_DATA           1

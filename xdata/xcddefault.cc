@@ -20,17 +20,17 @@
 
 /*********** COMMON HEADER FILES ***********/
 
-#include "../include/config.h"
-#include "../include/common.h"
-#include "../include/locations.h"
-#include "../include/comments.h"
-#include "../include/macros.h"
+#include "../include/config.hh"
+#include "../include/common.hh"
+#include "../include/locations.hh"
+#include "../include/comments.hh"
+#include "../include/macros.hh"
 
-#include "../include/objects.h"
-#include "../include/nagios.h"
+#include "../include/objects.hh"
+#include "../include/nagios.hh"
 
 /**** IMPLEMENTATION SPECIFIC HEADER FILES ****/
-#include "xcddefault.h"
+#include "xcddefault.hh"
 
 
 extern unsigned long next_comment_id;

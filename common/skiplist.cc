@@ -18,10 +18,10 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include "../include/config.h"
-#include "../include/common.h"
+#include "../include/config.hh"
+#include "../include/common.hh"
 
-#include "../include/skiplist.h"
+#include "../include/skiplist.hh"
 
 
 

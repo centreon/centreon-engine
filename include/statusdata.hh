@@ -21,7 +21,7 @@
 #ifndef STATUSDATA_H
 # define STATUSDATA_H
 
-# include "objects.h"
+# include "objects.hh"
 
 # ifdef __cplusplus
   extern "C" {

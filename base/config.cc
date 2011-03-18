@@ -18,14 +18,14 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include "../include/config.h"
-#include "../include/common.h"
-#include "../include/objects.h"
-#include "../include/macros.h"
-#include "../include/nagios.h"
-#include "../include/broker.h"
-#include "../include/nebmods.h"
-#include "../include/nebmodules.h"
+#include "../include/config.hh"
+#include "../include/common.hh"
+#include "../include/objects.hh"
+#include "../include/macros.hh"
+#include "../include/nagios.hh"
+#include "../include/broker.hh"
+#include "../include/nebmods.hh"
+#include "../include/nebmodules.hh"
 
 
 extern char	*log_file;

@@ -21,7 +21,7 @@
 #ifndef PERFDATA_H
 # define PERFDATA_H
 
-# include "objects.h"
+# include "objects.hh"
 
 # ifdef __cplusplus
   extern "C" {

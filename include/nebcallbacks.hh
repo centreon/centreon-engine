@@ -21,8 +21,8 @@
 #ifndef NEBCALLBACKS_H
 # define NEBCALLBACKS_H
 
-# include "config.h"
-# include "nebmodules.h"
+# include "config.hh"
+# include "nebmodules.hh"
 
 # ifdef __cplusplus
   extern "C" {

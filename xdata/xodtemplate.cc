@@ -20,20 +20,20 @@
 
 /*********** COMMON HEADER FILES ***********/
 
-#include "../include/config.h"
-#include "../include/common.h"
-#include "../include/objects.h"
-#include "../include/locations.h"
-#include "../include/macros.h"
-#include "../include/skiplist.h"
+#include "../include/config.hh"
+#include "../include/common.hh"
+#include "../include/objects.hh"
+#include "../include/locations.hh"
+#include "../include/macros.hh"
+#include "../include/skiplist.hh"
 
 /**** CORE OR CGI SPECIFIC HEADER FILES ****/
 
-#include "../include/nagios.h"
+#include "../include/nagios.hh"
 
 /**** DATA INPUT-SPECIFIC HEADER FILES ****/
 
-#include "xodtemplate.h"
+#include "xodtemplate.hh"
 
 
 extern int use_regexp_matches;

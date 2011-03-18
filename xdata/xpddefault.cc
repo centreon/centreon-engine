@@ -20,16 +20,16 @@
 
 /*********** COMMON HEADER FILES ***********/
 
-#include "../include/config.h"
-#include "../include/common.h"
-#include "../include/objects.h"
-#include "../include/macros.h"
-#include "../include/nagios.h"
+#include "../include/config.hh"
+#include "../include/common.hh"
+#include "../include/objects.hh"
+#include "../include/macros.hh"
+#include "../include/nagios.hh"
 
 
 /**** DATA INPUT-SPECIFIC HEADER FILES ****/
 
-#include "xpddefault.h"
+#include "xpddefault.hh"
 
 
 int     xpddefault_perfdata_timeout;

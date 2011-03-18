@@ -21,9 +21,9 @@
 #ifndef NEBMODS_H
 # define NEBMODS_H
 
-# include "config.h"
-# include "nebcallbacks.h"
-# include "nebmodules.h"
+# include "config.hh"
+# include "nebcallbacks.hh"
+# include "nebmodules.hh"
 
 # ifdef __cplusplus
 extern "C" {

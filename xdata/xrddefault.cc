@@ -21,20 +21,20 @@
 
 /*********** COMMON HEADER FILES ***********/
 
-#include "../include/config.h"
-#include "../include/common.h"
-#include "../include/objects.h"
-#include "../include/statusdata.h"
-#include "../include/macros.h"
-#include "../include/nagios.h"
-#include "../include/sretention.h"
-#include "../include/comments.h"
-#include "../include/downtime.h"
+#include "../include/config.hh"
+#include "../include/common.hh"
+#include "../include/objects.hh"
+#include "../include/statusdata.hh"
+#include "../include/macros.hh"
+#include "../include/nagios.hh"
+#include "../include/sretention.hh"
+#include "../include/comments.hh"
+#include "../include/downtime.hh"
 
 
 /**** STATE INFORMATION SPECIFIC HEADER FILES ****/
 
-#include "xrddefault.h"
+#include "xrddefault.hh"
 
 extern host           *host_list;
 extern service        *service_list;

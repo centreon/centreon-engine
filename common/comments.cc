@@ -18,19 +18,19 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include "../include/config.h"
-#include "../include/common.h"
-#include "../include/comments.h"
-#include "../include/objects.h"
+#include "../include/config.hh"
+#include "../include/common.hh"
+#include "../include/comments.hh"
+#include "../include/objects.hh"
 
 /***** IMPLEMENTATION-SPECIFIC INCLUDES *****/
 
 #ifdef USE_XCDDEFAULT
-#include "../xdata/xcddefault.h"
+#include "../xdata/xcddefault.hh"
 #endif
 
-#include "../include/nagios.h"
-#include "../include/broker.h"
+#include "../include/nagios.hh"
+#include "../include/broker.hh"
 
 comment     *comment_list=NULL;
 int	    defer_comment_sorting = 0;

@@ -19,19 +19,19 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include "../include/config.h"
-#include "../include/common.h"
-#include "../include/objects.h"
-#include "../include/comments.h"
-#include "../include/downtime.h"
-#include "../include/statusdata.h"
-#include "../include/macros.h"
-#include "../include/nagios.h"
-#include "../include/sretention.h"
-#include "../include/perfdata.h"
-#include "../include/broker.h"
-#include "../include/nebmods.h"
-#include "../include/nebmodules.h"
+#include "../include/config.hh"
+#include "../include/common.hh"
+#include "../include/objects.hh"
+#include "../include/comments.hh"
+#include "../include/downtime.hh"
+#include "../include/statusdata.hh"
+#include "../include/macros.hh"
+#include "../include/nagios.hh"
+#include "../include/sretention.hh"
+#include "../include/perfdata.hh"
+#include "../include/broker.hh"
+#include "../include/nebmods.hh"
+#include "../include/nebmodules.hh"
 
 /*#define DEBUG_MEMORY 1*/
 #ifdef DEBUG_MEMORY

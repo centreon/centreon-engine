@@ -21,8 +21,8 @@
 #ifndef BROKER_H
 # define BROKER_H
 
-# include "config.h"
-# include "nagios.h"
+# include "config.hh"
+# include "nagios.hh"
 
 # ifdef __cplusplus
   extern "C" {

@@ -18,14 +18,14 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include "../include/config.h"
-#include "../include/common.h"
-#include "../include/downtime.h"
-#include "../include/comments.h"
-#include "../include/statusdata.h"
-#include "../include/nagios.h"
-#include "../include/broker.h"
-#include "../include/sretention.h"
+#include "../include/config.hh"
+#include "../include/common.hh"
+#include "../include/downtime.hh"
+#include "../include/comments.hh"
+#include "../include/statusdata.hh"
+#include "../include/nagios.hh"
+#include "../include/broker.hh"
+#include "../include/sretention.hh"
 
 
 extern char	*config_file;

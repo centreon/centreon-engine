@@ -20,16 +20,16 @@
 
 /*********** COMMON HEADER FILES ***********/
 
-#include "../include/config.h"
-#include "../include/common.h"
-#include "../include/objects.h"
-#include "../include/perfdata.h"
-#include "../include/macros.h"
+#include "../include/config.hh"
+#include "../include/common.hh"
+#include "../include/objects.hh"
+#include "../include/perfdata.hh"
+#include "../include/macros.hh"
 
 /***** IMPLEMENTATION-SPECIFIC HEADER FILES *****/
 
 #ifdef USE_XPDDEFAULT
-#include "../xdata/xpddefault.h"
+#include "../xdata/xpddefault.hh"
 #endif
 
 

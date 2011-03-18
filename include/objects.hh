@@ -21,8 +21,8 @@
 #ifndef OBJECTS_H
 # define OBJECTS_H
 
-# include "config.h"
-# include "common.h"
+# include "config.hh"
+# include "common.hh"
 
 # ifdef __cplusplus
   extern "C" {

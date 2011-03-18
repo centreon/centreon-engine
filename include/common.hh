@@ -31,7 +31,7 @@
 /*# define DEBUG_CHECK_IPC 1 */
 /*# define DEBUG_CHECK_IPC2 1*/
 
-# include "shared.h"
+# include "shared.hh"
 
 /* daemon is thread safe */
 # ifndef _REENTRANT

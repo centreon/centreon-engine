@@ -20,13 +20,13 @@
 
 /*********** COMMON HEADER FILES ***********/
 
-#include "../include/config.h"
-#include "../include/common.h"
-#include "../include/objects.h"
-#include "../include/statusdata.h"
-#include "../include/nagios.h"
-#include "../include/sretention.h"
-#include "../include/broker.h"
+#include "../include/config.hh"
+#include "../include/common.hh"
+#include "../include/objects.hh"
+#include "../include/statusdata.hh"
+#include "../include/nagios.hh"
+#include "../include/sretention.hh"
+#include "../include/broker.hh"
 
 extern int            retain_state_information;
 
@@ -34,7 +34,7 @@ extern int            retain_state_information;
 
 /**** IMPLEMENTATION SPECIFIC HEADER FILES ****/
 #ifdef USE_XRDDEFAULT
-#include "../xdata/xrddefault.h"		/* default routines */
+#include "../xdata/xrddefault.hh"		/* default routines */
 #endif
 
 

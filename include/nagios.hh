@@ -27,12 +27,12 @@
 #  define __attribute__(x) /* nothing */
 # endif
 
-# include "config.h"
-# include "logging.h"
-# include "common.h"
-# include "locations.h"
-# include "objects.h"
-# include "macros.h"
+# include "config.hh"
+# include "logging.hh"
+# include "common.hh"
+# include "locations.hh"
+# include "objects.hh"
+# include "macros.hh"
 
 # ifdef __cplusplus
 extern "C" {

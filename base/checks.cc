@@ -18,15 +18,15 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include "../include/config.h"
-#include "../include/comments.h"
-#include "../include/common.h"
-#include "../include/statusdata.h"
-#include "../include/downtime.h"
-#include "../include/macros.h"
-#include "../include/nagios.h"
-#include "../include/broker.h"
-#include "../include/perfdata.h"
+#include "../include/config.hh"
+#include "../include/comments.hh"
+#include "../include/common.hh"
+#include "../include/statusdata.hh"
+#include "../include/downtime.hh"
+#include "../include/macros.hh"
+#include "../include/nagios.hh"
+#include "../include/broker.hh"
+#include "../include/perfdata.hh"
 
 /*#define DEBUG_CHECKS*/
 /*#define DEBUG_HOST_CHECKS 1*/
@@ -34,11 +34,11 @@
 #define MAX_CMD_ARGS 4096
 
 #ifdef EMBEDDEDPERL
-#include "../include/epn_nagios.h"
+#include "../include/epn_nagios.hh"
 #endif
 
 #ifdef USE_EVENT_BROKER
-#include "../include/neberrors.h"
+#include "../include/neberrors.hh"
 #endif
 
 extern int      sigshutdown;

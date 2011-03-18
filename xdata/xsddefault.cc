@@ -21,19 +21,19 @@
 
 /*********** COMMON HEADER FILES ***********/
 
-#include "../include/config.h"
-#include "../include/common.h"
-#include "../include/locations.h"
-#include "../include/statusdata.h"
-#include "../include/comments.h"
-#include "../include/downtime.h"
-#include "../include/macros.h"
-#include "../include/skiplist.h"
+#include "../include/config.hh"
+#include "../include/common.hh"
+#include "../include/locations.hh"
+#include "../include/statusdata.hh"
+#include "../include/comments.hh"
+#include "../include/downtime.hh"
+#include "../include/macros.hh"
+#include "../include/skiplist.hh"
 
-#include "../include/nagios.h"
+#include "../include/nagios.hh"
 
 /**** IMPLEMENTATION SPECIFIC HEADER FILES ****/
-#include "xsddefault.h"
+#include "xsddefault.hh"
 
 
 

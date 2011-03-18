@@ -21,9 +21,9 @@
 #ifndef NEBSTRUCTS_H
 # define NEBSTRUCTS_H
 
-# include "config.h"
-# include "objects.h"
-# include "nagios.h"
+# include "config.hh"
+# include "objects.hh"
+# include "nagios.hh"
 
 # ifdef __cplusplus
   extern "C" {

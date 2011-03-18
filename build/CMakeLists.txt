@@ -19,7 +19,7 @@
 
 # Global options.
 cmake_minimum_required(VERSION 2.8)
-project("Centreon Scheduler" CXX)
+project("Centreon Scheduler" C CXX)
 
 # Testing.
 set(PROJECT_SOURCE_DIR "${PROJECT_SOURCE_DIR}/..")
@@ -355,12 +355,12 @@ else ()
 endif ()
 
 # Configure files.
-configure_file("${INCLUDE_DIR}/config.h.in"
-  "${INCLUDE_DIR}/config.h")
-configure_file("${INCLUDE_DIR}/locations.h.in"
-  "${INCLUDE_DIR}/locations.h")
-configure_file("${INCLUDE_DIR}/snprintf.h.in"
-  "${INCLUDE_DIR}/snprintf.h")
+configure_file("${INCLUDE_DIR}/config.hh.in"
+  "${INCLUDE_DIR}/config.hh")
+configure_file("${INCLUDE_DIR}/locations.hh.in"
+  "${INCLUDE_DIR}/locations.hh")
+configure_file("${INCLUDE_DIR}/snprintf.hh.in"
+  "${INCLUDE_DIR}/snprintf.hh")
 
 # centscheduler target.
 add_executable("centscheduler"
