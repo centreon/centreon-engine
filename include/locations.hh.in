@@ -18,8 +18,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef LOCATIONS_H
-# define LOCATIONS_H
+#ifndef SCHEDULER_LOCATIONS_HH
+# define SCHEDULER_LOCATIONS_HH
 
 # define DEFAULT_TEMP_FILE			"@localstatedir@/tempfile"
 # define DEFAULT_TEMP_PATH                      "/tmp"
@@ -39,4 +39,4 @@
 # define DEFAULT_P1_FILE			"@bindir@/p1.pl"	/**** EMBEDDED PERL ****/
 # define DEFAULT_AUTH_FILE			""			/**** EMBEDDED PERL - IS THIS USED? ****/
 
-#endif /* !LOCATIONS_H */
+#endif // !SCHEDULER_LOCATIONS_HH

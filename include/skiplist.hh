@@ -18,8 +18,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef _SKIPLIST_H
-# define _SKIPLIST_H
+#ifndef SCHEDULER_SKIPLIST_HH
+# define SCHEDULER_SKIPLIST_HH
 
 # define SKIPLIST_OK              0
 # define SKIPLIST_ERROR_ARGS      1
@@ -69,4 +69,4 @@ int skiplist_delete_node(skiplist *list, void *node_ptr);
   }
 # endif
 
-#endif /* !SKIPLIST_H */
+#endif // !SCHEDULER_SKIPLIST_HH

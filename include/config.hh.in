@@ -20,8 +20,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef CONFIG_H
-# define CONFIG_H
+#ifndef SCHEDULER_CONFIG_HH
+# define SCHEDULER_CONFIG_HH
 
 /***** NAGIOS STUFF *****/
 
@@ -306,4 +306,4 @@
 #  define WIFEXITED(stat_val) (((stat_val) & 255) == 0)
 # endif
 
-#endif /* !CONFIG_H */
+#endif // !SCHEDULER_CONFIG_HH

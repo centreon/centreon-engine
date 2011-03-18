@@ -18,8 +18,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef NEBMODS_H
-# define NEBMODS_H
+#ifndef SCHEDULER_NEBMODS_HH
+# define SCHEDULER_NEBMODS_HH
 
 # include "config.hh"
 # include "nebcallbacks.hh"
@@ -63,4 +63,4 @@ int neb_make_callbacks(int,void *);
 }
 # endif
 
-#endif /* !NEBMODS_H */
+#endif // !SCHEDULER_NEBMODS_HH

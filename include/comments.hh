@@ -18,8 +18,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef COMMENTS_H
-# define COMMENTS_H
+#ifndef SCHEDULER_COMMENTS_HH
+# define SCHEDULER_COMMENTS_HH
 
 # include "config.hh"
 # include "common.hh"
@@ -123,4 +123,4 @@ void free_comment_data(void);                                             /* fre
   }
 # endif
 
-#endif /* !COMMENTS_H */
+#endif // !SCHEDULER_COMMENTS_HH

@@ -19,8 +19,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef MACROS_H
-# define MACROS_H
+#ifndef SCHEDULER_MACROS_HH
+# define SCHEDULER_MACROS_HH
 
 # include "config.hh"
 # include "common.hh"
@@ -289,4 +289,4 @@ int set_custom_macro_environment_vars(nagios_macros *mac, int);
 int set_contact_address_environment_vars(nagios_macros *mac, int);
 int set_macro_environment_var(char *,char *,int);
 
-#endif /* !MACROS_H */
+#endif // !SCHEDULER_MACROS_HH

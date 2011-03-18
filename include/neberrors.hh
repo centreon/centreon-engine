@@ -18,8 +18,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef NEBERRORS_H
-# define NEBERRORS_H
+#ifndef SCHEDULER_NEBERRORS_HH
+# define SCHEDULER_NEBERRORS_HH
 
 
 /***** GENERIC DEFINES *****/
@@ -62,4 +62,4 @@
 # define NEBERROR_MODINFOBOUNDS      400     /* module info index was out of bounds */
 
 
-#endif /* !NEBERRORS_H */
+#endif // !SCHEDULER_NEBERRORS_HH

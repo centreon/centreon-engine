@@ -18,8 +18,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef XCDDEFAULT_H
-# define XCDDEFAULT_H
+#ifndef SCHEDULER_XCDDEFAULT_HH
+# define SCHEDULER_XCDDEFAULT_HH
 
 int xcddefault_initialize_comment_data(char *);
 int xcddefault_cleanup_comment_data(char *);
@@ -29,4 +29,4 @@ int xcddefault_add_new_service_comment(int,char const *,char const *,time_t,char
 int xcddefault_delete_host_comment(unsigned long);
 int xcddefault_delete_service_comment(unsigned long);
 
-#endif /* XCDDEFAULT_H */
+#endif // !SCHEDULER_XCDDEFAULT_HH

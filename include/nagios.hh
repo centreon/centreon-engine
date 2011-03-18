@@ -20,8 +20,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef NAGIOS_H
-# define NAGIOS_H
+#ifndef SCHEDULER_NAGIOS_HH
+# define SCHEDULER_NAGIOS_HH
 
 # ifndef __GNUC__
 #  define __attribute__(x) /* nothing */
@@ -708,5 +708,4 @@ char *get_program_modification_date(void);
 # ifdef __cplusplus
 }
 # endif
-#endif /* !NAGIOS_H */
-
+#endif // !SCHEDULER_NAGIOS_HH

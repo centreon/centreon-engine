@@ -18,8 +18,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef STATUSDATA_H
-# define STATUSDATA_H
+#ifndef SCHEDULER_STATUSDATA_HH
+# define SCHEDULER_STATUSDATA_HH
 
 # include "objects.hh"
 
@@ -39,4 +39,4 @@ int update_contact_status(contact *,int);               /* updates contact statu
   }
 # endif
 
-#endif /* !STATUSDATA_H */
+#endif // !SCHEDULER_STATUSDATA_HH

@@ -18,8 +18,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef NEBCALLBACKS_H
-# define NEBCALLBACKS_H
+#ifndef SCHEDULER_NEBCALLBACKS_HH
+# define SCHEDULER_NEBCALLBACKS_HH
 
 # include "config.hh"
 # include "nebmodules.hh"
@@ -81,4 +81,4 @@ int neb_deregister_module_callbacks(nebmodule *);
 # endif
 
 
-#endif /* !NEBCALLBACKS_H */
+#endif // !SCHEDULER_NEBCALLBACKS_HH

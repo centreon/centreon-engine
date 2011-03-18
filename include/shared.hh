@@ -1,5 +1,5 @@
-#ifndef SHARED_H
-# define SHARED_H
+#ifndef SCHEDULER_SHARED_HH
+# define SCHEDULER_SHARED_HH
 
 # include <time.h>
 /* mmapfile structure - used for reading files via mmap() */
@@ -30,4 +30,4 @@ extern void get_datetime_string(time_t *raw_time, char *buffer,
 				int buffer_length, int type);
 extern void get_time_breakdown(unsigned long raw_time, int *days, int *hours,
 				   int *minutes, int *seconds);
-#endif /* !SHARED_H */
+#endif // !SCHEDULER_SHARED_HH

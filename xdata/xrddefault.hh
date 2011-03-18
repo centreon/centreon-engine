@@ -18,8 +18,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef XRDDEFAULT_H
-# define XRDDEFAULT_H
+#ifndef SCHEDULER_XRDDEFAULT_HH
+# define SCHEDULER_XRDDEFAULT_HH
 
 # define XRDDEFAULT_NO_DATA               0
 # define XRDDEFAULT_INFO_DATA             1
@@ -39,4 +39,4 @@ int xrddefault_grab_config_directives(char *);
 int xrddefault_save_state_information(void);        /* saves all host and service state information */
 int xrddefault_read_state_information(void);        /* reads in initial host and service state information */
 
-#endif /* !XRDDEFAULT_H */
+#endif // !SCHEDULER_XRDDEFAULT_HH

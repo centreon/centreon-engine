@@ -359,8 +359,8 @@ configure_file("${INCLUDE_DIR}/config.hh.in"
   "${INCLUDE_DIR}/config.hh")
 configure_file("${INCLUDE_DIR}/locations.hh.in"
   "${INCLUDE_DIR}/locations.hh")
-configure_file("${INCLUDE_DIR}/snprintf.hh.in"
-  "${INCLUDE_DIR}/snprintf.hh")
+configure_file("${INCLUDE_DIR}/snprintf.h.in"
+  "${INCLUDE_DIR}/snprintf.h")
 
 # Include Directories
 include_directories("${INCLUDE_DIR}")

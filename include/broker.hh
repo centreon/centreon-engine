@@ -18,8 +18,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef BROKER_H
-# define BROKER_H
+#ifndef SCHEDULER_BROKER_HH
+# define SCHEDULER_BROKER_HH
 
 # include "config.hh"
 # include "nagios.hh"
@@ -214,4 +214,4 @@ void broker_statechange_data(int,int,int,int,void *,int,int,int,int,struct timev
   }
 # endif
 
-#endif /* !BROKER_H */
+#endif // !SCHEDULER_BROKER_HH

@@ -18,8 +18,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef PERFDATA_H
-# define PERFDATA_H
+#ifndef SCHEDULER_PERFDATA_HH
+# define SCHEDULER_PERFDATA_HH
 
 # include "objects.hh"
 
@@ -37,4 +37,4 @@ int update_service_performance_data(service *);         	/* updates service perf
   }
 # endif
 
-#endif /* !PERFDATA_H */
+#endif // !SCHEDULER_PERFDATA_HH

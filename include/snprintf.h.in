@@ -1,0 +1,8 @@
+#ifndef SCHEDULER_SNPRINTF_HH
+# define SCHEDULER_SNPRINTF_HH
+
+/* -*- C -*- */
+#cmakedefine HAVE_SNPRINTF
+#cmakedefine NEED_VA_LIST
+
+#endif // !SCHEDULER_SNPRINTF_HH

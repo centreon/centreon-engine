@@ -18,8 +18,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef OBJECTS_H
-# define OBJECTS_H
+#ifndef SCHEDULER_OBJECTS_HH
+# define SCHEDULER_OBJECTS_HH
 
 # include "config.hh"
 # include "common.hh"
@@ -728,4 +728,4 @@ int free_object_data(void);                             /* frees all allocated m
   }
 # endif
 
-#endif /* !OBJECTS_H */
+#endif // !SCHEDULER_OBJECTS_HH

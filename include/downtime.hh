@@ -18,8 +18,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef DOWNTIME_H
-# define DOWNTIME_H
+#ifndef SCHEDULER_DOWNTIME_HH
+# define SCHEDULER_DOWNTIME_HH
 
 # include "config.hh"
 # include "common.hh"
@@ -96,4 +96,4 @@ void free_downtime_data(void);                                       /* frees me
   }
 # endif
 
-#endif /* !DOWNTIME_H */
+#endif // !SCHEDULER_DOWNTIME_HH

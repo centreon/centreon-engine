@@ -18,8 +18,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef NEBSTRUCTS_H
-# define NEBSTRUCTS_H
+#ifndef SCHEDULER_NEBSTRUCTS_HH
+# define SCHEDULER_NEBSTRUCTS_HH
 
 # include "config.hh"
 # include "objects.hh"
@@ -524,4 +524,4 @@ typedef struct nebstruct_statechange_struct{
   }
 # endif
 
-#endif /* !NEBSTRUCTS_H */
+#endif // !SCHEDULER_NEBSTRUCTS_HH

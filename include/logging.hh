@@ -1,5 +1,5 @@
-#ifndef LOGGING_H_
-# define LOGGING_H
+#ifndef SCHEDULER_LOGGING_HH
+# define SCHEDULER_LOGGING_HH
 
 # include "objects.hh"
 
@@ -83,4 +83,4 @@ int open_debug_log(void);
 int close_debug_log(void);
 # endif /* !NSCGI */
 
-#endif /* !LOGGING_H */
+#endif // !SCHEDULER_LOGGING_HH

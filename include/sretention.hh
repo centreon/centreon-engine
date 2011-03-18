@@ -18,8 +18,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef SRETENTION_H
-# define SRETENTION_H
+#ifndef SCHEDULER_SRETENTION_HH
+# define SCHEDULER_SRETENTION_HH
 
 # ifdef __cplusplus
   extern "C" {
@@ -34,4 +34,4 @@ int read_initial_state_information(void);        /* reads in initial host and st
   }
 # endif
 
-#endif /* !SRETENTION_H */
+#endif // !SCHEDULER_SRETENTION_HH

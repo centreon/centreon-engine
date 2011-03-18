@@ -18,8 +18,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef NEBMODULES_H
-# define NEBMODULES_H
+#ifndef SCHEDULER_NEBMODULES_HH
+# define SCHEDULER_NEBMODULES_HH
 
 # ifdef __cplusplus
   extern "C" {
@@ -95,4 +95,4 @@ int neb_set_module_info(void *,int,char *);
   }
 # endif
 
-#endif /* !NEBMODULES_H */
+#endif // !SCHEDULER_NEBMODULES_HH

@@ -18,8 +18,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef XPDDEFAULT_H
-# define XPDDEFAULT_H
+#ifndef SCHEDULER_XPDDEFAULT_HH
+# define SCHEDULER_XPDDEFAULT_HH
 
 # include "objects.hh"
 
@@ -53,4 +53,4 @@ int xpddefault_close_service_perfdata_file(void);
 int xpddefault_process_host_perfdata_file(void);
 int xpddefault_process_service_perfdata_file(void);
 
-#endif /* !XPDDEFAULT_H */
+#endif // !SCHEDULER_XPDDEFAULT_HH
