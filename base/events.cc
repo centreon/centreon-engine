@@ -889,7 +889,7 @@ void remove_event(timed_event *event, timed_event **event_list, timed_event **ev
 	broker_timed_event(NEBTYPE_TIMEDEVENT_REMOVE,NEBFLAG_NONE,NEBATTR_NONE,event,NULL);
 #endif
 
-	if(*event_list==NULL)
+	if(*event_list==NULL || event==NULL)
 		return;
 
 	if(*event_list==event){
