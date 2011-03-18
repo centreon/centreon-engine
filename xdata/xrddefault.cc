@@ -107,7 +107,7 @@ int xrddefault_grab_config_info(char *main_config_file)
 	nagios_macros *mac;
 
 	mac = get_global_macros();
-							      
+
 
 	/* open the main config file for reading */
 	if((thefile=mmap_fopen(main_config_file))==NULL){
@@ -167,7 +167,7 @@ int xrddefault_grab_config_info(char *main_config_file)
 
 /* process a single config directive */
 int xrddefault_grab_config_directives(char *input){
-	char *temp_ptr=NULL;
+	char const *temp_ptr=NULL;
 	char *varname=NULL;
 	char *varvalue=NULL;
 
@@ -583,7 +583,7 @@ int xrddefault_save_state_information(void){
 
 	/* a problem occurred saving the file */
 	else{
-		
+
 		result=ERROR;
 
 		/* remove temp file and log an error */
@@ -768,7 +768,7 @@ int xrddefault_read_state_information(void){
 					/* ADDED 01/23/2009 adjust current check attempts if host in hard problem state (max attempts may have changed in config since restart) */
 					if(temp_host->current_state!=HOST_UP && temp_host->state_type==HARD_STATE)
 						temp_host->current_attempt=temp_host->max_attempts;
-					   
+
 
 					/* ADDED 02/20/08 assume same flapping state if large install tweaks enabled */
 					if(use_large_installation_tweaks==TRUE){
@@ -791,7 +791,7 @@ int xrddefault_read_state_information(void){
 						if(was_flapping==TRUE && temp_host->is_flapping==FALSE)
 							temp_host->check_flapping_recovery_notification=FALSE;
 						}
-					
+
 					/* handle new vars added in 2.x */
 					if(temp_host->last_hard_state_change==(time_t)0)
 						temp_host->last_hard_state_change=temp_host->last_state_change;
@@ -816,7 +816,7 @@ int xrddefault_read_state_information(void){
 					/* adjust modified attributes if necessary */
 					if(temp_service->retain_nonstatus_information==FALSE)
 						temp_service->modified_attributes=MODATTR_NONE;
-					
+
 					/* adjust modified attributes if no custom variables have been changed */
 					if(temp_service->modified_attributes & MODATTR_CUSTOM_VARIABLE){
 						for(temp_customvariablesmember=temp_service->custom_variables;temp_customvariablesmember!=NULL;temp_customvariablesmember=temp_customvariablesmember->next){
@@ -839,7 +839,7 @@ int xrddefault_read_state_information(void){
 					/* ADDED 01/23/2009 adjust current check attempt if service is in hard problem state (max attempts may have changed in config since restart) */
 					if(temp_service->current_state!=STATE_OK && temp_service->state_type==HARD_STATE)
 						temp_service->current_attempt=temp_service->max_attempts;
-					   
+
 
 					/* ADDED 02/20/08 assume same flapping state if large install tweaks enabled */
 					if(use_large_installation_tweaks==TRUE){
@@ -862,7 +862,7 @@ int xrddefault_read_state_information(void){
 						if(was_flapping==TRUE && temp_service->is_flapping==FALSE)
 							temp_service->check_flapping_recovery_notification=FALSE;
 						}
-					
+
 					/* handle new vars added in 2.x */
 					if(temp_service->last_hard_state_change==(time_t)0)
 						temp_service->last_hard_state_change=temp_service->last_state_change;
@@ -935,7 +935,7 @@ int xrddefault_read_state_information(void){
 				/* non-persistent comments don't last past restarts UNLESS they're acks (see above) */
 				else if(persistent==FALSE)
 					remove_comment=TRUE;
-				
+
 				if(remove_comment==TRUE)
 					delete_comment((data_type==XRDDEFAULT_HOSTCOMMENT_DATA)?HOST_COMMENT:SERVICE_COMMENT,comment_id);
 
@@ -1376,7 +1376,7 @@ int xrddefault_read_state_information(void){
 						        }
 						else if(!strcmp(var,"max_attempts")){
 							if(temp_host->modified_attributes & MODATTR_MAX_CHECK_ATTEMPTS && atoi(val)>=1){
-								
+
 								temp_host->max_attempts=atoi(val);
 
 								/* adjust current attempt number if in a hard state */
@@ -1387,12 +1387,12 @@ int xrddefault_read_state_information(void){
 
 						/* custom variables */
 						else if(var[0]=='_'){
-							
+
 							if(temp_host->modified_attributes & MODATTR_CUSTOM_VARIABLE){
 
 								/* get the variable name */
 								if((customvarname=(char *)strdup(var+1))){
-							
+
 									for(temp_customvariablesmember=temp_host->custom_variables;temp_customvariablesmember!=NULL;temp_customvariablesmember=temp_customvariablesmember->next){
 										if(!strcmp(customvarname,temp_customvariablesmember->variable_name)){
 											if((x=atoi(val))>0 && strlen(val)>3){
@@ -1655,7 +1655,7 @@ int xrddefault_read_state_information(void){
 						        }
 						else if(!strcmp(var,"max_attempts")){
 							if(temp_service->modified_attributes & MODATTR_MAX_CHECK_ATTEMPTS && atoi(val)>=1){
-								
+
 								temp_service->max_attempts=atoi(val);
 
 								/* adjust current attempt number if in a hard state */
@@ -1668,10 +1668,10 @@ int xrddefault_read_state_information(void){
 						else if(var[0]=='_'){
 
 							if(temp_service->modified_attributes & MODATTR_CUSTOM_VARIABLE){
-							
+
 								/* get the variable name */
 								if((customvarname=(char *)strdup(var+1))){
-							
+
 									for(temp_customvariablesmember=temp_service->custom_variables;temp_customvariablesmember!=NULL;temp_customvariablesmember=temp_customvariablesmember->next){
 										if(!strcmp(customvarname,temp_customvariablesmember->variable_name)){
 											if((x=atoi(val))>0 && strlen(val)>3){
@@ -1776,10 +1776,10 @@ int xrddefault_read_state_information(void){
 						else if(var[0]=='_'){
 
 							if(temp_contact->modified_attributes & MODATTR_CUSTOM_VARIABLE){
-							
+
 								/* get the variable name */
 								if((customvarname=(char *)strdup(var+1))){
-							
+
 									for(temp_customvariablesmember=temp_contact->custom_variables;temp_customvariablesmember!=NULL;temp_customvariablesmember=temp_customvariablesmember->next){
 										if(!strcmp(customvarname,temp_customvariablesmember->variable_name)){
 											if((x=atoi(val))>0 && strlen(val)>3){

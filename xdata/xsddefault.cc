@@ -158,7 +158,7 @@ int xsddefault_grab_config_info(char *config_file)
 
 /* processes a single directive */
 int xsddefault_grab_config_directives(char *input){
-	char *temp_ptr=NULL;
+	char const *temp_ptr=NULL;
 	char *varname=NULL;
 	char *varvalue=NULL;
 

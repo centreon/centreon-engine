@@ -2726,7 +2726,7 @@ char *escape_newlines(char *rawbuf){
 		return NULL;
 
 	/* allocate enough memory to escape all chars if necessary */
-	if((newbuf=malloc((strlen(rawbuf)*2)+1))==NULL)
+	if((newbuf=(char*)malloc((strlen(rawbuf)*2)+1))==NULL)
 		return NULL;
 
 	for(x=0,y=0;rawbuf[x]!=(char)'\x0';x++){
@@ -2843,7 +2843,7 @@ int my_fdcopy(char *source, char *dest, int dest_fd)
 	 * cache, so larger isn't necessarily better.
 	 */
 	buf_size = st.st_size > 128 << 10 ? 128 << 10 : st.st_size;
-	buf = malloc(buf_size);
+	buf = (char*)malloc(buf_size);
 	if (!buf) {
 		logit(NSLOG_RUNTIME_ERROR,TRUE,"Error: Unable to malloc(%lu) bytes: %s\n", buf_size, strerror(errno));
 		close(source_fd);

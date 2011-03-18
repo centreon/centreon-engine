@@ -175,7 +175,7 @@ int skiplist_random_level(skiplist *list){
 
 
 int skiplist_empty(skiplist *list){
-	skiplistnode *this=NULL;
+	skiplistnode *self=NULL;
 	skiplistnode *next=NULL;
 	int level=0;
 
@@ -183,9 +183,9 @@ int skiplist_empty(skiplist *list){
 		return ERROR;
 
 	/* free all list nodes (but not header) */
-	for(this=list->head->forward[0];this!=NULL;this=next){
-		next=this->forward[0];
-		free(this);
+	for(self=list->head->forward[0];self!=NULL;self=next){
+		next=self->forward[0];
+		free(self);
 		}
 
 	/* reset level pointers */
@@ -204,7 +204,7 @@ int skiplist_empty(skiplist *list){
 
 
 int skiplist_free(skiplist **list){
-	skiplistnode *this=NULL;
+	skiplistnode *self=NULL;
 	skiplistnode *next=NULL;
 
 	if(list==NULL)
@@ -213,9 +213,9 @@ int skiplist_free(skiplist **list){
 		return OK;
 
 	/* free header and all list nodes */
-	for(this=(*list)->head;this!=NULL;this=next){
-		next=this->forward[0];
-		free(this);
+	for(self=(*list)->head;self!=NULL;self=next){
+		next=self->forward[0];
+		free(self);
 		}
 
 	/* free list structure */

@@ -101,7 +101,7 @@ typedef struct xodtemplate_daterange_struct{
 
 /* TIMEPERIOD TEMPLATE STRUCTURE */
 typedef struct xodtemplate_timeperiod_struct{
-	char       *template;
+	char       *tmpl;
 	char       *name;
 	int        _config_file;
 	int        _start_line;
@@ -120,7 +120,7 @@ typedef struct xodtemplate_timeperiod_struct{
 
 /* COMMAND TEMPLATE STRUCTURE */
 typedef struct xodtemplate_command_struct{
-	char       *template;
+	char       *tmpl;
 	char       *name;
 	int        _config_file;
 	int        _start_line;
@@ -136,7 +136,7 @@ typedef struct xodtemplate_command_struct{
 
 /* CONTACT TEMPLATE STRUCTURE */
 typedef struct xodtemplate_contact_struct{
-	char      *template;
+	char      *tmpl;
 	char      *name;
 	int        _config_file;
 	int        _start_line;
@@ -194,7 +194,7 @@ typedef struct xodtemplate_contact_struct{
 
 /* CONTACTGROUP TEMPLATE STRUCTURE */
 typedef struct xodtemplate_contactgroup_struct{
-	char      *template;
+	char      *tmpl;
 	char      *name;
 	int        _config_file;
 	int        _start_line;
@@ -215,7 +215,7 @@ typedef struct xodtemplate_contactgroup_struct{
 
 /* HOST TEMPLATE STRUCTURE */
 typedef struct xodtemplate_host_struct{
-	char      *template;
+	char      *tmpl;
 	char      *name;
 	int        _config_file;
 	int        _start_line;
@@ -330,7 +330,7 @@ typedef struct xodtemplate_host_struct{
 
 /* HOSTGROUP TEMPLATE STRUCTURE */
 typedef struct xodtemplate_hostgroup_struct{
-	char      *template;
+	char      *tmpl;
 	char      *name;
 	int        _config_file;
 	int        _start_line;
@@ -357,7 +357,7 @@ typedef struct xodtemplate_hostgroup_struct{
 
 /* SERVICE TEMPLATE STRUCTURE */
 typedef struct xodtemplate_service_struct{
-        char       *template;
+        char       *tmpl;
 	char       *name;
 	int        _config_file;
 	int        _start_line;
@@ -462,7 +462,7 @@ typedef struct xodtemplate_service_struct{
 	int        have_failure_prediction_enabled;
 	int        have_retain_status_information;
 	int        have_retain_nonstatus_information;
-	
+
 	int        has_been_resolved;
 	int        register_object;
 	struct xodtemplate_service_struct *next;
@@ -471,7 +471,7 @@ typedef struct xodtemplate_service_struct{
 
 /* SERVICEGROUP TEMPLATE STRUCTURE */
 typedef struct xodtemplate_servicegroup_struct{
-	char      *template;
+	char      *tmpl;
 	char      *name;
 	int        _config_file;
 	int        _start_line;
@@ -498,7 +498,7 @@ typedef struct xodtemplate_servicegroup_struct{
 
 /* SERVICEDEPENDENCY TEMPLATE STRUCTURE */
 typedef struct xodtemplate_servicedependency_struct{
-	char       *template;
+	char       *tmpl;
         char       *name;
 	int        _config_file;
 	int        _start_line;
@@ -546,7 +546,7 @@ typedef struct xodtemplate_servicedependency_struct{
 
 /* SERVICEESCALATION TEMPLATE STRUCTURE */
 typedef struct xodtemplate_serviceescalation_struct{
-	char      *template;
+	char      *tmpl;
 	char      *name;
 	int        _config_file;
 	int        _start_line;
@@ -587,7 +587,7 @@ typedef struct xodtemplate_serviceescalation_struct{
 
 /* HOSTDEPENDENCY TEMPLATE STRUCTURE */
 typedef struct xodtemplate_hostdependency_struct{
-	char      *template;
+	char      *tmpl;
         char      *name;
 	int        _config_file;
 	int        _start_line;
@@ -625,7 +625,7 @@ typedef struct xodtemplate_hostdependency_struct{
 
 /* HOSTESCALATION TEMPLATE STRUCTURE */
 typedef struct xodtemplate_hostescalation_struct{
-	char      *template;
+	char      *tmpl;
 	char      *name;
 	int        _config_file;
 	int        _start_line;
@@ -661,7 +661,7 @@ typedef struct xodtemplate_hostescalation_struct{
 
 /* HOSTEXTINFO TEMPLATE STRUCTURE */
 typedef struct xodtemplate_hostextinfo_struct{
-	char       *template;
+	char       *tmpl;
 	char       *name;
 	int        _config_file;
 	int        _start_line;
@@ -690,7 +690,7 @@ typedef struct xodtemplate_hostextinfo_struct{
 	int        have_icon_image_alt;
 	int        have_vrml_image;
 	int        have_statusmap_image;
-	
+
 	int        have_2d_coords;
 	int        have_3d_coords;
 
@@ -702,7 +702,7 @@ typedef struct xodtemplate_hostextinfo_struct{
 
 /* SERVICEEXTINFO TEMPLATE STRUCTURE */
 typedef struct xodtemplate_serviceextinfo_struct{
-	char       *template;
+	char       *tmpl;
 	char       *name;
 	int        _config_file;
 	int        _start_line;

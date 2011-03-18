@@ -34,7 +34,7 @@ char *main_config_file=NULL;
 char *status_file=NULL;
 char *nagiostats_file=NULL;
 char *mrtg_variables=NULL;
-char *mrtg_delimiter="\n";
+char const *mrtg_delimiter="\n";
 
 int mrtg_mode=FALSE;
 

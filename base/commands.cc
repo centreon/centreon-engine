@@ -252,7 +252,7 @@ int process_external_command1(char *cmd){
 	/**************************/
 	/**** PROCESS COMMANDS ****/
 	/**************************/
-	
+
 	if(!strcmp(command_id,"ENTER_STANDBY_MODE") || !strcmp(command_id,"DISABLE_NOTIFICATIONS"))
 		command_type=CMD_DISABLE_NOTIFICATIONS;
 	else if(!strcmp(command_id,"ENTER_ACTIVE_MODE") || !strcmp(command_id,"ENABLE_NOTIFICATIONS"))
@@ -380,7 +380,7 @@ int process_external_command1(char *cmd){
 		command_type=CMD_ENABLE_PASSIVE_HOST_CHECKS;
 	else if(!strcmp(command_id,"DISABLE_PASSIVE_HOST_CHECKS"))
 		command_type=CMD_DISABLE_PASSIVE_HOST_CHECKS;
-	
+
 	else if(!strcmp(command_id,"SCHEDULE_HOST_SVC_CHECKS"))
 		command_type=CMD_SCHEDULE_HOST_SVC_CHECKS;
 	else if(!strcmp(command_id,"SCHEDULE_FORCED_HOST_SVC_CHECKS"))
@@ -688,7 +688,7 @@ int process_external_command1(char *cmd){
 	else if(!strcmp(command_id,"PROCESS_FILE"))
 		command_type=CMD_PROCESS_FILE;
 
-	
+
 
 	/****************************/
 	/****** CUSTOM COMMANDS *****/
@@ -862,23 +862,23 @@ int process_external_command2(int cmd, time_t entry_time, char *args){
 	case CMD_ENABLE_SERVICE_FRESHNESS_CHECKS:
 		enable_service_freshness_checks();
 		break;
-	
+
 	case CMD_DISABLE_SERVICE_FRESHNESS_CHECKS:
 		disable_service_freshness_checks();
 		break;
-	
+
 	case CMD_ENABLE_HOST_FRESHNESS_CHECKS:
 		enable_host_freshness_checks();
 		break;
-	
+
 	case CMD_DISABLE_HOST_FRESHNESS_CHECKS:
 		disable_host_freshness_checks();
 		break;
-	
+
 	case CMD_ENABLE_FAILURE_PREDICTION:
 		enable_all_failure_prediction();
 		break;
-		
+
 	case CMD_DISABLE_FAILURE_PREDICTION:
 		disable_all_failure_prediction();
 		break;
@@ -1220,7 +1220,7 @@ int process_host_command(int cmd, time_t entry_time, char *args){
 				enable_service_checks(temp_service);
 			else
 				disable_service_checks(temp_service);
-	                } 
+	                }
 		break;
 
 	case CMD_ENABLE_HOST_CHECK:
@@ -1348,7 +1348,7 @@ int process_hostgroup_command(int cmd, time_t entry_time, char *args){
 			for(temp_servicesmember=temp_host->services;temp_servicesmember!=NULL;temp_servicesmember=temp_servicesmember->next){
 				if((temp_service=temp_servicesmember->service_ptr)==NULL)
 					continue;
-					
+
 				switch(cmd){
 
 				case CMD_ENABLE_HOSTGROUP_SVC_NOTIFICATIONS:
@@ -1379,7 +1379,7 @@ int process_hostgroup_command(int cmd, time_t entry_time, char *args){
 					break;
 				        }
 			        }
-			
+
 			break;
 		        }
 
@@ -1885,7 +1885,7 @@ int cmd_delay_notification(int cmd,char *args){
 		temp_host->next_host_notification=delay_time;
 	else
 		temp_service->next_notification=delay_time;
-	
+
 	return OK;
         }
 
@@ -1911,7 +1911,7 @@ int cmd_schedule_check(int cmd,char *args){
 		if((temp_host=find_host(host_name))==NULL)
 			return ERROR;
 	        }
-	
+
 	else{
 
 		/* get the service description */
@@ -2343,14 +2343,14 @@ int cmd_acknowledge_problem(int cmd,char *args){
 	if((temp_ptr=my_strtok(NULL,";"))==NULL)
 		return ERROR;
 	ack_author=(char *)strdup(temp_ptr);
-	
+
 	/* get the acknowledgement data */
 	if((temp_ptr=my_strtok(NULL,"\n"))==NULL){
 		my_free(ack_author);
 		return ERROR;
 	        }
 	ack_data=(char *)strdup(temp_ptr);
-	
+
 	/* acknowledge the host problem */
 	if(cmd==CMD_ACKNOWLEDGE_HOST_PROBLEM)
 		acknowledge_host_problem(temp_host,ack_author,ack_data,type,notify,persistent);
@@ -2433,7 +2433,7 @@ int cmd_schedule_downtime(int cmd, time_t entry_time, char *args){
 	unsigned long downtime_id=0L;
 
 	if(cmd==CMD_SCHEDULE_HOSTGROUP_HOST_DOWNTIME || cmd==CMD_SCHEDULE_HOSTGROUP_SVC_DOWNTIME){
-		
+
 		/* get the hostgroup name */
 		if((hostgroup_name=my_strtok(args,";"))==NULL)
 			return ERROR;
@@ -2614,7 +2614,7 @@ int cmd_delete_downtime(int cmd, char *args){
         }
 
 
-	
+
 /* changes a host or service (integer) variable */
 int cmd_change_object_int_var(int cmd,char *args){
 	service *temp_service=NULL;
@@ -2623,7 +2623,7 @@ int cmd_change_object_int_var(int cmd,char *args){
 	char *host_name=NULL;
 	char *svc_description=NULL;
 	char *contact_name=NULL;
-	char *temp_ptr=NULL;
+	char const *temp_ptr=NULL;
 	int intval=0;
 	double dval=0.0;
 	double old_dval=0.0;
@@ -2639,7 +2639,7 @@ int cmd_change_object_int_var(int cmd,char *args){
 	case CMD_CHANGE_RETRY_SVC_CHECK_INTERVAL:
 	case CMD_CHANGE_MAX_SVC_CHECK_ATTEMPTS:
 	case CMD_CHANGE_SVC_MODATTR:
-		
+
 		/* get the host name */
 		if((host_name=my_strtok(args,";"))==NULL)
 			return ERROR;
@@ -2811,7 +2811,7 @@ int cmd_change_object_int_var(int cmd,char *args){
 
 		sattr=intval;
 		break;
-		
+
 
 	default:
 		break;
@@ -2898,7 +2898,7 @@ int cmd_change_object_int_var(int cmd,char *args){
         }
 
 
-      
+
 /* changes a host or service (char) variable */
 int cmd_change_object_char_var(int cmd,char *args){
 	service *temp_service=NULL;
@@ -2916,7 +2916,7 @@ int cmd_change_object_char_var(int cmd,char *args){
 	unsigned long hattr=MODATTR_NONE;
 	unsigned long sattr=MODATTR_NONE;
 
-	
+
 	/* SECURITY PATCH - disable these for the time being */
 	switch(cmd){
 	case CMD_CHANGE_GLOBAL_HOST_EVENT_HANDLER:
@@ -2937,7 +2937,7 @@ int cmd_change_object_char_var(int cmd,char *args){
 
 		if((charval=my_strtok(args,"\n"))==NULL)
 			return ERROR;
-		
+
 		break;
 
 	case CMD_CHANGE_HOST_EVENT_HANDLER:
@@ -3332,7 +3332,7 @@ int cmd_change_object_custom_var(int cmd, char *args){
 
 	/* find the proper variable */
 	for(;temp_customvariablesmember!=NULL;temp_customvariablesmember=temp_customvariablesmember->next){
-		
+
 		/* we found the variable, so update the value */
 		if(!strcmp(varname,temp_customvariablesmember->variable_name)){
 
@@ -3374,7 +3374,7 @@ int cmd_change_object_custom_var(int cmd, char *args){
 
 	return OK;
         }
-	
+
 
 /* processes an external host command */
 int cmd_process_external_commands_from_file(int cmd, char *args){
@@ -4999,7 +4999,7 @@ void process_passive_checks(void){
 	}
 
 	checkresult_file_fp=fdopen(checkresult_file_fd,"w");
-	
+
 	time(&current_time);
 	fprintf(checkresult_file_fp,"### Passive Check Result File ###\n");
 	fprintf(checkresult_file_fp,"# Time: %s",ctime(&current_time));
@@ -5013,7 +5013,7 @@ void process_passive_checks(void){
 
 		/* write check results to file */
 		if(checkresult_file_fp){
-		
+
 			fprintf(checkresult_file_fp,"### Nagios %s Check Result ###\n",(temp_pcr->object_check_type==SERVICE_CHECK)?"Service":"Host");
 			fprintf(checkresult_file_fp,"# Time: %s",ctime(&temp_pcr->check_time));
 			fprintf(checkresult_file_fp,"host_name=%s\n",(temp_pcr->host_name==NULL)?"":temp_pcr->host_name);

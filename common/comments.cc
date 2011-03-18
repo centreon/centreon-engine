@@ -545,7 +545,7 @@ int sort_comments(void){
 	if(!unsorted_comments)
 		return OK;
 
-	if(!(array=malloc(sizeof(*array)*unsorted_comments)))
+	if(!(array=(comment**)malloc(sizeof(*array)*unsorted_comments)))
 		return ERROR;
 	while(comment_list){
 		array[i++]=comment_list;

@@ -28,9 +28,9 @@
 /**** IMPLEMENTATION-SPECIFIC HEADER FILES ****/
 
 #ifdef USE_XODTEMPLATE                          /* template-based routines */
-#include "../xdata/xodtemplate.h"
+# include "../xdata/xodtemplate.h"
 #endif
-  
+
 
 host            *host_list=NULL,*host_list_tail=NULL;
 service         *service_list=NULL,*service_list_tail=NULL;
@@ -401,7 +401,7 @@ timeperiod *add_timeperiod(char *name,char *alias){
 	        }
 
 	/* allocate memory for the new timeperiod */
-	if((new_timeperiod=calloc(1, sizeof(timeperiod)))==NULL)
+	if((new_timeperiod=(timeperiod*)calloc(1, sizeof(timeperiod)))==NULL)
 		return NULL;
 
 	/* copy string vars */
@@ -496,7 +496,7 @@ timerange *add_timerange_to_timeperiod(timeperiod *period, int day, unsigned lon
 	        }
 
 	/* allocate memory for the new time range */
-	if((new_timerange=malloc(sizeof(timerange)))==NULL)
+	if((new_timerange=(timerange*)malloc(sizeof(timerange)))==NULL)
 		return NULL;
 
 	new_timerange->range_start=start_time;
@@ -519,7 +519,7 @@ daterange *add_exception_to_timeperiod(timeperiod *period, int type, int syear, 
 		return NULL;
 
 	/* allocate memory for the date range range */
-	if((new_daterange=malloc(sizeof(daterange)))==NULL)
+	if((new_daterange=(daterange*)malloc(sizeof(daterange)))==NULL)
 		return NULL;
 
 	new_daterange->times=NULL;
@@ -565,7 +565,7 @@ timerange *add_timerange_to_daterange(daterange *drange, unsigned long start_tim
 	        }
 
 	/* allocate memory for the new time range */
-	if((new_timerange=malloc(sizeof(timerange)))==NULL)
+	if((new_timerange=(timerange*)malloc(sizeof(timerange)))==NULL)
 		return NULL;
 
 	new_timerange->range_start=start_time;
@@ -922,7 +922,7 @@ contactgroupsmember *add_contactgroup_to_host(host *hst, char *group_name){
 	        }
 
 	/* allocate memory for a new member */
-	if((new_contactgroupsmember=calloc(1, sizeof(contactgroupsmember)))==NULL)
+	if((new_contactgroupsmember=(contactgroupsmember*)calloc(1, sizeof(contactgroupsmember)))==NULL)
 		return NULL;
 
 	/* duplicate string vars */
@@ -935,7 +935,7 @@ contactgroupsmember *add_contactgroup_to_host(host *hst, char *group_name){
 		my_free(new_contactgroupsmember);
 		return NULL;
 	        }
-	
+
 	/* add the new member to the head of the member list */
 	new_contactgroupsmember->next=hst->contact_groups;
 	hst->contact_groups=new_contactgroupsmember;;
@@ -1048,7 +1048,7 @@ hostsmember *add_host_to_hostgroup(hostgroup *temp_hostgroup, char *host_name){
 	        }
 
 	/* allocate memory for a new member */
-	if((new_member=calloc(1, sizeof(hostsmember)))==NULL)
+	if((new_member=(hostsmember*)calloc(1, sizeof(hostsmember)))==NULL)
 		return NULL;
 
 	/* duplicate vars */
@@ -1061,7 +1061,7 @@ hostsmember *add_host_to_hostgroup(hostgroup *temp_hostgroup, char *host_name){
 		my_free(new_member);
 		return NULL;
 	        }
-	
+
 	/* add the new member to the member list, sorted by host name */
 	last_member=temp_hostgroup->members;
 	for(temp_member=temp_hostgroup->members;temp_member!=NULL;temp_member=temp_member->next){
@@ -1176,7 +1176,7 @@ servicesmember *add_service_to_servicegroup(servicegroup *temp_servicegroup, cha
 	        }
 
 	/* allocate memory for a new member */
-	if((new_member=calloc(1, sizeof(servicesmember)))==NULL)
+	if((new_member=(servicesmember*)calloc(1, sizeof(servicesmember)))==NULL)
 		return NULL;
 
 	/* duplicate vars */
@@ -1192,7 +1192,7 @@ servicesmember *add_service_to_servicegroup(servicegroup *temp_servicegroup, cha
 		my_free(new_member);
 		return NULL;
 	        }
-	
+
 	/* add new member to member list, sorted by host name then service description */
 	last_member=temp_servicegroup->members;
 	for(temp_member=temp_servicegroup->members;temp_member!=NULL;temp_member=temp_member->next){
@@ -1362,7 +1362,7 @@ commandsmember *add_host_notification_command_to_contact(contact *cntct,char *co
 	        }
 
 	/* allocate memory */
-	if((new_commandsmember=calloc(1, sizeof(commandsmember)))==NULL)
+	if((new_commandsmember=(commandsmember*)calloc(1, sizeof(commandsmember)))==NULL)
 		return NULL;
 
 	/* duplicate vars */
@@ -1397,7 +1397,7 @@ commandsmember *add_service_notification_command_to_contact(contact *cntct,char 
 	        }
 
 	/* allocate memory */
-	if((new_commandsmember=calloc(1, sizeof(commandsmember)))==NULL)
+	if((new_commandsmember=(commandsmember*)calloc(1, sizeof(commandsmember)))==NULL)
 		return NULL;
 
 	/* duplicate vars */
@@ -1440,7 +1440,7 @@ contactgroup *add_contactgroup(char *name,char *alias){
 	        }
 
 	/* allocate memory for a new contactgroup entry */
-	if((new_contactgroup=calloc(1, sizeof(contactgroup)))==NULL)
+	if((new_contactgroup=(contactgroup*)calloc(1, sizeof(contactgroup)))==NULL)
 		return NULL;
 
 	/* duplicate vars */
@@ -1502,7 +1502,7 @@ contactsmember *add_contact_to_contactgroup(contactgroup *grp, char *contact_nam
 	        }
 
 	/* allocate memory for a new member */
-	if((new_contactsmember=calloc(1, sizeof(contactsmember)))==NULL)
+	if((new_contactsmember=(contactsmember*)calloc(1, sizeof(contactsmember)))==NULL)
 		return NULL;
 
 	/* duplicate vars */
@@ -1515,7 +1515,7 @@ contactsmember *add_contact_to_contactgroup(contactgroup *grp, char *contact_nam
 		my_free(new_contactsmember);
 		return NULL;
 	        }
-	
+
 	/* add the new member to the head of the member list */
 	new_contactsmember->next=grp->members;
 	grp->members=new_contactsmember;
@@ -1740,7 +1740,7 @@ contactgroupsmember *add_contactgroup_to_service(service *svc,char *group_name){
 	        }
 
 	/* allocate memory for the contactgroups member */
-	if((new_contactgroupsmember=calloc(1, sizeof(contactgroupsmember)))==NULL)
+	if((new_contactgroupsmember=(contactgroupsmember*)calloc(1, sizeof(contactgroupsmember)))==NULL)
 		return NULL;
 
 	/* duplicate vars */
@@ -1856,7 +1856,7 @@ serviceescalation *add_serviceescalation(char *host_name,char *description, int 
 #endif
 
 	/* allocate memory for a new service escalation entry */
-	if((new_serviceescalation=calloc(1, sizeof(serviceescalation)))==NULL)
+	if((new_serviceescalation=(serviceescalation*)calloc(1, sizeof(serviceescalation)))==NULL)
 		return NULL;
 
 	/* duplicate vars */
@@ -2126,7 +2126,7 @@ hostescalation *add_hostescalation(char *host_name,int first_notification,int la
 #endif
 
 	/* allocate memory for a new host escalation entry */
-	if((new_hostescalation=calloc(1, sizeof(hostescalation)))==NULL)
+	if((new_hostescalation=(hostescalation*)calloc(1, sizeof(hostescalation)))==NULL)
 		return NULL;
 
 	/* duplicate vars */
@@ -2240,7 +2240,7 @@ contactsmember *add_contact_to_object(contactsmember **object_ptr, char *contact
 	        }
 
 	/* allocate memory for a new member */
-	if((new_contactsmember=malloc(sizeof(contactsmember)))==NULL){
+	if((new_contactsmember=(contactsmember*)malloc(sizeof(contactsmember)))==NULL){
 		logit(NSLOG_CONFIG_ERROR,TRUE,"Error: Could not allocate memory for contact\n");
 		return NULL;
 	        }
@@ -2278,7 +2278,7 @@ customvariablesmember *add_custom_variable_to_object(customvariablesmember **obj
 	        }
 
 	/* allocate memory for a new member */
-	if((new_customvariablesmember=malloc(sizeof(customvariablesmember)))==NULL){
+	if((new_customvariablesmember=(customvariablesmember*)malloc(sizeof(customvariablesmember)))==NULL){
 		logit(NSLOG_CONFIG_ERROR,TRUE,"Error: Could not allocate memory for custom variable\n");
 		return NULL;
 	        }
@@ -2324,7 +2324,7 @@ timeperiod * find_timeperiod(char *name){
 
 	temp_timeperiod.name=name;
 
-	return skiplist_find_first(object_skiplists[TIMEPERIOD_SKIPLIST],&temp_timeperiod,NULL);
+	return (timeperiod*)skiplist_find_first(object_skiplists[TIMEPERIOD_SKIPLIST],&temp_timeperiod,NULL);
 	}
 
 
@@ -2337,7 +2337,7 @@ host * find_host(char *name){
 
 	temp_host.name=name;
 
-	return skiplist_find_first(object_skiplists[HOST_SKIPLIST],&temp_host,NULL);
+	return (host*)skiplist_find_first(object_skiplists[HOST_SKIPLIST],&temp_host,NULL);
 	}
 
 
@@ -2350,7 +2350,7 @@ hostgroup * find_hostgroup(char *name){
 
 	temp_hostgroup.group_name=name;
 
-	return skiplist_find_first(object_skiplists[HOSTGROUP_SKIPLIST],&temp_hostgroup,NULL);
+	return (hostgroup*)skiplist_find_first(object_skiplists[HOSTGROUP_SKIPLIST],&temp_hostgroup,NULL);
 	}
 
 
@@ -2363,7 +2363,7 @@ servicegroup * find_servicegroup(char *name){
 
 	temp_servicegroup.group_name=name;
 
-	return skiplist_find_first(object_skiplists[SERVICEGROUP_SKIPLIST],&temp_servicegroup,NULL);
+	return (servicegroup*)skiplist_find_first(object_skiplists[SERVICEGROUP_SKIPLIST],&temp_servicegroup,NULL);
 	}
 
 
@@ -2376,7 +2376,7 @@ contact * find_contact(char *name){
 
 	temp_contact.name=name;
 
-	return skiplist_find_first(object_skiplists[CONTACT_SKIPLIST],&temp_contact,NULL);
+	return (contact*)skiplist_find_first(object_skiplists[CONTACT_SKIPLIST],&temp_contact,NULL);
 	}
 
 
@@ -2389,7 +2389,7 @@ contactgroup * find_contactgroup(char *name){
 
 	temp_contactgroup.group_name=name;
 
-	return skiplist_find_first(object_skiplists[CONTACTGROUP_SKIPLIST],&temp_contactgroup,NULL);
+	return (contactgroup*)skiplist_find_first(object_skiplists[CONTACTGROUP_SKIPLIST],&temp_contactgroup,NULL);
 	}
 
 
@@ -2402,7 +2402,7 @@ command * find_command(char *name){
 
 	temp_command.name=name;
 
-	return skiplist_find_first(object_skiplists[COMMAND_SKIPLIST],&temp_command,NULL);
+	return (command*)skiplist_find_first(object_skiplists[COMMAND_SKIPLIST],&temp_command,NULL);
         }
 
 
@@ -2416,7 +2416,7 @@ service * find_service(char *host_name,char *svc_desc){
 	temp_service.host_name=host_name;
 	temp_service.description=svc_desc;
 
-	return skiplist_find_first(object_skiplists[SERVICE_SKIPLIST],&temp_service,NULL);
+	return (service*)skiplist_find_first(object_skiplists[SERVICE_SKIPLIST],&temp_service,NULL);
         }
 
 
@@ -2434,7 +2434,7 @@ hostescalation *get_first_hostescalation_by_host(char *host_name, void **ptr){
 
 	temp_hostescalation.host_name=host_name;
 
-	return skiplist_find_first(object_skiplists[HOSTESCALATION_SKIPLIST],&temp_hostescalation,ptr);
+	return (hostescalation*)skiplist_find_first(object_skiplists[HOSTESCALATION_SKIPLIST],&temp_hostescalation,ptr);
         }
 
 
@@ -2446,7 +2446,7 @@ hostescalation *get_next_hostescalation_by_host(char *host_name, void **ptr){
 
 	temp_hostescalation.host_name=host_name;
 
-	return skiplist_find_next(object_skiplists[HOSTESCALATION_SKIPLIST],&temp_hostescalation,ptr);
+	return (hostescalation*)skiplist_find_next(object_skiplists[HOSTESCALATION_SKIPLIST],&temp_hostescalation,ptr);
         }
 
 
@@ -2459,7 +2459,7 @@ serviceescalation *get_first_serviceescalation_by_service(char *host_name, char 
 	temp_serviceescalation.host_name=host_name;
 	temp_serviceescalation.description=svc_description;
 
-	return skiplist_find_first(object_skiplists[SERVICEESCALATION_SKIPLIST],&temp_serviceescalation,ptr);
+	return (serviceescalation*)skiplist_find_first(object_skiplists[SERVICEESCALATION_SKIPLIST],&temp_serviceescalation,ptr);
 	}
 
 
@@ -2472,7 +2472,7 @@ serviceescalation *get_next_serviceescalation_by_service(char *host_name, char *
 	temp_serviceescalation.host_name=host_name;
 	temp_serviceescalation.description=svc_description;
 
-	return skiplist_find_next(object_skiplists[SERVICEESCALATION_SKIPLIST],&temp_serviceescalation,ptr);
+	return (serviceescalation*)skiplist_find_next(object_skiplists[SERVICEESCALATION_SKIPLIST],&temp_serviceescalation,ptr);
         }
 
 
@@ -2484,7 +2484,7 @@ hostdependency *get_first_hostdependency_by_dependent_host(char *host_name, void
 
 	temp_hostdependency.dependent_host_name=host_name;
 
-	return skiplist_find_first(object_skiplists[HOSTDEPENDENCY_SKIPLIST],&temp_hostdependency,ptr);
+	return (hostdependency*)skiplist_find_first(object_skiplists[HOSTDEPENDENCY_SKIPLIST],&temp_hostdependency,ptr);
         }
 
 
@@ -2496,7 +2496,7 @@ hostdependency *get_next_hostdependency_by_dependent_host(char *host_name, void 
 
 	temp_hostdependency.dependent_host_name=host_name;
 
-	return skiplist_find_next(object_skiplists[HOSTDEPENDENCY_SKIPLIST],&temp_hostdependency,ptr);
+	return (hostdependency*)skiplist_find_next(object_skiplists[HOSTDEPENDENCY_SKIPLIST],&temp_hostdependency,ptr);
         }
 
 
@@ -2509,7 +2509,7 @@ servicedependency *get_first_servicedependency_by_dependent_service(char *host_n
 	temp_servicedependency.dependent_host_name=host_name;
 	temp_servicedependency.dependent_service_description=svc_description;
 
-	return skiplist_find_first(object_skiplists[SERVICEDEPENDENCY_SKIPLIST],&temp_servicedependency,ptr);
+	return (servicedependency*)skiplist_find_first(object_skiplists[SERVICEDEPENDENCY_SKIPLIST],&temp_servicedependency,ptr);
         }
 
 
@@ -2522,7 +2522,7 @@ servicedependency *get_next_servicedependency_by_dependent_service(char *host_na
 	temp_servicedependency.dependent_host_name=host_name;
 	temp_servicedependency.dependent_service_description=svc_description;
 
-	return skiplist_find_next(object_skiplists[SERVICEDEPENDENCY_SKIPLIST],&temp_servicedependency,ptr);
+	return (servicedependency*)skiplist_find_next(object_skiplists[SERVICEDEPENDENCY_SKIPLIST],&temp_servicedependency,ptr);
 
 	return NULL;
         }
@@ -2768,7 +2768,7 @@ int is_contact_for_host(host *hst, contact *cntct){
 	contact *temp_contact=NULL;
 	contactgroupsmember *temp_contactgroupsmember=NULL;
 	contactgroup *temp_contactgroup=NULL;
-	
+
 	if(hst==NULL || cntct==NULL){
 		return FALSE;
 	        }
@@ -2817,7 +2817,7 @@ int is_escalated_contact_for_host(host *hst, contact *cntct){
 			if(temp_contact==cntct)
 				return TRUE;
 			}
-		
+
 		/* search all contactgroups of this host escalation */
 		for(temp_contactgroupsmember=temp_hostescalation->contact_groups;temp_contactgroupsmember!=NULL;temp_contactgroupsmember=temp_contactgroupsmember->next){
 			temp_contactgroup=temp_contactgroupsmember->group_ptr;
@@ -2846,7 +2846,7 @@ int is_contact_for_service(service *svc, contact *cntct){
 	/* search all individual contacts of this service */
 	for(temp_contactsmember=svc->contacts;temp_contactsmember!=NULL;temp_contactsmember=temp_contactsmember->next){
 		temp_contact=temp_contactsmember->contact_ptr;
-		
+
 		if(temp_contact==cntct)
 			return TRUE;
 		}
@@ -2886,7 +2886,7 @@ int is_escalated_contact_for_service(service *svc, contact *cntct){
 			if(temp_contact==cntct)
 				return TRUE;
 			}
-		
+
 		/* search all contactgroups of this service escalation */
 		for(temp_contactgroupsmember=temp_serviceescalation->contact_groups;temp_contactgroupsmember!=NULL;temp_contactgroupsmember=temp_contactgroupsmember->next){
 			temp_contactgroup=temp_contactgroupsmember->group_ptr;
@@ -3251,7 +3251,7 @@ int free_object_data(void){
 	/**** free memory for the contact list ****/
 	this_contact=contact_list;
 	while(this_contact!=NULL){
-	  
+
 		/* free memory for the host notification commands */
 		this_commandsmember=this_contact->host_notification_commands;
 		while(this_commandsmember!=NULL){

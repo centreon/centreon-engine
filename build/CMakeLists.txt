@@ -19,7 +19,7 @@
 
 # Global options.
 cmake_minimum_required(VERSION 2.8)
-project("Centreon Scheduler" C)
+project("Centreon Scheduler" CXX)
 
 # Testing.
 set(PROJECT_SOURCE_DIR "${PROJECT_SOURCE_DIR}/..")
@@ -364,35 +364,35 @@ configure_file("${INCLUDE_DIR}/snprintf.h.in"
 
 # centscheduler target.
 add_executable("centscheduler"
-  "${BASE_DIR}/broker.c"
-  "${BASE_DIR}/checks.c"
-  "${BASE_DIR}/commands.c"
-  "${BASE_DIR}/config.c"
-  "${BASE_DIR}/events.c"
-  "${BASE_DIR}/flapping.c"
-  "${BASE_DIR}/logging.c"
-  "${BASE_DIR}/nagios.c"
-  "${BASE_DIR}/nebmods.c"
-  "${BASE_DIR}/netutils.c"
-  "${BASE_DIR}/notifications.c"
-  "${BASE_DIR}/perfdata.c"
-  "${BASE_DIR}/sehandlers.c"
-  "${BASE_DIR}/sretention.c"
-  "${BASE_DIR}/utils.c"
-  "${COMMON_DIR}/comments.c"
-  "${COMMON_DIR}/downtime.c"
-  "${COMMON_DIR}/macros.c"
-  "${COMMON_DIR}/objects.c"
-  "${COMMON_DIR}/shared.c"
-  "${COMMON_DIR}/skiplist.c"
-  "${COMMON_DIR}/snprintf.c"
-  "${COMMON_DIR}/statusdata.c"
-  "${XDATA_DIR}/xcddefault.c"
-  "${XDATA_DIR}/xdddefault.c"
-  "${XDATA_DIR}/xodtemplate.c"
-  "${XDATA_DIR}/xpddefault.c"
-  "${XDATA_DIR}/xrddefault.c"
-  "${XDATA_DIR}/xsddefault.c"
+  "${BASE_DIR}/broker.cc"
+  "${BASE_DIR}/checks.cc"
+  "${BASE_DIR}/commands.cc"
+  "${BASE_DIR}/config.cc"
+  "${BASE_DIR}/events.cc"
+  "${BASE_DIR}/flapping.cc"
+  "${BASE_DIR}/logging.cc"
+  "${BASE_DIR}/nagios.cc"
+  "${BASE_DIR}/nebmods.cc"
+  "${BASE_DIR}/netutils.cc"
+  "${BASE_DIR}/notifications.cc"
+  "${BASE_DIR}/perfdata.cc"
+  "${BASE_DIR}/sehandlers.cc"
+  "${BASE_DIR}/sretention.cc"
+  "${BASE_DIR}/utils.cc"
+  "${COMMON_DIR}/comments.cc"
+  "${COMMON_DIR}/downtime.cc"
+  "${COMMON_DIR}/macros.cc"
+  "${COMMON_DIR}/objects.cc"
+  "${COMMON_DIR}/shared.cc"
+  "${COMMON_DIR}/skiplist.cc"
+  "${COMMON_DIR}/snprintf.cc"
+  "${COMMON_DIR}/statusdata.cc"
+  "${XDATA_DIR}/xcddefault.cc"
+  "${XDATA_DIR}/xdddefault.cc"
+  "${XDATA_DIR}/xodtemplate.cc"
+  "${XDATA_DIR}/xpddefault.cc"
+  "${XDATA_DIR}/xrddefault.cc"
+  "${XDATA_DIR}/xsddefault.cc"
   "${PERL_SOURCES}"
 )
 get_property(SCHEDULER_COMPILE_FLAGS
@@ -411,7 +411,7 @@ target_link_libraries("centscheduler"
 
 # centschedulerstats target.
 add_executable("centschedulerstats"
-  "${BASE_DIR}/nagiostats.c"
+  "${BASE_DIR}/nagiostats.cc"
 )
 
 # Package.
