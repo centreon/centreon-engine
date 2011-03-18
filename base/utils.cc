@@ -3272,13 +3272,13 @@ void * command_file_worker_thread(void *arg){
 
  			switch(errno){
  			case EBADF:
- 				write_to_log("command_file_worker_thread(): poll(): EBADF",logging_options,NULL);
+				logit(logging_options, FALSE, "command_file_worker_thread(): poll(): EBADF");
  				break;
  			case ENOMEM:
- 				write_to_log("command_file_worker_thread(): poll(): ENOMEM",logging_options,NULL);
+				logit(logging_options, FALSE, "command_file_worker_thread(): poll(): ENOMEM");
  				break;
  			case EFAULT:
- 				write_to_log("command_file_worker_thread(): poll(): EFAULT",logging_options,NULL);
+				logit(logging_options, FALSE, "command_file_worker_thread(): poll(): EFAULT");
  				break;
  			case EINTR:
  				/* this can happen when running under a debugger like gdb */
@@ -3287,7 +3287,7 @@ void * command_file_worker_thread(void *arg){
  				*/
  				break;
  			default:
- 				write_to_log("command_file_worker_thread(): poll(): Unknown errno value.",logging_options,NULL);
+				logit(logging_options, FALSE, "command_file_worker_thread(): poll(): Unknown errno value.");
  				break;
  			        }
 
