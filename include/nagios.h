@@ -20,259 +20,256 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef _NAGIOS_H
-#define _NAGIOS_H
+#ifndef NAGIOS_H
+# define NAGIOS_H
 
-#ifndef __GNUC__
-# define __attribute__(x) /* nothing */
-#endif
-#ifndef NSCORE
-# define NSCORE
-#endif
+# ifndef __GNUC__
+#  define __attribute__(x) /* nothing */
+# endif
 
-#include "config.h"
-#include "logging.h"
-#include "common.h"
-#include "locations.h"
-#include "objects.h"
-#include "macros.h"
+# include "config.h"
+# include "logging.h"
+# include "common.h"
+# include "locations.h"
+# include "objects.h"
+# include "macros.h"
 
-#ifdef __cplusplus
-extern "C" { 
-#endif
+# ifdef __cplusplus
+extern "C" {
+# endif
 
 
 /************* MISC LENGTH/SIZE DEFINITIONS ***********/
 
-/* 
+/*
    NOTE: Plugin length is artificially capped at 8k to prevent runaway plugins from returning MBs/GBs of data
    back to Nagios.  If you increase the 8k cap by modifying this value, make sure you also increase the value
    of MAX_EXTERNAL_COMMAND_LENGTH in common.h to allow for passive checks results received through the external
    command file. EG 10/19/07
 */
-#define MAX_PLUGIN_OUTPUT_LENGTH                8192    /* max length of plugin output (including perf data) */
+# define MAX_PLUGIN_OUTPUT_LENGTH                8192    /* max length of plugin output (including perf data) */
 
 
 
 /******************* DEFAULT VALUES *******************/
 
-#define DEFAULT_LOG_LEVEL					1	/* log all events to main log file */
-#define DEFAULT_USE_SYSLOG					1	/* log events to syslog? 1=yes, 0=no */
-#define DEFAULT_SYSLOG_LEVEL					2	/* log only severe events to syslog */
+# define DEFAULT_LOG_LEVEL					1	/* log all events to main log file */
+# define DEFAULT_USE_SYSLOG					1	/* log events to syslog? 1=yes, 0=no */
+# define DEFAULT_SYSLOG_LEVEL					2	/* log only severe events to syslog */
 
-#define DEFAULT_NOTIFICATION_LOGGING				1	/* log notification events? 1=yes, 0=no */
+# define DEFAULT_NOTIFICATION_LOGGING				1	/* log notification events? 1=yes, 0=no */
 
-#define DEFAULT_INTER_CHECK_DELAY				5.0	/* seconds between initial service check scheduling */
-#define DEFAULT_INTERLEAVE_FACTOR      				1       /* default interleave to use when scheduling checks */
-#define DEFAULT_SLEEP_TIME      				0.5    	/* seconds between event run checks */
-#define DEFAULT_INTERVAL_LENGTH 				60     	/* seconds per interval unit for check scheduling */
-#define DEFAULT_RETRY_INTERVAL  				30	/* services are retried in 30 seconds if they're not OK */
-#define DEFAULT_COMMAND_CHECK_INTERVAL				-1	/* interval to check for external commands (default = as often as possible) */
-#define DEFAULT_CHECK_REAPER_INTERVAL				10	/* interval in seconds to reap host and service check results */
-#define DEFAULT_MAX_REAPER_TIME                 		30      /* maximum number of seconds to spend reaping service checks before we break out for a while */
-#define DEFAULT_MAX_CHECK_RESULT_AGE				3600    /* maximum number of seconds that a check result file is considered to be valid */
-#define DEFAULT_MAX_PARALLEL_SERVICE_CHECKS 			0	/* maximum number of service checks we can have running at any given time (0=unlimited) */
-#define DEFAULT_RETENTION_UPDATE_INTERVAL			60	/* minutes between auto-save of retention data */
-#define DEFAULT_RETENTION_SCHEDULING_HORIZON    		900     /* max seconds between program restarts that we will preserve scheduling information */
-#define DEFAULT_STATUS_UPDATE_INTERVAL				60	/* seconds between aggregated status data updates */
-#define DEFAULT_FRESHNESS_CHECK_INTERVAL        		60      /* seconds between service result freshness checks */
-#define DEFAULT_AUTO_RESCHEDULING_INTERVAL      		30      /* seconds between host and service check rescheduling events */
-#define DEFAULT_AUTO_RESCHEDULING_WINDOW        		180     /* window of time (in seconds) for which we should reschedule host and service checks */
-#define DEFAULT_ORPHAN_CHECK_INTERVAL           		60      /* seconds between checks for orphaned hosts and services */
+# define DEFAULT_INTER_CHECK_DELAY				5.0	/* seconds between initial service check scheduling */
+# define DEFAULT_INTERLEAVE_FACTOR     				1       /* default interleave to use when scheduling checks */
+# define DEFAULT_SLEEP_TIME      				0.5    	/* seconds between event run checks */
+# define DEFAULT_INTERVAL_LENGTH 				60     	/* seconds per interval unit for check scheduling */
+# define DEFAULT_RETRY_INTERVAL  				30	/* services are retried in 30 seconds if they're not OK */
+# define DEFAULT_COMMAND_CHECK_INTERVAL				-1	/* interval to check for external commands (default = as often as possible) */
+# define DEFAULT_CHECK_REAPER_INTERVAL				10	/* interval in seconds to reap host and service check results */
+# define DEFAULT_MAX_REAPER_TIME                 		30      /* maximum number of seconds to spend reaping service checks before we break out for a while */
+# define DEFAULT_MAX_CHECK_RESULT_AGE				3600    /* maximum number of seconds that a check result file is considered to be valid */
+# define DEFAULT_MAX_PARALLEL_SERVICE_CHECKS 			0	/* maximum number of service checks we can have running at any given time (0=unlimited) */
+# define DEFAULT_RETENTION_UPDATE_INTERVAL			60	/* minutes between auto-save of retention data */
+# define DEFAULT_RETENTION_SCHEDULING_HORIZON    		900     /* max seconds between program restarts that we will preserve scheduling information */
+# define DEFAULT_STATUS_UPDATE_INTERVAL				60	/* seconds between aggregated status data updates */
+# define DEFAULT_FRESHNESS_CHECK_INTERVAL        		60      /* seconds between service result freshness checks */
+# define DEFAULT_AUTO_RESCHEDULING_INTERVAL      		30      /* seconds between host and service check rescheduling events */
+# define DEFAULT_AUTO_RESCHEDULING_WINDOW        		180     /* window of time (in seconds) for which we should reschedule host and service checks */
+# define DEFAULT_ORPHAN_CHECK_INTERVAL           		60      /* seconds between checks for orphaned hosts and services */
 
-#define DEFAULT_NOTIFICATION_TIMEOUT				30	/* max time in seconds to wait for notification commands to complete */
-#define DEFAULT_EVENT_HANDLER_TIMEOUT				30	/* max time in seconds to wait for event handler commands to complete */
-#define DEFAULT_HOST_CHECK_TIMEOUT				30	/* max time in seconds to wait for host check commands to complete */
-#define DEFAULT_SERVICE_CHECK_TIMEOUT				60	/* max time in seconds to wait for service check commands to complete */
-#define DEFAULT_OCSP_TIMEOUT					15	/* max time in seconds to wait for obsessive compulsive processing commands to complete */
-#define DEFAULT_OCHP_TIMEOUT					15	/* max time in seconds to wait for obsessive compulsive processing commands to complete */
-#define DEFAULT_PERFDATA_TIMEOUT                		5       /* max time in seconds to wait for performance data commands to complete */
-#define DEFAULT_TIME_CHANGE_THRESHOLD				900	/* compensate for time changes of more than 15 minutes */
+# define DEFAULT_NOTIFICATION_TIMEOUT				30	/* max time in seconds to wait for notification commands to complete */
+# define DEFAULT_EVENT_HANDLER_TIMEOUT				30	/* max time in seconds to wait for event handler commands to complete */
+# define DEFAULT_HOST_CHECK_TIMEOUT				30	/* max time in seconds to wait for host check commands to complete */
+# define DEFAULT_SERVICE_CHECK_TIMEOUT				60	/* max time in seconds to wait for service check commands to complete */
+# define DEFAULT_OCSP_TIMEOUT					15	/* max time in seconds to wait for obsessive compulsive processing commands to complete */
+# define DEFAULT_OCHP_TIMEOUT					15	/* max time in seconds to wait for obsessive compulsive processing commands to complete */
+# define DEFAULT_PERFDATA_TIMEOUT                		5       /* max time in seconds to wait for performance data commands to complete */
+# define DEFAULT_TIME_CHANGE_THRESHOLD				900	/* compensate for time changes of more than 15 minutes */
 
-#define DEFAULT_LOG_HOST_RETRIES				0	/* don't log host retries */
-#define DEFAULT_LOG_SERVICE_RETRIES				0	/* don't log service retries */
-#define DEFAULT_LOG_EVENT_HANDLERS				1	/* log event handlers */
-#define DEFAULT_LOG_INITIAL_STATES				0	/* don't log initial service and host states */
-#define DEFAULT_LOG_EXTERNAL_COMMANDS				1	/* log external commands */
-#define DEFAULT_LOG_PASSIVE_CHECKS				1	/* log passive service checks */
+# define DEFAULT_LOG_HOST_RETRIES				0	/* don't log host retries */
+# define DEFAULT_LOG_SERVICE_RETRIES				0	/* don't log service retries */
+# define DEFAULT_LOG_EVENT_HANDLERS				1	/* log event handlers */
+# define DEFAULT_LOG_INITIAL_STATES				0	/* don't log initial service and host states */
+# define DEFAULT_LOG_EXTERNAL_COMMANDS				1	/* log external commands */
+# define DEFAULT_LOG_PASSIVE_CHECKS				1	/* log passive service checks */
 
-#define DEFAULT_DEBUG_LEVEL                                     0       /* don't log any debugging information */
-#define DEFAULT_DEBUG_VERBOSITY                                 1
-#define DEFAULT_MAX_DEBUG_FILE_SIZE                             1000000 /* max size of debug log */
+# define DEFAULT_DEBUG_LEVEL                                    0       /* don't log any debugging information */
+# define DEFAULT_DEBUG_VERBOSITY                                1
+# define DEFAULT_MAX_DEBUG_FILE_SIZE                            1000000 /* max size of debug log */
 
-#define DEFAULT_AGGRESSIVE_HOST_CHECKING			0	/* don't use "aggressive" host checking */
-#define DEFAULT_CHECK_EXTERNAL_COMMANDS				1 	/* check for external commands */
-#define DEFAULT_CHECK_ORPHANED_SERVICES				1	/* check for orphaned services */
-#define DEFAULT_CHECK_ORPHANED_HOSTS            		1       /* check for orphaned hosts */
-#define DEFAULT_ENABLE_FLAP_DETECTION           		0       /* don't enable flap detection */
-#define DEFAULT_PROCESS_PERFORMANCE_DATA        		0       /* don't process performance data */
-#define DEFAULT_CHECK_SERVICE_FRESHNESS         		1       /* check service result freshness */
-#define DEFAULT_CHECK_HOST_FRESHNESS            		0       /* don't check host result freshness */
-#define DEFAULT_AUTO_RESCHEDULE_CHECKS          		0       /* don't auto-reschedule host and service checks */
-#define DEFAULT_TRANSLATE_PASSIVE_HOST_CHECKS                   0       /* should we translate DOWN/UNREACHABLE passive host checks? */
-#define DEFAULT_PASSIVE_HOST_CHECKS_SOFT                        0       /* passive host checks are treated as HARD by default */
+# define DEFAULT_AGGRESSIVE_HOST_CHECKING			0	/* don't use "aggressive" host checking */
+# define DEFAULT_CHECK_EXTERNAL_COMMANDS			1 	/* check for external commands */
+# define DEFAULT_CHECK_ORPHANED_SERVICES			1	/* check for orphaned services */
+# define DEFAULT_CHECK_ORPHANED_HOSTS            		1       /* check for orphaned hosts */
+# define DEFAULT_ENABLE_FLAP_DETECTION           		0       /* don't enable flap detection */
+# define DEFAULT_PROCESS_PERFORMANCE_DATA        		0       /* don't process performance data */
+# define DEFAULT_CHECK_SERVICE_FRESHNESS         		1       /* check service result freshness */
+# define DEFAULT_CHECK_HOST_FRESHNESS            		0       /* don't check host result freshness */
+# define DEFAULT_AUTO_RESCHEDULE_CHECKS          		0       /* don't auto-reschedule host and service checks */
+# define DEFAULT_TRANSLATE_PASSIVE_HOST_CHECKS                  0       /* should we translate DOWN/UNREACHABLE passive host checks? */
+# define DEFAULT_PASSIVE_HOST_CHECKS_SOFT                       0       /* passive host checks are treated as HARD by default */
 
-#define DEFAULT_LOW_SERVICE_FLAP_THRESHOLD			20.0	/* low threshold for detection of service flapping */
-#define DEFAULT_HIGH_SERVICE_FLAP_THRESHOLD			30.0	/* high threshold for detection of service flapping */
-#define DEFAULT_LOW_HOST_FLAP_THRESHOLD				20.0	/* low threshold for detection of host flapping */
-#define DEFAULT_HIGH_HOST_FLAP_THRESHOLD			30.0	/* high threshold for detection of host flapping */
+# define DEFAULT_LOW_SERVICE_FLAP_THRESHOLD			20.0	/* low threshold for detection of service flapping */
+# define DEFAULT_HIGH_SERVICE_FLAP_THRESHOLD			30.0	/* high threshold for detection of service flapping */
+# define DEFAULT_LOW_HOST_FLAP_THRESHOLD			20.0	/* low threshold for detection of host flapping */
+# define DEFAULT_HIGH_HOST_FLAP_THRESHOLD			30.0	/* high threshold for detection of host flapping */
 
-#define DEFAULT_HOST_CHECK_SPREAD				30	/* max minutes to schedule all initial host checks */
-#define DEFAULT_SERVICE_CHECK_SPREAD				30	/* max minutes to schedule all initial service checks */
+# define DEFAULT_HOST_CHECK_SPREAD				30	/* max minutes to schedule all initial host checks */
+# define DEFAULT_SERVICE_CHECK_SPREAD				30	/* max minutes to schedule all initial service checks */
 
-#define DEFAULT_CACHED_HOST_CHECK_HORIZON      			15      /* max age in seconds that cached host checks can be used */
-#define DEFAULT_CACHED_SERVICE_CHECK_HORIZON    		15      /* max age in seconds that cached service checks can be used */
-#define DEFAULT_ENABLE_PREDICTIVE_HOST_DEPENDENCY_CHECKS	1	/* should we use predictive host dependency checks? */
-#define DEFAULT_ENABLE_PREDICTIVE_SERVICE_DEPENDENCY_CHECKS	1	/* should we use predictive service dependency checks? */
+# define DEFAULT_CACHED_HOST_CHECK_HORIZON     			15      /* max age in seconds that cached host checks can be used */
+# define DEFAULT_CACHED_SERVICE_CHECK_HORIZON    		15      /* max age in seconds that cached service checks can be used */
+# define DEFAULT_ENABLE_PREDICTIVE_HOST_DEPENDENCY_CHECKS	1	/* should we use predictive host dependency checks? */
+# define DEFAULT_ENABLE_PREDICTIVE_SERVICE_DEPENDENCY_CHECKS	1	/* should we use predictive service dependency checks? */
 
-#define DEFAULT_USE_LARGE_INSTALLATION_TWEAKS                   0       /* don't use tweaks for large Nagios installations */
+# define DEFAULT_USE_LARGE_INSTALLATION_TWEAKS                  0       /* don't use tweaks for large Nagios installations */
 
-#define DEFAULT_ENABLE_EMBEDDED_PERL                            0       /* enable embedded Perl interpreter (if compiled in) */
-#define DEFAULT_USE_EMBEDDED_PERL_IMPLICITLY                    1       /* by default, embedded Perl is used for Perl plugins that don't explicitly disable it */
+# define DEFAULT_ENABLE_EMBEDDED_PERL                           0       /* enable embedded Perl interpreter (if compiled in) */
+# define DEFAULT_USE_EMBEDDED_PERL_IMPLICITLY                   1       /* by default, embedded Perl is used for Perl plugins that don't explicitly disable it */
 
-#define DEFAULT_ADDITIONAL_FRESHNESS_LATENCY			15	/* seconds to be added to freshness thresholds when automatically calculated by Nagios */
+# define DEFAULT_ADDITIONAL_FRESHNESS_LATENCY			15	/* seconds to be added to freshness thresholds when automatically calculated by Nagios */
 
-#define DEFAULT_CHECK_FOR_UPDATES                               1       /* should we check for new Nagios releases? */
-#define DEFAULT_BARE_UPDATE_CHECK                               0       /* report current version and new installs */
-#define MINIMUM_UPDATE_CHECK_INTERVAL                           60*60*22 /* 22 hours minimum between checks - please be kind to our servers! */
-#define BASE_UPDATE_CHECK_INTERVAL                              60*60*22 /* 22 hours base interval */
-#define UPDATE_CHECK_INTERVAL_WOBBLE                            60*60*4  /* 4 hour wobble on top of base interval */
-#define BASE_UPDATE_CHECK_RETRY_INTERVAL                        60*60*1  /* 1 hour base retry interval */
-#define UPDATE_CHECK_RETRY_INTERVAL_WOBBLE                      60*60*3  /* 3 hour wobble on top of base retry interval */
+# define DEFAULT_CHECK_FOR_UPDATES                              1       /* should we check for new Nagios releases? */
+# define DEFAULT_BARE_UPDATE_CHECK                              0       /* report current version and new installs */
+# define MINIMUM_UPDATE_CHECK_INTERVAL                          60*60*22 /* 22 hours minimum between checks - please be kind to our servers! */
+# define BASE_UPDATE_CHECK_INTERVAL                             60*60*22 /* 22 hours base interval */
+# define UPDATE_CHECK_INTERVAL_WOBBLE                           60*60*4  /* 4 hour wobble on top of base interval */
+# define BASE_UPDATE_CHECK_RETRY_INTERVAL                       60*60*1  /* 1 hour base retry interval */
+# define UPDATE_CHECK_RETRY_INTERVAL_WOBBLE                     60*60*3  /* 3 hour wobble on top of base retry interval */
 
-#define DEFAULT_ALLOW_EMPTY_HOSTGROUP_ASSIGNMENT                          0        /* Do not allow empty hostgroups by default */
+# define DEFAULT_ALLOW_EMPTY_HOSTGROUP_ASSIGNMENT               0        /* Do not allow empty hostgroups by default */
 
 /******************** HOST STATUS *********************/
 
-#define HOST_UP				0
-#define HOST_DOWN			1
-#define HOST_UNREACHABLE		2	
+# define HOST_UP			0
+# define HOST_DOWN			1
+# define HOST_UNREACHABLE		2
 
 
 
 /******************* STATE LOGGING TYPES **************/
 
-#define INITIAL_STATES                  1
-#define CURRENT_STATES                  2
+# define INITIAL_STATES                  1
+# define CURRENT_STATES                  2
 
 
 
 /************ SERVICE DEPENDENCY VALUES ***************/
 
-#define DEPENDENCIES_OK			0
-#define DEPENDENCIES_FAILED		1
+# define DEPENDENCIES_OK		0
+# define DEPENDENCIES_FAILED		1
 
 
 
 /*********** ROUTE CHECK PROPAGATION TYPES ************/
 
-#define PROPAGATE_TO_PARENT_HOSTS	1
-#define PROPAGATE_TO_CHILD_HOSTS	2
+# define PROPAGATE_TO_PARENT_HOSTS	1
+# define PROPAGATE_TO_CHILD_HOSTS	2
 
 
 
 /****************** SERVICE STATES ********************/
 
-#define STATE_OK			0
-#define STATE_WARNING			1
-#define STATE_CRITICAL			2
-#define STATE_UNKNOWN			3       /* changed from -1 on 02/24/2001 */
+# define STATE_OK			0
+# define STATE_WARNING			1
+# define STATE_CRITICAL			2
+# define STATE_UNKNOWN			3       /* changed from -1 on 02/24/2001 */
 
 
 
 /****************** FLAPPING TYPES ********************/
 
-#define HOST_FLAPPING                   0
-#define SERVICE_FLAPPING                1
+# define HOST_FLAPPING                   0
+# define SERVICE_FLAPPING                1
 
 
 
 /**************** NOTIFICATION TYPES ******************/
 
-#define HOST_NOTIFICATION               0
-#define SERVICE_NOTIFICATION            1
+# define HOST_NOTIFICATION               0
+# define SERVICE_NOTIFICATION            1
 
 
 
 /************* NOTIFICATION REASON TYPES ***************/
 
-#define NOTIFICATION_NORMAL             0
-#define NOTIFICATION_ACKNOWLEDGEMENT    1
-#define NOTIFICATION_FLAPPINGSTART      2
-#define NOTIFICATION_FLAPPINGSTOP       3
-#define NOTIFICATION_FLAPPINGDISABLED   4
-#define NOTIFICATION_DOWNTIMESTART      5
-#define NOTIFICATION_DOWNTIMEEND        6
-#define NOTIFICATION_DOWNTIMECANCELLED  7
-#define NOTIFICATION_CUSTOM             99
+# define NOTIFICATION_NORMAL             0
+# define NOTIFICATION_ACKNOWLEDGEMENT    1
+# define NOTIFICATION_FLAPPINGSTART      2
+# define NOTIFICATION_FLAPPINGSTOP       3
+# define NOTIFICATION_FLAPPINGDISABLED   4
+# define NOTIFICATION_DOWNTIMESTART      5
+# define NOTIFICATION_DOWNTIMEEND        6
+# define NOTIFICATION_DOWNTIMECANCELLED  7
+# define NOTIFICATION_CUSTOM             99
 
 
 
 /**************** EVENT HANDLER TYPES *****************/
 
-#define HOST_EVENTHANDLER               0
-#define SERVICE_EVENTHANDLER            1
-#define GLOBAL_HOST_EVENTHANDLER        2
-#define GLOBAL_SERVICE_EVENTHANDLER     3
+# define HOST_EVENTHANDLER               0
+# define SERVICE_EVENTHANDLER            1
+# define GLOBAL_HOST_EVENTHANDLER        2
+# define GLOBAL_SERVICE_EVENTHANDLER     3
 
 
 
 /***************** STATE CHANGE TYPES *****************/
 
-#define HOST_STATECHANGE                0
-#define SERVICE_STATECHANGE             1
+# define HOST_STATECHANGE                0
+# define SERVICE_STATECHANGE             1
 
 
 
 /***************** OBJECT CHECK TYPES *****************/
-#define SERVICE_CHECK                   0
-#define HOST_CHECK                      1
+# define SERVICE_CHECK                   0
+# define HOST_CHECK                      1
 
 
 
 /******************* EVENT TYPES **********************/
 
-#define EVENT_SERVICE_CHECK		0	/* active service check */
-#define EVENT_COMMAND_CHECK		1	/* external command check */
-#define EVENT_LOG_ROTATION		2	/* log file rotation */
-#define EVENT_PROGRAM_SHUTDOWN		3	/* program shutdown */
-#define EVENT_PROGRAM_RESTART		4	/* program restart */
-#define EVENT_CHECK_REAPER              5       /* reaps results from host and service checks */
-#define EVENT_ORPHAN_CHECK		6	/* checks for orphaned hosts and services */
-#define EVENT_RETENTION_SAVE		7	/* save (dump) retention data */
-#define EVENT_STATUS_SAVE		8	/* save (dump) status data */
-#define EVENT_SCHEDULED_DOWNTIME	9	/* scheduled host or service downtime */
-#define EVENT_SFRESHNESS_CHECK          10      /* checks service result "freshness" */
-#define EVENT_EXPIRE_DOWNTIME		11      /* checks for (and removes) expired scheduled downtime */
-#define EVENT_HOST_CHECK                12      /* active host check */
-#define EVENT_HFRESHNESS_CHECK          13      /* checks host result "freshness" */
-#define EVENT_RESCHEDULE_CHECKS		14      /* adjust scheduling of host and service checks */
-#define EVENT_EXPIRE_COMMENT            15      /* removes expired comments */
-#define EVENT_SLEEP                     98      /* asynchronous sleep event that occurs when event queues are empty */
-#define EVENT_USER_FUNCTION             99      /* USER-defined function (modules) */
+# define EVENT_SERVICE_CHECK		0	/* active service check */
+# define EVENT_COMMAND_CHECK		1	/* external command check */
+# define EVENT_LOG_ROTATION		2	/* log file rotation */
+# define EVENT_PROGRAM_SHUTDOWN		3	/* program shutdown */
+# define EVENT_PROGRAM_RESTART		4	/* program restart */
+# define EVENT_CHECK_REAPER             5       /* reaps results from host and service checks */
+# define EVENT_ORPHAN_CHECK		6	/* checks for orphaned hosts and services */
+# define EVENT_RETENTION_SAVE		7	/* save (dump) retention data */
+# define EVENT_STATUS_SAVE		8	/* save (dump) status data */
+# define EVENT_SCHEDULED_DOWNTIME	9	/* scheduled host or service downtime */
+# define EVENT_SFRESHNESS_CHECK         10      /* checks service result "freshness" */
+# define EVENT_EXPIRE_DOWNTIME		11      /* checks for (and removes) expired scheduled downtime */
+# define EVENT_HOST_CHECK               12      /* active host check */
+# define EVENT_HFRESHNESS_CHECK         13      /* checks host result "freshness" */
+# define EVENT_RESCHEDULE_CHECKS	14      /* adjust scheduling of host and service checks */
+# define EVENT_EXPIRE_COMMENT           15      /* removes expired comments */
+# define EVENT_SLEEP                    98      /* asynchronous sleep event that occurs when event queues are empty */
+# define EVENT_USER_FUNCTION            99      /* USER-defined function (modules) */
 
 
 
 /******* INTER-CHECK DELAY CALCULATION TYPES **********/
 
-#define ICD_NONE			0	/* no inter-check delay */
-#define ICD_DUMB			1	/* dumb delay of 1 second */
-#define ICD_SMART			2	/* smart delay */
-#define ICD_USER			3       /* user-specified delay */
+# define ICD_NONE			0	/* no inter-check delay */
+# define ICD_DUMB			1	/* dumb delay of 1 second */
+# define ICD_SMART			2	/* smart delay */
+# define ICD_USER			3       /* user-specified delay */
 
 
 
 /******* INTERLEAVE FACTOR CALCULATION TYPES **********/
 
-#define ILF_USER			0	/* user-specified interleave factor */
-#define ILF_SMART			1	/* smart interleave */
+# define ILF_USER			0	/* user-specified interleave factor */
+# define ILF_SMART			1	/* smart interleave */
 
 
 
 /************ SCHEDULED DOWNTIME TYPES ****************/
 
-#define ACTIVE_DOWNTIME                 0       /* active downtime - currently in effect */
-#define PENDING_DOWNTIME                1       /* pending downtime - scheduled for the future */
+# define ACTIVE_DOWNTIME                 0       /* active downtime - currently in effect */
+# define PENDING_DOWNTIME                1       /* pending downtime - scheduled for the future */
 
 
 
@@ -307,7 +304,7 @@ typedef struct check_result_struct{
 	char *host_name;                                /* host name */
 	char *service_description;                      /* service description */
 	int check_type;					/* was this an active or passive service check? */
-	int check_options;         
+	int check_options;
 	int scheduled_check;                            /* was this a scheduled or an on-demand check? */
 	int reschedule_check;                           /* should we reschedule the next check */
 	char *output_file;                              /* what file is the output stored in? */
@@ -385,7 +382,7 @@ typedef struct dbuf_struct{
         }dbuf;
 
 
-#define CHECK_STATS_BUCKETS                  15
+# define CHECK_STATS_BUCKETS                  15
 
 /* used for tracking host and service check statistics */
 typedef struct check_stats_struct{
@@ -400,12 +397,12 @@ typedef struct check_stats_struct{
 /******************* THREAD STUFF ********************/
 
 /* slots in circular buffers */
-#define DEFAULT_EXTERNAL_COMMAND_BUFFER_SLOTS     4096
+# define DEFAULT_EXTERNAL_COMMAND_BUFFER_SLOTS     4096
 
 /* worker threads */
-#define TOTAL_WORKER_THREADS              1
+# define TOTAL_WORKER_THREADS             1
 
-#define COMMAND_WORKER_THREAD		  0
+# define COMMAND_WORKER_THREAD		  0
 
 
 
@@ -539,13 +536,13 @@ int check_service_notification_viability(service *,int,int);			/* checks viabili
 int is_valid_escalation_for_service_notification(service *,serviceescalation *,int);	/* checks if an escalation entry is valid for a particular service notification */
 int should_service_notification_be_escalated(service *);			/* checks if a service notification should be escalated */
 int service_notification(service *,int,char *,char *,int);                     	/* notify all contacts about a service (problem or recovery) */
-int check_contact_service_notification_viability(contact *,service *,int,int);	/* checks viability of notifying a contact about a service */ 
+int check_contact_service_notification_viability(contact *,service *,int,int);	/* checks viability of notifying a contact about a service */
 int notify_contact_of_service(nagios_macros *mac, contact *,service *,int,char *,char *,int,int);  	/* notify a single contact about a service */
 int check_host_notification_viability(host *,int,int);				/* checks viability of notifying all contacts about a host */
 int is_valid_escalation_for_host_notification(host *,hostescalation *,int);	/* checks if an escalation entry is valid for a particular host notification */
 int should_host_notification_be_escalated(host *);				/* checks if a host notification should be escalated */
 int host_notification(host *,int,char *,char *,int);                           	/* notify all contacts about a host (problem or recovery) */
-int check_contact_host_notification_viability(contact *,host *,int,int);	/* checks viability of notifying a contact about a host */ 
+int check_contact_host_notification_viability(contact *,host *,int,int);	/* checks viability of notifying a contact about a host */
 int notify_contact_of_host(nagios_macros *mac, contact *,host *,int,char *,char *,int,int);        	/* notify a single contact about a host */
 int create_notification_list_from_host(nagios_macros *mac, host *,int,int *);         		/* given a host, create list of contacts to be notified (remove duplicates) */
 int create_notification_list_from_service(nagios_macros *mac, service *,int,int *);    		/* given a service, create list of contacts to be notified (remove duplicates) */
@@ -708,8 +705,8 @@ int submit_raw_external_command(char *,time_t *,int *);
 char *get_program_version(void);
 char *get_program_modification_date(void);
 
-#ifdef __cplusplus
+# ifdef __cplusplus
 }
-#endif
-#endif
+# endif
+#endif /* !NAGIOS_H */
 

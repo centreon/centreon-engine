@@ -18,8 +18,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef _XSDDEFAULT_H
-#define _XSDDEFAULT_H
+#ifndef XSDDEFAULT_H
+# define XSDDEFAULT_H
 
 int xsddefault_initialize_status_data(char *);
 int xsddefault_cleanup_status_data(char *,int);
@@ -28,4 +28,4 @@ int xsddefault_save_status_data(void);
 int xsddefault_grab_config_info(char *);
 int xsddefault_grab_config_directives(char *);
 
-#endif
+#endif /* !XSDDEFAULT_H */

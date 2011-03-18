@@ -18,48 +18,48 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef _OBJECTS_H
-#define _OBJECTS_H
+#ifndef OBJECTS_H
+# define OBJECTS_H
 
-#include "config.h"
-#include "common.h"
+# include "config.h"
+# include "common.h"
 
-#ifdef __cplusplus
+# ifdef __cplusplus
   extern "C" {
-#endif
+# endif
 
 
 
 /*************** CURRENT OBJECT REVISION **************/
 
-#define CURRENT_OBJECT_STRUCTURE_VERSION        307     /* increment when changes are made to data structures... */
+# define CURRENT_OBJECT_STRUCTURE_VERSION        307     /* increment when changes are made to data structures... */
 	                                                /* Nagios 3 starts at 300, Nagios 4 at 400, etc. */
 
 
 
 /***************** OBJECT SIZE LIMITS *****************/
 
-#define MAX_STATE_HISTORY_ENTRIES		21	/* max number of old states to keep track of for flap detection */
-#define MAX_CONTACT_ADDRESSES                   6       /* max number of custom addresses a contact can have */
+# define MAX_STATE_HISTORY_ENTRIES		21	/* max number of old states to keep track of for flap detection */
+# define MAX_CONTACT_ADDRESSES                   6       /* max number of custom addresses a contact can have */
 
 
 
 /***************** SKIP LISTS ****************/
 
-#define NUM_OBJECT_SKIPLISTS                   12
+# define NUM_OBJECT_SKIPLISTS                   12
 
-#define HOST_SKIPLIST                          0
-#define SERVICE_SKIPLIST                       1
-#define COMMAND_SKIPLIST                       2
-#define TIMEPERIOD_SKIPLIST                    3
-#define CONTACT_SKIPLIST                       4
-#define CONTACTGROUP_SKIPLIST                  5
-#define HOSTGROUP_SKIPLIST                     6
-#define SERVICEGROUP_SKIPLIST                  7
-#define HOSTDEPENDENCY_SKIPLIST                8
-#define SERVICEDEPENDENCY_SKIPLIST             9
-#define HOSTESCALATION_SKIPLIST                10
-#define SERVICEESCALATION_SKIPLIST             11
+# define HOST_SKIPLIST                          0
+# define SERVICE_SKIPLIST                       1
+# define COMMAND_SKIPLIST                       2
+# define TIMEPERIOD_SKIPLIST                    3
+# define CONTACT_SKIPLIST                       4
+# define CONTACTGROUP_SKIPLIST                  5
+# define HOSTGROUP_SKIPLIST                     6
+# define SERVICEGROUP_SKIPLIST                  7
+# define HOSTDEPENDENCY_SKIPLIST                8
+# define SERVICEDEPENDENCY_SKIPLIST             9
+# define HOSTESCALATION_SKIPLIST                10
+# define SERVICEESCALATION_SKIPLIST             11
 
 
 /****************** DATA STRUCTURES *******************/
@@ -182,7 +182,7 @@ struct contact_struct{
 	char	*pager;
 	char    *address[MAX_CONTACT_ADDRESSES];
 	commandsmember *host_notification_commands;
-	commandsmember *service_notification_commands;	
+	commandsmember *service_notification_commands;
 	int     notify_on_service_unknown;
 	int     notify_on_service_warning;
 	int     notify_on_service_critical;
@@ -641,7 +641,7 @@ hostescalation *add_hostescalation(char *,int,int,double,char *,int,int,int);   
 contactsmember *add_contact_to_hostescalation(hostescalation *,char *);                                 /* adds a contact to a host escalation definition */
 contactgroupsmember *add_contactgroup_to_hostescalation(hostescalation *,char *);                       /* adds a contact group to a host escalation definition */
 
-contactsmember *add_contact_to_object(contactsmember **,char *);                                        /* adds a contact to an object */ 
+contactsmember *add_contact_to_object(contactsmember **,char *);                                        /* adds a contact to an object */
 customvariablesmember *add_custom_variable_to_object(customvariablesmember **,char *,char *);           /* adds a custom variable to an object */
 
 
@@ -696,9 +696,9 @@ int free_objectlist(objectlist **);
 
 
 /**** Object Query Functions ****/
-int is_host_immediate_child_of_host(host *,host *);	                /* checks if a host is an immediate child of another host */	
+int is_host_immediate_child_of_host(host *,host *);	                /* checks if a host is an immediate child of another host */
 int is_host_primary_immediate_child_of_host(host *,host *);             /* checks if a host is an immediate child (and primary child) of another host */
-int is_host_immediate_parent_of_host(host *,host *);	                /* checks if a host is an immediate child of another host */	
+int is_host_immediate_parent_of_host(host *,host *);	                /* checks if a host is an immediate child of another host */
 int is_host_member_of_hostgroup(hostgroup *,host *);		        /* tests whether or not a host is a member of a specific hostgroup */
 int is_host_member_of_servicegroup(servicegroup *,host *);	        /* tests whether or not a service is a member of a specific servicegroup */
 int is_service_member_of_servicegroup(servicegroup *,service *);	/* tests whether or not a service is a member of a specific servicegroup */
@@ -724,8 +724,8 @@ int free_object_data(void);                             /* frees all allocated m
 
 
 
-#ifdef __cplusplus
+# ifdef __cplusplus
   }
-#endif
+# endif
 
-#endif
+#endif /* !OBJECTS_H */

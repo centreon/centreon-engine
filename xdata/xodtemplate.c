@@ -450,10 +450,8 @@ int xodtemplate_grab_config_info(char *main_config_file)
 	char *var=NULL;
 	char *val=NULL;
 	mmapfile *thefile=NULL;
-#ifdef NSCORE
 	nagios_macros *mac;
-#endif
-	
+
 	/* open the main config file for reading */
 	if((thefile=mmap_fopen(main_config_file))==NULL)
 		return ERROR;

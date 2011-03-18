@@ -18,16 +18,16 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef _DOWNTIME_H
-#define _DOWNTIME_H
+#ifndef DOWNTIME_H
+# define DOWNTIME_H
 
-#include "config.h"
-#include "common.h"
-#include "objects.h"
+# include "config.h"
+# include "common.h"
+# include "objects.h"
 
-#ifdef __cplusplus
+# ifdef __cplusplus
   extern "C" {
-#endif
+# endif
 
 /* SCHEDULED_DOWNTIME_ENTRY structure */
 typedef struct scheduled_downtime_struct{
@@ -92,8 +92,8 @@ scheduled_downtime *find_service_downtime(unsigned long);
 
 void free_downtime_data(void);                                       /* frees memory allocated to scheduled downtime list */
 
-#ifdef __cplusplus
+# ifdef __cplusplus
   }
-#endif
+# endif
 
-#endif
+#endif /* !DOWNTIME_H */

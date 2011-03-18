@@ -19,16 +19,16 @@
 */
 
 #ifndef _SKIPLIST_H
-#define _SKIPLIST_H
+# define _SKIPLIST_H
 
-#define SKIPLIST_OK              0
-#define SKIPLIST_ERROR_ARGS      1
-#define SKIPLIST_ERROR_MEMORY    2
-#define SKIPLIST_ERROR_DUPLICATE 3
+# define SKIPLIST_OK              0
+# define SKIPLIST_ERROR_ARGS      1
+# define SKIPLIST_ERROR_MEMORY    2
+# define SKIPLIST_ERROR_DUPLICATE 3
 
-#ifdef __cplusplus
+# ifdef __cplusplus
   extern "C" {
-#endif
+# endif
 
 
 typedef struct skiplistnode_struct{
@@ -65,8 +65,8 @@ int skiplist_delete_first(skiplist *list, void *data);
 int skiplist_delete_all(skiplist *list, void *data);
 int skiplist_delete_node(skiplist *list, void *node_ptr);
 
-#ifdef __cplusplus
+# ifdef __cplusplus
   }
-#endif
+# endif
 
-#endif
+#endif /* !SKIPLIST_H */

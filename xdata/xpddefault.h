@@ -18,14 +18,14 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef _XPDDEFAULT_H
-#define _XPDDEFAULT_H
+#ifndef XPDDEFAULT_H
+# define XPDDEFAULT_H
 
-#include "../include/objects.h"
+# include "../include/objects.h"
 
 
-#define DEFAULT_HOST_PERFDATA_FILE_TEMPLATE "[HOSTPERFDATA]\t$TIMET$\t$HOSTNAME$\t$HOSTEXECUTIONTIME$\t$HOSTOUTPUT$\t$HOSTPERFDATA$"
-#define DEFAULT_SERVICE_PERFDATA_FILE_TEMPLATE "[SERVICEPERFDATA]\t$TIMET$\t$HOSTNAME$\t$SERVICEDESC$\t$SERVICEEXECUTIONTIME$\t$SERVICELATENCY$\t$SERVICEOUTPUT$\t$SERVICEPERFDATA$"
+# define DEFAULT_HOST_PERFDATA_FILE_TEMPLATE    "[HOSTPERFDATA]\t$TIMET$\t$HOSTNAME$\t$HOSTEXECUTIONTIME$\t$HOSTOUTPUT$\t$HOSTPERFDATA$"
+# define DEFAULT_SERVICE_PERFDATA_FILE_TEMPLATE "[SERVICEPERFDATA]\t$TIMET$\t$HOSTNAME$\t$SERVICEDESC$\t$SERVICEEXECUTIONTIME$\t$SERVICELATENCY$\t$SERVICEOUTPUT$\t$SERVICEPERFDATA$"
 
 
 
@@ -53,4 +53,4 @@ int xpddefault_close_service_perfdata_file(void);
 int xpddefault_process_host_perfdata_file(void);
 int xpddefault_process_service_perfdata_file(void);
 
-#endif
+#endif /* !XPDDEFAULT_H */

@@ -18,14 +18,14 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef _STATUSDATA_H
-#define _STATUSDATA_H
+#ifndef STATUSDATA_H
+# define STATUSDATA_H
 
-#include "objects.h"
+# include "objects.h"
 
-#ifdef __cplusplus
+# ifdef __cplusplus
   extern "C" {
-#endif
+# endif
 
 int initialize_status_data(char *);                     /* initializes status data at program start */
 int update_all_status_data(void);                       /* updates all status data */
@@ -35,8 +35,8 @@ int update_host_status(host *,int);                     /* updates host status d
 int update_service_status(service *,int);               /* updates service status data */
 int update_contact_status(contact *,int);               /* updates contact status data */
 
-#ifdef __cplusplus
+# ifdef __cplusplus
   }
-#endif
+# endif
 
-#endif
+#endif /* !STATUSDATA_H */

@@ -18,16 +18,16 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef _NEBMODS_H
-#define _NEBMODS_H
+#ifndef NEBMODS_H
+# define NEBMODS_H
 
-#include "config.h"
-#include "nebcallbacks.h"
-#include "nebmodules.h"
+# include "config.h"
+# include "nebcallbacks.h"
+# include "nebmodules.h"
 
-#ifdef __cplusplus
-extern "C" { 
-#endif
+# ifdef __cplusplus
+extern "C" {
+# endif
 
 
 /***** MODULE STRUCTURES *****/
@@ -59,8 +59,8 @@ int neb_init_callback_list(void);
 int neb_free_callback_list(void);
 int neb_make_callbacks(int,void *);
 
-#ifdef __cplusplus
+# ifdef __cplusplus
 }
-#endif
+# endif
 
-#endif
+#endif /* !NEBMODS_H */

@@ -18,20 +18,25 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#define DEFAULT_TEMP_FILE			"@localstatedir@/tempfile"
-#define DEFAULT_TEMP_PATH                       "/tmp"
-#define DEFAULT_CHECK_RESULT_PATH		"@localstatedir@/spool/checkresults"
-#define DEFAULT_STATUS_FILE			"@localstatedir@/status.dat"
-#define DEFAULT_LOG_FILE			"@localstatedir@/nagios.log"
-#define DEFAULT_LOG_ARCHIVE_PATH		"@localstatedir@/archives/"
-#define DEFAULT_DEBUG_FILE                      "@localstatedir@/nagios.debug"
-#define DEFAULT_COMMENT_FILE			"@localstatedir@/comments.dat"
-#define DEFAULT_DOWNTIME_FILE			"@localstatedir@/downtime.dat"
-#define DEFAULT_RETENTION_FILE			"@localstatedir@/retention.dat"
-#define DEFAULT_COMMAND_FILE			"@localstatedir@/rw/nagios.cmd"
-#define DEFAULT_CONFIG_FILE			"@sysconfdir@/nagios.cfg"
-#define DEFAULT_OBJECT_CACHE_FILE		"@localstatedir@/objects.cache"
-#define DEFAULT_PRECACHED_OBJECT_FILE		"@localstatedir@/objects.precache"
-#define DEFAULT_EVENT_BROKER_FILE		"@localstatedir@/broker.socket"
-#define DEFAULT_P1_FILE				"@bindir@/p1.pl"	/**** EMBEDDED PERL ****/
-#define DEFAULT_AUTH_FILE			""			/**** EMBEDDED PERL - IS THIS USED? ****/
+#ifndef LOCATIONS_H
+# define LOCATIONS_H
+
+# define DEFAULT_TEMP_FILE			"@localstatedir@/tempfile"
+# define DEFAULT_TEMP_PATH                      "/tmp"
+# define DEFAULT_CHECK_RESULT_PATH		"@localstatedir@/spool/checkresults"
+# define DEFAULT_STATUS_FILE			"@localstatedir@/status.dat"
+# define DEFAULT_LOG_FILE			"@localstatedir@/nagios.log"
+# define DEFAULT_LOG_ARCHIVE_PATH		"@localstatedir@/archives/"
+# define DEFAULT_DEBUG_FILE                     "@localstatedir@/nagios.debug"
+# define DEFAULT_COMMENT_FILE			"@localstatedir@/comments.dat"
+# define DEFAULT_DOWNTIME_FILE			"@localstatedir@/downtime.dat"
+# define DEFAULT_RETENTION_FILE			"@localstatedir@/retention.dat"
+# define DEFAULT_COMMAND_FILE			"@localstatedir@/rw/nagios.cmd"
+# define DEFAULT_CONFIG_FILE			"@sysconfdir@/nagios.cfg"
+# define DEFAULT_OBJECT_CACHE_FILE		"@localstatedir@/objects.cache"
+# define DEFAULT_PRECACHED_OBJECT_FILE		"@localstatedir@/objects.precache"
+# define DEFAULT_EVENT_BROKER_FILE		"@localstatedir@/broker.socket"
+# define DEFAULT_P1_FILE			"@bindir@/p1.pl"	/**** EMBEDDED PERL ****/
+# define DEFAULT_AUTH_FILE			""			/**** EMBEDDED PERL - IS THIS USED? ****/
+
+#endif /* !LOCATIONS_H */

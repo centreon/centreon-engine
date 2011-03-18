@@ -18,14 +18,14 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef _PERFDATA_H
-#define _PERFDATA_H
+#ifndef PERFDATA_H
+# define PERFDATA_H
 
-#include "objects.h"
+# include "objects.h"
 
-#ifdef __cplusplus
+# ifdef __cplusplus
   extern "C" {
-#endif
+# endif
 
 int initialize_performance_data(char *);	                /* initializes performance data */
 int cleanup_performance_data(char *);                           /* cleans up performance data */
@@ -33,8 +33,8 @@ int cleanup_performance_data(char *);                           /* cleans up per
 int update_host_performance_data(host *);       	        /* updates host performance data */
 int update_service_performance_data(service *);         	/* updates service performance data */
 
-#ifdef __cplusplus
+# ifdef __cplusplus
   }
-#endif
+# endif
 
-#endif
+#endif /* !PERFDATA_H */

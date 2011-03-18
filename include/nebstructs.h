@@ -18,16 +18,16 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef _NEBSTRUCTS_H
-#define _NEBSTRUCTS_H
+#ifndef NEBSTRUCTS_H
+# define NEBSTRUCTS_H
 
-#include "config.h"
-#include "objects.h"
-#include "nagios.h"
+# include "config.h"
+# include "objects.h"
+# include "nagios.h"
 
-#ifdef __cplusplus
+# ifdef __cplusplus
   extern "C" {
-#endif
+# endif
 
 /****** STRUCTURES *************************/
 
@@ -520,8 +520,8 @@ typedef struct nebstruct_statechange_struct{
 	void            *object_ptr;
         }nebstruct_statechange_data;
 
-#ifdef __cplusplus
+# ifdef __cplusplus
   }
-#endif
+# endif
 
-#endif
+#endif /* !NEBSTRUCTS_H */

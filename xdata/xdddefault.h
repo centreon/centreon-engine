@@ -18,8 +18,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef _XDDDEFAULT_H
-#define _XDDDEFAULT_H
+#ifndef XDDDEFAULT_H
+# define XDDDEFAULT_H
 
 #define XDDDEFAULT_NO_DATA          0
 #define XDDDEFAULT_INFO_DATA        1
@@ -38,4 +38,4 @@ int xdddefault_delete_host_downtime(unsigned long);
 int xdddefault_delete_service_downtime(unsigned long);
 int xdddefault_delete_downtime(int,unsigned long);
 
-#endif
+#endif /* !XDDDEFAULT_H */

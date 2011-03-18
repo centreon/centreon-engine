@@ -1,7 +1,7 @@
-#ifndef INCLUDE__shared_h__
-#define INCLUDE__shared_h__
+#ifndef SHARED_H
+# define SHARED_H
 
-#include <time.h>
+# include <time.h>
 /* mmapfile structure - used for reading files via mmap() */
 typedef struct mmapfile_struct {
 	char *path;
@@ -14,7 +14,7 @@ typedef struct mmapfile_struct {
 } mmapfile;
 
 /* only usable on compile-time initialized arrays, for obvious reasons */
-#define ARRAY_SIZE(ary) (sizeof(ary) / sizeof(ary[0]))
+# define ARRAY_SIZE(ary) (sizeof(ary) / sizeof(ary[0]))
 
 extern char *my_strtok(char *buffer, char *tokens);
 extern char *my_strsep(char **stringp, const char *delim);
@@ -30,4 +30,4 @@ extern void get_datetime_string(time_t *raw_time, char *buffer,
 				int buffer_length, int type);
 extern void get_time_breakdown(unsigned long raw_time, int *days, int *hours,
 				   int *minutes, int *seconds);
-#endif
+#endif /* !SHARED_H */

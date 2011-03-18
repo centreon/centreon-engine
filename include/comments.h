@@ -18,42 +18,42 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef _COMMENTS_H
-#define _COMMENTS_H
+#ifndef COMMENTS_H
+# define COMMENTS_H
 
-#include "config.h"
-#include "common.h"
-#include "objects.h"
+# include "config.h"
+# include "common.h"
+# include "objects.h"
 
 
-#ifdef __cplusplus
+# ifdef __cplusplus
   extern "C" {
-#endif
+# endif
 
 /**************************** COMMENT SOURCES ******************************/
 
-#define COMMENTSOURCE_INTERNAL  0
-#define COMMENTSOURCE_EXTERNAL  1
+# define COMMENTSOURCE_INTERNAL  0
+# define COMMENTSOURCE_EXTERNAL  1
 
 
 
 /***************************** COMMENT TYPES *******************************/
 
-#define HOST_COMMENT			1
-#define SERVICE_COMMENT			2
+# define HOST_COMMENT			1
+# define SERVICE_COMMENT		2
 
 
 /****************************** ENTRY TYPES ********************************/
 
-#define USER_COMMENT                    1
-#define DOWNTIME_COMMENT                2
-#define FLAPPING_COMMENT                3
-#define ACKNOWLEDGEMENT_COMMENT         4
+# define USER_COMMENT                    1
+# define DOWNTIME_COMMENT                2
+# define FLAPPING_COMMENT                3
+# define ACKNOWLEDGEMENT_COMMENT         4
 
 
 /*************************** CHAINED HASH LIMITS ***************************/
 
-#define COMMENT_HASHSLOTS      1024
+# define COMMENT_HASHSLOTS      1024
 
 
 
@@ -119,8 +119,8 @@ int add_comment_to_hashlist(comment *);
 
 void free_comment_data(void);                                             /* frees memory allocated to the comment list */
 
-#ifdef __cplusplus
+# ifdef __cplusplus
   }
-#endif
+# endif
 
-#endif
+#endif /* !COMMENTS_H */

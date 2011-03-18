@@ -31,7 +31,6 @@
  *****************************************************************************/
 
 /* Need these to get CGI mode */
-#undef NSCORE
 #define NSCGI 1
 #include "../include/config.h"
 #include "../include/common.h"
