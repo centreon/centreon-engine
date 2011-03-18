@@ -20,13 +20,13 @@
 
 /*********** COMMON HEADER FILES ***********/
 
-#include "../include/config.hh"
-#include "../include/common.hh"
-#include "../include/objects.hh"
-#include "../include/statusdata.hh"
-#include "../include/nagios.hh"
-#include "../include/sretention.hh"
-#include "../include/broker.hh"
+#include "config.hh"
+#include "common.hh"
+#include "objects.hh"
+#include "statusdata.hh"
+#include "nagios.hh"
+#include "sretention.hh"
+#include "broker.hh"
 
 extern int            retain_state_information;
 

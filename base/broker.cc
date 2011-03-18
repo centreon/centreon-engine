@@ -19,14 +19,14 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include "../include/config.hh"
-#include "../include/common.hh"
+#include "config.hh"
+#include "common.hh"
 
-#include "../include/nagios.hh"
-#include "../include/broker.hh"
-#include "../include/nebcallbacks.hh"
-#include "../include/nebstructs.hh"
-#include "../include/nebmods.hh"
+#include "nagios.hh"
+#include "broker.hh"
+#include "nebcallbacks.hh"
+#include "nebstructs.hh"
+#include "nebmods.hh"
 
 extern unsigned long event_broker_options;
 

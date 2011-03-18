@@ -362,6 +362,9 @@ configure_file("${INCLUDE_DIR}/locations.hh.in"
 configure_file("${INCLUDE_DIR}/snprintf.hh.in"
   "${INCLUDE_DIR}/snprintf.hh")
 
+# Include Directories
+include_directories("${INCLUDE_DIR}")
+
 # centscheduler target.
 add_executable("centscheduler"
   "${BASE_DIR}/broker.cc"

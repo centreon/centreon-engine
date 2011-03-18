@@ -20,11 +20,11 @@
 
 /*********** COMMON HEADER FILES ***********/
 
-#include "../include/config.hh"
-#include "../include/common.hh"
-#include "../include/objects.hh"
-#include "../include/macros.hh"
-#include "../include/nagios.hh"
+#include "config.hh"
+#include "common.hh"
+#include "objects.hh"
+#include "macros.hh"
+#include "nagios.hh"
 
 
 /**** DATA INPUT-SPECIFIC HEADER FILES ****/

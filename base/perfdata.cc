@@ -20,11 +20,11 @@
 
 /*********** COMMON HEADER FILES ***********/
 
-#include "../include/config.hh"
-#include "../include/common.hh"
-#include "../include/objects.hh"
-#include "../include/perfdata.hh"
-#include "../include/macros.hh"
+#include "config.hh"
+#include "common.hh"
+#include "objects.hh"
+#include "perfdata.hh"
+#include "macros.hh"
 
 /***** IMPLEMENTATION-SPECIFIC HEADER FILES *****/
 

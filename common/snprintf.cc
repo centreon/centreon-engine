@@ -105,7 +105,7 @@
 
 #ifndef NO_CONFIG_H
 /* 02/28/2006 EG changed path to config.h to match Nagios distro */
-# include "../include/config.hh"
+# include "config.hh"
 #else
 # define NULL 0
 #endif

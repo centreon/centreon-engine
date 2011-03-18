@@ -1,5 +1,5 @@
-#include "../include/config.hh"
-#include "../include/common.hh"
+#include "config.hh"
+#include "common.hh"
 
 /*
  * This file holds random utility functions shared by cgi's and

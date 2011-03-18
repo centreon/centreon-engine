@@ -20,13 +20,13 @@
 
 /*********** COMMON HEADER FILES ***********/
 
-#include "../include/config.hh"
-#include "../include/common.hh"
-#include "../include/objects.hh"
-#include "../include/comments.hh"
-#include "../include/statusdata.hh"
-#include "../include/nagios.hh"
-#include "../include/broker.hh"
+#include "config.hh"
+#include "common.hh"
+#include "objects.hh"
+#include "comments.hh"
+#include "statusdata.hh"
+#include "nagios.hh"
+#include "broker.hh"
 
 extern int      interval_length;
 

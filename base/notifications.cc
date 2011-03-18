@@ -19,14 +19,14 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include "../include/config.hh"
-#include "../include/common.hh"
-#include "../include/objects.hh"
-#include "../include/statusdata.hh"
-#include "../include/macros.hh"
-#include "../include/nagios.hh"
-#include "../include/broker.hh"
-#include "../include/neberrors.hh"
+#include "config.hh"
+#include "common.hh"
+#include "objects.hh"
+#include "statusdata.hh"
+#include "macros.hh"
+#include "nagios.hh"
+#include "broker.hh"
+#include "neberrors.hh"
 
 extern notification    *notification_list;
 extern contact         *contact_list;

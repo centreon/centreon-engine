@@ -18,10 +18,10 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include "../include/config.hh"
-#include "../include/common.hh"
-#include "../include/comments.hh"
-#include "../include/objects.hh"
+#include "config.hh"
+#include "common.hh"
+#include "comments.hh"
+#include "objects.hh"
 
 /***** IMPLEMENTATION-SPECIFIC INCLUDES *****/
 
@@ -29,8 +29,8 @@
 #include "../xdata/xcddefault.hh"
 #endif
 
-#include "../include/nagios.hh"
-#include "../include/broker.hh"
+#include "nagios.hh"
+#include "broker.hh"
 
 comment     *comment_list=NULL;
 int	    defer_comment_sorting = 0;

@@ -18,10 +18,10 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include "../include/config.hh"
-#include "../include/common.hh"
-#include "../include/nagios.hh"
-#include "../include/locations.hh"
+#include "config.hh"
+#include "common.hh"
+#include "nagios.hh"
+#include "locations.hh"
 
 #define STATUS_NO_DATA             0
 #define STATUS_INFO_DATA           1

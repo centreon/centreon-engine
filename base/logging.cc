@@ -18,12 +18,12 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include "../include/config.hh"
-#include "../include/common.hh"
-#include "../include/statusdata.hh"
-#include "../include/macros.hh"
-#include "../include/nagios.hh"
-#include "../include/broker.hh"
+#include "config.hh"
+#include "common.hh"
+#include "statusdata.hh"
+#include "macros.hh"
+#include "nagios.hh"
+#include "broker.hh"
 
 
 extern char	*log_file;

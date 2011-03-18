@@ -20,14 +20,14 @@
 
 /*********** COMMON HEADER FILES ***********/
 
-#include "../include/config.hh"
-#include "../include/common.hh"
-#include "../include/locations.hh"
-#include "../include/downtime.hh"
-#include "../include/macros.hh"
+#include "config.hh"
+#include "common.hh"
+#include "locations.hh"
+#include "downtime.hh"
+#include "macros.hh"
 
-#include "../include/objects.hh"
-#include "../include/nagios.hh"
+#include "objects.hh"
+#include "nagios.hh"
 
 /**** IMPLEMENTATION SPECIFIC HEADER FILES ****/
 #include "xdddefault.hh"

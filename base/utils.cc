@@ -18,21 +18,21 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include "../include/config.hh"
-#include "../include/common.hh"
-#include "../include/objects.hh"
-#include "../include/statusdata.hh"
-#include "../include/comments.hh"
-#include "../include/macros.hh"
-#include "../include/nagios.hh"
-#include "../include/netutils.hh"
-#include "../include/broker.hh"
-#include "../include/nebmods.hh"
-#include "../include/nebmodules.hh"
+#include "config.hh"
+#include "common.hh"
+#include "objects.hh"
+#include "statusdata.hh"
+#include "comments.hh"
+#include "macros.hh"
+#include "nagios.hh"
+#include "netutils.hh"
+#include "broker.hh"
+#include "nebmods.hh"
+#include "nebmodules.hh"
 
 
 #ifdef EMBEDDEDPERL
-#include "../include/epn_nagios.hh"
+#include "epn_nagios.hh"
 static PerlInterpreter *my_perl=NULL;
 int use_embedded_perl=TRUE;
 #endif

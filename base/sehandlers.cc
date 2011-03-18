@@ -18,18 +18,18 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include "../include/config.hh"
-#include "../include/comments.hh"
-#include "../include/common.hh"
-#include "../include/statusdata.hh"
-#include "../include/downtime.hh"
-#include "../include/macros.hh"
-#include "../include/nagios.hh"
-#include "../include/perfdata.hh"
-#include "../include/broker.hh"
+#include "config.hh"
+#include "comments.hh"
+#include "common.hh"
+#include "statusdata.hh"
+#include "downtime.hh"
+#include "macros.hh"
+#include "nagios.hh"
+#include "perfdata.hh"
+#include "broker.hh"
 
 #ifdef USE_EVENT_BROKER
-#include "../include/neberrors.hh"
+#include "neberrors.hh"
 #endif
 
 extern int             enable_event_handlers;

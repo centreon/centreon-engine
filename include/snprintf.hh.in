@@ -2,7 +2,7 @@
 # define SNPRINTF_H
 
 /* -*- C -*- */
-# cmakedefine HAVE_SNPRINTF
-# cmakedefine NEED_VA_LIST
+#cmakedefine HAVE_SNPRINTF
+#cmakedefine NEED_VA_LIST
 
 #endif /* !SNPRINTF_H */

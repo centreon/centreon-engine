@@ -18,12 +18,12 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include "../include/config.hh"
-#include "../include/common.hh"
-#include "../include/objects.hh"
-#include "../include/skiplist.hh"
+#include "config.hh"
+#include "common.hh"
+#include "objects.hh"
+#include "skiplist.hh"
 
-#include "../include/nagios.hh"
+#include "nagios.hh"
 
 /**** IMPLEMENTATION-SPECIFIC HEADER FILES ****/
 

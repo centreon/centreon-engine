@@ -18,13 +18,13 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include "../include/macros.hh"
-#include "../include/config.hh"
-#include "../include/common.hh"
-#include "../include/objects.hh"
-#include "../include/statusdata.hh"
-#include "../include/comments.hh"
-#include "../include/nagios.hh"
+#include "macros.hh"
+#include "config.hh"
+#include "common.hh"
+#include "objects.hh"
+#include "statusdata.hh"
+#include "comments.hh"
+#include "nagios.hh"
 
 extern int      use_large_installation_tweaks;
 extern int      enable_environment_macros;

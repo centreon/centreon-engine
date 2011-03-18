@@ -21,7 +21,7 @@
 #ifndef XPDDEFAULT_H
 # define XPDDEFAULT_H
 
-# include "../include/objects.hh"
+# include "objects.hh"
 
 
 # define DEFAULT_HOST_PERFDATA_FILE_TEMPLATE    "[HOSTPERFDATA]\t$TIMET$\t$HOSTNAME$\t$HOSTEXECUTIONTIME$\t$HOSTOUTPUT$\t$HOSTPERFDATA$"

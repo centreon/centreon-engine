@@ -19,9 +19,9 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include "../include/config.hh"
-#include "../include/common.hh"
-#include "../include/netutils.hh"
+#include "config.hh"
+#include "common.hh"
+#include "netutils.hh"
 
 
 /* connect to a TCP socket in nonblocking fashion */
