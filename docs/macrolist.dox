@@ -3237,7 +3237,7 @@
  *        more @ref mainconfigurationfileoptionsconfigurationfilevariablesresourcefile
  *	  "resource files".
  *        Centreon Scheduler supports up to 256 user macros ($USER1$ through
- *        $USER32$).
+ *        $USER256$).
  *      </td>
  *    </tr>
  *  </table>
