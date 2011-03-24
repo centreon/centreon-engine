@@ -354,6 +354,39 @@ else ()
   set(EMBEDDED_PERL "No")
 endif ()
 
+# Find and execute gSOAP's wsdl2h.
+find_program(WSDL2H_PROGRAM "wsdl2h")
+if (NOT WSDL2H_PROGRAM)
+  message(FATAL_ERROR "Could not find gSOAP's wsdl2h binary.")
+endif ()
+add_custom_command(OUTPUT "${INCLUDE_DIR}/centreon-scheduler-ws.hh"
+  COMMAND "${WSDL2H_PROGRAM}" "-o" "${INCLUDE_DIR}/centreon-scheduler-ws.hh" "-t${SCRIPT_DIR}/typemap.dat" "${SCRIPT_DIR}/centreon-scheduler.wsdl")
+
+# Find and execute gSOAP's soapcpp2.
+find_program(SOAPCPP2_PROGRAM "soapcpp2")
+if (NOT SOAPCPP2_PROGRAM)
+  message(FATAL_ERROR "Could not find gSOAP's soapcpp2 binary.")
+endif ()
+find_path(GSOAP_INCLUDE_DIR NAMES "stlvector.h" PATH_SUFFIXES "" "gsoap")
+if (NOT GSOAP_INCLUDE_DIR)
+  message(FATAL_ERROR "Could not find gSOAP's stlvector.h header file.")
+endif ()
+add_custom_command(OUTPUT
+  "${BASE_DIR}/centreonscheduler.nsmap"
+  "${BASE_DIR}/soapC.cpp"
+  "${BASE_DIR}/soapH.h"
+  "${BASE_DIR}/soapServer.cpp"
+  "${BASE_DIR}/soapServerLib.cpp"
+  "${BASE_DIR}/soapStub.h"
+  COMMAND "${SOAPCPP2_PROGRAM}" "-d${BASE_DIR}" "-S" "-I${GSOAP_INCLUDE_DIR}" "${INCLUDE_DIR}/centreon-scheduler-ws.hh"
+  DEPENDS "${INCLUDE_DIR}/centreon-scheduler-ws.hh")
+
+# Find libgsoap++.
+find_library(GSOAP_LIBRARIES "gsoap++")
+if (NOT GSOAP_LIBRARIES)
+  message(FATAL_ERROR "Could not find gSOAP's libgsoap++.")
+endif ()
+
 # Configure files.
 configure_file("${INCLUDE_DIR}/config.hh.in"
   "${INCLUDE_DIR}/config.hh")
@@ -377,9 +410,12 @@ add_executable("centscheduler"
   "${BASE_DIR}/nagios.cc"
   "${BASE_DIR}/nebmods.cc"
   "${BASE_DIR}/netutils.cc"
+  "${BASE_DIR}/new_commands.cc"
   "${BASE_DIR}/notifications.cc"
   "${BASE_DIR}/perfdata.cc"
   "${BASE_DIR}/sehandlers.cc"
+  "${BASE_DIR}/soapC.cpp"
+  "${BASE_DIR}/soapServer.cpp"
   "${BASE_DIR}/sretention.cc"
   "${BASE_DIR}/utils.cc"
   "${COMMON_DIR}/comments.cc"
@@ -406,6 +442,7 @@ set_target_properties("centscheduler" PROPERTIES
   COMPILE_FLAGS "${SCHEDULER_COMPILE_FLAGS}")
 target_link_libraries("centscheduler"
   ${DL_LIBRARIES}
+  ${GSOAP_LIBRARIES}
   ${MATH_LIBRARIES}
   ${SOCKET_LIBRARIES}
   ${THREAD_LIBRARIES}
