@@ -30,9 +30,9 @@
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__enableHostsPassiveChecks(soap* s,
-                                                bool enable,
-                                                centreonscheduler__enableHostsPassiveChecksResponse& res) {
+int centreonscheduler__setHostsPassiveChecksEnabled(soap* s,
+                                                    bool enable,
+                                                    centreonscheduler__setHostsPassiveChecksEnabledResponse& res) {
 }
 
 /**
@@ -44,7 +44,7 @@ int centreonscheduler__enableHostsPassiveChecks(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__enableServicesPassiveChecks(soap* s,
-                                                   bool enable,
-                                                   centreonscheduler__enableServicesPassiveChecksResponse& res) {
+int centreonscheduler__setServicesPassiveChecksEnabled(soap* s,
+                                                       bool enable,
+                                                       centreonscheduler__setServicesPassiveChecksEnabledResponse& res) {
 }

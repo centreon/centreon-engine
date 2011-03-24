@@ -12,7 +12,7 @@
              xmlns="http://schemas.xmlsoap.org/wsdl/">
 
   <types>
-    <schema targetNamespace="urn:centreonscheduler"
+    <schema targetNamespace="http://www.centreon.com/scheduler/commands.wsdl"
             xmlns:SOAP-ENV="http://schemas.xmlsoap.org/soap/envelope/"
             xmlns:SOAP-ENC="http://schemas.xmlsoap.org/soap/encoding/"
             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -22,28 +22,49 @@
             elementFormDefault="unqualified"
             attributeFormDefault="unqualified">
       <import namespace="http://schemas.xmlsoap.org/soap/encoding/"/>
+      <complexType name="acknowledgement">
+        <sequence>
+          <element name="author" type="xsd:string"/>
+          <element name="comment" type="xsd:string"/>
+          <element name="notify" type="xsd:boolean"/>
+          <element name="persistent" type="xsd:boolean"/>
+          <element name="sticky" type="xsd:boolean"/>
+        </sequence>
+      </complexType>
+      <complexType name="downtime">
+        <sequence>
+          <element name="starttime" type="xsd:dateTime"/>
+          <element name="endtime" type="xsd:dateTime"/>
+          <element name="fixed" type="xsd:boolean"/>
+          <element name="triggerid" type="xsd:long"/>
+          <element name="duration" type="xsd:dateTime"/>
+          <element name="author" type="xsd:string"/>
+          <element name="comment" type="xsd:string"/>
+        </sequence>
+      </complexType>
+      <complexType name="notification">
+        <sequence>
+          <element name="author" type="xsd:string"/>
+          <element name="broadcast" type="xsd:boolean"/>
+          <element name="comment" type="xsd:string"/>
+          <element name="forced" type="xsd:string"/>
+          <element name="increment" type="xsd:string"/>
+        </sequence>
+      </complexType>
     </schema>
   </types>
 
   <!-- Message to acknowledge a host problem. -->
   <message name="acknowledgeHostProblemRequest">
     <part name="host" type="xsd:string"/>
-    <part name="author" type="xsd:string"/>
-    <part name="comment" type="xsd:string"/>
-    <part name="sticky" type="xsd:boolean"/>
-    <part name="notify" type="xsd:boolean"/>
-    <part name="persistent" type="xsd:boolean"/>
+    <part name="ack_data" type="tns:acknowledgement"/>
   </message>
 
   <!-- Message to acknowledge a service problem. -->
   <message name="acknowledgeServiceProblemRequest">
     <part name="host" type="xsd:string"/>
     <part name="service" type="xsd:string"/>
-    <part name="author" type="xsd:string"/>
-    <part name="comment" type="xsd:string"/>
-    <part name="sticky" type="xsd:boolean"/>
-    <part name="notify" type="xsd:boolean"/>
-    <part name="persistent" type="xsd:boolean"/>
+    <part name="ack_data" type="tns:acknowledgement"/>
   </message>
 
   <!-- Message sent when executing an operation on a contactgroup. -->
@@ -63,6 +84,12 @@
   <message name="hostgroupEnableRequest">
     <part name="hostgroup" type="xsd:string"/>
     <part name="enable" type="xsd:boolean"/>
+  </message>
+
+  <!-- Message sent when sending a host notification. -->
+  <message name="hostNotificationRequest">
+    <part name="host" type="xsd:string"/>
+    <part name="notif_data" type="tns:notification"/>
   </message>
 
   <!-- Message sent when executing an operation on a host. -->
@@ -120,10 +147,30 @@
     <part name="output" type="xsd:string"/>
   </message>
 
+  <!-- Message sent when scheduling a downtime (except for service target). -->
+  <message name="scheduleDowntimeRequest">
+    <part name="target" type="xsd:string"/>
+    <part name="downtime_data" type="tns:downtime"/>
+  </message>
+
+  <!-- Message sent when scheduling a downtime on a service. -->
+  <message name="scheduleServiceDowntimeRequest">
+    <part name="host" type="xsd:string"/>
+    <part name="service" type="xsd:string"/>
+    <part name="downtime_data" type="xsd:downtime"/>
+  </message>
+
   <!-- Message sent when setting a feature of a service group. -->
   <message name="servicegroupEnableRequest">
     <part name="servicegroup" type="xsd:string"/>
     <part name="enable" type="xsd:boolean"/>
+  </message>
+
+  <!-- Message sent when sending a service notification. -->
+  <message name="serviceNotificationRequest">
+    <part name="host" type="xsd:string"/>
+    <part name="service" type="xsd:string"/>
+    <part name="notif_data" type="tns:notification"/>
   </message>
 
   <!-- Message sent when executing an operation on a service. -->
@@ -186,12 +233,6 @@
     <part name="eventhandler" type="xsd:string"/>
   </message>
 
-  <!-- Message sent to change the max check attempt of a host. -->
-  <message name="setHostMaxCheckAttemptsRequest">
-    <part name="host" type="xsd:string"/>
-    <part name="maxattempts" type="xsd:positiveInteger"/>
-  </message>
-
   <!-- Message sent when changing the modified attributes value of a host. -->
   <message name="setHostModattrRequest">
     <part name="host" type="xsd:string"/>
@@ -202,6 +243,12 @@
   <message name="setHostTimeperiodRequest">
     <part name="host" type="xsd:string"/>
     <part name="timeperiod" type="xsd:string"/>
+  </message>
+
+  <!-- Message sent to change an unsigned integer value of a host. -->
+  <message name="setHostUnsignedIntegerRequest">
+    <part name="host" type="xsd:string"/>
+    <part name="value" type="xsd:positiveInteger"/>
   </message>
 
   <!-- Message sent when changing a service check command. -->
@@ -233,13 +280,6 @@
     <part name="eventhandler" type="xsd:string"/>
   </message>
 
-  <!-- Message sent when changing the max check attempts value of a service. -->
-  <message name="setServiceMaxCheckAttemptsRequest">
-    <part name="host" type="xsd:string"/>
-    <part name="service" type="xsd:string"/>
-    <part name="maxattempts" type="xsd:positiveInteger"/>
-  </message>
-
   <!-- Message sent when changing the modified attributes value of a service. -->
   <message name="setServiceModattrRequest">
     <part name="host" type="xsd:string"/>
@@ -254,43 +294,29 @@
     <part name="timeperiod" type="xsd:string"/>
   </message>
 
+  <!-- Message sent when changing an unsigned integer value of a service. -->
+  <message name="setServiceUnsignedIntegerRequest">
+    <part name="host" type="xsd:string"/>
+    <part name="service" type="xsd:string"/>
+    <part name="value" type="xsd:positiveInteger"/>
+  </message>
+
   <!-- Standard response of operations. -->
   <message name="standardResponse">
     <part name="errorCode" type="xsd:int"/>
     <part name="errorString" type="xsd:string"/>
   </message>
 
-
-
-  <message name="comment">
-    <part name="id" type="xsd:positiveInteger"/>
-  </message>
-
-  <message name="host">
-    <part name="host" type="xsd:string"/>
-  </message>
-
-  <message name="hostWhen">
-    <part name="host" type="xsd:string"/>
-    <part name="when" type="xsd:dateTime"/>
-  </message>
-
-  <message name="serviceWhen">
-    <part name="host" type="xsd:string"/>
-    <part name="service" type="xsd:string"/>
-    <part name="when" type="xsd:dateTime"/>
-  </message>
-
   <portType name="commandPortType">
 
-    <!-- acknowledgeHostProblem(string host, string author, string comment, bool sticky, bool notify, bool persistent) -->
+    <!-- acknowledgeHostProblem(string host, acknowledgement ack_data) -->
     <operation name="acknowledgeHostProblem">
       <documentation>Acknowledge a problem on a host.</documentation>
       <input message="tns:acknowledgeHostProblemRequest"/>
       <output message="tns:standardResponse"/>
     </operation>
 
-    <!-- acknowledgeServiceProblem(string host, string service, string author, string comment, bool sticky, bool notify, bool persistent) -->
+    <!-- acknowledgeServiceProblem(string host, string service, acknowledgement ack_data) -->
     <operation name="acknowledgeServiceProblem">
       <documentation>Acknowledge a problem on a service.</documentation>
       <input message="tns:acknowledgeServiceProblemRequest"/>
@@ -409,10 +435,31 @@
       <output message="tns:standardResponse"/>
     </operation>
 
+    <!-- scheduleAndPropagateHostDowntime(string host, downtime downtime_data) -->
+    <operation name="scheduleAndPropagateHostDowntime">
+      <documentation>Schedule downtime for a host and all of its children.</documentation>
+      <input message="tns:scheduleDowntimeRequest"/>
+      <output message="tns:standardResponse"/>
+    </operation>
+
+    <!-- scheduleAndPropagateHostTriggeredDowntime(string host, downtime downtime_data) -->
+    <operation name="scheduleAndPropagateHostTriggeredDowntime">
+      <documentation>Schedule downtime for a host and all of its children.</documentation>
+      <input message="tns:emptyRequest"/>
+      <output message="tns:standardResponse"/>
+    </operation>
+
     <!-- scheduleHostCheck(string host, time_t when) -->
     <operation name="scheduleHostCheck">
       <documentation>Schedule a host check.</documentation>
       <input message="tns:hostTimeRequest"/>
+      <output message="tns:standardResponse"/>
+    </operation>
+
+    <!-- scheduleHostDowntime(string host, downtime downtime_data) -->
+    <operation name="scheduleHostDowntime">
+      <documentation>Schedule a downtime on a host.</documentation>
+      <input message="tns:scheduleDowntimeRequest"/>
       <output message="tns:standardResponse"/>
     </operation>
 
@@ -423,10 +470,31 @@
       <output message="tns:standardResponse"/>
     </operation>
 
+    <!-- scheduleHostgroupHostDowntime(string hostgroup, downtime downtime_data) -->
+    <operation name="scheduleHostgroupHostDowntime">
+      <documentation>Schedule a downtime on all hosts of a host group.</documentation>
+      <input message="tns:scheduleDowntimeRequest"/>
+      <output message="tns:standardResponse"/>
+    </operation>
+
+    <!-- scheduleHostgroupServiceDowntime(string hostgroup, downtime downtime_data) -->
+    <operation name="scheduleHostgroupServiceDowntime">
+      <documentation>Schedule a downtime on all services of the hosts of the host group.</documentation>
+      <input message="tns:scheduleDowntimeRequest"/>
+      <output message="tns:standardResponse"/>
+    </operation>
+
     <!-- scheduleHostServiceChecks(string host, time_t when) -->
     <operation name="scheduleHostServiceChecks">
       <documentation>Schedule a check of all services associated with the host.</documentation>
       <input message="tns:hostTimeRequest"/>
+      <output message="tns:standardResponse"/>
+    </operation>
+
+    <!-- scheduleHostServiceDowntime(string host, downtime downtime_data) -->
+    <operation name="scheduleHostServiceDowntime">
+      <documentation>Schedule a downtime on all services of a host.</documentation>
+      <input message="tns:scheduleDowntimeRequest"/>
       <output message="tns:standardResponse"/>
     </operation>
 
@@ -444,10 +512,45 @@
       <output message="tns:standardResponse"/>
     </operation>
 
+    <!-- scheduleServiceDowntime(string host, string service, downtime downtime_data) -->
+    <operation name="scheduleServiceDowntime">
+      <documentation>Schedule a downtime on a service.</documentation>
+      <input message="tns:scheduleServiceDowntimeRequest"/>
+      <output message="tns:standardResponse"/>
+    </operation>
+
     <!-- scheduleServiceForcedCheck(string host, string service, time_t when) -->
     <operation name="scheduleServiceForcedCheck">
       <documentation>Schedule a forced service check.</documentation>
       <input message="tns:serviceTimeRequest"/>
+      <output message="tns:standardResponse"/>
+    </operation>
+
+    <!-- scheduleServicegroupHostDowntime(string servicegroup, downtime downtime_data) -->
+    <operation name="scheduleServicegroupHostDowntime">
+      <documentation>Schedule a downtime on all hosts related to services members of the service group.</documentation>
+      <input message="tns:scheduleDowntimeRequest"/>
+      <output message="tns:standardResponse"/>
+    </operation>
+
+    <!-- scheduleServicegroupServiceDowntime(string servicegroup, downtime downtime_data) -->
+    <operation name="scheduleServicegroupServiceDowntime">
+      <documentation>Schedule a downtime on all services of the service group.</documentation>
+      <input message="tns:scheduleDowntimeRequest"/>
+      <output message="tns:standardResponse"/>
+    </operation>
+
+    <!-- sendHostCustomNotification(string host, notification notif_data) -->
+    <operation name="sendHostCustomNotification">
+      <documentation>Send a notification on a host.</documentation>
+      <input message="tns:hostNotificationRequest"/>
+      <output message="tns:standardResponse"/>
+    </operation>
+
+    <!-- sendServiceCustomNotification(string host, string service, notification notif_data) -->
+    <operation name="sendServiceCustomNotification">
+      <documentation>Send a notification on a service.</documentation>
+      <input message="tns:serviceNotificationRequest"/>
       <output message="tns:standardResponse"/>
     </operation>
 
@@ -650,7 +753,7 @@
     <!-- setHostMaxCheckAttempts(string host, unsigned int maxattempts) -->
     <operation name="setHostMaxCheckAttempts">
       <documentation>Change the max check attempt value of a host.</documentation>
-      <input message="tns:setHostMaxCheckAttemptsRequest"/>
+      <input message="tns:setHostUnsignedIntegerRequest"/>
       <output message="tns:standardResponse"/>
     </operation>
 
@@ -665,6 +768,13 @@
     <operation name="setHostNormalCheckInterval">
       <documentation>Change the normal check interval of a host.</documentation>
       <input message="tns:hostTimeRequest"/>
+      <output message="tns:standardResponse"/>
+    </operation>
+
+    <!-- setHostNotificationNumber(string host, unsigned int notificationnumber) -->
+    <operation name="setHostNotificationNumber">
+      <documentation>Set the notification number of a host.</documentation>
+      <input message="tns:setHostUnsignedIntegerRequest"/>
       <output message="tns:standardResponse"/>
     </operation>
 
@@ -867,7 +977,7 @@
     <!-- setServiceMaxCheckAttempts(string host, string service, unsigned int maxattempts) -->
     <operation name="setServiceMaxCheckAttempts">
       <documentation>Set the maximum attempts of a service check.</documentation>
-      <input message="tns:setServiceMaxCheckAttemptsRequest"/>
+      <input message="tns:setServiceUnsignedIntegerRequest"/>
       <output message="tns:standardResponse"/>
     </operation>
 
@@ -882,6 +992,13 @@
     <operation name="setServiceNormalCheckInterval">
       <documentation>Change the normal check interval of a service.</documentation>
       <input message="tns:serviceTimeRequest"/>
+      <output message="tns:standardResponse"/>
+    </operation>
+
+    <!-- setServiceNotificationNumber(string host, string service, unsigned int notificationnumber) -->
+    <operation name="setServiceNotificationNumber">
+      <documentation>Set the notification number of a service.</documentation>
+      <input message="tns:setServiceUnsignedIntegerRequest"/>
       <output message="tns:standardResponse"/>
     </operation>
 
@@ -951,102 +1068,6 @@
     <!-- shutdown() -->
     <operation name="shutdown">
       <documentation>Shutdown Scheduler.</documentation>
-      <input message="tns:emptyRequest"/>
-      <output message="tns:standardResponse"/>
-    </operation>
-
-
-
-
-
-
-    <!-- scheduleAndPropagateHostDowntime(XXX) -->
-    <operation name="scheduleAndPropagateHostDowntime">
-      <documentation>XXX</documentation>
-      <input message="tns:emptyRequest"/>
-      <output message="tns:standardResponse"/>
-    </operation>
-
-    <!-- scheduleAndPropagateTriggeredHostDowntime(XXX) -->
-    <operation name="scheduleAndPropagateTriggeredHostDowntime">
-      <documentation>XXX</documentation>
-      <input message="tns:emptyRequest"/>
-      <output message="tns:standardResponse"/>
-    </operation>
-
-    <!-- scheduleHostDowntime(XXX) -->
-    <operation name="scheduleHostDowntime">
-      <documentation>XXX</documentation>
-      <input message="tns:emptyRequest"/>
-      <output message="tns:standardResponse"/>
-    </operation>
-
-    <!-- scheduleHostgroupHostDowntime(XXX) -->
-    <operation name="scheduleHostgroupHostDowntime">
-      <documentation>XXX</documentation>
-      <input message="tns:emptyRequest"/>
-      <output message="tns:standardResponse"/>
-    </operation>
-
-    <!-- scheduleHostgroupServiceDowntime(XXX) -->
-    <operation name="scheduleHostgroupServiceDowntime">
-      <documentation>XXX</documentation>
-      <input message="tns:emptyRequest"/>
-      <output message="tns:standardResponse"/>
-    </operation>
-
-    <!-- scheduleHostServiceDowntime(XXX) -->
-    <operation name="scheduleHostServiceDowntime">
-      <documentation>XXX</documentation>
-      <input message="tns:emptyRequest"/>
-      <output message="tns:standardResponse"/>
-    </operation>
-
-    <!-- scheduleServiceDowntime(XXX) -->
-    <operation name="scheduleServiceDowntime">
-      <documentation>XXX</documentation>
-      <input message="tns:emptyRequest"/>
-      <output message="tns:standardResponse"/>
-    </operation>
-
-    <!-- scheduleServicegroupHostDowntime(XXX) -->
-    <operation name="scheduleServicegroupHostDowntime">
-      <documentation>XXX</documentation>
-      <input message="tns:emptyRequest"/>
-      <output message="tns:standardResponse"/>
-    </operation>
-
-    <!-- scheduleServicegroupServiceDowntime(XXX) -->
-    <operation name="scheduleServicegroupServiceDowntime">
-      <documentation>XXX</documentation>
-      <input message="tns:emptyRequest"/>
-      <output message="tns:standardResponse"/>
-    </operation>
-
-    <!-- sendHostCustomNotification(XXX) -->
-    <operation name="sendHostCustomNotification">
-      <documentation>XXX</documentation>
-      <input message="tns:emptyRequest"/>
-      <output message="tns:standardResponse"/>
-    </operation>
-
-    <!-- sendServiceCustomNotification(XXX) -->
-    <operation name="sendServiceCustomNotification">
-      <documentation>XXX</documentation>
-      <input message="tns:emptyRequest"/>
-      <output message="tns:standardResponse"/>
-    </operation>
-
-    <!-- setHostNotificationNumber(XXX) -->
-    <operation name="setHostNotificationNumber">
-      <documentation>XXX</documentation>
-      <input message="tns:emptyRequest"/>
-      <output message="tns:standardResponse"/>
-    </operation>
-
-    <!-- setServiceNotificationNumber(XXX) -->
-    <operation name="setServiceNotificationNumber">
-      <documentation>XXX</documentation>
       <input message="tns:emptyRequest"/>
       <output message="tns:standardResponse"/>
     </operation>
@@ -1146,6 +1167,18 @@
       <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
     </operation>
 
+    <operation name="scheduleAndPropagateHostDowntime">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="scheduleAndPropagateHostTriggeredDowntime">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
     <operation name="scheduleHostCheck">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
@@ -1158,7 +1191,25 @@
       <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
     </operation>
 
+    <operation name="scheduleHostgroupHostDowntime">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="scheduleHostgroupServiceDowntime">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
     <operation name="scheduleHostServiceChecks">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="scheduleHostServiceDowntime">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
       <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
@@ -1176,7 +1227,37 @@
       <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
     </operation>
 
+    <operation name="scheduleServiceDowntime">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
     <operation name="scheduleServiceForcedCheck">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="scheduleServicegroupHostDowntime">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="scheduleServicegroupServiceDowntime">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="sendHostCustomNotification">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="sendServiceCustomNotification">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
       <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
@@ -1368,6 +1449,12 @@
       <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
     </operation>
 
+    <operation name="setHostNotificationNumber">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
     <operation name="setHostNotificationsEnabled">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
@@ -1543,6 +1630,12 @@
     </operation>
 
     <operation name="setServiceNormalCheckInterval">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="setServiceNotificationNumber">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
       <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
