@@ -22,7 +22,7 @@
             elementFormDefault="unqualified"
             attributeFormDefault="unqualified">
       <import namespace="http://schemas.xmlsoap.org/soap/encoding/"/>
-      <complexType name="acknowledgement">
+      <complexType name="acknowledgementType">
         <sequence>
           <element name="author" type="xsd:string"/>
           <element name="comment" type="xsd:string"/>
@@ -31,7 +31,7 @@
           <element name="sticky" type="xsd:boolean"/>
         </sequence>
       </complexType>
-      <complexType name="downtime">
+      <complexType name="downtimeType">
         <sequence>
           <element name="starttime" type="xsd:dateTime"/>
           <element name="endtime" type="xsd:dateTime"/>
@@ -42,7 +42,7 @@
           <element name="comment" type="xsd:string"/>
         </sequence>
       </complexType>
-      <complexType name="notification">
+      <complexType name="notificationType">
         <sequence>
           <element name="author" type="xsd:string"/>
           <element name="broadcast" type="xsd:boolean"/>
@@ -57,14 +57,14 @@
   <!-- Message to acknowledge a host problem. -->
   <message name="acknowledgeHostProblemRequest">
     <part name="host" type="xsd:string"/>
-    <part name="ack_data" type="tns:acknowledgement"/>
+    <part name="acknowledgement" type="tns:acknowledgementType"/>
   </message>
 
   <!-- Message to acknowledge a service problem. -->
   <message name="acknowledgeServiceProblemRequest">
     <part name="host" type="xsd:string"/>
     <part name="service" type="xsd:string"/>
-    <part name="ack_data" type="tns:acknowledgement"/>
+    <part name="acknowledgement" type="tns:acknowledgementType"/>
   </message>
 
   <!-- Message sent when executing an operation on a contactgroup. -->
@@ -89,7 +89,7 @@
   <!-- Message sent when sending a host notification. -->
   <message name="hostNotificationRequest">
     <part name="host" type="xsd:string"/>
-    <part name="notif_data" type="tns:notification"/>
+    <part name="notification" type="tns:notificationType"/>
   </message>
 
   <!-- Message sent when executing an operation on a host. -->
@@ -150,14 +150,14 @@
   <!-- Message sent when scheduling a downtime (except for service target). -->
   <message name="scheduleDowntimeRequest">
     <part name="target" type="xsd:string"/>
-    <part name="downtime_data" type="tns:downtime"/>
+    <part name="downtime" type="tns:downtimeType"/>
   </message>
 
   <!-- Message sent when scheduling a downtime on a service. -->
   <message name="scheduleServiceDowntimeRequest">
     <part name="host" type="xsd:string"/>
     <part name="service" type="xsd:string"/>
-    <part name="downtime_data" type="xsd:downtime"/>
+    <part name="downtime" type="xsd:downtimeType"/>
   </message>
 
   <!-- Message sent when setting a feature of a service group. -->
@@ -170,7 +170,7 @@
   <message name="serviceNotificationRequest">
     <part name="host" type="xsd:string"/>
     <part name="service" type="xsd:string"/>
-    <part name="notif_data" type="tns:notification"/>
+    <part name="notification" type="tns:notificationType"/>
   </message>
 
   <!-- Message sent when executing an operation on a service. -->
@@ -309,14 +309,14 @@
 
   <portType name="commandPortType">
 
-    <!-- acknowledgeHostProblem(string host, acknowledgement ack_data) -->
+    <!-- acknowledgeHostProblem(string host, acknowledgementType acknowledgement) -->
     <operation name="acknowledgeHostProblem">
       <documentation>Acknowledge a problem on a host.</documentation>
       <input message="tns:acknowledgeHostProblemRequest"/>
       <output message="tns:standardResponse"/>
     </operation>
 
-    <!-- acknowledgeServiceProblem(string host, string service, acknowledgement ack_data) -->
+    <!-- acknowledgeServiceProblem(string host, string service, acknowledgementType acknowledgement) -->
     <operation name="acknowledgeServiceProblem">
       <documentation>Acknowledge a problem on a service.</documentation>
       <input message="tns:acknowledgeServiceProblemRequest"/>
@@ -435,17 +435,17 @@
       <output message="tns:standardResponse"/>
     </operation>
 
-    <!-- scheduleAndPropagateHostDowntime(string host, downtime downtime_data) -->
+    <!-- scheduleAndPropagateHostDowntime(string host, downtimeType downtime) -->
     <operation name="scheduleAndPropagateHostDowntime">
       <documentation>Schedule downtime for a host and all of its children.</documentation>
       <input message="tns:scheduleDowntimeRequest"/>
       <output message="tns:standardResponse"/>
     </operation>
 
-    <!-- scheduleAndPropagateHostTriggeredDowntime(string host, downtime downtime_data) -->
+    <!-- scheduleAndPropagateHostTriggeredDowntime(string host, downtimeType downtime) -->
     <operation name="scheduleAndPropagateHostTriggeredDowntime">
       <documentation>Schedule downtime for a host and all of its children.</documentation>
-      <input message="tns:emptyRequest"/>
+      <input message="tns:scheduleDowntimeRequest"/>
       <output message="tns:standardResponse"/>
     </operation>
 
@@ -456,7 +456,7 @@
       <output message="tns:standardResponse"/>
     </operation>
 
-    <!-- scheduleHostDowntime(string host, downtime downtime_data) -->
+    <!-- scheduleHostDowntime(string host, downtimeType downtime) -->
     <operation name="scheduleHostDowntime">
       <documentation>Schedule a downtime on a host.</documentation>
       <input message="tns:scheduleDowntimeRequest"/>
@@ -470,14 +470,14 @@
       <output message="tns:standardResponse"/>
     </operation>
 
-    <!-- scheduleHostgroupHostDowntime(string hostgroup, downtime downtime_data) -->
+    <!-- scheduleHostgroupHostDowntime(string hostgroup, downtimeType downtime) -->
     <operation name="scheduleHostgroupHostDowntime">
       <documentation>Schedule a downtime on all hosts of a host group.</documentation>
       <input message="tns:scheduleDowntimeRequest"/>
       <output message="tns:standardResponse"/>
     </operation>
 
-    <!-- scheduleHostgroupServiceDowntime(string hostgroup, downtime downtime_data) -->
+    <!-- scheduleHostgroupServiceDowntime(string hostgroup, downtimeType downtime) -->
     <operation name="scheduleHostgroupServiceDowntime">
       <documentation>Schedule a downtime on all services of the hosts of the host group.</documentation>
       <input message="tns:scheduleDowntimeRequest"/>
@@ -491,7 +491,7 @@
       <output message="tns:standardResponse"/>
     </operation>
 
-    <!-- scheduleHostServiceDowntime(string host, downtime downtime_data) -->
+    <!-- scheduleHostServiceDowntime(string host, downtimeType downtime) -->
     <operation name="scheduleHostServiceDowntime">
       <documentation>Schedule a downtime on all services of a host.</documentation>
       <input message="tns:scheduleDowntimeRequest"/>
@@ -512,7 +512,7 @@
       <output message="tns:standardResponse"/>
     </operation>
 
-    <!-- scheduleServiceDowntime(string host, string service, downtime downtime_data) -->
+    <!-- scheduleServiceDowntime(string host, string service, downtimeType downtime) -->
     <operation name="scheduleServiceDowntime">
       <documentation>Schedule a downtime on a service.</documentation>
       <input message="tns:scheduleServiceDowntimeRequest"/>
@@ -526,28 +526,28 @@
       <output message="tns:standardResponse"/>
     </operation>
 
-    <!-- scheduleServicegroupHostDowntime(string servicegroup, downtime downtime_data) -->
+    <!-- scheduleServicegroupHostDowntime(string servicegroup, downtimeType downtime) -->
     <operation name="scheduleServicegroupHostDowntime">
       <documentation>Schedule a downtime on all hosts related to services members of the service group.</documentation>
       <input message="tns:scheduleDowntimeRequest"/>
       <output message="tns:standardResponse"/>
     </operation>
 
-    <!-- scheduleServicegroupServiceDowntime(string servicegroup, downtime downtime_data) -->
+    <!-- scheduleServicegroupServiceDowntime(string servicegroup, downtimeType downtime) -->
     <operation name="scheduleServicegroupServiceDowntime">
       <documentation>Schedule a downtime on all services of the service group.</documentation>
       <input message="tns:scheduleDowntimeRequest"/>
       <output message="tns:standardResponse"/>
     </operation>
 
-    <!-- sendHostCustomNotification(string host, notification notif_data) -->
+    <!-- sendHostCustomNotification(string host, notificationType notification) -->
     <operation name="sendHostCustomNotification">
       <documentation>Send a notification on a host.</documentation>
       <input message="tns:hostNotificationRequest"/>
       <output message="tns:standardResponse"/>
     </operation>
 
-    <!-- sendServiceCustomNotification(string host, string service, notification notif_data) -->
+    <!-- sendServiceCustomNotification(string host, string service, notificationType notification) -->
     <operation name="sendServiceCustomNotification">
       <documentation>Send a notification on a service.</documentation>
       <input message="tns:serviceNotificationRequest"/>
