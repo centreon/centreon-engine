@@ -18,6 +18,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "configuration.hh"
+
 #include "config.hh"
 #include "common.hh"
 #include "downtime.hh"
@@ -27,6 +29,7 @@
 #include "broker.hh"
 #include "sretention.hh"
 
+extern com::centreon::scheduler::configuration config;
 
 extern char	*config_file;
 
@@ -39,47 +42,7 @@ extern time_t   last_command_check;
 extern int      sigshutdown;
 extern int      sigrestart;
 
-extern double   sleep_time;
-extern int      interval_length;
-extern int      service_inter_check_delay_method;
-extern int      host_inter_check_delay_method;
-extern int      service_interleave_factor_method;
-extern int      max_host_check_spread;
-extern int      max_service_check_spread;
-
-extern int      command_check_interval;
-extern int      check_reaper_interval;
-extern int      service_freshness_check_interval;
-extern int      host_freshness_check_interval;
-extern int      auto_rescheduling_interval;
-extern int      auto_rescheduling_window;
-
-extern int      check_external_commands;
-extern int      check_orphaned_services;
-extern int      check_orphaned_hosts;
-extern int      check_service_freshness;
-extern int      check_host_freshness;
-extern int      auto_reschedule_checks;
-
-extern int      retain_state_information;
-extern int      retention_update_interval;
-
-extern int      max_parallel_service_checks;
 extern int      currently_running_service_checks;
-
-extern int      aggregate_status_updates;
-extern int      status_update_interval;
-
-extern int      log_rotation_method;
-
-extern int      service_check_timeout;
-
-extern int      execute_service_checks;
-extern int      execute_host_checks;
-
-extern int      child_processes_fork_twice;
-
-extern int      time_change_threshold;
 
 timed_event *event_list_low=NULL;
 timed_event *event_list_low_tail=NULL;
@@ -225,7 +188,7 @@ void init_timing_loop(void){
 	scheduling_info.average_scheduled_services_per_host=(double)((double)scheduling_info.total_scheduled_services/(double)scheduling_info.total_hosts);
 
 	/* adjust the check interval total to correspond to the interval length */
-	scheduling_info.service_check_interval_total=(scheduling_info.service_check_interval_total*interval_length);
+	scheduling_info.service_check_interval_total=(scheduling_info.service_check_interval_total*config.get_interval_length());
 
 	/* calculate the average check interval for services */
 	scheduling_info.average_service_check_interval=(double)((double)scheduling_info.service_check_interval_total/(double)scheduling_info.total_scheduled_services);
@@ -236,10 +199,10 @@ void init_timing_loop(void){
 	log_debug_info(DEBUGL_EVENTS,2,"Determining service scheduling parameters...");
 
 	/* default max service check spread (in minutes) */
-	scheduling_info.max_service_check_spread=max_service_check_spread;
+	scheduling_info.max_service_check_spread=config.get_max_service_check_spread();
 
 	/* how should we determine the service inter-check delay to use? */
-	switch(service_inter_check_delay_method){
+	switch(config.get_service_inter_check_delay_method()){
 
 	case ICD_NONE:
 
@@ -284,7 +247,7 @@ void init_timing_loop(void){
 	        }
 
 	/* how should we determine the service interleave factor? */
-	switch(service_interleave_factor_method){
+	switch(config.get_service_interleave_factor_method()){
 
 	case ILF_USER:
 
@@ -416,10 +379,10 @@ void init_timing_loop(void){
 	scheduling_info.last_host_check=(time_t)0L;
 
 	/* default max host check spread (in minutes) */
-	scheduling_info.max_host_check_spread=max_host_check_spread;
+	scheduling_info.max_host_check_spread=config.get_max_host_check_spread();
 
 	/* how should we determine the host inter-check delay to use? */
-	switch(host_inter_check_delay_method){
+	switch(config.get_host_inter_check_delay_method()){
 
 	case ICD_NONE:
 
@@ -445,7 +408,7 @@ void init_timing_loop(void){
 		if(scheduling_info.total_scheduled_hosts>0 && scheduling_info.host_check_interval_total>0){
 
 			/* adjust the check interval total to correspond to the interval length */
-			scheduling_info.host_check_interval_total=(scheduling_info.host_check_interval_total*interval_length);
+			scheduling_info.host_check_interval_total=(scheduling_info.host_check_interval_total*config.get_interval_length());
 
 			/* calculate the average check interval for hosts */
 			scheduling_info.average_host_check_interval=(double)((double)scheduling_info.host_check_interval_total/(double)scheduling_info.total_scheduled_hosts);
@@ -547,44 +510,43 @@ void init_timing_loop(void){
 	/******** SCHEDULE MISC EVENTS ********/
 
 	/* add a host and service check rescheduling event */
-	if(auto_reschedule_checks==TRUE)
-		schedule_new_event(EVENT_RESCHEDULE_CHECKS,TRUE,current_time+auto_rescheduling_interval,TRUE,auto_rescheduling_interval,NULL,TRUE,NULL,NULL,0);
+	if(config.get_auto_reschedule_checks()==TRUE)
+	  schedule_new_event(EVENT_RESCHEDULE_CHECKS,TRUE,current_time+config.get_auto_rescheduling_interval(),TRUE,config.get_auto_rescheduling_interval(),NULL,TRUE,NULL,NULL,0);
 
 	/* add a check result reaper event */
-	schedule_new_event(EVENT_CHECK_REAPER,TRUE,current_time+check_reaper_interval,TRUE,check_reaper_interval,NULL,TRUE,NULL,NULL,0);
+	schedule_new_event(EVENT_CHECK_REAPER,TRUE,current_time+config.get_check_reaper_interval(),TRUE,config.get_check_reaper_interval(),NULL,TRUE,NULL,NULL,0);
 
 	/* add an orphaned check event */
-	if(check_orphaned_services==TRUE || check_orphaned_hosts==TRUE)
-		schedule_new_event(EVENT_ORPHAN_CHECK,TRUE,current_time+DEFAULT_ORPHAN_CHECK_INTERVAL,TRUE,DEFAULT_ORPHAN_CHECK_INTERVAL,NULL,TRUE,NULL,NULL,0);
+	if(config.get_check_orphaned_services()==TRUE || config.get_check_orphaned_hosts()==TRUE)
+	  schedule_new_event(EVENT_ORPHAN_CHECK,TRUE,current_time+DEFAULT_ORPHAN_CHECK_INTERVAL,TRUE,DEFAULT_ORPHAN_CHECK_INTERVAL,NULL,TRUE,NULL,NULL,0);
 
 	/* add a service result "freshness" check event */
-	if(check_service_freshness==TRUE)
-		schedule_new_event(EVENT_SFRESHNESS_CHECK,TRUE,current_time+service_freshness_check_interval,TRUE,service_freshness_check_interval,NULL,TRUE,NULL,NULL,0);
+	if(config.get_check_service_freshness()==TRUE)
+	  schedule_new_event(EVENT_SFRESHNESS_CHECK,TRUE,current_time+config.get_service_freshness_check_interval(),TRUE,config.get_service_freshness_check_interval(),NULL,TRUE,NULL,NULL,0);
 
 	/* add a host result "freshness" check event */
-	if(check_host_freshness==TRUE)
-		schedule_new_event(EVENT_HFRESHNESS_CHECK,TRUE,current_time+host_freshness_check_interval,TRUE,host_freshness_check_interval,NULL,TRUE,NULL,NULL,0);
+	if(config.get_check_host_freshness()==TRUE)
+	  schedule_new_event(EVENT_HFRESHNESS_CHECK,TRUE,current_time+config.get_host_freshness_check_interval(),TRUE,config.get_host_freshness_check_interval(),NULL,TRUE,NULL,NULL,0);
 
 	/* add a status save event */
-	if(aggregate_status_updates==TRUE)
-		schedule_new_event(EVENT_STATUS_SAVE,TRUE,current_time+status_update_interval,TRUE,status_update_interval,NULL,TRUE,NULL,NULL,0);
+	schedule_new_event(EVENT_STATUS_SAVE,TRUE,current_time+config.get_status_update_interval(),TRUE,config.get_status_update_interval(),NULL,TRUE,NULL,NULL,0);
 
 	/* add an external command check event if needed */
-	if(check_external_commands==TRUE){
-		if(command_check_interval==-1)
+	if(config.get_check_external_commands()==TRUE){
+		if(config.get_command_check_interval()==-1)
 			interval_to_use=(unsigned long)60;
 		else
-			interval_to_use=(unsigned long)command_check_interval;
+			interval_to_use=(unsigned long)config.get_command_check_interval();
 		schedule_new_event(EVENT_COMMAND_CHECK,TRUE,current_time+interval_to_use,TRUE,interval_to_use,NULL,TRUE,NULL,NULL,0);
 	        }
 
 	/* add a log rotation event if necessary */
-	if(log_rotation_method!=LOG_ROTATION_NONE)
+	if(config.get_log_rotation_method()!=LOG_ROTATION_NONE)
 	  schedule_new_event(EVENT_LOG_ROTATION,TRUE,get_next_log_rotation_time(),TRUE,0,(void*)get_next_log_rotation_time,TRUE,NULL,NULL,0);
 
 	/* add a retention data save event if needed */
-	if(retain_state_information==TRUE && retention_update_interval>0)
-		schedule_new_event(EVENT_RETENTION_SAVE,TRUE,current_time+(retention_update_interval*60),TRUE,(retention_update_interval*60),NULL,TRUE,NULL,NULL,0);
+	if(config.get_retain_state_information()==TRUE && config.get_retention_update_interval()>0)
+	  schedule_new_event(EVENT_RETENTION_SAVE,TRUE,current_time+(config.get_retention_update_interval()*60),TRUE,(config.get_retention_update_interval()*60),NULL,TRUE,NULL,NULL,0);
 
 	if(test_scheduling==TRUE){
 
@@ -639,11 +601,11 @@ void display_scheduling_info(void){
 	printf("Total scheduled hosts:           %d\n",scheduling_info.total_scheduled_hosts);
 
 	printf("Host inter-check delay method:   ");
-	if(host_inter_check_delay_method==ICD_NONE)
+	if(config.get_host_inter_check_delay_method()==ICD_NONE)
 		printf("NONE\n");
-	else if(host_inter_check_delay_method==ICD_DUMB)
+	else if(config.get_host_inter_check_delay_method()==ICD_DUMB)
 		printf("DUMB\n");
-	else if(host_inter_check_delay_method==ICD_SMART){
+	else if(config.get_host_inter_check_delay_method()==ICD_SMART){
 		printf("SMART\n");
 		printf("Average host check interval:     %.2f sec\n",scheduling_info.average_host_check_interval);
 	        }
@@ -661,11 +623,11 @@ void display_scheduling_info(void){
 	printf("Total scheduled services:           %d\n",scheduling_info.total_scheduled_services);
 
 	printf("Service inter-check delay method:   ");
-	if(service_inter_check_delay_method==ICD_NONE)
+	if(config.get_service_inter_check_delay_method()==ICD_NONE)
 		printf("NONE\n");
-	else if(service_inter_check_delay_method==ICD_DUMB)
+	else if(config.get_service_inter_check_delay_method()==ICD_DUMB)
 		printf("DUMB\n");
-	else if(service_inter_check_delay_method==ICD_SMART){
+	else if(config.get_service_inter_check_delay_method()==ICD_SMART){
 		printf("SMART\n");
 		printf("Average service check interval:     %.2f sec\n",scheduling_info.average_service_check_interval);
 	        }
@@ -673,8 +635,8 @@ void display_scheduling_info(void){
 		printf("USER-SUPPLIED VALUE\n");
 	printf("Inter-check delay:                  %.2f sec\n",scheduling_info.service_inter_check_delay);
 
-	printf("Interleave factor method:           %s\n",(service_interleave_factor_method==ILF_USER)?"USER-SUPPLIED VALUE":"SMART");
-	if(service_interleave_factor_method==ILF_SMART)
+	printf("Interleave factor method:           %s\n",(config.get_service_interleave_factor_method()==ILF_USER)?"USER-SUPPLIED VALUE":"SMART");
+	if(config.get_service_interleave_factor_method()==ILF_SMART)
 		printf("Average services per host:          %.2f\n",scheduling_info.average_services_per_host);
 	printf("Service interleave factor:          %d\n",scheduling_info.service_interleave_factor);
 
@@ -685,12 +647,12 @@ void display_scheduling_info(void){
 
 	printf("CHECK PROCESSING INFORMATION\n");
 	printf("----------------------------\n");
-	printf("Check result reaper interval:       %d sec\n",check_reaper_interval);
+	printf("Check result reaper interval:       %d sec\n",config.get_check_reaper_interval());
 	printf("Max concurrent service checks:      ");
-	if(max_parallel_service_checks==0)
+	if(config.get_max_parallel_service_checks()==0)
 		printf("Unlimited\n");
 	else
-		printf("%d\n",max_parallel_service_checks);
+		printf("%d\n",config.get_max_parallel_service_checks());
 	printf("\n\n");
 
 	printf("PERFORMANCE SUGGESTIONS\n");
@@ -706,11 +668,11 @@ void display_scheduling_info(void){
 		max_reaper_interval=2.0;
 	if(max_reaper_interval>30.0)
 		max_reaper_interval=30.0;
-	if((int)max_reaper_interval<check_reaper_interval){
+	if((int)max_reaper_interval<config.get_check_reaper_interval()){
 		printf("* Value for 'check_result_reaper_frequency' should be <= %d seconds\n",(int)max_reaper_interval);
 		suggestions++;
 	        }
-	if(check_reaper_interval<2){
+	if(config.get_check_reaper_interval()<2){
 		printf("* Value for 'check_result_reaper_frequency' should be >= 2 seconds\n");
 		suggestions++;
 	        }
@@ -719,12 +681,12 @@ void display_scheduling_info(void){
 
 	/* first method (old) - assume a 100% (2x) service check burst for max concurrent checks */
 	if(scheduling_info.service_inter_check_delay==0.0)
-		minimum_concurrent_checks1=ceil(check_reaper_interval*2.0);
+		minimum_concurrent_checks1=ceil(config.get_check_reaper_interval()*2.0);
 	else
-		minimum_concurrent_checks1=ceil((check_reaper_interval*2.0)/scheduling_info.service_inter_check_delay);
+		minimum_concurrent_checks1=ceil((config.get_check_reaper_interval()*2.0)/scheduling_info.service_inter_check_delay);
 
 	/* second method (new) - assume a 25% (1.25x) service check burst for max concurrent checks */
-	minimum_concurrent_checks2=ceil((((double)scheduling_info.total_scheduled_services)/scheduling_info.average_service_check_interval) * 1.25 * check_reaper_interval * scheduling_info.average_service_execution_time);
+	minimum_concurrent_checks2=ceil((((double)scheduling_info.total_scheduled_services)/scheduling_info.average_service_check_interval) * 1.25 * config.get_check_reaper_interval() * scheduling_info.average_service_execution_time);
 
 	/* use max of computed values */
 	if(minimum_concurrent_checks1>minimum_concurrent_checks2)
@@ -733,7 +695,7 @@ void display_scheduling_info(void){
 		minimum_concurrent_checks=minimum_concurrent_checks2;
 
 	/* compare with configured value */
-	if(((int)minimum_concurrent_checks > max_parallel_service_checks) && max_parallel_service_checks!=0){
+	if(((int)minimum_concurrent_checks > config.get_max_parallel_service_checks()) && config.get_max_parallel_service_checks()!=0){
 		printf("* Value for 'max_concurrent_checks' option should be >= %d\n",(int)minimum_concurrent_checks);
 		suggestions++;
 	        }
@@ -973,7 +935,7 @@ int event_execution_loop(void){
 			compensate_for_system_time_change((unsigned long)last_time,(unsigned long)current_time);
 
 		/* else if the time advanced over the specified threshold, try and compensate... */
-		else if((current_time-last_time)>=time_change_threshold)
+		else if((current_time-last_time)>=config.get_time_change_threshold())
 			compensate_for_system_time_change((unsigned long)last_time,(unsigned long)current_time);
 
 		/* keep track of the last time */
@@ -988,10 +950,10 @@ int event_execution_loop(void){
 			log_debug_info(DEBUGL_EVENTS,1,"Next Low Priority Event Time:  %s",ctime(&event_list_low->run_time));
 		else
 			log_debug_info(DEBUGL_EVENTS,1,"No low priority events are scheduled...\n");
-		log_debug_info(DEBUGL_EVENTS,1,"Current/Max Service Checks: %d/%d\n",currently_running_service_checks,max_parallel_service_checks);
+		log_debug_info(DEBUGL_EVENTS,1,"Current/Max Service Checks: %d/%d\n",currently_running_service_checks,config.get_max_parallel_service_checks());
 
 		/* get rid of terminated child processes (zombies) */
-		if(child_processes_fork_twice==FALSE){
+		if(config.get_child_processes_fork_twice()==FALSE){
 			while((wait_result=waitpid(-1,NULL,WNOHANG))>0);
 			}
 
@@ -1028,18 +990,18 @@ int event_execution_loop(void){
 				temp_service=(service *)event_list_low->event_data;
 
 				/* don't run a service check if we're already maxed out on the number of parallel service checks...  */
-				if(max_parallel_service_checks!=0 && (currently_running_service_checks >= max_parallel_service_checks)){
+				if(config.get_max_parallel_service_checks()!=0 && (currently_running_service_checks >= config.get_max_parallel_service_checks())){
 
 					/* Move it at least 5 seconds (to overcome the current peak), with a random 10 seconds (to spread the load) */
 					nudge_seconds=5+(rand() % 10);
-					log_debug_info(DEBUGL_EVENTS|DEBUGL_CHECKS,0,"**WARNING** Max concurrent service checks (%d) has been reached!  Nudging %s:%s by %d seconds...\n",max_parallel_service_checks, temp_service->host_name, temp_service->description, nudge_seconds);
+					log_debug_info(DEBUGL_EVENTS|DEBUGL_CHECKS,0,"**WARNING** Max concurrent service checks (%d) has been reached!  Nudging %s:%s by %d seconds...\n",config.get_max_parallel_service_checks(), temp_service->host_name, temp_service->description, nudge_seconds);
 
-					logit(NSLOG_RUNTIME_WARNING,TRUE,"\tMax concurrent service checks (%d) has been reached.  Nudging %s:%s by %d seconds...\n",max_parallel_service_checks, temp_service->host_name, temp_service->description, nudge_seconds);
+					logit(NSLOG_RUNTIME_WARNING,TRUE,"\tMax concurrent service checks (%d) has been reached.  Nudging %s:%s by %d seconds...\n",config.get_max_parallel_service_checks(), temp_service->host_name, temp_service->description, nudge_seconds);
 					run_event=FALSE;
 					}
 
 				/* don't run a service check if active checks are disabled */
-				if(execute_service_checks==FALSE){
+				if(config.get_execute_service_checks()==FALSE){
 
 					log_debug_info(DEBUGL_EVENTS|DEBUGL_CHECKS,1,"We're not executing service checks right now, so we'll skip this event.\n");
 
@@ -1067,9 +1029,9 @@ int event_execution_loop(void){
 					else {
 						/* Otherwise reschedule (TODO: This should be smarter as it doesn't consider its timeperiod) */
 						if(temp_service->state_type==SOFT_STATE && temp_service->current_state!=STATE_OK)
-							temp_service->next_check=(time_t)(temp_service->next_check+(temp_service->retry_interval*interval_length));
+							temp_service->next_check=(time_t)(temp_service->next_check+(temp_service->retry_interval*config.get_interval_length()));
 						else
-							temp_service->next_check=(time_t)(temp_service->next_check+(temp_service->check_interval*interval_length));
+							temp_service->next_check=(time_t)(temp_service->next_check+(temp_service->check_interval*config.get_interval_length()));
 						}
 
 					temp_event->run_time=temp_service->next_check;
@@ -1089,7 +1051,7 @@ int event_execution_loop(void){
 				temp_host=(host *)event_list_low->event_data;
 
 				/* don't run a host check if active checks are disabled */
-				if(execute_host_checks==FALSE){
+				if(config.get_execute_host_checks()==FALSE){
 
 					log_debug_info(DEBUGL_EVENTS|DEBUGL_CHECKS,1,"We're not executing host checks right now, so we'll skip this event.\n");
 
@@ -1111,9 +1073,9 @@ int event_execution_loop(void){
 					event_list_low=event_list_low->next;
 					*/
 					if(temp_host->state_type==SOFT_STATE && temp_host->current_state!=STATE_OK)
-						temp_host->next_check=(time_t)(temp_host->next_check+(temp_host->retry_interval*interval_length));
+						temp_host->next_check=(time_t)(temp_host->next_check+(temp_host->retry_interval*config.get_interval_length()));
 					else
-						temp_host->next_check=(time_t)(temp_host->next_check+(temp_host->check_interval*interval_length));
+						temp_host->next_check=(time_t)(temp_host->next_check+(temp_host->check_interval*config.get_interval_length()));
 
 					temp_event->run_time=temp_host->next_check;
 					reschedule_event(temp_event,&event_list_low,&event_list_low_tail);
@@ -1153,11 +1115,11 @@ int event_execution_loop(void){
 				log_debug_info(DEBUGL_EVENTS,2,"Did not execute scheduled event.  Idling for a bit...\n");
 
 #ifdef USE_NANOSLEEP
-				delay.tv_sec=(time_t)sleep_time;
-				delay.tv_nsec=(long)((sleep_time-(double)delay.tv_sec)*1000000000);
+				delay.tv_sec=(time_t)config.get_sleep_time();
+				delay.tv_nsec=(long)((config.get_sleep_time()-(double)delay.tv_sec)*1000000000);
 				nanosleep(&delay,NULL);
 #else
-				delay.tv_sec=(time_t)sleep_time;
+				delay.tv_sec=(time_t)config.get_sleep_time();
 				if(delay.tv_sec==0L)
 					delay.tv_sec=1;
 				delay.tv_nsec=0L;
@@ -1172,15 +1134,15 @@ int event_execution_loop(void){
 			log_debug_info(DEBUGL_EVENTS,2,"No events to execute at the moment.  Idling for a bit...\n");
 
 			/* check for external commands if we're supposed to check as often as possible */
-			if(command_check_interval==-1)
+			if(config.get_command_check_interval()==-1)
 				check_for_external_commands();
 
 			/* set time to sleep so we don't hog the CPU... */
 #ifdef USE_NANOSLEEP
-			delay.tv_sec=(time_t)sleep_time;
-			delay.tv_nsec=(long)((sleep_time-(double)delay.tv_sec)*1000000000);
+			delay.tv_sec=(time_t)config.get_sleep_time();
+			delay.tv_nsec=(long)((config.get_sleep_time()-(double)delay.tv_sec)*1000000000);
 #else
-			delay.tv_sec=(time_t)sleep_time;
+			delay.tv_sec=(time_t)config.get_sleep_time();
 			if(delay.tv_sec==0L)
 				delay.tv_sec=1;
 			delay.tv_nsec=0L;
@@ -1319,9 +1281,9 @@ int handle_timed_event(timed_event *event){
 		log_debug_info(DEBUGL_EVENTS,0,"** Orphaned Host and Service Check Event\n");
 
 		/* check for orphaned hosts and services */
-		if(check_orphaned_hosts==TRUE)
+		if(config.get_check_orphaned_hosts()==TRUE)
 			check_for_orphaned_hosts();
-		if(check_orphaned_services==TRUE)
+		if(config.get_check_orphaned_services()==TRUE)
 			check_for_orphaned_services();
 		break;
 
@@ -1451,7 +1413,7 @@ void adjust_check_scheduling(void){
 	/* determine our adjustment window */
 	time(&current_time);
 	first_window_time=current_time;
-	last_window_time=first_window_time+auto_rescheduling_window;
+	last_window_time=first_window_time+config.get_auto_rescheduling_window();
 
 	/* get current scheduling data */
 	for(temp_event=event_list_low;temp_event!=NULL;temp_event=temp_event->next){
@@ -1525,12 +1487,12 @@ void adjust_check_scheduling(void){
 		return;
 	        }
 
-	if((unsigned long)total_check_exec_time>auto_rescheduling_window){
+	if((unsigned long)total_check_exec_time>config.get_auto_rescheduling_window()){
 		inter_check_delay=0.0;
-		exec_time_factor=(double)((double)auto_rescheduling_window/total_check_exec_time);
+		exec_time_factor=(double)((double)config.get_auto_rescheduling_window()/total_check_exec_time);
 	        }
 	else{
-		inter_check_delay=(double)((((double)auto_rescheduling_window)-total_check_exec_time)/(double)(total_checks*1.0));
+	  inter_check_delay=(double)((((double)config.get_auto_rescheduling_window())-total_check_exec_time)/(double)(total_checks*1.0));
 		exec_time_factor=1.0;
 	        }
 

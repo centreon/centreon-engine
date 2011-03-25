@@ -20,6 +20,8 @@
 
 /*********** COMMON HEADER FILES ***********/
 
+#include "configuration.hh"
+
 #include "config.hh"
 #include "common.hh"
 #include "objects.hh"
@@ -28,14 +30,7 @@
 #include "nagios.hh"
 #include "broker.hh"
 
-extern int      interval_length;
-
-extern int      enable_flap_detection;
-
-extern double   low_service_flap_threshold;
-extern double   high_service_flap_threshold;
-extern double   low_host_flap_threshold;
-extern double   high_host_flap_threshold;
+extern com::centreon::scheduler::configuration config;
 
 extern host     *host_list;
 extern service  *service_list;
@@ -79,8 +74,8 @@ void check_for_service_flapping(service *svc, int update, int allow_flapstart_no
 		return;
 
 	/* what threshold values should we use (global or service-specific)? */
-	low_threshold=(svc->low_flap_threshold<=0.0)?low_service_flap_threshold:svc->low_flap_threshold;
-	high_threshold=(svc->high_flap_threshold<=0.0)?high_service_flap_threshold:svc->high_flap_threshold;
+	low_threshold=(svc->low_flap_threshold<=0.0)?config.get_low_service_flap_threshold():svc->low_flap_threshold;
+	high_threshold=(svc->high_flap_threshold<=0.0)?config.get_high_service_flap_threshold():svc->high_flap_threshold;
 
 	update_history=update;
 
@@ -139,7 +134,7 @@ void check_for_service_flapping(service *svc, int update, int allow_flapstart_no
 
 
 	/* don't do anything if we don't have flap detection enabled on a program-wide basis */
-	if(enable_flap_detection==FALSE)
+	if(config.get_enable_flap_detection()==FALSE)
 		return;
 
 	/* don't do anything if we don't have flap detection enabled for this service */
@@ -202,9 +197,9 @@ void check_for_host_flapping(host *hst, int update, int actual_check, int allow_
 
 	/* period to wait for updating archived state info if we have no state change */
 	if(hst->total_services==0)
-		wait_threshold=hst->notification_interval*interval_length;
+		wait_threshold=hst->notification_interval*config.get_interval_length();
 	else
-		wait_threshold=(hst->total_service_check_interval*interval_length)/hst->total_services;
+		wait_threshold=(hst->total_service_check_interval*config.get_interval_length())/hst->total_services;
 
 	update_history=update;
 
@@ -227,8 +222,8 @@ void check_for_host_flapping(host *hst, int update, int actual_check, int allow_
 	        }
 
 	/* what thresholds should we use (global or host-specific)? */
-	low_threshold=(hst->low_flap_threshold<=0.0)?low_host_flap_threshold:hst->low_flap_threshold;
-	high_threshold=(hst->high_flap_threshold<=0.0)?high_host_flap_threshold:hst->high_flap_threshold;
+	low_threshold=(hst->low_flap_threshold<=0.0)?config.get_low_host_flap_threshold():hst->low_flap_threshold;
+	high_threshold=(hst->high_flap_threshold<=0.0)?config.get_high_host_flap_threshold():hst->high_flap_threshold;
 
 	/* record current host state */
 	if(update_history==TRUE){
@@ -275,7 +270,7 @@ void check_for_host_flapping(host *hst, int update, int actual_check, int allow_
 
 
 	/* don't do anything if we don't have flap detection enabled on a program-wide basis */
-	if(enable_flap_detection==FALSE)
+	if(config.get_enable_flap_detection()==FALSE)
 		return;
 
 	/* don't do anything if we don't have flap detection enabled for this host */
@@ -497,7 +492,7 @@ void enable_flap_detection_routines(void){
 	log_debug_info(DEBUGL_FUNCTIONS,0,"enable_flap_detection_routines()\n");
 
 	/* bail out if we're already set */
-	if(enable_flap_detection==TRUE)
+	if(config.get_enable_flap_detection()==TRUE)
 		return;
 
 	/* set the attribute modified flag */
@@ -505,7 +500,7 @@ void enable_flap_detection_routines(void){
 	modified_service_process_attributes|=attr;
 
 	/* set flap detection flag */
-	enable_flap_detection=TRUE;
+	config.set_enable_flap_detection(true);
 
 #ifdef USE_EVENT_BROKER
 	/* send data to event broker */
@@ -535,7 +530,7 @@ void disable_flap_detection_routines(void){
 	log_debug_info(DEBUGL_FUNCTIONS,0,"disable_flap_detection_routines()\n");
 
 	/* bail out if we're already set */
-	if(enable_flap_detection==FALSE)
+	if(config.get_enable_flap_detection()==FALSE)
 		return;
 
 	/* set the attribute modified flag */
@@ -543,7 +538,7 @@ void disable_flap_detection_routines(void){
 	modified_service_process_attributes|=attr;
 
 	/* set flap detection flag */
-	enable_flap_detection=FALSE;
+	config.set_enable_flap_detection(false);
 
 #ifdef USE_EVENT_BROKER
 	/* send data to event broker */

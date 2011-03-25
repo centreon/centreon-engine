@@ -21,6 +21,8 @@
 
 /*********** COMMON HEADER FILES ***********/
 
+#include "configuration.hh"
+
 #include "config.hh"
 #include "common.hh"
 #include "locations.hh"
@@ -35,34 +37,18 @@
 /**** IMPLEMENTATION SPECIFIC HEADER FILES ****/
 #include "xsddefault.hh"
 
-
+extern com::centreon::scheduler::configuration config;
 
 extern time_t program_start;
 extern int nagios_pid;
 extern time_t last_command_check;
 extern time_t last_log_rotation;
-extern int enable_notifications;
-extern int execute_service_checks;
-extern int accept_passive_service_checks;
-extern int execute_host_checks;
-extern int accept_passive_host_checks;
-extern int enable_event_handlers;
-extern int obsess_over_services;
-extern int obsess_over_hosts;
-extern int check_service_freshness;
-extern int check_host_freshness;
-extern int enable_flap_detection;
-extern int enable_failure_prediction;
-extern int process_performance_data;
-extern int aggregate_status_updates;
-extern int check_external_commands;
 
 extern char           *last_program_version;
 extern int            update_available;
 extern char           *last_program_version;
 extern char           *new_program_version;
 
-extern int external_command_buffer_slots;
 extern circular_buffer external_command_buffer;
 
 extern host *host_list;
@@ -81,8 +67,6 @@ extern unsigned long  next_notification_id;
 
 extern unsigned long  modified_host_process_attributes;
 extern unsigned long  modified_service_process_attributes;
-extern char           *global_host_event_handler;
-extern char           *global_service_event_handler;
 
 extern check_stats    check_statistics[MAX_CHECK_STATS_TYPES];
 
@@ -296,7 +280,7 @@ int xsddefault_save_status_data(void){
 	        }
 
 	/* get number of items in the command buffer */
-	if(check_external_commands==TRUE){
+	if(config.get_check_external_commands()==TRUE){
 		pthread_mutex_lock(&external_command_buffer.buffer_lock);
 		used_external_command_buffer_slots=external_command_buffer.items;
 		high_external_command_buffer_slots=external_command_buffer.high;
@@ -337,27 +321,27 @@ int xsddefault_save_status_data(void){
 	fprintf(fp,"\tprogram_start=%lu\n",program_start);
 	fprintf(fp,"\tlast_command_check=%lu\n",last_command_check);
 	fprintf(fp,"\tlast_log_rotation=%lu\n",last_log_rotation);
-	fprintf(fp,"\tenable_notifications=%d\n",enable_notifications);
-	fprintf(fp,"\tactive_service_checks_enabled=%d\n",execute_service_checks);
-	fprintf(fp,"\tpassive_service_checks_enabled=%d\n",accept_passive_service_checks);
-	fprintf(fp,"\tactive_host_checks_enabled=%d\n",execute_host_checks);
-	fprintf(fp,"\tpassive_host_checks_enabled=%d\n",accept_passive_host_checks);
-	fprintf(fp,"\tenable_event_handlers=%d\n",enable_event_handlers);
-	fprintf(fp,"\tobsess_over_services=%d\n",obsess_over_services);
-	fprintf(fp,"\tobsess_over_hosts=%d\n",obsess_over_hosts);
-	fprintf(fp,"\tcheck_service_freshness=%d\n",check_service_freshness);
-	fprintf(fp,"\tcheck_host_freshness=%d\n",check_host_freshness);
-	fprintf(fp,"\tenable_flap_detection=%d\n",enable_flap_detection);
-	fprintf(fp,"\tenable_failure_prediction=%d\n",enable_failure_prediction);
-	fprintf(fp,"\tprocess_performance_data=%d\n",process_performance_data);
-	fprintf(fp,"\tglobal_host_event_handler=%s\n",(global_host_event_handler==NULL)?"":global_host_event_handler);
-	fprintf(fp,"\tglobal_service_event_handler=%s\n",(global_service_event_handler==NULL)?"":global_service_event_handler);
+	fprintf(fp,"\tenable_notifications=%d\n",config.get_enable_notifications());
+	fprintf(fp,"\tactive_service_checks_enabled=%d\n",config.get_execute_service_checks());
+	fprintf(fp,"\tpassive_service_checks_enabled=%d\n",config.get_accept_passive_service_checks());
+	fprintf(fp,"\tactive_host_checks_enabled=%d\n",config.get_execute_host_checks());
+	fprintf(fp,"\tpassive_host_checks_enabled=%d\n",config.get_accept_passive_host_checks());
+	fprintf(fp,"\tenable_event_handlers=%d\n",config.get_enable_event_handlers());
+	fprintf(fp,"\tobsess_over_services=%d\n",config.get_obsess_over_services());
+	fprintf(fp,"\tobsess_over_hosts=%d\n",config.get_obsess_over_hosts());
+	fprintf(fp,"\tcheck_service_freshness=%d\n",config.get_check_service_freshness());
+	fprintf(fp,"\tcheck_host_freshness=%d\n",config.get_check_host_freshness());
+	fprintf(fp,"\tenable_flap_detection=%d\n",config.get_enable_flap_detection());
+	fprintf(fp,"\tenable_failure_prediction=%d\n",config.get_enable_failure_prediction());
+	fprintf(fp,"\tprocess_performance_data=%d\n",config.get_process_performance_data());
+	fprintf(fp,"\tglobal_host_event_handler=%s\n",config.get_global_host_event_handler().c_str());
+	fprintf(fp,"\tglobal_service_event_handler=%s\n",config.get_global_service_event_handler().c_str());
 	fprintf(fp,"\tnext_comment_id=%lu\n",next_comment_id);
 	fprintf(fp,"\tnext_downtime_id=%lu\n",next_downtime_id);
 	fprintf(fp,"\tnext_event_id=%lu\n",next_event_id);
 	fprintf(fp,"\tnext_problem_id=%lu\n",next_problem_id);
 	fprintf(fp,"\tnext_notification_id=%lu\n",next_notification_id);
-	fprintf(fp,"\ttotal_external_command_buffer_slots=%d\n",external_command_buffer_slots);
+	fprintf(fp,"\ttotal_external_command_buffer_slots=%d\n",config.get_external_command_buffer_slots());
 	fprintf(fp,"\tused_external_command_buffer_slots=%d\n",used_external_command_buffer_slots);
 	fprintf(fp,"\thigh_external_command_buffer_slots=%d\n",high_external_command_buffer_slots);
 	fprintf(fp,"\tactive_scheduled_host_check_stats=%d,%d,%d\n",check_statistics[ACTIVE_SCHEDULED_HOST_CHECK_STATS].minute_stats[0],check_statistics[ACTIVE_SCHEDULED_HOST_CHECK_STATS].minute_stats[1],check_statistics[ACTIVE_SCHEDULED_HOST_CHECK_STATS].minute_stats[2]);

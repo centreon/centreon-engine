@@ -18,6 +18,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "configuration.hh"
+
 #include "config.hh"
 #include "common.hh"
 #include "nebmods.hh"
@@ -31,8 +33,7 @@
 nebmodule *neb_module_list=NULL;
 nebcallback **neb_callback_list=NULL;
 
-extern char     *temp_path;
-
+extern com::centreon::scheduler::configuration config;
 
 /*#define DEBUG*/
 
@@ -79,7 +80,7 @@ int neb_deinit_modules(void){
 
 
 /* add a new module to module list */
-int neb_add_module(char *filename,char *args,int should_be_loaded){
+int neb_add_module(char const* filename,char const* args,int should_be_loaded){
 	nebmodule *new_module=NULL;
 	int x=OK;
 
@@ -199,7 +200,7 @@ int neb_load_module(nebmodule *mod)
 	 * we re-use the destination file descriptor returned by mkstemp(3),
 	 * which we have to close ourselves.
 	 */
-	snprintf(output_file, sizeof(output_file) - 1, "%s/nebmodXXXXXX",temp_path);
+	snprintf(output_file, sizeof(output_file) - 1, "%s/nebmodXXXXXX",config.get_temp_path().c_str());
 	dest_fd = mkstemp(output_file);
 	result = my_fdcopy(mod->filename, output_file, dest_fd);
 	close(dest_fd);

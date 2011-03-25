@@ -18,6 +18,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "configuration.hh"
+
 #include "config.hh"
 #include "common.hh"
 #include "statusdata.hh"
@@ -26,30 +28,19 @@
 #include "broker.hh"
 
 
-extern char	*log_file;
-extern char     *temp_file;
-extern char	*log_archive_path;
+extern com::centreon::scheduler::configuration config;
+
+extern unsigned long   logging_options;
+extern unsigned long   syslog_options;
 
 extern host     *host_list;
 extern service  *service_list;
-
-extern int	use_syslog;
-extern int      log_service_retries;
-extern int      log_initial_states;
-
-extern unsigned long      logging_options;
-extern unsigned long      syslog_options;
 
 extern int      verify_config;
 extern int      test_scheduling;
 
 extern time_t   last_log_rotation;
-extern int      log_rotation_method;
 
-extern char     *debug_file;
-extern int      debug_level;
-extern int      debug_verbosity;
-extern unsigned long max_debug_file_size;
 FILE            *debug_file_fp=NULL;
 
 static pthread_mutex_t debug_fp_lock;
@@ -181,10 +172,10 @@ int write_to_log(char *buffer, unsigned long data_type, time_t *timestamp){
 	if(!(data_type & logging_options))
 		return OK;
 
-	fp=fopen(log_file,"a+");
+	fp=fopen(config.get_log_file().c_str(),"a+");
 	if(fp==NULL){
 		if(!FALSE)
-			printf("Warning: Cannot open log file '%s' for writing\n",log_file);
+		  printf("Warning: Cannot open log file '%s' for writing\n",config.get_log_file().c_str());
 		return ERROR;
 		}
 
@@ -222,7 +213,7 @@ int write_to_syslog(char const *buffer, unsigned long data_type){
 		return OK;
 
 	/* bail out if we shouldn't write to syslog */
-	if(use_syslog==FALSE)
+	if(config.get_use_syslog()==false)
 		return OK;
 
 	/* make sure we should log this type of entry */
@@ -246,7 +237,7 @@ int log_service_event(service *svc)
 	nagios_macros mac;
 
 	/* don't log soft errors if the user doesn't want to */
-	if(svc->state_type==SOFT_STATE && !log_service_retries)
+	if(svc->state_type==SOFT_STATE && !config.get_log_service_retries())
 		return OK;
 
 	/* get the log options */
@@ -330,7 +321,7 @@ int log_host_states(int type, time_t *timestamp)
 	nagios_macros mac;
 
 	/* bail if we shouldn't be logging initial states */
-	if(type==INITIAL_STATES && log_initial_states==FALSE)
+	if(type==INITIAL_STATES && config.get_log_initial_states()==false)
 		return OK;
 
 	memset(&mac, 0, sizeof(mac));
@@ -367,7 +358,7 @@ int log_service_states(int type, time_t *timestamp)
 	nagios_macros mac;
 
 	/* bail if we shouldn't be logging initial states */
-	if(type==INITIAL_STATES && log_initial_states==FALSE)
+	if(type==INITIAL_STATES && config.get_log_initial_states()==false)
 		return OK;
 
 	memset(&mac, 0, sizeof(mac));
@@ -411,16 +402,16 @@ int rotate_log_file(time_t rotation_time){
 	struct stat log_file_stat;
 	int ret;
 
-	if(log_rotation_method==LOG_ROTATION_NONE){
+	if(config.get_log_rotation_method()==LOG_ROTATION_NONE){
 		return OK;
 	        }
-	else if(log_rotation_method==LOG_ROTATION_HOURLY)
+	else if(config.get_log_rotation_method()==LOG_ROTATION_HOURLY)
 		strcpy(method_string,"HOURLY");
-	else if(log_rotation_method==LOG_ROTATION_DAILY)
+	else if(config.get_log_rotation_method()==LOG_ROTATION_DAILY)
 		strcpy(method_string,"DAILY");
-	else if(log_rotation_method==LOG_ROTATION_WEEKLY)
+	else if(config.get_log_rotation_method()==LOG_ROTATION_WEEKLY)
 		strcpy(method_string,"WEEKLY");
-	else if(log_rotation_method==LOG_ROTATION_MONTHLY)
+	else if(config.get_log_rotation_method()==LOG_ROTATION_MONTHLY)
 		strcpy(method_string,"MONTHLY");
 	else
 		return ERROR;
@@ -431,16 +422,16 @@ int rotate_log_file(time_t rotation_time){
 
 	t = localtime_r(&rotation_time, &tm_s);
 
-	stat_result = stat(log_file, &log_file_stat);
+	stat_result = stat(config.get_log_file().c_str(), &log_file_stat);
 
 	/* get the archived filename to use */
-	if(asprintf(&log_archive,"%s%snagios-%02d-%02d-%d-%02d.log",log_archive_path,(log_archive_path[strlen(log_archive_path)-1]=='/')?"":"/",t->tm_mon+1,t->tm_mday,t->tm_year+1900,t->tm_hour)==-1){
+	if(asprintf(&log_archive,"%s%snagios-%02d-%02d-%d-%02d.log",config.get_log_archive_path().c_str(),(config.get_log_archive_path().c_str()[config.get_log_archive_path().size()-1]=='/')?"":"/",t->tm_mon+1,t->tm_mday,t->tm_year+1900,t->tm_hour)==-1){
 		logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
 		return ERROR;
 		}
 
 	/* rotate the log file */
-	rename_result=my_rename(log_file,log_archive);
+	rename_result=my_rename(config.get_log_file().c_str(),log_archive);
 
 	if(rename_result){
 		my_free(log_archive);
@@ -460,8 +451,8 @@ int rotate_log_file(time_t rotation_time){
 	write_log_file_info(&rotation_time);
 
 	if(stat_result==0){
-		chmod(log_file, log_file_stat.st_mode);
-		ret = chown(log_file, log_file_stat.st_uid, log_file_stat.st_gid);
+	  chmod(config.get_log_file().c_str(), log_file_stat.st_mode);
+	  ret = chown(config.get_log_file().c_str(), log_file_stat.st_uid, log_file_stat.st_gid);
 		}
 
 	/* log current host and service state */
@@ -500,10 +491,10 @@ int open_debug_log(void){
 		return OK;
 
 	/* don't do anything if we're not debugging */
-	if(debug_level==DEBUGL_NONE)
+	if(config.get_debug_level()==DEBUGL_NONE)
 		return OK;
 
-	if((debug_file_fp=fopen(debug_file,"a+"))==NULL)
+	if((debug_file_fp=fopen(config.get_debug_file().c_str(),"a+"))==NULL)
 		return ERROR;
 
 	return OK;
@@ -528,10 +519,10 @@ int log_debug_info(int level, int verbosity, const char *fmt, ...){
 	char *temp_path=NULL;
 	struct timeval current_time;
 
-	if(!(debug_level==DEBUGL_ALL || (level & debug_level)))
+	if(!(config.get_debug_level()==DEBUGL_ALL || (level & config.get_debug_level())))
 		return OK;
 
-	if(verbosity>debug_verbosity)
+	if(verbosity>config.get_debug_verbosity())
 		return OK;
 
 	if(debug_file_fp==NULL)
@@ -559,13 +550,13 @@ int log_debug_info(int level, int verbosity, const char *fmt, ...){
 	fflush(debug_file_fp);
 
 	/* if file has grown beyond max, rotate it */
-	if((unsigned long)ftell(debug_file_fp)>max_debug_file_size && max_debug_file_size>0L){
+	if((unsigned long)ftell(debug_file_fp)>config.get_max_debug_file_size() && config.get_max_debug_file_size()>0L){
 
 		/* close the file */
 		close_debug_log();
 
 		/* rotate the log file */
-		if(asprintf(&temp_path,"%s.old",debug_file)==-1){
+		if(asprintf(&temp_path,"%s.old",config.get_debug_file().c_str())==-1){
 			logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
 			return ERROR;
 			}
@@ -576,7 +567,7 @@ int log_debug_info(int level, int verbosity, const char *fmt, ...){
 			unlink(temp_path);
 
 			/* rotate the debug file */
-			my_rename(debug_file,temp_path);
+			my_rename(config.get_debug_file().c_str(),temp_path);
 
 			/* free memory */
 			my_free(temp_path);

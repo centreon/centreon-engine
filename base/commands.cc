@@ -18,6 +18,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "configuration.hh"
+
 #include "config.hh"
 #include "common.hh"
 #include "comments.hh"
@@ -28,45 +30,21 @@
 #include "broker.hh"
 #include "nagios.hh"
 
+extern com::centreon::scheduler::configuration config;
+
 extern char     *config_file;
-extern char	*log_file;
-extern char     *command_file;
-extern char     *temp_file;
-extern char     *temp_path;
 
 extern int      sigshutdown;
 extern int      sigrestart;
-
-extern int      check_external_commands;
 
 extern int      ipc_pipe[2];
 
 extern time_t   last_command_check;
 extern time_t   last_command_status_update;
 
-extern int      command_check_interval;
-
-extern int      enable_notifications;
-extern int      execute_service_checks;
-extern int      accept_passive_service_checks;
-extern int      execute_host_checks;
-extern int      accept_passive_host_checks;
-extern int      enable_event_handlers;
-extern int      obsess_over_services;
-extern int      obsess_over_hosts;
-extern int      check_service_freshness;
-extern int      check_host_freshness;
-extern int      enable_failure_prediction;
-extern int      process_performance_data;
-
-extern int      log_external_commands;
-extern int      log_passive_checks;
-
 extern unsigned long    modified_host_process_attributes;
 extern unsigned long    modified_service_process_attributes;
 
-extern char     *global_host_event_handler;
-extern char     *global_service_event_handler;
 extern command  *global_host_event_handler_ptr;
 extern command  *global_service_event_handler_ptr;
 
@@ -81,9 +59,6 @@ passive_check_result    *passive_check_result_list_tail=NULL;
 
 extern pthread_t       worker_threads[TOTAL_WORKER_THREADS];
 extern circular_buffer external_command_buffer;
-extern int             external_command_buffer_slots;
-
-
 
 /******************************************************************/
 /****************** EXTERNAL COMMAND PROCESSING *******************/
@@ -98,7 +73,7 @@ int check_for_external_commands(void){
 	log_debug_info(DEBUGL_FUNCTIONS,0,"check_for_external_commands()\n");
 
 	/* bail out if we shouldn't be checking for external commands */
-	if(check_external_commands==FALSE)
+	if(config.get_check_external_commands()==FALSE)
 		return ERROR;
 
 	/* update last command check time */
@@ -138,7 +113,7 @@ int check_for_external_commands(void){
 		my_free(((char **)external_command_buffer.buffer)[external_command_buffer.tail]);
 
 		/* adjust tail counter and number of items */
-		external_command_buffer.tail=(external_command_buffer.tail + 1) % external_command_buffer_slots;
+		external_command_buffer.tail=(external_command_buffer.tail + 1) % config.get_external_command_buffer_slots();
 		external_command_buffer.items--;
 
 		/* release the lock on the buffer */
@@ -727,11 +702,11 @@ int process_external_command1(char *cmd){
 
 	if(command_type==CMD_PROCESS_SERVICE_CHECK_RESULT || command_type==CMD_PROCESS_HOST_CHECK_RESULT){
 		/* passive checks are logged in checks.c as well, as some my bypass external commands by getting dropped in checkresults dir */
-		if(log_passive_checks==TRUE)
+		if(config.get_log_passive_checks()==true)
 			write_to_all_logs(temp_buffer,NSLOG_PASSIVE_CHECK);
 	        }
 	else{
-		if(log_external_commands==TRUE)
+	  if(config.get_log_external_commands()==true)
 			write_to_all_logs(temp_buffer,NSLOG_EXTERNAL_COMMAND);
 	        }
 	my_free(temp_buffer);
@@ -2065,7 +2040,7 @@ int process_passive_service_check(time_t check_time, char *host_name, char *svc_
 	int result=OK;
 
 	/* skip this service check result if we aren't accepting passive service checks */
-	if(accept_passive_service_checks==FALSE)
+	if(config.get_accept_passive_service_checks()==FALSE)
 		return ERROR;
 
 	/* make sure we have all required data */
@@ -2204,7 +2179,7 @@ int process_passive_host_check(time_t check_time, char *host_name, int return_co
 	int result=OK;
 
 	/* skip this host check result if we aren't accepting passive host checks */
-	if(accept_passive_service_checks==FALSE)
+	if(config.get_accept_passive_service_checks()==FALSE)
 		return ERROR;
 
 	/* make sure we have all required data */
@@ -3056,16 +3031,14 @@ int cmd_change_object_char_var(int cmd,char *args){
 
 	case CMD_CHANGE_GLOBAL_HOST_EVENT_HANDLER:
 
-		my_free(global_host_event_handler);
-		global_host_event_handler=temp_ptr;
+	  config.set_global_host_event_handler(temp_ptr);
 		global_host_event_handler_ptr=temp_command;
 		attr=MODATTR_EVENT_HANDLER_COMMAND;
 		break;
 
 	case CMD_CHANGE_GLOBAL_SVC_EVENT_HANDLER:
 
-		my_free(global_service_event_handler);
-		global_service_event_handler=temp_ptr;
+	  config.set_global_service_event_handler(temp_ptr);
 		global_service_event_handler_ptr=temp_command;
 		attr=MODATTR_EVENT_HANDLER_COMMAND;
 		break;
@@ -3494,7 +3467,7 @@ void enable_all_notifications(void){
 	unsigned long attr=MODATTR_NOTIFICATIONS_ENABLED;
 
 	/* bail out if we're already set... */
-	if(enable_notifications==TRUE)
+	if(config.get_enable_notifications()==TRUE)
 		return;
 
 	/* set the attribute modified flag */
@@ -3502,7 +3475,7 @@ void enable_all_notifications(void){
 	modified_service_process_attributes|=attr;
 
 	/* update notification status */
-	enable_notifications=TRUE;
+	config.set_enable_notifications(true);
 
 #ifdef USE_EVENT_BROKER
 	/* send data to event broker */
@@ -3521,7 +3494,7 @@ void disable_all_notifications(void){
 	unsigned long attr=MODATTR_NOTIFICATIONS_ENABLED;
 
 	/* bail out if we're already set... */
-	if(enable_notifications==FALSE)
+	if(config.get_enable_notifications()==FALSE)
 		return;
 
 	/* set the attribute modified flag */
@@ -3529,7 +3502,7 @@ void disable_all_notifications(void){
 	modified_service_process_attributes|=attr;
 
 	/* update notification status */
-	enable_notifications=FALSE;
+	config.set_enable_notifications(false);
 
 #ifdef USE_EVENT_BROKER
 	/* send data to event broker */
@@ -3962,14 +3935,14 @@ void start_executing_service_checks(void){
 	unsigned long attr=MODATTR_ACTIVE_CHECKS_ENABLED;
 
 	/* bail out if we're already executing services */
-	if(execute_service_checks==TRUE)
+	if(config.get_execute_service_checks()==TRUE)
 		return;
 
 	/* set the attribute modified flag */
 	modified_service_process_attributes|=attr;
 
 	/* set the service check execution flag */
-	execute_service_checks=TRUE;
+	config.set_execute_service_checks(true);
 
 #ifdef USE_EVENT_BROKER
 	/* send data to event broker */
@@ -3990,14 +3963,14 @@ void stop_executing_service_checks(void){
 	unsigned long attr=MODATTR_ACTIVE_CHECKS_ENABLED;
 
 	/* bail out if we're already not executing services */
-	if(execute_service_checks==FALSE)
+	if(config.get_execute_service_checks()==FALSE)
 		return;
 
 	/* set the attribute modified flag */
 	modified_service_process_attributes|=attr;
 
 	/* set the service check execution flag */
-	execute_service_checks=FALSE;
+	config.set_execute_service_checks(false);
 
 #ifdef USE_EVENT_BROKER
 	/* send data to event broker */
@@ -4017,14 +3990,14 @@ void start_accepting_passive_service_checks(void){
 	unsigned long attr=MODATTR_PASSIVE_CHECKS_ENABLED;
 
 	/* bail out if we're already accepting passive services */
-	if(accept_passive_service_checks==TRUE)
+	if(config.get_accept_passive_service_checks()==TRUE)
 		return;
 
 	/* set the attribute modified flag */
 	modified_service_process_attributes|=attr;
 
 	/* set the service check flag */
-	accept_passive_service_checks=TRUE;
+	config.set_accept_passive_service_checks(true);
 
 #ifdef USE_EVENT_BROKER
 	/* send data to event broker */
@@ -4044,14 +4017,14 @@ void stop_accepting_passive_service_checks(void){
 	unsigned long attr=MODATTR_PASSIVE_CHECKS_ENABLED;
 
 	/* bail out if we're already not accepting passive services */
-	if(accept_passive_service_checks==FALSE)
+	if(config.get_accept_passive_service_checks()==FALSE)
 		return;
 
 	/* set the attribute modified flag */
 	modified_service_process_attributes|=attr;
 
 	/* set the service check flag */
-	accept_passive_service_checks=FALSE;
+	config.set_accept_passive_service_checks(false);
 
 #ifdef USE_EVENT_BROKER
 	/* send data to event broker */
@@ -4125,14 +4098,14 @@ void start_executing_host_checks(void){
 	unsigned long attr=MODATTR_ACTIVE_CHECKS_ENABLED;
 
 	/* bail out if we're already executing hosts */
-	if(execute_host_checks==TRUE)
+	if(config.get_execute_host_checks()==TRUE)
 		return;
 
 	/* set the attribute modified flag */
 	modified_host_process_attributes|=attr;
 
 	/* set the host check execution flag */
-	execute_host_checks=TRUE;
+	config.set_execute_host_checks(true);
 
 #ifdef USE_EVENT_BROKER
 	/* send data to event broker */
@@ -4153,14 +4126,14 @@ void stop_executing_host_checks(void){
 	unsigned long attr=MODATTR_ACTIVE_CHECKS_ENABLED;
 
 	/* bail out if we're already not executing hosts */
-	if(execute_host_checks==FALSE)
+	if(config.get_execute_host_checks()==FALSE)
 		return;
 
 	/* set the attribute modified flag */
 	modified_host_process_attributes|=attr;
 
 	/* set the host check execution flag */
-	execute_host_checks=FALSE;
+	config.set_execute_host_checks(false);
 
 #ifdef USE_EVENT_BROKER
 	/* send data to event broker */
@@ -4180,14 +4153,14 @@ void start_accepting_passive_host_checks(void){
 	unsigned long attr=MODATTR_PASSIVE_CHECKS_ENABLED;
 
 	/* bail out if we're already accepting passive hosts */
-	if(accept_passive_host_checks==TRUE)
+	if(config.get_accept_passive_host_checks()==TRUE)
 		return;
 
 	/* set the attribute modified flag */
 	modified_host_process_attributes|=attr;
 
 	/* set the host check flag */
-	accept_passive_host_checks=TRUE;
+	config.set_accept_passive_host_checks(true);
 
 #ifdef USE_EVENT_BROKER
 	/* send data to event broker */
@@ -4207,14 +4180,14 @@ void stop_accepting_passive_host_checks(void){
 	unsigned long attr=MODATTR_PASSIVE_CHECKS_ENABLED;
 
 	/* bail out if we're already not accepting passive hosts */
-	if(accept_passive_host_checks==FALSE)
+	if(config.get_accept_passive_host_checks()==FALSE)
 		return;
 
 	/* set the attribute modified flag */
 	modified_host_process_attributes|=attr;
 
 	/* set the host check flag */
-	accept_passive_host_checks=FALSE;
+	config.set_accept_passive_host_checks(false);
 
 #ifdef USE_EVENT_BROKER
 	/* send data to event broker */
@@ -4287,7 +4260,7 @@ void start_using_event_handlers(void){
 	unsigned long attr=MODATTR_EVENT_HANDLER_ENABLED;
 
 	/* no change */
-	if(enable_event_handlers==TRUE)
+	if(config.get_enable_event_handlers()==TRUE)
 		return;
 
 	/* set the attribute modified flag */
@@ -4295,7 +4268,7 @@ void start_using_event_handlers(void){
 	modified_service_process_attributes|=attr;
 
 	/* set the event handler flag */
-	enable_event_handlers=TRUE;
+	config.set_enable_event_handlers(true);
 
 #ifdef USE_EVENT_BROKER
 	/* send data to event broker */
@@ -4314,7 +4287,7 @@ void stop_using_event_handlers(void){
 	unsigned long attr=MODATTR_EVENT_HANDLER_ENABLED;
 
 	/* no change */
-	if(enable_event_handlers==FALSE)
+	if(config.get_enable_event_handlers()==FALSE)
 		return;
 
 	/* set the attribute modified flag */
@@ -4322,7 +4295,7 @@ void stop_using_event_handlers(void){
 	modified_service_process_attributes|=attr;
 
 	/* set the event handler flag */
-	enable_event_handlers=FALSE;
+	config.set_enable_event_handlers(false);
 
 #ifdef USE_EVENT_BROKER
 	/* send data to event broker */
@@ -4520,14 +4493,14 @@ void start_obsessing_over_service_checks(void){
 	unsigned long attr=MODATTR_OBSESSIVE_HANDLER_ENABLED;
 
 	/* no change */
-	if(obsess_over_services==TRUE)
+	if(config.get_obsess_over_services()==TRUE)
 		return;
 
 	/* set the attribute modified flag */
 	modified_service_process_attributes|=attr;
 
 	/* set the service obsession flag */
-	obsess_over_services=TRUE;
+	config.set_obsess_over_services(true);
 
 #ifdef USE_EVENT_BROKER
 	/* send data to event broker */
@@ -4547,14 +4520,14 @@ void stop_obsessing_over_service_checks(void){
 	unsigned long attr=MODATTR_OBSESSIVE_HANDLER_ENABLED;
 
 	/* no change */
-	if(obsess_over_services==FALSE)
+	if(config.get_obsess_over_services()==FALSE)
 		return;
 
 	/* set the attribute modified flag */
 	modified_service_process_attributes|=attr;
 
 	/* set the service obsession flag */
-	obsess_over_services=FALSE;
+	config.set_obsess_over_services(false);
 
 #ifdef USE_EVENT_BROKER
 	/* send data to event broker */
@@ -4574,14 +4547,14 @@ void start_obsessing_over_host_checks(void){
 	unsigned long attr=MODATTR_OBSESSIVE_HANDLER_ENABLED;
 
 	/* no change */
-	if(obsess_over_hosts==TRUE)
+	if(config.get_obsess_over_hosts()==TRUE)
 		return;
 
 	/* set the attribute modified flag */
 	modified_host_process_attributes|=attr;
 
 	/* set the host obsession flag */
-	obsess_over_hosts=TRUE;
+	config.set_obsess_over_hosts(true);
 
 #ifdef USE_EVENT_BROKER
 	/* send data to event broker */
@@ -4601,14 +4574,14 @@ void stop_obsessing_over_host_checks(void){
 	unsigned long attr=MODATTR_OBSESSIVE_HANDLER_ENABLED;
 
 	/* no change */
-	if(obsess_over_hosts==FALSE)
+	if(config.get_obsess_over_hosts()==FALSE)
 		return;
 
 	/* set the attribute modified flag */
 	modified_host_process_attributes|=attr;
 
 	/* set the host obsession flag */
-	obsess_over_hosts=FALSE;
+	config.set_obsess_over_hosts(false);
 
 #ifdef USE_EVENT_BROKER
 	/* send data to event broker */
@@ -4628,14 +4601,14 @@ void enable_service_freshness_checks(void){
 	unsigned long attr=MODATTR_FRESHNESS_CHECKS_ENABLED;
 
 	/* no change */
-	if(check_service_freshness==TRUE)
+	if(config.get_check_service_freshness()==TRUE)
 		return;
 
 	/* set the attribute modified flag */
 	modified_service_process_attributes|=attr;
 
 	/* set the freshness check flag */
-	check_service_freshness=TRUE;
+	config.set_check_service_freshness(true);
 
 #ifdef USE_EVENT_BROKER
 	/* send data to event broker */
@@ -4654,14 +4627,14 @@ void disable_service_freshness_checks(void){
 	unsigned long attr=MODATTR_FRESHNESS_CHECKS_ENABLED;
 
 	/* no change */
-	if(check_service_freshness==FALSE)
+	if(config.get_check_service_freshness()==false)
 		return;
 
 	/* set the attribute modified flag */
 	modified_service_process_attributes|=attr;
 
 	/* set the freshness check flag */
-	check_service_freshness=FALSE;
+	config.set_check_service_freshness(false);
 
 #ifdef USE_EVENT_BROKER
 	/* send data to event broker */
@@ -4680,14 +4653,14 @@ void enable_host_freshness_checks(void){
 	unsigned long attr=MODATTR_FRESHNESS_CHECKS_ENABLED;
 
 	/* no change */
-	if(check_host_freshness==TRUE)
+	if(config.get_check_host_freshness()==TRUE)
 		return;
 
 	/* set the attribute modified flag */
 	modified_host_process_attributes|=attr;
 
 	/* set the freshness check flag */
-	check_host_freshness=TRUE;
+	config.set_check_host_freshness(true);
 
 #ifdef USE_EVENT_BROKER
 	/* send data to event broker */
@@ -4706,14 +4679,14 @@ void disable_host_freshness_checks(void){
 	unsigned long attr=MODATTR_FRESHNESS_CHECKS_ENABLED;
 
 	/* no change */
-	if(check_host_freshness==FALSE)
+	if(config.get_check_host_freshness()==false)
 		return;
 
 	/* set the attribute modified flag */
 	modified_host_process_attributes|=attr;
 
 	/* set the freshness check flag */
-	check_host_freshness=FALSE;
+	config.set_check_host_freshness(false);
 
 #ifdef USE_EVENT_BROKER
 	/* send data to event broker */
@@ -4732,14 +4705,14 @@ void enable_all_failure_prediction(void){
 	unsigned long attr=MODATTR_FAILURE_PREDICTION_ENABLED;
 
 	/* bail out if we're already set... */
-	if(enable_failure_prediction==TRUE)
+	if(config.get_enable_failure_prediction()==TRUE)
 		return;
 
 	/* set the attribute modified flag */
 	modified_host_process_attributes|=attr;
 	modified_service_process_attributes|=attr;
 
-	enable_failure_prediction=TRUE;
+	config.set_enable_failure_prediction(true);
 
 #ifdef USE_EVENT_BROKER
 	/* send data to event broker */
@@ -4758,14 +4731,14 @@ void disable_all_failure_prediction(void){
 	unsigned long attr=MODATTR_FAILURE_PREDICTION_ENABLED;
 
 	/* bail out if we're already set... */
-	if(enable_failure_prediction==FALSE)
+	if(config.get_enable_failure_prediction()==FALSE)
 		return;
 
 	/* set the attribute modified flag */
 	modified_host_process_attributes|=attr;
 	modified_service_process_attributes|=attr;
 
-	enable_failure_prediction=FALSE;
+	config.set_enable_failure_prediction(false);
 
 #ifdef USE_EVENT_BROKER
 	/* send data to event broker */
@@ -4784,14 +4757,14 @@ void enable_performance_data(void){
 	unsigned long attr=MODATTR_PERFORMANCE_DATA_ENABLED;
 
 	/* bail out if we're already set... */
-	if(process_performance_data==TRUE)
+	if(config.get_process_performance_data()==TRUE)
 		return;
 
 	/* set the attribute modified flag */
 	modified_host_process_attributes|=attr;
 	modified_service_process_attributes|=attr;
 
-	process_performance_data=TRUE;
+	config.set_process_performance_data(true);
 
 #ifdef USE_EVENT_BROKER
 	/* send data to event broker */
@@ -4810,14 +4783,14 @@ void disable_performance_data(void){
 	unsigned long attr=MODATTR_PERFORMANCE_DATA_ENABLED;
 
 #	/* bail out if we're already set... */
-	if(process_performance_data==FALSE)
+  if(config.get_process_performance_data()==FALSE)
 		return;
 
 	/* set the attribute modified flag */
 	modified_host_process_attributes|=attr;
 	modified_service_process_attributes|=attr;
 
-	process_performance_data=FALSE;
+	config.set_process_performance_data(false);
 
 #ifdef USE_EVENT_BROKER
 	/* send data to event broker */
@@ -4985,7 +4958,7 @@ void process_passive_checks(void){
 	/* open a temp file for storing check result(s) */
 	old_umask=umask(new_umask);
 
-	if(asprintf(&checkresult_file,"%s/checkXXXXXX",temp_path)==-1){
+	if(asprintf(&checkresult_file,"%s/checkXXXXXX",config.get_temp_path().c_str())==-1){
 		logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
 		return;
 		}

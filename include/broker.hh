@@ -184,7 +184,7 @@ struct timeval get_broker_timestamp(struct timeval *);
 void broker_program_state(int,int,int,struct timeval *);
 void broker_timed_event(int,int,int,timed_event *,struct timeval *);
 void broker_log_data(int,int,int,char *,unsigned long,time_t,struct timeval *);
-int broker_event_handler(int,int,int,int,void *,int,int,struct timeval,struct timeval,double,int,int,int,char *,char *,char *,struct timeval *);
+int broker_event_handler(int,int,int,int,void *,int,int,struct timeval,struct timeval,double,int,int,int,char const*,char *,char *,struct timeval *);
 void broker_system_command(int,int,int,struct timeval,struct timeval,double,int,int,int,char *,char *,struct timeval *);
 int broker_host_check(int,int,int,host *,int,int,int,struct timeval,struct timeval,char *,double,double,int,int,int,char *,char *,char *,char *,struct timeval *);
 int broker_service_check(int,int,int,service *,int,struct timeval,struct timeval,char *,double,double,int,int,int,char *,struct timeval *);

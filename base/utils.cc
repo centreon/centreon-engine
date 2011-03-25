@@ -18,6 +18,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "configuration.hh"
+
 #include "config.hh"
 #include "common.hh"
 #include "objects.hh"
@@ -37,16 +39,12 @@ static PerlInterpreter *my_perl=NULL;
 int use_embedded_perl=TRUE;
 #endif
 
+extern com::centreon::scheduler::configuration config;
+
+extern unsigned long   logging_options;
+extern unsigned long   syslog_options;
+
 extern char	*config_file;
-extern char	*log_file;
-extern char     *command_file;
-extern char     *temp_file;
-extern char     *temp_path;
-extern char     *check_result_path;
-extern char     *check_result_path;
-extern char	*log_archive_path;
-extern char     *auth_file;
-extern char	*p1_file;
 
 extern char     *macro_x_names[MACRO_X_COUNT];
 extern char     *macro_user[MAX_USER_MACROS];
@@ -61,21 +59,11 @@ extern servicegroup *macro_servicegroup_ptr;
 extern contact      *macro_contact_ptr;
 extern contactgroup *macro_contactgroup_ptr;
 
-extern char     *global_host_event_handler;
-extern char     *global_service_event_handler;
 extern command  *global_host_event_handler_ptr;
 extern command  *global_service_event_handler_ptr;
 
-extern char     *ocsp_command;
-extern char     *ochp_command;
 extern command  *ocsp_command_ptr;
 extern command  *ochp_command_ptr;
-
-extern char     *illegal_object_chars;
-extern char     *illegal_output_chars;
-
-extern int      use_regexp_matches;
-extern int      use_true_regexp_matching;
 
 extern int      sigshutdown;
 extern int      sigrestart;
@@ -85,50 +73,7 @@ extern int      sig_id;
 
 extern int      nagios_pid;
 
-extern int	use_syslog;
-extern int      log_notifications;
-extern int      log_service_retries;
 extern int      log_host_retries;
-extern int      log_event_handlers;
-extern int      log_external_commands;
-extern int      log_passive_checks;
-
-extern unsigned long      logging_options;
-extern unsigned long      syslog_options;
-
-extern int      service_check_timeout;
-extern int      host_check_timeout;
-extern int      event_handler_timeout;
-extern int      notification_timeout;
-extern int      ocsp_timeout;
-extern int      ochp_timeout;
-
-extern int      log_initial_states;
-
-extern double   sleep_time;
-extern int      interval_length;
-extern int      service_inter_check_delay_method;
-extern int      host_inter_check_delay_method;
-extern int      service_interleave_factor_method;
-extern int      max_host_check_spread;
-extern int      max_service_check_spread;
-
-extern int      command_check_interval;
-extern int      check_reaper_interval;
-extern int      max_check_reaper_time;
-extern int      service_freshness_check_interval;
-extern int      host_freshness_check_interval;
-extern int      auto_rescheduling_interval;
-extern int      auto_rescheduling_window;
-
-extern int      check_external_commands;
-extern int      check_orphaned_services;
-extern int      check_orphaned_hosts;
-extern int      check_service_freshness;
-extern int      check_host_freshness;
-extern int      auto_reschedule_checks;
-
-extern int      additional_freshness_latency;
 
 extern unsigned long update_uid;
 extern char     *last_program_version;
@@ -136,34 +81,13 @@ extern int      update_available;
 extern char     *last_program_version;
 extern char     *new_program_version;
 
-extern int      use_aggressive_host_checking;
-extern unsigned long cached_host_check_horizon;
-extern unsigned long cached_service_check_horizon;
-extern int      enable_predictive_host_dependency_checks;
-extern int      enable_predictive_service_dependency_checks;
-
-extern int      soft_state_dependencies;
-
-extern int      retain_state_information;
-extern int      retention_update_interval;
-extern int      use_retained_program_state;
-extern int      use_retained_scheduling_info;
-extern int      retention_scheduling_horizon;
 extern unsigned long modified_host_process_attributes;
 extern unsigned long modified_service_process_attributes;
-extern unsigned long retained_host_attribute_mask;
-extern unsigned long retained_service_attribute_mask;
-extern unsigned long retained_contact_host_attribute_mask;
-extern unsigned long retained_contact_service_attribute_mask;
-extern unsigned long retained_process_host_attribute_mask;
-extern unsigned long retained_process_service_attribute_mask;
 
 extern unsigned long next_comment_id;
 extern unsigned long next_downtime_id;
 extern unsigned long next_event_id;
 extern unsigned long next_notification_id;
-
-extern int      log_rotation_method;
 
 extern time_t   program_start;
 
@@ -176,48 +100,7 @@ extern int      test_scheduling;
 
 extern check_result check_result_info;
 
-extern int      max_parallel_service_checks;
 extern int      currently_running_service_checks;
-
-extern int      enable_notifications;
-extern int      execute_service_checks;
-extern int      accept_passive_service_checks;
-extern int      execute_host_checks;
-extern int      accept_passive_host_checks;
-extern int      enable_event_handlers;
-extern int      obsess_over_services;
-extern int      obsess_over_hosts;
-extern int      enable_failure_prediction;
-extern int      process_performance_data;
-
-extern int      translate_passive_host_checks;
-extern int      passive_host_checks_are_soft;
-
-extern int      aggregate_status_updates;
-extern int      status_update_interval;
-
-extern int      time_change_threshold;
-
-extern unsigned long event_broker_options;
-
-extern int      process_performance_data;
-
-extern int      enable_flap_detection;
-
-extern double   low_service_flap_threshold;
-extern double   high_service_flap_threshold;
-extern double   low_host_flap_threshold;
-extern double   high_host_flap_threshold;
-
-extern int      use_large_installation_tweaks;
-extern int      enable_environment_macros;
-extern int      free_child_process_memory;
-extern int      child_processes_fork_twice;
-
-extern int      enable_embedded_perl;
-extern int      use_embedded_perl_implicitly;
-
-extern int      date_format;
 
 extern contact		*contact_list;
 extern contactgroup	*contactgroup_list;
@@ -244,7 +127,6 @@ extern char     *tzname[2];
 #endif
 
 extern check_result    *check_result_list;
-extern unsigned long   max_check_result_file_age;
 
 extern dbuf            check_result_dbuf;
 
@@ -252,14 +134,8 @@ extern pthread_t       worker_threads[TOTAL_WORKER_THREADS];
 extern circular_buffer external_command_buffer;
 extern circular_buffer check_result_buffer;
 extern circular_buffer event_broker_buffer;
-extern int             external_command_buffer_slots;
 
 extern check_stats     check_statistics[MAX_CHECK_STATS_TYPES];
-
-extern char            *debug_file;
-extern int             debug_level;
-extern int             debug_verbosity;
-extern unsigned long   max_debug_file_size;
 
 /* from GNU defines errno as a macro, since it's a per-thread variable */
 #ifndef errno
@@ -541,7 +417,7 @@ int my_system_r(nagios_macros *mac, char *cmd,int timeout,int *early_timeout,dou
 #ifndef DONT_USE_MEMORY_PERFORMANCE_TWEAKS
 		/* free allocated memory */
 		/* this needs to be done last, so we don't free memory for variables before they're used above */
-		if(free_child_process_memory==TRUE)
+		if(config.get_free_child_process_memory()==TRUE)
 			free_memory(mac);
 #endif
 
@@ -671,7 +547,7 @@ int my_system(char *cmd,int timeout,int *early_timeout,double *exectime,char **o
 
 
 /* given a "raw" command, return the "expanded" or "whole" command line */
-int get_raw_command_line_r(nagios_macros *mac, command *cmd_ptr, char *cmd, char **full_command, int macro_options)
+int get_raw_command_line_r(nagios_macros *mac, command *cmd_ptr, char const* cmd, char **full_command, int macro_options)
 {
 	char temp_arg[MAX_COMMAND_BUFFER]="";
 	char *arg_buffer=NULL;
@@ -1691,7 +1567,7 @@ time_t get_next_log_rotation_time(void){
 	t->tm_sec=0;
 	is_dst_now=(t->tm_isdst>0)?TRUE:FALSE;
 
-	switch(log_rotation_method){
+	switch(config.get_log_rotation_method()){
 	case LOG_ROTATION_HOURLY:
 		t->tm_hour++;
 		run_time=mktime(t);
@@ -1907,7 +1783,7 @@ int move_check_result_to_queue(char *checkresult_file){
 	old_umask=umask(new_umask);
 
 	/* create a safe temp file */
-	if(asprintf(&output_file,"%s/cXXXXXX",check_result_path)==-1){
+	if(asprintf(&output_file,"%s/cXXXXXX",config.get_check_result_path().c_str())==-1){
 		logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
 		return ERROR;
 		}
@@ -1969,7 +1845,7 @@ int move_check_result_to_queue(char *checkresult_file){
 
 
 /* processes files in the check result queue directory */
-int process_check_result_queue(char *dirname){
+int process_check_result_queue(char const* dirname){
 	char file[MAX_FILENAME_LENGTH];
 	DIR *dirp=NULL;
 	struct dirent *dirfile=NULL;
@@ -2130,7 +2006,7 @@ int process_check_result_file(char *fname){
 
 			/* file is too old - ignore check results it contains and delete it */
 			/* this will only work as intended if file_time comes before check results */
-			if(max_check_result_file_age>0 && (current_time-(strtoul(val,NULL,0))>max_check_result_file_age)){
+		  if(config.get_max_check_result_file_age()>0 && (current_time-(strtoul(val,NULL,0))>config.get_max_check_result_file_age())){
 				delete_file=TRUE;
 				break;
 				}
@@ -2575,7 +2451,7 @@ int open_command_file(void){
  	int result=0;
 
 	/* if we're not checking external commands, don't do anything */
-	if(check_external_commands==FALSE)
+	if(config.get_check_external_commands()==FALSE)
 		return OK;
 
 	/* the command file was already created */
@@ -2586,19 +2462,19 @@ int open_command_file(void){
 	umask(S_IWOTH);
 
 	/* use existing FIFO if possible */
-	if(!(stat(command_file,&st)!=-1 && (st.st_mode & S_IFIFO))){
+	if(!(stat(config.get_command_file().c_str(),&st)!=-1 && (st.st_mode & S_IFIFO))){
 
 		/* create the external command file as a named pipe (FIFO) */
-		if((result=mkfifo(command_file,S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP))!=0){
+	  if((result=mkfifo(config.get_command_file().c_str(),S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP))!=0){
 
-			logit(NSLOG_RUNTIME_ERROR,TRUE,"Error: Could not create external command file '%s' as named pipe: (%d) -> %s.  If this file already exists and you are sure that another copy of Nagios is not running, you should delete this file.\n",command_file,errno,strerror(errno));
+	    logit(NSLOG_RUNTIME_ERROR,TRUE,"Error: Could not create external command file '%s' as named pipe: (%d) -> %s.  If this file already exists and you are sure that another copy of Nagios is not running, you should delete this file.\n",config.get_command_file().c_str(),errno,strerror(errno));
 			return ERROR;
 		        }
 	        }
 
 	/* open the command file for reading (non-blocked) - O_TRUNC flag cannot be used due to errors on some systems */
 	/* NOTE: file must be opened read-write for poll() to work */
-	if((command_file_fd=open(command_file,O_RDWR | O_NONBLOCK))<0){
+	if((command_file_fd=open(config.get_command_file().c_str(),O_RDWR | O_NONBLOCK))<0){
 
 		logit(NSLOG_RUNTIME_ERROR,TRUE,"Error: Could not open external command file for reading via open(): (%d) -> %s\n",errno,strerror(errno));
 
@@ -2622,7 +2498,7 @@ int open_command_file(void){
 		fclose(command_file_fp);
 
 		/* delete the named pipe */
-		unlink(command_file);
+		unlink(config.get_command_file().c_str());
 
 		return ERROR;
 	        }
@@ -2638,7 +2514,7 @@ int open_command_file(void){
 int close_command_file(void){
 
 	/* if we're not checking external commands, don't do anything */
-	if(check_external_commands==FALSE)
+	if(config.get_check_external_commands()==FALSE)
 		return OK;
 
 	/* the command file wasn't created or was already cleaned up */
@@ -2704,7 +2580,7 @@ int contains_illegal_object_chars(char *name){
 	for(;x>=0;x--){
 
 		ch=(int)name[x];
-
+		char const* illegal_object_chars = config.get_illegal_object_chars().c_str();
 		/* illegal user-specified characters */
 		if(illegal_object_chars!=NULL)
 			for(y=0;illegal_object_chars[y];y++)
@@ -2764,7 +2640,7 @@ int compare_strings(char *val1a, char *val2a){
 /******************************************************************/
 
 /* renames a file - works across filesystems (Mike Wiacek) */
-int my_rename(char *source, char *dest){
+int my_rename(char const* source, char const* dest){
 	int rename_result=0;
 
 
@@ -2809,7 +2685,7 @@ int my_rename(char *source, char *dest){
  * destination file dest.
  * This is handy when creating tempfiles with mkstemp()
  */
-int my_fdcopy(char *source, char *dest, int dest_fd)
+int my_fdcopy(char const* source, char const* dest, int dest_fd)
 {
 	int source_fd, rd_result = 0, wr_result = 0;
 	unsigned long tot_written = 0, tot_read = 0, buf_size = 0;
@@ -2894,7 +2770,7 @@ int my_fdcopy(char *source, char *dest, int dest_fd)
 }
 
 /* copies a file */
-int my_fcopy(char *source, char *dest){
+int my_fcopy(char const* source, char const* dest){
 	int dest_fd, result;
 
 	/* make sure we have something */
@@ -3007,7 +2883,7 @@ int init_embedded_perl(char **env){
 	struct stat stat_buf;
 
 	/* make sure the P1 file exists... */
-	if(p1_file==NULL || stat(p1_file,&stat_buf)!=0){
+	if(stat(config.get_p1_file().c_str(),&stat_buf)!=0){
 
 		use_embedded_perl=FALSE;
 
@@ -3020,7 +2896,7 @@ int init_embedded_perl(char **env){
 		if(embedding==NULL)
 			return ERROR;
 		*embedding=strdup("");
-		*(embedding+1)=strdup(p1_file);
+		*(embedding+1)=strdup(config.get_p1_file().c_str());
 
 		use_embedded_perl=TRUE;
 
@@ -3077,7 +2953,7 @@ int file_uses_embedded_perl(char *fname){
 	char *ptr=NULL;
 	int found_epn_directive=FALSE;
 
-	if(enable_embedded_perl==TRUE){
+	if(config.get_enable_embedded_perl()==TRUE){
 
 		/* open the file, check if its a Perl script and see if we can use epn  */
 		fp=fopen(fname,"r");
@@ -3126,7 +3002,7 @@ int file_uses_embedded_perl(char *fname){
 
 				/* if the plugin didn't tell us whether or not to use embedded Perl, use implicit value */
 				if(found_epn_directive==FALSE)
-					use_epn=(use_embedded_perl_implicitly==TRUE)?TRUE:FALSE;
+				  use_epn=(config.get_use_embedded_perl_implicitly()==TRUE)?TRUE:FALSE;
 				}
 
 			fclose(fp);
@@ -3158,7 +3034,7 @@ int init_command_file_worker_thread(void){
 	external_command_buffer.items=0;
 	external_command_buffer.high=0;
 	external_command_buffer.overflow=0L;
-	external_command_buffer.buffer=(void **)malloc(external_command_buffer_slots*sizeof(char **));
+	external_command_buffer.buffer=(void **)malloc(config.get_external_command_buffer_slots()*sizeof(char **));
 	if(external_command_buffer.buffer==NULL)
 		return ERROR;
 
@@ -3222,7 +3098,7 @@ void cleanup_command_file_worker_thread(void *arg){
 	(void)arg;
 
 	/* release memory allocated to circular buffer */
-	for(x=external_command_buffer.tail;x!=external_command_buffer.head;x=(x+1) % external_command_buffer_slots){
+	for(x=external_command_buffer.tail;x!=external_command_buffer.head;x=(x+1) % config.get_external_command_buffer_slots()){
 		my_free(((char **)external_command_buffer.buffer)[x]);
 	        }
 	my_free(external_command_buffer.buffer);
@@ -3303,7 +3179,7 @@ void * command_file_worker_thread(void *arg){
 		pthread_mutex_unlock(&external_command_buffer.buffer_lock);
 
 #ifdef DEBUG_CFWT
-		printf("(CFWT) BUFFER ITEMS: %d/%d\n",buffer_items,external_command_buffer_slots);
+		printf("(CFWT) BUFFER ITEMS: %d/%d\n",buffer_items,config.get_external_command_buffer_slots());
 #endif
 
 		/* 10-15-08 Fix for OS X by Jonathan Saggau - see http://www.jonathansaggau.com/blog/2008/09/using_shark_and_custom_dtrace.html */
@@ -3316,7 +3192,7 @@ void * command_file_worker_thread(void *arg){
 			}
 
 		/* process all commands in the file (named pipe) if there's some space in the buffer */
-		if(buffer_items<external_command_buffer_slots){
+		if(buffer_items<config.get_external_command_buffer_slots()){
 
 			/* clear EOF condition from prior run (FreeBSD fix) */
 			/* FIXME: use_poll_on_cmd_pipe: Still needed? */
@@ -3330,7 +3206,7 @@ void * command_file_worker_thread(void *arg){
 #endif
 
 				/* submit the external command for processing (retry if buffer is full) */
-				while((result=submit_external_command(input_buffer,&buffer_items))==ERROR && buffer_items==external_command_buffer_slots){
+				while((result=submit_external_command(input_buffer,&buffer_items))==ERROR && buffer_items==config.get_external_command_buffer_slots()){
 
 					/* wait a bit */
 					tv.tv_sec=0;
@@ -3346,7 +3222,7 @@ void * command_file_worker_thread(void *arg){
 #endif
 
 				/* bail if the circular buffer is full */
-				if(buffer_items==external_command_buffer_slots)
+				if(buffer_items==config.get_external_command_buffer_slots())
 					break;
 
 				/* should we shutdown? */
@@ -3376,13 +3252,13 @@ int submit_external_command(char *cmd, int *buffer_items){
 	/* obtain a lock for writing to the buffer */
 	pthread_mutex_lock(&external_command_buffer.buffer_lock);
 
-	if(external_command_buffer.items<external_command_buffer_slots){
+	if(external_command_buffer.items<config.get_external_command_buffer_slots()){
 
 		/* save the line in the buffer */
 		((char **)external_command_buffer.buffer)[external_command_buffer.head]=(char *)strdup(cmd);
 
 		/* increment the head counter and items */
-		external_command_buffer.head=(external_command_buffer.head + 1) % external_command_buffer_slots;
+		external_command_buffer.head=(external_command_buffer.head + 1) % config.get_external_command_buffer_slots();
 		external_command_buffer.items++;
 		if(external_command_buffer.items>external_command_buffer.high)
 			external_command_buffer.high=external_command_buffer.items;
@@ -3764,16 +3640,8 @@ void free_memory(nagios_macros *mac)
 	/* reset the event pointer */
 	event_list_low=NULL;
 
-	/* free memory for global event handlers */
-	my_free(global_host_event_handler);
-	my_free(global_service_event_handler);
-
 	/* free any notification list that may have been overlooked */
 	free_notification_list();
-
-	/* free obsessive compulsive commands */
-	my_free(ocsp_command);
-	my_free(ochp_command);
 
 	/*
 	 * free memory associated with macros.
@@ -3788,23 +3656,12 @@ void free_memory(nagios_macros *mac)
 	free_macrox_names();
 
 	/* free illegal char strings */
-	my_free(illegal_object_chars);
-	my_free(illegal_output_chars);
+	//my_free(illegal_object_chars);
+	//my_free(illegal_output_chars);
 
 	/* free version strings */
 	my_free(last_program_version);
 	my_free(new_program_version);
-
-	/* free file/path variables */
-	my_free(log_file);
-	my_free(debug_file);
-	my_free(temp_file);
-	my_free(temp_path);
-	my_free(check_result_path);
-	my_free(command_file);
-	my_free(auth_file);
-	my_free(p1_file);
-	my_free(log_archive_path);
 
 	return;
 }
@@ -3830,158 +3687,34 @@ void free_notification_list(void){
 
 
 /* reset all system-wide variables, so when we've receive a SIGHUP we can restart cleanly */
-int reset_variables(void){
-
-	log_file=(char *)strdup(DEFAULT_LOG_FILE);
-	temp_file=(char *)strdup(DEFAULT_TEMP_FILE);
-	temp_path=(char *)strdup(DEFAULT_TEMP_PATH);
-	check_result_path=(char *)strdup(DEFAULT_CHECK_RESULT_PATH);
-	command_file=(char *)strdup(DEFAULT_COMMAND_FILE);
-	auth_file=(char *)strdup(DEFAULT_AUTH_FILE);
-	p1_file=(char *)strdup(DEFAULT_P1_FILE);
-	log_archive_path=(char *)strdup(DEFAULT_LOG_ARCHIVE_PATH);
-	debug_file=(char *)strdup(DEFAULT_DEBUG_FILE);
-
-	use_regexp_matches=FALSE;
-	use_true_regexp_matching=FALSE;
-
-	use_syslog=DEFAULT_USE_SYSLOG;
-	log_service_retries=DEFAULT_LOG_SERVICE_RETRIES;
-	log_host_retries=DEFAULT_LOG_HOST_RETRIES;
-	log_initial_states=DEFAULT_LOG_INITIAL_STATES;
-
-	log_notifications=DEFAULT_NOTIFICATION_LOGGING;
-	log_event_handlers=DEFAULT_LOG_EVENT_HANDLERS;
-	log_external_commands=DEFAULT_LOG_EXTERNAL_COMMANDS;
-	log_passive_checks=DEFAULT_LOG_PASSIVE_CHECKS;
+int reset_variables(void){ // XXX: replace global var by configuration object
+	config.reset();
 
 	logging_options=NSLOG_RUNTIME_ERROR | NSLOG_RUNTIME_WARNING | NSLOG_VERIFICATION_ERROR | NSLOG_VERIFICATION_WARNING | NSLOG_CONFIG_ERROR | NSLOG_CONFIG_WARNING | NSLOG_PROCESS_INFO | NSLOG_HOST_NOTIFICATION | NSLOG_SERVICE_NOTIFICATION | NSLOG_EVENT_HANDLER | NSLOG_EXTERNAL_COMMAND | NSLOG_PASSIVE_CHECK | NSLOG_HOST_UP | NSLOG_HOST_DOWN | NSLOG_HOST_UNREACHABLE | NSLOG_SERVICE_OK | NSLOG_SERVICE_WARNING | NSLOG_SERVICE_UNKNOWN | NSLOG_SERVICE_CRITICAL | NSLOG_INFO_MESSAGE;
 
 	syslog_options=NSLOG_RUNTIME_ERROR | NSLOG_RUNTIME_WARNING | NSLOG_VERIFICATION_ERROR | NSLOG_VERIFICATION_WARNING | NSLOG_CONFIG_ERROR | NSLOG_CONFIG_WARNING | NSLOG_PROCESS_INFO | NSLOG_HOST_NOTIFICATION | NSLOG_SERVICE_NOTIFICATION | NSLOG_EVENT_HANDLER | NSLOG_EXTERNAL_COMMAND | NSLOG_PASSIVE_CHECK | NSLOG_HOST_UP | NSLOG_HOST_DOWN | NSLOG_HOST_UNREACHABLE | NSLOG_SERVICE_OK | NSLOG_SERVICE_WARNING | NSLOG_SERVICE_UNKNOWN | NSLOG_SERVICE_CRITICAL | NSLOG_INFO_MESSAGE;
 
-	service_check_timeout=DEFAULT_SERVICE_CHECK_TIMEOUT;
-	host_check_timeout=DEFAULT_HOST_CHECK_TIMEOUT;
-	event_handler_timeout=DEFAULT_EVENT_HANDLER_TIMEOUT;
-	notification_timeout=DEFAULT_NOTIFICATION_TIMEOUT;
-	ocsp_timeout=DEFAULT_OCSP_TIMEOUT;
-	ochp_timeout=DEFAULT_OCHP_TIMEOUT;
 
-	sleep_time=DEFAULT_SLEEP_TIME;
-	interval_length=DEFAULT_INTERVAL_LENGTH;
-	service_inter_check_delay_method=ICD_SMART;
-	host_inter_check_delay_method=ICD_SMART;
-	service_interleave_factor_method=ILF_SMART;
-	max_service_check_spread=DEFAULT_SERVICE_CHECK_SPREAD;
-	max_host_check_spread=DEFAULT_HOST_CHECK_SPREAD;
-
-	use_aggressive_host_checking=DEFAULT_AGGRESSIVE_HOST_CHECKING;
-	cached_host_check_horizon=DEFAULT_CACHED_HOST_CHECK_HORIZON;
-	cached_service_check_horizon=DEFAULT_CACHED_SERVICE_CHECK_HORIZON;
-	enable_predictive_host_dependency_checks=DEFAULT_ENABLE_PREDICTIVE_HOST_DEPENDENCY_CHECKS;
-	enable_predictive_service_dependency_checks=DEFAULT_ENABLE_PREDICTIVE_SERVICE_DEPENDENCY_CHECKS;
-
-	soft_state_dependencies=FALSE;
-
-	retain_state_information=FALSE;
-	retention_update_interval=DEFAULT_RETENTION_UPDATE_INTERVAL;
-	use_retained_program_state=TRUE;
-	use_retained_scheduling_info=FALSE;
-	retention_scheduling_horizon=DEFAULT_RETENTION_SCHEDULING_HORIZON;
 	modified_host_process_attributes=MODATTR_NONE;
 	modified_service_process_attributes=MODATTR_NONE;
-	retained_host_attribute_mask=0L;
-	retained_service_attribute_mask=0L;
-	retained_process_host_attribute_mask=0L;
-	retained_process_service_attribute_mask=0L;
-	retained_contact_host_attribute_mask=0L;
-	retained_contact_service_attribute_mask=0L;
-
-	command_check_interval=DEFAULT_COMMAND_CHECK_INTERVAL;
-	check_reaper_interval=DEFAULT_CHECK_REAPER_INTERVAL;
-        max_check_reaper_time=DEFAULT_MAX_REAPER_TIME;
-	max_check_result_file_age=DEFAULT_MAX_CHECK_RESULT_AGE;
-	service_freshness_check_interval=DEFAULT_FRESHNESS_CHECK_INTERVAL;
-	host_freshness_check_interval=DEFAULT_FRESHNESS_CHECK_INTERVAL;
-	auto_rescheduling_interval=DEFAULT_AUTO_RESCHEDULING_INTERVAL;
-	auto_rescheduling_window=DEFAULT_AUTO_RESCHEDULING_WINDOW;
-
-	check_external_commands=DEFAULT_CHECK_EXTERNAL_COMMANDS;
-	check_orphaned_services=DEFAULT_CHECK_ORPHANED_SERVICES;
-	check_orphaned_hosts=DEFAULT_CHECK_ORPHANED_HOSTS;
-	check_service_freshness=DEFAULT_CHECK_SERVICE_FRESHNESS;
-	check_host_freshness=DEFAULT_CHECK_HOST_FRESHNESS;
-	auto_reschedule_checks=DEFAULT_AUTO_RESCHEDULE_CHECKS;
-
-	log_rotation_method=LOG_ROTATION_NONE;
 
 	last_command_check=0L;
 	last_command_status_update=0L;
 	last_log_rotation=0L;
 
-        max_parallel_service_checks=DEFAULT_MAX_PARALLEL_SERVICE_CHECKS;
         currently_running_service_checks=0;
-
-	enable_notifications=TRUE;
-	execute_service_checks=TRUE;
-	accept_passive_service_checks=TRUE;
-	execute_host_checks=TRUE;
-	accept_passive_service_checks=TRUE;
-	enable_event_handlers=TRUE;
-	obsess_over_services=FALSE;
-	obsess_over_hosts=FALSE;
-	enable_failure_prediction=TRUE;
 
 	next_comment_id=0L;  /* comment and downtime id get initialized to nonzero elsewhere */
 	next_downtime_id=0L;
 	next_event_id=1;
 	next_notification_id=1;
 
-	aggregate_status_updates=TRUE;
-	status_update_interval=DEFAULT_STATUS_UPDATE_INTERVAL;
-
-	event_broker_options=BROKER_NOTHING;
-
-	time_change_threshold=DEFAULT_TIME_CHANGE_THRESHOLD;
-
-	enable_flap_detection=DEFAULT_ENABLE_FLAP_DETECTION;
-	low_service_flap_threshold=DEFAULT_LOW_SERVICE_FLAP_THRESHOLD;
-	high_service_flap_threshold=DEFAULT_HIGH_SERVICE_FLAP_THRESHOLD;
-	low_host_flap_threshold=DEFAULT_LOW_HOST_FLAP_THRESHOLD;
-	high_host_flap_threshold=DEFAULT_HIGH_HOST_FLAP_THRESHOLD;
-
-	process_performance_data=DEFAULT_PROCESS_PERFORMANCE_DATA;
-
-	translate_passive_host_checks=DEFAULT_TRANSLATE_PASSIVE_HOST_CHECKS;
-	passive_host_checks_are_soft=DEFAULT_PASSIVE_HOST_CHECKS_SOFT;
-
-	use_large_installation_tweaks=DEFAULT_USE_LARGE_INSTALLATION_TWEAKS;
-	enable_environment_macros=TRUE;
-	free_child_process_memory=-1;
-	child_processes_fork_twice=-1;
-
-	additional_freshness_latency=DEFAULT_ADDITIONAL_FRESHNESS_LATENCY;
-
-        enable_embedded_perl=DEFAULT_ENABLE_EMBEDDED_PERL;
-	use_embedded_perl_implicitly=DEFAULT_USE_EMBEDDED_PERL_IMPLICITLY;
-
-	external_command_buffer_slots=DEFAULT_EXTERNAL_COMMAND_BUFFER_SLOTS;
-
-	debug_level=DEFAULT_DEBUG_LEVEL;
-	debug_verbosity=DEFAULT_DEBUG_VERBOSITY;
-	max_debug_file_size=DEFAULT_MAX_DEBUG_FILE_SIZE;
-
-	date_format=DATE_FORMAT_US;
-
 	/* initialize macros */
 	init_macros();
 
-	global_host_event_handler=NULL;
-	global_service_event_handler=NULL;
 	global_host_event_handler_ptr=NULL;
 	global_service_event_handler_ptr=NULL;
 
-	ocsp_command=NULL;
-	ochp_command=NULL;
 	ocsp_command_ptr=NULL;
 	ochp_command_ptr=NULL;
 

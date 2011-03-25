@@ -1,11 +1,14 @@
+#include "configuration.hh"
+
 #include "config.hh"
 #include "common.hh"
+
+extern com::centreon::scheduler::configuration config;
 
 /*
  * This file holds random utility functions shared by cgi's and
  * core.
  */
-extern int date_format;
 
 /* fix the problem with strtok() skipping empty options between tokens */
 char *my_strtok(char *buffer, char const *tokens)
@@ -436,16 +439,16 @@ void get_datetime_string(time_t * raw_time, char *buffer, int buffer_length,
 
 	/* short date/time */
 	else if (type == SHORT_DATE_TIME) {
-		if (date_format == DATE_FORMAT_EURO)
+		if (config.get_date_format() == DATE_FORMAT_EURO)
 			snprintf(buffer, buffer_length,
 				 "%02d-%02d-%04d %02d:%02d:%02d", day, month,
 				 year, hour, minute, second);
-		else if (date_format == DATE_FORMAT_ISO8601
-			 || date_format == DATE_FORMAT_STRICT_ISO8601)
+		else if (config.get_date_format() == DATE_FORMAT_ISO8601
+			 || config.get_date_format() == DATE_FORMAT_STRICT_ISO8601)
 			snprintf(buffer, buffer_length,
 				 "%04d-%02d-%02d%c%02d:%02d:%02d", year, month,
 				 day,
-				 (date_format ==
+				 (config.get_date_format() ==
 				  DATE_FORMAT_STRICT_ISO8601) ? 'T' : ' ', hour,
 				 minute, second);
 		else
@@ -456,11 +459,11 @@ void get_datetime_string(time_t * raw_time, char *buffer, int buffer_length,
 
 	/* short date */
 	else if (type == SHORT_DATE) {
-		if (date_format == DATE_FORMAT_EURO)
+		if (config.get_date_format() == DATE_FORMAT_EURO)
 			snprintf(buffer, buffer_length, "%02d-%02d-%04d", day,
 				 month, year);
-		else if (date_format == DATE_FORMAT_ISO8601
-			 || date_format == DATE_FORMAT_STRICT_ISO8601)
+		else if (config.get_date_format() == DATE_FORMAT_ISO8601
+			 || config.get_date_format() == DATE_FORMAT_STRICT_ISO8601)
 			snprintf(buffer, buffer_length, "%04d-%02d-%02d", year,
 				 month, day);
 		else

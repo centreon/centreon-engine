@@ -18,6 +18,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "configuration.hh"
+
 #include "config.hh"
 #include "comments.hh"
 #include "common.hh"
@@ -41,57 +43,13 @@
 #include "neberrors.hh"
 #endif
 
+extern com::centreon::scheduler::configuration config;
+
 extern int      sigshutdown;
 extern int      sigrestart;
 
-extern char     *temp_file;
-extern char     *temp_path;
-extern char     *check_result_path;
-
-extern int      interval_length;
-
-extern int      command_check_interval;
-
-extern int      log_initial_states;
-extern int      log_passive_checks;
-
-extern int      service_check_timeout;
-extern int      host_check_timeout;
-
-extern int      check_reaper_interval;
-extern int      max_check_reaper_time;
-
-extern int      use_aggressive_host_checking;
-extern unsigned long cached_host_check_horizon;
-extern unsigned long cached_service_check_horizon;
-extern int      enable_predictive_host_dependency_checks;
-extern int      enable_predictive_service_dependency_checks;
-
-extern int      soft_state_dependencies;
-
 extern int      currently_running_service_checks;
 extern int      currently_running_host_checks;
-
-extern int      accept_passive_service_checks;
-extern int      execute_service_checks;
-extern int      accept_passive_host_checks;
-extern int      execute_host_checks;
-extern int      obsess_over_services;
-extern int      obsess_over_hosts;
-
-extern int      translate_passive_host_checks;
-extern int      passive_host_checks_are_soft;
-
-extern int      check_service_freshness;
-extern int      check_host_freshness;
-extern int      additional_freshness_latency;
-
-extern int      max_host_check_spread;
-extern int      max_service_check_spread;
-
-extern int      use_large_installation_tweaks;
-extern int      free_child_process_memory;
-extern int      child_processes_fork_twice;
 
 extern time_t   program_start;
 extern time_t   event_start;
@@ -111,8 +69,6 @@ extern check_result    check_result_info;
 extern check_result    *check_result_list;
 
 extern pthread_t       worker_threads[TOTAL_WORKER_THREADS];
-
-extern unsigned long max_debug_file_size;
 
 #ifdef EMBEDDEDPERL
 extern int      use_embedded_perl;
@@ -258,7 +214,7 @@ int reap_check_results(void){
 	time(&reaper_start_time);
 
 	/* process files in the check result queue */
-	process_check_result_queue(check_result_path);
+	process_check_result_queue(config.get_check_result_path().c_str());
 
 	/* read all check results that have come in... */
 	while((queued_check_result=read_check_result())){
@@ -330,7 +286,7 @@ int reap_check_results(void){
 
 		/* break out if we've been here too long (max_check_reaper_time seconds) */
 		time(&current_time);
-		if((int)(current_time-reaper_start_time)>max_check_reaper_time){
+		if((int)(current_time-reaper_start_time)>config.get_max_check_reaper_time()){
 			log_debug_info(DEBUGL_CHECKS,0,"Breaking out of check result reaper: max reaper time exceeded\n");
 			break;
 			}
@@ -386,7 +342,7 @@ int run_scheduled_service_check(service *svc, int check_options, double latency)
 			/* determine next time we should check the service if needed */
 			/* if service has no check interval, schedule it again for 5 minutes from now */
 			if(current_time>=preferred_time)
-				preferred_time=current_time+((svc->check_interval<=0)?300:(svc->check_interval*interval_length));
+				preferred_time=current_time+((svc->check_interval<=0)?300:(svc->check_interval*config.get_interval_length()));
 
 			/* make sure we rescheduled the next service check at a valid time */
 			get_next_valid_time(preferred_time,&next_valid_time,svc->check_period_ptr);
@@ -503,7 +459,7 @@ int run_async_service_check(service *svc, int check_options, double latency, int
 	/* neb module wants to cancel the service check - the check will be rescheduled for a later time by the scheduling logic */
 	if(neb_result==NEBERROR_CALLBACKCANCEL){
 		if(preferred_time)
-			*preferred_time+=(svc->check_interval*interval_length);
+			*preferred_time+=(svc->check_interval*config.get_interval_length());
 		return ERROR;
 		}
 
@@ -537,7 +493,7 @@ int run_async_service_check(service *svc, int check_options, double latency, int
 		clear_volatile_macros(&mac);
 		log_debug_info(DEBUGL_CHECKS,0,"Raw check command for service '%s' on host '%s' was NULL - aborting.\n",svc->description,svc->host_name);
 		if(preferred_time)
-			*preferred_time+=(svc->check_interval*interval_length);
+			*preferred_time+=(svc->check_interval*config.get_interval_length());
 		svc->latency=old_latency;
 		return ERROR;
 		}
@@ -548,7 +504,7 @@ int run_async_service_check(service *svc, int check_options, double latency, int
 		clear_volatile_macros(&mac);
 		log_debug_info(DEBUGL_CHECKS,0,"Processed check command for service '%s' on host '%s' was NULL - aborting.\n",svc->description,svc->host_name);
 		if(preferred_time)
-			*preferred_time+=(svc->check_interval*interval_length);
+			*preferred_time+=(svc->check_interval*config.get_interval_length());
 		svc->latency=old_latency;
 		my_free(raw_command);
 		return ERROR;
@@ -578,7 +534,7 @@ int run_async_service_check(service *svc, int check_options, double latency, int
 
 #ifdef USE_EVENT_BROKER
 	/* send data to event broker */
-	neb_result=broker_service_check(NEBTYPE_SERVICECHECK_INITIATE,NEBFLAG_NONE,NEBATTR_NONE,svc,SERVICE_CHECK_ACTIVE,start_time,end_time,svc->service_check_command,svc->latency,0.0,service_check_timeout,FALSE,0,processed_command,NULL);
+	neb_result=broker_service_check(NEBTYPE_SERVICECHECK_INITIATE,NEBFLAG_NONE,NEBATTR_NONE,svc,SERVICE_CHECK_ACTIVE,start_time,end_time,svc->service_check_command,svc->latency,0.0,config.get_service_check_timeout(),FALSE,0,processed_command,NULL);
 
 	/* neb module wants to override the service check - perhaps it will check the service itself */
 	if(neb_result==NEBERROR_CALLBACKOVERRIDE){
@@ -592,7 +548,7 @@ int run_async_service_check(service *svc, int check_options, double latency, int
 
 	/* open a temp file for storing check output */
 	old_umask=umask(new_umask);
-	if(asprintf(&output_file,"%s/checkXXXXXX",temp_path)==-1){
+	if(asprintf(&output_file,"%s/checkXXXXXX",config.get_temp_path().c_str())==-1){
 		logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
 		svc->latency=old_latency;
 		my_free(processed_command);
@@ -783,7 +739,7 @@ int run_async_service_check(service *svc, int check_options, double latency, int
 		close_command_file();
 
 		/* fork again if we're not in a large installation */
-		if(child_processes_fork_twice==TRUE){
+		if(config.get_child_processes_fork_twice()==TRUE){
 
 			/* fork again... */
 			pid=fork();
@@ -794,7 +750,7 @@ int run_async_service_check(service *svc, int check_options, double latency, int
 			}
 
 		/* the grandchild (or child if large install tweaks are enabled) process should run the service check... */
-		if(pid==0 || child_processes_fork_twice==FALSE){
+		if(pid==0 || config.get_child_processes_fork_twice()==FALSE){
 
 			/* reset signal handling */
 			reset_sighandler();
@@ -807,10 +763,10 @@ int run_async_service_check(service *svc, int check_options, double latency, int
 
 			/* catch plugins that don't finish in a timely manner */
 			signal(SIGALRM,service_check_sighandler);
-			alarm(service_check_timeout);
+			alarm(config.get_service_check_timeout());
 
 			/* disable rotation of the debug file */
-			max_debug_file_size=0L;
+			config.set_max_debug_file_size(0L);
 
 			/******** BEGIN EMBEDDED PERL INTERPRETER EXECUTION ********/
 #ifdef EMBEDDEDPERL
@@ -951,7 +907,7 @@ int run_async_service_check(service *svc, int check_options, double latency, int
 
 		/* free allocated memory */
 		/* this needs to be done last, so we don't free memory for variables before they're used above */
-		if(free_child_process_memory==TRUE)
+		if(config.get_free_child_process_memory()==TRUE)
 			free_memory(&mac);
 
 		/* parent exits immediately - grandchild process is inherited by the INIT process, so we have no zombie problem... */
@@ -978,7 +934,7 @@ int run_async_service_check(service *svc, int check_options, double latency, int
 
 		/* wait for the first child to return */
 		/* don't do this if large install tweaks are enabled - we'll clean up children in event loop */
-		if(child_processes_fork_twice==TRUE)
+		if(config.get_child_processes_fork_twice()==TRUE)
 			wait_result=waitpid(pid,NULL,0);
 	        }
 
@@ -1035,7 +991,7 @@ int handle_async_service_check_result(service *temp_service, check_result *queue
 
 	/* skip this service check results if its passive and we aren't accepting passive check results */
 	if(queued_check_result->check_type==SERVICE_CHECK_PASSIVE){
-		if(accept_passive_service_checks==FALSE){
+		if(config.get_accept_passive_service_checks()==FALSE){
 			log_debug_info(DEBUGL_CHECKS,0,"Discarding passive service check result because passive service checks are disabled globally.\n");
 			return ERROR;
 			}
@@ -1164,7 +1120,7 @@ int handle_async_service_check_result(service *temp_service, check_result *queue
 
 	/* log passive checks - we need to do this here, as some my bypass external commands by getting dropped in checkresults dir */
 	if(temp_service->check_type==SERVICE_CHECK_PASSIVE){
-		if(log_passive_checks==TRUE)
+		if(config.get_log_passive_checks()==true)
 			logit(NSLOG_PASSIVE_CHECK,FALSE,"PASSIVE SERVICE CHECK: %s;%s;%d;%s\n",temp_service->host_name,temp_service->description,temp_service->current_state,temp_service->plugin_output);
 	        }
 
@@ -1184,7 +1140,7 @@ int handle_async_service_check_result(service *temp_service, check_result *queue
 			/* 08/04/07 EG launch an async (parallel) host check unless aggressive host checking is enabled */
 			/* previous logic was to simply run a sync (serial) host check */
 			/* do NOT allow cached check results to happen here - we need the host to be checked for real... */
-			if(use_aggressive_host_checking==TRUE)
+			if(config.get_use_aggressive_host_checking()==TRUE)
 				perform_on_demand_host_check(temp_host,NULL,CHECK_OPTION_NONE,FALSE,0L);
 			else
 				run_async_host_check_3x(temp_host,CHECK_OPTION_NONE,0.0,FALSE,FALSE,NULL,NULL);
@@ -1316,15 +1272,15 @@ int handle_async_service_check_result(service *temp_service, check_result *queue
 
 			/* 08/04/07 EG launch an async (parallel) host check (possibly cached) unless aggressive host checking is enabled */
 			/* previous logic was to simply run a sync (serial) host check */
-			if(use_aggressive_host_checking==TRUE)
-				perform_on_demand_host_check(temp_host,NULL,CHECK_OPTION_NONE,TRUE,cached_host_check_horizon);
+			if(config.get_use_aggressive_host_checking()==TRUE)
+				perform_on_demand_host_check(temp_host,NULL,CHECK_OPTION_NONE,TRUE,config.get_cached_host_check_horizon());
 			/* 09/23/07 EG don't launch a new host check if we already did so earlier */
 			else if(first_host_check_initiated==TRUE)
 				log_debug_info(DEBUGL_CHECKS,1,"First host check was already initiated, so we'll skip a new host check.\n");
 			else{
 				/* can we use the last cached host state? */
 				/* usually only use cached host state if no service state change has occurred */
-				if((state_change==FALSE || state_changes_use_cached_state==TRUE) && temp_host->has_been_checked==TRUE && ((current_time-temp_host->last_check) <= cached_host_check_horizon)){
+				if((state_change==FALSE || state_changes_use_cached_state==TRUE) && temp_host->has_been_checked==TRUE && ((current_time-temp_host->last_check) <= config.get_cached_host_check_horizon())){
 					log_debug_info(DEBUGL_CHECKS,1,"* Using cached host state: %d\n",temp_host->current_state);
 					update_check_stats(ACTIVE_ONDEMAND_HOST_CHECK_STATS,current_time);
 					update_check_stats(ACTIVE_CACHED_HOST_CHECK_STATS,current_time);
@@ -1383,7 +1339,7 @@ int handle_async_service_check_result(service *temp_service, check_result *queue
 			}
 
 		/* should we obsessive over service checks? */
-		if(obsess_over_services==TRUE)
+		if(config.get_obsess_over_services()==TRUE)
 			obsessive_compulsive_service_check_processor(temp_service);
 
 		/* reset all service variables because its okay now... */
@@ -1402,7 +1358,7 @@ int handle_async_service_check_result(service *temp_service, check_result *queue
 		temp_service->no_more_notifications=FALSE;
 
 		if(reschedule_check==TRUE)
-			next_service_check=(time_t)(temp_service->last_check+(temp_service->check_interval*interval_length));
+			next_service_check=(time_t)(temp_service->last_check+(temp_service->check_interval*config.get_interval_length()));
 	        }
 
 
@@ -1422,12 +1378,12 @@ int handle_async_service_check_result(service *temp_service, check_result *queue
 
 			/* 08/04/07 EG launch an async (parallel) host check (possibly cached) unless aggressive host checking is enabled */
 			/* previous logic was to simply run a sync (serial) host check */
-			if(use_aggressive_host_checking==TRUE)
-				perform_on_demand_host_check(temp_host,&route_result,CHECK_OPTION_NONE,TRUE,cached_host_check_horizon);
+			if(config.get_use_aggressive_host_checking()==TRUE)
+				perform_on_demand_host_check(temp_host,&route_result,CHECK_OPTION_NONE,TRUE,config.get_cached_host_check_horizon());
 			else{
 				/* can we use the last cached host state? */
 				/* only use cached host state if no service state change has occurred */
-				if((state_change==FALSE || state_changes_use_cached_state==TRUE) && temp_host->has_been_checked==TRUE && ((current_time-temp_host->last_check) <= cached_host_check_horizon)){
+				if((state_change==FALSE || state_changes_use_cached_state==TRUE) && temp_host->has_been_checked==TRUE && ((current_time-temp_host->last_check) <= config.get_cached_host_check_horizon())){
 					/* use current host state as route result */
 					route_result=temp_host->current_state;
 					log_debug_info(DEBUGL_CHECKS,1,"* Using cached host state: %d\n",temp_host->current_state);
@@ -1460,9 +1416,9 @@ int handle_async_service_check_result(service *temp_service, check_result *queue
 			log_debug_info(DEBUGL_CHECKS,1,"Host is currently DOWN/UNREACHABLE.\n");
 
 			/* we're using aggressive host checking, so really do recheck the host... */
-			if(use_aggressive_host_checking==TRUE){
+			if(config.get_use_aggressive_host_checking()==TRUE){
 				log_debug_info(DEBUGL_CHECKS,1,"Agressive host checking is enabled, so we'll recheck the host state...\n");
-				perform_on_demand_host_check(temp_host,&route_result,CHECK_OPTION_NONE,TRUE,cached_host_check_horizon);
+				perform_on_demand_host_check(temp_host,&route_result,CHECK_OPTION_NONE,TRUE,config.get_cached_host_check_horizon());
 				}
 
 			/* the service wobbled between non-OK states, so check the host... */
@@ -1473,7 +1429,7 @@ int handle_async_service_check_result(service *temp_service, check_result *queue
 				/* use current host state as route result */
 				route_result=temp_host->current_state;
 				run_async_host_check_3x(temp_host,CHECK_OPTION_NONE,0.0,FALSE,FALSE,NULL,NULL);
-				/*perform_on_demand_host_check(temp_host,&route_result,CHECK_OPTION_NONE,TRUE,cached_host_check_horizon);*/
+				/*perform_on_demand_host_check(temp_host,&route_result,CHECK_OPTION_NONE,TRUE,config.get_cached_host_check_horizon());*/
 				}
 
 			/* else fake the host check, but (possibly) resend host notifications to contacts... */
@@ -1553,7 +1509,7 @@ int handle_async_service_check_result(service *temp_service, check_result *queue
 
 				/* the host is not up, so reschedule the next service check at regular interval */
 				if(reschedule_check==TRUE)
-					next_service_check=(time_t)(temp_service->last_check+(temp_service->check_interval*interval_length));
+					next_service_check=(time_t)(temp_service->last_check+(temp_service->check_interval*config.get_interval_length()));
 
 				/* log the problem as a hard state if the host just went down */
 				if(hard_state_change==TRUE){
@@ -1581,11 +1537,11 @@ int handle_async_service_check_result(service *temp_service, check_result *queue
 				handle_service_event(temp_service);
 
 				if(reschedule_check==TRUE)
-					next_service_check=(time_t)(temp_service->last_check+(temp_service->retry_interval*interval_length));
+					next_service_check=(time_t)(temp_service->last_check+(temp_service->retry_interval*config.get_interval_length()));
 			        }
 
 			/* perform dependency checks on the second to last check of the service */
-			if(enable_predictive_service_dependency_checks==TRUE && temp_service->current_attempt==(temp_service->max_attempts-1)){
+			if(config.get_enable_predictive_service_dependency_checks()==TRUE && temp_service->current_attempt==(temp_service->max_attempts-1)){
 
 				log_debug_info(DEBUGL_CHECKS,1,"Looking for services to check for predictive dependency checks...\n");
 
@@ -1648,12 +1604,12 @@ int handle_async_service_check_result(service *temp_service, check_result *queue
 
 			/* reschedule the next check at the regular interval */
 			if(reschedule_check==TRUE)
-				next_service_check=(time_t)(temp_service->last_check+(temp_service->check_interval*interval_length));
+				next_service_check=(time_t)(temp_service->last_check+(temp_service->check_interval*config.get_interval_length()));
 		        }
 
 
 		/* should we obsessive over service checks? */
-		if(obsess_over_services==TRUE)
+		if(config.get_obsess_over_services()==TRUE)
 			obsessive_compulsive_service_check_processor(temp_service);
 	        }
 
@@ -1708,7 +1664,7 @@ int handle_async_service_check_result(service *temp_service, check_result *queue
 
 #ifdef USE_EVENT_BROKER
 	/* send data to event broker */
-	broker_service_check(NEBTYPE_SERVICECHECK_PROCESSED,NEBFLAG_NONE,NEBATTR_NONE,temp_service,temp_service->check_type,queued_check_result->start_time,queued_check_result->finish_time,NULL,temp_service->latency,temp_service->execution_time,service_check_timeout,queued_check_result->early_timeout,queued_check_result->return_code,NULL,NULL);
+	broker_service_check(NEBTYPE_SERVICECHECK_PROCESSED,NEBFLAG_NONE,NEBATTR_NONE,temp_service,temp_service->check_type,queued_check_result->start_time,queued_check_result->finish_time,NULL,temp_service->latency,temp_service->execution_time,config.get_service_check_timeout(),queued_check_result->early_timeout,queued_check_result->return_code,NULL,NULL);
 #endif
 
 	if(!(reschedule_check==TRUE && temp_service->should_be_scheduled==TRUE && temp_service->has_been_checked==TRUE) ||
@@ -1740,7 +1696,7 @@ int handle_async_service_check_result(service *temp_service, check_result *queue
 		temp_service=(service *)servicelist_item->object_ptr;
 
 		/* we can get by with a cached state, so don't check the service */
-		if((current_time-temp_service->last_check)<=cached_service_check_horizon){
+		if((current_time-temp_service->last_check)<=config.get_cached_service_check_horizon()){
 			run_async_check=FALSE;
 
 			/* update check statistics */
@@ -1910,9 +1866,9 @@ int check_service_check_viability(service *svc, int check_options, int *time_is_
 
 	/* get the check interval to use if we need to reschedule the check */
 	if(svc->state_type==SOFT_STATE && svc->current_state!=STATE_OK)
-		check_interval=(svc->retry_interval*interval_length);
+		check_interval=(svc->retry_interval*config.get_interval_length());
 	else
-		check_interval=(svc->check_interval*interval_length);
+		check_interval=(svc->check_interval*config.get_interval_length());
 
 	/* get the current time */
 	time(&current_time);
@@ -1989,7 +1945,7 @@ int check_service_dependencies(service *svc,int dependency_type){
 			return FALSE;
 
 		/* get the status to use (use last hard state if its currently in a soft state) */
-		if(temp_service->state_type==SOFT_STATE && soft_state_dependencies==FALSE)
+		if(temp_service->state_type==SOFT_STATE && config.get_soft_state_dependencies()==FALSE)
 			state=temp_service->last_hard_state;
 		else
 			state=temp_service->current_state;
@@ -2038,7 +1994,7 @@ void check_for_orphaned_services(void){
 			continue;
 
 		/* determine the time at which the check results should have come in (allow 10 minutes slack time) */
-		expected_time=(time_t)(temp_service->next_check+temp_service->latency+service_check_timeout+check_reaper_interval+600);
+		expected_time=(time_t)(temp_service->next_check+temp_service->latency+config.get_service_check_timeout()+config.get_check_reaper_interval()+600);
 
 		/* this service was supposed to have executed a while ago, but for some reason the results haven't come back in... */
 		if(expected_time<current_time){
@@ -2076,7 +2032,7 @@ void check_service_result_freshness(void){
 	log_debug_info(DEBUGL_CHECKS,1,"Checking the freshness of service check results...\n");
 
 	/* bail out if we're not supposed to be checking freshness */
-	if(check_service_freshness==FALSE){
+	if(config.get_check_service_freshness()==FALSE){
 		log_debug_info(DEBUGL_CHECKS,1,"Service freshness checking is disabled.\n");
 		return;
 		}
@@ -2147,9 +2103,9 @@ int is_service_result_fresh(service *temp_service, time_t current_time, int log_
 	/* use user-supplied freshness threshold or auto-calculate a freshness threshold to use? */
 	if(temp_service->freshness_threshold==0){
 		if(temp_service->state_type==HARD_STATE || temp_service->current_state==STATE_OK)
-			freshness_threshold=(temp_service->check_interval*interval_length)+temp_service->latency+additional_freshness_latency;
+		  freshness_threshold=(temp_service->check_interval*config.get_interval_length())+temp_service->latency+config.get_additional_freshness_latency();
 		else
-			freshness_threshold=(temp_service->retry_interval*interval_length)+temp_service->latency+additional_freshness_latency;
+		  freshness_threshold=(temp_service->retry_interval*config.get_interval_length())+temp_service->latency+config.get_additional_freshness_latency();
 		}
 	else
 		freshness_threshold=temp_service->freshness_threshold;
@@ -2165,7 +2121,7 @@ int is_service_result_fresh(service *temp_service, time_t current_time, int log_
 	/* CHANGED 10/07/07 EG - Only match next condition for services that have active checks enabled... */
 	/* CHANGED 10/07/07 EG - Added max_service_check_spread to expiration time as suggested by Altinity */
 	else if(temp_service->checks_enabled==TRUE && event_start>temp_service->last_check && temp_service->freshness_threshold==0)
-		expiration_time=(time_t)(event_start+freshness_threshold+(max_service_check_spread*interval_length));
+		expiration_time=(time_t)(event_start+freshness_threshold+(config.get_max_service_check_spread()*config.get_interval_length()));
 	else
 		expiration_time=(time_t)(temp_service->last_check+freshness_threshold);
 
@@ -2387,7 +2343,7 @@ int check_host_dependencies(host *hst,int dependency_type){
 			return FALSE;
 
 		/* get the status to use (use last hard state if its currently in a soft state) */
-		if(temp_host->state_type==SOFT_STATE && soft_state_dependencies==FALSE)
+		if(temp_host->state_type==SOFT_STATE && config.get_soft_state_dependencies()==FALSE)
 			state=temp_host->last_hard_state;
 		else
 			state=temp_host->current_state;
@@ -2438,7 +2394,7 @@ void check_for_orphaned_hosts(void){
 			continue;
 
 		/* determine the time at which the check results should have come in (allow 10 minutes slack time) */
-		expected_time=(time_t)(temp_host->next_check+temp_host->latency+host_check_timeout+check_reaper_interval+600);
+		expected_time=(time_t)(temp_host->next_check+temp_host->latency+config.get_host_check_timeout()+config.get_check_reaper_interval()+600);
 
 		/* this host was supposed to have executed a while ago, but for some reason the results haven't come back in... */
 		if(expected_time<current_time){
@@ -2476,7 +2432,7 @@ void check_host_result_freshness(void){
 	log_debug_info(DEBUGL_CHECKS,2,"Attempting to check the freshness of host check results...\n");
 
 	/* bail out if we're not supposed to be checking freshness */
-	if(check_host_freshness==FALSE){
+	if(config.get_check_host_freshness()==FALSE){
 		log_debug_info(DEBUGL_CHECKS,2,"Host freshness checking is disabled.\n");
 		return;
 		}
@@ -2540,7 +2496,7 @@ int is_host_result_fresh(host *temp_host, time_t current_time, int log_this){
 
 	/* use user-supplied freshness threshold or auto-calculate a freshness threshold to use? */
 	if(temp_host->freshness_threshold==0)
-		freshness_threshold=(temp_host->check_interval*interval_length)+temp_host->latency+additional_freshness_latency;
+	  freshness_threshold=(temp_host->check_interval*config.get_interval_length())+temp_host->latency+config.get_additional_freshness_latency();
 	else
 		freshness_threshold=temp_host->freshness_threshold;
 
@@ -2553,7 +2509,7 @@ int is_host_result_fresh(host *temp_host, time_t current_time, int log_this){
 	/* CHANGED 06/19/07 EG - Per Ton's suggestion (and user requests), only use program start time over last check if no specific threshold has been set by user.  Otheriwse use it.  Problems can occur if Nagios is restarted more frequently that freshness threshold intervals (hosts never go stale). */
 	/* CHANGED 10/07/07 EG - Added max_host_check_spread to expiration time as suggested by Altinity */
 	else if(temp_host->checks_enabled==TRUE && event_start>temp_host->last_check && temp_host->freshness_threshold==0)
-		expiration_time=(time_t)(event_start+freshness_threshold+(max_host_check_spread*interval_length));
+		expiration_time=(time_t)(event_start+freshness_threshold+(config.get_max_host_check_spread()*config.get_interval_length()));
 	else
 		expiration_time=(time_t)(temp_host->last_check+freshness_threshold);
 
@@ -2703,7 +2659,7 @@ int run_sync_host_check_3x(host *hst, int *check_result_code, int check_options,
 	/* send data to event broker */
 	end_time.tv_sec=0L;
 	end_time.tv_usec=0L;
-	broker_host_check(NEBTYPE_HOSTCHECK_INITIATE,NEBFLAG_NONE,NEBATTR_NONE,hst,HOST_CHECK_ACTIVE,hst->current_state,hst->state_type,start_time,end_time,hst->host_check_command,hst->latency,0.0,host_check_timeout,FALSE,0,NULL,NULL,NULL,NULL,NULL);
+	broker_host_check(NEBTYPE_HOSTCHECK_INITIATE,NEBFLAG_NONE,NEBATTR_NONE,hst,HOST_CHECK_ACTIVE,hst->current_state,hst->state_type,start_time,end_time,hst->host_check_command,hst->latency,0.0,config.get_host_check_timeout(),FALSE,0,NULL,NULL,NULL,NULL,NULL);
 #endif
 
 	/* execute the host check */
@@ -2722,7 +2678,7 @@ int run_sync_host_check_3x(host *hst, int *check_result_code, int check_options,
 
 #ifdef USE_EVENT_BROKER
 	/* send data to event broker */
-	broker_host_check(NEBTYPE_HOSTCHECK_PROCESSED,NEBFLAG_NONE,NEBATTR_NONE,hst,HOST_CHECK_ACTIVE,hst->current_state,hst->state_type,start_time,end_time,hst->host_check_command,hst->latency,hst->execution_time,host_check_timeout,FALSE,hst->current_state,NULL,hst->plugin_output,hst->long_plugin_output,hst->perf_data,NULL);
+	broker_host_check(NEBTYPE_HOSTCHECK_PROCESSED,NEBFLAG_NONE,NEBATTR_NONE,hst,HOST_CHECK_ACTIVE,hst->current_state,hst->state_type,start_time,end_time,hst->host_check_command,hst->latency,hst->execution_time,config.get_host_check_timeout(),FALSE,hst->current_state,NULL,hst->plugin_output,hst->long_plugin_output,hst->perf_data,NULL);
 #endif
 
 	return result;
@@ -2765,7 +2721,7 @@ int execute_sync_host_check_3x(host *hst)
 	end_time.tv_usec=0L;
 
 	/* send data to event broker */
-	neb_result=broker_host_check(NEBTYPE_HOSTCHECK_SYNC_PRECHECK,NEBFLAG_NONE,NEBATTR_NONE,hst,HOST_CHECK_ACTIVE,hst->current_state,hst->state_type,start_time,end_time,hst->host_check_command,hst->latency,0.0,host_check_timeout,FALSE,0,NULL,NULL,NULL,NULL,NULL);
+	neb_result=broker_host_check(NEBTYPE_HOSTCHECK_SYNC_PRECHECK,NEBFLAG_NONE,NEBATTR_NONE,hst,HOST_CHECK_ACTIVE,hst->current_state,hst->state_type,start_time,end_time,hst->host_check_command,hst->latency,0.0,config.get_host_check_timeout(),FALSE,0,NULL,NULL,NULL,NULL,NULL);
 
 	/* neb module wants to cancel the host check - return the current state of the host */
 	if(neb_result==NEBERROR_CALLBACKCANCEL)
@@ -2805,7 +2761,7 @@ int execute_sync_host_check_3x(host *hst)
 	/* send data to event broker */
 	end_time.tv_sec=0L;
 	end_time.tv_usec=0L;
-	broker_host_check(NEBTYPE_HOSTCHECK_RAW_START,NEBFLAG_NONE,NEBATTR_NONE,hst,HOST_CHECK_ACTIVE,return_result,hst->state_type,start_time,end_time,hst->host_check_command,0.0,0.0,host_check_timeout,early_timeout,result,processed_command,hst->plugin_output,hst->long_plugin_output,hst->perf_data,NULL);
+	broker_host_check(NEBTYPE_HOSTCHECK_RAW_START,NEBFLAG_NONE,NEBATTR_NONE,hst,HOST_CHECK_ACTIVE,return_result,hst->state_type,start_time,end_time,hst->host_check_command,0.0,0.0,config.get_host_check_timeout(),early_timeout,result,processed_command,hst->plugin_output,hst->long_plugin_output,hst->perf_data,NULL);
 #endif
 
 	log_debug_info(DEBUGL_COMMANDS,1,"Raw host check command: %s\n",raw_command);
@@ -2817,14 +2773,14 @@ int execute_sync_host_check_3x(host *hst)
 	my_free(hst->perf_data);
 
 	/* run the host check command */
-	result=my_system_r(&mac, processed_command,host_check_timeout,&early_timeout,&exectime,&temp_plugin_output,MAX_PLUGIN_OUTPUT_LENGTH);
+	result=my_system_r(&mac, processed_command,config.get_host_check_timeout(),&early_timeout,&exectime,&temp_plugin_output,MAX_PLUGIN_OUTPUT_LENGTH);
 	clear_volatile_macros(&mac);
 
 	/* if the check timed out, report an error */
 	if(early_timeout==TRUE){
 
 		my_free(temp_plugin_output);
-		if(asprintf(&temp_plugin_output,"Host check timed out after %d seconds\n",host_check_timeout)==-1){
+		if(asprintf(&temp_plugin_output,"Host check timed out after %d seconds\n",config.get_host_check_timeout())==-1){
 			logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
 			/* free memory */
 			my_free(temp_plugin_output);
@@ -2833,7 +2789,7 @@ int execute_sync_host_check_3x(host *hst)
 			return ERROR;
 			}
 		/* log the timeout */
-		logit(NSLOG_RUNTIME_WARNING,TRUE,"Warning: Host check command '%s' for host '%s' timed out after %d seconds\n",processed_command,hst->name,host_check_timeout);
+		logit(NSLOG_RUNTIME_WARNING,TRUE,"Warning: Host check command '%s' for host '%s' timed out after %d seconds\n",processed_command,hst->name,config.get_host_check_timeout());
 	        }
 
 	/* calculate total execution time */
@@ -2870,7 +2826,7 @@ int execute_sync_host_check_3x(host *hst)
 	        }
 
 	/* if we're not doing aggressive host checking, let WARNING states indicate the host is up (fake the result to be STATE_OK) */
-	if(use_aggressive_host_checking==FALSE && result==STATE_WARNING)
+	if(config.get_use_aggressive_host_checking()==FALSE && result==STATE_WARNING)
 		result=STATE_OK;
 
 
@@ -2884,7 +2840,7 @@ int execute_sync_host_check_3x(host *hst)
 
 #ifdef USE_EVENT_BROKER
 	/* send data to event broker */
-	broker_host_check(NEBTYPE_HOSTCHECK_RAW_END,NEBFLAG_NONE,NEBATTR_NONE,hst,HOST_CHECK_ACTIVE,return_result,hst->state_type,start_time,end_time,hst->host_check_command,0.0,exectime,host_check_timeout,early_timeout,result,processed_command,hst->plugin_output,hst->long_plugin_output,hst->perf_data,NULL);
+	broker_host_check(NEBTYPE_HOSTCHECK_RAW_END,NEBFLAG_NONE,NEBATTR_NONE,hst,HOST_CHECK_ACTIVE,return_result,hst->state_type,start_time,end_time,hst->host_check_command,0.0,exectime,config.get_host_check_timeout(),early_timeout,result,processed_command,hst->plugin_output,hst->long_plugin_output,hst->perf_data,NULL);
 #endif
 
 	log_debug_info(DEBUGL_CHECKS,0,"** Sync host check done: state=%d\n",return_result);
@@ -2927,7 +2883,7 @@ int run_scheduled_host_check_3x(host *hst, int check_options, double latency){
 			/* determine next time we should check the host if needed */
 			/* if host has no check interval, schedule it again for 5 minutes from now */
 			if(current_time>=preferred_time)
-				preferred_time=current_time+((hst->check_interval<=0)?300:(hst->check_interval*interval_length));
+				preferred_time=current_time+((hst->check_interval<=0)?300:(hst->check_interval*config.get_interval_length()));
 
 			/* make sure we rescheduled the next host check at a valid time */
 			get_next_valid_time(preferred_time,&next_valid_time,hst->check_period_ptr);
@@ -3023,7 +2979,7 @@ int run_async_host_check_3x(host *hst, int check_options, double latency, int sc
 	end_time.tv_usec=0L;
 
 	/* send data to event broker */
-	neb_result=broker_host_check(NEBTYPE_HOSTCHECK_ASYNC_PRECHECK,NEBFLAG_NONE,NEBATTR_NONE,hst,HOST_CHECK_ACTIVE,hst->current_state,hst->state_type,start_time,end_time,hst->host_check_command,hst->latency,0.0,host_check_timeout,FALSE,0,NULL,NULL,NULL,NULL,NULL);
+	neb_result=broker_host_check(NEBTYPE_HOSTCHECK_ASYNC_PRECHECK,NEBFLAG_NONE,NEBATTR_NONE,hst,HOST_CHECK_ACTIVE,hst->current_state,hst->state_type,start_time,end_time,hst->host_check_command,hst->latency,0.0,config.get_host_check_timeout(),FALSE,0,NULL,NULL,NULL,NULL,NULL);
 
 	/* neb module wants to cancel the host check - the check will be rescheduled for a later time by the scheduling logic */
 	if(neb_result==NEBERROR_CALLBACKCANCEL)
@@ -3085,7 +3041,7 @@ int run_async_host_check_3x(host *hst, int check_options, double latency, int sc
 
 	/* open a temp file for storing check output */
 	old_umask=umask(new_umask);
-	if(asprintf(&output_file,"%s/checkXXXXXX",temp_path)==-1){
+	if(asprintf(&output_file,"%s/checkXXXXXX",config.get_temp_path().c_str())==-1){
 		logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
 		return ERROR;
 		}
@@ -3147,7 +3103,7 @@ int run_async_host_check_3x(host *hst, int check_options, double latency, int sc
 
 #ifdef USE_EVENT_BROKER
 	/* send data to event broker */
-	broker_host_check(NEBTYPE_HOSTCHECK_INITIATE,NEBFLAG_NONE,NEBATTR_NONE,hst,HOST_CHECK_ACTIVE,hst->current_state,hst->state_type,start_time,end_time,hst->host_check_command,hst->latency,0.0,host_check_timeout,FALSE,0,processed_command,NULL,NULL,NULL,NULL);
+	broker_host_check(NEBTYPE_HOSTCHECK_INITIATE,NEBFLAG_NONE,NEBATTR_NONE,hst,HOST_CHECK_ACTIVE,hst->current_state,hst->state_type,start_time,end_time,hst->host_check_command,hst->latency,0.0,config.get_host_check_timeout(),FALSE,0,processed_command,NULL,NULL,NULL,NULL);
 #endif
 
 	/* reset latency (permanent value for this check will get set later) */
@@ -3182,7 +3138,7 @@ int run_async_host_check_3x(host *hst, int check_options, double latency, int sc
 		close_command_file();
 
 		/* fork again if we're not in a large installation */
-		if(child_processes_fork_twice==TRUE){
+		if(config.get_child_processes_fork_twice()==TRUE){
 
 			/* fork again... */
 			pid=fork();
@@ -3193,7 +3149,7 @@ int run_async_host_check_3x(host *hst, int check_options, double latency, int sc
 			}
 
 		/* the grandchild (or child if large install tweaks are enabled) process should run the host check... */
-		if(pid==0 || child_processes_fork_twice==FALSE){
+		if(pid==0 || config.get_child_processes_fork_twice()==FALSE){
 
 			/* reset signal handling */
 			reset_sighandler();
@@ -3206,10 +3162,10 @@ int run_async_host_check_3x(host *hst, int check_options, double latency, int sc
 
 			/* catch plugins that don't finish in a timely manner */
 			signal(SIGALRM,host_check_sighandler);
-			alarm(host_check_timeout);
+			alarm(config.get_host_check_timeout());
      
 			/* disable rotation of the debug file */
-			max_debug_file_size=0L;
+			config.set_max_debug_file_size(0L);
 
 			/* run the plugin check command */
 			pclose_result=run_check(processed_command,&checkresult_dbuf);
@@ -3272,7 +3228,7 @@ int run_async_host_check_3x(host *hst, int check_options, double latency, int sc
 
 		/* free allocated memory */
 		/* this needs to be done last, so we don't free memory for variables before they're used above */
-		if(free_child_process_memory==TRUE)
+		if(config.get_free_child_process_memory()==TRUE)
 			free_memory(&mac);
 
 		/* parent exits immediately - grandchild process is inherited by the INIT process, so we have no zombie problem... */
@@ -3299,7 +3255,7 @@ int run_async_host_check_3x(host *hst, int check_options, double latency, int sc
 
 		/* wait for the first child to return */
 		/* if large install tweaks are enabled, we'll clean up the zombie process later */
-		if(child_processes_fork_twice==TRUE)
+		if(config.get_child_processes_fork_twice()==TRUE)
 			wait_result=waitpid(pid,NULL,0);
 	        }
 
@@ -3348,7 +3304,7 @@ int handle_async_host_check_result_3x(host *temp_host, check_result *queued_chec
 
 	/* skip this host check results if its passive and we aren't accepting passive check results */
 	if(queued_check_result->check_type==HOST_CHECK_PASSIVE){
-		if(accept_passive_host_checks==FALSE){
+	  if(config.get_accept_passive_host_checks()==FALSE){
 			log_debug_info(DEBUGL_CHECKS,0,"Discarding passive host check result because passive host checks are disabled globally.\n");
 			return ERROR;
 			}
@@ -3489,7 +3445,7 @@ int handle_async_host_check_result_3x(host *temp_host, check_result *queued_chec
 	if(queued_check_result->check_type==HOST_CHECK_ACTIVE){
 
 		/* if we're not doing aggressive host checking, let WARNING states indicate the host is up (fake the result to be STATE_OK) */
-		if(use_aggressive_host_checking==FALSE && result==STATE_WARNING)
+		if(config.get_use_aggressive_host_checking()==FALSE && result==STATE_WARNING)
 		result=STATE_OK;
 
 		/* OK states means the host is UP */
@@ -3505,7 +3461,7 @@ int handle_async_host_check_result_3x(host *temp_host, check_result *queued_chec
 	/******************* PROCESS THE CHECK RESULTS ******************/
 
 	/* process the host check result */
-	process_host_check_result_3x(temp_host,result,old_plugin_output,CHECK_OPTION_NONE,reschedule_check,TRUE,cached_host_check_horizon);
+	process_host_check_result_3x(temp_host,result,old_plugin_output,CHECK_OPTION_NONE,reschedule_check,TRUE,config.get_cached_host_check_horizon());
 
 	/* free memory */
 	my_free(old_plugin_output);
@@ -3520,7 +3476,7 @@ int handle_async_host_check_result_3x(host *temp_host, check_result *queued_chec
 
 #ifdef USE_EVENT_BROKER
 	/* send data to event broker */
-	broker_host_check(NEBTYPE_HOSTCHECK_PROCESSED,NEBFLAG_NONE,NEBATTR_NONE,temp_host,temp_host->check_type,temp_host->current_state,temp_host->state_type,start_time_hires,end_time_hires,temp_host->host_check_command,temp_host->latency,temp_host->execution_time,host_check_timeout,queued_check_result->early_timeout,queued_check_result->return_code,NULL,temp_host->plugin_output,temp_host->long_plugin_output,temp_host->perf_data,NULL);
+	broker_host_check(NEBTYPE_HOSTCHECK_PROCESSED,NEBFLAG_NONE,NEBATTR_NONE,temp_host,temp_host->check_type,temp_host->current_state,temp_host->state_type,start_time_hires,end_time_hires,temp_host->host_check_command,temp_host->latency,temp_host->execution_time,config.get_host_check_timeout(),queued_check_result->early_timeout,queued_check_result->return_code,NULL,temp_host->plugin_output,temp_host->long_plugin_output,temp_host->perf_data,NULL);
 #endif
 
 	return OK;
@@ -3555,15 +3511,15 @@ int process_host_check_result_3x(host *hst, int new_state, char *old_plugin_outp
 	time(&current_time);
 
 	/* default next check time */
-	next_check=(unsigned long)(current_time+(hst->check_interval*interval_length));
+	next_check=(unsigned long)(current_time+(hst->check_interval*config.get_interval_length()));
 
 	/* we have to adjust current attempt # for passive checks, as it isn't done elsewhere */
-	if(hst->check_type==HOST_CHECK_PASSIVE && passive_host_checks_are_soft==TRUE)
+	if(hst->check_type==HOST_CHECK_PASSIVE && config.get_passive_host_checks_are_soft()==TRUE)
 		adjust_host_check_attempt_3x(hst,FALSE);
 
 	/* log passive checks - we need to do this here, as some my bypass external commands by getting dropped in checkresults dir */
 	if(hst->check_type==HOST_CHECK_PASSIVE){
-		if(log_passive_checks==TRUE)
+		if(config.get_log_passive_checks()==true)
 			logit(NSLOG_PASSIVE_CHECK,FALSE,"PASSIVE HOST CHECK: %s;%d;%s\n",hst->name,new_state,hst->plugin_output);
 	        }
 
@@ -3582,7 +3538,7 @@ int process_host_check_result_3x(host *hst, int new_state, char *old_plugin_outp
 
 			/* set the state type */
 			/* set state type to HARD for passive checks and active checks that were previously in a HARD STATE */
-			if(hst->state_type==HARD_STATE || (hst->check_type==HOST_CHECK_PASSIVE && passive_host_checks_are_soft==FALSE))
+			if(hst->state_type==HARD_STATE || (hst->check_type==HOST_CHECK_PASSIVE && config.get_passive_host_checks_are_soft()==FALSE))
 				hst->state_type=HARD_STATE;
 			else
 				hst->state_type=SOFT_STATE;
@@ -3591,7 +3547,7 @@ int process_host_check_result_3x(host *hst, int new_state, char *old_plugin_outp
 
 			/* reschedule the next check of the host at the normal interval */
 			reschedule_check=TRUE;
-			next_check=(unsigned long)(current_time+(hst->check_interval*interval_length));
+			next_check=(unsigned long)(current_time+(hst->check_interval*config.get_interval_length()));
 
 			/* propagate checks to immediate parents if they are not already UP */
 			/* we do this because a parent host (or grandparent) may have recovered somewhere and we should catch the recovery as soon as possible */
@@ -3627,7 +3583,7 @@ int process_host_check_result_3x(host *hst, int new_state, char *old_plugin_outp
 			log_debug_info(DEBUGL_CHECKS,1,"Host is still DOWN/UNREACHABLE.\n");
 
 			/* passive checks are treated as HARD states by default... */
-			if(hst->check_type==HOST_CHECK_PASSIVE && passive_host_checks_are_soft==FALSE){
+			if(hst->check_type==HOST_CHECK_PASSIVE && config.get_passive_host_checks_are_soft()==FALSE){
 
 				/* set the state type */
 				hst->state_type=HARD_STATE;
@@ -3654,7 +3610,7 @@ int process_host_check_result_3x(host *hst, int new_state, char *old_plugin_outp
 			/* make a determination of the host's state */
 			/* translate host state between DOWN/UNREACHABLE (only for passive checks if enabled) */
 			hst->current_state=new_state;
-			if(hst->check_type==HOST_CHECK_ACTIVE || translate_passive_host_checks==TRUE)
+			if(hst->check_type==HOST_CHECK_ACTIVE || config.get_translate_passive_host_checks()==TRUE)
 				hst->current_state=determine_host_reachability(hst);
 			
 			/* reschedule the next check if the host state changed */
@@ -3664,11 +3620,11 @@ int process_host_check_result_3x(host *hst, int new_state, char *old_plugin_outp
 
 				/* schedule a re-check of the host at the retry interval because we can't determine its final state yet... */
 				if(hst->state_type==SOFT_STATE)
-					next_check=(unsigned long)(current_time+(hst->retry_interval*interval_length));
+					next_check=(unsigned long)(current_time+(hst->retry_interval*config.get_interval_length()));
 
 				/* host has maxed out on retries (or was previously in a hard problem state), so reschedule the next check at the normal interval */
 				else
-					next_check=(unsigned long)(current_time+(hst->check_interval*interval_length));
+					next_check=(unsigned long)(current_time+(hst->check_interval*config.get_interval_length()));
 				}
 
 		        }
@@ -3694,7 +3650,7 @@ int process_host_check_result_3x(host *hst, int new_state, char *old_plugin_outp
 
 			/* reschedule the next check at the normal interval */
 			if(reschedule_check==TRUE)
-				next_check=(unsigned long)(current_time+(hst->check_interval*interval_length));
+				next_check=(unsigned long)(current_time+(hst->check_interval*config.get_interval_length()));
 		        }
 
 		/***** HOST IS NOW DOWN/UNREACHABLE *****/
@@ -3712,7 +3668,7 @@ int process_host_check_result_3x(host *hst, int new_state, char *old_plugin_outp
 
 				/* host has maxed out on retries, so reschedule the next check at the normal interval */
 				reschedule_check=TRUE;
-				next_check=(unsigned long)(current_time+(hst->check_interval*interval_length));
+				next_check=(unsigned long)(current_time+(hst->check_interval*config.get_interval_length()));
 
 				/* we need to run SYNCHRONOUS checks of all parent hosts to accurately determine the state of this host */
 				/* this is extremely inefficient (reminiscent of Nagios 2.x logic), but there's no other good way around it */
@@ -3764,7 +3720,7 @@ int process_host_check_result_3x(host *hst, int new_state, char *old_plugin_outp
 
 					/* translate host state between DOWN/UNREACHABLE for passive checks (if enabled) */
 					/* make a determination of the host's state */
-					if(translate_passive_host_checks==TRUE)
+					if(config.get_translate_passive_host_checks()==TRUE)
 						hst->current_state=determine_host_reachability(hst);
 
 					}
@@ -3787,7 +3743,7 @@ int process_host_check_result_3x(host *hst, int new_state, char *old_plugin_outp
 			else{
 
 				/* active and (in some cases) passive check results are treated as SOFT states */
-				if(hst->check_type==HOST_CHECK_ACTIVE || passive_host_checks_are_soft==TRUE){
+				if(hst->check_type==HOST_CHECK_ACTIVE || config.get_passive_host_checks_are_soft()==TRUE){
 
 					/* set the state type */
 					hst->state_type=SOFT_STATE;
@@ -3806,19 +3762,19 @@ int process_host_check_result_3x(host *hst, int new_state, char *old_plugin_outp
 				/* make a (in some cases) preliminary determination of the host's state */
 				/* translate host state between DOWN/UNREACHABLE (for passive checks only if enabled) */
 				hst->current_state=new_state;
-				if(hst->check_type==HOST_CHECK_ACTIVE || translate_passive_host_checks==TRUE)
+				if(hst->check_type==HOST_CHECK_ACTIVE || config.get_translate_passive_host_checks()==TRUE)
 					hst->current_state=determine_host_reachability(hst);
 
 				/* reschedule a check of the host */
 				reschedule_check=TRUE;
 
 				/* schedule a re-check of the host at the retry interval because we can't determine its final state yet... */
-				if(hst->check_type==HOST_CHECK_ACTIVE || passive_host_checks_are_soft==TRUE)
-					next_check=(unsigned long)(current_time+(hst->retry_interval*interval_length));
+				if(hst->check_type==HOST_CHECK_ACTIVE || config.get_passive_host_checks_are_soft()==TRUE)
+					next_check=(unsigned long)(current_time+(hst->retry_interval*config.get_interval_length()));
 
 				/* schedule a re-check of the host at the normal interval */
 				else
-					next_check=(unsigned long)(current_time+(hst->check_interval*interval_length));
+					next_check=(unsigned long)(current_time+(hst->check_interval*config.get_interval_length()));
 
 				/* propagate checks to immediate parents if they are UP */
 				/* we do this because a parent host (or grandparent) may have gone down and blocked our route */
@@ -3848,7 +3804,7 @@ int process_host_check_result_3x(host *hst, int new_state, char *old_plugin_outp
 					}
 
 				/* check dependencies on second to last host check */
-				if(enable_predictive_host_dependency_checks==TRUE && hst->current_attempt==(hst->max_attempts-1)){
+				if(config.get_enable_predictive_host_dependency_checks()==TRUE && hst->current_attempt==(hst->max_attempts-1)){
 
 					/* propagate checks to hosts that THIS ONE depends on for notifications AND execution */
 					/* we do to help ensure that the dependency checks are accurate before it comes time to notify */
@@ -3969,9 +3925,9 @@ int check_host_check_viability_3x(host *hst, int check_options, int *time_is_val
 
 	/* get the check interval to use if we need to reschedule the check */
 	if(hst->state_type==SOFT_STATE && hst->current_state!=HOST_UP)
-		check_interval=(hst->retry_interval*interval_length);
+		check_interval=(hst->retry_interval*config.get_interval_length());
 	else
-		check_interval=(hst->check_interval*interval_length);
+		check_interval=(hst->check_interval*config.get_interval_length());
 
 	/* make sure check interval is positive - otherwise use 5 minutes out for next check */
 	if(check_interval<=0)

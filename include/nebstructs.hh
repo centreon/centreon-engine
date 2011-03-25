@@ -268,8 +268,8 @@ typedef struct nebstruct_program_status_struct{
 	int             obsess_over_services;
 	unsigned long   modified_host_attributes;
 	unsigned long   modified_service_attributes;
-	char            *global_host_event_handler;
-	char            *global_service_event_handler;
+	char const*     global_host_event_handler;
+	char const*     global_service_event_handler;
         }nebstruct_program_status_data;
 
 

@@ -18,6 +18,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "configuration.hh"
+
 #include "macros.hh"
 #include "config.hh"
 #include "common.hh"
@@ -26,10 +28,7 @@
 #include "comments.hh"
 #include "nagios.hh"
 
-extern int      use_large_installation_tweaks;
-extern int      enable_environment_macros;
-
-extern char     *illegal_output_chars;
+extern com::centreon::scheduler::configuration config;
 
 extern contact		*contact_list;
 extern contactgroup	*contactgroup_list;
@@ -2377,6 +2376,7 @@ char *clean_macro_chars(char *macro,int options)
 
 			/* illegal user-specified characters */
 			illegal_char=FALSE;
+			char const* illegal_output_chars = config.get_illegal_output_chars().c_str();
 			if(illegal_output_chars!=NULL){
 				for(z=0;illegal_output_chars[z]!='\x0';z++){
 					if(ch==(int)illegal_output_chars[z]){
@@ -3071,7 +3071,7 @@ int clear_summary_macros(nagios_macros *mac)
 /* sets or unsets all macro environment variables */
 int set_all_macro_environment_vars(nagios_macros *mac, int set)
 {
-	if(enable_environment_macros==FALSE)
+  if(config.get_enable_environment_macros()==FALSE)
 		return ERROR;
 
 	set_macrox_environment_vars(mac, set);
@@ -3103,7 +3103,7 @@ int set_macrox_environment_vars(nagios_macros *mac, int set)
 			generate_macro=TRUE;
 
 			/* skip summary macro generation if lage installation tweaks are enabled */
-			if((x>=MACRO_TOTALHOSTSUP && x<=MACRO_TOTALSERVICEPROBLEMSUNHANDLED) && use_large_installation_tweaks==TRUE)
+			if((x>=MACRO_TOTALHOSTSUP && x<=MACRO_TOTALSERVICEPROBLEMSUNHANDLED) && config.get_use_large_installation_tweaks()==TRUE)
 				generate_macro=FALSE;
 
 			if(mac->x[x]==NULL && generate_macro==TRUE)

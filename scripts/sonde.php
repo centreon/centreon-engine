@@ -12,10 +12,10 @@ define('BIN_NAGIOSTATS', '/home/merethis/nagios/nagiostats');
 define('BIN_CENTSCHEDULERSTATS', '/home/merethis/scheduler/centschedulerstats');
 
 define('FILE_NAGIOS_CONFIGURATION', '/home/merethis/nagios/etc/nagios.cfg');
-define('FILE_CENTSCHEDULER_CONFIGURATION', '/home/merethis/nagios/etc/nagios.cfg');
+define('FILE_CENTSCHEDULER_CONFIGURATION', '/home/merethis/scheduler/etc/nagios.cfg');
 
 define('FILE_NAGIOS_SERVICES', '/home/merethis/nagios/etc/objects/services.cfg');
-define('FILE_CENTSCHEDULER_SERVICES', '/home/merethis/nagios/etc/objects/services.cfg');
+define('FILE_CENTSCHEDULER_SERVICES', '/home/merethis/scheduler/etc/objects/services.cfg');
 
 define('DIR_NAGIOS_REPORT', '/home/merethis/nagios/log');
 define('DIR_CENTSCHEDULER_REPORT', '/home/merethis/scheduler/log');
@@ -30,9 +30,7 @@ function usage($appname)
 
 function my_kill($binary)
 {
-  if (($ret = my_system('ps aux | grep '.basename($binary).' | grep -v grep')) != '')
-    if (preg_match('#^\d{1,}\s*(\d{1,})#', $ret, $matche) === 1)
-	my_system('kill -TERM '.$matche[1]);
+  my_system('killall -q -s TERM '.basename($binary).' > /dev/null 2>&1');
 }
 
 function my_system($cmd)
@@ -88,7 +86,7 @@ function generate_configuration($nb_check)
       $service = '
 define service{
   host_name             localhost
-  service_description   autogen_sleep_'.$sleep_time.'
+  service_description   autogen_sleep_'.$sleep_time.'_'.$i.'
   check_command         check-service-alive
   use                   generic-service
   _SLEEP                '.$sleep_time.'
@@ -111,6 +109,7 @@ function run_check($file_services, $file_configuration, &$data_autoconf, $binary
 
     system($binary.' '.$file_configuration.' > /dev/null 2>&1 &');
     sleep(1);
+
     if (my_system('ps aux | grep '.basename($binary).' | grep -v grep') == '')
       exit('error: '.basename($binary).' not running'.NL);
 
@@ -133,8 +132,8 @@ function run_check($file_services, $file_configuration, &$data_autoconf, $binary
 if ($argc != 3 || is_numeric($argv[1]) === FALSE || is_numeric($argv[2]) === FALSE)
   usage($argv[0]);
 
-my_system('pkill -TERM '.basename(BIN_NAGIOS));
-my_system('pkill -TERM '.basename(BIN_CENTSCHEDULER));
+my_kill(BIN_NAGIOS);
+my_kill(BIN_CENTSCHEDULER);
 
 $time = intval($argv[1]);
 $nb_check = intval($argv[2]);
@@ -150,6 +149,8 @@ while ($nagios_latency < $timeout || $centscheduler_latency < $timeout)
     $filename_report = date('m_d_y_H_i_s').'_'.$nb_check;
 
     if ($nagios_latency < $timeout)
+      {
+       echo 'run_check: nagios'.NL;
        $nagios_latency = run_check(FILE_NAGIOS_SERVICES,
                                    FILE_NAGIOS_CONFIGURATION,
 				   $config,
@@ -159,8 +160,11 @@ while ($nagios_latency < $timeout || $centscheduler_latency < $timeout)
                                    DIR_NAGIOS_VAR,
 				   $nb_check,
                                    $time);
+      }
 
     if ($centscheduler_latency < $timeout)
+      {
+       echo 'run_check: centscheduler'.NL;
       $centscheduler_latency = run_check(FILE_CENTSCHEDULER_SERVICES,
                                          FILE_CENTSCHEDULER_CONFIGURATION,
 					 $config,
@@ -170,6 +174,7 @@ while ($nagios_latency < $timeout || $centscheduler_latency < $timeout)
                                          DIR_CENTSCHEDULER_VAR,
 					 $nb_check,
                                          $time);
+      }
     $nb_check *= 2;
   }
 

@@ -3,10 +3,14 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#include "configuration.hh"
+
 #include "nagios.h"
 
 #undef DEFAULT_CONFIG_FILE
 #define DEFAULT_CONFIG_FILE "./smallconfig/nagios.cfg"
+
+extern com::centreon::scheduler::configuration config;
 
 extern char *config_file;
 extern char *log_file;

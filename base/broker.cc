@@ -19,6 +19,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "configuration.hh"
+
 #include "config.hh"
 #include "common.hh"
 
@@ -28,28 +30,14 @@
 #include "nebstructs.hh"
 #include "nebmods.hh"
 
-extern unsigned long event_broker_options;
+extern com::centreon::scheduler::configuration config;
 
 extern time_t program_start;
 extern int nagios_pid;
 extern time_t last_command_check;
 extern time_t last_log_rotation;
-extern int enable_notifications;
-extern int execute_service_checks;
-extern int accept_passive_service_checks;
-extern int execute_host_checks;
-extern int accept_passive_host_checks;
-extern int enable_event_handlers;
-extern int obsess_over_services;
-extern int obsess_over_hosts;
-extern int enable_flap_detection;
-extern int enable_failure_prediction;
-extern int process_performance_data;
-extern int aggregate_status_updates;
 extern unsigned long modified_host_process_attributes;
 extern unsigned long modified_service_process_attributes;
-extern char *global_host_event_handler;
-extern char *global_service_event_handler;
 
 
 #ifdef USE_EVENT_BROKER
@@ -65,7 +53,7 @@ extern char *global_service_event_handler;
 void broker_program_state(int type, int flags, int attr, struct timeval *timestamp){
 	nebstruct_process_data ds;
 
-	if(!(event_broker_options & BROKER_PROGRAM_STATE))
+	if(!(config.get_event_broker_options() & BROKER_PROGRAM_STATE))
 		return;
 
 	/* fill struct with relevant data */
@@ -85,7 +73,7 @@ void broker_program_state(int type, int flags, int attr, struct timeval *timesta
 void broker_timed_event(int type, int flags, int attr, timed_event *event, struct timeval *timestamp){
 	nebstruct_timed_event_data ds;
 
-	if(!(event_broker_options & BROKER_TIMED_EVENTS))
+	if(!(config.get_event_broker_options() & BROKER_TIMED_EVENTS))
 		return;
 
 	if(event==NULL)
@@ -115,7 +103,7 @@ void broker_timed_event(int type, int flags, int attr, timed_event *event, struc
 void broker_log_data(int type, int flags, int attr, char *data, unsigned long data_type, time_t entry_time, struct timeval *timestamp){
 	nebstruct_log_data ds;
 
-	if(!(event_broker_options & BROKER_LOGGED_DATA))
+	if(!(config.get_event_broker_options() & BROKER_LOGGED_DATA))
 		return;
 
 	/* fill struct with relevant data */
@@ -140,7 +128,7 @@ void broker_log_data(int type, int flags, int attr, char *data, unsigned long da
 void broker_system_command(int type, int flags, int attr, struct timeval start_time, struct timeval end_time, double exectime, int timeout, int early_timeout, int retcode, char *cmd, char *output, struct timeval *timestamp){
 	nebstruct_system_command_data ds;
 
-	if(!(event_broker_options & BROKER_SYSTEM_COMMANDS))
+	if(!(config.get_event_broker_options() & BROKER_SYSTEM_COMMANDS))
 		return;
 	
 	if(cmd==NULL)
@@ -170,7 +158,7 @@ void broker_system_command(int type, int flags, int attr, struct timeval start_t
 
 
 /* send event handler data to broker */
-int broker_event_handler(int type, int flags, int attr, int eventhandler_type, void *data, int state, int state_type, struct timeval start_time, struct timeval end_time, double exectime, int timeout, int early_timeout, int retcode, char *cmd, char *cmdline, char *output, struct timeval *timestamp){
+int broker_event_handler(int type, int flags, int attr, int eventhandler_type, void *data, int state, int state_type, struct timeval start_time, struct timeval end_time, double exectime, int timeout, int early_timeout, int retcode, char const* cmd, char *cmdline, char *output, struct timeval *timestamp){
 	service *temp_service=NULL;
 	host *temp_host=NULL;
 	char *command_buf=NULL;
@@ -179,7 +167,7 @@ int broker_event_handler(int type, int flags, int attr, int eventhandler_type, v
 	nebstruct_event_handler_data ds;
 	int return_code=OK;
 
-	if(!(event_broker_options & BROKER_EVENT_HANDLERS))
+	if(!(config.get_event_broker_options() & BROKER_EVENT_HANDLERS))
 		return return_code;
 	
 	if(data==NULL)
@@ -243,7 +231,7 @@ int broker_host_check(int type, int flags, int attr, host *hst, int check_type, 
 	nebstruct_host_check_data ds;
 	int return_code=OK;
 
-	if(!(event_broker_options & BROKER_HOST_CHECKS))
+	if(!(config.get_event_broker_options() & BROKER_HOST_CHECKS))
 		return OK;
 	
 	if(hst==NULL)
@@ -302,7 +290,7 @@ int broker_service_check(int type, int flags, int attr, service *svc, int check_
 	nebstruct_service_check_data ds;
 	int return_code=OK;
 
-	if(!(event_broker_options & BROKER_SERVICE_CHECKS))
+	if(!(config.get_event_broker_options() & BROKER_SERVICE_CHECKS))
 		return OK;
 	
 	if(svc==NULL)
@@ -358,7 +346,7 @@ int broker_service_check(int type, int flags, int attr, service *svc, int check_
 void broker_comment_data(int type, int flags, int attr, int comment_type, int entry_type, char const *host_name, char const *svc_description, time_t entry_time, char const *author_name, char *comment_data, int persistent, int source, int expires, time_t expire_time, unsigned long comment_id, struct timeval *timestamp){
 	nebstruct_comment_data ds;
 
-	if(!(event_broker_options & BROKER_COMMENT_DATA))
+	if(!(config.get_event_broker_options() & BROKER_COMMENT_DATA))
 		return;
 	
 	/* fill struct with relevant data */
@@ -393,7 +381,7 @@ void broker_comment_data(int type, int flags, int attr, int comment_type, int en
 void broker_downtime_data(int type, int flags, int attr, int downtime_type, char *host_name, char *svc_description, time_t entry_time, char *author_name, char *comment_data, time_t start_time, time_t end_time, int fixed, unsigned long triggered_by, unsigned long duration, unsigned long downtime_id, struct timeval *timestamp){
 	nebstruct_downtime_data ds;
 
-	if(!(event_broker_options & BROKER_DOWNTIME_DATA))
+	if(!(config.get_event_broker_options() & BROKER_DOWNTIME_DATA))
 		return;
 	
 	/* fill struct with relevant data */
@@ -430,7 +418,7 @@ void broker_flapping_data(int type, int flags, int attr, int flapping_type, void
 	host *temp_host=NULL;
 	service *temp_service=NULL;
 
-	if(!(event_broker_options & BROKER_FLAPPING_DATA))
+	if(!(config.get_event_broker_options() & BROKER_FLAPPING_DATA))
 		return;
 
 	if(data==NULL)
@@ -471,7 +459,7 @@ void broker_flapping_data(int type, int flags, int attr, int flapping_type, void
 void broker_program_status(int type, int flags, int attr, struct timeval *timestamp){
 	nebstruct_program_status_data ds;
 
-	if(!(event_broker_options & BROKER_STATUS_DATA))
+	if(!(config.get_event_broker_options() & BROKER_STATUS_DATA))
 		return;
 
 	/* fill struct with relevant data */
@@ -484,21 +472,21 @@ void broker_program_status(int type, int flags, int attr, struct timeval *timest
 	ds.pid=nagios_pid;
 	ds.last_command_check=last_command_check;
 	ds.last_log_rotation=last_log_rotation;
-	ds.notifications_enabled=enable_notifications;
-	ds.active_service_checks_enabled=execute_service_checks;
-	ds.passive_service_checks_enabled=accept_passive_service_checks;
-	ds.active_host_checks_enabled=execute_host_checks;
-	ds.passive_host_checks_enabled=accept_passive_host_checks;
-	ds.event_handlers_enabled=enable_event_handlers;
-	ds.flap_detection_enabled=enable_flap_detection;
-	ds.failure_prediction_enabled=enable_failure_prediction;
-	ds.process_performance_data=process_performance_data;
-	ds.obsess_over_hosts=obsess_over_hosts;
-	ds.obsess_over_services=obsess_over_services;
+	ds.notifications_enabled=config.get_enable_notifications();
+	ds.active_service_checks_enabled=config.get_execute_service_checks();
+	ds.passive_service_checks_enabled=config.get_accept_passive_service_checks();
+	ds.active_host_checks_enabled=config.get_execute_host_checks();
+	ds.passive_host_checks_enabled=config.get_accept_passive_host_checks();
+	ds.event_handlers_enabled=config.get_enable_event_handlers();
+	ds.flap_detection_enabled=config.get_enable_flap_detection();
+	ds.failure_prediction_enabled=config.get_enable_failure_prediction();
+	ds.process_performance_data=config.get_process_performance_data();
+	ds.obsess_over_hosts=config.get_obsess_over_hosts();
+	ds.obsess_over_services=config.get_obsess_over_services();
 	ds.modified_host_attributes=modified_host_process_attributes;
 	ds.modified_service_attributes=modified_service_process_attributes;
-	ds.global_host_event_handler=global_host_event_handler;
-	ds.global_service_event_handler=global_service_event_handler;
+	ds.global_host_event_handler=config.get_global_host_event_handler().c_str();
+	ds.global_service_event_handler=config.get_global_service_event_handler().c_str();
 
 	/* make callbacks */
 	neb_make_callbacks(NEBCALLBACK_PROGRAM_STATUS_DATA,(void *)&ds);
@@ -512,7 +500,7 @@ void broker_program_status(int type, int flags, int attr, struct timeval *timest
 void broker_host_status(int type, int flags, int attr, host *hst, struct timeval *timestamp){
 	nebstruct_host_status_data ds;
 
-	if(!(event_broker_options & BROKER_STATUS_DATA))
+	if(!(config.get_event_broker_options() & BROKER_STATUS_DATA))
 		return;
 
 	/* fill struct with relevant data */
@@ -535,7 +523,7 @@ void broker_host_status(int type, int flags, int attr, host *hst, struct timeval
 void broker_service_status(int type, int flags, int attr, service *svc, struct timeval *timestamp){
 	nebstruct_service_status_data ds;
 
-	if(!(event_broker_options & BROKER_STATUS_DATA))
+	if(!(config.get_event_broker_options() & BROKER_STATUS_DATA))
 		return;
 
 	/* fill struct with relevant data */
@@ -558,7 +546,7 @@ void broker_service_status(int type, int flags, int attr, service *svc, struct t
 void broker_contact_status(int type, int flags, int attr, contact *cntct, struct timeval *timestamp){
 	nebstruct_service_status_data ds;
 
-	if(!(event_broker_options & BROKER_STATUS_DATA))
+	if(!(config.get_event_broker_options() & BROKER_STATUS_DATA))
 		return;
 
 	/* fill struct with relevant data */
@@ -584,7 +572,7 @@ int broker_notification_data(int type, int flags, int attr, int notification_typ
 	service *temp_service=NULL;
 	int return_code=OK;
 
-	if(!(event_broker_options & BROKER_NOTIFICATIONS))
+	if(!(config.get_event_broker_options() & BROKER_NOTIFICATIONS))
 		return return_code;
 
 	/* fill struct with relevant data */
@@ -632,7 +620,7 @@ int broker_contact_notification_data(int type, int flags, int attr, int notifica
 	service *temp_service=NULL;
 	int return_code=OK;
 
-	if(!(event_broker_options & BROKER_NOTIFICATIONS))
+	if(!(config.get_event_broker_options() & BROKER_NOTIFICATIONS))
 		return return_code;
 
 	/* fill struct with relevant data */
@@ -683,7 +671,7 @@ int broker_contact_notification_method_data(int type, int flags, int attr, int n
 	char *command_args=NULL;
 	int return_code=OK;
 
-	if(!(event_broker_options & BROKER_NOTIFICATIONS))
+	if(!(config.get_event_broker_options() & BROKER_NOTIFICATIONS))
 		return return_code;
 
 	/* get command name/args */
@@ -740,7 +728,7 @@ int broker_contact_notification_method_data(int type, int flags, int attr, int n
 void broker_adaptive_program_data(int type, int flags, int attr, int command_type, unsigned long modhattr, unsigned long modhattrs, unsigned long modsattr, unsigned long modsattrs, struct timeval *timestamp){
 	nebstruct_adaptive_program_data ds;
 
-	if(!(event_broker_options & BROKER_ADAPTIVE_DATA))
+	if(!(config.get_event_broker_options() & BROKER_ADAPTIVE_DATA))
 		return;
 
 	/* fill struct with relevant data */
@@ -766,7 +754,7 @@ void broker_adaptive_program_data(int type, int flags, int attr, int command_typ
 void broker_adaptive_host_data(int type, int flags, int attr, host *hst, int command_type, unsigned long modattr, unsigned long modattrs, struct timeval *timestamp){
 	nebstruct_adaptive_host_data ds;
 
-	if(!(event_broker_options & BROKER_ADAPTIVE_DATA))
+	if(!(config.get_event_broker_options() & BROKER_ADAPTIVE_DATA))
 		return;
 
 	/* fill struct with relevant data */
@@ -791,7 +779,7 @@ void broker_adaptive_host_data(int type, int flags, int attr, host *hst, int com
 void broker_adaptive_service_data(int type, int flags, int attr, service *svc, int command_type, unsigned long modattr, unsigned long modattrs, struct timeval *timestamp){
 	nebstruct_adaptive_service_data ds;
 
-	if(!(event_broker_options & BROKER_ADAPTIVE_DATA))
+	if(!(config.get_event_broker_options() & BROKER_ADAPTIVE_DATA))
 		return;
 
 	/* fill struct with relevant data */
@@ -816,7 +804,7 @@ void broker_adaptive_service_data(int type, int flags, int attr, service *svc, i
 void broker_adaptive_contact_data(int type, int flags, int attr, contact *cntct, int command_type, unsigned long modattr, unsigned long modattrs, unsigned long modhattr, unsigned long modhattrs, unsigned long modsattr, unsigned long modsattrs, struct timeval *timestamp){
 	nebstruct_adaptive_contact_data ds;
 
-	if(!(event_broker_options & BROKER_ADAPTIVE_DATA))
+	if(!(config.get_event_broker_options() & BROKER_ADAPTIVE_DATA))
 		return;
 
 	/* fill struct with relevant data */
@@ -845,7 +833,7 @@ void broker_adaptive_contact_data(int type, int flags, int attr, contact *cntct,
 void broker_external_command(int type, int flags, int attr, int command_type, time_t entry_time, char *command_string, char *command_args, struct timeval *timestamp){
 	nebstruct_external_command_data ds;
 
-	if(!(event_broker_options & BROKER_EXTERNALCOMMAND_DATA))
+	if(!(config.get_event_broker_options() & BROKER_EXTERNALCOMMAND_DATA))
 		return;
 
 	/* fill struct with relevant data */
@@ -870,7 +858,7 @@ void broker_external_command(int type, int flags, int attr, int command_type, ti
 void broker_aggregated_status_data(int type, int flags, int attr, struct timeval *timestamp){
 	nebstruct_aggregated_status_data ds;
 
-	if(!(event_broker_options & BROKER_STATUS_DATA))
+	if(!(config.get_event_broker_options() & BROKER_STATUS_DATA))
 		return;
 
 	/* fill struct with relevant data */
@@ -890,7 +878,7 @@ void broker_aggregated_status_data(int type, int flags, int attr, struct timeval
 void broker_retention_data(int type, int flags, int attr, struct timeval *timestamp){
 	nebstruct_retention_data ds;
 
-	if(!(event_broker_options & BROKER_RETENTION_DATA))
+	if(!(config.get_event_broker_options() & BROKER_RETENTION_DATA))
 		return;
 
 	/* fill struct with relevant data */
@@ -912,7 +900,7 @@ void broker_acknowledgement_data(int type, int flags, int attr, int acknowledgem
 	host *temp_host=NULL;
 	service *temp_service=NULL;
 
-	if(!(event_broker_options & BROKER_ACKNOWLEDGEMENT_DATA))
+	if(!(config.get_event_broker_options() & BROKER_ACKNOWLEDGEMENT_DATA))
 		return;
 	
 	/* fill struct with relevant data */
@@ -954,7 +942,7 @@ void broker_statechange_data(int type, int flags, int attr, int statechange_type
 	host *temp_host=NULL;
 	service *temp_service=NULL;
 
-	if(!(event_broker_options & BROKER_STATECHANGE_DATA))
+	if(!(config.get_event_broker_options() & BROKER_STATECHANGE_DATA))
 		return;
 	
 	/* fill struct with relevant data */

@@ -21,6 +21,8 @@
 
 /*********** COMMON HEADER FILES ***********/
 
+#include "configuration.hh"
+
 #include "config.hh"
 #include "common.hh"
 #include "objects.hh"
@@ -36,36 +38,15 @@
 
 #include "xrddefault.hh"
 
+extern com::centreon::scheduler::configuration config;
+
 extern host           *host_list;
 extern service        *service_list;
 extern contact        *contact_list;
 extern comment        *comment_list;
 extern scheduled_downtime *scheduled_downtime_list;
 
-extern char           *global_host_event_handler;
-extern char           *global_service_event_handler;
-
-extern int            enable_notifications;
-extern int            execute_service_checks;
-extern int            accept_passive_service_checks;
-extern int            execute_host_checks;
-extern int            accept_passive_host_checks;
-extern int            enable_event_handlers;
-extern int            obsess_over_services;
-extern int            obsess_over_hosts;
-extern int            enable_flap_detection;
-extern int            enable_failure_prediction;
-extern int            process_performance_data;
-extern int            check_service_freshness;
-extern int            check_host_freshness;
-
 extern int            test_scheduling;
-
-extern int            use_large_installation_tweaks;
-
-extern int            use_retained_program_state;
-extern int            use_retained_scheduling_info;
-extern int            retention_scheduling_horizon;
 
 extern unsigned long  update_uid;
 extern char           *last_program_version;
@@ -81,14 +62,6 @@ extern unsigned long  next_notification_id;
 
 extern unsigned long  modified_host_process_attributes;
 extern unsigned long  modified_service_process_attributes;
-
-extern unsigned long  retained_host_attribute_mask;
-extern unsigned long  retained_service_attribute_mask;
-extern unsigned long  retained_contact_host_attribute_mask;
-extern unsigned long  retained_contact_service_attribute_mask;
-extern unsigned long  retained_process_host_attribute_mask;
-extern unsigned long  retained_process_service_attribute_mask;
-
 
 char *xrddefault_retention_file=NULL;
 char *xrddefault_temp_file=NULL;
@@ -297,12 +270,12 @@ int xrddefault_save_state_information(void){
 
 	/* what attributes should be masked out? */
 	/* NOTE: host/service/contact-specific values may be added in the future, but for now we only have global masks */
-	process_host_attribute_mask=retained_process_host_attribute_mask;
-	process_service_attribute_mask=retained_process_host_attribute_mask;
-	host_attribute_mask=retained_host_attribute_mask;
-	service_attribute_mask=retained_host_attribute_mask;
-	contact_host_attribute_mask=retained_contact_host_attribute_mask;
-	contact_service_attribute_mask=retained_contact_service_attribute_mask;
+	process_host_attribute_mask=config.get_retained_process_host_attribute_mask();
+	process_service_attribute_mask=config.get_retained_process_host_attribute_mask();
+	host_attribute_mask=config.get_retained_host_attribute_mask();
+	service_attribute_mask=config.get_retained_host_attribute_mask();
+	contact_host_attribute_mask=config.get_retained_contact_host_attribute_mask();
+	contact_service_attribute_mask=config.get_retained_contact_service_attribute_mask();
 
 	/* write version info to status file */
 	fprintf(fp,"########################################\n");
@@ -328,21 +301,21 @@ int xrddefault_save_state_information(void){
 	fprintf(fp,"program {\n");
 	fprintf(fp,"modified_host_attributes=%lu\n",(modified_host_process_attributes & ~process_host_attribute_mask));
 	fprintf(fp,"modified_service_attributes=%lu\n",(modified_service_process_attributes & ~process_service_attribute_mask));
-	fprintf(fp,"enable_notifications=%d\n",enable_notifications);
-	fprintf(fp,"active_service_checks_enabled=%d\n",execute_service_checks);
-	fprintf(fp,"passive_service_checks_enabled=%d\n",accept_passive_service_checks);
-	fprintf(fp,"active_host_checks_enabled=%d\n",execute_host_checks);
-	fprintf(fp,"passive_host_checks_enabled=%d\n",accept_passive_host_checks);
-	fprintf(fp,"enable_event_handlers=%d\n",enable_event_handlers);
-	fprintf(fp,"obsess_over_services=%d\n",obsess_over_services);
-	fprintf(fp,"obsess_over_hosts=%d\n",obsess_over_hosts);
-	fprintf(fp,"check_service_freshness=%d\n",check_service_freshness);
-	fprintf(fp,"check_host_freshness=%d\n",check_host_freshness);
-	fprintf(fp,"enable_flap_detection=%d\n",enable_flap_detection);
-	fprintf(fp,"enable_failure_prediction=%d\n",enable_failure_prediction);
-	fprintf(fp,"process_performance_data=%d\n",process_performance_data);
-	fprintf(fp,"global_host_event_handler=%s\n",(global_host_event_handler==NULL)?"":global_host_event_handler);
-	fprintf(fp,"global_service_event_handler=%s\n",(global_service_event_handler==NULL)?"":global_service_event_handler);
+	fprintf(fp,"enable_notifications=%d\n",config.get_enable_notifications());
+	fprintf(fp,"active_service_checks_enabled=%d\n",config.get_execute_service_checks());
+	fprintf(fp,"passive_service_checks_enabled=%d\n",config.get_accept_passive_service_checks());
+	fprintf(fp,"active_host_checks_enabled=%d\n",config.get_execute_host_checks());
+	fprintf(fp,"passive_host_checks_enabled=%d\n",config.get_accept_passive_host_checks());
+	fprintf(fp,"enable_event_handlers=%d\n",config.get_enable_event_handlers());
+	fprintf(fp,"obsess_over_services=%d\n",config.get_obsess_over_services());
+	fprintf(fp,"obsess_over_hosts=%d\n",config.get_obsess_over_hosts());
+	fprintf(fp,"check_service_freshness=%d\n",config.get_check_service_freshness());
+	fprintf(fp,"check_host_freshness=%d\n",config.get_check_host_freshness());
+	fprintf(fp,"enable_flap_detection=%d\n",config.get_enable_flap_detection());
+	fprintf(fp,"enable_failure_prediction=%d\n",config.get_enable_failure_prediction());
+	fprintf(fp,"process_performance_data=%d\n",config.get_process_performance_data());
+	fprintf(fp,"global_host_event_handler=%s\n",config.get_global_host_event_handler().c_str());
+	fprintf(fp,"global_service_event_handler=%s\n",config.get_global_service_event_handler().c_str());
 	fprintf(fp,"next_comment_id=%lu\n",next_comment_id);
 	fprintf(fp,"next_downtime_id=%lu\n",next_downtime_id);
 	fprintf(fp,"next_event_id=%lu\n",next_event_id);
@@ -678,12 +651,12 @@ int xrddefault_read_state_information(void){
 
 	/* what attributes should be masked out? */
 	/* NOTE: host/service/contact-specific values may be added in the future, but for now we only have global masks */
-	process_host_attribute_mask=retained_process_host_attribute_mask;
-	process_service_attribute_mask=retained_process_host_attribute_mask;
-	host_attribute_mask=retained_host_attribute_mask;
-	service_attribute_mask=retained_host_attribute_mask;
-	contact_host_attribute_mask=retained_contact_host_attribute_mask;
-	contact_service_attribute_mask=retained_contact_service_attribute_mask;
+	process_host_attribute_mask=config.get_retained_process_host_attribute_mask();
+	process_service_attribute_mask=config.get_retained_process_host_attribute_mask();
+	host_attribute_mask=config.get_retained_host_attribute_mask();
+	service_attribute_mask=config.get_retained_host_attribute_mask();
+	contact_host_attribute_mask=config.get_retained_contact_host_attribute_mask();
+	contact_service_attribute_mask=config.get_retained_contact_service_attribute_mask();
 
 	/* Big speedup when reading retention.dat in bulk */
 	defer_downtime_sorting=1;
@@ -736,7 +709,7 @@ int xrddefault_read_state_information(void){
 			case XRDDEFAULT_PROGRAMSTATUS_DATA:
 
 				/* adjust modified attributes if necessary */
-				if(use_retained_program_state==FALSE){
+			  if(config.get_use_retained_program_state()==FALSE){
 					modified_host_process_attributes=MODATTR_NONE;
 					modified_service_process_attributes=MODATTR_NONE;
 				        }
@@ -771,7 +744,7 @@ int xrddefault_read_state_information(void){
 
 
 					/* ADDED 02/20/08 assume same flapping state if large install tweaks enabled */
-					if(use_large_installation_tweaks==TRUE){
+					if(config.get_use_large_installation_tweaks()==TRUE){
 						temp_host->is_flapping=was_flapping;
 						}
 					/* else use normal startup flap detection logic */
@@ -842,7 +815,7 @@ int xrddefault_read_state_information(void){
 
 
 					/* ADDED 02/20/08 assume same flapping state if large install tweaks enabled */
-					if(use_large_installation_tweaks==TRUE){
+					if(config.get_use_large_installation_tweaks()==TRUE){
 						temp_service->is_flapping=was_flapping;
 						}
 					/* else use normal startup flap detection logic */
@@ -1009,7 +982,7 @@ int xrddefault_read_state_information(void){
 				if(!strcmp(var,"created")){
 					creation_time=strtoul(val,NULL,10);
 					time(&current_time);
-					if(current_time-creation_time<retention_scheduling_horizon)
+					if(current_time-creation_time<config.get_retention_scheduling_horizon())
 						scheduling_info_is_ok=TRUE;
 					else
 						scheduling_info_is_ok=FALSE;
@@ -1047,58 +1020,58 @@ int xrddefault_read_state_information(void){
 					/* mask out attributes we don't want to retain */
 					modified_service_process_attributes&=~process_service_attribute_mask;
 					}
-				if(use_retained_program_state==TRUE){
+				if(config.get_use_retained_program_state()==TRUE){
 					if(!strcmp(var,"enable_notifications")){
 						if(modified_host_process_attributes & MODATTR_NOTIFICATIONS_ENABLED)
-							enable_notifications=(atoi(val)>0)?TRUE:FALSE;
+							config.set_enable_notifications((atoi(val)>0)?TRUE:FALSE);
 					        }
 					else if(!strcmp(var,"active_service_checks_enabled")){
 						if(modified_service_process_attributes & MODATTR_ACTIVE_CHECKS_ENABLED)
-							execute_service_checks=(atoi(val)>0)?TRUE:FALSE;
+							config.set_execute_service_checks((atoi(val)>0)?TRUE:FALSE);
 					        }
 					else if(!strcmp(var,"passive_service_checks_enabled")){
 						if(modified_service_process_attributes & MODATTR_PASSIVE_CHECKS_ENABLED)
-							accept_passive_service_checks=(atoi(val)>0)?TRUE:FALSE;
+							config.set_accept_passive_service_checks((atoi(val)>0)?TRUE:FALSE);
 					        }
 					else if(!strcmp(var,"active_host_checks_enabled")){
 						if(modified_host_process_attributes & MODATTR_ACTIVE_CHECKS_ENABLED)
-							execute_host_checks=(atoi(val)>0)?TRUE:FALSE;
+							config.set_execute_host_checks((atoi(val)>0)?TRUE:FALSE);
 					        }
 					else if(!strcmp(var,"passive_host_checks_enabled")){
 						if(modified_host_process_attributes & MODATTR_PASSIVE_CHECKS_ENABLED)
-							accept_passive_host_checks=(atoi(val)>0)?TRUE:FALSE;
+							config.set_accept_passive_host_checks((atoi(val)>0)?TRUE:FALSE);
 					        }
 					else if(!strcmp(var,"enable_event_handlers")){
 						if(modified_host_process_attributes & MODATTR_EVENT_HANDLER_ENABLED)
-							enable_event_handlers=(atoi(val)>0)?TRUE:FALSE;
+							config.set_enable_event_handlers((atoi(val)>0)?TRUE:FALSE);
 					        }
 					else if(!strcmp(var,"obsess_over_services")){
 						if(modified_service_process_attributes & MODATTR_OBSESSIVE_HANDLER_ENABLED)
-							obsess_over_services=(atoi(val)>0)?TRUE:FALSE;
+							config.set_obsess_over_services((atoi(val)>0)?TRUE:FALSE);
 					        }
 					else if(!strcmp(var,"obsess_over_hosts")){
 						if(modified_host_process_attributes & MODATTR_OBSESSIVE_HANDLER_ENABLED)
-							obsess_over_hosts=(atoi(val)>0)?TRUE:FALSE;
+							config.set_obsess_over_hosts((atoi(val)>0)?TRUE:FALSE);
 					        }
 					else if(!strcmp(var,"check_service_freshness")){
 						if(modified_service_process_attributes & MODATTR_FRESHNESS_CHECKS_ENABLED)
-							check_service_freshness=(atoi(val)>0)?TRUE:FALSE;
+						  config.set_check_service_freshness((atoi(val)>0)?TRUE:FALSE);
 					        }
 					else if(!strcmp(var,"check_host_freshness")){
 						if(modified_host_process_attributes & MODATTR_FRESHNESS_CHECKS_ENABLED)
-							check_host_freshness=(atoi(val)>0)?TRUE:FALSE;
+						  config.set_check_host_freshness((atoi(val)>0)?TRUE:FALSE);
 					        }
 					else if(!strcmp(var,"enable_flap_detection")){
 						if(modified_host_process_attributes & MODATTR_FLAP_DETECTION_ENABLED)
-							enable_flap_detection=(atoi(val)>0)?TRUE:FALSE;
+							config.set_enable_flap_detection((atoi(val)>0)?TRUE:FALSE);
 					        }
 					else if(!strcmp(var,"enable_failure_prediction")){
 						if(modified_host_process_attributes & MODATTR_FAILURE_PREDICTION_ENABLED)
-							enable_failure_prediction=(atoi(val)>0)?TRUE:FALSE;
+							config.set_enable_failure_prediction((atoi(val)>0)?TRUE:FALSE);
 					        }
 					else if(!strcmp(var,"process_performance_data")){
 						if(modified_host_process_attributes & MODATTR_PERFORMANCE_DATA_ENABLED)
-							process_performance_data=(atoi(val)>0)?TRUE:FALSE;
+							config.set_process_performance_data((atoi(val)>0)?TRUE:FALSE);
 					        }
 					else if(!strcmp(var,"global_host_event_handler")){
 						if(modified_host_process_attributes & MODATTR_EVENT_HANDLER_COMMAND){
@@ -1111,8 +1084,7 @@ int xrddefault_read_state_information(void){
 							my_free(tempval);
 
 							if(temp_command!=NULL && temp_ptr!=NULL){
-								my_free(global_host_event_handler);
-								global_host_event_handler=temp_ptr;
+							  config.set_global_host_event_handler(temp_ptr);
 							        }
 						        }
 					        }
@@ -1127,8 +1099,7 @@ int xrddefault_read_state_information(void){
 							my_free(tempval);
 
 							if(temp_command!=NULL && temp_ptr!=NULL){
-								my_free(global_service_event_handler);
-								global_service_event_handler=temp_ptr;
+							  config.set_global_service_event_handler(temp_ptr);
 							        }
 						        }
 					        }
@@ -1202,11 +1173,11 @@ int xrddefault_read_state_information(void){
 						else if(!strcmp(var,"last_check"))
 							temp_host->last_check=strtoul(val,NULL,10);
 						else if(!strcmp(var,"next_check")){
-							if(use_retained_scheduling_info==TRUE && scheduling_info_is_ok==TRUE)
+						  if(config.get_use_retained_scheduling_info()==TRUE && scheduling_info_is_ok==TRUE)
 								temp_host->next_check=strtoul(val,NULL,10);
 						        }
 						else if(!strcmp(var,"check_options")){
-							if(use_retained_scheduling_info==TRUE && scheduling_info_is_ok==TRUE)
+						  if(config.get_use_retained_scheduling_info()==TRUE && scheduling_info_is_ok==TRUE)
 								temp_host->check_options=atoi(val);
 						        }
 						else if(!strcmp(var,"current_attempt"))
@@ -1501,11 +1472,11 @@ int xrddefault_read_state_information(void){
 						else if(!strcmp(var,"last_check"))
 							temp_service->last_check=strtoul(val,NULL,10);
 						else if(!strcmp(var,"next_check")){
-							if(use_retained_scheduling_info==TRUE && scheduling_info_is_ok==TRUE)
+						  if(config.get_use_retained_scheduling_info()==TRUE && scheduling_info_is_ok==TRUE)
 								temp_service->next_check=strtoul(val,NULL,10);
 						        }
 						else if(!strcmp(var,"check_options")){
-							if(use_retained_scheduling_info==TRUE && scheduling_info_is_ok==TRUE)
+						  if(config.get_use_retained_scheduling_info()==TRUE && scheduling_info_is_ok==TRUE)
 								temp_service->check_options=atoi(val);
 						        }
 						else if(!strcmp(var,"notified_on_unknown"))

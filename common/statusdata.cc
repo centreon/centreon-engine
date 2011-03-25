@@ -20,6 +20,8 @@
 
 /*********** COMMON HEADER FILES ***********/
 
+#include "configuration.hh"
+
 #include "config.hh"
 #include "common.hh"
 #include "objects.hh"
@@ -34,9 +36,7 @@
 #include "../xdata/xsddefault.hh"		/* default routines */
 #endif
 
-
-extern int      aggregate_status_updates;
-
+extern com::centreon::scheduler::configuration config;
 
 /******************************************************************/
 /****************** TOP-LEVEL OUTPUT FUNCTIONS ********************/
@@ -104,12 +104,6 @@ int update_program_status(int aggregated_dump){
 	        broker_program_status(NEBTYPE_PROGRAMSTATUS_UPDATE,NEBFLAG_NONE,NEBATTR_NONE,NULL);
 #endif
 
-	/* currently a noop if aggregated updates is TRUE */
-
-	/* update all status data if we're not aggregating updates */
-	if(aggregate_status_updates==FALSE)
-		update_all_status_data();
-
 	return OK;
         }
 
@@ -123,12 +117,6 @@ int update_host_status(host *hst,int aggregated_dump){
 	if(aggregated_dump==FALSE)
 	          broker_host_status(NEBTYPE_HOSTSTATUS_UPDATE,NEBFLAG_NONE,NEBATTR_NONE,hst,NULL);
 #endif
-
-	/* currently a noop if aggregated updates is TRUE */
-
-	/* update all status data if we're not aggregating updates */
-	if(aggregate_status_updates==FALSE)
-		update_all_status_data();
 
 	return OK;
         }
@@ -144,12 +132,6 @@ int update_service_status(service *svc,int aggregated_dump){
 	        broker_service_status(NEBTYPE_SERVICESTATUS_UPDATE,NEBFLAG_NONE,NEBATTR_NONE,svc,NULL);
 #endif
 
-	/* currently a noop if aggregated updates is TRUE */
-
-	/* update all status data if we're not aggregating updates */
-	if(aggregate_status_updates==FALSE)
-		update_all_status_data();
-
 	return OK;
         }
 
@@ -163,12 +145,6 @@ int update_contact_status(contact *cntct,int aggregated_dump){
 	if(aggregated_dump==FALSE)
 	        broker_contact_status(NEBTYPE_CONTACTSTATUS_UPDATE,NEBFLAG_NONE,NEBATTR_NONE,cntct,NULL);
 #endif
-
-	/* currently a noop if aggregated updates is TRUE */
-
-	/* update all status data if we're not aggregating updates */
-	if(aggregate_status_updates==FALSE)
-		update_all_status_data();
 
 	return OK;
         }

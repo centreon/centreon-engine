@@ -19,6 +19,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "configuration.hh"
+
 #include "config.hh"
 #include "common.hh"
 #include "objects.hh"
@@ -28,19 +30,14 @@
 #include "broker.hh"
 #include "neberrors.hh"
 
+extern com::centreon::scheduler::configuration config;
+
 extern notification    *notification_list;
 extern contact         *contact_list;
 extern serviceescalation *serviceescalation_list;
 extern hostescalation  *hostescalation_list;
 
 extern time_t          program_start;
-
-extern int             interval_length;
-extern int             log_notifications;
-
-extern int             enable_notifications;
-
-extern int             notification_timeout;
 
 extern unsigned long   next_notification_id;
 
@@ -341,7 +338,7 @@ int check_service_notification_viability(service *svc, int type, int options){
 	time(&current_time);
 
 	/* are notifications enabled? */
-	if(enable_notifications==FALSE){
+	if(config.get_enable_notifications()==FALSE){
 		log_debug_info(DEBUGL_NOTIFICATIONS,1,"Notifications are disabled, so service notifications will not be sent out.\n");
 		return ERROR;
 	        }
@@ -540,7 +537,7 @@ int check_service_notification_viability(service *svc, int type, int options){
 		if((svc->last_time_critical < first_problem_time) && (svc->last_time_critical > svc->last_time_ok))
 			first_problem_time=svc->last_time_critical;
 	
-		if(current_time < (time_t)((first_problem_time==(time_t)0L)?program_start:first_problem_time) + (time_t)(svc->first_notification_delay*interval_length)){
+		if(current_time < (time_t)((first_problem_time==(time_t)0L)?program_start:first_problem_time) + (time_t)(svc->first_notification_delay*config.get_interval_length())){
 			log_debug_info(DEBUGL_NOTIFICATIONS,1,"Not enough time has elapsed since the service changed to a non-OK state, so we should not notify about this problem yet\n");
 			return ERROR;
 			}
@@ -775,7 +772,7 @@ int notify_contact_of_service(nagios_macros *mac, contact *cntct, service *svc, 
 		log_debug_info(DEBUGL_NOTIFICATIONS,2,"Processed notification command: %s\n",processed_command);
 
 		/* log the notification to program log file */
-		if(log_notifications==TRUE){
+		if(config.get_log_notifications()==true){
 			switch(type){
 			case NOTIFICATION_CUSTOM:
 				ret=asprintf(&temp_buffer,"SERVICE NOTIFICATION: %s;%s;%s;CUSTOM ($SERVICESTATE$);%s;$SERVICEOUTPUT$;$NOTIFICATIONAUTHOR$;$NOTIFICATIONCOMMENT$\n",cntct->name,svc->host_name,svc->description,command_name_ptr);
@@ -825,11 +822,11 @@ int notify_contact_of_service(nagios_macros *mac, contact *cntct, service *svc, 
 			}
 
 		/* run the notification command */
-		my_system_r(mac, processed_command,notification_timeout,&early_timeout,&exectime,NULL,0);
+		my_system_r(mac, processed_command,config.get_notification_timeout(),&early_timeout,&exectime,NULL,0);
 
 		/* check to see if the notification command timed out */
 		if(early_timeout==TRUE){
-			logit(NSLOG_SERVICE_NOTIFICATION | NSLOG_RUNTIME_WARNING,TRUE,"Warning: Contact '%s' service notification command '%s' timed out after %d seconds\n",cntct->name,processed_command,notification_timeout);
+		  logit(NSLOG_SERVICE_NOTIFICATION | NSLOG_RUNTIME_WARNING,TRUE,"Warning: Contact '%s' service notification command '%s' timed out after %d seconds\n",cntct->name,processed_command,config.get_notification_timeout());
 			}
 
 		/* free memory */
@@ -1317,7 +1314,7 @@ int check_host_notification_viability(host *hst, int type, int options){
 	time(&current_time);
 
 	/* are notifications enabled? */
-	if(enable_notifications==FALSE){
+	if(config.get_enable_notifications()==FALSE){
 		log_debug_info(DEBUGL_NOTIFICATIONS,1,"Notifications are disabled, so host notifications will not be sent out.\n");
 		return ERROR;
 	        }
@@ -1490,7 +1487,7 @@ int check_host_notification_viability(host *hst, int type, int options){
 		if((hst->last_time_unreachable < first_problem_time) && (hst->last_time_unreachable > hst->last_time_unreachable))
 			first_problem_time=hst->last_time_unreachable;
 	
-		if(current_time < (time_t)((first_problem_time==(time_t)0L)?program_start:first_problem_time) + (time_t)(hst->first_notification_delay*interval_length)){
+		if(current_time < (time_t)((first_problem_time==(time_t)0L)?program_start:first_problem_time) + (time_t)(hst->first_notification_delay*config.get_interval_length())){
 			log_debug_info(DEBUGL_NOTIFICATIONS,1,"Not enough time has elapsed since the host changed to a non-UP state (or since program start), so we shouldn't notify about this problem yet.\n");
 			return ERROR;
 			}
@@ -1714,7 +1711,7 @@ int notify_contact_of_host(nagios_macros *mac, contact *cntct, host *hst, int ty
 		log_debug_info(DEBUGL_NOTIFICATIONS,2,"Processed notification command: %s\n",processed_command);
 
 		/* log the notification to program log file */
-		if(log_notifications==TRUE){
+		if(config.get_log_notifications()==true){
 			switch(type){
 			case NOTIFICATION_CUSTOM:
 				ret = asprintf(&temp_buffer,"HOST NOTIFICATION: %s;%s;CUSTOM ($HOSTSTATE$);%s;$HOSTOUTPUT$;$NOTIFICATIONAUTHOR$;$NOTIFICATIONCOMMENT$\n",cntct->name,hst->name,command_name_ptr);
@@ -1764,11 +1761,11 @@ int notify_contact_of_host(nagios_macros *mac, contact *cntct, host *hst, int ty
 			}
 
 		/* run the notification command */
-		my_system_r(mac, processed_command,notification_timeout,&early_timeout,&exectime,NULL,0);
+		my_system_r(mac, processed_command,config.get_notification_timeout(),&early_timeout,&exectime,NULL,0);
 
 		/* check to see if the notification timed out */
 		if(early_timeout==TRUE){
-			logit(NSLOG_HOST_NOTIFICATION | NSLOG_RUNTIME_WARNING,TRUE,"Warning: Contact '%s' host notification command '%s' timed out after %d seconds\n", cntct->name,processed_command,notification_timeout);
+		  logit(NSLOG_HOST_NOTIFICATION | NSLOG_RUNTIME_WARNING,TRUE,"Warning: Contact '%s' host notification command '%s' timed out after %d seconds\n", cntct->name,processed_command,config.get_notification_timeout());
 			}
 
 		/* free memory */
@@ -2035,7 +2032,7 @@ time_t get_next_service_notification_time(service *svc, time_t offset)
 	log_debug_info(DEBUGL_NOTIFICATIONS,2,"Interval used for calculating next valid notification time: %f\n",interval_to_use);
 
 	/* calculate next notification time */
-	next_notification=offset+(interval_to_use*interval_length);
+	next_notification=offset+(interval_to_use*config.get_interval_length());
 
 	return next_notification;
         }
@@ -2094,7 +2091,7 @@ time_t get_next_host_notification_time(host *hst, time_t offset){
 	log_debug_info(DEBUGL_NOTIFICATIONS,2,"Interval used for calculating next valid notification time: %f\n",interval_to_use);
 
 	/* calculate next notification time */
-	next_notification=offset+(interval_to_use*interval_length);
+	next_notification=offset+(interval_to_use*config.get_interval_length());
 
 	return next_notification;
         }

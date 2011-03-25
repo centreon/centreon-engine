@@ -20,6 +20,8 @@
 
 /*********** COMMON HEADER FILES ***********/
 
+#include "configuration.hh"
+
 #include "config.hh"
 #include "common.hh"
 #include "objects.hh"
@@ -35,9 +37,8 @@
 
 #include "xodtemplate.hh"
 
+extern com::centreon::scheduler::configuration config;
 
-extern int use_regexp_matches;
-extern int use_true_regexp_matching;
 extern int verify_config;
 extern int test_scheduling;
 extern int use_precached_objects;
@@ -87,8 +88,6 @@ char *xodtemplate_cache_file=NULL;
 char *xodtemplate_precache_file=NULL;
 
 int presorted_objects=FALSE;
-
-extern int allow_empty_hostgroup_assignment;
 
 /*
  * Macro magic used to determine if a service is assigned
@@ -4070,7 +4069,7 @@ int xodtemplate_duplicate_services(void){
 					}
 				else{
 					/* User is ok with hostgroup -> service mappings with no hosts */
-					if(allow_empty_hostgroup_assignment==1){
+				  if(config.get_allow_empty_hostgroup_assignment()==1){
 						continue;
                                                }
 					}
@@ -11880,7 +11879,7 @@ int xodtemplate_expand_contactgroups(xodtemplate_memberlist **list, xodtemplate_
 		strip(temp_ptr);
 
 		/* should we use regular expression matching? */
-		if(use_regexp_matches==TRUE && (use_true_regexp_matching==TRUE || strstr(temp_ptr,"*") || strstr(temp_ptr,"?") || strstr(temp_ptr,"+") || strstr(temp_ptr,"\\.")))
+		if(config.get_use_regexp_matches()==true && (config.get_use_true_regexp_matching()==true || strstr(temp_ptr,"*") || strstr(temp_ptr,"?") || strstr(temp_ptr,"+") || strstr(temp_ptr,"\\.")))
 			use_regexp=TRUE;
 		else
 			use_regexp=FALSE;
@@ -12001,7 +12000,7 @@ int xodtemplate_expand_contacts(xodtemplate_memberlist **list, xodtemplate_membe
 		strip(temp_ptr);
 
 		/* should we use regular expression matching? */
-		if(use_regexp_matches==TRUE && (use_true_regexp_matching==TRUE || strstr(temp_ptr,"*") || strstr(temp_ptr,"?") || strstr(temp_ptr,"+") || strstr(temp_ptr,"\\.")))
+		if(config.get_use_regexp_matches()==true && (config.get_use_true_regexp_matching()==true || strstr(temp_ptr,"*") || strstr(temp_ptr,"?") || strstr(temp_ptr,"+") || strstr(temp_ptr,"\\.")))
 			use_regexp=TRUE;
 
 		/* use regular expression matching */
@@ -12224,7 +12223,7 @@ int xodtemplate_expand_hostgroups(xodtemplate_memberlist **list, xodtemplate_mem
 		strip(temp_ptr);
 
 		/* should we use regular expression matching? */
-		if(use_regexp_matches==TRUE && (use_true_regexp_matching==TRUE || strstr(temp_ptr,"*") || strstr(temp_ptr,"?") || strstr(temp_ptr,"+") || strstr(temp_ptr,"\\.")))
+		if(config.get_use_regexp_matches()==true && (config.get_use_true_regexp_matching()==true || strstr(temp_ptr,"*") || strstr(temp_ptr,"?") || strstr(temp_ptr,"+") || strstr(temp_ptr,"\\.")))
 			use_regexp=TRUE;
 		else
 			use_regexp=FALSE;
@@ -12345,7 +12344,7 @@ int xodtemplate_expand_hosts(xodtemplate_memberlist **list, xodtemplate_memberli
 		strip(temp_ptr);
 
 		/* should we use regular expression matching? */
-		if(use_regexp_matches==TRUE && (use_true_regexp_matching==TRUE || strstr(temp_ptr,"*") || strstr(temp_ptr,"?") || strstr(temp_ptr,"+") || strstr(temp_ptr,"\\.")))
+		if(config.get_use_regexp_matches()==true && (config.get_use_true_regexp_matching()==true || strstr(temp_ptr,"*") || strstr(temp_ptr,"?") || strstr(temp_ptr,"+") || strstr(temp_ptr,"\\.")))
 			use_regexp=TRUE;
 
 		/* use regular expression matching */
@@ -12558,7 +12557,7 @@ int xodtemplate_expand_servicegroups(xodtemplate_memberlist **list, xodtemplate_
 		strip(temp_ptr);
 
 		/* should we use regular expression matching? */
-		if(use_regexp_matches==TRUE && (use_true_regexp_matching==TRUE || strstr(temp_ptr,"*") || strstr(temp_ptr,"?") || strstr(temp_ptr,"+") || strstr(temp_ptr,"\\.")))
+		if(config.get_use_regexp_matches()==true && (config.get_use_true_regexp_matching()==true || strstr(temp_ptr,"*") || strstr(temp_ptr,"?") || strstr(temp_ptr,"+") || strstr(temp_ptr,"\\.")))
 			use_regexp=TRUE;
 		else
 			use_regexp=FALSE;
@@ -12670,7 +12669,7 @@ int xodtemplate_expand_services(xodtemplate_memberlist **list, xodtemplate_membe
 		return OK;
 
 	/* should we use regular expression matching for the host name? */
-	if(use_regexp_matches==TRUE && (use_true_regexp_matching==TRUE || strstr(host_name,"*") || strstr(host_name,"?") || strstr(host_name,"+") || strstr(host_name,"\\.")))
+	if(config.get_use_regexp_matches()==true && (config.get_use_true_regexp_matching()==true || strstr(host_name,"*") || strstr(host_name,"?") || strstr(host_name,"+") || strstr(host_name,"\\.")))
 		use_regexp_host=TRUE;
 
 	/* compile regular expression for host name */
@@ -12695,7 +12694,7 @@ int xodtemplate_expand_services(xodtemplate_memberlist **list, xodtemplate_membe
 		strip(temp_ptr);
 
 		/* should we use regular expression matching for the service description? */
-		if(use_regexp_matches==TRUE && (use_true_regexp_matching==TRUE || strstr(temp_ptr,"*") || strstr(temp_ptr,"?") || strstr(temp_ptr,"+") || strstr(temp_ptr,"\\.")))
+		if(config.get_use_regexp_matches()==true && (config.get_use_true_regexp_matching()==true || strstr(temp_ptr,"*") || strstr(temp_ptr,"?") || strstr(temp_ptr,"+") || strstr(temp_ptr,"\\.")))
 			use_regexp_service=TRUE;
 		else
 			use_regexp_service=FALSE;
@@ -12954,7 +12953,7 @@ int xodtemplate_get_hostgroup_names(xodtemplate_memberlist **list, xodtemplate_m
 		strip(temp_ptr);
 
 		/* should we use regular expression matching? */
-		if(use_regexp_matches==TRUE && (use_true_regexp_matching==TRUE || strstr(temp_ptr,"*") || strstr(temp_ptr,"?") || strstr(temp_ptr,"+") || strstr(temp_ptr,"\\.")))
+		if(config.get_use_regexp_matches()==true && (config.get_use_true_regexp_matching()==true || strstr(temp_ptr,"*") || strstr(temp_ptr,"?") || strstr(temp_ptr,"+") || strstr(temp_ptr,"\\.")))
 			use_regexp=TRUE;
 		else
 			use_regexp=FALSE;
@@ -13130,7 +13129,7 @@ int xodtemplate_get_contactgroup_names(xodtemplate_memberlist **list, xodtemplat
 		strip(temp_ptr);
 
 		/* should we use regular expression matching? */
-		if(use_regexp_matches==TRUE && (use_true_regexp_matching==TRUE || strstr(temp_ptr,"*") || strstr(temp_ptr,"?") || strstr(temp_ptr,"+") || strstr(temp_ptr,"\\.")))
+		if(config.get_use_regexp_matches()==true && (config.get_use_true_regexp_matching()==true || strstr(temp_ptr,"*") || strstr(temp_ptr,"?") || strstr(temp_ptr,"+") || strstr(temp_ptr,"\\.")))
 			use_regexp=TRUE;
 		else
 			use_regexp=FALSE;
@@ -13306,7 +13305,7 @@ int xodtemplate_get_servicegroup_names(xodtemplate_memberlist **list, xodtemplat
 		strip(temp_ptr);
 
 		/* should we use regular expression matching? */
-		if(use_regexp_matches==TRUE && (use_true_regexp_matching==TRUE || strstr(temp_ptr,"*") || strstr(temp_ptr,"?") || strstr(temp_ptr,"+") || strstr(temp_ptr,"\\.")))
+		if(config.get_use_regexp_matches()==true && (config.get_use_true_regexp_matching()==true || strstr(temp_ptr,"*") || strstr(temp_ptr,"?") || strstr(temp_ptr,"+") || strstr(temp_ptr,"\\.")))
 			use_regexp=TRUE;
 		else
 			use_regexp=FALSE;
