@@ -365,8 +365,9 @@ configure_file("${INCLUDE_DIR}/snprintf.h.in"
 # Include Directories
 include_directories("${INCLUDE_DIR}")
 
-# centscheduler target.
-add_executable("centscheduler"
+# library scheduler target.
+add_library("schedulerlib"
+  "STATIC"
   "${BASE_DIR}/broker.cc"
   "${BASE_DIR}/checks.cc"
   "${BASE_DIR}/commands.cc"
@@ -375,7 +376,6 @@ add_executable("centscheduler"
   "${BASE_DIR}/events.cc"
   "${BASE_DIR}/flapping.cc"
   "${BASE_DIR}/logging.cc"
-  "${BASE_DIR}/nagios.cc"
   "${BASE_DIR}/nebmods.cc"
   "${BASE_DIR}/netutils.cc"
   "${BASE_DIR}/notifications.cc"
@@ -400,6 +400,11 @@ add_executable("centscheduler"
   "${XDATA_DIR}/xsddefault.cc"
   "${PERL_SOURCES}"
 )
+
+# centscheduler target.
+add_executable("centscheduler"
+  "${BASE_DIR}/nagios.cc"
+)
 get_property(SCHEDULER_COMPILE_FLAGS
   TARGET "centscheduler"
   PROPERTY COMPILE_FLAGS)
@@ -412,12 +417,22 @@ target_link_libraries("centscheduler"
   ${SOCKET_LIBRARIES}
   ${THREAD_LIBRARIES}
   ${PERL_LINK_FLAGS}
+  "schedulerlib"
 )
 
 # centschedulerstats target.
 add_executable("centschedulerstats"
   "${BASE_DIR}/nagiostats.cc"
 )
+
+# # test configuration target.
+# add_executable("test_configuration"
+#   "${TEST_DIR}/test_configuration.cc")
+# target_link_libraries("test_configuration"
+#   ${DL_LIBRARIES}
+#   ${THREAD_LIBRARIES}
+#   ${PERL_LINK_FLAGS}
+#   "schedulerlib")
 
 # Package.
 set(CPACK_PACKAGE_NAME "Centreon-Scheduler")
