@@ -27,12 +27,12 @@
 #include <time.h>
 
 #include "nagios.hh"
+#include "locations.hh"
 #include "logging.hh"
 #include "common.hh"
 #include "macros.hh"
 #include "broker.hh"
 #include "nebmods.hh"
-
 #include "utils.hh"
 
 #include "error.hh"

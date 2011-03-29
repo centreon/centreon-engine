@@ -21,9 +21,8 @@
 
 /*********** COMMON HEADER FILES ***********/
 
-#include "configuration.hh"
-
 #include "conf.hh"
+#include "nagios.hh"
 #include "common.hh"
 #include "locations.hh"
 #include "statusdata.hh"
@@ -31,10 +30,9 @@
 #include "downtime.hh"
 #include "macros.hh"
 #include "skiplist.hh"
-
-#include "nagios.hh"
-
 #include "utils.hh"
+#include "logging.hh"
+#include "configuration.hh"
 
 /**** IMPLEMENTATION SPECIFIC HEADER FILES ****/
 #include "xsddefault.hh"

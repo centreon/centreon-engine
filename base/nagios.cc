@@ -35,10 +35,10 @@
 #include "perfdata.hh"
 #include "broker.hh"
 #include "nebmods.hh"
-
 #include "notifications.hh"
 #include "config.hh"
 #include "utils.hh"
+#include "logging.hh"
 #include "configuration.hh"
 #include "nagios.hh"
 

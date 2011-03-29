@@ -21,11 +21,12 @@
 /*********** COMMON HEADER FILES ***********/
 
 #include "conf.hh"
+#include "nagios.hh"
 #include "comments.hh"
 #include "statusdata.hh"
-#include "nagios.hh"
 #include "broker.hh"
 #include "notifications.hh"
+#include "logging.hh"
 #include "configuration.hh"
 #include "flapping.hh"
 

@@ -20,8 +20,8 @@
 
 #include "conf.hh"
 #include "neberrors.hh"
-#include "nagios.hh"
 #include "utils.hh"
+#include "logging.hh"
 #include "configuration.hh"
 #include "nebmods.hh"
 

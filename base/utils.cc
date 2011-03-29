@@ -19,8 +19,8 @@
 */
 
 #include "conf.hh"
-#include "comments.hh"
 #include "nagios.hh"
+#include "comments.hh"
 #include "broker.hh"
 #include "nebmods.hh"
 
@@ -31,6 +31,7 @@ int use_embedded_perl=TRUE;
 #endif
 
 #include "notifications.hh"
+#include "logging.hh"
 #include "configuration.hh"
 #include "utils.hh"
 

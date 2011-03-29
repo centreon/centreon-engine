@@ -19,15 +19,16 @@
 */
 
 #include "conf.hh"
+#include "nagios.hh"
 #include "comments.hh"
 #include "downtime.hh"
 #include "statusdata.hh"
 #include "sretention.hh"
 #include "broker.hh"
-#include "nagios.hh"
 #include "notifications.hh"
 #include "utils.hh"
 #include "flapping.hh"
+#include "logging.hh"
 #include "configuration.hh"
 #include "commands.hh"
 

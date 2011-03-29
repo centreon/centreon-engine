@@ -24,10 +24,9 @@
 #include "common.hh"
 #include "objects.hh"
 #include "macros.hh"
-#include "nagios.hh"
-
 #include "utils.hh"
 #include "events.hh"
+#include "logging.hh"
 
 /**** DATA INPUT-SPECIFIC HEADER FILES ****/
 

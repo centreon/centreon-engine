@@ -27,6 +27,7 @@
 #include "statusdata.hh"
 #include "broker.hh"
 #include "notifications.hh"
+#include "logging.hh"
 #include "downtime.hh"
 
 scheduled_downtime *scheduled_downtime_list=NULL;

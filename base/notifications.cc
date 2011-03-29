@@ -20,11 +20,12 @@
 */
 
 #include "conf.hh"
-#include "statusdata.hh"
 #include "nagios.hh"
+#include "statusdata.hh"
 #include "broker.hh"
 #include "neberrors.hh"
 #include "utils.hh"
+#include "logging.hh"
 #include "configuration.hh"
 #include "notifications.hh"
 

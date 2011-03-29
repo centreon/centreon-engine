@@ -20,14 +20,14 @@
 
 /*********** COMMON HEADER FILES ***********/
 
-#include "configuration.hh"
-
 #include "conf.hh"
 #include "common.hh"
 #include "objects.hh"
 #include "locations.hh"
 #include "macros.hh"
 #include "skiplist.hh"
+#include "configuration.hh"
+#include "logging.hh"
 
 /**** CORE OR CGI SPECIFIC HEADER FILES ****/
 

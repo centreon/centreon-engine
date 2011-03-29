@@ -22,6 +22,7 @@
 #include "nagios.hh"
 #include "utils.hh"
 #include "notifications.hh"
+#include "logging.hh"
 #include "configuration.hh"
 #include "config.hh"
 
