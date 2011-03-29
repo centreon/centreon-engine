@@ -18,26 +18,21 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include "configuration.hh"
-
-#include "config.hh"
-#include "common.hh"
-#include "objects.hh"
-#include "statusdata.hh"
+#include "conf.hh"
 #include "comments.hh"
-#include "macros.hh"
 #include "nagios.hh"
-#include "netutils.hh"
 #include "broker.hh"
 #include "nebmods.hh"
-#include "nebmodules.hh"
-
 
 #ifdef EMBEDDEDPERL
-#include "epn_nagios.hh"
+# include "epn_nagios.hh"
 static PerlInterpreter *my_perl=NULL;
 int use_embedded_perl=TRUE;
 #endif
+
+#include "notifications.hh"
+#include "configuration.hh"
+#include "utils.hh"
 
 extern com::centreon::scheduler::configuration config;
 
@@ -100,7 +95,7 @@ extern int      test_scheduling;
 
 extern check_result check_result_info;
 
-extern int      currently_running_service_checks;
+extern unsigned int     currently_running_service_checks;
 
 extern contact		*contact_list;
 extern contactgroup	*contactgroup_list;
@@ -150,13 +145,11 @@ extern int errno;
 
 
 /* executes a system command - used for notifications, event handlers, etc. */
-int my_system_r(nagios_macros *mac, char *cmd,int timeout,int *early_timeout,double *exectime,char **output,int max_output_length)
-{
+int my_system_r(nagios_macros *mac, char *cmd,int timeout,int *early_timeout,double *exectime,char **output,unsigned int max_output_length) {
 	pid_t pid=0;
 	int status=0;
 	int result=0;
 	char buffer[MAX_INPUT_BUFFER]="";
-	char *temp_buffer=NULL;
 	int fd[2];
 	FILE *fp=NULL;
 	int bytes_read=0;
@@ -510,7 +503,7 @@ int my_system_r(nagios_macros *mac, char *cmd,int timeout,int *early_timeout,dou
 				}while(1);
 
 			/* cap output length - this isn't necessary, but it keeps runaway plugin output from causing problems */
-			if(max_output_length>0  && output_dbuf.used_size>max_output_length)
+			if(output_dbuf.used_size>max_output_length)
 				output_dbuf.buf[max_output_length]='\x0';
 
 			if(output!=NULL && output_dbuf.buf)
@@ -551,7 +544,7 @@ int get_raw_command_line_r(nagios_macros *mac, command *cmd_ptr, char const* cmd
 {
 	char temp_arg[MAX_COMMAND_BUFFER]="";
 	char *arg_buffer=NULL;
-	register int x=0;
+	register unsigned int x=0;
 	register unsigned int y=0;
 	register int arg_index=0;
 	register int escaped=FALSE;
@@ -963,7 +956,7 @@ int check_time_against_period(time_t test_time, timeperiod *tperiod){
 /*#define TEST_TIMEPERIODS_B 1*/
 
 /* Separate this out from public get_next_valid_time for testing, so we can mock current_time */
-void _get_next_valid_time(time_t pref_time, time_t current_time, time_t *valid_time, timeperiod *tperiod){
+static void _get_next_valid_time(time_t pref_time, time_t current_time, time_t *valid_time, timeperiod *tperiod){
 	time_t preferred_time=(time_t)0L;
 	timerange *temp_timerange;
 	daterange *temp_daterange;
@@ -2688,7 +2681,7 @@ int my_rename(char const* source, char const* dest){
 int my_fdcopy(char const* source, char const* dest, int dest_fd)
 {
 	int source_fd, rd_result = 0, wr_result = 0;
-	unsigned long tot_written = 0, tot_read = 0, buf_size = 0;
+	long tot_written = 0, buf_size = 0;
 	struct stat st;
 	char *buf;
 
@@ -2735,7 +2728,6 @@ int my_fdcopy(char const* source, char const* dest, int dest_fd)
 			logit(NSLOG_RUNTIME_ERROR,TRUE,"Error: my_fcopy() failed to read from '%s': %s\n", source, strerror(errno));
 			break;
 		}
-		tot_read += rd_result;
 
 		while (loop_wr < rd_result) {
 			wr_result = write(dest_fd, buf + loop_wr, rd_result - loop_wr);
@@ -3656,8 +3648,8 @@ void free_memory(nagios_macros *mac)
 	free_macrox_names();
 
 	/* free illegal char strings */
-	//my_free(illegal_object_chars);
-	//my_free(illegal_output_chars);
+	// my_free(illegal_object_chars);
+	// my_free(illegal_output_chars);
 
 	/* free version strings */
 	my_free(last_program_version);
@@ -3687,7 +3679,7 @@ void free_notification_list(void){
 
 
 /* reset all system-wide variables, so when we've receive a SIGHUP we can restart cleanly */
-int reset_variables(void){ // XXX: replace global var by configuration object
+int reset_variables(void){
 	config.reset();
 
 	logging_options=NSLOG_RUNTIME_ERROR | NSLOG_RUNTIME_WARNING | NSLOG_VERIFICATION_ERROR | NSLOG_VERIFICATION_WARNING | NSLOG_CONFIG_ERROR | NSLOG_CONFIG_WARNING | NSLOG_PROCESS_INFO | NSLOG_HOST_NOTIFICATION | NSLOG_SERVICE_NOTIFICATION | NSLOG_EVENT_HANDLER | NSLOG_EXTERNAL_COMMAND | NSLOG_PASSIVE_CHECK | NSLOG_HOST_UP | NSLOG_HOST_DOWN | NSLOG_HOST_UNREACHABLE | NSLOG_SERVICE_OK | NSLOG_SERVICE_WARNING | NSLOG_SERVICE_UNKNOWN | NSLOG_SERVICE_CRITICAL | NSLOG_INFO_MESSAGE;

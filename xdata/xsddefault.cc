@@ -23,7 +23,7 @@
 
 #include "configuration.hh"
 
-#include "config.hh"
+#include "conf.hh"
 #include "common.hh"
 #include "locations.hh"
 #include "statusdata.hh"
@@ -33,6 +33,8 @@
 #include "skiplist.hh"
 
 #include "nagios.hh"
+
+#include "utils.hh"
 
 /**** IMPLEMENTATION SPECIFIC HEADER FILES ****/
 #include "xsddefault.hh"

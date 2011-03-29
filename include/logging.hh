@@ -1,86 +1,108 @@
-#ifndef SCHEDULER_LOGGING_HH
-# define SCHEDULER_LOGGING_HH
+/*
+** Copyright 1999-2007 Ethan Galstad
+** Copyright 2011      Merethis
+**
+** This file is part of Centreon Scheduler.
+**
+** Centreon Scheduler is free software: you can redistribute it and/or
+** modify it under the terms of the GNU General Public License version 2
+** as published by the Free Software Foundation.
+**
+** Centreon Scheduler is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+** General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with Centreon Scheduler. If not, see
+** <http://www.gnu.org/licenses/>.
+*/
 
+#ifndef CSS_LOGGING_HH
+# define CSS_LOGGING_HH
+
+# include <sys/time.h>
 # include "objects.hh"
 
-/******************* LOGGING TYPES ********************/
+# ifdef __cplusplus
+extern "C" {
+# endif
 
-# define NSLOG_RUNTIME_ERROR		1
-# define NSLOG_RUNTIME_WARNING		2
+// Logging Types
+static const unsigned int NSLOG_RUNTIME_ERROR        = 1;
+static const unsigned int NSLOG_RUNTIME_WARNING      = 2;
 
-# define NSLOG_VERIFICATION_ERROR	4
-# define NSLOG_VERIFICATION_WARNING	8
+static const unsigned int NSLOG_VERIFICATION_ERROR   = 4;
+static const unsigned int NSLOG_VERIFICATION_WARNING = 8;
 
-# define NSLOG_CONFIG_ERROR		16
-# define NSLOG_CONFIG_WARNING		32
+static const unsigned int NSLOG_CONFIG_ERROR         = 16;
+static const unsigned int NSLOG_CONFIG_WARNING       = 32;
 
-# define NSLOG_PROCESS_INFO		64
-# define NSLOG_EVENT_HANDLER		128
-/*# define NSLOG_NOTIFICATION		256*/	/* NOT USED ANYMORE - CAN BE REUSED */
-# define NSLOG_EXTERNAL_COMMAND		512
+static const unsigned int NSLOG_PROCESS_INFO         = 64;
+static const unsigned int NSLOG_EVENT_HANDLER        = 128;
+// static const unsigned int NSLOG_NOTIFICATION       = 256; //NOT USED ANYMORE - CAN BE REUSED
+static const unsigned int NSLOG_EXTERNAL_COMMAND     = 512;
 
-# define NSLOG_HOST_UP      		1024
-# define NSLOG_HOST_DOWN		2048
-# define NSLOG_HOST_UNREACHABLE		4096
+static const unsigned int NSLOG_HOST_UP              = 1024;
+static const unsigned int NSLOG_HOST_DOWN            = 2048;
+static const unsigned int NSLOG_HOST_UNREACHABLE     = 4096;
 
-# define NSLOG_SERVICE_OK		8192
-# define NSLOG_SERVICE_UNKNOWN		16384
-# define NSLOG_SERVICE_WARNING		32768
-# define NSLOG_SERVICE_CRITICAL		65536
+static const unsigned int NSLOG_SERVICE_OK           = 8192;
+static const unsigned int NSLOG_SERVICE_UNKNOWN      = 16384;
+static const unsigned int NSLOG_SERVICE_WARNING      = 32768;
+static const unsigned int NSLOG_SERVICE_CRITICAL     = 65536;
 
-# define NSLOG_PASSIVE_CHECK		131072
+static const unsigned int NSLOG_PASSIVE_CHECK        = 131072;
 
-# define NSLOG_INFO_MESSAGE		262144
+static const unsigned int NSLOG_INFO_MESSAGE         = 262144;
 
-# define NSLOG_HOST_NOTIFICATION	524288
-# define NSLOG_SERVICE_NOTIFICATION	1048576
+static const unsigned int NSLOG_HOST_NOTIFICATION    = 524288;
+static const unsigned int NSLOG_SERVICE_NOTIFICATION = 1048576;
 
-/***************** DEBUGGING LEVELS *******************/
+// Debugging Levels
+static const unsigned int DEBUGL_ALL                 = -1;
+static const unsigned int DEBUGL_NONE                = 0;
+static const unsigned int DEBUGL_FUNCTIONS           = 1;
+static const unsigned int DEBUGL_CONFIG              = 2;
+static const unsigned int DEBUGL_PROCESS             = 4;
+static const unsigned int DEBUGL_STATUSDATA          = 4;
+static const unsigned int DEBUGL_RETENTIONDATA       = 4;
+static const unsigned int DEBUGL_EVENTS              = 8;
+static const unsigned int DEBUGL_CHECKS              = 16;
+static const unsigned int DEBUGL_IPC                 = 16;
+static const unsigned int DEBUGL_FLAPPING            = 16;
+static const unsigned int DEBUGL_EVENTHANDLERS       = 16;
+static const unsigned int DEBUGL_PERFDATA            = 16;
+static const unsigned int DEBUGL_NOTIFICATIONS       = 32;
+static const unsigned int DEBUGL_EVENTBROKER         = 64;
+static const unsigned int DEBUGL_EXTERNALCOMMANDS    = 128;
+static const unsigned int DEBUGL_COMMANDS            = 256;
+static const unsigned int DEBUGL_DOWNTIME            = 512;
+static const unsigned int DEBUGL_COMMENTS            = 1024;
+static const unsigned int DEBUGL_MACROS              = 2048;
 
-# define DEBUGL_ALL                      -1
-# define DEBUGL_NONE                     0
-# define DEBUGL_FUNCTIONS                1
-# define DEBUGL_CONFIG			 2
-# define DEBUGL_PROCESS                  4
-# define DEBUGL_STATUSDATA               4
-# define DEBUGL_RETENTIONDATA            4
-# define DEBUGL_EVENTS                   8
-# define DEBUGL_CHECKS                   16
-# define DEBUGL_IPC                      16
-# define DEBUGL_FLAPPING                 16
-# define DEBUGL_EVENTHANDLERS            16
-# define DEBUGL_PERFDATA                 16
-# define DEBUGL_NOTIFICATIONS            32
-# define DEBUGL_EVENTBROKER              64
-# define DEBUGL_EXTERNALCOMMANDS         128
-# define DEBUGL_COMMANDS                 256
-# define DEBUGL_DOWNTIME                 512
-# define DEBUGL_COMMENTS                 1024
-# define DEBUGL_MACROS                   2048
+static const unsigned int DEBUGV_BASIC               = 0;
+static const unsigned int DEBUGV_MORE		     = 1;
+static const unsigned int DEBUGV_MOST                = 2;
 
-# define DEBUGV_BASIC                    0
-# define DEBUGV_MORE			 1
-# define DEBUGV_MOST                     2
+// Logging Functions
+void logit(int data_type, int display, const char *fmt, ...) __attribute__((__format__(__printf__, 3, 4)));
+int log_debug_info(int level, int verbosity, const char *fmt, ...) __attribute__((__format__(__printf__, 3, 4)));
 
-
-/**** Logging Functions ****/
-void logit(int,int,const char *, ...)
-	__attribute__((__format__(__printf__, 3, 4)));
-int log_debug_info(int,int,const char *,...)
-	__attribute__((__format__(__printf__, 3, 4)));
-
-# ifndef NSCGI
-int write_to_all_logs(char *,unsigned long);      /* writes a string to main log file and syslog facility */
-int write_to_log(char *,unsigned long,time_t *);  /* write a string to the main log file */
-int write_to_syslog(char const *,unsigned long);        /* write a string to the syslog facility */
-int log_service_event(service *);			/* logs a service event */
-int log_host_event(host *);				/* logs a host event */
-int log_host_states(int,time_t *);	                /* logs initial/current host states */
-int log_service_states(int,time_t *);                   /* logs initial/current service states */
-int rotate_log_file(time_t);			     	/* rotates the main log file */
-int write_log_file_info(time_t *); 			/* records log file/version info */
+int write_to_all_logs(char *buffer, unsigned long data_type);               // writes a string to main log file and syslog facility
+int write_to_log(char *buffer, unsigned long data_type, time_t *timestamp); // write a string to the main log file
+int write_to_syslog(char const *buffer, unsigned long data_type);           // write a string to the syslog facility
+int log_service_event(service *svc);                                        // logs a service event
+int log_host_event(host *hst);                                              // logs a host event
+int log_host_states(int type, time_t *timestamp);                           // logs initial/current host states
+int log_service_states(int type, time_t *timestamp);                        // logs initial/current service states
+int rotate_log_file(time_t rotation_time);                                  // rotates the main log file
+int write_log_file_info(time_t *timestamp);                                 // records log file/version info
 int open_debug_log(void);
 int close_debug_log(void);
-# endif /* !NSCGI */
 
-#endif // !SCHEDULER_LOGGING_HH
+# ifdef __cplusplus
+}
+# endif
+
+#endif // !CSS_LOGGING_HH

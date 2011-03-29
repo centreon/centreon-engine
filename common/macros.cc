@@ -18,15 +18,11 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include "configuration.hh"
-
-#include "macros.hh"
-#include "config.hh"
-#include "common.hh"
-#include "objects.hh"
-#include "statusdata.hh"
-#include "comments.hh"
+#include "conf.hh"
 #include "nagios.hh"
+#include "utils.hh"
+#include "configuration.hh"
+#include "macros.hh"
 
 extern com::centreon::scheduler::configuration config;
 
@@ -82,7 +78,7 @@ int process_macros_r(nagios_macros *mac, char *input_buffer, char **output_buffe
 	int x=0;
 	char *selected_macro=NULL;
 	char *original_macro=NULL;
-	char *cleaned_macro=NULL;
+	char const* cleaned_macro=NULL;
 	int clean_macro=FALSE;
 	int found_macro_x=FALSE;
 	int result=OK;
@@ -135,7 +131,7 @@ int process_macros_r(nagios_macros *mac, char *input_buffer, char **output_buffe
 			*output_buffer=(char *)realloc(*output_buffer,strlen(*output_buffer)+strlen(temp_buffer)+1);
 			strcat(*output_buffer,temp_buffer);
 
-			log_debug_info(DEBUGL_MACROS,2,"  Not currently in macro.  Running output (%d): '%s'\n",strlen(*output_buffer),*output_buffer);
+			log_debug_info(DEBUGL_MACROS,2,"  Not currently in macro.  Running output (%zd): '%s'\n",strlen(*output_buffer),*output_buffer);
 			in_macro=TRUE;
 			}
 
@@ -162,7 +158,7 @@ int process_macros_r(nagios_macros *mac, char *input_buffer, char **output_buffe
 
 			/* an escaped $ is done by specifying two $$ next to each other */
 			else if(!strcmp(temp_buffer,"")){
-				log_debug_info(DEBUGL_MACROS,2,"  Escaped $.  Running output (%d): '%s'\n",strlen(*output_buffer),*output_buffer);
+				log_debug_info(DEBUGL_MACROS,2,"  Escaped $.  Running output (%zd): '%s'\n",strlen(*output_buffer),*output_buffer);
 				*output_buffer=(char *)realloc(*output_buffer,strlen(*output_buffer)+2);
 				strcat(*output_buffer,"$");
 				}
@@ -369,7 +365,7 @@ int grab_macro_value(nagios_macros *mac, char *macro_buffer, char **output, int 
 	contactsmember *temp_contactsmember=NULL;
 	char *temp_buffer=NULL;
 	int delimiter_len=0;
-	register int x;
+	register unsigned int x;
 	int result=OK;
 
 	if(output==NULL)
@@ -589,7 +585,7 @@ int grab_macrox_value(nagios_macros *mac, int macro_type, char *arg1, char *arg2
 	int result=OK;
 	int delimiter_len=0;
 	int free_sub_macro=FALSE;
-	register int x;
+	register unsigned int x;
 	int authorized=TRUE;
 	int problem=TRUE;
 	int hosts_up=0;
@@ -1395,6 +1391,8 @@ int grab_datetime_macro(nagios_macros *mac, int macro_type, char *arg1, char *ar
 	time_t test_time=0L;
 	time_t next_valid_time=0L;
 
+	(void)mac;
+
 	if(output==NULL)
 		return ERROR;
 
@@ -1488,7 +1486,7 @@ int grab_datetime_macro(nagios_macros *mac, int macro_type, char *arg1, char *ar
 
 
 /* calculates a host macro */
-int grab_standard_host_macro(nagios_macros *mac, int macro_type, host *temp_host, char **output, int *free_macro)
+int grab_standard_host_macro(nagios_macros *mac, unsigned int macro_type, host *temp_host, char **output, int *free_macro)
 {
 	char *temp_buffer=NULL;
 	hostgroup *temp_hostgroup=NULL;
@@ -1876,7 +1874,7 @@ int grab_standard_hostgroup_macro(nagios_macros *mac, int macro_type, hostgroup 
 
 
 /* computes a service macro */
-int grab_standard_service_macro(nagios_macros *mac, int macro_type, service *temp_service, char **output, int *free_macro)
+int grab_standard_service_macro(nagios_macros *mac, unsigned int macro_type, service *temp_service, char **output, int *free_macro)
 {
 	char *temp_buffer=NULL;
 	servicegroup *temp_servicegroup=NULL;
@@ -2207,6 +2205,8 @@ int grab_standard_contact_macro(nagios_macros *mac, int macro_type, contact *tem
 	char *buf1=NULL;
 	char *buf2=NULL;
 
+	(void)mac;
+
 	if(temp_contact==NULL || output==NULL)
 		return ERROR;
 
@@ -2258,9 +2258,9 @@ int grab_standard_contact_macro(nagios_macros *mac, int macro_type, contact *tem
 
 
 /* computes a contact address macro */
-int grab_contact_address_macro(int macro_num, contact *temp_contact, char **output)
+int grab_contact_address_macro(unsigned int macro_num, contact *temp_contact, char **output)
 {
-	if(macro_num<0 || macro_num>=MAX_CONTACT_ADDRESSES)
+	if(macro_num>=MAX_CONTACT_ADDRESSES)
 		return ERROR;
 
 	if(temp_contact==NULL || output==NULL)
@@ -2320,6 +2320,8 @@ int grab_custom_object_macro(nagios_macros *mac, char *macro_name, customvariabl
 	customvariablesmember *temp_customvariablesmember=NULL;
 	int result=ERROR;
 
+	(void)mac;
+
 	if(macro_name==NULL || vars==NULL || output==NULL)
 		return ERROR;
 
@@ -2347,7 +2349,7 @@ int grab_custom_object_macro(nagios_macros *mac, char *macro_name, customvariabl
 /******************************************************************/
 
 /* cleans illegal characters in macros before output */
-char *clean_macro_chars(char *macro,int options)
+char const* clean_macro_chars(char *macro,int options)
 {
 	register int x=0;
 	register int y=0;
@@ -2485,7 +2487,7 @@ int init_macros(void)
  */
 #define add_macrox_name(name) macro_x_names[MACRO_##name] = strdup(#name)
 int init_macrox_names(void){
-	register int x=0;
+	register unsigned int x=0;
 
 	/* initialize macro names */
 	for(x=0;x<MACRO_X_COUNT;x++)
@@ -2656,7 +2658,7 @@ int init_macrox_names(void){
 
 /* free memory associated with the macrox names */
 int free_macrox_names(void){
-	register int x=0;
+	register unsigned int x=0;
 
 	/* free each macro name */
 	for(x=0;x<MACRO_X_COUNT;x++)
@@ -2670,7 +2672,7 @@ int free_macrox_names(void){
 /* clear argv macros - used in commands */
 int clear_argv_macros(nagios_macros *mac)
 {
-	register int x=0;
+	register unsigned int x=0;
 
 	/* command argument macros */
 	for(x=0;x<MAX_COMMAND_ARGUMENTS;x++)
@@ -2711,7 +2713,7 @@ int clear_volatile_macros(nagios_macros *mac)
 {
 	customvariablesmember *this_customvariablesmember=NULL;
 	customvariablesmember *next_customvariablesmember=NULL;
-	register int x=0;
+	register unsigned int x=0;
 
 	for(x=0;x<MACRO_X_COUNT;x++){
 		switch(x){
@@ -2792,7 +2794,7 @@ int clear_volatile_macros(nagios_macros *mac)
 /* clear service macros */
 int clear_service_macros(nagios_macros *mac)
 {
-	register int x;
+	register unsigned int x;
 	customvariablesmember *this_customvariablesmember=NULL;
 	customvariablesmember *next_customvariablesmember=NULL;
 	
@@ -2860,7 +2862,7 @@ int clear_service_macros(nagios_macros *mac)
 /* clear host macros */
 int clear_host_macros(nagios_macros *mac)
 {
-	register int x;
+	register unsigned int x;
 	customvariablesmember *this_customvariablesmember=NULL;
 	customvariablesmember *next_customvariablesmember=NULL;
 	
@@ -2933,7 +2935,7 @@ int clear_host_macros(nagios_macros *mac)
 /* clear hostgroup macros */
 int clear_hostgroup_macros(nagios_macros *mac)
 {
-	register int x;
+	register unsigned int x;
 	
 	for(x=0;x<MACRO_X_COUNT;x++){
 		switch(x){
@@ -2960,7 +2962,7 @@ int clear_hostgroup_macros(nagios_macros *mac)
 /* clear servicegroup macros */
 int clear_servicegroup_macros(nagios_macros *mac)
 {
-	register int x;
+	register unsigned int x;
 	
 	for(x=0;x<MACRO_X_COUNT;x++){
 		switch(x){
@@ -2987,7 +2989,7 @@ int clear_servicegroup_macros(nagios_macros *mac)
 /* clear contact macros */
 int clear_contact_macros(nagios_macros *mac)
 {
-	register int x;
+	register unsigned int x;
 	customvariablesmember *this_customvariablesmember=NULL;
 	customvariablesmember *next_customvariablesmember=NULL;
 	
@@ -3029,7 +3031,7 @@ int clear_contact_macros(nagios_macros *mac)
 /* clear contactgroup macros */
 int clear_contactgroup_macros(nagios_macros *mac)
 {
-	register int x;
+	register unsigned int x;
 	
 	for(x=0;x<MACRO_X_COUNT;x++){
 		switch(x){
@@ -3054,7 +3056,7 @@ int clear_contactgroup_macros(nagios_macros *mac)
 /* clear summary macros */
 int clear_summary_macros(nagios_macros *mac)
 {
-	register int x;
+	register unsigned int x;
 
 	for(x=MACRO_TOTALHOSTSUP;x<=MACRO_TOTALSERVICEPROBLEMSUNHANDLED;x++)
 		my_free(mac->x[x]);
@@ -3087,7 +3089,7 @@ int set_all_macro_environment_vars(nagios_macros *mac, int set)
 /* sets or unsets macrox environment variables */
 int set_macrox_environment_vars(nagios_macros *mac, int set)
 {
-	register int x=0;
+	register unsigned int x=0;
 	int free_macro=FALSE;
 	int generate_macro=TRUE;
 
@@ -3123,7 +3125,7 @@ int set_macrox_environment_vars(nagios_macros *mac, int set)
 int set_argv_macro_environment_vars(nagios_macros *mac, int set)
 {
 	char *macro_name=NULL;
-	register int x=0;
+	register unsigned int x=0;
 
 	/* set each of the argv macro environment variables */
 	for(x=0;x<MAX_COMMAND_ARGUMENTS;x++){
@@ -3207,7 +3209,7 @@ int set_custom_macro_environment_vars(nagios_macros *mac, int set)
 int set_contact_address_environment_vars(nagios_macros *mac, int set)
 {
 	char *varname=NULL;
-	register int x;
+	register unsigned int x;
 
 	/* these only get set during notifications */
 	if(mac->contact_ptr==NULL)
@@ -3228,7 +3230,7 @@ int set_contact_address_environment_vars(nagios_macros *mac, int set)
 
 
 /* sets or unsets a macro environment variable */
-int set_macro_environment_var(char *name, char *value, int set)
+int set_macro_environment_var(char const* name, char const* value, int set)
 {
 	char *env_macro_name=NULL;
 

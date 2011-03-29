@@ -355,8 +355,8 @@ else ()
 endif ()
 
 # Configure files.
-configure_file("${INCLUDE_DIR}/config.hh.in"
-  "${INCLUDE_DIR}/config.hh")
+configure_file("${INCLUDE_DIR}/conf.hh.in"
+  "${INCLUDE_DIR}/conf.hh")
 configure_file("${INCLUDE_DIR}/locations.hh.in"
   "${INCLUDE_DIR}/locations.hh")
 configure_file("${INCLUDE_DIR}/snprintf.h.in"

@@ -18,21 +18,16 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include "config.hh"
-#include "common.hh"
-#include "comments.hh"
-#include "downtime.hh"
-#include "objects.hh"
-#include "statusdata.hh"
-
-/***** IMPLEMENTATION-SPECIFIC INCLUDES *****/
-
+#include "conf.hh"
 #ifdef USE_XDDDEFAULT
-#include "../xdata/xdddefault.hh"
+# include "../xdata/xdddefault.hh"
 #endif
-
 #include "nagios.hh"
+#include "comments.hh"
+#include "statusdata.hh"
 #include "broker.hh"
+#include "notifications.hh"
+#include "downtime.hh"
 
 scheduled_downtime *scheduled_downtime_list=NULL;
 int		   defer_downtime_sorting = 0;

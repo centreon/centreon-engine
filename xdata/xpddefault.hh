@@ -18,32 +18,33 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef SCHEDULER_XPDDEFAULT_HH
-# define SCHEDULER_XPDDEFAULT_HH
+#ifndef CCS_XPDDEFAULT_HH
+# define CCS_XPDDEFAULT_HH
 
 # include "objects.hh"
 
+# ifdef __cplusplus
+extern "C" {
+# endif
 
-# define DEFAULT_HOST_PERFDATA_FILE_TEMPLATE    "[HOSTPERFDATA]\t$TIMET$\t$HOSTNAME$\t$HOSTEXECUTIONTIME$\t$HOSTOUTPUT$\t$HOSTPERFDATA$"
-# define DEFAULT_SERVICE_PERFDATA_FILE_TEMPLATE "[SERVICEPERFDATA]\t$TIMET$\t$HOSTNAME$\t$SERVICEDESC$\t$SERVICEEXECUTIONTIME$\t$SERVICELATENCY$\t$SERVICEOUTPUT$\t$SERVICEPERFDATA$"
+static const char DEFAULT_HOST_PERFDATA_FILE_TEMPLATE[] = "[HOSTPERFDATA]\t$TIMET$\t$HOSTNAME$\t$HOSTEXECUTIONTIME$\t$HOSTOUTPUT$\t$HOSTPERFDATA$";
+static const char DEFAULT_SERVICE_PERFDATA_FILE_TEMPLATE[] = "[SERVICEPERFDATA]\t$TIMET$\t$HOSTNAME$\t$SERVICEDESC$\t$SERVICEEXECUTIONTIME$\t$SERVICELATENCY$\t$SERVICEOUTPUT$\t$SERVICEPERFDATA$";
 
+int xpddefault_initialize_performance_data(char *config_file);
+int xpddefault_cleanup_performance_data(char *config_file);
+int xpddefault_grab_config_info(char *config_file);
+int xpddefault_grab_config_directives(char *input);
 
+int xpddefault_update_service_performance_data(service *svc);
+int xpddefault_update_host_performance_data(host *hst);
 
-int xpddefault_initialize_performance_data(char *);
-int xpddefault_cleanup_performance_data(char *);
-int xpddefault_grab_config_info(char *);
-int xpddefault_grab_config_directives(char *);
+int xpddefault_run_service_performance_data_command(nagios_macros *mac, service *svc);
+int xpddefault_run_host_performance_data_command(nagios_macros *mac, host *hst);
 
-int xpddefault_update_service_performance_data(service *);
-int xpddefault_update_host_performance_data(host *);
+int xpddefault_update_service_performance_data_file(nagios_macros *mac, service *svc);
+int xpddefault_update_host_performance_data_file(nagios_macros *mac, host *hst);
 
-int xpddefault_run_service_performance_data_command(nagios_macros *mac, service *);
-int xpddefault_run_host_performance_data_command(nagios_macros *mac, host *);
-
-int xpddefault_update_service_performance_data_file(nagios_macros *mac, service *);
-int xpddefault_update_host_performance_data_file(nagios_macros *mac, host *);
-
-int xpddefault_preprocess_file_templates(char *);
+int xpddefault_preprocess_file_templates(char *tmpl);
 
 int xpddefault_open_host_perfdata_file(void);
 int xpddefault_open_service_perfdata_file(void);
@@ -53,4 +54,8 @@ int xpddefault_close_service_perfdata_file(void);
 int xpddefault_process_host_perfdata_file(void);
 int xpddefault_process_service_perfdata_file(void);
 
-#endif // !SCHEDULER_XPDDEFAULT_HH
+# ifdef __cplusplus
+}
+# endif
+
+#endif // !CCS_XPDDEFAULT_HH

@@ -18,15 +18,13 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include "configuration.hh"
-
-#include "config.hh"
-#include "common.hh"
+#include "conf.hh"
 #include "statusdata.hh"
-#include "macros.hh"
 #include "nagios.hh"
 #include "broker.hh"
-
+#include "utils.hh"
+#include "configuration.hh"
+#include "logging.hh"
 
 extern com::centreon::scheduler::configuration config;
 

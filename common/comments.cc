@@ -18,19 +18,12 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include "config.hh"
-#include "common.hh"
-#include "comments.hh"
-#include "objects.hh"
-
-/***** IMPLEMENTATION-SPECIFIC INCLUDES *****/
-
+#include "conf.hh"
 #ifdef USE_XCDDEFAULT
-#include "../xdata/xcddefault.hh"
+# include "../xdata/xcddefault.hh"
 #endif
-
-#include "nagios.hh"
 #include "broker.hh"
+#include "comments.hh"
 
 comment     *comment_list=NULL;
 int	    defer_comment_sorting = 0;
@@ -76,7 +69,7 @@ int cleanup_comment_data(char *config_file){
 
 
 /* adds a new host or service comment */
-int add_new_comment(int type, int entry_type, char const *host_name, char const *svc_description, time_t entry_time, char const *author_name, char *comment_data, int persistent, int source, int expires, time_t expire_time, unsigned long *comment_id){
+int add_new_comment(unsigned int type, int entry_type, char const *host_name, char const *svc_description, time_t entry_time, char const *author_name, char *comment_data, int persistent, int source, int expires, time_t expire_time, unsigned long *comment_id){
 	int result=OK;
 	unsigned long new_comment_id=0L;
 
@@ -150,7 +143,7 @@ int add_new_service_comment(int entry_type, char const *host_name, char const *s
 
 
 /* deletes a host or service comment */
-int delete_comment(int type, unsigned long comment_id){
+int delete_comment(unsigned int type, unsigned long comment_id){
 	int result=OK;
 	comment *this_comment=NULL;
 	comment *last_comment=NULL;
@@ -250,7 +243,7 @@ int delete_service_comment(unsigned long comment_id){
 
 
 /* deletes all comments for a particular host or service */
-int delete_all_comments(int type, char *host_name, char *svc_description){
+int delete_all_comments(unsigned int type, char *host_name, char *svc_description){
 	int result=OK;
 
 	if(type==HOST_COMMENT)
@@ -370,12 +363,12 @@ int add_comment_to_hashlist(comment *new_comment){
 
 	/* initialize hash list */
 	if(comment_hashlist==NULL){
-		int i;
+		unsigned int i;
 
 		comment_hashlist=(comment **)malloc(sizeof(comment *)*COMMENT_HASHSLOTS);
 		if(comment_hashlist==NULL)
 			return 0;
-		
+
 		for(i=0;i<COMMENT_HASHSLOTS;i++)
 			comment_hashlist[i]=NULL;
 	        }
@@ -431,7 +424,7 @@ int add_service_comment(int entry_type, char const *host_name, char const *svc_d
 
 
 /* adds a comment to the list in memory */
-int add_comment(int comment_type, int entry_type, char const *host_name, char const *svc_description, time_t entry_time, char const *author, char *comment_data, unsigned long comment_id, int persistent, int expires, time_t expire_time, int source){
+int add_comment(unsigned int comment_type, int entry_type, char const *host_name, char const *svc_description, time_t entry_time, char const *author, char *comment_data, unsigned long comment_id, int persistent, int expires, time_t expire_time, int source){
 	comment *new_comment=NULL;
 	comment *last_comment=NULL;
 	comment *temp_comment=NULL;
@@ -682,7 +675,7 @@ comment *find_host_comment(unsigned long comment_id){
 
 
 /* find a comment by id */
-comment *find_comment(unsigned long comment_id, int comment_type){
+comment *find_comment(unsigned long comment_id, unsigned int comment_type){
 	comment *temp_comment=NULL;
 
 	for(temp_comment=comment_list;temp_comment!=NULL;temp_comment=temp_comment->next){

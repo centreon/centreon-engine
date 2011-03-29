@@ -18,15 +18,23 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef SCHEDULER_XCDDEFAULT_HH
-# define SCHEDULER_XCDDEFAULT_HH
+#ifndef CSS_XCDDEFAULT_HH
+# define CSS_XCDDEFAULT_HH
 
-int xcddefault_initialize_comment_data(char *);
-int xcddefault_cleanup_comment_data(char *);
+# ifdef __cplusplus
+extern "C" {
+# endif
+
+int xcddefault_initialize_comment_data(char *main_config_file);
+int xcddefault_cleanup_comment_data(char *main_config_file);
 int xcddefault_save_comment_data(void);
-int xcddefault_add_new_host_comment(int,char const *,time_t,char const *,char *,int,int,int,time_t,unsigned long *);
-int xcddefault_add_new_service_comment(int,char const *,char const *,time_t,char const *,char *,int,int,int,time_t,unsigned long *);
-int xcddefault_delete_host_comment(unsigned long);
-int xcddefault_delete_service_comment(unsigned long);
+int xcddefault_add_new_host_comment(int entry_type, char const *host_name, time_t entry_time, char const *author_name, char *comment_data, int persistent, int source, int expires, time_t expire_time, unsigned long *comment_id);
+int xcddefault_add_new_service_comment(int entry_type, char const *host_name, char const *svc_description, time_t entry_time, char const *author_name, char *comment_data, int persistent, int source, int expires, time_t expire_time, unsigned long *comment_id);
+int xcddefault_delete_host_comment(unsigned long comment_id);
+int xcddefault_delete_service_comment(unsigned long comment_id);
 
-#endif // !SCHEDULER_XCDDEFAULT_HH
+# ifdef __cplusplus
+}
+# endif
+
+#endif // !CSS_XCDDEFAULT_HH

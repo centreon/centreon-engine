@@ -21,7 +21,7 @@
 #ifndef SCHEDULER_NEBCALLBACKS_HH
 # define SCHEDULER_NEBCALLBACKS_HH
 
-# include "config.hh"
+# include "conf.hh"
 # include "nebmodules.hh"
 
 # ifdef __cplusplus

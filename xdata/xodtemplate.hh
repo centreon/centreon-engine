@@ -21,7 +21,11 @@
 #ifndef SCHEDULER_XODTEMPLATE_HH
 # define SCHEDULER_XODTEMPLATE_HH
 
+# include "common.hh"
 
+# ifdef __cplusplus
+extern "C" {
+# endif
 
 /*********** GENERAL DEFINITIONS ************/
 
@@ -957,6 +961,9 @@ int xodtemplate_skiplist_compare_servicedependency(void *a, void *b);
 int xodtemplate_skiplist_compare_hostescalation(void *a, void *b);
 int xodtemplate_skiplist_compare_serviceescalation(void *a, void *b);
 
+# ifdef __cplusplus
+}
+# endif
 
 #endif // !SCHEDULER_XODTEMPLATE_HH
 

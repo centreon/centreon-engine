@@ -18,16 +18,12 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include "configuration.hh"
-
-#include "config.hh"
-#include "common.hh"
-#include "objects.hh"
-#include "macros.hh"
+#include "conf.hh"
 #include "nagios.hh"
-#include "broker.hh"
-#include "nebmods.hh"
-#include "nebmodules.hh"
+#include "utils.hh"
+#include "notifications.hh"
+#include "configuration.hh"
+#include "config.hh"
 
 extern com::centreon::scheduler::configuration config;
 
@@ -106,7 +102,7 @@ int read_resource_file(char *resource_file){
 	mmapfile *thefile=NULL;
 	int current_line=1;
 	int error=FALSE;
-	int user_index=0;
+	unsigned int user_index=0;
 
 	if((thefile=mmap_fopen(resource_file))==NULL){
 		logit(NSLOG_CONFIG_ERROR,TRUE,"Error: Cannot open resource file '%s' for reading!",resource_file);
@@ -159,11 +155,11 @@ int read_resource_file(char *resource_file){
 
 		/* check for macro declarations */
 		if(variable[0]=='$' && variable[strlen(variable)-1]=='$'){
-			
+
 			/* $USERx$ macro declarations */
 			if(strstr(variable,"$USER")==variable  && strlen(variable)>5){
 				user_index=atoi(variable+5)-1;
-				if(user_index>=0 && user_index<MAX_USER_MACROS){
+				if(user_index<MAX_USER_MACROS){
 					my_free(macro_user[user_index]);
 					macro_user[user_index]=(char *)strdup(value);
 				        }

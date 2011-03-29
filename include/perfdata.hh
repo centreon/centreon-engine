@@ -1,5 +1,5 @@
 /*
-** Copyright 2001-2005 Ethan Galstad
+** Copyright 2000-2004 Ethan Galstad
 ** Copyright 2011      Merethis
 **
 ** This file is part of Centreon Scheduler.
@@ -18,23 +18,22 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef SCHEDULER_PERFDATA_HH
-# define SCHEDULER_PERFDATA_HH
+#ifndef CCS_PERFDATA_HH
+# define CCS_PERFDATA_HH
 
 # include "objects.hh"
 
 # ifdef __cplusplus
-  extern "C" {
+extern "C" {
 # endif
 
-int initialize_performance_data(char *);	                /* initializes performance data */
-int cleanup_performance_data(char *);                           /* cleans up performance data */
-
-int update_host_performance_data(host *);       	        /* updates host performance data */
-int update_service_performance_data(service *);         	/* updates service performance data */
+int initialize_performance_data(char *config_file); // initializes performance data
+int cleanup_performance_data(char *config_file);    // cleans up performance data
+int update_service_performance_data(service *svc);  // updates service performance data
+int update_host_performance_data(host *hst);        // updates host performance data
 
 # ifdef __cplusplus
-  }
+}
 # endif
 
-#endif // !SCHEDULER_PERFDATA_HH
+#endif // !CCS_PERFDATA_HH

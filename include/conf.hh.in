@@ -80,7 +80,6 @@
 /***** MISC DEFINITIONS *****/
 
 #cmakedefine USE_NANOSLEEP
-#cmakedefine STDC_HEADERS
 #cmakedefine HAVE_STRUCT_TM_TM_ZONE
 #cmakedefine HAVE_TZNAME
 

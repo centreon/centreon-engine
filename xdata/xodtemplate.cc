@@ -22,7 +22,7 @@
 
 #include "configuration.hh"
 
-#include "config.hh"
+#include "conf.hh"
 #include "common.hh"
 #include "objects.hh"
 #include "locations.hh"

@@ -1,7 +1,6 @@
 /*
-** Copyright          1999,2008 Ethan Galstad
-** Portions Copyright 1999-2008 Nagios Plugin Development Team
-** Copyright          2011      Merethis
+** Copyright 2002-2006 Ethan Galstad
+** Copyright 2011      Merethis
 **
 ** This file is part of Centreon Scheduler.
 **
@@ -19,19 +18,23 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef CCS_NETUTILS_HH
-# define CCS_NETUTILS_HH
+#ifndef CCS_CONFIG_HH
+# define CCS_CONFIG_HH
 
 # ifdef __cplusplus
 extern "C" {
 # endif
 
-int my_tcp_connect(char *host_name, int port, int *sd, int timeout);
-int my_sendall(int s, char *buf, int *len, int timeout);
-int my_recvall(int s, char *buf, int *len, int timeout);
+// Configuration Functions
+int read_all_object_data(char *main_config_file); // reads all object config data
+
+// Setup Functions
+int pre_flight_check(void);                       // try and verify the configuration data
+int pre_flight_object_check(int *w, int *e);      // verify object relationships and settings
+int pre_flight_circular_check(int *w, int *e);    // detects circular dependencies and paths
 
 # ifdef __cplusplus
 }
 # endif
 
-#endif // !CCS_NETUTILS_HH
+#endif // !CCS_CONFIG_HH

@@ -1,33 +1,60 @@
-#ifndef SCHEDULER_SHARED_HH
-# define SCHEDULER_SHARED_HH
+/*
+** Copyright 1999-2011 Ethan Galstad
+** Copyright 2011      Merethis
+**
+** This file is part of Centreon Scheduler.
+**
+** Centreon Scheduler is free software: you can redistribute it and/or
+** modify it under the terms of the GNU General Public License version 2
+** as published by the Free Software Foundation.
+**
+** Centreon Scheduler is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+** General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with Centreon Scheduler. If not, see
+** <http://www.gnu.org/licenses/>.
+*/
 
-# include <time.h>
-/* mmapfile structure - used for reading files via mmap() */
-typedef struct mmapfile_struct {
-	char *path;
-	int mode;
-	int fd;
-	unsigned long file_size;
-	unsigned long current_position;
-	unsigned long current_line;
-	void *mmap_buf;
-} mmapfile;
+#ifndef CCS_SHARED_HH
+# define CCS_SHARED_HH
 
-/* only usable on compile-time initialized arrays, for obvious reasons */
+# include <sys/time.h>
+
+# ifdef __cplusplus
+extern "C" {
+# endif
+
+// mmapfile structure - used for reading files via mmap()
+typedef struct  mmapfile_struct {
+  char          *path;
+  int           mode;
+  int           fd;
+  unsigned long file_size;
+  unsigned long current_position;
+  unsigned long current_line;
+  void          *mmap_buf;
+}               mmapfile;
+
+// only usable on compile-time initialized arrays, for obvious reasons
 # define ARRAY_SIZE(ary) (sizeof(ary) / sizeof(ary[0]))
 
-extern char *my_strtok(char *buffer, char const *tokens);
-extern char *my_strsep(char **stringp, const char *delim);
-extern mmapfile *mmap_fopen(char *filename);
-extern int mmap_fclose(mmapfile *temp_mmapfile);
-extern char *mmap_fgets(mmapfile *temp_mmapfile);
-extern char *mmap_fgets_multiline(mmapfile * temp_mmapfile);
-extern void strip(char *buffer);
-extern int hashfunc(const char *name1, const char *name2, int hashslots);
-extern int compare_hashdata(const char *val1a, const char *val1b, const char *val2a,
-			    const char *val2b);
-extern void get_datetime_string(time_t *raw_time, char *buffer,
-				int buffer_length, int type);
-extern void get_time_breakdown(unsigned long raw_time, int *days, int *hours,
-				   int *minutes, int *seconds);
-#endif // !SCHEDULER_SHARED_HH
+char *my_strtok(char *buffer, char const *tokens);
+char *my_strsep(char **stringp, const char *delim);
+mmapfile *mmap_fopen(char *filename);
+int mmap_fclose(mmapfile * temp_mmapfile);
+char *mmap_fgets(mmapfile * temp_mmapfile);
+char *mmap_fgets_multiline(mmapfile * temp_mmapfile);
+void strip(char *buffer);
+int hashfunc(const char *name1, const char *name2, int hashslots);
+int compare_hashdata(const char *val1a, const char *val1b, const char *val2a, const char *val2b);
+void get_datetime_string(time_t * raw_time, char *buffer, int buffer_length, int type);
+void get_time_breakdown(unsigned long raw_time, int *days, int *hours, int *minutes, int *seconds);
+
+# ifdef __cplusplus
+}
+# endif
+
+#endif // !CCS_SHARED_HH

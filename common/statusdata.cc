@@ -20,21 +20,13 @@
 
 /*********** COMMON HEADER FILES ***********/
 
-#include "configuration.hh"
-
-#include "config.hh"
-#include "common.hh"
-#include "objects.hh"
-#include "statusdata.hh"
-
-#include "nagios.hh"
-#include "broker.hh"
-
-/**** IMPLEMENTATION SPECIFIC HEADER FILES ****/
-
+#include "conf.hh"
 #ifdef USE_XSDDEFAULT
-#include "../xdata/xsddefault.hh"		/* default routines */
+# include "../xdata/xsddefault.hh"		/* default routines */
 #endif
+#include "broker.hh"
+#include "configuration.hh"
+#include "statusdata.hh"
 
 extern com::centreon::scheduler::configuration config;
 

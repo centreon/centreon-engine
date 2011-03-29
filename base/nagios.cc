@@ -21,27 +21,26 @@
 
 #include <exception>
 #include <iostream>
-#include "configuration.hh"
 
-#include "config.hh"
-#include "common.hh"
-#include "objects.hh"
+/*#define DEBUG_MEMORY 1*/
+#ifdef DEBUG_MEMORY
+# include <mcheck.h>
+#endif
+
+#include "conf.hh"
 #include "comments.hh"
 #include "downtime.hh"
 #include "statusdata.hh"
-#include "macros.hh"
-#include "nagios.hh"
 #include "sretention.hh"
 #include "perfdata.hh"
 #include "broker.hh"
 #include "nebmods.hh"
-#include "nebmodules.hh"
 
-/*#define DEBUG_MEMORY 1*/
-#ifdef DEBUG_MEMORY
-#include <mcheck.h>
-#endif
-
+#include "notifications.hh"
+#include "config.hh"
+#include "utils.hh"
+#include "configuration.hh"
+#include "nagios.hh"
 
 com::centreon::scheduler::configuration config;
 
@@ -89,8 +88,8 @@ int             test_scheduling=FALSE;
 int             precache_objects=FALSE;
 int             use_precached_objects=FALSE;
 
-int             currently_running_service_checks=0;
-int             currently_running_host_checks=0;
+unsigned int    currently_running_service_checks=0;
+unsigned int    currently_running_host_checks=0;
 
 time_t          program_start=0L;
 time_t          event_start=0L;
@@ -583,7 +582,7 @@ int main(int argc, char **argv){
 #else
 				init_embedded_perl(NULL);
 #endif
-				embedded_perl_initialized;
+				embedded_perl_initialized = TRUE;
 /*					}*/
 			        }
 

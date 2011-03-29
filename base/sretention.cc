@@ -20,22 +20,18 @@
 
 /*********** COMMON HEADER FILES ***********/
 
-#include "configuration.hh"
-
-#include "config.hh"
-#include "common.hh"
-#include "objects.hh"
-#include "statusdata.hh"
+#include "conf.hh"
 #include "nagios.hh"
-#include "sretention.hh"
 #include "broker.hh"
-
-extern com::centreon::scheduler::configuration config;
+#include "configuration.hh"
+#include "sretention.hh"
 
 /**** IMPLEMENTATION SPECIFIC HEADER FILES ****/
 #ifdef USE_XRDDEFAULT
 #include "../xdata/xrddefault.hh"		/* default routines */
 #endif
+
+extern com::centreon::scheduler::configuration config;
 
 /******************************************************************/
 /************* TOP-LEVEL STATE INFORMATION FUNCTIONS **************/

@@ -23,7 +23,7 @@
 
 #include "configuration.hh"
 
-#include "config.hh"
+#include "conf.hh"
 #include "common.hh"
 #include "objects.hh"
 #include "statusdata.hh"
@@ -33,6 +33,10 @@
 #include "comments.hh"
 #include "downtime.hh"
 
+
+#include "flapping.hh"
+#include "notifications.hh"
+#include "utils.hh"
 
 /**** STATE INFORMATION SPECIFIC HEADER FILES ****/
 
@@ -62,6 +66,9 @@ extern unsigned long  next_notification_id;
 
 extern unsigned long  modified_host_process_attributes;
 extern unsigned long  modified_service_process_attributes;
+
+extern int            defer_comment_sorting;
+extern int            defer_downtime_sorting;
 
 char *xrddefault_retention_file=NULL;
 char *xrddefault_temp_file=NULL;
@@ -224,7 +231,7 @@ int xrddefault_save_state_information(void){
 	contact *temp_contact=NULL;
 	comment *temp_comment=NULL;
 	scheduled_downtime *temp_downtime=NULL;
-	int x=0;
+	unsigned int x=0;
 	int fd=0;
 	unsigned long host_attribute_mask=0L;
 	unsigned long service_attribute_mask=0L;
@@ -587,8 +594,8 @@ int xrddefault_read_state_information(void){
 	char *contact_name=NULL;
 	char *author=NULL;
 	char *comment_data=NULL;
-	int data_type=XRDDEFAULT_NO_DATA;
-	int x=0;
+	unsigned int data_type=XRDDEFAULT_NO_DATA;
+	unsigned int x=0;
 	host *temp_host=NULL;
 	service *temp_service=NULL;
 	contact *temp_contact=NULL;
@@ -604,7 +611,7 @@ int xrddefault_read_state_information(void){
 	int persistent=FALSE;
 	int expires=FALSE;
 	time_t expire_time=0L;
-	int entry_type=USER_COMMENT;
+	unsigned int entry_type=USER_COMMENT;
 	int source=COMMENTSOURCE_INTERNAL;
 	time_t entry_time=0L;
 	time_t creation_time;

@@ -18,14 +18,22 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef SCHEDULER_XSDDEFAULT_HH
-# define SCHEDULER_XSDDEFAULT_HH
+#ifndef CCS_XSDDEFAULT_HH
+# define CCS_XSDDEFAULT_HH
 
-int xsddefault_initialize_status_data(char *);
-int xsddefault_cleanup_status_data(char *,int);
+# ifdef __cplusplus
+extern "C" {
+# endif
+
+int xsddefault_initialize_status_data(char *config_file);
+int xsddefault_cleanup_status_data(char *config_file, int delete_status_data);
 int xsddefault_save_status_data(void);
 
-int xsddefault_grab_config_info(char *);
-int xsddefault_grab_config_directives(char *);
+int xsddefault_grab_config_info(char *config_file);
+int xsddefault_grab_config_directives(char *input);
 
-#endif // !SCHEDULER_XSDDEFAULT_HH
+# ifdef __cplusplus
+}
+# endif
+
+#endif // !CCS_XSDDEFAULT_HH

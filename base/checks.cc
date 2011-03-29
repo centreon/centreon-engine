@@ -18,17 +18,19 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include "configuration.hh"
-
-#include "config.hh"
+#include "conf.hh"
 #include "comments.hh"
-#include "common.hh"
 #include "statusdata.hh"
 #include "downtime.hh"
-#include "macros.hh"
 #include "nagios.hh"
 #include "broker.hh"
 #include "perfdata.hh"
+#include "utils.hh"
+#include "notifications.hh"
+#include "sehandlers.hh"
+#include "flapping.hh"
+#include "configuration.hh"
+#include "checks.hh"
 
 /*#define DEBUG_CHECKS*/
 /*#define DEBUG_HOST_CHECKS 1*/
@@ -48,8 +50,8 @@ extern com::centreon::scheduler::configuration config;
 extern int      sigshutdown;
 extern int      sigrestart;
 
-extern int      currently_running_service_checks;
-extern int      currently_running_host_checks;
+extern unsigned int      currently_running_service_checks;
+extern unsigned int      currently_running_host_checks;
 
 extern time_t   program_start;
 extern time_t   event_start;
@@ -286,7 +288,7 @@ int reap_check_results(void){
 
 		/* break out if we've been here too long (max_check_reaper_time seconds) */
 		time(&current_time);
-		if((int)(current_time-reaper_start_time)>config.get_max_check_reaper_time()){
+		if((current_time-reaper_start_time)>config.get_max_check_reaper_time()){
 			log_debug_info(DEBUGL_CHECKS,0,"Breaking out of check result reaper: max reaper time exceeded\n");
 			break;
 			}
@@ -401,7 +403,6 @@ int run_async_service_check(service *svc, int check_options, double latency, int
 	nagios_macros mac;
 	char *raw_command=NULL;
 	char *processed_command=NULL;
-	char *temp_buffer=NULL;
 	struct timeval start_time,end_time;
 	pid_t pid=0;
 	int fork_error=FALSE;
@@ -1280,7 +1281,7 @@ int handle_async_service_check_result(service *temp_service, check_result *queue
 			else{
 				/* can we use the last cached host state? */
 				/* usually only use cached host state if no service state change has occurred */
-				if((state_change==FALSE || state_changes_use_cached_state==TRUE) && temp_host->has_been_checked==TRUE && ((current_time-temp_host->last_check) <= config.get_cached_host_check_horizon())){
+				if((state_change==FALSE || state_changes_use_cached_state==TRUE) && temp_host->has_been_checked==TRUE && (static_cast<unsigned long>(current_time-temp_host->last_check)<=config.get_cached_host_check_horizon())){
 					log_debug_info(DEBUGL_CHECKS,1,"* Using cached host state: %d\n",temp_host->current_state);
 					update_check_stats(ACTIVE_ONDEMAND_HOST_CHECK_STATS,current_time);
 					update_check_stats(ACTIVE_CACHED_HOST_CHECK_STATS,current_time);
@@ -1383,7 +1384,7 @@ int handle_async_service_check_result(service *temp_service, check_result *queue
 			else{
 				/* can we use the last cached host state? */
 				/* only use cached host state if no service state change has occurred */
-				if((state_change==FALSE || state_changes_use_cached_state==TRUE) && temp_host->has_been_checked==TRUE && ((current_time-temp_host->last_check) <= config.get_cached_host_check_horizon())){
+				if((state_change==FALSE || state_changes_use_cached_state==TRUE) && temp_host->has_been_checked==TRUE && (static_cast<unsigned long>(current_time-temp_host->last_check)<=config.get_cached_host_check_horizon())){
 					/* use current host state as route result */
 					route_result=temp_host->current_state;
 					log_debug_info(DEBUGL_CHECKS,1,"* Using cached host state: %d\n",temp_host->current_state);
@@ -1696,7 +1697,7 @@ int handle_async_service_check_result(service *temp_service, check_result *queue
 		temp_service=(service *)servicelist_item->object_ptr;
 
 		/* we can get by with a cached state, so don't check the service */
-		if((current_time-temp_service->last_check)<=config.get_cached_service_check_horizon()){
+		if(static_cast<unsigned long>(current_time-temp_service->last_check)<=config.get_cached_service_check_horizon()){
 			run_async_check=FALSE;
 
 			/* update check statistics */
@@ -2601,7 +2602,7 @@ int run_sync_host_check_3x(host *hst, int *check_result_code, int check_options,
 	if(use_cached_result==TRUE && !(check_options & CHECK_OPTION_FORCE_EXECUTION)){
 
 		/* we can used the cached result, so return it and get out of here... */
-		if(hst->has_been_checked==TRUE && ((current_time-hst->last_check) <= check_timestamp_horizon)){
+		if(hst->has_been_checked==TRUE && (static_cast<unsigned long>(current_time-hst->last_check) <= check_timestamp_horizon)){
 			if(check_result_code)
 				*check_result_code=hst->current_state;
 
@@ -2935,7 +2936,6 @@ int run_async_host_check_3x(host *hst, int check_options, double latency, int sc
 	nagios_macros mac;
 	char *raw_command=NULL;
 	char *processed_command=NULL;
-	char *temp_buffer=NULL;
 	struct timeval start_time,end_time;
 	pid_t pid=0;
 	int fork_error=FALSE;
@@ -3895,7 +3895,7 @@ int process_host_check_result_3x(host *hst, int new_state, char *old_plugin_outp
 
 		log_debug_info(DEBUGL_CHECKS,2,"ASYNC CHECK OF HOST: %s, CURRENTTIME: %lu, LASTHOSTCHECK: %lu, CACHEDTIMEHORIZON: %lu, USECACHEDRESULT: %d, ISEXECUTING: %d\n",temp_host->name,current_time,temp_host->last_check,check_timestamp_horizon,use_cached_result,temp_host->is_executing);
 
-		if(use_cached_result==TRUE && ((current_time-temp_host->last_check)<=check_timestamp_horizon))
+		if(use_cached_result==TRUE && (static_cast<unsigned long>(current_time-temp_host->last_check)<=check_timestamp_horizon))
 			run_async_check=FALSE;
 		if(temp_host->is_executing==TRUE)
 			run_async_check=FALSE;

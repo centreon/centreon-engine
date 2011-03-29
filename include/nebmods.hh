@@ -1,5 +1,5 @@
 /*
-** Copyright 2002-2005 Ethan Galstad
+** Copyright 2002-2006 Ethan Galstad
 ** Copyright 2011      Merethis
 **
 ** This file is part of Centreon Scheduler.
@@ -18,49 +18,47 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef SCHEDULER_NEBMODS_HH
-# define SCHEDULER_NEBMODS_HH
+#ifndef CCS_NEBMODS_HH
+# define CCS_NEBMODS_HH
 
-# include "config.hh"
-# include "nebcallbacks.hh"
 # include "nebmodules.hh"
+# include "nebcallbacks.hh"
 
 # ifdef __cplusplus
 extern "C" {
 # endif
 
+// Module Structures
+typedef struct              nebcallback_struct {
+  void                      *callback_func;
+  void                      *module_handle;
+  int                       priority;
+  struct nebcallback_struct *next;
+}                           nebcallback;
 
-/***** MODULE STRUCTURES *****/
-
-/* NEB module callback list struct */
-typedef struct nebcallback_struct{
-	void            *callback_func;
-	void            *module_handle;
-	int             priority;
-	struct nebcallback_struct *next;
-        }nebcallback;
-
-
-
-/***** MODULE FUNCTIONS *****/
-
+// Module Functions
 int neb_init_modules(void);
 int neb_deinit_modules(void);
-int neb_load_all_modules(void);
-int neb_load_module(nebmodule *);
+int neb_add_module(char const* filename,char const* args,int should_be_loaded);
 int neb_free_module_list(void);
-int neb_unload_all_modules(int,int);
-int neb_unload_module(nebmodule *,int,int);
-int neb_add_module(char const*,char const*,int);
+int neb_load_all_modules(void);
+int neb_load_module(nebmodule *mod);
+int neb_unload_all_modules(int flags, int reason);
+int neb_unload_module(nebmodule *mod, int flags, int reason);
 
+// int neb_set_module_info(void *handle, int type, char *data);
 
-/***** CALLBACK FUNCTIONS *****/
+// int neb_register_callback(int callback_type, void *mod_handle, int priority, int (*callback_func)(int,void *));
+// int neb_deregister_module_callbacks(nebmodule *mod);
+// int neb_deregister_callback(int callback_type, int (*callback_func)(int,void *));
+
+// Callback Functions
+int neb_make_callbacks(int callback_type, void *data);
 int neb_init_callback_list(void);
 int neb_free_callback_list(void);
-int neb_make_callbacks(int,void *);
 
 # ifdef __cplusplus
 }
 # endif
 
-#endif // !SCHEDULER_NEBMODS_HH
+#endif // !CCS_NEBMODS_HH

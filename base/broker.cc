@@ -19,16 +19,14 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include "configuration.hh"
-
-#include "config.hh"
-#include "common.hh"
-
-#include "nagios.hh"
-#include "broker.hh"
-#include "nebcallbacks.hh"
+#include "conf.hh"
 #include "nebstructs.hh"
 #include "nebmods.hh"
+#include "notifications.hh"
+#include "sehandlers.hh"
+#include "flapping.hh"
+#include "configuration.hh"
+#include "broker.hh"
 
 extern com::centreon::scheduler::configuration config;
 
@@ -158,7 +156,7 @@ void broker_system_command(int type, int flags, int attr, struct timeval start_t
 
 
 /* send event handler data to broker */
-int broker_event_handler(int type, int flags, int attr, int eventhandler_type, void *data, int state, int state_type, struct timeval start_time, struct timeval end_time, double exectime, int timeout, int early_timeout, int retcode, char const* cmd, char *cmdline, char *output, struct timeval *timestamp){
+int broker_event_handler(int type, int flags, int attr, unsigned int eventhandler_type, void *data, int state, int state_type, struct timeval start_time, struct timeval end_time, double exectime, int timeout, int early_timeout, int retcode, char const* cmd, char *cmdline, char *output, struct timeval *timestamp){
 	service *temp_service=NULL;
 	host *temp_host=NULL;
 	char *command_buf=NULL;
@@ -413,7 +411,7 @@ void broker_downtime_data(int type, int flags, int attr, int downtime_type, char
 
 
 /* send flapping data to broker */
-void broker_flapping_data(int type, int flags, int attr, int flapping_type, void *data, double percent_change, double high_threshold, double low_threshold, struct timeval *timestamp){
+void broker_flapping_data(int type, int flags, int attr, unsigned int flapping_type, void *data, double percent_change, double high_threshold, double low_threshold, struct timeval *timestamp){
 	nebstruct_flapping_data ds;
 	host *temp_host=NULL;
 	service *temp_service=NULL;
@@ -566,7 +564,7 @@ void broker_contact_status(int type, int flags, int attr, contact *cntct, struct
 
 
 /* send notification data to broker */
-int broker_notification_data(int type, int flags, int attr, int notification_type, int reason_type, struct timeval start_time, struct timeval end_time, void *data, char *ack_author, char *ack_data, int escalated, int contacts_notified, struct timeval *timestamp){
+int broker_notification_data(int type, int flags, int attr, unsigned int notification_type, int reason_type, struct timeval start_time, struct timeval end_time, void *data, char *ack_author, char *ack_data, int escalated, int contacts_notified, struct timeval *timestamp){
 	nebstruct_notification_data ds;
 	host *temp_host=NULL;
 	service *temp_service=NULL;
@@ -614,7 +612,7 @@ int broker_notification_data(int type, int flags, int attr, int notification_typ
 
 
 /* send contact notification data to broker */
-int broker_contact_notification_data(int type, int flags, int attr, int notification_type, int reason_type, struct timeval start_time, struct timeval end_time, void *data, contact *cntct, char *ack_author, char *ack_data, int escalated, struct timeval *timestamp){
+int broker_contact_notification_data(int type, int flags, int attr, unsigned int notification_type, int reason_type, struct timeval start_time, struct timeval end_time, void *data, contact *cntct, char *ack_author, char *ack_data, int escalated, struct timeval *timestamp){
 	nebstruct_contact_notification_data ds;
 	host *temp_host=NULL;
 	service *temp_service=NULL;
@@ -662,7 +660,7 @@ int broker_contact_notification_data(int type, int flags, int attr, int notifica
 
 
 /* send contact notification data to broker */
-int broker_contact_notification_method_data(int type, int flags, int attr, int notification_type, int reason_type, struct timeval start_time, struct timeval end_time, void *data, contact *cntct, char *cmd, char *ack_author, char *ack_data, int escalated, struct timeval *timestamp){
+int broker_contact_notification_method_data(int type, int flags, int attr, unsigned int notification_type, int reason_type, struct timeval start_time, struct timeval end_time, void *data, contact *cntct, char *cmd, char *ack_author, char *ack_data, int escalated, struct timeval *timestamp){
 	nebstruct_contact_notification_method_data ds;
 	host *temp_host=NULL;
 	service *temp_service=NULL;

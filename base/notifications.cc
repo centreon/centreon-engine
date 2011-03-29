@@ -19,16 +19,14 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include "configuration.hh"
-
-#include "config.hh"
-#include "common.hh"
-#include "objects.hh"
+#include "conf.hh"
 #include "statusdata.hh"
-#include "macros.hh"
 #include "nagios.hh"
 #include "broker.hh"
 #include "neberrors.hh"
+#include "utils.hh"
+#include "configuration.hh"
+#include "notifications.hh"
 
 extern com::centreon::scheduler::configuration config;
 
@@ -51,7 +49,7 @@ extern char            *generic_summary;
 
 
 /* notify contacts about a service problem or recovery */
-int service_notification(service *svc, int type, char *not_author, char *not_data, int options)
+int service_notification(service *svc, unsigned int type, char *not_author, char *not_data, int options)
 {
 	host *temp_host=NULL;
 	notification *temp_notification=NULL;
@@ -319,7 +317,7 @@ int service_notification(service *svc, int type, char *not_author, char *not_dat
 
 
 /* checks the viability of sending out a service alert (top level filters) */
-int check_service_notification_viability(service *svc, int type, int options){
+int check_service_notification_viability(service *svc, unsigned int type, int options){
 	host *temp_host;
 	timeperiod *temp_period;
 	time_t current_time;
@@ -590,7 +588,7 @@ int check_service_notification_viability(service *svc, int type, int options){
 
 
 /* check viability of sending out a service notification to a specific contact (contact-specific filters) */
-int check_contact_service_notification_viability(contact *cntct, service *svc, int type, int options){
+int check_contact_service_notification_viability(contact *cntct, service *svc, unsigned int type, int options){
 
 	log_debug_info(DEBUGL_FUNCTIONS,0,"check_contact_service_notification_viability()\n");
 
@@ -1039,7 +1037,7 @@ int create_notification_list_from_service(nagios_macros *mac, service *svc, int 
 
 
 /* notify all contacts for a host that the entire host is down or up */
-int host_notification(host *hst, int type, char *not_author, char *not_data, int options)
+int host_notification(host *hst, unsigned int type, char *not_author, char *not_data, int options)
 {
 	notification *temp_notification=NULL;
 	contact *temp_contact=NULL;
@@ -1297,7 +1295,7 @@ int host_notification(host *hst, int type, char *not_author, char *not_data, int
 
 
 /* checks viability of sending a host notification */
-int check_host_notification_viability(host *hst, int type, int options){
+int check_host_notification_viability(host *hst, unsigned int type, int options){
 	time_t current_time;
 	time_t timeperiod_start;
 	time_t first_problem_time;
@@ -1528,7 +1526,7 @@ int check_host_notification_viability(host *hst, int type, int options){
 
 
 /* checks the viability of notifying a specific contact about a host */
-int check_contact_host_notification_viability(contact *cntct, host *hst, int type, int options){
+int check_contact_host_notification_viability(contact *cntct, host *hst, unsigned int type, int options){
 
 	log_debug_info(DEBUGL_FUNCTIONS,0,"check_contact_host_notification_viability()\n");
 

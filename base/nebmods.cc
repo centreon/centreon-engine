@@ -18,14 +18,12 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include "configuration.hh"
-
-#include "config.hh"
-#include "common.hh"
-#include "nebmods.hh"
+#include "conf.hh"
 #include "neberrors.hh"
 #include "nagios.hh"
-
+#include "utils.hh"
+#include "configuration.hh"
+#include "nebmods.hh"
 
 #ifdef USE_EVENT_BROKER
 

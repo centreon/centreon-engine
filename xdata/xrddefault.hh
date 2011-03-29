@@ -18,25 +18,33 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef SCHEDULER_XRDDEFAULT_HH
-# define SCHEDULER_XRDDEFAULT_HH
+#ifndef CCS_XRDDEFAULT_HH
+# define CCS_XRDDEFAULT_HH
 
-# define XRDDEFAULT_NO_DATA               0
-# define XRDDEFAULT_INFO_DATA             1
-# define XRDDEFAULT_PROGRAMSTATUS_DATA    2
-# define XRDDEFAULT_HOSTSTATUS_DATA       3
-# define XRDDEFAULT_SERVICESTATUS_DATA    4
-# define XRDDEFAULT_CONTACTSTATUS_DATA    5
-# define XRDDEFAULT_HOSTCOMMENT_DATA      6
-# define XRDDEFAULT_SERVICECOMMENT_DATA   7
-# define XRDDEFAULT_HOSTDOWNTIME_DATA     8
-# define XRDDEFAULT_SERVICEDOWNTIME_DATA  9
+# ifdef __cplusplus
+extern "C" {
+# endif
 
-int xrddefault_initialize_retention_data(char *);
-int xrddefault_cleanup_retention_data(char *);
-int xrddefault_grab_config_info(char *);
-int xrddefault_grab_config_directives(char *);
-int xrddefault_save_state_information(void);        /* saves all host and service state information */
-int xrddefault_read_state_information(void);        /* reads in initial host and service state information */
+static const unsigned int XRDDEFAULT_NO_DATA              = 0;
+static const unsigned int XRDDEFAULT_INFO_DATA            = 1;
+static const unsigned int XRDDEFAULT_PROGRAMSTATUS_DATA   = 2;
+static const unsigned int XRDDEFAULT_HOSTSTATUS_DATA      = 3;
+static const unsigned int XRDDEFAULT_SERVICESTATUS_DATA   = 4;
+static const unsigned int XRDDEFAULT_CONTACTSTATUS_DATA   = 5;
+static const unsigned int XRDDEFAULT_HOSTCOMMENT_DATA     = 6;
+static const unsigned int XRDDEFAULT_SERVICECOMMENT_DATA  = 7;
+static const unsigned int XRDDEFAULT_HOSTDOWNTIME_DATA    = 8;
+static const unsigned int XRDDEFAULT_SERVICEDOWNTIME_DATA = 9;
 
-#endif // !SCHEDULER_XRDDEFAULT_HH
+int xrddefault_initialize_retention_data(char *config_file);
+int xrddefault_cleanup_retention_data(char *config_file);
+int xrddefault_grab_config_info(char *main_config_file);
+int xrddefault_grab_config_directives(char *input);
+int xrddefault_save_state_information(void); // saves all host and service state information
+int xrddefault_read_state_information(void); // reads in initial host and service state information
+
+# ifdef __cplusplus
+}
+# endif
+
+#endif // !CCS_XRDDEFAULT_HH

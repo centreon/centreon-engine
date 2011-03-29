@@ -108,7 +108,7 @@ namespace com {
 	std::string const&  get_illegal_output_chars() const throw();
 	std::string const&  get_use_timezone() const throw();
 	int                 get_additional_freshness_latency() const throw();
-	int                 get_debug_level() const throw();
+	unsigned int        get_debug_level() const throw();
 	int                 get_debug_verbosity() const throw();
 	int                 get_command_check_interval() const throw();
 	int                 get_external_command_buffer_slots() const throw();
@@ -213,7 +213,7 @@ namespace com {
 	void                set_illegal_output_chars(std::string const& value);
         void                set_use_timezone(std::string const& value);
 	void                set_additional_freshness_latency(int value);
-	void                set_debug_level(int value);
+	void                set_debug_level(unsigned int value);
 	void                set_debug_verbosity(int value);
 	void                set_command_check_interval(int value);
 	void                set_command_check_interval(std::string const& value);
@@ -369,7 +369,6 @@ namespace com {
 	 */
 	enum e_var_int {
 	  additional_freshness_latency = 0,
-	  debug_level,
 	  debug_verbosity,
 	  command_check_interval,
 	  external_command_buffer_slots,
@@ -383,7 +382,8 @@ namespace com {
 	 *  List all unsigned int variable
 	 */
 	enum e_var_uint {
-	  max_service_check_spread = 0,
+	  debug_level = 0,
+	  max_service_check_spread,
 	  max_host_check_spread,
 	  max_concurrent_checks,
 	  max_parallel_service_checks,

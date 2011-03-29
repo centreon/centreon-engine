@@ -33,6 +33,8 @@
 #include "broker.hh"
 #include "nebmods.hh"
 
+#include "utils.hh"
+
 #include "error.hh"
 #include "configuration.hh"
 
@@ -63,7 +65,7 @@ configuration::configuration()
 
   _lst_method["resource_file"]                               = &cpp_suck<std::string const&, &configuration::_parse_resource_file>::set_generic;;
   _lst_method["log_file"]                                    = &cpp_suck<std::string const&, &configuration::set_log_file>::set_generic;
-  _lst_method["debug_level"]                                 = &cpp_suck<int, &configuration::set_debug_level>::set_generic;
+  _lst_method["debug_level"]                                 = &cpp_suck<unsigned int, &configuration::set_debug_level>::set_generic;
   _lst_method["debug_verbosity"]                             = &cpp_suck<int, &configuration::set_debug_verbosity>::set_generic;
   _lst_method["debug_file"]                                  = &cpp_suck<std::string const&, &configuration::set_debug_file>::set_generic;
   _lst_method["max_debug_file_size"]                         = &cpp_suck<unsigned long, &configuration::set_max_debug_file_size>::set_generic;
@@ -597,8 +599,8 @@ int configuration::get_additional_freshness_latency() const throw() {
  *  Get the debug level.
  *  @return The debug level.
  */
-int configuration::get_debug_level() const throw() {
-  return (_tab_int[debug_level]);
+unsigned int configuration::get_debug_level() const throw() {
+  return (_tab_uint[debug_level]);
 }
 
 /**
@@ -1474,8 +1476,8 @@ void configuration::set_additional_freshness_latency(int value) {
  *  Set the debug level.
  *  @param[in] value The level.
  */
-void configuration::set_debug_level(int value) {
-  _tab_int[debug_level] = value;
+void configuration::set_debug_level(unsigned int value) {
+  _tab_uint[debug_level] = value;
 }
 
 /**

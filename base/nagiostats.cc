@@ -18,7 +18,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include "config.hh"
+#include "conf.hh"
 #include "common.hh"
 #include "nagios.hh"
 #include "locations.hh"

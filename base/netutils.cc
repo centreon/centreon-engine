@@ -19,10 +19,9 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include "config.hh"
+#include "conf.hh"
 #include "common.hh"
 #include "netutils.hh"
-
 
 /* connect to a TCP socket in nonblocking fashion */
 int my_tcp_connect(char *host_name, int port, int *sd, int timeout){

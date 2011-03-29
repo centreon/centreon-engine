@@ -18,19 +18,13 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include "config.hh"
-#include "common.hh"
-#include "objects.hh"
-#include "skiplist.hh"
-
-#include "nagios.hh"
-
-/**** IMPLEMENTATION-SPECIFIC HEADER FILES ****/
-
+#include "conf.hh"
 #ifdef USE_XODTEMPLATE                          /* template-based routines */
 # include "../xdata/xodtemplate.hh"
 #endif
-
+#include "skiplist.hh"
+#include "nagios.hh"
+#include "objects.hh"
 
 host            *host_list=NULL,*host_list_tail=NULL;
 service         *service_list=NULL,*service_list_tail=NULL;
@@ -83,7 +77,7 @@ int read_object_config_data(char *main_config_file, int options, int cache, int 
 /******************************************************************/
 
 int init_object_skiplists(void){
-	int x=0;
+	unsigned int x=0;
 
 	for(x=0;x<NUM_OBJECT_SKIPLISTS;x++)
 		object_skiplists[x]=NULL;
@@ -109,7 +103,7 @@ int init_object_skiplists(void){
 
 
 int free_object_skiplists(void){
-	int x=0;
+	unsigned int x=0;
 
 	for(x=0;x<NUM_OBJECT_SKIPLISTS;x++)
 		skiplist_free(&object_skiplists[x]);
@@ -584,7 +578,7 @@ timerange *add_timerange_to_daterange(daterange *drange, unsigned long start_tim
 host *add_host(char *name, char *display_name, char *alias, char *address, char *check_period, int initial_state, double check_interval, double retry_interval, int max_attempts, int notify_up, int notify_down, int notify_unreachable, int notify_flapping, int notify_downtime, double notification_interval, double first_notification_delay, char *notification_period, int notifications_enabled, char *check_command, int checks_enabled, int accept_passive_checks, char *event_handler, int event_handler_enabled, int flap_detection_enabled, double low_flap_threshold, double high_flap_threshold, int flap_detection_on_up, int flap_detection_on_down, int flap_detection_on_unreachable, int stalk_on_up, int stalk_on_down, int stalk_on_unreachable, int process_perfdata, int failure_prediction_enabled, char *failure_prediction_options, int check_freshness, int freshness_threshold, char *notes, char *notes_url, char *action_url, char *icon_image, char *icon_image_alt, char *vrml_image, char *statusmap_image, int x_2d, int y_2d, int have_2d_coords, double x_3d, double y_3d, double z_3d, int have_3d_coords, int should_be_drawn, int retain_status_information, int retain_nonstatus_information, int obsess_over_host){
 	host *new_host=NULL;
 	int result=OK;
-	int x=0;
+	unsigned int x=0;
 
 	/* make sure we have the data we need */
 	if((name==NULL || !strcmp(name,"")) || (address==NULL || !strcmp(address,""))){
@@ -1234,7 +1228,7 @@ servicesmember *add_service_to_servicegroup(servicegroup *temp_servicegroup, cha
 /* add a new contact to the list in memory */
 contact *add_contact(char *name,char *alias, char *email, char *pager, char **addresses, char *svc_notification_period, char *host_notification_period,int notify_service_ok,int notify_service_critical,int notify_service_warning, int notify_service_unknown, int notify_service_flapping, int notify_service_downtime, int notify_host_up, int notify_host_down, int notify_host_unreachable, int notify_host_flapping, int notify_host_downtime, int host_notifications_enabled, int service_notifications_enabled, int can_submit_commands, int retain_status_information, int retain_nonstatus_information){
 	contact *new_contact=NULL;
-	int x=0;
+	unsigned int x=0;
 	int result=OK;
 
 	/* make sure we have the data we need */
@@ -1529,7 +1523,7 @@ contactsmember *add_contact_to_contactgroup(contactgroup *grp, char *contact_nam
 service *add_service(char *host_name, char *description, char *display_name, char *check_period, int initial_state, int max_attempts, int parallelize, int accept_passive_checks, double check_interval, double retry_interval, double notification_interval, double first_notification_delay, char *notification_period, int notify_recovery, int notify_unknown, int notify_warning, int notify_critical, int notify_flapping, int notify_downtime, int notifications_enabled, int is_volatile, char *event_handler, int event_handler_enabled, char *check_command, int checks_enabled, int flap_detection_enabled, double low_flap_threshold, double high_flap_threshold, int flap_detection_on_ok, int flap_detection_on_warning, int flap_detection_on_unknown, int flap_detection_on_critical, int stalk_on_ok, int stalk_on_warning, int stalk_on_unknown, int stalk_on_critical, int process_perfdata, int failure_prediction_enabled, char *failure_prediction_options, int check_freshness, int freshness_threshold, char *notes, char *notes_url, char *action_url, char *icon_image, char *icon_image_alt, int retain_status_information, int retain_nonstatus_information, int obsess_over_service){
 	service *new_service=NULL;
 	int result=OK;
-	int x=0;
+	unsigned int x=0;
 
 	/* make sure we have everything we need */
 	if((host_name==NULL || !strcmp(host_name,"")) || (description==NULL || !strcmp(description,"")) || (check_command==NULL || !strcmp(check_command,""))){
@@ -3055,7 +3049,7 @@ int free_object_data(void){
 	hostescalation *this_hostescalation=NULL;
 	hostescalation *next_hostescalation=NULL;
 	register int x=0;
-	register int i=0;
+	register unsigned int i=0;
 
 
 	/**** free memory for the timeperiod list ****/

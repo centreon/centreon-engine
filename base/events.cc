@@ -18,16 +18,18 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include "configuration.hh"
-
-#include "config.hh"
-#include "common.hh"
+#include "conf.hh"
 #include "downtime.hh"
 #include "comments.hh"
 #include "statusdata.hh"
 #include "nagios.hh"
 #include "broker.hh"
 #include "sretention.hh"
+#include "utils.hh"
+#include "commands.hh"
+#include "notifications.hh"
+#include "configuration.hh"
+#include "events.hh"
 
 extern com::centreon::scheduler::configuration config;
 
@@ -42,7 +44,7 @@ extern time_t   last_command_check;
 extern int      sigshutdown;
 extern int      sigrestart;
 
-extern int      currently_running_service_checks;
+extern unsigned int currently_running_service_checks;
 
 timed_event *event_list_low=NULL;
 timed_event *event_list_low_tail=NULL;
@@ -542,11 +544,11 @@ void init_timing_loop(void){
 
 	/* add a log rotation event if necessary */
 	if(config.get_log_rotation_method()!=LOG_ROTATION_NONE)
-	  schedule_new_event(EVENT_LOG_ROTATION,TRUE,get_next_log_rotation_time(),TRUE,0,(void*)get_next_log_rotation_time,TRUE,NULL,NULL,0);
+		schedule_new_event(EVENT_LOG_ROTATION,TRUE,get_next_log_rotation_time(),TRUE,0,(void*)get_next_log_rotation_time,TRUE,NULL,NULL,0);
 
 	/* add a retention data save event if needed */
 	if(config.get_retain_state_information()==TRUE && config.get_retention_update_interval()>0)
-	  schedule_new_event(EVENT_RETENTION_SAVE,TRUE,current_time+(config.get_retention_update_interval()*60),TRUE,(config.get_retention_update_interval()*60),NULL,TRUE,NULL,NULL,0);
+		schedule_new_event(EVENT_RETENTION_SAVE,TRUE,current_time+(config.get_retention_update_interval()*60),TRUE,(config.get_retention_update_interval()*60),NULL,TRUE,NULL,NULL,0);
 
 	if(test_scheduling==TRUE){
 
@@ -668,7 +670,7 @@ void display_scheduling_info(void){
 		max_reaper_interval=2.0;
 	if(max_reaper_interval>30.0)
 		max_reaper_interval=30.0;
-	if((int)max_reaper_interval<config.get_check_reaper_interval()){
+	if(max_reaper_interval<config.get_check_reaper_interval()){
 		printf("* Value for 'check_result_reaper_frequency' should be <= %d seconds\n",(int)max_reaper_interval);
 		suggestions++;
 	        }
@@ -695,7 +697,7 @@ void display_scheduling_info(void){
 		minimum_concurrent_checks=minimum_concurrent_checks2;
 
 	/* compare with configured value */
-	if(((int)minimum_concurrent_checks > config.get_max_parallel_service_checks()) && config.get_max_parallel_service_checks()!=0){
+	if((minimum_concurrent_checks > config.get_max_parallel_service_checks()) && config.get_max_parallel_service_checks()!=0){
 		printf("* Value for 'max_concurrent_checks' option should be >= %d\n",(int)minimum_concurrent_checks);
 		suggestions++;
 	        }
@@ -1434,7 +1436,7 @@ void adjust_check_scheduling(void){
 				continue;
 
 			/* does the last check "bump" into this one? */
-			if((unsigned long)(last_check_time+last_check_exec_time)>temp_event->run_time)
+			if((last_check_time+last_check_exec_time)>temp_event->run_time)
 				adjust_scheduling=TRUE;
 	
 			last_check_time=temp_event->run_time;
@@ -1455,7 +1457,7 @@ void adjust_check_scheduling(void){
 				continue;
 
 			/* does the last check "bump" into this one? */
-			if((unsigned long)(last_check_time+last_check_exec_time)>temp_event->run_time)
+			if((last_check_time+last_check_exec_time)>temp_event->run_time)
 				adjust_scheduling=TRUE;
 	
 			last_check_time=temp_event->run_time;

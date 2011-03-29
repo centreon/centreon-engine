@@ -18,9 +18,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include "config.hh"
+#include "conf.hh"
 #include "common.hh"
-
 #include "skiplist.hh"
 
 
