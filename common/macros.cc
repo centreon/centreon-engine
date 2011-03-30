@@ -2433,7 +2433,7 @@ char *get_url_encoded_string(char *input)
 		        }
 
 		/* spaces are pluses */
-		else if((char)input[x]<=(char)' '){
+		else if(input[x]==' '){
 			encoded_url_string[y]='+';
 			y++;
 		        }
