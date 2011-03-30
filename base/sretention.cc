@@ -69,7 +69,7 @@ int cleanup_retention_data(char *config_file){
 int save_state_information(int autosave){
 	int result=OK;
 
-	if(config.get_retain_state_information()==FALSE)
+	if(config.get_retain_state_information()==false)
 		return OK;
 
 #ifdef USE_EVENT_BROKER
@@ -103,7 +103,7 @@ int save_state_information(int autosave){
 int read_initial_state_information(void){
 	int result=OK;
 
-	if(config.get_retain_state_information()==FALSE)
+	if(config.get_retain_state_information()==false)
 		return OK;
 
 #ifdef USE_EVENT_BROKER

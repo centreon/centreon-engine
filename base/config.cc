@@ -634,7 +634,7 @@ int pre_flight_object_check(int *w, int *e){
 
 		/* make sure each host has at least one service associated with it */
 		/* 02/21/08 NOTE: this is extremely inefficient */
-		if(use_precached_objects==FALSE && config.get_use_large_installation_tweaks()==FALSE){
+		if(use_precached_objects==FALSE && config.get_use_large_installation_tweaks()==false){
 
 			for(temp_service=service_list;temp_service!=NULL;temp_service=temp_service->next){
 				if(!strcmp(temp_service->host_name,temp_host->name)){

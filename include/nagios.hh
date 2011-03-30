@@ -109,20 +109,9 @@ extern "C" {
 # define SERVICE_STATECHANGE             1
 
 /***************** OBJECT CHECK TYPES *****************/
+
 # define SERVICE_CHECK                   0
 # define HOST_CHECK                      1
-
-/******* INTER-CHECK DELAY CALCULATION TYPES **********/
-
-# define ICD_NONE			0	/* no inter-check delay */
-# define ICD_DUMB			1	/* dumb delay of 1 second */
-# define ICD_SMART			2	/* smart delay */
-# define ICD_USER			3       /* user-specified delay */
-
-/******* INTERLEAVE FACTOR CALCULATION TYPES **********/
-
-# define ILF_USER			0	/* user-specified interleave factor */
-# define ILF_SMART			1	/* smart interleave */
 
 /************ SCHEDULED DOWNTIME TYPES ****************/
 

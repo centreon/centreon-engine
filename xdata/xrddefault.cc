@@ -715,7 +715,7 @@ int xrddefault_read_state_information(void){
 			case XRDDEFAULT_PROGRAMSTATUS_DATA:
 
 				/* adjust modified attributes if necessary */
-			  if(config.get_use_retained_program_state()==FALSE){
+			  if(config.get_use_retained_program_state()==false){
 					modified_host_process_attributes=MODATTR_NONE;
 					modified_service_process_attributes=MODATTR_NONE;
 				        }
@@ -750,7 +750,7 @@ int xrddefault_read_state_information(void){
 
 
 					/* ADDED 02/20/08 assume same flapping state if large install tweaks enabled */
-					if(config.get_use_large_installation_tweaks()==TRUE){
+					if(config.get_use_large_installation_tweaks()==true){
 						temp_host->is_flapping=was_flapping;
 						}
 					/* else use normal startup flap detection logic */
@@ -821,7 +821,7 @@ int xrddefault_read_state_information(void){
 
 
 					/* ADDED 02/20/08 assume same flapping state if large install tweaks enabled */
-					if(config.get_use_large_installation_tweaks()==TRUE){
+					if(config.get_use_large_installation_tweaks()==true){
 						temp_service->is_flapping=was_flapping;
 						}
 					/* else use normal startup flap detection logic */
@@ -1026,7 +1026,7 @@ int xrddefault_read_state_information(void){
 					/* mask out attributes we don't want to retain */
 					modified_service_process_attributes&=~process_service_attribute_mask;
 					}
-				if(config.get_use_retained_program_state()==TRUE){
+				if(config.get_use_retained_program_state()==true){
 					if(!strcmp(var,"enable_notifications")){
 						if(modified_host_process_attributes & MODATTR_NOTIFICATIONS_ENABLED)
 							config.set_enable_notifications((atoi(val)>0)?TRUE:FALSE);
@@ -1179,11 +1179,11 @@ int xrddefault_read_state_information(void){
 						else if(!strcmp(var,"last_check"))
 							temp_host->last_check=strtoul(val,NULL,10);
 						else if(!strcmp(var,"next_check")){
-						  if(config.get_use_retained_scheduling_info()==TRUE && scheduling_info_is_ok==TRUE)
+						  if(config.get_use_retained_scheduling_info()==true && scheduling_info_is_ok==TRUE)
 								temp_host->next_check=strtoul(val,NULL,10);
 						        }
 						else if(!strcmp(var,"check_options")){
-						  if(config.get_use_retained_scheduling_info()==TRUE && scheduling_info_is_ok==TRUE)
+						  if(config.get_use_retained_scheduling_info()==true && scheduling_info_is_ok==TRUE)
 								temp_host->check_options=atoi(val);
 						        }
 						else if(!strcmp(var,"current_attempt"))
@@ -1478,11 +1478,11 @@ int xrddefault_read_state_information(void){
 						else if(!strcmp(var,"last_check"))
 							temp_service->last_check=strtoul(val,NULL,10);
 						else if(!strcmp(var,"next_check")){
-						  if(config.get_use_retained_scheduling_info()==TRUE && scheduling_info_is_ok==TRUE)
+						  if(config.get_use_retained_scheduling_info()==true && scheduling_info_is_ok==TRUE)
 								temp_service->next_check=strtoul(val,NULL,10);
 						        }
 						else if(!strcmp(var,"check_options")){
-						  if(config.get_use_retained_scheduling_info()==TRUE && scheduling_info_is_ok==TRUE)
+						  if(config.get_use_retained_scheduling_info()==true && scheduling_info_is_ok==TRUE)
 								temp_service->check_options=atoi(val);
 						        }
 						else if(!strcmp(var,"notified_on_unknown"))

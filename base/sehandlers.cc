@@ -70,7 +70,7 @@ int obsessive_compulsive_service_check_processor(service *svc)
 		return ERROR;
 
 	/* bail out if we shouldn't be obsessing */
-	if(config.get_obsess_over_services()==FALSE)
+	if(config.get_obsess_over_services()==false)
 		return OK;
 	if(svc->obsess_over_service==FALSE)
 		return OK;
@@ -140,7 +140,7 @@ int obsessive_compulsive_host_check_processor(host *hst)
 		return ERROR;
 
 	/* bail out if we shouldn't be obsessing */
-	if(config.get_obsess_over_hosts()==FALSE)
+	if(config.get_obsess_over_hosts()==false)
 		return OK;
 	if(hst->obsess_over_host==FALSE)
 		return OK;
@@ -211,7 +211,7 @@ int handle_service_event(service *svc)
 #endif
 
 	/* bail out if we shouldn't be running event handlers */
-	if(config.get_enable_event_handlers()==FALSE)
+	if(config.get_enable_event_handlers()==false)
 		return OK;
 	if(svc->event_handler_enabled==FALSE)
 		return OK;
@@ -266,7 +266,7 @@ int run_global_service_event_handler(nagios_macros *mac, service *svc)
 		return ERROR;
 
 	/* bail out if we shouldn't be running event handlers */
-	if(config.get_enable_event_handlers()==FALSE)
+	if(config.get_enable_event_handlers()==false)
 		return OK;
 
 	/* a global service event handler command has not been defined */
@@ -477,7 +477,7 @@ int handle_host_event(host *hst)
 #endif
 
 	/* bail out if we shouldn't be running event handlers */
-	if(config.get_enable_event_handlers()==FALSE)
+	if(config.get_enable_event_handlers()==false)
 		return OK;
 	if(hst->event_handler_enabled==FALSE)
 		return OK;
@@ -525,7 +525,7 @@ int run_global_host_event_handler(nagios_macros *mac, host *hst)
 		return ERROR;
 
 	/* bail out if we shouldn't be running event handlers */
-	if(config.get_enable_event_handlers()==FALSE)
+	if(config.get_enable_event_handlers()==false)
 		return OK;
 
 	/* no global host event handler command is defined */

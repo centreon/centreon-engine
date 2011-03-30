@@ -741,7 +741,7 @@ int run_async_service_check(service *svc, int check_options, double latency, int
 		close_command_file();
 
 		/* fork again if we're not in a large installation */
-		if(config.get_child_processes_fork_twice()==TRUE){
+		if(config.get_child_processes_fork_twice()==true){
 
 			/* fork again... */
 			pid=fork();
@@ -752,7 +752,7 @@ int run_async_service_check(service *svc, int check_options, double latency, int
 			}
 
 		/* the grandchild (or child if large install tweaks are enabled) process should run the service check... */
-		if(pid==0 || config.get_child_processes_fork_twice()==FALSE){
+		if(pid==0 || config.get_child_processes_fork_twice()==false){
 
 			/* reset signal handling */
 			reset_sighandler();
@@ -909,7 +909,7 @@ int run_async_service_check(service *svc, int check_options, double latency, int
 
 		/* free allocated memory */
 		/* this needs to be done last, so we don't free memory for variables before they're used above */
-		if(config.get_free_child_process_memory()==TRUE)
+		if(config.get_free_child_process_memory()==true)
 			free_memory(&mac);
 
 		/* parent exits immediately - grandchild process is inherited by the INIT process, so we have no zombie problem... */
@@ -936,7 +936,7 @@ int run_async_service_check(service *svc, int check_options, double latency, int
 
 		/* wait for the first child to return */
 		/* don't do this if large install tweaks are enabled - we'll clean up children in event loop */
-		if(config.get_child_processes_fork_twice()==TRUE)
+		if(config.get_child_processes_fork_twice()==true)
 			wait_result=waitpid(pid,NULL,0);
 	        }
 
@@ -993,7 +993,7 @@ int handle_async_service_check_result(service *temp_service, check_result *queue
 
 	/* skip this service check results if its passive and we aren't accepting passive check results */
 	if(queued_check_result->check_type==SERVICE_CHECK_PASSIVE){
-		if(config.get_accept_passive_service_checks()==FALSE){
+		if(config.get_accept_passive_service_checks()==false){
 			log_debug_info(DEBUGL_CHECKS,0,"Discarding passive service check result because passive service checks are disabled globally.\n");
 			return ERROR;
 			}
@@ -1142,7 +1142,7 @@ int handle_async_service_check_result(service *temp_service, check_result *queue
 			/* 08/04/07 EG launch an async (parallel) host check unless aggressive host checking is enabled */
 			/* previous logic was to simply run a sync (serial) host check */
 			/* do NOT allow cached check results to happen here - we need the host to be checked for real... */
-			if(config.get_use_aggressive_host_checking()==TRUE)
+			if(config.get_use_aggressive_host_checking()==true)
 				perform_on_demand_host_check(temp_host,NULL,CHECK_OPTION_NONE,FALSE,0L);
 			else
 				run_async_host_check_3x(temp_host,CHECK_OPTION_NONE,0.0,FALSE,FALSE,NULL,NULL);
@@ -1274,7 +1274,7 @@ int handle_async_service_check_result(service *temp_service, check_result *queue
 
 			/* 08/04/07 EG launch an async (parallel) host check (possibly cached) unless aggressive host checking is enabled */
 			/* previous logic was to simply run a sync (serial) host check */
-			if(config.get_use_aggressive_host_checking()==TRUE)
+			if(config.get_use_aggressive_host_checking()==true)
 				perform_on_demand_host_check(temp_host,NULL,CHECK_OPTION_NONE,TRUE,config.get_cached_host_check_horizon());
 			/* 09/23/07 EG don't launch a new host check if we already did so earlier */
 			else if(first_host_check_initiated==TRUE)
@@ -1341,7 +1341,7 @@ int handle_async_service_check_result(service *temp_service, check_result *queue
 			}
 
 		/* should we obsessive over service checks? */
-		if(config.get_obsess_over_services()==TRUE)
+		if(config.get_obsess_over_services()==true)
 			obsessive_compulsive_service_check_processor(temp_service);
 
 		/* reset all service variables because its okay now... */
@@ -1380,7 +1380,7 @@ int handle_async_service_check_result(service *temp_service, check_result *queue
 
 			/* 08/04/07 EG launch an async (parallel) host check (possibly cached) unless aggressive host checking is enabled */
 			/* previous logic was to simply run a sync (serial) host check */
-			if(config.get_use_aggressive_host_checking()==TRUE)
+			if(config.get_use_aggressive_host_checking()==true)
 				perform_on_demand_host_check(temp_host,&route_result,CHECK_OPTION_NONE,TRUE,config.get_cached_host_check_horizon());
 			else{
 				/* can we use the last cached host state? */
@@ -1418,7 +1418,7 @@ int handle_async_service_check_result(service *temp_service, check_result *queue
 			log_debug_info(DEBUGL_CHECKS,1,"Host is currently DOWN/UNREACHABLE.\n");
 
 			/* we're using aggressive host checking, so really do recheck the host... */
-			if(config.get_use_aggressive_host_checking()==TRUE){
+			if(config.get_use_aggressive_host_checking()==true){
 				log_debug_info(DEBUGL_CHECKS,1,"Agressive host checking is enabled, so we'll recheck the host state...\n");
 				perform_on_demand_host_check(temp_host,&route_result,CHECK_OPTION_NONE,TRUE,config.get_cached_host_check_horizon());
 				}
@@ -1543,7 +1543,7 @@ int handle_async_service_check_result(service *temp_service, check_result *queue
 			        }
 
 			/* perform dependency checks on the second to last check of the service */
-			if(config.get_enable_predictive_service_dependency_checks()==TRUE && temp_service->current_attempt==(temp_service->max_attempts-1)){
+			if(config.get_enable_predictive_service_dependency_checks()==true && temp_service->current_attempt==(temp_service->max_attempts-1)){
 
 				log_debug_info(DEBUGL_CHECKS,1,"Looking for services to check for predictive dependency checks...\n");
 
@@ -1611,7 +1611,7 @@ int handle_async_service_check_result(service *temp_service, check_result *queue
 
 
 		/* should we obsessive over service checks? */
-		if(config.get_obsess_over_services()==TRUE)
+		if(config.get_obsess_over_services()==true)
 			obsessive_compulsive_service_check_processor(temp_service);
 	        }
 
@@ -1947,7 +1947,7 @@ int check_service_dependencies(service *svc,int dependency_type){
 			return FALSE;
 
 		/* get the status to use (use last hard state if its currently in a soft state) */
-		if(temp_service->state_type==SOFT_STATE && config.get_soft_state_dependencies()==FALSE)
+		if(temp_service->state_type==SOFT_STATE && config.get_soft_state_dependencies()==false)
 			state=temp_service->last_hard_state;
 		else
 			state=temp_service->current_state;
@@ -2034,7 +2034,7 @@ void check_service_result_freshness(void){
 	log_debug_info(DEBUGL_CHECKS,1,"Checking the freshness of service check results...\n");
 
 	/* bail out if we're not supposed to be checking freshness */
-	if(config.get_check_service_freshness()==FALSE){
+	if(config.get_check_service_freshness()==false){
 		log_debug_info(DEBUGL_CHECKS,1,"Service freshness checking is disabled.\n");
 		return;
 		}
@@ -2345,7 +2345,7 @@ int check_host_dependencies(host *hst,int dependency_type){
 			return FALSE;
 
 		/* get the status to use (use last hard state if its currently in a soft state) */
-		if(temp_host->state_type==SOFT_STATE && config.get_soft_state_dependencies()==FALSE)
+		if(temp_host->state_type==SOFT_STATE && config.get_soft_state_dependencies()==false)
 			state=temp_host->last_hard_state;
 		else
 			state=temp_host->current_state;
@@ -2434,7 +2434,7 @@ void check_host_result_freshness(void){
 	log_debug_info(DEBUGL_CHECKS,2,"Attempting to check the freshness of host check results...\n");
 
 	/* bail out if we're not supposed to be checking freshness */
-	if(config.get_check_host_freshness()==FALSE){
+	if(config.get_check_host_freshness()==false){
 		log_debug_info(DEBUGL_CHECKS,2,"Host freshness checking is disabled.\n");
 		return;
 		}
@@ -2828,7 +2828,7 @@ int execute_sync_host_check_3x(host *hst)
 	        }
 
 	/* if we're not doing aggressive host checking, let WARNING states indicate the host is up (fake the result to be STATE_OK) */
-	if(config.get_use_aggressive_host_checking()==FALSE && result==STATE_WARNING)
+	if(config.get_use_aggressive_host_checking()==false && result==STATE_WARNING)
 		result=STATE_OK;
 
 
@@ -3139,7 +3139,7 @@ int run_async_host_check_3x(host *hst, int check_options, double latency, int sc
 		close_command_file();
 
 		/* fork again if we're not in a large installation */
-		if(config.get_child_processes_fork_twice()==TRUE){
+		if(config.get_child_processes_fork_twice()==true){
 
 			/* fork again... */
 			pid=fork();
@@ -3150,7 +3150,7 @@ int run_async_host_check_3x(host *hst, int check_options, double latency, int sc
 			}
 
 		/* the grandchild (or child if large install tweaks are enabled) process should run the host check... */
-		if(pid==0 || config.get_child_processes_fork_twice()==FALSE){
+		if(pid==0 || config.get_child_processes_fork_twice()==false){
 
 			/* reset signal handling */
 			reset_sighandler();
@@ -3229,7 +3229,7 @@ int run_async_host_check_3x(host *hst, int check_options, double latency, int sc
 
 		/* free allocated memory */
 		/* this needs to be done last, so we don't free memory for variables before they're used above */
-		if(config.get_free_child_process_memory()==TRUE)
+		if(config.get_free_child_process_memory()==true)
 			free_memory(&mac);
 
 		/* parent exits immediately - grandchild process is inherited by the INIT process, so we have no zombie problem... */
@@ -3256,7 +3256,7 @@ int run_async_host_check_3x(host *hst, int check_options, double latency, int sc
 
 		/* wait for the first child to return */
 		/* if large install tweaks are enabled, we'll clean up the zombie process later */
-		if(config.get_child_processes_fork_twice()==TRUE)
+		if(config.get_child_processes_fork_twice()==true)
 			wait_result=waitpid(pid,NULL,0);
 	        }
 
@@ -3305,7 +3305,7 @@ int handle_async_host_check_result_3x(host *temp_host, check_result *queued_chec
 
 	/* skip this host check results if its passive and we aren't accepting passive check results */
 	if(queued_check_result->check_type==HOST_CHECK_PASSIVE){
-	  if(config.get_accept_passive_host_checks()==FALSE){
+	  if(config.get_accept_passive_host_checks()==false){
 			log_debug_info(DEBUGL_CHECKS,0,"Discarding passive host check result because passive host checks are disabled globally.\n");
 			return ERROR;
 			}
@@ -3446,7 +3446,7 @@ int handle_async_host_check_result_3x(host *temp_host, check_result *queued_chec
 	if(queued_check_result->check_type==HOST_CHECK_ACTIVE){
 
 		/* if we're not doing aggressive host checking, let WARNING states indicate the host is up (fake the result to be STATE_OK) */
-		if(config.get_use_aggressive_host_checking()==FALSE && result==STATE_WARNING)
+		if(config.get_use_aggressive_host_checking()==false && result==STATE_WARNING)
 		result=STATE_OK;
 
 		/* OK states means the host is UP */
@@ -3515,7 +3515,7 @@ int process_host_check_result_3x(host *hst, int new_state, char *old_plugin_outp
 	next_check=(unsigned long)(current_time+(hst->check_interval*config.get_interval_length()));
 
 	/* we have to adjust current attempt # for passive checks, as it isn't done elsewhere */
-	if(hst->check_type==HOST_CHECK_PASSIVE && config.get_passive_host_checks_are_soft()==TRUE)
+	if(hst->check_type==HOST_CHECK_PASSIVE && config.get_passive_host_checks_are_soft()==true)
 		adjust_host_check_attempt_3x(hst,FALSE);
 
 	/* log passive checks - we need to do this here, as some my bypass external commands by getting dropped in checkresults dir */
@@ -3539,7 +3539,7 @@ int process_host_check_result_3x(host *hst, int new_state, char *old_plugin_outp
 
 			/* set the state type */
 			/* set state type to HARD for passive checks and active checks that were previously in a HARD STATE */
-			if(hst->state_type==HARD_STATE || (hst->check_type==HOST_CHECK_PASSIVE && config.get_passive_host_checks_are_soft()==FALSE))
+			if(hst->state_type==HARD_STATE || (hst->check_type==HOST_CHECK_PASSIVE && config.get_passive_host_checks_are_soft()==false))
 				hst->state_type=HARD_STATE;
 			else
 				hst->state_type=SOFT_STATE;
@@ -3584,7 +3584,7 @@ int process_host_check_result_3x(host *hst, int new_state, char *old_plugin_outp
 			log_debug_info(DEBUGL_CHECKS,1,"Host is still DOWN/UNREACHABLE.\n");
 
 			/* passive checks are treated as HARD states by default... */
-			if(hst->check_type==HOST_CHECK_PASSIVE && config.get_passive_host_checks_are_soft()==FALSE){
+			if(hst->check_type==HOST_CHECK_PASSIVE && config.get_passive_host_checks_are_soft()==false){
 
 				/* set the state type */
 				hst->state_type=HARD_STATE;
@@ -3611,7 +3611,7 @@ int process_host_check_result_3x(host *hst, int new_state, char *old_plugin_outp
 			/* make a determination of the host's state */
 			/* translate host state between DOWN/UNREACHABLE (only for passive checks if enabled) */
 			hst->current_state=new_state;
-			if(hst->check_type==HOST_CHECK_ACTIVE || config.get_translate_passive_host_checks()==TRUE)
+			if(hst->check_type==HOST_CHECK_ACTIVE || config.get_translate_passive_host_checks()==true)
 				hst->current_state=determine_host_reachability(hst);
 			
 			/* reschedule the next check if the host state changed */
@@ -3721,7 +3721,7 @@ int process_host_check_result_3x(host *hst, int new_state, char *old_plugin_outp
 
 					/* translate host state between DOWN/UNREACHABLE for passive checks (if enabled) */
 					/* make a determination of the host's state */
-					if(config.get_translate_passive_host_checks()==TRUE)
+					if(config.get_translate_passive_host_checks()==true)
 						hst->current_state=determine_host_reachability(hst);
 
 					}
@@ -3744,7 +3744,7 @@ int process_host_check_result_3x(host *hst, int new_state, char *old_plugin_outp
 			else{
 
 				/* active and (in some cases) passive check results are treated as SOFT states */
-				if(hst->check_type==HOST_CHECK_ACTIVE || config.get_passive_host_checks_are_soft()==TRUE){
+				if(hst->check_type==HOST_CHECK_ACTIVE || config.get_passive_host_checks_are_soft()==true){
 
 					/* set the state type */
 					hst->state_type=SOFT_STATE;
@@ -3763,14 +3763,14 @@ int process_host_check_result_3x(host *hst, int new_state, char *old_plugin_outp
 				/* make a (in some cases) preliminary determination of the host's state */
 				/* translate host state between DOWN/UNREACHABLE (for passive checks only if enabled) */
 				hst->current_state=new_state;
-				if(hst->check_type==HOST_CHECK_ACTIVE || config.get_translate_passive_host_checks()==TRUE)
+				if(hst->check_type==HOST_CHECK_ACTIVE || config.get_translate_passive_host_checks()==true)
 					hst->current_state=determine_host_reachability(hst);
 
 				/* reschedule a check of the host */
 				reschedule_check=TRUE;
 
 				/* schedule a re-check of the host at the retry interval because we can't determine its final state yet... */
-				if(hst->check_type==HOST_CHECK_ACTIVE || config.get_passive_host_checks_are_soft()==TRUE)
+				if(hst->check_type==HOST_CHECK_ACTIVE || config.get_passive_host_checks_are_soft()==true)
 					next_check=(unsigned long)(current_time+(hst->retry_interval*config.get_interval_length()));
 
 				/* schedule a re-check of the host at the normal interval */
@@ -3805,7 +3805,7 @@ int process_host_check_result_3x(host *hst, int new_state, char *old_plugin_outp
 					}
 
 				/* check dependencies on second to last host check */
-				if(config.get_enable_predictive_host_dependency_checks()==TRUE && hst->current_attempt==(hst->max_attempts-1)){
+				if(config.get_enable_predictive_host_dependency_checks()==true && hst->current_attempt==(hst->max_attempts-1)){
 
 					/* propagate checks to hosts that THIS ONE depends on for notifications AND execution */
 					/* we do to help ensure that the dependency checks are accurate before it comes time to notify */

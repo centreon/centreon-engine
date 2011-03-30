@@ -411,7 +411,7 @@ int my_system_r(nagios_macros *mac, char *cmd,int timeout,int *early_timeout,dou
 #ifndef DONT_USE_MEMORY_PERFORMANCE_TWEAKS
 		/* free allocated memory */
 		/* this needs to be done last, so we don't free memory for variables before they're used above */
-		if(config.get_free_child_process_memory()==TRUE)
+		if(config.get_free_child_process_memory()==true)
 			free_memory(mac);
 #endif
 
@@ -2445,7 +2445,7 @@ int open_command_file(void){
  	int result=0;
 
 	/* if we're not checking external commands, don't do anything */
-	if(config.get_check_external_commands()==FALSE)
+	if(config.get_check_external_commands()==false)
 		return OK;
 
 	/* the command file was already created */
@@ -2508,7 +2508,7 @@ int open_command_file(void){
 int close_command_file(void){
 
 	/* if we're not checking external commands, don't do anything */
-	if(config.get_check_external_commands()==FALSE)
+	if(config.get_check_external_commands()==false)
 		return OK;
 
 	/* the command file wasn't created or was already cleaned up */
@@ -2946,7 +2946,7 @@ int file_uses_embedded_perl(char *fname){
 	char *ptr=NULL;
 	int found_epn_directive=FALSE;
 
-	if(config.get_enable_embedded_perl()==TRUE){
+	if(config.get_enable_embedded_perl()==true){
 
 		/* open the file, check if its a Perl script and see if we can use epn  */
 		fp=fopen(fname,"r");
@@ -2995,7 +2995,7 @@ int file_uses_embedded_perl(char *fname){
 
 				/* if the plugin didn't tell us whether or not to use embedded Perl, use implicit value */
 				if(found_epn_directive==FALSE)
-				  use_epn=(config.get_use_embedded_perl_implicitly()==TRUE)?TRUE:FALSE;
+				  use_epn=(config.get_use_embedded_perl_implicitly()==true)?TRUE:FALSE;
 				}
 
 			fclose(fp);

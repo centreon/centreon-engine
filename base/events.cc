@@ -32,7 +32,8 @@
 #include "configuration.hh"
 #include "events.hh"
 
-extern com::centreon::scheduler::configuration config;
+using namespace com::centreon::scheduler;
+extern configuration config;
 
 extern char	*config_file;
 
@@ -207,24 +208,24 @@ void init_timing_loop(void){
 	/* how should we determine the service inter-check delay to use? */
 	switch(config.get_service_inter_check_delay_method()){
 
-	case ICD_NONE:
+	case configuration::icd_none:
 
 		/* don't spread checks out - useful for testing parallelization code */
 		scheduling_info.service_inter_check_delay=0.0;
 		break;
 
-	case ICD_DUMB:
+	case configuration::icd_dumb:
 
 		/* be dumb and just schedule checks 1 second apart */
 		scheduling_info.service_inter_check_delay=1.0;
 		break;
 		
-	case ICD_USER:
+	case configuration::icd_user:
 
 		/* the user specified a delay, so don't try to calculate one */
 		break;
 
-	case ICD_SMART:
+	case configuration::icd_smart:
 	default:
 
 		/* be smart and calculate the best delay to use to minimize local load... */
@@ -252,12 +253,12 @@ void init_timing_loop(void){
 	/* how should we determine the service interleave factor? */
 	switch(config.get_service_interleave_factor_method()){
 
-	case ILF_USER:
+	case configuration::ilf_user:
 
 		/* the user supplied a value, so don't do any calculation */
 		break;
 
-	case ILF_SMART:
+	case configuration::ilf_smart:
 	default:
 
 		/* protect against a divide by zero problem - shouldn't happen, but just in case... */
@@ -387,24 +388,24 @@ void init_timing_loop(void){
 	/* how should we determine the host inter-check delay to use? */
 	switch(config.get_host_inter_check_delay_method()){
 
-	case ICD_NONE:
+	case configuration::icd_none:
 
 		/* don't spread checks out */
 		scheduling_info.host_inter_check_delay=0.0;
 		break;
 
-	case ICD_DUMB:
+	case configuration::icd_dumb:
 
 		/* be dumb and just schedule checks 1 second apart */
 		scheduling_info.host_inter_check_delay=1.0;
 		break;
 		
-	case ICD_USER:
+	case configuration::icd_user:
 
 		/* the user specified a delay, so don't try to calculate one */
 		break;
 
-	case ICD_SMART:
+	case configuration::icd_smart:
 	default:
 
 		/* be smart and calculate the best delay to use to minimize local load... */
@@ -513,29 +514,29 @@ void init_timing_loop(void){
 	/******** SCHEDULE MISC EVENTS ********/
 
 	/* add a host and service check rescheduling event */
-	if(config.get_auto_reschedule_checks()==TRUE)
+	if(config.get_auto_reschedule_checks()==true)
 	  schedule_new_event(EVENT_RESCHEDULE_CHECKS,TRUE,current_time+config.get_auto_rescheduling_interval(),TRUE,config.get_auto_rescheduling_interval(),NULL,TRUE,NULL,NULL,0);
 
 	/* add a check result reaper event */
 	schedule_new_event(EVENT_CHECK_REAPER,TRUE,current_time+config.get_check_reaper_interval(),TRUE,config.get_check_reaper_interval(),NULL,TRUE,NULL,NULL,0);
 
 	/* add an orphaned check event */
-	if(config.get_check_orphaned_services()==TRUE || config.get_check_orphaned_hosts()==TRUE)
+	if(config.get_check_orphaned_services()==TRUE || config.get_check_orphaned_hosts()==true)
 	  schedule_new_event(EVENT_ORPHAN_CHECK,TRUE,current_time+DEFAULT_ORPHAN_CHECK_INTERVAL,TRUE,DEFAULT_ORPHAN_CHECK_INTERVAL,NULL,TRUE,NULL,NULL,0);
 
 	/* add a service result "freshness" check event */
-	if(config.get_check_service_freshness()==TRUE)
+	if(config.get_check_service_freshness()==true)
 	  schedule_new_event(EVENT_SFRESHNESS_CHECK,TRUE,current_time+config.get_service_freshness_check_interval(),TRUE,config.get_service_freshness_check_interval(),NULL,TRUE,NULL,NULL,0);
 
 	/* add a host result "freshness" check event */
-	if(config.get_check_host_freshness()==TRUE)
+	if(config.get_check_host_freshness()==true)
 	  schedule_new_event(EVENT_HFRESHNESS_CHECK,TRUE,current_time+config.get_host_freshness_check_interval(),TRUE,config.get_host_freshness_check_interval(),NULL,TRUE,NULL,NULL,0);
 
 	/* add a status save event */
 	schedule_new_event(EVENT_STATUS_SAVE,TRUE,current_time+config.get_status_update_interval(),TRUE,config.get_status_update_interval(),NULL,TRUE,NULL,NULL,0);
 
 	/* add an external command check event if needed */
-	if(config.get_check_external_commands()==TRUE){
+	if(config.get_check_external_commands()==true){
 		if(config.get_command_check_interval()==-1)
 			interval_to_use=(unsigned long)60;
 		else
@@ -548,7 +549,7 @@ void init_timing_loop(void){
 		schedule_new_event(EVENT_LOG_ROTATION,TRUE,get_next_log_rotation_time(),TRUE,0,(void*)get_next_log_rotation_time,TRUE,NULL,NULL,0);
 
 	/* add a retention data save event if needed */
-	if(config.get_retain_state_information()==TRUE && config.get_retention_update_interval()>0)
+	if(config.get_retain_state_information()==true && config.get_retention_update_interval()>0)
 		schedule_new_event(EVENT_RETENTION_SAVE,TRUE,current_time+(config.get_retention_update_interval()*60),TRUE,(config.get_retention_update_interval()*60),NULL,TRUE,NULL,NULL,0);
 
 	if(test_scheduling==TRUE){
@@ -604,11 +605,11 @@ void display_scheduling_info(void){
 	printf("Total scheduled hosts:           %d\n",scheduling_info.total_scheduled_hosts);
 
 	printf("Host inter-check delay method:   ");
-	if(config.get_host_inter_check_delay_method()==ICD_NONE)
+	if(config.get_host_inter_check_delay_method()==configuration::icd_none)
 		printf("NONE\n");
-	else if(config.get_host_inter_check_delay_method()==ICD_DUMB)
+	else if(config.get_host_inter_check_delay_method()==configuration::icd_dumb)
 		printf("DUMB\n");
-	else if(config.get_host_inter_check_delay_method()==ICD_SMART){
+	else if(config.get_host_inter_check_delay_method()==configuration::icd_smart){
 		printf("SMART\n");
 		printf("Average host check interval:     %.2f sec\n",scheduling_info.average_host_check_interval);
 	        }
@@ -626,11 +627,11 @@ void display_scheduling_info(void){
 	printf("Total scheduled services:           %d\n",scheduling_info.total_scheduled_services);
 
 	printf("Service inter-check delay method:   ");
-	if(config.get_service_inter_check_delay_method()==ICD_NONE)
+	if(config.get_service_inter_check_delay_method()==configuration::icd_none)
 		printf("NONE\n");
-	else if(config.get_service_inter_check_delay_method()==ICD_DUMB)
+	else if(config.get_service_inter_check_delay_method()==configuration::icd_dumb)
 		printf("DUMB\n");
-	else if(config.get_service_inter_check_delay_method()==ICD_SMART){
+	else if(config.get_service_inter_check_delay_method()==configuration::icd_smart){
 		printf("SMART\n");
 		printf("Average service check interval:     %.2f sec\n",scheduling_info.average_service_check_interval);
 	        }
@@ -638,8 +639,8 @@ void display_scheduling_info(void){
 		printf("USER-SUPPLIED VALUE\n");
 	printf("Inter-check delay:                  %.2f sec\n",scheduling_info.service_inter_check_delay);
 
-	printf("Interleave factor method:           %s\n",(config.get_service_interleave_factor_method()==ILF_USER)?"USER-SUPPLIED VALUE":"SMART");
-	if(config.get_service_interleave_factor_method()==ILF_SMART)
+	printf("Interleave factor method:           %s\n",(config.get_service_interleave_factor_method()==configuration::ilf_user)?"USER-SUPPLIED VALUE":"SMART");
+	if(config.get_service_interleave_factor_method()==configuration::ilf_smart)
 		printf("Average services per host:          %.2f\n",scheduling_info.average_services_per_host);
 	printf("Service interleave factor:          %d\n",scheduling_info.service_interleave_factor);
 
@@ -956,7 +957,7 @@ int event_execution_loop(void){
 		log_debug_info(DEBUGL_EVENTS,1,"Current/Max Service Checks: %d/%d\n",currently_running_service_checks,config.get_max_parallel_service_checks());
 
 		/* get rid of terminated child processes (zombies) */
-		if(config.get_child_processes_fork_twice()==FALSE){
+		if(config.get_child_processes_fork_twice()==false){
 			while((wait_result=waitpid(-1,NULL,WNOHANG))>0);
 			}
 
@@ -1004,7 +1005,7 @@ int event_execution_loop(void){
 					}
 
 				/* don't run a service check if active checks are disabled */
-				if(config.get_execute_service_checks()==FALSE){
+				if(config.get_execute_service_checks()==false){
 
 					log_debug_info(DEBUGL_EVENTS|DEBUGL_CHECKS,1,"We're not executing service checks right now, so we'll skip this event.\n");
 
@@ -1054,7 +1055,7 @@ int event_execution_loop(void){
 				temp_host=(host *)event_list_low->event_data;
 
 				/* don't run a host check if active checks are disabled */
-				if(config.get_execute_host_checks()==FALSE){
+				if(config.get_execute_host_checks()==false){
 
 					log_debug_info(DEBUGL_EVENTS|DEBUGL_CHECKS,1,"We're not executing host checks right now, so we'll skip this event.\n");
 
@@ -1284,9 +1285,9 @@ int handle_timed_event(timed_event *event){
 		log_debug_info(DEBUGL_EVENTS,0,"** Orphaned Host and Service Check Event\n");
 
 		/* check for orphaned hosts and services */
-		if(config.get_check_orphaned_hosts()==TRUE)
+		if(config.get_check_orphaned_hosts()==true)
 			check_for_orphaned_hosts();
-		if(config.get_check_orphaned_services()==TRUE)
+		if(config.get_check_orphaned_services()==true)
 			check_for_orphaned_services();
 		break;
 

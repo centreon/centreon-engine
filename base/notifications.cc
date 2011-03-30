@@ -337,7 +337,7 @@ int check_service_notification_viability(service *svc, unsigned int type, int op
 	time(&current_time);
 
 	/* are notifications enabled? */
-	if(config.get_enable_notifications()==FALSE){
+	if(config.get_enable_notifications()==false){
 		log_debug_info(DEBUGL_NOTIFICATIONS,1,"Notifications are disabled, so service notifications will not be sent out.\n");
 		return ERROR;
 	        }
@@ -1313,7 +1313,7 @@ int check_host_notification_viability(host *hst, unsigned int type, int options)
 	time(&current_time);
 
 	/* are notifications enabled? */
-	if(config.get_enable_notifications()==FALSE){
+	if(config.get_enable_notifications()==false){
 		log_debug_info(DEBUGL_NOTIFICATIONS,1,"Notifications are disabled, so host notifications will not be sent out.\n");
 		return ERROR;
 	        }

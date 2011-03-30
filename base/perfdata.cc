@@ -69,7 +69,7 @@ int cleanup_performance_data(char *config_file){
 int update_service_performance_data(service *svc){
 
 	/* should we be processing performance data for anything? */
-  if(config.get_process_performance_data()==FALSE)
+  if(config.get_process_performance_data()==false)
 		return OK;
 
 	/* should we process performance data for this service? */
@@ -90,7 +90,7 @@ int update_service_performance_data(service *svc){
 int update_host_performance_data(host *hst){
 
 	/* should we be processing performance data for anything? */
-  if(config.get_process_performance_data()==FALSE)
+  if(config.get_process_performance_data()==false)
 		return OK;
 
 	/* should we process performance data for this host? */

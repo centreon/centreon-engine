@@ -75,7 +75,7 @@ int check_for_external_commands(void){
 	log_debug_info(DEBUGL_FUNCTIONS,0,"check_for_external_commands()\n");
 
 	/* bail out if we shouldn't be checking for external commands */
-	if(config.get_check_external_commands()==FALSE)
+	if(config.get_check_external_commands()==false)
 		return ERROR;
 
 	/* update last command check time */
@@ -2042,7 +2042,7 @@ int process_passive_service_check(time_t check_time, char *host_name, char *svc_
 	int result=OK;
 
 	/* skip this service check result if we aren't accepting passive service checks */
-	if(config.get_accept_passive_service_checks()==FALSE)
+	if(config.get_accept_passive_service_checks()==false)
 		return ERROR;
 
 	/* make sure we have all required data */
@@ -2181,7 +2181,7 @@ int process_passive_host_check(time_t check_time, char *host_name, int return_co
 	int result=OK;
 
 	/* skip this host check result if we aren't accepting passive host checks */
-	if(config.get_accept_passive_service_checks()==FALSE)
+	if(config.get_accept_passive_service_checks()==false)
 		return ERROR;
 
 	/* make sure we have all required data */
@@ -3469,7 +3469,7 @@ void enable_all_notifications(void){
 	unsigned long attr=MODATTR_NOTIFICATIONS_ENABLED;
 
 	/* bail out if we're already set... */
-	if(config.get_enable_notifications()==TRUE)
+	if(config.get_enable_notifications()==true)
 		return;
 
 	/* set the attribute modified flag */
@@ -3496,7 +3496,7 @@ void disable_all_notifications(void){
 	unsigned long attr=MODATTR_NOTIFICATIONS_ENABLED;
 
 	/* bail out if we're already set... */
-	if(config.get_enable_notifications()==FALSE)
+	if(config.get_enable_notifications()==false)
 		return;
 
 	/* set the attribute modified flag */
@@ -3937,7 +3937,7 @@ void start_executing_service_checks(void){
 	unsigned long attr=MODATTR_ACTIVE_CHECKS_ENABLED;
 
 	/* bail out if we're already executing services */
-	if(config.get_execute_service_checks()==TRUE)
+	if(config.get_execute_service_checks()==true)
 		return;
 
 	/* set the attribute modified flag */
@@ -3965,7 +3965,7 @@ void stop_executing_service_checks(void){
 	unsigned long attr=MODATTR_ACTIVE_CHECKS_ENABLED;
 
 	/* bail out if we're already not executing services */
-	if(config.get_execute_service_checks()==FALSE)
+	if(config.get_execute_service_checks()==false)
 		return;
 
 	/* set the attribute modified flag */
@@ -3992,7 +3992,7 @@ void start_accepting_passive_service_checks(void){
 	unsigned long attr=MODATTR_PASSIVE_CHECKS_ENABLED;
 
 	/* bail out if we're already accepting passive services */
-	if(config.get_accept_passive_service_checks()==TRUE)
+	if(config.get_accept_passive_service_checks()==true)
 		return;
 
 	/* set the attribute modified flag */
@@ -4019,7 +4019,7 @@ void stop_accepting_passive_service_checks(void){
 	unsigned long attr=MODATTR_PASSIVE_CHECKS_ENABLED;
 
 	/* bail out if we're already not accepting passive services */
-	if(config.get_accept_passive_service_checks()==FALSE)
+	if(config.get_accept_passive_service_checks()==false)
 		return;
 
 	/* set the attribute modified flag */
@@ -4100,7 +4100,7 @@ void start_executing_host_checks(void){
 	unsigned long attr=MODATTR_ACTIVE_CHECKS_ENABLED;
 
 	/* bail out if we're already executing hosts */
-	if(config.get_execute_host_checks()==TRUE)
+	if(config.get_execute_host_checks()==true)
 		return;
 
 	/* set the attribute modified flag */
@@ -4128,7 +4128,7 @@ void stop_executing_host_checks(void){
 	unsigned long attr=MODATTR_ACTIVE_CHECKS_ENABLED;
 
 	/* bail out if we're already not executing hosts */
-	if(config.get_execute_host_checks()==FALSE)
+	if(config.get_execute_host_checks()==false)
 		return;
 
 	/* set the attribute modified flag */
@@ -4155,7 +4155,7 @@ void start_accepting_passive_host_checks(void){
 	unsigned long attr=MODATTR_PASSIVE_CHECKS_ENABLED;
 
 	/* bail out if we're already accepting passive hosts */
-	if(config.get_accept_passive_host_checks()==TRUE)
+	if(config.get_accept_passive_host_checks()==true)
 		return;
 
 	/* set the attribute modified flag */
@@ -4182,7 +4182,7 @@ void stop_accepting_passive_host_checks(void){
 	unsigned long attr=MODATTR_PASSIVE_CHECKS_ENABLED;
 
 	/* bail out if we're already not accepting passive hosts */
-	if(config.get_accept_passive_host_checks()==FALSE)
+	if(config.get_accept_passive_host_checks()==false)
 		return;
 
 	/* set the attribute modified flag */
@@ -4262,7 +4262,7 @@ void start_using_event_handlers(void){
 	unsigned long attr=MODATTR_EVENT_HANDLER_ENABLED;
 
 	/* no change */
-	if(config.get_enable_event_handlers()==TRUE)
+	if(config.get_enable_event_handlers()==true)
 		return;
 
 	/* set the attribute modified flag */
@@ -4289,7 +4289,7 @@ void stop_using_event_handlers(void){
 	unsigned long attr=MODATTR_EVENT_HANDLER_ENABLED;
 
 	/* no change */
-	if(config.get_enable_event_handlers()==FALSE)
+	if(config.get_enable_event_handlers()==false)
 		return;
 
 	/* set the attribute modified flag */
@@ -4495,7 +4495,7 @@ void start_obsessing_over_service_checks(void){
 	unsigned long attr=MODATTR_OBSESSIVE_HANDLER_ENABLED;
 
 	/* no change */
-	if(config.get_obsess_over_services()==TRUE)
+	if(config.get_obsess_over_services()==true)
 		return;
 
 	/* set the attribute modified flag */
@@ -4522,7 +4522,7 @@ void stop_obsessing_over_service_checks(void){
 	unsigned long attr=MODATTR_OBSESSIVE_HANDLER_ENABLED;
 
 	/* no change */
-	if(config.get_obsess_over_services()==FALSE)
+	if(config.get_obsess_over_services()==false)
 		return;
 
 	/* set the attribute modified flag */
@@ -4549,7 +4549,7 @@ void start_obsessing_over_host_checks(void){
 	unsigned long attr=MODATTR_OBSESSIVE_HANDLER_ENABLED;
 
 	/* no change */
-	if(config.get_obsess_over_hosts()==TRUE)
+	if(config.get_obsess_over_hosts()==true)
 		return;
 
 	/* set the attribute modified flag */
@@ -4576,7 +4576,7 @@ void stop_obsessing_over_host_checks(void){
 	unsigned long attr=MODATTR_OBSESSIVE_HANDLER_ENABLED;
 
 	/* no change */
-	if(config.get_obsess_over_hosts()==FALSE)
+	if(config.get_obsess_over_hosts()==false)
 		return;
 
 	/* set the attribute modified flag */
@@ -4603,7 +4603,7 @@ void enable_service_freshness_checks(void){
 	unsigned long attr=MODATTR_FRESHNESS_CHECKS_ENABLED;
 
 	/* no change */
-	if(config.get_check_service_freshness()==TRUE)
+	if(config.get_check_service_freshness()==true)
 		return;
 
 	/* set the attribute modified flag */
@@ -4655,7 +4655,7 @@ void enable_host_freshness_checks(void){
 	unsigned long attr=MODATTR_FRESHNESS_CHECKS_ENABLED;
 
 	/* no change */
-	if(config.get_check_host_freshness()==TRUE)
+	if(config.get_check_host_freshness()==true)
 		return;
 
 	/* set the attribute modified flag */
@@ -4707,7 +4707,7 @@ void enable_all_failure_prediction(void){
 	unsigned long attr=MODATTR_FAILURE_PREDICTION_ENABLED;
 
 	/* bail out if we're already set... */
-	if(config.get_enable_failure_prediction()==TRUE)
+	if(config.get_enable_failure_prediction()==true)
 		return;
 
 	/* set the attribute modified flag */
@@ -4733,7 +4733,7 @@ void disable_all_failure_prediction(void){
 	unsigned long attr=MODATTR_FAILURE_PREDICTION_ENABLED;
 
 	/* bail out if we're already set... */
-	if(config.get_enable_failure_prediction()==FALSE)
+	if(config.get_enable_failure_prediction()==false)
 		return;
 
 	/* set the attribute modified flag */
@@ -4759,7 +4759,7 @@ void enable_performance_data(void){
 	unsigned long attr=MODATTR_PERFORMANCE_DATA_ENABLED;
 
 	/* bail out if we're already set... */
-	if(config.get_process_performance_data()==TRUE)
+	if(config.get_process_performance_data()==true)
 		return;
 
 	/* set the attribute modified flag */
@@ -4785,7 +4785,7 @@ void disable_performance_data(void){
 	unsigned long attr=MODATTR_PERFORMANCE_DATA_ENABLED;
 
 #	/* bail out if we're already set... */
-  if(config.get_process_performance_data()==FALSE)
+  if(config.get_process_performance_data()==false)
 		return;
 
 	/* set the attribute modified flag */

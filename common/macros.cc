@@ -3073,7 +3073,7 @@ int clear_summary_macros(nagios_macros *mac)
 /* sets or unsets all macro environment variables */
 int set_all_macro_environment_vars(nagios_macros *mac, int set)
 {
-  if(config.get_enable_environment_macros()==FALSE)
+  if(config.get_enable_environment_macros()==false)
 		return ERROR;
 
 	set_macrox_environment_vars(mac, set);
@@ -3105,7 +3105,7 @@ int set_macrox_environment_vars(nagios_macros *mac, int set)
 			generate_macro=TRUE;
 
 			/* skip summary macro generation if lage installation tweaks are enabled */
-			if((x>=MACRO_TOTALHOSTSUP && x<=MACRO_TOTALSERVICEPROBLEMSUNHANDLED) && config.get_use_large_installation_tweaks()==TRUE)
+			if((x>=MACRO_TOTALHOSTSUP && x<=MACRO_TOTALSERVICEPROBLEMSUNHANDLED) && config.get_use_large_installation_tweaks()==true)
 				generate_macro=FALSE;
 
 			if(mac->x[x]==NULL && generate_macro==TRUE)

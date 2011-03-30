@@ -280,7 +280,7 @@ int xsddefault_save_status_data(void){
 	        }
 
 	/* get number of items in the command buffer */
-	if(config.get_check_external_commands()==TRUE){
+	if(config.get_check_external_commands()==true){
 		pthread_mutex_lock(&external_command_buffer.buffer_lock);
 		used_external_command_buffer_slots=external_command_buffer.items;
 		high_external_command_buffer_slots=external_command_buffer.high;

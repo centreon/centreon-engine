@@ -134,7 +134,7 @@ void check_for_service_flapping(service *svc, int update, int allow_flapstart_no
 
 
 	/* don't do anything if we don't have flap detection enabled on a program-wide basis */
-	if(config.get_enable_flap_detection()==FALSE)
+	if(config.get_enable_flap_detection()==false)
 		return;
 
 	/* don't do anything if we don't have flap detection enabled for this service */
@@ -270,7 +270,7 @@ void check_for_host_flapping(host *hst, int update, int actual_check, int allow_
 
 
 	/* don't do anything if we don't have flap detection enabled on a program-wide basis */
-	if(config.get_enable_flap_detection()==FALSE)
+	if(config.get_enable_flap_detection()==false)
 		return;
 
 	/* don't do anything if we don't have flap detection enabled for this host */
@@ -492,7 +492,7 @@ void enable_flap_detection_routines(void){
 	log_debug_info(DEBUGL_FUNCTIONS,0,"enable_flap_detection_routines()\n");
 
 	/* bail out if we're already set */
-	if(config.get_enable_flap_detection()==TRUE)
+	if(config.get_enable_flap_detection()==true)
 		return;
 
 	/* set the attribute modified flag */
@@ -530,7 +530,7 @@ void disable_flap_detection_routines(void){
 	log_debug_info(DEBUGL_FUNCTIONS,0,"disable_flap_detection_routines()\n");
 
 	/* bail out if we're already set */
-	if(config.get_enable_flap_detection()==FALSE)
+	if(config.get_enable_flap_detection()==false)
 		return;
 
 	/* set the attribute modified flag */
