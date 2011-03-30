@@ -28,6 +28,10 @@
 extern "C" {
 # endif
 
+// State Logging Types
+static const unsigned int INITIAL_STATES             = 1;
+static const unsigned int CURRENT_STATES             = 2;
+
 // Logging Types
 static const unsigned int NSLOG_RUNTIME_ERROR        = 1;
 static const unsigned int NSLOG_RUNTIME_WARNING      = 2;
@@ -94,8 +98,8 @@ int write_to_log(char *buffer, unsigned long data_type, time_t *timestamp); // w
 int write_to_syslog(char const *buffer, unsigned long data_type);           // write a string to the syslog facility
 int log_service_event(service *svc);                                        // logs a service event
 int log_host_event(host *hst);                                              // logs a host event
-int log_host_states(int type, time_t *timestamp);                           // logs initial/current host states
-int log_service_states(int type, time_t *timestamp);                        // logs initial/current service states
+int log_host_states(unsigned int type, time_t *timestamp);                  // logs initial/current host states
+int log_service_states(unsigned int type, time_t *timestamp);               // logs initial/current service states
 int rotate_log_file(time_t rotation_time);                                  // rotates the main log file
 int write_log_file_info(time_t *timestamp);                                 // records log file/version info
 int open_debug_log(void);

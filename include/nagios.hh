@@ -81,21 +81,6 @@ extern "C" {
 # define HOST_DOWN			1
 # define HOST_UNREACHABLE		2
 
-/******************* STATE LOGGING TYPES **************/
-
-# define INITIAL_STATES                  1
-# define CURRENT_STATES                  2
-
-/************ SERVICE DEPENDENCY VALUES ***************/
-
-# define DEPENDENCIES_OK		0
-# define DEPENDENCIES_FAILED		1
-
-/*********** ROUTE CHECK PROPAGATION TYPES ************/
-
-# define PROPAGATE_TO_PARENT_HOSTS	1
-# define PROPAGATE_TO_CHILD_HOSTS	2
-
 /****************** SERVICE STATES ********************/
 
 # define STATE_OK			0
@@ -107,18 +92,6 @@ extern "C" {
 
 # define HOST_STATECHANGE                0
 # define SERVICE_STATECHANGE             1
-
-/***************** OBJECT CHECK TYPES *****************/
-
-# define SERVICE_CHECK                   0
-# define HOST_CHECK                      1
-
-/************ SCHEDULED DOWNTIME TYPES ****************/
-
-# define ACTIVE_DOWNTIME                 0       /* active downtime - currently in effect */
-# define PENDING_DOWNTIME                1       /* pending downtime - scheduled for the future */
-
-/****************** DATA STRUCTURES *******************/
 
 /* SCHED_INFO structure */
 typedef struct sched_info_struct{
@@ -146,20 +119,6 @@ typedef struct sched_info_struct{
 	time_t last_host_check;
         }sched_info;
 
-
-/* PASSIVE_CHECK_RESULT structure */
-typedef struct passive_check_result_struct{
-	int object_check_type;
-	char *host_name;
-	char *service_description;
-	int return_code;
-	char *output;
-	time_t check_time;
-	double latency;
-	struct passive_check_result_struct *next;
-	}passive_check_result;
-
-
 /* CIRCULAR_BUFFER structure - used by worker threads */
 typedef struct circular_buffer_struct{
 	void            **buffer;
@@ -172,7 +131,7 @@ typedef struct circular_buffer_struct{
         }circular_buffer;
 
 
-# define CHECK_STATS_BUCKETS                  15
+ # define CHECK_STATS_BUCKETS                  15
 
 /* used for tracking host and service check statistics */
 typedef struct check_stats_struct{

@@ -311,7 +311,7 @@ int log_host_event(host *hst)
 
 
 /* logs host states */
-int log_host_states(int type, time_t *timestamp)
+int log_host_states(unsigned int type, time_t *timestamp)
 {
 	char *temp_buffer=NULL;
 	char *processed_buffer=NULL;
@@ -347,7 +347,7 @@ int log_host_states(int type, time_t *timestamp)
 
 
 /* logs service states */
-int log_service_states(int type, time_t *timestamp)
+int log_service_states(unsigned int type, time_t *timestamp)
 {
 	char *temp_buffer=NULL;
 	char *processed_buffer=NULL;

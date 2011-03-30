@@ -18,6 +18,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <sys/time.h>
+
 #include "conf.hh"
 #include "nagios.hh"
 #include "comments.hh"
@@ -31,6 +33,18 @@
 #include "logging.hh"
 #include "configuration.hh"
 #include "commands.hh"
+
+// PASSIVE_CHECK_RESULT structure
+struct                 passive_check_result {
+  unsigned int         object_check_type;
+  char                 *host_name;
+  char                 *service_description;
+  int                  return_code;
+  char                 *output;
+  time_t               check_time;
+  double               latency;
+  passive_check_result *next;
+};
 
 extern com::centreon::scheduler::configuration config;
 

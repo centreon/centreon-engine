@@ -28,9 +28,17 @@
 extern "C" {
 # endif
 
+// Service Dependency Values
+static const unsigned int DEPENDENCIES_OK     = 0;
+static const unsigned int DEPENDENCIES_FAILED = 1;
+
+// Object Check Types
+static const unsigned int SERVICE_CHECK       = 0;
+static const unsigned int HOST_CHECK          = 1;
+
 // CHECK_RESULT structure
 typedef struct               check_result_struct {
-  int                        object_check_type;    // is this a service or a host check?
+  unsigned int               object_check_type;    // is this a service or a host check?
   char                       *host_name;           // host name
   char                       *service_description; // service description
   int                        check_type;           // was this an active or passive service check?
@@ -65,11 +73,11 @@ void schedule_service_check(service *svc, time_t check_time, int options);      
 void schedule_host_check(host *hst, time_t check_time, int options);                   // schedules an immediate or delayed host check
 
 // Monitoring/Event Handler Functions
-int check_service_dependencies(service *svc,int dependency_type);                      // checks service dependencies
+unsigned int check_service_dependencies(service *svc,int dependency_type);             // checks service dependencies
 void check_for_orphaned_services(void);                                                // checks for orphaned services
 void check_service_result_freshness(void);                                             // checks the "freshness" of service check results
 int is_service_result_fresh(service *temp_service, time_t current_time, int log_this); // determines if a service's check results are fresh
-int check_host_dependencies(host *hst,int dependency_type);                            // checks host dependencie
+unsigned int check_host_dependencies(host *hst,int dependency_type);                   // checks host dependencie
 void check_for_orphaned_hosts(void);                                                   // checks for orphaned hosts
 void check_host_result_freshness(void);                                                // checks the "freshness" of host check results
 int is_host_result_fresh(host *temp_host, time_t current_time, int log_this);          // determines if a host's check results are fresh

@@ -1920,7 +1920,7 @@ int check_service_check_viability(service *svc, int check_options, int *time_is_
 
 
 /* checks service dependencies */
-int check_service_dependencies(service *svc,int dependency_type){
+unsigned int check_service_dependencies(service *svc,int dependency_type){
 	servicedependency *temp_dependency=NULL;
 	service *temp_service=NULL;
 	int state=STATE_OK;
@@ -1944,7 +1944,7 @@ int check_service_dependencies(service *svc,int dependency_type){
 		/* skip this dependency if it has a timeperiod and the current time isn't valid */
 		time(&current_time);
 		if(temp_dependency->dependency_period!=NULL && check_time_against_period(current_time,temp_dependency->dependency_period_ptr)==ERROR)
-			return FALSE;
+			return DEPENDENCIES_OK;
 
 		/* get the status to use (use last hard state if its currently in a soft state) */
 		if(temp_service->state_type==SOFT_STATE && config.get_soft_state_dependencies()==false)
@@ -2318,7 +2318,7 @@ void schedule_host_check(host *hst, time_t check_time, int options){
 
 
 /* checks host dependencies */
-int check_host_dependencies(host *hst,int dependency_type){
+unsigned int check_host_dependencies(host *hst,int dependency_type){
 	hostdependency *temp_dependency=NULL;
 	host *temp_host=NULL;
 	int state=HOST_UP;
@@ -2342,7 +2342,7 @@ int check_host_dependencies(host *hst,int dependency_type){
 		/* skip this dependency if it has a timeperiod and the current time isn't valid */
 		time(&current_time);
 		if(temp_dependency->dependency_period!=NULL && check_time_against_period(current_time,temp_dependency->dependency_period_ptr)==ERROR)
-			return FALSE;
+			return DEPENDENCIES_OK;
 
 		/* get the status to use (use last hard state if its currently in a soft state) */
 		if(temp_host->state_type==SOFT_STATE && config.get_soft_state_dependencies()==false)
