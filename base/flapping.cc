@@ -48,8 +48,8 @@ extern unsigned long    modified_service_process_attributes;
 void check_for_service_flapping(service *svc, int update, int allow_flapstart_notification){
 	int update_history=TRUE;
 	int is_flapping=FALSE;
-	register unsigned int x=0;
-	register unsigned int y=0;
+	unsigned int x=0;
+	unsigned int y=0;
 	int last_state_history_value=STATE_OK;
 	double curved_changes=0.0;
 	double curved_percent_change=0.0;
@@ -173,8 +173,8 @@ void check_for_service_flapping(service *svc, int update, int allow_flapstart_no
 void check_for_host_flapping(host *hst, int update, int actual_check, int allow_flapstart_notification){
 	int update_history=TRUE;
 	int is_flapping=FALSE;
-	register unsigned int x=0;
-	register unsigned int y=0;
+	unsigned int x=0;
+	unsigned int y=0;
 	int last_state_history_value=HOST_UP;
 	unsigned long wait_threshold=0L;
 	double curved_changes=0.0;

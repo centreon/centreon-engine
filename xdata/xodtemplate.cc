@@ -517,7 +517,7 @@ int xodtemplate_process_config_dir(char *dirname, int options){
 	DIR *dirp=NULL;
 	struct dirent *dirfile=NULL;
 	int result=OK;
-	register int x=0;
+	int x=0;
 	struct stat stat_buf;
 
 	if(verify_config==TRUE)
@@ -592,11 +592,11 @@ int xodtemplate_process_config_dir(char *dirname, int options){
 int xodtemplate_process_config_file(char *filename, int options){
 	mmapfile *thefile=NULL;
 	char *input=NULL;
-	register int in_definition=FALSE;
-	register int current_line=0;
+	int in_definition=FALSE;
+	int current_line=0;
 	int result=OK;
-	register int x=0;
-	register int y=0;
+	int x=0;
+	int y=0;
 	char *ptr=NULL;
 
 
@@ -1076,8 +1076,8 @@ int xodtemplate_add_object_property(char *input, int options){
 	xodtemplate_hostescalation *temp_hostescalation=NULL;
 	xodtemplate_hostextinfo *temp_hostextinfo=NULL;
 	xodtemplate_serviceextinfo *temp_serviceextinfo=NULL;
-	register int x=0;
-	register int y=0;
+	int x=0;
+	int y=0;
 	int force_skiplists=FALSE;
 
 
@@ -3656,7 +3656,7 @@ xodtemplate_customvariablesmember *xodtemplate_add_custom_variable_to_contact(xo
 /* adds a custom variable to an object */
 xodtemplate_customvariablesmember *xodtemplate_add_custom_variable_to_object(xodtemplate_customvariablesmember **object_ptr, char *varname, char *varvalue){
 	xodtemplate_customvariablesmember *new_customvariablesmember=NULL;
-	register int x=0;
+	int x=0;
 
 	/* make sure we have the data we need */
 	if(object_ptr==NULL)
@@ -10068,7 +10068,7 @@ int xodtemplate_merge_host_extinfo_object(xodtemplate_host *this_host, xodtempla
 /* writes cached object definitions for use by web interface */
 int xodtemplate_cache_objects(char *cache_file){
 	FILE *fp=NULL;
-	register int x=0;
+	int x=0;
 	char const *days[7]={"sunday","monday","tuesday","wednesday","thursday","friday","saturday"};
 	char const *months[12]={"january","february","march","april","may","june","july","august","september","october","november","december"};
 	xodtemplate_timeperiod *temp_timeperiod=NULL;
@@ -11382,7 +11382,7 @@ int xodtemplate_free_memory(void){
 	xodtemplate_serviceextinfo *next_serviceextinfo=NULL;
 	xodtemplate_customvariablesmember *this_customvariablesmember=NULL;
 	xodtemplate_customvariablesmember *next_customvariablesmember=NULL;
-	register int x=0;
+	int x=0;
 
 
 	/* free memory allocated to timeperiod list */

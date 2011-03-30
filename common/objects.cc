@@ -3048,8 +3048,8 @@ int free_object_data(void){
 	hostdependency *next_hostdependency=NULL;
 	hostescalation *this_hostescalation=NULL;
 	hostescalation *next_hostescalation=NULL;
-	register int x=0;
-	register unsigned int i=0;
+	int x=0;
+	unsigned int i=0;
 
 
 	/**** free memory for the timeperiod list ****/

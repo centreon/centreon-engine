@@ -545,10 +545,10 @@ int get_raw_command_line_r(nagios_macros *mac, command *cmd_ptr, char const* cmd
 {
 	char temp_arg[MAX_COMMAND_BUFFER]="";
 	char *arg_buffer=NULL;
-	register unsigned int x=0;
-	register unsigned int y=0;
-	register int arg_index=0;
-	register int escaped=FALSE;
+	unsigned int x=0;
+	unsigned int y=0;
+	int arg_index=0;
+	int escaped=FALSE;
 
 	log_debug_info(DEBUGL_FUNCTIONS,0,"get_raw_command_line_r()\n");
 
@@ -1843,7 +1843,7 @@ int process_check_result_queue(char const* dirname){
 	char file[MAX_FILENAME_LENGTH];
 	DIR *dirp=NULL;
 	struct dirent *dirfile=NULL;
-	register int x=0;
+	int x=0;
 	struct stat stat_buf;
 	struct stat ok_stat_buf;
 	char *temp_buffer=NULL;
@@ -2254,8 +2254,8 @@ int parse_check_output(char *buf, char **short_output, char **long_output, char 
 	char *ptr=NULL;
 	int in_perf_data=FALSE;
 	char *tempbuf=NULL;
-	register int x=0;
-	register int y=0;
+	int x=0;
+	int y=0;
 
 	/* initialize values */
 	if(short_output)
@@ -2562,9 +2562,9 @@ char *get_next_string_from_buf(char *buf, int *start_index, int bufsize){
 
 /* determines whether or not an object name (host, service, etc) contains illegal characters */
 int contains_illegal_object_chars(char *name){
-	register int x=0;
-	register int y=0;
-	register int ch=0;
+	int x=0;
+	int y=0;
+	int ch=0;
 
 	if(name==NULL)
 		return FALSE;
@@ -2589,7 +2589,7 @@ int contains_illegal_object_chars(char *name){
 /* escapes newlines in a string */
 char *escape_newlines(char *rawbuf){
 	char *newbuf=NULL;
-	register int x,y;
+	int x,y;
 
 	if(rawbuf==NULL)
 		return NULL;
@@ -3086,7 +3086,7 @@ int shutdown_command_file_worker_thread(void){
 
 /* clean up resources used by command file worker thread */
 void cleanup_command_file_worker_thread(void *arg){
-	register int x=0;
+	int x=0;
 
 	(void)arg;
 

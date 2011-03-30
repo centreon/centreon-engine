@@ -133,7 +133,7 @@ int skiplist_insert(skiplist *list, void *data){
 
 skiplistnode *skiplist_new_node(skiplist *list, int node_levels){
 	skiplistnode *newnode=NULL;
-	register int x=0;
+	int x=0;
 
 	if(list==NULL)
 		return NULL;

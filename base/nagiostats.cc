@@ -1708,9 +1708,9 @@ int read_nagiostats_file(void){
 
 /* strip newline, carriage return, and tab characters from beginning and end of a string */
 void strip(char *buffer){
-	register int x;
-	register int y;
-	register int z;
+	int x;
+	int y;
+	int z;
 
 	if(buffer==NULL || buffer[0]=='\x0')
 		return;
