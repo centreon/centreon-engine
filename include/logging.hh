@@ -91,7 +91,7 @@ static const unsigned int DEBUGV_MOST                = 2;
 
 // Logging Functions
 void logit(int data_type, int display, const char *fmt, ...) __attribute__((__format__(__printf__, 3, 4)));
-int log_debug_info(int level, int verbosity, const char *fmt, ...) __attribute__((__format__(__printf__, 3, 4)));
+int log_debug_info(int level, unsigned int verbosity, const char *fmt, ...) __attribute__((__format__(__printf__, 3, 4)));
 
 int write_to_all_logs(char *buffer, unsigned long data_type);               // writes a string to main log file and syslog facility
 int write_to_log(char *buffer, unsigned long data_type, time_t *timestamp); // write a string to the main log file

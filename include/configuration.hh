@@ -91,7 +91,6 @@ namespace com {
 	void                reset();
 	void                parse(std::string const& filename);
 
-	std::string const&  get_auth_file() const throw();
 	std::string const&  get_log_file() const throw();
 	std::string const&  get_debug_file() const throw();
 	std::string const&  get_command_file() const throw();
@@ -109,7 +108,7 @@ namespace com {
 	std::string const&  get_use_timezone() const throw();
 	int                 get_additional_freshness_latency() const throw();
 	unsigned int        get_debug_level() const throw();
-	int                 get_debug_verbosity() const throw();
+	unsigned int        get_debug_verbosity() const throw();
 	int                 get_command_check_interval() const throw();
 	int                 get_external_command_buffer_slots() const throw();
 	unsigned int        get_max_service_check_spread() const throw();
@@ -196,7 +195,6 @@ namespace com {
 	e_inter_check_delay get_host_inter_check_delay_method() const throw();
 	e_interleave_factor get_service_interleave_factor_method() const throw();
 
-	void                set_auth_file(std::string const& value);
 	void                set_log_file(std::string const& value);
 	void                set_debug_file(std::string const& value);
 	void                set_command_file(std::string const& value);
@@ -214,7 +212,7 @@ namespace com {
         void                set_use_timezone(std::string const& value);
 	void                set_additional_freshness_latency(int value);
 	void                set_debug_level(unsigned int value);
-	void                set_debug_verbosity(int value);
+	void                set_debug_verbosity(unsigned int value);
 	void                set_command_check_interval(int value);
 	void                set_command_check_interval(std::string const& value);
         void                set_external_command_buffer_slots(int value);
@@ -314,8 +312,7 @@ namespace com {
 	 *  List all string variable
 	 */
 	enum e_var_string {
-	  auth_file = 0,
-	  log_file,
+	  log_file = 0,
 	  debug_file,
 	  command_file,
 	  temp_file,
@@ -369,7 +366,6 @@ namespace com {
 	 */
 	enum e_var_int {
 	  additional_freshness_latency = 0,
-	  debug_verbosity,
 	  command_check_interval,
 	  external_command_buffer_slots,
 	  free_child_process_memory,
@@ -383,6 +379,7 @@ namespace com {
 	 */
 	enum e_var_uint {
 	  debug_level = 0,
+	  debug_verbosity,
 	  max_service_check_spread,
 	  max_host_check_spread,
 	  max_concurrent_checks,
@@ -461,8 +458,10 @@ namespace com {
 	  max_bool
 	};
 
+	void                _reset();
  	void                _parse_resource_file(std::string const& value);
 
+	void                _set_auth_file(std::string const& value);
 	void                _set_admin_email(std::string const& value);
 	void                _set_admin_pager(std::string const& value);
 	void                _set_retained_service_attribute_mask(std::string const& value);

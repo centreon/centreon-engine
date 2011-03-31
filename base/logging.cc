@@ -512,7 +512,7 @@ int close_debug_log(void){
 
 
 /* write to the debug log */
-int log_debug_info(int level, int verbosity, const char *fmt, ...){
+int log_debug_info(int level, unsigned int verbosity, const char *fmt, ...){
 	va_list ap;
 	char *temp_path=NULL;
 	struct timeval current_time;

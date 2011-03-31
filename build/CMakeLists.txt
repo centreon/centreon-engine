@@ -425,14 +425,15 @@ add_executable("centschedulerstats"
   "${BASE_DIR}/nagiostats.cc"
 )
 
-# # test configuration target.
-# add_executable("test_configuration"
-#   "${TEST_DIR}/test_configuration.cc")
-# target_link_libraries("test_configuration"
-#   ${DL_LIBRARIES}
-#   ${THREAD_LIBRARIES}
-#   ${PERL_LINK_FLAGS}
-#   "schedulerlib")
+# test configuration target.
+add_executable("test_configuration"
+  "${TEST_DIR}/test_configuration.cc"
+  "${BASE_DIR}/configuration.cc"
+  "${COMMON_DIR}/error.cc")
+
+add_test("test_configuration_basic"
+  "test_configuration"
+  "test.cfg")
 
 # Package.
 set(CPACK_PACKAGE_NAME "Centreon-Scheduler")

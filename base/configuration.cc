@@ -66,7 +66,7 @@ configuration::configuration()
   _lst_method["resource_file"]                               = &cpp_suck<std::string const&, &configuration::_parse_resource_file>::set_generic;;
   _lst_method["log_file"]                                    = &cpp_suck<std::string const&, &configuration::set_log_file>::set_generic;
   _lst_method["debug_level"]                                 = &cpp_suck<unsigned int, &configuration::set_debug_level>::set_generic;
-  _lst_method["debug_verbosity"]                             = &cpp_suck<int, &configuration::set_debug_verbosity>::set_generic;
+  _lst_method["debug_verbosity"]                             = &cpp_suck<unsigned int, &configuration::set_debug_verbosity>::set_generic;
   _lst_method["debug_file"]                                  = &cpp_suck<std::string const&, &configuration::set_debug_file>::set_generic;
   _lst_method["max_debug_file_size"]                         = &cpp_suck<unsigned long, &configuration::set_max_debug_file_size>::set_generic;
   _lst_method["command_file"]                                = &cpp_suck<std::string const&, &configuration::set_command_file>::set_generic;
@@ -173,7 +173,7 @@ configuration::configuration()
   _lst_method["enable_embedded_perl"]                        = &cpp_suck<bool, &configuration::set_enable_embedded_perl>::set_generic;
   _lst_method["use_embedded_perl_implicitly"]                = &cpp_suck<bool, &configuration::set_use_embedded_perl_implicitly>::set_generic;
   _lst_method["external_command_buffer_slots"]               = &cpp_suck<int, &configuration::set_external_command_buffer_slots>::set_generic;
-  _lst_method["auth_file"]                                   = &cpp_suck<std::string const&, &configuration::set_auth_file>::set_generic;
+  _lst_method["auth_file"]                                   = &cpp_suck<std::string const&, &configuration::_set_auth_file>::set_generic;
   _lst_method["bare_update_check"]                           = &cpp_suck<std::string const&, &configuration::_set_bare_update_check>::set_generic;
   _lst_method["check_for_updates"]                           = &cpp_suck<std::string const&, &configuration::_set_check_for_updates>::set_generic;
   _lst_method["comment_file"]                                = &cpp_suck<std::string const&, &configuration::_set_comment_file>::set_generic;
@@ -194,10 +194,14 @@ configuration::configuration()
   _lst_method["object_cache_file"]                           = NULL;
   _lst_method["precached_object_file"]                       = NULL;
 
-  reset();
+  _reset();
 
   set_accept_passive_host_checks(DEFAULT_ACCEPT_PASSIVE_HOST_CHECKS);
   set_allow_empty_hostgroup_assignment(DEFAULT_ALLOW_EMPTY_HOSTGROUP_ASSIGNMENT);
+
+  _tab_string[temp_path] = DEFAULT_TEMP_PATH;
+  _tab_string[check_result_path] = DEFAULT_CHECK_RESULT_PATH;
+  _tab_string[log_archive_path] = DEFAULT_LOG_ARCHIVE_PATH;
 }
 
 /**
@@ -255,134 +259,12 @@ configuration& configuration::operator=(configuration const& right) {
  *  Reset variable
  */
 void configuration::reset() {
-  set_log_file(DEFAULT_LOG_FILE);
-  set_temp_file(DEFAULT_TEMP_FILE);
+  _reset();
+
   set_temp_path(DEFAULT_TEMP_PATH);
   set_check_result_path(DEFAULT_CHECK_RESULT_PATH);
-  set_command_file(DEFAULT_COMMAND_FILE);
-  set_auth_file(DEFAULT_AUTH_FILE);
-  set_p1_file(DEFAULT_P1_FILE);
   set_log_archive_path(DEFAULT_LOG_ARCHIVE_PATH);
-  set_debug_file(DEFAULT_DEBUG_FILE);
-
-  set_use_regexp_matches(DEFAULT_USE_REGEXP_MATCHES);
-  set_use_true_regexp_matching(DEFAULT_USE_TRUE_REGEXP_MATCHING);
-
-  set_use_syslog(DEFAULT_USE_SYSLOG);
-  set_log_service_retries(DEFAULT_LOG_SERVICE_RETRIES);
-  set_log_host_retries(DEFAULT_LOG_HOST_RETRIES);
-  set_log_initial_states(DEFAULT_LOG_INITIAL_STATES);
-
-  set_log_notifications(DEFAULT_NOTIFICATION_LOGGING);
-  set_log_event_handlers(DEFAULT_LOG_EVENT_HANDLERS);
-  set_log_external_commands(DEFAULT_LOG_EXTERNAL_COMMANDS);
-  set_log_passive_checks(DEFAULT_LOG_PASSIVE_CHECKS);
-
-  set_service_check_timeout(DEFAULT_SERVICE_CHECK_TIMEOUT);
-  set_host_check_timeout(DEFAULT_HOST_CHECK_TIMEOUT);
-  set_event_handler_timeout(DEFAULT_EVENT_HANDLER_TIMEOUT);
-  set_notification_timeout(DEFAULT_NOTIFICATION_TIMEOUT);
-  set_ocsp_timeout(DEFAULT_OCSP_TIMEOUT);
-  set_ochp_timeout(DEFAULT_OCHP_TIMEOUT);
-
-  set_sleep_time(DEFAULT_SLEEP_TIME);
-  set_interval_length(DEFAULT_INTERVAL_LENGTH);
-  set_service_inter_check_delay_method(DEFAULT_SERVICE_INTER_CHECK_DELAY_METHOD);
-  set_host_inter_check_delay_method(DEFAULT_HOST_INTER_CHECK_DELAY_METHOD);
-  set_service_interleave_factor_method(DEFAULT_SERVICE_INTERLEAVE_FACTOR_METHOD);
-  set_max_service_check_spread(DEFAULT_SERVICE_CHECK_SPREAD);
-  set_max_host_check_spread(DEFAULT_HOST_CHECK_SPREAD);
-
-  set_use_aggressive_host_checking(DEFAULT_AGGRESSIVE_HOST_CHECKING);
-  set_cached_host_check_horizon(DEFAULT_CACHED_HOST_CHECK_HORIZON);
-  set_cached_service_check_horizon(DEFAULT_CACHED_SERVICE_CHECK_HORIZON);
-  set_enable_predictive_host_dependency_checks(DEFAULT_ENABLE_PREDICTIVE_HOST_DEPENDENCY_CHECKS);
-  set_enable_predictive_service_dependency_checks(DEFAULT_ENABLE_PREDICTIVE_SERVICE_DEPENDENCY_CHECKS);
-
-  set_command_check_interval(DEFAULT_COMMAND_CHECK_INTERVAL);
-  set_check_reaper_interval(DEFAULT_CHECK_REAPER_INTERVAL);
-  set_max_check_reaper_time(DEFAULT_MAX_REAPER_TIME);
-  set_max_check_result_file_age(DEFAULT_MAX_CHECK_RESULT_AGE);
-  set_service_freshness_check_interval(DEFAULT_FRESHNESS_CHECK_INTERVAL);
-  set_host_freshness_check_interval(DEFAULT_FRESHNESS_CHECK_INTERVAL);
-  set_auto_rescheduling_interval(DEFAULT_AUTO_RESCHEDULING_INTERVAL);
-  set_auto_rescheduling_window(DEFAULT_AUTO_RESCHEDULING_WINDOW);
-
-  set_check_external_commands(DEFAULT_CHECK_EXTERNAL_COMMANDS);
-  set_check_orphaned_services(DEFAULT_CHECK_ORPHANED_SERVICES);
-  set_check_orphaned_hosts(DEFAULT_CHECK_ORPHANED_HOSTS);
-  set_check_service_freshness(DEFAULT_CHECK_SERVICE_FRESHNESS);
-  set_check_host_freshness(DEFAULT_CHECK_HOST_FRESHNESS);
-  set_auto_reschedule_checks(DEFAULT_AUTO_RESCHEDULE_CHECKS);
-
-  set_soft_state_dependencies(DEFAULT_SOFT_STATE_DEPENDENCIES);
-
-  set_retain_state_information(DEFAULT_RETAIN_STATE_INFORMATION);
-  set_retention_update_interval(DEFAULT_RETENTION_UPDATE_INTERVAL);
-  set_use_retained_program_state(DEFAULT_USE_RETAINED_PROGRAM_STATE);
-  set_use_retained_scheduling_info(DEFAULT_USE_RETAINED_SCHEDULING_INFO);
-  set_retention_scheduling_horizon(DEFAULT_RETENTION_SCHEDULING_HORIZON);
-  set_retained_host_attribute_mask(DEFAULT_RETAINED_HOST_ATTRIBUTE_MASK);
-  set_retained_process_host_attribute_mask(DEFAULT_RETAINED_PROCESS_HOST_ATTRIBUTE_MASK);
-  set_retained_contact_host_attribute_mask(DEFAULT_RETAINED_CONTACT_HOST_ATTRIBUTE_MASK);
-  set_retained_contact_service_attribute_mask(DEFAULT_RETAINED_CONTACT_SERVICE_ATTRIBUTE_MASK);
-
-  set_log_rotation_method(DEFAULT_LOG_ROTATION);
-
-  set_max_parallel_service_checks(DEFAULT_MAX_PARALLEL_SERVICE_CHECKS);
-
-  set_enable_notifications(DEFAULT_ENABLE_NOTIFICATIONS);
-  set_execute_service_checks(DEFAULT_EXECUTE_SERVICE_CHECKS);
-  set_accept_passive_service_checks(DEFAULT_ACCEPT_PASSIVE_SERVICE_CHECKS);
-  set_execute_host_checks(DEFAULT_EXECUTE_HOST_CHECKS);
-  set_accept_passive_service_checks(DEFAULT_ACCEPT_PASSIVE_SERVICE_CHECKS);
-  set_enable_event_handlers(DEFAULT_ENABLE_EVENT_HANDLERS);
-  set_obsess_over_services(DEFAULT_OBSESS_OVER_SERVICES);
-  set_obsess_over_hosts(DEFAULT_OBSESS_OVER_HOSTS);
-  set_enable_failure_prediction(DEFAULT_ENABLE_FAILURE_PREDICTION);
-
-  set_status_update_interval(DEFAULT_STATUS_UPDATE_INTERVAL);
-
-  set_event_broker_options(DEFAULT_EVENT_BROKER_OPTIONS);
-
-  set_time_change_threshold(DEFAULT_TIME_CHANGE_THRESHOLD);
-
-  set_enable_flap_detection(DEFAULT_ENABLE_FLAP_DETECTION);
-  set_low_service_flap_threshold(DEFAULT_LOW_SERVICE_FLAP_THRESHOLD);
-  set_high_service_flap_threshold(DEFAULT_HIGH_SERVICE_FLAP_THRESHOLD);
-  set_low_host_flap_threshold(DEFAULT_LOW_HOST_FLAP_THRESHOLD);
-  set_high_host_flap_threshold(DEFAULT_HIGH_HOST_FLAP_THRESHOLD);
-
-  set_process_performance_data(DEFAULT_PROCESS_PERFORMANCE_DATA);
-
-  set_translate_passive_host_checks(DEFAULT_TRANSLATE_PASSIVE_HOST_CHECKS);
-  set_passive_host_checks_are_soft(DEFAULT_PASSIVE_HOST_CHECKS_SOFT);
-
-  set_use_large_installation_tweaks(DEFAULT_USE_LARGE_INSTALLATION_TWEAKS);
-  set_enable_environment_macros(DEFAULT_ENABLE_ENVIRONMENT_MACROS);
-  set_free_child_process_memory(DEFAULT_FREE_CHILD_PROCESS_MEMORY);
-  set_child_processes_fork_twice(DEFAULT_CHILD_PROCESSES_FORK_TWICE);
-
-  set_additional_freshness_latency(DEFAULT_ADDITIONAL_FRESHNESS_LATENCY);
-
-  set_enable_embedded_perl(DEFAULT_ENABLE_EMBEDDED_PERL);
-  set_use_embedded_perl_implicitly(DEFAULT_USE_EMBEDDED_PERL_IMPLICITLY);
-
-  set_external_command_buffer_slots(DEFAULT_EXTERNAL_COMMAND_BUFFER_SLOTS);
-
-  set_debug_level(DEFAULT_DEBUG_LEVEL);
-  set_debug_verbosity(DEFAULT_DEBUG_VERBOSITY);
-  set_max_debug_file_size(DEFAULT_MAX_DEBUG_FILE_SIZE);
-
-  set_date_format(DEFAULT_DATE_FORMAT);
-
-  set_global_host_event_handler("");
-  set_global_service_event_handler("");
-
-  set_ocsp_command("");
-  set_ochp_command("");
 }
-
 
 /**
  *  Parse configuration file
@@ -398,7 +280,6 @@ void configuration::parse(std::string const& filename)
   }
 
   _filename = filename;
-
   _command_check_interval_is_seconds = false;
   for (_cur_line = 1; !ifs.eof(); ++_cur_line) {
       std::string line = _getline(ifs);
@@ -433,6 +314,7 @@ void configuration::parse(std::string const& filename)
       	       << "] unknown variable name: `" << key << "'");
       }
   }
+  ifs.close();
 
   if (_tab_string[log_file] == "") {
     throw (error() << "log_file is not specified anywhere in `" << _filename << "'");
@@ -445,26 +327,21 @@ void configuration::parse(std::string const& filename)
 
   // adjust tweaks
   if(_tab_int[free_child_process_memory] == -1) {
-    _tab_bool[free_child_process_memory] = !_tab_bool[use_large_installation_tweaks];
+    _tab_int[free_child_process_memory] = !_tab_bool[use_large_installation_tweaks];
   }
   if (_tab_int[child_processes_fork_twice] == -1) {
-    _tab_bool[child_processes_fork_twice] = !_tab_bool[use_large_installation_tweaks];
+    _tab_int[child_processes_fork_twice] = !_tab_bool[use_large_installation_tweaks];
   }
 
   my_free(_mac->x[MACRO_MAINCONFIGFILE]);
-  if ((_mac->x[MACRO_MAINCONFIGFILE] = strdup(_filename.c_str()))) {
+  if ((_mac->x[MACRO_MAINCONFIGFILE] = strdup(_filename.c_str())) == NULL) {
     throw (error() << "cannot allocate memory");
   }
 
-  ifs.close();
-}
-
-/**
- *  Get the auth filename.
- *  @return The auth filename.
- */
-std::string const& configuration::get_auth_file() const throw() {
-  return (_tab_string[auth_file]);
+  // check path
+  set_temp_path(get_temp_path());
+  set_check_result_path(get_check_result_path());
+  set_log_archive_path(get_log_archive_path());
 }
 
 /**
@@ -607,8 +484,8 @@ unsigned int configuration::get_debug_level() const throw() {
  *  Get the debug verbosity.
  *  @return The debug verbosity.
  */
-int configuration::get_debug_verbosity() const throw() {
-  return (_tab_int[debug_verbosity]);
+unsigned int configuration::get_debug_verbosity() const throw() {
+  return (_tab_uint[debug_verbosity]);
 }
 
 /**
@@ -1292,17 +1169,6 @@ configuration::e_interleave_factor configuration::get_service_interleave_factor_
 }
 
 /**
- *  Set the auth filename.
- *  @param[in] value The filename.
- */
-void configuration::set_auth_file(std::string const& value) {
-  if (pathconf(value.c_str(), _PC_PATH_MAX) == -1) {
-    throw (error() << "auth_file: invalid value");
-  }
-  _tab_string[auth_file] = value;
-}
-
-/**
  *  Set the logging filename.
  *  @param[in] value The filename.
  */
@@ -1313,7 +1179,9 @@ void configuration::set_log_file(std::string const& value) {
   _tab_string[log_file] = value;
 
   my_free(_mac->x[MACRO_LOGFILE]);
-  _mac->x[MACRO_LOGFILE] = strdup(value.c_str());
+  if ((_mac->x[MACRO_LOGFILE] = strdup(value.c_str())) == NULL) {
+    throw (error() << "cannot allocate memory");
+  }
 }
 
 /**
@@ -1338,7 +1206,9 @@ void configuration::set_command_file(std::string const& value) {
   _tab_string[command_file] = value;
 
   my_free(_mac->x[MACRO_COMMANDFILE]);
-  _mac->x[MACRO_COMMANDFILE] = strdup(value.c_str());
+  if ((_mac->x[MACRO_COMMANDFILE] = strdup(value.c_str())) == NULL) {
+    throw (error() << "cannot allocate memory");
+  }
 }
 
 /**
@@ -1352,7 +1222,9 @@ void configuration::set_temp_file(std::string const& value) {
   _tab_string[temp_file] = value;
 
   my_free(_mac->x[MACRO_TEMPFILE]);
-  _mac->x[MACRO_TEMPFILE] = strdup(value.c_str());
+  if ((_mac->x[MACRO_TEMPFILE] = strdup(value.c_str())) == NULL) {
+    throw (error() << "cannot allocate memory");
+  }
 }
 
 /**
@@ -1368,7 +1240,9 @@ void configuration::set_temp_path(std::string const& value) {
   _tab_string[temp_path] = value;
 
   my_free(_mac->x[MACRO_TEMPPATH]);
-  _mac->x[MACRO_TEMPPATH] = strdup(value.c_str());
+  if ((_mac->x[MACRO_TEMPPATH] = strdup(value.c_str())) == NULL) {
+    throw (error() << "cannot allocate memory");
+  }
 }
 
 /**
@@ -1484,8 +1358,8 @@ void configuration::set_debug_level(unsigned int value) {
  *  Set the debug verbosity.
  *  @param[in] value The verbosity.
  */
-void configuration::set_debug_verbosity(int value) {
-  _tab_int[debug_verbosity] = value;
+void configuration::set_debug_verbosity(unsigned int value) {
+  _tab_uint[debug_verbosity] = value;
 }
 
 /**
@@ -1502,7 +1376,7 @@ void configuration::set_command_check_interval(int value) {
   // adjust command check interval
   if (_command_check_interval_is_seconds == false &&
       _tab_int[command_check_interval] != -1) {
-    _tab_int[command_check_interval] *= _tab_int[interval_length];
+    _tab_int[command_check_interval] *= _tab_uint[interval_length];
   }
 }
 
@@ -1522,7 +1396,7 @@ void configuration::set_command_check_interval(std::string const& value) {
     val.erase(val.begin() + pos);
   }
 
-  cpp_suck<int, &configuration::set_command_check_interval>::set_generic(value, *this);
+  cpp_suck<int, &configuration::set_command_check_interval>::set_generic(val, *this);
 }
 
 /**
@@ -1601,7 +1475,16 @@ void configuration::set_interval_length(unsigned int value) {
   if (value == 0) {
     throw (error() << "interval_length: invalid value");
   }
-  _tab_uint[interval_length] = value;
+
+  if (_command_check_interval_is_seconds == false &&
+      _tab_int[command_check_interval] != -1) {
+    _tab_int[command_check_interval] /= _tab_uint[interval_length];
+    _tab_uint[interval_length] = value;
+    _tab_int[command_check_interval] *= _tab_uint[interval_length];
+  }
+  else {
+    _tab_uint[interval_length] = value;
+  }
 }
 
 /**
@@ -2152,7 +2035,7 @@ void configuration::set_enable_environment_macros(bool value) {
  *  @param[in] value The free child process memory.
  */
 void configuration::set_free_child_process_memory(bool value) {
-  _tab_bool[free_child_process_memory] = value;
+  _tab_int[free_child_process_memory] = value;
 }
 
 /**
@@ -2160,7 +2043,7 @@ void configuration::set_free_child_process_memory(bool value) {
  *  @param[in] value The child processes fork twice.
  */
 void configuration::set_child_processes_fork_twice(bool value) {
-  _tab_bool[child_processes_fork_twice] = value;
+  _tab_int[child_processes_fork_twice] = value;
 }
 
 /**
@@ -2445,6 +2328,135 @@ std::string& configuration::_trim(std::string& str) throw() {
 }
 
 /**
+ *  Reset variable
+ */
+void configuration::_reset() {
+  set_log_file(DEFAULT_LOG_FILE);
+  set_temp_file(DEFAULT_TEMP_FILE);
+  set_command_file(DEFAULT_COMMAND_FILE);
+  set_p1_file(DEFAULT_P1_FILE);
+  set_debug_file(DEFAULT_DEBUG_FILE);
+
+
+  set_use_regexp_matches(DEFAULT_USE_REGEXP_MATCHES);
+  set_use_true_regexp_matching(DEFAULT_USE_TRUE_REGEXP_MATCHING);
+
+  set_use_syslog(DEFAULT_USE_SYSLOG);
+  set_log_service_retries(DEFAULT_LOG_SERVICE_RETRIES);
+  set_log_host_retries(DEFAULT_LOG_HOST_RETRIES);
+  set_log_initial_states(DEFAULT_LOG_INITIAL_STATES);
+
+  set_log_notifications(DEFAULT_NOTIFICATION_LOGGING);
+  set_log_event_handlers(DEFAULT_LOG_EVENT_HANDLERS);
+  set_log_external_commands(DEFAULT_LOG_EXTERNAL_COMMANDS);
+  set_log_passive_checks(DEFAULT_LOG_PASSIVE_CHECKS);
+
+  set_service_check_timeout(DEFAULT_SERVICE_CHECK_TIMEOUT);
+  set_host_check_timeout(DEFAULT_HOST_CHECK_TIMEOUT);
+  set_event_handler_timeout(DEFAULT_EVENT_HANDLER_TIMEOUT);
+  set_notification_timeout(DEFAULT_NOTIFICATION_TIMEOUT);
+  set_ocsp_timeout(DEFAULT_OCSP_TIMEOUT);
+  set_ochp_timeout(DEFAULT_OCHP_TIMEOUT);
+
+  set_sleep_time(DEFAULT_SLEEP_TIME);
+  _tab_uint[interval_length] = DEFAULT_INTERVAL_LENGTH;
+  set_service_inter_check_delay_method(DEFAULT_SERVICE_INTER_CHECK_DELAY_METHOD);
+  set_host_inter_check_delay_method(DEFAULT_HOST_INTER_CHECK_DELAY_METHOD);
+  set_service_interleave_factor_method(DEFAULT_SERVICE_INTERLEAVE_FACTOR_METHOD);
+  set_max_service_check_spread(DEFAULT_SERVICE_CHECK_SPREAD);
+  set_max_host_check_spread(DEFAULT_HOST_CHECK_SPREAD);
+
+  set_use_aggressive_host_checking(DEFAULT_AGGRESSIVE_HOST_CHECKING);
+  set_cached_host_check_horizon(DEFAULT_CACHED_HOST_CHECK_HORIZON);
+  set_cached_service_check_horizon(DEFAULT_CACHED_SERVICE_CHECK_HORIZON);
+  set_enable_predictive_host_dependency_checks(DEFAULT_ENABLE_PREDICTIVE_HOST_DEPENDENCY_CHECKS);
+  set_enable_predictive_service_dependency_checks(DEFAULT_ENABLE_PREDICTIVE_SERVICE_DEPENDENCY_CHECKS);
+
+  set_command_check_interval(DEFAULT_COMMAND_CHECK_INTERVAL);
+  set_check_reaper_interval(DEFAULT_CHECK_REAPER_INTERVAL);
+  set_max_check_reaper_time(DEFAULT_MAX_REAPER_TIME);
+  set_max_check_result_file_age(DEFAULT_MAX_CHECK_RESULT_AGE);
+  set_service_freshness_check_interval(DEFAULT_FRESHNESS_CHECK_INTERVAL);
+  set_host_freshness_check_interval(DEFAULT_FRESHNESS_CHECK_INTERVAL);
+  set_auto_rescheduling_interval(DEFAULT_AUTO_RESCHEDULING_INTERVAL);
+  set_auto_rescheduling_window(DEFAULT_AUTO_RESCHEDULING_WINDOW);
+
+  set_check_external_commands(DEFAULT_CHECK_EXTERNAL_COMMANDS);
+  set_check_orphaned_services(DEFAULT_CHECK_ORPHANED_SERVICES);
+  set_check_orphaned_hosts(DEFAULT_CHECK_ORPHANED_HOSTS);
+  set_check_service_freshness(DEFAULT_CHECK_SERVICE_FRESHNESS);
+  set_check_host_freshness(DEFAULT_CHECK_HOST_FRESHNESS);
+  set_auto_reschedule_checks(DEFAULT_AUTO_RESCHEDULE_CHECKS);
+
+  set_soft_state_dependencies(DEFAULT_SOFT_STATE_DEPENDENCIES);
+
+  set_retain_state_information(DEFAULT_RETAIN_STATE_INFORMATION);
+  set_retention_update_interval(DEFAULT_RETENTION_UPDATE_INTERVAL);
+  set_use_retained_program_state(DEFAULT_USE_RETAINED_PROGRAM_STATE);
+  set_use_retained_scheduling_info(DEFAULT_USE_RETAINED_SCHEDULING_INFO);
+  set_retention_scheduling_horizon(DEFAULT_RETENTION_SCHEDULING_HORIZON);
+  set_retained_host_attribute_mask(DEFAULT_RETAINED_HOST_ATTRIBUTE_MASK);
+  set_retained_process_host_attribute_mask(DEFAULT_RETAINED_PROCESS_HOST_ATTRIBUTE_MASK);
+  set_retained_contact_host_attribute_mask(DEFAULT_RETAINED_CONTACT_HOST_ATTRIBUTE_MASK);
+  set_retained_contact_service_attribute_mask(DEFAULT_RETAINED_CONTACT_SERVICE_ATTRIBUTE_MASK);
+
+  set_log_rotation_method(DEFAULT_LOG_ROTATION);
+
+  set_max_parallel_service_checks(DEFAULT_MAX_PARALLEL_SERVICE_CHECKS);
+
+  set_enable_notifications(DEFAULT_ENABLE_NOTIFICATIONS);
+  set_execute_service_checks(DEFAULT_EXECUTE_SERVICE_CHECKS);
+  set_accept_passive_service_checks(DEFAULT_ACCEPT_PASSIVE_SERVICE_CHECKS);
+  set_execute_host_checks(DEFAULT_EXECUTE_HOST_CHECKS);
+  set_accept_passive_service_checks(DEFAULT_ACCEPT_PASSIVE_SERVICE_CHECKS);
+  set_enable_event_handlers(DEFAULT_ENABLE_EVENT_HANDLERS);
+  set_obsess_over_services(DEFAULT_OBSESS_OVER_SERVICES);
+  set_obsess_over_hosts(DEFAULT_OBSESS_OVER_HOSTS);
+  set_enable_failure_prediction(DEFAULT_ENABLE_FAILURE_PREDICTION);
+
+  set_status_update_interval(DEFAULT_STATUS_UPDATE_INTERVAL);
+
+  set_event_broker_options(DEFAULT_EVENT_BROKER_OPTIONS);
+
+  set_time_change_threshold(DEFAULT_TIME_CHANGE_THRESHOLD);
+
+  set_enable_flap_detection(DEFAULT_ENABLE_FLAP_DETECTION);
+  set_low_service_flap_threshold(DEFAULT_LOW_SERVICE_FLAP_THRESHOLD);
+  set_high_service_flap_threshold(DEFAULT_HIGH_SERVICE_FLAP_THRESHOLD);
+  set_low_host_flap_threshold(DEFAULT_LOW_HOST_FLAP_THRESHOLD);
+  set_high_host_flap_threshold(DEFAULT_HIGH_HOST_FLAP_THRESHOLD);
+
+  set_process_performance_data(DEFAULT_PROCESS_PERFORMANCE_DATA);
+
+  set_translate_passive_host_checks(DEFAULT_TRANSLATE_PASSIVE_HOST_CHECKS);
+  set_passive_host_checks_are_soft(DEFAULT_PASSIVE_HOST_CHECKS_SOFT);
+
+  set_use_large_installation_tweaks(DEFAULT_USE_LARGE_INSTALLATION_TWEAKS);
+  set_enable_environment_macros(DEFAULT_ENABLE_ENVIRONMENT_MACROS);
+  set_free_child_process_memory(DEFAULT_FREE_CHILD_PROCESS_MEMORY);
+  _tab_int[child_processes_fork_twice] = DEFAULT_CHILD_PROCESSES_FORK_TWICE;
+
+  set_additional_freshness_latency(DEFAULT_ADDITIONAL_FRESHNESS_LATENCY);
+
+  set_enable_embedded_perl(DEFAULT_ENABLE_EMBEDDED_PERL);
+  set_use_embedded_perl_implicitly(DEFAULT_USE_EMBEDDED_PERL_IMPLICITLY);
+
+  set_external_command_buffer_slots(DEFAULT_EXTERNAL_COMMAND_BUFFER_SLOTS);
+
+  set_debug_level(DEFAULT_DEBUG_LEVEL);
+  set_debug_verbosity(DEFAULT_DEBUG_VERBOSITY);
+  set_max_debug_file_size(DEFAULT_MAX_DEBUG_FILE_SIZE);
+
+  set_date_format(DEFAULT_DATE_FORMAT);
+
+  set_global_host_event_handler("");
+  set_global_service_event_handler("");
+
+  set_ocsp_command("");
+  set_ochp_command("");
+}
+
+/**
  *  Parse the resource file.
  *  @param[in] value The filename.
  */
@@ -2483,7 +2495,9 @@ void configuration::_parse_resource_file(std::string const& value) {
 
       std::string value = line.substr(pos + 1);
       my_free(macro_user[user_index]);
-      macro_user[user_index] = strdup(_trim(value).c_str());
+      if ((macro_user[user_index] = strdup(_trim(value).c_str())) == NULL) {
+	throw (error() << "cannot allocate memory");
+      }
     }
     else {
       logit(NSLOG_CONFIG_WARNING, TRUE, "Warning: [%s:%d] bad variable name `%s'",
@@ -2497,7 +2511,18 @@ void configuration::_parse_resource_file(std::string const& value) {
   ifs.close();
 
   my_free(_mac->x[MACRO_RESOURCEFILE]);
-  _mac->x[MACRO_RESOURCEFILE] = strdup(value.c_str());
+  if ((_mac->x[MACRO_RESOURCEFILE] = strdup(value.c_str())) == NULL) {
+    throw (error() << "cannot allocate memory");
+  }
+}
+
+/**
+ *  Set the auth filename.
+ *  @param[in] value The filename.
+ */
+void configuration::_set_auth_file(std::string const& value) {
+  (void)value;
+  logit(NSLOG_CONFIG_WARNING, TRUE, "Warning: auth_file variable ignored.");
 }
 
 /**
@@ -2506,7 +2531,9 @@ void configuration::_parse_resource_file(std::string const& value) {
  */
 void configuration::_set_admin_email(std::string const& value) {
   my_free(_mac->x[MACRO_ADMINEMAIL]);
-  _mac->x[MACRO_ADMINEMAIL] = strdup(value.c_str());
+  if ((_mac->x[MACRO_ADMINEMAIL] = strdup(value.c_str())) == NULL) {
+    throw (error() << "cannot allocate memory");
+  }
 }
 
 /**
@@ -2515,7 +2542,9 @@ void configuration::_set_admin_email(std::string const& value) {
  */
 void configuration::_set_admin_pager(std::string const& value) {
   my_free(_mac->x[MACRO_ADMINPAGER]);
-  _mac->x[MACRO_ADMINPAGER] = strdup(value.c_str());
+  if ((_mac->x[MACRO_ADMINPAGER] = strdup(value.c_str())) == NULL) {
+    throw (error() << "cannot allocate memory");
+  }
 }
 
 /**
