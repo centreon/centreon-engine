@@ -173,7 +173,7 @@ int broker_event_handler(int type, int flags, int attr, unsigned int eventhandle
 
 	/* get command name/args */
 	if(cmd!=NULL){
-		command_buf=(char *)strdup(cmd);
+		command_buf=my_strdup(cmd);
 		command_name=strtok(command_buf,"!");
 		command_args=strtok(NULL,"\x0");
 	        }
@@ -213,7 +213,7 @@ int broker_event_handler(int type, int flags, int attr, unsigned int eventhandle
 	return_code=neb_make_callbacks(NEBCALLBACK_EVENT_HANDLER_DATA,(void *)&ds);
 
 	/* free memory */
-	my_free(command_buf);
+	delete[] command_buf;
 
 	return return_code;
         }
@@ -237,7 +237,7 @@ int broker_host_check(int type, int flags, int attr, host *hst, int check_type, 
 
 	/* get command name/args */
 	if(cmd!=NULL){
-		command_buf=(char *)strdup(cmd);
+		command_buf=my_strdup(cmd);
 		command_name=strtok(command_buf,"!");
 		command_args=strtok(NULL,"\x0");
 	        }
@@ -273,7 +273,7 @@ int broker_host_check(int type, int flags, int attr, host *hst, int check_type, 
 	return_code=neb_make_callbacks(NEBCALLBACK_HOST_CHECK_DATA,(void *)&ds);
 
 	/* free data */
-	my_free(command_buf);
+	delete[] command_buf;
 
 	return return_code;
         }
@@ -296,7 +296,7 @@ int broker_service_check(int type, int flags, int attr, service *svc, int check_
 
 	/* get command name/args */
 	if(cmd!=NULL){
-		command_buf=(char *)strdup(cmd);
+		command_buf=my_strdup(cmd);
 		command_name=strtok(command_buf,"!");
 		command_args=strtok(NULL,"\x0");
 	        }
@@ -333,7 +333,7 @@ int broker_service_check(int type, int flags, int attr, service *svc, int check_
 	return_code=neb_make_callbacks(NEBCALLBACK_SERVICE_CHECK_DATA,(void *)&ds);
 
 	/* free data */
-	my_free(command_buf);
+	delete[] command_buf;
 
 	return return_code;
         }
@@ -674,7 +674,7 @@ int broker_contact_notification_method_data(int type, int flags, int attr, unsig
 
 	/* get command name/args */
 	if(cmd!=NULL){
-		command_buf=(char *)strdup(cmd);
+		command_buf=my_strdup(cmd);
 		command_name=strtok(command_buf,"!");
 		command_args=strtok(NULL,"\x0");
 	        }
@@ -716,7 +716,7 @@ int broker_contact_notification_method_data(int type, int flags, int attr, unsig
 	return_code=neb_make_callbacks(NEBCALLBACK_CONTACT_NOTIFICATION_METHOD_DATA,(void *)&ds);
 
 	/* free memory */
-	my_free(command_buf);
+	delete[] command_buf;
 
 	return return_code;
         }

@@ -18,16 +18,18 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <string.h>
 #include "conf.hh"
 #ifdef USE_XCDDEFAULT
 # include "../xdata/xcddefault.hh"
 #endif
 #include "broker.hh"
+#include "utils.hh"
 #include "comments.hh"
 
-comment     *comment_list=NULL;
-int	    defer_comment_sorting = 0;
-comment     **comment_hashlist=NULL;
+comment        *comment_list=NULL;
+int	       defer_comment_sorting = 0;
+static comment *comment_hashlist[COMMENT_HASHSLOTS];
 
 
 
@@ -196,11 +198,11 @@ int delete_comment(unsigned int type, unsigned long comment_id){
 			last_comment->next=next_comment;
 		
 		/* free memory */
-		my_free(this_comment->host_name);
-		my_free(this_comment->service_description);
-		my_free(this_comment->author);
-		my_free(this_comment->comment_data);
-		my_free(this_comment);
+		delete[] this_comment->host_name;
+		delete[] this_comment->service_description;
+		delete[] this_comment->author;
+		delete[] this_comment->comment_data;
+		delete this_comment;
 
 		result=OK;
 	        }
@@ -357,20 +359,16 @@ int check_for_expired_comment(unsigned long comment_id){
 
 /* adds comment to hash list in memory */
 int add_comment_to_hashlist(comment *new_comment){
+	static bool init = false;
 	comment *temp_comment=NULL;
 	comment *lastpointer=NULL;
 	int hashslot=0;
 
 	/* initialize hash list */
-	if(comment_hashlist==NULL){
-		unsigned int i;
-
-		comment_hashlist=(comment **)malloc(sizeof(comment *)*COMMENT_HASHSLOTS);
-		if(comment_hashlist==NULL)
-			return 0;
-
-		for(i=0;i<COMMENT_HASHSLOTS;i++)
+	if(init == false){
+		for(unsigned int i=0;i<COMMENT_HASHSLOTS;i++)
 			comment_hashlist[i]=NULL;
+		init = true;
 	        }
 
 	if(!new_comment)
@@ -428,27 +426,22 @@ int add_comment(unsigned int comment_type, int entry_type, char const *host_name
 	comment *new_comment=NULL;
 	comment *last_comment=NULL;
 	comment *temp_comment=NULL;
-	int result=OK;
 
 	/* make sure we have the data we need */
 	if(host_name==NULL || author==NULL || comment_data==NULL || (comment_type==SERVICE_COMMENT && svc_description==NULL))
 		return ERROR;
 
 	/* allocate memory for the comment */
-	if((new_comment=(comment *)calloc(1, sizeof(comment)))==NULL)
-		return ERROR;
+	new_comment = new comment;
+	memset(new_comment, 0, sizeof(*new_comment));
 
 	/* duplicate vars */
-	if((new_comment->host_name=(char *)strdup(host_name))==NULL)
-		result=ERROR;
+	new_comment->host_name=my_strdup(host_name);
 	if(comment_type==SERVICE_COMMENT){
-		if((new_comment->service_description=(char *)strdup(svc_description))==NULL)
-			result=ERROR;
+		new_comment->service_description=my_strdup(svc_description);
 	        }
-	if((new_comment->author=(char *)strdup(author))==NULL)
-		result=ERROR;
-	if((new_comment->comment_data=(char *)strdup(comment_data))==NULL)
-		result=ERROR;
+	new_comment->author=my_strdup(author);
+	new_comment->comment_data=my_strdup(comment_data);
 
 	new_comment->comment_type=comment_type;
 	new_comment->entry_type=entry_type;
@@ -460,20 +453,7 @@ int add_comment(unsigned int comment_type, int entry_type, char const *host_name
 	new_comment->expire_time=expire_time;
 
 	/* add comment to hash list */
-	if(result==OK){
-		if(!add_comment_to_hashlist(new_comment))
-			result=ERROR;
-	        }
-
-	/* handle errors */
-	if(result==ERROR){
-		my_free(new_comment->comment_data);
-		my_free(new_comment->author);
-		my_free(new_comment->service_description);
-		my_free(new_comment->host_name);
-		my_free(new_comment);
-		return ERROR;
-	        }
+	add_comment_to_hashlist(new_comment);
 
 	if(defer_comment_sorting){
 		new_comment->next=comment_list;
@@ -538,8 +518,8 @@ int sort_comments(void){
 	if(!unsorted_comments)
 		return OK;
 
-	if(!(array=(comment**)malloc(sizeof(*array)*unsorted_comments)))
-		return ERROR;
+	array = new comment*[unsorted_comments];
+
 	while(comment_list){
 		array[i++]=comment_list;
 		comment_list=comment_list->next;
@@ -552,7 +532,7 @@ int sort_comments(void){
 		temp_comment = temp_comment->next;
 		}
 	temp_comment->next = NULL;
-	my_free(array);
+	delete[] array;
 	return OK;
 	}
 
@@ -568,16 +548,14 @@ void free_comment_data(void){
 	/* free memory for the comment list */
 	for(this_comment=comment_list;this_comment!=NULL;this_comment=next_comment){
 		next_comment=this_comment->next;
-		my_free(this_comment->host_name);
-		my_free(this_comment->service_description);
-		my_free(this_comment->author);
-		my_free(this_comment->comment_data);
-		my_free(this_comment);
+		delete[] this_comment->host_name;
+		delete[] this_comment->service_description;
+		delete[] this_comment->author;
+		delete[] this_comment->comment_data;
+		delete this_comment;
 	        }
 
 	/* free hash list and reset list pointer */
-	my_free(comment_hashlist);
-	comment_hashlist=NULL;
 	comment_list=NULL;
 
 	return;

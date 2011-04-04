@@ -29,7 +29,7 @@
 
 
 nebmodule *neb_module_list=NULL;
-nebcallback **neb_callback_list=NULL;
+nebcallback *neb_callback_list[NEBCALLBACK_NUMITEMS];
 
 extern com::centreon::scheduler::configuration config;
 
@@ -86,13 +86,11 @@ int neb_add_module(char const* filename,char const* args,int should_be_loaded){
 		return ERROR;
 
 	/* allocate memory */
-	new_module=(nebmodule *)malloc(sizeof(nebmodule));
-	if(new_module==NULL)
-		return ERROR;
+	new_module = new nebmodule;
 
 	/* initialize vars */
-	new_module->filename=(char *)strdup(filename);
-	new_module->args=(args==NULL)?NULL:(char *)strdup(args);
+	new_module->filename=my_strdup(filename);
+	new_module->args=(args==NULL)?NULL:my_strdup(args);
 	new_module->should_be_loaded=should_be_loaded;
 	new_module->is_currently_loaded=FALSE;
 	for(x=0;x<NEBMODULE_MODINFO_NUMITEMS;x++)
@@ -122,11 +120,11 @@ int neb_free_module_list(void){
 
 	for(temp_module=neb_module_list;temp_module;){
 		next_module=temp_module->next;
-		my_free(temp_module->filename);
-		my_free(temp_module->args);
+		delete[] temp_module->filename;
+		delete[] temp_module->args;
 		for(x=0;x<NEBMODULE_MODINFO_NUMITEMS;x++)
-			my_free(temp_module->info[x]);
-		my_free(temp_module);
+			delete[] temp_module->info[x];
+		delete[] temp_module;
 		temp_module=next_module;
 	        }
 
@@ -398,11 +396,10 @@ int neb_set_module_info(void *handle, int type, char *data){
 		return NEBERROR_BADMODULEHANDLE;
 
 	/* free any previously allocated memory */
-	my_free(temp_module->info[type]);
+	delete[] temp_module->info[type];
 
 	/* allocate memory for the new data */
-	if((temp_module->info[type]=(char *)strdup(data))==NULL)
-		return NEBERROR_NOMEM;
+	temp_module->info[type]=my_strdup(data);
 
 	return OK;
         }
@@ -425,9 +422,6 @@ int neb_register_callback(int callback_type, void *mod_handle, int priority, int
 	if(callback_func==NULL)
 		return NEBERROR_NOCALLBACKFUNC;
 
-	if(neb_callback_list==NULL)
-		return NEBERROR_NOCALLBACKLIST;
-
 	if(mod_handle==NULL)
 		return NEBERROR_NOMODULEHANDLE;
 
@@ -444,9 +438,7 @@ int neb_register_callback(int callback_type, void *mod_handle, int priority, int
 		return NEBERROR_BADMODULEHANDLE;
 
 	/* allocate memory */
-	new_callback=(nebcallback *)malloc(sizeof(nebcallback));
-	if(new_callback==NULL)
-		return NEBERROR_NOMEM;
+	new_callback = new nebcallback;
 
 	new_callback->priority=priority;
 	new_callback->module_handle=(void *)mod_handle;
@@ -489,9 +481,6 @@ int neb_deregister_module_callbacks(nebmodule *mod){
 	if(mod==NULL)
 		return NEBERROR_NOMODULE;
 
-	if(neb_callback_list==NULL)
-		return OK;
-
 	for(callback_type=0;callback_type<NEBCALLBACK_NUMITEMS;callback_type++){
 		for(temp_callback=neb_callback_list[callback_type];temp_callback!=NULL;temp_callback=next_callback){
 			next_callback=temp_callback->next;
@@ -513,9 +502,6 @@ int neb_deregister_callback(int callback_type, int (*callback_func)(int,void *))
 
 	if(callback_func==NULL)
 		return NEBERROR_NOCALLBACKFUNC;
-
-	if(neb_callback_list==NULL)
-		return NEBERROR_NOCALLBACKLIST;
 
 	/* make sure the callback type is within bounds */
 	if(callback_type<0 || callback_type>=NEBCALLBACK_NUMITEMS)
@@ -542,9 +528,9 @@ int neb_deregister_callback(int callback_type, int (*callback_func)(int,void *))
 			neb_callback_list[callback_type]=NULL;
 		else
 			last_callback->next=next_callback;
-		my_free(temp_callback);
+		delete temp_callback;
 		}
-	
+
 	return OK;
         }
 
@@ -556,10 +542,6 @@ int neb_make_callbacks(int callback_type, void *data){
 	int (*callbackfunc)(int,void *);
 	int cbresult=0;
 	int total_callbacks=0;
-
-	/* make sure callback list is initialized */
-	if(neb_callback_list==NULL)
-		return ERROR;
 
 	/* make sure the callback type is within bounds */
 	if(callback_type<0 || callback_type>=NEBCALLBACK_NUMITEMS)
@@ -596,11 +578,6 @@ int neb_make_callbacks(int callback_type, void *data){
 int neb_init_callback_list(void){
 	int x=0;
 
-	/* allocate memory for the callback list */
-	neb_callback_list=(nebcallback **)malloc(NEBCALLBACK_NUMITEMS*sizeof(nebcallback *));
-	if(neb_callback_list==NULL)
-		return ERROR;
-
 	/* initialize list pointers */
 	for(x=0;x<NEBCALLBACK_NUMITEMS;x++)
 		neb_callback_list[x]=NULL;
@@ -615,20 +592,15 @@ int neb_free_callback_list(void){
 	nebcallback *next_callback=NULL;
 	int x=0;
 
-	if(neb_callback_list==NULL)
-		return OK;
-
 	for(x=0;x<NEBCALLBACK_NUMITEMS;x++){
 
 		for(temp_callback=neb_callback_list[x];temp_callback!=NULL;temp_callback=next_callback){
 			next_callback=temp_callback->next;
-			my_free(temp_callback);
+			delete temp_callback;
 	                }
 
 		neb_callback_list[x]=NULL;
 	        }
-
-	my_free(neb_callback_list);
 
 	return OK;
         }

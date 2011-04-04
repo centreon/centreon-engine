@@ -333,10 +333,8 @@ void configuration::parse(std::string const& filename)
     _tab_int[child_processes_fork_twice] = !_tab_bool[use_large_installation_tweaks];
   }
 
-  my_free(_mac->x[MACRO_MAINCONFIGFILE]);
-  if ((_mac->x[MACRO_MAINCONFIGFILE] = strdup(_filename.c_str())) == NULL) {
-    throw (error() << "cannot allocate memory");
-  }
+  delete[] _mac->x[MACRO_MAINCONFIGFILE];
+  _mac->x[MACRO_MAINCONFIGFILE] = my_strdup(_filename.c_str());
 
   // check path
   set_temp_path(get_temp_path());
@@ -1178,10 +1176,8 @@ void configuration::set_log_file(std::string const& value) {
   }
   _tab_string[log_file] = value;
 
-  my_free(_mac->x[MACRO_LOGFILE]);
-  if ((_mac->x[MACRO_LOGFILE] = strdup(value.c_str())) == NULL) {
-    throw (error() << "cannot allocate memory");
-  }
+  delete[] _mac->x[MACRO_LOGFILE];
+  _mac->x[MACRO_LOGFILE] = my_strdup(value.c_str());
 }
 
 /**
@@ -1205,10 +1201,8 @@ void configuration::set_command_file(std::string const& value) {
   }
   _tab_string[command_file] = value;
 
-  my_free(_mac->x[MACRO_COMMANDFILE]);
-  if ((_mac->x[MACRO_COMMANDFILE] = strdup(value.c_str())) == NULL) {
-    throw (error() << "cannot allocate memory");
-  }
+  delete[] _mac->x[MACRO_COMMANDFILE];
+  _mac->x[MACRO_COMMANDFILE] = my_strdup(value.c_str());
 }
 
 /**
@@ -1221,10 +1215,8 @@ void configuration::set_temp_file(std::string const& value) {
   }
   _tab_string[temp_file] = value;
 
-  my_free(_mac->x[MACRO_TEMPFILE]);
-  if ((_mac->x[MACRO_TEMPFILE] = strdup(value.c_str())) == NULL) {
-    throw (error() << "cannot allocate memory");
-  }
+  delete[] _mac->x[MACRO_TEMPFILE];
+  _mac->x[MACRO_TEMPFILE] = my_strdup(value.c_str());
 }
 
 /**
@@ -1239,10 +1231,8 @@ void configuration::set_temp_path(std::string const& value) {
   }
   _tab_string[temp_path] = value;
 
-  my_free(_mac->x[MACRO_TEMPPATH]);
-  if ((_mac->x[MACRO_TEMPPATH] = strdup(value.c_str())) == NULL) {
-    throw (error() << "cannot allocate memory");
-  }
+  delete[] _mac->x[MACRO_TEMPPATH];
+  _mac->x[MACRO_TEMPPATH] = my_strdup(value.c_str());
 }
 
 /**
@@ -2494,10 +2484,8 @@ void configuration::_parse_resource_file(std::string const& value) {
       }
 
       std::string value = line.substr(pos + 1);
-      my_free(macro_user[user_index]);
-      if ((macro_user[user_index] = strdup(_trim(value).c_str())) == NULL) {
-	throw (error() << "cannot allocate memory");
-      }
+      delete[] macro_user[user_index];
+      macro_user[user_index] = my_strdup(_trim(value).c_str());
     }
     else {
       logit(NSLOG_CONFIG_WARNING, TRUE, "Warning: [%s:%d] bad variable name `%s'",
@@ -2510,10 +2498,8 @@ void configuration::_parse_resource_file(std::string const& value) {
 
   ifs.close();
 
-  my_free(_mac->x[MACRO_RESOURCEFILE]);
-  if ((_mac->x[MACRO_RESOURCEFILE] = strdup(value.c_str())) == NULL) {
-    throw (error() << "cannot allocate memory");
-  }
+  delete[] _mac->x[MACRO_RESOURCEFILE];
+  _mac->x[MACRO_RESOURCEFILE] = my_strdup(value.c_str());
 }
 
 /**
@@ -2530,10 +2516,8 @@ void configuration::_set_auth_file(std::string const& value) {
  *  @param[in] value The admin email.
  */
 void configuration::_set_admin_email(std::string const& value) {
-  my_free(_mac->x[MACRO_ADMINEMAIL]);
-  if ((_mac->x[MACRO_ADMINEMAIL] = strdup(value.c_str())) == NULL) {
-    throw (error() << "cannot allocate memory");
-  }
+  delete[] _mac->x[MACRO_ADMINEMAIL];
+  _mac->x[MACRO_ADMINEMAIL] = my_strdup(value.c_str());
 }
 
 /**
@@ -2541,10 +2525,8 @@ void configuration::_set_admin_email(std::string const& value) {
  *  @param[in] value The admin pager.
  */
 void configuration::_set_admin_pager(std::string const& value) {
-  my_free(_mac->x[MACRO_ADMINPAGER]);
-  if ((_mac->x[MACRO_ADMINPAGER] = strdup(value.c_str())) == NULL) {
-    throw (error() << "cannot allocate memory");
-  }
+  delete[] _mac->x[MACRO_ADMINPAGER];
+  _mac->x[MACRO_ADMINPAGER] = my_strdup(value.c_str());
 }
 
 /**

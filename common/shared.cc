@@ -20,6 +20,7 @@
 
 #include "conf.hh"
 #include "common.hh"
+#include "utils.hh"
 #include "configuration.hh"
 #include "shared.hh"
 
@@ -30,6 +31,11 @@ extern com::centreon::scheduler::configuration config;
  * core.
  */
 
+char* my_strdup(char const* str) {
+  char* new_str = new char[strlen(str) + 1];
+  return (strcpy(new_str, str));
+}
+
 /* fix the problem with strtok() skipping empty options between tokens */
 char *my_strtok(char *buffer, char const *tokens)
 {
@@ -39,9 +45,8 @@ char *my_strtok(char *buffer, char const *tokens)
 	static char *original_my_strtok_buffer = NULL;
 
 	if (buffer != NULL) {
-		my_free(original_my_strtok_buffer);
-		if ((my_strtok_buffer = (char *)strdup(buffer)) == NULL)
-			return NULL;
+		delete[] original_my_strtok_buffer;
+		my_strtok_buffer = my_strdup(buffer);
 		original_my_strtok_buffer = my_strtok_buffer;
 	}
 
@@ -117,19 +122,18 @@ mmapfile *mmap_fopen(char *filename)
 		return NULL;
 
 	/* allocate memory */
-	if ((new_mmapfile = (mmapfile *) malloc(sizeof(mmapfile))) == NULL)
-		return NULL;
+	new_mmapfile = new mmapfile;
 
 	/* open the file */
 	if ((fd = open(filename, mode)) == -1) {
-		my_free(new_mmapfile);
+		delete[] new_mmapfile;
 		return NULL;
 	}
 
 	/* get file info */
 	if ((fstat(fd, &statbuf)) == -1) {
 		close(fd);
-		my_free(new_mmapfile);
+		delete[] new_mmapfile;
 		return NULL;
 	}
 
@@ -144,14 +148,14 @@ mmapfile *mmap_fopen(char *filename)
 		     (void *)mmap(0, file_size, PROT_READ, MAP_PRIVATE, fd,
 				  0)) == MAP_FAILED) {
 			close(fd);
-			my_free(new_mmapfile);
+			delete[] new_mmapfile;
 			return NULL;
 		}
 	} else
 		mmap_buf = NULL;
 
 	/* populate struct info for later use */
-	new_mmapfile->path = (char *)strdup(filename);
+	new_mmapfile->path = my_strdup(filename);
 	new_mmapfile->fd = fd;
 	new_mmapfile->file_size = (unsigned long)file_size;
 	new_mmapfile->current_position = 0L;
@@ -176,8 +180,8 @@ int mmap_fclose(mmapfile * temp_mmapfile)
 	close(temp_mmapfile->fd);
 
 	/* free memory */
-	my_free(temp_mmapfile->path);
-	my_free(temp_mmapfile);
+	delete[] temp_mmapfile->path;
+	delete[] temp_mmapfile;
 
 	return OK;
 }
@@ -213,8 +217,7 @@ char *mmap_fgets(mmapfile * temp_mmapfile)
 	len = (int)(x - temp_mmapfile->current_position);
 
 	/* allocate memory for the new line */
-	if ((buf = (char *)malloc(len + 1)) == NULL)
-		return NULL;
+	buf = new char[len + 1];
 
 	/* copy string to newly allocated memory and terminate the string */
 	memcpy(buf,
@@ -246,15 +249,14 @@ char *mmap_fgets_multiline(mmapfile * temp_mmapfile)
 
 	while (1) {
 
-		my_free(tempbuf);
+		delete[] tempbuf;
 
 		if ((tempbuf = mmap_fgets(temp_mmapfile)) == NULL)
 			break;
 
 		if (buf == NULL) {
 			len = strlen(tempbuf);
-			if ((buf = (char *)malloc(len + 1)) == NULL)
-				break;
+			buf = new char[len + 1];
 			memcpy(buf, tempbuf, len);
 			buf[len] = '\x0';
 		} else {
@@ -264,9 +266,7 @@ char *mmap_fgets_multiline(mmapfile * temp_mmapfile)
 				stripped++;
 			len = strlen(stripped);
 			len2 = strlen(buf);
-			if ((buf =
-			     (char *)realloc(buf, len + len2 + 1)) == NULL)
-				break;
+			buf = resize_string(buf, len + len2 + 1);
 			strcat(buf, stripped);
 			len += len2;
 			buf[len] = '\x0';
@@ -300,7 +300,7 @@ char *mmap_fgets_multiline(mmapfile * temp_mmapfile)
 			break;
 	}
 
-	my_free(tempbuf);
+	delete[] tempbuf;
 
 	return buf;
 }
@@ -530,4 +530,17 @@ void get_time_breakdown(unsigned long raw_time, int *days, int *hours,
 	*hours = temp_hours;
 	*minutes = temp_minutes;
 	*seconds = temp_seconds;
+}
+
+char* resize_string(char* str, size_t size) {
+  if (size == 0) {
+    delete[] str;
+    return (NULL);
+  }
+  if (str == NULL)
+    return (new char[size]);
+  char* new_str = new char[size];
+  strcpy(new_str, str);
+  delete[] str;
+  return (new_str);
 }

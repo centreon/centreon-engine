@@ -19,6 +19,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <string.h>
 #include <exception>
 #include <iostream>
 
@@ -276,24 +277,14 @@ int main(int argc, char **argv){
 
 
 	/* config file is last argument specified */
-	config_file=(char *)strdup(argv[optind]);
-	if(config_file==NULL){
-		printf("Error allocating memory.\n");
-		exit(ERROR);
-	        }
+	config_file=my_strdup(argv[optind]);
 
 	/* make sure the config file uses an absolute path */
 	if(config_file[0]!='/'){
 
 		/* save the name of the config file */
-		buffer=(char *)strdup(config_file);
-
-		/* reallocate a larger chunk of memory */
-		config_file=(char *)realloc(config_file,MAX_FILENAME_LENGTH);
-		if(config_file==NULL){
-			printf("Error allocating memory.\n");
-			exit(ERROR);
-		        }
+		buffer = new char[MAX_FILENAME_LENGTH];
+		strcpy(buffer, config_file);
 
 		/* get absolute path of current working directory */
 		if(getcwd(config_file,MAX_FILENAME_LENGTH) == NULL){
@@ -310,7 +301,7 @@ int main(int argc, char **argv){
 		strncat(config_file,buffer,MAX_FILENAME_LENGTH-strlen(config_file)-1);
 		config_file[MAX_FILENAME_LENGTH-1]='\x0';
 
-		my_free(buffer);
+		delete[] buffer;
 	        }
 
 
@@ -388,7 +379,7 @@ int main(int argc, char **argv){
 		cleanup();
 
 		/* free config_file */
-		my_free(config_file);
+		delete[] config_file;
 
 		/* exit */
 		exit(result);
@@ -491,12 +482,14 @@ int main(int argc, char **argv){
 			/* NOTE 11/06/07 EG moved to after we read config files, as user may have overridden timezone offset */
 			/* get program (re)start time and save as macro */
 			program_start=time(NULL);
-			my_free(mac->x[MACRO_PROCESSSTARTTIME]);
-			if(asprintf(&mac->x[MACRO_PROCESSSTARTTIME],"%lu",(unsigned long)program_start)==-1){
-				logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf. Aborting.\n");
-				cleanup();
-				exit(ERROR);
-				}
+			delete[] mac->x[MACRO_PROCESSSTARTTIME];
+			try {
+			  mac->x[MACRO_PROCESSSTARTTIME] = obj2pchar<unsigned long>(program_start);
+			}
+			catch (...) {
+			  cleanup();
+			  throw;
+			}
 
 			/* open debug log */
 			open_debug_log();
@@ -649,17 +642,16 @@ int main(int argc, char **argv){
 
 			/* get event start time and save as macro */
 			event_start=time(NULL);
-			my_free(mac->x[MACRO_EVENTSTARTTIME]);
-			if(asprintf(&mac->x[MACRO_EVENTSTARTTIME],"%lu",(unsigned long)event_start)==-1){
-				logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.  Aborting.\n");
-
+			delete[] mac->x[MACRO_EVENTSTARTTIME];
+			try {
+			  mac->x[MACRO_EVENTSTARTTIME] = obj2pchar<unsigned long>(event_start);
+			}
+			catch (...) {
 #ifdef USE_EVENT_BROKER
 				/* send program data to broker */
 				broker_program_state(NEBTYPE_PROCESS_SHUTDOWN,NEBFLAG_PROCESS_INITIATED,NEBATTR_SHUTDOWN_ABNORMAL,NULL);
 #endif
-
 				cleanup();
-				exit(ERROR);
 				}
 
 		        /***** start monitoring all services *****/
@@ -671,31 +663,36 @@ int main(int argc, char **argv){
 			if(caught_signal==TRUE){
 
 				if(sig_id==SIGHUP){
-					if(asprintf(&buffer,"Caught SIGHUP, restarting...\n")==-1){
-						logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.  Aborting.\n");
+				  try {
+					buffer = my_strdup("Caught SIGHUP, restarting...\n");
+				  }
+				  catch (...) {
 #ifdef USE_EVENT_BROKER
 						/* send program data to broker */
 						broker_program_state(NEBTYPE_PROCESS_SHUTDOWN,NEBFLAG_PROCESS_INITIATED,NEBATTR_SHUTDOWN_ABNORMAL,NULL);
 #endif
 
 						cleanup();
-						exit(ERROR);
 						}
 					}
-				else if(asprintf(&buffer,"Caught SIG%s, shutting down...\n",sigs[sig_id])==-1){
-					logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.  Aborting.\n");
-
+				else {
+				  try {
+				    std::ostringstream oss;
+				    oss << "Caught SIG" << sigs[sig_id] << ", shutting down...\n";
+				    buffer = my_strdup(oss.str().c_str());
+				  }
+				  catch (...) {
 #ifdef USE_EVENT_BROKER
 					/* send program data to broker */
 					broker_program_state(NEBTYPE_PROCESS_SHUTDOWN,NEBFLAG_PROCESS_INITIATED,NEBATTR_SHUTDOWN_ABNORMAL,NULL);
 #endif
 
 					cleanup();
-					exit(ERROR);
 					}
+				}
 
 				write_to_all_logs(buffer,NSLOG_PROCESS_INFO);
-				my_free(buffer);
+				delete[] buffer;
 				}
 
 #ifdef USE_EVENT_BROKER
@@ -750,7 +747,7 @@ int main(int argc, char **argv){
 	                }while(sigrestart==TRUE && sigshutdown==FALSE);
 
 		/* free misc memory */
-		my_free(config_file);
+		delete[] config_file;
 	        }
 
 	return OK;

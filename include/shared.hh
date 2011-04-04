@@ -41,6 +41,7 @@ typedef struct  mmapfile_struct {
 // only usable on compile-time initialized arrays, for obvious reasons
 # define ARRAY_SIZE(ary) (sizeof(ary) / sizeof(ary[0]))
 
+char* my_strdup(char const* str);
 char *my_strtok(char *buffer, char const *tokens);
 char *my_strsep(char **stringp, const char *delim);
 mmapfile *mmap_fopen(char *filename);
@@ -52,9 +53,23 @@ int hashfunc(const char *name1, const char *name2, int hashslots);
 int compare_hashdata(const char *val1a, const char *val1b, const char *val2a, const char *val2b);
 void get_datetime_string(time_t * raw_time, char *buffer, int buffer_length, int type);
 void get_time_breakdown(unsigned long raw_time, int *days, int *hours, int *minutes, int *seconds);
+char* resize_string(char* str, size_t size);
 
 # ifdef __cplusplus
 }
+# endif
+
+# ifdef __cplusplus
+#  include <sstream>
+#  include <string>
+  template <class T> char* obj2pchar(T obj) {
+    std::ostringstream oss;
+    oss << obj;
+    std::string const& str = oss.str();
+    char* buf = new char[str.size() + 1];
+    strcpy(buf, str.c_str());
+    return (buf);
+  }
 # endif
 
 #endif // !CCS_SHARED_HH

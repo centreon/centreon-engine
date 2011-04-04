@@ -18,6 +18,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <sstream>
 #include "conf.hh"
 #include "nagios.hh"
 #include "comments.hh"
@@ -96,7 +97,7 @@ static void extract_check_result(FILE *fp,dbuf *checkresult_dbuf){
 	while(fgets(output_buffer,sizeof(output_buffer)-1,fp)){
 		temp_buffer=escape_newlines(output_buffer);
 		dbuf_strcat(checkresult_dbuf,temp_buffer);
-		my_free(temp_buffer);
+		delete[] temp_buffer;
 		}
 	}
 
@@ -239,7 +240,7 @@ int reap_check_results(void){
 
 				/* free memory */
 				free_check_result(queued_check_result);
-				my_free(queued_check_result);
+				delete queued_check_result;
 
 				/* TODO - add new service definition automatically */
 
@@ -264,7 +265,7 @@ int reap_check_results(void){
 
 				/* free memory */
 				free_check_result(queued_check_result);
-				my_free(queued_check_result);
+				delete queued_check_result;
 
 				/* TODO - add new host definition automatically */
 
@@ -285,7 +286,7 @@ int reap_check_results(void){
 
 		/* free allocated memory */
 		free_check_result(queued_check_result);
-		my_free(queued_check_result);
+		delete queued_check_result;
 
 		/* break out if we've been here too long (max_check_reaper_time seconds) */
 		time(&current_time);
@@ -508,7 +509,7 @@ int run_async_service_check(service *svc, int check_options, double latency, int
 		if(preferred_time)
 			*preferred_time+=(svc->check_interval*config.get_interval_length());
 		svc->latency=old_latency;
-		my_free(raw_command);
+		delete[] raw_command;
 		return ERROR;
 		}
 
@@ -542,21 +543,18 @@ int run_async_service_check(service *svc, int check_options, double latency, int
 	if(neb_result==NEBERROR_CALLBACKOVERRIDE){
 		clear_volatile_macros(&mac);
 		svc->latency=old_latency;
-		my_free(processed_command);
-		my_free(raw_command);
+		delete[] processed_command;
+		delete[] raw_command;
 		return OK;
 		}
 #endif
 
 	/* open a temp file for storing check output */
 	old_umask=umask(new_umask);
-	if(asprintf(&output_file,"%s/checkXXXXXX",config.get_temp_path().c_str())==-1){
-		logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
-		svc->latency=old_latency;
-		my_free(processed_command);
-		my_free(raw_command);
-		return ERROR;
-		}
+	std::ostringstream oss;
+	oss << config.get_temp_path() << "/checkXXXXXX";
+	output_file = my_strdup(oss.str().c_str());
+
 	check_result_info.output_file_fd=mkstemp(output_file);
 	if(check_result_info.output_file_fd>=0)
 		check_result_info.output_file_fp=fdopen(check_result_info.output_file_fd,"w");
@@ -570,12 +568,12 @@ int run_async_service_check(service *svc, int check_options, double latency, int
 
 
 	/* finish save check info */
-	check_result_info.host_name=(char *)strdup(svc->host_name);
-	check_result_info.service_description=(char *)strdup(svc->description);
-	check_result_info.output_file=(check_result_info.output_file_fd<0 || output_file==NULL)?NULL:strdup(output_file);
+	check_result_info.host_name=my_strdup(svc->host_name);
+	check_result_info.service_description=my_strdup(svc->description);
+	check_result_info.output_file=(check_result_info.output_file_fd<0 || output_file==NULL)?NULL:my_strdup(output_file);
 
 	/* free memory */
-	my_free(output_file);
+	delete[] output_file;
 
 	/* write start of check result file */
 	/* if things go really bad later on down the line, the user will at least have a partial file to help debug missing output results */
@@ -667,7 +665,7 @@ int run_async_service_check(service *svc, int check_options, double latency, int
 			if(perl_plugin_output!=NULL){
 				temp_buffer=escape_newlines(perl_plugin_output);
 				dbuf_strcat(&checkresult_dbuf,temp_buffer);
-				my_free(temp_buffer);
+				delete[] temp_buffer;
 				}
 
 			/* get the check finish time */
@@ -800,7 +798,7 @@ int run_async_service_check(service *svc, int check_options, double latency, int
 				if(perl_plugin_output!=NULL){
 					temp_buffer=escape_newlines(perl_plugin_output);
 					dbuf_strcat(&checkresult_dbuf,temp_buffer);
-					my_free(temp_buffer);
+					delete[] temp_buffer;
 					}
 
 				PUTBACK;
@@ -892,8 +890,8 @@ int run_async_service_check(service *svc, int check_options, double latency, int
 
 			/* free memory */
 			dbuf_free(&checkresult_dbuf);
-			my_free(raw_command);
-			my_free(processed_command);
+			delete[] raw_command;
+			delete[] processed_command;
 
 			/* free check result memory */
 			free_check_result(&check_result_info);
@@ -931,8 +929,8 @@ int run_async_service_check(service *svc, int check_options, double latency, int
 		free_check_result(&check_result_info);
 
 		/* free memory */
-		my_free(raw_command);
-		my_free(processed_command);
+		delete[] raw_command;
+		delete[] processed_command;
 
 		/* wait for the first child to return */
 		/* don't do this if large install tweaks are enabled - we'll clean up children in event loop */
@@ -963,7 +961,6 @@ int handle_async_service_check_result(service *temp_service, check_result *queue
 	time_t current_time=0L;
 	int state_was_logged=FALSE;
 	char *old_plugin_output=NULL;
-	char *temp_plugin_output=NULL;
 	char *temp_ptr=NULL;
 	servicedependency *temp_dependency=NULL;
 	objectlist *check_servicelist=NULL;
@@ -1046,19 +1043,22 @@ int handle_async_service_check_result(service *temp_service, check_result *queue
 
 	/* save old plugin output */
 	if(temp_service->plugin_output)
-		old_plugin_output=(char *)strdup(temp_service->plugin_output);
+		old_plugin_output=my_strdup(temp_service->plugin_output);
 
 	/* clear the old plugin output and perf data buffers */
-	my_free(temp_service->plugin_output);
-	my_free(temp_service->long_plugin_output);
-	my_free(temp_service->perf_data);
+	delete[] temp_service->plugin_output;
+	delete[] temp_service->long_plugin_output;
+	delete[] temp_service->perf_data;
+
+	temp_service->long_plugin_output = NULL;
+	temp_service->perf_data = NULL;
 
 	/* if there was some error running the command, just skip it (this shouldn't be happening) */
 	if(queued_check_result->exited_ok==FALSE){
 
 		logit(NSLOG_RUNTIME_WARNING,TRUE,"Warning:  Check of service '%s' on host '%s' did not exit properly!\n",temp_service->description,temp_service->host_name);
 
-		temp_service->plugin_output=(char *)strdup("(Service check did not exit properly)");
+		temp_service->plugin_output=my_strdup("(Service check did not exit properly)");
 
 		temp_service->current_state=STATE_CRITICAL;
 	        }
@@ -1068,11 +1068,13 @@ int handle_async_service_check_result(service *temp_service, check_result *queue
 
 		logit(NSLOG_RUNTIME_WARNING,TRUE,"Warning: Return code of %d for check of service '%s' on host '%s' was out of bounds.%s\n",queued_check_result->return_code,temp_service->description,temp_service->host_name,(queued_check_result->return_code==126 ? "Make sure the plugin you're trying to run is executable." : (queued_check_result->return_code==127?" Make sure the plugin you're trying to run actually exists.":"")));
 
-		if(asprintf(&temp_service->plugin_output,"(Return code of %d is out of bounds%s)",queued_check_result->return_code,(queued_check_result->return_code==126 ? " - plugin may not be executable" : (queued_check_result->return_code==127 ?" - plugin may be missing":"")))==-1){
-			logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
-			return ERROR;
-			}
+		std::ostringstream oss;
+		oss << "(Return code of " << queued_check_result->return_code << " is out of bounds"
+		    << (queued_check_result->return_code == 126 ? " - plugin may not be executable"
+			: (queued_check_result->return_code == 127 ? " - plugin may be missing"
+			   : "")) << ')';
 
+		temp_service->plugin_output = my_strdup(oss.str().c_str());
 		temp_service->current_state=STATE_CRITICAL;
 	        }
 
@@ -1084,7 +1086,7 @@ int handle_async_service_check_result(service *temp_service, check_result *queue
 
 		/* make sure the plugin output isn't null */
 		if(temp_service->plugin_output==NULL)
-			temp_service->plugin_output=(char *)strdup("(No output returned from plugin)");
+			temp_service->plugin_output=my_strdup("(No output returned from plugin)");
 
 		/* replace semicolons in plugin output (but not performance data) with colons */
 		else if((temp_ptr=temp_service->plugin_output)){
@@ -1687,8 +1689,7 @@ int handle_async_service_check_result(service *temp_service, check_result *queue
 	update_service_performance_data(temp_service);
 
 	/* free allocated memory */
-	my_free(temp_plugin_output);
-	my_free(old_plugin_output);
+	delete[] old_plugin_output;
 
 
 	/* run async checks of all services we added above */
@@ -1799,7 +1800,8 @@ void schedule_service_check(service *svc, time_t check_time, int options){
 	/* else we're using the new event, so remove the old one */
 	else{
 		remove_event(temp_event,&event_list_low,&event_list_low_tail);
-		my_free(temp_event);
+		delete temp_event;
+		temp_event = NULL;
 		}
 
 	/* save check options for retention purposes */
@@ -1811,13 +1813,14 @@ void schedule_service_check(service *svc, time_t check_time, int options){
 		log_debug_info(DEBUGL_CHECKS,2,"Scheduling new service check event.\n");
 
 		/* allocate memory for a new event item */
-		new_event=(timed_event *)malloc(sizeof(timed_event));
-		if(new_event==NULL){
-			logit(NSLOG_RUNTIME_WARNING,TRUE,"Warning: Could not reschedule check of service '%s' on host '%s'!\n",svc->description,svc->host_name);
+		try {
+			new_event = new timed_event;
+		}
+		catch (...) {
 			/* update the status log */
 			update_service_status(svc,FALSE);
-			return;
-			}
+			throw;
+		}
 
 		/* set the next service check time */
 		svc->next_check=check_time;
@@ -2202,12 +2205,7 @@ void schedule_host_check(host *hst, time_t check_time, int options){
 		}
 
 	/* allocate memory for a new event item */
-	if((new_event=(timed_event *)malloc(sizeof(timed_event)))==NULL){
-
-		logit(NSLOG_RUNTIME_WARNING,TRUE,"Warning: Could not reschedule check of host '%s'!\n",hst->name);
-
-		return;
-	        }
+	new_event = new timed_event;
 
 	/* default is to use the new event */
 	use_original_event=FALSE;
@@ -2267,13 +2265,13 @@ void schedule_host_check(host *hst, time_t check_time, int options){
 
 		/* the originally queued event won the battle, so keep it */
 		if(use_original_event==TRUE){
-			my_free(new_event);
+			delete new_event;
 			}
 
 		/* else use the new event, so remove the old */
 		else{
 			remove_event(temp_event,&event_list_low,&event_list_low_tail);
-			my_free(temp_event);
+			delete temp_event;
 			}
 	        }
 
@@ -2640,7 +2638,7 @@ int run_sync_host_check_3x(host *hst, int *check_result_code, int check_options,
 
 	/* save old plugin output for state stalking */
 	if(hst->plugin_output)
-		old_plugin_output=(char *)strdup(hst->plugin_output);
+		old_plugin_output=my_strdup(hst->plugin_output);
 
 	/* set the checked flag */
 	hst->has_been_checked=TRUE;
@@ -2671,7 +2669,7 @@ int run_sync_host_check_3x(host *hst, int *check_result_code, int check_options,
 	process_host_check_result_3x(hst,host_result,old_plugin_output,check_options,FALSE,use_cached_result,check_timestamp_horizon);
 
 	/* free memory */
-	my_free(old_plugin_output);
+	delete[] old_plugin_output;
 
 	log_debug_info(DEBUGL_CHECKS,1,"* Sync host check done: new state=%d\n",hst->current_state);
 
@@ -2770,9 +2768,13 @@ int execute_sync_host_check_3x(host *hst)
 	log_debug_info(DEBUGL_COMMANDS,0,"Processed host check ommand: %s\n",processed_command);
 
 	/* clear plugin output and performance data buffers */
-	my_free(hst->plugin_output);
-	my_free(hst->long_plugin_output);
-	my_free(hst->perf_data);
+	delete[] hst->plugin_output;
+	delete[] hst->long_plugin_output;
+	delete[] hst->perf_data;
+
+	hst->plugin_output = NULL;
+	hst->long_plugin_output = NULL;
+	hst->perf_data = NULL;
 
 	/* run the host check command */
 	result=my_system_r(&mac, processed_command,config.get_host_check_timeout(),&early_timeout,&exectime,&temp_plugin_output,MAX_PLUGIN_OUTPUT_LENGTH);
@@ -2781,15 +2783,12 @@ int execute_sync_host_check_3x(host *hst)
 	/* if the check timed out, report an error */
 	if(early_timeout==TRUE){
 
-		my_free(temp_plugin_output);
-		if(asprintf(&temp_plugin_output,"Host check timed out after %d seconds\n",config.get_host_check_timeout())==-1){
-			logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
-			/* free memory */
-			my_free(temp_plugin_output);
-			my_free(raw_command);
-			my_free(processed_command);
-			return ERROR;
-			}
+		delete[] temp_plugin_output;
+		std::ostringstream oss;
+		oss << "Host check timed out after " << config.get_host_check_timeout()
+		    << " seconds" << std::endl;
+		temp_plugin_output = my_strdup(oss.str().c_str());
+
 		/* log the timeout */
 		logit(NSLOG_RUNTIME_WARNING,TRUE,"Warning: Host check command '%s' for host '%s' timed out after %d seconds\n",processed_command,hst->name,config.get_host_check_timeout());
 	        }
@@ -2804,21 +2803,23 @@ int execute_sync_host_check_3x(host *hst)
 	parse_check_output(temp_plugin_output,&hst->plugin_output,&hst->long_plugin_output,&hst->perf_data,TRUE,TRUE);
 
 	/* free memory */
-	my_free(temp_plugin_output);
-	my_free(raw_command);
-	my_free(processed_command);
+	delete[] temp_plugin_output;
+	delete[] raw_command;
+	delete[] processed_command;
+
+	processed_command = NULL;
 
 	/* a NULL host check command means we should assume the host is UP */
 	if(hst->host_check_command==NULL){
-		my_free(hst->plugin_output);
-		hst->plugin_output=(char *)strdup("(Host assumed to be UP)");
+		delete[] hst->plugin_output;
+		hst->plugin_output=my_strdup("(Host assumed to be UP)");
 		result=STATE_OK;
 	        }
 
 	/* make sure we have some data */
 	if(hst->plugin_output==NULL || !strcmp(hst->plugin_output,"")){
-		my_free(hst->plugin_output);
-		hst->plugin_output=(char *)strdup("(No output returned from host check)");
+		delete[] hst->plugin_output;
+		hst->plugin_output=my_strdup("(No output returned from host check)");
 	        }
 
 	/* replace semicolons in plugin output (but not performance data) with colons */
@@ -3042,10 +3043,10 @@ int run_async_host_check_3x(host *hst, int check_options, double latency, int sc
 
 	/* open a temp file for storing check output */
 	old_umask=umask(new_umask);
-	if(asprintf(&output_file,"%s/checkXXXXXX",config.get_temp_path().c_str())==-1){
-		logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
-		return ERROR;
-		}
+	std::ostringstream oss;
+	oss << config.get_temp_path() << "/checkXXXXXX";
+	output_file = my_strdup(oss.str().c_str());
+
 	check_result_info.output_file_fd=mkstemp(output_file);
 	if(check_result_info.output_file_fd>=0)
 		check_result_info.output_file_fp=fdopen(check_result_info.output_file_fd,"w");
@@ -3059,13 +3060,13 @@ int run_async_host_check_3x(host *hst, int check_options, double latency, int sc
 
 	/* save check info */
 	check_result_info.object_check_type=HOST_CHECK;
-	check_result_info.host_name=(char *)strdup(hst->name);
+	check_result_info.host_name=my_strdup(hst->name);
 	check_result_info.service_description=NULL;
 	check_result_info.check_type=HOST_CHECK_ACTIVE;
 	check_result_info.check_options=check_options;
 	check_result_info.scheduled_check=scheduled_check;
 	check_result_info.reschedule_check=reschedule_check;
-	check_result_info.output_file=(check_result_info.output_file_fd<0 || output_file==NULL)?NULL:strdup(output_file);
+	check_result_info.output_file=(check_result_info.output_file_fd<0 || output_file==NULL)?NULL:my_strdup(output_file);
 	check_result_info.latency=latency;
 	check_result_info.start_time=start_time;
 	check_result_info.finish_time=start_time;
@@ -3075,7 +3076,7 @@ int run_async_host_check_3x(host *hst, int check_options, double latency, int sc
 	check_result_info.output=NULL;
 
 	/* free memory */
-	my_free(output_file);
+	delete[] output_file;
 
 	/* write initial check info to file */
 	/* if things go bad later on, the user will at least have something to go on when debugging... */
@@ -3212,8 +3213,8 @@ int run_async_host_check_3x(host *hst, int check_options, double latency, int sc
 
 			/* free memory */
 			dbuf_free(&checkresult_dbuf);
-			my_free(raw_command);
-			my_free(processed_command);
+			delete[] raw_command;
+			delete[] processed_command;
 
 			/* free check result memory */
 			free_check_result(&check_result_info);
@@ -3251,8 +3252,8 @@ int run_async_host_check_3x(host *hst, int check_options, double latency, int sc
 		free_check_result(&check_result_info);
 
 		/* free memory */
-		my_free(raw_command);
-		my_free(processed_command);
+		delete[] raw_command;
+		delete[] processed_command;
 
 		/* wait for the first child to return */
 		/* if large install tweaks are enabled, we'll clean up the zombie process later */
@@ -3366,20 +3367,24 @@ int handle_async_host_check_result_3x(host *temp_host, check_result *queued_chec
 
 	/* save old plugin output */
 	if(temp_host->plugin_output)
-		old_plugin_output=(char *)strdup(temp_host->plugin_output);
+		old_plugin_output=my_strdup(temp_host->plugin_output);
 
 	/* clear the old plugin output and perf data buffers */
-	my_free(temp_host->plugin_output);
-	my_free(temp_host->long_plugin_output);
-	my_free(temp_host->perf_data);
+	delete[] temp_host->plugin_output;
+	delete[] temp_host->long_plugin_output;
+	delete[] temp_host->perf_data;
+
+	temp_host->plugin_output = NULL;
+	temp_host->long_plugin_output = NULL;
+	temp_host->perf_data = NULL;
 
 	/* parse check output to get: (1) short output, (2) long output, (3) perf data */
 	parse_check_output(queued_check_result->output,&temp_host->plugin_output,&temp_host->long_plugin_output,&temp_host->perf_data,TRUE,TRUE);
 
 	/* make sure we have some data */
 	if(temp_host->plugin_output==NULL || !strcmp(temp_host->plugin_output,"")){
-		my_free(temp_host->plugin_output);
-		temp_host->plugin_output=(char *)strdup("(No output returned from host check)");
+		delete[] temp_host->plugin_output;
+		temp_host->plugin_output=my_strdup("(No output returned from host check)");
 	        }
 
 	/* replace semicolons in plugin output (but not performance data) with colons */
@@ -3405,11 +3410,13 @@ int handle_async_host_check_result_3x(host *temp_host, check_result *queued_chec
 
 			logit(NSLOG_RUNTIME_WARNING,TRUE,"Warning:  Check of host '%s' did not exit properly!\n",temp_host->name);
 
-			my_free(temp_host->plugin_output);
-			my_free(temp_host->long_plugin_output);
-			my_free(temp_host->perf_data);
+			delete[] temp_host->plugin_output;
+			delete[] temp_host->long_plugin_output;
+			delete[] temp_host->perf_data;
 
-			temp_host->plugin_output=(char *)strdup("(Host check did not exit properly)");
+			temp_host->plugin_output=my_strdup("(Host check did not exit properly)");
+			temp_host->long_plugin_output = NULL;
+			temp_host->perf_data = NULL;
 
 			result=STATE_CRITICAL;
 			}
@@ -3419,24 +3426,28 @@ int handle_async_host_check_result_3x(host *temp_host, check_result *queued_chec
 
 			logit(NSLOG_RUNTIME_WARNING,TRUE,"Warning: Return code of %d for check of host '%s' was out of bounds.%s\n",queued_check_result->return_code,temp_host->name,(queued_check_result->return_code==126 || queued_check_result->return_code==127)?" Make sure the plugin you're trying to run actually exists.":"");
 
-			my_free(temp_host->plugin_output);
-			my_free(temp_host->long_plugin_output);
-			my_free(temp_host->perf_data);
+			std::ostringstream oss;
+			oss << "(Return code of " << queued_check_result->return_code
+			    << " is out of bounds"
+			    << ((queued_check_result->return_code == 126 ||
+				queued_check_result->return_code == 127) ?
+			  " - plugin may be missing" : "") << ")";
 
-			if(asprintf(&temp_host->plugin_output,"(Return code of %d is out of bounds%s)",queued_check_result->return_code,(queued_check_result->return_code==126 || queued_check_result->return_code==127)?" - plugin may be missing":"")==-1){
-				logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
-				/* free memory */
-				my_free(old_plugin_output);
-				return ERROR;
-				}
+			delete[] temp_host->plugin_output;
+			delete[] temp_host->long_plugin_output;
+			delete[] temp_host->perf_data;
+
+			temp_host->plugin_output = my_strdup(oss.str().c_str());
+			temp_host->long_plugin_output = NULL;
+			temp_host->perf_data = NULL;
 
 			result=STATE_CRITICAL;
 			}
 
 		/* a NULL host check command means we should assume the host is UP */
 		if(temp_host->host_check_command==NULL){
-			my_free(temp_host->plugin_output);
-			temp_host->plugin_output=(char *)strdup("(Host assumed to be UP)");
+			delete[] temp_host->plugin_output;
+			temp_host->plugin_output=my_strdup("(Host assumed to be UP)");
 			result=STATE_OK;
 			}
 		}
@@ -3465,7 +3476,7 @@ int handle_async_host_check_result_3x(host *temp_host, check_result *queued_chec
 	process_host_check_result_3x(temp_host,result,old_plugin_output,CHECK_OPTION_NONE,reschedule_check,TRUE,config.get_cached_host_check_horizon());
 
 	/* free memory */
-	my_free(old_plugin_output);
+	delete[] old_plugin_output;
 
 	log_debug_info(DEBUGL_CHECKS,1,"** Async check result for host '%s' handled: new state=%d\n",temp_host->name,temp_host->current_state);
 

@@ -44,7 +44,7 @@ int xpddefault_run_host_performance_data_command(nagios_macros *mac, host *hst);
 int xpddefault_update_service_performance_data_file(nagios_macros *mac, service *svc);
 int xpddefault_update_host_performance_data_file(nagios_macros *mac, host *hst);
 
-int xpddefault_preprocess_file_templates(char *tmpl);
+void xpddefault_preprocess_file_templates(char *tmpl);
 
 int xpddefault_open_host_perfdata_file(void);
 int xpddefault_open_service_perfdata_file(void);

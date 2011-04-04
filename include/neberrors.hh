@@ -32,12 +32,6 @@
 
 
 
-/***** GENERIC ERRORS *****/
-
-# define NEBERROR_NOMEM              100     /* memory could not be allocated */
-
-
-
 /***** CALLBACK ERRORS *****/
 
 # define NEBERROR_NOCALLBACKFUNC     200     /* no callback function was specified */

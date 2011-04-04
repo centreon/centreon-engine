@@ -18,6 +18,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <string.h>
 #include "conf.hh"
 #ifdef USE_XODTEMPLATE                          /* template-based routines */
 # include "../xdata/xodtemplate.hh"
@@ -395,19 +396,16 @@ timeperiod *add_timeperiod(char *name,char *alias){
 	        }
 
 	/* allocate memory for the new timeperiod */
-	if((new_timeperiod=(timeperiod*)calloc(1, sizeof(timeperiod)))==NULL)
-		return NULL;
+	new_timeperiod = new timeperiod;
+	memset(new_timeperiod, 0, sizeof(*new_timeperiod));
 
 	/* copy string vars */
-	if((new_timeperiod->name=(char *)strdup(name))==NULL)
-		result=ERROR;
-	if((new_timeperiod->alias=(char *)strdup(alias))==NULL)
-		result=ERROR;
+	new_timeperiod->name=my_strdup(name);
+	new_timeperiod->alias=my_strdup(alias);
 
 	/* add new timeperiod to skiplist */
-	if(result==OK){
-		result=skiplist_insert(object_skiplists[TIMEPERIOD_SKIPLIST],(void *)new_timeperiod);
-		switch(result){
+	result=skiplist_insert(object_skiplists[TIMEPERIOD_SKIPLIST],(void *)new_timeperiod);
+	switch(result){
 		case SKIPLIST_ERROR_DUPLICATE:
 			logit(NSLOG_CONFIG_ERROR,TRUE,"Error: Timeperiod '%s' has already been defined\n",name);
 			result=ERROR;
@@ -419,14 +417,13 @@ timeperiod *add_timeperiod(char *name,char *alias){
 			logit(NSLOG_CONFIG_ERROR,TRUE,"Error: Could not add timeperiod '%s' to skiplist\n",name);
 			result=ERROR;
 			break;
-			}
 		}
 
 	/* handle errors */
 	if(result==ERROR){
-		my_free(new_timeperiod->alias);
-		my_free(new_timeperiod->name);
-		my_free(new_timeperiod);
+		delete[] new_timeperiod->alias;
+		delete[] new_timeperiod->name;
+		delete new_timeperiod;
 		return NULL;
 	        }
 
@@ -454,10 +451,9 @@ timeperiodexclusion *add_exclusion_to_timeperiod(timeperiod *period, char *name)
 	if(period==NULL || name==NULL)
 		return NULL;
 
-	if((new_timeperiodexclusion=(timeperiodexclusion *)malloc(sizeof(timeperiodexclusion)))==NULL)
-		return NULL;
+	new_timeperiodexclusion = new timeperiodexclusion;
 
-	new_timeperiodexclusion->timeperiod_name=(char *)strdup(name);
+	new_timeperiodexclusion->timeperiod_name=my_strdup(name);
 
 	new_timeperiodexclusion->next=period->exclusions;
 	period->exclusions=new_timeperiodexclusion;
@@ -490,8 +486,7 @@ timerange *add_timerange_to_timeperiod(timeperiod *period, int day, unsigned lon
 	        }
 
 	/* allocate memory for the new time range */
-	if((new_timerange=(timerange*)malloc(sizeof(timerange)))==NULL)
-		return NULL;
+	new_timerange = new timerange;
 
 	new_timerange->range_start=start_time;
 	new_timerange->range_end=end_time;
@@ -513,8 +508,7 @@ daterange *add_exception_to_timeperiod(timeperiod *period, int type, int syear, 
 		return NULL;
 
 	/* allocate memory for the date range range */
-	if((new_daterange=(daterange*)malloc(sizeof(daterange)))==NULL)
-		return NULL;
+	new_daterange = new daterange;
 
 	new_daterange->times=NULL;
 	new_daterange->next=NULL;
@@ -559,8 +553,7 @@ timerange *add_timerange_to_daterange(daterange *drange, unsigned long start_tim
 	        }
 
 	/* allocate memory for the new time range */
-	if((new_timerange=(timerange*)malloc(sizeof(timerange)))==NULL)
-		return NULL;
+	new_timerange = new timerange;
 
 	new_timerange->range_start=start_time;
 	new_timerange->range_end=end_time;
@@ -609,65 +602,49 @@ host *add_host(char *name, char *display_name, char *alias, char *address, char 
 	        }
 
 	/* allocate memory for a new host */
-	if((new_host=(host *)calloc(1, sizeof(host)))==NULL)
-		return NULL;
+	new_host = new host;
+	memset(new_host, 0, sizeof(*new_host));
 
 	/* duplicate string vars */
-	if((new_host->name=(char *)strdup(name))==NULL)
-		result=ERROR;
-	if((new_host->display_name=(char *)strdup((display_name==NULL)?name:display_name))==NULL)
-		result=ERROR;
-	if((new_host->alias=(char *)strdup((alias==NULL)?name:alias))==NULL)
-		result=ERROR;
-	if((new_host->address=(char *)strdup(address))==NULL)
-		result=ERROR;
+	new_host->name=my_strdup(name);
+	new_host->display_name=my_strdup((display_name==NULL)?name:display_name);
+	new_host->alias=my_strdup((alias==NULL)?name:alias);
+	new_host->address=my_strdup(address);
 	if(check_period){
-		if((new_host->check_period=(char *)strdup(check_period))==NULL)
-			result=ERROR;
+		new_host->check_period=my_strdup(check_period);
 	        }
 	if(notification_period){
-		if((new_host->notification_period=(char *)strdup(notification_period))==NULL)
-			result=ERROR;
+		new_host->notification_period=my_strdup(notification_period);
 	        }
 	if(check_command){
-		if((new_host->host_check_command=(char *)strdup(check_command))==NULL)
-			result=ERROR;
+		new_host->host_check_command=my_strdup(check_command);
 	        }
 	if(event_handler){
-		if((new_host->event_handler=(char *)strdup(event_handler))==NULL)
-			result=ERROR;
-	        }
+		new_host->event_handler=my_strdup(event_handler);
+		}
 	if(failure_prediction_options){
-		if((new_host->failure_prediction_options=(char *)strdup(failure_prediction_options))==NULL)
-			result=ERROR;
+		new_host->failure_prediction_options=my_strdup(failure_prediction_options);
 	        }
 	if(notes){
-		if((new_host->notes=(char *)strdup(notes))==NULL)
-			result=ERROR;
+		new_host->notes=my_strdup(notes);
 	        }
 	if(notes_url){
-		if((new_host->notes_url=(char *)strdup(notes_url))==NULL)
-			result=ERROR;
+		new_host->notes_url=my_strdup(notes_url);
 	        }
 	if(action_url){
-		if((new_host->action_url=(char *)strdup(action_url))==NULL)
-			result=ERROR;
+		new_host->action_url=my_strdup(action_url);
 	        }
 	if(icon_image){
-		if((new_host->icon_image=(char *)strdup(icon_image))==NULL)
-			result=ERROR;
+		new_host->icon_image=my_strdup(icon_image);
 	        }
 	if(icon_image_alt){
-		if((new_host->icon_image_alt=(char *)strdup(icon_image_alt))==NULL)
-			result=ERROR;
+		new_host->icon_image_alt=my_strdup(icon_image_alt);
 	        }
 	if(vrml_image){
-		if((new_host->vrml_image=(char *)strdup(vrml_image))==NULL)
-			result=ERROR;
+		new_host->vrml_image=my_strdup(vrml_image);
 	        }
 	if(statusmap_image){
-		if((new_host->statusmap_image=(char *)strdup(statusmap_image))==NULL)
-			result=ERROR;
+		new_host->statusmap_image=my_strdup(statusmap_image);
 	        }
 
 
@@ -760,45 +737,43 @@ host *add_host(char *name, char *display_name, char *alias, char *address, char 
 	new_host->contains_circular_path=FALSE;
 
 	/* add new host to skiplist */
-	if(result==OK){
-		result=skiplist_insert(object_skiplists[HOST_SKIPLIST],(void *)new_host);
-		switch(result){
-		case SKIPLIST_ERROR_DUPLICATE:
-			logit(NSLOG_CONFIG_ERROR,TRUE,"Error: Host '%s' has already been defined\n",name);
-			result=ERROR;
-			break;
-		case SKIPLIST_OK:
-			result=OK;
-			break;
-		default:
-			logit(NSLOG_CONFIG_ERROR,TRUE,"Error: Could not add host '%s' to skiplist\n",name);
-			result=ERROR;
-			break;
-			}
-		}
+	result=skiplist_insert(object_skiplists[HOST_SKIPLIST],(void *)new_host);
+	switch(result){
+	case SKIPLIST_ERROR_DUPLICATE:
+		logit(NSLOG_CONFIG_ERROR,TRUE,"Error: Host '%s' has already been defined\n",name);
+		result=ERROR;
+		break;
+	case SKIPLIST_OK:
+		result=OK;
+		break;
+	default:
+	  logit(NSLOG_CONFIG_ERROR,TRUE,"Error: Could not add host '%s' to skiplist\n",name);
+	  result=ERROR;
+	  break;
+	}
 
 	/* handle errors */
 	if(result==ERROR){
-		my_free(new_host->plugin_output);
-		my_free(new_host->long_plugin_output);
-		my_free(new_host->perf_data);
-		my_free(new_host->statusmap_image);
-		my_free(new_host->vrml_image);
-		my_free(new_host->icon_image_alt);
-		my_free(new_host->icon_image);
-		my_free(new_host->action_url);
-		my_free(new_host->notes_url);
-		my_free(new_host->notes);
-		my_free(new_host->failure_prediction_options);
-		my_free(new_host->event_handler);
-		my_free(new_host->host_check_command);
-		my_free(new_host->notification_period);
-		my_free(new_host->check_period);
-		my_free(new_host->address);
-		my_free(new_host->alias);
-		my_free(new_host->display_name);
-		my_free(new_host->name);
-		my_free(new_host);
+		delete[] new_host->plugin_output;
+		delete[] new_host->long_plugin_output;
+		delete[] new_host->perf_data;
+		delete[] new_host->statusmap_image;
+		delete[] new_host->vrml_image;
+		delete[] new_host->icon_image_alt;
+		delete[] new_host->icon_image;
+		delete[] new_host->action_url;
+		delete[] new_host->notes_url;
+		delete[] new_host->notes;
+		delete[] new_host->failure_prediction_options;
+		delete[] new_host->event_handler;
+		delete[] new_host->host_check_command;
+		delete[] new_host->notification_period;
+		delete[] new_host->check_period;
+		delete[] new_host->address;
+		delete[] new_host->alias;
+		delete[] new_host->display_name;
+		delete[] new_host->name;
+		delete new_host;
 		return NULL;
 	        }
 
@@ -819,7 +794,6 @@ host *add_host(char *name, char *display_name, char *alias, char *address, char 
 
 hostsmember *add_parent_host_to_host(host *hst,char *host_name){
 	hostsmember *new_hostsmember=NULL;
-	int result=OK;
 
 	/* make sure we have the data we need */
 	if(hst==NULL || host_name==NULL || !strcmp(host_name,"")){
@@ -834,19 +808,11 @@ hostsmember *add_parent_host_to_host(host *hst,char *host_name){
 	        }
 
 	/* allocate memory */
-	if((new_hostsmember=(hostsmember *)calloc(1, sizeof(hostsmember)))==NULL)
-		return NULL;
+	new_hostsmember = new hostsmember;
+	memset(new_hostsmember, 0, sizeof(*new_hostsmember));
 
 	/* duplicate string vars */
-	if((new_hostsmember->host_name=(char *)strdup(host_name))==NULL)
-		result=ERROR;
-
-	/* handle errors */
-	if(result==ERROR){
-		my_free(new_hostsmember->host_name);
-		my_free(new_hostsmember);
-		return NULL;
-	        }
+	new_hostsmember->host_name=my_strdup(host_name);
 
 	/* add the parent host entry to the host definition */
 	new_hostsmember->next=hst->parent_hosts;
@@ -865,8 +831,7 @@ hostsmember *add_child_link_to_host(host *hst, host *child_ptr){
 		return NULL;
 
 	/* allocate memory */
-	if((new_hostsmember=(hostsmember *)malloc(sizeof(hostsmember)))==NULL)
-		return NULL;
+	new_hostsmember = new hostsmember;
 
 	/* initialize values */
 	new_hostsmember->host_name=NULL;
@@ -889,8 +854,8 @@ servicesmember *add_service_link_to_host(host *hst, service *service_ptr){
 		return NULL;
 
 	/* allocate memory */
-	if((new_servicesmember=(servicesmember *)calloc(1, sizeof(servicesmember)))==NULL)
-		return NULL;
+	new_servicesmember = new servicesmember;
+	memset(new_servicesmember, 0, sizeof(*new_servicesmember));
 
 	/* initialize values */
 	new_servicesmember->service_ptr=service_ptr;
@@ -907,28 +872,18 @@ servicesmember *add_service_link_to_host(host *hst, service *service_ptr){
 /* add a new contactgroup to a host */
 contactgroupsmember *add_contactgroup_to_host(host *hst, char *group_name){
 	contactgroupsmember *new_contactgroupsmember=NULL;
-	int result=OK;
 
-	/* make sure we have the data we need */
 	if(hst==NULL || (group_name==NULL || !strcmp(group_name,""))){
 		logit(NSLOG_CONFIG_ERROR,TRUE,"Error: Host or contactgroup member is NULL\n");
 		return NULL;
 	        }
 
 	/* allocate memory for a new member */
-	if((new_contactgroupsmember=(contactgroupsmember*)calloc(1, sizeof(contactgroupsmember)))==NULL)
-		return NULL;
+	new_contactgroupsmember = new contactgroupsmember;
+	memset(new_contactgroupsmember, 0, sizeof(*new_contactgroupsmember));
 
 	/* duplicate string vars */
-	if((new_contactgroupsmember->group_name=(char *)strdup(group_name))==NULL)
-		result=ERROR;
-
-	/* handle errors */
-	if(result==ERROR){
-		my_free(new_contactgroupsmember->group_name);
-		my_free(new_contactgroupsmember);
-		return NULL;
-	        }
+	new_contactgroupsmember->group_name=my_strdup(group_name);
 
 	/* add the new member to the head of the member list */
 	new_contactgroupsmember->next=hst->contact_groups;
@@ -967,50 +922,43 @@ hostgroup *add_hostgroup(char *name, char *alias, char *notes, char *notes_url, 
 	        }
 
 	/* allocate memory */
-	if((new_hostgroup=(hostgroup *)calloc(1, sizeof(hostgroup)))==NULL)
-		return NULL;
+	new_hostgroup = new hostgroup;
+	memset(new_hostgroup, 0, sizeof(*new_hostgroup));
 
 	/* duplicate vars */
-	if((new_hostgroup->group_name=(char *)strdup(name))==NULL)
-		result=ERROR;
-	if((new_hostgroup->alias=(char *)strdup((alias==NULL)?name:alias))==NULL)
-		result=ERROR;
+	new_hostgroup->group_name=my_strdup(name);
+	new_hostgroup->alias=my_strdup((alias==NULL)?name:alias);
 	if(notes){
-		if((new_hostgroup->notes=(char *)strdup(notes))==NULL)
-			result=ERROR;
+		new_hostgroup->notes=my_strdup(notes);
 		}
 	if(notes_url){
-		if((new_hostgroup->notes_url=(char *)strdup(notes_url))==NULL)
-			result=ERROR;
+		new_hostgroup->notes_url=my_strdup(notes_url);
 		}
 	if(action_url){
-		if((new_hostgroup->action_url=(char *)strdup(action_url))==NULL)
-			result=ERROR;
+		new_hostgroup->action_url=my_strdup(action_url);
 		}
 
 	/* add new host group to skiplist */
-	if(result==OK){
-		result=skiplist_insert(object_skiplists[HOSTGROUP_SKIPLIST],(void *)new_hostgroup);
-		switch(result){
-		case SKIPLIST_ERROR_DUPLICATE:
-			logit(NSLOG_CONFIG_ERROR,TRUE,"Error: Hostgroup '%s' has already been defined\n",name);
-			result=ERROR;
-			break;
-		case SKIPLIST_OK:
-			result=OK;
-			break;
-		default:
-			logit(NSLOG_CONFIG_ERROR,TRUE,"Error: Could not add hostgroup '%s' to skiplist\n",name);
-			result=ERROR;
-			break;
-			}
-		}
+	result=skiplist_insert(object_skiplists[HOSTGROUP_SKIPLIST],(void *)new_hostgroup);
+	switch(result){
+	case SKIPLIST_ERROR_DUPLICATE:
+		logit(NSLOG_CONFIG_ERROR,TRUE,"Error: Hostgroup '%s' has already been defined\n",name);
+		result=ERROR;
+		break;
+	case SKIPLIST_OK:
+		result=OK;
+		break;
+	default:
+		logit(NSLOG_CONFIG_ERROR,TRUE,"Error: Could not add hostgroup '%s' to skiplist\n",name);
+		result=ERROR;
+		break;
+	}
 
 	/* handle errors */
 	if(result==ERROR){
-		my_free(new_hostgroup->alias);
-		my_free(new_hostgroup->group_name);
-		my_free(new_hostgroup);
+		delete[] new_hostgroup->alias;
+		delete[] new_hostgroup->group_name;
+		delete new_hostgroup;
 		return NULL;
 	        }
 
@@ -1033,7 +981,6 @@ hostsmember *add_host_to_hostgroup(hostgroup *temp_hostgroup, char *host_name){
 	hostsmember *new_member=NULL;
 	hostsmember *last_member=NULL;
 	hostsmember *temp_member=NULL;
-	int result=OK;
 
 	/* make sure we have the data we need */
 	if(temp_hostgroup==NULL || (host_name==NULL || !strcmp(host_name,""))){
@@ -1042,19 +989,11 @@ hostsmember *add_host_to_hostgroup(hostgroup *temp_hostgroup, char *host_name){
 	        }
 
 	/* allocate memory for a new member */
-	if((new_member=(hostsmember*)calloc(1, sizeof(hostsmember)))==NULL)
-		return NULL;
+	new_member = new hostsmember;
+	memset(new_member, 0, sizeof(*new_member));
 
 	/* duplicate vars */
-	if((new_member->host_name=(char *)strdup(host_name))==NULL)
-		result=ERROR;
-
-	/* handle errors */
-	if(result==ERROR){
-		my_free(new_member->host_name);
-		my_free(new_member);
-		return NULL;
-	        }
+	new_member->host_name=my_strdup(host_name);
 
 	/* add the new member to the member list, sorted by host name */
 	last_member=temp_hostgroup->members;
@@ -1095,50 +1034,43 @@ servicegroup *add_servicegroup(char *name, char *alias, char *notes, char *notes
 	        }
 
 	/* allocate memory */
-	if((new_servicegroup=(servicegroup *)calloc(1, sizeof(servicegroup)))==NULL)
-		return NULL;
+	new_servicegroup = new servicegroup;
+	memset(new_servicegroup, 0, sizeof(*new_servicegroup));
 
 	/* duplicate vars */
-	if((new_servicegroup->group_name=(char *)strdup(name))==NULL)
-		result=ERROR;
-	if((new_servicegroup->alias=(char *)strdup((alias==NULL)?name:alias))==NULL)
-		result=ERROR;
+	new_servicegroup->group_name=my_strdup(name);
+	new_servicegroup->alias=my_strdup((alias==NULL)?name:alias);
 	if(notes){
-		if((new_servicegroup->notes=(char *)strdup(notes))==NULL)
-			result=ERROR;
+		new_servicegroup->notes=my_strdup(notes);
 		}
 	if(notes_url){
-		if((new_servicegroup->notes_url=(char *)strdup(notes_url))==NULL)
-			result=ERROR;
+		new_servicegroup->notes_url=my_strdup(notes_url);
 		}
 	if(action_url){
-		if((new_servicegroup->action_url=(char *)strdup(action_url))==NULL)
-			result=ERROR;
+		new_servicegroup->action_url=my_strdup(action_url);
 		}
 
 	/* add new service group to skiplist */
-	if(result==OK){
-		result=skiplist_insert(object_skiplists[SERVICEGROUP_SKIPLIST],(void *)new_servicegroup);
-		switch(result){
-		case SKIPLIST_ERROR_DUPLICATE:
-			logit(NSLOG_CONFIG_ERROR,TRUE,"Error: Servicegroup '%s' has already been defined\n",name);
-			result=ERROR;
-			break;
-		case SKIPLIST_OK:
-			result=OK;
-			break;
-		default:
-			logit(NSLOG_CONFIG_ERROR,TRUE,"Error: Could not add servicegroup '%s' to skiplist\n",name);
-			result=ERROR;
-			break;
-			}
-		}
+	result=skiplist_insert(object_skiplists[SERVICEGROUP_SKIPLIST],(void *)new_servicegroup);
+	switch(result){
+	case SKIPLIST_ERROR_DUPLICATE:
+		logit(NSLOG_CONFIG_ERROR,TRUE,"Error: Servicegroup '%s' has already been defined\n",name);
+		result=ERROR;
+		break;
+	case SKIPLIST_OK:
+		result=OK;
+		break;
+	default:
+		logit(NSLOG_CONFIG_ERROR,TRUE,"Error: Could not add servicegroup '%s' to skiplist\n",name);
+		result=ERROR;
+		break;
+	}
 
 	/* handle errors */
 	if(result==ERROR){
-		my_free(new_servicegroup->alias);
-		my_free(new_servicegroup->group_name);
-		my_free(new_servicegroup);
+		delete[] new_servicegroup->alias;
+		delete[] new_servicegroup->group_name;
+		delete new_servicegroup;
 		return NULL;
 	        }
 
@@ -1161,7 +1093,6 @@ servicesmember *add_service_to_servicegroup(servicegroup *temp_servicegroup, cha
 	servicesmember *new_member=NULL;
 	servicesmember *last_member=NULL;
 	servicesmember *temp_member=NULL;
-	int result=OK;
 
 	/* make sure we have the data we need */
 	if(temp_servicegroup==NULL || (host_name==NULL || !strcmp(host_name,"")) || (svc_description==NULL || !strcmp(svc_description,""))){
@@ -1170,22 +1101,12 @@ servicesmember *add_service_to_servicegroup(servicegroup *temp_servicegroup, cha
 	        }
 
 	/* allocate memory for a new member */
-	if((new_member=(servicesmember*)calloc(1, sizeof(servicesmember)))==NULL)
-		return NULL;
+	new_member = new servicesmember;
+	memset(new_member, 0, sizeof(*new_member));
 
 	/* duplicate vars */
-	if((new_member->host_name=(char *)strdup(host_name))==NULL)
-		result=ERROR;
-	if((new_member->service_description=(char *)strdup(svc_description))==NULL)
-		result=ERROR;
-
-	/* handle errors */
-	if(result==ERROR){
-		my_free(new_member->service_description);
-		my_free(new_member->host_name);
-		my_free(new_member);
-		return NULL;
-	        }
+	new_member->host_name=my_strdup(host_name);
+	new_member->service_description=my_strdup(svc_description);
 
 	/* add new member to member list, sorted by host name then service description */
 	last_member=temp_servicegroup->members;
@@ -1238,36 +1159,29 @@ contact *add_contact(char *name,char *alias, char *email, char *pager, char **ad
 	        }
 
 	/* allocate memory for a new contact */
-	if((new_contact=(contact *)calloc(1, sizeof(contact)))==NULL)
-		return NULL;
+	new_contact = new contact;
+	memset(new_contact, 0, sizeof(*new_contact));
 
 	/* duplicate vars */
-	if((new_contact->name=(char *)strdup(name))==NULL)
-		result=ERROR;
-	if((new_contact->alias=(char *)strdup((alias==NULL)?name:alias))==NULL)
-		result=ERROR;
+	new_contact->name=my_strdup(name);
+	new_contact->alias=my_strdup((alias==NULL)?name:alias);
 	if(email){
-		if((new_contact->email=(char *)strdup(email))==NULL)
-			result=ERROR;
+		new_contact->email=my_strdup(email);
 	        }
 	if(pager){
-		if((new_contact->pager=(char *)strdup(pager))==NULL)
-			result=ERROR;
+		new_contact->pager=my_strdup(pager);
 	        }
 	if(svc_notification_period){
-		if((new_contact->service_notification_period=(char *)strdup(svc_notification_period))==NULL)
-			result=ERROR;
+		new_contact->service_notification_period=my_strdup(svc_notification_period);
 	        }
 	if(host_notification_period){
-		if((new_contact->host_notification_period=(char *)strdup(host_notification_period))==NULL)
-			result=ERROR;
+		new_contact->host_notification_period=my_strdup(host_notification_period);
 	        }
 	if(addresses){
 		for(x=0;x<MAX_CONTACT_ADDRESSES;x++){
 			if(addresses[x]){
-				if((new_contact->address[x]=(char *)strdup(addresses[x]))==NULL)
-					result=ERROR;
-			        }
+				new_contact->address[x]=my_strdup(addresses[x]);
+				}
 		        }
 	        }
 
@@ -1318,14 +1232,14 @@ contact *add_contact(char *name,char *alias, char *email, char *pager, char **ad
 	/* handle errors */
 	if(result==ERROR){
 		for(x=0;x<MAX_CONTACT_ADDRESSES;x++)
-			my_free(new_contact->address[x]);
-		my_free(new_contact->name);
-		my_free(new_contact->alias);
-		my_free(new_contact->email);
-		my_free(new_contact->pager);
-		my_free(new_contact->service_notification_period);
-		my_free(new_contact->host_notification_period);
-		my_free(new_contact);
+			delete[] new_contact->address[x];
+		delete[] new_contact->name;
+		delete[] new_contact->alias;
+		delete[] new_contact->email;
+		delete[] new_contact->pager;
+		delete[] new_contact->service_notification_period;
+		delete[] new_contact->host_notification_period;
+		delete new_contact;
 		return NULL;
 	        }
 
@@ -1347,7 +1261,6 @@ contact *add_contact(char *name,char *alias, char *email, char *pager, char **ad
 /* adds a host notification command to a contact definition */
 commandsmember *add_host_notification_command_to_contact(contact *cntct,char *command_name){
 	commandsmember *new_commandsmember=NULL;
-	int result=OK;
 
 	/* make sure we have the data we need */
 	if(cntct==NULL || (command_name==NULL || !strcmp(command_name,""))){
@@ -1356,19 +1269,11 @@ commandsmember *add_host_notification_command_to_contact(contact *cntct,char *co
 	        }
 
 	/* allocate memory */
-	if((new_commandsmember=(commandsmember*)calloc(1, sizeof(commandsmember)))==NULL)
-		return NULL;
+	new_commandsmember = new commandsmember;
+	memset(new_commandsmember, 0, sizeof(*new_commandsmember));
 
 	/* duplicate vars */
-	if((new_commandsmember->cmd=(char *)strdup(command_name))==NULL)
-		result=ERROR;
-
-	/* handle errors */
-	if(result==ERROR){
-		my_free(new_commandsmember->cmd);
-		my_free(new_commandsmember);
-		return NULL;
-	        }
+	new_commandsmember->cmd=my_strdup(command_name);
 
 	/* add the notification command */
 	new_commandsmember->next=cntct->host_notification_commands;
@@ -1382,7 +1287,6 @@ commandsmember *add_host_notification_command_to_contact(contact *cntct,char *co
 /* adds a service notification command to a contact definition */
 commandsmember *add_service_notification_command_to_contact(contact *cntct,char *command_name){
 	commandsmember *new_commandsmember=NULL;
-	int result=OK;
 
 	/* make sure we have the data we need */
 	if(cntct==NULL || (command_name==NULL || !strcmp(command_name,""))){
@@ -1391,19 +1295,11 @@ commandsmember *add_service_notification_command_to_contact(contact *cntct,char 
 	        }
 
 	/* allocate memory */
-	if((new_commandsmember=(commandsmember*)calloc(1, sizeof(commandsmember)))==NULL)
-		return NULL;
+	new_commandsmember = new commandsmember;
+	memset(new_commandsmember, 0, sizeof(*new_commandsmember));
 
 	/* duplicate vars */
-	if((new_commandsmember->cmd=(char *)strdup(command_name))==NULL)
-		result=ERROR;
-
-	/* handle errors */
-	if(result==ERROR){
-		my_free(new_commandsmember->cmd);
-		my_free(new_commandsmember);
-		return NULL;
-	        }
+	new_commandsmember->cmd=my_strdup(command_name);
 
 	/* add the notification command */
 	new_commandsmember->next=cntct->service_notification_commands;
@@ -1434,38 +1330,34 @@ contactgroup *add_contactgroup(char *name,char *alias){
 	        }
 
 	/* allocate memory for a new contactgroup entry */
-	if((new_contactgroup=(contactgroup*)calloc(1, sizeof(contactgroup)))==NULL)
-		return NULL;
+	new_contactgroup = new contactgroup;
+	memset(new_contactgroup, 0, sizeof(*new_contactgroup));
 
 	/* duplicate vars */
-	if((new_contactgroup->group_name=(char *)strdup(name))==NULL)
-		result=ERROR;
-	if((new_contactgroup->alias=(char *)strdup((alias==NULL)?name:alias))==NULL)
-		result=ERROR;
+	new_contactgroup->group_name=my_strdup(name);
+	new_contactgroup->alias=my_strdup((alias==NULL)?name:alias);
 
 	/* add new contact group to skiplist */
-	if(result==OK){
-		result=skiplist_insert(object_skiplists[CONTACTGROUP_SKIPLIST],(void *)new_contactgroup);
-		switch(result){
-		case SKIPLIST_ERROR_DUPLICATE:
-			logit(NSLOG_CONFIG_ERROR,TRUE,"Error: Contactgroup '%s' has already been defined\n",name);
-			result=ERROR;
-			break;
-		case SKIPLIST_OK:
-			result=OK;
-			break;
-		default:
-			logit(NSLOG_CONFIG_ERROR,TRUE,"Error: Could not add contactgroup '%s' to skiplist\n",name);
-			result=ERROR;
-			break;
-			}
-		}
+	result=skiplist_insert(object_skiplists[CONTACTGROUP_SKIPLIST],(void *)new_contactgroup);
+	switch(result){
+	case SKIPLIST_ERROR_DUPLICATE:
+		logit(NSLOG_CONFIG_ERROR,TRUE,"Error: Contactgroup '%s' has already been defined\n",name);
+		result=ERROR;
+		break;
+	case SKIPLIST_OK:
+		result=OK;
+		break;
+	default:
+		logit(NSLOG_CONFIG_ERROR,TRUE,"Error: Could not add contactgroup '%s' to skiplist\n",name);
+		result=ERROR;
+		break;
+	}
 
 	/* handle errors */
 	if(result==ERROR){
-		my_free(new_contactgroup->alias);
-		my_free(new_contactgroup->group_name);
-		my_free(new_contactgroup);
+		delete[] new_contactgroup->alias;
+		delete[] new_contactgroup->group_name;
+		delete new_contactgroup;
 		return NULL;
 	        }
 
@@ -1487,7 +1379,6 @@ contactgroup *add_contactgroup(char *name,char *alias){
 /* add a new member to a contact group */
 contactsmember *add_contact_to_contactgroup(contactgroup *grp, char *contact_name){
 	contactsmember *new_contactsmember=NULL;
-	int result=OK;
 
 	/* make sure we have the data we need */
 	if(grp==NULL || (contact_name==NULL || !strcmp(contact_name,""))){
@@ -1496,19 +1387,11 @@ contactsmember *add_contact_to_contactgroup(contactgroup *grp, char *contact_nam
 	        }
 
 	/* allocate memory for a new member */
-	if((new_contactsmember=(contactsmember*)calloc(1, sizeof(contactsmember)))==NULL)
-		return NULL;
+	new_contactsmember = new contactsmember;
+	memset(new_contactsmember, 0, sizeof(*new_contactsmember));
 
 	/* duplicate vars */
-	if((new_contactsmember->contact_name=(char *)strdup(contact_name))==NULL)
-		result=ERROR;
-
-	/* handle errors */
-	if(result==ERROR){
-		my_free(new_contactsmember->contact_name);
-		my_free(new_contactsmember);
-		return NULL;
-	        }
+	new_contactsmember->contact_name=my_strdup(contact_name);
 
 	/* add the new member to the head of the member list */
 	new_contactsmember->next=grp->members;
@@ -1543,53 +1426,40 @@ service *add_service(char *host_name, char *description, char *display_name, cha
 	        }
 
 	/* allocate memory */
-	if((new_service=(service *)calloc(1, sizeof(service)))==NULL)
-		return NULL;
+	new_service = new service;
+	memset(new_service, 0, sizeof(*new_service));
 
 	/* duplicate vars */
-	if((new_service->host_name=(char *)strdup(host_name))==NULL)
-		result=ERROR;
-	if((new_service->description=(char *)strdup(description))==NULL)
-		result=ERROR;
-	if((new_service->display_name=(char *)strdup((display_name==NULL)?description:display_name))==NULL)
-		result=ERROR;
-	if((new_service->service_check_command=(char *)strdup(check_command))==NULL)
-		result=ERROR;
+	new_service->host_name=my_strdup(host_name);
+	new_service->description=my_strdup(description);
+	new_service->display_name=my_strdup((display_name==NULL)?description:display_name);
+	new_service->service_check_command=my_strdup(check_command);
 	if(event_handler){
-		if((new_service->event_handler=(char *)strdup(event_handler))==NULL)
-			result=ERROR;
+		new_service->event_handler=my_strdup(event_handler);
 	        }
 	if(notification_period){
-		if((new_service->notification_period=(char *)strdup(notification_period))==NULL)
-			result=ERROR;
-	        }
+		new_service->notification_period=my_strdup(notification_period);
+		}
 	if(check_period){
-		if((new_service->check_period=(char *)strdup(check_period))==NULL)
-			result=ERROR;
+		new_service->check_period=my_strdup(check_period);
 	        }
 	if(failure_prediction_options){
-		if((new_service->failure_prediction_options=(char *)strdup(failure_prediction_options))==NULL)
-			result=ERROR;
+		new_service->failure_prediction_options=my_strdup(failure_prediction_options);
 	        }
 	if(notes){
-		if((new_service->notes=(char *)strdup(notes))==NULL)
-			result=ERROR;
+		new_service->notes=my_strdup(notes);
 	        }
 	if(notes_url){
-		if((new_service->notes_url=(char *)strdup(notes_url))==NULL)
-			result=ERROR;
+		new_service->notes_url=my_strdup(notes_url);
 	        }
 	if(action_url){
-		if((new_service->action_url=(char *)strdup(action_url))==NULL)
-			result=ERROR;
+		new_service->action_url=my_strdup(action_url);
 	        }
 	if(icon_image){
-		if((new_service->icon_image=(char *)strdup(icon_image))==NULL)
-			result=ERROR;
+		new_service->icon_image=my_strdup(icon_image);
 	        }
 	if(icon_image_alt){
-		if((new_service->icon_image_alt=(char *)strdup(icon_image_alt))==NULL)
-			result=ERROR;
+		new_service->icon_image_alt=my_strdup(icon_image_alt);
 	        }
 
 	new_service->check_interval=check_interval;
@@ -1675,35 +1545,33 @@ service *add_service(char *host_name, char *description, char *display_name, cha
 	new_service->modified_attributes=MODATTR_NONE;
 
 	/* add new service to skiplist */
-	if(result==OK){
-		result=skiplist_insert(object_skiplists[SERVICE_SKIPLIST],(void *)new_service);
-		switch(result){
-		case SKIPLIST_ERROR_DUPLICATE:
-			logit(NSLOG_CONFIG_ERROR,TRUE,"Error: Service '%s' on host '%s' has already been defined\n",description,host_name);
-			result=ERROR;
-			break;
-		case SKIPLIST_OK:
-			result=OK;
-			break;
-		default:
-			logit(NSLOG_CONFIG_ERROR,TRUE,"Error: Could not add service '%s' on host '%s' to skiplist\n",description,host_name);
-			result=ERROR;
-			break;
-			}
-		}
+	result=skiplist_insert(object_skiplists[SERVICE_SKIPLIST],(void *)new_service);
+	switch(result){
+	case SKIPLIST_ERROR_DUPLICATE:
+		logit(NSLOG_CONFIG_ERROR,TRUE,"Error: Service '%s' on host '%s' has already been defined\n",description,host_name);
+		result=ERROR;
+		break;
+	case SKIPLIST_OK:
+		result=OK;
+		break;
+	default:
+		logit(NSLOG_CONFIG_ERROR,TRUE,"Error: Could not add service '%s' on host '%s' to skiplist\n",description,host_name);
+		result=ERROR;
+		break;
+	}
 
 	/* handle errors */
 	if(result==ERROR){
-		my_free(new_service->perf_data);
-		my_free(new_service->plugin_output);
-		my_free(new_service->long_plugin_output);
-		my_free(new_service->failure_prediction_options);
-		my_free(new_service->notification_period);
-		my_free(new_service->event_handler);
-		my_free(new_service->service_check_command);
-		my_free(new_service->description);
-		my_free(new_service->host_name);
-		my_free(new_service);
+		delete[] new_service->perf_data;
+		delete[] new_service->plugin_output;
+		delete[] new_service->long_plugin_output;
+		delete[] new_service->failure_prediction_options;
+		delete[] new_service->notification_period;
+		delete[] new_service->event_handler;
+		delete[] new_service->service_check_command;
+		delete[] new_service->description;
+		delete[] new_service->host_name;
+		delete new_service;
 		return NULL;
 	        }
 
@@ -1725,7 +1593,6 @@ service *add_service(char *host_name, char *description, char *display_name, cha
 /* adds a contact group to a service */
 contactgroupsmember *add_contactgroup_to_service(service *svc,char *group_name){
 	contactgroupsmember *new_contactgroupsmember=NULL;
-	int result=OK;
 
 	/* bail out if we weren't given the data we need */
 	if(svc==NULL || (group_name==NULL || !strcmp(group_name,""))){
@@ -1734,18 +1601,11 @@ contactgroupsmember *add_contactgroup_to_service(service *svc,char *group_name){
 	        }
 
 	/* allocate memory for the contactgroups member */
-	if((new_contactgroupsmember=(contactgroupsmember*)calloc(1, sizeof(contactgroupsmember)))==NULL)
-		return NULL;
+	new_contactgroupsmember = new contactgroupsmember;
+	memset(new_contactgroupsmember, 0, sizeof(*new_contactgroupsmember));
 
 	/* duplicate vars */
-	if((new_contactgroupsmember->group_name=(char *)strdup(group_name))==NULL)
-		result=ERROR;
-
-	/* handle errors */
-	if(result==ERROR){
-		my_free(new_contactgroupsmember);
-		return NULL;
-	        }
+	new_contactgroupsmember->group_name=my_strdup(group_name);
 
 	/* add this contactgroup to the service */
 	new_contactgroupsmember->next=svc->contact_groups;
@@ -1784,38 +1644,34 @@ command *add_command(char *name,char *value){
 	        }
 
 	/* allocate memory for the new command */
-	if((new_command=(command *)calloc(1, sizeof(command)))==NULL)
-		return NULL;
+	new_command = new command;
+	memset(new_command, 0, sizeof(*new_command));
 
 	/* duplicate vars */
-	if((new_command->name=(char *)strdup(name))==NULL)
-		result=ERROR;
-	if((new_command->command_line=(char *)strdup(value))==NULL)
-		result=ERROR;
+	new_command->name=my_strdup(name);
+	new_command->command_line=my_strdup(value);
 
 	/* add new command to skiplist */
-	if(result==OK){
-		result=skiplist_insert(object_skiplists[COMMAND_SKIPLIST],(void *)new_command);
-		switch(result){
-		case SKIPLIST_ERROR_DUPLICATE:
-			logit(NSLOG_CONFIG_ERROR,TRUE,"Error: Command '%s' has already been defined\n",name);
-			result=ERROR;
-			break;
-		case SKIPLIST_OK:
-			result=OK;
-			break;
-		default:
-			logit(NSLOG_CONFIG_ERROR,TRUE,"Error: Could not add command '%s' to skiplist\n",name);
-			result=ERROR;
-			break;
-			}
-		}
+	result=skiplist_insert(object_skiplists[COMMAND_SKIPLIST],(void *)new_command);
+	switch(result){
+	case SKIPLIST_ERROR_DUPLICATE:
+		logit(NSLOG_CONFIG_ERROR,TRUE,"Error: Command '%s' has already been defined\n",name);
+		result=ERROR;
+		break;
+	case SKIPLIST_OK:
+		result=OK;
+		break;
+	default:
+		logit(NSLOG_CONFIG_ERROR,TRUE,"Error: Could not add command '%s' to skiplist\n",name);
+		result=ERROR;
+		break;
+	}
 
 	/* handle errors */
 	if(result==ERROR){
-		my_free(new_command->command_line);
-		my_free(new_command->name);
-		my_free(new_command);
+		delete[] new_command->command_line;
+		delete[] new_command->name;
+		delete new_command;
 		return NULL;
 	        }
 
@@ -1850,17 +1706,14 @@ serviceescalation *add_serviceescalation(char *host_name,char *description, int 
 #endif
 
 	/* allocate memory for a new service escalation entry */
-	if((new_serviceescalation=(serviceescalation*)calloc(1, sizeof(serviceescalation)))==NULL)
-		return NULL;
+	new_serviceescalation = new serviceescalation;
+	memset(new_serviceescalation, 0, sizeof(*new_serviceescalation));
 
 	/* duplicate vars */
-	if((new_serviceescalation->host_name=(char *)strdup(host_name))==NULL)
-		result=ERROR;
-	if((new_serviceescalation->description=(char *)strdup(description))==NULL)
-		result=ERROR;
+	new_serviceescalation->host_name=my_strdup(host_name);
+	new_serviceescalation->description=my_strdup(description);
 	if(escalation_period){
-		if((new_serviceescalation->escalation_period=(char *)strdup(escalation_period))==NULL)
-			result=ERROR;
+		new_serviceescalation->escalation_period=my_strdup(escalation_period);
 	        }
 
 	new_serviceescalation->first_notification=first_notification;
@@ -1872,25 +1725,23 @@ serviceescalation *add_serviceescalation(char *host_name,char *description, int 
 	new_serviceescalation->escalate_on_critical=(escalate_on_critical>0)?TRUE:FALSE;
 
 	/* add new serviceescalation to skiplist */
-	if(result==OK){
-		result=skiplist_insert(object_skiplists[SERVICEESCALATION_SKIPLIST],(void *)new_serviceescalation);
-		switch(result){
-		case SKIPLIST_OK:
-			result=OK;
-			break;
-		default:
-			logit(NSLOG_CONFIG_ERROR,TRUE,"Error: Could not add escalation for service '%s' on host '%s' to skiplist\n",description,host_name);
-			result=ERROR;
-			break;
-			}
-		}
+	result=skiplist_insert(object_skiplists[SERVICEESCALATION_SKIPLIST],(void *)new_serviceescalation);
+	switch(result){
+	case SKIPLIST_OK:
+		result=OK;
+		break;
+	default:
+		logit(NSLOG_CONFIG_ERROR,TRUE,"Error: Could not add escalation for service '%s' on host '%s' to skiplist\n",description,host_name);
+		result=ERROR;
+		break;
+	}
 
 	/* handle errors */
 	if(result==ERROR){
-		my_free(new_serviceescalation->host_name);
-		my_free(new_serviceescalation->description);
-		my_free(new_serviceescalation->escalation_period);
-		my_free(new_serviceescalation);
+		delete[] new_serviceescalation->host_name;
+		delete[] new_serviceescalation->description;
+		delete[] new_serviceescalation->escalation_period;
+		delete new_serviceescalation;
 		return NULL;
 	        }
 
@@ -1912,7 +1763,6 @@ serviceescalation *add_serviceescalation(char *host_name,char *description, int 
 /* adds a contact group to a service escalation */
 contactgroupsmember *add_contactgroup_to_serviceescalation(serviceescalation *se,char *group_name){
 	contactgroupsmember *new_contactgroupsmember=NULL;
-	int result=OK;
 
 	/* bail out if we weren't given the data we need */
 	if(se==NULL || (group_name==NULL || !strcmp(group_name,""))){
@@ -1921,19 +1771,11 @@ contactgroupsmember *add_contactgroup_to_serviceescalation(serviceescalation *se
 	        }
 
 	/* allocate memory for the contactgroups member */
-	if((new_contactgroupsmember=(contactgroupsmember *)calloc(1, sizeof(contactgroupsmember)))==NULL)
-		return NULL;
+	new_contactgroupsmember = new contactgroupsmember;
+	memset(new_contactgroupsmember, 0, sizeof(*new_contactgroupsmember));
 
 	/* duplicate vars */
-	if((new_contactgroupsmember->group_name=(char *)strdup(group_name))==NULL)
-		result=ERROR;
-
-	/* handle errors */
-	if(result==ERROR){
-		my_free(new_contactgroupsmember->group_name);
-		my_free(new_contactgroupsmember);
-		return NULL;
-	        }
+	new_contactgroupsmember->group_name=my_strdup(group_name);
 
 	/* add this contactgroup to the service escalation */
 	new_contactgroupsmember->next=se->contact_groups;
@@ -1968,21 +1810,16 @@ servicedependency *add_service_dependency(char *dependent_host_name, char *depen
 	        }
 
 	/* allocate memory for a new service dependency entry */
-	if((new_servicedependency=(servicedependency *)calloc(1, sizeof(servicedependency)))==NULL)
-		return NULL;
+	new_servicedependency = new servicedependency;
+	memset(new_servicedependency, 0, sizeof(*new_servicedependency));
 
 	/* duplicate vars */
-	if((new_servicedependency->dependent_host_name=(char *)strdup(dependent_host_name))==NULL)
-		result=ERROR;
-	if((new_servicedependency->dependent_service_description=(char *)strdup(dependent_service_description))==NULL)
-		result=ERROR;
-	if((new_servicedependency->host_name=(char *)strdup(host_name))==NULL)
-		result=ERROR;
-	if((new_servicedependency->service_description=(char *)strdup(service_description))==NULL)
-		result=ERROR;
+	new_servicedependency->dependent_host_name=my_strdup(dependent_host_name);
+	new_servicedependency->dependent_service_description=my_strdup(dependent_service_description);
+	new_servicedependency->host_name=my_strdup(host_name);
+	new_servicedependency->service_description=my_strdup(service_description);
 	if(dependency_period){
-		if((new_servicedependency->dependency_period=(char *)strdup(dependency_period))==NULL)
-			result=ERROR;
+		new_servicedependency->dependency_period=my_strdup(dependency_period);
 		}
 
 	new_servicedependency->dependency_type=(dependency_type==EXECUTION_DEPENDENCY)?EXECUTION_DEPENDENCY:NOTIFICATION_DEPENDENCY;
@@ -1996,26 +1833,24 @@ servicedependency *add_service_dependency(char *dependent_host_name, char *depen
 	new_servicedependency->contains_circular_path=FALSE;
 
 	/* add new service dependency to skiplist */
-	if(result==OK){
-		result=skiplist_insert(object_skiplists[SERVICEDEPENDENCY_SKIPLIST],(void *)new_servicedependency);
-		switch(result){
-		case SKIPLIST_OK:
-			result=OK;
-			break;
-		default:
-			logit(NSLOG_CONFIG_ERROR,TRUE,"Error: Could not add service dependency to skiplist\n");
-			result=ERROR;
-			break;
-			}
-		}
+	result=skiplist_insert(object_skiplists[SERVICEDEPENDENCY_SKIPLIST],(void *)new_servicedependency);
+	switch(result){
+	case SKIPLIST_OK:
+		result=OK;
+		break;
+	default:
+		logit(NSLOG_CONFIG_ERROR,TRUE,"Error: Could not add service dependency to skiplist\n");
+		result=ERROR;
+		break;
+	}
 
 	/* handle errors */
 	if(result==ERROR){
-		my_free(new_servicedependency->host_name);
-		my_free(new_servicedependency->service_description);
-		my_free(new_servicedependency->dependent_host_name);
-		my_free(new_servicedependency->dependent_service_description);
-		my_free(new_servicedependency);
+		delete[] new_servicedependency->host_name;
+		delete[] new_servicedependency->service_description;
+		delete[] new_servicedependency->dependent_host_name;
+		delete[] new_servicedependency->dependent_service_description;
+		delete new_servicedependency;
 		return NULL;
 	        }
 
@@ -2045,17 +1880,14 @@ hostdependency *add_host_dependency(char *dependent_host_name, char *host_name, 
 	        }
 
 	/* allocate memory for a new host dependency entry */
-	if((new_hostdependency=(hostdependency *)calloc(1, sizeof(hostdependency)))==NULL)
-		return NULL;
+	new_hostdependency = new hostdependency;
+	memset(new_hostdependency, 0, sizeof(*new_hostdependency));
 
 	/* duplicate vars */
-	if((new_hostdependency->dependent_host_name=(char *)strdup(dependent_host_name))==NULL)
-		result=ERROR;
-	if((new_hostdependency->host_name=(char *)strdup(host_name))==NULL)
-		result=ERROR;
+	new_hostdependency->dependent_host_name=my_strdup(dependent_host_name);
+	new_hostdependency->host_name=my_strdup(host_name);
 	if(dependency_period){
-		if((new_hostdependency->dependency_period=(char *)strdup(dependency_period))==NULL)
-			result=ERROR;
+		new_hostdependency->dependency_period=my_strdup(dependency_period);
 		}
 
 	new_hostdependency->dependency_type=(dependency_type==EXECUTION_DEPENDENCY)?EXECUTION_DEPENDENCY:NOTIFICATION_DEPENDENCY;
@@ -2068,24 +1900,22 @@ hostdependency *add_host_dependency(char *dependent_host_name, char *host_name, 
 	new_hostdependency->contains_circular_path=FALSE;
 
 	/* add new host dependency to skiplist */
-	if(result==OK){
-		result=skiplist_insert(object_skiplists[HOSTDEPENDENCY_SKIPLIST],(void *)new_hostdependency);
-		switch(result){
-		case SKIPLIST_OK:
-			result=OK;
-			break;
-		default:
-			logit(NSLOG_CONFIG_ERROR,TRUE,"Error: Could not add host dependency to skiplist\n");
-			result=ERROR;
-			break;
-			}
-		}
+	result=skiplist_insert(object_skiplists[HOSTDEPENDENCY_SKIPLIST],(void *)new_hostdependency);
+	switch(result){
+	case SKIPLIST_OK:
+		result=OK;
+		break;
+	default:
+		logit(NSLOG_CONFIG_ERROR,TRUE,"Error: Could not add host dependency to skiplist\n");
+		result=ERROR;
+		break;
+	}
 
 	/* handle errors */
 	if(result==ERROR){
-		my_free(new_hostdependency->host_name);
-		my_free(new_hostdependency->dependent_host_name);
-		my_free(new_hostdependency);
+		delete[] new_hostdependency->host_name;
+		delete[] new_hostdependency->dependent_host_name;
+		delete new_hostdependency;
 		return NULL;
 	        }
 
@@ -2120,15 +1950,13 @@ hostescalation *add_hostescalation(char *host_name,int first_notification,int la
 #endif
 
 	/* allocate memory for a new host escalation entry */
-	if((new_hostescalation=(hostescalation*)calloc(1, sizeof(hostescalation)))==NULL)
-		return NULL;
+	new_hostescalation = new hostescalation;
+	memset(new_hostescalation, 0, sizeof(*new_hostescalation));
 
 	/* duplicate vars */
-	if((new_hostescalation->host_name=(char *)strdup(host_name))==NULL)
-		result=ERROR;
+	new_hostescalation->host_name=my_strdup(host_name);
 	if(escalation_period){
-		if((new_hostescalation->escalation_period=(char *)strdup(escalation_period))==NULL)
-			result=ERROR;
+		new_hostescalation->escalation_period=my_strdup(escalation_period);
 	        }
 
 	new_hostescalation->first_notification=first_notification;
@@ -2139,24 +1967,22 @@ hostescalation *add_hostescalation(char *host_name,int first_notification,int la
 	new_hostescalation->escalate_on_unreachable=(escalate_on_unreachable>0)?TRUE:FALSE;
 
 	/* add new hostescalation to skiplist */
-	if(result==OK){
-		result=skiplist_insert(object_skiplists[HOSTESCALATION_SKIPLIST],(void *)new_hostescalation);
-		switch(result){
-		case SKIPLIST_OK:
-			result=OK;
-			break;
-		default:
-			logit(NSLOG_CONFIG_ERROR,TRUE,"Error: Could not add hostescalation '%s' to skiplist\n",host_name);
-			result=ERROR;
-			break;
-			}
-		}
+	result=skiplist_insert(object_skiplists[HOSTESCALATION_SKIPLIST],(void *)new_hostescalation);
+	switch(result){
+	case SKIPLIST_OK:
+		result=OK;
+		break;
+	default:
+		logit(NSLOG_CONFIG_ERROR,TRUE,"Error: Could not add hostescalation '%s' to skiplist\n",host_name);
+		result=ERROR;
+		break;
+	}
 
 	/* handle errors */
 	if(result==ERROR){
-		my_free(new_hostescalation->host_name);
-		my_free(new_hostescalation->escalation_period);
-		my_free(new_hostescalation);
+		delete[] new_hostescalation->host_name;
+		delete[] new_hostescalation->escalation_period;
+		delete new_hostescalation;
 		return NULL;
 	        }
 
@@ -2178,7 +2004,6 @@ hostescalation *add_hostescalation(char *host_name,int first_notification,int la
 /* adds a contact group to a host escalation */
 contactgroupsmember *add_contactgroup_to_hostescalation(hostescalation *he,char *group_name){
 	contactgroupsmember *new_contactgroupsmember=NULL;
-	int result=OK;
 
 	/* bail out if we weren't given the data we need */
 	if(he==NULL || (group_name==NULL || !strcmp(group_name,""))){
@@ -2187,19 +2012,11 @@ contactgroupsmember *add_contactgroup_to_hostescalation(hostescalation *he,char 
 	        }
 
 	/* allocate memory for the contactgroups member */
-	if((new_contactgroupsmember=(contactgroupsmember *)calloc(1, sizeof(contactgroupsmember)))==NULL)
-		return NULL;
+	new_contactgroupsmember = new contactgroupsmember;
+	memset(new_contactgroupsmember, 0, sizeof(*new_contactgroupsmember));
 
 	/* duplicate vars */
-	if((new_contactgroupsmember->group_name=(char *)strdup(group_name))==NULL)
-		result=ERROR;
-
-	/* handle errors */
-	if(result==ERROR){
-		my_free(new_contactgroupsmember->group_name);
-		my_free(new_contactgroupsmember);
-		return NULL;
-	        }
+	new_contactgroupsmember->group_name=my_strdup(group_name);
 
 	/* add this contactgroup to the host escalation */
 	new_contactgroupsmember->next=he->contact_groups;
@@ -2234,15 +2051,8 @@ contactsmember *add_contact_to_object(contactsmember **object_ptr, char *contact
 	        }
 
 	/* allocate memory for a new member */
-	if((new_contactsmember=(contactsmember*)malloc(sizeof(contactsmember)))==NULL){
-		logit(NSLOG_CONFIG_ERROR,TRUE,"Error: Could not allocate memory for contact\n");
-		return NULL;
-	        }
-	if((new_contactsmember->contact_name=(char *)strdup(contactname))==NULL){
-		logit(NSLOG_CONFIG_ERROR,TRUE,"Error: Could not allocate memory for contact name\n");
-		my_free(new_contactsmember);
-		return NULL;
-	        }
+	new_contactsmember = new contactsmember;
+	new_contactsmember->contact_name=my_strdup(contactname);
 
 	/* set initial values */
 	new_contactsmember->contact_ptr=NULL;
@@ -2257,7 +2067,7 @@ contactsmember *add_contact_to_object(contactsmember **object_ptr, char *contact
 
 
 /* adds a custom variable to an object */
-customvariablesmember *add_custom_variable_to_object(customvariablesmember **object_ptr, char *varname, char *varvalue){
+customvariablesmember *add_custom_variable_to_object(customvariablesmember **object_ptr, char const* varname, char const* varvalue){
 	customvariablesmember *new_customvariablesmember=NULL;
 
 	/* make sure we have the data we need */
@@ -2272,22 +2082,11 @@ customvariablesmember *add_custom_variable_to_object(customvariablesmember **obj
 	        }
 
 	/* allocate memory for a new member */
-	if((new_customvariablesmember=(customvariablesmember*)malloc(sizeof(customvariablesmember)))==NULL){
-		logit(NSLOG_CONFIG_ERROR,TRUE,"Error: Could not allocate memory for custom variable\n");
-		return NULL;
-	        }
-	if((new_customvariablesmember->variable_name=(char *)strdup(varname))==NULL){
-		logit(NSLOG_CONFIG_ERROR,TRUE,"Error: Could not allocate memory for custom variable name\n");
-		my_free(new_customvariablesmember);
-		return NULL;
-	        }
+	new_customvariablesmember = new customvariablesmember;
+	new_customvariablesmember->variable_name=my_strdup(varname);
+
 	if(varvalue){
-		if((new_customvariablesmember->variable_value=(char *)strdup(varvalue))==NULL){
-			logit(NSLOG_CONFIG_ERROR,TRUE,"Error: Could not allocate memory for custom variable value\n");
-			my_free(new_customvariablesmember->variable_name);
-			my_free(new_customvariablesmember);
-			return NULL;
-	                }
+		new_customvariablesmember->variable_value=my_strdup(varvalue);
 	        }
 	else
 		new_customvariablesmember->variable_value=NULL;
@@ -2539,8 +2338,7 @@ int add_object_to_objectlist(objectlist **list, void *object_ptr){
 		return OK;
 
 	/* allocate memory for a new list item */
-	if((new_item=(objectlist *)malloc(sizeof(objectlist)))==NULL)
-		return ERROR;
+	new_item = new objectlist;
 
 	/* initialize vars */
 	new_item->object_ptr=object_ptr;
@@ -2565,7 +2363,7 @@ int free_objectlist(objectlist **temp_list){
 	/* free memory allocated to object list */
 	for(this_objectlist=*temp_list;this_objectlist!=NULL;this_objectlist=next_objectlist){
 		next_objectlist=this_objectlist->next;
-		my_free(this_objectlist);
+		delete this_objectlist;
 	        }
 
 	*temp_list=NULL;
@@ -3063,9 +2861,9 @@ int free_object_data(void){
 				next_daterange=this_daterange->next;
 				for(this_timerange=this_daterange->times;this_timerange!=NULL;this_timerange=next_timerange){
 					next_timerange=this_timerange->next;
-					my_free(this_timerange);
+					delete this_timerange;
 					}
-				my_free(this_daterange);
+				delete this_daterange;
 			        }
 		        }
 
@@ -3074,21 +2872,21 @@ int free_object_data(void){
 
 			for(this_timerange=this_timeperiod->days[x];this_timerange!=NULL;this_timerange=next_timerange){
 				next_timerange=this_timerange->next;
-				my_free(this_timerange);
+				delete this_timerange;
 			        }
 		        }
 
 		/* free exclusions */
 		for(this_timeperiodexclusion=this_timeperiod->exclusions;this_timeperiodexclusion!=NULL;this_timeperiodexclusion=next_timeperiodexclusion){
 			next_timeperiodexclusion=this_timeperiodexclusion->next;
-			my_free(this_timeperiodexclusion->timeperiod_name);
-			my_free(this_timeperiodexclusion);
+			delete[] this_timeperiodexclusion->timeperiod_name;
+			delete this_timeperiodexclusion;
 			}
 
 		next_timeperiod=this_timeperiod->next;
-		my_free(this_timeperiod->name);
-		my_free(this_timeperiod->alias);
-		my_free(this_timeperiod);
+		delete[] this_timeperiod->name;
+		delete[] this_timeperiod->alias;
+		delete  this_timeperiod;
 		this_timeperiod=next_timeperiod;
 		}
 
@@ -3106,8 +2904,8 @@ int free_object_data(void){
 		this_hostsmember=this_host->parent_hosts;
 		while(this_hostsmember!=NULL){
 			next_hostsmember=this_hostsmember->next;
-			my_free(this_hostsmember->host_name);
-			my_free(this_hostsmember);
+			delete[] this_hostsmember->host_name;
+			delete this_hostsmember;
 			this_hostsmember=next_hostsmember;
 			}
 
@@ -3115,8 +2913,8 @@ int free_object_data(void){
 		this_hostsmember=this_host->child_hosts;
 		while(this_hostsmember!=NULL){
 			next_hostsmember=this_hostsmember->next;
-			my_free(this_hostsmember->host_name);
-			my_free(this_hostsmember);
+			delete[] this_hostsmember->host_name;
+			delete this_hostsmember;
 			this_hostsmember=next_hostsmember;
 			}
 
@@ -3124,9 +2922,9 @@ int free_object_data(void){
 		this_servicesmember=this_host->services;
 		while(this_servicesmember!=NULL){
 			next_servicesmember=this_servicesmember->next;
-			my_free(this_servicesmember->host_name);
-			my_free(this_servicesmember->service_description);
-			my_free(this_servicesmember);
+			delete[] this_servicesmember->host_name;
+			delete[] this_servicesmember->service_description;
+			delete this_servicesmember;
 			this_servicesmember=next_servicesmember;
 			}
 
@@ -3134,8 +2932,8 @@ int free_object_data(void){
 		this_contactgroupsmember=this_host->contact_groups;
 		while(this_contactgroupsmember!=NULL){
 			next_contactgroupsmember=this_contactgroupsmember->next;
-			my_free(this_contactgroupsmember->group_name);
-			my_free(this_contactgroupsmember);
+			delete[] this_contactgroupsmember->group_name;
+			delete this_contactgroupsmember;
 			this_contactgroupsmember=next_contactgroupsmember;
 			}
 
@@ -3143,8 +2941,8 @@ int free_object_data(void){
 		this_contactsmember=this_host->contacts;
 		while(this_contactsmember!=NULL){
 			next_contactsmember=this_contactsmember->next;
-			my_free(this_contactsmember->contact_name);
-			my_free(this_contactsmember);
+			delete[] this_contactsmember->contact_name;
+			delete this_contactsmember;
 			this_contactsmember=next_contactsmember;
 			}
 
@@ -3152,34 +2950,34 @@ int free_object_data(void){
 		this_customvariablesmember=this_host->custom_variables;
 		while(this_customvariablesmember!=NULL){
 			next_customvariablesmember=this_customvariablesmember->next;
-			my_free(this_customvariablesmember->variable_name);
-			my_free(this_customvariablesmember->variable_value);
-			my_free(this_customvariablesmember);
+			delete[] this_customvariablesmember->variable_name;
+			delete[] this_customvariablesmember->variable_value;
+			delete this_customvariablesmember;
 			this_customvariablesmember=next_customvariablesmember;
 		        }
 
-		my_free(this_host->name);
-		my_free(this_host->display_name);
-		my_free(this_host->alias);
-		my_free(this_host->address);
-		my_free(this_host->plugin_output);
-		my_free(this_host->long_plugin_output);
-		my_free(this_host->perf_data);
+		delete[] this_host->name;
+		delete[] this_host->display_name;
+		delete[] this_host->alias;
+		delete[] this_host->address;
+		delete[] this_host->plugin_output;
+		delete[] this_host->long_plugin_output;
+		delete[] this_host->perf_data;
 
 		free_objectlist(&this_host->hostgroups_ptr);
-		my_free(this_host->check_period);
-		my_free(this_host->host_check_command);
-		my_free(this_host->event_handler);
-		my_free(this_host->failure_prediction_options);
-		my_free(this_host->notification_period);
-		my_free(this_host->notes);
-		my_free(this_host->notes_url);
-		my_free(this_host->action_url);
-		my_free(this_host->icon_image);
-		my_free(this_host->icon_image_alt);
-		my_free(this_host->vrml_image);
-		my_free(this_host->statusmap_image);
-		my_free(this_host);
+		delete[] this_host->check_period;
+		delete[] this_host->host_check_command;
+		delete[] this_host->event_handler;
+		delete[] this_host->failure_prediction_options;
+		delete[] this_host->notification_period;
+		delete[] this_host->notes;
+		delete[] this_host->notes_url;
+		delete[] this_host->action_url;
+		delete[] this_host->icon_image;
+		delete[] this_host->icon_image_alt;
+		delete[] this_host->vrml_image;
+		delete[] this_host->statusmap_image;
+		delete this_host;
 		this_host=next_host;
 	        }
 
@@ -3195,18 +2993,18 @@ int free_object_data(void){
 		this_hostsmember=this_hostgroup->members;
 		while(this_hostsmember!=NULL){
 			next_hostsmember=this_hostsmember->next;
-			my_free(this_hostsmember->host_name);
-			my_free(this_hostsmember);
+			delete[] this_hostsmember->host_name;
+			delete this_hostsmember;
 			this_hostsmember=next_hostsmember;
 		        }
 
 		next_hostgroup=this_hostgroup->next;
-		my_free(this_hostgroup->group_name);
-		my_free(this_hostgroup->alias);
-		my_free(this_hostgroup->notes);
-		my_free(this_hostgroup->notes_url);
-		my_free(this_hostgroup->action_url);
-		my_free(this_hostgroup);
+		delete[] this_hostgroup->group_name;
+		delete[] this_hostgroup->alias;
+		delete[] this_hostgroup->notes;
+		delete[] this_hostgroup->notes_url;
+		delete[] this_hostgroup->action_url;
+		delete this_hostgroup;
 		this_hostgroup=next_hostgroup;
 		}
 
@@ -3222,19 +3020,19 @@ int free_object_data(void){
 		this_servicesmember=this_servicegroup->members;
 		while(this_servicesmember!=NULL){
 			next_servicesmember=this_servicesmember->next;
-			my_free(this_servicesmember->host_name);
-			my_free(this_servicesmember->service_description);
-			my_free(this_servicesmember);
+			delete[] this_servicesmember->host_name;
+			delete[] this_servicesmember->service_description;
+			delete this_servicesmember;
 			this_servicesmember=next_servicesmember;
 		        }
 
 		next_servicegroup=this_servicegroup->next;
-		my_free(this_servicegroup->group_name);
-		my_free(this_servicegroup->alias);
-		my_free(this_servicegroup->notes);
-		my_free(this_servicegroup->notes_url);
-		my_free(this_servicegroup->action_url);
-		my_free(this_servicegroup);
+		delete[] this_servicegroup->group_name;
+		delete[] this_servicegroup->alias;
+		delete[] this_servicegroup->notes;
+		delete[] this_servicegroup->notes_url;
+		delete[] this_servicegroup->action_url;
+		delete this_servicegroup;
 		this_servicegroup=next_servicegroup;
 		}
 
@@ -3251,8 +3049,8 @@ int free_object_data(void){
 		while(this_commandsmember!=NULL){
 			next_commandsmember=this_commandsmember->next;
 			if(this_commandsmember->cmd!=NULL)
-				my_free(this_commandsmember->cmd);
-			my_free(this_commandsmember);
+				delete[] this_commandsmember->cmd;
+			delete this_commandsmember;
 			this_commandsmember=next_commandsmember;
 		        }
 
@@ -3261,8 +3059,8 @@ int free_object_data(void){
 		while(this_commandsmember!=NULL){
 			next_commandsmember=this_commandsmember->next;
 			if(this_commandsmember->cmd!=NULL)
-				my_free(this_commandsmember->cmd);
-			my_free(this_commandsmember);
+				delete[] this_commandsmember->cmd;
+			delete this_commandsmember;
 			this_commandsmember=next_commandsmember;
 		        }
 
@@ -3270,25 +3068,25 @@ int free_object_data(void){
 		this_customvariablesmember=this_contact->custom_variables;
 		while(this_customvariablesmember!=NULL){
 			next_customvariablesmember=this_customvariablesmember->next;
-			my_free(this_customvariablesmember->variable_name);
-			my_free(this_customvariablesmember->variable_value);
-			my_free(this_customvariablesmember);
+			delete[] this_customvariablesmember->variable_name;
+			delete[] this_customvariablesmember->variable_value;
+			delete this_customvariablesmember;
 			this_customvariablesmember=next_customvariablesmember;
 		        }
 
 		next_contact=this_contact->next;
-		my_free(this_contact->name);
-		my_free(this_contact->alias);
-		my_free(this_contact->email);
-		my_free(this_contact->pager);
+		delete[] this_contact->name;
+		delete[] this_contact->alias;
+		delete[] this_contact->email;
+		delete[] this_contact->pager;
 		for(i=0;i<MAX_CONTACT_ADDRESSES;i++)
-			my_free(this_contact->address[i]);
-		my_free(this_contact->host_notification_period);
-		my_free(this_contact->service_notification_period);
+			delete[] this_contact->address[i];
+		delete[] this_contact->host_notification_period;
+		delete[] this_contact->service_notification_period;
 
 		free_objectlist(&this_contact->contactgroups_ptr);
 
-		my_free(this_contact);
+		delete this_contact;
 		this_contact=next_contact;
 		}
 
@@ -3304,15 +3102,15 @@ int free_object_data(void){
 		this_contactsmember=this_contactgroup->members;
 		while(this_contactsmember!=NULL){
 			next_contactsmember=this_contactsmember->next;
-			my_free(this_contactsmember->contact_name);
-			my_free(this_contactsmember);
+			delete[] this_contactsmember->contact_name;
+			delete this_contactsmember;
 			this_contactsmember=next_contactsmember;
 		        }
 
 		next_contactgroup=this_contactgroup->next;
-		my_free(this_contactgroup->group_name);
-		my_free(this_contactgroup->alias);
-		my_free(this_contactgroup);
+		delete[] this_contactgroup->group_name;
+		delete[] this_contactgroup->alias;
+		delete this_contactgroup;
 		this_contactgroup=next_contactgroup;
 		}
 
@@ -3330,8 +3128,8 @@ int free_object_data(void){
 		this_contactgroupsmember=this_service->contact_groups;
 		while(this_contactgroupsmember!=NULL){
 			next_contactgroupsmember=this_contactgroupsmember->next;
-			my_free(this_contactgroupsmember->group_name);
-			my_free(this_contactgroupsmember);
+			delete[] this_contactgroupsmember->group_name;
+			delete this_contactgroupsmember;
 			this_contactgroupsmember=next_contactgroupsmember;
 	                }
 
@@ -3339,8 +3137,8 @@ int free_object_data(void){
 		this_contactsmember=this_service->contacts;
 		while(this_contactsmember!=NULL){
 			next_contactsmember=this_contactsmember->next;
-			my_free(this_contactsmember->contact_name);
-			my_free(this_contactsmember);
+			delete[] this_contactsmember->contact_name;
+			delete this_contactsmember;
 			this_contactsmember=next_contactsmember;
 			}
 
@@ -3348,34 +3146,34 @@ int free_object_data(void){
 		this_customvariablesmember=this_service->custom_variables;
 		while(this_customvariablesmember!=NULL){
 			next_customvariablesmember=this_customvariablesmember->next;
-			my_free(this_customvariablesmember->variable_name);
-			my_free(this_customvariablesmember->variable_value);
-			my_free(this_customvariablesmember);
+			delete[] this_customvariablesmember->variable_name;
+			delete[] this_customvariablesmember->variable_value;
+			delete this_customvariablesmember;
 			this_customvariablesmember=next_customvariablesmember;
 		        }
 
-		my_free(this_service->host_name);
-		my_free(this_service->description);
-		my_free(this_service->display_name);
-		my_free(this_service->service_check_command);
-		my_free(this_service->plugin_output);
-		my_free(this_service->long_plugin_output);
-		my_free(this_service->perf_data);
+		delete[] this_service->host_name;
+		delete[] this_service->description;
+		delete[] this_service->display_name;
+		delete[] this_service->service_check_command;
+		delete[] this_service->plugin_output;
+		delete[] this_service->long_plugin_output;
+		delete[] this_service->perf_data;
 
-		my_free(this_service->event_handler_args);
-		my_free(this_service->check_command_args);
+		delete[] this_service->event_handler_args;
+		delete[] this_service->check_command_args;
 
 		free_objectlist(&this_service->servicegroups_ptr);
-		my_free(this_service->notification_period);
-		my_free(this_service->check_period);
-		my_free(this_service->event_handler);
-		my_free(this_service->failure_prediction_options);
-		my_free(this_service->notes);
-		my_free(this_service->notes_url);
-		my_free(this_service->action_url);
-		my_free(this_service->icon_image);
-		my_free(this_service->icon_image_alt);
-		my_free(this_service);
+		delete[] this_service->notification_period;
+		delete[] this_service->check_period;
+		delete[] this_service->event_handler;
+		delete[] this_service->failure_prediction_options;
+		delete[] this_service->notes;
+		delete[] this_service->notes_url;
+		delete[] this_service->action_url;
+		delete[] this_service->icon_image;
+		delete[] this_service->icon_image_alt;
+		delete this_service;
 		this_service=next_service;
 	        }
 
@@ -3387,9 +3185,9 @@ int free_object_data(void){
 	this_command=command_list;
 	while(this_command!=NULL){
 		next_command=this_command->next;
-		my_free(this_command->name);
-		my_free(this_command->command_line);
-		my_free(this_command);
+		delete[] this_command->name;
+		delete[] this_command->command_line;
+		delete this_command;
 		this_command=next_command;
 	        }
 
@@ -3405,8 +3203,8 @@ int free_object_data(void){
 		this_contactgroupsmember=this_serviceescalation->contact_groups;
 		while(this_contactgroupsmember!=NULL){
 			next_contactgroupsmember=this_contactgroupsmember->next;
-			my_free(this_contactgroupsmember->group_name);
-			my_free(this_contactgroupsmember);
+			delete[] this_contactgroupsmember->group_name;
+			delete this_contactgroupsmember;
 			this_contactgroupsmember=next_contactgroupsmember;
 		        }
 
@@ -3414,16 +3212,16 @@ int free_object_data(void){
 		this_contactsmember=this_serviceescalation->contacts;
 		while(this_contactsmember!=NULL){
 			next_contactsmember=this_contactsmember->next;
-			my_free(this_contactsmember->contact_name);
-			my_free(this_contactsmember);
+			delete[] this_contactsmember->contact_name;
+			delete this_contactsmember;
 			this_contactsmember=next_contactsmember;
 			}
 
 		next_serviceescalation=this_serviceescalation->next;
-		my_free(this_serviceescalation->host_name);
-		my_free(this_serviceescalation->description);
-		my_free(this_serviceescalation->escalation_period);
-		my_free(this_serviceescalation);
+		delete[] this_serviceescalation->host_name;
+		delete[] this_serviceescalation->description;
+		delete[] this_serviceescalation->escalation_period;
+		delete this_serviceescalation;
 		this_serviceescalation=next_serviceescalation;
 	        }
 
@@ -3435,12 +3233,12 @@ int free_object_data(void){
 	this_servicedependency=servicedependency_list;
 	while(this_servicedependency!=NULL){
 		next_servicedependency=this_servicedependency->next;
-		my_free(this_servicedependency->dependency_period);
-		my_free(this_servicedependency->dependent_host_name);
-		my_free(this_servicedependency->dependent_service_description);
-		my_free(this_servicedependency->host_name);
-		my_free(this_servicedependency->service_description);
-		my_free(this_servicedependency);
+		delete[] this_servicedependency->dependency_period;
+		delete[] this_servicedependency->dependent_host_name;
+		delete[] this_servicedependency->dependent_service_description;
+		delete[] this_servicedependency->host_name;
+		delete[] this_servicedependency->service_description;
+		delete this_servicedependency;
 		this_servicedependency=next_servicedependency;
 	        }
 
@@ -3452,10 +3250,10 @@ int free_object_data(void){
 	this_hostdependency=hostdependency_list;
 	while(this_hostdependency!=NULL){
 		next_hostdependency=this_hostdependency->next;
-		my_free(this_hostdependency->dependency_period);
-		my_free(this_hostdependency->dependent_host_name);
-		my_free(this_hostdependency->host_name);
-		my_free(this_hostdependency);
+		delete[] this_hostdependency->dependency_period;
+		delete[] this_hostdependency->dependent_host_name;
+		delete[] this_hostdependency->host_name;
+		delete this_hostdependency;
 		this_hostdependency=next_hostdependency;
 	        }
 
@@ -3471,8 +3269,8 @@ int free_object_data(void){
 		this_contactgroupsmember=this_hostescalation->contact_groups;
 		while(this_contactgroupsmember!=NULL){
 			next_contactgroupsmember=this_contactgroupsmember->next;
-			my_free(this_contactgroupsmember->group_name);
-			my_free(this_contactgroupsmember);
+			delete[] this_contactgroupsmember->group_name;
+			delete this_contactgroupsmember;
 			this_contactgroupsmember=next_contactgroupsmember;
 		        }
 
@@ -3480,15 +3278,15 @@ int free_object_data(void){
 		this_contactsmember=this_hostescalation->contacts;
 		while(this_contactsmember!=NULL){
 			next_contactsmember=this_contactsmember->next;
-			my_free(this_contactsmember->contact_name);
-			my_free(this_contactsmember);
+			delete[] this_contactsmember->contact_name;
+			delete this_contactsmember;
 			this_contactsmember=next_contactsmember;
 			}
 
 		next_hostescalation=this_hostescalation->next;
-		my_free(this_hostescalation->host_name);
-		my_free(this_hostescalation->escalation_period);
-		my_free(this_hostescalation);
+		delete[] this_hostescalation->host_name;
+		delete[] this_hostescalation->escalation_period;
+		delete this_hostescalation;
 		this_hostescalation=next_hostescalation;
 	        }
 

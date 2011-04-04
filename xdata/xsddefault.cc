@@ -71,8 +71,8 @@ extern unsigned long  modified_service_process_attributes;
 extern check_stats    check_statistics[MAX_CHECK_STATS_TYPES];
 
 
-char *xsddefault_status_log=NULL;
-char *xsddefault_temp_file=NULL;
+static char *xsddefault_status_log=NULL;
+static char *xsddefault_temp_file=NULL;
 
 
 
@@ -98,7 +98,7 @@ int xsddefault_grab_config_info(char *config_file)
 	while(1){
 
 		/* free memory */
-		my_free(input);
+		delete[] input;
 
 		/* read the next line */
 		if((input=mmap_fgets_multiline(thefile))==NULL)
@@ -115,14 +115,14 @@ int xsddefault_grab_config_info(char *config_file)
 	        }
 
 	/* free memory and close the file */
-	my_free(input);
+	delete[] input;
 	mmap_fclose(thefile);
 
 	/* initialize locations if necessary */
 	if(xsddefault_status_log==NULL)
-		xsddefault_status_log=(char *)strdup(DEFAULT_STATUS_FILE);
+		xsddefault_status_log=my_strdup(DEFAULT_STATUS_FILE);
 	if(xsddefault_temp_file==NULL)
-		xsddefault_temp_file=(char *)strdup(DEFAULT_TEMP_FILE);
+		xsddefault_temp_file=my_strdup(DEFAULT_TEMP_FILE);
 
 	/* make sure we have what we need */
 	if(xsddefault_status_log==NULL)
@@ -132,9 +132,9 @@ int xsddefault_grab_config_info(char *config_file)
 
 	mac = get_global_macros();
 	/* save the status file macro */
-	my_free(mac->x[MACRO_STATUSDATAFILE]);
-	if((mac->x[MACRO_STATUSDATAFILE]=(char *)strdup(xsddefault_status_log)))
-		strip(mac->x[MACRO_STATUSDATAFILE]);
+	delete[] mac->x[MACRO_STATUSDATAFILE];
+	mac->x[MACRO_STATUSDATAFILE]=my_strdup(xsddefault_status_log);
+	strip(mac->x[MACRO_STATUSDATAFILE]);
 
 	return OK;
 }
@@ -149,30 +149,26 @@ int xsddefault_grab_config_directives(char *input){
 	/* get the variable name */
 	if((temp_ptr=my_strtok(input,"="))==NULL)
 		return ERROR;
-	if((varname=(char *)strdup(temp_ptr))==NULL)
-		return ERROR;
+	varname=my_strdup(temp_ptr);
 
 	/* get the variable value */
 	if((temp_ptr=my_strtok(NULL,"\n"))==NULL){
-		my_free(varname);
+		delete[] varname;
 		return ERROR;
 	        }
-	if((varvalue=(char *)strdup(temp_ptr))==NULL){
-		my_free(varname);
-		return ERROR;
-	        }
+	varvalue=my_strdup(temp_ptr);
 
 	/* status log definition */
 	if(!strcmp(varname,"status_file") || !strcmp(varname,"xsddefault_status_log"))
-		xsddefault_status_log=(char *)strdup(temp_ptr);
+		xsddefault_status_log=my_strdup(temp_ptr);
 
 	/* temp file definition */
 	else if(!strcmp(varname,"temp_file"))
-		xsddefault_temp_file=(char *)strdup(temp_ptr);
+		xsddefault_temp_file=my_strdup(temp_ptr);
 
 	/* free memory */
-	my_free(varname);
-	my_free(varvalue);
+	delete[] varname;
+	delete[] varvalue;
 
 	return OK;
         }
@@ -213,8 +209,11 @@ int xsddefault_cleanup_status_data(char *config_file, int delete_status_data){
 	        }
 
 	/* free memory */
-	my_free(xsddefault_status_log);
-	my_free(xsddefault_temp_file);
+	delete[] xsddefault_status_log;
+	delete[] xsddefault_temp_file;
+
+	xsddefault_status_log = NULL;
+	xsddefault_temp_file = NULL;
 
 	return OK;
         }
@@ -245,12 +244,9 @@ int xsddefault_save_status_data(void){
 	/* open a safe temp file for output */
 	if(xsddefault_temp_file==NULL)
 		return ERROR;
-	if(asprintf(&temp_file,"%sXXXXXX",xsddefault_temp_file)==-1){
-		logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
-		return ERROR;
-		}
-	if(temp_file==NULL)
-		return ERROR;
+	std::ostringstream oss;
+	oss << xsddefault_temp_file << "XXXXXX";
+	temp_file = my_strdup(oss.str().c_str());
 
 	log_debug_info(DEBUGL_STATUSDATA,2,"Writing status data to temp file '%s'\n",temp_file);
 
@@ -260,7 +256,7 @@ int xsddefault_save_status_data(void){
 		logit(NSLOG_RUNTIME_ERROR,TRUE,"Error: Unable to create temp file for writing status data: %s\n", strerror(errno));
 
 		/* free memory */
-		my_free(temp_file);
+		delete[] temp_file;
 
 		return ERROR;
 	        }
@@ -274,7 +270,7 @@ int xsddefault_save_status_data(void){
 		logit(NSLOG_RUNTIME_ERROR,TRUE,"Error: Unable to open temp file '%s' for writing status data: %s\n",temp_file, strerror(errno));
 
 		/* free memory */
-		my_free(temp_file);
+		delete[] temp_file;
 
 		return ERROR;
 	        }
@@ -610,7 +606,7 @@ int xsddefault_save_status_data(void){
 	        }
 
 	/* free memory */
-	my_free(temp_file);
+	delete[] temp_file;
 
 	return result;
         }

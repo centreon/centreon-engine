@@ -18,6 +18,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <sstream>
 #include <sys/time.h>
 
 #include "conf.hh"
@@ -123,10 +124,11 @@ int check_for_external_commands(void){
 		        }
 
 		if(external_command_buffer.buffer[external_command_buffer.tail])
-			buffer=strdup(((char **)external_command_buffer.buffer)[external_command_buffer.tail]);
+		  buffer=my_strdup(((char **)external_command_buffer.buffer)[external_command_buffer.tail]);
 
 		/* free memory allocated for buffer slot */
-		my_free(((char **)external_command_buffer.buffer)[external_command_buffer.tail]);
+		delete[] ((char **)external_command_buffer.buffer)[external_command_buffer.tail];
+		((char **)external_command_buffer.buffer)[external_command_buffer.tail] = NULL;
 
 		/* adjust tail counter and number of items */
 		external_command_buffer.tail=(external_command_buffer.tail + 1) % config.get_external_command_buffer_slots();
@@ -139,7 +141,7 @@ int check_for_external_commands(void){
 		process_external_command1(buffer);
 
 		/* free memory */
-		my_free(buffer);
+		delete[] buffer;
 	        }
 
 	/**** PROCESS ALL PASSIVE HOST AND SERVICE CHECK RESULTS AT ONE TIME ****/
@@ -174,7 +176,7 @@ int process_external_commands_from_file(char *fname, int delete_file){
 	while(1){
 
 		/* free memory */
-		my_free(input);
+		delete[] input;
 
 		/* read the next line */
 		if((input=mmap_fgets(thefile))==NULL)
@@ -225,18 +227,13 @@ int process_external_command1(char *cmd){
 	/* get the command identifier */
 	if((temp_ptr=my_strtok(NULL,";"))==NULL)
 		return ERROR;
-	if((command_id=(char *)strdup(temp_ptr+1))==NULL)
-		return ERROR;
+	command_id=my_strdup(temp_ptr+1);
 
 	/* get the command arguments */
 	if((temp_ptr=my_strtok(NULL,"\n"))==NULL)
-		args=(char *)strdup("");
+		args=my_strdup("");
 	else
-		args=(char *)strdup(temp_ptr);
-	if(args==NULL){
-		my_free(command_id);
-		return ERROR;
-	        }
+		args=my_strdup(temp_ptr);
 
 	/* decide what type of command this is... */
 
@@ -696,8 +693,8 @@ int process_external_command1(char *cmd){
 		logit(NSLOG_EXTERNAL_COMMAND | NSLOG_RUNTIME_WARNING,TRUE,"Warning: Unrecognized external command -> %s;%s\n",command_id,args);
 
 		/* free memory */
-		my_free(command_id);
-		my_free(args);
+		delete[] command_id;
+		delete[] args;
 
 		return ERROR;
 	        }
@@ -706,15 +703,9 @@ int process_external_command1(char *cmd){
 	update_check_stats(EXTERNAL_COMMAND_STATS,time(NULL));
 
 	/* log the external command */
-	if(asprintf(&temp_buffer,"EXTERNAL COMMAND: %s;%s\n",command_id,args)==-1){
-		logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
-
-		/* free memory */
-		my_free(command_id);
-		my_free(args);
-
-		return ERROR;
-		}
+	std::ostringstream oss;
+	oss << "EXTERNAL COMMAND: " << command_id << ';' << args << std::endl;
+	temp_buffer = my_strdup(oss.str().c_str());
 
 	if(command_type==CMD_PROCESS_SERVICE_CHECK_RESULT || command_type==CMD_PROCESS_HOST_CHECK_RESULT){
 		/* passive checks are logged in checks.c as well, as some my bypass external commands by getting dropped in checkresults dir */
@@ -725,7 +716,7 @@ int process_external_command1(char *cmd){
 	  if(config.get_log_external_commands()==true)
 			write_to_all_logs(temp_buffer,NSLOG_EXTERNAL_COMMAND);
 	        }
-	my_free(temp_buffer);
+	delete[] temp_buffer;
 
 #ifdef USE_EVENT_BROKER
 	/* send data to event broker */
@@ -741,8 +732,8 @@ int process_external_command1(char *cmd){
 #endif
 
 	/* free memory */
-	my_free(command_id);
-	my_free(args);
+	delete[] command_id;
+	delete[] args;
 
 	return OK;
         }
@@ -1266,10 +1257,10 @@ int process_host_command(int cmd, time_t entry_time, char *args){
 			intval=atoi(str);
 		str=my_strtok(NULL,";");
 		if(str)
-			buf[0]=strdup(str);
+			buf[0]=my_strdup(str);
 		str=my_strtok(NULL,";");
 		if(str)
-			buf[1]=strdup(str);
+			buf[1]=my_strdup(str);
 		if(buf[0] && buf[1])
 			host_notification(temp_host,NOTIFICATION_CUSTOM,buf[0],buf[1],intval);
 		break;
@@ -1466,10 +1457,10 @@ int process_service_command(int cmd, time_t entry_time, char *args){
 			intval=atoi(str);
 		str=my_strtok(NULL,";");
 		if(str)
-			buf[0]=strdup(str);
+			buf[0]=my_strdup(str);
 		str=my_strtok(NULL,";");
 		if(str)
-			buf[1]=strdup(str);
+			buf[1]=my_strdup(str);
 		if(buf[0] && buf[1])
 			service_notification(temp_service,NOTIFICATION_CUSTOM,buf[0],buf[1],intval);
 		break;
@@ -1977,10 +1968,9 @@ int cmd_schedule_host_service_checks(int cmd,char *args, int force){
 
 
 /* schedules a program shutdown or restart */
-int cmd_signal_process(int cmd, char *args){
+void cmd_signal_process(int cmd, char *args){
 	time_t scheduled_time=0L;
 	char *temp_ptr=NULL;
-	int result=OK;
 
 	/* get the time to schedule the event */
 	if((temp_ptr=my_strtok(args,"\n"))==NULL)
@@ -1989,9 +1979,7 @@ int cmd_signal_process(int cmd, char *args){
 		scheduled_time=strtoul(temp_ptr,NULL,10);
 
 	/* add a scheduled program shutdown or restart to the event list */
-	result=schedule_new_event((cmd==CMD_SHUTDOWN_PROCESS)?EVENT_PROGRAM_SHUTDOWN:EVENT_PROGRAM_RESTART,TRUE,scheduled_time,FALSE,0,NULL,FALSE,NULL,NULL,0);
-
-	return result;
+	schedule_new_event((cmd==CMD_SHUTDOWN_PROCESS)?EVENT_PROGRAM_SHUTDOWN:EVENT_PROGRAM_RESTART,TRUE,scheduled_time,FALSE,0,NULL,FALSE,NULL,NULL,0);
         }
 
 
@@ -2010,36 +1998,36 @@ int cmd_process_service_check_result(int cmd,time_t check_time,char *args){
 	/* get the host name */
 	if((temp_ptr=my_strtok(args,";"))==NULL)
 		return ERROR;
-	host_name=(char *)strdup(temp_ptr);
+	host_name=my_strdup(temp_ptr);
 
 	/* get the service description */
 	if((temp_ptr=my_strtok(NULL,";"))==NULL){
-		my_free(host_name);
+		delete[] host_name;
 		return ERROR;
 	        }
-	svc_description=(char *)strdup(temp_ptr);
+	svc_description=my_strdup(temp_ptr);
 
 	/* get the service check return code */
 	if((temp_ptr=my_strtok(NULL,";"))==NULL){
-		my_free(host_name);
-		my_free(svc_description);
+		delete[] host_name;
+		delete[] svc_description;
 		return ERROR;
 	        }
 	return_code=atoi(temp_ptr);
 
 	/* get the plugin output (may be empty) */
 	if((temp_ptr=my_strtok(NULL,"\n"))==NULL)
-		output=(char *)strdup("");
+		output=my_strdup("");
 	else
-		output=(char *)strdup(temp_ptr);
+		output=my_strdup(temp_ptr);
 
 	/* submit the passive check result */
 	result=process_passive_service_check(check_time,host_name,svc_description,return_code,output);
 
 	/* free memory */
-	my_free(host_name);
-	my_free(svc_description);
-	my_free(output);
+	delete[] host_name;
+	delete[] svc_description;
+	delete[] output;
 
 	return result;
         }
@@ -2053,7 +2041,6 @@ int process_passive_service_check(time_t check_time, char *host_name, char *svc_
 	service *temp_service=NULL;
 	char *real_host_name=NULL;
 	struct timeval tv;
-	int result=OK;
 
 	/* skip this service check result if we aren't accepting passive service checks */
 	if(config.get_accept_passive_service_checks()==false)
@@ -2092,9 +2079,7 @@ int process_passive_service_check(time_t check_time, char *host_name, char *svc_
 		return ERROR;
 
 	/* allocate memory for the passive check result */
-	new_pcr=(passive_check_result *)malloc(sizeof(passive_check_result));
-	if(new_pcr==NULL)
-		return ERROR;
+	new_pcr = new passive_check_result;
 
 	/* initialize vars */
 	new_pcr->object_check_type=SERVICE_CHECK;
@@ -2104,21 +2089,9 @@ int process_passive_service_check(time_t check_time, char *host_name, char *svc_
 	new_pcr->next=NULL;
 
 	/* save string vars */
-	if((new_pcr->host_name=(char *)strdup(real_host_name))==NULL)
-		result=ERROR;
-	if((new_pcr->service_description=(char *)strdup(svc_description))==NULL)
-		result=ERROR;
-	if((new_pcr->output=(char *)strdup(output))==NULL)
-		result=ERROR;
-
-	/* handle errors */
-	if(result==ERROR){
-		my_free(new_pcr->output);
-		my_free(new_pcr->service_description);
-		my_free(new_pcr->host_name);
-		my_free(new_pcr);
-		return ERROR;
-	        }
+	new_pcr->host_name=my_strdup(real_host_name);
+	new_pcr->service_description=my_strdup(svc_description);
+	new_pcr->output=my_strdup(output);
 
 	/* save the return code */
 	new_pcr->return_code=return_code;
@@ -2160,27 +2133,27 @@ int cmd_process_host_check_result(int cmd,time_t check_time,char *args){
 	/* get the host name */
 	if((temp_ptr=my_strtok(args,";"))==NULL)
 		return ERROR;
-	host_name=(char *)strdup(temp_ptr);
+	host_name=my_strdup(temp_ptr);
 
 	/* get the host check return code */
 	if((temp_ptr=my_strtok(NULL,";"))==NULL){
-		my_free(host_name);
+		delete[] host_name;
 		return ERROR;
 	        }
 	return_code=atoi(temp_ptr);
 
 	/* get the plugin output (may be empty) */
 	if((temp_ptr=my_strtok(NULL,"\n"))==NULL)
-		output=(char *)strdup("");
+		output=my_strdup("");
 	else
-		output=(char *)strdup(temp_ptr);
+		output=my_strdup(temp_ptr);
 
 	/* submit the check result */
 	result=process_passive_host_check(check_time,host_name,return_code,output);
 
 	/* free memory */
-	my_free(host_name);
-	my_free(output);
+	delete[] host_name;
+	delete[] output;
 
 	return result;
         }
@@ -2192,7 +2165,6 @@ int process_passive_host_check(time_t check_time, char *host_name, int return_co
 	host *temp_host=NULL;
 	char *real_host_name=NULL;
 	struct timeval tv;
-	int result=OK;
 
 	/* skip this host check result if we aren't accepting passive host checks */
 	if(config.get_accept_passive_service_checks()==false)
@@ -2229,9 +2201,7 @@ int process_passive_host_check(time_t check_time, char *host_name, int return_co
 		return ERROR;
 
 	/* allocate memory for the passive check result */
-	new_pcr=(passive_check_result *)malloc(sizeof(passive_check_result));
-	if(new_pcr==NULL)
-		return ERROR;
+	new_pcr = new passive_check_result;
 
 	/* initialize vars */
 	new_pcr->object_check_type=HOST_CHECK;
@@ -2241,19 +2211,8 @@ int process_passive_host_check(time_t check_time, char *host_name, int return_co
 	new_pcr->next=NULL;
 
 	/* save string vars */
-	if((new_pcr->host_name=(char *)strdup(real_host_name))==NULL)
-		result=ERROR;
-	if((new_pcr->output=(char *)strdup(output))==NULL)
-		result=ERROR;
-
-	/* handle errors */
-	if(result==ERROR){
-		my_free(new_pcr->output);
-		my_free(new_pcr->service_description);
-		my_free(new_pcr->host_name);
-		my_free(new_pcr);
-		return ERROR;
-	        }
+	new_pcr->host_name=my_strdup(real_host_name);
+	new_pcr->output=my_strdup(output);
 
 	/* save the return code */
 	new_pcr->return_code=return_code;
@@ -2333,14 +2292,14 @@ int cmd_acknowledge_problem(int cmd,char *args){
 	/* get the acknowledgement author */
 	if((temp_ptr=my_strtok(NULL,";"))==NULL)
 		return ERROR;
-	ack_author=(char *)strdup(temp_ptr);
+	ack_author=my_strdup(temp_ptr);
 
 	/* get the acknowledgement data */
 	if((temp_ptr=my_strtok(NULL,"\n"))==NULL){
-		my_free(ack_author);
+		delete[] ack_author;
 		return ERROR;
 	        }
-	ack_data=(char *)strdup(temp_ptr);
+	ack_data=my_strdup(temp_ptr);
 
 	/* acknowledge the host problem */
 	if(cmd==CMD_ACKNOWLEDGE_HOST_PROBLEM)
@@ -2351,8 +2310,8 @@ int cmd_acknowledge_problem(int cmd,char *args){
 		acknowledge_service_problem(temp_service,ack_author,ack_data,type,notify,persistent);
 
 	/* free memory */
-	my_free(ack_author);
-	my_free(ack_data);
+	delete[] ack_author;
+	delete[] ack_data;
 
 	return OK;
         }
@@ -2995,9 +2954,7 @@ int cmd_change_object_char_var(int cmd,char *args){
 
 	        }
 
-	if((temp_ptr=(char *)strdup(charval))==NULL)
-		return ERROR;
-
+	temp_ptr=my_strdup(charval);
 
 	/* do some validation */
 	switch(cmd){
@@ -3011,7 +2968,7 @@ int cmd_change_object_char_var(int cmd,char *args){
 
 		/* make sure the timeperiod is valid */
 		if((temp_timeperiod=find_timeperiod(temp_ptr))==NULL){
-			my_free(temp_ptr);
+			delete[] temp_ptr;
 			return ERROR;
 		        }
 
@@ -3027,13 +2984,12 @@ int cmd_change_object_char_var(int cmd,char *args){
 		/* make sure the command exists */
 		temp_ptr2=my_strtok(temp_ptr,"!");
 		if((temp_command=find_command(temp_ptr2))==NULL){
-			my_free(temp_ptr);
+			delete[] temp_ptr;
 			return ERROR;
 		        }
 
-		my_free(temp_ptr);
-		if((temp_ptr=(char *)strdup(charval))==NULL)
-			return ERROR;
+		delete[] temp_ptr;
+		temp_ptr=my_strdup(charval);
 
 		break;
 
@@ -3061,7 +3017,7 @@ int cmd_change_object_char_var(int cmd,char *args){
 
 	case CMD_CHANGE_HOST_EVENT_HANDLER:
 
-		my_free(temp_host->event_handler);
+		delete[] temp_host->event_handler;
 		temp_host->event_handler=temp_ptr;
 		temp_host->event_handler_ptr=temp_command;
 		attr=MODATTR_EVENT_HANDLER_COMMAND;
@@ -3069,7 +3025,7 @@ int cmd_change_object_char_var(int cmd,char *args){
 
 	case CMD_CHANGE_HOST_CHECK_COMMAND:
 
-		my_free(temp_host->host_check_command);
+		delete[] temp_host->host_check_command;
 		temp_host->host_check_command=temp_ptr;
 		temp_host->check_command_ptr=temp_command;
 		attr=MODATTR_CHECK_COMMAND;
@@ -3077,7 +3033,7 @@ int cmd_change_object_char_var(int cmd,char *args){
 
 	case CMD_CHANGE_HOST_CHECK_TIMEPERIOD:
 
-		my_free(temp_host->check_period);
+		delete[] temp_host->check_period;
 		temp_host->check_period=temp_ptr;
 		temp_host->check_period_ptr=temp_timeperiod;
 		attr=MODATTR_CHECK_TIMEPERIOD;
@@ -3085,7 +3041,7 @@ int cmd_change_object_char_var(int cmd,char *args){
 
 	case CMD_CHANGE_HOST_NOTIFICATION_TIMEPERIOD:
 
-		my_free(temp_host->notification_period);
+		delete[] temp_host->notification_period;
 		temp_host->notification_period=temp_ptr;
 		temp_host->notification_period_ptr=temp_timeperiod;
 		attr=MODATTR_NOTIFICATION_TIMEPERIOD;
@@ -3093,7 +3049,7 @@ int cmd_change_object_char_var(int cmd,char *args){
 
 	case CMD_CHANGE_SVC_EVENT_HANDLER:
 
-		my_free(temp_service->event_handler);
+		delete[] temp_service->event_handler;
 		temp_service->event_handler=temp_ptr;
 		temp_service->event_handler_ptr=temp_command;
 		attr=MODATTR_EVENT_HANDLER_COMMAND;
@@ -3101,7 +3057,7 @@ int cmd_change_object_char_var(int cmd,char *args){
 
 	case CMD_CHANGE_SVC_CHECK_COMMAND:
 
-		my_free(temp_service->service_check_command);
+		delete[] temp_service->service_check_command;
 		temp_service->service_check_command=temp_ptr;
 		temp_service->check_command_ptr=temp_command;
 		attr=MODATTR_CHECK_COMMAND;
@@ -3109,7 +3065,7 @@ int cmd_change_object_char_var(int cmd,char *args){
 
 	case CMD_CHANGE_SVC_CHECK_TIMEPERIOD:
 
-		my_free(temp_service->check_period);
+		delete[] temp_service->check_period;
 		temp_service->check_period=temp_ptr;
 		temp_service->check_period_ptr=temp_timeperiod;
 		attr=MODATTR_CHECK_TIMEPERIOD;
@@ -3117,7 +3073,7 @@ int cmd_change_object_char_var(int cmd,char *args){
 
 	case CMD_CHANGE_SVC_NOTIFICATION_TIMEPERIOD:
 
-		my_free(temp_service->notification_period);
+		delete[] temp_service->notification_period;
 		temp_service->notification_period=temp_ptr;
 		temp_service->notification_period_ptr=temp_timeperiod;
 		attr=MODATTR_NOTIFICATION_TIMEPERIOD;
@@ -3125,7 +3081,7 @@ int cmd_change_object_char_var(int cmd,char *args){
 
 	case CMD_CHANGE_CONTACT_HOST_NOTIFICATION_TIMEPERIOD:
 
-		my_free(temp_contact->host_notification_period);
+		delete[] temp_contact->host_notification_period;
 		temp_contact->host_notification_period=temp_ptr;
 		temp_contact->host_notification_period_ptr=temp_timeperiod;
 		hattr=MODATTR_NOTIFICATION_TIMEPERIOD;
@@ -3133,7 +3089,7 @@ int cmd_change_object_char_var(int cmd,char *args){
 
 	case CMD_CHANGE_CONTACT_SVC_NOTIFICATION_TIMEPERIOD:
 
-		my_free(temp_contact->service_notification_period);
+		delete[] temp_contact->service_notification_period;
 		temp_contact->service_notification_period=temp_ptr;
 		temp_contact->service_notification_period_ptr=temp_timeperiod;
 		sattr=MODATTR_NOTIFICATION_TIMEPERIOD;
@@ -3253,46 +3209,33 @@ int cmd_change_object_custom_var(int cmd, char *args){
 	/* get the host or contact name */
 	if((temp_ptr=my_strtok(args,";"))==NULL)
 		return ERROR;
-	if((name1=(char *)strdup(temp_ptr))==NULL)
-		return ERROR;
+	name1=my_strdup(temp_ptr);
 
 	/* get the service description if necessary */
 	if(cmd==CMD_CHANGE_CUSTOM_SVC_VAR){
 		if((temp_ptr=my_strtok(NULL,";"))==NULL){
-			my_free(name1);
+			delete[] name1;
 			return ERROR;
 		        }
-		if((name2=(char *)strdup(temp_ptr))==NULL){
-			my_free(name1);
-			return ERROR;
-		        }
+		name2=my_strdup(temp_ptr);
 	        }
 
 	/* get the custom variable name */
 	if((temp_ptr=my_strtok(NULL,";"))==NULL){
-		my_free(name1);
-		my_free(name2);
+		delete[] name1;
+		delete[] name2;
 		return ERROR;
 	        }
-	if((varname=(char *)strdup(temp_ptr))==NULL){
-		my_free(name1);
-		my_free(name2);
-		return ERROR;
-	        }
+	varname=my_strdup(temp_ptr);
 
 	/* get the custom variable value */
 	if((temp_ptr=my_strtok(NULL,";"))==NULL){
-		my_free(name1);
-		my_free(name2);
-		my_free(varname);
+		delete[] name1;
+		delete[] name2;
+		delete[] varname;
 		return ERROR;
 	        }
-	if((varvalue=(char *)strdup(temp_ptr))==NULL){
-		my_free(name1);
-		my_free(name2);
-		my_free(varname);
-		return ERROR;
-	        }
+	varvalue=my_strdup(temp_ptr);
 
 	/* find the object */
 	switch(cmd){
@@ -3327,8 +3270,8 @@ int cmd_change_object_custom_var(int cmd, char *args){
 
 			/* update the value */
 			if(temp_customvariablesmember->variable_value)
-				my_free(temp_customvariablesmember->variable_value);
-			temp_customvariablesmember->variable_value=(char *)strdup(varvalue);
+				delete[] temp_customvariablesmember->variable_value;
+			temp_customvariablesmember->variable_value=my_strdup(varvalue);
 
 			/* mark the variable value as having been changed */
 			temp_customvariablesmember->has_been_modified=TRUE;
@@ -3338,10 +3281,10 @@ int cmd_change_object_custom_var(int cmd, char *args){
 	        }
 
 	/* free memory */
-	my_free(name1);
-	my_free(name2);
-	my_free(varname);
-	my_free(varvalue);
+	delete[] name1;
+	delete[] name2;
+	delete[] varname;
+	delete[] varvalue;
 
 	/* set the modified attributes and update the status of the object */
 	switch(cmd){
@@ -3376,12 +3319,11 @@ int cmd_process_external_commands_from_file(int cmd, char *args){
 	/* get the file name */
 	if((temp_ptr=my_strtok(args,";"))==NULL)
 		return ERROR;
-	if((fname=(char *)strdup(temp_ptr))==NULL)
-		return ERROR;
+	fname=my_strdup(temp_ptr);
 
 	/* find the deletion option */
 	if((temp_ptr=my_strtok(NULL,"\n"))==NULL){
-		my_free(fname);
+		delete[] fname;
 		return ERROR;
 	        }
 	if(atoi(temp_ptr)==0)
@@ -3393,7 +3335,7 @@ int cmd_process_external_commands_from_file(int cmd, char *args){
 	process_external_commands_from_file(fname,delete_file);
 
 	/* free memory */
-	my_free(fname);
+	delete[] fname;
 
 	return OK;
         }
@@ -4974,16 +4916,15 @@ void process_passive_checks(void){
 	/* open a temp file for storing check result(s) */
 	old_umask=umask(new_umask);
 
-	if(asprintf(&checkresult_file,"%s/checkXXXXXX",config.get_temp_path().c_str())==-1){
-		logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
-		return;
-		}
+	std::ostringstream oss;
+	oss << config.get_temp_path() << "/checkXXXXXX";
+	checkresult_file = my_strdup(oss.str().c_str());
 
 	checkresult_file_fd=mkstemp(checkresult_file);
 	umask(old_umask);
 	if(checkresult_file_fd < 0) {
 		logit(NSLOG_RUNTIME_ERROR,TRUE,"Failed to open checkresult file '%s': %s\n", checkresult_file, strerror(errno));
-		free(checkresult_file);
+		delete[] checkresult_file;
 		return;
 	}
 
@@ -5028,16 +4969,16 @@ void process_passive_checks(void){
 	move_check_result_to_queue(checkresult_file);
 
 	/* free memory */
-	my_free(checkresult_file);
+	delete[] checkresult_file;
 
 	/* free memory for the passive check result list */
 	this_pcr=passive_check_result_list;
 	while(this_pcr!=NULL){
 		next_pcr=this_pcr->next;
-		my_free(this_pcr->host_name);
-		my_free(this_pcr->service_description);
-		my_free(this_pcr->output);
-		my_free(this_pcr);
+		delete[] this_pcr->host_name;
+		delete[] this_pcr->service_description;
+		delete[] this_pcr->output;
+		delete this_pcr;
 		this_pcr=next_pcr;
 	        }
 	passive_check_result_list=NULL;

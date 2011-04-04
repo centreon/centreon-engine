@@ -18,6 +18,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <sstream>
 #include "conf.hh"
 #include "nagios.hh"
 #include "comments.hh"
@@ -32,6 +33,7 @@ int use_embedded_perl=TRUE;
 
 #include "notifications.hh"
 #include "logging.hh"
+#include "shared.hh"
 #include "configuration.hh"
 #include "utils.hh"
 
@@ -229,13 +231,11 @@ int my_system_r(nagios_macros *mac, char *cmd,int timeout,int *early_timeout,dou
 			 */
 			(void) POPs ;
 
-			if(asprintf(&temp_buffer,"%s", SvPVX(ERRSV))==-1)
-				logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
-			else{
-				log_debug_info(DEBUGL_COMMANDS,0,"Embedded perl failed to compile %s, compile error %s\n",fname,temp_buffer);
-				logit(NSLOG_RUNTIME_WARNING,TRUE,"%s\n",temp_buffer);
-				my_free(temp_buffer);
-			}
+			temp_buffer = my_strdup(SvPVX(ERRSV));
+
+			log_debug_info(DEBUGL_COMMANDS,0,"Embedded perl failed to compile %s, compile error %s\n",fname,temp_buffer);
+			logit(NSLOG_RUNTIME_WARNING,TRUE,"%s\n",temp_buffer);
+			delete[] temp_buffer;
 
 			return STATE_UNKNOWN;
 			}
@@ -508,7 +508,7 @@ int my_system_r(nagios_macros *mac, char *cmd,int timeout,int *early_timeout,dou
 				output_dbuf.buf[max_output_length]='\x0';
 
 			if(output!=NULL && output_dbuf.buf)
-				*output=(char *)strdup(output_dbuf.buf);
+				*output=my_strdup(output_dbuf.buf);
 
 			}
 
@@ -562,7 +562,7 @@ int get_raw_command_line_r(nagios_macros *mac, command *cmd_ptr, char const* cmd
 	log_debug_info(DEBUGL_COMMANDS|DEBUGL_CHECKS|DEBUGL_MACROS,2,"Raw Command Input: %s\n",cmd_ptr->command_line);
 
 	/* get the full command line */
-	*full_command=(char *)strdup((cmd_ptr->command_line==NULL)?"":cmd_ptr->command_line);
+	*full_command=my_strdup((cmd_ptr->command_line==NULL)?"":cmd_ptr->command_line);
 
 	/* XXX: Crazy indent */
 	/* get the command arguments */
@@ -653,12 +653,10 @@ int set_environment_var(char const *name, char const *value, int set){
 #else
 		/* needed for Solaris and systems that don't have setenv() */
 		/* this will leak memory, but in a "controlled" way, since lost memory should be freed when the child process exits */
-		if(asprintf(&env_string,"%s=%s",name,(value==NULL)?"":value)==-1){
-			logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
-			return ERROR;
-			}
-		if(env_string)
-			putenv(env_string);
+		std::ostringstream oss;
+		oss << name << '=' << (value ? value : "");
+		env_string = my_strdup(oss.str().c_str());
+		putenv(env_string);
 #endif
 	        }
 	/* clear the variable */
@@ -1767,7 +1765,6 @@ void my_system_sighandler(int sig){
 /* move check result to queue directory */
 int move_check_result_to_queue(char *checkresult_file){
 	char *output_file=NULL;
-	char *temp_buffer=NULL;
 	int output_file_fd=-1;
 	mode_t new_umask=077;
 	mode_t old_umask;
@@ -1777,10 +1774,9 @@ int move_check_result_to_queue(char *checkresult_file){
 	old_umask=umask(new_umask);
 
 	/* create a safe temp file */
-	if(asprintf(&output_file,"%s/cXXXXXX",config.get_check_result_path().c_str())==-1){
-		logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
-		return ERROR;
-		}
+	std::ostringstream oss;
+	oss << config.get_check_result_path() << "/cXXXXXX";
+	output_file = my_strdup(oss.str().c_str());
 	output_file_fd=mkstemp(output_file);
 
 	/* file created okay */
@@ -1803,18 +1799,10 @@ int move_check_result_to_queue(char *checkresult_file){
 #endif
 
 		/* create an ok-to-go indicator file */
-		if(asprintf(&temp_buffer,"%s.ok",output_file)==-1){
-			logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
-			/* free memory */
-			my_free(output_file);
-			/* delete the original file if it couldn't be moved */
-			if(result!=0)
-			  unlink(checkresult_file);
-			return ERROR;
-		}
-		if((output_file_fd=open(temp_buffer,O_CREAT|O_WRONLY|O_TRUNC,S_IRUSR|S_IWUSR))>0)
+		std::string temp_buffer(output_file);
+		temp_buffer.append(".ok");
+		if((output_file_fd=open(temp_buffer.c_str(),O_CREAT|O_WRONLY|O_TRUNC,S_IRUSR|S_IWUSR))>0)
 			close(output_file_fd);
-		my_free(temp_buffer);
 
 		/* delete the original file if it couldn't be moved */
 		if(result!=0)
@@ -1831,7 +1819,7 @@ int move_check_result_to_queue(char *checkresult_file){
 		logit(NSLOG_RUNTIME_WARNING,TRUE,"Warning: Unable to move file '%s' to check results queue.\n",checkresult_file);
 
 	/* free memory */
-	my_free(output_file);
+	delete[] output_file;
 
 	return OK;
 	}
@@ -1846,7 +1834,6 @@ int process_check_result_queue(char const* dirname){
 	int x=0;
 	struct stat stat_buf;
 	struct stat ok_stat_buf;
-	char *temp_buffer=NULL;
 	int result=OK;
 
 	/* make sure we have what we need */
@@ -1896,13 +1883,9 @@ int process_check_result_queue(char const* dirname){
 			/* at this point we have a regular file... */
 
 			/* can we find the associated ok-to-go file ? */
-			if(asprintf(&temp_buffer,"%s.ok",file)==-1){
-				logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
-				closedir(dirp);
-				return ERROR;
-				}
-			result=stat(temp_buffer,&ok_stat_buf);
-			my_free(temp_buffer);
+			std::string temp_buffer(file);
+			temp_buffer.append(".ok");
+			result=stat(temp_buffer.c_str(),&ok_stat_buf);
 			if(result==-1)
 				continue;
 
@@ -1955,7 +1938,7 @@ int process_check_result_file(char *fname){
 	while(1){
 
 		/* free memory */
-		my_free(input);
+		delete[] input;
 
 		/* read the next line */
 		if((input=mmap_fgets_multiline(thefile))==NULL)
@@ -1985,7 +1968,7 @@ int process_check_result_file(char *fname){
 				else{
 					free_check_result(new_cr);
 					init_check_result(new_cr);
-					new_cr->output_file=(char *)strdup(fname);
+					new_cr->output_file=my_strdup(fname);
 					}
 				}
 			}
@@ -2011,19 +1994,17 @@ int process_check_result_file(char *fname){
 
 			/* allocate new check result if necessary */
 			if(new_cr==NULL){
-
-				if((new_cr=(check_result *)malloc(sizeof(check_result)))==NULL)
-					continue;
+				new_cr = new check_result;
 
 				/* init values */
 				init_check_result(new_cr);
-				new_cr->output_file=(char *)strdup(fname);
+				new_cr->output_file=my_strdup(fname);
 				}
 
 			if(!strcmp(var,"host_name"))
-				new_cr->host_name=(char *)strdup(val);
+				new_cr->host_name=my_strdup(val);
 			else if(!strcmp(var,"service_description")){
-				new_cr->service_description=(char *)strdup(val);
+				new_cr->service_description=my_strdup(val);
 				new_cr->object_check_type=SERVICE_CHECK;
 				}
 			else if(!strcmp(var,"check_type"))
@@ -2059,7 +2040,7 @@ int process_check_result_file(char *fname){
 			else if(!strcmp(var,"return_code"))
 				new_cr->return_code=atoi(val);
 			else if(!strcmp(var,"output"))
-				new_cr->output=(char *)strdup(val);
+				new_cr->output=my_strdup(val);
 			}
 	        }
 
@@ -2080,12 +2061,12 @@ int process_check_result_file(char *fname){
 		/* free memory for current check result record */
 		else{
 			free_check_result(new_cr);
-			my_free(new_cr);
+			delete new_cr;
 			}
 		}
 
 	/* free memory and close file */
-	my_free(input);
+	delete[] input;
 	mmap_fclose(thefile);
 
 	/* delete the file (as well its ok-to-go file) if it's too old */
@@ -2099,20 +2080,15 @@ int process_check_result_file(char *fname){
 
 
 /* deletes as check result file, as well as its ok-to-go file */
-int delete_check_result_file(char *fname){
-	char *temp_buffer=NULL;
-
+int delete_check_result_file(char const* fname){
 	/* delete the result file */
 	unlink(fname);
 
 	/* delete the ok-to-go file */
-	if(asprintf(&temp_buffer,"%s.ok",fname)==-1){
-		logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
-		return ERROR;
-		}
-	unlink(temp_buffer);
-	my_free(temp_buffer);
+	std::string temp_buffer(fname);
+	temp_buffer.append(".ok");
 
+	unlink(temp_buffer.c_str());
 	return OK;
 	}
 
@@ -2215,7 +2191,7 @@ int free_check_result_list(void){
 	for(this_cr=check_result_list;this_cr!=NULL;this_cr=next_cr){
 		next_cr=this_cr->next;
 		free_check_result(this_cr);
-		my_free(this_cr);
+		delete this_cr;
 		}
 
 	check_result_list=NULL;
@@ -2232,10 +2208,10 @@ int free_check_result(check_result *info){
 	if(info==NULL)
 		return OK;
 
-	my_free(info->host_name);
-	my_free(info->service_description);
-	my_free(info->output_file);
-	my_free(info->output);
+	delete[] info->host_name;
+	delete[] info->service_description;
+	delete[] info->output_file;
+	delete[] info->output;
 
 	return OK;
         }
@@ -2316,113 +2292,110 @@ int parse_check_output(char *buf, char **short_output, char **long_output, char 
 
 			/* handle this line of input */
 			buf[x]='\x0';
-			if((tempbuf=(char *)strdup(buf))){
+			tempbuf=my_strdup(buf);
 
-				/* first line contains short plugin output and optional perf data */
-				if(current_line==1){
+			/* first line contains short plugin output and optional perf data */
+			if(current_line==1){
 
-					/* get the short plugin output */
-					if((ptr=strtok(tempbuf,"|"))){
-						if(short_output)
-							*short_output=(char *)strdup(ptr);
+				/* get the short plugin output */
+				if((ptr=strtok(tempbuf,"|"))){
+					if(short_output)
+						*short_output=my_strdup(ptr);
 
-						/* get the optional perf data */
-						if((ptr=strtok(NULL,"\n")))
-							dbuf_strcat(&db2,ptr);
-					        }
-				        }
+					/* get the optional perf data */
+					if((ptr=strtok(NULL,"\n")))
+						dbuf_strcat(&db2,ptr);
+					}
+				}
 
-				/* additional lines contain long plugin output and optional perf data */
+			/* additional lines contain long plugin output and optional perf data */
+			else{
+
+				/* rest of the output is perf data */
+				if(in_perf_data==TRUE){
+					dbuf_strcat(&db2,tempbuf);
+					dbuf_strcat(&db2," ");
+					}
+
+				/* we're still in long output */
 				else{
 
-					/* rest of the output is perf data */
-					if(in_perf_data==TRUE){
-						dbuf_strcat(&db2,tempbuf);
-						dbuf_strcat(&db2," ");
-						}
+					/* perf data separator has been found */
+					if(strstr(tempbuf,"|")){
 
-					/* we're still in long output */
-					else{
+					/* NOTE: strtok() causes problems if first character of tempbuf='|', so use my_strtok() instead */
+					/* get the remaining long plugin output */
+						if((ptr=my_strtok(tempbuf,"|"))){
 
-						/* perf data separator has been found */
-						if(strstr(tempbuf,"|")){
-
-							/* NOTE: strtok() causes problems if first character of tempbuf='|', so use my_strtok() instead */
-							/* get the remaining long plugin output */
-							if((ptr=my_strtok(tempbuf,"|"))){
-
-								if(current_line>2)
-									dbuf_strcat(&db1,"\n");
-								dbuf_strcat(&db1,ptr);
-
-								/* get the perf data */
-								if((ptr=my_strtok(NULL,"\n"))){
-									dbuf_strcat(&db2,ptr);
-									dbuf_strcat(&db2," ");
-									}
-							        }
-
-							/* set the perf data flag */
-							in_perf_data=TRUE;
-						        }
-
-						/* just long output */
-						else{
 							if(current_line>2)
 								dbuf_strcat(&db1,"\n");
-							dbuf_strcat(&db1,tempbuf);
-						        }
-					        }
-				        }
+							dbuf_strcat(&db1,ptr);
 
-				my_free(tempbuf);
-				tempbuf=NULL;
-			        }
+							/* get the perf data */
+							if((ptr=my_strtok(NULL,"\n"))){
+								dbuf_strcat(&db2,ptr);
+								dbuf_strcat(&db2," ");
+								}
+							}
 
+						/* set the perf data flag */
+						in_perf_data=TRUE;
+						}
 
-			/* shift data back to front of buffer and adjust counters */
-			memmove((void *)&buf[0],(void *)&buf[x+1],(size_t)((int)used_buf-x-1));
-			used_buf-=(x+1);
-			buf[used_buf]='\x0';
-			x=-1;
-		        }
+					/* just long output */
+					else{
+						if(current_line>2)
+							dbuf_strcat(&db1,"\n");
+						dbuf_strcat(&db1,tempbuf);
+						}
+					}
+				}
+
+			delete[] tempbuf;
+			tempbuf=NULL;
+			}
+
+		/* shift data back to front of buffer and adjust counters */
+		memmove((void *)&buf[0],(void *)&buf[x+1],(size_t)((int)used_buf-x-1));
+		used_buf-=(x+1);
+		buf[used_buf]='\x0';
+		x=-1;
 	        }
 
 	/* save long output */
 	if(long_output && (db1.buf && strcmp(db1.buf,""))){
 
 		if(escape_newlines_please==FALSE)
-			*long_output=(char *)strdup(db1.buf);
+			*long_output=my_strdup(db1.buf);
 
 		else{
 
 			/* escape newlines (and backslashes) in long output */
-			if((tempbuf=(char *)malloc((strlen(db1.buf)*2)+1))){
+			tempbuf = new char[strlen(db1.buf)*2+1];
 
-				for(x=0,y=0;db1.buf[x]!='\x0';x++){
+			for(x=0,y=0;db1.buf[x]!='\x0';x++){
 
-					if(db1.buf[x]=='\n'){
-						tempbuf[y++]='\\';
-						tempbuf[y++]='n';
-					        }
-					else if(db1.buf[x]=='\\'){
-						tempbuf[y++]='\\';
-						tempbuf[y++]='\\';
-					        }
-					else
-						tempbuf[y++]=db1.buf[x];
-				        }
+				if(db1.buf[x]=='\n'){
+					tempbuf[y++]='\\';
+					tempbuf[y++]='n';
+					}
+				else if(db1.buf[x]=='\\'){
+					tempbuf[y++]='\\';
+					tempbuf[y++]='\\';
+					}
+				else
+					tempbuf[y++]=db1.buf[x];
+				}
 
-				tempbuf[y]='\x0';
-				*long_output=(char *)strdup(tempbuf);
-				my_free(tempbuf);
-			        }
-		        }
-	        }
+			tempbuf[y]='\x0';
+			*long_output=my_strdup(tempbuf);
+			delete[] tempbuf;
+			}
+		}
 
 	/* save perf data */
 	if(perf_data && (db2.buf && strcmp(db2.buf,"")))
-		*perf_data=(char *)strdup(db2.buf);
+		*perf_data=my_strdup(db2.buf);
 
 	/* strip short output and perf data */
 	if(short_output)
@@ -2595,8 +2568,7 @@ char *escape_newlines(char *rawbuf){
 		return NULL;
 
 	/* allocate enough memory to escape all chars if necessary */
-	if((newbuf=(char*)malloc((strlen(rawbuf)*2)+1))==NULL)
-		return NULL;
+	newbuf = new char[strlen(rawbuf)*2+1];
 
 	for(x=0,y=0;rawbuf[x]!=(char)'\x0';x++){
 
@@ -2712,11 +2684,12 @@ int my_fdcopy(char const* source, char const* dest, int dest_fd)
 	 * cache, so larger isn't necessarily better.
 	 */
 	buf_size = st.st_size > 128 << 10 ? 128 << 10 : st.st_size;
-	buf = (char*)malloc(buf_size);
-	if (!buf) {
-		logit(NSLOG_RUNTIME_ERROR,TRUE,"Error: Unable to malloc(%lu) bytes: %s\n", buf_size, strerror(errno));
+	try {
+		buf = new char[buf_size];
+	}
+	catch (...) {
 		close(source_fd);
-		return ERROR;
+		throw;
 	}
 	/* most of the times, this loop will be gone through once */
 	while (tot_written < st.st_size) {
@@ -2751,7 +2724,7 @@ int my_fdcopy(char const* source, char const* dest, int dest_fd)
 	 * our caller, so we mustn't close it.
 	 */
 	close(source_fd);
-	free(buf);
+	delete[] buf;
 
 	if (rd_result < 0 || wr_result < 0) {
 		/* don't leave half-written files around */
@@ -2810,7 +2783,7 @@ int dbuf_free(dbuf *db){
 		return ERROR;
 
 	if(db->buf!=NULL)
-		my_free(db->buf);
+		delete[] db->buf;
 	db->buf=NULL;
 	db->used_size=0L;
 	db->allocated_size=0L;
@@ -2821,7 +2794,6 @@ int dbuf_free(dbuf *db){
 
 /* dynamically expands a string */
 int dbuf_strcat(dbuf *db, char const *buf){
-	char *newbuf=NULL;
 	unsigned long buflen=0L;
 	unsigned long new_size=0L;
 	unsigned long memory_needed=0L;
@@ -2839,11 +2811,7 @@ int dbuf_strcat(dbuf *db, char const *buf){
 		memory_needed=((ceil(new_size/db->chunk_size)+1)*db->chunk_size);
 
 		/* allocate memory to store old and new string */
-		if((newbuf=(char *)realloc((void *)db->buf,(size_t)memory_needed))==NULL)
-			return ERROR;
-
-		/* update buffer pointer */
-		db->buf=newbuf;
+		db->buf = resize_string(db->buf, memory_needed);
 
 		/* update allocated size */
 		db->allocated_size=memory_needed;
@@ -2885,11 +2853,9 @@ int init_embedded_perl(char **env){
 
 	else{
 
-		embedding=malloc(2*sizeof(char *));
-		if(embedding==NULL)
-			return ERROR;
-		*embedding=strdup("");
-		*(embedding+1)=strdup(config.get_p1_file().c_str());
+		embedding = new char*[2];
+		*embedding=my_strdup("");
+		*(embedding+1)=my_strdup(config.get_p1_file().c_str());
 
 		use_embedded_perl=TRUE;
 
@@ -3027,7 +2993,7 @@ int init_command_file_worker_thread(void){
 	external_command_buffer.items=0;
 	external_command_buffer.high=0;
 	external_command_buffer.overflow=0L;
-	external_command_buffer.buffer=(void **)malloc(config.get_external_command_buffer_slots()*sizeof(char **));
+	external_command_buffer.buffer = new void*[config.get_external_command_buffer_slots()];
 	if(external_command_buffer.buffer==NULL)
 		return ERROR;
 
@@ -3092,9 +3058,11 @@ void cleanup_command_file_worker_thread(void *arg){
 
 	/* release memory allocated to circular buffer */
 	for(x=external_command_buffer.tail;x!=external_command_buffer.head;x=(x+1) % config.get_external_command_buffer_slots()){
-		my_free(((char **)external_command_buffer.buffer)[x]);
+		delete[] ((char **)external_command_buffer.buffer)[x];
+		((char **)external_command_buffer.buffer)[x] = NULL;
 	        }
-	my_free(external_command_buffer.buffer);
+	delete[] external_command_buffer.buffer;
+	external_command_buffer.buffer = NULL;
 
 	return;
         }
@@ -3248,7 +3216,7 @@ int submit_external_command(char *cmd, int *buffer_items){
 	if(external_command_buffer.items<config.get_external_command_buffer_slots()){
 
 		/* save the line in the buffer */
-		((char **)external_command_buffer.buffer)[external_command_buffer.head]=(char *)strdup(cmd);
+		((char **)external_command_buffer.buffer)[external_command_buffer.head]=my_strdup(cmd);
 
 		/* increment the head counter and items */
 		external_command_buffer.head=(external_command_buffer.head + 1) % config.get_external_command_buffer_slots();
@@ -3289,16 +3257,15 @@ int submit_raw_external_command(char *cmd, time_t *ts, int *buffer_items){
 		time(&timestamp);
 
 	/* create the command string */
-	if(asprintf(&newcmd,"[%lu] %s",(unsigned long)timestamp,cmd)==-1){
-		logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
-		return ERROR;
-		}
+	std::ostringstream oss;
+	oss << '[' << timestamp << "] " << cmd;
+	newcmd = my_strdup(oss.str().c_str());
 
 	/* submit the command */
 	result=submit_external_command(newcmd,buffer_items);
 
 	/* free allocated memory */
-	my_free(newcmd);
+	delete[] newcmd;
 
 	return result;
         }
@@ -3615,7 +3582,7 @@ void free_memory(nagios_macros *mac)
 	this_event=event_list_high;
 	while(this_event!=NULL){
 		next_event=this_event->next;
-		my_free(this_event);
+		delete this_event;
 		this_event=next_event;
 	        }
 
@@ -3626,7 +3593,7 @@ void free_memory(nagios_macros *mac)
 	this_event=event_list_low;
 	while(this_event!=NULL){
 		next_event=this_event->next;
-		my_free(this_event);
+		delete this_event;
 		this_event=next_event;
 	        }
 
@@ -3653,8 +3620,11 @@ void free_memory(nagios_macros *mac)
 	// my_free(illegal_output_chars);
 
 	/* free version strings */
-	my_free(last_program_version);
-	my_free(new_program_version);
+	delete[] last_program_version;
+	delete[] new_program_version;
+
+	last_program_version = NULL;
+	new_program_version = NULL;
 
 	return;
 }
@@ -3668,7 +3638,7 @@ void free_notification_list(void){
 	temp_notification=notification_list;
 	while(temp_notification!=NULL){
 		next_notification=temp_notification->next;
-		my_free(temp_notification);
+		delete temp_notification;
 		temp_notification=next_notification;
 	        }
 

@@ -18,6 +18,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <sstream>
 #include "conf.hh"
 #include "comments.hh"
 #include "downtime.hh"
@@ -116,8 +117,8 @@ int obsessive_compulsive_service_check_processor(service *svc)
 	  logit(NSLOG_RUNTIME_WARNING,TRUE,"Warning: OCSP command '%s' for service '%s' on host '%s' timed out after %d seconds\n",processed_command,svc->description,svc->host_name,config.get_ocsp_timeout());
 
 	/* free memory */
-	my_free(raw_command);
-	my_free(processed_command);
+	delete[] raw_command;
+	delete[] processed_command;
 	
 	return OK;
         }
@@ -180,8 +181,8 @@ int obsessive_compulsive_host_check_processor(host *hst)
 	  logit(NSLOG_RUNTIME_WARNING,TRUE,"Warning: OCHP command '%s' for host '%s' timed out after %d seconds\n",processed_command,hst->name,config.get_ochp_timeout());
 
 	/* free memory */
-	my_free(raw_command);
-	my_free(processed_command);
+	delete[] raw_command;
+	delete[] processed_command;
 
 	return OK;
 }
@@ -296,10 +297,11 @@ int run_global_service_event_handler(nagios_macros *mac, service *svc)
 	log_debug_info(DEBUGL_EVENTHANDLERS,2,"Processed global service event handler command line: %s\n",processed_command);
 
 	if(config.get_log_event_handlers()==true){
-	  if(asprintf(&raw_logentry,"GLOBAL SERVICE EVENT HANDLER: %s;%s;$SERVICESTATE$;$SERVICESTATETYPE$;$SERVICEATTEMPT$;%s\n",svc->host_name,svc->description,config.get_global_service_event_handler().c_str())==-1){
-			logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
-			return ERROR;
-			}
+		std::ostringstream oss;
+		oss << "GLOBAL SERVICE EVENT HANDLER: " << svc->host_name << ';'
+		    << svc->description << ";$SERVICESTATE$;$SERVICESTATETYPE$;$SERVICEATTEMPT$;"
+		    << config.get_global_service_event_handler() << std::endl;
+		raw_logentry = my_strdup(oss.str().c_str());
 		process_macros_r(mac, raw_logentry,&processed_logentry,macro_options);
 		logit(NSLOG_EVENT_HANDLER,FALSE,"%s",processed_logentry);
 		}
@@ -313,10 +315,10 @@ int run_global_service_event_handler(nagios_macros *mac, service *svc)
 	/* neb module wants to override (or cancel) the event handler - perhaps it will run the eventhandler itself */
 	if((neb_result==NEBERROR_CALLBACKCANCEL)
 	   ||(neb_result==NEBERROR_CALLBACKOVERRIDE)) {
-		my_free(processed_command);
-		my_free(raw_command);
-		my_free(raw_logentry);
-		my_free(processed_logentry);
+		delete[] processed_command;
+		delete[] raw_command;
+		delete[] raw_logentry;
+		delete[] processed_logentry;
 		return (neb_result==NEBERROR_CALLBACKCANCEL)?ERROR:OK;
 	}
 #endif
@@ -339,11 +341,11 @@ int run_global_service_event_handler(nagios_macros *mac, service *svc)
 #endif
 
 	/* free memory */
-	my_free(command_output);
-	my_free(raw_command);
-	my_free(processed_command);
-	my_free(raw_logentry);
-	my_free(processed_logentry);
+	delete[] command_output;
+	delete[] raw_command;
+	delete[] processed_command;
+	delete[] raw_logentry;
+	delete[] processed_logentry;
 
 	return OK;
 }
@@ -401,10 +403,11 @@ int run_service_event_handler(nagios_macros *mac, service *svc)
 	log_debug_info(DEBUGL_EVENTHANDLERS,2,"Processed service event handler command line: %s\n",processed_command);
 
 	if(config.get_log_event_handlers()==true){
-		if(asprintf(&raw_logentry,"SERVICE EVENT HANDLER: %s;%s;$SERVICESTATE$;$SERVICESTATETYPE$;$SERVICEATTEMPT$;%s\n",svc->host_name,svc->description,svc->event_handler)==-1){
-			logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
-			return ERROR;
-			}
+		std::ostringstream oss;
+		oss << "SERVICE EVENT HANDLER: " << svc->host_name << ';' << svc->description
+		    << ";$SERVICESTATE$;$SERVICESTATETYPE$;$SERVICEATTEMPT$;" << svc->event_handler
+		    << std::endl;
+		raw_logentry = my_strdup(oss.str().c_str());
 		process_macros_r(mac, raw_logentry,&processed_logentry,macro_options);
 		logit(NSLOG_EVENT_HANDLER,FALSE,"%s",processed_logentry);
 		}
@@ -418,10 +421,10 @@ int run_service_event_handler(nagios_macros *mac, service *svc)
 	/* neb module wants to override (or cancel) the event handler - perhaps it will run the eventhandler itself */
 	if((neb_result==NEBERROR_CALLBACKCANCEL)
 	   ||(neb_result==NEBERROR_CALLBACKOVERRIDE)) {
-		my_free(processed_command);
-		my_free(raw_command);
-		my_free(raw_logentry);
-		my_free(processed_logentry);
+		delete[] processed_command;
+		delete[] raw_command;
+		delete[] raw_logentry;
+		delete[] processed_logentry;
 		return (neb_result==NEBERROR_CALLBACKCANCEL)?ERROR:OK;
 	}
 #endif
@@ -444,11 +447,11 @@ int run_service_event_handler(nagios_macros *mac, service *svc)
 #endif
 
 	/* free memory */
-	my_free(command_output);
-	my_free(raw_command);
-	my_free(processed_command);
-	my_free(raw_logentry);
-	my_free(processed_logentry);
+	delete[] command_output;
+	delete[] raw_command;
+	delete[] processed_command;
+	delete[] raw_logentry;
+	delete[] processed_logentry;
 
 	return OK;
 }
@@ -554,10 +557,11 @@ int run_global_host_event_handler(nagios_macros *mac, host *hst)
 	log_debug_info(DEBUGL_EVENTHANDLERS,2,"Processed global host event handler command line: %s\n",processed_command);
 
 	if(config.get_log_event_handlers()==true){
-	  if(asprintf(&raw_logentry,"GLOBAL HOST EVENT HANDLER: %s;$HOSTSTATE$;$HOSTSTATETYPE$;$HOSTATTEMPT$;%s\n",hst->name,config.get_global_host_event_handler().c_str())==-1){
-			logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
-			return ERROR;
-			}
+		std::ostringstream oss;
+		oss << "GLOBAL HOST EVENT HANDLER: " << hst->name
+		    << "$HOSTSTATE$;$HOSTSTATETYPE$;$HOSTATTEMPT$;"
+		    << config.get_global_host_event_handler() << std::endl;
+		raw_logentry = my_strdup(oss.str().c_str());
 		process_macros_r(mac, raw_logentry,&processed_logentry,macro_options);
 		logit(NSLOG_EVENT_HANDLER,FALSE,"%s",processed_logentry);
 		}
@@ -571,10 +575,10 @@ int run_global_host_event_handler(nagios_macros *mac, host *hst)
 	/* neb module wants to override (or cancel) the event handler - perhaps it will run the eventhandler itself */
 	if((neb_result==NEBERROR_CALLBACKCANCEL)
 	   ||(neb_result==NEBERROR_CALLBACKOVERRIDE)) {
-		my_free(processed_command);
-		my_free(raw_command);
-		my_free(raw_logentry);
-		my_free(processed_logentry);
+		delete[] processed_command;
+		delete[] raw_command;
+		delete[] raw_logentry;
+		delete[] processed_logentry;
 		return (neb_result==NEBERROR_CALLBACKCANCEL)?ERROR:OK;
 	}
 #endif
@@ -597,11 +601,11 @@ int run_global_host_event_handler(nagios_macros *mac, host *hst)
 #endif
 
 	/* free memory */
-	my_free(command_output);
-	my_free(raw_command);
-	my_free(processed_command);
-	my_free(raw_logentry);
-	my_free(processed_logentry);
+	delete[] command_output;
+	delete[] raw_command;
+	delete[] processed_command;
+	delete[] raw_logentry;
+	delete[] processed_logentry;
 
 	return OK;
         }
@@ -657,10 +661,11 @@ int run_host_event_handler(nagios_macros *mac, host *hst)
 	log_debug_info(DEBUGL_EVENTHANDLERS,2,"Processed host event handler command line: %s\n",processed_command);
 
 	if(config.get_log_event_handlers()==true){
-		if(asprintf(&raw_logentry,"HOST EVENT HANDLER: %s;$HOSTSTATE$;$HOSTSTATETYPE$;$HOSTATTEMPT$;%s\n",hst->name,hst->event_handler)==-1){
-			logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
-			return ERROR;
-			}
+		std::ostringstream oss;
+		oss << "HOST EVENT HANDLER: " << hst->name
+		    << ";$HOSTSTATE$;$HOSTSTATETYPE$;$HOSTATTEMPT$;"
+		    << hst->event_handler << std::endl;
+		raw_logentry = my_strdup(oss.str().c_str());
 		process_macros_r(mac, raw_logentry,&processed_logentry,macro_options);
 		logit(NSLOG_EVENT_HANDLER,FALSE,"%s",processed_logentry);
 		}
@@ -674,10 +679,10 @@ int run_host_event_handler(nagios_macros *mac, host *hst)
 	/* neb module wants to override (or cancel) the event handler - perhaps it will run the eventhandler itself */
 	if((neb_result==NEBERROR_CALLBACKCANCEL)
 	   ||(neb_result==NEBERROR_CALLBACKOVERRIDE)) {
-		my_free(processed_command);
-		my_free(raw_command);
-		my_free(raw_logentry);
-		my_free(processed_logentry);
+		delete[] processed_command;
+		delete[] raw_command;
+		delete[] raw_logentry;
+		delete[] processed_logentry;
 		return (neb_result==NEBERROR_CALLBACKCANCEL)?ERROR:OK;
 	}
 #endif
@@ -700,11 +705,11 @@ int run_host_event_handler(nagios_macros *mac, host *hst)
 #endif
 
 	/* free memory */
-	my_free(command_output);
-	my_free(raw_command);
-	my_free(processed_command);
-	my_free(raw_logentry);
-	my_free(processed_logentry);
+	delete[] command_output;
+	delete[] raw_command;
+	delete[] processed_command;
+	delete[] raw_logentry;
+	delete[] processed_logentry;
 
 	return OK;
         }

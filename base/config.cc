@@ -18,6 +18,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <sstream>
 #include "conf.hh"
 #include "nagios.hh"
 #include "utils.hh"
@@ -114,9 +115,9 @@ int read_resource_file(char *resource_file){
 	while(1){
 
 		/* free memory */
-		my_free(input);
-		my_free(variable);
-		my_free(value);
+		delete[] input;
+		delete[] variable;
+		delete[] value;
 
 		/* read the next line */
 		if((input=mmap_fgets_multiline(thefile))==NULL)
@@ -136,10 +137,7 @@ int read_resource_file(char *resource_file){
 			error=TRUE;
 			break;
 			}
-		if((variable=(char *)strdup(temp_ptr))==NULL){
-			error=TRUE;
-			break;
-		        }
+		variable=my_strdup(temp_ptr);
 
 		/* get the value */
 		if((temp_ptr=my_strtok(NULL,"\n"))==NULL){
@@ -147,10 +145,7 @@ int read_resource_file(char *resource_file){
 			error=TRUE;
 			break;
 			}
-		if((value=(char *)strdup(temp_ptr))==NULL){
-			error=TRUE;
-			break;
-		        }
+		value=my_strdup(temp_ptr);
 
 		/* what should we do with the variable/value pair? */
 
@@ -161,20 +156,20 @@ int read_resource_file(char *resource_file){
 			if(strstr(variable,"$USER")==variable  && strlen(variable)>5){
 				user_index=atoi(variable+5)-1;
 				if(user_index<MAX_USER_MACROS){
-					my_free(macro_user[user_index]);
-					macro_user[user_index]=(char *)strdup(value);
+					delete[] macro_user[user_index];
+					macro_user[user_index]=my_strdup(value);
 				        }
 			        }
 		        }
 	        }
 
 	/* free leftover memory and close the file */
-	my_free(input);
+	delete[] input;
 	mmap_fclose(thefile);
 
 	/* free memory */
-	my_free(variable);
-	my_free(value);
+	delete[] variable;
+	delete[] value;
 
 	if(error==TRUE)
 		return ERROR;
@@ -232,7 +227,7 @@ int pre_flight_check(void){
 	if(config.get_global_host_event_handler()!=""){
 
 		/* check the event handler command */
-	  buf=(char *)strdup(config.get_global_host_event_handler().c_str());
+		buf=my_strdup(config.get_global_host_event_handler().c_str());
 
 		/* get the command name, leave any arguments behind */
 		temp_command_name=my_strtok(buf,"!");
@@ -246,12 +241,12 @@ int pre_flight_check(void){
 		/* save the pointer to the command for later */
 		global_host_event_handler_ptr=temp_command;
 
-		my_free(buf);
+		delete[] buf;
 	        }
 	if(config.get_global_service_event_handler()!=""){
 
 		/* check the event handler command */
-	  buf=(char *)strdup(config.get_global_service_event_handler().c_str());
+		buf=my_strdup(config.get_global_service_event_handler().c_str());
 
 		/* get the command name, leave any arguments behind */
 		temp_command_name=my_strtok(buf,"!");
@@ -265,7 +260,7 @@ int pre_flight_check(void){
 		/* save the pointer to the command for later */
 		global_service_event_handler_ptr=temp_command;
 
-		my_free(buf);
+		delete[] buf;
 	        }
 
 
@@ -276,7 +271,7 @@ int pre_flight_check(void){
 		printf("Checking obsessive compulsive processor commands...\n");
 	if(!config.get_ocsp_command().empty()){
 
-	  buf=(char *)strdup(config.get_ocsp_command().c_str());
+		buf=my_strdup(config.get_ocsp_command().c_str());
 
 		/* get the command name, leave any arguments behind */
 		temp_command_name=my_strtok(buf,"!");
@@ -290,11 +285,11 @@ int pre_flight_check(void){
 		/* save the pointer to the command for later */
 		ocsp_command_ptr=temp_command;
 
-		my_free(buf);
+		delete[] buf;
 	        }
 	if(!config.get_ochp_command().empty()){
 
-	  buf=(char *)strdup(config.get_ochp_command().c_str());
+		buf=my_strdup(config.get_ochp_command().c_str());
 
 		/* get the command name, leave any arguments behind */
 		temp_command_name=my_strtok(buf,"!");
@@ -308,7 +303,7 @@ int pre_flight_check(void){
 		/* save the pointer to the command for later */
 		ochp_command_ptr=temp_command;
 
-		my_free(buf);
+		delete[] buf;
 	        }
 
 
@@ -319,10 +314,9 @@ int pre_flight_check(void){
 		printf("Checking misc settings...\n");
 
 	/* check if we can write to temp_path */
-       	if(asprintf(&buf,"%s/nagiosXXXXXX",config.get_temp_path().c_str())==-1){
-		logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
-		return ERROR;
-		}
+	std::ostringstream oss;
+	oss << config.get_temp_path() << "/nagiosXXXXXX";
+	buf = my_strdup(oss.str().c_str());
        	if((temp_path_fd=mkstemp(buf))==-1){
 	  logit(NSLOG_VERIFICATION_ERROR,TRUE,"\tError: Unable to write to temp_path ('%s') - %s\n",config.get_temp_path().c_str(),strerror(errno));
 		errors++;
@@ -331,13 +325,12 @@ int pre_flight_check(void){
 		close(temp_path_fd);
 		remove(buf);
 		}
-	my_free(buf);
+	delete[] buf;
 
 	/* check if we can write to check_result_path */
-       	if(asprintf(&buf,"%s/nagiosXXXXXX",config.get_check_result_path().c_str())==-1){
-		logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
-		return ERROR;
-		}
+	oss.str() = "";
+	oss << config.get_check_result_path() << "/nagiosXXXXXX";
+	buf = my_strdup(oss.str().c_str());
        	if((temp_path_fd=mkstemp(buf))==-1){
 	  logit(NSLOG_VERIFICATION_WARNING,TRUE,"\tError: Unable to write to check_result_path ('%s') - %s\n",config.get_check_result_path().c_str(),strerror(errno));
 		errors++;
@@ -346,7 +339,7 @@ int pre_flight_check(void){
 		close(temp_path_fd);
 		remove(buf);
 		}
-	my_free(buf);
+	delete[] buf;
 
 	/* warn if user didn't specify any illegal macro output chars */
 	if(config.get_illegal_output_chars()==""){
@@ -485,7 +478,7 @@ int pre_flight_object_check(int *w, int *e){
 		if(temp_service->event_handler!=NULL){
 
 			/* check the event handler command */
-			buf=(char *)strdup(temp_service->event_handler);
+			buf=my_strdup(temp_service->event_handler);
 
 			/* get the command name, leave any arguments behind */
 			temp_command_name=my_strtok(buf,"!");
@@ -496,14 +489,14 @@ int pre_flight_object_check(int *w, int *e){
 				errors++;
 			        }
 
-			my_free(buf);
+			delete[] buf;
 
 			/* save the pointer to the event handler for later */
 			temp_service->event_handler_ptr=temp_command;
 		        }
 
 		/* check the service check_command */
-		buf=(char *)strdup(temp_service->service_check_command);
+		buf=my_strdup(temp_service->service_check_command);
 
 		/* get the command name, leave any arguments behind */
 		temp_command_name=my_strtok(buf,"!");
@@ -514,7 +507,7 @@ int pre_flight_object_check(int *w, int *e){
 			errors++;
 		        }
 
-		my_free(buf);
+		delete[] buf;
 
 		/* save the pointer to the check command for later */
 		temp_service->check_command_ptr=temp_command;
@@ -656,7 +649,7 @@ int pre_flight_object_check(int *w, int *e){
 		if(temp_host->event_handler!=NULL){
 
 			/* check the event handler command */
-			buf=(char *)strdup(temp_host->event_handler);
+			buf=my_strdup(temp_host->event_handler);
 
 			/* get the command name, leave any arguments behind */
 			temp_command_name=my_strtok(buf,"!");
@@ -667,7 +660,7 @@ int pre_flight_object_check(int *w, int *e){
 				errors++;
 			        }
 
-			my_free(buf);
+			delete[] buf;
 
 			/* save the pointer to the event handler command for later */
 			temp_host->event_handler_ptr=temp_command;
@@ -677,7 +670,7 @@ int pre_flight_object_check(int *w, int *e){
 		if(temp_host->host_check_command!=NULL){
 
 			/* check the host check_command */
-			buf=(char *)strdup(temp_host->host_check_command);
+			buf=my_strdup(temp_host->host_check_command);
 
 			/* get the command name, leave any arguments behind */
 			temp_command_name=my_strtok(buf,"!");
@@ -691,7 +684,7 @@ int pre_flight_object_check(int *w, int *e){
 			/* save the pointer to the check command for later */
 			temp_host->check_command_ptr=temp_command;
 
-			my_free(buf);
+			delete[] buf;
 		        }
 
 		/* check host check timeperiod */
@@ -881,7 +874,7 @@ int pre_flight_object_check(int *w, int *e){
 		else for(temp_commandsmember=temp_contact->service_notification_commands;temp_commandsmember!=NULL;temp_commandsmember=temp_commandsmember->next){
 
 			/* check the host notification command */
-			buf=(char *)strdup(temp_commandsmember->cmd);
+			buf=my_strdup(temp_commandsmember->cmd);
 
 			/* get the command name, leave any arguments behind */
 			temp_command_name=my_strtok(buf,"!");
@@ -895,7 +888,7 @@ int pre_flight_object_check(int *w, int *e){
 			/* save pointer to the command for later */
 			temp_commandsmember->command_ptr=temp_command;
 
-			my_free(buf);
+			delete[] buf;
 		        }
 
 		/* check host notification commands */
@@ -906,7 +899,7 @@ int pre_flight_object_check(int *w, int *e){
 		else for(temp_commandsmember=temp_contact->host_notification_commands;temp_commandsmember!=NULL;temp_commandsmember=temp_commandsmember->next){
 
 			/* check the host notification command */
-			buf=(char *)strdup(temp_commandsmember->cmd);
+			buf=my_strdup(temp_commandsmember->cmd);
 
 			/* get the command name, leave any arguments behind */
 			temp_command_name=my_strtok(buf,"!");
@@ -920,7 +913,7 @@ int pre_flight_object_check(int *w, int *e){
 			/* save pointer to the command for later */
 			temp_commandsmember->command_ptr=temp_command;
 
-			my_free(buf);
+			delete[] buf;
 	                }
 
 		/* check service notification timeperiod */

@@ -714,7 +714,7 @@ void display_scheduling_info(void){
 
 
 /* schedule a new timed event */
-int schedule_new_event(int event_type, int high_priority, time_t run_time, int recurring, unsigned long event_interval, void *timing_func, int compensate_for_time_change, void *event_data, void *event_args, int event_options){
+void schedule_new_event(int event_type, int high_priority, time_t run_time, int recurring, unsigned long event_interval, void *timing_func, int compensate_for_time_change, void *event_data, void *event_args, int event_options){
 	timed_event **event_list=NULL;
 	timed_event **event_list_tail=NULL;
 	timed_event *new_event=NULL;
@@ -730,25 +730,20 @@ int schedule_new_event(int event_type, int high_priority, time_t run_time, int r
 		event_list_tail=&event_list_low_tail;
 		}
 
-	new_event=(timed_event *)malloc(sizeof(timed_event));
-	if(new_event!=NULL){
-		new_event->event_type=event_type;
-		new_event->event_data=event_data;
-		new_event->event_args=event_args;
-		new_event->event_options=event_options;
-		new_event->run_time=run_time;
-		new_event->recurring=recurring;
-		new_event->event_interval=event_interval;
-		new_event->timing_func=timing_func;
-		new_event->compensate_for_time_change=compensate_for_time_change;
-	        }
-	else
-		return ERROR;
+	new_event = new timed_event;
+
+	new_event->event_type=event_type;
+	new_event->event_data=event_data;
+	new_event->event_args=event_args;
+	new_event->event_options=event_options;
+	new_event->run_time=run_time;
+	new_event->recurring=recurring;
+	new_event->event_interval=event_interval;
+	new_event->timing_func=timing_func;
+	new_event->compensate_for_time_change=compensate_for_time_change;
 
 	/* add the event to the event list */
 	add_event(new_event,event_list,event_list_tail);
-
-	return OK;
         }
 
 
@@ -978,7 +973,7 @@ int event_execution_loop(void){
 
 			/* else free memory associated with the event */
 			else
-				my_free(temp_event);
+				delete temp_event;
 		        }
 
 		/* handle low priority events */
@@ -1110,7 +1105,7 @@ int event_execution_loop(void){
 
 				/* else free memory associated with the event */
 				else
-					my_free(temp_event);
+					delete temp_event;
 			        }
 
 			/* wait a while so we don't hog the CPU... */
@@ -1314,7 +1309,7 @@ int handle_timed_event(timed_event *event){
 		/* process scheduled downtime info */
 		if(event->event_data){
 			handle_scheduled_downtime_by_id(*(unsigned long *)event->event_data);
-			free(event->event_data);
+			delete static_cast<unsigned long*>(event->event_data);
 			event->event_data=NULL;
 			}
 		break;

@@ -620,7 +620,7 @@ hostescalation *add_hostescalation(char *host_name,int first_notification,int la
 contactgroupsmember *add_contactgroup_to_hostescalation(hostescalation *he,char *group_name); // adds a contact group to a host escalation definition
 contactsmember *add_contact_to_hostescalation(hostescalation *he, char *contact_name);        // adds a contact to a host escalation definition
 contactsmember *add_contact_to_object(contactsmember **object_ptr, char *contactname);        // adds a contact to an object
-customvariablesmember *add_custom_variable_to_object(customvariablesmember **object_ptr, char *varname, char *varvalue); // adds a custom variable to an object
+customvariablesmember *add_custom_variable_to_object(customvariablesmember **object_ptr, char const* varname, char const* varvalue); // adds a custom variable to an object
 
 // Object Search Functions
 timeperiod *find_timeperiod(char *name);               // finds a timeperiod object

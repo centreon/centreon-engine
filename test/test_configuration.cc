@@ -47,6 +47,11 @@ extern "C" {
     return (0);
   }
   nagios_macros* get_global_macros(void) { return (&global_macros); }
+
+  char* my_strdup(char const* str) {
+    char* new_str = new char[strlen(str) + 1];
+    return (strcpy(new_str, str));
+  }
 }
 
 int my_rand(int min = INT_MIN + 1, int max = INT_MAX - 1) throw() {

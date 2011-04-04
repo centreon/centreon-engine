@@ -18,6 +18,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <string.h>
 #include "conf.hh"
 #ifdef USE_XDDDEFAULT
 # include "../xdata/xdddefault.hh"
@@ -251,16 +252,21 @@ int register_downtime(int type, unsigned long downtime_id){
 	else
 		type_string="service";
 	if(temp_downtime->fixed==TRUE){
-		if(asprintf(&temp_buffer,"This %s has been scheduled for fixed downtime from %s to %s.  Notifications for the %s will not be sent out during that time period.",(char*)type_string,start_time_string,end_time_string,type_string)==-1){
-			logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
-			return ERROR;
-			}
+		std::ostringstream oss;
+		oss << "This " << type_string << " has been scheduled for fixed downtime from "
+		    << start_time_string << " to " << end_time_string << " Notifications for the "
+		    << type_string << " will not be sent out during that time period.";
+		temp_buffer = my_strdup(oss.str().c_str());
 		}
 	else{
-		if(asprintf(&temp_buffer,"This %s has been scheduled for flexible downtime starting between %s and %s and lasting for a period of %d hours and %d minutes.  Notifications for the %s will not be sent out during that time period.",type_string,start_time_string,end_time_string,hours,minutes,type_string)==-1){
-			logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
-			return (ERROR);
-			}
+		std::ostringstream oss;
+		oss << "This " << type_string
+		    << " has been scheduled for flexible downtime starting between "
+		    << start_time_string << " and " << end_time_string
+		    << " and lasting for a period of " << hours << " hours and " << minutes
+		    << " minutes. Notifications for the " << type_string
+		    << " will not be sent out during that time period.";
+		temp_buffer = my_strdup(oss.str().c_str());
 		}
 
 
@@ -293,10 +299,9 @@ int register_downtime(int type, unsigned long downtime_id){
 
 	/* only non-triggered downtime is scheduled... */
 	if(temp_downtime->triggered_by==0){
-		if((new_downtime_id=(unsigned long *)malloc(sizeof(unsigned long *)))){
-			*new_downtime_id=downtime_id;
-			schedule_new_event(EVENT_SCHEDULED_DOWNTIME,TRUE,temp_downtime->start_time,FALSE,0,NULL,FALSE,(void *)new_downtime_id,NULL,0);
-			}
+		new_downtime_id = new unsigned long;
+		*new_downtime_id=downtime_id;
+		schedule_new_event(EVENT_SCHEDULED_DOWNTIME,TRUE,temp_downtime->start_time,FALSE,0,NULL,FALSE,(void *)new_downtime_id,NULL,0);
 		}
 
 #ifdef PROBABLY_NOT_NEEDED
@@ -512,10 +517,9 @@ int handle_scheduled_downtime(scheduled_downtime *temp_downtime){
 			event_time=(time_t)((unsigned long)time(NULL)+temp_downtime->duration);
 		else
 			event_time=temp_downtime->end_time;
-		if((new_downtime_id=(unsigned long *)malloc(sizeof(unsigned long *)))){
-			*new_downtime_id=temp_downtime->downtime_id;
-			schedule_new_event(EVENT_SCHEDULED_DOWNTIME,TRUE,event_time,FALSE,0,NULL,FALSE,(void *)new_downtime_id,NULL,0);
-			}
+		new_downtime_id = new unsigned long;
+		*new_downtime_id=temp_downtime->downtime_id;
+		schedule_new_event(EVENT_SCHEDULED_DOWNTIME,TRUE,event_time,FALSE,0,NULL,FALSE,(void *)new_downtime_id,NULL,0);
 
 		/* handle (start) downtime that is triggered by this one */
 		for(this_downtime=scheduled_downtime_list;this_downtime!=NULL;this_downtime=this_downtime->next){
@@ -779,11 +783,11 @@ int delete_downtime(int type,unsigned long downtime_id){
 			last_downtime->next=next_downtime;
 		
 		/* free memory */
-		my_free(this_downtime->host_name);
-		my_free(this_downtime->service_description);
-		my_free(this_downtime->author);
-		my_free(this_downtime->comment);
-		my_free(this_downtime);
+		delete[] this_downtime->host_name;
+		delete[] this_downtime->service_description;
+		delete[] this_downtime->author;
+		delete[] this_downtime->comment;
+		delete this_downtime;
 
 		result=OK;
 	        }
@@ -857,7 +861,6 @@ int add_downtime(int downtime_type, char *host_name, char *svc_description, time
 	scheduled_downtime *new_downtime=NULL;
 	scheduled_downtime *last_downtime=NULL;
 	scheduled_downtime *temp_downtime=NULL;
-	int result=OK;
 
 	/* don't add triggered downtimes that don't have a valid parent */
 	if(triggered_by>0  && find_downtime(ANY_DOWNTIME,triggered_by)==NULL)
@@ -868,33 +871,19 @@ int add_downtime(int downtime_type, char *host_name, char *svc_description, time
 		return ERROR;
 
 	/* allocate memory for the downtime */
-	if((new_downtime=(scheduled_downtime *)calloc(1, sizeof(scheduled_downtime)))==NULL)
-		return ERROR;
+	new_downtime = new scheduled_downtime;
+	memset(new_downtime, 0, sizeof(*new_downtime));
 
 	/* duplicate vars */
-	if((new_downtime->host_name=(char *)strdup(host_name))==NULL)
-		result=ERROR;
+	new_downtime->host_name=my_strdup(host_name);
 	if(downtime_type==SERVICE_DOWNTIME){
-		if((new_downtime->service_description=(char *)strdup(svc_description))==NULL)
-			result=ERROR;
+		new_downtime->service_description=my_strdup(svc_description);
 	        }
 	if(author){
-		if((new_downtime->author=(char *)strdup(author))==NULL)
-			result=ERROR;
-	        }
+		new_downtime->author=my_strdup(author);
+		}
 	if(comment_data){
-		if((new_downtime->comment=(char *)strdup(comment_data))==NULL)
-			result=ERROR;
-	        }
-
-	/* handle errors */
-	if(result==ERROR){
-		my_free(new_downtime->comment);
-		my_free(new_downtime->author);
-		my_free(new_downtime->service_description);
-		my_free(new_downtime->host_name);
-		my_free(new_downtime);
-		return ERROR;
+		new_downtime->comment=my_strdup(comment_data);
 	        }
 
 	new_downtime->type=downtime_type;
@@ -965,8 +954,8 @@ int sort_downtime(void){
 	if(!unsorted_downtimes)
 		return OK;
 
-	if(!(array=(scheduled_downtime**)malloc(sizeof(*array)*unsorted_downtimes)))
-		return ERROR;
+	array = new scheduled_downtime*[unsorted_downtimes];
+
 	while(scheduled_downtime_list){
 		array[i++]=scheduled_downtime_list;
 		scheduled_downtime_list=scheduled_downtime_list->next;
@@ -979,7 +968,7 @@ int sort_downtime(void){
 		temp_downtime = temp_downtime->next;
 		}
 	temp_downtime->next = NULL;
-	my_free(array);
+	delete[] array;
 	return OK;
 	}
 
@@ -1031,11 +1020,11 @@ void free_downtime_data(void){
 	/* free memory for the scheduled_downtime list */
 	for(this_downtime=scheduled_downtime_list;this_downtime!=NULL;this_downtime=next_downtime){
 		next_downtime=this_downtime->next;
-		my_free(this_downtime->host_name);
-		my_free(this_downtime->service_description);
-		my_free(this_downtime->author);
-		my_free(this_downtime->comment);
-		my_free(this_downtime);
+		delete[] this_downtime->host_name;
+		delete[] this_downtime->service_description;
+		delete[] this_downtime->author;
+		delete[] this_downtime->comment;
+		delete this_downtime;
 	        }
 
 	/* reset list pointer */

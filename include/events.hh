@@ -67,7 +67,7 @@ void init_timing_loop(void);        // setup the initial scheduling queue
 void display_scheduling_info(void); // displays service check scheduling information
 
 // Event Queue Functions
-int schedule_new_event(int event_type, int high_priority, time_t run_time, int recurring, unsigned long event_interval, void *timing_func, int compensate_for_time_change, void *event_data, void *event_args, int event_options); // schedules a new timed event
+void schedule_new_event(int event_type, int high_priority, time_t run_time, int recurring, unsigned long event_interval, void *timing_func, int compensate_for_time_change, void *event_data, void *event_args, int event_options); // schedules a new timed event
 void reschedule_event(timed_event *event, timed_event **event_list, timed_event **event_list_tail); // reschedules an event
 void add_event(timed_event *event, timed_event **event_list, timed_event **event_list_tail);        // adds an event to the execution queue
 void remove_event(timed_event *event, timed_event **event_list, timed_event **event_list_tail);     // remove an event from the execution queue

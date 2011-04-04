@@ -20,6 +20,8 @@
 
 /*********** COMMON HEADER FILES ***********/
 
+#include <sstream>
+#include <iomanip>
 #include "conf.hh"
 #include "nagios.hh"
 #include "comments.hh"
@@ -325,12 +327,16 @@ void set_service_flap(service *svc, double percent_change, double high_threshold
 	logit(NSLOG_RUNTIME_WARNING,FALSE,"SERVICE FLAPPING ALERT: %s;%s;STARTED; Service appears to have started flapping (%2.1f%% change >= %2.1f%% threshold)\n",svc->host_name,svc->description,percent_change,high_threshold);
 
 	/* add a non-persistent comment to the service */
-	if(asprintf(&temp_buffer,"Notifications for this service are being suppressed because it was detected as having been flapping between different states (%2.1f%% change >= %2.1f%% threshold).  When the service state stabilizes and the flapping stops, notifications will be re-enabled.",percent_change,high_threshold)==-1){
-		logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
-		return;
-		}
+	std::ostringstream oss;
+	oss << std::fixed << std::setprecision(1)
+	    << "Notifications for this service are being suppressed because it was detected as "
+	    << "having been flapping between different states (" << percent_change << "% change >= "
+	    << high_threshold << "% threshold).  When the service state stabilizes and the flapping "
+	    << "stops, notifications will be re-enabled.";
+	temp_buffer = my_strdup(oss.str().c_str());
+
 	add_new_service_comment(FLAPPING_COMMENT,svc->host_name,svc->description,time(NULL),"(Nagios Process)",temp_buffer,0,COMMENTSOURCE_INTERNAL,FALSE,(time_t)0,&(svc->flapping_comment_id));
-	my_free(temp_buffer);
+	delete[] temp_buffer;
 
 	/* set the flapping indicator */
 	svc->is_flapping=TRUE;
@@ -409,12 +415,15 @@ void set_host_flap(host *hst, double percent_change, double high_threshold, doub
 	logit(NSLOG_RUNTIME_WARNING,FALSE,"HOST FLAPPING ALERT: %s;STARTED; Host appears to have started flapping (%2.1f%% change > %2.1f%% threshold)\n",hst->name,percent_change,high_threshold);
 
 	/* add a non-persistent comment to the host */
-	if(asprintf(&temp_buffer,"Notifications for this host are being suppressed because it was detected as having been flapping between different states (%2.1f%% change > %2.1f%% threshold).  When the host state stabilizes and the flapping stops, notifications will be re-enabled.",percent_change,high_threshold)==-1){
-		logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
-		return;
-		}
+	std::ostringstream oss;
+	oss << std::fixed << std::setprecision(1)
+	    << "Notifications for this host are being suppressed because it was detected as "
+	    << "having been flapping between different states (" << percent_change << "% change > "
+	    << high_threshold << "% threshold).  When the host state stabilizes and the "
+	    << "flapping stops, notifications will be re-enabled.";
+	temp_buffer = my_strdup(oss.str().c_str());
 	add_new_host_comment(FLAPPING_COMMENT,hst->name,time(NULL),"(Nagios Process)",temp_buffer,0,COMMENTSOURCE_INTERNAL,FALSE,(time_t)0,&(hst->flapping_comment_id));
-	my_free(temp_buffer);
+	delete[] temp_buffer;
 
 	/* set the flapping indicator */
 	hst->is_flapping=TRUE;

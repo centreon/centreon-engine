@@ -18,6 +18,9 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <sstream>
+#include <iomanip>
+
 #include "conf.hh"
 #include "statusdata.hh"
 #include "nagios.hh"
@@ -257,18 +260,20 @@ int log_service_event(service *svc)
 	grab_host_macros(&mac, temp_host);
 	grab_service_macros(&mac, svc);
 
-	if(asprintf(&temp_buffer,"SERVICE ALERT: %s;%s;$SERVICESTATE$;$SERVICESTATETYPE$;$SERVICEATTEMPT$;%s\n",svc->host_name,svc->description,(svc->plugin_output==NULL)?"":svc->plugin_output)==-1){
-		logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
-		return ERROR;
-		}
+	std::ostringstream oss;
+	oss << "SERVICE ALERT: " << svc->host_name << ";" << svc->description
+	    << ";$SERVICESTATE$;$SERVICESTATETYPE$;$SERVICEATTEMPT$;"
+	    << (svc->plugin_output ? svc->plugin_output : "") << std::endl;
+	temp_buffer = my_strdup(oss.str().c_str());
+
 	process_macros_r(&mac, temp_buffer,&processed_buffer,0);
 	clear_host_macros(&mac);
 	clear_service_macros(&mac);
 
 	write_to_all_logs(processed_buffer,log_options);
 
-	my_free(temp_buffer);
-	my_free(processed_buffer);
+	delete[] temp_buffer;
+	delete[] processed_buffer;
 
 	return OK;
 }
@@ -294,17 +299,17 @@ int log_host_event(host *hst)
 	else
 		log_options=NSLOG_HOST_UP;
 
-	if(asprintf(&temp_buffer,"HOST ALERT: %s;$HOSTSTATE$;$HOSTSTATETYPE$;$HOSTATTEMPT$;%s\n",hst->name,(hst->plugin_output==NULL)?"":hst->plugin_output)==-1){
-		logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
-		return ERROR;
-		}
+	std::ostringstream oss;
+	oss << "HOST ALERT: " << hst->name << ";$HOSTSTATE$;$HOSTSTATETYPE$;$HOSTATTEMPT$;"
+	    << (hst->plugin_output ? hst->plugin_output : "") << std::endl;
+	temp_buffer = my_strdup(oss.str().c_str());
 	process_macros_r(&mac, temp_buffer,&processed_buffer,0);
 
 	write_to_all_logs(processed_buffer,log_options);
 
 	clear_host_macros(&mac);
-	my_free(temp_buffer);
-	my_free(processed_buffer);
+	delete[] temp_buffer;
+	delete[] processed_buffer;
 
 	return OK;
 }
@@ -328,18 +333,21 @@ int log_host_states(unsigned int type, time_t *timestamp)
 		/* grab the host macros */
 		grab_host_macros(&mac, temp_host);
 
-		if(asprintf(&temp_buffer,"%s HOST STATE: %s;$HOSTSTATE$;$HOSTSTATETYPE$;$HOSTATTEMPT$;%s\n",(type==INITIAL_STATES)?"INITIAL":"CURRENT",temp_host->name,(temp_host->plugin_output==NULL)?"":temp_host->plugin_output)==-1){
-			logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
-			return ERROR;
-			}
+		std::ostringstream oss;
+		oss << (type == INITIAL_STATES ? "INITIAL" : "CURRENT") << " HOST STATE: "
+		    << temp_host->name << ";$HOSTSTATE$;$HOSTSTATETYPE$;$HOSTATTEMPT$;"
+		    << (temp_host->plugin_output ? temp_host->plugin_output : "")
+		    << std::endl;
+		temp_buffer = my_strdup(oss.str().c_str());
+
 		process_macros_r(&mac, temp_buffer,&processed_buffer,0);
-		
+
 		write_to_all_logs_with_timestamp(processed_buffer,NSLOG_INFO_MESSAGE,timestamp);
 
 		clear_host_macros(&mac);
 
-		my_free(temp_buffer);
-		my_free(processed_buffer);
+		delete[] temp_buffer;
+		delete[] processed_buffer;
 	        }
 
 	return OK;
@@ -370,10 +378,13 @@ int log_service_states(unsigned int type, time_t *timestamp)
 		grab_host_macros(&mac, temp_host);
 		grab_service_macros(&mac, temp_service);
 
-		if(asprintf(&temp_buffer,"%s SERVICE STATE: %s;%s;$SERVICESTATE$;$SERVICESTATETYPE$;$SERVICEATTEMPT$;%s\n",(type==INITIAL_STATES)?"INITIAL":"CURRENT",temp_service->host_name,temp_service->description,temp_service->plugin_output)==-1){
-			logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
-			return ERROR;
-			}
+		std::ostringstream oss;
+		oss << (type == INITIAL_STATES ? "INITIAL" : "CURRENT")
+		    << " SERVICE STATE: " << temp_service->host_name << ';'
+		    << temp_service->description
+		    << ";$SERVICESTATE$;$SERVICESTATETYPE$;$SERVICEATTEMPT$;"
+		    << temp_service->plugin_output << std::endl;
+		temp_buffer = my_strdup(oss.str().c_str());
 		process_macros_r(&mac, temp_buffer,&processed_buffer,0);
 
 		write_to_all_logs_with_timestamp(processed_buffer,NSLOG_INFO_MESSAGE,timestamp);
@@ -381,8 +392,8 @@ int log_service_states(unsigned int type, time_t *timestamp)
 		clear_host_macros(&mac);
 		clear_service_macros(&mac);
 
-		my_free(temp_buffer);
-		my_free(processed_buffer);
+		delete[] temp_buffer;
+		delete[] processed_buffer;
 	        }
 
 	return OK;
@@ -423,27 +434,31 @@ int rotate_log_file(time_t rotation_time){
 	stat_result = stat(config.get_log_file().c_str(), &log_file_stat);
 
 	/* get the archived filename to use */
-	if(asprintf(&log_archive,"%s%snagios-%02d-%02d-%d-%02d.log",config.get_log_archive_path().c_str(),(config.get_log_archive_path().c_str()[config.get_log_archive_path().size()-1]=='/')?"":"/",t->tm_mon+1,t->tm_mday,t->tm_year+1900,t->tm_hour)==-1){
-		logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
-		return ERROR;
-		}
+	std::ostringstream oss;
+	oss << config.get_log_archive_path()
+	    << (config.get_log_archive_path()[config.get_log_archive_path().size()-1]=='/'?"":"/")
+	    << "nagios-"
+	    << std::setfill('0') << std::setw(2) << t->tm_mon+1 << '-'
+	    << std::setfill('0') << std::setw(2) << t->tm_mday << '-'
+	    << t->tm_year+1900 << '-'
+	    << std::setfill('0') << std::setw(2) << t->tm_hour << ".log";
+	log_archive = my_strdup(oss.str().c_str());
 
 	/* rotate the log file */
 	rename_result=my_rename(config.get_log_file().c_str(),log_archive);
 
 	if(rename_result){
-		my_free(log_archive);
+		delete[] log_archive;
 		return ERROR;
 	        }
 
 	/* record the log rotation after it has been done... */
-	if(asprintf(&temp_buffer,"LOG ROTATION: %s\n",method_string)==-1){
-		logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
-		my_free(log_archive);
-		return ERROR;
-		}
+	oss.str() = "";
+	oss << "LOG ROTATION: " << method_string << std::endl;
+	temp_buffer = my_strdup(oss.str().c_str());
+
 	write_to_all_logs_with_timestamp(temp_buffer,NSLOG_PROCESS_INFO,&rotation_time);
-	my_free(temp_buffer);
+	delete[] temp_buffer;
 
 	/* record log file version format */
 	write_log_file_info(&rotation_time);
@@ -458,7 +473,7 @@ int rotate_log_file(time_t rotation_time){
 	log_service_states(CURRENT_STATES,&rotation_time);
 
 	/* free memory */
-	my_free(log_archive);
+	delete[] log_archive;
 
 	return OK;
         }
@@ -469,13 +484,12 @@ int write_log_file_info(time_t *timestamp){
 	char *temp_buffer=NULL;
 
 	/* write log version */
-	if(asprintf(&temp_buffer,"LOG VERSION: %s\n",LOG_VERSION_2)==-1){
-		logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
-		return ERROR;
-		}
+	std::ostringstream oss;
+	oss << "LOG VERSION: " << LOG_VERSION_2 << std::endl;
+	temp_buffer = my_strdup(oss.str().c_str());
 
 	write_to_all_logs_with_timestamp(temp_buffer,NSLOG_PROCESS_INFO,timestamp);
-	my_free(temp_buffer);
+	delete[] temp_buffer;
 
 	return OK;
         }
@@ -514,7 +528,6 @@ int close_debug_log(void){
 /* write to the debug log */
 int log_debug_info(int level, unsigned int verbosity, const char *fmt, ...){
 	va_list ap;
-	char *temp_path=NULL;
 	struct timeval current_time;
 
 	if(!(config.get_debug_level()==DEBUGL_ALL || (level & config.get_debug_level())))
@@ -554,22 +567,12 @@ int log_debug_info(int level, unsigned int verbosity, const char *fmt, ...){
 		close_debug_log();
 
 		/* rotate the log file */
-		if(asprintf(&temp_path,"%s.old",config.get_debug_file().c_str())==-1){
-			logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
-			return ERROR;
-			}
+		std::string temp_path = config.get_debug_file() + ".old";
+		/* unlink the old debug file */
+		unlink(temp_path.c_str());
 
-		if(temp_path){
-
-			/* unlink the old debug file */
-			unlink(temp_path);
-
-			/* rotate the debug file */
-			my_rename(config.get_debug_file().c_str(),temp_path);
-
-			/* free memory */
-			my_free(temp_path);
-			}
+		/* rotate the debug file */
+		my_rename(config.get_debug_file().c_str(),temp_path.c_str());
 
 		/* open a new file */
 		open_debug_log();

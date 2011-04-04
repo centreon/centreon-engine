@@ -200,6 +200,8 @@ void strip(char *);
 void get_time_breakdown(unsigned long,int *,int *,int *,int *);
 int read_nagiostats_file(void);
 
+extern "C" char* my_strdup(char const* str);
+
 
 int main(int argc, char **argv){
 	int result;
@@ -225,8 +227,8 @@ int main(int argc, char **argv){
 #endif
 
 	/* defaults */
-	main_config_file=strdup(DEFAULT_CONFIG_FILE);
-	status_file=strdup(DEFAULT_STATUS_FILE);
+	main_config_file=my_strdup(DEFAULT_CONFIG_FILE);
+	status_file=my_strdup(DEFAULT_STATUS_FILE);
 
 	/* get all command line arguments */
 	while(1){
@@ -254,20 +256,20 @@ int main(int argc, char **argv){
 			break;
 		case 'c':
 			if(main_config_file)
-				free(main_config_file);
-			main_config_file=strdup(optarg);
+				delete[] main_config_file;
+			main_config_file=my_strdup(optarg);
 			break;
 		case 's':
-			nagiostats_file=strdup(optarg);
+			nagiostats_file=my_strdup(optarg);
 			break;
 		case 'm':
 			mrtg_mode=TRUE;
 			break;
 		case 'd':
-			mrtg_variables=strdup(optarg);
+			mrtg_variables=my_strdup(optarg);
 			break;
 		case 'D':
-			mrtg_delimiter=strdup(optarg);
+			mrtg_delimiter=my_strdup(optarg);
 			break;
 
 		default:
@@ -424,7 +426,7 @@ int main(int argc, char **argv){
 		display_mrtg_values();
 
 	if(nagiostats_file)
-		free(nagiostats_file);
+		delete[] nagiostats_file;
 
 	/* Opsera patch - return based on error, because mrtg_mode was always returning OK */
 	if(result==ERROR)
@@ -883,8 +885,8 @@ int read_config_file(void){
 
 		if(!strcmp(var,"status_file") || !strcmp(var,"status_log") || !strcmp(var,"xsddefault_status_log")){
 			if(status_file)
-				free(status_file);
-			status_file=strdup(val);
+				delete[] status_file;
+			status_file=my_strdup(val);
 		        }
 			
 	        }
@@ -1207,7 +1209,7 @@ int read_status_file(void){
 				if(!strcmp(var,"created"))
 					status_creation_date=strtoul(val,NULL,10);
 				else if(!strcmp(var,"version"))
-					status_version=strdup(val);
+					status_version=my_strdup(val);
 				break;
 
 			case STATUS_PROGRAM_DATA:
@@ -1402,7 +1404,7 @@ int read_nagiostats_file(void){
 		if(!strcmp(var,"created"))
 			status_creation_date=strtoul(val,NULL,10);
 		else if(!strcmp(var,"nagios_version"))
-			status_version=strdup(val);
+			status_version=my_strdup(val);
 
 		/****  PROGRAM INFO ****/
 		else if(!strcmp(var,"program_start"))
@@ -1769,3 +1771,7 @@ void get_time_breakdown(unsigned long raw_time,int *days,int *hours,int *minutes
 	return;
 	}
 
+char* my_strdup(char const* str) {
+  char* new_str = new char[strlen(str) + 1];
+  return (strcpy(new_str, str));
+}

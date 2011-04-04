@@ -97,7 +97,7 @@ int reset_variables(void);                 // reset all global variables
 int move_check_result_to_queue(char *checkresult_file);
 int process_check_result_queue(char const* dirname);
 int process_check_result_file(char *fname);
-int delete_check_result_file(char *fname);
+int delete_check_result_file(char const* fname);
 check_result *read_check_result(void);     // reads a host/service check result from the list in memory
 int init_check_result(check_result *info);
 int add_check_result_to_list(check_result *new_cr);
