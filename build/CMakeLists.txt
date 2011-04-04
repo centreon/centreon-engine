@@ -359,8 +359,6 @@ configure_file("${INCLUDE_DIR}/conf.hh.in"
   "${INCLUDE_DIR}/conf.hh")
 configure_file("${INCLUDE_DIR}/locations.hh.in"
   "${INCLUDE_DIR}/locations.hh")
-configure_file("${INCLUDE_DIR}/snprintf.h.in"
-  "${INCLUDE_DIR}/snprintf.h")
 
 # Include Directories
 include_directories("${INCLUDE_DIR}")
@@ -389,7 +387,6 @@ add_library("schedulerlib"
   "${COMMON_DIR}/objects.cc"
   "${COMMON_DIR}/shared.cc"
   "${COMMON_DIR}/skiplist.cc"
-  "${COMMON_DIR}/snprintf.cc"
   "${COMMON_DIR}/statusdata.cc"
   "${COMMON_DIR}/error.cc"
   "${XDATA_DIR}/xcddefault.cc"
