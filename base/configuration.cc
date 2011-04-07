@@ -25,9 +25,7 @@
 #include <string.h>
 #include <errno.h>
 #include <time.h>
-
 #include "nagios.hh"
-#include "locations.hh"
 #include "logging.hh"
 #include "common.hh"
 #include "macros.hh"

@@ -27,7 +27,6 @@
 #include <errno.h>
 #include "nagios.hh"
 #include "common.hh"
-#include "locations.hh"
 #include "statusdata.hh"
 #include "comments.hh"
 #include "downtime.hh"

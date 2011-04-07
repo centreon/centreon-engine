@@ -23,7 +23,6 @@
 #include <errno.h>
 #include "common.hh"
 #include "nagios.hh"
-#include "locations.hh"
 
 #define STATUS_NO_DATA             0
 #define STATUS_INFO_DATA           1

@@ -18,6 +18,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <stdio.h>
 #include <string.h>
 #ifdef USE_XODTEMPLATE          /* template-based routines */
 # include "../xdata/xodtemplate.hh"

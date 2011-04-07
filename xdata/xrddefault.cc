@@ -37,7 +37,6 @@
 #include "notifications.hh"
 #include "utils.hh"
 #include "logging.hh"
-#include "locations.hh"
 #include "configuration.hh"
 
 /**** STATE INFORMATION SPECIFIC HEADER FILES ****/

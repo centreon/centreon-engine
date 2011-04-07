@@ -245,7 +245,7 @@ else ()
   set(EMBEDDED_PERL "No")
 endif ()
 
-# Define Flags.
+# Define flags.
 #  Event broker integration.
 add_definitions(-DUSE_EVENT_BROKER)
 
@@ -257,7 +257,7 @@ add_definitions(-DUSE_XODTEMPLATE)
 add_definitions(-DUSE_XPDDEFAULT)
 add_definitions(-DUSE_XDDDEFAULT)
 
-#  Misc Definitions.
+#  Misc definitions.
 if (USE_NANOSLEEP)
   add_definitions(-DUSE_NANOSLEEP)
 endif ()
@@ -281,14 +281,29 @@ endif ()
 #  Replace dlfcn by ltdl.
 #add_definitions(-DUSE_LTDL);
 
-# Configure files.
-configure_file("${INCLUDE_DIR}/locations.hh.in"
-  "${INCLUDE_DIR}/locations.hh")
+#  Locations definitions
+add_definitions(-DDEFAULT_TEMP_FILE="${localstatedir}/tempfile")
+add_definitions(-DDEFAULT_TEMP_PATH="/tmp")
+add_definitions(-DDEFAULT_CHECK_RESULT_PATH="${localstatedir}/spool/checkresults")
+add_definitions(-DDEFAULT_STATUS_FILE="${localstatedir}/status.dat")
+add_definitions(-DDEFAULT_LOG_FILE="${localstatedir}/nagios.log")
+add_definitions(-DDEFAULT_LOG_ARCHIVE_PATH="${localstatedir}/archives/")
+add_definitions(-DDEFAULT_DEBUG_FILE="${localstatedir}/nagios.debug")
+add_definitions(-DDEFAULT_COMMENT_FILE="${localstatedir}/comments.dat")
+add_definitions(-DDEFAULT_DOWNTIME_FILE="${localstatedir}/downtime.dat")
+add_definitions(-DDEFAULT_RETENTION_FILE="${localstatedir}/retention.dat")
+add_definitions(-DDEFAULT_COMMAND_FILE="${localstatedir}/rw/nagios.cmd")
+add_definitions(-DDEFAULT_CONFIG_FILE="${sysconfdir}/nagios.cfg")
+add_definitions(-DDEFAULT_OBJECT_CACHE_FILE="${localstatedir}/objects.cache")
+add_definitions(-DDEFAULT_PRECACHED_OBJECT_FILE="${localstatedir}/objects.precache")
+add_definitions(-DDEFAULT_EVENT_BROKER_FILE="${localstatedir}/broker.socket")
+add_definitions(-DDEFAULT_P1_FILE="${bindir}/p1.pl")
+add_definitions(-DDEFAULT_AUTH_FILE="")
 
 # Include Directories
 include_directories("${INCLUDE_DIR}")
 
-# library scheduler target.
+# Library scheduler target.
 add_library("schedulerlib"
   "STATIC"
   "${BASE_DIR}/broker.cc"
@@ -323,7 +338,7 @@ add_library("schedulerlib"
   "${PERL_SOURCES}"
 )
 
-# centscheduler target.
+# Centscheduler target.
 add_executable("centscheduler"
   "${BASE_DIR}/nagios.cc"
 )
@@ -342,12 +357,12 @@ target_link_libraries("centscheduler"
   "schedulerlib"
 )
 
-# centschedulerstats target.
+# Centschedulerstats target.
 add_executable("centschedulerstats"
   "${BASE_DIR}/nagiostats.cc"
 )
 
-# test configuration target.
+# Test configuration target.
 add_executable("test_configuration"
   "${TEST_DIR}/test_configuration.cc"
   "${BASE_DIR}/configuration.cc"

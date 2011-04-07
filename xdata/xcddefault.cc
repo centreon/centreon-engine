@@ -21,7 +21,6 @@
 /*********** COMMON HEADER FILES ***********/
 
 #include "common.hh"
-#include "locations.hh"
 #include "comments.hh"
 #include "macros.hh"
 #include "objects.hh"

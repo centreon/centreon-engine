@@ -33,7 +33,6 @@
 #include <libgen.h>
 #include "common.hh"
 #include "objects.hh"
-#include "locations.hh"
 #include "macros.hh"
 #include "skiplist.hh"
 #include "configuration.hh"
