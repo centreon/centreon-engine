@@ -20,7 +20,11 @@
 
 /*********** COMMON HEADER FILES ***********/
 
-#include "conf.hh"
+#include <stdlib.h>
+#include <stdio.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 #include "common.hh"
 #include "objects.hh"
 #include "macros.hh"

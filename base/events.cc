@@ -18,7 +18,11 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include "conf.hh"
+#include <stdlib.h>
+#include <stdio.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <math.h>
 #include "nagios.hh"
 #include "downtime.hh"
 #include "comments.hh"

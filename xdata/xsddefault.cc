@@ -21,7 +21,10 @@
 
 /*********** COMMON HEADER FILES ***********/
 
-#include "conf.hh"
+#include <stdlib.h>
+#include <stdio.h>
+#include <sys/stat.h>
+#include <errno.h>
 #include "nagios.hh"
 #include "common.hh"
 #include "locations.hh"

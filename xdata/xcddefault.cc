@@ -20,7 +20,6 @@
 
 /*********** COMMON HEADER FILES ***********/
 
-#include "conf.hh"
 #include "common.hh"
 #include "locations.hh"
 #include "comments.hh"

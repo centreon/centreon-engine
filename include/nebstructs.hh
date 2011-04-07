@@ -21,7 +21,6 @@
 #ifndef SCHEDULER_NEBSTRUCTS_HH
 # define SCHEDULER_NEBSTRUCTS_HH
 
-# include "conf.hh"
 # include "objects.hh"
 # include "nagios.hh"
 

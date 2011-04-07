@@ -21,13 +21,11 @@
 #ifndef SCHEDULER_NEBCALLBACKS_HH
 # define SCHEDULER_NEBCALLBACKS_HH
 
-# include "conf.hh"
 # include "nebmodules.hh"
 
 # ifdef __cplusplus
 extern "C" {
 # endif
-
 
 /***** CALLBACK TYPES *****/
 

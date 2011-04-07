@@ -22,7 +22,6 @@
 
 #include <sstream>
 #include <iomanip>
-#include "conf.hh"
 #include "nagios.hh"
 #include "comments.hh"
 #include "statusdata.hh"

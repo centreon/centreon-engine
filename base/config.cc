@@ -19,7 +19,9 @@
 */
 
 #include <sstream>
-#include "conf.hh"
+#include <stdlib.h>
+#include <stdio.h>
+#include <errno.h>
 #include "nagios.hh"
 #include "utils.hh"
 #include "notifications.hh"

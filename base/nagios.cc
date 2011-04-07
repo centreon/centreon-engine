@@ -19,16 +19,19 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <string.h>
 #include <exception>
 #include <iostream>
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 
 /*#define DEBUG_MEMORY 1*/
 #ifdef DEBUG_MEMORY
 # include <mcheck.h>
 #endif
 
-#include "conf.hh"
 #include "comments.hh"
 #include "downtime.hh"
 #include "statusdata.hh"

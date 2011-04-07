@@ -20,7 +20,6 @@
 
 /*********** COMMON HEADER FILES ***********/
 
-#include "conf.hh"
 #include "broker.hh"
 #include "logging.hh"
 #include "configuration.hh"

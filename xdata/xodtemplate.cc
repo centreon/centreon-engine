@@ -21,8 +21,16 @@
 /*********** COMMON HEADER FILES ***********/
 
 #include <sstream>
+#include <stdlib.h>
+#include <stdio.h>
 #include <string.h>
-#include "conf.hh"
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#include <errno.h>
+#include <dirent.h>
+#include <regex.h>
+#include <libgen.h>
 #include "common.hh"
 #include "objects.hh"
 #include "locations.hh"

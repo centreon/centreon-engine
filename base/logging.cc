@@ -20,8 +20,12 @@
 
 #include <sstream>
 #include <iomanip>
-
-#include "conf.hh"
+#include <stdlib.h>
+#include <stdio.h>
+#include <syslog.h>
+#include <sys/stat.h>
+#include <stdarg.h>
+#include <errno.h>
 #include "statusdata.hh"
 #include "nagios.hh"
 #include "broker.hh"

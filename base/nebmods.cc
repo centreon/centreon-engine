@@ -18,7 +18,9 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include "conf.hh"
+#include <stdlib.h>
+#include <stdio.h>
+#include <errno.h>
 #include "neberrors.hh"
 #include "utils.hh"
 #include "logging.hh"
@@ -26,6 +28,14 @@
 #include "nebmods.hh"
 
 #ifdef USE_EVENT_BROKER
+
+/* configure script should allow user to override ltdl choice, but this will do for now... */
+
+# ifdef USE_LTDL
+#  include <ltdl.h>
+# else
+#  include <dlfcn.h>
+# endif
 
 using namespace com::centreon::scheduler;
 

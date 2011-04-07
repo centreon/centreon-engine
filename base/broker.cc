@@ -19,7 +19,6 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include "conf.hh"
 #include "nebstructs.hh"
 #include "nebmods.hh"
 #include "notifications.hh"

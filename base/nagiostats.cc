@@ -18,7 +18,9 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include "conf.hh"
+#include <stdlib.h>
+#include <stdio.h>
+#include <errno.h>
 #include "common.hh"
 #include "nagios.hh"
 #include "locations.hh"

@@ -20,7 +20,6 @@
 */
 
 #include <sstream>
-#include "conf.hh"
 #include "nagios.hh"
 #include "statusdata.hh"
 #include "broker.hh"

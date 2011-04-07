@@ -18,8 +18,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <stdlib.h>
 #include <string.h>
-#include "conf.hh"
 #ifdef USE_XCDDEFAULT
 # include "../xdata/xcddefault.hh"
 #endif

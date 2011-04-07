@@ -20,7 +20,6 @@
 
 /*********** COMMON HEADER FILES ***********/
 
-#include "conf.hh"
 #ifdef USE_XSDDEFAULT
 # include "../xdata/xsddefault.hh"      /* default routines */
 #endif

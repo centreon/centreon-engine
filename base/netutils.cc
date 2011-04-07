@@ -19,7 +19,12 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include "conf.hh"
+#include <unistd.h>
+#include <fcntl.h>
+#include <errno.h>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <netdb.h>
 #include "shared.hh"
 #include "common.hh"
 #include "netutils.hh"

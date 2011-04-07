@@ -22,7 +22,9 @@
 /*********** COMMON HEADER FILES ***********/
 
 #include <sstream>
-#include "conf.hh"
+#include <stdlib.h>
+#include <stdio.h>
+#include <errno.h>
 #include "common.hh"
 #include "objects.hh"
 #include "statusdata.hh"

@@ -19,7 +19,13 @@
 */
 
 #include <sstream>
-#include "conf.hh"
+#include <stdlib.h>
+#include <stdio.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <sys/wait.h>
+#include <errno.h>
+#include <signal.h>
 #include "nagios.hh"
 #include "comments.hh"
 #include "statusdata.hh"

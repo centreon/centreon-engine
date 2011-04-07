@@ -19,7 +19,18 @@
 */
 
 #include <sstream>
-#include "conf.hh"
+#include <stdlib.h>
+#include <stdio.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <sys/wait.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <math.h>
+#include <errno.h>
+#include <dirent.h>
+#include <poll.h>
+#include <signal.h>
 #include "nagios.hh"
 #include "comments.hh"
 #include "broker.hh"
@@ -701,9 +712,7 @@ int get_raw_command_line(command* cmd_ptr,
 
 /* sets or unsets an environment variable */
 int set_environment_var(char const* name, char const* value, int set) {
-#ifndef HAVE_SETENV
   char* env_string = NULL;
-#endif
 
   /* we won't mess with null variable names */
   if (name == NULL)
@@ -712,22 +721,18 @@ int set_environment_var(char const* name, char const* value, int set) {
   /* set the environment variable */
   if (set == TRUE) {
 
-#ifdef HAVE_SETENV
     setenv(name, (value == NULL) ? "" : value, 1);
-#else
+
     /* needed for Solaris and systems that don't have setenv() */
     /* this will leak memory, but in a "controlled" way, since lost memory should be freed when the child process exits */
     std::ostringstream oss;
     oss << name << '=' << (value ? value : "");
     env_string = my_strdup(oss.str().c_str());
     putenv(env_string);
-#endif
   }
   /* clear the variable */
   else {
-#ifdef HAVE_UNSETENV
     unsetenv(name);
-#endif
   }
 
   return (OK);

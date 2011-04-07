@@ -20,7 +20,6 @@
 
 /*********** COMMON HEADER FILES ***********/
 
-#include "conf.hh"
 #include "configuration.hh"
 #include "perfdata.hh"
 

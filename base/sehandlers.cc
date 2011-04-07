@@ -19,7 +19,6 @@
 */
 
 #include <sstream>
-#include "conf.hh"
 #include "comments.hh"
 #include "downtime.hh"
 #include "nagios.hh"
@@ -28,6 +27,7 @@
 #ifdef USE_EVENT_BROKER
 # include "neberrors.hh"
 #endif
+#include "logging.hh"
 #include "notifications.hh"
 #include "commands.hh"
 #include "utils.hh"

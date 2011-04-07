@@ -19,11 +19,11 @@
 */
 
 #include <string.h>
-#include "conf.hh"
 #ifdef USE_XODTEMPLATE          /* template-based routines */
 # include "../xdata/xodtemplate.hh"
 #endif
 #include "skiplist.hh"
+#include "logging.hh"
 #include "nagios.hh"
 #include "objects.hh"
 

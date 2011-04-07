@@ -20,10 +20,12 @@
 
 #include <sstream>
 #include <iomanip>
-#include "conf.hh"
+#include <stdlib.h>
+#include <stdio.h>
 #include "nagios.hh"
 #include "utils.hh"
 #include "shared.hh"
+#include "logging.hh"
 #include "configuration.hh"
 #include "macros.hh"
 

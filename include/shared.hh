@@ -21,6 +21,7 @@
 #ifndef CCS_SHARED_HH
 # define CCS_SHARED_HH
 
+# include <sys/types.h>
 # include <sys/time.h>
 
 # ifdef __cplusplus
@@ -62,6 +63,7 @@ char* resize_string(char* str, size_t size);
 # ifdef __cplusplus
 #  include <sstream>
 #  include <string>
+#  include <string.h>
 template <class T> char* obj2pchar(T obj) {
   std::ostringstream oss;
   oss << obj;
