@@ -21,7 +21,7 @@
 #include <stdio.h>
 #include <string.h>
 #ifdef USE_XODTEMPLATE          /* template-based routines */
-# include "../xdata/xodtemplate.hh"
+# include "xodtemplate.hh"
 #endif
 #include "skiplist.hh"
 #include "logging.hh"

@@ -21,7 +21,7 @@
 #include <stdlib.h>
 #include <string.h>
 #ifdef USE_XCDDEFAULT
-# include "../xdata/xcddefault.hh"
+# include "xcddefault.hh"
 #endif
 #include "broker.hh"
 #include "utils.hh"

@@ -26,7 +26,7 @@
 /***** IMPLEMENTATION-SPECIFIC HEADER FILES *****/
 
 #ifdef USE_XPDDEFAULT
-# include "../xdata/xpddefault.hh"
+# include "xpddefault.hh"
 #endif
 
 using namespace com::centreon::scheduler;

@@ -25,11 +25,13 @@ project("Centreon Scheduler" C CXX)
 set(PROJECT_SOURCE_DIR "${PROJECT_SOURCE_DIR}/..")
 include(CTest)
 
+# Find Qt.
+find_package(Qt4 COMPONENTS QtCore REQUIRED)
+include(${QT_USE_FILE})
+
 # Set directories.
-set(BASE_DIR "${PROJECT_SOURCE_DIR}/base")
-set(COMMON_DIR "${PROJECT_SOURCE_DIR}/common")
-set(INCLUDE_DIR "${PROJECT_SOURCE_DIR}/include")
-set(XDATA_DIR "${PROJECT_SOURCE_DIR}/xdata")
+set(SRC_DIR "${PROJECT_SOURCE_DIR}/src")
+set(INCLUDE_DIR "${PROJECT_SOURCE_DIR}/inc")
 set(TEST_DIR "${PROJECT_SOURCE_DIR}/test")
 set(SCRIPT_DIR "${PROJECT_SOURCE_DIR}/scripts")
 
@@ -235,7 +237,7 @@ if (WITH_EMBEDDED_PERL)
     message(FATAL_ERROR "Could not retrieve embedded Perl link flags.")
   endif ()
   string(STRIP "${PERL_LINK_FLAGS}" PERL_LINK_FLAGS)
-  set(PERL_SOURCES "${BASE_DIR}/perlxsi.c")
+  set(PERL_SOURCES "${SRC_DIR}/perlxsi.c")
   execute_process(COMMAND "perl" "-MExtUtils::Embed" "-e" "xsinit" "--" "-o" "${PERL_SOURCES}"
     RESULT_VARIABLE RETVAL)
   if (NOT RETVAL EQUAL 0)
@@ -306,41 +308,41 @@ include_directories("${INCLUDE_DIR}")
 # Library scheduler target.
 add_library("schedulerlib"
   "STATIC"
-  "${BASE_DIR}/broker.cc"
-  "${BASE_DIR}/checks.cc"
-  "${BASE_DIR}/commands.cc"
-  "${BASE_DIR}/config.cc"
-  "${BASE_DIR}/configuration.cc"
-  "${BASE_DIR}/events.cc"
-  "${BASE_DIR}/flapping.cc"
-  "${BASE_DIR}/logging.cc"
-  "${BASE_DIR}/nebmods.cc"
-  "${BASE_DIR}/netutils.cc"
-  "${BASE_DIR}/notifications.cc"
-  "${BASE_DIR}/perfdata.cc"
-  "${BASE_DIR}/sehandlers.cc"
-  "${BASE_DIR}/sretention.cc"
-  "${BASE_DIR}/utils.cc"
-  "${COMMON_DIR}/comments.cc"
-  "${COMMON_DIR}/downtime.cc"
-  "${COMMON_DIR}/macros.cc"
-  "${COMMON_DIR}/objects.cc"
-  "${COMMON_DIR}/shared.cc"
-  "${COMMON_DIR}/skiplist.cc"
-  "${COMMON_DIR}/statusdata.cc"
-  "${COMMON_DIR}/error.cc"
-  "${XDATA_DIR}/xcddefault.cc"
-  "${XDATA_DIR}/xdddefault.cc"
-  "${XDATA_DIR}/xodtemplate.cc"
-  "${XDATA_DIR}/xpddefault.cc"
-  "${XDATA_DIR}/xrddefault.cc"
-  "${XDATA_DIR}/xsddefault.cc"
+  "${SRC_DIR}/broker.cc"
+  "${SRC_DIR}/checks.cc"
+  "${SRC_DIR}/commands.cc"
+  "${SRC_DIR}/config.cc"
+  "${SRC_DIR}/configuration.cc"
+  "${SRC_DIR}/events.cc"
+  "${SRC_DIR}/flapping.cc"
+  "${SRC_DIR}/logging.cc"
+  "${SRC_DIR}/nebmods.cc"
+  "${SRC_DIR}/netutils.cc"
+  "${SRC_DIR}/notifications.cc"
+  "${SRC_DIR}/perfdata.cc"
+  "${SRC_DIR}/sehandlers.cc"
+  "${SRC_DIR}/sretention.cc"
+  "${SRC_DIR}/utils.cc"
+  "${SRC_DIR}/comments.cc"
+  "${SRC_DIR}/downtime.cc"
+  "${SRC_DIR}/macros.cc"
+  "${SRC_DIR}/objects.cc"
+  "${SRC_DIR}/shared.cc"
+  "${SRC_DIR}/skiplist.cc"
+  "${SRC_DIR}/statusdata.cc"
+  "${SRC_DIR}/error.cc"
+  "${SRC_DIR}/xcddefault.cc"
+  "${SRC_DIR}/xdddefault.cc"
+  "${SRC_DIR}/xodtemplate.cc"
+  "${SRC_DIR}/xpddefault.cc"
+  "${SRC_DIR}/xrddefault.cc"
+  "${SRC_DIR}/xsddefault.cc"
   "${PERL_SOURCES}"
 )
 
 # Centscheduler target.
 add_executable("centscheduler"
-  "${BASE_DIR}/nagios.cc"
+  "${SRC_DIR}/nagios.cc"
 )
 get_property(SCHEDULER_COMPILE_FLAGS
   TARGET "centscheduler"
@@ -354,19 +356,20 @@ target_link_libraries("centscheduler"
   ${SOCKET_LIBRARIES}
   ${THREAD_LIBRARIES}
   ${PERL_LINK_FLAGS}
+  ${QT_LIBRARIES}
   "schedulerlib"
 )
 
 # Centschedulerstats target.
 add_executable("centschedulerstats"
-  "${BASE_DIR}/nagiostats.cc"
+  "${SRC_DIR}/nagiostats.cc"
 )
 
 # Test configuration target.
 add_executable("test_configuration"
   "${TEST_DIR}/test_configuration.cc"
-  "${BASE_DIR}/configuration.cc"
-  "${COMMON_DIR}/error.cc")
+  "${SRC_DIR}/configuration.cc"
+  "${SRC_DIR}/error.cc")
 
 add_test("test_configuration_basic"
   "test_configuration"

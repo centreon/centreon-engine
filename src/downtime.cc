@@ -21,7 +21,7 @@
 #include <stdlib.h>
 #include <string.h>
 #ifdef USE_XDDDEFAULT
-# include "../xdata/xdddefault.hh"
+# include "xdddefault.hh"
 #endif
 #include "nagios.hh"
 #include "comments.hh"

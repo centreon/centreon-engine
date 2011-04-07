@@ -21,7 +21,7 @@
 /*********** COMMON HEADER FILES ***********/
 
 #ifdef USE_XSDDEFAULT
-# include "../xdata/xsddefault.hh"      /* default routines */
+# include "xsddefault.hh"      /* default routines */
 #endif
 #include "broker.hh"
 #include "configuration.hh"

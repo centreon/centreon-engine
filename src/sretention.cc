@@ -27,7 +27,7 @@
 
 /**** IMPLEMENTATION SPECIFIC HEADER FILES ****/
 #ifdef USE_XRDDEFAULT
-# include "../xdata/xrddefault.hh"      /* default routines */
+# include "xrddefault.hh"      /* default routines */
 #endif
 
 using namespace com::centreon::scheduler;
