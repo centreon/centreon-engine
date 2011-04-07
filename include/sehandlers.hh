@@ -35,15 +35,15 @@ static const unsigned int GLOBAL_HOST_EVENTHANDLER    = 2;
 static const unsigned int GLOBAL_SERVICE_EVENTHANDLER = 3;
 
 // Event Handler Functions
-int obsessive_compulsive_service_check_processor(service *svc);         // distributed monitoring craziness...
-int obsessive_compulsive_host_check_processor(host *hst);               // distributed monitoring craziness...
-int handle_service_event(service *svc);                                 // top level service event logic
-int run_global_service_event_handler(nagios_macros *mac, service *svc); // runs the global service event handler
-int run_service_event_handler(nagios_macros *mac, service *svc);        // runs the event handler for a specific service
-int handle_host_event(host *hst);                                       // top level host event logic
-int run_global_host_event_handler(nagios_macros *mac, host *hst);       // runs the global host event handler
-int run_host_event_handler(nagios_macros *mac, host *hst);              // runs the event handler for a specific host
-int handle_host_state(host *hst);                                       // top level host state handler
+int obsessive_compulsive_service_check_processor(service* svc);         // distributed monitoring craziness...
+int obsessive_compulsive_host_check_processor(host* hst);               // distributed monitoring craziness...
+int handle_service_event(service* svc);                                 // top level service event logic
+int run_global_service_event_handler(nagios_macros* mac, service* svc); // runs the global service event handler
+int run_service_event_handler(nagios_macros* mac, service* svc);        // runs the event handler for a specific service
+int handle_host_event(host* hst);                                       // top level host event logic
+int run_global_host_event_handler(nagios_macros* mac, host* hst);       // runs the global host event handler
+int run_host_event_handler(nagios_macros* mac, host* hst);              // runs the event handler for a specific host
+int handle_host_state(host* hst);                                       // top level host state handler
 
 # ifdef __cplusplus
 }

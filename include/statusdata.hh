@@ -27,13 +27,13 @@
 extern "C" {
 # endif
 
-int initialize_status_data(char *config_file);                       // initializes status data at program start
-int update_all_status_data(void);                                    // updates all status data
-int cleanup_status_data(char *config_file,int delete_status_data); // cleans up status data at program termination
-int update_program_status(int aggregated_dump);                      // updates program status data
-int update_host_status(host *hst,int aggregated_dump);             // updates host status data
-int update_service_status(service *svc,int aggregated_dump);       // updates service status data
-int update_contact_status(contact *cntct,int aggregated_dump);     // updates contact status data
+int initialize_status_data(char* config_file);                     // initializes status data at program start
+int update_all_status_data(void);                                  // updates all status data
+int cleanup_status_data(char* config_file,int delete_status_data); // cleans up status data at program termination
+int update_program_status(int aggregated_dump);                    // updates program status data
+int update_host_status(host* hst,int aggregated_dump);             // updates host status data
+int update_service_status(service* svc,int aggregated_dump);       // updates service status data
+int update_contact_status(contact* cntct,int aggregated_dump);     // updates contact status data
 
 # ifdef __cplusplus
 }

@@ -90,18 +90,18 @@ static const unsigned int DEBUGV_MORE		     = 1;
 static const unsigned int DEBUGV_MOST                = 2;
 
 // Logging Functions
-void logit(int data_type, int display, const char *fmt, ...) __attribute__((__format__(__printf__, 3, 4)));
-int log_debug_info(int level, unsigned int verbosity, const char *fmt, ...) __attribute__((__format__(__printf__, 3, 4)));
+void logit(int data_type, int display, char const* fmt, ...) __attribute__((__format__(__printf__, 3, 4)));
+int log_debug_info(int level, unsigned int verbosity,char const* fmt, ...) __attribute__((__format__(__printf__, 3, 4)));
 
-int write_to_all_logs(char *buffer, unsigned long data_type);               // writes a string to main log file and syslog facility
-int write_to_log(char *buffer, unsigned long data_type, time_t *timestamp); // write a string to the main log file
-int write_to_syslog(char const *buffer, unsigned long data_type);           // write a string to the syslog facility
-int log_service_event(service *svc);                                        // logs a service event
-int log_host_event(host *hst);                                              // logs a host event
-int log_host_states(unsigned int type, time_t *timestamp);                  // logs initial/current host states
-int log_service_states(unsigned int type, time_t *timestamp);               // logs initial/current service states
+int write_to_all_logs(char* buffer, unsigned long data_type);               // writes a string to main log file and syslog facility
+int write_to_log(char* buffer, unsigned long data_type, time_t* timestamp); // write a string to the main log file
+int write_to_syslog(char const* buffer, unsigned long data_type);           // write a string to the syslog facility
+int log_service_event(service* svc);                                        // logs a service event
+int log_host_event(host* hst);                                              // logs a host event
+int log_host_states(unsigned int type, time_t* timestamp);                  // logs initial/current host states
+int log_service_states(unsigned int type, time_t* timestamp);               // logs initial/current service states
 int rotate_log_file(time_t rotation_time);                                  // rotates the main log file
-int write_log_file_info(time_t *timestamp);                                 // records log file/version info
+int write_log_file_info(time_t* timestamp);                                 // records log file/version info
 int open_debug_log(void);
 int close_debug_log(void);
 

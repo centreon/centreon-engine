@@ -22,121 +22,122 @@
 
 #include "conf.hh"
 #ifdef USE_XSDDEFAULT
-# include "../xdata/xsddefault.hh"		/* default routines */
+# include "../xdata/xsddefault.hh"      /* default routines */
 #endif
 #include "broker.hh"
 #include "configuration.hh"
 #include "statusdata.hh"
 
-extern com::centreon::scheduler::configuration config;
+using namespace com::centreon::scheduler;
+
+extern configuration config;
 
 /******************************************************************/
 /****************** TOP-LEVEL OUTPUT FUNCTIONS ********************/
 /******************************************************************/
 
 /* initializes status data at program start */
-int initialize_status_data(char *config_file){
-	int result=OK;
-
-	/**** IMPLEMENTATION-SPECIFIC CALLS ****/
+int initialize_status_data(char* config_file) {
+  /**** IMPLEMENTATION-SPECIFIC CALLS ****/
 #ifdef USE_XSDDEFAULT
-	result=xsddefault_initialize_status_data(config_file);
+  return (xsddefault_initialize_status_data(config_file));
 #endif
-
-	return result;
-        }
-
+  return (OK);
+}
 
 /* update all status data (aggregated dump) */
-int update_all_status_data(void){
-	int result=OK;
+int update_all_status_data(void) {
+  int result = OK;
 
 #ifdef USE_EVENT_BROKER
-	/* send data to event broker */
-	broker_aggregated_status_data(NEBTYPE_AGGREGATEDSTATUS_STARTDUMP,NEBFLAG_NONE,NEBATTR_NONE,NULL);
+  /* send data to event broker */
+  broker_aggregated_status_data(NEBTYPE_AGGREGATEDSTATUS_STARTDUMP,
+                                NEBFLAG_NONE,
+				NEBATTR_NONE,
+				NULL);
 #endif
 
-	/**** IMPLEMENTATION-SPECIFIC CALLS ****/
+  /**** IMPLEMENTATION-SPECIFIC CALLS ****/
 #ifdef USE_XSDDEFAULT
-	result=xsddefault_save_status_data();
+  result = xsddefault_save_status_data();
 #endif
 
 #ifdef USE_EVENT_BROKER
-	/* send data to event broker */
-	broker_aggregated_status_data(NEBTYPE_AGGREGATEDSTATUS_ENDDUMP,NEBFLAG_NONE,NEBATTR_NONE,NULL);
+  /* send data to event broker */
+  broker_aggregated_status_data(NEBTYPE_AGGREGATEDSTATUS_ENDDUMP,
+                                NEBFLAG_NONE,
+				NEBATTR_NONE,
+				NULL);
 #endif
 
-	if(result!=OK)
-		return ERROR;
-
-	return OK;
-        }
-
+  if (result != OK)
+    return (ERROR);
+  return (OK);
+}
 
 /* cleans up status data before program termination */
-int cleanup_status_data(char *config_file,int delete_status_data){
-	int result=OK;
-
-	/**** IMPLEMENTATION-SPECIFIC CALLS ****/
+int cleanup_status_data(char* config_file, int delete_status_data) {
+  /**** IMPLEMENTATION-SPECIFIC CALLS ****/
 #ifdef USE_XSDDEFAULT
-	result=xsddefault_cleanup_status_data(config_file,delete_status_data);
+  return (xsddefault_cleanup_status_data(config_file, delete_status_data));
 #endif
-
-	return result;
-        }
-
-
+  return (OK);
+}
 
 /* updates program status info */
-int update_program_status(int aggregated_dump){
+int update_program_status(int aggregated_dump) {
 
 #ifdef USE_EVENT_BROKER
-	/* send data to event broker (non-aggregated dumps only) */
-	if(aggregated_dump==FALSE)
-	        broker_program_status(NEBTYPE_PROGRAMSTATUS_UPDATE,NEBFLAG_NONE,NEBATTR_NONE,NULL);
+  /* send data to event broker (non-aggregated dumps only) */
+  if (aggregated_dump == FALSE)
+    broker_program_status(NEBTYPE_PROGRAMSTATUS_UPDATE,
+			  NEBFLAG_NONE,
+                          NEBATTR_NONE,
+			  NULL);
 #endif
-
-	return OK;
-        }
-
-
+  return (OK);
+}
 
 /* updates host status info */
-int update_host_status(host *hst,int aggregated_dump){
+int update_host_status(host* hst, int aggregated_dump) {
 
 #ifdef USE_EVENT_BROKER
-	/* send data to event broker (non-aggregated dumps only) */
-	if(aggregated_dump==FALSE)
-	          broker_host_status(NEBTYPE_HOSTSTATUS_UPDATE,NEBFLAG_NONE,NEBATTR_NONE,hst,NULL);
+  /* send data to event broker (non-aggregated dumps only) */
+  if (aggregated_dump == FALSE)
+    broker_host_status(NEBTYPE_HOSTSTATUS_UPDATE,
+		       NEBFLAG_NONE,
+                       NEBATTR_NONE,
+		       hst,
+		       NULL);
 #endif
-
-	return OK;
-        }
-
-
+  return (OK);
+}
 
 /* updates service status info */
-int update_service_status(service *svc,int aggregated_dump){
+int update_service_status(service* svc, int aggregated_dump) {
 
 #ifdef USE_EVENT_BROKER
-	/* send data to event broker (non-aggregated dumps only) */
-	if(aggregated_dump==FALSE)
-	        broker_service_status(NEBTYPE_SERVICESTATUS_UPDATE,NEBFLAG_NONE,NEBATTR_NONE,svc,NULL);
+  /* send data to event broker (non-aggregated dumps only) */
+  if (aggregated_dump == FALSE)
+    broker_service_status(NEBTYPE_SERVICESTATUS_UPDATE,
+			  NEBFLAG_NONE,
+                          NEBATTR_NONE,
+			  svc,
+			  NULL);
 #endif
-
-	return OK;
-        }
-
-
+  return (OK);
+}
 
 /* updates contact status info */
-int update_contact_status(contact *cntct,int aggregated_dump){
-
+int update_contact_status(contact* cntct, int aggregated_dump) {
 #ifdef USE_EVENT_BROKER
-	/* send data to event broker (non-aggregated dumps only) */
-	if(aggregated_dump==FALSE)
-	        broker_contact_status(NEBTYPE_CONTACTSTATUS_UPDATE,NEBFLAG_NONE,NEBATTR_NONE,cntct,NULL);
+  /* send data to event broker (non-aggregated dumps only) */
+  if (aggregated_dump == FALSE)
+    broker_contact_status(NEBTYPE_CONTACTSTATUS_UPDATE,
+			  NEBFLAG_NONE,
+                          NEBATTR_NONE,
+			  cntct,
+			  NULL);
 #endif
-
-	return OK;
-        }
+  return (OK);
+}

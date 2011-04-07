@@ -29,12 +29,12 @@ extern "C" {
 # endif
 
 // Module Structures
-typedef struct              nebcallback_struct {
-  void                      *callback_func;
-  void                      *module_handle;
-  int                       priority;
-  struct nebcallback_struct *next;
-}                           nebcallback;
+typedef struct               nebcallback_struct {
+  void*                      callback_func;
+  void*                      module_handle;
+  int                        priority;
+  struct nebcallback_struct* next;
+}                            nebcallback;
 
 // Module Functions
 int neb_init_modules(void);
@@ -42,9 +42,9 @@ int neb_deinit_modules(void);
 int neb_add_module(char const* filename,char const* args,int should_be_loaded);
 int neb_free_module_list(void);
 int neb_load_all_modules(void);
-int neb_load_module(nebmodule *mod);
+int neb_load_module(nebmodule* mod);
 int neb_unload_all_modules(int flags, int reason);
-int neb_unload_module(nebmodule *mod, int flags, int reason);
+int neb_unload_module(nebmodule* mod, int flags, int reason);
 
 // int neb_set_module_info(void *handle, int type, char *data);
 
@@ -53,7 +53,7 @@ int neb_unload_module(nebmodule *mod, int flags, int reason);
 // int neb_deregister_callback(int callback_type, int (*callback_func)(int,void *));
 
 // Callback Functions
-int neb_make_callbacks(int callback_type, void *data);
+int neb_make_callbacks(int callback_type, void* data);
 int neb_init_callback_list(void);
 int neb_free_callback_list(void);
 

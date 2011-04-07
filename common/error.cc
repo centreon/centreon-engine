@@ -41,7 +41,6 @@ void error::_insert_with_snprintf(T t, char const* format) {
                t,
                &wc) > 0)
     _current += wc;
-  return ;
 }
 
 /**

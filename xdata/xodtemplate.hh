@@ -78,699 +78,699 @@ extern "C" {
 
 /* CUSTOMVARIABLESMEMBER structure */
 typedef struct xodtemplate_customvariablesmember_struct{
-	char    *variable_name;
-	char    *variable_value;
-	struct xodtemplate_customvariablesmember_struct *next;
-        }xodtemplate_customvariablesmember;
+  char    *variable_name;
+  char    *variable_value;
+  struct xodtemplate_customvariablesmember_struct *next;
+}xodtemplate_customvariablesmember;
 
 
 /* DATERANGE structure */
 typedef struct xodtemplate_daterange_struct{
-	int type;
-	int syear;          /* start year */
-	int smon;           /* start month */
-	int smday;          /* start day of month (may 3rd, last day in feb) */
-	int swday;          /* start day of week (thursday) */
-	int swday_offset;   /* start weekday offset (3rd thursday, last monday in jan) */
-	int eyear;
-	int emon;
-	int emday;
-	int ewday;
-	int ewday_offset;
-	int skip_interval;
-	char *timeranges;
-	struct xodtemplate_daterange_struct *next;
-	}xodtemplate_daterange;
+  int type;
+  int syear;          /* start year */
+  int smon;           /* start month */
+  int smday;          /* start day of month (may 3rd, last day in feb) */
+  int swday;          /* start day of week (thursday) */
+  int swday_offset;   /* start weekday offset (3rd thursday, last monday in jan) */
+  int eyear;
+  int emon;
+  int emday;
+  int ewday;
+  int ewday_offset;
+  int skip_interval;
+  char *timeranges;
+  struct xodtemplate_daterange_struct *next;
+}xodtemplate_daterange;
 
 
 /* TIMEPERIOD TEMPLATE STRUCTURE */
 typedef struct xodtemplate_timeperiod_struct{
-	char       *tmpl;
-	char       *name;
-	int        _config_file;
-	int        _start_line;
+  char       *tmpl;
+  char       *name;
+  int        _config_file;
+  int        _start_line;
 
-	char       *timeperiod_name;
-	char       *alias;
-	char       *timeranges[7];
-	xodtemplate_daterange *exceptions[DATERANGE_TYPES];
-	char       *exclusions;
+  char       *timeperiod_name;
+  char       *alias;
+  char       *timeranges[7];
+  xodtemplate_daterange *exceptions[DATERANGE_TYPES];
+  char       *exclusions;
 
-	int        has_been_resolved;
-	int        register_object;
-	struct xodtemplate_timeperiod_struct *next;
-        }xodtemplate_timeperiod;
+  int        has_been_resolved;
+  int        register_object;
+  struct xodtemplate_timeperiod_struct *next;
+}xodtemplate_timeperiod;
 
 
 /* COMMAND TEMPLATE STRUCTURE */
 typedef struct xodtemplate_command_struct{
-	char       *tmpl;
-	char       *name;
-	int        _config_file;
-	int        _start_line;
+  char       *tmpl;
+  char       *name;
+  int        _config_file;
+  int        _start_line;
 
-	char       *command_name;
-	char       *command_line;
+  char       *command_name;
+  char       *command_line;
 
-	int        has_been_resolved;
-	int        register_object;
-	struct xodtemplate_command_struct *next;
-        }xodtemplate_command;
+  int        has_been_resolved;
+  int        register_object;
+  struct xodtemplate_command_struct *next;
+}xodtemplate_command;
 
 
 /* CONTACT TEMPLATE STRUCTURE */
 typedef struct xodtemplate_contact_struct{
-	char      *tmpl;
-	char      *name;
-	int        _config_file;
-	int        _start_line;
+  char      *tmpl;
+  char      *name;
+  int        _config_file;
+  int        _start_line;
 
-	char      *contact_name;
-	char      *alias;
-	char      *contact_groups;
-	char      *email;
-	char      *pager;
-	char      *address[MAX_XODTEMPLATE_CONTACT_ADDRESSES];
-	char      *host_notification_period;
-	char      *host_notification_commands;
-	int       notify_on_host_down;
-	int       notify_on_host_unreachable;
-	int       notify_on_host_recovery;
-	int       notify_on_host_flapping;
-	int       notify_on_host_downtime;
-	char      *service_notification_period;
-	char      *service_notification_commands;
-	int       notify_on_service_unknown;
-	int       notify_on_service_warning;
-	int       notify_on_service_critical;
-	int       notify_on_service_recovery;
-	int       notify_on_service_flapping;
-	int       notify_on_service_downtime;
-	int       host_notifications_enabled;
-	int       service_notifications_enabled;
-	int       can_submit_commands;
-	int       retain_status_information;
-	int       retain_nonstatus_information;
-	xodtemplate_customvariablesmember *custom_variables;
+  char      *contact_name;
+  char      *alias;
+  char      *contact_groups;
+  char      *email;
+  char      *pager;
+  char      *address[MAX_XODTEMPLATE_CONTACT_ADDRESSES];
+  char      *host_notification_period;
+  char      *host_notification_commands;
+  int       notify_on_host_down;
+  int       notify_on_host_unreachable;
+  int       notify_on_host_recovery;
+  int       notify_on_host_flapping;
+  int       notify_on_host_downtime;
+  char      *service_notification_period;
+  char      *service_notification_commands;
+  int       notify_on_service_unknown;
+  int       notify_on_service_warning;
+  int       notify_on_service_critical;
+  int       notify_on_service_recovery;
+  int       notify_on_service_flapping;
+  int       notify_on_service_downtime;
+  int       host_notifications_enabled;
+  int       service_notifications_enabled;
+  int       can_submit_commands;
+  int       retain_status_information;
+  int       retain_nonstatus_information;
+  xodtemplate_customvariablesmember *custom_variables;
 
-	int       have_contact_groups;
-	int       have_email;
-	int       have_pager;
-	int       have_address[MAX_XODTEMPLATE_CONTACT_ADDRESSES];
-	int       have_host_notification_period;
-	int       have_host_notification_commands;
-	int       have_service_notification_period;
-	int       have_service_notification_commands;
+  int       have_contact_groups;
+  int       have_email;
+  int       have_pager;
+  int       have_address[MAX_XODTEMPLATE_CONTACT_ADDRESSES];
+  int       have_host_notification_period;
+  int       have_host_notification_commands;
+  int       have_service_notification_period;
+  int       have_service_notification_commands;
 
-	int       have_host_notification_options;
-	int       have_service_notification_options;
-	int       have_host_notifications_enabled;
-	int       have_service_notifications_enabled;
-	int       have_can_submit_commands;
-	int       have_retain_status_information;
-	int       have_retain_nonstatus_information;
+  int       have_host_notification_options;
+  int       have_service_notification_options;
+  int       have_host_notifications_enabled;
+  int       have_service_notifications_enabled;
+  int       have_can_submit_commands;
+  int       have_retain_status_information;
+  int       have_retain_nonstatus_information;
 
-	int       has_been_resolved;
-	int       register_object;
-	struct xodtemplate_contact_struct *next;
-        }xodtemplate_contact;
+  int       has_been_resolved;
+  int       register_object;
+  struct xodtemplate_contact_struct *next;
+}xodtemplate_contact;
 
 
 /* CONTACTGROUP TEMPLATE STRUCTURE */
 typedef struct xodtemplate_contactgroup_struct{
-	char      *tmpl;
-	char      *name;
-	int        _config_file;
-	int        _start_line;
+  char      *tmpl;
+  char      *name;
+  int        _config_file;
+  int        _start_line;
 
-	char      *contactgroup_name;
-	char      *alias;
-        char      *members;
-	char      *contactgroup_members;
+  char      *contactgroup_name;
+  char      *alias;
+  char      *members;
+  char      *contactgroup_members;
 
-	int       have_members;
-	int       have_contactgroup_members;
+  int       have_members;
+  int       have_contactgroup_members;
 
-	int       has_been_resolved;
-	int       register_object;
-	struct xodtemplate_contactgroup_struct *next;
-        }xodtemplate_contactgroup;
+  int       has_been_resolved;
+  int       register_object;
+  struct xodtemplate_contactgroup_struct *next;
+}xodtemplate_contactgroup;
 
 
 /* HOST TEMPLATE STRUCTURE */
 typedef struct xodtemplate_host_struct{
-	char      *tmpl;
-	char      *name;
-	int        _config_file;
-	int        _start_line;
+  char      *tmpl;
+  char      *name;
+  int        _config_file;
+  int        _start_line;
 
-	char      *host_name;
-	char      *display_name;
-	char      *alias;
-	char      *address;
-	char      *parents;
-	char      *host_groups;
-	char      *check_command;
-	char      *check_period;
-	int       initial_state;
-	double    check_interval;
-	double    retry_interval;
-	int       max_check_attempts;
-	int       active_checks_enabled;
-	int       passive_checks_enabled;
-	int       obsess_over_host;
-	char      *event_handler;
-	int       event_handler_enabled;
-	int       check_freshness;
-	int       freshness_threshold;
-	float     low_flap_threshold;
-	float     high_flap_threshold;
-	int       flap_detection_enabled;
-	int       flap_detection_on_up;
-	int       flap_detection_on_down;
-	int       flap_detection_on_unreachable;
-	char      *contact_groups;
-	char      *contacts;
-	int       notify_on_down;
-	int       notify_on_unreachable;
-	int       notify_on_recovery;
-	int       notify_on_flapping;
-	int       notify_on_downtime;
-	int       notifications_enabled;
-	char      *notification_period;
-	double    notification_interval;
-	double    first_notification_delay;
-	int       stalk_on_up;
-	int       stalk_on_down;
-	int       stalk_on_unreachable;
-	int       process_perf_data;
-	int       failure_prediction_enabled;
-	char      *failure_prediction_options;
-	char      *notes;
-	char      *notes_url;
-	char      *action_url;
-	char      *icon_image;
-	char      *icon_image_alt;
-	char      *vrml_image;
-	char      *statusmap_image;
-	int       x_2d;
-	int       y_2d;
-	double    x_3d;
-	double    y_3d;
-	double    z_3d;
-	int       retain_status_information;
-	int       retain_nonstatus_information;
-	xodtemplate_customvariablesmember *custom_variables;
+  char      *host_name;
+  char      *display_name;
+  char      *alias;
+  char      *address;
+  char      *parents;
+  char      *host_groups;
+  char      *check_command;
+  char      *check_period;
+  int       initial_state;
+  double    check_interval;
+  double    retry_interval;
+  int       max_check_attempts;
+  int       active_checks_enabled;
+  int       passive_checks_enabled;
+  int       obsess_over_host;
+  char      *event_handler;
+  int       event_handler_enabled;
+  int       check_freshness;
+  int       freshness_threshold;
+  float     low_flap_threshold;
+  float     high_flap_threshold;
+  int       flap_detection_enabled;
+  int       flap_detection_on_up;
+  int       flap_detection_on_down;
+  int       flap_detection_on_unreachable;
+  char      *contact_groups;
+  char      *contacts;
+  int       notify_on_down;
+  int       notify_on_unreachable;
+  int       notify_on_recovery;
+  int       notify_on_flapping;
+  int       notify_on_downtime;
+  int       notifications_enabled;
+  char      *notification_period;
+  double    notification_interval;
+  double    first_notification_delay;
+  int       stalk_on_up;
+  int       stalk_on_down;
+  int       stalk_on_unreachable;
+  int       process_perf_data;
+  int       failure_prediction_enabled;
+  char      *failure_prediction_options;
+  char      *notes;
+  char      *notes_url;
+  char      *action_url;
+  char      *icon_image;
+  char      *icon_image_alt;
+  char      *vrml_image;
+  char      *statusmap_image;
+  int       x_2d;
+  int       y_2d;
+  double    x_3d;
+  double    y_3d;
+  double    z_3d;
+  int       retain_status_information;
+  int       retain_nonstatus_information;
+  xodtemplate_customvariablesmember *custom_variables;
 
-	int       have_display_name;
-	int       have_parents;
-	int       have_host_groups;
-	int       have_check_command;
-	int       have_check_period;
-	int       have_event_handler;
-	int       have_contact_groups;
-	int       have_contacts;
-	int       have_notification_period;
-	int       have_failure_prediction_options;
-	int       have_notes;
-	int       have_notes_url;
-	int       have_action_url;
-	int       have_icon_image;
-	int       have_icon_image_alt;
-	int       have_vrml_image;
-	int       have_statusmap_image;
+  int       have_display_name;
+  int       have_parents;
+  int       have_host_groups;
+  int       have_check_command;
+  int       have_check_period;
+  int       have_event_handler;
+  int       have_contact_groups;
+  int       have_contacts;
+  int       have_notification_period;
+  int       have_failure_prediction_options;
+  int       have_notes;
+  int       have_notes_url;
+  int       have_action_url;
+  int       have_icon_image;
+  int       have_icon_image_alt;
+  int       have_vrml_image;
+  int       have_statusmap_image;
 
-	int       have_initial_state;
-	int       have_check_interval;
-	int       have_retry_interval;
-	int       have_max_check_attempts;
-	int       have_active_checks_enabled;
-	int       have_passive_checks_enabled;
-	int       have_obsess_over_host;
-	int       have_event_handler_enabled;
-	int       have_check_freshness;
-	int       have_freshness_threshold;
-	int       have_low_flap_threshold;
-	int       have_high_flap_threshold;
-	int       have_flap_detection_enabled;
-	int       have_flap_detection_options;
-	int       have_notification_options;
-	int       have_notifications_enabled;
-	int       have_notification_interval;
-	int       have_first_notification_delay;
-	int       have_stalking_options;
-	int       have_process_perf_data;
-	int       have_failure_prediction_enabled;
-	int       have_2d_coords;
-	int       have_3d_coords;
-	int       have_retain_status_information;
-	int       have_retain_nonstatus_information;
+  int       have_initial_state;
+  int       have_check_interval;
+  int       have_retry_interval;
+  int       have_max_check_attempts;
+  int       have_active_checks_enabled;
+  int       have_passive_checks_enabled;
+  int       have_obsess_over_host;
+  int       have_event_handler_enabled;
+  int       have_check_freshness;
+  int       have_freshness_threshold;
+  int       have_low_flap_threshold;
+  int       have_high_flap_threshold;
+  int       have_flap_detection_enabled;
+  int       have_flap_detection_options;
+  int       have_notification_options;
+  int       have_notifications_enabled;
+  int       have_notification_interval;
+  int       have_first_notification_delay;
+  int       have_stalking_options;
+  int       have_process_perf_data;
+  int       have_failure_prediction_enabled;
+  int       have_2d_coords;
+  int       have_3d_coords;
+  int       have_retain_status_information;
+  int       have_retain_nonstatus_information;
 
-	int       has_been_resolved;
-	int       register_object;
-	struct xodtemplate_host_struct *next;
-        }xodtemplate_host;
+  int       has_been_resolved;
+  int       register_object;
+  struct xodtemplate_host_struct *next;
+}xodtemplate_host;
 
 
 /* HOSTGROUP TEMPLATE STRUCTURE */
 typedef struct xodtemplate_hostgroup_struct{
-	char      *tmpl;
-	char      *name;
-	int        _config_file;
-	int        _start_line;
+  char      *tmpl;
+  char      *name;
+  int        _config_file;
+  int        _start_line;
 
-	char      *hostgroup_name;
-	char      *alias;
-	char      *members;
-	char      *hostgroup_members;
-	char      *notes;
-	char      *notes_url;
-	char      *action_url;
+  char      *hostgroup_name;
+  char      *alias;
+  char      *members;
+  char      *hostgroup_members;
+  char      *notes;
+  char      *notes_url;
+  char      *action_url;
 
-	int       have_members;
-	int       have_hostgroup_members;
-	int       have_notes;
-	int       have_notes_url;
-	int       have_action_url;
+  int       have_members;
+  int       have_hostgroup_members;
+  int       have_notes;
+  int       have_notes_url;
+  int       have_action_url;
 
-	int       has_been_resolved;
-	int       register_object;
-	struct xodtemplate_hostgroup_struct *next;
-        }xodtemplate_hostgroup;
+  int       has_been_resolved;
+  int       register_object;
+  struct xodtemplate_hostgroup_struct *next;
+}xodtemplate_hostgroup;
 
 
 /* SERVICE TEMPLATE STRUCTURE */
 typedef struct xodtemplate_service_struct{
-        char       *tmpl;
-	char       *name;
-	int        _config_file;
-	int        _start_line;
+  char       *tmpl;
+  char       *name;
+  int        _config_file;
+  int        _start_line;
 
-	char       *host_name;
-	char       *service_description;
-	char       *display_name;
-	char       *hostgroup_name;
-	char       *service_groups;
-	char       *check_command;
-	int        initial_state;
-	int        max_check_attempts;
-        double     check_interval;
-        double     retry_interval;
-        char       *check_period;
-        int        active_checks_enabled;
-        int        passive_checks_enabled;
-        int        parallelize_check;
-	int        is_volatile;
-	int        obsess_over_service;
-	char       *event_handler;
-	int        event_handler_enabled;
-	int        check_freshness;
-	int        freshness_threshold;
-	double     low_flap_threshold;
-	double     high_flap_threshold;
-	int        flap_detection_enabled;
-	int        flap_detection_on_ok;
-	int        flap_detection_on_warning;
-	int        flap_detection_on_unknown;
-	int        flap_detection_on_critical;
-	int        notify_on_unknown;
-	int        notify_on_warning;
-	int        notify_on_critical;
-	int        notify_on_recovery;
-	int        notify_on_flapping;
-	int        notify_on_downtime;
-	int        notifications_enabled;
-	char       *notification_period;
-	double     notification_interval;
-	double     first_notification_delay;
-	char       *contact_groups;
-	char       *contacts;
-	int        stalk_on_ok;
-	int        stalk_on_unknown;
-	int        stalk_on_warning;
-	int        stalk_on_critical;
-	int        process_perf_data;
-	int        failure_prediction_enabled;
-	char       *failure_prediction_options;
-	char       *notes;
-	char       *notes_url;
-	char       *action_url;
-	char       *icon_image;
-	char       *icon_image_alt;
-	int        retain_status_information;
-	int        retain_nonstatus_information;
-	xodtemplate_customvariablesmember *custom_variables;
+  char       *host_name;
+  char       *service_description;
+  char       *display_name;
+  char       *hostgroup_name;
+  char       *service_groups;
+  char       *check_command;
+  int        initial_state;
+  int        max_check_attempts;
+  double     check_interval;
+  double     retry_interval;
+  char       *check_period;
+  int        active_checks_enabled;
+  int        passive_checks_enabled;
+  int        parallelize_check;
+  int        is_volatile;
+  int        obsess_over_service;
+  char       *event_handler;
+  int        event_handler_enabled;
+  int        check_freshness;
+  int        freshness_threshold;
+  double     low_flap_threshold;
+  double     high_flap_threshold;
+  int        flap_detection_enabled;
+  int        flap_detection_on_ok;
+  int        flap_detection_on_warning;
+  int        flap_detection_on_unknown;
+  int        flap_detection_on_critical;
+  int        notify_on_unknown;
+  int        notify_on_warning;
+  int        notify_on_critical;
+  int        notify_on_recovery;
+  int        notify_on_flapping;
+  int        notify_on_downtime;
+  int        notifications_enabled;
+  char       *notification_period;
+  double     notification_interval;
+  double     first_notification_delay;
+  char       *contact_groups;
+  char       *contacts;
+  int        stalk_on_ok;
+  int        stalk_on_unknown;
+  int        stalk_on_warning;
+  int        stalk_on_critical;
+  int        process_perf_data;
+  int        failure_prediction_enabled;
+  char       *failure_prediction_options;
+  char       *notes;
+  char       *notes_url;
+  char       *action_url;
+  char       *icon_image;
+  char       *icon_image_alt;
+  int        retain_status_information;
+  int        retain_nonstatus_information;
+  xodtemplate_customvariablesmember *custom_variables;
 
-	int        have_host_name;
-	int        have_service_description;
-	int        have_display_name;
-	int        have_hostgroup_name;
-	int        have_service_groups;
-	int        have_check_command;
-	int        have_important_check_command;
-	int        have_check_period;
-	int        have_event_handler;
-	int        have_notification_period;
-	int        have_contact_groups;
-	int        have_contacts;
-	int        have_failure_prediction_options;
-	int        have_notes;
-	int        have_notes_url;
-	int        have_action_url;
-	int        have_icon_image;
-	int        have_icon_image_alt;
+  int        have_host_name;
+  int        have_service_description;
+  int        have_display_name;
+  int        have_hostgroup_name;
+  int        have_service_groups;
+  int        have_check_command;
+  int        have_important_check_command;
+  int        have_check_period;
+  int        have_event_handler;
+  int        have_notification_period;
+  int        have_contact_groups;
+  int        have_contacts;
+  int        have_failure_prediction_options;
+  int        have_notes;
+  int        have_notes_url;
+  int        have_action_url;
+  int        have_icon_image;
+  int        have_icon_image_alt;
 
-	int        have_initial_state;
-	int        have_max_check_attempts;
-	int        have_check_interval;
-	int        have_retry_interval;
-        int        have_active_checks_enabled;
-        int        have_passive_checks_enabled;
-        int        have_parallelize_check;
-	int        have_is_volatile;
-	int        have_obsess_over_service;
-	int        have_event_handler_enabled;
-	int        have_check_freshness;
-	int        have_freshness_threshold;
-	int        have_low_flap_threshold;
-	int        have_high_flap_threshold;
-	int        have_flap_detection_enabled;
-	int        have_flap_detection_options;
-	int        have_notification_options;
-	int        have_notifications_enabled;
-	int        have_notification_dependencies;
-	int        have_notification_interval;
-	int        have_first_notification_delay;
-	int        have_stalking_options;
-	int        have_process_perf_data;
-	int        have_failure_prediction_enabled;
-	int        have_retain_status_information;
-	int        have_retain_nonstatus_information;
+  int        have_initial_state;
+  int        have_max_check_attempts;
+  int        have_check_interval;
+  int        have_retry_interval;
+  int        have_active_checks_enabled;
+  int        have_passive_checks_enabled;
+  int        have_parallelize_check;
+  int        have_is_volatile;
+  int        have_obsess_over_service;
+  int        have_event_handler_enabled;
+  int        have_check_freshness;
+  int        have_freshness_threshold;
+  int        have_low_flap_threshold;
+  int        have_high_flap_threshold;
+  int        have_flap_detection_enabled;
+  int        have_flap_detection_options;
+  int        have_notification_options;
+  int        have_notifications_enabled;
+  int        have_notification_dependencies;
+  int        have_notification_interval;
+  int        have_first_notification_delay;
+  int        have_stalking_options;
+  int        have_process_perf_data;
+  int        have_failure_prediction_enabled;
+  int        have_retain_status_information;
+  int        have_retain_nonstatus_information;
 
-	int        has_been_resolved;
-	int        register_object;
-	struct xodtemplate_service_struct *next;
-        }xodtemplate_service;
+  int        has_been_resolved;
+  int        register_object;
+  struct xodtemplate_service_struct *next;
+}xodtemplate_service;
 
 
 /* SERVICEGROUP TEMPLATE STRUCTURE */
 typedef struct xodtemplate_servicegroup_struct{
-	char      *tmpl;
-	char      *name;
-	int        _config_file;
-	int        _start_line;
+  char      *tmpl;
+  char      *name;
+  int        _config_file;
+  int        _start_line;
 
-	char      *servicegroup_name;
-	char      *alias;
-	char      *members;
-	char      *servicegroup_members;
-	char      *notes;
-	char      *notes_url;
-	char      *action_url;
+  char      *servicegroup_name;
+  char      *alias;
+  char      *members;
+  char      *servicegroup_members;
+  char      *notes;
+  char      *notes_url;
+  char      *action_url;
 
-	int       have_members;
-	int       have_servicegroup_members;
-	int       have_notes;
-	int       have_notes_url;
-	int       have_action_url;
+  int       have_members;
+  int       have_servicegroup_members;
+  int       have_notes;
+  int       have_notes_url;
+  int       have_action_url;
 
-	int       has_been_resolved;
-	int       register_object;
-	struct xodtemplate_servicegroup_struct *next;
-        }xodtemplate_servicegroup;
+  int       has_been_resolved;
+  int       register_object;
+  struct xodtemplate_servicegroup_struct *next;
+}xodtemplate_servicegroup;
 
 
 /* SERVICEDEPENDENCY TEMPLATE STRUCTURE */
 typedef struct xodtemplate_servicedependency_struct{
-	char       *tmpl;
-        char       *name;
-	int        _config_file;
-	int        _start_line;
+  char       *tmpl;
+  char       *name;
+  int        _config_file;
+  int        _start_line;
 
-	char       *host_name;
-	char       *service_description;
-	char       *dependent_host_name;
-	char       *dependent_service_description;
-	char       *servicegroup_name;
-	char       *hostgroup_name;
-	char       *dependent_servicegroup_name;
-	char       *dependent_hostgroup_name;
-	char       *dependency_period;
-	int        inherits_parent;
-	int        fail_notify_on_ok;
-	int        fail_notify_on_unknown;
-	int        fail_notify_on_warning;
-	int        fail_notify_on_critical;
-	int        fail_notify_on_pending;
-	int        fail_execute_on_ok;
-	int        fail_execute_on_unknown;
-	int        fail_execute_on_warning;
-	int        fail_execute_on_critical;
-	int        fail_execute_on_pending;
+  char       *host_name;
+  char       *service_description;
+  char       *dependent_host_name;
+  char       *dependent_service_description;
+  char       *servicegroup_name;
+  char       *hostgroup_name;
+  char       *dependent_servicegroup_name;
+  char       *dependent_hostgroup_name;
+  char       *dependency_period;
+  int        inherits_parent;
+  int        fail_notify_on_ok;
+  int        fail_notify_on_unknown;
+  int        fail_notify_on_warning;
+  int        fail_notify_on_critical;
+  int        fail_notify_on_pending;
+  int        fail_execute_on_ok;
+  int        fail_execute_on_unknown;
+  int        fail_execute_on_warning;
+  int        fail_execute_on_critical;
+  int        fail_execute_on_pending;
 
-	int        have_host_name;
-	int        have_service_description;
-	int        have_dependent_host_name;
-	int        have_dependent_service_description;
-	int        have_servicegroup_name;
-	int        have_hostgroup_name;
-	int        have_dependent_servicegroup_name;
-	int        have_dependent_hostgroup_name;
-	int        have_dependency_period;
+  int        have_host_name;
+  int        have_service_description;
+  int        have_dependent_host_name;
+  int        have_dependent_service_description;
+  int        have_servicegroup_name;
+  int        have_hostgroup_name;
+  int        have_dependent_servicegroup_name;
+  int        have_dependent_hostgroup_name;
+  int        have_dependency_period;
 
-	int        have_inherits_parent;
-	int        have_notification_dependency_options;
-	int        have_execution_dependency_options;
+  int        have_inherits_parent;
+  int        have_notification_dependency_options;
+  int        have_execution_dependency_options;
 
-	int        has_been_resolved;
-	int        register_object;
-	struct xodtemplate_servicedependency_struct *next;
-        }xodtemplate_servicedependency;
+  int        has_been_resolved;
+  int        register_object;
+  struct xodtemplate_servicedependency_struct *next;
+}xodtemplate_servicedependency;
 
 
 /* SERVICEESCALATION TEMPLATE STRUCTURE */
 typedef struct xodtemplate_serviceescalation_struct{
-	char      *tmpl;
-	char      *name;
-	int        _config_file;
-	int        _start_line;
+  char      *tmpl;
+  char      *name;
+  int        _config_file;
+  int        _start_line;
 
-	char      *host_name;
-	char      *service_description;
-	char      *servicegroup_name;
-	char      *hostgroup_name;
-	int       first_notification;
-	int       last_notification;
-	double    notification_interval;
-	char      *escalation_period;
-	int       escalate_on_warning;
-	int       escalate_on_unknown;
-	int       escalate_on_critical;
-	int       escalate_on_recovery;
-	char      *contact_groups;
-	char      *contacts;
+  char      *host_name;
+  char      *service_description;
+  char      *servicegroup_name;
+  char      *hostgroup_name;
+  int       first_notification;
+  int       last_notification;
+  double    notification_interval;
+  char      *escalation_period;
+  int       escalate_on_warning;
+  int       escalate_on_unknown;
+  int       escalate_on_critical;
+  int       escalate_on_recovery;
+  char      *contact_groups;
+  char      *contacts;
 
-	int       have_host_name;
-	int       have_service_description;
-	int       have_servicegroup_name;
-	int       have_hostgroup_name;
-	int       have_escalation_period;
-	int       have_contact_groups;
-	int       have_contacts;
+  int       have_host_name;
+  int       have_service_description;
+  int       have_servicegroup_name;
+  int       have_hostgroup_name;
+  int       have_escalation_period;
+  int       have_contact_groups;
+  int       have_contacts;
 
-	int       have_first_notification;
-	int       have_last_notification;
-	int       have_notification_interval;
-	int       have_escalation_options;
+  int       have_first_notification;
+  int       have_last_notification;
+  int       have_notification_interval;
+  int       have_escalation_options;
 
-	int       has_been_resolved;
-	int       register_object;
-	struct xodtemplate_serviceescalation_struct *next;
-        }xodtemplate_serviceescalation;
+  int       has_been_resolved;
+  int       register_object;
+  struct xodtemplate_serviceescalation_struct *next;
+}xodtemplate_serviceescalation;
 
 
 /* HOSTDEPENDENCY TEMPLATE STRUCTURE */
 typedef struct xodtemplate_hostdependency_struct{
-	char      *tmpl;
-        char      *name;
-	int        _config_file;
-	int        _start_line;
+  char      *tmpl;
+  char      *name;
+  int        _config_file;
+  int        _start_line;
 
-	char      *host_name;
-	char      *dependent_host_name;
-	char      *hostgroup_name;
-	char      *dependent_hostgroup_name;
-	char      *dependency_period;
-	int       inherits_parent;
-	int       fail_notify_on_up;
-	int       fail_notify_on_down;
-	int       fail_notify_on_unreachable;
-	int       fail_notify_on_pending;
-	int       fail_execute_on_up;
-	int       fail_execute_on_down;
-	int       fail_execute_on_unreachable;
-	int       fail_execute_on_pending;
+  char      *host_name;
+  char      *dependent_host_name;
+  char      *hostgroup_name;
+  char      *dependent_hostgroup_name;
+  char      *dependency_period;
+  int       inherits_parent;
+  int       fail_notify_on_up;
+  int       fail_notify_on_down;
+  int       fail_notify_on_unreachable;
+  int       fail_notify_on_pending;
+  int       fail_execute_on_up;
+  int       fail_execute_on_down;
+  int       fail_execute_on_unreachable;
+  int       fail_execute_on_pending;
 
-	int       have_host_name;
-	int       have_dependent_host_name;
-	int       have_hostgroup_name;
-	int       have_dependent_hostgroup_name;
-	int       have_dependency_period;
+  int       have_host_name;
+  int       have_dependent_host_name;
+  int       have_hostgroup_name;
+  int       have_dependent_hostgroup_name;
+  int       have_dependency_period;
 
-	int       have_inherits_parent;
-	int       have_notification_dependency_options;
-	int       have_execution_dependency_options;
+  int       have_inherits_parent;
+  int       have_notification_dependency_options;
+  int       have_execution_dependency_options;
 
-	int       has_been_resolved;
-	int       register_object;
-	struct xodtemplate_hostdependency_struct *next;
-        }xodtemplate_hostdependency;
+  int       has_been_resolved;
+  int       register_object;
+  struct xodtemplate_hostdependency_struct *next;
+}xodtemplate_hostdependency;
 
 
 /* HOSTESCALATION TEMPLATE STRUCTURE */
 typedef struct xodtemplate_hostescalation_struct{
-	char      *tmpl;
-	char      *name;
-	int        _config_file;
-	int        _start_line;
+  char      *tmpl;
+  char      *name;
+  int        _config_file;
+  int        _start_line;
 
-	char      *host_name;
-	char      *hostgroup_name;
-	int       first_notification;
-	int       last_notification;
-	double    notification_interval;
-	char      *escalation_period;
-	int       escalate_on_down;
-	int       escalate_on_unreachable;
-	int       escalate_on_recovery;
-	char      *contact_groups;
-	char      *contacts;
+  char      *host_name;
+  char      *hostgroup_name;
+  int       first_notification;
+  int       last_notification;
+  double    notification_interval;
+  char      *escalation_period;
+  int       escalate_on_down;
+  int       escalate_on_unreachable;
+  int       escalate_on_recovery;
+  char      *contact_groups;
+  char      *contacts;
 
-	int       have_host_name;
-	int       have_hostgroup_name;
-	int       have_escalation_period;
-	int       have_contact_groups;
-	int       have_contacts;
+  int       have_host_name;
+  int       have_hostgroup_name;
+  int       have_escalation_period;
+  int       have_contact_groups;
+  int       have_contacts;
 
-	int       have_first_notification;
-	int       have_last_notification;
-	int       have_notification_interval;
-	int       have_escalation_options;
+  int       have_first_notification;
+  int       have_last_notification;
+  int       have_notification_interval;
+  int       have_escalation_options;
 
-	int       has_been_resolved;
-	int       register_object;
-	struct xodtemplate_hostescalation_struct *next;
-        }xodtemplate_hostescalation;
+  int       has_been_resolved;
+  int       register_object;
+  struct xodtemplate_hostescalation_struct *next;
+}xodtemplate_hostescalation;
 
 
 /* HOSTEXTINFO TEMPLATE STRUCTURE */
 typedef struct xodtemplate_hostextinfo_struct{
-	char       *tmpl;
-	char       *name;
-	int        _config_file;
-	int        _start_line;
+  char       *tmpl;
+  char       *name;
+  int        _config_file;
+  int        _start_line;
 
-	char       *host_name;
-	char       *hostgroup_name;
-	char       *notes;
-	char       *notes_url;
-	char       *action_url;
-	char       *icon_image;
-	char       *icon_image_alt;
-	char       *vrml_image;
-	char       *statusmap_image;
-	int        x_2d;
-	int        y_2d;
-	double     x_3d;
-	double     y_3d;
-	double     z_3d;
+  char       *host_name;
+  char       *hostgroup_name;
+  char       *notes;
+  char       *notes_url;
+  char       *action_url;
+  char       *icon_image;
+  char       *icon_image_alt;
+  char       *vrml_image;
+  char       *statusmap_image;
+  int        x_2d;
+  int        y_2d;
+  double     x_3d;
+  double     y_3d;
+  double     z_3d;
 
-	int        have_host_name;
-	int        have_hostgroup_name;
-	int        have_notes;
-	int        have_notes_url;
-	int        have_action_url;
-	int        have_icon_image;
-	int        have_icon_image_alt;
-	int        have_vrml_image;
-	int        have_statusmap_image;
+  int        have_host_name;
+  int        have_hostgroup_name;
+  int        have_notes;
+  int        have_notes_url;
+  int        have_action_url;
+  int        have_icon_image;
+  int        have_icon_image_alt;
+  int        have_vrml_image;
+  int        have_statusmap_image;
 
-	int        have_2d_coords;
-	int        have_3d_coords;
+  int        have_2d_coords;
+  int        have_3d_coords;
 
-	int        has_been_resolved;
-	int        register_object;
-	struct xodtemplate_hostextinfo_struct *next;
-        }xodtemplate_hostextinfo;
+  int        has_been_resolved;
+  int        register_object;
+  struct xodtemplate_hostextinfo_struct *next;
+}xodtemplate_hostextinfo;
 
 
 /* SERVICEEXTINFO TEMPLATE STRUCTURE */
 typedef struct xodtemplate_serviceextinfo_struct{
-	char       *tmpl;
-	char       *name;
-	int        _config_file;
-	int        _start_line;
+  char       *tmpl;
+  char       *name;
+  int        _config_file;
+  int        _start_line;
 
-	char       *host_name;
-	char       *hostgroup_name;
-	char       *service_description;
-	char       *notes;
-	char       *notes_url;
-	char       *action_url;
-	char       *icon_image;
-	char       *icon_image_alt;
+  char       *host_name;
+  char       *hostgroup_name;
+  char       *service_description;
+  char       *notes;
+  char       *notes_url;
+  char       *action_url;
+  char       *icon_image;
+  char       *icon_image_alt;
 
-	int        have_host_name;
-	int        have_hostgroup_name;
-	int        have_service_description;
-	int        have_notes;
-	int        have_notes_url;
-	int        have_action_url;
-	int        have_icon_image;
-	int        have_icon_image_alt;
+  int        have_host_name;
+  int        have_hostgroup_name;
+  int        have_service_description;
+  int        have_notes;
+  int        have_notes_url;
+  int        have_action_url;
+  int        have_icon_image;
+  int        have_icon_image_alt;
 
-	int        has_been_resolved;
-	int        register_object;
-	struct xodtemplate_serviceextinfo_struct *next;
-        }xodtemplate_serviceextinfo;
+  int        has_been_resolved;
+  int        register_object;
+  struct xodtemplate_serviceextinfo_struct *next;
+}xodtemplate_serviceextinfo;
 
 
 /* CONTACT LIST STRUCTURE */
 typedef struct xodtemplate_contactlist_struct{
-	char      *contact_name;
-	struct xodtemplate_contactlist_struct *next;
-        }xodtemplate_contactlist;
+  char      *contact_name;
+  struct xodtemplate_contactlist_struct *next;
+}xodtemplate_contactlist;
 
 
 /* HOST LIST STRUCTURE */
 typedef struct xodtemplate_hostlist_struct{
-	char      *host_name;
-	struct xodtemplate_hostlist_struct *next;
-        }xodtemplate_hostlist;
+  char      *host_name;
+  struct xodtemplate_hostlist_struct *next;
+}xodtemplate_hostlist;
 
 
 /* SERVICE LIST STRUCTURE */
 typedef struct xodtemplate_servicelist_struct{
-	char      *host_name;
-	char      *service_description;
-	struct xodtemplate_servicelist_struct *next;
-        }xodtemplate_servicelist;
+  char      *host_name;
+  char      *service_description;
+  struct xodtemplate_servicelist_struct *next;
+}xodtemplate_servicelist;
 
 
 /* MEMBER LIST STRUCTURE */
 typedef struct xodtemplate_memberlist_struct{
-	char      *name1;
-	char      *name2;
-	struct xodtemplate_memberlist_struct *next;
-        }xodtemplate_memberlist;
+  char      *name1;
+  char      *name2;
+  struct xodtemplate_memberlist_struct *next;
+}xodtemplate_memberlist;
 
 
 /***** CHAINED HASH DATA STRUCTURES ******/
 
 typedef struct xodtemplate_service_cursor_struct{
-	int xodtemplate_service_iterator;
-	xodtemplate_service *current_xodtemplate_service;
-        }xodtemplate_service_cursor;
+  int xodtemplate_service_iterator;
+  xodtemplate_service *current_xodtemplate_service;
+}xodtemplate_service_cursor;
 
 
 

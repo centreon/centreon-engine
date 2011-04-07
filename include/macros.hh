@@ -195,83 +195,83 @@ static const unsigned int ESCAPE_MACRO_CHARS                   = 2;
 static const unsigned int URL_ENCODE_MACRO_CHARS               = 4;
 
 // NAGIOS_MACROS structure
-struct                  nagios_macros {
-  char                  *x[MACRO_X_COUNT];
-  char                  *argv[MAX_COMMAND_ARGUMENTS];
-  char                  *contactaddress[MAX_CONTACT_ADDRESSES];
-  char                  *ondemand;
-  host                  *host_ptr;
-  hostgroup             *hostgroup_ptr;
-  service               *service_ptr;
-  servicegroup          *servicegroup_ptr;
-  contact               *contact_ptr;
-  contactgroup          *contactgroup_ptr;
-  customvariablesmember *custom_host_vars;
-  customvariablesmember *custom_service_vars;
-  customvariablesmember *custom_contact_vars;
+struct                   nagios_macros {
+  char*                  x[MACRO_X_COUNT];
+  char*                  argv[MAX_COMMAND_ARGUMENTS];
+  char*                  contactaddress[MAX_CONTACT_ADDRESSES];
+  char*                  ondemand;
+  host*                  host_ptr;
+  hostgroup*             hostgroup_ptr;
+  service*               service_ptr;
+  servicegroup*          servicegroup_ptr;
+  contact*               contact_ptr;
+  contactgroup*          contactgroup_ptr;
+  customvariablesmember* custom_host_vars;
+  customvariablesmember* custom_service_vars;
+  customvariablesmember* custom_contact_vars;
 };
 
 // Macro Functions
-nagios_macros *get_global_macros(void);
+nagios_macros* get_global_macros(void);
 
 // thread-safe version of process_macros.
-int process_macros_r(nagios_macros *mac, char *input_buffer, char **output_buffer, int options);
+int process_macros_r(nagios_macros* mac, char* input_buffer, char** output_buffer, int options);
 
 /*
  * Replace macros with their actual values
  * This function modifies the global_macros struct and is thus
  * not thread-safe.
  */
-int process_macros(char *input_buffer, char **output_buffer, int options);
+int process_macros(char* input_buffer, char** output_buffer, int options);
 
 /*
  * These functions updates **macros with the values from
  * their respective object type.
  */
-int grab_host_macros(nagios_macros *mac, host *hst);
-int grab_hostgroup_macros(nagios_macros *mac, hostgroup *hg);
-int grab_service_macros(nagios_macros *mac, service *svc);
-int grab_servicegroup_macros(nagios_macros *mac, servicegroup *sg);
-int grab_contact_macros(nagios_macros *mac, contact *cntct);
+int grab_host_macros(nagios_macros* mac, host* hst);
+int grab_hostgroup_macros(nagios_macros* mac, hostgroup* hg);
+int grab_service_macros(nagios_macros* mac, service* svc);
+int grab_servicegroup_macros(nagios_macros* mac, servicegroup* sg);
+int grab_contact_macros(nagios_macros* mac, contact* cntct);
 
-int grab_macro_value(nagios_macros *mac, char *macro_buffer, char **output, int *clean_options, int *free_macro);
-int grab_macrox_value(nagios_macros *mac, int macro_type, char *arg1, char *arg2, char **output, int *free_macro);
-int grab_custom_macro_value(nagios_macros *mac, char *macro_name, char *arg1, char *arg2, char **output);
-int grab_datetime_macro(nagios_macros *mac, int macro_type, char *arg1, char *arg2, char **output);
-int grab_standard_host_macro(nagios_macros *mac, unsigned int macro_type, host *temp_host, char **output, int *free_macro);
-int grab_standard_hostgroup_macro(nagios_macros *mac, int macro_type, hostgroup *temp_hostgroup, char **output);
-int grab_standard_service_macro(nagios_macros *mac, unsigned int macro_type, service *temp_service, char **output, int *free_macro);
-int grab_standard_servicegroup_macro(nagios_macros *mac, int macro_type, servicegroup *temp_servicegroup, char **output);
-int grab_standard_contact_macro(nagios_macros *mac, int macro_type, contact *temp_contact, char **output);
-int grab_contact_address_macro(unsigned int macro_num, contact *temp_contact, char **output);
-int grab_standard_contactgroup_macro(int macro_type, contactgroup *temp_contactgroup, char **output);
-int grab_custom_object_macro(nagios_macros *mac, char *macro_name, customvariablesmember *vars, char **output);
+int grab_macro_value(nagios_macros* mac, char* macro_buffer, char** output, int* clean_options, int* free_macro);
+int grab_macrox_value(nagios_macros* mac, int macro_type, char* arg1, char* arg2, char** output, int* free_macro);
+int grab_custom_macro_value(nagios_macros* mac, char* macro_name, char* arg1, char* arg2, char** output);
+int grab_datetime_macro(nagios_macros* mac, int macro_type, char* arg1, char* arg2, char** output);
+int grab_standard_host_macro(nagios_macros* mac, unsigned int macro_type, host* temp_host, char** output, int* free_macro);
+int grab_standard_hostgroup_macro(nagios_macros* mac, int macro_type, hostgroup* temp_hostgroup, char** output);
+int grab_standard_service_macro(nagios_macros* mac, unsigned int macro_type, service* temp_service, char** output, int* free_macro);
+int grab_standard_servicegroup_macro(nagios_macros* mac, int macro_type, servicegroup* temp_servicegroup, char** output);
+int grab_standard_contact_macro(nagios_macros* mac, int macro_type, contact* temp_contact, char** output);
+int grab_contact_address_macro(unsigned int macro_num, contact* temp_contact, char** output);
+int grab_standard_contactgroup_macro(int macro_type, contactgroup* temp_contactgroup, char** output);
+int grab_custom_object_macro(nagios_macros* mac, char* macro_name, customvariablesmember* vars, char** output);
 
-char const* clean_macro_chars(char *macro,int options); // cleans macros characters before insertion into output string
+char const* clean_macro_chars(char* macro,int options); // cleans macros characters before insertion into output string
 
-char *get_url_encoded_string(char *input);        // URL encode a string
+char* get_url_encoded_string(char* input);              // URL encode a string
 
 int init_macros(void);
 int init_macrox_names(void);
 int free_macrox_names(void);
 
-void copy_constant_macros(char **dest);
+void copy_constant_macros(char** dest);
 
-int clear_argv_macros(nagios_macros *mac);
-int clear_volatile_macros(nagios_macros *mac);
-int clear_service_macros(nagios_macros *mac);
-int clear_host_macros(nagios_macros *mac);
-int clear_hostgroup_macros(nagios_macros *mac);
-int clear_servicegroup_macros(nagios_macros *mac);
-int clear_contact_macros(nagios_macros *mac);
-int clear_contactgroup_macros(nagios_macros *mac);
-int clear_summary_macros(nagios_macros *mac);
+int clear_argv_macros(nagios_macros* mac);
+int clear_volatile_macros(nagios_macros* mac);
+int clear_service_macros(nagios_macros* mac);
+int clear_host_macros(nagios_macros* mac);
+int clear_hostgroup_macros(nagios_macros* mac);
+int clear_servicegroup_macros(nagios_macros* mac);
+int clear_contact_macros(nagios_macros* mac);
+int clear_contactgroup_macros(nagios_macros* mac);
+int clear_summary_macros(nagios_macros* mac);
 
-int set_all_macro_environment_vars(nagios_macros *mac, int set);
-int set_macrox_environment_vars(nagios_macros *mac, int set);
-int set_argv_macro_environment_vars(nagios_macros *mac, int set);
-int set_custom_macro_environment_vars(nagios_macros *mac, int set);
-int set_contact_address_environment_vars(nagios_macros *mac, int set);
+int set_all_macro_environment_vars(nagios_macros* mac, int set);
+int set_macrox_environment_vars(nagios_macros* mac, int set);
+int set_argv_macro_environment_vars(nagios_macros* mac, int set);
+int set_custom_macro_environment_vars(nagios_macros* mac, int set);
+int set_contact_address_environment_vars(nagios_macros* mac, int set);
 int set_macro_environment_var(char const* name, char const* value, int set);
 
 # ifdef __cplusplus

@@ -30,21 +30,21 @@ extern "C" {
 static const char DEFAULT_HOST_PERFDATA_FILE_TEMPLATE[] = "[HOSTPERFDATA]\t$TIMET$\t$HOSTNAME$\t$HOSTEXECUTIONTIME$\t$HOSTOUTPUT$\t$HOSTPERFDATA$";
 static const char DEFAULT_SERVICE_PERFDATA_FILE_TEMPLATE[] = "[SERVICEPERFDATA]\t$TIMET$\t$HOSTNAME$\t$SERVICEDESC$\t$SERVICEEXECUTIONTIME$\t$SERVICELATENCY$\t$SERVICEOUTPUT$\t$SERVICEPERFDATA$";
 
-int xpddefault_initialize_performance_data(char *config_file);
-int xpddefault_cleanup_performance_data(char *config_file);
-int xpddefault_grab_config_info(char *config_file);
-int xpddefault_grab_config_directives(char *input);
+int xpddefault_initialize_performance_data(char* config_file);
+int xpddefault_cleanup_performance_data(char* config_file);
+int xpddefault_grab_config_info(char* config_file);
+int xpddefault_grab_config_directives(char* input);
 
-int xpddefault_update_service_performance_data(service *svc);
-int xpddefault_update_host_performance_data(host *hst);
+int xpddefault_update_service_performance_data(service* svc);
+int xpddefault_update_host_performance_data(host* hst);
 
-int xpddefault_run_service_performance_data_command(nagios_macros *mac, service *svc);
-int xpddefault_run_host_performance_data_command(nagios_macros *mac, host *hst);
+int xpddefault_run_service_performance_data_command(nagios_macros* mac, service* svc);
+int xpddefault_run_host_performance_data_command(nagios_macros* mac, host* hst);
 
-int xpddefault_update_service_performance_data_file(nagios_macros *mac, service *svc);
-int xpddefault_update_host_performance_data_file(nagios_macros *mac, host *hst);
+int xpddefault_update_service_performance_data_file(nagios_macros* mac, service* svc);
+int xpddefault_update_host_performance_data_file(nagios_macros* mac, host* hst);
 
-void xpddefault_preprocess_file_templates(char *tmpl);
+void xpddefault_preprocess_file_templates(char* tmpl);
 
 int xpddefault_open_host_perfdata_file(void);
 int xpddefault_open_service_perfdata_file(void);

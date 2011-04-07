@@ -36,10 +36,10 @@ static const unsigned int XRDDEFAULT_SERVICECOMMENT_DATA  = 7;
 static const unsigned int XRDDEFAULT_HOSTDOWNTIME_DATA    = 8;
 static const unsigned int XRDDEFAULT_SERVICEDOWNTIME_DATA = 9;
 
-int xrddefault_initialize_retention_data(char *config_file);
-int xrddefault_cleanup_retention_data(char *config_file);
-int xrddefault_grab_config_info(char *main_config_file);
-int xrddefault_grab_config_directives(char *input);
+int xrddefault_initialize_retention_data(char* config_file);
+int xrddefault_cleanup_retention_data(char* config_file);
+int xrddefault_grab_config_info(char* main_config_file);
+int xrddefault_grab_config_directives(char* input);
 int xrddefault_save_state_information(void); // saves all host and service state information
 int xrddefault_read_state_information(void); // reads in initial host and service state information
 

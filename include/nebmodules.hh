@@ -22,7 +22,7 @@
 # define SCHEDULER_NEBMODULES_HH
 
 # ifdef __cplusplus
-  extern "C" {
+extern "C" {
 # endif
 
 /***** MODULE VERSION INFORMATION *****/
@@ -65,34 +65,32 @@
 /***** MODULE STRUCTURES *****/
 
 /* NEB module structure */
-typedef struct nebmodule_struct{
-	char            *filename;
-	char            *args;
-	char            *info[NEBMODULE_MODINFO_NUMITEMS];
-	int             should_be_loaded;
-	int             is_currently_loaded;
+typedef struct             nebmodule_struct{
+  char*                    filename;
+  char*                    args;
+  char*                    info[NEBMODULE_MODINFO_NUMITEMS];
+  int                      should_be_loaded;
+  int                      is_currently_loaded;
 # ifdef USE_LTDL
-	lt_dlhandle     module_handle;
-	lt_ptr          init_func;
-	lt_ptr          deinit_func;
+  lt_dlhandle              module_handle;
+  lt_ptr                   init_func;
+  lt_ptr                   deinit_func;
 # else
-	void            *module_handle;
-	void            *init_func;
-	void            *deinit_func;
+  void*                    module_handle;
+  void*                    init_func;
+  void*                    deinit_func;
 # endif /* ! USE_LTDL */
 # ifdef HAVE_PTHREAD_H
-	pthread_t       thread_id;
+  pthread_t                thread_id;
 # endif /* !HAVE_PTHREAD_H */
-	struct nebmodule_struct *next;
-        }nebmodule;
-
-
+  struct nebmodule_struct* next;
+}                          nebmodule;
 
 /***** MODULE FUNCTIONS *****/
-int neb_set_module_info(void *,int,char *);
+int neb_set_module_info(void*, int, char*);
 
 # ifdef __cplusplus
-  }
+}
 # endif
 
 #endif // !SCHEDULER_NEBMODULES_HH
