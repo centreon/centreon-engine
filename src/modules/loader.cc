@@ -26,11 +26,23 @@
 using namespace com::centreon::scheduler;
 using namespace com::centreon::scheduler::modules;
 
+/**************************************
+ *                                     *
+ *           Public Methods            *
+ *                                     *
+ **************************************/
+
+/**
+ *  Get instance of loader singleton.
+ */
 loader& loader::instance() {
   static loader instance;
   return (instance);
 }
 
+/**
+ *  Load modules in the specify directory.
+ */
 void loader::load() {
   QDir dir(_directory);
   QStringList filters("*.so");
@@ -58,6 +70,9 @@ void loader::load() {
   }
 }
 
+/**
+ *  Unload all modules.
+ */
 void loader::unload() {
   for (QMultiHash<QString, handle>::iterator it = _modules.begin(), end = _modules.end();
        it != end;
@@ -70,30 +85,60 @@ void loader::unload() {
   _modules.clear();
 }
 
+/**
+ *  Add a new module.
+ *  @param[in] module Module to add.
+ */
 void loader::add_module(handle const& module) {
   _modules.insert(module.get_filename(), module);
 }
 
+/**
+ *  Remove a module.
+ *  @param[in] module Modile to remove.
+ */
 void loader::del_module(handle const& module) {
   _modules.remove(module.get_filename(), module);
 }
 
+/**
+ *  Get the directory.
+ *  @return The directory.
+ */
 QString const& loader::get_directory() const throw() {
   return (_directory);
 }
 
+/**
+ *  Get all modules.
+ *  @return All modules in a const map.
+ */
 QMultiHash<QString, handle> const& loader::get_modules() const throw() {
   return (_modules);
 }
 
+/**
+ *  Get all modules.
+ *  @return All modules in a map.
+ */
 QMultiHash<QString, handle>& loader::get_modules() throw() {
   return (_modules);
 }
 
+/**
+ *  Set the directory.
+ *  @param[in] directory The Directory path content modules.
+ */
 void loader::set_directory(QString const& directory) {
   _directory = directory;
 }
 
+/**
+ *  Slot for notify when module name changed.
+ *  @param[in] filename The filename of the module.
+ *  @param[in] old_name The old name of the module.
+ *  @param[in] new_name The new name of the module.
+ */
 void loader::module_name_changed(QString const& filename,
 				 QString const& old_name,
 				 QString const& new_name) {
@@ -110,6 +155,18 @@ void loader::module_name_changed(QString const& filename,
   throw (error() << "Module `" << filename << ":" << old_name << "' not found");
 }
 
+/**************************************
+ *                                     *
+ *           Private Methods           *
+ *                                     *
+ **************************************/
+
+/**
+ *  Default constructor.
+ */
 loader::loader() : QObject(0) {}
 
+/**
+ *  Default destructor.
+ */
 loader::~loader() throw() {}

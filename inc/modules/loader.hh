@@ -31,9 +31,9 @@ namespace                             com {
       namespace                       modules {
 	/**
 	 *  @class loader loader.hh
-	 *  @brief
+	 *  @brief Modules loader.
 	 *
-	 *
+	 *  Loader manage all modules.
 	 */
 	class                         loader : public QObject {
 	  Q_OBJECT

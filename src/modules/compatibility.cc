@@ -25,11 +25,24 @@ using namespace com::centreon::scheduler::modules;
 
 nebmodule* neb_module_list = NULL;
 
+/**************************************
+ *                                     *
+ *           Public Methods            *
+ *                                     *
+ **************************************/
+
+/**
+ *  Get instance of compatibility singleton.
+ */
 compatibility& compatibility::instance() {
   static compatibility instance;
   return (instance);
 }
 
+/**
+ *  Slot for notify when module was create.
+ *  @param module The module object.
+ */
 void compatibility::create_module(modules::handle* module) {
   if (module == NULL)
     return;
@@ -62,6 +75,10 @@ void compatibility::create_module(modules::handle* module) {
   neb_module_list = new_module;
 }
 
+/**
+ *  Slot for notify when module was destroy.
+ *  @param module The module object.
+ */
 void compatibility::destroy_module(modules::handle* module) {
   if (module == NULL)
     return;
@@ -90,6 +107,10 @@ void compatibility::destroy_module(modules::handle* module) {
   }
 }
 
+/**
+ *  Slot for notify when module name changed.
+ *  @param module The module object.
+ */
 void compatibility::name_module(modules::handle* module) {
   if (module == NULL)
     return;
@@ -103,6 +124,10 @@ void compatibility::name_module(modules::handle* module) {
   }
 }
 
+/**
+ *  Slot for notify when module author changed.
+ *  @param module The module object.
+ */
 void compatibility::author_module(modules::handle* module) {
   if (module == NULL)
     return;
@@ -116,6 +141,10 @@ void compatibility::author_module(modules::handle* module) {
   }
 }
 
+/**
+ *  Slot for notify when module copyright changed.
+ *  @param module The module object.
+ */
 void compatibility::copyright_module(modules::handle* module) {
   if (module == NULL)
     return;
@@ -129,6 +158,10 @@ void compatibility::copyright_module(modules::handle* module) {
   }
 }
 
+/**
+ *  Slot for notify when module version changed.
+ *  @param module The module object.
+ */
 void compatibility::version_module(modules::handle* module) {
   if (module == NULL)
     return;
@@ -142,6 +175,10 @@ void compatibility::version_module(modules::handle* module) {
   }
 }
 
+/**
+ *  Slot for notify when module license changed.
+ *  @param module The module object.
+ */
 void compatibility::license_module(modules::handle* module) {
   if (module == NULL)
     return;
@@ -155,6 +192,10 @@ void compatibility::license_module(modules::handle* module) {
   }
 }
 
+/**
+ *  Slot for notify when module description changed.
+ *  @param module The module object.
+ */
 void compatibility::description_module(modules::handle* module) {
   if (module == NULL)
     return;
@@ -168,6 +209,10 @@ void compatibility::description_module(modules::handle* module) {
   }
 }
 
+/**
+ *  Slot for notify when module was loaded.
+ *  @param module The module object.
+ */
 void compatibility::loaded_module(modules::handle* module) {
   if (module == NULL)
     return;
@@ -180,6 +225,10 @@ void compatibility::loaded_module(modules::handle* module) {
   }
 }
 
+/**
+ *  Slot for notify when module was unloaded.
+ *  @param module The module object.
+ */
 void compatibility::unloaded_module(modules::handle* module) {
   if (module == NULL)
     return;
@@ -192,6 +241,18 @@ void compatibility::unloaded_module(modules::handle* module) {
   }
 }
 
+/**************************************
+ *                                     *
+ *           Private Methods           *
+ *                                     *
+ **************************************/
+
+/**
+ *  Default constructor.
+ */
 compatibility::compatibility() {}
 
+/**
+ *  Default destructor.
+ */
 compatibility::~compatibility() throw() {}

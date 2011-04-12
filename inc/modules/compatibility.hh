@@ -30,9 +30,10 @@ namespace                       com {
       namespace                 modules {
 	/**
 	 *  @class compatibility compatibility.hh
-	 *  @brief
+	 *  @brief Simple compatibility class.
 	 *
-	 *
+	 *  Use to keep compatibility with old
+	 *  module system API.
 	 */
 	class                   compatibility : public QObject {
 	  Q_OBJECT

@@ -31,9 +31,10 @@ namespace                          com {
       namespace                    modules {
 	/**
 	 *  @class handle handle.hh
-	 *  @brief
+	 *  @brief Handle contains module informations.
 	 *
-	 *
+	 *  Handle is a module object, contains information
+	 *  about module, start and stop module.
 	 */
 	class                      handle : public QObject {
 	  Q_OBJECT
