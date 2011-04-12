@@ -810,7 +810,7 @@ int xodtemplate_process_config_file(char* filename, int options) {
 #define xod_begin_def(type)						\
   do {									\
     new_##type = new xodtemplate_##type;				\
-    memset(new_##type, 0, sizeof(new_##type));				\
+    memset(new_##type, 0, sizeof(*new_##type));				\
     									\
     new_##type->register_object=TRUE;					\
     new_##type->_config_file=config_file;				\

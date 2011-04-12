@@ -120,9 +120,9 @@ int read_resource_file(char* resource_file) {
   while (1) {
 
     /* free memory */
-    delete[]input;
-    delete[]variable;
-    delete[]value;
+    delete[] input;
+    delete[] variable;
+    delete[] value;
 
     /* read the next line */
     if ((input = mmap_fgets_multiline(thefile)) == NULL)
@@ -165,7 +165,7 @@ int read_resource_file(char* resource_file) {
       if (strstr(variable, "$USER") == variable && strlen(variable) > 5) {
         user_index = atoi(variable + 5) - 1;
         if (user_index < MAX_USER_MACROS) {
-          delete[]macro_user[user_index];
+          delete[] macro_user[user_index];
           macro_user[user_index] = my_strdup(value);
         }
       }
@@ -173,12 +173,12 @@ int read_resource_file(char* resource_file) {
   }
 
   /* free leftover memory and close the file */
-  delete[]input;
+  delete[] input;
   mmap_fclose(thefile);
 
   /* free memory */
-  delete[]variable;
-  delete[]value;
+  delete[] variable;
+  delete[] value;
 
   if (error == TRUE)
     return (ERROR);
@@ -229,7 +229,7 @@ int pre_flight_check(void) {
   if (config.get_global_host_event_handler() != "") {
 
     /* check the event handler command */
-    buf = my_strdup(config.get_global_host_event_handler().c_str());
+    buf = my_strdup(config.get_global_host_event_handler().toStdString().c_str());
 
     /* get the command name, leave any arguments behind */
     temp_command_name = my_strtok(buf, "!");
@@ -245,13 +245,13 @@ int pre_flight_check(void) {
     /* save the pointer to the command for later */
     global_host_event_handler_ptr = temp_command;
 
-    delete[]buf;
+    delete[] buf;
   }
 
   if (config.get_global_service_event_handler() != "") {
 
     /* check the event handler command */
-    buf = my_strdup(config.get_global_service_event_handler().c_str());
+    buf = my_strdup(config.get_global_service_event_handler().toStdString().c_str());
 
     /* get the command name, leave any arguments behind */
     temp_command_name = my_strtok(buf, "!");
@@ -267,7 +267,7 @@ int pre_flight_check(void) {
     /* save the pointer to the command for later */
     global_service_event_handler_ptr = temp_command;
 
-    delete[]buf;
+    delete[] buf;
   }
 
   /**************************************************/
@@ -276,9 +276,9 @@ int pre_flight_check(void) {
   if (verify_config == TRUE)
     printf("Checking obsessive compulsive processor commands...\n");
 
-  if (!config.get_ocsp_command().empty()) {
+  if (!config.get_ocsp_command().isEmpty()) {
 
-    buf = my_strdup(config.get_ocsp_command().c_str());
+    buf = my_strdup(config.get_ocsp_command().toStdString().c_str());
 
     /* get the command name, leave any arguments behind */
     temp_command_name = my_strtok(buf, "!");
@@ -294,12 +294,12 @@ int pre_flight_check(void) {
     /* save the pointer to the command for later */
     ocsp_command_ptr = temp_command;
 
-    delete[]buf;
+    delete[] buf;
   }
 
-  if (!config.get_ochp_command().empty()) {
+  if (!config.get_ochp_command().isEmpty()) {
 
-    buf = my_strdup(config.get_ochp_command().c_str());
+    buf = my_strdup(config.get_ochp_command().toStdString().c_str());
 
     /* get the command name, leave any arguments behind */
     temp_command_name = my_strtok(buf, "!");
@@ -315,7 +315,7 @@ int pre_flight_check(void) {
     /* save the pointer to the command for later */
     ochp_command_ptr = temp_command;
 
-    delete[]buf;
+    delete[] buf;
   }
 
   /**************************************************/
@@ -326,35 +326,37 @@ int pre_flight_check(void) {
 
   /* check if we can write to temp_path */
   std::ostringstream oss;
-  oss << config.get_temp_path() << "/nagiosXXXXXX";
+  oss << config.get_temp_path().toStdString() << "/nagiosXXXXXX";
   buf = my_strdup(oss.str().c_str());
   if ((temp_path_fd = mkstemp(buf)) == -1) {
     logit(NSLOG_VERIFICATION_ERROR, TRUE,
           "\tError: Unable to write to temp_path ('%s') - %s\n",
-          config.get_temp_path().c_str(), strerror(errno));
+          config.get_temp_path().toStdString().c_str(),
+	  strerror(errno));
     errors++;
   }
   else {
     close(temp_path_fd);
     remove(buf);
   }
-  delete[]buf;
+  delete[] buf;
 
   /* check if we can write to check_result_path */
-  oss.str() = "";
-  oss << config.get_check_result_path() << "/nagiosXXXXXX";
+  oss.str("");
+  oss << config.get_check_result_path().toStdString() << "/nagiosXXXXXX";
   buf = my_strdup(oss.str().c_str());
   if ((temp_path_fd = mkstemp(buf)) == -1) {
     logit(NSLOG_VERIFICATION_WARNING, TRUE,
           "\tError: Unable to write to check_result_path ('%s') - %s\n",
-          config.get_check_result_path().c_str(), strerror(errno));
+          config.get_check_result_path().toStdString().c_str(),
+	  strerror(errno));
     errors++;
   }
   else {
     close(temp_path_fd);
     remove(buf);
   }
-  delete[]buf;
+  delete[] buf;
 
   /* warn if user didn't specify any illegal macro output chars */
   if (config.get_illegal_output_chars() == "") {
@@ -522,7 +524,7 @@ int pre_flight_object_check(int* w, int* e) {
         errors++;
       }
 
-      delete[]buf;
+      delete[] buf;
 
       /* save the pointer to the event handler for later */
       temp_service->event_handler_ptr = temp_command;
@@ -543,7 +545,7 @@ int pre_flight_object_check(int* w, int* e) {
       errors++;
     }
 
-    delete[]buf;
+    delete[] buf;
 
     /* save the pointer to the check command for later */
     temp_service->check_command_ptr = temp_command;
@@ -732,7 +734,7 @@ int pre_flight_object_check(int* w, int* e) {
         errors++;
       }
 
-      delete[]buf;
+      delete[] buf;
 
       /* save the pointer to the event handler command for later */
       temp_host->event_handler_ptr = temp_command;
@@ -758,7 +760,7 @@ int pre_flight_object_check(int* w, int* e) {
       /* save the pointer to the check command for later */
       temp_host->check_command_ptr = temp_command;
 
-      delete[]buf;
+      delete[] buf;
     }
 
     /* check host check timeperiod */
@@ -1008,7 +1010,7 @@ int pre_flight_object_check(int* w, int* e) {
         /* save pointer to the command for later */
         temp_commandsmember->command_ptr = temp_command;
 
-        delete[]buf;
+        delete[] buf;
       }
 
     /* check host notification commands */
@@ -1040,7 +1042,7 @@ int pre_flight_object_check(int* w, int* e) {
         /* save pointer to the command for later */
         temp_commandsmember->command_ptr = temp_command;
 
-        delete[]buf;
+        delete[] buf;
       }
 
     /* check service notification timeperiod */

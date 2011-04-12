@@ -63,46 +63,46 @@ float my_rand(float min, float max) throw() {
   return ((max - min) * ((float)random() / (float)RAND_MAX) + min);
 }
 
-template<class T> std::string obj2str(T const& value) {
+template<class T> QString obj2str(T const& value) {
   std::ostringstream oss;
   oss << value;
-  return (oss.str());
+  return (oss.str().c_str());
 }
 
-void build_resource(std::string const& resource) {
-  std::ofstream ofs(resource.c_str());
+void build_resource(QString const& resource) {
+  std::ofstream ofs(resource.toStdString().c_str());
   for (unsigned int i = 0; i < MAX_USER_MACROS; ++i) {
     if (my_rand(1, 5) == 5) {
       ofs << "# comment !" << std::endl;
     }
 
     ofs << std::string(my_rand(0, 10), ' ')
-    	<< "$USER" + obj2str(i) + "$"
+    	<< "$USER" + obj2str(i).toStdString() + "$"
     	<< std::string(my_rand(0, 10), ' ')
     	<< "="
     	<< std::string(my_rand(0, 10), ' ')
-    	<< "USER" + obj2str(i)
+    	<< "USER" + obj2str(i).toStdString()
     	<< std::string(my_rand(0, 10), ' ')
     	<< std::endl;
   }
   ofs.close();
 }
 
-std::map<std::string, std::string> build_configuration(std::string const& mainconf, std::string const& resource) {
-  std::map<std::string, std::string> var;
+std::map<QString, QString> build_configuration(QString const& mainconf, QString const& resource) {
+  std::map<QString, QString> var;
 
-  std::string date_format[] = { "us", "euro", "iso8601", "strict-iso8601" };
-  std::string log_rotation[] = { "n", "h", "d", "w", "m" };
-  std::string check_delay[] = { "n", "d", "s", "" };
+  QString date_format[] = { "us", "euro", "iso8601", "strict-iso8601" };
+  QString log_rotation[] = { "n", "h", "d", "w", "m" };
+  QString check_delay[] = { "n", "d", "s", "" };
 
   int cmd_check_interval = my_rand(-1, 10000);
   cmd_check_interval = (cmd_check_interval == 0 ? -1 : cmd_check_interval);
 
-  std::string scd = check_delay[my_rand(0, 3)];
+  QString scd = check_delay[my_rand(0, 3)];
   if (scd == "")
     scd = obj2str(my_rand(0.1f, 10000.0f));
 
-  std::string hcd = check_delay[my_rand(0, 3)];
+  QString hcd = check_delay[my_rand(0, 3)];
   if (hcd == "")
     hcd = obj2str(my_rand(0.1f, 10000.0f));
 
@@ -229,18 +229,18 @@ std::map<std::string, std::string> build_configuration(std::string const& mainco
   var["nagios_group"] = "nagios";
   var["allow_empty_hostgroup_assignment"] = obj2str(my_rand(0, 1));
 
-  std::ofstream ofs(mainconf.c_str());
-  for (std::map<std::string, std::string>::const_iterator it = var.begin(), end = var.end();
+  std::ofstream ofs(mainconf.toStdString().c_str());
+  for (std::map<QString, QString>::const_iterator it = var.begin(), end = var.end();
        it != end; ++it) {
     if (my_rand(1, 5) == 5) {
       ofs << "# comment !" << std::endl;
     }
     ofs << std::string(my_rand(0, 10), ' ')
-	<< it->first
+	<< it->first.toStdString()
 	<< std::string(my_rand(0, 10), ' ')
 	<< "="
 	<< std::string(my_rand(0, 10), ' ')
-	<< it->second
+	<< it->second.toStdString()
 	<< std::string(my_rand(0, 10), ' ')
 	<< std::endl;
   }
@@ -251,13 +251,13 @@ std::map<std::string, std::string> build_configuration(std::string const& mainco
   return (var);
 }
 
-void test_configuration(std::string const& filename, std::map<std::string, std::string>& my_conf) {
+void test_configuration(QString const& filename, std::map<QString, QString>& my_conf) {
   configuration config;
   config.parse(filename);
 
-  std::string date_format[] = { "us", "euro", "iso8601", "strict-iso8601" };
-  std::string log_rotation[] = { "n", "h", "d", "w", "m" };
-  std::string check_delay[] = { "n", "d", "s", "" };
+  QString date_format[] = { "us", "euro", "iso8601", "strict-iso8601" };
+  QString log_rotation[] = { "n", "h", "d", "w", "m" };
+  QString check_delay[] = { "n", "d", "s", "" };
 
   if (my_conf["date_format"] != date_format[config.get_date_format()]) {
     throw (error() << "date_format: init with '" << my_conf["date_format"] << "'");
@@ -598,12 +598,12 @@ int main(void) {
   try {
     srandom(time(NULL));
 
-    std::string mainconf(tmpnam(NULL));
-    std::string resource(tmpnam(NULL));
-    std::map<std::string, std::string> my_conf = build_configuration(mainconf, resource);
+    QString mainconf(tmpnam(NULL));
+    QString resource(tmpnam(NULL));
+    std::map<QString, QString> my_conf = build_configuration(mainconf, resource);
     test_configuration(mainconf, my_conf);
-    remove(mainconf.c_str());
-    remove(resource.c_str());
+    remove(mainconf.toStdString().c_str());
+    remove(resource.toStdString().c_str());
   }
   catch (std::exception const& e) {
     std::cerr << "error: " << e.what() << std::endl;

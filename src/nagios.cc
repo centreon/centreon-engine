@@ -44,6 +44,7 @@
 #include "utils.hh"
 #include "logging.hh"
 #include "configuration.hh"
+#include "modules/loader.hh"
 #include "nagios.hh"
 
 using namespace com::centreon::scheduler;
@@ -288,8 +289,10 @@ int main(int argc, char** argv) {
   /* make sure the config file uses an absolute path */
   if (config_file[0] != '/') {
     /* save the name of the config file */
-    buffer = new char[MAX_FILENAME_LENGTH];
-    strcpy(buffer, config_file);
+    buffer = my_strdup(config_file);
+
+    delete[] config_file;
+    config_file = new char[MAX_FILENAME_LENGTH];
 
     /* get absolute path of current working directory */
     if (getcwd(config_file, MAX_FILENAME_LENGTH) == NULL) {
@@ -495,6 +498,16 @@ int main(int argc, char** argv) {
       /* initialize modules */
       neb_init_modules();
       neb_init_callback_list();
+
+      try {
+	modules::loader& loader = modules::loader::instance();
+	loader.set_directory(config.get_broker_module_directory());
+	loader.load();
+      }
+      catch (std::exception const& e) {
+	logit(NSLOG_INFO_MESSAGE, false, "Event broker module initialize failed.\n");
+	result = ERROR;
+      }
 #endif
 
       /* this must be logged after we read config data, as user may have changed location of main log file */

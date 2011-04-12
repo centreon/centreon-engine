@@ -20,12 +20,13 @@
 #ifndef CCS_ERROR_HH
 # define CCS_ERROR_HH
 
+# include <QString>
 # include <exception>
 # include <string>
 
-namespace com {
-  namespace centreon {
-    namespace scheduler {
+namespace            com {
+  namespace          centreon {
+    namespace        scheduler {
 
       /**
        *  @class error error.hh
@@ -57,6 +58,7 @@ namespace com {
 	error&       operator<<(int i) throw ();
 	error&       operator<<(unsigned int u) throw ();
 	error&       operator<<(std::string const& str) throw ();
+	error&       operator<<(QString const& str) throw ();
 	bool         is_fatal() const throw ();
 	void         set_fatal(bool fatal) throw ();
 	char const*  what() const throw ();

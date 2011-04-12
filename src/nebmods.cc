@@ -25,23 +25,16 @@
 #include "utils.hh"
 #include "logging.hh"
 #include "configuration.hh"
+#include "modules/loader.hh"
+#include "modules/handle.hh"
 #include "nebmods.hh"
 
 #ifdef USE_EVENT_BROKER
-
-/* configure script should allow user to override ltdl choice, but this will do for now... */
-
-# ifdef USE_LTDL
-#  include <ltdl.h>
-# else
-#  include <dlfcn.h>
-# endif
 
 using namespace com::centreon::scheduler;
 
 extern configuration config;
 
-nebmodule*           neb_module_list = NULL;
 nebcallback*         neb_callback_list[NEBCALLBACK_NUMITEMS];
 
 /*#define DEBUG*/
@@ -54,79 +47,50 @@ nebcallback*         neb_callback_list[NEBCALLBACK_NUMITEMS];
 
 /* initialize module routines */
 int neb_init_modules(void) {
-  /* initialize library */
-# ifdef USE_LTDL
-  if (lt_dlinit())
-    return (ERROR);
-# endif
   return (OK);
 }
 
 /* deinitialize module routines */
 int neb_deinit_modules(void) {
-  /* deinitialize library */
-# ifdef USE_LTDL
-  if (lt_dlexit())
-    return (ERROR);
-# endif
   return (OK);
 }
 
 /* add a new module to module list */
 int neb_add_module(char const* filename, char const* args, int should_be_loaded) {
-  nebmodule* new_module = NULL;
-  int x = OK;
+  (void)should_be_loaded;
 
   if (filename == NULL)
     return (ERROR);
 
-  /* allocate memory */
-  new_module = new nebmodule;
-
-  /* initialize vars */
-  new_module->filename = my_strdup(filename);
-  new_module->args = (args == NULL) ? NULL : my_strdup(args);
-  new_module->should_be_loaded = should_be_loaded;
-  new_module->is_currently_loaded = FALSE;
-  for (x = 0; x < NEBMODULE_MODINFO_NUMITEMS; x++)
-    new_module->info[x] = NULL;
-  new_module->module_handle = NULL;
-  new_module->init_func = NULL;
-  new_module->deinit_func = NULL;
-# ifdef HAVE_PTHREAD_H
-  new_module->thread_id = (pthread_t) NULL;
-# endif
-
-  /* add module to head of list */
-  new_module->next = neb_module_list;
-  neb_module_list = new_module;
-
-  log_debug_info(DEBUGL_EVENTBROKER, 0,
-                 "Added module: name='%s', args='%s', should_be_loaded='%d'\n",
-                 filename, args,
-		 should_be_loaded);
-
+  try {
+    modules::loader& loader = modules::loader::instance();
+    modules::handle module(filename, args);
+    loader.add_module(module);
+    log_debug_info(DEBUGL_EVENTBROKER, 0,
+		   "Added module: name=`%s', args=`%s'\n",
+		   filename,
+		   args);
+  }
+  catch (...) {
+    log_debug_info(DEBUGL_EVENTBROKER, 0,
+		   "Counld not add module: name=`%s', args=`%s'\n",
+		   filename,
+		   args);
+    return (ERROR);
+  }
   return (OK);
 }
 
 /* free memory allocated to module list */
 int neb_free_module_list(void) {
-  nebmodule* temp_module = NULL;
-  nebmodule* next_module = NULL;
-  int x = OK;
-
-  for (temp_module = neb_module_list; temp_module;) {
-    next_module = temp_module->next;
-    delete[] temp_module->filename;
-    delete[] temp_module->args;
-    for (x = 0; x < NEBMODULE_MODINFO_NUMITEMS; x++)
-      delete[] temp_module->info[x];
-    delete[] temp_module;
-    temp_module = next_module;
+  try {
+    modules::loader::instance().unload();
+    log_debug_info(DEBUGL_EVENTBROKER, 0, "unload all modules success.\n");
   }
-
-  neb_module_list = NULL;
-
+  catch (...) {
+    log_debug_info(DEBUGL_EVENTBROKER, 0, "unload all modules failed.\n");
+    return (ERROR);
+  }
   return (OK);
 }
 
@@ -138,244 +102,105 @@ int neb_free_module_list(void) {
 
 /* load all modules */
 int neb_load_all_modules(void) {
-  nebmodule* temp_module = NULL;
+  try {
+    modules::loader& loader = modules::loader::instance();
+    QMultiHash<QString, modules::handle>& modules = loader.get_modules();
 
-  for (temp_module = neb_module_list; temp_module != NULL; temp_module = temp_module->next)
-    neb_load_module(temp_module);
+    for (QMultiHash<QString, modules::handle>::iterator it = modules.begin(), end = modules.end();
+	 it != end;
+	 ++it) {
+      neb_load_module(&it.value());
+    }
+  }
+  catch (...) {
+    log_debug_info(DEBUGL_EVENTBROKER, 0, "Counld not load all modules\n");
+    return (ERROR);
+  }
   return (OK);
 }
 
-# ifndef PATH_MAX
-#  define PATH_MAX 4096
-# endif
 /* load a particular module */
-int neb_load_module(nebmodule* mod) {
-  int (*initfunc)(int, char*, void*);
-  int* module_version_ptr = NULL;
-  char output_file[PATH_MAX];
-  int dest_fd, result = OK;
-
-  if (mod == NULL || mod->filename == NULL)
+int neb_load_module(void* mod) {
+  if (mod == NULL)
     return (ERROR);
+
+  modules::handle* module = static_cast<modules::handle*>(mod);
 
   /* don't reopen the module */
-  if (mod->is_currently_loaded == TRUE)
+  if (module->is_loaded() == true)
     return (OK);
 
-  /* don't load modules unless they should be loaded */
-  if (mod->should_be_loaded == FALSE)
-    return (ERROR);
-
-  /**********
-	     Using dlopen() is great, but a real danger as-is.  The problem with loaded modules is that if you overwrite the original file (e.g. using 'mv'),
-	     you do not alter the inode of the original file.  Since the original file/module is memory-mapped in some fashion, Nagios will segfault the next
-	     time an event broker call is directed to one of the module's callback functions.  This is extremely problematic when it comes to upgrading NEB
-	     modules while Nagios is running.  A workaround is to (1) 'mv' the original/loaded module file to another name (on the same filesystem)
-	     and (2) copy the new module file to the location of the original one (using the original filename).  In this scenario, dlopen() will keep referencing
-	     the original file/inode for callbacks.  This is not an ideal solution.   A better one is to delete the module file once it is loaded by dlopen().
-	     This prevents other processed from unintentially overwriting the original file, which would cause Nagios to crash.  However, if we delete the file
-	     before anyone else can muck with it, things should be good.  'lsof' shows that a deleted file is still referenced by the kernel and callback
-	     functions continue to work once the module has been loaded.  Long story, but this took quite a while to figure out, as there isn't much
-	     of anything I could find on the subject other than some sketchy info on similar problems on HP-UX.  Hopefully this will save future coders some time.
-	     So... the trick is to (1) copy the module to a temp file, (2) dlopen() the temp file, and (3) immediately delete the temp file.
-  ************/
-
-  /*
-   * open a temp file for copying the module. We use my_fdcopy() so
-   * we re-use the destination file descriptor returned by mkstemp(3),
-   * which we have to close ourselves.
-   */
-  snprintf(output_file, sizeof(output_file) - 1, "%s/nebmodXXXXXX", config.get_temp_path().c_str());
-  dest_fd = mkstemp(output_file);
-  result = my_fdcopy(mod->filename, output_file, dest_fd);
-  close(dest_fd);
-  if (result == ERROR) {
-    logit(NSLOG_RUNTIME_ERROR, FALSE,
-          "Error: Failed to safely copy module '%s'. The module will not be loaded\n",
-          mod->filename);
+  try {
+    module->open();
+    logit(NSLOG_INFO_MESSAGE, false,
+	  "Event broker module `%s' initialized syccessfully.\n",
+	  module->get_filename().toStdString().c_str());
+  }
+  catch (error const& e) {
+    logit(NSLOG_RUNTIME_ERROR, false,
+	  "Error: Could not load module `%s' -> %s\n",
+	  module->get_filename().toStdString().c_str(),
+	  e.what());
     return (ERROR);
   }
-
-  /* load the module (use the temp copy we just made) */
-# ifdef USE_LTDL
-  mod->module_handle = lt_dlopen(output_file);
-# else
-  mod->module_handle = (void*)dlopen(output_file, RTLD_NOW | RTLD_GLOBAL);
-# endif
-  if (mod->module_handle == NULL) {
-
-# ifdef USE_LTDL
-    logit(NSLOG_RUNTIME_ERROR, FALSE,
-          "Error: Could not load module '%s' -> %s\n",
-	  mod->filename,
-          lt_dlerror());
-# else
-    logit(NSLOG_RUNTIME_ERROR, FALSE,
-          "Error: Could not load module '%s' -> %s\n",
-	  mod->filename,
-          dlerror());
-# endif
-
+  catch (...) {
+    logit(NSLOG_RUNTIME_ERROR, false,
+	  "Error: Could not load module `%s'\n",
+	  module->get_filename().toStdString().c_str());
     return (ERROR);
   }
-
-  /* mark the module as being loaded */
-  mod->is_currently_loaded = TRUE;
-
-  /* delete the temp copy of the module we just created and loaded */
-  /* this will prevent other processes from overwriting the file (using the same inode), which would cause Nagios to crash */
-  /* the kernel will keep the deleted file in memory until we unload it */
-  /* NOTE: This *should* be portable to most Unices, but I've only tested it on Linux */
-  if (unlink(output_file) == -1) {
-    logit(NSLOG_RUNTIME_ERROR, FALSE,
-          "Error: Could not delete temporary file '%s' used for module '%s'.  The module will be unloaded: %s\n",
-          output_file,
-	  mod->filename,
-	  strerror(errno));
-
-    neb_unload_module(mod, NEBMODULE_FORCE_UNLOAD, NEBMODULE_ERROR_API_VERSION);
-    return (ERROR);
-  }
-
-  /* find module API version */
-# ifdef USE_LTDL
-  module_version_ptr = (int*)lt_dlsym(mod->module_handle, "__neb_api_version");
-# else
-  module_version_ptr = (int*)dlsym(mod->module_handle, "__neb_api_version");
-# endif
-
-  /* check the module API version */
-  if (module_version_ptr == NULL
-      || ((*module_version_ptr) != CURRENT_NEB_API_VERSION)) {
-
-    logit(NSLOG_RUNTIME_ERROR, FALSE,
-          "Error: Module '%s' is using an old or unspecified version of the event broker API.  Module will be unloaded.\n",
-          mod->filename);
-
-    neb_unload_module(mod, NEBMODULE_FORCE_UNLOAD, NEBMODULE_ERROR_API_VERSION);
-
-    return (ERROR);
-  }
-
-  /* locate the initialization function */
-# ifdef USE_LTDL
-  mod->init_func = lt_dlsym(mod->module_handle, "nebmodule_init");
-# else
-  mod->init_func = (void*)dlsym(mod->module_handle, "nebmodule_init");
-# endif
-
-  /* if the init function could not be located, unload the module */
-  if (mod->init_func == NULL) {
-
-    logit(NSLOG_RUNTIME_ERROR, FALSE,
-          "Error: Could not locate nebmodule_init() in module '%s'.  Module will be unloaded.\n",
-          mod->filename);
-
-    neb_unload_module(mod, NEBMODULE_FORCE_UNLOAD, NEBMODULE_ERROR_NO_INIT);
-    return (ERROR);
-  }
-
-  /* run the module's init function */
-  *(void**)(&initfunc) = mod->init_func;
-  result = (*initfunc)(NEBMODULE_NORMAL_LOAD, mod->args, mod->module_handle);
-
-  /* if the init function returned an error, unload the module */
-  if (result != OK) {
-
-    logit(NSLOG_RUNTIME_ERROR, FALSE,
-          "Error: Function nebmodule_init() in module '%s' returned an error.  Module will be unloaded.\n",
-          mod->filename);
-
-    neb_unload_module(mod, NEBMODULE_FORCE_UNLOAD, NEBMODULE_ERROR_BAD_INIT);
-    return (ERROR);
-  }
-
-  logit(NSLOG_INFO_MESSAGE, FALSE,
-        "Event broker module '%s' initialized successfully.\n",
-        mod->filename);
-
-  /* locate the de-initialization function (may or may not be present) */
-# ifdef USE_LTDL
-  mod->deinit_func = lt_dlsym(mod->module_handle, "nebmodule_deinit");
-# else
-  mod->deinit_func = (void*)dlsym(mod->module_handle, "nebmodule_deinit");
-# endif
-
-  log_debug_info(DEBUGL_EVENTBROKER, 0,
-                 "Module '%s' loaded with return (code of '%d'\n",
-                 mod->filename, result);
-  if (mod->deinit_func != NULL)
-    log_debug_info(DEBUGL_EVENTBROKER, 0, "nebmodule_deinit() found\n");
   return (OK);
 }
 
 /* close (unload) all modules that are currently loaded */
 int neb_unload_all_modules(int flags, int reason) {
-  nebmodule* temp_module;
+  try {
+    modules::loader& loader = modules::loader::instance();
+    QMultiHash<QString, modules::handle>& modules = loader.get_modules();
 
-  for (temp_module = neb_module_list;
-       temp_module != NULL;
-       temp_module = temp_module->next) {
-
-    /* skip modules that are not loaded */
-    if (temp_module->is_currently_loaded == FALSE)
-      continue;
-
-    /* skip modules that do not have a valid handle */
-    if (temp_module->module_handle == NULL)
-      continue;
-
-    /* close/unload the module */
-    neb_unload_module(temp_module, flags, reason);
-  } return (OK);
+    for (QMultiHash<QString, modules::handle>::iterator it = modules.begin(), end = modules.end();
+	 it != end;
+	 ++it) {
+      neb_unload_module(&it.value(), flags, reason);
+    }
+    log_debug_info(DEBUGL_EVENTBROKER, 0, "load all modules success.\n");
+  }
+  catch (...) {
+    log_debug_info(DEBUGL_EVENTBROKER, 0, "load all modules failed.\n");
+    return (ERROR);
+  }
+  return (OK);
 }
 
 /* close (unload) a particular module */
-int neb_unload_module(nebmodule* mod, int flags, int reason) {
-  int (*deinitfunc)(int, int);
-  int result = OK;
+int neb_unload_module(void* mod, int flags, int reason) {
+  (void)flags;
+  (void)reason;
 
   if (mod == NULL)
     return (ERROR);
 
+  modules::handle* module = static_cast<modules::handle*>(mod);
+
+  if (module->is_loaded() == false)
+    return (OK);
+
   log_debug_info(DEBUGL_EVENTBROKER, 0,
-                 "Attempting to unload module '%s': flags=%d, reason=%d\n",
-                 mod->filename,
-		 flags,
-		 reason);
+                 "Attempting to unload module `%s'\n",
+                 module->get_filename().toStdString().c_str());
 
-  /* call the de-initialization function if available (and the module was initialized) */
-  if (mod->deinit_func && reason != NEBMODULE_ERROR_BAD_INIT) {
+  module->close();
 
-    *(void**)(&deinitfunc) = mod->deinit_func;
-
-    /* module can opt to not be unloaded */
-    result = (*deinitfunc) (flags, reason);
-
-    /* if module doesn't want to be unloaded, exit with error (unless its being forced) */
-    if (result != OK && !(flags & NEBMODULE_FORCE_UNLOAD))
-      return (ERROR);
-  }
   /* deregister all of the module's callbacks */
-  neb_deregister_module_callbacks(mod);
-
-  /* unload the module */
-# ifdef USE_LTDL
-  result = lt_dlclose(mod->module_handle);
-# else
-  result = dlclose(mod->module_handle);
-# endif
-
-  /* mark the module as being unloaded */
-  mod->is_currently_loaded = FALSE;
+  neb_deregister_module_callbacks(module);
 
   log_debug_info(DEBUGL_EVENTBROKER, 0,
                  "Module '%s' unloaded successfully.\n",
-		 mod->filename);
+		 module->get_filename().toStdString().c_str());
 
-  logit(NSLOG_INFO_MESSAGE, FALSE,
+  logit(NSLOG_INFO_MESSAGE, false,
         "Event broker module '%s' deinitialized successfully.\n",
-        mod->filename);
+        module->get_filename().toStdString().c_str());
 
   return (OK);
 }
@@ -388,8 +213,6 @@ int neb_unload_module(nebmodule* mod, int flags, int reason) {
 
 /* sets module information */
 int neb_set_module_info(void* handle, int type, char* data) {
-  nebmodule* temp_module = NULL;
-
   if (handle == NULL)
     return (NEBERROR_NOMODULE);
 
@@ -397,21 +220,56 @@ int neb_set_module_info(void* handle, int type, char* data) {
   if (type < 0 || type >= NEBMODULE_MODINFO_NUMITEMS)
     return (NEBERROR_MODINFOBOUNDS);
 
-  /* find the module */
-  for (temp_module = neb_module_list;
-       temp_module != NULL;
-       temp_module = temp_module->next) {
-    if ((void*)temp_module->module_handle == (void*)handle)
+  try {
+    modules::handle* module = static_cast<modules::handle*>(handle);
+    modules::loader& loader = modules::loader::instance();
+    QMultiHash<QString, modules::handle> const& modules = loader.get_modules();
+
+    /* find the module */
+    if (modules.find(module->get_filename(), *module) == modules.end()) {
+      log_debug_info(DEBUGL_EVENTBROKER, 0,
+		     "set module info failed: filename=%s, type=`%d'\n",
+		     module->get_filename().toStdString().c_str(),
+		     type);
+      return (NEBERROR_BADMODULEHANDLE);
+    }
+
+    switch (type) {
+    case NEBMODULE_MODINFO_TITLE:
+      module->set_name(data);
       break;
+
+    case NEBMODULE_MODINFO_AUTHOR:
+      module->set_author(data);
+      break;
+
+    case NEBMODULE_MODINFO_COPYRIGHT:
+      module->set_copyright(data);
+      break;
+
+    case NEBMODULE_MODINFO_VERSION:
+      module->set_version(data);
+      break;
+
+    case NEBMODULE_MODINFO_LICENSE:
+      module->set_license(data);
+      break;
+
+    case NEBMODULE_MODINFO_DESC:
+      module->set_description(data);
+      break;
+    }
+
+    log_debug_info(DEBUGL_EVENTBROKER, 0,
+		   "set module info success: filename=%s, type=`%d'\n",
+		   module->get_filename().toStdString().c_str(),
+		   type);
   }
-  if (temp_module == NULL)
-    return (NEBERROR_BADMODULEHANDLE);
+  catch (...) {
+    log_debug_info(DEBUGL_EVENTBROKER, 0, "Counld not set module info.\n");
+    return (ERROR);
+  }
 
-  /* free any previously allocated memory */
-  delete[] temp_module->info[type];
-
-  /* allocate memory for the new data */
-  temp_module->info[type] = my_strdup(data);
   return (OK);
 }
 
@@ -426,7 +284,6 @@ int neb_register_callback(int callback_type,
 			  void* mod_handle,
                           int priority,
 			  int (*callback_func) (int, void*)) {
-  nebmodule* temp_module = NULL;
   nebcallback* new_callback = NULL;
   nebcallback* temp_callback = NULL;
   nebcallback* last_callback = NULL;
@@ -441,15 +298,18 @@ int neb_register_callback(int callback_type,
   if (callback_type < 0 || callback_type >= NEBCALLBACK_NUMITEMS)
     return (NEBERROR_CALLBACKBOUNDS);
 
-  /* make sure module handle is valid */
-  for (temp_module = neb_module_list;
-       temp_module != NULL;
-       temp_module = temp_module->next) {
-    if ((void*)temp_module->module_handle == (void*)mod_handle)
-      break;
+  try {
+    modules::handle* module = static_cast<modules::handle*>(mod_handle);
+    modules::loader& loader = modules::loader::instance();
+    QMultiHash<QString, modules::handle> const& modules = loader.get_modules();
+
+    /* make sure module handle is valid */
+    if (modules.find(module->get_filename(), *module) == modules.end())
+      return (NEBERROR_BADMODULEHANDLE);
   }
-  if (temp_module == NULL)
+  catch (...) {
     return (NEBERROR_BADMODULEHANDLE);
+  }
 
   /* allocate memory */
   new_callback = new nebcallback;
@@ -487,7 +347,7 @@ int neb_register_callback(int callback_type,
 }
 
 /* dregisters all callback functions for a given module */
-int neb_deregister_module_callbacks(nebmodule* mod) {
+int neb_deregister_module_callbacks(void* mod) {
   nebcallback* temp_callback = NULL;
   nebcallback* next_callback = NULL;
   int callback_type = 0;
@@ -500,7 +360,7 @@ int neb_deregister_module_callbacks(nebmodule* mod) {
 	 temp_callback != NULL;
 	 temp_callback = next_callback) {
       next_callback = temp_callback->next;
-      if ((void*)temp_callback->module_handle == (void*)mod->module_handle)
+      if ((void*)temp_callback->module_handle == (void*)mod)
         neb_deregister_callback(callback_type,
 				(int (*)(int, void*))temp_callback->callback_func);
     }

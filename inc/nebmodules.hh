@@ -18,8 +18,12 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef SCHEDULER_NEBMODULES_HH
-# define SCHEDULER_NEBMODULES_HH
+#ifndef CCS_NEBMODULES_HH
+# define CCS_NEBMODULES_HH
+
+# ifdef HAVE_PTHREAD_H
+#  include <pthread.h>
+# endif // !HAVE_PTHREAD_H
 
 # ifdef __cplusplus
 extern "C" {
@@ -29,8 +33,6 @@ extern "C" {
 
 # define NEB_API_VERSION(x) int __neb_api_version = x;
 # define CURRENT_NEB_API_VERSION    3
-
-
 
 /***** MODULE INFORMATION *****/
 
@@ -42,15 +44,11 @@ extern "C" {
 # define NEBMODULE_MODINFO_LICENSE   4
 # define NEBMODULE_MODINFO_DESC      5
 
-
-
 /***** MODULE LOAD/UNLOAD OPTIONS *****/
 
 # define NEBMODULE_NORMAL_LOAD       0    /* module is being loaded normally */
 # define NEBMODULE_REQUEST_UNLOAD    0    /* request module to unload (but don't force it) */
 # define NEBMODULE_FORCE_UNLOAD      1    /* force module to unload */
-
-
 
 /***** MODULES UNLOAD REASONS *****/
 
@@ -60,37 +58,29 @@ extern "C" {
 # define NEBMODULE_ERROR_BAD_INIT    4    /* _module_init() function returned a bad code */
 # define NEBMODULE_ERROR_API_VERSION 5    /* module version is incompatible with current api */
 
-
+/***** MODULE FUNCTIONS *****/
+int neb_set_module_info(void*, int, char*);
 
 /***** MODULE STRUCTURES *****/
 
-/* NEB module structure */
-typedef struct             nebmodule_struct{
+// NEB module structure
+typedef struct nebmodule_struct {
   char*                    filename;
   char*                    args;
   char*                    info[NEBMODULE_MODINFO_NUMITEMS];
   int                      should_be_loaded;
   int                      is_currently_loaded;
-# ifdef USE_LTDL
-  lt_dlhandle              module_handle;
-  lt_ptr                   init_func;
-  lt_ptr                   deinit_func;
-# else
   void*                    module_handle;
   void*                    init_func;
   void*                    deinit_func;
-# endif /* ! USE_LTDL */
-# ifdef HAVE_PTHREAD_H
+#ifdef HAVE_PTHREAD_H
   pthread_t                thread_id;
-# endif /* !HAVE_PTHREAD_H */
+#endif // !HAVE_PTHREAD_H
   struct nebmodule_struct* next;
 }                          nebmodule;
-
-/***** MODULE FUNCTIONS *****/
-int neb_set_module_info(void*, int, char*);
 
 # ifdef __cplusplus
 }
 # endif
 
-#endif // !SCHEDULER_NEBMODULES_HH
+#endif // !CCS_NEBMODULES_HH

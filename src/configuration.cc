@@ -61,23 +61,24 @@ configuration::configuration()
 
   _mac = get_global_macros();
 
-  _lst_method["resource_file"]                               = &cpp_suck<std::string const&, &configuration::_parse_resource_file>::set_generic;;
-  _lst_method["log_file"]                                    = &cpp_suck<std::string const&, &configuration::set_log_file>::set_generic;
+  _lst_method["resource_file"]                               = &cpp_suck<QString const&, &configuration::_parse_resource_file>::set_generic;;
+  _lst_method["log_file"]                                    = &cpp_suck<QString const&, &configuration::set_log_file>::set_generic;
+  _lst_method["broker_module_directory"]                     = &cpp_suck<QString const&, &configuration::set_broker_module_directory>::set_generic;
   _lst_method["debug_level"]                                 = &cpp_suck<unsigned int, &configuration::set_debug_level>::set_generic;
   _lst_method["debug_verbosity"]                             = &cpp_suck<unsigned int, &configuration::set_debug_verbosity>::set_generic;
-  _lst_method["debug_file"]                                  = &cpp_suck<std::string const&, &configuration::set_debug_file>::set_generic;
+  _lst_method["debug_file"]                                  = &cpp_suck<QString const&, &configuration::set_debug_file>::set_generic;
   _lst_method["max_debug_file_size"]                         = &cpp_suck<unsigned long, &configuration::set_max_debug_file_size>::set_generic;
-  _lst_method["command_file"]                                = &cpp_suck<std::string const&, &configuration::set_command_file>::set_generic;
-  _lst_method["temp_file"]                                   = &cpp_suck<std::string const&, &configuration::set_temp_file>::set_generic;
-  _lst_method["temp_path"]                                   = &cpp_suck<std::string const&, &configuration::set_temp_path>::set_generic;
-  _lst_method["check_result_path"]                           = &cpp_suck<std::string const&, &configuration::set_check_result_path>::set_generic;
+  _lst_method["command_file"]                                = &cpp_suck<QString const&, &configuration::set_command_file>::set_generic;
+  _lst_method["temp_file"]                                   = &cpp_suck<QString const&, &configuration::set_temp_file>::set_generic;
+  _lst_method["temp_path"]                                   = &cpp_suck<QString const&, &configuration::set_temp_path>::set_generic;
+  _lst_method["check_result_path"]                           = &cpp_suck<QString const&, &configuration::set_check_result_path>::set_generic;
   _lst_method["max_check_result_file_age"]                   = &cpp_suck<unsigned long, &configuration::set_max_check_result_file_age>::set_generic;
-  _lst_method["global_host_event_handler"]                   = &cpp_suck<std::string const&, &configuration::set_global_host_event_handler>::set_generic;
-  _lst_method["global_service_event_handler"]                = &cpp_suck<std::string const&, &configuration::set_global_service_event_handler>::set_generic;
-  _lst_method["ocsp_command"]                                = &cpp_suck<std::string const&, &configuration::set_ocsp_command>::set_generic;
-  _lst_method["ochp_command"]                                = &cpp_suck<std::string const&, &configuration::set_ochp_command>::set_generic;
-  _lst_method["admin_email"]                                 = &cpp_suck<std::string const&, &configuration::_set_admin_email>::set_generic;
-  _lst_method["admin_pager"]                                 = &cpp_suck<std::string const&, &configuration::_set_admin_pager>::set_generic;
+  _lst_method["global_host_event_handler"]                   = &cpp_suck<QString const&, &configuration::set_global_host_event_handler>::set_generic;
+  _lst_method["global_service_event_handler"]                = &cpp_suck<QString const&, &configuration::set_global_service_event_handler>::set_generic;
+  _lst_method["ocsp_command"]                                = &cpp_suck<QString const&, &configuration::set_ocsp_command>::set_generic;
+  _lst_method["ochp_command"]                                = &cpp_suck<QString const&, &configuration::set_ochp_command>::set_generic;
+  _lst_method["admin_email"]                                 = &cpp_suck<QString const&, &configuration::_set_admin_email>::set_generic;
+  _lst_method["admin_pager"]                                 = &cpp_suck<QString const&, &configuration::_set_admin_pager>::set_generic;
   _lst_method["use_syslog"]                                  = &cpp_suck<bool, &configuration::set_use_syslog>::set_generic;
   _lst_method["log_notifications"]                           = &cpp_suck<bool, &configuration::set_log_notifications>::set_generic;
   _lst_method["log_service_retries"]                         = &cpp_suck<bool, &configuration::set_log_service_retries>::set_generic;
@@ -93,9 +94,9 @@ configuration::configuration()
   _lst_method["retention_scheduling_horizon"]                = &cpp_suck<unsigned int, &configuration::set_retention_scheduling_horizon>::set_generic;
   _lst_method["additional_freshness_latency"]                = &cpp_suck<int, &configuration::set_additional_freshness_latency>::set_generic;
   _lst_method["retained_host_attribute_mask"]                = &cpp_suck<unsigned long, &configuration::set_retained_host_attribute_mask>::set_generic;
-  _lst_method["retained_service_attribute_mask"]             = &cpp_suck<std::string const&, &configuration::_set_retained_service_attribute_mask>::set_generic;
+  _lst_method["retained_service_attribute_mask"]             = &cpp_suck<QString const&, &configuration::_set_retained_service_attribute_mask>::set_generic;
   _lst_method["retained_process_host_attribute_mask"]        = &cpp_suck<unsigned long, &configuration::set_retained_process_host_attribute_mask>::set_generic;
-  _lst_method["retained_process_service_attribute_mask"]     = &cpp_suck<std::string const&, &configuration::_set_retained_process_service_attribute_mask>::set_generic;
+  _lst_method["retained_process_service_attribute_mask"]     = &cpp_suck<QString const&, &configuration::_set_retained_process_service_attribute_mask>::set_generic;
   _lst_method["retained_contact_host_attribute_mask"]        = &cpp_suck<unsigned long, &configuration::set_retained_contact_host_attribute_mask>::set_generic;
   _lst_method["retained_contact_service_attribute_mask"]     = &cpp_suck<unsigned long, &configuration::set_retained_contact_service_attribute_mask>::set_generic;
   _lst_method["obsess_over_services"]                        = &cpp_suck<bool, &configuration::set_obsess_over_services>::set_generic;
@@ -115,19 +116,19 @@ configuration::configuration()
   _lst_method["cached_service_check_horizon"]                = &cpp_suck<unsigned long, &configuration::set_cached_service_check_horizon>::set_generic;
   _lst_method["enable_predictive_service_dependency_checks"] = &cpp_suck<bool, &configuration::set_enable_predictive_service_dependency_checks>::set_generic;
   _lst_method["soft_state_dependencies"]                     = &cpp_suck<bool, &configuration::set_soft_state_dependencies>::set_generic;
-  _lst_method["log_rotation_method"]                         = &cpp_suck<std::string const&, &configuration::set_log_rotation_method>::set_generic;
-  _lst_method["log_archive_path"]                            = &cpp_suck<std::string const&, &configuration::set_log_archive_path>::set_generic;
+  _lst_method["log_rotation_method"]                         = &cpp_suck<QString const&, &configuration::set_log_rotation_method>::set_generic;
+  _lst_method["log_archive_path"]                            = &cpp_suck<QString const&, &configuration::set_log_archive_path>::set_generic;
   _lst_method["enable_event_handlers"]                       = &cpp_suck<bool, &configuration::set_enable_event_handlers>::set_generic;
   _lst_method["enable_notifications"]                        = &cpp_suck<bool, &configuration::set_enable_notifications>::set_generic;
   _lst_method["execute_service_checks"]                      = &cpp_suck<bool, &configuration::set_execute_service_checks>::set_generic;
   _lst_method["accept_passive_service_checks"]               = &cpp_suck<bool, &configuration::set_accept_passive_service_checks>::set_generic;
   _lst_method["execute_host_checks"]                         = &cpp_suck<bool, &configuration::set_execute_host_checks>::set_generic;
   _lst_method["accept_passive_host_checks"]                  = &cpp_suck<bool, &configuration::set_accept_passive_host_checks>::set_generic;
-  _lst_method["service_inter_check_delay_method"]            = &cpp_suck<std::string const&, &configuration::set_service_inter_check_delay_method>::set_generic;
+  _lst_method["service_inter_check_delay_method"]            = &cpp_suck<QString const&, &configuration::set_service_inter_check_delay_method>::set_generic;
   _lst_method["max_service_check_spread"]                    = &cpp_suck<unsigned int, &configuration::set_max_service_check_spread>::set_generic;
-  _lst_method["host_inter_check_delay_method"]               = &cpp_suck<std::string const&, &configuration::set_host_inter_check_delay_method>::set_generic;
+  _lst_method["host_inter_check_delay_method"]               = &cpp_suck<QString const&, &configuration::set_host_inter_check_delay_method>::set_generic;
   _lst_method["max_host_check_spread"]                       = &cpp_suck<unsigned int, &configuration::set_max_host_check_spread>::set_generic;
-  _lst_method["service_interleave_factor"]                   = &cpp_suck<std::string const&, &configuration::set_service_interleave_factor_method>::set_generic;
+  _lst_method["service_interleave_factor"]                   = &cpp_suck<QString const&, &configuration::set_service_interleave_factor_method>::set_generic;
   _lst_method["max_concurrent_checks"]                       = &cpp_suck<unsigned int, &configuration::set_max_concurrent_checks>::set_generic;
   _lst_method["check_result_reaper_frequency"]               = &cpp_suck<unsigned int, &configuration::set_check_reaper_interval>::set_generic;
   _lst_method["service_reaper_frequency"]                    = &cpp_suck<unsigned int, &configuration::set_check_reaper_interval>::set_generic;
@@ -135,7 +136,7 @@ configuration::configuration()
   _lst_method["sleep_time"]                                  = &cpp_suck<float, &configuration::set_sleep_time>::set_generic;
   _lst_method["interval_length"]                             = &cpp_suck<unsigned int, &configuration::set_interval_length>::set_generic;
   _lst_method["check_external_commands"]                     = &cpp_suck<bool, &configuration::set_check_external_commands>::set_generic;
-  _lst_method["command_check_interval"]                      = &cpp_suck<std::string const&, &configuration::set_command_check_interval>::set_generic;
+  _lst_method["command_check_interval"]                      = &cpp_suck<QString const&, &configuration::set_command_check_interval>::set_generic;
   _lst_method["check_for_orphaned_services"]                 = &cpp_suck<bool, &configuration::set_check_orphaned_services>::set_generic;
   _lst_method["check_for_orphaned_hosts"]                    = &cpp_suck<bool, &configuration::set_check_orphaned_hosts>::set_generic;
   _lst_method["check_service_freshness"]                     = &cpp_suck<bool, &configuration::set_check_service_freshness>::set_generic;
@@ -145,7 +146,7 @@ configuration::configuration()
   _lst_method["auto_reschedule_checks"]                      = &cpp_suck<bool, &configuration::set_auto_reschedule_checks>::set_generic;
   _lst_method["auto_rescheduling_interval"]                  = &cpp_suck<unsigned int, &configuration::set_auto_rescheduling_interval>::set_generic;
   _lst_method["auto_rescheduling_window"]                    = &cpp_suck<unsigned int, &configuration::set_auto_rescheduling_window>::set_generic;
-  _lst_method["aggregate_status_updates"]                    = &cpp_suck<std::string const&, &configuration::_set_aggregate_status_updates>::set_generic;
+  _lst_method["aggregate_status_updates"]                    = &cpp_suck<QString const&, &configuration::_set_aggregate_status_updates>::set_generic;
   _lst_method["status_update_interval"]                      = &cpp_suck<unsigned int, &configuration::set_status_update_interval>::set_generic;
   _lst_method["time_change_threshold"]                       = &cpp_suck<unsigned int, &configuration::set_time_change_threshold>::set_generic;
   _lst_method["process_performance_data"]                    = &cpp_suck<bool, &configuration::set_process_performance_data>::set_generic;
@@ -155,13 +156,13 @@ configuration::configuration()
   _lst_method["high_service_flap_threshold"]                 = &cpp_suck<float, &configuration::set_high_service_flap_threshold>::set_generic;
   _lst_method["low_host_flap_threshold"]                     = &cpp_suck<float, &configuration::set_low_host_flap_threshold>::set_generic;
   _lst_method["high_host_flap_threshold"]                    = &cpp_suck<float, &configuration::set_high_host_flap_threshold>::set_generic;
-  _lst_method["date_format"]                                 = &cpp_suck<std::string const&, &configuration::set_date_format>::set_generic;
-  _lst_method["use_timezone"]                                = &cpp_suck<std::string const&, &configuration::set_use_timezone>::set_generic;
-  _lst_method["p1_file"]                                     = &cpp_suck<std::string const&, &configuration::set_p1_file>::set_generic;
-  _lst_method["event_broker_options"]                        = &cpp_suck<std::string const&, &configuration::set_event_broker_options>::set_generic;
-  _lst_method["illegal_object_name_chars"]                   = &cpp_suck<std::string const&, &configuration::set_illegal_object_chars>::set_generic;
-  _lst_method["illegal_macro_output_chars"]                  = &cpp_suck<std::string const&, &configuration::set_illegal_output_chars>::set_generic;
-  _lst_method["broker_module"]                               = &cpp_suck<std::string const&, &configuration::_set_broker_module>::set_generic;
+  _lst_method["date_format"]                                 = &cpp_suck<QString const&, &configuration::set_date_format>::set_generic;
+  _lst_method["use_timezone"]                                = &cpp_suck<QString const&, &configuration::set_use_timezone>::set_generic;
+  _lst_method["p1_file"]                                     = &cpp_suck<QString const&, &configuration::set_p1_file>::set_generic;
+  _lst_method["event_broker_options"]                        = &cpp_suck<QString const&, &configuration::set_event_broker_options>::set_generic;
+  _lst_method["illegal_object_name_chars"]                   = &cpp_suck<QString const&, &configuration::set_illegal_object_chars>::set_generic;
+  _lst_method["illegal_macro_output_chars"]                  = &cpp_suck<QString const&, &configuration::set_illegal_output_chars>::set_generic;
+  _lst_method["broker_module"]                               = &cpp_suck<QString const&, &configuration::_set_broker_module>::set_generic;
   _lst_method["use_regexp_matching"]                         = &cpp_suck<bool, &configuration::set_use_regexp_matches>::set_generic;
   _lst_method["use_true_regexp_matching"]                    = &cpp_suck<bool, &configuration::set_use_true_regexp_matching>::set_generic;
   _lst_method["use_large_installation_tweaks"]               = &cpp_suck<bool, &configuration::set_use_large_installation_tweaks>::set_generic;
@@ -171,17 +172,17 @@ configuration::configuration()
   _lst_method["enable_embedded_perl"]                        = &cpp_suck<bool, &configuration::set_enable_embedded_perl>::set_generic;
   _lst_method["use_embedded_perl_implicitly"]                = &cpp_suck<bool, &configuration::set_use_embedded_perl_implicitly>::set_generic;
   _lst_method["external_command_buffer_slots"]               = &cpp_suck<int, &configuration::set_external_command_buffer_slots>::set_generic;
-  _lst_method["auth_file"]                                   = &cpp_suck<std::string const&, &configuration::_set_auth_file>::set_generic;
-  _lst_method["bare_update_check"]                           = &cpp_suck<std::string const&, &configuration::_set_bare_update_check>::set_generic;
-  _lst_method["check_for_updates"]                           = &cpp_suck<std::string const&, &configuration::_set_check_for_updates>::set_generic;
-  _lst_method["comment_file"]                                = &cpp_suck<std::string const&, &configuration::_set_comment_file>::set_generic;
-  _lst_method["xcddefault_comment_file"]                     = &cpp_suck<std::string const&, &configuration::_set_comment_file>::set_generic;
-  _lst_method["daemon_dumps_core"]                           = &cpp_suck<std::string const&, &configuration::_set_daemon_dumps_core>::set_generic;
-  _lst_method["downtime_file"]                               = &cpp_suck<std::string const&, &configuration::_set_downtime_file>::set_generic;
-  _lst_method["xdddefault_downtime_file"]                    = &cpp_suck<std::string const&, &configuration::_set_downtime_file>::set_generic;
-  _lst_method["lock_file"]                                   = &cpp_suck<std::string const&, &configuration::_set_lock_file>::set_generic;
-  _lst_method["nagios_user"]                                 = &cpp_suck<std::string const&, &configuration::_set_nagios_user>::set_generic;
-  _lst_method["nagios_group"]                                = &cpp_suck<std::string const&, &configuration::_set_nagios_group>::set_generic;
+  _lst_method["auth_file"]                                   = &cpp_suck<QString const&, &configuration::_set_auth_file>::set_generic;
+  _lst_method["bare_update_check"]                           = &cpp_suck<QString const&, &configuration::_set_bare_update_check>::set_generic;
+  _lst_method["check_for_updates"]                           = &cpp_suck<QString const&, &configuration::_set_check_for_updates>::set_generic;
+  _lst_method["comment_file"]                                = &cpp_suck<QString const&, &configuration::_set_comment_file>::set_generic;
+  _lst_method["xcddefault_comment_file"]                     = &cpp_suck<QString const&, &configuration::_set_comment_file>::set_generic;
+  _lst_method["daemon_dumps_core"]                           = &cpp_suck<QString const&, &configuration::_set_daemon_dumps_core>::set_generic;
+  _lst_method["downtime_file"]                               = &cpp_suck<QString const&, &configuration::_set_downtime_file>::set_generic;
+  _lst_method["xdddefault_downtime_file"]                    = &cpp_suck<QString const&, &configuration::_set_downtime_file>::set_generic;
+  _lst_method["lock_file"]                                   = &cpp_suck<QString const&, &configuration::_set_lock_file>::set_generic;
+  _lst_method["nagios_user"]                                 = &cpp_suck<QString const&, &configuration::_set_nagios_user>::set_generic;
+  _lst_method["nagios_group"]                                = &cpp_suck<QString const&, &configuration::_set_nagios_group>::set_generic;
   _lst_method["allow_empty_hostgroup_assignment"]            = &cpp_suck<bool, &configuration::set_allow_empty_hostgroup_assignment>::set_generic;
 
   _lst_method["status_file"]                                 = NULL; // ignore external variables
@@ -269,10 +270,10 @@ void configuration::reset() {
  *
  *  @param[in] filename configuration file
  */
-void configuration::parse(std::string const& filename)
+void configuration::parse(QString const& filename)
 {
   std::ifstream ifs;
-  ifs.open(filename.c_str());
+  ifs.open(filename.toStdString().c_str());
   if (ifs.fail()) {
     throw (error() << "cannot open configuration file: `" << filename << "'");
   }
@@ -291,20 +292,20 @@ void configuration::parse(std::string const& filename)
       	       << _filename << "'");
       }
       std::string key = line.substr(0, pos);
-      methods::const_iterator it = _lst_method.find(_trim(key));
+      methods::const_iterator it = _lst_method.find(_trim(key).c_str());
       if (it != _lst_method.end()) {
       	if (it->second != NULL) {
       	  std::string value = line.substr(pos + 1);
 	  try {
-	    it->second(_trim(value), *this);
+	    it->second(_trim(value).c_str(), *this);
 	  }
 	  catch (error const& e) {
 	    throw (error() << "[" << _filename << ":" << _cur_line << "] " << e.what());
 	  }
       	}
       }
-      else if (!key.compare(0, 13, "host_perfdata") ||
-      	       !key.compare(0, 16, "service_perfdata")) {
+      else if (!key.compare(0, 13, "host_perfdata")
+      	       || !key.compare(0, 16, "service_perfdata")) {
       	continue;
       }
       else {
@@ -318,8 +319,8 @@ void configuration::parse(std::string const& filename)
     throw (error() << "log_file is not specified anywhere in `" << _filename << "'");
   }
 
-  if (!get_use_timezone().empty()) {
-    set_environment_var("TZ", get_use_timezone().c_str(), 1);
+  if (!get_use_timezone().isEmpty()) {
+    set_environment_var("TZ", get_use_timezone().toStdString().c_str(), 1);
   }
   tzset();
 
@@ -332,7 +333,7 @@ void configuration::parse(std::string const& filename)
   }
 
   delete[] _mac->x[MACRO_MAINCONFIGFILE];
-  _mac->x[MACRO_MAINCONFIGFILE] = my_strdup(_filename.c_str());
+  _mac->x[MACRO_MAINCONFIGFILE] = my_strdup(_filename.toStdString().c_str());
 
   // check path
   set_temp_path(get_temp_path());
@@ -344,15 +345,23 @@ void configuration::parse(std::string const& filename)
  *  Get the logging filename.
  *  @return The logging filename.
  */
-std::string const& configuration::get_log_file() const throw() {
+QString const& configuration::get_log_file() const throw() {
   return (_tab_string[log_file]);
+}
+
+/**
+ *  Get the broker_module directory.
+ *  @return The broker_module directory.
+ */
+QString const& configuration::get_broker_module_directory() const throw() {
+  return (_tab_string[broker_module_directory]);
 }
 
 /**
  *  Get the debug filename.
  *  @return The debug filename.
  */
-std::string const& configuration::get_debug_file() const throw() {
+QString const& configuration::get_debug_file() const throw() {
   return (_tab_string[debug_file]);
 }
 
@@ -360,7 +369,7 @@ std::string const& configuration::get_debug_file() const throw() {
  *  Get the command filename.
  *  @return The command filename.
  */
-std::string const& configuration::get_command_file() const throw() {
+QString const& configuration::get_command_file() const throw() {
   return (_tab_string[command_file]);
 }
 
@@ -368,7 +377,7 @@ std::string const& configuration::get_command_file() const throw() {
  *  Get the temporary filename.
  *  @return The temporary filename.
  */
-std::string const& configuration::get_temp_file() const throw() {
+QString const& configuration::get_temp_file() const throw() {
   return (_tab_string[temp_file]);
 }
 
@@ -376,7 +385,7 @@ std::string const& configuration::get_temp_file() const throw() {
  *  Get the temporary path.
  *  @return The temporary path.
  */
-std::string const& configuration::get_temp_path() const throw() {
+QString const& configuration::get_temp_path() const throw() {
   return (_tab_string[temp_path]);
 }
 
@@ -384,7 +393,7 @@ std::string const& configuration::get_temp_path() const throw() {
  *  Get The Check result path.
  *  @return the check result path.
  */
-std::string const& configuration::get_check_result_path() const throw() {
+QString const& configuration::get_check_result_path() const throw() {
   return (_tab_string[check_result_path]);
 }
 
@@ -392,7 +401,7 @@ std::string const& configuration::get_check_result_path() const throw() {
  *  Get the global host event handler.
  *  @return The global host event handler.
  */
-std::string const& configuration::get_global_host_event_handler() const throw() {
+QString const& configuration::get_global_host_event_handler() const throw() {
   return (_tab_string[global_host_event_handler]);
 }
 
@@ -400,7 +409,7 @@ std::string const& configuration::get_global_host_event_handler() const throw() 
  *  Get the global service event handler.
  *  @return The global service event handler.
  */
-std::string const& configuration::get_global_service_event_handler() const throw() {
+QString const& configuration::get_global_service_event_handler() const throw() {
   return (_tab_string[global_service_event_handler]);
 }
 
@@ -408,7 +417,7 @@ std::string const& configuration::get_global_service_event_handler() const throw
  *  Get the ocsp command.
  *  @return The ocsp command.
  */
-std::string const& configuration::get_ocsp_command() const throw() {
+QString const& configuration::get_ocsp_command() const throw() {
   return (_tab_string[ocsp_command]);
 }
 
@@ -416,7 +425,7 @@ std::string const& configuration::get_ocsp_command() const throw() {
  *  Get the ochp command.
  *  @return The ochp command.
  */
-std::string const& configuration::get_ochp_command() const throw() {
+QString const& configuration::get_ochp_command() const throw() {
   return (_tab_string[ochp_command]);
 }
 
@@ -424,7 +433,7 @@ std::string const& configuration::get_ochp_command() const throw() {
  *  Get the logging archive path.
  *  @return The logging archive path.
  */
-std::string const& configuration::get_log_archive_path() const throw() {
+QString const& configuration::get_log_archive_path() const throw() {
   return (_tab_string[log_archive_path]);
 }
 
@@ -432,7 +441,7 @@ std::string const& configuration::get_log_archive_path() const throw() {
  *  Get the p1 filename.
  *  @return The p1 filename.
  */
-std::string const& configuration::get_p1_file() const throw() {
+QString const& configuration::get_p1_file() const throw() {
   return (_tab_string[p1_file]);
 }
 
@@ -440,7 +449,7 @@ std::string const& configuration::get_p1_file() const throw() {
  *  Get the illegal object characters.
  *  @return The illegal object characters.
  */
-std::string const& configuration::get_illegal_object_chars() const throw() {
+QString const& configuration::get_illegal_object_chars() const throw() {
   return (_tab_string[illegal_object_chars]);
 }
 
@@ -448,7 +457,7 @@ std::string const& configuration::get_illegal_object_chars() const throw() {
  *  Get the illegal output characters.
  *  @return The illegal output characters.
  */
-std::string const& configuration::get_illegal_output_chars() const throw() {
+QString const& configuration::get_illegal_output_chars() const throw() {
   return (_tab_string[illegal_output_chars]);
 }
 
@@ -456,7 +465,7 @@ std::string const& configuration::get_illegal_output_chars() const throw() {
  *  Get the use timezone.
  *  @return The use timezone.
  */
-std::string const& configuration::get_use_timezone() const throw() {
+QString const& configuration::get_use_timezone() const throw() {
   return (_tab_string[use_timezone]);
 }
 
@@ -1168,22 +1177,34 @@ configuration::e_interleave_factor configuration::get_service_interleave_factor_
  *  Set the logging filename.
  *  @param[in] value The filename.
  */
-void configuration::set_log_file(std::string const& value) {
-  if (pathconf(value.c_str(), _PC_PATH_MAX) == -1) {
+void configuration::set_log_file(QString const& value) {
+  if (pathconf(value.toStdString().c_str(), _PC_PATH_MAX) == -1) {
     throw (error() << "log_file: invalid value");
   }
   _tab_string[log_file] = value;
 
   delete[] _mac->x[MACRO_LOGFILE];
-  _mac->x[MACRO_LOGFILE] = my_strdup(value.c_str());
+  _mac->x[MACRO_LOGFILE] = my_strdup(value.toStdString().c_str());
 }
+
+/**
+ *  Set the broker module directory.
+ *  @param[in] value The broker module directory.
+ */
+void configuration::set_broker_module_directory(QString const& value) {
+  if (pathconf(value.toStdString().c_str(), _PC_PATH_MAX) == -1) {
+    throw (error() << "broker_module_directory: invalid value");
+  }
+  _tab_string[broker_module_directory] = value;
+}
+
 
 /**
  *  Set the debug filename.
  *  @param[in] value The filename
  */
-void configuration::set_debug_file(std::string const& value) {
-  if (pathconf(value.c_str(), _PC_PATH_MAX) == -1) {
+void configuration::set_debug_file(QString const& value) {
+  if (pathconf(value.toStdString().c_str(), _PC_PATH_MAX) == -1) {
     throw (error() << "debuf_file: invalid value");
   }
   _tab_string[debug_file] = value;
@@ -1193,54 +1214,54 @@ void configuration::set_debug_file(std::string const& value) {
  *  Set the command filename.
  *  @param[in] value The filename.
  */
-void configuration::set_command_file(std::string const& value) {
-  if (pathconf(value.c_str(), _PC_PATH_MAX) == -1) {
+void configuration::set_command_file(QString const& value) {
+  if (pathconf(value.toStdString().c_str(), _PC_PATH_MAX) == -1) {
     throw (error() << "command_file: invalid value");
   }
   _tab_string[command_file] = value;
 
   delete[] _mac->x[MACRO_COMMANDFILE];
-  _mac->x[MACRO_COMMANDFILE] = my_strdup(value.c_str());
+  _mac->x[MACRO_COMMANDFILE] = my_strdup(value.toStdString().c_str());
 }
 
 /**
  *  Set the temporary filename.
  *  @param[in] value The filename.
  */
-void configuration::set_temp_file(std::string const& value) {
-  if (pathconf(value.c_str(), _PC_PATH_MAX) == -1) {
+void configuration::set_temp_file(QString const& value) {
+  if (pathconf(value.toStdString().c_str(), _PC_PATH_MAX) == -1) {
     throw (error() << "temp_file: invalid value");
   }
   _tab_string[temp_file] = value;
 
   delete[] _mac->x[MACRO_TEMPFILE];
-  _mac->x[MACRO_TEMPFILE] = my_strdup(value.c_str());
+  _mac->x[MACRO_TEMPFILE] = my_strdup(value.toStdString().c_str());
 }
 
 /**
  *  Set the temporary path.
  *  @param[in] value The path.
  */
-void configuration::set_temp_path(std::string const& value) {
+void configuration::set_temp_path(QString const& value) {
   struct stat stat_info;
-  if (stat(value.c_str(), &stat_info) == -1 ||
-      !S_ISDIR(stat_info.st_mode)) {
+  if (stat(value.toStdString().c_str(), &stat_info) == -1
+      || !S_ISDIR(stat_info.st_mode)) {
     throw (error() << "temp_path: invalid value");
   }
   _tab_string[temp_path] = value;
 
   delete[] _mac->x[MACRO_TEMPPATH];
-  _mac->x[MACRO_TEMPPATH] = my_strdup(value.c_str());
+  _mac->x[MACRO_TEMPPATH] = my_strdup(value.toStdString().c_str());
 }
 
 /**
  *  Set the check result path.
  *  @param[in] value The path.
  */
-void configuration::set_check_result_path(std::string const& value) {
+void configuration::set_check_result_path(QString const& value) {
   struct stat stat_info;
-  if (stat(value.c_str(), &stat_info) == -1 ||
-      !S_ISDIR(stat_info.st_mode)) {
+  if (stat(value.toStdString().c_str(), &stat_info) == -1
+      || !S_ISDIR(stat_info.st_mode)) {
     throw (error() << "check_result_path: invalid value");
   }
   _tab_string[check_result_path] = value;
@@ -1250,7 +1271,7 @@ void configuration::set_check_result_path(std::string const& value) {
  *  Set the global host event handler.
  *  @param[in] value The event handler.
  */
-void configuration::set_global_host_event_handler(std::string const& value) {
+void configuration::set_global_host_event_handler(QString const& value) {
   _tab_string[global_host_event_handler] = value;
 }
 
@@ -1258,7 +1279,7 @@ void configuration::set_global_host_event_handler(std::string const& value) {
  *  Set the service event handler.
  *  @param[in] value The event handler.
  */
-void configuration::set_global_service_event_handler(std::string const& value) {
+void configuration::set_global_service_event_handler(QString const& value) {
   _tab_string[global_service_event_handler] = value;
 }
 
@@ -1266,7 +1287,7 @@ void configuration::set_global_service_event_handler(std::string const& value) {
  *  Set the ocsp command.
  *  @param[in] value The command.
  */
-void configuration::set_ocsp_command(std::string const& value) {
+void configuration::set_ocsp_command(QString const& value) {
   _tab_string[ocsp_command] = value;
 }
 
@@ -1274,7 +1295,7 @@ void configuration::set_ocsp_command(std::string const& value) {
  *  Set the ochp command.
  *  @param[in] value The command.
  */
-void configuration::set_ochp_command(std::string const& value) {
+void configuration::set_ochp_command(QString const& value) {
   _tab_string[ochp_command] = value;
 }
 
@@ -1282,10 +1303,10 @@ void configuration::set_ochp_command(std::string const& value) {
  *  Set the logging archive path.
  *  @param[in] value The path.
  */
-void configuration::set_log_archive_path(std::string const& value) {
+void configuration::set_log_archive_path(QString const& value) {
   struct stat stat_info;
-  if (stat(value.c_str(), &stat_info) == -1 ||
-      !S_ISDIR(stat_info.st_mode)) {
+  if (stat(value.toStdString().c_str(), &stat_info) == -1
+      || !S_ISDIR(stat_info.st_mode)) {
     throw (error() << "log_archive_path: invalid value");
   }
   _tab_string[log_archive_path] = value;
@@ -1295,8 +1316,8 @@ void configuration::set_log_archive_path(std::string const& value) {
  *  Set the p1 filename.
  *  @param[in] value The filename.
  */
-void configuration::set_p1_file(std::string const& value) {
-  if (pathconf(value.c_str(), _PC_PATH_MAX) == -1) {
+void configuration::set_p1_file(QString const& value) {
+  if (pathconf(value.toStdString().c_str(), _PC_PATH_MAX) == -1) {
     throw (error() << "p1_file: invalid value");
   }
   _tab_string[p1_file] = value;
@@ -1306,7 +1327,7 @@ void configuration::set_p1_file(std::string const& value) {
  *  Set the illegal object characters.
  *  @param[in] value The illegal object characters.
  */
-void configuration::set_illegal_object_chars(std::string const& value) {
+void configuration::set_illegal_object_chars(QString const& value) {
   _tab_string[illegal_object_chars] = value;
 }
 
@@ -1314,7 +1335,7 @@ void configuration::set_illegal_object_chars(std::string const& value) {
  *  Set the illegal output characters.
  *  @param[in] value The illegal output characters.
  */
-void configuration::set_illegal_output_chars(std::string const& value) {
+void configuration::set_illegal_output_chars(QString const& value) {
   _tab_string[illegal_output_chars] = value;
 }
 
@@ -1322,7 +1343,7 @@ void configuration::set_illegal_output_chars(std::string const& value) {
  *  Set the use timezone.
  *  @param[in] value The timezone.
  */
-void configuration::set_use_timezone(std::string const& value) {
+void configuration::set_use_timezone(QString const& value) {
   _tab_string[use_timezone] = value;
 }
 
@@ -1356,8 +1377,8 @@ void configuration::set_debug_verbosity(unsigned int value) {
  */
 void configuration::set_command_check_interval(int value) {
   _tab_int[command_check_interval] = value;
-  if (_tab_int[command_check_interval] < -1 ||
-      _tab_int[command_check_interval] == 0) {
+  if (_tab_int[command_check_interval] < -1
+      || _tab_int[command_check_interval] == 0) {
     throw (error() << "command_check_interval: invalid value");
   }
 
@@ -1372,9 +1393,9 @@ void configuration::set_command_check_interval(int value) {
  *  Set the command check interval.
  *  @param[in] value The check interval.
  */
-void configuration::set_command_check_interval(std::string const& value) {
-  size_t pos = value.find('s');
-  std::string val = value;
+void configuration::set_command_check_interval(QString const& value) {
+  size_t pos = value.toStdString().find('s');
+  std::string val = value.toStdString();
 
   if (pos == std::string::npos) {
     _command_check_interval_is_seconds = false;
@@ -1384,7 +1405,7 @@ void configuration::set_command_check_interval(std::string const& value) {
     val.erase(val.begin() + pos);
   }
 
-  cpp_suck<int, &configuration::set_command_check_interval>::set_generic(val, *this);
+  cpp_suck<int, &configuration::set_command_check_interval>::set_generic(val.c_str(), *this);
 }
 
 /**
@@ -1705,7 +1726,7 @@ void configuration::set_event_broker_options(unsigned long value) {
  *  Set the event broker options.
  *  @param[in] value The options.
  */
-void configuration::set_event_broker_options(std::string const& value) {
+void configuration::set_event_broker_options(QString const& value) {
   if (value == "-1") {
     _tab_ulong[event_broker_options] = BROKER_EVERYTHING;
   }
@@ -2125,7 +2146,7 @@ void configuration::set_date_format(e_date_format value) {
  *  Set the data format.
  *  @param[in] value The date format.
  */
-void configuration::set_date_format(std::string const& value) {
+void configuration::set_date_format(QString const& value) {
   if (value == "euro") {
     _tab_uint[date_format] = euro;
   }
@@ -2152,7 +2173,7 @@ void configuration::set_log_rotation_method(e_log_rotation value) {
  *  Set the logging rotation method.
  *  @param[in] value The logging rotation method.
  */
-void configuration::set_log_rotation_method(std::string const& value) {
+void configuration::set_log_rotation_method(QString const& value) {
   if (value == "n") {
     _tab_uint[log_rotation_method] = rot_none;
   }
@@ -2185,7 +2206,7 @@ void configuration::set_service_inter_check_delay_method(e_inter_check_delay val
  *  Set the service inter check delay method.
  *  @param[in] value The service inter check delay method.
  */
-void configuration::set_service_inter_check_delay_method(std::string const& value) {
+void configuration::set_service_inter_check_delay_method(QString const& value) {
   if (value == "n") {
     _tab_uint[service_inter_check_delay_method] = icd_none;
   }
@@ -2197,8 +2218,8 @@ void configuration::set_service_inter_check_delay_method(std::string const& valu
   }
   else {
     _tab_uint[service_inter_check_delay_method] = icd_user;
-    if (_str2obj<double>(value, &scheduling_info.service_inter_check_delay) == false ||
-	scheduling_info.service_inter_check_delay <= 0.0) {
+    if (_str2obj<double>(value, &scheduling_info.service_inter_check_delay) == false
+	|| scheduling_info.service_inter_check_delay <= 0.0) {
       throw (error() << "service_inter_check_delay_method: invalid value.");
     }
   }
@@ -2216,7 +2237,7 @@ void configuration::set_host_inter_check_delay_method(e_inter_check_delay value)
  *  Set the host inter check delay method.
  *  @param[in] value The host inter check delay method.
  */
-void configuration::set_host_inter_check_delay_method(std::string const& value) {
+void configuration::set_host_inter_check_delay_method(QString const& value) {
   if (value == "n") {
     _tab_uint[host_inter_check_delay_method] = icd_none;
   }
@@ -2228,8 +2249,8 @@ void configuration::set_host_inter_check_delay_method(std::string const& value) 
   }
   else {
     _tab_uint[host_inter_check_delay_method] = icd_user;
-    if (_str2obj<double>(value, &scheduling_info.host_inter_check_delay) == false ||
-	scheduling_info.host_inter_check_delay <= 0.0) {
+    if (_str2obj<double>(value, &scheduling_info.host_inter_check_delay) == false
+	|| scheduling_info.host_inter_check_delay <= 0.0) {
       throw (error() << "host_inter_check_delay_method: invalid value.");
     }
   }
@@ -2247,14 +2268,14 @@ void configuration::set_service_interleave_factor_method(e_interleave_factor val
  *  Set the service interleave factor method.
  *  @param[in] value The service interleave factor method.
  */
-void configuration::set_service_interleave_factor_method(std::string const& value) {
+void configuration::set_service_interleave_factor_method(QString const& value) {
   if (value == "s") {
     _tab_uint[service_interleave_factor_method] = ilf_smart;
   }
   else {
     _tab_uint[service_interleave_factor_method] = ilf_user;
-    if (_str2obj<int>(value, &scheduling_info.service_interleave_factor) == false ||
-	scheduling_info.service_interleave_factor < 1) {
+    if (_str2obj<int>(value, &scheduling_info.service_interleave_factor) == false
+	|| scheduling_info.service_interleave_factor < 1) {
       scheduling_info.service_interleave_factor = 1;
     }
   }
@@ -2448,15 +2469,15 @@ void configuration::_reset() {
  *  Parse the resource file.
  *  @param[in] value The filename.
  */
-void configuration::_parse_resource_file(std::string const& value) {
+void configuration::_parse_resource_file(QString const& value) {
   std::ifstream ifs;
-  ifs.open(value.c_str());
+  ifs.open(value.toStdString().c_str());
   if (ifs.fail()) {
     throw (error() << "cannot open resource file: `" << value << "'");
   }
 
   unsigned int save_cur_line = _cur_line;
-  std::string save_filename = _filename;
+  QString save_filename = _filename;
   _filename = value;
 
   for (_cur_line = 1; !ifs.eof(); ++_cur_line) {
@@ -2474,10 +2495,10 @@ void configuration::_parse_resource_file(std::string const& value) {
     unsigned int user_index;
     if (!_trim(key).compare(0, 5, "$USER") && key[key.size() - 1] == '$') {
       key = key.substr(5, key.size() - 6);
-      if (_str2obj<unsigned int>(key, &user_index) == false ||
-	  user_index >= MAX_USER_MACROS) {
+      if (_str2obj<unsigned int>(key.c_str(), &user_index) == false
+	  || user_index >= MAX_USER_MACROS) {
 	logit(NSLOG_CONFIG_WARNING, TRUE, "Warning: [%s:%d] bad variable name `%s'",
-	      _filename.c_str(), _cur_line, key.c_str());
+	      _filename.toStdString().c_str(), _cur_line, key.c_str());
 	continue;
       }
 
@@ -2487,7 +2508,7 @@ void configuration::_parse_resource_file(std::string const& value) {
     }
     else {
       logit(NSLOG_CONFIG_WARNING, TRUE, "Warning: [%s:%d] bad variable name `%s'",
-       	    _filename.c_str(), _cur_line, key.c_str());
+       	    _filename.toStdString().c_str(), _cur_line, key.c_str());
     }
   }
 
@@ -2497,14 +2518,14 @@ void configuration::_parse_resource_file(std::string const& value) {
   ifs.close();
 
   delete[] _mac->x[MACRO_RESOURCEFILE];
-  _mac->x[MACRO_RESOURCEFILE] = my_strdup(value.c_str());
+  _mac->x[MACRO_RESOURCEFILE] = my_strdup(value.toStdString().c_str());
 }
 
 /**
  *  Set the auth filename.
  *  @param[in] value The filename.
  */
-void configuration::_set_auth_file(std::string const& value) {
+void configuration::_set_auth_file(QString const& value) {
   (void)value;
   logit(NSLOG_CONFIG_WARNING, TRUE, "Warning: auth_file variable ignored.");
 }
@@ -2513,24 +2534,24 @@ void configuration::_set_auth_file(std::string const& value) {
  *  Set the admin email macro.
  *  @param[in] value The admin email.
  */
-void configuration::_set_admin_email(std::string const& value) {
+void configuration::_set_admin_email(QString const& value) {
   delete[] _mac->x[MACRO_ADMINEMAIL];
-  _mac->x[MACRO_ADMINEMAIL] = my_strdup(value.c_str());
+  _mac->x[MACRO_ADMINEMAIL] = my_strdup(value.toStdString().c_str());
 }
 
 /**
  *  Set the admin pager macro.
  *  @param[in] value The admin pager.
  */
-void configuration::_set_admin_pager(std::string const& value) {
+void configuration::_set_admin_pager(QString const& value) {
   delete[] _mac->x[MACRO_ADMINPAGER];
-  _mac->x[MACRO_ADMINPAGER] = my_strdup(value.c_str());
+  _mac->x[MACRO_ADMINPAGER] = my_strdup(value.toStdString().c_str());
 }
 
 /**
  *  Retained sercice attribute mask ignored.
  */
-void configuration::_set_retained_service_attribute_mask(std::string const& value) {
+void configuration::_set_retained_service_attribute_mask(QString const& value) {
   (void)value;
   logit(NSLOG_CONFIG_WARNING, TRUE, "Warning: retained_service_attribute_mask variable ignored.");
 }
@@ -2538,7 +2559,7 @@ void configuration::_set_retained_service_attribute_mask(std::string const& valu
 /**
  * Retained process service attribute mask ignored.
  */
-void configuration::_set_retained_process_service_attribute_mask(std::string const& value) {
+void configuration::_set_retained_process_service_attribute_mask(QString const& value) {
   (void)value;
   logit(NSLOG_CONFIG_WARNING, TRUE, "Warning: retained_process_service_attribute_mask variable ignored.");
 }
@@ -2546,7 +2567,7 @@ void configuration::_set_retained_process_service_attribute_mask(std::string con
 /**
  *  Aggrefate status updates ignored.
  */
-void configuration::_set_aggregate_status_updates(std::string const& value) {
+void configuration::_set_aggregate_status_updates(QString const& value) {
   (void)value;
   // DEPRECATED
   logit(NSLOG_CONFIG_WARNING, TRUE, "Warning: aggregate_status_updates directive ignored.  All status file updates are now aggregated.");
@@ -2556,14 +2577,14 @@ void configuration::_set_aggregate_status_updates(std::string const& value) {
  *  Set the broker module.
  *  @param[in] value The broker module.
  */
-void configuration::_set_broker_module(std::string const& value) {
-  size_t pos = value.find_first_of(" \n");
+void configuration::_set_broker_module(QString const& value) {
+  size_t pos = value.toStdString().find_first_of(" \n");
   if (pos == std::string::npos)
     throw (error() << "broker_module: invalid value.");
 
 #ifdef USE_EVENT_BROKER
-  std::string mod = value.substr(0, pos);
-  std::string arg = value.substr(pos + 1, value.find_first_of(" \n", pos + 1) - pos);
+  std::string mod = value.toStdString().substr(0, pos);
+  std::string arg = value.toStdString().substr(pos + 1, value.toStdString().find_first_of(" \n", pos + 1) - pos);
 
   neb_add_module(mod.c_str(), arg.c_str(), TRUE);
 #endif
@@ -2572,7 +2593,7 @@ void configuration::_set_broker_module(std::string const& value) {
 /**
  *  Bare update check ignored.
  */
-void configuration::_set_bare_update_check(std::string const& value) {
+void configuration::_set_bare_update_check(QString const& value) {
   (void)value;
   logit(NSLOG_CONFIG_WARNING, TRUE, "Warning: bare_update_check variable ignored. Centreon Scheduler does not check for updates.");
 }
@@ -2580,7 +2601,7 @@ void configuration::_set_bare_update_check(std::string const& value) {
 /**
  *  Check for updates ignored.
  */
-void configuration::_set_check_for_updates(std::string const& value) {
+void configuration::_set_check_for_updates(QString const& value) {
   (void)value;
   logit(NSLOG_CONFIG_WARNING, TRUE, "Warning: check_for_updates variable ignored. Centreon Scheduler does not check for updates.");
 }
@@ -2588,7 +2609,7 @@ void configuration::_set_check_for_updates(std::string const& value) {
 /**
  * Comment file ignored.
  */
-void configuration::_set_comment_file(std::string const& value) {
+void configuration::_set_comment_file(QString const& value) {
   (void)value;
   logit(NSLOG_CONFIG_WARNING, TRUE, "Warning: comment_file variable ignored. Comments are now stored in the status and retention files.");
 }
@@ -2596,7 +2617,7 @@ void configuration::_set_comment_file(std::string const& value) {
 /**
  * Daemon dumps core ignored.
  */
-void configuration::_set_daemon_dumps_core(std::string const& value) {
+void configuration::_set_daemon_dumps_core(QString const& value) {
   (void)value;
   logit(NSLOG_CONFIG_WARNING, TRUE, "Warning: daemon_dumps_core variable ignored. Core dumping has to be handled by Centreon Scheduler user.");
 }
@@ -2604,7 +2625,7 @@ void configuration::_set_daemon_dumps_core(std::string const& value) {
 /**
  * Downtime file ignored.
  */
-void configuration::_set_downtime_file(std::string const& value) {
+void configuration::_set_downtime_file(QString const& value) {
   (void)value;
   logit(NSLOG_CONFIG_WARNING, TRUE, "Warning: downtime_file variable ignored. Downtime entries are now stored in the status and retention files.");
 }
@@ -2612,7 +2633,7 @@ void configuration::_set_downtime_file(std::string const& value) {
 /**
  * Lock file ignored.
  */
-void configuration::_set_lock_file(std::string const& value) {
+void configuration::_set_lock_file(QString const& value) {
   (void)value;
   logit(NSLOG_CONFIG_WARNING, TRUE, "Warning: lock_file variable ignored. Priviledge drop should be handled by startup script.");
 }
@@ -2620,7 +2641,7 @@ void configuration::_set_lock_file(std::string const& value) {
 /**
  * Nagios user ignored.
  */
-void configuration::_set_nagios_user(std::string const& value) {
+void configuration::_set_nagios_user(QString const& value) {
   (void)value;
   logit(NSLOG_CONFIG_WARNING, TRUE, "Warning: nagios_user varible ignored. Priviledge drop should be handled by startup script.");
 }
@@ -2628,7 +2649,7 @@ void configuration::_set_nagios_user(std::string const& value) {
 /**
  * Nagios group ignored.
  */
-void configuration::_set_nagios_group(std::string const& value) {
+void configuration::_set_nagios_group(QString const& value) {
   (void)value;
   logit(NSLOG_CONFIG_WARNING, TRUE, "Warning: nagios_group variable ignored. Priviledge drop should be handled by startup script.");
 }

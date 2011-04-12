@@ -305,6 +305,13 @@ add_definitions(-DDEFAULT_AUTH_FILE="")
 # Include Directories
 include_directories("${INCLUDE_DIR}")
 
+# Qt moc files.
+qt4_wrap_cpp(QT_MOC_FILES
+  "${INCLUDE_DIR}/modules/loader.hh"
+  "${INCLUDE_DIR}/modules/handle.hh"
+  "${INCLUDE_DIR}/modules/compatibility.hh"
+)
+
 # Library scheduler target.
 add_library("schedulerlib"
   "STATIC"
@@ -337,7 +344,11 @@ add_library("schedulerlib"
   "${SRC_DIR}/xpddefault.cc"
   "${SRC_DIR}/xrddefault.cc"
   "${SRC_DIR}/xsddefault.cc"
+  "${SRC_DIR}/modules/loader.cc"
+  "${SRC_DIR}/modules/handle.cc"
+  "${SRC_DIR}/modules/compatibility.cc"
   "${PERL_SOURCES}"
+  ${QT_MOC_FILES}
 )
 
 # Centscheduler target.
@@ -370,6 +381,9 @@ add_executable("test_configuration"
   "${TEST_DIR}/test_configuration.cc"
   "${SRC_DIR}/configuration.cc"
   "${SRC_DIR}/error.cc")
+target_link_libraries("test_configuration"
+  ${QT_LIBRARIES}
+)
 
 add_test("test_configuration_basic"
   "test_configuration"

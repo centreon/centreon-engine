@@ -5361,7 +5361,7 @@ void process_passive_checks(void) {
   old_umask = umask(new_umask);
 
   std::ostringstream oss;
-  oss << config.get_temp_path() << "/checkXXXXXX";
+  oss << config.get_temp_path().toStdString() << "/checkXXXXXX";
   checkresult_file = my_strdup(oss.str().c_str());
 
   checkresult_file_fd = mkstemp(checkresult_file);

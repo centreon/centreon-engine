@@ -223,7 +223,7 @@ int reap_check_results(void) {
   time(&reaper_start_time);
 
   /* process files in the check result queue */
-  process_check_result_queue(config.get_check_result_path().c_str());
+  process_check_result_queue(config.get_check_result_path().toStdString().c_str());
 
   /* read all check results that have come in... */
   while ((queued_check_result = read_check_result())) {
@@ -634,7 +634,7 @@ int run_async_service_check(service* svc,
   /* open a temp file for storing check output */
   old_umask = umask(new_umask);
   std::ostringstream oss;
-  oss << config.get_temp_path() << "/checkXXXXXX";
+  oss << config.get_temp_path().toStdString() << "/checkXXXXXX";
   output_file = my_strdup(oss.str().c_str());
 
   check_result_info.output_file_fd = mkstemp(output_file);
@@ -3615,7 +3615,7 @@ int run_async_host_check_3x(host* hst,
   /* open a temp file for storing check output */
   old_umask = umask(new_umask);
   std::ostringstream oss;
-  oss << config.get_temp_path() << "/checkXXXXXX";
+  oss << config.get_temp_path().toStdString() << "/checkXXXXXX";
   output_file = my_strdup(oss.str().c_str());
 
   check_result_info.output_file_fd = mkstemp(output_file);

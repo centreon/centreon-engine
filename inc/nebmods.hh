@@ -21,6 +21,7 @@
 #ifndef CCS_NEBMODS_HH
 # define CCS_NEBMODS_HH
 
+# include "modules/handle.hh"
 # include "nebmodules.hh"
 # include "nebcallbacks.hh"
 
@@ -42,9 +43,9 @@ int neb_deinit_modules(void);
 int neb_add_module(char const* filename,char const* args,int should_be_loaded);
 int neb_free_module_list(void);
 int neb_load_all_modules(void);
-int neb_load_module(nebmodule* mod);
+int neb_load_module(void* mod);
 int neb_unload_all_modules(int flags, int reason);
-int neb_unload_module(nebmodule* mod, int flags, int reason);
+int neb_unload_module(void* mod, int flags, int reason);
 
 // int neb_set_module_info(void *handle, int type, char *data);
 

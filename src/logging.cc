@@ -168,11 +168,11 @@ int write_to_log(char* buffer, unsigned long data_type, time_t* timestamp) {
   if (!(data_type & logging_options))
     return (OK);
 
-  fp = fopen(config.get_log_file().c_str(), "a+");
+  fp = fopen(config.get_log_file().toStdString().c_str(), "a+");
   if (fp == NULL) {
     if (!FALSE)
       printf("Warning: Cannot open log file '%s' for writing\n",
-             config.get_log_file().c_str());
+             config.get_log_file().toStdString().c_str());
     return (ERROR);
   }
 
@@ -433,11 +433,11 @@ int rotate_log_file(time_t rotation_time) {
 
   t = localtime_r(&rotation_time, &tm_s);
 
-  stat_result = stat(config.get_log_file().c_str(), &log_file_stat);
+  stat_result = stat(config.get_log_file().toStdString().c_str(), &log_file_stat);
 
   /* get the archived filename to use */
   std::ostringstream oss;
-  oss << config.get_log_archive_path()
+  oss << config.get_log_archive_path().toStdString()
       << (config.get_log_archive_path()[config.get_log_archive_path().size() - 1] == '/' ? "" : "/")
       << "nagios-" << std::setfill('0') << std::setw(2) << t->tm_mon + 1
       << '-' << std::setfill('0') << std::setw(2) << t->tm_mday
@@ -446,7 +446,7 @@ int rotate_log_file(time_t rotation_time) {
   log_archive = my_strdup(oss.str().c_str());
 
   /* rotate the log file */
-  rename_result = my_rename(config.get_log_file().c_str(), log_archive);
+  rename_result = my_rename(config.get_log_file().toStdString().c_str(), log_archive);
 
   if (rename_result) {
     delete[] log_archive;
@@ -467,8 +467,8 @@ int rotate_log_file(time_t rotation_time) {
   write_log_file_info(&rotation_time);
 
   if (stat_result == 0) {
-    chmod(config.get_log_file().c_str(), log_file_stat.st_mode);
-    ret = chown(config.get_log_file().c_str(), log_file_stat.st_uid, log_file_stat.st_gid);
+    chmod(config.get_log_file().toStdString().c_str(), log_file_stat.st_mode);
+    ret = chown(config.get_log_file().toStdString().c_str(), log_file_stat.st_uid, log_file_stat.st_gid);
   }
 
   /* log current host and service state */
@@ -509,7 +509,7 @@ int open_debug_log(void) {
   if (config.get_debug_level() == DEBUGL_NONE)
     return (OK);
 
-  if ((debug_file_fp = fopen(config.get_debug_file().c_str(), "a+")) == NULL)
+  if ((debug_file_fp = fopen(config.get_debug_file().toStdString().c_str(), "a+")) == NULL)
     return (ERROR);
 
   return (OK);
@@ -575,12 +575,12 @@ int log_debug_info(int level, unsigned int verbosity, char const* fmt, ...) {
     close_debug_log();
 
     /* rotate the log file */
-    std::string temp_path = config.get_debug_file() + ".old";
+    QString temp_path = config.get_debug_file() + ".old";
     /* unlink the old debug file */
-    unlink(temp_path.c_str());
+    unlink(temp_path.toStdString().c_str());
 
     /* rotate the debug file */
-    my_rename(config.get_debug_file().c_str(), temp_path.c_str());
+    my_rename(config.get_debug_file().toStdString().c_str(), temp_path.toStdString().c_str());
 
     /* open a new file */
     open_debug_log();

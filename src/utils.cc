@@ -1937,7 +1937,7 @@ int move_check_result_to_queue(char* checkresult_file) {
 
   /* create a safe temp file */
   std::ostringstream oss;
-  oss << config.get_check_result_path() << "/cXXXXXX";
+  oss << config.get_check_result_path().toStdString() << "/cXXXXXX";
   output_file = my_strdup(oss.str().c_str());
   output_file_fd = mkstemp(output_file);
 
@@ -2573,16 +2573,16 @@ int open_command_file(void) {
   umask(S_IWOTH);
 
   /* use existing FIFO if possible */
-  if (!(stat(config.get_command_file().c_str(), &st) != -1
+  if (!(stat(config.get_command_file().toStdString().c_str(), &st) != -1
 	&& (st.st_mode & S_IFIFO))) {
 
     /* create the external command file as a named pipe (FIFO) */
-    if ((result = mkfifo(config.get_command_file().c_str(),
+    if ((result = mkfifo(config.get_command_file().toStdString().c_str(),
 			 S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP)) != 0) {
 
       logit(NSLOG_RUNTIME_ERROR, TRUE,
             "Error: Could not create external command file '%s' as named pipe: (%d) -> %s.  If this file already exists and you are sure that another copy of Nagios is not running, you should delete this file.\n",
-            config.get_command_file().c_str(),
+            config.get_command_file().toStdString().c_str(),
 	    errno,
 	    strerror(errno));
       return (ERROR);
@@ -2591,7 +2591,7 @@ int open_command_file(void) {
 
   /* open the command file for reading (non-blocked) - O_TRUNC flag cannot be used due to errors on some systems */
   /* NOTE: file must be opened read-write for poll() to work */
-  if ((command_file_fd = open(config.get_command_file().c_str(), O_RDWR | O_NONBLOCK)) < 0) {
+  if ((command_file_fd = open(config.get_command_file().toStdString().c_str(), O_RDWR | O_NONBLOCK)) < 0) {
     logit(NSLOG_RUNTIME_ERROR, TRUE,
           "Error: Could not open external command file for reading via open(): (%d) -> %s\n",
           errno,
@@ -2617,7 +2617,7 @@ int open_command_file(void) {
     fclose(command_file_fp);
 
     /* delete the named pipe */
-    unlink(config.get_command_file().c_str());
+    unlink(config.get_command_file().toStdString().c_str());
 
     return (ERROR);
   }
@@ -2692,7 +2692,7 @@ int contains_illegal_object_chars(char* name) {
   for (; x >= 0; x--) {
 
     ch = (int)name[x];
-    char const* illegal_object_chars = config.get_illegal_object_chars().c_str();
+    char const* illegal_object_chars = config.get_illegal_object_chars().toStdString().c_str();
     /* illegal user-specified characters */
     if (illegal_object_chars != NULL)
       for (y = 0; illegal_object_chars[y]; y++)
@@ -2999,14 +2999,14 @@ int init_embedded_perl(char** env) {
   struct stat stat_buf;
 
   /* make sure the P1 file exists... */
-  if (stat(config.get_p1_file().c_str(), &stat_buf) != 0) {
+  if (stat(config.get_p1_file().toStdString().c_str(), &stat_buf) != 0) {
     use_embedded_perl = FALSE;
     logit(NSLOG_RUNTIME_ERROR, TRUE, "Error: p1.pl file required for embedded Perl interpreter is missing!\n");
   }
   else {
     embedding = new char* [2];
     *embedding = my_strdup("");
-    *(embedding + 1) = my_strdup(config.get_p1_file().c_str());
+    *(embedding + 1) = my_strdup(config.get_p1_file().toStdString().c_str());
 
     use_embedded_perl = TRUE;
 

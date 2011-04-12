@@ -184,6 +184,17 @@ error& error::operator<<(std::string const& str) throw () {
 }
 
 /**
+ *  Insertion operator.
+ *
+ *  @param[in] str String to concatenate to error message.
+ *
+ *  @return This object.
+ */
+error& error::operator<<(QString const& str) throw () {
+  return (operator<<(str.toStdString().c_str()));
+}
+
+/**
  *  Get the error message.
  *
  *  @return Error message.

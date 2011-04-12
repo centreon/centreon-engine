@@ -76,7 +76,7 @@ int obsessive_compulsive_service_check_processor(service* svc) {
     return (OK);
 
   /* if there is no valid command, exit */
-  if (config.get_ocsp_command().empty())
+  if (config.get_ocsp_command().isEmpty())
     return (ERROR);
 
   /* find the associated host */
@@ -91,7 +91,7 @@ int obsessive_compulsive_service_check_processor(service* svc) {
   /* get the raw command line */
   get_raw_command_line_r(&mac,
 			 ocsp_command_ptr,
-                         config.get_ocsp_command().c_str(),
+                         config.get_ocsp_command().toStdString().c_str(),
                          &raw_command, macro_options);
   if (raw_command == NULL) {
     clear_volatile_macros(&mac);
@@ -164,7 +164,7 @@ int obsessive_compulsive_host_check_processor(host* hst) {
     return (OK);
 
   /* if there is no valid command, exit */
-  if (config.get_ochp_command().empty())
+  if (config.get_ochp_command().isEmpty())
     return (ERROR);
 
   /* update macros */
@@ -174,7 +174,7 @@ int obsessive_compulsive_host_check_processor(host* hst) {
   /* get the raw command line */
   get_raw_command_line_r(&mac,
 			 ochp_command_ptr,
-                         config.get_ochp_command().c_str(),
+                         config.get_ochp_command().toStdString().c_str(),
                          &raw_command, macro_options);
   if (raw_command == NULL) {
     clear_volatile_macros(&mac);
@@ -308,7 +308,7 @@ int run_global_service_event_handler(nagios_macros* mac, service* svc) {
     return (OK);
 
   /* a global service event handler command has not been defined */
-  if (config.get_global_service_event_handler().empty())
+  if (config.get_global_service_event_handler().isEmpty())
     return (ERROR);
 
   log_debug_info(DEBUGL_EVENTHANDLERS, 1,
@@ -323,7 +323,7 @@ int run_global_service_event_handler(nagios_macros* mac, service* svc) {
   /* get the raw command line */
   get_raw_command_line_r(mac,
 			 global_service_event_handler_ptr,
-                         config.get_global_service_event_handler().c_str(),
+                         config.get_global_service_event_handler().toStdString().c_str(),
 			 &raw_command,
 			 macro_options);
   if (raw_command == NULL) {
@@ -347,7 +347,7 @@ int run_global_service_event_handler(nagios_macros* mac, service* svc) {
     std::ostringstream oss;
     oss << "GLOBAL SERVICE EVENT HANDLER: " << svc->host_name << ';'
 	<< svc->description << ";$SERVICESTATE$;$SERVICESTATETYPE$;$SERVICEATTEMPT$;"
-	<< config.get_global_service_event_handler() << std::endl;
+	<< config.get_global_service_event_handler().toStdString() << std::endl;
     raw_logentry = my_strdup(oss.str().c_str());
     process_macros_r(mac, raw_logentry, &processed_logentry, macro_options);
     logit(NSLOG_EVENT_HANDLER, FALSE, "%s", processed_logentry);
@@ -370,7 +370,7 @@ int run_global_service_event_handler(nagios_macros* mac, service* svc) {
 				    config.get_event_handler_timeout(),
 				    early_timeout,
 				    result,
-				    config.get_global_service_event_handler().c_str(),
+				    config.get_global_service_event_handler().toStdString().c_str(),
 				    processed_command,
 				    NULL,
 				    NULL);
@@ -422,7 +422,7 @@ int run_global_service_event_handler(nagios_macros* mac, service* svc) {
                        config.get_event_handler_timeout(),
                        early_timeout,
 		       result,
-                       config.get_global_service_event_handler().c_str(),
+                       config.get_global_service_event_handler().toStdString().c_str(),
 		       processed_command,
 		       command_output,
                        NULL);
@@ -685,7 +685,7 @@ int run_global_host_event_handler(nagios_macros* mac, host* hst) {
   /* get the raw command line */
   get_raw_command_line_r(mac,
 			 global_host_event_handler_ptr,
-                         config.get_global_host_event_handler().c_str(),
+                         config.get_global_host_event_handler().toStdString().c_str(),
                          &raw_command,
 			 macro_options);
   if (raw_command == NULL)
@@ -708,7 +708,7 @@ int run_global_host_event_handler(nagios_macros* mac, host* hst) {
     std::ostringstream oss;
     oss << "GLOBAL HOST EVENT HANDLER: " << hst->name
 	<< "$HOSTSTATE$;$HOSTSTATETYPE$;$HOSTATTEMPT$;"
-	<< config.get_global_host_event_handler() << std::endl;
+	<< config.get_global_host_event_handler().toStdString() << std::endl;
     raw_logentry = my_strdup(oss.str().c_str());
     process_macros_r(mac, raw_logentry, &processed_logentry, macro_options);
     logit(NSLOG_EVENT_HANDLER, FALSE, "%s", processed_logentry);
@@ -730,7 +730,7 @@ int run_global_host_event_handler(nagios_macros* mac, host* hst) {
 				    exectime,
 				    config.get_event_handler_timeout(),
 				    early_timeout, result,
-				    config.get_global_host_event_handler().c_str(),
+				    config.get_global_host_event_handler().toStdString().c_str(),
 				    processed_command,
 				    NULL,
 				    NULL);
@@ -782,7 +782,7 @@ int run_global_host_event_handler(nagios_macros* mac, host* hst) {
                        config.get_event_handler_timeout(),
                        early_timeout,
 		       result,
-                       config.get_global_host_event_handler().c_str(),
+                       config.get_global_host_event_handler().toStdString().c_str(),
                        processed_command,
 		       command_output,
 		       NULL);
