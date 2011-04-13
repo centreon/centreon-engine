@@ -21,7 +21,6 @@
 #ifndef CCS_NEBMODS_HH
 # define CCS_NEBMODS_HH
 
-# include "modules/handle.hh"
 # include "nebmodules.hh"
 # include "nebcallbacks.hh"
 

@@ -1,5 +1,5 @@
-#ifndef SCHEDULER_EPN_NAGIOS_HH
-# define SCHEDULER_EPN_NAGIOS_HH
+#ifndef CCS_EPN_NAGIOS_HH
+# define CCS_EPN_NAGIOS_HH
 
 /************************************************************************
  *
@@ -36,4 +36,4 @@ EXTERN_C void xs_init(void);
 
 /******** END EMBEDDED PERL INTERPRETER DECLARATIONS ********/
 
-#endif // !SCHEDULER_EPN_NAGIOS_HH
+#endif // !CCS_EPN_NAGIOS_HH

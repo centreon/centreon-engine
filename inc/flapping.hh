@@ -28,8 +28,8 @@ extern "C" {
 # endif
 
 // Flapping Types
-static const unsigned int HOST_FLAPPING    = 0;
-static const unsigned int SERVICE_FLAPPING = 1;
+# define HOST_FLAPPING    0
+# define SERVICE_FLAPPING 1
 
 // Flap Detection Functions
 void check_for_service_flapping(service* svc, int update, int allow_flapstart_notification);               // determines whether or not a service is "flapping" between states

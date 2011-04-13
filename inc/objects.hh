@@ -31,27 +31,27 @@ extern "C" {
 // Nagios 3 starts at 300, Nagios 4 at 400, etc.
 
 // Current Object Revision
-static const unsigned int CURRENT_OBJECT_STRUCTURE_VERSION = 307; // increment when changes are made to data structures...
+# define CURRENT_OBJECT_STRUCTURE_VERSION 307 // increment when changes are made to data structures...
 
 // Object Size Limits
-static const unsigned int MAX_STATE_HISTORY_ENTRIES        = 21; // max number of old states to keep track of for flap detection
-static const unsigned int MAX_CONTACT_ADDRESSES            = 6; // max number of custom addresses a contact can have
+# define MAX_STATE_HISTORY_ENTRIES        21   // max number of old states to keep track of for flap detection
+# define MAX_CONTACT_ADDRESSES            6    // max number of custom addresses a contact can have
 
 // Skip Lists
-static const unsigned int NUM_OBJECT_SKIPLISTS             = 12;
+# define NUM_OBJECT_SKIPLISTS             12
 
-static const unsigned int HOST_SKIPLIST                    = 0;
-static const unsigned int SERVICE_SKIPLIST                 = 1;
-static const unsigned int COMMAND_SKIPLIST                 = 2;
-static const unsigned int TIMEPERIOD_SKIPLIST              = 3;
-static const unsigned int CONTACT_SKIPLIST                 = 4;
-static const unsigned int CONTACTGROUP_SKIPLIST            = 5;
-static const unsigned int HOSTGROUP_SKIPLIST               = 6;
-static const unsigned int SERVICEGROUP_SKIPLIST            = 7;
-static const unsigned int HOSTDEPENDENCY_SKIPLIST          = 8;
-static const unsigned int SERVICEDEPENDENCY_SKIPLIST       = 9;
-static const unsigned int HOSTESCALATION_SKIPLIST          = 10;
-static const unsigned int SERVICEESCALATION_SKIPLIST       = 11;
+# define HOST_SKIPLIST                    0
+# define SERVICE_SKIPLIST                 1
+# define COMMAND_SKIPLIST                 2
+# define TIMEPERIOD_SKIPLIST              3
+# define CONTACT_SKIPLIST                 4
+# define CONTACTGROUP_SKIPLIST            5
+# define HOSTGROUP_SKIPLIST               6
+# define SERVICEGROUP_SKIPLIST            7
+# define HOSTDEPENDENCY_SKIPLIST          8
+# define SERVICEDEPENDENCY_SKIPLIST       9
+# define HOSTESCALATION_SKIPLIST          10
+# define SERVICEESCALATION_SKIPLIST       11
 
 // Data Structures
 typedef struct host_struct host;

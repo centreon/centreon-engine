@@ -129,7 +129,7 @@ void handle::open() {
   _handle = QSharedPointer<QLibrary>(new QLibrary(_filename));
   _handle->load();
   if (_handle->isLoaded() == false) {
-    throw (error() << "Cannot load library " << _handle->errorString());
+    throw (error() << _handle->errorString());
   }
 
   int* api_version = static_cast<int*>(_handle->resolve("__neb_api_version"));

@@ -29,10 +29,10 @@ extern "C" {
 # endif
 
 // Event Handler Types
-static const unsigned int HOST_EVENTHANDLER           = 0;
-static const unsigned int SERVICE_EVENTHANDLER        = 1;
-static const unsigned int GLOBAL_HOST_EVENTHANDLER    = 2;
-static const unsigned int GLOBAL_SERVICE_EVENTHANDLER = 3;
+# define HOST_EVENTHANDLER           0
+# define SERVICE_EVENTHANDLER        1
+# define GLOBAL_HOST_EVENTHANDLER    2
+# define GLOBAL_SERVICE_EVENTHANDLER 3
 
 // Event Handler Functions
 int obsessive_compulsive_service_check_processor(service* svc);         // distributed monitoring craziness...

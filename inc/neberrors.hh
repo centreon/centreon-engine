@@ -18,8 +18,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef SCHEDULER_NEBERRORS_HH
-# define SCHEDULER_NEBERRORS_HH
+#ifndef CCS_NEBERRORS_HH
+# define CCS_NEBERRORS_HH
 
 
 /***** GENERIC DEFINES *****/
@@ -46,7 +46,7 @@
 
 
 /***** MODULE ERRORS *****/
-
+# define NEBERROR_NOMEM              100     /* memory could not be allocated */
 # define NEBERROR_NOMODULE           300     /* no module was specified */
 
 
@@ -56,4 +56,4 @@
 # define NEBERROR_MODINFOBOUNDS      400     /* module info index was out of bounds */
 
 
-#endif // !SCHEDULER_NEBERRORS_HH
+#endif // !CCS_NEBERRORS_HH

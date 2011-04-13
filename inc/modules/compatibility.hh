@@ -21,7 +21,7 @@
 # define CCS_MODULES_COMPATIBILITY_HH
 
 # include <QObject>
-#include "nebmodules.hh"
+# include "nebmodules.hh"
 # include "modules/handle.hh"
 
 namespace                       com {

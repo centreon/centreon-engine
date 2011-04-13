@@ -18,8 +18,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef CSS_LOGGING_HH
-# define CSS_LOGGING_HH
+#ifndef CCS_LOGGING_HH
+# define CCS_LOGGING_HH
 
 # include <sys/time.h>
 # include "objects.hh"
@@ -29,65 +29,65 @@ extern "C" {
 # endif
 
 // State Logging Types
-static const unsigned int INITIAL_STATES             = 1;
-static const unsigned int CURRENT_STATES             = 2;
+# define INITIAL_STATES             1
+# define CURRENT_STATES             2
 
 // Logging Types
-static const unsigned int NSLOG_RUNTIME_ERROR        = 1;
-static const unsigned int NSLOG_RUNTIME_WARNING      = 2;
+# define NSLOG_RUNTIME_ERROR        1
+# define NSLOG_RUNTIME_WARNING      2
 
-static const unsigned int NSLOG_VERIFICATION_ERROR   = 4;
-static const unsigned int NSLOG_VERIFICATION_WARNING = 8;
+# define NSLOG_VERIFICATION_ERROR   4
+# define NSLOG_VERIFICATION_WARNING 8
 
-static const unsigned int NSLOG_CONFIG_ERROR         = 16;
-static const unsigned int NSLOG_CONFIG_WARNING       = 32;
+# define NSLOG_CONFIG_ERROR         16
+# define NSLOG_CONFIG_WARNING       32
 
-static const unsigned int NSLOG_PROCESS_INFO         = 64;
-static const unsigned int NSLOG_EVENT_HANDLER        = 128;
-// static const unsigned int NSLOG_NOTIFICATION       = 256; //NOT USED ANYMORE - CAN BE REUSED
-static const unsigned int NSLOG_EXTERNAL_COMMAND     = 512;
+# define NSLOG_PROCESS_INFO         64
+# define NSLOG_EVENT_HANDLER        128
+// # define NSLOG_NOTIFICATION       256 //NOT USED ANYMORE - CAN BE REUSED
+# define NSLOG_EXTERNAL_COMMAND     512
 
-static const unsigned int NSLOG_HOST_UP              = 1024;
-static const unsigned int NSLOG_HOST_DOWN            = 2048;
-static const unsigned int NSLOG_HOST_UNREACHABLE     = 4096;
+# define NSLOG_HOST_UP              1024
+# define NSLOG_HOST_DOWN            2048
+# define NSLOG_HOST_UNREACHABLE     4096
 
-static const unsigned int NSLOG_SERVICE_OK           = 8192;
-static const unsigned int NSLOG_SERVICE_UNKNOWN      = 16384;
-static const unsigned int NSLOG_SERVICE_WARNING      = 32768;
-static const unsigned int NSLOG_SERVICE_CRITICAL     = 65536;
+# define NSLOG_SERVICE_OK           8192
+# define NSLOG_SERVICE_UNKNOWN      16384
+# define NSLOG_SERVICE_WARNING      32768
+# define NSLOG_SERVICE_CRITICAL     65536
 
-static const unsigned int NSLOG_PASSIVE_CHECK        = 131072;
+# define NSLOG_PASSIVE_CHECK        131072
 
-static const unsigned int NSLOG_INFO_MESSAGE         = 262144;
+# define NSLOG_INFO_MESSAGE         262144
 
-static const unsigned int NSLOG_HOST_NOTIFICATION    = 524288;
-static const unsigned int NSLOG_SERVICE_NOTIFICATION = 1048576;
+# define NSLOG_HOST_NOTIFICATION    524288
+# define NSLOG_SERVICE_NOTIFICATION 1048576
 
 // Debugging Levels
-static const unsigned int DEBUGL_ALL                 = -1;
-static const unsigned int DEBUGL_NONE                = 0;
-static const unsigned int DEBUGL_FUNCTIONS           = 1;
-static const unsigned int DEBUGL_CONFIG              = 2;
-static const unsigned int DEBUGL_PROCESS             = 4;
-static const unsigned int DEBUGL_STATUSDATA          = 4;
-static const unsigned int DEBUGL_RETENTIONDATA       = 4;
-static const unsigned int DEBUGL_EVENTS              = 8;
-static const unsigned int DEBUGL_CHECKS              = 16;
-static const unsigned int DEBUGL_IPC                 = 16;
-static const unsigned int DEBUGL_FLAPPING            = 16;
-static const unsigned int DEBUGL_EVENTHANDLERS       = 16;
-static const unsigned int DEBUGL_PERFDATA            = 16;
-static const unsigned int DEBUGL_NOTIFICATIONS       = 32;
-static const unsigned int DEBUGL_EVENTBROKER         = 64;
-static const unsigned int DEBUGL_EXTERNALCOMMANDS    = 128;
-static const unsigned int DEBUGL_COMMANDS            = 256;
-static const unsigned int DEBUGL_DOWNTIME            = 512;
-static const unsigned int DEBUGL_COMMENTS            = 1024;
-static const unsigned int DEBUGL_MACROS              = 2048;
+# define DEBUGL_ALL                 -1
+# define DEBUGL_NONE                0
+# define DEBUGL_FUNCTIONS           1
+# define DEBUGL_CONFIG              2
+# define DEBUGL_PROCESS             4
+# define DEBUGL_STATUSDATA          4
+# define DEBUGL_RETENTIONDATA       4
+# define DEBUGL_EVENTS              8
+# define DEBUGL_CHECKS              16
+# define DEBUGL_IPC                 16
+# define DEBUGL_FLAPPING            16
+# define DEBUGL_EVENTHANDLERS       16
+# define DEBUGL_PERFDATA            16
+# define DEBUGL_NOTIFICATIONS       32
+# define DEBUGL_EVENTBROKER         64
+# define DEBUGL_EXTERNALCOMMANDS    128
+# define DEBUGL_COMMANDS            256
+# define DEBUGL_DOWNTIME            512
+# define DEBUGL_COMMENTS            1024
+# define DEBUGL_MACROS              2048
 
-static const unsigned int DEBUGV_BASIC               = 0;
-static const unsigned int DEBUGV_MORE		     = 1;
-static const unsigned int DEBUGV_MOST                = 2;
+# define DEBUGV_BASIC               0
+# define DEBUGV_MORE                1
+# define DEBUGV_MOST                2
 
 // Logging Functions
 void logit(int data_type, int display, char const* fmt, ...) __attribute__((__format__(__printf__, 3, 4)));
@@ -109,4 +109,4 @@ int close_debug_log(void);
 }
 # endif
 
-#endif // !CSS_LOGGING_HH
+#endif // !CCS_LOGGING_HH

@@ -18,8 +18,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef SCHEDULER_NEBSTRUCTS_HH
-# define SCHEDULER_NEBSTRUCTS_HH
+#ifndef CCS_NEBSTRUCTS_HH
+# define CCS_NEBSTRUCTS_HH
 
 # include "objects.hh"
 # include "nagios.hh"
@@ -242,6 +242,7 @@ typedef struct   nebstruct_program_status_struct{
 
   time_t         program_start;
   int            pid;
+  int            daemon_mode;
   time_t         last_command_check;
   time_t         last_log_rotation;
   int            notifications_enabled;
@@ -496,4 +497,4 @@ typedef struct   nebstruct_statechange_struct{
 }
 # endif
 
-#endif // !SCHEDULER_NEBSTRUCTS_HH
+#endif // !CCS_NEBSTRUCTS_HH

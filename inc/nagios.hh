@@ -20,8 +20,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef SCHEDULER_NAGIOS_HH
-# define SCHEDULER_NAGIOS_HH
+#ifndef CCS_NAGIOS_HH
+# define CCS_NAGIOS_HH
 
 # include <sys/time.h>
 # include <pthread.h>
@@ -30,31 +30,32 @@
 #  define __attribute__(x) /* nothing */
 # endif
 
-// # include "broker.hh"
-// # include "checks.hh"
-// # include "commands.hh"
-// # include "comments.hh"
-// # include "common.hh"
-// # include "config.hh"
-// # include "downtime.hh"
-// # include "events.hh"
-// # include "flapping.hh"
-// # include "locations.hh"
-// # include "logging.hh"
-// # include "macros.hh"
-// # include "neberrors.hh"
-// # include "nebmods.hh"
-// # include "nebstructs.hh"
-// # include "netutils.hh"
-// # include "notifications.hh"
-// # include "objects.hh"
-// # include "perfdata.hh"
-// # include "sehandlers.hh"
-// # include "shared.hh"
-// # include "skiplist.hh"
-// # include "sretention.hh"
-// # include "statusdata.hh"
-// # include "utils.hh"
+/*
+# include "broker.hh"
+# include "checks.hh"
+# include "commands.hh"
+# include "comments.hh"
+# include "common.hh"
+# include "config.hh"
+# include "downtime.hh"
+# include "events.hh"
+# include "flapping.hh"
+# include "logging.hh"
+# include "macros.hh"
+# include "neberrors.hh"
+# include "nebmods.hh"
+# include "nebstructs.hh"
+# include "netutils.hh"
+# include "notifications.hh"
+# include "objects.hh"
+# include "perfdata.hh"
+# include "sehandlers.hh"
+# include "shared.hh"
+# include "skiplist.hh"
+# include "sretention.hh"
+# include "statusdata.hh"
+# include "utils.hh"
+*/
 
 # ifdef __cplusplus
 extern "C" {
@@ -152,4 +153,4 @@ typedef struct check_stats_struct {
 # ifdef __cplusplus
 }
 # endif
-#endif // !SCHEDULER_NAGIOS_HH
+#endif // !CCS_NAGIOS_HH

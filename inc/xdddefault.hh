@@ -25,10 +25,10 @@
 extern "C" {
 # endif
 
-static const unsigned int XDDDEFAULT_NO_DATA      = 0;
-static const unsigned int XDDDEFAULT_INFO_DATA    = 1;
-static const unsigned int XDDDEFAULT_HOST_DATA    = 2;
-static const unsigned int XDDDEFAULT_SERVICE_DATA = 3;
+# define XDDDEFAULT_NO_DATA      0
+# define XDDDEFAULT_INFO_DATA    1
+# define XDDDEFAULT_HOST_DATA    2
+# define XDDDEFAULT_SERVICE_DATA 3
 
 int xdddefault_initialize_downtime_data(char* main_config_file);
 int xdddefault_validate_downtime_data(void);

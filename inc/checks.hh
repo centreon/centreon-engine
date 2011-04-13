@@ -29,12 +29,12 @@ extern "C" {
 # endif
 
 // Service Dependency Values
-static const unsigned int DEPENDENCIES_OK     = 0;
-static const unsigned int DEPENDENCIES_FAILED = 1;
+# define DEPENDENCIES_OK     0
+# define DEPENDENCIES_FAILED 1
 
 // Object Check Types
-static const unsigned int SERVICE_CHECK       = 0;
-static const unsigned int HOST_CHECK          = 1;
+# define SERVICE_CHECK       0
+# define HOST_CHECK          1
 
 // CHECK_RESULT structure
 typedef struct                check_result_struct {

@@ -29,21 +29,21 @@ extern "C" {
 # endif
 
 // Comment Sources
-static const unsigned int COMMENTSOURCE_INTERNAL  = 0;
-static const unsigned int COMMENTSOURCE_EXTERNAL  = 1;
+# define COMMENTSOURCE_INTERNAL  0
+# define COMMENTSOURCE_EXTERNAL  1
 
 // Comment Types
-static const unsigned int HOST_COMMENT		  = 1;
-static const unsigned int SERVICE_COMMENT	  = 2;
+# define HOST_COMMENT		 1
+# define SERVICE_COMMENT	 2
 
 // Entry Types
-static const unsigned int USER_COMMENT            = 1;
-static const unsigned int DOWNTIME_COMMENT        = 2;
-static const unsigned int FLAPPING_COMMENT        = 3;
-static const unsigned int ACKNOWLEDGEMENT_COMMENT = 4;
+# define USER_COMMENT            1
+# define DOWNTIME_COMMENT        2
+# define FLAPPING_COMMENT        3
+# define ACKNOWLEDGEMENT_COMMENT 4
 
 // Chained Hash Limits
-static const unsigned int COMMENT_HASHSLOTS       = 1024;
+# define COMMENT_HASHSLOTS       1024
 
 // COMMENT structure
 typedef struct           comment_struct {

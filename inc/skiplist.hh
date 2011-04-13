@@ -18,17 +18,17 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef CCS_SKUPLIST_HH
-# define CCS_SKUPLIST_HH
+#ifndef CCS_SKIPLIST_HH
+# define CCS_SKIPLIST_HH
 
 # ifdef __cplusplus
 extern "C" {
 # endif
 
-static const unsigned int SKIPLIST_OK              = 0;
-static const unsigned int SKIPLIST_ERROR_ARGS      = 1;
-static const unsigned int SKIPLIST_ERROR_MEMORY    = 2;
-static const unsigned int SKIPLIST_ERROR_DUPLICATE = 3;
+# define SKIPLIST_OK              0
+# define SKIPLIST_ERROR_ARGS      1
+# define SKIPLIST_ERROR_MEMORY    2
+# define SKIPLIST_ERROR_DUPLICATE 3
 
 typedef struct                skiplistnode_struct {
   void*                       data;
@@ -67,4 +67,4 @@ int skiplist_delete_node(skiplist* list, void* node_ptr);
 }
 # endif
 
-#endif // !CCS_SKUPLIST_HH
+#endif // !CCS_SKIPLIST_HH

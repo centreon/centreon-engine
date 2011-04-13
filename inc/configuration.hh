@@ -220,7 +220,6 @@ namespace com {
         void                set_external_command_buffer_slots(int value);
         void                set_max_service_check_spread(unsigned int value);
         void                set_max_host_check_spread(unsigned int value);
-        void                set_max_concurrent_checks(unsigned int value);
         void                set_max_parallel_service_checks(unsigned int value);
         void                set_check_reaper_interval(unsigned int value);
         void                set_max_check_reaper_time(unsigned int value);

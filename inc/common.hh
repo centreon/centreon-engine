@@ -19,8 +19,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef SCHEDULER_COMMON_HH
-# define SCHEDULER_COMMON_HH
+#ifndef CCS_COMMON_HH
+# define CCS_COMMON_HH
 
 # define PROGRAM_NAME "Centreon Scheduler"
 # define PROGRAM_NAME_UC "CENTREON SCHEDULER"
@@ -494,4 +494,4 @@
 # define MODATTR_CUSTOM_VARIABLE                 32768
 # define MODATTR_NOTIFICATION_TIMEPERIOD         65536
 
-#endif // !SCHEDULER_COMMON_HH
+#endif // !CCS_COMMON_HH

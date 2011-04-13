@@ -31,19 +31,19 @@ extern "C" {
 # endif
 
 // Notification Types
-static const unsigned int HOST_NOTIFICATION               = 0;
-static const unsigned int SERVICE_NOTIFICATION            = 1;
+# define HOST_NOTIFICATION               0
+# define SERVICE_NOTIFICATION            1
 
 // Notification Reason Types
-static const unsigned int NOTIFICATION_NORMAL             = 0;
-static const unsigned int NOTIFICATION_ACKNOWLEDGEMENT    = 1;
-static const unsigned int NOTIFICATION_FLAPPINGSTART      = 2;
-static const unsigned int NOTIFICATION_FLAPPINGSTOP       = 3;
-static const unsigned int NOTIFICATION_FLAPPINGDISABLED   = 4;
-static const unsigned int NOTIFICATION_DOWNTIMESTART      = 5;
-static const unsigned int NOTIFICATION_DOWNTIMEEND        = 6;
-static const unsigned int NOTIFICATION_DOWNTIMECANCELLED  = 7;
-static const unsigned int NOTIFICATION_CUSTOM             = 99;
+# define NOTIFICATION_NORMAL             0
+# define NOTIFICATION_ACKNOWLEDGEMENT    1
+# define NOTIFICATION_FLAPPINGSTART      2
+# define NOTIFICATION_FLAPPINGSTOP       3
+# define NOTIFICATION_FLAPPINGDISABLED   4
+# define NOTIFICATION_DOWNTIMESTART      5
+# define NOTIFICATION_DOWNTIMEEND        6
+# define NOTIFICATION_DOWNTIMECANCELLED  7
+# define NOTIFICATION_CUSTOM             99
 
 // NOTIFY_LIST structure
 typedef struct               notify_list_struct {

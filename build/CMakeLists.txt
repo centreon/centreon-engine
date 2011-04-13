@@ -280,9 +280,6 @@ if (DOCLEAN)
   add_definitions(-DDOCLEAN)
 endif ()
 
-#  Replace dlfcn by ltdl.
-#add_definitions(-DUSE_LTDL);
-
 #  Locations definitions
 add_definitions(-DDEFAULT_TEMP_FILE="${localstatedir}/tempfile")
 add_definitions(-DDEFAULT_TEMP_PATH="/tmp")
@@ -301,6 +298,12 @@ add_definitions(-DDEFAULT_PRECACHED_OBJECT_FILE="${localstatedir}/objects.precac
 add_definitions(-DDEFAULT_EVENT_BROKER_FILE="${localstatedir}/broker.socket")
 add_definitions(-DDEFAULT_P1_FILE="${bindir}/p1.pl")
 add_definitions(-DDEFAULT_AUTH_FILE="")
+
+# Configuration file.
+configure_file (
+  "${INCLUDE_DIR}/compatibility/locations.h.in"
+  "${INCLUDE_DIR}/compatibility/locations.h"
+  )
 
 # Include Directories
 include_directories("${INCLUDE_DIR}")

@@ -18,8 +18,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef SCHEDULER_XODTEMPLATE_HH
-# define SCHEDULER_XODTEMPLATE_HH
+#ifndef CCS_XODTEMPLATE_HH
+# define CCS_XODTEMPLATE_HH
 
 # include "common.hh"
 
@@ -965,6 +965,6 @@ int xodtemplate_skiplist_compare_serviceescalation(void *a, void *b);
 }
 # endif
 
-#endif // !SCHEDULER_XODTEMPLATE_HH
+#endif // !CCS_XODTEMPLATE_HH
 
 

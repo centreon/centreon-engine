@@ -21,9 +21,9 @@
 #ifndef CCS_NEBMODULES_HH
 # define CCS_NEBMODULES_HH
 
-# ifdef HAVE_PTHREAD_H
+# ifdef HAVE_PTHREAD_HH
 #  include <pthread.h>
-# endif // !HAVE_PTHREAD_H
+# endif // !HAVE_PTHREAD_HH
 
 # ifdef __cplusplus
 extern "C" {
@@ -73,9 +73,9 @@ typedef struct nebmodule_struct {
   void*                    module_handle;
   void*                    init_func;
   void*                    deinit_func;
-#ifdef HAVE_PTHREAD_H
+#ifdef HAVE_PTHREAD_HH
   pthread_t                thread_id;
-#endif // !HAVE_PTHREAD_H
+#endif // !HAVE_PTHREAD_HH
   struct nebmodule_struct* next;
 }                          nebmodule;
 

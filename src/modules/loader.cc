@@ -47,21 +47,22 @@ void loader::load() {
   QDir dir(_directory);
   QStringList filters("*.so");
   QFileInfoList files = dir.entryInfoList(filters);
+  QHash<QString, handle>::iterator it_module;
 
   for (QFileInfoList::const_iterator it = files.begin(), end = files.end(); it != end; ++it) {
     QString config_file(it->baseName() + ".cfg");
     if (dir.exists(config_file) == false)
       config_file = "";
-
     try {
       handle module(it->fileName(), config_file);
-      module.open();
-      add_module(module);
+      it_module = _modules.insert(module.get_filename(), module);
+      it_module->open();
       logit(NSLOG_INFO_MESSAGE, false,
 	    "Event broker module `%s' initialized syccessfully.\n",
 	    it->fileName().toStdString().c_str());
     }
     catch (error const& e) {
+      _modules.erase(it_module);
       logit(NSLOG_RUNTIME_ERROR, false,
 	    "Error: Could not load module `%s' -> %s\n",
 	    it->fileName().toStdString().c_str(),

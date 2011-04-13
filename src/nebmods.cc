@@ -295,8 +295,9 @@ int neb_register_callback(int callback_type,
     return (NEBERROR_NOMODULEHANDLE);
 
   /* make sure the callback type is within bounds */
-  if (callback_type < 0 || callback_type >= NEBCALLBACK_NUMITEMS)
+  if (callback_type < 0 || callback_type >= NEBCALLBACK_NUMITEMS) {
     return (NEBERROR_CALLBACKBOUNDS);
+  }
 
   try {
     modules::handle* module = static_cast<modules::handle*>(mod_handle);
@@ -304,8 +305,9 @@ int neb_register_callback(int callback_type,
     QMultiHash<QString, modules::handle> const& modules = loader.get_modules();
 
     /* make sure module handle is valid */
-    if (modules.find(module->get_filename(), *module) == modules.end())
+    if (modules.find(module->get_filename(), *module) == modules.end()) {
       return (NEBERROR_BADMODULEHANDLE);
+    }
   }
   catch (...) {
     return (NEBERROR_BADMODULEHANDLE);
@@ -342,7 +344,6 @@ int neb_register_callback(int callback_type,
       }
     }
   }
-
   return (OK);
 }
 
