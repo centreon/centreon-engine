@@ -1,0 +1,22 @@
+#!/bin/sh
+
+# Abort if any command returns an error value
+set -e
+
+case "$1" in
+    remove|upgrade|deconfigure)
+	if [ -f "/etc/init.d/centscheduler" ]; then
+	    update-rc.d centscheduler remove
+	fi
+        ;;
+
+    failed-upgrade)
+        ;;
+
+    *)
+	echo "$0: called with unknown argument" 1>&2
+        exit 0
+	;;
+esac
+
+exit 0

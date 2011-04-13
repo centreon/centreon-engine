@@ -1,0 +1,10 @@
+#!/bin/sh
+
+# Abort if any command returns an error value
+set -e
+
+if [ -f "/etc/init.d/centscheduler" ]; then
+    update-rc.d centscheduler remove
+fi
+
+exit 0

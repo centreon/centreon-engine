@@ -8,8 +8,13 @@ case "$1" in
 	if [ @GROUP@ != "root" ]; then
 	    groupadd -f @GROUP@
 	fi
+
 	if [ @USER@ != "root" ]; then
 	    useradd -M -N -G @GROUP@ @USER@
+	fi
+
+	if [ -f "/etc/init.d/centscheduler" ]; then
+	    update-rc.d centscheduler defaults
 	fi
 	;;
 

@@ -153,20 +153,23 @@ set(STARTUP_SCRIPT "No")
 if (WITH_STARTUP_SCRIPT)
   if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
     message(STATUS "Attempting to determine OS distributor.")
-    execute_process(COMMAND "lsb_release" "-i"
+    execute_process(COMMAND "lsb_release" "--short" "--id"
       RESULT_VARIABLE RETCODE
       OUTPUT_VARIABLE OS_DISTRIBUTOR
       ERROR_QUIET)
     if (RETCODE EQUAL 0)
-      string(LENGTH "${OS_DISTRIBUTOR}" OS_DISTRIBUTOR_LEN)
-      math(EXPR OS_DISTRIBUTOR_LEN "${OS_DISTRIBUTOR_LEN}-17")
-      string(SUBSTRING "${OS_DISTRIBUTOR}" 16 "${OS_DISTRIBUTOR_LEN}" OS_DISTRIBUTOR)
-      if (OS_DISTRIBUTOR STREQUAL "CentOS")
+      if (OS_DISTRIBUTOR STREQUAL "CentOS\n")
         message(STATUS "Generating CentOS startup script.")
         set(STARTUP_SCRIPT "CentOS init script")
-      elseif (OS_DISTRIBUTOR STREQUAL "Ubuntu")
+	install(PROGRAMS "${SCRIPT_DIR}/centscheduler.sh"
+	  DESTINATION "/etc/init.d"
+	  RENAME "centscheduler")
+      elseif (OS_DISTRIBUTOR STREQUAL "Ubuntu\n")
         message(STATUS "Generating Ubuntu startup script.")
         set(STARTUP_SCRIPT "Ubuntu upstart script")
+	install(PROGRAMS "${SCRIPT_DIR}/ubuntu.conf"
+	  DESTINATION "/etc/init"
+	  RENAME "centscheduler.conf")
       else ()
         message(STATUS "Unsupported distributor: ${OS_DISTRIBUTOR}")
       endif ()
@@ -269,10 +272,12 @@ add_definitions(-DDEFAULT_P1_FILE="${bindir}/p1.pl")
 add_definitions(-DDEFAULT_AUTH_FILE="")
 
 # Configuration file.
-configure_file (
-  "${INCLUDE_DIR}/compatibility/locations.h.in"
-  "${INCLUDE_DIR}/compatibility/locations.h"
-  )
+configure_file("${INCLUDE_DIR}/compatibility/locations.h.in"
+  "${INCLUDE_DIR}/compatibility/locations.h")
+configure_file("${SCRIPT_DIR}/centscheduler.sh.in"
+  "${SCRIPT_DIR}/centscheduler.sh")
+configure_file("${SCRIPT_DIR}/ubuntu.conf.in"
+  "${SCRIPT_DIR}/ubuntu.conf")
 
 # Include Directories
 include_directories("${INCLUDE_DIR}")
