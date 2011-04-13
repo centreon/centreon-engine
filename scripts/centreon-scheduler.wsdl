@@ -79,6 +79,14 @@
     </schema>
   </types>
 
+  <!--
+   --  Generic messages.
+   -->
+
+  <!-- Empty request. -->
+  <message name="emptyRequest">
+  </message>
+
   <!-- Default response (an error code and an error string). -->
   <message name="defaultResponse">
     <part name="error" type="tns:errorType"/>
@@ -135,7 +143,6 @@
     <part name="error" type="tns:errorType"/>
     <part name="value" type="xsd:unsignedShort"/>
   </message>
-    
 
   <!--
    --  Host messages.
@@ -201,9 +208,6 @@
   <message name="contactRequest">
     <part name="contact" type="xsd:string"/>
   </message>
-
-  <!-- Message for operation with no arguments. -->
-  <message name="emptyRequest"/>
 
   <!-- Message sent when setting a feature of a host group. -->
   <message name="hostgroupEnableRequest">
@@ -427,6 +431,51 @@
   </message>
 
   <portType name="commandPortType">
+
+    <!--------------------------
+     --                       --
+     --  Global operations.  --
+     --                       --
+     --------------------------->
+
+    <!--
+     --  Process.
+     -->
+
+    <!-- restart() -->
+    <operation name="restart">
+      <documentation>Restart Scheduler.</documentation>
+      <input message="tns:emptyRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- shutdown() -->
+    <operation name="shutdown">
+      <documentation>Shutdown Scheduler.</documentation>
+      <input message="tns:emptyRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!--
+     --  Retention file.
+     -->
+
+    <!-- readStateInformation() -->
+    <operation name="readStateInformation">
+      <documentation>Read state information.</documentation>
+      <input message="tns:emptyRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- saveStateInformation() -->
+    <operation name="saveStateInformation">
+      <documentation>Save state information.</documentation>
+      <input message="tns:emptyRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+
+
 
     <!-----------------------
      --                    --
@@ -1438,27 +1487,6 @@
       <output message="tns:defaultResponse"/>
     </operation>
 
-    <!-- readStateInformation() -->
-    <operation name="readStateInformation">
-      <documentation>Read state information.</documentation>
-      <input message="tns:emptyRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
-
-    <!-- restart() -->
-    <operation name="restart">
-      <documentation>Restart Scheduler.</documentation>
-      <input message="tns:emptyRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
-
-    <!-- saveStateInformation() -->
-    <operation name="saveStateInformation">
-      <documentation>Save state information.</documentation>
-      <input message="tns:emptyRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
-
     <!-- scheduleAndPropagateHostDowntime(string host, downtimeType downtime) -->
     <operation name="scheduleAndPropagateHostDowntime">
       <documentation>Schedule downtime for a host and all of its children.</documentation>
@@ -2089,17 +2117,47 @@
       <output message="tns:defaultResponse"/>
     </operation>
 
-    <!-- shutdown() -->
-    <operation name="shutdown">
-      <documentation>Shutdown Scheduler.</documentation>
-      <input message="tns:emptyRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
-
   </portType>
 
   <binding name="centreonscheduler" type="tns:commandPortType">
     <SOAP:binding style="rpc" transport="http://schemas.xmlsoap.org/soap/http"/>
+
+    <!--------------------------
+     --                       --
+     --  Process operations.  --
+     --                       --
+     --------------------------->
+
+    <operation name="restart">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="shutdown">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="readStateInformation">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="saveStateInformation">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+
+    <!-----------------------
+     --                    --
+     --  Host properties.  --
+     --                    --
+     ------------------------>
 
     <operation name="getHostAcknowledgementIsSet">
       <SOAP:operation style="rpc" soapAction=""/>
@@ -2860,24 +2918,6 @@
       <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
     </operation>
 
-    <operation name="readStateInformation">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
-    <operation name="restart">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
-    <operation name="saveStateInformation">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
     <operation name="scheduleAndPropagateHostDowntime">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
@@ -3401,12 +3441,6 @@
     </operation>
 
     <operation name="setServicesPassiveChecksEnabled">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
-    <operation name="shutdown">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
       <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
