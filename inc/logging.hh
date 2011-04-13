@@ -64,7 +64,7 @@ extern "C" {
 # define NSLOG_SERVICE_NOTIFICATION 1048576
 
 // Debugging Levels
-# define DEBUGL_ALL                 -1
+# define DEBUGL_ALL                 (unsigned int)-1
 # define DEBUGL_NONE                0
 # define DEBUGL_FUNCTIONS           1
 # define DEBUGL_CONFIG              2
