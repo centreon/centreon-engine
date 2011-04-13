@@ -9,7 +9,7 @@ stop on runlevel [!2345]
 
 respawn
 
-env HOME=/etc/centreon/scheduler
+env HOME=@sysconfdir@
 umask 007
 
 # Default of 5 seconds is too low.
@@ -17,8 +17,8 @@ kill timeout 180
 
 pre-start script
     # Sanity checks.
-    [ -r "$HOME/scheduler.conf" ]
+    [ -r "$HOME/centscheduler.cfg" ]
 #    [ -d /var/run/mysqld ] || install -m 755 -o mysql -g root -d /var/run/mysqld
 end script
 
-exec /usr/local/bin/centscheduler -c "$HOME/scheduler.conf"
+exec @bindir@/centscheduler -c "$HOME/centscheduler.cfg"

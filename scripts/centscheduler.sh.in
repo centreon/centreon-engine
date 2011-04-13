@@ -9,20 +9,18 @@
 # Short-Description: Start and stop the centreon-scheduler
 ### END INIT INFO
 
-prefix=/usr/local/nagios
-exec_prefix=${prefix}
-binary=${exec_prefix}/bin/nagios
-config_file=${prefix}/etc/nagios.cfg
-status_file=${prefix}/var/status.dat
-retention_file=${prefix}/var/retention.dat
-command_file=${prefix}/var/rw/nagios.cmd
-var_dir=${prefix}/var
-run_file=${prefix}/var/nagios.lock
+prefix=@localstatedir@
+var_dir=@vardir@
+binary=@bindir@/centscheduler
+config_file=@sysconfdir@/centscheduler.cfg
+status_file=$var_dir/status.dat
+retention_file=$var_dir/retention.dat
+command_file=$var_dir/rw/centscheduler.cmd
 lock_dir=/var/lock/subsys
-lock_file=nagios
+lock_file=centscheduler
 pid_file=/var/run/$(basename $binary).pid
-user=nagios
-group=nagios
+user=centscheduler
+group=centscheduler
 timeout=300
 
 servicename=$(basename "$0")
@@ -82,9 +80,7 @@ service_start()
     if [ ! -f $pid_file ]; then
 	check_configuration
 
-	su - $user -c "touch $var_dir/nagios.log $retention_file"
-	touch $run_file
-	chown $user:$group $run_file
+	su - $user -c "touch $var_dir/centscheduler.log $retention_file"
 
 	$binary $config_file > /dev/null  2>&1 &
 	sleep 1
@@ -121,7 +117,7 @@ service_stop()
 	    kill -TERM $pid
 	fi
     fi
-    rm -f $status_file $run_file $lock_dir/$lock_file $command_file $pid_file
+    rm -f $status_file $lock_dir/$lock_file $command_file $pid_file
 }
 
 service_reload()
@@ -156,11 +152,6 @@ service_status()
 
     if [ -f $pid_file ]; then
 	log_failure_msg "$servicename $command: $binary dead with existing pid file: $pid_file"
-	exit 2
-    fi
-
-    if [ -f $run_file ]; then
-	log_failure_msg "$servicename $command: $binary dead with existing lock file: $run_file"
 	exit 2
     fi
 

@@ -10,4 +10,6 @@ if [ @USER@ != "root" ]; then
     useradd -M -N -G @GROUP@ @USER@
 fi
 
+#update-rc.d mon-fichier defaults
+
 exit 0

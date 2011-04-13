@@ -242,6 +242,7 @@ else ()
 endif ()
 set(bindir "${localstatedir}/bin")
 set(sysconfdir "${localstatedir}/etc")
+set(vardir "${localstatedir}/var")
 
 # Check result dir.
 if (WITH_CHECK_RESULT_DIR)
@@ -277,20 +278,23 @@ set(STARTUP_SCRIPT "No")
 if (WITH_STARTUP_SCRIPT)
   if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
     message(STATUS "Attempting to determine OS distributor.")
-    execute_process(COMMAND "lsb_release" "-i"
+    execute_process(COMMAND "lsb_release" "--short" "--id"
       RESULT_VARIABLE RETCODE
       OUTPUT_VARIABLE OS_DISTRIBUTOR
       ERROR_QUIET)
     if (RETCODE EQUAL 0)
-      string(LENGTH "${OS_DISTRIBUTOR}" OS_DISTRIBUTOR_LEN)
-      math(EXPR OS_DISTRIBUTOR_LEN "${OS_DISTRIBUTOR_LEN}-17")
-      string(SUBSTRING "${OS_DISTRIBUTOR}" 16 "${OS_DISTRIBUTOR_LEN}" OS_DISTRIBUTOR)
-      if (OS_DISTRIBUTOR STREQUAL "CentOS")
+      if (OS_DISTRIBUTOR STREQUAL "CentOS\n")
         message(STATUS "Generating CentOS startup script.")
         set(STARTUP_SCRIPT "CentOS init script")
-      elseif (OS_DISTRIBUTOR STREQUAL "Ubuntu")
+	install(PROGRAMS "${SCRIPT_DIR}/centscheduler.sh"
+	  DESTINATION "/etc/init.d"
+	  RENAME "centscheduler")
+      elseif (OS_DISTRIBUTOR STREQUAL "Ubuntu\n")
         message(STATUS "Generating Ubuntu startup script.")
         set(STARTUP_SCRIPT "Ubuntu upstart script")
+	install(PROGRAMS "${SCRIPT_DIR}/ubuntu.conf"
+	  DESTINATION "/etc/init"
+	  RENAME "centscheduler.conf")
       else ()
         message(STATUS "Unsupported distributor: ${OS_DISTRIBUTOR}")
       endif ()
@@ -361,6 +365,10 @@ configure_file("${INCLUDE_DIR}/locations.h.in"
   "${INCLUDE_DIR}/locations.h")
 configure_file("${INCLUDE_DIR}/snprintf.h.in"
   "${INCLUDE_DIR}/snprintf.h")
+configure_file("${SCRIPT_DIR}/centscheduler.sh.in"
+  "${SCRIPT_DIR}/centscheduler.sh")
+configure_file("${SCRIPT_DIR}/ubuntu.conf.in"
+  "${SCRIPT_DIR}/ubuntu.conf")
 
 # centscheduler target.
 add_executable("centscheduler"
@@ -433,7 +441,9 @@ if (CPACK_BINARY_DEB)
 
   set(DEB_PACKAGE "Yes")
   set(CPACK_DEBIAN_PACKAGE_SECTION "net")
-  set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${SCRIPT_DIR}/deb/postinst" )
+  set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA
+    "${SCRIPT_DIR}/deb/postinst"
+    "${SCRIPT_DIR}/deb/prerm")
 else ()
   set(DEB_PACKAGE "No")
 endif ()
@@ -445,6 +455,7 @@ if (CPACK_BINARY_RPM)
   set(CPACK_RPM_PACKAGE_RELEASE 1)
   set(CPACK_RPM_PACKAGE_LICENSE "GPLv2")
   set(CPACK_RPM_POST_INSTALL_SCRIPT_FILE "${SCRIPT_DIR}/rpm/postinst")
+  set(CPACK_RPM_PRE_UNINSTALL_SCRIPT_FILE "${SCRIPT_DIR}/rpm/prerm")
 else ()
   set(RPM_PACKAGE "No")
 endif ()
