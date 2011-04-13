@@ -2837,12 +2837,10 @@ void configuration::_set_broker_module(QString const& value) {
   if (pos == std::string::npos)
     throw (error() << "broker_module: invalid value.");
 
-#ifdef USE_EVENT_BROKER
   std::string mod = value.toStdString().substr(0, pos);
   std::string arg = value.toStdString().substr(pos + 1, value.toStdString().find_first_of(" \n", pos + 1) - pos);
 
   neb_add_module(mod.c_str(), arg.c_str(), TRUE);
-#endif
 }
 
 /**

@@ -721,7 +721,6 @@ int process_external_command1(char* cmd) {
   }
   delete[] temp_buffer;
 
-#ifdef USE_EVENT_BROKER
   /* send data to event broker */
   broker_external_command(NEBTYPE_EXTERNALCOMMAND_START,
 			  NEBFLAG_NONE,
@@ -731,12 +730,10 @@ int process_external_command1(char* cmd) {
 			  command_id,
                           args,
 			  NULL);
-#endif
 
   /* process the command */
   process_external_command2(command_type, entry_time, args);
 
-#ifdef USE_EVENT_BROKER
   /* send data to event broker */
   broker_external_command(NEBTYPE_EXTERNALCOMMAND_END,
 			  NEBFLAG_NONE,
@@ -746,7 +743,6 @@ int process_external_command1(char* cmd) {
 			  command_id,
                           args,
 			  NULL);
-#endif
 
   /* free memory */
   delete[] command_id;
@@ -2911,7 +2907,6 @@ int cmd_change_object_int_var(int cmd, char* args) {
     else
       temp_service->modified_attributes |= attr;
 
-#ifdef USE_EVENT_BROKER
     /* send data to event broker */
     broker_adaptive_service_data(NEBTYPE_ADAPTIVESERVICE_UPDATE,
 				 NEBFLAG_NONE,
@@ -2920,7 +2915,6 @@ int cmd_change_object_int_var(int cmd, char* args) {
 				 cmd, attr,
                                  temp_service->modified_attributes,
 				 NULL);
-#endif
 
     /* update the status log with the service info */
     update_service_status(temp_service, FALSE);
@@ -2936,7 +2930,6 @@ int cmd_change_object_int_var(int cmd, char* args) {
     else
       temp_host->modified_attributes |= attr;
 
-#ifdef USE_EVENT_BROKER
     /* send data to event broker */
     broker_adaptive_host_data(NEBTYPE_ADAPTIVEHOST_UPDATE,
 			      NEBFLAG_NONE,
@@ -2946,7 +2939,6 @@ int cmd_change_object_int_var(int cmd, char* args) {
 			      attr,
                               temp_host->modified_attributes,
 			      NULL);
-#endif
 
     /* update the status log with the host info */
     update_host_status(temp_host, FALSE);
@@ -2973,7 +2965,6 @@ int cmd_change_object_int_var(int cmd, char* args) {
       break;
     }
 
-#ifdef USE_EVENT_BROKER
     /* send data to event broker */
     broker_adaptive_contact_data(NEBTYPE_ADAPTIVECONTACT_UPDATE,
 				 NEBFLAG_NONE,
@@ -2986,7 +2977,6 @@ int cmd_change_object_int_var(int cmd, char* args) {
 				 sattr,
                                  temp_contact->modified_service_attributes,
                                  NULL);
-#endif
 
     /* update the status log with the contact info */
     update_contact_status(temp_contact, FALSE);
@@ -3227,7 +3217,6 @@ int cmd_change_object_char_var(int cmd, char* args) {
     /* set the modified host attribute */
     modified_host_process_attributes |= attr;
 
-#ifdef USE_EVENT_BROKER
     /* send data to event broker */
     broker_adaptive_program_data(NEBTYPE_ADAPTIVEPROGRAM_UPDATE,
 				 NEBFLAG_NONE,
@@ -3238,7 +3227,6 @@ int cmd_change_object_char_var(int cmd, char* args) {
 				 MODATTR_NONE,
                                  modified_service_process_attributes,
 				 NULL);
-#endif
     /* update program status */
     update_program_status(FALSE);
     break;
@@ -3247,7 +3235,6 @@ int cmd_change_object_char_var(int cmd, char* args) {
     /* set the modified service attribute */
     modified_service_process_attributes |= attr;
 
-#ifdef USE_EVENT_BROKER
     /* send data to event broker */
     broker_adaptive_program_data(NEBTYPE_ADAPTIVEPROGRAM_UPDATE,
 				 NEBFLAG_NONE,
@@ -3258,7 +3245,6 @@ int cmd_change_object_char_var(int cmd, char* args) {
 				 attr,
                                  modified_service_process_attributes,
 				 NULL);
-#endif
 
     /* update program status */
     update_program_status(FALSE);
@@ -3272,7 +3258,6 @@ int cmd_change_object_char_var(int cmd, char* args) {
     /* set the modified service attribute */
     temp_service->modified_attributes |= attr;
 
-#ifdef USE_EVENT_BROKER
     /* send data to event broker */
     broker_adaptive_service_data(NEBTYPE_ADAPTIVESERVICE_UPDATE,
 				 NEBFLAG_NONE,
@@ -3282,7 +3267,6 @@ int cmd_change_object_char_var(int cmd, char* args) {
 				 attr,
                                  temp_service->modified_attributes,
 				 NULL);
-#endif
 
     /* update the status log with the service info */
     update_service_status(temp_service, FALSE);
@@ -3295,7 +3279,6 @@ int cmd_change_object_char_var(int cmd, char* args) {
     /* set the modified host attribute */
     temp_host->modified_attributes |= attr;
 
-#ifdef USE_EVENT_BROKER
     /* send data to event broker */
     broker_adaptive_host_data(NEBTYPE_ADAPTIVEHOST_UPDATE,
 			      NEBFLAG_NONE,
@@ -3305,7 +3288,6 @@ int cmd_change_object_char_var(int cmd, char* args) {
 			      attr,
                               temp_host->modified_attributes,
 			      NULL);
-#endif
 
     /* update the status log with the host info */
     update_host_status(temp_host, FALSE);
@@ -3317,7 +3299,6 @@ int cmd_change_object_char_var(int cmd, char* args) {
     temp_contact->modified_host_attributes |= hattr;
     temp_contact->modified_service_attributes |= sattr;
 
-#ifdef USE_EVENT_BROKER
     /* send data to event broker */
     broker_adaptive_contact_data(NEBTYPE_ADAPTIVECONTACT_UPDATE,
 				 NEBFLAG_NONE,
@@ -3331,7 +3312,6 @@ int cmd_change_object_char_var(int cmd, char* args) {
 				 sattr,
                                  temp_contact->modified_service_attributes,
                                  NULL);
-#endif
 
     /* update the status log with the contact info */
     update_contact_status(temp_contact, FALSE);
@@ -3518,7 +3498,6 @@ void disable_service_checks(service* svc) {
   svc->checks_enabled = FALSE;
   svc->should_be_scheduled = FALSE;
 
-#ifdef USE_EVENT_BROKER
   /* send data to event broker */
   broker_adaptive_service_data(NEBTYPE_ADAPTIVESERVICE_UPDATE,
 			       NEBFLAG_NONE,
@@ -3528,7 +3507,6 @@ void disable_service_checks(service* svc) {
 			       attr,
                                svc->modified_attributes,
 			       NULL);
-#endif
 
   /* update the status log to reflect the new service state */
   update_service_status(svc, FALSE);
@@ -3568,7 +3546,6 @@ void enable_service_checks(service* svc) {
   if (svc->should_be_scheduled == TRUE)
     schedule_service_check(svc, svc->next_check, CHECK_OPTION_NONE);
 
-#ifdef USE_EVENT_BROKER
   /* send data to event broker */
   broker_adaptive_service_data(NEBTYPE_ADAPTIVESERVICE_UPDATE,
 			       NEBFLAG_NONE,
@@ -3578,7 +3555,6 @@ void enable_service_checks(service* svc) {
 			       attr,
                                svc->modified_attributes,
 			       NULL);
-#endif
 
   /* update the status log to reflect the new service state */
   update_service_status(svc, FALSE);
@@ -3599,7 +3575,6 @@ void enable_all_notifications(void) {
   /* update notification status */
   config.set_enable_notifications(true);
 
-#ifdef USE_EVENT_BROKER
   /* send data to event broker */
   broker_adaptive_program_data(NEBTYPE_ADAPTIVEPROGRAM_UPDATE,
 			       NEBFLAG_NONE,
@@ -3610,7 +3585,6 @@ void enable_all_notifications(void) {
 			       attr,
                                modified_service_process_attributes,
 			       NULL);
-#endif
 
   /* update the status log */
   update_program_status(FALSE);
@@ -3631,7 +3605,6 @@ void disable_all_notifications(void) {
   /* update notification status */
   config.set_enable_notifications(false);
 
-#ifdef USE_EVENT_BROKER
   /* send data to event broker */
   broker_adaptive_program_data(NEBTYPE_ADAPTIVEPROGRAM_UPDATE,
 			       NEBFLAG_NONE,
@@ -3642,7 +3615,6 @@ void disable_all_notifications(void) {
 			       attr,
                                modified_service_process_attributes,
 			       NULL);
-#endif
 
   /* update the status log */
   update_program_status(FALSE);
@@ -3662,7 +3634,6 @@ void enable_service_notifications(service* svc) {
   /* enable the service notifications... */
   svc->notifications_enabled = TRUE;
 
-#ifdef USE_EVENT_BROKER
   /* send data to event broker */
   broker_adaptive_service_data(NEBTYPE_ADAPTIVESERVICE_UPDATE,
 			       NEBFLAG_NONE,
@@ -3672,7 +3643,6 @@ void enable_service_notifications(service* svc) {
 			       attr,
                                svc->modified_attributes,
 			       NULL);
-#endif
 
   /* update the status log to reflect the new service state */
   update_service_status(svc, FALSE);
@@ -3692,7 +3662,6 @@ void disable_service_notifications(service* svc) {
   /* disable the service notifications... */
   svc->notifications_enabled = FALSE;
 
-#ifdef USE_EVENT_BROKER
   /* send data to event broker */
   broker_adaptive_service_data(NEBTYPE_ADAPTIVESERVICE_UPDATE,
 			       NEBFLAG_NONE,
@@ -3702,7 +3671,6 @@ void disable_service_notifications(service* svc) {
 			       attr,
                                svc->modified_attributes,
 			       NULL);
-#endif
 
   /* update the status log to reflect the new service state */
   update_service_status(svc, FALSE);
@@ -3722,7 +3690,6 @@ void enable_host_notifications(host* hst) {
   /* enable the host notifications... */
   hst->notifications_enabled = TRUE;
 
-#ifdef USE_EVENT_BROKER
   /* send data to event broker */
   broker_adaptive_host_data(NEBTYPE_ADAPTIVEHOST_UPDATE,
 			    NEBFLAG_NONE,
@@ -3732,7 +3699,6 @@ void enable_host_notifications(host* hst) {
 			    attr,
                             hst->modified_attributes,
 			    NULL);
-#endif
 
   /* update the status log to reflect the new host state */
   update_host_status(hst, FALSE);
@@ -3752,7 +3718,6 @@ void disable_host_notifications(host* hst) {
   /* disable the host notifications... */
   hst->notifications_enabled = FALSE;
 
-#ifdef USE_EVENT_BROKER
   /* send data to event broker */
   broker_adaptive_host_data(NEBTYPE_ADAPTIVEHOST_UPDATE,
 			    NEBFLAG_NONE,
@@ -3762,7 +3727,6 @@ void disable_host_notifications(host* hst) {
 			    attr,
                             hst->modified_attributes,
 			    NULL);
-#endif
 
   /* update the status log to reflect the new host state */
   update_host_status(hst, FALSE);
@@ -3879,7 +3843,6 @@ void enable_contact_host_notifications(contact* cntct) {
   /* enable the host notifications... */
   cntct->host_notifications_enabled = TRUE;
 
-#ifdef USE_EVENT_BROKER
   /* send data to event broker */
   broker_adaptive_contact_data(NEBTYPE_ADAPTIVECONTACT_UPDATE,
 			       NEBFLAG_NONE,
@@ -3893,7 +3856,6 @@ void enable_contact_host_notifications(contact* cntct) {
 			       MODATTR_NONE,
                                cntct->modified_service_attributes,
 			       NULL);
-#endif
 
   /* update the status log to reflect the new contact state */
   update_contact_status(cntct, FALSE);
@@ -3913,7 +3875,6 @@ void disable_contact_host_notifications(contact* cntct) {
   /* enable the host notifications... */
   cntct->host_notifications_enabled = FALSE;
 
-#ifdef USE_EVENT_BROKER
   /* send data to event broker */
   broker_adaptive_contact_data(NEBTYPE_ADAPTIVECONTACT_UPDATE,
 			       NEBFLAG_NONE,
@@ -3927,7 +3888,6 @@ void disable_contact_host_notifications(contact* cntct) {
 			       MODATTR_NONE,
                                cntct->modified_service_attributes,
 			       NULL);
-#endif
 
   /* update the status log to reflect the new contact state */
   update_contact_status(cntct, FALSE);
@@ -3947,7 +3907,6 @@ void enable_contact_service_notifications(contact* cntct) {
   /* enable the host notifications... */
   cntct->service_notifications_enabled = TRUE;
 
-#ifdef USE_EVENT_BROKER
   /* send data to event broker */
   broker_adaptive_contact_data(NEBTYPE_ADAPTIVECONTACT_UPDATE,
 			       NEBFLAG_NONE,
@@ -3961,7 +3920,6 @@ void enable_contact_service_notifications(contact* cntct) {
 			       attr,
                                cntct->modified_service_attributes,
 			       NULL);
-#endif
 
   /* update the status log to reflect the new contact state */
   update_contact_status(cntct, FALSE);
@@ -3981,7 +3939,6 @@ void disable_contact_service_notifications(contact* cntct) {
   /* enable the host notifications... */
   cntct->service_notifications_enabled = FALSE;
 
-#ifdef USE_EVENT_BROKER
   /* send data to event broker */
   broker_adaptive_contact_data(NEBTYPE_ADAPTIVECONTACT_UPDATE,
 			       NEBFLAG_NONE,
@@ -3995,7 +3952,6 @@ void disable_contact_service_notifications(contact* cntct) {
 			       attr,
                                cntct->modified_service_attributes,
 			       NULL);
-#endif
 
   /* update the status log to reflect the new contact state */
   update_contact_status(cntct, FALSE);
@@ -4062,7 +4018,6 @@ void acknowledge_host_problem(host* hst,
   if (hst->current_state == HOST_UP)
     return;
 
-#ifdef USE_EVENT_BROKER
   /* send data to event broker */
   broker_acknowledgement_data(NEBTYPE_ACKNOWLEDGEMENT_ADD,
 			      NEBFLAG_NONE,
@@ -4075,7 +4030,6 @@ void acknowledge_host_problem(host* hst,
 			      notify,
 			      persistent,
                               NULL);
-#endif
 
   /* send out an acknowledgement notification */
   if (notify == TRUE)
@@ -4122,7 +4076,6 @@ void acknowledge_service_problem(service* svc,
   if (svc->current_state == STATE_OK)
     return;
 
-#ifdef USE_EVENT_BROKER
   /* send data to event broker */
   broker_acknowledgement_data(NEBTYPE_ACKNOWLEDGEMENT_ADD,
 			      NEBFLAG_NONE,
@@ -4135,7 +4088,6 @@ void acknowledge_service_problem(service* svc,
 			      notify,
                               persistent,
 			      NULL);
-#endif
 
   /* send out an acknowledgement notification */
   if (notify == TRUE)
@@ -4208,7 +4160,6 @@ void start_executing_service_checks(void) {
   /* set the service check execution flag */
   config.set_execute_service_checks(true);
 
-#ifdef USE_EVENT_BROKER
   /* send data to event broker */
   broker_adaptive_program_data(NEBTYPE_ADAPTIVEPROGRAM_UPDATE,
 			       NEBFLAG_NONE,
@@ -4219,7 +4170,6 @@ void start_executing_service_checks(void) {
 			       attr,
                                modified_service_process_attributes,
 			       NULL);
-#endif
 
   /* update the status log with the program info */
   update_program_status(FALSE);
@@ -4239,7 +4189,6 @@ void stop_executing_service_checks(void) {
   /* set the service check execution flag */
   config.set_execute_service_checks(false);
 
-#ifdef USE_EVENT_BROKER
   /* send data to event broker */
   broker_adaptive_program_data(NEBTYPE_ADAPTIVEPROGRAM_UPDATE,
 			       NEBFLAG_NONE,
@@ -4250,7 +4199,6 @@ void stop_executing_service_checks(void) {
 			       attr,
                                modified_service_process_attributes,
 			       NULL);
-#endif
 
   /* update the status log with the program info */
   update_program_status(FALSE);
@@ -4270,7 +4218,6 @@ void start_accepting_passive_service_checks(void) {
   /* set the service check flag */
   config.set_accept_passive_service_checks(true);
 
-#ifdef USE_EVENT_BROKER
   /* send data to event broker */
   broker_adaptive_program_data(NEBTYPE_ADAPTIVEPROGRAM_UPDATE,
 			       NEBFLAG_NONE,
@@ -4281,7 +4228,6 @@ void start_accepting_passive_service_checks(void) {
 			       attr,
                                modified_service_process_attributes,
 			       NULL);
-#endif
 
   /* update the status log with the program info */
   update_program_status(FALSE);
@@ -4301,7 +4247,6 @@ void stop_accepting_passive_service_checks(void) {
   /* set the service check flag */
   config.set_accept_passive_service_checks(false);
 
-#ifdef USE_EVENT_BROKER
   /* send data to event broker */
   broker_adaptive_program_data(NEBTYPE_ADAPTIVEPROGRAM_UPDATE,
 			       NEBFLAG_NONE,
@@ -4312,7 +4257,6 @@ void stop_accepting_passive_service_checks(void) {
 			       attr,
                                modified_service_process_attributes,
 			       NULL);
-#endif
 
   /* update the status log with the program info */
   update_program_status(FALSE);
@@ -4332,7 +4276,6 @@ void enable_passive_service_checks(service* svc) {
   /* set the passive check flag */
   svc->accept_passive_service_checks = TRUE;
 
-#ifdef USE_EVENT_BROKER
   /* send data to event broker */
   broker_adaptive_service_data(NEBTYPE_ADAPTIVESERVICE_UPDATE,
 			       NEBFLAG_NONE,
@@ -4342,7 +4285,6 @@ void enable_passive_service_checks(service* svc) {
 			       attr,
                                svc->modified_attributes,
 			       NULL);
-#endif
 
   /* update the status log with the service info */
   update_service_status(svc, FALSE);
@@ -4362,7 +4304,6 @@ void disable_passive_service_checks(service* svc) {
   /* set the passive check flag */
   svc->accept_passive_service_checks = FALSE;
 
-#ifdef USE_EVENT_BROKER
   /* send data to event broker */
   broker_adaptive_service_data(NEBTYPE_ADAPTIVESERVICE_UPDATE,
 			       NEBFLAG_NONE,
@@ -4372,7 +4313,6 @@ void disable_passive_service_checks(service* svc) {
 			       attr,
                                svc->modified_attributes,
 			       NULL);
-#endif
 
   /* update the status log with the service info */
   update_service_status(svc, FALSE);
@@ -4392,7 +4332,6 @@ void start_executing_host_checks(void) {
   /* set the host check execution flag */
   config.set_execute_host_checks(true);
 
-#ifdef USE_EVENT_BROKER
   /* send data to event broker */
   broker_adaptive_program_data(NEBTYPE_ADAPTIVEPROGRAM_UPDATE,
 			       NEBFLAG_NONE,
@@ -4403,7 +4342,6 @@ void start_executing_host_checks(void) {
 			       MODATTR_NONE,
                                modified_service_process_attributes,
 			       NULL);
-#endif
 
   /* update the status log with the program info */
   update_program_status(FALSE);
@@ -4423,7 +4361,6 @@ void stop_executing_host_checks(void) {
   /* set the host check execution flag */
   config.set_execute_host_checks(false);
 
-#ifdef USE_EVENT_BROKER
   /* send data to event broker */
   broker_adaptive_program_data(NEBTYPE_ADAPTIVEPROGRAM_UPDATE,
 			       NEBFLAG_NONE,
@@ -4434,7 +4371,6 @@ void stop_executing_host_checks(void) {
 			       MODATTR_NONE,
                                modified_service_process_attributes,
 			       NULL);
-#endif
 
   /* update the status log with the program info */
   update_program_status(FALSE);
@@ -4454,7 +4390,6 @@ void start_accepting_passive_host_checks(void) {
   /* set the host check flag */
   config.set_accept_passive_host_checks(true);
 
-#ifdef USE_EVENT_BROKER
   /* send data to event broker */
   broker_adaptive_program_data(NEBTYPE_ADAPTIVEPROGRAM_UPDATE,
 			       NEBFLAG_NONE,
@@ -4465,7 +4400,6 @@ void start_accepting_passive_host_checks(void) {
 			       MODATTR_NONE,
                                modified_service_process_attributes,
 			       NULL);
-#endif
 
   /* update the status log with the program info */
   update_program_status(FALSE);
@@ -4485,7 +4419,6 @@ void stop_accepting_passive_host_checks(void) {
   /* set the host check flag */
   config.set_accept_passive_host_checks(false);
 
-#ifdef USE_EVENT_BROKER
   /* send data to event broker */
   broker_adaptive_program_data(NEBTYPE_ADAPTIVEPROGRAM_UPDATE,
 			       NEBFLAG_NONE,
@@ -4496,7 +4429,6 @@ void stop_accepting_passive_host_checks(void) {
 			       MODATTR_NONE,
                                modified_service_process_attributes,
 			       NULL);
-#endif
   /* update the status log with the program info */
   update_program_status(FALSE);
 }
@@ -4515,7 +4447,6 @@ void enable_passive_host_checks(host* hst) {
   /* set the passive check flag */
   hst->accept_passive_host_checks = TRUE;
 
-#ifdef USE_EVENT_BROKER
   /* send data to event broker */
   broker_adaptive_host_data(NEBTYPE_ADAPTIVEHOST_UPDATE,
 			    NEBFLAG_NONE,
@@ -4525,7 +4456,6 @@ void enable_passive_host_checks(host* hst) {
 			    attr,
                             hst->modified_attributes,
 			    NULL);
-#endif
 
   /* update the status log with the host info */
   update_host_status(hst, FALSE);
@@ -4545,7 +4475,6 @@ void disable_passive_host_checks(host* hst) {
   /* set the passive check flag */
   hst->accept_passive_host_checks = FALSE;
 
-#ifdef USE_EVENT_BROKER
   /* send data to event broker */
   broker_adaptive_host_data(NEBTYPE_ADAPTIVEHOST_UPDATE,
 			    NEBFLAG_NONE,
@@ -4555,7 +4484,6 @@ void disable_passive_host_checks(host* hst) {
 			    attr,
                             hst->modified_attributes,
 			    NULL);
-#endif
 
   /* update the status log with the host info */
   update_host_status(hst, FALSE);
@@ -4576,7 +4504,6 @@ void start_using_event_handlers(void) {
   /* set the event handler flag */
   config.set_enable_event_handlers(true);
 
-#ifdef USE_EVENT_BROKER
   /* send data to event broker */
   broker_adaptive_program_data(NEBTYPE_ADAPTIVEPROGRAM_UPDATE,
 			       NEBFLAG_NONE,
@@ -4587,7 +4514,6 @@ void start_using_event_handlers(void) {
 			       attr,
                                modified_service_process_attributes,
 			       NULL);
-#endif
 
   /* update the status log with the program info */
   update_program_status(FALSE);
@@ -4608,7 +4534,6 @@ void stop_using_event_handlers(void) {
   /* set the event handler flag */
   config.set_enable_event_handlers(false);
 
-#ifdef USE_EVENT_BROKER
   /* send data to event broker */
   broker_adaptive_program_data(NEBTYPE_ADAPTIVEPROGRAM_UPDATE,
 			       NEBFLAG_NONE,
@@ -4619,7 +4544,6 @@ void stop_using_event_handlers(void) {
 			       attr,
                                modified_service_process_attributes,
 			       NULL);
-#endif
 
   /* update the status log with the program info */
   update_program_status(FALSE);
@@ -4639,7 +4563,6 @@ void enable_service_event_handler(service* svc) {
   /* set the event handler flag */
   svc->event_handler_enabled = TRUE;
 
-#ifdef USE_EVENT_BROKER
   /* send data to event broker */
   broker_adaptive_service_data(NEBTYPE_ADAPTIVESERVICE_UPDATE,
 			       NEBFLAG_NONE,
@@ -4649,7 +4572,6 @@ void enable_service_event_handler(service* svc) {
 			       attr,
                                svc->modified_attributes,
 			       NULL);
-#endif
 
   /* update the status log with the service info */
   update_service_status(svc, FALSE);
@@ -4669,7 +4591,6 @@ void disable_service_event_handler(service* svc) {
   /* set the event handler flag */
   svc->event_handler_enabled = FALSE;
 
-#ifdef USE_EVENT_BROKER
   /* send data to event broker */
   broker_adaptive_service_data(NEBTYPE_ADAPTIVESERVICE_UPDATE,
 			       NEBFLAG_NONE,
@@ -4679,7 +4600,6 @@ void disable_service_event_handler(service* svc) {
 			       attr,
                                svc->modified_attributes,
 			       NULL);
-#endif
 
   /* update the status log with the service info */
   update_service_status(svc, FALSE);
@@ -4699,7 +4619,6 @@ void enable_host_event_handler(host* hst) {
   /* set the event handler flag */
   hst->event_handler_enabled = TRUE;
 
-#ifdef USE_EVENT_BROKER
   /* send data to event broker */
   broker_adaptive_host_data(NEBTYPE_ADAPTIVEHOST_UPDATE,
 			    NEBFLAG_NONE,
@@ -4709,7 +4628,6 @@ void enable_host_event_handler(host* hst) {
 			    attr,
                             hst->modified_attributes,
 			    NULL);
-#endif
 
   /* update the status log with the host info */
   update_host_status(hst, FALSE);
@@ -4729,7 +4647,6 @@ void disable_host_event_handler(host* hst) {
   /* set the event handler flag */
   hst->event_handler_enabled = FALSE;
 
-#ifdef USE_EVENT_BROKER
   /* send data to event broker */
   broker_adaptive_host_data(NEBTYPE_ADAPTIVEHOST_UPDATE,
 			    NEBFLAG_NONE,
@@ -4739,7 +4656,6 @@ void disable_host_event_handler(host* hst) {
 			    attr,
                             hst->modified_attributes,
 			    NULL);
-#endif
 
   /* update the status log with the host info */
   update_host_status(hst, FALSE);
@@ -4760,7 +4676,6 @@ void disable_host_checks(host* hst) {
   hst->checks_enabled = FALSE;
   hst->should_be_scheduled = FALSE;
 
-#ifdef USE_EVENT_BROKER
   /* send data to event broker */
   broker_adaptive_host_data(NEBTYPE_ADAPTIVEHOST_UPDATE,
 			    NEBFLAG_NONE,
@@ -4770,7 +4685,6 @@ void disable_host_checks(host* hst) {
 			    attr,
                             hst->modified_attributes,
 			    NULL);
-#endif
 
   /* update the status log with the host info */
   update_host_status(hst, FALSE);
@@ -4810,7 +4724,6 @@ void enable_host_checks(host* hst) {
   if (hst->should_be_scheduled == TRUE)
     schedule_host_check(hst, hst->next_check, CHECK_OPTION_NONE);
 
-#ifdef USE_EVENT_BROKER
   /* send data to event broker */
   broker_adaptive_host_data(NEBTYPE_ADAPTIVEHOST_UPDATE,
 			    NEBFLAG_NONE,
@@ -4820,7 +4733,6 @@ void enable_host_checks(host* hst) {
 			    attr,
                             hst->modified_attributes,
 			    NULL);
-#endif
 
   /* update the status log with the host info */
   update_host_status(hst, FALSE);
@@ -4840,7 +4752,6 @@ void start_obsessing_over_service_checks(void) {
   /* set the service obsession flag */
   config.set_obsess_over_services(true);
 
-#ifdef USE_EVENT_BROKER
   /* send data to event broker */
   broker_adaptive_program_data(NEBTYPE_ADAPTIVEPROGRAM_UPDATE,
 			       NEBFLAG_NONE,
@@ -4851,7 +4762,6 @@ void start_obsessing_over_service_checks(void) {
 			       attr,
                                modified_service_process_attributes,
 			       NULL);
-#endif
 
   /* update the status log with the program info */
   update_program_status(FALSE);
@@ -4871,7 +4781,6 @@ void stop_obsessing_over_service_checks(void) {
   /* set the service obsession flag */
   config.set_obsess_over_services(false);
 
-#ifdef USE_EVENT_BROKER
   /* send data to event broker */
   broker_adaptive_program_data(NEBTYPE_ADAPTIVEPROGRAM_UPDATE,
 			       NEBFLAG_NONE,
@@ -4882,7 +4791,6 @@ void stop_obsessing_over_service_checks(void) {
 			       attr,
                                modified_service_process_attributes,
 			       NULL);
-#endif
 
   /* update the status log with the program info */
   update_program_status(FALSE);
@@ -4902,7 +4810,6 @@ void start_obsessing_over_host_checks(void) {
   /* set the host obsession flag */
   config.set_obsess_over_hosts(true);
 
-#ifdef USE_EVENT_BROKER
   /* send data to event broker */
   broker_adaptive_program_data(NEBTYPE_ADAPTIVEPROGRAM_UPDATE,
 			       NEBFLAG_NONE,
@@ -4913,7 +4820,6 @@ void start_obsessing_over_host_checks(void) {
 			       MODATTR_NONE,
                                modified_service_process_attributes,
 			       NULL);
-#endif
 
   /* update the status log with the program info */
   update_program_status(FALSE);
@@ -4933,7 +4839,6 @@ void stop_obsessing_over_host_checks(void) {
   /* set the host obsession flag */
   config.set_obsess_over_hosts(false);
 
-#ifdef USE_EVENT_BROKER
   /* send data to event broker */
   broker_adaptive_program_data(NEBTYPE_ADAPTIVEPROGRAM_UPDATE,
 			       NEBFLAG_NONE,
@@ -4944,7 +4849,6 @@ void stop_obsessing_over_host_checks(void) {
 			       MODATTR_NONE,
                                modified_service_process_attributes,
 			       NULL);
-#endif
 
   /* update the status log with the program info */
   update_program_status(FALSE);
@@ -4964,7 +4868,6 @@ void enable_service_freshness_checks(void) {
   /* set the freshness check flag */
   config.set_check_service_freshness(true);
 
-#ifdef USE_EVENT_BROKER
   /* send data to event broker */
   broker_adaptive_program_data(NEBTYPE_ADAPTIVEPROGRAM_UPDATE,
 			       NEBFLAG_NONE,
@@ -4975,7 +4878,6 @@ void enable_service_freshness_checks(void) {
 			       attr,
                                modified_service_process_attributes,
 			       NULL);
-#endif
 
   /* update the status log with the program info */
   update_program_status(FALSE);
@@ -4995,7 +4897,6 @@ void disable_service_freshness_checks(void) {
   /* set the freshness check flag */
   config.set_check_service_freshness(false);
 
-#ifdef USE_EVENT_BROKER
   /* send data to event broker */
   broker_adaptive_program_data(NEBTYPE_ADAPTIVEPROGRAM_UPDATE,
 			       NEBFLAG_NONE,
@@ -5006,7 +4907,6 @@ void disable_service_freshness_checks(void) {
 			       attr,
                                modified_service_process_attributes,
 			       NULL);
-#endif
 
   /* update the status log with the program info */
   update_program_status(FALSE);
@@ -5026,7 +4926,6 @@ void enable_host_freshness_checks(void) {
   /* set the freshness check flag */
   config.set_check_host_freshness(true);
 
-#ifdef USE_EVENT_BROKER
   /* send data to event broker */
   broker_adaptive_program_data(NEBTYPE_ADAPTIVEPROGRAM_UPDATE,
 			       NEBFLAG_NONE,
@@ -5037,8 +4936,6 @@ void enable_host_freshness_checks(void) {
 			       MODATTR_NONE,
                                modified_service_process_attributes,
 			       NULL);
-#endif
-
   /* update the status log with the program info */
   update_program_status(FALSE);
 }
@@ -5057,7 +4954,6 @@ void disable_host_freshness_checks(void) {
   /* set the freshness check flag */
   config.set_check_host_freshness(false);
 
-#ifdef USE_EVENT_BROKER
   /* send data to event broker */
   broker_adaptive_program_data(NEBTYPE_ADAPTIVEPROGRAM_UPDATE,
 			       NEBFLAG_NONE,
@@ -5068,7 +4964,6 @@ void disable_host_freshness_checks(void) {
 			       MODATTR_NONE,
                                modified_service_process_attributes,
 			       NULL);
-#endif
 
   /* update the status log with the program info */
   update_program_status(FALSE);
@@ -5088,7 +4983,6 @@ void enable_all_failure_prediction(void) {
 
   config.set_enable_failure_prediction(true);
 
-#ifdef USE_EVENT_BROKER
   /* send data to event broker */
   broker_adaptive_program_data(NEBTYPE_ADAPTIVEPROGRAM_UPDATE,
 			       NEBFLAG_NONE,
@@ -5099,7 +4993,6 @@ void enable_all_failure_prediction(void) {
 			       attr,
                                modified_service_process_attributes,
 			       NULL);
-#endif
 
   /* update the status log */
   update_program_status(FALSE);
@@ -5119,7 +5012,6 @@ void disable_all_failure_prediction(void) {
 
   config.set_enable_failure_prediction(false);
 
-#ifdef USE_EVENT_BROKER
   /* send data to event broker */
   broker_adaptive_program_data(NEBTYPE_ADAPTIVEPROGRAM_UPDATE,
 			       NEBFLAG_NONE,
@@ -5130,7 +5022,6 @@ void disable_all_failure_prediction(void) {
 			       attr,
                                modified_service_process_attributes,
 			       NULL);
-#endif
 
   /* update the status log */
   update_program_status(FALSE);
@@ -5150,7 +5041,6 @@ void enable_performance_data(void) {
 
   config.set_process_performance_data(true);
 
-#ifdef USE_EVENT_BROKER
   /* send data to event broker */
   broker_adaptive_program_data(NEBTYPE_ADAPTIVEPROGRAM_UPDATE,
 			       NEBFLAG_NONE,
@@ -5161,7 +5051,6 @@ void enable_performance_data(void) {
 			       attr,
                                modified_service_process_attributes,
 			       NULL);
-#endif
 
   /* update the status log */
   update_program_status(FALSE);
@@ -5181,7 +5070,6 @@ void disable_performance_data(void) {
 
   config.set_process_performance_data(false);
 
-#ifdef USE_EVENT_BROKER
   /* send data to event broker */
   broker_adaptive_program_data(NEBTYPE_ADAPTIVEPROGRAM_UPDATE,
 			       NEBFLAG_NONE,
@@ -5192,7 +5080,6 @@ void disable_performance_data(void) {
 			       attr,
                                modified_service_process_attributes,
 			       NULL);
-#endif
 
   /* update the status log */
   update_program_status(FALSE);
@@ -5212,7 +5099,6 @@ void start_obsessing_over_service(service* svc) {
   /* set the obsess over service flag */
   svc->obsess_over_service = TRUE;
 
-#ifdef USE_EVENT_BROKER
   /* send data to event broker */
   broker_adaptive_service_data(NEBTYPE_ADAPTIVESERVICE_UPDATE,
 			       NEBFLAG_NONE,
@@ -5222,7 +5108,6 @@ void start_obsessing_over_service(service* svc) {
 			       attr,
                                svc->modified_attributes,
 			       NULL);
-#endif
 
   /* update the status log with the service info */
   update_service_status(svc, FALSE);
@@ -5242,7 +5127,6 @@ void stop_obsessing_over_service(service* svc) {
   /* set the obsess over service flag */
   svc->obsess_over_service = FALSE;
 
-#ifdef USE_EVENT_BROKER
   /* send data to event broker */
   broker_adaptive_service_data(NEBTYPE_ADAPTIVESERVICE_UPDATE,
 			       NEBFLAG_NONE,
@@ -5252,7 +5136,6 @@ void stop_obsessing_over_service(service* svc) {
 			       attr,
                                svc->modified_attributes,
 			       NULL);
-#endif
 
   /* update the status log with the service info */
   update_service_status(svc, FALSE);
@@ -5272,7 +5155,6 @@ void start_obsessing_over_host(host* hst) {
   /* set the obsess over host flag */
   hst->obsess_over_host = TRUE;
 
-#ifdef USE_EVENT_BROKER
   /* send data to event broker */
   broker_adaptive_host_data(NEBTYPE_ADAPTIVEHOST_UPDATE,
 			    NEBFLAG_NONE,
@@ -5282,7 +5164,6 @@ void start_obsessing_over_host(host* hst) {
 			    attr,
                             hst->modified_attributes,
 			    NULL);
-#endif
 
   /* update the status log with the host info */
   update_host_status(hst, FALSE);
@@ -5302,7 +5183,6 @@ void stop_obsessing_over_host(host* hst) {
   /* set the obsess over host flag */
   hst->obsess_over_host = FALSE;
 
-#ifdef USE_EVENT_BROKER
   /* send data to event broker */
   broker_adaptive_host_data(NEBTYPE_ADAPTIVEHOST_UPDATE,
 			    NEBFLAG_NONE,
@@ -5312,7 +5192,6 @@ void stop_obsessing_over_host(host* hst) {
 			    attr,
                             hst->modified_attributes,
 			    NULL);
-#endif
 
   /* update the status log with the host info */
   update_host_status(hst, FALSE);

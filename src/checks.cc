@@ -26,6 +26,7 @@
 #include <sys/wait.h>
 #include <errno.h>
 #include <signal.h>
+#include "neberrors.hh"
 #include "nagios.hh"
 #include "comments.hh"
 #include "statusdata.hh"
@@ -47,10 +48,6 @@
 
 #ifdef EMBEDDEDPERL
 # include "epn_nagios.hh"
-#endif
-
-#ifdef USE_EVENT_BROKER
-# include "neberrors.hh"
 #endif
 
 using namespace com::centreon::scheduler;
@@ -459,9 +456,7 @@ int run_async_service_check(service* svc,
   double old_latency = 0.0;
   dbuf checkresult_dbuf;
   int dbuf_chunk = 1024;
-#ifdef USE_EVENT_BROKER
   int neb_result = OK;
-#endif
 #ifdef EMBEDDEDPERL
   char fname[512] = "";
   char* args[5] = { "", DO_CLEAN, "", "", NULL };
@@ -491,7 +486,6 @@ int run_async_service_check(service* svc,
 
   /******** GOOD TO GO FOR A REAL SERVICE CHECK AT THIS POINT* *******/
 
-#ifdef USE_EVENT_BROKER
   /* initialize start/end times */
   start_time.tv_sec = 0L;
   start_time.tv_usec = 0L;
@@ -526,8 +520,6 @@ int run_async_service_check(service* svc,
   /* NOTE: if would be easier for modules to override checks when the NEBTYPE_SERVICECHECK_INITIATE event is called (later) */
   if (neb_result == NEBERROR_CALLBACKOVERRIDE)
     return (OK);
-#endif
-
 
   log_debug_info(DEBUGL_CHECKS, 0,
                  "Checking service '%s' on host '%s'...\n",
@@ -603,7 +595,6 @@ int run_async_service_check(service* svc,
   check_result_info.return_code = STATE_OK;
   check_result_info.output = NULL;
 
-#ifdef USE_EVENT_BROKER
   /* send data to event broker */
   neb_result = broker_service_check(NEBTYPE_SERVICECHECK_INITIATE,
 				    NEBFLAG_NONE,
@@ -629,7 +620,6 @@ int run_async_service_check(service* svc,
     delete[] raw_command;
     return (OK);
   }
-#endif
 
   /* open a temp file for storing check output */
   old_umask = umask(new_umask);
@@ -1958,7 +1948,6 @@ int handle_async_service_check_result(service* temp_service, check_result* queue
 	    log_service_event(temp_service);
   }
 
-#ifdef USE_EVENT_BROKER
   /* send data to event broker */
   broker_service_check(NEBTYPE_SERVICECHECK_PROCESSED,
 		       NEBFLAG_NONE,
@@ -1974,7 +1963,6 @@ int handle_async_service_check_result(service* temp_service, check_result* queue
                        queued_check_result->return_code,
 		       NULL,
 		       NULL);
-#endif
 
   if (!(reschedule_check == TRUE
 	&& temp_service->should_be_scheduled == TRUE
@@ -3074,7 +3062,6 @@ int run_sync_host_check_3x(host* hst,
 
   /*********** EXECUTE THE CHECK AND PROCESS THE RESULTS **********/
 
-#ifdef USE_EVENT_BROKER
   /* send data to event broker */
   end_time.tv_sec = 0L;
   end_time.tv_usec = 0L;
@@ -3098,7 +3085,6 @@ int run_sync_host_check_3x(host* hst,
 		    NULL,
 		    NULL,
 		    NULL);
-#endif
 
   /* execute the host check */
   host_result = execute_sync_host_check_3x(hst);
@@ -3120,7 +3106,6 @@ int run_sync_host_check_3x(host* hst,
   /* high resolution end time for event broker */
   gettimeofday(&end_time, NULL);
 
-#ifdef USE_EVENT_BROKER
   /* send data to event broker */
   broker_host_check(NEBTYPE_HOSTCHECK_PROCESSED,
 		    NEBFLAG_NONE,
@@ -3142,7 +3127,6 @@ int run_sync_host_check_3x(host* hst,
                     hst->long_plugin_output,
 		    hst->perf_data,
 		    NULL);
-#endif
   return (result);
 }
 
@@ -3160,10 +3144,7 @@ int execute_sync_host_check_3x(host* hst) {
   int early_timeout = FALSE;
   double exectime;
   char* temp_plugin_output = NULL;
-#ifdef USE_EVENT_BROKER
   int neb_result = OK;
-#endif
-
 
   log_debug_info(DEBUGL_FUNCTIONS, 0, "execute_sync_host_check_3x()\n");
 
@@ -3172,7 +3153,6 @@ int execute_sync_host_check_3x(host* hst) {
 
   log_debug_info(DEBUGL_CHECKS, 0, "** Executing sync check of host '%s'...\n", hst->name);
 
-#ifdef USE_EVENT_BROKER
   /* initialize start/end times */
   start_time.tv_sec = 0L;
   start_time.tv_usec = 0L;
@@ -3209,7 +3189,6 @@ int execute_sync_host_check_3x(host* hst) {
   /* NOTE: if a module does this, it must check the status of the host and populate the data structures BEFORE it returns from the callback! */
   if (neb_result == NEBERROR_CALLBACKOVERRIDE)
     return (hst->current_state);
-#endif
 
   /* grab the host macros */
   memset(&mac, 0, sizeof(mac));
@@ -3239,7 +3218,6 @@ int execute_sync_host_check_3x(host* hst) {
     return (ERROR);
   }
 
-#ifdef USE_EVENT_BROKER
   /* send data to event broker */
   end_time.tv_sec = 0L;
   end_time.tv_usec = 0L;
@@ -3262,7 +3240,6 @@ int execute_sync_host_check_3x(host* hst) {
                     hst->long_plugin_output,
 		    hst->perf_data,
 		    NULL);
-#endif
 
   log_debug_info(DEBUGL_COMMANDS, 1, "Raw host check command: %s\n", raw_command);
   log_debug_info(DEBUGL_COMMANDS, 0, "Processed host check ommand: %s\n", processed_command);
@@ -3355,7 +3332,6 @@ int execute_sync_host_check_3x(host* hst) {
   /* high resolution end time for event broker */
   gettimeofday(&end_time, NULL);
 
-#ifdef USE_EVENT_BROKER
   /* send data to event broker */
   broker_host_check(NEBTYPE_HOSTCHECK_RAW_END,
 		    NEBFLAG_NONE,
@@ -3377,7 +3353,6 @@ int execute_sync_host_check_3x(host* hst) {
                     hst->long_plugin_output,
 		    hst->perf_data,
 		    NULL);
-#endif
 
   log_debug_info(DEBUGL_CHECKS, 0, "** Sync host check done: state=%d\n", return_result);
   return (return_result);
@@ -3493,9 +3468,7 @@ int run_async_host_check_3x(host* hst,
   double old_latency = 0.0;
   dbuf checkresult_dbuf;
   int dbuf_chunk = 1024;
-#ifdef USE_EVENT_BROKER
   int neb_result = OK;
-#endif
 
   log_debug_info(DEBUGL_FUNCTIONS, 0, "run_async_host_check_3x()\n");
 
@@ -3517,7 +3490,6 @@ int run_async_host_check_3x(host* hst,
   }
 
   /******** GOOD TO GO FOR A REAL HOST CHECK AT THIS POINT* *******/
-#ifdef USE_EVENT_BROKER
   /* initialize start/end times */
   start_time.tv_sec = 0L;
   start_time.tv_usec = 0L;
@@ -3554,7 +3526,6 @@ int run_async_host_check_3x(host* hst,
   /* NOTE: if a module does this, it has to do a lot of the stuff found below to make sure things don't get whacked out of shape! */
   if (neb_result == NEBERROR_CALLBACKOVERRIDE)
     return (OK);
-#endif
 
   log_debug_info(DEBUGL_CHECKS, 0, "Checking host '%s'...\n", hst->name);
 
@@ -3684,7 +3655,6 @@ int run_async_host_check_3x(host* hst,
   /* initialize dynamic buffer for storing plugin output */
   dbuf_init(&checkresult_dbuf, dbuf_chunk);
 
-#ifdef USE_EVENT_BROKER
   /* send data to event broker */
   broker_host_check(NEBTYPE_HOSTCHECK_INITIATE,
 		    NEBFLAG_NONE,
@@ -3706,7 +3676,6 @@ int run_async_host_check_3x(host* hst,
 		    NULL,
 		    NULL,
 		    NULL);
-#endif
 
   /* reset latency (permanent value for this check will get set later) */
   hst->latency = old_latency;
@@ -4146,7 +4115,6 @@ int handle_async_host_check_result_3x(host* temp_host, check_result* queued_chec
   /* high resolution end time for event broker */
   gettimeofday(&end_time_hires, NULL);
 
-#ifdef USE_EVENT_BROKER
   /* send data to event broker */
   broker_host_check(NEBTYPE_HOSTCHECK_PROCESSED,
 		    NEBFLAG_NONE,
@@ -4168,7 +4136,6 @@ int handle_async_host_check_result_3x(host* temp_host, check_result* queued_chec
                     temp_host->long_plugin_output,
 		    temp_host->perf_data,
                     NULL);
-#endif
   return (OK);
 }
 

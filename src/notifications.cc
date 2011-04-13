@@ -122,7 +122,6 @@ int service_notification(service* svc,
   /* create the contact notification list for this service */
   create_notification_list_from_service(mac, svc, options, &escalated);
 
-#ifdef USE_EVENT_BROKER
   /* send data to event broker */
   end_time.tv_sec = 0L;
   end_time.tv_usec = 0L;
@@ -143,7 +142,6 @@ int service_notification(service* svc,
     return (ERROR);
   else if (NEBERROR_CALLBACKOVERRIDE == neb_result)
     return (OK);
-#endif
 
   /* XXX: crazy indent */
   /* we have contacts to notify... */
@@ -327,7 +325,6 @@ int service_notification(service* svc,
   /* get the time we finished */
   gettimeofday(&end_time, NULL);
 
-#ifdef USE_EVENT_BROKER
   /* send data to event broker */
   broker_notification_data(NEBTYPE_NOTIFICATION_END,
 			   NEBFLAG_NONE,
@@ -342,7 +339,6 @@ int service_notification(service* svc,
 			   escalated,
                            contacts_notified,
 			   NULL);
-#endif
 
   /* update the status log with the service information */
   update_service_status(svc, FALSE);
@@ -833,7 +829,6 @@ int notify_contact_of_service(nagios_macros* mac,
   /* get start time */
   gettimeofday(&start_time, NULL);
 
-#ifdef USE_EVENT_BROKER
   /* send data to event broker */
   end_time.tv_sec = 0L;
   end_time.tv_usec = 0L;
@@ -854,7 +849,6 @@ int notify_contact_of_service(nagios_macros* mac,
     return (ERROR);
   else if (NEBERROR_CALLBACKOVERRIDE == neb_result)
     return (OK);
-#endif
 
   /* process all the notification commands this user has */
   for (temp_commandsmember = cntct->service_notification_commands;
@@ -864,7 +858,6 @@ int notify_contact_of_service(nagios_macros* mac,
     /* get start time */
     gettimeofday(&method_start_time, NULL);
 
-#ifdef USE_EVENT_BROKER
     /* send data to event broker */
     method_end_time.tv_sec = 0L;
     method_end_time.tv_usec = 0L;
@@ -886,7 +879,6 @@ int notify_contact_of_service(nagios_macros* mac,
       break;
     else if (NEBERROR_CALLBACKOVERRIDE == neb_result)
       continue;
-#endif
 
     /* get the raw command line */
     get_raw_command_line_r(mac,
@@ -1047,7 +1039,6 @@ int notify_contact_of_service(nagios_macros* mac,
     /* get end time */
     gettimeofday(&method_end_time, NULL);
 
-#ifdef USE_EVENT_BROKER
     /* send data to event broker */
     broker_contact_notification_method_data(NEBTYPE_CONTACTNOTIFICATIONMETHOD_END,
 					    NEBFLAG_NONE,
@@ -1063,7 +1054,6 @@ int notify_contact_of_service(nagios_macros* mac,
 					    not_data,
 					    escalated,
 					    NULL);
-#endif
   }
 
   /* get end time */
@@ -1072,7 +1062,6 @@ int notify_contact_of_service(nagios_macros* mac,
   /* update the contact's last service notification time */
   cntct->last_service_notification = start_time.tv_sec;
 
-#ifdef USE_EVENT_BROKER
   /* send data to event broker */
   broker_contact_notification_data(NEBTYPE_CONTACTNOTIFICATION_END,
                                    NEBFLAG_NONE,
@@ -1087,8 +1076,6 @@ int notify_contact_of_service(nagios_macros* mac,
 				   not_data,
                                    escalated,
 				   NULL);
-#endif
-
   return (OK);
 }
 
@@ -1364,7 +1351,6 @@ int host_notification(host* hst,
   /* create the contact notification list for this host */
   create_notification_list_from_host(mac, hst, options, &escalated);
 
-#ifdef USE_EVENT_BROKER
   /* send data to event broker */
   end_time.tv_sec = 0L;
   end_time.tv_usec = 0L;
@@ -1385,7 +1371,6 @@ int host_notification(host* hst,
     return (ERROR);
   else if (NEBERROR_CALLBACKOVERRIDE == neb_result)
     return (OK);
-#endif
 
   /* XXX: crazy indent */
   /* there are contacts to be notified... */
@@ -1567,7 +1552,6 @@ int host_notification(host* hst,
   /* get the time we finished */
   gettimeofday(&end_time, NULL);
 
-#ifdef USE_EVENT_BROKER
   /* send data to event broker */
   broker_notification_data(NEBTYPE_NOTIFICATION_END,
 			   NEBFLAG_NONE,
@@ -1582,7 +1566,6 @@ int host_notification(host* hst,
 			   escalated,
                            contacts_notified,
 			   NULL);
-#endif
 
   /* update the status log with the host info */
   update_host_status(hst, FALSE);
@@ -2017,7 +2000,6 @@ int notify_contact_of_host(nagios_macros* mac,
   /* get start time */
   gettimeofday(&start_time, NULL);
 
-#ifdef USE_EVENT_BROKER
   /* send data to event broker */
   end_time.tv_sec = 0L;
   end_time.tv_usec = 0L;
@@ -2038,7 +2020,6 @@ int notify_contact_of_host(nagios_macros* mac,
     return (ERROR);
   else if (NEBERROR_CALLBACKOVERRIDE == neb_result)
     return (OK);
-#endif
 
   /* process all the notification commands this user has */
   for (temp_commandsmember = cntct->host_notification_commands;
@@ -2048,7 +2029,6 @@ int notify_contact_of_host(nagios_macros* mac,
     /* get start time */
     gettimeofday(&method_start_time, NULL);
 
-#ifdef USE_EVENT_BROKER
     /* send data to event broker */
     method_end_time.tv_sec = 0L;
     method_end_time.tv_usec = 0L;
@@ -2070,7 +2050,6 @@ int notify_contact_of_host(nagios_macros* mac,
       break;
     else if (NEBERROR_CALLBACKOVERRIDE == neb_result)
       continue;
-#endif
 
     /* get the raw command line */
     get_raw_command_line_r(mac,
@@ -2231,7 +2210,6 @@ int notify_contact_of_host(nagios_macros* mac,
     /* get end time */
     gettimeofday(&method_end_time, NULL);
 
-#ifdef USE_EVENT_BROKER
     /* send data to event broker */
     broker_contact_notification_method_data(NEBTYPE_CONTACTNOTIFICATIONMETHOD_END,
 					    NEBFLAG_NONE,
@@ -2247,7 +2225,6 @@ int notify_contact_of_host(nagios_macros* mac,
 					    not_data,
 					    escalated,
 					    NULL);
-#endif
   }
 
   /* get end time */
@@ -2256,7 +2233,6 @@ int notify_contact_of_host(nagios_macros* mac,
   /* update the contact's last host notification time */
   cntct->last_host_notification = start_time.tv_sec;
 
-#ifdef USE_EVENT_BROKER
   /* send data to event broker */
   broker_contact_notification_data(NEBTYPE_CONTACTNOTIFICATION_END,
                                    NEBFLAG_NONE,
@@ -2271,7 +2247,6 @@ int notify_contact_of_host(nagios_macros* mac,
 				   not_data,
 				   escalated,
                                    NULL);
-#endif
 
   return (OK);
 }

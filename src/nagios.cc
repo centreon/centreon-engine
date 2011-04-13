@@ -494,7 +494,6 @@ int main(int argc, char** argv) {
       /* open debug log */
       open_debug_log();
 
-#ifdef USE_EVENT_BROKER
       /* initialize modules */
       neb_init_modules();
       neb_init_callback_list();
@@ -508,7 +507,6 @@ int main(int argc, char** argv) {
 	logit(NSLOG_INFO_MESSAGE, false, "Event broker module initialize failed.\n");
 	result = ERROR;
       }
-#endif
 
       /* this must be logged after we read config data, as user may have changed location of main log file */
       logit(NSLOG_PROCESS_INFO, TRUE,
@@ -523,7 +521,6 @@ int main(int argc, char** argv) {
       /* write log version/info */
       write_log_file_info(NULL);
 
-#ifdef USE_EVENT_BROKER
       /* load modules */
       neb_load_all_modules();
 
@@ -532,7 +529,6 @@ int main(int argc, char** argv) {
 			   NEBFLAG_NONE,
 			   NEBATTR_NONE,
 			   NULL);
-#endif
 
       /* read in all object config data */
       if (result == OK)
@@ -569,13 +565,11 @@ int main(int argc, char** argv) {
 	    deinit_embedded_perl();
 	}
 
-#ifdef USE_EVENT_BROKER
 	/* send program data to broker */
 	broker_program_state(NEBTYPE_PROCESS_SHUTDOWN,
 			     NEBFLAG_PROCESS_INITIATED,
 			     NEBATTR_SHUTDOWN_ABNORMAL,
 			     NULL);
-#endif
 	cleanup();
 	exit(ERROR);
       }
@@ -597,13 +591,11 @@ int main(int argc, char** argv) {
       /* handle signals (interrupts) */
       setup_sighandler();
 
-#ifdef USE_EVENT_BROKER
       /* send program data to broker */
       broker_program_state(NEBTYPE_PROCESS_START,
 			   NEBFLAG_NONE,
 			   NEBATTR_NONE,
 			   NULL);
-#endif
 
       /* open the command file (named pipe) for reading */
       result = open_command_file();
@@ -613,13 +605,11 @@ int main(int argc, char** argv) {
 	      "Bailing out due to errors encountered while trying to initialize the external command file... (PID=%d)\n",
 	      (int)getpid());
 
-#ifdef USE_EVENT_BROKER
 	/* send program data to broker */
 	broker_program_state(NEBTYPE_PROCESS_SHUTDOWN,
 			     NEBFLAG_PROCESS_INITIATED,
 			     NEBATTR_SHUTDOWN_ABNORMAL,
 			     NULL);
-#endif
 	cleanup();
 	exit(ERROR);
       }
@@ -657,13 +647,11 @@ int main(int argc, char** argv) {
       /* reset the restart flag */
       sigrestart = FALSE;
 
-#ifdef USE_EVENT_BROKER
       /* send program data to broker */
       broker_program_state(NEBTYPE_PROCESS_EVENTLOOPSTART,
 			   NEBFLAG_NONE,
 			   NEBATTR_NONE,
 			   NULL);
-#endif
 
       /* get event start time and save as macro */
       event_start = time(NULL);
@@ -672,13 +660,11 @@ int main(int argc, char** argv) {
 	mac->x[MACRO_EVENTSTARTTIME] = obj2pchar<unsigned long>(event_start);
       }
       catch(...) {
-#ifdef USE_EVENT_BROKER
 	/* send program data to broker */
 	broker_program_state(NEBTYPE_PROCESS_SHUTDOWN,
 			     NEBFLAG_PROCESS_INITIATED,
 			     NEBATTR_SHUTDOWN_ABNORMAL,
 			     NULL);
-#endif
 	cleanup();
       }
 
@@ -694,13 +680,11 @@ int main(int argc, char** argv) {
 	    buffer = my_strdup("Caught SIGHUP, restarting...\n");
 	  }
 	  catch(...) {
-#ifdef USE_EVENT_BROKER
 	    /* send program data to broker */
 	    broker_program_state(NEBTYPE_PROCESS_SHUTDOWN,
 				 NEBFLAG_PROCESS_INITIATED,
 				 NEBATTR_SHUTDOWN_ABNORMAL,
 				 NULL);
-#endif
 	    cleanup();
 	  }
 	}
@@ -711,13 +695,11 @@ int main(int argc, char** argv) {
 	    buffer = my_strdup(oss.str().c_str());
 	  }
 	  catch(...) {
-#ifdef USE_EVENT_BROKER
 	    /* send program data to broker */
 	    broker_program_state(NEBTYPE_PROCESS_SHUTDOWN,
 				 NEBFLAG_PROCESS_INITIATED,
 				 NEBATTR_SHUTDOWN_ABNORMAL,
 				 NULL);
-#endif
 	    cleanup();
 	  }
 	}
@@ -726,7 +708,6 @@ int main(int argc, char** argv) {
 	delete[] buffer;
       }
 
-#ifdef USE_EVENT_BROKER
       /* send program data to broker */
       broker_program_state(NEBTYPE_PROCESS_EVENTLOOPEND,
 			   NEBFLAG_NONE,
@@ -742,7 +723,6 @@ int main(int argc, char** argv) {
 			     NEBFLAG_USER_INITIATED,
 			     NEBATTR_RESTART_NORMAL,
 			     NULL);
-#endif
 
       /* save service and host state information */
       save_state_information(FALSE);

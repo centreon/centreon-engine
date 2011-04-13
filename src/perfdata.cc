@@ -21,13 +21,9 @@
 /*********** COMMON HEADER FILES ***********/
 
 #include "configuration.hh"
+#include "xpddefault.hh"
 #include "perfdata.hh"
 
-/***** IMPLEMENTATION-SPECIFIC HEADER FILES *****/
-
-#ifdef USE_XPDDEFAULT
-# include "xpddefault.hh"
-#endif
 
 using namespace com::centreon::scheduler;
 
@@ -39,17 +35,13 @@ extern configuration config;
 
 /* initializes performance data */
 int initialize_performance_data(char* config_file) {
-#ifdef USE_XPDDEFAULT
   xpddefault_initialize_performance_data(config_file);
-#endif
   return (OK);
 }
 
 /* cleans up performance data */
 int cleanup_performance_data(char* config_file) {
-#ifdef USE_XPDDEFAULT
   xpddefault_cleanup_performance_data(config_file);
-#endif
   return (OK);
 }
 
@@ -68,10 +60,7 @@ int update_service_performance_data(service* svc) {
     return (OK);
 
   /* process the performance data! */
-#ifdef USE_XPDDEFAULT
   xpddefault_update_service_performance_data(svc);
-#endif
-
   return (OK);
 }
 
@@ -86,9 +75,6 @@ int update_host_performance_data(host* hst) {
     return (OK);
 
   /* process the performance data! */
-#ifdef USE_XPDDEFAULT
   xpddefault_update_host_performance_data(hst);
-#endif
-
   return (OK);
 }

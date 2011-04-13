@@ -167,7 +167,6 @@ extern "C" {
 # define NEBATTR_DOWNTIME_STOP_NORMAL             1
 # define NEBATTR_DOWNTIME_STOP_CANCELLED          2
 
-# ifdef USE_EVENT_BROKER
 void broker_program_state(int type, int flags, int attr, struct timeval* timestamp);
 void broker_timed_event(int type, int flags, int attr, timed_event* event, struct timeval* timestamp);
 void broker_log_data(int type, int flags, int attr, char* data, unsigned long data_type, time_t entry_time, struct timeval* timestamp);
@@ -195,7 +194,6 @@ void broker_retention_data(int type, int flags, int attr, struct timeval* timest
 void broker_acknowledgement_data(int type, int flags, int attr, int acknowledgement_type, void* data, char* ack_author, char* ack_data, int subtype, int notify_contacts, int persistent_comment, struct timeval* timestamp);
 void broker_statechange_data(int type, int flags, int attr, int statechange_type, void* data, int state, int state_type, int current_attempt, int max_attempts, struct timeval* timestamp);
 struct timeval get_broker_timestamp(struct timeval* timestamp);
-# endif // !USE_EVENT_BROKER
 
 # ifdef __cplusplus
 }

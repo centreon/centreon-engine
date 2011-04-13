@@ -20,9 +20,7 @@
 
 #include <stdio.h>
 #include <string.h>
-#ifdef USE_XODTEMPLATE          /* template-based routines */
-# include "xodtemplate.hh"
-#endif
+#include "xodtemplate.hh"
 #include "skiplist.hh"
 #include "logging.hh"
 #include "nagios.hh"
@@ -70,12 +68,8 @@ int read_object_config_data(char* main_config_file,
   /* initialize object skiplists */
   init_object_skiplists();
 
-  /********* IMPLEMENTATION-SPECIFIC INPUT FUNCTION ********/
-#ifdef USE_XODTEMPLATE
   /* read in data from all text host config files (template-based) */
   return (xodtemplate_read_config_data(main_config_file, options, cache, precache) != OK);
-#endif
-  return (OK);
 }
 
 /******************************************************************/

@@ -29,8 +29,6 @@
 #include "modules/handle.hh"
 #include "nebmods.hh"
 
-#ifdef USE_EVENT_BROKER
-
 using namespace com::centreon::scheduler;
 
 extern configuration config;
@@ -482,5 +480,3 @@ int neb_free_callback_list(void) {
 
   return (OK);
 }
-
-#endif

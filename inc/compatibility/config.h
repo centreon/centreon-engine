@@ -50,6 +50,10 @@
 #  define USE_XDDDEFAULT
 # endif /* !USE_XDDDEFAULT */
 
+# ifndef USE_NANOSLEEP
+#  define USE_NANOSLEEP
+# endif /* !USE_NANOSLEEP */
+
 /***** HEADER FILES *****/
 
 # include <stdio.h>

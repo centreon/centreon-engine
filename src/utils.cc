@@ -285,7 +285,6 @@ int my_system_r(nagios_macros* mac,
   /* get the command start time */
   gettimeofday(&start_time, NULL);
 
-#ifdef USE_EVENT_BROKER
   /* send data to event broker */
   end_time.tv_sec = 0L;
   end_time.tv_usec = 0L;
@@ -301,7 +300,6 @@ int my_system_r(nagios_macros* mac,
 			cmd,
 			NULL,
                         NULL);
-#endif
 
   /* fork */
   pid = fork();
@@ -564,7 +562,6 @@ int my_system_r(nagios_macros* mac,
 		   result,
                    (output_dbuf.buf == NULL) ? "(null)" : output_dbuf.buf);
 
-#ifdef USE_EVENT_BROKER
     /* send data to event broker */
     broker_system_command(NEBTYPE_SYSTEM_COMMAND_END,
 			  NEBFLAG_NONE,
@@ -578,7 +575,6 @@ int my_system_r(nagios_macros* mac,
 			  cmd,
                           (output_dbuf.buf == NULL) ? NULL : output_dbuf.buf,
 			  NULL);
-#endif
 
     /* free memory */
     dbuf_free(&output_dbuf);
@@ -3699,7 +3695,6 @@ char* get_program_modification_date(void) {
 
 /* do some cleanup before we exit */
 void cleanup(void) {
-#ifdef USE_EVENT_BROKER
   /* unload modules */
   if (test_scheduling == FALSE && verify_config == FALSE) {
     neb_free_callback_list();
@@ -3708,7 +3703,6 @@ void cleanup(void) {
     neb_free_module_list();
     neb_deinit_modules();
   }
-#endif
 
   /* free all allocated memory - including macros */
   free_memory(get_global_macros());

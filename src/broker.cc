@@ -38,8 +38,6 @@ extern time_t        last_log_rotation;
 extern unsigned long modified_host_process_attributes;
 extern unsigned long modified_service_process_attributes;
 
-#ifdef USE_EVENT_BROKER
-
 /******************************************************************/
 /************************* EVENT FUNCTIONS ************************/
 /******************************************************************/
@@ -1116,4 +1114,3 @@ struct timeval get_broker_timestamp(struct timeval* timestamp) {
   return (tv);
 }
 
-#endif

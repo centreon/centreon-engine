@@ -24,9 +24,7 @@
 #include "nagios.hh"
 #include "perfdata.hh"
 #include "broker.hh"
-#ifdef USE_EVENT_BROKER
-# include "neberrors.hh"
-#endif
+#include "neberrors.hh"
 #include "logging.hh"
 #include "notifications.hh"
 #include "commands.hh"
@@ -238,7 +236,6 @@ int handle_service_event(service* svc) {
   if (svc == NULL)
     return (ERROR);
 
-#ifdef USE_EVENT_BROKER
   /* send event data to broker */
   broker_statechange_data(NEBTYPE_STATECHANGE_END,
 			  NEBFLAG_NONE,
@@ -250,7 +247,6 @@ int handle_service_event(service* svc) {
 			  svc->current_attempt,
                           svc->max_attempts,
 			  NULL);
-#endif
 
   /* bail out if we shouldn't be running event handlers */
   if (config.get_enable_event_handlers() == false)
@@ -291,11 +287,9 @@ int run_global_service_event_handler(nagios_macros* mac, service* svc) {
   int early_timeout = FALSE;
   double exectime = 0.0;
   int result = 0;
-#ifdef USE_EVENT_BROKER
   struct timeval start_time;
   struct timeval end_time;
   int neb_result = OK;
-#endif
   int macro_options = STRIP_ILLEGAL_MACRO_CHARS | ESCAPE_MACRO_CHARS;
 
   log_debug_info(DEBUGL_FUNCTIONS, 0, "run_global_service_event_handler()\n");
@@ -315,10 +309,8 @@ int run_global_service_event_handler(nagios_macros* mac, service* svc) {
                  "Running global event handler for service '%s' on host '%s'...\n",
                  svc->description, svc->host_name);
 
-#ifdef USE_EVENT_BROKER
   /* get start time */
   gettimeofday(&start_time, NULL);
-#endif
 
   /* get the raw command line */
   get_raw_command_line_r(mac,
@@ -353,7 +345,6 @@ int run_global_service_event_handler(nagios_macros* mac, service* svc) {
     logit(NSLOG_EVENT_HANDLER, FALSE, "%s", processed_logentry);
   }
 
-#ifdef USE_EVENT_BROKER
   /* send event data to broker */
   end_time.tv_sec = 0L;
   end_time.tv_usec = 0L;
@@ -384,7 +375,6 @@ int run_global_service_event_handler(nagios_macros* mac, service* svc) {
     delete[] processed_logentry;
     return ((neb_result == NEBERROR_CALLBACKCANCEL) ? ERROR : OK);
   }
-#endif
 
   /* run the command */
   result = my_system_r(mac,
@@ -402,12 +392,9 @@ int run_global_service_event_handler(nagios_macros* mac, service* svc) {
           processed_command,
 	  config.get_event_handler_timeout());
 
-#ifdef USE_EVENT_BROKER
   /* get end time */
   gettimeofday(&end_time, NULL);
-#endif
 
-#ifdef USE_EVENT_BROKER
   /* send event data to broker */
   broker_event_handler(NEBTYPE_EVENTHANDLER_END,
 		       NEBFLAG_NONE,
@@ -426,7 +413,6 @@ int run_global_service_event_handler(nagios_macros* mac, service* svc) {
 		       processed_command,
 		       command_output,
                        NULL);
-#endif
 
   /* free memory */
   delete[] command_output;
@@ -448,11 +434,9 @@ int run_service_event_handler(nagios_macros* mac, service* svc) {
   int early_timeout = FALSE;
   double exectime = 0.0;
   int result = 0;
-#ifdef USE_EVENT_BROKER
   struct timeval start_time;
   struct timeval end_time;
   int neb_result = OK;
-#endif
   int macro_options = STRIP_ILLEGAL_MACRO_CHARS | ESCAPE_MACRO_CHARS;
 
 
@@ -470,10 +454,8 @@ int run_service_event_handler(nagios_macros* mac, service* svc) {
                  svc->description,
 		 svc->host_name);
 
-#ifdef USE_EVENT_BROKER
   /* get start time */
   gettimeofday(&start_time, NULL);
-#endif
 
   /* get the raw command line */
   get_raw_command_line_r(mac,
@@ -508,7 +490,6 @@ int run_service_event_handler(nagios_macros* mac, service* svc) {
     logit(NSLOG_EVENT_HANDLER, FALSE, "%s", processed_logentry);
   }
 
-#ifdef USE_EVENT_BROKER
   /* send event data to broker */
   end_time.tv_sec = 0L;
   end_time.tv_usec = 0L;
@@ -539,7 +520,6 @@ int run_service_event_handler(nagios_macros* mac, service* svc) {
     delete[] processed_logentry;
     return ((neb_result == NEBERROR_CALLBACKCANCEL) ? ERROR : OK);
   }
-#endif
 
   /* run the command */
   result = my_system_r(mac,
@@ -557,12 +537,9 @@ int run_service_event_handler(nagios_macros* mac, service* svc) {
           processed_command,
 	  config.get_event_handler_timeout());
 
-#ifdef USE_EVENT_BROKER
   /* get end time */
   gettimeofday(&end_time, NULL);
-#endif
 
-#ifdef USE_EVENT_BROKER
   /* send event data to broker */
   broker_event_handler(NEBTYPE_EVENTHANDLER_END,
 		       NEBFLAG_NONE,
@@ -581,7 +558,6 @@ int run_service_event_handler(nagios_macros* mac, service* svc) {
                        processed_command,
 		       command_output,
 		       NULL);
-#endif
 
   /* free memory */
   delete[] command_output;
@@ -606,7 +582,6 @@ int handle_host_event(host* hst) {
   if (hst == NULL)
     return (ERROR);
 
-#ifdef USE_EVENT_BROKER
   /* send event data to broker */
   broker_statechange_data(NEBTYPE_STATECHANGE_END,
 			  NEBFLAG_NONE,
@@ -618,7 +593,6 @@ int handle_host_event(host* hst) {
                           hst->current_attempt,
 			  hst->max_attempts,
                           NULL);
-#endif
 
   /* bail out if we shouldn't be running event handlers */
   if (config.get_enable_event_handlers() == false)
@@ -653,11 +627,9 @@ int run_global_host_event_handler(nagios_macros* mac, host* hst) {
   int early_timeout = FALSE;
   double exectime = 0.0;
   int result = 0;
-#ifdef USE_EVENT_BROKER
   struct timeval start_time;
   struct timeval end_time;
   int neb_result = OK;
-#endif
   int macro_options = STRIP_ILLEGAL_MACRO_CHARS | ESCAPE_MACRO_CHARS;
 
   log_debug_info(DEBUGL_FUNCTIONS, 0, "run_global_host_event_handler()\n");
@@ -677,10 +649,8 @@ int run_global_host_event_handler(nagios_macros* mac, host* hst) {
                  "Running global event handler for host '%s'..\n",
                  hst->name);
 
-#ifdef USE_EVENT_BROKER
   /* get start time */
   gettimeofday(&start_time, NULL);
-#endif
 
   /* get the raw command line */
   get_raw_command_line_r(mac,
@@ -714,7 +684,6 @@ int run_global_host_event_handler(nagios_macros* mac, host* hst) {
     logit(NSLOG_EVENT_HANDLER, FALSE, "%s", processed_logentry);
   }
 
-#ifdef USE_EVENT_BROKER
   /* send event data to broker */
   end_time.tv_sec = 0L;
   end_time.tv_usec = 0L;
@@ -744,7 +713,6 @@ int run_global_host_event_handler(nagios_macros* mac, host* hst) {
     delete[] processed_logentry;
     return ((neb_result == NEBERROR_CALLBACKCANCEL) ? ERROR : OK);
   }
-#endif
 
   /* run the command */
   result = my_system_r(mac,
@@ -762,12 +730,9 @@ int run_global_host_event_handler(nagios_macros* mac, host* hst) {
           processed_command,
 	  config.get_event_handler_timeout());
 
-#ifdef USE_EVENT_BROKER
   /* get end time */
   gettimeofday(&end_time, NULL);
-#endif
 
-#ifdef USE_EVENT_BROKER
   /* send event data to broker */
   broker_event_handler(NEBTYPE_EVENTHANDLER_END,
 		       NEBFLAG_NONE,
@@ -786,7 +751,6 @@ int run_global_host_event_handler(nagios_macros* mac, host* hst) {
                        processed_command,
 		       command_output,
 		       NULL);
-#endif
 
   /* free memory */
   delete[] command_output;
@@ -808,11 +772,9 @@ int run_host_event_handler(nagios_macros* mac, host* hst) {
   int early_timeout = FALSE;
   double exectime = 0.0;
   int result = 0;
-#ifdef USE_EVENT_BROKER
   struct timeval start_time;
   struct timeval end_time;
   int neb_result = OK;
-#endif
   int macro_options = STRIP_ILLEGAL_MACRO_CHARS | ESCAPE_MACRO_CHARS;
 
   log_debug_info(DEBUGL_FUNCTIONS, 0, "run_host_event_handler()\n");
@@ -827,10 +789,8 @@ int run_host_event_handler(nagios_macros* mac, host* hst) {
   log_debug_info(DEBUGL_EVENTHANDLERS, 1,
                  "Running event handler for host '%s'..\n", hst->name);
 
-#ifdef USE_EVENT_BROKER
   /* get start time */
   gettimeofday(&start_time, NULL);
-#endif
 
   /* get the raw command line */
   get_raw_command_line_r(mac,
@@ -864,7 +824,6 @@ int run_host_event_handler(nagios_macros* mac, host* hst) {
     logit(NSLOG_EVENT_HANDLER, FALSE, "%s", processed_logentry);
   }
 
-#ifdef USE_EVENT_BROKER
   /* send event data to broker */
   end_time.tv_sec = 0L;
   end_time.tv_usec = 0L;
@@ -895,7 +854,6 @@ int run_host_event_handler(nagios_macros* mac, host* hst) {
     delete[] processed_logentry;
     return ((neb_result == NEBERROR_CALLBACKCANCEL) ? ERROR : OK);
   }
-#endif
 
   /* run the command */
   result = my_system_r(mac,
@@ -913,12 +871,9 @@ int run_host_event_handler(nagios_macros* mac, host* hst) {
           processed_command,
 	  config.get_event_handler_timeout());
 
-#ifdef USE_EVENT_BROKER
   /* get end time */
   gettimeofday(&end_time, NULL);
-#endif
 
-#ifdef USE_EVENT_BROKER
   /* send event data to broker */
   broker_event_handler(NEBTYPE_EVENTHANDLER_END,
 		       NEBFLAG_NONE,
@@ -937,7 +892,6 @@ int run_host_event_handler(nagios_macros* mac, host* hst) {
                        processed_command,
 		       command_output,
 		       NULL);
-#endif
 
   /* free memory */
   delete[] command_output;

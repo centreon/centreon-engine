@@ -75,15 +75,7 @@ check_function_exists("strstr" HAVE_STRSTR)
 check_function_exists("strtoul" HAVE_STRTOUL)
 check_function_exists("unsetenv" HAVE_UNSETENV)
 check_function_exists("vasprintf" HAVE_VASPRINTF)
-
-# Should we use nanosleep.
-option(WITH_NANOSLEEP "Use nanosleep instead of sleep." ON)
-if (WITH_NANOSLEEP)
-  set(NANOSLEEP "Yes")
-  check_function_exists("nanosleep" USE_NANOSLEEP)
-else ()
-  set(NANOSLEEP "No")
-endif ()
+check_function_exists("nanosleep" HAVE_NANOSLEEP)
 
 # Check timezone informations.
 include(CheckStructHasMember)
@@ -117,15 +109,6 @@ if (NOT CMAKE_USE_PTHREADS_INIT)
   message(FATAL_ERROR "Could not find pthreads.")
 endif ()
 set(THREAD_LIBRARIES "${CMAKE_THREAD_LIBS_INIT}")
-
-# Event broker option.
-option(WITH_EVENT_BROKER "Allow event broker modules use." ON)
-if (WITH_EVENT_BROKER)
-  set(EVENT_BROKER "Yes")
-  set(USE_EVENT_BROKER TRUE)
-else ()
-  set(EVENT_BROKER "No")
-endif ()
 
 # localstatedir is the prefix.
 if (WITH_PREFIX)
@@ -248,21 +231,7 @@ else ()
 endif ()
 
 # Define flags.
-#  Event broker integration.
-add_definitions(-DUSE_EVENT_BROKER)
-
-#  I/O implementations.
-add_definitions(-DUSE_XSDDEFAULT)
-add_definitions(-DUSE_XCDDEFAULT)
-add_definitions(-DUSE_XRDDEFAULT)
-add_definitions(-DUSE_XODTEMPLATE)
-add_definitions(-DUSE_XPDDEFAULT)
-add_definitions(-DUSE_XDDDEFAULT)
-
 #  Misc definitions.
-if (USE_NANOSLEEP)
-  add_definitions(-DUSE_NANOSLEEP)
-endif ()
 if (HAVE_STRUCT_TM_TM_ZONE)
   add_definitions(-DHAVE_STRUCT_TM_TM_ZONE)
 elseif (HAVE_TZNAME)
@@ -435,8 +404,6 @@ message(STATUS "Configuration Summary")
 message(STATUS "---------------------")
 message(STATUS "")
 message(STATUS "    Version:                 ${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}")
-message(STATUS "    Nanosleep enabled:       ${NANOSLEEP}")
-message(STATUS "    Event-broker enabled:    ${EVENT_BROKER}")
 message(STATUS "    Embedded Perl:           ${EMBEDDED_PERL}")
 if (EMBEDDEDPERL)
   message(STATUS "    Threaded Perl:           ${THREADED_PERL}")

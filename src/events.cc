@@ -1022,14 +1022,12 @@ void add_event(timed_event* event,
     }
   }
 
-#ifdef USE_EVENT_BROKER
   /* send event data to broker */
   broker_timed_event(NEBTYPE_TIMEDEVENT_ADD,
 		     NEBFLAG_NONE,
 		     NEBATTR_NONE,
 		     event,
                      NULL);
-#endif
 }
 
 /* remove an event from the queue */
@@ -1040,14 +1038,12 @@ void remove_event(timed_event* event,
 
   log_debug_info(DEBUGL_FUNCTIONS, 0, "remove_event()\n");
 
-#ifdef USE_EVENT_BROKER
   /* send event data to broker */
   broker_timed_event(NEBTYPE_TIMEDEVENT_REMOVE,
 		     NEBFLAG_NONE,
 		     NEBATTR_NONE,
                      event,
 		     NULL);
-#endif
 
   if (*event_list == NULL || event == NULL)
     return;
@@ -1339,17 +1335,9 @@ int event_execution_loop(void) {
         log_debug_info(DEBUGL_EVENTS, 2,
                        "Did not execute scheduled event.  Idling for a bit...\n");
 
-#ifdef USE_NANOSLEEP
         delay.tv_sec = (time_t)config.get_sleep_time();
         delay.tv_nsec = (long)((config.get_sleep_time() - (double)delay.tv_sec) * 1000000000);
         nanosleep(&delay, NULL);
-#else
-        delay.tv_sec = (time_t)config.get_sleep_time();
-        if (delay.tv_sec == 0L)
-          delay.tv_sec = 1;
-        delay.tv_nsec = 0L;
-        sleep((unsigned int)delay.tv_sec);
-#endif
       }
     }
 
@@ -1368,17 +1356,9 @@ int event_execution_loop(void) {
 	  check_for_external_commands();
 
 	/* set time to sleep so we don't hog the CPU... */
-#ifdef USE_NANOSLEEP
 	delay.tv_sec = (time_t)config.get_sleep_time();
 	delay.tv_nsec = (long)((config.get_sleep_time() - (double)delay.tv_sec) * 1000000000);
-#else
-	delay.tv_sec = (time_t)config.get_sleep_time();
-	if (delay.tv_sec == 0L)
-	  delay.tv_sec = 1;
-	delay.tv_nsec = 0L;
-#endif
 
-#ifdef USE_EVENT_BROKER
 	/* populate fake "sleep" event */
 	sleep_event.run_time = current_time;
 	sleep_event.event_data = (void*)&delay;
@@ -1389,14 +1369,9 @@ int event_execution_loop(void) {
 			   NEBATTR_NONE,
 			   &sleep_event,
 			   NULL);
-#endif
 
 	/* wait a while so we don't hog the CPU... */
-#ifdef USE_NANOSLEEP
 	nanosleep(&delay, NULL);
-#else
-	sleep((unsigned int)delay.tv_sec);
-#endif
       }
 
     /* update status information occassionally - NagVis watches the NDOUtils DB to see if Nagios is alive */
@@ -1420,10 +1395,8 @@ int handle_timed_event(timed_event* event) {
 
   log_debug_info(DEBUGL_FUNCTIONS, 0, "handle_timed_event() start\n");
 
-#ifdef USE_EVENT_BROKER
   /* send event data to broker */
   broker_timed_event(NEBTYPE_TIMEDEVENT_EXECUTE, NEBFLAG_NONE, NEBATTR_NONE, event, NULL);
-#endif
 
   log_debug_info(DEBUGL_EVENTS, 0, "** Timed Event ** Type: %d, Run Time: %s",
 		 event->event_type,

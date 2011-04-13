@@ -20,9 +20,7 @@
 
 #include <stdlib.h>
 #include <string.h>
-#ifdef USE_XCDDEFAULT
-# include "xcddefault.hh"
-#endif
+#include "xcddefault.hh"
 #include "broker.hh"
 #include "utils.hh"
 #include "comments.hh"
@@ -37,20 +35,12 @@ static comment* comment_hashlist[COMMENT_HASHSLOTS];
 
 /* initializes comment data */
 int initialize_comment_data(char* config_file) {
-  /**** IMPLEMENTATION-SPECIFIC CALLS ****/
-#ifdef USE_XCDDEFAULT
   return (xcddefault_initialize_comment_data(config_file));
-#endif
-  return (OK);
 }
 
 /* removes old/invalid comments */
 int cleanup_comment_data(char* config_file) {
-  /**** IMPLEMENTATION-SPECIFIC CALLS ****/
-#ifdef USE_XCDDEFAULT
   return (xcddefault_cleanup_comment_data(config_file));
-#endif
-  return (OK);
 }
 
 /******************************************************************/
@@ -130,8 +120,6 @@ int add_new_host_comment(int entry_type,
   int result = OK;
   unsigned long new_comment_id = 0L;
 
-  /**** IMPLEMENTATION-SPECIFIC CALLS ****/
-#ifdef USE_XCDDEFAULT
   result = xcddefault_add_new_host_comment(entry_type,
 					   host_name,
 					   entry_time,
@@ -142,13 +130,11 @@ int add_new_host_comment(int entry_type,
 					   expires,
 					   expire_time,
 					   &new_comment_id);
-#endif
 
   /* save comment id */
   if (comment_id != NULL)
     *comment_id = new_comment_id;
 
-#ifdef USE_EVENT_BROKER
   /* send data to event broker */
   broker_comment_data(NEBTYPE_COMMENT_ADD,
 		      NEBFLAG_NONE,
@@ -166,7 +152,6 @@ int add_new_host_comment(int entry_type,
 		      expire_time,
 		      new_comment_id,
                       NULL);
-#endif
   return (result);
 }
 
@@ -185,8 +170,6 @@ int add_new_service_comment(int entry_type,
   int result = OK;
   unsigned long new_comment_id = 0L;
 
-  /**** IMPLEMENTATION-SPECIFIC CALLS ****/
-#ifdef USE_XCDDEFAULT
   result = xcddefault_add_new_service_comment(entry_type,
 					      host_name,
 					      svc_description,
@@ -198,13 +181,11 @@ int add_new_service_comment(int entry_type,
 					      expires,
 					      expire_time,
 					      &new_comment_id);
-#endif
 
   /* save comment id */
   if (comment_id != NULL)
     *comment_id = new_comment_id;
 
-#ifdef USE_EVENT_BROKER
   /* send data to event broker */
   broker_comment_data(NEBTYPE_COMMENT_ADD,
 		      NEBFLAG_NONE,
@@ -222,7 +203,6 @@ int add_new_service_comment(int entry_type,
                       expire_time,
 		      new_comment_id,
 		      NULL);
-#endif
   return (result);
 }
 
@@ -257,7 +237,6 @@ int delete_comment(unsigned int type, unsigned long comment_id) {
   /* remove the comment from the list in memory */
   if (this_comment != NULL) {
 
-#ifdef USE_EVENT_BROKER
     /* send data to event broker */
     broker_comment_data(NEBTYPE_COMMENT_DELETE,
 			NEBFLAG_NONE,
@@ -274,7 +253,6 @@ int delete_comment(unsigned int type, unsigned long comment_id) {
                         this_comment->expire_time,
 			comment_id,
 			NULL);
-#endif
 
     /* first remove from chained hash list */
     hashslot = hashfunc(this_comment->host_name, NULL, COMMENT_HASHSLOTS);
@@ -310,13 +288,10 @@ int delete_comment(unsigned int type, unsigned long comment_id) {
   else
     result = ERROR;
 
-  /**** IMPLEMENTATION-SPECIFIC CALLS ****/
-#ifdef USE_XCDDEFAULT
   if (type == HOST_COMMENT)
     result = xcddefault_delete_host_comment(comment_id);
   else
     result = xcddefault_delete_service_comment(comment_id);
-#endif
   return (result);
 }
 
@@ -611,7 +586,6 @@ int add_comment(unsigned int comment_type,
     }
   }
 
-#ifdef USE_EVENT_BROKER
   /* send data to event broker */
   broker_comment_data(NEBTYPE_COMMENT_LOAD,
 		      NEBFLAG_NONE,
@@ -629,7 +603,6 @@ int add_comment(unsigned int comment_type,
 		      expire_time,
                       comment_id,
 		      NULL);
-#endif
   return (OK);
 }
 
