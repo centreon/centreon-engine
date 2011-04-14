@@ -167,7 +167,7 @@ if (WITH_STARTUP_SCRIPT)
       elseif (OS_DISTRIBUTOR STREQUAL "Ubuntu\n")
         message(STATUS "Generating Ubuntu startup script.")
         set(STARTUP_SCRIPT "Ubuntu upstart script")
-	install(PROGRAMS "${SCRIPT_DIR}/ubuntu.conf"
+	install(FILES "${SCRIPT_DIR}/ubuntu.conf"
 	  DESTINATION "/etc/init"
 	  RENAME "centscheduler.conf")
       else ()
@@ -347,6 +347,7 @@ target_link_libraries("centscheduler"
   ${QT_LIBRARIES}
   "schedulerlib"
 )
+install(TARGETS "centscheduler" DESTINATION "${bindir}")
 
 # Centschedulerstats target.
 add_executable("centschedulerstats"
@@ -361,6 +362,7 @@ add_executable("test_configuration"
 target_link_libraries("test_configuration"
   ${QT_LIBRARIES}
 )
+install(TARGETS "centschedulerstats" DESTINATION "${bindir}")
 
 add_test("test_configuration_basic"
   "test_configuration"
