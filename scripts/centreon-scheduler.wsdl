@@ -57,6 +57,14 @@
         </sequence>
       </complexType>
 
+      <!-- Check result. -->
+      <complexType name="checkResultType">
+        <sequence>
+          <element name="retval" type="xsd:int"/>
+          <element name="output" type="xsd:string"/>
+        </sequence>
+      </complexType>
+
       <!-- Downtime identifier. -->
       <complexType name="downtimeIDType">
         <sequence>
@@ -263,6 +271,22 @@
   </message>
 
   <!--
+   --  Check messages.
+   -->
+
+  <!-- Message sent when submitting a host check result. -->
+  <message name="checkHostRequest">
+    <part name="host" type="tns:hostIDType"/>
+    <part name="result" type="tns:checkResultType"/>
+  </message>
+
+  <!-- Message sent when submitting a service check result. -->
+  <message name="checkServiceRequest">
+    <part name="service" type="tns:serviceIDType"/>
+    <part name="result" type="tns:checkResultType"/>
+  </message>
+
+  <!--
    --  Downtime messages.
    -->
 
@@ -285,7 +309,7 @@
 
   <!-- Returns a downtime ID. -->
   <message name="downtimeResponse">
-    <part name="downtimeid" type="downtimeIDType"/>
+    <part name="downtimeid" type="tns:downtimeIDType"/>
   </message>
 
   <!--
@@ -2422,6 +2446,69 @@
     </operation>
 
 
+    <!--------------
+     --           --
+     --  Checks.  --
+     --           --
+     --------------->
+
+    <!-- checkHostProcessResult(host, result) -->
+    <operation name="checkHostProcessResult">
+      <documentation>Process a host check result.</documentation>
+      <input message="tns:checkHostRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- checkHostSchedule(host, when) -->
+    <operation name="checkHostSchedule">
+      <documentation>Schedule a host check.</documentation>
+      <input message="tns:hostDateRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- checkHostScheduleForced(host, when) -->
+    <operation name="checkHostScheduleForced">
+      <documentation>Schedule a forced host check.</documentation>
+      <input message="tns:hostDateRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- checkHostScheduleServices(host, when) -->
+    <operation name="checkHostScheduleServices">
+      <documentation>Schedule a check of all services associated with the host.</documentation>
+      <input message="tns:hostDateRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- checkHostScheduleServicesForced(host, when) -->
+    <operation name="checkHostScheduleServicesForced">
+      <documentation>Schedule a forced check of all services associated with the host.</documentation>
+      <input message="tns:hostDateRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- checkServiceProcessResult(service, result) -->
+    <operation name="checkServiceProcessResult">
+      <documentation>Process a service check result.</documentation>
+      <input message="tns:checkServiceRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- checkServiceSchedule(service, when) -->
+    <operation name="checkServiceSchedule">
+      <documentation>Schedule a service check.</documentation>
+      <input message="tns:serviceDateRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- checkServiceScheduleForced(service, when) -->
+    <operation name="checkServiceScheduleForced">
+      <documentation>Schedule a forced service check.</documentation>
+      <input message="tns:serviceDateRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+
     <!-----------------
      --              --
      --  Downtimes.  --
@@ -2615,34 +2702,6 @@
       <output message="tns:newCommentResponse"/>
     </operation>
 
-    <!-- processHostCheckResult(string host, int retval, string output) -->
-    <operation name="processHostCheckResult">
-      <documentation>Process a host check result.</documentation>
-      <input message="tns:processHostCheckResultRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
-
-    <!-- processServiceCheckResult(string host, string service, int retval, string output) -->
-    <operation name="processServiceCheckResult">
-      <documentation>Process a service check result.</documentation>
-      <input message="tns:processServiceCheckResultRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
-
-    <!-- scheduleHostCheck(string host, time_t when) -->
-    <operation name="scheduleHostCheck">
-      <documentation>Schedule a host check.</documentation>
-      <input message="tns:hostTimeRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
-
-    <!-- scheduleHostForcedCheck(string host, time_t when) -->
-    <operation name="scheduleHostForcedCheck">
-      <documentation>Schedule a forced host check.</documentation>
-      <input message="tns:hostTimeRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
-
     <!-- scheduleHostgroupHostDowntime(string hostgroup, downtimeType downtime) -->
     <operation name="scheduleHostgroupHostDowntime">
       <documentation>Schedule a downtime on all hosts of a host group.</documentation>
@@ -2654,34 +2713,6 @@
     <operation name="scheduleHostgroupServiceDowntime">
       <documentation>Schedule a downtime on all services of the hosts of the host group.</documentation>
       <input message="tns:scheduleDowntimeRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
-
-    <!-- scheduleHostServiceChecks(string host, time_t when) -->
-    <operation name="scheduleHostServiceChecks">
-      <documentation>Schedule a check of all services associated with the host.</documentation>
-      <input message="tns:hostTimeRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
-
-    <!-- scheduleHostServiceForcedChecks(string host, time_t when) -->
-    <operation name="scheduleHostServiceForcedChecks">
-      <documentation>Schedule a forced check of all services associated with the host.</documentation>
-      <input message="tns:hostTimeRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
-
-    <!-- scheduleServiceCheck(string host, string service, time_t when) -->
-    <operation name="scheduleServiceCheck">
-      <documentation>Schedule a service check.</documentation>
-      <input message="tns:serviceTimeRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
-
-    <!-- scheduleServiceForcedCheck(string host, string service, time_t when) -->
-    <operation name="scheduleServiceForcedCheck">
-      <documentation>Schedule a forced service check.</documentation>
-      <input message="tns:serviceTimeRequest"/>
       <output message="tns:defaultResponse"/>
     </operation>
 
@@ -4635,6 +4666,61 @@
       <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
     </operation>
 
+    <!--------------
+     --           --
+     --  Checks.  --
+     --           --
+     --------------->
+
+    <operation name="checkHostProcessResult">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="checkHostSchedule">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="checkHostScheduleForced">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="checkHostScheduleServices">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="checkHostScheduleServicesForced">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="checkServiceProcessResult">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="checkServiceSchedule">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="checkServiceScheduleForced">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+    
+
     <!-----------------
      --              --
      --  Downtimes.  --
@@ -4779,30 +4865,6 @@
       <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
     </operation>
 
-    <operation name="processHostCheckResult">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
-    <operation name="processServiceCheckResult">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
-    <operation name="scheduleHostCheck">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
-    <operation name="scheduleHostForcedCheck">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
     <operation name="scheduleHostgroupHostDowntime">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
@@ -4810,30 +4872,6 @@
     </operation>
 
     <operation name="scheduleHostgroupServiceDowntime">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
-    <operation name="scheduleHostServiceChecks">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
-    <operation name="scheduleHostServiceForcedChecks">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
-    <operation name="scheduleServiceCheck">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
-    <operation name="scheduleServiceForcedCheck">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
       <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
