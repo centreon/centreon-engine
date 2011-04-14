@@ -77,8 +77,7 @@
         </sequence>
       </complexType>
 
-
-      <!-- Not validated types. -->
+      <!-- Notification. -->
       <complexType name="notificationType">
         <sequence>
           <element name="author" type="xsd:string"/>
@@ -88,6 +87,7 @@
           <element name="increment" type="xsd:string"/>
         </sequence>
       </complexType>
+
     </schema>
   </types>
 
@@ -171,6 +171,12 @@
     <part name="value" type="xsd:boolean"/>
   </message>
 
+  <!-- Host request with a date. -->
+  <message name="hostDateRequest">
+    <part name="host" type="tns:hostIDType"/>
+    <part name="value" type="xsd:dateTime"/>
+  </message>
+
   <!-- Host request with a double. -->
   <message name="hostDoubleRequest">
     <part name="host" type="tns:hostIDType"/>
@@ -208,6 +214,12 @@
   <message name="serviceBooleanRequest">
     <part name="service" type="tns:serviceIDType"/>
     <part name="value" type="xsd:boolean"/>
+  </message>
+
+  <!-- Service request with a date. -->
+  <message name="serviceDateRequest">
+    <part name="service" type="tns:serviceIDType"/>
+    <part name="value" type="xsd:dateTime"/>
   </message>
 
   <!-- Service request with a double. -->
@@ -274,6 +286,22 @@
   <!-- Returns a downtime ID. -->
   <message name="downtimeResponse">
     <part name="downtime" type="downtimeIDType"/>
+  </message>
+
+  <!--
+   --  Notification messages.
+   -->
+
+  <!-- Host notification request. -->
+  <message name="notificationHostRequest">
+    <part name="host" type="hostIDType"/>
+    <part name="notification" type="notificationType"/>
+  </message>
+
+  <!-- Add service notification. -->
+  <message name="notificationServiceRequest">
+    <part name="service" type="serviceIDType"/>
+    <part name="notification" type="notificationType"/>
   </message>
 
 
@@ -1049,158 +1077,172 @@
      --  Notification.
      -->
 
-    <!-- hostGetNotificationCurrentID(host) -->
-    <operation name="hostGetNotificationCurrentID">
+    <!-- hostGetNotificationsCurrentID(host) -->
+    <operation name="hostGetNotificationsCurrentID">
       <documentation>Get the ID of the current host notification.</documentation>
       <input message="tns:hostRequest"/>
       <output message="tns:unsignedIntResponse"/>
     </operation>
 
-    <!-- hostGetNotificationCurrentNumber(host) -->
-    <operation name="hostGetNotificationCurrentNumber">
+    <!-- hostGetNotificationsCurrentNumber(host) -->
+    <operation name="hostGetNotificationsCurrentNumber">
       <documentation>Get the current notification number of the host.</documentation>
       <input message="tns:hostRequest"/>
       <output message="tns:unsignedIntResponse"/>
     </operation>
 
-    <!-- hostGetNotificationEnabled(host) -->
-    <operation name="hostGetNotificationEnabled">
+    <!-- hostGetNotificationsEnabled(host) -->
+    <operation name="hostGetNotificationsEnabled">
       <documentation>Check if notifications are enabled on host.</documentation>
       <input message="tns:hostRequest"/>
       <output message="tns:booleanResponse"/>
     </operation>
 
-    <!-- hostGetNotificationFirstDelay(host) -->
-    <operation name="hostGetNotificationFirstDelay">
+    <!-- hostGetNotificationsFirstDelay(host) -->
+    <operation name="hostGetNotificationsFirstDelay">
       <documentation>Get the first notification delay of the host.</documentation>
       <input message="tns:hostRequest"/>
       <output message="tns:unsignedIntResponse"/>
     </operation>
 
-    <!-- hostGetNotificationInterval(host) -->
-    <operation name="hostGetNotificationInterval">
+    <!-- hostGetNotificationsInterval(host) -->
+    <operation name="hostGetNotificationsInterval">
       <documentation>Get the notification interval of the host.</documentation>
       <input message="tns:hostRequest"/>
       <output message="tns:unsignedIntResponse"/>
     </operation>
 
-    <!-- hostGetNotificationLast(host) -->
-    <operation name="hostGetNotificationLast">
+    <!-- hostGetNotificationsLast(host) -->
+    <operation name="hostGetNotificationsLast">
       <documentation>Get the time at which the last notification was sent.</documentation>
       <input message="tns:hostRequest"/>
       <output message="tns:dateResponse"/>
     </operation>
 
-    <!-- hostGetNotificationNext(host) -->
-    <operation name="hostGetNotificationNext">
+    <!-- hostGetNotificationsNext(host) -->
+    <operation name="hostGetNotificationsNext">
       <documentation>Get the time at which the next notification will be sent.</documentation>
       <input message="tns:hostRequest"/>
       <output message="tns:dateResponse"/>
     </operation>
 
-    <!-- hostGetNotificationNoMore(host) -->
+    <!-- hostGetNotificationsNoMore(host) -->
     <!-- XXX -->
 
-    <!-- hostGetNotificationOnDown(host) -->
-    <operation name="hostGetNotificationOnDown">
+    <!-- hostGetNotificationsOnDown(host) -->
+    <operation name="hostGetNotificationsOnDown">
       <documentation>Check if notifications are sent if host is down.</documentation>
       <input message="tns:hostRequest"/>
       <output message="tns:booleanResponse"/>
     </operation>
 
-    <!-- hostGetNotificationOnDowntime(host) -->
-    <operation name="hostGetNotificationOnDowntime">
+    <!-- hostGetNotificationsOnDowntime(host) -->
+    <operation name="hostGetNotificationsOnDowntime">
       <documentation>Check if notifications are sent if host is on downtime.</documentation>
       <input message="tns:hostRequest"/>
       <output message="tns:booleanResponse"/>
     </operation>
 
-    <!-- hostGetNotificationOnFlapping(host) -->
-    <operation name="hostGetNotificationOnFlapping">
+    <!-- hostGetNotificationsOnFlapping(host) -->
+    <operation name="hostGetNotificationsOnFlapping">
       <documentation>Check if notifications are sent if host is flappy.</documentation>
       <input message="tns:hostRequest"/>
       <output message="tns:booleanResponse"/>
     </operation>
 
-    <!-- hostGetNotificationOnRecovery(host) -->
-    <operation name="hostGetNotificationOnRecovery">
+    <!-- hostGetNotificationsOnRecovery(host) -->
+    <operation name="hostGetNotificationsOnRecovery">
       <documentation>Check if notifications are sent if host recovers.</documentation>
       <input message="tns:hostRequest"/>
       <output message="tns:booleanResponse"/>
     </operation>
 
-    <!-- hostGetNotificationOnUnreachable(host) -->
-    <operation name="hostGetNotificationOnUnreachable">
+    <!-- hostGetNotificationsOnUnreachable(host) -->
+    <operation name="hostGetNotificationsOnUnreachable">
       <documentation>Check if notifications are sent if host is unreachable.</documentation>
       <input message="tns:hostRequest"/>
       <output message="tns:booleanResponse"/>
     </operation>
 
-    <!-- hostGetNotificationPeriod(host) -->
-    <operation name="hostGetNotificationPeriod">
+    <!-- hostGetNotificationsPeriod(host) -->
+    <operation name="hostGetNotificationsPeriod">
       <documentation>Get the notification period of the host.</documentation>
       <input message="tns:hostRequest"/>
       <output message="tns:booleanResponse"/>
     </operation>
 
-    <!-- hostSetNotificationEnabled(host, enable) -->
-    <operation name="hostSetNotificationEnabled">
+    <!-- hostSetNotificationsBeyondEnabled(host, enable) -->
+    <operation name="hostSetNotificationsBeyondEnabled">
+      <documentation>Enable or disable all notifications beyond a host.</documentation>
+      <input message="tns:hostBooleanRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- hostSetNotificationsEnabled(host, enable) -->
+    <operation name="hostSetNotificationsEnabled">
       <documentation>Enable or disable notifications on host.</documentation>
       <input message="tns:hostBooleanRequest"/>
       <output message="tns:defaultResponse"/>
     </operation>
 
-    <!-- hostSetNotificationFirstDelay(host, delay) -->
-    <operation name="hostSetNotificationFirstDelay">
+    <!-- hostSetNotificationsFirstDelay(host, delay) -->
+    <operation name="hostSetNotificationsFirstDelay">
       <documentation>Set the time after which the first host notification will be sent.</documentation>
       <input message="tns:hostUnsignedIntegerRequest"/>
       <output message="tns:defaultResponse"/>
     </operation>
 
-    <!-- hostSetNotificationInterval(host, interval) -->
-    <operation name="hostSetNotificationInterval">
+    <!-- hostSetNotificationsInterval(host, interval) -->
+    <operation name="hostSetNotificationsInterval">
       <documentation>Set the notification interval of the host.</documentation>
       <input message="tns:hostUnsignedIntegerRequest"/>
       <output message="tns:defaultResponse"/>
     </operation>
 
-    <!-- hostSetNotificationOnDown(host, enable) -->
-    <operation name="hostSetNotificationOnDown">
+    <!-- hostSetNotificationsOnDown(host, enable) -->
+    <operation name="hostSetNotificationsOnDown">
       <documentation>Enable or disable notifications when host is down.</documentation>
       <input message="tns:hostBooleanRequest"/>
       <output message="tns:defaultResponse"/>
     </operation>
 
-    <!-- hostSetNotificationOnDowntime(host, enable) -->
-    <operation name="hostSetNotificationOnDowntime">
+    <!-- hostSetNotificationsOnDowntime(host, enable) -->
+    <operation name="hostSetNotificationsOnDowntime">
       <documentation>Enable or disable notifications when host is in downtime.</documentation>
       <input message="tns:hostBooleanRequest"/>
       <output message="tns:defaultResponse"/>
     </operation>
 
-    <!-- hostSetNotificationOnFlapping(host, enable) -->
-    <operation name="hostSetNotificationOnFlapping">
+    <!-- hostSetNotificationsOnFlapping(host, enable) -->
+    <operation name="hostSetNotificationsOnFlapping">
       <documentation>Enable or disable notifications when host is flappy.</documentation>
       <input message="tns:hostBooleanRequest"/>
       <output message="tns:defaultResponse"/>
     </operation>
 
-    <!-- hostSetNotificationOnRecovery(host, enable) -->
-    <operation name="hostSetNotificationOnRecovery">
+    <!-- hostSetNotificationsOnRecovery(host, enable) -->
+    <operation name="hostSetNotificationsOnRecovery">
       <documentation>Enable or disable notifications when host recovers.</documentation>
       <input message="tns:hostBooleanRequest"/>
       <output message="tns:defaultResponse"/>
     </operation>
 
-    <!-- hostSetNotificationOnUnreachable(host, enable) -->
-    <operation name="hostSetNotificationOnUnreachable">
+    <!-- hostSetNotificationsOnSelfAndChildrenEnabled(host, enable) -->
+    <operation name="hostSetNotificationsOnSelfAndChildrenEnabled">
+      <documentation>Enable notifications of a host and its children.</documentation>
+      <input message="tns:hostBooleanRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- hostSetNotificationsOnUnreachable(host, enable) -->
+    <operation name="hostSetNotificationsOnUnreachable">
       <documentation>Enable or disable notifications when host is unreachable.</documentation>
       <input message="tns:hostBooleanRequest"/>
       <output message="tns:defaultResponse"/>
     </operation>
 
-    <!-- hostSetNotificationPeriod(host, period) -->
-    <operation name="hostSetNotificationPeriod">
+    <!-- hostSetNotificationsPeriod(host, period) -->
+    <operation name="hostSetNotificationsPeriod">
       <documentation>Set notification period of host.</documentation>
       <input message="tns:hostBooleanRequest"/>
       <output message="tns:defaultResponse"/>
@@ -1907,175 +1949,175 @@
     </operation>
 
     <!--
-     --  Notification.
+     --  Notifications.
      -->
 
-    <!-- serviceGetNotificationCurrentID(service) -->
-    <operation name="serviceGetNotificationCurrentID">
+    <!-- serviceGetNotificationsCurrentID(service) -->
+    <operation name="serviceGetNotificationsCurrentID">
       <documentation>Get the ID of the current service notification.</documentation>
       <input message="tns:serviceRequest"/>
       <output message="tns:unsignedIntResponse"/>
     </operation>
 
-    <!-- serviceGetNotificationCurrentNumber(service) -->
-    <operation name="serviceGetNotificationCurrentNumber">
+    <!-- serviceGetNotificationsCurrentNumber(service) -->
+    <operation name="serviceGetNotificationsCurrentNumber">
       <documentation>Get the current notification number of the service.</documentation>
       <input message="tns:serviceRequest"/>
       <output message="tns:unsignedIntResponse"/>
     </operation>
 
-    <!-- serviceGetNotificationEnabled(service) -->
-    <operation name="serviceGetNotificationEnabled">
+    <!-- serviceGetNotificationsEnabled(service) -->
+    <operation name="serviceGetNotificationsEnabled">
       <documentation>Check if notifications are enabled on service.</documentation>
       <input message="tns:serviceRequest"/>
       <output message="tns:booleanResponse"/>
     </operation>
 
-    <!-- serviceGetNotificationFirstDelay(service) -->
-    <operation name="serviceGetNotificationFirstDelay">
+    <!-- serviceGetNotificationsFirstDelay(service) -->
+    <operation name="serviceGetNotificationsFirstDelay">
       <documentation>Get the first notification delay of the service.</documentation>
       <input message="tns:serviceRequest"/>
       <output message="tns:unsignedIntResponse"/>
     </operation>
 
-    <!-- serviceGetNotificationInterval(service) -->
-    <operation name="serviceGetNotificationInterval">
+    <!-- serviceGetNotificationsInterval(service) -->
+    <operation name="serviceGetNotificationsInterval">
       <documentation>Get the notification interval of the service.</documentation>
       <input message="tns:serviceRequest"/>
       <output message="tns:unsignedIntResponse"/>
     </operation>
 
-    <!-- serviceGetNotificationLast(service) -->
-    <operation name="serviceGetNotificationLast">
+    <!-- serviceGetNotificationsLast(service) -->
+    <operation name="serviceGetNotificationsLast">
       <documentation>Get the time at which the last notification was sent.</documentation>
       <input message="tns:serviceRequest"/>
       <output message="tns:dateResponse"/>
     </operation>
 
-    <!-- serviceGetNotificationNext(service) -->
-    <operation name="serviceGetNotificationNext">
+    <!-- serviceGetNotificationsNext(service) -->
+    <operation name="serviceGetNotificationsNext">
       <documentation>Get the time at which the next notification will be sent.</documentation>
       <input message="tns:serviceRequest"/>
       <output message="tns:dateResponse"/>
     </operation>
 
-    <!-- serviceGetNotificationNoMore(service) -->
+    <!-- serviceGetNotificationsNoMore(service) -->
     <!-- XXX -->
 
-    <!-- serviceGetNotificationOnCritical(service) -->
-    <operation name="serviceGetNotificationOnCritical">
+    <!-- serviceGetNotificationsOnCritical(service) -->
+    <operation name="serviceGetNotificationsOnCritical">
       <documentation>Check if notifications are sent if service is critical.</documentation>
       <input message="tns:serviceRequest"/>
       <output message="tns:booleanResponse"/>
     </operation>
 
-    <!-- serviceGetNotificationOnDowntime(service) -->
-    <operation name="serviceGetNotificationOnDowntime">
+    <!-- serviceGetNotificationsOnDowntime(service) -->
+    <operation name="serviceGetNotificationsOnDowntime">
       <documentation>Check if notifications are sent if service is on downtime.</documentation>
       <input message="tns:serviceRequest"/>
       <output message="tns:booleanResponse"/>
     </operation>
 
-    <!-- serviceGetNotificationOnFlapping(service) -->
-    <operation name="serviceGetNotificationOnFlapping">
+    <!-- serviceGetNotificationsOnFlapping(service) -->
+    <operation name="serviceGetNotificationsOnFlapping">
       <documentation>Check if notifications are sent if service is flappy.</documentation>
       <input message="tns:serviceRequest"/>
       <output message="tns:booleanResponse"/>
     </operation>
 
-    <!-- serviceGetNotificationOnRecovery(service) -->
-    <operation name="serviceGetNotificationOnRecovery">
+    <!-- serviceGetNotificationsOnRecovery(service) -->
+    <operation name="serviceGetNotificationsOnRecovery">
       <documentation>Check if notifications are sent if service recovers.</documentation>
       <input message="tns:serviceRequest"/>
       <output message="tns:booleanResponse"/>
     </operation>
 
-    <!-- serviceGetNotificationOnUnknown(service) -->
-    <operation name="serviceGetNotificationOnUnknown">
+    <!-- serviceGetNotificationsOnUnknown(service) -->
+    <operation name="serviceGetNotificationsOnUnknown">
       <documentation>Check if notifications are sent if service is unknown.</documentation>
       <input message="tns:serviceRequest"/>
       <output message="tns:booleanResponse"/>
     </operation>
 
-    <!-- serviceGetNotificationOnWarning(service) -->
-    <operation name="serviceGetNotificationOnWarning">
+    <!-- serviceGetNotificationsOnWarning(service) -->
+    <operation name="serviceGetNotificationsOnWarning">
       <documentation>Check if notifications are sent if service is warning.</documentation>
       <input message="tns:serviceRequest"/>
       <output message="tns:booleanResponse"/>
     </operation>
 
-    <!-- serviceGetNotificationPeriod(service) -->
-    <operation name="serviceGetNotificationPeriod">
+    <!-- serviceGetNotificationsPeriod(service) -->
+    <operation name="serviceGetNotificationsPeriod">
       <documentation>Get the notification period of the service.</documentation>
       <input message="tns:serviceRequest"/>
       <output message="tns:booleanResponse"/>
     </operation>
 
-    <!-- serviceSetNotificationEnabled(service, enable) -->
-    <operation name="serviceSetNotificationEnabled">
+    <!-- serviceSetNotificationsEnabled(service, enable) -->
+    <operation name="serviceSetNotificationsEnabled">
       <documentation>Enable or disable notifications on service.</documentation>
       <input message="tns:serviceBooleanRequest"/>
       <output message="tns:defaultResponse"/>
     </operation>
 
-    <!-- serviceSetNotificationFirstDelay(service, delay) -->
-    <operation name="serviceSetNotificationFirstDelay">
+    <!-- serviceSetNotificationsFirstDelay(service, delay) -->
+    <operation name="serviceSetNotificationsFirstDelay">
       <documentation>Set the time after which the first service notification will be sent.</documentation>
       <input message="tns:serviceUnsignedIntegerRequest"/>
       <output message="tns:defaultResponse"/>
     </operation>
 
-    <!-- serviceSetNotificationInterval(service, interval) -->
-    <operation name="serviceSetNotificationInterval">
+    <!-- serviceSetNotificationsInterval(service, interval) -->
+    <operation name="serviceSetNotificationsInterval">
       <documentation>Set the notification interval of the service.</documentation>
       <input message="tns:serviceUnsignedIntegerRequest"/>
       <output message="tns:defaultResponse"/>
     </operation>
 
-    <!-- serviceSetNotificationOnCritical(service, enable) -->
-    <operation name="serviceSetNotificationOnCritical">
+    <!-- serviceSetNotificationsOnCritical(service, enable) -->
+    <operation name="serviceSetNotificationsOnCritical">
       <documentation>Enable or disable notifications when service is critical.</documentation>
       <input message="tns:serviceBooleanRequest"/>
       <output message="tns:defaultResponse"/>
     </operation>
 
-    <!-- serviceSetNotificationOnDowntime(service, enable) -->
-    <operation name="serviceSetNotificationOnDowntime">
+    <!-- serviceSetNotificationsOnDowntime(service, enable) -->
+    <operation name="serviceSetNotificationsOnDowntime">
       <documentation>Enable or disable notifications when service is in downtime.</documentation>
       <input message="tns:serviceBooleanRequest"/>
       <output message="tns:defaultResponse"/>
     </operation>
 
-    <!-- serviceSetNotificationOnFlapping(service, enable) -->
-    <operation name="serviceSetNotificationOnFlapping">
+    <!-- serviceSetNotificationsOnFlapping(service, enable) -->
+    <operation name="serviceSetNotificationsOnFlapping">
       <documentation>Enable or disable notifications when service is flappy.</documentation>
       <input message="tns:serviceBooleanRequest"/>
       <output message="tns:defaultResponse"/>
     </operation>
 
-    <!-- serviceSetNotificationOnRecovery(service, enable) -->
-    <operation name="serviceSetNotificationOnRecovery">
+    <!-- serviceSetNotificationsOnRecovery(service, enable) -->
+    <operation name="serviceSetNotificationsOnRecovery">
       <documentation>Enable or disable notifications when service recovers.</documentation>
       <input message="tns:serviceBooleanRequest"/>
       <output message="tns:defaultResponse"/>
     </operation>
 
-    <!-- serviceSetNotificationOnUnknown(service, enable) -->
-    <operation name="serviceSetNotificationOnUnknown">
+    <!-- serviceSetNotificationsOnUnknown(service, enable) -->
+    <operation name="serviceSetNotificationsOnUnknown">
       <documentation>Enable or disable notifications when service is unknown.</documentation>
       <input message="tns:serviceBooleanRequest"/>
       <output message="tns:defaultResponse"/>
     </operation>
 
-    <!-- serviceSetNotificationOnWarning(service, enable) -->
-    <operation name="serviceSetNotificationOnWarning">
+    <!-- serviceSetNotificationsOnWarning(service, enable) -->
+    <operation name="serviceSetNotificationsOnWarning">
       <documentation>Enable or disable notifications when service is warning.</documentation>
       <input message="tns:serviceBooleanRequest"/>
       <output message="tns:defaultResponse"/>
     </operation>
 
-    <!-- serviceSetNotificationPeriod(service, period) -->
-    <operation name="serviceSetNotificationPeriod">
+    <!-- serviceSetNotificationsPeriod(service, period) -->
+    <operation name="serviceSetNotificationsPeriod">
       <documentation>Set notification period of service.</documentation>
       <input message="tns:serviceBooleanRequest"/>
       <output message="tns:defaultResponse"/>
@@ -2485,23 +2527,51 @@
       <output message="tns:downtimeResponse"/>
     </operation>
 
+    <!---------------------
+     --                  --
+     --  Notifications.  --
+     --                  --
+     ---------------------->
+
+    <!--
+     --  By host.
+     -->
+
+    <!-- notificationHostDelay(host, until) -->
+    <operation name="notificationHostDelay">
+      <documentation>Delay a host notification.</documentation>
+      <input message="tns:hostDateRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- notificationHostSend(host, notification) -->
+    <operation name="notificationHostSend">
+      <documentation>Send a notification on a host.</documentation>
+      <input message="tns:notificationHostRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!--
+     --  By service.
+     -->
+
+    <!-- notificationServiceDelay(service, until) -->
+    <operation name="notificationServiceDelay">
+      <documentation>Delay a service notification.</documentation>
+      <input message="tns:serviceDateRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- notificationServiceSend(service, notification) -->
+    <operation name="notificationServiceSend">
+      <documentation>Send a notification on a service.</documentation>
+      <input message="tns:notificationServiceRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
 
 
     <!-- Not validated commands. -->
-
-    <!-- delayHostNotification(string host, time_t until) -->
-    <operation name="delayHostNotification">
-      <documentation>Delay a host notification.</documentation>
-      <input message="tns:hostTimeRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
-
-    <!-- delayServiceNotification(string host, string service, time_t until) -->
-    <operation name="delayServiceNotification">
-      <documentation>Delay a service notification.</documentation>
-      <input message="tns:serviceTimeRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
 
     <!-- deleteComment(unsigned long commentid) -->
     <operation name="deleteComment">
@@ -2629,27 +2699,6 @@
       <output message="tns:defaultResponse"/>
     </operation>
 
-    <!-- sendHostCustomNotification(string host, notificationType notification) -->
-    <operation name="sendHostCustomNotification">
-      <documentation>Send a notification on a host.</documentation>
-      <input message="tns:hostNotificationRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
-
-    <!-- sendServiceCustomNotification(string host, string service, notificationType notification) -->
-    <operation name="sendServiceCustomNotification">
-      <documentation>Send a notification on a service.</documentation>
-      <input message="tns:serviceNotificationRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
-
-    <!-- setAllNotificationsBeyondHostEnabled(string host) -->
-    <operation name="setAllNotificationsBeyondHostEnabled">
-      <documentation>Enable or disable all notifications beyond a host.</documentation>
-      <input message="tns:hostRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
-
     <!-- setContactCustomVar(string contact, string varname, string varvalue) -->
     <operation name="setContactCustomVar">
       <documentation>Set the value of a custom variable of a contact.</documentation>
@@ -2745,13 +2794,6 @@
     <operation name="setHostActiveChecksEnabled">
       <documentation>Enable or disable active checks on a host.</documentation>
       <input message="tns:setHostEnabledRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
-
-    <!-- setHostAndChildNotificationsEnabled(string host) -->
-    <operation name="setHostAndChildNotificationsEnabled">
-      <documentation>Enable notifications of a host and its children.</documentation>
-      <input message="tns:hostRequest"/>
       <output message="tns:defaultResponse"/>
     </operation>
 
@@ -2864,20 +2906,6 @@
     <operation name="setHostNotificationNumber">
       <documentation>Set the notification number of a host.</documentation>
       <input message="tns:setHostUnsignedIntegerRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
-
-    <!-- setHostNotificationsEnabled(string host, bool enable) -->
-    <operation name="setHostNotificationsEnabled">
-      <documentation>Enable or disable notifications of a host.</documentation>
-      <input message="tns:setHostEnabledRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
-
-    <!-- setHostNotificationTimeperiod(string host, string timeperiod) -->
-    <operation name="setHostNotificationTimeperiod">
-      <documentation>Change the host notification timeperiod.</documentation>
-      <input message="tns:setHostTimeperiodRequest"/>
       <output message="tns:defaultResponse"/>
     </operation>
 
@@ -3556,133 +3584,145 @@
       <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
     </operation>
 
-    <operation name="hostGetNotificationCurrentID">
+    <operation name="hostGetNotificationsCurrentID">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
       <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
     </operation>
 
-    <operation name="hostGetNotificationCurrentNumber">
+    <operation name="hostGetNotificationsCurrentNumber">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
       <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
     </operation>
 
-    <operation name="hostGetNotificationEnabled">
+    <operation name="hostGetNotificationsEnabled">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
       <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
     </operation>
 
-    <operation name="hostGetNotificationFirstDelay">
+    <operation name="hostGetNotificationsFirstDelay">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
       <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
     </operation>
 
-    <operation name="hostGetNotificationInterval">
+    <operation name="hostGetNotificationsInterval">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
       <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
     </operation>
 
-    <operation name="hostGetNotificationLast">
+    <operation name="hostGetNotificationsLast">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
       <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
     </operation>
 
-    <operation name="hostGetNotificationNext">
+    <operation name="hostGetNotificationsNext">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
       <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
     </operation>
 
-    <operation name="hostGetNotificationOnDown">
+    <operation name="hostGetNotificationsOnDown">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
       <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
     </operation>
 
-    <operation name="hostGetNotificationOnDowntime">
+    <operation name="hostGetNotificationsOnDowntime">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
       <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
     </operation>
 
-    <operation name="hostGetNotificationOnFlapping">
+    <operation name="hostGetNotificationsOnFlapping">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
       <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
     </operation>
 
-    <operation name="hostGetNotificationOnRecovery">
+    <operation name="hostGetNotificationsOnRecovery">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
       <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
     </operation>
 
-    <operation name="hostGetNotificationOnUnreachable">
+    <operation name="hostGetNotificationsOnUnreachable">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
       <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
     </operation>
 
-    <operation name="hostGetNotificationPeriod">
+    <operation name="hostGetNotificationsPeriod">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
       <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
     </operation>
 
-    <operation name="hostSetNotificationEnabled">
+    <operation name="hostSetNotificationsBeyondEnabled">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
       <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
     </operation>
 
-    <operation name="hostSetNotificationFirstDelay">
+    <operation name="hostSetNotificationsEnabled">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
       <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
     </operation>
 
-    <operation name="hostSetNotificationInterval">
+    <operation name="hostSetNotificationsFirstDelay">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
       <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
     </operation>
 
-    <operation name="hostSetNotificationOnDown">
+    <operation name="hostSetNotificationsInterval">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
       <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
     </operation>
 
-    <operation name="hostSetNotificationOnDowntime">
+    <operation name="hostSetNotificationsOnDown">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
       <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
     </operation>
 
-    <operation name="hostSetNotificationOnFlapping">
+    <operation name="hostSetNotificationsOnDowntime">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
       <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
     </operation>
 
-    <operation name="hostSetNotificationOnRecovery">
+    <operation name="hostSetNotificationsOnFlapping">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
       <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
     </operation>
 
-    <operation name="hostSetNotificationOnUnreachable">
+    <operation name="hostSetNotificationsOnRecovery">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
       <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
     </operation>
 
-    <operation name="hostSetNotificationPeriod">
+    <operation name="hostSetNotificationsOnSelfAndChildrenEnabled">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="hostSetNotificationsOnUnreachable">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="hostSetNotificationsPeriod">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
       <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
@@ -4223,145 +4263,145 @@
       <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
     </operation>
 
-    <operation name="serviceGetNotificationCurrentID">
+    <operation name="serviceGetNotificationsCurrentID">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
       <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
     </operation>
 
-    <operation name="serviceGetNotificationCurrentNumber">
+    <operation name="serviceGetNotificationsCurrentNumber">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
       <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
     </operation>
 
-    <operation name="serviceGetNotificationEnabled">
+    <operation name="serviceGetNotificationsEnabled">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
       <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
     </operation>
 
-    <operation name="serviceGetNotificationFirstDelay">
+    <operation name="serviceGetNotificationsFirstDelay">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
       <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
     </operation>
 
-    <operation name="serviceGetNotificationInterval">
+    <operation name="serviceGetNotificationsInterval">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
       <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
     </operation>
 
-    <operation name="serviceGetNotificationLast">
+    <operation name="serviceGetNotificationsLast">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
       <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
     </operation>
 
-    <operation name="serviceGetNotificationNext">
+    <operation name="serviceGetNotificationsNext">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
       <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
     </operation>
 
-    <operation name="serviceGetNotificationOnCritical">
+    <operation name="serviceGetNotificationsOnCritical">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
       <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
     </operation>
 
-    <operation name="serviceGetNotificationOnDowntime">
+    <operation name="serviceGetNotificationsOnDowntime">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
       <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
     </operation>
 
-    <operation name="serviceGetNotificationOnFlapping">
+    <operation name="serviceGetNotificationsOnFlapping">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
       <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
     </operation>
 
-    <operation name="serviceGetNotificationOnRecovery">
+    <operation name="serviceGetNotificationsOnRecovery">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
       <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
     </operation>
 
-    <operation name="serviceGetNotificationOnUnknown">
+    <operation name="serviceGetNotificationsOnUnknown">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
       <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
     </operation>
 
-    <operation name="serviceGetNotificationOnWarning">
+    <operation name="serviceGetNotificationsOnWarning">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
       <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
     </operation>
 
-    <operation name="serviceGetNotificationPeriod">
+    <operation name="serviceGetNotificationsPeriod">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
       <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
     </operation>
 
-    <operation name="serviceSetNotificationEnabled">
+    <operation name="serviceSetNotificationsEnabled">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
       <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
     </operation>
 
-    <operation name="serviceSetNotificationFirstDelay">
+    <operation name="serviceSetNotificationsFirstDelay">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
       <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
     </operation>
 
-    <operation name="serviceSetNotificationInterval">
+    <operation name="serviceSetNotificationsInterval">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
       <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
     </operation>
 
-    <operation name="serviceSetNotificationOnCritical">
+    <operation name="serviceSetNotificationsOnCritical">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
       <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
     </operation>
 
-    <operation name="serviceSetNotificationOnDowntime">
+    <operation name="serviceSetNotificationsOnDowntime">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
       <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
     </operation>
 
-    <operation name="serviceSetNotificationOnFlapping">
+    <operation name="serviceSetNotificationsOnFlapping">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
       <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
     </operation>
 
-    <operation name="serviceSetNotificationOnRecovery">
+    <operation name="serviceSetNotificationsOnRecovery">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
       <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
     </operation>
 
-    <operation name="serviceSetNotificationOnUnknown">
+    <operation name="serviceSetNotificationsOnUnknown">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
       <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
     </operation>
 
-    <operation name="serviceSetNotificationOnWarning">
+    <operation name="serviceSetNotificationsOnWarning">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
       <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
     </operation>
 
-    <operation name="serviceSetNotificationPeriod">
+    <operation name="serviceSetNotificationsPeriod">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
       <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
@@ -4667,6 +4707,38 @@
       <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
     </operation>
 
+    <!---------------------
+     --                  --
+     --  Notifications.  --
+     --                  --
+     ---------------------->
+
+    <operation name="notificationHostDelay">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="notificationHostSend">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="notificationServiceDelay">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="notificationServiceSend">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    
+
     
 
     <!-- Not validated operations. -->
@@ -4779,24 +4851,6 @@
       <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
     </operation>
 
-    <operation name="sendHostCustomNotification">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
-    <operation name="sendServiceCustomNotification">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
-    <operation name="setAllNotificationsBeyondHostEnabled">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
     <operation name="setContactCustomVar">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
@@ -4876,12 +4930,6 @@
     </operation>
 
     <operation name="setHostActiveChecksEnabled">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
-    <operation name="setHostAndChildNotificationsEnabled">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
       <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
@@ -4978,18 +5026,6 @@
     </operation>
 
     <operation name="setHostNotificationNumber">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
-    <operation name="setHostNotificationsEnabled">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
-    <operation name="setHostNotificationTimeperiod">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
       <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
