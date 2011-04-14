@@ -285,7 +285,7 @@
 
   <!-- Returns a downtime ID. -->
   <message name="downtimeResponse">
-    <part name="downtime" type="downtimeIDType"/>
+    <part name="downtimeid" type="downtimeIDType"/>
   </message>
 
   <!--
