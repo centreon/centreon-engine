@@ -2329,13 +2329,13 @@ timeperiod * find_timeperiod(char *name){
 
 
 /* given a host name, find it in the list in memory */
-host * find_host(char *name){
+host * find_host(char const* name){
 	host temp_host;
 
 	if(name==NULL)
 		return NULL;
 
-	temp_host.name=name;
+	temp_host.name=const_cast<char*>(name);
 
 	return (host*)skiplist_find_first(object_skiplists[HOST_SKIPLIST],&temp_host,NULL);
 	}
