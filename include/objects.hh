@@ -672,7 +672,7 @@ int get_service_count(void);
 
 /**** Object Search Functions ****/
 timeperiod * find_timeperiod(char *);						                /* finds a timeperiod object */
-host * find_host(char *);									/* finds a host object */
+host * find_host(char const*);									/* finds a host object */
 hostgroup * find_hostgroup(char *);						                /* finds a hostgroup object */
 servicegroup * find_servicegroup(char *);					                /* finds a servicegroup object */
 contact * find_contact(char *);							                /* finds a contact object */
