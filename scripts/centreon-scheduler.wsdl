@@ -318,14 +318,14 @@
 
   <!-- Host notification request. -->
   <message name="notificationHostRequest">
-    <part name="host" type="hostIDType"/>
-    <part name="notification" type="notificationType"/>
+    <part name="host" type="tns:hostIDType"/>
+    <part name="notification" type="tns:notificationType"/>
   </message>
 
   <!-- Add service notification. -->
   <message name="notificationServiceRequest">
-    <part name="service" type="serviceIDType"/>
-    <part name="notification" type="notificationType"/>
+    <part name="service" type="tns:serviceIDType"/>
+    <part name="notification" type="tns:notificationType"/>
   </message>
 
 
