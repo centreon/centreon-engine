@@ -25,25 +25,25 @@
 
       <!-- Error. -->
       <complexType name="errorType">
-	<sequence>
-	  <element name="code" type="xsd:unsignedInt"/>
-	  <element name="message" type="xsd:string"/>
-	</sequence>
+        <sequence>
+          <element name="code" type="xsd:unsignedInt"/>
+          <element name="message" type="xsd:string"/>
+        </sequence>
       </complexType>
 
       <!-- Host identifier. -->
       <complexType name="hostIDType">
-	<sequence>
-	  <element name="name" type="xsd:string"/>
-	</sequence>
+        <sequence>
+          <element name="name" type="xsd:string"/>
+        </sequence>
       </complexType>
 
       <!-- Service identifier. -->
       <complexType name="serviceIDType">
-	<sequence>
+        <sequence>
           <element name="host" type="tns:hostIDType"/>
           <element name="service" type="xsd:string"/>
-	</sequence>
+        </sequence>
       </complexType>
 
       <!-- Not validated types. -->
@@ -180,6 +180,45 @@
   <!-- Host request with unsigned integer. -->
   <message name="hostUnsignedIntegerRequest">
     <part name="host" type="tns:hostIDType"/>
+    <part name="value" type="xsd:unsignedInt"/>
+  </message>
+
+  <!--
+   --  Service messages.
+   -->
+
+  <!-- Service request with no additional parameter. -->
+  <message name="serviceRequest">
+    <part name="service" type="tns:serviceIDType"/>
+  </message>
+
+  <!-- Service request with a boolean. -->
+  <message name="serviceBooleanRequest">
+    <part name="service" type="tns:serviceIDType"/>
+    <part name="value" type="xsd:boolean"/>
+  </message>
+
+  <!-- Service request with a double. -->
+  <message name="serviceDoubleRequest">
+    <part name="service" type="tns:serviceIDType"/>
+    <part name="value" type="xsd:double"/>
+  </message>
+
+  <!-- Service request with an integer. -->
+  <message name="serviceIntegerRequest">
+    <part name="service" type="tns:serviceIDType"/>
+    <part name="value" type="xsd:int"/>
+  </message>
+
+  <!-- Service request with a string. -->
+  <message name="serviceStringRequest">
+    <part name="service" type="tns:serviceIDType"/>
+    <part name="value" type="xsd:string"/>
+  </message>
+
+  <!-- Service request with an unsigned integer. -->
+  <message name="serviceUnsignedIntegerRequest">
+    <part name="service" type="tns:serviceIDType"/>
     <part name="value" type="xsd:unsignedInt"/>
   </message>
 
@@ -442,15 +481,15 @@
      --  Process.
      -->
 
-    <!-- restart() -->
-    <operation name="restart">
+    <!-- processRestart() -->
+    <operation name="processRestart">
       <documentation>Restart Scheduler.</documentation>
       <input message="tns:emptyRequest"/>
       <output message="tns:defaultResponse"/>
     </operation>
 
-    <!-- shutdown() -->
-    <operation name="shutdown">
+    <!-- processShutdown() -->
+    <operation name="processShutdown">
       <documentation>Shutdown Scheduler.</documentation>
       <input message="tns:emptyRequest"/>
       <output message="tns:defaultResponse"/>
@@ -460,21 +499,19 @@
      --  Retention file.
      -->
 
-    <!-- readStateInformation() -->
-    <operation name="readStateInformation">
+    <!-- stateInformationLoad() -->
+    <operation name="stateInformationLoad">
       <documentation>Read state information.</documentation>
       <input message="tns:emptyRequest"/>
       <output message="tns:defaultResponse"/>
     </operation>
 
-    <!-- saveStateInformation() -->
-    <operation name="saveStateInformation">
+    <!-- stateInformationSave() -->
+    <operation name="stateInformationSave">
       <documentation>Save state information.</documentation>
       <input message="tns:emptyRequest"/>
       <output message="tns:defaultResponse"/>
     </operation>
-
-
 
 
     <!-----------------------
@@ -1380,6 +1417,888 @@
       <output message="tns:dateResponse"/>
     </operation>
 
+
+    <!--------------------------
+     --                       --
+     --  Service properties.  --
+     --                       --
+     --------------------------->
+
+    <!--
+     --  Acknowledgement.
+     -->
+
+    <!-- getServiceAcknowledgementIsSet(service) -->
+    <operation name="getServiceAcknowledgementIsSet">
+      <documentation>Get whether or not the service is acknowledged.</documentation>
+      <input message="tns:serviceRequest"/>
+      <output message="tns:booleanResponse"/>
+    </operation>
+
+    <!-- getServiceAcknowledgementType(service) -->
+    <operation name="getServiceAcknowledgementType">
+      <documentation>Get the current type of the acknowledgement on a service.</documentation>
+      <input message="tns:serviceRequest"/>
+      <output message="tns:unsignedShortResponse"/>
+    </operation>
+
+    <!--
+     --  Check.
+     -->
+
+    <!-- getServiceCheckActiveEnabled(service) -->
+    <operation name="getServiceCheckActiveEnabled">
+      <documentation>Check if active checks are enabled on the service.</documentation>
+      <input message="tns:serviceRequest"/>
+      <output message="tns:booleanResponse"/>
+    </operation>
+
+    <!-- getServiceCheckCommand(service) -->
+    <operation name="getServiceCheckCommand">
+      <documentation>Get the service check command.</documentation>
+      <input message="tns:serviceRequest"/>
+      <output message="tns:stringResponse"/>
+    </operation>
+
+    <!-- getServiceCheckCurrentAttempt(service) -->
+    <operation name="getServiceCheckCurrentAttempt">
+      <documentation>Get the current check attempt of the service.</documentation>
+      <input message="tns:serviceRequest"/>
+      <output message="tns:unsignedIntResponse"/>
+    </operation>
+
+    <!-- getServiceCheckIntervalNormal(service) -->
+    <operation name="getServiceCheckIntervalNormal">
+      <documentation>Get the normal check interval.</documentation>
+      <input message="tns:serviceRequest"/>
+      <output message="tns:unsignedIntResponse"/>
+    </operation>
+
+    <!-- getServiceCheckIntervalRetry(service) -->
+    <operation name="getServiceCheckIntervalRetry">
+      <documentation>Get the retry check interval.</documentation>
+      <input message="tns:serviceRequest"/>
+      <output message="tns:unsignedIntResponse"/>
+    </operation>
+
+    <!-- getServiceCheckLast(service) -->
+    <operation name="getServiceCheckLast">
+      <documentation>Get the date when the last check was executed.</documentation>
+      <input message="tns:serviceRequest"/>
+      <output message="tns:dateResponse"/>
+    </operation>
+
+    <!-- getServiceCheckMaxAttempts(service) -->
+    <operation name="getServiceCheckMaxAttempts">
+      <documentation>Get the max check attempts of the service.</documentation>
+      <input message="tns:serviceRequest"/>
+      <output message="tns:unsignedIntResponse"/>
+    </operation>
+
+    <!-- getServiceCheckNext(service) -->
+    <operation name="getServiceCheckNext">
+      <documentation>Get the time at which the next service check is scheduled to run.</documentation>
+      <input message="tns:serviceRequest"/>
+      <output message="tns:dateResponse"/>
+    </operation>
+
+    <!-- getServiceCheckOptions(service) -->
+    <operation name="getServiceCheckOptions">
+      <documentation>Get the service check options.</documentation>
+      <input message="tns:serviceRequest"/>
+      <output message="tns:unsignedIntResponse"/>
+    </operation>
+
+    <!-- getServiceCheckPassiveEnabled(service) -->
+    <operation name="getServiceCheckPassiveEnabled">
+      <documentation>Check if passive checks are enabled on this service.</documentation>
+      <input message="tns:serviceRequest"/>
+      <output message="tns:booleanResponse"/>
+    </operation>
+
+    <!-- getServiceCheckPeriod(service) -->
+    <operation name="getServiceCheckPeriod">
+      <documentation>Get the service check period.</documentation>
+      <input message="tns:serviceRequest"/>
+      <output message="tns:stringResponse"/>
+    </operation>
+
+    <!-- getServiceCheckShouldBeScheduled(service) -->
+    <operation name="getServiceCheckShouldBeScheduled">
+      <documentation>Check if the service should be scheduled.</documentation>
+      <input message="tns:serviceRequest"/>
+      <output message="tns:booleanResponse"/>
+    </operation>
+
+    <!-- getServiceCheckType(service) -->
+    <operation name="getServiceCheckType">
+      <documentation>Get the type of the service check.</documentation>
+      <input message="tns:serviceRequest"/>
+      <output message="tns:unsignedShortResponse"/>
+    </operation>
+
+    <!-- setServiceCheckActiveEnabled(service, enable) -->
+    <operation name="setServiceCheckActiveEnabled">
+      <documentation>Enable or disable active checks on the service.</documentation>
+      <input message="tns:serviceBooleanRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- setServiceCheckCommand(service, command) -->
+    <operation name="setServiceCheckCommand">
+      <documentation>Set the service check command.</documentation>
+      <input message="tns:serviceStringRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- setServiceCheckIntervalNormal(service, interval) -->
+    <operation name="setServiceCheckIntervalNormal">
+      <documentation>Set the normal check interval of the service.</documentation>
+      <input message="tns:serviceUnsignedIntegerRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- setServiceCheckIntervalRetry(service, interval) -->
+    <operation name="setServiceCheckIntervalRetry">
+      <documentation>Set the retry check interval of the service.</documentation>
+      <input message="tns:serviceUnsignedIntegerRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- setServiceCheckMaxAttempts(service, attempts) -->
+    <operation name="setServiceCheckMaxAttempts">
+      <documentation>Set the max check attempts of the service.</documentation>
+      <input message="tns:serviceUnsignedIntegerRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- setServiceCheckPassiveEnabled(service, enable) -->
+    <operation name="setServiceCheckPassiveEnabled">
+      <documentation>Enable or disable host passive checks.</documentation>
+      <input message="tns:serviceBooleanRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- setServiceCheckPeriod(service, period) -->
+    <operation name="setServiceCheckPeriod">
+      <documentation>Set the service check period.</documentation>
+      <input message="tns:serviceStringRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!--
+     --  Custom Variable.
+     -->
+
+    <!-- getServiceCustomVariable(service) -->
+    <operation name="getServiceCustomVariable">
+      <documentation>Get the value of a service custom variable.</documentation>
+      <input message="tns:serviceStringRequest"/>
+      <output message="tns:stringResponse"/>
+    </operation>
+
+    <!-- getServiceCustomVariables(service) -->
+    <!-- XXX -->
+
+    <!-- setServiceCustomVariable(service, variable, value) -->
+    <!-- XXX -->
+
+    <!--
+     --  Downtime.
+     -->
+
+    <!-- getServiceDowntimeDepth(service) -->
+    <operation name="getServiceDowntimeDepth">
+      <documentation>Get the service downtime depth.</documentation>
+      <input message="tns:serviceRequest"/>
+      <output message="tns:unsignedIntResponse"/>
+    </operation>
+
+    <!-- getServiceDowntimeFlexPending(service) -->
+    <operation name="getServiceDowntimeFlexPending">
+      <documentation>Check if service has a pending flexible downtime.</documentation>
+      <input message="tns:serviceRequest"/>
+      <output message="tns:booleanResponse"/>
+    </operation>
+
+    <!--
+     --  Event Handler.
+     -->
+
+    <!-- getServiceEventHandler(service) -->
+    <operation name="getServiceEventHandler">
+      <documentation>Get the service event handler.</documentation>
+      <input message="tns:serviceRequest"/>
+      <output message="tns:stringResponse"/>
+    </operation>
+
+    <!-- getServiceEventHandlerEnabled(service) -->
+    <operation name="getServiceEventHandlerEnabled">
+      <documentation>Check if the service event handler is enabled.</documentation>
+      <input message="tns:serviceRequest"/>
+      <output message="tns:booleanResponse"/>
+    </operation>
+
+    <!-- setServiceEventHandler(service, eventhandler) -->
+    <operation name="setServiceEventHandler">
+      <documentation>Set the service event handler.</documentation>
+      <input message="tns:serviceStringRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- setServiceEventHandlerEnabled(service, enable) -->
+    <operation name="setServiceEventHandlerEnabled">
+      <documentation>Enable or disable service event handler.</documentation>
+      <input message="tns:serviceBooleanRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!--
+     --  Failure Prediction.
+     -->
+
+    <!-- getServiceFailurePredictionEnabled(service) -->
+    <operation name="getServiceFailurePredictionEnabled">
+      <documentation>Check if failure prediction is enabled on service.</documentation>
+      <input message="tns:serviceRequest"/>
+      <output message="tns:booleanResponse"/>
+    </operation>
+
+    <!-- getServiceFailurePredictionOptions(service) -->
+    <operation name="getServiceFailurePredictionOptions">
+      <documentation>Get service failure prediction options.</documentation>
+      <input message="tns:serviceRequest"/>
+      <output message="tns:stringResponse"/>
+    </operation>
+
+    <!-- setServiceFailurePredictionEnabled(service, enable) -->
+    <operation name="setServiceFailurePredictionEnabled">
+      <documentation>Enable or disable failure prediction on service.</documentation>
+      <input message="tns:serviceBooleanRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!--
+     --  Flap Detection.
+     -->
+
+    <!-- getServiceFlapDetectionCommentID(host) -->
+    <operation name="getServiceFlapDetectionCommentID">
+      <documentation>Get the flap detection comment ID of the service.</documentation>
+      <input message="tns:serviceRequest"/>
+      <output message="tns:unsignedIntResponse"/>
+    </operation>
+
+    <!-- getServiceFlapDetectionEnabled(service) -->
+    <operation name="getServiceFlapDetectionEnabled">
+      <documentation>Check whether flap detection is enabled on service.</documentation>
+      <input message="tns:serviceRequest"/>
+      <output message="tns:booleanResponse"/>
+    </operation>
+
+    <!-- getServiceFlapDetectionIsFlapping(service) -->
+    <operation name="getServiceFlapDetectionIsFlapping">
+      <documentation>Check if service is flapping.</documentation>
+      <input message="tns:serviceRequest"/>
+      <output message="tns:booleanResponse"/>
+    </operation>
+
+    <!-- getServiceFlapDetectionOnCritical(service) -->
+    <operation name="getServiceFlapDetectionOnCritical">
+      <documentation>Check if flap detection is enabled on critical state.</documentation>
+      <input message="tns:serviceRequest"/>
+      <output message="tns:booleanResponse"/>
+    </operation>
+
+    <!-- getServiceFlapDetectionOnOk(service) -->
+    <operation name="getServiceFlapDetectionOnOk">
+      <documentation>Check if flap detection is enabled on ok state.</documentation>
+      <input message="tns:serviceRequest"/>
+      <output message="tns:booleanResponse"/>
+    </operation>
+
+    <!-- getServiceFlapDetectionOnUnknown(service) -->
+    <operation name="getServiceFlapDetectionOnUnknown">
+      <documentation>Check if flap detection is enabled on unknown state.</documentation>
+      <input message="tns:serviceRequest"/>
+      <output message="tns:booleanResponse"/>
+    </operation>
+
+    <!-- getServiceFlapDetectionOnWarning(service) -->
+    <operation name="getServiceFlapDetectionOnWarning">
+      <documentation>Check if flap detection is enabled on warning state.</documentation>
+      <input message="tns:serviceRequest"/>
+      <output message="tns:booleanResponse"/>
+    </operation>
+
+    <!-- getServiceFlapDetectionStateHistory(service) -->
+    <!-- XXX -->
+
+    <!-- getServiceFlapDetectionThresholdHigh(service) -->
+    <operation name="getServiceFlapDetectionThresholdHigh">
+      <documentation>Get the service high flap threshold.</documentation>
+      <input message="tns:serviceRequest"/>
+      <output message="tns:doubleResponse"/>
+    </operation>
+
+    <!-- getServiceFlapDetectionThresholdLow(service) -->
+    <operation name="getServiceFlapDetectionThresholdLow">
+      <documentation>Get the service low flap threshold.</documentation>
+      <input message="tns:serviceRequest"/>
+      <output message="tns:doubleResponse"/>
+    </operation>
+
+    <!-- setServiceFlapDetectionEnabled(service, enable) -->
+    <operation name="setServiceFlapDetectionEnabled">
+      <documentation>Enable or disable flap detection on service.</documentation>
+      <input message="tns:serviceBooleanRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- setServiceFlapDetectionOnCritical(service, enable) -->
+    <operation name="setServiceFlapDetectionOnCritical">
+      <documentation>Enable or disable flap detection on critical state.</documentation>
+      <input message="tns:serviceBooleanRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- setServiceFlapDetectionOnOk(service, enable) -->
+    <operation name="setServiceFlapDetectionOnOk">
+      <documentation>Enable or disable flap detection on ok state.</documentation>
+      <input message="tns:serviceBooleanRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- setServiceFlapDetectionOnUnknown(service, enable) -->
+    <operation name="setServiceFlapDetectionOnUnknown">
+      <documentation>Enable or disable flap detection on unknown state.</documentation>
+      <input message="tns:serviceBooleanRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- setServiceFlapDetectionOnWarning(service, enable) -->
+    <operation name="setServiceFlapDetectionOnWarning">
+      <documentation>Enable or disable flap detection on warning state.</documentation>
+      <input message="tns:serviceBooleanRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- setServiceFlapDetectionThresholdHigh(service, threshold) -->
+    <operation name="setServiceFlapDetectionThresholdHigh">
+      <documentation>Set the high flap threshold of the service.</documentation>
+      <input message="tns:serviceDoubleRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- setServiceFlapDetectionThresholdLow(service, threshold) -->
+    <operation name="setServiceFlapDetectionThresholdLow">
+      <documentation>Set the low flap threshold of the service.</documentation>
+      <input message="tns:serviceDoubleRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!--
+     --  Freshness.
+     -->
+
+    <!-- getServiceFreshnessCheckEnabled(service) -->
+    <operation name="getServiceFreshnessCheckEnabled">
+      <documentation>Check if freshness checks are enabled on service.</documentation>
+      <input message="tns:serviceRequest"/>
+      <output message="tns:booleanResponse"/>
+    </operation>
+
+    <!-- getServiceFreshnessIsActive(service) -->
+    <operation name="getServiceFreshnessIsActive">
+      <documentation>Check if freshness check is active on service.</documentation>
+      <input message="tns:serviceRequest"/>
+      <output message="tns:booleanResponse"/>
+    </operation>
+
+    <!-- getServiceFreshnessThreshold(service) -->
+    <operation name="getServiceFreshnessThreshold">
+      <documentation>Get the freshness threshold of the service.</documentation>
+      <input message="tns:serviceRequest"/>
+      <output message="tns:integerResponse"/>
+    </operation>
+
+    <!-- setServiceFreshnessCheckEnabled(service, enable) -->
+    <operation name="setServiceFreshnessCheckEnabled">
+      <documentation>Enable or disable freshness checks on service.</documentation>
+      <input message="tns:serviceBooleanRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- setServiceFreshnessThreshold(service, threshold) -->
+    <operation name="setServiceFreshnessThreshold">
+      <documentation>Set the service freshness threshold.</documentation>
+      <input message="tns:serviceIntegerRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!--
+     --  Modified Attributes.
+     -->
+
+    <!-- getServiceModifiedAttributes(service) -->
+    <operation name="getServiceModifiedAttributes">
+      <documentation>Get the modified attributes on the service.</documentation>
+      <input message="tns:serviceRequest"/>
+      <output message="tns:unsignedIntResponse"/>
+    </operation>
+
+    <!--
+     --  Name.
+     -->
+
+    <!-- getServiceNameDisplay(service) -->
+    <operation name="getServiceNameDisplay">
+      <documentation>Get the service display name.</documentation>
+      <input message="tns:serviceRequest"/>
+      <output message="tns:stringResponse"/>
+    </operation>
+
+    <!-- setServiceNameDisplay(service, displayname) -->
+    <operation name="setServiceNameDisplay">
+      <documentation>Set the display name of the service.</documentation>
+      <input message="tns:serviceStringRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!--
+     --  Notification.
+     -->
+
+    <!-- getServiceNotificationCurrentID(service) -->
+    <operation name="getServiceNotificationCurrentID">
+      <documentation>Get the ID of the current service notification.</documentation>
+      <input message="tns:serviceRequest"/>
+      <output message="tns:unsignedIntResponse"/>
+    </operation>
+
+    <!-- getServiceNotificationCurrentNumber(service) -->
+    <operation name="getServiceNotificationCurrentNumber">
+      <documentation>Get the current notification number of the service.</documentation>
+      <input message="tns:serviceRequest"/>
+      <output message="tns:unsignedIntResponse"/>
+    </operation>
+
+    <!-- getServiceNotificationEnabled(service) -->
+    <operation name="getServiceNotificationEnabled">
+      <documentation>Check if notifications are enabled on service.</documentation>
+      <input message="tns:serviceRequest"/>
+      <output message="tns:booleanResponse"/>
+    </operation>
+
+    <!-- getServiceNotificationFirstDelay(service) -->
+    <operation name="getServiceNotificationFirstDelay">
+      <documentation>Get the first notification delay of the service.</documentation>
+      <input message="tns:serviceRequest"/>
+      <output message="tns:unsignedIntResponse"/>
+    </operation>
+
+    <!-- getServiceNotificationInterval(service) -->
+    <operation name="getServiceNotificationInterval">
+      <documentation>Get the notification interval of the service.</documentation>
+      <input message="tns:serviceRequest"/>
+      <output message="tns:unsignedIntResponse"/>
+    </operation>
+
+    <!-- getServiceNotificationLast(service) -->
+    <operation name="getServiceNotificationLast">
+      <documentation>Get the time at which the last notification was sent.</documentation>
+      <input message="tns:serviceRequest"/>
+      <output message="tns:dateResponse"/>
+    </operation>
+
+    <!-- getServiceNotificationNext(service) -->
+    <operation name="getServiceNotificationNext">
+      <documentation>Get the time at which the next notification will be sent.</documentation>
+      <input message="tns:serviceRequest"/>
+      <output message="tns:dateResponse"/>
+    </operation>
+
+    <!-- getServiceNotificationNoMore(service) -->
+    <!-- XXX -->
+
+    <!-- getServiceNotificationOnCritical(service) -->
+    <operation name="getServiceNotificationOnCritical">
+      <documentation>Check if notifications are sent if service is critical.</documentation>
+      <input message="tns:serviceRequest"/>
+      <output message="tns:booleanResponse"/>
+    </operation>
+
+    <!-- getServiceNotificationOnDowntime(service) -->
+    <operation name="getServiceNotificationOnDowntime">
+      <documentation>Check if notifications are sent if service is on downtime.</documentation>
+      <input message="tns:serviceRequest"/>
+      <output message="tns:booleanResponse"/>
+    </operation>
+
+    <!-- getServiceNotificationOnFlapping(service) -->
+    <operation name="getServiceNotificationOnFlapping">
+      <documentation>Check if notifications are sent if service is flappy.</documentation>
+      <input message="tns:serviceRequest"/>
+      <output message="tns:booleanResponse"/>
+    </operation>
+
+    <!-- getServiceNotificationOnRecovery(service) -->
+    <operation name="getServiceNotificationOnRecovery">
+      <documentation>Check if notifications are sent if service recovers.</documentation>
+      <input message="tns:serviceRequest"/>
+      <output message="tns:booleanResponse"/>
+    </operation>
+
+    <!-- getServiceNotificationOnUnknown(service) -->
+    <operation name="getServiceNotificationOnUnknown">
+      <documentation>Check if notifications are sent if service is unknown.</documentation>
+      <input message="tns:serviceRequest"/>
+      <output message="tns:booleanResponse"/>
+    </operation>
+
+    <!-- getServiceNotificationOnWarning(service) -->
+    <operation name="getServiceNotificationOnWarning">
+      <documentation>Check if notifications are sent if service is warning.</documentation>
+      <input message="tns:serviceRequest"/>
+      <output message="tns:booleanResponse"/>
+    </operation>
+
+    <!-- getServiceNotificationPeriod(service) -->
+    <operation name="getServiceNotificationPeriod">
+      <documentation>Get the notification period of the service.</documentation>
+      <input message="tns:serviceRequest"/>
+      <output message="tns:booleanResponse"/>
+    </operation>
+
+    <!-- setServiceNotificationEnabled(service, enable) -->
+    <operation name="setServiceNotificationEnabled">
+      <documentation>Enable or disable notifications on service.</documentation>
+      <input message="tns:serviceBooleanRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- setServiceNotificationFirstDelay(service, delay) -->
+    <operation name="setServiceNotificationFirstDelay">
+      <documentation>Set the time after which the first service notification will be sent.</documentation>
+      <input message="tns:serviceUnsignedIntegerRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- setServiceNotificationInterval(service, interval) -->
+    <operation name="setServiceNotificationInterval">
+      <documentation>Set the notification interval of the service.</documentation>
+      <input message="tns:serviceUnsignedIntegerRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- setServiceNotificationOnCritical(service, enable) -->
+    <operation name="setServiceNotificationOnCritical">
+      <documentation>Enable or disable notifications when service is critical.</documentation>
+      <input message="tns:serviceBooleanRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- setServiceNotificationOnDowntime(service, enable) -->
+    <operation name="setServiceNotificationOnDowntime">
+      <documentation>Enable or disable notifications when service is in downtime.</documentation>
+      <input message="tns:serviceBooleanRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- setServiceNotificationOnFlapping(service, enable) -->
+    <operation name="setServiceNotificationOnFlapping">
+      <documentation>Enable or disable notifications when service is flappy.</documentation>
+      <input message="tns:serviceBooleanRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- setServiceNotificationOnRecovery(service, enable) -->
+    <operation name="setServiceNotificationOnRecovery">
+      <documentation>Enable or disable notifications when service recovers.</documentation>
+      <input message="tns:serviceBooleanRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- setServiceNotificationOnUnknown(service, enable) -->
+    <operation name="setServiceNotificationOnUnknown">
+      <documentation>Enable or disable notifications when service is unknown.</documentation>
+      <input message="tns:serviceBooleanRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- setServiceNotificationOnWarning(service, enable) -->
+    <operation name="setServiceNotificationOnWarning">
+      <documentation>Enable or disable notifications when service is warning.</documentation>
+      <input message="tns:serviceBooleanRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- setServiceNotificationPeriod(service, period) -->
+    <operation name="setServiceNotificationPeriod">
+      <documentation>Set notification period of service.</documentation>
+      <input message="tns:serviceBooleanRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!--
+     --  Obsession.
+     -->
+
+    <!-- getServiceObsessOver(service) -->
+    <operation name="getServiceObsessOver">
+      <documentation>Check whether or not service is being obsessed over.</documentation>
+      <input message="tns:serviceRequest"/>
+      <output message="tns:booleanResponse"/>
+    </operation>
+
+    <!-- setServiceObsessOver(service, enable) -->
+    <operation name="setServiceObsessOver">
+      <documentation>Enable or disable service obsession.</documentation>
+      <input message="tns:serviceBooleanRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!--
+     --  Perfdata.
+     -->
+
+    <!-- getServicePerfdataProcessingEnabled(service) -->
+    <operation name="getServicePerfdataProcessingEnabled">
+      <documentation>Check if perfdata processing is enabled on service.</documentation>
+      <input message="tns:serviceRequest"/>
+      <output message="tns:booleanResponse"/>
+    </operation>
+
+    <!-- setServicePerfdataProcessingEnabled(service, enable) -->
+    <operation name="setServicePerfdataProcessingEnabled">
+      <documentation>Enable or disable perfdata processing.</documentation>
+      <input message="tns:serviceBooleanRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!--
+     --  Plugin.
+     -->
+
+    <!-- getServicePluginExecutionTime(service) -->
+    <operation name="getServicePluginExecutionTime">
+      <documentation>Get the last execution time of the plugin.</documentation>
+      <input message="tns:serviceRequest"/>
+      <output message="tns:unsignedIntResponse"/>
+    </operation>
+
+    <!-- getServicePluginIsExecuting(service) -->
+    <operation name="getServicePluginIsExecuting">
+      <documentation>Check if service check if currently executing.</documentation>
+      <input message="tns:serviceRequest"/>
+      <output message="tns:booleanResponse"/>
+    </operation>
+
+    <!-- getServicePluginLatency(service) -->
+    <operation name="getServicePluginLatency">
+      <documentation>Get the service latency.</documentation>
+      <input message="tns:serviceRequest"/>
+      <output message="tns:doubleResponse"/>
+    </operation>
+
+    <!-- getServicePluginOutput(service) -->
+    <operation name="getServicePluginOutput">
+      <documentation>Get the plugin output.</documentation>
+      <input message="tns:serviceRequest"/>
+      <output message="tns:stringResponse"/>
+    </operation>
+
+    <!-- getServicePluginPerfdata(service) -->
+    <operation name="getServicePluginPerfdata">
+      <documentation>Get the plugin perfdata.</documentation>
+      <input message="tns:serviceRequest"/>
+      <output message="tns:stringResponse"/>
+    </operation>
+
+    <!--
+     --  Retention.
+     -->
+
+    <!-- getServiceRetainStatusInformation(service) -->
+    <operation name="getServiceRetainStatusInformation">
+      <documentation>Check if service status information are retained.</documentation>
+      <input message="tns:serviceRequest"/>
+      <output message="tns:booleanResponse"/>
+    </operation>
+
+    <!-- getServiceRetainNonStatusInformation(service) -->
+    <operation name="getServiceRetainNonStatusInformation">
+      <documentation>Check if service non status information are retained.</documentation>
+      <input message="tns:serviceRequest"/>
+      <output message="tns:booleanResponse"/>
+    </operation>
+
+    <!-- setServiceRetainStatusInformation(service, enable) -->
+    <operation name="setServiceRetainStatusInformation">
+      <documentation>Enable or disable status information retention on service.</documentation>
+      <input message="tns:serviceBooleanRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- setServiceRetainNonStatusInformation(service, enable) -->
+    <operation name="setServiceRetainNonStatusInformation">
+      <documentation>Enable or disable non status information retention on service.</documentation>
+      <input message="tns:serviceBooleanRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!--
+     --  Stalking.
+     -->
+
+    <!-- getServiceStalkOnCritical(service) -->
+    <operation name="getServiceStalkOnCritical">
+      <documentation>Check if stalking on critical is enabled on service.</documentation>
+      <input message="tns:serviceRequest"/>
+      <output message="tns:booleanResponse"/>
+    </operation>
+
+    <!-- getServiceStalkOnOk(service) -->
+    <operation name="getServiceStalkOnOk">
+      <documentation>Check if stalking on ok is enabled on service.</documentation>
+      <input message="tns:serviceRequest"/>
+      <output message="tns:booleanResponse"/>
+    </operation>
+
+    <!-- getServiceStalkOnUnknown(service) -->
+    <operation name="getServiceStalkOnUnknown">
+      <documentation>Check if stalking on unknown is enabled on service.</documentation>
+      <input message="tns:serviceRequest"/>
+      <output message="tns:booleanResponse"/>
+    </operation>
+
+    <!-- getServiceStalkOnWarning(service) -->
+    <operation name="getServiceStalkOnWarning">
+      <documentation>Check if stalking on warning is enabled on service.</documentation>
+      <input message="tns:serviceRequest"/>
+      <output message="tns:booleanResponse"/>
+    </operation>
+
+    <!-- setServiceStalkOnCritical(service, enable) -->
+    <operation name="setServiceStalkOnCritical">
+      <documentation>Enable or disable stalking on critical.</documentation>
+      <input message="tns:serviceBooleanRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- setServiceStalkOnOk(service, enable) -->
+    <operation name="setServiceStalkOnOk">
+      <documentation>Enable or disable stalking on ok.</documentation>
+      <input message="tns:serviceBooleanRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- setServiceStalkOnUnknown(service, enable) -->
+    <operation name="setServiceStalkOnUnknown">
+      <documentation>Enable or disable stalking on unknown.</documentation>
+      <input message="tns:serviceBooleanRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- setServiceStalkOnWarning(service, enable) -->
+    <operation name="setServiceStalkOnWarning">
+      <documentation>Enable or disable stalking on warning.</documentation>
+      <input message="tns:serviceBooleanRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!--
+     --  State.
+     -->
+
+    <!-- getServiceStateCurrent(service) -->
+    <operation name="getServiceStateCurrent">
+      <documentation>Get the current state of the state.</documentation>
+      <input message="tns:serviceRequest"/>
+      <output message="tns:unsignedShortResponse"/>
+    </operation>
+
+    <!-- getServiceStateInitial(service) -->
+    <operation name="getServiceStateInitial">
+      <documentation>Get the initial state of the service.</documentation>
+      <input message="tns:serviceRequest"/>
+      <output message="tns:unsignedShortResponse"/>
+    </operation>
+
+    <!-- getServiceStateLast(service) -->
+    <operation name="getServiceStateLast">
+      <documentation>Get the last service state.</documentation>
+      <input message="tns:serviceRequest"/>
+      <output message="tns:unsignedShortResponse"/>
+    </operation>
+
+    <!-- getServiceStateLastChange(service) -->
+    <operation name="getServiceStateLastChange">
+      <documentation>Get the last time the state changed.</documentation>
+      <input message="tns:serviceRequest"/>
+      <output message="tns:dateResponse"/>
+    </operation>
+
+    <!-- getServiceStateLastCritical(service) -->
+    <operation name="getServiceStateLastCritical">
+      <documentation>Get the last time the service was in a critical state.</documentation>
+      <input message="tns:serviceRequest"/>
+      <output message="tns:dateResponse"/>
+    </operation>
+
+    <!-- getServiceStateLastHard(service) -->
+    <operation name="getServiceStateLastHard">
+      <documentation>Get the service last hard state.</documentation>
+      <input message="tns:serviceRequest"/>
+      <output message="tns:dateResponse"/>
+    </operation>
+
+    <!-- getServiceStateLastHardChange(service) -->
+    <operation name="getServiceStateLastHardChange">
+      <documentation>Get the last time at which the hard state changed.</documentation>
+      <input message="tns:serviceRequest"/>
+      <output message="tns:dateResponse"/>
+    </operation>
+
+    <!-- getServiceStateLastOk(service) -->
+    <operation name="getServiceStateLastOk">
+      <documentation>Get the last time the service was in an ok state.</documentation>
+      <input message="tns:serviceRequest"/>
+      <output message="tns:dateResponse"/>
+    </operation>
+
+    <!-- getServiceStateLastUnknown(service) -->
+    <operation name="getServiceStateLastUnknown">
+      <documentation>Get the last time the service was in an unknown state.</documentation>
+      <input message="tns:serviceRequest"/>
+      <output message="tns:dateResponse"/>
+    </operation>
+
+    <!-- getServiceStateLastWarning(service) -->
+    <operation name="getServiceStateLastWarning">
+      <documentation>Get the last time the service was in a warning state.</documentation>
+      <input message="tns:serviceRequest"/>
+      <output message="tns:dateResponse"/>
+    </operation>
+
+    <!-- getServiceStatePercentChange(service) -->
+    <operation name="getServiceStatePercentChange">
+      <documentation>Get the percent state change of the service.</documentation>
+      <input message="tns:serviceRequest"/>
+      <output message="tns:dateResponse"/>
+    </operation>
+
+    <!-- getServiceStateType(service) -->
+    <operation name="getServiceStateType">
+      <documentation>Get state type (hard or soft).</documentation>
+      <input message="tns:serviceRequest"/>
+      <output message="tns:dateResponse"/>
+    </operation>
+
+
+
+
+
     <!-- Not validated commands. -->
 
     <!-- acknowledgeHostProblem(string host, acknowledgementType acknowledgement) -->
@@ -2128,25 +3047,25 @@
      --                       --
      --------------------------->
 
-    <operation name="restart">
+    <operation name="processRestart">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
       <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
     </operation>
 
-    <operation name="shutdown">
+    <operation name="processShutdown">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
       <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
     </operation>
 
-    <operation name="readStateInformation">
+    <operation name="stateInformationLoad">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
       <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
     </operation>
 
-    <operation name="saveStateInformation">
+    <operation name="stateInformationSave">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
       <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
@@ -2842,6 +3761,692 @@
       <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
       <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
     </operation>
+
+
+    <!--------------------------
+     --                       --
+     --  Service properties.  --
+     --                       --
+     --------------------------->
+
+    <operation name="getServiceAcknowledgementIsSet">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="getServiceAcknowledgementType">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="getServiceCheckActiveEnabled">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="getServiceCheckCommand">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="getServiceCheckCurrentAttempt">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="getServiceCheckIntervalNormal">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="getServiceCheckIntervalRetry">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="getServiceCheckLast">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="getServiceCheckMaxAttempts">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="getServiceCheckNext">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="getServiceCheckOptions">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="getServiceCheckPassiveEnabled">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="getServiceCheckPeriod">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="getServiceCheckShouldBeScheduled">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="getServiceCheckType">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="setServiceCheckActiveEnabled">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="setServiceCheckCommand">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="setServiceCheckIntervalNormal">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="setServiceCheckIntervalRetry">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="setServiceCheckMaxAttempts">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="setServiceCheckPassiveEnabled">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="setServiceCheckPeriod">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="getServiceCustomVariable">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="getServiceDowntimeDepth">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="getServiceDowntimeFlexPending">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="getServiceEventHandler">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="getServiceEventHandlerEnabled">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="setServiceEventHandler">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="setServiceEventHandlerEnabled">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="getServiceFailurePredictionEnabled">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="getServiceFailurePredictionOptions">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="setServiceFailurePredictionEnabled">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="getServiceFlapDetectionCommentID">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="getServiceFlapDetectionEnabled">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="getServiceFlapDetectionIsFlapping">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="getServiceFlapDetectionOnCritical">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="getServiceFlapDetectionOnOk">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="getServiceFlapDetectionOnUnknown">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="getServiceFlapDetectionOnWarning">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="getServiceFlapDetectionThresholdHigh">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="getServiceFlapDetectionThresholdLow">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="setServiceFlapDetectionEnabled">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="setServiceFlapDetectionOnCritical">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="setServiceFlapDetectionOnOk">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="setServiceFlapDetectionOnUnknown">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="setServiceFlapDetectionOnWarning">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="setServiceFlapDetectionThresholdHigh">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="setServiceFlapDetectionThresholdLow">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="getServiceFreshnessCheckEnabled">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="getServiceFreshnessIsActive">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="getServiceFreshnessThreshold">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="setServiceFreshnessCheckEnabled">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="setServiceFreshnessThreshold">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="getServiceModifiedAttributes">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="getServiceNameDisplay">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="setServiceNameDisplay">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="getServiceNotificationCurrentID">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="getServiceNotificationCurrentNumber">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="getServiceNotificationEnabled">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="getServiceNotificationFirstDelay">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="getServiceNotificationInterval">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="getServiceNotificationLast">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="getServiceNotificationNext">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="getServiceNotificationOnCritical">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="getServiceNotificationOnDowntime">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="getServiceNotificationOnFlapping">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="getServiceNotificationOnRecovery">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="getServiceNotificationOnUnknown">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="getServiceNotificationOnWarning">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="getServiceNotificationPeriod">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="setServiceNotificationEnabled">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="setServiceNotificationFirstDelay">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="setServiceNotificationInterval">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="setServiceNotificationOnCritical">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="setServiceNotificationOnDowntime">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="setServiceNotificationOnFlapping">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="setServiceNotificationOnRecovery">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="setServiceNotificationOnUnknown">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="setServiceNotificationOnWarning">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="setServiceNotificationPeriod">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="getServiceObsessOver">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="setServiceObsessOver">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="getServicePerfdataProcessingEnabled">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="setServicePerfdataProcessingEnabled">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="getServicePluginExecutionTime">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="getServicePluginIsExecuting">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="getServicePluginLatency">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="getServicePluginOutput">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="getServicePluginPerfdata">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="getServiceRetainStatusInformation">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="getServiceRetainNonStatusInformation">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="setServiceRetainStatusInformation">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="setServiceRetainNonStatusInformation">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="getServiceStalkOnCritical">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="getServiceStalkOnOk">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="getServiceStalkOnUnknown">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="getServiceStalkOnWarning">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="setServiceStalkOnCritical">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="setServiceStalkOnOk">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="setServiceStalkOnUnknown">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="setServiceStalkOnWarning">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="getServiceStateCurrent">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="getServiceStateInitial">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="getServiceStateLast">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="getServiceStateLastChange">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="getServiceStateLastCritical">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="getServiceStateLastHard">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="getServiceStateLastHardChange">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="getServiceStateLastOk">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="getServiceStateLastUnknown">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="getServiceStateLastWarning">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="getServiceStatePercentChange">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="getServiceStateType">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
 
 
 
