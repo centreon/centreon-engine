@@ -46,7 +46,7 @@
         </sequence>
       </complexType>
 
-      <!-- Not validated types. -->
+      <!-- Acknowledgement. -->
       <complexType name="acknowledgementType">
         <sequence>
           <element name="author" type="xsd:string"/>
@@ -56,17 +56,29 @@
           <element name="sticky" type="xsd:boolean"/>
         </sequence>
       </complexType>
+
+      <!-- Downtime identifier. -->
+      <complexType name="downtimeIDType">
+        <sequence>
+          <element name="downtime" type="xsd:unsignedLong"/>
+        </sequence>
+      </complexType>
+
+      <!-- Downtime. -->
       <complexType name="downtimeType">
         <sequence>
           <element name="starttime" type="xsd:dateTime"/>
           <element name="endtime" type="xsd:dateTime"/>
           <element name="fixed" type="xsd:boolean"/>
-          <element name="triggerid" type="xsd:long"/>
-          <element name="duration" type="xsd:dateTime"/>
+          <element name="triggerid" type="tns:downtimeIDType"/>
+          <element name="duration" type="xsd:double"/>
           <element name="author" type="xsd:string"/>
           <element name="comment" type="xsd:string"/>
         </sequence>
       </complexType>
+
+
+      <!-- Not validated types. -->
       <complexType name="notificationType">
         <sequence>
           <element name="author" type="xsd:string"/>
@@ -222,21 +234,50 @@
     <part name="value" type="xsd:unsignedInt"/>
   </message>
 
-
-  <!-- Not validated messages. -->
+  <!--
+   --  Acknowledgement messages.
+   -->
 
   <!-- Message to acknowledge a host problem. -->
-  <message name="acknowledgeHostProblemRequest">
-    <part name="host" type="xsd:string"/>
+  <message name="acknowledgementOnHostAddRequest">
+    <part name="host" type="tns:hostIDType"/>
     <part name="acknowledgement" type="tns:acknowledgementType"/>
   </message>
 
   <!-- Message to acknowledge a service problem. -->
-  <message name="acknowledgeServiceProblemRequest">
-    <part name="host" type="xsd:string"/>
-    <part name="service" type="xsd:string"/>
+  <message name="acknowledgementOnServiceAddRequest">
+    <part name="service" type="tns:serviceIDType"/>
     <part name="acknowledgement" type="tns:acknowledgementType"/>
   </message>
+
+  <!--
+   --  Downtime messages.
+   -->
+
+  <!-- Generic downtime request. -->
+  <message name="downtimeRequest">
+    <part name="downtime" type="tns:downtimeIDType"/>
+  </message>
+
+  <!-- Add a downtime related to a host. -->
+  <message name="downtimeHostRequest">
+    <part name="host" type="tns:hostIDType"/>
+    <part name="downtime" type="tns:downtimeType"/>
+  </message>
+
+  <!-- Add a downtime related to a service. -->
+  <message name="downtimeServiceRequest">
+    <part name="service" type="tns:serviceIDType"/>
+    <part name="downtime" type="tns:downtimeType"/>
+  </message>
+
+  <!-- Returns a downtime ID. -->
+  <message name="downtimeResponse">
+    <part name="downtime" type="downtimeIDType"/>
+  </message>
+
+
+  <!-- Not validated messages. -->
 
   <!-- Message sent when executing an operation on a contactgroup. -->
   <message name="contactgroupRequest">
@@ -2296,24 +2337,157 @@
     </operation>
 
 
+    <!------------------------
+     --                     --
+     --  Acknowledgements.  --
+     --                     --
+     ------------------------->
+
+    <!--
+     --  Host.
+     -->
+
+    <!-- acknowledgementOnHostAdd(host, acknowledgement) -->
+    <operation name="acknowledgementOnHostAdd">
+      <documentation>Acknowledge a problem on a host.</documentation>
+      <input message="tns:acknowledgementOnHostAddRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- acknowledgementOnHostRemove(host) -->
+    <operation name="acknowledgementOnHostRemove">
+      <documentation>Remove an acknowledgement on a host.</documentation>
+      <input message="tns:hostRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!--
+     --  Service.
+     -->
+
+    <!-- acknowledgementOnServiceAdd(service, acknowledgement) -->
+    <operation name="acknowledgementOnServiceAdd">
+      <documentation>Acknowledge a problem on a service.</documentation>
+      <input message="tns:acknowledgementOnServiceAddRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- acknowledgementOnServiceRemove(service) -->
+    <operation name="acknowledgementOnServiceRemove">
+      <documentation>Remove an acknowledgement on a service.</documentation>
+      <input message="tns:serviceRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+
+    <!-----------------
+     --              --
+     --  Downtimes.  --
+     --              --
+     ------------------>
+
+    <!--
+     --  Properties.
+     -->
+
+    <!-- getDowntimeAuthor(downtime) -->
+    <operation name="getDowntimeAuthor">
+      <documentation>Get the author of a downtime.</documentation>
+      <input message="tns:downtimeRequest"/>
+      <output message="tns:stringResponse"/>
+    </operation>
+
+    <!-- getDowntimeComment(downtime) -->
+    <!-- XXX -->
+
+    <!-- getDowntimeDuration(downtime) -->
+    <operation name="getDowntimeDuration">
+      <documentation>Get the duration of a downtime.</documentation>
+      <input message="tns:downtimeRequest"/>
+      <output message="tns:doubleResponse"/>
+    </operation>
+
+    <!-- getDowntimeEnd(downtime) -->
+    <operation name="getDowntimeEnd">
+      <documentation>Get the end time of a downtime.</documentation>
+      <input message="tns:downtimeRequest"/>
+      <output message="tns:dateResponse"/>
+    </operation>
+
+    <!-- getDowntimeFixed(downtime) -->
+    <operation name="getDowntimeFixed">
+      <documentation>Check if a downtime is fixed or not.</documentation>
+      <input message="tns:downtimeRequest"/>
+      <output message="tns:booleanResponse"/>
+    </operation>
+
+    <!-- getDowntimeStart(downtime) -->
+    <operation name="getDowntimeStart">
+      <documentation>Get the start time of a downtime.</documentation>
+      <input message="tns:downtimeRequest"/>
+      <output message="tns:dateResponse"/>
+    </operation>
+
+    <!-- getDowntimeTriggerID(downtime) -->
+    <!-- XXX -->
+
+    <!--
+     --  Deletion.
+     -->
+
+    <!-- downtimeDelete(downtime) -->
+    <operation name="downtimeDelete">
+      <documentation>Delete a downtime.</documentation>
+      <input message="tns:downtimeRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!--
+     --  By host.
+     -->
+
+    <!-- downtimeAddToHost(host, downtime) -->
+    <operation name="downtimeAddToHost">
+      <documentation>Schedule a downtime on a host.</documentation>
+      <input message="tns:downtimeHostRequest"/>
+      <output message="tns:downtimeResponse"/>
+    </operation>
+
+    <!-- downtimeAddAndPropagateToHost(host, downtime) -->
+    <operation name="downtimeAddAndPropagateToHost">
+      <documentation>Schedule downtime for a host and all of its children.</documentation>
+      <input message="tns:downtimeHostRequest"/>
+      <output message="tns:downtimeResponse"/>
+    </operation>
+
+    <!-- downtimeAddAndPropagateTriggeredToHost(host, downtime) -->
+    <operation name="downtimeAddAndPropagateTriggeredToHost">
+      <documentation>Schedule downtime for a host and all of its children.</documentation>
+      <input message="tns:downtimeHostRequest"/>
+      <output message="tns:downtimeResponse"/>
+    </operation>
+
+    <!-- downtimeAddToHostServices(host, downtime) -->
+    <operation name="downtimeAddToHostServices">
+      <documentation>Schedule a downtime on all services of a host.</documentation>
+      <input message="tns:downtimeHostRequest"/>
+      <output message="tns:downtimeResponse"/>
+    </operation>
+
+    <!--
+     --  By service.
+     -->
+
+    <!-- downtimeAddToService(service, downtime) -->
+    <operation name="downtimeAddToService">
+      <documentation>Schedule a downtime on a service.</documentation>
+      <input message="tns:downtimeServiceRequest"/>
+      <output message="tns:downtimeResponse"/>
+    </operation>
 
 
 
     <!-- Not validated commands. -->
-
-    <!-- acknowledgeHostProblem(string host, acknowledgementType acknowledgement) -->
-    <operation name="acknowledgeHostProblem">
-      <documentation>Acknowledge a problem on a host.</documentation>
-      <input message="tns:acknowledgeHostProblemRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
-
-    <!-- acknowledgeServiceProblem(string host, string service, acknowledgementType acknowledgement) -->
-    <operation name="acknowledgeServiceProblem">
-      <documentation>Acknowledge a problem on a service.</documentation>
-      <input message="tns:acknowledgeServiceProblemRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
 
     <!-- delayHostNotification(string host, time_t until) -->
     <operation name="delayHostNotification">
@@ -2336,13 +2510,6 @@
       <output message="tns:defaultResponse"/>
     </operation>
 
-    <!-- deleteDowntime(unsigned long downtimeid) -->
-    <operation name="deleteDowntime">
-      <documentation>Delete a downtime.</documentation>
-      <input message="tns:IDRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
-
     <!-- deleteHostAllComments(string host) -->
     <operation name="deleteHostAllComments">
       <documentation>Delete all comments of a host.</documentation>
@@ -2350,23 +2517,9 @@
       <output message="tns:defaultResponse"/>
     </operation>
 
-    <!-- deleteHostAcknowledgement(string host) -->
-    <operation name="deleteHostAcknowledgement">
-      <documentation>Remove an acknowledgement on a host.</documentation>
-      <input message="tns:hostRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
-
     <!-- deleteServiceAllComments(string host, string service) -->
     <operation name="deleteServiceAllComments">
       <documentation>Delete all comments of a service.</documentation>
-      <input message="tns:serviceRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
-
-    <!-- deleteServiceAcknowledgement(string host, string service) -->
-    <operation name="deleteServiceAcknowledgement">
-      <documentation>Remove an acknowledgement on a service.</documentation>
       <input message="tns:serviceRequest"/>
       <output message="tns:defaultResponse"/>
     </operation>
@@ -2406,31 +2559,10 @@
       <output message="tns:defaultResponse"/>
     </operation>
 
-    <!-- scheduleAndPropagateHostDowntime(string host, downtimeType downtime) -->
-    <operation name="scheduleAndPropagateHostDowntime">
-      <documentation>Schedule downtime for a host and all of its children.</documentation>
-      <input message="tns:scheduleDowntimeRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
-
-    <!-- scheduleAndPropagateHostTriggeredDowntime(string host, downtimeType downtime) -->
-    <operation name="scheduleAndPropagateHostTriggeredDowntime">
-      <documentation>Schedule downtime for a host and all of its children.</documentation>
-      <input message="tns:scheduleDowntimeRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
-
     <!-- scheduleHostCheck(string host, time_t when) -->
     <operation name="scheduleHostCheck">
       <documentation>Schedule a host check.</documentation>
       <input message="tns:hostTimeRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
-
-    <!-- scheduleHostDowntime(string host, downtimeType downtime) -->
-    <operation name="scheduleHostDowntime">
-      <documentation>Schedule a downtime on a host.</documentation>
-      <input message="tns:scheduleDowntimeRequest"/>
       <output message="tns:defaultResponse"/>
     </operation>
 
@@ -2462,13 +2594,6 @@
       <output message="tns:defaultResponse"/>
     </operation>
 
-    <!-- scheduleHostServiceDowntime(string host, downtimeType downtime) -->
-    <operation name="scheduleHostServiceDowntime">
-      <documentation>Schedule a downtime on all services of a host.</documentation>
-      <input message="tns:scheduleDowntimeRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
-
     <!-- scheduleHostServiceForcedChecks(string host, time_t when) -->
     <operation name="scheduleHostServiceForcedChecks">
       <documentation>Schedule a forced check of all services associated with the host.</documentation>
@@ -2480,13 +2605,6 @@
     <operation name="scheduleServiceCheck">
       <documentation>Schedule a service check.</documentation>
       <input message="tns:serviceTimeRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
-
-    <!-- scheduleServiceDowntime(string host, string service, downtimeType downtime) -->
-    <operation name="scheduleServiceDowntime">
-      <documentation>Schedule a downtime on a service.</documentation>
-      <input message="tns:scheduleServiceDowntimeRequest"/>
       <output message="tns:defaultResponse"/>
     </operation>
 
@@ -4447,35 +4565,109 @@
       <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
     </operation>
 
+    <!--
+     --  Acknowledgements.
+     -->
 
+    <operation name="acknowledgementOnHostAdd">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
 
+    <operation name="acknowledgementOnHostRemove">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="acknowledgementOnServiceAdd">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="acknowledgementOnServiceRemove">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <!--
+     --  Downtimes.
+     -->
+
+    <operation name="getDowntimeAuthor">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="getDowntimeDuration">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="getDowntimeEnd">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="getDowntimeFixed">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="getDowntimeStart">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="downtimeDelete">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="downtimeAddToHost">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="downtimeAddAndPropagateToHost">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="downtimeAddAndPropagateTriggeredToHost">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="downtimeAddToHostServices">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="downtimeAddToService">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    
 
     <!-- Not validated operations. -->
-    <operation name="acknowledgeHostProblem">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
-    <operation name="acknowledgeServiceProblem">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
 
     <operation name="deleteComment">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
-    <operation name="deleteDowntime">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
-    <operation name="deleteHostAcknowledgement">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
       <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
@@ -4523,18 +4715,6 @@
       <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
     </operation>
 
-    <operation name="scheduleAndPropagateHostDowntime">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
-    <operation name="scheduleAndPropagateHostTriggeredDowntime">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
     <operation name="scheduleHostCheck">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
@@ -4565,12 +4745,6 @@
       <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
     </operation>
 
-    <operation name="scheduleHostServiceDowntime">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
     <operation name="scheduleHostServiceForcedChecks">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
@@ -4578,12 +4752,6 @@
     </operation>
 
     <operation name="scheduleServiceCheck">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
-    <operation name="scheduleServiceDowntime">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
       <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
