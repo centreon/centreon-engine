@@ -26,7 +26,7 @@
       <!-- Error. -->
       <complexType name="errorType">
 	<sequence>
-	  <element name="code" type="xsd:unsignedInteger"/>
+	  <element name="code" type="xsd:unsignedInt"/>
 	  <element name="message" type="xsd:string"/>
 	</sequence>
       </complexType>
@@ -117,7 +117,7 @@
   <!-- Returns an integer. -->
   <message name="integerResponse">
     <part name="error" type="tns:errorType"/>
-    <part name="value" type="xsd:integer"/>
+    <part name="value" type="xsd:int"/>
   </message>
 
   <!-- Returns a short. -->
@@ -133,9 +133,9 @@
   </message>
 
   <!-- Returns an unsigned integer value. -->
-  <message name="unsignedIntegerResponse">
+  <message name="unsignedIntResponse">
     <part name="error" type="tns:errorType"/>
-    <part name="value" type="xsd:unsignedInteger"/>
+    <part name="value" type="xsd:unsignedInt"/>
   </message>
 
   <!-- Returns an unsigned short value. -->
@@ -168,7 +168,7 @@
   <!-- Host request with an integer. -->
   <message name="hostIntegerRequest">
     <part name="host" type="tns:hostIDType"/>
-    <part name="value" type="xsd:integer"/>
+    <part name="value" type="xsd:int"/>
   </message>
 
   <!-- Host request with a string. -->
@@ -180,7 +180,7 @@
   <!-- Host request with unsigned integer. -->
   <message name="hostUnsignedIntegerRequest">
     <part name="host" type="tns:hostIDType"/>
-    <part name="value" type="xsd:unsignedInteger"/>
+    <part name="value" type="xsd:unsignedInt"/>
   </message>
 
 
@@ -241,7 +241,7 @@
   <message name="newCommentResponse">
     <part name="errorCode" type="xsd:int"/>
     <part name="errorString" type="xsd:string"/>
-    <part name="commentID" type="xsd:unsignedInteger"/>
+    <part name="commentID" type="xsd:unsignedInt"/>
   </message>
 
   <!-- Message sent when creating a new host comment. -->
@@ -318,7 +318,7 @@
   <!-- Message sent when changing a modified attribute value. -->
   <message name="setContactModattrRequest">
     <part name="contact" type="xsd:string"/>
-    <part name="modattr" type="xsd:unsignedInteger"/>
+    <part name="modattr" type="xsd:unsignedInt"/>
   </message>
 
   <!-- Message sent when changing a notification timeperiod of a contact. -->
@@ -365,7 +365,7 @@
   <!-- Message sent when changing the modified attributes value of a host. -->
   <message name="setHostModattrRequest">
     <part name="host" type="xsd:string"/>
-    <part name="modattr" type="xsd:unsignedInteger"/>
+    <part name="modattr" type="xsd:unsignedInt"/>
   </message>
 
   <!-- Message sent when changing a host timeperiod. -->
@@ -377,7 +377,7 @@
   <!-- Message sent to change an unsigned integer value of a host. -->
   <message name="setHostUnsignedIntegerRequest">
     <part name="host" type="xsd:string"/>
-    <part name="value" type="xsd:unsignedInteger"/>
+    <part name="value" type="xsd:unsignedInt"/>
   </message>
 
   <!-- Message sent when changing a service check command. -->
@@ -413,7 +413,7 @@
   <message name="setServiceModattrRequest">
     <part name="host" type="xsd:string"/>
     <part name="service" type="xsd:string"/>
-    <part name="modattr" type="xsd:unsignedInteger"/>
+    <part name="modattr" type="xsd:unsignedInt"/>
   </message>
 
   <!-- Message sent when changing a service timeperiod. -->
@@ -427,7 +427,7 @@
   <message name="setServiceUnsignedIntegerRequest">
     <part name="host" type="xsd:string"/>
     <part name="service" type="xsd:string"/>
-    <part name="value" type="xsd:unsignedInteger"/>
+    <part name="value" type="xsd:unsignedInt"/>
   </message>
 
   <portType name="commandPortType">
@@ -541,21 +541,21 @@
     <operation name="getHostCheckCurrentAttempt">
       <documentation>Get the current check attempt of the host.</documentation>
       <input message="tns:hostRequest"/>
-      <output message="tns:unsignedIntegerResponse"/>
+      <output message="tns:unsignedIntResponse"/>
     </operation>
 
     <!-- getHostCheckIntervalNormal(host) -->
     <operation name="getHostCheckIntervalNormal">
       <documentation>Get the normal check interval.</documentation>
       <input message="tns:hostRequest"/>
-      <output message="tns:unsignedIntegerResponse"/>
+      <output message="tns:unsignedIntResponse"/>
     </operation>
 
     <!-- getHostCheckIntervalRetry(host) -->
     <operation name="getHostCheckIntervalRetry">
       <documentation>Get the retry check interval.</documentation>
       <input message="tns:hostRequest"/>
-      <output message="tns:unsignedIntegerResponse"/>
+      <output message="tns:unsignedIntResponse"/>
     </operation>
 
     <!-- getHostCheckLast(host) -->
@@ -569,7 +569,7 @@
     <operation name="getHostCheckMaxAttempts">
       <documentation>Get the max check attempts of the host.</documentation>
       <input message="tns:hostRequest"/>
-      <output message="tns:unsignedIntegerResponse"/>
+      <output message="tns:unsignedIntResponse"/>
     </operation>
 
     <!-- getHostCheckNext(host) -->
@@ -583,7 +583,7 @@
     <operation name="getHostCheckOptions">
       <documentation>Get the host check options.</documentation>
       <input message="tns:hostRequest"/>
-      <output message="tns:unsignedIntegerResponse"/>
+      <output message="tns:unsignedIntResponse"/>
     </operation>
 
     <!-- getHostCheckPassiveEnabled(host) -->
@@ -706,7 +706,7 @@
     <operation name="getHostDowntimeDepth">
       <documentation>Get the host downtime depth.</documentation>
       <input message="tns:hostRequest"/>
-      <output message="tns:unsignedIntegerResponse"/>
+      <output message="tns:unsignedIntResponse"/>
     </operation>
 
     <!-- getHostDowntimeFlexPending(host) -->
@@ -781,7 +781,7 @@
     <operation name="getHostFlapDetectionCommentID">
       <documentation>Get the flap detection comment ID of the host.</documentation>
       <input message="tns:hostRequest"/>
-      <output message="tns:unsignedIntegerResponse"/>
+      <output message="tns:unsignedIntResponse"/>
     </operation>
 
     <!-- getHostFlapDetectionEnabled(host) -->
@@ -932,7 +932,7 @@
     <operation name="getHostModifiedAttributes">
       <documentation>Get the modified attributes on the host.</documentation>
       <input message="tns:hostRequest"/>
-      <output message="tns:unsignedIntegerResponse"/>
+      <output message="tns:unsignedIntResponse"/>
     </operation>
 
     <!--
@@ -975,14 +975,14 @@
     <operation name="getHostNotificationCurrentID">
       <documentation>Get the ID of the current host notification.</documentation>
       <input message="tns:hostRequest"/>
-      <output message="tns:unsignedIntegerResponse"/>
+      <output message="tns:unsignedIntResponse"/>
     </operation>
 
     <!-- getHostNotificationCurrentNumber(host) -->
     <operation name="getHostNotificationCurrentNumber">
       <documentation>Get the current notification number of the host.</documentation>
       <input message="tns:hostRequest"/>
-      <output message="tns:unsignedIntegerResponse"/>
+      <output message="tns:unsignedIntResponse"/>
     </operation>
 
     <!-- getHostNotificationEnabled(host) -->
@@ -996,14 +996,14 @@
     <operation name="getHostNotificationFirstDelay">
       <documentation>Get the first notification delay of the host.</documentation>
       <input message="tns:hostRequest"/>
-      <output message="tns:unsignedIntegerResponse"/>
+      <output message="tns:unsignedIntResponse"/>
     </operation>
 
     <!-- getHostNotificationInterval(host) -->
     <operation name="getHostNotificationInterval">
       <documentation>Get the notification interval of the host.</documentation>
       <input message="tns:hostRequest"/>
-      <output message="tns:unsignedIntegerResponse"/>
+      <output message="tns:unsignedIntResponse"/>
     </operation>
 
     <!-- getHostNotificationLast(host) -->
@@ -1172,7 +1172,7 @@
     <operation name="getHostPluginExecutionTime">
       <documentation>Get the last execution time of the plugin.</documentation>
       <input message="tns:hostRequest"/>
-      <output message="tns:unsignedIntegerResponse"/>
+      <output message="tns:unsignedIntResponse"/>
     </operation>
 
     <!-- getHostPluginIsExecuting(host) -->
@@ -1243,14 +1243,14 @@
     <operation name="getHostServicesCount">
       <documentation>Get the number of services on this host.</documentation>
       <input message="tns:hostRequest"/>
-      <output message="tns:unsignedIntegerResponse"/>
+      <output message="tns:unsignedIntResponse"/>
     </operation>
 
     <!-- getHostServicesTotalCheckInterval(host) -->
     <operation name="getHostServicesTotalCheckInterval">
       <documentation>Get the total check interval on this host.</documentation>
       <input message="tns:hostRequest"/>
-      <output message="tns:unsignedIntegerResponse"/>
+      <output message="tns:unsignedIntResponse"/>
     </operation>
 
     <!--
