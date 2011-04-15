@@ -324,6 +324,11 @@
    --  Contact messages.
    -->
 
+  <!-- Message sent when executing an operation on a contact. -->
+  <message name="contactRequest">
+    <part name="contact" type="xsd:contactIDType"/>
+  </message>
+
   <!-- Boolean request on a contact. -->
   <message name="contactBooleanRequest">
     <part name="contact" type="tns:contactIDType"/>
@@ -393,11 +398,6 @@
     <part name="contactgroup" type="xsd:string"/>
   </message>
 
-  <!-- Message sent when executing an operation on a contact. -->
-  <message name="contactRequest">
-    <part name="contact" type="xsd:string"/>
-  </message>
-
   <!-- Message sent when setting a feature of a host group. -->
   <message name="hostgroupEnableRequest">
     <part name="hostgroup" type="xsd:string"/>
@@ -408,17 +408,6 @@
   <message name="hostNotificationRequest">
     <part name="host" type="xsd:string"/>
     <part name="notification" type="tns:notificationType"/>
-  </message>
-
-  <!-- Message sent when executing an operation on a host. -->
-  <message name="hostRequest">
-    <part name="host" type="xsd:string"/>
-  </message>
-
-  <!-- Message sent when changing a time on a host. -->
-  <message name="hostTimeRequest">
-    <part name="host" type="xsd:string"/>
-    <part name="time" type="xsd:dateTime"/>
   </message>
 
   <!-- Message send when operating on an ID. -->
@@ -450,21 +439,6 @@
     <part name="persistent" type="xsd:boolean"/>
   </message>
 
-  <!-- Message sent when processing a host check result. -->
-  <message name="processHostCheckResultRequest">
-    <part name="host" type="xsd:string"/>
-    <part name="retval" type="xsd:int"/>
-    <part name="output" type="xsd:string"/>
-  </message>
-
-  <!-- Message sent when processing a service check result. -->
-  <message name="processServiceCheckResultRequest">
-    <part name="host" type="xsd:string"/>
-    <part name="service" type="xsd:string"/>
-    <part name="retval" type="xsd:int"/>
-    <part name="output" type="xsd:string"/>
-  </message>
-
   <!-- Message sent when scheduling a downtime (except for service target). -->
   <message name="scheduleDowntimeRequest">
     <part name="target" type="xsd:string"/>
@@ -489,134 +463,6 @@
     <part name="host" type="xsd:string"/>
     <part name="service" type="xsd:string"/>
     <part name="notification" type="tns:notificationType"/>
-  </message>
-
-  <!-- Message sent when executing an operation on a service. -->
-  <message name="serviceRequest">
-    <part name="host" type="xsd:string"/>
-    <part name="service" type="xsd:string"/>
-  </message>
-
-  <!-- Message sent when changing a service time. -->
-  <message name="serviceTimeRequest">
-    <part name="host" type="xsd:string"/>
-    <part name="service" type="xsd:string"/>
-    <part name="time" type="xsd:dateTime"/>
-  </message>
-
-  <!-- Message sent when changing a modified attribute value. -->
-  <message name="setContactModattrRequest">
-    <part name="contact" type="xsd:string"/>
-    <part name="modattr" type="xsd:unsignedInt"/>
-  </message>
-
-  <!-- Message sent when changing a notification timeperiod of a contact. -->
-  <message name="setContactNotificationTimeperiodRequest">
-    <part name="contact" type="xsd:string"/>
-    <part name="timeperiod" type="xsd:string"/>
-  </message>
-
-  <!-- Message sent when (re)setting a custom variable (except for service targets). -->
-  <message name="setCustomVarRequest">
-    <part name="target" type="xsd:string"/>
-    <part name="varname" type="xsd:string"/>
-    <part name="varvalue" type="xsd:string"/>
-  </message>
-
-  <!-- Message to enable or disable feature. -->
-  <message name="setEnabledRequest">
-    <part name="enable" type="xsd:boolean"/>
-  </message>
-
-  <!-- Message sent when (re)setting a global event handler. -->
-  <message name="setEventHandlerRequest">
-    <part name="command" type="xsd:string"/>
-  </message>
-
-  <!-- Message sent when changing a host check command. -->
-  <message name="setHostCheckCommandRequest">
-    <part name="host" type="xsd:string"/>
-    <part name="command" type="xsd:string"/>
-  </message>
-
-  <!-- Message sent to enable a host feature. -->
-  <message name="setHostEnabledRequest">
-    <part name="host" type="xsd:string"/>
-    <part name="enable" type="xsd:boolean"/>
-  </message>
-
-  <!-- Message sent when changing a host event handler. -->
-  <message name="setHostEventHandlerRequest">
-    <part name="host" type="xsd:string"/>
-    <part name="eventhandler" type="xsd:string"/>
-  </message>
-
-  <!-- Message sent when changing the modified attributes value of a host. -->
-  <message name="setHostModattrRequest">
-    <part name="host" type="xsd:string"/>
-    <part name="modattr" type="xsd:unsignedInt"/>
-  </message>
-
-  <!-- Message sent when changing a host timeperiod. -->
-  <message name="setHostTimeperiodRequest">
-    <part name="host" type="xsd:string"/>
-    <part name="timeperiod" type="xsd:string"/>
-  </message>
-
-  <!-- Message sent to change an unsigned integer value of a host. -->
-  <message name="setHostUnsignedIntegerRequest">
-    <part name="host" type="xsd:string"/>
-    <part name="value" type="xsd:unsignedInt"/>
-  </message>
-
-  <!-- Message sent when changing a service check command. -->
-  <message name="setServiceCheckCommandRequest">
-    <part name="host" type="xsd:string"/>
-    <part name="service" type="xsd:string"/>
-    <part name="command" type="xsd:string"/>
-  </message>
-
-  <!-- Message sent when (re)setting a service custom variable. -->
-  <message name="setServiceCustomVarRequest">
-    <part name="host" type="xsd:string"/>
-    <part name="service" type="xsd:string"/>
-    <part name="varname" type="xsd:string"/>
-    <part name="varvalue" type="xsd:string"/>
-  </message>
-
-  <!-- Message sent to enable a service feature. -->
-  <message name="setServiceEnabledRequest">
-    <part name="host" type="xsd:string"/>
-    <part name="service" type="xsd:string"/>
-    <part name="enable" type="xsd:boolean"/>
-  </message>
-
-  <!-- Message sent when changing a service event handler. -->
-  <message name="setServiceEventHandlerRequest">
-    <part name="host" type="xsd:string"/>
-    <part name="service" type="xsd:string"/>
-    <part name="eventhandler" type="xsd:string"/>
-  </message>
-
-  <!-- Message sent when changing the modified attributes value of a service. -->
-  <message name="setServiceModattrRequest">
-    <part name="host" type="xsd:string"/>
-    <part name="service" type="xsd:string"/>
-    <part name="modattr" type="xsd:unsignedInt"/>
-  </message>
-
-  <!-- Message sent when changing a service timeperiod. -->
-  <message name="setServiceTimeperiodRequest">
-    <part name="host" type="xsd:string"/>
-    <part name="service" type="xsd:string"/>
-    <part name="timeperiod" type="xsd:string"/>
-  </message>
-
-  <!-- Message sent when changing an unsigned integer value of a service. -->
-  <message name="setServiceUnsignedIntegerRequest">
-    <part name="host" type="xsd:string"/>
-    <part name="service" type="xsd:string"/>
-    <part name="value" type="xsd:unsignedInt"/>
   </message>
 
   <portType name="commandPortType">
@@ -795,7 +641,7 @@
     <!-- setNotificationsEnabled(enable) -->
     <operation name="setNotificationsEnabled">
       <documentation>Enable or disable notifications globally.</documentation>
-      <input message="tns:setEnabledRequest"/>
+      <input message="tns:booleanRequest"/>
       <output message="tns:defaultResponse"/>
     </operation>
 
@@ -1666,6 +1512,20 @@
       <documentation>Get the total check interval on this host.</documentation>
       <input message="tns:hostRequest"/>
       <output message="tns:unsignedIntResponse"/>
+    </operation>
+
+    <!-- hostSetServicesCheckActiveEnabled(host, enable) -->
+    <operation name="hostSetServicesCheckActiveEnabled">
+      <documentation>Enable or disable active checks on all services of the host.</documentation>
+      <input message="tns:hostBooleanRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- hostSetServicesNotificationsEnabled(host, enable) -->
+    <operation name="hostSetServicesNotificationsEnabled">
+      <documentation>Enable or disable notifications on all services of the host.</documentation>
+      <input message="tns:hostBooleanRequest"/>
+      <output message="tns:defaultResponse"/>
     </operation>
 
     <!--
@@ -3415,20 +3275,6 @@
       <output message="tns:defaultResponse"/>
     </operation>
 
-    <!-- setHostServicesActiveChecksEnabled(string host, bool enable) -->
-    <operation name="setHostServicesActiveChecksEnabled">
-      <documentation>Enable all active checks of all services of a host.</documentation>
-      <input message="tns:setHostEnabledRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
-
-    <!-- setHostServicesNotificationsEnabled(string host, bool enable) -->
-    <operation name="setHostServicesNotificationsEnabled">
-      <documentation>Enable or disable notifications on all services of a host.</documentation>
-      <input message="tns:setHostEnabledRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
-
     <!-- setServicegroupHostActiveChecksEnabled(string servicegroup, bool enable) -->
     <operation name="setServicegroupHostActiveChecksEnabled">
       <documentation>Enable or disable active checks of hosts of services of the service group.</documentation>
@@ -4282,6 +4128,18 @@
     </operation>
 
     <operation name="hostGetServicesTotalCheckInterval">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="hostSetServicesCheckActiveEnabled">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="hostSetServicesNotificationsEnabled">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
       <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
@@ -5659,18 +5517,6 @@
     </operation>
 
     <operation name="setHostgroupServicePassiveChecksEnabled">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
-    <operation name="setHostServicesActiveChecksEnabled">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
-    <operation name="setHostServicesNotificationsEnabled">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
       <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
