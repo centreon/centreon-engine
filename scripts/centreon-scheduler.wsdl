@@ -307,6 +307,12 @@
     <part name="command" type="tns:commandIDType"/>
   </message>
 
+  <!-- Returns a command identifier. -->
+  <message name="commandResponse">
+    <part name="error" type="tns:errorType"/>
+    <part name="command" type="commandIDType"/>
+  </message>
+
   <!--
    --  Downtime messages.
    -->
@@ -330,6 +336,7 @@
 
   <!-- Returns a downtime ID. -->
   <message name="downtimeResponse">
+    <part name="error" type="tns:errorType"/>
     <part name="downtimeid" type="tns:downtimeIDType"/>
   </message>
 
@@ -594,6 +601,111 @@
     <!--
      --  Features.
      -->
+
+    <!-- getEventHandlersEnabled() -->
+    <operation name="getEventHandlersEnabled">
+      <documentation>Check if event handlers are enabled globally.</documentation>
+      <input message="tns:emptyRequest"/>
+      <output message="tns:booleanResponse"/>
+    </operation>
+
+    <!-- getFailurePredictionEnabled() -->
+    <operation name="getFailurePredictionEnabled">
+      <documentation>Check if failure prediction is globally enabled.</documentation>
+      <input message="tns:emptyRequest"/>
+      <output message="tns:booleanResponse"/>
+    </operation>
+
+    <!-- getFlapDetectionEnabled() -->
+    <operation name="getFlapDetectionEnabled">
+      <documentation>Check if flap detection is globally enabled.</documentation>
+      <input message="tns:emptyRequest"/>
+      <output message="tns:booleanResponse"/>
+    </operation>
+
+    <!-- getHostsChecksActiveEnabled() -->
+    <operation name="getHostsChecksActiveEnabled">
+      <documentation>Check if hosts active checks are globally enabled.</documentation>
+      <input message="tns:emptyRequest"/>
+      <output message="tns:booleanResponse"/>
+    </operation>
+
+    <!-- getHostsChecksPassiveEnabled() -->
+    <operation name="getHostsChecksPassiveEnabled">
+      <documentation>Check if hosts passive checks are globally enabled.</documentation>
+      <input message="tns:emptyRequest"/>
+      <output message="tns:booleanResponse"/>
+    </operation>
+
+    <!-- getHostsEventHandler() -->
+    <operation name="getHostsEventHandler">
+      <documentation>Get the global host event handler.</documentation>
+      <input message="tns:emptyRequest"/>
+      <output message="tns:commandResponse"/>
+    </operation>
+
+    <!-- getHostsFreshnessChecksEnabled() -->
+    <operation name="getHostsFreshnessChecksEnabled">
+      <documentation>Check if the hosts freshness checks are globally enabled.</documentation>
+      <input message="tns:emptyRequest"/>
+      <output message="tns:booleanResponse"/>
+    </operation>
+
+    <!-- getHostsObsessOverEnabled() -->
+    <operation name="getHostsObsessOverEnabled">
+      <documentation>Check if host obsession is globally enabled.</documentation>
+      <input message="tns:emptyRequest"/>
+      <output message="tns:booleanResponse"/>
+    </operation>
+
+    <!-- getNotificationsEnabled() -->
+    <operation name="getNotificationsEnabled">
+      <documentation>Check if notifications are enabled.</documentation>
+      <input message="tns:emptyRequest"/>
+      <output message="tns:booleanResponse"/>
+    </operation>
+
+    <!-- getPerfdataProcessingEnabled() -->
+    <operation name="getPerfdataProcessingEnabled">
+      <documentation>Check if performance data processing is enabled.</documentation>
+      <input message="tns:emptyRequest"/>
+      <output message="tns:booleanResponse"/>
+    </operation>
+
+    <!-- getServicesChecksActiveEnabled() -->
+    <operation name="getServicesChecksActiveEnabled">
+      <documentation>Check if services active checks are enabled.</documentation>
+      <input message="tns:emptyRequest"/>
+      <output message="tns:booleanResponse"/>
+    </operation>
+
+    <!-- getServicesChecksPassiveEnabled() -->
+    <operation name="getServicesChecksPassiveEnabled">
+      <documentation>Check if services passive checks are enabled.</documentation>
+      <input message="tns:emptyRequest"/>
+      <output message="tns:booleanResponse"/>
+    </operation>
+
+    <!-- getServicesEventHandler() -->
+    <operation name="getServicesEventHandler">
+      <documentation>Get the global service event handler.</documentation>
+      <input message="tns:emptyRequest"/>
+      <output message="tns:commandResponse"/>
+    </operation>
+
+    <!-- getServicesFreshnessChecksEnabled() -->
+    <operation name="getServicesFreshnessChecksEnabled">
+      <documentation>Check if services freshness checks are globally enabled.</documentation>
+      <input message="tns:emptyRequest"/>
+      <output message="tns:booleanResponse"/>
+    </operation>
+
+    <!-- getServicesObsessOverEnabled() -->
+    <operation name="getServicesObsessOverEnabled">
+      <documentation>Check if services obsession is globally enabled.</documentation>
+      <input message="tns:emptyRequest"/>
+      <output message="tns:booleanResponse"/>
+    </operation>
 
     <!-- setEventHandlersEnabled(enable) -->
     <operation name="setEventHandlersEnabled">
@@ -3038,6 +3150,96 @@
      --  Global operations.  --
      --                      --
      -------------------------->
+
+    <operation name="getEventHandlersEnabled">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="getFailurePredictionEnabled">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="getFlapDetectionEnabled">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="getHostsChecksActiveEnabled">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="getHostsChecksPassiveEnabled">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="getHostsEventHandler">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="getHostsFreshnessChecksEnabled">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="getHostsObsessOverEnabled">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="getNotificationsEnabled">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="getPerfdataProcessingEnabled">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="getServicesChecksActiveEnabled">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="getServicesChecksPassiveEnabled">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="getServicesEventHandler">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="getServicesFreshnessChecksEnabled">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="getServicesObsessOverEnabled">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
 
     <operation name="setEventHandlersEnabled">
       <SOAP:operation style="rpc" soapAction=""/>
