@@ -105,8 +105,8 @@
           <element name="author" type="xsd:string"/>
           <element name="broadcast" type="xsd:boolean"/>
           <element name="comment" type="xsd:string"/>
-          <element name="forced" type="xsd:string"/>
-          <element name="increment" type="xsd:string"/>
+          <element name="forced" type="xsd:boolean"/>
+          <element name="increment" type="xsd:boolean"/>
         </sequence>
       </complexType>
 
