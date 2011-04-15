@@ -110,6 +110,13 @@
         </sequence>
       </complexType>
 
+      <!-- Timeperiod identifier. -->
+      <complexType name="timeperiodIDType">
+	<sequence>
+	  <element name="timeperiod" type="xsd:string"/>
+	</sequence>
+      </complexType>
+
     </schema>
   </types>
 
@@ -171,6 +178,12 @@
     <part name="value" type="xsd:string"/>
   </message>
 
+  <!-- Returns a timeperiod. -->
+  <message name="timeperiodResponse">
+    <part name="error" type="tns:errorType"/>
+    <part name="value" type="tns:timeperiodIDType"/>
+  </message>
+
   <!-- Returns an unsigned integer value. -->
   <message name="unsignedIntResponse">
     <part name="error" type="tns:errorType"/>
@@ -222,6 +235,12 @@
     <part name="value" type="xsd:string"/>
   </message>
 
+  <!-- Host request with a timeperiod. -->
+  <message name="hostTimeperiodRequest">
+    <part name="host" type="tns:hostIDType"/>
+    <part name="timeperiod" type="tns:timeperiodIDType"/>
+  </message>
+
   <!-- Host request with unsigned integer. -->
   <message name="hostUnsignedIntegerRequest">
     <part name="host" type="tns:hostIDType"/>
@@ -265,6 +284,12 @@
   <message name="serviceStringRequest">
     <part name="service" type="tns:serviceIDType"/>
     <part name="value" type="xsd:string"/>
+  </message>
+
+  <!-- Service request with a timeperiod. -->
+  <message name="serviceTimeperiodRequest">
+    <part name="service" type="tns:serviceIDType"/>
+    <part name="value" type="tns:timeperiodIDType"/>
   </message>
 
   <!-- Service request with an unsigned integer. -->
@@ -345,6 +370,12 @@
   <message name="contactStringRequest">
     <part name="contact" type="tns:contactIDType"/>
     <part name="value" type="xsd:string"/>
+  </message>
+
+  <!-- Timeperiod request on a contact. -->
+  <message name="contactTimeperiodRequest">
+    <part name="contact" type="tns:contactIDType"/>
+    <part name="value" type="tns:timeperiodIDType"/>
   </message>
 
   <!--
@@ -844,7 +875,7 @@
     <operation name="hostGetCheckPeriod">
       <documentation>Get the host check period.</documentation>
       <input message="tns:hostRequest"/>
-      <output message="tns:stringResponse"/>
+      <output message="tns:timeperiodResponse"/>
     </operation>
 
     <!-- hostGetCheckShouldBeScheduled(host) -->
@@ -906,7 +937,7 @@
     <!-- hostSetCheckPeriod(host, period) -->
     <operation name="hostSetCheckPeriod">
       <documentation>Set the host check period.</documentation>
-      <input message="tns:hostStringRequest"/>
+      <input message="tns:hostTimeperiodRequest"/>
       <output message="tns:defaultResponse"/>
     </operation>
 
@@ -1309,7 +1340,7 @@
     <operation name="hostGetNotificationsPeriod">
       <documentation>Get the notification period of the host.</documentation>
       <input message="tns:hostRequest"/>
-      <output message="tns:booleanResponse"/>
+      <output message="tns:timeperiodResponse"/>
     </operation>
 
     <!-- hostSetNotificationsBeyondEnabled(host, enable) -->
@@ -1385,7 +1416,7 @@
     <!-- hostSetNotificationsPeriod(host, period) -->
     <operation name="hostSetNotificationsPeriod">
       <documentation>Set notification period of host.</documentation>
-      <input message="tns:hostBooleanRequest"/>
+      <input message="tns:hostTimeperiodRequest"/>
       <output message="tns:defaultResponse"/>
     </operation>
 
@@ -1758,7 +1789,7 @@
     <operation name="serviceGetCheckPeriod">
       <documentation>Get the service check period.</documentation>
       <input message="tns:serviceRequest"/>
-      <output message="tns:stringResponse"/>
+      <output message="tns:timeperiodResponse"/>
     </operation>
 
     <!-- serviceGetCheckShouldBeScheduled(service) -->
@@ -1820,7 +1851,7 @@
     <!-- serviceSetCheckPeriod(service, period) -->
     <operation name="serviceSetCheckPeriod">
       <documentation>Set the service check period.</documentation>
-      <input message="tns:serviceStringRequest"/>
+      <input message="tns:serviceTimeperiodRequest"/>
       <output message="tns:defaultResponse"/>
     </operation>
 
@@ -2205,7 +2236,7 @@
     <operation name="serviceGetNotificationsPeriod">
       <documentation>Get the notification period of the service.</documentation>
       <input message="tns:serviceRequest"/>
-      <output message="tns:booleanResponse"/>
+      <output message="tns:timeperiodResponse"/>
     </operation>
 
     <!-- serviceSetNotificationsEnabled(service, enable) -->
@@ -2274,7 +2305,7 @@
     <!-- serviceSetNotificationsPeriod(service, period) -->
     <operation name="serviceSetNotificationsPeriod">
       <documentation>Set notification period of service.</documentation>
-      <input message="tns:serviceBooleanRequest"/>
+      <input message="tns:serviceTimeperiodRequest"/>
       <output message="tns:defaultResponse"/>
     </operation>
 
@@ -2747,7 +2778,11 @@
     </operation>
 
     <!-- contactGetNotificationsOnHostTimeperiod(contact) -->
-    <!-- XXX -->
+    <operation name="contactGetNotificationsOnHostTimeperiod">
+      <documentation>Get the host notification timeperiod of the contact.</documentation>
+      <input message="tns:contactRequest"/>
+      <output message="tns:timeperiodResponse"/>
+    </operation>
 
     <!-- contactGetNotificationsOnHostUnreachable(contact) -->
     <operation name="contactGetNotificationsOnHostUnreachable">
@@ -2806,7 +2841,11 @@
     </operation>
 
     <!-- contactGetNotificationsOnServiceTimeperiod(contact) -->
-    <!-- XXX -->
+    <operation name="contactGetNotificationsOnServiceTimeperiod">
+      <documentation>Get the service notification timeperiod of the contact.</documentation>
+      <input message="tns:contactRequest"/>
+      <output message="tns:timeperiodResponse"/>
+    </operation>
 
     <!-- contactGetNotificationsOnServiceUnknown(contact) -->
     <operation name="contactGetNotificationsOnServiceUnknown">
@@ -2908,7 +2947,11 @@
     </operation>
 
     <!-- contactSetNotificationsOnHostTimeperiod(contact, timeperiod) -->
-    <!-- XXX -->
+    <operation name="contactSetNotificationsOnHostTimeperiod">
+      <documentation>Set the host notifications timeperiod of the contact.</documentation>
+      <input message="tns:contactTimeperiodRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
 
     <!-- contactSetNotificationsOnHostUnreachable(contact, enable) -->
     <operation name="contactSetNotificationsOnHostUnreachable">
@@ -2960,7 +3003,11 @@
     </operation>
 
     <!-- contactSetNotificationsOnServiceTimeperiod(contact, timeperiod) -->
-    <!-- XXX -->
+    <operation name="contactSetNotificationsOnServiceTimeperiod">
+      <documentation>Set the service notification timeperiod of the contact.</documentation>
+      <input message="tns:contactTimeperiodRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
 
     <!-- contactSetNotificationsOnServiceUnknown(contact, enable) -->
     <operation name="contactSetNotificationsOnServiceUnknown">
@@ -5101,6 +5148,12 @@
       <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
     </operation>
 
+    <operation name="contactGetNotificationsOnHostTimeperiod">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
     <operation name="contactGetNotificationsOnHostUnreachable">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
@@ -5144,6 +5197,12 @@
     </operation>
 
     <operation name="contactGetNotificationsOnServiceRecovery">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="contactGetNotificationsOnServiceTimeperiod">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
       <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
@@ -5233,6 +5292,12 @@
       <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
     </operation>
 
+    <operation name="contactSetNotificationsOnHostTimeperiod">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
     <operation name="contactSetNotificationsOnHostUnreachable">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
@@ -5270,6 +5335,12 @@
     </operation>
 
     <operation name="contactSetNotificationsOnServiceRecovery">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="contactSetNotificationsOnServiceTimeperiod">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
       <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
