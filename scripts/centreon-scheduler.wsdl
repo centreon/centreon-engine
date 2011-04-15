@@ -67,9 +67,16 @@
 
       <!-- Command identifier. -->
       <complexType name="commandIDType">
-	<sequence>
-	  <element name="command" type="xsd:string"/>
-	</sequence>
+        <sequence>
+          <element name="command" type="xsd:string"/>
+        </sequence>
+      </complexType>
+
+      <!-- Contact identifier. -->
+      <complexType name="contactIDType">
+        <sequence>
+          <element name="contact" type="xsd:string"/>
+        </sequence>
       </complexType>
 
       <!-- Downtime identifier. -->
@@ -310,7 +317,29 @@
   <!-- Returns a command identifier. -->
   <message name="commandResponse">
     <part name="error" type="tns:errorType"/>
-    <part name="command" type="commandIDType"/>
+    <part name="command" type="tns:commandIDType"/>
+  </message>
+
+  <!--
+   --  Contact messages.
+   -->
+
+  <!-- Boolean request on a contact. -->
+  <message name="contactBooleanRequest">
+    <part name="contact" type="tns:contactIDType"/>
+    <part name="value" type="xsd:boolean"/>
+  </message>
+
+  <!-- Command request on a contact. -->
+  <message name="contactCommandRequest">
+    <part name="contact" type="tns:contactIDType"/>
+    <part name="value" type="tns:commandIDType"/>
+  </message>
+
+  <!-- String request on a contact. -->
+  <message name="contactStringRequest">
+    <part name="contact" type="tns:contactIDType"/>
+    <part name="value" type="xsd:string"/>
   </message>
 
   <!--
@@ -2751,6 +2780,364 @@
     </operation>
 
 
+    <!----------------
+     --             --
+     --  Contacts.  --
+     --             --
+     ----------------->
+
+    <!-- contactGetAddresses(contact) -->
+    <!-- XXX -->
+
+    <!-- contactGetAlias(contact) -->
+    <operation name="contactGetAlias">
+      <documentation>Get the contact alias.</documentation>
+      <input message="tns:contactRequest"/>
+      <output message="tns:stringResponse"/>
+    </operation>
+
+    <!-- contactGetCanSubmitCommands(contact) -->
+    <operation name="contactGetCanSubmitCommands">
+      <documentation>Check if the contact can submit external commands.</documentation>
+      <input message="tns:contactRequest"/>
+      <output message="tns:booleanResponse"/>
+    </operation>
+
+    <!-- contactGetCustomVariable(contact, variable) -->
+    <!-- XXX -->
+
+    <!-- contactGetCustomVariables(contact) -->
+    <!-- XXX -->
+
+    <!-- contactGetEmail(contact) -->
+    <operation name="contactGetEmail">
+      <documentation>Get the contact email.</documentation>
+      <input message="tns:contactRequest"/>
+      <output message="tns:stringResponse"/>
+    </operation>
+
+    <!-- contactGetModifiedAttributes(contact) -->
+    <operation name="contactGetModifiedAttributes">
+      <documentation>Get the contact modified attributes.</documentation>
+      <input message="tns:contactRequest"/>
+      <output message="tns:unsignedIntResponse"/>
+    </operation>
+
+    <!-- contactGetModifiedAttributesHost(contact) -->
+    <operation name="contactGetModifiedAttributesHost">
+      <documentation>Get the contact host modified attributes.</documentation>
+      <input message="tns:contactRequest"/>
+      <output message="tns:unsignedIntResponse"/>
+    </operation>
+
+    <!-- contactGetModifiedAttributesService(contact) -->
+    <operation name="contactGetModifiedAttributesService">
+      <documentation>Get the contact service modified attributes.</documentation>
+      <input message="tns:contactRequest"/>
+      <output message="tns:unsignedIntResponse"/>
+    </operation>
+
+    <!-- contactGetNotificationsOnHostCommand(contact) -->
+    <operation name="contactGetNotificationsOnHostCommand">
+      <documentation>Get the host notification command of the contact.</documentation>
+      <input message="tns:contactRequest"/>
+      <output message="tns:commandResponse"/>
+    </operation>
+
+    <!-- contactGetNotificationsOnHostDown(contact) -->
+    <operation name="contactGetNotificationsOnHostDown">
+      <documentation>Check if contact should be notified by down hosts.</documentation>
+      <input message="tns:contactRequest"/>
+      <output message="tns:booleanResponse"/>
+    </operation>
+
+    <!-- contactGetNotificationsOnHostDowntime(contact) -->
+    <operation name="contactGetNotificationsOnHostDowntime">
+      <documentation>Check if contact should be notified by hosts downtimes.</documentation>
+      <input message="tns:contactRequest"/>
+      <output message="tns:booleanResponse"/>
+    </operation>
+
+    <!-- contactGetNotificationsOnHostEnabled(contact) -->
+    <operation name="contactGetNotificationsOnHostEnabled">
+      <documentation>Check if contact will be notified by host events.</documentation>
+      <input message="tns:contactRequest"/>
+      <output message="tns:booleanResponse"/>
+    </operation>
+
+    <!-- contactGetNotificationsOnHostFlapping(contact) -->
+    <operation name="contactGetNotificationsOnHostFlapping">
+      <documentation>Check if contact should be notified when hosts are flapping.</documentation>
+      <input message="tns:contactRequest"/>
+      <output message="tns:booleanResponse"/>
+    </operation>
+
+    <!-- contactGetNotificationsOnHostLast(contact) -->
+    <operation name="contactGetNotificationsOnHostLast">
+      <documentation>Get the last time the contact received a host notification.</documentation>
+      <input message="tns:contactRequest"/>
+      <output message="tns:dateResponse"/>
+    </operation>
+
+    <!-- contactGetNotificationsOnHostRecovery(contact) -->
+    <operation name="contactGetNotificationsOnHostRecovery">
+      <documentation>Check if contact should be notified when hosts recover.</documentation>
+      <input message="tns:contactRequest"/>
+      <output message="tns:booleanResponse"/>
+    </operation>
+
+    <!-- contactGetNotificationsOnHostTimeperiod(contact) -->
+    <!-- XXX -->
+
+    <!-- contactGetNotificationsOnHostUnreachable(contact) -->
+    <operation name="contactGetNotificationsOnHostUnreachable">
+      <documentation>Check if contact should be notified when hosts are unreachable.</documentation>
+      <input message="tns:contactRequest"/>
+      <output message="tns:booleanResponse"/>
+    </operation>
+
+    <!-- contactGetNotificationsOnServiceCommand(contact) -->
+    <operation name="contactGetNotificationsOnServiceCommand">
+      <documentation>Get the service notification command of the contact.</documentation>
+      <input message="tns:contactRequest"/>
+      <output message="tns:commandResponse"/>
+    </operation>
+
+    <!-- contactGetNotificationsOnServiceCritical(contact) -->
+    <operation name="contactGetNotificationsOnServiceCritical">
+      <documentation>Check if contact should be notified when services are critical.</documentation>
+      <input message="tns:contactRequest"/>
+      <output message="tns:booleanResponse"/>
+    </operation>
+
+    <!-- contactGetNotificationsOnServiceDowntime(contact) -->
+    <operation name="contactGetNotificationsOnServiceDowntime">
+      <documentation>Check if contact should be notified by services downtimes.</documentation>
+      <input message="tns:contactRequest"/>
+      <output message="tns:booleanResponse"/>
+    </operation>
+
+    <!-- contactGetNotificationsOnServiceEnabled(contact) -->
+    <operation name="contactGetNotificationsOnServiceEnabled">
+      <documentation>Check if contact will be notified by service events.</documentation>
+      <input message="tns:contactRequest"/>
+      <output message="tns:booleanResponse"/>
+    </operation>
+
+    <!-- contactGetNotificationsOnServiceFlapping(contact) -->
+    <operation name="contactGetNotificationsOnServiceFlapping">
+      <documentation>Check if contact should be notified when services are flapping.</documentation>
+      <input message="tns:contactRequest"/>
+      <output message="tns:booleanResponse"/>
+    </operation>
+
+    <!-- contactGetNotificationsOnServiceLast(contact) -->
+    <operation name="contactGetNotificationsOnServiceLast">
+      <documentation>Get the last time the contact received a service notification.</documentation>
+      <input message="tns:contactRequest"/>
+      <output message="tns:dateResponse"/>
+    </operation>
+
+    <!-- contactGetNotificationsOnServiceRecovery(contact) -->
+    <operation name="contactGetNotificationsOnServiceRecovery">
+      <documentation>Check if contact should be notified when services recover.</documentation>
+      <input message="tns:contactRequest"/>
+      <output message="tns:booleanResponse"/>
+    </operation>
+
+    <!-- contactGetNotificationsOnServiceTimeperiod(contact) -->
+    <!-- XXX -->
+
+    <!-- contactGetNotificationsOnServiceUnknown(contact) -->
+    <operation name="contactGetNotificationsOnServiceUnknown">
+      <documentation>Check if contact should be notified when services states are unknown.</documentation>
+      <input message="tns:contactRequest"/>
+      <output message="tns:booleanResponse"/>
+    </operation>
+
+    <!-- contactGetNotificationsOnServiceWarning(contact) -->
+    <operation name="contactGetNotificationsOnServiceWarning">
+      <documentation>Check if contact should be notified when services are warning.</documentation>
+    </operation>
+
+    <!-- contactGetPager(contact) -->
+    <operation name="contactGetPager">
+      <documentation>Get the contact pager.</documentation>
+      <input message="tns:contactRequest"/>
+      <output message="tns:stringResponse"/>
+    </operation>
+
+    <!-- contactGetRetainStatusInformation(contact) -->
+    <operation name="contactGetRetainStatusInformation">
+      <documentation>Check if contact status information should be retained.</documentation>
+      <input message="tns:contactRequest"/>
+      <output message="tns:booleanResponse"/>
+    </operation>
+
+    <!-- contactGetRetainStatusNonInformation(contact) -->
+    <operation name="contactGetRetainStatusNonInformation">
+      <documentation>Check if contact non status information should be retained.</documentation>
+      <input message="tns:contactRequest"/>
+      <output message="tns:booleanResponse"/>
+    </operation>
+
+    <!-- contactSetAlias(contact, alias) -->
+    <operation name="contactSetAlias">
+      <documentation>Set the contact alias.</documentation>
+      <input message="tns:contactStringRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- contactSetCanSubmitCommands(contact, enable) -->
+    <operation name="contactSetCanSubmitCommands">
+      <documentation>Enable a contact to submit commands.</documentation>
+      <input message="tns:contactBooleanRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- contactSetCustomVariable(contact, variable, value) -->
+    <!-- XXX -->
+
+    <!-- contactSetEmail(contact, email) -->
+    <operation name="contactSetEmail">
+      <documentation>Set the email address of a contact.</documentation>
+      <input message="tns:contactStringRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- contactSetNotificationsOnHostCommand(contact, command) -->
+    <operation name="contactSetNotificationsOnHostCommand">
+      <documentation>Set the contact notification command for host events.</documentation>
+      <input message="tns:contactCommandRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- contactSetNotificationsOnHostDown(contact, enable) -->
+    <operation name="contactSetNotificationsOnHostDown">
+      <documentation>Enable or disable notifications on host down.</documentation>
+      <input message="tns:contactBooleanRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- contactSetNotificationsOnHostDowntime(contact, enable) -->
+    <operation name="contactSetNotificationsOnHostDowntime">
+      <documentation>Enable or disable notifications on host downtime.</documentation>
+      <input message="tns:contactBooleanRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- contactSetNotificationsOnHostEnabled(contact, enable) -->
+    <operation name="contactSetNotificationsOnHostEnabled">
+      <documentation>Enable or disable notifications on host.</documentation>
+      <input message="tns:contactBooleanRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- contactSetNotificationsOnHostFlapping(contact, enable) -->
+    <operation name="contactSetNotificationsOnHostFlapping">
+      <documentation>Enable or disable notifications on flappy hosts.</documentation>
+      <input message="tns:contactBooleanRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- contactSetNotificationsOnHostRecovery(contact, enable) -->
+    <operation name="contactSetNotificationsOnHostRecovery">
+      <documentation>Enable or disable notifications on host recover.</documentation>
+      <input message="tns:contactBooleanRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- contactSetNotificationsOnHostTimeperiod(contact, timeperiod) -->
+    <!-- XXX -->
+
+    <!-- contactSetNotificationsOnHostUnreachable(contact, enable) -->
+    <operation name="contactSetNotificationsOnHostUnreachable">
+      <documentation>Enable or disable notifications on host unreachable.</documentation>
+      <input message="tns:contactBooleanRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- contactSetNotificationsOnServiceCommand(contact, command) -->
+    <operation name="contactSetNotificationsOnServiceCommand">
+      <documentation>Set the service notification command.</documentation>
+      <input message="tns:contactCommandRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- contactSetNotificationsOnServiceCritical(contact, enable) -->
+    <operation name="contactSetNotificationsOnServiceCritical">
+      <documentation>Enable or disable notifications on service critical.</documentation>
+      <input message="tns:contactBooleanRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- contactSetNotificationsOnServiceDowntime(contact, enable) -->
+    <operation name="contactSetNotificationsOnServiceDowntime">
+      <documentation>Enable or disable notifications on service downtime.</documentation>
+      <input message="tns:contactBooleanRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- contactSetNotificationsOnServiceEnabled(contact, enable) -->
+    <operation name="contactSetNotificationsOnServiceEnabled">
+      <documentation>Enable or disable notifications on service.</documentation>
+      <input message="tns:contactBooleanRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- contactSetNotificationsOnServiceFlapping(contact, enable) -->
+    <operation name="contactSetNotificationsOnServiceFlapping">
+      <documentation>Enable or disable notifications on service flapping.</documentation>
+      <input message="tns:contactBooleanRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- contactSetNotificationsOnServiceRecovery(contact, enable) -->
+    <operation name="contactSetNotificationsOnServiceRecovery">
+      <documentation>Enable or disable notifications on service recovery.</documentation>
+      <input message="tns:contactBooleanRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- contactSetNotificationsOnServiceTimeperiod(contact, timeperiod) -->
+    <!-- XXX -->
+
+    <!-- contactSetNotificationsOnServiceUnknown(contact, enable) -->
+    <operation name="contactSetNotificationsOnServiceUnknown">
+      <documentation>Enable or disable notifications on service unknown.</documentation>
+      <input message="tns:contactBooleanRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- contactSetNotificationsOnServiceWarning(contact, enable) -->
+    <operation name="contactSetNotificationsOnServiceWarning">
+      <documentation>Enable or disable notifications on service warning.</documentation>
+      <input message="tns:contactBooleanRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- contactSetPager(contact, pager) -->
+    <operation name="contactSetPager">
+      <documentation>Set the contact pager.</documentation>
+      <input message="tns:contactStringRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- contactSetRetainStatusInformation(contact, enable) -->
+    <operation name="contactSetRetainStatusInformation">
+      <documentation>Enable or disable status information retention for contact.</documentation>
+      <input message="tns:contactBooleanRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- contactSetRetainStatusNonInformation(contact, enable) -->
+    <operation name="contactSetRetainStatusNonInformation">
+      <documentation>Enable or disable non status information retention for contact.</documentation>
+      <input message="tns:contactBooleanRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+
     <!-----------------
      --              --
      --  Downtimes.  --
@@ -2972,13 +3359,6 @@
       <output message="tns:defaultResponse"/>
     </operation>
 
-    <!-- setContactCustomVar(string contact, string varname, string varvalue) -->
-    <operation name="setContactCustomVar">
-      <documentation>Set the value of a custom variable of a contact.</documentation>
-      <input message="tns:setCustomVarRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
-
     <!-- setContactgroupHostNotificationsEnabled(string contactgroup) -->
     <operation name="setContactgroupHostNotificationsEnabled">
       <documentation>Enable hosts notifications for each member of the contact group.</documentation>
@@ -2990,55 +3370,6 @@
     <operation name="setContactgroupServiceNotificationsEnabled">
       <documentation>Enable services notifications for each member of the contact group.</documentation>
       <input message="tns:contactgroupRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
-
-    <!-- setContactHostNotificationsEnabled(string contact) -->
-    <operation name="setContactHostNotificationsEnabled">
-      <documentation>Enable host notifications on a contact.</documentation>
-      <input message="tns:contactRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
-
-    <!-- setContactHostNotificationTimeperiod(string contact, string timeperiod) -->
-    <operation name="setContactHostNotificationTimeperiod">
-      <documentation>Change the host notification timeperiod of a contact.</documentation>
-      <input message="tns:setContactNotificationTimeperiodRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
-
-    <!-- setContactModattr(string contact, unsigned int modattr) -->
-    <operation name="setContactModattr">
-      <documentation>Change the contact modified attributes value.</documentation>
-      <input message="tns:setContactModattrRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
-
-    <!-- setContactModhattr(string contact, unsigned int modattr) -->
-    <operation name="setContactModhattr">
-      <documentation>Change the contact modified host attributes value.</documentation>
-      <input message="tns:setContactModattrRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
-
-    <!-- setContactModsattr(string contact, unsigned int modattr) -->
-    <operation name="setContactModsattr">
-      <documentation>Change the contact modified service attributes value.</documentation>
-      <input message="tns:setContactModattrRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
-
-    <!-- setContactServiceNotificationsEnabled(string contact) -->
-    <operation name="setContactServiceNotificationsEnabled">
-      <documentation>Enable service notifications on a contact.</documentation>
-      <input message="tns:contactRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
-
-    <!-- setContactServiceNotificationTimeperiod(string contact, string timeperiod) -->
-    <operation name="setContactServiceNotificationTimeperiod">
-      <documentation>Change the service notification timeperiod of a contact.</documentation>
-      <input message="tns:setContactNotificationTimeperiodRequest"/>
       <output message="tns:defaultResponse"/>
     </operation>
 
@@ -4826,7 +5157,296 @@
       <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
       <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
     </operation>
-    
+
+
+    <!----------------
+     --             --
+     --  Contacts.  --
+     --             --
+     ----------------->
+
+    <operation name="contactGetAlias">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="contactGetCanSubmitCommands">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="contactGetEmail">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="contactGetModifiedAttributes">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="contactGetModifiedAttributesHost">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="contactGetModifiedAttributesService">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="contactGetNotificationsOnHostCommand">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="contactGetNotificationsOnHostDown">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="contactGetNotificationsOnHostDowntime">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="contactGetNotificationsOnHostEnabled">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="contactGetNotificationsOnHostFlapping">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="contactGetNotificationsOnHostLast">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="contactGetNotificationsOnHostRecovery">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="contactGetNotificationsOnHostUnreachable">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="contactGetNotificationsOnServiceCommand">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="contactGetNotificationsOnServiceCritical">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="contactGetNotificationsOnServiceDowntime">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="contactGetNotificationsOnServiceEnabled">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="contactGetNotificationsOnServiceFlapping">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="contactGetNotificationsOnServiceLast">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="contactGetNotificationsOnServiceRecovery">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="contactGetNotificationsOnServiceUnknown">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="contactGetNotificationsOnServiceWarning">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="contactGetPager">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="contactGetRetainStatusInformation">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="contactGetRetainStatusNonInformation">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="contactSetAlias">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="contactSetCanSubmitCommands">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="contactSetEmail">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="contactSetNotificationsOnHostCommand">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="contactSetNotificationsOnHostDown">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="contactSetNotificationsOnHostDowntime">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="contactSetNotificationsOnHostEnabled">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="contactSetNotificationsOnHostFlapping">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="contactSetNotificationsOnHostRecovery">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="contactSetNotificationsOnHostUnreachable">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="contactSetNotificationsOnServiceCommand">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="contactSetNotificationsOnServiceCritical">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="contactSetNotificationsOnServiceDowntime">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="contactSetNotificationsOnServiceEnabled">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="contactSetNotificationsOnServiceFlapping">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="contactSetNotificationsOnServiceRecovery">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="contactSetNotificationsOnServiceUnknown">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="contactSetNotificationsOnServiceWarning">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="contactSetPager">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="contactSetRetainStatusInformation">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="contactSetRetainStatusNonInformation">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
 
     <!-----------------
      --              --
@@ -4996,12 +5616,6 @@
       <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
     </operation>
 
-    <operation name="setContactCustomVar">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
     <operation name="setContactgroupHostNotificationsEnabled">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
@@ -5009,66 +5623,6 @@
     </operation>
 
     <operation name="setContactgroupServiceNotificationsEnabled">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
-    <operation name="setContactHostNotificationsEnabled">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
-    <operation name="setContactHostNotificationTimeperiod">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
-    <operation name="setContactModattr">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
-    <operation name="setContactModhattr">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
-    <operation name="setContactModsattr">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
-    <operation name="setContactServiceNotificationsEnabled">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
-    <operation name="setContactServiceNotificationTimeperiod">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
-    <operation name="setEventHandlersEnabled">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
-    <operation name="setFailurePredictionEnabled">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
-    <operation name="setFlapDetectionEnabled">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
       <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
