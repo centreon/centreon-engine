@@ -3136,7 +3136,7 @@
     <operation name="downtimeAddToHostServices">
       <documentation>Schedule a downtime on all services of a host.</documentation>
       <input message="tns:downtimeHostRequest"/>
-      <output message="tns:downtimeResponse"/>
+      <output message="tns:defaultResponse"/>
     </operation>
 
     <!--
