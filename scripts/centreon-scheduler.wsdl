@@ -480,7 +480,7 @@
   <message name="scheduleServiceDowntimeRequest">
     <part name="host" type="xsd:string"/>
     <part name="service" type="xsd:string"/>
-    <part name="downtime" type="xsd:downtimeType"/>
+    <part name="downtime" type="tns:downtimeType"/>
   </message>
 
   <!-- Message sent when setting a feature of a service group. -->
