@@ -19,8 +19,8 @@ command_file=$var_dir/rw/centscheduler.cmd
 lock_dir=/var/lock/subsys
 lock_file=centscheduler
 pid_file=/var/run/$(basename $binary).pid
-user=centscheduler
-group=centscheduler
+user=@USER@
+group=@GROUP@
 timeout=300
 
 servicename=$(basename "$0")
@@ -82,8 +82,8 @@ service_start()
 
 	su - $user -c "touch $var_dir/centscheduler.log $retention_file"
 
-	$binary $config_file > /dev/null  2>&1 &
-	sleep 1
+	su - $user -c "$binary $config_file > /dev/null  2>&1" &
+	sleep 2
 	pid=$(pidofproc $binary)
 	if [ $? -ne 0 ]; then
 	    log_failure_msg "$servicename $command: failed."

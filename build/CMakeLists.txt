@@ -118,6 +118,7 @@ else ()
 endif ()
 set(bindir "${localstatedir}/bin")
 set(sysconfdir "${localstatedir}/etc")
+set(vardir "${localstatedir}/var")
 
 # Check result dir.
 if (WITH_CHECK_RESULT_DIR)
@@ -241,6 +242,18 @@ elseif (HAVE_TZNAME)
   add_definitions(-DHAVE_TZNAME)
 endif ()
 
+# Configure files.
+configure_file("${INCLUDE_DIR}/config.h.in"
+  "${INCLUDE_DIR}/config.h")
+configure_file("${INCLUDE_DIR}/locations.h.in"
+  "${INCLUDE_DIR}/locations.h")
+configure_file("${INCLUDE_DIR}/snprintf.h.in"
+  "${INCLUDE_DIR}/snprintf.h")
+configure_file("${SCRIPT_DIR}/centscheduler.sh.in"
+  "${SCRIPT_DIR}/centscheduler.sh")
+configure_file("${SCRIPT_DIR}/ubuntu.conf.in"
+  "${SCRIPT_DIR}/ubuntu.conf")
+
 #  Enmbed PERL interpreter.
 if (EMBEDDEDPERL)
   add_definitions(-DEMBEDDEDPERL)
@@ -353,6 +366,7 @@ install(TARGETS "centscheduler" DESTINATION "${bindir}")
 add_executable("centschedulerstats"
   "${SRC_DIR}/nagiostats.cc"
 )
+install(TARGETS "centschedulerstats" DESTINATION "${bindir}")
 
 # Test configuration target.
 add_executable("test_configuration"
@@ -387,7 +401,9 @@ if (CPACK_BINARY_DEB)
 
   set(DEB_PACKAGE "Yes")
   set(CPACK_DEBIAN_PACKAGE_SECTION "net")
-  set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${SCRIPT_DIR}/deb/postinst" )
+  set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA
+    "${SCRIPT_DIR}/deb/postinst"
+    "${SCRIPT_DIR}/deb/prerm")
 else ()
   set(DEB_PACKAGE "No")
 endif ()
@@ -399,6 +415,7 @@ if (CPACK_BINARY_RPM)
   set(CPACK_RPM_PACKAGE_RELEASE 1)
   set(CPACK_RPM_PACKAGE_LICENSE "GPLv2")
   set(CPACK_RPM_POST_INSTALL_SCRIPT_FILE "${SCRIPT_DIR}/rpm/postinst")
+  set(CPACK_RPM_PRE_UNINSTALL_SCRIPT_FILE "${SCRIPT_DIR}/rpm/prerm")
 else ()
   set(RPM_PACKAGE "No")
 endif ()
