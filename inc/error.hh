@@ -17,8 +17,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef CCS_ERROR_HH
-# define CCS_ERROR_HH
+#ifndef CCE_ERROR_HH
+# define CCE_ERROR_HH
 
 # include <QString>
 # include <exception>
@@ -26,7 +26,7 @@
 
 namespace            com {
   namespace          centreon {
-    namespace        scheduler {
+    namespace        engine {
 
       /**
        *  @class error error.hh
@@ -73,4 +73,4 @@ namespace            com {
 #  define error() error(__FILE__, __FUNCTION__, __LINE__)
 # endif // !NDEBUG
 
-#endif // !CCS_ERROR_HH
+#endif // !CCE_ERROR_HH

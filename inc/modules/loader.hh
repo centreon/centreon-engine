@@ -17,8 +17,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef CCS_MODULES_LOADER_HH
-# define CCS_MODULES_LOADER_HH
+#ifndef CCE_MODULES_LOADER_HH
+# define CCE_MODULES_LOADER_HH
 
 # include <QObject>
 # include <QString>
@@ -27,7 +27,7 @@
 
 namespace                             com {
   namespace                           centreon {
-    namespace                         scheduler {
+    namespace                         engine {
       namespace                       modules {
 	/**
 	 *  @class loader loader.hh
@@ -74,4 +74,4 @@ namespace                             com {
   }
 }
 
-#endif // !CCS_MODULES_LOADER_HH
+#endif // !CCE_MODULES_LOADER_HH

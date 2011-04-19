@@ -18,8 +18,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef CCS_XCDDEFAULT_HH
-# define CCS_XCDDEFAULT_HH
+#ifndef CCE_XCDDEFAULT_HH
+# define CCE_XCDDEFAULT_HH
 
 # ifdef __cplusplus
 extern "C" {
@@ -37,4 +37,4 @@ int xcddefault_delete_service_comment(unsigned long comment_id);
 }
 # endif
 
-#endif // !CCS_XCDDEFAULT_HH
+#endif // !CCE_XCDDEFAULT_HH

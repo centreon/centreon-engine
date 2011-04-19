@@ -18,8 +18,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef CCS_NEBMODS_HH
-# define CCS_NEBMODS_HH
+#ifndef CCE_NEBMODS_HH
+# define CCE_NEBMODS_HH
 
 # include "nebmodules.hh"
 # include "nebcallbacks.hh"
@@ -61,4 +61,4 @@ int neb_free_callback_list(void);
 }
 # endif
 
-#endif // !CCS_NEBMODS_HH
+#endif // !CCE_NEBMODS_HH

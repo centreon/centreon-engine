@@ -1,19 +1,19 @@
 /*
 ** Copyright 2011      Merethis
 **
-** This file is part of Centreon Scheduler.
+** This file is part of Centreon Engine.
 **
-** Centreon Scheduler is free software: you can redistribute it and/or
+** Centreon Engine is free software: you can redistribute it and/or
 ** modify it under the terms of the GNU General Public License version 2
 ** as published by the Free Software Foundation.
 **
-** Centreon Scheduler is distributed in the hope that it will be useful,
+** Centreon Engine is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
 ** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
 ** General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
-** along with Centreon Scheduler. If not, see
+** along with Centreon Engine. If not, see
 ** <http://www.gnu.org/licenses/>.
 */
 
@@ -41,7 +41,7 @@
 extern sched_info scheduling_info;
 extern char       *macro_user[MAX_USER_MACROS];
 
-using namespace com::centreon::scheduler;
+using namespace com::centreon::engine;
 
 const float configuration::DEFAULT_SLEEP_TIME                  = 0.5;
 const float configuration::DEFAULT_LOW_SERVICE_FLAP_THRESHOLD  = 20.0;
@@ -2848,7 +2848,7 @@ void configuration::_set_broker_module(QString const& value) {
  */
 void configuration::_set_bare_update_check(QString const& value) {
   (void)value;
-  logit(NSLOG_CONFIG_WARNING, TRUE, "Warning: bare_update_check variable ignored. Centreon Scheduler does not check for updates.");
+  logit(NSLOG_CONFIG_WARNING, TRUE, "Warning: bare_update_check variable ignored. Centreon Engine does not check for updates.");
 }
 
 /**
@@ -2856,7 +2856,7 @@ void configuration::_set_bare_update_check(QString const& value) {
  */
 void configuration::_set_check_for_updates(QString const& value) {
   (void)value;
-  logit(NSLOG_CONFIG_WARNING, TRUE, "Warning: check_for_updates variable ignored. Centreon Scheduler does not check for updates.");
+  logit(NSLOG_CONFIG_WARNING, TRUE, "Warning: check_for_updates variable ignored. Centreon Engine does not check for updates.");
 }
 
 /**
@@ -2872,7 +2872,7 @@ void configuration::_set_comment_file(QString const& value) {
  */
 void configuration::_set_daemon_dumps_core(QString const& value) {
   (void)value;
-  logit(NSLOG_CONFIG_WARNING, TRUE, "Warning: daemon_dumps_core variable ignored. Core dumping has to be handled by Centreon Scheduler user.");
+  logit(NSLOG_CONFIG_WARNING, TRUE, "Warning: daemon_dumps_core variable ignored. Core dumping has to be handled by Centreon Engine user.");
 }
 
 /**

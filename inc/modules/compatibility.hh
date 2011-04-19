@@ -17,8 +17,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef CCS_MODULES_COMPATIBILITY_HH
-# define CCS_MODULES_COMPATIBILITY_HH
+#ifndef CCE_MODULES_COMPATIBILITY_HH
+# define CCE_MODULES_COMPATIBILITY_HH
 
 # include <QObject>
 # include "nebmodules.hh"
@@ -26,7 +26,7 @@
 
 namespace                       com {
   namespace                     centreon {
-    namespace                   scheduler {
+    namespace                   engine {
       namespace                 modules {
 	/**
 	 *  @class compatibility compatibility.hh
@@ -64,4 +64,4 @@ namespace                       com {
   }
 }
 
-#endif // !CCS_MODULES_COMPATIBILITY_HH
+#endif // !CCE_MODULES_COMPATIBILITY_HH

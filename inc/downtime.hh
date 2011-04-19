@@ -18,8 +18,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef CCS_DOWTIME_HH
-# define CCS_DOWTIME_HH
+#ifndef CCE_DOWTIME_HH
+# define CCE_DOWTIME_HH
 
 # include <sys/time.h>
 # include "objects.hh"
@@ -87,4 +87,4 @@ void free_downtime_data(void); // frees memory allocated to scheduled downtime l
 }
 # endif
 
-#endif // !CCS_DOWTIME_HH
+#endif // !CCE_DOWTIME_HH

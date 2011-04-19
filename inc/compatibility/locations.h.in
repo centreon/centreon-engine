@@ -1,24 +1,24 @@
 /*
 ** Copyright 2011      Merethis
 **
-** This file is part of Centreon Scheduler.
+** This file is part of Centreon Engine.
 **
-** Centreon Scheduler is free software: you can redistribute it and/or
+** Centreon Engine is free software: you can redistribute it and/or
 ** modify it under the terms of the GNU General Public License version 2
 ** as published by the Free Software Foundation.
 **
-** Centreon Scheduler is distributed in the hope that it will be useful,
+** Centreon Engine is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
 ** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
 ** General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
-** along with Centreon Scheduler. If not, see
+** along with Centreon Engine. If not, see
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef CCS_LOCATIONS_H
-# define CCS_LOCATIONS_H
+#ifndef CCE_LOCATIONS_H
+# define CCE_LOCATIONS_H
 
 # define DEFAULT_TEMP_FILE             "@localstatedir@/tempfile"
 # define DEFAULT_TEMP_PATH             "/tmp"
@@ -39,4 +39,4 @@
 # define DEFAULT_P1_FILE               "@bindir@/p1.pl" /* EMBEDDED PERL */
 # define DEFAULT_AUTH_FILE             ""               /* EMBEDDED PERL - IS THIS USED? */
 
-#endif /* !CCS_LOCATIONS_H */
+#endif /* !CCE_LOCATIONS_H */

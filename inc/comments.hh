@@ -2,24 +2,24 @@
 ** Copyright 1999-2010 Ethan Galstad
 ** Copyright 2011      Merethis
 **
-** This file is part of Centreon Scheduler.
+** This file is part of Centreon Engine.
 **
-** Centreon Scheduler is free software: you can redistribute it and/or
+** Centreon Engine is free software: you can redistribute it and/or
 ** modify it under the terms of the GNU General Public License version 2
 ** as published by the Free Software Foundation.
 **
-** Centreon Scheduler is distributed in the hope that it will be useful,
+** Centreon Engine is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
 ** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
 ** General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
-** along with Centreon Scheduler. If not, see
+** along with Centreon Engine. If not, see
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef CCS_COMMENTS_HH
-# define CCS_COMMENTS_HH
+#ifndef CCE_COMMENTS_HH
+# define CCE_COMMENTS_HH
 
 # include <sys/time.h>
 # include "objects.hh"
@@ -104,4 +104,4 @@ comment* find_comment(unsigned long comment_id, unsigned int comment_type); // f
 }
 # endif
 
-#endif // !CCS_COMMENTS_HH
+#endif // !CCE_COMMENTS_HH

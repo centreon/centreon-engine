@@ -18,8 +18,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef CCS_XRDDEFAULT_HH
-# define CCS_XRDDEFAULT_HH
+#ifndef CCE_XRDDEFAULT_HH
+# define CCE_XRDDEFAULT_HH
 
 # ifdef __cplusplus
 extern "C" {
@@ -47,4 +47,4 @@ int xrddefault_read_state_information(void); // reads in initial host and servic
 }
 # endif
 
-#endif // !CCS_XRDDEFAULT_HH
+#endif // !CCE_XRDDEFAULT_HH

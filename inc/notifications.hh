@@ -19,8 +19,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef CCS_NOTIFICATIONS_HH
-# define CCS_NOTIFICATIONS_HH
+#ifndef CCE_NOTIFICATIONS_HH
+# define CCE_NOTIFICATIONS_HH
 
 # include <sys/time.h>
 # include "macros.hh"
@@ -76,4 +76,4 @@ int add_notification(nagios_macros* mac, contact* cntct);                       
 }
 # endif
 
-#endif // !CCS_NOTIFICATIONS_HH
+#endif // !CCE_NOTIFICATIONS_HH

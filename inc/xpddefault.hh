@@ -18,8 +18,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef CCS_XPDDEFAULT_HH
-# define CCS_XPDDEFAULT_HH
+#ifndef CCE_XPDDEFAULT_HH
+# define CCE_XPDDEFAULT_HH
 
 # include "objects.hh"
 
@@ -58,4 +58,4 @@ int xpddefault_process_service_perfdata_file(void);
 }
 # endif
 
-#endif // !CCS_XPDDEFAULT_HH
+#endif // !CCE_XPDDEFAULT_HH

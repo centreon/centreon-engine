@@ -18,8 +18,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef CCS_XSDDEFAULT_HH
-# define CCS_XSDDEFAULT_HH
+#ifndef CCE_XSDDEFAULT_HH
+# define CCE_XSDDEFAULT_HH
 
 # ifdef __cplusplus
 extern "C" {
@@ -36,4 +36,4 @@ int xsddefault_grab_config_directives(char* input);
 }
 # endif
 
-#endif // !CCS_XSDDEFAULT_HH
+#endif // !CCE_XSDDEFAULT_HH

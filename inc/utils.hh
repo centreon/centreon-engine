@@ -18,8 +18,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef CCS_UTILS_HH
-# define CCS_UTILS_HH
+#ifndef CCE_UTILS_HH
+# define CCE_UTILS_HH
 
 # include <sys/time.h>
 # include "macros.hh"
@@ -111,4 +111,4 @@ int close_command_file(void);              // closes and deletes the external co
 }
 # endif
 
-#endif // !CCS_UTILS_HH
+#endif // !CCE_UTILS_HH

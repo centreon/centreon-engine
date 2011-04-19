@@ -18,8 +18,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef CCS_SKIPLIST_HH
-# define CCS_SKIPLIST_HH
+#ifndef CCE_SKIPLIST_HH
+# define CCE_SKIPLIST_HH
 
 # ifdef __cplusplus
 extern "C" {
@@ -67,4 +67,4 @@ int skiplist_delete_node(skiplist* list, void* node_ptr);
 }
 # endif
 
-#endif // !CCS_SKIPLIST_HH
+#endif // !CCE_SKIPLIST_HH

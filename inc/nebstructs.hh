@@ -18,8 +18,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef CCS_NEBSTRUCTS_HH
-# define CCS_NEBSTRUCTS_HH
+#ifndef CCE_NEBSTRUCTS_HH
+# define CCE_NEBSTRUCTS_HH
 
 # include "objects.hh"
 # include "nagios.hh"
@@ -497,4 +497,4 @@ typedef struct   nebstruct_statechange_struct{
 }
 # endif
 
-#endif // !CCS_NEBSTRUCTS_HH
+#endif // !CCE_NEBSTRUCTS_HH

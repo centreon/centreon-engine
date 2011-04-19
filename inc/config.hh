@@ -18,8 +18,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef CCS_CONFIG_HH
-# define CCS_CONFIG_HH
+#ifndef CCE_CONFIG_HH
+# define CCE_CONFIG_HH
 
 # ifdef __cplusplus
 extern "C" {
@@ -37,4 +37,4 @@ int pre_flight_circular_check(int* w, int* e);    // detects circular dependenci
 }
 # endif
 
-#endif // !CCS_CONFIG_HH
+#endif // !CCE_CONFIG_HH

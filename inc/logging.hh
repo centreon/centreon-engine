@@ -18,8 +18,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef CCS_LOGGING_HH
-# define CCS_LOGGING_HH
+#ifndef CCE_LOGGING_HH
+# define CCE_LOGGING_HH
 
 # include <sys/time.h>
 # include "objects.hh"
@@ -109,4 +109,4 @@ int close_debug_log(void);
 }
 # endif
 
-#endif // !CCS_LOGGING_HH
+#endif // !CCE_LOGGING_HH

@@ -18,8 +18,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef CCS_NEBMODULES_HH
-# define CCS_NEBMODULES_HH
+#ifndef CCE_NEBMODULES_HH
+# define CCE_NEBMODULES_HH
 
 # ifdef HAVE_PTHREAD_HH
 #  include <pthread.h>
@@ -83,4 +83,4 @@ typedef struct nebmodule_struct {
 }
 # endif
 
-#endif // !CCS_NEBMODULES_HH
+#endif // !CCE_NEBMODULES_HH

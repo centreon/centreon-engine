@@ -18,8 +18,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef CCS_NEBCALLBACKS_HH
-# define CCS_NEBCALLBACKS_HH
+#ifndef CCE_NEBCALLBACKS_HH
+# define CCE_NEBCALLBACKS_HH
 
 # include "nebmodules.hh"
 
@@ -79,4 +79,4 @@ int neb_deregister_module_callbacks(void* mod);
 # endif
 
 
-#endif // !CCS_NEBCALLBACKS_HH
+#endif // !CCE_NEBCALLBACKS_HH

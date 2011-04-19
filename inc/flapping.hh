@@ -18,8 +18,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef CCS_FLAPPING_HH
-# define CCS_FLAPPING_HH
+#ifndef CCE_FLAPPING_HH
+# define CCE_FLAPPING_HH
 
 # include "objects.hh"
 
@@ -51,4 +51,4 @@ void handle_service_flap_detection_disabled(service* svc); // handles the detail
 }
 # endif
 
-#endif // !CCS_FLAPPING_HH
+#endif // !CCE_FLAPPING_HH

@@ -18,8 +18,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef CCS_OBJECTS_HH
-# define CCS_OBJECTS_HH
+#ifndef CCE_OBJECTS_HH
+# define CCE_OBJECTS_HH
 
 # include <sys/time.h>
 # include "common.hh"
@@ -673,4 +673,4 @@ int free_object_data(void); // frees all allocated memory for the object definit
 }
 # endif
 
-#endif // !CCS_OBJECTS_HH
+#endif // !CCE_OBJECTS_HH

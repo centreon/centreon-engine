@@ -18,8 +18,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef CCS_SEHANDLERS_HH
-# define CCS_SEHANDLERS_HH
+#ifndef CCE_SEHANDLERS_HH
+# define CCE_SEHANDLERS_HH
 
 # include "macros.hh"
 # include "objects.hh"
@@ -49,4 +49,4 @@ int handle_host_state(host* hst);                                       // top l
 }
 # endif
 
-#endif // !CCS_SEHANDLERS_HH
+#endif // !CCE_SEHANDLERS_HH

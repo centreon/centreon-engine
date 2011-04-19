@@ -18,8 +18,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef CCS_SRETENTION_HH
-# define CCS_SRETENTION_HH
+#ifndef CCE_SRETENTION_HH
+# define CCE_SRETENTION_HH
 
 # ifdef __cplusplus
 extern "C" {
@@ -34,4 +34,4 @@ int read_initial_state_information(void); // reads in initial host and state inf
 }
 # endif
 
-#endif // !CCS_SRETENTION_HH
+#endif // !CCE_SRETENTION_HH

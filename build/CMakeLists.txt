@@ -1,25 +1,25 @@
 ##
 ## Copyright 2011 Merethis
 ##
-## This file is part of Centreon Scheduler.
+## This file is part of Centreon Engine.
 ##
-## Centreon Scheduler is free software: you can redistribute it and/or
+## Centreon Engine is free software: you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License version 2
 ## as published by the Free Software Foundation.
 ##
-## Centreon Scheduler is distributed in the hope that it will be useful,
+## Centreon Engine is distributed in the hope that it will be useful,
 ## but WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with Centreon Scheduler. If not, see
+## along with Centreon Engine. If not, see
 ## <http://www.gnu.org/licenses/>.
 ##
 
 # Global options.
 cmake_minimum_required(VERSION 2.8)
-project("Centreon Scheduler" C CXX)
+project("Centreon Engine" C CXX)
 
 # Testing.
 set(PROJECT_SOURCE_DIR "${PROJECT_SOURCE_DIR}/..")
@@ -134,14 +134,14 @@ else ()
   set(TMPDIR "/tmp")
 endif ()
 
-# User used to run Centreon Scheduler.
+# User used to run Centreon Engine.
 if (WITH_USER)
   set(USER "${WITH_USER}")
 else ()
   set(USER "root")
 endif ()
 
-# Group used to run Centreon Scheduler.
+# Group used to run Centreon Engine.
 if (WITH_GROUP)
   set(GROUP "${WITH_GROUP}")
 else ()
@@ -162,15 +162,15 @@ if (WITH_STARTUP_SCRIPT)
       if (OS_DISTRIBUTOR STREQUAL "CentOS\n")
         message(STATUS "Generating CentOS startup script.")
         set(STARTUP_SCRIPT "CentOS init script")
-	install(PROGRAMS "${SCRIPT_DIR}/centscheduler.sh"
+	install(PROGRAMS "${SCRIPT_DIR}/centengine.sh"
 	  DESTINATION "/etc/init.d"
-	  RENAME "centscheduler")
+	  RENAME "centengine")
       elseif (OS_DISTRIBUTOR STREQUAL "Ubuntu\n")
         message(STATUS "Generating Ubuntu startup script.")
         set(STARTUP_SCRIPT "Ubuntu upstart script")
 	install(FILES "${SCRIPT_DIR}/ubuntu.conf"
 	  DESTINATION "/etc/init"
-	  RENAME "centscheduler.conf")
+	  RENAME "centengine.conf")
       else ()
         message(STATUS "Unsupported distributor: ${OS_DISTRIBUTOR}")
       endif ()
@@ -178,7 +178,7 @@ if (WITH_STARTUP_SCRIPT)
       message(STATUS "Could not get Linux distributor name, not startup script will be installed.")
     endif ()
   else ()
-    message(STATUS "Centreon Scheduler does not provide startup script for ${CMAKE_SYSTEM_NAME}")
+    message(STATUS "Centreon Engine does not provide startup script for ${CMAKE_SYSTEM_NAME}")
     set(OS_DISTRIBUTOR "${CMAKE_SYSTEM_NAME}")
   endif ()
 endif ()
@@ -245,8 +245,8 @@ endif ()
 # Configure files.
 configure_file("${INCLUDE_DIR}/compatibility/locations.h.in"
   "${INCLUDE_DIR}/compatibility/locations.h")
-configure_file("${SCRIPT_DIR}/centscheduler.sh.in"
-  "${SCRIPT_DIR}/centscheduler.sh")
+configure_file("${SCRIPT_DIR}/centengine.sh.in"
+  "${SCRIPT_DIR}/centengine.sh")
 configure_file("${SCRIPT_DIR}/ubuntu.conf.in"
   "${SCRIPT_DIR}/ubuntu.conf")
 
@@ -266,14 +266,14 @@ add_definitions(-DDEFAULT_TEMP_FILE="${localstatedir}/tempfile")
 add_definitions(-DDEFAULT_TEMP_PATH="/tmp")
 add_definitions(-DDEFAULT_CHECK_RESULT_PATH="${localstatedir}/spool/checkresults")
 add_definitions(-DDEFAULT_STATUS_FILE="${localstatedir}/status.dat")
-add_definitions(-DDEFAULT_LOG_FILE="${localstatedir}/nagios.log")
+add_definitions(-DDEFAULT_LOG_FILE="${localstatedir}/centengine.log")
 add_definitions(-DDEFAULT_LOG_ARCHIVE_PATH="${localstatedir}/archives/")
-add_definitions(-DDEFAULT_DEBUG_FILE="${localstatedir}/nagios.debug")
+add_definitions(-DDEFAULT_DEBUG_FILE="${localstatedir}/centengine.debug")
 add_definitions(-DDEFAULT_COMMENT_FILE="${localstatedir}/comments.dat")
 add_definitions(-DDEFAULT_DOWNTIME_FILE="${localstatedir}/downtime.dat")
 add_definitions(-DDEFAULT_RETENTION_FILE="${localstatedir}/retention.dat")
-add_definitions(-DDEFAULT_COMMAND_FILE="${localstatedir}/rw/nagios.cmd")
-add_definitions(-DDEFAULT_CONFIG_FILE="${sysconfdir}/nagios.cfg")
+add_definitions(-DDEFAULT_COMMAND_FILE="${localstatedir}/rw/centengine.cmd")
+add_definitions(-DDEFAULT_CONFIG_FILE="${sysconfdir}/centengine.cfg")
 add_definitions(-DDEFAULT_OBJECT_CACHE_FILE="${localstatedir}/objects.cache")
 add_definitions(-DDEFAULT_PRECACHED_OBJECT_FILE="${localstatedir}/objects.precache")
 add_definitions(-DDEFAULT_EVENT_BROKER_FILE="${localstatedir}/broker.socket")
@@ -283,8 +283,8 @@ add_definitions(-DDEFAULT_AUTH_FILE="")
 # Configuration file.
 configure_file("${INCLUDE_DIR}/compatibility/locations.h.in"
   "${INCLUDE_DIR}/compatibility/locations.h")
-configure_file("${SCRIPT_DIR}/centscheduler.sh.in"
-  "${SCRIPT_DIR}/centscheduler.sh")
+configure_file("${SCRIPT_DIR}/centengine.sh.in"
+  "${SCRIPT_DIR}/centengine.sh")
 configure_file("${SCRIPT_DIR}/ubuntu.conf.in"
   "${SCRIPT_DIR}/ubuntu.conf")
 
@@ -298,8 +298,8 @@ qt4_wrap_cpp(QT_MOC_FILES
   "${INCLUDE_DIR}/modules/compatibility.hh"
 )
 
-# Library scheduler target.
-add_library("schedulerlib"
+# Library engine target.
+add_library("centenginelib"
   "STATIC"
   "${SRC_DIR}/broker.cc"
   "${SRC_DIR}/checks.cc"
@@ -337,32 +337,32 @@ add_library("schedulerlib"
   ${QT_MOC_FILES}
 )
 
-# Centscheduler target.
-add_executable("centscheduler"
-  "${SRC_DIR}/nagios.cc"
+# Centengine target.
+add_executable("centengine"
+  "${SRC_DIR}/main.cc"
 )
-get_property(SCHEDULER_COMPILE_FLAGS
-  TARGET "centscheduler"
+get_property(ENGINE_COMPILE_FLAGS
+  TARGET "centengine"
   PROPERTY COMPILE_FLAGS)
-set(SCHEDULER_COMPILE_FLAGS "${SCHEDULER_COMPILE_FLAGS} ${PERL_COMPILE_FLAGS}")
-set_target_properties("centscheduler" PROPERTIES
-  COMPILE_FLAGS "${SCHEDULER_COMPILE_FLAGS}")
-target_link_libraries("centscheduler"
+set(ENGINE_COMPILE_FLAGS "${ENGINE_COMPILE_FLAGS} ${PERL_COMPILE_FLAGS}")
+set_target_properties("centengine" PROPERTIES
+  COMPILE_FLAGS "${ENGINE_COMPILE_FLAGS}")
+target_link_libraries("centengine"
   ${DL_LIBRARIES}
   ${MATH_LIBRARIES}
   ${SOCKET_LIBRARIES}
   ${THREAD_LIBRARIES}
   ${PERL_LINK_FLAGS}
   ${QT_LIBRARIES}
-  "schedulerlib"
+  "centenginelib"
 )
-install(TARGETS "centscheduler" DESTINATION "${bindir}")
+install(TARGETS "centengine" DESTINATION "${bindir}")
 
-# Centschedulerstats target.
-add_executable("centschedulerstats"
-  "${SRC_DIR}/nagiostats.cc"
+# Centenginestats target.
+add_executable("centenginestats"
+  "${SRC_DIR}/centenginestats.cc"
 )
-install(TARGETS "centschedulerstats" DESTINATION "${bindir}")
+install(TARGETS "centenginestats" DESTINATION "${bindir}")
 
 # Test configuration target.
 add_executable("test_configuration"
@@ -372,23 +372,23 @@ add_executable("test_configuration"
 target_link_libraries("test_configuration"
   ${QT_LIBRARIES}
 )
-install(TARGETS "centschedulerstats" DESTINATION "${bindir}")
+install(TARGETS "centenginestats" DESTINATION "${bindir}")
 
 add_test("test_configuration_basic"
   "test_configuration"
   "test.cfg")
 
 # Package.
-set(CPACK_PACKAGE_NAME "Centreon-Scheduler")
+set(CPACK_PACKAGE_NAME "Centreon-Engine")
 set(CPACK_PACKAGE_VENDOR "Merethis")
 set(CPACK_PACKAGE_VERSION_MAJOR 1)
 set(CPACK_PACKAGE_VERSION_MINOR 0)
 set(CPACK_PACKAGE_VERSION_PATCH "0beta")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY
-  "Centreon Scheduler monitors your IT infrastructure.")
+  "Centreon Engine monitors your IT infrastructure.")
 set(CPACK_PACKAGE_FILE_NAME
-  "centreon-scheduler-${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}")
-set(CPACK_PACKAGE_INSTALL_DIRECTORY "Centreon-Scheduler")
+  "centreon-engine-${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}")
+set(CPACK_PACKAGE_INSTALL_DIRECTORY "Centreon-Engine")
 set(CPACK_RESOURCE_FILE_LICENSE "${PROJECT_SOURCE_DIR}/license.txt")
 set(CPACK_PACKAGE_CONTACT "Matthieu Kermagoret <mkermagoret@merethis.com>")
 if (CPACK_BINARY_DEB)

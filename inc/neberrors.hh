@@ -18,8 +18,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef CCS_NEBERRORS_HH
-# define CCS_NEBERRORS_HH
+#ifndef CCE_NEBERRORS_HH
+# define CCE_NEBERRORS_HH
 
 
 /***** GENERIC DEFINES *****/
@@ -56,4 +56,4 @@
 # define NEBERROR_MODINFOBOUNDS      400     /* module info index was out of bounds */
 
 
-#endif // !CCS_NEBERRORS_HH
+#endif // !CCE_NEBERRORS_HH

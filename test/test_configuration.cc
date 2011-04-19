@@ -29,7 +29,7 @@
 #include "error.hh"
 #include "configuration.hh"
 
-using namespace com::centreon::scheduler;
+using namespace com::centreon::engine;
 
 static nagios_macros global_macros;
 sched_info scheduling_info;

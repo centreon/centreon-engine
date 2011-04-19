@@ -18,8 +18,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef CCS_XDDDEFAULT_HH
-# define CCS_XDDDEFAULT_HH
+#ifndef CCE_XDDDEFAULT_HH
+# define CCE_XDDDEFAULT_HH
 
 # ifdef __cplusplus
 extern "C" {
@@ -46,4 +46,4 @@ int xdddefault_delete_downtime(int type, unsigned long downtime_id);
 }
 # endif
 
-#endif // !CCS_XDDDEFAULT_HH
+#endif // !CCE_XDDDEFAULT_HH

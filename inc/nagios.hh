@@ -20,8 +20,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef CCS_NAGIOS_HH
-# define CCS_NAGIOS_HH
+#ifndef CCE_NAGIOS_HH
+# define CCE_NAGIOS_HH
 
 # include <sys/time.h>
 # include <pthread.h>
@@ -153,4 +153,4 @@ typedef struct check_stats_struct {
 # ifdef __cplusplus
 }
 # endif
-#endif // !CCS_NAGIOS_HH
+#endif // !CCE_NAGIOS_HH

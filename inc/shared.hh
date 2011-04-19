@@ -18,8 +18,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef CCS_SHARED_HH
-# define CCS_SHARED_HH
+#ifndef CCE_SHARED_HH
+# define CCE_SHARED_HH
 
 # include <sys/types.h>
 # include <sys/time.h>
@@ -74,4 +74,4 @@ template <class T> char* obj2pchar(T obj) {
 }
 # endif
 
-#endif // !CCS_SHARED_HH
+#endif // !CCE_SHARED_HH

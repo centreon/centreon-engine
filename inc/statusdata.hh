@@ -18,8 +18,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef CCS_STATUSDATA_HH
-# define CCS_STATUSDATA_HH
+#ifndef CCE_STATUSDATA_HH
+# define CCE_STATUSDATA_HH
 
 # include "objects.hh"
 
@@ -39,4 +39,4 @@ int update_contact_status(contact* cntct,int aggregated_dump);     // updates co
 }
 # endif
 
-#endif // !CCS_STATUSDATA_HH
+#endif // !CCE_STATUSDATA_HH

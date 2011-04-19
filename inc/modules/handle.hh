@@ -17,8 +17,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef CCS_MODULES_HANDLE_HH
-# define CCS_MODULES_HANDLE_HH
+#ifndef CCE_MODULES_HANDLE_HH
+# define CCE_MODULES_HANDLE_HH
 
 # include <QObject>
 # include <QSharedPointer>
@@ -27,7 +27,7 @@
 
 namespace                          com {
   namespace                        centreon {
-    namespace                      scheduler {
+    namespace                      engine {
       namespace                    modules {
 	/**
 	 *  @class handle handle.hh
@@ -104,4 +104,4 @@ namespace                          com {
   }
 }
 
-#endif // !CCS_MODULES_HANDLE_HH
+#endif // !CCE_MODULES_HANDLE_HH

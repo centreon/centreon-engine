@@ -19,8 +19,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef CCS_NETUTILS_HH
-# define CCS_NETUTILS_HH
+#ifndef CCE_NETUTILS_HH
+# define CCE_NETUTILS_HH
 
 # ifdef __cplusplus
 extern "C" {
@@ -34,4 +34,4 @@ int my_recvall(int s, char* buf, int* len, int timeout);
 }
 # endif
 
-#endif // !CCS_NETUTILS_HH
+#endif // !CCE_NETUTILS_HH

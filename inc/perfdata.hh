@@ -18,8 +18,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef CCS_PERFDATA_HH
-# define CCS_PERFDATA_HH
+#ifndef CCE_PERFDATA_HH
+# define CCE_PERFDATA_HH
 
 # include "objects.hh"
 
@@ -36,4 +36,4 @@ int update_host_performance_data(host* hst);        // updates host performance 
 }
 # endif
 
-#endif // !CCS_PERFDATA_HH
+#endif // !CCE_PERFDATA_HH

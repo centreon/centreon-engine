@@ -18,8 +18,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef CCS_MACROS_HH
-# define CCS_MACROS_HH
+#ifndef CCE_MACROS_HH
+# define CCE_MACROS_HH
 
 # include "objects.hh"
 
@@ -280,4 +280,4 @@ int set_macro_environment_var(char const* name, char const* value, int set);
 }
 # endif
 
-#endif // !CCS_MACROS_HH
+#endif // !CCE_MACROS_HH

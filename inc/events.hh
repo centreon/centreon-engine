@@ -18,8 +18,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef CCS_EVENTS_HH
-# define CCS_EVENTS_HH
+#ifndef CCE_EVENTS_HH
+# define CCE_EVENTS_HH
 
 # include <sys/time.h>
 
@@ -82,4 +82,4 @@ void adjust_timestamp_for_time_change(time_t last_time, time_t current_time, uns
 }
 # endif
 
-#endif // !CCS_EVENTS_HH
+#endif // !CCE_EVENTS_HH

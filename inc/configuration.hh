@@ -17,8 +17,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef CCS_CONFIGURATION_HH
-# define CCS_CONFIGURATION_HH
+#ifndef CCE_CONFIGURATION_HH
+# define CCE_CONFIGURATION_HH
 
 # include <sstream>
 # include <string>
@@ -30,12 +30,12 @@ struct nagios_macros;
 
 namespace com {
   namespace centreon {
-    namespace scheduler {
+    namespace engine {
       /**
        *  @class configuration configuration.hh
        *  @brief Simple configuration class.
        *
-       *  Simple configuration class used by Centreon Scheduler to manage configuration data.
+       *  Simple configuration class used by Centreon Engine to manage configuration data.
        */
       class configuration {
       public:
@@ -619,4 +619,4 @@ namespace com {
   }
 }
 
-#endif // !CCS_CONFIGURATION_HH
+#endif // !CCE_CONFIGURATION_HH
