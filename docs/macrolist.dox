@@ -28,22 +28,16 @@
  *  should be noted that macros consist of all uppercase characters and
  *  are enclosed in $ characters.
  *
- *  @section standardmacrosincentschedulermacroavailabilitychart Macro Availability Chart
+ *  @section standardmacrosincentschedulermacroavailabilitychart Macro Availability Charts
+ *
+ *  @latexonly
+ *    \clearpage
+ *    \begin{landscape}
+ *  @endlatexonly
+ *
+ *  @subsection hostmacros Host Macros <sup>3</sup>
  *
  *  <table>
- *    <caption>Legend</caption>
- *    <tr>
- *      <td>No</td>
- *      <td>The macro is not available</td>
- *    </tr>
- *    <tr>
- *      <td>@b Yes</td>
- *      <td>The macro is available</td>
- *    </tr>
- *  </table>
- *
- *  <table>
- *    <caption>Host Macros <sup>3</sup></caption>
  *    <tr>
  *      <th>Macro Name</th>
  *      <th>Service Checks</th>
@@ -541,8 +535,13 @@
  *    </tr>
  *  </table>
  *
+ *  @latexonly
+ *    \clearpage
+ *  @endlatexonly
+ *
+ *  @subsection hostgroupmacros Host Group Macros
+ *
  *  <table>
- *    <caption>Host Group Macros</caption>
  *    <tr>
  *      <th>Macro Name</th>
  *      <th>Service Checks</th>
@@ -611,8 +610,13 @@
  *    </tr>
  *  </table>
  *
+ *  @latexonly
+ *    \clearpage
+ *  @endlatexonly
+ *
+ *  @subsection servicemacros Service Macros
+ *
  *  <table>
- *    <caption>Service Macros</caption>
  *    <tr>
  *      <th>Macro Name</th>
  *      <th>Service Checks</th>
@@ -1055,8 +1059,13 @@
  *    </tr>
  *  </table>
  *
+ *  @latexonly
+ *    \clearpage
+ *  @endlatexonly
+ *
+ *  @subsection servicegroupmacros Service Group Macros
+ *
  *  <table>
- *    <caption>Service Group Macros</caption>
  *    <tr>
  *      <th>Macro Name</th>
  *      <th>Service Checks</th>
@@ -1125,8 +1134,13 @@
  *    </tr>
  *  </table>
  *
+ *  @latexonly
+ *    \clearpage
+ *  @endlatexonly
+ *
+ *  @subsection contactmacros Contact Macros
+ *
  *  <table>
- *    <caption>Contact Macros</caption>
  *    <tr>
  *      <th>Macro Name</th>
  *      <th>Service Checks</th>
@@ -1195,8 +1209,13 @@
  *    </tr>
  *  </table>
  *
+ *  @latexonly
+ *    \clearpage
+ *  @endlatexonly
+ *
+ *  @subsection contactgroupmacros Contact Group Macros
+ *
  *  <table>
- *    <caption>Contact Group Macros</caption>
  *    <tr>
  *      <th>Macro Name</th>
  *      <th>Service Checks</th>
@@ -1232,8 +1251,13 @@
  *    </tr>
  *  </table>
  *
+ *  @latexonly
+ *    \clearpage
+ *  @endlatexonly
+ *
+ *  @subsection summarymacros Summary Macros
+ *
  *  <table>
- *    <caption>Summary Macros</caption>
  *    <tr>
  *      <th>Macro Name</th>
  *      <th>Service Checks</th>
@@ -1423,8 +1447,13 @@
  *    </tr>
  *  </table>
  *
+ *  @latexonly
+ *    \clearpage
+ *  @endlatexonly
+ *
+ *  @subsection notificationmacros Notification Macros
+ *
  *  <table>
- *    <caption>Notification Macros</caption>
  *    <tr>
  *      <th>Macro Name</th>
  *  	<th>Service Checks</th>
@@ -1559,8 +1588,13 @@
  *    </tr>
  *  </table>
  *
+ *  @latexonly
+ *    \clearpage
+ *  @endlatexonly
+ *
+ *  @subsection datetimemacros Date/Time Macros
+ *
  *  <table>
- *    <caption>Date/Time Macros</caption>
  *    <tr>
  *      <th>Macro Name</th>
  *      <th>Service Checks</th>
@@ -1651,8 +1685,13 @@
  *    </tr>
  *  </table>
  *
+ *  @latexonly
+ *    \clearpage
+ *  @endlatexonly
+ *
+ *  @subsection filemacros File Macros
+ *
  *  <table>
- *    <caption>File Macros</caption>
  *    <tr>
  *      <th>Macro Name</th>
  *  	<th>Service Checks</th>
@@ -1809,8 +1848,13 @@
  *    </tr>
  *  </table>
  *
+ *  @latexonly
+ *    \clearpage
+ *  @endlatexonly
+ *
+ *  @subsection miscmacros Misc Macros
+ *
  *  <table>
- *    <caption>Misc Macros</caption>
  *    <tr>
  *      <th>Macro Name</th>
  *  	<th>Service Checks</th>
@@ -1890,10 +1934,15 @@
  *    </tr>
  *  </table>
  *
+ *  @latexonly
+ *    \clearpage
+ *  @endlatexonly
+ *
  *  @section standardmacrosincentschedulermacrodescriptions Macro Descriptions
  *
+ *  @subsection hostmacros Host Macros <sup>3</sup>
+ *
  *  <table>
- *    <caption>Host Macros <sup>3</sup></caption>
  *    <tr>
  *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefhostname $HOSTNAME$</td>
  *      <td>
@@ -2250,8 +2299,13 @@
  *    </tr>
  *  </table>
  *
+ *  @latexonly
+ *    \clearpage
+ *  @endlatexonly
+ *
+ *  @subsection hostgroupmacros Host Group Macros
+ *
  *  <table>
- *    <caption>Host Group Macros</caption>
  *    <tr>
  *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefhostgroupalias $HOSTGROUPALIAS$ <sup>5</sup></td>
  *      <td>
@@ -2303,8 +2357,13 @@
  *    </tr>
  *  </table>
  *
+ *  @latexonly
+ *    \clearpage
+ *  @endlatexonly
+ *
+ *  @subsection servicemacros Service Macros
+ *
  *  <table>
- *    <caption>Service Macros</caption>
  *    <tr>
  *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefservicedesc $SERVICEDESC$</td>
  *      <td>
@@ -2629,8 +2688,13 @@
  *    </tr>
  *  </table>
  *
+ *  @latexonly
+ *    \clearpage
+ *  @endlatexonly
+ *
+ *  @subsection Service Group Macros <sup>6</sup>
+ *
  *  <table>
- *    <caption>Service Group Macros <sup>6</sup></caption>
  *    <tr>
  *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefservicegroupalias $SERVICEGROUPALIAS$ <sup>6</sup></td>
  *      <td>
@@ -2686,8 +2750,13 @@
  *    </tr>
  *  </table>
  *
+ *  @latexonly
+ *    \clearpage
+ *  @endlatexonly
+ *
+ *  @subsection contactmacros Contact Macros
+ *
  *  <table>
- *    <caption>Contact Macros</caption>
  *    <tr>
  *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefcontactname $CONTACTNAME$</td>
  *      <td>
@@ -2750,8 +2819,13 @@
  *    </tr>
  *  </table>
  *
+ *  @latexonly
+ *    \clearpage
+ *  @endlatexonly
+ *
+ *  @subsection contactgroupmacros Contact Group Macros <sup>5</sup>
+ *
  *  <table>
- *    <caption>Contact Group Macros<sup>5</sup></caption>
  *    <tr>
  *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefcontactgroupalias $CONTACTGROUPALIAS$ <sup>7</sup></td>
  *      <td>
@@ -2774,8 +2848,13 @@
  *    </tr>
  *  </table>
  *
+ *  @latexonly
+ *    \clearpage
+ *  @endlatexonly
+ *
+ *  @subsection summarymacros Summary Macros
+ *
  *  <table>
- *    <caption>SUMMARY Macros</caption>
  *    <tr>
  *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdeftotalhostsup $TOTALHOSTSUP$</td>
  *      <td>
@@ -2911,8 +2990,13 @@
  *    </tr>
  *  </table>
  *
+ *  @latexonly
+ *    \clearpage
+ *  @endlatexonly
+ *
+ *  @subsection notificationmacros Notification Macros
+ *
  *  <table>
- *    <caption>Notification Macros</caption>
  *    <tr>
  *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefnotificationtype $NOTIFICATIONTYPE$</td>
  *      <td>
@@ -3030,8 +3114,13 @@
  *    </tr>
  *  </table>
  *
+ *  @latexonly
+ *    \clearpage
+ *  @endlatexonly
+ *
+ *  @subsection datetimemacros Date/Time Macros
+ *
  *  <table>
- *    <caption>Date/Time Macros</caption>
  *    <tr>
  *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdeflongdatetime $LONGDATETIME$</td>
  *      <td>
@@ -3097,8 +3186,13 @@
  *    </tr>
  *  </table>
  *
+ *  @latexonly
+ *    \clearpage
+ *  @endlatexonly
+ *
+ *  @subsection filemacros File Macros
+ *
  *  <table>
- *    <caption>File Macros</caption>
  *    <tr>
  *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefmainconfigfile $MAINCONFIGFILE$</td>
  *      <td>
@@ -3184,8 +3278,13 @@
  *    </tr>
  *  </table>
  *
+ *  @latexonly
+ *    \clearpage
+ *  @endlatexonly
+ *
+ *  @subsection miscmacros Misc Macros
+ *
  *  <table>
- *    <caption>Misc Macros</caption>
  *    <tr>
  *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefprocessstarttime $PROCESSSTARTTIME$</td>
  *      <td>
@@ -3242,6 +3341,11 @@
  *    </tr>
  *  </table>
  *
+ *  @latexonly
+ *    \end{landscape}
+ *    \clearpage
+ *  @endlatexonly
+ *
  *  @section standardmacrosincentschedulernotes Notes
  *
  *  - <sup>1</sup> These macros are not valid for the host they are
@@ -3295,4 +3399,3 @@
  *  "use_large_installation_tweaks" option is enabled, as they
  *  are quite CPU-intensive to calculate.
  */
-
