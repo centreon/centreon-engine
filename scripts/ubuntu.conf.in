@@ -21,4 +21,4 @@ pre-start script
 #    [ -d /var/run/mysqld ] || install -m 755 -o mysql -g root -d /var/run/mysqld
 end script
 
-exec @bindir@/centscheduler -c "$HOME/centscheduler.cfg"
+exec sudo -g @GROUP@ -u @USER@ @bindir@/centscheduler -c "$HOME/centscheduler.cfg"
