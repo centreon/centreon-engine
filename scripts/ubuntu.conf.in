@@ -1,6 +1,6 @@
-# Centreon Scheduler Service
+# Centreon Engine Service
 
-description     "Centreon Scheduler"
+description     "Centreon Engine"
 author          "Matthieu Kermagoret <mkermagoret@merethis.com>"
 
 start on (local-filesystems
@@ -17,8 +17,8 @@ kill timeout 180
 
 pre-start script
     # Sanity checks.
-    [ -r "$HOME/centscheduler.cfg" ]
+    [ -r "$HOME/centengine.cfg" ]
 #    [ -d /var/run/mysqld ] || install -m 755 -o mysql -g root -d /var/run/mysqld
 end script
 
-exec @bindir@/centscheduler -c "$HOME/centscheduler.cfg"
+exec sudo -g @GROUP@ -u @USER@ @bindir@/centengine -c "$HOME/centengine.cfg"
