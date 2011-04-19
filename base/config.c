@@ -2,19 +2,19 @@
 ** Copyright 1999-2008 Ethan Galstad
 ** Copyright 2011      Merethis
 **
-** This file is part of Centreon Scheduler.
+** This file is part of Centreon Engine.
 **
-** Centreon Scheduler is free software: you can redistribute it and/or
+** Centreon Engine is free software: you can redistribute it and/or
 ** modify it under the terms of the GNU General Public License version 2
 ** as published by the Free Software Foundation.
 **
-** Centreon Scheduler is distributed in the hope that it will be useful,
+** Centreon Engine is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
 ** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
 ** General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
-** along with Centreon Scheduler. If not, see
+** along with Centreon Engine. If not, see
 ** <http://www.gnu.org/licenses/>.
 */
 
@@ -1258,16 +1258,16 @@ int read_main_config_file(char *main_config_file)
 
 		/* warn about old variables */
 		else if(!strcmp(variable,"bare_update_check"))
-			logit(NSLOG_CONFIG_WARNING,TRUE,"Warning: bare_update_check variable ignored. Centreon Scheduler does not check for updates.");
+			logit(NSLOG_CONFIG_WARNING,TRUE,"Warning: bare_update_check variable ignored. Centreon Engine does not check for updates.");
 
 		else if(!strcmp(variable,"check_for_updates"))
-			logit(NSLOG_CONFIG_WARNING,TRUE,"Warning: check_for_updates variable ignored. Centreon Scheduler does not check for updates.");
+			logit(NSLOG_CONFIG_WARNING,TRUE,"Warning: check_for_updates variable ignored. Centreon Engine does not check for updates.");
 
 		else if(!strcmp(variable,"comment_file") || !strcmp(variable,"xcddefault_comment_file"))
 			logit(NSLOG_CONFIG_WARNING,TRUE,"Warning: comment_file variable ignored. Comments are now stored in the status and retention files.");
 
 		else if(!strcmp(variable,"daemon_dumps_core"))
-			logit(NSLOG_CONFIG_WARNING,TRUE,"Warning: daemon_dumps_core variable ignored. Core dumping has to be handled by Centreon Scheduler user.");
+			logit(NSLOG_CONFIG_WARNING,TRUE,"Warning: daemon_dumps_core variable ignored. Core dumping has to be handled by Centreon Engine user.");
 
 		else if(!strcmp(variable,"downtime_file") || !strcmp(variable,"xdddefault_downtime_file"))
 			logit(NSLOG_CONFIG_WARNING,TRUE,"Warning: downtime_file variable ignored. Downtime entries are now stored in the status and retention files.");

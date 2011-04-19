@@ -1,23 +1,23 @@
 #!/bin/sh
 
 ### BEGIN INIT INFO
-# Provides: centscheduler
+# Provides: centengine
 # Required-Start: $local_fs
 # Required-Stop:
 # Default-Start: 2 3 4 5
 # Default-Stop: 0 6
-# Short-Description: Start and stop the centreon-scheduler
+# Short-Description: Start and stop the centengine
 ### END INIT INFO
 
 prefix=@localstatedir@
 var_dir=@vardir@
-binary=@bindir@/centscheduler
-config_file=@sysconfdir@/centscheduler.cfg
+binary=@bindir@/centengine
+config_file=@sysconfdir@/centengine.cfg
 status_file=$var_dir/status.dat
 retention_file=$var_dir/retention.dat
-command_file=$var_dir/rw/centscheduler.cmd
+command_file=$var_dir/rw/centengine.cmd
 lock_dir=/var/lock/subsys
-lock_file=centscheduler
+lock_file=centengine
 pid_file=/var/run/$(basename $binary).pid
 user=@USER@
 group=@GROUP@
@@ -80,7 +80,7 @@ service_start()
     if [ ! -f $pid_file ]; then
 	check_configuration
 
-	su - $user -c "touch $var_dir/centscheduler.log $retention_file"
+	su - $user -c "touch $var_dir/centengine.log $retention_file"
 
 	su - $user -c "$binary $config_file > /dev/null  2>&1" &
 	sleep 2

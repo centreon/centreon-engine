@@ -13,8 +13,8 @@ case "$1" in
 	    useradd -M -N -G @GROUP@ @USER@
 	fi
 
-	if [ -f "/etc/init.d/centscheduler" ]; then
-	    update-rc.d centscheduler defaults
+	if [ -f "/etc/init.d/centengine" ]; then
+	    update-rc.d centengine defaults
 	fi
 	;;
 
