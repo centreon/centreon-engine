@@ -1,19 +1,19 @@
 /*
 ** Copyright 2011 Merethis
 **
-** This file is part of Centreon Scheduler.
+** This file is part of Centreon Engine.
 **
-** Centreon Scheduler is free software: you can redistribute it and/or
+** Centreon Engine is free software: you can redistribute it and/or
 ** modify it under the terms of the GNU General Public License version 2
 ** as published by the Free Software Foundation.
 **
-** Centreon Scheduler is distributed in the hope that it will be useful,
+** Centreon Engine is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
 ** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
 ** General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
-** along with Centreon Scheduler. If not, see
+** along with Centreon Engine. If not, see
 ** <http://www.gnu.org/licenses/>.
 */
 
@@ -21,7 +21,7 @@
 #include <string>
 #include <string.h>
 #include <strings.h>
-#include "centreonscheduler.nsmap" // gSOAP namespaces.
+#include "centreonengine.nsmap" // gSOAP namespaces.
 #include "soapH.h"
 #include "objects.hh"
 #include "downtime.hh"
@@ -62,15 +62,15 @@ static inline char* my_strdup(char const* str) {
 }
 
 /**
- *  Restart Scheduler.
+ *  Restart Engine.
  *
  *  @param[in]  s      Unused.
  *  @param[out] res    Result of operation.
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__processRestart(soap* s,
-				      centreonscheduler__processRestartResponse& res) {
+int centreonengine__processRestart(soap* s,
+				   centreonengine__processRestartResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2, "Webservice: %s()\n", __func__);
@@ -82,15 +82,15 @@ int centreonscheduler__processRestart(soap* s,
 }
 
 /**
- *  Shutdown Scheduler.
+ *  Shutdown Engine.
  *
  *  @param[in]  s      Unused.
  *  @param[out] res    Result of operation.
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__processShutdown(soap* s,
-				       centreonscheduler__processShutdownResponse& res) {
+int centreonengine__processShutdown(soap* s,
+				    centreonengine__processShutdownResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2, "Webservice: %s()\n", __func__);
@@ -109,8 +109,8 @@ int centreonscheduler__processShutdown(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__stateInformationLoad(soap* s,
-					    centreonscheduler__stateInformationLoadResponse& res) {
+int centreonengine__stateInformationLoad(soap* s,
+					 centreonengine__stateInformationLoadResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2, "Webservice: %s()\n", __func__);
@@ -128,8 +128,8 @@ int centreonscheduler__stateInformationLoad(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__stateInformationSave(soap* s,
-					    centreonscheduler__stateInformationSaveResponse& res) {
+int centreonengine__stateInformationSave(soap* s,
+					 centreonengine__stateInformationSaveResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2, "Webservice: %s()\n", __func__);
@@ -148,9 +148,9 @@ int centreonscheduler__stateInformationSave(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostGetAcknowledgementIsSet(soap* s,
-						   ns1__hostIDType* host_id,
-						   centreonscheduler__hostGetAcknowledgementIsSetResponse& res) {
+int centreonengine__hostGetAcknowledgementIsSet(soap* s,
+						ns1__hostIDType* host_id,
+						centreonengine__hostGetAcknowledgementIsSetResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -185,9 +185,9 @@ int centreonscheduler__hostGetAcknowledgementIsSet(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostGetAcknowledgementType(soap* s,
-						  ns1__hostIDType* host_id,
-						  centreonscheduler__hostGetAcknowledgementTypeResponse& res) {
+int centreonengine__hostGetAcknowledgementType(soap* s,
+					       ns1__hostIDType* host_id,
+					       centreonengine__hostGetAcknowledgementTypeResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -222,9 +222,9 @@ int centreonscheduler__hostGetAcknowledgementType(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostGetAddress(soap* s,
-				      ns1__hostIDType* host_id,
-				      centreonscheduler__hostGetAddressResponse& res) {
+int centreonengine__hostGetAddress(soap* s,
+				   ns1__hostIDType* host_id,
+				   centreonengine__hostGetAddressResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -262,10 +262,10 @@ int centreonscheduler__hostGetAddress(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostSetAddress(soap* s,
-				      ns1__hostIDType* host_id,
-				      std::string address,
-				      centreonscheduler__hostSetAddressResponse& res) {
+int centreonengine__hostSetAddress(soap* s,
+				   ns1__hostIDType* host_id,
+				   std::string address,
+				   centreonengine__hostSetAddressResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -307,9 +307,9 @@ int centreonscheduler__hostSetAddress(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostGetCheckActiveEnabled(soap* s,
-						 ns1__hostIDType* host_id,
-						 centreonscheduler__hostGetCheckActiveEnabledResponse& res) {
+int centreonengine__hostGetCheckActiveEnabled(soap* s,
+					      ns1__hostIDType* host_id,
+					      centreonengine__hostGetCheckActiveEnabledResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -344,9 +344,9 @@ int centreonscheduler__hostGetCheckActiveEnabled(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostGetCheckCommand(soap* s,
-					   ns1__hostIDType* host_id,
-					   centreonscheduler__hostGetCheckCommandResponse& res) {
+int centreonengine__hostGetCheckCommand(soap* s,
+					ns1__hostIDType* host_id,
+					centreonengine__hostGetCheckCommandResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -383,9 +383,9 @@ int centreonscheduler__hostGetCheckCommand(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostGetCheckCurrentAttempt(soap* s,
-						  ns1__hostIDType* host_id,
-						  centreonscheduler__hostGetCheckCurrentAttemptResponse& res) {
+int centreonengine__hostGetCheckCurrentAttempt(soap* s,
+					       ns1__hostIDType* host_id,
+					       centreonengine__hostGetCheckCurrentAttemptResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -420,9 +420,9 @@ int centreonscheduler__hostGetCheckCurrentAttempt(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostGetCheckIntervalNormal(soap* s,
-						  ns1__hostIDType* host_id,
-						  centreonscheduler__hostGetCheckIntervalNormalResponse& res) {
+int centreonengine__hostGetCheckIntervalNormal(soap* s,
+					       ns1__hostIDType* host_id,
+					       centreonengine__hostGetCheckIntervalNormalResponse& res) {
   (void)s;
 
   host* host = find_host(host_id->name.c_str());
@@ -452,9 +452,9 @@ int centreonscheduler__hostGetCheckIntervalNormal(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostGetCheckIntervalRetry(soap* s,
-						 ns1__hostIDType* host_id,
-						 centreonscheduler__hostGetCheckIntervalRetryResponse& res) {
+int centreonengine__hostGetCheckIntervalRetry(soap* s,
+					      ns1__hostIDType* host_id,
+					      centreonengine__hostGetCheckIntervalRetryResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -489,9 +489,9 @@ int centreonscheduler__hostGetCheckIntervalRetry(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostGetCheckLast(soap* s,
-					ns1__hostIDType* host_id,
-					centreonscheduler__hostGetCheckLastResponse& res) {
+int centreonengine__hostGetCheckLast(soap* s,
+				     ns1__hostIDType* host_id,
+				     centreonengine__hostGetCheckLastResponse& res) {
   (void)s;
 
   host* host = find_host(host_id->name.c_str());
@@ -521,9 +521,9 @@ int centreonscheduler__hostGetCheckLast(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostGetCheckMaxAttempts(soap* s,
-					       ns1__hostIDType* host_id,
-					       centreonscheduler__hostGetCheckMaxAttemptsResponse& res) {
+int centreonengine__hostGetCheckMaxAttempts(soap* s,
+					    ns1__hostIDType* host_id,
+					    centreonengine__hostGetCheckMaxAttemptsResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -558,9 +558,9 @@ int centreonscheduler__hostGetCheckMaxAttempts(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostGetCheckNext(soap* s,
-					ns1__hostIDType* host_id,
-					centreonscheduler__hostGetCheckNextResponse& res) {
+int centreonengine__hostGetCheckNext(soap* s,
+				     ns1__hostIDType* host_id,
+				     centreonengine__hostGetCheckNextResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -595,9 +595,9 @@ int centreonscheduler__hostGetCheckNext(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostGetCheckOptions(soap* s,
-					   ns1__hostIDType* host_id,
-					   centreonscheduler__hostGetCheckOptionsResponse& res) {
+int centreonengine__hostGetCheckOptions(soap* s,
+					ns1__hostIDType* host_id,
+					centreonengine__hostGetCheckOptionsResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -632,9 +632,9 @@ int centreonscheduler__hostGetCheckOptions(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostGetCheckPassiveEnabled(soap* s,
-						  ns1__hostIDType* host_id,
-						  centreonscheduler__hostGetCheckPassiveEnabledResponse& res) {
+int centreonengine__hostGetCheckPassiveEnabled(soap* s,
+					       ns1__hostIDType* host_id,
+					       centreonengine__hostGetCheckPassiveEnabledResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -669,9 +669,9 @@ int centreonscheduler__hostGetCheckPassiveEnabled(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostGetCheckPeriod(soap* s,
-					  ns1__hostIDType* host_id,
-					  centreonscheduler__hostGetCheckPeriodResponse& res) {
+int centreonengine__hostGetCheckPeriod(soap* s,
+				       ns1__hostIDType* host_id,
+				       centreonengine__hostGetCheckPeriodResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -708,9 +708,9 @@ int centreonscheduler__hostGetCheckPeriod(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostGetCheckShouldBeScheduled(soap* s,
-						     ns1__hostIDType* host_id,
-						     centreonscheduler__hostGetCheckShouldBeScheduledResponse& res) {
+int centreonengine__hostGetCheckShouldBeScheduled(soap* s,
+						  ns1__hostIDType* host_id,
+						  centreonengine__hostGetCheckShouldBeScheduledResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -745,9 +745,9 @@ int centreonscheduler__hostGetCheckShouldBeScheduled(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostGetCheckType(soap* s,
-					ns1__hostIDType* host_id,
-					centreonscheduler__hostGetCheckTypeResponse& res) {
+int centreonengine__hostGetCheckType(soap* s,
+				     ns1__hostIDType* host_id,
+				     centreonengine__hostGetCheckTypeResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -783,10 +783,10 @@ int centreonscheduler__hostGetCheckType(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostSetCheckActiveEnabled(soap* s,
-						 ns1__hostIDType* host_id,
-						 bool enable,
-						 centreonscheduler__hostSetCheckActiveEnabledResponse& res) {
+int centreonengine__hostSetCheckActiveEnabled(soap* s,
+					      ns1__hostIDType* host_id,
+					      bool enable,
+					      centreonengine__hostSetCheckActiveEnabledResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -823,10 +823,10 @@ int centreonscheduler__hostSetCheckActiveEnabled(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostSetCheckCommand(soap* s,
-					   ns1__hostIDType* host_id,
-					   std::string command,
-					   centreonscheduler__hostSetCheckCommandResponse& res) {
+int centreonengine__hostSetCheckCommand(soap* s,
+					ns1__hostIDType* host_id,
+					std::string command,
+					centreonengine__hostSetCheckCommandResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -869,10 +869,10 @@ int centreonscheduler__hostSetCheckCommand(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostSetCheckIntervalNormal(soap* s,
-						  ns1__hostIDType* host_id,
-						  unsigned int interval,
-						  centreonscheduler__hostSetCheckIntervalNormalResponse& res) {
+int centreonengine__hostSetCheckIntervalNormal(soap* s,
+					       ns1__hostIDType* host_id,
+					       unsigned int interval,
+					       centreonengine__hostSetCheckIntervalNormalResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -909,10 +909,10 @@ int centreonscheduler__hostSetCheckIntervalNormal(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostSetCheckIntervalRetry(soap* s,
-						 ns1__hostIDType* host_id,
-						 unsigned int interval,
-						 centreonscheduler__hostSetCheckIntervalRetryResponse& res) {
+int centreonengine__hostSetCheckIntervalRetry(soap* s,
+					      ns1__hostIDType* host_id,
+					      unsigned int interval,
+					      centreonengine__hostSetCheckIntervalRetryResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -949,10 +949,10 @@ int centreonscheduler__hostSetCheckIntervalRetry(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostSetCheckMaxAttempts(soap* s,
-					       ns1__hostIDType* host_id,
-					       unsigned int attempts,
-					       centreonscheduler__hostSetCheckMaxAttemptsResponse& res) {
+int centreonengine__hostSetCheckMaxAttempts(soap* s,
+					    ns1__hostIDType* host_id,
+					    unsigned int attempts,
+					    centreonengine__hostSetCheckMaxAttemptsResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -1000,10 +1000,10 @@ int centreonscheduler__hostSetCheckMaxAttempts(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostSetCheckPassiveEnabled(soap* s,
-						  ns1__hostIDType* host_id,
-						  bool enable,
-						  centreonscheduler__hostSetCheckPassiveEnabledResponse& res) {
+int centreonengine__hostSetCheckPassiveEnabled(soap* s,
+					       ns1__hostIDType* host_id,
+					       bool enable,
+					       centreonengine__hostSetCheckPassiveEnabledResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -1039,9 +1039,9 @@ int centreonscheduler__hostSetCheckPassiveEnabled(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostGetCircularPathChecked(soap* s,
-						  ns1__hostIDType* host_id,
-						  centreonscheduler__hostGetCircularPathCheckedResponse& res) {
+int centreonengine__hostGetCircularPathChecked(soap* s,
+					       ns1__hostIDType* host_id,
+					       centreonengine__hostGetCircularPathCheckedResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -1076,9 +1076,9 @@ int centreonscheduler__hostGetCircularPathChecked(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostGetCircularPathHas(soap* s,
-					      ns1__hostIDType* host_id,
-					      centreonscheduler__hostGetCircularPathHasResponse& res) {
+int centreonengine__hostGetCircularPathHas(soap* s,
+					   ns1__hostIDType* host_id,
+					   centreonengine__hostGetCircularPathHasResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -1113,9 +1113,9 @@ int centreonscheduler__hostGetCircularPathHas(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostGetDowntimeDepth(soap* s,
-					    ns1__hostIDType* host_id,
-					    centreonscheduler__hostGetDowntimeDepthResponse& res) {
+int centreonengine__hostGetDowntimeDepth(soap* s,
+					 ns1__hostIDType* host_id,
+					 centreonengine__hostGetDowntimeDepthResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -1150,9 +1150,9 @@ int centreonscheduler__hostGetDowntimeDepth(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostGetDowntimeFlexPending(soap* s,
-						  ns1__hostIDType* host_id,
-						  centreonscheduler__hostGetDowntimeFlexPendingResponse& res) {
+int centreonengine__hostGetDowntimeFlexPending(soap* s,
+					       ns1__hostIDType* host_id,
+					       centreonengine__hostGetDowntimeFlexPendingResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -1187,9 +1187,9 @@ int centreonscheduler__hostGetDowntimeFlexPending(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostGetEventHandler(soap* s,
-					   ns1__hostIDType* host_id,
-					   centreonscheduler__hostGetEventHandlerResponse& res) {
+int centreonengine__hostGetEventHandler(soap* s,
+					ns1__hostIDType* host_id,
+					centreonengine__hostGetEventHandlerResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -1226,9 +1226,9 @@ int centreonscheduler__hostGetEventHandler(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostGetEventHandlerEnabled(soap* s,
-						  ns1__hostIDType* host_id,
-						  centreonscheduler__hostGetEventHandlerEnabledResponse& res) {
+int centreonengine__hostGetEventHandlerEnabled(soap* s,
+					       ns1__hostIDType* host_id,
+					       centreonengine__hostGetEventHandlerEnabledResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -1264,10 +1264,10 @@ int centreonscheduler__hostGetEventHandlerEnabled(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostSetEventHandler(soap* s,
-					   ns1__hostIDType* host_id,
-					   std::string event_handler,
-					   centreonscheduler__hostSetEventHandlerResponse& res) {
+int centreonengine__hostSetEventHandler(soap* s,
+					ns1__hostIDType* host_id,
+					std::string event_handler,
+					centreonengine__hostSetEventHandlerResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -1310,10 +1310,10 @@ int centreonscheduler__hostSetEventHandler(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostSetEventHandlerEnabled(soap* s,
-						  ns1__hostIDType* host_id,
-						  bool enable,
-						  centreonscheduler__hostSetEventHandlerEnabledResponse& res) {
+int centreonengine__hostSetEventHandlerEnabled(soap* s,
+					       ns1__hostIDType* host_id,
+					       bool enable,
+					       centreonengine__hostSetEventHandlerEnabledResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -1349,9 +1349,9 @@ int centreonscheduler__hostSetEventHandlerEnabled(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostGetFailurePredictionEnabled(soap* s,
-						       ns1__hostIDType* host_id,
-						       centreonscheduler__hostGetFailurePredictionEnabledResponse& res) {
+int centreonengine__hostGetFailurePredictionEnabled(soap* s,
+						    ns1__hostIDType* host_id,
+						    centreonengine__hostGetFailurePredictionEnabledResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -1386,9 +1386,9 @@ int centreonscheduler__hostGetFailurePredictionEnabled(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostGetFailurePredictionOptions(soap* s,
-						       ns1__hostIDType* host_id,
-						       centreonscheduler__hostGetFailurePredictionOptionsResponse& res) {
+int centreonengine__hostGetFailurePredictionOptions(soap* s,
+						    ns1__hostIDType* host_id,
+						    centreonengine__hostGetFailurePredictionOptionsResponse& res) {
   (void)s;
 
   host* host = find_host(host_id->name.c_str());
@@ -1421,10 +1421,10 @@ int centreonscheduler__hostGetFailurePredictionOptions(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostSetFailurePredictionEnabled(soap* s,
-						       ns1__hostIDType* host_id,
-						       bool enable,
-						       centreonscheduler__hostSetFailurePredictionEnabledResponse& res) {
+int centreonengine__hostSetFailurePredictionEnabled(soap* s,
+						    ns1__hostIDType* host_id,
+						    bool enable,
+						    centreonengine__hostSetFailurePredictionEnabledResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -1460,9 +1460,9 @@ int centreonscheduler__hostSetFailurePredictionEnabled(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostGetFlapDetectionCommentID(soap* s,
-						     ns1__hostIDType* host_id,
-						     centreonscheduler__hostGetFlapDetectionCommentIDResponse& res) {
+int centreonengine__hostGetFlapDetectionCommentID(soap* s,
+						  ns1__hostIDType* host_id,
+						  centreonengine__hostGetFlapDetectionCommentIDResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -1497,9 +1497,9 @@ int centreonscheduler__hostGetFlapDetectionCommentID(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostGetFlapDetectionEnabled(soap* s,
-						   ns1__hostIDType* host_id,
-						   centreonscheduler__hostGetFlapDetectionEnabledResponse& res) {
+int centreonengine__hostGetFlapDetectionEnabled(soap* s,
+						ns1__hostIDType* host_id,
+						centreonengine__hostGetFlapDetectionEnabledResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -1534,9 +1534,9 @@ int centreonscheduler__hostGetFlapDetectionEnabled(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostGetFlapDetectionIsFlapping(soap* s,
-						      ns1__hostIDType* host_id,
-						      centreonscheduler__hostGetFlapDetectionIsFlappingResponse& res) {
+int centreonengine__hostGetFlapDetectionIsFlapping(soap* s,
+						   ns1__hostIDType* host_id,
+						   centreonengine__hostGetFlapDetectionIsFlappingResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -1571,9 +1571,9 @@ int centreonscheduler__hostGetFlapDetectionIsFlapping(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostGetFlapDetectionOnDown(soap* s,
-						  ns1__hostIDType* host_id,
-						  centreonscheduler__hostGetFlapDetectionOnDownResponse& res) {
+int centreonengine__hostGetFlapDetectionOnDown(soap* s,
+					       ns1__hostIDType* host_id,
+					       centreonengine__hostGetFlapDetectionOnDownResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -1608,9 +1608,9 @@ int centreonscheduler__hostGetFlapDetectionOnDown(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostGetFlapDetectionOnUnreachable(soap* s,
-							 ns1__hostIDType* host_id,
-							 centreonscheduler__hostGetFlapDetectionOnUnreachableResponse& res) {
+int centreonengine__hostGetFlapDetectionOnUnreachable(soap* s,
+						      ns1__hostIDType* host_id,
+						      centreonengine__hostGetFlapDetectionOnUnreachableResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -1645,9 +1645,9 @@ int centreonscheduler__hostGetFlapDetectionOnUnreachable(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostGetFlapDetectionOnUp(soap* s,
-						ns1__hostIDType* host_id,
-						centreonscheduler__hostGetFlapDetectionOnUpResponse& res) {
+int centreonengine__hostGetFlapDetectionOnUp(soap* s,
+					     ns1__hostIDType* host_id,
+					     centreonengine__hostGetFlapDetectionOnUpResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -1682,9 +1682,9 @@ int centreonscheduler__hostGetFlapDetectionOnUp(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostGetFlapDetectionStateHistoryLastUpdate(soap* s,
-								  ns1__hostIDType* host_id,
-								  centreonscheduler__hostGetFlapDetectionStateHistoryLastUpdateResponse& res) {
+int centreonengine__hostGetFlapDetectionStateHistoryLastUpdate(soap* s,
+							       ns1__hostIDType* host_id,
+							       centreonengine__hostGetFlapDetectionStateHistoryLastUpdateResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -1719,9 +1719,9 @@ int centreonscheduler__hostGetFlapDetectionStateHistoryLastUpdate(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostGetFlapDetectionThresholdHigh(soap* s,
-							 ns1__hostIDType* host_id,
-							 centreonscheduler__hostGetFlapDetectionThresholdHighResponse& res) {
+int centreonengine__hostGetFlapDetectionThresholdHigh(soap* s,
+						      ns1__hostIDType* host_id,
+						      centreonengine__hostGetFlapDetectionThresholdHighResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -1756,9 +1756,9 @@ int centreonscheduler__hostGetFlapDetectionThresholdHigh(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostGetFlapDetectionThresholdLow(soap* s,
-							ns1__hostIDType* host_id,
-							centreonscheduler__hostGetFlapDetectionThresholdLowResponse& res) {
+int centreonengine__hostGetFlapDetectionThresholdLow(soap* s,
+						     ns1__hostIDType* host_id,
+						     centreonengine__hostGetFlapDetectionThresholdLowResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -1794,10 +1794,10 @@ int centreonscheduler__hostGetFlapDetectionThresholdLow(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostSetFlapDetectionEnabled(soap* s,
-						   ns1__hostIDType* host_id,
-						   bool enable,
-						   centreonscheduler__hostSetFlapDetectionEnabledResponse& res) {
+int centreonengine__hostSetFlapDetectionEnabled(soap* s,
+						ns1__hostIDType* host_id,
+						bool enable,
+						centreonengine__hostSetFlapDetectionEnabledResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -1834,10 +1834,10 @@ int centreonscheduler__hostSetFlapDetectionEnabled(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostSetFlapDetectionOnDown(soap* s,
-						  ns1__hostIDType* host_id,
-						  bool enable,
-						  centreonscheduler__hostSetFlapDetectionOnDownResponse& res) {
+int centreonengine__hostSetFlapDetectionOnDown(soap* s,
+					       ns1__hostIDType* host_id,
+					       bool enable,
+					       centreonengine__hostSetFlapDetectionOnDownResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -1874,10 +1874,10 @@ int centreonscheduler__hostSetFlapDetectionOnDown(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostSetFlapDetectionOnUnreachable(soap* s,
-							 ns1__hostIDType* host_id,
-							 bool enable,
-							 centreonscheduler__hostSetFlapDetectionOnUnreachableResponse& res) {
+int centreonengine__hostSetFlapDetectionOnUnreachable(soap* s,
+						      ns1__hostIDType* host_id,
+						      bool enable,
+						      centreonengine__hostSetFlapDetectionOnUnreachableResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -1914,10 +1914,10 @@ int centreonscheduler__hostSetFlapDetectionOnUnreachable(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostSetFlapDetectionOnUp(soap* s,
-						ns1__hostIDType* host_id,
-						bool enable,
-						centreonscheduler__hostSetFlapDetectionOnUpResponse& res) {
+int centreonengine__hostSetFlapDetectionOnUp(soap* s,
+					     ns1__hostIDType* host_id,
+					     bool enable,
+					     centreonengine__hostSetFlapDetectionOnUpResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -1954,10 +1954,10 @@ int centreonscheduler__hostSetFlapDetectionOnUp(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostSetFlapDetectionThresholdHigh(soap* s,
-							 ns1__hostIDType* host_id,
-							 double threshold,
-							 centreonscheduler__hostSetFlapDetectionThresholdHighResponse& res) {
+int centreonengine__hostSetFlapDetectionThresholdHigh(soap* s,
+						      ns1__hostIDType* host_id,
+						      double threshold,
+						      centreonengine__hostSetFlapDetectionThresholdHighResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -1994,10 +1994,10 @@ int centreonscheduler__hostSetFlapDetectionThresholdHigh(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostSetFlapDetectionThresholdLow(soap* s,
-							ns1__hostIDType* host_id,
-							double threshold,
-							centreonscheduler__hostSetFlapDetectionThresholdLowResponse& res) {
+int centreonengine__hostSetFlapDetectionThresholdLow(soap* s,
+						     ns1__hostIDType* host_id,
+						     double threshold,
+						     centreonengine__hostSetFlapDetectionThresholdLowResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -2033,9 +2033,9 @@ int centreonscheduler__hostSetFlapDetectionThresholdLow(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostGetFreshnessCheckEnabled(soap* s,
-						    ns1__hostIDType* host_id,
-						    centreonscheduler__hostGetFreshnessCheckEnabledResponse& res) {
+int centreonengine__hostGetFreshnessCheckEnabled(soap* s,
+						 ns1__hostIDType* host_id,
+						 centreonengine__hostGetFreshnessCheckEnabledResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -2070,9 +2070,9 @@ int centreonscheduler__hostGetFreshnessCheckEnabled(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostGetFreshnessIsActive(soap* s,
-						ns1__hostIDType* host_id,
-						centreonscheduler__hostGetFreshnessIsActiveResponse& res) {
+int centreonengine__hostGetFreshnessIsActive(soap* s,
+					     ns1__hostIDType* host_id,
+					     centreonengine__hostGetFreshnessIsActiveResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -2107,9 +2107,9 @@ int centreonscheduler__hostGetFreshnessIsActive(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostGetFreshnessThreshold(soap* s,
-						 ns1__hostIDType* host_id,
-						 centreonscheduler__hostGetFreshnessThresholdResponse& res) {
+int centreonengine__hostGetFreshnessThreshold(soap* s,
+					      ns1__hostIDType* host_id,
+					      centreonengine__hostGetFreshnessThresholdResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -2145,10 +2145,10 @@ int centreonscheduler__hostGetFreshnessThreshold(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostSetFreshnessCheckEnabled(soap* s,
-						    ns1__hostIDType* host_id,
-						    bool enable,
-						    centreonscheduler__hostSetFreshnessCheckEnabledResponse& res) {
+int centreonengine__hostSetFreshnessCheckEnabled(soap* s,
+						 ns1__hostIDType* host_id,
+						 bool enable,
+						 centreonengine__hostSetFreshnessCheckEnabledResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -2185,10 +2185,10 @@ int centreonscheduler__hostSetFreshnessCheckEnabled(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostSetFreshnessThreshold(soap* s,
-						 ns1__hostIDType* host_id,
-						 int threshold,
-						 centreonscheduler__hostSetFreshnessThresholdResponse& res) {
+int centreonengine__hostSetFreshnessThreshold(soap* s,
+					      ns1__hostIDType* host_id,
+					      int threshold,
+					      centreonengine__hostSetFreshnessThresholdResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -2224,9 +2224,9 @@ int centreonscheduler__hostSetFreshnessThreshold(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostGetModifiedAttributes(soap* s,
-						 ns1__hostIDType* host_id,
-						 centreonscheduler__hostGetModifiedAttributesResponse& res) {
+int centreonengine__hostGetModifiedAttributes(soap* s,
+					      ns1__hostIDType* host_id,
+					      centreonengine__hostGetModifiedAttributesResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -2261,9 +2261,9 @@ int centreonscheduler__hostGetModifiedAttributes(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostGetNameAlias(soap* s,
-					ns1__hostIDType* host_id,
-					centreonscheduler__hostGetNameAliasResponse& res) {
+int centreonengine__hostGetNameAlias(soap* s,
+				     ns1__hostIDType* host_id,
+				     centreonengine__hostGetNameAliasResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -2300,9 +2300,9 @@ int centreonscheduler__hostGetNameAlias(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostGetNameDisplay(soap* s,
-					  ns1__hostIDType* host_id,
-					  centreonscheduler__hostGetNameDisplayResponse& res) {
+int centreonengine__hostGetNameDisplay(soap* s,
+				       ns1__hostIDType* host_id,
+				       centreonengine__hostGetNameDisplayResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -2340,10 +2340,10 @@ int centreonscheduler__hostGetNameDisplay(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostSetNameAlias(soap* s,
-					ns1__hostIDType* host_id,
-					std::string alias,
-					centreonscheduler__hostSetNameAliasResponse& res) {
+int centreonengine__hostSetNameAlias(soap* s,
+				     ns1__hostIDType* host_id,
+				     std::string alias,
+				     centreonengine__hostSetNameAliasResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -2386,10 +2386,10 @@ int centreonscheduler__hostSetNameAlias(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostSetNameDisplay(soap* s,
-					  ns1__hostIDType* host_id,
-					  std::string displayname,
-					  centreonscheduler__hostSetNameDisplayResponse& res) {
+int centreonengine__hostSetNameDisplay(soap* s,
+				       ns1__hostIDType* host_id,
+				       std::string displayname,
+				       centreonengine__hostSetNameDisplayResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -2431,9 +2431,9 @@ int centreonscheduler__hostSetNameDisplay(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostGetNotificationsCurrentID(soap* s,
-						     ns1__hostIDType* host_id,
-						     centreonscheduler__hostGetNotificationsCurrentIDResponse& res) {
+int centreonengine__hostGetNotificationsCurrentID(soap* s,
+						  ns1__hostIDType* host_id,
+						  centreonengine__hostGetNotificationsCurrentIDResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -2468,9 +2468,9 @@ int centreonscheduler__hostGetNotificationsCurrentID(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostGetNotificationsCurrentNumber(soap* s,
-							 ns1__hostIDType* host_id,
-							 centreonscheduler__hostGetNotificationsCurrentNumberResponse& res) {
+int centreonengine__hostGetNotificationsCurrentNumber(soap* s,
+						      ns1__hostIDType* host_id,
+						      centreonengine__hostGetNotificationsCurrentNumberResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -2505,9 +2505,9 @@ int centreonscheduler__hostGetNotificationsCurrentNumber(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostGetNotificationsEnabled(soap* s,
-						   ns1__hostIDType* host_id,
-						   centreonscheduler__hostGetNotificationsEnabledResponse& res) {
+int centreonengine__hostGetNotificationsEnabled(soap* s,
+						ns1__hostIDType* host_id,
+						centreonengine__hostGetNotificationsEnabledResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -2542,9 +2542,9 @@ int centreonscheduler__hostGetNotificationsEnabled(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostGetNotificationsFirstDelay(soap* s,
-						      ns1__hostIDType* host_id,
-						      centreonscheduler__hostGetNotificationsFirstDelayResponse& res) {
+int centreonengine__hostGetNotificationsFirstDelay(soap* s,
+						   ns1__hostIDType* host_id,
+						   centreonengine__hostGetNotificationsFirstDelayResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -2579,9 +2579,9 @@ int centreonscheduler__hostGetNotificationsFirstDelay(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostGetNotificationsInterval(soap* s,
-						    ns1__hostIDType* host_id,
-						    centreonscheduler__hostGetNotificationsIntervalResponse& res) {
+int centreonengine__hostGetNotificationsInterval(soap* s,
+						 ns1__hostIDType* host_id,
+						 centreonengine__hostGetNotificationsIntervalResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -2616,9 +2616,9 @@ int centreonscheduler__hostGetNotificationsInterval(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostGetNotificationsLast(soap* s,
-						ns1__hostIDType* host_id,
-						centreonscheduler__hostGetNotificationsLastResponse& res) {
+int centreonengine__hostGetNotificationsLast(soap* s,
+					     ns1__hostIDType* host_id,
+					     centreonengine__hostGetNotificationsLastResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -2653,9 +2653,9 @@ int centreonscheduler__hostGetNotificationsLast(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostGetNotificationsNext(soap* s,
-						ns1__hostIDType* host_id,
-						centreonscheduler__hostGetNotificationsNextResponse& res) {
+int centreonengine__hostGetNotificationsNext(soap* s,
+					     ns1__hostIDType* host_id,
+					     centreonengine__hostGetNotificationsNextResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -2690,9 +2690,9 @@ int centreonscheduler__hostGetNotificationsNext(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostGetNotificationsOnDown(soap* s,
-						  ns1__hostIDType* host_id,
-						  centreonscheduler__hostGetNotificationsOnDownResponse& res) {
+int centreonengine__hostGetNotificationsOnDown(soap* s,
+					       ns1__hostIDType* host_id,
+					       centreonengine__hostGetNotificationsOnDownResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -2727,9 +2727,9 @@ int centreonscheduler__hostGetNotificationsOnDown(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostGetNotificationsOnDowntime(soap* s,
-						      ns1__hostIDType* host_id,
-						      centreonscheduler__hostGetNotificationsOnDowntimeResponse& res) {
+int centreonengine__hostGetNotificationsOnDowntime(soap* s,
+						   ns1__hostIDType* host_id,
+						   centreonengine__hostGetNotificationsOnDowntimeResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -2764,9 +2764,9 @@ int centreonscheduler__hostGetNotificationsOnDowntime(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostGetNotificationsOnFlapping(soap* s,
-						      ns1__hostIDType* host_id,
-						      centreonscheduler__hostGetNotificationsOnFlappingResponse& res) {
+int centreonengine__hostGetNotificationsOnFlapping(soap* s,
+						   ns1__hostIDType* host_id,
+						   centreonengine__hostGetNotificationsOnFlappingResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -2801,9 +2801,9 @@ int centreonscheduler__hostGetNotificationsOnFlapping(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostGetNotificationsOnRecovery(soap* s,
-						      ns1__hostIDType* host_id,
-						      centreonscheduler__hostGetNotificationsOnRecoveryResponse& res) {
+int centreonengine__hostGetNotificationsOnRecovery(soap* s,
+						   ns1__hostIDType* host_id,
+						   centreonengine__hostGetNotificationsOnRecoveryResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -2838,9 +2838,9 @@ int centreonscheduler__hostGetNotificationsOnRecovery(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostGetNotificationsOnUnreachable(soap* s,
-							 ns1__hostIDType* host_id,
-							 centreonscheduler__hostGetNotificationsOnUnreachableResponse& res) {
+int centreonengine__hostGetNotificationsOnUnreachable(soap* s,
+						      ns1__hostIDType* host_id,
+						      centreonengine__hostGetNotificationsOnUnreachableResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -2875,9 +2875,9 @@ int centreonscheduler__hostGetNotificationsOnUnreachable(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostGetNotificationsPeriod(soap* s,
-						  ns1__hostIDType* host_id,
-						  centreonscheduler__hostGetNotificationsPeriodResponse& res) {
+int centreonengine__hostGetNotificationsPeriod(soap* s,
+					       ns1__hostIDType* host_id,
+					       centreonengine__hostGetNotificationsPeriodResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -2915,10 +2915,10 @@ int centreonscheduler__hostGetNotificationsPeriod(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostSetNotificationsEnabled(soap* s,
-						   ns1__hostIDType* host_id,
-						   bool enable,
-						   centreonscheduler__hostSetNotificationsEnabledResponse& res) {
+int centreonengine__hostSetNotificationsEnabled(soap* s,
+						ns1__hostIDType* host_id,
+						bool enable,
+						centreonengine__hostSetNotificationsEnabledResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -2955,10 +2955,10 @@ int centreonscheduler__hostSetNotificationsEnabled(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostSetNotificationsFirstDelay(soap* s,
-						      ns1__hostIDType* host_id,
-						      unsigned int delay,
-						      centreonscheduler__hostSetNotificationsFirstDelayResponse& res) {
+int centreonengine__hostSetNotificationsFirstDelay(soap* s,
+						   ns1__hostIDType* host_id,
+						   unsigned int delay,
+						   centreonengine__hostSetNotificationsFirstDelayResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -2995,10 +2995,10 @@ int centreonscheduler__hostSetNotificationsFirstDelay(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostSetNotificationsInterval(soap* s,
-						    ns1__hostIDType* host_id,
-						    unsigned int interval,
-						    centreonscheduler__hostSetNotificationsIntervalResponse& res) {
+int centreonengine__hostSetNotificationsInterval(soap* s,
+						 ns1__hostIDType* host_id,
+						 unsigned int interval,
+						 centreonengine__hostSetNotificationsIntervalResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -3035,10 +3035,10 @@ int centreonscheduler__hostSetNotificationsInterval(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostSetNotificationsOnDown(soap* s,
-						  ns1__hostIDType* host_id,
-						  bool enable,
-						  centreonscheduler__hostSetNotificationsOnDownResponse& res) {
+int centreonengine__hostSetNotificationsOnDown(soap* s,
+					       ns1__hostIDType* host_id,
+					       bool enable,
+					       centreonengine__hostSetNotificationsOnDownResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -3075,10 +3075,10 @@ int centreonscheduler__hostSetNotificationsOnDown(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostSetNotificationsOnDowntime(soap* s,
-						      ns1__hostIDType* host_id,
-						      bool enable,
-						      centreonscheduler__hostSetNotificationsOnDowntimeResponse& res) {
+int centreonengine__hostSetNotificationsOnDowntime(soap* s,
+						   ns1__hostIDType* host_id,
+						   bool enable,
+						   centreonengine__hostSetNotificationsOnDowntimeResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -3115,10 +3115,10 @@ int centreonscheduler__hostSetNotificationsOnDowntime(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostSetNotificationsOnFlapping(soap* s,
-						      ns1__hostIDType* host_id,
-						      bool enable,
-						      centreonscheduler__hostSetNotificationsOnFlappingResponse& res) {
+int centreonengine__hostSetNotificationsOnFlapping(soap* s,
+						   ns1__hostIDType* host_id,
+						   bool enable,
+						   centreonengine__hostSetNotificationsOnFlappingResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -3155,10 +3155,10 @@ int centreonscheduler__hostSetNotificationsOnFlapping(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostSetNotificationsOnRecovery(soap* s,
-						      ns1__hostIDType* host_id,
-						      bool enable,
-						      centreonscheduler__hostSetNotificationsOnRecoveryResponse& res) {
+int centreonengine__hostSetNotificationsOnRecovery(soap* s,
+						   ns1__hostIDType* host_id,
+						   bool enable,
+						   centreonengine__hostSetNotificationsOnRecoveryResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -3195,10 +3195,10 @@ int centreonscheduler__hostSetNotificationsOnRecovery(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostSetNotificationsOnUnreachable(soap* s,
-							 ns1__hostIDType* host_id,
-							 bool enable,
-							 centreonscheduler__hostSetNotificationsOnUnreachableResponse& res) {
+int centreonengine__hostSetNotificationsOnUnreachable(soap* s,
+						      ns1__hostIDType* host_id,
+						      bool enable,
+						      centreonengine__hostSetNotificationsOnUnreachableResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -3234,9 +3234,9 @@ int centreonscheduler__hostSetNotificationsOnUnreachable(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostGetObsessOver(soap* s,
-					 ns1__hostIDType* host_id,
-					 centreonscheduler__hostGetObsessOverResponse& res) {
+int centreonengine__hostGetObsessOver(soap* s,
+				      ns1__hostIDType* host_id,
+				      centreonengine__hostGetObsessOverResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -3272,10 +3272,10 @@ int centreonscheduler__hostGetObsessOver(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostSetObsessOver(soap* s,
-					 ns1__hostIDType* host_id,
-					 bool enable,
-					 centreonscheduler__hostSetObsessOverResponse& res) {
+int centreonengine__hostSetObsessOver(soap* s,
+				      ns1__hostIDType* host_id,
+				      bool enable,
+				      centreonengine__hostSetObsessOverResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -3311,9 +3311,9 @@ int centreonscheduler__hostSetObsessOver(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostGetPerfdataProcessingEnabled(soap* s,
-							ns1__hostIDType* host_id,
-							centreonscheduler__hostGetPerfdataProcessingEnabledResponse& res) {
+int centreonengine__hostGetPerfdataProcessingEnabled(soap* s,
+						     ns1__hostIDType* host_id,
+						     centreonengine__hostGetPerfdataProcessingEnabledResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -3349,10 +3349,10 @@ int centreonscheduler__hostGetPerfdataProcessingEnabled(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostSetPerfdataProcessingEnabled(soap* s,
-							ns1__hostIDType* host_id,
-							bool enable,
-							centreonscheduler__hostSetPerfdataProcessingEnabledResponse& res) {
+int centreonengine__hostSetPerfdataProcessingEnabled(soap* s,
+						     ns1__hostIDType* host_id,
+						     bool enable,
+						     centreonengine__hostSetPerfdataProcessingEnabledResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -3388,9 +3388,9 @@ int centreonscheduler__hostSetPerfdataProcessingEnabled(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostGetPluginExecutionTime(soap* s,
-						  ns1__hostIDType* host_id,
-						  centreonscheduler__hostGetPluginExecutionTimeResponse& res) {
+int centreonengine__hostGetPluginExecutionTime(soap* s,
+					       ns1__hostIDType* host_id,
+					       centreonengine__hostGetPluginExecutionTimeResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -3425,9 +3425,9 @@ int centreonscheduler__hostGetPluginExecutionTime(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostGetPluginIsExecuting(soap* s,
-						ns1__hostIDType* host_id,
-						centreonscheduler__hostGetPluginIsExecutingResponse& res) {
+int centreonengine__hostGetPluginIsExecuting(soap* s,
+					     ns1__hostIDType* host_id,
+					     centreonengine__hostGetPluginIsExecutingResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -3462,9 +3462,9 @@ int centreonscheduler__hostGetPluginIsExecuting(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostGetPluginLatency(soap* s,
-					    ns1__hostIDType* host_id,
-					    centreonscheduler__hostGetPluginLatencyResponse& res) {
+int centreonengine__hostGetPluginLatency(soap* s,
+					 ns1__hostIDType* host_id,
+					 centreonengine__hostGetPluginLatencyResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -3499,9 +3499,9 @@ int centreonscheduler__hostGetPluginLatency(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostGetPluginOutput(soap* s,
-					   ns1__hostIDType* host_id,
-					   centreonscheduler__hostGetPluginOutputResponse& res) {
+int centreonengine__hostGetPluginOutput(soap* s,
+					ns1__hostIDType* host_id,
+					centreonengine__hostGetPluginOutputResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -3538,9 +3538,9 @@ int centreonscheduler__hostGetPluginOutput(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostGetPluginPerfdata(soap* s,
-					     ns1__hostIDType* host_id,
-					     centreonscheduler__hostGetPluginPerfdataResponse& res) {
+int centreonengine__hostGetPluginPerfdata(soap* s,
+					  ns1__hostIDType* host_id,
+					  centreonengine__hostGetPluginPerfdataResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -3577,9 +3577,9 @@ int centreonscheduler__hostGetPluginPerfdata(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostGetRetainStatusInformation(soap* s,
-						      ns1__hostIDType* host_id,
-						      centreonscheduler__hostGetRetainStatusInformationResponse& res) {
+int centreonengine__hostGetRetainStatusInformation(soap* s,
+						   ns1__hostIDType* host_id,
+						   centreonengine__hostGetRetainStatusInformationResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -3614,9 +3614,9 @@ int centreonscheduler__hostGetRetainStatusInformation(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostGetRetainNonStatusInformation(soap* s,
-							 ns1__hostIDType* host_id,
-							 centreonscheduler__hostGetRetainNonStatusInformationResponse& res) {
+int centreonengine__hostGetRetainNonStatusInformation(soap* s,
+						      ns1__hostIDType* host_id,
+						      centreonengine__hostGetRetainNonStatusInformationResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -3652,10 +3652,10 @@ int centreonscheduler__hostGetRetainNonStatusInformation(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostSetRetainStatusInformation(soap* s,
-						      ns1__hostIDType* host_id,
-						      bool enable,
-						      centreonscheduler__hostSetRetainStatusInformationResponse& res) {
+int centreonengine__hostSetRetainStatusInformation(soap* s,
+						   ns1__hostIDType* host_id,
+						   bool enable,
+						   centreonengine__hostSetRetainStatusInformationResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -3692,10 +3692,10 @@ int centreonscheduler__hostSetRetainStatusInformation(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostSetRetainNonStatusInformation(soap* s,
-							 ns1__hostIDType* host_id,
-							 bool enable,
-							 centreonscheduler__hostSetRetainNonStatusInformationResponse& res) {
+int centreonengine__hostSetRetainNonStatusInformation(soap* s,
+						      ns1__hostIDType* host_id,
+						      bool enable,
+						      centreonengine__hostSetRetainNonStatusInformationResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -3731,9 +3731,9 @@ int centreonscheduler__hostSetRetainNonStatusInformation(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostGetServicesCount(soap* s,
-					    ns1__hostIDType* host_id,
-					    centreonscheduler__hostGetServicesCountResponse& res) {
+int centreonengine__hostGetServicesCount(soap* s,
+					 ns1__hostIDType* host_id,
+					 centreonengine__hostGetServicesCountResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -3768,9 +3768,9 @@ int centreonscheduler__hostGetServicesCount(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostGetServicesTotalCheckInterval(soap* s,
-							 ns1__hostIDType* host_id,
-							 centreonscheduler__hostGetServicesTotalCheckIntervalResponse& res) {
+int centreonengine__hostGetServicesTotalCheckInterval(soap* s,
+						      ns1__hostIDType* host_id,
+						      centreonengine__hostGetServicesTotalCheckIntervalResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -3805,9 +3805,9 @@ int centreonscheduler__hostGetServicesTotalCheckInterval(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostGetStalkOnDown(soap* s,
-					  ns1__hostIDType* host_id,
-					  centreonscheduler__hostGetStalkOnDownResponse& res) {
+int centreonengine__hostGetStalkOnDown(soap* s,
+				       ns1__hostIDType* host_id,
+				       centreonengine__hostGetStalkOnDownResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -3842,9 +3842,9 @@ int centreonscheduler__hostGetStalkOnDown(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostGetStalkOnUnreachable(soap* s,
-						 ns1__hostIDType* host_id,
-						 centreonscheduler__hostGetStalkOnUnreachableResponse& res) {
+int centreonengine__hostGetStalkOnUnreachable(soap* s,
+					      ns1__hostIDType* host_id,
+					      centreonengine__hostGetStalkOnUnreachableResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -3879,9 +3879,9 @@ int centreonscheduler__hostGetStalkOnUnreachable(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostGetStalkOnUp(soap* s,
-					ns1__hostIDType* host_id,
-					centreonscheduler__hostGetStalkOnUpResponse& res) {
+int centreonengine__hostGetStalkOnUp(soap* s,
+				     ns1__hostIDType* host_id,
+				     centreonengine__hostGetStalkOnUpResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -3917,10 +3917,10 @@ int centreonscheduler__hostGetStalkOnUp(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostSetStalkOnDown(soap* s,
-					  ns1__hostIDType* host_id,
-					  bool enable,
-					  centreonscheduler__hostSetStalkOnDownResponse& res) {
+int centreonengine__hostSetStalkOnDown(soap* s,
+				       ns1__hostIDType* host_id,
+				       bool enable,
+				       centreonengine__hostSetStalkOnDownResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -3957,10 +3957,10 @@ int centreonscheduler__hostSetStalkOnDown(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostSetStalkOnUnreachable(soap* s,
-						 ns1__hostIDType* host_id,
-						 bool enable,
-						 centreonscheduler__hostSetStalkOnUnreachableResponse& res) {
+int centreonengine__hostSetStalkOnUnreachable(soap* s,
+					      ns1__hostIDType* host_id,
+					      bool enable,
+					      centreonengine__hostSetStalkOnUnreachableResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -3997,10 +3997,10 @@ int centreonscheduler__hostSetStalkOnUnreachable(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostSetStalkOnUp(soap* s,
-					ns1__hostIDType* host_id,
-					bool enable,
-					centreonscheduler__hostSetStalkOnUpResponse& res) {
+int centreonengine__hostSetStalkOnUp(soap* s,
+				     ns1__hostIDType* host_id,
+				     bool enable,
+				     centreonengine__hostSetStalkOnUpResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -4036,9 +4036,9 @@ int centreonscheduler__hostSetStalkOnUp(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostGetStateCurrent(soap* s,
-					   ns1__hostIDType* host_id,
-					   centreonscheduler__hostGetStateCurrentResponse& res) {
+int centreonengine__hostGetStateCurrent(soap* s,
+					ns1__hostIDType* host_id,
+					centreonengine__hostGetStateCurrentResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -4073,9 +4073,9 @@ int centreonscheduler__hostGetStateCurrent(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostGetStateInitial(soap* s,
-					   ns1__hostIDType* host_id,
-					   centreonscheduler__hostGetStateInitialResponse& res) {
+int centreonengine__hostGetStateInitial(soap* s,
+					ns1__hostIDType* host_id,
+					centreonengine__hostGetStateInitialResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -4110,9 +4110,9 @@ int centreonscheduler__hostGetStateInitial(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostGetStateLast(soap* s,
-					ns1__hostIDType* host_id,
-					centreonscheduler__hostGetStateLastResponse& res) {
+int centreonengine__hostGetStateLast(soap* s,
+				     ns1__hostIDType* host_id,
+				     centreonengine__hostGetStateLastResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -4147,9 +4147,9 @@ int centreonscheduler__hostGetStateLast(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostGetStateLastChange(soap* s,
-					      ns1__hostIDType* host_id,
-					      centreonscheduler__hostGetStateLastChangeResponse& res) {
+int centreonengine__hostGetStateLastChange(soap* s,
+					   ns1__hostIDType* host_id,
+					   centreonengine__hostGetStateLastChangeResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -4184,9 +4184,9 @@ int centreonscheduler__hostGetStateLastChange(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostGetStateLastDown(soap* s,
-					    ns1__hostIDType* host_id,
-					    centreonscheduler__hostGetStateLastDownResponse& res) {
+int centreonengine__hostGetStateLastDown(soap* s,
+					 ns1__hostIDType* host_id,
+					 centreonengine__hostGetStateLastDownResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -4221,9 +4221,9 @@ int centreonscheduler__hostGetStateLastDown(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostGetStateLastHard(soap* s,
-					    ns1__hostIDType* host_id,
-					    centreonscheduler__hostGetStateLastHardResponse& res) {
+int centreonengine__hostGetStateLastHard(soap* s,
+					 ns1__hostIDType* host_id,
+					 centreonengine__hostGetStateLastHardResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -4258,9 +4258,9 @@ int centreonscheduler__hostGetStateLastHard(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostGetStateLastHardChange(soap* s,
-						  ns1__hostIDType* host_id,
-						  centreonscheduler__hostGetStateLastHardChangeResponse& res) {
+int centreonengine__hostGetStateLastHardChange(soap* s,
+					       ns1__hostIDType* host_id,
+					       centreonengine__hostGetStateLastHardChangeResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -4295,9 +4295,9 @@ int centreonscheduler__hostGetStateLastHardChange(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostGetStateLastUnreachable(soap* s,
-						   ns1__hostIDType* host_id,
-						   centreonscheduler__hostGetStateLastUnreachableResponse& res) {
+int centreonengine__hostGetStateLastUnreachable(soap* s,
+						ns1__hostIDType* host_id,
+						centreonengine__hostGetStateLastUnreachableResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -4332,9 +4332,9 @@ int centreonscheduler__hostGetStateLastUnreachable(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostGetStateLastUp(soap* s,
-					  ns1__hostIDType* host_id,
-					  centreonscheduler__hostGetStateLastUpResponse& res) {
+int centreonengine__hostGetStateLastUp(soap* s,
+				       ns1__hostIDType* host_id,
+				       centreonengine__hostGetStateLastUpResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -4369,9 +4369,9 @@ int centreonscheduler__hostGetStateLastUp(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostGetStatePercentChange(soap* s,
-						 ns1__hostIDType* host_id,
-						 centreonscheduler__hostGetStatePercentChangeResponse& res) {
+int centreonengine__hostGetStatePercentChange(soap* s,
+					      ns1__hostIDType* host_id,
+					      centreonengine__hostGetStatePercentChangeResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -4406,9 +4406,9 @@ int centreonscheduler__hostGetStatePercentChange(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostGetStateType(soap* s,
-					ns1__hostIDType* host_id,
-					centreonscheduler__hostGetStateTypeResponse& res) {
+int centreonengine__hostGetStateType(soap* s,
+				     ns1__hostIDType* host_id,
+				     centreonengine__hostGetStateTypeResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -4444,10 +4444,10 @@ int centreonscheduler__hostGetStateType(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostSetNotificationsBeyondEnabled(soap* s,
-							 ns1__hostIDType* host_id,
-							 bool enable,
-							 centreonscheduler__hostSetNotificationsBeyondEnabledResponse& res) {
+int centreonengine__hostSetNotificationsBeyondEnabled(soap* s,
+						      ns1__hostIDType* host_id,
+						      bool enable,
+						      centreonengine__hostSetNotificationsBeyondEnabledResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -4488,10 +4488,10 @@ int centreonscheduler__hostSetNotificationsBeyondEnabled(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostSetNotificationsOnSelfAndChildrenEnabled(soap* s,
-								    ns1__hostIDType* host_id,
-								    bool enable,
-								    centreonscheduler__hostSetNotificationsOnSelfAndChildrenEnabledResponse& res) {
+int centreonengine__hostSetNotificationsOnSelfAndChildrenEnabled(soap* s,
+								 ns1__hostIDType* host_id,
+								 bool enable,
+								 centreonengine__hostSetNotificationsOnSelfAndChildrenEnabledResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -4533,10 +4533,10 @@ int centreonscheduler__hostSetNotificationsOnSelfAndChildrenEnabled(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostSetNotificationsPeriod(soap* s,
-						  ns1__hostIDType* host_id,
-						  ns1__timeperiodIDType* timeperiod_id,
-						  centreonscheduler__hostSetNotificationsPeriodResponse& res) {
+int centreonengine__hostSetNotificationsPeriod(soap* s,
+					       ns1__hostIDType* host_id,
+					       ns1__timeperiodIDType* timeperiod_id,
+					       centreonengine__hostSetNotificationsPeriodResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -4574,9 +4574,9 @@ int centreonscheduler__hostSetNotificationsPeriod(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceGetAcknowledgementIsSet(soap* s,
-						      ns1__serviceIDType* service_id,
-						      centreonscheduler__serviceGetAcknowledgementIsSetResponse& res) {
+int centreonengine__serviceGetAcknowledgementIsSet(soap* s,
+						   ns1__serviceIDType* service_id,
+						   centreonengine__serviceGetAcknowledgementIsSetResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -4613,9 +4613,9 @@ int centreonscheduler__serviceGetAcknowledgementIsSet(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceGetAcknowledgementType(soap* s,
-						     ns1__serviceIDType* service_id,
-						     centreonscheduler__serviceGetAcknowledgementTypeResponse& res) {
+int centreonengine__serviceGetAcknowledgementType(soap* s,
+						  ns1__serviceIDType* service_id,
+						  centreonengine__serviceGetAcknowledgementTypeResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -4652,9 +4652,9 @@ int centreonscheduler__serviceGetAcknowledgementType(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceGetCheckActiveEnabled(soap* s,
-						    ns1__serviceIDType* service_id,
-						    centreonscheduler__serviceGetCheckActiveEnabledResponse& res) {
+int centreonengine__serviceGetCheckActiveEnabled(soap* s,
+						 ns1__serviceIDType* service_id,
+						 centreonengine__serviceGetCheckActiveEnabledResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -4691,9 +4691,9 @@ int centreonscheduler__serviceGetCheckActiveEnabled(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceGetCheckCommand(soap* s,
-					      ns1__serviceIDType* service_id,
-					      centreonscheduler__serviceGetCheckCommandResponse& res) {
+int centreonengine__serviceGetCheckCommand(soap* s,
+					   ns1__serviceIDType* service_id,
+					   centreonengine__serviceGetCheckCommandResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -4732,9 +4732,9 @@ int centreonscheduler__serviceGetCheckCommand(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceGetCheckCurrentAttempt(soap* s,
-						     ns1__serviceIDType* service_id,
-						     centreonscheduler__serviceGetCheckCurrentAttemptResponse& res) {
+int centreonengine__serviceGetCheckCurrentAttempt(soap* s,
+						  ns1__serviceIDType* service_id,
+						  centreonengine__serviceGetCheckCurrentAttemptResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -4771,9 +4771,9 @@ int centreonscheduler__serviceGetCheckCurrentAttempt(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceGetCheckIntervalNormal(soap* s,
-						     ns1__serviceIDType* service_id,
-						     centreonscheduler__serviceGetCheckIntervalNormalResponse& res) {
+int centreonengine__serviceGetCheckIntervalNormal(soap* s,
+						  ns1__serviceIDType* service_id,
+						  centreonengine__serviceGetCheckIntervalNormalResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -4810,9 +4810,9 @@ int centreonscheduler__serviceGetCheckIntervalNormal(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceGetCheckIntervalRetry(soap* s,
-						    ns1__serviceIDType* service_id,
-						    centreonscheduler__serviceGetCheckIntervalRetryResponse& res) {
+int centreonengine__serviceGetCheckIntervalRetry(soap* s,
+						 ns1__serviceIDType* service_id,
+						 centreonengine__serviceGetCheckIntervalRetryResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -4849,9 +4849,9 @@ int centreonscheduler__serviceGetCheckIntervalRetry(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceGetCheckLast(soap* s,
-					   ns1__serviceIDType* service_id,
-					   centreonscheduler__serviceGetCheckLastResponse& res) {
+int centreonengine__serviceGetCheckLast(soap* s,
+					ns1__serviceIDType* service_id,
+					centreonengine__serviceGetCheckLastResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -4888,9 +4888,9 @@ int centreonscheduler__serviceGetCheckLast(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceGetCheckMaxAttempts(soap* s,
-						  ns1__serviceIDType* service_id,
-						  centreonscheduler__serviceGetCheckMaxAttemptsResponse& res) {
+int centreonengine__serviceGetCheckMaxAttempts(soap* s,
+					       ns1__serviceIDType* service_id,
+					       centreonengine__serviceGetCheckMaxAttemptsResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -4927,9 +4927,9 @@ int centreonscheduler__serviceGetCheckMaxAttempts(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceGetCheckNext(soap* s,
-					   ns1__serviceIDType* service_id,
-					   centreonscheduler__serviceGetCheckNextResponse& res) {
+int centreonengine__serviceGetCheckNext(soap* s,
+					ns1__serviceIDType* service_id,
+					centreonengine__serviceGetCheckNextResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -4966,9 +4966,9 @@ int centreonscheduler__serviceGetCheckNext(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceGetCheckOptions(soap* s,
-					      ns1__serviceIDType* service_id,
-					      centreonscheduler__serviceGetCheckOptionsResponse& res) {
+int centreonengine__serviceGetCheckOptions(soap* s,
+					   ns1__serviceIDType* service_id,
+					   centreonengine__serviceGetCheckOptionsResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -5005,9 +5005,9 @@ int centreonscheduler__serviceGetCheckOptions(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceGetCheckPassiveEnabled(soap* s,
-						     ns1__serviceIDType* service_id,
-						     centreonscheduler__serviceGetCheckPassiveEnabledResponse& res) {
+int centreonengine__serviceGetCheckPassiveEnabled(soap* s,
+						  ns1__serviceIDType* service_id,
+						  centreonengine__serviceGetCheckPassiveEnabledResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -5044,9 +5044,9 @@ int centreonscheduler__serviceGetCheckPassiveEnabled(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceGetCheckPeriod(soap* s,
-					     ns1__serviceIDType* service_id,
-					     centreonscheduler__serviceGetCheckPeriodResponse& res) {
+int centreonengine__serviceGetCheckPeriod(soap* s,
+					  ns1__serviceIDType* service_id,
+					  centreonengine__serviceGetCheckPeriodResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -5085,9 +5085,9 @@ int centreonscheduler__serviceGetCheckPeriod(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceGetCheckShouldBeScheduled(soap* s,
-							ns1__serviceIDType* service_id,
-							centreonscheduler__serviceGetCheckShouldBeScheduledResponse& res) {
+int centreonengine__serviceGetCheckShouldBeScheduled(soap* s,
+						     ns1__serviceIDType* service_id,
+						     centreonengine__serviceGetCheckShouldBeScheduledResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -5124,9 +5124,9 @@ int centreonscheduler__serviceGetCheckShouldBeScheduled(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceGetCheckType(soap* s,
-					   ns1__serviceIDType* service_id,
-					   centreonscheduler__serviceGetCheckTypeResponse& res) {
+int centreonengine__serviceGetCheckType(soap* s,
+					ns1__serviceIDType* service_id,
+					centreonengine__serviceGetCheckTypeResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -5164,10 +5164,10 @@ int centreonscheduler__serviceGetCheckType(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceSetCheckActiveEnabled(soap* s,
-						    ns1__serviceIDType* service_id,
-						    bool enable,
-						    centreonscheduler__serviceSetCheckActiveEnabledResponse& res) {
+int centreonengine__serviceSetCheckActiveEnabled(soap* s,
+						 ns1__serviceIDType* service_id,
+						 bool enable,
+						 centreonengine__serviceSetCheckActiveEnabledResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -5206,10 +5206,10 @@ int centreonscheduler__serviceSetCheckActiveEnabled(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceSetCheckCommand(soap* s,
-					      ns1__serviceIDType* service_id,
-					      std::string command,
-					      centreonscheduler__serviceSetCheckCommandResponse& res) {
+int centreonengine__serviceSetCheckCommand(soap* s,
+					   ns1__serviceIDType* service_id,
+					   std::string command,
+					   centreonengine__serviceSetCheckCommandResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -5254,10 +5254,10 @@ int centreonscheduler__serviceSetCheckCommand(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceSetCheckIntervalNormal(soap* s,
-						     ns1__serviceIDType* service_id,
-						     unsigned int interval,
-						     centreonscheduler__serviceSetCheckIntervalNormalResponse& res) {
+int centreonengine__serviceSetCheckIntervalNormal(soap* s,
+						  ns1__serviceIDType* service_id,
+						  unsigned int interval,
+						  centreonengine__serviceSetCheckIntervalNormalResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -5296,10 +5296,10 @@ int centreonscheduler__serviceSetCheckIntervalNormal(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceSetCheckIntervalRetry(soap* s,
-						    ns1__serviceIDType* service_id,
-						    unsigned int interval,
-						    centreonscheduler__serviceSetCheckIntervalRetryResponse& res) {
+int centreonengine__serviceSetCheckIntervalRetry(soap* s,
+						 ns1__serviceIDType* service_id,
+						 unsigned int interval,
+						 centreonengine__serviceSetCheckIntervalRetryResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -5338,10 +5338,10 @@ int centreonscheduler__serviceSetCheckIntervalRetry(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceSetCheckMaxAttempts(soap* s,
-						  ns1__serviceIDType* service_id,
-						  unsigned int attempts,
-						  centreonscheduler__serviceSetCheckMaxAttemptsResponse& res) {
+int centreonengine__serviceSetCheckMaxAttempts(soap* s,
+					       ns1__serviceIDType* service_id,
+					       unsigned int attempts,
+					       centreonengine__serviceSetCheckMaxAttemptsResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -5391,10 +5391,10 @@ int centreonscheduler__serviceSetCheckMaxAttempts(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceSetCheckPassiveEnabled(soap* s,
-						     ns1__serviceIDType* service_id,
-						     bool enable,
-						     centreonscheduler__serviceSetCheckPassiveEnabledResponse& res) {
+int centreonengine__serviceSetCheckPassiveEnabled(soap* s,
+						  ns1__serviceIDType* service_id,
+						  bool enable,
+						  centreonengine__serviceSetCheckPassiveEnabledResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -5433,10 +5433,10 @@ int centreonscheduler__serviceSetCheckPassiveEnabled(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceGetCustomVariable(soap* s,
-						ns1__serviceIDType* service_id,
-						std::string variable,
-						centreonscheduler__serviceGetCustomVariableResponse& res) {
+int centreonengine__serviceGetCustomVariable(soap* s,
+					     ns1__serviceIDType* service_id,
+					     std::string variable,
+					     centreonengine__serviceGetCustomVariableResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -5492,9 +5492,9 @@ int centreonscheduler__serviceGetCustomVariable(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceGetDowntimeDepth(soap* s,
-					       ns1__serviceIDType* service_id,
-					       centreonscheduler__serviceGetDowntimeDepthResponse& res) {
+int centreonengine__serviceGetDowntimeDepth(soap* s,
+					    ns1__serviceIDType* service_id,
+					    centreonengine__serviceGetDowntimeDepthResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -5531,9 +5531,9 @@ int centreonscheduler__serviceGetDowntimeDepth(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceGetDowntimeFlexPending(soap* s,
-						     ns1__serviceIDType* service_id,
-						     centreonscheduler__serviceGetDowntimeFlexPendingResponse& res) {
+int centreonengine__serviceGetDowntimeFlexPending(soap* s,
+						  ns1__serviceIDType* service_id,
+						  centreonengine__serviceGetDowntimeFlexPendingResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -5570,9 +5570,9 @@ int centreonscheduler__serviceGetDowntimeFlexPending(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceGetEventHandler(soap* s,
-					      ns1__serviceIDType* service_id,
-					      centreonscheduler__serviceGetEventHandlerResponse& res) {
+int centreonengine__serviceGetEventHandler(soap* s,
+					   ns1__serviceIDType* service_id,
+					   centreonengine__serviceGetEventHandlerResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -5611,9 +5611,9 @@ int centreonscheduler__serviceGetEventHandler(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceGetEventHandlerEnabled(soap* s,
-						     ns1__serviceIDType* service_id,
-						     centreonscheduler__serviceGetEventHandlerEnabledResponse& res) {
+int centreonengine__serviceGetEventHandlerEnabled(soap* s,
+						  ns1__serviceIDType* service_id,
+						  centreonengine__serviceGetEventHandlerEnabledResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -5651,10 +5651,10 @@ int centreonscheduler__serviceGetEventHandlerEnabled(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceSetEventHandler(soap* s,
-					      ns1__serviceIDType* service_id,
-					      std::string event_handler,
-					      centreonscheduler__serviceSetEventHandlerResponse& res) {
+int centreonengine__serviceSetEventHandler(soap* s,
+					   ns1__serviceIDType* service_id,
+					   std::string event_handler,
+					   centreonengine__serviceSetEventHandlerResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -5699,10 +5699,10 @@ int centreonscheduler__serviceSetEventHandler(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceSetEventHandlerEnabled(soap* s,
-						     ns1__serviceIDType* service_id,
-						     bool enable,
-						     centreonscheduler__serviceSetEventHandlerEnabledResponse& res) {
+int centreonengine__serviceSetEventHandlerEnabled(soap* s,
+						  ns1__serviceIDType* service_id,
+						  bool enable,
+						  centreonengine__serviceSetEventHandlerEnabledResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -5740,9 +5740,9 @@ int centreonscheduler__serviceSetEventHandlerEnabled(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceGetFailurePredictionEnabled(soap* s,
-							  ns1__serviceIDType* service_id,
-							  centreonscheduler__serviceGetFailurePredictionEnabledResponse& res) {
+int centreonengine__serviceGetFailurePredictionEnabled(soap* s,
+						       ns1__serviceIDType* service_id,
+						       centreonengine__serviceGetFailurePredictionEnabledResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -5774,9 +5774,9 @@ int centreonscheduler__serviceGetFailurePredictionEnabled(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceGetFailurePredictionOptions(soap* s,
-							  ns1__serviceIDType* service_id,
-							  centreonscheduler__serviceGetFailurePredictionOptionsResponse& res) {
+int centreonengine__serviceGetFailurePredictionOptions(soap* s,
+						       ns1__serviceIDType* service_id,
+						       centreonengine__serviceGetFailurePredictionOptionsResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -5816,10 +5816,10 @@ int centreonscheduler__serviceGetFailurePredictionOptions(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceSetFailurePredictionEnabled(soap* s,
-							  ns1__serviceIDType* service_id,
-							  bool enable,
-							  centreonscheduler__serviceSetFailurePredictionEnabledResponse& res) {
+int centreonengine__serviceSetFailurePredictionEnabled(soap* s,
+						       ns1__serviceIDType* service_id,
+						       bool enable,
+						       centreonengine__serviceSetFailurePredictionEnabledResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -5857,9 +5857,9 @@ int centreonscheduler__serviceSetFailurePredictionEnabled(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceGetFlapDetectionCommentID(soap* s,
-							ns1__serviceIDType* service_id,
-							centreonscheduler__serviceGetFlapDetectionCommentIDResponse& res) {
+int centreonengine__serviceGetFlapDetectionCommentID(soap* s,
+						     ns1__serviceIDType* service_id,
+						     centreonengine__serviceGetFlapDetectionCommentIDResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -5896,9 +5896,9 @@ int centreonscheduler__serviceGetFlapDetectionCommentID(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceGetFlapDetectionEnabled(soap* s,
-						      ns1__serviceIDType* service_id,
-						      centreonscheduler__serviceGetFlapDetectionEnabledResponse& res) {
+int centreonengine__serviceGetFlapDetectionEnabled(soap* s,
+						   ns1__serviceIDType* service_id,
+						   centreonengine__serviceGetFlapDetectionEnabledResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -5935,9 +5935,9 @@ int centreonscheduler__serviceGetFlapDetectionEnabled(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceGetFlapDetectionIsFlapping(soap* s,
-							 ns1__serviceIDType* service_id,
-							 centreonscheduler__serviceGetFlapDetectionIsFlappingResponse& res) {
+int centreonengine__serviceGetFlapDetectionIsFlapping(soap* s,
+						      ns1__serviceIDType* service_id,
+						      centreonengine__serviceGetFlapDetectionIsFlappingResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -5974,9 +5974,9 @@ int centreonscheduler__serviceGetFlapDetectionIsFlapping(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceGetFlapDetectionOnCritical(soap* s,
-							 ns1__serviceIDType* service_id,
-							 centreonscheduler__serviceGetFlapDetectionOnCriticalResponse& res) {
+int centreonengine__serviceGetFlapDetectionOnCritical(soap* s,
+						      ns1__serviceIDType* service_id,
+						      centreonengine__serviceGetFlapDetectionOnCriticalResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -6013,9 +6013,9 @@ int centreonscheduler__serviceGetFlapDetectionOnCritical(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceGetFlapDetectionOnOk(soap* s,
-						   ns1__serviceIDType* service_id,
-						   centreonscheduler__serviceGetFlapDetectionOnOkResponse& res) {
+int centreonengine__serviceGetFlapDetectionOnOk(soap* s,
+						ns1__serviceIDType* service_id,
+						centreonengine__serviceGetFlapDetectionOnOkResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -6052,9 +6052,9 @@ int centreonscheduler__serviceGetFlapDetectionOnOk(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceGetFlapDetectionOnUnknown(soap* s,
-							ns1__serviceIDType* service_id,
-							centreonscheduler__serviceGetFlapDetectionOnUnknownResponse& res) {
+int centreonengine__serviceGetFlapDetectionOnUnknown(soap* s,
+						     ns1__serviceIDType* service_id,
+						     centreonengine__serviceGetFlapDetectionOnUnknownResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -6091,9 +6091,9 @@ int centreonscheduler__serviceGetFlapDetectionOnUnknown(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceGetFlapDetectionOnWarning(soap* s,
-							ns1__serviceIDType* service_id,
-							centreonscheduler__serviceGetFlapDetectionOnWarningResponse& res) {
+int centreonengine__serviceGetFlapDetectionOnWarning(soap* s,
+						     ns1__serviceIDType* service_id,
+						     centreonengine__serviceGetFlapDetectionOnWarningResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -6130,9 +6130,9 @@ int centreonscheduler__serviceGetFlapDetectionOnWarning(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceGetFlapDetectionThresholdHigh(soap* s,
-							    ns1__serviceIDType* service_id,
-							    centreonscheduler__serviceGetFlapDetectionThresholdHighResponse& res) {
+int centreonengine__serviceGetFlapDetectionThresholdHigh(soap* s,
+							 ns1__serviceIDType* service_id,
+							 centreonengine__serviceGetFlapDetectionThresholdHighResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -6169,9 +6169,9 @@ int centreonscheduler__serviceGetFlapDetectionThresholdHigh(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceGetFlapDetectionThresholdLow(soap* s,
-							   ns1__serviceIDType* service_id,
-							   centreonscheduler__serviceGetFlapDetectionThresholdLowResponse& res) {
+int centreonengine__serviceGetFlapDetectionThresholdLow(soap* s,
+							ns1__serviceIDType* service_id,
+							centreonengine__serviceGetFlapDetectionThresholdLowResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -6209,10 +6209,10 @@ int centreonscheduler__serviceGetFlapDetectionThresholdLow(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceSetFlapDetectionEnabled(soap* s,
-						      ns1__serviceIDType* service_id,
-						      bool enable,
-						      centreonscheduler__serviceSetFlapDetectionEnabledResponse& res) {
+int centreonengine__serviceSetFlapDetectionEnabled(soap* s,
+						   ns1__serviceIDType* service_id,
+						   bool enable,
+						   centreonengine__serviceSetFlapDetectionEnabledResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -6251,10 +6251,10 @@ int centreonscheduler__serviceSetFlapDetectionEnabled(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceSetFlapDetectionOnCritical(soap* s,
-							 ns1__serviceIDType* service_id,
-							 bool enable,
-							 centreonscheduler__serviceSetFlapDetectionOnCriticalResponse& res) {
+int centreonengine__serviceSetFlapDetectionOnCritical(soap* s,
+						      ns1__serviceIDType* service_id,
+						      bool enable,
+						      centreonengine__serviceSetFlapDetectionOnCriticalResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -6293,10 +6293,10 @@ int centreonscheduler__serviceSetFlapDetectionOnCritical(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceSetFlapDetectionOnOk(soap* s,
-						   ns1__serviceIDType* service_id,
-						   bool enable,
-						   centreonscheduler__serviceSetFlapDetectionOnOkResponse& res) {
+int centreonengine__serviceSetFlapDetectionOnOk(soap* s,
+						ns1__serviceIDType* service_id,
+						bool enable,
+						centreonengine__serviceSetFlapDetectionOnOkResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -6335,10 +6335,10 @@ int centreonscheduler__serviceSetFlapDetectionOnOk(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceSetFlapDetectionOnUnknown(soap* s,
-							ns1__serviceIDType* service_id,
-							bool enable,
-							centreonscheduler__serviceSetFlapDetectionOnUnknownResponse& res) {
+int centreonengine__serviceSetFlapDetectionOnUnknown(soap* s,
+						     ns1__serviceIDType* service_id,
+						     bool enable,
+						     centreonengine__serviceSetFlapDetectionOnUnknownResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -6377,10 +6377,10 @@ int centreonscheduler__serviceSetFlapDetectionOnUnknown(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceSetFlapDetectionOnWarning(soap* s,
-							ns1__serviceIDType* service_id,
-							bool enable,
-							centreonscheduler__serviceSetFlapDetectionOnWarningResponse& res) {
+int centreonengine__serviceSetFlapDetectionOnWarning(soap* s,
+						     ns1__serviceIDType* service_id,
+						     bool enable,
+						     centreonengine__serviceSetFlapDetectionOnWarningResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -6419,10 +6419,10 @@ int centreonscheduler__serviceSetFlapDetectionOnWarning(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceSetFlapDetectionThresholdHigh(soap* s,
-							    ns1__serviceIDType* service_id,
-							    double threshold,
-							    centreonscheduler__serviceSetFlapDetectionThresholdHighResponse& res) {
+int centreonengine__serviceSetFlapDetectionThresholdHigh(soap* s,
+							 ns1__serviceIDType* service_id,
+							 double threshold,
+							 centreonengine__serviceSetFlapDetectionThresholdHighResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -6461,10 +6461,10 @@ int centreonscheduler__serviceSetFlapDetectionThresholdHigh(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceSetFlapDetectionThresholdLow(soap* s,
-							   ns1__serviceIDType* service_id,
-							   double threshold,
-							   centreonscheduler__serviceSetFlapDetectionThresholdLowResponse& res) {
+int centreonengine__serviceSetFlapDetectionThresholdLow(soap* s,
+							ns1__serviceIDType* service_id,
+							double threshold,
+							centreonengine__serviceSetFlapDetectionThresholdLowResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -6502,9 +6502,9 @@ int centreonscheduler__serviceSetFlapDetectionThresholdLow(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceGetFreshnessCheckEnabled(soap* s,
-						       ns1__serviceIDType* service_id,
-						       centreonscheduler__serviceGetFreshnessCheckEnabledResponse& res) {
+int centreonengine__serviceGetFreshnessCheckEnabled(soap* s,
+						    ns1__serviceIDType* service_id,
+						    centreonengine__serviceGetFreshnessCheckEnabledResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -6541,9 +6541,9 @@ int centreonscheduler__serviceGetFreshnessCheckEnabled(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceGetFreshnessIsActive(soap* s,
-						   ns1__serviceIDType* service_id,
-						   centreonscheduler__serviceGetFreshnessIsActiveResponse& res) {
+int centreonengine__serviceGetFreshnessIsActive(soap* s,
+						ns1__serviceIDType* service_id,
+						centreonengine__serviceGetFreshnessIsActiveResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -6580,9 +6580,9 @@ int centreonscheduler__serviceGetFreshnessIsActive(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceGetFreshnessThreshold(soap* s,
-						    ns1__serviceIDType* service_id,
-						    centreonscheduler__serviceGetFreshnessThresholdResponse& res) {
+int centreonengine__serviceGetFreshnessThreshold(soap* s,
+						 ns1__serviceIDType* service_id,
+						 centreonengine__serviceGetFreshnessThresholdResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -6620,10 +6620,10 @@ int centreonscheduler__serviceGetFreshnessThreshold(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceSetFreshnessCheckEnabled(soap* s,
-						       ns1__serviceIDType* service_id,
-						       bool enable,
-						       centreonscheduler__serviceSetFreshnessCheckEnabledResponse& res) {
+int centreonengine__serviceSetFreshnessCheckEnabled(soap* s,
+						    ns1__serviceIDType* service_id,
+						    bool enable,
+						    centreonengine__serviceSetFreshnessCheckEnabledResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -6662,10 +6662,10 @@ int centreonscheduler__serviceSetFreshnessCheckEnabled(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceSetFreshnessThreshold(soap* s,
-						    ns1__serviceIDType* service_id,
-						    int threshold,
-						    centreonscheduler__serviceSetFreshnessThresholdResponse& res) {
+int centreonengine__serviceSetFreshnessThreshold(soap* s,
+						 ns1__serviceIDType* service_id,
+						 int threshold,
+						 centreonengine__serviceSetFreshnessThresholdResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -6703,9 +6703,9 @@ int centreonscheduler__serviceSetFreshnessThreshold(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceGetModifiedAttributes(soap* s,
-						    ns1__serviceIDType* service_id,
-						    centreonscheduler__serviceGetModifiedAttributesResponse& res) {
+int centreonengine__serviceGetModifiedAttributes(soap* s,
+						 ns1__serviceIDType* service_id,
+						 centreonengine__serviceGetModifiedAttributesResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -6742,9 +6742,9 @@ int centreonscheduler__serviceGetModifiedAttributes(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceGetNameDisplay(soap* s,
-					     ns1__serviceIDType* service_id,
-					     centreonscheduler__serviceGetNameDisplayResponse& res) {
+int centreonengine__serviceGetNameDisplay(soap* s,
+					  ns1__serviceIDType* service_id,
+					  centreonengine__serviceGetNameDisplayResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -6784,10 +6784,10 @@ int centreonscheduler__serviceGetNameDisplay(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceSetNameDisplay(soap* s,
-					     ns1__serviceIDType* service_id,
-					     std::string name,
-					     centreonscheduler__serviceSetNameDisplayResponse& res) {
+int centreonengine__serviceSetNameDisplay(soap* s,
+					  ns1__serviceIDType* service_id,
+					  std::string name,
+					  centreonengine__serviceSetNameDisplayResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -6831,9 +6831,9 @@ int centreonscheduler__serviceSetNameDisplay(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceGetNotificationsCurrentID(soap* s,
-							ns1__serviceIDType* service_id,
-							centreonscheduler__serviceGetNotificationsCurrentIDResponse& res) {
+int centreonengine__serviceGetNotificationsCurrentID(soap* s,
+						     ns1__serviceIDType* service_id,
+						     centreonengine__serviceGetNotificationsCurrentIDResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -6870,9 +6870,9 @@ int centreonscheduler__serviceGetNotificationsCurrentID(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceGetNotificationsCurrentNumber(soap* s,
-							    ns1__serviceIDType* service_id,
-							    centreonscheduler__serviceGetNotificationsCurrentNumberResponse& res) {
+int centreonengine__serviceGetNotificationsCurrentNumber(soap* s,
+							 ns1__serviceIDType* service_id,
+							 centreonengine__serviceGetNotificationsCurrentNumberResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -6909,9 +6909,9 @@ int centreonscheduler__serviceGetNotificationsCurrentNumber(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceGetNotificationsEnabled(soap* s,
-						      ns1__serviceIDType* service_id,
-						      centreonscheduler__serviceGetNotificationsEnabledResponse& res) {
+int centreonengine__serviceGetNotificationsEnabled(soap* s,
+						   ns1__serviceIDType* service_id,
+						   centreonengine__serviceGetNotificationsEnabledResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -6948,9 +6948,9 @@ int centreonscheduler__serviceGetNotificationsEnabled(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceGetNotificationsFirstDelay(soap* s,
-							 ns1__serviceIDType* service_id,
-							 centreonscheduler__serviceGetNotificationsFirstDelayResponse& res) {
+int centreonengine__serviceGetNotificationsFirstDelay(soap* s,
+						      ns1__serviceIDType* service_id,
+						      centreonengine__serviceGetNotificationsFirstDelayResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -6987,9 +6987,9 @@ int centreonscheduler__serviceGetNotificationsFirstDelay(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceGetNotificationsInterval(soap* s,
-						       ns1__serviceIDType* service_id,
-						       centreonscheduler__serviceGetNotificationsIntervalResponse& res) {
+int centreonengine__serviceGetNotificationsInterval(soap* s,
+						    ns1__serviceIDType* service_id,
+						    centreonengine__serviceGetNotificationsIntervalResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -7026,9 +7026,9 @@ int centreonscheduler__serviceGetNotificationsInterval(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceGetNotificationsLast(soap* s,
-						   ns1__serviceIDType* service_id,
-						   centreonscheduler__serviceGetNotificationsLastResponse& res) {
+int centreonengine__serviceGetNotificationsLast(soap* s,
+						ns1__serviceIDType* service_id,
+						centreonengine__serviceGetNotificationsLastResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -7065,9 +7065,9 @@ int centreonscheduler__serviceGetNotificationsLast(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceGetNotificationsNext(soap* s,
-						   ns1__serviceIDType* service_id,
-						   centreonscheduler__serviceGetNotificationsNextResponse& res) {
+int centreonengine__serviceGetNotificationsNext(soap* s,
+						ns1__serviceIDType* service_id,
+						centreonengine__serviceGetNotificationsNextResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -7104,9 +7104,9 @@ int centreonscheduler__serviceGetNotificationsNext(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceGetNotificationsOnCritical(soap* s,
-							 ns1__serviceIDType* service_id,
-							 centreonscheduler__serviceGetNotificationsOnCriticalResponse& res) {
+int centreonengine__serviceGetNotificationsOnCritical(soap* s,
+						      ns1__serviceIDType* service_id,
+						      centreonengine__serviceGetNotificationsOnCriticalResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -7143,9 +7143,9 @@ int centreonscheduler__serviceGetNotificationsOnCritical(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceGetNotificationsOnDowntime(soap* s,
-							 ns1__serviceIDType* service_id,
-							 centreonscheduler__serviceGetNotificationsOnDowntimeResponse& res) {
+int centreonengine__serviceGetNotificationsOnDowntime(soap* s,
+						      ns1__serviceIDType* service_id,
+						      centreonengine__serviceGetNotificationsOnDowntimeResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -7182,9 +7182,9 @@ int centreonscheduler__serviceGetNotificationsOnDowntime(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceGetNotificationsOnFlapping(soap* s,
-							 ns1__serviceIDType* service_id,
-							 centreonscheduler__serviceGetNotificationsOnFlappingResponse& res) {
+int centreonengine__serviceGetNotificationsOnFlapping(soap* s,
+						      ns1__serviceIDType* service_id,
+						      centreonengine__serviceGetNotificationsOnFlappingResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -7221,9 +7221,9 @@ int centreonscheduler__serviceGetNotificationsOnFlapping(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceGetNotificationsOnRecovery(soap* s,
-							 ns1__serviceIDType* service_id,
-							 centreonscheduler__serviceGetNotificationsOnRecoveryResponse& res) {
+int centreonengine__serviceGetNotificationsOnRecovery(soap* s,
+						      ns1__serviceIDType* service_id,
+						      centreonengine__serviceGetNotificationsOnRecoveryResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -7260,9 +7260,9 @@ int centreonscheduler__serviceGetNotificationsOnRecovery(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceGetNotificationsOnUnknown(soap* s,
-							ns1__serviceIDType* service_id,
-							centreonscheduler__serviceGetNotificationsOnUnknownResponse& res) {
+int centreonengine__serviceGetNotificationsOnUnknown(soap* s,
+						     ns1__serviceIDType* service_id,
+						     centreonengine__serviceGetNotificationsOnUnknownResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -7299,9 +7299,9 @@ int centreonscheduler__serviceGetNotificationsOnUnknown(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceGetNotificationsOnWarning(soap* s,
-							ns1__serviceIDType* service_id,
-							centreonscheduler__serviceGetNotificationsOnWarningResponse& res) {
+int centreonengine__serviceGetNotificationsOnWarning(soap* s,
+						     ns1__serviceIDType* service_id,
+						     centreonengine__serviceGetNotificationsOnWarningResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -7338,9 +7338,9 @@ int centreonscheduler__serviceGetNotificationsOnWarning(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceGetNotificationsPeriod(soap* s,
-						     ns1__serviceIDType* service_id,
-						     centreonscheduler__serviceGetNotificationsPeriodResponse& res) {
+int centreonengine__serviceGetNotificationsPeriod(soap* s,
+						  ns1__serviceIDType* service_id,
+						  centreonengine__serviceGetNotificationsPeriodResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -7380,10 +7380,10 @@ int centreonscheduler__serviceGetNotificationsPeriod(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceSetNotificationsEnabled(soap* s,
-						      ns1__serviceIDType* service_id,
-						      bool enable,
-						      centreonscheduler__serviceSetNotificationsEnabledResponse& res) {
+int centreonengine__serviceSetNotificationsEnabled(soap* s,
+						   ns1__serviceIDType* service_id,
+						   bool enable,
+						   centreonengine__serviceSetNotificationsEnabledResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -7422,10 +7422,10 @@ int centreonscheduler__serviceSetNotificationsEnabled(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceSetNotificationsFirstDelay(soap* s,
-							 ns1__serviceIDType* service_id,
-							 unsigned int delay,
-							 centreonscheduler__serviceSetNotificationsFirstDelayResponse& res) {
+int centreonengine__serviceSetNotificationsFirstDelay(soap* s,
+						      ns1__serviceIDType* service_id,
+						      unsigned int delay,
+						      centreonengine__serviceSetNotificationsFirstDelayResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -7464,10 +7464,10 @@ int centreonscheduler__serviceSetNotificationsFirstDelay(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceSetNotificationsInterval(soap* s,
-						       ns1__serviceIDType* service_id,
-						       unsigned int interval,
-						       centreonscheduler__serviceSetNotificationsIntervalResponse& res) {
+int centreonengine__serviceSetNotificationsInterval(soap* s,
+						    ns1__serviceIDType* service_id,
+						    unsigned int interval,
+						    centreonengine__serviceSetNotificationsIntervalResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -7506,10 +7506,10 @@ int centreonscheduler__serviceSetNotificationsInterval(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceSetNotificationsOnCritical(soap* s,
-							 ns1__serviceIDType* service_id,
-							 bool enable,
-							 centreonscheduler__serviceSetNotificationsOnCriticalResponse& res) {
+int centreonengine__serviceSetNotificationsOnCritical(soap* s,
+						      ns1__serviceIDType* service_id,
+						      bool enable,
+						      centreonengine__serviceSetNotificationsOnCriticalResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -7548,10 +7548,10 @@ int centreonscheduler__serviceSetNotificationsOnCritical(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceSetNotificationsOnDowntime(soap* s,
-							 ns1__serviceIDType* service_id,
-							 bool enable,
-							 centreonscheduler__serviceSetNotificationsOnDowntimeResponse& res) {
+int centreonengine__serviceSetNotificationsOnDowntime(soap* s,
+						      ns1__serviceIDType* service_id,
+						      bool enable,
+						      centreonengine__serviceSetNotificationsOnDowntimeResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -7590,10 +7590,10 @@ int centreonscheduler__serviceSetNotificationsOnDowntime(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceSetNotificationsOnFlapping(soap* s,
-							 ns1__serviceIDType* service_id,
-							 bool enable,
-							 centreonscheduler__serviceSetNotificationsOnFlappingResponse& res) {
+int centreonengine__serviceSetNotificationsOnFlapping(soap* s,
+						      ns1__serviceIDType* service_id,
+						      bool enable,
+						      centreonengine__serviceSetNotificationsOnFlappingResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -7632,10 +7632,10 @@ int centreonscheduler__serviceSetNotificationsOnFlapping(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceSetNotificationsOnRecovery(soap* s,
-							 ns1__serviceIDType* service_id,
-							 bool enable,
-							 centreonscheduler__serviceSetNotificationsOnRecoveryResponse& res) {
+int centreonengine__serviceSetNotificationsOnRecovery(soap* s,
+						      ns1__serviceIDType* service_id,
+						      bool enable,
+						      centreonengine__serviceSetNotificationsOnRecoveryResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -7674,10 +7674,10 @@ int centreonscheduler__serviceSetNotificationsOnRecovery(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceSetNotificationsOnUnknown(soap* s,
-							ns1__serviceIDType* service_id,
-							bool enable,
-							centreonscheduler__serviceSetNotificationsOnUnknownResponse& res) {
+int centreonengine__serviceSetNotificationsOnUnknown(soap* s,
+						     ns1__serviceIDType* service_id,
+						     bool enable,
+						     centreonengine__serviceSetNotificationsOnUnknownResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -7716,10 +7716,10 @@ int centreonscheduler__serviceSetNotificationsOnUnknown(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceSetNotificationsOnWarning(soap* s,
-							ns1__serviceIDType* service_id,
-							bool enable,
-							centreonscheduler__serviceSetNotificationsOnWarningResponse& res) {
+int centreonengine__serviceSetNotificationsOnWarning(soap* s,
+						     ns1__serviceIDType* service_id,
+						     bool enable,
+						     centreonengine__serviceSetNotificationsOnWarningResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -7757,9 +7757,9 @@ int centreonscheduler__serviceSetNotificationsOnWarning(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceGetObsessOver(soap* s,
-					    ns1__serviceIDType* service_id,
-					    centreonscheduler__serviceGetObsessOverResponse& res) {
+int centreonengine__serviceGetObsessOver(soap* s,
+					 ns1__serviceIDType* service_id,
+					 centreonengine__serviceGetObsessOverResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -7797,10 +7797,10 @@ int centreonscheduler__serviceGetObsessOver(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceSetObsessOver(soap* s,
-					    ns1__serviceIDType* service_id,
-					    bool enable,
-					    centreonscheduler__serviceSetObsessOverResponse& res) {
+int centreonengine__serviceSetObsessOver(soap* s,
+					 ns1__serviceIDType* service_id,
+					 bool enable,
+					 centreonengine__serviceSetObsessOverResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -7838,9 +7838,9 @@ int centreonscheduler__serviceSetObsessOver(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceGetPerfdataProcessingEnabled(soap* s,
-							   ns1__serviceIDType* service_id,
-							   centreonscheduler__serviceGetPerfdataProcessingEnabledResponse& res) {
+int centreonengine__serviceGetPerfdataProcessingEnabled(soap* s,
+							ns1__serviceIDType* service_id,
+							centreonengine__serviceGetPerfdataProcessingEnabledResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -7878,10 +7878,10 @@ int centreonscheduler__serviceGetPerfdataProcessingEnabled(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceSetPerfdataProcessingEnabled(soap* s,
-							   ns1__serviceIDType* service_id,
-							   bool enable,
-							   centreonscheduler__serviceSetPerfdataProcessingEnabledResponse& res) {
+int centreonengine__serviceSetPerfdataProcessingEnabled(soap* s,
+							ns1__serviceIDType* service_id,
+							bool enable,
+							centreonengine__serviceSetPerfdataProcessingEnabledResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -7919,9 +7919,9 @@ int centreonscheduler__serviceSetPerfdataProcessingEnabled(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceGetPluginExecutionTime(soap* s,
-						     ns1__serviceIDType* service_id,
-						     centreonscheduler__serviceGetPluginExecutionTimeResponse& res) {
+int centreonengine__serviceGetPluginExecutionTime(soap* s,
+						  ns1__serviceIDType* service_id,
+						  centreonengine__serviceGetPluginExecutionTimeResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -7958,9 +7958,9 @@ int centreonscheduler__serviceGetPluginExecutionTime(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceGetPluginIsExecuting(soap* s,
-						   ns1__serviceIDType* service_id,
-						   centreonscheduler__serviceGetPluginIsExecutingResponse& res) {
+int centreonengine__serviceGetPluginIsExecuting(soap* s,
+						ns1__serviceIDType* service_id,
+						centreonengine__serviceGetPluginIsExecutingResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -7997,9 +7997,9 @@ int centreonscheduler__serviceGetPluginIsExecuting(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceGetPluginLatency(soap* s,
-					       ns1__serviceIDType* service_id,
-					       centreonscheduler__serviceGetPluginLatencyResponse& res) {
+int centreonengine__serviceGetPluginLatency(soap* s,
+					    ns1__serviceIDType* service_id,
+					    centreonengine__serviceGetPluginLatencyResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -8036,9 +8036,9 @@ int centreonscheduler__serviceGetPluginLatency(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceGetPluginOutput(soap* s,
-					      ns1__serviceIDType* service_id,
-					      centreonscheduler__serviceGetPluginOutputResponse& res) {
+int centreonengine__serviceGetPluginOutput(soap* s,
+					   ns1__serviceIDType* service_id,
+					   centreonengine__serviceGetPluginOutputResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -8076,9 +8076,9 @@ int centreonscheduler__serviceGetPluginOutput(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceGetPluginPerfdata(soap* s,
-						ns1__serviceIDType* service_id,
-						centreonscheduler__serviceGetPluginPerfdataResponse& res) {
+int centreonengine__serviceGetPluginPerfdata(soap* s,
+					     ns1__serviceIDType* service_id,
+					     centreonengine__serviceGetPluginPerfdataResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -8117,9 +8117,9 @@ int centreonscheduler__serviceGetPluginPerfdata(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceGetRetainStatusInformation(soap* s,
-							 ns1__serviceIDType* service_id,
-							 centreonscheduler__serviceGetRetainStatusInformationResponse& res) {
+int centreonengine__serviceGetRetainStatusInformation(soap* s,
+						      ns1__serviceIDType* service_id,
+						      centreonengine__serviceGetRetainStatusInformationResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -8156,9 +8156,9 @@ int centreonscheduler__serviceGetRetainStatusInformation(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceGetRetainNonStatusInformation(soap* s,
-							    ns1__serviceIDType* service_id,
-							    centreonscheduler__serviceGetRetainNonStatusInformationResponse& res) {
+int centreonengine__serviceGetRetainNonStatusInformation(soap* s,
+							 ns1__serviceIDType* service_id,
+							 centreonengine__serviceGetRetainNonStatusInformationResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -8196,10 +8196,10 @@ int centreonscheduler__serviceGetRetainNonStatusInformation(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceSetRetainStatusInformation(soap* s,
-							 ns1__serviceIDType* service_id,
-							 bool enable,
-							 centreonscheduler__serviceSetRetainStatusInformationResponse& res) {
+int centreonengine__serviceSetRetainStatusInformation(soap* s,
+						      ns1__serviceIDType* service_id,
+						      bool enable,
+						      centreonengine__serviceSetRetainStatusInformationResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -8238,10 +8238,10 @@ int centreonscheduler__serviceSetRetainStatusInformation(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceSetRetainNonStatusInformation(soap* s,
-							    ns1__serviceIDType* service_id,
-							    bool enable,
-							    centreonscheduler__serviceSetRetainNonStatusInformationResponse& res) {
+int centreonengine__serviceSetRetainNonStatusInformation(soap* s,
+							 ns1__serviceIDType* service_id,
+							 bool enable,
+							 centreonengine__serviceSetRetainNonStatusInformationResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -8279,9 +8279,9 @@ int centreonscheduler__serviceSetRetainNonStatusInformation(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceGetStalkOnCritical(soap* s,
-						 ns1__serviceIDType* service_id,
-						 centreonscheduler__serviceGetStalkOnCriticalResponse& res) {
+int centreonengine__serviceGetStalkOnCritical(soap* s,
+					      ns1__serviceIDType* service_id,
+					      centreonengine__serviceGetStalkOnCriticalResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -8318,9 +8318,9 @@ int centreonscheduler__serviceGetStalkOnCritical(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceGetStalkOnOk(soap* s,
-					   ns1__serviceIDType* service_id,
-					   centreonscheduler__serviceGetStalkOnOkResponse& res) {
+int centreonengine__serviceGetStalkOnOk(soap* s,
+					ns1__serviceIDType* service_id,
+					centreonengine__serviceGetStalkOnOkResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -8357,9 +8357,9 @@ int centreonscheduler__serviceGetStalkOnOk(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceGetStalkOnUnknown(soap* s,
-						ns1__serviceIDType* service_id,
-						centreonscheduler__serviceGetStalkOnUnknownResponse& res) {
+int centreonengine__serviceGetStalkOnUnknown(soap* s,
+					     ns1__serviceIDType* service_id,
+					     centreonengine__serviceGetStalkOnUnknownResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -8396,9 +8396,9 @@ int centreonscheduler__serviceGetStalkOnUnknown(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceGetStalkOnWarning(soap* s,
-						ns1__serviceIDType* service_id,
-						centreonscheduler__serviceGetStalkOnWarningResponse& res) {
+int centreonengine__serviceGetStalkOnWarning(soap* s,
+					     ns1__serviceIDType* service_id,
+					     centreonengine__serviceGetStalkOnWarningResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -8436,10 +8436,10 @@ int centreonscheduler__serviceGetStalkOnWarning(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceSetStalkOnCritical(soap* s,
-						 ns1__serviceIDType* service_id,
-						 bool enable,
-						 centreonscheduler__serviceSetStalkOnCriticalResponse& res) {
+int centreonengine__serviceSetStalkOnCritical(soap* s,
+					      ns1__serviceIDType* service_id,
+					      bool enable,
+					      centreonengine__serviceSetStalkOnCriticalResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -8478,10 +8478,10 @@ int centreonscheduler__serviceSetStalkOnCritical(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceSetStalkOnOk(soap* s,
-					   ns1__serviceIDType* service_id,
-					   bool enable,
-					   centreonscheduler__serviceSetStalkOnOkResponse& res) {
+int centreonengine__serviceSetStalkOnOk(soap* s,
+					ns1__serviceIDType* service_id,
+					bool enable,
+					centreonengine__serviceSetStalkOnOkResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -8520,10 +8520,10 @@ int centreonscheduler__serviceSetStalkOnOk(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceSetStalkOnUnknown(soap* s,
-						ns1__serviceIDType* service_id,
-						bool enable,
-						centreonscheduler__serviceSetStalkOnUnknownResponse& res) {
+int centreonengine__serviceSetStalkOnUnknown(soap* s,
+					     ns1__serviceIDType* service_id,
+					     bool enable,
+					     centreonengine__serviceSetStalkOnUnknownResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -8562,10 +8562,10 @@ int centreonscheduler__serviceSetStalkOnUnknown(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceSetStalkOnWarning(soap* s,
-						ns1__serviceIDType* service_id,
-						bool enable,
-						centreonscheduler__serviceSetStalkOnWarningResponse& res) {
+int centreonengine__serviceSetStalkOnWarning(soap* s,
+					     ns1__serviceIDType* service_id,
+					     bool enable,
+					     centreonengine__serviceSetStalkOnWarningResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -8603,9 +8603,9 @@ int centreonscheduler__serviceSetStalkOnWarning(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceGetStateCurrent(soap* s,
-					      ns1__serviceIDType* service_id,
-					      centreonscheduler__serviceGetStateCurrentResponse& res) {
+int centreonengine__serviceGetStateCurrent(soap* s,
+					   ns1__serviceIDType* service_id,
+					   centreonengine__serviceGetStateCurrentResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -8642,9 +8642,9 @@ int centreonscheduler__serviceGetStateCurrent(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceGetStateInitial(soap* s,
-					      ns1__serviceIDType* service_id,
-					      centreonscheduler__serviceGetStateInitialResponse& res) {
+int centreonengine__serviceGetStateInitial(soap* s,
+					   ns1__serviceIDType* service_id,
+					   centreonengine__serviceGetStateInitialResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -8681,9 +8681,9 @@ int centreonscheduler__serviceGetStateInitial(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceGetStateLast(soap* s,
-					   ns1__serviceIDType* service_id,
-					   centreonscheduler__serviceGetStateLastResponse& res) {
+int centreonengine__serviceGetStateLast(soap* s,
+					ns1__serviceIDType* service_id,
+					centreonengine__serviceGetStateLastResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -8720,9 +8720,9 @@ int centreonscheduler__serviceGetStateLast(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceGetStateLastChange(soap* s,
-						 ns1__serviceIDType* service_id,
-						 centreonscheduler__serviceGetStateLastChangeResponse& res) {
+int centreonengine__serviceGetStateLastChange(soap* s,
+					      ns1__serviceIDType* service_id,
+					      centreonengine__serviceGetStateLastChangeResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -8759,9 +8759,9 @@ int centreonscheduler__serviceGetStateLastChange(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceGetStateLastCritical(soap* s,
-						   ns1__serviceIDType* service_id,
-						   centreonscheduler__serviceGetStateLastCriticalResponse& res) {
+int centreonengine__serviceGetStateLastCritical(soap* s,
+						ns1__serviceIDType* service_id,
+						centreonengine__serviceGetStateLastCriticalResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -8798,9 +8798,9 @@ int centreonscheduler__serviceGetStateLastCritical(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceGetStateLastHard(soap* s,
-					       ns1__serviceIDType* service_id,
-					       centreonscheduler__serviceGetStateLastHardResponse& res) {
+int centreonengine__serviceGetStateLastHard(soap* s,
+					    ns1__serviceIDType* service_id,
+					    centreonengine__serviceGetStateLastHardResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -8837,9 +8837,9 @@ int centreonscheduler__serviceGetStateLastHard(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceGetStateLastHardChange(soap* s,
-						     ns1__serviceIDType* service_id,
-						     centreonscheduler__serviceGetStateLastHardChangeResponse& res) {
+int centreonengine__serviceGetStateLastHardChange(soap* s,
+						  ns1__serviceIDType* service_id,
+						  centreonengine__serviceGetStateLastHardChangeResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -8876,9 +8876,9 @@ int centreonscheduler__serviceGetStateLastHardChange(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceGetStateLastOk(soap* s,
-					     ns1__serviceIDType* service_id,
-					     centreonscheduler__serviceGetStateLastOkResponse& res) {
+int centreonengine__serviceGetStateLastOk(soap* s,
+					  ns1__serviceIDType* service_id,
+					  centreonengine__serviceGetStateLastOkResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -8915,9 +8915,9 @@ int centreonscheduler__serviceGetStateLastOk(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceGetStateLastUnknown(soap* s,
-						  ns1__serviceIDType* service_id,
-						  centreonscheduler__serviceGetStateLastUnknownResponse& res) {
+int centreonengine__serviceGetStateLastUnknown(soap* s,
+					       ns1__serviceIDType* service_id,
+					       centreonengine__serviceGetStateLastUnknownResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -8954,9 +8954,9 @@ int centreonscheduler__serviceGetStateLastUnknown(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceGetStateLastWarning(soap* s,
-						  ns1__serviceIDType* service_id,
-						  centreonscheduler__serviceGetStateLastWarningResponse& res) {
+int centreonengine__serviceGetStateLastWarning(soap* s,
+					       ns1__serviceIDType* service_id,
+					       centreonengine__serviceGetStateLastWarningResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -8993,9 +8993,9 @@ int centreonscheduler__serviceGetStateLastWarning(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceGetStatePercentChange(soap* s,
-						    ns1__serviceIDType* service_id,
-						    centreonscheduler__serviceGetStatePercentChangeResponse& res) {
+int centreonengine__serviceGetStatePercentChange(soap* s,
+						 ns1__serviceIDType* service_id,
+						 centreonengine__serviceGetStatePercentChangeResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -9032,9 +9032,9 @@ int centreonscheduler__serviceGetStatePercentChange(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceGetStateType(soap* s,
-					   ns1__serviceIDType* service_id,
-					   centreonscheduler__serviceGetStateTypeResponse& res) {
+int centreonengine__serviceGetStateType(soap* s,
+					ns1__serviceIDType* service_id,
+					centreonengine__serviceGetStateTypeResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -9072,10 +9072,10 @@ int centreonscheduler__serviceGetStateType(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__acknowledgementOnHostAdd(soap* s,
-						ns1__hostIDType* host_id,
-						ns1__acknowledgementType* acknowledgement_type,
-						centreonscheduler__acknowledgementOnHostAddResponse& res) {
+int centreonengine__acknowledgementOnHostAdd(soap* s,
+					     ns1__hostIDType* host_id,
+					     ns1__acknowledgementType* acknowledgement_type,
+					     centreonengine__acknowledgementOnHostAddResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -9129,9 +9129,9 @@ int centreonscheduler__acknowledgementOnHostAdd(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__acknowledgementOnHostRemove(soap* s,
-						   ns1__hostIDType* host_id,
-						   centreonscheduler__acknowledgementOnHostRemoveResponse& res) {
+int centreonengine__acknowledgementOnHostRemove(soap* s,
+						ns1__hostIDType* host_id,
+						centreonengine__acknowledgementOnHostRemoveResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -9167,10 +9167,10 @@ int centreonscheduler__acknowledgementOnHostRemove(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__acknowledgementOnServiceAdd(soap* s,
-						   ns1__serviceIDType* service_id,
-						   ns1__acknowledgementType* acknowledgement_type,
-						   centreonscheduler__acknowledgementOnServiceAddResponse& res) {
+int centreonengine__acknowledgementOnServiceAdd(soap* s,
+						ns1__serviceIDType* service_id,
+						ns1__acknowledgementType* acknowledgement_type,
+						centreonengine__acknowledgementOnServiceAddResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -9225,9 +9225,9 @@ int centreonscheduler__acknowledgementOnServiceAdd(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__acknowledgementOnServiceRemove(soap* s,
-						      ns1__serviceIDType* service_id,
-						      centreonscheduler__acknowledgementOnServiceRemoveResponse& res) {
+int centreonengine__acknowledgementOnServiceRemove(soap* s,
+						   ns1__serviceIDType* service_id,
+						   centreonengine__acknowledgementOnServiceRemoveResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -9265,10 +9265,10 @@ int centreonscheduler__acknowledgementOnServiceRemove(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__checkHostProcessResult(soap* s,
-					      ns1__hostIDType* host_id,
-					      ns1__checkResultType* result_type,
-					      centreonscheduler__checkHostProcessResultResponse& res) {
+int centreonengine__checkHostProcessResult(soap* s,
+					   ns1__hostIDType* host_id,
+					   ns1__checkResultType* result_type,
+					   centreonengine__checkHostProcessResultResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -9323,10 +9323,10 @@ int centreonscheduler__checkHostProcessResult(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__checkHostSchedule(soap* s,
-					 ns1__hostIDType* host_id,
-					 long delay,
-					 centreonscheduler__checkHostScheduleResponse& res) {
+int centreonengine__checkHostSchedule(soap* s,
+				      ns1__hostIDType* host_id,
+				      long delay,
+				      centreonengine__checkHostScheduleResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -9363,10 +9363,10 @@ int centreonscheduler__checkHostSchedule(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__checkHostScheduleForced(soap* s,
-					       ns1__hostIDType* host_id,
-					       long delay,
-					       centreonscheduler__checkHostScheduleForcedResponse& res) {
+int centreonengine__checkHostScheduleForced(soap* s,
+					    ns1__hostIDType* host_id,
+					    long delay,
+					    centreonengine__checkHostScheduleForcedResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -9403,10 +9403,10 @@ int centreonscheduler__checkHostScheduleForced(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__checkHostScheduleServices(soap* s,
-						 ns1__hostIDType* host_id,
-						 long delay,
-						 centreonscheduler__checkHostScheduleServicesResponse& res) {
+int centreonengine__checkHostScheduleServices(soap* s,
+					      ns1__hostIDType* host_id,
+					      long delay,
+					      centreonengine__checkHostScheduleServicesResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -9448,10 +9448,10 @@ int centreonscheduler__checkHostScheduleServices(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__checkHostScheduleServicesForced(soap* s,
-						       ns1__hostIDType* host_id,
-						       long delay,
-						       centreonscheduler__checkHostScheduleServicesForcedResponse& res) {
+int centreonengine__checkHostScheduleServicesForced(soap* s,
+						    ns1__hostIDType* host_id,
+						    long delay,
+						    centreonengine__checkHostScheduleServicesForcedResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -9493,10 +9493,10 @@ int centreonscheduler__checkHostScheduleServicesForced(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__checkServiceProcessResult(soap* s,
-						 ns1__serviceIDType* service_id,
-						 ns1__checkResultType* result_type,
-						 centreonscheduler__checkServiceProcessResultResponse& res) {
+int centreonengine__checkServiceProcessResult(soap* s,
+					      ns1__serviceIDType* service_id,
+					      ns1__checkResultType* result_type,
+					      centreonengine__checkServiceProcessResultResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -9555,10 +9555,10 @@ int centreonscheduler__checkServiceProcessResult(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__checkServiceSchedule(soap* s,
-					    ns1__serviceIDType* service_id,
-					    long delay,
-					    centreonscheduler__checkServiceScheduleResponse& res) {
+int centreonengine__checkServiceSchedule(soap* s,
+					 ns1__serviceIDType* service_id,
+					 long delay,
+					 centreonengine__checkServiceScheduleResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -9597,10 +9597,10 @@ int centreonscheduler__checkServiceSchedule(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__checkServiceScheduleForced(soap* s,
-						  ns1__serviceIDType* service_id,
-						  long delay,
-						  centreonscheduler__checkServiceScheduleForcedResponse& res) {
+int centreonengine__checkServiceScheduleForced(soap* s,
+					       ns1__serviceIDType* service_id,
+					       long delay,
+					       centreonengine__checkServiceScheduleForcedResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -9638,9 +9638,9 @@ int centreonscheduler__checkServiceScheduleForced(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__downtimeGetAuthor(soap* s,
-					 ns1__downtimeIDType* downtime_id,
-					 centreonscheduler__downtimeGetAuthorResponse& res) {
+int centreonengine__downtimeGetAuthor(soap* s,
+				      ns1__downtimeIDType* downtime_id,
+				      centreonengine__downtimeGetAuthorResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -9680,9 +9680,9 @@ int centreonscheduler__downtimeGetAuthor(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__downtimeGetDuration(soap* s,
-					   ns1__downtimeIDType* downtime_id,
-					   centreonscheduler__downtimeGetDurationResponse& res) {
+int centreonengine__downtimeGetDuration(soap* s,
+					ns1__downtimeIDType* downtime_id,
+					centreonengine__downtimeGetDurationResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -9720,9 +9720,9 @@ int centreonscheduler__downtimeGetDuration(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__downtimeGetEnd(soap* s,
-				      ns1__downtimeIDType* downtime_id,
-				      centreonscheduler__downtimeGetEndResponse& res) {
+int centreonengine__downtimeGetEnd(soap* s,
+				   ns1__downtimeIDType* downtime_id,
+				   centreonengine__downtimeGetEndResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -9760,9 +9760,9 @@ int centreonscheduler__downtimeGetEnd(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__downtimeGetFixed(soap* s,
-					ns1__downtimeIDType* downtime_id,
-					centreonscheduler__downtimeGetFixedResponse& res) {
+int centreonengine__downtimeGetFixed(soap* s,
+				     ns1__downtimeIDType* downtime_id,
+				     centreonengine__downtimeGetFixedResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -9800,9 +9800,9 @@ int centreonscheduler__downtimeGetFixed(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__downtimeGetStart(soap* s,
-					ns1__downtimeIDType* downtime_id,
-					centreonscheduler__downtimeGetStartResponse& res) {
+int centreonengine__downtimeGetStart(soap* s,
+				     ns1__downtimeIDType* downtime_id,
+				     centreonengine__downtimeGetStartResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -9840,9 +9840,9 @@ int centreonscheduler__downtimeGetStart(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__downtimeDelete(soap* s,
-				      ns1__downtimeIDType* downtime_id,
-				      centreonscheduler__downtimeDeleteResponse& res) {
+int centreonengine__downtimeDelete(soap* s,
+				   ns1__downtimeIDType* downtime_id,
+				   centreonengine__downtimeDeleteResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -9880,10 +9880,10 @@ int centreonscheduler__downtimeDelete(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__downtimeAddToHost(soap* s,
-					 ns1__hostIDType* host_id,
-					 ns1__downtimeType* downtime_type,
-					 centreonscheduler__downtimeAddToHostResponse& res) {
+int centreonengine__downtimeAddToHost(soap* s,
+				      ns1__hostIDType* host_id,
+				      ns1__downtimeType* downtime_type,
+				      centreonengine__downtimeAddToHostResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -9954,10 +9954,10 @@ int centreonscheduler__downtimeAddToHost(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__downtimeAddAndPropagateToHost(soap* s,
-						     ns1__hostIDType* host_id,
-						     ns1__downtimeType* downtime_type,
-						     centreonscheduler__downtimeAddAndPropagateToHostResponse& res) {
+int centreonengine__downtimeAddAndPropagateToHost(soap* s,
+						  ns1__hostIDType* host_id,
+						  ns1__downtimeType* downtime_type,
+						  centreonengine__downtimeAddAndPropagateToHostResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -10033,10 +10033,10 @@ int centreonscheduler__downtimeAddAndPropagateToHost(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__downtimeAddAndPropagateTriggeredToHost(soap* s,
-							      ns1__hostIDType* host_id,
-							      ns1__downtimeType* downtime_type,
-							      centreonscheduler__downtimeAddAndPropagateTriggeredToHostResponse& res) {
+int centreonengine__downtimeAddAndPropagateTriggeredToHost(soap* s,
+							   ns1__hostIDType* host_id,
+							   ns1__downtimeType* downtime_type,
+							   centreonengine__downtimeAddAndPropagateTriggeredToHostResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -10112,10 +10112,10 @@ int centreonscheduler__downtimeAddAndPropagateTriggeredToHost(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__downtimeAddToHostServices(soap* s,
-						 ns1__hostIDType* host_id,
-						 ns1__downtimeType* downtime_type,
-						 centreonscheduler__downtimeAddToHostServicesResponse& res) {
+int centreonengine__downtimeAddToHostServices(soap* s,
+					      ns1__hostIDType* host_id,
+					      ns1__downtimeType* downtime_type,
+					      centreonengine__downtimeAddToHostServicesResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -10188,10 +10188,10 @@ int centreonscheduler__downtimeAddToHostServices(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__downtimeAddToService(soap* s,
-					    ns1__serviceIDType* service_id,
-					    ns1__downtimeType* downtime_type,
-					    centreonscheduler__downtimeAddToServiceResponse& res) {
+int centreonengine__downtimeAddToService(soap* s,
+					 ns1__serviceIDType* service_id,
+					 ns1__downtimeType* downtime_type,
+					 centreonengine__downtimeAddToServiceResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -10264,10 +10264,10 @@ int centreonscheduler__downtimeAddToService(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__notificationHostDelay(soap* s,
-					     ns1__hostIDType* host_id,
-					     long delay,
-					     centreonscheduler__notificationHostDelayResponse& res) {
+int centreonengine__notificationHostDelay(soap* s,
+					  ns1__hostIDType* host_id,
+					  long delay,
+					  centreonengine__notificationHostDelayResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -10304,10 +10304,10 @@ int centreonscheduler__notificationHostDelay(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__notificationHostSend(soap* s,
-					    ns1__hostIDType* host_id,
-					    ns1__notificationType* notification_type,
-					    centreonscheduler__notificationHostSendResponse& res) {
+int centreonengine__notificationHostSend(soap* s,
+					 ns1__hostIDType* host_id,
+					 ns1__notificationType* notification_type,
+					 centreonengine__notificationHostSendResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -10373,10 +10373,10 @@ int centreonscheduler__notificationHostSend(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__notificationServiceDelay(soap* s,
-						ns1__serviceIDType* service_id,
-						long delay,
-						centreonscheduler__notificationServiceDelayResponse& res) {
+int centreonengine__notificationServiceDelay(soap* s,
+					     ns1__serviceIDType* service_id,
+					     long delay,
+					     centreonengine__notificationServiceDelayResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -10415,10 +10415,10 @@ int centreonscheduler__notificationServiceDelay(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__notificationServiceSend(soap* s,
-					       ns1__serviceIDType* service_id,
-					       ns1__notificationType* notification_type,
-					       centreonscheduler__notificationServiceSendResponse& res) {
+int centreonengine__notificationServiceSend(soap* s,
+					    ns1__serviceIDType* service_id,
+					    ns1__notificationType* notification_type,
+					    centreonengine__notificationServiceSendResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -10485,8 +10485,8 @@ int centreonscheduler__notificationServiceSend(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__getEventHandlersEnabled(soap* s,
-					       centreonscheduler__getEventHandlersEnabledResponse& res) {
+int centreonengine__getEventHandlersEnabled(soap* s,
+					    centreonengine__getEventHandlersEnabledResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2, "Webservice: %s()\n", __func__);
@@ -10505,8 +10505,8 @@ int centreonscheduler__getEventHandlersEnabled(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__getFailurePredictionEnabled(soap* s,
-						   centreonscheduler__getFailurePredictionEnabledResponse& res) {
+int centreonengine__getFailurePredictionEnabled(soap* s,
+						centreonengine__getFailurePredictionEnabledResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2, "Webservice: %s()\n", __func__);
@@ -10525,8 +10525,8 @@ int centreonscheduler__getFailurePredictionEnabled(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__getFlapDetectionEnabled(soap* s,
-					       centreonscheduler__getFlapDetectionEnabledResponse& res) {
+int centreonengine__getFlapDetectionEnabled(soap* s,
+					    centreonengine__getFlapDetectionEnabledResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2, "Webservice: %s()\n", __func__);
@@ -10545,8 +10545,8 @@ int centreonscheduler__getFlapDetectionEnabled(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__getHostsChecksActiveEnabled(soap* s,
-						   centreonscheduler__getHostsChecksActiveEnabledResponse& res) {
+int centreonengine__getHostsChecksActiveEnabled(soap* s,
+						centreonengine__getHostsChecksActiveEnabledResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2, "Webservice: %s()\n", __func__);
@@ -10565,8 +10565,8 @@ int centreonscheduler__getHostsChecksActiveEnabled(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__getHostsChecksPassiveEnabled(soap* s,
-						    centreonscheduler__getHostsChecksPassiveEnabledResponse& res) {
+int centreonengine__getHostsChecksPassiveEnabled(soap* s,
+						 centreonengine__getHostsChecksPassiveEnabledResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2, "Webservice: %s()\n", __func__);
@@ -10585,8 +10585,8 @@ int centreonscheduler__getHostsChecksPassiveEnabled(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__getHostsEventHandler(soap* s,
-					    centreonscheduler__getHostsEventHandlerResponse& res) {
+int centreonengine__getHostsEventHandler(soap* s,
+					 centreonengine__getHostsEventHandlerResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2, "Webservice: %s()\n", __func__);
@@ -10605,8 +10605,8 @@ int centreonscheduler__getHostsEventHandler(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__getHostsFreshnessChecksEnabled(soap* s,
-						      centreonscheduler__getHostsFreshnessChecksEnabledResponse& res) {
+int centreonengine__getHostsFreshnessChecksEnabled(soap* s,
+						   centreonengine__getHostsFreshnessChecksEnabledResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2, "Webservice: %s()\n", __func__);
@@ -10625,8 +10625,8 @@ int centreonscheduler__getHostsFreshnessChecksEnabled(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__getHostsObsessOverEnabled(soap* s,
-						 centreonscheduler__getHostsObsessOverEnabledResponse& res) {
+int centreonengine__getHostsObsessOverEnabled(soap* s,
+					      centreonengine__getHostsObsessOverEnabledResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2, "Webservice: %s()\n", __func__);
@@ -10645,8 +10645,8 @@ int centreonscheduler__getHostsObsessOverEnabled(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__getNotificationsEnabled(soap* s,
-					       centreonscheduler__getNotificationsEnabledResponse& res) {
+int centreonengine__getNotificationsEnabled(soap* s,
+					    centreonengine__getNotificationsEnabledResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2, "Webservice: %s()\n", __func__);
@@ -10665,8 +10665,8 @@ int centreonscheduler__getNotificationsEnabled(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__getPerfdataProcessingEnabled(soap* s,
-						    centreonscheduler__getPerfdataProcessingEnabledResponse& res) {
+int centreonengine__getPerfdataProcessingEnabled(soap* s,
+						 centreonengine__getPerfdataProcessingEnabledResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2, "Webservice: %s()\n", __func__);
@@ -10685,8 +10685,8 @@ int centreonscheduler__getPerfdataProcessingEnabled(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__getServicesChecksActiveEnabled(soap* s,
-						      centreonscheduler__getServicesChecksActiveEnabledResponse& res) {
+int centreonengine__getServicesChecksActiveEnabled(soap* s,
+						   centreonengine__getServicesChecksActiveEnabledResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2, "Webservice: %s()\n", __func__);
@@ -10705,8 +10705,8 @@ int centreonscheduler__getServicesChecksActiveEnabled(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__getServicesChecksPassiveEnabled(soap* s,
-						       centreonscheduler__getServicesChecksPassiveEnabledResponse& res) {
+int centreonengine__getServicesChecksPassiveEnabled(soap* s,
+						    centreonengine__getServicesChecksPassiveEnabledResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2, "Webservice: %s()\n", __func__);
@@ -10725,8 +10725,8 @@ int centreonscheduler__getServicesChecksPassiveEnabled(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__getServicesEventHandler(soap* s,
-					       centreonscheduler__getServicesEventHandlerResponse& res) {
+int centreonengine__getServicesEventHandler(soap* s,
+					    centreonengine__getServicesEventHandlerResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2, "Webservice: %s()\n", __func__);
@@ -10745,8 +10745,8 @@ int centreonscheduler__getServicesEventHandler(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__getServicesFreshnessChecksEnabled(soap* s,
-							 centreonscheduler__getServicesFreshnessChecksEnabledResponse& res) {
+int centreonengine__getServicesFreshnessChecksEnabled(soap* s,
+						      centreonengine__getServicesFreshnessChecksEnabledResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2, "Webservice: %s()\n", __func__);
@@ -10765,8 +10765,8 @@ int centreonscheduler__getServicesFreshnessChecksEnabled(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__getServicesObsessOverEnabled(soap* s,
-						    centreonscheduler__getServicesObsessOverEnabledResponse& res) {
+int centreonengine__getServicesObsessOverEnabled(soap* s,
+						 centreonengine__getServicesObsessOverEnabledResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2, "Webservice: %s()\n", __func__);
@@ -10786,9 +10786,9 @@ int centreonscheduler__getServicesObsessOverEnabled(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__setEventHandlersEnabled(soap* s,
-					       bool enable,
-					       centreonscheduler__setEventHandlersEnabledResponse& res) {
+int centreonengine__setEventHandlersEnabled(soap* s,
+					    bool enable,
+					    centreonengine__setEventHandlersEnabledResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2, "Webservice: %s()\n", __func__);
@@ -10808,9 +10808,9 @@ int centreonscheduler__setEventHandlersEnabled(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__setFailurePredictionEnabled(soap* s,
-						   bool enable,
-						   centreonscheduler__setFailurePredictionEnabledResponse& res) {
+int centreonengine__setFailurePredictionEnabled(soap* s,
+						bool enable,
+						centreonengine__setFailurePredictionEnabledResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2, "Webservice: %s(%d)\n", __func__, enable);
@@ -10830,9 +10830,9 @@ int centreonscheduler__setFailurePredictionEnabled(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__setFlapDetectionEnabled(soap* s,
-					       bool enable,
-					       centreonscheduler__setFlapDetectionEnabledResponse& res) {
+int centreonengine__setFlapDetectionEnabled(soap* s,
+					    bool enable,
+					    centreonengine__setFlapDetectionEnabledResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2, "Webservice: %s(%d)\n", __func__, enable);
@@ -10852,9 +10852,9 @@ int centreonscheduler__setFlapDetectionEnabled(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__setHostsChecksActiveEnabled(soap* s,
-						   bool enable,
-						   centreonscheduler__setHostsChecksActiveEnabledResponse& res) {
+int centreonengine__setHostsChecksActiveEnabled(soap* s,
+						bool enable,
+						centreonengine__setHostsChecksActiveEnabledResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2, "Webservice: %s(%d)\n", __func__, enable);
@@ -10874,9 +10874,9 @@ int centreonscheduler__setHostsChecksActiveEnabled(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__setHostsChecksPassiveEnabled(soap* s,
-						    bool enable,
-						    centreonscheduler__setHostsChecksPassiveEnabledResponse& res) {
+int centreonengine__setHostsChecksPassiveEnabled(soap* s,
+						 bool enable,
+						 centreonengine__setHostsChecksPassiveEnabledResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2, "Webservice: %s(%d)\n", __func__, enable);
@@ -10896,9 +10896,9 @@ int centreonscheduler__setHostsChecksPassiveEnabled(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__setHostsEventHandler(soap* s,
-					    ns1__commandIDType* command_id,
-					    centreonscheduler__setHostsEventHandlerResponse& res) {
+int centreonengine__setHostsEventHandler(soap* s,
+					 ns1__commandIDType* command_id,
+					 centreonengine__setHostsEventHandlerResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -10949,9 +10949,9 @@ int centreonscheduler__setHostsEventHandler(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__setHostsFreshnessChecksEnabled(soap* s,
-						      bool enable,
-						      centreonscheduler__setHostsFreshnessChecksEnabledResponse& res) {
+int centreonengine__setHostsFreshnessChecksEnabled(soap* s,
+						   bool enable,
+						   centreonengine__setHostsFreshnessChecksEnabledResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2, "Webservice: %s(%d)\n", __func__, enable);
@@ -10971,9 +10971,9 @@ int centreonscheduler__setHostsFreshnessChecksEnabled(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__setHostsObsessOverEnabled(soap* s,
-						 bool enable,
-						 centreonscheduler__setHostsObsessOverEnabledResponse& res) {
+int centreonengine__setHostsObsessOverEnabled(soap* s,
+					      bool enable,
+					      centreonengine__setHostsObsessOverEnabledResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2, "Webservice: %s(%d)\n", __func__, enable);
@@ -10993,9 +10993,9 @@ int centreonscheduler__setHostsObsessOverEnabled(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__setNotificationsEnabled(soap* s,
-					       bool enable,
-					       centreonscheduler__setNotificationsEnabledResponse& res) {
+int centreonengine__setNotificationsEnabled(soap* s,
+					    bool enable,
+					    centreonengine__setNotificationsEnabledResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2, "Webservice: %s(%d)\n", __func__, enable);
@@ -11015,9 +11015,9 @@ int centreonscheduler__setNotificationsEnabled(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__setPerfdataProcessingEnabled(soap* s,
-						    bool enable,
-						    centreonscheduler__setPerfdataProcessingEnabledResponse& res) {
+int centreonengine__setPerfdataProcessingEnabled(soap* s,
+						 bool enable,
+						 centreonengine__setPerfdataProcessingEnabledResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2, "Webservice: %s(%d)\n", __func__, enable);
@@ -11037,9 +11037,9 @@ int centreonscheduler__setPerfdataProcessingEnabled(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__setServicesChecksActiveEnabled(soap* s,
-						      bool enable,
-						      centreonscheduler__setServicesChecksActiveEnabledResponse& res) {
+int centreonengine__setServicesChecksActiveEnabled(soap* s,
+						   bool enable,
+						   centreonengine__setServicesChecksActiveEnabledResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2, "Webservice: %s(%d)\n", __func__, enable);
@@ -11059,9 +11059,9 @@ int centreonscheduler__setServicesChecksActiveEnabled(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__setServicesChecksPassiveEnabled(soap* s,
-						       bool enable,
-						       centreonscheduler__setServicesChecksPassiveEnabledResponse& res) {
+int centreonengine__setServicesChecksPassiveEnabled(soap* s,
+						    bool enable,
+						    centreonengine__setServicesChecksPassiveEnabledResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2, "Webservice: %s(%d)\n", __func__, enable);
@@ -11081,9 +11081,9 @@ int centreonscheduler__setServicesChecksPassiveEnabled(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__setServicesEventHandler(soap* s,
-					       ns1__commandIDType* command_id,
-					       centreonscheduler__setServicesEventHandlerResponse& res) {
+int centreonengine__setServicesEventHandler(soap* s,
+					    ns1__commandIDType* command_id,
+					    centreonengine__setServicesEventHandlerResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -11135,9 +11135,9 @@ int centreonscheduler__setServicesEventHandler(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__setServicesFreshnessChecksEnabled(soap* s,
-							 bool enable,
-							 centreonscheduler__setServicesFreshnessChecksEnabledResponse& res) {
+int centreonengine__setServicesFreshnessChecksEnabled(soap* s,
+						      bool enable,
+						      centreonengine__setServicesFreshnessChecksEnabledResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2, "Webservice: %s(%d)\n", __func__, enable);
@@ -11157,9 +11157,9 @@ int centreonscheduler__setServicesFreshnessChecksEnabled(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__setServicesObsessOverEnabled(soap* s,
-						    bool enable,
-						    centreonscheduler__setServicesObsessOverEnabledResponse& res) {
+int centreonengine__setServicesObsessOverEnabled(soap* s,
+						 bool enable,
+						 centreonengine__setServicesObsessOverEnabledResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2, "Webservice: %s(%d)\n", __func__, enable);
@@ -11180,10 +11180,10 @@ int centreonscheduler__setServicesObsessOverEnabled(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostSetCheckPeriod(soap* s,
-					  ns1__hostIDType* host_id,
-					  ns1__timeperiodIDType* timeperiod_id,
-					  centreonscheduler__hostSetCheckPeriodResponse& res) {
+int centreonengine__hostSetCheckPeriod(soap* s,
+				       ns1__hostIDType* host_id,
+				       ns1__timeperiodIDType* timeperiod_id,
+				       centreonengine__hostSetCheckPeriodResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -11226,10 +11226,10 @@ int centreonscheduler__hostSetCheckPeriod(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostSetServicesCheckActiveEnabled(soap* s,
-							 ns1__hostIDType* host_id,
-							 bool enable,
-							 centreonscheduler__hostSetServicesCheckActiveEnabledResponse& res) {
+int centreonengine__hostSetServicesCheckActiveEnabled(soap* s,
+						      ns1__hostIDType* host_id,
+						      bool enable,
+						      centreonengine__hostSetServicesCheckActiveEnabledResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -11271,10 +11271,10 @@ int centreonscheduler__hostSetServicesCheckActiveEnabled(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__hostSetServicesNotificationsEnabled(soap* s,
-							   ns1__hostIDType* host_id,
-							   bool enable,
-							   centreonscheduler__hostSetServicesNotificationsEnabledResponse& res) {
+int centreonengine__hostSetServicesNotificationsEnabled(soap* s,
+							ns1__hostIDType* host_id,
+							bool enable,
+							centreonengine__hostSetServicesNotificationsEnabledResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -11316,10 +11316,10 @@ int centreonscheduler__hostSetServicesNotificationsEnabled(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceSetCheckPeriod(soap* s,
-					     ns1__serviceIDType* service_id,
-					     ns1__timeperiodIDType* timeperiod_id,
-					     centreonscheduler__serviceSetCheckPeriodResponse& res) {
+int centreonengine__serviceSetCheckPeriod(soap* s,
+					  ns1__serviceIDType* service_id,
+					  ns1__timeperiodIDType* timeperiod_id,
+					  centreonengine__serviceSetCheckPeriodResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -11364,10 +11364,10 @@ int centreonscheduler__serviceSetCheckPeriod(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__serviceSetNotificationsPeriod(soap* s,
-						     ns1__serviceIDType* service_id,
-						     ns1__timeperiodIDType* timeperiod_id,
-						     centreonscheduler__serviceSetNotificationsPeriodResponse& res) {
+int centreonengine__serviceSetNotificationsPeriod(soap* s,
+						  ns1__serviceIDType* service_id,
+						  ns1__timeperiodIDType* timeperiod_id,
+						  centreonengine__serviceSetNotificationsPeriodResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -11407,9 +11407,9 @@ int centreonscheduler__serviceSetNotificationsPeriod(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__contactGetAlias(soap* s,
-				       ns1__contactIDType* contact_id,
-				       centreonscheduler__contactGetAliasResponse& res) {
+int centreonengine__contactGetAlias(soap* s,
+				    ns1__contactIDType* contact_id,
+				    centreonengine__contactGetAliasResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -11446,9 +11446,9 @@ int centreonscheduler__contactGetAlias(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__contactGetCanSubmitCommands(soap* s,
-						   ns1__contactIDType* contact_id,
-						   centreonscheduler__contactGetCanSubmitCommandsResponse& res) {
+int centreonengine__contactGetCanSubmitCommands(soap* s,
+						ns1__contactIDType* contact_id,
+						centreonengine__contactGetCanSubmitCommandsResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -11483,9 +11483,9 @@ int centreonscheduler__contactGetCanSubmitCommands(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__contactGetEmail(soap* s,
-				       ns1__contactIDType* contact_id,
-				       centreonscheduler__contactGetEmailResponse& res) {
+int centreonengine__contactGetEmail(soap* s,
+				    ns1__contactIDType* contact_id,
+				    centreonengine__contactGetEmailResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -11522,9 +11522,9 @@ int centreonscheduler__contactGetEmail(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__contactGetModifiedAttributes(soap* s,
-						    ns1__contactIDType* contact_id,
-						    centreonscheduler__contactGetModifiedAttributesResponse& res) {
+int centreonengine__contactGetModifiedAttributes(soap* s,
+						 ns1__contactIDType* contact_id,
+						 centreonengine__contactGetModifiedAttributesResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -11559,9 +11559,9 @@ int centreonscheduler__contactGetModifiedAttributes(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__contactGetModifiedAttributesHost(soap* s,
-							ns1__contactIDType* contact_id,
-							centreonscheduler__contactGetModifiedAttributesHostResponse& res) {
+int centreonengine__contactGetModifiedAttributesHost(soap* s,
+						     ns1__contactIDType* contact_id,
+						     centreonengine__contactGetModifiedAttributesHostResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -11596,9 +11596,9 @@ int centreonscheduler__contactGetModifiedAttributesHost(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__contactGetModifiedAttributesService(soap* s,
-							   ns1__contactIDType* contact_id,
-							   centreonscheduler__contactGetModifiedAttributesServiceResponse& res) {
+int centreonengine__contactGetModifiedAttributesService(soap* s,
+							ns1__contactIDType* contact_id,
+							centreonengine__contactGetModifiedAttributesServiceResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -11633,9 +11633,9 @@ int centreonscheduler__contactGetModifiedAttributesService(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__contactGetNotificationsOnHostCommand(soap* s,
-							    ns1__contactIDType* contact_id,
-							    centreonscheduler__contactGetNotificationsOnHostCommandResponse& res) {
+int centreonengine__contactGetNotificationsOnHostCommand(soap* s,
+							 ns1__contactIDType* contact_id,
+							 centreonengine__contactGetNotificationsOnHostCommandResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -11672,9 +11672,9 @@ int centreonscheduler__contactGetNotificationsOnHostCommand(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__contactGetNotificationsOnHostDown(soap* s,
-							 ns1__contactIDType* contact_id,
-							 centreonscheduler__contactGetNotificationsOnHostDownResponse& res) {
+int centreonengine__contactGetNotificationsOnHostDown(soap* s,
+						      ns1__contactIDType* contact_id,
+						      centreonengine__contactGetNotificationsOnHostDownResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -11709,9 +11709,9 @@ int centreonscheduler__contactGetNotificationsOnHostDown(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__contactGetNotificationsOnHostDowntime(soap* s,
-							     ns1__contactIDType* contact_id,
-							     centreonscheduler__contactGetNotificationsOnHostDowntimeResponse& res) {
+int centreonengine__contactGetNotificationsOnHostDowntime(soap* s,
+							  ns1__contactIDType* contact_id,
+							  centreonengine__contactGetNotificationsOnHostDowntimeResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -11746,9 +11746,9 @@ int centreonscheduler__contactGetNotificationsOnHostDowntime(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__contactGetNotificationsOnHostEnabled(soap* s,
-							    ns1__contactIDType* contact_id,
-							    centreonscheduler__contactGetNotificationsOnHostEnabledResponse& res) {
+int centreonengine__contactGetNotificationsOnHostEnabled(soap* s,
+							 ns1__contactIDType* contact_id,
+							 centreonengine__contactGetNotificationsOnHostEnabledResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -11784,9 +11784,9 @@ int centreonscheduler__contactGetNotificationsOnHostEnabled(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__contactGetNotificationsOnHostFlapping(soap* s,
-							     ns1__contactIDType* contact_id,
-							     centreonscheduler__contactGetNotificationsOnHostFlappingResponse& res) {
+int centreonengine__contactGetNotificationsOnHostFlapping(soap* s,
+							  ns1__contactIDType* contact_id,
+							  centreonengine__contactGetNotificationsOnHostFlappingResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -11821,9 +11821,9 @@ int centreonscheduler__contactGetNotificationsOnHostFlapping(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__contactGetNotificationsOnHostLast(soap* s,
-							 ns1__contactIDType* contact_id,
-							 centreonscheduler__contactGetNotificationsOnHostLastResponse& res) {
+int centreonengine__contactGetNotificationsOnHostLast(soap* s,
+						      ns1__contactIDType* contact_id,
+						      centreonengine__contactGetNotificationsOnHostLastResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -11858,9 +11858,9 @@ int centreonscheduler__contactGetNotificationsOnHostLast(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__contactGetNotificationsOnHostRecovery(soap* s,
-							     ns1__contactIDType* contact_id,
-							     centreonscheduler__contactGetNotificationsOnHostRecoveryResponse& res) {
+int centreonengine__contactGetNotificationsOnHostRecovery(soap* s,
+							  ns1__contactIDType* contact_id,
+							  centreonengine__contactGetNotificationsOnHostRecoveryResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -11895,9 +11895,9 @@ int centreonscheduler__contactGetNotificationsOnHostRecovery(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__contactGetNotificationsOnHostTimeperiod(soap* s,
-							       ns1__contactIDType* contact_id,
-							       centreonscheduler__contactGetNotificationsOnHostTimeperiodResponse& res) {
+int centreonengine__contactGetNotificationsOnHostTimeperiod(soap* s,
+							    ns1__contactIDType* contact_id,
+							    centreonengine__contactGetNotificationsOnHostTimeperiodResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -11933,9 +11933,9 @@ int centreonscheduler__contactGetNotificationsOnHostTimeperiod(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__contactGetNotificationsOnHostUnreachable(soap* s,
-								ns1__contactIDType* contact_id,
-								centreonscheduler__contactGetNotificationsOnHostUnreachableResponse& res) {
+int centreonengine__contactGetNotificationsOnHostUnreachable(soap* s,
+							     ns1__contactIDType* contact_id,
+							     centreonengine__contactGetNotificationsOnHostUnreachableResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -11970,9 +11970,9 @@ int centreonscheduler__contactGetNotificationsOnHostUnreachable(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__contactGetNotificationsOnServiceCommand(soap* s,
-							       ns1__contactIDType* contact_id,
-							       centreonscheduler__contactGetNotificationsOnServiceCommandResponse& res) {
+int centreonengine__contactGetNotificationsOnServiceCommand(soap* s,
+							    ns1__contactIDType* contact_id,
+							    centreonengine__contactGetNotificationsOnServiceCommandResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -12009,9 +12009,9 @@ int centreonscheduler__contactGetNotificationsOnServiceCommand(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__contactGetNotificationsOnServiceCritical(soap* s,
-								ns1__contactIDType* contact_id,
-								centreonscheduler__contactGetNotificationsOnServiceCriticalResponse& res) {
+int centreonengine__contactGetNotificationsOnServiceCritical(soap* s,
+							     ns1__contactIDType* contact_id,
+							     centreonengine__contactGetNotificationsOnServiceCriticalResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -12046,9 +12046,9 @@ int centreonscheduler__contactGetNotificationsOnServiceCritical(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__contactGetNotificationsOnServiceDowntime(soap* s,
-								ns1__contactIDType* contact_id,
-								centreonscheduler__contactGetNotificationsOnServiceDowntimeResponse& res) {
+int centreonengine__contactGetNotificationsOnServiceDowntime(soap* s,
+							     ns1__contactIDType* contact_id,
+							     centreonengine__contactGetNotificationsOnServiceDowntimeResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -12083,9 +12083,9 @@ int centreonscheduler__contactGetNotificationsOnServiceDowntime(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__contactGetNotificationsOnServiceEnabled(soap* s,
-							       ns1__contactIDType* contact_id,
-							       centreonscheduler__contactGetNotificationsOnServiceEnabledResponse& res) {
+int centreonengine__contactGetNotificationsOnServiceEnabled(soap* s,
+							    ns1__contactIDType* contact_id,
+							    centreonengine__contactGetNotificationsOnServiceEnabledResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -12120,9 +12120,9 @@ int centreonscheduler__contactGetNotificationsOnServiceEnabled(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__contactGetNotificationsOnServiceFlapping(soap* s,
-								ns1__contactIDType* contact_id,
-								centreonscheduler__contactGetNotificationsOnServiceFlappingResponse& res) {
+int centreonengine__contactGetNotificationsOnServiceFlapping(soap* s,
+							     ns1__contactIDType* contact_id,
+							     centreonengine__contactGetNotificationsOnServiceFlappingResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -12157,9 +12157,9 @@ int centreonscheduler__contactGetNotificationsOnServiceFlapping(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__contactGetNotificationsOnServiceLast(soap* s,
-							    ns1__contactIDType* contact_id,
-							    centreonscheduler__contactGetNotificationsOnServiceLastResponse& res) {
+int centreonengine__contactGetNotificationsOnServiceLast(soap* s,
+							 ns1__contactIDType* contact_id,
+							 centreonengine__contactGetNotificationsOnServiceLastResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -12194,9 +12194,9 @@ int centreonscheduler__contactGetNotificationsOnServiceLast(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__contactGetNotificationsOnServiceRecovery(soap* s,
-								ns1__contactIDType* contact_id,
-								centreonscheduler__contactGetNotificationsOnServiceRecoveryResponse& res) {
+int centreonengine__contactGetNotificationsOnServiceRecovery(soap* s,
+							     ns1__contactIDType* contact_id,
+							     centreonengine__contactGetNotificationsOnServiceRecoveryResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -12231,9 +12231,9 @@ int centreonscheduler__contactGetNotificationsOnServiceRecovery(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__contactGetNotificationsOnServiceTimeperiod(soap* s,
-								  ns1__contactIDType* contact_id,
-								  centreonscheduler__contactGetNotificationsOnServiceTimeperiodResponse& res) {
+int centreonengine__contactGetNotificationsOnServiceTimeperiod(soap* s,
+							       ns1__contactIDType* contact_id,
+							       centreonengine__contactGetNotificationsOnServiceTimeperiodResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -12269,9 +12269,9 @@ int centreonscheduler__contactGetNotificationsOnServiceTimeperiod(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__contactGetNotificationsOnServiceUnknown(soap* s,
-							       ns1__contactIDType* contact_id,
-							       centreonscheduler__contactGetNotificationsOnServiceUnknownResponse& res) {
+int centreonengine__contactGetNotificationsOnServiceUnknown(soap* s,
+							    ns1__contactIDType* contact_id,
+							    centreonengine__contactGetNotificationsOnServiceUnknownResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -12306,9 +12306,9 @@ int centreonscheduler__contactGetNotificationsOnServiceUnknown(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__contactGetPager(soap* s,
-				       ns1__contactIDType* contact_id,
-				       centreonscheduler__contactGetPagerResponse& res) {
+int centreonengine__contactGetPager(soap* s,
+				    ns1__contactIDType* contact_id,
+				    centreonengine__contactGetPagerResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -12345,9 +12345,9 @@ int centreonscheduler__contactGetPager(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__contactGetRetainStatusInformation(soap* s,
-							 ns1__contactIDType* contact_id,
-							 centreonscheduler__contactGetRetainStatusInformationResponse& res) {
+int centreonengine__contactGetRetainStatusInformation(soap* s,
+						      ns1__contactIDType* contact_id,
+						      centreonengine__contactGetRetainStatusInformationResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -12382,9 +12382,9 @@ int centreonscheduler__contactGetRetainStatusInformation(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__contactGetRetainStatusNonInformation(soap* s,
-							    ns1__contactIDType* contact_id,
-							    centreonscheduler__contactGetRetainStatusNonInformationResponse& res) {
+int centreonengine__contactGetRetainStatusNonInformation(soap* s,
+							 ns1__contactIDType* contact_id,
+							 centreonengine__contactGetRetainStatusNonInformationResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -12420,10 +12420,10 @@ int centreonscheduler__contactGetRetainStatusNonInformation(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__contactSetAlias(soap* s,
-				       ns1__contactIDType* contact_id,
-				       std::string alias,
-				       centreonscheduler__contactSetAliasResponse& res) {
+int centreonengine__contactSetAlias(soap* s,
+				    ns1__contactIDType* contact_id,
+				    std::string alias,
+				    centreonengine__contactSetAliasResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -12462,10 +12462,10 @@ int centreonscheduler__contactSetAlias(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__contactSetCanSubmitCommands(soap* s,
-						   ns1__contactIDType* contact_id,
-						   bool enable,
-						   centreonscheduler__contactSetCanSubmitCommandsResponse& res) {
+int centreonengine__contactSetCanSubmitCommands(soap* s,
+						ns1__contactIDType* contact_id,
+						bool enable,
+						centreonengine__contactSetCanSubmitCommandsResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -12502,10 +12502,10 @@ int centreonscheduler__contactSetCanSubmitCommands(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__contactSetEmail(soap* s,
-				       ns1__contactIDType* contact_id,
-				       std::string email,
-				       centreonscheduler__contactSetEmailResponse& res) {
+int centreonengine__contactSetEmail(soap* s,
+				    ns1__contactIDType* contact_id,
+				    std::string email,
+				    centreonengine__contactSetEmailResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -12544,10 +12544,10 @@ int centreonscheduler__contactSetEmail(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__contactSetNotificationsOnHostDown(soap* s,
-							 ns1__contactIDType* contact_id,
-							 bool enable,
-							 centreonscheduler__contactSetNotificationsOnHostDownResponse& res) {
+int centreonengine__contactSetNotificationsOnHostDown(soap* s,
+						      ns1__contactIDType* contact_id,
+						      bool enable,
+						      centreonengine__contactSetNotificationsOnHostDownResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -12584,10 +12584,10 @@ int centreonscheduler__contactSetNotificationsOnHostDown(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__contactSetNotificationsOnHostDowntime(soap* s,
-							     ns1__contactIDType* contact_id,
-							     bool enable,
-							     centreonscheduler__contactSetNotificationsOnHostDowntimeResponse& res) {
+int centreonengine__contactSetNotificationsOnHostDowntime(soap* s,
+							  ns1__contactIDType* contact_id,
+							  bool enable,
+							  centreonengine__contactSetNotificationsOnHostDowntimeResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -12624,10 +12624,10 @@ int centreonscheduler__contactSetNotificationsOnHostDowntime(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__contactSetNotificationsOnHostEnabled(soap* s,
-							    ns1__contactIDType* contact_id,
-							    bool enable,
-							    centreonscheduler__contactSetNotificationsOnHostEnabledResponse& res) {
+int centreonengine__contactSetNotificationsOnHostEnabled(soap* s,
+							 ns1__contactIDType* contact_id,
+							 bool enable,
+							 centreonengine__contactSetNotificationsOnHostEnabledResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -12664,10 +12664,10 @@ int centreonscheduler__contactSetNotificationsOnHostEnabled(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__contactSetNotificationsOnHostFlapping(soap* s,
-							     ns1__contactIDType* contact_id,
-							     bool enable,
-							     centreonscheduler__contactSetNotificationsOnHostFlappingResponse& res) {
+int centreonengine__contactSetNotificationsOnHostFlapping(soap* s,
+							  ns1__contactIDType* contact_id,
+							  bool enable,
+							  centreonengine__contactSetNotificationsOnHostFlappingResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -12704,10 +12704,10 @@ int centreonscheduler__contactSetNotificationsOnHostFlapping(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__contactSetNotificationsOnHostRecovery(soap* s,
-							     ns1__contactIDType* contact_id,
-							     bool enable,
-							     centreonscheduler__contactSetNotificationsOnHostRecoveryResponse& res) {
+int centreonengine__contactSetNotificationsOnHostRecovery(soap* s,
+							  ns1__contactIDType* contact_id,
+							  bool enable,
+							  centreonengine__contactSetNotificationsOnHostRecoveryResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -12744,10 +12744,10 @@ int centreonscheduler__contactSetNotificationsOnHostRecovery(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__contactSetNotificationsOnHostTimeperiod(soap* s,
-							       ns1__contactIDType* contact_id,
-							       ns1__timeperiodIDType* timeperiod_id,
-							       centreonscheduler__contactSetNotificationsOnHostTimeperiodResponse& res) {
+int centreonengine__contactSetNotificationsOnHostTimeperiod(soap* s,
+							    ns1__contactIDType* contact_id,
+							    ns1__timeperiodIDType* timeperiod_id,
+							    centreonengine__contactSetNotificationsOnHostTimeperiodResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -12786,10 +12786,10 @@ int centreonscheduler__contactSetNotificationsOnHostTimeperiod(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__contactSetNotificationsOnHostUnreachable(soap* s,
-								ns1__contactIDType* contact_id,
-								bool enable,
-								centreonscheduler__contactSetNotificationsOnHostUnreachableResponse& res) {
+int centreonengine__contactSetNotificationsOnHostUnreachable(soap* s,
+							     ns1__contactIDType* contact_id,
+							     bool enable,
+							     centreonengine__contactSetNotificationsOnHostUnreachableResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -12826,10 +12826,10 @@ int centreonscheduler__contactSetNotificationsOnHostUnreachable(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__contactSetNotificationsOnServiceCritical(soap* s,
-								ns1__contactIDType* contact_id,
-								bool enable,
-								centreonscheduler__contactSetNotificationsOnServiceCriticalResponse& res) {
+int centreonengine__contactSetNotificationsOnServiceCritical(soap* s,
+							     ns1__contactIDType* contact_id,
+							     bool enable,
+							     centreonengine__contactSetNotificationsOnServiceCriticalResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -12866,10 +12866,10 @@ int centreonscheduler__contactSetNotificationsOnServiceCritical(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__contactSetNotificationsOnServiceDowntime(soap* s,
-								ns1__contactIDType* contact_id,
-								bool enable,
-								centreonscheduler__contactSetNotificationsOnServiceDowntimeResponse& res) {
+int centreonengine__contactSetNotificationsOnServiceDowntime(soap* s,
+							     ns1__contactIDType* contact_id,
+							     bool enable,
+							     centreonengine__contactSetNotificationsOnServiceDowntimeResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -12906,10 +12906,10 @@ int centreonscheduler__contactSetNotificationsOnServiceDowntime(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__contactSetNotificationsOnServiceEnabled(soap* s,
-							       ns1__contactIDType* contact_id,
-							       bool enable,
-							       centreonscheduler__contactSetNotificationsOnServiceEnabledResponse& res) {
+int centreonengine__contactSetNotificationsOnServiceEnabled(soap* s,
+							    ns1__contactIDType* contact_id,
+							    bool enable,
+							    centreonengine__contactSetNotificationsOnServiceEnabledResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -12946,10 +12946,10 @@ int centreonscheduler__contactSetNotificationsOnServiceEnabled(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__contactSetNotificationsOnServiceFlapping(soap* s,
-								ns1__contactIDType* contact_id,
-								bool enable,
-								centreonscheduler__contactSetNotificationsOnServiceFlappingResponse& res) {
+int centreonengine__contactSetNotificationsOnServiceFlapping(soap* s,
+							     ns1__contactIDType* contact_id,
+							     bool enable,
+							     centreonengine__contactSetNotificationsOnServiceFlappingResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -12986,10 +12986,10 @@ int centreonscheduler__contactSetNotificationsOnServiceFlapping(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__contactSetNotificationsOnServiceRecovery(soap* s,
-								ns1__contactIDType* contact_id,
-								bool enable,
-								centreonscheduler__contactSetNotificationsOnServiceRecoveryResponse& res) {
+int centreonengine__contactSetNotificationsOnServiceRecovery(soap* s,
+							     ns1__contactIDType* contact_id,
+							     bool enable,
+							     centreonengine__contactSetNotificationsOnServiceRecoveryResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -13026,10 +13026,10 @@ int centreonscheduler__contactSetNotificationsOnServiceRecovery(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__contactSetNotificationsOnServiceTimeperiod(soap* s,
-								  ns1__contactIDType* contact_id,
-								  ns1__timeperiodIDType* timeperiod_id,
-								  centreonscheduler__contactSetNotificationsOnServiceTimeperiodResponse& res) {
+int centreonengine__contactSetNotificationsOnServiceTimeperiod(soap* s,
+							       ns1__contactIDType* contact_id,
+							       ns1__timeperiodIDType* timeperiod_id,
+							       centreonengine__contactSetNotificationsOnServiceTimeperiodResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -13067,10 +13067,10 @@ int centreonscheduler__contactSetNotificationsOnServiceTimeperiod(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__contactSetNotificationsOnServiceUnknown(soap* s,
-							       ns1__contactIDType* contact_id,
-							       bool enable,
-							       centreonscheduler__contactSetNotificationsOnServiceUnknownResponse& res) {
+int centreonengine__contactSetNotificationsOnServiceUnknown(soap* s,
+							    ns1__contactIDType* contact_id,
+							    bool enable,
+							    centreonengine__contactSetNotificationsOnServiceUnknownResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -13107,10 +13107,10 @@ int centreonscheduler__contactSetNotificationsOnServiceUnknown(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__contactSetNotificationsOnServiceWarning(soap* s,
-							       ns1__contactIDType* contact_id,
-							       bool enable,
-							       centreonscheduler__contactSetNotificationsOnServiceWarningResponse& res) {
+int centreonengine__contactSetNotificationsOnServiceWarning(soap* s,
+							    ns1__contactIDType* contact_id,
+							    bool enable,
+							    centreonengine__contactSetNotificationsOnServiceWarningResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -13147,10 +13147,10 @@ int centreonscheduler__contactSetNotificationsOnServiceWarning(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__contactSetPager(soap* s,
-				       ns1__contactIDType* contact_id,
-				       std::string pager,
-				       centreonscheduler__contactSetPagerResponse& res) {
+int centreonengine__contactSetPager(soap* s,
+				    ns1__contactIDType* contact_id,
+				    std::string pager,
+				    centreonengine__contactSetPagerResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -13189,10 +13189,10 @@ int centreonscheduler__contactSetPager(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__contactSetRetainStatusInformation(soap* s,
-							 ns1__contactIDType* contact_id,
-							 bool enable,
-							 centreonscheduler__contactSetRetainStatusInformationResponse& res) {
+int centreonengine__contactSetRetainStatusInformation(soap* s,
+						      ns1__contactIDType* contact_id,
+						      bool enable,
+						      centreonengine__contactSetRetainStatusInformationResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -13229,10 +13229,10 @@ int centreonscheduler__contactSetRetainStatusInformation(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__contactSetRetainStatusNonInformation(soap* s,
-							    ns1__contactIDType* contact_id,
-							    bool enable,
-							    centreonscheduler__contactSetRetainStatusNonInformationResponse& res) {
+int centreonengine__contactSetRetainStatusNonInformation(soap* s,
+							 ns1__contactIDType* contact_id,
+							 bool enable,
+							 centreonengine__contactSetRetainStatusNonInformationResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -13269,10 +13269,10 @@ int centreonscheduler__contactSetRetainStatusNonInformation(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__contactSetNotificationsOnHostCommand(soap* s,
-							    ns1__contactIDType* contact_id,
-							    ns1__commandIDType* command_id,
-							    centreonscheduler__contactSetNotificationsOnHostCommandResponse& res) {
+int centreonengine__contactSetNotificationsOnHostCommand(soap* s,
+							 ns1__contactIDType* contact_id,
+							 ns1__commandIDType* command_id,
+							 centreonengine__contactSetNotificationsOnHostCommandResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
@@ -13310,10 +13310,10 @@ int centreonscheduler__contactSetNotificationsOnHostCommand(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonscheduler__contactSetNotificationsOnServiceCommand(soap* s,
-							       ns1__contactIDType* contact_id,
-							       ns1__commandIDType* command_id,
-							       centreonscheduler__contactSetNotificationsOnServiceCommandResponse& res) {
+int centreonengine__contactSetNotificationsOnServiceCommand(soap* s,
+							    ns1__contactIDType* contact_id,
+							    ns1__commandIDType* command_id,
+							    centreonengine__contactSetNotificationsOnServiceCommandResponse& res) {
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,

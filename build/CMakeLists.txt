@@ -359,8 +359,8 @@ find_program(WSDL2H_PROGRAM "wsdl2h")
 if (NOT WSDL2H_PROGRAM)
   message(FATAL_ERROR "Could not find gSOAP's wsdl2h binary.")
 endif ()
-add_custom_command(OUTPUT "${INCLUDE_DIR}/centreon-scheduler-ws.hh"
-  COMMAND "${WSDL2H_PROGRAM}" "-o" "${INCLUDE_DIR}/centreon-scheduler-ws.hh" "-t${SCRIPT_DIR}/typemap.dat" "${SCRIPT_DIR}/centreon-scheduler.wsdl")
+add_custom_command(OUTPUT "${INCLUDE_DIR}/centreon-engine-ws.hh"
+  COMMAND "${WSDL2H_PROGRAM}" "-o" "${INCLUDE_DIR}/centreon-engine-ws.hh" "-t${SCRIPT_DIR}/typemap.dat" "${SCRIPT_DIR}/centreon-engine.wsdl")
 
 # Find and execute gSOAP's soapcpp2.
 find_program(SOAPCPP2_PROGRAM "soapcpp2")
@@ -372,14 +372,14 @@ if (NOT GSOAP_INCLUDE_DIR)
   message(FATAL_ERROR "Could not find gSOAP's stlvector.h header file.")
 endif ()
 add_custom_command(OUTPUT
-  "${BASE_DIR}/centreonscheduler.nsmap"
+  "${BASE_DIR}/centreonengine.nsmap"
   "${BASE_DIR}/soapC.cpp"
   "${BASE_DIR}/soapH.h"
   "${BASE_DIR}/soapServer.cpp"
   "${BASE_DIR}/soapServerLib.cpp"
   "${BASE_DIR}/soapStub.h"
-  COMMAND "${SOAPCPP2_PROGRAM}" "-d${BASE_DIR}" "-S" "-I${GSOAP_INCLUDE_DIR}" "${INCLUDE_DIR}/centreon-scheduler-ws.hh"
-  DEPENDS "${INCLUDE_DIR}/centreon-scheduler-ws.hh")
+  COMMAND "${SOAPCPP2_PROGRAM}" "-d${BASE_DIR}" "-S" "-I${GSOAP_INCLUDE_DIR}" "${INCLUDE_DIR}/centreon-engine-ws.hh"
+  DEPENDS "${INCLUDE_DIR}/centreon-engine-ws.hh")
 
 # Find libgsoap++.
 find_library(GSOAP_LIBRARIES "gsoap++")
