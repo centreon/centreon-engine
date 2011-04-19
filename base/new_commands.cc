@@ -61,8 +61,6 @@ static inline char* my_strdup(char const* str) {
   return (strcpy(new_str, str));
 }
 
-// XXX: checkpoint part 1.
-
 /**
  *  Restart Scheduler.
  *
@@ -164,6 +162,11 @@ int centreonscheduler__hostGetAcknowledgementIsSet(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -196,6 +199,11 @@ int centreonscheduler__hostGetAcknowledgementType(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -228,6 +236,11 @@ int centreonscheduler__hostGetAddress(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -265,6 +278,11 @@ int centreonscheduler__hostSetAddress(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -303,6 +321,11 @@ int centreonscheduler__hostGetCheckActiveEnabled(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -335,6 +358,11 @@ int centreonscheduler__hostGetCheckCommand(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -369,6 +397,11 @@ int centreonscheduler__hostGetCheckCurrentAttempt(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -396,6 +429,11 @@ int centreonscheduler__hostGetCheckIntervalNormal(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -428,6 +466,11 @@ int centreonscheduler__hostGetCheckIntervalRetry(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -455,6 +498,11 @@ int centreonscheduler__hostGetCheckLast(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -487,6 +535,11 @@ int centreonscheduler__hostGetCheckMaxAttempts(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -519,6 +572,11 @@ int centreonscheduler__hostGetCheckNext(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -551,6 +609,11 @@ int centreonscheduler__hostGetCheckOptions(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -583,6 +646,11 @@ int centreonscheduler__hostGetCheckPassiveEnabled(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -615,6 +683,11 @@ int centreonscheduler__hostGetCheckPeriod(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -649,6 +722,11 @@ int centreonscheduler__hostGetCheckShouldBeScheduled(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -681,6 +759,11 @@ int centreonscheduler__hostGetCheckType(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -716,6 +799,11 @@ int centreonscheduler__hostSetCheckActiveEnabled(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -751,6 +839,11 @@ int centreonscheduler__hostSetCheckCommand(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -792,6 +885,11 @@ int centreonscheduler__hostSetCheckIntervalNormal(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -827,6 +925,11 @@ int centreonscheduler__hostSetCheckIntervalRetry(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -862,12 +965,22 @@ int centreonscheduler__hostSetCheckMaxAttempts(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
   if (attempts == 0) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' bad attempts value.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -903,6 +1016,11 @@ int centreonscheduler__hostSetCheckPassiveEnabled(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -935,6 +1053,11 @@ int centreonscheduler__hostGetCircularPathChecked(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -967,6 +1090,11 @@ int centreonscheduler__hostGetCircularPathHas(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -999,6 +1127,11 @@ int centreonscheduler__hostGetDowntimeDepth(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -1031,6 +1164,11 @@ int centreonscheduler__hostGetDowntimeFlexPending(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -1063,6 +1201,11 @@ int centreonscheduler__hostGetEventHandler(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -1097,6 +1240,11 @@ int centreonscheduler__hostGetEventHandlerEnabled(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -1132,6 +1280,11 @@ int centreonscheduler__hostSetEventHandler(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -1173,6 +1326,11 @@ int centreonscheduler__hostSetEventHandlerEnabled(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -1205,6 +1363,11 @@ int centreonscheduler__hostGetFailurePredictionEnabled(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -1232,6 +1395,11 @@ int centreonscheduler__hostGetFailurePredictionOptions(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -1269,6 +1437,11 @@ int centreonscheduler__hostSetFailurePredictionEnabled(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -1301,6 +1474,11 @@ int centreonscheduler__hostGetFlapDetectionCommentID(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -1333,6 +1511,11 @@ int centreonscheduler__hostGetFlapDetectionEnabled(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -1365,6 +1548,11 @@ int centreonscheduler__hostGetFlapDetectionIsFlapping(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -1397,6 +1585,11 @@ int centreonscheduler__hostGetFlapDetectionOnDown(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -1429,6 +1622,11 @@ int centreonscheduler__hostGetFlapDetectionOnUnreachable(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -1461,6 +1659,11 @@ int centreonscheduler__hostGetFlapDetectionOnUp(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -1493,6 +1696,11 @@ int centreonscheduler__hostGetFlapDetectionStateHistoryLastUpdate(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -1525,6 +1733,11 @@ int centreonscheduler__hostGetFlapDetectionThresholdHigh(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -1557,6 +1770,11 @@ int centreonscheduler__hostGetFlapDetectionThresholdLow(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -1592,6 +1810,11 @@ int centreonscheduler__hostSetFlapDetectionEnabled(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -1627,6 +1850,11 @@ int centreonscheduler__hostSetFlapDetectionOnDown(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -1662,6 +1890,11 @@ int centreonscheduler__hostSetFlapDetectionOnUnreachable(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -1697,6 +1930,11 @@ int centreonscheduler__hostSetFlapDetectionOnUp(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -1732,6 +1970,11 @@ int centreonscheduler__hostSetFlapDetectionThresholdHigh(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -1767,6 +2010,11 @@ int centreonscheduler__hostSetFlapDetectionThresholdLow(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -1799,6 +2047,11 @@ int centreonscheduler__hostGetFreshnessCheckEnabled(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -1831,6 +2084,11 @@ int centreonscheduler__hostGetFreshnessIsActive(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -1863,6 +2121,11 @@ int centreonscheduler__hostGetFreshnessThreshold(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -1898,6 +2161,11 @@ int centreonscheduler__hostSetFreshnessCheckEnabled(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -1933,6 +2201,11 @@ int centreonscheduler__hostSetFreshnessThreshold(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -1965,6 +2238,11 @@ int centreonscheduler__hostGetModifiedAttributes(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -1997,6 +2275,11 @@ int centreonscheduler__hostGetNameAlias(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -2031,6 +2314,11 @@ int centreonscheduler__hostGetNameDisplay(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -2068,6 +2356,11 @@ int centreonscheduler__hostSetNameAlias(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -2109,6 +2402,11 @@ int centreonscheduler__hostSetNameDisplay(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -2147,6 +2445,11 @@ int centreonscheduler__hostGetNotificationsCurrentID(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -2179,6 +2482,11 @@ int centreonscheduler__hostGetNotificationsCurrentNumber(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -2211,6 +2519,11 @@ int centreonscheduler__hostGetNotificationsEnabled(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -2243,6 +2556,11 @@ int centreonscheduler__hostGetNotificationsFirstDelay(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -2275,6 +2593,11 @@ int centreonscheduler__hostGetNotificationsInterval(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -2307,6 +2630,11 @@ int centreonscheduler__hostGetNotificationsLast(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -2339,6 +2667,11 @@ int centreonscheduler__hostGetNotificationsNext(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -2371,6 +2704,11 @@ int centreonscheduler__hostGetNotificationsOnDown(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -2403,6 +2741,11 @@ int centreonscheduler__hostGetNotificationsOnDowntime(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -2435,6 +2778,11 @@ int centreonscheduler__hostGetNotificationsOnFlapping(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -2467,6 +2815,11 @@ int centreonscheduler__hostGetNotificationsOnRecovery(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -2499,6 +2852,11 @@ int centreonscheduler__hostGetNotificationsOnUnreachable(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -2531,6 +2889,11 @@ int centreonscheduler__hostGetNotificationsPeriod(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -2568,6 +2931,11 @@ int centreonscheduler__hostSetNotificationsEnabled(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -2603,6 +2971,11 @@ int centreonscheduler__hostSetNotificationsFirstDelay(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -2638,6 +3011,11 @@ int centreonscheduler__hostSetNotificationsInterval(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -2673,6 +3051,11 @@ int centreonscheduler__hostSetNotificationsOnDown(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -2708,6 +3091,11 @@ int centreonscheduler__hostSetNotificationsOnDowntime(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -2743,6 +3131,11 @@ int centreonscheduler__hostSetNotificationsOnFlapping(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -2778,6 +3171,11 @@ int centreonscheduler__hostSetNotificationsOnRecovery(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -2813,6 +3211,11 @@ int centreonscheduler__hostSetNotificationsOnUnreachable(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -2845,6 +3248,11 @@ int centreonscheduler__hostGetObsessOver(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -2880,6 +3288,11 @@ int centreonscheduler__hostSetObsessOver(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -2912,6 +3325,11 @@ int centreonscheduler__hostGetPerfdataProcessingEnabled(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -2947,6 +3365,11 @@ int centreonscheduler__hostSetPerfdataProcessingEnabled(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -2979,6 +3402,11 @@ int centreonscheduler__hostGetPluginExecutionTime(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -3011,6 +3439,11 @@ int centreonscheduler__hostGetPluginIsExecuting(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -3043,6 +3476,11 @@ int centreonscheduler__hostGetPluginLatency(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -3075,6 +3513,11 @@ int centreonscheduler__hostGetPluginOutput(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -3109,6 +3552,11 @@ int centreonscheduler__hostGetPluginPerfdata(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -3143,6 +3591,11 @@ int centreonscheduler__hostGetRetainStatusInformation(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -3175,6 +3628,11 @@ int centreonscheduler__hostGetRetainNonStatusInformation(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -3210,6 +3668,11 @@ int centreonscheduler__hostSetRetainStatusInformation(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -3245,6 +3708,11 @@ int centreonscheduler__hostSetRetainNonStatusInformation(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -3277,6 +3745,11 @@ int centreonscheduler__hostGetServicesCount(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -3309,6 +3782,11 @@ int centreonscheduler__hostGetServicesTotalCheckInterval(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -3341,6 +3819,11 @@ int centreonscheduler__hostGetStalkOnDown(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -3373,6 +3856,11 @@ int centreonscheduler__hostGetStalkOnUnreachable(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -3405,6 +3893,11 @@ int centreonscheduler__hostGetStalkOnUp(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -3440,6 +3933,11 @@ int centreonscheduler__hostSetStalkOnDown(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -3475,6 +3973,11 @@ int centreonscheduler__hostSetStalkOnUnreachable(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -3510,6 +4013,11 @@ int centreonscheduler__hostSetStalkOnUp(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -3542,6 +4050,11 @@ int centreonscheduler__hostGetStateCurrent(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -3574,6 +4087,11 @@ int centreonscheduler__hostGetStateInitial(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -3606,6 +4124,11 @@ int centreonscheduler__hostGetStateLast(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -3638,6 +4161,11 @@ int centreonscheduler__hostGetStateLastChange(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -3670,6 +4198,11 @@ int centreonscheduler__hostGetStateLastDown(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -3702,6 +4235,11 @@ int centreonscheduler__hostGetStateLastHard(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -3734,6 +4272,11 @@ int centreonscheduler__hostGetStateLastHardChange(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -3766,6 +4309,11 @@ int centreonscheduler__hostGetStateLastUnreachable(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -3798,6 +4346,11 @@ int centreonscheduler__hostGetStateLastUp(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -3830,6 +4383,11 @@ int centreonscheduler__hostGetStatePercentChange(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -3862,6 +4420,11 @@ int centreonscheduler__hostGetStateType(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -3870,8 +4433,6 @@ int centreonscheduler__hostGetStateType(soap* s,
 
   return (SOAP_OK);
 }
-
-// XXX: checkpoint part 2.
 
 /**
  *  Enable or disable all notifications beyond a host.
@@ -3898,6 +4459,11 @@ int centreonscheduler__hostSetNotificationsBeyondEnabled(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -3938,6 +4504,11 @@ int centreonscheduler__hostSetNotificationsOnSelfAndChildrenEnabled(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -3978,6 +4549,11 @@ int centreonscheduler__hostSetNotificationsPeriod(soap* s,
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -4004,7 +4580,7 @@ int centreonscheduler__serviceGetAcknowledgementIsSet(soap* s,
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
-		 "Webservice: %s(%s { %s })\n",
+		 "Webservice: %s({ %s, { %s } })\n",
 		 __func__,
 		 service_id->service.c_str(),
 		 service_id->host->name.c_str());
@@ -4012,7 +4588,13 @@ int centreonscheduler__serviceGetAcknowledgementIsSet(soap* s,
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -4037,7 +4619,7 @@ int centreonscheduler__serviceGetAcknowledgementType(soap* s,
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
-		 "Webservice: %s(%s { %s })\n",
+		 "Webservice: %s({ %s, { %s } })\n",
 		 __func__,
 		 service_id->service.c_str(),
 		 service_id->host->name.c_str());
@@ -4045,7 +4627,13 @@ int centreonscheduler__serviceGetAcknowledgementType(soap* s,
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -4070,7 +4658,7 @@ int centreonscheduler__serviceGetCheckActiveEnabled(soap* s,
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
-		 "Webservice: %s(%s { %s })\n",
+		 "Webservice: %s({ %s, { %s } })\n",
 		 __func__,
 		 service_id->service.c_str(),
 		 service_id->host->name.c_str());
@@ -4078,7 +4666,13 @@ int centreonscheduler__serviceGetCheckActiveEnabled(soap* s,
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -4103,7 +4697,7 @@ int centreonscheduler__serviceGetCheckCommand(soap* s,
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
-		 "Webservice: %s(%s { %s })\n",
+		 "Webservice: %s({ %s, { %s } })\n",
 		 __func__,
 		 service_id->service.c_str(),
 		 service_id->host->name.c_str());
@@ -4111,7 +4705,13 @@ int centreonscheduler__serviceGetCheckCommand(soap* s,
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -4138,7 +4738,7 @@ int centreonscheduler__serviceGetCheckCurrentAttempt(soap* s,
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
-		 "Webservice: %s(%s { %s })\n",
+		 "Webservice: %s({ %s, { %s } })\n",
 		 __func__,
 		 service_id->service.c_str(),
 		 service_id->host->name.c_str());
@@ -4146,7 +4746,13 @@ int centreonscheduler__serviceGetCheckCurrentAttempt(soap* s,
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -4171,7 +4777,7 @@ int centreonscheduler__serviceGetCheckIntervalNormal(soap* s,
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
-		 "Webservice: %s(%s { %s })\n",
+		 "Webservice: %s({ %s, { %s } })\n",
 		 __func__,
 		 service_id->service.c_str(),
 		 service_id->host->name.c_str());
@@ -4179,7 +4785,13 @@ int centreonscheduler__serviceGetCheckIntervalNormal(soap* s,
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -4204,7 +4816,7 @@ int centreonscheduler__serviceGetCheckIntervalRetry(soap* s,
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
-		 "Webservice: %s(%s { %s })\n",
+		 "Webservice: %s({ %s, { %s } })\n",
 		 __func__,
 		 service_id->service.c_str(),
 		 service_id->host->name.c_str());
@@ -4212,7 +4824,13 @@ int centreonscheduler__serviceGetCheckIntervalRetry(soap* s,
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -4237,7 +4855,7 @@ int centreonscheduler__serviceGetCheckLast(soap* s,
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
-		 "Webservice: %s(%s { %s })\n",
+		 "Webservice: %s({ %s, { %s } })\n",
 		 __func__,
 		 service_id->service.c_str(),
 		 service_id->host->name.c_str());
@@ -4245,7 +4863,13 @@ int centreonscheduler__serviceGetCheckLast(soap* s,
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -4270,7 +4894,7 @@ int centreonscheduler__serviceGetCheckMaxAttempts(soap* s,
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
-		 "Webservice: %s(%s { %s })\n",
+		 "Webservice: %s({ %s, { %s } })\n",
 		 __func__,
 		 service_id->service.c_str(),
 		 service_id->host->name.c_str());
@@ -4278,7 +4902,13 @@ int centreonscheduler__serviceGetCheckMaxAttempts(soap* s,
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -4303,7 +4933,7 @@ int centreonscheduler__serviceGetCheckNext(soap* s,
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
-		 "Webservice: %s(%s { %s })\n",
+		 "Webservice: %s({ %s, { %s } })\n",
 		 __func__,
 		 service_id->service.c_str(),
 		 service_id->host->name.c_str());
@@ -4311,7 +4941,13 @@ int centreonscheduler__serviceGetCheckNext(soap* s,
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -4336,7 +4972,7 @@ int centreonscheduler__serviceGetCheckOptions(soap* s,
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
-		 "Webservice: %s(%s { %s })\n",
+		 "Webservice: %s({ %s, { %s } })\n",
 		 __func__,
 		 service_id->service.c_str(),
 		 service_id->host->name.c_str());
@@ -4344,7 +4980,13 @@ int centreonscheduler__serviceGetCheckOptions(soap* s,
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -4369,7 +5011,7 @@ int centreonscheduler__serviceGetCheckPassiveEnabled(soap* s,
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
-		 "Webservice: %s(%s { %s })\n",
+		 "Webservice: %s({ %s, { %s } })\n",
 		 __func__,
 		 service_id->service.c_str(),
 		 service_id->host->name.c_str());
@@ -4377,7 +5019,13 @@ int centreonscheduler__serviceGetCheckPassiveEnabled(soap* s,
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -4402,7 +5050,7 @@ int centreonscheduler__serviceGetCheckPeriod(soap* s,
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
-		 "Webservice: %s(%s { %s })\n",
+		 "Webservice: %s({ %s, { %s } })\n",
 		 __func__,
 		 service_id->service.c_str(),
 		 service_id->host->name.c_str());
@@ -4410,7 +5058,13 @@ int centreonscheduler__serviceGetCheckPeriod(soap* s,
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -4437,7 +5091,7 @@ int centreonscheduler__serviceGetCheckShouldBeScheduled(soap* s,
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
-		 "Webservice: %s(%s { %s })\n",
+		 "Webservice: %s({ %s, { %s } })\n",
 		 __func__,
 		 service_id->service.c_str(),
 		 service_id->host->name.c_str());
@@ -4445,7 +5099,13 @@ int centreonscheduler__serviceGetCheckShouldBeScheduled(soap* s,
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -4470,7 +5130,7 @@ int centreonscheduler__serviceGetCheckType(soap* s,
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
-		 "Webservice: %s(%s { %s })\n",
+		 "Webservice: %s({ %s, { %s } })\n",
 		 __func__,
 		 service_id->service.c_str(),
 		 service_id->host->name.c_str());
@@ -4478,7 +5138,13 @@ int centreonscheduler__serviceGetCheckType(soap* s,
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -4514,7 +5180,13 @@ int centreonscheduler__serviceSetCheckActiveEnabled(soap* s,
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -4550,7 +5222,13 @@ int centreonscheduler__serviceSetCheckCommand(soap* s,
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -4592,7 +5270,13 @@ int centreonscheduler__serviceSetCheckIntervalNormal(soap* s,
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -4628,7 +5312,13 @@ int centreonscheduler__serviceSetCheckIntervalRetry(soap* s,
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -4664,13 +5354,24 @@ int centreonscheduler__serviceSetCheckMaxAttempts(soap* s,
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
   if (attempts == 0) {
     res.error->code = 1;
     res.error->message = "Service `" + service_id->service + "' bad attempts value.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -4706,7 +5407,13 @@ int centreonscheduler__serviceSetCheckPassiveEnabled(soap* s,
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -4742,7 +5449,13 @@ int centreonscheduler__serviceGetCustomVariable(soap* s,
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -4762,6 +5475,11 @@ int centreonscheduler__serviceGetCustomVariable(soap* s,
   res.error->message = "Service `" + service_id->service
     + "' variable `" + variable + "' not found.";
 
+
+  log_debug_info(DEBUGL_COMMANDS, 2,
+		 "Webservice: %s failed. %s\n",
+		 __func__,
+		 res.error->message.c_str());
   return (SOAP_OK);
 }
 
@@ -4780,7 +5498,7 @@ int centreonscheduler__serviceGetDowntimeDepth(soap* s,
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
-		 "Webservice: %s(%s { %s })\n",
+		 "Webservice: %s({ %s, { %s } })\n",
 		 __func__,
 		 service_id->service.c_str(),
 		 service_id->host->name.c_str());
@@ -4788,7 +5506,13 @@ int centreonscheduler__serviceGetDowntimeDepth(soap* s,
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -4813,7 +5537,7 @@ int centreonscheduler__serviceGetDowntimeFlexPending(soap* s,
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
-		 "Webservice: %s(%s { %s })\n",
+		 "Webservice: %s({ %s, { %s } })\n",
 		 __func__,
 		 service_id->service.c_str(),
 		 service_id->host->name.c_str());
@@ -4821,7 +5545,13 @@ int centreonscheduler__serviceGetDowntimeFlexPending(soap* s,
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -4846,7 +5576,7 @@ int centreonscheduler__serviceGetEventHandler(soap* s,
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
-		 "Webservice: %s(%s { %s })\n",
+		 "Webservice: %s({ %s, { %s } })\n",
 		 __func__,
 		 service_id->service.c_str(),
 		 service_id->host->name.c_str());
@@ -4854,7 +5584,13 @@ int centreonscheduler__serviceGetEventHandler(soap* s,
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -4881,7 +5617,7 @@ int centreonscheduler__serviceGetEventHandlerEnabled(soap* s,
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
-		 "Webservice: %s(%s { %s })\n",
+		 "Webservice: %s({ %s, { %s } })\n",
 		 __func__,
 		 service_id->service.c_str(),
 		 service_id->host->name.c_str());
@@ -4889,7 +5625,13 @@ int centreonscheduler__serviceGetEventHandlerEnabled(soap* s,
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -4925,7 +5667,13 @@ int centreonscheduler__serviceSetEventHandler(soap* s,
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -4967,7 +5715,13 @@ int centreonscheduler__serviceSetEventHandlerEnabled(soap* s,
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -4992,7 +5746,7 @@ int centreonscheduler__serviceGetFailurePredictionEnabled(soap* s,
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
-		 "Webservice: %s(%s { %s })\n",
+		 "Webservice: %s({ %s, { %s } })\n",
 		 __func__,
 		 service_id->service.c_str(),
 		 service_id->host->name.c_str());
@@ -5000,7 +5754,8 @@ int centreonscheduler__serviceGetFailurePredictionEnabled(soap* s,
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
     return (SOAP_OK);
   }
 
@@ -5025,7 +5780,7 @@ int centreonscheduler__serviceGetFailurePredictionOptions(soap* s,
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
-		 "Webservice: %s(%s { %s })\n",
+		 "Webservice: %s({ %s, { %s } })\n",
 		 __func__,
 		 service_id->service.c_str(),
 		 service_id->host->name.c_str());
@@ -5033,7 +5788,13 @@ int centreonscheduler__serviceGetFailurePredictionOptions(soap* s,
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -5071,7 +5832,13 @@ int centreonscheduler__serviceSetFailurePredictionEnabled(soap* s,
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -5096,7 +5863,7 @@ int centreonscheduler__serviceGetFlapDetectionCommentID(soap* s,
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
-		 "Webservice: %s(%s { %s })\n",
+		 "Webservice: %s({ %s, { %s } })\n",
 		 __func__,
 		 service_id->service.c_str(),
 		 service_id->host->name.c_str());
@@ -5104,7 +5871,13 @@ int centreonscheduler__serviceGetFlapDetectionCommentID(soap* s,
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -5129,7 +5902,7 @@ int centreonscheduler__serviceGetFlapDetectionEnabled(soap* s,
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
-		 "Webservice: %s(%s { %s })\n",
+		 "Webservice: %s({ %s, { %s } })\n",
 		 __func__,
 		 service_id->service.c_str(),
 		 service_id->host->name.c_str());
@@ -5137,7 +5910,13 @@ int centreonscheduler__serviceGetFlapDetectionEnabled(soap* s,
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -5162,7 +5941,7 @@ int centreonscheduler__serviceGetFlapDetectionIsFlapping(soap* s,
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
-		 "Webservice: %s(%s { %s })\n",
+		 "Webservice: %s({ %s, { %s } })\n",
 		 __func__,
 		 service_id->service.c_str(),
 		 service_id->host->name.c_str());
@@ -5170,7 +5949,13 @@ int centreonscheduler__serviceGetFlapDetectionIsFlapping(soap* s,
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -5195,7 +5980,7 @@ int centreonscheduler__serviceGetFlapDetectionOnCritical(soap* s,
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
-		 "Webservice: %s(%s { %s })\n",
+		 "Webservice: %s({ %s, { %s } })\n",
 		 __func__,
 		 service_id->service.c_str(),
 		 service_id->host->name.c_str());
@@ -5203,7 +5988,13 @@ int centreonscheduler__serviceGetFlapDetectionOnCritical(soap* s,
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -5228,7 +6019,7 @@ int centreonscheduler__serviceGetFlapDetectionOnOk(soap* s,
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
-		 "Webservice: %s(%s { %s })\n",
+		 "Webservice: %s({ %s, { %s } })\n",
 		 __func__,
 		 service_id->service.c_str(),
 		 service_id->host->name.c_str());
@@ -5236,7 +6027,13 @@ int centreonscheduler__serviceGetFlapDetectionOnOk(soap* s,
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -5261,7 +6058,7 @@ int centreonscheduler__serviceGetFlapDetectionOnUnknown(soap* s,
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
-		 "Webservice: %s(%s { %s })\n",
+		 "Webservice: %s({ %s, { %s } })\n",
 		 __func__,
 		 service_id->service.c_str(),
 		 service_id->host->name.c_str());
@@ -5269,7 +6066,13 @@ int centreonscheduler__serviceGetFlapDetectionOnUnknown(soap* s,
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -5294,7 +6097,7 @@ int centreonscheduler__serviceGetFlapDetectionOnWarning(soap* s,
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
-		 "Webservice: %s(%s { %s })\n",
+		 "Webservice: %s({ %s, { %s } })\n",
 		 __func__,
 		 service_id->service.c_str(),
 		 service_id->host->name.c_str());
@@ -5302,7 +6105,13 @@ int centreonscheduler__serviceGetFlapDetectionOnWarning(soap* s,
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -5327,7 +6136,7 @@ int centreonscheduler__serviceGetFlapDetectionThresholdHigh(soap* s,
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
-		 "Webservice: %s(%s { %s })\n",
+		 "Webservice: %s({ %s, { %s } })\n",
 		 __func__,
 		 service_id->service.c_str(),
 		 service_id->host->name.c_str());
@@ -5335,7 +6144,13 @@ int centreonscheduler__serviceGetFlapDetectionThresholdHigh(soap* s,
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -5360,7 +6175,7 @@ int centreonscheduler__serviceGetFlapDetectionThresholdLow(soap* s,
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
-		 "Webservice: %s(%s { %s })\n",
+		 "Webservice: %s({ %s, { %s } })\n",
 		 __func__,
 		 service_id->service.c_str(),
 		 service_id->host->name.c_str());
@@ -5368,7 +6183,13 @@ int centreonscheduler__serviceGetFlapDetectionThresholdLow(soap* s,
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -5404,7 +6225,13 @@ int centreonscheduler__serviceSetFlapDetectionEnabled(soap* s,
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -5440,7 +6267,13 @@ int centreonscheduler__serviceSetFlapDetectionOnCritical(soap* s,
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -5476,7 +6309,13 @@ int centreonscheduler__serviceSetFlapDetectionOnOk(soap* s,
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -5512,7 +6351,13 @@ int centreonscheduler__serviceSetFlapDetectionOnUnknown(soap* s,
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -5548,7 +6393,13 @@ int centreonscheduler__serviceSetFlapDetectionOnWarning(soap* s,
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -5584,7 +6435,13 @@ int centreonscheduler__serviceSetFlapDetectionThresholdHigh(soap* s,
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -5620,7 +6477,13 @@ int centreonscheduler__serviceSetFlapDetectionThresholdLow(soap* s,
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -5645,7 +6508,7 @@ int centreonscheduler__serviceGetFreshnessCheckEnabled(soap* s,
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
-		 "Webservice: %s(%s { %s })\n",
+		 "Webservice: %s({ %s, { %s } })\n",
 		 __func__,
 		 service_id->service.c_str(),
 		 service_id->host->name.c_str());
@@ -5653,7 +6516,13 @@ int centreonscheduler__serviceGetFreshnessCheckEnabled(soap* s,
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -5678,7 +6547,7 @@ int centreonscheduler__serviceGetFreshnessIsActive(soap* s,
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
-		 "Webservice: %s(%s { %s })\n",
+		 "Webservice: %s({ %s, { %s } })\n",
 		 __func__,
 		 service_id->service.c_str(),
 		 service_id->host->name.c_str());
@@ -5686,7 +6555,13 @@ int centreonscheduler__serviceGetFreshnessIsActive(soap* s,
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -5711,7 +6586,7 @@ int centreonscheduler__serviceGetFreshnessThreshold(soap* s,
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
-		 "Webservice: %s(%s { %s })\n",
+		 "Webservice: %s({ %s, { %s } })\n",
 		 __func__,
 		 service_id->service.c_str(),
 		 service_id->host->name.c_str());
@@ -5719,7 +6594,13 @@ int centreonscheduler__serviceGetFreshnessThreshold(soap* s,
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -5755,7 +6636,13 @@ int centreonscheduler__serviceSetFreshnessCheckEnabled(soap* s,
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -5791,7 +6678,13 @@ int centreonscheduler__serviceSetFreshnessThreshold(soap* s,
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -5816,7 +6709,7 @@ int centreonscheduler__serviceGetModifiedAttributes(soap* s,
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
-		 "Webservice: %s(%s { %s })\n",
+		 "Webservice: %s({ %s, { %s } })\n",
 		 __func__,
 		 service_id->service.c_str(),
 		 service_id->host->name.c_str());
@@ -5824,7 +6717,13 @@ int centreonscheduler__serviceGetModifiedAttributes(soap* s,
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -5849,7 +6748,7 @@ int centreonscheduler__serviceGetNameDisplay(soap* s,
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
-		 "Webservice: %s(%s { %s })\n",
+		 "Webservice: %s({ %s, { %s } })\n",
 		 __func__,
 		 service_id->service.c_str(),
 		 service_id->host->name.c_str());
@@ -5857,7 +6756,13 @@ int centreonscheduler__serviceGetNameDisplay(soap* s,
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -5895,7 +6800,13 @@ int centreonscheduler__serviceSetNameDisplay(soap* s,
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -5926,7 +6837,7 @@ int centreonscheduler__serviceGetNotificationsCurrentID(soap* s,
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
-		 "Webservice: %s(%s { %s })\n",
+		 "Webservice: %s({ %s, { %s } })\n",
 		 __func__,
 		 service_id->service.c_str(),
 		 service_id->host->name.c_str());
@@ -5934,7 +6845,13 @@ int centreonscheduler__serviceGetNotificationsCurrentID(soap* s,
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -5959,7 +6876,7 @@ int centreonscheduler__serviceGetNotificationsCurrentNumber(soap* s,
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
-		 "Webservice: %s(%s { %s })\n",
+		 "Webservice: %s({ %s, { %s } })\n",
 		 __func__,
 		 service_id->service.c_str(),
 		 service_id->host->name.c_str());
@@ -5967,7 +6884,13 @@ int centreonscheduler__serviceGetNotificationsCurrentNumber(soap* s,
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -5992,7 +6915,7 @@ int centreonscheduler__serviceGetNotificationsEnabled(soap* s,
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
-		 "Webservice: %s(%s { %s })\n",
+		 "Webservice: %s({ %s, { %s } })\n",
 		 __func__,
 		 service_id->service.c_str(),
 		 service_id->host->name.c_str());
@@ -6000,7 +6923,13 @@ int centreonscheduler__serviceGetNotificationsEnabled(soap* s,
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -6025,7 +6954,7 @@ int centreonscheduler__serviceGetNotificationsFirstDelay(soap* s,
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
-		 "Webservice: %s(%s { %s })\n",
+		 "Webservice: %s({ %s, { %s } })\n",
 		 __func__,
 		 service_id->service.c_str(),
 		 service_id->host->name.c_str());
@@ -6033,7 +6962,13 @@ int centreonscheduler__serviceGetNotificationsFirstDelay(soap* s,
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -6058,7 +6993,7 @@ int centreonscheduler__serviceGetNotificationsInterval(soap* s,
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
-		 "Webservice: %s(%s { %s })\n",
+		 "Webservice: %s({ %s, { %s } })\n",
 		 __func__,
 		 service_id->service.c_str(),
 		 service_id->host->name.c_str());
@@ -6066,7 +7001,13 @@ int centreonscheduler__serviceGetNotificationsInterval(soap* s,
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -6091,7 +7032,7 @@ int centreonscheduler__serviceGetNotificationsLast(soap* s,
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
-		 "Webservice: %s(%s { %s })\n",
+		 "Webservice: %s({ %s, { %s } })\n",
 		 __func__,
 		 service_id->service.c_str(),
 		 service_id->host->name.c_str());
@@ -6099,7 +7040,13 @@ int centreonscheduler__serviceGetNotificationsLast(soap* s,
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -6124,7 +7071,7 @@ int centreonscheduler__serviceGetNotificationsNext(soap* s,
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
-		 "Webservice: %s(%s { %s })\n",
+		 "Webservice: %s({ %s, { %s } })\n",
 		 __func__,
 		 service_id->service.c_str(),
 		 service_id->host->name.c_str());
@@ -6132,7 +7079,13 @@ int centreonscheduler__serviceGetNotificationsNext(soap* s,
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -6157,7 +7110,7 @@ int centreonscheduler__serviceGetNotificationsOnCritical(soap* s,
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
-		 "Webservice: %s(%s { %s })\n",
+		 "Webservice: %s({ %s, { %s } })\n",
 		 __func__,
 		 service_id->service.c_str(),
 		 service_id->host->name.c_str());
@@ -6165,7 +7118,13 @@ int centreonscheduler__serviceGetNotificationsOnCritical(soap* s,
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -6190,7 +7149,7 @@ int centreonscheduler__serviceGetNotificationsOnDowntime(soap* s,
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
-		 "Webservice: %s(%s { %s })\n",
+		 "Webservice: %s({ %s, { %s } })\n",
 		 __func__,
 		 service_id->service.c_str(),
 		 service_id->host->name.c_str());
@@ -6198,7 +7157,13 @@ int centreonscheduler__serviceGetNotificationsOnDowntime(soap* s,
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -6223,7 +7188,7 @@ int centreonscheduler__serviceGetNotificationsOnFlapping(soap* s,
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
-		 "Webservice: %s(%s { %s })\n",
+		 "Webservice: %s({ %s, { %s } })\n",
 		 __func__,
 		 service_id->service.c_str(),
 		 service_id->host->name.c_str());
@@ -6231,7 +7196,13 @@ int centreonscheduler__serviceGetNotificationsOnFlapping(soap* s,
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -6256,7 +7227,7 @@ int centreonscheduler__serviceGetNotificationsOnRecovery(soap* s,
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
-		 "Webservice: %s(%s { %s })\n",
+		 "Webservice: %s({ %s, { %s } })\n",
 		 __func__,
 		 service_id->service.c_str(),
 		 service_id->host->name.c_str());
@@ -6264,7 +7235,13 @@ int centreonscheduler__serviceGetNotificationsOnRecovery(soap* s,
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -6289,7 +7266,7 @@ int centreonscheduler__serviceGetNotificationsOnUnknown(soap* s,
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
-		 "Webservice: %s(%s { %s })\n",
+		 "Webservice: %s({ %s, { %s } })\n",
 		 __func__,
 		 service_id->service.c_str(),
 		 service_id->host->name.c_str());
@@ -6297,7 +7274,13 @@ int centreonscheduler__serviceGetNotificationsOnUnknown(soap* s,
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -6322,7 +7305,7 @@ int centreonscheduler__serviceGetNotificationsOnWarning(soap* s,
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
-		 "Webservice: %s(%s { %s })\n",
+		 "Webservice: %s({ %s, { %s } })\n",
 		 __func__,
 		 service_id->service.c_str(),
 		 service_id->host->name.c_str());
@@ -6330,7 +7313,13 @@ int centreonscheduler__serviceGetNotificationsOnWarning(soap* s,
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -6355,7 +7344,7 @@ int centreonscheduler__serviceGetNotificationsPeriod(soap* s,
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
-		 "Webservice: %s(%s { %s })\n",
+		 "Webservice: %s({ %s, { %s } })\n",
 		 __func__,
 		 service_id->service.c_str(),
 		 service_id->host->name.c_str());
@@ -6363,7 +7352,13 @@ int centreonscheduler__serviceGetNotificationsPeriod(soap* s,
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -6401,7 +7396,13 @@ int centreonscheduler__serviceSetNotificationsEnabled(soap* s,
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -6437,7 +7438,13 @@ int centreonscheduler__serviceSetNotificationsFirstDelay(soap* s,
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -6473,7 +7480,13 @@ int centreonscheduler__serviceSetNotificationsInterval(soap* s,
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -6509,7 +7522,13 @@ int centreonscheduler__serviceSetNotificationsOnCritical(soap* s,
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -6545,7 +7564,13 @@ int centreonscheduler__serviceSetNotificationsOnDowntime(soap* s,
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -6581,7 +7606,13 @@ int centreonscheduler__serviceSetNotificationsOnFlapping(soap* s,
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -6617,7 +7648,13 @@ int centreonscheduler__serviceSetNotificationsOnRecovery(soap* s,
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -6653,7 +7690,13 @@ int centreonscheduler__serviceSetNotificationsOnUnknown(soap* s,
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -6689,7 +7732,13 @@ int centreonscheduler__serviceSetNotificationsOnWarning(soap* s,
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -6714,7 +7763,7 @@ int centreonscheduler__serviceGetObsessOver(soap* s,
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
-		 "Webservice: %s(%s { %s })\n",
+		 "Webservice: %s({ %s, { %s } })\n",
 		 __func__,
 		 service_id->service.c_str(),
 		 service_id->host->name.c_str());
@@ -6722,7 +7771,13 @@ int centreonscheduler__serviceGetObsessOver(soap* s,
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -6758,7 +7813,13 @@ int centreonscheduler__serviceSetObsessOver(soap* s,
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -6783,7 +7844,7 @@ int centreonscheduler__serviceGetPerfdataProcessingEnabled(soap* s,
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
-		 "Webservice: %s(%s { %s })\n",
+		 "Webservice: %s({ %s, { %s } })\n",
 		 __func__,
 		 service_id->service.c_str(),
 		 service_id->host->name.c_str());
@@ -6791,7 +7852,13 @@ int centreonscheduler__serviceGetPerfdataProcessingEnabled(soap* s,
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -6827,7 +7894,13 @@ int centreonscheduler__serviceSetPerfdataProcessingEnabled(soap* s,
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -6852,7 +7925,7 @@ int centreonscheduler__serviceGetPluginExecutionTime(soap* s,
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
-		 "Webservice: %s(%s { %s })\n",
+		 "Webservice: %s({ %s, { %s } })\n",
 		 __func__,
 		 service_id->service.c_str(),
 		 service_id->host->name.c_str());
@@ -6860,7 +7933,13 @@ int centreonscheduler__serviceGetPluginExecutionTime(soap* s,
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -6885,7 +7964,7 @@ int centreonscheduler__serviceGetPluginIsExecuting(soap* s,
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
-		 "Webservice: %s(%s { %s })\n",
+		 "Webservice: %s({ %s, { %s } })\n",
 		 __func__,
 		 service_id->service.c_str(),
 		 service_id->host->name.c_str());
@@ -6893,7 +7972,13 @@ int centreonscheduler__serviceGetPluginIsExecuting(soap* s,
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -6918,7 +8003,7 @@ int centreonscheduler__serviceGetPluginLatency(soap* s,
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
-		 "Webservice: %s(%s { %s })\n",
+		 "Webservice: %s({ %s, { %s } })\n",
 		 __func__,
 		 service_id->service.c_str(),
 		 service_id->host->name.c_str());
@@ -6926,7 +8011,13 @@ int centreonscheduler__serviceGetPluginLatency(soap* s,
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -6951,7 +8042,7 @@ int centreonscheduler__serviceGetPluginOutput(soap* s,
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
-		 "Webservice: %s(%s { %s })\n",
+		 "Webservice: %s({ %s, { %s } })\n",
 		 __func__,
 		 service_id->service.c_str(),
 		 service_id->host->name.c_str());
@@ -6959,7 +8050,13 @@ int centreonscheduler__serviceGetPluginOutput(soap* s,
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -6985,7 +8082,7 @@ int centreonscheduler__serviceGetPluginPerfdata(soap* s,
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
-		 "Webservice: %s(%s { %s })\n",
+		 "Webservice: %s({ %s, { %s } })\n",
 		 __func__,
 		 service_id->service.c_str(),
 		 service_id->host->name.c_str());
@@ -6993,7 +8090,13 @@ int centreonscheduler__serviceGetPluginPerfdata(soap* s,
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -7020,7 +8123,7 @@ int centreonscheduler__serviceGetRetainStatusInformation(soap* s,
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
-		 "Webservice: %s(%s { %s })\n",
+		 "Webservice: %s({ %s, { %s } })\n",
 		 __func__,
 		 service_id->service.c_str(),
 		 service_id->host->name.c_str());
@@ -7028,7 +8131,13 @@ int centreonscheduler__serviceGetRetainStatusInformation(soap* s,
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -7053,7 +8162,7 @@ int centreonscheduler__serviceGetRetainNonStatusInformation(soap* s,
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
-		 "Webservice: %s(%s { %s })\n",
+		 "Webservice: %s({ %s, { %s } })\n",
 		 __func__,
 		 service_id->service.c_str(),
 		 service_id->host->name.c_str());
@@ -7061,7 +8170,13 @@ int centreonscheduler__serviceGetRetainNonStatusInformation(soap* s,
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -7097,7 +8212,13 @@ int centreonscheduler__serviceSetRetainStatusInformation(soap* s,
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -7133,7 +8254,13 @@ int centreonscheduler__serviceSetRetainNonStatusInformation(soap* s,
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -7158,7 +8285,7 @@ int centreonscheduler__serviceGetStalkOnCritical(soap* s,
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
-		 "Webservice: %s(%s { %s })\n",
+		 "Webservice: %s({ %s, { %s } })\n",
 		 __func__,
 		 service_id->service.c_str(),
 		 service_id->host->name.c_str());
@@ -7166,7 +8293,13 @@ int centreonscheduler__serviceGetStalkOnCritical(soap* s,
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -7191,7 +8324,7 @@ int centreonscheduler__serviceGetStalkOnOk(soap* s,
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
-		 "Webservice: %s(%s { %s })\n",
+		 "Webservice: %s({ %s, { %s } })\n",
 		 __func__,
 		 service_id->service.c_str(),
 		 service_id->host->name.c_str());
@@ -7199,7 +8332,13 @@ int centreonscheduler__serviceGetStalkOnOk(soap* s,
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -7224,7 +8363,7 @@ int centreonscheduler__serviceGetStalkOnUnknown(soap* s,
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
-		 "Webservice: %s(%s { %s })\n",
+		 "Webservice: %s({ %s, { %s } })\n",
 		 __func__,
 		 service_id->service.c_str(),
 		 service_id->host->name.c_str());
@@ -7232,7 +8371,13 @@ int centreonscheduler__serviceGetStalkOnUnknown(soap* s,
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -7257,7 +8402,7 @@ int centreonscheduler__serviceGetStalkOnWarning(soap* s,
   (void)s;
 
   log_debug_info(DEBUGL_FUNCTIONS, 2,
-		 "Webservice: %s(%s { %s })\n",
+		 "Webservice: %s({ %s, { %s } })\n",
 		 __func__,
 		 service_id->service.c_str(),
 		 service_id->host->name.c_str());
@@ -7265,7 +8410,13 @@ int centreonscheduler__serviceGetStalkOnWarning(soap* s,
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -7301,7 +8452,13 @@ int centreonscheduler__serviceSetStalkOnCritical(soap* s,
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -7337,7 +8494,13 @@ int centreonscheduler__serviceSetStalkOnOk(soap* s,
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -7373,7 +8536,13 @@ int centreonscheduler__serviceSetStalkOnUnknown(soap* s,
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -7399,10 +8568,23 @@ int centreonscheduler__serviceSetStalkOnWarning(soap* s,
 						centreonscheduler__serviceSetStalkOnWarningResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2,
+		 "Webservice: %s(%s { %s }, %d)\n",
+		 __func__,
+		 service_id->service.c_str(),
+		 service_id->host->name.c_str(),
+		 enable);
+
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -7426,10 +8608,22 @@ int centreonscheduler__serviceGetStateCurrent(soap* s,
 					      centreonscheduler__serviceGetStateCurrentResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2,
+		 "Webservice: %s({ %s, { %s } })\n",
+		 __func__,
+		 service_id->service.c_str(),
+		 service_id->host->name.c_str());
+
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -7453,10 +8647,22 @@ int centreonscheduler__serviceGetStateInitial(soap* s,
 					      centreonscheduler__serviceGetStateInitialResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2,
+		 "Webservice: %s({ %s, { %s } })\n",
+		 __func__,
+		 service_id->service.c_str(),
+		 service_id->host->name.c_str());
+
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -7480,10 +8686,22 @@ int centreonscheduler__serviceGetStateLast(soap* s,
 					   centreonscheduler__serviceGetStateLastResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2,
+		 "Webservice: %s({ %s, { %s } })\n",
+		 __func__,
+		 service_id->service.c_str(),
+		 service_id->host->name.c_str());
+
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -7507,10 +8725,22 @@ int centreonscheduler__serviceGetStateLastChange(soap* s,
 						 centreonscheduler__serviceGetStateLastChangeResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2,
+		 "Webservice: %s({ %s, { %s } })\n",
+		 __func__,
+		 service_id->service.c_str(),
+		 service_id->host->name.c_str());
+
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -7534,10 +8764,22 @@ int centreonscheduler__serviceGetStateLastCritical(soap* s,
 						   centreonscheduler__serviceGetStateLastCriticalResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2,
+		 "Webservice: %s({ %s, { %s } })\n",
+		 __func__,
+		 service_id->service.c_str(),
+		 service_id->host->name.c_str());
+
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -7561,10 +8803,22 @@ int centreonscheduler__serviceGetStateLastHard(soap* s,
 					       centreonscheduler__serviceGetStateLastHardResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2,
+		 "Webservice: %s({ %s, { %s } })\n",
+		 __func__,
+		 service_id->service.c_str(),
+		 service_id->host->name.c_str());
+
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -7588,10 +8842,22 @@ int centreonscheduler__serviceGetStateLastHardChange(soap* s,
 						     centreonscheduler__serviceGetStateLastHardChangeResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2,
+		 "Webservice: %s({ %s, { %s } })\n",
+		 __func__,
+		 service_id->service.c_str(),
+		 service_id->host->name.c_str());
+
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -7615,10 +8881,22 @@ int centreonscheduler__serviceGetStateLastOk(soap* s,
 					     centreonscheduler__serviceGetStateLastOkResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2,
+		 "Webservice: %s({ %s, { %s } })\n",
+		 __func__,
+		 service_id->service.c_str(),
+		 service_id->host->name.c_str());
+
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -7642,10 +8920,22 @@ int centreonscheduler__serviceGetStateLastUnknown(soap* s,
 						  centreonscheduler__serviceGetStateLastUnknownResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2,
+		 "Webservice: %s({ %s, { %s } })\n",
+		 __func__,
+		 service_id->service.c_str(),
+		 service_id->host->name.c_str());
+
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -7669,10 +8959,22 @@ int centreonscheduler__serviceGetStateLastWarning(soap* s,
 						  centreonscheduler__serviceGetStateLastWarningResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2,
+		 "Webservice: %s({ %s, { %s } })\n",
+		 __func__,
+		 service_id->service.c_str(),
+		 service_id->host->name.c_str());
+
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -7696,10 +8998,22 @@ int centreonscheduler__serviceGetStatePercentChange(soap* s,
 						    centreonscheduler__serviceGetStatePercentChangeResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2,
+		 "Webservice: %s({ %s, { %s } })\n",
+		 __func__,
+		 service_id->service.c_str(),
+		 service_id->host->name.c_str());
+
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -7723,10 +9037,22 @@ int centreonscheduler__serviceGetStateType(soap* s,
 					   centreonscheduler__serviceGetStateTypeResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2,
+		 "Webservice: %s({ %s, { %s } })\n",
+		 __func__,
+		 service_id->service.c_str(),
+		 service_id->host->name.c_str());
+
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -7752,10 +9078,25 @@ int centreonscheduler__acknowledgementOnHostAdd(soap* s,
 						centreonscheduler__acknowledgementOnHostAddResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2,
+		 "Webservice: %s(%s, { %s, %s, %d, %d, %d })\n",
+		 __func__,
+		 host_id->name.c_str(),
+		 acknowledgement_type->author.c_str(),
+		 acknowledgement_type->comment.c_str(),
+		 acknowledgement_type->notify,
+		 acknowledgement_type->persistent,
+		 acknowledgement_type->sticky);
+
   host* host = find_host(host_id->name.c_str());
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -7793,10 +9134,20 @@ int centreonscheduler__acknowledgementOnHostRemove(soap* s,
 						   centreonscheduler__acknowledgementOnHostRemoveResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2,
+		 "Webservice: %s(%s)\n",
+		 __func__,
+		 host_id->name.c_str());
+
   host* host = find_host(host_id->name.c_str());
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -7822,10 +9173,27 @@ int centreonscheduler__acknowledgementOnServiceAdd(soap* s,
 						   centreonscheduler__acknowledgementOnServiceAddResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2,
+		 "Webservice: %s({ %s, { %s } }, { %s, %s, %d, %d, %d })\n",
+		 __func__,
+		 service_id->service.c_str(),
+		 service_id->host->name.c_str(),
+		 acknowledgement_type->author.c_str(),
+		 acknowledgement_type->comment.c_str(),
+		 acknowledgement_type->notify,
+		 acknowledgement_type->persistent,
+		 acknowledgement_type->sticky);
+
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -7862,10 +9230,22 @@ int centreonscheduler__acknowledgementOnServiceRemove(soap* s,
 						      centreonscheduler__acknowledgementOnServiceRemoveResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2,
+		 "Webservice: %s({ %s, { %s } })\n",
+		 __func__,
+		 service_id->service.c_str(),
+		 service_id->host->name.c_str());
+
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -7891,10 +9271,26 @@ int centreonscheduler__checkHostProcessResult(soap* s,
 					      centreonscheduler__checkHostProcessResultResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2,
+		 "Webservice: %s(%s, { %d, ... })\n",
+		 __func__,
+		 host_id->name.c_str(),
+		 result_type->retval);
+
+  log_debug_info(DEBUGL_CHECKS, 2,
+		 "Webservice: call %s: output=%s\n",
+		 __func__,
+		 result_type->output.c_str());
+
   host* host = find_host(host_id->name.c_str());
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -7904,6 +9300,11 @@ int centreonscheduler__checkHostProcessResult(soap* s,
 				 result_type->output.c_str()) == ERROR) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' check process result failed.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -7928,10 +9329,21 @@ int centreonscheduler__checkHostSchedule(soap* s,
 					 centreonscheduler__checkHostScheduleResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2,
+		 "Webservice: %s(%s, %ld)\n",
+		 __func__,
+		 host_id->name.c_str(),
+		 delay);
+
   host* host = find_host(host_id->name.c_str());
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -7957,10 +9369,21 @@ int centreonscheduler__checkHostScheduleForced(soap* s,
 					       centreonscheduler__checkHostScheduleForcedResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2,
+		 "Webservice: %s(%s, %ld)\n",
+		 __func__,
+		 host_id->name.c_str(),
+		 delay);
+
   host* host = find_host(host_id->name.c_str());
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -7986,10 +9409,21 @@ int centreonscheduler__checkHostScheduleServices(soap* s,
 						 centreonscheduler__checkHostScheduleServicesResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2,
+		 "Webservice: %s(%s, %ld)\n",
+		 __func__,
+		 host_id->name.c_str(),
+		 delay);
+
   host* host = find_host(host_id->name.c_str());
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -8020,10 +9454,21 @@ int centreonscheduler__checkHostScheduleServicesForced(soap* s,
 						       centreonscheduler__checkHostScheduleServicesForcedResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2,
+		 "Webservice: %s(%s, %ld)\n",
+		 __func__,
+		 host_id->name.c_str(),
+		 delay);
+
   host* host = find_host(host_id->name.c_str());
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -8054,10 +9499,28 @@ int centreonscheduler__checkServiceProcessResult(soap* s,
 						 centreonscheduler__checkServiceProcessResultResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2,
+		 "Webservice: %s({ %s, { %s } }, { %d, ... })\n",
+		 __func__,
+		 service_id->service.c_str(),
+		 service_id->host->name.c_str(),
+		 result_type->retval);
+
+  log_debug_info(DEBUGL_CHECKS, 2,
+		 "Webservice: call %s: output=%s\n",
+		 __func__,
+		 result_type->output.c_str());
+
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
   if (process_passive_service_check(time(NULL),
@@ -8069,6 +9532,11 @@ int centreonscheduler__checkServiceProcessResult(soap* s,
     res.error->message = "Service `" + service_id->service
       + "' check process result failed "
       + "for host `" + service_id->host->name + "'.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -8093,10 +9561,23 @@ int centreonscheduler__checkServiceSchedule(soap* s,
 					    centreonscheduler__checkServiceScheduleResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2,
+		 "Webservice: %s({ %s, { %s } }, %ld)\n",
+		 __func__,
+		 service_id->service.c_str(),
+		 service_id->host->name.c_str(),
+		 delay);
+
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -8122,10 +9603,23 @@ int centreonscheduler__checkServiceScheduleForced(soap* s,
 						  centreonscheduler__checkServiceScheduleForcedResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2,
+		 "Webservice: %s({ %s, { %s } }, %ld)\n",
+		 __func__,
+		 service_id->service.c_str(),
+		 service_id->host->name.c_str(),
+		 delay);
+
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -8149,6 +9643,11 @@ int centreonscheduler__downtimeGetAuthor(soap* s,
 					 centreonscheduler__downtimeGetAuthorResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2,
+		 "Webservice: %s(%lu)\n",
+		 __func__,
+		 downtime_id->downtime);
+
   scheduled_downtime* downtime = find_downtime(ANY_DOWNTIME, downtime_id->downtime);
   if (downtime == NULL) {
     std::ostringstream oss;
@@ -8156,6 +9655,11 @@ int centreonscheduler__downtimeGetAuthor(soap* s,
 
     res.error->code = 1;
     res.error->message = "Downtime `" + oss.str() + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -8181,6 +9685,11 @@ int centreonscheduler__downtimeGetDuration(soap* s,
 					   centreonscheduler__downtimeGetDurationResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2,
+		 "Webservice: %s(%lu)\n",
+		 __func__,
+		 downtime_id->downtime);
+
   scheduled_downtime* downtime = find_downtime(ANY_DOWNTIME, downtime_id->downtime);
   if (downtime == NULL) {
     std::ostringstream oss;
@@ -8188,6 +9697,11 @@ int centreonscheduler__downtimeGetDuration(soap* s,
 
     res.error->code = 1;
     res.error->message = "Downtime `" + oss.str() + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -8211,6 +9725,11 @@ int centreonscheduler__downtimeGetEnd(soap* s,
 				      centreonscheduler__downtimeGetEndResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2,
+		 "Webservice: %s(%lu)\n",
+		 __func__,
+		 downtime_id->downtime);
+
   scheduled_downtime* downtime = find_downtime(ANY_DOWNTIME, downtime_id->downtime);
   if (downtime == NULL) {
     std::ostringstream oss;
@@ -8218,6 +9737,11 @@ int centreonscheduler__downtimeGetEnd(soap* s,
 
     res.error->code = 1;
     res.error->message = "Downtime `" + oss.str() + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -8241,6 +9765,11 @@ int centreonscheduler__downtimeGetFixed(soap* s,
 					centreonscheduler__downtimeGetFixedResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2,
+		 "Webservice: %s(%lu)\n",
+		 __func__,
+		 downtime_id->downtime);
+
   scheduled_downtime* downtime = find_downtime(ANY_DOWNTIME, downtime_id->downtime);
   if (downtime == NULL) {
     std::ostringstream oss;
@@ -8248,6 +9777,11 @@ int centreonscheduler__downtimeGetFixed(soap* s,
 
     res.error->code = 1;
     res.error->message = "Downtime `" + oss.str() + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -8271,6 +9805,11 @@ int centreonscheduler__downtimeGetStart(soap* s,
 					centreonscheduler__downtimeGetStartResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2,
+		 "Webservice: %s(%lu)\n",
+		 __func__,
+		 downtime_id->downtime);
+
   scheduled_downtime* downtime = find_downtime(ANY_DOWNTIME, downtime_id->downtime);
   if (downtime == NULL) {
     std::ostringstream oss;
@@ -8278,6 +9817,11 @@ int centreonscheduler__downtimeGetStart(soap* s,
 
     res.error->code = 1;
     res.error->message = "Downtime `" + oss.str() + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -8301,6 +9845,11 @@ int centreonscheduler__downtimeDelete(soap* s,
 				      centreonscheduler__downtimeDeleteResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2,
+		 "Webservice: %s(%lu)\n",
+		 __func__,
+		 downtime_id->downtime);
+
   if (unschedule_downtime(HOST_DOWNTIME, downtime_id->downtime) == ERROR
       && unschedule_downtime(SERVICE_DOWNTIME, downtime_id->downtime) == ERROR) {
     std::ostringstream oss;
@@ -8308,6 +9857,11 @@ int centreonscheduler__downtimeDelete(soap* s,
 
     res.error->code = 1;
     res.error->message = "Downtime `" + oss.str() + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -8332,10 +9886,27 @@ int centreonscheduler__downtimeAddToHost(soap* s,
 					 centreonscheduler__downtimeAddToHostResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2,
+		 "Webservice: %s(%s, { %ld, %ld, %d, %lu, %f, %s, %s })\n",
+		 __func__,
+		 host_id->name.c_str(),
+		 downtime_type->starttime,
+		 downtime_type->endtime,
+		 downtime_type->fixed,
+		 downtime_type->triggerid->downtime,
+		 downtime_type->duration,
+		 downtime_type->author.c_str(),
+		 downtime_type->comment.c_str());
+
   host* host = find_host(host_id->name.c_str());
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -8358,6 +9929,11 @@ int centreonscheduler__downtimeAddToHost(soap* s,
     delete[] comment;
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' add downtime to host failed.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -8384,10 +9960,27 @@ int centreonscheduler__downtimeAddAndPropagateToHost(soap* s,
 						     centreonscheduler__downtimeAddAndPropagateToHostResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2,
+		 "Webservice: %s(%s, { %ld, %ld, %d, %lu, %f, %s, %s })\n",
+		 __func__,
+		 host_id->name.c_str(),
+		 downtime_type->starttime,
+		 downtime_type->endtime,
+		 downtime_type->fixed,
+		 downtime_type->triggerid->downtime,
+		 downtime_type->duration,
+		 downtime_type->author.c_str(),
+		 downtime_type->comment.c_str());
+
   host* host = find_host(host_id->name.c_str());
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -8446,10 +10039,27 @@ int centreonscheduler__downtimeAddAndPropagateTriggeredToHost(soap* s,
 							      centreonscheduler__downtimeAddAndPropagateTriggeredToHostResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2,
+		 "Webservice: %s(%s, { %ld, %ld, %d, %lu, %f, %s, %s })\n",
+		 __func__,
+		 host_id->name.c_str(),
+		 downtime_type->starttime,
+		 downtime_type->endtime,
+		 downtime_type->fixed,
+		 downtime_type->triggerid->downtime,
+		 downtime_type->duration,
+		 downtime_type->author.c_str(),
+		 downtime_type->comment.c_str());
+
   host* host = find_host(host_id->name.c_str());
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -8508,10 +10118,27 @@ int centreonscheduler__downtimeAddToHostServices(soap* s,
 						 centreonscheduler__downtimeAddToHostServicesResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2,
+		 "Webservice: %s(%s, { %ld, %ld, %d, %lu, %f, %s, %s })\n",
+		 __func__,
+		 host_id->name.c_str(),
+		 downtime_type->starttime,
+		 downtime_type->endtime,
+		 downtime_type->fixed,
+		 downtime_type->triggerid->downtime,
+		 downtime_type->duration,
+		 downtime_type->author.c_str(),
+		 downtime_type->comment.c_str());
+
   host* host = find_host(host_id->name.c_str());
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -8567,10 +10194,29 @@ int centreonscheduler__downtimeAddToService(soap* s,
 					    centreonscheduler__downtimeAddToServiceResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2,
+		 "Webservice: %s({ %s, { %s } }, { %ld, %ld, %d, %lu, %f, %s, %s })\n",
+		 __func__,
+		 service_id->service.c_str(),
+		 service_id->host->name.c_str(),
+		 downtime_type->starttime,
+		 downtime_type->endtime,
+		 downtime_type->fixed,
+		 downtime_type->triggerid->downtime,
+		 downtime_type->duration,
+		 downtime_type->author.c_str(),
+		 downtime_type->comment.c_str());
+
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -8593,6 +10239,11 @@ int centreonscheduler__downtimeAddToService(soap* s,
     delete[] comment;
     res.error->code = 1;
     res.error->message = "Service `" + service_id->service + "' add downtime to service failed.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -8619,10 +10270,21 @@ int centreonscheduler__notificationHostDelay(soap* s,
 					     centreonscheduler__notificationHostDelayResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2,
+		 "Webservice: %s(%s, %ld)\n",
+		 __func__,
+		 host_id->name.c_str(),
+		 delay);
+
   host* host = find_host(host_id->name.c_str());
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -8648,10 +10310,25 @@ int centreonscheduler__notificationHostSend(soap* s,
 					    centreonscheduler__notificationHostSendResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2,
+		 "Webservice: %s(%s, { %s, %d, %s, %d, %d })\n",
+		 __func__,
+		 host_id->name.c_str(),
+		 notification_type->author.c_str(),
+		 notification_type->broadcast,
+		 notification_type->comment.c_str(),
+		 notification_type->forced,
+		 notification_type->increment);
+
   host* host = find_host(host_id->name.c_str());
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -8671,6 +10348,11 @@ int centreonscheduler__notificationHostSend(soap* s,
     delete[] comment;
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' send notification failed.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -8697,10 +10379,23 @@ int centreonscheduler__notificationServiceDelay(soap* s,
 						centreonscheduler__notificationServiceDelayResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2,
+		 "Webservice: %s({ %s, { %s } }, %ld)\n",
+		 __func__,
+		 service_id->service.c_str(),
+		 service_id->host->name.c_str(),
+		 delay);
+
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -8726,10 +10421,27 @@ int centreonscheduler__notificationServiceSend(soap* s,
 					       centreonscheduler__notificationServiceSendResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2,
+		 "Webservice: %s({ %s, { %s } }, { %s, %d, %s, %d, %d })\n",
+		 __func__,
+		 service_id->service.c_str(),
+		 service_id->host->name.c_str(),
+		 notification_type->author.c_str(),
+		 notification_type->broadcast,
+		 notification_type->comment.c_str(),
+		 notification_type->forced,
+		 notification_type->increment);
+
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -8750,6 +10462,11 @@ int centreonscheduler__notificationServiceSend(soap* s,
     delete[] comment;
     res.error->code = 1;
     res.error->message = "Service `" + service_id->service + "' send notification failed.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -8759,8 +10476,6 @@ int centreonscheduler__notificationServiceSend(soap* s,
 
   return (SOAP_OK);
 }
-
-// XXX: checkpoint part 3.
 
 /**
  *  Check if event handlers are enabled globally.
@@ -8773,6 +10488,8 @@ int centreonscheduler__notificationServiceSend(soap* s,
 int centreonscheduler__getEventHandlersEnabled(soap* s,
 					       centreonscheduler__getEventHandlersEnabledResponse& res) {
   (void)s;
+
+  log_debug_info(DEBUGL_FUNCTIONS, 2, "Webservice: %s()\n", __func__);
 
   res.value = enable_event_handlers;
   res.error->code = 0;
@@ -8792,6 +10509,8 @@ int centreonscheduler__getFailurePredictionEnabled(soap* s,
 						   centreonscheduler__getFailurePredictionEnabledResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2, "Webservice: %s()\n", __func__);
+
   res.value = enable_failure_prediction;
   res.error->code = 0;
 
@@ -8809,6 +10528,8 @@ int centreonscheduler__getFailurePredictionEnabled(soap* s,
 int centreonscheduler__getFlapDetectionEnabled(soap* s,
 					       centreonscheduler__getFlapDetectionEnabledResponse& res) {
   (void)s;
+
+  log_debug_info(DEBUGL_FUNCTIONS, 2, "Webservice: %s()\n", __func__);
 
   res.value = enable_flap_detection;
   res.error->code = 0;
@@ -8828,6 +10549,8 @@ int centreonscheduler__getHostsChecksActiveEnabled(soap* s,
 						   centreonscheduler__getHostsChecksActiveEnabledResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2, "Webservice: %s()\n", __func__);
+
   res.value = execute_host_checks;
   res.error->code = 0;
 
@@ -8845,6 +10568,8 @@ int centreonscheduler__getHostsChecksActiveEnabled(soap* s,
 int centreonscheduler__getHostsChecksPassiveEnabled(soap* s,
 						    centreonscheduler__getHostsChecksPassiveEnabledResponse& res) {
   (void)s;
+
+  log_debug_info(DEBUGL_FUNCTIONS, 2, "Webservice: %s()\n", __func__);
 
   res.value = accept_passive_host_checks;
   res.error->code = 0;
@@ -8864,6 +10589,8 @@ int centreonscheduler__getHostsEventHandler(soap* s,
 					    centreonscheduler__getHostsEventHandlerResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2, "Webservice: %s()\n", __func__);
+
   res.command->command = global_host_event_handler;
   res.error->code = 0;
 
@@ -8881,6 +10608,8 @@ int centreonscheduler__getHostsEventHandler(soap* s,
 int centreonscheduler__getHostsFreshnessChecksEnabled(soap* s,
 						      centreonscheduler__getHostsFreshnessChecksEnabledResponse& res) {
   (void)s;
+
+  log_debug_info(DEBUGL_FUNCTIONS, 2, "Webservice: %s()\n", __func__);
 
   res.value = check_host_freshness;
   res.error->code = 0;
@@ -8900,6 +10629,8 @@ int centreonscheduler__getHostsObsessOverEnabled(soap* s,
 						 centreonscheduler__getHostsObsessOverEnabledResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2, "Webservice: %s()\n", __func__);
+
   res.value = obsess_over_hosts;
   res.error->code = 0;
 
@@ -8917,6 +10648,8 @@ int centreonscheduler__getHostsObsessOverEnabled(soap* s,
 int centreonscheduler__getNotificationsEnabled(soap* s,
 					       centreonscheduler__getNotificationsEnabledResponse& res) {
   (void)s;
+
+  log_debug_info(DEBUGL_FUNCTIONS, 2, "Webservice: %s()\n", __func__);
 
   res.value = enable_notifications;
   res.error->code = 0;
@@ -8936,6 +10669,8 @@ int centreonscheduler__getPerfdataProcessingEnabled(soap* s,
 						    centreonscheduler__getPerfdataProcessingEnabledResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2, "Webservice: %s()\n", __func__);
+
   res.value = process_performance_data;
   res.error->code = 0;
 
@@ -8953,6 +10688,8 @@ int centreonscheduler__getPerfdataProcessingEnabled(soap* s,
 int centreonscheduler__getServicesChecksActiveEnabled(soap* s,
 						      centreonscheduler__getServicesChecksActiveEnabledResponse& res) {
   (void)s;
+
+  log_debug_info(DEBUGL_FUNCTIONS, 2, "Webservice: %s()\n", __func__);
 
   res.value = execute_service_checks;
   res.error->code = 0;
@@ -8972,6 +10709,8 @@ int centreonscheduler__getServicesChecksPassiveEnabled(soap* s,
 						       centreonscheduler__getServicesChecksPassiveEnabledResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2, "Webservice: %s()\n", __func__);
+
   res.value = accept_passive_service_checks;
   res.error->code = 0;
 
@@ -8989,6 +10728,8 @@ int centreonscheduler__getServicesChecksPassiveEnabled(soap* s,
 int centreonscheduler__getServicesEventHandler(soap* s,
 					       centreonscheduler__getServicesEventHandlerResponse& res) {
   (void)s;
+
+  log_debug_info(DEBUGL_FUNCTIONS, 2, "Webservice: %s()\n", __func__);
 
   res.command->command = global_service_event_handler;
   res.error->code = 0;
@@ -9008,6 +10749,8 @@ int centreonscheduler__getServicesFreshnessChecksEnabled(soap* s,
 							 centreonscheduler__getServicesFreshnessChecksEnabledResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2, "Webservice: %s()\n", __func__);
+
   res.value = check_service_freshness;
   res.error->code = 0;
 
@@ -9025,6 +10768,8 @@ int centreonscheduler__getServicesFreshnessChecksEnabled(soap* s,
 int centreonscheduler__getServicesObsessOverEnabled(soap* s,
 						    centreonscheduler__getServicesObsessOverEnabledResponse& res) {
   (void)s;
+
+  log_debug_info(DEBUGL_FUNCTIONS, 2, "Webservice: %s()\n", __func__);
 
   res.value = obsess_over_services;
   res.error->code = 0;
@@ -9046,6 +10791,8 @@ int centreonscheduler__setEventHandlersEnabled(soap* s,
 					       centreonscheduler__setEventHandlersEnabledResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2, "Webservice: %s()\n", __func__);
+
   enable_event_handlers = enable;
   res.error->code = 0;
 
@@ -9065,6 +10812,8 @@ int centreonscheduler__setFailurePredictionEnabled(soap* s,
 						   bool enable,
 						   centreonscheduler__setFailurePredictionEnabledResponse& res) {
   (void)s;
+
+  log_debug_info(DEBUGL_FUNCTIONS, 2, "Webservice: %s(%d)\n", __func__, enable);
 
   enable_failure_prediction = enable;
   res.error->code = 0;
@@ -9086,6 +10835,8 @@ int centreonscheduler__setFlapDetectionEnabled(soap* s,
 					       centreonscheduler__setFlapDetectionEnabledResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2, "Webservice: %s(%d)\n", __func__, enable);
+
   enable_flap_detection = enable;
   res.error->code = 0;
 
@@ -9105,6 +10856,8 @@ int centreonscheduler__setHostsChecksActiveEnabled(soap* s,
 						   bool enable,
 						   centreonscheduler__setHostsChecksActiveEnabledResponse& res) {
   (void)s;
+
+  log_debug_info(DEBUGL_FUNCTIONS, 2, "Webservice: %s(%d)\n", __func__, enable);
 
   execute_host_checks = enable;
   res.error->code = 0;
@@ -9126,6 +10879,8 @@ int centreonscheduler__setHostsChecksPassiveEnabled(soap* s,
 						    centreonscheduler__setHostsChecksPassiveEnabledResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2, "Webservice: %s(%d)\n", __func__, enable);
+
   accept_passive_host_checks = enable;
   res.error->code = 0;
 
@@ -9146,10 +10901,20 @@ int centreonscheduler__setHostsEventHandler(soap* s,
 					    centreonscheduler__setHostsEventHandlerResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2,
+		 "Webservice: %s(%s)\n",
+		 __func__,
+		 command_id->command.c_str());
+
   command* command = find_command(command_id->command.c_str());
   if (command == NULL) {
     res.error->code = 1;
     res.error->message = "Command `" + command_id->command + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -9189,6 +10954,8 @@ int centreonscheduler__setHostsFreshnessChecksEnabled(soap* s,
 						      centreonscheduler__setHostsFreshnessChecksEnabledResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2, "Webservice: %s(%d)\n", __func__, enable);
+
   check_host_freshness = enable;
   res.error->code = 0;
 
@@ -9208,6 +10975,8 @@ int centreonscheduler__setHostsObsessOverEnabled(soap* s,
 						 bool enable,
 						 centreonscheduler__setHostsObsessOverEnabledResponse& res) {
   (void)s;
+
+  log_debug_info(DEBUGL_FUNCTIONS, 2, "Webservice: %s(%d)\n", __func__, enable);
 
   obsess_over_hosts = enable;
   res.error->code = 0;
@@ -9229,6 +10998,8 @@ int centreonscheduler__setNotificationsEnabled(soap* s,
 					       centreonscheduler__setNotificationsEnabledResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2, "Webservice: %s(%d)\n", __func__, enable);
+
   enable_notifications = enable;
   res.error->code = 0;
 
@@ -9248,6 +11019,8 @@ int centreonscheduler__setPerfdataProcessingEnabled(soap* s,
 						    bool enable,
 						    centreonscheduler__setPerfdataProcessingEnabledResponse& res) {
   (void)s;
+
+  log_debug_info(DEBUGL_FUNCTIONS, 2, "Webservice: %s(%d)\n", __func__, enable);
 
   process_performance_data = enable;
   res.error->code = 0;
@@ -9269,6 +11042,8 @@ int centreonscheduler__setServicesChecksActiveEnabled(soap* s,
 						      centreonscheduler__setServicesChecksActiveEnabledResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2, "Webservice: %s(%d)\n", __func__, enable);
+
   execute_service_checks = enable;
   res.error->code = 0;
 
@@ -9288,6 +11063,8 @@ int centreonscheduler__setServicesChecksPassiveEnabled(soap* s,
 						       bool enable,
 						       centreonscheduler__setServicesChecksPassiveEnabledResponse& res) {
   (void)s;
+
+  log_debug_info(DEBUGL_FUNCTIONS, 2, "Webservice: %s(%d)\n", __func__, enable);
 
   accept_passive_service_checks = enable;
   res.error->code = 0;
@@ -9309,10 +11086,20 @@ int centreonscheduler__setServicesEventHandler(soap* s,
 					       centreonscheduler__setServicesEventHandlerResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2,
+		 "Webservice: %s(%s)\n",
+		 __func__,
+		 command_id->command.c_str());
+
   command* command = find_command(command_id->command.c_str());
   if (command == NULL) {
     res.error->code = 1;
     res.error->message = "Command `" + command_id->command + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -9321,7 +11108,6 @@ int centreonscheduler__setServicesEventHandler(soap* s,
   global_service_event_handler_ptr = command;
 
   modified_service_process_attributes |= MODATTR_EVENT_HANDLER_COMMAND;
-
 
   broker_adaptive_program_data(NEBTYPE_ADAPTIVEPROGRAM_UPDATE,
 			       NEBFLAG_NONE,
@@ -9354,6 +11140,8 @@ int centreonscheduler__setServicesFreshnessChecksEnabled(soap* s,
 							 centreonscheduler__setServicesFreshnessChecksEnabledResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2, "Webservice: %s(%d)\n", __func__, enable);
+
   check_service_freshness = enable;
   res.error->code = 0;
 
@@ -9373,6 +11161,8 @@ int centreonscheduler__setServicesObsessOverEnabled(soap* s,
 						    bool enable,
 						    centreonscheduler__setServicesObsessOverEnabledResponse& res) {
   (void)s;
+
+  log_debug_info(DEBUGL_FUNCTIONS, 2, "Webservice: %s(%d)\n", __func__, enable);
 
   obsess_over_services = enable;
   res.error->code = 0;
@@ -9396,10 +11186,21 @@ int centreonscheduler__hostSetCheckPeriod(soap* s,
 					  centreonscheduler__hostSetCheckPeriodResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2,
+		 "Webservice: %s(%s, %s)\n",
+		 __func__,
+		 host_id->name.c_str(),
+		 timeperiod_id->timeperiod.c_str());
+
   host* host = find_host(host_id->name.c_str());
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -9431,10 +11232,21 @@ int centreonscheduler__hostSetServicesCheckActiveEnabled(soap* s,
 							 centreonscheduler__hostSetServicesCheckActiveEnabledResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2,
+		 "Webservice: %s(%s, %d)\n",
+		 __func__,
+		 host_id->name.c_str(),
+		 enable);
+
   host* host = find_host(host_id->name.c_str());
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -9465,10 +11277,21 @@ int centreonscheduler__hostSetServicesNotificationsEnabled(soap* s,
 							   centreonscheduler__hostSetServicesNotificationsEnabledResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2,
+		 "Webservice: %s(%s, %d)\n",
+		 __func__,
+		 host_id->name.c_str(),
+		 enable);
+
   host* host = find_host(host_id->name.c_str());
   if (host == NULL) {
     res.error->code = 1;
     res.error->message = "Host `" + host_id->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -9499,10 +11322,23 @@ int centreonscheduler__serviceSetCheckPeriod(soap* s,
 					     centreonscheduler__serviceSetCheckPeriodResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2,
+		 "Webservice: %s({ %s, { %s } }, %s)\n",
+		 __func__,
+		 service_id->service.c_str(),
+		 service_id->host->name.c_str(),
+		 timeperiod_id->timeperiod.c_str());
+
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -9534,10 +11370,23 @@ int centreonscheduler__serviceSetNotificationsPeriod(soap* s,
 						     centreonscheduler__serviceSetNotificationsPeriodResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2,
+		 "Webservice: %s({ %s, { %s } }, %s)\n",
+		 __func__,
+		 service_id->service.c_str(),
+		 service_id->host->name.c_str(),
+		 timeperiod_id->timeperiod.c_str());
+
   service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
   if (service == NULL) {
     res.error->code = 1;
-    res.error->message = "Service `" + service_id->service + "' not found.";
+    res.error->message = "Service `" + service_id->service
+      + "' with Host `" + service_id->host->name + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -9563,10 +11412,20 @@ int centreonscheduler__contactGetAlias(soap* s,
 				       centreonscheduler__contactGetAliasResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2,
+		 "Webservice: %s(%s)\n",
+		 __func__,
+		 contact_id->contact.c_str());
+
   contact* contact = find_contact(contact_id->contact.c_str());
   if (contact == NULL) {
     res.error->code = 1;
     res.error->message = "Contact `" + contact_id->contact + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -9592,10 +11451,20 @@ int centreonscheduler__contactGetCanSubmitCommands(soap* s,
 						   centreonscheduler__contactGetCanSubmitCommandsResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2,
+		 "Webservice: %s(%s)\n",
+		 __func__,
+		 contact_id->contact.c_str());
+
   contact* contact = find_contact(contact_id->contact.c_str());
   if (contact == NULL) {
     res.error->code = 1;
     res.error->message = "Contact `" + contact_id->contact + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -9619,10 +11488,20 @@ int centreonscheduler__contactGetEmail(soap* s,
 				       centreonscheduler__contactGetEmailResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2,
+		 "Webservice: %s(%s)\n",
+		 __func__,
+		 contact_id->contact.c_str());
+
   contact* contact = find_contact(contact_id->contact.c_str());
   if (contact == NULL) {
     res.error->code = 1;
     res.error->message = "Contact `" + contact_id->contact + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -9648,10 +11527,20 @@ int centreonscheduler__contactGetModifiedAttributes(soap* s,
 						    centreonscheduler__contactGetModifiedAttributesResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2,
+		 "Webservice: %s(%s)\n",
+		 __func__,
+		 contact_id->contact.c_str());
+
   contact* contact = find_contact(contact_id->contact.c_str());
   if (contact == NULL) {
     res.error->code = 1;
     res.error->message = "Contact `" + contact_id->contact + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -9675,10 +11564,20 @@ int centreonscheduler__contactGetModifiedAttributesHost(soap* s,
 							centreonscheduler__contactGetModifiedAttributesHostResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2,
+		 "Webservice: %s(%s)\n",
+		 __func__,
+		 contact_id->contact.c_str());
+
   contact* contact = find_contact(contact_id->contact.c_str());
   if (contact == NULL) {
     res.error->code = 1;
     res.error->message = "Contact `" + contact_id->contact + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -9702,10 +11601,20 @@ int centreonscheduler__contactGetModifiedAttributesService(soap* s,
 							   centreonscheduler__contactGetModifiedAttributesServiceResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2,
+		 "Webservice: %s(%s)\n",
+		 __func__,
+		 contact_id->contact.c_str());
+
   contact* contact = find_contact(contact_id->contact.c_str());
   if (contact == NULL) {
     res.error->code = 1;
     res.error->message = "Contact `" + contact_id->contact + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -9729,10 +11638,20 @@ int centreonscheduler__contactGetNotificationsOnHostCommand(soap* s,
 							    centreonscheduler__contactGetNotificationsOnHostCommandResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2,
+		 "Webservice: %s(%s)\n",
+		 __func__,
+		 contact_id->contact.c_str());
+
   contact* contact = find_contact(contact_id->contact.c_str());
   if (contact == NULL) {
     res.error->code = 1;
     res.error->message = "Contact `" + contact_id->contact + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -9758,10 +11677,20 @@ int centreonscheduler__contactGetNotificationsOnHostDown(soap* s,
 							 centreonscheduler__contactGetNotificationsOnHostDownResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2,
+		 "Webservice: %s(%s)\n",
+		 __func__,
+		 contact_id->contact.c_str());
+
   contact* contact = find_contact(contact_id->contact.c_str());
   if (contact == NULL) {
     res.error->code = 1;
     res.error->message = "Contact `" + contact_id->contact + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -9785,10 +11714,20 @@ int centreonscheduler__contactGetNotificationsOnHostDowntime(soap* s,
 							     centreonscheduler__contactGetNotificationsOnHostDowntimeResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2,
+		 "Webservice: %s(%s)\n",
+		 __func__,
+		 contact_id->contact.c_str());
+
   contact* contact = find_contact(contact_id->contact.c_str());
   if (contact == NULL) {
     res.error->code = 1;
     res.error->message = "Contact `" + contact_id->contact + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -9812,10 +11751,20 @@ int centreonscheduler__contactGetNotificationsOnHostEnabled(soap* s,
 							    centreonscheduler__contactGetNotificationsOnHostEnabledResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2,
+		 "Webservice: %s(%s)\n",
+		 __func__,
+		 contact_id->contact.c_str());
+
   contact* contact = find_contact(contact_id->contact.c_str());
   if (contact == NULL) {
     res.error->code = 1;
     res.error->message = "Contact `" + contact_id->contact + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -9840,10 +11789,20 @@ int centreonscheduler__contactGetNotificationsOnHostFlapping(soap* s,
 							     centreonscheduler__contactGetNotificationsOnHostFlappingResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2,
+		 "Webservice: %s(%s)\n",
+		 __func__,
+		 contact_id->contact.c_str());
+
   contact* contact = find_contact(contact_id->contact.c_str());
   if (contact == NULL) {
     res.error->code = 1;
     res.error->message = "Contact `" + contact_id->contact + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -9867,10 +11826,20 @@ int centreonscheduler__contactGetNotificationsOnHostLast(soap* s,
 							 centreonscheduler__contactGetNotificationsOnHostLastResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2,
+		 "Webservice: %s(%s)\n",
+		 __func__,
+		 contact_id->contact.c_str());
+
   contact* contact = find_contact(contact_id->contact.c_str());
   if (contact == NULL) {
     res.error->code = 1;
     res.error->message = "Contact `" + contact_id->contact + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -9894,10 +11863,20 @@ int centreonscheduler__contactGetNotificationsOnHostRecovery(soap* s,
 							     centreonscheduler__contactGetNotificationsOnHostRecoveryResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2,
+		 "Webservice: %s(%s)\n",
+		 __func__,
+		 contact_id->contact.c_str());
+
   contact* contact = find_contact(contact_id->contact.c_str());
   if (contact == NULL) {
     res.error->code = 1;
     res.error->message = "Contact `" + contact_id->contact + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -9921,10 +11900,20 @@ int centreonscheduler__contactGetNotificationsOnHostTimeperiod(soap* s,
 							       centreonscheduler__contactGetNotificationsOnHostTimeperiodResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2,
+		 "Webservice: %s(%s)\n",
+		 __func__,
+		 contact_id->contact.c_str());
+
   contact* contact = find_contact(contact_id->contact.c_str());
   if (contact == NULL) {
     res.error->code = 1;
     res.error->message = "Contact `" + contact_id->contact + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -9949,10 +11938,20 @@ int centreonscheduler__contactGetNotificationsOnHostUnreachable(soap* s,
 								centreonscheduler__contactGetNotificationsOnHostUnreachableResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2,
+		 "Webservice: %s(%s)\n",
+		 __func__,
+		 contact_id->contact.c_str());
+
   contact* contact = find_contact(contact_id->contact.c_str());
   if (contact == NULL) {
     res.error->code = 1;
     res.error->message = "Contact `" + contact_id->contact + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -9976,10 +11975,20 @@ int centreonscheduler__contactGetNotificationsOnServiceCommand(soap* s,
 							       centreonscheduler__contactGetNotificationsOnServiceCommandResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2,
+		 "Webservice: %s(%s)\n",
+		 __func__,
+		 contact_id->contact.c_str());
+
   contact* contact = find_contact(contact_id->contact.c_str());
   if (contact == NULL) {
     res.error->code = 1;
     res.error->message = "Contact `" + contact_id->contact + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -10005,10 +12014,20 @@ int centreonscheduler__contactGetNotificationsOnServiceCritical(soap* s,
 								centreonscheduler__contactGetNotificationsOnServiceCriticalResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2,
+		 "Webservice: %s(%s)\n",
+		 __func__,
+		 contact_id->contact.c_str());
+
   contact* contact = find_contact(contact_id->contact.c_str());
   if (contact == NULL) {
     res.error->code = 1;
     res.error->message = "Contact `" + contact_id->contact + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -10032,10 +12051,20 @@ int centreonscheduler__contactGetNotificationsOnServiceDowntime(soap* s,
 								centreonscheduler__contactGetNotificationsOnServiceDowntimeResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2,
+		 "Webservice: %s(%s)\n",
+		 __func__,
+		 contact_id->contact.c_str());
+
   contact* contact = find_contact(contact_id->contact.c_str());
   if (contact == NULL) {
     res.error->code = 1;
     res.error->message = "Contact `" + contact_id->contact + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -10059,10 +12088,20 @@ int centreonscheduler__contactGetNotificationsOnServiceEnabled(soap* s,
 							       centreonscheduler__contactGetNotificationsOnServiceEnabledResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2,
+		 "Webservice: %s(%s)\n",
+		 __func__,
+		 contact_id->contact.c_str());
+
   contact* contact = find_contact(contact_id->contact.c_str());
   if (contact == NULL) {
     res.error->code = 1;
     res.error->message = "Contact `" + contact_id->contact + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -10086,10 +12125,20 @@ int centreonscheduler__contactGetNotificationsOnServiceFlapping(soap* s,
 								centreonscheduler__contactGetNotificationsOnServiceFlappingResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2,
+		 "Webservice: %s(%s)\n",
+		 __func__,
+		 contact_id->contact.c_str());
+
   contact* contact = find_contact(contact_id->contact.c_str());
   if (contact == NULL) {
     res.error->code = 1;
     res.error->message = "Contact `" + contact_id->contact + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -10113,10 +12162,20 @@ int centreonscheduler__contactGetNotificationsOnServiceLast(soap* s,
 							    centreonscheduler__contactGetNotificationsOnServiceLastResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2,
+		 "Webservice: %s(%s)\n",
+		 __func__,
+		 contact_id->contact.c_str());
+
   contact* contact = find_contact(contact_id->contact.c_str());
   if (contact == NULL) {
     res.error->code = 1;
     res.error->message = "Contact `" + contact_id->contact + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -10140,10 +12199,20 @@ int centreonscheduler__contactGetNotificationsOnServiceRecovery(soap* s,
 								centreonscheduler__contactGetNotificationsOnServiceRecoveryResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2,
+		 "Webservice: %s(%s)\n",
+		 __func__,
+		 contact_id->contact.c_str());
+
   contact* contact = find_contact(contact_id->contact.c_str());
   if (contact == NULL) {
     res.error->code = 1;
     res.error->message = "Contact `" + contact_id->contact + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -10167,10 +12236,20 @@ int centreonscheduler__contactGetNotificationsOnServiceTimeperiod(soap* s,
 								  centreonscheduler__contactGetNotificationsOnServiceTimeperiodResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2,
+		 "Webservice: %s(%s)\n",
+		 __func__,
+		 contact_id->contact.c_str());
+
   contact* contact = find_contact(contact_id->contact.c_str());
   if (contact == NULL) {
     res.error->code = 1;
     res.error->message = "Contact `" + contact_id->contact + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -10195,10 +12274,20 @@ int centreonscheduler__contactGetNotificationsOnServiceUnknown(soap* s,
 							       centreonscheduler__contactGetNotificationsOnServiceUnknownResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2,
+		 "Webservice: %s(%s)\n",
+		 __func__,
+		 contact_id->contact.c_str());
+
   contact* contact = find_contact(contact_id->contact.c_str());
   if (contact == NULL) {
     res.error->code = 1;
     res.error->message = "Contact `" + contact_id->contact + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -10222,10 +12311,20 @@ int centreonscheduler__contactGetPager(soap* s,
 				       centreonscheduler__contactGetPagerResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2,
+		 "Webservice: %s(%s)\n",
+		 __func__,
+		 contact_id->contact.c_str());
+
   contact* contact = find_contact(contact_id->contact.c_str());
   if (contact == NULL) {
     res.error->code = 1;
     res.error->message = "Contact `" + contact_id->contact + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -10251,10 +12350,20 @@ int centreonscheduler__contactGetRetainStatusInformation(soap* s,
 							 centreonscheduler__contactGetRetainStatusInformationResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2,
+		 "Webservice: %s(%s)\n",
+		 __func__,
+		 contact_id->contact.c_str());
+
   contact* contact = find_contact(contact_id->contact.c_str());
   if (contact == NULL) {
     res.error->code = 1;
     res.error->message = "Contact `" + contact_id->contact + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -10278,10 +12387,20 @@ int centreonscheduler__contactGetRetainStatusNonInformation(soap* s,
 							    centreonscheduler__contactGetRetainStatusNonInformationResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2,
+		 "Webservice: %s(%s)\n",
+		 __func__,
+		 contact_id->contact.c_str());
+
   contact* contact = find_contact(contact_id->contact.c_str());
   if (contact == NULL) {
     res.error->code = 1;
     res.error->message = "Contact `" + contact_id->contact + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -10307,10 +12426,21 @@ int centreonscheduler__contactSetAlias(soap* s,
 				       centreonscheduler__contactSetAliasResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2,
+		 "Webservice: %s(%s, %s)\n",
+		 __func__,
+		 contact_id->contact.c_str(),
+		 alias.c_str());
+
   contact* contact = find_contact(contact_id->contact.c_str());
   if (contact == NULL) {
     res.error->code = 1;
     res.error->message = "Contact `" + contact_id->contact + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -10338,10 +12468,21 @@ int centreonscheduler__contactSetCanSubmitCommands(soap* s,
 						   centreonscheduler__contactSetCanSubmitCommandsResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2,
+		 "Webservice: %s(%s, %d)\n",
+		 __func__,
+		 contact_id->contact.c_str(),
+		 enable);
+
   contact* contact = find_contact(contact_id->contact.c_str());
   if (contact == NULL) {
     res.error->code = 1;
     res.error->message = "Contact `" + contact_id->contact + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -10367,10 +12508,21 @@ int centreonscheduler__contactSetEmail(soap* s,
 				       centreonscheduler__contactSetEmailResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2,
+		 "Webservice: %s(%s, %s)\n",
+		 __func__,
+		 contact_id->contact.c_str(),
+		 email.c_str());
+
   contact* contact = find_contact(contact_id->contact.c_str());
   if (contact == NULL) {
     res.error->code = 1;
     res.error->message = "Contact `" + contact_id->contact + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -10398,10 +12550,21 @@ int centreonscheduler__contactSetNotificationsOnHostDown(soap* s,
 							 centreonscheduler__contactSetNotificationsOnHostDownResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2,
+		 "Webservice: %s(%s, %d)\n",
+		 __func__,
+		 contact_id->contact.c_str(),
+		 enable);
+
   contact* contact = find_contact(contact_id->contact.c_str());
   if (contact == NULL) {
     res.error->code = 1;
     res.error->message = "Contact `" + contact_id->contact + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -10427,10 +12590,21 @@ int centreonscheduler__contactSetNotificationsOnHostDowntime(soap* s,
 							     centreonscheduler__contactSetNotificationsOnHostDowntimeResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2,
+		 "Webservice: %s(%s, %d)\n",
+		 __func__,
+		 contact_id->contact.c_str(),
+		 enable);
+
   contact* contact = find_contact(contact_id->contact.c_str());
   if (contact == NULL) {
     res.error->code = 1;
     res.error->message = "Contact `" + contact_id->contact + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -10456,10 +12630,21 @@ int centreonscheduler__contactSetNotificationsOnHostEnabled(soap* s,
 							    centreonscheduler__contactSetNotificationsOnHostEnabledResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2,
+		 "Webservice: %s(%s, %d)\n",
+		 __func__,
+		 contact_id->contact.c_str(),
+		 enable);
+
   contact* contact = find_contact(contact_id->contact.c_str());
   if (contact == NULL) {
     res.error->code = 1;
     res.error->message = "Contact `" + contact_id->contact + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -10485,10 +12670,21 @@ int centreonscheduler__contactSetNotificationsOnHostFlapping(soap* s,
 							     centreonscheduler__contactSetNotificationsOnHostFlappingResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2,
+		 "Webservice: %s(%s, %d)\n",
+		 __func__,
+		 contact_id->contact.c_str(),
+		 enable);
+
   contact* contact = find_contact(contact_id->contact.c_str());
   if (contact == NULL) {
     res.error->code = 1;
     res.error->message = "Contact `" + contact_id->contact + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -10514,10 +12710,21 @@ int centreonscheduler__contactSetNotificationsOnHostRecovery(soap* s,
 							     centreonscheduler__contactSetNotificationsOnHostRecoveryResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2,
+		 "Webservice: %s(%s, %d)\n",
+		 __func__,
+		 contact_id->contact.c_str(),
+		 enable);
+
   contact* contact = find_contact(contact_id->contact.c_str());
   if (contact == NULL) {
     res.error->code = 1;
     res.error->message = "Contact `" + contact_id->contact + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -10543,10 +12750,21 @@ int centreonscheduler__contactSetNotificationsOnHostTimeperiod(soap* s,
 							       centreonscheduler__contactSetNotificationsOnHostTimeperiodResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2,
+		 "Webservice: %s(%s, %s)\n",
+		 __func__,
+		 contact_id->contact.c_str(),
+		 timeperiod_id->timeperiod.c_str());
+
   contact* contact = find_contact(contact_id->contact.c_str());
   if (contact == NULL) {
     res.error->code = 1;
     res.error->message = "Contact `" + contact_id->contact + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -10574,10 +12792,21 @@ int centreonscheduler__contactSetNotificationsOnHostUnreachable(soap* s,
 								centreonscheduler__contactSetNotificationsOnHostUnreachableResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2,
+		 "Webservice: %s(%s, %d)\n",
+		 __func__,
+		 contact_id->contact.c_str(),
+		 enable);
+
   contact* contact = find_contact(contact_id->contact.c_str());
   if (contact == NULL) {
     res.error->code = 1;
     res.error->message = "Contact `" + contact_id->contact + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -10603,10 +12832,21 @@ int centreonscheduler__contactSetNotificationsOnServiceCritical(soap* s,
 								centreonscheduler__contactSetNotificationsOnServiceCriticalResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2,
+		 "Webservice: %s(%s, %d)\n",
+		 __func__,
+		 contact_id->contact.c_str(),
+		 enable);
+
   contact* contact = find_contact(contact_id->contact.c_str());
   if (contact == NULL) {
     res.error->code = 1;
     res.error->message = "Contact `" + contact_id->contact + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -10632,10 +12872,21 @@ int centreonscheduler__contactSetNotificationsOnServiceDowntime(soap* s,
 								centreonscheduler__contactSetNotificationsOnServiceDowntimeResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2,
+		 "Webservice: %s(%s, %d)\n",
+		 __func__,
+		 contact_id->contact.c_str(),
+		 enable);
+
   contact* contact = find_contact(contact_id->contact.c_str());
   if (contact == NULL) {
     res.error->code = 1;
     res.error->message = "Contact `" + contact_id->contact + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -10661,10 +12912,21 @@ int centreonscheduler__contactSetNotificationsOnServiceEnabled(soap* s,
 							       centreonscheduler__contactSetNotificationsOnServiceEnabledResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2,
+		 "Webservice: %s(%s, %d)\n",
+		 __func__,
+		 contact_id->contact.c_str(),
+		 enable);
+
   contact* contact = find_contact(contact_id->contact.c_str());
   if (contact == NULL) {
     res.error->code = 1;
     res.error->message = "Contact `" + contact_id->contact + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -10690,10 +12952,21 @@ int centreonscheduler__contactSetNotificationsOnServiceFlapping(soap* s,
 								centreonscheduler__contactSetNotificationsOnServiceFlappingResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2,
+		 "Webservice: %s(%s, %d)\n",
+		 __func__,
+		 contact_id->contact.c_str(),
+		 enable);
+
   contact* contact = find_contact(contact_id->contact.c_str());
   if (contact == NULL) {
     res.error->code = 1;
     res.error->message = "Contact `" + contact_id->contact + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -10719,10 +12992,21 @@ int centreonscheduler__contactSetNotificationsOnServiceRecovery(soap* s,
 								centreonscheduler__contactSetNotificationsOnServiceRecoveryResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2,
+		 "Webservice: %s(%s, %d)\n",
+		 __func__,
+		 contact_id->contact.c_str(),
+		 enable);
+
   contact* contact = find_contact(contact_id->contact.c_str());
   if (contact == NULL) {
     res.error->code = 1;
     res.error->message = "Contact `" + contact_id->contact + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -10748,10 +13032,21 @@ int centreonscheduler__contactSetNotificationsOnServiceTimeperiod(soap* s,
 								  centreonscheduler__contactSetNotificationsOnServiceTimeperiodResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2,
+		 "Webservice: %s(%s, %s)\n",
+		 __func__,
+		 contact_id->contact.c_str(),
+		 timeperiod_id->timeperiod.c_str());
+
   contact* contact = find_contact(contact_id->contact.c_str());
   if (contact == NULL) {
     res.error->code = 1;
     res.error->message = "Contact `" + contact_id->contact + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -10778,10 +13073,21 @@ int centreonscheduler__contactSetNotificationsOnServiceUnknown(soap* s,
 							       centreonscheduler__contactSetNotificationsOnServiceUnknownResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2,
+		 "Webservice: %s(%s, %d)\n",
+		 __func__,
+		 contact_id->contact.c_str(),
+		 enable);
+
   contact* contact = find_contact(contact_id->contact.c_str());
   if (contact == NULL) {
     res.error->code = 1;
     res.error->message = "Contact `" + contact_id->contact + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -10807,10 +13113,21 @@ int centreonscheduler__contactSetNotificationsOnServiceWarning(soap* s,
 							       centreonscheduler__contactSetNotificationsOnServiceWarningResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2,
+		 "Webservice: %s(%s, %d)\n",
+		 __func__,
+		 contact_id->contact.c_str(),
+		 enable);
+
   contact* contact = find_contact(contact_id->contact.c_str());
   if (contact == NULL) {
     res.error->code = 1;
     res.error->message = "Contact `" + contact_id->contact + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -10836,10 +13153,21 @@ int centreonscheduler__contactSetPager(soap* s,
 				       centreonscheduler__contactSetPagerResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2,
+		 "Webservice: %s(%s, %s)\n",
+		 __func__,
+		 contact_id->contact.c_str(),
+		 pager.c_str());
+
   contact* contact = find_contact(contact_id->contact.c_str());
   if (contact == NULL) {
     res.error->code = 1;
     res.error->message = "Contact `" + contact_id->contact + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -10867,10 +13195,21 @@ int centreonscheduler__contactSetRetainStatusInformation(soap* s,
 							 centreonscheduler__contactSetRetainStatusInformationResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2,
+		 "Webservice: %s(%s, %d)\n",
+		 __func__,
+		 contact_id->contact.c_str(),
+		 enable);
+
   contact* contact = find_contact(contact_id->contact.c_str());
   if (contact == NULL) {
     res.error->code = 1;
     res.error->message = "Contact `" + contact_id->contact + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -10896,10 +13235,21 @@ int centreonscheduler__contactSetRetainStatusNonInformation(soap* s,
 							    centreonscheduler__contactSetRetainStatusNonInformationResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2,
+		 "Webservice: %s(%s, %d)\n",
+		 __func__,
+		 contact_id->contact.c_str(),
+		 enable);
+
   contact* contact = find_contact(contact_id->contact.c_str());
   if (contact == NULL) {
     res.error->code = 1;
     res.error->message = "Contact `" + contact_id->contact + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -10925,10 +13275,21 @@ int centreonscheduler__contactSetNotificationsOnHostCommand(soap* s,
 							    centreonscheduler__contactSetNotificationsOnHostCommandResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2,
+		 "Webservice: %s(%s, %s)\n",
+		 __func__,
+		 contact_id->contact.c_str(),
+		 command_id->command.c_str());
+
   contact* contact = find_contact(contact_id->contact.c_str());
   if (contact == NULL) {
     res.error->code = 1;
     res.error->message = "Contact `" + contact_id->contact + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 
@@ -10955,10 +13316,21 @@ int centreonscheduler__contactSetNotificationsOnServiceCommand(soap* s,
 							       centreonscheduler__contactSetNotificationsOnServiceCommandResponse& res) {
   (void)s;
 
+  log_debug_info(DEBUGL_FUNCTIONS, 2,
+		 "Webservice: %s(%s, %s)\n",
+		 __func__,
+		 contact_id->contact.c_str(),
+		 command_id->command.c_str());
+
   contact* contact = find_contact(contact_id->contact.c_str());
   if (contact == NULL) {
     res.error->code = 1;
     res.error->message = "Contact `" + contact_id->contact + "' not found.";
+
+    log_debug_info(DEBUGL_COMMANDS, 2,
+		   "Webservice: %s failed. %s\n",
+		   __func__,
+		   res.error->message.c_str());
     return (SOAP_OK);
   }
 

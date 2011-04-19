@@ -2316,13 +2316,13 @@ customvariablesmember *add_custom_variable_to_object(customvariablesmember **obj
 /******************************************************************/
 
 /* given a timeperiod name and a starting point, find a timeperiod from the list in memory */
-timeperiod * find_timeperiod(char *name){
+timeperiod * find_timeperiod(char const* name){
 	timeperiod temp_timeperiod;
 
 	if(name==NULL)
 		return NULL;
 
-	temp_timeperiod.name=name;
+	temp_timeperiod.name=const_cast<char*>(name);
 
 	return (timeperiod*)skiplist_find_first(object_skiplists[TIMEPERIOD_SKIPLIST],&temp_timeperiod,NULL);
 	}
@@ -2368,13 +2368,13 @@ servicegroup * find_servicegroup(char *name){
 
 
 /* find a contact from the list in memory */
-contact * find_contact(char *name){
+contact * find_contact(char const*name){
 	contact temp_contact;
 
 	if(name==NULL)
 		return NULL;
 
-	temp_contact.name=name;
+	temp_contact.name=const_cast<char*>(name);
 
 	return (contact*)skiplist_find_first(object_skiplists[CONTACT_SKIPLIST],&temp_contact,NULL);
 	}
@@ -2394,27 +2394,27 @@ contactgroup * find_contactgroup(char *name){
 
 
 /* given a command name, find a command from the list in memory */
-command * find_command(char *name){
+command * find_command(char const* name){
 	command temp_command;
 
 	if(name==NULL)
 		return NULL;
 
-	temp_command.name=name;
+	temp_command.name=const_cast<char*>(name);
 
 	return (command*)skiplist_find_first(object_skiplists[COMMAND_SKIPLIST],&temp_command,NULL);
         }
 
 
 /* given a host/service name, find the service in the list in memory */
-service * find_service(char *host_name,char *svc_desc){
+service * find_service(char const* host_name,char const* svc_desc){
 	service temp_service;
 
 	if(host_name==NULL || svc_desc==NULL)
 		return NULL;
 
-	temp_service.host_name=host_name;
-	temp_service.description=svc_desc;
+	temp_service.host_name=const_cast<char*>(host_name);
+	temp_service.description=const_cast<char*>(svc_desc);
 
 	return (service*)skiplist_find_first(object_skiplists[SERVICE_SKIPLIST],&temp_service,NULL);
         }

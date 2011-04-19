@@ -2056,11 +2056,11 @@ int cmd_process_service_check_result(int cmd,time_t check_time,char *args){
 
 
 /* submits a passive service check result for later processing */
-int process_passive_service_check(time_t check_time, char *host_name, char *svc_description, int return_code, char *output){
+int process_passive_service_check(time_t check_time, char const* host_name, char *svc_description, int return_code, char const*output){
 	passive_check_result *new_pcr=NULL;
 	host *temp_host=NULL;
 	service *temp_service=NULL;
-	char *real_host_name=NULL;
+	char const*real_host_name=NULL;
 	struct timeval tv;
 	int result=OK;
 
@@ -2196,7 +2196,7 @@ int cmd_process_host_check_result(int cmd,time_t check_time,char *args){
 
 
 /* process passive host check result */
-int process_passive_host_check(time_t check_time, char *host_name, int return_code, char *output){
+int process_passive_host_check(time_t check_time, char *host_name, int return_code, char const* output){
 	passive_check_result *new_pcr=NULL;
 	host *temp_host=NULL;
 	char *real_host_name=NULL;

@@ -671,14 +671,14 @@ int get_service_count(void);
 
 
 /**** Object Search Functions ****/
-timeperiod * find_timeperiod(char *);						                /* finds a timeperiod object */
+timeperiod * find_timeperiod(char const*);						                /* finds a timeperiod object */
 host * find_host(char const*);									/* finds a host object */
 hostgroup * find_hostgroup(char *);						                /* finds a hostgroup object */
 servicegroup * find_servicegroup(char *);					                /* finds a servicegroup object */
-contact * find_contact(char *);							                /* finds a contact object */
+contact * find_contact(char const*);							                /* finds a contact object */
 contactgroup * find_contactgroup(char *);					                /* finds a contactgroup object */
-command * find_command(char *);							                /* finds a command object */
-service * find_service(char *,char *);								/* finds a service object */
+command * find_command(char const*);							                /* finds a command object */
+service * find_service(char const*,char const*);								/* finds a service object */
 
 
 /**** Object Traversal Functions ****/

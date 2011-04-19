@@ -5479,12 +5479,10 @@
       <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
     </operation>
 
-    
 
-    
 
     <!-- Not validated operations. -->
-
+    <!-- XXX: todo.
     <operation name="deleteComment">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
@@ -5628,7 +5626,7 @@
       <input><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
       <output><SOAP:body use="encoded" namespace="urn:centreonscheduler" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
     </operation>
-
+    -->
   </binding>
 
   <service name="centreonscheduler">
