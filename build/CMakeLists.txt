@@ -243,12 +243,8 @@ elseif (HAVE_TZNAME)
 endif ()
 
 # Configure files.
-configure_file("${INCLUDE_DIR}/config.h.in"
-  "${INCLUDE_DIR}/config.h")
-configure_file("${INCLUDE_DIR}/locations.h.in"
-  "${INCLUDE_DIR}/locations.h")
-configure_file("${INCLUDE_DIR}/snprintf.h.in"
-  "${INCLUDE_DIR}/snprintf.h")
+configure_file("${INCLUDE_DIR}/compatibility/locations.h.in"
+  "${INCLUDE_DIR}/compatibility/locations.h")
 configure_file("${SCRIPT_DIR}/centscheduler.sh.in"
   "${SCRIPT_DIR}/centscheduler.sh")
 configure_file("${SCRIPT_DIR}/ubuntu.conf.in"
