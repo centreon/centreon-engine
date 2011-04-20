@@ -2,21 +2,21 @@
  *  @page passivechecks Passive Checks
  *  @section passivechecksintroduction Introduction
  *
- *  In most cases you'll use Centreon Scheduler to monitor your hosts
+ *  In most cases you'll use Centreon Engine to monitor your hosts
  *  and services using regularly scheduled @link activechecks.html
  *  active checks @endlink. Active checks can be used to "poll" a
  *  device or service for status information every so often. Centreon
- *  Scheduler also supports a way to monitor hosts and services
+ *  Engine also supports a way to monitor hosts and services
  *  passively instead of actively. They key features of passive checks
  *  are as follows:
  *
  *  - Passive checks are initiated and performed external
  *  applications/processes
- *  - Passive check results are submitted to Centreon Scheduler for
+ *  - Passive check results are submitted to Centreon Engine for
  *  processing
  *
  *  The major difference between active and passive checks is that
- *  active checks are initiated and performed by Centreon Scheduler,
+ *  active checks are initiated and performed by Centreon Engine,
  *  while passive checks are performed by external applications.
  *
  *  @section passivechecksusesforpassivechecks Uses For Passive Checks
@@ -48,26 +48,26 @@
  *  - The external application writes the results of the check to the
  *  @ref mainconfigurationfileoptionsconfigurationfilevariablesexternalcommandfile
  *  "external command file".
- *  - The next time Centreon Scheduler reads the external command file
+ *  - The next time Centreon Engine reads the external command file
  *  it will place the results of all passive checks into a queue for
  *  later processing. The same queue that is used for storing results
  *  from active checks is also used to store the results from passive
  *  checks.
- *  - Centreon Scheduler will periodically execute a @ref
+ *  - Centreon Engine will periodically execute a @ref
  *  mainconfigurationfileoptionsconfigurationfilevariablescheckresultreaperfrequency
  *  "check result reaper event" and scan the check result queue. Each service check
  *  result that is found in the queue is processed in the same manner
  *  - regardless of whether the check was active or passive. Centreon
- *  Scheduler may send out notifications, log alerts, etc. depending
+ *  Engine may send out notifications, log alerts, etc. depending
  *  on the check result information.
  *
  *  The processing of active and passive check results is essentially
  *  identical. This allows for seamless integration of status
- *  information from external applications with Centreon Scheduler.
+ *  information from external applications with Centreon Engine.
  *
  *  @section passivechecksenablingpassivechecks Enabling Passive Checks
  *
- *  In order to enable passive checks in Centreon Scheduler, you'll need
+ *  In order to enable passive checks in Centreon Engine, you'll need
  *  to do the following:
  *  - Set @ref mainconfigurationfileoptionsconfigurationfilevariablespassiveservicecheckacceptanceoption
  *  "accept_passive_service_checks" directive to 1.
@@ -85,7 +85,7 @@
  *  @section passivecheckssubmittingpassiveservicecheckresults Submitting Passive Service Check Results
  *
  *  External applications can submit passive service check results to
- *  Centreon Scheduler by writing a PROCESS_SERVICE_CHECK_RESULT @link
+ *  Centreon Engine by writing a PROCESS_SERVICE_CHECK_RESULT @link
  *  externalcommands external command @endlink to the external command
  *  file.
  *
@@ -109,19 +109,19 @@
  *  - plugin_output is the text output of the service check (i.e. the
  *  plugin output)
  *
- *  @note A service must be defined in Centreon Scheduler before you can
- *  submit passive check results for it! Centreon Scheduler will ignore
+ *  @note A service must be defined in Centreon Engine before you can
+ *  submit passive check results for it! Centreon Engine will ignore
  *  all check results for services that had not been configured before
  *  it was last (re)started.
  *
  *  @note An example shell script of how to submit passive service check
- *  results to Centreon Scheduler can be found in the documentation on
+ *  results to Centreon Engine can be found in the documentation on
  *  @ref volatileservices "volatile services".
  *
  *  @section passivecheckssubmittingpassivehostcheckresults Submitting Passive Host Check Results
  *
  *  External applications can submit passive host check results to
- *  Centreon Scheduler by writing a PROCESS_HOST_CHECK_RESULT external
+ *  Centreon Engine by writing a PROCESS_HOST_CHECK_RESULT external
  *  command to the external command file.
  *
  *  The format of the command is as follows:
@@ -141,16 +141,16 @@
  *  2=UNREACHABLE)
  *  - plugin_output is the text output of the host check
  *
- *  @note A host must be defined in Centreon Scheduler before you can
- *  submit passive check results for it! Centreon Scheduler will ignore
+ *  @note A host must be defined in Centreon Engine before you can
+ *  submit passive check results for it! Centreon Engine will ignore
  *  all check results for hosts that had not been configured before it
  *  was last (re)started.
  *
  *  @section passivecheckspassivechecksandhoststates Passive Checks and Host States
  *
- *  Unlike with active host checks, Centreon Scheduler does not (by
+ *  Unlike with active host checks, Centreon Engine does not (by
  *  default) attempt to determine whether or host is DOWN or
- *  UNREACHABLE with passive checks. Rather, Centreon Scheduler takes
+ *  UNREACHABLE with passive checks. Rather, Centreon Engine takes
  *  the passive check result to be the actual state the host is in and
  *  doesn't try to determine the host's actual state using the @link
  *  determiningstatusandreachabilityofnetworkhosts reachability logic @endlink. This can
@@ -159,7 +159,7 @@
  *  setup @endlink where the parent/child host relationships are
  *  different.
  *
- *  You can tell Centreon Scheduler to translate DOWN/UNREACHABLE
+ *  You can tell Centreon Engine to translate DOWN/UNREACHABLE
  *  passive check result states to their "proper" state by using the
  *  @ref mainconfigurationfileoptionsconfigurationfilevariablestranslatepassivehostchecksoption
  *  "translate_passive_host_checks" variable. More information
@@ -177,19 +177,19 @@
  *  @image latex nsca.eps
  *
  *  If an application that resides on the same host as Centreon
- *  Scheduler is sending passive host or service check results, it can
+ *  Engine is sending passive host or service check results, it can
  *  simply write the results directly to the external command file as
  *  outlined above. However, applications on remote hosts can't do this
  *  so easily.
  *
  *  In order to allow remote hosts to send passive check results to the
- *  monitoring host, I've developed the @ref centscheduleraddonsnsca "NSCA
+ *  monitoring host, I've developed the @ref centengineaddonsnsca "NSCA
  *  addon". The NSCA addon consists of a daemon that runs on
- *  the Centreon Scheduler hosts and a client that is executed from
+ *  the Centreon Engine hosts and a client that is executed from
  *  remote hosts. The daemon will listen for connections from remote
  *  clients, perform some basic validation on the results being
  *  submitted, and then write the check results directly into the
  *  external command file (as described above). More information on the
- *  NSCA addon can be found @ref centscheduleraddonsnsca "here".
+ *  NSCA addon can be found @ref centengineaddonsnsca "here".
  */
 

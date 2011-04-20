@@ -2,7 +2,7 @@ x/**
  *  @page serviceandhostfreshnesschecks Service and Host Freshness Checks
  *  @section serviceandhostfreshnesschecksintroduction Introduction
  *
- *  Centreon Scheduler supports a feature that does "freshness" checking
+ *  Centreon Engine supports a feature that does "freshness" checking
  *  on the results of host and service checks. The purpose of freshness
  *  checking is to ensure that host and service checks are being
  *  provided passively by external applications on a regular basis.
@@ -18,14 +18,14 @@ x/**
  *
  *  @section serviceandhostfreshnesscheckshowdoesfreshnesscheckingwork How Does Freshness Checking Work?
  *
- *  Centreon Scheduler periodically checks the freshness of the results
+ *  Centreon Engine periodically checks the freshness of the results
  *  for all hosts services that have freshness checking enabled.
  *  - A freshness threshold is calculated for each host or service.
  *  - For each host/service, the age of its last check result is
  *  compared with the freshness threshold.
  *  - If the age of the last check result is greater than the freshness
  *  threshold, the check result is considered "stale".
- *  - If the check results is found to be stale, Centreon Scheduler will
+ *  - If the check results is found to be stale, Centreon Engine will
  *  force an @link activechecks.html active check @endlink of the host
  *  or service by executing the command specified by in the host or
  *  service definition.
@@ -34,7 +34,7 @@ x/**
  *  disabled on a program-wide or host- or service-specific basis.
  *
  *  For example, if you have a freshness threshold of 60 for one of
- *  your services, Centreon Scheduler will consider that service to be
+ *  your services, Centreon Engine will consider that service to be
  *  stale if its last check result is older than 60 seconds.
  *
  *  @section serviceandhostfreshnesschecksenablingfreshnesschecking Enabling Freshness Checking
@@ -48,7 +48,7 @@ x/**
  *  "service_freshness_check_interval" and
  *  @ref mainconfigurationfileoptionsconfigurationfilevariableshostfreshnesscheckinterval
  *  "host_freshness_check_interval" options to tell Centreon
- *  Scheduler how often in should check the freshness of service and
+ *  Engine how often in should check the freshness of service and
  *  host results.
  *  - Enable freshness checking on a host- and service-specific basis
  *  by setting the check_freshness option in your host and service
@@ -59,29 +59,29 @@ x/**
  *  definitions to reflect a valid command that should be used to
  *  actively check the host or service when it is detected as stale.
  *  - The check_period option in your host and service definitions is
- *  used when Centreon Scheduler determines when a host or service can
+ *  used when Centreon Engine determines when a host or service can
  *  be checked for freshness, so make sure it is set to a valid
  *  timeperiod.
  *
  *  @note Tip: If you do not specify a host- or service-specific
  *  freshness_threshold value (or you set it to zero), Centreon
- *  Scheduler will automatically calculate a threshold automatically,
+ *  Engine will automatically calculate a threshold automatically,
  *  based on a how often you monitor that particular host or service. I
  *  would recommended that you explicitly specify a freshness
- *  threshold, rather than let Centreon Scheduler pick one for you.
+ *  threshold, rather than let Centreon Engine pick one for you.
  *
  *  @section serviceandhostfreshnesschecksexample Example
  *
  *  An example of a service that might require freshness checking might
  *  be one that reports the status of your nightly backup jobs. Perhaps
  *  you have a external script that submit the results of the backup
- *  job to Centreon Scheduler once the backup is completed. In this
+ *  job to Centreon Engine once the backup is completed. In this
  *  case, all of the checks/results for the service are provided by an
  *  external application using passive checks. In order to ensure that
  *  the status of the backup job gets reported every day, you may want
  *  to enable freshness checking for the service. If the external
  *  script doesn't submit the results of the backup job, you can have
- *  Centreon Scheduler fake a critical result by doing something like
+ *  Centreon Engine fake a critical result by doing something like
  *  this...
  *
  *  Here's what the definition for the service might look like (some
@@ -114,14 +114,14 @@ x/**
  *  @code
  *  define command{
  *    command_name no-backup-report
- *    command_line /usr/local/centscheduler/libexec/check_dummy 2 "CRITICAL: Results of backup job were not reported!"
+ *    command_line /usr/local/centengine/libexec/check_dummy 2 "CRITICAL: Results of backup job were not reported!"
  *  }
  *  @endcode
  *
- *  If Centreon Scheduler detects that the service results are stale, it
+ *  If Centreon Engine detects that the service results are stale, it
  *  will run the no-backup-report command as an active service check.
  *  This causes the check_dummy plugin to be executed, which returns a
- *  critical state to Centreon Scheduler. The service will then go into
+ *  critical state to Centreon Engine. The service will then go into
  *  to a critical state (if it isn't already there) and someone will
  *  probably get notified of the problem.
  */

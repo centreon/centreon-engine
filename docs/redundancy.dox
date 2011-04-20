@@ -5,11 +5,11 @@
  *  This section describes a few scenarios for implementing redundant
  *  monitoring hosts an various types of network layouts. With
  *  redundant hosts, you can maintain the ability to monitor your
- *  network when the primary host that runs Centreon Scheduler fails or
+ *  network when the primary host that runs Centreon Engine fails or
  *  when portions of your network become unreachable.
  *
  *  @note If you are just learning how to use Centreon
- *  Scheduler, I would suggest not trying to implement redudancy until
+ *  Engine, I would suggest not trying to implement redudancy until
  *  you have becoming familiar with the @ref redundantandfailovernetworkmonitoringprerequisites
  *  "prerequisites" I've laid out. Redundancy is a relatively
  *  complicated issue to understand, and even more difficult to
@@ -18,21 +18,21 @@
  *  @section redundantandfailovernetworkmonitoringprerequisites Prerequisites
  *
  *  Before you can even think about implementing redundancy with
- *  Centreon Scheduler, you need to be familiar with the following...
+ *  Centreon Engine, you need to be familiar with the following...
  *
  *  - Implementing @link eventhandlers.html event handlers @endlink for
  *  hosts and services
  *  - Issuing @link externalcommands external commands @endlink to
- *  Centreon Scheduler via shell scripts
+ *  Centreon Engine via shell scripts
  *  - Executing plugins on remote hosts using either the @ref
- *  centscheduleraddonsnrpe "NRPE addon" or some other method
- *  - Checking the status of the Centreon Scheduler process with the
- *  check_centscheduler plugin
+ *  centengineaddonsnrpe "NRPE addon" or some other method
+ *  - Checking the status of the Centreon Engine process with the
+ *  check_centengine plugin
  *
  *  @section redundantandfailovernetworkmonitoringsamplescripts Sample Scripts
  *
  *  All of the sample scripts that I use in this documentation can be
- *  found in the eventhandlers/ subdirectory of the Centreon Scheduler
+ *  found in the eventhandlers/ subdirectory of the Centreon Engine
  *  distribution. You'll probably need to modify them to work on your
  *  system...
  *
@@ -52,17 +52,17 @@
  *  the "master" and "slave" hosts monitor the same hosts and service
  *  on the network. Under normal circumstances only the "master" host
  *  will be sending out notifications to contacts about problems. We
- *  want the "slave" host running Centreon Scheduler to take over the
+ *  want the "slave" host running Centreon Engine to take over the
  *  job of notifying contacts about problems if:
- *  - The "master" host that runs Centreon Scheduler is down or..
- *  - The Centreon Scheduler process on the "master" host stops running
+ *  - The "master" host that runs Centreon Engine is down or..
+ *  - The Centreon Engine process on the "master" host stops running
  *  for some reason
  *
  *  @subsection redundantandfailovernetworkmonitoringscenario1redundantmonitoringnetworklayoutdiagram Network Layout Diagram
  *
  *  The diagram below shows a very simple network setup. For this
  *  scenario I will be assuming that hosts A and E are both running
- *  Centreon Scheduler and are monitoring all the hosts shown. Host A
+ *  Centreon Engine and are monitoring all the hosts shown. Host A
  *  will be considered the "master" host and host E will be considered
  *  the "slave" host.
  *
@@ -96,12 +96,12 @@
  *  handle-master-host-event.
  *
  *  - The configuration file on host E should have a service defined to
- *  check the status of the Centreon Scheduler process on host A. Lets
+ *  check the status of the Centreon Engine process on host A. Lets
  *  assume that you define this service check to run the
- *  check_centscheduler plugin on host A. This can be done by using one
+ *  check_centengine plugin on host A. This can be done by using one
  *  of the methods described in this FAQ (update this!).
  *
- *  - The service definition for the Centreon Scheduler process check on
+ *  - The service definition for the Centreon Engine process check on
  *  host A should have an @link eventhandlers.html event handler
  *  @endlink defined. Lets say the name of the service event handler is
  *  handle-master-proc-event.
@@ -121,17 +121,17 @@
  *  @code
  *  define command{
  *    command_name handle-master-host-event
- *    command_line /usr/local/centscheduler/libexec/eventhandlers/handle-master-host-event $HOSTSTATE$ $HOSTSTATETYPE$
+ *    command_line /usr/local/centengine/libexec/eventhandlers/handle-master-host-event $HOSTSTATE$ $HOSTSTATETYPE$
  *  }
  *
  *  define command{
  *    command_name handle-master-proc-event
- *    command_line /usr/local/centscheduler/libexec/eventhandlers/handle-master-proc-event $SERVICESTATE$ $SERVICESTATETYPE$
+ *    command_line /usr/local/centengine/libexec/eventhandlers/handle-master-proc-event $SERVICESTATE$ $SERVICESTATETYPE$
  *  }
  *  @endcode
  *
  *  This assumes that you have placed the event handler scripts in the
- *  /usr/local/centscheduler/libexec/eventhandlers directory. You may
+ *  /usr/local/centengine/libexec/eventhandlers directory. You may
  *  place them anywhere you wish, but you'll need to modify the
  *  examples I've given here.
  *
@@ -154,14 +154,14 @@
  *          # We should now become the master host and take
  *  	    # over the responsibilities of monitoring the
  *  	    # network, so enable notifications...
- *  	    /usr/local/centscheduler/libexec/eventhandlers/enable_notifications
+ *  	    /usr/local/centengine/libexec/eventhandlers/enable_notifications
  *  	    ;;
  *  	  UP)
  *  	    # The master host has recovered!
  *  	    # We should go back to being the slave host and
  *  	    # let the master host do the monitoring, so
  *  	    # disable notifications...
- *  	    /usr/local/centscheduler/libexec/eventhandlers/disable_notifications
+ *  	    /usr/local/centengine/libexec/eventhandlers/disable_notifications
  *  	    ;;
  *  	esac
  *  	;;
@@ -179,25 +179,25 @@
  *    HARD)
  *      case "$1" in
  *  	  CRITICAL)
- *  	    # The master Centreon Scheduler process is not running!
+ *  	    # The master Centreon Engine process is not running!
  *  	    # We should now become the master host and
  *  	    # take over the responsibility of monitoring
  *  	    # the network, so enable notifications...
- *  	    /usr/local/centscheduler/libexec/eventhandlers/enable_notifications
+ *  	    /usr/local/centengine/libexec/eventhandlers/enable_notifications
  *  	    ;;
  *  	  WARNING)
  *  	  UNKNOWN)
- *  	    # The master Centreon Scheduler process may or may not
+ *  	    # The master Centreon Engine process may or may not
  *  	    # be running.. We won't do anything here, but
  *  	    # to be on the safe side you may decide you
  *  	    # want the slave host to become the master in
  *  	    # these situations...
  *  	    ;;
  *  	  OK)
- *  	    # The master Centreon Scheduler process running again!
+ *  	    # The master Centreon Engine process running again!
  *  	    # We should go back to being the slave host,
  *  	    # so disable notifications...
- *  	    /usr/local/centscheduler/libexec/eventhandlers/disable_notifications
+ *  	    /usr/local/centengine/libexec/eventhandlers/disable_notifications
  *  	    ;;
  *  	esac
  *  	;;
@@ -209,39 +209,39 @@
  *
  *  The slave host (host E) initially has notifications disabled, so it
  *  won't send out any host or service notifications while the Centreon
- *  Scheduler process on the master host (host A) is still running.
+ *  Engine process on the master host (host A) is still running.
  *
- *  The Centreon Scheduler process on the slave host (host E) becomes
+ *  The Centreon Engine process on the slave host (host E) becomes
  *  the master host when...
  *  - The master host (host A) goes down and the
  *  handle-master-host-event host event handler is executed.
- *  - The Centreon Scheduler process on the master host (host A) stops
+ *  - The Centreon Engine process on the master host (host A) stops
  *  running and the handle-master-proc-event service event handler is
  *  executed.
  *
- *  When the Centreon Scheduler process on the slave host (host E) has
+ *  When the Centreon Engine process on the slave host (host E) has
  *  notifications enabled, it will be able to send out notifications
  *  about any service or host problems or recoveries. At this point
  *  host E has effectively taken over the responsibility of notifying
  *  contacts of host and service problems!
  *
- *  The Centreon Scheduler process on host E returns to being the slave
+ *  The Centreon Engine process on host E returns to being the slave
  *  host when...
  *  - Host A recovers and the handle-master-host-event host event
  *  handler is executed.
- *  - The Centreon Scheduler process on host A recovers and the
+ *  - The Centreon Engine process on host A recovers and the
  *  handle-master-proc-event service event handler is executed.
  *
- *  When the Centreon Scheduler process on host E has notifications
+ *  When the Centreon Engine process on host E has notifications
  *  disabled, it will not send out notifications about any service or
  *  host problems or recoveries. At this point host E has handed over
  *  the responsibilities of notifying contacts of problems to the
- *  Centreon Scheduler process on host A. Everything is now as it was
+ *  Centreon Engine process on host A. Everything is now as it was
  *  when we first started!
  *
  *  @subsection redundantandfailovernetworkmonitoringscenario1redundantmonitoringtimelags Time Lags
  *
- *  Redundancy in Centreon Scheduler is by no means perfect. One of the
+ *  Redundancy in Centreon Engine is by no means perfect. One of the
  *  more obvious problems is the lag time between the master host
  *  failing and the slave host taking over. This is affected by the
  *  following...
@@ -250,10 +250,10 @@
  *  - The time needed to verify that the master host really does have a
  *  problem (using service or host check retries on the slave host)
  *  - The time between the execution of the event handler and the next
- *  time that Centreon Scheduler checks for external commands
+ *  time that Centreon Engine checks for external commands
  *
  *  You can minimize this lag by...
- *  - Ensuring that the Centreon Scheduler process on host E (re)checks
+ *  - Ensuring that the Centreon Engine process on host E (re)checks
  *  one or more services at a high frequency. This is done by using the
  *  check_interval and retry_interval arguments in each service
  *  definition.
@@ -265,13 +265,13 @@
  *  mainconfigurationfileoptionsconfigurationfilevariablesexternalcommandcheckinterval
  *  "command_check_interval" option in the main configuration file.
  *
- *  When Centreon Scheduler recovers on the host A, there is also some
+ *  When Centreon Engine recovers on the host A, there is also some
  *  lag time before host E returns to being a slave host. This is
  *  affected by the following...
  *  - The time between a recovery of host A and the time the Centreon
- *  Scheduler process on host E detects the recovery
+ *  Engine process on host E detects the recovery
  *  - The time between the execution of the event handler on host B and
- *  the next time the Centreon Scheduler process on host E checks for
+ *  the next time the Centreon Engine process on host E checks for
  *  external commands
  *
  *  The exact lag times between the transfer of monitoring
@@ -285,19 +285,19 @@
  *  host E will have notifications enabled and take over the
  *  responsibilities of notifying contacts of problems. When host A
  *  recovers, host E will have notifications disabled. If - when host A
- *  recovers - the Centreon Scheduler process on host A does not start
+ *  recovers - the Centreon Engine process on host A does not start
  *  up properly, there will be a period of time when neither host is
  *  notifying contacts of problems! Fortunately, the service check
- *  logic in Centreon Scheduler accounts for this. The next time the
- *  Centreon Scheduler process on host E checks the status of the
- *  Centreon Scheduler process on host A, it will find that it is not
+ *  logic in Centreon Engine accounts for this. The next time the
+ *  Centreon Engine process on host E checks the status of the
+ *  Centreon Engine process on host A, it will find that it is not
  *  running. Host E will then have notifications enabled again and take
  *  over all responsibilities of notifying contacts of problems.
  *
  *  The exact amount of time that neither host is monitoring the
  *  network is hard to determine. Obviously, this period can be
  *  minimized by increasing the frequency of service checks (on host E)
- *  of the Centreon Scheduler process on host A. The rest is up to pure
+ *  of the Centreon Engine process on host A. The rest is up to pure
  *  chance, but the total "blackout" time shouldn't be too bad.
  *
  *  @section redundantandfailovernetworkmonitoringscenario2failovermonitoring Scenario 2 - FailoverMonitoring
@@ -311,10 +311,10 @@
  *  @subsection redundantandfailovernetworkmonitoringscenario2failovermonitoringgoals Goals
  *
  *  The basic goal of failover monitoring is to have the Centreon
- *  Scheduler process on the slave host sit idle while the Centreon
- *  Scheduler process on the master host is running. If the process on
+ *  Engine process on the slave host sit idle while the Centreon
+ *  Engine process on the master host is running. If the process on
  *  the master host stops running (or if the host goes down), the
- *  Centreon Scheduler process on the slave host starts monitoring
+ *  Centreon Engine process on the slave host starts monitoring
  *  everything.
  *
  *  While the method described in @ref redundantandfailovernetworkmonitoringscenario1redundantmonitoring "scenario 1"
@@ -334,7 +334,7 @@
  *  mainconfigurationfileoptionsconfigurationfilevariablesnotificationsoption
  *  "enable_notifications" directives. This will prevent the slave host
  *  from monitoring hosts and services and sending out notifications
- *  while the Centreon Scheduler process on the master host is still up and
+ *  while the Centreon Engine process on the master host is still up and
  *  running. Make sure you also have the @ref
  *  mainconfigurationfileoptionsconfigurationfilevariablesexternalcommandcheckoption
  *  "check_external_commands" directive enabled on the slave host.
@@ -343,9 +343,9 @@
  *
  *  Set up a cron job on the slave host that periodically (say every
  *  minute) runs a script that checks the staus of the Centreon
- *  Scheduler process on the master host (using the check_nrpe plugin
- *  on the slave host and the @ref centscheduleraddonsnrpe "nrpe daemon"
- *  and check_centscheduler plugin on the master host). The
+ *  Engine process on the master host (using the check_nrpe plugin
+ *  on the slave host and the @ref centengineaddonsnrpe "nrpe daemon"
+ *  and check_centengine plugin on the master host). The
  *  script should check the return code of the check_nrpe plugin . If
  *  it returns a non-OK state, the script should send the appropriate
  *  commands to the @ref
@@ -375,7 +375,7 @@
  *  One way to solve this problem is to enable the @ref
  *  mainconfigurationfileoptionsconfigurationfilevariablesobsessivecompulsiveserviceprocessorcommand
  *  "ocsp command" on the master host and have it send all service check
- *  results to the slave host using the @ref centscheduleraddonsnsca "nsca
+ *  results to the slave host using the @ref centengineaddonsnsca "nsca
  *  addon". The slave host will then have up-to-date status
  *  information for all services at the time it takes over the job of
  *  monitoring things. Since active service checks are not enabled on

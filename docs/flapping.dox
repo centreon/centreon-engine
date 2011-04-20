@@ -2,7 +2,7 @@
  *  @page detectionandhandlingofstateflapping Detection and Handling of State Flapping
  *  @section detectionandhandlingofstateflappingintroduction Introduction
  *
- *  Centreon Scheduler supports optional detection of hosts and services
+ *  Centreon Engine supports optional detection of hosts and services
  *  that are "flapping". Flapping occurs when a service or host changes
  *  state too frequently, resulting in a storm of problem and recovery
  *  notifications. Flapping can be indicative of configuration problems
@@ -20,7 +20,7 @@
  *  about what others were using (where they using any?), so I decided
  *  to settle with what seemed to me to be a reasonable solution...
  *
- *  Whenever Centreon Scheduler checks the status of a host or service,
+ *  Whenever Centreon Engine checks the status of a host or service,
  *  it will check to see if it has started or stopped flapping. It does
  *  this by:
  *  - Storing the results of the last 21 checks of the host or service
@@ -91,11 +91,11 @@
  *  be compared against flapping thresholds to see what should happen:
  *
  *  - If the service was not previously flapping and 31% is equal to or
- *  greater than the high flap threshold, Centreon Scheduler considers
+ *  greater than the high flap threshold, Centreon Engine considers
  *  the service to have just started flapping.
  *
  *  - If the service was previously flapping and 31% is less than the
- *  low flap threshold, Centreon Scheduler considers the service to have
+ *  low flap threshold, Centreon Engine considers the service to have
  *  just stopped flapping.
  *
  *  If neither of those two conditions are met, the flap detection
@@ -104,7 +104,7 @@
  *
  *  @section detectionandhandlingofstateflappingflapdetectionforservices Flap Detection for Services
  *
- *  Centreon Scheduler checks to see if a service is flapping whenever
+ *  Centreon Engine checks to see if a service is flapping whenever
  *  the service is checked (either actively or passively).
  *
  *  The flap detection logic for services works as described in the
@@ -113,7 +113,7 @@
  *  @section detectionandhandlingofstateflappingflapdetectionforhosts Flap Detection for Hosts
  *
  *  Host flap detection works in a similiar manner to service flap
- *  detection, with one important difference: Centreon Scheduler will
+ *  detection, with one important difference: Centreon Engine will
  *  attempt to check to see if a host is flapping whenever:
  *  - The host is checked (actively or passively)
  *  - Sometimes when a service associated with that host is checked.
@@ -134,11 +134,11 @@
  *
  *  @section detectionandhandlingofstateflappingflapdetectionthresholds Flap Detection Thresholds
  *
- *  Centreon Scheduler uses several variables to determine the percent
+ *  Centreon Engine uses several variables to determine the percent
  *  state change thresholds is uses for flap detection. For both hosts
  *  and services, there are global high and low thresholds and host- or
  *  service-specific thresholds that you can configure. Centreon
- *  Scheduler will use the global thresholds for flap detection if you
+ *  Engine will use the global thresholds for flap detection if you
  *  to not specify host- or service- specific thresholds.
  *
  *  The table below shows the global and host- or service-specific
@@ -178,7 +178,7 @@
  *
  *  @section detectionandhandlingofstateflappingstatesusedforflapdetection States Used For Flap Detection
  *
- *  Normally Centreon Scheduler will track the results of the last 21
+ *  Normally Centreon Engine will track the results of the last 21
  *  checks of a host or service, regardless of the check result
  *  (host/service state), for use in the flap detection logic.
  *
@@ -193,7 +193,7 @@
  *  @section detectionandhandlingofstateflappingflaphandling Flap Handling
  *
  *  When a service or host is first detected as flapping, Centreon
- *  Scheduler will:
+ *  Engine will:
  *  - Log a message indicating that the service or host is flapping.
  *  - Add a non-persistent comment to the host or service indicating
  *  that it is flapping.
@@ -203,7 +203,7 @@
  *  of the filters in the @link notifications.html notification logic
  *  @endlink).
  *
- *  When a service or host stops flapping, Centreon Scheduler will:
+ *  When a service or host stops flapping, Centreon Engine will:
  *  - Log a message indicating that the service or host has stopped
  *  flapping.
  *  - Delete the comment that was originally added to the service or
@@ -217,7 +217,7 @@
  *  @section detectionandhandlingofstateflappingenablingflapdetection Enabling Flap Detection
  *
  *  In order to enable the flap detection features in Centreon
- *  Scheduler, you'll need to:
+ *  Engine, you'll need to:
  *  - Set @ref mainconfigurationfileoptionsconfigurationfilevariablesflapdetectionoption
  *  "enable_flap_detection" directive is set to 1.
  *  - Set the flap_detection_enabled directive in your host and service

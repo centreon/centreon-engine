@@ -1,15 +1,15 @@
 /**
- *  @page about About Centreon Scheduler
- *  @section whatiscentscheduler What is Centreon Scheduler ?
+ *  @page about About Centreon Engine
+ *  @section whatiscentengine What is Centreon Engine ?
  *
- *  Centreon Scheduler is an Open Source system and network monitoring
+ *  Centreon Engine is an Open Source system and network monitoring
  *  application. It watches hosts and services that you specify,
  *  alerting you when things go bad and when they get better.
  *
- *  Centreon Scheduler was originally designed to run under Linux,
+ *  Centreon Engine was originally designed to run under Linux,
  *  although it should work under most other unices as well.
  *
- *  Some of the many features of Centreon Scheduler include:
+ *  Some of the many features of Centreon Engine include:
  *
  *  - monitoring of network services (SMTP, IMAP, HTTP, NNTP, PING,
  *  etc.)
@@ -29,36 +29,36 @@
  *
  *  @section systemrequirements System Requirements
  *
- *  The only requirement of running Centreon Scheduler is a machine
+ *  The only requirement of running Centreon Engine is a machine
  *  running Linux (or UNIX variant) that has network access and a C
  *  compiler installed (if installing from source code).
  *
  *  @section licensing Licensing
  *
- *  Centreon Scheduler is licensed under the terms of the
+ *  Centreon Engine is licensed under the terms of the
  *  <a href="http://www.gnu.org/licenses/old-licenses/gpl-2.0.html">GNU
  *  General Public License</a> Version 2 as published by the
  *  <a href="http://www.fsf.org/">Free Software Foundation</a>. This
  *  gives you legal permission to copy, distribute and/or modify
- *  Centreon Scheduler under certain conditions. Read the 'license.txt'
- *  file in the Centreon Scheduler distribution or read the
+ *  Centreon Engine under certain conditions. Read the 'license.txt'
+ *  file in the Centreon Engine distribution or read the
  *  <a href="http://www.gnu.org/licenses/old-licenses/gpl-2.0.html">
  *  online version of the license</a> for more details.
  *
- *  Centreon Scheduler has started as a fork of the Nagios Core project.
+ *  Centreon Engine has started as a fork of the Nagios Core project.
  *  Nagios and the Nagios logo are trademarks, servicemarks, registered
  *  trademarks or registered servicemarks owned by Nagios Enterprises,
  *  LLC. All other trademarks, servicemarks, registered trademarks, and
  *  registered servicemarks are the property of their respective
  *  owner(s).
  *
- *  Centreon Scheduler is provided AS IS with NO WARRANTY OF ANY KIND,
+ *  Centreon Engine is provided AS IS with NO WARRANTY OF ANY KIND,
  *  INCLUDING THE WARRANTY OF DESIGN, MERCHANTABILITY, AND FITNESS FOR A
  *  PARTICULAR PURPOSE.
  *
- *  Several people have contributed to Centreon Scheduler or Nagios
+ *  Several people have contributed to Centreon Engine or Nagios
  *  Core by either reporting bugs, suggesting improvements, writing
  *  plugins, etc. A list of some of the many contributors to the
- *  development of Centreon Scheduler or Nagios Core can be found in the
- *  thanks.txt file in the root of the Centreon Scheduler distribution.
+ *  development of Centreon Engine or Nagios Core can be found in the
+ *  thanks.txt file in the root of the Centreon Engine distribution.
  */

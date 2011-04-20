@@ -1,30 +1,30 @@
 /**
- *  @page centschedulerpluginapi Centreon Scheduler Plugin API
- *  @section centschedulerpluginapiotherresources Other Resources
+ *  @page centenginepluginapi Centreon Engine Plugin API
+ *  @section centenginepluginapiotherresources Other Resources
  *
  *  If you're looking at writing your own plugins for Centreon
- *  Scheduler, please make sure to visit these other resources:
- *  - The official <a href="http://XX/">Centreon Scheduler plugin project
+ *  Engine, please make sure to visit these other resources:
+ *  - The official <a href="http://XX/">Centreon Engine plugin project
  *  website</a>
  *  - The official <a href="http://XXX/developer-guidelines.html">
- *  Centreon Scheduler plugin development guidelines</a>
+ *  Centreon Engine plugin development guidelines</a>
  *
- *  @section centschedulerpluginapipluginoverview Plugin Overview
+ *  @section centenginepluginapipluginoverview Plugin Overview
  *
  *  Scripts and executables must do two things (at a minimum) in order
- *  to function as Centreon Scheduler plugins:
+ *  to function as Centreon Engine plugins:
  *  - Exit with one of several possible return values
  *  - Return at least one line of text output to STDOUT
  *
  *  The inner workings of your plugin are unimportant to Centreon
- *  Scheduler. Your plugin could check the status of a TCP port, run a
+ *  Engine. Your plugin could check the status of a TCP port, run a
  *  database query, check disk free space, or do whatever else it needs
  *  to check something. The details will depend on what needs to be
  *  checked - that's up to you.
  *
- *  @section centschedulerpluginapireturncode Return Code
+ *  @section centenginepluginapireturncode Return Code
  *
- *  Centreon Scheduler determines the status of a host or service by
+ *  Centreon Engine determines the status of a host or service by
  *  evaluating the return code from plugins. The following tables shows
  *  a list of valid return codes, along with their corresponding
  *  service or host states.
@@ -62,14 +62,14 @@
  *  "use_aggressive_host_checking" option is enabled, return
  *  codes of 1 will result in a host state of DOWN or UNREACHABLE.
  *  Otherwise return codes of 1 will result in a host state of UP. The
- *  process by which Centreon Scheduler determines whether or not a host
+ *  process by which Centreon Engine determines whether or not a host
  *  is DOWN or UNREACHABLE is discussed @link
  *  determiningstatusandreachabilityofnetworkhosts here toto @endlink .
  *
- *  @section centschedulerpluginapipluginoutputspec Plugin Output Spec
+ *  @section centenginepluginapipluginoutputspec Plugin Output Spec
  *
  *  At a minimum, plugins should return at least one of text output.
- *  Beginning with Centreon Scheduler 3, plugins can optionally return
+ *  Beginning with Centreon Engine 3, plugins can optionally return
  *  multiple lines of output. Plugins may also return optional
  *  performance data that can be processed by external applications.
  *  The basic format for plugin output is shown below:
@@ -89,7 +89,7 @@
  *  symbol. Additional lines of long text output (shown in blue) are
  *  also optional.
  *
- *  @section centschedulerpluginapipluginoutputexamples Plugin Output Examples
+ *  @section centenginepluginapipluginoutputexamples Plugin Output Examples
  *
  *  Let's see some examples of possible plugin output...
  *
@@ -103,7 +103,7 @@
  *  @endcode
  *
  *  If this plugin was used to perform a service check, the entire line
- *  of output will be stored in the @ref standardmacrosincentschedulermacroavailabilitychartserviceoutput
+ *  of output will be stored in the @ref standardmacrosincentenginemacroavailabilitychartserviceoutput
  *  "$SERVICEOUTPUT$" macro.
  *
  *  - Case 2: One line of output (text and perfdata)
@@ -118,9 +118,9 @@
  *
  *  If this plugin was used to perform a service check, the first
  *  portion of output (left of the pipe separator) will be stored in
- *  the @ref standardmacrosincentschedulermacroavailabilitychartserviceoutput "$SERVICEOUTPUT$"
+ *  the @ref standardmacrosincentenginemacroavailabilitychartserviceoutput "$SERVICEOUTPUT$"
  *  macro and the second portion of output (right of the pipe separator)
- *  will be stored in the @ref standardmacrosincentschedulermacroavailabilitychartserviceperfdata
+ *  will be stored in the @ref standardmacrosincentenginemacroavailabilitychartserviceperfdata
  *  "$SERVICEPERFDATA$" macro.
  *
  *  - Case 3: Multiple lines of output (text and perfdata)
@@ -140,15 +140,15 @@
  *
  *  If this plugin was used to perform a service check, the red portion
  *  of first line of output (left of the pipe separator) will be stored
- *  in the @ref standardmacrosincentschedulermacroavailabilitychartserviceoutput "$SERVICEOUTPUT$"
+ *  in the @ref standardmacrosincentenginemacroavailabilitychartserviceoutput "$SERVICEOUTPUT$"
  *  macro.
  *
  *  The orange portions of the first and subsequent lines are
  *  concatenated (with spaces) are stored in the
- *  @ref standardmacrosincentschedulermacroavailabilitychartserviceperfdata "$SERVICEPERFDATA$" macro.
+ *  @ref standardmacrosincentenginemacroavailabilitychartserviceperfdata "$SERVICEPERFDATA$" macro.
  *  The blue portions of the 2nd - 5th lines of output will be
  *  concatenated (with escaped newlines) and stored in
- *  @ref standardmacrosincentschedulermacroavailabilitychartlongserviceoutput "$LONGSERVICEOUTPUT$" the
+ *  @ref standardmacrosincentenginemacroavailabilitychartlongserviceoutput "$LONGSERVICEOUTPUT$" the
  *  macro.
  *
  *  The final contents of each macro are listed below:
@@ -181,28 +181,28 @@
  *  - You can return performance data in both the first line and
  *  subsequent lines (as shown above)
  *
- *  @section centschedulerpluginapipluginoutputlengthrestrictions Plugin Output Length Restrictions
+ *  @section centenginepluginapipluginoutputlengthrestrictions Plugin Output Length Restrictions
  *
- *  Centreon Scheduler will only read the first 4 KB of data that a
+ *  Centreon Engine will only read the first 4 KB of data that a
  *  plugin returns. This is done in order to prevent runaway plugins
- *  from dumping megs or gigs of data back to Centreon Scheduler. This 4
+ *  from dumping megs or gigs of data back to Centreon Engine. This 4
  *  KB output limit is fairly easy to change if you need. Simply edit
  *  the value of the MAX_PLUGIN_OUTPUT_LENGTH definition in the
- *  include/centscheduler.h.in file of the source code distribution and
- *  recompile Centreon Scheduler. There's nothing else you need to
+ *  include/centengine.h.in file of the source code distribution and
+ *  recompile Centreon Engine. There's nothing else you need to
  *  change!
  *
- *  @section centschedulerpluginapiexamples Examples
+ *  @section centenginepluginapiexamples Examples
  *
  *  If you're looking for some example plugins to study, I would
- *  recommend that you download the official Centreon Scheduler plugins
+ *  recommend that you download the official Centreon Engine plugins
  *  and look through the code for various C, Perl, and shell script
- *  plugins. Information on obtaining the official Centreon Scheduler
+ *  plugins. Information on obtaining the official Centreon Engine
  *  plugins can be found @link plugins.html here @endlink.
  *
- *  @section centschedulerpluginapiperlplugins Perl Plugins
+ *  @section centenginepluginapiperlplugins Perl Plugins
  *
- *  Centreon Scheduler features an optional @link usingtheembeddedperlinterpreter
+ *  Centreon Engine features an optional @link usingtheembeddedperlinterpreter
  *  embedded Perl interpreter @endlink which can speed up the execution
  *  of Perl plugins. More information on developing Perl plugins for
  *  use with the embedded Perl interpreter can be found @link

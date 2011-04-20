@@ -2,7 +2,7 @@
  *  @page distributedmonitoring Distributed Monitoring
  *  @section distributedmonitoringintroduction Introduction
  *
- *  Centreon Scheduler can be configured to support distributed
+ *  Centreon Engine can be configured to support distributed
  *  monitoring of network services and resources. I'll try to briefly
  *  explan how this can be accomplished...
  *
@@ -14,19 +14,19 @@
  *  "distributed" servers. Most small to medium sized shops will not
  *  have a real need for setting up such an environment. However, when
  *  you want to start monitoring hundreds or even thousands of hosts
- *  (and several times that many services) using Centreon Scheduler,
+ *  (and several times that many services) using Centreon Engine,
  *  this becomes quite important.
  *
  *  @section distributedmonitoringreferencediagram Reference Diagram
  *
  *  The diagram below should help give you a general idea of how
- *  distributed monitoring works with Centreon Scheduler. I'll be
+ *  distributed monitoring works with Centreon Engine. I'll be
  *  referring to the items shown in the diagram as I explain things...
  *
  *  @section distributedmonitoringcentralservervsdistributedservers Central Server vs. Distributed Servers
  *
  *  When setting up a distributed monitoring environment with Centreon
- *  Scheduler, there are differences in the way the central and
+ *  Engine, there are differences in the way the central and
  *  distributed servers are configured. I'll show you how to configure
  *  both types of servers and explain what effects the changes being
  *  made have on the overall monitoring. For starters, lets describe
@@ -39,10 +39,10 @@
  *  have several cluters at one physical location, or each cluster may
  *  be separated by a WAN, its own firewall, etc. The important thing
  *  to remember to that for each cluster of hosts (however you define
- *  that), there is one distributed server that runs Centreon Scheduler
+ *  that), there is one distributed server that runs Centreon Engine
  *  and monitors the services on the hosts in the cluster. A
  *  distributed server is usually a bare-bones installation of Centreon
- *  Scheduler. It doesn't have to have the web interface installed,
+ *  Engine. It doesn't have to have the web interface installed,
  *  send out notifications, run event handler scripts, or do anything
  *  other than execute service checks if you don't want it to. More
  *  detailed information on configuring a distributed server comes
@@ -65,31 +65,31 @@
  *  Okay, before we go jumping into configuration detail we need to
  *  know how to send the service check results from the distributed
  *  servers to the central server. I've already discussed how to submit
- *  passive check results to Centreon Scheduler from same host that
- *  Centreon Scheduler is running on (as described in the documentation
+ *  passive check results to Centreon Engine from same host that
+ *  Centreon Engine is running on (as described in the documentation
  *  on @link passivechecks.html passive checks @endlink), but I haven't
  *  given any info on how to submit passive check results from other
  *  hosts.
  *
  *  In order to facilitate the submission of passive check results to a
- *  remote host, I've written the @ref centscheduleraddonsnsca "nsca addon".
+ *  remote host, I've written the @ref centengineaddonsnsca "nsca addon".
  *  The addon consists of two pieces. The first is a client
  *  program (send_nsca) which is run from a remote host and is used to
  *  send the service check results to another server. The second piece
  *  is the nsca daemon (nsca) which either runs as a standalone daemon
  *  or under inetd and listens for connections from client programs.
  *  Upon receiving service check information from a client, the daemon
- *  will sumbit the check information to Centreon Scheduler (on the
+ *  will sumbit the check information to Centreon Engine (on the
  *  central server) by inserting a PROCESS_SVC_CHECK_RESULT command
  *  into the @ref mainconfigurationfileoptionsconfigurationfilevariablesexternalcommandfile
  *  "external command file", along with the check results. The next time Centreon
- *  Scheduler checks for @link externalcommands external commands
+ *  Engine checks for @link externalcommands external commands
  *  @endlink, it will find the passive service check information that
  *  was sent from the distributed server and process it. Easy, huh?
  *
  *  @section distributedmonitoringdistributedserverconfiguration Distributed Server Configuration
  *
- *  So how exactly is Centreon Scheduler configured on a distributed
+ *  So how exactly is Centreon Engine configured on a distributed
  *  server? Basically, its just a bare-bones installation. You don't
  *  need to install the web interface or have notifications sent out
  *  from the server, as this will all be handled by the central server.
@@ -111,7 +111,7 @@
  *
  *  In order to make everything come together and work properly, we
  *  want the distributed server to report the results of all service
- *  checks to Centreon Scheduler. We could use @link eventhandlers.html
+ *  checks to Centreon Engine. We could use @link eventhandlers.html
  *  event handlers @endlink to report changes in the state of a
  *  service, but that just doesn't cut it. In order to force the
  *  distributed server to report all service check results, you must
@@ -136,7 +136,7 @@
  *  @code
  *  define command{
  *    command_name submit_check_result
- *    command_line /usr/local/centscheduler/libexec/eventhandlers/submit_check_result $HOSTNAME$ '$SERVICEDESC$' $SERVICESTATE$ '$SERVICEOUTPUT$'
+ *    command_line /usr/local/centengine/libexec/eventhandlers/submit_check_result $HOSTNAME$ '$SERVICEDESC$' $SERVICESTATE$ '$SERVICEOUTPUT$'
  *  }
  *  @endcode
  *
@@ -176,18 +176,18 @@
  *  # pipe the service check info into the send_nsca program, which
  *  # in turn transmits the data to the nsca daemon on the central
  *  # monitoring server
- *  /bin/printf "%s\t%s\t%s\t%s\n" "$1" "$2" "$return_code" "$4" | /usr/local/centscheduler/bin/send_nsca -H central_server -c /usr/local/centscheduler/etc/send_nsca.cfg
+ *  /bin/printf "%s\t%s\t%s\t%s\n" "$1" "$2" "$return_code" "$4" | /usr/local/centengine/bin/send_nsca -H central_server -c /usr/local/centengine/etc/send_nsca.cfg
  *  @endcode
  *
  *  The script above assumes that you have the send_nsca program and it
  *  configuration file (send_nsca.cfg) located in the
- *  /usr/local/centscheduler/bin/ and /usr/local/centscheduler/etc/
+ *  /usr/local/centengine/bin/ and /usr/local/centengine/etc/
  *  directories, respectively.
  *
  *  That's it! We've sucessfully configured a remote host running
- *  Centreon Scheduler to act as a distributed monitoring server. Let's
+ *  Centreon Engine to act as a distributed monitoring server. Let's
  *  go over exactly what happens with the distributed server and how it
- *  sends service check results to Centreon Scheduler (the steps
+ *  sends service check results to Centreon Engine (the steps
  *  outlined below correspond to the numbers in the reference diagram
  *  above):
  *  - After the distributed server finishes executing a service check,
@@ -195,7 +195,7 @@
  *  @ref mainconfigurationfileoptionsconfigurationfilevariablesobsessivecompulsiveserviceprocessorcommand
  *  "ocsp_command" variable. In our
  *  example, this is the
- *  /usr/local/centscheduler/libexec/eventhandlers/submit_check_result
+ *  /usr/local/centengine/libexec/eventhandlers/submit_check_result
  *  script. Note that the definition for the submit_check_result
  *  command passed four pieces of information to the script: the name
  *  of the host the service is associated with, the service
@@ -208,8 +208,8 @@
  *  the nsca daemon on the central monitoring server.
  *  - The nsca daemon on the central server takes the service check
  *  information and writes it to the external command file for later
- *  pickup by Centreon Scheduler.
- *  - The Centreon Scheduler process on the central server reads the
+ *  pickup by Centreon Engine.
+ *  - The Centreon Engine process on the central server reads the
  *  external command file and processes the passive service check
  *  information that originated from the distributed monitoring server.
  *
@@ -239,7 +239,7 @@
  *  in mind when configuring the central server:
  *  - The central server must have service definitions for all services
  *  that are being monitored by all the distributed servers. Centreon
- *  Scheduler will ignore passive check results if they do not
+ *  Engine will ignore passive check results if they do not
  *  correspond to a service that has been defined.
  *  - If you're only using the central server to process services whose
  *  results are going to be provided by distributed hosts, you can
@@ -249,7 +249,7 @@
  *  central server to actively monitor a few services on its own
  *  (without the aid of distributed servers), the enable_active_checks
  *  option of the defintions for service being monitored by distributed
- *  servers should be set to 0. This will prevent Centreon Scheduler
+ *  servers should be set to 0. This will prevent Centreon Engine
  *  from actively checking those services.
  *
  *  It is important that you either disable all service checks on a
@@ -259,7 +259,7 @@
  *  executed under normal circumstances. The services will keep getting
  *  rescheduled at their normal check intervals (3 minutes, 5 minutes,
  *  etc...), but the won't actually be executed. This rescheduling loop
- *  will just continue all the while Centreon Scheduler is running. I'll
+ *  will just continue all the while Centreon Engine is running. I'll
  *  explain why this is done in a bit...
  *
  *  That's it! Easy, huh?
@@ -269,10 +269,10 @@
  *  For all intensive purposes we can say that the central server is
  *  relying solely on passive checks for monitoring. The main problem
  *  with relying completely on passive checks for monitoring is the
- *  fact that Centreon Scheduler must rely on something else to provide
+ *  fact that Centreon Engine must rely on something else to provide
  *  the monitoring data. What if the remote host that is sending in
  *  passive check results goes down or becomes unreachable? If Centreon
- *  Scheduler isn't actively checking the services on the host, how
+ *  Engine isn't actively checking the services on the host, how
  *  will it know that there is a problem?
  *
  *  Fortunately, there is a way we can handle these types of
@@ -280,7 +280,7 @@
  *
  *  @section distributedmonitoringfreshnesschecking Freshness Checking
  *
- *  Centreon Scheduler supports a feature that does "freshness" checking
+ *  Centreon Engine supports a feature that does "freshness" checking
  *  on the results of service checks. More information freshness
  *  checking can be found @link serviceandhostfreshnesschecks here @endlink. This
  *  features gives some protection against situations where remote
@@ -289,7 +289,7 @@
  *  that service checks are either being provided passively by
  *  distributed servers on a regular basis or performed actively by the
  *  central server if the need arises. If the service check results
- *  provided by the distributed servers get "stale", Centreon Scheduler
+ *  provided by the distributed servers get "stale", Centreon Engine
  *  can be configured to force active checks of the service from the
  *  central monitoring host.
  *
@@ -306,19 +306,19 @@
  *  reflect valid commands that can be used to actively check the
  *  service from the central monitoring server.
  *
- *  Centreon Scheduler periodically checks the "freshness" of the
+ *  Centreon Engine periodically checks the "freshness" of the
  *  results for all services that have freshness checking enabled. The
  *  freshness_threshold option in each service definition is used to
  *  determine how "fresh" the results for each service should be. For
  *  example, if you set this value to 300 for one of your services,
- *  Centreon Scheduler will consider the service results to be "stale"
+ *  Centreon Engine will consider the service results to be "stale"
  *  if they're older than 5 minutes (300 seconds). If you do not
  *  specify a value for the freshness_threshold option, Centreon
- *  Scheduler will automatically calculate a "freshness" threshold by
+ *  Engine will automatically calculate a "freshness" threshold by
  *  looking at either the normal_check_interval or retry_check_interval
  *  options (depending on what @link statetypes.html type of state
  *  @endlink the service is in). If the service results are found to be
- *  "stale", Centreon Scheduler will run the service check command
+ *  "stale", Centreon Engine will run the service check command
  *  specified by the check_command option in the service definition,
  *  thereby actively checking the service.
  *
@@ -327,7 +327,7 @@
  *  of the service from the central monitoring server. Under normal
  *  circumstances, this check command is never executed (because active
  *  checks were disabled on a program-wide basis or for the specific
- *  services). When freshness checking is enabled, Centreon Scheduler
+ *  services). When freshness checking is enabled, Centreon Engine
  *  will run this command to actively check the status of the service
  *  even if active checks are disabled on a program-wide or
  *  service-specific basis.
@@ -344,11 +344,11 @@
  *  @code
  *  define command{
  *    command_name service-is-stale
- *    command_line /usr/local/centscheduler/libexec/check_dummy 2 "CRITICAL: Service results are stale"
+ *    command_line /usr/local/centengine/libexec/check_dummy 2 "CRITICAL: Service results are stale"
  *  }
  *  @endcode
  *
- *  When Centreon Scheduler detects that the service results are stale
+ *  When Centreon Engine detects that the service results are stale
  *  and runs the service-is-stale command, the check_dummy plugin is
  *  executed and the service will go into a critical state. This would
  *  likely cause notifications to be sent out, so you'll know that
@@ -371,7 +371,7 @@
  *  Passive host checks are available (read @link passivechecks.html
  *  here @endlink), so you could use them in your distributed
  *  monitoring setup, but they suffer from a few problems. The biggest
- *  problem is that Centreon Scheduler does not translate passive host
+ *  problem is that Centreon Engine does not translate passive host
  *  check problem states (DOWN and UNREACHABLE) when they are
  *  processed. This means that if your monitoring servers have a
  *  different parent/child host structure (and they will, if you

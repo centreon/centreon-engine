@@ -2,10 +2,10 @@
  *  @page adaptivemonitoring Adaptive Monitoring
  *  @section adaptivemonitoringintroduction Introduction
  *
- *  Centreon Scheduler allows you to change certain commands and host
+ *  Centreon Engine allows you to change certain commands and host
  *  and service check attributes during runtime. I'll refer to this
  *  feature as "adaptive monitoring". Please note that the adaptive
- *  monitoring features found in Centreon Scheduler will probably not be
+ *  monitoring features found in Centreon Engine will probably not be
  *  of much use to 99% of users, but they do allow you to do some neat
  *  things.
  *
@@ -37,7 +37,7 @@
  *
  *  In order to change global or host- or service-specific attributes
  *  during runtime, you must submit the appropriate @link
- *  externalcommands external command @endlink to Centreon Scheduler via
+ *  externalcommands external command @endlink to Centreon Engine via
  *  the @ref mainconfigurationfileoptionsconfigurationfilevariablesexternalcommandfile
  *  "external command file". The table below lists the different
  *  attributes that may be changed during runtime, along with the
@@ -50,9 +50,9 @@
  *
  *  @note When changing check commands, check timeperiods, or event
  *  handler commands, it is important to note that the new values for
- *  these options must have been defined before Centreon Scheduler was
+ *  these options must have been defined before Centreon Engine was
  *  started. Any request to change a command or timeperiod to one which
- *  had not been defined when Centreon Scheduler was started is ignored.
+ *  had not been defined when Centreon Engine was started is ignored.
  *
  *  @note You can specify command arguments along with the actual
  *  command name - just seperate individual arguments from the command

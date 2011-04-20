@@ -6,7 +6,7 @@
  *  by most users. When enabled, it allows you to log changes in the
  *  output service and host checks even if the state of the host or
  *  service does not change. When stalking is enabled for a particular
- *  host or service, Centreon Scheduler will watch that host or service
+ *  host or service, Centreon Engine will watch that host or service
  *  very carefully and log any changes it sees in the output of check
  *  results. As you'll see, it can be very helpful to you in later
  *  analysis of the log files.
@@ -19,7 +19,7 @@
  *  most part, that's the rule.
  *
  *  If you enable stalking for one or more states of a particular host
- *  or service, Centreon Scheduler will log the results of the host or
+ *  or service, Centreon Engine will log the results of the host or
  *  service check if the output from the check differs from the output
  *  from the previous check. Take the following example of eight
  *  consecutive checks of a service:
@@ -104,7 +104,7 @@
  *  Well, if you had enabled stalking of this service for CRITICAL
  *  states, you would have events at x+4 and x+5 logged in addition to
  *  the events at x+2 and x+3. Why is this? With state stalking
- *  enabled, Centreon Scheduler would have examined the output from each
+ *  enabled, Centreon Engine would have examined the output from each
  *  service check to see if it differed from the output of the previous
  *  check. If the output differed and the state of the service didn't
  *  change between the two checks, the result of the newer service

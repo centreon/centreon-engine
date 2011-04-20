@@ -1,10 +1,10 @@
 /**
- *  @page centscheduleraddons Centreon Scheduler Addons
- *  @section centscheduleraddonsintroduction Introduction
+ *  @page centengineaddons Centreon Engine Addons
+ *  @section centengineaddonsintroduction Introduction
  *
  *  There are a lot of "addon" software packages that are available for
- *  Centreon Scheduler. Addons can be used to extend Centreon Scheduler'
- *  functionality or integrate Centreon Scheduler with other
+ *  Centreon Engine. Addons can be used to extend Centreon Engine'
+ *  functionality or integrate Centreon Engine with other
  *  applications.
  *
  *  Addons are available for:
@@ -14,15 +14,15 @@
  *  - Simplifying/extending the notification logic
  *  - ...and much more
  *
- *  You can find many addons for Centreon Scheduler by visiting:
- *  - <a href="http://XXX">Centreon Scheduler.org</a>
+ *  You can find many addons for Centreon Engine by visiting:
+ *  - <a href="http://XXX">Centreon Engine.org</a>
  *  - <a href="http://XXX">SourceForge.net</a>
- *  - <a href="http://XXX">Centreon SchedulerExchange.org</a>
+ *  - <a href="http://XXX">Centreon EngineExchange.org</a>
  *
  *  I'll give a brief introduction to a few of the addons that I've
- *  developed for Centreon Scheduler...
+ *  developed for Centreon Engine...
  *
- *  @section centscheduleraddonsnrpe NRPE
+ *  @section centengineaddonsnrpe NRPE
  *
  *  @image html nrpe.png
  *  @image latex nrpe.eps
@@ -38,39 +38,39 @@
  *  The NRPE addon and documentation can be found at
  *  http://XXX/.
  *
- *  @section centscheduleraddonsnsca NSCA
+ *  @section centengineaddonsnsca NSCA
  *
  *  @image html nsca.png
  *  @image latex nsca.eps
  *
  *  NSCA is an addon that allows you to send @link passivechecks.html
  *  passive check @endlink results from remote Linux/Unix hosts to the
- *  Centreon Scheduler daemon running on the monitoring server. This is
+ *  Centreon Engine daemon running on the monitoring server. This is
  *  very useful in @link distributedmonitoring distributed @endlink and
  *  @link redundantandfailovernetworkmonitoring redundant/failover
  *  @endlink monitoring setups.
  *
  *  The NSCA addon can be found at http://XXX/.
  *
- *  @section centscheduleraddonsndoutils NDOUtils
+ *  @section centengineaddonsndoutils NDOUtils
  *
  *  @image html ndoutils.png
  *  @image latex ndoutils.eps
  *
  *  NDOUtils is an addon that allows you to store all status
- *  information from Centreon Scheduler in a MySQL database. Multiple
- *  instances of Centreon Scheduler can all store their information in a
+ *  information from Centreon Engine in a MySQL database. Multiple
+ *  instances of Centreon Engine can all store their information in a
  *  central database for centralized reporting. This will likely serve
  *  as the basis for a new PHP-based web interface for Centreon
- *  Scheduler in the future.
+ *  Engine in the future.
  *
  *  The NDOUtils addon and documentation can be found at
  *  http://XXX/.
  *
- *  @section centscheduleraddonscentschedulerexchangehundredsofotheraddons Centreon Scheduler Exchange - Hundreds of Other Addons
+ *  @section centengineaddonscentengineexchangehundredsofotheraddons Centreon Engine Exchange - Hundreds of Other Addons
  *
- *  Hundreds of community-developed Centreon Scheduler addons can be
- *  found on the Centreon Scheduler Exchange website at
- *  <a hre="http://XXX">exchange.centscheduler.org</a>
+ *  Hundreds of community-developed Centreon Engine addons can be
+ *  found on the Centreon Engine Exchange website at
+ *  <a hre="http://XXX">exchange.centengine.org</a>
  */
 
