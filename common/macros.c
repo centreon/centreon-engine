@@ -1154,22 +1154,22 @@ int grab_macrox_value(nagios_macros *mac, int macro_type, char *arg1, char *arg2
 			/* these macros are time-intensive to compute, and will likely be used together, so save them all for future use */
 			for(x=MACRO_TOTALHOSTSUP;x<=MACRO_TOTALSERVICEPROBLEMSUNHANDLED;x++)
 				my_free(mac->x[x]);
-			if(asprintf(&mac->x[MACRO_TOTALHOSTSUP],"%d",hosts_up)==-1 ||
-			   asprintf(&mac->x[MACRO_TOTALHOSTSDOWN],"%d",hosts_down)==-1 ||
-			   asprintf(&mac->x[MACRO_TOTALHOSTSUNREACHABLE],"%d",hosts_unreachable)==-1 ||
-			   asprintf(&mac->x[MACRO_TOTALHOSTSDOWNUNHANDLED],"%d",hosts_down_unhandled)==-1 ||
-			   asprintf(&mac->x[MACRO_TOTALHOSTSUNREACHABLEUNHANDLED],"%d",hosts_unreachable_unhandled)==-1 ||
-			   asprintf(&mac->x[MACRO_TOTALHOSTPROBLEMS],"%d",host_problems)==-1 ||
-			   asprintf(&mac->x[MACRO_TOTALHOSTPROBLEMSUNHANDLED],"%d",host_problems_unhandled)==-1 ||
-			   asprintf(&mac->x[MACRO_TOTALSERVICESOK],"%d",services_ok)==-1 ||
-			   asprintf(&mac->x[MACRO_TOTALSERVICESWARNING],"%d",services_warning)==-1 ||
-			   asprintf(&mac->x[MACRO_TOTALSERVICESCRITICAL],"%d",services_critical)==-1 ||
-			   asprintf(&mac->x[MACRO_TOTALSERVICESUNKNOWN],"%d",services_unknown)==-1 ||
-			   asprintf(&mac->x[MACRO_TOTALSERVICESWARNINGUNHANDLED],"%d",services_warning_unhandled)==-1 ||
-			   asprintf(&mac->x[MACRO_TOTALSERVICESCRITICALUNHANDLED],"%d",services_critical_unhandled)==-1 ||
-			   asprintf(&mac->x[MACRO_TOTALSERVICESUNKNOWNUNHANDLED],"%d",services_unknown_unhandled)==-1 ||
-			   asprintf(&mac->x[MACRO_TOTALSERVICEPROBLEMS],"%d",service_problems)==-1 ||
-			   asprintf(&mac->x[MACRO_TOTALSERVICEPROBLEMSUNHANDLED],"%d",service_problems_unhandled)==-1){
+			if(my_asprintf(&mac->x[MACRO_TOTALHOSTSUP],"%d",hosts_up)==-1 ||
+			   my_asprintf(&mac->x[MACRO_TOTALHOSTSDOWN],"%d",hosts_down)==-1 ||
+			   my_asprintf(&mac->x[MACRO_TOTALHOSTSUNREACHABLE],"%d",hosts_unreachable)==-1 ||
+			   my_asprintf(&mac->x[MACRO_TOTALHOSTSDOWNUNHANDLED],"%d",hosts_down_unhandled)==-1 ||
+			   my_asprintf(&mac->x[MACRO_TOTALHOSTSUNREACHABLEUNHANDLED],"%d",hosts_unreachable_unhandled)==-1 ||
+			   my_asprintf(&mac->x[MACRO_TOTALHOSTPROBLEMS],"%d",host_problems)==-1 ||
+			   my_asprintf(&mac->x[MACRO_TOTALHOSTPROBLEMSUNHANDLED],"%d",host_problems_unhandled)==-1 ||
+			   my_asprintf(&mac->x[MACRO_TOTALSERVICESOK],"%d",services_ok)==-1 ||
+			   my_asprintf(&mac->x[MACRO_TOTALSERVICESWARNING],"%d",services_warning)==-1 ||
+			   my_asprintf(&mac->x[MACRO_TOTALSERVICESCRITICAL],"%d",services_critical)==-1 ||
+			   my_asprintf(&mac->x[MACRO_TOTALSERVICESUNKNOWN],"%d",services_unknown)==-1 ||
+			   my_asprintf(&mac->x[MACRO_TOTALSERVICESWARNINGUNHANDLED],"%d",services_warning_unhandled)==-1 ||
+			   my_asprintf(&mac->x[MACRO_TOTALSERVICESCRITICALUNHANDLED],"%d",services_critical_unhandled)==-1 ||
+			   my_asprintf(&mac->x[MACRO_TOTALSERVICESUNKNOWNUNHANDLED],"%d",services_unknown_unhandled)==-1 ||
+			   my_asprintf(&mac->x[MACRO_TOTALSERVICEPROBLEMS],"%d",service_problems)==-1 ||
+			   my_asprintf(&mac->x[MACRO_TOTALSERVICEPROBLEMSUNHANDLED],"%d",service_problems_unhandled)==-1){
 				logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
 				for(x=MACRO_TOTALHOSTSUP;x<=MACRO_TOTALSERVICEPROBLEMSUNHANDLED;x++)
 					my_free(mac->x[x]);
@@ -1710,16 +1710,15 @@ int grab_standard_host_macro(nagios_macros *mac, int macro_type, host *temp_host
 
 			/* these macros are time-intensive to compute, and will likely be used together, so save them all for future use */
 			my_free(mac->x[MACRO_TOTALHOSTSERVICES]);
-			ret=asprintf(&mac->x[MACRO_TOTALHOSTSERVICES],"%d",total_host_services);
 			my_free(mac->x[MACRO_TOTALHOSTSERVICESOK]);
-			ret=asprintf(&mac->x[MACRO_TOTALHOSTSERVICESOK],"%d",total_host_services_ok);
 			my_free(mac->x[MACRO_TOTALHOSTSERVICESWARNING]);
-			ret=asprintf(&mac->x[MACRO_TOTALHOSTSERVICESWARNING],"%d",total_host_services_warning);
 			my_free(mac->x[MACRO_TOTALHOSTSERVICESUNKNOWN]);
-			ret=asprintf(&mac->x[MACRO_TOTALHOSTSERVICESUNKNOWN],"%d",total_host_services_unknown);
 			my_free(mac->x[MACRO_TOTALHOSTSERVICESCRITICAL]);
-			ret=asprintf(&mac->x[MACRO_TOTALHOSTSERVICESCRITICAL],"%d",total_host_services_critical);
-			if(ret==-1){
+			if(my_asprintf(&mac->x[MACRO_TOTALHOSTSERVICES],"%d",total_host_services)==-1 ||
+			   my_asprintf(&mac->x[MACRO_TOTALHOSTSERVICESOK],"%d",total_host_services_ok)==-1 ||
+			   my_asprintf(&mac->x[MACRO_TOTALHOSTSERVICESWARNING],"%d",total_host_services_warning)==-1 ||
+			   my_asprintf(&mac->x[MACRO_TOTALHOSTSERVICESUNKNOWN],"%d",total_host_services_unknown)==-1 ||
+			   my_asprintf(&mac->x[MACRO_TOTALHOSTSERVICESCRITICAL],"%d",total_host_services_critical)==-1){
 				logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
 				my_free(mac->x[MACRO_TOTALHOSTSERVICES]);
 				my_free(mac->x[MACRO_TOTALHOSTSERVICESOK]);
@@ -2055,6 +2054,8 @@ int grab_standard_service_macro(nagios_macros *mac, int macro_type, service *tem
 
 			ret=asprintf(&buf1,"%s%s%s",(buf2)?buf2:"",(buf2)?",":"",temp_servicegroup->group_name);
 			my_free(buf2);
+			if (ret==-1)
+			  break;
 			buf2=buf1;
 			}
 		if(buf2){

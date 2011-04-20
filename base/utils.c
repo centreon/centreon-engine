@@ -670,6 +670,21 @@ int my_system(char *cmd,int timeout,int *early_timeout,double *exectime,char **o
 	return my_system_r(get_global_macros(), cmd, timeout, early_timeout, exectime, output, max_output_length);
 }
 
+int my_asprintf(char** ptr, const char* format, ...)
+{
+	va_list ap;
+	int ret;
+
+	*ptr = NULL;
+	va_start(ap, format);
+	ret = vasprintf(ptr, format, ap);
+	va_end(ap);
+
+	if(ret==-1)
+	  *ptr = NULL;
+
+	return ret;
+}
 
 /* given a "raw" command, return the "expanded" or "whole" command line */
 int get_raw_command_line_r(nagios_macros *mac, command *cmd_ptr, char *cmd, char **full_command, int macro_options)

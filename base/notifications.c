@@ -201,19 +201,8 @@ int service_notification(service *svc, int type, char *not_author, char *not_dat
 
 		/* set the notification number macro */
 		my_free(mac->x[MACRO_SERVICENOTIFICATIONNUMBER]);
-		if(asprintf(&mac->x[MACRO_SERVICENOTIFICATIONNUMBER],"%d",svc->current_notification_number)==-1){
-			logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
-			my_free(mac->x[MACRO_NOTIFICATIONAUTHOR]);
-			my_free(mac->x[MACRO_NOTIFICATIONAUTHORNAME]);
-			my_free(mac->x[MACRO_NOTIFICATIONAUTHORALIAS]);
-			my_free(mac->x[MACRO_NOTIFICATIONCOMMENT]);
-			my_free(mac->x[MACRO_SERVICEACKAUTHOR]);
-			my_free(mac->x[MACRO_SERVICEACKCOMMENT]);
-			my_free(mac->x[MACRO_SERVICEACKAUTHORNAME]);
-			my_free(mac->x[MACRO_SERVICEACKAUTHORALIAS]);
-			my_free(mac->x[MACRO_NOTIFICATIONTYPE]);
-			return ERROR;
-			}
+		if(asprintf(&mac->x[MACRO_SERVICENOTIFICATIONNUMBER],"%d",svc->current_notification_number)==-1)
+			goto error_handler_1;
 
 		/* the $NOTIFICATIONNUMBER$ macro is maintained for backward compatability */
 		my_free(mac->x[MACRO_NOTIFICATIONNUMBER]);
@@ -221,20 +210,8 @@ int service_notification(service *svc, int type, char *not_author, char *not_dat
 
 		/* set the notification id macro */
 		my_free(mac->x[MACRO_SERVICENOTIFICATIONID]);
-		if(asprintf(&mac->x[MACRO_SERVICENOTIFICATIONID],"%lu",svc->current_notification_id)==-1){
-			logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
-			my_free(mac->x[MACRO_NOTIFICATIONAUTHOR]);
-			my_free(mac->x[MACRO_NOTIFICATIONAUTHORNAME]);
-			my_free(mac->x[MACRO_NOTIFICATIONAUTHORALIAS]);
-			my_free(mac->x[MACRO_NOTIFICATIONCOMMENT]);
-			my_free(mac->x[MACRO_SERVICEACKAUTHOR]);
-			my_free(mac->x[MACRO_SERVICEACKCOMMENT]);
-			my_free(mac->x[MACRO_SERVICEACKAUTHORNAME]);
-			my_free(mac->x[MACRO_SERVICEACKAUTHORALIAS]);
-			my_free(mac->x[MACRO_NOTIFICATIONTYPE]);
-			my_free(mac->x[MACRO_NOTIFICATIONNUMBER]);
-			return ERROR;
-			}
+		if(asprintf(&mac->x[MACRO_SERVICENOTIFICATIONID],"%lu",svc->current_notification_id)==-1)
+			goto error_handler_2;
 
 		/* notify each contact (duplicates have been removed) */
 		for(temp_notification=notification_list;temp_notification!=NULL;temp_notification=temp_notification->next){
@@ -317,7 +294,24 @@ int service_notification(service *svc, int type, char *not_author, char *not_dat
 	update_service_status(svc,FALSE);
 
 	return OK;
-}
+
+ error_handler_2:
+	my_free(mac->x[MACRO_SERVICENOTIFICATIONNUMBER]);
+ error_handler_1:
+	my_free(mac->x[MACRO_NOTIFICATIONAUTHOR]);
+	my_free(mac->x[MACRO_NOTIFICATIONAUTHORNAME]);
+	my_free(mac->x[MACRO_NOTIFICATIONAUTHORALIAS]);
+	my_free(mac->x[MACRO_NOTIFICATIONCOMMENT]);
+	my_free(mac->x[MACRO_SERVICEACKAUTHOR]);
+	my_free(mac->x[MACRO_SERVICEACKCOMMENT]);
+	my_free(mac->x[MACRO_SERVICEACKAUTHORNAME]);
+	my_free(mac->x[MACRO_SERVICEACKAUTHORALIAS]);
+	my_free(mac->x[MACRO_NOTIFICATIONTYPE]);
+	my_free(mac->x[MACRO_NOTIFICATIONNUMBER]);
+
+	logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
+	return ERROR;
+	}
 
 
 
@@ -1182,19 +1176,8 @@ int host_notification(host *hst, int type, char *not_author, char *not_data, int
 
 		/* set the notification number macro */
 		my_free(mac->x[MACRO_HOSTNOTIFICATIONNUMBER]);
-		if(asprintf(&mac->x[MACRO_HOSTNOTIFICATIONNUMBER],"%d",hst->current_notification_number)==-1){
-			logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
-			my_free(mac->x[MACRO_NOTIFICATIONAUTHOR]);
-			my_free(mac->x[MACRO_NOTIFICATIONAUTHORNAME]);
-			my_free(mac->x[MACRO_NOTIFICATIONAUTHORALIAS]);
-			my_free(mac->x[MACRO_NOTIFICATIONCOMMENT]);
-			my_free(mac->x[MACRO_HOSTACKAUTHOR]);
-			my_free(mac->x[MACRO_HOSTACKCOMMENT]);
-			my_free(mac->x[MACRO_SERVICEACKAUTHORNAME]);
-			my_free(mac->x[MACRO_SERVICEACKAUTHORALIAS]);
-			my_free(mac->x[MACRO_NOTIFICATIONTYPE]);
-			return ERROR;
-			}
+		if(asprintf(&mac->x[MACRO_HOSTNOTIFICATIONNUMBER],"%d",hst->current_notification_number)==-1)
+			goto error_handler_1;
 
 		/* the $NOTIFICATIONNUMBER$ macro is maintained for backward compatability */
 		my_free(mac->x[MACRO_NOTIFICATIONNUMBER]);
@@ -1202,20 +1185,8 @@ int host_notification(host *hst, int type, char *not_author, char *not_data, int
 
 		/* set the notification id macro */
 		my_free(mac->x[MACRO_HOSTNOTIFICATIONID]);
-		if(asprintf(&mac->x[MACRO_HOSTNOTIFICATIONID],"%lu",hst->current_notification_id)==-1){
-			logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
-			my_free(mac->x[MACRO_NOTIFICATIONAUTHOR]);
-			my_free(mac->x[MACRO_NOTIFICATIONAUTHORNAME]);
-			my_free(mac->x[MACRO_NOTIFICATIONAUTHORALIAS]);
-			my_free(mac->x[MACRO_NOTIFICATIONCOMMENT]);
-			my_free(mac->x[MACRO_HOSTACKAUTHOR]);
-			my_free(mac->x[MACRO_HOSTACKCOMMENT]);
-			my_free(mac->x[MACRO_SERVICEACKAUTHORNAME]);
-			my_free(mac->x[MACRO_SERVICEACKAUTHORALIAS]);
-			my_free(mac->x[MACRO_NOTIFICATIONTYPE]);
-			my_free(mac->x[MACRO_NOTIFICATIONNUMBER]);
-			return ERROR;
-			}
+		if(asprintf(&mac->x[MACRO_HOSTNOTIFICATIONID],"%lu",hst->current_notification_id)==-1)
+			goto error_handler_2;
 
 		/* notify each contact (duplicates have been removed) */
 		for(temp_notification=notification_list;temp_notification!=NULL;temp_notification=temp_notification->next){
@@ -1295,6 +1266,23 @@ int host_notification(host *hst, int type, char *not_author, char *not_data, int
 	update_host_status(hst,FALSE);
 
 	return OK;
+
+ error_handler_2:
+	my_free(mac->x[MACRO_HOSTNOTIFICATIONNUMBER]);
+ error_handler_1:
+	my_free(mac->x[MACRO_NOTIFICATIONAUTHOR]);
+	my_free(mac->x[MACRO_NOTIFICATIONAUTHORNAME]);
+	my_free(mac->x[MACRO_NOTIFICATIONAUTHORALIAS]);
+	my_free(mac->x[MACRO_NOTIFICATIONCOMMENT]);
+	my_free(mac->x[MACRO_HOSTACKAUTHOR]);
+	my_free(mac->x[MACRO_HOSTACKCOMMENT]);
+	my_free(mac->x[MACRO_SERVICEACKAUTHORNAME]);
+	my_free(mac->x[MACRO_SERVICEACKAUTHORALIAS]);
+	my_free(mac->x[MACRO_NOTIFICATIONTYPE]);
+	my_free(mac->x[MACRO_NOTIFICATIONNUMBER]);
+
+	logit(NSLOG_RUNTIME_ERROR,FALSE,"Error: due to asprintf.\n");
+	return ERROR;
         }
 
 
