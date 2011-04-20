@@ -164,12 +164,14 @@ if (WITH_STARTUP_SCRIPT)
         set(STARTUP_SCRIPT "CentOS init script")
 	install(PROGRAMS "${SCRIPT_DIR}/centengine.sh"
 	  DESTINATION "/etc/init.d"
+	  COMPONENT "runtime"
 	  RENAME "centengine")
       elseif (OS_DISTRIBUTOR STREQUAL "Ubuntu\n")
         message(STATUS "Generating Ubuntu startup script.")
         set(STARTUP_SCRIPT "Ubuntu upstart script")
 	install(FILES "${SCRIPT_DIR}/ubuntu.conf"
 	  DESTINATION "/etc/init"
+	  COMPONENT "runtime"
 	  RENAME "centengine.conf")
       else ()
         message(STATUS "Unsupported distributor: ${OS_DISTRIBUTOR}")
@@ -295,8 +297,7 @@ include_directories("${INCLUDE_DIR}")
 qt4_wrap_cpp(QT_MOC_FILES
   "${INCLUDE_DIR}/modules/loader.hh"
   "${INCLUDE_DIR}/modules/handle.hh"
-  "${INCLUDE_DIR}/modules/compatibility.hh"
-)
+  "${INCLUDE_DIR}/modules/compatibility.hh")
 
 # Library engine target.
 add_library("centenginelib"
@@ -369,14 +370,15 @@ add_library("centenginelib"
   "${INCLUDE_DIR}/xpddefault.hh"
   "${INCLUDE_DIR}/xrddefault.hh"
   "${INCLUDE_DIR}/xsddefault.hh"
+  "${INCLUDE_DIR}/modules/compatibility.hh"
+  "${INCLUDE_DIR}/modules/handle.hh"
+  "${INCLUDE_DIR}/modules/loader.hh"
   "${PERL_SOURCES}"
-  ${QT_MOC_FILES}
-)
+  ${QT_MOC_FILES})
 
 # Centengine target.
 add_executable("centengine"
-  "${SRC_DIR}/main.cc"
-)
+  "${SRC_DIR}/main.cc")
 get_property(ENGINE_COMPILE_FLAGS
   TARGET "centengine"
   PROPERTY COMPILE_FLAGS)
@@ -390,15 +392,13 @@ target_link_libraries("centengine"
   ${THREAD_LIBRARIES}
   ${PERL_LINK_FLAGS}
   ${QT_LIBRARIES}
-  "centenginelib"
-)
-install(TARGETS "centengine" DESTINATION "${bindir}")
+  "centenginelib")
+install(TARGETS "centengine" DESTINATION "${bindir}" COMPONENT "runtime")
 
 # Centenginestats target.
 add_executable("centenginestats"
-  "${SRC_DIR}/centenginestats.cc"
-)
-install(TARGETS "centenginestats" DESTINATION "${bindir}")
+  "${SRC_DIR}/centenginestats.cc")
+install(TARGETS "centenginestats" DESTINATION "${bindir}" COMPONENT "runtime")
 
 # Test configuration target.
 add_executable("test_configuration"
@@ -406,19 +406,29 @@ add_executable("test_configuration"
   "${SRC_DIR}/configuration.cc"
   "${SRC_DIR}/error.cc")
 target_link_libraries("test_configuration"
-  ${QT_LIBRARIES}
-)
-install(TARGETS "centenginestats" DESTINATION "${bindir}")
+  ${QT_LIBRARIES})
 
 add_test("test_configuration_basic"
   "test_configuration"
   "test.cfg")
 
+# Install header files for devel.
+install(DIRECTORY "${INCLUDE_DIR}/"
+  DESTINATION "${localstatedir}/include/centreon-engine/"
+  COMPONENT "development"
+  FILES_MATCHING PATTERN "*.hh"
+  PATTERN "${INCLUDE_DIR}/compatibility/" EXCLUDE)
+
+install(DIRECTORY "${INCLUDE_DIR}/compatibility/"
+  DESTINATION "${localstatedir}/include/centreon-engine/"
+  COMPONENT "development"
+  FILES_MATCHING PATTERN "*.h")
+
 # Package.
 set(CPACK_PACKAGE_NAME "Centreon-Engine")
 set(CPACK_PACKAGE_VENDOR "Merethis")
 set(CPACK_PACKAGE_VERSION_MAJOR 1)
-set(CPACK_PACKAGE_VERSION_MINOR 0)
+set(CPACK_PACKAGE_VERSION_MINOR 1)
 set(CPACK_PACKAGE_VERSION_PATCH "0beta")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY
   "Centreon Engine monitors your IT infrastructure.")
