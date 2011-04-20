@@ -1,12 +1,12 @@
 /**
- *  @page standardmacrosincentscheduler Standard Macros in Centreon Scheduler
- *  @section standardmacrosincentschedulermacrovalidity Macro Validity
+ *  @page standardmacrosincentengine Standard Macros in Centreon Engine
+ *  @section standardmacrosincentenginemacrovalidity Macro Validity
  *
  *  Although macros can be used in all commands you define, not all
  *  macros may be "valid" in a particular type of command. For example,
  *  some macros may only be valid during service notification commands,
  *  whereas other may only be valid during host check commands. There
- *  are ten types of commands that Centreon Scheduler recognizes and
+ *  are ten types of commands that Centreon Engine recognizes and
  *  treats differently. They are as follows:
  *  - Service checks
  *  - Service notifications
@@ -22,13 +22,13 @@
  *  - Host @link performancedata performance data @endlink commands
  *
  *  The tables below list all macros currently available in Centreon
- *  Scheduler, along with a brief description of each and the types of
+ *  Engine, along with a brief description of each and the types of
  *  commands in which they are valid. If a macro is used in a command
  *  in which it is invalid, it is replaced with an empty string. It
  *  should be noted that macros consist of all uppercase characters and
  *  are enclosed in $ characters.
  *
- *  @section standardmacrosincentschedulermacroavailabilitychart Macro Availability Chart
+ *  @section standardmacrosincentenginemacroavailabilitychart Macro Availability Chart
  *
  *  <table>
  *    <caption>Legend</caption>
@@ -56,7 +56,7 @@
  *      <th>Host Perf Data</th>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitycharthostname @ref standardmacrosincentschedulermacroavailabilitychartdefhostname "$HOSTNAME$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitycharthostname @ref standardmacrosincentenginemacroavailabilitychartdefhostname "$HOSTNAME$"</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
@@ -67,7 +67,7 @@
  *      <td>@b Yes</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitycharthostdisplayname @ref standardmacrosincentschedulermacroavailabilitychartdefhostdisplayname "$HOSTDISPLAYNAME$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitycharthostdisplayname @ref standardmacrosincentenginemacroavailabilitychartdefhostdisplayname "$HOSTDISPLAYNAME$"</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
@@ -78,7 +78,7 @@
  *      <td>@b Yes</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitycharthostalias @ref standardmacrosincentschedulermacroavailabilitychartdefhostalias "$HOSTALIAS$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitycharthostalias @ref standardmacrosincentenginemacroavailabilitychartdefhostalias "$HOSTALIAS$"</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
@@ -89,7 +89,7 @@
  *      <td>@b Yes</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitycharthostaddress @ref standardmacrosincentschedulermacroavailabilitychartdefhostaddress "$HOSTADDRESS$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitycharthostaddress @ref standardmacrosincentenginemacroavailabilitychartdefhostaddress "$HOSTADDRESS$"</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
@@ -100,7 +100,7 @@
  *      <td>@b Yes</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitycharthoststate @ref standardmacrosincentschedulermacroavailabilitychartdefhoststate "$HOSTSTATE$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitycharthoststate @ref standardmacrosincentenginemacroavailabilitychartdefhoststate "$HOSTSTATE$"</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes <sup>1</sup></td>
@@ -111,7 +111,7 @@
  *      <td>@b Yes</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitycharthoststateid @ref standardmacrosincentschedulermacroavailabilitychartdefhoststateid "$HOSTSTATEID$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitycharthoststateid @ref standardmacrosincentenginemacroavailabilitychartdefhoststateid "$HOSTSTATEID$"</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes <sup>1</sup></td>
@@ -122,7 +122,7 @@
  *      <td>@b Yes</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartlasthoststate @ref standardmacrosincentschedulermacroavailabilitychartdeflasthoststate "$LASTHOSTSTATE$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartlasthoststate @ref standardmacrosincentenginemacroavailabilitychartdeflasthoststate "$LASTHOSTSTATE$"</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
@@ -133,7 +133,7 @@
  *      <td>@b Yes</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartlasthoststateid @ref standardmacrosincentschedulermacroavailabilitychartdeflasthoststateid "$LASTHOSTSTATEID$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartlasthoststateid @ref standardmacrosincentenginemacroavailabilitychartdeflasthoststateid "$LASTHOSTSTATEID$"</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
@@ -144,7 +144,7 @@
  *      <td>@b Yes</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitycharthoststatetype @ref standardmacrosincentschedulermacroavailabilitychartdefhoststatetype "$HOSTSTATETYPE$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitycharthoststatetype @ref standardmacrosincentenginemacroavailabilitychartdefhoststatetype "$HOSTSTATETYPE$"</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes <sup>1</sup></td>
@@ -155,7 +155,7 @@
  *      <td>@b Yes</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitycharthostattempt @ref standardmacrosincentschedulermacroavailabilitychartdefhostattempt "$HOSTATTEMPT$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitycharthostattempt @ref standardmacrosincentenginemacroavailabilitychartdefhostattempt "$HOSTATTEMPT$"</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
@@ -166,7 +166,7 @@
  *      <td>@b Yes</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartmaxhostattempts @ref standardmacrosincentschedulermacroavailabilitychartdefmaxhostattempts "$MAXHOSTATTEMPTS$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartmaxhostattempts @ref standardmacrosincentenginemacroavailabilitychartdefmaxhostattempts "$MAXHOSTATTEMPTS$"</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
@@ -177,7 +177,7 @@
  *      <td>@b Yes</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitycharthosteventid @ref standardmacrosincentschedulermacroavailabilitychartdefhosteventid "$HOSTEVENTID$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitycharthosteventid @ref standardmacrosincentenginemacroavailabilitychartdefhosteventid "$HOSTEVENTID$"</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
@@ -188,7 +188,7 @@
  *      <td>@b Yes</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartlasthosteventid @ref standardmacrosincentschedulermacroavailabilitychartdeflasthosteventid "$LASTHOSTEVENTID$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartlasthosteventid @ref standardmacrosincentenginemacroavailabilitychartdeflasthosteventid "$LASTHOSTEVENTID$"</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
@@ -199,7 +199,7 @@
  *      <td>@b Yes</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitycharthostproblemid @ref standardmacrosincentschedulermacroavailabilitychartdefhostproblemid "$HOSTPROBLEMID$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitycharthostproblemid @ref standardmacrosincentenginemacroavailabilitychartdefhostproblemid "$HOSTPROBLEMID$"</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
@@ -210,7 +210,7 @@
  *      <td>@b Yes</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartlasthostproblemid @ref standardmacrosincentschedulermacroavailabilitychartdeflasthostproblemid "$LASTHOSTPROBLEMID$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartlasthostproblemid @ref standardmacrosincentenginemacroavailabilitychartdeflasthostproblemid "$LASTHOSTPROBLEMID$"</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
@@ -221,7 +221,7 @@
  *      <td>@b Yes</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitycharthostlatency @ref standardmacrosincentschedulermacroavailabilitychartdefhostlatency "$HOSTLATENCY$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitycharthostlatency @ref standardmacrosincentenginemacroavailabilitychartdefhostlatency "$HOSTLATENCY$"</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
@@ -232,7 +232,7 @@
  *      <td>@b Yes</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitycharthostexecutiontime @ref standardmacrosincentschedulermacroavailabilitychartdefhostexecutiontime "$HOSTEXECUTIONTIME$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitycharthostexecutiontime @ref standardmacrosincentenginemacroavailabilitychartdefhostexecutiontime "$HOSTEXECUTIONTIME$"</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes <sup>1</sup></td>
@@ -243,7 +243,7 @@
  *      <td>@b Yes</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitycharthostduration @ref standardmacrosincentschedulermacroavailabilitychartdefhostduration "$HOSTDURATION$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitycharthostduration @ref standardmacrosincentenginemacroavailabilitychartdefhostduration "$HOSTDURATION$"</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
@@ -254,7 +254,7 @@
  *      <td>@b Yes</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitycharthostdurationsec @ref standardmacrosincentschedulermacroavailabilitychartdefhostdurationsec "$HOSTDURATIONSEC$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitycharthostdurationsec @ref standardmacrosincentenginemacroavailabilitychartdefhostdurationsec "$HOSTDURATIONSEC$"</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
@@ -265,7 +265,7 @@
  *      <td>@b Yes</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitycharthostdowntime @ref standardmacrosincentschedulermacroavailabilitychartdefhostdowntime "$HOSTDOWNTIME$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitycharthostdowntime @ref standardmacrosincentenginemacroavailabilitychartdefhostdowntime "$HOSTDOWNTIME$"</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
@@ -276,7 +276,7 @@
  *      <td>@b Yes</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitycharthostpercentchange @ref standardmacrosincentschedulermacroavailabilitychartdefhostpercentchange "$HOSTPERCENTCHANGE$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitycharthostpercentchange @ref standardmacrosincentenginemacroavailabilitychartdefhostpercentchange "$HOSTPERCENTCHANGE$"</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
@@ -287,7 +287,7 @@
  *      <td>@b Yes</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitycharthostgroupname @ref standardmacrosincentschedulermacroavailabilitychartdefhostgroupname "$HOSTGROUPNAME$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitycharthostgroupname @ref standardmacrosincentenginemacroavailabilitychartdefhostgroupname "$HOSTGROUPNAME$"</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
@@ -298,7 +298,7 @@
  *      <td>@b Yes</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitycharthostgroupnames @ref standardmacrosincentschedulermacroavailabilitychartdefhostgroupnames "$HOSTGROUPNAMES$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitycharthostgroupnames @ref standardmacrosincentenginemacroavailabilitychartdefhostgroupnames "$HOSTGROUPNAMES$"</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
@@ -309,7 +309,7 @@
  *      <td>@b Yes</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartlasthostcheck @ref standardmacrosincentschedulermacroavailabilitychartdeflasthostcheck "$LASTHOSTCHECK$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartlasthostcheck @ref standardmacrosincentenginemacroavailabilitychartdeflasthostcheck "$LASTHOSTCHECK$"</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
@@ -320,7 +320,7 @@
  *      <td>@b Yes</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartlasthoststatechange @ref standardmacrosincentschedulermacroavailabilitychartdeflasthoststatechange "$LASTHOSTSTATECHANGE$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartlasthoststatechange @ref standardmacrosincentenginemacroavailabilitychartdeflasthoststatechange "$LASTHOSTSTATECHANGE$"</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
@@ -331,7 +331,7 @@
  *      <td>@b Yes</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartlasthostup @ref standardmacrosincentschedulermacroavailabilitychartdeflasthostup "$LASTHOSTUP$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartlasthostup @ref standardmacrosincentenginemacroavailabilitychartdeflasthostup "$LASTHOSTUP$"</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
@@ -342,7 +342,7 @@
  *      <td>@b Yes</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartlasthostdown @ref standardmacrosincentschedulermacroavailabilitychartdeflasthostdown "$LASTHOSTDOWN$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartlasthostdown @ref standardmacrosincentenginemacroavailabilitychartdeflasthostdown "$LASTHOSTDOWN$"</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
@@ -353,7 +353,7 @@
  *      <td>@b Yes</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartlasthostunreachable @ref standardmacrosincentschedulermacroavailabilitychartdeflasthostunreachable "$LASTHOSTUNREACHABLE$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartlasthostunreachable @ref standardmacrosincentenginemacroavailabilitychartdeflasthostunreachable "$LASTHOSTUNREACHABLE$"</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
@@ -364,7 +364,7 @@
  *      <td>@b Yes</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitycharthostoutput @ref standardmacrosincentschedulermacroavailabilitychartdefhostoutput "$HOSTOUTPUT$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitycharthostoutput @ref standardmacrosincentenginemacroavailabilitychartdefhostoutput "$HOSTOUTPUT$"</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes <sup>1</sup></td>
@@ -375,7 +375,7 @@
  *      <td>@b Yes</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartlonghostoutput @ref standardmacrosincentschedulermacroavailabilitychartdeflonghostoutput "$LONGHOSTOUTPUT$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartlonghostoutput @ref standardmacrosincentenginemacroavailabilitychartdeflonghostoutput "$LONGHOSTOUTPUT$"</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes <sup>1</sup></td>
@@ -386,7 +386,7 @@
  *      <td>@b Yes</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitycharthostperfdata @ref standardmacrosincentschedulermacroavailabilitychartdefhostperfdata "$HOSTPERFDATA$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitycharthostperfdata @ref standardmacrosincentenginemacroavailabilitychartdefhostperfdata "$HOSTPERFDATA$"</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes <sup>1</sup></td>
@@ -397,7 +397,7 @@
  *      <td>@b Yes</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitycharthostcheckcommand @ref standardmacrosincentschedulermacroavailabilitychartdefhostcheckcommand "$HOSTCHECKCOMMAND$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitycharthostcheckcommand @ref standardmacrosincentenginemacroavailabilitychartdefhostcheckcommand "$HOSTCHECKCOMMAND$"</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
@@ -408,7 +408,7 @@
  *      <td>@b Yes</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitycharthostackauthor $HOSTACKAUTHOR <sup>8</sup></td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitycharthostackauthor $HOSTACKAUTHOR <sup>8</sup></td>
  *      <td>No</td>
  *      <td>No</td>
  *      <td>No</td>
@@ -419,7 +419,7 @@
  *      <td>No</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitycharthostackauthorname @ref standardmacrosincentschedulermacroavailabilitychartdefhostackauthorname "$HOSTACKAUTHORNAME$" <sup>8</sup></td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitycharthostackauthorname @ref standardmacrosincentenginemacroavailabilitychartdefhostackauthorname "$HOSTACKAUTHORNAME$" <sup>8</sup></td>
  *      <td>No</td>
  *      <td>No</td>
  *      <td>No</td>
@@ -430,7 +430,7 @@
  *      <td>No</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitycharthostackauthoralias @ref standardmacrosincentschedulermacroavailabilitychartdefhostackauthoralias "$HOSTACKAUTHORALIAS$" <sup>8</sup></td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitycharthostackauthoralias @ref standardmacrosincentenginemacroavailabilitychartdefhostackauthoralias "$HOSTACKAUTHORALIAS$" <sup>8</sup></td>
  *      <td>No</td>
  *      <td>No</td>
  *      <td>No</td>
@@ -441,7 +441,7 @@
  *      <td>No</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitycharthostackcomment @ref standardmacrosincentschedulermacroavailabilitychartdefhostackcomment "$HOSTACKCOMMENT$" <sup>8</sup></td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitycharthostackcomment @ref standardmacrosincentenginemacroavailabilitychartdefhostackcomment "$HOSTACKCOMMENT$" <sup>8</sup></td>
  *      <td>No</td>
  *      <td>No</td>
  *      <td>No</td>
@@ -452,7 +452,7 @@
  *      <td>No</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitycharthostactionurl @ref standardmacrosincentschedulermacroavailabilitychartdefhostactionurl "$HOSTACTIONURL$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitycharthostactionurl @ref standardmacrosincentenginemacroavailabilitychartdefhostactionurl "$HOSTACTIONURL$"</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
@@ -463,7 +463,7 @@
  *      <td>@b Yes</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitycharthostnotesurl @ref standardmacrosincentschedulermacroavailabilitychartdefhostnotesurl "$HOSTNOTESURL$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitycharthostnotesurl @ref standardmacrosincentenginemacroavailabilitychartdefhostnotesurl "$HOSTNOTESURL$"</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
@@ -474,7 +474,7 @@
  *      <td>@b Yes</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitycharthostnotes @ref standardmacrosincentschedulermacroavailabilitychartdefhostnotes "$HOSTNOTES$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitycharthostnotes @ref standardmacrosincentenginemacroavailabilitychartdefhostnotes "$HOSTNOTES$"</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
@@ -485,7 +485,7 @@
  *      <td>@b Yes</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitycharttotalhostservices @ref standardmacrosincentschedulermacroavailabilitychartdeftotalhostservices "$TOTALHOSTSERVICES$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitycharttotalhostservices @ref standardmacrosincentenginemacroavailabilitychartdeftotalhostservices "$TOTALHOSTSERVICES$"</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
@@ -496,7 +496,7 @@
  *      <td>@b Yes</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitycharttotalhostservicesok @ref standardmacrosincentschedulermacroavailabilitychartdeftotalhostservicesok "$TOTALHOSTSERVICESOK$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitycharttotalhostservicesok @ref standardmacrosincentenginemacroavailabilitychartdeftotalhostservicesok "$TOTALHOSTSERVICESOK$"</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
@@ -507,7 +507,7 @@
  *      <td>@b Yes</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitycharttotalhostserviceswarning @ref standardmacrosincentschedulermacroavailabilitychartdeftotalhostserviceswarning "$TOTALHOSTSERVICESWARNING$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitycharttotalhostserviceswarning @ref standardmacrosincentenginemacroavailabilitychartdeftotalhostserviceswarning "$TOTALHOSTSERVICESWARNING$"</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
@@ -518,7 +518,7 @@
  *      <td>@b Yes</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitycharttotalhostservicesunknown @ref standardmacrosincentschedulermacroavailabilitychartdeftotalhostservicesunknown "$TOTALHOSTSERVICESUNKNOWN$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitycharttotalhostservicesunknown @ref standardmacrosincentenginemacroavailabilitychartdeftotalhostservicesunknown "$TOTALHOSTSERVICESUNKNOWN$"</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
@@ -529,7 +529,7 @@
  *      <td>@b Yes</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitycharttotalhostservicescritical @ref standardmacrosincentschedulermacroavailabilitychartdeftotalhostservicescritical "$TOTALHOSTSERVICESCRITICAL$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitycharttotalhostservicescritical @ref standardmacrosincentenginemacroavailabilitychartdeftotalhostservicescritical "$TOTALHOSTSERVICESCRITICAL$"</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
@@ -555,7 +555,7 @@
  *      <th>Host Perf Data</th>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitycharthostgroupalias "$HOSTGROUPALIAS$" <sup>5</sup></td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitycharthostgroupalias "$HOSTGROUPALIAS$" <sup>5</sup></td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
@@ -566,7 +566,7 @@
  *      <td>@b Yes</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitycharthostgroupmembers "$HOSTGROUPMEMBERS$" <sup>5</sup></td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitycharthostgroupmembers "$HOSTGROUPMEMBERS$" <sup>5</sup></td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
@@ -577,7 +577,7 @@
  *      <td>@b Yes</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitycharthostgroupnotes "$HOSTGROUPNOTES$" <sup>5</sup></td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitycharthostgroupnotes "$HOSTGROUPNOTES$" <sup>5</sup></td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
@@ -588,7 +588,7 @@
  *      <td>@b Yes</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitycharthostgroupnotesurl "$HOSTGROUPNOTESURL$" <sup>5</sup></td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitycharthostgroupnotesurl "$HOSTGROUPNOTESURL$" <sup>5</sup></td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
@@ -599,7 +599,7 @@
  *      <td>@b Yes</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitycharthostgroupactionurl "$HOSTGROUPACTIONURL$" <sup>5</sup></td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitycharthostgroupactionurl "$HOSTGROUPACTIONURL$" <sup>5</sup></td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
@@ -625,7 +625,7 @@
  *      <th>Host Perf Data</th>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartservicedesc @ref standardmacrosincentschedulermacroavailabilitychartdefservicedesc "$SERVICEDESC$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartservicedesc @ref standardmacrosincentenginemacroavailabilitychartdefservicedesc "$SERVICEDESC$"</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>No</td>
@@ -636,7 +636,7 @@
  *      <td>No</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartservicedisplayname @ref standardmacrosincentschedulermacroavailabilitychartdefservicedisplayname "$SERVICEDISPLAYNAME$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartservicedisplayname @ref standardmacrosincentenginemacroavailabilitychartdefservicedisplayname "$SERVICEDISPLAYNAME$"</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>No</td>
@@ -647,7 +647,7 @@
  *      <td>No</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartservicestate @ref standardmacrosincentschedulermacroavailabilitychartdefservicestate "$SERVICESTATE$" <sup>2</sup></td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartservicestate @ref standardmacrosincentenginemacroavailabilitychartdefservicestate "$SERVICESTATE$" <sup>2</sup></td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>No</td>
@@ -658,7 +658,7 @@
  *      <td>No</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartservicestateid @ref standardmacrosincentschedulermacroavailabilitychartdefservicestateid "$SERVICESTATEID$" <sup>2</sup></td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartservicestateid @ref standardmacrosincentenginemacroavailabilitychartdefservicestateid "$SERVICESTATEID$" <sup>2</sup></td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>No</td>
@@ -669,7 +669,7 @@
  *      <td>No</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartlastservicestate @ref standardmacrosincentschedulermacroavailabilitychartdeflastservicestate "$LASTSERVICESTATE$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartlastservicestate @ref standardmacrosincentenginemacroavailabilitychartdeflastservicestate "$LASTSERVICESTATE$"</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>No</td>
@@ -680,7 +680,7 @@
  *      <td>No</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartlastservicestateid @ref standardmacrosincentschedulermacroavailabilitychartdeflastservicestateid "$LASTSERVICESTATEID$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartlastservicestateid @ref standardmacrosincentenginemacroavailabilitychartdeflastservicestateid "$LASTSERVICESTATEID$"</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>No</td>
@@ -691,7 +691,7 @@
  *      <td>No</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartservicestatetype @ref standardmacrosincentschedulermacroavailabilitychartdefservicestatetype "$SERVICESTATETYPE$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartservicestatetype @ref standardmacrosincentenginemacroavailabilitychartdefservicestatetype "$SERVICESTATETYPE$"</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>No</td>
@@ -702,7 +702,7 @@
  *      <td>No</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartserviceattempt @ref standardmacrosincentschedulermacroavailabilitychartdefserviceattempt "$SERVICEATTEMPT$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartserviceattempt @ref standardmacrosincentenginemacroavailabilitychartdefserviceattempt "$SERVICEATTEMPT$"</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>No</td>
@@ -713,7 +713,7 @@
  *      <td>No</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartmaxserviceattempts @ref standardmacrosincentschedulermacroavailabilitychartdefmaxserviceattempts "$MAXSERVICEATTEMPTS$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartmaxserviceattempts @ref standardmacrosincentenginemacroavailabilitychartdefmaxserviceattempts "$MAXSERVICEATTEMPTS$"</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>No</td>
@@ -724,7 +724,7 @@
  *      <td>No</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartserviceisvolatile @ref standardmacrosincentschedulermacroavailabilitychartdefserviceisvolatile "$SERVICEISVOLATILE$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartserviceisvolatile @ref standardmacrosincentenginemacroavailabilitychartdefserviceisvolatile "$SERVICEISVOLATILE$"</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>No</td>
@@ -735,7 +735,7 @@
  *      <td>No</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartserviceeventid @ref standardmacrosincentschedulermacroavailabilitychartdefserviceeventid "$SERVICEEVENTID$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartserviceeventid @ref standardmacrosincentenginemacroavailabilitychartdefserviceeventid "$SERVICEEVENTID$"</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>No</td>
@@ -746,7 +746,7 @@
  *      <td>No</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartlastserviceeventid @ref standardmacrosincentschedulermacroavailabilitychartdeflastserviceeventid "$LASTSERVICEEVENTID$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartlastserviceeventid @ref standardmacrosincentenginemacroavailabilitychartdeflastserviceeventid "$LASTSERVICEEVENTID$"</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>No</td>
@@ -757,7 +757,7 @@
  *      <td>No</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartserviceproblemid @ref standardmacrosincentschedulermacroavailabilitychartdefserviceproblemid "$SERVICEPROBLEMID$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartserviceproblemid @ref standardmacrosincentenginemacroavailabilitychartdefserviceproblemid "$SERVICEPROBLEMID$"</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>No</td>
@@ -768,7 +768,7 @@
  *      <td>No</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartlastserviceproblemid @ref standardmacrosincentschedulermacroavailabilitychartdeflastserviceproblemid "$LASTSERVICEPROBLEMID$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartlastserviceproblemid @ref standardmacrosincentenginemacroavailabilitychartdeflastserviceproblemid "$LASTSERVICEPROBLEMID$"</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>No</td>
@@ -779,7 +779,7 @@
  *      <td>No</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartservicelatency @ref standardmacrosincentschedulermacroavailabilitychartdefservicelatency "$SERVICELATENCY$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartservicelatency @ref standardmacrosincentenginemacroavailabilitychartdefservicelatency "$SERVICELATENCY$"</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>No</td>
@@ -790,7 +790,7 @@
  *      <td>No</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartserviceexecutiontime @ref standardmacrosincentschedulermacroavailabilitychartdefserviceexecutiontime "$SERVICEEXECUTIONTIME$" <sup>2</sup></td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartserviceexecutiontime @ref standardmacrosincentenginemacroavailabilitychartdefserviceexecutiontime "$SERVICEEXECUTIONTIME$" <sup>2</sup></td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>No</td>
@@ -801,7 +801,7 @@
  *      <td>No</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartserviceduration @ref standardmacrosincentschedulermacroavailabilitychartdefserviceduration "$SERVICEDURATION$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartserviceduration @ref standardmacrosincentenginemacroavailabilitychartdefserviceduration "$SERVICEDURATION$"</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>No</td>
@@ -812,7 +812,7 @@
  *      <td>No</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartservicedurationsec @ref standardmacrosincentschedulermacroavailabilitychartdefservicedurationsec "$SERVICEDURATIONSEC$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartservicedurationsec @ref standardmacrosincentenginemacroavailabilitychartdefservicedurationsec "$SERVICEDURATIONSEC$"</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>No</td>
@@ -823,7 +823,7 @@
  *      <td>No</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartservicedowntime @ref standardmacrosincentschedulermacroavailabilitychartdefservicedowntime "$SERVICEDOWNTIME$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartservicedowntime @ref standardmacrosincentenginemacroavailabilitychartdefservicedowntime "$SERVICEDOWNTIME$"</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>No</td>
@@ -834,7 +834,7 @@
  *      <td>No</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartservicepercentchange @ref standardmacrosincentschedulermacroavailabilitychartdefservicepercentchange "$SERVICEPERCENTCHANGE$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartservicepercentchange @ref standardmacrosincentenginemacroavailabilitychartdefservicepercentchange "$SERVICEPERCENTCHANGE$"</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>No</td>
@@ -845,7 +845,7 @@
  *      <td>No</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartservicegroupname @ref standardmacrosincentschedulermacroavailabilitychartdefservicegroupname "$SERVICEGROUPNAME$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartservicegroupname @ref standardmacrosincentenginemacroavailabilitychartdefservicegroupname "$SERVICEGROUPNAME$"</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>No</td>
@@ -856,7 +856,7 @@
  *      <td>No</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartservicegroupnames @ref standardmacrosincentschedulermacroavailabilitychartdefservicegroupnames "$SERVICEGROUPNAMES$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartservicegroupnames @ref standardmacrosincentenginemacroavailabilitychartdefservicegroupnames "$SERVICEGROUPNAMES$"</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>No</td>
@@ -867,7 +867,7 @@
  *      <td>No</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartlastservicecheck @ref standardmacrosincentschedulermacroavailabilitychartdeflastservicecheck "$LASTSERVICECHECK$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartlastservicecheck @ref standardmacrosincentenginemacroavailabilitychartdeflastservicecheck "$LASTSERVICECHECK$"</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>No</td>
@@ -878,7 +878,7 @@
  *      <td>No</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartlastservicestatechange @ref standardmacrosincentschedulermacroavailabilitychartdeflastservicestatechange "$LASTSERVICESTATECHANGE$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartlastservicestatechange @ref standardmacrosincentenginemacroavailabilitychartdeflastservicestatechange "$LASTSERVICESTATECHANGE$"</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>No</td>
@@ -889,7 +889,7 @@
  *      <td>No</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartlastserviceok @ref standardmacrosincentschedulermacroavailabilitychartdeflastserviceok "$LASTSERVICEOK$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartlastserviceok @ref standardmacrosincentenginemacroavailabilitychartdeflastserviceok "$LASTSERVICEOK$"</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>No</td>
@@ -900,7 +900,7 @@
  *      <td>No</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartlastservicewarning @ref standardmacrosincentschedulermacroavailabilitychartdeflastservicewarning "$LASTSERVICEWARNING$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartlastservicewarning @ref standardmacrosincentenginemacroavailabilitychartdeflastservicewarning "$LASTSERVICEWARNING$"</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>No</td>
@@ -911,7 +911,7 @@
  *      <td>No</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartlastserviceunknown @ref standardmacrosincentschedulermacroavailabilitychartdeflastserviceunknown "$LASTSERVICEUNKNOWN$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartlastserviceunknown @ref standardmacrosincentenginemacroavailabilitychartdeflastserviceunknown "$LASTSERVICEUNKNOWN$"</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>No</td>
@@ -922,7 +922,7 @@
  *      <td>No</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartlastservicecritical @ref standardmacrosincentschedulermacroavailabilitychartdeflastservicecritical "$LASTSERVICECRITICAL$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartlastservicecritical @ref standardmacrosincentenginemacroavailabilitychartdeflastservicecritical "$LASTSERVICECRITICAL$"</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>No</td>
@@ -933,7 +933,7 @@
  *      <td>No</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartserviceoutput @ref standardmacrosincentschedulermacroavailabilitychartdefserviceoutput "$SERVICEOUTPUT$" <sup>2</sup></td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartserviceoutput @ref standardmacrosincentenginemacroavailabilitychartdefserviceoutput "$SERVICEOUTPUT$" <sup>2</sup></td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>No</td>
@@ -944,7 +944,7 @@
  *      <td>No</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartlongserviceoutput @ref standardmacrosincentschedulermacroavailabilitychartdeflongserviceoutput "$LONGSERVICEOUTPUT$" <sup>2</sup></td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartlongserviceoutput @ref standardmacrosincentenginemacroavailabilitychartdeflongserviceoutput "$LONGSERVICEOUTPUT$" <sup>2</sup></td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>No</td>
@@ -955,7 +955,7 @@
  *      <td>No</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartserviceperfdata @ref standardmacrosincentschedulermacroavailabilitychartdefserviceperfdata "$SERVICEPERFDATA$" <sup>2</sup></td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartserviceperfdata @ref standardmacrosincentenginemacroavailabilitychartdefserviceperfdata "$SERVICEPERFDATA$" <sup>2</sup></td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>No</td>
@@ -966,7 +966,7 @@
  *      <td>No</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartservicecheckcommand @ref standardmacrosincentschedulermacroavailabilitychartdefservicecheckcommand "$SERVICECHECKCOMMAND$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartservicecheckcommand @ref standardmacrosincentenginemacroavailabilitychartdefservicecheckcommand "$SERVICECHECKCOMMAND$"</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>No</td>
@@ -977,7 +977,7 @@
  *      <td>No</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartserviceackauthor "$SERVICEACKAUTHOR$" <sup>8</sup></td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartserviceackauthor "$SERVICEACKAUTHOR$" <sup>8</sup></td>
  *      <td>No</td>
  *      <td>@b Yes</td>
  *      <td>No</td>
@@ -988,7 +988,7 @@
  *      <td>No</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartserviceackauthorname "$SERVICEACKAUTHORNAME$" <sup>8</sup></td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartserviceackauthorname "$SERVICEACKAUTHORNAME$" <sup>8</sup></td>
  *      <td>No</td>
  *      <td>@b Yes</td>
  *      <td>No</td>
@@ -999,7 +999,7 @@
  *      <td>No</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartserviceackauthoralias "$SERVICEACKAUTHORALIAS$" <sup>8</sup></td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartserviceackauthoralias "$SERVICEACKAUTHORALIAS$" <sup>8</sup></td>
  *      <td>No</td>
  *      <td>@b Yes</td>
  *      <td>No</td>
@@ -1010,7 +1010,7 @@
  *      <td>No</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartserviceackcomment "$SERVICEACKCOMMENT$" <sup>8</sup></td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartserviceackcomment "$SERVICEACKCOMMENT$" <sup>8</sup></td>
  *      <td>No</td>
  *      <td>@b Yes</td>
  *      <td>No</td>
@@ -1021,7 +1021,7 @@
  *      <td>No</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartserviceactionurl @ref standardmacrosincentschedulermacroavailabilitychartdefserviceactionurl "$SERVICEACTIONURL$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartserviceactionurl @ref standardmacrosincentenginemacroavailabilitychartdefserviceactionurl "$SERVICEACTIONURL$"</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>No</td>
@@ -1032,7 +1032,7 @@
  *      <td>No</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartservicenotesurl @ref standardmacrosincentschedulermacroavailabilitychartdefservicenotesurl "$SERVICENOTESURL$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartservicenotesurl @ref standardmacrosincentenginemacroavailabilitychartdefservicenotesurl "$SERVICENOTESURL$"</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>No</td>
@@ -1043,7 +1043,7 @@
  *      <td>No</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartservicenotes @ref standardmacrosincentschedulermacroavailabilitychartdefservicenotes "$SERVICENOTES$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartservicenotes @ref standardmacrosincentenginemacroavailabilitychartdefservicenotes "$SERVICENOTES$"</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>No</td>
@@ -1069,7 +1069,7 @@
  *      <th>Host Perf Data</th>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartservicegroupalias "$SERVICEGROUPALIAS$" <sup>6</sup></td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartservicegroupalias "$SERVICEGROUPALIAS$" <sup>6</sup></td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
@@ -1080,7 +1080,7 @@
  *      <td>@b Yes</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartservicegroupmembers "$SERVICEGROUPMEMBERS$" <sup>6</sup></td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartservicegroupmembers "$SERVICEGROUPMEMBERS$" <sup>6</sup></td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
@@ -1091,7 +1091,7 @@
  *      <td>@b Yes</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartservicegroupnotes "$SERVICEGROUPNOTES$" <sup>6</sup></td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartservicegroupnotes "$SERVICEGROUPNOTES$" <sup>6</sup></td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
@@ -1102,7 +1102,7 @@
  *      <td>@b Yes</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartservicegroupnotesurl "$SERVICEGROUPNOTESURL$" <sup>6</sup></td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartservicegroupnotesurl "$SERVICEGROUPNOTESURL$" <sup>6</sup></td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
@@ -1113,7 +1113,7 @@
  *      <td>@b Yes</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartservicegroupactionurl "$SERVICEGROUPACTIONURL$" <sup>6</sup></td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartservicegroupactionurl "$SERVICEGROUPACTIONURL$" <sup>6</sup></td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
@@ -1139,7 +1139,7 @@
  *      <th>Host Perf Data</th>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartcontactname @ref standardmacrosincentschedulermacroavailabilitychartdefcontactname "$CONTACTNAME$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartcontactname @ref standardmacrosincentenginemacroavailabilitychartdefcontactname "$CONTACTNAME$"</td>
  *      <td>No</td>
  *      <td>@b Yes</td>
  *      <td>No</td>
@@ -1150,7 +1150,7 @@
  *      <td>No</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartcontactalias @ref standardmacrosincentschedulermacroavailabilitychartdefcontactalias "$CONTACTALIAS$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartcontactalias @ref standardmacrosincentenginemacroavailabilitychartdefcontactalias "$CONTACTALIAS$"</td>
  *      <td>No</td>
  *      <td>@b Yes</td>
  *      <td>No</td>
@@ -1161,7 +1161,7 @@
  *      <td>No</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartcontactemail @ref standardmacrosincentschedulermacroavailabilitychartdefcontactemail "$CONTACTEMAIL$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartcontactemail @ref standardmacrosincentenginemacroavailabilitychartdefcontactemail "$CONTACTEMAIL$"</td>
  *      <td>No</td>
  *      <td>@b Yes</td>
  *      <td>No</td>
@@ -1172,7 +1172,7 @@
  *      <td>No</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartcontactpager @ref standardmacrosincentschedulermacroavailabilitychartdefcontactpager "$CONTACTPAGER$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartcontactpager @ref standardmacrosincentenginemacroavailabilitychartdefcontactpager "$CONTACTPAGER$"</td>
  *      <td>No</td>
  *      <td>@b Yes</td>
  *      <td>No</td>
@@ -1183,7 +1183,7 @@
  *      <td>No</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartcontactaddress @ref standardmacrosincentschedulermacroavailabilitychartdefcontactaddressn "$CONTACTADDRESSn$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartcontactaddress @ref standardmacrosincentenginemacroavailabilitychartdefcontactaddressn "$CONTACTADDRESSn$"</td>
  *      <td>No</td>
  *      <td>@b Yes</td>
  *      <td>No</td>
@@ -1209,7 +1209,7 @@
  *      <th>Host Perf Data</th>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartcontactgroupalias "$CONTACTGROUPALIAS$" <sup>7</sup></td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartcontactgroupalias "$CONTACTGROUPALIAS$" <sup>7</sup></td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
@@ -1220,7 +1220,7 @@
  *      <td>@b Yes</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartcontactgroupmembers "$CONTACTGROUPMEMBERS$" <sup>7</sup></td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartcontactgroupmembers "$CONTACTGROUPMEMBERS$" <sup>7</sup></td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
@@ -1246,7 +1246,7 @@
  *      <th>Host Perf Data</th>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitycharttotalhostsup @ref standardmacrosincentschedulermacroavailabilitychartdeftotalhostsup "$TOTALHOSTSUP$" <sup>10</sup></td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitycharttotalhostsup @ref standardmacrosincentenginemacroavailabilitychartdeftotalhostsup "$TOTALHOSTSUP$" <sup>10</sup></td>
  *      <td>@b Yes</td>
  *      <td>@b Yes <sup>4</sup></td>
  *      <td>@b Yes</td>
@@ -1257,7 +1257,7 @@
  *      <td>@b Yes</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitycharttotalhostsdown @ref standardmacrosincentschedulermacroavailabilitychartdeftotalhostsdown "$TOTALHOSTSDOWN$" <sup>10</sup></td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitycharttotalhostsdown @ref standardmacrosincentenginemacroavailabilitychartdeftotalhostsdown "$TOTALHOSTSDOWN$" <sup>10</sup></td>
  *      <td>@b Yes</td>
  *      <td>@b Yes <sup>4</sup></td>
  *      <td>@b Yes</td>
@@ -1268,7 +1268,7 @@
  *      <td>@b Yes</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitycharttotalhostsunreachable @ref standardmacrosincentschedulermacroavailabilitychartdeftotalhostsunreachable "$TOTALHOSTSUNREACHABLE$" <sup>10</sup></td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitycharttotalhostsunreachable @ref standardmacrosincentenginemacroavailabilitychartdeftotalhostsunreachable "$TOTALHOSTSUNREACHABLE$" <sup>10</sup></td>
  *      <td>@b Yes</td>
  *      <td>@b Yes <sup>4</sup></td>
  *      <td>@b Yes</td>
@@ -1279,7 +1279,7 @@
  *      <td>@b Yes</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitycharttotalhostsdownunhandled @ref standardmacrosincentschedulermacroavailabilitychartdeftotalhostsdownunhandled "$TOTALHOSTSDOWNUNHANDLED$" <sup>10</sup></td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitycharttotalhostsdownunhandled @ref standardmacrosincentenginemacroavailabilitychartdeftotalhostsdownunhandled "$TOTALHOSTSDOWNUNHANDLED$" <sup>10</sup></td>
  *      <td>@b Yes</td>
  *      <td>@b Yes <sup>4</sup></td>
  *      <td>@b Yes</td>
@@ -1290,7 +1290,7 @@
  *      <td>@b Yes</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitycharttotalhostsunreachableunhandled @ref standardmacrosincentschedulermacroavailabilitychartdeftotalhostsunreachableunhandled "$TOTALHOSTSUNREACHABLEUNHANDLED$" <sup>10</sup></td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitycharttotalhostsunreachableunhandled @ref standardmacrosincentenginemacroavailabilitychartdeftotalhostsunreachableunhandled "$TOTALHOSTSUNREACHABLEUNHANDLED$" <sup>10</sup></td>
  *      <td>@b Yes</td>
  *      <td>@b Yes <sup>4</sup></td>
  *      <td>@b Yes</td>
@@ -1301,7 +1301,7 @@
  *      <td>@b Yes</td>
  *    </tr>
  *    <tr>
- *      <td class='MacroName'>@anchor standardmacrosincentschedulermacroavailabilitycharttotalhostproblems $TOTALHOSTPROBLEMS$ <sup>10</sup></td>
+ *      <td class='MacroName'>@anchor standardmacrosincentenginemacroavailabilitycharttotalhostproblems $TOTALHOSTPROBLEMS$ <sup>10</sup></td>
  *      <td>@b Yes</td>
  *      <td>@b Yes <sup>4</sup></td>
  *      <td>@b Yes</td>
@@ -1312,7 +1312,7 @@
  *      <td>@b Yes</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitycharttotalhostproblemsunhandled @ref standardmacrosincentschedulermacroavailabilitychartdeftotalhostproblemsunhandled "$TOTALHOSTPROBLEMSUNHANDLED$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitycharttotalhostproblemsunhandled @ref standardmacrosincentenginemacroavailabilitychartdeftotalhostproblemsunhandled "$TOTALHOSTPROBLEMSUNHANDLED$"</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes <sup>4</sup></td>
  *      <td>@b Yes</td>
@@ -1323,7 +1323,7 @@
  *      <td>@b Yes</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitycharttotalservicesok @ref standardmacrosincentschedulermacroavailabilitychartdeftotalservicesok "$TOTALSERVICESOK$" <sup>10</sup></td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitycharttotalservicesok @ref standardmacrosincentenginemacroavailabilitychartdeftotalservicesok "$TOTALSERVICESOK$" <sup>10</sup></td>
  *      <td>@b Yes</td>
  *      <td>@b Yes <sup>4</sup></td>
  *      <td>@b Yes</td>
@@ -1334,7 +1334,7 @@
  *      <td>@b Yes</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitycharttotalserviceswarning @ref standardmacrosincentschedulermacroavailabilitychartdeftotalserviceswarning "$TOTALSERVICESWARNING$" <sup>10</sup></td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitycharttotalserviceswarning @ref standardmacrosincentenginemacroavailabilitychartdeftotalserviceswarning "$TOTALSERVICESWARNING$" <sup>10</sup></td>
  *      <td>@b Yes</td>
  *      <td>@b Yes <sup>4</sup></td>
  *      <td>@b Yes</td>
@@ -1345,7 +1345,7 @@
  *      <td>@b Yes</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitycharttotalservicescritical @ref standardmacrosincentschedulermacroavailabilitychartdeftotalservicescritical "$TOTALSERVICESCRITICAL$" <sup>10</sup></td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitycharttotalservicescritical @ref standardmacrosincentenginemacroavailabilitychartdeftotalservicescritical "$TOTALSERVICESCRITICAL$" <sup>10</sup></td>
  *      <td>@b Yes</td>
  *      <td>@b Yes <sup>4</sup></td>
  *      <td>@b Yes</td>
@@ -1356,7 +1356,7 @@
  *      <td>@b Yes</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitycharttotalservicesunknown @ref standardmacrosincentschedulermacroavailabilitychartdeftotalservicesunknown "$TOTALSERVICESUNKNOWN$" <sup>10</sup></td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitycharttotalservicesunknown @ref standardmacrosincentenginemacroavailabilitychartdeftotalservicesunknown "$TOTALSERVICESUNKNOWN$" <sup>10</sup></td>
  *      <td>@b Yes</td>
  *      <td>@b Yes <sup>4</sup></td>
  *      <td>@b Yes</td>
@@ -1367,7 +1367,7 @@
  *      <td>@b Yes</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitycharttotalserviceswarningunhandled @ref standardmacrosincentschedulermacroavailabilitychartdeftotalserviceswarningunhandled "$TOTALSERVICESWARNINGUNHANDLED$" <sup>10</sup></td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitycharttotalserviceswarningunhandled @ref standardmacrosincentenginemacroavailabilitychartdeftotalserviceswarningunhandled "$TOTALSERVICESWARNINGUNHANDLED$" <sup>10</sup></td>
  *      <td>@b Yes</td>
  *      <td>@b Yes <sup>4</sup></td>
  *      <td>@b Yes</td>
@@ -1378,7 +1378,7 @@
  *      <td>@b Yes</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitycharttotalservicescriticalunhandled @ref standardmacrosincentschedulermacroavailabilitychartdeftotalservicescriticalunhandled "$TOTALSERVICESCRITICALUNHANDLED$" <sup>10</sup></td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitycharttotalservicescriticalunhandled @ref standardmacrosincentenginemacroavailabilitychartdeftotalservicescriticalunhandled "$TOTALSERVICESCRITICALUNHANDLED$" <sup>10</sup></td>
  *      <td>@b Yes</td>
  *      <td>@b Yes <sup>4</sup></td>
  *      <td>@b Yes</td>
@@ -1389,7 +1389,7 @@
  *      <td>@b Yes</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitycharttotalservicesunknownunhandled @ref standardmacrosincentschedulermacroavailabilitychartdeftotalservicesunknownunhandled "$TOTALSERVICESUNKNOWNUNHANDLED$" <sup>10</sup></td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitycharttotalservicesunknownunhandled @ref standardmacrosincentenginemacroavailabilitychartdeftotalservicesunknownunhandled "$TOTALSERVICESUNKNOWNUNHANDLED$" <sup>10</sup></td>
  *      <td>@b Yes</td>
  *      <td>@b Yes <sup>4</sup></td>
  *      <td>@b Yes</td>
@@ -1400,7 +1400,7 @@
  *      <td>@b Yes</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitycharttotalserviceproblems @ref standardmacrosincentschedulermacroavailabilitychartdeftotalserviceproblems "$TOTALSERVICEPROBLEMS$" <sup>10</sup></td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitycharttotalserviceproblems @ref standardmacrosincentenginemacroavailabilitychartdeftotalserviceproblems "$TOTALSERVICEPROBLEMS$" <sup>10</sup></td>
  *      <td>@b Yes</td>
  *      <td>@b Yes <sup>4</sup></td>
  *      <td>@b Yes</td>
@@ -1411,7 +1411,7 @@
  *      <td>@b Yes</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitycharttotalserviceproblemsunhandled @ref standardmacrosincentschedulermacroavailabilitychartdeftotalserviceproblemsunhandled "$TOTALSERVICEPROBLEMSUNHANDLED$" <sup>10</sup></td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitycharttotalserviceproblemsunhandled @ref standardmacrosincentenginemacroavailabilitychartdeftotalserviceproblemsunhandled "$TOTALSERVICEPROBLEMSUNHANDLED$" <sup>10</sup></td>
  *      <td>@b Yes</td>
  *      <td>@b Yes <sup>4</sup></td>
  *      <td>@b Yes</td>
@@ -1437,7 +1437,7 @@
  *  	<th>Host Perf Data</th>
  *    </tr>
  *    <tr>
- *    <td>@anchor standardmacrosincentschedulermacroavailabilitychartnotificationtype @ref standardmacrosincentschedulermacroavailabilitychartdefnotificationtype "$NOTIFICATIONTYPE$"</td>
+ *    <td>@anchor standardmacrosincentenginemacroavailabilitychartnotificationtype @ref standardmacrosincentenginemacroavailabilitychartdefnotificationtype "$NOTIFICATIONTYPE$"</td>
  *      <td>No</td>
  *      <td>@b Yes</td>
  *      <td>No</td>
@@ -1448,7 +1448,7 @@
  *      <td>No</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartnotificationrecipients @ref standardmacrosincentschedulermacroavailabilitychartdefnotificationrecipients "$NOTIFICATIONRECIPIENTS$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartnotificationrecipients @ref standardmacrosincentenginemacroavailabilitychartdefnotificationrecipients "$NOTIFICATIONRECIPIENTS$"</td>
  *      <td>No</td>
  *      <td>@b Yes</td>
  *      <td>No</td>
@@ -1459,7 +1459,7 @@
  *      <td>No</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartnotificationisescalated @ref standardmacrosincentschedulermacroavailabilitychartdefnotificationisescalated "$NOTIFICATIONISESCALATED$" </td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartnotificationisescalated @ref standardmacrosincentenginemacroavailabilitychartdefnotificationisescalated "$NOTIFICATIONISESCALATED$" </td>
  *      <td>No</td>
  *      <td>@b Yes</td>
  *      <td>No</td>
@@ -1470,7 +1470,7 @@
  *      <td>No</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartnotificationauthor @ref standardmacrosincentschedulermacroavailabilitychartdefnotificationauthor "$NOTIFICATIONAUTHOR$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartnotificationauthor @ref standardmacrosincentenginemacroavailabilitychartdefnotificationauthor "$NOTIFICATIONAUTHOR$"</td>
  *      <td>No</td>
  *      <td>@b Yes</td>
  *      <td>No</td>
@@ -1481,7 +1481,7 @@
  *      <td>No</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartnotificationauthorname @ref standardmacrosincentschedulermacroavailabilitychartdefnotificationauthorname "$NOTIFICATIONAUTHORNAME$" </td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartnotificationauthorname @ref standardmacrosincentenginemacroavailabilitychartdefnotificationauthorname "$NOTIFICATIONAUTHORNAME$" </td>
  *      <td>No</td>
  *      <td>@b Yes</td>
  *      <td>No</td>
@@ -1492,7 +1492,7 @@
  *      <td>No</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartnotificationauthoralias @ref standardmacrosincentschedulermacroavailabilitychartdefnotificationauthoralias "$NOTIFICATIONAUTHORALIAS$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartnotificationauthoralias @ref standardmacrosincentenginemacroavailabilitychartdefnotificationauthoralias "$NOTIFICATIONAUTHORALIAS$"</td>
  *      <td>No</td>
  *      <td>@b Yes</td>
  *      <td>No</td>
@@ -1503,7 +1503,7 @@
  *      <td>No</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartnotificationcomment @ref standardmacrosincentschedulermacroavailabilitychartdefnotificationcomment "$NOTIFICATIONCOMMENT$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartnotificationcomment @ref standardmacrosincentenginemacroavailabilitychartdefnotificationcomment "$NOTIFICATIONCOMMENT$"</td>
  *      <td>No</td>
  *      <td>@b Yes</td>
  *      <td>No</td>
@@ -1514,7 +1514,7 @@
  *      <td>No</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitycharthostnotificationnumber @ref standardmacrosincentschedulermacroavailabilitychartdefhostnotificationnumber "$HOSTNOTIFICATIONNUMBER$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitycharthostnotificationnumber @ref standardmacrosincentenginemacroavailabilitychartdefhostnotificationnumber "$HOSTNOTIFICATIONNUMBER$"</td>
  *      <td>No</td>
  *      <td>@b Yes</td>
  *      <td>No</td>
@@ -1525,7 +1525,7 @@
  *      <td>No</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitycharthostnotificationid @ref standardmacrosincentschedulermacroavailabilitychartdefhostnotificationid "$HOSTNOTIFICATIONID$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitycharthostnotificationid @ref standardmacrosincentenginemacroavailabilitychartdefhostnotificationid "$HOSTNOTIFICATIONID$"</td>
  *      <td>No</td>
  *      <td>@b Yes</td>
  *      <td>No</td>
@@ -1536,7 +1536,7 @@
  *      <td>No</td>
  *    </tr>
  *    <tr>
- *      <td class='MacroName'>@anchor standardmacrosincentschedulermacroavailabilitychartservicenotificationnumber $SERVICENOTIFICATIONNUMBER$</td>
+ *      <td class='MacroName'>@anchor standardmacrosincentenginemacroavailabilitychartservicenotificationnumber $SERVICENOTIFICATIONNUMBER$</td>
  *      <td>No</td>
  *      <td>@b Yes</td>
  *      <td>No</td>
@@ -1547,7 +1547,7 @@
  *      <td>No</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartservicenotificationid @ref standardmacrosincentschedulermacroavailabilitychartdefservicenotificationid "$SERVICENOTIFICATIONID$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartservicenotificationid @ref standardmacrosincentenginemacroavailabilitychartdefservicenotificationid "$SERVICENOTIFICATIONID$"</td>
  *      <td>No</td>
  *      <td>@b Yes</td>
  *      <td>No</td>
@@ -1573,7 +1573,7 @@
  *      <th>Host Perf Data</th>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartlongdatetime @ref standardmacrosincentschedulermacroavailabilitychartdeflongdatetime "$LONGDATETIME$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartlongdatetime @ref standardmacrosincentenginemacroavailabilitychartdeflongdatetime "$LONGDATETIME$"</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
@@ -1584,7 +1584,7 @@
  *      <td>@b Yes</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartshortdatetime @ref standardmacrosincentschedulermacroavailabilitychartdefshortdatetime "$SHORTDATETIME$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartshortdatetime @ref standardmacrosincentenginemacroavailabilitychartdefshortdatetime "$SHORTDATETIME$"</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
@@ -1595,7 +1595,7 @@
  *      <td>@b Yes</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdate @ref standardmacrosincentschedulermacroavailabilitychartdefdate "$DATE$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdate @ref standardmacrosincentenginemacroavailabilitychartdefdate "$DATE$"</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
@@ -1606,7 +1606,7 @@
  *      <td>@b Yes</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitycharttime @ref standardmacrosincentschedulermacroavailabilitychartdeftime "$TIME$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitycharttime @ref standardmacrosincentenginemacroavailabilitychartdeftime "$TIME$"</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
@@ -1617,7 +1617,7 @@
  *      <td>@b Yes</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitycharttimet @ref standardmacrosincentschedulermacroavailabilitychartdeftimet "$TIMET$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitycharttimet @ref standardmacrosincentenginemacroavailabilitychartdeftimet "$TIMET$"</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
@@ -1628,7 +1628,7 @@
  *      <td>@b Yes</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartisvalidtime "$ISVALIDTIME:$" <sup>9</sup></td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartisvalidtime "$ISVALIDTIME:$" <sup>9</sup></td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
@@ -1639,7 +1639,7 @@
  *      <td>@b Yes</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartnextvalidtime "$NEXTVALIDTIME:$" <sup>9</sup></td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartnextvalidtime "$NEXTVALIDTIME:$" <sup>9</sup></td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
@@ -1665,7 +1665,7 @@
  *  	<th>Host Perf Data</th>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartmainconfigfile @ref standardmacrosincentschedulermacroavailabilitychartdefmainconfigfile "$MAINCONFIGFILE$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartmainconfigfile @ref standardmacrosincentenginemacroavailabilitychartdefmainconfigfile "$MAINCONFIGFILE$"</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
@@ -1676,7 +1676,7 @@
  *      <td>@b Yes</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartstatusdatafile @ref standardmacrosincentschedulermacroavailabilitychartdefstatusdatafile "$STATUSDATAFILE$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartstatusdatafile @ref standardmacrosincentenginemacroavailabilitychartdefstatusdatafile "$STATUSDATAFILE$"</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
@@ -1687,7 +1687,7 @@
  *      <td>@b Yes</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartcommentdatafile @ref standardmacrosincentschedulermacroavailabilitychartdefcommentdatafile "$COMMENTDATAFILE$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartcommentdatafile @ref standardmacrosincentenginemacroavailabilitychartdefcommentdatafile "$COMMENTDATAFILE$"</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
@@ -1698,7 +1698,7 @@
  *      <td>@b Yes</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdowntimedatafile @ref standardmacrosincentschedulermacroavailabilitychartdefdowntimedatafile "$DOWNTIMEDATAFILE$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdowntimedatafile @ref standardmacrosincentenginemacroavailabilitychartdefdowntimedatafile "$DOWNTIMEDATAFILE$"</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
@@ -1709,7 +1709,7 @@
  *      <td>@b Yes</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartretentiondatafile @ref standardmacrosincentschedulermacroavailabilitychartdefretentiondatafile "$RETENTIONDATAFILE$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartretentiondatafile @ref standardmacrosincentenginemacroavailabilitychartdefretentiondatafile "$RETENTIONDATAFILE$"</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
@@ -1720,7 +1720,7 @@
  *      <td>@b Yes</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartobjectcachefile @ref standardmacrosincentschedulermacroavailabilitychartdefobjectcachefile "$OBJECTCACHEFILE$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartobjectcachefile @ref standardmacrosincentenginemacroavailabilitychartdefobjectcachefile "$OBJECTCACHEFILE$"</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
@@ -1731,7 +1731,7 @@
  *      <td>@b Yes</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitycharttempfile @ref standardmacrosincentschedulermacroavailabilitychartdeftempfile "$TEMPFILE$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitycharttempfile @ref standardmacrosincentenginemacroavailabilitychartdeftempfile "$TEMPFILE$"</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
@@ -1742,7 +1742,7 @@
  *      <td>@b Yes</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitycharttemppath @ref standardmacrosincentschedulermacroavailabilitychartdeftemppath "$TEMPPATH$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitycharttemppath @ref standardmacrosincentenginemacroavailabilitychartdeftemppath "$TEMPPATH$"</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
@@ -1753,7 +1753,7 @@
  *      <td>@b Yes</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartlogfile @ref standardmacrosincentschedulermacroavailabilitychartdeflogfile "$LOGFILE$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartlogfile @ref standardmacrosincentenginemacroavailabilitychartdeflogfile "$LOGFILE$"</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
@@ -1764,7 +1764,7 @@
  *      <td>@b Yes</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartresourcefile @ref standardmacrosincentschedulermacroavailabilitychartdefresourcefile "$RESOURCEFILE$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartresourcefile @ref standardmacrosincentenginemacroavailabilitychartdefresourcefile "$RESOURCEFILE$"</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
@@ -1775,7 +1775,7 @@
  *      <td>@b Yes</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartcommandfile @ref standardmacrosincentschedulermacroavailabilitychartdefcommandfile "$COMMANDFILE$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartcommandfile @ref standardmacrosincentenginemacroavailabilitychartdefcommandfile "$COMMANDFILE$"</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
@@ -1786,7 +1786,7 @@
  *      <td>@b Yes</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitycharthostperfdatafile @ref standardmacrosincentschedulermacroavailabilitychartdefhostperfdatafile "$HOSTPERFDATAFILE$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitycharthostperfdatafile @ref standardmacrosincentenginemacroavailabilitychartdefhostperfdatafile "$HOSTPERFDATAFILE$"</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
@@ -1797,7 +1797,7 @@
  *      <td>@b Yes</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartserviceperfdatafile @ref standardmacrosincentschedulermacroavailabilitychartdefserviceperfdatafile "$SERVICEPERFDATAFILE$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartserviceperfdatafile @ref standardmacrosincentenginemacroavailabilitychartdefserviceperfdatafile "$SERVICEPERFDATAFILE$"</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
@@ -1823,7 +1823,7 @@
  *  	<th>Host Perf Data</th>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartprocessstarttime @ref standardmacrosincentschedulermacroavailabilitychartdefprocessstarttime "$PROCESSSTARTTIME$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartprocessstarttime @ref standardmacrosincentenginemacroavailabilitychartdefprocessstarttime "$PROCESSSTARTTIME$"</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
@@ -1834,7 +1834,7 @@
  *      <td>@b Yes</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitycharteventstarttime @ref standardmacrosincentschedulermacroavailabilitychartdefeventstarttime "$EVENTSTARTTIME$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitycharteventstarttime @ref standardmacrosincentenginemacroavailabilitychartdefeventstarttime "$EVENTSTARTTIME$"</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
@@ -1845,7 +1845,7 @@
  *      <td>@b Yes</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartadminemail @ref standardmacrosincentschedulermacroavailabilitychartdefadminemail "$ADMINEMAIL$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartadminemail @ref standardmacrosincentenginemacroavailabilitychartdefadminemail "$ADMINEMAIL$"</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
@@ -1856,7 +1856,7 @@
  *      <td>@b Yes</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartadminpager @ref standardmacrosincentschedulermacroavailabilitychartdefadminpager "$ADMINPAGER$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartadminpager @ref standardmacrosincentenginemacroavailabilitychartdefadminpager "$ADMINPAGER$"</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
@@ -1867,7 +1867,7 @@
  *      <td>@b Yes</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartarg @ref standardmacrosincentschedulermacroavailabilitychartdefargn "$ARGn$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartarg @ref standardmacrosincentenginemacroavailabilitychartdefargn "$ARGn$"</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
@@ -1878,7 +1878,7 @@
  *      <td>@b Yes</td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartuser @ref standardmacrosincentschedulermacroavailabilitychartdefusern "$USERn$"</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartuser @ref standardmacrosincentenginemacroavailabilitychartdefusern "$USERn$"</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
  *      <td>@b Yes</td>
@@ -1890,12 +1890,12 @@
  *    </tr>
  *  </table>
  *
- *  @section standardmacrosincentschedulermacrodescriptions Macro Descriptions
+ *  @section standardmacrosincentenginemacrodescriptions Macro Descriptions
  *
  *  <table>
  *    <caption>Host Macros <sup>3</sup></caption>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefhostname $HOSTNAME$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefhostname $HOSTNAME$</td>
  *      <td>
  *  	  Short name for the host (i.e. "biglinuxbox"). This value is taken
  *  	  from the host_name directive in the @ref
@@ -1903,7 +1903,7 @@
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefhostdisplayname $HOSTDISPLAYNAME$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefhostdisplayname $HOSTDISPLAYNAME$</td>
  *      <td>
  *  	  An alternate display name for the host. This value is taken from
  *  	  the display_name directive in the @ref objectdefinitionsobjecttypeshostdefinition
@@ -1911,7 +1911,7 @@
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefhostalias $HOSTALIAS$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefhostalias $HOSTALIAS$</td>
  *      <td>
  *  	  Long name/description for the host. This value is taken from the
  *  	  alias directive in the @ref objectdefinitionsobjecttypeshostdefinition "host
@@ -1919,42 +1919,42 @@
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefhostaddress $HOSTADDRESS$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefhostaddress $HOSTADDRESS$</td>
  *      <td>
  *  	  Address of the host. This value is taken from the address directive
  *  	  in the @ref objectdefinitionsobjecttypeshostdefinition "host definition".
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefhoststate $HOSTSTATE$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefhoststate $HOSTSTATE$</td>
  *      <td>
  *	  A string indicating the current state of the host ("UP",
  *  	  "DOWN", or "UNREACHABLE").
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefhoststateid $HOSTSTATEID$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefhoststateid $HOSTSTATEID$</td>
  *      <td>
  *        A number that corresponds to the current state of the host: 0=UP,
  *        1=DOWN, 2=UNREACHABLE.
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdeflasthoststate $LASTHOSTSTATE$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdeflasthoststate $LASTHOSTSTATE$</td>
  *      <td>
  *        A string indicating the last state of the host ("UP", "DOWN",
  *        or "UNREACHABLE").
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdeflasthoststateid $LASTHOSTSTATEID$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdeflasthoststateid $LASTHOSTSTATEID$</td>
  *      <td>
  *        A number that corresponds to the last state of the host: 0=UP,
  *        1=DOWN, 2=UNREACHABLE.
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefhoststatetype $HOSTSTATETYPE$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefhoststatetype $HOSTSTATETYPE$</td>
  *      <td>
  *        A string indicating the @link statetypes.html state type @endlink
  *        for the current host check ("HARD" or "SOFT"). Soft states
@@ -1964,7 +1964,7 @@
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefhostattempt $HOSTATTEMPT$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefhostattempt $HOSTATTEMPT$</td>
  *      <td>
  *        The number of the current host check retry. For instance, if this
  *        is the second time that the host is being rechecked, this will be
@@ -1974,7 +1974,7 @@
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefmaxhostattempts $MAXHOSTATTEMPTS$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefmaxhostattempts $MAXHOSTATTEMPTS$</td>
  *      <td>
  *        The max check attempts as defined for the current host. Useful when
  *        writing host event handlers for "soft" states that take a
@@ -1982,7 +1982,7 @@
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefhosteventid $HOSTEVENTID$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefhosteventid $HOSTEVENTID$</td>
  *      <td>
  *        A globally unique number associated with the host's current state.
  *        Every time a host (or service) experiences a state change, a global
@@ -1991,14 +1991,14 @@
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdeflasthosteventid $LASTHOSTEVENTID$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdeflasthosteventid $LASTHOSTEVENTID$</td>
  *      <td>
  *        The previous (globally unique) event number that was given to the
  *        host.
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefhostproblemid $HOSTPROBLEMID$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefhostproblemid $HOSTPROBLEMID$</td>
  *      <td>
  *        A globally unique number associated with the host's current problem
  *        state. Every time a host (or service) transitions from an UP or OK
@@ -2013,7 +2013,7 @@
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdeflasthostproblemid $LASTHOSTPROBLEMID$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdeflasthostproblemid $LASTHOSTPROBLEMID$</td>
  *      <td>
  *        The previous (globally unique) problem number that was given to the
  *        host. Combined with event handlers, this macro could be used for
@@ -2022,7 +2022,7 @@
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefhostlatency $HOSTLATENCY$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefhostlatency $HOSTLATENCY$</td>
  *      <td>
  *        A (floating point) number indicating the number of seconds that a
  *        scheduled host check lagged behind its scheduled check time. For
@@ -2032,7 +2032,7 @@
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefhostexecutiontime $HOSTEXECUTIONTIME$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefhostexecutiontime $HOSTEXECUTIONTIME$</td>
  *      <td>
  *        A (floating point) number indicating the number of seconds that the
  *        host check took to execute (i.e. the amount of time the check was
@@ -2040,7 +2040,7 @@
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefhostduration $HOSTDURATION$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefhostduration $HOSTDURATION$</td>
  *      <td>
  *        A string indicating the amount of time that the host has spent in
  *        its current state. Format is "XXh YYm ZZs", indicating hours,
@@ -2048,14 +2048,14 @@
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefhostdurationsec $HOSTDURATIONSEC$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefhostdurationsec $HOSTDURATIONSEC$</td>
  *      <td>
  *        A number indicating the number of seconds that the host has spent
  *        in its current state.
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefhostdowntime $HOSTDOWNTIME$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefhostdowntime $HOSTDOWNTIME$</td>
  *      <td>
  *        A number indicating the current "downtime depth" for the host. If
  *        this host is currently in a period of @link scheduleddowntime scheduled
@@ -2064,7 +2064,7 @@
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefhostpercentchange $HOSTPERCENTCHANGE$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefhostpercentchange $HOSTPERCENTCHANGE$</td>
  *      <td>
  *        A (floating point) number indicating the percent state change the
  *        host has undergone. Percent state change is used by the @link
@@ -2072,7 +2072,7 @@
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefhostgroupname $HOSTGROUPNAME$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefhostgroupname $HOSTGROUPNAME$</td>
  *      <td>
  *        The short name of the hostgroup that this host belongs to. This
  *        value is taken from the hostgroup_name directive in the @ref
@@ -2082,14 +2082,14 @@
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefhostgroupnames $HOSTGROUPNAMES$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefhostgroupnames $HOSTGROUPNAMES$</td>
  *      <td>
  *        A comma separated list of the short names of all the hostgroups
  *        that this host belongs to.
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdeflasthostcheck $LASTHOSTCHECK$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdeflasthostcheck $LASTHOSTCHECK$</td>
  *      <td>
  *        This is a timestamp in time_t format (seconds since the UNIX epoch)
  *        indicating the time at which a check of the host was last
@@ -2097,14 +2097,14 @@
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdeflasthoststatechange $LASTHOSTSTATECHANGE$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdeflasthoststatechange $LASTHOSTSTATECHANGE$</td>
  *      <td>
  *        This is a timestamp in time_t format (seconds since the UNIX epoch)
  *        indicating the time the host last changed state.
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdeflasthostup $LASTHOSTUP$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdeflasthostup $LASTHOSTUP$</td>
  *      <td>
  *  	  This is a timestamp in time_t format (seconds since the UNIX epoch)
  *        indicating the time at which the host was last detected as being in
@@ -2112,7 +2112,7 @@
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdeflasthostdown $LASTHOSTDOWN$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdeflasthostdown $LASTHOSTDOWN$</td>
  *      <td>
  *        This is a timestamp in time_t format (seconds since the UNIX epoch)
  *        indicating the time at which the host was last detected as being in
@@ -2120,7 +2120,7 @@
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdeflasthostunreachable $LASTHOSTUNREACHABLE$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdeflasthostunreachable $LASTHOSTUNREACHABLE$</td>
  *      <td>
  *        This is a timestamp in time_t format (seconds since the UNIX epoch)
  *        indicating the time at which the host was last detected as being in
@@ -2128,35 +2128,35 @@
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefhostoutput $HOSTOUTPUT$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefhostoutput $HOSTOUTPUT$</td>
  *      <td>
  *        The first line of text output from the last host check (i.e. "Ping
  *        OK").
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdeflonghostoutput $LONGHOSTOUTPUT$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdeflonghostoutput $LONGHOSTOUTPUT$</td>
  *      <td>
  *        The full text output (aside from the first line) from the last host
  *        check.
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefhostperfdata $HOSTPERFDATA$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefhostperfdata $HOSTPERFDATA$</td>
  *      <td>
  *        This macro contains any @link performancedata performance data
  *        @endlink that may have been returned by the last host check.
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefhostcheckcommand $HOSTCHECKCOMMAND$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefhostcheckcommand $HOSTCHECKCOMMAND$</td>
  *      <td>
  *        This macro contains the name of the command (along with any
  *        arguments passed to it) used to perform the host check.
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefhostackauthor $HOSTACKAUTHOR$ <sup>8</sup></td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefhostackauthor $HOSTACKAUTHOR$ <sup>8</sup></td>
  *      <td>
  *        A string containing the name of the user who acknowledged the host
  *        problem. This macro is only valid in notifications where the
@@ -2164,7 +2164,7 @@
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefhostackauthorname $HOSTACKAUTHORNAME$ <sup>8</sup></td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefhostackauthorname $HOSTACKAUTHORNAME$ <sup>8</sup></td>
  *      <td>
  *        A string containing the short name of the contact (if applicable)
  *        who acknowledged the host problem. This macro is only valid in
@@ -2173,7 +2173,7 @@
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefhostackauthoralias $HOSTACKAUTHORALIAS$ <sup>8</sup></td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefhostackauthoralias $HOSTACKAUTHORALIAS$ <sup>8</sup></td>
  *      <td>
  *        A string containing the alias of the contact (if applicable) who
  *        acknowledged the host problem. This macro is only valid in
@@ -2182,7 +2182,7 @@
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefhostackcomment $HOSTACKCOMMENT$ <sup>8</sup></td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefhostackcomment $HOSTACKCOMMENT$ <sup>8</sup></td>
  *      <td>
  *        A string containing the acknowledgement comment that was entered by
  *        the user who acknowledged the host problem. This macro is only
@@ -2191,7 +2191,7 @@
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefhostactionurl $HOSTACTIONURL$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefhostactionurl $HOSTACTIONURL$</td>
  *      <td>
  *        Action URL for the host. This macro may contain other macros (e.g.
  *        $HOSTNAME$), which can be useful when you want to pass the host
@@ -2199,7 +2199,7 @@
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefhostnotesurl $HOSTNOTESURL$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefhostnotesurl $HOSTNOTESURL$</td>
  *      <td>
  *        Notes URL for the host. This macro may contain other macros (e.g.
  *        $HOSTNAME$), which can be useful when you want to pass the host
@@ -2207,7 +2207,7 @@
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefhostnotes $HOSTNOTES$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefhostnotes $HOSTNOTES$</td>
  *      <td>
  *        Notes for the host. This macro may contain other macros (e.g.
  *        $HOSTNAME$), which can be useful when you want to host-specific
@@ -2215,34 +2215,34 @@
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdeftotalhostservices $TOTALHOSTSERVICES$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdeftotalhostservices $TOTALHOSTSERVICES$</td>
  *      <td>
  *        The total number of services associated with the host.
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdeftotalhostservicesok $TOTALHOSTSERVICESOK$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdeftotalhostservicesok $TOTALHOSTSERVICESOK$</td>
  *      <td>
  *        The total number of services associated with the host that are in
  *        an OK state.
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdeftotalhostserviceswarning $TOTALHOSTSERVICESWARNING$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdeftotalhostserviceswarning $TOTALHOSTSERVICESWARNING$</td>
  *      <td>
  *        The total number of services associated with the host that are in a
  *        WARNING state.
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdeftotalhostservicesunknown $TOTALHOSTSERVICESUNKNOWN$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdeftotalhostservicesunknown $TOTALHOSTSERVICESUNKNOWN$</td>
  *      <td>
  *        The total number of services associated with the host that are in
  *        an UNKNOWN state.
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdeftotalhostservicescritical $TOTALHOSTSERVICESCRITICAL$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdeftotalhostservicescritical $TOTALHOSTSERVICESCRITICAL$</td>
  *      <td>
  *        The total number of services associated with the host that are in a
  *        CRITICAL state.
@@ -2253,7 +2253,7 @@
  *  <table>
  *    <caption>Host Group Macros</caption>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefhostgroupalias $HOSTGROUPALIAS$ <sup>5</sup></td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefhostgroupalias $HOSTGROUPALIAS$ <sup>5</sup></td>
  *      <td>
  *        The long name / alias of either 1) the hostgroup name passed as an
  *        on-demand macro argument or 2) the primary hostgroup associated
@@ -2263,7 +2263,7 @@
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefhostgroupmembers $HOSTGROUPMEMBERS$ <sup>5</sup></td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefhostgroupmembers $HOSTGROUPMEMBERS$ <sup>5</sup></td>
  *      <td>
  *        A comma-separated list of all hosts that belong to either 1) the
  *        hostgroup name passed as an on-demand macro argument or 2) the
@@ -2272,7 +2272,7 @@
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefhostgroupnotes $HOSTGROUPNOTES$ <sup>5</sup></td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefhostgroupnotes $HOSTGROUPNOTES$ <sup>5</sup></td>
  *      <td>
  *        The notes associated with either 1) the hostgroup name passed as an
  *        on-demand macro argument or 2) the primary hostgroup associated
@@ -2282,7 +2282,7 @@
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefhostgroupnotesurl $HOSTGROUPNOTESURL$ <sup>5</sup></td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefhostgroupnotesurl $HOSTGROUPNOTESURL$ <sup>5</sup></td>
  *      <td>
  *        The notes URL associated with either 1) the hostgroup name passed
  *        as an on-demand macro argument or 2) the primary hostgroup
@@ -2292,7 +2292,7 @@
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefhostgroupactionurl $HOSTGROUPACTIONURL$ <sup>5</sup></td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefhostgroupactionurl $HOSTGROUPACTIONURL$ <sup>5</sup></td>
  *      <td>
  *        The action URL associated with either 1) the hostgroup name passed
  *        as an on-demand macro argument or 2) the primary hostgroup
@@ -2306,7 +2306,7 @@
  *  <table>
  *    <caption>Service Macros</caption>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefservicedesc $SERVICEDESC$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefservicedesc $SERVICEDESC$</td>
  *      <td>
  *        The long name/description of the service (i.e. "Main Website").
  *        This value is taken from the service_description directive of the
@@ -2314,7 +2314,7 @@
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefservicedisplayname $SERVICEDISPLAYNAME$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefservicedisplayname $SERVICEDISPLAYNAME$</td>
  *      <td>
  *        An alternate display name for the service. This value is taken from
  *        the display_name directive in the @ref
@@ -2322,35 +2322,35 @@
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefservicestate $SERVICESTATE$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefservicestate $SERVICESTATE$</td>
  *      <td>
  *        A string indicating the current state of the service ("OK",
  *        "WARNING", "UNKNOWN", or "CRITICAL").
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefservicestateid $SERVICESTATEID$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefservicestateid $SERVICESTATEID$</td>
  *      <td>
  *        A number that corresponds to the current state of the service:
  *        0=OK, 1=WARNING, 2=CRITICAL, 3=UNKNOWN.
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdeflastservicestate $LASTSERVICESTATE$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdeflastservicestate $LASTSERVICESTATE$</td>
  *      <td>
  *        A string indicating the last state of the service ("OK",
  *        "WARNING", "UNKNOWN", or "CRITICAL").
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdeflastservicestateid $LASTSERVICESTATEID$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdeflastservicestateid $LASTSERVICESTATEID$</td>
  *      <td>
  *        A number that corresponds to the last state of the service: 0=OK,
  *        1=WARNING, 2=CRITICAL, 3=UNKNOWN.
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefservicestatetype $SERVICESTATETYPE$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefservicestatetype $SERVICESTATETYPE$</td>
  *      <td>
  *        A string indicating the @link statetypes.html state type @endlink
  *        for the current service check ("HARD" or "SOFT"). Soft states
@@ -2360,7 +2360,7 @@
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefserviceattempt $SERVICEATTEMPT$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefserviceattempt $SERVICEATTEMPT$</td>
  *      <td>
  *        The number of the current service check retry. For instance, if
  *        this is the second time that the service is being rechecked, this
@@ -2370,7 +2370,7 @@
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefmaxserviceattempts $MAXSERVICEATTEMPTS$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefmaxserviceattempts $MAXSERVICEATTEMPTS$</td>
  *      <td>
  *        The max check attempts as defined for the current service. Useful
  *        when writing host event handlers for "soft" states that take a
@@ -2378,14 +2378,14 @@
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefserviceisvolatile $SERVICEISVOLATILE$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefserviceisvolatile $SERVICEISVOLATILE$</td>
  *      <td>
  *        Indicates whether the service is marked as being volatile or not: 0
  *        = not volatile, 1 = volatile.
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefserviceeventid $SERVICEEVENTID$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefserviceeventid $SERVICEEVENTID$</td>
  *      <td>
  *        A globally unique number associated with the service's current
  *        state. Every time a a service (or host) experiences a state change,
@@ -2395,14 +2395,14 @@
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdeflastserviceeventid $LASTSERVICEEVENTID$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdeflastserviceeventid $LASTSERVICEEVENTID$</td>
  *      <td>
  *        The previous (globally unique) event number that given to the
  *        service.
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefserviceproblemid $SERVICEPROBLEMID$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefserviceproblemid $SERVICEPROBLEMID$</td>
  *      <td>
  *        A globally unique number associated with the service's current
  *        problem state. Every time a service (or host) transitions from an
@@ -2417,7 +2417,7 @@
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdeflastserviceproblemid $LASTSERVICEPROBLEMID$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdeflastserviceproblemid $LASTSERVICEPROBLEMID$</td>
  *      <td>
  *        The previous (globally unique) problem number that was given to the
  *        service. Combined with event handlers, this macro could be used for
@@ -2426,7 +2426,7 @@
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefservicelatency $SERVICELATENCY$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefservicelatency $SERVICELATENCY$</td>
  *      <td>
  *  A (floating point) number indicating the number of seconds that a
  *        scheduled service check lagged behind its scheduled check time. For
@@ -2436,7 +2436,7 @@
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefserviceexecutiontime $SERVICEEXECUTIONTIME$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefserviceexecutiontime $SERVICEEXECUTIONTIME$</td>
  *      <td>
  *        A (floating point) number indicating the number of seconds that the
  *        service check took to execute (i.e. the amount of time the check
@@ -2444,7 +2444,7 @@
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefserviceduration $SERVICEDURATION$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefserviceduration $SERVICEDURATION$</td>
  *      <td>
  *        A string indicating the amount of time that the service has spent
  *        in its current state. Format is "XXh YYm ZZs", indicating hours,
@@ -2452,14 +2452,14 @@
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefservicedurationsec $SERVICEDURATIONSEC$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefservicedurationsec $SERVICEDURATIONSEC$</td>
  *      <td>
  *  A number indicating the number of seconds that the service has
  *  spent in its current state.
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefservicedowntime $SERVICEDOWNTIME$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefservicedowntime $SERVICEDOWNTIME$</td>
  *      <td>
  *        A number indicating the current "downtime depth" for the service.
  *        If this service is currently in a period of @link scheduleddowntime
@@ -2469,7 +2469,7 @@
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefservicepercentchange $SERVICEPERCENTCHANGE$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefservicepercentchange $SERVICEPERCENTCHANGE$</td>
  *      <td>
  *        A (floating point) number indicating the percent state change the
  *        service has undergone. Percent state change is used by the @link
@@ -2477,7 +2477,7 @@
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefservicegroupname $SERVICEGROUPNAME$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefservicegroupname $SERVICEGROUPNAME$</td>
  *      <td>
  *        The short name of the servicegroup that this service belongs to.
  *        This value is taken from the servicegroup_name directive in the
@@ -2487,14 +2487,14 @@
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefservicegroupnames $SERVICEGROUPNAMES$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefservicegroupnames $SERVICEGROUPNAMES$</td>
  *      <td>
  *  A comma separated list of the short names of all the servicegroups
  *  that this service belongs to.
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdeflastservicecheck $LASTSERVICECHECK$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdeflastservicecheck $LASTSERVICECHECK$</td>
  *      <td>
  *        This is a timestamp in time_t format (seconds since the UNIX epoch)
  *        indicating the time at which a check of the service was last
@@ -2502,14 +2502,14 @@
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdeflastservicestatechange $LASTSERVICESTATECHANGE$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdeflastservicestatechange $LASTSERVICESTATECHANGE$</td>
  *      <td>
  *        This is a timestamp in time_t format (seconds since the UNIX epoch)
  *        indicating the time the service last changed state.
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdeflastserviceok $LASTSERVICEOK$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdeflastserviceok $LASTSERVICEOK$</td>
  *      <td>
  *        This is a timestamp in time_t format (seconds since the UNIX epoch)
  *        indicating the time at which the service was last detected as being
@@ -2517,7 +2517,7 @@
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdeflastservicewarning $LASTSERVICEWARNING$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdeflastservicewarning $LASTSERVICEWARNING$</td>
  *      <td>
  *        This is a timestamp in time_t format (seconds since the UNIX epoch)
  *        indicating the time at which the service was last detected as being
@@ -2525,7 +2525,7 @@
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdeflastserviceunknown $LASTSERVICEUNKNOWN$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdeflastserviceunknown $LASTSERVICEUNKNOWN$</td>
  *      <td>
  *        This is a timestamp in time_t format (seconds since the UNIX epoch)
  *        indicating the time at which the service was last detected as being
@@ -2533,7 +2533,7 @@
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdeflastservicecritical $LASTSERVICECRITICAL$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdeflastservicecritical $LASTSERVICECRITICAL$</td>
  *      <td>
  *        This is a timestamp in time_t format (seconds since the UNIX epoch)
  *        indicating the time at which the service was last detected as being
@@ -2541,35 +2541,35 @@
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefserviceoutput $SERVICEOUTPUT$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefserviceoutput $SERVICEOUTPUT$</td>
  *      <td>
  *        The first line of text output from the last service check (i.e.
  *        "Ping OK").
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdeflongserviceoutput $LONGSERVICEOUTPUT$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdeflongserviceoutput $LONGSERVICEOUTPUT$</td>
  *      <td>
  *        The full text output (aside from the first line) from the last
  *        service check.
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefserviceperfdata $SERVICEPERFDATA$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefserviceperfdata $SERVICEPERFDATA$</td>
  *      <td>
  *        This macro contains any @link performancedata performance data
  *        @endlink that may have been returned by the last service check.
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefservicecheckcommand $SERVICECHECKCOMMAND$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefservicecheckcommand $SERVICECHECKCOMMAND$</td>
  *      <td>
  *        This macro contains the name of the command (along with any
  *        arguments passed to it) used to perform the service check.
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefserviceackauthor $SERVICEACKAUTHOR$ <sup>8</sup></td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefserviceackauthor $SERVICEACKAUTHOR$ <sup>8</sup></td>
  *      <td>
  *        A string containing the name of the user who acknowledged the
  *        service problem. This macro is only valid in notifications where
@@ -2577,7 +2577,7 @@
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefserviceackauthorname $SERVICEACKAUTHORNAME$ <sup>8</sup></td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefserviceackauthorname $SERVICEACKAUTHORNAME$ <sup>8</sup></td>
  *      <td>
  *        A string containing the short name of the contact (if applicable)
  *        who acknowledged the service problem. This macro is only valid in
@@ -2586,7 +2586,7 @@
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefserviceackauthoralias $SERVICEACKAUTHORALIAS$ <sup>8</sup></td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefserviceackauthoralias $SERVICEACKAUTHORALIAS$ <sup>8</sup></td>
  *      <td>
  *        A string containing the alias of the contact (if applicable) who
  *        acknowledged the service problem. This macro is only valid in
@@ -2595,7 +2595,7 @@
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefserviceackcomment $SERVICEACKCOMMENT$ <sup>8</sup></td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefserviceackcomment $SERVICEACKCOMMENT$ <sup>8</sup></td>
  *      <td>
  *        A string containing the acknowledgement comment that was entered by
  *        the user who acknowledged the service problem. This macro is only
@@ -2604,7 +2604,7 @@
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefserviceactionurl $SERVICEACTIONURL$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefserviceactionurl $SERVICEACTIONURL$</td>
  *      <td>
  *        Action URL for the service. This macro may contain other macros
  *        (e.g. $HOSTNAME$ or $SERVICEDESC$), which can be useful when you
@@ -2612,7 +2612,7 @@
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefservicenotesurl $SERVICENOTESURL$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefservicenotesurl $SERVICENOTESURL$</td>
  *      <td>
  *        Notes URL for the service. This macro may contain other macros
  *        (e.g. $HOSTNAME$ or $SERVICEDESC$), which can be useful when you
@@ -2620,7 +2620,7 @@
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefservicenotes $SERVICENOTES$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefservicenotes $SERVICENOTES$</td>
  *      <td>
  *        Notes for the service. This macro may contain other macros (e.g.
  *        $HOSTNAME$ or $SERVICESTATE$), which can be useful when you want to
@@ -2632,7 +2632,7 @@
  *  <table>
  *    <caption>Service Group Macros <sup>6</sup></caption>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefservicegroupalias $SERVICEGROUPALIAS$ <sup>6</sup></td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefservicegroupalias $SERVICEGROUPALIAS$ <sup>6</sup></td>
  *      <td>
  *        The long name / alias of either 1) the servicegroup name passed as
  *        an on-demand macro argument or 2) the primary servicegroup
@@ -2643,7 +2643,7 @@
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefservicegroupmembers $SERVICEGROUPMEMBERS$ <sup>6</sup></td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefservicegroupmembers $SERVICEGROUPMEMBERS$ <sup>6</sup></td>
  *      <td>
  *        A comma-separated list of all services that belong to either 1) the
  *        servicegroup name passed as an on-demand macro argument or 2) the
@@ -2652,7 +2652,7 @@
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefservicegroupnotes $SERVICEGROUPNOTES$ <sup>6</sup></td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefservicegroupnotes $SERVICEGROUPNOTES$ <sup>6</sup></td>
  *      <td>
  *        The notes associated with either 1) the servicegroup name passed as
  *        an on-demand macro argument or 2) the primary servicegroup
@@ -2663,7 +2663,7 @@
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefservicegroupnotesurl $SERVICEGROUPNOTESURL$ <sup>6</sup></td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefservicegroupnotesurl $SERVICEGROUPNOTESURL$ <sup>6</sup></td>
  *      <td>
  *        The notes URL associated with either 1) the servicegroup name
  *        passed as an on-demand macro argument or 2) the primary
@@ -2674,7 +2674,7 @@
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefservicegroupnotes $SERVICEGROUPNOTES$ <sup>6</sup></td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefservicegroupnotes $SERVICEGROUPNOTES$ <sup>6</sup></td>
  *      <td>
  *        The action URL associated with either 1) the servicegroup name
  *        passed as an on-demand macro argument or 2) the primary
@@ -2689,7 +2689,7 @@
  *  <table>
  *    <caption>Contact Macros</caption>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefcontactname $CONTACTNAME$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefcontactname $CONTACTNAME$</td>
  *      <td>
  *        Short name for the contact (i.e. "jdoe") that is being notified
  *        of a host or service problem. This value is taken from the
@@ -2698,7 +2698,7 @@
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefcontactalias $CONTACTALIAS$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefcontactalias $CONTACTALIAS$</td>
  *      <td>
  *        Long name/description for the contact (i.e. "John Doe") being
  *        notified. This value is taken from the alias directive in the @ref
@@ -2706,7 +2706,7 @@
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefcontactemail $CONTACTEMAIL$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefcontactemail $CONTACTEMAIL$</td>
  *      <td>
  *        Email address of the contact being notified. This value is taken
  *        from the email directive in the @ref
@@ -2714,7 +2714,7 @@
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefcontactpager $CONTACTPAGER$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefcontactpager $CONTACTPAGER$</td>
  *      <td>
  *        Pager number/address of the contact being notified. This value is
  *        taken from the pager directive in the @ref
@@ -2722,7 +2722,7 @@
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefcontactaddressn $CONTACTADDRESSn$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefcontactaddressn $CONTACTADDRESSn$</td>
  *      <td>
  *        Address of the contact being notified. Each contact can have six
  *        different addresses (in addition to email address and pager
@@ -2732,7 +2732,7 @@
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefcontactgroupname $CONTACTGROUPNAME$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefcontactgroupname $CONTACTGROUPNAME$</td>
  *      <td>
  *        The short name of the contactgroup that this contact is a member
  *        of. This value is taken from the contactgroup_name directive in the
@@ -2742,7 +2742,7 @@
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefcontactgroupnames $CONTACTGROUPNAMES$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefcontactgroupnames $CONTACTGROUPNAMES$</td>
  *      <td>
  *        A comma separated list of the short names of all the contactgroups
  *        that this contact is a member of.
@@ -2753,7 +2753,7 @@
  *  <table>
  *    <caption>Contact Group Macros<sup>5</sup></caption>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefcontactgroupalias $CONTACTGROUPALIAS$ <sup>7</sup></td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefcontactgroupalias $CONTACTGROUPALIAS$ <sup>7</sup></td>
  *      <td>
  *        The long name / alias of either 1) the contactgroup name passed as
  *        an on-demand macro argument or 2) the primary contactgroup
@@ -2764,7 +2764,7 @@
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefcontactgroupmembers $CONTACTGROUPMEMBERS$ <sup>7</sup></td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefcontactgroupmembers $CONTACTGROUPMEMBERS$ <sup>7</sup></td>
  *      <td>
  *        A comma-separated list of all contacts that belong to either 1) the
  *        contactgroup name passed as an on-demand macro argument or 2) the
@@ -2777,28 +2777,28 @@
  *  <table>
  *    <caption>SUMMARY Macros</caption>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdeftotalhostsup $TOTALHOSTSUP$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdeftotalhostsup $TOTALHOSTSUP$</td>
  *      <td>
  *        This macro reflects the total number of hosts that are currently in
  *        an UP state.
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdeftotalhostsdown $TOTALHOSTSDOWN$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdeftotalhostsdown $TOTALHOSTSDOWN$</td>
  *      <td>
  *        This macro reflects the total number of hosts that are currently in
  *        a DOWN state.
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdeftotalhostsunreachable $TOTALHOSTSUNREACHABLE$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdeftotalhostsunreachable $TOTALHOSTSUNREACHABLE$</td>
  *      <td>
  *        This macro reflects the total number of hosts that are currently in
  *        an UNREACHABLE state.
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdeftotalhostsdownunhandled $TOTALHOSTSDOWNUNHANDLED$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdeftotalhostsdownunhandled $TOTALHOSTSDOWNUNHANDLED$</td>
  *      <td>
  *        This macro reflects the total number of hosts that are currently in
  *        a DOWN state that are not currently being "handled". Unhandled
@@ -2808,7 +2808,7 @@
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdeftotalhostsunreachableunhandled $TOTALHOSTSUNREACHABLEUNHANDLED$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdeftotalhostsunreachableunhandled $TOTALHOSTSUNREACHABLEUNHANDLED$</td>
  *      <td>
  *        This macro reflects the total number of hosts that are currently in
  *        an UNREACHABLE state that are not currently being "handled".
@@ -2818,14 +2818,14 @@
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdeftotalhostproblems $TOTALHOSTPROBLEMS$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdeftotalhostproblems $TOTALHOSTPROBLEMS$</td>
  *      <td>
  *        This macro reflects the total number of hosts that are currently
  *        either in a DOWN or an UNREACHABLE state.
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdeftotalhostproblemsunhandled $TOTALHOSTPROBLEMSUNHANDLED$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdeftotalhostproblemsunhandled $TOTALHOSTPROBLEMSUNHANDLED$</td>
  *      <td>
  *        This macro reflects the total number of hosts that are currently
  *        either in a DOWN or an UNREACHABLE state that are not currently
@@ -2835,35 +2835,35 @@
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdeftotalservicesok $TOTALSERVICESOK$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdeftotalservicesok $TOTALSERVICESOK$</td>
  *      <td>
  *        This macro reflects the total number of services that are currently
  *        in an OK state.
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdeftotalserviceswarning $TOTALSERVICESWARNING$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdeftotalserviceswarning $TOTALSERVICESWARNING$</td>
  *      <td>
  *        This macro reflects the total number of services that are currently
  *        in a WARNING state.
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdeftotalservicescritical $TOTALSERVICESCRITICAL$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdeftotalservicescritical $TOTALSERVICESCRITICAL$</td>
  *      <td>
  *        This macro reflects the total number of services that are currently
  *        in a CRITICAL state.
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdeftotalservicesunknown $TOTALSERVICESUNKNOWN$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdeftotalservicesunknown $TOTALSERVICESUNKNOWN$</td>
  *      <td>
  *        This macro reflects the total number of services that are currently
  *        in an UNKNOWN state.
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdeftotalserviceswarningunhandled $TOTALSERVICESWARNINGUNHANDLED$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdeftotalserviceswarningunhandled $TOTALSERVICESWARNINGUNHANDLED$</td>
  *      <td>
  *        This macro reflects the total number of services that are currently
  *        in a WARNING state that are not currently being "handled".
@@ -2873,7 +2873,7 @@
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdeftotalservicescriticalunhandled $TOTALSERVICESCRITICALUNHANDLED$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdeftotalservicescriticalunhandled $TOTALSERVICESCRITICALUNHANDLED$</td>
  *      <td>
  *        This macro reflects the total number of services that are currently
  *        in a CRITICAL state that are not currently being "handled".
@@ -2883,7 +2883,7 @@
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdeftotalservicesunknownunhandled $TOTALSERVICESUNKNOWNUNHANDLED$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdeftotalservicesunknownunhandled $TOTALSERVICESUNKNOWNUNHANDLED$</td>
  *      <td>
  *        This macro reflects the total number of services that are currently
  *        in an UNKNOWN state that are not currently being "handled".
@@ -2893,14 +2893,14 @@
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdeftotalserviceproblems $TOTALSERVICEPROBLEMS$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdeftotalserviceproblems $TOTALSERVICEPROBLEMS$</td>
  *      <td>
  *        This macro reflects the total number of services that are currently
  *        either in a WARNING, CRITICAL, or UNKNOWN state.
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdeftotalserviceproblemsunhandled $TOTALSERVICEPROBLEMSUNHANDLED$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdeftotalserviceproblemsunhandled $TOTALSERVICEPROBLEMSUNHANDLED$</td>
  *      <td>
  *        This macro reflects the total number of services that are currently
  *        either in a WARNING, CRITICAL, or UNKNOWN state that are not
@@ -2914,7 +2914,7 @@
  *  <table>
  *    <caption>Notification Macros</caption>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefnotificationtype $NOTIFICATIONTYPE$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefnotificationtype $NOTIFICATIONTYPE$</td>
  *      <td>
  *        A string identifying the type of notification that is being sent
  *        ("PROBLEM", "RECOVERY", "ACKNOWLEDGEMENT", "FLAPPINGSTART",
@@ -2923,14 +2923,14 @@
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefnotificationrecipients $NOTIFICATIONRECIPIENTS$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefnotificationrecipients $NOTIFICATIONRECIPIENTS$</td>
  *      <td>
  *        A comma-separated list of the short names of all contacts that are
  *        being notified about the host or service.
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefnotificationisescalated $NOTIFICATIONISESCALATED$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefnotificationisescalated $NOTIFICATIONISESCALATED$</td>
  *      <td>
  *        An integer indicating whether this was sent to normal contacts for
  *        the host or service or if it was escalated. 0 = Normal
@@ -2938,7 +2938,7 @@
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefnotificationauthor $NOTIFICATIONAUTHOR$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefnotificationauthor $NOTIFICATIONAUTHOR$</td>
  *      <td>
  *        A string containing the name of the user who authored the
  *        notification. If the $NOTIFICATIONTYPE$ macro is set to
@@ -2951,21 +2951,21 @@
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefnotificationauthorname $NOTIFICATIONAUTHORNAME$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefnotificationauthorname $NOTIFICATIONAUTHORNAME$</td>
  *      <td>
  *        A string containing the short name of the contact (if applicable)
  *        specified in the $NOTIFICATIONAUTHOR$ macro.
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefnotificationauthoralias $NOTIFICATIONAUTHORALIAS$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefnotificationauthoralias $NOTIFICATIONAUTHORALIAS$</td>
  *      <td>
  *        A string containing the alias of the contact (if applicable)
  *        specified in the $NOTIFICATIONAUTHOR$ macro.
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefnotificationcomment $NOTIFICATIONCOMMENT$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefnotificationcomment $NOTIFICATIONCOMMENT$</td>
  *      <td>
  *        A string containing the comment that was entered by the
  *        notification author. If the $NOTIFICATIONTYPE$ macro is set to
@@ -2979,7 +2979,7 @@
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefhostnotificationnumber $HOSTNOTIFICATIONNUMBER$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefhostnotificationnumber $HOSTNOTIFICATIONNUMBER$</td>
  *      <td>
  *        The current notification number for the host. The notification
  *        number increases by one (1) each time a new notification is sent
@@ -2991,20 +2991,20 @@
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefhostnotificationid $HOSTNOTIFICATIONID$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefhostnotificationid $HOSTNOTIFICATIONID$</td>
  *      <td>
  *        A unique number identifying a host notification. Notification ID
  *        numbers are unique across both hosts and service notifications, so
  *        you could potentially use this unique number as a primary key in a
  *        notification database. Notification ID numbers should remain unique
- *        across restarts of the Centreon Scheduler process, so long as you
+ *        across restarts of the Centreon Engine process, so long as you
  *        have state retention enabled. The notification ID number is
  *        incremented by one (1) each time a new host notification is sent
  *        out, and regardless of how many contacts are notified.
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefservicenotificationnumber $SERVICENOTIFICATIONNUMBER$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefservicenotificationnumber $SERVICENOTIFICATIONNUMBER$</td>
  *      <td>
  *        The current notification number for the service. The notification
  *        number increases by one (1) each time a new notification is sent
@@ -3016,13 +3016,13 @@
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefservicenotificationid $SERVICENOTIFICATIONID$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefservicenotificationid $SERVICENOTIFICATIONID$</td>
  *      <td>
  *        A unique number identifying a service notification. Notification ID
  *        numbers are unique across both hosts and service notifications, so
  *        you could potentially use this unique number as a primary key in a
  *        notification database. Notification ID numbers should remain unique
- *        across restarts of the Centreon Scheduler process, so long as you
+ *        across restarts of the Centreon Engine process, so long as you
  *        have state retention enabled. The notification ID number is
  *        incremented by one (1) each time a new service notification is sent
  *        out, and regardless of how many contacts are notified.
@@ -3033,40 +3033,40 @@
  *  <table>
  *    <caption>Date/Time Macros</caption>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdeflongdatetime $LONGDATETIME$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdeflongdatetime $LONGDATETIME$</td>
  *      <td>
  *        Current date/time stamp (i.e. Fri Oct 13 00:30:28 CDT 2000). Format
  *        of date is determined by @ref mainconfigurationfileoptionsconfigurationfilevariablesdateformat "date_format" directive.
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefshortdatetime $SHORTDATETIME$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefshortdatetime $SHORTDATETIME$</td>
  *      <td>
  *        Current date/time stamp (i.e. 10-13-2000 00:30:28). Format of date
  *        is determined by @ref mainconfigurationfileoptionsconfigurationfilevariablesdateformat "date_format" directive.
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefdate $DATE$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefdate $DATE$</td>
  *      <td>
  *        Date stamp (i.e. 10-13-2000). Format of date is determined by @ref
  *        mainconfigurationfileoptionsconfigurationfilevariablesdateformat "date_format" directive.
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdeftime $TIME$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdeftime $TIME$</td>
  *      <td>
  *        Current time stamp (i.e. 00:30:28).
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdeftimet $TIMET$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdeftimet $TIMET$</td>
  *      <td>
  *        Current time stamp in time_t format (seconds since the UNIX epoch).
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefisvalidtime $ISVALIDTIME:$ <sup>9</sup></td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefisvalidtime $ISVALIDTIME:$ <sup>9</sup></td>
  *      <td>
  *        This is a special on-demand macro that returns a 1 or 0 depending
  *        on whether or not a particular time is valid within a specified
@@ -3080,7 +3080,7 @@
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefnextvalidtime $NEXTVALIDTIME:$ <sup>9</sup></td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefnextvalidtime $NEXTVALIDTIME:$ <sup>9</sup></td>
  *      <td>
  *  	  This is a special on-demand macro that returns the next valid time
  *  	  (in time_t format) for a specified timeperiod. There are two ways
@@ -3100,70 +3100,70 @@
  *  <table>
  *    <caption>File Macros</caption>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefmainconfigfile $MAINCONFIGFILE$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefmainconfigfile $MAINCONFIGFILE$</td>
  *      <td>
  *        The location of the @link mainconfigurationfileoptions main config file
  *        @endlink.
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefstatusdatafile $STATUSDATAFILE$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefstatusdatafile $STATUSDATAFILE$</td>
  *      <td>
  *        The location of the @ref mainconfigurationfileoptionsconfigurationfilevariablesstatusfile "status data file".
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefcommentdatafile $COMMENTDATAFILE$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefcommentdatafile $COMMENTDATAFILE$</td>
  *      <td>
  *        The location of the comment data file.
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefdowntimedatafile $DOWNTIMEDATAFILE$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefdowntimedatafile $DOWNTIMEDATAFILE$</td>
  *      <td>
  *        The location of the downtime data file.
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefretentiondatafile $RETENTIONDATAFILE$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefretentiondatafile $RETENTIONDATAFILE$</td>
  *      <td>
  *        The location of the @ref mainconfigurationfileoptionsconfigurationfilevariablesstateretentionfile
  *        "retention data file".
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefobjectcachefile $OBJECTCACHEFILE$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefobjectcachefile $OBJECTCACHEFILE$</td>
  *      <td>
  *        The location of the @ref mainconfigurationfileoptionsconfigurationfilevariablesobjectcachefile "object cache file".
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdeftempfile $TEMPFILE$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdeftempfile $TEMPFILE$</td>
  *      <td>
  *        The location of the @ref mainconfigurationfileoptionsconfigurationfilevariablestempfile "temp file".
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdeftemppath $TEMPPATH$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdeftemppath $TEMPPATH$</td>
  *      <td>
  *        The directory specified by the @ref mainconfigurationfileoptionsconfigurationfilevariablestemppath "temp path" variable.
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdeflogfile $LOGFILE$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdeflogfile $LOGFILE$</td>
  *      <td>
  *        The location of the @ref mainconfigurationfileoptionsconfigurationfilevariableslogfile "log file".
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefresourcefile $RESOURCEFILE$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefresourcefile $RESOURCEFILE$</td>
  *      <td>
  *        The location of the @ref mainconfigurationfileoptionsconfigurationfilevariablesresourcefile
  *	  "resource file".
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefcommandfile $COMMANDFILE$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefcommandfile $COMMANDFILE$</td>
  *      <td>
  *        The location of the
  *        @ref mainconfigurationfileoptionsconfigurationfilevariablesexternalcommandfile
@@ -3171,13 +3171,13 @@
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefhostperfdatafile $HOSTPERFDATAFILE$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefhostperfdatafile $HOSTPERFDATAFILE$</td>
  *      <td>
  *        The location of the host performance data file (if defined).
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefserviceperfdatafile $SERVICEPERFDATAFILE$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefserviceperfdatafile $SERVICEPERFDATAFILE$</td>
  *      <td>
  *        The location of the service performance data file (if defined).
  *      </td>
@@ -3187,35 +3187,35 @@
  *  <table>
  *    <caption>Misc Macros</caption>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefprocessstarttime $PROCESSSTARTTIME$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefprocessstarttime $PROCESSSTARTTIME$</td>
  *      <td>
  *        Time stamp in time_t format (seconds since the UNIX epoch)
- *        indicating when the Centreon Scheduler process was last (re)started.
- *        You can determine the number of seconds that Centreon Scheduler has
+ *        indicating when the Centreon Engine process was last (re)started.
+ *        You can determine the number of seconds that Centreon Engine has
  *        been running (since it was last restarted) by subtracting
- *        $PROCESSSTARTTIME$ from @ref standardmacrosincentschedulermacroavailabilitycharttimet
+ *        $PROCESSSTARTTIME$ from @ref standardmacrosincentenginemacroavailabilitycharttimet
  *	  "$TIMET$".
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefeventstarttime $EVENTSTARTTIME$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefeventstarttime $EVENTSTARTTIME$</td>
  *      <td>
  *        Time stamp in time_t format (seconds since the UNIX epoch)
- *        indicating when the Centreon Scheduler process starting process
+ *        indicating when the Centreon Engine process starting process
  *        events (checks, etc.). You can determine the number of seconds that
- *        it took for Centreon Scheduler to startup by subtracting
+ *        it took for Centreon Engine to startup by subtracting
  *        $PROCESSSTARTTIME$ from $EVENTSTARTTIME$.
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefadminemail $ADMINEMAIL$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefadminemail $ADMINEMAIL$</td>
  *      <td>
  *        Global administrative email address. This value is taken from the
  *        @ref mainconfigurationfileoptionsconfigurationfilevariablesadministratoremailaddress "admin_email" directive.
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefadminpager $ADMINPAGER$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefadminpager $ADMINPAGER$</td>
  *      <td>
  *        Global administrative pager number/address. This value is taken
  *        from the @ref mainconfigurationfileoptionsconfigurationfilevariablesadministratorpager "admin_pager"
@@ -3223,26 +3223,26 @@
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefargn $ARGn$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefargn $ARGn$</td>
  *      <td>
  *        The nth argument passed to the command (notification, event
- *        handler, service check, etc.). Centreon Scheduler supports up to 32
+ *        handler, service check, etc.). Centreon Engine supports up to 32
  *        argument macros ($ARG1$ through $ARG32$).
  *      </td>
  *    </tr>
  *    <tr>
- *      <td>@anchor standardmacrosincentschedulermacroavailabilitychartdefusern $USERn$</td>
+ *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefusern $USERn$</td>
  *      <td>
  *        The nth user-definable macro. User macros can be defined in one or
  *        more @ref mainconfigurationfileoptionsconfigurationfilevariablesresourcefile
  *	  "resource files".
- *        Centreon Scheduler supports up to 256 user macros ($USER1$ through
+ *        Centreon Engine supports up to 256 user macros ($USER1$ through
  *        $USER256$).
  *      </td>
  *    </tr>
  *  </table>
  *
- *  @section standardmacrosincentschedulernotes Notes
+ *  @section standardmacrosincentenginenotes Notes
  *
  *  - <sup>1</sup> These macros are not valid for the host they are
  *  associated with when that host is being checked (i.e. they make no

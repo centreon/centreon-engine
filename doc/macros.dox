@@ -2,17 +2,17 @@
  *  @page understandingmacrosandhowtheywork Understanding Macros and How They Work
  *  @section understandingmacrosandhowtheyworkmacros Macros
  *
- *  One of the main features that make Centreon Scheduler so flexible is
+ *  One of the main features that make Centreon Engine so flexible is
  *  the ability to use macros in command defintions. Macros allow you
  *  to reference information from hosts, services, and other sources in
  *  your commands.
  *
  *  @section understandingmacrosandhowtheyworkmacrosubstitutionhowmacroswork Macro Substitution - How Macros Work
  *
- *  Before Centreon Scheduler executes a command, it will replace any
+ *  Before Centreon Engine executes a command, it will replace any
  *  macros it finds in the command definition with their corresponding
  *  values. This macro substitution occurs for all types of commands
- *  that Centreon Scheduler executes - host and service checks,
+ *  that Centreon Engine executes - host and service checks,
  *  notifications, event handlers, etc.
  *
  *  Certain macros may themselves contain other macros. These include
@@ -36,7 +36,7 @@
  *
  *  define command{
  *    command_name check_ping
- *    command_line /usr/local/centscheduler/libexec/check_ping -H $HOSTADDRESS$ -w 100.0,90% -c 200.0,60%
+ *    command_line /usr/local/centengine/libexec/check_ping -H $HOSTADDRESS$ -w 100.0,90% -c 200.0,60%
  *  }
  *  @endcode
  *
@@ -44,7 +44,7 @@
  *  command would look like this:
  *
  *  @code
- *  /usr/local/centscheduler/libexec/check_ping -H 192.168.1.2 -w 100.0,90% -c 200.0,60%
+ *  /usr/local/centengine/libexec/check_ping -H 192.168.1.2 -w 100.0,90% -c 200.0,60%
  *  @endcode
  *
  *  Pretty simple, right? The beauty in this is that you can use a
@@ -71,7 +71,7 @@
  *  @endcode
  *
  *  In the example above, the service check command has two arguments
- *  (which can be referenced with @ref standardmacrosincentschedulermacroavailabilitychartarg "$ARGn$"
+ *  (which can be referenced with @ref standardmacrosincentenginemacroavailabilitychartarg "$ARGn$"
  *  macros). The $ARG1$ macro will be "200.0,80%" and $ARG2$
  *  will be "400.0,40%" (both without quotes). Assuming we are using the
  *  host definition given earlier and a check_ping command defined like
@@ -80,7 +80,7 @@
  *  @code
  *  define command{
  *    command_name check_ping
- *    command_line /usr/local/centscheduler/libexec/check_ping -H $HOSTADDRESS$ -w $ARG1$ -c $ARG2$
+ *    command_line /usr/local/centengine/libexec/check_ping -H $HOSTADDRESS$ -w $ARG1$ -c $ARG2$
  *  }
  *  @endcode
  *
@@ -88,7 +88,7 @@
  *  check command would look like this:
  *
  *  @code
- *  /usr/local/centscheduler/libexec/check_ping -H 192.168.1.2 -w 200.0,80% -c 400.0,40%
+ *  /usr/local/centengine/libexec/check_ping -H 192.168.1.2 -w 200.0,80% -c 400.0,40%
  *  @endcode
  *
  *  @note Tip: If you need to pass bang (!) characters in your command
@@ -102,7 +102,7 @@
  *  definitions, they refer to values for the host or service for which
  *  the command is being run. For instance, if a host check command is
  *  being executed for a host named "linuxbox", all the @ref
- *  standardmacrosincentscheduler "standard host macros" will refer to values
+ *  standardmacrosincentengine "standard host macros" will refer to values
  *  for that host ("linuxbox").
  *
  *  If you would like to reference values for another host or service
@@ -115,7 +115,7 @@
  *  - $SERVICEMACRONAME:host_name:service_description$
  *
  *  Replace HOSTMACRONAME and SERVICEMACRONAME with the name of one of
- *  the standard host of service macros found @ref standardmacrosincentscheduler "here".
+ *  the standard host of service macros found @ref standardmacrosincentengine "here".
  *
  *  Note that the macro name is separated from the host or service
  *  identifier by a colon (:). For on-demand service macros, the
@@ -157,7 +157,7 @@
  *
  *  Replace HOSTMACRONAME, SERVICEMACRONAME, and CONTACTMACRONAME with
  *  the name of one of the standard host, service, or contact macros
- *  found @ref standardmacrosincentscheduler "here". The delimiter you specify
+ *  found @ref standardmacrosincentengine "here". The delimiter you specify
  *  is used to separate macro values for each group member.
  *
  *  For example, the following macro will return a comma-separated list
@@ -207,16 +207,16 @@
  *  the setting of the @ref mainconfigurationfileoptionsconfigurationfilevariablesillegalmacrooutputcharacters
  *  "illegal_macro_output_chars" directive. The following macros
  *  are stripped of potentially dangerous characters:
- *  - @ref standardmacrosincentschedulermacroavailabilitycharthostoutput "$HOSTOUTPUT$"
- *  - @ref standardmacrosincentschedulermacroavailabilitychartlonghostoutput "$LONGHOSTOUTPUT$"
- *  - @ref standardmacrosincentschedulermacroavailabilitycharthostperfdata "$HOSTPERFDATA$"
- *  - @ref standardmacrosincentschedulermacroavailabilitycharthostackauthor "$HOSTACKAUTHOR$"
- *  - @ref standardmacrosincentschedulermacroavailabilitycharthostcheckcommand "$HOSTACKCOMMENT$"
- *  - @ref standardmacrosincentschedulermacroavailabilitychartserviceoutput "$SERVICEOUTPUT$"
- *  - @ref standardmacrosincentschedulermacroavailabilitychartlongserviceoutput "$LONGSERVICEOUTPUT$"
- *  - @ref standardmacrosincentschedulermacroavailabilitychartserviceperfdata "$SERVICEPERFDATA$"
- *  - @ref standardmacrosincentschedulermacroavailabilitychartserviceackauthor "$SERVICEACKAUTHOR$"
- *  - @ref standardmacrosincentschedulermacroavailabilitychartserviceackcomment "$SERVICEACKCOMMENT$"
+ *  - @ref standardmacrosincentenginemacroavailabilitycharthostoutput "$HOSTOUTPUT$"
+ *  - @ref standardmacrosincentenginemacroavailabilitychartlonghostoutput "$LONGHOSTOUTPUT$"
+ *  - @ref standardmacrosincentenginemacroavailabilitycharthostperfdata "$HOSTPERFDATA$"
+ *  - @ref standardmacrosincentenginemacroavailabilitycharthostackauthor "$HOSTACKAUTHOR$"
+ *  - @ref standardmacrosincentenginemacroavailabilitycharthostcheckcommand "$HOSTACKCOMMENT$"
+ *  - @ref standardmacrosincentenginemacroavailabilitychartserviceoutput "$SERVICEOUTPUT$"
+ *  - @ref standardmacrosincentenginemacroavailabilitychartlongserviceoutput "$LONGSERVICEOUTPUT$"
+ *  - @ref standardmacrosincentenginemacroavailabilitychartserviceperfdata "$SERVICEPERFDATA$"
+ *  - @ref standardmacrosincentenginemacroavailabilitychartserviceackauthor "$SERVICEACKAUTHOR$"
+ *  - @ref standardmacrosincentenginemacroavailabilitychartserviceackcomment "$SERVICEACKCOMMENT$"
  *
  *  Additionally, any macros that contain @link customobjectvariables
  *  custom variables @endlink are stripped for safety and security.
@@ -225,21 +225,21 @@
  *
  *  Most macros are made available as environment variables for easy
  *  reference by scripts or commands that are executed by Centreon
- *  Scheduler. For purposes of security and sanity,
- *  @ref standardmacrosincentschedulermacroavailabilitychartuser "$USERn$" and "on-demand" host and
+ *  Engine. For purposes of security and sanity,
+ *  @ref standardmacrosincentenginemacroavailabilitychartuser "$USERn$" and "on-demand" host and
  *  service macros are not made available as environment variables.
  *
  *  Environment variables that contain standard macros are named the
  *  same as their corresponding macro names (listed
- *  @link standardmacrosincentscheduler here @endlink), with "NAGIOS_" prepended to their
- *  names. For example, the @ref standardmacrosincentschedulermacroavailabilitycharthostname "$HOSTNAME$"
+ *  @link standardmacrosincentengine here @endlink), with "NAGIOS_" prepended to their
+ *  names. For example, the @ref standardmacrosincentenginemacroavailabilitycharthostname "$HOSTNAME$"
  *  macro would be available as an environment variable named
  *  "NAGIOS_HOSTNAME".
  *
  *  @section understandingmacrosandhowtheyworkavailablemacros Available Macros
  *
- *  A list of all the macros that are available in Centreon Scheduler,
+ *  A list of all the macros that are available in Centreon Engine,
  *  as well as a chart of when they can be used, can be found @link
- *  standardmacrosincentscheduler here @endlink.
+ *  standardmacrosincentengine here @endlink.
  */
 

@@ -10,7 +10,7 @@
  *  occurs.
  *
  *  An obvious use for event handlers is the ability for Centreon
- *  Scheduler to proactively fix problems before anyone is notified.
+ *  Engine to proactively fix problems before anyone is notified.
  *  Some other uses for event handlers include:
  *
  *  - Restarting a failed service
@@ -90,13 +90,13 @@
  *  prompt. At a minimum, the scripts should take the following @link
  *  understandingmacrosandhowtheywork macros @endlink as arguments:
  *
- *  For Services: @ref standardmacrosincentschedulermacroavailabilitychartservicestate "$SERVICESTATE$",
- *  @ref standardmacrosincentschedulermacroavailabilitychartservicestatetype "$SERVICESTATETYPE$",
- *  @ref standardmacrosincentschedulermacroavailabilitychartserviceattempt "$SERVICEATTEMPT$",
+ *  For Services: @ref standardmacrosincentenginemacroavailabilitychartservicestate "$SERVICESTATE$",
+ *  @ref standardmacrosincentenginemacroavailabilitychartservicestatetype "$SERVICESTATETYPE$",
+ *  @ref standardmacrosincentenginemacroavailabilitychartserviceattempt "$SERVICEATTEMPT$",
  *
- *  For Hosts: @ref standardmacrosincentschedulermacroavailabilitycharthoststate "$HOSTSTATE$",
- *  @ref standardmacrosincentschedulermacroavailabilitycharthoststatetype "$HOSTSTATETYPE$",
- *  @ref standardmacrosincentschedulermacroavailabilitycharthostattempt "$HOSTATTEMPT$"
+ *  For Hosts: @ref standardmacrosincentenginemacroavailabilitycharthoststate "$HOSTSTATE$",
+ *  @ref standardmacrosincentenginemacroavailabilitycharthoststatetype "$HOSTSTATETYPE$",
+ *  @ref standardmacrosincentenginemacroavailabilitycharthostattempt "$HOSTATTEMPT$"
  *
  *  The scripts should examine the values of the arguments passed to it
  *  and take any necessary action based upon those values. The best way
@@ -104,7 +104,7 @@
  *  for you, one is provided @ref eventhandlersserviceeventhandlerexample "below".
  *
  *  @note Tip: Additional sample event handler scripts can be found in the
- *  contrib/eventhandlers/ subdirectory of the Centreon Scheduler
+ *  contrib/eventhandlers/ subdirectory of the Centreon Engine
  *  distribution. Some of these sample scripts demonstrate the use of
  *  @link externalcommands external commands @endlink to implement a
  *  @link redundantandfailovernetworkmonitoring redundant @endlink and @link distributedmonitoring
@@ -113,14 +113,14 @@
  *  @section eventhandlerspermissionsforeventhandlercommands Permissions For Event Handler Commands
  *
  *  Event handler commands will normally execute with the same
- *  permissions as the user under which Centreon Scheduler is running on
+ *  permissions as the user under which Centreon Engine is running on
  *  your machine. This can present a problem if you want to write an
  *  event handler that restarts system services, as root privileges are
  *  generally required to do these sorts of tasks.
  *
  *  Ideally you should evaluate the types of event handlers you will be
  *  implementing and grant just enough permissions to the Centreon
- *  Scheduler user for executing the necessary system commands. You
+ *  Engine user for executing the necessary system commands. You
  *  might want to try using <a href="http://www.courtesan.com/sudo/sudo.html">
  *  sudo</a> to accomplish this.
  *
@@ -153,12 +153,12 @@
  *  @code
  *  define command{
  *    command_name restart-httpd
- *    command_line /usr/local/centscheduler/libexec/eventhandlers/restart-httpd $SERVICESTATE$ $SERVICESTATETYPE$ $SERVICEATTEMPT$
+ *    command_line /usr/local/centengine/libexec/eventhandlers/restart-httpd $SERVICESTATE$ $SERVICESTATETYPE$ $SERVICEATTEMPT$
  *  }
  *  @endcode
  *
  *  Now, let's actually write the event handler script (this is the
- *  /usr/local/centscheduler/libexec/eventhandlers/restart-httpd
+ *  /usr/local/centengine/libexec/eventhandlers/restart-httpd
  *  script).
  *
  *  @code
@@ -185,7 +185,7 @@
  *      # Aha! The HTTP service appears to have a problem - perhaps we should restart the server...
  *  	# Is this a "soft" or a "hard" state?
  *  	case "$2" in
- *  	  # We're in a "soft" state, meaning that Centreon Scheduler is in the middle of retrying the
+ *  	  # We're in a "soft" state, meaning that Centreon Engine is in the middle of retrying the
  *  	  # check before it turns into a "hard" state and contacts get notified...
  *  	  SOFT)
  *  	    # What check attempt are we on? We don't want to restart the web server on the first
@@ -231,7 +231,7 @@
  *  include a fallback case in the event it doesn't work the first
  *  time. It should be noted that the event handler will only be
  *  executed the first time that the service falls into a HARD problem
- *  state. This prevents Centreon Scheduler from continuously executing
+ *  state. This prevents Centreon Engine from continuously executing
  *  the script to restart the web server if the service remains in a
  *  HARD problem state. You don't want that. :-)
  *

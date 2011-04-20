@@ -6,22 +6,22 @@ error_reporting(E_ALL);
 define('NL', "\n");
 
 define('BIN_NAGIOS', '/home/merethis/nagios/nagios');
-define('BIN_CENTSCHEDULER', '/home/merethis/scheduler/centscheduler');
+define('BIN_CENTENGINE', '/home/merethis/engine/centengine');
 
 define('BIN_NAGIOSTATS', '/home/merethis/nagios/nagiostats');
-define('BIN_CENTSCHEDULERSTATS', '/home/merethis/scheduler/centschedulerstats');
+define('BIN_CENTENGINESTATS', '/home/merethis/engine/centenginestats');
 
 define('FILE_NAGIOS_CONFIGURATION', '/home/merethis/nagios/etc/nagios.cfg');
-define('FILE_CENTSCHEDULER_CONFIGURATION', '/home/merethis/scheduler/etc/nagios.cfg');
+define('FILE_CENTENGINE_CONFIGURATION', '/home/merethis/engine/etc/nagios.cfg');
 
 define('FILE_NAGIOS_SERVICES', '/home/merethis/nagios/etc/objects/services.cfg');
-define('FILE_CENTSCHEDULER_SERVICES', '/home/merethis/scheduler/etc/objects/services.cfg');
+define('FILE_CENTENGINE_SERVICES', '/home/merethis/engine/etc/objects/services.cfg');
 
 define('DIR_NAGIOS_REPORT', '/home/merethis/nagios/log');
-define('DIR_CENTSCHEDULER_REPORT', '/home/merethis/scheduler/log');
+define('DIR_CENTENGINE_REPORT', '/home/merethis/engine/log');
 
 define('DIR_NAGIOS_VAR', '/home/merethis/nagios/var');
-define('DIR_CENTSCHEDULER_VAR', '/home/merethis/nagios/var');
+define('DIR_CENTENGINE_VAR', '/home/merethis/nagios/var');
 
 function usage($appname)
 {
@@ -133,15 +133,15 @@ if ($argc != 3 || is_numeric($argv[1]) === FALSE || is_numeric($argv[2]) === FAL
   usage($argv[0]);
 
 my_kill(BIN_NAGIOS);
-my_kill(BIN_CENTSCHEDULER);
+my_kill(BIN_CENTENGINE);
 
 $time = intval($argv[1]);
 $nb_check = intval($argv[2]);
 $nagios_latency = 0;
-$centscheduler_latency = 0;
+$centengine_latency = 0;
 $timeout = $time / 2;
 
-while ($nagios_latency < $timeout || $centscheduler_latency < $timeout)
+while ($nagios_latency < $timeout || $centengine_latency < $timeout)
   {
     if (($config = generate_configuration($nb_check)) === FALSE)
       exit('error: generate_configuration failed'.NL);
@@ -162,16 +162,16 @@ while ($nagios_latency < $timeout || $centscheduler_latency < $timeout)
                                    $time);
       }
 
-    if ($centscheduler_latency < $timeout)
+    if ($centengine_latency < $timeout)
       {
-       echo 'run_check: centscheduler'.NL;
-      $centscheduler_latency = run_check(FILE_CENTSCHEDULER_SERVICES,
-                                         FILE_CENTSCHEDULER_CONFIGURATION,
+       echo 'run_check: centengine'.NL;
+      $centengine_latency = run_check(FILE_CENTENGINE_SERVICES,
+                                         FILE_CENTENGINE_CONFIGURATION,
 					 $config,
-					 BIN_CENTSCHEDULER,
-					 BIN_CENTSCHEDULERSTATS,
-					 DIR_CENTSCHEDULER_REPORT.'/'.$filename_report,
-                                         DIR_CENTSCHEDULER_VAR,
+					 BIN_CENTENGINE,
+					 BIN_CENTENGINESTATS,
+					 DIR_CENTENGINE_REPORT.'/'.$filename_report,
+                                         DIR_CENTENGINE_VAR,
 					 $nb_check,
                                          $time);
       }

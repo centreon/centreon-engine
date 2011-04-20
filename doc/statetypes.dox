@@ -8,7 +8,7 @@
  *  etc.)
  *  - Tye type of state the service or host is in
  *
- *  There are two state types in Centreon Scheduler - SOFT states and
+ *  There are two state types in Centreon Engine - SOFT states and
  *  HARD states. These state types are a crucial part of the monitoring
  *  logic, as they are used to determine when @link eventhandlers.html
  *  event handlers @endlink are executed and when @link
@@ -20,7 +20,7 @@
  *  @section statetypesserviceandhostcheckretries Service and Host Check Retries
  *
  *  In order to prevent false alarms from transient problems, Centreon
- *  Scheduler allows you to define how many times a service or host
+ *  Engine allows you to define how many times a service or host
  *  should be (re)checked before it is considered to have a "real"
  *  problem. This is controlled by the max_check_attempts option in the
  *  host and service definitions. Understanding how hosts and services
@@ -52,8 +52,8 @@
  *  particularly useful if you want to try and proactively fix a
  *  problem before it turns into a HARD state.
  *
- *  The @ref standardmacrosincentschedulermacroavailabilitycharthoststatetype "$HOSTSTATETYPE$" or
- *  @ref standardmacrosincentschedulermacroavailabilitychartservicestatetype "$SERVICESTATETYPE$"
+ *  The @ref standardmacrosincentenginemacroavailabilitycharthoststatetype "$HOSTSTATETYPE$" or
+ *  @ref standardmacrosincentenginemacroavailabilitychartservicestatetype "$SERVICESTATETYPE$"
  *  macros will have a value of "SOFT" when event handlers are
  *  executed, which allows your event handler scripts to know when they
  *  should take corrective action. More information on event handlers
@@ -85,8 +85,8 @@
  *  - Contacts are notifified of the host or service problem or
  *  recovery.
  *
- *  The @ref standardmacrosincentschedulermacroavailabilitycharthoststatetype "$HOSTSTATETYPE$" or
- *  @ref standardmacrosincentschedulermacroavailabilitychartservicestatetype "$SERVICESTATETYPE$"
+ *  The @ref standardmacrosincentenginemacroavailabilitycharthoststatetype "$HOSTSTATETYPE$" or
+ *  @ref standardmacrosincentenginemacroavailabilitychartservicestatetype "$SERVICESTATETYPE$"
  *  macros will have a value of "HARD" when event handlers are
  *  executed, which allows your event handler scripts to know when they
  *  should take corrective action. More information on event handlers

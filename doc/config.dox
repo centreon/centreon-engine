@@ -4,12 +4,12 @@
  *
  *  There are several different configuration files that you're going
  *  to need to create or edit before you start monitoring anything. Be
- *  patient! Configuring Centreon Scheduler can take quite a while,
+ *  patient! Configuring Centreon Engine can take quite a while,
  *  especially if you're first-time user. Once you figure out how
  *  things work, it'll all be well worth your time. :-)
  *
  *  @note Sample configuration files are installed in the
- *  /usr/local/centscheduler/etc/ directory when you follow the @link
+ *  /usr/local/centengine/etc/ directory when you follow the @link
  *  quickstartinstallationguides quickstart installation guide @endlink.
  *
  *  @image html configoverview.png
@@ -19,7 +19,7 @@
  *  Configuration File
  *
  *  The main configuration file contains a number of directives that
- *  affect how the Centreon Scheduler daemon operates. This is where
+ *  affect how the Centreon Engine daemon operates. This is where
  *  you're going to want to get started in your configuration
  *  adventures.
  *

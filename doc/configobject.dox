@@ -29,14 +29,14 @@
  *
  *  @note Tip: When you follow @link quickstartinstallationguides quickstart
  *  installation guide @endlink, several sample object configuration
- *  files are placed in /usr/local/centscheduler/etc/objects/. You can
+ *  files are placed in /usr/local/centengine/etc/objects/. You can
  *  use these sample files to see how object inheritance works and learn
  *  how to define your own object definitions.
  *
  *  @section objectconfigurationoverviewhowareobjectsdefined How Are Objects Defined?
  *
  *  Objects are defined in a flexible template format, which can make
- *  it much easier to manage your Centreon Scheduler configuration in
+ *  it much easier to manage your Centreon Engine configuration in
  *  the long term. Basic information on how to define objects in your
  *  configuration files can be found @link objectdefinitions here
  *  @endlink.
@@ -67,7 +67,7 @@
  *
  *  @ref objectdefinitionsobjecttypeshostgroupdefinition "Host Groups" are
  *  groups of one or more hosts. Host groups can make it easier to
- *  (1) view the status of related hosts in the Centreon Scheduler web
+ *  (1) view the status of related hosts in the Centreon Engine web
  *  interface and (2) simplify your configuration through the use of
  *  @link timesavingtricksforobjectdefinitions object tricks @endlink.
  *
@@ -84,7 +84,7 @@
  *  @ref objectdefinitionsobjecttypesservicegroupdefinition "Services Groups"
  *  are groups of one or more services. Service groups can make it
  *  easier to (1) view the status of related services in the Centreon
- *  Scheduler web interface and (2) simplify your configuration through
+ *  Engine web interface and (2) simplify your configuration through
  *  the use of @link timesavingtricksforobjectdefinitions object tricks @endlink.
  *
  *  @image html objects-services.png
@@ -117,7 +117,7 @@
  *  @image latex objects-timeperiods.eps
  *
  *  @ref objectdefinitionsobjecttypescommanddefinition "Commands" are used to
- *  tell Centreon Scheduler what programs, scripts, etc. it should
+ *  tell Centreon Engine what programs, scripts, etc. it should
  *  execute to perform:
  *  - Host and service checks
  *  - Notifications

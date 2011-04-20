@@ -3,7 +3,7 @@
  *  @section faststartupoptionsintroduction Introduction
  *
  *  There are a few things you can do that can decrease the amount of
- *  time it take Centreon Scheduler to startup (or restart). These
+ *  time it take Centreon Engine to startup (or restart). These
  *  speedups involve easing some of the burden involved in processing
  *  your configuration files.
  *
@@ -15,7 +15,7 @@
  *
  *  @section faststartupoptionsbackground Background
  *
- *  Whenever Centreon Scheduler starts/restarts it has to process your
+ *  Whenever Centreon Engine starts/restarts it has to process your
  *  configuration files before it can get down to the business of
  *  monitoring. This configuration startup process involves a number of
  *  steps:
@@ -38,21 +38,21 @@
  *
  *  Before we get on to making things faster, we need to see what's
  *  possible and whether or not we should even bother with the whole
- *  thing. This is easy to do - simply start centscheduler with the -s
+ *  thing. This is easy to do - simply start centengine with the -s
  *  command line switch to get timing and scheduling information.
  *
  *  An example of the output (abbreviated to only show relevant
  *  portions) is shown below. For this example, I'm using a Centreon
- *  Scheduler config that has 25 hosts defined and just over 10,000
+ *  Engine config that has 25 hosts defined and just over 10,000
  *  services.
  *
  *  @code
- *  /usr/local/centscheduler/bin/centscheduler -s /usr/local/centscheduler/etc/centscheduler.cfg
+ *  /usr/local/centengine/bin/centengine -s /usr/local/centengine/etc/centengine.cfg
  *
- *  Centreon Scheduler 3.0-prealpha
+ *  Centreon Engine 3.0-prealpha
  *
  *  Copyright (c) 1999-2007 Ethan Galstad
- *  (http://www.centscheduler.org)
+ *  (http://www.centengine.org)
  *  Last Modified: 01-27-2007
  *  License: GPL
  *
@@ -101,15 +101,15 @@
  *  Okay, lets see what happened. Looking at the totals, it took
  *  roughly 11.6 seconds to process the configuration files and another
  *  56 seconds to verify the config. That means that every time I start
- *  or restart Centreon Scheduler with this configuration, it will take
+ *  or restart Centreon Engine with this configuration, it will take
  *  nearly 68 seconds of startup work before it can monitor anything!
- *  That's not acceptable if I have to restart Centreon Scheduler on a
+ *  That's not acceptable if I have to restart Centreon Engine on a
  *  semi-regular basis.
  *
  *  What can I do about this? Take another look at the output and
- *  you'll see that Centreon Scheduler estimates that I could save about
+ *  you'll see that Centreon Engine estimates that I could save about
  *  8.4 seconds off the configuration processing time and another 54.7
- *  off the verification times. In total, Centreon Scheduler thinks I
+ *  off the verification times. In total, Centreon Engine thinks I
  *  could save 63 seconds of the normal startup time if some
  *  optimizations were taken.
  *
@@ -118,26 +118,26 @@
  *
  *  @section faststartupoptionsprecachingobjectconfiguration Pre-Caching Object Configuration
  *
- *  Centreon Scheduler can spend quite a bit of time parsing your config
+ *  Centreon Engine can spend quite a bit of time parsing your config
  *  files, especially if you make use of the template features such as
  *  inheritance, etc. In order to reduce the time it takes to parse
- *  your config, you can have Centreon Scheduler pre-process and
+ *  your config, you can have Centreon Engine pre-process and
  *  pre-cache your config files for future use.
  *
- *  When you run Centreon Scheduler with the -p command line option,
- *  Centreon Scheduler will read your config files in, process them,
+ *  When you run Centreon Engine with the -p command line option,
+ *  Centreon Engine will read your config files in, process them,
  *  and save them to a pre-cached object config file (specified by the
  *  @ref mainconfigurationfileoptionsconfigurationfilevariablesprecachedobjectfile
  *  "precached_object_file" directive). This pre-cached config file will contain
  *  pre-processed configuration entries that are easier/faster for
- *  Centreon Scheduler to process in the future.
+ *  Centreon Engine to process in the future.
  *
  *  You must use the -p command line option along with either the -v or
  *  -s command line options, as shown below. This ensures that your
  *  configuration is verified before the precached file is created.
  *
  *  @code
- *  /usr/local/centscheduler/bin/centscheduler -pv /usr/local/centscheduler/etc/centscheduler.cfg
+ *  /usr/local/centengine/bin/centengine -pv /usr/local/centengine/etc/centengine.cfg
  *  @endcode
  *
  *  The size of your precached config file will most likely be
@@ -148,18 +148,18 @@
  *  @image latex fast-startup1.eps
  *
  *  Once the precached object configuration file have been created, you
- *  can start Centreon Scheduler and tell it to use the precached config
+ *  can start Centreon Engine and tell it to use the precached config
  *  file instead of your object config file(s) by using the -u command
  *  line option.
  *
  *  @code
- *  /usr/local/centscheduler/bin/centscheduler -ud /usr/local/centscheduler/etc/centscheduler.cfg
+ *  /usr/local/centengine/bin/centengine -ud /usr/local/centengine/etc/centengine.cfg
  *  @endcode
  *
  *  @warning If you modify your configuration files, you will need to
  *  re-verify and re-cache your configuration files before restarting
- *  Centreon Scheduler. If you don't re-generate the precached object
- *  file, Centreon Scheduler will continue to use your old configuration
+ *  Centreon Engine. If you don't re-generate the precached object
+ *  file, Centreon Engine will continue to use your old configuration
  *  because it is now reading from the precached file, rather than your
  *  source configuration files.
  *
@@ -177,25 +177,25 @@
  *  circular patch check is designed to ensure that you don't define
  *  any circular paths in your host, host dependency, or service
  *  dependency definitions. If a circular path existed in your config
- *  files, Centreon Scheduler could end up in a deadlock situation. The
+ *  files, Centreon Engine could end up in a deadlock situation. The
  *  most likely reason for the check taking so long is that I'm not
  *  using an efficient algorithm. A much more efficient algorithm for
  *  detecting circular paths would be most welcomed. Hint: That means
  *  all you CompSci graduate students who have been emailing me about
- *  doing your thesis on Centreon Scheduler can contribute some code
+ *  doing your thesis on Centreon Engine can contribute some code
  *  back. :-)
  *
- *  If you want to skip the circular path check when Centreon Scheduler
+ *  If you want to skip the circular path check when Centreon Engine
  *  starts, you can add the -x command line option like this:
  *
  *  @code
- *  /usr/local/centscheduler/bin/centscheduler -xd /usr/local/centscheduler/etc/centscheduler.cfg
+ *  /usr/local/centengine/bin/centengine -xd /usr/local/centengine/etc/centengine.cfg
  *  @endcode
  *
  *  @warning It is of utmost importance that you verify your
- *  configuration before starting/restarting Centreon Scheduler when
+ *  configuration before starting/restarting Centreon Engine when
  *  skipping circular path checks. Failure to do so could lead to
- *  deadlocks in the Centreon Scheduler logic. You have been warned.
+ *  deadlocks in the Centreon Engine logic. You have been warned.
  *
  *  @section faststartupoptionsputtingitalltogether Putting It All Together
  *
@@ -207,25 +207,25 @@
  *  following command:
  *
  *  @code
- *  /usr/local/centscheduler/bin/centscheduler -vp /usr/local/centscheduler/etc/centscheduler.cfg
+ *  /usr/local/centengine/bin/centengine -vp /usr/local/centengine/etc/centengine.cfg
  *  @endcode
  *
- *  2. Stop Centreon Scheduler if it is currently running.
+ *  2. Stop Centreon Engine if it is currently running.
  *
- *  3. Start Centreon Scheduler like so to use the precached config file
+ *  3. Start Centreon Engine like so to use the precached config file
  *  and skip circular path checks:
  *
  *  @code
- *  /usr/local/centscheduler/bin/centscheduler -uxd /usr/local/centscheduler/etc/centscheduler.cfg
+ *  /usr/local/centengine/bin/centengine -uxd /usr/local/centengine/etc/centengine.cfg
  *  @endcode
  *
  *  4. When you modify your original configuration files in the future
- *  and need to restart Centreon Scheduler to make those changes take
+ *  and need to restart Centreon Engine to make those changes take
  *  place, repeat step 1 to re-verify your config and regenerate your
  *  cached config file. Once that is done you can restart Centreon
- *  Scheduler through the web interface or by sending a SIGHUP signal.
+ *  Engine through the web interface or by sending a SIGHUP signal.
  *  If you don't re-generate the precached object file, Centreon
- *  Scheduler will continue to use your old confguration because it is
+ *  Engine will continue to use your old confguration because it is
  *  now reading from the precached file, rather than your source
  *  configuration files.
  *

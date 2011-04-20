@@ -2,7 +2,7 @@
  *  @page performancedata Performance Data
  *  @section performancedataintroduction Introduction
  *
- *  Centreon Scheduler is designed to allow @link plugins.html plugins
+ *  Centreon Engine is designed to allow @link plugins.html plugins
  *  @endlink to return optional performance data in addition to normal
  *  status data, as well as allow you to pass that performance data to
  *  external applications for processing. A description of the
@@ -12,7 +12,7 @@
  *  @section performancedatatypesofperformancedata Types of Performance Data
  *
  *  There are two basic categories of performance data that can be
- *  obtained from Centreon Scheduler:
+ *  obtained from Centreon Engine:
  *  - Check performance data
  *  - Plugin performance data
  *
@@ -22,12 +22,12 @@
  *  from its scheduled execution time) and the number of seconds a host
  *  or service check took to execute. This type of performance data is
  *  available for all checks that are performed. The
- *  @ref standardmacrosincentschedulermacroavailabilitycharthostexecutiontime "$HOSTEXECUTIONTIME$" and
- *  @ref standardmacrosincentschedulermacroavailabilitychartserviceexecutiontime "$SERVICEEXECUTIONTIME$"
+ *  @ref standardmacrosincentenginemacroavailabilitycharthostexecutiontime "$HOSTEXECUTIONTIME$" and
+ *  @ref standardmacrosincentenginemacroavailabilitychartserviceexecutiontime "$SERVICEEXECUTIONTIME$"
  *  @ref understandingmacrosandhowtheywork "macros" can be used to determine
  *  the number of seconds a host or service check was running and the
- *  @ref standardmacrosincentschedulermacroavailabilitycharthostlatency "$HOSTLATENCY$" and
- *  @ref standardmacrosincentschedulermacroavailabilitychartservicelatency "$SERVICELATENCY$" macros can
+ *  @ref standardmacrosincentenginemacroavailabilitycharthostlatency "$HOSTLATENCY$" and
+ *  @ref standardmacrosincentenginemacroavailabilitychartservicelatency "$SERVICELATENCY$" macros can
  *  be used to determine how "late" a regularly-scheduled host or
  *  service check was.
  *
@@ -38,16 +38,16 @@
  *  that the plugin is measuring when it executes. Plugin-specific
  *  performance data is optional and may not be supported by all
  *  plugins. Plugin-specific performance data (if available) can be
- *  obtained by using the @ref standardmacrosincentschedulermacroavailabilitycharthostperfdata
- *  "$HOSTPERFDATA$" and @ref standardmacrosincentschedulermacroavailabilitychartserviceperfdata
+ *  obtained by using the @ref standardmacrosincentenginemacroavailabilitycharthostperfdata
+ *  "$HOSTPERFDATA$" and @ref standardmacrosincentenginemacroavailabilitychartserviceperfdata
  *  "$SERVICEPERFDATA$" @ref understandingmacrosandhowtheywork "macros". Read
  *  on for more information on how plugins can return performance data
- *  to Centreon Scheduler for inclusion in the $HOSTPERFDATA$ and
+ *  to Centreon Engine for inclusion in the $HOSTPERFDATA$ and
  *  $SERVICEPERFDATA$ macros.
  *
  *  @section performancedatapluginperformancedata Plugin Performance Data
  *
- *  At a minimum, Centreon Scheduler plugins must return a single line
+ *  At a minimum, Centreon Engine plugins must return a single line
  *  of human-readable text that indicates the status of some type of
  *  measurable data. For example, the check_ping plugin might return a
  *  line of text like the following:
@@ -74,7 +74,7 @@
  *  PING ok - Packet loss = 0%, RTA = 0.80 ms | percent_packet_loss=0, rta=0.80
  *  @endcode
  *
- *  When Centreon Scheduler sees this plugin output format it will split
+ *  When Centreon Engine sees this plugin output format it will split
  *  the output into two parts:
  *  - Everything before the pipe character is considered to be the
  *  "normal" plugin output and will be stored in either the
@@ -90,9 +90,9 @@
  *
  *  Multiple lines of performace data (as well as normal text output)
  *  can be obtained from plugins, as described in the @link
- *  centschedulerpluginapi plugin API documentation @endlink.
+ *  centenginepluginapi plugin API documentation @endlink.
  *
- *  @note The Centreon Scheduler daemon doesn't directly process plugin
+ *  @note The Centreon Engine daemon doesn't directly process plugin
  *  performance data, so it doesn't really care what the performance
  *  data looks like. There aren't really any inherent limitations on
  *  the format or content of the performance data. However, if you are
@@ -104,10 +104,10 @@
  *  @section performancedataprocessingperformancedata Processing Performance Data
  *
  *  If you want to process the performance data that is available from
- *  Centreon Scheduler and the plugins, you'll need to do the following:
+ *  Centreon Engine and the plugins, you'll need to do the following:
  *  - Enable the @ref mainconfigurationfileoptionsconfigurationfilevariablesperformancedataprocessingoption
  *  "process_performance_data" option.
- *  - Configure Centreon Scheduler so that performance data is either
+ *  - Configure Centreon Engine so that performance data is either
  *  written to files and/or processed by executing commands.
  *
  *  Read on for information on how to process performance data by
@@ -116,9 +116,9 @@
  *  @section performancedataprocessingperformancedatausingcommands Processing Performance Data Using Commands
  *
  *  The most flexible way to process performance data is by having
- *  Centreon Scheduler execute commands (that you specify) to process or
+ *  Centreon Engine execute commands (that you specify) to process or
  *  redirect the data for later processing by external applications.
- *  The commands that Centreon Scheduler executes to process host and
+ *  The commands that Centreon Engine executes to process host and
  *  service performance data are determined by the
  *  @ref mainconfigurationfileoptionsconfigurationfilevariableshostperformancedataprocessingcommand
  *  "host_perfdata_command" and @ref mainconfigurationfileoptionsconfigurationfilevariablesserviceperformancedataprocessingcommand
@@ -131,19 +131,19 @@
  *  @code
  *  define command{
  *    command_name store-service-perfdata
- *    command_line /bin/echo -e "$LASTSERVICECHECK$\t$HOSTNAME$\t$SERVICEDESC$\t$SERVICESTATE$\t$SERVICEATTEMPT$\t$SERVICESTATETYPE$\t$SERVICEEXECUTIONTIME$\t$SERVICELATENCY$\t$SERVICEOUTPUT$\t$SERVICEPERFDATA$" << /usr/local/centscheduler/var/service-perfdata.dat
+ *    command_line /bin/echo -e "$LASTSERVICECHECK$\t$HOSTNAME$\t$SERVICEDESC$\t$SERVICESTATE$\t$SERVICEATTEMPT$\t$SERVICESTATETYPE$\t$SERVICEEXECUTIONTIME$\t$SERVICELATENCY$\t$SERVICEOUTPUT$\t$SERVICEPERFDATA$" << /usr/local/centengine/var/service-perfdata.dat
  *  }
  *  @endcode
  *
  *  @note Tip: This method, while flexible, comes with a relatively high CPU
  *  overhead. If you're processing performance data for a large number
- *  of hosts and services, you'll probably want Centreon Scheduler to
+ *  of hosts and services, you'll probably want Centreon Engine to
  *  write performance data to files instead. This method is described
  *  in the next section.
  *
  *  @section performancedatawritingperformancedatatofiles Writing Performance Data To Files
  *
- *  You can have Centreon Scheduler write all host and service
+ *  You can have Centreon Engine write all host and service
  *  performance data directly to text files using the
  *  @ref mainconfigurationfileoptionsconfigurationfilevariableshostperformancedatafile
  *  "host_perfdata_file" and
@@ -170,7 +170,7 @@
  *  @ref mainconfigurationfileoptionsconfigurationfilevariablesserviceperformancedatafilemode
  *  "service_perfdata_file_mode" options.
  *
- *  Additionally, you can have Centreon Scheduler periodically execute
+ *  Additionally, you can have Centreon Engine periodically execute
  *  commands to periocially process the performance data files (e.g.
  *  rotate them) using the
  *  @ref mainconfigurationfileoptionsconfigurationfilevariableshostperformancedatafileprocessingcommand

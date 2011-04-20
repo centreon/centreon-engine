@@ -1,23 +1,23 @@
 /**
- *  @page running Running Centreon Scheduler
+ *  @page running Running Centreon Engine
  *  @section verifyconfig Verifying Your Configuration
  *
  *  Every time you modify your configuration files, you should run a
  *  sanity check on them. It is important to do this before you
- *  (re)start Centreon Scheduler, as Centreon Scheduler will shut down
+ *  (re)start Centreon Engine, as Centreon Engine will shut down
  *  if your configuration contains errors.
  *
- *  In order to verify your configuration, run Centreon Scheduler with
+ *  In order to verify your configuration, run Centreon Engine with
  *  the @b -v command line option like so:
  *  @code
- *  /usr/local/bin/centscheduler -v /etc/centreon/scheduler/scheduler.cfg
+ *  /usr/local/bin/centengine -v /etc/centreon/engine/engine.cfg
  *  @endcode
  *
  *  If you've forgotten to enter some critical data or misconfigured
- *  things, Centreon Scheduler will spit out a warning or error message
+ *  things, Centreon Engine will spit out a warning or error message
  *  that should point you to the location of the problem. Error messages
  *  generally print out the line in the configuration file that seems to
- *  be the source of the problem. On errors, Centreon Scheduler will
+ *  be the source of the problem. On errors, Centreon Engine will
  *  often exit the pre-flight check and return to the command prompt
  *  after printing only the first error that it has encountered. This is
  *  done so that one error does not cascade into multiple errors as the
@@ -27,59 +27,59 @@
  *  ignored, since they are only recommendations and not requirements.
  *
  *  Once you've verified your configuration files and fixed any errors
- *  you can go ahead and (re)start Centreon Scheduler.
+ *  you can go ahead and (re)start Centreon Engine.
  *
  *
- *  @section startingcentscheduler Starting And Stopping Centreon Scheduler
+ *  @section startingcentengine Starting And Stopping Centreon Engine
  *
  *  There's more than one way to start, stop, and restart Centreon
- *  Scheduler. Here are some of the more common ones...
+ *  Engine. Here are some of the more common ones...
  *
- *  @subsection starting Starting Centreon Scheduler
+ *  @subsection starting Starting Centreon Engine
  *
  *  @subsubsection initscript Init Script
- *  The easiest way to start the Centreon Scheduler daemon is by using
+ *  The easiest way to start the Centreon Engine daemon is by using
  *  the init script like so:
  *  @code
- *  /etc/init.d/centscheduler start
+ *  /etc/init.d/centengine start
  *  @endcode
  *
  *  @subsubsection manually Manually
- *  You can start the Centreon Scheduler daemon manually on the command
+ *  You can start the Centreon Engine daemon manually on the command
  *  line like so:
  *  @code
- *  /usr/local/bin/centscheduler /etc/centreon/scheduler/scheduler.cfg &
+ *  /usr/local/bin/centengine /etc/centreon/engine/engine.cfg &
  *  @endcode
  *
- *  @subsection restarting Restarting Centreon Scheduler
+ *  @subsection restarting Restarting Centreon Engine
  *
  *  @subsubsection initscript Init Script
- *  The easiest way to restart the centreon Scheduler daemon is by using
+ *  The easiest way to restart the centreon Engine daemon is by using
  *  the init script like so:
  *  @code
- *  /etc/init.d/centscheduler restart
+ *  /etc/init.d/centengine restart
  *  @endcode
  *
  *  @subsubsection manually Manually
- *  You can restart the Centreon Scheduler process by sending it a
+ *  You can restart the Centreon Engine process by sending it a
  *  SIGHUP signal like so:
  *  @code
- *  kill -HUP <centscheduler_pid>
+ *  kill -HUP <centengine_pid>
  *  @endcode
  *
- *  @subsection stopping Stopping Centreon Scheduler
+ *  @subsection stopping Stopping Centreon Engine
  *
  *  @subsubsection initscript Init Script
- *  The easiest way to stop the Centreon Scheduler daemon is by using
+ *  The easiest way to stop the Centreon Engine daemon is by using
  *  the init script like so:
  *  @code
- *  /etc/init.d/centscheduler stop
+ *  /etc/init.d/centengine stop
  *  @endcode
  *
  *  @subsubsection manually Manually
- *  You can stop the Centreon Scheduler process by sending it a TERM
+ *  You can stop the Centreon Engine process by sending it a TERM
  *  signal like so:
  *  @code
- *  kill -TERM <centscheduler_pid>
+ *  kill -TERM <centengine_pid>
  *  @endcode
  */

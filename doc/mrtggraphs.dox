@@ -2,22 +2,22 @@
  *  @page graphingperformanceinfowithmrtg Graphing Performance Info With MRTG
  *  @section graphingperformanceinfowithmrtgintroduction Introduction
  *
- *  The @link usingthecentschedulertatsutility centschedulertats @endlink utility
- *  allows you to graph various Centreon Scheduler performance
+ *  The @link usingthecentenginetatsutility centenginetats @endlink utility
+ *  allows you to graph various Centreon Engine performance
  *  statistics over time using <a href="http://oss.oetiker.ch/mrtg/">
  *  MRTG</a>. This is important because it can help you:
- *  - Ensure Centreon Scheduler is operating efficiently
+ *  - Ensure Centreon Engine is operating efficiently
  *  - Locate problem areas in the monitoring process
  *  - Observe the performance impacts of changes in your Centreon
- *  Scheduler configuration
+ *  Engine configuration
  *
  *  @section graphingperformanceinfowithmrtgsamplemrtgconfiguration
  *  Sample MRTG Configuration
  *
  *  Sample MRTG configuration file snippets for graphing various
- *  Centreon Scheduler performance statistics can be found in the
+ *  Centreon Engine performance statistics can be found in the
  *  mrtg.cfg file located in the sample-config/ subdirectory of the
- *  Centreon Scheduler distribution. You can create graphs of other
+ *  Centreon Engine distribution. You can create graphs of other
  *  performance information if you'd like - the samples just provide
  *  you with a good starting point.
  *
@@ -91,7 +91,7 @@
  *  average service check latency and execution times over time. Useful
  *  for understanding:
  *  - @link servicechecks.html Service checks @endlink
- *  - @link tuningcentschedulerformaximumperformance Performance tuning @endlink
+ *  - @link tuningcentengineformaximumperformance Performance tuning @endlink
  *
  *  Consistently high latencies can be an indication that one of more
  *  of the following variables need tweaking:
@@ -118,7 +118,7 @@
  *  average host check latency and execution times over time. Useful
  *  for understanding:
  *  - @link hostchecks.html Host checks @endlink
- *  - @link tuningcentschedulerformaximumperformance Performance tuning @endlink
+ *  - @link tuningcentengineformaximumperformance Performance tuning @endlink
  *
  *  Consistently high latencies can be an indication that one of more
  *  of the following variables need tweaking:
@@ -142,7 +142,7 @@
  *  @image latex mrtg-hoststatechange.eps
  *
  *  External Commands - This graph shows how may external commands have
- *  been processed by the Centreon Scheduler daemon over time. Unless
+ *  been processed by the Centreon Engine daemon over time. Unless
  *  you're processing a large number of external commands (as in the
  *  case with distributed monitoring setups), this graph may appear
  *  mostly empty. Monitoring external commands can be useful for
@@ -164,7 +164,7 @@
  *  from the time they are read from the @ref
  *  mainconfigurationfileoptionsconfigurationfilevariablesexternalcommandfile
  *  "external command file" to the
- *  time they are processed by the Centreon Scheduler daemon.
+ *  time they are processed by the Centreon Engine daemon.
  *
  *  @image html mrtg-commandbuffers.png
  *  @image latex mrtg-commandbuffers.eps
