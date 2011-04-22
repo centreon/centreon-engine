@@ -401,7 +401,7 @@ void test_configuration(QString const& filename, std::map<QString, QString>& my_
   if (my_conf["max_host_check_spread"] != obj2str(config.get_max_host_check_spread())) {
     throw (error() << "max_host_check_spread: init with '" << my_conf["max_host_check_spread"] << "'");
   }
-  if (my_conf["max_concurrent_checks"] != obj2str(config.get_max_concurrent_checks())) {
+  if (my_conf["max_concurrent_checks"] != obj2str(config.get_max_parallel_service_checks())) {
     throw (error() << "max_concurrent_checks: init with '" << my_conf["max_concurrent_checks"] << "'");
   }
   if (my_conf["check_result_reaper_frequency"] != obj2str(config.get_check_reaper_interval())) {

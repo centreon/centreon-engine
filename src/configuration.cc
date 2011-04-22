@@ -651,14 +651,6 @@ unsigned int configuration::get_max_host_check_spread() const throw() {
 }
 
 /**
- *  Get the max concurrent checks.
- *  @return The max concurrent chechs.
- */
-unsigned int configuration::get_max_concurrent_checks() const throw() {
-  return (_tab_uint[max_concurrent_checks]);
-}
-
-/**
  *  Get the max parallel service checks.
  *  @return The max parallel service checks.
  */

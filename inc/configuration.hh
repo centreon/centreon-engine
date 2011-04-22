@@ -114,7 +114,6 @@ namespace com {
 	int                 get_external_command_buffer_slots() const throw();
 	unsigned int        get_max_service_check_spread() const throw();
 	unsigned int        get_max_host_check_spread() const throw();
-	unsigned int        get_max_concurrent_checks() const throw();
 	unsigned int        get_max_parallel_service_checks() const throw();
 	unsigned int        get_check_reaper_interval() const throw();
 	unsigned int        get_max_check_reaper_time() const throw();
@@ -384,7 +383,6 @@ namespace com {
 	  debug_verbosity,
 	  max_service_check_spread,
 	  max_host_check_spread,
-	  max_concurrent_checks,
 	  max_parallel_service_checks,
 	  check_reaper_interval,
 	  max_check_reaper_time,
