@@ -477,8 +477,8 @@ namespace com {
 	void                _set_daemon_dumps_core(QString const& value);
 	void                _set_downtime_file(QString const& value);
 	void                _set_lock_file(QString const& value);
-	void                _set_nagios_user(QString const& value);
-	void                _set_nagios_group(QString const& value);
+	void                _set_user(QString const& value);
+	void                _set_group(QString const& value);
 
 	static std::string  _getline(std::ifstream& ifs) throw();
 	static std::string& _trim(std::string& str) throw();

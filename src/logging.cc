@@ -152,7 +152,7 @@ static void write_to_all_logs_with_timestamp(char* buffer,
   write_to_log(buffer, data_type, timestamp);
 }
 
-/* write something to the nagios log file */
+/* write something to the log file */
 int write_to_log(char* buffer, unsigned long data_type, time_t* timestamp) {
   FILE* fp = NULL;
   time_t log_time = 0L;
@@ -223,7 +223,7 @@ int write_to_syslog(char const* buffer, unsigned long data_type) {
   return (OK);
 }
 
-/* write a service problem/recovery to the nagios log file */
+/* write a service problem/recovery to the log file */
 int log_service_event(service* svc) {
   char* temp_buffer = NULL;
   char* processed_buffer = NULL;
@@ -437,7 +437,7 @@ int rotate_log_file(time_t rotation_time) {
   std::ostringstream oss;
   oss << config.get_log_archive_path().toStdString()
       << (config.get_log_archive_path()[config.get_log_archive_path().size() - 1] == '/' ? "" : "/")
-      << "nagios-" << std::setfill('0') << std::setw(2) << t->tm_mon + 1
+      << "centreon-engine-" << std::setfill('0') << std::setw(2) << t->tm_mon + 1
       << '-' << std::setfill('0') << std::setw(2) << t->tm_mday
       << '-' << t->tm_year + 1900
       << '-' << std::setfill('0') << std::setw(2) << t->tm_hour << ".log";

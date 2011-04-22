@@ -280,8 +280,9 @@ int main(int argc, char** argv) {
   }
 
   if (mrtg_mode == FALSE) {
-    printf("\nNagios Stats %s\n", PROGRAM_VERSION);
-    printf("Copyright (c) 2003-2008 Ethan Galstad (www.nagios.org)\n");
+    printf("\nCentreon Engine Stats %s\n", PROGRAM_VERSION);
+    printf("Copyright 2003-2008 Ethan Galstad\n");
+    printf("Copyright 2011 Merethis\n");
     printf("Last Modified: %s\n", PROGRAM_MODIFICATION_DATE);
     printf("License: GPL\n\n");
   }
@@ -313,8 +314,8 @@ int main(int argc, char** argv) {
     printf(" -h, --help         display usage information and exit.\n");
     printf("\n");
     printf("Input file:\n");
-    printf(" -c, --config=FILE  specifies location of main Nagios config file.\n");
-    printf(" -s, --statsfile=FILE  specifies alternate location of file to read Nagios\n");
+    printf(" -c, --config=FILE  specifies location of main Centreon Engine config file.\n");
+    printf(" -s, --statsfile=FILE  specifies alternate location of file to read Centreon Engine\n");
     printf("                       performance data from.\n");
     printf("\n");
     printf("Output:\n");
@@ -326,13 +327,13 @@ int main(int argc, char** argv) {
     printf("                    Defaults to a newline.\n");
     printf("\n");
     printf("MRTG DATA VARIABLES (-d option):\n");
-    printf(" PROGRUNTIME          string with time Nagios process has been running.\n");
-    printf(" PROGRUNTIMETT        time Nagios process has been running (time_t format).\n");
+    printf(" PROGRUNTIME          string with time Centreon Engine process has been running.\n");
+    printf(" PROGRUNTIMETT        time Centreon Engine process has been running (time_t format).\n");
     printf(" STATUSFILEAGE        string with age of status data file.\n");
     printf(" STATUSFILEAGETT      string with age of status data file (time_t format).\n");
-    printf(" NAGIOSVERSION        string with Nagios version.\n");
-    printf(" NAGIOSPID            pid number of Nagios deamon.\n");
-    printf(" NAGIOSVERPID         string with Nagios version and PID.\n");
+    printf(" NAGIOSVERSION        string with Centreon Engine version.\n");
+    printf(" NAGIOSPID            pid number of Centreon Engine deamon.\n");
+    printf(" NAGIOSVERPID         string with Centreon Engine version and PID.\n");
     printf(" TOTCMDBUF            total number of external command buffer slots available.\n");
     printf(" USEDCMDBUF           number of external command buffer slots currently in use.\n");
     printf(" HIGHCMDBUF           highest number of external command buffer slots ever in use.\n");
@@ -477,7 +478,7 @@ int display_mrtg_values(void) {
     else if (!strcmp(temp_ptr, "NAGIOSPID"))
       printf("%lu%s", nagios_pid, mrtg_delimiter);
     else if (!strcmp(temp_ptr, "NAGIOSVERPID"))
-      printf("Nagios %s (pid=%lu)%s", status_version, nagios_pid, mrtg_delimiter);
+      printf("Centreon Engine %s (pid=%lu)%s", status_version, nagios_pid, mrtg_delimiter);
 
 
     else if (!strcmp(temp_ptr, "TOTCMDBUF"))
@@ -788,7 +789,7 @@ int display_stats(void) {
   time_difference = (current_time - program_start);
   get_time_breakdown(time_difference, &days, &hours, &minutes, &seconds);
   printf("Program Running Time:                   %dd %dh %dm %ds\n", days, hours, minutes, seconds);
-  printf("Nagios PID:                             %lu\n", nagios_pid);
+  printf("Centreon Engine PID:                    %lu\n", nagios_pid);
   printf("Used/High/Total Command Buffers:        %d / %d / %d\n",
          used_external_command_buffer_slots,
          high_external_command_buffer_slots,
@@ -954,7 +955,7 @@ int read_config_file(void) {
   if (fp == NULL)
     return (ERROR);
 
-  /* read all lines from the main nagios config file */
+  /* read all lines from the main Centreon Engine config file */
   while (fgets(temp_buffer, sizeof(temp_buffer) - 1, fp)) {
 
     strip(temp_buffer);

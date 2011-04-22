@@ -439,11 +439,11 @@ int neb_make_callbacks(int callback_type, void* data) {
 		   callback_type,
 		   cbresult);
 
-    /* module wants to cancel callbacks to other modules (and potentially cancel the default Nagios handling of an event) */
+    /* module wants to cancel callbacks to other modules (and potentially cancel the default handling of an event) */
     if (cbresult == NEBERROR_CALLBACKCANCEL)
       break;
 
-    /* module wants to override default Nagios handling of an event */
+    /* module wants to override default handling of an event */
     /* not sure if we should bail out here just because one module wants to override things - what about other modules? EG 12/11/2006 */
     else if (cbresult == NEBERROR_CALLBACKOVERRIDE)
       break;

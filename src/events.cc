@@ -413,7 +413,7 @@ void init_timing_loop(void) {
     /* skip most services that shouldn't be scheduled */
     if (temp_service->should_be_scheduled == FALSE) {
 
-      /* passive checks are an exception if a forced check was scheduled before Nagios was restarted */
+      /* passive checks are an exception if a forced check was scheduled before Centreon Engine was restarted */
       if (!(temp_service->checks_enabled == FALSE
 	    && temp_service->next_check != (time_t)0L
 	    && (temp_service->check_options & CHECK_OPTION_FORCE_EXECUTION)))
@@ -577,7 +577,7 @@ void init_timing_loop(void) {
     /* skip most hosts that shouldn't be scheduled */
     if (temp_host->should_be_scheduled == FALSE) {
 
-      /* passive checks are an exception if a forced check was scheduled before Nagios was restarted */
+      /* passive checks are an exception if a forced check was scheduled before Centreon Engine was restarted */
       if (!(temp_host->checks_enabled == FALSE
 	    && temp_host->next_check != (time_t)0L
 	    && (temp_host->check_options & CHECK_OPTION_FORCE_EXECUTION)))
@@ -771,7 +771,7 @@ void display_scheduling_info(void) {
 
   printf("Projected scheduling information for host and service checks\n");
   printf("is listed below.  This information assumes that you are going\n");
-  printf("to start running Nagios with your current config files.\n\n");
+  printf("to start running Centreon Engine with your current config files.\n\n");
 
   printf("HOST SCHEDULING INFORMATION\n");
   printf("---------------------------\n");
@@ -1374,7 +1374,7 @@ int event_execution_loop(void) {
 	nanosleep(&delay, NULL);
       }
 
-    /* update status information occassionally - NagVis watches the NDOUtils DB to see if Nagios is alive */
+    /* update status information occassionally - NagVis watches the NDOUtils DB to see if Engine is alive */
     if ((unsigned long)(current_time - last_status_update) > 5) {
       last_status_update = current_time;
       update_program_status(FALSE);

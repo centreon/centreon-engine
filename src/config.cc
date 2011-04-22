@@ -326,7 +326,7 @@ int pre_flight_check(void) {
 
   /* check if we can write to temp_path */
   std::ostringstream oss;
-  oss << config.get_temp_path().toStdString() << "/nagiosXXXXXX";
+  oss << config.get_temp_path().toStdString() << "/centreonengineXXXXXX";
   buf = my_strdup(oss.str().c_str());
   if ((temp_path_fd = mkstemp(buf)) == -1) {
     logit(NSLOG_VERIFICATION_ERROR, TRUE,
@@ -343,7 +343,7 @@ int pre_flight_check(void) {
 
   /* check if we can write to check_result_path */
   oss.str("");
-  oss << config.get_check_result_path().toStdString() << "/nagiosXXXXXX";
+  oss << config.get_check_result_path().toStdString() << "/centreonengineXXXXXX";
   buf = my_strdup(oss.str().c_str());
   if ((temp_path_fd = mkstemp(buf)) == -1) {
     logit(NSLOG_VERIFICATION_WARNING, TRUE,

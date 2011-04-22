@@ -296,8 +296,8 @@ configuration::configuration()
   _lst_method["downtime_file"]                               = &cpp_suck<QString const&, &configuration::_set_downtime_file>::set_generic;
   _lst_method["xdddefault_downtime_file"]                    = &cpp_suck<QString const&, &configuration::_set_downtime_file>::set_generic;
   _lst_method["lock_file"]                                   = &cpp_suck<QString const&, &configuration::_set_lock_file>::set_generic;
-  _lst_method["nagios_user"]                                 = &cpp_suck<QString const&, &configuration::_set_nagios_user>::set_generic;
-  _lst_method["nagios_group"]                                = &cpp_suck<QString const&, &configuration::_set_nagios_group>::set_generic;
+  _lst_method["nagios_user"]                                 = &cpp_suck<QString const&, &configuration::_set_user>::set_generic;
+  _lst_method["nagios_group"]                                = &cpp_suck<QString const&, &configuration::_set_group>::set_generic;
   _lst_method["allow_empty_hostgroup_assignment"]            = &cpp_suck<bool, &configuration::set_allow_empty_hostgroup_assignment>::set_generic;
 
   _lst_method["status_file"]                                 = NULL; // ignore external variables
@@ -2892,17 +2892,17 @@ void configuration::_set_lock_file(QString const& value) {
 }
 
 /**
- * Nagios user ignored.
+ * User ignored.
  */
-void configuration::_set_nagios_user(QString const& value) {
+void configuration::_set_user(QString const& value) {
   (void)value;
   logit(NSLOG_CONFIG_WARNING, TRUE, "Warning: nagios_user varible ignored. Priviledge drop should be handled by startup script.");
 }
 
 /**
- * Nagios group ignored.
+ * Group ignored.
  */
-void configuration::_set_nagios_group(QString const& value) {
+void configuration::_set_group(QString const& value) {
   (void)value;
   logit(NSLOG_CONFIG_WARNING, TRUE, "Warning: nagios_group variable ignored. Priviledge drop should be handled by startup script.");
 }

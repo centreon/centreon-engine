@@ -28,8 +28,6 @@
 extern "C" {
 # endif
 
-// Nagios 3 starts at 300, Nagios 4 at 400, etc.
-
 // Current Object Revision
 # define CURRENT_OBJECT_STRUCTURE_VERSION 307 // increment when changes are made to data structures...
 

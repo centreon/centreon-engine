@@ -241,7 +241,7 @@ int my_system_r(nagios_macros* mac,
 
     if (SvTRUE(ERRSV)) {
       /*
-       * XXXX need pipe open to send the compilation failure message back to Nagios ?
+       * XXXX need pipe open to send the compilation failure message back to Centreon Engine ?
        */
       (void)POPs;
 
@@ -588,7 +588,7 @@ int my_system_r(nagios_macros* mac,
 
 /*
  * For API compatibility, we must include a my_system() whose
- * signature doesn't include the nagios_macros variable.
+ * signature doesn't include the Centreon Engine_macros variable.
  * NDOUtils uses this. Possibly other modules as well.
  */
 int my_system(char* cmd,
@@ -2577,7 +2577,7 @@ int open_command_file(void) {
 			 S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP)) != 0) {
 
       logit(NSLOG_RUNTIME_ERROR, TRUE,
-            "Error: Could not create external command file '%s' as named pipe: (%d) -> %s.  If this file already exists and you are sure that another copy of Nagios is not running, you should delete this file.\n",
+            "Error: Could not create external command file '%s' as named pipe: (%d) -> %s.  If this file already exists and you are sure that another copy of Centreon Engine is not running, you should delete this file.\n",
             config.get_command_file().toStdString().c_str(),
 	    errno,
 	    strerror(errno));
@@ -3072,7 +3072,7 @@ int file_uses_embedded_perl(char* fname) {
 
           if (fgets(linen, 80, fp)) {
 
-            /* line contains Nagios directives */
+            /* line contains Centreon Engine directives */
             if (strstr(linen, "# nagios:")) {
 
               ptr = strtok(linen, ":");
@@ -3679,12 +3679,12 @@ int generate_check_stats(void) {
 /************************* MISC FUNCTIONS *************************/
 /******************************************************************/
 
-/* returns Nagios version */
+/* returns Centreon Engine version */
 char* get_program_version(void) {
   return ((char*)PROGRAM_VERSION);
 }
 
-/* returns Nagios modification date */
+/* returns Centreon Engine modification date */
 char* get_program_modification_date(void) {
   return ((char*)PROGRAM_MODIFICATION_DATE);
 }

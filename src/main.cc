@@ -265,10 +265,6 @@ int main(int argc, char** argv) {
     printf("  -p, --precache-objects       Precache object configuration - use with -v or -s options\n");
     printf("  -u, --use-precached-objects  Use precached object config file\n");
     printf("\n");
-    printf("Visit the Nagios website at http://www.nagios.org/ for bug fixes, new\n");
-    printf("releases, online documentation, FAQs, information on subscribing to\n");
-    printf("the mailing lists, and commercial support options for Nagios.\n");
-    printf("\n");
 
     exit(ERROR);
   }
@@ -500,7 +496,7 @@ int main(int argc, char** argv) {
 
       /* this must be logged after we read config data, as user may have changed location of main log file */
       logit(NSLOG_PROCESS_INFO, TRUE,
-	    "Nagios %s starting... (PID=%d)\n", PROGRAM_VERSION, (int)getpid());
+	    "Centreon Engine %s starting... (PID=%d)\n", PROGRAM_VERSION, (int)getpid());
 
       /* log the local time - may be different than clock time due to timezone offset */
       now = time(NULL);
@@ -527,13 +523,13 @@ int main(int argc, char** argv) {
       /* there was a problem reading the config files */
       if (result != OK)
 	logit(NSLOG_PROCESS_INFO | NSLOG_RUNTIME_ERROR | NSLOG_CONFIG_ERROR, TRUE,
-	      "Bailing out due to one or more errors encountered in the configuration files. Run Nagios from the command line with the -v option to verify your config before restarting. (PID=%d)",
+	      "Bailing out due to one or more errors encountered in the configuration files. Run Centreon Engine from the command line with the -v option to verify your config before restarting. (PID=%d)",
 	      (int)getpid());
       else {
 	/* run the pre-flight check to make sure everything looks okay */
 	if ((result = pre_flight_check()) != OK)
 	  logit(NSLOG_PROCESS_INFO | NSLOG_RUNTIME_ERROR | NSLOG_VERIFICATION_ERROR, TRUE,
-		"Bailing out due to errors encountered while running the pre-flight check.  Run Nagios from the command line with the -v option to verify your config before restarting. (PID=%d)\n",
+		"Bailing out due to errors encountered while running the pre-flight check.  Run Centreon Engine from the command line with the -v option to verify your config before restarting. (PID=%d)\n",
 		(int)getpid());
       }
 
@@ -566,7 +562,7 @@ int main(int argc, char** argv) {
 
       /* initialize embedded Perl interpreter */
       /* NOTE 02/15/08 embedded Perl must be initialized if compiled in, regardless of whether or not its enabled in the config file */
-      /* It compiled it, but not initialized, Nagios will segfault in readdir() calls, as libperl takes this function over */
+      /* It compiled it, but not initialized, Centreon Engine will segfault in readdir() calls, as libperl takes this function over */
       if (embedded_perl_initialized == FALSE) {
 	/*				if(enable_embedded_perl==TRUE){*/
 #ifdef EMBEDDEDPERL
