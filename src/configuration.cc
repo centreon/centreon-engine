@@ -27,7 +27,7 @@
 #include <time.h>
 #include <pwd.h>
 #include <grp.h>
-#include "nagios.hh"
+#include "engine.hh"
 #include "logging.hh"
 #include "common.hh"
 #include "macros.hh"

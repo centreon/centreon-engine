@@ -25,7 +25,7 @@
 #include <stdio.h>
 #include <sys/stat.h>
 #include <errno.h>
-#include "nagios.hh"
+#include "engine.hh"
 #include "common.hh"
 #include "statusdata.hh"
 #include "comments.hh"

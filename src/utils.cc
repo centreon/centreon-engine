@@ -31,7 +31,7 @@
 #include <dirent.h>
 #include <poll.h>
 #include <signal.h>
-#include "nagios.hh"
+#include "engine.hh"
 #include "comments.hh"
 #include "broker.hh"
 #include "nebmods.hh"

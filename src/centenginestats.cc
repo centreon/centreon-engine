@@ -22,7 +22,7 @@
 #include <stdio.h>
 #include <errno.h>
 #include "common.hh"
-#include "nagios.hh"
+#include "engine.hh"
 
 #define STATUS_NO_DATA             0
 #define STATUS_INFO_DATA           1

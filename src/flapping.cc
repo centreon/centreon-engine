@@ -22,7 +22,7 @@
 
 #include <sstream>
 #include <iomanip>
-#include "nagios.hh"
+#include "engine.hh"
 #include "comments.hh"
 #include "statusdata.hh"
 #include "broker.hh"

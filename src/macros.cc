@@ -22,7 +22,7 @@
 #include <iomanip>
 #include <stdlib.h>
 #include <stdio.h>
-#include "nagios.hh"
+#include "engine.hh"
 #include "utils.hh"
 #include "shared.hh"
 #include "logging.hh"

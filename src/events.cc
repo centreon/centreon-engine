@@ -23,7 +23,7 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <math.h>
-#include "nagios.hh"
+#include "engine.hh"
 #include "downtime.hh"
 #include "comments.hh"
 #include "statusdata.hh"

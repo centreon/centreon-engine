@@ -40,7 +40,7 @@
 # include "utils.hh"
 # include "commands.hh"
 # include "config.hh"
-# include "nagios.hh"
+# include "engine.hh"
 
 /******* INTER-CHECK DELAY CALCULATION TYPES **********/
 

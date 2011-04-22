@@ -27,7 +27,7 @@
 #include <errno.h>
 #include <signal.h>
 #include "neberrors.hh"
-#include "nagios.hh"
+#include "engine.hh"
 #include "comments.hh"
 #include "statusdata.hh"
 #include "downtime.hh"

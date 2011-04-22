@@ -27,7 +27,7 @@
 #include <stdarg.h>
 #include <errno.h>
 #include "statusdata.hh"
-#include "nagios.hh"
+#include "engine.hh"
 #include "broker.hh"
 #include "utils.hh"
 #include "configuration.hh"

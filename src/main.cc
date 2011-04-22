@@ -39,7 +39,7 @@
 #include "logging.hh"
 #include "configuration.hh"
 #include "modules/loader.hh"
-#include "nagios.hh"
+#include "engine.hh"
 
 using namespace com::centreon::engine;
 

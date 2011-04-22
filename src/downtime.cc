@@ -21,7 +21,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "xdddefault.hh"
-#include "nagios.hh"
+#include "engine.hh"
 #include "comments.hh"
 #include "statusdata.hh"
 #include "broker.hh"

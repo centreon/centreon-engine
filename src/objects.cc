@@ -23,7 +23,7 @@
 #include "xodtemplate.hh"
 #include "skiplist.hh"
 #include "logging.hh"
-#include "nagios.hh"
+#include "engine.hh"
 #include "objects.hh"
 
 host*              host_list = NULL;

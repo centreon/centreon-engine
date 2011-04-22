@@ -22,7 +22,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <errno.h>
-#include "nagios.hh"
+#include "engine.hh"
 #include "utils.hh"
 #include "notifications.hh"
 #include "logging.hh"

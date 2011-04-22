@@ -40,7 +40,7 @@
 
 /**** CORE OR CGI SPECIFIC HEADER FILES ****/
 
-#include "nagios.hh"
+#include "engine.hh"
 
 /**** DATA INPUT-SPECIFIC HEADER FILES ****/
 

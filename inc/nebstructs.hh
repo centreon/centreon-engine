@@ -22,7 +22,7 @@
 # define CCE_NEBSTRUCTS_HH
 
 # include "objects.hh"
-# include "nagios.hh"
+# include "engine.hh"
 
 # ifdef __cplusplus
 extern "C" {

@@ -24,7 +24,7 @@
 #include <iostream>
 #include <fstream>
 #include <map>
-#include "nagios.hh"
+#include "engine.hh"
 #include "macros.hh"
 #include "error.hh"
 #include "configuration.hh"

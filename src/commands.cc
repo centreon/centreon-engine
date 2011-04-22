@@ -25,7 +25,7 @@
 #include <sys/stat.h>
 #include <sys/time.h>
 #include <errno.h>
-#include "nagios.hh"
+#include "engine.hh"
 #include "comments.hh"
 #include "downtime.hh"
 #include "statusdata.hh"
