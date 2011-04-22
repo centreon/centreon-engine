@@ -1,5 +1,5 @@
 /*
-** Copyright 2011      Merethis
+** Copyright 2011 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -385,9 +385,9 @@ configuration& configuration::operator=(configuration const& right) {
 void configuration::reset() {
   _reset();
 
-  set_temp_path(DEFAULT_TEMP_PATH);
-  set_check_result_path(DEFAULT_CHECK_RESULT_PATH);
-  set_log_archive_path(DEFAULT_LOG_ARCHIVE_PATH);
+  _tab_string[temp_path] = DEFAULT_TEMP_PATH;
+  _tab_string[check_result_path] = DEFAULT_CHECK_RESULT_PATH;
+  _tab_string[log_archive_path] = DEFAULT_LOG_ARCHIVE_PATH;
 }
 
 /**

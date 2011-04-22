@@ -25,7 +25,7 @@
 # define PROGRAM_NAME "Centreon Engine"
 # define PROGRAM_NAME_UC "CENTREON ENGINE"
 # define PROGRAM_NAME_LC "centreon engine"
-# define PROGRAM_VERSION "1.0.0"
+# define PROGRAM_VERSION "1.1.0"
 # define PROGRAM_MODIFICATION_DATE "01-01-1970"
 
 /*# define DEBUG_CHECK_IPC 1 */
