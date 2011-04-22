@@ -27,10 +27,6 @@ include(CTest)
 
 # Check libraries to link with.
 include(CheckLibraryExists)
-check_library_exists("dl" "dlopen" "${CMAKE_LIBRARY_PATH}" DLLIB)
-if (DLLIB)
-  set(DL_LIBRARIES "dl")
-endif ()
 check_library_exists("m" "ceil" "${CMAKE_LIBRARY_PATH}" MATHLIB)
 if (MATHLIB)
   set(MATH_LIBRARIES "m")
@@ -67,7 +63,6 @@ include(CheckIncludeFileCXX)
 check_include_file_cxx("arpa/inet.h" HAVE_ARPA_INET_H)
 check_include_file_cxx("ctype.h" HAVE_CTYPE_H)
 check_include_file_cxx("dirent.h" HAVE_DIRENT_H)
-check_include_file_cxx("dlfcn.h" HAVE_DLFCN_H)
 check_include_file_cxx("errno.h" HAVE_ERRNO_H)
 check_include_file_cxx("exception" HAVE_EXCEPTION)
 check_include_file_cxx("fcntl.h" HAVE_FCNTL_H)
@@ -105,7 +100,6 @@ check_include_file_cxx("unistd.h" HAVE_UNISTD_H)
 if (NOT HAVE_ARPA_INET_H
     OR NOT HAVE_CTYPE_H
     OR NOT HAVE_DIRENT_H
-    OR NOT HAVE_DLFCN_H
     OR NOT HAVE_ERRNO_H
     OR NOT HAVE_EXCEPTION
     OR NOT HAVE_FCNTL_H
@@ -659,7 +653,6 @@ set(ENGINE_COMPILE_FLAGS "${ENGINE_COMPILE_FLAGS} ${PERL_COMPILE_FLAGS}")
 set_target_properties("centengine" PROPERTIES
   COMPILE_FLAGS "${ENGINE_COMPILE_FLAGS}")
 target_link_libraries("centengine"
-  ${DL_LIBRARIES}
   ${MATH_LIBRARIES}
   ${SOCKET_LIBRARIES}
   ${THREAD_LIBRARIES}
