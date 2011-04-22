@@ -26,12 +26,6 @@
 #include <string.h>
 #include <sys/types.h>
 #include <sys/wait.h>
-
-/*#define DEBUG_MEMORY 1*/
-#ifdef DEBUG_MEMORY
-# include <mcheck.h>
-#endif
-
 #include "comments.hh"
 #include "downtime.hh"
 #include "statusdata.hh"
@@ -236,10 +230,6 @@ int main(int argc, char** argv) {
     error = TRUE;
     display_help = TRUE;
   }
-
-#ifdef DEBUG_MEMORY
-  mtrace();
-#endif
 
   /* just display the license */
   if (display_license == TRUE) {
