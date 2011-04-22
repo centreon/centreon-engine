@@ -47,7 +47,7 @@
 #define MAX_CMD_ARGS 4096
 
 #ifdef EMBEDDEDPERL
-# include "epn_nagios.hh"
+# include "epn_engine.hh"
 #endif
 
 using namespace com::centreon::engine;

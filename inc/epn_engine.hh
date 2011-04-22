@@ -1,5 +1,5 @@
-#ifndef CCE_EPN_NAGIOS_HH
-# define CCE_EPN_NAGIOS_HH
+#ifndef CCE_EPN_ENGINE_HH
+# define CCE_EPN_ENGINE_HH
 
 /************************************************************************
  *
@@ -36,4 +36,4 @@ EXTERN_C void xs_init(void);
 
 /******** END EMBEDDED PERL INTERPRETER DECLARATIONS ********/
 
-#endif // !CCE_EPN_NAGIOS_HH
+#endif // !CCE_EPN_ENGINE_HH

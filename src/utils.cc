@@ -37,7 +37,7 @@
 #include "nebmods.hh"
 
 #ifdef EMBEDDEDPERL
-# include "epn_nagios.hh"
+# include "epn_engine.hh"
 static PerlInterpreter* my_perl = NULL;
 int                     use_embedded_perl = TRUE;
 #endif
