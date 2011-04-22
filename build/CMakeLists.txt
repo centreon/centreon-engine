@@ -36,34 +36,85 @@ set(TEST_DIR "${PROJECT_SOURCE_DIR}/test")
 set(SCRIPT_DIR "${PROJECT_SOURCE_DIR}/scripts")
 
 # Check headers.
-include(CheckIncludeFiles)
-include(CheckCSourceCompiles)
-check_include_files("dirent.h" HAVE_DIRENT_H)
-check_include_files("dlfcn.h" HAVE_DLFCN_H)
-check_include_files("errno.h" HAVE_ERRNO_H)
-check_include_files("fcntl.h" HAVE_FCNTL_H)
-check_include_files("getopt.h" HAVE_GETOPT_H)
-check_include_files("libgen.h" HAVE_LIBGEN_H)
-check_include_files("limits.h" HAVE_LIMITS_H)
-check_include_files("math.h" HAVE_MATH_H)
-check_include_files("netdb.h" HAVE_NETDB_H)
-check_include_files("pthread.h" HAVE_PTHREAD_H)
-check_include_files("regex.h" HAVE_REGEX_H)
-check_include_files("signal.h" HAVE_SIGNAL_H)
-check_include_files("stdarg.h" HAVE_STDARG_H)
-check_include_files("stdio.h" HAVE_STDIO_H)
-check_include_files("stdlib.h" HAVE_STDLIB_H)
-check_include_files("string.h" HAVE_STRING_H)
-check_include_files("sys/mman.h" HAVE_SYS_MMAN_H)
-check_include_files("sys/poll.h" HAVE_SYS_POLL_H)
-check_include_files("sys/socket.h" HAVE_SYS_SOCKET_H)
-check_include_files("sys/stat.h" HAVE_SYS_STAT_H)
-check_include_files("sys/time.h" HAVE_SYS_TIME_H)
-check_include_files("sys/types.h" HAVE_SYS_TYPES_H)
-check_include_files("sys/wait.h" HAVE_SYS_WAIT_H)
-check_include_files("syslog.h" HAVE_SYSLOG_H)
-check_include_files("time.h" HAVE_TIME_H)
-check_include_files("unistd.h" HAVE_UNISTD_H)
+include(CheckIncludeFileCXX)
+check_include_file_cxx("arpa/inet.h" HAVE_ARPA_INET_H)
+check_include_file_cxx("ctype.h" HAVE_CTYPE_H)
+check_include_file_cxx("dirent.h" HAVE_DIRENT_H)
+check_include_file_cxx("dlfcn.h" HAVE_DLFCN_H)
+check_include_file_cxx("errno.h" HAVE_ERRNO_H)
+check_include_file_cxx("exception" HAVE_EXCEPTION)
+check_include_file_cxx("fcntl.h" HAVE_FCNTL_H)
+check_include_file_cxx("fstream" HAVE_FSTREAM)
+check_include_file_cxx("getopt.h" HAVE_GETOPT_H)
+check_include_file_cxx("grp.h" HAVE_GRP_H)
+check_include_file_cxx("iomanip" HAVE_IOMANIP)
+check_include_file_cxx("iostream" HAVE_IOSTREAM)
+check_include_file_cxx("libgen.h" HAVE_LIBGEN_H)
+check_include_file_cxx("limits.h" HAVE_LIMITS_H)
+check_include_file_cxx("map" HAVE_MAP)
+check_include_file_cxx("math.h" HAVE_MATH_H)
+check_include_file_cxx("netdb.h" HAVE_NETDB_H)
+check_include_file_cxx("netinet/in.h" HAVE_NETINET_IN_H)
+check_include_file_cxx("poll.h" HAVE_POLL_H)
+check_include_file_cxx("pthread.h" HAVE_PTHREAD_H)
+check_include_file_cxx("pwd.h" HAVE_PWD_H)
+check_include_file_cxx("regex.h" HAVE_REGEX_H)
+check_include_file_cxx("signal.h" HAVE_SIGNAL_H)
+check_include_file_cxx("sstream" HAVE_SSTREAM)
+check_include_file_cxx("stdarg.h" HAVE_STDARG_H) # In logging.
+check_include_file_cxx("stdio.h" HAVE_STDIO_H)
+check_include_file_cxx("stdlib.h" HAVE_STDLIB_H)
+check_include_file_cxx("string" HAVE_STRING)
+check_include_file_cxx("string.h" HAVE_STRING_H)
+check_include_file_cxx("syslog.h" HAVE_SYSLOG_H)
+check_include_file_cxx("sys/mman.h" HAVE_SYS_MMAN_H)
+check_include_file_cxx("sys/socket.h" HAVE_SYS_SOCKET_H)
+check_include_file_cxx("sys/stat.h" HAVE_SYS_STAT_H)
+check_include_file_cxx("sys/time.h" HAVE_SYS_TIME_H)
+check_include_file_cxx("sys/types.h" HAVE_SYS_TYPES_H)
+check_include_file_cxx("sys/wait.h" HAVE_SYS_WAIT_H)
+check_include_file_cxx("time.h" HAVE_TIME_H)
+check_include_file_cxx("unistd.h" HAVE_UNISTD_H)
+if (NOT HAVE_ARPA_INET_H
+    OR NOT HAVE_CTYPE_H
+    OR NOT HAVE_DIRENT_H
+    OR NOT HAVE_DLFCN_H
+    OR NOT HAVE_ERRNO_H
+    OR NOT HAVE_EXCEPTION
+    OR NOT HAVE_FCNTL_H
+    OR NOT HAVE_FSTREAM
+#    OR NOT HAVE_GETOPT_H Optionnal header
+    OR NOT HAVE_GRP_H
+    OR NOT HAVE_IOMANIP
+    OR NOT HAVE_IOSTREAM
+    OR NOT HAVE_LIBGEN_H
+    OR NOT HAVE_LIMITS_H
+    OR NOT HAVE_MAP
+    OR NOT HAVE_MATH_H
+    OR NOT HAVE_NETDB_H
+    OR NOT HAVE_NETINET_IN_H
+    OR NOT HAVE_POLL_H
+    OR NOT HAVE_PTHREAD_H
+    OR NOT HAVE_PWD_H
+    OR NOT HAVE_REGEX_H
+    OR NOT HAVE_SIGNAL_H
+    OR NOT HAVE_SSTREAM
+    OR NOT HAVE_STDARG_H
+    OR NOT HAVE_STDIO_H
+    OR NOT HAVE_STDLIB_H
+    OR NOT HAVE_STRING
+    OR NOT HAVE_STRING_H
+    OR NOT HAVE_SYSLOG_H
+    OR NOT HAVE_SYS_MMAN_H
+    OR NOT HAVE_SYS_SOCKET_H
+    OR NOT HAVE_SYS_STAT_H
+    OR NOT HAVE_SYS_TIME_H
+    OR NOT HAVE_SYS_TYPES_H
+    OR NOT HAVE_SYS_WAIT_H
+    OR NOT HAVE_TIME_H
+    OR NOT HAVE_UNISTD_H)
+  message(FATAL_ERROR "Could not find all mandatory headers.")
+endif ()
 
 # Check functions.
 include(CheckFunctionExists)
