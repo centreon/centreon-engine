@@ -69,12 +69,6 @@ command*                  ochp_command_ptr = NULL;
 unsigned long             logging_options = 0;
 unsigned long             syslog_options = 0;
 
-// XXX : these variables refer to the update API (now removed)
-unsigned long             update_uid = 0L;
-int                       update_available = FALSE;
-char*                     last_program_version = NULL;
-char*                     new_program_version = NULL;
-
 time_t                    last_command_check = 0L;
 time_t                    last_command_status_update = 0L;
 time_t                    last_log_rotation = 0L;

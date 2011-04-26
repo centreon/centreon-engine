@@ -86,12 +86,6 @@ extern int                    nagios_pid;
 
 extern int                    log_host_retries;
 
-extern unsigned long          update_uid;
-extern char*                  last_program_version;
-extern int                    update_available;
-extern char*                  last_program_version;
-extern char*                  new_program_version;
-
 extern unsigned long          modified_host_process_attributes;
 extern unsigned long          modified_service_process_attributes;
 
@@ -3748,13 +3742,6 @@ void free_memory(nagios_macros* mac) {
   /* free illegal char strings */
   // my_free(illegal_object_chars);
   // my_free(illegal_output_chars);
-
-  /* free version strings */
-  delete[] last_program_version;
-  delete[] new_program_version;
-
-  last_program_version = NULL;
-  new_program_version = NULL;
 }
 
 /* free a notification list that was created */

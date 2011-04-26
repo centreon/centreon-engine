@@ -55,12 +55,6 @@ extern scheduled_downtime* scheduled_downtime_list;
 
 extern int                 test_scheduling;
 
-extern unsigned long       update_uid;
-extern char*               last_program_version;
-extern int                 update_available;
-extern char*               last_program_version;
-extern char*               new_program_version;
-
 extern unsigned long       next_comment_id;
 extern unsigned long       next_downtime_id;
 extern unsigned long       next_event_id;
@@ -280,10 +274,6 @@ int xrddefault_save_state_information(void) {
   /* write file info */
   fprintf(fp, "info {\n");
   fprintf(fp, "created=%lu\n", current_time);
-  fprintf(fp, "update_available=%d\n", update_available);
-  fprintf(fp, "update_uid=%lu\n", update_uid);
-  fprintf(fp, "last_version=%s\n", (last_program_version == NULL) ? "" : last_program_version);
-  fprintf(fp, "new_version=%s\n", (new_program_version == NULL) ? "" : new_program_version);
   fprintf(fp, "}\n");
 
   /* save program state information */
@@ -1031,22 +1021,13 @@ int xrddefault_read_state_information(void) {
           else
             scheduling_info_is_ok = FALSE;
         }
-        else if (!strcmp(var, "version")) {
-          /* initialize last version in case we're reading a pre-3.1.0 retention file */
-          if (last_program_version == NULL)
-            last_program_version = my_strdup(val);
-        }
-        else if (!strcmp(var, "update_available"))
-          update_available = atoi(val);
-        else if (!strcmp(var, "update_uid"))
-          update_uid = strtoul(val, NULL, 10);
-        else if (!strcmp(var, "last_version")) {
-          delete[] last_program_version;
-          last_program_version = my_strdup(val);
-        }
-        else if (!strcmp(var, "new_version"))
-          new_program_version = my_strdup(val);
-        break;
+        // Ignore update-related fields.
+        else if (!strcmp(var, "version")
+                 || !strcmp(var, "update_available")
+                 || !strcmp(var, "update_uid")
+                 || !strcmp(var, "last_version")
+                 || !strcmp(var, "new_version"))
+          break;
 
       case XRDDEFAULT_PROGRAMSTATUS_DATA:
         if (!strcmp(var, "modified_host_attributes")) {
@@ -1257,19 +1238,19 @@ int xrddefault_read_state_information(void) {
               temp_host->percent_state_change = strtod(val, NULL);
             else
               if (!strcmp(var, "check_flapping_recovery_notification"))
-		temp_host->check_flapping_recovery_notification = atoi(val);
-	      else if (!strcmp(var, "state_history")) {
-		temp_ptr = val;
-		for (x = 0; x < MAX_STATE_HISTORY_ENTRIES; x++) {
-		  if ((ch = my_strsep(&temp_ptr, ",")) != NULL)
-		    temp_host->state_history[x] = atoi(ch);
-		  else
-		    break;
-		}
-		temp_host->state_history_index = 0;
-	      }
-	      else
-		found_directive = FALSE;
+                temp_host->check_flapping_recovery_notification = atoi(val);
+              else if (!strcmp(var, "state_history")) {
+                temp_ptr = val;
+                for (x = 0; x < MAX_STATE_HISTORY_ENTRIES; x++) {
+                  if ((ch = my_strsep(&temp_ptr, ",")) != NULL)
+                    temp_host->state_history[x] = atoi(ch);
+                  else
+                    break;
+                }
+                temp_host->state_history_index = 0;
+              }
+              else
+                found_directive = FALSE;
           }
           if (temp_host->retain_nonstatus_information == TRUE) {
             /* null-op speeds up logic */
@@ -1375,7 +1356,7 @@ int xrddefault_read_state_information(void) {
             }
             else if (!strcmp(var, "normal_check_interval")) {
               if (temp_host->modified_attributes & MODATTR_NORMAL_CHECK_INTERVAL
-		  && strtod(val, NULL) >= 0)
+                  && strtod(val, NULL) >= 0)
                 temp_host->check_interval = strtod(val, NULL);
             }
             else if (!strcmp(var, "retry_check_interval")) {
@@ -1417,7 +1398,7 @@ int xrddefault_read_state_information(void) {
               }
             }
           }
-	}
+        }
         break;
 
       case XRDDEFAULT_SERVICESTATUS_DATA:
@@ -1530,19 +1511,19 @@ int xrddefault_read_state_information(void) {
               temp_service->percent_state_change = strtod(val, NULL);
             else
               if (!strcmp(var, "check_flapping_recovery_notification"))
-		temp_service->check_flapping_recovery_notification = atoi(val);
-	      else if (!strcmp(var, "state_history")) {
-		temp_ptr = val;
-		for (x = 0; x < MAX_STATE_HISTORY_ENTRIES; x++) {
-		  if ((ch = my_strsep(&temp_ptr, ",")) != NULL)
-		    temp_service->state_history[x] = atoi(ch);
-		  else
-		    break;
-		}
-		temp_service->state_history_index = 0;
-	      }
-	      else
-		found_directive = FALSE;
+                temp_service->check_flapping_recovery_notification = atoi(val);
+              else if (!strcmp(var, "state_history")) {
+                temp_ptr = val;
+                for (x = 0; x < MAX_STATE_HISTORY_ENTRIES; x++) {
+                  if ((ch = my_strsep(&temp_ptr, ",")) != NULL)
+                    temp_service->state_history[x] = atoi(ch);
+                  else
+                    break;
+                }
+                temp_service->state_history_index = 0;
+              }
+              else
+                found_directive = FALSE;
           }
           if (temp_service->retain_nonstatus_information == TRUE) {
             /* null-op speeds up logic */
@@ -1815,7 +1796,7 @@ int xrddefault_read_state_information(void) {
           author = my_strdup(val);
         else if (!strcmp(var, "comment_data"))
           comment_data = my_strdup(val);
-	    break;
+            break;
 
       case XRDDEFAULT_HOSTDOWNTIME_DATA:
       case XRDDEFAULT_SERVICEDOWNTIME_DATA:
@@ -1841,7 +1822,7 @@ int xrddefault_read_state_information(void) {
           author = my_strdup(val);
         else if (!strcmp(var, "comment"))
           comment_data = my_strdup(val);
-	    break;
+            break;
 
       default:
         break;
@@ -1863,10 +1844,10 @@ int xrddefault_read_state_information(void) {
 
   if (test_scheduling == TRUE) {
     runtime[0] = (double)((double)(tv[1].tv_sec - tv[0].tv_sec) +
-			  (double)((tv[1].tv_usec - tv[0].tv_usec) / 1000.0) / 1000.0);
+                          (double)((tv[1].tv_usec - tv[0].tv_usec) / 1000.0) / 1000.0);
 
     runtime[1] = (double)((double)(tv[1].tv_sec - tv[0].tv_sec) +
-			  (double)((tv[1].tv_usec - tv[0].tv_usec) / 1000.0) / 1000.0);
+                          (double)((tv[1].tv_usec - tv[0].tv_usec) / 1000.0) / 1000.0);
 
     printf("RETENTION DATA TIMES\n");
     printf("----------------------------------\n");

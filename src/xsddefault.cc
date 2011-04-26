@@ -48,11 +48,6 @@ extern int                 nagios_pid;
 extern time_t              last_command_check;
 extern time_t              last_log_rotation;
 
-extern char*               last_program_version;
-extern int                 update_available;
-extern char*               last_program_version;
-extern char*               new_program_version;
-
 extern circular_buffer     external_command_buffer;
 
 extern host*               host_list;
@@ -296,9 +291,6 @@ int xsddefault_save_status_data(void) {
   /* write file info */
   fprintf(fp, "info {\n");
   fprintf(fp, "\tcreated=%lu\n", current_time);
-  fprintf(fp, "\tupdate_available=%d\n", update_available);
-  fprintf(fp, "\tlast_version=%s\n", (last_program_version == NULL) ? "" : last_program_version);
-  fprintf(fp, "\tnew_version=%s\n", (new_program_version == NULL) ? "" : new_program_version);
   fprintf(fp, "\t}\n\n");
 
   /* save program status data */
