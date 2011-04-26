@@ -280,10 +280,9 @@ int main(int argc, char** argv) {
   }
 
   if (mrtg_mode == FALSE) {
-    printf("\nCentreon Engine Stats %s\n", PROGRAM_VERSION);
+    printf("\nCentreon Engine Stats\n");
     printf("Copyright 2003-2008 Ethan Galstad\n");
     printf("Copyright 2011 Merethis\n");
-    printf("Last Modified: %s\n", PROGRAM_MODIFICATION_DATE);
     printf("License: GPL\n\n");
   }
 

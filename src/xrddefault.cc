@@ -280,7 +280,6 @@ int xrddefault_save_state_information(void) {
   /* write file info */
   fprintf(fp, "info {\n");
   fprintf(fp, "created=%lu\n", current_time);
-  fprintf(fp, "version=%s\n", PROGRAM_VERSION);
   fprintf(fp, "update_available=%d\n", update_available);
   fprintf(fp, "update_uid=%lu\n", update_uid);
   fprintf(fp, "last_version=%s\n", (last_program_version == NULL) ? "" : last_program_version);

@@ -3676,20 +3676,6 @@ int generate_check_stats(void) {
 }
 
 /******************************************************************/
-/************************* MISC FUNCTIONS *************************/
-/******************************************************************/
-
-/* returns Centreon Engine version */
-char* get_program_version(void) {
-  return ((char*)PROGRAM_VERSION);
-}
-
-/* returns Centreon Engine modification date */
-char* get_program_modification_date(void) {
-  return ((char*)PROGRAM_MODIFICATION_DATE);
-}
-
-/******************************************************************/
 /*********************** CLEANUP FUNCTIONS ************************/
 /******************************************************************/
 

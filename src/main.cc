@@ -471,8 +471,8 @@ int main(int argc, char** argv) {
 
       // This must be logged after we read config data, as user may have changed location of main log file.
       logit(NSLOG_PROCESS_INFO, TRUE,
-            "Centreon Engine %s starting... (PID=%d)\n",
-            PROGRAM_VERSION, (int)getpid());
+        "Centreon Engine starting... (PID=%d)\n",
+        (int)getpid());
 
       // Log the local time - may be different than clock time due to timezone offset.
       now = time(NULL);
