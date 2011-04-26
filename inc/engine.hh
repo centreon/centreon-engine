@@ -26,10 +26,6 @@
 # include <sys/time.h>
 # include <pthread.h>
 
-# ifndef __GNUC__
-#  define __attribute__(x) /* nothing */
-# endif
-
 # ifdef __cplusplus
 extern "C" {
 # endif
