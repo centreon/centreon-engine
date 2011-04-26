@@ -57,6 +57,8 @@ namespace            com {
 	error&       operator<<(char const* str) throw ();
 	error&       operator<<(int i) throw ();
 	error&       operator<<(unsigned int u) throw ();
+	error&       operator<<(long l) throw ();
+	error&       operator<<(long long ll) throw ();
 	error&       operator<<(std::string const& str) throw ();
 	error&       operator<<(QString const& str) throw ();
 	bool         is_fatal() const throw ();

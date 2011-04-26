@@ -236,14 +236,6 @@ else ()
   set(EMBEDDED_PERL "No")
 endif ()
 
-# Define flags.
-#  Misc definitions.
-if (HAVE_STRUCT_TM_TM_ZONE)
-  add_definitions(-DHAVE_STRUCT_TM_TM_ZONE)
-elseif (HAVE_TZNAME)
-  add_definitions(-DHAVE_TZNAME)
-endif ()
-
 # Configure files.
 configure_file("${INCLUDE_DIR}/compatibility/locations.h.in"
   "${INCLUDE_DIR}/compatibility/locations.h")
@@ -387,6 +379,7 @@ set_target_properties("centengine" PROPERTIES
   COMPILE_FLAGS "${ENGINE_COMPILE_FLAGS}")
 target_link_libraries("centengine"
   ${DL_LIBRARIES}
+  # ${GSOAP_LIBRARIES}
   ${MATH_LIBRARIES}
   ${SOCKET_LIBRARIES}
   ${THREAD_LIBRARIES}
@@ -423,6 +416,9 @@ install(DIRECTORY "${INCLUDE_DIR}/compatibility/"
   DESTINATION "${localstatedir}/include/centreon-engine/"
   COMPONENT "development"
   FILES_MATCHING PATTERN "*.h")
+
+# Add Modules.
+add_subdirectory("./modules")
 
 # Package.
 set(CPACK_PACKAGE_NAME "Centreon-Engine")

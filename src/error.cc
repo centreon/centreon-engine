@@ -150,6 +150,16 @@ error& error::operator<<(unsigned int u) throw () {
   return (*this);
 }
 
+error& error::operator<<(long l) throw () {
+  _insert_with_snprintf(l, "%l%n");
+  return (*this);
+}
+
+error& error::operator<<(long long ll) throw () {
+  _insert_with_snprintf(ll, "%ll%n");
+  return (*this);
+}
+
 /**
  *  Get the fatal flag.
  *
