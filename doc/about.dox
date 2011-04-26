@@ -27,7 +27,7 @@
  *  - automatic log file rotation
  *  - support for implementing redundant monitoring hosts
  *
- *  @section systemrequirements Sysetm Requirements
+ *  @section systemrequirements System Requirements
  *
  *  The only requirement of running Centreon Engine is a machine
  *  running Linux (or UNIX variant) that has network access and a C

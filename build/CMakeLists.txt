@@ -704,8 +704,9 @@ install(DIRECTORY "${INCLUDE_DIR}/compatibility/"
   COMPONENT "development"
   FILES_MATCHING PATTERN "*.h")
 
-# Add Modules.
-add_subdirectory("./modules")
+# Add subdirectories.
+add_subdirectory("doc")
+add_subdirectory("modules")
 
 # Package.
 set(CPACK_PACKAGE_NAME "Centreon-Engine")

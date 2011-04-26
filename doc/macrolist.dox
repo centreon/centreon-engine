@@ -28,10 +28,15 @@
  *  should be noted that macros consist of all uppercase characters and
  *  are enclosed in $ characters.
  *
+ *  @latexonly
+ *    \begin{landscape}
+ *  @endlatexonly
+ *
  *  @section standardmacrosincentenginemacroavailabilitychart Macro Availability Chart
  *
+ *  @subsection Legend
+ *
  *  <table>
- *    <caption>Legend</caption>
  *    <tr>
  *      <td>No</td>
  *      <td>The macro is not available</td>
@@ -42,8 +47,13 @@
  *    </tr>
  *  </table>
  *
+ *  @latexonly
+ *    \clearpage
+ *  @endlatexonly
+ *
+ *  @subsection hostmacros Host Macros <sup>3</sup>
+ *
  *  <table>
- *    <caption>Host Macros <sup>3</sup></caption>
  *    <tr>
  *      <th>Macro Name</th>
  *      <th>Service Checks</th>
@@ -541,8 +551,13 @@
  *    </tr>
  *  </table>
  *
+ *  @latexonly
+ *    \clearpage
+ *  @endlatexonly
+ *
+ *  @subsection hostgroupmacros Host Group Macros
+ *
  *  <table>
- *    <caption>Host Group Macros</caption>
  *    <tr>
  *      <th>Macro Name</th>
  *      <th>Service Checks</th>
@@ -611,8 +626,13 @@
  *    </tr>
  *  </table>
  *
+ *  @latexonly
+ *    \clearpage
+ *  @endlatexonly
+ *
+ *  @subsection servicemacros Service Macros
+ *
  *  <table>
- *    <caption>Service Macros</caption>
  *    <tr>
  *      <th>Macro Name</th>
  *      <th>Service Checks</th>
@@ -1055,8 +1075,13 @@
  *    </tr>
  *  </table>
  *
+ *  @latexonly
+ *    \clearpage
+ *  @endlatexonly
+ *
+ *  @subsection servicegroupmacros Service Group Macros
+ *
  *  <table>
- *    <caption>Service Group Macros</caption>
  *    <tr>
  *      <th>Macro Name</th>
  *      <th>Service Checks</th>
@@ -1125,8 +1150,13 @@
  *    </tr>
  *  </table>
  *
+ *  @latexonly
+ *    \clearpage
+ *  @endlatexonly
+ *
+ *  @subsection contactmacros Contact Macros
+ *
  *  <table>
- *    <caption>Contact Macros</caption>
  *    <tr>
  *      <th>Macro Name</th>
  *      <th>Service Checks</th>
@@ -1195,8 +1225,13 @@
  *    </tr>
  *  </table>
  *
+ *  @latexonly
+ *    \clearpage
+ *  @endlatexonly
+ *
+ *  @subsection contactgroupmacros Contact Group Macros
+ *
  *  <table>
- *    <caption>Contact Group Macros</caption>
  *    <tr>
  *      <th>Macro Name</th>
  *      <th>Service Checks</th>
@@ -1232,8 +1267,13 @@
  *    </tr>
  *  </table>
  *
+ *  @latexonly
+ *    \clearpage
+ *  @endlatexonly
+ *
+ *  @subsection summarymacros Summary Macros
+ *
  *  <table>
- *    <caption>Summary Macros</caption>
  *    <tr>
  *      <th>Macro Name</th>
  *      <th>Service Checks</th>
@@ -1423,8 +1463,13 @@
  *    </tr>
  *  </table>
  *
+ *  @latexonly
+ *    \clearpage
+ *  @endlatexonly
+ *
+ *  @subsection notificationmacros Notification Macros
+ *
  *  <table>
- *    <caption>Notification Macros</caption>
  *    <tr>
  *      <th>Macro Name</th>
  *  	<th>Service Checks</th>
@@ -1559,8 +1604,13 @@
  *    </tr>
  *  </table>
  *
+ *  @latexonly
+ *    \clearpage
+ *  @endlatexonly
+ *
+ *  @subsection datetimemacros Date/Time Macros
+ *
  *  <table>
- *    <caption>Date/Time Macros</caption>
  *    <tr>
  *      <th>Macro Name</th>
  *      <th>Service Checks</th>
@@ -1651,8 +1701,13 @@
  *    </tr>
  *  </table>
  *
+ *  @latexonly
+ *    \clearpage
+ *  @endlatexonly
+ *
+ *  @subsection filemacros File Macros
+ *
  *  <table>
- *    <caption>File Macros</caption>
  *    <tr>
  *      <th>Macro Name</th>
  *  	<th>Service Checks</th>
@@ -1809,8 +1864,13 @@
  *    </tr>
  *  </table>
  *
+ *  @latexonly
+ *    \clearpage
+ *  @endlatexonly
+ *
+ *  @subsection miscmacros Misc Macros
+ *
  *  <table>
- *    <caption>Misc Macros</caption>
  *    <tr>
  *      <th>Macro Name</th>
  *  	<th>Service Checks</th>
@@ -1890,10 +1950,15 @@
  *    </tr>
  *  </table>
  *
+ *  @latexonly
+ *    \clearpage
+ *  @endlatexonly
+ *
  *  @section standardmacrosincentenginemacrodescriptions Macro Descriptions
  *
+ *  @subsection hostmacro Host Macros <sup>3</sup>
+ *
  *  <table>
- *    <caption>Host Macros <sup>3</sup></caption>
  *    <tr>
  *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefhostname $HOSTNAME$</td>
  *      <td>
@@ -2250,8 +2315,13 @@
  *    </tr>
  *  </table>
  *
+ *  @latexonly
+ *    \clearpage
+ *  @endlatexonly
+ *
+ *  @subsection hostgroupmacros Host Group Macros
+ *
  *  <table>
- *    <caption>Host Group Macros</caption>
  *    <tr>
  *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefhostgroupalias $HOSTGROUPALIAS$ <sup>5</sup></td>
  *      <td>
@@ -2303,8 +2373,13 @@
  *    </tr>
  *  </table>
  *
+ *  @latexonly
+ *    \clearpage
+ *  @endlatexonly
+ *
+ *  @subsection servicemacros Service Macros
+ *
  *  <table>
- *    <caption>Service Macros</caption>
  *    <tr>
  *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefservicedesc $SERVICEDESC$</td>
  *      <td>
@@ -2629,8 +2704,13 @@
  *    </tr>
  *  </table>
  *
+ *  @latexonly
+ *    \clearpage
+ *  @endlatexonly
+ *
+ *  @subsection servicegroupmacros Service Group Macros <sup>6</sup>
+ *
  *  <table>
- *    <caption>Service Group Macros <sup>6</sup></caption>
  *    <tr>
  *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefservicegroupalias $SERVICEGROUPALIAS$ <sup>6</sup></td>
  *      <td>
@@ -2686,8 +2766,13 @@
  *    </tr>
  *  </table>
  *
+ *  @latexonly
+ *    \clearpage
+ *  @endlatexonly
+ *
+ *  @subsection contactmacros Contact Macros
+ *
  *  <table>
- *    <caption>Contact Macros</caption>
  *    <tr>
  *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefcontactname $CONTACTNAME$</td>
  *      <td>
@@ -2750,8 +2835,13 @@
  *    </tr>
  *  </table>
  *
+ *  @latexonly
+ *    \clearpage
+ *  @endlatexonly
+ *
+ *  @subsection contactgroupmacros Contact Group Macros <sup>5</sup>
+ *
  *  <table>
- *    <caption>Contact Group Macros<sup>5</sup></caption>
  *    <tr>
  *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefcontactgroupalias $CONTACTGROUPALIAS$ <sup>7</sup></td>
  *      <td>
@@ -2774,8 +2864,13 @@
  *    </tr>
  *  </table>
  *
+ *  @latexonly
+ *    \clearpage
+ *  @endlatexonly
+ *
+ *  @subsection summarymacros Summary Macros
+ *
  *  <table>
- *    <caption>SUMMARY Macros</caption>
  *    <tr>
  *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdeftotalhostsup $TOTALHOSTSUP$</td>
  *      <td>
@@ -2911,8 +3006,13 @@
  *    </tr>
  *  </table>
  *
+ *  @latexonly
+ *    \clearpage
+ *  @endlatexonly
+ *
+ *  @subsection notificationmacros Notification Macros
+ *
  *  <table>
- *    <caption>Notification Macros</caption>
  *    <tr>
  *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefnotificationtype $NOTIFICATIONTYPE$</td>
  *      <td>
@@ -3030,8 +3130,13 @@
  *    </tr>
  *  </table>
  *
+ *  @latexonly
+ *    \clearpage
+ *  @endlatexonly
+ *
+ *  @subsection datetimemacros Date/Time Macros
+ *
  *  <table>
- *    <caption>Date/Time Macros</caption>
  *    <tr>
  *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdeflongdatetime $LONGDATETIME$</td>
  *      <td>
@@ -3097,8 +3202,13 @@
  *    </tr>
  *  </table>
  *
+ *  @latexonly
+ *    \clearpage
+ *  @endlatexonly
+ *
+ *  @subsection filemacros File Macros
+ *
  *  <table>
- *    <caption>File Macros</caption>
  *    <tr>
  *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefmainconfigfile $MAINCONFIGFILE$</td>
  *      <td>
@@ -3184,8 +3294,13 @@
  *    </tr>
  *  </table>
  *
+ *  @latexonly
+ *    \clearpage
+ *  @endlatexonly
+ *
+ *  @subsection miscmacros Misc Macros
+ *
  *  <table>
- *    <caption>Misc Macros</caption>
  *    <tr>
  *      <td>@anchor standardmacrosincentenginemacroavailabilitychartdefprocessstarttime $PROCESSSTARTTIME$</td>
  *      <td>
@@ -3241,6 +3356,10 @@
  *      </td>
  *    </tr>
  *  </table>
+ *
+ *  @latexonly
+ *    \end{landscape}
+ *  @endlatexonly
  *
  *  @section standardmacrosincentenginenotes Notes
  *
