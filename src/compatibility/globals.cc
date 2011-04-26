@@ -19,6 +19,9 @@
 
 #include <stddef.h>
 
+// Startup verifications.
+int           verify_object_relationships = 1;
+
 // Update-related variables.
 int           update_available = 0;
 unsigned long update_uid;

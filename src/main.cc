@@ -101,7 +101,6 @@ int                       sig_id = 0;
 int                       restarting = FALSE;
 
 int                       verify_config = FALSE;
-int                       verify_object_relationships = TRUE;
 int                       verify_circular_paths = TRUE;
 int                       test_scheduling = FALSE;
 int                       precache_objects = FALSE;
@@ -162,7 +161,6 @@ int main(int argc, char** argv) {
 #ifdef HAVE_GETOPT_H
   int option_index = 0;
   static struct option long_options[] = {
-    {"dont-verify-objects", no_argument, NULL, 'o'},
     {"dont-verify-paths", no_argument, NULL, 'x'},
     {"help", no_argument, NULL, 'h'},
     {"license", no_argument, NULL, 'V'},
@@ -181,9 +179,9 @@ int main(int argc, char** argv) {
 
   // Process all command line arguments.
 #ifdef HAVE_GETOPT_H
-  while ((c = getopt_long(argc, argv, "+hVvsoxpu", long_options, &option_index)) != -1) {
+  while ((c = getopt_long(argc, argv, "+hVvsxpu", long_options, &option_index)) != -1) {
 #else
-  while ((c = getopt(argc, argv, "+hVvsoxpu")) != -1) {
+  while ((c = getopt(argc, argv, "+hVvsxpu")) != -1) {
 #endif // HAVE_GETOPT_H
 
     // Process flag.
@@ -200,9 +198,6 @@ int main(int argc, char** argv) {
       break ;
      case 's': // Scheduling Check.
       test_scheduling = TRUE;
-      break ;
-     case 'o': // Don't verify objects.
-      //verify_object_relationships=FALSE;
       break ;
      case 'x': // Don't verify circular paths.
       verify_circular_paths = FALSE;
@@ -256,8 +251,6 @@ int main(int argc, char** argv) {
                  "                              scheduling and other diagnostic info\n"
                  "                              based on the current configuration\n"
                  "                              files.\n"
-               /*"  -o, --dont-verify-objects   Don't verify object relationships - USE\n"
-                 "                              WITH CAUTION !\n"*/
                  "  -x, --dont-verify-paths     Don't check for circular object paths -\n"
                  "                              USE WITH CAUTION !\n"
                  "  -p, --precache-objects      Precache object configuration - use with\n"
