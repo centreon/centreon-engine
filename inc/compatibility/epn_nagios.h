@@ -20,6 +20,6 @@
 #ifndef CCE_COMPATIBILITY_EPN_NAGIOS_H
 # define CCE_COMPATIBILITY_EPN_NAGIOS_H
 
-# include "epn_nagios.hh"
+# include "epn_engine.hh"
 
 #endif /* !CCE_COMPATIBILITY_EPN_NAGIOS_H */

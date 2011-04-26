@@ -22,12 +22,6 @@
 #ifndef CCE_COMMON_HH
 # define CCE_COMMON_HH
 
-# define PROGRAM_NAME "Centreon Engine"
-# define PROGRAM_NAME_UC "CENTREON ENGINE"
-# define PROGRAM_NAME_LC "centreon engine"
-# define PROGRAM_VERSION "1.0.0"
-# define PROGRAM_MODIFICATION_DATE "01-01-1970"
-
 /*# define DEBUG_CHECK_IPC 1 */
 /*# define DEBUG_CHECK_IPC2 1*/
 
@@ -303,13 +297,13 @@
 
 /************************ SERVICE CHECK TYPES ****************************/
 
-# define SERVICE_CHECK_ACTIVE		0	/* Nagios performed the service check */
+# define SERVICE_CHECK_ACTIVE		0	/* Engine performed the service check */
 # define SERVICE_CHECK_PASSIVE		1	/* the service check result was submitted by an external source */
 
 
 /************************** HOST CHECK TYPES *****************************/
 
-# define HOST_CHECK_ACTIVE		0	/* Nagios performed the host check */
+# define HOST_CHECK_ACTIVE		0	/* Engine performed the host check */
 # define HOST_CHECK_PASSIVE		1	/* the host check result was submitted by an external source */
 
 
@@ -465,7 +459,7 @@
 
 /************************** MISC DEFINITIONS ****************************/
 
-# define MAX_FILENAME_LENGTH			256	/* max length of path/filename that Nagios will process */
+# define MAX_FILENAME_LENGTH			256	/* max length of path/filename that Engine will process */
 # define MAX_INPUT_BUFFER			1024	/* size in bytes of max. input buffer (for reading files, misc stuff) */
 # define MAX_COMMAND_BUFFER                     8192    /* max length of raw or processed command line */
 # define MAX_EXTERNAL_COMMAND_LENGTH            8192    /* max length of an external command */

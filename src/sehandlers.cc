@@ -21,7 +21,7 @@
 #include <sstream>
 #include "comments.hh"
 #include "downtime.hh"
-#include "nagios.hh"
+#include "engine.hh"
 #include "perfdata.hh"
 #include "broker.hh"
 #include "neberrors.hh"

@@ -1,5 +1,5 @@
 /*
-** Copyright 2000-2004 Ethan Galstad
+** Copyright 1999-2009 Ethan Galstad
 ** Copyright 2011      Merethis
 **
 ** This file is part of Centreon Engine.
@@ -18,22 +18,25 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef CCE_PERFDATA_HH
-# define CCE_PERFDATA_HH
+#include "compatibility/common.h"
 
-# include "objects.hh"
-
-# ifdef __cplusplus
-extern "C" {
-# endif
-
-int initialize_performance_data(char* config_file); // initializes performance data
-int cleanup_performance_data(char* config_file);    // cleans up performance data
-int update_service_performance_data(service* svc);  // updates service performance data
-int update_host_performance_data(host* hst);        // updates host performance data
-
-# ifdef __cplusplus
+/**
+ *  @brief Get the Centreon Engine last modification date.
+ *
+ *  This value is no longer maintained. The last modification date is
+ *  set to 01-01-1970.
+ *
+ *  @return 01-01-1970.
+ */
+char const* get_program_modification_date() {
+  return (PROGRAM_MODIFICATION_DATE);
 }
-# endif
 
-#endif // !CCE_PERFDATA_HH
+/**
+ *  Get the Centreon Engine version.
+ *
+ *  @return Centreon Engine version.
+ */
+char const* get_program_version() {
+  return (PROGRAM_VERSION);
+}

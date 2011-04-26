@@ -19,19 +19,16 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "errno.h"
 #include <exception>
 #include <iostream>
-#include <stdlib.h>
+#include <limits.h>
 #include <stdio.h>
+#include <stdlib.h>
+#include <string>
 #include <string.h>
 #include <sys/types.h>
 #include <sys/wait.h>
-
-/*#define DEBUG_MEMORY 1*/
-#ifdef DEBUG_MEMORY
-# include <mcheck.h>
-#endif
-
 #include "comments.hh"
 #include "downtime.hh"
 #include "statusdata.hh"
@@ -45,10 +42,20 @@
 #include "logging.hh"
 #include "configuration.hh"
 #include "modules/loader.hh"
-#include "nagios.hh"
+#include "engine.hh"
 
 using namespace com::centreon::engine;
 
+// Error message when configuration parsing fail.
+#define ERROR_CONFIGURATION "    Check your configuration file(s) to ensure that they contain valid\n" \
+                            "    directives and data defintions. If you are upgrading from a\n" \
+                            "    previous version of Centreon Engine, you should be aware that some\n" \
+                            "    variables/definitions may have been removed or modified in this\n" \
+                            "    version. Make sure to read the documentation regarding the config\n" \
+                            "    files, as well as the version changelog to find out what has\n" \
+                            "    changed.\n\n"
+
+// Global variables.
 configuration             config;
 
 char*                     config_file = NULL;
@@ -61,11 +68,6 @@ command*                  ochp_command_ptr = NULL;
 
 unsigned long             logging_options = 0;
 unsigned long             syslog_options = 0;
-
-unsigned long             update_uid = 0L;
-int                       update_available = FALSE;
-char*                     last_program_version = NULL;
-char*                     new_program_version = NULL;
 
 time_t                    last_command_check = 0L;
 time_t                    last_command_status_update = 0L;
@@ -99,7 +101,6 @@ int                       sig_id = 0;
 int                       restarting = FALSE;
 
 int                       verify_config = FALSE;
-int                       verify_object_relationships = TRUE;
 int                       verify_circular_paths = TRUE;
 int                       test_scheduling = FALSE;
 int                       precache_objects = FALSE;
@@ -139,15 +140,13 @@ pthread_t                 worker_threads[TOTAL_WORKER_THREADS];
 
 check_stats               check_statistics[MAX_CHECK_STATS_TYPES];
 
-/* Following main() declaration required by older versions of Perl ut 5.00503 */
+// Following main() declaration required by older versions of Perl ut 5.00503.
 #ifdef EMBEDDEDPERL
 int main(int argc, char** argv, char** env) {
 #else
 int main(int argc, char** argv) {
-#endif
-  int result = ERROR;
+#endif // EMBEDDEDPERL
   int error = FALSE;
-  char* buffer = NULL;
   int display_license = FALSE;
   int display_help = FALSE;
   int c = 0;
@@ -156,285 +155,232 @@ int main(int argc, char** argv) {
   char datestring[256];
   nagios_macros* mac;
 
+  // Get global macros.
   mac = get_global_macros();
 
 #ifdef HAVE_GETOPT_H
   int option_index = 0;
   static struct option long_options[] = {
-    {"help", no_argument, 0, 'h'},
-    {"version", no_argument, 0, 'V'},
-    {"license", no_argument, 0, 'V'},
-    {"verify-config", no_argument, 0, 'v'},
-    {"test-scheduling", no_argument, 0, 's'},
-    {"dont-verify-objects", no_argument, 0, 'o'},
-    {"dont-verify-paths", no_argument, 0, 'x'},
-    {"precache-objects", no_argument, 0, 'p'},
-    {"use-precached-objects", no_argument, 0, 'u'},
-    {0, 0, 0, 0}
+    {"dont-verify-paths", no_argument, NULL, 'x'},
+    {"help", no_argument, NULL, 'h'},
+    {"license", no_argument, NULL, 'V'},
+    {"precache-objects", no_argument, NULL, 'p'},
+    {"test-scheduling", no_argument, NULL, 's'},
+    {"use-precached-objects", no_argument, NULL, 'u'},
+    {"verify-config", no_argument, NULL, 'v'},
+    {"version", no_argument, NULL, 'V'},
+    {NULL, no_argument, NULL, '\0'}
   };
-#endif
+#endif // HAVE_GETOPT_H
 
-  /* make sure we have the correct number of command line arguments */
+  // Make sure we have the correct number of command line arguments.
   if (argc < 2)
     error = TRUE;
 
-  /* get all command line arguments */
-  while (1) {
-
+  // Process all command line arguments.
 #ifdef HAVE_GETOPT_H
-    c = getopt_long(argc, argv, "+hVvsoxpu", long_options, &option_index);
+  while ((c = getopt_long(argc, argv, "+hVvsxpu", long_options, &option_index)) != -1) {
 #else
-    c = getopt(argc, argv, "+hVvsoxpu");
-#endif
+  while ((c = getopt(argc, argv, "+hVvsxpu")) != -1) {
+#endif // HAVE_GETOPT_H
 
-    if (c == -1 || c == EOF)
-      break;
-
+    // Process flag.
     switch (c) {
-    case '?':                  /* usage */
-    case 'h':
+     case '?': // Usage.
+     case 'h':
       display_help = TRUE;
-    break;
-
-    case 'V':                  /* version */
+      break ;
+     case 'V': // Version.
       display_license = TRUE;
-      break;
-
-    case 'v':                  /* verify */
+      break ;
+     case 'v': // Verify config.
       verify_config = TRUE;
-      break;
-
-    case 's':                  /* scheduling check */
+      break ;
+     case 's': // Scheduling Check.
       test_scheduling = TRUE;
-      break;
-
-    case 'o':                  /* don't verify objects */
-      /*
-	verify_object_relationships=FALSE;
-      */
-      break;
-
-    case 'x':                  /* don't verify circular paths */
+      break ;
+     case 'x': // Don't verify circular paths.
       verify_circular_paths = FALSE;
-      break;
-
-    case 'p':                  /* precache object config */
+      break ;
+     case 'p': // Precache object config.
       precache_objects = TRUE;
-      break;
-
-    case 'u':                  /* use precached object config */
+      break ;
+     case 'u': // Use precached object config.
       use_precached_objects = TRUE;
-      break;
-
-    default:
-      break;
+      break ;
+     default:
+      break ;
     }
   }
 
-  /* make sure we have the right combination of arguments */
-  if (precache_objects == TRUE && (test_scheduling == FALSE && verify_config == FALSE)) {
+  // Make sure we have the right combination of arguments.
+  if ((TRUE == precache_objects)
+      && (FALSE == test_scheduling)
+      && (FALSE == verify_config)) {
     error = TRUE;
     display_help = TRUE;
   }
 
-#ifdef DEBUG_MEMORY
-  mtrace();
-#endif
-
-  /* just display the license */
-  if (display_license == TRUE) {
-    printf("This program is free software; you can redistribute it and/or modify\n");
-    printf("it under the terms of the GNU General Public License version 2 as\n");
-    printf("published by the Free Software Foundation.\n\n");
-    printf("This program is distributed in the hope that it will be useful,\n");
-    printf("but WITHOUT ANY WARRANTY; without even the implied warranty of\n");
-    printf("MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n");
-    printf("GNU General Public License for more details.\n\n");
-    printf("You should have received a copy of the GNU General Public License\n");
-    printf("along with this program; if not, write to the Free Software\n");
-    printf("Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.\n\n");
-
-    exit(OK);
+  // Just display the license.
+  if (TRUE == display_license) {
+    std:: cout << "Centreon Engine is free software: you can redistribute it and/or modify\n"
+                  "it under the terms of the GNU General Public License version 2 as\n"
+                  "published by the Free Software Foundation.\n"
+                  "\n"
+                  "Centreon Engine is distributed in the hope that it will be useful, but\n"
+                  "WITHOUT ANY WARRANTY; without even the implied warranty of\n"
+                  "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU\n"
+                  "General Public License for more details.\n"
+                  "\n"
+                  "You should have received a copy of the GNU General Public License along\n"
+                  "with Centreon Engine. If not, see <http://www.gnu.org/licenses/>."
+               << std::endl;
+    exit(EXIT_SUCCESS);
   }
 
-  /* make sure we got the main config file on the command line... */
+  // Make sure we got the main config file on the command line.
   if (optind >= argc)
     error = TRUE;
 
-  /* if there are no command line options (or if we encountered an error), print usage */
-  if (error == TRUE || display_help == TRUE) {
-    printf("Usage: %s [options] <main_config_file>\n", argv[0]);
-    printf("\n");
-    printf("Options:\n");
-    printf("\n");
-    printf("  -v, --verify-config          Verify all configuration data\n");
-    printf("  -s, --test-scheduling        Shows projected/recommended check scheduling and other\n");
-    printf("                               diagnostic info based on the current configuration files.\n");
-    /*printf("  -o, --dont-verify-objects    Don't verify object relationships - USE WITH CAUTION!\n"); */
-    printf("  -x, --dont-verify-paths      Don't check for circular object paths - USE WITH CAUTION!\n");
-    printf("  -p, --precache-objects       Precache object configuration - use with -v or -s options\n");
-    printf("  -u, --use-precached-objects  Use precached object config file\n");
-    printf("\n");
-    printf("Visit the Nagios website at http://www.nagios.org/ for bug fixes, new\n");
-    printf("releases, online documentation, FAQs, information on subscribing to\n");
-    printf("the mailing lists, and commercial support options for Nagios.\n");
-    printf("\n");
-
+  // If there are no command line options or if an error occured, print usage.
+  if ((TRUE == error) || (TRUE == display_help)) {
+    std::cout << "Usage: " << argv[0] << " [options] <main_config_file>\n"
+                 "\nOptions:\n"
+                 "  -v, --verify-config         Verify all configuration data.\n"
+                 "  -s, --test-scheduling       Shows projected/recommended check\n"
+                 "                              scheduling and other diagnostic info\n"
+                 "                              based on the current configuration\n"
+                 "                              files.\n"
+                 "  -x, --dont-verify-paths     Don't check for circular object paths -\n"
+                 "                              USE WITH CAUTION !\n"
+                 "  -p, --precache-objects      Precache object configuration - use with\n"
+                 "                              -v or -s options.\n"
+                 "  -u, --use-precached-objects Use precached object config file."
+              << std::endl;
     exit(ERROR);
   }
 
-  /* config file is last argument specified */
+  // Config file is last argument specified.
   config_file = my_strdup(argv[optind]);
 
-  /* make sure the config file uses an absolute path */
+  // Make sure the config file uses an absolute path.
   if (config_file[0] != '/') {
-    /* save the name of the config file */
-    buffer = my_strdup(config_file);
-
-    delete[] config_file;
-    config_file = new char[MAX_FILENAME_LENGTH];
-
-    /* get absolute path of current working directory */
-    if (getcwd(config_file, MAX_FILENAME_LENGTH) == NULL) {
-      perror("Error ");
-      exit(ERROR);
+    // Get absolute path of current working directory.
+    std::string buffer;
+    {
+      char buff[PATH_MAX];
+      if (getcwd(buff, sizeof(buff)) == NULL) {
+        char const* msg(strerror(errno));
+        std::cerr << "failure while retrieving current working directory: "
+                  << msg << std::endl;
+        exit(EXIT_FAILURE);
+      }
+      buffer.append(buff);
     }
 
-    /* append a forward slash */
-    strncat(config_file, "/", 1);
-    config_file[MAX_FILENAME_LENGTH - 1] = '\x0';
+    // Append a forward slash.
+    buffer.append("/");
 
-    /* append the config file to the path */
-    strncat(config_file, buffer, MAX_FILENAME_LENGTH - strlen(config_file) - 1);
-    config_file[MAX_FILENAME_LENGTH - 1] = '\x0';
-
-    delete[] buffer;
+    // Append the config file to the path.
+    buffer.append(config_file);
+    delete [] config_file;
+    config_file = my_strdup(buffer.c_str());
   }
 
-  /* we're just verifying the configuration... */
-  if (verify_config == TRUE) {
-    /* reset program variables */
+  // We're just verifying the configuration.
+  int result = ERROR;
+  if (TRUE == verify_config) {
+    // Reset program variables.
     reset_variables();
 
-    printf("Reading configuration data...\n");
-
-    /* read in the configuration files (main config file, resource and object config files) */
+    // Read in the configuration files (main config file,
+    // resource and object config files).
     try {
+      // Read main config file.
+      std::cout << "reading main config file" << std::endl;
       config.parse(config_file);
-      std::cout << "Read main config file okay..." << std::endl;
 
-      /* read object config files */
+      // Read object config files.
       if ((result = read_all_object_data(config_file)) == OK)
-	printf("   Read object config files okay...\n");
+        result = OK;
       else
-	printf("   Error processing object config files!\n");
+        result = ERROR;
     }
     catch(std::exception const &e) {
-      std::cerr << e.what() << std::endl;
-      std::cerr << "Error processing main config file!" << std::endl;
+      std::cerr << "error while processing a config file: "
+                << e.what() << std::endl;
+      result = ERROR;
     }
 
-    printf("\n");
+    // There was a problem reading the config files.
+    if (result != OK)
+      std::cout << "\n    One or more problems occurred while processing the config files.\n\n"
+                   ERROR_CONFIGURATION;
 
-    /* there was a problem reading the config files */
-    if (result != OK) {
-      /* if the config filename looks fishy, warn the user */
-      if (!strstr(config_file, "nagios.cfg")) {
-	printf("\n***> The name of the main configuration file looks suspicious...\n");
-	printf("\n");
-	printf("     Make sure you are specifying the name of the MAIN configuration file on\n");
-	printf("     the command line and not the name of another configuration file.  The\n");
-	printf("     main configuration file is typically '/usr/local/nagios/etc/nagios.cfg'\n");
-      }
-
-      printf("\n***> One or more problems was encountered while processing the config files...\n");
-      printf("\n");
-      printf("     Check your configuration file(s) to ensure that they contain valid\n");
-      printf("     directives and data defintions.  If you are upgrading from a previous\n");
-      printf("     version of Nagios, you should be aware that some variables/definitions\n");
-      printf("     may have been removed or modified in this version.  Make sure to read\n");
-      printf("     the HTML documentation regarding the config files, as well as the\n");
-      printf("     'Whats New' section to find out what has changed.\n\n");
-    }
-
-    /* the config files were okay, so run the pre-flight check */
+    // The config files were okay, so run the pre-flight check.
     else {
-
-      printf("Running pre-flight check on configuration data...\n\n");
-
-      /* run the pre-flight check to make sure things look okay... */
+      std::cout << "running pre-flight check on configuration data"
+                << std::endl;
       result = pre_flight_check();
-
-      if (result == OK)
-	printf("\nThings look okay - No serious problems were detected during the pre-flight check\n");
-      else {
-	printf("\n***> One or more problems was encountered while running the pre-flight check...\n");
-	printf("\n");
-	printf("     Check your configuration file(s) to ensure that they contain valid\n");
-	printf("     directives and data defintions.  If you are upgrading from a previous\n");
-	printf("     version of Nagios, you should be aware that some variables/definitions\n");
-	printf("     may have been removed or modified in this version.  Make sure to read\n");
-	printf("     the HTML documentation regarding the config files, as well as the\n");
-	printf("     'Whats New' section to find out what has changed.\n\n");
-      }
+      if (result != OK)
+        std::cout << "\n    One or more problem occurred during the pre-flight check.\n\n"
+                     ERROR_CONFIGURATION;
     }
 
-    /* clean up after ourselves */
+    // Clean up after ourselves.
     cleanup();
 
-    /* free config_file */
-    delete[] config_file;
+    // Free config_file.
+    delete [] config_file;
 
-    /* exit */
-    exit(result);
+    // Exit.
+    exit(result ? EXIT_FAILURE : EXIT_SUCCESS);
   }
 
-  /* we're just testing scheduling... */
-  else if (test_scheduling == TRUE) {
+  // We're just testing scheduling.
+  else if (TRUE == test_scheduling) {
 
-    /* reset program variables */
+    // Reset program variables.
     reset_variables();
 
-    /* read in the configuration files (main config file and all host config files) */
+    // Read in the configuration files (main config file and all host config files).
     try {
       config.parse(config_file);
 
-      /* read object config files */
+      // Read object config files.
       result = read_all_object_data(config_file);
     }
     catch(std::exception const &e) {
-      std::cerr << e.what() << std::endl;
+      std::cerr << "error while processing a config file: "
+                << e.what() << std::endl;
     }
 
-    /* read initial service and host state information */
+    // Read initial service and host state information.
     if (result == OK) {
       initialize_retention_data(config_file);
       read_initial_state_information();
     }
 
     if (result != OK)
-      printf("***> One or more problems was encountered while reading configuration data...\n");
+      std::cout << "\n    One or more problems occurred while processing the config files.\n\n";
 
-    /* run the pre-flight check to make sure everything looks okay */
-    if (result == OK) {
-      if ((result = pre_flight_check()) != OK)
-	printf("***> One or more problems was encountered while running the pre-flight check...\n");
-    }
+    // Run the pre-flight check to make sure everything looks okay.
+    if ((OK == result) && ((result = pre_flight_check()) != OK))
+      std::cout << "\n    One or more problems occurred during the pre-flight check.\n\n";
 
-    if (result == OK) {
+    if (OK == result) {
 
-      /* initialize the event timing loop */
+      // Initialize the event timing loop.
       init_timing_loop();
 
-      /* display scheduling information */
+      // Display scheduling information.
       display_scheduling_info();
 
-      if (precache_objects == TRUE) {
-	printf("\n");
-	printf("OBJECT PRECACHING\n");
-	printf("-----------------\n");
-	printf("Object config files were precached.\n");
-      }
+      if (precache_objects == TRUE)
+        std::cout << "\n"
+                  << "OBJECT PRECACHING\n"
+                  << "-----------------\n"
+                  << "Object config files were precached.\n";
     }
 
 #undef TEST_TIMEPERIODS
@@ -453,321 +399,324 @@ int main(int argc, char** argv) {
     printf("=====\n");
 #endif
 
-    /* clean up after ourselves */
+    // Clean up after ourselves.
     cleanup();
 
-    /* exit */
-    exit(result);
+    // Exit.
+    exit(result ? EXIT_FAILURE : EXIT_SUCCESS);
   }
 
-  /* else start to monitor things... */
+  // Else start to monitor things.
   else {
-    /* keep monitoring things until we get a shutdown command */
+    char* buffer;
+    // Keep monitoring things until we get a shutdown command.
     do {
-      /* reset program variables */
+      // Reset program variables.
       reset_variables();
 
-      /* get PID */
+      // Get PID.
       nagios_pid = (int)getpid();
 
-      /* read in the configuration files (main and resource config files) */
+      // Read in the configuration files (main
+      // and resource config files).
       try {
-	config.parse(config_file);
-	result = OK;
+        config.parse(config_file);
+        result = OK;
       }
       catch(std::exception const &e) {
-	std::cerr << e.what() << std::endl;
+        std::cerr << "error while processing a config file: "
+                  << e.what() << std::endl;
       }
 
       /* NOTE 11/06/07 EG moved to after we read config files, as user may have overridden timezone offset */
       /* get program (re)start time and save as macro */
       program_start = time(NULL);
-      delete[] mac->x[MACRO_PROCESSSTARTTIME];
+      delete [] mac->x[MACRO_PROCESSSTARTTIME];
       try {
-	mac->x[MACRO_PROCESSSTARTTIME] = obj2pchar<unsigned long>(program_start);
+        mac->x[MACRO_PROCESSSTARTTIME] = obj2pchar<unsigned long>(program_start);
       }
-      catch(...) {
-	cleanup();
-	throw;
+      catch (...) {
+        cleanup();
+        throw ;
       }
 
-      /* open debug log */
+      // Open debug log.
       open_debug_log();
 
-      /* initialize modules */
+      // Initialize modules.
       neb_init_modules();
       neb_init_callback_list();
-
       try {
-	modules::loader& loader = modules::loader::instance();
-	loader.set_directory(config.get_broker_module_directory());
-	loader.load();
+        modules::loader& loader = modules::loader::instance();
+        loader.set_directory(config.get_broker_module_directory());
+        loader.load();
       }
       catch (std::exception const& e) {
-	logit(NSLOG_INFO_MESSAGE, false, "Event broker module initialize failed.\n");
-	result = ERROR;
+        logit(NSLOG_INFO_MESSAGE, false, "Event broker module initialize failed.\n");
+        result = ERROR;
       }
 
-      /* this must be logged after we read config data, as user may have changed location of main log file */
+      // This must be logged after we read config data, as user may have changed location of main log file.
       logit(NSLOG_PROCESS_INFO, TRUE,
-	    "Nagios %s starting... (PID=%d)\n", PROGRAM_VERSION, (int)getpid());
+        "Centreon Engine starting... (PID=%d)\n",
+        (int)getpid());
 
-      /* log the local time - may be different than clock time due to timezone offset */
+      // Log the local time - may be different than clock time due to timezone offset.
       now = time(NULL);
       tm = localtime_r(&now, &tm_s);
       strftime(datestring, sizeof(datestring), "%a %b %d %H:%M:%S %Z %Y", tm);
       logit(NSLOG_PROCESS_INFO, TRUE, "Local time is %s", datestring);
 
-      /* write log version/info */
+      // Write log version/info.
       write_log_file_info(NULL);
 
-      /* load modules */
+      // Load modules.
       neb_load_all_modules();
 
-      /* send program data to broker */
+      // Send program data to broker.
       broker_program_state(NEBTYPE_PROCESS_PRELAUNCH,
-			   NEBFLAG_NONE,
-			   NEBATTR_NONE,
-			   NULL);
+                           NEBFLAG_NONE,
+                           NEBATTR_NONE,
+                           NULL);
 
-      /* read in all object config data */
+      // Read in all object config data.
       if (result == OK)
-	result = read_all_object_data(config_file);
+        result = read_all_object_data(config_file);
 
-      /* there was a problem reading the config files */
+      // There was a problem reading the config files.
       if (result != OK)
-	logit(NSLOG_PROCESS_INFO | NSLOG_RUNTIME_ERROR | NSLOG_CONFIG_ERROR, TRUE,
-	      "Bailing out due to one or more errors encountered in the configuration files. Run Nagios from the command line with the -v option to verify your config before restarting. (PID=%d)",
-	      (int)getpid());
+        logit(NSLOG_PROCESS_INFO | NSLOG_RUNTIME_ERROR | NSLOG_CONFIG_ERROR, TRUE,
+              "Bailing out due to one or more errors encountered in the configuration files. Run Centreon Engine from the command line with the -v option to verify your config before restarting. (PID=%d)",
+              (int)getpid());
       else {
-	/* run the pre-flight check to make sure everything looks okay */
-	if ((result = pre_flight_check()) != OK)
-	  logit(NSLOG_PROCESS_INFO | NSLOG_RUNTIME_ERROR | NSLOG_VERIFICATION_ERROR, TRUE,
-		"Bailing out due to errors encountered while running the pre-flight check.  Run Nagios from the command line with the -v option to verify your config before restarting. (PID=%d)\n",
-		(int)getpid());
+        // Run the pre-flight check to make sure everything looks okay.
+        if ((result = pre_flight_check()) != OK)
+          logit(NSLOG_PROCESS_INFO | NSLOG_RUNTIME_ERROR | NSLOG_VERIFICATION_ERROR, TRUE,
+                "Bailing out due to errors encountered while running the pre-flight check.  Run Centreon Engine from the command line with the -v option to verify your config before restarting. (PID=%d)\n",
+                (int)getpid());
       }
 
-      /* an error occurred that prevented us from (re)starting */
+      // An error occurred that prevented us from (re)starting.
       if (result != OK) {
-	/* if we were restarting, we need to cleanup from the previous run */
-	if (sigrestart == TRUE) {
-	  /* clean up the status data */
-	  cleanup_status_data(config_file, TRUE);
+        // If we were restarting, we need to cleanup from the previous run.
+        if (sigrestart == TRUE) {
+          // Clean up the status data.
+          cleanup_status_data(config_file, TRUE);
 
-	  /* shutdown the external command worker thread */
-	  shutdown_command_file_worker_thread();
+          // Shutdown the external command worker thread.
+          shutdown_command_file_worker_thread();
 
-	  /* close and delete the external command file FIFO */
-	  close_command_file();
+          // Close and delete the external command file FIFO.
+          close_command_file();
 
-	  /* cleanup embedded perl interpreter */
-	  if (embedded_perl_initialized == TRUE)
-	    deinit_embedded_perl();
-	}
+          // Cleanup embedded perl interpreter.
+          if (embedded_perl_initialized == TRUE)
+            deinit_embedded_perl();
+        }
 
-	/* send program data to broker */
-	broker_program_state(NEBTYPE_PROCESS_SHUTDOWN,
-			     NEBFLAG_PROCESS_INITIATED,
-			     NEBATTR_SHUTDOWN_ABNORMAL,
-			     NULL);
-	cleanup();
-	exit(ERROR);
+        // Send program data to broker.
+        broker_program_state(NEBTYPE_PROCESS_SHUTDOWN,
+                             NEBFLAG_PROCESS_INITIATED,
+                             NEBATTR_SHUTDOWN_ABNORMAL,
+                             NULL);
+        cleanup();
+        exit(ERROR);
       }
 
       /* initialize embedded Perl interpreter */
       /* NOTE 02/15/08 embedded Perl must be initialized if compiled in, regardless of whether or not its enabled in the config file */
-      /* It compiled it, but not initialized, Nagios will segfault in readdir() calls, as libperl takes this function over */
+      /* It compiled it, but not initialized, Centreon Engine will segfault in readdir() calls, as libperl takes this function over */
       if (embedded_perl_initialized == FALSE) {
-	/*				if(enable_embedded_perl==TRUE){*/
+        /*                                if(enable_embedded_perl==TRUE){*/
 #ifdef EMBEDDEDPERL
-	init_embedded_perl(env);
+        init_embedded_perl(env);
 #else
-	init_embedded_perl(NULL);
+        init_embedded_perl(NULL);
 #endif
-	embedded_perl_initialized = TRUE;
-	/*					}*/
+        embedded_perl_initialized = TRUE;
+        /*                                        }*/
       }
 
-      /* handle signals (interrupts) */
+      // Handle signals (interrupts).
       setup_sighandler();
 
-      /* send program data to broker */
+      // Send program data to broker.
       broker_program_state(NEBTYPE_PROCESS_START,
-			   NEBFLAG_NONE,
-			   NEBATTR_NONE,
-			   NULL);
+                           NEBFLAG_NONE,
+                           NEBATTR_NONE,
+                           NULL);
 
-      /* open the command file (named pipe) for reading */
+      // Open the command file (named pipe) for reading.
       result = open_command_file();
       if (result != OK) {
 
-	logit(NSLOG_PROCESS_INFO | NSLOG_RUNTIME_ERROR, TRUE,
-	      "Bailing out due to errors encountered while trying to initialize the external command file... (PID=%d)\n",
-	      (int)getpid());
+        logit(NSLOG_PROCESS_INFO | NSLOG_RUNTIME_ERROR, TRUE,
+              "Bailing out due to errors encountered while trying to initialize the external command file... (PID=%d)\n",
+              (int)getpid());
 
-	/* send program data to broker */
-	broker_program_state(NEBTYPE_PROCESS_SHUTDOWN,
-			     NEBFLAG_PROCESS_INITIATED,
-			     NEBATTR_SHUTDOWN_ABNORMAL,
-			     NULL);
-	cleanup();
-	exit(ERROR);
+        // Send program data to broker.
+        broker_program_state(NEBTYPE_PROCESS_SHUTDOWN,
+                             NEBFLAG_PROCESS_INITIATED,
+                             NEBATTR_SHUTDOWN_ABNORMAL,
+                             NULL);
+        cleanup();
+        exit(ERROR);
       }
 
-      /* initialize status data unless we're starting */
+      // Initialize status data unless we're starting.
       if (sigrestart == FALSE)
-	initialize_status_data(config_file);
+        initialize_status_data(config_file);
 
-      /* read initial service and host state information  */
+      // Read initial service and host state information.
       initialize_retention_data(config_file);
       read_initial_state_information();
 
-      /* initialize comment data */
+      // Initialize comment data.
       initialize_comment_data(config_file);
 
-      /* initialize scheduled downtime data */
+      // Initialize scheduled downtime data.
       initialize_downtime_data(config_file);
 
-      /* initialize performance data */
+      // Initialize performance data.
       initialize_performance_data(config_file);
 
-      /* initialize the event timing loop */
+      // Initialize the event timing loop.
       init_timing_loop();
 
-      /* initialize check statistics */
+      // Initialize check statistics.
       init_check_stats();
 
-      /* update all status data (with retained information) */
+      // Update all status data (with retained information).
       update_all_status_data();
 
-      /* log initial host and service state */
+      // Log initial host and service state.
       log_host_states(INITIAL_STATES, NULL);
       log_service_states(INITIAL_STATES, NULL);
 
-      /* reset the restart flag */
+      // Reset the restart flag.
       sigrestart = FALSE;
 
-      /* send program data to broker */
+      // Send program data to broker.
       broker_program_state(NEBTYPE_PROCESS_EVENTLOOPSTART,
-			   NEBFLAG_NONE,
-			   NEBATTR_NONE,
-			   NULL);
+                           NEBFLAG_NONE,
+                           NEBATTR_NONE,
+                           NULL);
 
-      /* get event start time and save as macro */
+      // Get event start time and save as macro.
       event_start = time(NULL);
       delete[] mac->x[MACRO_EVENTSTARTTIME];
       try {
-	mac->x[MACRO_EVENTSTARTTIME] = obj2pchar<unsigned long>(event_start);
+        mac->x[MACRO_EVENTSTARTTIME] = obj2pchar<unsigned long>(event_start);
       }
       catch(...) {
-	/* send program data to broker */
-	broker_program_state(NEBTYPE_PROCESS_SHUTDOWN,
-			     NEBFLAG_PROCESS_INITIATED,
-			     NEBATTR_SHUTDOWN_ABNORMAL,
-			     NULL);
-	cleanup();
+        // Send program data to broker.
+        broker_program_state(NEBTYPE_PROCESS_SHUTDOWN,
+                             NEBFLAG_PROCESS_INITIATED,
+                             NEBATTR_SHUTDOWN_ABNORMAL,
+                             NULL);
+        cleanup();
       }
 
-      /***** start monitoring all services *****/
-      /* (doesn't return until a restart or shutdown signal is encountered) */
+      /***** Start monitoring all services. *****/
+      // (doesn't return until a restart or shutdown signal is encountered).
       event_execution_loop();
 
       /* 03/01/2007 EG Moved from sighandler() to prevent FUTEX locking problems under NPTL */
-      /* did we catch a signal? */
+      // Did we catch a signal ?
       if (caught_signal == TRUE) {
-	if (sig_id == SIGHUP) {
-	  try {
-	    buffer = my_strdup("Caught SIGHUP, restarting...\n");
-	  }
-	  catch(...) {
-	    /* send program data to broker */
-	    broker_program_state(NEBTYPE_PROCESS_SHUTDOWN,
-				 NEBFLAG_PROCESS_INITIATED,
-				 NEBATTR_SHUTDOWN_ABNORMAL,
-				 NULL);
-	    cleanup();
-	  }
-	}
-	else {
-	  try {
-	    std::ostringstream oss;
-	    oss << "Caught SIG" << sigs[sig_id] << ", shutting down...\n";
-	    buffer = my_strdup(oss.str().c_str());
-	  }
-	  catch(...) {
-	    /* send program data to broker */
-	    broker_program_state(NEBTYPE_PROCESS_SHUTDOWN,
-				 NEBFLAG_PROCESS_INITIATED,
-				 NEBATTR_SHUTDOWN_ABNORMAL,
-				 NULL);
-	    cleanup();
-	  }
-	}
+        if (sig_id == SIGHUP) {
+          try {
+            buffer = my_strdup("Caught SIGHUP, restarting...\n");
+          }
+          catch(...) {
+            // Send program data to broker.
+            broker_program_state(NEBTYPE_PROCESS_SHUTDOWN,
+                                 NEBFLAG_PROCESS_INITIATED,
+                                 NEBATTR_SHUTDOWN_ABNORMAL,
+                                 NULL);
+            cleanup();
+          }
+        }
+        else {
+          try {
+            std::ostringstream oss;
+            oss << "Caught SIG" << sigs[sig_id] << ", shutting down...\n";
+            buffer = my_strdup(oss.str().c_str());
+          }
+          catch(...) {
+            // Send program data to broker.
+            broker_program_state(NEBTYPE_PROCESS_SHUTDOWN,
+                                 NEBFLAG_PROCESS_INITIATED,
+                                 NEBATTR_SHUTDOWN_ABNORMAL,
+                                 NULL);
+            cleanup();
+          }
+        }
 
-	write_to_all_logs(buffer, NSLOG_PROCESS_INFO);
-	delete[] buffer;
+        write_to_all_logs(buffer, NSLOG_PROCESS_INFO);
+        delete[] buffer;
       }
 
-      /* send program data to broker */
+      // Send program data to broker.
       broker_program_state(NEBTYPE_PROCESS_EVENTLOOPEND,
-			   NEBFLAG_NONE,
-			   NEBATTR_NONE,
-			   NULL);
+                           NEBFLAG_NONE,
+                           NEBATTR_NONE,
+                           NULL);
       if (sigshutdown == TRUE)
-	broker_program_state(NEBTYPE_PROCESS_SHUTDOWN,
-			     NEBFLAG_USER_INITIATED,
-			     NEBATTR_SHUTDOWN_NORMAL,
-			     NULL);
+        broker_program_state(NEBTYPE_PROCESS_SHUTDOWN,
+                             NEBFLAG_USER_INITIATED,
+                             NEBATTR_SHUTDOWN_NORMAL,
+                             NULL);
       else if (sigrestart == TRUE)
-	broker_program_state(NEBTYPE_PROCESS_RESTART,
-			     NEBFLAG_USER_INITIATED,
-			     NEBATTR_RESTART_NORMAL,
-			     NULL);
+        broker_program_state(NEBTYPE_PROCESS_RESTART,
+                             NEBFLAG_USER_INITIATED,
+                             NEBATTR_RESTART_NORMAL,
+                             NULL);
 
-      /* save service and host state information */
+      // Save service and host state information.
       save_state_information(FALSE);
       cleanup_retention_data(config_file);
 
-      /* clean up performance data */
+      // Clean up performance data.
       cleanup_performance_data(config_file);
 
-      /* clean up the scheduled downtime data */
+      // Clean up the scheduled downtime data.
       cleanup_downtime_data(config_file);
 
-      /* clean up the comment data */
+      // Clean up the comment data.
       cleanup_comment_data(config_file);
 
-      /* clean up the status data unless we're restarting */
+      // Clean up the status data unless we're restarting.
       if (sigrestart == FALSE)
-	cleanup_status_data(config_file, TRUE);
+        cleanup_status_data(config_file, TRUE);
 
-      /* close and delete the external command file FIFO unless we're restarting */
+      // Close and delete the external command file FIFO unless we're restarting.
       if (sigrestart == FALSE) {
-	shutdown_command_file_worker_thread();
-	close_command_file();
+        shutdown_command_file_worker_thread();
+        close_command_file();
       }
 
-      /* cleanup embedded perl interpreter */
+      // Cleanup embedded perl interpreter.
       if (sigrestart == FALSE)
-	deinit_embedded_perl();
+        deinit_embedded_perl();
 
-      /* shutdown stuff... */
+      // Shutdown stuff.
       if (sigshutdown == TRUE) {
-	/* log a shutdown message */
-	logit(NSLOG_PROCESS_INFO, TRUE,
-	      "Successfully shutdown... (PID=%d)\n", (int)getpid());
+        // Log a shutdown message.
+        logit(NSLOG_PROCESS_INFO, TRUE,
+              "Successfully shutdown... (PID=%d)\n", (int)getpid());
       }
 
-      /* clean up after ourselves */
+      // Clean up after ourselves.
       cleanup();
 
-      /* close debug log */
+      // Close debug log.
       close_debug_log();
 
     } while (sigrestart == TRUE && sigshutdown == FALSE);
 
-    /* free misc memory */
-    delete[] config_file;
+    // Free misc memory.
+    delete [] config_file;
   }
 
   return (OK);

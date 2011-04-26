@@ -1,5 +1,5 @@
 /*
-** Copyright 2011      Merethis
+** Copyright 2011 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -27,7 +27,7 @@
 #include <time.h>
 #include <pwd.h>
 #include <grp.h>
-#include "nagios.hh"
+#include "engine.hh"
 #include "logging.hh"
 #include "common.hh"
 #include "macros.hh"
@@ -296,8 +296,8 @@ configuration::configuration()
   _lst_method["downtime_file"]                               = &cpp_suck<QString const&, &configuration::_set_downtime_file>::set_generic;
   _lst_method["xdddefault_downtime_file"]                    = &cpp_suck<QString const&, &configuration::_set_downtime_file>::set_generic;
   _lst_method["lock_file"]                                   = &cpp_suck<QString const&, &configuration::_set_lock_file>::set_generic;
-  _lst_method["nagios_user"]                                 = &cpp_suck<QString const&, &configuration::_set_nagios_user>::set_generic;
-  _lst_method["nagios_group"]                                = &cpp_suck<QString const&, &configuration::_set_nagios_group>::set_generic;
+  _lst_method["nagios_user"]                                 = &cpp_suck<QString const&, &configuration::_set_user>::set_generic;
+  _lst_method["nagios_group"]                                = &cpp_suck<QString const&, &configuration::_set_group>::set_generic;
   _lst_method["allow_empty_hostgroup_assignment"]            = &cpp_suck<bool, &configuration::set_allow_empty_hostgroup_assignment>::set_generic;
 
   _lst_method["status_file"]                                 = NULL; // ignore external variables
@@ -385,9 +385,9 @@ configuration& configuration::operator=(configuration const& right) {
 void configuration::reset() {
   _reset();
 
-  set_temp_path(DEFAULT_TEMP_PATH);
-  set_check_result_path(DEFAULT_CHECK_RESULT_PATH);
-  set_log_archive_path(DEFAULT_LOG_ARCHIVE_PATH);
+  _tab_string[temp_path] = DEFAULT_TEMP_PATH;
+  _tab_string[check_result_path] = DEFAULT_CHECK_RESULT_PATH;
+  _tab_string[log_archive_path] = DEFAULT_LOG_ARCHIVE_PATH;
 }
 
 /**
@@ -648,14 +648,6 @@ unsigned int configuration::get_max_service_check_spread() const throw() {
  */
 unsigned int configuration::get_max_host_check_spread() const throw() {
   return (_tab_uint[max_host_check_spread]);
-}
-
-/**
- *  Get the max concurrent checks.
- *  @return The max concurrent chechs.
- */
-unsigned int configuration::get_max_concurrent_checks() const throw() {
-  return (_tab_uint[max_concurrent_checks]);
 }
 
 /**
@@ -2892,17 +2884,17 @@ void configuration::_set_lock_file(QString const& value) {
 }
 
 /**
- * Nagios user ignored.
+ * User ignored.
  */
-void configuration::_set_nagios_user(QString const& value) {
+void configuration::_set_user(QString const& value) {
   (void)value;
   logit(NSLOG_CONFIG_WARNING, TRUE, "Warning: nagios_user varible ignored. Priviledge drop should be handled by startup script.");
 }
 
 /**
- * Nagios group ignored.
+ * Group ignored.
  */
-void configuration::_set_nagios_group(QString const& value) {
+void configuration::_set_group(QString const& value) {
   (void)value;
   logit(NSLOG_CONFIG_WARNING, TRUE, "Warning: nagios_group variable ignored. Priviledge drop should be handled by startup script.");
 }

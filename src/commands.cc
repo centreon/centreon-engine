@@ -25,7 +25,7 @@
 #include <sys/stat.h>
 #include <sys/time.h>
 #include <errno.h>
-#include "nagios.hh"
+#include "engine.hh"
 #include "comments.hh"
 #include "downtime.hh"
 #include "statusdata.hh"
@@ -1118,7 +1118,7 @@ int process_external_command2(int cmd, time_t entry_time, char* args) {
     /*************************/
 
   case CMD_CUSTOM_COMMAND:
-    /* custom commands aren't handled internally by Nagios, but may be by NEB modules */
+    /* custom commands aren't handled internally by Centreon Engine, but may be by NEB modules */
     break;
 
   default:
@@ -5274,7 +5274,7 @@ void process_passive_checks(void) {
     /* write check results to file */
     if (checkresult_file_fp) {
 
-      fprintf(checkresult_file_fp, "### Nagios %s Check Result ###\n",
+      fprintf(checkresult_file_fp, "### Centreon Engine %s Check Result ###\n",
               (temp_pcr->object_check_type == SERVICE_CHECK) ? "Service" : "Host");
       fprintf(checkresult_file_fp, "# Time: %s", ctime(&temp_pcr->check_time));
       fprintf(checkresult_file_fp, "host_name=%s\n",

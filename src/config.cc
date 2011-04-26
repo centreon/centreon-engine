@@ -22,7 +22,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <errno.h>
-#include "nagios.hh"
+#include "engine.hh"
 #include "utils.hh"
 #include "notifications.hh"
 #include "logging.hh"
@@ -42,7 +42,6 @@ extern command*           ocsp_command_ptr;
 extern command*           ochp_command_ptr;
 
 extern int                verify_config;
-extern int                verify_object_relationships;
 extern int                verify_circular_paths;
 extern int                test_scheduling;
 extern int                precache_objects;
@@ -326,7 +325,7 @@ int pre_flight_check(void) {
 
   /* check if we can write to temp_path */
   std::ostringstream oss;
-  oss << config.get_temp_path().toStdString() << "/nagiosXXXXXX";
+  oss << config.get_temp_path().toStdString() << "/centreonengineXXXXXX";
   buf = my_strdup(oss.str().c_str());
   if ((temp_path_fd = mkstemp(buf)) == -1) {
     logit(NSLOG_VERIFICATION_ERROR, TRUE,
@@ -343,7 +342,7 @@ int pre_flight_check(void) {
 
   /* check if we can write to check_result_path */
   oss.str("");
-  oss << config.get_check_result_path().toStdString() << "/nagiosXXXXXX";
+  oss << config.get_check_result_path().toStdString() << "/centreonengineXXXXXX";
   buf = my_strdup(oss.str().c_str());
   if ((temp_path_fd = mkstemp(buf)) == -1) {
     logit(NSLOG_VERIFICATION_WARNING, TRUE,
@@ -386,11 +385,8 @@ int pre_flight_check(void) {
 
   if (test_scheduling == TRUE) {
 
-    if (verify_object_relationships == TRUE)
-      runtime[0] = (double)((double)(tv[1].tv_sec - tv[0].tv_sec)
-			    + (double)((tv[1].tv_usec - tv[0].tv_usec) / 1000.0) / 1000.0);
-    else
-      runtime[0] = 0.0;
+    runtime[0] = (double)((double)(tv[1].tv_sec - tv[0].tv_sec)
+      + (double)((tv[1].tv_usec - tv[0].tv_usec) / 1000.0) / 1000.0);
     if (verify_circular_paths == TRUE)
       runtime[1] = (double)((double)(tv[2].tv_sec - tv[1].tv_sec)
 			    + (double)((tv[2].tv_usec - tv[1].tv_usec) / 1000.0) / 1000.0);
@@ -467,10 +463,6 @@ int pre_flight_object_check(int* w, int* e) {
            temp_he->notification_interval, ptr);
   }
 #endif
-
-  /* bail out if we aren't supposed to verify object relationships */
-  if (verify_object_relationships == FALSE)
-    return (OK);
 
   /*****************************************/
   /* check each service...                 */

@@ -24,7 +24,7 @@
 #include "comments.hh"
 #include "macros.hh"
 #include "objects.hh"
-#include "nagios.hh"
+#include "engine.hh"
 
 /**** IMPLEMENTATION SPECIFIC HEADER FILES ****/
 #include "xcddefault.hh"

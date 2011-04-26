@@ -2,19 +2,19 @@
 ** Copyright 2003-2006 Ethan Galstad
 ** Copyright 2011      Merethis
 **
-** This file is part of Centreon Scheduler.
+** This file is part of Centreon Engine.
 **
-** Centreon Scheduler is free software: you can redistribute it and/or
+** Centreon Engine is free software: you can redistribute it and/or
 ** modify it under the terms of the GNU General Public License version 2
 ** as published by the Free Software Foundation.
 **
-** Centreon Scheduler is distributed in the hope that it will be useful,
+** Centreon Engine is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
 ** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
 ** General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
-** along with Centreon Scheduler. If not, see
+** along with Centreon Engine. If not, see
 ** <http://www.gnu.org/licenses/>.
 */
 
@@ -40,7 +40,7 @@
 # define NEBERROR_CALLBACKNOTFOUND   203     /* the callback could not be found */
 # define NEBERROR_NOMODULEHANDLE     204     /* no module handle specified */
 # define NEBERROR_BADMODULEHANDLE    205     /* bad module handle */
-# define NEBERROR_CALLBACKOVERRIDE   206     /* module wants to override default Nagios handling of event */
+# define NEBERROR_CALLBACKOVERRIDE   206     /* module wants to override default handling of event */
 # define NEBERROR_CALLBACKCANCEL     207     /* module wants to cancel callbacks to other modules */
 
 

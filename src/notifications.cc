@@ -20,7 +20,7 @@
 */
 
 #include <sstream>
-#include "nagios.hh"
+#include "engine.hh"
 #include "statusdata.hh"
 #include "broker.hh"
 #include "neberrors.hh"
@@ -182,7 +182,7 @@ int service_notification(service* svc,
       mac->x[MACRO_NOTIFICATIONAUTHORALIAS] = 0;
     }
 
-    /* NOTE: these macros are deprecated and will likely disappear in Nagios 4.x */
+    /* NOTE: these macros are deprecated and will likely disappear in next major release */
     /* if this is an acknowledgement, get author and comment macros */
     if (type == NOTIFICATION_ACKNOWLEDGEMENT) {
 
@@ -1411,7 +1411,7 @@ int host_notification(host* hst,
       mac->x[MACRO_NOTIFICATIONAUTHORALIAS] = 0;
     }
 
-    /* NOTE: these macros are deprecated and will likely disappear in Nagios 4.x */
+    /* NOTE: these macros are deprecated and will likely disappear in next major release */
     /* if this is an acknowledgement, get author and comment macros */
     if (type == NOTIFICATION_ACKNOWLEDGEMENT) {
 

@@ -2,19 +2,19 @@
 ** Copyright 1999-2007 Ethan Galstad
 ** Copyright 2011      Merethis
 **
-** This file is part of Centreon Scheduler.
+** This file is part of Centreon Engine.
 **
-** Centreon Scheduler is free software: you can redistribute it and/or
+** Centreon Engine is free software: you can redistribute it and/or
 ** modify it under the terms of the GNU General Public License version 2
 ** as published by the Free Software Foundation.
 **
-** Centreon Scheduler is distributed in the hope that it will be useful,
+** Centreon Engine is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
 ** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
 ** General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
-** along with Centreon Scheduler. If not, see
+** along with Centreon Engine. If not, see
 ** <http://www.gnu.org/licenses/>.
 */
 
@@ -90,8 +90,8 @@ extern "C" {
 # define DEBUGV_MOST                2
 
 // Logging Functions
-void logit(int data_type, int display, char const* fmt, ...) __attribute__((__format__(__printf__, 3, 4)));
-int log_debug_info(int level, unsigned int verbosity,char const* fmt, ...) __attribute__((__format__(__printf__, 3, 4)));
+void logit(int data_type, int display, char const* fmt, ...);
+int log_debug_info(int level, unsigned int verbosity,char const* fmt, ...);
 
 int write_to_all_logs(char* buffer, unsigned long data_type);               // writes a string to main log file and syslog facility
 int write_to_log(char* buffer, unsigned long data_type, time_t* timestamp); // write a string to the main log file

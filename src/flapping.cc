@@ -22,7 +22,7 @@
 
 #include <sstream>
 #include <iomanip>
-#include "nagios.hh"
+#include "engine.hh"
 #include "comments.hh"
 #include "statusdata.hh"
 #include "broker.hh"
@@ -392,7 +392,7 @@ void set_service_flap(service* svc,
 			  svc->host_name,
                           svc->description,
 			  time(NULL),
-                          "(Nagios Process)",
+                          "(Centreon Engine Process)",
 			  temp_buffer,
 			  0,
                           COMMENTSOURCE_INTERNAL,
@@ -529,7 +529,7 @@ void set_host_flap(host* hst,
   add_new_host_comment(FLAPPING_COMMENT,
 		       hst->name,
 		       time(NULL),
-                       "(Nagios Process)",
+                       "(Centreon Engine Process)",
 		       temp_buffer,
 		       0,
                        COMMENTSOURCE_INTERNAL,

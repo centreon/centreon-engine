@@ -1,19 +1,19 @@
 /*
-** Copyright 2011      Merethis
+** Copyright 2011 Merethis
 **
-** This file is part of Centreon Scheduler.
+** This file is part of Centreon Engine.
 **
-** Centreon Scheduler is free software: you can redistribute it and/or
+** Centreon Engine is free software: you can redistribute it and/or
 ** modify it under the terms of the GNU General Public License version 2
 ** as published by the Free Software Foundation.
 **
-** Centreon Scheduler is distributed in the hope that it will be useful,
+** Centreon Engine is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
 ** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
 ** General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
-** along with Centreon Scheduler. If not, see
+** along with Centreon Engine. If not, see
 ** <http://www.gnu.org/licenses/>.
 */
 
@@ -24,7 +24,7 @@
 #include <iostream>
 #include <fstream>
 #include <map>
-#include "nagios.hh"
+#include "engine.hh"
 #include "macros.hh"
 #include "error.hh"
 #include "configuration.hh"
@@ -225,8 +225,6 @@ std::map<QString, QString> build_configuration(QString const& mainconf, QString 
   var["downtime_file"] = "downtime_file.tmp";
   var["xdddefault_downtime_file"] = "downtime_file.tmp";
   var["lock_file"] = "lock_file.tmp";
-  var["nagios_user"] = "nagios";
-  var["nagios_group"] = "nagios";
   var["allow_empty_hostgroup_assignment"] = obj2str(my_rand(0, 1));
 
   std::ofstream ofs(mainconf.toStdString().c_str());
@@ -403,7 +401,7 @@ void test_configuration(QString const& filename, std::map<QString, QString>& my_
   if (my_conf["max_host_check_spread"] != obj2str(config.get_max_host_check_spread())) {
     throw (error() << "max_host_check_spread: init with '" << my_conf["max_host_check_spread"] << "'");
   }
-  if (my_conf["max_concurrent_checks"] != obj2str(config.get_max_concurrent_checks())) {
+  if (my_conf["max_concurrent_checks"] != obj2str(config.get_max_parallel_service_checks())) {
     throw (error() << "max_concurrent_checks: init with '" << my_conf["max_concurrent_checks"] << "'");
   }
   if (my_conf["check_result_reaper_frequency"] != obj2str(config.get_check_reaper_interval())) {

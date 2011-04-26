@@ -4,58 +4,27 @@
 ** Copyright 2010      Max Schubert
 ** Copyright 2011      Merethis
 **
-** This file is part of Centreon Scheduler.
+** This file is part of Centreon Engine.
 **
-** Centreon Scheduler is free software: you can redistribute it and/or
+** Centreon Engine is free software: you can redistribute it and/or
 ** modify it under the terms of the GNU General Public License version 2
 ** as published by the Free Software Foundation.
 **
-** Centreon Scheduler is distributed in the hope that it will be useful,
+** Centreon Engine is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
 ** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
 ** General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
-** along with Centreon Scheduler. If not, see
+** along with Centreon Engine. If not, see
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef CCE_NAGIOS_HH
-# define CCE_NAGIOS_HH
+#ifndef CCE_ENGINE_HH
+# define CCE_ENGINE_HH
 
 # include <sys/time.h>
 # include <pthread.h>
-
-# ifndef __GNUC__
-#  define __attribute__(x) /* nothing */
-# endif
-
-/*
-# include "broker.hh"
-# include "checks.hh"
-# include "commands.hh"
-# include "comments.hh"
-# include "common.hh"
-# include "config.hh"
-# include "downtime.hh"
-# include "events.hh"
-# include "flapping.hh"
-# include "logging.hh"
-# include "macros.hh"
-# include "neberrors.hh"
-# include "nebmods.hh"
-# include "nebstructs.hh"
-# include "netutils.hh"
-# include "notifications.hh"
-# include "objects.hh"
-# include "perfdata.hh"
-# include "sehandlers.hh"
-# include "shared.hh"
-# include "skiplist.hh"
-# include "sretention.hh"
-# include "statusdata.hh"
-# include "utils.hh"
-*/
 
 # ifdef __cplusplus
 extern "C" {
@@ -63,12 +32,16 @@ extern "C" {
 
   /************* MISC LENGTH/SIZE DEFINITIONS ***********/
 
-  /*
-    NOTE: Plugin length is artificially capped at 8k to prevent runaway plugins from returning MBs/GBs of data
-    back to Nagios.  If you increase the 8k cap by modifying this value, make sure you also increase the value
-    of MAX_EXTERNAL_COMMAND_LENGTH in common.h to allow for passive checks results received through the external
-    command file. EG 10/19/07
-  */
+  /**
+   *  @note
+   *
+   *  Plugin length is artificially capped at 8k to prevent runaway
+   *  plugins from returning MBs/GBs of data back to Centreon Engine.
+   *  If you increase the 8k cap by modifying this value, make sure you
+   *  also increase the value of MAX_EXTERNAL_COMMAND_LENGTH in
+   *  common.hh to allow for passive checks results received through the
+   *  external command file.
+   */
 # define MAX_PLUGIN_OUTPUT_LENGTH       8192    /* max length of plugin output (including perf data) */
 
   /******************* DEFAULT VALUES *******************/
@@ -153,4 +126,4 @@ typedef struct check_stats_struct {
 # ifdef __cplusplus
 }
 # endif
-#endif // !CCE_NAGIOS_HH
+#endif // !CCE_ENGINE_HH

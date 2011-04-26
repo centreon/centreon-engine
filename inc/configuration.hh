@@ -1,19 +1,19 @@
 /*
-** Copyright 2011      Merethis
+** Copyright 2011 Merethis
 **
-** This file is part of Centreon Scheduler.
+** This file is part of Centreon Engine.
 **
-** Centreon Scheduler is free software: you can redistribute it and/or
+** Centreon Engine is free software: you can redistribute it and/or
 ** modify it under the terms of the GNU General Public License version 2
 ** as published by the Free Software Foundation.
 **
-** Centreon Scheduler is distributed in the hope that it will be useful,
+** Centreon Engine is distributed in the hope that it will be useful,
 ** but WITHOUT ANY WARRANTY; without even the implied warranty of
 ** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
 ** General Public License for more details.
 **
 ** You should have received a copy of the GNU General Public License
-** along with Centreon Scheduler. If not, see
+** along with Centreon Engine. If not, see
 ** <http://www.gnu.org/licenses/>.
 */
 
@@ -114,7 +114,6 @@ namespace com {
 	int                 get_external_command_buffer_slots() const throw();
 	unsigned int        get_max_service_check_spread() const throw();
 	unsigned int        get_max_host_check_spread() const throw();
-	unsigned int        get_max_concurrent_checks() const throw();
 	unsigned int        get_max_parallel_service_checks() const throw();
 	unsigned int        get_check_reaper_interval() const throw();
 	unsigned int        get_max_check_reaper_time() const throw();
@@ -384,7 +383,6 @@ namespace com {
 	  debug_verbosity,
 	  max_service_check_spread,
 	  max_host_check_spread,
-	  max_concurrent_checks,
 	  max_parallel_service_checks,
 	  check_reaper_interval,
 	  max_check_reaper_time,
@@ -477,8 +475,8 @@ namespace com {
 	void                _set_daemon_dumps_core(QString const& value);
 	void                _set_downtime_file(QString const& value);
 	void                _set_lock_file(QString const& value);
-	void                _set_nagios_user(QString const& value);
-	void                _set_nagios_group(QString const& value);
+	void                _set_user(QString const& value);
+	void                _set_group(QString const& value);
 
 	static std::string  _getline(std::ifstream& ifs) throw();
 	static std::string& _trim(std::string& str) throw();

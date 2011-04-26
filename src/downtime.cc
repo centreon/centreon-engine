@@ -21,7 +21,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "xdddefault.hh"
-#include "nagios.hh"
+#include "engine.hh"
 #include "comments.hh"
 #include "statusdata.hh"
 #include "broker.hh"
@@ -309,7 +309,7 @@ int register_downtime(int type, unsigned long downtime_id) {
 		    svc->host_name,
                     svc->description,
 		    time(NULL),
-		    "(Nagios Process)",
+		    "(Centreon Engine Process)",
                     temp_buffer,
 		    0,
 		    COMMENTSOURCE_INTERNAL,
@@ -322,7 +322,7 @@ int register_downtime(int type, unsigned long downtime_id) {
 		    hst->name,
 		    NULL,
                     time(NULL),
-		    "(Nagios Process)",
+		    "(Centreon Engine Process)",
 		    temp_buffer,
 		    0,
                     COMMENTSOURCE_INTERNAL,
