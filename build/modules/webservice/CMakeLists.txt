@@ -45,7 +45,7 @@ add_custom_command(OUTPUT
   "${MODULE_DIR}/soapServer.cpp"
   "${MODULE_DIR}/soapServerLib.cpp"
   "${MODULE_DIR}/soapStub.h"
-  COMMAND "${SOAPCPP2_PROGRAM}" "-d${MODULE_DIR}/" "-S" "-I${GSOAP_INCLUDE_DIR}" "${MODULE_DIR}/centreon-engine-ws.hh"
+  COMMAND "${SOAPCPP2_PROGRAM}" "-x" "-d${MODULE_DIR}/" "-S" "-I${GSOAP_INCLUDE_DIR}" "${MODULE_DIR}/centreon-engine-ws.hh"
   DEPENDS "${MODULE_DIR}/centreon-engine-ws.hh")
 
 # Find library.
@@ -84,7 +84,6 @@ add_definitions(-DWITH_GZIP)
 # centscheduler target.
 add_library("webservice"
   "SHARED"
-  "${SRC_DIR}/error.cc"
   "${MODULE_DIR}/soapC.cpp"
   "${MODULE_DIR}/soapServer.cpp"
   "${MODULE_DIR}/commands.cc"
