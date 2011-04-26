@@ -901,7 +901,7 @@
  *  plugins distribution comes with plugins that can be used to monitor
  *  a variety of services and protocols. There are also a large number
  *  of contributed plugins that can be found in the contrib/
- *  subdirectory of the plugin distribution. The XXX.org website hosts a
+ *  subdirectory of the plugin distribution. The nagios.org website hosts a
  *  number of additional plugins that have been written by users, so
  *  check it out when you have a chance.
  *

@@ -41,6 +41,17 @@ if (WITH_DOCUMENTATION)
   foreach (refman_line IN LISTS REFMAN_TEX)
     file(APPEND "${REFMAN_FILE}" "${refman_line}\n")
   endforeach()
+  set(DOXYSTY_FILE "${PROJECT_SOURCE_DIR}/build/doc/latex/doxygen.sty")
+  file(APPEND "${DOXYSTY_FILE}"
+    "\\RequirePackage{longtable}\n"
+    "\\renewenvironment{TabularC}[1]\n"
+    "{\n"
+    "\\setlength{\\tmplength}\n"
+    "     {\\linewidth/(#1)-\\tabcolsep*2-\\arrayrulewidth*(#1+1)/(#1)}\n"
+    "      \\par\\begin{longtable}\n"
+    "             {*{#1}{|p{\\the\\tmplength}}|}\n"
+    "}\n"
+    "{\\end{longtable}\\par}\n")
 
   # Copy images in latex directory.
   file(COPY "${PROJECT_SOURCE_DIR}/doc/images/"

@@ -72,7 +72,7 @@
  *
  *  More to come... The check_cluster plugin can be found in the
  *  contrib directory of the Centreon Engine Plugins release at
- *  http://XXX/.
+ *  http://sourceforge.net/projects/nagiosplug/.
  *
  *  @section monitoringserviceandhostclustersmonitoringserviceclusters Monitoring Service Clusters
  *

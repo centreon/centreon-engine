@@ -15,9 +15,9 @@
  *  - ...and much more
  *
  *  You can find many addons for Centreon Engine by visiting:
- *  - <a href="http://XXX">Centreon Engine.org</a>
- *  - <a href="http://XXX">SourceForge.net</a>
- *  - <a href="http://XXX">Centreon EngineExchange.org</a>
+ *  - <a href="http://www.nagios.org">nagios.org</a>
+ *  - <a href="http://sourceforge.net/projects/nagios">Nagios' SourceForge.net page</a>
+ *  - <a href="http://www.nagiosexchange.org">nagiosexchange.org</a>
  *
  *  I'll give a brief introduction to a few of the addons that I've
  *  developed for Centreon Engine...
@@ -36,7 +36,7 @@
  *  if you are monitoring hundreds or thousands of hosts.
  *
  *  The NRPE addon and documentation can be found at
- *  http://XXX/.
+ *  http://www.nagios.org/.
  *
  *  @section centengineaddonsnsca NSCA
  *
@@ -50,7 +50,7 @@
  *  @link redundantandfailovernetworkmonitoring redundant/failover
  *  @endlink monitoring setups.
  *
- *  The NSCA addon can be found at http://XXX/.
+ *  The NSCA addon can be found at http://www.nagios.org/.
  *
  *  @section centengineaddonsndoutils NDOUtils
  *
@@ -65,12 +65,12 @@
  *  Engine in the future.
  *
  *  The NDOUtils addon and documentation can be found at
- *  http://XXX/.
+ *  http://www.nagios.org/.
  *
  *  @section centengineaddonscentengineexchangehundredsofotheraddons Centreon Engine Exchange - Hundreds of Other Addons
  *
  *  Hundreds of community-developed Centreon Engine addons can be
  *  found on the Centreon Engine Exchange website at
- *  <a hre="http://XXX">exchange.centengine.org</a>
+ *  <a hre="http://exchange.nagios.org">exchange.nagios.org</a>
  */
 
