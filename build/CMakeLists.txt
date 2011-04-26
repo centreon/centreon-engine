@@ -25,6 +25,10 @@ project("Centreon Scheduler" C CXX)
 set(PROJECT_SOURCE_DIR "${PROJECT_SOURCE_DIR}/..")
 include(CTest)
 
+# Find Qt.
+find_package(Qt4 COMPONENTS QtCore REQUIRED)
+include(${QT_USE_FILE})
+
 # Set directories.
 set(BASE_DIR "${PROJECT_SOURCE_DIR}/base")
 set(COMMON_DIR "${PROJECT_SOURCE_DIR}/common")
@@ -354,38 +358,38 @@ else ()
   set(EMBEDDED_PERL "No")
 endif ()
 
-# Find and execute gSOAP's wsdl2h.
-find_program(WSDL2H_PROGRAM "wsdl2h")
-if (NOT WSDL2H_PROGRAM)
-  message(FATAL_ERROR "Could not find gSOAP's wsdl2h binary.")
-endif ()
-add_custom_command(OUTPUT "${INCLUDE_DIR}/centreon-engine-ws.hh"
-  COMMAND "${WSDL2H_PROGRAM}" "-o" "${INCLUDE_DIR}/centreon-engine-ws.hh" "-t${SCRIPT_DIR}/typemap.dat" "${SCRIPT_DIR}/centreon-engine.wsdl")
+# # Find and execute gSOAP's wsdl2h.
+# find_program(WSDL2H_PROGRAM "wsdl2h")
+# if (NOT WSDL2H_PROGRAM)
+#   message(FATAL_ERROR "Could not find gSOAP's wsdl2h binary.")
+# endif ()
+# add_custom_command(OUTPUT "${MODULES_DIR}/webservice/centreon-engine-ws.hh"
+#   COMMAND "${WSDL2H_PROGRAM}" "-o" "${MODULES_DIR}/webservice/centreon-engine-ws.hh" "-t${MODULES_DIR}/webservice/typemap.dat" "${MODULES_DIR}/webservice/centreon-engine.wsdl")
 
-# Find and execute gSOAP's soapcpp2.
-find_program(SOAPCPP2_PROGRAM "soapcpp2")
-if (NOT SOAPCPP2_PROGRAM)
-  message(FATAL_ERROR "Could not find gSOAP's soapcpp2 binary.")
-endif ()
-find_path(GSOAP_INCLUDE_DIR NAMES "stlvector.h" PATH_SUFFIXES "" "gsoap")
-if (NOT GSOAP_INCLUDE_DIR)
-  message(FATAL_ERROR "Could not find gSOAP's stlvector.h header file.")
-endif ()
-add_custom_command(OUTPUT
-  "${BASE_DIR}/centreonengine.nsmap"
-  "${BASE_DIR}/soapC.cpp"
-  "${BASE_DIR}/soapH.h"
-  "${BASE_DIR}/soapServer.cpp"
-  "${BASE_DIR}/soapServerLib.cpp"
-  "${BASE_DIR}/soapStub.h"
-  COMMAND "${SOAPCPP2_PROGRAM}" "-d${BASE_DIR}" "-S" "-I${GSOAP_INCLUDE_DIR}" "${INCLUDE_DIR}/centreon-engine-ws.hh"
-  DEPENDS "${INCLUDE_DIR}/centreon-engine-ws.hh")
+# # Find and execute gSOAP's soapcpp2.
+# find_program(SOAPCPP2_PROGRAM "soapcpp2")
+# if (NOT SOAPCPP2_PROGRAM)
+#   message(FATAL_ERROR "Could not find gSOAP's soapcpp2 binary.")
+# endif ()
+# find_path(GSOAP_INCLUDE_DIR NAMES "stlvector.h" PATH_SUFFIXES "" "gsoap")
+# if (NOT GSOAP_INCLUDE_DIR)
+#   message(FATAL_ERROR "Could not find gSOAP's stlvector.h header file.")
+# endif ()
+# add_custom_command(OUTPUT
+#   "$${MODULES_DIR}/webservice/centreonengine.nsmap"
+#   "${MODULES_DIR}/webservice/soapC.cpp"
+#   "${MODULES_DIR}/webservice/soapH.h"
+#   "${MODULES_DIR}/webservice/soapServer.cpp"
+#   "${MODULES_DIR}/webservice/soapServerLib.cpp"
+#   "$${MODULES_DIR}/webservice/soapStub.h"
+#   COMMAND "${SOAPCPP2_PROGRAM}" "-d${MODULES_DIR}/webservice/" "-S" "-I${GSOAP_INCLUDE_DIR}" "${MODULES_DIR}/webservice/centreon-engine-ws.hh"
+#   DEPENDS "${MODULES_DIR}/webservice/centreon-engine-ws.hh")
 
-# Find libgsoap++.
-find_library(GSOAP_LIBRARIES "gsoap++")
-if (NOT GSOAP_LIBRARIES)
-  message(FATAL_ERROR "Could not find gSOAP's libgsoap++.")
-endif ()
+# # Find libgsoap++.
+# find_library(GSOAP_LIBRARIES "gsoap++")
+# if (NOT GSOAP_LIBRARIES)
+#   message(FATAL_ERROR "Could not find gSOAP's libgsoap++.")
+# endif ()
 
 # Configure files.
 configure_file("${INCLUDE_DIR}/config.hh.in"
@@ -410,12 +414,9 @@ add_executable("centscheduler"
   "${BASE_DIR}/nagios.cc"
   "${BASE_DIR}/nebmods.cc"
   "${BASE_DIR}/netutils.cc"
-  "${BASE_DIR}/new_commands.cc"
   "${BASE_DIR}/notifications.cc"
   "${BASE_DIR}/perfdata.cc"
   "${BASE_DIR}/sehandlers.cc"
-  "${BASE_DIR}/soapC.cpp"
-  "${BASE_DIR}/soapServer.cpp"
   "${BASE_DIR}/sretention.cc"
   "${BASE_DIR}/utils.cc"
   "${COMMON_DIR}/comments.cc"
@@ -433,6 +434,10 @@ add_executable("centscheduler"
   "${XDATA_DIR}/xrddefault.cc"
   "${XDATA_DIR}/xsddefault.cc"
   "${PERL_SOURCES}"
+
+  # "${MODULES_DIR}/webservice/soapC.cpp"
+  # "${MODULES_DIR}/webservice/soapServer.cpp"
+  # "${MODULES_DIR}/webservice/commands.cc"
 )
 get_property(SCHEDULER_COMPILE_FLAGS
   TARGET "centscheduler"
@@ -442,7 +447,7 @@ set_target_properties("centscheduler" PROPERTIES
   COMPILE_FLAGS "${SCHEDULER_COMPILE_FLAGS}")
 target_link_libraries("centscheduler"
   ${DL_LIBRARIES}
-  ${GSOAP_LIBRARIES}
+  # ${GSOAP_LIBRARIES}
   ${MATH_LIBRARIES}
   ${SOCKET_LIBRARIES}
   ${THREAD_LIBRARIES}
@@ -453,6 +458,9 @@ target_link_libraries("centscheduler"
 add_executable("centschedulerstats"
   "${BASE_DIR}/nagiostats.cc"
 )
+
+# Add Modules.
+add_subdirectory("./modules")
 
 # Package.
 set(CPACK_PACKAGE_NAME "Centreon-Scheduler")
