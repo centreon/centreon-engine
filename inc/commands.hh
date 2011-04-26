@@ -49,9 +49,9 @@ int cmd_schedule_check(int cmd,char* args);                                 // s
 int cmd_schedule_host_service_checks(int cmd,char* args, int force);        // schedule an immediate or delayed checks of all services on a host
 void cmd_signal_process(int cmd, char* args);                               // schedules a program shutdown or restart
 int cmd_process_service_check_result(int cmd,time_t check_time,char* args); // processes a passive service check
-int process_passive_service_check(time_t check_time, char* host_name, char* svc_description, int return_code, char* output);
+int process_passive_service_check(time_t check_time, char const* host_name, char* svc_description, int return_code, char const* output);
 int cmd_process_host_check_result(int cmd,time_t check_time,char* args);    // processes a passive host check
-int process_passive_host_check(time_t check_time, char* host_name, int return_code, char* output);
+int process_passive_host_check(time_t check_time, char* host_name, int return_code, char const* output);
 int cmd_acknowledge_problem(int cmd,char* args);                            // acknowledges a host or service problem
 int cmd_remove_acknowledgement(int cmd,char* args);                         // removes a host or service acknowledgement
 int cmd_schedule_downtime(int cmd, time_t entry_time, char* args);          // schedules host or service downtime

@@ -74,7 +74,7 @@ include_directories("${INCLUDE_DIR}")
 include_directories("${MODULE_DIR}")
 
 # Qt moc files.
-qt4_wrap_cpp(QT_MOC_FILES
+qt4_wrap_cpp(QT_WS_MOC_FILES
   "${MODULE_DIR}/webservice.hh")
 
 # Define flags.
@@ -84,7 +84,7 @@ add_definitions(-DWITH_GZIP)
 # centscheduler target.
 add_library("webservice"
   "SHARED"
-  "${BASE_DIR}/error.cc"
+  "${SRC_DIR}/error.cc"
   "${MODULE_DIR}/soapC.cpp"
   "${MODULE_DIR}/soapServer.cpp"
   "${MODULE_DIR}/commands.cc"
@@ -92,7 +92,7 @@ add_library("webservice"
   "${MODULE_DIR}/configuration.cc"
   "${MODULE_DIR}/ssl.cc"
   "${MODULE_DIR}/main.cc"
-  ${QT_MOC_FILES})
+  ${QT_WS_MOC_FILES})
 get_property(MODULE_COMPILE_FLAGS
   TARGET "webservice"
   PROPERTY COMPILE_FLAGS)

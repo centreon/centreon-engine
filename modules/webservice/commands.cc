@@ -27,9 +27,11 @@
 #include "downtime.hh"
 #include "logging.hh"
 #include "sretention.hh"
-#include "nagios.hh"
 #include "broker.hh"
 #include "statusdata.hh"
+#include "notifications.hh"
+#include "commands.hh"
+#include "checks.hh"
 
 extern int           sigrestart;
 extern int           sigshutdown;
@@ -55,18 +57,6 @@ extern command*      global_host_event_handler_ptr;
 extern command*      global_service_event_handler_ptr;
 extern unsigned long modified_host_process_attributes;
 extern unsigned long modified_service_process_attributes;
-
-/**
- *  Duplicate string.
- *
- *  @param[in]  str      string to copy.
- *
- *  @return new pointer string on succes, otherwise NULL.
- */
-static inline char* my_strdup(char const* str) {
-  char* new_str = new char[strlen(str) + 1];
-  return (strcpy(new_str, str));
-}
 
 /**
  *  Restart Engine.

@@ -645,6 +645,18 @@ add_library("centenginelib"
   "${INCLUDE_DIR}/modules/loader.hh"
   "${PERL_SOURCES}"
   ${QT_MOC_FILES})
+get_property(LIB_COMPILE_FLAGS
+  TARGET "centenginelib"
+  PROPERTY COMPILE_FLAGS)
+set(LIB_COMPILE_FLAGS "${LIB_COMPILE_FLAGS}")
+set_target_properties("centenginelib" PROPERTIES
+  COMPILE_FLAGS "${LIB_COMPILE_FLAGS}")
+target_link_libraries("centenginelib"
+  ${MATH_LIBRARIES}
+  ${SOCKET_LIBRARIES}
+  ${THREAD_LIBRARIES}
+  ${PERL_LINK_FLAGS}
+  ${QT_LIBRARIES})
 
 # Centengine target.
 add_executable("centengine"
@@ -656,11 +668,6 @@ set(ENGINE_COMPILE_FLAGS "${ENGINE_COMPILE_FLAGS} ${PERL_COMPILE_FLAGS}")
 set_target_properties("centengine" PROPERTIES
   COMPILE_FLAGS "${ENGINE_COMPILE_FLAGS}")
 target_link_libraries("centengine"
-  ${MATH_LIBRARIES}
-  ${SOCKET_LIBRARIES}
-  ${THREAD_LIBRARIES}
-  ${PERL_LINK_FLAGS}
-  ${QT_LIBRARIES}
   "centenginelib")
 install(TARGETS "centengine"
   DESTINATION "${bindir}"

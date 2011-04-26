@@ -621,14 +621,14 @@ contactsmember* add_contact_to_object(contactsmember** object_ptr, char* contact
 customvariablesmember* add_custom_variable_to_object(customvariablesmember** object_ptr, char const* varname, char const* varvalue); // adds a custom variable to an object
 
 // Object Search Functions
-timeperiod* find_timeperiod(char* name);               // finds a timeperiod object
-host* find_host(char* name);                           // finds a host object
-hostgroup* find_hostgroup(char* name);                 // finds a hostgroup object
-servicegroup* find_servicegroup(char* name);           // finds a servicegroup object
-contact* find_contact(char* name);                     // finds a contact object
-contactgroup* find_contactgroup(char* name);           // finds a contactgroup object
-command* find_command(char* name);                     // finds a command object
-service* find_service(char* host_name,char* svc_desc); // finds a service object
+timeperiod* find_timeperiod(char const* name);                      // finds a timeperiod object
+host* find_host(char const* name);                                  // finds a host object
+hostgroup* find_hostgroup(char* name);                              // finds a hostgroup object
+servicegroup* find_servicegroup(char* name);                        // finds a servicegroup object
+contact* find_contact(char const* name);                            // finds a contact object
+contactgroup* find_contactgroup(char* name);                        // finds a contactgroup object
+command* find_command(char const* name);                            // finds a command object
+service* find_service(char const* host_name, char const* svc_desc); // finds a service object
 
 // Object Traversal Functions
 hostescalation* get_first_hostescalation_by_host(char* host_name, void** ptr);
