@@ -137,7 +137,7 @@
  *  them. Hence Centreon Engine considers them to be UNREACHABLE
  *  instead of DOWN.
  *
- *  @section determiningstatusandreachabilityofnetworkhostsunreachablestatesandnotifications UNREACHABLE States and Notifications
+ *  @section determiningstatusandreachabilityofnetworkhostsunreachablestatesandnotifications Unreachable States and Notifications
  *
  *  By default, Centreon Engine will notify contacts about both DOWN
  *  and UNREACHABLE host states. As an admin/tech, you might not want
