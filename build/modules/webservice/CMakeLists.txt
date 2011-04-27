@@ -75,6 +75,7 @@ include_directories("${MODULE_DIR}")
 
 # Qt moc files.
 qt4_wrap_cpp(QT_WS_MOC_FILES
+  "${MODULE_DIR}/syncro.hh"
   "${MODULE_DIR}/webservice.hh")
 
 # Define flags.
@@ -90,12 +91,17 @@ add_library("webservice"
   "${MODULE_DIR}/webservice.cc"
   "${MODULE_DIR}/configuration.cc"
   "${MODULE_DIR}/ssl.cc"
+  "${MODULE_DIR}/syncro.cc"
   "${MODULE_DIR}/main.cc"
   ${QT_WS_MOC_FILES})
 get_property(MODULE_COMPILE_FLAGS
   TARGET "webservice"
   PROPERTY COMPILE_FLAGS)
 set(MODULE_COMPILE_FLAGS "${MODULE_COMPILE_FLAGS}")
+if (CMAKE_COMPILER_IS_GNUCXX)
+  set_source_files_properties("${MODULE_DIR}/soapC.cpp" PROPERTIES
+    COMPILE_FLAGS "-Wno-unused-parameter")
+endif ()
 set_target_properties("webservice" PROPERTIES
   COMPILE_FLAGS "${MODULE_COMPILE_FLAGS}")
 target_link_libraries("webservice"

@@ -34,7 +34,7 @@ webservice::webservice(configuration const& config)
   : QThread(0),
     _is_end(false),
     _config(config) {
-
+  _init();
 }
 
 /**
@@ -46,11 +46,9 @@ webservice::~webservice() throw() {
 }
 
 /**
- *  Initialize and start the webservice.
+ *  Start the webservice.
  */
 void  webservice::run() {
-  _init();
-
   while (_is_end != true) {
     SOAP_SOCKET s = soap_accept(&_soap_ctx);
     if (!soap_valid_socket(s)) {
@@ -105,7 +103,7 @@ void webservice::_init() {
   if (_config.get_ssl_enable() == true) {
     soap_ssl_init();
     if (CRYPTO_thread_setup()) {
-      throw (error() << "ssl thread setup failed.");
+      throw (engine_error() << "ssl thread setup failed.");
     }
   }
   soap_init(&_soap_ctx);
@@ -124,7 +122,7 @@ void webservice::_init() {
 				dh,
 				NULL,
 				NULL)) {
-      throw (error() << "create ssl context with host `"
+      throw (engine_error() << "create ssl context with host `"
 	     << _config.get_host() << "' on port `" << _config.get_port() << "' failed.");
     }
   }
@@ -135,7 +133,7 @@ void webservice::_init() {
 				   _config.get_port(),
 				   100);
   if (!soap_valid_socket(m_socket)) {
-    throw (error() << "bind with host `" << _config.get_host()
+    throw (engine_error() << "bind with host `" << _config.get_host()
 	   << "' on port `" << _config.get_port() << "' failed.");
   }
 }

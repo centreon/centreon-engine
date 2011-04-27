@@ -153,7 +153,7 @@ void loader::module_name_changed(QString const& filename,
       return;
     }
   }
-  throw (error() << "Module `" << filename << ":" << old_name << "' not found");
+  throw (engine_error() << "Module `" << filename << ":" << old_name << "' not found");
 }
 
 /**************************************

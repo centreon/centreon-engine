@@ -400,7 +400,7 @@ void configuration::parse(QString const& filename)
   std::ifstream ifs;
   ifs.open(filename.toStdString().c_str());
   if (ifs.fail()) {
-    throw (error() << "cannot open configuration file: `" << filename << "'");
+    throw (engine_error() << "cannot open configuration file: `" << filename << "'");
   }
 
   _filename = filename;
@@ -413,8 +413,8 @@ void configuration::parse(QString const& filename)
 
       size_t pos = line.find_first_of('=');
       if (pos == std::string::npos) {
-      	throw (error() << "[" << _filename << ":" << _cur_line << "] bad variable name: `"
-      	       << _filename << "'");
+      	throw (engine_error() << "[" << _filename << ":" << _cur_line
+	       << "] bad variable name: `" << _filename << "'");
       }
       std::string key = line.substr(0, pos);
       methods::const_iterator it = _lst_method.find(_trim(key).c_str());
@@ -425,7 +425,8 @@ void configuration::parse(QString const& filename)
 	    it->second(_trim(value).c_str(), *this);
 	  }
 	  catch (error const& e) {
-	    throw (error() << "[" << _filename << ":" << _cur_line << "] " << e.what());
+	    throw (engine_error() << "[" << _filename << ":" << _cur_line
+		   << "] " << e.what());
 	  }
       	}
       }
@@ -434,14 +435,14 @@ void configuration::parse(QString const& filename)
       	continue;
       }
       else {
-      	throw (error() << "[" << _filename << ":" << _cur_line
+      	throw (engine_error() << "[" << _filename << ":" << _cur_line
       	       << "] unknown variable name: `" << key << "'");
       }
   }
   ifs.close();
 
   if (_tab_string[log_file] == "") {
-    throw (error() << "log_file is not specified anywhere in `" << _filename << "'");
+    throw (engine_error() << "log_file is not specified anywhere in `" << _filename << "'");
   }
 
   if (!get_use_timezone().isEmpty()) {
@@ -1296,7 +1297,7 @@ configuration::e_interleave_factor configuration::get_service_interleave_factor_
  */
 void configuration::set_log_file(QString const& value) {
   if (pathconf(value.toStdString().c_str(), _PC_PATH_MAX) == -1) {
-    throw (error() << "log_file: invalid value");
+    throw (engine_error() << "log_file: invalid value");
   }
   _tab_string[log_file] = value;
 
@@ -1313,7 +1314,7 @@ void configuration::set_log_file(QString const& value) {
  */
 void configuration::set_broker_module_directory(QString const& value) {
   if (pathconf(value.toStdString().c_str(), _PC_PATH_MAX) == -1) {
-    throw (error() << "broker_module_directory: invalid value");
+    throw (engine_error() << "broker_module_directory: invalid value");
   }
   _tab_string[broker_module_directory] = value;
 }
@@ -1325,7 +1326,7 @@ void configuration::set_broker_module_directory(QString const& value) {
  */
 void configuration::set_debug_file(QString const& value) {
   if (pathconf(value.toStdString().c_str(), _PC_PATH_MAX) == -1) {
-    throw (error() << "debuf_file: invalid value");
+    throw (engine_error() << "debuf_file: invalid value");
   }
   _tab_string[debug_file] = value;
 
@@ -1339,7 +1340,7 @@ void configuration::set_debug_file(QString const& value) {
  */
 void configuration::set_command_file(QString const& value) {
   if (pathconf(value.toStdString().c_str(), _PC_PATH_MAX) == -1) {
-    throw (error() << "command_file: invalid value");
+    throw (engine_error() << "command_file: invalid value");
   }
   _tab_string[command_file] = value;
 
@@ -1356,7 +1357,7 @@ void configuration::set_command_file(QString const& value) {
  */
 void configuration::set_temp_file(QString const& value) {
   if (pathconf(value.toStdString().c_str(), _PC_PATH_MAX) == -1) {
-    throw (error() << "temp_file: invalid value");
+    throw (engine_error() << "temp_file: invalid value");
   }
   _tab_string[temp_file] = value;
 
@@ -1372,7 +1373,7 @@ void configuration::set_temp_path(QString const& value) {
   struct stat stat_info;
   if (stat(value.toStdString().c_str(), &stat_info) == -1
       || !S_ISDIR(stat_info.st_mode)) {
-    throw (error() << "temp_path: invalid value");
+    throw (engine_error() << "temp_path: invalid value");
   }
   _tab_string[temp_path] = value;
 
@@ -1391,7 +1392,7 @@ void configuration::set_check_result_path(QString const& value) {
   struct stat stat_info;
   if (stat(value.toStdString().c_str(), &stat_info) == -1
       || !S_ISDIR(stat_info.st_mode)) {
-    throw (error() << "check_result_path: invalid value");
+    throw (engine_error() << "check_result_path: invalid value");
   }
   _tab_string[check_result_path] = value;
 
@@ -1451,7 +1452,7 @@ void configuration::set_log_archive_path(QString const& value) {
   struct stat stat_info;
   if (stat(value.toStdString().c_str(), &stat_info) == -1
       || !S_ISDIR(stat_info.st_mode)) {
-    throw (error() << "log_archive_path: invalid value");
+    throw (engine_error() << "log_archive_path: invalid value");
   }
   _tab_string[log_archive_path] = value;
 
@@ -1465,7 +1466,7 @@ void configuration::set_log_archive_path(QString const& value) {
  */
 void configuration::set_p1_file(QString const& value) {
   if (pathconf(value.toStdString().c_str(), _PC_PATH_MAX) == -1) {
-    throw (error() << "p1_file: invalid value");
+    throw (engine_error() << "p1_file: invalid value");
   }
   _tab_string[p1_file] = value;
 
@@ -1543,7 +1544,7 @@ void configuration::set_command_check_interval(int value) {
 
   if (_tab_int[command_check_interval] < -1
       || _tab_int[command_check_interval] == 0) {
-    throw (error() << "command_check_interval: invalid value");
+    throw (engine_error() << "command_check_interval: invalid value");
   }
 
   // adjust command check interval
@@ -1587,7 +1588,7 @@ void configuration::set_external_command_buffer_slots(int value) {
  */
 void configuration::set_max_service_check_spread(unsigned int value) {
   if (value == 0) {
-    throw (error() << "max_service_check_spread: invalid value");
+    throw (engine_error() << "max_service_check_spread: invalid value");
   }
   _tab_uint[max_service_check_spread] = value;
   ::max_service_check_spread = value;
@@ -1599,7 +1600,7 @@ void configuration::set_max_service_check_spread(unsigned int value) {
  */
 void configuration::set_max_host_check_spread(unsigned int value) {
   if (value == 0) {
-    throw (error() << "max_host_check_spread: invalid value");
+    throw (engine_error() << "max_host_check_spread: invalid value");
   }
   _tab_uint[max_host_check_spread] = value;
   ::max_host_check_spread = value;
@@ -1620,7 +1621,7 @@ void configuration::set_max_parallel_service_checks(unsigned int value) {
  */
 void configuration::set_check_reaper_interval(unsigned int value) {
   if (value == 0) {
-    throw (error() << "check_reaper_interval: invalid value");
+    throw (engine_error() << "check_reaper_interval: invalid value");
   }
   _tab_uint[check_reaper_interval] = value;
   ::check_reaper_interval = value;
@@ -1632,7 +1633,7 @@ void configuration::set_check_reaper_interval(unsigned int value) {
  */
 void configuration::set_max_check_reaper_time(unsigned int value) {
   if (value == 0) {
-    throw (error() << "max_check_reaper_time: invalid value");
+    throw (engine_error() << "max_check_reaper_time: invalid value");
   }
   _tab_uint[max_check_reaper_time] = value;
   ::max_check_reaper_time = value;
@@ -1644,7 +1645,7 @@ void configuration::set_max_check_reaper_time(unsigned int value) {
  */
 void configuration::set_interval_length(unsigned int value) {
   if (value == 0) {
-    throw (error() << "interval_length: invalid value");
+    throw (engine_error() << "interval_length: invalid value");
   }
 
   if (_command_check_interval_is_seconds == false &&
@@ -1665,7 +1666,7 @@ void configuration::set_interval_length(unsigned int value) {
  */
 void configuration::set_service_freshness_check_interval(unsigned int value) {
   if (value == 0) {
-    throw (error() << "service_freshness_check_interval: invalid value");
+    throw (engine_error() << "service_freshness_check_interval: invalid value");
   }
   _tab_uint[service_freshness_check_interval] = value;
   ::service_freshness_check_interval = value;
@@ -1677,7 +1678,7 @@ void configuration::set_service_freshness_check_interval(unsigned int value) {
  */
 void configuration::set_host_freshness_check_interval(unsigned int value) {
   if (value == 0) {
-    throw (error() << "host_freshness_check_interval: invalid value");
+    throw (engine_error() << "host_freshness_check_interval: invalid value");
   }
   _tab_uint[host_freshness_check_interval] = value;
   ::host_freshness_check_interval = value;
@@ -1689,7 +1690,7 @@ void configuration::set_host_freshness_check_interval(unsigned int value) {
  */
 void configuration::set_auto_rescheduling_interval(unsigned int value) {
   if (value == 0) {
-    throw (error() << "auto_rescheduling_interval: invalid value");
+    throw (engine_error() << "auto_rescheduling_interval: invalid value");
   }
   _tab_uint[auto_rescheduling_interval] = value;
   ::auto_rescheduling_interval = value;
@@ -1701,7 +1702,7 @@ void configuration::set_auto_rescheduling_interval(unsigned int value) {
  */
 void configuration::set_auto_rescheduling_window(unsigned int value) {
   if (value == 0) {
-    throw (error() << "auto_rescheduling_window: invalid value");
+    throw (engine_error() << "auto_rescheduling_window: invalid value");
   }
   _tab_uint[auto_rescheduling_window] = value;
   ::auto_rescheduling_window = value;
@@ -1713,7 +1714,7 @@ void configuration::set_auto_rescheduling_window(unsigned int value) {
  */
 void configuration::set_status_update_interval(unsigned int value) {
   if (value < 2) {
-    throw (error() << "status_update_interval: invalid value");
+    throw (engine_error() << "status_update_interval: invalid value");
   }
   _tab_uint[status_update_interval] = value;
   ::status_update_interval = value;
@@ -1725,7 +1726,7 @@ void configuration::set_status_update_interval(unsigned int value) {
  */
 void configuration::set_time_change_threshold(unsigned int value) {
   if (value < 6) {
-    throw (error() << "time_change_threshold: invalid value");
+    throw (engine_error() << "time_change_threshold: invalid value");
   }
   _tab_uint[time_change_threshold] = value;
   ::time_change_threshold = value;
@@ -1737,7 +1738,7 @@ void configuration::set_time_change_threshold(unsigned int value) {
  */
 void configuration::set_retention_update_interval(unsigned int value) {
   if (value == 0) {
-    throw (error() << "retention_update_interval: invalid value");
+    throw (engine_error() << "retention_update_interval: invalid value");
   }
   _tab_uint[retention_update_interval] = value;
   ::retention_update_interval = value;
@@ -1749,7 +1750,7 @@ void configuration::set_retention_update_interval(unsigned int value) {
  */
 void configuration::set_retention_scheduling_horizon(unsigned int value) {
   if (value == 0) {
-    throw (error() << "retention_scheduling_horizon: invalid value");
+    throw (engine_error() << "retention_scheduling_horizon: invalid value");
   }
   _tab_uint[retention_scheduling_horizon] = value;
   ::retention_scheduling_horizon = value;
@@ -1761,7 +1762,7 @@ void configuration::set_retention_scheduling_horizon(unsigned int value) {
  */
 void configuration::set_service_check_timeout(unsigned int value) {
   if (value == 0) {
-    throw (error() << "service_check_timeout: invalid value");
+    throw (engine_error() << "service_check_timeout: invalid value");
   }
   _tab_uint[service_check_timeout] = value;
   ::service_check_timeout = value;
@@ -1773,7 +1774,7 @@ void configuration::set_service_check_timeout(unsigned int value) {
  */
 void configuration::set_host_check_timeout(unsigned int value) {
   if (value == 0) {
-    throw (error() << "host_check_timeout: invalid value");
+    throw (engine_error() << "host_check_timeout: invalid value");
   }
   _tab_uint[host_check_timeout] = value;
   ::host_check_timeout = value;
@@ -1785,7 +1786,7 @@ void configuration::set_host_check_timeout(unsigned int value) {
  */
 void configuration::set_event_handler_timeout(unsigned int value) {
   if (value == 0) {
-    throw (error() << "event_handler_timeout: invalid value");
+    throw (engine_error() << "event_handler_timeout: invalid value");
   }
   _tab_uint[event_handler_timeout] = value;
   ::event_handler_timeout = value;
@@ -1797,7 +1798,7 @@ void configuration::set_event_handler_timeout(unsigned int value) {
  */
 void configuration::set_notification_timeout(unsigned int value) {
   if (value == 0) {
-    throw (error() << "notification_timeout: invalid value");
+    throw (engine_error() << "notification_timeout: invalid value");
   }
   _tab_uint[notification_timeout] = value;
   ::notification_timeout = value;
@@ -1809,7 +1810,7 @@ void configuration::set_notification_timeout(unsigned int value) {
  */
 void configuration::set_ocsp_timeout(unsigned int value) {
   if (value == 0) {
-    throw (error() << "ocsp_timeout: invalid value");
+    throw (engine_error() << "ocsp_timeout: invalid value");
   }
   _tab_uint[ocsp_timeout] = value;
   ::ocsp_timeout = value;
@@ -1821,7 +1822,7 @@ void configuration::set_ocsp_timeout(unsigned int value) {
  */
 void configuration::set_ochp_timeout(unsigned int value) {
   if (value == 0) {
-    throw (error() << "ochp_timeout: invalid value");
+    throw (engine_error() << "ochp_timeout: invalid value");
   }
   _tab_uint[ochp_timeout] = value;
   ::ochp_timeout = value;
@@ -2316,7 +2317,7 @@ void configuration::set_allow_empty_hostgroup_assignment(bool value) {
  */
 void configuration::set_sleep_time(float value) {
   if (value <= 0.0){
-    throw (error() << "sleep_time: invalid value.");
+    throw (engine_error() << "sleep_time: invalid value.");
   }
   _tab_float[sleep_time] = value;
   ::sleep_time = value;
@@ -2328,7 +2329,7 @@ void configuration::set_sleep_time(float value) {
  */
 void configuration::set_low_service_flap_threshold(float value) {
   if (value <= 0.0 || value >= 100.0) {
-    throw (error() << "low_service_flap_threshold: invalid value.");
+    throw (engine_error() << "low_service_flap_threshold: invalid value.");
   }
   _tab_float[low_service_flap_threshold] = value;
   ::low_service_flap_threshold = value;
@@ -2340,7 +2341,7 @@ void configuration::set_low_service_flap_threshold(float value) {
  */
 void configuration::set_high_service_flap_threshold(float value) {
   if (value <= 0.0 || value >= 100.0) {
-    throw (error() << "high_service_flap_threshold: invalid value.");
+    throw (engine_error() << "high_service_flap_threshold: invalid value.");
   }
   _tab_float[high_service_flap_threshold] = value;
   ::high_service_flap_threshold = value;
@@ -2352,7 +2353,7 @@ void configuration::set_high_service_flap_threshold(float value) {
  */
 void configuration::set_low_host_flap_threshold(float value) {
   if (value <= 0.0 || value >= 100.0) {
-    throw (error() << "low_host_flap_threshold: invalid value.");
+    throw (engine_error() << "low_host_flap_threshold: invalid value.");
   }
   _tab_float[low_host_flap_threshold] = value;
   ::low_host_flap_threshold = value;
@@ -2364,7 +2365,7 @@ void configuration::set_low_host_flap_threshold(float value) {
  */
 void configuration::set_high_host_flap_threshold(float value) {
   if (value <= 0.0 || value >= 100.0) {
-    throw (error() << "high_host_flap_threshold: invalid value.");
+    throw (engine_error() << "high_host_flap_threshold: invalid value.");
   }
   _tab_float[high_host_flap_threshold] = value;
   ::high_host_flap_threshold = value;
@@ -2429,7 +2430,7 @@ void configuration::set_log_rotation_method(QString const& value) {
     _tab_uint[log_rotation_method] = rot_monthly;
   }
   else {
-    throw (error() << "log_rotation_method: invalid value.");
+    throw (engine_error() << "log_rotation_method: invalid value.");
   }
   ::log_rotation_method = _tab_uint[log_rotation_method];
 }
@@ -2461,7 +2462,7 @@ void configuration::set_service_inter_check_delay_method(QString const& value) {
     _tab_uint[service_inter_check_delay_method] = icd_user;
     if (_str2obj<double>(value, &scheduling_info.service_inter_check_delay) == false
 	|| scheduling_info.service_inter_check_delay <= 0.0) {
-      throw (error() << "service_inter_check_delay_method: invalid value.");
+      throw (engine_error() << "service_inter_check_delay_method: invalid value.");
     }
   }
   ::service_inter_check_delay_method = _tab_uint[service_inter_check_delay_method];
@@ -2494,7 +2495,7 @@ void configuration::set_host_inter_check_delay_method(QString const& value) {
     _tab_uint[host_inter_check_delay_method] = icd_user;
     if (_str2obj<double>(value, &scheduling_info.host_inter_check_delay) == false
 	|| scheduling_info.host_inter_check_delay <= 0.0) {
-      throw (error() << "host_inter_check_delay_method: invalid value.");
+      throw (engine_error() << "host_inter_check_delay_method: invalid value.");
     }
   }
   ::host_inter_check_delay_method = _tab_uint[host_inter_check_delay_method];
@@ -2720,7 +2721,7 @@ void configuration::_parse_resource_file(QString const& value) {
   std::ifstream ifs;
   ifs.open(value.toStdString().c_str());
   if (ifs.fail()) {
-    throw (error() << "cannot open resource file: `" << value << "'");
+    throw (engine_error() << "cannot open resource file: `" << value << "'");
   }
 
   unsigned int save_cur_line = _cur_line;
@@ -2735,7 +2736,7 @@ void configuration::_parse_resource_file(QString const& value) {
 
     size_t pos = line.find_first_of('=');
     if (pos == std::string::npos) {
-      throw (error() << "[" << _filename << ":" << _cur_line
+      throw (engine_error() << "[" << _filename << ":" << _cur_line
 	     << "] bad variable name: `" << line << "'");
     }
     std::string key = line.substr(0, pos);
@@ -2827,7 +2828,7 @@ void configuration::_set_aggregate_status_updates(QString const& value) {
 void configuration::_set_broker_module(QString const& value) {
   size_t pos = value.toStdString().find_first_of(" \n");
   if (pos == std::string::npos)
-    throw (error() << "broker_module: invalid value.");
+    throw (engine_error() << "broker_module: invalid value.");
 
   std::string mod = value.toStdString().substr(0, pos);
   std::string arg = value.toStdString().substr(pos + 1, value.toStdString().find_first_of(" \n", pos + 1) - pos);

@@ -258,336 +258,336 @@ void test_configuration(QString const& filename, std::map<QString, QString>& my_
   QString check_delay[] = { "n", "d", "s", "" };
 
   if (my_conf["date_format"] != date_format[config.get_date_format()]) {
-    throw (error() << "date_format: init with '" << my_conf["date_format"] << "'");
+    throw (engine_error() << "date_format: init with '" << my_conf["date_format"] << "'");
   }
   if (my_conf["debug_level"] != obj2str(config.get_debug_level())) {
-    throw (error() << "debug_level: init with '" << my_conf["debug_level"] << "'");
+    throw (engine_error() << "debug_level: init with '" << my_conf["debug_level"] << "'");
   }
   if (my_conf["debug_verbosity"] != obj2str(config.get_debug_verbosity())) {
-    throw (error() << "debug_verbosity: init with '" << my_conf["debug_verbosity"] << "'");
+    throw (engine_error() << "debug_verbosity: init with '" << my_conf["debug_verbosity"] << "'");
   }
   if (my_conf["max_debug_file_size"] != obj2str(config.get_max_debug_file_size())) {
-    throw (error() << "max_debug_file_size: init with '" << my_conf["max_debug_file_size"] << "'");
+    throw (engine_error() << "max_debug_file_size: init with '" << my_conf["max_debug_file_size"] << "'");
   }
   if (my_conf["max_check_result_file_age"] != obj2str(config.get_max_check_result_file_age())) {
-    throw (error() << "max_check_result_file_age: init with '" << my_conf["max_check_result_file_age"] << "'");
+    throw (engine_error() << "max_check_result_file_age: init with '" << my_conf["max_check_result_file_age"] << "'");
   }
   if (my_conf["use_syslog"] != obj2str(config.get_use_syslog())) {
-    throw (error() << "use_syslog: init with '" << my_conf["use_syslog"] << "'");
+    throw (engine_error() << "use_syslog: init with '" << my_conf["use_syslog"] << "'");
   }
   if (my_conf["log_notifications"] != obj2str(config.get_log_notifications())) {
-    throw (error() << "log_notifications: init with '" << my_conf["log_notifications"] << "'");
+    throw (engine_error() << "log_notifications: init with '" << my_conf["log_notifications"] << "'");
   }
   if (my_conf["log_service_retries"] != obj2str(config.get_log_service_retries())) {
-    throw (error() << "log_service_retries: init with '" << my_conf["log_service_retries"] << "'");
+    throw (engine_error() << "log_service_retries: init with '" << my_conf["log_service_retries"] << "'");
   }
   if (my_conf["log_host_retries"] != obj2str(config.get_log_host_retries())) {
-    throw (error() << "log_host_retries: init with '" << my_conf["log_host_retries"] << "'");
+    throw (engine_error() << "log_host_retries: init with '" << my_conf["log_host_retries"] << "'");
   }
   if (my_conf["log_event_handlers"] != obj2str(config.get_log_event_handlers())) {
-    throw (error() << "log_event_handlers: init with '" << my_conf["log_event_handlers"] << "'");
+    throw (engine_error() << "log_event_handlers: init with '" << my_conf["log_event_handlers"] << "'");
   }
   if (my_conf["log_external_commands"] != obj2str(config.get_log_external_commands())) {
-    throw (error() << "log_external_commands: init with '" << my_conf["log_external_commands"] << "'");
+    throw (engine_error() << "log_external_commands: init with '" << my_conf["log_external_commands"] << "'");
   }
   if (my_conf["log_passive_checks"] != obj2str(config.get_log_passive_checks())) {
-    throw (error() << "log_passive_checks: init with '" << my_conf["log_passive_checks"] << "'");
+    throw (engine_error() << "log_passive_checks: init with '" << my_conf["log_passive_checks"] << "'");
   }
   if (my_conf["log_initial_states"] != obj2str(config.get_log_initial_states())) {
-    throw (error() << "log_initial_states: init with '" << my_conf["log_initial_states"] << "'");
+    throw (engine_error() << "log_initial_states: init with '" << my_conf["log_initial_states"] << "'");
   }
   if (my_conf["retain_state_information"] != obj2str(config.get_retain_state_information())) {
-    throw (error() << "retain_state_information: init with '" << my_conf["retain_state_information"] << "'");
+    throw (engine_error() << "retain_state_information: init with '" << my_conf["retain_state_information"] << "'");
   }
   if (my_conf["retention_update_interval"] != obj2str(config.get_retention_update_interval())) {
-    throw (error() << "retention_update_interval: init with '" << my_conf["retention_update_interval"] << "'");
+    throw (engine_error() << "retention_update_interval: init with '" << my_conf["retention_update_interval"] << "'");
   }
   if (my_conf["use_retained_program_state"] != obj2str(config.get_use_retained_program_state())) {
-    throw (error() << "use_retained_program_state: init with '" << my_conf["use_retained_program_state"] << "'");
+    throw (engine_error() << "use_retained_program_state: init with '" << my_conf["use_retained_program_state"] << "'");
   }
   if (my_conf["use_retained_scheduling_info"] != obj2str(config.get_use_retained_scheduling_info())) {
-    throw (error() << "use_retained_scheduling_info: init with '" << my_conf["use_retained_scheduling_info"] << "'");
+    throw (engine_error() << "use_retained_scheduling_info: init with '" << my_conf["use_retained_scheduling_info"] << "'");
   }
   if (my_conf["retention_scheduling_horizon"] != obj2str(config.get_retention_scheduling_horizon())) {
-    throw (error() << "retention_scheduling_horizon: init with '" << my_conf["retention_scheduling_horizon"] << "'");
+    throw (engine_error() << "retention_scheduling_horizon: init with '" << my_conf["retention_scheduling_horizon"] << "'");
   }
   if (my_conf["additional_freshness_latency"] != obj2str(config.get_additional_freshness_latency())) {
-    throw (error() << "additional_freshness_latency: init with '" << my_conf["additional_freshness_latency"] << "'");
+    throw (engine_error() << "additional_freshness_latency: init with '" << my_conf["additional_freshness_latency"] << "'");
   }
   if (my_conf["retained_host_attribute_mask"] != obj2str(config.get_retained_host_attribute_mask())) {
-    throw (error() << "retained_host_attribute_mask: init with '" << my_conf["retained_host_attribute_mask"] << "'");
+    throw (engine_error() << "retained_host_attribute_mask: init with '" << my_conf["retained_host_attribute_mask"] << "'");
   }
   if (my_conf["retained_process_host_attribute_mask"] != obj2str(config.get_retained_process_host_attribute_mask())) {
-    throw (error() << "retained_process_host_attribute_mask: init with '" << my_conf["retained_process_host_attribute_mask"] << "'");
+    throw (engine_error() << "retained_process_host_attribute_mask: init with '" << my_conf["retained_process_host_attribute_mask"] << "'");
   }
   if (my_conf["retained_contact_host_attribute_mask"] != obj2str(config.get_retained_contact_host_attribute_mask())) {
-    throw (error() << "retained_contact_host_attribute_mask: init with '" << my_conf["retained_contact_host_attribute_mask"] << "'");
+    throw (engine_error() << "retained_contact_host_attribute_mask: init with '" << my_conf["retained_contact_host_attribute_mask"] << "'");
   }
   if (my_conf["retained_contact_service_attribute_mask"] != obj2str(config.get_retained_contact_service_attribute_mask())) {
-    throw (error() << "retained_contact_service_attribute_mask: init with '" << my_conf["retained_contact_service_attribute_mask"] << "'");
+    throw (engine_error() << "retained_contact_service_attribute_mask: init with '" << my_conf["retained_contact_service_attribute_mask"] << "'");
   }
   if (my_conf["obsess_over_services"] != obj2str(config.get_obsess_over_services())) {
-    throw (error() << "obsess_over_services: init with '" << my_conf["obsess_over_services"] << "'");
+    throw (engine_error() << "obsess_over_services: init with '" << my_conf["obsess_over_services"] << "'");
   }
   if (my_conf["obsess_over_hosts"] != obj2str(config.get_obsess_over_hosts())) {
-    throw (error() << "obsess_over_hosts: init with '" << my_conf["obsess_over_hosts"] << "'");
+    throw (engine_error() << "obsess_over_hosts: init with '" << my_conf["obsess_over_hosts"] << "'");
   }
   if (my_conf["translate_passive_host_checks"] != obj2str(config.get_translate_passive_host_checks())) {
-    throw (error() << "translate_passive_host_checks: init with '" << my_conf["translate_passive_host_checks"] << "'");
+    throw (engine_error() << "translate_passive_host_checks: init with '" << my_conf["translate_passive_host_checks"] << "'");
   }
   if (my_conf["passive_host_checks_are_soft"] != obj2str(config.get_passive_host_checks_are_soft())) {
-    throw (error() << "passive_host_checks_are_soft: init with '" << my_conf["passive_host_checks_are_soft"] << "'");
+    throw (engine_error() << "passive_host_checks_are_soft: init with '" << my_conf["passive_host_checks_are_soft"] << "'");
   }
   if (my_conf["service_check_timeout"] != obj2str(config.get_service_check_timeout())) {
-    throw (error() << "service_check_timeout: init with '" << my_conf["service_check_timeout"] << "'");
+    throw (engine_error() << "service_check_timeout: init with '" << my_conf["service_check_timeout"] << "'");
   }
   if (my_conf["host_check_timeout"] != obj2str(config.get_host_check_timeout())) {
-    throw (error() << "host_check_timeout: init with '" << my_conf["host_check_timeout"] << "'");
+    throw (engine_error() << "host_check_timeout: init with '" << my_conf["host_check_timeout"] << "'");
   }
   if (my_conf["event_handler_timeout"] != obj2str(config.get_event_handler_timeout())) {
-    throw (error() << "event_handler_timeout: init with '" << my_conf["event_handler_timeout"] << "'");
+    throw (engine_error() << "event_handler_timeout: init with '" << my_conf["event_handler_timeout"] << "'");
   }
   if (my_conf["notification_timeout"] != obj2str(config.get_notification_timeout())) {
-    throw (error() << "notification_timeout: init with '" << my_conf["notification_timeout"] << "'");
+    throw (engine_error() << "notification_timeout: init with '" << my_conf["notification_timeout"] << "'");
   }
   if (my_conf["ocsp_timeout"] != obj2str(config.get_ocsp_timeout())) {
-    throw (error() << "ocsp_timeout: init with '" << my_conf["ocsp_timeout"] << "'");
+    throw (engine_error() << "ocsp_timeout: init with '" << my_conf["ocsp_timeout"] << "'");
   }
   if (my_conf["ochp_timeout"] != obj2str(config.get_ochp_timeout())) {
-    throw (error() << "ochp_timeout: init with '" << my_conf["ochp_timeout"] << "'");
+    throw (engine_error() << "ochp_timeout: init with '" << my_conf["ochp_timeout"] << "'");
   }
   if (my_conf["use_agressive_host_checking"] != obj2str(config.get_use_aggressive_host_checking())) {
-    throw (error() << "use_agressive_host_checking: init with '" << my_conf["use_agressive_host_checking"] << "'");
+    throw (engine_error() << "use_agressive_host_checking: init with '" << my_conf["use_agressive_host_checking"] << "'");
   }
   if (my_conf["use_aggressive_host_checking"] != obj2str(config.get_use_aggressive_host_checking())) {
-    throw (error() << "use_aggressive_host_checking: init with '" << my_conf["use_aggressive_host_checking"] << "'");
+    throw (engine_error() << "use_aggressive_host_checking: init with '" << my_conf["use_aggressive_host_checking"] << "'");
   }
   if (my_conf["cached_host_check_horizon"] != obj2str(config.get_cached_host_check_horizon())) {
-    throw (error() << "cached_host_check_horizon: init with '" << my_conf["cached_host_check_horizon"] << "'");
+    throw (engine_error() << "cached_host_check_horizon: init with '" << my_conf["cached_host_check_horizon"] << "'");
   }
   if (my_conf["enable_predictive_host_dependency_checks"] != obj2str(config.get_enable_predictive_host_dependency_checks())) {
-    throw (error() << "enable_predictive_host_dependency_checks: init with '" << my_conf["enable_predictive_host_dependency_checks"] << "'");
+    throw (engine_error() << "enable_predictive_host_dependency_checks: init with '" << my_conf["enable_predictive_host_dependency_checks"] << "'");
   }
   if (my_conf["cached_service_check_horizon"] != obj2str(config.get_cached_service_check_horizon())) {
-    throw (error() << "cached_service_check_horizon: init with '" << my_conf["cached_service_check_horizon"] << "'");
+    throw (engine_error() << "cached_service_check_horizon: init with '" << my_conf["cached_service_check_horizon"] << "'");
   }
   if (my_conf["enable_predictive_service_dependency_checks"] != obj2str(config.get_enable_predictive_service_dependency_checks())) {
-    throw (error() << "enable_predictive_service_dependency_checks: init with '" << my_conf["enable_predictive_service_dependency_checks"] << "'");
+    throw (engine_error() << "enable_predictive_service_dependency_checks: init with '" << my_conf["enable_predictive_service_dependency_checks"] << "'");
   }
   if (my_conf["soft_state_dependencies"] != obj2str(config.get_soft_state_dependencies())) {
-    throw (error() << "soft_state_dependencies: init with '" << my_conf["soft_state_dependencies"] << "'");
+    throw (engine_error() << "soft_state_dependencies: init with '" << my_conf["soft_state_dependencies"] << "'");
   }
   if (my_conf["enable_event_handlers"] != obj2str(config.get_enable_event_handlers())) {
-    throw (error() << "enable_event_handlers: init with '" << my_conf["enable_event_handlers"] << "'");
+    throw (engine_error() << "enable_event_handlers: init with '" << my_conf["enable_event_handlers"] << "'");
   }
   if (my_conf["enable_notifications"] != obj2str(config.get_enable_notifications())) {
-    throw (error() << "enable_notifications: init with '" << my_conf["enable_notifications"] << "'");
+    throw (engine_error() << "enable_notifications: init with '" << my_conf["enable_notifications"] << "'");
   }
   if (my_conf["execute_service_checks"] != obj2str(config.get_execute_service_checks())) {
-    throw (error() << "execute_service_checks: init with '" << my_conf["execute_service_checks"] << "'");
+    throw (engine_error() << "execute_service_checks: init with '" << my_conf["execute_service_checks"] << "'");
   }
   if (my_conf["accept_passive_service_checks"] != obj2str(config.get_accept_passive_service_checks())) {
-    throw (error() << "accept_passive_service_checks: init with '" << my_conf["accept_passive_service_checks"] << "'");
+    throw (engine_error() << "accept_passive_service_checks: init with '" << my_conf["accept_passive_service_checks"] << "'");
   }
   if (my_conf["execute_host_checks"] != obj2str(config.get_execute_host_checks())) {
-    throw (error() << "execute_host_checks: init with '" << my_conf["execute_host_checks"] << "'");
+    throw (engine_error() << "execute_host_checks: init with '" << my_conf["execute_host_checks"] << "'");
   }
   if (my_conf["accept_passive_host_checks"] != obj2str(config.get_accept_passive_host_checks())) {
-    throw (error() << "accept_passive_host_checks: init with '" << my_conf["accept_passive_host_checks"] << "'");
+    throw (engine_error() << "accept_passive_host_checks: init with '" << my_conf["accept_passive_host_checks"] << "'");
   }
   if (my_conf["max_service_check_spread"] != obj2str(config.get_max_service_check_spread())) {
-    throw (error() << "max_service_check_spread: init with '" << my_conf["max_service_check_spread"] << "'");
+    throw (engine_error() << "max_service_check_spread: init with '" << my_conf["max_service_check_spread"] << "'");
   }
   if (my_conf["max_host_check_spread"] != obj2str(config.get_max_host_check_spread())) {
-    throw (error() << "max_host_check_spread: init with '" << my_conf["max_host_check_spread"] << "'");
+    throw (engine_error() << "max_host_check_spread: init with '" << my_conf["max_host_check_spread"] << "'");
   }
   if (my_conf["max_concurrent_checks"] != obj2str(config.get_max_parallel_service_checks())) {
-    throw (error() << "max_concurrent_checks: init with '" << my_conf["max_concurrent_checks"] << "'");
+    throw (engine_error() << "max_concurrent_checks: init with '" << my_conf["max_concurrent_checks"] << "'");
   }
   if (my_conf["check_result_reaper_frequency"] != obj2str(config.get_check_reaper_interval())) {
-    throw (error() << "check_result_reaper_frequency: init with '" << my_conf["check_result_reaper_frequency"] << "'");
+    throw (engine_error() << "check_result_reaper_frequency: init with '" << my_conf["check_result_reaper_frequency"] << "'");
   }
   if (my_conf["service_reaper_frequency"] != obj2str(config.get_check_reaper_interval())) {
-    throw (error() << "service_reaper_frequency: init with '" << my_conf["service_reaper_frequency"] << "'");
+    throw (engine_error() << "service_reaper_frequency: init with '" << my_conf["service_reaper_frequency"] << "'");
   }
   if (my_conf["max_check_result_reaper_time"] != obj2str(config.get_max_check_reaper_time())) {
-    throw (error() << "max_check_result_reaper_time: init with '" << my_conf["max_check_result_reaper_time"] << "'");
+    throw (engine_error() << "max_check_result_reaper_time: init with '" << my_conf["max_check_result_reaper_time"] << "'");
   }
   if (my_conf["sleep_time"] != obj2str(config.get_sleep_time())) {
-    throw (error() << "sleep_time: init with '" << my_conf["sleep_time"] << "'");
+    throw (engine_error() << "sleep_time: init with '" << my_conf["sleep_time"] << "'");
   }
   if (my_conf["interval_length"] != obj2str(config.get_interval_length())) {
-    throw (error() << "interval_length: init with '" << my_conf["interval_length"] << "'");
+    throw (engine_error() << "interval_length: init with '" << my_conf["interval_length"] << "'");
   }
   if (my_conf["check_external_commands"] != obj2str(config.get_check_external_commands())) {
-    throw (error() << "check_external_commands: init with '" << my_conf["check_external_commands"] << "'");
+    throw (engine_error() << "check_external_commands: init with '" << my_conf["check_external_commands"] << "'");
   }
   if (my_conf["check_for_orphaned_services"] != obj2str(config.get_check_orphaned_services())) {
-    throw (error() << "check_for_orphaned_services: init with '" << my_conf["check_for_orphaned_services"] << "'");
+    throw (engine_error() << "check_for_orphaned_services: init with '" << my_conf["check_for_orphaned_services"] << "'");
   }
   if (my_conf["check_for_orphaned_hosts"] != obj2str(config.get_check_orphaned_hosts())) {
-    throw (error() << "check_for_orphaned_hosts: init with '" << my_conf["check_for_orphaned_hosts"] << "'");
+    throw (engine_error() << "check_for_orphaned_hosts: init with '" << my_conf["check_for_orphaned_hosts"] << "'");
   }
   if (my_conf["check_service_freshness"] != obj2str(config.get_check_service_freshness())) {
-    throw (error() << "check_service_freshness: init with '" << my_conf["check_service_freshness"] << "'");
+    throw (engine_error() << "check_service_freshness: init with '" << my_conf["check_service_freshness"] << "'");
   }
   if (my_conf["check_host_freshness"] != obj2str(config.get_check_host_freshness())) {
-    throw (error() << "check_host_freshness: init with '" << my_conf["check_host_freshness"] << "'");
+    throw (engine_error() << "check_host_freshness: init with '" << my_conf["check_host_freshness"] << "'");
   }
   if (my_conf["service_freshness_check_interval"] != obj2str(config.get_service_freshness_check_interval())) {
-    throw (error() << "service_freshness_check_interval: init with '" << my_conf["service_freshness_check_interval"] << "'");
+    throw (engine_error() << "service_freshness_check_interval: init with '" << my_conf["service_freshness_check_interval"] << "'");
   }
   if (my_conf["host_freshness_check_interval"] != obj2str(config.get_host_freshness_check_interval())) {
-    throw (error() << "host_freshness_check_interval: init with '" << my_conf["host_freshness_check_interval"] << "'");
+    throw (engine_error() << "host_freshness_check_interval: init with '" << my_conf["host_freshness_check_interval"] << "'");
   }
   if (my_conf["auto_reschedule_checks"] != obj2str(config.get_auto_reschedule_checks())) {
-    throw (error() << "auto_reschedule_checks: init with '" << my_conf["auto_reschedule_checks"] << "'");
+    throw (engine_error() << "auto_reschedule_checks: init with '" << my_conf["auto_reschedule_checks"] << "'");
   }
   if (my_conf["auto_rescheduling_interval"] != obj2str(config.get_auto_rescheduling_interval())) {
-    throw (error() << "auto_rescheduling_interval: init with '" << my_conf["auto_rescheduling_interval"] << "'");
+    throw (engine_error() << "auto_rescheduling_interval: init with '" << my_conf["auto_rescheduling_interval"] << "'");
   }
   if (my_conf["auto_rescheduling_window"] != obj2str(config.get_auto_rescheduling_window())) {
-    throw (error() << "auto_rescheduling_window: init with '" << my_conf["auto_rescheduling_window"] << "'");
+    throw (engine_error() << "auto_rescheduling_window: init with '" << my_conf["auto_rescheduling_window"] << "'");
   }
   if (my_conf["status_update_interval"] != obj2str(config.get_status_update_interval())) {
-    throw (error() << "status_update_interval: init with '" << my_conf["status_update_interval"] << "'");
+    throw (engine_error() << "status_update_interval: init with '" << my_conf["status_update_interval"] << "'");
   }
   if (my_conf["time_change_threshold"] != obj2str(config.get_time_change_threshold())) {
-    throw (error() << "time_change_threshold: init with '" << my_conf["time_change_threshold"] << "'");
+    throw (engine_error() << "time_change_threshold: init with '" << my_conf["time_change_threshold"] << "'");
   }
   if (my_conf["process_performance_data"] != obj2str(config.get_process_performance_data())) {
-    throw (error() << "process_performance_data: init with '" << my_conf["process_performance_data"] << "'");
+    throw (engine_error() << "process_performance_data: init with '" << my_conf["process_performance_data"] << "'");
   }
   if (my_conf["enable_flap_detection"] != obj2str(config.get_enable_flap_detection())) {
-    throw (error() << "enable_flap_detection: init with '" << my_conf["enable_flap_detection"] << "'");
+    throw (engine_error() << "enable_flap_detection: init with '" << my_conf["enable_flap_detection"] << "'");
   }
   if (my_conf["enable_failure_prediction"] != obj2str(config.get_enable_failure_prediction())) {
-    throw (error() << "enable_failure_prediction: init with '" << my_conf["enable_failure_prediction"] << "'");
+    throw (engine_error() << "enable_failure_prediction: init with '" << my_conf["enable_failure_prediction"] << "'");
   }
   if (my_conf["low_service_flap_threshold"] != obj2str(config.get_low_service_flap_threshold())) {
-    throw (error() << "low_service_flap_threshold: init with '" << my_conf["low_service_flap_threshold"] << "'");
+    throw (engine_error() << "low_service_flap_threshold: init with '" << my_conf["low_service_flap_threshold"] << "'");
   }
   if (my_conf["high_service_flap_threshold"] != obj2str(config.get_high_service_flap_threshold())) {
-    throw (error() << "high_service_flap_threshold: init with '" << my_conf["high_service_flap_threshold"] << "'");
+    throw (engine_error() << "high_service_flap_threshold: init with '" << my_conf["high_service_flap_threshold"] << "'");
   }
   if (my_conf["low_host_flap_threshold"] != obj2str(config.get_low_host_flap_threshold())) {
-    throw (error() << "low_host_flap_threshold: init with '" << my_conf["low_host_flap_threshold"] << "'");
+    throw (engine_error() << "low_host_flap_threshold: init with '" << my_conf["low_host_flap_threshold"] << "'");
   }
   if (my_conf["high_host_flap_threshold"] != obj2str(config.get_high_host_flap_threshold())) {
-    throw (error() << "high_host_flap_threshold: init with '" << my_conf["high_host_flap_threshold"] << "'");
+    throw (engine_error() << "high_host_flap_threshold: init with '" << my_conf["high_host_flap_threshold"] << "'");
   }
   if (my_conf["event_broker_options"] != obj2str(config.get_event_broker_options())) {
-    throw (error() << "event_broker_options: init with '" << my_conf["event_broker_options"] << "'");
+    throw (engine_error() << "event_broker_options: init with '" << my_conf["event_broker_options"] << "'");
   }
   if (my_conf["use_true_regexp_matching"] != obj2str(config.get_use_true_regexp_matching())) {
-    throw (error() << "use_true_regexp_matching: init with '" << my_conf["use_true_regexp_matching"] << "'");
+    throw (engine_error() << "use_true_regexp_matching: init with '" << my_conf["use_true_regexp_matching"] << "'");
   }
   if (my_conf["use_large_installation_tweaks"] != obj2str(config.get_use_large_installation_tweaks())) {
-    throw (error() << "use_large_installation_tweaks: init with '" << my_conf["use_large_installation_tweaks"] << "'");
+    throw (engine_error() << "use_large_installation_tweaks: init with '" << my_conf["use_large_installation_tweaks"] << "'");
   }
   if (my_conf["enable_environment_macros"] != obj2str(config.get_enable_environment_macros())) {
-    throw (error() << "enable_environment_macros: init with '" << my_conf["enable_environment_macros"] << "'");
+    throw (engine_error() << "enable_environment_macros: init with '" << my_conf["enable_environment_macros"] << "'");
   }
   if (my_conf["free_child_process_memory"] != obj2str(config.get_free_child_process_memory())) {
-    throw (error() << "free_child_process_memory: init with '" << my_conf["free_child_process_memory"] << "'");
+    throw (engine_error() << "free_child_process_memory: init with '" << my_conf["free_child_process_memory"] << "'");
   }
   if (my_conf["child_processes_fork_twice"] != obj2str(config.get_child_processes_fork_twice())) {
-    throw (error() << "child_processes_fork_twice: init with '" << my_conf["child_processes_fork_twice"] << "'");
+    throw (engine_error() << "child_processes_fork_twice: init with '" << my_conf["child_processes_fork_twice"] << "'");
   }
   if (my_conf["enable_embedded_perl"] != obj2str(config.get_enable_embedded_perl())) {
-    throw (error() << "enable_embedded_perl: init with '" << my_conf["enable_embedded_perl"] << "'");
+    throw (engine_error() << "enable_embedded_perl: init with '" << my_conf["enable_embedded_perl"] << "'");
   }
   if (my_conf["use_embedded_perl_implicitly"] != obj2str(config.get_use_embedded_perl_implicitly())) {
-    throw (error() << "use_embedded_perl_implicitly: init with '" << my_conf["use_embedded_perl_implicitly"] << "'");
+    throw (engine_error() << "use_embedded_perl_implicitly: init with '" << my_conf["use_embedded_perl_implicitly"] << "'");
   }
   if (my_conf["external_command_buffer_slots"] != obj2str(config.get_external_command_buffer_slots())) {
-    throw (error() << "external_command_buffer_slots: init with '" << my_conf["external_command_buffer_slots"] << "'");
+    throw (engine_error() << "external_command_buffer_slots: init with '" << my_conf["external_command_buffer_slots"] << "'");
   }
   if (my_conf["allow_empty_hostgroup_assignment"] != obj2str(config.get_allow_empty_hostgroup_assignment())) {
-    throw (error() << "allow_empty_hostgroup_assignment: init with '" << my_conf["allow_empty_hostgroup_assignment"] << "'");
+    throw (engine_error() << "allow_empty_hostgroup_assignment: init with '" << my_conf["allow_empty_hostgroup_assignment"] << "'");
   }
   if (my_conf["debug_file"] != config.get_debug_file()) {
-    throw (error() << "debug_file: init with '" << my_conf["debug_file"] << "'");
+    throw (engine_error() << "debug_file: init with '" << my_conf["debug_file"] << "'");
   }
   if (my_conf["command_file"] != config.get_command_file()) {
-    throw (error() << "command_file: init with '" << my_conf["command_file"] << "'");
+    throw (engine_error() << "command_file: init with '" << my_conf["command_file"] << "'");
   }
   if (my_conf["temp_file"] != config.get_temp_file()) {
-    throw (error() << "temp_file: init with '" << my_conf["temp_file"] << "'");
+    throw (engine_error() << "temp_file: init with '" << my_conf["temp_file"] << "'");
   }
   if (my_conf["temp_path"] != config.get_temp_path()) {
-    throw (error() << "temp_path: init with '" << my_conf["temp_path"] << "'");
+    throw (engine_error() << "temp_path: init with '" << my_conf["temp_path"] << "'");
   }
   if (my_conf["check_result_path"] != config.get_check_result_path()) {
-    throw (error() << "check_result_path: init with '" << my_conf["check_result_path"] << "'");
+    throw (engine_error() << "check_result_path: init with '" << my_conf["check_result_path"] << "'");
   }
   if (my_conf["global_host_event_handler"] != config.get_global_host_event_handler()) {
-    throw (error() << "global_host_event_handler: init with '" << my_conf["global_host_event_handler"] << "'");
+    throw (engine_error() << "global_host_event_handler: init with '" << my_conf["global_host_event_handler"] << "'");
   }
   if (my_conf["global_service_event_handler"] != config.get_global_service_event_handler()) {
-    throw (error() << "global_service_event_handler: init with '" << my_conf["global_service_event_handler"] << "'");
+    throw (engine_error() << "global_service_event_handler: init with '" << my_conf["global_service_event_handler"] << "'");
   }
   if (my_conf["ocsp_command"] != config.get_ocsp_command()) {
-    throw (error() << "ocsp_command: init with '" << my_conf["ocsp_command"] << "'");
+    throw (engine_error() << "ocsp_command: init with '" << my_conf["ocsp_command"] << "'");
   }
   if (my_conf["ochp_command"] != config.get_ochp_command()) {
-    throw (error() << "ochp_command: init with '" << my_conf["ochp_command"] << "'");
+    throw (engine_error() << "ochp_command: init with '" << my_conf["ochp_command"] << "'");
   }
   if (my_conf["log_archive_path"] != config.get_log_archive_path()) {
-    throw (error() << "log_archive_path: init with '" << my_conf["log_archive_path"] << "'");
+    throw (engine_error() << "log_archive_path: init with '" << my_conf["log_archive_path"] << "'");
   }
   if (my_conf["log_file"] != config.get_log_file()) {
-    throw (error() << "log_file: init with '" << my_conf["log_file"] << "'");
+    throw (engine_error() << "log_file: init with '" << my_conf["log_file"] << "'");
   }
   if (my_conf["illegal_object_name_chars"] != config.get_illegal_object_chars()) {
-    throw (error() << "illegal_object_name_chars: init with '" << my_conf["illegal_object_name_chars"] << "'");
+    throw (engine_error() << "illegal_object_name_chars: init with '" << my_conf["illegal_object_name_chars"] << "'");
   }
   if (my_conf["illegal_macro_output_chars"] != config.get_illegal_output_chars()) {
-    throw (error() << "illegal_macro_output_chars: init with '" << my_conf["illegal_macro_output_chars"] << "'");
+    throw (engine_error() << "illegal_macro_output_chars: init with '" << my_conf["illegal_macro_output_chars"] << "'");
   }
   if (my_conf["use_regexp_matching"] != obj2str(config.get_use_regexp_matches())) {
-    throw (error() << "use_regexp_matching: init with '" << my_conf["use_regexp_matching"] << "'");
+    throw (engine_error() << "use_regexp_matching: init with '" << my_conf["use_regexp_matching"] << "'");
   }
   if (my_conf["log_rotation_method"] != log_rotation[config.get_log_rotation_method()]) {
-    throw (error() << "log_rotation_method: init with '" << my_conf["log_rotation_method"] << "'");
+    throw (engine_error() << "log_rotation_method: init with '" << my_conf["log_rotation_method"] << "'");
   }
   if (my_conf["command_check_interval"] != obj2str(config.get_command_check_interval() / config.get_interval_length()) &&
       my_conf["command_check_interval"] != obj2str(config.get_command_check_interval()) + "s") {
-    throw (error() << "command_check_interval: init with '" << my_conf["log_rotation_method"] << "'");
+    throw (engine_error() << "command_check_interval: init with '" << my_conf["log_rotation_method"] << "'");
   }
   if (my_conf["service_interleave_factor"] == "s") {
     if (config.get_service_interleave_factor_method() != configuration::ilf_smart) {
-      throw (error() << "service_interleave_factor: init with '" << my_conf["log_rotation_method"] << "'");
+      throw (engine_error() << "service_interleave_factor: init with '" << my_conf["log_rotation_method"] << "'");
     }
   }
   else {
     if (my_conf["service_interleave_factor"] != obj2str(scheduling_info.service_interleave_factor) &&
 	scheduling_info.service_interleave_factor != 1) {
-      throw (error() << "service_interleave_factor: init with '" << my_conf["log_rotation_method"] << "'");
+      throw (engine_error() << "service_interleave_factor: init with '" << my_conf["log_rotation_method"] << "'");
     }
   }
   if (my_conf["service_inter_check_delay_method"] != check_delay[config.get_service_inter_check_delay_method()] &&
       my_conf["service_inter_check_delay_method"] != obj2str(scheduling_info.service_inter_check_delay)) {
-      throw (error() << "service_inter_check_delay_method: init with '" << my_conf["log_rotation_method"] << "'");
+      throw (engine_error() << "service_inter_check_delay_method: init with '" << my_conf["log_rotation_method"] << "'");
   }
   if (my_conf["host_inter_check_delay_method"] != check_delay[config.get_host_inter_check_delay_method()] &&
       my_conf["host_inter_check_delay_method"] != obj2str(scheduling_info.host_inter_check_delay)) {
-      throw (error() << "host_inter_check_delay_method: init with '" << my_conf["log_rotation_method"] << "'");
+      throw (engine_error() << "host_inter_check_delay_method: init with '" << my_conf["log_rotation_method"] << "'");
   }
 
   nagios_macros* mac = get_global_macros();
   if (mac->x[MACRO_ADMINEMAIL] != NULL &&
       my_conf["admin_email"] != mac->x[MACRO_ADMINEMAIL]) {
-    throw (error() << "admin_email: init with '" << my_conf["log_rotation_method"] << "'");
+    throw (engine_error() << "admin_email: init with '" << my_conf["log_rotation_method"] << "'");
   }
   if (mac->x[MACRO_ADMINPAGER] &&
       my_conf["admin_pager"] != mac->x[MACRO_ADMINPAGER]) {
-    throw (error() << "admin_pager: init with '" << my_conf["log_rotation_method"] << "'");
+    throw (engine_error() << "admin_pager: init with '" << my_conf["log_rotation_method"] << "'");
   }
 
   for (unsigned int i = 0; i < MAX_USER_MACROS; ++i) {
     if (macro_user[i] != "USER" + obj2str(i)) {
-      throw (error() << "resource_file: init with '" << my_conf["log_rotation_method"] << "'");
+      throw (engine_error() << "resource_file: init with '" << my_conf["log_rotation_method"] << "'");
     }
   }
 }

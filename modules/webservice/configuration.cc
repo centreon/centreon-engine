@@ -170,7 +170,7 @@ QString const& configuration::get_ssl_password() const throw() {
 void configuration::parse() {
   QFile file(_filename);
   if (file.open(QFile::ReadOnly | QFile::Text) == false) {
-    throw (error() << file.errorString());
+    throw (engine_error() << file.errorString());
   }
   _reader.setDevice(&file);
 
@@ -180,7 +180,7 @@ void configuration::parse() {
 
       QHash<QString, void (configuration::*)()>::const_iterator it = _keytab.find(_path);
       if (it == _keytab.end()) {
-      	throw (error() << "line " << _reader.lineNumber());
+      	throw (engine_error() << "line " << _reader.lineNumber());
       }
       if (it.value() != NULL) {
       	(this->*it.value())();
@@ -208,7 +208,7 @@ void configuration::_set_port() {
   bool ok;
   _port = _reader.readElementText().toInt(&ok);
   if (ok == false) {
-    throw (error() << "line " << _reader.lineNumber());
+    throw (engine_error() << "line " << _reader.lineNumber());
   }
 }
 
@@ -219,7 +219,7 @@ void configuration::_set_recv_timeout() {
   bool ok;
   _recv_timeout = _reader.readElementText().toInt(&ok);
   if (ok == false) {
-    throw (error() << "line " << _reader.lineNumber());
+    throw (engine_error() << "line " << _reader.lineNumber());
   }
 }
 
@@ -230,7 +230,7 @@ void configuration::_set_send_timeout() {
   bool ok;
   _send_timeout = _reader.readElementText().toInt(&ok);
   if (ok == false) {
-    throw (error() << "line " << _reader.lineNumber());
+    throw (engine_error() << "line " << _reader.lineNumber());
   }
 }
 
@@ -241,7 +241,7 @@ void configuration::_set_accept_timeout() {
   bool ok;
   _accept_timeout = _reader.readElementText().toInt(&ok) * -1000;
   if (ok == false) {
-    throw (error() << "line " << _reader.lineNumber());
+    throw (engine_error() << "line " << _reader.lineNumber());
   }
 }
 
@@ -257,7 +257,7 @@ void configuration::_set_ssl_enable() {
     _ssl_enable = false;
   }
   else {
-    throw (error() << "line " << _reader.lineNumber());
+    throw (engine_error() << "line " << _reader.lineNumber());
   }
 }
 
