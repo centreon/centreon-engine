@@ -157,8 +157,6 @@ unsigned int child_processes_fork_twice;
 unsigned int enable_embedded_perl;
 unsigned int use_embedded_perl_implicitly;
 int external_command_buffer_slots;
-// check_for_updates;
-// bare_update_check;
 // auth_file;
 
 

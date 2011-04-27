@@ -480,39 +480,6 @@
  *  command buffers. You can read more on how to configure graphing
  *  @link graphingperformanceinfowithmrtg here @endlink.
  *
- *  @subsection mainconfigurationfileoptionsconfigurationfilevariablesupdatechecks Update Checks
- *
- *  @code
- *  Format:  check_for_updates=<0/1>
- *  Example: check_for_updates=1
- *  @endcode
- *
- *  This option determines whether Centreon Engine will automatically
- *  check to see if new updates (releases) are available. It is
- *  recommend that you enable this option to ensure that you stay on
- *  top of the latest critical patches to Centreon Engine. Centreon
- *  Engine is critical to you - make sure you keep it in good shape.
- *  Centreon Engine will check once a day for new updates. Data
- *  collected by Centreon Engine Enterprises from the update check is
- *  processed in accordance with our privacy policy - see
- *  http://api.centengine.org for details.
- *
- *  @subsection mainconfigurationfileoptionsconfigurationfilevariablesbareupdatechecks Bare Update Checks
- *
- *  @code
- *  Format:  bare_update_checks=<0/1>
- *  Example: bare_update_checks
- *  @endcode
- *
- *  This option deterines what data Centreon Engine will send to
- *  api.centengine.org when it checks for updates. By default,
- *  Centreon Engine will send information on the current version of
- *  Centreon Engine you have installed, as well as an indicator as to
- *  whether this was a new installation or not. Centreon Engine
- *  Enterprises uses this data to determine the number of users running
- *  specific version of Centreon Engine. Enable this option if you do
- *  not wish for this information to be sent.
- *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariableslockfile Lock File
  *
  *  @code
