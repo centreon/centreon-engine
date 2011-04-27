@@ -11,8 +11,7 @@
  *  - Observe the performance impacts of changes in your Centreon
  *  Engine configuration
  *
- *  @section graphingperformanceinfowithmrtgsamplemrtgconfiguration
- *  Sample MRTG Configuration
+ *  @section graphingperformanceinfowithmrtgsamplemrtgconfiguration Sample MRTG Configuration
  *
  *  Sample MRTG configuration file snippets for graphing various
  *  Centreon Engine performance statistics can be found in the
@@ -25,8 +24,7 @@
  *  (/etc/mrtg/mrtg.cfg) you should have some new graphs the next time
  *  MRTG runs.
  *
- *  @section graphingperformanceinfowithmrtgexamplegraphs Example
- *  Graphs
+ *  @section graphingperformanceinfowithmrtgexamplegraphs Example Graphs
  *
  *  I'll describe what a few of the sample MRTG graphs mean and what
  *  they can be used for...
