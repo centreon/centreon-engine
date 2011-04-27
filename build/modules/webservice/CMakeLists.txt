@@ -98,6 +98,10 @@ get_property(MODULE_COMPILE_FLAGS
   TARGET "webservice"
   PROPERTY COMPILE_FLAGS)
 set(MODULE_COMPILE_FLAGS "${MODULE_COMPILE_FLAGS}")
+if (CMAKE_COMPILER_IS_GNUCXX)
+  set_source_files_properties("${MODULE_DIR}/soapC.cpp" PROPERTIES
+    COMPILE_FLAGS "-Wno-unused-parameter")
+endif ()
 set_target_properties("webservice" PROPERTIES
   COMPILE_FLAGS "${MODULE_COMPILE_FLAGS}")
 target_link_libraries("webservice"
