@@ -61,8 +61,6 @@ char* global_host_event_handler = NULL;
 char* global_service_event_handler = NULL;
 char* ocsp_command = NULL;
 char* ochp_command = NULL;
-char* nagios_user = NULL;
-char* nagios_group = NULL;
 unsigned int use_syslog;
 unsigned int log_notifications;
 unsigned int log_service_retries;
@@ -292,8 +290,6 @@ configuration::configuration()
   _lst_method["daemon_dumps_core"]                           = &cpp_suck<QString const&, &configuration::_set_daemon_dumps_core>::set_generic;
   _lst_method["downtime_file"]                               = &cpp_suck<QString const&, &configuration::_set_downtime_file>::set_generic;
   _lst_method["xdddefault_downtime_file"]                    = &cpp_suck<QString const&, &configuration::_set_downtime_file>::set_generic;
-  _lst_method["nagios_user"]                                 = &cpp_suck<QString const&, &configuration::_set_user>::set_generic;
-  _lst_method["nagios_group"]                                = &cpp_suck<QString const&, &configuration::_set_group>::set_generic;
   _lst_method["allow_empty_hostgroup_assignment"]            = &cpp_suck<bool, &configuration::set_allow_empty_hostgroup_assignment>::set_generic;
 
   _lst_method["status_file"]                                 = NULL; // ignore external variables
@@ -312,16 +308,6 @@ configuration::configuration()
   _tab_string[temp_path] = DEFAULT_TEMP_PATH;
   _tab_string[check_result_path] = DEFAULT_CHECK_RESULT_PATH;
   _tab_string[log_archive_path] = DEFAULT_LOG_ARCHIVE_PATH;
-
-  passwd* pw = getpwent();
-  if (pw->pw_name != NULL) {
-    ::nagios_user = my_strdup(pw->pw_name);
-  }
-
-  group* grp = getgrent();
-  if (grp->gr_name != NULL) {
-    ::nagios_group = my_strdup(grp->gr_name);
-  }
 }
 
 /**

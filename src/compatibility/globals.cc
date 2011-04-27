@@ -20,7 +20,9 @@
 #include <stddef.h>
 
 // Features now handled by startup script.
-char const*   lock_file = "";
+char*         lock_file = NULL;
+char*         nagios_user = NULL;
+char*         nagios_group = NULL;
 
 // Startup verifications.
 int           verify_object_relationships = 1;
