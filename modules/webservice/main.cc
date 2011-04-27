@@ -20,8 +20,13 @@
 #include <exception>
 #include <stddef.h>
 #include "nebmodules.hh"
+#include "nebcallbacks.hh"
+#include "nebstructs.hh"
+#include "broker.hh"
 #include "logging.hh"
 #include "configuration.hh"
+#include "error.hh"
+#include "syncro.hh"
 #include "webservice.hh"
 
 using namespace com::centreon::engine::modules;
@@ -40,6 +45,43 @@ static void*          gl_mod_handle = NULL;
 static webservice*    gl_webservice = NULL;
 static configuration* gl_config = NULL;
 
+/**************************************
+ *                                     *
+ *         Callback Function           *
+ *                                     *
+ **************************************/
+
+/**
+ *  @brief Function that process external command.
+ *
+ *  This function is called by Centreon-Engine when external
+ *  command are check.
+ *
+ *  @param[in] callback_type Type of the callback.
+ *  @param[in] data          A pointer to a nebstruct_external_command_data.
+ *
+ *  @return 0 on success.
+ */
+int callback_external_command(int callback_type, void* data) {
+  (void)callback_type;
+
+  nebstruct_external_command_data* neb_data = static_cast<nebstruct_external_command_data*>(data);
+  if (neb_data->type != NEBTYPE_EXTERNALCOMMAND_CHECK_END
+      || neb_data->flags != NEBFLAG_NONE
+      || neb_data->attr != NEBATTR_NONE
+      || neb_data->command_type != CMD_NONE
+      || neb_data->command_string != NULL
+      || neb_data->command_args != NULL)
+    return (0);
+
+  try {
+    syncro::instance().wakeup_worker();
+  }
+  catch (...) {
+
+  }
+  return (0);
+}
 
 /**************************************
  *                                     *
@@ -65,6 +107,10 @@ extern "C" int nebmodule_deinit(int flags, int reason) {
 
   try {
     delete gl_webservice;
+    delete gl_config;
+
+    neb_deregister_callback(NEBCALLBACK_EXTERNAL_COMMAND_DATA,
+			    callback_external_command);
   }
   catch (std::exception const& e) {
       logit(NSLOG_RUNTIME_ERROR, false,
@@ -77,7 +123,7 @@ extern "C" int nebmodule_deinit(int flags, int reason) {
   }
   return (0);
 }
-#include <QDebug>
+
 /**
  *  @brief Module entry point.
  *
@@ -121,12 +167,22 @@ extern "C" int nebmodule_init(int flags, char const* args, void* handle) {
 		      "Access Protocol.");
 
   try {
+    // Initialise configuration.
     gl_config = new configuration;
     if (args != NULL) {
       gl_config->set_filename(args);
       gl_config->parse();
     }
 
+    // Register callbacks.
+    if (neb_register_callback(NEBCALLBACK_EXTERNAL_COMMAND_DATA,
+			      gl_mod_handle,
+			      0,
+			      callback_external_command) != 0) {
+      throw (com::centreon::engine::error() << "register callback failed");
+    }
+
+    // Initialise webservice.
     gl_webservice = new webservice(*gl_config);
     gl_webservice->start();
   }

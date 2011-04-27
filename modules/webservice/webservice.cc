@@ -34,7 +34,7 @@ webservice::webservice(configuration const& config)
   : QThread(0),
     _is_end(false),
     _config(config) {
-
+  _init();
 }
 
 /**
@@ -46,11 +46,9 @@ webservice::~webservice() throw() {
 }
 
 /**
- *  Initialize and start the webservice.
+ *  Start the webservice.
  */
 void  webservice::run() {
-  _init();
-
   while (_is_end != true) {
     SOAP_SOCKET s = soap_accept(&_soap_ctx);
     if (!soap_valid_socket(s)) {
