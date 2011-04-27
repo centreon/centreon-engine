@@ -217,14 +217,11 @@ std::map<QString, QString> build_configuration(QString const& mainconf, QString 
   var["use_embedded_perl_implicitly"] = obj2str(my_rand(0, 1));
   var["external_command_buffer_slots"] = obj2str(my_rand());
   var["auth_file"] = "auth_file.tmp";
-  var["bare_update_check"] = obj2str(my_rand(0, 1));
-  var["check_for_updates"] = obj2str(my_rand(0, 1));
   var["comment_file"] = "comment_file.tmp";
   var["xcddefault_comment_file"] = "comment_file.tmp";
   var["daemon_dumps_core"] = obj2str(my_rand(0, 1));
   var["downtime_file"] = "downtime_file.tmp";
   var["xdddefault_downtime_file"] = "downtime_file.tmp";
-  var["lock_file"] = "lock_file.tmp";
   var["allow_empty_hostgroup_assignment"] = obj2str(my_rand(0, 1));
 
   std::ofstream ofs(mainconf.toStdString().c_str());

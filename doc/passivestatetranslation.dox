@@ -55,19 +55,16 @@
  *  know how distributed instances see their respective portions of the
  *  network.
  *
- *  @section passivehoststatetranslationenablingstatetranslation
- *  Enabling State Translation
+ *  @section passivehoststatetranslationenablingstatetranslation Enabling State Translation
  *
  *  By default, Centreon Engine will not automatically translate
  *  DOWN/UNREACHABLE states from passive check results. You will need
  *  to enable this feature if you need and want it.
  *
  *  The automatic translation of passive host check states is
- *  controlled by the @ref
- *  mainconfigurationfileoptionsconfigurationfilevariablestranslatepassivehostchecksoption
- *  "translate_passive_host_checks" variable. Enable it and
- *  Centreon Engine will automatically translate DOWN and UNREACHABLE
- *  states from remote sources to their correct state for the local
- *  instance of Centreon Engine.
+ *  controlled by the
+ *  @ref mainconfigurationfileoptionsconfigurationfilevariablestranslatepassivehostchecksoption "translate_passive_host_checks"
+ *  variable. Enable it and Centreon Engine will automatically translate
+ *  DOWN and UNREACHABLE states from remote sources to their correct
+ *  state for the local instance of Centreon Engine.
  */
-

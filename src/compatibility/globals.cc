@@ -19,10 +19,17 @@
 
 #include <stddef.h>
 
+// Features now handled by startup script.
+char*         lock_file = NULL;
+char*         nagios_user = NULL;
+char*         nagios_group = NULL;
+
 // Startup verifications.
 int           verify_object_relationships = 1;
 
 // Update-related variables.
+int           bare_update_checks = 0;
+int           check_for_updates = 0;
 int           update_available = 0;
 unsigned long update_uid;
 char*         last_program_version = NULL;
