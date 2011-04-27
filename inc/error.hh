@@ -70,9 +70,9 @@ namespace            com {
 }
 
 # ifdef NDEBUG
-#  define error() error()
+#  define engine_error() com::centron::engine::error()
 # else
-#  define error() error(__FILE__, __FUNCTION__, __LINE__)
+#  define engine_error() com::centreon::engine::error(__FILE__, __FUNCTION__, __LINE__)
 # endif // !NDEBUG
 
 #endif // !CCE_ERROR_HH

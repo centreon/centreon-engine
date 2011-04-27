@@ -179,7 +179,7 @@ extern "C" int nebmodule_init(int flags, char const* args, void* handle) {
 			      gl_mod_handle,
 			      0,
 			      callback_external_command) != 0) {
-      throw (com::centreon::engine::error() << "register callback failed");
+      throw (engine_error() << "register callback failed");
     }
 
     // Initialise webservice.
