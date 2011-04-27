@@ -222,7 +222,6 @@ std::map<QString, QString> build_configuration(QString const& mainconf, QString 
   var["daemon_dumps_core"] = obj2str(my_rand(0, 1));
   var["downtime_file"] = "downtime_file.tmp";
   var["xdddefault_downtime_file"] = "downtime_file.tmp";
-  var["lock_file"] = "lock_file.tmp";
   var["allow_empty_hostgroup_assignment"] = obj2str(my_rand(0, 1));
 
   std::ofstream ofs(mainconf.toStdString().c_str());

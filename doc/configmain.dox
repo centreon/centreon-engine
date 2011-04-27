@@ -480,18 +480,6 @@
  *  command buffers. You can read more on how to configure graphing
  *  @link graphingperformanceinfowithmrtg here @endlink.
  *
- *  @subsection mainconfigurationfileoptionsconfigurationfilevariableslockfile Lock File
- *
- *  @code
- *  Format:  lock_file=<file_name>
- *  Example: lock_file=/tmp/centengine.lock
- *  @endcode
- *
- *  This option specifies the location of the lock file that Centreon
- *  Engine should create when it runs as a daemon (when started with
- *  the -d command line argument). This file contains the process id
- *  (PID) number of the running Centreon Engine process.
- *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariablesstateretentionoption State Retention Option
  *
  *  @code

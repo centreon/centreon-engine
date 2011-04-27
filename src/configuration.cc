@@ -57,7 +57,6 @@ unsigned long max_debug_file_size;
 char* command_file = NULL;
 char* temp_path = NULL;
 char* check_result_path = NULL;
-char const* lock_file = "";
 char* global_host_event_handler = NULL;
 char* global_service_event_handler = NULL;
 char* ocsp_command = NULL;
@@ -293,7 +292,6 @@ configuration::configuration()
   _lst_method["daemon_dumps_core"]                           = &cpp_suck<QString const&, &configuration::_set_daemon_dumps_core>::set_generic;
   _lst_method["downtime_file"]                               = &cpp_suck<QString const&, &configuration::_set_downtime_file>::set_generic;
   _lst_method["xdddefault_downtime_file"]                    = &cpp_suck<QString const&, &configuration::_set_downtime_file>::set_generic;
-  _lst_method["lock_file"]                                   = &cpp_suck<QString const&, &configuration::_set_lock_file>::set_generic;
   _lst_method["nagios_user"]                                 = &cpp_suck<QString const&, &configuration::_set_user>::set_generic;
   _lst_method["nagios_group"]                                = &cpp_suck<QString const&, &configuration::_set_group>::set_generic;
   _lst_method["allow_empty_hostgroup_assignment"]            = &cpp_suck<bool, &configuration::set_allow_empty_hostgroup_assignment>::set_generic;
