@@ -1,0 +1,220 @@
+/**
+ *  @page compiling Compiling Centreon Engine
+ *  @section compilingprerequisites Prerequisites
+ *
+ *  Centreon Engine should be able to compile and run on most Unix-like
+ *  platforms where a C++ compiler and the Qt framework are available.
+ *  The following table list all dependencies that Centreon Engine
+ *  requires to get properly built.
+ *
+ *  <table>
+ *  <tr>
+ *    <td><b>Dependency</b></td>
+ *    <td><b>Description</b></td>
+ *  </tr>
+ *  <tr>
+ *    <td>C++ compiler</td>
+ *    <td>A fully functionnal C++ compiler like <a href="http://gcc.gnu.org/">GCC</a>.</td>
+ *  </tr>
+ *  <tr>
+ *    <td><a href="http://qt.nokia.com">Qt</a></td>
+ *    <td>A well-known cross-platform application framework.</td>
+ *  </tr>
+ *  <tr>
+ *    <td><a href="http://www.cmake.org/">CMake</a></td>
+ *    <td>The cross-platform build system used by Centreon Engine.</td>
+ *  </tr>
+ *  <tr>
+ *    <td>make</td>
+ *    <td>A standard utility used to automatically build Centreon Engine.</td>
+ *  </tr>
+ *  </table>
+ *
+ *  To help you get ready fast, the end of this chapter will list
+ *  ways to install dependencies. This will usually be limited to
+ *  installation from source code or with a binary package if your
+ *  operating system have one. If your system have a package available,
+ *  then use your favorite package manager (@em yum, @em apt-get, ...)
+ *  to install it as this is the preferred solution.
+ *
+ *  @subsection compilingprerequisitescompiler C++ Compiler
+ *
+ *  @subsubsection GCC
+ *
+ *  GCC is certainly the most famous C++ compiler in the open source
+ *  world. It supports all C++ features required by Centreon Engine and
+ *  runs on a wide variety of platforms. Usually GCC will be available
+ *  as a package on your operating system.
+ *
+ *  @par From sources
+ *
+ *  Your can find instructions on how to build and install GCC from
+ *  source here
+ *  <a href="http://gcc.gnu.org/install/">http://gcc.gnu.org/install/</a>.
+ *
+ *  @par With a package
+ *
+ *  <table>
+ *  <tr>
+ *    <td><b>Operating System</b></td>
+ *    <td><b>Package Name</b></td>
+ *  </tr>
+ *  <tr>
+ *    <td>Ubuntu 10.10</td>
+ *    <td>@em g++</td>
+ *  </tr>
+ *  </table>
+ *
+ *
+ *  @subsection compilingprerequisitesqt Qt Framework
+ *
+ *  @subsubsection compilingprerequisitesqtfromsources From sources
+ *
+ *  You can find installation instructions for Qt on the official Qt
+ *  documentation at
+ *  <a href="http://doc.qt.nokia.com/">http://doc.qt.nokia.com/</a>. At
+ *  the time of writing (May '11) the latest Qt version is 4.7 and
+ *  installation instructions are available at
+ *  <a href="http://doc.qt.nokia.com/4.7/installation.html">http://doc.qt.nokia.com/4.7/installation.html</a>.
+ *
+ *  @subsubsection compilingprerequisitesqtwithpackage With a package
+ *
+ *  <table>
+ *  <tr>
+ *    <td><b>Operating System</b></td>
+ *    <td><b>Package Name</b></td>
+ *  </tr>
+ *  <tr>
+ *    <td>Ubuntu 10.10</td>
+ *    <td>@em qt4-dev</td>
+ *  </tr>
+ *  </table>
+ *
+ *
+ *  @subsection compilingprerequisitescmake CMake
+ *
+ *  @subsubsection compilingprerequisitescmakefromsources From sources
+ *
+ *  You can find installation instructions for CMake on the official
+ *  documentation at
+ *  <a href="http://www.cmake.org/cmake/help/install.html">http://www.cmake.org/cmake/help/install.html</a>.
+ *
+ *  @subsubsection compilingprerequisitescmakewithpackage With a package
+ *
+ *  <table>
+ *  <tr>
+ *    <td><b>Operating System</b></td>
+ *    <td><b>Package Name</b></td>
+ *  </tr>
+ *  <tr>
+ *    <td>Ubuntu 10.10</td>
+ *    <td>@em cmake</td>
+ *  </tr>
+ *  </table>
+ *
+ *
+ *  @subsection compilingprerequisitesmake make
+ *
+ *  @em make is usually already installed on your platform.
+ *
+ *
+ *  @section compilingconfiguration Configuration
+ *
+ *  @subsection compilingconfigurationsimpleusage Simple Configuration
+ *
+ *  The simplest way to configure Centreon Engine with CMake is to get
+ *  into the build directory and launch CMake with the CMakeLists.txt
+ *  file. On a Linux terminal this would be as simple as :
+ *
+ *  @code
+ *    cd <my_centreon_engine_source_directory>
+ *    cd build
+ *    cmake .
+ *  @endcode
+ *
+ *  Then CMake will check for prerequisites and tells you if anything
+ *  goes wrong. At the end of the configuration process, you should see
+ *  a summary of Centreon Engine features. Do not hesitate to change
+ *  them with @ref compilingconfigurationvariables "variables" !
+ *
+ *  @subsection compilingconfigurationvariables Variables
+ *
+ *  Your Centreon Engine installation can be tweaked to your convenience
+ *  through multiple variables. These variables must be provided to
+ *  CMake using it's -D flag like this :
+ *
+ *  @code
+ *    cmake -D<variable1>=<value1> [-D<variable2>=<value2>] ... .
+ *  @endcode
+ *
+ *  The following table list the most important variables you can set
+ *  and their use.
+ *
+ *  <table>
+ *  <tr>
+ *    <td><b>Variable Name</b></td>
+ *    <td><b>Description</b></td>
+ *  </tr>
+ *  <tr>
+ *    <td>WITH_PREFIX</td>
+ *    <td>Installation prefix. On Linux this could be set to /usr/local for example.</td>
+ *  </tr>
+ *  <tr>
+ *    <td>WITH_CHECK_RESULT_DIR</td>
+ *    <td>Where temporary check result files will be stored. This directory is used as a temporary place to store check results while they wait to be processed by Centreon Engine.</td>
+ *  </tr>
+ *  <tr>
+ *    <td>WITH_TEMP_DIR</td>
+ *    <td>Temporary directory used by Centreon Engine. Default to /tmp.</td>
+ *  </tr>
+ *  <tr>
+ *    <td>WITH_USER</td>
+ *    <td>If you plan on using on of Centreon Engine's startup script, this variable must be set to the user you want Centreon Engine to run under. Default to root.</td>
+ *  </tr>
+ *  <tr>
+ *    <td>WITH_GROUP</td>
+ *    <td>Similar to @em WITH_USER but for the group Centreon Engine will run under. Default to root.</td>
+ *  </tr>
+ *  <tr>
+ *    <td>WITH_STARTUP_SCRIPT</td>
+ *    <td>Enable or disable startup script installation. If enabled, your platform will be detected and the appropriate startup script automatically chosen. If detection fails, make sure that the @em lsb_release utility is available on your system.</td>
+ *  </tr>
+ *  <tr>
+ *    <td>WITH_EMBEDDED_PERL</td>
+ *    <td>Enable or disable embedded Perl. Default is disabled.</td>
+ *  </tr>
+ *  <tr>
+ *    <td>WITH_PERL_CACHE</td>
+ *    <td>If embedded Perl is enabled, enable or disable script caching.</td>
+ *  </tr>
+ *  </table>
+ *
+ *
+ *  @section compilingcompilation Compilation
+ *
+ *  The @ref compilingconfiguration "configuration" step is the most
+ *  important one. Once properly executed the compilation process is as
+ *  simple as :
+ *
+ *  @code
+ *    cd <my_centreon_engine_source_directory>
+ *    cd build
+ *    make
+ *  @endcode
+ *
+ *  And that should be it.
+ *
+ *
+ *  @section compilinginstallation Installation
+ *
+ *  Once built, the following command should install all necessary files
+ *  according to the @ref compilingconfiguration "configuration" phase.
+ *
+ *  @code
+ *    make install
+ *  @endcode
+ *
+ *  @note
+ *
+ *  This command should be run as priviledged user (@em root).
+ */
