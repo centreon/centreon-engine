@@ -1,5 +1,5 @@
 /**
- *  @page usingthecentenginetatsutility Using The Centreon Enginetats Utility
+ *  @page usingthecentenginetatsutility Using The Centreon Engine Stats Utility
  *  @section usingthecentenginetatsutilityintroduction Introduction
  *
  *  A utility called centenginetats is included in the Centreon
@@ -25,9 +25,8 @@
  *  @code
  *  # /usr/local/centengine/bin/centenginetats -c /usr/local/centengine/etc/centengine.cfg
  *
- *  Centreon Engine Stats 3.0prealpha-05202006
+ *  Centreon Engine Stats
  *  Copyright (c) 2003-2007 Ethan Galstad (www.centengine.org)
- *  Last Modified: 05-20-2006
  *  License: GPL
  *
  *  CURRENT STATUS DATA
@@ -103,4 +102,3 @@
  *  generate MRTG graphs for Centreon Engine performance statistics
  *  can be found @link graphingperformanceinfowithmrtg here @endlink.
  */
-

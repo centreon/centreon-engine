@@ -28,11 +28,27 @@
  *  should be noted that macros consist of all uppercase characters and
  *  are enclosed in $ characters.
  *
- *  @section standardmacrosincentenginemacroavailabilitychart Macro Availability Charts
+ *  @latexonly
+ *    \begin{landscape}
+ *  @endlatexonly
+ *
+ *  @section standardmacrosincentenginemacroavailabilitychart Macro Availability Chart
+ *
+ *  @subsection Legend
+ *
+ *  <table>
+ *    <tr>
+ *      <td>No</td>
+ *      <td>The macro is not available</td>
+ *    </tr>
+ *    <tr>
+ *      <td>@b Yes</td>
+ *      <td>The macro is available</td>
+ *    </tr>
+ *  </table>
  *
  *  @latexonly
  *    \clearpage
- *    \begin{landscape}
  *  @endlatexonly
  *
  *  @subsection hostmacros Host Macros <sup>3</sup>
@@ -1940,7 +1956,7 @@
  *
  *  @section standardmacrosincentenginemacrodescriptions Macro Descriptions
  *
- *  @subsection hostmacros Host Macros <sup>3</sup>
+ *  @subsection hostmacro Host Macros <sup>3</sup>
  *
  *  <table>
  *    <tr>
@@ -2692,7 +2708,7 @@
  *    \clearpage
  *  @endlatexonly
  *
- *  @subsection Service Group Macros <sup>6</sup>
+ *  @subsection servicegroupmacros Service Group Macros <sup>6</sup>
  *
  *  <table>
  *    <tr>
@@ -3336,14 +3352,13 @@
  *        more @ref mainconfigurationfileoptionsconfigurationfilevariablesresourcefile
  *	  "resource files".
  *        Centreon Engine supports up to 256 user macros ($USER1$ through
- *        $USER32$).
+ *        $USER256$).
  *      </td>
  *    </tr>
  *  </table>
  *
  *  @latexonly
  *    \end{landscape}
- *    \clearpage
  *  @endlatexonly
  *
  *  @section standardmacrosincentenginenotes Notes
@@ -3399,3 +3414,4 @@
  *  "use_large_installation_tweaks" option is enabled, as they
  *  are quite CPU-intensive to calculate.
  */
+

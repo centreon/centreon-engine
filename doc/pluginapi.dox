@@ -4,9 +4,9 @@
  *
  *  If you're looking at writing your own plugins for Centreon
  *  Engine, please make sure to visit these other resources:
- *  - The official <a href="http://XX/">Centreon Engine plugin project
+ *  - The official <a href="http://sourceforge.net/projects/nagiosplug/">Nagios plugin project
  *  website</a>
- *  - The official <a href="http://XXX/developer-guidelines.html">
+ *  - The official <a href="http://nagiosplug.sourceforge.net/developer-guidelines.html">
  *  Centreon Engine plugin development guidelines</a>
  *
  *  @section centenginepluginapipluginoverview Plugin Overview

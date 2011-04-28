@@ -12,25 +12,25 @@
  *  Some of the many features of Centreon Engine include:
  *
  *  - monitoring of network services (SMTP, IMAP, HTTP, NNTP, PING,
- *  etc.)
+ *    etc.)
  *  - monitoring of host resources (processor load, disk usage, etc.)
  *  - simple plugin design that allows users to easily develop their
- *  own service checks
+ *    own service checks
  *  - parallelized service checks
  *  - ability to define network host hierarchy using "parent" hosts,
- *  allowing detection of and distinction between hosts that are
- *  down and those that are unreachable
+ *    allowing detection of and distinction between hosts that are
+ *    down and those that are unreachable
  *  - contact notifications when service or host problems occur and
- *  get resolved (via email, page, or user-defined method)
+ *    get resolved (via email, page, or user-defined method)
  *  - ability to define event handlers to be run during service or
- *  host events for proactive problem resolution
+ *    host events for proactive problem resolution
  *  - automatic log file rotation
  *  - support for implementing redundant monitoring hosts
  *
  *  @section systemrequirements System Requirements
  *
  *  The only requirement of running Centreon Engine is a machine
- *  running Linux (or UNIX variant) that has network access and a C
+ *  running Linux (or Unix variant) that has network access and a C
  *  compiler installed (if installing from source code).
  *
  *  @section licensing Licensing
@@ -50,7 +50,8 @@
  *  trademarks or registered servicemarks owned by Nagios Enterprises,
  *  LLC. All other trademarks, servicemarks, registered trademarks, and
  *  registered servicemarks are the property of their respective
- *  owner(s).
+ *  owner(s). This documentation was started by Ethan Galstad and other
+ *  Nagios Community members.
  *
  *  Centreon Engine is provided AS IS with NO WARRANTY OF ANY KIND,
  *  INCLUDING THE WARRANTY OF DESIGN, MERCHANTABILITY, AND FITNESS FOR A

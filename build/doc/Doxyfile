@@ -1,0 +1,74 @@
+# Project properties.
+PROJECT_NAME           = "Centreon Engine"
+PROJECT_NUMBER         = 1.0.0
+
+# Build properties.
+INPUT                  = ../../doc/about.dox                   \
+                         ../../doc/knownissues.dox             \
+                         ../../doc/beginners.dox               \
+                         ../../doc/quickstart.dox              \
+                         ../../doc/compiling.dox               \
+                         ../../doc/monitoring.dox              \
+                         ../../doc/config.dox                  \
+                         ../../doc/configmain.dox              \
+                         ../../doc/configobject.dox            \
+                         ../../doc/objectdefinitions.dox       \
+                         ../../doc/customobjectvars.dox        \
+                         ../../doc/running.dox                 \
+                         ../../doc/plugins.dox                 \
+                         ../../doc/macros.dox                  \
+                         ../../doc/macrolist.dox               \
+                         ../../doc/hostchecks.dox              \
+                         ../../doc/servicechecks.dox           \
+                         ../../doc/activechecks.dox            \
+                         ../../doc/passivechecks.dox           \
+                         ../../doc/statetypes.dox              \
+                         ../../doc/timeperiods.dox             \
+                         ../../doc/networkreachability.dox     \
+                         ../../doc/notifications.dox           \
+                         ../../doc/extcommands.dox             \
+                         ../../doc/eventhandlers.dox           \
+                         ../../doc/volatileservices.dox        \
+                         ../../doc/freshness.dox               \
+                         ../../doc/distributed.dox             \
+                         ../../doc/redundancy.dox              \
+                         ../../doc/flapping.dox                \
+                         ../../doc/escalations.dox             \
+                         ../../doc/oncallrotation.dox          \
+                         ../../doc/clusters.dox                \
+                         ../../doc/dependencies.dox            \
+                         ../../doc/stalking.dox                \
+                         ../../doc/perfdata.dox                \
+                         ../../doc/downtime.dox                \
+                         ../../doc/embeddedperl.dox            \
+                         ../../doc/adaptive.dox                \
+                         ../../doc/dependencychecks.dox        \
+                         ../../doc/cachedchecks.dox            \
+                         ../../doc/passivestatetranslation.dox \
+                         ../../doc/checkscheduling.dox         \
+                         ../../doc/objectinheritance.dox       \
+                         ../../doc/objecttricks.dox            \
+                         ../../doc/security.dox                \
+                         ../../doc/tuning.dox                  \
+                         ../../doc/faststartup.dox             \
+                         ../../doc/largeinstalltweaks.dox      \
+                         ../../doc/stats.dox                   \
+                         ../../doc/mrtggraphs.dox              \
+                         ../../doc/integration.dox             \
+                         ../../doc/int-snmptrap.dox            \
+                         ../../doc/int-tcpwrappers.dox         \
+                         ../../doc/addons.dox                  \
+                         ../../doc/pluginapi.dox               \
+                         ../../doc/epnplugins.dox
+OUTPUT_DIRECTORY       = 
+OUTPUT_LANGUAGE        = English
+RECURSIVE              = NO
+IMAGE_PATH             = images
+
+# Output format.
+GENERATE_HTML          = YES
+HTML_OUTPUT            = html
+GENERATE_LATEX         = YES
+LATEX_OUTPUT           = latex
+LATEX_HEADER           = header.tex
+PDF_HYPERLINKS         = NO

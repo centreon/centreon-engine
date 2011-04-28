@@ -1,0 +1,41 @@
+\documentclass[a4paper]{book}
+\usepackage{a4wide}
+\usepackage{alltt}
+\usepackage{color}
+\usepackage{doxygen}
+\usepackage{fix-cm}
+\usepackage{float}
+\usepackage{graphicx}
+\usepackage[utf8]{inputenc}
+\usepackage{listings}
+\usepackage{makeidx}
+\usepackage{multicol}
+\usepackage{pdflscape}
+\usepackage{textcomp}
+\usepackage{times}
+\usepackage{wallpaper}
+\lstset{language=C++,inputencoding=utf8,basicstyle=\footnotesize,breaklines=true,breakatwhitespace=true,tabsize=8,numbers=left }
+\makeindex
+\setcounter{tocdepth}{4}
+\renewcommand{\footrulewidth}{0.4pt}
+\begin{document}
+\begin{titlepage}
+\ThisLLCornerWallPaper{1.0}{merethis_frontpage_footer}
+\vspace*{1.5cm}
+\begin{center}
+\mbox{\includegraphics{centreon_logo}}
+\vspace*{2cm}
+{\fontsize{16}{16} \bf USER MANUAL }\\
+{\large for Centreon Engine 1.0.0 }\\
+\vspace*{0.5cm}
+\definecolor{gray}{RGB}{100,100,100}
+{\textcolor{gray}{\large \bf ENGLISH VERSION }}\\
+\vspace*{6cm}
+{\small \hfill Copyright 1999-2009 Ethan Galstad\\\hfill Copyright 2009-2010 Nagios Core Development Team and Community Contributors\\\hfill Copyright 2009 Icinga Development Team\\\hfill Copyright 2011 Merethis}\\
+\end{center}
+\end{titlepage}
+\clearemptydoublepage
+\pagenumbering{roman}
+\tableofcontents
+\clearemptydoublepage
+\pagenumbering{arabic}

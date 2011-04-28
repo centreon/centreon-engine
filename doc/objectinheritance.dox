@@ -550,8 +550,7 @@
  *  }
  *  @endcode
  *
- *  @section objectinheritanceprecedencewithmultipleinheritancesources
- *  Precedence With Multiple Inheritance Sources
+ *  @section objectinheritanceprecedencewithmultipleinheritancesources Precedence With Multiple Inheritance Sources
  *
  *  When you use multiple inheritance sources, it is important to know
  *  how Centreon Engine handles variables that are defined in

@@ -447,6 +447,9 @@ add_executable("centenginestats"
 )
 install(TARGETS "centenginestats" DESTINATION "${bindir}")
 
+# Documentation.
+add_subdirectory("doc")
+
 # Package.
 set(CPACK_PACKAGE_NAME "Centreon-Engine")
 set(CPACK_PACKAGE_VENDOR "Merethis")

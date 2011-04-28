@@ -1,0 +1,232 @@
+/**
+ *  @page quickstartinstallationguide Quickstart Installation Guide
+ *  @section installationintroduction Installation Introduction
+ *
+ *  This quickstart guide is intended to provide you with simple
+ *  instructions on how to install Centreon Engine from source (code)
+ *  and have it monitoring your local machine inside of 20 minutes. No
+ *  advanced installation options are discussed here - just the basics
+ *  that will work for 95% of users who want to get started.
+ *
+ *  Quickstart installation guide has been written for the following
+ *  Linux distributions:
+ *
+ *    - CentOS
+ *    - Ubuntu
+ *
+ *  If you are installing Centreon Engine on an operating system or
+ *  Linux distribution that isn't listed above, read the quickstart
+ *  guide for an overview of what you'll need to do. Command names,
+ *  paths, etc. vary widely across different OSes/distributions, so
+ *  you'll likely need to tweak the installation docs a bit to work for
+ *  your particular case.
+ *
+ *  @section postinstallationmodifications Post-Installation Modifications
+ *
+ *  Once you get Centreon Engine installed and running properly, you'll
+ *  no doubt want to start monitoring more than just your local machine.
+ *  Check out the following docs for how to go about @link monitoring
+ *  monitoring @endlink other things ...
+ *
+ *    - @ref monitoringwindowsmachines "Monitoring Windows machines"
+ *    - @ref monitoringlinuxunixmachines "Monitoring Linux/Unix machines"
+ *    - @ref monitoringnetwareservers "Monitoring Netware servers"
+ *    - @ref monitoringroutersswitches "Monitoring routers/switches"
+ *    - @ref monitoringnetworkprinters "Monitoring network printers"
+ *    - @ref monitoringpubliclyavailableservices "Monitoring publicly available services (HTTP, FTP, SSH, etc.)"
+ *
+ *  @section quickstartwhatyoullendwith What You'll End Up With
+ *
+ *    - Centreon Engine and the Nagios plugins will be installed
+ *      underneath @em /usr/local/centengine
+ *    - Centreon Engine will be configured to monitor a few aspects of
+ *      your local system (CPU load, disk usage, etc.)
+ *
+ *  @section quickstartprerequisites Prerequisites
+ *
+ *  During portions of the installation you'll need to have root access
+ *  to your machine.
+ *
+ *  Make sure you've installed the following packages on your system
+ *  before continuing :
+ *
+ *    - GCC C++ compiler
+ *    - Qt framework
+ *    - CMake
+ *    - make
+ *
+ *  You can use yum to install these packages by running the following
+ *  commands (as root).
+ *
+ *  @subsection quickstartprerequisitescentos CentOS
+ *
+ *  @code
+ *    yum install gcc-c++ qt4-devel cmake make
+ *  @endcode
+ *
+ *  @subsection quickstartprerequisitesubuntu Ubuntu
+ *
+ *  @code
+ *    apt-get install g++ qt4-dev cmake make
+ *  @endcode
+ *
+ *  @section quickstartaccount Create Account Information
+ *
+ *  Become the root user.
+ *
+ *  @code
+ *    su -l
+ *  @endcode
+ *
+ *  Create a new @em centengine user account.
+ *
+ *  @code
+ *    useradd -m centengine
+ *  @endcode
+ *
+ *  Create a new @em centengine group and add the centengine user to the
+ *  group.
+ *
+ *  @code
+ *    groupadd centengine
+ *    usermod -a -G centengine centengine
+ *  @endcode
+ *
+ *  @section quickstartdownload Download Centreon Engine and the Nagios Plugins
+ *
+ *  Create a directory for storing the downloads.
+ *
+ *  @code
+ *    mkdir ~/downloads
+ *    cd ~/downloads
+ *  @endcode
+ *
+ *  Download the source code tarballs of both Centreon Engine and the
+ *  Centreon Engine plugins
+ *  (visit <a href="http://www.centreon.com/">http://www.centreon.com/</a>
+ *  and
+ *  <a href="http://www.nagiosplugins.org/">http://www.nagiosplugins.org</a>
+ *  for links to the latest versions).
+ *
+ *  @code
+ *    wget http://www.centreon.com/downloads/centreon-engine.tar.gz
+ *    wget http://prdownloads.sourceforge.net/sourceforge/nagiosplug/nagios-plugins-1.4.15.tar.gz
+ *  @endcode
+ *
+ *  @section quickstartcompile Compile and Install Centreon Engine
+ *
+ *  Extract the Centreon Engine source code tarball.
+ *
+ *  @code
+ *    cd ~/downloads
+ *    tar xzf centreon-engine.tar.gz
+ *    cd centreon-engine
+ *  @endcode
+ *
+ *  Configure your Centreon Engine setup with CMake, passing the name of
+ *  the user you created earlier like so :
+ *
+ *  @code
+ *    cmake -DWITH_USER=centengine .
+ *  @endcode
+ *
+ *  Compile the Centreon Engine source code.
+ *
+ *  @code
+ *    make
+ *  @endcode
+ *
+ *  Install binaries, init script, sample config files and set
+ *  permissions on the external command directory.
+ *
+ *  @code
+ *    make install
+ *    XXX more commands
+ *  @endcode
+ *
+ *  Don't start Centreon Engine yet - there's still more that needs to
+ *  be done ...
+ *
+ *  @section quickstartcustomize Customize Configuration
+ *
+ *  Sample configuration files have now been installed in the
+ *  @em /usr/local/centengine/etc directory. These sample files should
+ *  work fine for getting started with Centreon Engine. You'll need to
+ *  make just one change before you proceed ...
+ *
+ *  Edit the /usr/local/centengine/etc/objects/contacts.cfg config file
+ *  with your favorite editor and change the email address associated
+ *  with the centengineadmin contact definition to the address you'd
+ *  like to use for receiving alerts.
+ *
+ *  @code
+ *    vi /usr/local/centengine/etc/objects/contacts.cfg
+ *  @endcode
+ *
+ *  @section quickstartplugins Compile and Install the Centreon Engine Plugins
+ *
+ *  Extract the Nagios plugins source code tarball.
+ *
+ *  @code
+ *  cd ~/downloads
+ *  tar xzf nagios-plugins-1.4.15.tar.gz
+ *  cd nagios-plugins-1.4.15
+ *  @endcode
+ *
+ *  Compile and install the plugins.
+ *
+ *  @code
+ *    ./configure --with-user=centengine --with-group=centengine
+ *    make
+ *    make install
+ *  @endcode
+ *
+ *  @section quickstartaddservice Add Centreon Engine Service
+ *
+ *  Add Centreon Engine to the list of system services and have it
+ *  automatically start when the system boots.
+ *
+ *  @code
+ *    chkconfig --add centengine
+ *    chkconfig centengine on
+ *  @endcode
+ *
+ *  @section quickstartstart Start Centreon Engine
+ *
+ *  Verify the sample Centreon Engine configuration files.
+ *
+ *  @code
+ *    /usr/local/centengine/bin/centengine -v /usr/local/centengine/etc/centengine.cfg
+ *  @endcode
+ *
+ *  If there are no errors, start Centreon Engine.
+ *
+ *  @subsection quickstartstartcentos CentOS
+ *
+ *  @code
+ *    service centengine start
+ *  @endcode
+ *
+ *  @subsection quickstartstartubuntu Ubuntu
+ *
+ *  @code
+ *    start centengine
+ *  @endcode
+ *
+ *  @section quickstartothermodifications Other Modifications
+ *
+ *  Configuring email notifications is out of the scope of this
+ *  documentation. While Centreon Engine is currently configured to
+ *  send you email notifications, your system may not yet have a mail
+ *  program properly installed or configured. Refer to your system
+ *  documentation, search the web for specific instructions on
+ *  configuring your system to send email messages to external
+ *  addresses. More information on notifications can be found here.
+ *
+ *  @section quickstartyouredone You're Done
+ *
+ *  Congratulations ! You sucessfully installed Centreon Engine. Your
+ *  journey into monitoring is just beginning. You'll no doubt want to
+ *  monitor more than just your local machine, so check out the
+ *  @ref monitoring "monitoring" docs.
+ */
