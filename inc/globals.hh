@@ -24,8 +24,12 @@
 
 # include <stdio.h>
 # include "checks.hh"
+# include "comments.hh"
 # include "configuration.hh"
+# include "downtime.hh"
 # include "engine.hh"
+# include "events.hh"
+# include "nebmods.hh"
 # include "notifications.hh"
 # include "objects.hh"
 # include "skiplist.hh"
@@ -126,5 +130,133 @@ extern circular_buffer           check_result_buffer;
 extern pthread_t                 worker_threads[];
 
 extern check_stats               check_statistics[];
+
+extern timed_event*              event_list_low;
+extern timed_event*              event_list_low_tail;
+extern timed_event*              event_list_high;
+extern timed_event*              event_list_high_tail;
+extern sched_info                scheduling_info;
+
+extern comment*                  comment_list;
+extern int                       defer_comment_sorting;
+
+extern char*                     macro_x_names[];
+extern char*                     macro_user[];
+
+extern scheduled_downtime*       scheduled_downtime_list;
+extern int                       defer_downtime_sorting;
+
+extern FILE*                     debug_file_fp;
+
+extern char**                    macro_x;
+
+extern nebcallback*              neb_callback_list[];
+
+extern char* log_file;
+extern unsigned int debug_level;
+extern unsigned int debug_verbosity;
+extern char* debug_file;
+extern unsigned long max_debug_file_size;
+extern char* command_file;
+extern char* temp_path;
+extern char* check_result_path;
+extern char* global_host_event_handler;
+extern char* global_service_event_handler;
+extern char* ocsp_command;
+extern char* ochp_command;
+extern unsigned int use_syslog;
+extern unsigned int log_notifications;
+extern unsigned int log_service_retries;
+extern unsigned int log_event_handlers;
+extern unsigned int log_external_commands;
+extern unsigned int log_passive_checks;
+extern unsigned int log_initial_states;
+extern int log_host_retries;
+extern int allow_empty_hostgroup_assignment;
+extern unsigned int retain_state_information;
+extern unsigned int retention_update_interval;
+extern unsigned int use_retained_program_state;
+extern unsigned int use_retained_scheduling_info;
+extern unsigned int retention_scheduling_horizon;
+extern int additional_freshness_latency;
+extern unsigned long retained_host_attribute_mask;
+// retained_service_attribute_mask;
+extern unsigned long retained_process_host_attribute_mask;
+// retained_process_service_attribute_mask;
+extern unsigned long retained_contact_service_attribute_mask;
+extern unsigned long max_check_result_file_age;
+extern unsigned long retained_contact_host_attribute_mask;
+extern unsigned int obsess_over_services;
+extern unsigned int obsess_over_hosts;
+extern unsigned int translate_passive_host_checks;
+extern unsigned int passive_host_checks_are_soft;
+extern unsigned int service_check_timeout;
+extern unsigned int host_check_timeout;
+extern unsigned int event_handler_timeout;
+extern unsigned int notification_timeout;
+extern unsigned int ocsp_timeout;
+extern unsigned int ochp_timeout;
+extern unsigned int use_aggressive_host_checking;
+extern unsigned long cached_host_check_horizon;
+extern unsigned int enable_predictive_host_dependency_checks;
+extern unsigned long cached_service_check_horizon;
+extern unsigned int enable_predictive_service_dependency_checks;
+extern unsigned int soft_state_dependencies;
+extern unsigned int log_rotation_method;
+extern char* log_archive_path;
+extern unsigned int enable_event_handlers;
+extern unsigned int enable_notifications;
+extern unsigned int execute_service_checks;
+extern unsigned int accept_passive_service_checks;
+extern unsigned int execute_host_checks;
+extern unsigned int accept_passive_host_checks;
+extern unsigned int service_inter_check_delay_method;
+extern unsigned int max_service_check_spread;
+extern unsigned int host_inter_check_delay_method;
+extern unsigned int max_host_check_spread;
+extern unsigned int service_interleave_factor_method;
+extern unsigned int max_parallel_service_checks;
+extern unsigned int check_reaper_interval;
+extern unsigned int max_check_reaper_time;
+extern float sleep_time;
+extern unsigned int interval_length;
+extern unsigned int check_external_commands;
+// command_check_interval_is_seconds;
+extern int command_check_interval;
+extern unsigned int check_orphaned_services;
+extern unsigned int check_orphaned_hosts;
+extern unsigned int check_service_freshness;
+extern unsigned int check_host_freshness;
+extern unsigned int service_freshness_check_interval;
+extern unsigned int host_freshness_check_interval;
+extern unsigned int auto_reschedule_checks;
+extern unsigned int auto_rescheduling_interval;
+extern unsigned int auto_rescheduling_window;
+extern unsigned int status_update_interval;
+extern unsigned int time_change_threshold;
+extern unsigned int process_performance_data;
+extern unsigned int enable_flap_detection;
+extern unsigned int enable_failure_prediction;
+extern float low_service_flap_threshold;
+extern float high_service_flap_threshold;
+extern float low_host_flap_threshold;
+extern float high_host_flap_threshold;
+extern unsigned int date_format;
+extern char* use_timezone;
+extern char* p1_file;
+extern unsigned long event_broker_options;
+extern char* illegal_object_chars;
+extern char* illegal_output_chars;
+extern unsigned int use_regexp_matches;
+extern unsigned int use_true_regexp_matching;
+extern int daemon_dumps_core;
+extern unsigned int use_large_installation_tweaks;
+extern unsigned int enable_environment_macros;
+extern unsigned int free_child_process_memory;
+extern unsigned int child_processes_fork_twice;
+extern unsigned int enable_embedded_perl;
+extern unsigned int use_embedded_perl_implicitly;
+extern int external_command_buffer_slots;
+// auth_file;
 
 #endif /* !CCE_GLOBALS_HH_ */

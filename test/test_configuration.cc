@@ -25,6 +25,7 @@
 #include <fstream>
 #include <map>
 #include "engine.hh"
+#include "globals.hh"
 #include "macros.hh"
 #include "error.hh"
 #include "configuration.hh"
@@ -32,8 +33,6 @@
 using namespace com::centreon::engine;
 
 static nagios_macros global_macros;
-sched_info scheduling_info;
-char* macro_user[MAX_USER_MACROS];
 
 extern "C" {
   void logit(int data_type, int display, char const* fmt, ...) {

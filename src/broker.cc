@@ -19,6 +19,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "globals.hh"
 #include "nebstructs.hh"
 #include "nebmods.hh"
 #include "notifications.hh"
@@ -28,15 +29,6 @@
 #include "broker.hh"
 
 using namespace com::centreon::engine;
-
-extern configuration config;
-
-extern time_t        program_start;
-extern int           nagios_pid;
-extern time_t        last_command_check;
-extern time_t        last_log_rotation;
-extern unsigned long modified_host_process_attributes;
-extern unsigned long modified_service_process_attributes;
 
 /******************************************************************/
 /************************* EVENT FUNCTIONS ************************/

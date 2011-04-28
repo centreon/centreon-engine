@@ -32,6 +32,7 @@
 #include <regex.h>
 #include <libgen.h>
 #include "common.hh"
+#include "globals.hh"
 #include "objects.hh"
 #include "macros.hh"
 #include "skiplist.hh"
@@ -47,12 +48,6 @@
 #include "xodtemplate.hh"
 
 using namespace com::centreon::engine;
-
-extern configuration                  config;
-
-extern int                            verify_config;
-extern int                            test_scheduling;
-extern int                            use_precached_objects;
 
 static xodtemplate_timeperiod*        xodtemplate_timeperiod_list = NULL;
 static xodtemplate_command*           xodtemplate_command_list = NULL;

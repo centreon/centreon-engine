@@ -26,6 +26,7 @@
 #include <sys/wait.h>
 #include <errno.h>
 #include <signal.h>
+#include "globals.hh"
 #include "neberrors.hh"
 #include "engine.hh"
 #include "comments.hh"
@@ -51,33 +52,6 @@
 #endif
 
 using namespace com::centreon::engine;
-
-extern configuration     config;
-
-extern int               sigshutdown;
-extern int               sigrestart;
-
-extern unsigned int      currently_running_service_checks;
-extern unsigned int      currently_running_host_checks;
-
-extern time_t             program_start;
-extern time_t             event_start;
-
-extern timed_event*       event_list_low;
-extern timed_event*       event_list_low_tail;
-
-extern host*              host_list;
-extern service*           service_list;
-extern servicedependency* servicedependency_list;
-extern hostdependency*    hostdependency_list;
-
-extern unsigned long      next_event_id;
-extern unsigned long      next_problem_id;
-
-extern check_result       check_result_info;
-extern check_result*      check_result_list;
-
-extern pthread_t          worker_threads[TOTAL_WORKER_THREADS];
 
 #ifdef EMBEDDEDPERL
 extern int                use_embedded_perl;

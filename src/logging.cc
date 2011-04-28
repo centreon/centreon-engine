@@ -29,26 +29,12 @@
 #include "statusdata.hh"
 #include "engine.hh"
 #include "broker.hh"
+#include "globals.hh"
 #include "utils.hh"
 #include "configuration.hh"
 #include "logging.hh"
 
 using namespace com::centreon::engine;
-
-extern configuration   config;
-
-extern unsigned long   logging_options;
-extern unsigned long   syslog_options;
-
-extern host*           host_list;
-extern service*        service_list;
-
-extern int             verify_config;
-extern int             test_scheduling;
-
-extern time_t          last_log_rotation;
-
-FILE*                  debug_file_fp = NULL;
 
 static pthread_mutex_t debug_fp_lock;
 

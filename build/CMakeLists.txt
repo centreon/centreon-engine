@@ -697,7 +697,8 @@ install(TARGETS "centenginestats"
 add_executable("test_configuration"
   "${TEST_DIR}/test_configuration.cc"
   "${SRC_DIR}/configuration.cc"
-  "${SRC_DIR}/error.cc")
+  "${SRC_DIR}/error.cc"
+  "${SRC_DIR}/globals.cc")
 target_link_libraries("test_configuration"
   ${QT_LIBRARIES})
 

@@ -23,6 +23,7 @@
 #include "engine.hh"
 #include "statusdata.hh"
 #include "broker.hh"
+#include "globals.hh"
 #include "neberrors.hh"
 #include "utils.hh"
 #include "logging.hh"
@@ -31,19 +32,6 @@
 #include "notifications.hh"
 
 using namespace com::centreon::engine;
-
-extern configuration      config;
-
-extern notification*      notification_list;
-extern contact*           contact_list;
-extern serviceescalation* serviceescalation_list;
-extern hostescalation*    hostescalation_list;
-
-extern time_t             program_start;
-
-extern unsigned long      next_notification_id;
-
-extern char*              generic_summary;
 
 /******************************************************************/
 /***************** SERVICE NOTIFICATION FUNCTIONS *****************/

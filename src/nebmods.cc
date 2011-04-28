@@ -21,6 +21,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <errno.h>
+#include "globals.hh"
 #include "neberrors.hh"
 #include "utils.hh"
 #include "logging.hh"
@@ -30,10 +31,6 @@
 #include "nebmods.hh"
 
 using namespace com::centreon::engine;
-
-extern configuration config;
-
-nebcallback*         neb_callback_list[NEBCALLBACK_NUMITEMS];
 
 /*#define DEBUG*/
 

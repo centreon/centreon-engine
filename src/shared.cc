@@ -25,13 +25,12 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include "common.hh"
+#include "globals.hh"
 #include "utils.hh"
 #include "configuration.hh"
 #include "shared.hh"
 
 using namespace com::centreon::engine;
-
-extern configuration config;
 
 /*
  * This file holds random utility functions shared by cgi's and

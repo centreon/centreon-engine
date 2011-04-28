@@ -27,8 +27,6 @@
 #include "engine.hh"
 #include "objects.hh"
 
-extern int        use_precached_objects;
-
 /******************************************************************/
 /******* TOP-LEVEL HOST CONFIGURATION DATA INPUT FUNCTION *********/
 /******************************************************************/

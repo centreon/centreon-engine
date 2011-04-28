@@ -26,6 +26,7 @@
 #include "engine.hh"
 #include "downtime.hh"
 #include "comments.hh"
+#include "globals.hh"
 #include "statusdata.hh"
 #include "broker.hh"
 #include "sretention.hh"
@@ -37,31 +38,6 @@
 #include "events.hh"
 
 using namespace com::centreon::engine;
-
-extern configuration config;
-
-extern char*         config_file;
-
-extern int           test_scheduling;
-
-extern time_t        program_start;
-extern time_t        event_start;
-extern time_t        last_command_check;
-
-extern int           sigshutdown;
-extern int           sigrestart;
-
-extern unsigned int  currently_running_service_checks;
-
-timed_event*         event_list_low = NULL;
-timed_event*         event_list_low_tail = NULL;
-timed_event*         event_list_high = NULL;
-timed_event*         event_list_high_tail = NULL;
-
-extern host*         host_list;
-extern service*      service_list;
-
-sched_info           scheduling_info;
 
 /******************************************************************/
 /************ EVENT SCHEDULING/HANDLING FUNCTIONS *****************/

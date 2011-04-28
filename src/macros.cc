@@ -23,6 +23,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "engine.hh"
+#include "globals.hh"
 #include "utils.hh"
 #include "shared.hh"
 #include "logging.hh"
@@ -30,31 +31,6 @@
 #include "macros.hh"
 
 using namespace com::centreon::engine;
-
-extern configuration config;
-
-extern contact*      contact_list;
-extern contactgroup* contactgroup_list;
-extern host*         host_list;
-extern hostgroup*    hostgroup_list;
-extern service*      service_list;
-extern servicegroup* servicegroup_list;
-extern command*      command_list;
-extern timeperiod*   timeperiod_list;
-
-char*                macro_x_names[MACRO_X_COUNT];     /* the macro names */
-char*                macro_user[MAX_USER_MACROS];      /* $USERx$ macros */
-
-/*
- * These point to their corresponding pointer arrays in global_macros
- * AFTER macros have been initialized.
- *
- * They really only exist so that eventbroker modules that reference
- * them won't need to be re-compiled, although modules that rely
- * on their values after having run a certain command will require an
- * update
- */
-char**               macro_x = NULL;
 
 /*
  * scoped to this file to prevent (unintentional) mischief,
