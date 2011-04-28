@@ -63,14 +63,9 @@
  *  @subsection securityconsiderationsbestpracticesdontruncentreonengineasroot Don't Run Centreon Engine As Root
  *
  *  Centreon Centreon Engine doesn't need to run as root, so don't do
- *  it. You can tell Centreon Engine to drop privileges after startup
- *  and run as another user/group by using the @ref mainconfigurationfileoptionsconfigurationfilevariablescentreonengineuser
- *  "centengine_user" and
- *  @ref mainconfigurationfileoptionsconfigurationfilevariablescentreonenginegroup
- *  "centengine_group" directives in the main config file. If you need to execute
- *  event handlers or plugins which require root access, you might want
- *  to try using <a href="http://www.courtesan.com/sudo/sudo.html">sudo
- *  </a>.
+ *  it. If you need to execute event handlers or plugins which require
+ *  root access, you might want to try using
+ *  <a href="http://www.courtesan.com/sudo/sudo.html">sudo</a>.
  *
  *  @subsection securityconsiderationsbestpracticesLockdownthecheckresultdirectory Down The Check Result Directory
  *
