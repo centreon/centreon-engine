@@ -19,6 +19,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <unistd.h>
 #include "globals.hh"
 #include "nebstructs.hh"
 #include "nebmods.hh"
@@ -520,7 +521,7 @@ void broker_program_status(int type,
   ds.timestamp = get_broker_timestamp(timestamp);
 
   ds.program_start = program_start;
-  ds.pid = nagios_pid;
+  ds.pid = getpid();
   ds.last_command_check = last_command_check;
   ds.last_log_rotation = last_log_rotation;
   ds.notifications_enabled = config.get_enable_notifications();

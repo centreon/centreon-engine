@@ -330,9 +330,6 @@ int main(int argc, char** argv) {
       // Reset program variables.
       reset_variables();
 
-      // Get PID.
-      nagios_pid = (int)getpid();
-
       // Read in the configuration files (main
       // and resource config files).
       try {

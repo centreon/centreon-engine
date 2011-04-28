@@ -81,7 +81,6 @@ extern unsigned int              currently_running_host_checks;
 
 extern time_t                    program_start;
 extern time_t                    event_start;
-extern int                       nagios_pid;
 
 extern int                       embedded_perl_initialized;
 

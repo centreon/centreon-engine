@@ -75,7 +75,6 @@ unsigned int              currently_running_host_checks = 0;
 
 time_t                    program_start = 0L;
 time_t                    event_start = 0L;
-int                       nagios_pid = 0;
 
 int                       embedded_perl_initialized = FALSE;
 

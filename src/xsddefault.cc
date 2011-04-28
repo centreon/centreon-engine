@@ -270,7 +270,7 @@ int xsddefault_save_status_data(void) {
   fprintf(fp, "programstatus {\n");
   fprintf(fp, "\tmodified_host_attributes=%lu\n", modified_host_process_attributes);
   fprintf(fp, "\tmodified_service_attributes=%lu\n", modified_service_process_attributes);
-  fprintf(fp, "\tnagios_pid=%d\n", nagios_pid);
+  fprintf(fp, "\tnagios_pid=%d\n", (int)getpid());
   fprintf(fp, "\tprogram_start=%lu\n", program_start);
   fprintf(fp, "\tlast_command_check=%lu\n", last_command_check);
   fprintf(fp, "\tlast_log_rotation=%lu\n", last_log_rotation);
