@@ -19,7 +19,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include "errno.h"
+#include <errno.h>
 #include <exception>
 #include <iostream>
 #include <limits.h>
