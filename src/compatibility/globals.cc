@@ -20,6 +20,7 @@
 #include <stddef.h>
 
 // Features now handled by startup script.
+int           daemon_dumps_core = 0;
 char*         lock_file = NULL;
 char*         nagios_user = NULL;
 char*         nagios_group = NULL;

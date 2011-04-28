@@ -252,7 +252,6 @@ char* illegal_object_chars = NULL;
 char* illegal_output_chars = NULL;
 unsigned int use_regexp_matches;
 unsigned int use_true_regexp_matching;
-int daemon_dumps_core = false;
 unsigned int use_large_installation_tweaks;
 unsigned int enable_environment_macros;
 unsigned int free_child_process_memory;
