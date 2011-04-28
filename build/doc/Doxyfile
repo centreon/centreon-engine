@@ -15,7 +15,6 @@ INPUT                  = ../../doc/about.dox                   \
                          ../../doc/objectdefinitions.dox       \
                          ../../doc/customobjectvars.dox        \
                          ../../doc/running.dox                 \
-                         ../../doc/startstop.dox               \
                          ../../doc/plugins.dox                 \
                          ../../doc/macros.dox                  \
                          ../../doc/macrolist.dox               \

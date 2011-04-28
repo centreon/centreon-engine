@@ -30,56 +30,76 @@
  *  you can go ahead and (re)start Centreon Engine.
  *
  *
- *  @section startingcentengine Starting And Stopping Centreon Engine
+ *  @section runningstartstop Starting and Stopping Centreon Engine
  *
  *  There's more than one way to start, stop, and restart Centreon
- *  Engine. Here are some of the more common ones...
+ *  Engine. Here are some of the more common ones ...
  *
- *  @subsection starting Starting Centreon Engine
+ *  @note
  *
- *  @subsubsection initscript Init Script
- *  The easiest way to start the Centreon Engine daemon is by using
- *  the init script like so:
+ *  Always make sure you @ref verifyconfig "verify your configuration"
+ *  before you (re)start Centreon Engine.
+ *
+ *  @subsection runningstartstopcentos On CentOS
+ *
+ *  On CentOS, Centreon Engine provides an init script called
+ *  @em centengine that should have been installed in @em /etc/init.d/.
+ *  The script can be used like this as a superuser (@em root) :
+ *
  *  @code
- *  /etc/init.d/centengine start
+ *    /etc/init.d/centengine <operation>
  *  @endcode
  *
- *  @subsubsection manually Manually
- *  You can start the Centreon Engine daemon manually on the command
- *  line like so:
+ *  Where operation is one of :
+ *
+ *  <table>
+ *  <tr>
+ *    <td><b>Operation</b></td>
+ *    <td><b>Description</b></td>
+ *  </tr>
+ *  <tr>
+ *    <td>@em start</td>
+ *    <td>Start Centreon Engine if it is not already running.</td>
+ *  </tr>
+ *  <tr>
+ *    <td>@em stop</td>
+ *    <td>Stop Centreon Engine if it is running.</td>
+ *  </tr>
+ *  <tr>
+ *    <td>@em restart</td>
+ *    <td>Stop and restart Centreon Engine if it is already running, otherwise start it.</td>
+ *  </tr>
+ *  <tr>
+ *    <td>@em try-restart</td>
+ *    <td>Restart Centreon Engine if it is already running.
+ *  </tr>
+ *  <tr>
+ *    <td>@em reload</td>
+ *    <td>Cause the configuration to be reloaded without actually stopping and restarting the service. Warning : the use of this feature is highly discouraged.</td>
+ *  </tr>
+ *  <tr>
+ *    <td>@em force-reload</td>
+ *    <td>Similar to @em try-restart.</td>
+ *  </tr>
+ *  <tr>
+ *    <td>@em status</td>
+ *    <td>Print the current status of the service.</td>
+ *  </tr>
+ *  </table>
+ *
+ *
+ *  @subsection runningstartstopubuntu On Ubuntu
+ *
+ *  On Ubuntu, Centreon Engine provides an upstart configuration file
+ *  called @em centengine.conf that should have been installed in the
+ *  @em /etc/init/ directory. Starting and stopping the daemon should be
+ *  as simple as :
+ *
  *  @code
- *  /usr/local/bin/centengine /etc/centreon/engine/engine.cfg &
+ *    start centengine  # Start Centreon Engine
+ *    stop centengine   # Stop Centreon Engine
  *  @endcode
  *
- *  @subsection restarting Restarting Centreon Engine
- *
- *  @subsubsection initscript Init Script
- *  The easiest way to restart the centreon Engine daemon is by using
- *  the init script like so:
- *  @code
- *  /etc/init.d/centengine restart
- *  @endcode
- *
- *  @subsubsection manually Manually
- *  You can restart the Centreon Engine process by sending it a
- *  SIGHUP signal like so:
- *  @code
- *  kill -HUP <centengine_pid>
- *  @endcode
- *
- *  @subsection stopping Stopping Centreon Engine
- *
- *  @subsubsection initscript Init Script
- *  The easiest way to stop the Centreon Engine daemon is by using
- *  the init script like so:
- *  @code
- *  /etc/init.d/centengine stop
- *  @endcode
- *
- *  @subsubsection manually Manually
- *  You can stop the Centreon Engine process by sending it a TERM
- *  signal like so:
- *  @code
- *  kill -TERM <centengine_pid>
- *  @endcode
+ *  Please refer to the @em initctl manpage for the full list of
+ *  operations available.
  */
