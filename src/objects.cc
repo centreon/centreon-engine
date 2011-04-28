@@ -21,39 +21,12 @@
 #include <stdio.h>
 #include <string.h>
 #include "xodtemplate.hh"
+#include "globals.hh"
 #include "skiplist.hh"
 #include "logging.hh"
 #include "engine.hh"
 #include "objects.hh"
 
-host*              host_list = NULL;
-host*              host_list_tail = NULL;
-service*           service_list = NULL;
-service*           service_list_tail = NULL;
-contact*           contact_list = NULL;
-contact*           contact_list_tail = NULL;
-contactgroup*      contactgroup_list = NULL;
-contactgroup*      contactgroup_list_tail = NULL;
-hostgroup*         hostgroup_list = NULL;
-hostgroup*         hostgroup_list_tail = NULL;
-servicegroup*      servicegroup_list = NULL;
-servicegroup*      servicegroup_list_tail = NULL;
-command*           command_list = NULL;
-command*           command_list_tail = NULL;
-timeperiod*        timeperiod_list = NULL;
-timeperiod*        timeperiod_list_tail = NULL;
-serviceescalation* serviceescalation_list = NULL;
-serviceescalation* serviceescalation_list_tail = NULL;
-servicedependency* servicedependency_list = NULL;
-servicedependency* servicedependency_list_tail = NULL;
-hostdependency*    hostdependency_list = NULL;
-hostdependency*    hostdependency_list_tail = NULL;
-hostescalation*    hostescalation_list = NULL;
-hostescalation*    hostescalation_list_tail = NULL;
-
-skiplist*          object_skiplists[NUM_OBJECT_SKIPLISTS];
-
-int               __nagios_object_structure_version = CURRENT_OBJECT_STRUCTURE_VERSION;
 extern int        use_precached_objects;
 
 /******************************************************************/
