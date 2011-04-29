@@ -26,24 +26,24 @@
 #include "utils.hh"
 #include "shared.hh"
 #include "logging.hh"
-#include "configuration.hh"
+#include "configuration/states.hh"
 #include "macros.hh"
 
 using namespace com::centreon::engine;
 
-extern configuration config;
+extern configuration::states config;
 
-extern contact*      contact_list;
-extern contactgroup* contactgroup_list;
-extern host*         host_list;
-extern hostgroup*    hostgroup_list;
-extern service*      service_list;
-extern servicegroup* servicegroup_list;
-extern command*      command_list;
-extern timeperiod*   timeperiod_list;
+extern contact*              contact_list;
+extern contactgroup*         contactgroup_list;
+extern host*                 host_list;
+extern hostgroup*            hostgroup_list;
+extern service*              service_list;
+extern servicegroup*         servicegroup_list;
+extern command*              command_list;
+extern timeperiod*           timeperiod_list;
 
-char*                macro_x_names[MACRO_X_COUNT];     /* the macro names */
-char*                macro_user[MAX_USER_MACROS];      /* $USERx$ macros */
+char*                        macro_x_names[MACRO_X_COUNT];     /* the macro names */
+char*                        macro_user[MAX_USER_MACROS];      /* $USERx$ macros */
 
 /*
  * These point to their corresponding pointer arrays in global_macros
@@ -75,7 +75,7 @@ nagios_macros* get_global_macros(void) {
  * the thread-safe version
  */
 int process_macros_r(nagios_macros* mac,
-		     char* input_buffer,
+		     char const* input_buffer,
                      char** output_buffer,
 		     int options) {
   char* temp_buffer = NULL;
@@ -274,7 +274,7 @@ int process_macros_r(nagios_macros* mac,
   return (OK);
 }
 
-int process_macros(char* input_buffer, char** output_buffer, int options) {
+int process_macros(char const* input_buffer, char** output_buffer, int options) {
   return (process_macros_r(&global_macros, input_buffer, output_buffer, options));
 }
 

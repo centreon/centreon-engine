@@ -28,18 +28,18 @@
 #include "broker.hh"
 #include "notifications.hh"
 #include "logging.hh"
-#include "configuration.hh"
+#include "configuration/states.hh"
 #include "flapping.hh"
 
 using namespace com::centreon::engine;
 
-extern configuration config;
+extern configuration::states config;
 
-extern host*         host_list;
-extern service*      service_list;
+extern host*                 host_list;
+extern service*              service_list;
 
-extern unsigned long modified_host_process_attributes;
-extern unsigned long modified_service_process_attributes;
+extern unsigned long         modified_host_process_attributes;
+extern unsigned long         modified_service_process_attributes;
 
 /******************************************************************/
 /******************** FLAP DETECTION FUNCTIONS ********************/

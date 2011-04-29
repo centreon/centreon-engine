@@ -24,16 +24,16 @@
 #include "neberrors.hh"
 #include "utils.hh"
 #include "logging.hh"
-#include "configuration.hh"
+#include "configuration/states.hh"
 #include "modules/loader.hh"
 #include "modules/handle.hh"
 #include "nebmods.hh"
 
 using namespace com::centreon::engine;
 
-extern configuration config;
+extern configuration::states config;
 
-nebcallback*         neb_callback_list[NEBCALLBACK_NUMITEMS];
+nebcallback*                 neb_callback_list[NEBCALLBACK_NUMITEMS];
 
 /*#define DEBUG*/
 

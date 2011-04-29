@@ -26,47 +26,47 @@
 #include "utils.hh"
 #include "notifications.hh"
 #include "logging.hh"
-#include "configuration.hh"
+#include "configuration/states.hh"
 #include "config.hh"
 
 using namespace com::centreon::engine;
 
-extern configuration      config;
+extern configuration::states config;
 
-extern char*              macro_user[MAX_USER_MACROS];
+extern char*                 macro_user[MAX_USER_MACROS];
 
-extern command*           global_host_event_handler_ptr;
-extern command*           global_service_event_handler_ptr;
+extern command*              global_host_event_handler_ptr;
+extern command*              global_service_event_handler_ptr;
 
-extern command*           ocsp_command_ptr;
-extern command*           ochp_command_ptr;
+extern command*              ocsp_command_ptr;
+extern command*              ochp_command_ptr;
 
-extern int                verify_config;
-extern int                verify_circular_paths;
-extern int                test_scheduling;
-extern int                precache_objects;
-extern int                use_precached_objects;
+extern int                   verify_config;
+extern int                   verify_circular_paths;
+extern int                   test_scheduling;
+extern int                   precache_objects;
+extern int                   use_precached_objects;
 
-extern sched_info         scheduling_info;
+extern sched_info            scheduling_info;
 
-extern int                max_child_process_time;
+extern int                   max_child_process_time;
 
-extern contact*           contact_list;
-extern contactgroup*      contactgroup_list;
-extern host*              host_list;
-extern hostgroup*         hostgroup_list;
-extern service*           service_list;
-extern servicegroup*      servicegroup_list;
-extern notification*      notification_list;
-extern command*           command_list;
-extern timeperiod*        timeperiod_list;
-extern serviceescalation* serviceescalation_list;
-extern servicedependency* servicedependency_list;
-extern hostdependency*    hostdependency_list;
-extern hostescalation*    hostescalation_list;
+extern contact*              contact_list;
+extern contactgroup*         contactgroup_list;
+extern host*                 host_list;
+extern hostgroup*            hostgroup_list;
+extern service*              service_list;
+extern servicegroup*         servicegroup_list;
+extern notification*         notification_list;
+extern command*              command_list;
+extern timeperiod*           timeperiod_list;
+extern serviceescalation*    serviceescalation_list;
+extern servicedependency*    servicedependency_list;
+extern hostdependency*       hostdependency_list;
+extern hostescalation*       hostescalation_list;
 
-extern host**             host_hashlist;
-extern service**          service_hashlist;
+extern host**                host_hashlist;
+extern service**             service_hashlist;
 
 /******************************************************************/
 /************** CONFIGURATION INPUT FUNCTIONS *********************/

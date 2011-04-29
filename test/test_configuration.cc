@@ -27,13 +27,13 @@
 #include "engine.hh"
 #include "macros.hh"
 #include "error.hh"
-#include "configuration.hh"
+#include "configuration/states.hh"
 
 using namespace com::centreon::engine;
 
 static nagios_macros global_macros;
-sched_info scheduling_info;
-char* macro_user[MAX_USER_MACROS];
+sched_info           scheduling_info;
+char*                macro_user[MAX_USER_MACROS];
 
 extern "C" {
   void logit(int data_type, int display, char const* fmt, ...) {
@@ -247,7 +247,7 @@ std::map<QString, QString> build_configuration(QString const& mainconf, QString 
 }
 
 void test_configuration(QString const& filename, std::map<QString, QString>& my_conf) {
-  configuration config;
+  configuration::states config;
   config.parse(filename);
 
   QString date_format[] = { "us", "euro", "iso8601", "strict-iso8601" };
@@ -553,7 +553,7 @@ void test_configuration(QString const& filename, std::map<QString, QString>& my_
     throw (engine_error() << "command_check_interval: init with '" << my_conf["log_rotation_method"] << "'");
   }
   if (my_conf["service_interleave_factor"] == "s") {
-    if (config.get_service_interleave_factor_method() != configuration::ilf_smart) {
+    if (config.get_service_interleave_factor_method() != configuration::states::ilf_smart) {
       throw (engine_error() << "service_interleave_factor: init with '" << my_conf["log_rotation_method"] << "'");
     }
   }

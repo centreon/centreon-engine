@@ -45,12 +45,12 @@ int                     use_embedded_perl = TRUE;
 #include "notifications.hh"
 #include "logging.hh"
 #include "shared.hh"
-#include "configuration.hh"
+#include "configuration/states.hh"
 #include "utils.hh"
 
 using namespace com::centreon::engine;
 
-extern configuration          config;
+extern configuration::states  config;
 
 extern unsigned long          logging_options;
 extern unsigned long          syslog_options;

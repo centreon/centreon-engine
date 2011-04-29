@@ -27,23 +27,23 @@
 #include "utils.hh"
 #include "logging.hh"
 #include "shared.hh"
-#include "configuration.hh"
+#include "configuration/states.hh"
 #include "notifications.hh"
 
 using namespace com::centreon::engine;
 
-extern configuration      config;
+extern configuration::states config;
 
-extern notification*      notification_list;
-extern contact*           contact_list;
-extern serviceescalation* serviceescalation_list;
-extern hostescalation*    hostescalation_list;
+extern notification*         notification_list;
+extern contact*              contact_list;
+extern serviceescalation*    serviceescalation_list;
+extern hostescalation*       hostescalation_list;
 
-extern time_t             program_start;
+extern time_t                program_start;
 
-extern unsigned long      next_notification_id;
+extern unsigned long         next_notification_id;
 
-extern char*              generic_summary;
+extern char*                 generic_summary;
 
 /******************************************************************/
 /***************** SERVICE NOTIFICATION FUNCTIONS *****************/

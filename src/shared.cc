@@ -26,12 +26,12 @@
 #include <fcntl.h>
 #include "common.hh"
 #include "utils.hh"
-#include "configuration.hh"
+#include "configuration/states.hh"
 #include "shared.hh"
 
 using namespace com::centreon::engine;
 
-extern configuration config;
+extern configuration::states config;
 
 /*
  * This file holds random utility functions shared by cgi's and

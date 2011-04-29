@@ -27,9 +27,16 @@ namespace           com {
   namespace         centreon {
     namespace       engine {
       namespace     logging {
+	/**
+	 *  @class standard standard.hh
+	 *  @brief Call console for all logging message.
+	 *
+	 *  Call console for all logging message.
+	 *  You can select stdout or stderr.
+	 */
 	class       standard : public object {
 	public:
-	            standard(bool is_stdout);
+	            standard(bool is_stdout = true);
 	            ~standard() throw();
 
 	  void      log(char const* message,

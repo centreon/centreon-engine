@@ -29,6 +29,12 @@ namespace                    com {
   namespace                  centreon {
     namespace                engine {
       namespace              logging {
+	/**
+         *  @class engine engnie.hh
+         *  @brief Class to manage logging.
+         *
+         *  Class to manage all logging objects.
+         */
 	class                engine {
 	public:
 	  struct                   obj_info {
@@ -55,12 +61,6 @@ namespace                    com {
 	  unsigned long      add_object(obj_info const& info);
 	  void               remove_object(unsigned long id) throw();
 
-	  void               set_verbosity_level(unsigned int level) throw();
-	  unsigned int       get_verbosity_level() throw();
-
-	  void               set_options(unsigned long long options) throw();
-	  unsigned long long get_options() throw();
-
 	private:
 	                     engine();
 	                     ~engine() throw();
@@ -70,9 +70,7 @@ namespace                    com {
 
 	  QHash<unsigned long, obj_info> _objects;
 	  QMutex             _mutex;
-	  unsigned long long _options;
 	  unsigned long      _id;
-	  unsigned int       _verbosity_level;
 	};
       }
     }

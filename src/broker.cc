@@ -24,12 +24,12 @@
 #include "notifications.hh"
 #include "sehandlers.hh"
 #include "flapping.hh"
-#include "configuration.hh"
+#include "configuration/states.hh"
 #include "broker.hh"
 
 using namespace com::centreon::engine;
 
-extern configuration config;
+extern configuration::states config;
 
 extern time_t        program_start;
 extern int           nagios_pid;
@@ -1113,4 +1113,3 @@ struct timeval get_broker_timestamp(struct timeval* timestamp) {
 
   return (tv);
 }
-

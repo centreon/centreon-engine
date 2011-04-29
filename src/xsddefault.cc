@@ -34,43 +34,43 @@
 #include "skiplist.hh"
 #include "utils.hh"
 #include "logging.hh"
-#include "configuration.hh"
+#include "configuration/states.hh"
 
 /**** IMPLEMENTATION SPECIFIC HEADER FILES ****/
 #include "xsddefault.hh"
 
 using namespace com::centreon::engine;
 
-extern configuration       config;
+extern configuration::states config;
 
-extern time_t              program_start;
-extern int                 nagios_pid;
-extern time_t              last_command_check;
-extern time_t              last_log_rotation;
+extern time_t                program_start;
+extern int                   nagios_pid;
+extern time_t                last_command_check;
+extern time_t                last_log_rotation;
 
-extern circular_buffer     external_command_buffer;
+extern circular_buffer       external_command_buffer;
 
-extern host*               host_list;
-extern service*            service_list;
-extern contact*            contact_list;
-extern comment*            comment_list;
-extern scheduled_downtime* scheduled_downtime_list;
+extern host*                 host_list;
+extern service*              service_list;
+extern contact*              contact_list;
+extern comment*              comment_list;
+extern scheduled_downtime*   scheduled_downtime_list;
 
-extern skiplist*           object_skiplists[NUM_OBJECT_SKIPLISTS];
+extern skiplist*             object_skiplists[NUM_OBJECT_SKIPLISTS];
 
-extern unsigned long       next_comment_id;
-extern unsigned long       next_downtime_id;
-extern unsigned long       next_event_id;
-extern unsigned long       next_problem_id;
-extern unsigned long       next_notification_id;
+extern unsigned long         next_comment_id;
+extern unsigned long         next_downtime_id;
+extern unsigned long         next_event_id;
+extern unsigned long         next_problem_id;
+extern unsigned long         next_notification_id;
 
-extern unsigned long       modified_host_process_attributes;
-extern unsigned long       modified_service_process_attributes;
+extern unsigned long         modified_host_process_attributes;
+extern unsigned long         modified_service_process_attributes;
 
-extern check_stats         check_statistics[MAX_CHECK_STATS_TYPES];
+extern check_stats           check_statistics[MAX_CHECK_STATS_TYPES];
 
-static char*               xsddefault_status_log = NULL;
-static char*               xsddefault_temp_file = NULL;
+static char*                 xsddefault_status_log = NULL;
+static char*                 xsddefault_temp_file = NULL;
 
 /******************************************************************/
 /***************** COMMON CONFIG INITIALIZATION  ******************/

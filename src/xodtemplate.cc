@@ -35,7 +35,7 @@
 #include "objects.hh"
 #include "macros.hh"
 #include "skiplist.hh"
-#include "configuration.hh"
+#include "configuration/states.hh"
 #include "logging.hh"
 
 /**** CORE OR CGI SPECIFIC HEADER FILES ****/
@@ -48,7 +48,7 @@
 
 using namespace com::centreon::engine;
 
-extern configuration                  config;
+extern configuration::states          config;
 
 extern int                            verify_config;
 extern int                            test_scheduling;

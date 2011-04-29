@@ -21,34 +21,62 @@
 
 using namespace com::centreon::engine::logging;
 
+/**************************************
+ *                                     *
+ *           Public Methods            *
+ *                                     *
+ **************************************/
+
+/**
+ *  Default constructor.
+ */
 engine::engine()
-  : _options(0), _id(0), _verbosity_level(0) {
+  : _id(0) {
 
 }
 
+/**
+ *  Default destructor.
+ */
 engine::~engine() throw() {
 
 }
 
+/**
+ *  Get instance of engine singleton.
+ */
 engine& engine::instance() {
   static engine instance;
   return (instance);
 }
 
+/**
+ *  Write message into all objects logging.
+ *
+ *  @param[in] message   Message to log.
+ *  @param[in] type      Logging types.
+ *  @param[in] verbosity Verbosity level.
+ */
 void engine::log(char const* message,
 		 unsigned long long type,
 		 unsigned int verbosity) throw() {
   _mutex.lock();
-  if (verbosity <= _verbosity_level && (type & _options)) {
-    for (QHash<unsigned long, obj_info>::iterator it = _objects.begin(), end = _objects.end();
-	 it != end;
-	 ++it) {
-      it.value().obj->log(message, type, verbosity);
+  for (QHash<unsigned long, obj_info>::iterator it = _objects.begin(), end = _objects.end();
+       it != end;
+       ++it) {
+    obj_info& info = it.value();
+    if (verbosity <= info.verbosity && (type & info.type)) {
+      info.obj->log(message, type, verbosity);
     }
   }
   _mutex.unlock();
 }
 
+/**
+ *  Add a new object logging into engine.
+ *
+ *  @param[in] info The object logging with type and verbosity.
+ */
 unsigned long engine::add_object(obj_info const& info) {
   _mutex.lock();
   unsigned int id = _id++;
@@ -57,6 +85,11 @@ unsigned long engine::add_object(obj_info const& info) {
   return (id);
 }
 
+/**
+ *  Remove an object logging.
+ *
+ *  @param[in] id The object's id.
+ */
 void engine::remove_object(unsigned long id) throw() {
   _mutex.lock();
   QHash<unsigned long, obj_info>::iterator it = _objects.find(id);
@@ -66,38 +99,21 @@ void engine::remove_object(unsigned long id) throw() {
   _mutex.unlock();
 }
 
-void engine::set_verbosity_level(unsigned int level) throw() {
-  _mutex.lock();
-  _verbosity_level = level;
-  _mutex.unlock();
-}
-
-unsigned int engine::get_verbosity_level() throw() {
-  _mutex.lock();
-  unsigned int level = _verbosity_level;
-  _mutex.unlock();
-  return (level);
-}
-
-void engine::set_options(unsigned long long options) throw() {
-  _mutex.lock();
-  _options = options;
-  _mutex.unlock();
-}
-
-unsigned long long engine::get_options() throw() {
-  _mutex.lock();
-  unsigned long long options = _options;
-  _mutex.unlock();
-  return (options);
-}
-
-
+/**
+ *  Default constructor.
+ */
 engine::obj_info::obj_info()
   : type(0), verbosity(0) {
 
 }
 
+/**
+ *  Constructor.
+ *
+ *  @param[in] _obj       Pointer on object logging.
+ *  @param[in] _type      Message type to log with this object.
+ *  @param[in] _verbosity Verbosity level.
+ */
 engine::obj_info::obj_info(QSharedPointer<object> _obj,
 			   unsigned long long _type,
 			   unsigned int _verbosity)
@@ -105,15 +121,28 @@ engine::obj_info::obj_info(QSharedPointer<object> _obj,
 
 }
 
+/**
+ *  Default copy constructor.
+ *
+ *  @param[in] right The class to copy.
+ */
 engine::obj_info::obj_info(obj_info const& right)
   : type(0), verbosity(0) {
   operator=(right);
 }
 
+/**
+ *  Default destructor.
+ */
 engine::obj_info::~obj_info() throw() {
 
 }
 
+/**
+ *  Default copy operator.
+ *
+ *  @param[in] right The class to copy.
+ */
 engine::obj_info& engine::obj_info::operator=(obj_info const& right) {
   if (this != &right) {
     obj = right.obj;

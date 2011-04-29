@@ -29,23 +29,23 @@
 #include "notifications.hh"
 #include "commands.hh"
 #include "utils.hh"
-#include "configuration.hh"
+#include "configuration/states.hh"
 #include "sehandlers.hh"
 
 using namespace com::centreon::engine;
 
-extern configuration config;
+extern configuration::states config;
 
-extern unsigned long next_event_id;
-extern unsigned long next_problem_id;
+extern unsigned long         next_event_id;
+extern unsigned long         next_problem_id;
 
-extern command*      global_host_event_handler_ptr;
-extern command*      global_service_event_handler_ptr;
+extern command*              global_host_event_handler_ptr;
+extern command*              global_service_event_handler_ptr;
 
-extern command*      ocsp_command_ptr;
-extern command*      ochp_command_ptr;
+extern command*              ocsp_command_ptr;
+extern command*              ochp_command_ptr;
 
-extern time_t        program_start;
+extern time_t                program_start;
 
 /******************************************************************/
 /************* OBSESSIVE COMPULSIVE HANDLER FUNCTIONS *************/

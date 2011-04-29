@@ -17,9 +17,10 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <stdio.h>
 #include <string.h>
-#include "logging/standard.hh"
+#include "broker.hh"
+#include "logging/object.hh"
+#include "logging/broker.hh"
 
 using namespace com::centreon::engine::logging;
 
@@ -31,32 +32,42 @@ using namespace com::centreon::engine::logging;
 
 /**
  *  Default constructor.
- *
- *  @param[in] is_stdout Select stdout or stderr to logging the message.
  */
-standard::standard(bool is_stdout) {
-  _file = (is_stdout == true ? stdout : stderr);
+broker::broker() {
+
 }
 
 /**
  *  Default destructor.
  */
-standard::~standard() throw() {
+broker::~broker() throw() {
 
 }
 
 /**
- *  Write log in stdout or stderr.
+ *  Send message to broker.
  *
  *  @param[in] message   Message to log.
  *  @param[in] type      Logging types.
  *  @param[in] verbosity Verbosity level.
  */
-void standard::log(char const* message,
-		   unsigned long long type,
-		   unsigned int verbosity) throw() {
-  (void)type;
+void broker::log(char const* message,
+	  unsigned long long type,
+	  unsigned int verbosity) throw() {
   (void)verbosity;
 
-  fwrite(message, strlen(message), 1, _file);
+  if ((type & object::dbg_all) == 0) {
+    char* copy = new char[strlen(message) + 1];
+    strcpy(copy, message);
+
+    broker_log_data(NEBTYPE_LOG_DATA,
+		    NEBFLAG_NONE,
+		    NEBATTR_NONE,
+		    copy,
+		    type,
+		    time(NULL),
+		    NULL);
+
+    delete[] copy;
+  }
 }

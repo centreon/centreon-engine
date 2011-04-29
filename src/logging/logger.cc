@@ -17,32 +17,56 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-//#include "logging/engine.hh"
+#include <time.h>
+#include "logging/engine.hh"
 #include "logging/logger.hh"
 
 using namespace com::centreon::engine::logging;
 
+/**************************************
+ *                                     *
+ *           Public Methods            *
+ *                                     *
+ **************************************/
+
+/**
+ *  Default constructor.
+ *
+ *  @param[in] type      Logging types.
+ *  @param[in] verbosity Verbosity level.
+ */
 logger::logger(unsigned long long type, unsigned int verbosity)
   : _type(type), _verbosity(verbosity) {
 
 }
 
+/**
+ *  Default copy constructor.
+ *
+ *  @param[in] right The class to copy.
+ */
 logger::logger(logger const& right) {
   operator=(right);
 }
 
+/**
+ *  Default destructor.
+ */
 logger::~logger() throw() {
-  //engine::instance().log(_buffer.str(), _type, _verbosity);
+  if (_buffer.str().size() != 0) {
+    _buffer << "[" << time(NULL) << "] ";
+    engine::instance().log(_buffer.str().c_str(), _type, _verbosity);
+  }
 }
 
+/**
+ *  Default copy operator.
+ *
+ *  @param[in] right The class to copy.
+ */
 logger& logger::operator=(logger const& right) {
   if (this != &right) {
     _buffer << right._buffer.str();
   }
-  return (*this);
-}
-
-template <typename T> logger& logger::operator<<(T obj) {
-  _buffer << obj;
   return (*this);
 }

@@ -40,7 +40,7 @@
 #include "config.hh"
 #include "utils.hh"
 #include "logging.hh"
-#include "configuration.hh"
+#include "configuration/states.hh"
 #include "modules/loader.hh"
 #include "engine.hh"
 
@@ -56,7 +56,7 @@ using namespace com::centreon::engine;
                             "    changed.\n\n"
 
 // Global variables.
-configuration             config;
+configuration::states     config;
 
 char*                     config_file = NULL;
 
