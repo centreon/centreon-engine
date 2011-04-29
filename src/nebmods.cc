@@ -25,7 +25,6 @@
 #include "neberrors.hh"
 #include "utils.hh"
 #include "logging.hh"
-#include "configuration.hh"
 #include "modules/loader.hh"
 #include "modules/handle.hh"
 #include "nebmods.hh"

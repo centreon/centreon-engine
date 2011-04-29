@@ -39,7 +39,6 @@
 #include "sehandlers.hh"
 #include "flapping.hh"
 #include "logging.hh"
-#include "configuration.hh"
 #include "checks.hh"
 
 /*#define DEBUG_CHECKS*/
@@ -51,10 +50,8 @@
 # include "epn_engine.hh"
 #endif
 
-using namespace com::centreon::engine;
-
 #ifdef EMBEDDEDPERL
-extern int                use_embedded_perl;
+extern int                   use_embedded_perl;
 #endif
 
 /******************************************************************/

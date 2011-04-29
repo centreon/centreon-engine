@@ -20,12 +20,9 @@
 
 /*********** COMMON HEADER FILES ***********/
 
-#include "configuration.hh"
 #include "globals.hh"
 #include "xpddefault.hh"
 #include "perfdata.hh"
-
-using namespace com::centreon::engine;
 
 /******************************************************************/
 /************** INITIALIZATION & CLEANUP FUNCTIONS ****************/

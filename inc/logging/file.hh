@@ -21,26 +21,48 @@
 # define CCE_LOGGING_FILE_HH
 
 # include <QFile>
+# include <QString>
+# include <QList>
 
-namespace         com {
-  namespace       centreon {
-    namespace     engine {
-      namespace   logging {
-	class     file {
+namespace                     com {
+  namespace                   centreon {
+    namespace                 engine {
+      namespace               logging {
+	/**
+         *  @class file file.hh
+         *  @brief Write logging message into file.
+         *
+         *  Write logging message into file.
+         */
+	class                 file {
 	public:
-	          file(char const* file);
-	          ~file() throw();
+	                      file(char const* file,
+				   char const* archive_path = "./",
+				   long long size_limit = 0);
+	                      ~file() throw();
 
-	  void    rotate();
-	  void    log(char const* message,
-		      unsigned long long type,
-		      unsigned int verbosity) throw();
+	  static void         rotate_all();
+	  void                rotate();
+
+	  void                log(char const* message,
+				  unsigned long long type,
+				  unsigned int verbosity) throw();
+
+	  void                set_archive_path(char const* path) throw();
+	  QString const&      get_archive_path() const throw();
+
+	  void                set_size_limit(long long size) throw();
+	  long long           get_size_limit() const throw();
 
 	private:
-	          file(file const& right);
-	  file&   operator=(file const& right);
+	                      file(file const& right);
+	  file&               operator=(file const& right);
 
-	  QFile   _file;
+	  QFile               _file;
+	  QString             _archive_path;
+	  long long           _size_limit;
+
+	  static QList<file*> _files;
 	};
       }
     }

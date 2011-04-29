@@ -46,10 +46,7 @@ int                     use_embedded_perl = TRUE;
 #include "notifications.hh"
 #include "logging.hh"
 #include "shared.hh"
-#include "configuration.hh"
 #include "utils.hh"
-
-using namespace com::centreon::engine;
 
 #ifdef HAVE_TZNAME
 # ifdef CYGWIN

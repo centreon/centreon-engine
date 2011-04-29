@@ -22,11 +22,8 @@
 
 #include "xsddefault.hh"      /* default routines */
 #include "broker.hh"
-#include "configuration.hh"
 #include "globals.hh"
 #include "statusdata.hh"
-
-using namespace com::centreon::engine;
 
 /******************************************************************/
 /****************** TOP-LEVEL OUTPUT FUNCTIONS ********************/

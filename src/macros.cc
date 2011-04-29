@@ -27,10 +27,7 @@
 #include "utils.hh"
 #include "shared.hh"
 #include "logging.hh"
-#include "configuration.hh"
 #include "macros.hh"
-
-using namespace com::centreon::engine;
 
 /*
  * scoped to this file to prevent (unintentional) mischief,
@@ -51,7 +48,7 @@ nagios_macros* get_global_macros(void) {
  * the thread-safe version
  */
 int process_macros_r(nagios_macros* mac,
-		     char* input_buffer,
+		     char const* input_buffer,
                      char** output_buffer,
 		     int options) {
   char* temp_buffer = NULL;
@@ -250,7 +247,7 @@ int process_macros_r(nagios_macros* mac,
   return (OK);
 }
 
-int process_macros(char* input_buffer, char** output_buffer, int options) {
+int process_macros(char const* input_buffer, char** output_buffer, int options) {
   return (process_macros_r(&global_macros, input_buffer, output_buffer, options));
 }
 

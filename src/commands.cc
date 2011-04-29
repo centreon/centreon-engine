@@ -36,10 +36,7 @@
 #include "utils.hh"
 #include "flapping.hh"
 #include "logging.hh"
-#include "configuration.hh"
 #include "commands.hh"
-
-using namespace com::centreon::engine;
 
 // PASSIVE_CHECK_RESULT structure
 struct                  passive_check_result {
@@ -53,8 +50,8 @@ struct                  passive_check_result {
   passive_check_result* next;
 };
 
-passive_check_result*   passive_check_result_list = NULL;
-passive_check_result*   passive_check_result_list_tail = NULL;
+static passive_check_result*   passive_check_result_list = NULL;
+static passive_check_result*   passive_check_result_list_tail = NULL;
 
 /******************************************************************/
 /****************** EXTERNAL COMMAND PROCESSING *******************/

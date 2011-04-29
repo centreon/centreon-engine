@@ -217,14 +217,14 @@ typedef struct nagios_macros nagios_macros;
 nagios_macros* get_global_macros(void);
 
 // thread-safe version of process_macros.
-int process_macros_r(nagios_macros* mac, char* input_buffer, char** output_buffer, int options);
+int process_macros_r(nagios_macros* mac, char const* input_buffer, char** output_buffer, int options);
 
 /*
  * Replace macros with their actual values
  * This function modifies the global_macros struct and is thus
  * not thread-safe.
  */
-int process_macros(char* input_buffer, char** output_buffer, int options);
+int process_macros(char const* input_buffer, char** output_buffer, int options);
 
 /*
  * These functions updates **macros with the values from

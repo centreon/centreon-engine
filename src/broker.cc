@@ -26,10 +26,7 @@
 #include "notifications.hh"
 #include "sehandlers.hh"
 #include "flapping.hh"
-#include "configuration.hh"
 #include "broker.hh"
-
-using namespace com::centreon::engine;
 
 /******************************************************************/
 /************************* EVENT FUNCTIONS ************************/
@@ -1106,4 +1103,3 @@ struct timeval get_broker_timestamp(struct timeval* timestamp) {
 
   return (tv);
 }
-

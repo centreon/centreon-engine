@@ -41,7 +41,6 @@
 #include "config.hh"
 #include "utils.hh"
 #include "logging.hh"
-#include "configuration.hh"
 #include "modules/loader.hh"
 #include "engine.hh"
 

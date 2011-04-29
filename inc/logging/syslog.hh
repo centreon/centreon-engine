@@ -26,6 +26,12 @@ namespace                com {
   namespace              centreon {
     namespace            engine {
       namespace          logging {
+	/**
+	 *  @class syslog syslog.hh
+	 *  @brief Call syslog for all logging message.
+	 *
+	 *  Call syscall for all logging message.
+	 */
 	class            syslog : public object {
 	public:
 	                 syslog();

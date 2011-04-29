@@ -25,7 +25,7 @@
 # include <stdio.h>
 # include "checks.hh"
 # include "comments.hh"
-# include "configuration.hh"
+# include "configuration/state.hh"
 # include "downtime.hh"
 # include "engine.hh"
 # include "events.hh"
@@ -35,7 +35,7 @@
 # include "skiplist.hh"
 # include "utils.hh"
 
-extern com::centreon::engine::configuration config;
+extern com::centreon::engine::configuration::state config;
 extern char*                     config_file;
 
 extern command*                  global_host_event_handler_ptr;

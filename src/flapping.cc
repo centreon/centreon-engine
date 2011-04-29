@@ -29,10 +29,7 @@
 #include "broker.hh"
 #include "notifications.hh"
 #include "logging.hh"
-#include "configuration.hh"
 #include "flapping.hh"
-
-using namespace com::centreon::engine;
 
 /******************************************************************/
 /******************** FLAP DETECTION FUNCTIONS ********************/

@@ -27,10 +27,7 @@
 #include "utils.hh"
 #include "notifications.hh"
 #include "logging.hh"
-#include "configuration.hh"
 #include "config.hh"
-
-using namespace com::centreon::engine;
 
 /******************************************************************/
 /************** CONFIGURATION INPUT FUNCTIONS *********************/

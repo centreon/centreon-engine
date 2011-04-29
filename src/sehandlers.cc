@@ -30,10 +30,7 @@
 #include "notifications.hh"
 #include "commands.hh"
 #include "utils.hh"
-#include "configuration.hh"
 #include "sehandlers.hh"
-
-using namespace com::centreon::engine;
 
 /******************************************************************/
 /************* OBSESSIVE COMPULSIVE HANDLER FUNCTIONS *************/

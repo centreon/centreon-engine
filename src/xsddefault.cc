@@ -35,15 +35,12 @@
 #include "skiplist.hh"
 #include "utils.hh"
 #include "logging.hh"
-#include "configuration.hh"
 
 /**** IMPLEMENTATION SPECIFIC HEADER FILES ****/
 #include "xsddefault.hh"
 
-using namespace com::centreon::engine;
-
-static char*               xsddefault_status_log = NULL;
-static char*               xsddefault_temp_file = NULL;
+static char* xsddefault_status_log = NULL;
+static char* xsddefault_temp_file = NULL;
 
 /******************************************************************/
 /***************** COMMON CONFIG INITIALIZATION  ******************/

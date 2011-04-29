@@ -38,13 +38,10 @@
 #include "notifications.hh"
 #include "utils.hh"
 #include "logging.hh"
-#include "configuration.hh"
 
 /**** STATE INFORMATION SPECIFIC HEADER FILES ****/
 
 #include "xrddefault.hh"
-
-using namespace com::centreon::engine;
 
 static char*               xrddefault_retention_file = NULL;
 static char*               xrddefault_temp_file = NULL;

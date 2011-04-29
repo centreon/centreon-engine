@@ -28,10 +28,7 @@
 #include "utils.hh"
 #include "logging.hh"
 #include "shared.hh"
-#include "configuration.hh"
 #include "notifications.hh"
-
-using namespace com::centreon::engine;
 
 /******************************************************************/
 /***************** SERVICE NOTIFICATION FUNCTIONS *****************/

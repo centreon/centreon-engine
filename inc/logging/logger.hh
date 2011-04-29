@@ -26,6 +26,12 @@ namespace                    com {
   namespace                  centreon {
     namespace                engine {
       namespace              logging {
+	/**
+         *  @class logger logger.hh
+         *  @brief Simple logging class.
+         *
+         *  Simple logging class used by the engine to write log data.
+         */
 	class                logger {
 	public:
 	                     logger(unsigned long long type, unsigned int verbosity);
@@ -34,7 +40,10 @@ namespace                    com {
 
 	  logger&            operator=(logger const& right);
 	  template <typename T>
-	  logger&            operator<<(T obj);
+	  logger&            operator<<(T obj) {
+	    _buffer << obj;
+	    return (*this);
+	  }
 
 	private:
 	  std::ostringstream _buffer;

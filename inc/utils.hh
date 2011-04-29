@@ -79,9 +79,6 @@ void*  command_file_worker_thread(void* arg);
 int submit_external_command(char* cmd, int* buffer_items);
 int submit_raw_external_command(char* cmd, time_t* ts, int* buffer_items);
 
-char* get_program_version(void);
-char* get_program_modification_date(void);
-
 // Check Statistics Functions
 int init_check_stats(void);
 int update_check_stats(int check_type, time_t check_time);

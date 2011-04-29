@@ -36,7 +36,6 @@
 #include "objects.hh"
 #include "macros.hh"
 #include "skiplist.hh"
-#include "configuration.hh"
 #include "logging.hh"
 
 /**** CORE OR CGI SPECIFIC HEADER FILES ****/
@@ -46,8 +45,6 @@
 /**** DATA INPUT-SPECIFIC HEADER FILES ****/
 
 #include "xodtemplate.hh"
-
-using namespace com::centreon::engine;
 
 static xodtemplate_timeperiod*        xodtemplate_timeperiod_list = NULL;
 static xodtemplate_command*           xodtemplate_command_list = NULL;
