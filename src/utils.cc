@@ -48,11 +48,6 @@ int                     use_embedded_perl = TRUE;
 #include "shared.hh"
 #include "utils.hh"
 
-/* from GNU defines errno as a macro, since it's a per-thread variable */
-#ifndef errno
-extern int                    errno;
-#endif
-
 /******************************************************************/
 /******************** SYSTEM COMMAND FUNCTIONS ********************/
 /******************************************************************/
