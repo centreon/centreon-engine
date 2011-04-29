@@ -46,8 +46,12 @@ if (WITH_DOCUMENTATION)
 
   # Copy images in latex directory.
   file(COPY "${PROJECT_SOURCE_DIR}/doc/images/"
-    DESTINATION "${PROJECT_SOURCE_DIR}/build/doc/latex"
+    DESTINATION "${PROJECT_SOURCE_DIR}/build/doc/latex/"
     FILES_MATCHING PATTERN "*.png")
+  file(COPY "${PROJECT_SOURCE_DIR}/build/doc/centreon_logo.png"
+    DESTINATION "${PROJECT_SOURCE_DIR}/build/doc/latex/")
+  file(COPY "${PROJECT_SOURCE_DIR}/build/doc/merethis_frontpage_footer.png"
+    DESTINATION "${PROJECT_SOURCE_DIR}/build/doc/latex/")
 
   # Add documentation target.
   add_custom_target("documentation" ALL "make"

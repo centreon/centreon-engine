@@ -22,23 +22,18 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <sys/time.h>
+#include "globals.hh"
 #include "objects.hh"
 #include "macros.hh"
 #include "common.hh"
-#include "configuration/states.hh"
 #include "statusdata.hh"
 #include "logging/file.hh"
 #include "logging/logger.hh"
 #include "logging/object.hh"
 #include "compatibility/logging.h"
 
-using namespace com::centreon::engine;
+// using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;
-
-extern configuration::states config;
-extern host*                 host_list;
-extern service*              service_list;
-extern time_t                last_log_rotation;
 
 static const unsigned int    BUFFER_SIZE = 4096;
 
@@ -256,7 +251,7 @@ extern "C" {
   int log_host_states(unsigned int type, time_t* timestamp) {
     (void)timestamp;
 
-    if (type == INITIAL_STATES && config.get_log_initial_states() == false) {
+    if (type == INITIAL_STATES && config.get_log_initial_state() == false) {
       return (OK);
     }
 
@@ -297,7 +292,7 @@ extern "C" {
   int log_service_states(unsigned int type, time_t* timestamp) {
     (void)timestamp;
 
-    if (type == INITIAL_STATES && config.get_log_initial_states() == false) {
+    if (type == INITIAL_STATES && config.get_log_initial_state() == false) {
       return (OK);
     }
 

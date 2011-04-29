@@ -33,6 +33,7 @@
 #include <signal.h>
 #include "engine.hh"
 #include "comments.hh"
+#include "globals.hh"
 #include "broker.hh"
 #include "nebmods.hh"
 
@@ -45,83 +46,7 @@ int                     use_embedded_perl = TRUE;
 #include "notifications.hh"
 #include "logging.hh"
 #include "shared.hh"
-#include "configuration/states.hh"
 #include "utils.hh"
-
-using namespace com::centreon::engine;
-
-extern configuration::states  config;
-
-extern unsigned long          logging_options;
-extern unsigned long          syslog_options;
-
-extern char*                  config_file;
-
-extern char*                  macro_x_names[MACRO_X_COUNT];
-extern char*                  macro_user[MAX_USER_MACROS];
-extern customvariablesmember* macro_custom_host_vars;
-extern customvariablesmember* macro_custom_service_vars;
-extern customvariablesmember* macro_custom_contact_vars;
-
-extern host*                  macro_host_ptr;
-extern hostgroup*             macro_hostgroup_ptr;
-extern service*               macro_service_ptr;
-extern servicegroup*          macro_servicegroup_ptr;
-extern contact*               macro_contact_ptr;
-extern contactgroup*          macro_contactgroup_ptr;
-
-extern command*               global_host_event_handler_ptr;
-extern command*               global_service_event_handler_ptr;
-
-extern command*               ocsp_command_ptr;
-extern command*               ochp_command_ptr;
-
-extern int                    sigshutdown;
-extern int                    sigrestart;
-extern char*                  sigs[35];
-extern int                    caught_signal;
-extern int                    sig_id;
-
-extern int                    nagios_pid;
-
-extern int                    log_host_retries;
-
-extern unsigned long          modified_host_process_attributes;
-extern unsigned long          modified_service_process_attributes;
-
-extern unsigned long          next_comment_id;
-extern unsigned long          next_downtime_id;
-extern unsigned long          next_event_id;
-extern unsigned long          next_notification_id;
-
-extern time_t                 program_start;
-
-extern time_t                 last_command_check;
-extern time_t                 last_command_status_update;
-extern time_t                 last_log_rotation;
-
-extern int                    verify_config;
-extern int                    test_scheduling;
-
-extern check_result           check_result_info;
-
-extern unsigned int           currently_running_service_checks;
-
-extern contact*               contact_list;
-extern contactgroup*          contactgroup_list;
-extern host*                  host_list;
-extern hostgroup*             hostgroup_list;
-extern service*               service_list;
-extern servicegroup*          servicegroup_list;
-extern timed_event*           event_list_high;
-extern timed_event*           event_list_low;
-extern notification*          notification_list;
-extern command*               command_list;
-extern timeperiod*            timeperiod_list;
-
-extern int                    command_file_fd;
-extern FILE*                  command_file_fp;
-extern int                    command_file_created;
 
 #ifdef HAVE_TZNAME
 # ifdef CYGWIN
@@ -130,17 +55,6 @@ extern char*                  _tzname[2] __declspec(dllimport);
 extern char*                  tzname[2];
 # endif
 #endif
-
-extern check_result*          check_result_list;
-
-extern dbuf                   check_result_dbuf;
-
-extern pthread_t              worker_threads[TOTAL_WORKER_THREADS];
-extern circular_buffer        external_command_buffer;
-extern circular_buffer        check_result_buffer;
-extern circular_buffer        event_broker_buffer;
-
-extern check_stats            check_statistics[MAX_CHECK_STATS_TYPES];
 
 /* from GNU defines errno as a macro, since it's a per-thread variable */
 #ifndef errno

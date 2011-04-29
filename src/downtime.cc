@@ -23,17 +23,12 @@
 #include "xdddefault.hh"
 #include "engine.hh"
 #include "comments.hh"
+#include "globals.hh"
 #include "statusdata.hh"
 #include "broker.hh"
 #include "notifications.hh"
 #include "logging.hh"
 #include "downtime.hh"
-
-scheduled_downtime* scheduled_downtime_list = NULL;
-int                 defer_downtime_sorting = 0;
-
-extern timed_event* event_list_high;
-extern timed_event* event_list_high_tail;
 
 /******************************************************************/
 /**************** INITIALIZATION/CLEANUP FUNCTIONS ****************/

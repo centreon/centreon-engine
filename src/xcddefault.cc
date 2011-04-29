@@ -22,15 +22,13 @@
 
 #include "common.hh"
 #include "comments.hh"
+#include "globals.hh"
 #include "macros.hh"
 #include "objects.hh"
 #include "engine.hh"
 
 /**** IMPLEMENTATION SPECIFIC HEADER FILES ****/
 #include "xcddefault.hh"
-
-extern unsigned long next_comment_id;
-extern comment*      comment_list;
 
 /******************************************************************/
 /************ COMMENT INITIALIZATION/CLEANUP FUNCTIONS ************/

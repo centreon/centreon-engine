@@ -26,6 +26,7 @@
 #include <stdio.h>
 #include <errno.h>
 #include "common.hh"
+#include "globals.hh"
 #include "objects.hh"
 #include "statusdata.hh"
 #include "macros.hh"
@@ -37,38 +38,13 @@
 #include "notifications.hh"
 #include "utils.hh"
 #include "logging.hh"
-#include "configuration/states.hh"
 
 /**** STATE INFORMATION SPECIFIC HEADER FILES ****/
 
 #include "xrddefault.hh"
 
-using namespace com::centreon::engine;
-
-extern configuration::states config;
-
-extern host*                 host_list;
-extern service*              service_list;
-extern contact*              contact_list;
-extern comment*              comment_list;
-extern scheduled_downtime*   scheduled_downtime_list;
-
-extern int                   test_scheduling;
-
-extern unsigned long         next_comment_id;
-extern unsigned long         next_downtime_id;
-extern unsigned long         next_event_id;
-extern unsigned long         next_problem_id;
-extern unsigned long         next_notification_id;
-
-extern unsigned long         modified_host_process_attributes;
-extern unsigned long         modified_service_process_attributes;
-
-extern int                   defer_comment_sorting;
-extern int                   defer_downtime_sorting;
-
-static char*                 xrddefault_retention_file = NULL;
-static char*                 xrddefault_temp_file = NULL;
+static char*               xrddefault_retention_file = NULL;
+static char*               xrddefault_temp_file = NULL;
 
 /******************************************************************/
 /********************* CONFIG INITIALIZATION  *********************/

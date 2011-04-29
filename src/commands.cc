@@ -28,6 +28,7 @@
 #include "engine.hh"
 #include "comments.hh"
 #include "downtime.hh"
+#include "globals.hh"
 #include "statusdata.hh"
 #include "sretention.hh"
 #include "broker.hh"
@@ -35,10 +36,7 @@
 #include "utils.hh"
 #include "flapping.hh"
 #include "logging.hh"
-#include "configuration/states.hh"
 #include "commands.hh"
-
-using namespace com::centreon::engine;
 
 // PASSIVE_CHECK_RESULT structure
 struct                  passive_check_result {
@@ -52,35 +50,8 @@ struct                  passive_check_result {
   passive_check_result* next;
 };
 
-extern configuration::states config;
-
-extern char*                 config_file;
-
-extern int                   sigshutdown;
-extern int                   sigrestart;
-
-extern int                   ipc_pipe[2];
-
-extern time_t                last_command_check;
-extern time_t                last_command_status_update;
-
-extern unsigned long         modified_host_process_attributes;
-extern unsigned long         modified_service_process_attributes;
-
-extern command*              global_host_event_handler_ptr;
-extern command*              global_service_event_handler_ptr;
-
-extern host*                 host_list;
-extern service*              service_list;
-
-extern FILE*                 command_file_fp;
-extern int                   command_file_fd;
-
-passive_check_result*        passive_check_result_list = NULL;
-passive_check_result*        passive_check_result_list_tail = NULL;
-
-extern pthread_t             worker_threads[TOTAL_WORKER_THREADS];
-extern circular_buffer       external_command_buffer;
+static passive_check_result*   passive_check_result_list = NULL;
+static passive_check_result*   passive_check_result_list_tail = NULL;
 
 /******************************************************************/
 /****************** EXTERNAL COMMAND PROCESSING *******************/

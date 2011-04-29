@@ -19,7 +19,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include "errno.h"
+#include <errno.h>
 #include <exception>
 #include <iostream>
 #include <limits.h>
@@ -31,6 +31,7 @@
 #include <sys/wait.h>
 #include "comments.hh"
 #include "downtime.hh"
+#include "globals.hh"
 #include "statusdata.hh"
 #include "sretention.hh"
 #include "perfdata.hh"
@@ -40,7 +41,6 @@
 #include "config.hh"
 #include "utils.hh"
 #include "logging.hh"
-#include "configuration/states.hh"
 #include "modules/loader.hh"
 #include "engine.hh"
 
@@ -54,91 +54,6 @@ using namespace com::centreon::engine;
                             "    version. Make sure to read the documentation regarding the config\n" \
                             "    files, as well as the version changelog to find out what has\n" \
                             "    changed.\n\n"
-
-// Global variables.
-configuration::states     config;
-
-char*                     config_file = NULL;
-
-command*                  global_host_event_handler_ptr = NULL;
-command*                  global_service_event_handler_ptr = NULL;
-
-command*                  ocsp_command_ptr = NULL;
-command*                  ochp_command_ptr = NULL;
-
-unsigned long             logging_options = 0;
-unsigned long             syslog_options = 0;
-
-time_t                    last_command_check = 0L;
-time_t                    last_command_status_update = 0L;
-time_t                    last_log_rotation = 0L;
-
-unsigned long             modified_host_process_attributes = MODATTR_NONE;
-unsigned long             modified_service_process_attributes = MODATTR_NONE;
-
-unsigned long             next_comment_id = 0L;
-unsigned long             next_downtime_id = 0L;
-unsigned long             next_event_id = 0L;
-unsigned long             next_problem_id = 0L;
-unsigned long             next_notification_id = 0L;
-
-int                       sigshutdown = FALSE;
-int                       sigrestart = FALSE;
-
-char const*               sigs[35] = {
-  "EXIT", "HUP", "INT", "QUIT", "ILL",
-  "TRAP", "ABRT", "BUS", "FPE", "KILL",
-  "USR1", "SEGV", "USR2", "PIPE", "ALRM",
-  "TERM", "STKFLT", "CHLD", "CONT", "STOP",
-  "TSTP", "TTIN", "TTOU", "URG", "XCPU",
-  "XFSZ", "VTALRM", "PROF", "WINCH", "IO",
-  "PWR", "UNUSED", "ZERR", "DEBUG", NULL
-};
-
-int                       caught_signal = FALSE;
-int                       sig_id = 0;
-
-int                       restarting = FALSE;
-
-int                       verify_config = FALSE;
-int                       verify_circular_paths = TRUE;
-int                       test_scheduling = FALSE;
-int                       precache_objects = FALSE;
-int                       use_precached_objects = FALSE;
-
-unsigned int              currently_running_service_checks = 0;
-unsigned int              currently_running_host_checks = 0;
-
-time_t                    program_start = 0L;
-time_t                    event_start = 0L;
-int                       nagios_pid = 0;
-
-int                       embedded_perl_initialized = FALSE;
-
-int                       command_file_fd;
-FILE*                     command_file_fp;
-int                       command_file_created = FALSE;
-
-
-extern contact*           contact_list;
-extern contactgroup*      contactgroup_list;
-extern hostgroup*         hostgroup_list;
-extern command*           command_list;
-extern timeperiod*        timeperiod_list;
-extern serviceescalation* serviceescalation_list;
-
-notification*             notification_list;
-
-check_result              check_result_info;
-check_result*             check_result_list = NULL;
-
-dbuf                      check_result_dbuf;
-
-circular_buffer           external_command_buffer;
-circular_buffer           check_result_buffer;
-pthread_t                 worker_threads[TOTAL_WORKER_THREADS];
-
-check_stats               check_statistics[MAX_CHECK_STATS_TYPES];
 
 // Following main() declaration required by older versions of Perl ut 5.00503.
 #ifdef EMBEDDEDPERL
@@ -413,9 +328,6 @@ int main(int argc, char** argv) {
     do {
       // Reset program variables.
       reset_variables();
-
-      // Get PID.
-      nagios_pid = (int)getpid();
 
       // Read in the configuration files (main
       // and resource config files).

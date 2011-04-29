@@ -24,9 +24,8 @@
 #include "broker.hh"
 #include "utils.hh"
 #include "comments.hh"
+#include "globals.hh"
 
-comment*        comment_list = NULL;
-int             defer_comment_sorting = 0;
 static comment* comment_hashlist[COMMENT_HASHSLOTS];
 
 /******************************************************************/

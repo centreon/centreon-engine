@@ -25,15 +25,13 @@
 #include <fstream>
 #include <map>
 #include "engine.hh"
+#include "globals.hh"
 #include "macros.hh"
 #include "error.hh"
-#include "configuration/states.hh"
 
 using namespace com::centreon::engine;
 
 static nagios_macros global_macros;
-sched_info           scheduling_info;
-char*                macro_user[MAX_USER_MACROS];
 
 extern "C" {
   void logit(int data_type, int display, char const* fmt, ...) {
@@ -219,7 +217,6 @@ std::map<QString, QString> build_configuration(QString const& mainconf, QString 
   var["auth_file"] = "auth_file.tmp";
   var["comment_file"] = "comment_file.tmp";
   var["xcddefault_comment_file"] = "comment_file.tmp";
-  var["daemon_dumps_core"] = obj2str(my_rand(0, 1));
   var["downtime_file"] = "downtime_file.tmp";
   var["xdddefault_downtime_file"] = "downtime_file.tmp";
   var["allow_empty_hostgroup_assignment"] = obj2str(my_rand(0, 1));
@@ -247,7 +244,7 @@ std::map<QString, QString> build_configuration(QString const& mainconf, QString 
 }
 
 void test_configuration(QString const& filename, std::map<QString, QString>& my_conf) {
-  configuration::states config;
+  configuration::state config;
   config.parse(filename);
 
   QString date_format[] = { "us", "euro", "iso8601", "strict-iso8601" };
@@ -290,7 +287,7 @@ void test_configuration(QString const& filename, std::map<QString, QString>& my_
   if (my_conf["log_passive_checks"] != obj2str(config.get_log_passive_checks())) {
     throw (engine_error() << "log_passive_checks: init with '" << my_conf["log_passive_checks"] << "'");
   }
-  if (my_conf["log_initial_states"] != obj2str(config.get_log_initial_states())) {
+  if (my_conf["log_initial_states"] != obj2str(config.get_log_initial_state())) {
     throw (engine_error() << "log_initial_states: init with '" << my_conf["log_initial_states"] << "'");
   }
   if (my_conf["retain_state_information"] != obj2str(config.get_retain_state_information())) {
@@ -553,7 +550,7 @@ void test_configuration(QString const& filename, std::map<QString, QString>& my_
     throw (engine_error() << "command_check_interval: init with '" << my_conf["log_rotation_method"] << "'");
   }
   if (my_conf["service_interleave_factor"] == "s") {
-    if (config.get_service_interleave_factor_method() != configuration::states::ilf_smart) {
+    if (config.get_service_interleave_factor_method() != configuration::state::ilf_smart) {
       throw (engine_error() << "service_interleave_factor: init with '" << my_conf["log_rotation_method"] << "'");
     }
   }

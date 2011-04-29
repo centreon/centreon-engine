@@ -22,15 +22,13 @@
 
 #include "common.hh"
 #include "downtime.hh"
+#include "globals.hh"
 #include "macros.hh"
 #include "objects.hh"
 #include "engine.hh"
 
 /**** IMPLEMENTATION SPECIFIC HEADER FILES ****/
 #include "xdddefault.hh"
-
-extern unsigned long       next_downtime_id;
-extern scheduled_downtime* scheduled_downtime_list;
 
 /******************************************************************/
 /*********** DOWNTIME INITIALIZATION/CLEANUP FUNCTIONS ************/

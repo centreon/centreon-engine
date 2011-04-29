@@ -172,32 +172,6 @@
  *  mainconfigurationfileoptionsconfigurationfilevariablesstatusfile
  *  "status file". The minimum update interval is 1 second.
  *
- *  @subsection mainconfigurationfileoptionsconfigurationfilevariablescentreonengineuser Centreon Engine User
- *
- *  @code
- *  Format:  centengine_user=<username/UID>
- *  Example: centengine_user=centengine
- *  @endcode
- *
- *  This is used to set the effective user that the Centreon Engine
- *  process should run as. After initial program startup and before
- *  starting to monitor anything, Centreon Engine will drop its
- *  effective privileges and run as this user. You may specify either a
- *  username or a UID.
- *
- *  @subsection mainconfigurationfileoptionsconfigurationfilevariablescentreonenginegroup Centreon Engine Group
- *
- *  @code
- *  Format:  centengine_group=<groupname/GID>
- *  Example: centengine_group=centengine
- *  @endcode
- *
- *  This is used to set the effective group that the Centreon Engine
- *  process should run as. After initial program startup and before
- *  starting to monitor anything, Centreon Engine will drop its
- *  effective privileges and run as this group. You may specify either
- *  a groupname or a GID.
- *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariablesnotificationsoption Notifications Option
  *
  *  @code

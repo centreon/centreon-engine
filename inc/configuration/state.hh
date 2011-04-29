@@ -17,8 +17,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef CCE_CONFIGURATION_STATES_HH
-# define CCE_CONFIGURATION_STATES_HH
+#ifndef CCE_CONFIGURATION_STATE_HH
+# define CCE_CONFIGURATION_STATE_HH
 
 # include <sstream>
 # include <string>
@@ -33,16 +33,16 @@ namespace                   com {
     namespace               engine {
       namespace             configuration {
 	/**
-	 *  @class states states.hh
-	 *  @brief Simple configuration states class.
+	 *  @class state state.hh
+	 *  @brief Simple configuration state class.
 	 *
-	 *  Simple configuration states class used by Centreon Engine
+	 *  Simple configuration state class used by Centreon Engine
 	 *  to manage configuration data.
 	 */
-	class                 states {
+	class                 state {
 	public:
 	  /**
-	   *  @enum states::e_date_format
+	   *  @enum state::e_date_format
 	   *  Date format types
 	   */
 	  enum                e_date_format {
@@ -53,7 +53,7 @@ namespace                   com {
 	  };
 
 	  /**
-	   *  @enum states::e_log_rotation
+	   *  @enum state::e_log_rotation
 	   *  Logging rotation modes
 	   */
 	  enum                e_log_rotation {
@@ -65,7 +65,7 @@ namespace                   com {
 	  };
 
 	  /**
-	   *  @enum states::e_inter_check_delay
+	   *  @enum state::e_inter_check_delay
 	   *  Inter-check delay calculation types
 	   */
 	  enum                e_inter_check_delay {
@@ -76,7 +76,7 @@ namespace                   com {
 	  };
 
 	  /**
-	   *  @enum states::e_interleave_factor
+	   *  @enum state::e_interleave_factor
 	   *  Interleave factor calculation types
 	   */
 	  enum                e_interleave_factor {
@@ -84,11 +84,11 @@ namespace                   com {
 	    ilf_smart           // smart interleave
 	  };
 
-	                      states();
-	                      states(states const& right);
-	                      ~states() throw();
+	                      state();
+	                      state(state const& right);
+	                      ~state() throw();
 
-	  states&             operator=(states const& right);
+	  state&             operator=(state const& right);
 
 	  void                reset();
 	  void                parse(QString const& filename);
@@ -150,7 +150,7 @@ namespace                   com {
 	  bool                get_log_event_handlers() const throw();
 	  bool                get_log_external_commands() const throw();
 	  bool                get_log_passive_checks() const throw();
-	  bool                get_log_initial_states() const throw();
+	  bool                get_log_initial_state() const throw();
 	  bool                get_retain_state_information() const throw();
 	  bool                get_use_retained_program_state() const throw();
 	  bool                get_use_retained_scheduling_info() const throw();
@@ -256,7 +256,7 @@ namespace                   com {
 	  void                set_log_event_handlers(bool value);
 	  void                set_log_external_commands(bool value);
 	  void                set_log_passive_checks(bool value);
-	  void                set_log_initial_states(bool value);
+	  void                set_log_initial_state(bool value);
 	  void                set_retain_state_information(bool value);
 	  void                set_use_retained_program_state(bool value);
 	  void                set_use_retained_scheduling_info(bool value);
@@ -310,7 +310,7 @@ namespace                   com {
 
 	private:
 	  /**
-	   *  @enum states::e_var_string
+	   *  @enum state::e_var_string
 	   *  List all string variable
 	   */
 	  enum                e_var_string {
@@ -334,7 +334,7 @@ namespace                   com {
 	  };
 
 	  /**
-	   *  @enum states::e_var_string
+	   *  @enum state::e_var_string
 	   *  List all unsigned long variable
 	   */
 	  enum                e_var_ulong {
@@ -351,7 +351,7 @@ namespace                   com {
 	  };
 
 	  /**
-	   *  @enum states::e_var_string
+	   *  @enum state::e_var_string
 	   *  List all float variable
 	   */
 	  enum                e_var_float {
@@ -364,7 +364,7 @@ namespace                   com {
 	  };
 
 	  /**
-	   *  @enum states::e_var_string
+	   *  @enum state::e_var_string
 	   *  List all int variable
 	   */
 	  enum                e_var_int {
@@ -377,7 +377,7 @@ namespace                   com {
 	  };
 
 	  /**
-	   *  @enum states::e_var_string
+	   *  @enum state::e_var_string
 	   *  List all unsigned int variable
 	   */
 	  enum                e_var_uint {
@@ -412,7 +412,7 @@ namespace                   com {
 	  };
 
 	  /**
-	   *  @enum states::e_var_string
+	   *  @enum state::e_var_string
 	   *  List all bool variable
 	   */
 	  enum                e_var_bool {
@@ -423,7 +423,7 @@ namespace                   com {
 	    log_event_handlers,
 	    log_external_commands,
 	    log_passive_checks,
-	    log_initial_states,
+	    log_initial_state,
 	    retain_state_information,
 	    use_retained_program_state,
 	    use_retained_scheduling_info,
@@ -492,9 +492,9 @@ namespace                   com {
 	    return (true);
 	  }
 
-	  template<class T, void (states::*ptr)(T)>
+	  template<class T, void (state::*ptr)(T)>
 	  struct              cpp_suck {
-	    static bool       set_generic(QString const& value, states& config) {
+	    static bool       set_generic(QString const& value, state& config) {
 	      T ret;
 	      if (_str2obj(value, &ret) == false) {
 		return (false);
@@ -504,15 +504,15 @@ namespace                   com {
 	    }
 	  };
 
-	  template<void (states::*ptr)(QString const&)>
+	  template<void (state::*ptr)(QString const&)>
 	  struct              cpp_suck<QString const&, ptr> {
-	    static bool       set_generic(QString const& value, states& config) {
+	    static bool       set_generic(QString const& value, state& config) {
 	      (config.*ptr)(value);
 	      return (true);
 	    }
 	  };
 
-	  typedef std::map<QString, bool (*)(QString const&, states& config)> methods;
+	  typedef std::map<QString, bool (*)(QString const&, state& config)> methods;
 
 	  QString             _tab_string[max_string];
 	  unsigned long       _tab_ulong[max_ulong];
@@ -575,7 +575,7 @@ namespace                   com {
 	  static const bool                DEFAULT_LOG_EVENT_HANDLERS                          = true;
 	  static const bool                DEFAULT_LOG_EXTERNAL_COMMANDS                       = true;
 	  static const bool                DEFAULT_LOG_PASSIVE_CHECKS                          = true;
-	  static const bool                DEFAULT_LOG_INITIAL_STATES                          = false;
+	  static const bool                DEFAULT_LOG_INITIAL_STATE                          = false;
 	  static const bool                DEFAULT_RETAIN_STATE_INFORMATION                    = false;
 	  static const bool                DEFAULT_USE_RETAINED_PROGRAM_STATE                  = true;
 	  static const bool                DEFAULT_USE_RETAINED_SCHEDULING_INFO                = false;
@@ -620,4 +620,4 @@ namespace                   com {
   }
 }
 
-#endif // !CCE_CONFIGURATION_STATES_HH
+#endif // !CCE_CONFIGURATION_STATE_HH

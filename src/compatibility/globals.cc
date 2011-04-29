@@ -20,11 +20,13 @@
 #include <stddef.h>
 
 // Features now handled by startup script.
+int           daemon_dumps_core = 0;
 char*         lock_file = NULL;
 char*         nagios_user = NULL;
 char*         nagios_group = NULL;
 
-// Startup verifications.
+// Process options.
+int           nagios_pid = 0;
 int           verify_object_relationships = 1;
 
 // Update-related variables.

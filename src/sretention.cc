@@ -22,13 +22,9 @@
 
 #include "broker.hh"
 #include "logging.hh"
-#include "configuration/states.hh"
+#include "globals.hh"
 #include "xrddefault.hh"      /* default routines */
 #include "sretention.hh"
-
-using namespace com::centreon::engine;
-
-extern configuration::states config;
 
 /******************************************************************/
 /************* TOP-LEVEL STATE INFORMATION FUNCTIONS **************/

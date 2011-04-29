@@ -19,24 +19,14 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <unistd.h>
+#include "globals.hh"
 #include "nebstructs.hh"
 #include "nebmods.hh"
 #include "notifications.hh"
 #include "sehandlers.hh"
 #include "flapping.hh"
-#include "configuration/states.hh"
 #include "broker.hh"
-
-using namespace com::centreon::engine;
-
-extern configuration::states config;
-
-extern time_t        program_start;
-extern int           nagios_pid;
-extern time_t        last_command_check;
-extern time_t        last_log_rotation;
-extern unsigned long modified_host_process_attributes;
-extern unsigned long modified_service_process_attributes;
 
 /******************************************************************/
 /************************* EVENT FUNCTIONS ************************/
@@ -528,7 +518,7 @@ void broker_program_status(int type,
   ds.timestamp = get_broker_timestamp(timestamp);
 
   ds.program_start = program_start;
-  ds.pid = nagios_pid;
+  ds.pid = getpid();
   ds.last_command_check = last_command_check;
   ds.last_log_rotation = last_log_rotation;
   ds.notifications_enabled = config.get_enable_notifications();

@@ -26,6 +26,7 @@
 #include "engine.hh"
 #include "downtime.hh"
 #include "comments.hh"
+#include "globals.hh"
 #include "statusdata.hh"
 #include "broker.hh"
 #include "sretention.hh"
@@ -33,35 +34,9 @@
 #include "commands.hh"
 #include "notifications.hh"
 #include "logging.hh"
-#include "configuration/states.hh"
 #include "events.hh"
 
 using namespace com::centreon::engine;
-
-extern configuration::states config;
-
-extern char*                 config_file;
-
-extern int                   test_scheduling;
-
-extern time_t                program_start;
-extern time_t                event_start;
-extern time_t                last_command_check;
-
-extern int                   sigshutdown;
-extern int                   sigrestart;
-
-extern unsigned int          currently_running_service_checks;
-
-timed_event*                 event_list_low = NULL;
-timed_event*                 event_list_low_tail = NULL;
-timed_event*                 event_list_high = NULL;
-timed_event*                 event_list_high_tail = NULL;
-
-extern host*                 host_list;
-extern service*              service_list;
-
-sched_info                   scheduling_info;
 
 /******************************************************************/
 /************ EVENT SCHEDULING/HANDLING FUNCTIONS *****************/
@@ -222,21 +197,21 @@ void init_timing_loop(void) {
   /* how should we determine the service inter-check delay to use? */
   switch (config.get_service_inter_check_delay_method()) {
 
-  case configuration::states::icd_none:
+  case configuration::state::icd_none:
     /* don't spread checks out - useful for testing parallelization code */
     scheduling_info.service_inter_check_delay = 0.0;
     break;
 
-  case configuration::states::icd_dumb:
+  case configuration::state::icd_dumb:
     /* be dumb and just schedule checks 1 second apart */
     scheduling_info.service_inter_check_delay = 1.0;
     break;
 
-  case configuration::states::icd_user:
+  case configuration::state::icd_user:
     /* the user specified a delay, so don't try to calculate one */
     break;
 
-  case configuration::states::icd_smart:
+  case configuration::state::icd_smart:
   default:
     /* be smart and calculate the best delay to use to minimize local load... */
     if (scheduling_info.total_scheduled_services > 0
@@ -273,11 +248,11 @@ void init_timing_loop(void) {
   /* how should we determine the service interleave factor? */
   switch (config.get_service_interleave_factor_method()) {
 
-  case configuration::states::ilf_user:
+  case configuration::state::ilf_user:
     /* the user supplied a value, so don't do any calculation */
     break;
 
-  case configuration::states::ilf_smart:
+  case configuration::state::ilf_smart:
   default:
     /* protect against a divide by zero problem - shouldn't happen, but just in case... */
     if (scheduling_info.total_hosts == 0)
@@ -448,21 +423,21 @@ void init_timing_loop(void) {
 
   /* how should we determine the host inter-check delay to use? */
   switch (config.get_host_inter_check_delay_method()) {
-  case configuration::states::icd_none:
+  case configuration::state::icd_none:
     /* don't spread checks out */
     scheduling_info.host_inter_check_delay = 0.0;
     break;
 
-  case configuration::states::icd_dumb:
+  case configuration::state::icd_dumb:
     /* be dumb and just schedule checks 1 second apart */
     scheduling_info.host_inter_check_delay = 1.0;
     break;
 
-  case configuration::states::icd_user:
+  case configuration::state::icd_user:
     /* the user specified a delay, so don't try to calculate one */
     break;
 
-  case configuration::states::icd_smart:
+  case configuration::state::icd_smart:
   default:
     /* be smart and calculate the best delay to use to minimize local load... */
     if (scheduling_info.total_scheduled_hosts > 0
@@ -779,11 +754,11 @@ void display_scheduling_info(void) {
   printf("Total scheduled hosts:           %d\n", scheduling_info.total_scheduled_hosts);
 
   printf("Host inter-check delay method:   ");
-  if (config.get_host_inter_check_delay_method() == configuration::states::icd_none)
+  if (config.get_host_inter_check_delay_method() == configuration::state::icd_none)
     printf("NONE\n");
-  else if (config.get_host_inter_check_delay_method() == configuration::states::icd_dumb)
+  else if (config.get_host_inter_check_delay_method() == configuration::state::icd_dumb)
     printf("DUMB\n");
-  else if (config.get_host_inter_check_delay_method() == configuration::states::icd_smart) {
+  else if (config.get_host_inter_check_delay_method() == configuration::state::icd_smart) {
     printf("SMART\n");
     printf("Average host check interval:     %.2f sec\n",
 	   scheduling_info.average_host_check_interval);
@@ -804,11 +779,11 @@ void display_scheduling_info(void) {
   printf("Total scheduled services:           %d\n", scheduling_info.total_scheduled_services);
 
   printf("Service inter-check delay method:   ");
-  if (config.get_service_inter_check_delay_method() == configuration::states::icd_none)
+  if (config.get_service_inter_check_delay_method() == configuration::state::icd_none)
     printf("NONE\n");
-  else if (config.get_service_inter_check_delay_method() == configuration::states::icd_dumb)
+  else if (config.get_service_inter_check_delay_method() == configuration::state::icd_dumb)
     printf("DUMB\n");
-  else if (config.get_service_inter_check_delay_method() == configuration::states::icd_smart) {
+  else if (config.get_service_inter_check_delay_method() == configuration::state::icd_smart) {
     printf("SMART\n");
     printf("Average service check interval:     %.2f sec\n",
 	   scheduling_info.average_service_check_interval);
@@ -818,9 +793,9 @@ void display_scheduling_info(void) {
   printf("Inter-check delay:                  %.2f sec\n", scheduling_info.service_inter_check_delay);
 
   printf("Interleave factor method:           %s\n",
-         (config.get_service_interleave_factor_method() == configuration::states::ilf_user)
+         (config.get_service_interleave_factor_method() == configuration::state::ilf_user)
 	 ? "USER-SUPPLIED VALUE" : "SMART");
-  if (config.get_service_interleave_factor_method() == configuration::states::ilf_smart)
+  if (config.get_service_interleave_factor_method() == configuration::state::ilf_smart)
     printf("Average services per host:          %.2f\n", scheduling_info.average_services_per_host);
   printf("Service interleave factor:          %d\n", scheduling_info.service_interleave_factor);
 
