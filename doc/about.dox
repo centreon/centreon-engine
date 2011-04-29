@@ -48,14 +48,16 @@
  *  Centreon Engine has started as a fork of the Nagios Core project.
  *  Nagios and the Nagios logo are trademarks, servicemarks, registered
  *  trademarks or registered servicemarks owned by Nagios Enterprises,
- *  LLC. All other trademarks, servicemarks, registered trademarks, and
- *  registered servicemarks are the property of their respective
- *  owner(s). This documentation was started by Ethan Galstad and other
- *  Nagios Community members.
+ *  LLC. Centreon, the Centreon Logo, Merethis and the Merethis logo are
+ *  trademarks, servicemarks, registered trademarks or registered
+ *  servicemarks owned by Merethis. All other trademarks, servicemarks,
+ *  registered trademarks, and registered servicemarks are the property
+ *  of their respective owner(s).
  *
- *  Centreon Engine is provided AS IS with NO WARRANTY OF ANY KIND,
- *  INCLUDING THE WARRANTY OF DESIGN, MERCHANTABILITY, AND FITNESS FOR A
- *  PARTICULAR PURPOSE.
+ *  All source code, binaries, documentation, information, and other
+ *  files contained in this distribution are provided AS IS with NO
+ *  WARRANTY OF ANY KIND, INCLUDING THE WARRANTY OF DESIGN,
+ *  MERCHANTABILITY, AND FITNESS FOR A PARTICULAR PURPOSE.
  *
  *  Several people have contributed to Centreon Engine or Nagios
  *  Core by either reporting bugs, suggesting improvements, writing
