@@ -381,6 +381,11 @@ if (NOT HAVE_ALARM
 endif ()
 
 # Check timezone informations.
+include(CheckStructHasMember)
+check_struct_has_member("tm" "tm_zone" "time.h" HAVE_TM_ZONE)
+if (HAVE_TM_ZONE)
+  add_definitions(-DHAVE_TM_ZONE)
+endif ()
 include(CheckSymbolExists)
 check_symbol_exists("tzname" "time.h" HAVE_TZNAME)
 if (HAVE_TZNAME)

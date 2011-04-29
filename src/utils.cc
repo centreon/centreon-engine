@@ -48,14 +48,6 @@ int                     use_embedded_perl = TRUE;
 #include "shared.hh"
 #include "utils.hh"
 
-#ifdef HAVE_TZNAME
-# ifdef CYGWIN
-extern char*                  _tzname[2] __declspec(dllimport);
-# else
-extern char*                  tzname[2];
-# endif
-#endif
-
 /* from GNU defines errno as a macro, since it's a per-thread variable */
 #ifndef errno
 extern int                    errno;

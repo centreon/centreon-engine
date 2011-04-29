@@ -29,6 +29,14 @@
 #include "utils.hh"
 #include "shared.hh"
 
+#ifdef HAVE_TZNAME
+# ifdef CYGWIN
+extern char*                  _tzname[2] __declspec(dllimport);
+# else
+extern char*                  tzname[2];
+# endif
+#endif
+
 /*
  * This file holds random utility functions shared by cgi's and
  * core.
@@ -443,9 +451,9 @@ void get_datetime_string(time_t* raw_time,
 
 #ifdef HAVE_TM_ZONE
   tzone = (char*)(tm_ptr->tm_zone);
-#else
+#elif HAVE_TZNAME
   tzone = tm_ptr->tm_isdst ? tzname[1] : tzname[0];
-#endif
+#endif /* HAVE_TM_ZONE || HAVE_TZNAME */
 
   /* ctime() style date/time */
   if (type == LONG_DATE_TIME)
