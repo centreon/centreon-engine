@@ -453,8 +453,8 @@ add_subdirectory("doc")
 # Package.
 set(CPACK_PACKAGE_NAME "Centreon-Engine")
 set(CPACK_PACKAGE_VENDOR "Merethis")
-set(CPACK_PACKAGE_VERSION_MAJOR 1)
-set(CPACK_PACKAGE_VERSION_MINOR 0)
+set(CPACK_PACKAGE_VERSION_MAJOR 0)
+set(CPACK_PACKAGE_VERSION_MINOR 9)
 set(CPACK_PACKAGE_VERSION_PATCH "0beta")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY
   "Centreon Engine monitors your IT infrastructure.")
