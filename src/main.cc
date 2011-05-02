@@ -44,6 +44,8 @@
 #include "modules/loader.hh"
 #include "configuration/applier/logging.hh"
 #include "logging/logger.hh"
+#include "logging/broker.hh"
+#include "logging/engine.hh"
 #include "engine.hh"
 
 using namespace com::centreon::engine;
@@ -272,6 +274,9 @@ int main(int argc, char** argv) {
     try {
       config.parse(config_file);
       apply_log.apply(config);
+      engine::instance().add_object(engine::obj_info(QSharedPointer<broker>(new broker),
+						     object::log_all,
+						     object::basic));
 
       // Read object config files.
       result = read_all_object_data(config_file);
