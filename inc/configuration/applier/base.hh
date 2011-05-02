@@ -1,5 +1,5 @@
 /*
-** Copyright 2011      Merethis
+** Copyright 2011 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -17,33 +17,32 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef CCE_LOGGING_BROKER_HH
-# define CCE_LOGGING_BROKER_HH
+#ifndef CCE_CONFIGURATION_APPLIER_BASE_HH
+# define CCE_CONFIGURATION_APPLIER_BASE_HH
 
-# include "logging/object.hh"
-
-namespace       com {
-  namespace     centreon {
-    namespace   engine {
-      namespace logging {
+namespace                com {
+  namespace              centreon {
+    namespace            engine {
+      namespace          configuration {
+	namespace        applier {
 	/**
-	 *  @class broker broker.hh
-	 *  @brief Call broker for all logging message.
+	 *  @class base base.hh
+	 *  @brief Parent class of all applier objects.
 	 *
-	 *  Call broker for all logging message without debug.
+	 *  Parent class of all applier objects.
 	 */
-	class   broker : public object {
-	public:
-	        broker();
-	        ~broker() throw();
+	  class          base {
+	  public:
+	    virtual      ~base() throw() = 0;
 
-	  void  log(char const* message,
-		    unsigned long long type,
-		    unsigned int verbosity) throw();
-	};
+	    virtual void apply(state const& config) = 0;
+	  };
+
+	  inline base::~base() throw() {}
+	}
       }
     }
   }
 }
 
-#endif // !CCE_LOGGING_BROKER_HH
+#endif // !CCE_CONFIGURATION_APPLIER_BASE_HH

@@ -75,7 +75,6 @@ include_directories("${MODULE_DIR}")
 
 # Qt moc files.
 qt4_wrap_cpp(QT_WS_MOC_FILES
-  "${MODULE_DIR}/syncro.hh"
   "${MODULE_DIR}/webservice.hh")
 
 # Define flags.

@@ -37,16 +37,16 @@ namespace           com {
 	class       standard : public object {
 	public:
 	            standard(bool is_stdout = true);
+	            standard(standard const& right);
 	            ~standard() throw();
+
+	  standard& operator=(standard const& right);
 
 	  void      log(char const* message,
 			unsigned long long type,
 			unsigned int verbosity) throw();
 
 	private:
-	            standard(standard const& right);
-	  standard& operator=(standard const& right);
-
 	  FILE*     _file;
 	};
       }

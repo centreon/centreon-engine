@@ -21,6 +21,7 @@
 # define CCE_LOGGING_LOGGER_HH
 
 # include <sstream>
+# include <string>
 
 namespace                    com {
   namespace                  centreon {
@@ -36,7 +37,7 @@ namespace                    com {
 	public:
 	                     logger(unsigned long long type, unsigned int verbosity);
 	                     logger(logger const& right);
-	                     ~logger() throw();
+	                     ~logger();
 
 	  logger&            operator=(logger const& right);
 	  template <typename T>
@@ -46,6 +47,8 @@ namespace                    com {
 	  }
 
 	private:
+	  std::string        _trim(std::string str) throw();
+
 	  std::ostringstream _buffer;
 	  unsigned long long _type;
 	  unsigned int       _verbosity;

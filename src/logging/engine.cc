@@ -79,7 +79,7 @@ void engine::log(char const* message,
  */
 unsigned long engine::add_object(obj_info const& info) {
   _mutex.lock();
-  unsigned int id = _id++;
+  unsigned int id = ++_id;
   _objects.insert(id, info);
   _mutex.unlock();
   return (id);
@@ -94,7 +94,30 @@ void engine::remove_object(unsigned long id) throw() {
   _mutex.lock();
   QHash<unsigned long, obj_info>::iterator it = _objects.find(id);
   if (it != _objects.end()) {
+    if (it.key() + 1 == id) {
+      --_id;
+    }
     _objects.erase(it);
+  }
+  _mutex.unlock();
+}
+
+/**
+ *  Update type and verbosity for an object.
+ *
+ *  @param[in] id        The object's id.
+ *  @param[in] type      Logging types.
+ *  @param[in] verbosity Verbosity level.
+ */
+void engine::update_object(unsigned long id,
+			   unsigned long long type,
+			   unsigned int verbosity) throw() {
+  _mutex.lock();
+  QHash<unsigned long, obj_info>::iterator it = _objects.find(id);
+  if (it != _objects.end()) {
+    obj_info& info = it.value();
+    info.type = type;
+    info.verbosity = verbosity;
   }
   _mutex.unlock();
 }

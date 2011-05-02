@@ -60,6 +60,9 @@ namespace                    com {
 
 	  unsigned long      add_object(obj_info const& info);
 	  void               remove_object(unsigned long id) throw();
+	  void               update_object(unsigned long id,
+					   unsigned long long type,
+					   unsigned int verbosity) throw();
 
 	private:
 	                     engine();

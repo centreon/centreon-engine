@@ -33,12 +33,30 @@ QList<file*> file::_files;
 
 /**
  *  Default constructor.
+ *
+ *  @param[in] file       The file name.
+ *  @param[in] size_limit The file's size limit.
  */
-file::file(char const* file, char const* archive_path, long long size_limit)
-  : _file(file), _archive_path(archive_path), _size_limit(size_limit) {
-  _file.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Append);
-  if (_file.QFile::error() != QFile::NoError) {
-    throw (engine_error() << _file.errorString());
+file::file(QString const& file, long long size_limit)
+  : _file(new QFile(file)), _size_limit(size_limit) {
+  _file->open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Append);
+  if (_file->QFile::error() != QFile::NoError) {
+    throw (engine_error() << file << ": " << _file->errorString());
+  }
+  _files.push_back(this);
+}
+
+/**
+ *  Constructor.
+ *
+ *  @param[in] file         The file name.
+ *  @param[in] archive_path The archive path for the rotation.
+ */
+file::file(QString const& file, QString const& archive_path)
+  : _file(new QFile(file)), _archive_path(archive_path), _size_limit(0) {
+  _file->open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Append);
+  if (_file->QFile::error() != QFile::NoError) {
+    throw (engine_error() << file << ": " << _file->errorString());
   }
   _files.push_back(this);
 }
@@ -47,13 +65,40 @@ file::file(char const* file, char const* archive_path, long long size_limit)
  *  Default destructor.
  */
 file::~file() throw() {
-  _file.close();
+  _file->close();
   QList<file*>::iterator it = std::find(_files.begin(), _files.end(), this);
   if (it != _files.end()) {
     _files.erase(it);
   }
 }
 
+/**
+ *  Default copy constructor.
+ *
+ * @param[in] right The class to copy.
+ */
+file::file(file const& right)
+  : _size_limit(0) {
+  operator=(right);
+}
+
+/**
+ *  Default copy operator.
+ *
+ *  @param[in] right The class to copy.
+ */
+file& file::operator=(file const& right) {
+  if (this != &right) {
+    _file = right._file;
+    _archive_path = right._archive_path;
+    _size_limit = right._size_limit;
+  }
+  return (*this);
+}
+
+/**
+ *  Archive all files.
+ */
 void file::rotate_all() {
   for (QList<file*>::iterator it = _files.begin(), end = _files.end();
        it != end;
@@ -62,13 +107,20 @@ void file::rotate_all() {
   }
 }
 
+/**
+ *  Archive file.
+ */
 void file::rotate() {
+  if (_size_limit <= 0) {
+    return;
+  }
+
   time_t now = time(NULL);
   tm t;
 
   localtime_r(&now, &t);
 
-  QString old_name = _file.fileName();
+  QString old_name = _file->fileName();
   QString new_name = QString("%1/%2-%3-%4-%5-%6.log")
     .arg(_archive_path)
     .arg(old_name)
@@ -77,11 +129,11 @@ void file::rotate() {
     .arg(t.tm_year + 1900)
     .arg(t.tm_hour, 2, 10, QLatin1Char('0'));
 
-    _file.close();
-    QFile::remove(new_name);
-    _file.rename(new_name);
-    _file.setFileName(old_name);
-    _file.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Append);
+    _file->close();
+    if (QFile::remove(new_name) == true && _file->rename(new_name) == true) {
+      _file->setFileName(old_name);
+    }
+    _file->open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Append);
 }
 
 /**
@@ -97,18 +149,18 @@ void file::log(char const* message,
   (void)type;
   (void)verbosity;
 
-  _file.write(message);
+  _file->write(message);
 
-  if (_file.size() >= _size_limit) {
-    QString old_name = _file.fileName();
+  if (_size_limit > 0 && _file->size() >= _size_limit) {
+    QString old_name = _file->fileName();
     QString new_name = old_name + ".old";
 
-    _file.close();
+    _file->close();
     QFile::remove(new_name);
-    _file.rename(new_name);
+    _file->rename(new_name);
 
-    _file.setFileName(old_name);
-    _file.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Append);
+    _file->setFileName(old_name);
+    _file->open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Append);
   }
 }
 
@@ -117,7 +169,7 @@ void file::log(char const* message,
  *
  *  @param[in] path The new archive path.
  */
-void file::set_archive_path(char const* path) throw() {
+void file::set_archive_path(QString const& path) throw() {
   _archive_path = path;
 }
 
@@ -148,3 +200,11 @@ long long file::get_size_limit() const throw() {
   return (_size_limit);
 }
 
+/**
+ *  Get the file name.
+ *
+ *  @return The file name.
+ */
+QString file::get_file_name() const throw() {
+  return (_file->fileName());
+}

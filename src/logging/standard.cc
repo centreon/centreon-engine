@@ -46,6 +46,28 @@ standard::~standard() throw() {
 }
 
 /**
+ *  Default copy constructor.
+ *
+ *  @param[in] right The class to copy.
+ */
+standard::standard(standard const& right)
+  : _file(0) {
+  operator=(right);
+}
+
+/**
+ *  Default copy operator.
+ *
+ *  @param[in] right The class to copy.
+ */
+standard& standard::operator=(standard const& right) {
+  if (this != &right) {
+    _file = right._file;
+  }
+  return (*this);
+}
+
+/**
  *  Write log in stdout or stderr.
  *
  *  @param[in] message   Message to log.

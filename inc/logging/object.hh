@@ -37,58 +37,52 @@ namespace                 com {
 	   *  Logging types.
 	   */
 	  enum            e_type {
-	    none                 = 0ull,
+	    none                     = 0ull,
 
-	    runtime_error        = 1ull,
-	    runtime_warning      = 2ull,
+	    log_runtime_error        = 1ull,
+	    log_runtime_warning      = 2ull,
+	    log_verification_error   = 4ull,
+	    log_verification_warning = 8ull,
+	    log_config_error         = 16ull,
+	    log_config_warning       = 32ull,
+	    log_process_info         = 64ull,
+	    log_event_handler        = 128ull,
+	    // log_notification         = 256ull, //NOT USED ANYMORE - CAN BE REUSED
+	    log_external_command     = 512ull,
+	    log_host_up              = 1024ull,
+	    log_host_down            = 2048ull,
+	    log_host_unreachable     = 4096ull,
+	    log_service_ok           = 8192ull,
+	    log_service_unknown      = 16384ull,
+	    log_service_warning      = 32768ull,
+	    log_service_critical     = 65536ull,
+	    log_passive_check        = 131072ull,
+	    log_info_message         = 262144ull,
+	    log_host_notification    = 524288ull,
+	    log_service_notification = 1048576ull,
+	    log_all                  = 2096895ull,
 
-	    verification_error   = 4ull,
-	    verification_warning = 8ull,
+	    dbg_functions            = 1ull << 32,
+	    dbg_config               = 2ull << 32,
+	    dbg_process              = 4ull << 32,
+	    dbg_statusdata           = 4ull << 32,
+	    dbg_retentiondata        = 4ull << 32,
+	    dbg_events               = 8ull << 32,
+	    dbg_checks               = 16ull << 32,
+	    dbg_ipc                  = 16ull << 32,
+	    dbg_flapping             = 16ull << 32,
+	    dbg_eventhandlers        = 16ull << 32,
+	    dbg_perfdata             = 16ull << 32,
+	    dbg_notifications        = 32ull << 32,
+	    dbg_eventbroker          = 64ull << 32,
+	    dbg_externalcommands     = 128ull << 32,
+	    dbg_commands             = 256ull << 32,
+	    dbg_downtime             = 512ull << 32,
+	    dbg_comments             = 1024ull << 32,
+	    dbg_macros               = 2048ull << 32,
+	    dbg_all                  = 4095ull << 32,
 
-	    config_error         = 16ull,
-	    config_warning       = 32ull,
-
-	    process_info         = 64ull,
-	    event_handler        = 128ull,
-	    // notification         = 256ull, //NOT USED ANYMORE - CAN BE REUSED
-	    external_command     = 512ull,
-
-	    host_up              = 1024ull,
-	    host_down            = 2048ull,
-	    host_unreachable     = 4096ull,
-
-	    service_ok           = 8192ull,
-	    service_unknown      = 16384ull,
-	    service_warning      = 32768ull,
-	    service_critical     = 65536ull,
-
-	    passive_check        = 131072ull,
-
-	    info_message         = 262144ull,
-
-	    host_notification    = 524288ull,
-	    service_notification = 1048576ull,
-
-	    dbg_functions        = 1ull << 32,
-	    dbg_config           = 2ull << 32,
-	    dbg_process          = 4ull << 32,
-	    dbg_statusdata       = 4ull << 32,
-	    dbg_retentiondata    = 4ull << 32,
-	    dbg_events           = 8ull << 32,
-	    dbg_checks           = 16ull << 32,
-	    dbg_ipc              = 16ull << 32,
-	    dbg_flapping         = 16ull << 32,
-	    dbg_eventhandlers    = 16ull << 32,
-	    dbg_perfdata         = 16ull << 32,
-	    dbg_notifications    = 32ull << 32,
-	    dbg_eventbroker      = 64ull << 32,
-	    dbg_externalcommands = 128ull << 32,
-	    dbg_commands         = 256ull << 32,
-	    dbg_downtime         = 512ull << 32,
-	    dbg_comments         = 1024ull << 32,
-	    dbg_macros           = 2048ull << 32,
-
-	    dbg_all              = 4095ull << 32
+	    all                      = log_all | dbg_all
 	  };
 
 	  /**

@@ -88,7 +88,7 @@ namespace                   com {
 	                      state(state const& right);
 	                      ~state() throw();
 
-	  state&             operator=(state const& right);
+	  state&              operator=(state const& right);
 
 	  void                reset();
 	  void                parse(QString const& filename);

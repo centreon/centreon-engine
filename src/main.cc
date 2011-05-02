@@ -42,9 +42,12 @@
 #include "utils.hh"
 #include "logging.hh"
 #include "modules/loader.hh"
+#include "configuration/applier/logging.hh"
+#include "logging/logger.hh"
 #include "engine.hh"
 
 using namespace com::centreon::engine;
+using namespace com::centreon::engine::logging;
 
 // Error message when configuration parsing fail.
 #define ERROR_CONFIGURATION "    Check your configuration file(s) to ensure that they contain valid\n" \
@@ -61,6 +64,8 @@ int main(int argc, char** argv, char** env) {
 #else
 int main(int argc, char** argv) {
 #endif // EMBEDDEDPERL
+  configuration::applier::logging apply_log;
+
   int error = FALSE;
   int display_license = FALSE;
   int display_help = FALSE;
@@ -138,18 +143,18 @@ int main(int argc, char** argv) {
 
   // Just display the license.
   if (TRUE == display_license) {
-    std:: cout << "Centreon Engine is free software: you can redistribute it and/or modify\n"
-                  "it under the terms of the GNU General Public License version 2 as\n"
-                  "published by the Free Software Foundation.\n"
-                  "\n"
-                  "Centreon Engine is distributed in the hope that it will be useful, but\n"
-                  "WITHOUT ANY WARRANTY; without even the implied warranty of\n"
-                  "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU\n"
-                  "General Public License for more details.\n"
-                  "\n"
-                  "You should have received a copy of the GNU General Public License along\n"
-                  "with Centreon Engine. If not, see <http://www.gnu.org/licenses/>."
-               << std::endl;
+    logger(object::log_info_message, object::basic)
+      << "Centreon Engine is free software: you can redistribute it and/or modify\n"
+      << "it under the terms of the GNU General Public License version 2 as\n"
+      << "published by the Free Software Foundation.\n"
+      << "\n"
+      << "Centreon Engine is distributed in the hope that it will be useful, but\n"
+      << "WITHOUT ANY WARRANTY; without even the implied warranty of\n"
+      << "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU\n"
+      << "General Public License for more details.\n"
+      << "\n"
+      << "You should have received a copy of the GNU General Public License along\n"
+      << "with Centreon Engine. If not, see <http://www.gnu.org/licenses/>.\n";
     exit(EXIT_SUCCESS);
   }
 
@@ -159,19 +164,19 @@ int main(int argc, char** argv) {
 
   // If there are no command line options or if an error occured, print usage.
   if ((TRUE == error) || (TRUE == display_help)) {
-    std::cout << "Usage: " << argv[0] << " [options] <main_config_file>\n"
-                 "\nOptions:\n"
-                 "  -v, --verify-config         Verify all configuration data.\n"
-                 "  -s, --test-scheduling       Shows projected/recommended check\n"
-                 "                              scheduling and other diagnostic info\n"
-                 "                              based on the current configuration\n"
-                 "                              files.\n"
-                 "  -x, --dont-verify-paths     Don't check for circular object paths -\n"
-                 "                              USE WITH CAUTION !\n"
-                 "  -p, --precache-objects      Precache object configuration - use with\n"
-                 "                              -v or -s options.\n"
-                 "  -u, --use-precached-objects Use precached object config file."
-              << std::endl;
+    logger(object::log_info_message, object::basic)
+      << "Usage: " << argv[0] << " [options] <main_config_file>\n"
+      << "\nOptions:\n"
+      << "  -v, --verify-config         Verify all configuration data.\n"
+      << "  -s, --test-scheduling       Shows projected/recommended check\n"
+      << "                              scheduling and other diagnostic info\n"
+      << "                              based on the current configuration\n"
+      << "                              files.\n"
+      << "  -x, --dont-verify-paths     Don't check for circular object paths -\n"
+      << "                              USE WITH CAUTION !\n"
+      << "  -p, --precache-objects      Precache object configuration - use with\n"
+      << "                              -v or -s options.\n"
+      << "  -u, --use-precached-objects Use precached object config file.\n";
     exit(ERROR);
   }
 
@@ -186,8 +191,9 @@ int main(int argc, char** argv) {
       char buff[PATH_MAX];
       if (getcwd(buff, sizeof(buff)) == NULL) {
         char const* msg(strerror(errno));
-        std::cerr << "failure while retrieving current working directory: "
-                  << msg << std::endl;
+        logger(object::log_runtime_error, object::basic)
+	  << "failure while retrieving current working directory: "
+	  << msg << "\n";
         exit(EXIT_FAILURE);
       }
       buffer.append(buff);
@@ -198,7 +204,7 @@ int main(int argc, char** argv) {
 
     // Append the config file to the path.
     buffer.append(config_file);
-    delete [] config_file;
+    delete[] config_file;
     config_file = my_strdup(buffer.c_str());
   }
 
@@ -212,7 +218,8 @@ int main(int argc, char** argv) {
     // resource and object config files).
     try {
       // Read main config file.
-      std::cout << "reading main config file" << std::endl;
+      logger(object::log_info_message, object::basic)
+	<< "reading main config file\n";
       config.parse(config_file);
 
       // Read object config files.
@@ -222,31 +229,34 @@ int main(int argc, char** argv) {
         result = ERROR;
     }
     catch(std::exception const &e) {
-      std::cerr << "error while processing a config file: "
-                << e.what() << std::endl;
+      logger(object::log_config_error, object::basic)
+	<< "error while processing a config file: " << e.what() << "\n";
       result = ERROR;
     }
 
     // There was a problem reading the config files.
-    if (result != OK)
-      std::cout << "\n    One or more problems occurred while processing the config files.\n\n"
-                   ERROR_CONFIGURATION;
-
+    if (result != OK) {
+      logger(object::log_config_error, object::basic)
+	<< "\n    One or more problems occurred while processing the config files.\n\n"
+	<< ERROR_CONFIGURATION;
+    }
     // The config files were okay, so run the pre-flight check.
     else {
-      std::cout << "running pre-flight check on configuration data"
-                << std::endl;
+      logger(object::log_info_message, object::basic)
+	<< "running pre-flight check on configuration data\n";
       result = pre_flight_check();
-      if (result != OK)
-        std::cout << "\n    One or more problem occurred during the pre-flight check.\n\n"
-                     ERROR_CONFIGURATION;
+      if (result != OK) {
+	logger(object::log_config_error, object::basic)
+	  << "\n    One or more problem occurred during the pre-flight check.\n\n"
+	  << ERROR_CONFIGURATION;
+      }
     }
 
     // Clean up after ourselves.
     cleanup();
 
     // Free config_file.
-    delete [] config_file;
+    delete[] config_file;
 
     // Exit.
     exit(result ? EXIT_FAILURE : EXIT_SUCCESS);
@@ -261,13 +271,14 @@ int main(int argc, char** argv) {
     // Read in the configuration files (main config file and all host config files).
     try {
       config.parse(config_file);
+      apply_log.apply(config);
 
       // Read object config files.
       result = read_all_object_data(config_file);
     }
     catch(std::exception const &e) {
-      std::cerr << "error while processing a config file: "
-                << e.what() << std::endl;
+      logger(object::log_config_error, object::basic)
+	<< "error while processing a config file: " << e.what() << "\n";
     }
 
     // Read initial service and host state information.
@@ -276,15 +287,18 @@ int main(int argc, char** argv) {
       read_initial_state_information();
     }
 
-    if (result != OK)
-      std::cout << "\n    One or more problems occurred while processing the config files.\n\n";
+    if (result != OK) {
+      logger(object::log_config_error, object::basic)
+	<< "\n    One or more problems occurred while processing the config files.\n\n";
+    }
 
     // Run the pre-flight check to make sure everything looks okay.
-    if ((OK == result) && ((result = pre_flight_check()) != OK))
-      std::cout << "\n    One or more problems occurred during the pre-flight check.\n\n";
+    if ((OK == result) && ((result = pre_flight_check()) != OK)) {
+      logger(object::log_config_error, object::basic)
+	<< "\n    One or more problems occurred during the pre-flight check.\n\n";
+    }
 
     if (OK == result) {
-
       // Initialize the event timing loop.
       init_timing_loop();
 
@@ -292,10 +306,11 @@ int main(int argc, char** argv) {
       display_scheduling_info();
 
       if (precache_objects == TRUE)
-        std::cout << "\n"
-                  << "OBJECT PRECACHING\n"
-                  << "-----------------\n"
-                  << "Object config files were precached.\n";
+        logger(object::log_info_message, object::basic)
+	  << "\n"
+	  << "OBJECT PRECACHING\n"
+	  << "-----------------\n"
+	  << "Object config files were precached.\n";
     }
 
 #undef TEST_TIMEPERIODS
@@ -333,17 +348,18 @@ int main(int argc, char** argv) {
       // and resource config files).
       try {
         config.parse(config_file);
+	apply_log.apply(config);
         result = OK;
       }
       catch(std::exception const &e) {
-        std::cerr << "error while processing a config file: "
-                  << e.what() << std::endl;
+        logger(object::log_config_error, object::basic)
+	  << "error while processing a config file: " << e.what() << "\n";
       }
 
       /* NOTE 11/06/07 EG moved to after we read config files, as user may have overridden timezone offset */
       /* get program (re)start time and save as macro */
       program_start = time(NULL);
-      delete [] mac->x[MACRO_PROCESSSTARTTIME];
+      delete[] mac->x[MACRO_PROCESSSTARTTIME];
       try {
         mac->x[MACRO_PROCESSSTARTTIME] = obj2pchar<unsigned long>(program_start);
       }
@@ -364,20 +380,21 @@ int main(int argc, char** argv) {
         loader.load();
       }
       catch (std::exception const& e) {
-        logit(NSLOG_INFO_MESSAGE, false, "Event broker module initialize failed.\n");
+        logger(object::log_info_message, object::basic)
+	  << "Event broker module initialize failed.\n";
         result = ERROR;
       }
 
       // This must be logged after we read config data, as user may have changed location of main log file.
-      logit(NSLOG_PROCESS_INFO, TRUE,
-        "Centreon Engine starting... (PID=%d)\n",
-        (int)getpid());
+      logger(object::log_process_info, object::basic)
+	<< "Centreon Engine starting... (PID=" << getpid() << ")\n";
 
       // Log the local time - may be different than clock time due to timezone offset.
       now = time(NULL);
       tm = localtime_r(&now, &tm_s);
       strftime(datestring, sizeof(datestring), "%a %b %d %H:%M:%S %Z %Y", tm);
-      logit(NSLOG_PROCESS_INFO, TRUE, "Local time is %s", datestring);
+      logger(object::log_process_info, object::basic)
+	<< "Local time is " << datestring;
 
       // Write log version/info.
       write_log_file_info(NULL);
@@ -396,16 +413,18 @@ int main(int argc, char** argv) {
         result = read_all_object_data(config_file);
 
       // There was a problem reading the config files.
-      if (result != OK)
-        logit(NSLOG_PROCESS_INFO | NSLOG_RUNTIME_ERROR | NSLOG_CONFIG_ERROR, TRUE,
-              "Bailing out due to one or more errors encountered in the configuration files. Run Centreon Engine from the command line with the -v option to verify your config before restarting. (PID=%d)",
-              (int)getpid());
+      if (result != OK) {
+	logger(object::log_process_info | object::log_runtime_error | object::log_config_error, object::basic)
+	  << "Bailing out due to one or more errors encountered in the configuration files. "
+	  << "Run Centreon Engine from the command line with the -v option to verify your config before restarting. (PID=" << getpid() << ")";
+      }
       else {
         // Run the pre-flight check to make sure everything looks okay.
-        if ((result = pre_flight_check()) != OK)
-          logit(NSLOG_PROCESS_INFO | NSLOG_RUNTIME_ERROR | NSLOG_VERIFICATION_ERROR, TRUE,
-                "Bailing out due to errors encountered while running the pre-flight check.  Run Centreon Engine from the command line with the -v option to verify your config before restarting. (PID=%d)\n",
-                (int)getpid());
+        if ((result = pre_flight_check()) != OK) {
+          logger(object::log_process_info | object::log_runtime_error | object::log_verification_error, object::basic)
+	    << "Bailing out due to errors encountered while running the pre-flight check.  "
+	    << "Run Centreon Engine from the command line with the -v option to verify your config before restarting. (PID=" << getpid() << ")\n";
+	}
       }
 
       // An error occurred that prevented us from (re)starting.
@@ -462,9 +481,8 @@ int main(int argc, char** argv) {
       result = open_command_file();
       if (result != OK) {
 
-        logit(NSLOG_PROCESS_INFO | NSLOG_RUNTIME_ERROR, TRUE,
-              "Bailing out due to errors encountered while trying to initialize the external command file... (PID=%d)\n",
-              (int)getpid());
+        logger(object::log_process_info | object::log_runtime_error, object::basic)
+	  << "Bailing out due to errors encountered while trying to initialize the external command file... (PID=" << getpid() << ")\n";
 
         // Send program data to broker.
         broker_program_state(NEBTYPE_PROCESS_SHUTDOWN,
@@ -615,8 +633,8 @@ int main(int argc, char** argv) {
       // Shutdown stuff.
       if (sigshutdown == TRUE) {
         // Log a shutdown message.
-        logit(NSLOG_PROCESS_INFO, TRUE,
-              "Successfully shutdown... (PID=%d)\n", (int)getpid());
+        logger(object::log_process_info, object::basic)
+	  << "Successfully shutdown... (PID=" << getpid() << ")\n";
       }
 
       // Clean up after ourselves.
@@ -628,7 +646,7 @@ int main(int argc, char** argv) {
     } while (sigrestart == TRUE && sigshutdown == FALSE);
 
     // Free misc memory.
-    delete [] config_file;
+    delete[] config_file;
   }
 
   return (OK);

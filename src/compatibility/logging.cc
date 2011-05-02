@@ -271,7 +271,7 @@ extern "C" {
       char* processed_buffer = NULL;
       process_macros_r(&mac, buffer.c_str(), &processed_buffer, 0);
 
-      logger(object::info_message, object::basic) << processed_buffer;
+      logger(object::log_info_message, object::basic) << processed_buffer;
 
       clear_host_macros(&mac);
       delete[] processed_buffer;
@@ -318,7 +318,7 @@ extern "C" {
       char* processed_buffer = NULL;
       process_macros_r(&mac, buffer.c_str(), &processed_buffer, 0);
 
-      logger(object::info_message, object::basic) << processed_buffer;
+      logger(object::log_info_message, object::basic) << processed_buffer;
 
       clear_host_macros(&mac);
       clear_service_macros(&mac);
@@ -358,7 +358,7 @@ extern "C" {
   int write_log_file_info(time_t* timestamp) {
     (void)timestamp;
 
-    logger(object::process_info, object::basic)
+    logger(object::log_process_info, object::basic)
       <<  "LOG VERSION: " << LOG_VERSION_2 << "\n";
     return (OK);
   }

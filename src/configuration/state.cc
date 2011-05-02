@@ -86,7 +86,7 @@ state::state()
   _lst_method["log_event_handlers"]                          = &cpp_suck<bool, &state::set_log_event_handlers>::set_generic;
   _lst_method["log_external_commands"]                       = &cpp_suck<bool, &state::set_log_external_commands>::set_generic;
   _lst_method["log_passive_checks"]                          = &cpp_suck<bool, &state::set_log_passive_checks>::set_generic;
-  _lst_method["log_initial_state"]                          = &cpp_suck<bool, &state::set_log_initial_state>::set_generic;
+  _lst_method["log_initial_states"]                          = &cpp_suck<bool, &state::set_log_initial_state>::set_generic;
   _lst_method["retain_state_information"]                    = &cpp_suck<bool, &state::set_retain_state_information>::set_generic;
   _lst_method["retention_update_interval"]                   = &cpp_suck<unsigned int, &state::set_retention_update_interval>::set_generic;
   _lst_method["use_retained_program_state"]                  = &cpp_suck<bool, &state::set_use_retained_program_state>::set_generic;
@@ -181,6 +181,10 @@ state::state()
   _lst_method["downtime_file"]                               = &cpp_suck<QString const&, &state::_set_downtime_file>::set_generic;
   _lst_method["xdddefault_downtime_file"]                    = &cpp_suck<QString const&, &state::_set_downtime_file>::set_generic;
   _lst_method["allow_empty_hostgroup_assignment"]            = &cpp_suck<bool, &state::set_allow_empty_hostgroup_assignment>::set_generic;
+  _lst_method["daemon_dumps_core"]                           = &cpp_suck<QString const&, &state::_set_daemon_dumps_core>::set_generic;
+  _lst_method["nagios_user"]                                 = &cpp_suck<QString const&, &state::_set_user>::set_generic;
+  _lst_method["nagios_group"]                                = &cpp_suck<QString const&, &state::_set_group>::set_generic;
+  _lst_method["lock_file"]                                   = &cpp_suck<QString const&, &state::_set_lock_file>::set_generic;
 
   _lst_method["status_file"]                                 = NULL; // ignore external variables
   _lst_method["perfdata_timeout"]                            = NULL; // ignore external variables

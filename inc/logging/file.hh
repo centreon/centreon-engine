@@ -20,49 +20,55 @@
 #ifndef CCE_LOGGING_FILE_HH
 # define CCE_LOGGING_FILE_HH
 
+# include <QSharedPointer>
 # include <QFile>
 # include <QString>
 # include <QList>
 
-namespace                     com {
-  namespace                   centreon {
-    namespace                 engine {
-      namespace               logging {
+# include "logging/object.hh"
+
+namespace                      com {
+  namespace                    centreon {
+    namespace                  engine {
+      namespace                logging {
 	/**
          *  @class file file.hh
          *  @brief Write logging message into file.
          *
          *  Write logging message into file.
          */
-	class                 file {
+	class                  file : public object {
 	public:
-	                      file(char const* file,
-				   char const* archive_path = "./",
-				   long long size_limit = 0);
-	                      ~file() throw();
+	                       file(QString const& file,
+				    long long size_limit = 0);
+	                       file(QString const& file,
+				    QString const& archive_path);
+	                       file(file const& right);
+	                       ~file() throw();
 
-	  static void         rotate_all();
-	  void                rotate();
+	  file&                operator=(file const& right);
 
-	  void                log(char const* message,
-				  unsigned long long type,
-				  unsigned int verbosity) throw();
+	  static void          rotate_all();
+	  void                 rotate();
 
-	  void                set_archive_path(char const* path) throw();
-	  QString const&      get_archive_path() const throw();
+	  void                 log(char const* message,
+				   unsigned long long type,
+				   unsigned int verbosity) throw();
 
-	  void                set_size_limit(long long size) throw();
-	  long long           get_size_limit() const throw();
+	  void                 set_archive_path(QString const& path) throw();
+	  QString const&       get_archive_path() const throw();
+
+	  void                 set_size_limit(long long size) throw();
+	  long long            get_size_limit() const throw();
+
+	  QString              get_file_name() const throw();
 
 	private:
-	                      file(file const& right);
-	  file&               operator=(file const& right);
+	  QSharedPointer<QFile> _file;
+	  QString              _archive_path;
+	  long long            _size_limit;
 
-	  QFile               _file;
-	  QString             _archive_path;
-	  long long           _size_limit;
-
-	  static QList<file*> _files;
+	  static QList<file*>  _files;
 	};
       }
     }

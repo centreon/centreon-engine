@@ -37,7 +37,7 @@ using namespace com::centreon::engine::logging;
  */
 logger::logger(unsigned long long type, unsigned int verbosity)
   : _type(type), _verbosity(verbosity) {
-
+  _buffer << "[" << time(NULL) << "] ";
 }
 
 /**
@@ -52,11 +52,9 @@ logger::logger(logger const& right) {
 /**
  *  Default destructor.
  */
-logger::~logger() throw() {
-  if (_buffer.str().size() != 0) {
-    _buffer << "[" << time(NULL) << "] ";
-    engine::instance().log(_buffer.str().c_str(), _type, _verbosity);
-  }
+logger::~logger() {
+  std::string buf = _trim(_buffer.str()) + "\n";
+  engine::instance().log(buf.c_str(), _type, _verbosity);
 }
 
 /**
@@ -69,4 +67,26 @@ logger& logger::operator=(logger const& right) {
     _buffer << right._buffer.str();
   }
   return (*this);
+}
+
+/**
+ *  Trim a string.
+ *
+ *  @param[in] str The string.
+ *
+ *  @return The trimming stream.
+ */
+std::string logger::_trim(std::string str) throw() {
+  const char* whitespaces = " \t\r\n";
+  size_t pos = str.find_last_not_of(whitespaces);
+
+  if (pos == std::string::npos)
+    str.clear();
+  else
+    {
+      str.erase(pos + 1);
+      if ((pos = str.find_first_not_of(whitespaces)) != std::string::npos)
+        str.erase(0, pos);
+    }
+  return (str);
 }
