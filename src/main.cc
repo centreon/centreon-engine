@@ -41,7 +41,7 @@
 #include "config.hh"
 #include "utils.hh"
 #include "logging.hh"
-#include "modules/loader.hh"
+#include "broker/loader.hh"
 #include "configuration/applier/logging.hh"
 #include "logging/logger.hh"
 #include "logging/broker.hh"
@@ -274,7 +274,7 @@ int main(int argc, char** argv) {
     try {
       config.parse(config_file);
       apply_log.apply(config);
-      engine::instance().add_object(engine::obj_info(QSharedPointer<broker>(new broker),
+      engine::instance().add_object(engine::obj_info(QSharedPointer<logging::broker>(new logging::broker),
 						     object::log_all,
 						     object::basic));
 
@@ -380,7 +380,7 @@ int main(int argc, char** argv) {
       neb_init_modules();
       neb_init_callback_list();
       try {
-        modules::loader& loader = modules::loader::instance();
+        broker::loader& loader = broker::loader::instance();
         loader.set_directory(config.get_broker_module_directory());
         loader.load();
       }

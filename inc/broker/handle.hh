@@ -17,8 +17,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef CCE_MODULES_HANDLE_HH
-# define CCE_MODULES_HANDLE_HH
+#ifndef CCE_BROKER_HANDLE_HH
+# define CCE_BROKER_HANDLE_HH
 
 # include <QObject>
 # include <QSharedPointer>
@@ -28,7 +28,7 @@
 namespace                          com {
   namespace                        centreon {
     namespace                      engine {
-      namespace                    modules {
+      namespace                    broker {
 	/**
 	 *  @class handle handle.hh
 	 *  @brief Handle contains module informations.
@@ -72,16 +72,16 @@ namespace                          com {
 	  void                     set_version(QString const& version);
 
 	signals:
-	  void                     event_create(modules::handle* module);
-	  void                     event_destroy(modules::handle* module);
-	  void                     event_name(modules::handle* module);
-	  void                     event_author(modules::handle* module);
-	  void                     event_copyright(modules::handle* module);
-	  void                     event_version(modules::handle* module);
-	  void                     event_license(modules::handle* module);
-	  void                     event_description(modules::handle* module);
-	  void                     event_loaded(modules::handle* module);
-	  void                     event_unloaded(modules::handle* module);
+	  void                     event_create(broker::handle* module);
+	  void                     event_destroy(broker::handle* module);
+	  void                     event_name(broker::handle* module);
+	  void                     event_author(broker::handle* module);
+	  void                     event_copyright(broker::handle* module);
+	  void                     event_version(broker::handle* module);
+	  void                     event_license(broker::handle* module);
+	  void                     event_description(broker::handle* module);
+	  void                     event_loaded(broker::handle* module);
+	  void                     event_unloaded(broker::handle* module);
 	  void                     name_changed(QString const& filename,
 						QString const& old_name,
 						QString const& new_name);
@@ -104,4 +104,4 @@ namespace                          com {
   }
 }
 
-#endif // !CCE_MODULES_HANDLE_HH
+#endif // !CCE_BROKER_HANDLE_HH

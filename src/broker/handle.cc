@@ -21,11 +21,11 @@
 #include "nebmodules.hh"
 #include "error.hh"
 #include "logging.hh"
-#include "modules/compatibility.hh"
-#include "modules/loader.hh"
-#include "modules/handle.hh"
+#include "broker/compatibility.hh"
+#include "broker/loader.hh"
+#include "broker/handle.hh"
 
-using namespace com::centreon::engine::modules;
+using namespace com::centreon::engine::broker;
 
 /**************************************
  *                                     *
@@ -339,29 +339,29 @@ void handle::set_version(QString const& version) {
  *  Connect all Qt Signal to Slot.
  */
 void handle::_init_connection() {
-  modules::loader& loader = modules::loader::instance();
+  broker::loader& loader = broker::loader::instance();
   connect(this, SIGNAL(name_changed(QString const&, QString const&, QString const&)),
 	  &loader, SLOT(module_name_changed(QString const&, QString const&, QString const&)));
 
-  modules::compatibility& compatibility = modules::compatibility::instance();
-  connect(this, SIGNAL(event_create(modules::handle*)),
-	  &compatibility, SLOT(create_module(modules::handle*)));
-  connect(this, SIGNAL(event_destroy(modules::handle*)),
-	  &compatibility, SLOT(destroy_module(modules::handle*)));
-  connect(this, SIGNAL(event_name(modules::handle*)),
-	  &compatibility, SLOT(name_module(modules::handle*)));
-  connect(this, SIGNAL(event_author(modules::handle*)),
-	  &compatibility, SLOT(author_module(modules::handle*)));
-  connect(this, SIGNAL(event_copyright(modules::handle*)),
-	  &compatibility, SLOT(copyright_module(modules::handle*)));
-  connect(this, SIGNAL(event_version(modules::handle*)),
-	  &compatibility, SLOT(version_module(modules::handle*)));
-  connect(this, SIGNAL(event_license(modules::handle*)),
-	  &compatibility, SLOT(license_module(modules::handle*)));
-  connect(this, SIGNAL(event_description(modules::handle*)),
-	  &compatibility, SLOT(description_module(modules::handle*)));
-  connect(this, SIGNAL(event_loaded(modules::handle*)),
-	  &compatibility, SLOT(loaded_module(modules::handle*)));
-  connect(this, SIGNAL(event_unloaded(modules::handle*)),
-	  &compatibility, SLOT(unloaded_module(modules::handle*)));
+  broker::compatibility& compatibility = broker::compatibility::instance();
+  connect(this, SIGNAL(event_create(broker::handle*)),
+	  &compatibility, SLOT(create_module(broker::handle*)));
+  connect(this, SIGNAL(event_destroy(broker::handle*)),
+	  &compatibility, SLOT(destroy_module(broker::handle*)));
+  connect(this, SIGNAL(event_name(broker::handle*)),
+	  &compatibility, SLOT(name_module(broker::handle*)));
+  connect(this, SIGNAL(event_author(broker::handle*)),
+	  &compatibility, SLOT(author_module(broker::handle*)));
+  connect(this, SIGNAL(event_copyright(broker::handle*)),
+	  &compatibility, SLOT(copyright_module(broker::handle*)));
+  connect(this, SIGNAL(event_version(broker::handle*)),
+	  &compatibility, SLOT(version_module(broker::handle*)));
+  connect(this, SIGNAL(event_license(broker::handle*)),
+	  &compatibility, SLOT(license_module(broker::handle*)));
+  connect(this, SIGNAL(event_description(broker::handle*)),
+	  &compatibility, SLOT(description_module(broker::handle*)));
+  connect(this, SIGNAL(event_loaded(broker::handle*)),
+	  &compatibility, SLOT(loaded_module(broker::handle*)));
+  connect(this, SIGNAL(event_unloaded(broker::handle*)),
+	  &compatibility, SLOT(unloaded_module(broker::handle*)));
 }

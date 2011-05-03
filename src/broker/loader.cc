@@ -21,10 +21,10 @@
 #include <QFile>
 #include "error.hh"
 #include "logging.hh"
-#include "modules/loader.hh"
+#include "broker/loader.hh"
 
 using namespace com::centreon::engine;
-using namespace com::centreon::engine::modules;
+using namespace com::centreon::engine::broker;
 
 /**************************************
  *                                     *

@@ -20,6 +20,7 @@
 #ifndef CCE_CONFIGURATION_STATE_HH
 # define CCE_CONFIGURATION_STATE_HH
 
+# include <QString>
 # include <sstream>
 # include <string>
 # include <map>
