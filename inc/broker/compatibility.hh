@@ -17,17 +17,17 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef CCE_MODULES_COMPATIBILITY_HH
-# define CCE_MODULES_COMPATIBILITY_HH
+#ifndef CCE_BROKER_COMPATIBILITY_HH
+# define CCE_BROKER_COMPATIBILITY_HH
 
 # include <QObject>
 # include "nebmodules.hh"
-# include "modules/handle.hh"
+# include "broker/handle.hh"
 
 namespace                       com {
   namespace                     centreon {
     namespace                   engine {
-      namespace                 modules {
+      namespace                 broker {
 	/**
 	 *  @class compatibility compatibility.hh
 	 *  @brief Simple compatibility class.
@@ -41,16 +41,16 @@ namespace                       com {
 	  static compatibility& instance();
 
 	public slots:
-	  void                  create_module(modules::handle* module);
-	  void                  destroy_module(modules::handle* module);
-	  void                  name_module(modules::handle* module);
-	  void                  author_module(modules::handle* module);
-	  void                  copyright_module(modules::handle* module);
-	  void                  version_module(modules::handle* module);
-	  void                  license_module(modules::handle* module);
-	  void                  description_module(modules::handle* module);
-	  void                  loaded_module(modules::handle* module);
-	  void                  unloaded_module(modules::handle* module);
+	  void                  create_module(broker::handle* module);
+	  void                  destroy_module(broker::handle* module);
+	  void                  name_module(broker::handle* module);
+	  void                  author_module(broker::handle* module);
+	  void                  copyright_module(broker::handle* module);
+	  void                  version_module(broker::handle* module);
+	  void                  license_module(broker::handle* module);
+	  void                  description_module(broker::handle* module);
+	  void                  loaded_module(broker::handle* module);
+	  void                  unloaded_module(broker::handle* module);
 
 	private:
 	  compatibility();
@@ -64,4 +64,4 @@ namespace                       com {
   }
 }
 
-#endif // !CCE_MODULES_COMPATIBILITY_HH
+#endif // !CCE_BROKER_COMPATIBILITY_HH

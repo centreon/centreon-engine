@@ -529,8 +529,6 @@ if (DOCLEAN)
 endif ()
 
 # Configure files.
-configure_file("${INCLUDE_DIR}/compatibility/locations.h.in"
-  "${INCLUDE_DIR}/compatibility/locations.h")
 configure_file("${SCRIPT_DIR}/centengine.sh.in"
   "${SCRIPT_DIR}/centengine.sh")
 configure_file("${SCRIPT_DIR}/ubuntu.conf.in"
@@ -555,22 +553,8 @@ add_definitions(-DDEFAULT_EVENT_BROKER_FILE="${localstatedir}/broker.socket")
 add_definitions(-DDEFAULT_P1_FILE="${bindir}/p1.pl")
 add_definitions(-DDEFAULT_AUTH_FILE="")
 
-# Configuration file.
-configure_file("${INCLUDE_DIR}/compatibility/locations.h.in"
-  "${INCLUDE_DIR}/compatibility/locations.h")
-configure_file("${SCRIPT_DIR}/centengine.sh.in"
-  "${SCRIPT_DIR}/centengine.sh")
-configure_file("${SCRIPT_DIR}/ubuntu.conf.in"
-  "${SCRIPT_DIR}/ubuntu.conf")
-
 # Include Directories
 include_directories("${INCLUDE_DIR}")
-
-# Produce moc files.
-qt4_wrap_cpp(QT_MOC_FILES
-  "${INCLUDE_DIR}/modules/loader.hh"
-  "${INCLUDE_DIR}/modules/handle.hh"
-  "${INCLUDE_DIR}/modules/compatibility.hh")
 
 # Library engine target.
 add_library("centenginelib"
@@ -578,8 +562,6 @@ add_library("centenginelib"
   "${SRC_DIR}/broker.cc"
   "${SRC_DIR}/checks.cc"
   "${SRC_DIR}/commands.cc"
-  "${SRC_DIR}/compatibility/common.cc"
-  "${SRC_DIR}/compatibility/globals.cc"
   "${SRC_DIR}/config.cc"
   "${SRC_DIR}/events.cc"
   "${SRC_DIR}/flapping.cc"
@@ -604,18 +586,6 @@ add_library("centenginelib"
   "${SRC_DIR}/xpddefault.cc"
   "${SRC_DIR}/xrddefault.cc"
   "${SRC_DIR}/xsddefault.cc"
-  "${SRC_DIR}/configuration/state.cc"
-  "${SRC_DIR}/configuration/applier/logging.cc"
-  "${SRC_DIR}/modules/loader.cc"
-  "${SRC_DIR}/modules/handle.cc"
-  "${SRC_DIR}/modules/compatibility.cc"
-  "${SRC_DIR}/logging/standard.cc"
-  "${SRC_DIR}/logging/file.cc"
-  "${SRC_DIR}/logging/syslog.cc"
-  "${SRC_DIR}/logging/logger.cc"
-  "${SRC_DIR}/logging/broker.cc"
-  "${SRC_DIR}/logging/engine.cc"
-  "${SRC_DIR}/compatibility/logging.cc"
   "${INCLUDE_DIR}/broker.hh"
   "${INCLUDE_DIR}/checks.hh"
   "${INCLUDE_DIR}/commands.hh"
@@ -651,19 +621,6 @@ add_library("centenginelib"
   "${INCLUDE_DIR}/xpddefault.hh"
   "${INCLUDE_DIR}/xrddefault.hh"
   "${INCLUDE_DIR}/xsddefault.hh"
-  "${INCLUDE_DIR}/configuration/state.hh"
-  "${INCLUDE_DIR}/configuration/applier/base.hh"
-  "${INCLUDE_DIR}/configuration/applier/logging.hh"
-  "${INCLUDE_DIR}/modules/compatibility.hh"
-  "${INCLUDE_DIR}/modules/handle.hh"
-  "${INCLUDE_DIR}/modules/loader.hh"
-  "${INCLUDE_DIR}/logging/object.hh"
-  "${INCLUDE_DIR}/logging/standard.hh"
-  "${INCLUDE_DIR}/logging/file.hh"
-  "${INCLUDE_DIR}/logging/syslog.hh"
-  "${INCLUDE_DIR}/logging/logger.hh"
-  "${INCLUDE_DIR}/logging/broker.hh"
-  "${INCLUDE_DIR}/logging/engine.hh"
   "${PERL_SOURCES}"
   ${QT_MOC_FILES})
 get_property(LIB_COMPILE_FLAGS
@@ -677,7 +634,12 @@ target_link_libraries("centenginelib"
   ${SOCKET_LIBRARIES}
   ${THREAD_LIBRARIES}
   ${PERL_LINK_FLAGS}
-  ${QT_LIBRARIES})
+  ${QT_LIBRARIES}
+  "cce_logging"
+  "cce_broker"
+  "cce_configuration"
+  "cce_configurationapplier"
+  "cce_compatibility")
 
 # Centengine target.
 add_executable("centengine"
@@ -686,8 +648,8 @@ get_property(ENGINE_COMPILE_FLAGS
   TARGET "centengine"
   PROPERTY COMPILE_FLAGS)
 set(ENGINE_COMPILE_FLAGS "${ENGINE_COMPILE_FLAGS} ${PERL_COMPILE_FLAGS}")
-set_target_properties("centengine" PROPERTIES
-  COMPILE_FLAGS "${ENGINE_COMPILE_FLAGS}")
+set_target_properties("centengine"
+  PROPERTIES COMPILE_FLAGS "${ENGINE_COMPILE_FLAGS}")
 target_link_libraries("centengine"
   "centenginelib")
 install(TARGETS "centengine"
@@ -701,18 +663,17 @@ install(TARGETS "centenginestats"
   DESTINATION "${bindir}"
   COMPONENT "runtime")
 
-# Test configuration target.
-add_executable("test_configuration"
-  "${TEST_DIR}/test_configuration.cc"
-  "${SRC_DIR}/globals.cc"
-  "${SRC_DIR}/error.cc"
-  "${SRC_DIR}/configuration/state.cc")
-target_link_libraries("test_configuration"
-  ${QT_LIBRARIES})
-
-add_test("test_configuration_basic"
-  "test_configuration"
-  "test.cfg")
+# # Test logging target.
+# add_executable("test_logging"
+#   "${TEST_DIR}/test_logging.cc"
+#   "${SRC_DIR}/globals.cc"
+#   "${SRC_DIR}/error.cc"
+#   "${SRC_DIR}/logging/engine.cc")
+# target_link_libraries("test_configuration"
+#   ${QT_LIBRARIES})
+# add_test("test_configuration_basic"
+#   "test_configuration"
+#   "test.cfg")
 
 # Install header files for devel.
 install(DIRECTORY "${INCLUDE_DIR}/"
@@ -721,14 +682,14 @@ install(DIRECTORY "${INCLUDE_DIR}/"
   FILES_MATCHING PATTERN "*.hh"
   PATTERN "${INCLUDE_DIR}/compatibility/" EXCLUDE)
 
-install(DIRECTORY "${INCLUDE_DIR}/compatibility/"
-  DESTINATION "${localstatedir}/include/centreon-engine/"
-  COMPONENT "development"
-  FILES_MATCHING PATTERN "*.h")
-
 # Add subdirectories.
 add_subdirectory("doc")
 add_subdirectory("modules")
+add_subdirectory("broker")
+add_subdirectory("logging")
+add_subdirectory("configuration")
+add_subdirectory("configuration/applier")
+add_subdirectory("compatibility")
 
 # Package.
 set(CPACK_PACKAGE_NAME "Centreon-Engine")

@@ -25,8 +25,8 @@
 #include "neberrors.hh"
 #include "utils.hh"
 #include "logging.hh"
-#include "modules/loader.hh"
-#include "modules/handle.hh"
+#include "broker/loader.hh"
+#include "broker/handle.hh"
 #include "nebmods.hh"
 
 using namespace com::centreon::engine;
@@ -57,8 +57,8 @@ int neb_add_module(char const* filename, char const* args, int should_be_loaded)
     return (ERROR);
 
   try {
-    modules::loader& loader = modules::loader::instance();
-    modules::handle module(filename, args);
+    broker::loader& loader = broker::loader::instance();
+    broker::handle module(filename, args);
     loader.add_module(module);
     log_debug_info(DEBUGL_EVENTBROKER, 0,
 		   "Added module: name=`%s', args=`%s'\n",
@@ -78,7 +78,7 @@ int neb_add_module(char const* filename, char const* args, int should_be_loaded)
 /* free memory allocated to module list */
 int neb_free_module_list(void) {
   try {
-    modules::loader::instance().unload();
+    broker::loader::instance().unload();
     log_debug_info(DEBUGL_EVENTBROKER, 0, "unload all modules success.\n");
   }
   catch (...) {
@@ -97,10 +97,10 @@ int neb_free_module_list(void) {
 /* load all modules */
 int neb_load_all_modules(void) {
   try {
-    modules::loader& loader = modules::loader::instance();
-    QMultiHash<QString, modules::handle>& modules = loader.get_modules();
+    broker::loader& loader = broker::loader::instance();
+    QMultiHash<QString, broker::handle>& modules = loader.get_modules();
 
-    for (QMultiHash<QString, modules::handle>::iterator it = modules.begin(), end = modules.end();
+    for (QMultiHash<QString, broker::handle>::iterator it = modules.begin(), end = modules.end();
 	 it != end;
 	 ++it) {
       neb_load_module(&it.value());
@@ -118,7 +118,7 @@ int neb_load_module(void* mod) {
   if (mod == NULL)
     return (ERROR);
 
-  modules::handle* module = static_cast<modules::handle*>(mod);
+  broker::handle* module = static_cast<broker::handle*>(mod);
 
   /* don't reopen the module */
   if (module->is_loaded() == true)
@@ -149,10 +149,10 @@ int neb_load_module(void* mod) {
 /* close (unload) all modules that are currently loaded */
 int neb_unload_all_modules(int flags, int reason) {
   try {
-    modules::loader& loader = modules::loader::instance();
-    QMultiHash<QString, modules::handle>& modules = loader.get_modules();
+    broker::loader& loader = broker::loader::instance();
+    QMultiHash<QString, broker::handle>& modules = loader.get_modules();
 
-    for (QMultiHash<QString, modules::handle>::iterator it = modules.begin(), end = modules.end();
+    for (QMultiHash<QString, broker::handle>::iterator it = modules.begin(), end = modules.end();
 	 it != end;
 	 ++it) {
       neb_unload_module(&it.value(), flags, reason);
@@ -174,7 +174,7 @@ int neb_unload_module(void* mod, int flags, int reason) {
   if (mod == NULL)
     return (ERROR);
 
-  modules::handle* module = static_cast<modules::handle*>(mod);
+  broker::handle* module = static_cast<broker::handle*>(mod);
 
   if (module->is_loaded() == false)
     return (OK);
@@ -215,9 +215,9 @@ int neb_set_module_info(void* handle, int type, char* data) {
     return (NEBERROR_MODINFOBOUNDS);
 
   try {
-    modules::handle* module = static_cast<modules::handle*>(handle);
-    modules::loader& loader = modules::loader::instance();
-    QMultiHash<QString, modules::handle> const& modules = loader.get_modules();
+    broker::handle* module = static_cast<broker::handle*>(handle);
+    broker::loader& loader = broker::loader::instance();
+    QMultiHash<QString, broker::handle> const& modules = loader.get_modules();
 
     /* find the module */
     if (modules.find(module->get_filename(), *module) == modules.end()) {
@@ -294,9 +294,9 @@ int neb_register_callback(int callback_type,
   }
 
   try {
-    modules::handle* module = static_cast<modules::handle*>(mod_handle);
-    modules::loader& loader = modules::loader::instance();
-    QMultiHash<QString, modules::handle> const& modules = loader.get_modules();
+    broker::handle* module = static_cast<broker::handle*>(mod_handle);
+    broker::loader& loader = broker::loader::instance();
+    QMultiHash<QString, broker::handle> const& modules = loader.get_modules();
 
     /* make sure module handle is valid */
     if (modules.find(module->get_filename(), *module) == modules.end()) {

@@ -23,12 +23,12 @@
 # include <QObject>
 # include <QString>
 # include <QMultiHash>
-# include "modules/handle.hh"
+# include "broker/handle.hh"
 
 namespace                             com {
   namespace                           centreon {
     namespace                         engine {
-      namespace                       modules {
+      namespace                       broker {
 	/**
 	 *  @class loader loader.hh
 	 *  @brief Modules loader.
