@@ -1,6 +1,6 @@
 # Project properties.
 PROJECT_NAME           = "Centreon Engine"
-PROJECT_NUMBER         = 0.9.0
+PROJECT_NUMBER         = 1.1.0
 
 # Build properties.
 INPUT                  = ../../doc/about.dox                   \
@@ -9,6 +9,7 @@ INPUT                  = ../../doc/about.dox                   \
                          ../../doc/quickstart.dox              \
                          ../../doc/compiling.dox               \
                          ../../doc/monitoring.dox              \
+                         ../../doc/migrating.dox               \
                          ../../doc/config.dox                  \
                          ../../doc/configmain.dox              \
                          ../../doc/configobject.dox            \
