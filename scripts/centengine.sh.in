@@ -6,7 +6,7 @@
 # Required-Stop:
 # Default-Start: 2 3 4 5
 # Default-Stop: 0 6
-# Short-Description: Start and stop the centengine
+# Short-Description: Start and stop Centreon Engine
 ### END INIT INFO
 
 prefix=@localstatedir@

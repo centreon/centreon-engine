@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<webservice>
+  <host>localhost</host>
+  <port>80</port>
+  <recv_timeout>5</recv_timeout>
+  <send_timeout>5</send_timeout>
+  <accept_timeout>500</accept_timeout>
+
+  <ssl>
+    <enable>true</enable>
+    <keyfile>keyfile</keyfile>
+    <cacert>certif</cacert>
+    <dh>dhfile</dh>
+    <password>password</password>
+  </ssl>
+</webservice>
