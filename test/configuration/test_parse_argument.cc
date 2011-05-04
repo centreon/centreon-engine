@@ -28,8 +28,14 @@ using namespace com::centreon::engine;
  *  Check parse with directory.
  */
 void check_directory() {
-  configuration::state config;
-  config.parse("./");
+  try {
+    configuration::state config;
+    config.parse("./");
+  }
+  catch (std::exception const& e) {
+    (void)e;
+  }
+  throw (engine_error() << "configure::parse didn't failed.");
 }
 
 /**

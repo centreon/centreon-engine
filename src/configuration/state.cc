@@ -281,7 +281,7 @@ void state::parse(QString const& filename)
 
   _filename = filename;
   _command_check_interval_is_seconds = false;
-  for (_cur_line = 1; !ifs.good(); ++_cur_line) {
+  for (_cur_line = 1; ifs.good(); ++_cur_line) {
       std::string line = _getline(ifs);
       if (line == "" || line[0] == '#') {
       	continue;
@@ -316,6 +316,10 @@ void state::parse(QString const& filename)
       }
   }
   ifs.close();
+
+  if (!ifs.good() && !ifs.eof()) {
+    throw (engine_error() << filename << " parsing failed.");
+  }
 
   if (_tab_string[log_file] == "") {
     throw (engine_error() << "log_file is not specified anywhere in `" << _filename << "'");
