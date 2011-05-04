@@ -9,6 +9,7 @@ INPUT                  = ../../doc/about.dox                   \
                          ../../doc/quickstart.dox              \
                          ../../doc/compiling.dox               \
                          ../../doc/monitoring.dox              \
+                         ../../doc/migrating.dox               \
                          ../../doc/config.dox                  \
                          ../../doc/configmain.dox              \
                          ../../doc/configobject.dox            \
