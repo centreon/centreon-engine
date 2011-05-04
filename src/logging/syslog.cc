@@ -57,9 +57,11 @@ com::centreon::engine::logging::syslog& syslog::instance() {
  *                      program is logging the message.
  */
 void syslog::set_facility(int facility) throw() {
+  _mutex.lock();
   _facility = facility;
   closelog();
   openlog("centreon-engine", LOG_ODELAY, _facility);
+  _mutex.unlock();
 }
 
 /**
@@ -75,5 +77,7 @@ void syslog::log(char const* message,
   (void)type;
   (void)verbosity;
 
+  _mutex.lock();
   ::syslog(_facility | LOG_INFO, "%s", message);
+  _mutex.unlock();
 }

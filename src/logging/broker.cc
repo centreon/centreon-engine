@@ -18,6 +18,7 @@
 */
 
 #include <string.h>
+
 #include "broker.hh"
 #include "logging/object.hh"
 #include "logging/broker.hh"
@@ -33,7 +34,8 @@ using namespace com::centreon::engine::logging;
 /**
  *  Default constructor.
  */
-broker::broker() {
+broker::broker()
+  : _mutex(QMutex::Recursive), _thread(NULL) {
 
 }
 
@@ -49,7 +51,7 @@ broker::~broker() throw() {
  *
  *  @param[in] message   Message to log.
  *  @param[in] type      Logging types.
- *  @param[in] verbosity Verbosity level.
+ *  @param[in] verbosity Unused.
  */
 void broker::log(char const* message,
 	  unsigned long long type,
@@ -57,17 +59,23 @@ void broker::log(char const* message,
   (void)verbosity;
 
   if ((type & object::dbg_all) == 0) {
-    char* copy = new char[strlen(message) + 1];
-    strcpy(copy, message);
+    _mutex.lock();
+    if (_thread != QThread::currentThread()) {
+      _thread = QThread::currentThread();
+      char* copy = new char[strlen(message) + 1];
+      strcpy(copy, message);
 
-    broker_log_data(NEBTYPE_LOG_DATA,
-		    NEBFLAG_NONE,
-		    NEBATTR_NONE,
-		    copy,
-		    type,
-		    time(NULL),
-		    NULL);
+      broker_log_data(NEBTYPE_LOG_DATA,
+		      NEBFLAG_NONE,
+		      NEBATTR_NONE,
+		      copy,
+		      type,
+		      time(NULL),
+		      NULL);
 
-    delete[] copy;
+      delete[] copy;
+      _thread = NULL;
+    }
+    _mutex.lock();
   }
 }

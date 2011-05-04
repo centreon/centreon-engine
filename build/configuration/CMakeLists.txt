@@ -20,6 +20,7 @@
 # Set directories.
 set(MY_SRC_DIR "${SRC_DIR}/configuration")
 set(MY_INC_DIR "${INCLUDE_DIR}/configuration")
+set(MY_TEST_DIR "${TEST_DIR}/configuration")
 
 # cce_configuration target.
 add_library("cce_configuration"
@@ -37,7 +38,7 @@ target_link_libraries("cce_configuration" ${QT_LIBRARIES})
 
 # Test target.
 add_executable("test_configuration"
-  "${TEST_DIR}/test_configuration.cc"
+  "${MY_TEST_DIR}/test_configuration.cc"
   "${SRC_DIR}/globals.cc"
   "${SRC_DIR}/error.cc"
   "${SRC_DIR}/configuration/state.cc")

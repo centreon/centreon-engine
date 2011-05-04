@@ -95,14 +95,14 @@ namespace                 com {
 	    most  = 2u
 	  };
 
-	  virtual         ~object() throw() = 0;
+	  virtual         ~object() = 0;
 
 	  virtual void    log(char const* message,
 			      unsigned long long type,
 			      unsigned int verbosity) throw() = 0;
 	};
 
-	inline object::~object() throw() {}
+	inline object::~object() {}
       }
     }
   }

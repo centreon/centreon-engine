@@ -23,6 +23,8 @@
 # include <sstream>
 # include <string>
 
+# include "object.hh"
+
 namespace                    com {
   namespace                  centreon {
     namespace                engine {

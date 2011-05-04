@@ -60,7 +60,7 @@ engine& engine::instance() {
 void engine::log(char const* message,
 		 unsigned long long type,
 		 unsigned int verbosity) throw() {
-  _mutex.lock();
+  _rwlock.lockForRead();
   for (QHash<unsigned long, obj_info>::iterator it = _objects.begin(), end = _objects.end();
        it != end;
        ++it) {
@@ -69,7 +69,7 @@ void engine::log(char const* message,
       info.obj->log(message, type, verbosity);
     }
   }
-  _mutex.unlock();
+  _rwlock.unlock();
 }
 
 /**
@@ -78,10 +78,10 @@ void engine::log(char const* message,
  *  @param[in] info The object logging with type and verbosity.
  */
 unsigned long engine::add_object(obj_info const& info) {
-  _mutex.lock();
+  _rwlock.lockForWrite();
   unsigned int id = ++_id;
   _objects.insert(id, info);
-  _mutex.unlock();
+  _rwlock.unlock();
   return (id);
 }
 
@@ -91,7 +91,7 @@ unsigned long engine::add_object(obj_info const& info) {
  *  @param[in] id The object's id.
  */
 void engine::remove_object(unsigned long id) throw() {
-  _mutex.lock();
+  _rwlock.lockForWrite();
   QHash<unsigned long, obj_info>::iterator it = _objects.find(id);
   if (it != _objects.end()) {
     if (it.key() + 1 == id) {
@@ -99,7 +99,7 @@ void engine::remove_object(unsigned long id) throw() {
     }
     _objects.erase(it);
   }
-  _mutex.unlock();
+  _rwlock.unlock();
 }
 
 /**
@@ -112,14 +112,14 @@ void engine::remove_object(unsigned long id) throw() {
 void engine::update_object(unsigned long id,
 			   unsigned long long type,
 			   unsigned int verbosity) throw() {
-  _mutex.lock();
+  _rwlock.lockForWrite();
   QHash<unsigned long, obj_info>::iterator it = _objects.find(id);
   if (it != _objects.end()) {
     obj_info& info = it.value();
     info.type = type;
     info.verbosity = verbosity;
   }
-  _mutex.unlock();
+  _rwlock.unlock();
 }
 
 /**

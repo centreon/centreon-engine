@@ -20,6 +20,7 @@
 # Set directories.
 set(MY_SRC_DIR "${SRC_DIR}/logging")
 set(MY_INC_DIR "${INCLUDE_DIR}/logging")
+set(MY_TEST_DIR "${TEST_DIR}/logging")
 
 # cce_logging target.
 add_library("cce_logging"
@@ -44,3 +45,59 @@ set(MY_COMPILE_FLAGS "${MY_COMPILE_FLAGS}")
 set_target_properties("cce_logging"
   PROPERTIES COMPILE_FLAGS "${MY_COMPILE_FLAGS}")
 target_link_libraries("cce_logging" ${QT_LIBRARIES})
+
+# Test.
+set(SRC_TEST_COMMON
+  "${MY_TEST_DIR}/common.cc"
+  "${SRC_DIR}/globals.cc"
+  "${SRC_DIR}/error.cc"
+  "${SRC_DIR}/configuration/state.cc"
+  "${MY_SRC_DIR}/logger.cc"
+  "${MY_SRC_DIR}/engine.cc")
+
+# Test engine.
+add_executable("test_logging_engine"
+  "${MY_TEST_DIR}/test_engine.cc"
+  ${SRC_TEST_COMMON})
+target_link_libraries("test_logging_engine"
+  ${QT_LIBRARIES}
+  "m")
+add_test("test_logging_engine"
+  "test_logging_engine")
+
+# Produce moc files.
+qt4_wrap_cpp(QT_MOC_FILES
+  "${INCLUDE_DIR}/broker/loader.hh"
+  "${INCLUDE_DIR}/broker/handle.hh"
+  "${INCLUDE_DIR}/broker/compatibility.hh")
+
+# Test broker.
+add_library("dummymod"
+  "SHARED"
+  "${MY_TEST_DIR}/module_dummy.cc")
+add_executable("test_logging_broker"
+  "${MY_TEST_DIR}/test_broker.cc"
+  "${MY_SRC_DIR}/broker.cc"
+  "${SRC_DIR}/broker.cc"
+  "${SRC_DIR}/nebmods.cc"
+  "${SRC_DIR}/broker/handle.cc"
+  "${SRC_DIR}/broker/loader.cc"
+  "${SRC_DIR}/broker/compatibility.cc"
+  ${SRC_TEST_COMMON}
+  ${QT_MOC_FILES})
+target_link_libraries("test_logging_broker"
+  ${QT_LIBRARIES}
+  "m")
+add_test("test_logging_broker"
+  "test_logging_broker")
+
+# Test file.
+add_executable("test_logging_file"
+  "${MY_TEST_DIR}/test_file.cc"
+  "${MY_SRC_DIR}/file.cc"
+  ${SRC_TEST_COMMON})
+target_link_libraries("test_logging_file"
+  ${QT_LIBRARIES}
+  "m")
+add_test("test_logging_file"
+  "test_logging_file")

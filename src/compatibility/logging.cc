@@ -35,7 +35,7 @@
 // using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;
 
-static const unsigned int    BUFFER_SIZE = 4096;
+static const unsigned int BUFFER_SIZE = 4096;
 
 extern "C" {
   /**

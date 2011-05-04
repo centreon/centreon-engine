@@ -22,7 +22,8 @@
 
 # include <QSharedPointer>
 # include <QHash>
-# include <QMutex>
+# include <QReadWriteLock>
+
 # include "logging/object.hh"
 
 namespace                    com {
@@ -72,7 +73,7 @@ namespace                    com {
 	  engine&            operator=(engine const& right);
 
 	  QHash<unsigned long, obj_info> _objects;
-	  QMutex             _mutex;
+	  QReadWriteLock     _rwlock;
 	  unsigned long      _id;
 	};
       }

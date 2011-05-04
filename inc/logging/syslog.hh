@@ -20,6 +20,7 @@
 #ifndef CCE_LOGGING_SYSLOG_HH
 # define CCE_LOGGING_SYSLOG_HH
 
+# include <QMutex>
 # include "logging/object.hh"
 
 namespace                com {
@@ -48,6 +49,7 @@ namespace                com {
 	                 syslog(syslog const& right);
 	  syslog&        operator=(syslog const& right);
 
+	  QMutex         _mutex;
 	  int            _facility;
 	};
       }

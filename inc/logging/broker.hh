@@ -20,26 +20,33 @@
 #ifndef CCE_LOGGING_BROKER_HH
 # define CCE_LOGGING_BROKER_HH
 
+# include <QMutex>
+# include <QThread>
+
 # include "logging/object.hh"
 
-namespace       com {
-  namespace     centreon {
-    namespace   engine {
-      namespace logging {
+namespace         com {
+  namespace       centreon {
+    namespace     engine {
+      namespace   logging {
 	/**
 	 *  @class broker broker.hh
 	 *  @brief Call broker for all logging message.
 	 *
 	 *  Call broker for all logging message without debug.
 	 */
-	class   broker : public object {
+	class      broker : public object {
 	public:
-	        broker();
-	        ~broker() throw();
+	           broker();
+	           ~broker() throw();
 
-	  void  log(char const* message,
-		    unsigned long long type,
-		    unsigned int verbosity) throw();
+	  void     log(char const* message,
+		       unsigned long long type,
+		       unsigned int verbosity) throw();
+
+	private:
+	  QMutex   _mutex;
+	  QThread* _thread;
 	};
       }
     }

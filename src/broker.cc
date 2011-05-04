@@ -92,7 +92,9 @@ void broker_log_data(int type,
                      struct timeval* timestamp) {
   nebstruct_log_data ds;
 
-  if (!(config.get_event_broker_options() & BROKER_LOGGED_DATA))                                           return;
+  if (!(config.get_event_broker_options() & BROKER_LOGGED_DATA)) {
+    return;
+  }
 
   /* fill struct with relevant data */
   ds.type = type;

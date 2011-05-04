@@ -150,13 +150,39 @@ error& error::operator<<(unsigned int u) throw () {
   return (*this);
 }
 
+/**
+ *  Insertion operator.
+ *
+ *  @param[in] u Long integer to concatenate to error message.
+ *
+ *  @return This object.
+ */
 error& error::operator<<(long l) throw () {
   _insert_with_snprintf(l, "%l%n");
   return (*this);
 }
 
+/**
+ *  Insertion operator.
+ *
+ *  @param[in] u Lon lon integer to concatenate to error message.
+ *
+ *  @return This object.
+ */
 error& error::operator<<(long long ll) throw () {
   _insert_with_snprintf(ll, "%ll%n");
+  return (*this);
+}
+
+/**
+ *  Insertion operator.
+ *
+ *  @param[in] u Unsigned long long integer to concatenate to error message.
+ *
+ *  @return This object.
+ */
+error& error::operator<<(unsigned long long ull) throw () {
+  _insert_with_snprintf(ull, "%llu%n");
   return (*this);
 }
 

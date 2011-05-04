@@ -20,7 +20,9 @@
 #ifndef CCE_LOGGING_STANDARD_HH
 # define CCE_LOGGING_STANDARD_HH
 
+# include <QMutex>
 # include <stdio.h>
+
 # include "object.hh"
 
 namespace           com {
@@ -47,6 +49,7 @@ namespace           com {
 			unsigned int verbosity) throw();
 
 	private:
+	  QMutex    _mutex;
 	  FILE*     _file;
 	};
       }

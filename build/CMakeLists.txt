@@ -663,18 +663,6 @@ install(TARGETS "centenginestats"
   DESTINATION "${bindir}"
   COMPONENT "runtime")
 
-# # Test logging target.
-# add_executable("test_logging"
-#   "${TEST_DIR}/test_logging.cc"
-#   "${SRC_DIR}/globals.cc"
-#   "${SRC_DIR}/error.cc"
-#   "${SRC_DIR}/logging/engine.cc")
-# target_link_libraries("test_configuration"
-#   ${QT_LIBRARIES})
-# add_test("test_configuration_basic"
-#   "test_configuration"
-#   "test.cfg")
-
 # Install header files for devel.
 install(DIRECTORY "${INCLUDE_DIR}/"
   DESTINATION "${localstatedir}/include/centreon-engine/"
