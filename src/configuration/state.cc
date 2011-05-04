@@ -281,7 +281,7 @@ void state::parse(QString const& filename)
 
   _filename = filename;
   _command_check_interval_is_seconds = false;
-  for (_cur_line = 1; !ifs.eof(); ++_cur_line) {
+  for (_cur_line = 1; !ifs.good(); ++_cur_line) {
       std::string line = _getline(ifs);
       if (line == "" || line[0] == '#') {
       	continue;
