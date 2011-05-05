@@ -17,13 +17,14 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <QDebug>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
 #include <limits.h>
-#include <iostream>
 #include <fstream>
 #include <map>
+
 #include "engine.hh"
 #include "globals.hh"
 #include "macros.hh"
@@ -31,56 +32,13 @@
 
 using namespace com::centreon::engine;
 
-extern "C" {
-  /**
-   *  Define Symbole to compile, but unused.
-   */
-  void logit(int data_type, int display, char const* fmt, ...) {
-    (void)data_type; (void)display; (void)fmt;
-  }
-
-  /**
-   *  Define Symbole to compile, but unused.
-   */
-  int set_environment_var(char const* name, char const* value, int set) {
-    (void)name; (void)value; (void)set;
-    return (0);
-  }
-
-  /**
-   *  Define Symbole to compile, but unused.
-   */
-  int neb_add_module(char const* filename, char const* args, int should_be_loaded) {
-    (void)filename; (void)args; (void)should_be_loaded;
-    return (0);
-  }
-
-  /**
-   *  Return the global nacros struct.
-   */
-  nagios_macros* get_global_macros(void) {
-    static nagios_macros global_macros;
-    return (&global_macros);
-  }
-
-  /**
-   *  Duplicate string.
-   *
-   *  @return The duplicate string.
-   */
-  char* my_strdup(char const* str) {
-    char* new_str = new char[strlen(str) + 1];
-    return (strcpy(new_str, str));
-  }
-}
-
 /**
  *  Create a random integer between min and max.
  *
  *  @param[in] min The minimum.
  *  @param[in] max The maximum.
  */
-int my_rand(int min = INT_MIN + 1, int max = INT_MAX - 1) throw() {
+static int my_rand(int min = INT_MIN + 1, int max = INT_MAX - 1) throw() {
   return ((random() % (max - min + 1)) + min);
 }
 
@@ -90,7 +48,7 @@ int my_rand(int min = INT_MIN + 1, int max = INT_MAX - 1) throw() {
  *  @param[in] min The minimum.
  *  @param[in] max The maximum.
  */
-float my_rand(float min, float max) throw() {
+static float my_rand(float min, float max) throw() {
   return ((max - min) * ((float)random() / (float)RAND_MAX) + min);
 }
 
@@ -101,7 +59,7 @@ float my_rand(float min, float max) throw() {
  *
  *  @return The value into string.
  */
-template<class T> QString obj2str(T const& value) {
+template<class T> static QString obj2str(T const& value) {
   std::ostringstream oss;
   oss << value;
   return (oss.str().c_str());
@@ -112,7 +70,7 @@ template<class T> QString obj2str(T const& value) {
  *
  *  @param[in] resource The resource file name.
  */
-void build_resource(QString const& resource) {
+static void build_resource(QString const& resource) {
   std::ofstream ofs(resource.toStdString().c_str());
   for (unsigned int i = 0; i < MAX_USER_MACROS; ++i) {
     if (my_rand(1, 5) == 5) {
@@ -139,7 +97,7 @@ void build_resource(QString const& resource) {
  *
  *  @return The configuration value.
  */
-std::map<QString, QString> build_configuration(QString const& mainconf, QString const& resource) {
+static std::map<QString, QString> build_configuration(QString const& mainconf, QString const& resource) {
   std::map<QString, QString> var;
 
   QString date_format[] = { "us", "euro", "iso8601", "strict-iso8601" };
@@ -660,7 +618,7 @@ int main(void) {
     remove(resource.toStdString().c_str());
   }
   catch (std::exception const& e) {
-    std::cerr << "error: " << e.what() << std::endl;
+    qDebug() << "error: " << e.what();
     return (1);
   }
   return (0);

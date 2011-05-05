@@ -34,26 +34,23 @@ get_property(MY_COMPILE_FLAGS
 set(MY_COMPILE_FLAGS "${MY_COMPILE_FLAGS}")
 set_target_properties("cce_configuration"
   PROPERTIES COMPILE_FLAGS "${MY_COMPILE_FLAGS}")
-target_link_libraries("cce_configuration" ${QT_LIBRARIES})
+target_link_libraries("cce_configuration"
+  ${QT_LIBRARIES}
+  "centenginelib")
 
 # Test configuration.
 add_executable("test_configuration"
-  "${MY_TEST_DIR}/test_configuration.cc"
-  "${SRC_DIR}/globals.cc"
-  "${SRC_DIR}/error.cc"
-  "${SRC_DIR}/configuration/state.cc")
+  "${MY_TEST_DIR}/test_configuration.cc")
 target_link_libraries("test_configuration"
-  ${QT_LIBRARIES})
+  ${QT_LIBRARIES}
+  "centenginelib")
 add_test("test_configuration_basic"
   "test_configuration"
   "test.cfg")
 
 # Test parse argument.
 add_executable("test_configuration_parse_argument"
-  "${MY_TEST_DIR}/test_parse_argument.cc"
-  "${SRC_DIR}/globals.cc"
-  "${SRC_DIR}/error.cc"
-  "${SRC_DIR}/configuration/state.cc")
+  "${MY_TEST_DIR}/test_parse_argument.cc")
 target_link_libraries("test_configuration_parse_argument"
   ${QT_LIBRARIES}
   "centenginelib")

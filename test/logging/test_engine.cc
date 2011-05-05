@@ -17,43 +17,16 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <QDebug>
 #include <exception>
-#include <iostream>
 #include <math.h>
 #include <time.h>
 
-#include "common.hh"
+#include "test.hh"
 #include "logging/engine.hh"
 #include "error.hh"
 
 using namespace com::centreon::engine::logging;
-
-/**
- *  Define Symbole to compile, but unused.
- */
-extern "C" int neb_add_module(char const* filename, char const* args, int should_be_loaded) {
-  (void)filename; (void)args; (void)should_be_loaded;
-  return (0);
-}
-
-/**
- *  Define Symbole to compile, but unused.
- */
-extern "C" void broker_log_data(int type,
-				int flags,
-				int attr,
-				char* data,
-				unsigned long data_type,
-				time_t entry_time,
-				struct timeval* timestamp) {
-  (void)type;
-  (void)flags;
-  (void)attr;
-  (void)data;
-  (void)data_type;
-  (void)entry_time;
-  (void)timestamp;
-}
 
 /**************************************
  *                                     *
@@ -125,11 +98,11 @@ int main(void) {
     }
   }
   catch (std::exception const& e) {
-    std::cerr << "error: " << e.what() << std::endl;
+    qDebug() << "error: " << e.what();
     return (1);
   }
   catch (...) {
-    std::cerr << "error: catch all." << std::endl;
+    qDebug() << "error: catch all.";
     return (1);
   }
   return (0);

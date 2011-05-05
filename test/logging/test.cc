@@ -17,75 +17,18 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <string.h>
-#include <stdio.h>
-
-#include "logging/logger.hh"
 #include "error.hh"
-#include "common.hh"
+#include "test.hh"
 
 using namespace com::centreon::engine::logging;
 
 /**************************************
  *                                     *
- *           Global Objects            *
+ *           Static Objects            *
  *                                     *
  **************************************/
 
-static const unsigned int BUFFER_SIZE = 4096;
-static nagios_macros      global_macros;
-
 unsigned int test::_nb_instance = 0;
-
-extern "C" {
-  /**
-   *  Define Symbole to compile, but unused.
-   */
-  nagios_macros* get_global_macros(void) { return (&global_macros); }
-  char* my_strdup(char const* str) {
-    char* ptr = new char[strlen(str) + 1];
-    return (strcpy(ptr, str));
-  }
-  int set_environment_var(char const* name, char const* value, int set) {
-    (void)name; (void)value; (void)set;
-    return (0);
-  }
-  void logit(int type, int display, char const* fmt, ...) {
-    (void)display;
-    char buffer[BUFFER_SIZE];
-    va_list ap;
-    va_start(ap, fmt);
-    if (vsnprintf(buffer, sizeof(buffer), fmt, ap) > 0) {
-      logger(type, object::basic) << buffer;
-    }
-    va_end(ap);
-  }
-  int log_debug_info(int type, unsigned int verbosity, char const* fmt, ...) {
-    char buffer[BUFFER_SIZE];
-    va_list ap;
-
-    va_start(ap, fmt);
-    if (vsnprintf(buffer, sizeof(buffer), fmt, ap) > 0) {
-      timeval now;
-      if (gettimeofday(&now, NULL) == -1) {
-	now.tv_sec = 0;
-	now.tv_usec = 0;
-      }
-
-      if (verbosity > object::most) {
-	verbosity = object::most;
-      }
-
-      logger(static_cast<unsigned long long>(type) << 32, verbosity)
-	<< "[" << now.tv_sec << "." << now.tv_usec << "] "
-	<< "[" << type << "." << verbosity << "] "
-	<< "[pid=" << getpid() << "] " << buffer;
-    }
-    va_end(ap);
-
-    return (OK);
-  }
-}
 
 /**************************************
  *                                     *

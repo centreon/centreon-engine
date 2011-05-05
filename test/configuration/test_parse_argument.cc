@@ -18,6 +18,7 @@
 */
 
 #include <QDebug>
+#include <QFile>
 #include <exception>
 
 #include "configuration/state.hh"
@@ -27,15 +28,47 @@ using namespace com::centreon::engine;
 /**
  *  Check parse with directory.
  */
-void check_directory() {
+static void check_directory() {
   try {
     configuration::state config;
     config.parse("./");
   }
   catch (std::exception const& e) {
     (void)e;
+    return;
   }
-  throw (engine_error() << "configure::parse didn't failed.");
+  throw (engine_error() << "try to parse directory.");
+}
+
+/**
+ *  Check pase with noexist file.
+ */
+static void check_noexist_file() {
+  try {
+    configuration::state config;
+    config.parse("./test_noexist_file.cfg");
+  }
+  catch (std::exception const& e) {
+    (void)e;
+    return;
+  }
+  throw (engine_error() << "try to parse noexisting file.");
+}
+
+/**
+ *  Check parse with exist file.
+ */
+static void check_exist_file() {
+  QString filename("./test_exist_file.cfg");
+  QFile file(filename);
+  file.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Unbuffered);
+  if (file.error() != QFile::NoError) {
+    throw (engine_error() << filename << ": " << file.errorString());
+  }
+  file.close();
+  configuration::state config;
+  config.parse(filename);
+  file.remove();
 }
 
 /**
@@ -44,6 +77,8 @@ void check_directory() {
 int main(void) {
   try {
     check_directory();
+    check_noexist_file();
+    check_exist_file();
   }
   catch (std::exception const& e) {
     qDebug() << "error: " << e.what();
