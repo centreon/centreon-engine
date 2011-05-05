@@ -159,7 +159,7 @@ void init_timing_loop(void) {
       scheduling_info.total_scheduled_hosts++;
 
       /* this is used later in inter-check delay calculations */
-      scheduling_info.host_check_interval_total += temp_host->check_interval;
+      scheduling_info.host_check_interval_total += static_cast<unsigned long>(temp_host->check_interval);
     }
     else {
       temp_host->should_be_scheduled = FALSE;
