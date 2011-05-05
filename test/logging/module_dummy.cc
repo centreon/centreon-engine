@@ -73,7 +73,8 @@ int callback(int callback_type, void* data) {
     ++index;
   }
 
-  if (neb_log->data_type != (1ull << index++)
+  if (static_cast<unsigned long long>(neb_log->data_type)
+        != (1ull << index++)
       || strcmp(neb_log->data, LOG_MESSAGE)
       || (neb_log->data_type & object::log_all) == 0) {
     qDebug() << "error: bad value in module.";
