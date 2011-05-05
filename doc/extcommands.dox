@@ -16,19 +16,19 @@
  *  @section externalcommandsenablingexternalcommands Enabling External Commands
  *
  *  In order to have Centreon Engine process external commands, make
- *  sure you do the following:
- *  - Enable external command checking with the
- *  @ref mainconfigurationfileoptionsconfigurationfilevariablesexternalcommandcheckoption
- *  "check_external_commands" option.
- *  - Set the frequency of command checks with the
- *  @ref mainconfigurationfileoptionsconfigurationfilevariablesexternalcommandcheckinterval
- *  "command_check_interval" option.
- *  - Specify the location of the command file with the
- *  @ref mainconfigurationfileoptionsconfigurationfilevariablesexternalcommandfile
- *  "command_file" option.
- *  - Setup proper permissions on the directory containing the external
- *  command file, as described in the @link quickstartinstallationguides quickstart
- *  guide @endlink.
+ *  sure you do the following :
+ *    - enable external command checking with the
+ *      @ref mainconfigurationfileoptionsconfigurationfilevariablesexternalcommandcheckoption
+ *      "check_external_commands" option
+ *    - set the frequency of command checks with the
+ *      @ref mainconfigurationfileoptionsconfigurationfilevariablesexternalcommandcheckinterval
+ *      "command_check_interval" option
+ *    - specify the location of the command file with the
+ *      @ref mainconfigurationfileoptionsconfigurationfilevariablesexternalcommandfile
+ *      "command_file" option
+ *    - setup proper permissions on the directory containing the external
+ *      command file, as described in the
+ *      @ref quickstartinstallationguide "quickstart guide"
  *
  *  @section externalcommandswhendoescentenginecheckforexternalcommands When Does Centreon Engine Check For External Commands?
  *

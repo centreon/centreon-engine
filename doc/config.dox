@@ -9,8 +9,8 @@
  *  things work, it'll all be well worth your time. :-)
  *
  *  @note Sample configuration files are installed in the
- *  /usr/local/centengine/etc/ directory when you follow the @link
- *  quickstartinstallationguides quickstart installation guide @endlink.
+ *  /usr/local/centengine/etc/ directory when you follow the
+ *  @ref quickstartinstallationguide "quickstart installation guide".
  *
  *  @image html configoverview.png
  *  @image latex configoverview.eps

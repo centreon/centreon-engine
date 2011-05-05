@@ -276,7 +276,8 @@ int reap_check_results(void) {
 
     /* break out if we've been here too long (max_check_reaper_time seconds) */
     time(&current_time);
-    if ((current_time - reaper_start_time) > config.get_max_check_reaper_time()) {
+    if ((current_time - reaper_start_time)
+        > static_cast<time_t>(config.get_max_check_reaper_time())) {
       log_debug_info(DEBUGL_CHECKS, 0,
                      "Breaking out of check result reaper: max reaper time exceeded\n");
       break;

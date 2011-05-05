@@ -20,6 +20,11 @@
 # Global options.
 cmake_minimum_required(VERSION 2.8)
 project("Centreon Engine" C CXX)
+set(ENGINE_MAJOR 1)
+set(ENGINE_MINOR 0)
+set(ENGINE_PATCH "0beta")
+set(ENGINE_VERSION "${ENGINE_MAJOR}.${ENGINE_MINOR}.${ENGINE_PATCH}")
+add_definitions("-DENGINE_VERSION=\"${ENGINE_VERSION}\"")
 
 # Testing.
 set(PROJECT_SOURCE_DIR "${PROJECT_SOURCE_DIR}/..")
@@ -531,6 +536,12 @@ if (DOCLEAN)
 endif ()
 
 # Configure files.
+configure_file("${PROJECT_SOURCE_DIR}/build/doc/Doxyfile.in"
+  "${PROJECT_SOURCE_DIR}/build/doc/Doxyfile")
+configure_file("${PROJECT_SOURCE_DIR}/build/doc/header.tex.in"
+  "${PROJECT_SOURCE_DIR}/build/doc/header.tex")
+configure_file("${INCLUDE_DIR}/compatibility/common.h.in"
+  "${INCLUDE_DIR}/compatibility/common.h")
 configure_file("${SCRIPT_DIR}/centengine.sh.in"
   "${SCRIPT_DIR}/centengine.sh")
 configure_file("${SCRIPT_DIR}/ubuntu.conf.in"
@@ -685,13 +696,13 @@ add_subdirectory("compatibility")
 # Package.
 set(CPACK_PACKAGE_NAME "Centreon-Engine")
 set(CPACK_PACKAGE_VENDOR "Merethis")
-set(CPACK_PACKAGE_VERSION_MAJOR 1)
-set(CPACK_PACKAGE_VERSION_MINOR 0)
-set(CPACK_PACKAGE_VERSION_PATCH "0beta")
+set(CPACK_PACKAGE_VERSION_MAJOR "${ENGINE_MAJOR}")
+set(CPACK_PACKAGE_VERSION_MINOR "${ENGINE_MINOR}")
+set(CPACK_PACKAGE_VERSION_PATCH "${ENGINE_PATCH}")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY
   "Centreon Engine monitors your IT infrastructure.")
 set(CPACK_PACKAGE_FILE_NAME
-  "centreon-engine-${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}")
+  "centreon-engine-${ENGINE_VERSION}")
 set(CPACK_PACKAGE_INSTALL_DIRECTORY "Centreon-Engine")
 set(CPACK_RESOURCE_FILE_LICENSE "${PROJECT_SOURCE_DIR}/license.txt")
 set(CPACK_PACKAGE_CONTACT "Matthieu Kermagoret <mkermagoret@merethis.com>")

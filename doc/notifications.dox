@@ -62,7 +62,7 @@
  *  out - period. If they are enabled on a program-wide basis, there
  *  are still other tests that must be passed...
  *
- *  @section notificationsserviceandhostfilters Service and Host Filters:
+ *  @section notificationsserviceandhostfilters Service and Host Filters
  *
  *  The first filter for host or service notifications is a check to
  *  see if the host or service is in a period of @link scheduleddowntime
@@ -121,7 +121,7 @@
  *  not it actually is sent to individual contacts is up to another set
  *  of filters...
  *
- *  @section notificationscontactfilters Contact Filters:
+ *  @section notificationscontactfilters Contact Filters
  *
  *  At this point the notification has passed the program mode filter
  *  and all host or service filters and Centreon Engine starts to
@@ -165,8 +165,8 @@
  *  are defined in your @link configurationoverview object definition files
  *  @endlink.
  *
- *  @note If you install Centreon Engine according to the @link
- *  quickstartinstallationguides quickstart guide @endlink, it should be configured
+ *  @note If you install Centreon Engine according to the
+ *  @ref quickstartinstallationguide "quickstart guide", it should be configured
  *  to send email notifications. You can see the email notification
  *  commands that are used by viewing the contents of the following
  *  file: /usr/local/centengine/etc/objects/commands.cfg.

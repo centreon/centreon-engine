@@ -148,10 +148,7 @@
  *  horizon options is to compare how many on-demand checks Centreon
  *  Engine has to actually run versus how may it can use cached
  *  values for. The @link usingthecentenginetatsutility centenginetats
- *  @endlink utility can produce information on cached checks, which
- *  can then be @link graphingperformanceinfowithmrtg graphed with MRTG @endlink.
- *  Example MRTG graphs that show cached vs. actual on-demand checks
- *  are shown to the right.
+ *  @endlink utility can produce information on cached checks.
  *
  *  The monitoring installation which produced the graphs above had:
  *  - A total of 44 hosts, all of which were checked at regular

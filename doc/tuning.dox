@@ -10,15 +10,7 @@
  *  large number (> 1,000) of hosts and services. Here are a few things
  *  to look at for optimizing Centreon Engine...
  *
- *  @section tuningcentengineformaximumperformanceoptimizationtips Optimization Tips:
- *
- *  - Graph performance statistics with MRTG. In order to keep track of
- *  how well your Centreon Engine installation handles load over time
- *  and how your configuration changes affect it, you should be
- *  graphing several important statistics with MRTG. This is really,
- *  really, really useful when it comes to tuning the performance of a
- *  Centreon Engine installation. Really. Information on how to do
- *  this can be found @link graphingperformanceinfowithmrtg here @endlink.
+ *  @section tuningcentengineformaximumperformanceoptimizationtips Optimization Tips
  *
  *  - Use large installation tweaks. Enabling the
  *  @ref mainconfigurationfileoptionsconfigurationfilevariableslargeinstallationtweaksoption
@@ -56,14 +48,11 @@
  *  high of a value can result in large latencies for your host and
  *  service checks. Too low of a value can have the same effect. If
  *  you're experiencing high latencies, adjust this variable and see
- *  what effect it has. Again, you should be @link graphingperformanceinfowithmrtg
- *  graphing statistics @endlink in order to make this determination.
+ *  what effect it has.
  *
  *  - Adjust buffer slots. You may need to adjust the value of the
  *  @ref mainconfigurationfileoptionsconfigurationfilevariablesexternalcommandbufferslots
- *  "external_command_buffer_slots" option. Graphing buffer slot
- *  statistics with @link graphingperformanceinfowithmrtg MRTG @endlink (see above) is
- *  critical in determining what values you should use for this option.
+ *  "external_command_buffer_slots" option.
  *
  *  - Check service latencies to determine best value for maximum
  *  concurrent checks. Centreon Engine can restrict the number of
@@ -183,11 +172,7 @@
  *  you could end up in a situation where the buffers are always full.
  *  This results in child processes (external scripts, NSCA daemon,
  *  etc.) blocking when they attempt to write to the external command
- *  file. I would highly recommend that you graph external command
- *  buffer slot usage using MRTG and the centenginetats utility as
- *  described @link graphingperformanceinfowithmrtg here @endlink, so
- *  you understand the typical external command buffer usage of your
- *  Centreon Engine installation.
+ *  file.
  *
  *  - Optimize hardware for maximum performance. NOTE: Hardware
  *  performance shouldn't be an issue unless: 1) you're monitoring

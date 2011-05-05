@@ -20,7 +20,7 @@
 #include <syslog.h>
 #include "logging/syslog.hh"
 
-using namespace com::centreon::engine::logging;
+using namespace com::centreon::engine;
 
 /**************************************
  *                                     *
@@ -31,22 +31,22 @@ using namespace com::centreon::engine::logging;
 /**
  *  Default constructor.
  */
-syslog::syslog() : _facility(LOG_USER) {
+logging::syslog::syslog() : _facility(LOG_USER) {
   openlog("centreon-engine", LOG_ODELAY, _facility);
 }
 
 /**
  *  Default destructor.
  */
-syslog::~syslog() throw() {
+logging::syslog::~syslog() throw() {
   closelog();
 }
 
 /**
  *  Get instance of syslog singleton.
  */
-com::centreon::engine::logging::syslog& syslog::instance() {
-  static syslog instance;
+logging::syslog& logging::syslog::instance() {
+  static logging::syslog instance;
   return (instance);
 }
 
@@ -56,7 +56,7 @@ com::centreon::engine::logging::syslog& syslog::instance() {
  *  @param[in] facility Used to specify what type of
  *                      program is logging the message.
  */
-void syslog::set_facility(int facility) throw() {
+void logging::syslog::set_facility(int facility) throw() {
   _mutex.lock();
   _facility = facility;
   closelog();
@@ -71,12 +71,11 @@ void syslog::set_facility(int facility) throw() {
  *  @param[in] type      Logging types.
  *  @param[in] verbosity Verbosity level.
  */
-void syslog::log(char const* message,
-		 unsigned long long type,
-		 unsigned int verbosity) throw() {
+void logging::syslog::log(char const* message,
+                          unsigned long long type,
+                          unsigned int verbosity) throw() {
   (void)type;
   (void)verbosity;
-
   _mutex.lock();
   ::syslog(_facility | LOG_INFO, "%s", message);
   _mutex.unlock();

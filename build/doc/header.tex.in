@@ -23,10 +23,10 @@
 \ThisLLCornerWallPaper{1.0}{merethis_frontpage_footer}
 \vspace*{1.5cm}
 \begin{center}
-\mbox{\includegraphics{centreon_logo}}
+\mbox{\includegraphics[width=\linewidth]{centreon_logo}}
 \vspace*{2cm}
 {\fontsize{16}{16} \bf USER MANUAL }\\
-{\large for Centreon Engine 1.0.0 }\\
+{\large for Centreon Engine @ENGINE_VERSION@ }\\
 \vspace*{0.5cm}
 \definecolor{gray}{RGB}{100,100,100}
 {\textcolor{gray}{\large \bf ENGLISH VERSION }}\\
