@@ -109,7 +109,7 @@ void init_timing_loop(void) {
       scheduling_info.total_scheduled_services++;
 
       /* used later in inter-check delay calculations */
-      scheduling_info.service_check_interval_total += temp_service->check_interval;
+      scheduling_info.service_check_interval_total += static_cast<unsigned long>(temp_service->check_interval);
 
       /* calculate rolling average execution time (available from retained state information) */
       scheduling_info.average_service_execution_time =
@@ -1100,7 +1100,8 @@ int event_execution_loop(void) {
                                         (unsigned long)current_time);
 
     /* else if the time advanced over the specified threshold, try and compensate... */
-    else if ((current_time - last_time) >= config.get_time_change_threshold())
+    else if ((current_time - last_time)
+             >= static_cast<time_t>(config.get_time_change_threshold()))
       compensate_for_system_time_change((unsigned long)last_time,
                                         (unsigned long)current_time);
 

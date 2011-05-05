@@ -51,7 +51,8 @@ standard::~standard() throw() {
  *  @param[in] right The class to copy.
  */
 standard::standard(standard const& right)
-  : _file(0) {
+  : object(right),
+    _file(0) {
   operator=(right);
 }
 

@@ -64,7 +64,8 @@ logging::logging(state const& config)
  *  @param[in,out] right The class to copy.
  */
 logging::logging(logging& right)
-  : _debug_limit(0),
+  : base(right),
+    _debug_limit(0),
     _debug_level(0),
     _debug_verbosity(0),
     _stdout_id(0),

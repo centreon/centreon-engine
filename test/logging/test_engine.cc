@@ -60,7 +60,7 @@ int main(void) {
     	if (i == 8) {
     	  continue;
     	}
-    	unsigned long long type = pow(2, i);
+    	unsigned long long type(static_cast<unsigned long long>(pow(2, i)));
     	QSharedPointer<test> obj(new test(LOG_MESSAGE, type, j, j + 1));
     	engine::obj_info info(obj, type, j);
     	id[i + j * NB_LOG_TYPE] = engine.add_object(info);

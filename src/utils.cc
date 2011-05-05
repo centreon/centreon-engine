@@ -2856,7 +2856,7 @@ int dbuf_strcat(dbuf* db, char const* buf) {
   /* we need more memory */
   if (db->allocated_size < new_size) {
 
-    memory_needed = ((ceil(new_size / db->chunk_size) + 1) * db->chunk_size);
+    memory_needed = static_cast<unsigned long>((ceil(new_size / db->chunk_size) + 1) * db->chunk_size);
 
     /* allocate memory to store old and new string */
     db->buf = resize_string(db->buf, memory_needed);

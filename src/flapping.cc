@@ -213,10 +213,11 @@ void check_for_host_flapping(host* hst,
 
   /* period to wait for updating archived state info if we have no state change */
   if (hst->total_services == 0)
-    wait_threshold = hst->notification_interval * config.get_interval_length();
+    wait_threshold = static_cast<unsigned long>(hst->notification_interval * config.get_interval_length());
   else
-    wait_threshold = (hst->total_service_check_interval * config.get_interval_length())
-      / hst->total_services;
+    wait_threshold = static_cast<unsigned long>((hst->total_service_check_interval
+      * config.get_interval_length())
+      / hst->total_services);
 
   update_history = update;
 

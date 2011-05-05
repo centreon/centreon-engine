@@ -2567,7 +2567,8 @@ time_t get_next_host_notification_time(host* hst, time_t offset) {
                  interval_to_use);
 
   /* calculate next notification time */
-  next_notification = offset + (interval_to_use * config.get_interval_length());
+  next_notification = static_cast<time_t>(offset
+    + (interval_to_use * config.get_interval_length()));
 
   return (next_notification);
 }
