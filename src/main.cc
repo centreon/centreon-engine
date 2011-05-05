@@ -199,8 +199,8 @@ int main(int argc, char** argv) {
       if (getcwd(buff, sizeof(buff)) == NULL) {
         char const* msg(strerror(errno));
         logger(object::log_runtime_error, object::basic)
-	  << "failure while retrieving current working directory: "
-	  << msg << "\n";
+          << "failure while retrieving current working directory: "
+          << msg << "\n";
         exit(EXIT_FAILURE);
       }
       buffer.append(buff);
@@ -226,7 +226,7 @@ int main(int argc, char** argv) {
     try {
       // Read main config file.
       logger(object::log_info_message, object::basic)
-	<< "reading main config file\n";
+        << "reading main config file\n";
       config.parse(config_file);
 
       // Read object config files.
@@ -237,25 +237,25 @@ int main(int argc, char** argv) {
     }
     catch(std::exception const &e) {
       logger(object::log_config_error, object::basic)
-	<< "error while processing a config file: " << e.what() << "\n";
+        << "error while processing a config file: " << e.what() << "\n";
       result = ERROR;
     }
 
     // There was a problem reading the config files.
     if (result != OK) {
       logger(object::log_config_error, object::basic)
-	<< "\n    One or more problems occurred while processing the config files.\n\n"
-	<< ERROR_CONFIGURATION;
+        << "\n    One or more problems occurred while processing the config files.\n\n"
+        << ERROR_CONFIGURATION;
     }
     // The config files were okay, so run the pre-flight check.
     else {
       logger(object::log_info_message, object::basic)
-	<< "running pre-flight check on configuration data\n";
+        << "running pre-flight check on configuration data\n";
       result = pre_flight_check();
       if (result != OK) {
-	logger(object::log_config_error, object::basic)
-	  << "\n    One or more problem occurred during the pre-flight check.\n\n"
-	  << ERROR_CONFIGURATION;
+        logger(object::log_config_error, object::basic)
+          << "\n    One or more problem occurred during the pre-flight check.\n\n"
+          << ERROR_CONFIGURATION;
       }
     }
 
@@ -280,15 +280,15 @@ int main(int argc, char** argv) {
       config.parse(config_file);
       apply_log.apply(config);
       engine::instance().add_object(engine::obj_info(QSharedPointer<logging::broker>(new logging::broker),
-						     object::log_all,
-						     object::basic));
+                                                     object::log_all,
+                                                     object::basic));
 
       // Read object config files.
       result = read_all_object_data(config_file);
     }
     catch(std::exception const &e) {
       logger(object::log_config_error, object::basic)
-	<< "error while processing a config file: " << e.what() << "\n";
+        << "error while processing a config file: " << e.what() << "\n";
     }
 
     // Read initial service and host state information.
@@ -299,13 +299,13 @@ int main(int argc, char** argv) {
 
     if (result != OK) {
       logger(object::log_config_error, object::basic)
-	<< "\n    One or more problems occurred while processing the config files.\n\n";
+        << "\n    One or more problems occurred while processing the config files.\n\n";
     }
 
     // Run the pre-flight check to make sure everything looks okay.
     if ((OK == result) && ((result = pre_flight_check()) != OK)) {
       logger(object::log_config_error, object::basic)
-	<< "\n    One or more problems occurred during the pre-flight check.\n\n";
+        << "\n    One or more problems occurred during the pre-flight check.\n\n";
     }
 
     if (OK == result) {
@@ -317,10 +317,10 @@ int main(int argc, char** argv) {
 
       if (precache_objects == TRUE)
         logger(object::log_info_message, object::basic)
-	  << "\n"
-	  << "OBJECT PRECACHING\n"
-	  << "-----------------\n"
-	  << "Object config files were precached.\n";
+          << "\n"
+          << "OBJECT PRECACHING\n"
+          << "-----------------\n"
+          << "Object config files were precached.\n";
     }
 
 #undef TEST_TIMEPERIODS
@@ -358,12 +358,12 @@ int main(int argc, char** argv) {
       // and resource config files).
       try {
         config.parse(config_file);
-	apply_log.apply(config);
+        apply_log.apply(config);
         result = OK;
       }
       catch(std::exception const &e) {
         logger(object::log_config_error, object::basic)
-	  << "error while processing a config file: " << e.what() << "\n";
+          << "error while processing a config file: " << e.what() << "\n";
       }
 
       /* NOTE 11/06/07 EG moved to after we read config files, as user may have overridden timezone offset */
@@ -385,19 +385,20 @@ int main(int argc, char** argv) {
       neb_init_modules();
       neb_init_callback_list();
       try {
-        broker::loader& loader = broker::loader::instance();
+        com::centreon::engine::broker::loader& loader(
+          com::centreon::engine::broker::loader::instance());
         loader.set_directory(config.get_broker_module_directory());
         loader.load();
       }
       catch (std::exception const& e) {
         logger(object::log_info_message, object::basic)
-	  << "Event broker module initialize failed.\n";
+          << "Event broker module initialize failed.\n";
         result = ERROR;
       }
 
       // This must be logged after we read config data, as user may have changed location of main log file.
       logger(object::log_process_info, object::basic)
-	<< "Centreon Engine " << ENGINE_VERSION
+        << "Centreon Engine " << ENGINE_VERSION
         << " starting... (PID=" << getpid() << ")\n";
 
       // Log the local time - may be different than clock time due to timezone offset.
@@ -405,7 +406,7 @@ int main(int argc, char** argv) {
       tm = localtime_r(&now, &tm_s);
       strftime(datestring, sizeof(datestring), "%a %b %d %H:%M:%S %Z %Y", tm);
       logger(object::log_process_info, object::basic)
-	<< "Local time is " << datestring;
+        << "Local time is " << datestring;
 
       // Write log version/info.
       write_log_file_info(NULL);
@@ -425,17 +426,17 @@ int main(int argc, char** argv) {
 
       // There was a problem reading the config files.
       if (result != OK) {
-	logger(object::log_process_info | object::log_runtime_error | object::log_config_error, object::basic)
-	  << "Bailing out due to one or more errors encountered in the configuration files. "
-	  << "Run Centreon Engine from the command line with the -v option to verify your config before restarting. (PID=" << getpid() << ")";
+        logger(object::log_process_info | object::log_runtime_error | object::log_config_error, object::basic)
+          << "Bailing out due to one or more errors encountered in the configuration files. "
+          << "Run Centreon Engine from the command line with the -v option to verify your config before restarting. (PID=" << getpid() << ")";
       }
       else {
         // Run the pre-flight check to make sure everything looks okay.
         if ((result = pre_flight_check()) != OK) {
           logger(object::log_process_info | object::log_runtime_error | object::log_verification_error, object::basic)
-	    << "Bailing out due to errors encountered while running the pre-flight check.  "
-	    << "Run Centreon Engine from the command line with the -v option to verify your config before restarting. (PID=" << getpid() << ")\n";
-	}
+            << "Bailing out due to errors encountered while running the pre-flight check.  "
+            << "Run Centreon Engine from the command line with the -v option to verify your config before restarting. (PID=" << getpid() << ")\n";
+        }
       }
 
       // An error occurred that prevented us from (re)starting.
@@ -493,7 +494,7 @@ int main(int argc, char** argv) {
       if (result != OK) {
 
         logger(object::log_process_info | object::log_runtime_error, object::basic)
-	  << "Bailing out due to errors encountered while trying to initialize the external command file... (PID=" << getpid() << ")\n";
+          << "Bailing out due to errors encountered while trying to initialize the external command file... (PID=" << getpid() << ")\n";
 
         // Send program data to broker.
         broker_program_state(NEBTYPE_PROCESS_SHUTDOWN,
@@ -645,7 +646,7 @@ int main(int argc, char** argv) {
       if (sigshutdown == TRUE) {
         // Log a shutdown message.
         logger(object::log_process_info, object::basic)
-	  << "Successfully shutdown... (PID=" << getpid() << ")\n";
+          << "Successfully shutdown... (PID=" << getpid() << ")\n";
       }
 
       // Clean up after ourselves.
