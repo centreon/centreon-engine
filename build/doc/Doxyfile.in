@@ -1,6 +1,6 @@
 # Project properties.
 PROJECT_NAME           = "Centreon Engine"
-PROJECT_NUMBER         = 1.1.0
+PROJECT_NUMBER         = @ENGINE_VERSION@
 
 # Build properties.
 INPUT                  = ../../doc/about.dox                   \

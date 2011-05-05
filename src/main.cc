@@ -51,6 +51,11 @@
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;
 
+// Engine version if not defined by build system.
+#ifndef ENGINE_VERSION
+# define ENGINE_VERSION "(unknown)"
+#endif /* !ENGINE_VERSION */
+
 // Error message when configuration parsing fail.
 #define ERROR_CONFIGURATION "    Check your configuration file(s) to ensure that they contain valid\n" \
                             "    directives and data defintions. If you are upgrading from a\n" \
@@ -392,7 +397,8 @@ int main(int argc, char** argv) {
 
       // This must be logged after we read config data, as user may have changed location of main log file.
       logger(object::log_process_info, object::basic)
-	<< "Centreon Engine starting... (PID=" << getpid() << ")\n";
+	<< "Centreon Engine " << ENGINE_VERSION
+        << " starting... (PID=" << getpid() << ")\n";
 
       // Log the local time - may be different than clock time due to timezone offset.
       now = time(NULL);
