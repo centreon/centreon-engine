@@ -51,14 +51,22 @@ add_custom_command(OUTPUT
   DEPENDS "${MODULE_DIR}/centreon-engine-ws.hh")
 
 # Find library.
-find_library(GSOAPSSL_LIBRARIES "gsoapssl++")
-if (NOT GSOAPSSL_LIBRARIES)
-  message(FATAL_ERROR "Could not find gSOAP's libgsoapssl++.")
-endif ()
+if (WITH_SSL)
+  find_library(GSOAP_LIBRARIES "gsoapssl++")
+  if (NOT GSOAP_LIBRARIES)
+    message(FATAL_ERROR "Could not find gSOAP's libgsoapssl++.")
+  endif ()
 
-find_library(SSL_LIBRARIES "ssl")
-if (NOT SSL_LIBRARIES)
-  message(FATAL_ERROR "Could not find libssl.")
+  find_library(SSL_LIBRARIES "ssl")
+  if (NOT SSL_LIBRARIES)
+    message(FATAL_ERROR "Could not find libssl.")
+  endif ()
+else ()
+  find_library(GSOAP_LIBRARIES "gsoap++")
+  if (NOT GSOAP_LIBRARIES)
+    message(FATAL_ERROR "Could not find gSOAP's libgsoap++.")
+  endif ()
+  set(SSL_LIBRARIES "")
 endif ()
 
 find_library(CRYPTO_LIBRARIES "crypto")
@@ -80,7 +88,9 @@ qt4_wrap_cpp(QT_WS_MOC_FILES
   "${MODULE_DIR}/webservice.hh")
 
 # Define flags.
-add_definitions(-DWITH_OPENSSL)
+if (WITH_SSL)
+  add_definitions(-DWITH_OPENSSL)
+endif ()
 add_definitions(-DWITH_GZIP)
 
 # centscheduler target.
@@ -106,7 +116,7 @@ endif ()
 set_target_properties("webservice" PROPERTIES
   COMPILE_FLAGS "${MODULE_COMPILE_FLAGS}")
 target_link_libraries("webservice"
-  ${GSOAPSSL_LIBRARIES}
+  ${GSOAP_LIBRARIES}
   ${SSL_LIBRARIES}
   ${CRYPTO_LIBRARIES}
   ${ZLIB_LIBRARIES}

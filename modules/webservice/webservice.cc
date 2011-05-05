@@ -34,6 +34,14 @@ webservice::webservice(configuration const& config)
   : QThread(0),
     _is_end(false),
     _config(config) {
+#ifndef WITH_OPENSSL
+  if (config.get_ssl_enable() == true) {
+    logit(NSLOG_CONFIG_WARNING, false,
+	  "webservice configuration enable ssl but webservice module was "
+	  "compiled without openssl library.");
+  }
+#endif // !WITH_OPENSSL
+
   _init();
 }
 
@@ -73,6 +81,7 @@ void  webservice::run() {
       break;
     }
 
+#ifndef WITH_OPENSSL
     if (_config.get_ssl_enable() == true
 	&& soap_ssl_accept(soap_cpy) != SOAP_OK) {
       char buf_error[1024];
@@ -82,6 +91,7 @@ void  webservice::run() {
 	    buf_error);
       continue;
     }
+#endif // !WITH_OPENSSL
 
     soap_serve(soap_cpy);
 
@@ -94,20 +104,26 @@ void  webservice::run() {
   soap_end(&_soap_ctx);     // clean up and remove deserialized data.
   soap_done(&_soap_ctx);    // detach context (last use and no longer in scope).
 
+#ifdef WITH_OPENSSL
   if (_config.get_ssl_enable() == true) {
     CRYPTO_thread_cleanup();
   }
+#endif // !WITH_OPENSSL
 }
 
 void webservice::_init() {
+#ifdef WITH_OPENSSL
   if (_config.get_ssl_enable() == true) {
     soap_ssl_init();
     if (CRYPTO_thread_setup()) {
       throw (engine_error() << "ssl thread setup failed.");
     }
   }
+#endif // !WITH_OPENSSL
+
   soap_init(&_soap_ctx);
 
+#ifdef WITH_OPENSSL
   if (_config.get_ssl_enable() == true) {
     char const* keyfile = (_config.get_ssl_keyfile() != "" ? _config.get_ssl_keyfile().toStdString().c_str() : NULL);
     char const* cacert = (_config.get_ssl_cacert() != "" ? _config.get_ssl_cacert().toStdString().c_str() : NULL);
@@ -126,6 +142,7 @@ void webservice::_init() {
 	     << _config.get_host() << "' on port `" << _config.get_port() << "' failed.");
     }
   }
+#endif // !WITH_OPENSSL
 
   char const* host = (_config.get_host() != "" ? _config.get_host().toStdString().c_str() : NULL);
   SOAP_SOCKET m_socket = soap_bind(&_soap_ctx,

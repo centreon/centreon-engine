@@ -21,7 +21,9 @@
 #ifndef CCE_MOD_WS_SSL_HH
 # define CCE_MOD_WS_SSL_HH
 
+#  ifdef WITH_OPENSSL
 int CRYPTO_thread_setup();
 void CRYPTO_thread_cleanup();
+# endif // !WITH_OPENSSL
 
 #endif // !CCE_MOD_WS_SSL_HH

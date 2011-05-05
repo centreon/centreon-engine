@@ -40,15 +40,15 @@ namespace                       com {
 	  Q_OBJECT
 
 	public:
-	  webservice(configuration const& config);
-	  ~webservice() throw();
+	                        webservice(configuration const& config);
+	                        ~webservice() throw();
 
 	protected:
 	  void                  run();
 
 	private:
-	  webservice(webservice const& right);
-	  webservice& operator=(webservice const& right);
+	                        webservice(webservice const& right);
+                                webservice& operator=(webservice const& right);
 
 	  void                  _init();
 
