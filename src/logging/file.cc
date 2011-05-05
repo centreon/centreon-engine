@@ -170,7 +170,9 @@ void file::log(char const* message,
   (void)verbosity;
 
   _mutex->lock();
-  if (_size_limit > 0 && _file->size() + strlen(message) >= _size_limit) {
+  if ((_size_limit > 0)
+      && (static_cast<unsigned long long>(_file->size() + strlen(message))
+          >= _size_limit)) {
     QString old_name = _file->fileName();
     QString new_name = old_name + ".old";
 
