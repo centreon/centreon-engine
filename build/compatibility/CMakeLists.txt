@@ -38,7 +38,7 @@ set(MY_COMPILE_FLAGS "${MY_COMPILE_FLAGS}")
 set_target_properties("cce_compatibility"
   PROPERTIES COMPILE_FLAGS "${MY_COMPILE_FLAGS}")
 target_link_libraries("cce_compatibility"
-  "cce_logging")
+  "centenginelib")
 
 # Install header files for devel.
 install(DIRECTORY "${MY_INC_DIR}"

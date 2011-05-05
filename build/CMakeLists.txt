@@ -200,6 +200,7 @@ check_function_exists("perror" HAVE_PERROR)
 check_function_exists("pipe" HAVE_PIPE)
 check_function_exists("poll" HAVE_POLL)
 check_function_exists("popen" HAVE_POPEN)
+check_function_exists("pow" HAVE_POW)
 check_function_exists("printf" HAVE_PRINTF)
 check_function_exists("pthread_cancel" HAVE_PTHREAD_CANCEL)
 check_function_exists("pthread_create" HAVE_PTHREAD_CREATE)
@@ -317,6 +318,7 @@ if (NOT HAVE_ALARM
     OR NOT HAVE_PIPE
     OR NOT HAVE_POLL
     OR NOT HAVE_POPEN
+    OR NOT HAVE_POW
     OR NOT HAVE_PRINTF
     OR NOT HAVE_PTHREAD_CANCEL
     OR NOT HAVE_PTHREAD_CREATE

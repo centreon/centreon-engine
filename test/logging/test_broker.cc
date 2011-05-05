@@ -17,8 +17,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <QDebug>
 #include <exception>
-#include <iostream>
 #include <math.h>
 
 #include "globals.hh"
@@ -84,11 +84,11 @@ int main(void) {
     engine.remove_object(id);
   }
   catch (std::exception const& e) {
-    std::cerr << "error: " << e.what() << std::endl;
+    qDebug() << "error: " << e.what();
     return (1);
   }
   catch (...) {
-    std::cerr << "error: catch all." << std::endl;
+    qDebug() << "error: catch all.";
     return (1);
   }
   return (0);

@@ -274,8 +274,8 @@ void state::reset() {
 void state::parse(QString const& filename)
 {
   std::ifstream ifs;
-  ifs.open(filename.toStdString().c_str());
-  if (ifs.fail()) {
+  ifs.open(filename.toStdString().c_str(), std::ifstream::in);
+  if (ifs.is_open() == false) {
     throw (engine_error() << "cannot open configuration file: `" << filename << "'");
   }
 

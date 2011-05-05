@@ -20,6 +20,7 @@
 # Set directories.
 set(MY_SRC_DIR "${SRC_DIR}/broker")
 set(MY_INC_DIR "${INCLUDE_DIR}/broker")
+set(MY_TEST_DIR "${TEST_DIR}/broker")
 
 # Produce moc files.
 qt4_wrap_cpp(QT_MOC_FILES
@@ -43,4 +44,24 @@ get_property(MY_COMPILE_FLAGS
 set(MY_COMPILE_FLAGS "${MY_COMPILE_FLAGS}")
 set_target_properties("cce_broker"
   PROPERTIES COMPILE_FLAGS "${MY_COMPILE_FLAGS}")
-target_link_libraries("cce_broker" ${QT_LIBRARIES})
+target_link_libraries("cce_broker"
+  ${QT_LIBRARIES}
+  "centenginelib")
+
+# Test loader.
+# add_executable("test_broker_loader"
+#   "${MY_TEST_DIR}/test_loader.cc"
+#   ${QT_MOC_FILES})
+# target_link_libraries("test_broker_loader"
+#   ${QT_LIBRARIES}
+#   "centenginelib")
+# add_test("test_broker_loader"
+#   "test_broker_loader")
+
+# add_executable("test_broker_"
+#   "${MY_TEST_DIR}/test_.cc")
+# target_link_libraries("test_broker_"
+#   ${QT_LIBRARIES}
+#   "centenginelib")
+# add_test("test_broker_"
+#   "test_broker_")

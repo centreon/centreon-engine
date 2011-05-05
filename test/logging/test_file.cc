@@ -17,10 +17,10 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <QDebug>
 #include <QDir>
 #include <QFile>
 #include <exception>
-#include <iostream>
 #include <math.h>
 
 #include "globals.hh"
@@ -32,46 +32,13 @@
 
 using namespace com::centreon::engine::logging;
 
-/**************************************
- *                                     *
- *         Exported Functions          *
- *                                     *
- **************************************/
-
-/**
- *  Define Symbole to compile, but unused.
- */
-extern "C" int neb_add_module(char const* filename, char const* args, int should_be_loaded) {
-  (void)filename; (void)args; (void)should_be_loaded;
-  return (0);
-}
-
-/**
- *  Define Symbole to compile, but unused.
- */
-extern "C" void broker_log_data(int type,
-				int flags,
-				int attr,
-				char* data,
-				unsigned long data_type,
-				time_t entry_time,
-				struct timeval* timestamp) {
-  (void)type;
-  (void)flags;
-  (void)attr;
-  (void)data;
-  (void)data_type;
-  (void)entry_time;
-  (void)timestamp;
-}
-
 /**
  *  Check the file's content.
  *
  *  @param[in] filename The file name.
  *  @param[in] text     The content reference.
  */
-void check_file(QString const& filename, QString const& text) {
+static void check_file(QString const& filename, QString const& text) {
   QFile file(filename);
   file.open(QIODevice::ReadOnly);
   if (file.error() != QFile::NoError) {
@@ -148,11 +115,11 @@ int main(void) {
     }
   }
   catch (std::exception const& e) {
-    std::cerr << "error: " << e.what() << std::endl;
+    qDebug() << "error: " << e.what();
     return (1);
   }
   catch (...) {
-    std::cerr << "error: catch all." << std::endl;
+    qDebug() << "error: catch all.";
     return (1);
   }
   return (0);

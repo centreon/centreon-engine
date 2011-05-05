@@ -17,7 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <iostream>
+#include <QDebug>
 #include <stdlib.h>
 #include <math.h>
 
@@ -77,7 +77,7 @@ int callback(int callback_type, void* data) {
   if (neb_log->data_type != pow(2, index++)
       || strcmp(neb_log->data, LOG_MESSAGE)
       || (neb_log->data_type & object::log_all) == 0) {
-    std::cerr << "error: bad value in module." << std::endl;;
+    qDebug() << "error: bad value in module.";
     exit(1);
   }
 
@@ -153,7 +153,7 @@ extern "C" int nebmodule_init(int flags, char const* args, void* handle) {
 			    handle,
 			    0,
 			    callback) != 0) {
-    std::cerr << "register callback failed." << std::endl;
+    qDebug() << "register callback failed.";
     exit(1);
   }
 

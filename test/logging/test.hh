@@ -20,19 +20,7 @@
 #ifndef TEST_LOGGING_COMMON_HH
 # define TEST_LOGGING_COMMON_HH
 
-# include <string>
-# include <stdarg.h>
-
-# include "macros.hh"
 # include "logging/object.hh"
-
-extern "C" {
-  nagios_macros* get_global_macros(void);
-  int neb_add_module(char const* filename, char const* args, int should_be_loaded);
-  char* my_strdup(char const* str);
-  int set_environment_var(char const* name, char const* value, int set);
-  void logit(int type, int display, char const* fmt, ...);
-}
 
 namespace com {
   namespace centreon {
