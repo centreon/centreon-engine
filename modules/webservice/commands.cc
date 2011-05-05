@@ -70,7 +70,7 @@ extern unsigned long modified_service_process_attributes;
  *  @return SOAP_OK on success.
  */
 int centreonengine__processRestart(soap* s,
-				   centreonengine__processRestartResponse& res) {
+                                   centreonengine__processRestartResponse& res) {
   (void)s;
   (void)res;
 
@@ -83,8 +83,8 @@ int centreonengine__processRestart(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -101,7 +101,7 @@ int centreonengine__processRestart(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__processShutdown(soap* s,
-				    centreonengine__processShutdownResponse& res) {
+                                    centreonengine__processShutdownResponse& res) {
   (void)s;
   (void)res;
 
@@ -114,8 +114,8 @@ int centreonengine__processShutdown(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -132,7 +132,7 @@ int centreonengine__processShutdown(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__stateInformationLoad(soap* s,
-					 centreonengine__stateInformationLoadResponse& res) {
+                                         centreonengine__stateInformationLoadResponse& res) {
   (void)s;
   (void)res;
 
@@ -144,8 +144,8 @@ int centreonengine__stateInformationLoad(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -162,7 +162,7 @@ int centreonengine__stateInformationLoad(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__stateInformationSave(soap* s,
-					 centreonengine__stateInformationSaveResponse& res) {
+                                         centreonengine__stateInformationSaveResponse& res) {
   (void)s;
   (void)res;
 
@@ -176,8 +176,8 @@ int centreonengine__stateInformationSave(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -194,15 +194,15 @@ int centreonengine__stateInformationSave(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostGetAcknowledgementIsSet(soap* s,
-						ns1__hostIDType* host_id,
-						bool& val) {
+                                                ns1__hostIDType* host_id,
+                                                bool& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   host_id->name.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   host_id->name.c_str());
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -210,9 +210,9 @@ int centreonengine__hostGetAcknowledgementIsSet(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -223,8 +223,8 @@ int centreonengine__hostGetAcknowledgementIsSet(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -241,15 +241,15 @@ int centreonengine__hostGetAcknowledgementIsSet(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostGetAcknowledgementType(soap* s,
-					       ns1__hostIDType* host_id,
-					       unsigned short& val) {
+                                               ns1__hostIDType* host_id,
+                                               unsigned short& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   host_id->name.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   host_id->name.c_str());
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -257,9 +257,9 @@ int centreonengine__hostGetAcknowledgementType(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -270,8 +270,8 @@ int centreonengine__hostGetAcknowledgementType(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -288,15 +288,15 @@ int centreonengine__hostGetAcknowledgementType(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostGetAddress(soap* s,
-				   ns1__hostIDType* host_id,
-				   std::string& val) {
+                                   ns1__hostIDType* host_id,
+                                   std::string& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   host_id->name.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   host_id->name.c_str());
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -304,9 +304,9 @@ int centreonengine__hostGetAddress(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -319,8 +319,8 @@ int centreonengine__hostGetAddress(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -338,19 +338,19 @@ int centreonengine__hostGetAddress(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostSetAddress(soap* s,
-				   ns1__hostIDType* host_id,
-				   std::string address,
-				   centreonengine__hostSetAddressResponse& res) {
+                                   ns1__hostIDType* host_id,
+                                   std::string address,
+                                   centreonengine__hostSetAddressResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s, %s)\n",
-		   __func__,
-		   host_id->name.c_str(),
-		   address.c_str());
+                   "Webservice: %s(%s, %s)\n",
+                   __func__,
+                   host_id->name.c_str(),
+                   address.c_str());
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -358,9 +358,9 @@ int centreonengine__hostSetAddress(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -372,8 +372,8 @@ int centreonengine__hostSetAddress(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -390,15 +390,15 @@ int centreonengine__hostSetAddress(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostGetCheckActiveEnabled(soap* s,
-					      ns1__hostIDType* host_id,
-					      bool& val) {
+                                              ns1__hostIDType* host_id,
+                                              bool& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   host_id->name.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   host_id->name.c_str());
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -406,9 +406,9 @@ int centreonengine__hostGetCheckActiveEnabled(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -419,8 +419,8 @@ int centreonengine__hostGetCheckActiveEnabled(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -437,15 +437,15 @@ int centreonengine__hostGetCheckActiveEnabled(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostGetCheckCommand(soap* s,
-					ns1__hostIDType* host_id,
-					std::string& val) {
+                                        ns1__hostIDType* host_id,
+                                        std::string& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   host_id->name.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   host_id->name.c_str());
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -453,9 +453,9 @@ int centreonengine__hostGetCheckCommand(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -468,8 +468,8 @@ int centreonengine__hostGetCheckCommand(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -486,15 +486,15 @@ int centreonengine__hostGetCheckCommand(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostGetCheckCurrentAttempt(soap* s,
-					       ns1__hostIDType* host_id,
-					       unsigned int& val) {
+                                               ns1__hostIDType* host_id,
+                                               unsigned int& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   host_id->name.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   host_id->name.c_str());
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -502,9 +502,9 @@ int centreonengine__hostGetCheckCurrentAttempt(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -515,8 +515,8 @@ int centreonengine__hostGetCheckCurrentAttempt(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -533,8 +533,8 @@ int centreonengine__hostGetCheckCurrentAttempt(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostGetCheckIntervalNormal(soap* s,
-					       ns1__hostIDType* host_id,
-					       unsigned int& val) {
+                                               ns1__hostIDType* host_id,
+                                               unsigned int& val) {
   try {
     syncro::instance().waiting_callback();
 
@@ -544,9 +544,9 @@ int centreonengine__hostGetCheckIntervalNormal(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -557,8 +557,8 @@ int centreonengine__hostGetCheckIntervalNormal(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -575,15 +575,15 @@ int centreonengine__hostGetCheckIntervalNormal(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostGetCheckIntervalRetry(soap* s,
-					      ns1__hostIDType* host_id,
-					      unsigned int& val) {
+                                              ns1__hostIDType* host_id,
+                                              unsigned int& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   host_id->name.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   host_id->name.c_str());
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -591,9 +591,9 @@ int centreonengine__hostGetCheckIntervalRetry(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -604,8 +604,8 @@ int centreonengine__hostGetCheckIntervalRetry(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -622,8 +622,8 @@ int centreonengine__hostGetCheckIntervalRetry(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostGetCheckLast(soap* s,
-				     ns1__hostIDType* host_id,
-				     unsigned long& val) {
+                                     ns1__hostIDType* host_id,
+                                     unsigned long& val) {
   try {
     syncro::instance().waiting_callback();
 
@@ -633,9 +633,9 @@ int centreonengine__hostGetCheckLast(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -646,8 +646,8 @@ int centreonengine__hostGetCheckLast(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -664,15 +664,15 @@ int centreonengine__hostGetCheckLast(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostGetCheckMaxAttempts(soap* s,
-					    ns1__hostIDType* host_id,
-					    unsigned int& val) {
+                                            ns1__hostIDType* host_id,
+                                            unsigned int& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   host_id->name.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   host_id->name.c_str());
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -680,9 +680,9 @@ int centreonengine__hostGetCheckMaxAttempts(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -693,8 +693,8 @@ int centreonengine__hostGetCheckMaxAttempts(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -711,15 +711,15 @@ int centreonengine__hostGetCheckMaxAttempts(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostGetCheckNext(soap* s,
-				     ns1__hostIDType* host_id,
-				     unsigned long& val) {
+                                     ns1__hostIDType* host_id,
+                                     unsigned long& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   host_id->name.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   host_id->name.c_str());
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -727,9 +727,9 @@ int centreonengine__hostGetCheckNext(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -740,8 +740,8 @@ int centreonengine__hostGetCheckNext(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -758,15 +758,15 @@ int centreonengine__hostGetCheckNext(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostGetCheckOptions(soap* s,
-					ns1__hostIDType* host_id,
-					unsigned int& val) {
+                                        ns1__hostIDType* host_id,
+                                        unsigned int& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   host_id->name.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   host_id->name.c_str());
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -774,9 +774,9 @@ int centreonengine__hostGetCheckOptions(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -787,8 +787,8 @@ int centreonengine__hostGetCheckOptions(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -805,16 +805,16 @@ int centreonengine__hostGetCheckOptions(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostGetCheckPassiveEnabled(soap* s,
-					       ns1__hostIDType* host_id,
-					       bool& val) {
+                                               ns1__hostIDType* host_id,
+                                               bool& val) {
   // XXX: ici
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   host_id->name.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   host_id->name.c_str());
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -822,9 +822,9 @@ int centreonengine__hostGetCheckPassiveEnabled(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -835,8 +835,8 @@ int centreonengine__hostGetCheckPassiveEnabled(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -853,15 +853,15 @@ int centreonengine__hostGetCheckPassiveEnabled(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostGetCheckPeriod(soap* s,
-				       ns1__hostIDType* host_id,
-				       centreonengine__hostGetCheckPeriodResponse& res) {
+                                       ns1__hostIDType* host_id,
+                                       centreonengine__hostGetCheckPeriodResponse& res) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   host_id->name.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   host_id->name.c_str());
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -869,9 +869,9 @@ int centreonengine__hostGetCheckPeriod(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -885,8 +885,8 @@ int centreonengine__hostGetCheckPeriod(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -903,15 +903,15 @@ int centreonengine__hostGetCheckPeriod(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostGetCheckShouldBeScheduled(soap* s,
-						  ns1__hostIDType* host_id,
-						  bool& val) {
+                                                  ns1__hostIDType* host_id,
+                                                  bool& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   host_id->name.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   host_id->name.c_str());
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -919,9 +919,9 @@ int centreonengine__hostGetCheckShouldBeScheduled(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -932,8 +932,8 @@ int centreonengine__hostGetCheckShouldBeScheduled(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -950,15 +950,15 @@ int centreonengine__hostGetCheckShouldBeScheduled(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostGetCheckType(soap* s,
-				     ns1__hostIDType* host_id,
-				     unsigned short& val) {
+                                     ns1__hostIDType* host_id,
+                                     unsigned short& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   host_id->name.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   host_id->name.c_str());
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -966,9 +966,9 @@ int centreonengine__hostGetCheckType(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -979,8 +979,8 @@ int centreonengine__hostGetCheckType(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -998,19 +998,19 @@ int centreonengine__hostGetCheckType(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostSetCheckActiveEnabled(soap* s,
-					      ns1__hostIDType* host_id,
-					      bool enable,
-					      centreonengine__hostSetCheckActiveEnabledResponse& res) {
+                                              ns1__hostIDType* host_id,
+                                              bool enable,
+                                              centreonengine__hostSetCheckActiveEnabledResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s, %d)\n",
-		   __func__,
-		   host_id->name.c_str(),
-		   enable);
+                   "Webservice: %s(%s, %d)\n",
+                   __func__,
+                   host_id->name.c_str(),
+                   enable);
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -1018,9 +1018,9 @@ int centreonengine__hostSetCheckActiveEnabled(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -1031,8 +1031,8 @@ int centreonengine__hostSetCheckActiveEnabled(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -1050,19 +1050,19 @@ int centreonengine__hostSetCheckActiveEnabled(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostSetCheckCommand(soap* s,
-					ns1__hostIDType* host_id,
-					std::string command,
-					centreonengine__hostSetCheckCommandResponse& res) {
+                                        ns1__hostIDType* host_id,
+                                        std::string command,
+                                        centreonengine__hostSetCheckCommandResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s, %s)\n",
-		   __func__,
-		   host_id->name.c_str(),
-		   command.c_str());
+                   "Webservice: %s(%s, %s)\n",
+                   __func__,
+                   host_id->name.c_str(),
+                   command.c_str());
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -1070,9 +1070,9 @@ int centreonengine__hostSetCheckCommand(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -1084,8 +1084,8 @@ int centreonengine__hostSetCheckCommand(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -1103,19 +1103,19 @@ int centreonengine__hostSetCheckCommand(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostSetCheckIntervalNormal(soap* s,
-					       ns1__hostIDType* host_id,
-					       unsigned int interval,
-					       centreonengine__hostSetCheckIntervalNormalResponse& res) {
+                                               ns1__hostIDType* host_id,
+                                               unsigned int interval,
+                                               centreonengine__hostSetCheckIntervalNormalResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s, %u)\n",
-		   __func__,
-		   host_id->name.c_str(),
-		   interval);
+                   "Webservice: %s(%s, %u)\n",
+                   __func__,
+                   host_id->name.c_str(),
+                   interval);
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -1123,9 +1123,9 @@ int centreonengine__hostSetCheckIntervalNormal(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -1136,8 +1136,8 @@ int centreonengine__hostSetCheckIntervalNormal(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -1155,19 +1155,19 @@ int centreonengine__hostSetCheckIntervalNormal(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostSetCheckIntervalRetry(soap* s,
-					      ns1__hostIDType* host_id,
-					      unsigned int interval,
-					      centreonengine__hostSetCheckIntervalRetryResponse& res) {
+                                              ns1__hostIDType* host_id,
+                                              unsigned int interval,
+                                              centreonengine__hostSetCheckIntervalRetryResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s, %u)\n",
-		   __func__,
-		   host_id->name.c_str(),
-		   interval);
+                   "Webservice: %s(%s, %u)\n",
+                   __func__,
+                   host_id->name.c_str(),
+                   interval);
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -1175,9 +1175,9 @@ int centreonengine__hostSetCheckIntervalRetry(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -1188,8 +1188,8 @@ int centreonengine__hostSetCheckIntervalRetry(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -1207,19 +1207,19 @@ int centreonengine__hostSetCheckIntervalRetry(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostSetCheckMaxAttempts(soap* s,
-					    ns1__hostIDType* host_id,
-					    unsigned int attempts,
-					    centreonengine__hostSetCheckMaxAttemptsResponse& res) {
+                                            ns1__hostIDType* host_id,
+                                            unsigned int attempts,
+                                            centreonengine__hostSetCheckMaxAttemptsResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s, %u)\n",
-		   __func__,
-		   host_id->name.c_str(),
-		   attempts);
+                   "Webservice: %s(%s, %u)\n",
+                   __func__,
+                   host_id->name.c_str(),
+                   attempts);
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -1227,9 +1227,9 @@ int centreonengine__hostSetCheckMaxAttempts(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -1240,9 +1240,9 @@ int centreonengine__hostSetCheckMaxAttempts(soap* s,
       *error = "Host `" + host_id->name + "' bad attempts value.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -1253,8 +1253,8 @@ int centreonengine__hostSetCheckMaxAttempts(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -1272,19 +1272,19 @@ int centreonengine__hostSetCheckMaxAttempts(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostSetCheckPassiveEnabled(soap* s,
-					       ns1__hostIDType* host_id,
-					       bool enable,
-					       centreonengine__hostSetCheckPassiveEnabledResponse& res) {
+                                               ns1__hostIDType* host_id,
+                                               bool enable,
+                                               centreonengine__hostSetCheckPassiveEnabledResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s, %d)\n",
-		   __func__,
-		   host_id->name.c_str(),
-		   enable);
+                   "Webservice: %s(%s, %d)\n",
+                   __func__,
+                   host_id->name.c_str(),
+                   enable);
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -1292,9 +1292,9 @@ int centreonengine__hostSetCheckPassiveEnabled(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -1305,8 +1305,8 @@ int centreonengine__hostSetCheckPassiveEnabled(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -1323,15 +1323,15 @@ int centreonengine__hostSetCheckPassiveEnabled(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostGetCircularPathChecked(soap* s,
-					       ns1__hostIDType* host_id,
-					       bool& val) {
+                                               ns1__hostIDType* host_id,
+                                               bool& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   host_id->name.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   host_id->name.c_str());
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -1339,9 +1339,9 @@ int centreonengine__hostGetCircularPathChecked(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -1352,8 +1352,8 @@ int centreonengine__hostGetCircularPathChecked(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -1370,15 +1370,15 @@ int centreonengine__hostGetCircularPathChecked(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostGetCircularPathHas(soap* s,
-					   ns1__hostIDType* host_id,
-					   bool& val) {
+                                           ns1__hostIDType* host_id,
+                                           bool& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   host_id->name.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   host_id->name.c_str());
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -1386,9 +1386,9 @@ int centreonengine__hostGetCircularPathHas(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -1399,8 +1399,8 @@ int centreonengine__hostGetCircularPathHas(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -1417,15 +1417,15 @@ int centreonengine__hostGetCircularPathHas(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostGetDowntimeDepth(soap* s,
-					 ns1__hostIDType* host_id,
-					 unsigned int& val) {
+                                         ns1__hostIDType* host_id,
+                                         unsigned int& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   host_id->name.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   host_id->name.c_str());
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -1433,9 +1433,9 @@ int centreonengine__hostGetDowntimeDepth(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -1446,8 +1446,8 @@ int centreonengine__hostGetDowntimeDepth(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -1464,15 +1464,15 @@ int centreonengine__hostGetDowntimeDepth(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostGetDowntimeFlexPending(soap* s,
-					       ns1__hostIDType* host_id,
-					       bool& val) {
+                                               ns1__hostIDType* host_id,
+                                               bool& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   host_id->name.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   host_id->name.c_str());
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -1480,9 +1480,9 @@ int centreonengine__hostGetDowntimeFlexPending(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -1493,8 +1493,8 @@ int centreonengine__hostGetDowntimeFlexPending(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -1511,15 +1511,15 @@ int centreonengine__hostGetDowntimeFlexPending(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostGetEventHandler(soap* s,
-					ns1__hostIDType* host_id,
-					std::string& val) {
+                                        ns1__hostIDType* host_id,
+                                        std::string& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   host_id->name.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   host_id->name.c_str());
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -1527,9 +1527,9 @@ int centreonengine__hostGetEventHandler(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -1542,8 +1542,8 @@ int centreonengine__hostGetEventHandler(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -1560,15 +1560,15 @@ int centreonengine__hostGetEventHandler(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostGetEventHandlerEnabled(soap* s,
-					       ns1__hostIDType* host_id,
-					       bool& val) {
+                                               ns1__hostIDType* host_id,
+                                               bool& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   host_id->name.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   host_id->name.c_str());
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -1576,9 +1576,9 @@ int centreonengine__hostGetEventHandlerEnabled(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -1589,8 +1589,8 @@ int centreonengine__hostGetEventHandlerEnabled(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -1608,19 +1608,19 @@ int centreonengine__hostGetEventHandlerEnabled(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostSetEventHandler(soap* s,
-					ns1__hostIDType* host_id,
-					std::string event_handler,
-					centreonengine__hostSetEventHandlerResponse& res) {
+                                        ns1__hostIDType* host_id,
+                                        std::string event_handler,
+                                        centreonengine__hostSetEventHandlerResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s, %s)\n",
-		   __func__,
-		   host_id->name.c_str(),
-		   event_handler.c_str());
+                   "Webservice: %s(%s, %s)\n",
+                   __func__,
+                   host_id->name.c_str(),
+                   event_handler.c_str());
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -1628,9 +1628,9 @@ int centreonengine__hostSetEventHandler(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -1642,8 +1642,8 @@ int centreonengine__hostSetEventHandler(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -1661,19 +1661,19 @@ int centreonengine__hostSetEventHandler(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostSetEventHandlerEnabled(soap* s,
-					       ns1__hostIDType* host_id,
-					       bool enable,
-					       centreonengine__hostSetEventHandlerEnabledResponse& res) {
+                                               ns1__hostIDType* host_id,
+                                               bool enable,
+                                               centreonengine__hostSetEventHandlerEnabledResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s, %d)\n",
-		   __func__,
-		   host_id->name.c_str(),
-		   enable);
+                   "Webservice: %s(%s, %d)\n",
+                   __func__,
+                   host_id->name.c_str(),
+                   enable);
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -1681,9 +1681,9 @@ int centreonengine__hostSetEventHandlerEnabled(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -1694,8 +1694,8 @@ int centreonengine__hostSetEventHandlerEnabled(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -1712,15 +1712,15 @@ int centreonengine__hostSetEventHandlerEnabled(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostGetFailurePredictionEnabled(soap* s,
-						    ns1__hostIDType* host_id,
-						    bool& val) {
+                                                    ns1__hostIDType* host_id,
+                                                    bool& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   host_id->name.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   host_id->name.c_str());
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -1728,9 +1728,9 @@ int centreonengine__hostGetFailurePredictionEnabled(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -1741,8 +1741,8 @@ int centreonengine__hostGetFailurePredictionEnabled(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -1759,15 +1759,15 @@ int centreonengine__hostGetFailurePredictionEnabled(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostGetFailurePredictionOptions(soap* s,
-						    ns1__hostIDType* host_id,
-						    std::string& val) {
+                                                    ns1__hostIDType* host_id,
+                                                    std::string& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   host_id->name.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   host_id->name.c_str());
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -1775,9 +1775,9 @@ int centreonengine__hostGetFailurePredictionOptions(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -1790,8 +1790,8 @@ int centreonengine__hostGetFailurePredictionOptions(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -1809,19 +1809,19 @@ int centreonengine__hostGetFailurePredictionOptions(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostSetFailurePredictionEnabled(soap* s,
-						    ns1__hostIDType* host_id,
-						    bool enable,
-						    centreonengine__hostSetFailurePredictionEnabledResponse& res) {
+                                                    ns1__hostIDType* host_id,
+                                                    bool enable,
+                                                    centreonengine__hostSetFailurePredictionEnabledResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s, %d)\n",
-		   __func__,
-		   host_id->name.c_str(),
-		   enable);
+                   "Webservice: %s(%s, %d)\n",
+                   __func__,
+                   host_id->name.c_str(),
+                   enable);
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -1829,9 +1829,9 @@ int centreonengine__hostSetFailurePredictionEnabled(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -1842,8 +1842,8 @@ int centreonengine__hostSetFailurePredictionEnabled(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -1860,15 +1860,15 @@ int centreonengine__hostSetFailurePredictionEnabled(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostGetFlapDetectionCommentID(soap* s,
-						  ns1__hostIDType* host_id,
-						  unsigned int& val) {
+                                                  ns1__hostIDType* host_id,
+                                                  unsigned int& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   host_id->name.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   host_id->name.c_str());
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -1876,9 +1876,9 @@ int centreonengine__hostGetFlapDetectionCommentID(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -1889,8 +1889,8 @@ int centreonengine__hostGetFlapDetectionCommentID(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -1907,15 +1907,15 @@ int centreonengine__hostGetFlapDetectionCommentID(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostGetFlapDetectionEnabled(soap* s,
-						ns1__hostIDType* host_id,
-						bool& val) {
+                                                ns1__hostIDType* host_id,
+                                                bool& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   host_id->name.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   host_id->name.c_str());
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -1923,9 +1923,9 @@ int centreonengine__hostGetFlapDetectionEnabled(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -1936,8 +1936,8 @@ int centreonengine__hostGetFlapDetectionEnabled(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -1954,15 +1954,15 @@ int centreonengine__hostGetFlapDetectionEnabled(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostGetFlapDetectionIsFlapping(soap* s,
-						   ns1__hostIDType* host_id,
-						   bool& val) {
+                                                   ns1__hostIDType* host_id,
+                                                   bool& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   host_id->name.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   host_id->name.c_str());
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -1970,9 +1970,9 @@ int centreonengine__hostGetFlapDetectionIsFlapping(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -1983,8 +1983,8 @@ int centreonengine__hostGetFlapDetectionIsFlapping(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -2001,15 +2001,15 @@ int centreonengine__hostGetFlapDetectionIsFlapping(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostGetFlapDetectionOnDown(soap* s,
-					       ns1__hostIDType* host_id,
-					       bool& val) {
+                                               ns1__hostIDType* host_id,
+                                               bool& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   host_id->name.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   host_id->name.c_str());
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -2017,9 +2017,9 @@ int centreonengine__hostGetFlapDetectionOnDown(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -2030,8 +2030,8 @@ int centreonengine__hostGetFlapDetectionOnDown(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -2048,15 +2048,15 @@ int centreonengine__hostGetFlapDetectionOnDown(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostGetFlapDetectionOnUnreachable(soap* s,
-						      ns1__hostIDType* host_id,
-						      bool& val) {
+                                                      ns1__hostIDType* host_id,
+                                                      bool& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   host_id->name.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   host_id->name.c_str());
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -2064,9 +2064,9 @@ int centreonengine__hostGetFlapDetectionOnUnreachable(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -2077,8 +2077,8 @@ int centreonengine__hostGetFlapDetectionOnUnreachable(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -2095,15 +2095,15 @@ int centreonengine__hostGetFlapDetectionOnUnreachable(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostGetFlapDetectionOnUp(soap* s,
-					     ns1__hostIDType* host_id,
-					     bool& val) {
+                                             ns1__hostIDType* host_id,
+                                             bool& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   host_id->name.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   host_id->name.c_str());
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -2111,9 +2111,9 @@ int centreonengine__hostGetFlapDetectionOnUp(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -2124,8 +2124,8 @@ int centreonengine__hostGetFlapDetectionOnUp(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -2142,15 +2142,15 @@ int centreonengine__hostGetFlapDetectionOnUp(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostGetFlapDetectionStateHistoryLastUpdate(soap* s,
-							       ns1__hostIDType* host_id,
-							       unsigned long& val) {
+                                                               ns1__hostIDType* host_id,
+                                                               unsigned long& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   host_id->name.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   host_id->name.c_str());
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -2158,9 +2158,9 @@ int centreonengine__hostGetFlapDetectionStateHistoryLastUpdate(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -2171,8 +2171,8 @@ int centreonengine__hostGetFlapDetectionStateHistoryLastUpdate(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -2189,15 +2189,15 @@ int centreonengine__hostGetFlapDetectionStateHistoryLastUpdate(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostGetFlapDetectionThresholdHigh(soap* s,
-						      ns1__hostIDType* host_id,
-						      double& val) {
+                                                      ns1__hostIDType* host_id,
+                                                      double& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   host_id->name.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   host_id->name.c_str());
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -2205,9 +2205,9 @@ int centreonengine__hostGetFlapDetectionThresholdHigh(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -2218,8 +2218,8 @@ int centreonengine__hostGetFlapDetectionThresholdHigh(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -2236,15 +2236,15 @@ int centreonengine__hostGetFlapDetectionThresholdHigh(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostGetFlapDetectionThresholdLow(soap* s,
-						     ns1__hostIDType* host_id,
-						     double& val) {
+                                                     ns1__hostIDType* host_id,
+                                                     double& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   host_id->name.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   host_id->name.c_str());
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -2252,9 +2252,9 @@ int centreonengine__hostGetFlapDetectionThresholdLow(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -2265,8 +2265,8 @@ int centreonengine__hostGetFlapDetectionThresholdLow(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -2284,19 +2284,19 @@ int centreonengine__hostGetFlapDetectionThresholdLow(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostSetFlapDetectionEnabled(soap* s,
-						ns1__hostIDType* host_id,
-						bool enable,
-						centreonengine__hostSetFlapDetectionEnabledResponse& res) {
+                                                ns1__hostIDType* host_id,
+                                                bool enable,
+                                                centreonengine__hostSetFlapDetectionEnabledResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s, %d)\n",
-		   __func__,
-		   host_id->name.c_str(),
-		   enable);
+                   "Webservice: %s(%s, %d)\n",
+                   __func__,
+                   host_id->name.c_str(),
+                   enable);
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -2304,9 +2304,9 @@ int centreonengine__hostSetFlapDetectionEnabled(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -2317,8 +2317,8 @@ int centreonengine__hostSetFlapDetectionEnabled(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -2336,19 +2336,19 @@ int centreonengine__hostSetFlapDetectionEnabled(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostSetFlapDetectionOnDown(soap* s,
-					       ns1__hostIDType* host_id,
-					       bool enable,
-					       centreonengine__hostSetFlapDetectionOnDownResponse& res) {
+                                               ns1__hostIDType* host_id,
+                                               bool enable,
+                                               centreonengine__hostSetFlapDetectionOnDownResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s, %d)\n",
-		   __func__,
-		   host_id->name.c_str(),
-		   enable);
+                   "Webservice: %s(%s, %d)\n",
+                   __func__,
+                   host_id->name.c_str(),
+                   enable);
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -2356,9 +2356,9 @@ int centreonengine__hostSetFlapDetectionOnDown(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -2369,8 +2369,8 @@ int centreonengine__hostSetFlapDetectionOnDown(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -2388,19 +2388,19 @@ int centreonengine__hostSetFlapDetectionOnDown(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostSetFlapDetectionOnUnreachable(soap* s,
-						      ns1__hostIDType* host_id,
-						      bool enable,
-						      centreonengine__hostSetFlapDetectionOnUnreachableResponse& res) {
+                                                      ns1__hostIDType* host_id,
+                                                      bool enable,
+                                                      centreonengine__hostSetFlapDetectionOnUnreachableResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s, %d)\n",
-		   __func__,
-		   host_id->name.c_str(),
-		   enable);
+                   "Webservice: %s(%s, %d)\n",
+                   __func__,
+                   host_id->name.c_str(),
+                   enable);
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -2408,9 +2408,9 @@ int centreonengine__hostSetFlapDetectionOnUnreachable(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -2421,8 +2421,8 @@ int centreonengine__hostSetFlapDetectionOnUnreachable(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -2440,19 +2440,19 @@ int centreonengine__hostSetFlapDetectionOnUnreachable(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostSetFlapDetectionOnUp(soap* s,
-					     ns1__hostIDType* host_id,
-					     bool enable,
-					     centreonengine__hostSetFlapDetectionOnUpResponse& res) {
+                                             ns1__hostIDType* host_id,
+                                             bool enable,
+                                             centreonengine__hostSetFlapDetectionOnUpResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s, %d)\n",
-		   __func__,
-		   host_id->name.c_str(),
-		   enable);
+                   "Webservice: %s(%s, %d)\n",
+                   __func__,
+                   host_id->name.c_str(),
+                   enable);
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -2460,9 +2460,9 @@ int centreonengine__hostSetFlapDetectionOnUp(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -2473,8 +2473,8 @@ int centreonengine__hostSetFlapDetectionOnUp(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -2492,19 +2492,19 @@ int centreonengine__hostSetFlapDetectionOnUp(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostSetFlapDetectionThresholdHigh(soap* s,
-						      ns1__hostIDType* host_id,
-						      double threshold,
-						      centreonengine__hostSetFlapDetectionThresholdHighResponse& res) {
+                                                      ns1__hostIDType* host_id,
+                                                      double threshold,
+                                                      centreonengine__hostSetFlapDetectionThresholdHighResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s, %f)\n",
-		   __func__,
-		   host_id->name.c_str(),
-		   threshold);
+                   "Webservice: %s(%s, %f)\n",
+                   __func__,
+                   host_id->name.c_str(),
+                   threshold);
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -2512,9 +2512,9 @@ int centreonengine__hostSetFlapDetectionThresholdHigh(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -2525,8 +2525,8 @@ int centreonengine__hostSetFlapDetectionThresholdHigh(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -2544,19 +2544,19 @@ int centreonengine__hostSetFlapDetectionThresholdHigh(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostSetFlapDetectionThresholdLow(soap* s,
-						     ns1__hostIDType* host_id,
-						     double threshold,
-						     centreonengine__hostSetFlapDetectionThresholdLowResponse& res) {
+                                                     ns1__hostIDType* host_id,
+                                                     double threshold,
+                                                     centreonengine__hostSetFlapDetectionThresholdLowResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s, %f)\n",
-		   __func__,
-		   host_id->name.c_str(),
-		   threshold);
+                   "Webservice: %s(%s, %f)\n",
+                   __func__,
+                   host_id->name.c_str(),
+                   threshold);
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -2564,9 +2564,9 @@ int centreonengine__hostSetFlapDetectionThresholdLow(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -2577,8 +2577,8 @@ int centreonengine__hostSetFlapDetectionThresholdLow(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -2595,15 +2595,15 @@ int centreonengine__hostSetFlapDetectionThresholdLow(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostGetFreshnessCheckEnabled(soap* s,
-						 ns1__hostIDType* host_id,
-						 bool& val) {
+                                                 ns1__hostIDType* host_id,
+                                                 bool& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   host_id->name.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   host_id->name.c_str());
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -2611,9 +2611,9 @@ int centreonengine__hostGetFreshnessCheckEnabled(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -2624,8 +2624,8 @@ int centreonengine__hostGetFreshnessCheckEnabled(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -2642,15 +2642,15 @@ int centreonengine__hostGetFreshnessCheckEnabled(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostGetFreshnessIsActive(soap* s,
-					     ns1__hostIDType* host_id,
-					     bool& val) {
+                                             ns1__hostIDType* host_id,
+                                             bool& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   host_id->name.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   host_id->name.c_str());
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -2658,9 +2658,9 @@ int centreonengine__hostGetFreshnessIsActive(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -2671,8 +2671,8 @@ int centreonengine__hostGetFreshnessIsActive(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -2689,15 +2689,15 @@ int centreonengine__hostGetFreshnessIsActive(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostGetFreshnessThreshold(soap* s,
-					      ns1__hostIDType* host_id,
-					      int& val) {
+                                              ns1__hostIDType* host_id,
+                                              int& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   host_id->name.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   host_id->name.c_str());
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -2705,9 +2705,9 @@ int centreonengine__hostGetFreshnessThreshold(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -2718,8 +2718,8 @@ int centreonengine__hostGetFreshnessThreshold(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -2737,19 +2737,19 @@ int centreonengine__hostGetFreshnessThreshold(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostSetFreshnessCheckEnabled(soap* s,
-						 ns1__hostIDType* host_id,
-						 bool enable,
-						 centreonengine__hostSetFreshnessCheckEnabledResponse& res) {
+                                                 ns1__hostIDType* host_id,
+                                                 bool enable,
+                                                 centreonengine__hostSetFreshnessCheckEnabledResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s, %d)\n",
-		   __func__,
-		   host_id->name.c_str(),
-		   enable);
+                   "Webservice: %s(%s, %d)\n",
+                   __func__,
+                   host_id->name.c_str(),
+                   enable);
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -2757,9 +2757,9 @@ int centreonengine__hostSetFreshnessCheckEnabled(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -2770,8 +2770,8 @@ int centreonengine__hostSetFreshnessCheckEnabled(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -2789,19 +2789,19 @@ int centreonengine__hostSetFreshnessCheckEnabled(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostSetFreshnessThreshold(soap* s,
-					      ns1__hostIDType* host_id,
-					      int threshold,
-					      centreonengine__hostSetFreshnessThresholdResponse& res) {
+                                              ns1__hostIDType* host_id,
+                                              int threshold,
+                                              centreonengine__hostSetFreshnessThresholdResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s, %d)\n",
-		   __func__,
-		   host_id->name.c_str(),
-		   threshold);
+                   "Webservice: %s(%s, %d)\n",
+                   __func__,
+                   host_id->name.c_str(),
+                   threshold);
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -2809,9 +2809,9 @@ int centreonengine__hostSetFreshnessThreshold(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -2822,8 +2822,8 @@ int centreonengine__hostSetFreshnessThreshold(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -2840,15 +2840,15 @@ int centreonengine__hostSetFreshnessThreshold(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostGetModifiedAttributes(soap* s,
-					      ns1__hostIDType* host_id,
-					      unsigned int& val) {
+                                              ns1__hostIDType* host_id,
+                                              unsigned int& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   host_id->name.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   host_id->name.c_str());
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -2856,9 +2856,9 @@ int centreonengine__hostGetModifiedAttributes(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -2869,8 +2869,8 @@ int centreonengine__hostGetModifiedAttributes(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -2887,15 +2887,15 @@ int centreonengine__hostGetModifiedAttributes(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostGetNameAlias(soap* s,
-				     ns1__hostIDType* host_id,
-				     std::string& val) {
+                                     ns1__hostIDType* host_id,
+                                     std::string& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   host_id->name.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   host_id->name.c_str());
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -2903,9 +2903,9 @@ int centreonengine__hostGetNameAlias(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -2918,8 +2918,8 @@ int centreonengine__hostGetNameAlias(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -2936,15 +2936,15 @@ int centreonengine__hostGetNameAlias(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostGetNameDisplay(soap* s,
-				       ns1__hostIDType* host_id,
-				       std::string& val) {
+                                       ns1__hostIDType* host_id,
+                                       std::string& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   host_id->name.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   host_id->name.c_str());
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -2952,9 +2952,9 @@ int centreonengine__hostGetNameDisplay(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -2967,8 +2967,8 @@ int centreonengine__hostGetNameDisplay(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -2986,19 +2986,19 @@ int centreonengine__hostGetNameDisplay(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostSetNameAlias(soap* s,
-				     ns1__hostIDType* host_id,
-				     std::string alias,
-				     centreonengine__hostSetNameAliasResponse& res) {
+                                     ns1__hostIDType* host_id,
+                                     std::string alias,
+                                     centreonengine__hostSetNameAliasResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s, %s)\n",
-		   __func__,
-		   host_id->name.c_str(),
-		   alias.c_str());
+                   "Webservice: %s(%s, %s)\n",
+                   __func__,
+                   host_id->name.c_str(),
+                   alias.c_str());
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -3006,9 +3006,9 @@ int centreonengine__hostSetNameAlias(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -3020,8 +3020,8 @@ int centreonengine__hostSetNameAlias(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -3039,19 +3039,19 @@ int centreonengine__hostSetNameAlias(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostSetNameDisplay(soap* s,
-				       ns1__hostIDType* host_id,
-				       std::string displayname,
-				       centreonengine__hostSetNameDisplayResponse& res) {
+                                       ns1__hostIDType* host_id,
+                                       std::string displayname,
+                                       centreonengine__hostSetNameDisplayResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s, %s)\n",
-		   __func__,
-		   host_id->name.c_str(),
-		   displayname.c_str());
+                   "Webservice: %s(%s, %s)\n",
+                   __func__,
+                   host_id->name.c_str(),
+                   displayname.c_str());
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -3059,9 +3059,9 @@ int centreonengine__hostSetNameDisplay(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -3073,8 +3073,8 @@ int centreonengine__hostSetNameDisplay(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -3091,15 +3091,15 @@ int centreonengine__hostSetNameDisplay(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostGetNotificationsCurrentID(soap* s,
-						  ns1__hostIDType* host_id,
-						  unsigned int& val) {
+                                                  ns1__hostIDType* host_id,
+                                                  unsigned int& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   host_id->name.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   host_id->name.c_str());
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -3107,9 +3107,9 @@ int centreonengine__hostGetNotificationsCurrentID(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
     }
 
@@ -3118,8 +3118,8 @@ int centreonengine__hostGetNotificationsCurrentID(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -3136,15 +3136,15 @@ int centreonengine__hostGetNotificationsCurrentID(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostGetNotificationsCurrentNumber(soap* s,
-						      ns1__hostIDType* host_id,
-						      unsigned int& val) {
+                                                      ns1__hostIDType* host_id,
+                                                      unsigned int& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   host_id->name.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   host_id->name.c_str());
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -3152,9 +3152,9 @@ int centreonengine__hostGetNotificationsCurrentNumber(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -3165,8 +3165,8 @@ int centreonengine__hostGetNotificationsCurrentNumber(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -3183,15 +3183,15 @@ int centreonengine__hostGetNotificationsCurrentNumber(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostGetNotificationsEnabled(soap* s,
-						ns1__hostIDType* host_id,
-						bool& val) {
+                                                ns1__hostIDType* host_id,
+                                                bool& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   host_id->name.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   host_id->name.c_str());
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -3199,9 +3199,9 @@ int centreonengine__hostGetNotificationsEnabled(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -3212,8 +3212,8 @@ int centreonengine__hostGetNotificationsEnabled(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -3230,15 +3230,15 @@ int centreonengine__hostGetNotificationsEnabled(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostGetNotificationsFirstDelay(soap* s,
-						   ns1__hostIDType* host_id,
-						   unsigned int& val) {
+                                                   ns1__hostIDType* host_id,
+                                                   unsigned int& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   host_id->name.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   host_id->name.c_str());
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -3246,9 +3246,9 @@ int centreonengine__hostGetNotificationsFirstDelay(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -3259,8 +3259,8 @@ int centreonengine__hostGetNotificationsFirstDelay(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -3277,15 +3277,15 @@ int centreonengine__hostGetNotificationsFirstDelay(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostGetNotificationsInterval(soap* s,
-						 ns1__hostIDType* host_id,
-						 unsigned int& val) {
+                                                 ns1__hostIDType* host_id,
+                                                 unsigned int& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   host_id->name.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   host_id->name.c_str());
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -3293,9 +3293,9 @@ int centreonengine__hostGetNotificationsInterval(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -3306,8 +3306,8 @@ int centreonengine__hostGetNotificationsInterval(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -3324,15 +3324,15 @@ int centreonengine__hostGetNotificationsInterval(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostGetNotificationsLast(soap* s,
-					     ns1__hostIDType* host_id,
-					     unsigned long& val) {
+                                             ns1__hostIDType* host_id,
+                                             unsigned long& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   host_id->name.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   host_id->name.c_str());
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -3340,9 +3340,9 @@ int centreonengine__hostGetNotificationsLast(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -3353,8 +3353,8 @@ int centreonengine__hostGetNotificationsLast(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -3371,15 +3371,15 @@ int centreonengine__hostGetNotificationsLast(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostGetNotificationsNext(soap* s,
-					     ns1__hostIDType* host_id,
-					     unsigned long& val) {
+                                             ns1__hostIDType* host_id,
+                                             unsigned long& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   host_id->name.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   host_id->name.c_str());
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -3387,9 +3387,9 @@ int centreonengine__hostGetNotificationsNext(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -3400,8 +3400,8 @@ int centreonengine__hostGetNotificationsNext(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -3418,15 +3418,15 @@ int centreonengine__hostGetNotificationsNext(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostGetNotificationsOnDown(soap* s,
-					       ns1__hostIDType* host_id,
-					       bool& val) {
+                                               ns1__hostIDType* host_id,
+                                               bool& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   host_id->name.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   host_id->name.c_str());
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -3434,9 +3434,9 @@ int centreonengine__hostGetNotificationsOnDown(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -3447,8 +3447,8 @@ int centreonengine__hostGetNotificationsOnDown(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -3465,15 +3465,15 @@ int centreonengine__hostGetNotificationsOnDown(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostGetNotificationsOnDowntime(soap* s,
-						   ns1__hostIDType* host_id,
-						   bool& val) {
+                                                   ns1__hostIDType* host_id,
+                                                   bool& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   host_id->name.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   host_id->name.c_str());
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -3481,9 +3481,9 @@ int centreonengine__hostGetNotificationsOnDowntime(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -3494,8 +3494,8 @@ int centreonengine__hostGetNotificationsOnDowntime(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -3512,15 +3512,15 @@ int centreonengine__hostGetNotificationsOnDowntime(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostGetNotificationsOnFlapping(soap* s,
-						   ns1__hostIDType* host_id,
-						   bool& val) {
+                                                   ns1__hostIDType* host_id,
+                                                   bool& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   host_id->name.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   host_id->name.c_str());
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -3528,9 +3528,9 @@ int centreonengine__hostGetNotificationsOnFlapping(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -3541,8 +3541,8 @@ int centreonengine__hostGetNotificationsOnFlapping(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -3559,15 +3559,15 @@ int centreonengine__hostGetNotificationsOnFlapping(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostGetNotificationsOnRecovery(soap* s,
-						   ns1__hostIDType* host_id,
-						   bool& val) {
+                                                   ns1__hostIDType* host_id,
+                                                   bool& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   host_id->name.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   host_id->name.c_str());
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -3575,9 +3575,9 @@ int centreonengine__hostGetNotificationsOnRecovery(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -3588,8 +3588,8 @@ int centreonengine__hostGetNotificationsOnRecovery(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -3606,15 +3606,15 @@ int centreonengine__hostGetNotificationsOnRecovery(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostGetNotificationsOnUnreachable(soap* s,
-						      ns1__hostIDType* host_id,
-						      bool& val) {
+                                                      ns1__hostIDType* host_id,
+                                                      bool& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   host_id->name.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   host_id->name.c_str());
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -3622,9 +3622,9 @@ int centreonengine__hostGetNotificationsOnUnreachable(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -3635,8 +3635,8 @@ int centreonengine__hostGetNotificationsOnUnreachable(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -3653,15 +3653,15 @@ int centreonengine__hostGetNotificationsOnUnreachable(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostGetNotificationsPeriod(soap* s,
-					       ns1__hostIDType* host_id,
-					       centreonengine__hostGetNotificationsPeriodResponse& res) {
+                                               ns1__hostIDType* host_id,
+                                               centreonengine__hostGetNotificationsPeriodResponse& res) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   host_id->name.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   host_id->name.c_str());
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -3669,9 +3669,9 @@ int centreonengine__hostGetNotificationsPeriod(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -3684,8 +3684,8 @@ int centreonengine__hostGetNotificationsPeriod(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -3703,19 +3703,19 @@ int centreonengine__hostGetNotificationsPeriod(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostSetNotificationsEnabled(soap* s,
-						ns1__hostIDType* host_id,
-						bool enable,
-						centreonengine__hostSetNotificationsEnabledResponse& res) {
+                                                ns1__hostIDType* host_id,
+                                                bool enable,
+                                                centreonengine__hostSetNotificationsEnabledResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s, %d)\n",
-		   __func__,
-		   host_id->name.c_str(),
-		   enable);
+                   "Webservice: %s(%s, %d)\n",
+                   __func__,
+                   host_id->name.c_str(),
+                   enable);
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -3723,9 +3723,9 @@ int centreonengine__hostSetNotificationsEnabled(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -3736,8 +3736,8 @@ int centreonengine__hostSetNotificationsEnabled(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -3755,19 +3755,19 @@ int centreonengine__hostSetNotificationsEnabled(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostSetNotificationsFirstDelay(soap* s,
-						   ns1__hostIDType* host_id,
-						   unsigned int delay,
-						   centreonengine__hostSetNotificationsFirstDelayResponse& res) {
+                                                   ns1__hostIDType* host_id,
+                                                   unsigned int delay,
+                                                   centreonengine__hostSetNotificationsFirstDelayResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s, %u)\n",
-		   __func__,
-		   host_id->name.c_str(),
-		   delay);
+                   "Webservice: %s(%s, %u)\n",
+                   __func__,
+                   host_id->name.c_str(),
+                   delay);
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -3775,9 +3775,9 @@ int centreonengine__hostSetNotificationsFirstDelay(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -3788,8 +3788,8 @@ int centreonengine__hostSetNotificationsFirstDelay(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -3807,19 +3807,19 @@ int centreonengine__hostSetNotificationsFirstDelay(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostSetNotificationsInterval(soap* s,
-						 ns1__hostIDType* host_id,
-						 unsigned int interval,
-						 centreonengine__hostSetNotificationsIntervalResponse& res) {
+                                                 ns1__hostIDType* host_id,
+                                                 unsigned int interval,
+                                                 centreonengine__hostSetNotificationsIntervalResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s, %u)\n",
-		   __func__,
-		   host_id->name.c_str(),
-		   interval);
+                   "Webservice: %s(%s, %u)\n",
+                   __func__,
+                   host_id->name.c_str(),
+                   interval);
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -3827,9 +3827,9 @@ int centreonengine__hostSetNotificationsInterval(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -3840,8 +3840,8 @@ int centreonengine__hostSetNotificationsInterval(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -3859,19 +3859,19 @@ int centreonengine__hostSetNotificationsInterval(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostSetNotificationsOnDown(soap* s,
-					       ns1__hostIDType* host_id,
-					       bool enable,
-					       centreonengine__hostSetNotificationsOnDownResponse& res) {
+                                               ns1__hostIDType* host_id,
+                                               bool enable,
+                                               centreonengine__hostSetNotificationsOnDownResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s, %d)\n",
-		   __func__,
-		   host_id->name.c_str(),
-		   enable);
+                   "Webservice: %s(%s, %d)\n",
+                   __func__,
+                   host_id->name.c_str(),
+                   enable);
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -3879,9 +3879,9 @@ int centreonengine__hostSetNotificationsOnDown(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -3892,8 +3892,8 @@ int centreonengine__hostSetNotificationsOnDown(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -3911,19 +3911,19 @@ int centreonengine__hostSetNotificationsOnDown(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostSetNotificationsOnDowntime(soap* s,
-						   ns1__hostIDType* host_id,
-						   bool enable,
-						   centreonengine__hostSetNotificationsOnDowntimeResponse& res) {
+                                                   ns1__hostIDType* host_id,
+                                                   bool enable,
+                                                   centreonengine__hostSetNotificationsOnDowntimeResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s, %d)\n",
-		   __func__,
-		   host_id->name.c_str(),
-		   enable);
+                   "Webservice: %s(%s, %d)\n",
+                   __func__,
+                   host_id->name.c_str(),
+                   enable);
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -3931,9 +3931,9 @@ int centreonengine__hostSetNotificationsOnDowntime(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -3944,8 +3944,8 @@ int centreonengine__hostSetNotificationsOnDowntime(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -3963,19 +3963,19 @@ int centreonengine__hostSetNotificationsOnDowntime(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostSetNotificationsOnFlapping(soap* s,
-						   ns1__hostIDType* host_id,
-						   bool enable,
-						   centreonengine__hostSetNotificationsOnFlappingResponse& res) {
+                                                   ns1__hostIDType* host_id,
+                                                   bool enable,
+                                                   centreonengine__hostSetNotificationsOnFlappingResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s, %d)\n",
-		   __func__,
-		   host_id->name.c_str(),
-		   enable);
+                   "Webservice: %s(%s, %d)\n",
+                   __func__,
+                   host_id->name.c_str(),
+                   enable);
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -3983,9 +3983,9 @@ int centreonengine__hostSetNotificationsOnFlapping(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -3996,8 +3996,8 @@ int centreonengine__hostSetNotificationsOnFlapping(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -4015,19 +4015,19 @@ int centreonengine__hostSetNotificationsOnFlapping(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostSetNotificationsOnRecovery(soap* s,
-						   ns1__hostIDType* host_id,
-						   bool enable,
-						   centreonengine__hostSetNotificationsOnRecoveryResponse& res) {
+                                                   ns1__hostIDType* host_id,
+                                                   bool enable,
+                                                   centreonengine__hostSetNotificationsOnRecoveryResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s, %d)\n",
-		   __func__,
-		   host_id->name.c_str(),
-		   enable);
+                   "Webservice: %s(%s, %d)\n",
+                   __func__,
+                   host_id->name.c_str(),
+                   enable);
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -4035,9 +4035,9 @@ int centreonengine__hostSetNotificationsOnRecovery(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -4048,8 +4048,8 @@ int centreonengine__hostSetNotificationsOnRecovery(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -4067,19 +4067,19 @@ int centreonengine__hostSetNotificationsOnRecovery(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostSetNotificationsOnUnreachable(soap* s,
-						      ns1__hostIDType* host_id,
-						      bool enable,
-						      centreonengine__hostSetNotificationsOnUnreachableResponse& res) {
+                                                      ns1__hostIDType* host_id,
+                                                      bool enable,
+                                                      centreonengine__hostSetNotificationsOnUnreachableResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s, %d)\n",
-		   __func__,
-		   host_id->name.c_str(),
-		   enable);
+                   "Webservice: %s(%s, %d)\n",
+                   __func__,
+                   host_id->name.c_str(),
+                   enable);
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -4087,9 +4087,9 @@ int centreonengine__hostSetNotificationsOnUnreachable(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -4100,8 +4100,8 @@ int centreonengine__hostSetNotificationsOnUnreachable(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -4118,15 +4118,15 @@ int centreonengine__hostSetNotificationsOnUnreachable(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostGetObsessOver(soap* s,
-				      ns1__hostIDType* host_id,
-				      bool& val) {
+                                      ns1__hostIDType* host_id,
+                                      bool& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   host_id->name.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   host_id->name.c_str());
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -4134,9 +4134,9 @@ int centreonengine__hostGetObsessOver(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -4147,8 +4147,8 @@ int centreonengine__hostGetObsessOver(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -4166,19 +4166,19 @@ int centreonengine__hostGetObsessOver(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostSetObsessOver(soap* s,
-				      ns1__hostIDType* host_id,
-				      bool enable,
-				      centreonengine__hostSetObsessOverResponse& res) {
+                                      ns1__hostIDType* host_id,
+                                      bool enable,
+                                      centreonengine__hostSetObsessOverResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s, %d)\n",
-		   __func__,
-		   host_id->name.c_str(),
-		   enable);
+                   "Webservice: %s(%s, %d)\n",
+                   __func__,
+                   host_id->name.c_str(),
+                   enable);
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -4186,9 +4186,9 @@ int centreonengine__hostSetObsessOver(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -4199,8 +4199,8 @@ int centreonengine__hostSetObsessOver(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -4217,15 +4217,15 @@ int centreonengine__hostSetObsessOver(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostGetPerfdataProcessingEnabled(soap* s,
-						     ns1__hostIDType* host_id,
-						     bool& val) {
+                                                     ns1__hostIDType* host_id,
+                                                     bool& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   host_id->name.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   host_id->name.c_str());
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -4233,9 +4233,9 @@ int centreonengine__hostGetPerfdataProcessingEnabled(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -4246,8 +4246,8 @@ int centreonengine__hostGetPerfdataProcessingEnabled(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -4265,19 +4265,19 @@ int centreonengine__hostGetPerfdataProcessingEnabled(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostSetPerfdataProcessingEnabled(soap* s,
-						     ns1__hostIDType* host_id,
-						     bool enable,
-						     centreonengine__hostSetPerfdataProcessingEnabledResponse& res) {
+                                                     ns1__hostIDType* host_id,
+                                                     bool enable,
+                                                     centreonengine__hostSetPerfdataProcessingEnabledResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s, %d)\n",
-		   __func__,
-		   host_id->name.c_str(),
-		   enable);
+                   "Webservice: %s(%s, %d)\n",
+                   __func__,
+                   host_id->name.c_str(),
+                   enable);
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -4285,9 +4285,9 @@ int centreonengine__hostSetPerfdataProcessingEnabled(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -4298,8 +4298,8 @@ int centreonengine__hostSetPerfdataProcessingEnabled(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -4316,15 +4316,15 @@ int centreonengine__hostSetPerfdataProcessingEnabled(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostGetPluginExecutionTime(soap* s,
-					       ns1__hostIDType* host_id,
-					       unsigned int& val) {
+                                               ns1__hostIDType* host_id,
+                                               unsigned int& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   host_id->name.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   host_id->name.c_str());
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -4332,9 +4332,9 @@ int centreonengine__hostGetPluginExecutionTime(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -4345,8 +4345,8 @@ int centreonengine__hostGetPluginExecutionTime(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -4363,15 +4363,15 @@ int centreonengine__hostGetPluginExecutionTime(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostGetPluginIsExecuting(soap* s,
-					     ns1__hostIDType* host_id,
-					     bool& val) {
+                                             ns1__hostIDType* host_id,
+                                             bool& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   host_id->name.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   host_id->name.c_str());
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -4379,9 +4379,9 @@ int centreonengine__hostGetPluginIsExecuting(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -4392,8 +4392,8 @@ int centreonengine__hostGetPluginIsExecuting(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -4410,15 +4410,15 @@ int centreonengine__hostGetPluginIsExecuting(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostGetPluginLatency(soap* s,
-					 ns1__hostIDType* host_id,
-					 double& val) {
+                                         ns1__hostIDType* host_id,
+                                         double& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   host_id->name.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   host_id->name.c_str());
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -4426,9 +4426,9 @@ int centreonengine__hostGetPluginLatency(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -4439,8 +4439,8 @@ int centreonengine__hostGetPluginLatency(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -4457,15 +4457,15 @@ int centreonengine__hostGetPluginLatency(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostGetPluginOutput(soap* s,
-					ns1__hostIDType* host_id,
-					std::string& val) {
+                                        ns1__hostIDType* host_id,
+                                        std::string& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   host_id->name.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   host_id->name.c_str());
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -4473,9 +4473,9 @@ int centreonengine__hostGetPluginOutput(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -4488,8 +4488,8 @@ int centreonengine__hostGetPluginOutput(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -4506,15 +4506,15 @@ int centreonengine__hostGetPluginOutput(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostGetPluginPerfdata(soap* s,
-					  ns1__hostIDType* host_id,
-					  std::string& val) {
+                                          ns1__hostIDType* host_id,
+                                          std::string& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   host_id->name.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   host_id->name.c_str());
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -4522,9 +4522,9 @@ int centreonengine__hostGetPluginPerfdata(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -4537,8 +4537,8 @@ int centreonengine__hostGetPluginPerfdata(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -4555,15 +4555,15 @@ int centreonengine__hostGetPluginPerfdata(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostGetRetainStatusInformation(soap* s,
-						   ns1__hostIDType* host_id,
-						   bool& val) {
+                                                   ns1__hostIDType* host_id,
+                                                   bool& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   host_id->name.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   host_id->name.c_str());
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -4571,9 +4571,9 @@ int centreonengine__hostGetRetainStatusInformation(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -4584,8 +4584,8 @@ int centreonengine__hostGetRetainStatusInformation(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -4602,15 +4602,15 @@ int centreonengine__hostGetRetainStatusInformation(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostGetRetainNonStatusInformation(soap* s,
-						      ns1__hostIDType* host_id,
-						      bool& val) {
+                                                      ns1__hostIDType* host_id,
+                                                      bool& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   host_id->name.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   host_id->name.c_str());
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -4618,9 +4618,9 @@ int centreonengine__hostGetRetainNonStatusInformation(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -4631,8 +4631,8 @@ int centreonengine__hostGetRetainNonStatusInformation(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -4650,19 +4650,19 @@ int centreonengine__hostGetRetainNonStatusInformation(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostSetRetainStatusInformation(soap* s,
-						   ns1__hostIDType* host_id,
-						   bool enable,
-						   centreonengine__hostSetRetainStatusInformationResponse& res) {
+                                                   ns1__hostIDType* host_id,
+                                                   bool enable,
+                                                   centreonengine__hostSetRetainStatusInformationResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s, %d)\n",
-		   __func__,
-		   host_id->name.c_str(),
-		   enable);
+                   "Webservice: %s(%s, %d)\n",
+                   __func__,
+                   host_id->name.c_str(),
+                   enable);
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -4670,9 +4670,9 @@ int centreonengine__hostSetRetainStatusInformation(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -4683,8 +4683,8 @@ int centreonengine__hostSetRetainStatusInformation(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -4702,19 +4702,19 @@ int centreonengine__hostSetRetainStatusInformation(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostSetRetainNonStatusInformation(soap* s,
-						      ns1__hostIDType* host_id,
-						      bool enable,
-						      centreonengine__hostSetRetainNonStatusInformationResponse& res) {
+                                                      ns1__hostIDType* host_id,
+                                                      bool enable,
+                                                      centreonengine__hostSetRetainNonStatusInformationResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s, %d)\n",
-		   __func__,
-		   host_id->name.c_str(),
-		   enable);
+                   "Webservice: %s(%s, %d)\n",
+                   __func__,
+                   host_id->name.c_str(),
+                   enable);
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -4722,9 +4722,9 @@ int centreonengine__hostSetRetainNonStatusInformation(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -4735,8 +4735,8 @@ int centreonengine__hostSetRetainNonStatusInformation(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -4753,15 +4753,15 @@ int centreonengine__hostSetRetainNonStatusInformation(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostGetServicesCount(soap* s,
-					 ns1__hostIDType* host_id,
-					 unsigned int& val) {
+                                         ns1__hostIDType* host_id,
+                                         unsigned int& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   host_id->name.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   host_id->name.c_str());
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -4769,9 +4769,9 @@ int centreonengine__hostGetServicesCount(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -4782,8 +4782,8 @@ int centreonengine__hostGetServicesCount(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -4800,15 +4800,15 @@ int centreonengine__hostGetServicesCount(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostGetServicesTotalCheckInterval(soap* s,
-						      ns1__hostIDType* host_id,
-						      unsigned int& val) {
+                                                      ns1__hostIDType* host_id,
+                                                      unsigned int& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   host_id->name.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   host_id->name.c_str());
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -4816,9 +4816,9 @@ int centreonengine__hostGetServicesTotalCheckInterval(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -4829,8 +4829,8 @@ int centreonengine__hostGetServicesTotalCheckInterval(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -4847,15 +4847,15 @@ int centreonengine__hostGetServicesTotalCheckInterval(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostGetStalkOnDown(soap* s,
-				       ns1__hostIDType* host_id,
-				       bool& val) {
+                                       ns1__hostIDType* host_id,
+                                       bool& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   host_id->name.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   host_id->name.c_str());
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -4863,9 +4863,9 @@ int centreonengine__hostGetStalkOnDown(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -4876,8 +4876,8 @@ int centreonengine__hostGetStalkOnDown(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -4894,15 +4894,15 @@ int centreonengine__hostGetStalkOnDown(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostGetStalkOnUnreachable(soap* s,
-					      ns1__hostIDType* host_id,
-					      bool& val) {
+                                              ns1__hostIDType* host_id,
+                                              bool& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   host_id->name.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   host_id->name.c_str());
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -4910,9 +4910,9 @@ int centreonengine__hostGetStalkOnUnreachable(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -4923,8 +4923,8 @@ int centreonengine__hostGetStalkOnUnreachable(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -4941,15 +4941,15 @@ int centreonengine__hostGetStalkOnUnreachable(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostGetStalkOnUp(soap* s,
-				     ns1__hostIDType* host_id,
-				     bool& val) {
+                                     ns1__hostIDType* host_id,
+                                     bool& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   host_id->name.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   host_id->name.c_str());
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -4957,9 +4957,9 @@ int centreonengine__hostGetStalkOnUp(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -4970,8 +4970,8 @@ int centreonengine__hostGetStalkOnUp(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -4989,19 +4989,19 @@ int centreonengine__hostGetStalkOnUp(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostSetStalkOnDown(soap* s,
-				       ns1__hostIDType* host_id,
-				       bool enable,
-				       centreonengine__hostSetStalkOnDownResponse& res) {
+                                       ns1__hostIDType* host_id,
+                                       bool enable,
+                                       centreonengine__hostSetStalkOnDownResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s, %d)\n",
-		   __func__,
-		   host_id->name.c_str(),
-		   enable);
+                   "Webservice: %s(%s, %d)\n",
+                   __func__,
+                   host_id->name.c_str(),
+                   enable);
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -5009,9 +5009,9 @@ int centreonengine__hostSetStalkOnDown(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -5022,8 +5022,8 @@ int centreonengine__hostSetStalkOnDown(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -5041,19 +5041,19 @@ int centreonengine__hostSetStalkOnDown(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostSetStalkOnUnreachable(soap* s,
-					      ns1__hostIDType* host_id,
-					      bool enable,
-					      centreonengine__hostSetStalkOnUnreachableResponse& res) {
+                                              ns1__hostIDType* host_id,
+                                              bool enable,
+                                              centreonengine__hostSetStalkOnUnreachableResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s, %d)\n",
-		   __func__,
-		   host_id->name.c_str(),
-		   enable);
+                   "Webservice: %s(%s, %d)\n",
+                   __func__,
+                   host_id->name.c_str(),
+                   enable);
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -5061,9 +5061,9 @@ int centreonengine__hostSetStalkOnUnreachable(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -5074,8 +5074,8 @@ int centreonengine__hostSetStalkOnUnreachable(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -5093,19 +5093,19 @@ int centreonengine__hostSetStalkOnUnreachable(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostSetStalkOnUp(soap* s,
-				     ns1__hostIDType* host_id,
-				     bool enable,
-				     centreonengine__hostSetStalkOnUpResponse& res) {
+                                     ns1__hostIDType* host_id,
+                                     bool enable,
+                                     centreonengine__hostSetStalkOnUpResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s, %d)\n",
-		   __func__,
-		   host_id->name.c_str(),
-		   enable);
+                   "Webservice: %s(%s, %d)\n",
+                   __func__,
+                   host_id->name.c_str(),
+                   enable);
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -5113,9 +5113,9 @@ int centreonengine__hostSetStalkOnUp(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -5126,8 +5126,8 @@ int centreonengine__hostSetStalkOnUp(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -5144,15 +5144,15 @@ int centreonengine__hostSetStalkOnUp(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostGetStateCurrent(soap* s,
-					ns1__hostIDType* host_id,
-					unsigned short& val) {
+                                        ns1__hostIDType* host_id,
+                                        unsigned short& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   host_id->name.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   host_id->name.c_str());
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -5160,9 +5160,9 @@ int centreonengine__hostGetStateCurrent(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -5173,8 +5173,8 @@ int centreonengine__hostGetStateCurrent(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -5191,15 +5191,15 @@ int centreonengine__hostGetStateCurrent(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostGetStateInitial(soap* s,
-					ns1__hostIDType* host_id,
-					unsigned short& val) {
+                                        ns1__hostIDType* host_id,
+                                        unsigned short& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   host_id->name.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   host_id->name.c_str());
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -5207,9 +5207,9 @@ int centreonengine__hostGetStateInitial(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -5220,8 +5220,8 @@ int centreonengine__hostGetStateInitial(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -5238,15 +5238,15 @@ int centreonengine__hostGetStateInitial(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostGetStateLast(soap* s,
-				     ns1__hostIDType* host_id,
-				     unsigned short& val) {
+                                     ns1__hostIDType* host_id,
+                                     unsigned short& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   host_id->name.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   host_id->name.c_str());
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -5254,9 +5254,9 @@ int centreonengine__hostGetStateLast(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -5267,8 +5267,8 @@ int centreonengine__hostGetStateLast(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -5285,15 +5285,15 @@ int centreonengine__hostGetStateLast(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostGetStateLastChange(soap* s,
-					   ns1__hostIDType* host_id,
-					   unsigned long& val) {
+                                           ns1__hostIDType* host_id,
+                                           unsigned long& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   host_id->name.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   host_id->name.c_str());
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -5301,9 +5301,9 @@ int centreonengine__hostGetStateLastChange(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -5314,8 +5314,8 @@ int centreonengine__hostGetStateLastChange(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -5332,15 +5332,15 @@ int centreonengine__hostGetStateLastChange(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostGetStateLastDown(soap* s,
-					 ns1__hostIDType* host_id,
-					 unsigned long& val) {
+                                         ns1__hostIDType* host_id,
+                                         unsigned long& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   host_id->name.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   host_id->name.c_str());
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -5348,9 +5348,9 @@ int centreonengine__hostGetStateLastDown(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -5361,8 +5361,8 @@ int centreonengine__hostGetStateLastDown(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -5379,15 +5379,15 @@ int centreonengine__hostGetStateLastDown(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostGetStateLastHard(soap* s,
-					 ns1__hostIDType* host_id,
-					 unsigned long& val) {
+                                         ns1__hostIDType* host_id,
+                                         unsigned long& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   host_id->name.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   host_id->name.c_str());
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -5395,9 +5395,9 @@ int centreonengine__hostGetStateLastHard(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -5408,8 +5408,8 @@ int centreonengine__hostGetStateLastHard(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -5426,15 +5426,15 @@ int centreonengine__hostGetStateLastHard(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostGetStateLastHardChange(soap* s,
-					       ns1__hostIDType* host_id,
-					       unsigned long& val) {
+                                               ns1__hostIDType* host_id,
+                                               unsigned long& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   host_id->name.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   host_id->name.c_str());
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -5442,9 +5442,9 @@ int centreonengine__hostGetStateLastHardChange(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -5455,8 +5455,8 @@ int centreonengine__hostGetStateLastHardChange(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -5473,15 +5473,15 @@ int centreonengine__hostGetStateLastHardChange(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostGetStateLastUnreachable(soap* s,
-						ns1__hostIDType* host_id,
-						unsigned long& val) {
+                                                ns1__hostIDType* host_id,
+                                                unsigned long& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   host_id->name.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   host_id->name.c_str());
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -5489,9 +5489,9 @@ int centreonengine__hostGetStateLastUnreachable(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -5502,8 +5502,8 @@ int centreonengine__hostGetStateLastUnreachable(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -5520,15 +5520,15 @@ int centreonengine__hostGetStateLastUnreachable(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostGetStateLastUp(soap* s,
-				       ns1__hostIDType* host_id,
-				       unsigned long& val) {
+                                       ns1__hostIDType* host_id,
+                                       unsigned long& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   host_id->name.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   host_id->name.c_str());
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -5536,9 +5536,9 @@ int centreonengine__hostGetStateLastUp(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -5549,8 +5549,8 @@ int centreonengine__hostGetStateLastUp(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -5567,15 +5567,15 @@ int centreonengine__hostGetStateLastUp(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostGetStatePercentChange(soap* s,
-					      ns1__hostIDType* host_id,
-					      unsigned long& val) {
+                                              ns1__hostIDType* host_id,
+                                              unsigned long& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   host_id->name.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   host_id->name.c_str());
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -5583,9 +5583,9 @@ int centreonengine__hostGetStatePercentChange(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -5596,8 +5596,8 @@ int centreonengine__hostGetStatePercentChange(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -5614,15 +5614,15 @@ int centreonengine__hostGetStatePercentChange(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostGetStateType(soap* s,
-				     ns1__hostIDType* host_id,
-				     unsigned long& val) {
+                                     ns1__hostIDType* host_id,
+                                     unsigned long& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   host_id->name.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   host_id->name.c_str());
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -5630,9 +5630,9 @@ int centreonengine__hostGetStateType(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -5643,8 +5643,8 @@ int centreonengine__hostGetStateType(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -5662,18 +5662,18 @@ int centreonengine__hostGetStateType(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostSetNotificationsBeyondEnabled(soap* s,
-						      ns1__hostIDType* host_id,
-						      bool enable,
-						      centreonengine__hostSetNotificationsBeyondEnabledResponse& res) {
+                                                      ns1__hostIDType* host_id,
+                                                      bool enable,
+                                                      centreonengine__hostSetNotificationsBeyondEnabledResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   host_id->name.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   host_id->name.c_str());
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -5681,9 +5681,9 @@ int centreonengine__hostSetNotificationsBeyondEnabled(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -5699,8 +5699,8 @@ int centreonengine__hostSetNotificationsBeyondEnabled(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -5718,19 +5718,19 @@ int centreonengine__hostSetNotificationsBeyondEnabled(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostSetNotificationsOnSelfAndChildrenEnabled(soap* s,
-								 ns1__hostIDType* host_id,
-								 bool enable,
-								 centreonengine__hostSetNotificationsOnSelfAndChildrenEnabledResponse& res) {
+                                                                 ns1__hostIDType* host_id,
+                                                                 bool enable,
+                                                                 centreonengine__hostSetNotificationsOnSelfAndChildrenEnabledResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s, %d)\n",
-		   __func__,
-		   host_id->name.c_str(),
-		   enable);
+                   "Webservice: %s(%s, %d)\n",
+                   __func__,
+                   host_id->name.c_str(),
+                   enable);
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -5738,9 +5738,9 @@ int centreonengine__hostSetNotificationsOnSelfAndChildrenEnabled(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -5756,8 +5756,8 @@ int centreonengine__hostSetNotificationsOnSelfAndChildrenEnabled(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -5775,19 +5775,19 @@ int centreonengine__hostSetNotificationsOnSelfAndChildrenEnabled(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostSetNotificationsPeriod(soap* s,
-					       ns1__hostIDType* host_id,
-					       ns1__timeperiodIDType* timeperiod_id,
-					       centreonengine__hostSetNotificationsPeriodResponse& res) {
+                                               ns1__hostIDType* host_id,
+                                               ns1__timeperiodIDType* timeperiod_id,
+                                               centreonengine__hostSetNotificationsPeriodResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s, %s)\n",
-		   __func__,
-		   host_id->name.c_str(),
-		   timeperiod_id->timeperiod.c_str());
+                   "Webservice: %s(%s, %s)\n",
+                   __func__,
+                   host_id->name.c_str(),
+                   timeperiod_id->timeperiod.c_str());
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -5795,9 +5795,9 @@ int centreonengine__hostSetNotificationsPeriod(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -5809,8 +5809,8 @@ int centreonengine__hostSetNotificationsPeriod(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -5827,27 +5827,27 @@ int centreonengine__hostSetNotificationsPeriod(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceGetAcknowledgementIsSet(soap* s,
-						   ns1__serviceIDType* service_id,
-						   bool& val) {
+                                                   ns1__serviceIDType* service_id,
+                                                   bool& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s({ %s, { %s } })\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str());
+                   "Webservice: %s({ %s, { %s } })\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str());
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -5858,8 +5858,8 @@ int centreonengine__serviceGetAcknowledgementIsSet(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -5876,27 +5876,27 @@ int centreonengine__serviceGetAcknowledgementIsSet(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceGetAcknowledgementType(soap* s,
-						  ns1__serviceIDType* service_id,
-						  unsigned short& val) {
+                                                  ns1__serviceIDType* service_id,
+                                                  unsigned short& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s({ %s, { %s } })\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str());
+                   "Webservice: %s({ %s, { %s } })\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str());
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -5907,8 +5907,8 @@ int centreonengine__serviceGetAcknowledgementType(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -5925,27 +5925,27 @@ int centreonengine__serviceGetAcknowledgementType(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceGetCheckActiveEnabled(soap* s,
-						 ns1__serviceIDType* service_id,
-						 bool& val) {
+                                                 ns1__serviceIDType* service_id,
+                                                 bool& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s({ %s, { %s } })\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str());
+                   "Webservice: %s({ %s, { %s } })\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str());
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -5956,8 +5956,8 @@ int centreonengine__serviceGetCheckActiveEnabled(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -5974,27 +5974,27 @@ int centreonengine__serviceGetCheckActiveEnabled(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceGetCheckCommand(soap* s,
-					   ns1__serviceIDType* service_id,
-					   std::string& val) {
+                                           ns1__serviceIDType* service_id,
+                                           std::string& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s({ %s, { %s } })\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str());
+                   "Webservice: %s({ %s, { %s } })\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str());
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -6007,8 +6007,8 @@ int centreonengine__serviceGetCheckCommand(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -6025,27 +6025,27 @@ int centreonengine__serviceGetCheckCommand(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceGetCheckCurrentAttempt(soap* s,
-						  ns1__serviceIDType* service_id,
-						  unsigned int& val) {
+                                                  ns1__serviceIDType* service_id,
+                                                  unsigned int& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s({ %s, { %s } })\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str());
+                   "Webservice: %s({ %s, { %s } })\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str());
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -6056,8 +6056,8 @@ int centreonengine__serviceGetCheckCurrentAttempt(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -6074,27 +6074,27 @@ int centreonengine__serviceGetCheckCurrentAttempt(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceGetCheckIntervalNormal(soap* s,
-						  ns1__serviceIDType* service_id,
-						  unsigned int& val) {
+                                                  ns1__serviceIDType* service_id,
+                                                  unsigned int& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s({ %s, { %s } })\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str());
+                   "Webservice: %s({ %s, { %s } })\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str());
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -6105,8 +6105,8 @@ int centreonengine__serviceGetCheckIntervalNormal(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -6123,27 +6123,27 @@ int centreonengine__serviceGetCheckIntervalNormal(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceGetCheckIntervalRetry(soap* s,
-						 ns1__serviceIDType* service_id,
-						 unsigned int& val) {
+                                                 ns1__serviceIDType* service_id,
+                                                 unsigned int& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s({ %s, { %s } })\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str());
+                   "Webservice: %s({ %s, { %s } })\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str());
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -6154,8 +6154,8 @@ int centreonengine__serviceGetCheckIntervalRetry(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -6172,27 +6172,27 @@ int centreonengine__serviceGetCheckIntervalRetry(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceGetCheckLast(soap* s,
-					ns1__serviceIDType* service_id,
-					unsigned long& val) {
+                                        ns1__serviceIDType* service_id,
+                                        unsigned long& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s({ %s, { %s } })\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str());
+                   "Webservice: %s({ %s, { %s } })\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str());
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -6203,8 +6203,8 @@ int centreonengine__serviceGetCheckLast(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -6221,27 +6221,27 @@ int centreonengine__serviceGetCheckLast(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceGetCheckMaxAttempts(soap* s,
-					       ns1__serviceIDType* service_id,
-					       unsigned int& val) {
+                                               ns1__serviceIDType* service_id,
+                                               unsigned int& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s({ %s, { %s } })\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str());
+                   "Webservice: %s({ %s, { %s } })\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str());
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -6252,8 +6252,8 @@ int centreonengine__serviceGetCheckMaxAttempts(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -6270,27 +6270,27 @@ int centreonengine__serviceGetCheckMaxAttempts(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceGetCheckNext(soap* s,
-					ns1__serviceIDType* service_id,
-					unsigned long& val) {
+                                        ns1__serviceIDType* service_id,
+                                        unsigned long& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s({ %s, { %s } })\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str());
+                   "Webservice: %s({ %s, { %s } })\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str());
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -6301,8 +6301,8 @@ int centreonengine__serviceGetCheckNext(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -6319,27 +6319,27 @@ int centreonengine__serviceGetCheckNext(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceGetCheckOptions(soap* s,
-					   ns1__serviceIDType* service_id,
-					   unsigned int& val) {
+                                           ns1__serviceIDType* service_id,
+                                           unsigned int& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s({ %s, { %s } })\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str());
+                   "Webservice: %s({ %s, { %s } })\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str());
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -6350,8 +6350,8 @@ int centreonengine__serviceGetCheckOptions(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -6368,27 +6368,27 @@ int centreonengine__serviceGetCheckOptions(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceGetCheckPassiveEnabled(soap* s,
-						  ns1__serviceIDType* service_id,
-						  bool& val) {
+                                                  ns1__serviceIDType* service_id,
+                                                  bool& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s({ %s, { %s } })\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str());
+                   "Webservice: %s({ %s, { %s } })\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str());
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -6399,8 +6399,8 @@ int centreonengine__serviceGetCheckPassiveEnabled(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -6417,27 +6417,27 @@ int centreonengine__serviceGetCheckPassiveEnabled(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceGetCheckPeriod(soap* s,
-					  ns1__serviceIDType* service_id,
-					  centreonengine__serviceGetCheckPeriodResponse& res) {
+                                          ns1__serviceIDType* service_id,
+                                          centreonengine__serviceGetCheckPeriodResponse& res) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s({ %s, { %s } })\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str());
+                   "Webservice: %s({ %s, { %s } })\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str());
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -6450,8 +6450,8 @@ int centreonengine__serviceGetCheckPeriod(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -6468,27 +6468,27 @@ int centreonengine__serviceGetCheckPeriod(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceGetCheckShouldBeScheduled(soap* s,
-						     ns1__serviceIDType* service_id,
-						     bool& val) {
+                                                     ns1__serviceIDType* service_id,
+                                                     bool& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s({ %s, { %s } })\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str());
+                   "Webservice: %s({ %s, { %s } })\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str());
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -6499,8 +6499,8 @@ int centreonengine__serviceGetCheckShouldBeScheduled(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -6517,27 +6517,27 @@ int centreonengine__serviceGetCheckShouldBeScheduled(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceGetCheckType(soap* s,
-					ns1__serviceIDType* service_id,
-					unsigned short& val) {
+                                        ns1__serviceIDType* service_id,
+                                        unsigned short& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s({ %s, { %s } })\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str());
+                   "Webservice: %s({ %s, { %s } })\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str());
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -6548,8 +6548,8 @@ int centreonengine__serviceGetCheckType(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -6567,31 +6567,31 @@ int centreonengine__serviceGetCheckType(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceSetCheckActiveEnabled(soap* s,
-						 ns1__serviceIDType* service_id,
-						 bool enable,
-						 centreonengine__serviceSetCheckActiveEnabledResponse& res) {
+                                                 ns1__serviceIDType* service_id,
+                                                 bool enable,
+                                                 centreonengine__serviceSetCheckActiveEnabledResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s { %s }, %d)\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str(),
-		   enable);
+                   "Webservice: %s(%s { %s }, %d)\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str(),
+                   enable);
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -6602,8 +6602,8 @@ int centreonengine__serviceSetCheckActiveEnabled(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -6621,31 +6621,31 @@ int centreonengine__serviceSetCheckActiveEnabled(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceSetCheckCommand(soap* s,
-					   ns1__serviceIDType* service_id,
-					   std::string command,
-					   centreonengine__serviceSetCheckCommandResponse& res) {
+                                           ns1__serviceIDType* service_id,
+                                           std::string command,
+                                           centreonengine__serviceSetCheckCommandResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s { %s }, %s)\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str(),
-		   command.c_str());
+                   "Webservice: %s(%s { %s }, %s)\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str(),
+                   command.c_str());
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -6657,8 +6657,8 @@ int centreonengine__serviceSetCheckCommand(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -6676,31 +6676,31 @@ int centreonengine__serviceSetCheckCommand(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceSetCheckIntervalNormal(soap* s,
-						  ns1__serviceIDType* service_id,
-						  unsigned int interval,
-						  centreonengine__serviceSetCheckIntervalNormalResponse& res) {
+                                                  ns1__serviceIDType* service_id,
+                                                  unsigned int interval,
+                                                  centreonengine__serviceSetCheckIntervalNormalResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s { %s }, %u)\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str(),
-		   interval);
+                   "Webservice: %s(%s { %s }, %u)\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str(),
+                   interval);
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -6711,8 +6711,8 @@ int centreonengine__serviceSetCheckIntervalNormal(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -6730,31 +6730,31 @@ int centreonengine__serviceSetCheckIntervalNormal(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceSetCheckIntervalRetry(soap* s,
-						 ns1__serviceIDType* service_id,
-						 unsigned int interval,
-						 centreonengine__serviceSetCheckIntervalRetryResponse& res) {
+                                                 ns1__serviceIDType* service_id,
+                                                 unsigned int interval,
+                                                 centreonengine__serviceSetCheckIntervalRetryResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s { %s }, %u)\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str(),
-		   interval);
+                   "Webservice: %s(%s { %s }, %u)\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str(),
+                   interval);
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -6765,8 +6765,8 @@ int centreonengine__serviceSetCheckIntervalRetry(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -6784,31 +6784,31 @@ int centreonengine__serviceSetCheckIntervalRetry(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceSetCheckMaxAttempts(soap* s,
-					       ns1__serviceIDType* service_id,
-					       unsigned int attempts,
-					       centreonengine__serviceSetCheckMaxAttemptsResponse& res) {
+                                               ns1__serviceIDType* service_id,
+                                               unsigned int attempts,
+                                               centreonengine__serviceSetCheckMaxAttemptsResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s { %s }, %u)\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str(),
-		   attempts);
+                   "Webservice: %s(%s { %s }, %u)\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str(),
+                   attempts);
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -6819,9 +6819,9 @@ int centreonengine__serviceSetCheckMaxAttempts(soap* s,
       *error = "Service `" + service_id->service + "' bad attempts value.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -6832,8 +6832,8 @@ int centreonengine__serviceSetCheckMaxAttempts(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -6851,31 +6851,31 @@ int centreonengine__serviceSetCheckMaxAttempts(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceSetCheckPassiveEnabled(soap* s,
-						  ns1__serviceIDType* service_id,
-						  bool enable,
-						  centreonengine__serviceSetCheckPassiveEnabledResponse& res) {
+                                                  ns1__serviceIDType* service_id,
+                                                  bool enable,
+                                                  centreonengine__serviceSetCheckPassiveEnabledResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s { %s }, %d)\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str(),
-		   enable);
+                   "Webservice: %s(%s { %s }, %d)\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str(),
+                   enable);
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -6886,8 +6886,8 @@ int centreonengine__serviceSetCheckPassiveEnabled(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -6905,43 +6905,43 @@ int centreonengine__serviceSetCheckPassiveEnabled(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceGetCustomVariable(soap* s,
-					     ns1__serviceIDType* service_id,
-					     std::string variable,
-					     std::string& val) {
+                                             ns1__serviceIDType* service_id,
+                                             std::string variable,
+                                             std::string& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s { %s }, %s)\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str(),
-		   variable.c_str());
+                   "Webservice: %s(%s { %s }, %s)\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str(),
+                   variable.c_str());
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
     }
 
     for(customvariablesmember* tmp = service->custom_variables;
-	tmp != NULL;
-	tmp = tmp->next){
+        tmp != NULL;
+        tmp = tmp->next){
       if (!strcasecmp(tmp->variable_name, variable.c_str())) {
-	if (tmp->variable_value != NULL) {
-	  val = tmp->variable_value;
-	}
-	syncro::instance().worker_finish();
-	return (SOAP_OK);
+        if (tmp->variable_value != NULL) {
+          val = tmp->variable_value;
+        }
+        syncro::instance().worker_finish();
+        return (SOAP_OK);
       }
     }
 
@@ -6951,17 +6951,17 @@ int centreonengine__serviceGetCustomVariable(soap* s,
       + "' and variable `" + variable + "' not found.";
 
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. %s\n",
-		   __func__,
-		   error->c_str());
+                   "Webservice: %s failed. %s\n",
+                   __func__,
+                   error->c_str());
 
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -6977,27 +6977,27 @@ int centreonengine__serviceGetCustomVariable(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceGetDowntimeDepth(soap* s,
-					    ns1__serviceIDType* service_id,
-					    unsigned int& val) {
+                                            ns1__serviceIDType* service_id,
+                                            unsigned int& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s({ %s, { %s } })\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str());
+                   "Webservice: %s({ %s, { %s } })\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str());
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -7008,8 +7008,8 @@ int centreonengine__serviceGetDowntimeDepth(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -7026,27 +7026,27 @@ int centreonengine__serviceGetDowntimeDepth(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceGetDowntimeFlexPending(soap* s,
-						  ns1__serviceIDType* service_id,
-						  bool& val) {
+                                                  ns1__serviceIDType* service_id,
+                                                  bool& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s({ %s, { %s } })\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str());
+                   "Webservice: %s({ %s, { %s } })\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str());
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -7057,8 +7057,8 @@ int centreonengine__serviceGetDowntimeFlexPending(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -7075,27 +7075,27 @@ int centreonengine__serviceGetDowntimeFlexPending(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceGetEventHandler(soap* s,
-					   ns1__serviceIDType* service_id,
-					   std::string& val) {
+                                           ns1__serviceIDType* service_id,
+                                           std::string& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s({ %s, { %s } })\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str());
+                   "Webservice: %s({ %s, { %s } })\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str());
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -7108,8 +7108,8 @@ int centreonengine__serviceGetEventHandler(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -7126,27 +7126,27 @@ int centreonengine__serviceGetEventHandler(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceGetEventHandlerEnabled(soap* s,
-						  ns1__serviceIDType* service_id,
-						  bool& val) {
+                                                  ns1__serviceIDType* service_id,
+                                                  bool& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s({ %s, { %s } })\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str());
+                   "Webservice: %s({ %s, { %s } })\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str());
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -7157,8 +7157,8 @@ int centreonengine__serviceGetEventHandlerEnabled(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -7176,31 +7176,31 @@ int centreonengine__serviceGetEventHandlerEnabled(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceSetEventHandler(soap* s,
-					   ns1__serviceIDType* service_id,
-					   std::string event_handler,
-					   centreonengine__serviceSetEventHandlerResponse& res) {
+                                           ns1__serviceIDType* service_id,
+                                           std::string event_handler,
+                                           centreonengine__serviceSetEventHandlerResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s { %s }, %s)\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str(),
-		   event_handler.c_str());
+                   "Webservice: %s(%s { %s }, %s)\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str(),
+                   event_handler.c_str());
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -7212,8 +7212,8 @@ int centreonengine__serviceSetEventHandler(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -7231,31 +7231,31 @@ int centreonengine__serviceSetEventHandler(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceSetEventHandlerEnabled(soap* s,
-						  ns1__serviceIDType* service_id,
-						  bool enable,
-						  centreonengine__serviceSetEventHandlerEnabledResponse& res) {
+                                                  ns1__serviceIDType* service_id,
+                                                  bool enable,
+                                                  centreonengine__serviceSetEventHandlerEnabledResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s { %s }, %d)\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str(),
-		   enable);
+                   "Webservice: %s(%s { %s }, %d)\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str(),
+                   enable);
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -7266,8 +7266,8 @@ int centreonengine__serviceSetEventHandlerEnabled(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -7284,22 +7284,22 @@ int centreonengine__serviceSetEventHandlerEnabled(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceGetFailurePredictionEnabled(soap* s,
-						       ns1__serviceIDType* service_id,
-						       bool& val) {
+                                                       ns1__serviceIDType* service_id,
+                                                       bool& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s({ %s, { %s } })\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str());
+                   "Webservice: %s({ %s, { %s } })\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str());
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -7310,8 +7310,8 @@ int centreonengine__serviceGetFailurePredictionEnabled(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -7328,27 +7328,27 @@ int centreonengine__serviceGetFailurePredictionEnabled(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceGetFailurePredictionOptions(soap* s,
-						       ns1__serviceIDType* service_id,
-						       std::string& val) {
+                                                       ns1__serviceIDType* service_id,
+                                                       std::string& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s({ %s, { %s } })\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str());
+                   "Webservice: %s({ %s, { %s } })\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str());
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -7361,8 +7361,8 @@ int centreonengine__serviceGetFailurePredictionOptions(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -7380,31 +7380,31 @@ int centreonengine__serviceGetFailurePredictionOptions(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceSetFailurePredictionEnabled(soap* s,
-						       ns1__serviceIDType* service_id,
-						       bool enable,
-						       centreonengine__serviceSetFailurePredictionEnabledResponse& res) {
+                                                       ns1__serviceIDType* service_id,
+                                                       bool enable,
+                                                       centreonengine__serviceSetFailurePredictionEnabledResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s { %s }, %d)\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str(),
-		   enable);
+                   "Webservice: %s(%s { %s }, %d)\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str(),
+                   enable);
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -7415,8 +7415,8 @@ int centreonengine__serviceSetFailurePredictionEnabled(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -7433,27 +7433,27 @@ int centreonengine__serviceSetFailurePredictionEnabled(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceGetFlapDetectionCommentID(soap* s,
-						     ns1__serviceIDType* service_id,
-						     unsigned int& val) {
+                                                     ns1__serviceIDType* service_id,
+                                                     unsigned int& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s({ %s, { %s } })\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str());
+                   "Webservice: %s({ %s, { %s } })\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str());
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -7464,8 +7464,8 @@ int centreonengine__serviceGetFlapDetectionCommentID(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -7482,27 +7482,27 @@ int centreonengine__serviceGetFlapDetectionCommentID(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceGetFlapDetectionEnabled(soap* s,
-						   ns1__serviceIDType* service_id,
-						   bool& val) {
+                                                   ns1__serviceIDType* service_id,
+                                                   bool& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s({ %s, { %s } })\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str());
+                   "Webservice: %s({ %s, { %s } })\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str());
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -7513,8 +7513,8 @@ int centreonengine__serviceGetFlapDetectionEnabled(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -7531,27 +7531,27 @@ int centreonengine__serviceGetFlapDetectionEnabled(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceGetFlapDetectionIsFlapping(soap* s,
-						      ns1__serviceIDType* service_id,
-						      bool& val) {
+                                                      ns1__serviceIDType* service_id,
+                                                      bool& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s({ %s, { %s } })\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str());
+                   "Webservice: %s({ %s, { %s } })\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str());
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -7562,8 +7562,8 @@ int centreonengine__serviceGetFlapDetectionIsFlapping(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -7580,27 +7580,27 @@ int centreonengine__serviceGetFlapDetectionIsFlapping(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceGetFlapDetectionOnCritical(soap* s,
-						      ns1__serviceIDType* service_id,
-						      bool& val) {
+                                                      ns1__serviceIDType* service_id,
+                                                      bool& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s({ %s, { %s } })\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str());
+                   "Webservice: %s({ %s, { %s } })\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str());
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -7611,8 +7611,8 @@ int centreonengine__serviceGetFlapDetectionOnCritical(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -7629,27 +7629,27 @@ int centreonengine__serviceGetFlapDetectionOnCritical(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceGetFlapDetectionOnOk(soap* s,
-						ns1__serviceIDType* service_id,
-						bool& val) {
+                                                ns1__serviceIDType* service_id,
+                                                bool& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s({ %s, { %s } })\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str());
+                   "Webservice: %s({ %s, { %s } })\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str());
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -7660,8 +7660,8 @@ int centreonengine__serviceGetFlapDetectionOnOk(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -7678,27 +7678,27 @@ int centreonengine__serviceGetFlapDetectionOnOk(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceGetFlapDetectionOnUnknown(soap* s,
-						     ns1__serviceIDType* service_id,
-						     bool& val) {
+                                                     ns1__serviceIDType* service_id,
+                                                     bool& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s({ %s, { %s } })\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str());
+                   "Webservice: %s({ %s, { %s } })\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str());
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -7709,8 +7709,8 @@ int centreonengine__serviceGetFlapDetectionOnUnknown(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -7727,27 +7727,27 @@ int centreonengine__serviceGetFlapDetectionOnUnknown(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceGetFlapDetectionOnWarning(soap* s,
-						     ns1__serviceIDType* service_id,
-						     bool& val) {
+                                                     ns1__serviceIDType* service_id,
+                                                     bool& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s({ %s, { %s } })\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str());
+                   "Webservice: %s({ %s, { %s } })\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str());
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -7758,8 +7758,8 @@ int centreonengine__serviceGetFlapDetectionOnWarning(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -7776,27 +7776,27 @@ int centreonengine__serviceGetFlapDetectionOnWarning(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceGetFlapDetectionThresholdHigh(soap* s,
-							 ns1__serviceIDType* service_id,
-							 double& val) {
+                                                         ns1__serviceIDType* service_id,
+                                                         double& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s({ %s, { %s } })\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str());
+                   "Webservice: %s({ %s, { %s } })\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str());
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -7807,8 +7807,8 @@ int centreonengine__serviceGetFlapDetectionThresholdHigh(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -7825,27 +7825,27 @@ int centreonengine__serviceGetFlapDetectionThresholdHigh(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceGetFlapDetectionThresholdLow(soap* s,
-							ns1__serviceIDType* service_id,
-							double& val) {
+                                                        ns1__serviceIDType* service_id,
+                                                        double& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s({ %s, { %s } })\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str());
+                   "Webservice: %s({ %s, { %s } })\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str());
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -7856,8 +7856,8 @@ int centreonengine__serviceGetFlapDetectionThresholdLow(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -7875,31 +7875,31 @@ int centreonengine__serviceGetFlapDetectionThresholdLow(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceSetFlapDetectionEnabled(soap* s,
-						   ns1__serviceIDType* service_id,
-						   bool enable,
-						   centreonengine__serviceSetFlapDetectionEnabledResponse& res) {
+                                                   ns1__serviceIDType* service_id,
+                                                   bool enable,
+                                                   centreonengine__serviceSetFlapDetectionEnabledResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s { %s }, %d)\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str(),
-		   enable);
+                   "Webservice: %s(%s { %s }, %d)\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str(),
+                   enable);
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -7910,8 +7910,8 @@ int centreonengine__serviceSetFlapDetectionEnabled(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -7929,31 +7929,31 @@ int centreonengine__serviceSetFlapDetectionEnabled(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceSetFlapDetectionOnCritical(soap* s,
-						      ns1__serviceIDType* service_id,
-						      bool enable,
-						      centreonengine__serviceSetFlapDetectionOnCriticalResponse& res) {
+                                                      ns1__serviceIDType* service_id,
+                                                      bool enable,
+                                                      centreonengine__serviceSetFlapDetectionOnCriticalResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s { %s }, %d)\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str(),
-		   enable);
+                   "Webservice: %s(%s { %s }, %d)\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str(),
+                   enable);
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -7964,8 +7964,8 @@ int centreonengine__serviceSetFlapDetectionOnCritical(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -7983,31 +7983,31 @@ int centreonengine__serviceSetFlapDetectionOnCritical(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceSetFlapDetectionOnOk(soap* s,
-						ns1__serviceIDType* service_id,
-						bool enable,
-						centreonengine__serviceSetFlapDetectionOnOkResponse& res) {
+                                                ns1__serviceIDType* service_id,
+                                                bool enable,
+                                                centreonengine__serviceSetFlapDetectionOnOkResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s { %s }, %d)\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str(),
-		   enable);
+                   "Webservice: %s(%s { %s }, %d)\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str(),
+                   enable);
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -8018,8 +8018,8 @@ int centreonengine__serviceSetFlapDetectionOnOk(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -8037,31 +8037,31 @@ int centreonengine__serviceSetFlapDetectionOnOk(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceSetFlapDetectionOnUnknown(soap* s,
-						     ns1__serviceIDType* service_id,
-						     bool enable,
-						     centreonengine__serviceSetFlapDetectionOnUnknownResponse& res) {
+                                                     ns1__serviceIDType* service_id,
+                                                     bool enable,
+                                                     centreonengine__serviceSetFlapDetectionOnUnknownResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s { %s }, %d)\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str(),
-		   enable);
+                   "Webservice: %s(%s { %s }, %d)\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str(),
+                   enable);
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -8072,8 +8072,8 @@ int centreonengine__serviceSetFlapDetectionOnUnknown(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -8091,31 +8091,31 @@ int centreonengine__serviceSetFlapDetectionOnUnknown(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceSetFlapDetectionOnWarning(soap* s,
-						     ns1__serviceIDType* service_id,
-						     bool enable,
-						     centreonengine__serviceSetFlapDetectionOnWarningResponse& res) {
+                                                     ns1__serviceIDType* service_id,
+                                                     bool enable,
+                                                     centreonengine__serviceSetFlapDetectionOnWarningResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s { %s }, %d)\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str(),
-		   enable);
+                   "Webservice: %s(%s { %s }, %d)\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str(),
+                   enable);
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -8126,8 +8126,8 @@ int centreonengine__serviceSetFlapDetectionOnWarning(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -8145,31 +8145,31 @@ int centreonengine__serviceSetFlapDetectionOnWarning(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceSetFlapDetectionThresholdHigh(soap* s,
-							 ns1__serviceIDType* service_id,
-							 double threshold,
-							 centreonengine__serviceSetFlapDetectionThresholdHighResponse& res) {
+                                                         ns1__serviceIDType* service_id,
+                                                         double threshold,
+                                                         centreonengine__serviceSetFlapDetectionThresholdHighResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s { %s }, %f)\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str(),
-		   threshold);
+                   "Webservice: %s(%s { %s }, %f)\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str(),
+                   threshold);
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -8180,8 +8180,8 @@ int centreonengine__serviceSetFlapDetectionThresholdHigh(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -8199,31 +8199,31 @@ int centreonengine__serviceSetFlapDetectionThresholdHigh(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceSetFlapDetectionThresholdLow(soap* s,
-							ns1__serviceIDType* service_id,
-							double threshold,
-							centreonengine__serviceSetFlapDetectionThresholdLowResponse& res) {
+                                                        ns1__serviceIDType* service_id,
+                                                        double threshold,
+                                                        centreonengine__serviceSetFlapDetectionThresholdLowResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s { %s }, %f)\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str(),
-		   threshold);
+                   "Webservice: %s(%s { %s }, %f)\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str(),
+                   threshold);
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -8234,8 +8234,8 @@ int centreonengine__serviceSetFlapDetectionThresholdLow(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -8252,27 +8252,27 @@ int centreonengine__serviceSetFlapDetectionThresholdLow(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceGetFreshnessCheckEnabled(soap* s,
-						    ns1__serviceIDType* service_id,
-						    bool& val) {
+                                                    ns1__serviceIDType* service_id,
+                                                    bool& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s({ %s, { %s } })\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str());
+                   "Webservice: %s({ %s, { %s } })\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str());
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -8283,8 +8283,8 @@ int centreonengine__serviceGetFreshnessCheckEnabled(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -8301,27 +8301,27 @@ int centreonengine__serviceGetFreshnessCheckEnabled(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceGetFreshnessIsActive(soap* s,
-						ns1__serviceIDType* service_id,
-						bool& val) {
+                                                ns1__serviceIDType* service_id,
+                                                bool& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s({ %s, { %s } })\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str());
+                   "Webservice: %s({ %s, { %s } })\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str());
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -8332,8 +8332,8 @@ int centreonengine__serviceGetFreshnessIsActive(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -8350,27 +8350,27 @@ int centreonengine__serviceGetFreshnessIsActive(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceGetFreshnessThreshold(soap* s,
-						 ns1__serviceIDType* service_id,
-						 int& val) {
+                                                 ns1__serviceIDType* service_id,
+                                                 int& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s({ %s, { %s } })\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str());
+                   "Webservice: %s({ %s, { %s } })\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str());
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -8381,8 +8381,8 @@ int centreonengine__serviceGetFreshnessThreshold(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -8400,31 +8400,31 @@ int centreonengine__serviceGetFreshnessThreshold(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceSetFreshnessCheckEnabled(soap* s,
-						    ns1__serviceIDType* service_id,
-						    bool enable,
-						    centreonengine__serviceSetFreshnessCheckEnabledResponse& res) {
+                                                    ns1__serviceIDType* service_id,
+                                                    bool enable,
+                                                    centreonengine__serviceSetFreshnessCheckEnabledResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s { %s }, %d)\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str(),
-		   enable);
+                   "Webservice: %s(%s { %s }, %d)\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str(),
+                   enable);
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -8435,8 +8435,8 @@ int centreonengine__serviceSetFreshnessCheckEnabled(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -8454,31 +8454,31 @@ int centreonengine__serviceSetFreshnessCheckEnabled(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceSetFreshnessThreshold(soap* s,
-						 ns1__serviceIDType* service_id,
-						 int threshold,
-						 centreonengine__serviceSetFreshnessThresholdResponse& res) {
+                                                 ns1__serviceIDType* service_id,
+                                                 int threshold,
+                                                 centreonengine__serviceSetFreshnessThresholdResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s { %s }, %d)\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str(),
-		   threshold);
+                   "Webservice: %s(%s { %s }, %d)\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str(),
+                   threshold);
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -8489,8 +8489,8 @@ int centreonengine__serviceSetFreshnessThreshold(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -8507,27 +8507,27 @@ int centreonengine__serviceSetFreshnessThreshold(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceGetModifiedAttributes(soap* s,
-						 ns1__serviceIDType* service_id,
-						 unsigned int& val) {
+                                                 ns1__serviceIDType* service_id,
+                                                 unsigned int& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s({ %s, { %s } })\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str());
+                   "Webservice: %s({ %s, { %s } })\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str());
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -8538,8 +8538,8 @@ int centreonengine__serviceGetModifiedAttributes(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -8556,27 +8556,27 @@ int centreonengine__serviceGetModifiedAttributes(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceGetNameDisplay(soap* s,
-					  ns1__serviceIDType* service_id,
-					  std::string& val) {
+                                          ns1__serviceIDType* service_id,
+                                          std::string& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s({ %s, { %s } })\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str());
+                   "Webservice: %s({ %s, { %s } })\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str());
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -8589,8 +8589,8 @@ int centreonengine__serviceGetNameDisplay(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -8608,31 +8608,31 @@ int centreonengine__serviceGetNameDisplay(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceSetNameDisplay(soap* s,
-					  ns1__serviceIDType* service_id,
-					  std::string name,
-					  centreonengine__serviceSetNameDisplayResponse& res) {
+                                          ns1__serviceIDType* service_id,
+                                          std::string name,
+                                          centreonengine__serviceSetNameDisplayResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s { %s }, %s)\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str(),
-		   name.c_str());
+                   "Webservice: %s(%s { %s }, %s)\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str(),
+                   name.c_str());
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -8644,8 +8644,8 @@ int centreonengine__serviceSetNameDisplay(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -8662,27 +8662,27 @@ int centreonengine__serviceSetNameDisplay(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceGetNotificationsCurrentID(soap* s,
-						     ns1__serviceIDType* service_id,
-						     unsigned int& val) {
+                                                     ns1__serviceIDType* service_id,
+                                                     unsigned int& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s({ %s, { %s } })\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str());
+                   "Webservice: %s({ %s, { %s } })\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str());
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -8693,8 +8693,8 @@ int centreonengine__serviceGetNotificationsCurrentID(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -8711,27 +8711,27 @@ int centreonengine__serviceGetNotificationsCurrentID(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceGetNotificationsCurrentNumber(soap* s,
-							 ns1__serviceIDType* service_id,
-							 unsigned int& val) {
+                                                         ns1__serviceIDType* service_id,
+                                                         unsigned int& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s({ %s, { %s } })\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str());
+                   "Webservice: %s({ %s, { %s } })\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str());
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -8742,8 +8742,8 @@ int centreonengine__serviceGetNotificationsCurrentNumber(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -8760,27 +8760,27 @@ int centreonengine__serviceGetNotificationsCurrentNumber(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceGetNotificationsEnabled(soap* s,
-						   ns1__serviceIDType* service_id,
-						   bool& val) {
+                                                   ns1__serviceIDType* service_id,
+                                                   bool& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s({ %s, { %s } })\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str());
+                   "Webservice: %s({ %s, { %s } })\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str());
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -8791,8 +8791,8 @@ int centreonengine__serviceGetNotificationsEnabled(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -8809,27 +8809,27 @@ int centreonengine__serviceGetNotificationsEnabled(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceGetNotificationsFirstDelay(soap* s,
-						      ns1__serviceIDType* service_id,
-						      unsigned int& val) {
+                                                      ns1__serviceIDType* service_id,
+                                                      unsigned int& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s({ %s, { %s } })\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str());
+                   "Webservice: %s({ %s, { %s } })\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str());
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -8840,8 +8840,8 @@ int centreonengine__serviceGetNotificationsFirstDelay(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -8858,27 +8858,27 @@ int centreonengine__serviceGetNotificationsFirstDelay(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceGetNotificationsInterval(soap* s,
-						    ns1__serviceIDType* service_id,
-						    unsigned int& val) {
+                                                    ns1__serviceIDType* service_id,
+                                                    unsigned int& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s({ %s, { %s } })\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str());
+                   "Webservice: %s({ %s, { %s } })\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str());
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -8889,8 +8889,8 @@ int centreonengine__serviceGetNotificationsInterval(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -8907,27 +8907,27 @@ int centreonengine__serviceGetNotificationsInterval(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceGetNotificationsLast(soap* s,
-						ns1__serviceIDType* service_id,
-						unsigned long& val) {
+                                                ns1__serviceIDType* service_id,
+                                                unsigned long& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s({ %s, { %s } })\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str());
+                   "Webservice: %s({ %s, { %s } })\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str());
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -8938,8 +8938,8 @@ int centreonengine__serviceGetNotificationsLast(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -8956,27 +8956,27 @@ int centreonengine__serviceGetNotificationsLast(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceGetNotificationsNext(soap* s,
-						ns1__serviceIDType* service_id,
-						unsigned long& val) {
+                                                ns1__serviceIDType* service_id,
+                                                unsigned long& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s({ %s, { %s } })\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str());
+                   "Webservice: %s({ %s, { %s } })\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str());
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -8987,8 +8987,8 @@ int centreonengine__serviceGetNotificationsNext(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -9005,27 +9005,27 @@ int centreonengine__serviceGetNotificationsNext(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceGetNotificationsOnCritical(soap* s,
-						      ns1__serviceIDType* service_id,
-						      bool& val) {
+                                                      ns1__serviceIDType* service_id,
+                                                      bool& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s({ %s, { %s } })\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str());
+                   "Webservice: %s({ %s, { %s } })\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str());
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -9036,8 +9036,8 @@ int centreonengine__serviceGetNotificationsOnCritical(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -9054,27 +9054,27 @@ int centreonengine__serviceGetNotificationsOnCritical(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceGetNotificationsOnDowntime(soap* s,
-						      ns1__serviceIDType* service_id,
-						      bool& val) {
+                                                      ns1__serviceIDType* service_id,
+                                                      bool& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s({ %s, { %s } })\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str());
+                   "Webservice: %s({ %s, { %s } })\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str());
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -9085,8 +9085,8 @@ int centreonengine__serviceGetNotificationsOnDowntime(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -9103,27 +9103,27 @@ int centreonengine__serviceGetNotificationsOnDowntime(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceGetNotificationsOnFlapping(soap* s,
-						      ns1__serviceIDType* service_id,
-						      bool& val) {
+                                                      ns1__serviceIDType* service_id,
+                                                      bool& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s({ %s, { %s } })\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str());
+                   "Webservice: %s({ %s, { %s } })\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str());
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -9134,8 +9134,8 @@ int centreonengine__serviceGetNotificationsOnFlapping(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -9152,27 +9152,27 @@ int centreonengine__serviceGetNotificationsOnFlapping(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceGetNotificationsOnRecovery(soap* s,
-						      ns1__serviceIDType* service_id,
-						      bool& val) {
+                                                      ns1__serviceIDType* service_id,
+                                                      bool& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s({ %s, { %s } })\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str());
+                   "Webservice: %s({ %s, { %s } })\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str());
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -9183,8 +9183,8 @@ int centreonengine__serviceGetNotificationsOnRecovery(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -9201,27 +9201,27 @@ int centreonengine__serviceGetNotificationsOnRecovery(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceGetNotificationsOnUnknown(soap* s,
-						     ns1__serviceIDType* service_id,
-						     bool& val) {
+                                                     ns1__serviceIDType* service_id,
+                                                     bool& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s({ %s, { %s } })\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str());
+                   "Webservice: %s({ %s, { %s } })\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str());
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -9232,8 +9232,8 @@ int centreonengine__serviceGetNotificationsOnUnknown(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -9250,27 +9250,27 @@ int centreonengine__serviceGetNotificationsOnUnknown(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceGetNotificationsOnWarning(soap* s,
-						     ns1__serviceIDType* service_id,
-						     bool& val) {
+                                                     ns1__serviceIDType* service_id,
+                                                     bool& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s({ %s, { %s } })\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str());
+                   "Webservice: %s({ %s, { %s } })\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str());
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -9281,8 +9281,8 @@ int centreonengine__serviceGetNotificationsOnWarning(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -9299,27 +9299,27 @@ int centreonengine__serviceGetNotificationsOnWarning(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceGetNotificationsPeriod(soap* s,
-						  ns1__serviceIDType* service_id,
-						  centreonengine__serviceGetNotificationsPeriodResponse& res) {
+                                                  ns1__serviceIDType* service_id,
+                                                  centreonengine__serviceGetNotificationsPeriodResponse& res) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s({ %s, { %s } })\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str());
+                   "Webservice: %s({ %s, { %s } })\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str());
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -9332,8 +9332,8 @@ int centreonengine__serviceGetNotificationsPeriod(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -9351,31 +9351,31 @@ int centreonengine__serviceGetNotificationsPeriod(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceSetNotificationsEnabled(soap* s,
-						   ns1__serviceIDType* service_id,
-						   bool enable,
-						   centreonengine__serviceSetNotificationsEnabledResponse& res) {
+                                                   ns1__serviceIDType* service_id,
+                                                   bool enable,
+                                                   centreonengine__serviceSetNotificationsEnabledResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s { %s }, %d)\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str(),
-		   enable);
+                   "Webservice: %s(%s { %s }, %d)\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str(),
+                   enable);
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -9386,8 +9386,8 @@ int centreonengine__serviceSetNotificationsEnabled(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -9405,31 +9405,31 @@ int centreonengine__serviceSetNotificationsEnabled(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceSetNotificationsFirstDelay(soap* s,
-						      ns1__serviceIDType* service_id,
-						      unsigned int delay,
-						      centreonengine__serviceSetNotificationsFirstDelayResponse& res) {
+                                                      ns1__serviceIDType* service_id,
+                                                      unsigned int delay,
+                                                      centreonengine__serviceSetNotificationsFirstDelayResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s { %s }, %d)\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str(),
-		   delay);
+                   "Webservice: %s(%s { %s }, %d)\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str(),
+                   delay);
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -9440,8 +9440,8 @@ int centreonengine__serviceSetNotificationsFirstDelay(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -9459,31 +9459,31 @@ int centreonengine__serviceSetNotificationsFirstDelay(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceSetNotificationsInterval(soap* s,
-						    ns1__serviceIDType* service_id,
-						    unsigned int interval,
-						    centreonengine__serviceSetNotificationsIntervalResponse& res) {
+                                                    ns1__serviceIDType* service_id,
+                                                    unsigned int interval,
+                                                    centreonengine__serviceSetNotificationsIntervalResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s { %s }, %d)\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str(),
-		   interval);
+                   "Webservice: %s(%s { %s }, %d)\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str(),
+                   interval);
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -9494,8 +9494,8 @@ int centreonengine__serviceSetNotificationsInterval(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -9513,31 +9513,31 @@ int centreonengine__serviceSetNotificationsInterval(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceSetNotificationsOnCritical(soap* s,
-						      ns1__serviceIDType* service_id,
-						      bool enable,
-						      centreonengine__serviceSetNotificationsOnCriticalResponse& res) {
+                                                      ns1__serviceIDType* service_id,
+                                                      bool enable,
+                                                      centreonengine__serviceSetNotificationsOnCriticalResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s { %s }, %d)\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str(),
-		   enable);
+                   "Webservice: %s(%s { %s }, %d)\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str(),
+                   enable);
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -9548,8 +9548,8 @@ int centreonengine__serviceSetNotificationsOnCritical(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -9567,31 +9567,31 @@ int centreonengine__serviceSetNotificationsOnCritical(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceSetNotificationsOnDowntime(soap* s,
-						      ns1__serviceIDType* service_id,
-						      bool enable,
-						      centreonengine__serviceSetNotificationsOnDowntimeResponse& res) {
+                                                      ns1__serviceIDType* service_id,
+                                                      bool enable,
+                                                      centreonengine__serviceSetNotificationsOnDowntimeResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s { %s }, %d)\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str(),
-		   enable);
+                   "Webservice: %s(%s { %s }, %d)\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str(),
+                   enable);
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -9602,8 +9602,8 @@ int centreonengine__serviceSetNotificationsOnDowntime(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -9621,31 +9621,31 @@ int centreonengine__serviceSetNotificationsOnDowntime(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceSetNotificationsOnFlapping(soap* s,
-						      ns1__serviceIDType* service_id,
-						      bool enable,
-						      centreonengine__serviceSetNotificationsOnFlappingResponse& res) {
+                                                      ns1__serviceIDType* service_id,
+                                                      bool enable,
+                                                      centreonengine__serviceSetNotificationsOnFlappingResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s { %s }, %d)\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str(),
-		   enable);
+                   "Webservice: %s(%s { %s }, %d)\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str(),
+                   enable);
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -9656,8 +9656,8 @@ int centreonengine__serviceSetNotificationsOnFlapping(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -9675,31 +9675,31 @@ int centreonengine__serviceSetNotificationsOnFlapping(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceSetNotificationsOnRecovery(soap* s,
-						      ns1__serviceIDType* service_id,
-						      bool enable,
-						      centreonengine__serviceSetNotificationsOnRecoveryResponse& res) {
+                                                      ns1__serviceIDType* service_id,
+                                                      bool enable,
+                                                      centreonengine__serviceSetNotificationsOnRecoveryResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s { %s }, %d)\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str(),
-		   enable);
+                   "Webservice: %s(%s { %s }, %d)\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str(),
+                   enable);
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -9710,8 +9710,8 @@ int centreonengine__serviceSetNotificationsOnRecovery(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -9729,31 +9729,31 @@ int centreonengine__serviceSetNotificationsOnRecovery(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceSetNotificationsOnUnknown(soap* s,
-						     ns1__serviceIDType* service_id,
-						     bool enable,
-						     centreonengine__serviceSetNotificationsOnUnknownResponse& res) {
+                                                     ns1__serviceIDType* service_id,
+                                                     bool enable,
+                                                     centreonengine__serviceSetNotificationsOnUnknownResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s { %s }, %d)\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str(),
-		   enable);
+                   "Webservice: %s(%s { %s }, %d)\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str(),
+                   enable);
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -9764,8 +9764,8 @@ int centreonengine__serviceSetNotificationsOnUnknown(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -9783,31 +9783,31 @@ int centreonengine__serviceSetNotificationsOnUnknown(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceSetNotificationsOnWarning(soap* s,
-						     ns1__serviceIDType* service_id,
-						     bool enable,
-						     centreonengine__serviceSetNotificationsOnWarningResponse& res) {
+                                                     ns1__serviceIDType* service_id,
+                                                     bool enable,
+                                                     centreonengine__serviceSetNotificationsOnWarningResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s { %s }, %d)\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str(),
-		   enable);
+                   "Webservice: %s(%s { %s }, %d)\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str(),
+                   enable);
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -9818,8 +9818,8 @@ int centreonengine__serviceSetNotificationsOnWarning(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -9836,27 +9836,27 @@ int centreonengine__serviceSetNotificationsOnWarning(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceGetObsessOver(soap* s,
-					 ns1__serviceIDType* service_id,
-					 bool& val) {
+                                         ns1__serviceIDType* service_id,
+                                         bool& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s({ %s, { %s } })\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str());
+                   "Webservice: %s({ %s, { %s } })\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str());
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -9867,8 +9867,8 @@ int centreonengine__serviceGetObsessOver(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -9886,31 +9886,31 @@ int centreonengine__serviceGetObsessOver(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceSetObsessOver(soap* s,
-					 ns1__serviceIDType* service_id,
-					 bool enable,
-					 centreonengine__serviceSetObsessOverResponse& res) {
+                                         ns1__serviceIDType* service_id,
+                                         bool enable,
+                                         centreonengine__serviceSetObsessOverResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s { %s }, %d)\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str(),
-		   enable);
+                   "Webservice: %s(%s { %s }, %d)\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str(),
+                   enable);
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -9921,8 +9921,8 @@ int centreonengine__serviceSetObsessOver(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -9939,27 +9939,27 @@ int centreonengine__serviceSetObsessOver(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceGetPerfdataProcessingEnabled(soap* s,
-							ns1__serviceIDType* service_id,
-							bool& val) {
+                                                        ns1__serviceIDType* service_id,
+                                                        bool& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s({ %s, { %s } })\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str());
+                   "Webservice: %s({ %s, { %s } })\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str());
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -9970,8 +9970,8 @@ int centreonengine__serviceGetPerfdataProcessingEnabled(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -9989,31 +9989,31 @@ int centreonengine__serviceGetPerfdataProcessingEnabled(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceSetPerfdataProcessingEnabled(soap* s,
-							ns1__serviceIDType* service_id,
-							bool enable,
-							centreonengine__serviceSetPerfdataProcessingEnabledResponse& res) {
+                                                        ns1__serviceIDType* service_id,
+                                                        bool enable,
+                                                        centreonengine__serviceSetPerfdataProcessingEnabledResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s { %s }, %d)\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str(),
-		   enable);
+                   "Webservice: %s(%s { %s }, %d)\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str(),
+                   enable);
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -10024,8 +10024,8 @@ int centreonengine__serviceSetPerfdataProcessingEnabled(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -10042,27 +10042,27 @@ int centreonengine__serviceSetPerfdataProcessingEnabled(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceGetPluginExecutionTime(soap* s,
-						  ns1__serviceIDType* service_id,
-						  unsigned int& val) {
+                                                  ns1__serviceIDType* service_id,
+                                                  unsigned int& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s({ %s, { %s } })\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str());
+                   "Webservice: %s({ %s, { %s } })\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str());
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -10073,8 +10073,8 @@ int centreonengine__serviceGetPluginExecutionTime(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -10091,27 +10091,27 @@ int centreonengine__serviceGetPluginExecutionTime(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceGetPluginIsExecuting(soap* s,
-						ns1__serviceIDType* service_id,
-						bool& val) {
+                                                ns1__serviceIDType* service_id,
+                                                bool& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s({ %s, { %s } })\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str());
+                   "Webservice: %s({ %s, { %s } })\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str());
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -10122,8 +10122,8 @@ int centreonengine__serviceGetPluginIsExecuting(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -10140,27 +10140,27 @@ int centreonengine__serviceGetPluginIsExecuting(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceGetPluginLatency(soap* s,
-					    ns1__serviceIDType* service_id,
-					    double& val) {
+                                            ns1__serviceIDType* service_id,
+                                            double& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s({ %s, { %s } })\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str());
+                   "Webservice: %s({ %s, { %s } })\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str());
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -10171,8 +10171,8 @@ int centreonengine__serviceGetPluginLatency(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -10189,27 +10189,27 @@ int centreonengine__serviceGetPluginLatency(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceGetPluginOutput(soap* s,
-					   ns1__serviceIDType* service_id,
-					   std::string& val) {
+                                           ns1__serviceIDType* service_id,
+                                           std::string& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s({ %s, { %s } })\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str());
+                   "Webservice: %s({ %s, { %s } })\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str());
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -10222,8 +10222,8 @@ int centreonengine__serviceGetPluginOutput(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -10240,27 +10240,27 @@ int centreonengine__serviceGetPluginOutput(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceGetPluginPerfdata(soap* s,
-					     ns1__serviceIDType* service_id,
-					     std::string& val) {
+                                             ns1__serviceIDType* service_id,
+                                             std::string& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s({ %s, { %s } })\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str());
+                   "Webservice: %s({ %s, { %s } })\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str());
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -10273,8 +10273,8 @@ int centreonengine__serviceGetPluginPerfdata(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -10291,27 +10291,27 @@ int centreonengine__serviceGetPluginPerfdata(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceGetRetainStatusInformation(soap* s,
-						      ns1__serviceIDType* service_id,
-						      bool& val) {
+                                                      ns1__serviceIDType* service_id,
+                                                      bool& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s({ %s, { %s } })\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str());
+                   "Webservice: %s({ %s, { %s } })\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str());
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -10322,8 +10322,8 @@ int centreonengine__serviceGetRetainStatusInformation(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -10340,27 +10340,27 @@ int centreonengine__serviceGetRetainStatusInformation(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceGetRetainNonStatusInformation(soap* s,
-							 ns1__serviceIDType* service_id,
-							 bool& val) {
+                                                         ns1__serviceIDType* service_id,
+                                                         bool& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s({ %s, { %s } })\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str());
+                   "Webservice: %s({ %s, { %s } })\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str());
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -10371,8 +10371,8 @@ int centreonengine__serviceGetRetainNonStatusInformation(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -10390,31 +10390,31 @@ int centreonengine__serviceGetRetainNonStatusInformation(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceSetRetainStatusInformation(soap* s,
-						      ns1__serviceIDType* service_id,
-						      bool enable,
-						      centreonengine__serviceSetRetainStatusInformationResponse& res) {
+                                                      ns1__serviceIDType* service_id,
+                                                      bool enable,
+                                                      centreonengine__serviceSetRetainStatusInformationResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s { %s }, %d)\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str(),
-		   enable);
+                   "Webservice: %s(%s { %s }, %d)\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str(),
+                   enable);
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -10425,8 +10425,8 @@ int centreonengine__serviceSetRetainStatusInformation(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -10444,31 +10444,31 @@ int centreonengine__serviceSetRetainStatusInformation(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceSetRetainNonStatusInformation(soap* s,
-							 ns1__serviceIDType* service_id,
-							 bool enable,
-							 centreonengine__serviceSetRetainNonStatusInformationResponse& res) {
+                                                         ns1__serviceIDType* service_id,
+                                                         bool enable,
+                                                         centreonengine__serviceSetRetainNonStatusInformationResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s { %s }, %d)\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str(),
-		   enable);
+                   "Webservice: %s(%s { %s }, %d)\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str(),
+                   enable);
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -10479,8 +10479,8 @@ int centreonengine__serviceSetRetainNonStatusInformation(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -10497,27 +10497,27 @@ int centreonengine__serviceSetRetainNonStatusInformation(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceGetStalkOnCritical(soap* s,
-					      ns1__serviceIDType* service_id,
-					      bool& val) {
+                                              ns1__serviceIDType* service_id,
+                                              bool& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s({ %s, { %s } })\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str());
+                   "Webservice: %s({ %s, { %s } })\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str());
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -10528,8 +10528,8 @@ int centreonengine__serviceGetStalkOnCritical(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -10546,27 +10546,27 @@ int centreonengine__serviceGetStalkOnCritical(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceGetStalkOnOk(soap* s,
-					ns1__serviceIDType* service_id,
-					bool& val) {
+                                        ns1__serviceIDType* service_id,
+                                        bool& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s({ %s, { %s } })\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str());
+                   "Webservice: %s({ %s, { %s } })\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str());
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -10577,8 +10577,8 @@ int centreonengine__serviceGetStalkOnOk(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -10595,27 +10595,27 @@ int centreonengine__serviceGetStalkOnOk(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceGetStalkOnUnknown(soap* s,
-					     ns1__serviceIDType* service_id,
-					     bool& val) {
+                                             ns1__serviceIDType* service_id,
+                                             bool& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s({ %s, { %s } })\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str());
+                   "Webservice: %s({ %s, { %s } })\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str());
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -10626,8 +10626,8 @@ int centreonengine__serviceGetStalkOnUnknown(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -10644,27 +10644,27 @@ int centreonengine__serviceGetStalkOnUnknown(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceGetStalkOnWarning(soap* s,
-					     ns1__serviceIDType* service_id,
-					     bool& val) {
+                                             ns1__serviceIDType* service_id,
+                                             bool& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s({ %s, { %s } })\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str());
+                   "Webservice: %s({ %s, { %s } })\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str());
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -10675,8 +10675,8 @@ int centreonengine__serviceGetStalkOnWarning(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -10694,31 +10694,31 @@ int centreonengine__serviceGetStalkOnWarning(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceSetStalkOnCritical(soap* s,
-					      ns1__serviceIDType* service_id,
-					      bool enable,
-					      centreonengine__serviceSetStalkOnCriticalResponse& res) {
+                                              ns1__serviceIDType* service_id,
+                                              bool enable,
+                                              centreonengine__serviceSetStalkOnCriticalResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s { %s }, %d)\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str(),
-		   enable);
+                   "Webservice: %s(%s { %s }, %d)\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str(),
+                   enable);
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -10729,8 +10729,8 @@ int centreonengine__serviceSetStalkOnCritical(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -10748,31 +10748,31 @@ int centreonengine__serviceSetStalkOnCritical(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceSetStalkOnOk(soap* s,
-					ns1__serviceIDType* service_id,
-					bool enable,
-					centreonengine__serviceSetStalkOnOkResponse& res) {
+                                        ns1__serviceIDType* service_id,
+                                        bool enable,
+                                        centreonengine__serviceSetStalkOnOkResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s { %s }, %d)\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str(),
-		   enable);
+                   "Webservice: %s(%s { %s }, %d)\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str(),
+                   enable);
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -10783,8 +10783,8 @@ int centreonengine__serviceSetStalkOnOk(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -10802,31 +10802,31 @@ int centreonengine__serviceSetStalkOnOk(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceSetStalkOnUnknown(soap* s,
-					     ns1__serviceIDType* service_id,
-					     bool enable,
-					     centreonengine__serviceSetStalkOnUnknownResponse& res) {
+                                             ns1__serviceIDType* service_id,
+                                             bool enable,
+                                             centreonengine__serviceSetStalkOnUnknownResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s { %s }, %d)\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str(),
-		   enable);
+                   "Webservice: %s(%s { %s }, %d)\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str(),
+                   enable);
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -10837,8 +10837,8 @@ int centreonengine__serviceSetStalkOnUnknown(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -10856,31 +10856,31 @@ int centreonengine__serviceSetStalkOnUnknown(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceSetStalkOnWarning(soap* s,
-					     ns1__serviceIDType* service_id,
-					     bool enable,
-					     centreonengine__serviceSetStalkOnWarningResponse& res) {
+                                             ns1__serviceIDType* service_id,
+                                             bool enable,
+                                             centreonengine__serviceSetStalkOnWarningResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s { %s }, %d)\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str(),
-		   enable);
+                   "Webservice: %s(%s { %s }, %d)\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str(),
+                   enable);
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -10891,8 +10891,8 @@ int centreonengine__serviceSetStalkOnWarning(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -10909,27 +10909,27 @@ int centreonengine__serviceSetStalkOnWarning(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceGetStateCurrent(soap* s,
-					   ns1__serviceIDType* service_id,
-					   unsigned short& val) {
+                                           ns1__serviceIDType* service_id,
+                                           unsigned short& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s({ %s, { %s } })\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str());
+                   "Webservice: %s({ %s, { %s } })\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str());
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -10940,8 +10940,8 @@ int centreonengine__serviceGetStateCurrent(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -10958,27 +10958,27 @@ int centreonengine__serviceGetStateCurrent(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceGetStateInitial(soap* s,
-					   ns1__serviceIDType* service_id,
-					   unsigned short& val) {
+                                           ns1__serviceIDType* service_id,
+                                           unsigned short& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s({ %s, { %s } })\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str());
+                   "Webservice: %s({ %s, { %s } })\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str());
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -10989,8 +10989,8 @@ int centreonengine__serviceGetStateInitial(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -11007,27 +11007,27 @@ int centreonengine__serviceGetStateInitial(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceGetStateLast(soap* s,
-					ns1__serviceIDType* service_id,
-					unsigned short& val) {
+                                        ns1__serviceIDType* service_id,
+                                        unsigned short& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s({ %s, { %s } })\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str());
+                   "Webservice: %s({ %s, { %s } })\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str());
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -11038,8 +11038,8 @@ int centreonengine__serviceGetStateLast(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -11056,27 +11056,27 @@ int centreonengine__serviceGetStateLast(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceGetStateLastChange(soap* s,
-					      ns1__serviceIDType* service_id,
-					      unsigned long& val) {
+                                              ns1__serviceIDType* service_id,
+                                              unsigned long& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s({ %s, { %s } })\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str());
+                   "Webservice: %s({ %s, { %s } })\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str());
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -11087,8 +11087,8 @@ int centreonengine__serviceGetStateLastChange(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -11105,27 +11105,27 @@ int centreonengine__serviceGetStateLastChange(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceGetStateLastCritical(soap* s,
-						ns1__serviceIDType* service_id,
-						unsigned long& val) {
+                                                ns1__serviceIDType* service_id,
+                                                unsigned long& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s({ %s, { %s } })\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str());
+                   "Webservice: %s({ %s, { %s } })\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str());
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -11136,8 +11136,8 @@ int centreonengine__serviceGetStateLastCritical(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -11154,27 +11154,27 @@ int centreonengine__serviceGetStateLastCritical(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceGetStateLastHard(soap* s,
-					    ns1__serviceIDType* service_id,
-					    unsigned long& val) {
+                                            ns1__serviceIDType* service_id,
+                                            unsigned long& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s({ %s, { %s } })\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str());
+                   "Webservice: %s({ %s, { %s } })\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str());
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -11185,8 +11185,8 @@ int centreonengine__serviceGetStateLastHard(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -11203,27 +11203,27 @@ int centreonengine__serviceGetStateLastHard(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceGetStateLastHardChange(soap* s,
-						  ns1__serviceIDType* service_id,
-						  unsigned long& val) {
+                                                  ns1__serviceIDType* service_id,
+                                                  unsigned long& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s({ %s, { %s } })\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str());
+                   "Webservice: %s({ %s, { %s } })\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str());
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -11234,8 +11234,8 @@ int centreonengine__serviceGetStateLastHardChange(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -11252,27 +11252,27 @@ int centreonengine__serviceGetStateLastHardChange(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceGetStateLastOk(soap* s,
-					  ns1__serviceIDType* service_id,
-					  unsigned long& val) {
+                                          ns1__serviceIDType* service_id,
+                                          unsigned long& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s({ %s, { %s } })\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str());
+                   "Webservice: %s({ %s, { %s } })\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str());
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -11283,8 +11283,8 @@ int centreonengine__serviceGetStateLastOk(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -11301,27 +11301,27 @@ int centreonengine__serviceGetStateLastOk(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceGetStateLastUnknown(soap* s,
-					       ns1__serviceIDType* service_id,
-					       unsigned long& val) {
+                                               ns1__serviceIDType* service_id,
+                                               unsigned long& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s({ %s, { %s } })\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str());
+                   "Webservice: %s({ %s, { %s } })\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str());
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -11332,8 +11332,8 @@ int centreonengine__serviceGetStateLastUnknown(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -11350,27 +11350,27 @@ int centreonengine__serviceGetStateLastUnknown(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceGetStateLastWarning(soap* s,
-					       ns1__serviceIDType* service_id,
-					       unsigned long& val) {
+                                               ns1__serviceIDType* service_id,
+                                               unsigned long& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s({ %s, { %s } })\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str());
+                   "Webservice: %s({ %s, { %s } })\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str());
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -11381,8 +11381,8 @@ int centreonengine__serviceGetStateLastWarning(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -11399,27 +11399,27 @@ int centreonengine__serviceGetStateLastWarning(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceGetStatePercentChange(soap* s,
-						 ns1__serviceIDType* service_id,
-						 unsigned long& val) {
+                                                 ns1__serviceIDType* service_id,
+                                                 unsigned long& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s({ %s, { %s } })\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str());
+                   "Webservice: %s({ %s, { %s } })\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str());
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -11430,8 +11430,8 @@ int centreonengine__serviceGetStatePercentChange(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -11448,27 +11448,27 @@ int centreonengine__serviceGetStatePercentChange(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceGetStateType(soap* s,
-					ns1__serviceIDType* service_id,
-					unsigned long& val) {
+                                        ns1__serviceIDType* service_id,
+                                        unsigned long& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s({ %s, { %s } })\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str());
+                   "Webservice: %s({ %s, { %s } })\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str());
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -11479,8 +11479,8 @@ int centreonengine__serviceGetStateType(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -11498,23 +11498,23 @@ int centreonengine__serviceGetStateType(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__acknowledgementOnHostAdd(soap* s,
-					     ns1__hostIDType* host_id,
-					     ns1__acknowledgementType* acknowledgement_type,
-					     centreonengine__acknowledgementOnHostAddResponse& res) {
+                                             ns1__hostIDType* host_id,
+                                             ns1__acknowledgementType* acknowledgement_type,
+                                             centreonengine__acknowledgementOnHostAddResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s, { %s, %s, %d, %d, %d })\n",
-		   __func__,
-		   host_id->name.c_str(),
-		   acknowledgement_type->author.c_str(),
-		   acknowledgement_type->comment.c_str(),
-		   acknowledgement_type->notify,
-		   acknowledgement_type->persistent,
-		   acknowledgement_type->sticky);
+                   "Webservice: %s(%s, { %s, %s, %d, %d, %d })\n",
+                   __func__,
+                   host_id->name.c_str(),
+                   acknowledgement_type->author.c_str(),
+                   acknowledgement_type->comment.c_str(),
+                   acknowledgement_type->notify,
+                   acknowledgement_type->persistent,
+                   acknowledgement_type->sticky);
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -11522,9 +11522,9 @@ int centreonengine__acknowledgementOnHostAdd(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -11536,11 +11536,11 @@ int centreonengine__acknowledgementOnHostAdd(soap* s,
     char* comment = my_strdup(acknowledgement_type->comment.c_str());
 
     acknowledge_host_problem(host,
-			     author,
-			     comment,
-			     type,
-			     acknowledgement_type->notify,
-			     acknowledgement_type->persistent);
+                             author,
+                             comment,
+                             type,
+                             acknowledgement_type->notify,
+                             acknowledgement_type->persistent);
 
     delete[] author;
     delete[] comment;
@@ -11548,8 +11548,8 @@ int centreonengine__acknowledgementOnHostAdd(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -11566,17 +11566,17 @@ int centreonengine__acknowledgementOnHostAdd(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__acknowledgementOnHostRemove(soap* s,
-						ns1__hostIDType* host_id,
-						centreonengine__acknowledgementOnHostRemoveResponse& res) {
+                                                ns1__hostIDType* host_id,
+                                                centreonengine__acknowledgementOnHostRemoveResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   host_id->name.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   host_id->name.c_str());
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -11584,9 +11584,9 @@ int centreonengine__acknowledgementOnHostRemove(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -11597,8 +11597,8 @@ int centreonengine__acknowledgementOnHostRemove(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -11616,35 +11616,35 @@ int centreonengine__acknowledgementOnHostRemove(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__acknowledgementOnServiceAdd(soap* s,
-						ns1__serviceIDType* service_id,
-						ns1__acknowledgementType* acknowledgement_type,
-						centreonengine__acknowledgementOnServiceAddResponse& res) {
+                                                ns1__serviceIDType* service_id,
+                                                ns1__acknowledgementType* acknowledgement_type,
+                                                centreonengine__acknowledgementOnServiceAddResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s({ %s, { %s } }, { %s, %s, %d, %d, %d })\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str(),
-		   acknowledgement_type->author.c_str(),
-		   acknowledgement_type->comment.c_str(),
-		   acknowledgement_type->notify,
-		   acknowledgement_type->persistent,
-		   acknowledgement_type->sticky);
+                   "Webservice: %s({ %s, { %s } }, { %s, %s, %d, %d, %d })\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str(),
+                   acknowledgement_type->author.c_str(),
+                   acknowledgement_type->comment.c_str(),
+                   acknowledgement_type->notify,
+                   acknowledgement_type->persistent,
+                   acknowledgement_type->sticky);
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -11656,19 +11656,19 @@ int centreonengine__acknowledgementOnServiceAdd(soap* s,
     char* comment = my_strdup(acknowledgement_type->comment.c_str());
 
     acknowledge_service_problem(service,
-				author,
-				comment,
-				type,
-				acknowledgement_type->notify,
-				acknowledgement_type->persistent);
+                                author,
+                                comment,
+                                type,
+                                acknowledgement_type->notify,
+                                acknowledgement_type->persistent);
     delete[] author;
     delete[] comment;
     syncro::instance().worker_finish();
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -11685,29 +11685,29 @@ int centreonengine__acknowledgementOnServiceAdd(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__acknowledgementOnServiceRemove(soap* s,
-						   ns1__serviceIDType* service_id,
-						   centreonengine__acknowledgementOnServiceRemoveResponse& res) {
+                                                   ns1__serviceIDType* service_id,
+                                                   centreonengine__acknowledgementOnServiceRemoveResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s({ %s, { %s } })\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str());
+                   "Webservice: %s({ %s, { %s } })\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str());
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -11718,8 +11718,8 @@ int centreonengine__acknowledgementOnServiceRemove(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -11737,24 +11737,24 @@ int centreonengine__acknowledgementOnServiceRemove(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__checkHostProcessResult(soap* s,
-					   ns1__hostIDType* host_id,
-					   ns1__checkResultType* result_type,
-					   centreonengine__checkHostProcessResultResponse& res) {
+                                           ns1__hostIDType* host_id,
+                                           ns1__checkResultType* result_type,
+                                           centreonengine__checkHostProcessResultResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s, { %d, ... })\n",
-		   __func__,
-		   host_id->name.c_str(),
-		   result_type->retval);
+                   "Webservice: %s(%s, { %d, ... })\n",
+                   __func__,
+                   host_id->name.c_str(),
+                   result_type->retval);
 
     log_debug_info(DEBUGL_CHECKS, 2,
-		   "Webservice: call %s: output=%s\n",
-		   __func__,
-		   result_type->output.c_str());
+                   "Webservice: call %s: output=%s\n",
+                   __func__,
+                   result_type->output.c_str());
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -11762,25 +11762,25 @@ int centreonengine__checkHostProcessResult(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
     }
 
     if (process_passive_host_check(time(NULL),
-				   host->name,
-				   result_type->retval,
-				   result_type->output.c_str()) == ERROR) {
+                                   host->name,
+                                   result_type->retval,
+                                   result_type->output.c_str()) == ERROR) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Host `" + host_id->name + "' check process result failed.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -11789,8 +11789,8 @@ int centreonengine__checkHostProcessResult(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -11808,19 +11808,19 @@ int centreonengine__checkHostProcessResult(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__checkHostSchedule(soap* s,
-				      ns1__hostIDType* host_id,
-				      long delay,
-				      centreonengine__checkHostScheduleResponse& res) {
+                                      ns1__hostIDType* host_id,
+                                      long delay,
+                                      centreonengine__checkHostScheduleResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s, %ld)\n",
-		   __func__,
-		   host_id->name.c_str(),
-		   delay);
+                   "Webservice: %s(%s, %ld)\n",
+                   __func__,
+                   host_id->name.c_str(),
+                   delay);
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -11828,9 +11828,9 @@ int centreonengine__checkHostSchedule(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -11841,8 +11841,8 @@ int centreonengine__checkHostSchedule(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -11860,19 +11860,19 @@ int centreonengine__checkHostSchedule(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__checkHostScheduleForced(soap* s,
-					    ns1__hostIDType* host_id,
-					    long delay,
-					    centreonengine__checkHostScheduleForcedResponse& res) {
+                                            ns1__hostIDType* host_id,
+                                            long delay,
+                                            centreonengine__checkHostScheduleForcedResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s, %ld)\n",
-		   __func__,
-		   host_id->name.c_str(),
-		   delay);
+                   "Webservice: %s(%s, %ld)\n",
+                   __func__,
+                   host_id->name.c_str(),
+                   delay);
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -11880,9 +11880,9 @@ int centreonengine__checkHostScheduleForced(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -11893,8 +11893,8 @@ int centreonengine__checkHostScheduleForced(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -11912,19 +11912,19 @@ int centreonengine__checkHostScheduleForced(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__checkHostScheduleServices(soap* s,
-					      ns1__hostIDType* host_id,
-					      long delay,
-					      centreonengine__checkHostScheduleServicesResponse& res) {
+                                              ns1__hostIDType* host_id,
+                                              long delay,
+                                              centreonengine__checkHostScheduleServicesResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s, %ld)\n",
-		   __func__,
-		   host_id->name.c_str(),
-		   delay);
+                   "Webservice: %s(%s, %ld)\n",
+                   __func__,
+                   host_id->name.c_str(),
+                   delay);
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -11932,9 +11932,9 @@ int centreonengine__checkHostScheduleServices(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -11942,15 +11942,15 @@ int centreonengine__checkHostScheduleServices(soap* s,
 
     for (servicesmember* tmp = host->services; tmp != NULL; tmp = tmp->next) {
       if (tmp->service_ptr != NULL) {
-	schedule_service_check(tmp->service_ptr, delay, CHECK_OPTION_NONE);
+        schedule_service_check(tmp->service_ptr, delay, CHECK_OPTION_NONE);
       }
     }
     syncro::instance().worker_finish();
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -11968,19 +11968,19 @@ int centreonengine__checkHostScheduleServices(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__checkHostScheduleServicesForced(soap* s,
-						    ns1__hostIDType* host_id,
-						    long delay,
-						    centreonengine__checkHostScheduleServicesForcedResponse& res) {
+                                                    ns1__hostIDType* host_id,
+                                                    long delay,
+                                                    centreonengine__checkHostScheduleServicesForcedResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s, %ld)\n",
-		   __func__,
-		   host_id->name.c_str(),
-		   delay);
+                   "Webservice: %s(%s, %ld)\n",
+                   __func__,
+                   host_id->name.c_str(),
+                   delay);
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -11988,9 +11988,9 @@ int centreonengine__checkHostScheduleServicesForced(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -11998,15 +11998,15 @@ int centreonengine__checkHostScheduleServicesForced(soap* s,
 
     for (servicesmember* tmp = host->services; tmp != NULL; tmp = tmp->next) {
       if (tmp->service_ptr != NULL) {
-	schedule_service_check(tmp->service_ptr, delay, CHECK_OPTION_FORCE_EXECUTION);
+        schedule_service_check(tmp->service_ptr, delay, CHECK_OPTION_FORCE_EXECUTION);
       }
     }
     syncro::instance().worker_finish();
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -12024,55 +12024,55 @@ int centreonengine__checkHostScheduleServicesForced(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__checkServiceProcessResult(soap* s,
-					      ns1__serviceIDType* service_id,
-					      ns1__checkResultType* result_type,
-					      centreonengine__checkServiceProcessResultResponse& res) {
+                                              ns1__serviceIDType* service_id,
+                                              ns1__checkResultType* result_type,
+                                              centreonengine__checkServiceProcessResultResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s({ %s, { %s } }, { %d, ... })\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str(),
-		   result_type->retval);
+                   "Webservice: %s({ %s, { %s } }, { %d, ... })\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str(),
+                   result_type->retval);
 
     log_debug_info(DEBUGL_CHECKS, 2,
-		   "Webservice: call %s: output=%s\n",
-		   __func__,
-		   result_type->output.c_str());
+                   "Webservice: call %s: output=%s\n",
+                   __func__,
+                   result_type->output.c_str());
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
     }
 
     if (process_passive_service_check(time(NULL),
-				      service_id->host->name.c_str(),
-				      service->description,
-				      result_type->retval,
-				      result_type->output.c_str()) == ERROR) {
+                                      service_id->host->name.c_str(),
+                                      service->description,
+                                      result_type->retval,
+                                      result_type->output.c_str()) == ERROR) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' check process result failed "
-	+ "for host `" + service_id->host->name + "'.";
+        + "' check process result failed "
+        + "for host `" + service_id->host->name + "'.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -12081,8 +12081,8 @@ int centreonengine__checkServiceProcessResult(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -12100,31 +12100,31 @@ int centreonengine__checkServiceProcessResult(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__checkServiceSchedule(soap* s,
-					 ns1__serviceIDType* service_id,
-					 long delay,
-					 centreonengine__checkServiceScheduleResponse& res) {
+                                         ns1__serviceIDType* service_id,
+                                         long delay,
+                                         centreonengine__checkServiceScheduleResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s({ %s, { %s } }, %ld)\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str(),
-		   delay);
+                   "Webservice: %s({ %s, { %s } }, %ld)\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str(),
+                   delay);
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -12135,8 +12135,8 @@ int centreonengine__checkServiceSchedule(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -12154,31 +12154,31 @@ int centreonengine__checkServiceSchedule(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__checkServiceScheduleForced(soap* s,
-					       ns1__serviceIDType* service_id,
-					       long delay,
-					       centreonengine__checkServiceScheduleForcedResponse& res) {
+                                               ns1__serviceIDType* service_id,
+                                               long delay,
+                                               centreonengine__checkServiceScheduleForcedResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s({ %s, { %s } }, %ld)\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str(),
-		   delay);
+                   "Webservice: %s({ %s, { %s } }, %ld)\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str(),
+                   delay);
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -12189,8 +12189,8 @@ int centreonengine__checkServiceScheduleForced(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -12207,15 +12207,15 @@ int centreonengine__checkServiceScheduleForced(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__downtimeGetAuthor(soap* s,
-				      ns1__downtimeIDType* downtime_id,
-				      std::string& val) {
+                                      ns1__downtimeIDType* downtime_id,
+                                      std::string& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%lu)\n",
-		   __func__,
-		   downtime_id->downtime);
+                   "Webservice: %s(%lu)\n",
+                   __func__,
+                   downtime_id->downtime);
 
     scheduled_downtime* downtime = find_downtime(ANY_DOWNTIME, downtime_id->downtime);
     if (downtime == NULL) {
@@ -12226,9 +12226,9 @@ int centreonengine__downtimeGetAuthor(soap* s,
       *error = "Downtime `" + oss.str() + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -12241,8 +12241,8 @@ int centreonengine__downtimeGetAuthor(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -12259,15 +12259,15 @@ int centreonengine__downtimeGetAuthor(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__downtimeGetDuration(soap* s,
-					ns1__downtimeIDType* downtime_id,
-					double& val) {
+                                        ns1__downtimeIDType* downtime_id,
+                                        double& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%lu)\n",
-		   __func__,
-		   downtime_id->downtime);
+                   "Webservice: %s(%lu)\n",
+                   __func__,
+                   downtime_id->downtime);
 
     scheduled_downtime* downtime = find_downtime(ANY_DOWNTIME, downtime_id->downtime);
     if (downtime == NULL) {
@@ -12278,9 +12278,9 @@ int centreonengine__downtimeGetDuration(soap* s,
       *error = "Downtime `" + oss.str() + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -12291,8 +12291,8 @@ int centreonengine__downtimeGetDuration(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -12309,15 +12309,15 @@ int centreonengine__downtimeGetDuration(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__downtimeGetEnd(soap* s,
-				   ns1__downtimeIDType* downtime_id,
-				   unsigned long& val) {
+                                   ns1__downtimeIDType* downtime_id,
+                                   unsigned long& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%lu)\n",
-		   __func__,
-		   downtime_id->downtime);
+                   "Webservice: %s(%lu)\n",
+                   __func__,
+                   downtime_id->downtime);
 
     scheduled_downtime* downtime = find_downtime(ANY_DOWNTIME, downtime_id->downtime);
     if (downtime == NULL) {
@@ -12328,9 +12328,9 @@ int centreonengine__downtimeGetEnd(soap* s,
       *error = "Downtime `" + oss.str() + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -12341,8 +12341,8 @@ int centreonengine__downtimeGetEnd(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -12359,15 +12359,15 @@ int centreonengine__downtimeGetEnd(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__downtimeGetFixed(soap* s,
-				     ns1__downtimeIDType* downtime_id,
-				     bool& val) {
+                                     ns1__downtimeIDType* downtime_id,
+                                     bool& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%lu)\n",
-		   __func__,
-		   downtime_id->downtime);
+                   "Webservice: %s(%lu)\n",
+                   __func__,
+                   downtime_id->downtime);
 
     scheduled_downtime* downtime = find_downtime(ANY_DOWNTIME, downtime_id->downtime);
     if (downtime == NULL) {
@@ -12378,9 +12378,9 @@ int centreonengine__downtimeGetFixed(soap* s,
       *error = "Downtime `" + oss.str() + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -12391,8 +12391,8 @@ int centreonengine__downtimeGetFixed(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -12409,15 +12409,15 @@ int centreonengine__downtimeGetFixed(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__downtimeGetStart(soap* s,
-				     ns1__downtimeIDType* downtime_id,
-				     unsigned long& val) {
+                                     ns1__downtimeIDType* downtime_id,
+                                     unsigned long& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%lu)\n",
-		   __func__,
-		   downtime_id->downtime);
+                   "Webservice: %s(%lu)\n",
+                   __func__,
+                   downtime_id->downtime);
 
     scheduled_downtime* downtime = find_downtime(ANY_DOWNTIME, downtime_id->downtime);
     if (downtime == NULL) {
@@ -12428,9 +12428,9 @@ int centreonengine__downtimeGetStart(soap* s,
       *error = "Downtime `" + oss.str() + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -12441,8 +12441,8 @@ int centreonengine__downtimeGetStart(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -12459,20 +12459,20 @@ int centreonengine__downtimeGetStart(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__downtimeDelete(soap* s,
-				   ns1__downtimeIDType* downtime_id,
-				   centreonengine__downtimeDeleteResponse& res) {
+                                   ns1__downtimeIDType* downtime_id,
+                                   centreonengine__downtimeDeleteResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%lu)\n",
-		   __func__,
-		   downtime_id->downtime);
+                   "Webservice: %s(%lu)\n",
+                   __func__,
+                   downtime_id->downtime);
 
     if (unschedule_downtime(HOST_DOWNTIME, downtime_id->downtime) == ERROR
-	&& unschedule_downtime(SERVICE_DOWNTIME, downtime_id->downtime) == ERROR) {
+        && unschedule_downtime(SERVICE_DOWNTIME, downtime_id->downtime) == ERROR) {
       std::ostringstream oss;
       oss << downtime_id->downtime;
 
@@ -12480,9 +12480,9 @@ int centreonengine__downtimeDelete(soap* s,
       *error = "Downtime `" + oss.str() + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -12491,8 +12491,8 @@ int centreonengine__downtimeDelete(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -12510,23 +12510,23 @@ int centreonengine__downtimeDelete(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__downtimeAddToHost(soap* s,
-				      ns1__hostIDType* host_id,
-				      ns1__downtimeType* downtime_type,
-				      centreonengine__downtimeAddToHostResponse& res) {
+                                      ns1__hostIDType* host_id,
+                                      ns1__downtimeType* downtime_type,
+                                      centreonengine__downtimeAddToHostResponse& res) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s, { %ld, %ld, %d, %lu, %f, %s, %s })\n",
-		   __func__,
-		   host_id->name.c_str(),
-		   downtime_type->starttime,
-		   downtime_type->endtime,
-		   downtime_type->fixed,
-		   downtime_type->triggerid->downtime,
-		   downtime_type->duration,
-		   downtime_type->author.c_str(),
-		   downtime_type->comment.c_str());
+                   "Webservice: %s(%s, { %ld, %ld, %d, %lu, %f, %s, %s })\n",
+                   __func__,
+                   host_id->name.c_str(),
+                   downtime_type->starttime,
+                   downtime_type->endtime,
+                   downtime_type->fixed,
+                   downtime_type->triggerid->downtime,
+                   downtime_type->duration,
+                   downtime_type->author.c_str(),
+                   downtime_type->comment.c_str());
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -12534,9 +12534,9 @@ int centreonengine__downtimeAddToHost(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -12545,31 +12545,33 @@ int centreonengine__downtimeAddToHost(soap* s,
     char* author = my_strdup(downtime_type->author.c_str());
     char* comment = my_strdup(downtime_type->comment.c_str());
 
+    unsigned long downtime_id;
     if (schedule_downtime(HOST_DOWNTIME,
-			  host->name,
-			  NULL,
-			  time(NULL),
-			  author,
-			  comment,
-			  downtime_type->starttime,
-			  downtime_type->endtime,
-			  downtime_type->fixed,
-			  downtime_type->triggerid->downtime,
-			  downtime_type->duration,
-			  &res.downtimeid->downtime) == ERROR) {
+                          host->name,
+                          NULL,
+                          time(NULL),
+                          author,
+                          comment,
+                          downtime_type->starttime,
+                          downtime_type->endtime,
+                          downtime_type->fixed,
+                          downtime_type->triggerid->downtime,
+                          downtime_type->duration,
+                          &downtime_id) == ERROR) {
       delete[] author;
       delete[] comment;
       std::string* error = soap_new_std__string(s, 1);
       *error = "Host `" + host_id->name + "' add downtime to host failed.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
     }
+    res.downtimeid->downtime = downtime_id;
 
     delete[] author;
     delete[] comment;
@@ -12577,8 +12579,8 @@ int centreonengine__downtimeAddToHost(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -12596,23 +12598,23 @@ int centreonengine__downtimeAddToHost(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__downtimeAddAndPropagateToHost(soap* s,
-						  ns1__hostIDType* host_id,
-						  ns1__downtimeType* downtime_type,
-						  centreonengine__downtimeAddAndPropagateToHostResponse& res) {
+                                                  ns1__hostIDType* host_id,
+                                                  ns1__downtimeType* downtime_type,
+                                                  centreonengine__downtimeAddAndPropagateToHostResponse& res) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s, { %ld, %ld, %d, %lu, %f, %s, %s })\n",
-		   __func__,
-		   host_id->name.c_str(),
-		   downtime_type->starttime,
-		   downtime_type->endtime,
-		   downtime_type->fixed,
-		   downtime_type->triggerid->downtime,
-		   downtime_type->duration,
-		   downtime_type->author.c_str(),
-		   downtime_type->comment.c_str());
+                   "Webservice: %s(%s, { %ld, %ld, %d, %lu, %f, %s, %s })\n",
+                   __func__,
+                   host_id->name.c_str(),
+                   downtime_type->starttime,
+                   downtime_type->endtime,
+                   downtime_type->fixed,
+                   downtime_type->triggerid->downtime,
+                   downtime_type->duration,
+                   downtime_type->author.c_str(),
+                   downtime_type->comment.c_str());
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -12620,9 +12622,9 @@ int centreonengine__downtimeAddAndPropagateToHost(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -12633,18 +12635,19 @@ int centreonengine__downtimeAddAndPropagateToHost(soap* s,
     char* author = my_strdup(downtime_type->author.c_str());
     char* comment = my_strdup(downtime_type->comment.c_str());
 
+    unsigned long downtime_id;
     if (schedule_downtime(HOST_DOWNTIME,
-			  host->name,
-			  NULL,
-			  entry_time,
-			  author,
-			  comment,
-			  downtime_type->starttime,
-			  downtime_type->endtime,
-			  downtime_type->fixed,
-			  downtime_type->triggerid->downtime,
-			  downtime_type->duration,
-			  &res.downtimeid->downtime) == ERROR) {
+                          host->name,
+                          NULL,
+                          entry_time,
+                          author,
+                          comment,
+                          downtime_type->starttime,
+                          downtime_type->endtime,
+                          downtime_type->fixed,
+                          downtime_type->triggerid->downtime,
+                          downtime_type->duration,
+                          &downtime_id) == ERROR) {
 
       delete[] author;
       delete[] comment;
@@ -12652,23 +12655,24 @@ int centreonengine__downtimeAddAndPropagateToHost(soap* s,
       std::string* error = soap_new_std__string(s, 1);
       *error = "Host `" + host_id->name + "' add downtime faild.";
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
     }
+    res.downtimeid->downtime = downtime_id;
 
     schedule_and_propagate_downtime(host,
-				    entry_time,
-				    author,
-				    comment,
-				    downtime_type->starttime,
-				    downtime_type->endtime,
-				    downtime_type->fixed,
-				    0,
-				    downtime_type->duration);
+                                    entry_time,
+                                    author,
+                                    comment,
+                                    downtime_type->starttime,
+                                    downtime_type->endtime,
+                                    downtime_type->fixed,
+                                    0,
+                                    downtime_type->duration);
 
     delete[] author;
     delete[] comment;
@@ -12676,8 +12680,8 @@ int centreonengine__downtimeAddAndPropagateToHost(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -12695,23 +12699,23 @@ int centreonengine__downtimeAddAndPropagateToHost(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__downtimeAddAndPropagateTriggeredToHost(soap* s,
-							   ns1__hostIDType* host_id,
-							   ns1__downtimeType* downtime_type,
-							   centreonengine__downtimeAddAndPropagateTriggeredToHostResponse& res) {
+                                                           ns1__hostIDType* host_id,
+                                                           ns1__downtimeType* downtime_type,
+                                                           centreonengine__downtimeAddAndPropagateTriggeredToHostResponse& res) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s, { %ld, %ld, %d, %lu, %f, %s, %s })\n",
-		   __func__,
-		   host_id->name.c_str(),
-		   downtime_type->starttime,
-		   downtime_type->endtime,
-		   downtime_type->fixed,
-		   downtime_type->triggerid->downtime,
-		   downtime_type->duration,
-		   downtime_type->author.c_str(),
-		   downtime_type->comment.c_str());
+                   "Webservice: %s(%s, { %ld, %ld, %d, %lu, %f, %s, %s })\n",
+                   __func__,
+                   host_id->name.c_str(),
+                   downtime_type->starttime,
+                   downtime_type->endtime,
+                   downtime_type->fixed,
+                   downtime_type->triggerid->downtime,
+                   downtime_type->duration,
+                   downtime_type->author.c_str(),
+                   downtime_type->comment.c_str());
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -12719,9 +12723,9 @@ int centreonengine__downtimeAddAndPropagateTriggeredToHost(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -12732,18 +12736,19 @@ int centreonengine__downtimeAddAndPropagateTriggeredToHost(soap* s,
     char* author = my_strdup(downtime_type->author.c_str());
     char* comment = my_strdup(downtime_type->comment.c_str());
 
+    unsigned long downtime_id;
     if (schedule_downtime(HOST_DOWNTIME,
-			  host->name,
-			  NULL,
-			  entry_time,
-			  author,
-			  comment,
-			  downtime_type->starttime,
-			  downtime_type->endtime,
-			  downtime_type->fixed,
-			  downtime_type->triggerid->downtime,
-			  downtime_type->duration,
-			  &res.downtimeid->downtime) == ERROR) {
+                          host->name,
+                          NULL,
+                          entry_time,
+                          author,
+                          comment,
+                          downtime_type->starttime,
+                          downtime_type->endtime,
+                          downtime_type->fixed,
+                          downtime_type->triggerid->downtime,
+                          downtime_type->duration,
+                          &downtime_id) == ERROR) {
       delete[] author;
       delete[] comment;
 
@@ -12751,23 +12756,24 @@ int centreonengine__downtimeAddAndPropagateTriggeredToHost(soap* s,
       *error = "Host `" + host_id->name + "' add downtime faild.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
     }
+    res.downtimeid->downtime = downtime_id;
 
     schedule_and_propagate_downtime(host,
-				    entry_time,
-				    author,
-				    comment,
-				    downtime_type->starttime,
-				    downtime_type->endtime,
-				    downtime_type->fixed,
-				    res.downtimeid->downtime,
-				    downtime_type->duration);
+                                    entry_time,
+                                    author,
+                                    comment,
+                                    downtime_type->starttime,
+                                    downtime_type->endtime,
+                                    downtime_type->fixed,
+                                    res.downtimeid->downtime,
+                                    downtime_type->duration);
 
     delete[] author;
     delete[] comment;
@@ -12775,8 +12781,8 @@ int centreonengine__downtimeAddAndPropagateTriggeredToHost(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -12794,25 +12800,25 @@ int centreonengine__downtimeAddAndPropagateTriggeredToHost(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__downtimeAddToHostServices(soap* s,
-					      ns1__hostIDType* host_id,
-					      ns1__downtimeType* downtime_type,
-					      centreonengine__downtimeAddToHostServicesResponse& res) {
+                                              ns1__hostIDType* host_id,
+                                              ns1__downtimeType* downtime_type,
+                                              centreonengine__downtimeAddToHostServicesResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s, { %ld, %ld, %d, %lu, %f, %s, %s })\n",
-		   __func__,
-		   host_id->name.c_str(),
-		   downtime_type->starttime,
-		   downtime_type->endtime,
-		   downtime_type->fixed,
-		   downtime_type->triggerid->downtime,
-		   downtime_type->duration,
-		   downtime_type->author.c_str(),
-		   downtime_type->comment.c_str());
+                   "Webservice: %s(%s, { %ld, %ld, %d, %lu, %f, %s, %s })\n",
+                   __func__,
+                   host_id->name.c_str(),
+                   downtime_type->starttime,
+                   downtime_type->endtime,
+                   downtime_type->fixed,
+                   downtime_type->triggerid->downtime,
+                   downtime_type->duration,
+                   downtime_type->author.c_str(),
+                   downtime_type->comment.c_str());
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -12820,9 +12826,9 @@ int centreonengine__downtimeAddToHostServices(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -12837,20 +12843,20 @@ int centreonengine__downtimeAddToHostServices(soap* s,
 
     for (servicesmember* tmp = host->services; tmp != NULL; tmp = tmp->next) {
       if (tmp->service_ptr !=NULL) {
-	if (schedule_downtime(SERVICE_DOWNTIME,
-			      host->name,
-			      tmp->service_ptr->description,
-			      entry_time,
-			      author,
-			      comment,
-			      downtime_type->starttime,
-			      downtime_type->endtime,
-			      downtime_type->fixed,
-			      downtime_type->triggerid->downtime,
-			      downtime_type->duration,
-			      NULL) == ERROR) {
-	  is_error = true;
-	}
+        if (schedule_downtime(SERVICE_DOWNTIME,
+                              host->name,
+                              tmp->service_ptr->description,
+                              entry_time,
+                              author,
+                              comment,
+                              downtime_type->starttime,
+                              downtime_type->endtime,
+                              downtime_type->fixed,
+                              downtime_type->triggerid->downtime,
+                              downtime_type->duration,
+                              NULL) == ERROR) {
+          is_error = true;
+        }
       }
     }
 
@@ -12862,9 +12868,9 @@ int centreonengine__downtimeAddToHostServices(soap* s,
       *error = "Host `" + host_id->name + "' one or more service cannot schedule downtime.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -12873,8 +12879,8 @@ int centreonengine__downtimeAddToHostServices(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -12892,35 +12898,35 @@ int centreonengine__downtimeAddToHostServices(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__downtimeAddToService(soap* s,
-					 ns1__serviceIDType* service_id,
-					 ns1__downtimeType* downtime_type,
-					 centreonengine__downtimeAddToServiceResponse& res) {
+                                         ns1__serviceIDType* service_id,
+                                         ns1__downtimeType* downtime_type,
+                                         centreonengine__downtimeAddToServiceResponse& res) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s({ %s, { %s } }, { %ld, %ld, %d, %lu, %f, %s, %s })\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str(),
-		   downtime_type->starttime,
-		   downtime_type->endtime,
-		   downtime_type->fixed,
-		   downtime_type->triggerid->downtime,
-		   downtime_type->duration,
-		   downtime_type->author.c_str(),
-		   downtime_type->comment.c_str());
+                   "Webservice: %s({ %s, { %s } }, { %ld, %ld, %d, %lu, %f, %s, %s })\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str(),
+                   downtime_type->starttime,
+                   downtime_type->endtime,
+                   downtime_type->fixed,
+                   downtime_type->triggerid->downtime,
+                   downtime_type->duration,
+                   downtime_type->author.c_str(),
+                   downtime_type->comment.c_str());
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -12929,31 +12935,33 @@ int centreonengine__downtimeAddToService(soap* s,
     char* author = my_strdup(downtime_type->author.c_str());
     char* comment = my_strdup(downtime_type->comment.c_str());
 
+    unsigned long downtime_id;
     if (schedule_downtime(SERVICE_DOWNTIME,
-			  service->host_name,
-			  service->description,
-			  time(NULL),
-			  author,
-			  comment,
-			  downtime_type->starttime,
-			  downtime_type->endtime,
-			  downtime_type->fixed,
-			  downtime_type->triggerid->downtime,
-			  downtime_type->duration,
-			  &res.downtimeid->downtime) == ERROR) {
+                          service->host_name,
+                          service->description,
+                          time(NULL),
+                          author,
+                          comment,
+                          downtime_type->starttime,
+                          downtime_type->endtime,
+                          downtime_type->fixed,
+                          downtime_type->triggerid->downtime,
+                          downtime_type->duration,
+                          &downtime_id) == ERROR) {
       delete[] author;
       delete[] comment;
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service + "' add downtime to service failed.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
     }
+    res.downtimeid->downtime = downtime_id;
 
     delete[] author;
     delete[] comment;
@@ -12961,8 +12969,8 @@ int centreonengine__downtimeAddToService(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -12980,19 +12988,19 @@ int centreonengine__downtimeAddToService(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__notificationHostDelay(soap* s,
-					  ns1__hostIDType* host_id,
-					  long delay,
-					  centreonengine__notificationHostDelayResponse& res) {
+                                          ns1__hostIDType* host_id,
+                                          long delay,
+                                          centreonengine__notificationHostDelayResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s, %ld)\n",
-		   __func__,
-		   host_id->name.c_str(),
-		   delay);
+                   "Webservice: %s(%s, %ld)\n",
+                   __func__,
+                   host_id->name.c_str(),
+                   delay);
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -13000,9 +13008,9 @@ int centreonengine__notificationHostDelay(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -13013,8 +13021,8 @@ int centreonengine__notificationHostDelay(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -13032,23 +13040,23 @@ int centreonengine__notificationHostDelay(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__notificationHostSend(soap* s,
-					 ns1__hostIDType* host_id,
-					 ns1__notificationType* notification_type,
-					 centreonengine__notificationHostSendResponse& res) {
+                                         ns1__hostIDType* host_id,
+                                         ns1__notificationType* notification_type,
+                                         centreonengine__notificationHostSendResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s, { %s, %d, %s, %d, %d })\n",
-		   __func__,
-		   host_id->name.c_str(),
-		   notification_type->author.c_str(),
-		   notification_type->broadcast,
-		   notification_type->comment.c_str(),
-		   notification_type->forced,
-		   notification_type->increment);
+                   "Webservice: %s(%s, { %s, %d, %s, %d, %d })\n",
+                   __func__,
+                   host_id->name.c_str(),
+                   notification_type->author.c_str(),
+                   notification_type->broadcast,
+                   notification_type->comment.c_str(),
+                   notification_type->forced,
+                   notification_type->increment);
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -13056,9 +13064,9 @@ int centreonengine__notificationHostSend(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -13072,19 +13080,19 @@ int centreonengine__notificationHostSend(soap* s,
     char* comment = my_strdup(notification_type->comment.c_str());
 
     if (host_notification(host,
-			  NOTIFICATION_CUSTOM,
-			  author,
-			  comment,
-			  options) == ERROR) {
+                          NOTIFICATION_CUSTOM,
+                          author,
+                          comment,
+                          options) == ERROR) {
       delete[] author;
       delete[] comment;
       std::string* error = soap_new_std__string(s, 1);
       *error = "Host `" + host_id->name + "' send notification failed.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -13096,8 +13104,8 @@ int centreonengine__notificationHostSend(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -13115,31 +13123,31 @@ int centreonengine__notificationHostSend(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__notificationServiceDelay(soap* s,
-					     ns1__serviceIDType* service_id,
-					     long delay,
-					     centreonengine__notificationServiceDelayResponse& res) {
+                                             ns1__serviceIDType* service_id,
+                                             long delay,
+                                             centreonengine__notificationServiceDelayResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s({ %s, { %s } }, %ld)\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str(),
-		   delay);
+                   "Webservice: %s({ %s, { %s } }, %ld)\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str(),
+                   delay);
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -13150,8 +13158,8 @@ int centreonengine__notificationServiceDelay(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -13169,35 +13177,35 @@ int centreonengine__notificationServiceDelay(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__notificationServiceSend(soap* s,
-					    ns1__serviceIDType* service_id,
-					    ns1__notificationType* notification_type,
-					    centreonengine__notificationServiceSendResponse& res) {
+                                            ns1__serviceIDType* service_id,
+                                            ns1__notificationType* notification_type,
+                                            centreonengine__notificationServiceSendResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s({ %s, { %s } }, { %s, %d, %s, %d, %d })\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str(),
-		   notification_type->author.c_str(),
-		   notification_type->broadcast,
-		   notification_type->comment.c_str(),
-		   notification_type->forced,
-		   notification_type->increment);
+                   "Webservice: %s({ %s, { %s } }, { %s, %d, %s, %d, %d })\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str(),
+                   notification_type->author.c_str(),
+                   notification_type->broadcast,
+                   notification_type->comment.c_str(),
+                   notification_type->forced,
+                   notification_type->increment);
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -13212,19 +13220,19 @@ int centreonengine__notificationServiceSend(soap* s,
     char* comment = my_strdup(notification_type->comment.c_str());
 
     if (service_notification(service,
-			     NOTIFICATION_CUSTOM,
-			     author,
-			     comment,
-			     options) == ERROR) {
+                             NOTIFICATION_CUSTOM,
+                             author,
+                             comment,
+                             options) == ERROR) {
       delete[] author;
       delete[] comment;
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service + "' send notification failed.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -13236,8 +13244,8 @@ int centreonengine__notificationServiceSend(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -13264,8 +13272,8 @@ int centreonengine__getEventHandlersEnabled(soap* s, bool& val) {
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -13292,8 +13300,8 @@ int centreonengine__getFailurePredictionEnabled(soap* s, bool& val) {
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -13320,8 +13328,8 @@ int centreonengine__getFlapDetectionEnabled(soap* s, bool& val) {
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -13348,8 +13356,8 @@ int centreonengine__getHostsChecksActiveEnabled(soap* s, bool& val) {
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -13376,8 +13384,8 @@ int centreonengine__getHostsChecksPassiveEnabled(soap* s, bool& val) {
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -13393,7 +13401,7 @@ int centreonengine__getHostsChecksPassiveEnabled(soap* s, bool& val) {
  *  @return SOAP_OK on success.
  */
 int centreonengine__getHostsEventHandler(soap* s,
-					 centreonengine__getHostsEventHandlerResponse& res) {
+                                         centreonengine__getHostsEventHandlerResponse& res) {
   (void)s;
 
   try {
@@ -13405,8 +13413,8 @@ int centreonengine__getHostsEventHandler(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -13433,8 +13441,8 @@ int centreonengine__getHostsFreshnessChecksEnabled(soap* s, bool& val) {
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -13461,8 +13469,8 @@ int centreonengine__getHostsObsessOverEnabled(soap* s, bool& val) {
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -13489,8 +13497,8 @@ int centreonengine__getNotificationsEnabled(soap* s, bool& val) {
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -13517,8 +13525,8 @@ int centreonengine__getPerfdataProcessingEnabled(soap* s, bool& val) {
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -13545,8 +13553,8 @@ int centreonengine__getServicesChecksActiveEnabled(soap* s, bool& val) {
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -13573,8 +13581,8 @@ int centreonengine__getServicesChecksPassiveEnabled(soap* s, bool& val) {
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -13590,7 +13598,7 @@ int centreonengine__getServicesChecksPassiveEnabled(soap* s, bool& val) {
  *  @return SOAP_OK on success.
  */
 int centreonengine__getServicesEventHandler(soap* s,
-					    centreonengine__getServicesEventHandlerResponse& res) {
+                                            centreonengine__getServicesEventHandlerResponse& res) {
   (void)s;
 
   try {
@@ -13602,8 +13610,8 @@ int centreonengine__getServicesEventHandler(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -13630,8 +13638,8 @@ int centreonengine__getServicesFreshnessChecksEnabled(soap* s, bool& val) {
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -13658,8 +13666,8 @@ int centreonengine__getServicesObsessOverEnabled(soap* s, bool& val) {
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -13676,8 +13684,8 @@ int centreonengine__getServicesObsessOverEnabled(soap* s, bool& val) {
  *  @return SOAP_OK on success.
  */
 int centreonengine__setEventHandlersEnabled(soap* s,
-					    bool enable,
-					    centreonengine__setEventHandlersEnabledResponse& res) {
+                                            bool enable,
+                                            centreonengine__setEventHandlersEnabledResponse& res) {
   (void)s;
   (void)res;
 
@@ -13690,8 +13698,8 @@ int centreonengine__setEventHandlersEnabled(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -13708,8 +13716,8 @@ int centreonengine__setEventHandlersEnabled(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__setFailurePredictionEnabled(soap* s,
-						bool enable,
-						centreonengine__setFailurePredictionEnabledResponse& res) {
+                                                bool enable,
+                                                centreonengine__setFailurePredictionEnabledResponse& res) {
   (void)s;
   (void)res;
 
@@ -13722,8 +13730,8 @@ int centreonengine__setFailurePredictionEnabled(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -13740,8 +13748,8 @@ int centreonengine__setFailurePredictionEnabled(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__setFlapDetectionEnabled(soap* s,
-					    bool enable,
-					    centreonengine__setFlapDetectionEnabledResponse& res) {
+                                            bool enable,
+                                            centreonengine__setFlapDetectionEnabledResponse& res) {
   (void)s;
   (void)res;
 
@@ -13754,8 +13762,8 @@ int centreonengine__setFlapDetectionEnabled(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -13772,8 +13780,8 @@ int centreonengine__setFlapDetectionEnabled(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__setHostsChecksActiveEnabled(soap* s,
-						bool enable,
-						centreonengine__setHostsChecksActiveEnabledResponse& res) {
+                                                bool enable,
+                                                centreonengine__setHostsChecksActiveEnabledResponse& res) {
   (void)s;
   (void)res;
 
@@ -13786,8 +13794,8 @@ int centreonengine__setHostsChecksActiveEnabled(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -13804,8 +13812,8 @@ int centreonengine__setHostsChecksActiveEnabled(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__setHostsChecksPassiveEnabled(soap* s,
-						 bool enable,
-						 centreonengine__setHostsChecksPassiveEnabledResponse& res) {
+                                                 bool enable,
+                                                 centreonengine__setHostsChecksPassiveEnabledResponse& res) {
   (void)s;
   (void)res;
 
@@ -13818,8 +13826,8 @@ int centreonengine__setHostsChecksPassiveEnabled(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -13836,17 +13844,17 @@ int centreonengine__setHostsChecksPassiveEnabled(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__setHostsEventHandler(soap* s,
-					 ns1__commandIDType* command_id,
-					 centreonengine__setHostsEventHandlerResponse& res) {
+                                         ns1__commandIDType* command_id,
+                                         centreonengine__setHostsEventHandlerResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   command_id->command.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   command_id->command.c_str());
 
     command* command = find_command(command_id->command.c_str());
     if (command == NULL) {
@@ -13854,9 +13862,9 @@ int centreonengine__setHostsEventHandler(soap* s,
       *error = "Command `" + command_id->command + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -13869,21 +13877,21 @@ int centreonengine__setHostsEventHandler(soap* s,
     modified_host_process_attributes |= MODATTR_EVENT_HANDLER_COMMAND;
 
     broker_adaptive_program_data(NEBTYPE_ADAPTIVEPROGRAM_UPDATE,
-				 NEBFLAG_NONE,NEBATTR_NONE,
-				 CMD_CHANGE_GLOBAL_HOST_EVENT_HANDLER,
-				 MODATTR_EVENT_HANDLER_COMMAND,
-				 modified_host_process_attributes,
-				 MODATTR_NONE,
-				 modified_service_process_attributes,
-				 NULL);
+                                 NEBFLAG_NONE,NEBATTR_NONE,
+                                 CMD_CHANGE_GLOBAL_HOST_EVENT_HANDLER,
+                                 MODATTR_EVENT_HANDLER_COMMAND,
+                                 modified_host_process_attributes,
+                                 MODATTR_NONE,
+                                 modified_service_process_attributes,
+                                 NULL);
 
     update_program_status(false);
     syncro::instance().worker_finish();
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -13900,8 +13908,8 @@ int centreonengine__setHostsEventHandler(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__setHostsFreshnessChecksEnabled(soap* s,
-						   bool enable,
-						   centreonengine__setHostsFreshnessChecksEnabledResponse& res) {
+                                                   bool enable,
+                                                   centreonengine__setHostsFreshnessChecksEnabledResponse& res) {
   (void)s;
   (void)res;
 
@@ -13914,8 +13922,8 @@ int centreonengine__setHostsFreshnessChecksEnabled(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -13932,8 +13940,8 @@ int centreonengine__setHostsFreshnessChecksEnabled(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__setHostsObsessOverEnabled(soap* s,
-					      bool enable,
-					      centreonengine__setHostsObsessOverEnabledResponse& res) {
+                                              bool enable,
+                                              centreonengine__setHostsObsessOverEnabledResponse& res) {
   (void)s;
   (void)res;
 
@@ -13946,8 +13954,8 @@ int centreonengine__setHostsObsessOverEnabled(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -13964,8 +13972,8 @@ int centreonengine__setHostsObsessOverEnabled(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__setNotificationsEnabled(soap* s,
-					    bool enable,
-					    centreonengine__setNotificationsEnabledResponse& res) {
+                                            bool enable,
+                                            centreonengine__setNotificationsEnabledResponse& res) {
   (void)s;
   (void)res;
 
@@ -13978,8 +13986,8 @@ int centreonengine__setNotificationsEnabled(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -13996,8 +14004,8 @@ int centreonengine__setNotificationsEnabled(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__setPerfdataProcessingEnabled(soap* s,
-						 bool enable,
-						 centreonengine__setPerfdataProcessingEnabledResponse& res) {
+                                                 bool enable,
+                                                 centreonengine__setPerfdataProcessingEnabledResponse& res) {
   (void)s;
   (void)res;
 
@@ -14010,8 +14018,8 @@ int centreonengine__setPerfdataProcessingEnabled(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -14028,8 +14036,8 @@ int centreonengine__setPerfdataProcessingEnabled(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__setServicesChecksActiveEnabled(soap* s,
-						   bool enable,
-						   centreonengine__setServicesChecksActiveEnabledResponse& res) {
+                                                   bool enable,
+                                                   centreonengine__setServicesChecksActiveEnabledResponse& res) {
   (void)s;
   (void)res;
 
@@ -14042,8 +14050,8 @@ int centreonengine__setServicesChecksActiveEnabled(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -14060,8 +14068,8 @@ int centreonengine__setServicesChecksActiveEnabled(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__setServicesChecksPassiveEnabled(soap* s,
-						    bool enable,
-						    centreonengine__setServicesChecksPassiveEnabledResponse& res) {
+                                                    bool enable,
+                                                    centreonengine__setServicesChecksPassiveEnabledResponse& res) {
   (void)s;
   (void)res;
 
@@ -14074,8 +14082,8 @@ int centreonengine__setServicesChecksPassiveEnabled(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -14092,17 +14100,17 @@ int centreonengine__setServicesChecksPassiveEnabled(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__setServicesEventHandler(soap* s,
-					    ns1__commandIDType* command_id,
-					    centreonengine__setServicesEventHandlerResponse& res) {
+                                            ns1__commandIDType* command_id,
+                                            centreonengine__setServicesEventHandlerResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   command_id->command.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   command_id->command.c_str());
 
     command* command = find_command(command_id->command.c_str());
     if (command == NULL) {
@@ -14110,9 +14118,9 @@ int centreonengine__setServicesEventHandler(soap* s,
       *error = "Command `" + command_id->command + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -14125,22 +14133,22 @@ int centreonengine__setServicesEventHandler(soap* s,
     modified_service_process_attributes |= MODATTR_EVENT_HANDLER_COMMAND;
 
     broker_adaptive_program_data(NEBTYPE_ADAPTIVEPROGRAM_UPDATE,
-				 NEBFLAG_NONE,
-				 NEBATTR_NONE,
-				 CMD_CHANGE_GLOBAL_SVC_EVENT_HANDLER,
-				 MODATTR_NONE,
-				 modified_host_process_attributes,
-				 MODATTR_EVENT_HANDLER_COMMAND,
-				 modified_service_process_attributes,
-				 NULL);
+                                 NEBFLAG_NONE,
+                                 NEBATTR_NONE,
+                                 CMD_CHANGE_GLOBAL_SVC_EVENT_HANDLER,
+                                 MODATTR_NONE,
+                                 modified_host_process_attributes,
+                                 MODATTR_EVENT_HANDLER_COMMAND,
+                                 modified_service_process_attributes,
+                                 NULL);
 
     update_program_status(false);
     syncro::instance().worker_finish();
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -14157,8 +14165,8 @@ int centreonengine__setServicesEventHandler(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__setServicesFreshnessChecksEnabled(soap* s,
-						      bool enable,
-						      centreonengine__setServicesFreshnessChecksEnabledResponse& res) {
+                                                      bool enable,
+                                                      centreonengine__setServicesFreshnessChecksEnabledResponse& res) {
   (void)s;
   (void)res;
 
@@ -14171,8 +14179,8 @@ int centreonengine__setServicesFreshnessChecksEnabled(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -14189,8 +14197,8 @@ int centreonengine__setServicesFreshnessChecksEnabled(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__setServicesObsessOverEnabled(soap* s,
-						 bool enable,
-						 centreonengine__setServicesObsessOverEnabledResponse& res) {
+                                                 bool enable,
+                                                 centreonengine__setServicesObsessOverEnabledResponse& res) {
   (void)s;
   (void)res;
 
@@ -14203,8 +14211,8 @@ int centreonengine__setServicesObsessOverEnabled(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -14222,19 +14230,19 @@ int centreonengine__setServicesObsessOverEnabled(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostSetCheckPeriod(soap* s,
-				       ns1__hostIDType* host_id,
-				       ns1__timeperiodIDType* timeperiod_id,
-				       centreonengine__hostSetCheckPeriodResponse& res) {
+                                       ns1__hostIDType* host_id,
+                                       ns1__timeperiodIDType* timeperiod_id,
+                                       centreonengine__hostSetCheckPeriodResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s, %s)\n",
-		   __func__,
-		   host_id->name.c_str(),
-		   timeperiod_id->timeperiod.c_str());
+                   "Webservice: %s(%s, %s)\n",
+                   __func__,
+                   host_id->name.c_str(),
+                   timeperiod_id->timeperiod.c_str());
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -14242,9 +14250,9 @@ int centreonengine__hostSetCheckPeriod(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -14256,8 +14264,8 @@ int centreonengine__hostSetCheckPeriod(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -14275,19 +14283,19 @@ int centreonengine__hostSetCheckPeriod(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostSetServicesCheckActiveEnabled(soap* s,
-						      ns1__hostIDType* host_id,
-						      bool enable,
-						      centreonengine__hostSetServicesCheckActiveEnabledResponse& res) {
+                                                      ns1__hostIDType* host_id,
+                                                      bool enable,
+                                                      centreonengine__hostSetServicesCheckActiveEnabledResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s, %d)\n",
-		   __func__,
-		   host_id->name.c_str(),
-		   enable);
+                   "Webservice: %s(%s, %d)\n",
+                   __func__,
+                   host_id->name.c_str(),
+                   enable);
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -14295,9 +14303,9 @@ int centreonengine__hostSetServicesCheckActiveEnabled(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -14305,15 +14313,15 @@ int centreonengine__hostSetServicesCheckActiveEnabled(soap* s,
 
     for (servicesmember* tmp = host->services; tmp != NULL; tmp = tmp->next) {
       if (tmp->service_ptr != NULL) {
-	tmp->service_ptr->checks_enabled = enable;
+        tmp->service_ptr->checks_enabled = enable;
       }
     }
     syncro::instance().worker_finish();
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -14331,19 +14339,19 @@ int centreonengine__hostSetServicesCheckActiveEnabled(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__hostSetServicesNotificationsEnabled(soap* s,
-							ns1__hostIDType* host_id,
-							bool enable,
-							centreonengine__hostSetServicesNotificationsEnabledResponse& res) {
+                                                        ns1__hostIDType* host_id,
+                                                        bool enable,
+                                                        centreonengine__hostSetServicesNotificationsEnabledResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s, %d)\n",
-		   __func__,
-		   host_id->name.c_str(),
-		   enable);
+                   "Webservice: %s(%s, %d)\n",
+                   __func__,
+                   host_id->name.c_str(),
+                   enable);
 
     host* host = find_host(host_id->name.c_str());
     if (host == NULL) {
@@ -14351,9 +14359,9 @@ int centreonengine__hostSetServicesNotificationsEnabled(soap* s,
       *error = "Host `" + host_id->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -14361,15 +14369,15 @@ int centreonengine__hostSetServicesNotificationsEnabled(soap* s,
 
     for (servicesmember* tmp = host->services; tmp != NULL; tmp = tmp->next) {
       if (tmp->service_ptr != NULL) {
-	tmp->service_ptr->notifications_enabled = enable;
+        tmp->service_ptr->notifications_enabled = enable;
       }
     }
     syncro::instance().worker_finish();
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -14387,31 +14395,31 @@ int centreonengine__hostSetServicesNotificationsEnabled(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceSetCheckPeriod(soap* s,
-					  ns1__serviceIDType* service_id,
-					  ns1__timeperiodIDType* timeperiod_id,
-					  centreonengine__serviceSetCheckPeriodResponse& res) {
+                                          ns1__serviceIDType* service_id,
+                                          ns1__timeperiodIDType* timeperiod_id,
+                                          centreonengine__serviceSetCheckPeriodResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s({ %s, { %s } }, %s)\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str(),
-		   timeperiod_id->timeperiod.c_str());
+                   "Webservice: %s({ %s, { %s } }, %s)\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str(),
+                   timeperiod_id->timeperiod.c_str());
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -14423,8 +14431,8 @@ int centreonengine__serviceSetCheckPeriod(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -14442,31 +14450,31 @@ int centreonengine__serviceSetCheckPeriod(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__serviceSetNotificationsPeriod(soap* s,
-						  ns1__serviceIDType* service_id,
-						  ns1__timeperiodIDType* timeperiod_id,
-						  centreonengine__serviceSetNotificationsPeriodResponse& res) {
+                                                  ns1__serviceIDType* service_id,
+                                                  ns1__timeperiodIDType* timeperiod_id,
+                                                  centreonengine__serviceSetNotificationsPeriodResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s({ %s, { %s } }, %s)\n",
-		   __func__,
-		   service_id->service.c_str(),
-		   service_id->host->name.c_str(),
-		   timeperiod_id->timeperiod.c_str());
+                   "Webservice: %s({ %s, { %s } }, %s)\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str(),
+                   timeperiod_id->timeperiod.c_str());
 
     service* service = find_service(service_id->host->name.c_str(), service_id->service.c_str());
     if (service == NULL) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
-	+ "' with Host `" + service_id->host->name + "' not found.";
+        + "' with Host `" + service_id->host->name + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -14478,8 +14486,8 @@ int centreonengine__serviceSetNotificationsPeriod(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -14496,15 +14504,15 @@ int centreonengine__serviceSetNotificationsPeriod(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__contactGetAlias(soap* s,
-				    ns1__contactIDType* contact_id,
-				    std::string& val) {
+                                    ns1__contactIDType* contact_id,
+                                    std::string& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   contact_id->contact.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   contact_id->contact.c_str());
 
     contact* contact = find_contact(contact_id->contact.c_str());
     if (contact == NULL) {
@@ -14512,9 +14520,9 @@ int centreonengine__contactGetAlias(soap* s,
       *error = "Contact `" + contact_id->contact + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -14527,8 +14535,8 @@ int centreonengine__contactGetAlias(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -14545,15 +14553,15 @@ int centreonengine__contactGetAlias(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__contactGetCanSubmitCommands(soap* s,
-						ns1__contactIDType* contact_id,
-						bool& val) {
+                                                ns1__contactIDType* contact_id,
+                                                bool& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   contact_id->contact.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   contact_id->contact.c_str());
 
     contact* contact = find_contact(contact_id->contact.c_str());
     if (contact == NULL) {
@@ -14561,9 +14569,9 @@ int centreonengine__contactGetCanSubmitCommands(soap* s,
       *error = "Contact `" + contact_id->contact + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -14574,8 +14582,8 @@ int centreonengine__contactGetCanSubmitCommands(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -14592,15 +14600,15 @@ int centreonengine__contactGetCanSubmitCommands(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__contactGetEmail(soap* s,
-				    ns1__contactIDType* contact_id,
-				    std::string& val) {
+                                    ns1__contactIDType* contact_id,
+                                    std::string& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   contact_id->contact.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   contact_id->contact.c_str());
 
     contact* contact = find_contact(contact_id->contact.c_str());
     if (contact == NULL) {
@@ -14608,9 +14616,9 @@ int centreonengine__contactGetEmail(soap* s,
       *error = "Contact `" + contact_id->contact + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -14623,8 +14631,8 @@ int centreonengine__contactGetEmail(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -14641,15 +14649,15 @@ int centreonengine__contactGetEmail(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__contactGetModifiedAttributes(soap* s,
-						 ns1__contactIDType* contact_id,
-						 unsigned int& val) {
+                                                 ns1__contactIDType* contact_id,
+                                                 unsigned int& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   contact_id->contact.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   contact_id->contact.c_str());
 
     contact* contact = find_contact(contact_id->contact.c_str());
     if (contact == NULL) {
@@ -14657,9 +14665,9 @@ int centreonengine__contactGetModifiedAttributes(soap* s,
       *error = "Contact `" + contact_id->contact + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -14670,8 +14678,8 @@ int centreonengine__contactGetModifiedAttributes(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -14688,15 +14696,15 @@ int centreonengine__contactGetModifiedAttributes(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__contactGetModifiedAttributesHost(soap* s,
-						     ns1__contactIDType* contact_id,
-						     unsigned int& val) {
+                                                     ns1__contactIDType* contact_id,
+                                                     unsigned int& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   contact_id->contact.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   contact_id->contact.c_str());
 
     contact* contact = find_contact(contact_id->contact.c_str());
     if (contact == NULL) {
@@ -14704,9 +14712,9 @@ int centreonengine__contactGetModifiedAttributesHost(soap* s,
       *error = "Contact `" + contact_id->contact + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -14717,8 +14725,8 @@ int centreonengine__contactGetModifiedAttributesHost(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -14735,15 +14743,15 @@ int centreonengine__contactGetModifiedAttributesHost(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__contactGetModifiedAttributesService(soap* s,
-							ns1__contactIDType* contact_id,
-							unsigned int& val) {
+                                                        ns1__contactIDType* contact_id,
+                                                        unsigned int& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   contact_id->contact.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   contact_id->contact.c_str());
 
     contact* contact = find_contact(contact_id->contact.c_str());
     if (contact == NULL) {
@@ -14751,9 +14759,9 @@ int centreonengine__contactGetModifiedAttributesService(soap* s,
       *error = "Contact `" + contact_id->contact + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -14764,8 +14772,8 @@ int centreonengine__contactGetModifiedAttributesService(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -14782,15 +14790,15 @@ int centreonengine__contactGetModifiedAttributesService(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__contactGetNotificationsOnHostCommand(soap* s,
-							 ns1__contactIDType* contact_id,
-							 centreonengine__contactGetNotificationsOnHostCommandResponse& res) {
+                                                         ns1__contactIDType* contact_id,
+                                                         centreonengine__contactGetNotificationsOnHostCommandResponse& res) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   contact_id->contact.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   contact_id->contact.c_str());
 
     contact* contact = find_contact(contact_id->contact.c_str());
     if (contact == NULL) {
@@ -14798,9 +14806,9 @@ int centreonengine__contactGetNotificationsOnHostCommand(soap* s,
       *error = "Contact `" + contact_id->contact + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -14813,8 +14821,8 @@ int centreonengine__contactGetNotificationsOnHostCommand(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -14831,15 +14839,15 @@ int centreonengine__contactGetNotificationsOnHostCommand(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__contactGetNotificationsOnHostDown(soap* s,
-						      ns1__contactIDType* contact_id,
-						      bool& val) {
+                                                      ns1__contactIDType* contact_id,
+                                                      bool& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   contact_id->contact.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   contact_id->contact.c_str());
 
     contact* contact = find_contact(contact_id->contact.c_str());
     if (contact == NULL) {
@@ -14847,9 +14855,9 @@ int centreonengine__contactGetNotificationsOnHostDown(soap* s,
       *error = "Contact `" + contact_id->contact + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -14860,8 +14868,8 @@ int centreonengine__contactGetNotificationsOnHostDown(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -14878,15 +14886,15 @@ int centreonengine__contactGetNotificationsOnHostDown(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__contactGetNotificationsOnHostDowntime(soap* s,
-							  ns1__contactIDType* contact_id,
-							  bool& val) {
+                                                          ns1__contactIDType* contact_id,
+                                                          bool& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   contact_id->contact.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   contact_id->contact.c_str());
 
     contact* contact = find_contact(contact_id->contact.c_str());
     if (contact == NULL) {
@@ -14894,9 +14902,9 @@ int centreonengine__contactGetNotificationsOnHostDowntime(soap* s,
       *error = "Contact `" + contact_id->contact + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -14907,8 +14915,8 @@ int centreonengine__contactGetNotificationsOnHostDowntime(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -14925,15 +14933,15 @@ int centreonengine__contactGetNotificationsOnHostDowntime(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__contactGetNotificationsOnHostEnabled(soap* s,
-							 ns1__contactIDType* contact_id,
-							 bool& val) {
+                                                         ns1__contactIDType* contact_id,
+                                                         bool& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   contact_id->contact.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   contact_id->contact.c_str());
 
     contact* contact = find_contact(contact_id->contact.c_str());
     if (contact == NULL) {
@@ -14941,9 +14949,9 @@ int centreonengine__contactGetNotificationsOnHostEnabled(soap* s,
       *error = "Contact `" + contact_id->contact + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -14954,8 +14962,8 @@ int centreonengine__contactGetNotificationsOnHostEnabled(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -14972,15 +14980,15 @@ int centreonengine__contactGetNotificationsOnHostEnabled(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__contactGetNotificationsOnHostFlapping(soap* s,
-							  ns1__contactIDType* contact_id,
-							  bool& val) {
+                                                          ns1__contactIDType* contact_id,
+                                                          bool& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   contact_id->contact.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   contact_id->contact.c_str());
 
     contact* contact = find_contact(contact_id->contact.c_str());
     if (contact == NULL) {
@@ -14988,9 +14996,9 @@ int centreonengine__contactGetNotificationsOnHostFlapping(soap* s,
       *error = "Contact `" + contact_id->contact + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -15001,8 +15009,8 @@ int centreonengine__contactGetNotificationsOnHostFlapping(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -15019,15 +15027,15 @@ int centreonengine__contactGetNotificationsOnHostFlapping(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__contactGetNotificationsOnHostLast(soap* s,
-						      ns1__contactIDType* contact_id,
-						      unsigned long& val) {
+                                                      ns1__contactIDType* contact_id,
+                                                      unsigned long& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   contact_id->contact.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   contact_id->contact.c_str());
 
     contact* contact = find_contact(contact_id->contact.c_str());
     if (contact == NULL) {
@@ -15035,9 +15043,9 @@ int centreonengine__contactGetNotificationsOnHostLast(soap* s,
       *error = "Contact `" + contact_id->contact + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -15048,8 +15056,8 @@ int centreonengine__contactGetNotificationsOnHostLast(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -15066,15 +15074,15 @@ int centreonengine__contactGetNotificationsOnHostLast(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__contactGetNotificationsOnHostRecovery(soap* s,
-							  ns1__contactIDType* contact_id,
-							  bool& val) {
+                                                          ns1__contactIDType* contact_id,
+                                                          bool& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   contact_id->contact.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   contact_id->contact.c_str());
 
     contact* contact = find_contact(contact_id->contact.c_str());
     if (contact == NULL) {
@@ -15082,9 +15090,9 @@ int centreonengine__contactGetNotificationsOnHostRecovery(soap* s,
       *error = "Contact `" + contact_id->contact + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -15095,8 +15103,8 @@ int centreonengine__contactGetNotificationsOnHostRecovery(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -15113,15 +15121,15 @@ int centreonengine__contactGetNotificationsOnHostRecovery(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__contactGetNotificationsOnHostTimeperiod(soap* s,
-							    ns1__contactIDType* contact_id,
-							    centreonengine__contactGetNotificationsOnHostTimeperiodResponse& res) {
+                                                            ns1__contactIDType* contact_id,
+                                                            centreonengine__contactGetNotificationsOnHostTimeperiodResponse& res) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   contact_id->contact.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   contact_id->contact.c_str());
 
     contact* contact = find_contact(contact_id->contact.c_str());
     if (contact == NULL) {
@@ -15129,9 +15137,9 @@ int centreonengine__contactGetNotificationsOnHostTimeperiod(soap* s,
       *error = "Contact `" + contact_id->contact + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -15144,8 +15152,8 @@ int centreonengine__contactGetNotificationsOnHostTimeperiod(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -15162,15 +15170,15 @@ int centreonengine__contactGetNotificationsOnHostTimeperiod(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__contactGetNotificationsOnHostUnreachable(soap* s,
-							     ns1__contactIDType* contact_id,
-							     bool& val) {
+                                                             ns1__contactIDType* contact_id,
+                                                             bool& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   contact_id->contact.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   contact_id->contact.c_str());
 
     contact* contact = find_contact(contact_id->contact.c_str());
     if (contact == NULL) {
@@ -15178,9 +15186,9 @@ int centreonengine__contactGetNotificationsOnHostUnreachable(soap* s,
       *error = "Contact `" + contact_id->contact + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -15191,8 +15199,8 @@ int centreonengine__contactGetNotificationsOnHostUnreachable(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -15209,15 +15217,15 @@ int centreonengine__contactGetNotificationsOnHostUnreachable(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__contactGetNotificationsOnServiceCommand(soap* s,
-							    ns1__contactIDType* contact_id,
-							    centreonengine__contactGetNotificationsOnServiceCommandResponse& res) {
+                                                            ns1__contactIDType* contact_id,
+                                                            centreonengine__contactGetNotificationsOnServiceCommandResponse& res) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   contact_id->contact.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   contact_id->contact.c_str());
 
     contact* contact = find_contact(contact_id->contact.c_str());
     if (contact == NULL) {
@@ -15225,9 +15233,9 @@ int centreonengine__contactGetNotificationsOnServiceCommand(soap* s,
       *error = "Contact `" + contact_id->contact + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -15240,8 +15248,8 @@ int centreonengine__contactGetNotificationsOnServiceCommand(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -15258,15 +15266,15 @@ int centreonengine__contactGetNotificationsOnServiceCommand(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__contactGetNotificationsOnServiceCritical(soap* s,
-							     ns1__contactIDType* contact_id,
-							     bool& val) {
+                                                             ns1__contactIDType* contact_id,
+                                                             bool& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   contact_id->contact.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   contact_id->contact.c_str());
 
     contact* contact = find_contact(contact_id->contact.c_str());
     if (contact == NULL) {
@@ -15274,9 +15282,9 @@ int centreonengine__contactGetNotificationsOnServiceCritical(soap* s,
       *error = "Contact `" + contact_id->contact + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -15287,8 +15295,8 @@ int centreonengine__contactGetNotificationsOnServiceCritical(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -15305,15 +15313,15 @@ int centreonengine__contactGetNotificationsOnServiceCritical(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__contactGetNotificationsOnServiceDowntime(soap* s,
-							     ns1__contactIDType* contact_id,
-							     bool& val) {
+                                                             ns1__contactIDType* contact_id,
+                                                             bool& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   contact_id->contact.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   contact_id->contact.c_str());
 
     contact* contact = find_contact(contact_id->contact.c_str());
     if (contact == NULL) {
@@ -15321,9 +15329,9 @@ int centreonengine__contactGetNotificationsOnServiceDowntime(soap* s,
       *error = "Contact `" + contact_id->contact + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -15334,8 +15342,8 @@ int centreonengine__contactGetNotificationsOnServiceDowntime(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -15352,15 +15360,15 @@ int centreonengine__contactGetNotificationsOnServiceDowntime(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__contactGetNotificationsOnServiceEnabled(soap* s,
-							    ns1__contactIDType* contact_id,
-							    bool& val) {
+                                                            ns1__contactIDType* contact_id,
+                                                            bool& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   contact_id->contact.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   contact_id->contact.c_str());
 
     contact* contact = find_contact(contact_id->contact.c_str());
     if (contact == NULL) {
@@ -15368,9 +15376,9 @@ int centreonengine__contactGetNotificationsOnServiceEnabled(soap* s,
       *error = "Contact `" + contact_id->contact + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -15381,8 +15389,8 @@ int centreonengine__contactGetNotificationsOnServiceEnabled(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -15399,15 +15407,15 @@ int centreonengine__contactGetNotificationsOnServiceEnabled(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__contactGetNotificationsOnServiceFlapping(soap* s,
-							     ns1__contactIDType* contact_id,
-							     bool& val) {
+                                                             ns1__contactIDType* contact_id,
+                                                             bool& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   contact_id->contact.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   contact_id->contact.c_str());
 
     contact* contact = find_contact(contact_id->contact.c_str());
     if (contact == NULL) {
@@ -15415,9 +15423,9 @@ int centreonengine__contactGetNotificationsOnServiceFlapping(soap* s,
       *error = "Contact `" + contact_id->contact + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -15428,8 +15436,8 @@ int centreonengine__contactGetNotificationsOnServiceFlapping(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -15446,15 +15454,15 @@ int centreonengine__contactGetNotificationsOnServiceFlapping(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__contactGetNotificationsOnServiceLast(soap* s,
-							 ns1__contactIDType* contact_id,
-							 unsigned long& val) {
+                                                         ns1__contactIDType* contact_id,
+                                                         unsigned long& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   contact_id->contact.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   contact_id->contact.c_str());
 
     contact* contact = find_contact(contact_id->contact.c_str());
     if (contact == NULL) {
@@ -15462,9 +15470,9 @@ int centreonengine__contactGetNotificationsOnServiceLast(soap* s,
       *error = "Contact `" + contact_id->contact + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -15475,8 +15483,8 @@ int centreonengine__contactGetNotificationsOnServiceLast(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -15493,15 +15501,15 @@ int centreonengine__contactGetNotificationsOnServiceLast(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__contactGetNotificationsOnServiceRecovery(soap* s,
-							     ns1__contactIDType* contact_id,
-							     bool& val) {
+                                                             ns1__contactIDType* contact_id,
+                                                             bool& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   contact_id->contact.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   contact_id->contact.c_str());
 
     contact* contact = find_contact(contact_id->contact.c_str());
     if (contact == NULL) {
@@ -15509,9 +15517,9 @@ int centreonengine__contactGetNotificationsOnServiceRecovery(soap* s,
       *error = "Contact `" + contact_id->contact + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -15522,8 +15530,8 @@ int centreonengine__contactGetNotificationsOnServiceRecovery(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -15540,15 +15548,15 @@ int centreonengine__contactGetNotificationsOnServiceRecovery(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__contactGetNotificationsOnServiceTimeperiod(soap* s,
-							       ns1__contactIDType* contact_id,
-							       centreonengine__contactGetNotificationsOnServiceTimeperiodResponse& res) {
+                                                               ns1__contactIDType* contact_id,
+                                                               centreonengine__contactGetNotificationsOnServiceTimeperiodResponse& res) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   contact_id->contact.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   contact_id->contact.c_str());
 
     contact* contact = find_contact(contact_id->contact.c_str());
     if (contact == NULL) {
@@ -15556,9 +15564,9 @@ int centreonengine__contactGetNotificationsOnServiceTimeperiod(soap* s,
       *error = "Contact `" + contact_id->contact + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -15571,8 +15579,8 @@ int centreonengine__contactGetNotificationsOnServiceTimeperiod(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -15589,15 +15597,15 @@ int centreonengine__contactGetNotificationsOnServiceTimeperiod(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__contactGetNotificationsOnServiceUnknown(soap* s,
-							    ns1__contactIDType* contact_id,
-							    bool& val) {
+                                                            ns1__contactIDType* contact_id,
+                                                            bool& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   contact_id->contact.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   contact_id->contact.c_str());
 
     contact* contact = find_contact(contact_id->contact.c_str());
     if (contact == NULL) {
@@ -15605,9 +15613,9 @@ int centreonengine__contactGetNotificationsOnServiceUnknown(soap* s,
       *error = "Contact `" + contact_id->contact + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -15618,8 +15626,8 @@ int centreonengine__contactGetNotificationsOnServiceUnknown(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -15636,15 +15644,15 @@ int centreonengine__contactGetNotificationsOnServiceUnknown(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__contactGetPager(soap* s,
-				    ns1__contactIDType* contact_id,
-				    std::string& val) {
+                                    ns1__contactIDType* contact_id,
+                                    std::string& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   contact_id->contact.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   contact_id->contact.c_str());
 
     contact* contact = find_contact(contact_id->contact.c_str());
     if (contact == NULL) {
@@ -15652,9 +15660,9 @@ int centreonengine__contactGetPager(soap* s,
       *error = "Contact `" + contact_id->contact + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -15667,8 +15675,8 @@ int centreonengine__contactGetPager(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -15685,15 +15693,15 @@ int centreonengine__contactGetPager(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__contactGetRetainStatusInformation(soap* s,
-						      ns1__contactIDType* contact_id,
-						      bool& val) {
+                                                      ns1__contactIDType* contact_id,
+                                                      bool& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   contact_id->contact.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   contact_id->contact.c_str());
 
     contact* contact = find_contact(contact_id->contact.c_str());
     if (contact == NULL) {
@@ -15701,9 +15709,9 @@ int centreonengine__contactGetRetainStatusInformation(soap* s,
       *error = "Contact `" + contact_id->contact + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -15714,8 +15722,8 @@ int centreonengine__contactGetRetainStatusInformation(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -15732,15 +15740,15 @@ int centreonengine__contactGetRetainStatusInformation(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__contactGetRetainStatusNonInformation(soap* s,
-							 ns1__contactIDType* contact_id,
-							 bool& val) {
+                                                         ns1__contactIDType* contact_id,
+                                                         bool& val) {
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s)\n",
-		   __func__,
-		   contact_id->contact.c_str());
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   contact_id->contact.c_str());
 
     contact* contact = find_contact(contact_id->contact.c_str());
     if (contact == NULL) {
@@ -15748,9 +15756,9 @@ int centreonengine__contactGetRetainStatusNonInformation(soap* s,
       *error = "Contact `" + contact_id->contact + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -15761,8 +15769,8 @@ int centreonengine__contactGetRetainStatusNonInformation(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -15780,19 +15788,19 @@ int centreonengine__contactGetRetainStatusNonInformation(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__contactSetAlias(soap* s,
-				    ns1__contactIDType* contact_id,
-				    std::string alias,
-				    centreonengine__contactSetAliasResponse& res) {
+                                    ns1__contactIDType* contact_id,
+                                    std::string alias,
+                                    centreonengine__contactSetAliasResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s, %s)\n",
-		   __func__,
-		   contact_id->contact.c_str(),
-		   alias.c_str());
+                   "Webservice: %s(%s, %s)\n",
+                   __func__,
+                   contact_id->contact.c_str(),
+                   alias.c_str());
 
     contact* contact = find_contact(contact_id->contact.c_str());
     if (contact == NULL) {
@@ -15800,9 +15808,9 @@ int centreonengine__contactSetAlias(soap* s,
       *error = "Contact `" + contact_id->contact + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -15814,8 +15822,8 @@ int centreonengine__contactSetAlias(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -15833,19 +15841,19 @@ int centreonengine__contactSetAlias(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__contactSetCanSubmitCommands(soap* s,
-						ns1__contactIDType* contact_id,
-						bool enable,
-						centreonengine__contactSetCanSubmitCommandsResponse& res) {
+                                                ns1__contactIDType* contact_id,
+                                                bool enable,
+                                                centreonengine__contactSetCanSubmitCommandsResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s, %d)\n",
-		   __func__,
-		   contact_id->contact.c_str(),
-		   enable);
+                   "Webservice: %s(%s, %d)\n",
+                   __func__,
+                   contact_id->contact.c_str(),
+                   enable);
 
     contact* contact = find_contact(contact_id->contact.c_str());
     if (contact == NULL) {
@@ -15853,9 +15861,9 @@ int centreonengine__contactSetCanSubmitCommands(soap* s,
       *error = "Contact `" + contact_id->contact + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -15866,8 +15874,8 @@ int centreonengine__contactSetCanSubmitCommands(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -15885,19 +15893,19 @@ int centreonengine__contactSetCanSubmitCommands(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__contactSetEmail(soap* s,
-				    ns1__contactIDType* contact_id,
-				    std::string email,
-				    centreonengine__contactSetEmailResponse& res) {
+                                    ns1__contactIDType* contact_id,
+                                    std::string email,
+                                    centreonengine__contactSetEmailResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s, %s)\n",
-		   __func__,
-		   contact_id->contact.c_str(),
-		   email.c_str());
+                   "Webservice: %s(%s, %s)\n",
+                   __func__,
+                   contact_id->contact.c_str(),
+                   email.c_str());
 
     contact* contact = find_contact(contact_id->contact.c_str());
     if (contact == NULL) {
@@ -15905,9 +15913,9 @@ int centreonengine__contactSetEmail(soap* s,
       *error = "Contact `" + contact_id->contact + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -15919,8 +15927,8 @@ int centreonengine__contactSetEmail(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -15938,19 +15946,19 @@ int centreonengine__contactSetEmail(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__contactSetNotificationsOnHostDown(soap* s,
-						      ns1__contactIDType* contact_id,
-						      bool enable,
-						      centreonengine__contactSetNotificationsOnHostDownResponse& res) {
+                                                      ns1__contactIDType* contact_id,
+                                                      bool enable,
+                                                      centreonengine__contactSetNotificationsOnHostDownResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s, %d)\n",
-		   __func__,
-		   contact_id->contact.c_str(),
-		   enable);
+                   "Webservice: %s(%s, %d)\n",
+                   __func__,
+                   contact_id->contact.c_str(),
+                   enable);
 
     contact* contact = find_contact(contact_id->contact.c_str());
     if (contact == NULL) {
@@ -15958,9 +15966,9 @@ int centreonengine__contactSetNotificationsOnHostDown(soap* s,
       *error = "Contact `" + contact_id->contact + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -15971,8 +15979,8 @@ int centreonengine__contactSetNotificationsOnHostDown(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -15990,19 +15998,19 @@ int centreonengine__contactSetNotificationsOnHostDown(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__contactSetNotificationsOnHostDowntime(soap* s,
-							  ns1__contactIDType* contact_id,
-							  bool enable,
-							  centreonengine__contactSetNotificationsOnHostDowntimeResponse& res) {
+                                                          ns1__contactIDType* contact_id,
+                                                          bool enable,
+                                                          centreonengine__contactSetNotificationsOnHostDowntimeResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s, %d)\n",
-		   __func__,
-		   contact_id->contact.c_str(),
-		   enable);
+                   "Webservice: %s(%s, %d)\n",
+                   __func__,
+                   contact_id->contact.c_str(),
+                   enable);
 
     contact* contact = find_contact(contact_id->contact.c_str());
     if (contact == NULL) {
@@ -16010,9 +16018,9 @@ int centreonengine__contactSetNotificationsOnHostDowntime(soap* s,
       *error = "Contact `" + contact_id->contact + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -16023,8 +16031,8 @@ int centreonengine__contactSetNotificationsOnHostDowntime(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -16042,19 +16050,19 @@ int centreonengine__contactSetNotificationsOnHostDowntime(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__contactSetNotificationsOnHostEnabled(soap* s,
-							 ns1__contactIDType* contact_id,
-							 bool enable,
-							 centreonengine__contactSetNotificationsOnHostEnabledResponse& res) {
+                                                         ns1__contactIDType* contact_id,
+                                                         bool enable,
+                                                         centreonengine__contactSetNotificationsOnHostEnabledResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s, %d)\n",
-		   __func__,
-		   contact_id->contact.c_str(),
-		   enable);
+                   "Webservice: %s(%s, %d)\n",
+                   __func__,
+                   contact_id->contact.c_str(),
+                   enable);
 
     contact* contact = find_contact(contact_id->contact.c_str());
     if (contact == NULL) {
@@ -16062,9 +16070,9 @@ int centreonengine__contactSetNotificationsOnHostEnabled(soap* s,
       *error = "Contact `" + contact_id->contact + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -16075,8 +16083,8 @@ int centreonengine__contactSetNotificationsOnHostEnabled(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -16094,19 +16102,19 @@ int centreonengine__contactSetNotificationsOnHostEnabled(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__contactSetNotificationsOnHostFlapping(soap* s,
-							  ns1__contactIDType* contact_id,
-							  bool enable,
-							  centreonengine__contactSetNotificationsOnHostFlappingResponse& res) {
+                                                          ns1__contactIDType* contact_id,
+                                                          bool enable,
+                                                          centreonengine__contactSetNotificationsOnHostFlappingResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s, %d)\n",
-		   __func__,
-		   contact_id->contact.c_str(),
-		   enable);
+                   "Webservice: %s(%s, %d)\n",
+                   __func__,
+                   contact_id->contact.c_str(),
+                   enable);
 
     contact* contact = find_contact(contact_id->contact.c_str());
     if (contact == NULL) {
@@ -16114,9 +16122,9 @@ int centreonengine__contactSetNotificationsOnHostFlapping(soap* s,
       *error = "Contact `" + contact_id->contact + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -16127,8 +16135,8 @@ int centreonengine__contactSetNotificationsOnHostFlapping(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -16146,19 +16154,19 @@ int centreonengine__contactSetNotificationsOnHostFlapping(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__contactSetNotificationsOnHostRecovery(soap* s,
-							  ns1__contactIDType* contact_id,
-							  bool enable,
-							  centreonengine__contactSetNotificationsOnHostRecoveryResponse& res) {
+                                                          ns1__contactIDType* contact_id,
+                                                          bool enable,
+                                                          centreonengine__contactSetNotificationsOnHostRecoveryResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s, %d)\n",
-		   __func__,
-		   contact_id->contact.c_str(),
-		   enable);
+                   "Webservice: %s(%s, %d)\n",
+                   __func__,
+                   contact_id->contact.c_str(),
+                   enable);
 
     contact* contact = find_contact(contact_id->contact.c_str());
     if (contact == NULL) {
@@ -16166,9 +16174,9 @@ int centreonengine__contactSetNotificationsOnHostRecovery(soap* s,
       *error = "Contact `" + contact_id->contact + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -16179,8 +16187,8 @@ int centreonengine__contactSetNotificationsOnHostRecovery(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -16198,19 +16206,19 @@ int centreonengine__contactSetNotificationsOnHostRecovery(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__contactSetNotificationsOnHostTimeperiod(soap* s,
-							    ns1__contactIDType* contact_id,
-							    ns1__timeperiodIDType* timeperiod_id,
-							    centreonengine__contactSetNotificationsOnHostTimeperiodResponse& res) {
+                                                            ns1__contactIDType* contact_id,
+                                                            ns1__timeperiodIDType* timeperiod_id,
+                                                            centreonengine__contactSetNotificationsOnHostTimeperiodResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s, %s)\n",
-		   __func__,
-		   contact_id->contact.c_str(),
-		   timeperiod_id->timeperiod.c_str());
+                   "Webservice: %s(%s, %s)\n",
+                   __func__,
+                   contact_id->contact.c_str(),
+                   timeperiod_id->timeperiod.c_str());
 
     contact* contact = find_contact(contact_id->contact.c_str());
     if (contact == NULL) {
@@ -16218,9 +16226,9 @@ int centreonengine__contactSetNotificationsOnHostTimeperiod(soap* s,
       *error = "Contact `" + contact_id->contact + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -16232,8 +16240,8 @@ int centreonengine__contactSetNotificationsOnHostTimeperiod(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -16251,19 +16259,19 @@ int centreonengine__contactSetNotificationsOnHostTimeperiod(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__contactSetNotificationsOnHostUnreachable(soap* s,
-							     ns1__contactIDType* contact_id,
-							     bool enable,
-							     centreonengine__contactSetNotificationsOnHostUnreachableResponse& res) {
+                                                             ns1__contactIDType* contact_id,
+                                                             bool enable,
+                                                             centreonengine__contactSetNotificationsOnHostUnreachableResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s, %d)\n",
-		   __func__,
-		   contact_id->contact.c_str(),
-		   enable);
+                   "Webservice: %s(%s, %d)\n",
+                   __func__,
+                   contact_id->contact.c_str(),
+                   enable);
 
     contact* contact = find_contact(contact_id->contact.c_str());
     if (contact == NULL) {
@@ -16271,9 +16279,9 @@ int centreonengine__contactSetNotificationsOnHostUnreachable(soap* s,
       *error = "Contact `" + contact_id->contact + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -16284,8 +16292,8 @@ int centreonengine__contactSetNotificationsOnHostUnreachable(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -16303,19 +16311,19 @@ int centreonengine__contactSetNotificationsOnHostUnreachable(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__contactSetNotificationsOnServiceCritical(soap* s,
-							     ns1__contactIDType* contact_id,
-							     bool enable,
-							     centreonengine__contactSetNotificationsOnServiceCriticalResponse& res) {
+                                                             ns1__contactIDType* contact_id,
+                                                             bool enable,
+                                                             centreonengine__contactSetNotificationsOnServiceCriticalResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s, %d)\n",
-		   __func__,
-		   contact_id->contact.c_str(),
-		   enable);
+                   "Webservice: %s(%s, %d)\n",
+                   __func__,
+                   contact_id->contact.c_str(),
+                   enable);
 
     contact* contact = find_contact(contact_id->contact.c_str());
     if (contact == NULL) {
@@ -16323,9 +16331,9 @@ int centreonengine__contactSetNotificationsOnServiceCritical(soap* s,
       *error = "Contact `" + contact_id->contact + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -16336,8 +16344,8 @@ int centreonengine__contactSetNotificationsOnServiceCritical(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -16355,19 +16363,19 @@ int centreonengine__contactSetNotificationsOnServiceCritical(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__contactSetNotificationsOnServiceDowntime(soap* s,
-							     ns1__contactIDType* contact_id,
-							     bool enable,
-							     centreonengine__contactSetNotificationsOnServiceDowntimeResponse& res) {
+                                                             ns1__contactIDType* contact_id,
+                                                             bool enable,
+                                                             centreonengine__contactSetNotificationsOnServiceDowntimeResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s, %d)\n",
-		   __func__,
-		   contact_id->contact.c_str(),
-		   enable);
+                   "Webservice: %s(%s, %d)\n",
+                   __func__,
+                   contact_id->contact.c_str(),
+                   enable);
 
     contact* contact = find_contact(contact_id->contact.c_str());
     if (contact == NULL) {
@@ -16375,9 +16383,9 @@ int centreonengine__contactSetNotificationsOnServiceDowntime(soap* s,
       *error = "Contact `" + contact_id->contact + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -16388,8 +16396,8 @@ int centreonengine__contactSetNotificationsOnServiceDowntime(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -16407,19 +16415,19 @@ int centreonengine__contactSetNotificationsOnServiceDowntime(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__contactSetNotificationsOnServiceEnabled(soap* s,
-							    ns1__contactIDType* contact_id,
-							    bool enable,
-							    centreonengine__contactSetNotificationsOnServiceEnabledResponse& res) {
+                                                            ns1__contactIDType* contact_id,
+                                                            bool enable,
+                                                            centreonengine__contactSetNotificationsOnServiceEnabledResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s, %d)\n",
-		   __func__,
-		   contact_id->contact.c_str(),
-		   enable);
+                   "Webservice: %s(%s, %d)\n",
+                   __func__,
+                   contact_id->contact.c_str(),
+                   enable);
 
     contact* contact = find_contact(contact_id->contact.c_str());
     if (contact == NULL) {
@@ -16427,9 +16435,9 @@ int centreonengine__contactSetNotificationsOnServiceEnabled(soap* s,
       *error = "Contact `" + contact_id->contact + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -16440,8 +16448,8 @@ int centreonengine__contactSetNotificationsOnServiceEnabled(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -16459,19 +16467,19 @@ int centreonengine__contactSetNotificationsOnServiceEnabled(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__contactSetNotificationsOnServiceFlapping(soap* s,
-							     ns1__contactIDType* contact_id,
-							     bool enable,
-							     centreonengine__contactSetNotificationsOnServiceFlappingResponse& res) {
+                                                             ns1__contactIDType* contact_id,
+                                                             bool enable,
+                                                             centreonengine__contactSetNotificationsOnServiceFlappingResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s, %d)\n",
-		   __func__,
-		   contact_id->contact.c_str(),
-		   enable);
+                   "Webservice: %s(%s, %d)\n",
+                   __func__,
+                   contact_id->contact.c_str(),
+                   enable);
 
     contact* contact = find_contact(contact_id->contact.c_str());
     if (contact == NULL) {
@@ -16479,9 +16487,9 @@ int centreonengine__contactSetNotificationsOnServiceFlapping(soap* s,
       *error = "Contact `" + contact_id->contact + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -16492,8 +16500,8 @@ int centreonengine__contactSetNotificationsOnServiceFlapping(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -16511,19 +16519,19 @@ int centreonengine__contactSetNotificationsOnServiceFlapping(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__contactSetNotificationsOnServiceRecovery(soap* s,
-							     ns1__contactIDType* contact_id,
-							     bool enable,
-							     centreonengine__contactSetNotificationsOnServiceRecoveryResponse& res) {
+                                                             ns1__contactIDType* contact_id,
+                                                             bool enable,
+                                                             centreonengine__contactSetNotificationsOnServiceRecoveryResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s, %d)\n",
-		   __func__,
-		   contact_id->contact.c_str(),
-		   enable);
+                   "Webservice: %s(%s, %d)\n",
+                   __func__,
+                   contact_id->contact.c_str(),
+                   enable);
 
     contact* contact = find_contact(contact_id->contact.c_str());
     if (contact == NULL) {
@@ -16531,9 +16539,9 @@ int centreonengine__contactSetNotificationsOnServiceRecovery(soap* s,
       *error = "Contact `" + contact_id->contact + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -16544,8 +16552,8 @@ int centreonengine__contactSetNotificationsOnServiceRecovery(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -16563,19 +16571,19 @@ int centreonengine__contactSetNotificationsOnServiceRecovery(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__contactSetNotificationsOnServiceTimeperiod(soap* s,
-							       ns1__contactIDType* contact_id,
-							       ns1__timeperiodIDType* timeperiod_id,
-							       centreonengine__contactSetNotificationsOnServiceTimeperiodResponse& res) {
+                                                               ns1__contactIDType* contact_id,
+                                                               ns1__timeperiodIDType* timeperiod_id,
+                                                               centreonengine__contactSetNotificationsOnServiceTimeperiodResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s, %s)\n",
-		   __func__,
-		   contact_id->contact.c_str(),
-		   timeperiod_id->timeperiod.c_str());
+                   "Webservice: %s(%s, %s)\n",
+                   __func__,
+                   contact_id->contact.c_str(),
+                   timeperiod_id->timeperiod.c_str());
 
     contact* contact = find_contact(contact_id->contact.c_str());
     if (contact == NULL) {
@@ -16583,9 +16591,9 @@ int centreonengine__contactSetNotificationsOnServiceTimeperiod(soap* s,
       *error = "Contact `" + contact_id->contact + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -16597,8 +16605,8 @@ int centreonengine__contactSetNotificationsOnServiceTimeperiod(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -16616,19 +16624,19 @@ int centreonengine__contactSetNotificationsOnServiceTimeperiod(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__contactSetNotificationsOnServiceUnknown(soap* s,
-							    ns1__contactIDType* contact_id,
-							    bool enable,
-							    centreonengine__contactSetNotificationsOnServiceUnknownResponse& res) {
+                                                            ns1__contactIDType* contact_id,
+                                                            bool enable,
+                                                            centreonengine__contactSetNotificationsOnServiceUnknownResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s, %d)\n",
-		   __func__,
-		   contact_id->contact.c_str(),
-		   enable);
+                   "Webservice: %s(%s, %d)\n",
+                   __func__,
+                   contact_id->contact.c_str(),
+                   enable);
 
     contact* contact = find_contact(contact_id->contact.c_str());
     if (contact == NULL) {
@@ -16636,9 +16644,9 @@ int centreonengine__contactSetNotificationsOnServiceUnknown(soap* s,
       *error = "Contact `" + contact_id->contact + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -16649,8 +16657,8 @@ int centreonengine__contactSetNotificationsOnServiceUnknown(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -16668,19 +16676,19 @@ int centreonengine__contactSetNotificationsOnServiceUnknown(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__contactSetNotificationsOnServiceWarning(soap* s,
-							    ns1__contactIDType* contact_id,
-							    bool enable,
-							    centreonengine__contactSetNotificationsOnServiceWarningResponse& res) {
+                                                            ns1__contactIDType* contact_id,
+                                                            bool enable,
+                                                            centreonengine__contactSetNotificationsOnServiceWarningResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s, %d)\n",
-		   __func__,
-		   contact_id->contact.c_str(),
-		   enable);
+                   "Webservice: %s(%s, %d)\n",
+                   __func__,
+                   contact_id->contact.c_str(),
+                   enable);
 
     contact* contact = find_contact(contact_id->contact.c_str());
     if (contact == NULL) {
@@ -16688,9 +16696,9 @@ int centreonengine__contactSetNotificationsOnServiceWarning(soap* s,
       *error = "Contact `" + contact_id->contact + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -16701,8 +16709,8 @@ int centreonengine__contactSetNotificationsOnServiceWarning(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -16720,19 +16728,19 @@ int centreonengine__contactSetNotificationsOnServiceWarning(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__contactSetPager(soap* s,
-				    ns1__contactIDType* contact_id,
-				    std::string pager,
-				    centreonengine__contactSetPagerResponse& res) {
+                                    ns1__contactIDType* contact_id,
+                                    std::string pager,
+                                    centreonengine__contactSetPagerResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s, %s)\n",
-		   __func__,
-		   contact_id->contact.c_str(),
-		   pager.c_str());
+                   "Webservice: %s(%s, %s)\n",
+                   __func__,
+                   contact_id->contact.c_str(),
+                   pager.c_str());
 
     contact* contact = find_contact(contact_id->contact.c_str());
     if (contact == NULL) {
@@ -16740,9 +16748,9 @@ int centreonengine__contactSetPager(soap* s,
       *error = "Contact `" + contact_id->contact + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -16754,8 +16762,8 @@ int centreonengine__contactSetPager(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -16773,19 +16781,19 @@ int centreonengine__contactSetPager(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__contactSetRetainStatusInformation(soap* s,
-						      ns1__contactIDType* contact_id,
-						      bool enable,
-						      centreonengine__contactSetRetainStatusInformationResponse& res) {
+                                                      ns1__contactIDType* contact_id,
+                                                      bool enable,
+                                                      centreonengine__contactSetRetainStatusInformationResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s, %d)\n",
-		   __func__,
-		   contact_id->contact.c_str(),
-		   enable);
+                   "Webservice: %s(%s, %d)\n",
+                   __func__,
+                   contact_id->contact.c_str(),
+                   enable);
 
     contact* contact = find_contact(contact_id->contact.c_str());
     if (contact == NULL) {
@@ -16793,9 +16801,9 @@ int centreonengine__contactSetRetainStatusInformation(soap* s,
       *error = "Contact `" + contact_id->contact + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -16806,8 +16814,8 @@ int centreonengine__contactSetRetainStatusInformation(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -16825,19 +16833,19 @@ int centreonengine__contactSetRetainStatusInformation(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__contactSetRetainStatusNonInformation(soap* s,
-							 ns1__contactIDType* contact_id,
-							 bool enable,
-							 centreonengine__contactSetRetainStatusNonInformationResponse& res) {
+                                                         ns1__contactIDType* contact_id,
+                                                         bool enable,
+                                                         centreonengine__contactSetRetainStatusNonInformationResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s, %d)\n",
-		   __func__,
-		   contact_id->contact.c_str(),
-		   enable);
+                   "Webservice: %s(%s, %d)\n",
+                   __func__,
+                   contact_id->contact.c_str(),
+                   enable);
 
     contact* contact = find_contact(contact_id->contact.c_str());
     if (contact == NULL) {
@@ -16845,9 +16853,9 @@ int centreonengine__contactSetRetainStatusNonInformation(soap* s,
       *error = "Contact `" + contact_id->contact + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -16858,8 +16866,8 @@ int centreonengine__contactSetRetainStatusNonInformation(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -16877,19 +16885,19 @@ int centreonengine__contactSetRetainStatusNonInformation(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__contactSetNotificationsOnHostCommand(soap* s,
-							 ns1__contactIDType* contact_id,
-							 ns1__commandIDType* command_id,
-							 centreonengine__contactSetNotificationsOnHostCommandResponse& res) {
+                                                         ns1__contactIDType* contact_id,
+                                                         ns1__commandIDType* command_id,
+                                                         centreonengine__contactSetNotificationsOnHostCommandResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s, %s)\n",
-		   __func__,
-		   contact_id->contact.c_str(),
-		   command_id->command.c_str());
+                   "Webservice: %s(%s, %s)\n",
+                   __func__,
+                   contact_id->contact.c_str(),
+                   command_id->command.c_str());
 
     contact* contact = find_contact(contact_id->contact.c_str());
     if (contact == NULL) {
@@ -16897,9 +16905,9 @@ int centreonengine__contactSetNotificationsOnHostCommand(soap* s,
       *error = "Contact `" + contact_id->contact + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -16911,8 +16919,8 @@ int centreonengine__contactSetNotificationsOnHostCommand(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
@@ -16930,19 +16938,19 @@ int centreonengine__contactSetNotificationsOnHostCommand(soap* s,
  *  @return SOAP_OK on success.
  */
 int centreonengine__contactSetNotificationsOnServiceCommand(soap* s,
-							    ns1__contactIDType* contact_id,
-							    ns1__commandIDType* command_id,
-							    centreonengine__contactSetNotificationsOnServiceCommandResponse& res) {
+                                                            ns1__contactIDType* contact_id,
+                                                            ns1__commandIDType* command_id,
+                                                            centreonengine__contactSetNotificationsOnServiceCommandResponse& res) {
   (void)res;
 
   try {
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-		   "Webservice: %s(%s, %s)\n",
-		   __func__,
-		   contact_id->contact.c_str(),
-		   command_id->command.c_str());
+                   "Webservice: %s(%s, %s)\n",
+                   __func__,
+                   contact_id->contact.c_str(),
+                   command_id->command.c_str());
 
     contact* contact = find_contact(contact_id->contact.c_str());
     if (contact == NULL) {
@@ -16950,9 +16958,9 @@ int centreonengine__contactSetNotificationsOnServiceCommand(soap* s,
       *error = "Contact `" + contact_id->contact + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
-		     "Webservice: %s failed. %s\n",
-		     __func__,
-		     error->c_str());
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
 
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
@@ -16964,8 +16972,8 @@ int centreonengine__contactSetNotificationsOnServiceCommand(soap* s,
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
-		   "Webservice: %s failed. catch all.\n",
-		   __func__);
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
   }
