@@ -7,8 +7,7 @@
  *  main Centreon Engine daemon. The centenginetats utility allows
  *  you to obtain various information about a running Centreon Engine
  *  process that can be very helpful in @link tuningcentengineformaximumperformance tuning
- *  performance @endlink. You can obtain information either in
- *  human-readable or MRTG-compatible format.
+ *  performance @endlink.
  *
  *  @section usingthecentenginetatsutilityusageinformation Usage Information
  *
@@ -87,18 +86,4 @@
  *  pertaining to the Centreon Engine process. Metrics which have
  *  multiple values are (unless otherwise specified) min, max and
  *  average values for that particular metric.
- *
- *  @section usingthecentenginetatsutilitymrtgintegration MRTG Integration
- *
- *  You can use the centenginetats utility to display various
- *  Centreon Engine metrics using MRTG (or other compatible program).
- *  To do so, run the centenginetats utility using the --mrtg and
- *  --data arguments. The --data argument is used to specify what
- *  statistics should be graphed. Possible values for the --data
- *  argument can be found by running the centenginetats utility with
- *  the --help option.
- *
- *  @note Information on using the centenginetats utility to
- *  generate MRTG graphs for Centreon Engine performance statistics
- *  can be found @link graphingperformanceinfowithmrtg here @endlink.
  */

@@ -14,8 +14,8 @@
  *
  *  @note Tip: A sample main configuration file
  *  (/usr/local/centengine/etc/centengine.cfg) is installed for
- *  you when you follow the @link quickstartinstallationguides quickstart
- *  installation guide @endlink.
+ *  you when you follow the
+ *  @ref quickstartinstallationguide "quickstart installation guide".
  *
  *  @section mainconfigurationfileoptionsconfigfilelocation Config File Location
  *
@@ -449,10 +449,7 @@
  *  command, so this option essentially determines how many commands
  *  can be buffered. For installations where you process a large number
  *  of passive checks (e.g. @link distributedmonitoring distributed setups
- *  @endlink), you may need to increase this number. You should
- *  consider using MRTG to graph Centreon Engine' usage of external
- *  command buffers. You can read more on how to configure graphing
- *  @link graphingperformanceinfowithmrtg here @endlink.
+ *  @endlink), you may need to increase this number.
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariablesstateretentionoption State Retention Option
  *

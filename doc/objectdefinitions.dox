@@ -47,8 +47,8 @@
  *  @section objectdefinitionssampleconfigurationfiles Sample Configuration Files
  *
  *  @note Sample object configuration files are installed in the
- *  /usr/local/centengine/etc/ directory when you follow the @link
- *  quickstartinstallationguides quickstart installation guide @endlink.
+ *  /usr/local/centengine/etc/ directory when you follow the
+ *  @ref quickstartinstallationguide "quickstart installation guide".
  *
  *  @section objectdefinitionsobjecttypes Object Types
  *

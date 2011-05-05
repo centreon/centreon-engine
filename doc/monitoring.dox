@@ -20,7 +20,8 @@
  *  documentation on monitoring publicly available services.
  *
  *  @note These instructions assume that you've installed Centreon
- *  Engine according to the quickstart guide. The sample
+ *  Engine according to the
+ *  @ref quickstartinstallationguide "quickstart guide". The sample
  *  configuration entries below reference objects that are defined in
  *  the sample config files (commands.cfg, templates.cfg, etc.) that
  *  are installed if you follow the quickstart.
@@ -38,7 +39,7 @@
  *  Windows machine and using the check_nt plugin to communicate with
  *  the NSClient++ addon. The check_nt plugin should already be
  *  installed on the Centreon Engine server if you followed the
- *  quickstart guide.
+ *  @ref quickstartinstallationguide "quickstart guide".
  *
  *  Other Windows agents (like NC_Net) could be used instead of
  *  NSClient++ if you wish - provided you change command and service
@@ -331,7 +332,8 @@
  *  the documentation on monitoring publicly available services.
  *
  *  @note These instructions assume that you've installed Centreon
- *  Engine according to the quickstart guide. The sample
+ *  Engine according to the
+ *  @ref quickstartinstallationguide "quickstart guide". The sample
  *  configuration entries below reference objects that are defined in
  *  the sample config files (commands.cfg, templates.cfg, etc.) that
  *  are installed if you follow the quickstart.
@@ -411,11 +413,11 @@
  *  - Bandwidth / traffic rate
  *
  *  @note These instructions assume that you've installed Centreon
- *  Engine according to the @link quickstartinstallationguides
- *  quickstart guide @endlink. The sample configuration entries below
- *  reference objects that are defined in the sample config files
- *  (commands.cfg, templates.cfg, etc.) that are installed when you
- *  follow the quickstart.
+ *  Engine according to the
+ *  @ref quickstartinstallationguide "quickstart guide". The sample
+ *  configuration entries below reference objects that are defined in
+ *  the sample config files (commands.cfg, templates.cfg, etc.) that are
+ *  installed when you follow the quickstart.
  *
  *  @subsection monitoringroutersswitchesoverview Overview
  *
@@ -659,7 +661,7 @@
  *  switch.cfg file, you're ready to start monitoring the
  *  router/switch. To do this, you'll need to
  *  @ref verifyconfig "verify your configuration"
- *  and @link startingandstoppingcentreonengine restart Centreon Engine @endlink.
+ *  and @ref runningstartstop "restart Centreon Engine".
  *
  *  If the verification process produces any errors messages, fix your
  *  configuration file before continuing. Make sure that you don't
@@ -691,7 +693,8 @@
  *  - and more...
  *
  *  @note These instructions assume that you've installed Centreon
- *  Engine according to the quickstart guide. The sample
+ *  Engine according to the
+ *  @ref quickstartinstallationguide "quickstart guide". The sample
  *  configuration entries below reference objects that are defined in
  *  the sample config files (commands.cfg, templates.cfg, etc.) that
  *  are installed if you follow the quickstart.
@@ -846,7 +849,7 @@
  *  printer.cfg file, you're ready to start monitoring the printer. To
  *  do this, you'll need to
  *  @ref verifyconfig "verify your configuration"
- *  and @link startingandstoppingcentreonengine restart Centreon Engine @endlink.
+ *  and @ref runningstartstop "restart Centreon Engine".
  *
  *  If the verification process produces any errors messages, fix your
  *  configuration file before continuing. Make sure that you don't
@@ -888,10 +891,10 @@
  *  @ref monitoringroutersswitches "monitoring routers/switches".
  *
  *  @note These instructions assume that you've installed Centreon
- *  Engine according to the @link quickstartinstallationguides
- *  quickstart guide @endlink. The sample configuration entries below
- *  reference objects that are defined in the sample commands.cfg and
- *  localhost.cfg config files.
+ *  Engine according to the
+ *  @ref quickstartinstallationguide "quickstart guide". The sample
+ *  configuration entries below reference objects that are defined in
+ *  the sample commands.cfg and localhost.cfg config files.
  *
  *  @subsection monitoringpubliclyavailableservicespluginsformonitoringservices Plugins For Monitoring Services
  *
