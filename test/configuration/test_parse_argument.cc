@@ -19,8 +19,10 @@
 
 #include <QDebug>
 #include <QFile>
+#include <QDir>
 #include <exception>
 
+#include "globals.hh"
 #include "configuration/state.hh"
 
 using namespace com::centreon::engine;
@@ -76,6 +78,8 @@ static void check_exist_file() {
  */
 int main(void) {
   try {
+    config.set_check_result_path(QDir::tempPath());
+
     check_directory();
     check_noexist_file();
     check_exist_file();

@@ -18,6 +18,8 @@
 */
 
 #include <QDebug>
+#include <QTemporaryFile>
+#include <QDir>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
@@ -610,12 +612,21 @@ int main(void) {
   try {
     srandom(time(NULL));
 
-    QString mainconf(tmpnam(NULL));
-    QString resource(tmpnam(NULL));
-    std::map<QString, QString> my_conf = build_configuration(mainconf, resource);
-    test_configuration(mainconf, my_conf);
-    remove(mainconf.toStdString().c_str());
-    remove(resource.toStdString().c_str());
+    QTemporaryFile mainconf("centengine.cfg");
+    QTemporaryFile resource("resource.cfg");
+
+    if (mainconf.open() == false || resource.open() == false) {
+      throw (engine_error() << "open temporary file failed.");
+    }
+
+    mainconf.close();
+    resource.close();
+
+    QString mainconf_path = QDir::tempPath() + "/" + mainconf.fileName();
+    QString resource_path = QDir::tempPath() + "/" + resource.fileName();
+
+    std::map<QString, QString> my_conf = build_configuration(mainconf_path, resource_path);
+    test_configuration(mainconf_path, my_conf);
   }
   catch (std::exception const& e) {
     qDebug() << "error: " << e.what();
