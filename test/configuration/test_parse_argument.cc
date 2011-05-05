@@ -18,6 +18,7 @@
 */
 
 #include <QDebug>
+#include <QTemporaryFile>
 #include <QFile>
 #include <QDir>
 #include <exception>
@@ -32,7 +33,6 @@ using namespace com::centreon::engine;
  */
 static void check_directory() {
   try {
-    configuration::state config;
     config.parse("./");
   }
   catch (std::exception const& e) {
@@ -47,7 +47,6 @@ static void check_directory() {
  */
 static void check_noexist_file() {
   try {
-    configuration::state config;
     config.parse("./test_noexist_file.cfg");
   }
   catch (std::exception const& e) {
@@ -61,16 +60,12 @@ static void check_noexist_file() {
  *  Check parse with exist file.
  */
 static void check_exist_file() {
-  QString filename("./test_exist_file.cfg");
-  QFile file(filename);
-  file.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Unbuffered);
-  if (file.error() != QFile::NoError) {
-    throw (engine_error() << filename << ": " << file.errorString());
+  QTemporaryFile tmp("centengine_test_exist_file.cfg");
+  if (tmp.open() == false) {
+    throw (engine_error() << "open temporary file failed.");
   }
-  file.close();
-  configuration::state config;
-  config.parse(filename);
-  file.remove();
+  config.parse(tmp.fileName());
+  tmp.close();
 }
 
 /**

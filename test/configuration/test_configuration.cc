@@ -619,9 +619,6 @@ int main(void) {
       throw (engine_error() << "open temporary file failed.");
     }
 
-    mainconf.close();
-    resource.close();
-
     QString mainconf_path = QDir::tempPath() + "/" + mainconf.fileName();
     QString resource_path = QDir::tempPath() + "/" + resource.fileName();
 
