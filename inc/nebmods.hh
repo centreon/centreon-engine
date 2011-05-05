@@ -46,8 +46,6 @@ int neb_load_module(void* mod);
 int neb_unload_all_modules(int flags, int reason);
 int neb_unload_module(void* mod, int flags, int reason);
 
-// int neb_set_module_info(void *handle, int type, char *data);
-
 // int neb_register_callback(int callback_type, void *mod_handle, int priority, int (*callback_func)(int,void *));
 // int neb_deregister_module_callbacks(nebmodule *mod);
 // int neb_deregister_callback(int callback_type, int (*callback_func)(int,void *));

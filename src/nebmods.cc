@@ -206,7 +206,7 @@ int neb_unload_module(void* mod, int flags, int reason) {
 /****************************************************************************/
 
 /* sets module information */
-int neb_set_module_info(void* handle, int type, char* data) {
+int neb_set_module_info(void* handle, int type, char const* data) {
   if (handle == NULL)
     return (NEBERROR_NOMODULE);
 

@@ -59,7 +59,7 @@ extern "C" {
 # define NEBMODULE_ERROR_API_VERSION 5    /* module version is incompatible with current api */
 
 /***** MODULE FUNCTIONS *****/
-int neb_set_module_info(void*, int, char*);
+int neb_set_module_info(void* handle, int type, char const* data);
 
 /***** MODULE STRUCTURES *****/
 
