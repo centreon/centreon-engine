@@ -331,7 +331,7 @@ int pre_flight_check(void) {
        temp_service = temp_service->next) {
     if ((temp_host = find_host(temp_service->host_name))) {
       temp_host->total_services++;
-      temp_host->total_service_check_interval += temp_service->check_interval;
+      temp_host->total_service_check_interval += static_cast<unsigned long>(temp_service->check_interval);
     }
   }
 

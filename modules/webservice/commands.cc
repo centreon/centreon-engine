@@ -552,7 +552,7 @@ int centreonengine__hostGetCheckIntervalNormal(soap* s,
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
     }
 
-    val = host->check_interval;
+    val = static_cast<unsigned int>(host->check_interval);
     syncro::instance().worker_finish();
   }
   catch (...) {
@@ -599,7 +599,7 @@ int centreonengine__hostGetCheckIntervalRetry(soap* s,
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
     }
 
-    val = host->retry_interval;
+    val = static_cast<unsigned int>(host->retry_interval);
     syncro::instance().worker_finish();
   }
   catch (...) {
@@ -3254,7 +3254,7 @@ int centreonengine__hostGetNotificationsFirstDelay(soap* s,
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
     }
 
-    val = host->first_notification_delay;
+    val = static_cast<unsigned int>(host->first_notification_delay);
     syncro::instance().worker_finish();
   }
   catch (...) {
@@ -3301,7 +3301,7 @@ int centreonengine__hostGetNotificationsInterval(soap* s,
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
     }
 
-    val = host->notification_interval;
+    val = static_cast<unsigned int>(host->notification_interval);
     syncro::instance().worker_finish();
   }
   catch (...) {
@@ -4340,7 +4340,7 @@ int centreonengine__hostGetPluginExecutionTime(soap* s,
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
     }
 
-    val = host->execution_time;
+    val = static_cast<unsigned int>(host->execution_time);
     syncro::instance().worker_finish();
   }
   catch (...) {
@@ -5568,7 +5568,7 @@ int centreonengine__hostGetStateLastUp(soap* s,
  */
 int centreonengine__hostGetStatePercentChange(soap* s,
                                               ns1__hostIDType* host_id,
-                                              unsigned long& val) {
+                                              time_t& val) {
   try {
     syncro::instance().waiting_callback();
 
@@ -5591,7 +5591,7 @@ int centreonengine__hostGetStatePercentChange(soap* s,
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
     }
 
-    val = host->percent_state_change;
+    val = static_cast<time_t>(host->percent_state_change);
     syncro::instance().worker_finish();
   }
   catch (...) {
@@ -6100,7 +6100,7 @@ int centreonengine__serviceGetCheckIntervalNormal(soap* s,
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
     }
 
-    val = service->check_interval;
+    val = static_cast<unsigned int>(service->check_interval);
     syncro::instance().worker_finish();
   }
   catch (...) {
@@ -6149,7 +6149,7 @@ int centreonengine__serviceGetCheckIntervalRetry(soap* s,
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
     }
 
-    val = service->retry_interval;
+    val = static_cast<unsigned int>(service->retry_interval);
     syncro::instance().worker_finish();
   }
   catch (...) {
@@ -8835,7 +8835,7 @@ int centreonengine__serviceGetNotificationsFirstDelay(soap* s,
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
     }
 
-    val = service->first_notification_delay;
+    val = static_cast<unsigned int>(service->first_notification_delay);
     syncro::instance().worker_finish();
   }
   catch (...) {
@@ -8884,7 +8884,7 @@ int centreonengine__serviceGetNotificationsInterval(soap* s,
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
     }
 
-    val = service->notification_interval;
+    val = static_cast<unsigned int>(service->notification_interval);
     syncro::instance().worker_finish();
   }
   catch (...) {
@@ -10068,7 +10068,7 @@ int centreonengine__serviceGetPluginExecutionTime(soap* s,
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
     }
 
-    val = service->execution_time;
+    val = static_cast<unsigned int>(service->execution_time);
     syncro::instance().worker_finish();
   }
   catch (...) {
@@ -11400,7 +11400,7 @@ int centreonengine__serviceGetStateLastWarning(soap* s,
  */
 int centreonengine__serviceGetStatePercentChange(soap* s,
                                                  ns1__serviceIDType* service_id,
-                                                 unsigned long& val) {
+                                                 time_t& val) {
   try {
     syncro::instance().waiting_callback();
 
@@ -11425,7 +11425,7 @@ int centreonengine__serviceGetStatePercentChange(soap* s,
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
     }
 
-    val = service->percent_state_change;
+    val = static_cast<time_t>(service->percent_state_change);
     syncro::instance().worker_finish();
   }
   catch (...) {
@@ -12547,17 +12547,17 @@ int centreonengine__downtimeAddToHost(soap* s,
 
     unsigned long downtime_id;
     if (schedule_downtime(HOST_DOWNTIME,
-                          host->name,
-                          NULL,
-                          time(NULL),
-                          author,
-                          comment,
-                          downtime_type->starttime,
-                          downtime_type->endtime,
-                          downtime_type->fixed,
-                          downtime_type->triggerid->downtime,
-                          downtime_type->duration,
-                          &downtime_id) == ERROR) {
+          host->name,
+          NULL,
+          time(NULL),
+          author,
+          comment,
+          downtime_type->starttime,
+          downtime_type->endtime,
+          downtime_type->fixed,
+          downtime_type->triggerid->downtime,
+          static_cast<unsigned long>(downtime_type->duration),
+          &downtime_id) == ERROR) {
       delete[] author;
       delete[] comment;
       std::string* error = soap_new_std__string(s, 1);
@@ -12637,17 +12637,17 @@ int centreonengine__downtimeAddAndPropagateToHost(soap* s,
 
     unsigned long downtime_id;
     if (schedule_downtime(HOST_DOWNTIME,
-                          host->name,
-                          NULL,
-                          entry_time,
-                          author,
-                          comment,
-                          downtime_type->starttime,
-                          downtime_type->endtime,
-                          downtime_type->fixed,
-                          downtime_type->triggerid->downtime,
-                          downtime_type->duration,
-                          &downtime_id) == ERROR) {
+          host->name,
+          NULL,
+          entry_time,
+          author,
+          comment,
+          downtime_type->starttime,
+          downtime_type->endtime,
+          downtime_type->fixed,
+          downtime_type->triggerid->downtime,
+          static_cast<unsigned long>(downtime_type->duration),
+          &downtime_id) == ERROR) {
 
       delete[] author;
       delete[] comment;
@@ -12665,14 +12665,14 @@ int centreonengine__downtimeAddAndPropagateToHost(soap* s,
     res.downtimeid->downtime = downtime_id;
 
     schedule_and_propagate_downtime(host,
-                                    entry_time,
-                                    author,
-                                    comment,
-                                    downtime_type->starttime,
-                                    downtime_type->endtime,
-                                    downtime_type->fixed,
-                                    0,
-                                    downtime_type->duration);
+      entry_time,
+      author,
+      comment,
+      downtime_type->starttime,
+      downtime_type->endtime,
+      downtime_type->fixed,
+      0,
+      static_cast<unsigned long>(downtime_type->duration));
 
     delete[] author;
     delete[] comment;
@@ -12738,17 +12738,17 @@ int centreonengine__downtimeAddAndPropagateTriggeredToHost(soap* s,
 
     unsigned long downtime_id;
     if (schedule_downtime(HOST_DOWNTIME,
-                          host->name,
-                          NULL,
-                          entry_time,
-                          author,
-                          comment,
-                          downtime_type->starttime,
-                          downtime_type->endtime,
-                          downtime_type->fixed,
-                          downtime_type->triggerid->downtime,
-                          downtime_type->duration,
-                          &downtime_id) == ERROR) {
+          host->name,
+          NULL,
+          entry_time,
+          author,
+          comment,
+          downtime_type->starttime,
+          downtime_type->endtime,
+          downtime_type->fixed,
+          downtime_type->triggerid->downtime,
+          static_cast<unsigned long>(downtime_type->duration),
+          &downtime_id) == ERROR) {
       delete[] author;
       delete[] comment;
 
@@ -12766,14 +12766,14 @@ int centreonengine__downtimeAddAndPropagateTriggeredToHost(soap* s,
     res.downtimeid->downtime = downtime_id;
 
     schedule_and_propagate_downtime(host,
-                                    entry_time,
-                                    author,
-                                    comment,
-                                    downtime_type->starttime,
-                                    downtime_type->endtime,
-                                    downtime_type->fixed,
-                                    res.downtimeid->downtime,
-                                    downtime_type->duration);
+      entry_time,
+      author,
+      comment,
+      downtime_type->starttime,
+      downtime_type->endtime,
+      downtime_type->fixed,
+      res.downtimeid->downtime,
+      static_cast<unsigned long>(downtime_type->duration));
 
     delete[] author;
     delete[] comment;
@@ -12844,17 +12844,17 @@ int centreonengine__downtimeAddToHostServices(soap* s,
     for (servicesmember* tmp = host->services; tmp != NULL; tmp = tmp->next) {
       if (tmp->service_ptr !=NULL) {
         if (schedule_downtime(SERVICE_DOWNTIME,
-                              host->name,
-                              tmp->service_ptr->description,
-                              entry_time,
-                              author,
-                              comment,
-                              downtime_type->starttime,
-                              downtime_type->endtime,
-                              downtime_type->fixed,
-                              downtime_type->triggerid->downtime,
-                              downtime_type->duration,
-                              NULL) == ERROR) {
+              host->name,
+              tmp->service_ptr->description,
+              entry_time,
+              author,
+              comment,
+              downtime_type->starttime,
+              downtime_type->endtime,
+              downtime_type->fixed,
+              downtime_type->triggerid->downtime,
+              static_cast<unsigned long>(downtime_type->duration),
+              NULL) == ERROR) {
           is_error = true;
         }
       }
@@ -12937,17 +12937,17 @@ int centreonengine__downtimeAddToService(soap* s,
 
     unsigned long downtime_id;
     if (schedule_downtime(SERVICE_DOWNTIME,
-                          service->host_name,
-                          service->description,
-                          time(NULL),
-                          author,
-                          comment,
-                          downtime_type->starttime,
-                          downtime_type->endtime,
-                          downtime_type->fixed,
-                          downtime_type->triggerid->downtime,
-                          downtime_type->duration,
-                          &downtime_id) == ERROR) {
+          service->host_name,
+          service->description,
+          time(NULL),
+          author,
+          comment,
+          downtime_type->starttime,
+          downtime_type->endtime,
+          downtime_type->fixed,
+          downtime_type->triggerid->downtime,
+          static_cast<unsigned long>(downtime_type->duration),
+          &downtime_id) == ERROR) {
       delete[] author;
       delete[] comment;
       std::string* error = soap_new_std__string(s, 1);

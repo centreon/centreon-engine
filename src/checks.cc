@@ -348,8 +348,8 @@ int run_scheduled_service_check(service* svc,
       /* determine next time we should check the service if needed */
       /* if service has no check interval, schedule it again for 5 minutes from now */
       if (current_time >= preferred_time)
-        preferred_time = current_time +
-	  ((svc->check_interval <= 0) ? 300 : (svc->check_interval * config.get_interval_length()));
+        preferred_time = current_time
+          + static_cast<time_t>((svc->check_interval <= 0) ? 300 : (svc->check_interval * config.get_interval_length()));
 
       /* make sure we rescheduled the next service check at a valid time */
       get_next_valid_time(preferred_time, &next_valid_time, svc->check_period_ptr);
@@ -483,7 +483,7 @@ int run_async_service_check(service* svc,
   /* neb module wants to cancel the service check - the check will be rescheduled for a later time by the scheduling logic */
   if (neb_result == NEBERROR_CALLBACKCANCEL) {
     if (preferred_time)
-      *preferred_time += (svc->check_interval * config.get_interval_length());
+      *preferred_time += static_cast<time_t>(svc->check_interval * config.get_interval_length());
     return (ERROR);
   }
 
@@ -525,7 +525,7 @@ int run_async_service_check(service* svc,
                    svc->description,
 		   svc->host_name);
     if (preferred_time)
-      *preferred_time += (svc->check_interval * config.get_interval_length());
+      *preferred_time += static_cast<time_t>(svc->check_interval * config.get_interval_length());
     svc->latency = old_latency;
     return (ERROR);
   }
@@ -539,7 +539,7 @@ int run_async_service_check(service* svc,
                    svc->description,
 		   svc->host_name);
     if (preferred_time)
-      *preferred_time += (svc->check_interval * config.get_interval_length());
+      *preferred_time += static_cast<time_t>(svc->check_interval * config.get_interval_length());
     svc->latency = old_latency;
     delete[] raw_command;
     return (ERROR);
@@ -2146,9 +2146,9 @@ int check_service_check_viability(service* svc,
 
   /* get the check interval to use if we need to reschedule the check */
   if (svc->state_type == SOFT_STATE && svc->current_state != STATE_OK)
-    check_interval = (svc->retry_interval * config.get_interval_length());
+    check_interval = static_cast<int>(svc->retry_interval * config.get_interval_length());
   else
-    check_interval = (svc->check_interval * config.get_interval_length());
+    check_interval = static_cast<int>(svc->check_interval * config.get_interval_length());
 
   /* get the current time */
   time(&current_time);
@@ -2393,11 +2393,11 @@ int is_service_result_fresh(service* temp_service,
   if (temp_service->freshness_threshold == 0) {
     if (temp_service->state_type == HARD_STATE
         || temp_service->current_state == STATE_OK)
-      freshness_threshold = (temp_service->check_interval * config.get_interval_length())
-	+ temp_service->latency + config.get_additional_freshness_latency();
+      freshness_threshold = static_cast<int>((temp_service->check_interval * config.get_interval_length())
+        + temp_service->latency + config.get_additional_freshness_latency());
     else
-      freshness_threshold = (temp_service->retry_interval * config.get_interval_length())
-        + temp_service->latency + config.get_additional_freshness_latency();
+      freshness_threshold = static_cast<int>((temp_service->retry_interval * config.get_interval_length())
+        + temp_service->latency + config.get_additional_freshness_latency());
   }
   else
     freshness_threshold = temp_service->freshness_threshold;
@@ -2835,8 +2835,8 @@ int is_host_result_fresh(host* temp_host,
 
   /* use user-supplied freshness threshold or auto-calculate a freshness threshold to use? */
   if (temp_host->freshness_threshold == 0)
-    freshness_threshold = (temp_host->check_interval * config.get_interval_length())
-      + temp_host->latency + config.get_additional_freshness_latency();
+    freshness_threshold = static_cast<int>((temp_host->check_interval * config.get_interval_length())
+      + temp_host->latency + config.get_additional_freshness_latency());
   else
     freshness_threshold = temp_host->freshness_threshold;
 
@@ -3370,7 +3370,7 @@ int run_scheduled_host_check_3x(host* hst, int check_options, double latency) {
       /* determine next time we should check the host if needed */
       /* if host has no check interval, schedule it again for 5 minutes from now */
       if (current_time >= preferred_time)
-        preferred_time = current_time + ((hst->check_interval <= 0)
+        preferred_time = current_time + static_cast<time_t>((hst->check_interval <= 0)
 					 ? 300
 					 : (hst->check_interval * config.get_interval_length()));
 
@@ -4629,9 +4629,9 @@ int check_host_check_viability_3x(host* hst,
 
   /* get the check interval to use if we need to reschedule the check */
   if (hst->state_type == SOFT_STATE && hst->current_state != HOST_UP)
-    check_interval = (hst->retry_interval * config.get_interval_length());
+    check_interval = static_cast<int>(hst->retry_interval * config.get_interval_length());
   else
-    check_interval = (hst->check_interval * config.get_interval_length());
+    check_interval = static_cast<int>(hst->check_interval * config.get_interval_length());
 
   /* make sure check interval is positive - otherwise use 5 minutes out for next check */
   if (check_interval <= 0)

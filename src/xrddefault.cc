@@ -991,8 +991,8 @@ int xrddefault_read_state_information(void) {
         if (!strcmp(var, "created")) {
           creation_time = strtoul(val, NULL, 10);
           time(&current_time);
-          if (current_time - creation_time <
-              config.get_retention_scheduling_horizon())
+          if ((current_time - creation_time)
+              < static_cast<time_t>(config.get_retention_scheduling_horizon()))
             scheduling_info_is_ok = TRUE;
           else
             scheduling_info_is_ok = FALSE;

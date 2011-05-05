@@ -1,5 +1,5 @@
 /*
-** Copyright 2011      Merethis
+** Copyright 2011 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -90,7 +90,7 @@ file::~file() throw() {
  * @param[in] right The class to copy.
  */
 file::file(file const& right)
-  : _size_limit(0) {
+  : object(right), _size_limit(0) {
   operator=(right);
 }
 
