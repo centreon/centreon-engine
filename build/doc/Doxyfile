@@ -54,7 +54,6 @@ INPUT                  = ../../doc/about.dox                   \
                          ../../doc/faststartup.dox             \
                          ../../doc/largeinstalltweaks.dox      \
                          ../../doc/stats.dox                   \
-                         ../../doc/mrtggraphs.dox              \
                          ../../doc/integration.dox             \
                          ../../doc/int-snmptrap.dox            \
                          ../../doc/int-tcpwrappers.dox         \

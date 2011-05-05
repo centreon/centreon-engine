@@ -43,7 +43,7 @@
  *  dependent on other services for notifications and check execution.
  *
  *  @image html service-dependencies.png
- *  @image latex service-dependencies.eps
+ *  @image latex service-dependencies.eps width=\linewidth
  *
  *  In this example, the dependency definitions for Service F on Host C
  *  would be defined as follows:

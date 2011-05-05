@@ -1,44 +1,51 @@
 /**
  *  @page adviceforbeginners Advice for Beginners
  *
- *  Congratulations on choosing Centreon Engine! Centreon Engine is
+ *  Congratulations on choosing Centreon Engine ! Centreon Engine is
  *  quite powerful and flexible, but it can take a lot of work to get
  *  it configured just the way you'd like. Once you become familiar
  *  with how it works and what it can do for you, you'll never want to
  *  be without it. :-) Here are some important things to keep in mind
- *  for first-time Centreon Engine users:
+ *  for first-time Centreon Engine users :
  *
- *  1. Relax - it's going to take some time. Don't expect to be able to
- *  get things working exactly the way you want them right off the bat.
- *  it's not that easy. Setting up Centreon Engine can involve a bit
- *  of work - partly because of the options that Centreon Engine
- *  offers, partly because you need to know what to monitor on your
- *  network (and how best to do it).
+ *  @paragraph useafrontend Use a Frontend
+ *  Centreon Engine relies on configuration files that might are
+ *  difficult to write and maintain by hand. You might want to use a
+ *  frontend to configure Centreon Engine like
+ *  <a href="http://www.centreon.com/">Centreon</a>. Centreon can help
+ *  you get your IT network monitored in very few time and provide much
+ *  more feature to Centreon Engine.
  *
- *  2. Use the quickstart instructions. The @link
- *  quickstartinstallationguides quickstart installation guide @endlink
+ *  @paragraph relax Relax
+ *  Relax - it's going to take some time. Don't expect to be able to get
+ *  things working exactly the way you want them right off the bat. It's
+ *  not that easy. Setting up Centreon Engine can involve a bit of work,
+ *  partly because of the options that Centreon Engine offers, partly
+ *  because you need to know what to monitor on your network (and how
+ *  best to do it).
+ *
+ *  @paragraph usequickstart Use the quickstart instructions
+ *  The
+ *  @ref quickstartinstallationguide "quickstart installation guide"
  *  is designed to get most new users up and running with a basic
  *  Centreon Engine setup fairly quickly. Within 20 minutes you can
  *  have Centreon Engine installed and monitoring your local system.
  *  Once that's complete, you can move on to learning how to configure
  *  Centreon Engine to do more.
  *
- *  3. Read the documentation. Centreon Engine can be tricky to
- *  configure when you've got a good grasp of what's going on, and
- *  nearly impossible if you don't. Make sure you read the
- *  documentation (particularly the sections on "Configuring Centreon
- *  Engine" and "The Basics"). Save the advanced topics for when
- *  you've got a good understanding of the basics.
+ *  @paragraph readthedoc Read the documentation
+ *  Centreon Engine can be tricky to configure when you've got a good
+ *  grasp of what's going on, and nearly impossible if you don't. Make
+ *  sure you read the documentation (particularly the sections on
+ *  @ref configurationoverview "Configuring Centreon Engine"). Save the
+ *  advanced topics for when you've got a good understanding of the
+ *  basics.
  *
- *  4. Seek the help of others. If you've read the documentation,
- *  reviewed the sample config files, and are still having problems,
- *  send an email message describing your problems to the
- *  centengine-users mailing list. Due to the amount of work that I
- *  have to do for this project, I am unable to answer most of the
- *  questions that get sent directly to me, so your best source of help
- *  is going to be the mailing list. If you've done some background
- *  reading and you provide a good problem description, odds are that
- *  someone will give you some pointers on getting things working
- *  properly. More information on subscribing to the mailing lists or
- *  searching the list archives.
+ *  @paragraph seekhelp Seek the help of others
+ *  If you've read the documentation, reviewed the sample config files,
+ *  and are still having problems, send an email message describing your
+ *  problems to the Centreon Engine mailing list. If you've done some
+ *  background reading and you provide a good problem description, odds
+ *  are that someone will give you some pointers on getting things
+ *  working properly.
  */

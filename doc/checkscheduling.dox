@@ -154,21 +154,21 @@
  *  @subsection checkschedulingnoninterleavedchecks Non-Interleaved Checks
  *
  *  @image html noninterleaved1.png
- *  @image latex noninterleaved1.eps
+ *  @image latex noninterleaved1.eps width=\linewidth
  *
  *  @image html noninterleaved2.png
- *  @image latex noninterleaved2.eps
+ *  @image latex noninterleaved2.eps width=\linewidth
  *
  *  @subsection checkschedulinginterleavedchecks Interleaved Checks
  *
  *  @image html interleaved1.png
- *  @image latex interleaved1.eps
+ *  @image latex interleaved1.eps width=\linewidth
  *
  *  @image html interleaved2.png
- *  @image latex interleaved2.eps
+ *  @image latex interleaved2.eps width=\linewidth
  *
  *  @image html interleaved3.png
- *  @image latex interleaved3.eps
+ *  @image latex interleaved3.eps width=\linewidth
  *
  *  @section checkschedulingmaximumconcurrentservicechecks Maximum Concurrent Service Checks
  *
@@ -346,7 +346,7 @@
  *  refer to it as we explain how things are done.
  *
  *  @image html checktiming.png
- *  @image latex checktiming.eps
+ *  @image latex checktiming.eps width=\linewidth
  *
  *  First off, the @b X<sub>n</sub> events are check result reaper
  *  events that are scheduled at a frequency specified by the
