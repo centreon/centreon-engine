@@ -60,7 +60,7 @@ static void check_noexist_file() {
  *  Check parse with exist file.
  */
 static void check_exist_file() {
-  QTemporaryFile tmp("centengine_test_exist_file.cfg");
+  QTemporaryFile tmp("./centengine_test_exist_file.cfg");
   if (tmp.open() == false) {
     throw (engine_error() << "open temporary file failed.");
   }
@@ -74,6 +74,8 @@ static void check_exist_file() {
 int main(void) {
   try {
     config.set_check_result_path(QDir::tempPath());
+    config.set_log_archive_path(QDir::tempPath());
+    config.set_temp_path(QDir::tempPath());
 
     check_directory();
     check_noexist_file();
