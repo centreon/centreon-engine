@@ -19,7 +19,6 @@
 
 #include <QDebug>
 #include <exception>
-#include <math.h>
 #include <time.h>
 
 #include "test.hh"
@@ -60,7 +59,7 @@ int main(void) {
     	if (i == 8) {
     	  continue;
     	}
-    	unsigned long long type(static_cast<unsigned long long>(pow(2, i)));
+    	unsigned long long type(1ull << i);
     	QSharedPointer<test> obj(new test(LOG_MESSAGE, type, j, j + 1));
     	engine::obj_info info(obj, type, j);
     	id[i + j * NB_LOG_TYPE] = engine.add_object(info);
@@ -69,7 +68,7 @@ int main(void) {
 
     // Add new object (test) to log into engine. One object by debug logging type.
     for (unsigned int i = 0; i < NB_DBG_TYPE; ++i) {
-      unsigned long long type = static_cast<unsigned long long>(pow(2, i)) << 32;
+      unsigned long long type(1ull << (i + 32));
       QSharedPointer<test> obj(new test(LOG_MESSAGE, type, 0, 1));
       engine::obj_info info(obj, type, 0);
       id[NB_LOG_TYPE * NB_LOG_LEVEL + i] = engine.add_object(info);
@@ -77,13 +76,13 @@ int main(void) {
 
     // Send message on all different debug logging type.
     for (unsigned int i = 0; i < NB_DBG_TYPE; ++i) {
-      engine.log(LOG_MESSAGE, static_cast<unsigned long long>(pow(2, i)) << 32, 0);
+      engine.log(LOG_MESSAGE, 1ull << (i + 32), 0);
     }
 
     // Send message on all different logging type and level.
     for (unsigned int j = 0; j < NB_LOG_LEVEL; ++j) {
       for (unsigned int i = 0; i < NB_LOG_TYPE; ++i) {
-    	engine.log(LOG_MESSAGE, pow(2, i), j);
+    	engine.log(LOG_MESSAGE, 1ull << i, j);
       }
     }
 

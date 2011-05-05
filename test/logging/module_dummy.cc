@@ -19,7 +19,6 @@
 
 #include <QDebug>
 #include <stdlib.h>
-#include <math.h>
 
 #include "nebmods.hh"
 #include "nebstructs.hh"
@@ -74,7 +73,7 @@ int callback(int callback_type, void* data) {
     ++index;
   }
 
-  if (neb_log->data_type != pow(2, index++)
+  if (neb_log->data_type != (1ull << index++)
       || strcmp(neb_log->data, LOG_MESSAGE)
       || (neb_log->data_type & object::log_all) == 0) {
     qDebug() << "error: bad value in module.";

@@ -53,7 +53,6 @@ add_executable("test_logging_engine"
   "${MY_TEST_DIR}/test.hh")
 target_link_libraries("test_logging_engine"
   ${QT_LIBRARIES}
-  ${MATH_LIBRARIES}
   "centenginelib")
 add_test("test_logging_engine"
   "test_logging_engine")
@@ -67,7 +66,6 @@ add_executable("test_logging_broker"
   ${QT_MOC_FILES})
 target_link_libraries("test_logging_broker"
   ${QT_LIBRARIES}
-  ${MATH_LIBRARIES}
   "centenginelib")
 add_test("test_logging_broker"
   "test_logging_broker")
@@ -77,7 +75,6 @@ add_executable("test_logging_file"
   "${MY_TEST_DIR}/test_file.cc")
 target_link_libraries("test_logging_file"
   ${QT_LIBRARIES}
-  ${MATH_LIBRARIES}
   "centenginelib")
 add_test("test_logging_file"
   "test_logging_file")

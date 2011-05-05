@@ -2504,7 +2504,7 @@ time_t get_next_service_notification_time(service* svc, time_t offset) {
                  interval_to_use);
 
   /* calculate next notification time */
-  next_notification = offset + (interval_to_use * config.get_interval_length());
+  next_notification = offset + static_cast<time_t>(interval_to_use * config.get_interval_length());
 
   return (next_notification);
 }

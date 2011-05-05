@@ -19,7 +19,6 @@
 
 #include <QDebug>
 #include <exception>
-#include <math.h>
 
 #include "globals.hh"
 #include "nebmods.hh"
@@ -72,12 +71,12 @@ int main(void) {
 
     // Send message on all different logging type.
     for (unsigned int i = 0; i < NB_LOG_TYPE; ++i) {
-      engine.log(LOG_MESSAGE, static_cast<unsigned long long>(pow(2, i)), 0);
+      engine.log(LOG_MESSAGE, 1ull << i, 0);
     }
 
     // Send message on all different debug logging type.
     for (unsigned int i = 0; i < NB_DBG_TYPE; ++i) {
-      engine.log(LOG_MESSAGE, static_cast<unsigned long long>(pow(2, i)) << 32, 0);
+      engine.log(LOG_MESSAGE, 1ull << (i + 32), 0);
     }
 
     // Remove object (broker).
