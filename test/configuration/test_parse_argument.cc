@@ -68,6 +68,7 @@ static void check_exist_file() {
   file.close();
   configuration::state config;
   config.parse(filename);
+  file.remove();
 }
 
 /**
