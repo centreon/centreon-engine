@@ -1,5 +1,12 @@
 #!/bin/sh
-
+#
+# centengine - Monitoring core.
+#
+# /etc/init.d/centengine
+#
+# chkconfig: - 70 30
+# description: Centreon Engine
+#
 ### BEGIN INIT INFO
 # Provides: centengine
 # Required-Start: $local_fs
