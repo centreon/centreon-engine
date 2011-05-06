@@ -187,6 +187,10 @@
  *    <td>WITH_PERL_CACHE</td>
  *    <td>If embedded Perl is enabled, enable or disable script caching.</td>
  *  </tr>
+ *  <tr>
+ *    <td>WITH_DOCUMENTATION</td>
+ *    <td>Enable or disable documentation generation. @em Doxygen must be present on your machine.</td>
+ *  <tr>
  *  </table>
  *
  *
