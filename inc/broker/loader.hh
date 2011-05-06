@@ -23,51 +23,50 @@
 # include <QObject>
 # include <QString>
 # include <QMultiHash>
+# include <QSharedPointer>
 # include "broker/handle.hh"
 
-namespace                             com {
-  namespace                           centreon {
-    namespace                         engine {
-      namespace                       broker {
+namespace                        com {
+  namespace                      centreon {
+    namespace                    engine {
+      namespace                  broker {
 	/**
 	 *  @class loader loader.hh
 	 *  @brief Modules loader.
 	 *
 	 *  Loader manage all modules.
 	 */
-	class                         loader : public QObject {
+	class                    loader : public QObject {
 	  Q_OBJECT
 	public:
-	  static loader&              instance();
+	  static loader&         instance();
 
-	  void                        load();
-	  void                        unload();
+	  void                   load();
+	  void                   unload();
 
-	  void                        add_module(handle const& module);
-	  void                        del_module(handle const& module);
+	  QSharedPointer<handle> add_module(QString const& filename = "",
+					    QString const& args = "");
+	  void                   del_module(QSharedPointer<handle> const& module);
 
-	  QString const&              get_directory() const throw();
-	  QMultiHash<QString, handle> const&
-	                              get_modules() const throw();
-	  QMultiHash<QString, handle>&
-	                              get_modules() throw();
+	  QString const&         get_directory() const throw();
+	  QList<QSharedPointer<handle> >
+	                         get_modules() const throw();
 
-	  void                        set_directory(QString const& directory);
+	  void                   set_directory(QString const& directory);
 
 	public slots:
-	  void                        module_name_changed(QString const& filename,
-							  QString const& old_name,
-							  QString const& new_name);
+	  void                   module_name_changed(QString const& old_name,
+						     QString const& new_name);
 
 	private:
-	                              loader();
-				      loader(loader const& right);
-	  virtual                     ~loader() throw();
+	                         loader();
+				 loader(loader const& right);
+	  virtual                ~loader() throw();
 
-	  loader&                     operator=(loader const& right);
+	  loader&                operator=(loader const& right);
 
-	  QString                     _directory;
-	  QMultiHash<QString, handle> _modules;
+	  QString                _directory;
+	  QMultiHash<QString, QSharedPointer<handle> > _modules;
 	};
       }
     }

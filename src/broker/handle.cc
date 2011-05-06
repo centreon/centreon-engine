@@ -21,8 +21,6 @@
 #include "nebmodules.hh"
 #include "error.hh"
 #include "logging.hh"
-#include "broker/compatibility.hh"
-#include "broker/loader.hh"
 #include "broker/handle.hh"
 
 using namespace com::centreon::engine::broker;
@@ -35,38 +33,30 @@ using namespace com::centreon::engine::broker;
 
 /**
  *  Default constructor.
- */
-handle::handle() : QObject() {
-  _init_connection();
-  event_create(this);
-}
-
-/**
- *  Default constructor.
+ *
  *  @param[in] filename The module filename.
  *  @param[in] args The module args.
  */
 handle::handle(QString const& filename, QString const& args)
-  : QObject(), _filename(filename), _args(args) {
-  _init_connection();
-  event_create(this);
+  : QObject(), _filename(filename), _name(filename), _args(args) {
+  emit event_create(this);
 }
 
 /**
  *  Default copy constructor.
+ *
  *  @param[in] right The object to copy.
  */
 handle::handle(handle const& right) : QObject() {
-  _init_connection();
   operator=(right);
-  event_create(this);
+  emit event_create(this);
 }
 
 /**
  *  Default destructor.
  */
 handle::~handle() throw() {
-  event_destroy(this);
+  emit event_destroy(this);
   if (_handle.data() != NULL) {
     _handle.clear();
   }
@@ -74,7 +64,9 @@ handle::~handle() throw() {
 
 /**
  *  Copy operator.
+ *
  *  @param[in] right The object to copy.
+ *
  *  @return This object.
  */
 handle& handle::operator=(handle const& right) {
@@ -94,7 +86,9 @@ handle& handle::operator=(handle const& right) {
 
 /**
  *  Default egality operator.
+ *
  *  @param[in] right The object to compare.
+ *
  *  @return true or false.
  */
 bool handle::operator==(handle const& right) const throw() {
@@ -111,7 +105,9 @@ bool handle::operator==(handle const& right) const throw() {
 
 /**
  *  Default no egality operator.
+ *
  *  @param[in] right The object to compare.
+ *
  *  @return true or false.
  */
 bool handle::operator!=(handle const& right) const throw() {
@@ -157,6 +153,7 @@ void handle::open() {
 
 /**
  *  Open and load module.
+ *
  *  @param[in] filename The module filename.
  *  @param[in] args The module arguments.
  */
@@ -165,6 +162,7 @@ void handle::open(QString const& filename, QString const& args) {
     return;
   }
 
+  close();
   _filename = filename;
   _args = args;
   open();
@@ -195,6 +193,7 @@ void handle::close() {
 
 /**
  *  Check if the module is loaded.
+ *
  *  @return true if the module is loaded, false otherwise.
  */
 bool handle::is_loaded() {
@@ -203,6 +202,7 @@ bool handle::is_loaded() {
 
 /**
  *  Get the handle of the module.
+ *
  *  @return pointer on a QLibrary.
  */
 QLibrary* handle::get_handle() const throw() {
@@ -211,6 +211,7 @@ QLibrary* handle::get_handle() const throw() {
 
 /**
  *  Get the module's author name.
+ *
  *  @return The author name.
  */
 QString const& handle::get_author() const throw() {
@@ -219,6 +220,7 @@ QString const& handle::get_author() const throw() {
 
 /**
  *  Get the module's copyright.
+ *
  *  @return The copyright.
  */
 QString const& handle::get_copyright() const throw() {
@@ -227,6 +229,7 @@ QString const& handle::get_copyright() const throw() {
 
 /**
  *  Get the module's description.
+ *
  *  @return The description.
  */
 QString const& handle::get_description() const throw() {
@@ -235,6 +238,7 @@ QString const& handle::get_description() const throw() {
 
 /**
  *  Get the module's filename.
+ *
  *  @return The filename.
  */
 QString const& handle::get_filename() const throw() {
@@ -243,6 +247,7 @@ QString const& handle::get_filename() const throw() {
 
 /**
  *  Get the module's license.
+ *
  *  @return The license.
  */
 QString const& handle::get_license() const throw() {
@@ -251,6 +256,7 @@ QString const& handle::get_license() const throw() {
 
 /**
  *  Get the module's name.
+ *
  *  @return The name.
  */
 QString const& handle::get_name() const throw() {
@@ -259,6 +265,7 @@ QString const& handle::get_name() const throw() {
 
 /**
  *  Get the module's version.
+ *
  *  @return The version.
  */
 QString const& handle::get_version() const throw() {
@@ -267,6 +274,7 @@ QString const& handle::get_version() const throw() {
 
 /**
  *  Get the module's arguments.
+ *
  *  @return The arguments.
  */
 QString const& handle::get_args() const throw() {
@@ -275,6 +283,7 @@ QString const& handle::get_args() const throw() {
 
 /**
  *  Set the module's author name.
+ *
  *  @param[in] The author name.
  */
 void handle::set_author(QString const& author) {
@@ -284,6 +293,7 @@ void handle::set_author(QString const& author) {
 
 /**
  *  Set the module's copyright.
+ *
  *  @param[in] The copyright.
  */
 void handle::set_copyright(QString const& copyright) {
@@ -293,6 +303,7 @@ void handle::set_copyright(QString const& copyright) {
 
 /**
  *  Set the module's description.
+ *
  *  @param[in] The description.
  */
 void handle::set_description(QString const& description) {
@@ -302,6 +313,7 @@ void handle::set_description(QString const& description) {
 
 /**
  *  Set the module's license.
+ *
  *  @param[in] The license.
  */
 void handle::set_license(QString const& license) {
@@ -311,57 +323,22 @@ void handle::set_license(QString const& license) {
 
 /**
  *  Set the module's name.
+ *
  *  @param[in] The name.
  */
 void handle::set_name(QString const& name) {
   QString old_name = _name;
   _name = name;
-  emit name_changed(_filename, old_name, _name);
+  emit name_changed(old_name, _name);
   emit event_name(this);
 }
 
 /**
  *  Set the module's version.
+ *
  *  @param[in] The version.
  */
 void handle::set_version(QString const& version) {
   _version = version;
   emit event_version(this);
-}
-
-/**************************************
- *                                     *
- *           Private Methods           *
- *                                     *
- **************************************/
-
-/**
- *  Connect all Qt Signal to Slot.
- */
-void handle::_init_connection() {
-  broker::loader& loader = broker::loader::instance();
-  connect(this, SIGNAL(name_changed(QString const&, QString const&, QString const&)),
-	  &loader, SLOT(module_name_changed(QString const&, QString const&, QString const&)));
-
-  broker::compatibility& compatibility = broker::compatibility::instance();
-  connect(this, SIGNAL(event_create(broker::handle*)),
-	  &compatibility, SLOT(create_module(broker::handle*)));
-  connect(this, SIGNAL(event_destroy(broker::handle*)),
-	  &compatibility, SLOT(destroy_module(broker::handle*)));
-  connect(this, SIGNAL(event_name(broker::handle*)),
-	  &compatibility, SLOT(name_module(broker::handle*)));
-  connect(this, SIGNAL(event_author(broker::handle*)),
-	  &compatibility, SLOT(author_module(broker::handle*)));
-  connect(this, SIGNAL(event_copyright(broker::handle*)),
-	  &compatibility, SLOT(copyright_module(broker::handle*)));
-  connect(this, SIGNAL(event_version(broker::handle*)),
-	  &compatibility, SLOT(version_module(broker::handle*)));
-  connect(this, SIGNAL(event_license(broker::handle*)),
-	  &compatibility, SLOT(license_module(broker::handle*)));
-  connect(this, SIGNAL(event_description(broker::handle*)),
-	  &compatibility, SLOT(description_module(broker::handle*)));
-  connect(this, SIGNAL(event_loaded(broker::handle*)),
-	  &compatibility, SLOT(loaded_module(broker::handle*)));
-  connect(this, SIGNAL(event_unloaded(broker::handle*)),
-	  &compatibility, SLOT(unloaded_module(broker::handle*)));
 }

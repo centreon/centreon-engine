@@ -57,9 +57,7 @@ int neb_add_module(char const* filename, char const* args, int should_be_loaded)
     return (ERROR);
 
   try {
-    broker::loader& loader = broker::loader::instance();
-    broker::handle module(filename, args);
-    loader.add_module(module);
+    broker::loader::instance().add_module(filename, args);
     log_debug_info(DEBUGL_EVENTBROKER, 0,
 		   "Added module: name=`%s', args=`%s'\n",
 		   filename,
@@ -98,12 +96,13 @@ int neb_free_module_list(void) {
 int neb_load_all_modules(void) {
   try {
     broker::loader& loader = broker::loader::instance();
-    QMultiHash<QString, broker::handle>& modules = loader.get_modules();
+    QList<QSharedPointer<broker::handle> > modules = loader.get_modules();
 
-    for (QMultiHash<QString, broker::handle>::iterator it = modules.begin(), end = modules.end();
+    for (QList<QSharedPointer<broker::handle> >::const_iterator
+	   it = modules.begin(), end = modules.end();
 	 it != end;
 	 ++it) {
-      neb_load_module(&it.value());
+      neb_load_module(&(*(*it)));
     }
   }
   catch (...) {
@@ -150,12 +149,13 @@ int neb_load_module(void* mod) {
 int neb_unload_all_modules(int flags, int reason) {
   try {
     broker::loader& loader = broker::loader::instance();
-    QMultiHash<QString, broker::handle>& modules = loader.get_modules();
+    QList<QSharedPointer<broker::handle> > modules = loader.get_modules();
 
-    for (QMultiHash<QString, broker::handle>::iterator it = modules.begin(), end = modules.end();
+    for (QList<QSharedPointer<broker::handle> >::const_iterator
+	   it = modules.begin(), end = modules.end();
 	 it != end;
 	 ++it) {
-      neb_unload_module(&it.value(), flags, reason);
+      neb_unload_module(&**it, flags, reason);
     }
     log_debug_info(DEBUGL_EVENTBROKER, 0, "load all modules success.\n");
   }
@@ -216,17 +216,6 @@ int neb_set_module_info(void* handle, int type, char const* data) {
 
   try {
     broker::handle* module = static_cast<broker::handle*>(handle);
-    broker::loader& loader = broker::loader::instance();
-    QMultiHash<QString, broker::handle> const& modules = loader.get_modules();
-
-    /* find the module */
-    if (modules.find(module->get_filename(), *module) == modules.end()) {
-      log_debug_info(DEBUGL_EVENTBROKER, 0,
-		     "set module info failed: filename=%s, type=`%d'\n",
-		     module->get_filename().toStdString().c_str(),
-		     type);
-      return (NEBERROR_BADMODULEHANDLE);
-    }
 
     switch (type) {
     case NEBMODULE_MODINFO_TITLE:
@@ -291,20 +280,6 @@ int neb_register_callback(int callback_type,
   /* make sure the callback type is within bounds */
   if (callback_type < 0 || callback_type >= NEBCALLBACK_NUMITEMS) {
     return (NEBERROR_CALLBACKBOUNDS);
-  }
-
-  try {
-    broker::handle* module = static_cast<broker::handle*>(mod_handle);
-    broker::loader& loader = broker::loader::instance();
-    QMultiHash<QString, broker::handle> const& modules = loader.get_modules();
-
-    /* make sure module handle is valid */
-    if (modules.find(module->get_filename(), *module) == modules.end()) {
-      return (NEBERROR_BADMODULEHANDLE);
-    }
-  }
-  catch (...) {
-    return (NEBERROR_BADMODULEHANDLE);
   }
 
   /* allocate memory */

@@ -19,8 +19,11 @@
 
 #include <QDir>
 #include <QFile>
+#include <unistd.h>
+
 #include "error.hh"
 #include "logging.hh"
+#include "broker/compatibility.hh"
 #include "broker/loader.hh"
 
 using namespace com::centreon::engine;
@@ -47,22 +50,21 @@ void loader::load() {
   QDir dir(_directory);
   QStringList filters("*.so");
   QFileInfoList files = dir.entryInfoList(filters);
-  QHash<QString, handle>::iterator it_module;
+  QSharedPointer<handle> module;
 
   for (QFileInfoList::const_iterator it = files.begin(), end = files.end(); it != end; ++it) {
-    QString config_file(it->baseName() + ".cfg");
+    QString config_file(dir.path() + "/" + it->baseName() + ".cfg");
     if (dir.exists(config_file) == false)
       config_file = "";
     try {
-      handle module(it->fileName(), config_file);
-      it_module = _modules.insert(module.get_filename(), module);
-      it_module->open();
+      module = add_module(dir.path() + "/" + it->fileName(), config_file);
+      module->open();
       logit(NSLOG_INFO_MESSAGE, false,
 	    "Event broker module `%s' initialized syccessfully.\n",
 	    it->fileName().toStdString().c_str());
     }
     catch (error const& e) {
-      _modules.erase(it_module);
+      del_module(module);
       logit(NSLOG_RUNTIME_ERROR, false,
 	    "Error: Could not load module `%s' -> %s\n",
 	    it->fileName().toStdString().c_str(),
@@ -75,35 +77,70 @@ void loader::load() {
  *  Unload all modules.
  */
 void loader::unload() {
-  for (QMultiHash<QString, handle>::iterator it = _modules.begin(), end = _modules.end();
+  for (QMultiHash<QString, QSharedPointer<handle> >::iterator
+	 it = _modules.begin(), end = _modules.end();
        it != end;
        ++it) {
-    it.value().close();
+    it.value()->close();
     log_debug_info(DEBUGL_EVENTBROKER, 0,
 		   "Module `%s' unloaded successfully.\n",
-		   it.value().get_filename().toStdString().c_str());
+		   it.value()->get_filename().toStdString().c_str());
   }
   _modules.clear();
 }
 
 /**
  *  Add a new module.
- *  @param[in] module Module to add.
+ *
+ *  @param[in] filename The module filename.
+ *  @param[in] args     The arguments module.
+ *
+ *  @return The new object module.
  */
-void loader::add_module(handle const& module) {
-  _modules.insert(module.get_filename(), module);
+QSharedPointer<handle> loader::add_module(QString const& filename,
+					  QString const& args) {
+  QSharedPointer<handle> module(new handle(filename, args));
+
+  connect(&(*module), SIGNAL(name_changed(QString const&, QString const&)),
+  	  this, SLOT(module_name_changed(QString const&, QString const&)));
+
+  broker::compatibility& compatibility = broker::compatibility::instance();
+  connect(&(*module), SIGNAL(event_create(broker::handle*)),
+  	  &compatibility, SLOT(create_module(broker::handle*)));
+  connect(&(*module), SIGNAL(event_destroy(broker::handle*)),
+  	  &compatibility, SLOT(destroy_module(broker::handle*)));
+  connect(&(*module), SIGNAL(event_name(broker::handle*)),
+  	  &compatibility, SLOT(name_module(broker::handle*)));
+  connect(&(*module), SIGNAL(event_author(broker::handle*)),
+  	  &compatibility, SLOT(author_module(broker::handle*)));
+  connect(&(*module), SIGNAL(event_copyright(broker::handle*)),
+  	  &compatibility, SLOT(copyright_module(broker::handle*)));
+  connect(&(*module), SIGNAL(event_version(broker::handle*)),
+  	  &compatibility, SLOT(version_module(broker::handle*)));
+  connect(&(*module), SIGNAL(event_license(broker::handle*)),
+  	  &compatibility, SLOT(license_module(broker::handle*)));
+  connect(&(*module), SIGNAL(event_description(broker::handle*)),
+  	  &compatibility, SLOT(description_module(broker::handle*)));
+  connect(&(*module), SIGNAL(event_loaded(broker::handle*)),
+  	  &compatibility, SLOT(loaded_module(broker::handle*)));
+  connect(&(*module), SIGNAL(event_unloaded(broker::handle*)),
+  	  &compatibility, SLOT(unloaded_module(broker::handle*)));
+
+  return (_modules.insert(filename, module).value());
 }
 
 /**
  *  Remove a module.
+ *
  *  @param[in] module Modile to remove.
  */
-void loader::del_module(handle const& module) {
-  _modules.remove(module.get_filename(), module);
+void loader::del_module(QSharedPointer<handle> const& module) {
+  _modules.remove(module->get_name(), module);
 }
 
 /**
  *  Get the directory.
+ *
  *  @return The directory.
  */
 QString const& loader::get_directory() const throw() {
@@ -112,48 +149,45 @@ QString const& loader::get_directory() const throw() {
 
 /**
  *  Get all modules.
+ *
  *  @return All modules in a const map.
  */
-QMultiHash<QString, handle> const& loader::get_modules() const throw() {
-  return (_modules);
-}
-
-/**
- *  Get all modules.
- *  @return All modules in a map.
- */
-QMultiHash<QString, handle>& loader::get_modules() throw() {
-  return (_modules);
+QList<QSharedPointer<handle> > loader::get_modules() const throw() {
+  return (_modules.values());
 }
 
 /**
  *  Set the directory.
+ *
  *  @param[in] directory The Directory path content modules.
  */
 void loader::set_directory(QString const& directory) {
+  if (pathconf(directory.toStdString().c_str(), _PC_PATH_MAX) == -1) {
+    throw (engine_error() << "invalid directory");
+  }
   _directory = directory;
 }
 
 /**
  *  Slot for notify when module name changed.
- *  @param[in] filename The filename of the module.
+ *
  *  @param[in] old_name The old name of the module.
  *  @param[in] new_name The new name of the module.
  */
-void loader::module_name_changed(QString const& filename,
-				 QString const& old_name,
+void loader::module_name_changed(QString const& old_name,
 				 QString const& new_name) {
-  for (QHash<QString, handle>::iterator it = _modules.find(old_name), end = _modules.end();
-       it != end;
+  for (QMultiHash<QString, QSharedPointer<handle> >::iterator
+	 it = _modules.find(old_name), end = _modules.end();
+       it != end && it.key() == old_name;
        ++it) {
-    if (it->get_filename() == filename) {
-      handle module(*it);
+    if (it.value() == this->sender()) {
+      QSharedPointer<handle> module = it.value();
       _modules.insert(new_name, module);
       _modules.remove(old_name, module);
       return;
     }
   }
-  throw (engine_error() << "Module `" << filename << ":" << old_name << "' not found");
+  throw (engine_error() << "Module `" << old_name << "' not found");
 }
 
 /**************************************

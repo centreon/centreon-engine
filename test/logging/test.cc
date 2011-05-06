@@ -66,7 +66,7 @@ test::~test() {
 	   << " " << _nb_call
 	   << " " << _type
 	   << " " << _verbosity
-	   << " bad job call.");
+	   << " bad lob call.");
   }
 }
 

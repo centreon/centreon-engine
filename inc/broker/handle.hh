@@ -39,8 +39,7 @@ namespace                          com {
 	class                      handle : public QObject {
 	  Q_OBJECT
 	public:
-	                           handle();
-	                           handle(QString const& filename, QString const& args);
+	                           handle(QString const& filename = "", QString const& args = "");
 	                           handle(handle const& right);
 	  virtual                  ~handle() throw();
 
@@ -82,13 +81,10 @@ namespace                          com {
 	  void                     event_description(broker::handle* module);
 	  void                     event_loaded(broker::handle* module);
 	  void                     event_unloaded(broker::handle* module);
-	  void                     name_changed(QString const& filename,
-						QString const& old_name,
+	  void                     name_changed(QString const& old_name,
 						QString const& new_name);
 
 	private:
-	  void                     _init_connection();
-
 	  QString                  _author;
 	  QString                  _copyright;
 	  QString                  _description;

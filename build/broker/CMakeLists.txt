@@ -48,20 +48,46 @@ target_link_libraries("cce_broker"
   ${QT_LIBRARIES}
   "centenginelib")
 
-# Test loader.
-# add_executable("test_broker_loader"
-#   "${MY_TEST_DIR}/test_loader.cc"
-#   ${QT_MOC_FILES})
-# target_link_libraries("test_broker_loader"
-#   ${QT_LIBRARIES}
-#   "centenginelib")
-# add_test("test_broker_loader"
-#   "test_broker_loader")
+# Test module.
+add_library("mod_test_load"
+  "SHARED"
+  "${MY_TEST_DIR}/mod_test_load.cc")
+add_library("mod_test_load_compatibility"
+  "SHARED"
+  "${MY_TEST_DIR}/mod_test_load_compatibility.cc")
 
-# add_executable("test_broker_"
-#   "${MY_TEST_DIR}/test_.cc")
-# target_link_libraries("test_broker_"
-#   ${QT_LIBRARIES}
-#   "centenginelib")
-# add_test("test_broker_"
-#   "test_broker_")
+# Test loader.
+add_executable("test_broker_loader"
+  "${MY_TEST_DIR}/test_loader.cc")
+target_link_libraries("test_broker_loader"
+  ${QT_LIBRARIES}
+  "centenginelib")
+add_test("test_broker_loader"
+  "test_broker_loader")
+
+# Test handle.
+add_executable("test_broker_handle"
+  "${MY_TEST_DIR}/test_handle.cc")
+target_link_libraries("test_broker_handle"
+  ${QT_LIBRARIES}
+  "centenginelib")
+add_test("test_broker_handle"
+  "test_broker_handle")
+
+# Test nebmodule.
+add_executable("test_broker_nebmodule"
+  "${MY_TEST_DIR}/test_nebmodule.cc")
+target_link_libraries("test_broker_nebmodule"
+  ${QT_LIBRARIES}
+  "centenginelib")
+add_test("test_broker_nebmodule"
+  "test_broker_nebmodule")
+
+# Test compatibility.
+add_executable("test_broker_compatibility"
+  "${MY_TEST_DIR}/test_compatibility.cc")
+target_link_libraries("test_broker_compatibility"
+  ${QT_LIBRARIES}
+  "centenginelib")
+add_test("test_broker_compatibility"
+  "test_broker_compatibility")
