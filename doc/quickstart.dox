@@ -55,8 +55,8 @@
  *    - CMake
  *    - make
  *
- *  You can use yum to install these packages by running the following
- *  commands (as root).
+ *  You can use your favorite package manager to install these packages
+ *  by running the following commands (as root).
  *
  *  @subsection quickstartprerequisitescentos CentOS
  *
@@ -78,18 +78,18 @@
  *    su -l
  *  @endcode
  *
- *  Create a new @em centengine user account.
+ *  Create a new @em centreon user account.
  *
  *  @code
- *    useradd -m centengine
+ *    useradd -m centreon
  *  @endcode
  *
- *  Create a new @em centengine group and add the centengine user to the
+ *  Create a new @em centreon group and add the @em centreon user to the
  *  group.
  *
  *  @code
- *    groupadd centengine
- *    usermod -a -G centengine centengine
+ *    groupadd centreon
+ *    usermod -a -G centreon centreon
  *  @endcode
  *
  *  @section quickstartdownload Download Centreon Engine and the Nagios Plugins
@@ -127,7 +127,7 @@
  *  the user you created earlier like so :
  *
  *  @code
- *    cmake -DWITH_USER=centengine .
+ *    cmake -DWITH_USER=centreon .
  *  @endcode
  *
  *  Compile the Centreon Engine source code.
@@ -168,15 +168,15 @@
  *  Extract the Nagios plugins source code tarball.
  *
  *  @code
- *  cd ~/downloads
- *  tar xzf nagios-plugins-1.4.15.tar.gz
- *  cd nagios-plugins-1.4.15
+ *    cd ~/downloads
+ *    tar xzf nagios-plugins-1.4.15.tar.gz
+ *    cd nagios-plugins-1.4.15
  *  @endcode
  *
  *  Compile and install the plugins.
  *
  *  @code
- *    ./configure --with-user=centengine --with-group=centengine
+ *    ./configure --with-user=centreon --with-group=centreon
  *    make
  *    make install
  *  @endcode
@@ -221,7 +221,7 @@
  *  program properly installed or configured. Refer to your system
  *  documentation, search the web for specific instructions on
  *  configuring your system to send email messages to external
- *  addresses. More information on notifications can be found here.
+ *  addresses.
  *
  *  @section quickstartyouredone You're Done
  *
