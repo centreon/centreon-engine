@@ -81,7 +81,9 @@ void standard::log(char const* message,
   (void)type;
   (void)verbosity;
 
-  _mutex.lock();
-  fwrite(message, strlen(message), 1, _file);
-  _mutex.unlock();
+  if (message != NULL) {
+    _mutex.lock();
+    fwrite(message, strlen(message), 1, _file);
+    _mutex.unlock();
+  }
 }

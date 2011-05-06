@@ -58,7 +58,7 @@ void broker::log(char const* message,
 	  unsigned int verbosity) throw() {
   (void)verbosity;
 
-  if ((type & object::dbg_all) == 0) {
+  if (message != NULL && (type & object::dbg_all) == 0) {
     _mutex.lock();
     if (_thread != QThread::currentThread()) {
       _thread = QThread::currentThread();

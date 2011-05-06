@@ -169,6 +169,10 @@ void file::log(char const* message,
   (void)type;
   (void)verbosity;
 
+  if (message == NULL) {
+    return;
+  }
+
   _mutex->lock();
   if ((_size_limit > 0)
       && (static_cast<unsigned long long>(_file->size() + strlen(message))
