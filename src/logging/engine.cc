@@ -60,16 +60,18 @@ engine& engine::instance() {
 void engine::log(char const* message,
 		 unsigned long long type,
 		 unsigned int verbosity) throw() {
-  _rwlock.lockForRead();
-  for (QHash<unsigned long, obj_info>::iterator it = _objects.begin(), end = _objects.end();
-       it != end;
-       ++it) {
-    obj_info& info = it.value();
-    if (verbosity <= info.verbosity && (type & info.type)) {
-      info.obj->log(message, type, verbosity);
+  if (message != NULL) {
+    _rwlock.lockForRead();
+    for (QHash<unsigned long, obj_info>::iterator it = _objects.begin(), end = _objects.end();
+	 it != end;
+	 ++it) {
+      obj_info& info = it.value();
+      if (verbosity <= info.verbosity && (type & info.type)) {
+	info.obj->log(message, type, verbosity);
+      }
     }
+    _rwlock.unlock();
   }
-  _rwlock.unlock();
 }
 
 /**

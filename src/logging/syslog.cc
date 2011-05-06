@@ -76,7 +76,10 @@ void logging::syslog::log(char const* message,
                           unsigned int verbosity) throw() {
   (void)type;
   (void)verbosity;
-  _mutex.lock();
-  ::syslog(_facility | LOG_INFO, "%s", message);
-  _mutex.unlock();
+
+  if (message != NULL) {
+    _mutex.lock();
+    ::syslog(_facility | LOG_INFO, "%s", message);
+    _mutex.unlock();
+  }
 }

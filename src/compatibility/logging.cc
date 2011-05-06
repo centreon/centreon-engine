@@ -161,7 +161,9 @@ extern "C" {
       return (OK);
     }
 
-    if (svc->host_ptr == NULL) {
+    if (svc->host_ptr == NULL
+	|| svc->host_name == NULL
+	|| svc->description == NULL) {
       return (ERROR);
     }
 
@@ -208,6 +210,10 @@ extern "C" {
    *  @return Return true on success.
    */
   int log_host_event(host* hst) {
+    if (hst == NULL || hst->name == NULL) {
+      return (ERROR);
+    }
+
     nagios_macros mac;
     memset(&mac, 0, sizeof(mac));
     grab_host_macros(&mac, hst);
@@ -260,6 +266,9 @@ extern "C" {
     for (host* host = host_list;
 	 host != NULL;
 	 host = host->next) {
+      if (host->name == NULL) {
+	continue;
+      }
 
       grab_host_macros(&mac, host);
 
@@ -302,7 +311,9 @@ extern "C" {
 	 service != NULL;
 	 service = service->next) {
 
-      if (service->host_ptr == NULL) {
+      if (service->host_ptr == NULL
+	  || service->host_name == NULL
+	  || service->description == NULL) {
 	continue;
       }
 
@@ -313,7 +324,7 @@ extern "C" {
 	+ std::string(" SERVICE STATE: ") + std::string(service->host_name)
 	+ ';' + service->description
 	+ ";$SERVICESTATE$;$SERVICESTATETYPE$;$SERVICEATTEMPT$;"
-	+ service->plugin_output + "\n";
+	+ (service->plugin_output != NULL ? service->plugin_output : "") + "\n";
 
       char* processed_buffer = NULL;
       process_macros_r(&mac, buffer.c_str(), &processed_buffer, 0);
