@@ -60,7 +60,9 @@ int cmd_change_object_int_var(int cmd,char* args);                          // c
 int cmd_change_object_char_var(int cmd,char* args);                         // changes host/svc (char) variable
 int cmd_change_object_custom_var(int cmd, char* args);                      // changes host/svc custom variable
 int cmd_process_external_commands_from_file(int cmd, char* args);           // process external commands from a file
-  int cmd_delete_downtime_by_start_time_comment(int, char*);
+int cmd_delete_downtime_by_start_time_comment(int, char*);
+int cmd_delete_downtime_by_host_name(int, char*);
+int cmd_delete_downtime_by_hostgroup_name(int, char*);
 void disable_service_checks(service* svc);                                  // disables a service check
 void enable_service_checks(service* svc);                                   // enables a service check
 void enable_all_notifications(void);                                        // enables notifications on a program-wide basis
