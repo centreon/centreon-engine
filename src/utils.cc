@@ -1764,8 +1764,8 @@ void service_check_sighandler(int sig) {
   if (check_result_info.output_file_fp) {
 
     fprintf(check_result_info.output_file_fp, "finish_time=%lu.%lu\n",
-	    check_result_info.finish_time.tv_sec,
-            check_result_info.finish_time.tv_usec);
+            static_cast<unsigned long>(check_result_info.finish_time.tv_sec),
+            static_cast<unsigned long>(check_result_info.finish_time.tv_usec));
     fprintf(check_result_info.output_file_fp, "early_timeout=%d\n",
             check_result_info.early_timeout);
     fprintf(check_result_info.output_file_fp, "exited_ok=%d\n",
@@ -1811,8 +1811,8 @@ void host_check_sighandler(int sig) {
   if (check_result_info.output_file_fp) {
 
     fprintf(check_result_info.output_file_fp, "finish_time=%lu.%lu\n",
-            check_result_info.finish_time.tv_sec,
-            check_result_info.finish_time.tv_usec);
+            static_cast<unsigned long>(check_result_info.finish_time.tv_sec),
+            static_cast<unsigned long>(check_result_info.finish_time.tv_usec));
     fprintf(check_result_info.output_file_fp, "early_timeout=%d\n",
             check_result_info.early_timeout);
     fprintf(check_result_info.output_file_fp, "exited_ok=%d\n",

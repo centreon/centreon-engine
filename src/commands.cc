@@ -5474,8 +5474,12 @@ void process_passive_checks(void) {
       fprintf(checkresult_file_fp, "scheduled_check=0\n");
       fprintf(checkresult_file_fp, "reschedule_check=0\n");
       fprintf(checkresult_file_fp, "latency=%f\n", temp_pcr->latency);
-      fprintf(checkresult_file_fp, "start_time=%lu.%lu\n", temp_pcr->check_time, 0L);
-      fprintf(checkresult_file_fp, "finish_time=%lu.%lu\n", temp_pcr->check_time, 0L);
+      fprintf(checkresult_file_fp, "start_time=%lu.%lu\n",
+        static_cast<unsigned long>(temp_pcr->check_time),
+        0ul);
+      fprintf(checkresult_file_fp, "finish_time=%lu.%lu\n",
+        static_cast<unsigned long>(temp_pcr->check_time),
+        0ul);
       fprintf(checkresult_file_fp, "return_code=%d\n", temp_pcr->return_code);
       /* newlines in output are already escaped */
       fprintf(checkresult_file_fp, "output=%s\n", (temp_pcr->output == NULL) ? "" : temp_pcr->output);

@@ -646,8 +646,8 @@ int run_async_service_check(service* svc,
 	    check_result_info.reschedule_check);
     fprintf(check_result_info.output_file_fp, "latency=%f\n", svc->latency);
     fprintf(check_result_info.output_file_fp, "start_time=%lu.%lu\n",
-	    check_result_info.start_time.tv_sec,
-            check_result_info.start_time.tv_usec);
+            static_cast<unsigned long>(check_result_info.start_time.tv_sec),
+            static_cast<unsigned long>(check_result_info.start_time.tv_usec));
 
     /* flush output or it'll get written again when we fork() */
     fflush(check_result_info.output_file_fp);
@@ -962,8 +962,8 @@ int run_async_service_check(service* svc,
     if (check_result_info.output_file_fp) {
 
       fprintf(check_result_info.output_file_fp, "finish_time=%lu.%lu\n",
-	      check_result_info.finish_time.tv_sec,
-	      check_result_info.finish_time.tv_usec);
+	      static_cast<unsigned long>(check_result_info.finish_time.tv_sec),
+	      static_cast<unsigned long>(check_result_info.finish_time.tv_usec));
       fprintf(check_result_info.output_file_fp, "early_timeout=%d\n",
 	      check_result_info.early_timeout);
       fprintf(check_result_info.output_file_fp, "exited_ok=%d\n",
@@ -3616,8 +3616,8 @@ int run_async_host_check_3x(host* hst,
 	    check_result_info.reschedule_check);
     fprintf(check_result_info.output_file_fp, "latency=%f\n", hst->latency);
     fprintf(check_result_info.output_file_fp, "start_time=%lu.%lu\n",
-            check_result_info.start_time.tv_sec,
-            check_result_info.start_time.tv_usec);
+            static_cast<unsigned long>(check_result_info.start_time.tv_sec),
+            static_cast<unsigned long>(check_result_info.start_time.tv_usec));
 
     /* flush buffer or we'll end up writing twice when we fork() */
     fflush(check_result_info.output_file_fp);
@@ -3748,8 +3748,8 @@ int run_async_host_check_3x(host* hst,
       if (check_result_info.output_file_fp) {
 
         fprintf(check_result_info.output_file_fp, "finish_time=%lu.%lu\n",
-                check_result_info.finish_time.tv_sec,
-                check_result_info.finish_time.tv_usec);
+                static_cast<unsigned long>(check_result_info.finish_time.tv_sec),
+                static_cast<unsigned long>(check_result_info.finish_time.tv_usec));
         fprintf(check_result_info.output_file_fp, "early_timeout=%d\n",
                 check_result_info.early_timeout);
         fprintf(check_result_info.output_file_fp, "exited_ok=%d\n",
