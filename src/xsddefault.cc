@@ -472,7 +472,7 @@ int xsddefault_save_status_data(void) {
     fprintf(fp, "\tfailure_prediction_enabled=%d\n", temp_service->failure_prediction_enabled);
     fprintf(fp, "\tprocess_performance_data=%d\n", temp_service->process_performance_data);
     fprintf(fp, "\tobsess_over_service=%d\n", temp_service->obsess_over_service);
-    fprintf(fp, "\tlast_update=%lu\n", current_time);
+    fprintf(fp, "\tlast_update=%lu\n", static_cast<unsigned long>(current_time));
     fprintf(fp, "\tis_flapping=%d\n", temp_service->is_flapping);
     fprintf(fp, "\tpercent_state_change=%.2f\n", temp_service->percent_state_change);
     fprintf(fp, "\tscheduled_downtime_depth=%d\n", temp_service->scheduled_downtime_depth);
@@ -507,8 +507,8 @@ int xsddefault_save_status_data(void) {
     fprintf(fp, "\tmodified_service_attributes=%lu\n", temp_contact->modified_service_attributes);
     fprintf(fp, "\thost_notification_period=%s\n", (temp_contact->host_notification_period == NULL) ? "" : temp_contact->host_notification_period);
     fprintf(fp, "\tservice_notification_period=%s\n", (temp_contact->service_notification_period == NULL) ? "" : temp_contact->service_notification_period);
-    fprintf(fp, "\tlast_host_notification=%lu\n", temp_contact->last_host_notification);
-    fprintf(fp, "\tlast_service_notification=%lu\n", temp_contact->last_service_notification);
+    fprintf(fp, "\tlast_host_notification=%lu\n", static_cast<unsigned long>(temp_contact->last_host_notification));
+    fprintf(fp, "\tlast_service_notification=%lu\n", static_cast<unsigned long>(temp_contact->last_service_notification));
     fprintf(fp, "\thost_notifications_enabled=%d\n", temp_contact->host_notifications_enabled);
     fprintf(fp, "\tservice_notifications_enabled=%d\n", temp_contact->service_notifications_enabled);
     /* custom variables */
@@ -540,9 +540,9 @@ int xsddefault_save_status_data(void) {
     fprintf(fp, "\tcomment_id=%lu\n", temp_comment->comment_id);
     fprintf(fp, "\tsource=%d\n", temp_comment->source);
     fprintf(fp, "\tpersistent=%d\n", temp_comment->persistent);
-    fprintf(fp, "\tentry_time=%lu\n", temp_comment->entry_time);
+    fprintf(fp, "\tentry_time=%lu\n", static_cast<unsigned long>(temp_comment->entry_time));
     fprintf(fp, "\texpires=%d\n", temp_comment->expires);
-    fprintf(fp, "\texpire_time=%lu\n", temp_comment->expire_time);
+    fprintf(fp, "\texpire_time=%lu\n", static_cast<unsigned long>(temp_comment->expire_time));
     fprintf(fp, "\tauthor=%s\n", temp_comment->author);
     fprintf(fp, "\tcomment_data=%s\n", temp_comment->comment_data);
     fprintf(fp, "\t}\n\n");
@@ -560,9 +560,9 @@ int xsddefault_save_status_data(void) {
     if (temp_downtime->type == SERVICE_DOWNTIME)
       fprintf(fp, "\tservice_description=%s\n", temp_downtime->service_description);
     fprintf(fp, "\tdowntime_id=%lu\n", temp_downtime->downtime_id);
-    fprintf(fp, "\tentry_time=%lu\n", temp_downtime->entry_time);
-    fprintf(fp, "\tstart_time=%lu\n", temp_downtime->start_time);
-    fprintf(fp, "\tend_time=%lu\n", temp_downtime->end_time);
+    fprintf(fp, "\tentry_time=%lu\n", static_cast<unsigned long>(temp_downtime->entry_time));
+    fprintf(fp, "\tstart_time=%lu\n", static_cast<unsigned long>(temp_downtime->start_time));
+    fprintf(fp, "\tend_time=%lu\n", static_cast<unsigned long>(temp_downtime->end_time));
     fprintf(fp, "\ttriggered_by=%lu\n", temp_downtime->triggered_by);
     fprintf(fp, "\tfixed=%d\n", temp_downtime->fixed);
     fprintf(fp, "\tduration=%lu\n", temp_downtime->duration);
