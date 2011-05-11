@@ -17,6 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <QFileInfo>
 #include <sstream>
 #include <fstream>
 #include <sys/types.h>
@@ -2598,15 +2599,29 @@ void state::_reset() {
  *  @param[in] value The filename.
  */
 void state::_parse_resource_file(QString const& value) {
+  // Prepend main config file path.
+  QFileInfo qinfo(value);
+  QString resfile;
+  if (qinfo.isAbsolute())
+    resfile = value;
+  else {
+    qinfo.setFile(_filename);
+    resfile = qinfo.path();
+    resfile.append("/");
+    resfile.append(value);
+  }
+
+  // Open resource file.
   std::ifstream ifs;
-  ifs.open(value.toStdString().c_str());
+  ifs.open(resfile.toStdString().c_str());
   if (ifs.fail()) {
-    throw (engine_error() << "cannot open resource file: `" << value << "'");
+    throw (engine_error() << "cannot open resource file: `"
+                          << resfile << "'");
   }
 
   unsigned int save_cur_line = _cur_line;
   QString save_filename = _filename;
-  _filename = value;
+  _filename = resfile;
 
   for (_cur_line = 1; !ifs.eof(); ++_cur_line) {
     std::string line = _getline(ifs);
@@ -2646,7 +2661,7 @@ void state::_parse_resource_file(QString const& value) {
   ifs.close();
 
   delete[] _mac->x[MACRO_RESOURCEFILE];
-  _mac->x[MACRO_RESOURCEFILE] = my_strdup(value.toStdString().c_str());
+  _mac->x[MACRO_RESOURCEFILE] = my_strdup(resfile.toStdString().c_str());
 }
 
 /**
