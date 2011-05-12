@@ -67,22 +67,22 @@ int main(void) {
     {
       // Add new object (file) to log into engine and test limit size.
       QSharedPointer<file> obj1(new file("./test_logging_file_size_limit.log", 10));
-      engine::obj_info info1(obj1, object::log_all, object::most);
+      engine::obj_info info1(obj1, log_all, most);
       id1 = engine.add_object(info1);
 
       // Add new object (file) to log into engine and test rotation.
       QSharedPointer<file> obj2(new file("./test_logging_file_rotate.log", "./"));
-      engine::obj_info info2(obj2, object::log_all, object::most);
+      engine::obj_info info2(obj2, log_all, most);
       id2 = engine.add_object(info2);
     }
 
     // Send message to all object.
-    engine.log("012345", object::log_info_message, object::basic);
-    engine.log("0123456789", object::log_info_message, object::basic);
+    engine.log("012345", log_info_message, basic);
+    engine.log("0123456789", log_info_message, basic);
     // Make a rotation for obj2.
     file::rotate_all();
     // Send message to all object.
-    engine.log("qwerty", object::log_info_message, object::basic);
+    engine.log("qwerty", log_info_message, basic);
 
     // Cleanup.
     engine.remove_object(id2);

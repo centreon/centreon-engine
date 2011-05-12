@@ -2626,9 +2626,8 @@ void state::_parse_resource_file(QString const& value) {
       key = key.substr(5, key.size() - 6);
       if (_str2obj<unsigned int>(key.c_str(), &user_index) == false
 	  || user_index >= MAX_USER_MACROS) {
-	logger(object::log_config_warning, object::basic)
-          << "warning: [" << _filename << ":" << _cur_line
-          << "] bad variable name '" << key << "'";
+	logger(log_config_warning, basic) << "warning: [" << _filename
+          << ":" << _cur_line << "] bad variable name '" << key << "'";
 	continue;
       }
 
@@ -2637,10 +2636,8 @@ void state::_parse_resource_file(QString const& value) {
       macro_user[user_index] = my_strdup(_trim(value).c_str());
     }
     else
-      logger(object::log_config_warning, object::basic)
-        << "warning: [" << _filename << ":" << _cur_line
-        << "] bad variable name '" << key << "'";
-
+      logger(log_config_warning, basic) << "warning: [" << _filename
+        << ":" << _cur_line << "] bad variable name '" << key << "'";
   }
 
   _cur_line = save_cur_line;
@@ -2658,7 +2655,7 @@ void state::_parse_resource_file(QString const& value) {
  */
 void state::_set_auth_file(QString const& value) {
   (void)value;
-  logger(object::log_config_warning, object::basic)
+  logger(log_config_warning, basic)
     << "warning: auth_file variable ignored";
   return ;
 }
@@ -2686,7 +2683,7 @@ void state::_set_admin_pager(QString const& value) {
  */
 void state::_set_retained_service_attribute_mask(QString const& value) {
   (void)value;
-  logger(object::log_config_warning, object::basic)
+  logger(log_config_warning, basic)
     << "warning: retained_service_attribute_mask variable ignored";
   return ;
 }
@@ -2696,7 +2693,7 @@ void state::_set_retained_service_attribute_mask(QString const& value) {
  */
 void state::_set_retained_process_service_attribute_mask(QString const& value) {
   (void)value;
-  logger(object::log_config_warning, object::basic)
+  logger(log_config_warning, basic)
     << "warning: retained_process_service_attribute_mask variable ignored";
   return ;
 }
@@ -2706,7 +2703,7 @@ void state::_set_retained_process_service_attribute_mask(QString const& value) {
  */
 void state::_set_aggregate_status_updates(QString const& value) {
   (void)value;
-  logger(object::log_config_warning, object::basic)
+  logger(log_config_warning, basic)
     << "warning: aggregate_status_updates directive ignored: all" \
        " status file updates are now aggregated";
   return ;
@@ -2732,9 +2729,8 @@ void state::_set_broker_module(QString const& value) {
  */
 void state::_set_bare_update_check(QString const& value) {
   (void)value;
-  logger(object::log_config_warning, object::basic)
-    << "warning: bare_update_check variable ignored: Centreon Engine" \
-       " does not check for updates";
+  logger(log_config_warning, basic) << "warning: bare_update_check " \
+    "variable ignored: Centreon Engine does not check for updates";
   return ;
 }
 
@@ -2743,9 +2739,8 @@ void state::_set_bare_update_check(QString const& value) {
  */
 void state::_set_check_for_updates(QString const& value) {
   (void)value;
-  logger(object::log_config_warning, object::basic)
-    << "warning: check_for_updates variable ignored: Centreon Engine" \
-       " does not check for updates.";
+  logger(log_config_warning, basic) << "warning: check_for_updates " \
+    "variable ignored: Centreon Engine does not check for updates";
   return ;
 }
 
@@ -2754,9 +2749,9 @@ void state::_set_check_for_updates(QString const& value) {
  */
 void state::_set_comment_file(QString const& value) {
   (void)value;
-  logger(object::log_config_warning, object::basic)
-    << "warning: comment_file variable ignored: comments are now" \
-       " stored in the status and retention files";
+  logger(log_config_warning, basic) << "warning: comment_file " \
+    "variable ignored: comments are now stored in the status and " \
+    "retention files";
   return ;
 }
 
@@ -2765,7 +2760,7 @@ void state::_set_comment_file(QString const& value) {
  */
 void state::_set_daemon_dumps_core(QString const& value) {
   (void)value;
-  logger(object::log_config_warning, object::basic)
+  logger(log_config_warning, basic)
     << "warning: daemon_dumps_core variable ignored: core dumping has" \
        " to be handled by Centreon Engine user";
   return ;
@@ -2776,7 +2771,7 @@ void state::_set_daemon_dumps_core(QString const& value) {
  */
 void state::_set_downtime_file(QString const& value) {
   (void)value;
-  logger(object::log_config_warning, object::basic)
+  logger(log_config_warning, basic)
     << "warning: downtime_file variable ignored: downtime entries are" \
        " now stored in the status and retention files";
   return ;
@@ -2787,9 +2782,8 @@ void state::_set_downtime_file(QString const& value) {
  */
 void state::_set_lock_file(QString const& value) {
   (void)value;
-  logger(object::log_config_warning, object::basic)
-    << "warning: lock_file variable ignored: daemonization should be" \
-       " handled by startup script";
+  logger(log_config_warning, basic) << "warning: lock_file variable " \
+    "ignored: daemonization should be handled by startup script";
   return ;
 }
 
@@ -2798,9 +2792,8 @@ void state::_set_lock_file(QString const& value) {
  */
 void state::_set_user(QString const& value) {
   (void)value;
-  logger(object::log_config_warning, object::basic)
-    << "warning: nagios_user varible ignored: priviledge drop should" \
-       " be handled by startup script";
+  logger(log_config_warning, basic) << "warning: nagios_user variable" \
+    " ignored: priviledge drop should be handled by startup script";
   return ;
 }
 
@@ -2809,8 +2802,8 @@ void state::_set_user(QString const& value) {
  */
 void state::_set_group(QString const& value) {
   (void)value;
-  logger(object::log_config_warning, object::basic)
-    << "warning: nagios_group variable ignored: priviledge drop" \
-       " should be handled by startup script";
+  logger(log_config_warning, basic) << "warning: nagios_group " \
+    "variable ignored: priviledge drop should be handled by startup " \
+    "script";
   return ;
 }
