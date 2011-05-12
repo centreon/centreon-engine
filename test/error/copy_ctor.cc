@@ -17,26 +17,32 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <stddef.h>
+#include <string.h>
+#include "error.hh"
 
-// Features now handled by startup script.
-int           daemon_dumps_core(0);
-char*         lock_file(NULL);
-char*         nagios_user(NULL);
-char*         nagios_group(NULL);
+using namespace com::centreon::engine;
 
-// Process options.
-int           nagios_pid(0);
-int           verify_object_relationships(1);
+/**
+ *  Check that error copy constructor works properly.
+ *
+ *  @return 0 on success.
+ */
+int main() {
+  // Base object.
+  error e1;
+  e1 << "foo" << 42 << "bar" << 23459498498748ull << " baz";
+  e1.set_fatal(false);
 
-// Update-related variables.
-int           bare_update_checks(0);
-int           check_for_updates(0);
-int           update_available(0);
-unsigned long update_uid;
-char*         last_program_version(NULL);
-char*         new_program_version(NULL);
+  // Copy base object.
+  error e2(e1);
 
-// Retention flags.
-unsigned long retained_process_service_attribute_mask(0);
-unsigned long retained_service_attribute_mask(0);
+  // Change base object.
+  e1 << 0;
+  e1.set_fatal(true);
+
+  // Check.
+  return (strcmp(e1.what(), "foo42bar23459498498748 baz0")
+          || (e1.is_fatal() != true)
+          || strcmp(e2.what(), "foo42bar23459498498748 baz")
+          || (e2.is_fatal() != false));
+}

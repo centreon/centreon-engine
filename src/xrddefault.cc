@@ -249,7 +249,7 @@ int xrddefault_save_state_information(void) {
 
   /* write file info */
   fprintf(fp, "info {\n");
-  fprintf(fp, "created=%lu\n", current_time);
+  fprintf(fp, "created=%lu\n", static_cast<unsigned long>(current_time));
   fprintf(fp, "}\n");
 
   /* save program state information */
@@ -285,8 +285,6 @@ int xrddefault_save_state_information(void) {
 
     fprintf(fp, "host {\n");
     fprintf(fp, "host_name=%s\n", temp_host->name);
-    fprintf(fp, "alias=%s\n", temp_host->alias);
-    fprintf(fp, "display_name=%s\n", temp_host->display_name);
     fprintf(fp, "modified_attributes=%lu\n", (temp_host->modified_attributes & ~host_attribute_mask));
     fprintf(fp, "check_command=%s\n", (temp_host->host_check_command == NULL) ? "" : temp_host->host_check_command);
     fprintf(fp, "check_period=%s\n", (temp_host->check_period == NULL) ? "" : temp_host->check_period);
@@ -306,22 +304,22 @@ int xrddefault_save_state_information(void) {
     fprintf(fp, "plugin_output=%s\n", (temp_host->plugin_output == NULL) ? "" : temp_host->plugin_output);
     fprintf(fp, "long_plugin_output=%s\n", (temp_host->long_plugin_output == NULL) ? "" : temp_host->long_plugin_output);
     fprintf(fp, "performance_data=%s\n", (temp_host->perf_data == NULL) ? "" : temp_host->perf_data);
-    fprintf(fp, "last_check=%lu\n", temp_host->last_check);
-    fprintf(fp, "next_check=%lu\n", temp_host->next_check);
+    fprintf(fp, "last_check=%lu\n", static_cast<unsigned long>(temp_host->last_check));
+    fprintf(fp, "next_check=%lu\n", static_cast<unsigned long>(temp_host->next_check));
     fprintf(fp, "check_options=%d\n", temp_host->check_options);
     fprintf(fp, "current_attempt=%d\n", temp_host->current_attempt);
     fprintf(fp, "max_attempts=%d\n", temp_host->max_attempts);
     fprintf(fp, "normal_check_interval=%f\n", temp_host->check_interval);
     fprintf(fp, "retry_check_interval=%f\n", temp_host->check_interval);
     fprintf(fp, "state_type=%d\n", temp_host->state_type);
-    fprintf(fp, "last_state_change=%lu\n", temp_host->last_state_change);
-    fprintf(fp, "last_hard_state_change=%lu\n", temp_host->last_hard_state_change);
-    fprintf(fp, "last_time_up=%lu\n", temp_host->last_time_up);
-    fprintf(fp, "last_time_down=%lu\n", temp_host->last_time_down);
-    fprintf(fp, "last_time_unreachable=%lu\n", temp_host->last_time_unreachable);
+    fprintf(fp, "last_state_change=%lu\n", static_cast<unsigned long>(temp_host->last_state_change));
+    fprintf(fp, "last_hard_state_change=%lu\n", static_cast<unsigned long>(temp_host->last_hard_state_change));
+    fprintf(fp, "last_time_up=%lu\n", static_cast<unsigned long>(temp_host->last_time_up));
+    fprintf(fp, "last_time_down=%lu\n", static_cast<unsigned long>(temp_host->last_time_down));
+    fprintf(fp, "last_time_unreachable=%lu\n", static_cast<unsigned long>(temp_host->last_time_unreachable));
     fprintf(fp, "notified_on_down=%d\n", temp_host->notified_on_down);
     fprintf(fp, "notified_on_unreachable=%d\n", temp_host->notified_on_unreachable);
-    fprintf(fp, "last_notification=%lu\n", temp_host->last_host_notification);
+    fprintf(fp, "last_notification=%lu\n", static_cast<unsigned long>(temp_host->last_host_notification));
     fprintf(fp, "current_notification_number=%d\n", temp_host->current_notification_number);
     fprintf(fp, "current_notification_id=%lu\n", temp_host->current_notification_id);
     fprintf(fp, "notifications_enabled=%d\n", temp_host->notifications_enabled);
@@ -363,7 +361,6 @@ int xrddefault_save_state_information(void) {
 
     fprintf(fp, "service {\n");
     fprintf(fp, "host_name=%s\n", temp_service->host_name);
-    fprintf(fp, "display_name=%s\n", temp_service->display_name);
     fprintf(fp, "service_description=%s\n", temp_service->description);
     fprintf(fp, "modified_attributes=%lu\n", (temp_service->modified_attributes & ~service_attribute_mask));
     fprintf(fp, "check_command=%s\n", (temp_service->service_check_command == NULL) ? "" : temp_service->service_check_command);
@@ -386,24 +383,24 @@ int xrddefault_save_state_information(void) {
     fprintf(fp, "normal_check_interval=%f\n", temp_service->check_interval);
     fprintf(fp, "retry_check_interval=%f\n", temp_service->retry_interval);
     fprintf(fp, "state_type=%d\n", temp_service->state_type);
-    fprintf(fp, "last_state_change=%lu\n", temp_service->last_state_change);
-    fprintf(fp, "last_hard_state_change=%lu\n", temp_service->last_hard_state_change);
-    fprintf(fp, "last_time_ok=%lu\n", temp_service->last_time_ok);
-    fprintf(fp, "last_time_warning=%lu\n", temp_service->last_time_warning);
-    fprintf(fp, "last_time_unknown=%lu\n", temp_service->last_time_unknown);
-    fprintf(fp, "last_time_critical=%lu\n", temp_service->last_time_critical);
+    fprintf(fp, "last_state_change=%lu\n", static_cast<unsigned long>(temp_service->last_state_change));
+    fprintf(fp, "last_hard_state_change=%lu\n", static_cast<unsigned long>(temp_service->last_hard_state_change));
+    fprintf(fp, "last_time_ok=%lu\n", static_cast<unsigned long>(temp_service->last_time_ok));
+    fprintf(fp, "last_time_warning=%lu\n", static_cast<unsigned long>(temp_service->last_time_warning));
+    fprintf(fp, "last_time_unknown=%lu\n", static_cast<unsigned long>(temp_service->last_time_unknown));
+    fprintf(fp, "last_time_critical=%lu\n", static_cast<unsigned long>(temp_service->last_time_critical));
     fprintf(fp, "plugin_output=%s\n", (temp_service->plugin_output == NULL) ? "" : temp_service->plugin_output);
     fprintf(fp, "long_plugin_output=%s\n", (temp_service->long_plugin_output == NULL) ? "" : temp_service->long_plugin_output);
     fprintf(fp, "performance_data=%s\n", (temp_service->perf_data == NULL) ? "" : temp_service->perf_data);
-    fprintf(fp, "last_check=%lu\n", temp_service->last_check);
-    fprintf(fp, "next_check=%lu\n", temp_service->next_check);
+    fprintf(fp, "last_check=%lu\n", static_cast<unsigned long>(temp_service->last_check));
+    fprintf(fp, "next_check=%lu\n", static_cast<unsigned long>(temp_service->next_check));
     fprintf(fp, "check_options=%d\n", temp_service->check_options);
     fprintf(fp, "notified_on_unknown=%d\n", temp_service->notified_on_unknown);
     fprintf(fp, "notified_on_warning=%d\n", temp_service->notified_on_warning);
     fprintf(fp, "notified_on_critical=%d\n", temp_service->notified_on_critical);
     fprintf(fp, "current_notification_number=%d\n", temp_service->current_notification_number);
     fprintf(fp, "current_notification_id=%lu\n", temp_service->current_notification_id);
-    fprintf(fp, "last_notification=%lu\n", temp_service->last_notification);
+    fprintf(fp, "last_notification=%lu\n", static_cast<unsigned long>(temp_service->last_notification));
     fprintf(fp, "notifications_enabled=%d\n", temp_service->notifications_enabled);
     fprintf(fp, "active_checks_enabled=%d\n", temp_service->checks_enabled);
     fprintf(fp, "passive_checks_enabled=%d\n", temp_service->accept_passive_service_checks);
@@ -449,8 +446,8 @@ int xrddefault_save_state_information(void) {
     fprintf(fp, "modified_service_attributes=%lu\n", (temp_contact->modified_service_attributes & ~contact_service_attribute_mask));
     fprintf(fp, "host_notification_period=%s\n", (temp_contact->host_notification_period == NULL) ? "" : temp_contact->host_notification_period);
     fprintf(fp, "service_notification_period=%s\n", (temp_contact->service_notification_period == NULL) ? "" : temp_contact->service_notification_period);
-    fprintf(fp, "last_host_notification=%lu\n", temp_contact->last_host_notification);
-    fprintf(fp, "last_service_notification=%lu\n", temp_contact->last_service_notification);
+    fprintf(fp, "last_host_notification=%lu\n", static_cast<unsigned long>(temp_contact->last_host_notification));
+    fprintf(fp, "last_service_notification=%lu\n", static_cast<unsigned long>(temp_contact->last_service_notification));
     fprintf(fp, "host_notifications_enabled=%d\n", temp_contact->host_notifications_enabled);
     fprintf(fp, "service_notifications_enabled=%d\n", temp_contact->service_notifications_enabled);
 
@@ -484,9 +481,9 @@ int xrddefault_save_state_information(void) {
     fprintf(fp, "comment_id=%lu\n", temp_comment->comment_id);
     fprintf(fp, "source=%d\n", temp_comment->source);
     fprintf(fp, "persistent=%d\n", temp_comment->persistent);
-    fprintf(fp, "entry_time=%lu\n", temp_comment->entry_time);
+    fprintf(fp, "entry_time=%lu\n", static_cast<unsigned long>(temp_comment->entry_time));
     fprintf(fp, "expires=%d\n", temp_comment->expires);
-    fprintf(fp, "expire_time=%lu\n", temp_comment->expire_time);
+    fprintf(fp, "expire_time=%lu\n", static_cast<unsigned long>(temp_comment->expire_time));
     fprintf(fp, "author=%s\n", temp_comment->author);
     fprintf(fp, "comment_data=%s\n", temp_comment->comment_data);
     fprintf(fp, "}\n");
@@ -505,9 +502,9 @@ int xrddefault_save_state_information(void) {
     if (temp_downtime->type == SERVICE_DOWNTIME)
       fprintf(fp, "service_description=%s\n", temp_downtime->service_description);
     fprintf(fp, "downtime_id=%lu\n", temp_downtime->downtime_id);
-    fprintf(fp, "entry_time=%lu\n", temp_downtime->entry_time);
-    fprintf(fp, "start_time=%lu\n", temp_downtime->start_time);
-    fprintf(fp, "end_time=%lu\n", temp_downtime->end_time);
+    fprintf(fp, "entry_time=%lu\n", static_cast<unsigned long>(temp_downtime->entry_time));
+    fprintf(fp, "start_time=%lu\n", static_cast<unsigned long>(temp_downtime->start_time));
+    fprintf(fp, "end_time=%lu\n", static_cast<unsigned long>(temp_downtime->end_time));
     fprintf(fp, "triggered_by=%lu\n", temp_downtime->triggered_by);
     fprintf(fp, "fixed=%d\n", temp_downtime->fixed);
     fprintf(fp, "duration=%lu\n", temp_downtime->duration);
@@ -1144,14 +1141,6 @@ int xrddefault_read_state_information(void) {
               temp_host->last_state = atoi(val);
             else if (!strcmp(var, "last_hard_state"))
               temp_host->last_hard_state = atoi(val);
-            else if (!strcmp(var, "alias")) {
-              delete[] temp_host->alias;
-              temp_host->alias = my_strdup(val);
-            }
-            else if (!strcmp(var, "display_name")) {
-              delete[] temp_host->display_name;
-              temp_host->display_name = my_strdup(val);
-            }
             else if (!strcmp(var, "plugin_output")) {
               delete[] temp_host->plugin_output;
               temp_host->plugin_output = my_strdup(val);
@@ -1417,10 +1406,6 @@ int xrddefault_read_state_information(void) {
               temp_service->last_state = atoi(val);
             else if (!strcmp(var, "last_hard_state"))
               temp_service->last_hard_state = atoi(val);
-            else if (!strcmp(var, "display_name")) {
-              delete[] temp_service->display_name;
-              temp_service->display_name = my_strdup(val);
-            }
             else if (!strcmp(var, "current_attempt"))
               temp_service->current_attempt = atoi(val);
             else if (!strcmp(var, "current_event_id"))

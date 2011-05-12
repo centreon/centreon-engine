@@ -44,16 +44,17 @@ void error::_insert_with_snprintf(T t, char const* format) {
 }
 
 /**
- *  Constructor.
+ *  Default constructor.
  */
-#ifdef NDEBUG
 error::error() throw () : _current(0), _fatal(true) {}
-#else
+
+/**
+ *  Constructor with debugging informations.
+ */
 error::error(char const* file, char const* function, int line) throw()
   : _current(0), _fatal(true) {
   *this << "[" << file << ":" << line << "(" << function << ")] ";
 }
-#endif // !NDEBUG
 
 /**
  *  Copy constructor.
@@ -158,7 +159,7 @@ error& error::operator<<(unsigned int u) throw () {
  *  @return This object.
  */
 error& error::operator<<(long l) throw () {
-  _insert_with_snprintf(l, "%l%n");
+  _insert_with_snprintf(l, "%ld%n");
   return (*this);
 }
 
@@ -170,7 +171,7 @@ error& error::operator<<(long l) throw () {
  *  @return This object.
  */
 error& error::operator<<(long long ll) throw () {
-  _insert_with_snprintf(ll, "%ll%n");
+  _insert_with_snprintf(ll, "%lld%n");
   return (*this);
 }
 

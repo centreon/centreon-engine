@@ -21,6 +21,8 @@
 #ifndef CCE_XDDDEFAULT_HH
 # define CCE_XDDDEFAULT_HH
 
+# include <sys/types.h>
+
 # ifdef __cplusplus
 extern "C" {
 # endif

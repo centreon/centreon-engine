@@ -17,26 +17,23 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <stddef.h>
+#include <string>
+#include <string.h>
+#include "error.hh"
 
-// Features now handled by startup script.
-int           daemon_dumps_core(0);
-char*         lock_file(NULL);
-char*         nagios_user(NULL);
-char*         nagios_group(NULL);
+using namespace com::centreon::engine;
 
-// Process options.
-int           nagios_pid(0);
-int           verify_object_relationships(1);
+/**
+ *  Check that mixed insertions work with error.
+ *
+ *  @return 0 on success.
+ */
+int main() {
+  // Insertions.
+  error e;
+  e << 'f' << "oo" << std::string(" bar baz") << 42 << 789654321456ull
+    << 3000000000u << std::string() << 'q' << 'u' << "x";
 
-// Update-related variables.
-int           bare_update_checks(0);
-int           check_for_updates(0);
-int           update_available(0);
-unsigned long update_uid;
-char*         last_program_version(NULL);
-char*         new_program_version(NULL);
-
-// Retention flags.
-unsigned long retained_process_service_attribute_mask(0);
-unsigned long retained_service_attribute_mask(0);
+  // Check.
+  return (strcmp("foo bar baz427896543214563000000000qux", e.what()));
+}

@@ -26,6 +26,9 @@
 #include "logging.hh"
 #include "engine.hh"
 #include "objects.hh"
+#include "logging/logger.hh"
+
+using namespace com::centreon::engine::logging;
 
 /******************************************************************/
 /******* TOP-LEVEL HOST CONFIGURATION DATA INPUT FUNCTION *********/
@@ -1444,10 +1447,19 @@ service* add_service(char* host_name, char* description,
   unsigned int x = 0;
 
   /* make sure we have everything we need */
-  if ((host_name == NULL || !strcmp(host_name, ""))
-      || (description == NULL || !strcmp(description, ""))
-      || (check_command == NULL || !strcmp(check_command, ""))) {
-    logit(NSLOG_CONFIG_ERROR, TRUE, "Error: Service description, host name, or check command is NULL\n");
+  if (!description || !description[0]) {
+    logger(log_config_error, basic)
+      << "error: service description is not set";
+    return (NULL);
+  }
+  else if (!host_name || !host_name[0]) {
+    logger(log_config_error, basic) << "error: host name of service '"
+      << description << "' is not set";
+    return (NULL);
+  }
+  else if (!check_command || !check_command[0]) {
+    logger(log_config_error, basic) << "error: check command of service '"
+      << description << "' on host '" << host_name << "' is not set";
     return (NULL);
   }
 

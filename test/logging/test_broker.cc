@@ -66,7 +66,7 @@ int main(void) {
 
     // Add new object (broker) to log into engine.
     QSharedPointer<broker> obj(new broker);
-    engine::obj_info info(obj, object::log_all, object::most);
+    engine::obj_info info(obj, log_all, most);
     unsigned int id = engine.add_object(info);
 
     // Send message on all different logging type.

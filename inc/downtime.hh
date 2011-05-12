@@ -83,6 +83,8 @@ scheduled_downtime* find_host_downtime(unsigned long downtime_id);
 scheduled_downtime* find_service_downtime(unsigned long downtime_id);
 void free_downtime_data(void); // frees memory allocated to scheduled downtime list
 
+int delete_downtime_by_hostname_service_description_start_time_comment(char*, char*, time_t, char*);
+
 # ifdef __cplusplus
 }
 # endif

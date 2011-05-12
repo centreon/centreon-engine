@@ -694,6 +694,109 @@ add_subdirectory("configuration/applier")
 add_subdirectory("compatibility")
 add_subdirectory("scripts")
 
+#
+# Error tests.
+#
+# Integer insertion.
+set(TEST_NAME "error_insert_integer")
+add_executable("${TEST_NAME}"
+  "${TEST_DIR}/error/insert_integer.cc")
+target_link_libraries("${TEST_NAME}" "centenginelib")
+add_test("${TEST_NAME}" "${TEST_NAME}")
+# Unsigned integer insertion.
+set(TEST_NAME "error_insert_unsigned_integer")
+add_executable("${TEST_NAME}"
+  "${TEST_DIR}/error/insert_unsigned_integer.cc")
+target_link_libraries("${TEST_NAME}" "centenginelib")
+add_test("${TEST_NAME}" "${TEST_NAME}")
+# Long insertion.
+set(TEST_NAME "error_insert_long")
+add_executable("${TEST_NAME}"
+  "${TEST_DIR}/error/insert_long.cc")
+target_link_libraries("${TEST_NAME}" "centenginelib")
+add_test("${TEST_NAME}" "${TEST_NAME}")
+# Long long insertion.
+set(TEST_NAME "error_insert_long_long")
+add_executable("${TEST_NAME}"
+  "${TEST_DIR}/error/insert_long_long.cc")
+target_link_libraries("${TEST_NAME}" "centenginelib")
+add_test("${TEST_NAME}" "${TEST_NAME}")
+# Unsigned long long insertion.
+set(TEST_NAME "error_insert_unsigned_long_long")
+add_executable("${TEST_NAME}"
+  "${TEST_DIR}/error/insert_unsigned_long_long.cc")
+target_link_libraries("${TEST_NAME}" "centenginelib")
+add_test("${TEST_NAME}" "${TEST_NAME}")
+# Char insertion.
+set(TEST_NAME "error_insert_char")
+add_executable("${TEST_NAME}"
+  "${TEST_DIR}/error/insert_char.cc")
+target_link_libraries("${TEST_NAME}" "centenginelib")
+add_test("${TEST_NAME}" "${TEST_NAME}")
+# Char array (C string) insertion.
+set(TEST_NAME "error_insert_char_array")
+add_executable("${TEST_NAME}"
+  "${TEST_DIR}/error/insert_char_array.cc")
+target_link_libraries("${TEST_NAME}" "centenginelib")
+add_test("${TEST_NAME}" "${TEST_NAME}")
+# String insertion.
+set(TEST_NAME "error_insert_string")
+add_executable("${TEST_NAME}"
+  "${TEST_DIR}/error/insert_string.cc")
+target_link_libraries("${TEST_NAME}" "centenginelib")
+add_test("${TEST_NAME}" "${TEST_NAME}")
+# Mixed insertions.
+set(TEST_NAME "error_insert_mixed")
+add_executable("${TEST_NAME}"
+  "${TEST_DIR}/error/insert_mixed.cc")
+target_link_libraries("${TEST_NAME}" "centenginelib")
+add_test("${TEST_NAME}" "${TEST_NAME}")
+# Copy constructor.
+set(TEST_NAME "error_copy_ctor")
+add_executable("${TEST_NAME}"
+  "${TEST_DIR}/error/copy_ctor.cc")
+target_link_libraries("${TEST_NAME}" "centenginelib")
+add_test("${TEST_NAME}" "${TEST_NAME}")
+# Assignment operator.
+set(TEST_NAME "error_assignment")
+add_executable("${TEST_NAME}"
+  "${TEST_DIR}/error/assignment.cc")
+target_link_libraries("${TEST_NAME}" "centenginelib")
+add_test("${TEST_NAME}" "${TEST_NAME}")
+
+#
+# Stats tests.
+#
+# Non-existent configuration file.
+add_test("running_stats_no_config_file"
+  "centenginestats" "-c" "${TEST_DIR}/running/etc/does_not_exist.cfg")
+set_tests_properties("running_stats_no_config_file"
+  PROPERTIES WILL_FAIL TRUE)
+# Non-existent status file.
+add_test("running_stats_no_status_file"
+  "centenginestats" "-c" "${TEST_DIR}/running/etc/no_status.cfg")
+set_tests_properties("running_stats_no_status_file"
+  PROPERTIES WILL_FAIL TRUE)
+
+#
+# Engine tests.
+#
+# Without any service.
+add_test("running_engine_no_service"
+  "centengine" "-v" "${TEST_DIR}/running/etc/no_service.cfg")
+set_tests_properties("running_engine_no_service"
+  PROPERTIES WILL_FAIL TRUE)
+# Without any contactgroup.
+add_test("running_engine_no_contactgroup"
+  "centengine" "-v" "${TEST_DIR}/running/etc/no_contactgroup.cfg")
+set_tests_properties("running_engine_no_contactgroup"
+  PROPERTIES WILL_FAIL TRUE)
+# Empty groups.
+add_test("running_engine_empty_groups"
+  "centengine" "-v" "${TEST_DIR}/running/etc/empty_groups.cfg")
+set_tests_properties("running_engine_empty_groups"
+  PROPERTIES WILL_FAIL TRUE)
+
 # Package.
 set(CPACK_PACKAGE_NAME "Centreon-Engine")
 set(CPACK_PACKAGE_VENDOR "Merethis")

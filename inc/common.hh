@@ -290,6 +290,10 @@
 # define CMD_CHANGE_CONTACT_MODHATTR				168
 # define CMD_CHANGE_CONTACT_MODSATTR				169
 
+# define CMD_DEL_DOWNTIME_BY_HOST_NAME                          170
+# define CMD_DEL_DOWNTIME_BY_HOSTGROUP_NAME                     171
+# define CMD_DEL_DOWNTIME_BY_START_TIME_COMMENT                 172
+
 /* custom command introduced in Nagios 3.x */
 # define CMD_CUSTOM_COMMAND					999
 

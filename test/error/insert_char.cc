@@ -17,26 +17,23 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <stddef.h>
+#include <string.h>
+#include "error.hh"
 
-// Features now handled by startup script.
-int           daemon_dumps_core(0);
-char*         lock_file(NULL);
-char*         nagios_user(NULL);
-char*         nagios_group(NULL);
+using namespace com::centreon::engine;
 
-// Process options.
-int           nagios_pid(0);
-int           verify_object_relationships(1);
+/**
+ *  Check that chars can be properly inserted in error.
+ *
+ *  @return 0 on success.
+ */
+int main() {
+  // Insert chars.
+  error e;
+  e << 'f' << 'o' << 'o';
+  e << ' ';
+  e << 'b' << 'a' << 'r';
 
-// Update-related variables.
-int           bare_update_checks(0);
-int           check_for_updates(0);
-int           update_available(0);
-unsigned long update_uid;
-char*         last_program_version(NULL);
-char*         new_program_version(NULL);
-
-// Retention flags.
-unsigned long retained_process_service_attribute_mask(0);
-unsigned long retained_service_attribute_mask(0);
+  // Check insertion.
+  return (strcmp("foo bar", e.what()));
+}

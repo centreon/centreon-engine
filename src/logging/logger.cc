@@ -1,5 +1,5 @@
 /*
-** Copyright 2011      Merethis
+** Copyright 2011 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -61,11 +61,25 @@ logger::~logger() {
  *  Default copy operator.
  *
  *  @param[in] right The class to copy.
+ *
+ *  @return This object.
  */
 logger& logger::operator=(logger const& right) {
   if (this != &right) {
     _buffer << right._buffer.str();
   }
+  return (*this);
+}
+
+/**
+ *  Append a QString to the message buffer.
+ *
+ *  @param[in] str String to append.
+ *
+ *  @return This object.
+ */
+logger& logger::operator<<(QString const& str) {
+  _buffer << str.toStdString();
   return (*this);
 }
 

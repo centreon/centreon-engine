@@ -20,41 +20,42 @@
 #ifndef CCE_LOGGING_LOGGER_HH
 # define CCE_LOGGING_LOGGER_HH
 
+# include <QString>
 # include <sstream>
 # include <string>
-
-# include "object.hh"
+# include "logging/object.hh"
 
 namespace                    com {
   namespace                  centreon {
     namespace                engine {
       namespace              logging {
-	/**
+        /**
          *  @class logger logger.hh
          *  @brief Simple logging class.
          *
          *  Simple logging class used by the engine to write log data.
          */
-	class                logger {
-	public:
-	                     logger(unsigned long long type, unsigned int verbosity);
-	                     logger(logger const& right);
-	                     ~logger();
+        class                logger {
+         public:
+                             logger(unsigned long long type, unsigned int verbosity);
+                             logger(logger const& right);
+                             ~logger();
 
-	  logger&            operator=(logger const& right);
-	  template <typename T>
-	  logger&            operator<<(T obj) {
-	    _buffer << obj;
-	    return (*this);
-	  }
+          logger&            operator=(logger const& right);
+          template           <typename T>
+          logger&            operator<<(T obj) {
+            _buffer << obj;
+            return (*this);
+          }
+          logger&            operator<<(QString const& str);
 
-	private:
-	  std::string        _trim(std::string str) throw();
+         private:
+          std::string        _trim(std::string str) throw();
 
-	  std::ostringstream _buffer;
-	  unsigned long long _type;
-	  unsigned int       _verbosity;
-	};
+          std::ostringstream _buffer;
+          unsigned long long _type;
+          unsigned int       _verbosity;
+        };
       }
     }
   }

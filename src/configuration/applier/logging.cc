@@ -152,21 +152,21 @@ void logging::apply(state const& config) {
 void logging::_add_stdout() {
   if (_stdout_id == 0) {
     QSharedPointer<standard> obj(new standard());
-    unsigned long long type = object::log_process_info
-      | object::log_event_handler
-      | object::log_external_command
-      | object::log_host_up
-      | object::log_host_down
-      | object::log_host_unreachable
-      | object::log_service_ok
-      | object::log_service_unknown
-      | object::log_service_warning
-      | object::log_service_critical
-      | object::log_passive_check
-      | object::log_info_message
-      | object::log_host_notification
-      | object::log_service_notification;
-    ::engine::obj_info info(obj, type, object::basic);
+    unsigned long long type(log_process_info
+      | log_event_handler
+      | log_external_command
+      | log_host_up
+      | log_host_down
+      | log_host_unreachable
+      | log_service_ok
+      | log_service_unknown
+      | log_service_warning
+      | log_service_critical
+      | log_passive_check
+      | log_info_message
+      | log_host_notification
+      | log_service_notification);
+    ::engine::obj_info info(obj, type, basic);
     _stdout_id = ::engine::instance().add_object(info);
   }
 }
@@ -177,13 +177,13 @@ void logging::_add_stdout() {
 void logging::_add_stderr() {
   if (_stderr_id == 0) {
     QSharedPointer<standard> obj(new standard(false));
-    unsigned long long type = object::log_runtime_error
-      | object::log_runtime_warning
-      | object::log_verification_error
-      | object::log_verification_warning
-      | object::log_config_error
-      | object::log_config_warning;
-    ::engine::obj_info info(obj, type, object::basic);
+    unsigned long long type(log_runtime_error
+      | log_runtime_warning
+      | log_verification_error
+      | log_verification_warning
+      | log_config_error
+      | log_config_warning);
+    ::engine::obj_info info(obj, type, basic);
     _stderr_id = ::engine::instance().add_object(info);
   }
 }
@@ -193,7 +193,7 @@ void logging::_add_stderr() {
  */
 void logging::_add_syslog() {
   QSharedPointer<syslog> obj(new syslog);
-  ::engine::obj_info info(obj, object::log_all, object::basic);
+  ::engine::obj_info info(obj, log_all, basic);
   _syslog_id = ::engine::instance().add_object(info);
 }
 
@@ -205,7 +205,7 @@ void logging::_add_log_file(state const& config) {
     ::engine::instance().remove_object(_file_id);
   }
   QSharedPointer<file> obj(new file(config.get_log_file(), config.get_log_archive_path()));
-  ::engine::obj_info info(obj, object::log_all, object::basic);
+  ::engine::obj_info info(obj, log_all, basic);
   _file_id = ::engine::instance().add_object(info);
 }
 

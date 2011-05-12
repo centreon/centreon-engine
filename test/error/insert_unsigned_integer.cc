@@ -17,26 +17,28 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <stddef.h>
+#include <limits.h>
+#include <sstream>
+#include <string.h>
+#include "error.hh"
 
-// Features now handled by startup script.
-int           daemon_dumps_core(0);
-char*         lock_file(NULL);
-char*         nagios_user(NULL);
-char*         nagios_group(NULL);
+using namespace com::centreon::engine;
 
-// Process options.
-int           nagios_pid(0);
-int           verify_object_relationships(1);
+/**
+ *  Check that unsigned integer insertion works properly in error.
+ *
+ *  @return 0 on success.
+ */
+int main() {
+  // Insert unsigned integers.
+  error e;
+  e << 0u << 89u << UINT_MAX - 10000 << 7896541u;
+  e << UINT_MAX << 1;
 
-// Update-related variables.
-int           bare_update_checks(0);
-int           check_for_updates(0);
-int           update_available(0);
-unsigned long update_uid;
-char*         last_program_version(NULL);
-char*         new_program_version(NULL);
+  // Reference object.
+  std::ostringstream oss;
+  oss << 0u << 89u << UINT_MAX - 10000 << 7896541u << UINT_MAX << 1;
 
-// Retention flags.
-unsigned long retained_process_service_attribute_mask(0);
-unsigned long retained_service_attribute_mask(0);
+  // Check.
+  return (strcmp(oss.str().c_str(), e.what()));
+}

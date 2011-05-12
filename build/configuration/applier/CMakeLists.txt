@@ -24,9 +24,10 @@ set(MY_INC_DIR "${INCLUDE_DIR}/configuration/applier")
 # cce_configurationapplier target.
 add_library("cce_configurationapplier"
   "STATIC"
+  "${MY_SRC_DIR}/base.cc"
   "${MY_SRC_DIR}/logging.cc"
-  "${MY_INC_DIR}/logging.hh"
-  "${MY_INC_DIR}/base.hh")
+  "${MY_INC_DIR}/base.hh"
+  "${MY_INC_DIR}/logging.hh")
 get_property(MY_COMPILE_FLAGS
   TARGET "cce_configurationapplier"
   PROPERTY COMPILE_FLAGS)

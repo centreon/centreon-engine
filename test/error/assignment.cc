@@ -17,26 +17,34 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <stddef.h>
+#include <string>
+#include "error.hh"
 
-// Features now handled by startup script.
-int           daemon_dumps_core(0);
-char*         lock_file(NULL);
-char*         nagios_user(NULL);
-char*         nagios_group(NULL);
+using namespace com::centreon::engine;
 
-// Process options.
-int           nagios_pid(0);
-int           verify_object_relationships(1);
+/**
+ *  Check that the assignment operator works properly on error.
+ *
+ *  @return 0 on success.
+ */
+int main() {
+  // Base object.
+  error e1;
+  e1 << "foo " << "bar" << 42u;
+  e1.set_fatal(false);
 
-// Update-related variables.
-int           bare_update_checks(0);
-int           check_for_updates(0);
-int           update_available(0);
-unsigned long update_uid;
-char*         last_program_version(NULL);
-char*         new_program_version(NULL);
+  // Copy object.
+  error e2;
+  e2 << "baz" << " qux" << 21l;
+  e2 = e1;
 
-// Retention flags.
-unsigned long retained_process_service_attribute_mask(0);
-unsigned long retained_service_attribute_mask(0);
+  // Change object object.
+  e1 << 3612;
+  e1.set_fatal(true);
+
+  // Check.
+  return (strcmp(e1.what(), "foo bar423612")
+          || (e1.is_fatal() != true)
+          || strcmp(e2.what(), "foo bar42")
+          || (e2.is_fatal() != false));
+}

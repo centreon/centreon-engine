@@ -1,5 +1,5 @@
 /*
-** Copyright 2011      Merethis
+** Copyright 2011 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -37,34 +37,31 @@ namespace            com {
        *  or not.
        */
       class          error : public std::exception {
-      private:
-	mutable char _buffer[4096];
-	unsigned int _current;
-	bool         _fatal;
-	template     <typename T>
-	void         _insert_with_snprintf(T t, char const* format);
+       private:
+        mutable char _buffer[4096];
+        unsigned int _current;
+        bool         _fatal;
+        template     <typename T>
+        void         _insert_with_snprintf(T t, char const* format);
 
-      public:
-# ifdef NDEBUG
-	             error() throw();
-# else
-	             error(char const* file, char const* function, int line) throw();
-# endif // !NDEBUG
-	             error(error const& e) throw ();
-	             ~error() throw ();
-	error&       operator=(error const& e) throw ();
-	error&       operator<<(char c) throw ();
-	error&       operator<<(char const* str) throw ();
-	error&       operator<<(int i) throw ();
-	error&       operator<<(unsigned int u) throw ();
-	error&       operator<<(long l) throw ();
-	error&       operator<<(long long ll) throw ();
-	error&       operator<<(unsigned long long ull) throw ();
-	error&       operator<<(std::string const& str) throw ();
-	error&       operator<<(QString const& str) throw ();
-	bool         is_fatal() const throw ();
-	void         set_fatal(bool fatal) throw ();
-	char const*  what() const throw ();
+       public:
+                     error() throw();
+                     error(char const* file, char const* function, int line) throw();
+                     error(error const& e) throw ();
+                     ~error() throw ();
+        error&       operator=(error const& e) throw ();
+        error&       operator<<(char c) throw ();
+        error&       operator<<(char const* str) throw ();
+        error&       operator<<(int i) throw ();
+        error&       operator<<(unsigned int u) throw ();
+        error&       operator<<(long l) throw ();
+        error&       operator<<(long long ll) throw ();
+        error&       operator<<(unsigned long long ull) throw ();
+        error&       operator<<(std::string const& str) throw ();
+        error&       operator<<(QString const& str) throw ();
+        bool         is_fatal() const throw ();
+        void         set_fatal(bool fatal) throw ();
+        char const*  what() const throw ();
       };
     }
   }
@@ -73,7 +70,7 @@ namespace            com {
 # ifdef NDEBUG
 #  define engine_error() com::centreon::engine::error()
 # else
-#  define engine_error() com::centreon::engine::error(__FILE__, __FUNCTION__, __LINE__)
+#  define engine_error() com::centreon::engine::error(__FILE__, __func__, __LINE__)
 # endif // !NDEBUG
 
 #endif // !CCE_ERROR_HH

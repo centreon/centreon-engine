@@ -55,7 +55,7 @@ extern "C" {
 
     va_start(ap, fmt);
     if (vsnprintf(buffer, sizeof(buffer), fmt, ap) > 0) {
-      logger(type, object::basic) << buffer;
+      logger(type, basic) << buffer;
     }
     va_end(ap);
   }
@@ -83,8 +83,8 @@ extern "C" {
 	now.tv_usec = 0;
       }
 
-      if (verbosity > object::most) {
-	verbosity = object::most;
+      if (verbosity > most) {
+	verbosity = most;
       }
 
       logger(static_cast<unsigned long long>(type) << 32, verbosity)
@@ -108,7 +108,7 @@ extern "C" {
    */
   int write_to_all_logs(char const* buffer, unsigned long type) {
     if (buffer != NULL) {
-      logger(type, object::basic) << buffer;
+      logger(type, basic) << buffer;
     }
     return (OK);
   }
@@ -127,7 +127,7 @@ extern "C" {
     (void)timestamp;
 
     if (buffer != NULL) {
-      logger(type, object::basic) << buffer;
+      logger(type, basic) << buffer;
     }
     return (OK);
   }
@@ -143,7 +143,7 @@ extern "C" {
    */
   int write_to_syslog(char const* buffer, unsigned long type) {
     if (buffer != NULL) {
-      logger(type, object::basic) << buffer;
+      logger(type, basic) << buffer;
     }
     return (OK);
   }
@@ -194,7 +194,7 @@ extern "C" {
     clear_host_macros(&mac);
     clear_service_macros(&mac);
 
-    logger(log_options, object::basic) << processed_buffer;
+    logger(log_options, basic) << processed_buffer;
 
     delete[] processed_buffer;
 
@@ -237,7 +237,7 @@ extern "C" {
     char* processed_buffer = NULL;
     process_macros_r(&mac, buffer.c_str(), &processed_buffer, 0);
 
-    logger(log_options, object::basic) << processed_buffer;
+    logger(log_options, basic) << processed_buffer;
 
     clear_host_macros(&mac);
     delete[] processed_buffer;
@@ -280,7 +280,7 @@ extern "C" {
       char* processed_buffer = NULL;
       process_macros_r(&mac, buffer.c_str(), &processed_buffer, 0);
 
-      logger(object::log_info_message, object::basic) << processed_buffer;
+      logger(log_info_message, basic) << processed_buffer;
 
       clear_host_macros(&mac);
       delete[] processed_buffer;
@@ -329,7 +329,7 @@ extern "C" {
       char* processed_buffer = NULL;
       process_macros_r(&mac, buffer.c_str(), &processed_buffer, 0);
 
-      logger(object::log_info_message, object::basic) << processed_buffer;
+      logger(log_info_message, basic) << processed_buffer;
 
       clear_host_macros(&mac);
       clear_service_macros(&mac);
@@ -369,7 +369,7 @@ extern "C" {
   int write_log_file_info(time_t* timestamp) {
     (void)timestamp;
 
-    logger(object::log_process_info, object::basic)
+    logger(log_process_info, basic)
       <<  "LOG VERSION: " << LOG_VERSION_2 << "\n";
     return (OK);
   }
