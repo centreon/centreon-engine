@@ -694,6 +694,76 @@ add_subdirectory("configuration/applier")
 add_subdirectory("compatibility")
 
 #
+# Error tests.
+#
+# Integer insertion.
+set(TEST_NAME "error_insert_integer")
+add_executable("${TEST_NAME}"
+  "${TEST_DIR}/error/insert_integer.cc")
+target_link_libraries("${TEST_NAME}" "centenginelib")
+add_test("${TEST_NAME}" "${TEST_NAME}")
+# Unsigned integer insertion.
+set(TEST_NAME "error_insert_unsigned_integer")
+add_executable("${TEST_NAME}"
+  "${TEST_DIR}/error/insert_unsigned_integer.cc")
+target_link_libraries("${TEST_NAME}" "centenginelib")
+add_test("${TEST_NAME}" "${TEST_NAME}")
+# Long insertion.
+set(TEST_NAME "error_insert_long")
+add_executable("${TEST_NAME}"
+  "${TEST_DIR}/error/insert_long.cc")
+target_link_libraries("${TEST_NAME}" "centenginelib")
+add_test("${TEST_NAME}" "${TEST_NAME}")
+# Long long insertion.
+set(TEST_NAME "error_insert_long_long")
+add_executable("${TEST_NAME}"
+  "${TEST_DIR}/error/insert_long_long.cc")
+target_link_libraries("${TEST_NAME}" "centenginelib")
+add_test("${TEST_NAME}" "${TEST_NAME}")
+# Unsigned long long insertion.
+set(TEST_NAME "error_insert_unsigned_long_long")
+add_executable("${TEST_NAME}"
+  "${TEST_DIR}/error/insert_unsigned_long_long.cc")
+target_link_libraries("${TEST_NAME}" "centenginelib")
+add_test("${TEST_NAME}" "${TEST_NAME}")
+# Char insertion.
+set(TEST_NAME "error_insert_char")
+add_executable("${TEST_NAME}"
+  "${TEST_DIR}/error/insert_char.cc")
+target_link_libraries("${TEST_NAME}" "centenginelib")
+add_test("${TEST_NAME}" "${TEST_NAME}")
+# Char array (C string) insertion.
+set(TEST_NAME "error_insert_char_array")
+add_executable("${TEST_NAME}"
+  "${TEST_DIR}/error/insert_char_array.cc")
+target_link_libraries("${TEST_NAME}" "centenginelib")
+add_test("${TEST_NAME}" "${TEST_NAME}")
+# String insertion.
+set(TEST_NAME "error_insert_string")
+add_executable("${TEST_NAME}"
+  "${TEST_DIR}/error/insert_string.cc")
+target_link_libraries("${TEST_NAME}" "centenginelib")
+add_test("${TEST_NAME}" "${TEST_NAME}")
+# Mixed insertions.
+set(TEST_NAME "error_insert_mixed")
+add_executable("${TEST_NAME}"
+  "${TEST_DIR}/error/insert_mixed.cc")
+target_link_libraries("${TEST_NAME}" "centenginelib")
+add_test("${TEST_NAME}" "${TEST_NAME}")
+# Copy constructor.
+set(TEST_NAME "error_copy_ctor")
+add_executable("${TEST_NAME}"
+  "${TEST_DIR}/error/copy_ctor.cc")
+target_link_libraries("${TEST_NAME}" "centenginelib")
+add_test("${TEST_NAME}" "${TEST_NAME}")
+# Assignment operator.
+set(TEST_NAME "error_assignment")
+add_executable("${TEST_NAME}"
+  "${TEST_DIR}/error/assignment.cc")
+target_link_libraries("${TEST_NAME}" "centenginelib")
+add_test("${TEST_NAME}" "${TEST_NAME}")
+
+#
 # Stats tests.
 #
 # Non-existent configuration file.
