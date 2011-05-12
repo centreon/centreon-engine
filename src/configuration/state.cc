@@ -1177,9 +1177,6 @@ state::e_interleave_factor state::get_service_interleave_factor_method() const t
  *  @param[in] value The filename.
  */
 void state::set_log_file(QString const& value) {
-  if (pathconf(value.toStdString().c_str(), _PC_PATH_MAX) == -1) {
-    throw (engine_error() << "log_file: invalid value");
-  }
   _tab_string[log_file] = value;
 
   delete[] _mac->x[MACRO_LOGFILE];
@@ -1194,9 +1191,6 @@ void state::set_log_file(QString const& value) {
  *  @param[in] value The broker module directory.
  */
 void state::set_broker_module_directory(QString const& value) {
-  if (pathconf(value.toStdString().c_str(), _PC_PATH_MAX) == -1) {
-    throw (engine_error() << "broker_module_directory: invalid value");
-  }
   _tab_string[broker_module_directory] = value;
 }
 
@@ -1206,9 +1200,6 @@ void state::set_broker_module_directory(QString const& value) {
  *  @param[in] value The filename
  */
 void state::set_debug_file(QString const& value) {
-  if (pathconf(value.toStdString().c_str(), _PC_PATH_MAX) == -1) {
-    throw (engine_error() << "debuf_file: invalid value");
-  }
   _tab_string[debug_file] = value;
 
   delete[] ::debug_file;
@@ -1220,9 +1211,6 @@ void state::set_debug_file(QString const& value) {
  *  @param[in] value The filename.
  */
 void state::set_command_file(QString const& value) {
-  if (pathconf(value.toStdString().c_str(), _PC_PATH_MAX) == -1) {
-    throw (engine_error() << "command_file: invalid value");
-  }
   _tab_string[command_file] = value;
 
   delete[] _mac->x[MACRO_COMMANDFILE];
@@ -1237,9 +1225,6 @@ void state::set_command_file(QString const& value) {
  *  @param[in] value The filename.
  */
 void state::set_temp_file(QString const& value) {
-  if (pathconf(value.toStdString().c_str(), _PC_PATH_MAX) == -1) {
-    throw (engine_error() << "temp_file: invalid value");
-  }
   _tab_string[temp_file] = value;
 
   delete[] _mac->x[MACRO_TEMPFILE];
@@ -1346,9 +1331,6 @@ void state::set_log_archive_path(QString const& value) {
  *  @param[in] value The filename.
  */
 void state::set_p1_file(QString const& value) {
-  if (pathconf(value.toStdString().c_str(), _PC_PATH_MAX) == -1) {
-    throw (engine_error() << "p1_file: invalid value");
-  }
   _tab_string[p1_file] = value;
 
   delete[] ::p1_file;
