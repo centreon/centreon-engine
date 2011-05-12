@@ -17,30 +17,19 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <QFileInfo>
-#include <sstream>
 #include <fstream>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
-#include <string.h>
-#include <errno.h>
-#include <time.h>
-#include <pwd.h>
-#include <grp.h>
-#include "engine.hh"
-#include "globals.hh"
-#include "logging.hh"
-#include "common.hh"
-#include "macros.hh"
+#include <QFileInfo>
+#include <string>
 #include "broker.hh"
-#include "nebmods.hh"
-#include "utils.hh"
-
-#include "error.hh"
 #include "configuration/state.hh"
+#include "engine.hh"
+#include "error.hh"
+#include "globals.hh"
+#include "logging/logger.hh"
+#include "macros.hh"
 
 using namespace com::centreon::engine::configuration;
+using namespace com::centreon::engine::logging;
 
 const float state::DEFAULT_SLEEP_TIME                  = 0.5;
 const float state::DEFAULT_LOW_SERVICE_FLAP_THRESHOLD  = 20.0;
@@ -49,10 +38,10 @@ const float state::DEFAULT_LOW_HOST_FLAP_THRESHOLD     = 20.0;
 const float state::DEFAULT_HIGH_HOST_FLAP_THRESHOLD    = 30.0;
 
 /**************************************
- *                                     *
- *           Public Methods            *
- *                                     *
- **************************************/
+*                                     *
+*           Public Methods            *
+*                                     *
+**************************************/
 
 /**
  *  Default constructor.
@@ -217,9 +206,7 @@ state::state(state const& right) {
 /**
  *  Destructor.
  */
-state::~state() throw() {
-
-}
+state::~state() throw() {}
 
 /**
  *  Assignment operator.
@@ -272,8 +259,7 @@ void state::reset() {
  *
  *  @param[in] filename configuration file
  */
-void state::parse(QString const& filename)
-{
+void state::parse(QString const& filename) {
   std::ifstream ifs;
   ifs.open(filename.toStdString().c_str(), std::ifstream::in);
   if (ifs.is_open() == false) {
@@ -285,35 +271,35 @@ void state::parse(QString const& filename)
   for (_cur_line = 1; ifs.good(); ++_cur_line) {
       std::string line = _getline(ifs);
       if (line == "" || line[0] == '#') {
-      	continue;
+              continue;
       }
 
       size_t pos = line.find_first_of('=');
       if (pos == std::string::npos) {
-      	throw (engine_error() << "[" << _filename << ":" << _cur_line
-	       << "] bad variable name: `" << _filename << "'");
+              throw (engine_error() << "[" << _filename << ":" << _cur_line
+               << "] bad variable name: `" << _filename << "'");
       }
       std::string key = line.substr(0, pos);
       methods::const_iterator it = _lst_method.find(_trim(key).c_str());
       if (it != _lst_method.end()) {
-      	if (it->second != NULL) {
-      	  std::string value = line.substr(pos + 1);
-	  try {
-	    it->second(_trim(value).c_str(), *this);
-	  }
-	  catch (error const& e) {
-	    throw (engine_error() << "[" << _filename << ":" << _cur_line
-		   << "] " << e.what());
-	  }
-      	}
+              if (it->second != NULL) {
+                std::string value = line.substr(pos + 1);
+          try {
+            it->second(_trim(value).c_str(), *this);
+          }
+          catch (error const& e) {
+            throw (engine_error() << "[" << _filename << ":" << _cur_line
+                   << "] " << e.what());
+          }
+              }
       }
       else if (!key.compare(0, 13, "host_perfdata")
-      	       || !key.compare(0, 16, "service_perfdata")) {
-      	continue;
+                     || !key.compare(0, 16, "service_perfdata")) {
+              continue;
       }
       else {
-      	throw (engine_error() << "[" << _filename << ":" << _cur_line
-      	       << "] unknown variable name: `" << key << "'");
+              throw (engine_error() << "[" << _filename << ":" << _cur_line
+                     << "] unknown variable name: `" << key << "'");
       }
   }
   ifs.close();
@@ -1236,16 +1222,23 @@ void state::set_temp_file(QString const& value) {
  *  @param[in] value The path.
  */
 void state::set_temp_path(QString const& value) {
-  struct stat stat_info;
-  if (stat(value.toStdString().c_str(), &stat_info) == -1
-      || !S_ISDIR(stat_info.st_mode)) {
-    throw (engine_error() << "temp_path: invalid value");
-  }
+  // Check that temp path exists and is a directory.
+  QFileInfo qinfo(value);
+  if (!qinfo.exists())
+    throw (engine_error() << "temp_path '" << value
+                          << "' does not exist");
+  if (!qinfo.isDir())
+    throw (engine_error() << "temp_path '" << value
+                          << "' is not a directory");
+
+  // Set configuration variable.
   _tab_string[temp_path] = value;
 
+  // Set macro.
   delete[] _mac->x[MACRO_TEMPPATH];
   _mac->x[MACRO_TEMPPATH] = my_strdup(value.toStdString().c_str());
 
+  // Set compatibility variable.
   delete[] ::temp_path;
   ::temp_path = my_strdup(_mac->x[MACRO_TEMPPATH]);
 }
@@ -1255,13 +1248,19 @@ void state::set_temp_path(QString const& value) {
  *  @param[in] value The path.
  */
 void state::set_check_result_path(QString const& value) {
-  struct stat stat_info;
-  if (stat(value.toStdString().c_str(), &stat_info) == -1
-      || !S_ISDIR(stat_info.st_mode)) {
-    throw (engine_error() << "check_result_path: invalid value");
-  }
+  // Check that check result path exists and is a directory.
+  QFileInfo qinfo(value);
+  if (!qinfo.exists())
+    throw (engine_error() << "check_result_path '" << value
+                          << "' does not exist");
+  if (!qinfo.isDir())
+    throw (engine_error() << "check_result_path '" << value
+                          << "' is not a directory");
+
+  // Set configuration variable.
   _tab_string[check_result_path] = value;
 
+  // Set compatibility variable.
   delete[] ::check_result_path;
   ::check_result_path = my_strdup(value.toStdString().c_str());
 }
@@ -1315,13 +1314,19 @@ void state::set_ochp_command(QString const& value) {
  *  @param[in] value The path.
  */
 void state::set_log_archive_path(QString const& value) {
-  struct stat stat_info;
-  if (stat(value.toStdString().c_str(), &stat_info) == -1
-      || !S_ISDIR(stat_info.st_mode)) {
-    throw (engine_error() << "log_archive_path: invalid value");
-  }
+  // Check that log_archive_path exists and is a directory.
+  QFileInfo qinfo(value);
+  if (!qinfo.exists())
+    throw (engine_error() << "log_archive_path '" << value
+                          << "' does not exist");
+  if (!qinfo.isDir())
+    throw (engine_error() << "log_archive_path '" << value
+                          << "' is not a directory");
+
+  // Set configuration variable.
   _tab_string[log_archive_path] = value;
 
+  // Set compatibility variable.
   delete[] ::log_archive_path;
   ::log_archive_path = my_strdup(value.toStdString().c_str());
 }
@@ -1782,9 +1787,8 @@ void state::set_event_broker_options(QString const& value) {
     _tab_ulong[event_broker_options] = BROKER_EVERYTHING;
     ::event_broker_options = BROKER_EVERYTHING;
   }
-  else {
+  else
     cpp_suck<unsigned long, &state::set_event_broker_options>::set_generic(value, *this);
-  }
 }
 
 /**
@@ -2179,7 +2183,7 @@ void state::set_allow_empty_hostgroup_assignment(bool value) {
  *  @param[in] value The sleep time.
  */
 void state::set_sleep_time(float value) {
-  if (value <= 0.0){
+  if (value <= 0.0) {
     throw (engine_error() << "sleep_time: invalid value.");
   }
   _tab_float[sleep_time] = value;
@@ -2324,7 +2328,7 @@ void state::set_service_inter_check_delay_method(QString const& value) {
   else {
     _tab_uint[service_inter_check_delay_method] = icd_user;
     if (_str2obj<double>(value, &scheduling_info.service_inter_check_delay) == false
-	|| scheduling_info.service_inter_check_delay <= 0.0) {
+        || scheduling_info.service_inter_check_delay <= 0.0) {
       throw (engine_error() << "service_inter_check_delay_method: invalid value.");
     }
   }
@@ -2622,8 +2626,9 @@ void state::_parse_resource_file(QString const& value) {
       key = key.substr(5, key.size() - 6);
       if (_str2obj<unsigned int>(key.c_str(), &user_index) == false
 	  || user_index >= MAX_USER_MACROS) {
-	logit(NSLOG_CONFIG_WARNING, TRUE, "Warning: [%s:%d] bad variable name `%s'",
-	      _filename.toStdString().c_str(), _cur_line, key.c_str());
+	logger(object::log_config_warning, object::basic)
+          << "warning: [" << _filename << ":" << _cur_line
+          << "] bad variable name '" << key << "'";
 	continue;
       }
 
@@ -2631,10 +2636,11 @@ void state::_parse_resource_file(QString const& value) {
       delete[] macro_user[user_index];
       macro_user[user_index] = my_strdup(_trim(value).c_str());
     }
-    else {
-      logit(NSLOG_CONFIG_WARNING, TRUE, "Warning: [%s:%d] bad variable name `%s'",
-       	    _filename.toStdString().c_str(), _cur_line, key.c_str());
-    }
+    else
+      logger(object::log_config_warning, object::basic)
+        << "warning: [" << _filename << ":" << _cur_line
+        << "] bad variable name '" << key << "'";
+
   }
 
   _cur_line = save_cur_line;
@@ -2652,7 +2658,9 @@ void state::_parse_resource_file(QString const& value) {
  */
 void state::_set_auth_file(QString const& value) {
   (void)value;
-  logit(NSLOG_CONFIG_WARNING, TRUE, "Warning: auth_file variable ignored.");
+  logger(object::log_config_warning, object::basic)
+    << "warning: auth_file variable ignored";
+  return ;
 }
 
 /**
@@ -2678,7 +2686,9 @@ void state::_set_admin_pager(QString const& value) {
  */
 void state::_set_retained_service_attribute_mask(QString const& value) {
   (void)value;
-  logit(NSLOG_CONFIG_WARNING, TRUE, "Warning: retained_service_attribute_mask variable ignored.");
+  logger(object::log_config_warning, object::basic)
+    << "warning: retained_service_attribute_mask variable ignored";
+  return ;
 }
 
 /**
@@ -2686,7 +2696,9 @@ void state::_set_retained_service_attribute_mask(QString const& value) {
  */
 void state::_set_retained_process_service_attribute_mask(QString const& value) {
   (void)value;
-  logit(NSLOG_CONFIG_WARNING, TRUE, "Warning: retained_process_service_attribute_mask variable ignored.");
+  logger(object::log_config_warning, object::basic)
+    << "warning: retained_process_service_attribute_mask variable ignored";
+  return ;
 }
 
 /**
@@ -2694,8 +2706,10 @@ void state::_set_retained_process_service_attribute_mask(QString const& value) {
  */
 void state::_set_aggregate_status_updates(QString const& value) {
   (void)value;
-  // DEPRECATED
-  logit(NSLOG_CONFIG_WARNING, TRUE, "Warning: aggregate_status_updates directive ignored.  All status file updates are now aggregated.");
+  logger(object::log_config_warning, object::basic)
+    << "warning: aggregate_status_updates directive ignored: all" \
+       " status file updates are now aggregated";
+  return ;
 }
 
 /**
@@ -2718,7 +2732,10 @@ void state::_set_broker_module(QString const& value) {
  */
 void state::_set_bare_update_check(QString const& value) {
   (void)value;
-  logit(NSLOG_CONFIG_WARNING, TRUE, "Warning: bare_update_check variable ignored. Centreon Engine does not check for updates.");
+  logger(object::log_config_warning, object::basic)
+    << "warning: bare_update_check variable ignored: Centreon Engine" \
+       " does not check for updates";
+  return ;
 }
 
 /**
@@ -2726,7 +2743,10 @@ void state::_set_bare_update_check(QString const& value) {
  */
 void state::_set_check_for_updates(QString const& value) {
   (void)value;
-  logit(NSLOG_CONFIG_WARNING, TRUE, "Warning: check_for_updates variable ignored. Centreon Engine does not check for updates.");
+  logger(object::log_config_warning, object::basic)
+    << "warning: check_for_updates variable ignored: Centreon Engine" \
+       " does not check for updates.";
+  return ;
 }
 
 /**
@@ -2734,7 +2754,10 @@ void state::_set_check_for_updates(QString const& value) {
  */
 void state::_set_comment_file(QString const& value) {
   (void)value;
-  logit(NSLOG_CONFIG_WARNING, TRUE, "Warning: comment_file variable ignored. Comments are now stored in the status and retention files.");
+  logger(object::log_config_warning, object::basic)
+    << "warning: comment_file variable ignored: comments are now" \
+       " stored in the status and retention files";
+  return ;
 }
 
 /**
@@ -2742,7 +2765,10 @@ void state::_set_comment_file(QString const& value) {
  */
 void state::_set_daemon_dumps_core(QString const& value) {
   (void)value;
-  logit(NSLOG_CONFIG_WARNING, TRUE, "Warning: daemon_dumps_core variable ignored. Core dumping has to be handled by Centreon Engine user.");
+  logger(object::log_config_warning, object::basic)
+    << "warning: daemon_dumps_core variable ignored: core dumping has" \
+       " to be handled by Centreon Engine user";
+  return ;
 }
 
 /**
@@ -2750,7 +2776,10 @@ void state::_set_daemon_dumps_core(QString const& value) {
  */
 void state::_set_downtime_file(QString const& value) {
   (void)value;
-  logit(NSLOG_CONFIG_WARNING, TRUE, "Warning: downtime_file variable ignored. Downtime entries are now stored in the status and retention files.");
+  logger(object::log_config_warning, object::basic)
+    << "warning: downtime_file variable ignored: downtime entries are" \
+       " now stored in the status and retention files";
+  return ;
 }
 
 /**
@@ -2758,7 +2787,10 @@ void state::_set_downtime_file(QString const& value) {
  */
 void state::_set_lock_file(QString const& value) {
   (void)value;
-  logit(NSLOG_CONFIG_WARNING, TRUE, "Warning: lock_file variable ignored. Priviledge drop should be handled by startup script.");
+  logger(object::log_config_warning, object::basic)
+    << "warning: lock_file variable ignored: daemonization should be" \
+       " handled by startup script";
+  return ;
 }
 
 /**
@@ -2766,7 +2798,10 @@ void state::_set_lock_file(QString const& value) {
  */
 void state::_set_user(QString const& value) {
   (void)value;
-  logit(NSLOG_CONFIG_WARNING, TRUE, "Warning: nagios_user varible ignored. Priviledge drop should be handled by startup script.");
+  logger(object::log_config_warning, object::basic)
+    << "warning: nagios_user varible ignored: priviledge drop should" \
+       " be handled by startup script";
+  return ;
 }
 
 /**
@@ -2774,5 +2809,8 @@ void state::_set_user(QString const& value) {
  */
 void state::_set_group(QString const& value) {
   (void)value;
-  logit(NSLOG_CONFIG_WARNING, TRUE, "Warning: nagios_group variable ignored. Priviledge drop should be handled by startup script.");
+  logger(object::log_config_warning, object::basic)
+    << "warning: nagios_group variable ignored: priviledge drop" \
+       " should be handled by startup script";
+  return ;
 }
