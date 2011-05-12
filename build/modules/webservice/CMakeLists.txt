@@ -25,8 +25,6 @@ find_program(WSDL2H_PROGRAM "wsdl2h")
 if (NOT WSDL2H_PROGRAM)
   message(FATAL_ERROR "Could not find gSOAP's wsdl2h binary.")
 endif ()
-add_custom_command(OUTPUT "${MODULE_DIR}/centreon-engine-ws.hh"
-  COMMAND "${WSDL2H_PROGRAM}" "-o" "${MODULE_DIR}/centreon-engine-ws.hh" "-t${MODULE_DIR}/typemap.dat" "${MODULE_DIR}/centreon-engine.wsdl")
 
 # Find and execute gSOAP's soapcpp2.
 find_program(SOAPCPP2_PROGRAM "soapcpp2")
@@ -39,16 +37,6 @@ find_path(GSOAP_INCLUDE_DIR NAMES "stlvector.h"
 if (NOT GSOAP_INCLUDE_DIR)
   message(FATAL_ERROR "Could not find gSOAP's stlvector.h header file.")
 endif ()
-
-add_custom_command(OUTPUT
-  "${MODULE_DIR}/centreonengine.nsmap"
-  "${MODULE_DIR}/soapC.cpp"
-  "${MODULE_DIR}/soapH.h"
-  "${MODULE_DIR}/soapServer.cpp"
-  "${MODULE_DIR}/soapServerLib.cpp"
-  "${MODULE_DIR}/soapStub.h"
-  COMMAND "${SOAPCPP2_PROGRAM}" "-x" "-d${MODULE_DIR}/" "-S" "-I${GSOAP_INCLUDE_DIR}" "${MODULE_DIR}/centreon-engine-ws.hh"
-  DEPENDS "${MODULE_DIR}/centreon-engine-ws.hh")
 
 # Find library.
 if (WITH_SSL)
@@ -79,48 +67,11 @@ if (NOT ZLIB_LIBRARIES)
   message(FATAL_ERROR "Could not find zlib's libz.")
 endif ()
 
-# Include Directories
-include_directories("${INCLUDE_DIR}")
-include_directories("${MODULE_DIR}")
-
-# Qt moc files.
-qt4_wrap_cpp(QT_WS_MOC_FILES
-  "${MODULE_DIR}/webservice.hh")
-
 # Define flags.
 if (WITH_SSL)
   add_definitions(-DWITH_OPENSSL)
 endif ()
 add_definitions(-DWITH_GZIP)
 
-# centscheduler target.
-add_library("webservice"
-  "SHARED"
-  "${MODULE_DIR}/soapC.cpp"
-  "${MODULE_DIR}/soapServer.cpp"
-  "${MODULE_DIR}/commands.cc"
-  "${MODULE_DIR}/webservice.cc"
-  "${MODULE_DIR}/configuration.cc"
-  "${MODULE_DIR}/ssl.cc"
-  "${MODULE_DIR}/syncro.cc"
-  "${MODULE_DIR}/main.cc"
-  ${QT_WS_MOC_FILES})
-get_property(MODULE_COMPILE_FLAGS
-  TARGET "webservice"
-  PROPERTY COMPILE_FLAGS)
-set(MODULE_COMPILE_FLAGS "${MODULE_COMPILE_FLAGS}")
-if (CMAKE_COMPILER_IS_GNUCXX)
-  set_source_files_properties("${MODULE_DIR}/soapC.cpp" PROPERTIES
-    COMPILE_FLAGS "-Wno-unused-parameter")
-endif ()
-set_target_properties("webservice" PROPERTIES
-  COMPILE_FLAGS "${MODULE_COMPILE_FLAGS}")
-target_link_libraries("webservice"
-  ${GSOAP_LIBRARIES}
-  ${SSL_LIBRARIES}
-  ${CRYPTO_LIBRARIES}
-  ${ZLIB_LIBRARIES}
-  ${QT_LIBRARIES})
-install(TARGETS "webservice"
-  DESTINATION "${libdir}/"
-  COMPONENT "runtime")
+add_subdirectory("./client")
+add_subdirectory("./server")

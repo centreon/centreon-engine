@@ -29,7 +29,7 @@
 using namespace com::centreon::engine::broker;
 
 static const char* MOD_LIB_NAME        = "./libmod_test_load.so";
-static const char* MOD_LIB_COMPAT_NAME = "./libmod_test_load.so";
+static const char* MOD_LIB_COMPAT_NAME = "./libmod_test_load_compatibility.so";
 
 bool mod_test_load_quit = false;
 

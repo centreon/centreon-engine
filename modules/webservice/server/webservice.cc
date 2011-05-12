@@ -17,6 +17,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <signal.h>
+
 #include "ssl.hh"
 #include "logging.hh"
 #include "webservice.hh"
@@ -114,6 +116,7 @@ void  webservice::run() {
 void webservice::_init() {
 #ifdef WITH_OPENSSL
   if (_config.get_ssl_enable() == true) {
+    signal(SIGPIPE, _sigpipe_handle);
     soap_ssl_init();
     if (CRYPTO_thread_setup()) {
       throw (engine_error() << "ssl thread setup failed.");
@@ -129,8 +132,11 @@ void webservice::_init() {
     char const* cacert = (_config.get_ssl_cacert() != "" ? _config.get_ssl_cacert().toStdString().c_str() : NULL);
     char const* dh = (_config.get_ssl_dh() != "" ? _config.get_ssl_dh().toStdString().c_str() : NULL);
     char const* password = (_config.get_ssl_password() != "" ? _config.get_ssl_password().toStdString().c_str() : NULL);
+    int flags = (keyfile == NULL && cacert == NULL && dh == NULL && password == NULL
+		 ? SOAP_SSL_NO_AUTHENTICATION
+		 : SOAP_SSL_DEFAULT);
     if (soap_ssl_server_context(&_soap_ctx,
-				SOAP_SSL_DEFAULT,
+				flags,
 				keyfile,
 				password,
 				cacert,
@@ -153,4 +159,8 @@ void webservice::_init() {
     throw (engine_error() << "bind with host `" << _config.get_host()
 	   << "' on port `" << _config.get_port() << "' failed.");
   }
+}
+
+void webservice::_sigpipe_handle(int x) {
+  (void)x;
 }

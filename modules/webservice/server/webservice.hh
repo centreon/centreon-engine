@@ -17,8 +17,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef CCE_MOD_WS_WERBSERVICE_HH
-# define CCE_MOD_WS_WERBSERVICE_HH
+#ifndef CCE_MOD_WS_SERVER_WERBSERVICE_HH
+# define CCE_MOD_WS_SERVER_WERBSERVICE_HH
 
 # include <QThread>
 # include <QString>
@@ -51,6 +51,7 @@ namespace                       com {
                                 webservice& operator=(webservice const& right);
 
 	  void                  _init();
+	  static void           _sigpipe_handle(int x);
 
 	  soap                  _soap_ctx;
 	  bool                  _is_end;
@@ -61,4 +62,4 @@ namespace                       com {
   }
 }
 
-#endif // !CCE_MOD_WS_WERBSERVICE_HH
+#endif // !CCE_MOD_WS_SERVER_WERBSERVICE_HH

@@ -18,12 +18,12 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef CCE_MOD_WS_SSL_HH
-# define CCE_MOD_WS_SSL_HH
+#ifndef CCE_MOD_WS_SERVER_SSL_HH
+# define CCE_MOD_WS_SERVER_SSL_HH
 
 #  ifdef WITH_OPENSSL
 int CRYPTO_thread_setup();
 void CRYPTO_thread_cleanup();
 # endif // !WITH_OPENSSL
 
-#endif // !CCE_MOD_WS_SSL_HH
+#endif // !CCE_MOD_WS_SERVER_SSL_HH

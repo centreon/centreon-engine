@@ -17,8 +17,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef CCE_MOD_WS_CONFIGURATION_HH
-# define CCE_MOD_WS_CONFIGURATION_HH
+#ifndef CCE_MOD_WS_SERVER_CONFIGURATION_HH
+# define CCE_MOD_WS_SERVER_CONFIGURATION_HH
 
 # include <QXmlStreamReader>
 # include <QString>
@@ -91,4 +91,4 @@ namespace                  com {
   }
 }
 
-#endif // !CCE_MOD_WS_CONFIGURATION_HH
+#endif // !CCE_MOD_WS_SERVER_CONFIGURATION_HH

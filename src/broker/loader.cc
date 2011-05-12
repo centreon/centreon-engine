@@ -162,9 +162,6 @@ QList<QSharedPointer<handle> > loader::get_modules() const throw() {
  *  @param[in] directory The Directory path content modules.
  */
 void loader::set_directory(QString const& directory) {
-  if (pathconf(directory.toStdString().c_str(), _PC_PATH_MAX) == -1) {
-    throw (engine_error() << "invalid directory");
-  }
   _directory = directory;
 }
 

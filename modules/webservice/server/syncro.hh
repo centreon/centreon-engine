@@ -17,8 +17,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef CCE_MOD_WS_SYNCRO_HH
-# define CCE_MOD_WS_SYNCRO_HH
+#ifndef CCE_MOD_WS_SERVER_SYNCRO_HH
+# define CCE_MOD_WS_SERVER_SYNCRO_HH
 
 # include <QWaitCondition>
 # include <QMutex>
@@ -59,4 +59,4 @@ namespace                com {
   }
 }
 
-#endif // !CCE_MOD_WS_SYNCRO_HH
+#endif // !CCE_MOD_WS_SERVER_SYNCRO_HH
