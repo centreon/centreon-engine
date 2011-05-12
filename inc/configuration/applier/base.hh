@@ -24,22 +24,26 @@ namespace                com {
   namespace              centreon {
     namespace            engine {
       namespace          configuration {
-	namespace        applier {
-	/**
-	 *  @class base base.hh
-	 *  @brief Parent class of all applier objects.
-	 *
-	 *  Parent class of all applier objects.
-	 */
-	  class          base {
-	  public:
-	    virtual      ~base() throw() = 0;
+        // Forward declaration.
+        class            state;
 
-	    virtual void apply(state const& config) = 0;
-	  };
+        namespace        applier {
+          /**
+           *  @class base base.hh
+           *  @brief Parent class of all applier objects.
+           *
+           *  Parent class of all applier objects.
+           */
+          class          base {
+           public:
+                         base();
+                         base(base const& b);
+            virtual      ~base() throw ();
+            base&        operator=(base const& b);
 
-	  inline base::~base() throw() {}
-	}
+            virtual void apply(state const& config) = 0;
+          };
+        }
       }
     }
   }
