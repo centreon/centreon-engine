@@ -3068,6 +3068,8 @@ int run_sync_host_check_3x(host* hst,
 			       FALSE,
 			       use_cached_result,
                                check_timestamp_horizon);
+  if (check_result_code)
+    *check_result_code = hst->current_state;
 
   /* free memory */
   delete[] old_plugin_output;
