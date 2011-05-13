@@ -307,9 +307,6 @@ if (WITH_STARTUP_SCRIPT)
   endif ()
 endif ()
 
-# Lock file location.
-# XXX
-
 # Embedded Perl.
 option(WITH_EMBEDDED_PERL "Enable embedded Perl" OFF)
 option(WITH_PERL_CACHE "Enable cacheing of internally compiled Perl scripts.")
@@ -446,6 +443,16 @@ add_executable("centenginestats"
   "${BASE_DIR}/centenginestats.c"
 )
 install(TARGETS "centenginestats" DESTINATION "${bindir}")
+
+# Install directories.
+install(CODE "
+  file(MAKE_DIRECTORY \"${bindir}\")
+  file(MAKE_DIRECTORY \"${sysconfdir}\")
+  file(MAKE_DIRECTORY \"${vardir}\")
+  file(MAKE_DIRECTORY \"${CHECK_RESULT_DIR}\")
+  file(MAKE_DIRECTORY \"${TMPDIR}\")
+  file(MAKE_DIRECTORY \"${localstatedir}/rw\")
+  file(MAKE_DIRECTORY \"${localstatedir}/archives\")")
 
 # Documentation.
 add_subdirectory("doc")
