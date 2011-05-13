@@ -71,6 +71,7 @@ since 1999.  If I missed your name, let me know.
 * Joel Crisp
 * Jean-Eric Cuendet
 * Ahmon Dancy
+* Rune Darrud
 * Jan David
 * Stephen Davies
 * Karl DeBisschop
