@@ -42,8 +42,11 @@ configure_file("${MY_SRC_DIR}/objects/timeperiods.cfg.in"
 configure_file("${MY_SRC_DIR}/objects/windows.cfg.in"
   "${MY_SRC_DIR}/objects/windows.cfg")
 
-#install files.
-install(DIRECTORY "${MY_SRC_DIR}/"
-  DESTINATION "${sysconfdir}/"
-  COMPONENT "runtime"
-  FILES_MATCHING PATTERN "*.cfg")
+# Install files if necessary.
+option(WITH_SAMPLE_CONFIG "Install sample configuration files." ON)
+if (WITH_SAMPLE_CONFIG)
+  install(DIRECTORY "${MY_SRC_DIR}/"
+    DESTINATION "${sysconfdir}/"
+    COMPONENT "runtime"
+    FILES_MATCHING PATTERN "*.cfg")
+endif ()

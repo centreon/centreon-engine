@@ -120,14 +120,14 @@
  *  @code
  *    cd ~/downloads
  *    tar xzf centreon-engine.tar.gz
- *    cd centreon-engine
+ *    cd centreon-engine/build
  *  @endcode
  *
  *  Configure your Centreon Engine setup with CMake, passing the name of
  *  the user you created earlier like so :
  *
  *  @code
- *    cmake -DWITH_USER=centreon .
+ *    cmake -DWITH_USER=centreon -DWITH_GROUP=centreon .
  *  @endcode
  *
  *  Compile the Centreon Engine source code.
@@ -136,12 +136,11 @@
  *    make
  *  @endcode
  *
- *  Install binaries, init script, sample config files and set
+ *  Install binaries and init script, sample config files and set
  *  permissions on the external command directory.
  *
  *  @code
  *    make install
- *    XXX more commands
  *  @endcode
  *
  *  Don't start Centreon Engine yet - there's still more that needs to
