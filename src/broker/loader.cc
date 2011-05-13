@@ -60,7 +60,7 @@ void loader::load() {
       module = add_module(dir.path() + "/" + it->fileName(), config_file);
       module->open();
       logit(NSLOG_INFO_MESSAGE, false,
-	    "Event broker module `%s' initialized syccessfully.\n",
+	    "Event broker module `%s' initialized successfully.\n",
 	    it->fileName().toStdString().c_str());
     }
     catch (error const& e) {

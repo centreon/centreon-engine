@@ -29,9 +29,9 @@ add_custom_command(OUTPUT
   COMMAND "${SOAPCPP2_PROGRAM}" "-S" "-L" "-x" "-d${MODULE_DIR}/server" "-I${GSOAP_INCLUDE_DIR}" "${MODULE_DIR}/server/centreon-engine-ws.hh"
   DEPENDS "${MODULE_DIR}/server/centreon-engine-ws.hh")
 
-# Include Directories
-include_directories("${INCLUDE_DIR}")
+# Include Directories.
 include_directories("${MODULE_DIR}/server")
+include_directories("${MODULE_DIR}/../external_cmd")
 
 # Qt moc files.
 qt4_wrap_cpp(QT_WS_MOC_FILES
@@ -46,8 +46,12 @@ add_library("webservice"
   "${MODULE_DIR}/server/webservice.cc"
   "${MODULE_DIR}/server/configuration.cc"
   "${MODULE_DIR}/server/ssl.cc"
-  "${MODULE_DIR}/server/syncro.cc"
   "${MODULE_DIR}/server/main.cc"
+  "${MODULE_DIR}/server/syncro.cc"
+  "${MODULE_DIR}/server/webservice.hh"
+  "${MODULE_DIR}/server/configuration.hh"
+  "${MODULE_DIR}/server/ssl.hh"
+  "${MODULE_DIR}/server/syncro.hh"
   ${QT_WS_MOC_FILES})
 get_property(MODULE_COMPILE_FLAGS
   TARGET "webservice"
@@ -64,7 +68,8 @@ target_link_libraries("webservice"
   ${SSL_LIBRARIES}
   ${CRYPTO_LIBRARIES}
   ${ZLIB_LIBRARIES}
-  ${QT_LIBRARIES})
+  ${QT_LIBRARIES}
+  "external_cmd")
 install(TARGETS "webservice"
   DESTINATION "${libdir}/"
   COMPONENT "runtime")

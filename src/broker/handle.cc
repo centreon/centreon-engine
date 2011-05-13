@@ -123,6 +123,7 @@ void handle::open() {
   }
 
   _handle = QSharedPointer<QLibrary>(new QLibrary(_filename));
+  _handle->setLoadHints(QLibrary::ResolveAllSymbolsHint);
   _handle->load();
   if (_handle->isLoaded() == false) {
     throw (engine_error() << _handle->errorString());

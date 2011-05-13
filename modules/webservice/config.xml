@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <webservice>
   <host>127.0.0.1</host>
-  <port>4242</port>
+  <port>4042</port>
   <recv_timeout>5</recv_timeout>
   <send_timeout>5</send_timeout>
   <accept_timeout>500</accept_timeout>

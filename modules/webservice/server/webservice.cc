@@ -83,7 +83,7 @@ void  webservice::run() {
       break;
     }
 
-#ifndef WITH_OPENSSL
+#ifdef WITH_OPENSSL
     if (_config.get_ssl_enable() == true
 	&& soap_ssl_accept(soap_cpy) != SOAP_OK) {
       char buf_error[1024];
@@ -125,6 +125,9 @@ void webservice::_init() {
 #endif // !WITH_OPENSSL
 
   soap_init(&_soap_ctx);
+  _soap_ctx.accept_timeout = _config.get_accept_timeout();
+  _soap_ctx.send_timeout = _config.get_send_timeout();
+  _soap_ctx.recv_timeout = _config.get_recv_timeout();
 
 #ifdef WITH_OPENSSL
   if (_config.get_ssl_enable() == true) {

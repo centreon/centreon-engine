@@ -31,7 +31,6 @@
 #include "broker.hh"
 #include "sretention.hh"
 #include "utils.hh"
-#include "commands.hh"
 #include "notifications.hh"
 #include "logging.hh"
 #include "events.hh"
@@ -1328,8 +1327,17 @@ int event_execution_loop(void) {
 		       "No events to execute at the moment.  Idling for a bit...\n");
 
 	/* check for external commands if we're supposed to check as often as possible */
-	if (config.get_command_check_interval() == -1)
-	  check_for_external_commands();
+	if (config.get_command_check_interval() == -1) {
+	  /* send data to event broker */
+	  broker_external_command(NEBTYPE_EXTERNALCOMMAND_CHECK,
+				  NEBFLAG_NONE,
+				  NEBATTR_NONE,
+				  CMD_NONE,
+				  time(NULL),
+				  NULL,
+				  NULL,
+				  NULL);
+	}
 
 	/* set time to sleep so we don't hog the CPU... */
 	delay.tv_sec = (time_t)config.get_sleep_time();
@@ -1421,8 +1429,15 @@ int handle_timed_event(timed_event* event) {
   case EVENT_COMMAND_CHECK:
     log_debug_info(DEBUGL_EVENTS, 0, "** External Command Check Event\n");
 
-    /* check for external commands */
-    check_for_external_commands();
+    /* send data to event broker */
+    broker_external_command(NEBTYPE_EXTERNALCOMMAND_CHECK,
+			    NEBFLAG_NONE,
+			    NEBATTR_NONE,
+			    CMD_NONE,
+			    time(NULL),
+			    NULL,
+			    NULL,
+			    NULL);
     break;
 
   case EVENT_LOG_ROTATION:

@@ -5568,7 +5568,7 @@ int centreonengine__hostGetStateLastUp(soap* s,
  */
 int centreonengine__hostGetStatePercentChange(soap* s,
                                               ns1__hostIDType* host_id,
-                                              time_t& val) {
+                                              ULONG64& val) {
   try {
     syncro::instance().waiting_callback();
 
@@ -11400,7 +11400,7 @@ int centreonengine__serviceGetStateLastWarning(soap* s,
  */
 int centreonengine__serviceGetStatePercentChange(soap* s,
                                                  ns1__serviceIDType* service_id,
-                                                 time_t& val) {
+                                                 ULONG64& val) {
   try {
     syncro::instance().waiting_callback();
 

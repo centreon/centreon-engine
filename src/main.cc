@@ -428,12 +428,6 @@ int main(int argc, char** argv) {
           // Clean up the status data.
           cleanup_status_data(config_file, TRUE);
 
-          // Shutdown the external command worker thread.
-          shutdown_command_file_worker_thread();
-
-          // Close and delete the external command file FIFO.
-          close_command_file();
-
           // Cleanup embedded perl interpreter.
           if (embedded_perl_initialized == TRUE)
             deinit_embedded_perl();
@@ -470,22 +464,6 @@ int main(int argc, char** argv) {
                            NEBFLAG_NONE,
                            NEBATTR_NONE,
                            NULL);
-
-      // Open the command file (named pipe) for reading.
-      result = open_command_file();
-      if (result != OK) {
-
-        logger(log_process_info | log_runtime_error, basic)
-          << "Bailing out due to errors encountered while trying to initialize the external command file ... (PID=" << getpid() << ")";
-
-        // Send program data to broker.
-        broker_program_state(NEBTYPE_PROCESS_SHUTDOWN,
-                             NEBFLAG_PROCESS_INITIATED,
-                             NEBATTR_SHUTDOWN_ABNORMAL,
-                             NULL);
-        cleanup();
-        exit(ERROR);
-      }
 
       // Initialize status data unless we're starting.
       if (sigrestart == FALSE)
@@ -613,12 +591,6 @@ int main(int argc, char** argv) {
       // Clean up the status data unless we're restarting.
       if (sigrestart == FALSE)
         cleanup_status_data(config_file, TRUE);
-
-      // Close and delete the external command file FIFO unless we're restarting.
-      if (sigrestart == FALSE) {
-        shutdown_command_file_worker_thread();
-        close_command_file();
-      }
 
       // Cleanup embedded perl interpreter.
       if (sigrestart == FALSE)

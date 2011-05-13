@@ -50,8 +50,8 @@ struct                  passive_check_result {
   passive_check_result* next;
 };
 
-static passive_check_result*   passive_check_result_list = NULL;
-static passive_check_result*   passive_check_result_list_tail = NULL;
+static passive_check_result* passive_check_result_list = NULL;
+static passive_check_result* passive_check_result_list_tail = NULL;
 
 /******************************************************************/
 /****************** EXTERNAL COMMAND PROCESSING *******************/
@@ -67,16 +67,6 @@ int check_for_external_commands(void) {
   /* bail out if we shouldn't be checking for external commands */
   if (config.get_check_external_commands() == false)
     return (ERROR);
-
-  /* send data to event broker */
-  broker_external_command(NEBTYPE_EXTERNALCOMMAND_CHECK_START,
-                          NEBFLAG_NONE,
-                          NEBATTR_NONE,
-                          CMD_NONE,
-                          time(NULL),
-                          NULL,
-                          NULL,
-                          NULL);
 
   /* update last command check time */
   last_command_check = time(NULL);
@@ -133,16 +123,6 @@ int check_for_external_commands(void) {
   /**** PROCESS ALL PASSIVE HOST AND SERVICE CHECK RESULTS AT ONE TIME ****/
   if (passive_check_result_list != NULL)
     process_passive_checks();
-
-  /* send data to event broker */
-  broker_external_command(NEBTYPE_EXTERNALCOMMAND_CHECK_END,
-                          NEBFLAG_NONE,
-                          NEBATTR_NONE,
-                          CMD_NONE,
-                          time(NULL),
-                          NULL,
-                          NULL,
-                          NULL);
 
   return (OK);
 }

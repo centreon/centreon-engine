@@ -72,13 +72,6 @@ int init_embedded_perl(char** env);                                             
 int deinit_embedded_perl(void);                                                                    // cleans up embedded perl
 int file_uses_embedded_perl(char* fname);                                                          // tests whether or not the embedded perl interpreter should be used on a file
 
-int init_command_file_worker_thread(void);
-int shutdown_command_file_worker_thread(void);
-void cleanup_command_file_worker_thread(void* arg);
-void*  command_file_worker_thread(void* arg);
-int submit_external_command(char* cmd, int* buffer_items);
-int submit_raw_external_command(char* cmd, time_t* ts, int* buffer_items);
-
 // Check Statistics Functions
 int init_check_stats(void);
 int update_check_stats(int check_type, time_t check_time);
@@ -101,8 +94,6 @@ int add_check_result_to_list(check_result* new_cr);
 int free_check_result_list(void);
 int free_check_result(check_result* info); // frees memory associated with a host/service check result
 int parse_check_output(char* buf, char** short_output, char** long_output, char** perf_data, int escape_newlines_please, int newlines_are_escaped);
-int open_command_file(void);               // creates the external command file as a named pipe (FIFO) and opens it for reading
-int close_command_file(void);              // closes and deletes the external command file (FIFO)
 
 # ifdef __cplusplus
 }

@@ -22,14 +22,13 @@
 #include "nebmodules.hh"
 #include "nebcallbacks.hh"
 #include "nebstructs.hh"
-#include "broker.hh"
-#include "logging.hh"
-#include "configuration.hh"
+#include "logging/logger.hh"
 #include "error.hh"
-#include "syncro.hh"
-#include "webservice.hh"
+#include "broker.hh"
+#include "commands.hh"
+#include "utils.hh"
 
-using namespace com::centreon::engine::modules;
+using namespace com::centreon::engine::logging;
 
 /**************************************
  *                                     *
@@ -42,8 +41,6 @@ NEB_API_VERSION(CURRENT_NEB_API_VERSION)
 
 // Module handle
 static void*          gl_mod_handle = NULL;
-static webservice*    gl_webservice = NULL;
-static configuration* gl_config = NULL;
 
 /**************************************
  *                                     *
@@ -75,7 +72,7 @@ int callback_external_command(int callback_type, void* data) {
     return (0);
 
   try {
-    syncro::instance().wakeup_worker();
+    check_for_external_commands();
   }
   catch (...) {
 
@@ -106,20 +103,20 @@ extern "C" int nebmodule_deinit(int flags, int reason) {
   (void)reason;
 
   try {
-    delete gl_webservice;
-    delete gl_config;
-
     neb_deregister_callback(NEBCALLBACK_EXTERNAL_COMMAND_DATA,
-			    callback_external_command);
+    			    callback_external_command);
+
+    // Close and delete the external command file FIFO.
+    shutdown_command_file_worker_thread();
+    close_command_file();
   }
   catch (std::exception const& e) {
-      logit(NSLOG_RUNTIME_ERROR, false,
-	    "webservice runtime error `%s'.\n",
-	    e.what());
+      logger(log_runtime_error, basic)
+	<< "external command runtime error `" << e.what() << "'.\n";
   }
   catch (...) {
-      logit(NSLOG_RUNTIME_ERROR, false,
-	    "webservice runtime error `unknown'\n");
+      logger(log_runtime_error, basic)
+	<< "external command runtime error `unknown'\n";
   }
   return (0);
 }
@@ -132,13 +129,13 @@ extern "C" int nebmodule_deinit(int flags, int reason) {
  *  stuff like config file parsing, thread creation, ...
  *
  *  @param[in] flags  Unused.
- *  @param[in] args   The argument string of the module (shall contain the
- *                    configuration file name).
+ *  @param[in] args   Unused.
  *  @param[in] handle The module handle.
  *
  *  @return 0 on success, any other value on failure.
  */
 extern "C" int nebmodule_init(int flags, char const* args, void* handle) {
+  (void)args;
   (void)flags;
 
   // Save module handle for future use.
@@ -147,7 +144,7 @@ extern "C" int nebmodule_init(int flags, char const* args, void* handle) {
   // Set module informations.
   neb_set_module_info(gl_mod_handle,
 		      NEBMODULE_MODINFO_TITLE,
-		      "Centreon-Engine's Webservice");
+		      "Centreon-Engine's external command");
   neb_set_module_info(gl_mod_handle,
 		      NEBMODULE_MODINFO_AUTHOR,
 		      "Merethis");
@@ -162,39 +159,35 @@ extern "C" int nebmodule_init(int flags, char const* args, void* handle) {
 		      "GPL version 2");
   neb_set_module_info(gl_mod_handle,
 		      NEBMODULE_MODINFO_DESC,
-		      "Centreon-Engine's Webservice provide system to " \
-		      "execute commands over a network with a Simple Object" \
-		      "Access Protocol.");
+		      "Centreon-Engine's external command provide system to " \
+		      "execute commands over a pipe.");
 
   try {
-    // Initialise configuration.
-    gl_config = new configuration;
-    if (args != NULL) {
-      gl_config->set_filename(args);
-      gl_config->parse();
+    // Open the command file (named pipe) for reading.
+    if (open_command_file() != OK) {
+      logger(log_process_info | log_runtime_error, basic)
+	<< "Bailing out due to errors encountered while trying to "
+	<< "initialize the external command file ... "
+	<< "(PID=" << getpid() << ")";
+      return (1);
     }
 
     // Register callbacks.
     if (neb_register_callback(NEBCALLBACK_EXTERNAL_COMMAND_DATA,
-			      gl_mod_handle,
-			      0,
-			      callback_external_command) != 0) {
+    			      gl_mod_handle,
+    			      0,
+    			      callback_external_command) != 0) {
       throw (engine_error() << "register callback failed");
     }
-
-    // Initialise webservice.
-    gl_webservice = new webservice(*gl_config);
-    gl_webservice->start();
   }
   catch (std::exception const& e) {
-      logit(NSLOG_RUNTIME_ERROR, false,
-	    "webservice runtime error `%s'.\n",
-	    e.what());
+      logger(log_runtime_error, basic)
+	<< "external command runtime error `" << e.what() << "'.\n";
     return (1);
   }
   catch (...) {
-      logit(NSLOG_RUNTIME_ERROR, false,
-	    "webservice runtime error `unknown'.\n");
+      logger(log_runtime_error, basic)
+	<< "external command runtime error `unknown'.\n";
     return (1);
   }
 

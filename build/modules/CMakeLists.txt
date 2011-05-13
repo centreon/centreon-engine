@@ -17,4 +17,5 @@
 ## <http://www.gnu.org/licenses/>.
 ##
 
+add_subdirectory("./external_cmd")
 add_subdirectory("./webservice")

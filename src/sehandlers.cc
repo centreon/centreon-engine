@@ -28,7 +28,6 @@
 #include "neberrors.hh"
 #include "logging.hh"
 #include "notifications.hh"
-#include "commands.hh"
 #include "utils.hh"
 #include "sehandlers.hh"
 
@@ -256,8 +255,15 @@ int handle_service_event(service* svc) {
     run_service_event_handler(&mac, svc);
   clear_volatile_macros(&mac);
 
-  /* check for external commands - the event handler may have given us some directives... */
-  check_for_external_commands();
+  /* send data to event broker */
+  broker_external_command(NEBTYPE_EXTERNALCOMMAND_CHECK,
+			  NEBFLAG_NONE,
+			  NEBATTR_NONE,
+			  CMD_NONE,
+			  time(NULL),
+			  NULL,
+			  NULL,
+			  NULL);
 
   return (OK);
 }
@@ -596,8 +602,15 @@ int handle_host_event(host* hst) {
   if (hst->event_handler != NULL)
     run_host_event_handler(&mac, hst);
 
-  /* check for external commands - the event handler may have given us some directives... */
-  check_for_external_commands();
+  /* send data to event broker */
+  broker_external_command(NEBTYPE_EXTERNALCOMMAND_CHECK,
+			  NEBFLAG_NONE,
+			  NEBATTR_NONE,
+			  CMD_NONE,
+			  time(NULL),
+			  NULL,
+			  NULL,
+			  NULL);
 
   return (OK);
 }

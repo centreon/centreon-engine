@@ -811,10 +811,6 @@ int run_async_service_check(service* svc,
     /* set environment variables */
     set_all_macro_environment_vars(&mac, TRUE);
 
-    /* ADDED 11/12/07 EG */
-    /* close external command file and shut down worker thread */
-    close_command_file();
-
     /* fork again if we're not in a large installation */
     if (config.get_child_processes_fork_twice() == true) {
 
@@ -3684,10 +3680,6 @@ int run_async_host_check_3x(host* hst,
 
     /* set environment variables */
     set_all_macro_environment_vars(&mac, TRUE);
-
-    /* ADDED 11/12/07 EG */
-    /* close external command file and shut down worker thread */
-    close_command_file();
 
     /* fork again if we're not in a large installation */
     if (config.get_child_processes_fork_twice() == true) {

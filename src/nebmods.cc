@@ -126,7 +126,7 @@ int neb_load_module(void* mod) {
   try {
     module->open();
     logit(NSLOG_INFO_MESSAGE, false,
-	  "Event broker module `%s' initialized syccessfully.\n",
+	  "Event broker module `%s' initialized successfully.\n",
 	  module->get_filename().toStdString().c_str());
   }
   catch (error const& e) {

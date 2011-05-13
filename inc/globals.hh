@@ -84,10 +84,6 @@ extern time_t                    event_start;
 
 extern int                       embedded_perl_initialized;
 
-extern int                       command_file_fd;
-extern FILE*                     command_file_fp;
-extern int                       command_file_created;
-
 extern host*                     host_list;
 extern host*                     host_list_tail;
 extern service*                  service_list;

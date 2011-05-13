@@ -78,10 +78,6 @@ time_t                    event_start = 0L;
 
 int                       embedded_perl_initialized = FALSE;
 
-int                       command_file_fd = -1;
-FILE*                     command_file_fp = NULL;
-int                       command_file_created = FALSE;
-
 host*                     host_list = NULL;
 host*                     host_list_tail = NULL;
 service*                  service_list = NULL;
