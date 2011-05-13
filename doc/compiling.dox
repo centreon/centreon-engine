@@ -191,6 +191,10 @@
  *    <td>WITH_DOCUMENTATION</td>
  *    <td>Enable or disable documentation generation. @em Doxygen must be present on your machine.</td>
  *  <tr>
+ *  <tr>
+ *    <td>WITH_SAMPLE_CONFIG</td>
+ *    <td>Enable or disable sample configuration files installation.</td>
+ *  </tr>
  *  </table>
  *
  *
