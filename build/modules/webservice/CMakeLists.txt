@@ -31,12 +31,12 @@ find_program(SOAPCPP2_PROGRAM "soapcpp2")
 if (NOT SOAPCPP2_PROGRAM)
   message(FATAL_ERROR "Could not find gSOAP's soapcpp2 binary.")
 endif ()
-find_path(GSOAP_INCLUDE_DIR NAMES "stdsoap2.h"
+find_path(GSOAP_INC_DIR NAMES "stdsoap2.h"
   PATH_SUFFIXES "" "gsoap")
-if (NOT GSOAP_INCLUDE_DIR)
+if (NOT GSOAP_INC_DIR)
   message(FATAL_ERROR "Could not find gSOAP's stdsoap2.h header file.")
 endif ()
-include_directories("${GSOAP_INCLUDE_DIR}")
+include_directories("${GSOAP_INC_DIR}")
 find_path(GSOAP_INCLUDE_DIR NAMES "stlvector.h"
   HINTS "/usr/share/gsoap/import" "/usr/local/share/gsoap/import"
   PATH_SUFFIXES "" "gsoap")
