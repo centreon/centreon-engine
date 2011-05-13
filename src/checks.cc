@@ -1361,7 +1361,8 @@ int handle_async_service_check_result(service* temp_service, check_result* queue
     /* reset notification suppression option */
     temp_service->no_more_notifications = FALSE;
 
-    if (temp_service->acknowledgement_type == ACKNOWLEDGEMENT_NORMAL) {
+    if ((ACKNOWLEDGEMENT_NORMAL == temp_service->acknowledgement_type)
+	&& ((TRUE == state_change) || (FALSE == hard_state_change))) {
 
       temp_service->problem_has_been_acknowledged = FALSE;
       temp_service->acknowledgement_type = ACKNOWLEDGEMENT_NONE;
