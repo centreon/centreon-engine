@@ -660,7 +660,7 @@ int check_time_against_period(time_t test_time, timeperiod* tperiod) {
   timeperiodexclusion* first_timeperiodexclusion = NULL;
   daterange* temp_daterange = NULL;
   timerange* temp_timerange = NULL;
-  unsigned long midnight = 0L;
+  time_t midnight = (time_t)0L;
   time_t start_time = (time_t)0L;
   time_t end_time = (time_t)0L;
   int found_match = FALSE;
@@ -707,7 +707,7 @@ int check_time_against_period(time_t test_time, timeperiod* tperiod) {
   t->tm_sec = 0;
   t->tm_min = 0;
   t->tm_hour = 0;
-  midnight = (unsigned long)mktime(t);
+  midnight = mktime(t);
 
   /**** check exceptions first ****/
   for (daterange_type = 0;
@@ -896,14 +896,10 @@ int check_time_against_period(time_t test_time, timeperiod* tperiod) {
           continue;
 
         /* Check if interval is accress dlst change and gets the compensation. */
-        {
-          time_t midnight_time(midnight);
-          shift = get_dst_shift(&start_time, &midnight_time);
-          midnight = midnight_time;
-        }
+        shift = get_dst_shift(&start_time, &midnight);
 
         /* how many days have passed between skip start date and test time? */
-        days = (shift + midnight - (unsigned long)start_time) / (3600 * 24);
+        days = (shift + (unsigned long)midnight - (unsigned long)start_time) / (3600 * 24);
 
         /* if test date doesn't fall on a skip interval day, bail out early */
         if ((days % temp_daterange->skip_interval) != 0)
@@ -911,12 +907,12 @@ int check_time_against_period(time_t test_time, timeperiod* tperiod) {
 
         /* use midnight of test date as start time */
         else
-          start_time = (time_t)midnight;
+          start_time = midnight;
 
         /* if skipping range has no end, use test date as end */
         if ((daterange_type == DATERANGE_CALENDAR_DATE)
             && (is_daterange_single_day(temp_daterange) == TRUE))
-          end_time = (time_t)midnight;
+          end_time = midnight;
       }
 
 #ifdef TEST_TIMEPERIODS_A
@@ -927,7 +923,7 @@ int check_time_against_period(time_t test_time, timeperiod* tperiod) {
 #endif
 
       /* time falls into the range of days */
-      if ((time_t)midnight >= start_time && (time_t)midnight <= end_time)
+      if (midnight >= start_time && midnight <= end_time)
         found_match = TRUE;
 
       /* found a day match, so see if time ranges are good */
@@ -999,7 +995,7 @@ static void _get_next_valid_time(time_t pref_time,
   time_t preferred_time = (time_t)0L;
   timerange* temp_timerange;
   daterange* temp_daterange;
-  unsigned long midnight = 0L;
+  time_t midnight = (time_t)0L;
   struct tm* t, tm_s;
   time_t day_start = (time_t)0L;
   time_t day_range_start = (time_t)0L;
@@ -1053,7 +1049,7 @@ static void _get_next_valid_time(time_t pref_time,
   t->tm_sec = 0;
   t->tm_min = 0;
   t->tm_hour = 0;
-  midnight = (unsigned long)mktime(t);
+  midnight = mktime(t);
 
   /* save pref time values for later */
   pref_time_year = t->tm_year;
@@ -1311,18 +1307,14 @@ static void _get_next_valid_time(time_t pref_time,
         if (start_time < preferred_time) {
 
           /* Check if the interval is across dlst change and gets the compensation. */
-          {
-            time_t midnight_time(midnight);
-            shift = get_dst_shift(&start_time, &midnight_time);
-            midnight = midnight_time;
-          }
+          shift = get_dst_shift(&start_time, &midnight);
 
           /* how many days have passed between skip start date and preferred time? */
-          days = (shift + midnight - (unsigned long)start_time) / (3600 * 24);
+          days = (shift + (unsigned long)midnight - (unsigned long)start_time) / (3600 * 24);
 
 #ifdef TEST_TIMEPERIODS_B
-          printf("MIDNIGHT: %lu = %s", midnight, ctime(&midnight));
-          printf("%lu SECONDS PASSED\n", (midnight - (unsigned long)start_time));
+          printf("MIDNIGHT: %lu = %s", (unsigned long)midnight, ctime(&midnight));
+          printf("%lu SECONDS PASSED\n", (unsigned long)(midnight - start_time));
           printf("%d DAYS PASSED\n", days);
           printf("REMAINDER: %d\n", (days % temp_daterange->skip_interval));
           printf("SKIP INTERVAL: %d\n", temp_daterange->skip_interval);
