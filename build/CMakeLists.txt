@@ -676,6 +676,16 @@ install(TARGETS "centenginestats"
   DESTINATION "${bindir}"
   COMPONENT "runtime")
 
+# Create directories.
+install(CODE "
+  file(MAKE_DIRECTORY \"${bindir}\")
+  file(MAKE_DIRECTORY \"${sysconfdir}\")
+  file(MAKE_DIRECTORY \"${vardir}\")
+  file(MAKE_DIRECTORY \"${CHECK_RESULT_DIR}\")
+  file(MAKE_DIRECTORY \"${TMPDIR}\")
+  file(MAKE_DIRECTORY \"${localstatedir}/rw\")
+  file(MAKE_DIRECTORY \"${localstatedir}/archives\")")
+
 # Install header files for devel.
 install(DIRECTORY "${INCLUDE_DIR}/"
   DESTINATION "${localstatedir}/include/centreon-engine/"
