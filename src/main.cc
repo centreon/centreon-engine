@@ -49,6 +49,7 @@
 #include "logging/broker.hh"
 #include "logging/engine.hh"
 #include "engine.hh"
+#include "compatibility/common.h"
 
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;
@@ -163,7 +164,8 @@ int main(int argc, char** argv) {
       << "General Public License for more details.\n"
       << "\n"
       << "You should have received a copy of the GNU General Public License along\n"
-      << "with Centreon Engine. If not, see <http://www.gnu.org/licenses/>.\n";
+      << "with Centreon Engine. If not, see <http://www.gnu.org/licenses/>.\n\n"
+      << "Centreon Engine version: " << get_program_version() << "\n";
     exit(EXIT_SUCCESS);
   }
 
