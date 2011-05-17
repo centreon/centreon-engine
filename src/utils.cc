@@ -2419,13 +2419,13 @@ int parse_check_output(char* buf,
 
       delete[] tempbuf;
       tempbuf = NULL;
-    }
 
-    /* shift data back to front of buffer and adjust counters */
-    memmove((void*)&buf[0], (void*)&buf[x + 1], (size_t)((int)used_buf - x - 1));
-    used_buf -= (x + 1);
-    buf[used_buf] = '\x0';
-    x = -1;
+      /* shift data back to front of buffer and adjust counters */
+      memmove((void*)&buf[0], (void*)&buf[x + 1], (size_t)((int)used_buf - x - 1));
+      used_buf -= (x + 1);
+      buf[used_buf] = '\x0';
+      x = -1;
+    }
   }
 
   /* save long output */
