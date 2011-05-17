@@ -693,12 +693,10 @@ install(DIRECTORY "${INCLUDE_DIR}/"
 
 # Add subdirectories.
 add_subdirectory("broker")
-add_subdirectory("checks")
 add_subdirectory("conf")
 add_subdirectory("configuration")
 add_subdirectory("configuration/applier")
 add_subdirectory("compatibility")
-add_subdirectory("commands")
 add_subdirectory("doc")
 add_subdirectory("logging")
 add_subdirectory("modules")
