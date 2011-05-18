@@ -408,6 +408,7 @@ endif ()
 set(bindir "${localstatedir}/bin")
 set(sysconfdir "${localstatedir}/etc")
 set(vardir "${localstatedir}/var")
+set(libdir "${localstatedir}/lib/centreon-engine")
 
 # Check result dir.
 if (WITH_CHECK_RESULT_DIR)
