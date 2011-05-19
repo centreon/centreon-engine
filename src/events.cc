@@ -18,6 +18,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <QCoreApplication>
 #include <stdlib.h>
 #include <stdio.h>
 #include <sys/types.h>
@@ -1078,10 +1079,12 @@ int event_execution_loop(void) {
   sleep_event.prev = NULL;
 
   while (1) {
-
     /* see if we should exit or restart (a signal was encountered) */
     if (sigshutdown == TRUE || sigrestart == TRUE)
       break;
+
+    QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents
+				    | QEventLoop::ExcludeSocketNotifiers);
 
     /* if we don't have any events to handle, exit */
     if (event_list_high == NULL && event_list_low == NULL) {

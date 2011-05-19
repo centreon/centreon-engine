@@ -80,11 +80,11 @@ static void build_resource(QString const& resource) {
     }
 
     ofs << std::string(my_rand(0, 10), ' ')
-    	<< "$USER" + obj2str(i).toStdString() + "$"
+    	<< "$USER" + obj2str(i + 1).toStdString() + "$"
     	<< std::string(my_rand(0, 10), ' ')
     	<< "="
     	<< std::string(my_rand(0, 10), ' ')
-    	<< "USER" + obj2str(i).toStdString()
+    	<< "USER" + obj2str(i + 1).toStdString()
     	<< std::string(my_rand(0, 10), ' ')
     	<< std::endl;
   }
@@ -599,7 +599,7 @@ void test_configuration(QString const& filename, std::map<QString, QString>& my_
   }
 
   for (unsigned int i = 0; i < MAX_USER_MACROS; ++i) {
-    if (macro_user[i] != "USER" + obj2str(i)) {
+    if (macro_user[i] != "USER" + obj2str(i + 1)) {
       throw (engine_error() << "resource_file: init with '" << my_conf["log_rotation_method"] << "'");
     }
   }

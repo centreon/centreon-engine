@@ -19,6 +19,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <QCoreApplication>
 #include <errno.h>
 #include <exception>
 #include <iostream>
@@ -74,6 +75,8 @@ int main(int argc, char** argv, char** env) {
 #else
 int main(int argc, char** argv) {
 #endif // EMBEDDEDPERL
+  QCoreApplication app(argc, argv);
+
   configuration::applier::logging apply_log;
 
   int error = FALSE;

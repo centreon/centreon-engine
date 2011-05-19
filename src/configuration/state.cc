@@ -2625,7 +2625,7 @@ void state::_parse_resource_file(QString const& value) {
     if (!_trim(key).compare(0, 5, "$USER") && key[key.size() - 1] == '$') {
       key = key.substr(5, key.size() - 6);
       if (_str2obj<unsigned int>(key.c_str(), &user_index) == false
-	  || user_index >= MAX_USER_MACROS) {
+	  || user_index > MAX_USER_MACROS || user_index == 0) {
 	logger(log_config_warning, basic) << "warning: [" << _filename
           << ":" << _cur_line << "] bad variable name '" << key << "'";
 	continue;
