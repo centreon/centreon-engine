@@ -2632,8 +2632,8 @@ void state::_parse_resource_file(QString const& value) {
       }
 
       std::string value = line.substr(pos + 1);
-      delete[] macro_user[user_index];
-      macro_user[user_index] = my_strdup(_trim(value).c_str());
+      delete[] macro_user[user_index - 1];
+      macro_user[user_index - 1] = my_strdup(_trim(value).c_str());
     }
     else
       logger(log_config_warning, basic) << "warning: [" << _filename

@@ -25,6 +25,10 @@
 # include "shared.h"
 # include "common.hh"
 
+# ifdef __cplusplus
+extern "C" {
+# endif
+
 # define PROGRAM_NAME "Centreon Engine"
 # define PROGRAM_NAME_UC "CENTREON ENGINE"
 # define PROGRAM_NAME_LC "centreon engine"
@@ -40,5 +44,9 @@ char const* get_program_version();
 #  include <stdlib.h>
 #  define my_free(ptr) do { if(ptr) { free(ptr); ptr = NULL; } } while(0)
 # endif /* !my_free */
+
+# ifdef __cplusplus
+}
+# endif
 
 #endif /* !CCE_COMPATIBILITY_COMMON_H */

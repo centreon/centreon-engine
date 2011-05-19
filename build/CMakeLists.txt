@@ -408,6 +408,7 @@ endif ()
 set(bindir "${localstatedir}/bin")
 set(sysconfdir "${localstatedir}/etc")
 set(vardir "${localstatedir}/var")
+set(libdir "${localstatedir}/lib/centreon-engine")
 
 # Check result dir.
 if (WITH_CHECK_RESULT_DIR)
@@ -692,14 +693,14 @@ install(DIRECTORY "${INCLUDE_DIR}/"
   PATTERN "${INCLUDE_DIR}/compatibility/" EXCLUDE)
 
 # Add subdirectories.
-add_subdirectory("doc")
-add_subdirectory("modules")
 add_subdirectory("broker")
-add_subdirectory("logging")
 add_subdirectory("conf")
 add_subdirectory("configuration")
 add_subdirectory("configuration/applier")
 add_subdirectory("compatibility")
+add_subdirectory("doc")
+add_subdirectory("logging")
+add_subdirectory("modules")
 add_subdirectory("scripts")
 
 #
