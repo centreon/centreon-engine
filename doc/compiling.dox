@@ -195,6 +195,14 @@
  *    <td>WITH_SAMPLE_CONFIG</td>
  *    <td>Enable or disable sample configuration files installation.</td>
  *  </tr>
+ *  <tr>
+ *    <td>WITH_SSL</td>
+ *    <td>Enable or disable SSL support in webservice. Default is disabled.</td>
+ *  </tr>
+ *  <tr>
+ *    <td>WITH_ZLIB</td>
+ *    <td>Enable or disable compression (deflate and gzip) support in webservice. Default is disabled.</td>
+ *  </tr>
  *  </table>
  *
  *
