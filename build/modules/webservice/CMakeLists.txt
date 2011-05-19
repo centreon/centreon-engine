@@ -44,40 +44,52 @@ if (NOT GSOAP_INCLUDE_DIR)
   message(FATAL_ERROR "Could not find gSOAP's stlvector.h header file.")
 endif ()
 
-# Find library.
+# Check for SSL support.
+option(WITH_SSL "Enable or disable SSL support in webservice." OFF)
 if (WITH_SSL)
+  # Find libgsoapssl++.
   find_library(GSOAP_LIBRARIES "gsoapssl++")
   if (NOT GSOAP_LIBRARIES)
     message(FATAL_ERROR "Could not find gSOAP's libgsoapssl++.")
   endif ()
 
+  # Find libssl.
   find_library(SSL_LIBRARIES "ssl")
   if (NOT SSL_LIBRARIES)
     message(FATAL_ERROR "Could not find libssl.")
   endif ()
+
+  # Find libcrypto.
+  find_library(CRYPTO_LIBRARIES "crypto")
+  if (NOT CRYPTO_LIBRARIES)
+    message(FATAL_ERROR "Could not find libcrypto.")
+  endif ()
+
+  # Compilation flag.
+  add_definitions(-DWITH_OPENSSL)
 else ()
+  # Find libgsoap++.
   find_library(GSOAP_LIBRARIES "gsoap++")
   if (NOT GSOAP_LIBRARIES)
     message(FATAL_ERROR "Could not find gSOAP's libgsoap++.")
   endif ()
   set(SSL_LIBRARIES "")
+  set(CRYPTO_LIBRARIES "")
 endif ()
 
-find_library(CRYPTO_LIBRARIES "crypto")
-if (NOT CRYPTO_LIBRARIES)
-  message(FATAL_ERROR "Could not find libcrypto.")
+# Check for compression support.
+option(WITH_ZLIB "Enable or disable compression in webservice." ON)
+if (WITH_ZLIB)
+  # Search for libz.
+  find_library(ZLIB_LIBRARIES "z")
+  if (NOT ZLIB_LIBRARIES)
+    message(FATAL_ERROR "Could not find zlib's libz.")
+  endif ()
+
+  # Enable deflate and gzip compression.
+  add_definitions(-DWITH_GZIP)
 endif ()
 
-find_library(ZLIB_LIBRARIES "z")
-if (NOT ZLIB_LIBRARIES)
-  message(FATAL_ERROR "Could not find zlib's libz.")
-endif ()
-
-# Define flags.
-if (WITH_SSL)
-  add_definitions(-DWITH_OPENSSL)
-endif ()
-add_definitions(-DWITH_GZIP)
-
+# Add subdirectories.
 add_subdirectory("./client")
 add_subdirectory("./server")
