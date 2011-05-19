@@ -240,15 +240,40 @@ if (WITH_PREFIX)
 else ()
   set(localstatedir "${CMAKE_INSTALL_PREFIX}")
 endif ()
-set(bindir "${localstatedir}/bin")
-set(sysconfdir "${localstatedir}/etc")
-set(vardir "${localstatedir}/var")
+
+# bindir.
+if (WITH_PREFIX_BIN)
+  set(bindir "${WITH_PREFIX_BIN}")
+else ()
+  set(bindir "${localstatedir}/bin")
+endif ()
+
+# confdir.
+if (WITH_PREFIX_CONF)
+  set(confdir "${WITH_PREFIX_CONF}")
+else ()
+  set(confdir "${localstatedir}/etc")
+endif ()
+
+# vardir.
+if (WITH_PREFIX_VAR)
+  set(vardir "${WITH_PREFIX_VAR}")
+else ()
+  set(vardir "${localstatedir}/var")
+endif ()
 
 # Check result dir.
 if (WITH_CHECK_RESULT_DIR)
   set(CHECK_RESULT_DIR "${WITH_CHECK_RESULT_DIR}")
 else ()
   set(CHECK_RESULT_DIR "${localstatedir}/spool/checkresults")
+endif ()
+
+# Log archive dir.
+if (WITH_LOG_ARCHIVE_DIR)
+  set(LOG_ARCHIVE_DIR "${WITH_LOG_ARCHIVE_DIR}")
+else ()
+  set(LOG_ARCHIVE_DIR "${localstatedir}/archives")
 endif ()
 
 # Temporary check result dir.
@@ -286,15 +311,45 @@ if (WITH_STARTUP_SCRIPT)
       if (OS_DISTRIBUTOR STREQUAL "CentOS\n")
         message(STATUS "Generating CentOS startup script.")
         set(STARTUP_SCRIPT "CentOS init script")
-	install(PROGRAMS "${SCRIPT_DIR}/centengine.sh"
-	  DESTINATION "/etc/init.d"
-	  RENAME "centengine")
+
+        # Lock file.
+        if (WITH_LOCK_FILE)
+          set(LOCK_FILE "${WITH_LOCK_FILE}")
+        else ()
+          set(LOCK_FILE "/var/lock/subsys")
+        endif ()
+
+        # PID file.
+        if (WITH_PID_FILE)
+          set(PID_FILE "${WITH_PID_FILE}")
+        else ()
+          set(PID_FILE "/var/run/centengine.pid")
+        endif ()
+
+        # Startup dir.
+        if (WITH_STARTUP_DIR)
+          set(STARTUP_DIR "${WITH_STARTUP_DIR}")
+        else ()
+          set(STARTUP_DIR "/etc/init.d")
+        endif ()
+
+        install(PROGRAMS "${SCRIPT_DIR}/centengine.sh"
+          DESTINATION "${STARTUP_DIR}"
+          RENAME "centengine")
       elseif (OS_DISTRIBUTOR STREQUAL "Ubuntu\n")
         message(STATUS "Generating Ubuntu startup script.")
         set(STARTUP_SCRIPT "Ubuntu upstart script")
-	install(FILES "${SCRIPT_DIR}/ubuntu.conf"
-	  DESTINATION "/etc/init"
-	  RENAME "centengine.conf")
+
+        # Startup dir.
+        if (WITH_STARTUP_DIR)
+          set(STARTUP_DIR "${WITH_STARTUP_DIR}")
+        else ()
+          set(STARTUP_DIR "/etc/init")
+        endif ()
+
+        install(FILES "${SCRIPT_DIR}/ubuntu.conf"
+          DESTINATION "${STARTUP_DIR}"
+          RENAME "centengine.conf")
       else ()
         message(STATUS "Unsupported distributor: ${OS_DISTRIBUTOR}")
       endif ()
@@ -447,12 +502,11 @@ install(TARGETS "centenginestats" DESTINATION "${bindir}")
 # Install directories.
 install(CODE "
   file(MAKE_DIRECTORY \"${bindir}\")
-  file(MAKE_DIRECTORY \"${sysconfdir}\")
+  file(MAKE_DIRECTORY \"${confdir}\")
   file(MAKE_DIRECTORY \"${vardir}\")
   file(MAKE_DIRECTORY \"${CHECK_RESULT_DIR}\")
   file(MAKE_DIRECTORY \"${TMPDIR}\")
-  file(MAKE_DIRECTORY \"${localstatedir}/rw\")
-  file(MAKE_DIRECTORY \"${localstatedir}/archives\")")
+  file(MAKE_DIRECTORY \"${LOG_ARCHIVE_DIR}\")")
 
 # Documentation.
 add_subdirectory("doc")
@@ -512,7 +566,8 @@ endif ()
 message(STATUS "    Extra Compilation Flags: ${CMAKE_CXX_FLAGS}")
 message(STATUS "    Prefix:                  ${localstatedir}")
 message(STATUS "    Binary Directory:        ${bindir}")
-message(STATUS "    Configuration Directory: ${sysconfdir}")
+message(STATUS "    Configuration Directory: ${confdir}")
+message(STATUS "    Var Directory:           ${vardir}")
 message(STATUS "    Check Result Directory:  ${CHECK_RESULT_DIR}")
 message(STATUS "    Temporary Directory:     ${TMPDIR}")
 message(STATUS "    Startup Script:          ${STARTUP_SCRIPT}")
