@@ -21,4 +21,4 @@ pre-start script
 #    [ -d /var/run/mysqld ] || install -m 755 -o mysql -g root -d /var/run/mysqld
 end script
 
-exec sudo -g @GROUP@ -u @USER@ @bindir@/centengine -c "$HOME/centengine.cfg"
+exec sudo -g @GROUP@ -u @USER@ @bindir@/centengine "$HOME/centengine.cfg"
