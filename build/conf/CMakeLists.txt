@@ -46,7 +46,7 @@ configure_file("${MY_SRC_DIR}/objects/windows.cfg.in"
 option(WITH_SAMPLE_CONFIG "Install sample configuration files." ON)
 if (WITH_SAMPLE_CONFIG)
   install(DIRECTORY "${MY_SRC_DIR}/"
-    DESTINATION "${sysconfdir}/"
+    DESTINATION "${confdir}/"
     COMPONENT "runtime"
     FILES_MATCHING PATTERN "*.cfg")
 endif ()

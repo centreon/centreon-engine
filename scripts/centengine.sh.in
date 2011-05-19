@@ -19,13 +19,12 @@
 prefix=@localstatedir@
 var_dir=@vardir@
 binary=@bindir@/centengine
-config_file=@sysconfdir@/centengine.cfg
+config_file=@confdir@/centengine.cfg
 status_file=$var_dir/status.dat
 retention_file=$var_dir/retention.dat
-command_file=$var_dir/rw/centengine.cmd
-lock_dir=/var/lock/subsys
-lock_file=centengine
-pid_file=/var/run/$(basename $binary).pid
+command_file=$var_dir/centengine.cmd
+lock_file=@LOCK_FILE@
+pid_file=@PID_FILE@
 user=@USER@
 group=@GROUP@
 timeout=300
@@ -98,9 +97,7 @@ service_start()
 	fi
 	echo $pid > $pid_file
 
-	if [ -d $lock_dir ]; then
-	    touch $lock_dir/$lock_file;
-	fi
+        touch $lock_file;
     fi
 }
 
@@ -124,7 +121,7 @@ service_stop()
 	    kill -TERM $pid
 	fi
     fi
-    rm -f $status_file $lock_dir/$lock_file $command_file $pid_file
+    rm -f $lock_file $command_file $pid_file
 }
 
 service_reload()

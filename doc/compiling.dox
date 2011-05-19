@@ -160,12 +160,40 @@
  *    <td>Installation prefix. On Linux this could be set to /usr/local for example.</td>
  *  </tr>
  *  <tr>
+ *    <td>WITH_PREFIX_BIN</td>
+ *    <td>Installation prefix for binaries.</td>
+ *  </tr>
+ *  <tr>
+ *    <td>WITH_PREFIX_CONF</td>
+ *    <td>Installation prefix for documentation.</td>
+ *  </tr>
+ *  <tr>
+ *    <td>WITH_PREFIX_VAR</td>
+ *    <td>Installation prefix for miscellaneous files.</td>
+ *  </tr>
+ *  <tr>
  *    <td>WITH_CHECK_RESULT_DIR</td>
  *    <td>Where temporary check result files will be stored. This directory is used as a temporary place to store check results while they wait to be processed by Centreon Engine.</td>
  *  </tr>
  *  <tr>
+ *    <td>WITH_STARTUP_DIR</td>
+ *    <td>If applicable, where the startup script should be installed.</td>
+ *  </tr>
+ *  <tr>
+ *    <td>WITH_LOG_ARCHIVE_DIR</td>
+ *    <td>Where rotated archive logs will be stored.</td>
+ *  </tr>
+ *  <tr>
  *    <td>WITH_TEMP_DIR</td>
  *    <td>Temporary directory used by Centreon Engine. Default to /tmp.</td>
+ *  </tr>
+ *  <tr>
+ *    <td>WITH_LOCK_FILE</td>
+ *    <td>If applicable, lock file to use by the init script.</td>
+ *  </tr>
+ *  <tr>
+ *    <td>WITH_PID_FILE</td>
+ *    <td>If applicable, where to store the PID file used by the init script.</td>
  *  </tr>
  *  <tr>
  *    <td>WITH_USER</td>
@@ -190,7 +218,7 @@
  *  <tr>
  *    <td>WITH_DOCUMENTATION</td>
  *    <td>Enable or disable documentation generation. @em Doxygen must be present on your machine.</td>
- *  <tr>
+ *  </tr>
  *  <tr>
  *    <td>WITH_SAMPLE_CONFIG</td>
  *    <td>Enable or disable sample configuration files installation.</td>
