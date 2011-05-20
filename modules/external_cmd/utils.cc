@@ -56,29 +56,50 @@ int open_command_file(void) {
 
   /* use existing FIFO if possible */
   if (!(stat(config.get_command_file().toStdString().c_str(), &st) != -1
-	&& (st.st_mode & S_IFIFO))) {
+        && (st.st_mode & S_IFIFO))) {
 
     /* create the external command file as a named pipe (FIFO) */
     if ((result = mkfifo(config.get_command_file().toStdString().c_str(),
-			 S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP)) != 0) {
+                         S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP)) != 0) {
 
       logit(NSLOG_RUNTIME_ERROR, TRUE,
             "Error: Could not create external command file '%s' as named pipe: (%d) -> %s.  If this file already exists and you are sure that another copy of Centreon Engine is not running, you should delete this file.\n",
             config.get_command_file().toStdString().c_str(),
-	    errno,
-	    strerror(errno));
+            errno,
+            strerror(errno));
       return (ERROR);
     }
   }
 
   /* open the command file for reading (non-blocked) - O_TRUNC flag cannot be used due to errors on some systems */
   /* NOTE: file must be opened read-write for poll() to work */
-  if ((command_file_fd = open(config.get_command_file().toStdString().c_str(), O_RDWR | O_NONBLOCK | O_CLOEXEC)) < 0) {
+  if ((command_file_fd = open(config.get_command_file().toStdString().c_str(), O_RDWR | O_NONBLOCK)) < 0) {
     logit(NSLOG_RUNTIME_ERROR, TRUE,
           "Error: Could not open external command file for reading via open(): (%d) -> %s\n",
           errno,
-	  strerror(errno));
+          strerror(errno));
     return (ERROR);
+  }
+
+  /* Set the close-on-exec flag on the file descriptor. */
+  {
+    int flags;
+    flags = fcntl(command_file_fd, F_GETFL);
+    if (flags < 0) {
+      logit(NSLOG_RUNTIME_ERROR, TRUE,
+        "Error: Could not get file descriptor flags on external command via fcntl(): (%d) -> %s\n",
+        errno,
+        strerror(errno));
+      return (ERROR);
+    }
+    flags |= FD_CLOEXEC;
+    if (fcntl(command_file_fd, F_SETFL, flags) == -1) {
+      logit(NSLOG_RUNTIME_ERROR, TRUE,
+        "Error: Could not set close-on-exec flag on external command via fcntl(): (%d) -> %s\n",
+        errno,
+        strerror(errno));
+      return (ERROR);
+    }
   }
 
   /* re-open the FIFO for use with fgets() */
@@ -86,7 +107,7 @@ int open_command_file(void) {
     logit(NSLOG_RUNTIME_ERROR, TRUE,
           "Error: Could not open external command file for reading via fdopen(): (%d) -> %s\n",
           errno,
-	  strerror(errno));
+          strerror(errno));
     return (ERROR);
   }
 
@@ -154,9 +175,9 @@ int init_command_file_worker_thread(void) {
 
   /* create worker thread */
   result = pthread_create(&worker_threads[COMMAND_WORKER_THREAD],
-			  NULL,
-			  command_file_worker_thread,
-			  NULL);
+                          NULL,
+                          command_file_worker_thread,
+                          NULL);
 
   /* main thread should unblock all signals */
   pthread_sigmask(SIG_UNBLOCK, &newmask, NULL);
@@ -267,8 +288,8 @@ void* command_file_worker_thread(void* arg) {
       case EINTR:
         /* this can happen when running under a debugger like gdb */
         /*
-	  write_to_log("command_file_worker_thread(): poll(): EINTR (impossible)",logging_options,NULL);
-	*/
+          write_to_log("command_file_worker_thread(): poll(): EINTR (impossible)",logging_options,NULL);
+        */
         break;
 
       default:
@@ -330,9 +351,9 @@ void* command_file_worker_thread(void* arg) {
 
 #ifdef DEBUG_CFWT
         printf("(CFWT) RES: %d, BUFFER_ITEMS: %d/%d\n",
-	       result,
-	       buffer_items,
-	       external_comand_buffer_slots);
+               result,
+               buffer_items,
+               external_comand_buffer_slots);
 #endif
 
         /* bail if the circular buffer is full */
