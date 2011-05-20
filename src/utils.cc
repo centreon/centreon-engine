@@ -36,13 +36,6 @@
 #include "globals.hh"
 #include "broker.hh"
 #include "nebmods.hh"
-
-#ifdef EMBEDDEDPERL
-# include "epn_engine.hh"
-static PerlInterpreter* my_perl = NULL;
-int                     use_embedded_perl = TRUE;
-#endif
-
 #include "notifications.hh"
 #include "logging.hh"
 #include "shared.hh"
@@ -71,19 +64,6 @@ int my_system_r(nagios_macros* mac,
   dbuf output_dbuf;
   int dbuf_chunk = 1024;
   int flags;
-#ifdef EMBEDDEDPERL
-  char fname[512] = "";
-  char* args[5] = { "", DO_CLEAN, "", "", NULL };
-  SV* plugin_hndlr_cr = NULL;
-  char* perl_output = NULL;
-  int count;
-  int use_epn = FALSE;
-# ifdef aTHX
-  dTHX;
-# endif
-  dSP;
-#endif
-
 
   log_debug_info(DEBUGL_FUNCTIONS, 0, "my_system_r()\n");
 
@@ -98,72 +78,6 @@ int my_system_r(nagios_macros* mac,
     return (STATE_OK);
 
   log_debug_info(DEBUGL_COMMANDS, 1, "Running command '%s'...\n", cmd);
-
-#ifdef EMBEDDEDPERL
-  /* get"filename" component of command */
-  strncpy(fname, cmd, strcspn(cmd, " "));
-  fname[strcspn(cmd, " ")] = '\x0';
-
-  /* should we use the embedded Perl interpreter to run this script? */
-  use_epn = file_uses_embedded_perl(fname);
-
-  /* if yes, do some initialization */
-  if (use_epn == TRUE) {
-    args[0] = fname;
-    args[2] = "";
-
-    if (strchr(cmd, ' ') == NULL)
-      args[3] = "";
-    else
-      args[3] = cmd + strlen(fname) + 1;
-
-    /* call our perl interpreter to compile and optionally cache the compiled script. */
-
-    ENTER;
-    SAVETMPS;
-    PUSHMARK(SP);
-
-    XPUSHs(sv_2mortal(newSVpv(args[0], 0)));
-    XPUSHs(sv_2mortal(newSVpv(args[1], 0)));
-    XPUSHs(sv_2mortal(newSVpv(args[2], 0)));
-    XPUSHs(sv_2mortal(newSVpv(args[3], 0)));
-
-    PUTBACK;
-
-    call_pv("Embed::Persistent::eval_file", G_EVAL);
-
-    SPAGAIN;
-
-    if (SvTRUE(ERRSV)) {
-      /*
-       * XXXX need pipe open to send the compilation failure message back to Centreon Engine ?
-       */
-      (void)POPs;
-
-      temp_buffer = my_strdup(SvPVX(ERRSV));
-
-      log_debug_info(DEBUGL_COMMANDS, 0,
-                     "Embedded perl failed to compile %s, compile error %s\n",
-                     fname,
-		     temp_buffer);
-      logit(NSLOG_RUNTIME_WARNING, TRUE, "%s\n", temp_buffer);
-      delete[] temp_buffer;
-
-      return (STATE_UNKNOWN);
-    }
-    else {
-      plugin_hndlr_cr = newSVsv(POPs);
-
-      log_debug_info(DEBUGL_COMMANDS, 0,
-                     "Embedded perl successfully compiled %s and returned plugin handler (Perl subroutine code ref)\n",
-                     fname);
-
-      PUTBACK;
-      FREETMPS;
-      LEAVE;
-    }
-  }
-#endif
 
   /* create a pipe */
   if (pipe(fd) == -1) {
@@ -235,60 +149,6 @@ int my_system_r(nagios_macros* mac,
     /* trap commands that timeout */
     signal(SIGALRM, my_system_sighandler);
     alarm(timeout);
-
-    /******** BEGIN EMBEDDED PERL CODE EXECUTION ********/
-
-#ifdef EMBEDDEDPERL
-    if (use_epn == TRUE) {
-
-      /* execute our previously compiled script - by call_pv("Embed::Persistent::eval_file",..) */
-      ENTER;
-      SAVETMPS;
-      PUSHMARK(SP);
-
-      XPUSHs(sv_2mortal(newSVpv(args[0], 0)));
-      XPUSHs(sv_2mortal(newSVpv(args[1], 0)));
-      XPUSHs(plugin_hndlr_cr);
-      XPUSHs(sv_2mortal(newSVpv(args[3], 0)));
-
-      PUTBACK;
-
-      count = call_pv("Embed::Persistent::run_package", G_ARRAY);
-      /* count is a debug hook. It should always be two (2), because the persistence framework tries to return two (2) args */
-
-      SPAGAIN;
-
-      perl_output = POPpx;
-      strip(perl_output);
-      strncpy(buffer, (perl_output == NULL) ? "" : perl_output, sizeof(buffer));
-      buffer[sizeof(buffer) - 1] = '\x0';
-      status = POPi;
-
-      PUTBACK;
-      FREETMPS;
-      LEAVE;
-
-      log_debug_info(DEBUGL_COMMANDS, 0,
-                     "Embedded perl ran command %s with output %d, %s\n",
-                     fname,
-		     status,
-		     buffer);
-
-      /* write the output back to the parent process */
-      if (write(fd[1], buffer, strlen(buffer) + 1) == -1)
-        logit(NSLOG_RUNTIME_WARNING, FALSE,
-	      "Warning: Write failed. %s\n", strerror(errno));
-
-      /* close pipe for writing */
-      close(fd[1]);
-
-      /* reset the alarm */
-      alarm(0);
-
-      _exit(status);
-    }
-#endif
-    /******** END EMBEDDED PERL CODE EXECUTION ********/
 
     /* run the command */
     fp = (FILE*)popen(cmd, "r");
@@ -2810,140 +2670,6 @@ int dbuf_strcat(dbuf* db, char const* buf) {
   db->used_size += buflen;
 
   return (OK);
-}
-
-/******************************************************************/
-/******************** EMBEDDED PERL FUNCTIONS *********************/
-/******************************************************************/
-
-/* initializes embedded perl interpreter */
-int init_embedded_perl(char** env) {
-#ifdef EMBEDDEDPERL
-  char** embedding;
-  int exitstatus = 0;
-  int argc = 2;
-  struct stat stat_buf;
-
-  /* make sure the P1 file exists... */
-  if (stat(config.get_p1_file().toStdString().c_str(), &stat_buf) != 0) {
-    use_embedded_perl = FALSE;
-    logit(NSLOG_RUNTIME_ERROR, TRUE, "Error: p1.pl file required for embedded Perl interpreter is missing!\n");
-  }
-  else {
-    embedding = new char* [2];
-    *embedding = my_strdup("");
-    *(embedding + 1) = my_strdup(config.get_p1_file().toStdString().c_str());
-
-    use_embedded_perl = TRUE;
-
-    PERL_SYS_INIT3(&argc, &embedding, &env);
-
-    if ((my_perl = perl_alloc()) == NULL) {
-      use_embedded_perl = FALSE;
-      logit(NSLOG_RUNTIME_ERROR, TRUE,
-            "Error: Could not allocate memory for embedded Perl interpreter!\n");
-    }
-  }
-
-  /* a fatal error occurred... */
-  if (use_embedded_perl == FALSE) {
-    logit(NSLOG_PROCESS_INFO | NSLOG_RUNTIME_ERROR, TRUE,
-          "Bailing out due to errors encountered while initializing the embedded Perl interpreter. (PID=%d)\n",
-          (int)getpid());
-    cleanup();
-    exit(ERROR);
-  }
-
-  perl_construct(my_perl);
-  exitstatus = perl_parse(my_perl, xs_init, 2, (char**)embedding, env);
-  if (!exitstatus)
-    exitstatus = perl_run(my_perl);
-#else
-  (void)env;
-#endif
-  return (OK);
-}
-
-/* closes embedded perl interpreter */
-int deinit_embedded_perl(void) {
-#ifdef EMBEDDEDPERL
-  PL_perl_destruct_level = 0;
-  perl_destruct(my_perl);
-  perl_free(my_perl);
-  PERL_SYS_TERM();
-#endif
-  return (OK);
-}
-
-/* checks to see if we should run a script using the embedded Perl interpreter */
-int file_uses_embedded_perl(char* fname) {
-  int use_epn = FALSE;
-#ifdef EMBEDDEDPERL
-  FILE* fp = NULL;
-  char line1[80] = "";
-  char linen[80] = "";
-  int line = 0;
-  char* ptr = NULL;
-  int found_epn_directive = FALSE;
-
-  if (config.get_enable_embedded_perl() == true) {
-    /* open the file, check if its a Perl script and see if we can use epn  */
-    fp = fopen(fname, "r");
-    if (fp != NULL) {
-
-      /* grab the first line - we should see Perl */
-      fgets(line1, 80, fp);
-
-      /* yep, its a Perl script... */
-      if (strstr(line1, "/bin/perl") != NULL) {
-
-        /* epn directives must be found in first ten lines of plugin */
-        for (line = 1; line < 10; line++) {
-
-          if (fgets(linen, 80, fp)) {
-
-            /* line contains Centreon Engine directives */
-            if (strstr(linen, "# nagios:")) {
-
-              ptr = strtok(linen, ":");
-
-              /* process each directive */
-              for (ptr = strtok(NULL, ","); ptr != NULL; ptr = strtok(NULL, ",")) {
-                strip(ptr);
-
-                if (!strcmp(ptr, "+epn")) {
-                  use_epn = TRUE;
-                  found_epn_directive = TRUE;
-                }
-                else if (!strcmp(ptr, "-epn")) {
-                  use_epn = FALSE;
-                  found_epn_directive = TRUE;
-                }
-              }
-            }
-
-            if (found_epn_directive == TRUE)
-              break;
-          }
-
-          /* EOF */
-          else
-            break;
-        }
-
-        /* if the plugin didn't tell us whether or not to use embedded Perl, use implicit value */
-        if (found_epn_directive == FALSE)
-          use_epn = (config.get_use_embedded_perl_implicitly() == true) ? TRUE : FALSE;
-      }
-
-      fclose(fp);
-    }
-  }
-#else
-  (void)fname;
-#endif
-
-  return (use_epn);
 }
 
 /******************************************************************/

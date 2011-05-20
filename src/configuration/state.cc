@@ -431,14 +431,6 @@ QString const& state::get_log_archive_path() const throw() {
 }
 
 /**
- *  Get the p1 filename.
- *  @return The p1 filename.
- */
-QString const& state::get_p1_file() const throw() {
-  return (_tab_string[p1_file]);
-}
-
-/**
  *  Get the illegal object characters.
  *  @return The illegal object characters.
  */
@@ -1055,22 +1047,6 @@ bool state::get_child_processes_fork_twice() const throw() {
 }
 
 /**
- *  Get the enable embedded perl.
- *  @return The enable embedded perl.
- */
-bool state::get_enable_embedded_perl() const throw() {
-  return (_tab_bool[enable_embedded_perl]);
-}
-
-/**
- *  Get the use embedded perl implicitly.
- *  @return The use embedded perl implicitly.
- */
-bool state::get_use_embedded_perl_implicitly() const throw() {
-  return (_tab_bool[use_embedded_perl_implicitly]);
-}
-
-/**
  *  Get the allow empty hostgroup assignment.
  *  @return The allow empty hostgroup assignment.
  */
@@ -1332,14 +1308,13 @@ void state::set_log_archive_path(QString const& value) {
 }
 
 /**
- *  Set the p1 filename.
- *  @param[in] value The filename.
+ *  p1 filename ignore.
+ *  @param[in] value Unused.
  */
 void state::set_p1_file(QString const& value) {
-  _tab_string[p1_file] = value;
-
-  delete[] ::p1_file;
-  ::p1_file = my_strdup(value.toStdString().c_str());
+  (void)value;
+  logger(log_config_warning, basic)
+    << "warning: p1_file variable ignored";
 }
 
 /**
@@ -2152,21 +2127,23 @@ void state::set_child_processes_fork_twice(bool value) {
 }
 
 /**
- *  Set the enable embedded perl.
- *  @param[in] value The enable embedded perl.
+ *  Enable embedded perl ignore.
+ *  @param[in] value Unused.
  */
 void state::set_enable_embedded_perl(bool value) {
-  _tab_bool[enable_embedded_perl] = value;
-  ::enable_embedded_perl = value;
+  (void)value;
+  logger(log_config_warning, basic)
+    << "warning: enable_embedded_perl variable ignored";
 }
 
 /**
- *  Set the use embedded perl implicitly.
- *  @param[in] value The use embedded perl implicitly.
+ *  Use embedded perl implicitly ingore.
+ *  @param[in] value Unused.
  */
 void state::set_use_embedded_perl_implicitly(bool value) {
-  _tab_bool[use_embedded_perl_implicitly] = value;
-  ::use_embedded_perl_implicitly = value;
+  (void)value;
+  logger(log_config_warning, basic)
+    << "warning: use_embedded_perl_implicitly variable ignored";
 }
 
 /**
@@ -2458,7 +2435,6 @@ void state::_reset() {
   set_log_file(DEFAULT_LOG_FILE);
   set_temp_file(DEFAULT_TEMP_FILE);
   set_command_file(DEFAULT_COMMAND_FILE);
-  set_p1_file(DEFAULT_P1_FILE);
   set_debug_file(DEFAULT_DEBUG_FILE);
 
 
@@ -2561,9 +2537,6 @@ void state::_reset() {
   _tab_int[child_processes_fork_twice] = DEFAULT_CHILD_PROCESSES_FORK_TWICE;
 
   set_additional_freshness_latency(DEFAULT_ADDITIONAL_FRESHNESS_LATENCY);
-
-  set_enable_embedded_perl(DEFAULT_ENABLE_EMBEDDED_PERL);
-  set_use_embedded_perl_implicitly(DEFAULT_USE_EMBEDDED_PERL_IMPLICITLY);
 
   set_external_command_buffer_slots(DEFAULT_EXTERNAL_COMMAND_BUFFER_SLOTS);
 

@@ -69,12 +69,7 @@ using namespace com::centreon::engine::logging;
                             "    files, as well as the version changelog to find out what has\n" \
                             "    changed.\n\n"
 
-// Following main() declaration required by older versions of Perl ut 5.00503.
-#ifdef EMBEDDEDPERL
-int main(int argc, char** argv, char** env) {
-#else
 int main(int argc, char** argv) {
-#endif // EMBEDDEDPERL
   QCoreApplication app(argc, argv);
 
   configuration::applier::logging apply_log;
@@ -432,10 +427,6 @@ int main(int argc, char** argv) {
         if (sigrestart == TRUE) {
           // Clean up the status data.
           cleanup_status_data(config_file, TRUE);
-
-          // Cleanup embedded perl interpreter.
-          if (embedded_perl_initialized == TRUE)
-            deinit_embedded_perl();
         }
 
         // Send program data to broker.
@@ -445,20 +436,6 @@ int main(int argc, char** argv) {
                              NULL);
         cleanup();
         exit(ERROR);
-      }
-
-      /* initialize embedded Perl interpreter */
-      /* NOTE 02/15/08 embedded Perl must be initialized if compiled in, regardless of whether or not its enabled in the config file */
-      /* It compiled it, but not initialized, Centreon Engine will segfault in readdir() calls, as libperl takes this function over */
-      if (embedded_perl_initialized == FALSE) {
-        /*                                if(enable_embedded_perl==TRUE){*/
-#ifdef EMBEDDEDPERL
-        init_embedded_perl(env);
-#else
-        init_embedded_perl(NULL);
-#endif
-        embedded_perl_initialized = TRUE;
-        /*                                        }*/
       }
 
       // Handle signals (interrupts).
@@ -596,10 +573,6 @@ int main(int argc, char** argv) {
       // Clean up the status data unless we're restarting.
       if (sigrestart == FALSE)
         cleanup_status_data(config_file, TRUE);
-
-      // Cleanup embedded perl interpreter.
-      if (sigrestart == FALSE)
-        deinit_embedded_perl();
 
       // Shutdown stuff.
       if (sigshutdown == TRUE) {

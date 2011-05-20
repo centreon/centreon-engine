@@ -507,12 +507,6 @@ void test_configuration(QString const& filename, std::map<QString, QString>& my_
   if (my_conf["child_processes_fork_twice"] != obj2str(config.get_child_processes_fork_twice())) {
     throw (engine_error() << "child_processes_fork_twice: init with '" << my_conf["child_processes_fork_twice"] << "'");
   }
-  if (my_conf["enable_embedded_perl"] != obj2str(config.get_enable_embedded_perl())) {
-    throw (engine_error() << "enable_embedded_perl: init with '" << my_conf["enable_embedded_perl"] << "'");
-  }
-  if (my_conf["use_embedded_perl_implicitly"] != obj2str(config.get_use_embedded_perl_implicitly())) {
-    throw (engine_error() << "use_embedded_perl_implicitly: init with '" << my_conf["use_embedded_perl_implicitly"] << "'");
-  }
   if (my_conf["external_command_buffer_slots"] != obj2str(config.get_external_command_buffer_slots())) {
     throw (engine_error() << "external_command_buffer_slots: init with '" << my_conf["external_command_buffer_slots"] << "'");
   }

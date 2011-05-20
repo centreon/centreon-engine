@@ -76,7 +76,7 @@ unsigned int              currently_running_host_checks = 0;
 time_t                    program_start = 0L;
 time_t                    event_start = 0L;
 
-int                       embedded_perl_initialized = FALSE;
+int                       embedded_perl_initialized = false;
 
 host*                     host_list = NULL;
 host*                     host_list_tail = NULL;
@@ -249,7 +249,7 @@ unsigned int use_large_installation_tweaks;
 unsigned int enable_environment_macros;
 unsigned int free_child_process_memory;
 unsigned int child_processes_fork_twice;
-unsigned int enable_embedded_perl;
-unsigned int use_embedded_perl_implicitly;
+unsigned int enable_embedded_perl = false;
+unsigned int use_embedded_perl_implicitly = false;
 int external_command_buffer_slots;
 // auth_file;

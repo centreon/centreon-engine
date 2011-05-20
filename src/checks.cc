@@ -46,14 +46,6 @@
 
 #define MAX_CMD_ARGS 4096
 
-#ifdef EMBEDDEDPERL
-# include "epn_engine.hh"
-#endif
-
-#ifdef EMBEDDEDPERL
-extern int                   use_embedded_perl;
-#endif
-
 /******************************************************************/
 /********************* MISCELLANEOUS FUNCTIONS ********************/
 /******************************************************************/
@@ -429,18 +421,6 @@ int run_async_service_check(service* svc,
   dbuf checkresult_dbuf;
   int dbuf_chunk = 1024;
   int neb_result = OK;
-#ifdef EMBEDDEDPERL
-  char fname[512] = "";
-  char* args[5] = { "", DO_CLEAN, "", "", NULL };
-  char* perl_plugin_output = NULL;
-  SV* plugin_hndlr_cr = NULL;
-  int count;
-  int use_epn = FALSE;
-# ifdef aTHX
-  dTHX;
-# endif
-  dSP;
-#endif
 
   log_debug_info(DEBUGL_FUNCTIONS, 0, "run_async_service_check()\n");
 
@@ -665,125 +645,6 @@ int run_async_service_check(service* svc,
 		     : ACTIVE_ONDEMAND_SERVICE_CHECK_STATS,
 		     start_time.tv_sec);
 
-#ifdef EMBEDDEDPERL
-  /* get"filename" component of command */
-  strncpy(fname, processed_command, strcspn(processed_command, " "));
-  fname[strcspn(processed_command, " ")] = '\x0';
-
-  /* should we use the embedded Perl interpreter to run this script? */
-  use_epn = file_uses_embedded_perl(fname);
-
-  /* if yes, do some initialization */
-  if (use_epn == TRUE) {
-
-    log_debug_info(DEBUGL_CHECKS, 1,
-                   "** Using Embedded Perl interpreter to run service check...\n");
-
-    args[0] = fname;
-    args[2] = "";
-
-    if (strchr(processed_command, ' ') == NULL)
-      args[3] = "";
-    else
-      args[3] = processed_command + strlen(fname) + 1;
-
-    ENTER;
-    SAVETMPS;
-    PUSHMARK(SP);
-    XPUSHs(sv_2mortal(newSVpv(args[0], 0)));
-    XPUSHs(sv_2mortal(newSVpv(args[1], 0)));
-    XPUSHs(sv_2mortal(newSVpv(args[2], 0)));
-    XPUSHs(sv_2mortal(newSVpv(args[3], 0)));
-    PUTBACK;
-
-    /* call our perl interpreter to compile and optionally cache the command */
-
-    call_pv("Embed::Persistent::eval_file", G_SCALAR | G_EVAL);
-
-    SPAGAIN;
-
-    if (SvTRUE(ERRSV)) {
-
-      /*
-       * if SvTRUE(ERRSV)
-       *      write failure to IPC pipe
-       *      return
-       */
-
-      /* remove the top element of the Perl stack (undef) */
-      (void)POPs;
-
-      pclose_result = STATE_UNKNOWN;
-      perl_plugin_output = SvPVX(ERRSV);
-
-      log_debug_info(DEBUGL_CHECKS, 0,
-                     "Embedded Perl failed to compile %s, compile error %s - skipping plugin\n",
-                     fname,
-		     perl_plugin_output);
-
-      /* save plugin output */
-      if (perl_plugin_output != NULL) {
-        temp_buffer = escape_newlines(perl_plugin_output);
-        dbuf_strcat(&checkresult_dbuf, temp_buffer);
-        delete[] temp_buffer;
-      }
-
-      /* get the check finish time */
-      gettimeofday(&end_time, NULL);
-
-      /* record check result info */
-      check_result_info.exited_ok = FALSE;
-      check_result_info.return_code = pclose_result;
-      check_result_info.finish_time = end_time;
-
-      /* write check result to file */
-      if (check_result_info.output_file_fp) {
-
-        fprintf(check_result_info.output_file_fp,
-                "finish_time=%lu.%lu\n",
-                check_result_info.finish_time.tv_sec,
-                check_result_info.finish_time.tv_usec);
-        fprintf(check_result_info.output_file_fp, "early_timeout=%d\n",
-                check_result_info.early_timeout);
-        fprintf(check_result_info.output_file_fp, "exited_ok=%d\n",
-                check_result_info.exited_ok);
-        fprintf(check_result_info.output_file_fp, "return_code=%d\n",
-                check_result_info.return_code);
-        fprintf(check_result_info.output_file_fp, "output=%s\n",
-                (checkresult_dbuf.buf == NULL) ? "(null)" : checkresult_dbuf.buf);
-
-        /* close the temp file */
-        fclose(check_result_info.output_file_fp);
-
-        /* move check result to queue directory */
-        move_check_result_to_queue(check_result_info.output_file);
-      }
-
-      /* free memory */
-      dbuf_free(&checkresult_dbuf);
-
-      /* free check result memory */
-      free_check_result(&check_result_info);
-
-      return (OK);
-    }
-    else {
-
-      plugin_hndlr_cr = newSVsv(POPs);
-
-      log_debug_info(DEBUGL_CHECKS, 1,
-                     "Embedded Perl successfully compiled %s and returned code ref to plugin handler\n",
-                     fname);
-
-      PUTBACK;
-      FREETMPS;
-      LEAVE;
-    }
-  }
-#endif
-
-  /* plugin is a C plugin or a Perl plugin _without_ compilation errors */
-
   /* fork a child process */
   pid = fork();
 
@@ -841,47 +702,8 @@ int run_async_service_check(service* svc,
       /* disable rotation of the debug file */
       config.set_max_debug_file_size(0L);
 
-      /******** BEGIN EMBEDDED PERL INTERPRETER EXECUTION ********/
-#ifdef EMBEDDEDPERL
-      if (use_epn == TRUE) {
-
-        /* execute our previously compiled script - from call_pv("Embed::Persistent::eval_file",..) */
-        /* NB. args[2] is _now_ a code ref (to the Perl subroutine corresp to the plugin) returned by eval_file() */
-
-        ENTER;
-        SAVETMPS;
-        PUSHMARK(SP);
-
-        XPUSHs(sv_2mortal(newSVpv(args[0], 0)));
-        XPUSHs(sv_2mortal(newSVpv(args[1], 0)));
-        XPUSHs(plugin_hndlr_cr);
-        XPUSHs(sv_2mortal(newSVpv(args[3], 0)));
-
-        PUTBACK;
-
-        count = call_pv("Embed::Persistent::run_package", G_ARRAY);
-
-        SPAGAIN;
-
-        perl_plugin_output = POPpx;
-        pclose_result = POPi;
-
-        /* NOTE: 07/16/07 This has to be done before FREETMPS statement below, or the POPpx pointer will be invalid (Hendrik B.) */
-        /* get perl plugin output - escape newlines */
-        if (perl_plugin_output != NULL) {
-          temp_buffer = escape_newlines(perl_plugin_output);
-          dbuf_strcat(&checkresult_dbuf, temp_buffer);
-          delete[] temp_buffer;
-        }
-
-        PUTBACK;
-        FREETMPS;
-        LEAVE;
-
-        log_debug_info(DEBUGL_CHECKS, 1,
-                       "Embedded Perl ran %s: return (code=%d, plugin output=%s\n",
-                       fname, pclose_result,
-                       (perl_plugin_output == NULL) ? "NULL" : checkresult_dbuf.buf));
+      /* run the plugin check command */
+      pclose_result = run_check(processed_command, &checkresult_dbuf);
 
       /* reset the alarm */
       alarm(0);
@@ -890,15 +712,29 @@ int run_async_service_check(service* svc,
       gettimeofday(&end_time, NULL);
 
       /* record check result info */
-      check_result_info.return_code = pclose_result;
       check_result_info.finish_time = end_time;
+      check_result_info.early_timeout = FALSE;
+
+      /* test for execution error */
+      if (pclose_result == -1) {
+	pclose_result = STATE_UNKNOWN;
+	check_result_info.return_code = STATE_CRITICAL;
+	check_result_info.exited_ok = FALSE;
+      }
+      else {
+	if (WEXITSTATUS(pclose_result) == 0
+	    && WIFSIGNALED(pclose_result))
+	  check_result_info.return_code = 128 + WTERMSIG(pclose_result);
+	else
+	  check_result_info.return_code = WEXITSTATUS(pclose_result);
+      }
 
       /* write check result to file */
       if (check_result_info.output_file_fp) {
 
 	fprintf(check_result_info.output_file_fp, "finish_time=%lu.%lu\n",
-		check_result_info.finish_time.tv_sec,
-		check_result_info.finish_time.tv_usec);
+		static_cast<unsigned long>(check_result_info.finish_time.tv_sec),
+		static_cast<unsigned long>(check_result_info.finish_time.tv_usec));
 	fprintf(check_result_info.output_file_fp, "early_timeout=%d\n",
 		check_result_info.early_timeout);
 	fprintf(check_result_info.output_file_fp, "exited_ok=%d\n",
@@ -917,6 +753,8 @@ int run_async_service_check(service* svc,
 
       /* free memory */
       dbuf_free(&checkresult_dbuf);
+      delete[] raw_command;
+      delete[] processed_command;
 
       /* free check result memory */
       free_check_result(&check_result_info);
@@ -924,115 +762,52 @@ int run_async_service_check(service* svc,
       /* return with plugin exit status - not really necessary... */
       _exit(pclose_result);
     }
-#endif
-    /******** END EMBEDDED PERL INTERPRETER EXECUTION ********/
 
-    /* run the plugin check command */
-    pclose_result = run_check(processed_command, &checkresult_dbuf);
+    /* NOTE: this code is never reached if large install tweaks are enabled... */
 
-    /* reset the alarm */
-    alarm(0);
+    /* unset environment variables */
+    set_all_macro_environment_vars(&mac, FALSE);
 
-    /* get the check finish time */
-    gettimeofday(&end_time, NULL);
+    /* free allocated memory */
+    /* this needs to be done last, so we don't free memory for variables before they're used above */
+    if (config.get_free_child_process_memory() == true)
+      free_memory(&mac);
 
-    /* record check result info */
-    check_result_info.finish_time = end_time;
-    check_result_info.early_timeout = FALSE;
+    /* parent exits immediately - grandchild process is inherited by the INIT process, so we have no zombie problem... */
+    _exit(STATE_OK);
+  }
 
-    /* test for execution error */
-    if (pclose_result == -1) {
-      pclose_result = STATE_UNKNOWN;
-      check_result_info.return_code = STATE_CRITICAL;
-      check_result_info.exited_ok = FALSE;
-    }
-    else {
-      if (WEXITSTATUS(pclose_result) == 0
-	  && WIFSIGNALED(pclose_result))
-	check_result_info.return_code = 128 + WTERMSIG(pclose_result);
-      else
-	check_result_info.return_code = WEXITSTATUS(pclose_result);
-    }
+  /* else the parent should wait for the first child to return... */
+  else if (pid > 0) {
+    clear_volatile_macros(&mac);
 
-    /* write check result to file */
-    if (check_result_info.output_file_fp) {
+    log_debug_info(DEBUGL_CHECKS, 2,
+		   "Service check is executing in child process (pid=%lu)\n",
+		   (unsigned long)pid);
 
-      fprintf(check_result_info.output_file_fp, "finish_time=%lu.%lu\n",
-	      static_cast<unsigned long>(check_result_info.finish_time.tv_sec),
-	      static_cast<unsigned long>(check_result_info.finish_time.tv_usec));
-      fprintf(check_result_info.output_file_fp, "early_timeout=%d\n",
-	      check_result_info.early_timeout);
-      fprintf(check_result_info.output_file_fp, "exited_ok=%d\n",
-	      check_result_info.exited_ok);
-      fprintf(check_result_info.output_file_fp, "return_code=%d\n",
-	      check_result_info.return_code);
-      fprintf(check_result_info.output_file_fp, "output=%s\n",
-	      (checkresult_dbuf.buf == NULL) ? "(null)" : checkresult_dbuf.buf);
-
-      /* close the temp file */
+    /* parent should close output file */
+    if (check_result_info.output_file_fp)
       fclose(check_result_info.output_file_fp);
 
-      /* move check result to queue directory */
-      move_check_result_to_queue(check_result_info.output_file);
-    }
+    /* should this be done in first child process (after spawning grandchild) as well? */
+    /* free memory allocated for IPC functionality */
+    free_check_result(&check_result_info);
 
     /* free memory */
-    dbuf_free(&checkresult_dbuf);
     delete[] raw_command;
     delete[] processed_command;
 
-    /* free check result memory */
-    free_check_result(&check_result_info);
-
-    /* return with plugin exit status - not really necessary... */
-    _exit(pclose_result);
+    /* wait for the first child to return */
+    /* don't do this if large install tweaks are enabled - we'll clean up children in event loop */
+    if (config.get_child_processes_fork_twice() == true)
+      wait_result = waitpid(pid, NULL, 0);
   }
 
-  /* NOTE: this code is never reached if large install tweaks are enabled... */
+  /* see if we were able to run the check... */
+  if (fork_error == TRUE)
+    return (ERROR);
 
-  /* unset environment variables */
-  set_all_macro_environment_vars(&mac, FALSE);
-
-  /* free allocated memory */
-  /* this needs to be done last, so we don't free memory for variables before they're used above */
-  if (config.get_free_child_process_memory() == true)
-    free_memory(&mac);
-
-  /* parent exits immediately - grandchild process is inherited by the INIT process, so we have no zombie problem... */
-  _exit(STATE_OK);
-}
-
-/* else the parent should wait for the first child to return... */
- else if (pid > 0) {
-   clear_volatile_macros(&mac);
-
-   log_debug_info(DEBUGL_CHECKS, 2,
-		  "Service check is executing in child process (pid=%lu)\n",
-		  (unsigned long)pid);
-
-   /* parent should close output file */
-   if (check_result_info.output_file_fp)
-     fclose(check_result_info.output_file_fp);
-
-   /* should this be done in first child process (after spawning grandchild) as well? */
-   /* free memory allocated for IPC functionality */
-   free_check_result(&check_result_info);
-
-   /* free memory */
-   delete[] raw_command;
-   delete[] processed_command;
-
-   /* wait for the first child to return */
-   /* don't do this if large install tweaks are enabled - we'll clean up children in event loop */
-   if (config.get_child_processes_fork_twice() == true)
-     wait_result = waitpid(pid, NULL, 0);
- }
-
-/* see if we were able to run the check... */
-if (fork_error == TRUE)
-  return (ERROR);
-
-return (OK);
+  return (OK);
 }
 
 /* handles asynchronous service check results */
@@ -1186,7 +961,7 @@ int handle_async_service_check_result(service* temp_service, check_result* queue
 
   /* make sure the return code is within bounds */
   else if (queued_check_result->return_code < 0
-           || queued_check_result->return_code > 3) {
+					      || queued_check_result->return_code > 3) {
 
     logit(NSLOG_RUNTIME_WARNING, TRUE,
           "Warning: return (code of %d for check of service '%s' on host '%s' was out of bounds.%s\n",
@@ -2391,10 +2166,10 @@ int is_service_result_fresh(service* temp_service,
     if (temp_service->state_type == HARD_STATE
         || temp_service->current_state == STATE_OK)
       freshness_threshold = static_cast<int>((temp_service->check_interval * config.get_interval_length())
-        + temp_service->latency + config.get_additional_freshness_latency());
+					     + temp_service->latency + config.get_additional_freshness_latency());
     else
       freshness_threshold = static_cast<int>((temp_service->retry_interval * config.get_interval_length())
-        + temp_service->latency + config.get_additional_freshness_latency());
+					     + temp_service->latency + config.get_additional_freshness_latency());
   }
   else
     freshness_threshold = temp_service->freshness_threshold;
@@ -2839,7 +2614,7 @@ int is_host_result_fresh(host* temp_host,
     else
       interval = temp_host->retry_interval;
     freshness_threshold = static_cast<int>((interval * config.get_interval_length())
-      + temp_host->latency + config.get_additional_freshness_latency());
+					   + temp_host->latency + config.get_additional_freshness_latency());
   }
   else
     freshness_threshold = temp_host->freshness_threshold;
@@ -3377,8 +3152,8 @@ int run_scheduled_host_check_3x(host* hst, int check_options, double latency) {
       /* if host has no check interval, schedule it again for 5 minutes from now */
       if (current_time >= preferred_time)
         preferred_time = current_time + static_cast<time_t>((hst->check_interval <= 0)
-					 ? 300
-					 : (hst->check_interval * config.get_interval_length()));
+							    ? 300
+							    : (hst->check_interval * config.get_interval_length()));
 
       /* make sure we rescheduled the next host check at a valid time */
       get_next_valid_time(preferred_time, &next_valid_time, hst->check_period_ptr);
@@ -4012,7 +3787,7 @@ int handle_async_host_check_result_3x(host* temp_host, check_result* queued_chec
 
     /* make sure the return code is within bounds */
     else if (queued_check_result->return_code < 0
-             || queued_check_result->return_code > 3) {
+						|| queued_check_result->return_code > 3) {
 
       logit(NSLOG_RUNTIME_WARNING, TRUE,
             "Warning: return (code of %d for check of host '%s' was out of bounds.%s\n",

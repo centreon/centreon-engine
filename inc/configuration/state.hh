@@ -106,7 +106,6 @@ namespace                   com {
 	  QString const&      get_ocsp_command() const throw();
 	  QString const&      get_ochp_command() const throw();
 	  QString const&      get_log_archive_path() const throw();
-	  QString const&      get_p1_file() const throw();
 	  QString const&      get_illegal_object_chars() const throw();
 	  QString const&      get_illegal_output_chars() const throw();
 	  QString const&      get_use_timezone() const throw();
@@ -184,8 +183,6 @@ namespace                   com {
 	  bool                get_enable_environment_macros() const throw();
 	  bool                get_free_child_process_memory() const throw();
 	  bool                get_child_processes_fork_twice() const throw();
-	  bool                get_enable_embedded_perl() const throw();
-	  bool                get_use_embedded_perl_implicitly() const throw();
 	  bool                get_allow_empty_hostgroup_assignment() const throw();
 	  float               get_sleep_time() const throw();
 	  float               get_low_service_flap_threshold() const throw();
@@ -327,7 +324,6 @@ namespace                   com {
 	    ocsp_command,
 	    ochp_command,
 	    log_archive_path,
-	    p1_file,
 	    illegal_object_chars,
 	    illegal_output_chars,
 	    use_timezone,
@@ -455,8 +451,6 @@ namespace                   com {
 	    use_true_regexp_matching,
 	    use_large_installation_tweaks,
 	    enable_environment_macros,
-	    enable_embedded_perl,
-	    use_embedded_perl_implicitly,
 	    allow_empty_hostgroup_assignment,
 	    max_bool
 	  };
@@ -607,8 +601,6 @@ namespace                   com {
 	  static const bool                DEFAULT_USE_TRUE_REGEXP_MATCHING                    = false;
 	  static const bool                DEFAULT_USE_LARGE_INSTALLATION_TWEAKS               = false;
 	  static const bool                DEFAULT_ENABLE_ENVIRONMENT_MACROS                   = true;
-	  static const bool                DEFAULT_ENABLE_EMBEDDED_PERL                        = false;
-	  static const bool                DEFAULT_USE_EMBEDDED_PERL_IMPLICITLY                = true;
 	  static const bool                DEFAULT_ALLOW_EMPTY_HOSTGROUP_ASSIGNMENT            = false;
 	  static const float               DEFAULT_SLEEP_TIME;
 	  static const float               DEFAULT_LOW_SERVICE_FLAP_THRESHOLD;
