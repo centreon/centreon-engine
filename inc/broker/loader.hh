@@ -30,44 +30,44 @@ namespace                        com {
   namespace                      centreon {
     namespace                    engine {
       namespace                  broker {
-	/**
-	 *  @class loader loader.hh
-	 *  @brief Modules loader.
-	 *
-	 *  Loader manage all modules.
-	 */
-	class                    loader : public QObject {
-	  Q_OBJECT
-	public:
-	  static loader&         instance();
+        /**
+         *  @class loader loader.hh
+         *  @brief Modules loader.
+         *
+         *  Loader manage all modules.
+         */
+        class                    loader : public QObject {
+          Q_OBJECT
+         public:
+          static loader&         instance();
 
-	  void                   load();
-	  void                   unload();
+          unsigned int           load();
+          void                   unload();
 
-	  QSharedPointer<handle> add_module(QString const& filename = "",
-					    QString const& args = "");
-	  void                   del_module(QSharedPointer<handle> const& module);
+          QSharedPointer<handle> add_module(QString const& filename = "",
+                                            QString const& args = "");
+          void                   del_module(QSharedPointer<handle> const& module);
 
-	  QString const&         get_directory() const throw();
-	  QList<QSharedPointer<handle> >
-	                         get_modules() const throw();
+          QString const&         get_directory() const throw();
+          QList<QSharedPointer<handle> >
+                                 get_modules() const throw();
 
-	  void                   set_directory(QString const& directory);
+          void                   set_directory(QString const& directory);
 
-	public slots:
-	  void                   module_name_changed(QString const& old_name,
-						     QString const& new_name);
+         public slots:
+          void                   module_name_changed(QString const& old_name,
+                                                     QString const& new_name);
 
-	private:
-	                         loader();
-				 loader(loader const& right);
-	  virtual                ~loader() throw();
+         private:
+                                 loader();
+                                 loader(loader const& right);
+          virtual                ~loader() throw();
 
-	  loader&                operator=(loader const& right);
+          loader&                operator=(loader const& right);
 
-	  QString                _directory;
-	  QMultiHash<QString, QSharedPointer<handle> > _modules;
-	};
+          QString                _directory;
+          QMultiHash<QString, QSharedPointer<handle> > _modules;
+        };
       }
     }
   }

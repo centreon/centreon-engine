@@ -20,16 +20,16 @@
 #include <QDebug>
 #include <exception>
 
-#include "globals.hh"
-#include "nebmods.hh"
+#include "broker.hh"
+#include "broker/loader.hh"
 #include "common.hh"
 #include "error.hh"
-#include "broker.hh"
+#include "globals.hh"
 #include "logging/engine.hh"
 #include "logging/broker.hh"
 #include "logging/object.hh"
 
-using namespace com::centreon::engine::logging;
+using namespace com::centreon::engine;
 
 /**************************************
  *                                     *
@@ -55,17 +55,22 @@ int main(void) {
     // Add event logged data to broker.
     config.set_event_broker_options(BROKER_LOGGED_DATA);
 
-    // Get instance of logging engine.
-    engine& engine = engine::instance();
+    // Get instance of the module loader.
+    broker::loader& loader(broker::loader::instance());
 
-    // Add and load dummy module.
-    if (neb_add_module("./libdummybidulemod.so", "", 0) != 0
-        || neb_load_all_modules() != 0)
-      throw (engine_error() << "load module failed.");
+    // Load dummy module.
+    loader.set_directory(".");
+    if (loader.load() != 1)
+      throw (engine_error() << "module loading failed");
+
+    // Get instance of logging engine.
+    logging::engine& engine(logging::engine::instance());
 
     // Add new object (broker) to log into engine.
-    QSharedPointer<broker> obj(new broker);
-    engine::obj_info info(obj, log_all, most);
+    QSharedPointer<logging::broker> obj(new logging::broker);
+    logging::engine::obj_info info(obj,
+      logging::log_all,
+      logging::most);
     unsigned int id = engine.add_object(info);
 
     // Send message on all different logging type.

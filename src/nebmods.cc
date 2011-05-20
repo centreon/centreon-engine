@@ -59,15 +59,15 @@ int neb_add_module(char const* filename, char const* args, int should_be_loaded)
   try {
     broker::loader::instance().add_module(filename, args);
     log_debug_info(DEBUGL_EVENTBROKER, 0,
-		   "Added module: name=`%s', args=`%s'\n",
-		   filename,
-		   args);
+                   "Added module: name=`%s', args=`%s'\n",
+                   filename,
+                   args);
   }
   catch (...) {
     log_debug_info(DEBUGL_EVENTBROKER, 0,
-		   "Counld not add module: name=`%s', args=`%s'\n",
-		   filename,
-		   args);
+                   "Counld not add module: name=`%s', args=`%s'\n",
+                   filename,
+                   args);
     return (ERROR);
   }
   return (OK);
@@ -94,22 +94,23 @@ int neb_free_module_list(void) {
 
 /* load all modules */
 int neb_load_all_modules(void) {
+  int unloaded(0);
   try {
     broker::loader& loader = broker::loader::instance();
     QList<QSharedPointer<broker::handle> > modules = loader.get_modules();
 
     for (QList<QSharedPointer<broker::handle> >::const_iterator
-	   it = modules.begin(), end = modules.end();
-	 it != end;
-	 ++it) {
-      neb_load_module(&(*(*it)));
-    }
+           it = modules.begin(), end = modules.end();
+         it != end;
+         ++it)
+      if (neb_load_module(&(*(*it))))
+        ++unloaded;
   }
   catch (...) {
     log_debug_info(DEBUGL_EVENTBROKER, 0, "Counld not load all modules\n");
-    return (ERROR);
+    return (-1);
   }
-  return (OK);
+  return (unloaded);
 }
 
 /* load a particular module */
@@ -126,20 +127,20 @@ int neb_load_module(void* mod) {
   try {
     module->open();
     logit(NSLOG_INFO_MESSAGE, false,
-	  "Event broker module `%s' initialized successfully.\n",
-	  module->get_filename().toStdString().c_str());
+          "Event broker module `%s' initialized successfully.\n",
+          module->get_filename().toStdString().c_str());
   }
   catch (error const& e) {
     logit(NSLOG_RUNTIME_ERROR, false,
-	  "Error: Could not load module `%s' -> %s\n",
-	  module->get_filename().toStdString().c_str(),
-	  e.what());
+          "Error: Could not load module `%s' -> %s\n",
+          module->get_filename().toStdString().c_str(),
+          e.what());
     return (ERROR);
   }
   catch (...) {
     logit(NSLOG_RUNTIME_ERROR, false,
-	  "Error: Could not load module `%s'\n",
-	  module->get_filename().toStdString().c_str());
+          "Error: Could not load module `%s'\n",
+          module->get_filename().toStdString().c_str());
     return (ERROR);
   }
   return (OK);
@@ -152,9 +153,9 @@ int neb_unload_all_modules(int flags, int reason) {
     QList<QSharedPointer<broker::handle> > modules = loader.get_modules();
 
     for (QList<QSharedPointer<broker::handle> >::const_iterator
-	   it = modules.begin(), end = modules.end();
-	 it != end;
-	 ++it) {
+           it = modules.begin(), end = modules.end();
+         it != end;
+         ++it) {
       neb_unload_module(&**it, flags, reason);
     }
     log_debug_info(DEBUGL_EVENTBROKER, 0, "load all modules success.\n");
@@ -190,7 +191,7 @@ int neb_unload_module(void* mod, int flags, int reason) {
 
   log_debug_info(DEBUGL_EVENTBROKER, 0,
                  "Module '%s' unloaded successfully.\n",
-		 module->get_filename().toStdString().c_str());
+                 module->get_filename().toStdString().c_str());
 
   logit(NSLOG_INFO_MESSAGE, false,
         "Event broker module '%s' deinitialized successfully.\n",
@@ -244,9 +245,9 @@ int neb_set_module_info(void* handle, int type, char const* data) {
     }
 
     log_debug_info(DEBUGL_EVENTBROKER, 0,
-		   "set module info success: filename=%s, type=`%d'\n",
-		   module->get_filename().toStdString().c_str(),
-		   type);
+                   "set module info success: filename=%s, type=`%d'\n",
+                   module->get_filename().toStdString().c_str(),
+                   type);
   }
   catch (...) {
     log_debug_info(DEBUGL_EVENTBROKER, 0, "Counld not set module info.\n");
@@ -264,9 +265,9 @@ int neb_set_module_info(void* handle, int type, char const* data) {
 
 /* allows a module to register a callback function */
 int neb_register_callback(int callback_type,
-			  void* mod_handle,
+                          void* mod_handle,
                           int priority,
-			  int (*callback_func) (int, void*)) {
+                          int (*callback_func) (int, void*)) {
   nebcallback* new_callback = NULL;
   nebcallback* temp_callback = NULL;
   nebcallback* last_callback = NULL;
@@ -297,7 +298,7 @@ int neb_register_callback(int callback_type,
     last_callback = NULL;
     for (temp_callback = neb_callback_list[callback_type];
          temp_callback != NULL;
-	 temp_callback = temp_callback->next) {
+         temp_callback = temp_callback->next) {
       if (temp_callback->priority > new_callback->priority)
         break;
       last_callback = temp_callback;
@@ -327,12 +328,12 @@ int neb_deregister_module_callbacks(void* mod) {
 
   for (callback_type = 0; callback_type < NEBCALLBACK_NUMITEMS; callback_type++) {
     for (temp_callback = neb_callback_list[callback_type];
-	 temp_callback != NULL;
-	 temp_callback = next_callback) {
+         temp_callback != NULL;
+         temp_callback = next_callback) {
       next_callback = temp_callback->next;
       if ((void*)temp_callback->module_handle == (void*)mod)
         neb_deregister_callback(callback_type,
-				(int (*)(int, void*))temp_callback->callback_func);
+                                (int (*)(int, void*))temp_callback->callback_func);
     }
   }
   return (OK);
@@ -407,8 +408,8 @@ int neb_make_callbacks(int callback_type, void* data) {
     log_debug_info(DEBUGL_EVENTBROKER, 2,
                    "Callback #%d (type %d) return (code = %d\n",
                    total_callbacks,
-		   callback_type,
-		   cbresult);
+                   callback_type,
+                   cbresult);
 
     /* module wants to cancel callbacks to other modules (and potentially cancel the default handling of an event) */
     if (cbresult == NEBERROR_CALLBACKCANCEL)
@@ -440,7 +441,7 @@ int neb_free_callback_list(void) {
 
   for (x = 0; x < NEBCALLBACK_NUMITEMS; x++) {
     for (temp_callback = neb_callback_list[x];
-	 temp_callback != NULL;
+         temp_callback != NULL;
          temp_callback = next_callback) {
       next_callback = temp_callback->next;
       delete temp_callback;

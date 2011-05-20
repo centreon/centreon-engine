@@ -20,11 +20,10 @@
 #include <QDir>
 #include <QFile>
 #include <unistd.h>
-
-#include "error.hh"
-#include "logging.hh"
 #include "broker/compatibility.hh"
 #include "broker/loader.hh"
+#include "error.hh"
+#include "logging.hh"
 
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::broker;
@@ -45,12 +44,15 @@ loader& loader::instance() {
 
 /**
  *  Load modules in the specify directory.
+ *
+ *  @return Number of modules loaded.
  */
-void loader::load() {
+unsigned int loader::load() {
   QDir dir(_directory);
   QStringList filters("*.so");
   QFileInfoList files = dir.entryInfoList(filters);
   QSharedPointer<handle> module;
+  unsigned int loaded(0);
 
   for (QFileInfoList::const_iterator it = files.begin(), end = files.end(); it != end; ++it) {
     QString config_file(dir.path() + "/" + it->baseName() + ".cfg");
@@ -60,17 +62,20 @@ void loader::load() {
       module = add_module(dir.path() + "/" + it->fileName(), config_file);
       module->open();
       logit(NSLOG_INFO_MESSAGE, false,
-	    "Event broker module `%s' initialized successfully.\n",
-	    it->fileName().toStdString().c_str());
+        "Event broker module `%s' initialized successfully.\n",
+        it->fileName().toStdString().c_str());
+      ++loaded;
     }
     catch (error const& e) {
       del_module(module);
       logit(NSLOG_RUNTIME_ERROR, false,
-	    "Error: Could not load module `%s' -> %s\n",
-	    it->fileName().toStdString().c_str(),
-	    e.what());
+        "Error: Could not load module `%s' -> %s\n",
+        it->fileName().toStdString().c_str(),
+        e.what());
     }
   }
+
+  return (loaded);
 }
 
 /**
@@ -83,8 +88,8 @@ void loader::unload() {
        ++it) {
     it.value()->close();
     log_debug_info(DEBUGL_EVENTBROKER, 0,
-		   "Module `%s' unloaded successfully.\n",
-		   it.value()->get_filename().toStdString().c_str());
+      "Module `%s' unloaded successfully.\n",
+      it.value()->get_filename().toStdString().c_str());
   }
   _modules.clear();
 }
