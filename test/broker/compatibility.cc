@@ -22,13 +22,13 @@
 #include <limits.h>
 
 #include "error.hh"
-#include "mod_test_load.hh"
+#include "mod_load.hh"
 #include "broker/compatibility.hh"
 #include "broker/loader.hh"
 
 using namespace com::centreon::engine::broker;
 
-static const char* MOD_LIB_COMPT_NAME = "./libmod_test_load_compatibility.so";
+static const char* MOD_LIB_COMPT_NAME = "./broker_mod_compatibility.so";
 
 extern nebmodule* neb_module_list;
 

@@ -59,10 +59,9 @@ int main(void) {
     engine& engine = engine::instance();
 
     // Add and load dummy module.
-    if (neb_add_module("./libdummymod.so", "", 0) != 0
-	|| neb_load_all_modules() != 0) {
+    if (neb_add_module("./libdummybidulemod.so", "", 0) != 0
+        || neb_load_all_modules() != 0)
       throw (engine_error() << "load module failed.");
-    }
 
     // Add new object (broker) to log into engine.
     QSharedPointer<broker> obj(new broker);

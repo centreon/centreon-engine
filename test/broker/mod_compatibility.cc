@@ -21,7 +21,7 @@
 #include <string.h>
 
 #include "nebmods.hh"
-#include "mod_test_load.hh"
+#include "mod_load.hh"
 
 /**************************************
  *                                     *

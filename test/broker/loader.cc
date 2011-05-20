@@ -26,7 +26,7 @@
 
 using namespace com::centreon::engine::broker;
 
-static const char* MOD_LIB_NAME = "./libmod_test_load.so";
+static const char* MOD_LIB_NAME = "./broker_mod_load.so";
 
 bool mod_test_load_quit = false;
 

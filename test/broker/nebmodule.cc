@@ -23,13 +23,13 @@
 
 #include "error.hh"
 #include "nebmods.hh"
-#include "mod_test_load.hh"
+#include "mod_load.hh"
 #include "broker/loader.hh"
 
 using namespace com::centreon::engine::broker;
 
-static const char* MOD_LIB_NAME        = "./libmod_test_load.so";
-static const char* MOD_LIB_COMPAT_NAME = "./libmod_test_load_compatibility.so";
+static const char* MOD_LIB_NAME        = "./broker_mod_load.so";
+static const char* MOD_LIB_COMPAT_NAME = "./broker_mod_compatibility.so";
 
 bool mod_test_load_quit = false;
 

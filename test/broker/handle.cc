@@ -1,5 +1,5 @@
 /*
-** Copyright 2011      Merethis
+** Copyright 2011 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -22,12 +22,12 @@
 
 #include "error.hh"
 #include "broker/handle.hh"
-#include "mod_test_load.hh"
+#include "mod_load.hh"
 
 using namespace com::centreon::engine::broker;
 
-static const char* MOD_LIB_UNKNOW  = "./libmod_test_unknow.so";
-static const char* MOD_LIB_NAME    = "./libmod_test_load.so";
+static const char* MOD_LIB_UNKNOW  = "./broker_mod_unknow.so";
+static const char* MOD_LIB_NAME    = "./broker_mod_load.so";
 
 bool mod_test_load_quit = false;
 

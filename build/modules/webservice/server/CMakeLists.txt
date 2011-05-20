@@ -1,25 +1,27 @@
 ##
 ## Copyright 2011 Merethis
 ##
-## This file is part of Centreon Scheduler.
+## This file is part of Centreon Engine.
 ##
-## Centreon Scheduler is free software: you can redistribute it and/or
+## Centreon Engine is free software: you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License version 2
 ## as published by the Free Software Foundation.
 ##
-## Centreon Scheduler is distributed in the hope that it will be useful,
+## Centreon Engine is distributed in the hope that it will be useful,
 ## but WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with Centreon Scheduler. If not, see
+## along with Centreon Engine. If not, see
 ## <http://www.gnu.org/licenses/>.
 ##
 
+# Generate webservice header from WSDL.
 add_custom_command(OUTPUT "${MODULE_DIR}/server/centreon-engine-ws.hh"
   COMMAND "${WSDL2H_PROGRAM}" "-o" "${MODULE_DIR}/server/centreon-engine-ws.hh" "-t${MODULE_DIR}/typemap.dat" "${MODULE_DIR}/centreon-engine.wsdl")
 
+# Generate webservice sources from header.
 add_custom_command(OUTPUT
   "${MODULE_DIR}/server/centreonengine.nsmap"
   "${MODULE_DIR}/server/soapC.cpp"
@@ -29,7 +31,7 @@ add_custom_command(OUTPUT
   COMMAND "${SOAPCPP2_PROGRAM}" "-S" "-L" "-x" "-d${MODULE_DIR}/server" "-I${GSOAP_INCLUDE_DIR}" "${MODULE_DIR}/server/centreon-engine-ws.hh"
   DEPENDS "${MODULE_DIR}/server/centreon-engine-ws.hh")
 
-# Include Directories.
+# Include directories.
 include_directories("${MODULE_DIR}/server")
 include_directories("${MODULE_DIR}/../external_cmd")
 
@@ -37,9 +39,9 @@ include_directories("${MODULE_DIR}/../external_cmd")
 qt4_wrap_cpp(QT_WS_MOC_FILES
   "${MODULE_DIR}/server/webservice.hh")
 
-# centscheduler target.
+# webservice target.
 add_library("webservice"
-  "SHARED"
+  SHARED
   "${MODULE_DIR}/server/soapC.cpp"
   "${MODULE_DIR}/server/soapServer.cpp"
   "${MODULE_DIR}/server/commands.cc"
@@ -53,23 +55,36 @@ add_library("webservice"
   "${MODULE_DIR}/server/ssl.hh"
   "${MODULE_DIR}/server/syncro.hh"
   ${QT_WS_MOC_FILES})
-get_property(MODULE_COMPILE_FLAGS
-  TARGET "webservice"
-  PROPERTY COMPILE_FLAGS)
-set(MODULE_COMPILE_FLAGS "${MODULE_COMPILE_FLAGS}")
+
+# Prettier name.
+set_target_properties("webservice" PROPERTIES PREFIX "")
+
+# Compiler-specific addon to avoid some warnings.
 if (CMAKE_COMPILER_IS_GNUCXX)
-  set_source_files_properties("${MODULE_DIR}/server/soapC.cpp" PROPERTIES
-    COMPILE_FLAGS "-Wno-unused-parameter")
+  # Avoid warnings on autogenerate soapC.cpp file.
+  unset(compile_flags)
+  get_source_file_property(compile_flags
+    "${MODULE_DIR}/server/soapC.cpp"
+    COMPILE_FLAGS)
+  if (compile_flags)
+    set(compile_flags "${compile_flags} -Wno-unused-parameter")
+  else ()
+    set(compile_flags "-Wno-unused-parameter")
+  endif ()
+  set_source_files_properties("${MODULE_DIR}/server/soapC.cpp"
+    PROPERTIES COMPILE_FLAGS "${compile_flags}")
 endif ()
-set_target_properties("webservice" PROPERTIES
-  COMPILE_FLAGS "${MODULE_COMPILE_FLAGS}")
+
+# Link target with libraries.
 target_link_libraries("webservice"
   ${GSOAP_LIBRARIES}
   ${SSL_LIBRARIES}
   ${CRYPTO_LIBRARIES}
   ${ZLIB_LIBRARIES}
   ${QT_LIBRARIES}
-  "external_cmd")
+  "externalcmd")
+
+# Install rule.
 install(TARGETS "webservice"
   DESTINATION "${libdir}/"
   COMPONENT "runtime")

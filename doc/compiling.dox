@@ -224,6 +224,10 @@
  *    <td>Enable or disable sample configuration files installation.</td>
  *  </tr>
  *  <tr>
+ *    <td>WITH_WEBSERVICE</td>
+ *    <td>Enable or disable webservice module generation. Default is enabled.</td>
+ *  </tr>
+ *  <tr>
  *    <td>WITH_SSL</td>
  *    <td>Enable or disable SSL support in webservice. Default is disabled.</td>
  *  </tr>

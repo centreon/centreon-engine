@@ -628,12 +628,12 @@ add_definitions(-DDEFAULT_EVENT_BROKER_FILE="${localstatedir}/broker.socket")
 add_definitions(-DDEFAULT_P1_FILE="${bindir}/p1.pl")
 add_definitions(-DDEFAULT_AUTH_FILE="")
 
-# Include Directories
+# Include directories.
 include_directories("${INCLUDE_DIR}")
 
 # Library engine target.
-add_library("centenginelib"
-  "STATIC"
+add_library("cce_core"
+  STATIC
   "${SRC_DIR}/broker.cc"
   "${SRC_DIR}/checks.cc"
   "${SRC_DIR}/config.cc"
@@ -696,13 +696,19 @@ add_library("centenginelib"
   "${INCLUDE_DIR}/xsddefault.hh"
   "${PERL_SOURCES}"
   ${QT_MOC_FILES})
-get_property(LIB_COMPILE_FLAGS
-  TARGET "centenginelib"
-  PROPERTY COMPILE_FLAGS)
-set(LIB_COMPILE_FLAGS "${LIB_COMPILE_FLAGS}")
-set_target_properties("centenginelib" PROPERTIES
-  COMPILE_FLAGS "${LIB_COMPILE_FLAGS}")
-target_link_libraries("centenginelib"
+
+# Subdirectories with core features.
+add_subdirectory("broker")
+add_subdirectory("conf")
+add_subdirectory("configuration")
+add_subdirectory("compatibility")
+add_subdirectory("doc")
+add_subdirectory("logging")
+add_subdirectory("modules")
+add_subdirectory("scripts")
+
+# Link target with required libraries.
+target_link_libraries("cce_core"
   ${MATH_LIBRARIES}
   ${SOCKET_LIBRARIES}
   ${THREAD_LIBRARIES}
@@ -711,10 +717,9 @@ target_link_libraries("centenginelib"
   "cce_logging"
   "cce_broker"
   "cce_configuration"
-  "cce_configurationapplier"
   "cce_compatibility")
 
-# Centengine target.
+# centengine target.
 add_executable("centengine"
   "${SRC_DIR}/main.cc")
 get_property(ENGINE_COMPILE_FLAGS
@@ -723,15 +728,18 @@ get_property(ENGINE_COMPILE_FLAGS
 set(ENGINE_COMPILE_FLAGS "${ENGINE_COMPILE_FLAGS} ${PERL_COMPILE_FLAGS}")
 set_target_properties("centengine"
   PROPERTIES COMPILE_FLAGS "${ENGINE_COMPILE_FLAGS}")
+# Link centengine with required libraries.
 target_link_libraries("centengine"
-  "centenginelib")
+  "cce_core")
+# Install rule.
 install(TARGETS "centengine"
   DESTINATION "${bindir}"
   COMPONENT "runtime")
 
-# Centenginestats target.
+# centenginestats target.
 add_executable("centenginestats"
   "${SRC_DIR}/centenginestats.cc")
+# Install rule.
 install(TARGETS "centenginestats"
   DESTINATION "${bindir}"
   COMPONENT "runtime")
@@ -753,17 +761,6 @@ install(DIRECTORY "${INCLUDE_DIR}/"
   FILES_MATCHING PATTERN "*.hh"
   PATTERN "${INCLUDE_DIR}/compatibility/" EXCLUDE)
 
-# Add subdirectories.
-add_subdirectory("broker")
-add_subdirectory("conf")
-add_subdirectory("configuration")
-add_subdirectory("configuration/applier")
-add_subdirectory("compatibility")
-add_subdirectory("doc")
-add_subdirectory("logging")
-add_subdirectory("modules")
-add_subdirectory("scripts")
-
 #
 # Error tests.
 #
@@ -771,67 +768,67 @@ add_subdirectory("scripts")
 set(TEST_NAME "error_insert_integer")
 add_executable("${TEST_NAME}"
   "${TEST_DIR}/error/insert_integer.cc")
-target_link_libraries("${TEST_NAME}" "centenginelib")
+target_link_libraries("${TEST_NAME}" "cce_core")
 add_test("${TEST_NAME}" "${TEST_NAME}")
 # Unsigned integer insertion.
 set(TEST_NAME "error_insert_unsigned_integer")
 add_executable("${TEST_NAME}"
   "${TEST_DIR}/error/insert_unsigned_integer.cc")
-target_link_libraries("${TEST_NAME}" "centenginelib")
+target_link_libraries("${TEST_NAME}" "cce_core")
 add_test("${TEST_NAME}" "${TEST_NAME}")
 # Long insertion.
 set(TEST_NAME "error_insert_long")
 add_executable("${TEST_NAME}"
   "${TEST_DIR}/error/insert_long.cc")
-target_link_libraries("${TEST_NAME}" "centenginelib")
+target_link_libraries("${TEST_NAME}" "cce_core")
 add_test("${TEST_NAME}" "${TEST_NAME}")
 # Long long insertion.
 set(TEST_NAME "error_insert_long_long")
 add_executable("${TEST_NAME}"
   "${TEST_DIR}/error/insert_long_long.cc")
-target_link_libraries("${TEST_NAME}" "centenginelib")
+target_link_libraries("${TEST_NAME}" "cce_core")
 add_test("${TEST_NAME}" "${TEST_NAME}")
 # Unsigned long long insertion.
 set(TEST_NAME "error_insert_unsigned_long_long")
 add_executable("${TEST_NAME}"
   "${TEST_DIR}/error/insert_unsigned_long_long.cc")
-target_link_libraries("${TEST_NAME}" "centenginelib")
+target_link_libraries("${TEST_NAME}" "cce_core")
 add_test("${TEST_NAME}" "${TEST_NAME}")
 # Char insertion.
 set(TEST_NAME "error_insert_char")
 add_executable("${TEST_NAME}"
   "${TEST_DIR}/error/insert_char.cc")
-target_link_libraries("${TEST_NAME}" "centenginelib")
+target_link_libraries("${TEST_NAME}" "cce_core")
 add_test("${TEST_NAME}" "${TEST_NAME}")
 # Char array (C string) insertion.
 set(TEST_NAME "error_insert_char_array")
 add_executable("${TEST_NAME}"
   "${TEST_DIR}/error/insert_char_array.cc")
-target_link_libraries("${TEST_NAME}" "centenginelib")
+target_link_libraries("${TEST_NAME}" "cce_core")
 add_test("${TEST_NAME}" "${TEST_NAME}")
 # String insertion.
 set(TEST_NAME "error_insert_string")
 add_executable("${TEST_NAME}"
   "${TEST_DIR}/error/insert_string.cc")
-target_link_libraries("${TEST_NAME}" "centenginelib")
+target_link_libraries("${TEST_NAME}" "cce_core")
 add_test("${TEST_NAME}" "${TEST_NAME}")
 # Mixed insertions.
 set(TEST_NAME "error_insert_mixed")
 add_executable("${TEST_NAME}"
   "${TEST_DIR}/error/insert_mixed.cc")
-target_link_libraries("${TEST_NAME}" "centenginelib")
+target_link_libraries("${TEST_NAME}" "cce_core")
 add_test("${TEST_NAME}" "${TEST_NAME}")
 # Copy constructor.
 set(TEST_NAME "error_copy_ctor")
 add_executable("${TEST_NAME}"
   "${TEST_DIR}/error/copy_ctor.cc")
-target_link_libraries("${TEST_NAME}" "centenginelib")
+target_link_libraries("${TEST_NAME}" "cce_core")
 add_test("${TEST_NAME}" "${TEST_NAME}")
 # Assignment operator.
 set(TEST_NAME "error_assignment")
 add_executable("${TEST_NAME}"
   "${TEST_DIR}/error/assignment.cc")
-target_link_libraries("${TEST_NAME}" "centenginelib")
+target_link_libraries("${TEST_NAME}" "cce_core")
 add_test("${TEST_NAME}" "${TEST_NAME}")
 
 #
@@ -905,11 +902,6 @@ else ()
   set(RPM_PACKAGE "No")
 endif ()
 include(CPack)
-if (WITH_SSL)
-  set(OPENSSL "Yes")
-else()
-  set(OPENSSL "No")
-endif()
 
 # Print summary.
 message(STATUS "")
@@ -918,7 +910,6 @@ message(STATUS "Configuration Summary")
 message(STATUS "---------------------")
 message(STATUS "")
 message(STATUS "    Version:                 ${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}")
-message(STATUS "    OpenSSL:                 ${OPENSSL}")
 message(STATUS "    Embedded Perl:           ${EMBEDDED_PERL}")
 if (EMBEDDEDPERL)
   message(STATUS "    Threaded Perl:           ${THREADED_PERL}")
@@ -927,6 +918,7 @@ message(STATUS "    Extra Compilation Flags: ${CMAKE_CXX_FLAGS}")
 message(STATUS "    Prefix:                  ${localstatedir}")
 message(STATUS "    Binary Directory:        ${bindir}")
 message(STATUS "    Configuration Directory: ${confdir}")
+message(STATUS "    Library Directory:       ${libdir}")
 message(STATUS "    Var Directory:           ${vardir}")
 message(STATUS "    Check Result Directory:  ${CHECK_RESULT_DIR}")
 message(STATUS "    Temporary Directory:     ${TMPDIR}")

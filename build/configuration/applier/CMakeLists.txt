@@ -1,39 +1,35 @@
 ##
 ## Copyright 2011 Merethis
 ##
-## This file is part of Centreon Scheduler.
+## This file is part of Centreon Engine.
 ##
-## Centreon Scheduler is free software: you can redistribute it and/or
+## Centreon Engine is free software: you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License version 2
 ## as published by the Free Software Foundation.
 ##
-## Centreon Scheduler is distributed in the hope that it will be useful,
+## Centreon Engine is distributed in the hope that it will be useful,
 ## but WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with Centreon Scheduler. If not, see
+## along with Centreon Engine. If not, see
 ## <http://www.gnu.org/licenses/>.
 ##
 
 # Set directories.
-set(MY_SRC_DIR "${SRC_DIR}/configuration/applier")
-set(MY_INC_DIR "${INCLUDE_DIR}/configuration/applier")
+set(SRC_DIR "${SRC_DIR}/applier")
+set(INC_DIR "${INC_DIR}/applier")
 
-# cce_configurationapplier target.
-add_library("cce_configurationapplier"
-  "STATIC"
-  "${MY_SRC_DIR}/base.cc"
-  "${MY_SRC_DIR}/logging.cc"
-  "${MY_INC_DIR}/base.hh"
-  "${MY_INC_DIR}/logging.hh")
-get_property(MY_COMPILE_FLAGS
-  TARGET "cce_configurationapplier"
-  PROPERTY COMPILE_FLAGS)
-set(MY_COMPILE_FLAGS "${MY_COMPILE_FLAGS}")
-set_target_properties("cce_configurationapplier"
-  PROPERTIES COMPILE_FLAGS "${MY_COMPILE_FLAGS}")
-target_link_libraries("cce_configurationapplier"
+# cce_configuration_applier target.
+add_library("cce_configuration_applier"
+  STATIC
+  "${SRC_DIR}/base.cc"
+  "${SRC_DIR}/logging.cc"
+  "${INC_DIR}/base.hh"
+  "${INC_DIR}/logging.hh")
+
+# Link target with required libraries.
+target_link_libraries("cce_configuration_applier"
   ${QT_LIBRARIES}
   "cce_logging")

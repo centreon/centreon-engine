@@ -23,7 +23,7 @@
 #include "nebmods.hh"
 #include "error.hh"
 #include "broker/handle.hh"
-#include "mod_test_load.hh"
+#include "mod_load.hh"
 
 using namespace com::centreon::engine;
 

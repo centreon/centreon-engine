@@ -1,59 +1,54 @@
 ##
 ## Copyright 2011 Merethis
 ##
-## This file is part of Centreon Scheduler.
+## This file is part of Centreon Engine.
 ##
-## Centreon Scheduler is free software: you can redistribute it and/or
+## Centreon Engine is free software: you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License version 2
 ## as published by the Free Software Foundation.
 ##
-## Centreon Scheduler is distributed in the hope that it will be useful,
+## Centreon Engine is distributed in the hope that it will be useful,
 ## but WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
 ## General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with Centreon Scheduler. If not, see
+## along with Centreon Engine. If not, see
 ## <http://www.gnu.org/licenses/>.
 ##
 
 # Set directories.
-set(MY_SRC_DIR "${SRC_DIR}/configuration")
-set(MY_INC_DIR "${INCLUDE_DIR}/configuration")
-set(MY_TEST_DIR "${TEST_DIR}/configuration")
+set(SRC_DIR "${SRC_DIR}/configuration")
+set(INC_DIR "${INCLUDE_DIR}/configuration")
+set(TEST_DIR "${TEST_DIR}/configuration")
+
+# Subdirectory.
+add_subdirectory("applier")
 
 # cce_configuration target.
 add_library("cce_configuration"
-  "STATIC"
-  "${MY_SRC_DIR}/"
-  "${MY_SRC_DIR}/state.cc"
-  "${MY_INC_DIR}/state.hh")
-get_property(MY_COMPILE_FLAGS
-  TARGET "cce_configuration"
-  PROPERTY COMPILE_FLAGS)
-set(MY_COMPILE_FLAGS "${MY_COMPILE_FLAGS}")
-set_target_properties("cce_configuration"
-  PROPERTIES COMPILE_FLAGS "${MY_COMPILE_FLAGS}")
+  STATIC
+  "${SRC_DIR}/state.cc"
+  "${INC_DIR}/state.hh")
+
+# Link target with subdirectory's library.
 target_link_libraries("cce_configuration"
-  ${QT_LIBRARIES}
-  "centenginelib")
+  "cce_configuration_applier"
+  "cce_core")
 
-# Test configuration.
-add_executable("test_configuration"
-  "${MY_TEST_DIR}/test_configuration.cc")
-target_link_libraries("test_configuration"
-  ${QT_LIBRARIES}
-  "centenginelib")
-add_test("test_configuration_basic"
-  "test_configuration"
-  "test.cfg")
+# Basic test.
+set(TEST_NAME "configuration_basic")
+add_executable("${TEST_NAME}"
+  "${TEST_DIR}/basic.cc")
+target_link_libraries("${TEST_NAME}"
+  "cce_core")
+add_test("${TEST_NAME}" "${TEST_NAME}" "test.cfg")
 
-# Test parse argument.
-add_executable("test_configuration_parse_argument"
-  "${MY_TEST_DIR}/test_parse_argument.cc")
-target_link_libraries("test_configuration_parse_argument"
+# Parsing test.
+set(TEST_NAME "configuration_parsing")
+add_executable("${TEST_NAME}"
+  "${TEST_DIR}/parsing.cc")
+target_link_libraries("${TEST_NAME}"
   ${QT_LIBRARIES}
-  "centenginelib")
-add_test("test_configuration_parse_argument"
-  "test_configuration_parse_argument")
-
+  "cce_core")
+add_test("${TEST_NAME}" "${TEST_NAME}")
