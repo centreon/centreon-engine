@@ -20,7 +20,6 @@
 # Set directories.
 set(SRC_DIR "${SRC_DIR}/configuration")
 set(INC_DIR "${INCLUDE_DIR}/configuration")
-set(TEST_DIR "${TEST_DIR}/configuration")
 
 # Subdirectory.
 add_subdirectory("applier")
@@ -37,6 +36,9 @@ target_link_libraries("cce_configuration"
   "cce_core")
 
 if (WITH_TESTING)
+  # Set directories.
+  set(TEST_DIR "${TEST_DIR}/configuration")
+
   # Basic test.
   set(TEST_NAME "configuration_basic")
   add_executable("${TEST_NAME}" "${TEST_DIR}/basic.cc")
