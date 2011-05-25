@@ -770,6 +770,7 @@ install(TARGETS "centenginestats"
 
 # Create directories.
 install(CODE "
+  file(MAKE_DIRECTORY \"${localstatedir}\")
   file(MAKE_DIRECTORY \"${bindir}\")
   file(MAKE_DIRECTORY \"${confdir}\")
   file(MAKE_DIRECTORY \"${libdir}\")
