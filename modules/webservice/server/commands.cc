@@ -15635,6 +15635,53 @@ int centreonengine__contactGetNotificationsOnServiceUnknown(soap* s,
 }
 
 /**
+ *  Check if contact should be notified when services states are warning.
+ *
+ *  @param[in]  s                 Unused.
+ *  @param[in]  contact_id        Contact to get data.
+ *  @param[out] val               Result of operation.
+ *
+ *  @return SOAP_OK on success.
+ */
+int centreonengine__contactGetNotificationsOnServiceWarning(soap* s,
+                                                            ns1__contactIDType* contact_id,
+                                                            bool& val) {
+  try {
+    syncro::instance().waiting_callback();
+
+    log_debug_info(DEBUGL_FUNCTIONS, 2,
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   contact_id->contact.c_str());
+
+    contact* contact = find_contact(contact_id->contact.c_str());
+    if (contact == NULL) {
+      std::string* error = soap_new_std__string(s, 1);
+      *error = "Contact `" + contact_id->contact + "' not found.";
+
+      log_debug_info(DEBUGL_COMMANDS, 2,
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
+
+      syncro::instance().worker_finish();
+      return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
+    }
+
+    val = contact->notify_on_service_warning;
+    syncro::instance().worker_finish();
+  }
+  catch (...) {
+    log_debug_info(DEBUGL_COMMANDS, 2,
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
+    syncro::instance().worker_finish();
+    return (soap_receiver_fault(s, "Runtime error.", "catch all"));
+  }
+  return (SOAP_OK);
+}
+
+/**
  *  Get the contact pager.
  *
  *  @param[in]  s                 Unused.

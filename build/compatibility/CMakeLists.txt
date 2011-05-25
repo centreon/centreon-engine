@@ -33,8 +33,7 @@ add_library("cce_compatibility"
   "${SRC_DIR}/logging.cc")
 
 # Link target.
-target_link_libraries("cce_compatibility"
-  "cce_core")
+target_link_libraries("cce_compatibility" "cce_core")
 
 # Install header files for devel.
 install(DIRECTORY "${INC_DIR}"

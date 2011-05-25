@@ -23,8 +23,7 @@ set(INC_DIR "${INCLUDE_DIR}/checks")
 set(TEST_DIR "${TEST_DIR}/checks")
 
 # Produce moc files.
-qt4_wrap_cpp(QT_MOC_FILES
-  "${INC_DIR}/checker.hh")
+qt4_wrap_cpp(QT_MOC_FILES "${INC_DIR}/checker.hh")
 
 # cce_checks target.
 add_library("cce_checks"
@@ -34,6 +33,4 @@ add_library("cce_checks"
   ${QT_MOC_FILES})
 
 # Link target with required libraries.
-target_link_libraries("cce_checks"
-  ${QT_LIBRARIES}
-  "cce_commands")
+target_link_libraries("cce_checks" ${QT_LIBRARIES} "cce_commands")

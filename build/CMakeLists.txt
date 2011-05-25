@@ -28,7 +28,9 @@ add_definitions("-DENGINE_VERSION=\"${ENGINE_VERSION}\"")
 
 # Testing.
 set(PROJECT_SOURCE_DIR "${PROJECT_SOURCE_DIR}/..")
-include(CTest)
+if (WITH_TESTING)
+  include(CTest)
+endif ()
 
 # Check libraries to link with.
 include(CheckLibraryExists)
@@ -61,7 +63,9 @@ include(${QT_USE_FILE})
 set(INCLUDE_DIR "${PROJECT_SOURCE_DIR}/inc")
 set(SCRIPT_DIR "${PROJECT_SOURCE_DIR}/scripts")
 set(SRC_DIR "${PROJECT_SOURCE_DIR}/src")
-set(TEST_DIR "${PROJECT_SOURCE_DIR}/test")
+if (WITH_TESTING)
+  set(TEST_DIR "${PROJECT_SOURCE_DIR}/test")
+endif ()
 
 # Check headers.
 include(CheckIncludeFileCXX)
@@ -539,6 +543,14 @@ if (WITH_STARTUP_SCRIPT)
   endif ()
 endif ()
 
+# Unit test.
+option(WITH_TESTING "Enable unit test" OFF)
+if (WITH_TESTING)
+  set(UNIT_TEST "Yes")
+else ()
+  set(UNIT_TEST "No")
+endif ()
+
 # Configure files.
 configure_file("${PROJECT_SOURCE_DIR}/build/doc/Doxyfile.in"
   "${PROJECT_SOURCE_DIR}/build/doc/Doxyfile")
@@ -707,105 +719,111 @@ install(DIRECTORY "${INCLUDE_DIR}/"
 #
 # Error tests.
 #
-# Integer insertion.
-set(TEST_NAME "error_insert_integer")
-add_executable("${TEST_NAME}"
-  "${TEST_DIR}/error/insert_integer.cc")
-target_link_libraries("${TEST_NAME}" "cce_core")
-add_test("${TEST_NAME}" "${TEST_NAME}")
-# Unsigned integer insertion.
-set(TEST_NAME "error_insert_unsigned_integer")
-add_executable("${TEST_NAME}"
-  "${TEST_DIR}/error/insert_unsigned_integer.cc")
-target_link_libraries("${TEST_NAME}" "cce_core")
-add_test("${TEST_NAME}" "${TEST_NAME}")
-# Long insertion.
-set(TEST_NAME "error_insert_long")
-add_executable("${TEST_NAME}"
-  "${TEST_DIR}/error/insert_long.cc")
-target_link_libraries("${TEST_NAME}" "cce_core")
-add_test("${TEST_NAME}" "${TEST_NAME}")
-# Long long insertion.
-set(TEST_NAME "error_insert_long_long")
-add_executable("${TEST_NAME}"
-  "${TEST_DIR}/error/insert_long_long.cc")
-target_link_libraries("${TEST_NAME}" "cce_core")
-add_test("${TEST_NAME}" "${TEST_NAME}")
-# Unsigned long long insertion.
-set(TEST_NAME "error_insert_unsigned_long_long")
-add_executable("${TEST_NAME}"
-  "${TEST_DIR}/error/insert_unsigned_long_long.cc")
-target_link_libraries("${TEST_NAME}" "cce_core")
-add_test("${TEST_NAME}" "${TEST_NAME}")
-# Char insertion.
-set(TEST_NAME "error_insert_char")
-add_executable("${TEST_NAME}"
-  "${TEST_DIR}/error/insert_char.cc")
-target_link_libraries("${TEST_NAME}" "cce_core")
-add_test("${TEST_NAME}" "${TEST_NAME}")
-# Char array (C string) insertion.
-set(TEST_NAME "error_insert_char_array")
-add_executable("${TEST_NAME}"
-  "${TEST_DIR}/error/insert_char_array.cc")
-target_link_libraries("${TEST_NAME}" "cce_core")
-add_test("${TEST_NAME}" "${TEST_NAME}")
-# String insertion.
-set(TEST_NAME "error_insert_string")
-add_executable("${TEST_NAME}"
-  "${TEST_DIR}/error/insert_string.cc")
-target_link_libraries("${TEST_NAME}" "cce_core")
-add_test("${TEST_NAME}" "${TEST_NAME}")
-# Mixed insertions.
-set(TEST_NAME "error_insert_mixed")
-add_executable("${TEST_NAME}"
-  "${TEST_DIR}/error/insert_mixed.cc")
-target_link_libraries("${TEST_NAME}" "cce_core")
-add_test("${TEST_NAME}" "${TEST_NAME}")
-# Copy constructor.
-set(TEST_NAME "error_copy_ctor")
-add_executable("${TEST_NAME}"
-  "${TEST_DIR}/error/copy_ctor.cc")
-target_link_libraries("${TEST_NAME}" "cce_core")
-add_test("${TEST_NAME}" "${TEST_NAME}")
-# Assignment operator.
-set(TEST_NAME "error_assignment")
-add_executable("${TEST_NAME}"
-  "${TEST_DIR}/error/assignment.cc")
-target_link_libraries("${TEST_NAME}" "cce_core")
-add_test("${TEST_NAME}" "${TEST_NAME}")
+if (WITH_TESTING)
+  # Integer insertion.
+  set(TEST_NAME "error_insert_integer")
+  add_executable("${TEST_NAME}"
+    "${TEST_DIR}/error/insert_integer.cc")
+  target_link_libraries("${TEST_NAME}" "cce_core")
+  add_test("${TEST_NAME}" "${TEST_NAME}")
+  # Unsigned integer insertion.
+  set(TEST_NAME "error_insert_unsigned_integer")
+  add_executable("${TEST_NAME}"
+    "${TEST_DIR}/error/insert_unsigned_integer.cc")
+  target_link_libraries("${TEST_NAME}" "cce_core")
+  add_test("${TEST_NAME}" "${TEST_NAME}")
+  # Long insertion.
+  set(TEST_NAME "error_insert_long")
+  add_executable("${TEST_NAME}"
+    "${TEST_DIR}/error/insert_long.cc")
+  target_link_libraries("${TEST_NAME}" "cce_core")
+  add_test("${TEST_NAME}" "${TEST_NAME}")
+  # Long long insertion.
+  set(TEST_NAME "error_insert_long_long")
+  add_executable("${TEST_NAME}"
+    "${TEST_DIR}/error/insert_long_long.cc")
+  target_link_libraries("${TEST_NAME}" "cce_core")
+  add_test("${TEST_NAME}" "${TEST_NAME}")
+  # Unsigned long long insertion.
+  set(TEST_NAME "error_insert_unsigned_long_long")
+  add_executable("${TEST_NAME}"
+    "${TEST_DIR}/error/insert_unsigned_long_long.cc")
+  target_link_libraries("${TEST_NAME}" "cce_core")
+  add_test("${TEST_NAME}" "${TEST_NAME}")
+  # Char insertion.
+  set(TEST_NAME "error_insert_char")
+  add_executable("${TEST_NAME}"
+    "${TEST_DIR}/error/insert_char.cc")
+  target_link_libraries("${TEST_NAME}" "cce_core")
+  add_test("${TEST_NAME}" "${TEST_NAME}")
+  # Char array (C string) insertion.
+  set(TEST_NAME "error_insert_char_array")
+  add_executable("${TEST_NAME}"
+    "${TEST_DIR}/error/insert_char_array.cc")
+  target_link_libraries("${TEST_NAME}" "cce_core")
+  add_test("${TEST_NAME}" "${TEST_NAME}")
+  # String insertion.
+  set(TEST_NAME "error_insert_string")
+  add_executable("${TEST_NAME}"
+    "${TEST_DIR}/error/insert_string.cc")
+  target_link_libraries("${TEST_NAME}" "cce_core")
+  add_test("${TEST_NAME}" "${TEST_NAME}")
+  # Mixed insertions.
+  set(TEST_NAME "error_insert_mixed")
+  add_executable("${TEST_NAME}"
+    "${TEST_DIR}/error/insert_mixed.cc")
+  target_link_libraries("${TEST_NAME}" "cce_core")
+  add_test("${TEST_NAME}" "${TEST_NAME}")
+  # Copy constructor.
+  set(TEST_NAME "error_copy_ctor")
+  add_executable("${TEST_NAME}"
+    "${TEST_DIR}/error/copy_ctor.cc")
+  target_link_libraries("${TEST_NAME}" "cce_core")
+  add_test("${TEST_NAME}" "${TEST_NAME}")
+  # Assignment operator.
+  set(TEST_NAME "error_assignment")
+  add_executable("${TEST_NAME}"
+    "${TEST_DIR}/error/assignment.cc")
+  target_link_libraries("${TEST_NAME}" "cce_core")
+  add_test("${TEST_NAME}" "${TEST_NAME}")
+endif ()
 
 #
 # Stats tests.
 #
-# Non-existent configuration file.
-add_test("running_stats_no_config_file"
-  "centenginestats" "-c" "${TEST_DIR}/running/etc/does_not_exist.cfg")
-set_tests_properties("running_stats_no_config_file"
-  PROPERTIES WILL_FAIL TRUE)
-# Non-existent status file.
-add_test("running_stats_no_status_file"
-  "centenginestats" "-c" "${TEST_DIR}/running/etc/no_status.cfg")
-set_tests_properties("running_stats_no_status_file"
-  PROPERTIES WILL_FAIL TRUE)
+if (WITH_TESTING)
+  # Non-existent configuration file.
+  add_test("running_stats_no_config_file"
+    "centenginestats" "-c" "${TEST_DIR}/running/etc/does_not_exist.cfg")
+  set_tests_properties("running_stats_no_config_file"
+    PROPERTIES WILL_FAIL TRUE)
+  # Non-existent status file.
+  add_test("running_stats_no_status_file"
+    "centenginestats" "-c" "${TEST_DIR}/running/etc/no_status.cfg")
+  set_tests_properties("running_stats_no_status_file"
+    PROPERTIES WILL_FAIL TRUE)
+endif ()
 
 #
 # Engine tests.
 #
 # Without any service.
-add_test("running_engine_no_service"
-  "centengine" "-v" "${TEST_DIR}/running/etc/no_service.cfg")
-set_tests_properties("running_engine_no_service"
-  PROPERTIES WILL_FAIL TRUE)
-# Without any contactgroup.
-add_test("running_engine_no_contactgroup"
-  "centengine" "-v" "${TEST_DIR}/running/etc/no_contactgroup.cfg")
-set_tests_properties("running_engine_no_contactgroup"
-  PROPERTIES WILL_FAIL TRUE)
-# Empty groups.
-add_test("running_engine_empty_groups"
-  "centengine" "-v" "${TEST_DIR}/running/etc/empty_groups.cfg")
-set_tests_properties("running_engine_empty_groups"
-  PROPERTIES WILL_FAIL TRUE)
+if (WITH_TESTING)
+  add_test("running_engine_no_service"
+    "centengine" "-v" "${TEST_DIR}/running/etc/no_service.cfg")
+  set_tests_properties("running_engine_no_service"
+    PROPERTIES WILL_FAIL TRUE)
+  # Without any contactgroup.
+  add_test("running_engine_no_contactgroup"
+    "centengine" "-v" "${TEST_DIR}/running/etc/no_contactgroup.cfg")
+  set_tests_properties("running_engine_no_contactgroup"
+    PROPERTIES WILL_FAIL TRUE)
+  # Empty groups.
+  add_test("running_engine_empty_groups"
+    "centengine" "-v" "${TEST_DIR}/running/etc/empty_groups.cfg")
+  set_tests_properties("running_engine_empty_groups"
+    PROPERTIES WILL_FAIL TRUE)
+endif ()
 
 # Package.
 set(CPACK_PACKAGE_NAME "Centreon-Engine")
@@ -853,6 +871,7 @@ message(STATUS "Configuration Summary")
 message(STATUS "---------------------")
 message(STATUS "")
 message(STATUS "    Version:                 ${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}")
+message(STATUS "    Unit test:               ${UNIT_TEST}")
 message(STATUS "    Extra Compilation Flags: ${CMAKE_CXX_FLAGS}")
 message(STATUS "    Prefix:                  ${localstatedir}")
 message(STATUS "    Binary Directory:        ${bindir}")
