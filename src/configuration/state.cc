@@ -321,9 +321,6 @@ void state::parse(QString const& filename) {
   if(_tab_int[free_child_process_memory] == -1) {
     _tab_int[free_child_process_memory] = !_tab_bool[use_large_installation_tweaks];
   }
-  if (_tab_int[child_processes_fork_twice] == -1) {
-    _tab_int[child_processes_fork_twice] = !_tab_bool[use_large_installation_tweaks];
-  }
 
   delete[] _mac->x[MACRO_MAINCONFIGFILE];
   _mac->x[MACRO_MAINCONFIGFILE] = my_strdup(_filename.toStdString().c_str());
@@ -1036,14 +1033,6 @@ bool state::get_enable_environment_macros() const throw() {
  */
 bool state::get_free_child_process_memory() const throw() {
   return (_tab_int[free_child_process_memory]);
-}
-
-/**
- *  Get the child processes fork twice.
- *  @return The child processes fork twice.
- */
-bool state::get_child_processes_fork_twice() const throw() {
-  return (_tab_int[child_processes_fork_twice]);
 }
 
 /**
@@ -2119,11 +2108,12 @@ void state::set_free_child_process_memory(bool value) {
 
 /**
  *  Set the child processes fork twice.
- *  @param[in] value The child processes fork twice.
+ *  @param[in] value Unused.
  */
 void state::set_child_processes_fork_twice(bool value) {
-  _tab_int[child_processes_fork_twice] = value;
-  ::child_processes_fork_twice = value;
+  (void)value;
+  logger(log_config_warning, basic)
+    << "warning: child_processes_fork_twice variable ignored";
 }
 
 /**
@@ -2534,7 +2524,6 @@ void state::_reset() {
   set_use_large_installation_tweaks(DEFAULT_USE_LARGE_INSTALLATION_TWEAKS);
   set_enable_environment_macros(DEFAULT_ENABLE_ENVIRONMENT_MACROS);
   set_free_child_process_memory(DEFAULT_FREE_CHILD_PROCESS_MEMORY);
-  _tab_int[child_processes_fork_twice] = DEFAULT_CHILD_PROCESSES_FORK_TWICE;
 
   set_additional_freshness_latency(DEFAULT_ADDITIONAL_FRESHNESS_LATENCY);
 

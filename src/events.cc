@@ -1127,11 +1127,6 @@ int event_execution_loop(void) {
                    currently_running_service_checks,
                    config.get_max_parallel_service_checks());
 
-    /* get rid of terminated child processes (zombies) */
-    if (config.get_child_processes_fork_twice() == false) {
-      while ((wait_result = waitpid(-1, NULL, WNOHANG)) > 0);
-    }
-
     /* handle high priority events */
     if (event_list_high != NULL && (current_time >= event_list_high->run_time)) {
 
