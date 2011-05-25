@@ -2837,6 +2837,8 @@
     <!-- contactGetNotificationsOnServiceWarning(contact) -->
     <operation name="contactGetNotificationsOnServiceWarning">
       <documentation>Check if contact should be notified when services are warning.</documentation>
+      <input message="tns:contactRequest"/>
+      <output message="tns:booleanResponse"/>
     </operation>
 
     <!-- contactGetPager(contact) -->
