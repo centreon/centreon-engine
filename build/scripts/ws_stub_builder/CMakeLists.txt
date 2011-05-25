@@ -32,5 +32,4 @@ add_executable("ws_stub_builder"
   "${SCRIPT_DIR}/ws_stub_builder/error.hh")
 
 # Link target with libraries.
-target_link_libraries("ws_stub_builder"
-  ${QT_LIBRARIES})
+target_link_libraries("ws_stub_builder" ${QT_LIBRARIES})

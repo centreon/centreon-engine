@@ -40,54 +40,34 @@ add_library("cce_broker"
   ${QT_MOC_FILES})
 
 # Link target with required libraries.
-target_link_libraries("cce_broker"
-  ${QT_LIBRARIES}
-  "cce_core")
+target_link_libraries("cce_broker" ${QT_LIBRARIES} "cce_core")
 
-# Test module.
-add_library("broker_mod_load"
-  SHARED
-  "${TEST_DIR}/mod_load.cc")
-set_target_properties("broker_mod_load"
-  PROPERTIES PREFIX "")
-add_library("broker_mod_compatibility"
-  SHARED
-  "${TEST_DIR}/mod_compatibility.cc")
-set_target_properties("broker_mod_compatibility"
-  PROPERTIES PREFIX "")
+if (WITH_TESTING)
+  # Test module.
+  add_library("broker_mod_load" SHARED "${TEST_DIR}/mod_load.cc")
+  set_target_properties("broker_mod_load" PROPERTIES PREFIX "")
+  add_library("broker_mod_compatibility"
+    SHARED
+    "${TEST_DIR}/mod_compatibility.cc")
+  set_target_properties("broker_mod_compatibility" PROPERTIES PREFIX "")
 
-# Test loader.
-add_executable("broker_loader"
-  "${TEST_DIR}/loader.cc")
-target_link_libraries("broker_loader"
-  ${QT_LIBRARIES}
-  "cce_core")
-add_test("broker_loader"
-  "broker_loader")
+  # Test loader.
+  add_executable("broker_loader" "${TEST_DIR}/loader.cc")
+  target_link_libraries("broker_loader" ${QT_LIBRARIES} "cce_core")
+  add_test("broker_loader" "broker_loader")
 
-# Test handle.
-add_executable("broker_handle"
-  "${TEST_DIR}/handle.cc")
-target_link_libraries("broker_handle"
-  ${QT_LIBRARIES}
-  "cce_core")
-add_test("broker_handle"
-  "broker_handle")
+  # Test handle.
+  add_executable("broker_handle" "${TEST_DIR}/handle.cc")
+  target_link_libraries("broker_handle" ${QT_LIBRARIES} "cce_core")
+  add_test("broker_handle" "broker_handle")
 
-# Test nebmodule.
-add_executable("broker_nebmodule"
-  "${TEST_DIR}/nebmodule.cc")
-target_link_libraries("broker_nebmodule"
-  ${QT_LIBRARIES}
-  "cce_core")
-add_test("broker_nebmodule"
-  "broker_nebmodule")
+  # Test nebmodule.
+  add_executable("broker_nebmodule" "${TEST_DIR}/nebmodule.cc")
+  target_link_libraries("broker_nebmodule" ${QT_LIBRARIES} "cce_core")
+  add_test("broker_nebmodule" "broker_nebmodule")
 
-# Test compatibility.
-add_executable("broker_compatibility"
-  "${TEST_DIR}/compatibility.cc")
-target_link_libraries("broker_compatibility"
-  ${QT_LIBRARIES}
-  "cce_core")
-add_test("broker_compatibility"
-  "broker_compatibility")
+  # Test compatibility.
+  add_executable("broker_compatibility" "${TEST_DIR}/compatibility.cc")
+  target_link_libraries("broker_compatibility" ${QT_LIBRARIES} "cce_core")
+  add_test("broker_compatibility" "broker_compatibility")
+endif ()

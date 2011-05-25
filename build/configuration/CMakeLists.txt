@@ -36,19 +36,16 @@ target_link_libraries("cce_configuration"
   "cce_configuration_applier"
   "cce_core")
 
-# Basic test.
-set(TEST_NAME "configuration_basic")
-add_executable("${TEST_NAME}"
-  "${TEST_DIR}/basic.cc")
-target_link_libraries("${TEST_NAME}"
-  "cce_core")
-add_test("${TEST_NAME}" "${TEST_NAME}" "test.cfg")
+if (WITH_TESTING)
+  # Basic test.
+  set(TEST_NAME "configuration_basic")
+  add_executable("${TEST_NAME}" "${TEST_DIR}/basic.cc")
+  target_link_libraries("${TEST_NAME}" "cce_core")
+  add_test("${TEST_NAME}" "${TEST_NAME}" "test.cfg")
 
-# Parsing test.
-set(TEST_NAME "configuration_parsing")
-add_executable("${TEST_NAME}"
-  "${TEST_DIR}/parsing.cc")
-target_link_libraries("${TEST_NAME}"
-  ${QT_LIBRARIES}
-  "cce_core")
-add_test("${TEST_NAME}" "${TEST_NAME}")
+  # Parsing test.
+  set(TEST_NAME "configuration_parsing")
+  add_executable("${TEST_NAME}" "${TEST_DIR}/parsing.cc")
+  target_link_libraries("${TEST_NAME}" ${QT_LIBRARIES} "cce_core")
+  add_test("${TEST_NAME}" "${TEST_NAME}")
+endif ()
