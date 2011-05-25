@@ -33,6 +33,18 @@ set(XDATA_DIR "${PROJECT_SOURCE_DIR}/xdata")
 set(TEST_DIR "${PROJECT_SOURCE_DIR}/test")
 set(SCRIPT_DIR "${PROJECT_SOURCE_DIR}/scripts")
 
+# Function mkdir_chown.
+function(mkdir_chown)
+  if (APPLE OR (UNIX AND NOT CYGWIN))
+    if (NOT EXISTS "${ARGV2}")
+      file(MAKE_DIRECTORY "${ARGV2}")
+      execute_process(COMMAND "chown" "${ARGV0}:${ARGV1}" "${ARGV2}")
+    endif ()
+  else()
+    file(MAKE_DIRECTORY "${ARGV2}")
+  endif ()
+endfunction()
+
 # Check headers.
 include(CheckIncludeFiles)
 include(CheckCSourceCompiles)
@@ -503,10 +515,10 @@ install(TARGETS "centenginestats" DESTINATION "${bindir}")
 install(CODE "
   file(MAKE_DIRECTORY \"${bindir}\")
   file(MAKE_DIRECTORY \"${confdir}\")
-  file(MAKE_DIRECTORY \"${vardir}\")
-  file(MAKE_DIRECTORY \"${CHECK_RESULT_DIR}\")
-  file(MAKE_DIRECTORY \"${TMPDIR}\")
-  file(MAKE_DIRECTORY \"${LOG_ARCHIVE_DIR}\")")
+  mkdir_chown(\"${USER}\" \"${GROUP}\" \"${vardir}\")
+  mkdir_chown(\"${USER}\" \"${GROUP}\" \"${CHECK_RESULT_DIR}\")
+  mkdir_chown(\"${USER}\" \"${GROUP}\" \"${TMPDIR}\")
+  mkdir_chown(\"${USER}\" \"${GROUP}\" \"${LOG_ARCHIVE_DIR}\")")
 
 # Documentation.
 add_subdirectory("doc")
