@@ -20,7 +20,6 @@
 # Set directories.
 set(SRC_DIR "${SRC_DIR}/logging")
 set(INC_DIR "${INCLUDE_DIR}/logging")
-set(TEST_DIR "${TEST_DIR}/logging")
 
 # cce_logging target.
 add_library("cce_logging"
@@ -43,6 +42,9 @@ add_library("cce_logging"
 target_link_libraries("cce_logging" ${QT_LIBRARIES})
 
 if (WITH_TESTING)
+  # Set directories.
+  set(TEST_DIR "${TEST_DIR}/logging")
+
   # Test engine.
   add_executable("logging_engine"
     "${TEST_DIR}/engine.cc"

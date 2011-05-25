@@ -20,7 +20,6 @@
 # Set directories.
 set(SRC_DIR "${SRC_DIR}/broker")
 set(INC_DIR "${INCLUDE_DIR}/broker")
-set(TEST_DIR "${TEST_DIR}/broker")
 
 # Produce moc files.
 qt4_wrap_cpp(QT_MOC_FILES
@@ -43,6 +42,9 @@ add_library("cce_broker"
 target_link_libraries("cce_broker" ${QT_LIBRARIES} "cce_core")
 
 if (WITH_TESTING)
+  # Set directories.
+  set(TEST_DIR "${TEST_DIR}/broker")
+
   # Test module.
   add_library("broker_mod_load" SHARED "${TEST_DIR}/mod_load.cc")
   set_target_properties("broker_mod_load" PROPERTIES PREFIX "")

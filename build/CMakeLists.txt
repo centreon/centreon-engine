@@ -26,6 +26,18 @@ set(ENGINE_PATCH "0beta")
 set(ENGINE_VERSION "${ENGINE_MAJOR}.${ENGINE_MINOR}.${ENGINE_PATCH}")
 add_definitions("-DENGINE_VERSION=\"${ENGINE_VERSION}\"")
 
+# Function mkdir_chown.
+function(mkdir_chown)
+  if (APPLE OR (UNIX AND NOT CYGWIN))
+    if (NOT EXISTS "${ARGV2}")
+      file(MAKE_DIRECTORY "${ARGV2}")
+      execute_process(COMMAND "chown" "${ARGV0}:${ARGV1}" "${ARGV2}")
+    endif ()
+  else()
+    file(MAKE_DIRECTORY "${ARGV2}")
+  endif ()
+endfunction()
+
 # Testing.
 set(PROJECT_SOURCE_DIR "${PROJECT_SOURCE_DIR}/..")
 if (WITH_TESTING)
@@ -761,10 +773,10 @@ install(CODE "
   file(MAKE_DIRECTORY \"${bindir}\")
   file(MAKE_DIRECTORY \"${confdir}\")
   file(MAKE_DIRECTORY \"${libdir}\")
-  file(MAKE_DIRECTORY \"${vardir}\")
-  file(MAKE_DIRECTORY \"${CHECK_RESULT_DIR}\")
-  file(MAKE_DIRECTORY \"${TMPDIR}\")
-  file(MAKE_DIRECTORY \"${LOG_ARCHIVE_DIR}\")")
+  mkdir_chown(\"${USER}\" \"${GROUP}\" \"${vardir}\")
+  mkdir_chown(\"${USER}\" \"${GROUP}\" \"${CHECK_RESULT_DIR}\")
+  mkdir_chown(\"${USER}\" \"${GROUP}\" \"${TMPDIR}\")
+  mkdir_chown(\"${USER}\" \"${GROUP}\" \"${LOG_ARCHIVE_DIR}\")")
 
 # Install header files for devel.
 install(DIRECTORY "${INCLUDE_DIR}/"
