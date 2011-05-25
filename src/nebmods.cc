@@ -59,13 +59,13 @@ int neb_add_module(char const* filename, char const* args, int should_be_loaded)
   try {
     broker::loader::instance().add_module(filename, args);
     log_debug_info(DEBUGL_EVENTBROKER, 0,
-                   "Added module: name=`%s', args=`%s'\n",
+                   "Added module: name='%s', args='%s'\n",
                    filename,
                    args);
   }
   catch (...) {
     log_debug_info(DEBUGL_EVENTBROKER, 0,
-                   "Counld not add module: name=`%s', args=`%s'\n",
+                   "Counld not add module: name='%s', args='%s'\n",
                    filename,
                    args);
     return (ERROR);
@@ -127,19 +127,19 @@ int neb_load_module(void* mod) {
   try {
     module->open();
     logit(NSLOG_INFO_MESSAGE, false,
-          "Event broker module `%s' initialized successfully.\n",
+          "Event broker module '%s' initialized successfully.\n",
           module->get_filename().toStdString().c_str());
   }
   catch (error const& e) {
     logit(NSLOG_RUNTIME_ERROR, false,
-          "Error: Could not load module `%s' -> %s\n",
+          "Error: Could not load module '%s' -> %s\n",
           module->get_filename().toStdString().c_str(),
           e.what());
     return (ERROR);
   }
   catch (...) {
     logit(NSLOG_RUNTIME_ERROR, false,
-          "Error: Could not load module `%s'\n",
+          "Error: Could not load module '%s'\n",
           module->get_filename().toStdString().c_str());
     return (ERROR);
   }
@@ -181,7 +181,7 @@ int neb_unload_module(void* mod, int flags, int reason) {
     return (OK);
 
   log_debug_info(DEBUGL_EVENTBROKER, 0,
-                 "Attempting to unload module `%s'\n",
+                 "Attempting to unload module '%s'\n",
                  module->get_filename().toStdString().c_str());
 
   module->close();
@@ -245,7 +245,7 @@ int neb_set_module_info(void* handle, int type, char const* data) {
     }
 
     log_debug_info(DEBUGL_EVENTBROKER, 0,
-                   "set module info success: filename=%s, type=`%d'\n",
+                   "set module info success: filename=%s, type='%d'\n",
                    module->get_filename().toStdString().c_str(),
                    type);
   }

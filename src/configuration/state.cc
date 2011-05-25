@@ -263,7 +263,7 @@ void state::parse(QString const& filename) {
   std::ifstream ifs;
   ifs.open(filename.toStdString().c_str(), std::ifstream::in);
   if (ifs.is_open() == false) {
-    throw (engine_error() << "cannot open configuration file: `" << filename << "'");
+    throw (engine_error() << "cannot open configuration file: '" << filename << "'");
   }
 
   _filename = filename;
@@ -277,7 +277,7 @@ void state::parse(QString const& filename) {
       size_t pos = line.find_first_of('=');
       if (pos == std::string::npos) {
               throw (engine_error() << "[" << _filename << ":" << _cur_line
-               << "] bad variable name: `" << _filename << "'");
+               << "] bad variable name: '" << _filename << "'");
       }
       std::string key = line.substr(0, pos);
       methods::const_iterator it = _lst_method.find(_trim(key).c_str());
@@ -299,7 +299,7 @@ void state::parse(QString const& filename) {
       }
       else {
               throw (engine_error() << "[" << _filename << ":" << _cur_line
-                     << "] unknown variable name: `" << key << "'");
+                     << "] unknown variable name: '" << key << "'");
       }
   }
   ifs.close();
@@ -309,7 +309,7 @@ void state::parse(QString const& filename) {
   }
 
   if (_tab_string[log_file] == "") {
-    throw (engine_error() << "log_file is not specified anywhere in `" << _filename << "'");
+    throw (engine_error() << "log_file is not specified anywhere in '" << _filename << "'");
   }
 
   if (!get_use_timezone().isEmpty()) {
@@ -2574,7 +2574,7 @@ void state::_parse_resource_file(QString const& value) {
   std::ifstream ifs;
   ifs.open(resfile.toStdString().c_str());
   if (ifs.fail()) {
-    throw (engine_error() << "cannot open resource file: `"
+    throw (engine_error() << "cannot open resource file: '"
                           << resfile << "'");
   }
 
@@ -2591,7 +2591,7 @@ void state::_parse_resource_file(QString const& value) {
     size_t pos = line.find_first_of('=');
     if (pos == std::string::npos) {
       throw (engine_error() << "[" << _filename << ":" << _cur_line
-	     << "] bad variable name: `" << line << "'");
+	     << "] bad variable name: '" << line << "'");
     }
     std::string key = line.substr(0, pos);
     unsigned int user_index;

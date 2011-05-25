@@ -376,15 +376,18 @@ int get_raw_command_line_r(nagios_macros* mac,
   clear_argv_macros(mac);
 
   /* make sure we've got all the requirements */
-  if (cmd_ptr == NULL || full_command == NULL)
+  if (cmd_ptr == NULL) {
     return (ERROR);
+  }
 
   log_debug_info(DEBUGL_COMMANDS | DEBUGL_CHECKS | DEBUGL_MACROS, 2,
                  "Raw Command Input: %s\n",
 		 cmd_ptr->command_line);
 
   /* get the full command line */
-  *full_command = my_strdup((cmd_ptr->command_line == NULL) ? "" : cmd_ptr->command_line);
+  if (full_command != NULL) {
+    *full_command = my_strdup(cmd_ptr->command_line == NULL ? "" : cmd_ptr->command_line);
+  }
 
   /* XXX: Crazy indent */
   /* get the command arguments */
@@ -432,9 +435,11 @@ int get_raw_command_line_r(nagios_macros* mac,
     }
   }
 
-  log_debug_info(DEBUGL_COMMANDS | DEBUGL_CHECKS | DEBUGL_MACROS, 2,
-                 "Expanded Command Output: %s\n",
-		 *full_command);
+  if (full_command != NULL) {
+    log_debug_info(DEBUGL_COMMANDS | DEBUGL_CHECKS | DEBUGL_MACROS, 2,
+		   "Expanded Command Output: %s\n",
+		   *full_command);
+  }
 
   return (OK);
 }

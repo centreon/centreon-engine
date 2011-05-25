@@ -179,7 +179,7 @@ void handle::close() {
       func_deinit deinit = (func_deinit)_handle->resolve("nebmodule_deinit");
       if (deinit == NULL) {
 	logit(NSLOG_INFO_MESSAGE, false,
-	      "Cannot resolve symbole `nebmodule_deinit' in module `%s'.\n",
+	      "Cannot resolve symbole 'nebmodule_deinit' in module '%s'.\n",
 	      _filename.toStdString().c_str());
       }
       else {

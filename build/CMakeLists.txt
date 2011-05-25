@@ -639,8 +639,10 @@ add_library("cce_core"
 
 # Subdirectories with core features.
 add_subdirectory("broker")
+add_subdirectory("checks")
 add_subdirectory("conf")
 add_subdirectory("configuration")
+add_subdirectory("commands")
 add_subdirectory("compatibility")
 add_subdirectory("doc")
 add_subdirectory("logging")
@@ -655,7 +657,9 @@ target_link_libraries("cce_core"
   ${QT_LIBRARIES}
   "cce_logging"
   "cce_broker"
+  "cce_checks"
   "cce_configuration"
+  "cce_commands"
   "cce_compatibility")
 
 # centengine target.

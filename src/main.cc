@@ -61,13 +61,27 @@ using namespace com::centreon::engine::logging;
 #endif /* !ENGINE_VERSION */
 
 // Error message when configuration parsing fail.
-#define ERROR_CONFIGURATION "    Check your configuration file(s) to ensure that they contain valid\n" \
-                            "    directives and data defintions. If you are upgrading from a\n" \
-                            "    previous version of Centreon Engine, you should be aware that some\n" \
-                            "    variables/definitions may have been removed or modified in this\n" \
-                            "    version. Make sure to read the documentation regarding the config\n" \
-                            "    files, as well as the version changelog to find out what has\n" \
-                            "    changed.\n\n"
+#define ERROR_CONFIGURATION						\
+  "    Check your configuration file(s) to ensure that they contain valid\n" \
+  "    directives and data defintions. If you are upgrading from a\n"	\
+  "    previous version of Centreon Engine, you should be aware that some\n" \
+  "    variables/definitions may have been removed or modified in this\n" \
+  "    version. Make sure to read the documentation regarding the config\n" \
+  "    files, as well as the version changelog to find out what has\n"	\
+  "    changed.\n\n"
+
+#include "commands/set.hh"
+#include "commands/raw.hh"
+void init_execution_system() {
+  commands::set& cmd_set = commands::set::instance();
+  void* ptr = NULL;
+  for (command* cmd = static_cast<command*>(skiplist_get_first(object_skiplists[COMMAND_SKIPLIST], &ptr));
+       cmd != NULL;
+       cmd = static_cast<command*>(skiplist_get_next(&ptr))) {
+    QSharedPointer<commands::command> new_command(new commands::raw(cmd->name, cmd->command_line));
+    cmd_set.add_command(new_command);
+  }
+}
 
 int main(int argc, char** argv) {
   QCoreApplication app(argc, argv);
@@ -472,6 +486,9 @@ int main(int argc, char** argv) {
 
       // Update all status data (with retained information).
       update_all_status_data();
+
+      // Initialize command executon system.
+      init_execution_system();
 
       // Log initial host and service state.
       log_host_states(INITIAL_STATES, NULL);
