@@ -513,6 +513,7 @@ install(TARGETS "centenginestats" DESTINATION "${bindir}")
 
 # Install directories.
 install(CODE "
+  file(MAKE_DIRECTORY \"${localstatedir}\")
   file(MAKE_DIRECTORY \"${bindir}\")
   file(MAKE_DIRECTORY \"${confdir}\")
   mkdir_chown(\"${USER}\" \"${GROUP}\" \"${vardir}\")
