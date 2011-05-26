@@ -458,6 +458,64 @@ int main(int argc, char **argv){
 				printf("   Read object config files okay...\n");
 			else
 				printf("   Error processing object config files!\n");
+
+			/* check file and path permission */
+			int fd = 0;
+			if (log_file == NULL || (fd = open(log_file, O_RDWR)) == -1) {
+			  printf("Error: log_file %s.\n",
+				 log_file == NULL ? " undefine" : strerror(errno));
+			  return (ERROR);
+			}
+			close(fd);
+			if (debug_file == NULL || (fd = open(debug_file, O_RDWR)) == -1) {
+			  printf("Error: debug_file %s.\n",
+				 debug_file == NULL ? " undefine" : strerror(errno));
+			  return (ERROR);
+			}
+			close(fd);
+			if (command_file == NULL || (fd = open(command_file, O_RDWR)) == -1) {
+			  printf("Error: command_file %s.\n",
+				 command_file == NULL ? " undefine" : strerror(errno));
+			  return (ERROR);
+			}
+			close(fd);
+			if (mac->x[MACRO_STATUSDATAFILE] == NULL
+			    || (fd = open(mac->x[MACRO_STATUSDATAFILE], O_RDWR)) == -1) {
+				printf("Error: status_file %s.\n",
+				       mac->x[MACRO_STATUSDATAFILE] == NULL
+				       ? " undefine"
+				       : strerror(errno));
+				return (ERROR);
+				}
+			close(fd);
+			if (mac->x[MACRO_RETENTIONDATAFILE] == NULL
+			    || (fd = open(mac->x[MACRO_RETENTIONDATAFILE], O_RDWR)) == -1) {
+				printf("Error: state_retention_file %s.\n",
+				       mac->x[MACRO_RETENTIONDATAFILE] == NULL
+				       ? " undefine"
+				       : strerror(errno));
+				return (ERROR);
+				}
+			close(fd);
+			DIR* dir;
+			if (temp_path == NULL || (dir = opendir(temp_path)) == NULL) {
+			  printf("Error: temp_path %s.\n",
+				 temp_path == NULL ? " undefine" : strerror(errno));
+			  return (ERROR);
+			}
+			closedir(dir);
+			if (check_result_path == NULL || (dir = opendir(check_result_path)) == NULL) {
+			  printf("Error: check_result_path %s.\n",
+				 check_result_path == NULL ? " undefine" : strerror(errno));
+			  return (ERROR);
+			}
+			closedir(dir);
+			if (log_archive_path == NULL || (dir = opendir(log_archive_path)) == NULL) {
+			  printf("Error: log_archive_path %s.\n",
+				 log_archive_path == NULL ? " undefine" : strerror(errno));
+			  return (ERROR);
+			}
+			closedir(dir);
 			}
 		else
 			printf("   Error processing main config file!\n\n");
