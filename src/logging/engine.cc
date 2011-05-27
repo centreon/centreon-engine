@@ -57,6 +57,7 @@ engine& engine::instance() {
  *  @param[in] type      Logging types.
  *  @param[in] verbosity Verbosity level.
  */
+#include <QDebug>
 void engine::log(char const* message,
 		 unsigned long long type,
 		 unsigned int verbosity) throw() {
@@ -66,6 +67,9 @@ void engine::log(char const* message,
 	 it != end;
 	 ++it) {
       obj_info& info = it.value();
+      qDebug() << "verbosity(" << verbosity << ") <= info.verbosity(" << info.verbosity
+	       << ") && (type(" << type << ") & info.type(" << info.type << "))("
+	       << (type & info.type) << ")";
       if (verbosity <= info.verbosity && (type & info.type)) {
 	info.obj->log(message, type, verbosity);
       }

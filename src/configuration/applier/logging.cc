@@ -166,7 +166,7 @@ void logging::_add_stdout() {
       | log_info_message
       | log_host_notification
       | log_service_notification);
-    ::engine::obj_info info(obj, type, basic);
+    ::engine::obj_info info(obj, type, most);
     _stdout_id = ::engine::instance().add_object(info);
   }
 }
@@ -183,11 +183,10 @@ void logging::_add_stderr() {
       | log_verification_warning
       | log_config_error
       | log_config_warning);
-    ::engine::obj_info info(obj, type, basic);
+    ::engine::obj_info info(obj, type, most);
     _stderr_id = ::engine::instance().add_object(info);
   }
 }
-
 /**
  *  Add syslog object logging.
  */
@@ -201,11 +200,11 @@ void logging::_add_syslog() {
  *  Add file object logging.
  */
 void logging::_add_log_file(state const& config) {
-  if (_debug_id != 0) {
+  if (_file_id != 0) {
     ::engine::instance().remove_object(_file_id);
   }
   QSharedPointer<file> obj(new file(config.get_log_file(), config.get_log_archive_path()));
-  ::engine::obj_info info(obj, log_all, basic);
+  ::engine::obj_info info(obj, log_all, most);
   _file_id = ::engine::instance().add_object(info);
 }
 
@@ -221,7 +220,7 @@ void logging::_add_debug(state const& config) {
   ::engine::obj_info info(obj,
 			  config.get_debug_level(),
 			  config.get_debug_verbosity());
-  _file_id = ::engine::instance().add_object(info);
+  _debug_id = ::engine::instance().add_object(info);
 }
 
 /**

@@ -20,6 +20,7 @@
 #include <fstream>
 #include <QFileInfo>
 #include <string>
+#include <limits.h>
 #include "broker.hh"
 #include "configuration/state.hh"
 #include "engine.hh"
@@ -54,7 +55,7 @@ state::state()
   _lst_method["resource_file"]                               = &cpp_suck<QString const&, &state::_parse_resource_file>::set_generic;;
   _lst_method["log_file"]                                    = &cpp_suck<QString const&, &state::set_log_file>::set_generic;
   _lst_method["broker_module_directory"]                     = &cpp_suck<QString const&, &state::set_broker_module_directory>::set_generic;
-  _lst_method["debug_level"]                                 = &cpp_suck<unsigned int, &state::set_debug_level>::set_generic;
+  _lst_method["debug_level"]                                 = &cpp_suck<unsigned long, &state::set_debug_level>::set_generic;
   _lst_method["debug_verbosity"]                             = &cpp_suck<unsigned int, &state::set_debug_verbosity>::set_generic;
   _lst_method["debug_file"]                                  = &cpp_suck<QString const&, &state::set_debug_file>::set_generic;
   _lst_method["max_debug_file_size"]                         = &cpp_suck<unsigned long, &state::set_max_debug_file_size>::set_generic;
@@ -463,8 +464,8 @@ int state::get_additional_freshness_latency() const throw() {
  *  Get the debug level.
  *  @return The debug level.
  */
-unsigned int state::get_debug_level() const throw() {
-  return (_tab_uint[debug_level]);
+unsigned long state::get_debug_level() const throw() {
+  return (_tab_ulong[debug_level]);
 }
 
 /**
@@ -1352,9 +1353,14 @@ void state::set_additional_freshness_latency(int value) {
  *  Set the debug level.
  *  @param[in] value The level.
  */
-void state::set_debug_level(unsigned int value) {
-  _tab_uint[debug_level] = value;
-  ::debug_level = value;
+void state::set_debug_level(unsigned long value) {
+  if (value == UINT_MAX) {
+    _tab_ulong[debug_level] = static_cast<unsigned long>(all);
+  }
+  else {
+    _tab_ulong[debug_level] = value;
+  }
+  ::debug_level = _tab_ulong[debug_level];
 }
 
 /**
@@ -1362,8 +1368,13 @@ void state::set_debug_level(unsigned int value) {
  *  @param[in] value The verbosity.
  */
 void state::set_debug_verbosity(unsigned int value) {
-  _tab_uint[debug_verbosity] = value;
-  ::debug_verbosity = value;
+  if (value > most) {
+    _tab_uint[debug_verbosity] = static_cast<unsigned int>(most);
+  }
+  else {
+    _tab_uint[debug_verbosity] = value;
+  }
+  ::debug_verbosity = _tab_uint[debug_verbosity];
 }
 
 /**
