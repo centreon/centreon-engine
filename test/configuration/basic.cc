@@ -124,7 +124,7 @@ static std::map<QString, QString> build_configuration(QString const& mainconf, Q
   var["resource_file"] = resource;
   var["log_file"] = "log_file.tmp";
   var["debug_level"] = obj2str(my_rand(0));
-  var["debug_verbosity"] = obj2str(my_rand(0));
+  var["debug_verbosity"] = obj2str(my_rand(0, 2));
   var["debug_file"] = "debug_file.tmp";
   var["max_debug_file_size"] = obj2str(my_rand(0));
   var["command_file"] = "command_file.tmp";
@@ -497,9 +497,6 @@ void test_configuration(QString const& filename, std::map<QString, QString>& my_
   }
   if (my_conf["free_child_process_memory"] != obj2str(config.get_free_child_process_memory())) {
     throw (engine_error() << "free_child_process_memory: init with '" << my_conf["free_child_process_memory"] << "'");
-  }
-  if (my_conf["child_processes_fork_twice"] != obj2str(config.get_child_processes_fork_twice())) {
-    throw (engine_error() << "child_processes_fork_twice: init with '" << my_conf["child_processes_fork_twice"] << "'");
   }
   if (my_conf["external_command_buffer_slots"] != obj2str(config.get_external_command_buffer_slots())) {
     throw (engine_error() << "external_command_buffer_slots: init with '" << my_conf["external_command_buffer_slots"] << "'");
