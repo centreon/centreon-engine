@@ -74,15 +74,6 @@ void checker::reap() {
       break;
     }
 
-    // file is too old - ignore check results it contains and delete it.
-    if (config.get_max_check_result_file_age() > 0
-	&& (static_cast<unsigned int>(time(NULL) - result.start_time.tv_sec)
-	    > config.get_max_check_result_file_age())) {
-      // cleanup.
-      free_check_result(&result);
-      continue;
-    }
-
     if (result.object_check_type == SERVICE_CHECK) {
       // check if the service exist.
       service* svc = find_service(result.host_name,

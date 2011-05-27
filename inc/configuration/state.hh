@@ -99,7 +99,6 @@ namespace                   com {
 	  QString const&      get_debug_file() const throw();
 	  QString const&      get_command_file() const throw();
 	  QString const&      get_temp_file() const throw();
-	  QString const&      get_check_result_path() const throw();
 	  QString const&      get_global_host_event_handler() const throw();
 	  QString const&      get_global_service_event_handler() const throw();
 	  QString const&      get_ocsp_command() const throw();
@@ -134,7 +133,6 @@ namespace                   com {
 	  unsigned int        get_ocsp_timeout() const throw();
 	  unsigned int        get_ochp_timeout() const throw();
 	  unsigned long       get_max_debug_file_size() const throw();
-	  unsigned long       get_max_check_result_file_age() const throw();
 	  unsigned long       get_retained_host_attribute_mask() const throw();
 	  unsigned long       get_retained_process_host_attribute_mask() const throw();
 	  unsigned long       get_retained_contact_host_attribute_mask() const throw();
@@ -316,7 +314,6 @@ namespace                   com {
 	    debug_file,
 	    command_file,
 	    temp_file,
-	    check_result_path,
 	    global_host_event_handler,
 	    global_service_event_handler,
 	    ocsp_command,
@@ -335,7 +332,6 @@ namespace                   com {
 	  enum                e_var_ulong {
 	    debug_level = 0,
 	    max_debug_file_size,
-	    max_check_result_file_age,
 	    retained_host_attribute_mask,
 	    retained_process_host_attribute_mask,
 	    retained_contact_host_attribute_mask,
@@ -553,7 +549,6 @@ namespace                   com {
 	  static const e_inter_check_delay DEFAULT_HOST_INTER_CHECK_DELAY_METHOD               = icd_smart;
 	  static const e_interleave_factor DEFAULT_SERVICE_INTERLEAVE_FACTOR_METHOD            = ilf_smart;
 	  static const unsigned long       DEFAULT_MAX_DEBUG_FILE_SIZE                         = 1000000;
-	  static const unsigned long       DEFAULT_MAX_CHECK_RESULT_AGE                        = 3600;
 	  static const unsigned long       DEFAULT_RETAINED_HOST_ATTRIBUTE_MASK                = 0L;
 	  static const unsigned long       DEFAULT_RETAINED_PROCESS_HOST_ATTRIBUTE_MASK        = 0L;
 	  static const unsigned long       DEFAULT_RETAINED_CONTACT_HOST_ATTRIBUTE_MASK        = 0L;

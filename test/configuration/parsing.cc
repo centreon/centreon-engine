@@ -73,9 +73,7 @@ static void check_exist_file() {
  */
 int main(void) {
   try {
-    config.set_check_result_path(QDir::tempPath());
     config.set_log_archive_path(QDir::tempPath());
-    config.set_temp_path(QDir::tempPath());
 
     check_directory();
     check_noexist_file();

@@ -129,9 +129,6 @@ static std::map<QString, QString> build_configuration(QString const& mainconf, Q
   var["max_debug_file_size"] = obj2str(my_rand(0));
   var["command_file"] = "command_file.tmp";
   var["temp_file"] = "temp_file.tmp";
-  var["temp_path"] = "./";
-  var["check_result_path"] = "./";
-  var["max_check_result_file_age"] = obj2str(my_rand(0));
   var["global_host_event_handler"] = "host-event-handler";
   var["global_service_event_handler"] = "service-event-handler";
   var["ocsp_command"] = "ocsp-command";
@@ -281,9 +278,6 @@ void test_configuration(QString const& filename, std::map<QString, QString>& my_
   }
   if (my_conf["max_debug_file_size"] != obj2str(config.get_max_debug_file_size())) {
     throw (engine_error() << "max_debug_file_size: init with '" << my_conf["max_debug_file_size"] << "'");
-  }
-  if (my_conf["max_check_result_file_age"] != obj2str(config.get_max_check_result_file_age())) {
-    throw (engine_error() << "max_check_result_file_age: init with '" << my_conf["max_check_result_file_age"] << "'");
   }
   if (my_conf["use_syslog"] != obj2str(config.get_use_syslog())) {
     throw (engine_error() << "use_syslog: init with '" << my_conf["use_syslog"] << "'");
@@ -521,12 +515,6 @@ void test_configuration(QString const& filename, std::map<QString, QString>& my_
   }
   if (my_conf["temp_file"] != config.get_temp_file()) {
     throw (engine_error() << "temp_file: init with '" << my_conf["temp_file"] << "'");
-  }
-  if (my_conf["temp_path"] != config.get_temp_path()) {
-    throw (engine_error() << "temp_path: init with '" << my_conf["temp_path"] << "'");
-  }
-  if (my_conf["check_result_path"] != config.get_check_result_path()) {
-    throw (engine_error() << "check_result_path: init with '" << my_conf["check_result_path"] << "'");
   }
   if (my_conf["global_host_event_handler"] != config.get_global_host_event_handler()) {
     throw (engine_error() << "global_host_event_handler: init with '" << my_conf["global_host_event_handler"] << "'");

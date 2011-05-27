@@ -74,6 +74,7 @@ check_result* read_check_result(void);     // reads a host/service check result 
 int init_check_result(check_result* info);
 int add_check_result_to_list(check_result* new_cr);
 int free_check_result_list(void);
+int move_check_result_to_queue(char* checkresult_file);
 
 # ifdef __cplusplus
 }

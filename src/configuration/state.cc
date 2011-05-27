@@ -190,7 +190,6 @@ state::state()
   set_accept_passive_host_checks(DEFAULT_ACCEPT_PASSIVE_HOST_CHECKS);
   set_allow_empty_hostgroup_assignment(DEFAULT_ALLOW_EMPTY_HOSTGROUP_ASSIGNMENT);
 
-  _tab_string[check_result_path] = DEFAULT_CHECK_RESULT_PATH;
   _tab_string[log_archive_path] = DEFAULT_LOG_ARCHIVE_PATH;
 
   // Set macro.
@@ -253,7 +252,6 @@ state& state::operator=(state const& right) {
 void state::reset() {
   _reset();
 
-  _tab_string[check_result_path] = DEFAULT_CHECK_RESULT_PATH;
   _tab_string[log_archive_path] = DEFAULT_LOG_ARCHIVE_PATH;
 }
 
@@ -329,7 +327,6 @@ void state::parse(QString const& filename) {
   _mac->x[MACRO_MAINCONFIGFILE] = my_strdup(_filename.toStdString().c_str());
 
   // check path
-  set_check_result_path(get_check_result_path());
   set_log_archive_path(get_log_archive_path());
 }
 
@@ -371,14 +368,6 @@ QString const& state::get_command_file() const throw() {
  */
 QString const& state::get_temp_file() const throw() {
   return (_tab_string[temp_file]);
-}
-
-/**
- *  Get The Check result path.
- *  @return the check result path.
- */
-QString const& state::get_check_result_path() const throw() {
-  return (_tab_string[check_result_path]);
 }
 
 /**
@@ -651,14 +640,6 @@ unsigned int state::get_ochp_timeout() const throw() {
  */
 unsigned long state::get_max_debug_file_size() const throw() {
   return (_tab_ulong[max_debug_file_size]);
-}
-
-/**
- *  Get the max check result file age.
- *  @return The max check result file age.
- */
-unsigned long state::get_max_check_result_file_age() const throw() {
-  return (_tab_ulong[max_check_result_file_age]);
 }
 
 /**
@@ -1178,7 +1159,7 @@ void state::set_temp_file(QString const& value) {
 
 /**
  *  Set the temporary path.
- *  @param[in] value The path.
+ *  @param[in] value Unused.
  */
 void state::set_temp_path(QString const& value) {
   (void)value;
@@ -1187,24 +1168,11 @@ void state::set_temp_path(QString const& value) {
 
 /**
  *  Set the check result path.
- *  @param[in] value The path.
+ *  @param[in] value Unused.
  */
 void state::set_check_result_path(QString const& value) {
-  // Check that check result path exists and is a directory.
-  QFileInfo qinfo(value);
-  if (!qinfo.exists())
-    throw (engine_error() << "check_result_path '" << value
-                          << "' does not exist");
-  if (!qinfo.isDir())
-    throw (engine_error() << "check_result_path '" << value
-                          << "' is not a directory");
-
-  // Set configuration variable.
-  _tab_string[check_result_path] = value;
-
-  // Set compatibility variable.
-  delete[] ::check_result_path;
-  ::check_result_path = my_strdup(value.toStdString().c_str());
+  (void)value;
+  logger(log_config_warning, basic) << "warning: check_result_path variable ignored";
 }
 
 /**
@@ -1658,11 +1626,12 @@ void state::set_max_debug_file_size(unsigned long value) {
 
 /**
  *  Set the max check result file age.
- *  @param[in] value The max check result file age.
+ *  @param[in] value Unused.
  */
 void state::set_max_check_result_file_age(unsigned long value) {
-  _tab_ulong[max_check_result_file_age] = value;
-  ::max_check_result_file_age = value;
+  (void)value;
+  logger(log_config_warning, basic)
+    << "warning: max_check_result_file_age variable ignored";
 }
 
 /**
@@ -2452,7 +2421,6 @@ void state::_reset() {
   set_command_check_interval(DEFAULT_COMMAND_CHECK_INTERVAL);
   set_check_reaper_interval(DEFAULT_CHECK_REAPER_INTERVAL);
   set_max_check_reaper_time(DEFAULT_MAX_REAPER_TIME);
-  set_max_check_result_file_age(DEFAULT_MAX_CHECK_RESULT_AGE);
   set_service_freshness_check_interval(DEFAULT_FRESHNESS_CHECK_INTERVAL);
   set_host_freshness_check_interval(DEFAULT_FRESHNESS_CHECK_INTERVAL);
   set_auto_rescheduling_interval(DEFAULT_AUTO_RESCHEDULING_INTERVAL);

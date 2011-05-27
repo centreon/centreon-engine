@@ -78,7 +78,6 @@ void free_memory(nagios_macros* mac);      // free memory allocated to all linke
 void free_notification_list(void);         // frees all memory allocated to the notification list
 int reset_variables(void);                 // reset all global variables
 
-int move_check_result_to_queue(char* checkresult_file);
 int free_check_result(check_result* info); // frees memory associated with a host/service check result
 int parse_check_output(char* buf, char** short_output, char** long_output, char** perf_data, int escape_newlines_please, int newlines_are_escaped);
 

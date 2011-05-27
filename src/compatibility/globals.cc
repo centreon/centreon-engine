@@ -43,6 +43,7 @@ unsigned long retained_service_attribute_mask(0);
 
 // Commands execution system.
 unsigned int  child_processes_fork_twice(-1);
+unsigned long max_check_result_file_age(-1);
 
 // Embedded_perl.
 unsigned int  enable_embedded_perl(false);
@@ -50,3 +51,4 @@ unsigned int  use_embedded_perl_implicitly(false);
 
 // Old path.
 char const*   temp_path("/tmp");
+char const*   check_result_path("/tmp");

@@ -397,23 +397,6 @@ check_result_reaper_frequency=10
 max_check_result_reaper_time=30
 
 
-# var:    check_result_path
-# brief:  This is directory where Centreon Engine stores the results of host and
-#         service checks that have not yet been processed.
-#         Note: Make sure that only one instance of Centreon Engine has access
-#         to this directory!
-
-check_result_path=@CHECK_RESULT_DIR@
-
-
-# var:    max_check_result_file_age
-# brief:  This option determines the maximum age (in seconds) which check result
-#         files are considered to be valid. Files older than this threshold will
-#         be mercilessly deleted without further processing.
-
-max_check_result_file_age=3600
-
-
 # var:    cached_host_check_horizon
 # brief:  This option determines the maximum amount of time (in seconds) that
 #         the state of a previous host check is considered current. Cached host
