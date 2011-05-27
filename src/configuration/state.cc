@@ -20,6 +20,7 @@
 #include <fstream>
 #include <QFileInfo>
 #include <string>
+#include <limits.h>
 #include "broker.hh"
 #include "configuration/state.hh"
 #include "engine.hh"
@@ -54,7 +55,7 @@ state::state()
   _lst_method["resource_file"]                               = &cpp_suck<QString const&, &state::_parse_resource_file>::set_generic;;
   _lst_method["log_file"]                                    = &cpp_suck<QString const&, &state::set_log_file>::set_generic;
   _lst_method["broker_module_directory"]                     = &cpp_suck<QString const&, &state::set_broker_module_directory>::set_generic;
-  _lst_method["debug_level"]                                 = &cpp_suck<unsigned int, &state::set_debug_level>::set_generic;
+  _lst_method["debug_level"]                                 = &cpp_suck<unsigned long, &state::set_debug_level>::set_generic;
   _lst_method["debug_verbosity"]                             = &cpp_suck<unsigned int, &state::set_debug_verbosity>::set_generic;
   _lst_method["debug_file"]                                  = &cpp_suck<QString const&, &state::set_debug_file>::set_generic;
   _lst_method["max_debug_file_size"]                         = &cpp_suck<unsigned long, &state::set_max_debug_file_size>::set_generic;
@@ -263,7 +264,7 @@ void state::parse(QString const& filename) {
   std::ifstream ifs;
   ifs.open(filename.toStdString().c_str(), std::ifstream::in);
   if (ifs.is_open() == false) {
-    throw (engine_error() << "cannot open configuration file: `" << filename << "'");
+    throw (engine_error() << "cannot open configuration file: '" << filename << "'");
   }
 
   _filename = filename;
@@ -277,7 +278,7 @@ void state::parse(QString const& filename) {
       size_t pos = line.find_first_of('=');
       if (pos == std::string::npos) {
               throw (engine_error() << "[" << _filename << ":" << _cur_line
-               << "] bad variable name: `" << _filename << "'");
+               << "] bad variable name: '" << _filename << "'");
       }
       std::string key = line.substr(0, pos);
       methods::const_iterator it = _lst_method.find(_trim(key).c_str());
@@ -299,7 +300,7 @@ void state::parse(QString const& filename) {
       }
       else {
               throw (engine_error() << "[" << _filename << ":" << _cur_line
-                     << "] unknown variable name: `" << key << "'");
+                     << "] unknown variable name: '" << key << "'");
       }
   }
   ifs.close();
@@ -309,7 +310,7 @@ void state::parse(QString const& filename) {
   }
 
   if (_tab_string[log_file] == "") {
-    throw (engine_error() << "log_file is not specified anywhere in `" << _filename << "'");
+    throw (engine_error() << "log_file is not specified anywhere in '" << _filename << "'");
   }
 
   if (!get_use_timezone().isEmpty()) {
@@ -474,8 +475,8 @@ int state::get_additional_freshness_latency() const throw() {
  *  Get the debug level.
  *  @return The debug level.
  */
-unsigned int state::get_debug_level() const throw() {
-  return (_tab_uint[debug_level]);
+unsigned long state::get_debug_level() const throw() {
+  return (_tab_ulong[debug_level]);
 }
 
 /**
@@ -1388,9 +1389,14 @@ void state::set_additional_freshness_latency(int value) {
  *  Set the debug level.
  *  @param[in] value The level.
  */
-void state::set_debug_level(unsigned int value) {
-  _tab_uint[debug_level] = value;
-  ::debug_level = value;
+void state::set_debug_level(unsigned long value) {
+  if (value == UINT_MAX) {
+    _tab_ulong[debug_level] = static_cast<unsigned long>(all);
+  }
+  else {
+    _tab_ulong[debug_level] = value;
+  }
+  ::debug_level = _tab_ulong[debug_level];
 }
 
 /**
@@ -1398,8 +1404,13 @@ void state::set_debug_level(unsigned int value) {
  *  @param[in] value The verbosity.
  */
 void state::set_debug_verbosity(unsigned int value) {
-  _tab_uint[debug_verbosity] = value;
-  ::debug_verbosity = value;
+  if (value > most) {
+    _tab_uint[debug_verbosity] = static_cast<unsigned int>(most);
+  }
+  else {
+    _tab_uint[debug_verbosity] = value;
+  }
+  ::debug_verbosity = _tab_uint[debug_verbosity];
 }
 
 /**
@@ -2601,7 +2612,7 @@ void state::_parse_resource_file(QString const& value) {
   std::ifstream ifs;
   ifs.open(resfile.toStdString().c_str());
   if (ifs.fail()) {
-    throw (engine_error() << "cannot open resource file: `"
+    throw (engine_error() << "cannot open resource file: '"
                           << resfile << "'");
   }
 
@@ -2618,7 +2629,7 @@ void state::_parse_resource_file(QString const& value) {
     size_t pos = line.find_first_of('=');
     if (pos == std::string::npos) {
       throw (engine_error() << "[" << _filename << ":" << _cur_line
-	     << "] bad variable name: `" << line << "'");
+	     << "] bad variable name: '" << line << "'");
     }
     std::string key = line.substr(0, pos);
     unsigned int user_index;

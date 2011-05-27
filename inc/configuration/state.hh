@@ -111,7 +111,7 @@ namespace                   com {
 	  QString const&      get_illegal_output_chars() const throw();
 	  QString const&      get_use_timezone() const throw();
 	  int                 get_additional_freshness_latency() const throw();
-	  unsigned int        get_debug_level() const throw();
+	  unsigned long       get_debug_level() const throw();
 	  unsigned int        get_debug_verbosity() const throw();
 	  int                 get_command_check_interval() const throw();
 	  int                 get_external_command_buffer_slots() const throw();
@@ -215,7 +215,7 @@ namespace                   com {
 	  void                set_illegal_output_chars(QString const& value);
 	  void                set_use_timezone(QString const& value);
 	  void                set_additional_freshness_latency(int value);
-	  void                set_debug_level(unsigned int value);
+	  void                set_debug_level(unsigned long value);
 	  void                set_debug_verbosity(unsigned int value);
 	  void                set_command_check_interval(int value);
 	  void                set_command_check_interval(QString const& value);
@@ -339,7 +339,8 @@ namespace                   com {
 	   *  List all unsigned long variable
 	   */
 	  enum                e_var_ulong {
-	    max_debug_file_size = 0,
+	    debug_level = 0,
+	    max_debug_file_size,
 	    max_check_result_file_age,
 	    retained_host_attribute_mask,
 	    retained_process_host_attribute_mask,
@@ -382,8 +383,7 @@ namespace                   com {
 	   *  List all unsigned int variable
 	   */
 	  enum                e_var_uint {
-	    debug_level = 0,
-	    debug_verbosity,
+	    debug_verbosity = 0,
 	    max_service_check_spread,
 	    max_host_check_spread,
 	    max_parallel_service_checks,
@@ -530,7 +530,7 @@ namespace                   com {
 
 	private:
 	  static const int                 DEFAULT_ADDITIONAL_FRESHNESS_LATENCY                = 15;
-	  static const int                 DEFAULT_DEBUG_LEVEL                                 = 0;
+	  static const unsigned long       DEFAULT_DEBUG_LEVEL                                 = 0;
 	  static const int                 DEFAULT_DEBUG_VERBOSITY                             = 1;
 	  static const int                 DEFAULT_COMMAND_CHECK_INTERVAL                      = -1;
 	  static const int                 DEFAULT_EXTERNAL_COMMAND_BUFFER_SLOTS               = 4096;
