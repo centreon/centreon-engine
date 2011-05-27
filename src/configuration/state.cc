@@ -190,9 +190,12 @@ state::state()
   set_accept_passive_host_checks(DEFAULT_ACCEPT_PASSIVE_HOST_CHECKS);
   set_allow_empty_hostgroup_assignment(DEFAULT_ALLOW_EMPTY_HOSTGROUP_ASSIGNMENT);
 
-  _tab_string[temp_path] = DEFAULT_TEMP_PATH;
   _tab_string[check_result_path] = DEFAULT_CHECK_RESULT_PATH;
   _tab_string[log_archive_path] = DEFAULT_LOG_ARCHIVE_PATH;
+
+  // Set macro.
+  delete[] _mac->x[MACRO_TEMPPATH];
+  _mac->x[MACRO_TEMPPATH] = my_strdup("/tmp");
 }
 
 /**
@@ -250,7 +253,6 @@ state& state::operator=(state const& right) {
 void state::reset() {
   _reset();
 
-  _tab_string[temp_path] = DEFAULT_TEMP_PATH;
   _tab_string[check_result_path] = DEFAULT_CHECK_RESULT_PATH;
   _tab_string[log_archive_path] = DEFAULT_LOG_ARCHIVE_PATH;
 }
@@ -327,7 +329,6 @@ void state::parse(QString const& filename) {
   _mac->x[MACRO_MAINCONFIGFILE] = my_strdup(_filename.toStdString().c_str());
 
   // check path
-  set_temp_path(get_temp_path());
   set_check_result_path(get_check_result_path());
   set_log_archive_path(get_log_archive_path());
 }
@@ -370,14 +371,6 @@ QString const& state::get_command_file() const throw() {
  */
 QString const& state::get_temp_file() const throw() {
   return (_tab_string[temp_file]);
-}
-
-/**
- *  Get the temporary path.
- *  @return The temporary path.
- */
-QString const& state::get_temp_path() const throw() {
-  return (_tab_string[temp_path]);
 }
 
 /**
@@ -1188,25 +1181,8 @@ void state::set_temp_file(QString const& value) {
  *  @param[in] value The path.
  */
 void state::set_temp_path(QString const& value) {
-  // Check that temp path exists and is a directory.
-  QFileInfo qinfo(value);
-  if (!qinfo.exists())
-    throw (engine_error() << "temp_path '" << value
-                          << "' does not exist");
-  if (!qinfo.isDir())
-    throw (engine_error() << "temp_path '" << value
-                          << "' is not a directory");
-
-  // Set configuration variable.
-  _tab_string[temp_path] = value;
-
-  // Set macro.
-  delete[] _mac->x[MACRO_TEMPPATH];
-  _mac->x[MACRO_TEMPPATH] = my_strdup(value.toStdString().c_str());
-
-  // Set compatibility variable.
-  delete[] ::temp_path;
-  ::temp_path = my_strdup(_mac->x[MACRO_TEMPPATH]);
+  (void)value;
+  logger(log_config_warning, basic) << "warning: temp_path variable ignored";
 }
 
 /**

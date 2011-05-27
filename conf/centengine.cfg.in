@@ -172,13 +172,6 @@ external_command_buffer_slots=4096
 temp_file=@localstatedir@/nagios.tmp
 
 
-# var:   temp_path
-# brif:  This is path where Centreon Engine can create temp files for service and host
-#        check results, etc.
-
-temp_path=@TMPDIR@
-
-
 # var:    event_broker_options
 # brief:  Controls what (if any) data gets sent to the event broker.
 # values: 0       = Broker nothing.

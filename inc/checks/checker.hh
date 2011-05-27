@@ -48,6 +48,8 @@ namespace                                    com {
 
 	  void                               reap();
 
+	  void                               push_check_result(check_result const& result);
+
 	  void                               run(host* hst,
 						 int check_options = CHECK_OPTION_NONE,
 						 double latency = 0.0,
@@ -73,11 +75,6 @@ namespace                                    com {
 	  void                               _command_executed(commands::result const& res);
 
 	private:
-	  struct                             result_info {
-	    commands::result                 command;
-	    check_result                     check;
-	  };
-
 	                                     checker();
 	                                     checker(checker const& right);
 	                                     ~checker() throw();
@@ -86,7 +83,7 @@ namespace                                    com {
 
 	  int                                _execute_sync(host* hst);
 
-	  QQueue<result_info>                _to_reap;
+	  QQueue<check_result>               _to_reap;
 	  QHash<unsigned long, check_result> _list_id;
 	  QMutex                             _mut_reap;
 	  QMutex                             _mut_id;

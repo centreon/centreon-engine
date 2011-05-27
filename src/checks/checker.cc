@@ -57,16 +57,16 @@ void checker::reap() {
   time(&reaper_start_time);
 
   int reaped_checks = 0;
-  result_info res_info;
   while (true) {
+    check_result result;
     _mut_reap.lock();
     bool is_empty = _to_reap.isEmpty();
     if (is_empty == false) {
       logger(dbg_checks, basic)
 	<< "Found a check result (#" << ++reaped_checks << ") to handle...";
 
-      // get result and service.
-      res_info = _to_reap.dequeue();
+      // get result host or service check.
+      result = _to_reap.dequeue();
     }
     _mut_reap.unlock();
 
@@ -74,55 +74,63 @@ void checker::reap() {
       break;
     }
 
-    if (res_info.check.object_check_type == SERVICE_CHECK) {
+    // file is too old - ignore check results it contains and delete it.
+    if (config.get_max_check_result_file_age() > 0
+	&& (static_cast<unsigned int>(time(NULL) - result.start_time.tv_sec)
+	    > config.get_max_check_result_file_age())) {
+      // cleanup.
+      free_check_result(&result);
+      continue;
+    }
+
+    if (result.object_check_type == SERVICE_CHECK) {
       // check if the service exist.
-      service* svc = find_service(res_info.check.host_name,
-				  res_info.check.service_description);
+      service* svc = find_service(result.host_name,
+				  result.service_description);
       if (svc == NULL) {
 	logger(log_runtime_warning, basic)
 	  << "Warning: Check result queue contained results for service '"
-	  << res_info.check.service_description << "' on host '"
-	  << res_info.check.host_name << "', but the service could "
+	  << result.service_description << "' on host '"
+	  << result.host_name << "', but the service could "
 	  << "not be found! Perhaps you forgot to define the service in your "
 	  << "config files?";
 
 	// cleanup.
-        free_check_result(&res_info.check);
+        free_check_result(&result);
 	continue;
       }
 
       logger(dbg_checks, more)
 	<< "Handling check result for service '"
-	<< res_info.check.service_description << "' on host '"
-	<< res_info.check.host_name << "'...";
+	<< result.service_description << "' on host '"
+	<< result.host_name << "'...";
 
       // process the check result.
-      handle_async_service_check_result(svc, &res_info.check);
+      handle_async_service_check_result(svc, &result);
     }
     else {
-      host* hst = find_host(res_info.check.host_name);
+      host* hst = find_host(result.host_name);
       if (hst == NULL) {
         // check if the host exist.
 	logger(log_runtime_warning, basic)
 	  << "Warning: Check result queue contained results for host '"
-	  << res_info.check.host_name << "', but the host could not be found! "
+	  << result.host_name << "', but the host could not be found! "
 	  << "Perhaps you forgot to define the host in your config files?";
 
 	// cleanup.
-        free_check_result(&res_info.check);
+        free_check_result(&result);
         continue;
       }
 
       logger(dbg_checks, more)
-	<< "Handling check result for host '"
-	<< res_info.check.host_name << "'...";
+	<< "Handling check result for host '" << result.host_name << "'...";
 
       // process the check result.
-      handle_async_host_check_result_3x(hst, &res_info.check);
+      handle_async_host_check_result_3x(hst, &result);
     }
 
     // cleanup.
-    free_check_result(&res_info.check);
+    free_check_result(&result);
 
     // check if reaping is timeout.
     time_t current_time;
@@ -145,6 +153,17 @@ void checker::reap() {
   logger(dbg_checks, basic)
     << "Finished reaping " << reaped_checks << " check results";
   logger(dbg_functions, basic) << "end " << __PRETTY_FUNCTION__;;
+}
+
+/**
+ *  Add into the queue a result to reap later.
+ *
+ *  @param[in] result The check_result to process later.
+ */
+void checker::push_check_result(check_result const& result) {
+  _mut_reap.lock();
+  _to_reap.enqueue(result);
+  _mut_reap.unlock();
 }
 
 /**
@@ -707,20 +726,19 @@ void checker::_command_executed(commands::result const& res) {
     return;
   }
 
-  result_info res_info;
-  res_info.command = res;
-  res_info.check = it.value();
+  check_result result;
+  result = it.value();
   _list_id.erase(it);
   _mut_id.unlock();
 
-  res_info.check.finish_time = res.get_end_time();
-  res_info.check.early_timeout = res.get_is_timeout();
-  res_info.check.return_code = res.get_retval();
-  res_info.check.exited_ok = res.get_exited_ok();
-  res_info.check.output = my_strdup(res.get_stdout().toStdString().c_str());
+  result.finish_time = res.get_end_time();
+  result.early_timeout = res.get_is_timeout();
+  result.return_code = res.get_retval();
+  result.exited_ok = res.get_exited_ok();
+  result.output = my_strdup(res.get_stdout().toStdString().c_str());
 
   _mut_reap.lock();
-  _to_reap.enqueue(res_info);
+  _to_reap.enqueue(result);
   _mut_reap.unlock();
 }
 

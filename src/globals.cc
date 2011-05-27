@@ -156,7 +156,6 @@ unsigned int debug_verbosity;
 char* debug_file = NULL;
 unsigned long max_debug_file_size;
 char* command_file = NULL;
-char* temp_path = NULL;
 char* check_result_path = NULL;
 char* global_host_event_handler = NULL;
 char* global_service_event_handler = NULL;

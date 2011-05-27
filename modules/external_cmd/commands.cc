@@ -37,21 +37,9 @@
 #include "flapping.hh"
 #include "logging.hh"
 #include "commands.hh"
+#include "checks/checker.hh"
 
-// PASSIVE_CHECK_RESULT structure
-struct                  passive_check_result {
-  unsigned int          object_check_type;
-  char*                 host_name;
-  char*                 service_description;
-  int                   return_code;
-  char*                 output;
-  time_t                check_time;
-  double                latency;
-  passive_check_result* next;
-};
-
-static passive_check_result* passive_check_result_list = NULL;
-static passive_check_result* passive_check_result_list_tail = NULL;
+using namespace com::centreon::engine;
 
 /******************************************************************/
 /****************** EXTERNAL COMMAND PROCESSING *******************/
@@ -81,10 +69,6 @@ int check_for_external_commands(void) {
     last_command_status_update = last_command_check;
     update_program_status(FALSE);
   }
-
-  /* reset passive check result list pointers */
-  passive_check_result_list = NULL;
-  passive_check_result_list_tail = NULL;
 
   /* process all commands found in the buffer */
   while (1) {
@@ -119,10 +103,6 @@ int check_for_external_commands(void) {
     /* free memory */
     delete[] buffer;
   }
-
-  /**** PROCESS ALL PASSIVE HOST AND SERVICE CHECK RESULTS AT ONE TIME ****/
-  if (passive_check_result_list != NULL)
-    process_passive_checks();
 
   return (OK);
 }
@@ -2042,11 +2022,9 @@ int process_passive_service_check(time_t check_time,
                                   char* svc_description,
                                   int return_code,
                                   char const* output) {
-  passive_check_result* new_pcr = NULL;
   host* temp_host = NULL;
   service* temp_service = NULL;
   char const* real_host_name = NULL;
-  struct timeval tv;
 
   /* skip this service check result if we aren't accepting passive service checks */
   if (config.get_accept_passive_service_checks() == false)
@@ -2090,43 +2068,43 @@ int process_passive_service_check(time_t check_time,
   if (temp_service->accept_passive_service_checks == FALSE)
     return (ERROR);
 
-  /* allocate memory for the passive check result */
-  new_pcr = new passive_check_result;
+  timeval tv;
+  gettimeofday(&tv, NULL);
 
-  /* initialize vars */
-  new_pcr->object_check_type = SERVICE_CHECK;
-  new_pcr->host_name = NULL;
-  new_pcr->service_description = NULL;
-  new_pcr->output = NULL;
-  new_pcr->next = NULL;
-
-  /* save string vars */
-  new_pcr->host_name = my_strdup(real_host_name);
-  new_pcr->service_description = my_strdup(svc_description);
-  new_pcr->output = my_strdup(output);
-
-  /* save the return code */
-  new_pcr->return_code = return_code;
+  check_result result;
+  result.object_check_type = SERVICE_CHECK;
+  result.host_name = my_strdup(real_host_name);
+  result.service_description = my_strdup(svc_description);
+  result.check_type = SERVICE_CHECK_PASSIVE;
+  result.check_options = CHECK_OPTION_NONE;
+  result.scheduled_check = false;
+  result.reschedule_check = false;
+  result.output_file = NULL;
+  result.output_file_fp = NULL;
+  result.output_file_fd = -1;
+  result.latency = (double)((double)(tv.tv_sec - check_time)
+			    + (double)(tv.tv_usec / 1000.0) / 1000.0);
+  result.start_time.tv_sec = check_time;
+  result.start_time.tv_usec = 0;
+  result.finish_time.tv_sec = check_time;
+  result.finish_time.tv_usec = 0;
+  result.early_timeout = false;
+  result.exited_ok = true;
+  result.return_code = return_code;
+  result.output = my_strdup(output);
+  result.next = NULL;
+  // result.check_time = check_time;
 
   /* make sure the return code is within bounds */
-  if (new_pcr->return_code < 0 || new_pcr->return_code > 3)
-    new_pcr->return_code = STATE_UNKNOWN;
+  if (result.return_code < 0 || result.return_code > 3) {
+    result.return_code = STATE_UNKNOWN;
+  }
 
-  new_pcr->check_time = check_time;
+  if (result.latency < 0.0) {
+    result.latency = 0.0;
+  }
 
-  /* calculate latency */
-  gettimeofday(&tv, NULL);
-  new_pcr->latency = (double)((double)(tv.tv_sec - check_time)
-                              + (double)(tv.tv_usec / 1000.0) / 1000.0);
-  if (new_pcr->latency < 0.0)
-    new_pcr->latency = 0.0;
-
-  /* add the passive check result to the end of the list in memory */
-  if (passive_check_result_list == NULL)
-    passive_check_result_list = new_pcr;
-  else
-    passive_check_result_list_tail->next = new_pcr;
-  passive_check_result_list_tail = new_pcr;
+  checks::checker::instance().push_check_result(result);
 
   return (OK);
 }
@@ -2174,10 +2152,8 @@ int process_passive_host_check(time_t check_time,
                                char* host_name,
                                int return_code,
                                char const* output) {
-  passive_check_result* new_pcr = NULL;
   host* temp_host = NULL;
   char* real_host_name = NULL;
-  struct timeval tv;
 
   /* skip this host check result if we aren't accepting passive host checks */
   if (config.get_accept_passive_service_checks() == false)
@@ -2215,42 +2191,43 @@ int process_passive_host_check(time_t check_time,
   if (temp_host->accept_passive_host_checks == FALSE)
     return (ERROR);
 
-  /* allocate memory for the passive check result */
-  new_pcr = new passive_check_result;
+  timeval tv;
+  gettimeofday(&tv, NULL);
 
-  /* initialize vars */
-  new_pcr->object_check_type = HOST_CHECK;
-  new_pcr->host_name = NULL;
-  new_pcr->service_description = NULL;
-  new_pcr->output = NULL;
-  new_pcr->next = NULL;
-
-  /* save string vars */
-  new_pcr->host_name = my_strdup(real_host_name);
-  new_pcr->output = my_strdup(output);
-
-  /* save the return code */
-  new_pcr->return_code = return_code;
+  check_result result;
+  result.object_check_type = HOST_CHECK;
+  result.host_name = my_strdup(real_host_name);
+  result.service_description = NULL;
+  result.check_type = HOST_CHECK_PASSIVE;
+  result.check_options = CHECK_OPTION_NONE;
+  result.scheduled_check = false;
+  result.reschedule_check = false;
+  result.output_file = NULL;
+  result.output_file_fp = NULL;
+  result.output_file_fd = -1;
+  result.latency = (double)((double)(tv.tv_sec - check_time)
+			    + (double)(tv.tv_usec / 1000.0) / 1000.0);
+  result.start_time.tv_sec = check_time;
+  result.start_time.tv_usec = 0;
+  result.finish_time.tv_sec = check_time;
+  result.finish_time.tv_usec = 0;
+  result.early_timeout = false;
+  result.exited_ok = true;
+  result.return_code = return_code;
+  result.output = my_strdup(output);
+  result.next = NULL;
+  // result.check_time = check_time;
 
   /* make sure the return code is within bounds */
-  if (new_pcr->return_code < 0 || new_pcr->return_code > 3)
-    new_pcr->return_code = STATE_UNKNOWN;
+  if (result.return_code < 0 || result.return_code > 3) {
+    result.return_code = STATE_UNKNOWN;
+  }
 
-  new_pcr->check_time = check_time;
+  if (result.latency < 0.0) {
+    result.latency = 0.0;
+  }
 
-  /* calculate latency */
-  gettimeofday(&tv, NULL);
-  new_pcr->latency = (double)((double)(tv.tv_sec - check_time) +
-                              (double)(tv.tv_usec / 1000.0) / 1000.0);
-  if (new_pcr->latency < 0.0)
-    new_pcr->latency = 0.0;
-
-  /* add the passive check result to the end of the list in memory */
-  if (passive_check_result_list == NULL)
-    passive_check_result_list = new_pcr;
-  else
-    passive_check_result_list_tail->next = new_pcr;
-  passive_check_result_list_tail = new_pcr;
+  checks::checker::instance().push_check_result(result);
 
   return (OK);
 }
@@ -5380,112 +5357,4 @@ void set_service_notification_number(service* svc, int num) {
 
   /* update the status log with the service info */
   update_service_status(svc, FALSE);
-}
-
-/* process all passive host and service checks we found in the external command file */
-void process_passive_checks(void) {
-  passive_check_result* temp_pcr = NULL;
-  passive_check_result* this_pcr = NULL;
-  passive_check_result* next_pcr = NULL;
-  char* checkresult_file = NULL;
-  int checkresult_file_fd = -1;
-  FILE* checkresult_file_fp = NULL;
-  mode_t new_umask = 077;
-  mode_t old_umask;
-  time_t current_time;
-
-  log_debug_info(DEBUGL_FUNCTIONS, 0, "process_passive_checks()\n");
-
-  /* nothing to do */
-  if (passive_check_result_list == NULL)
-    return;
-
-  log_debug_info(DEBUGL_CHECKS, 1,
-                 "Submitting passive host/service check results obtained from external commands...\n");
-
-  /* open a temp file for storing check result(s) */
-  old_umask = umask(new_umask);
-
-  std::ostringstream oss;
-  oss << config.get_temp_path().toStdString() << "/checkXXXXXX";
-  checkresult_file = my_strdup(oss.str().c_str());
-
-  checkresult_file_fd = mkstemp(checkresult_file);
-  umask(old_umask);
-  if (checkresult_file_fd < 0) {
-    logit(NSLOG_RUNTIME_ERROR, TRUE,
-          "Failed to open checkresult file '%s': %s\n",
-          checkresult_file,
-          strerror(errno));
-    delete[] checkresult_file;
-    return;
-  }
-
-  checkresult_file_fp = fdopen(checkresult_file_fd, "w");
-
-  time(&current_time);
-  fprintf(checkresult_file_fp, "### Passive Check Result File ###\n");
-  fprintf(checkresult_file_fp, "# Time: %s", ctime(&current_time));
-  fprintf(checkresult_file_fp, "file_time=%lu\n", (unsigned long)current_time);
-  fprintf(checkresult_file_fp, "\n");
-
-  log_debug_info(DEBUGL_CHECKS | DEBUGL_IPC, 1,
-                 "Passive check result(s) will be written to '%s' (fd=%d)\n",
-                 checkresult_file, checkresult_file_fd);
-
-  /* write all service checks to check result queue file for later processing */
-  for (temp_pcr = passive_check_result_list;
-       temp_pcr != NULL;
-       temp_pcr = temp_pcr->next) {
-
-    /* write check results to file */
-    if (checkresult_file_fp) {
-
-      fprintf(checkresult_file_fp, "### Centreon Engine %s Check Result ###\n",
-              (temp_pcr->object_check_type == SERVICE_CHECK) ? "Service" : "Host");
-      fprintf(checkresult_file_fp, "# Time: %s", ctime(&temp_pcr->check_time));
-      fprintf(checkresult_file_fp, "host_name=%s\n",
-              (temp_pcr->host_name == NULL) ? "" : temp_pcr->host_name);
-      if (temp_pcr->object_check_type == SERVICE_CHECK)
-        fprintf(checkresult_file_fp, "service_description=%s\n",
-                (temp_pcr->service_description == NULL) ? "" : temp_pcr->service_description);
-      fprintf(checkresult_file_fp, "check_type=%d\n",
-              (temp_pcr->object_check_type == HOST_CHECK) ? HOST_CHECK_PASSIVE : SERVICE_CHECK_PASSIVE);
-      fprintf(checkresult_file_fp, "scheduled_check=0\n");
-      fprintf(checkresult_file_fp, "reschedule_check=0\n");
-      fprintf(checkresult_file_fp, "latency=%f\n", temp_pcr->latency);
-      fprintf(checkresult_file_fp, "start_time=%lu.%lu\n",
-        static_cast<unsigned long>(temp_pcr->check_time),
-        0ul);
-      fprintf(checkresult_file_fp, "finish_time=%lu.%lu\n",
-        static_cast<unsigned long>(temp_pcr->check_time),
-        0ul);
-      fprintf(checkresult_file_fp, "return_code=%d\n", temp_pcr->return_code);
-      /* newlines in output are already escaped */
-      fprintf(checkresult_file_fp, "output=%s\n", (temp_pcr->output == NULL) ? "" : temp_pcr->output);
-      fprintf(checkresult_file_fp, "\n");
-    }
-  }
-
-  /* close the temp file */
-  fclose(checkresult_file_fp);
-
-  /* move check result to queue directory */
-  move_check_result_to_queue(checkresult_file);
-
-  /* free memory */
-  delete[] checkresult_file;
-
-  /* free memory for the passive check result list */
-  this_pcr = passive_check_result_list;
-  while (this_pcr != NULL) {
-    next_pcr = this_pcr->next;
-    delete[] this_pcr->host_name;
-    delete[] this_pcr->service_description;
-    delete[] this_pcr->output;
-    delete this_pcr;
-    this_pcr = next_pcr;
-  }
-  passive_check_result_list = NULL;
-  passive_check_result_list_tail = NULL;
 }

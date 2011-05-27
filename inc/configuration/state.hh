@@ -99,7 +99,6 @@ namespace                   com {
 	  QString const&      get_debug_file() const throw();
 	  QString const&      get_command_file() const throw();
 	  QString const&      get_temp_file() const throw();
-	  QString const&      get_temp_path() const throw();
 	  QString const&      get_check_result_path() const throw();
 	  QString const&      get_global_host_event_handler() const throw();
 	  QString const&      get_global_service_event_handler() const throw();
@@ -317,7 +316,6 @@ namespace                   com {
 	    debug_file,
 	    command_file,
 	    temp_file,
-	    temp_path,
 	    check_result_path,
 	    global_host_event_handler,
 	    global_service_event_handler,

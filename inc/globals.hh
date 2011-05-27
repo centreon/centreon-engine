@@ -153,7 +153,6 @@ extern unsigned int debug_verbosity;
 extern char* debug_file;
 extern unsigned long max_debug_file_size;
 extern char* command_file;
-extern char* temp_path;
 extern char* check_result_path;
 extern char* global_host_event_handler;
 extern char* global_service_event_handler;
