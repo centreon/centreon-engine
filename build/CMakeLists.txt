@@ -26,7 +26,7 @@ set(ENGINE_PATCH "0beta")
 set(ENGINE_VERSION "${ENGINE_MAJOR}.${ENGINE_MINOR}.${ENGINE_PATCH}")
 add_definitions("-DENGINE_VERSION=\"${ENGINE_VERSION}\"")
 
-# Function mkdir_chown.
+# Function chown.
 function(mkdir_chown)
   if (APPLE OR (UNIX AND NOT CYGWIN))
     if (NOT EXISTS "${ARGV2}")
@@ -35,6 +35,14 @@ function(mkdir_chown)
     endif ()
   else()
     file(MAKE_DIRECTORY "${ARGV2}")
+  endif ()
+endfunction()
+
+function(chown)
+  if (APPLE OR (UNIX AND NOT CYGWIN))
+    if (EXISTS "${ARGV2}")
+      execute_process(COMMAND "chown" "${ARGV0}:${ARGV1}" "${ARGV2}")
+    endif ()
   endif ()
 endfunction()
 
@@ -508,6 +516,8 @@ if (WITH_STARTUP_SCRIPT)
         else ()
           set(LOCK_FILE "/var/lock/subsys")
         endif ()
+	string(REGEX REPLACE "/[^/]*$" "" LOCK_DIR "${LOCK_FILE}")
+	file(MAKE_DIRECTORY "${LOCK_DIR}")
 
         # PID file.
         if (WITH_PID_FILE)
@@ -515,6 +525,8 @@ if (WITH_STARTUP_SCRIPT)
         else ()
           set(PID_FILE "/var/run/centengine.pid")
         endif ()
+	string(REGEX REPLACE "/[^/]*$" "" PID_DIR "${PID_FILE}")
+	file(MAKE_DIRECTORY "${PID_DIR}")
 
         # Startup dir.
         if (WITH_STARTUP_DIR)
