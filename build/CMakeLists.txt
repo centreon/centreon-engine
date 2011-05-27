@@ -33,7 +33,7 @@ set(XDATA_DIR "${PROJECT_SOURCE_DIR}/xdata")
 set(TEST_DIR "${PROJECT_SOURCE_DIR}/test")
 set(SCRIPT_DIR "${PROJECT_SOURCE_DIR}/scripts")
 
-# Function mkdir_chown.
+# Function chown.
 function(mkdir_chown)
   if (APPLE OR (UNIX AND NOT CYGWIN))
     if (NOT EXISTS "${ARGV2}")
@@ -330,6 +330,8 @@ if (WITH_STARTUP_SCRIPT)
         else ()
           set(LOCK_FILE "/var/lock/subsys")
         endif ()
+	string(REGEX REPLACE "/[^/]*$" "" LOCK_DIR "${LOCK_FILE}")
+	file(MAKE_DIRECTORY "${LOCK_DIR}")
 
         # PID file.
         if (WITH_PID_FILE)
@@ -337,6 +339,8 @@ if (WITH_STARTUP_SCRIPT)
         else ()
           set(PID_FILE "/var/run/centengine.pid")
         endif ()
+	string(REGEX REPLACE "/[^/]*$" "" PID_DIR "${PID_FILE}")
+	file(MAKE_DIRECTORY "${PID_DIR}")
 
         # Startup dir.
         if (WITH_STARTUP_DIR)
