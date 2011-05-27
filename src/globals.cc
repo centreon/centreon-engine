@@ -109,8 +109,8 @@ int                       __nagios_object_structure_version = CURRENT_OBJECT_STR
 
 notification*             notification_list = NULL;
 
-check_result              check_result_info;
-check_result*             check_result_list = NULL;
+// check_result              check_result_info;
+// check_result*             check_result_list = NULL;
 
 dbuf                      check_result_dbuf;
 

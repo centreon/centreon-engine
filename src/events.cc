@@ -1059,7 +1059,6 @@ int event_execution_loop(void) {
   host* temp_host = NULL;
   service* temp_service = NULL;
   struct timespec delay;
-  pid_t wait_result;
 
   log_debug_info(DEBUGL_FUNCTIONS, 0, "event_execution_loop() start\n");
 

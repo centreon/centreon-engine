@@ -265,6 +265,7 @@ void checker::run(host* hst,
   hst->is_executing = true;
 
   // init check result info.
+  check_result check_result_info;
   check_result_info.object_check_type = HOST_CHECK;
   check_result_info.check_type = HOST_CHECK_ACTIVE;
   check_result_info.check_options = check_options;
@@ -282,6 +283,7 @@ void checker::run(host* hst,
   check_result_info.host_name = my_strdup(hst->name);
   check_result_info.service_description = NULL;
   check_result_info.latency = latency;
+  check_result_info.next = NULL;
 
   commands::set& cmd_set = commands::set::instance();
   QSharedPointer<commands::command> cmd = cmd_set.get_command(hst->check_command_ptr->name);
@@ -447,6 +449,7 @@ void checker::run(service* svc,
   svc->is_executing = true;
 
   // init check result info.
+  check_result check_result_info;
   check_result_info.object_check_type = SERVICE_CHECK;
   check_result_info.check_type = SERVICE_CHECK_ACTIVE;
   check_result_info.check_options = check_options;
@@ -463,6 +466,8 @@ void checker::run(service* svc,
   check_result_info.output_file = NULL;
   check_result_info.host_name = my_strdup(svc->host_name);
   check_result_info.service_description = my_strdup(svc->description);
+  check_result_info.latency = 0.0;
+  check_result_info.next = NULL;
 
   commands::set& cmd_set = commands::set::instance();
   QSharedPointer<commands::command> cmd = cmd_set.get_command(svc->check_command_ptr->name);
@@ -702,7 +707,7 @@ void checker::_command_executed(commands::result const& res) {
     return;
   }
 
-   result_info res_info;
+  result_info res_info;
   res_info.command = res;
   res_info.check = it.value();
   _list_id.erase(it);

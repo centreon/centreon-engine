@@ -55,8 +55,6 @@ time_t get_next_log_rotation_time(void);                                        
 void setup_sighandler(void);                                                                       // trap signals
 void reset_sighandler(void);                                                                       // reset signals to default action
 void sighandler(int sig);                                                                          // handles signals
-void service_check_sighandler(int sig);                                                            // handles timeouts when executing service checks
-void host_check_sighandler(int sig);                                                               // handles timeouts when executing host checks
 void my_system_sighandler(int sig);                                                                // handles timeouts when executing commands via my_system()
 char* get_next_string_from_buf(char* buf, int* start_index, int bufsize);
 int contains_illegal_object_chars(char* name);                                                     // tests whether or not an object name (host, service, etc.) contains illegal characters
@@ -68,9 +66,6 @@ int my_fcopy(char const* source, char const* dest);                             
 int dbuf_init(dbuf* db, int chunk_size);
 int dbuf_free(dbuf* db);
 int dbuf_strcat(dbuf* db, char const* buf);
-int init_embedded_perl(char** env);                                                                // initialized embedded perl interpreter
-int deinit_embedded_perl(void);                                                                    // cleans up embedded perl
-int file_uses_embedded_perl(char* fname);                                                          // tests whether or not the embedded perl interpreter should be used on a file
 
 // Check Statistics Functions
 int init_check_stats(void);
@@ -83,15 +78,7 @@ void free_memory(nagios_macros* mac);      // free memory allocated to all linke
 void free_notification_list(void);         // frees all memory allocated to the notification list
 int reset_variables(void);                 // reset all global variables
 
-// IPC Functions
 int move_check_result_to_queue(char* checkresult_file);
-int process_check_result_queue(char const* dirname);
-int process_check_result_file(char* fname);
-int delete_check_result_file(char const* fname);
-check_result* read_check_result(void);     // reads a host/service check result from the list in memory
-int init_check_result(check_result* info);
-int add_check_result_to_list(check_result* new_cr);
-int free_check_result_list(void);
 int free_check_result(check_result* info); // frees memory associated with a host/service check result
 int parse_check_output(char* buf, char** short_output, char** long_output, char** perf_data, int escape_newlines_please, int newlines_are_escaped);
 
