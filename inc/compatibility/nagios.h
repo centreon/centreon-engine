@@ -65,6 +65,7 @@ int file_uses_embedded_perl(char* fname); // tests whether or not the embedded p
 
 void service_check_sighandler(int sig);   // handles timeouts when executing service checks
 void host_check_sighandler(int sig);      // handles timeouts when executing host checks
+void my_system_sighandler(int sig);
 
 // IPC Functions
 int process_check_result_queue(char const* dirname);

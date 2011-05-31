@@ -56,8 +56,8 @@ bool run_with_timeout() {
       || cmd_res.get_retval() != STATE_CRITICAL
       || cmd_res.get_execution_time() == 0
       || cmd_res.get_stdout() != ""
-      || cmd_res.get_stderr() != "Process Timeout"
-      || cmd_res.get_exited_ok() == true
+      || cmd_res.get_stderr() != "(Process Timeout)"
+      || cmd_res.get_exited_ok() == false
       || cmd_res.get_is_timeout() == false) {
     return (false);
   }

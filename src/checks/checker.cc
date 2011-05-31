@@ -726,7 +726,12 @@ void checker::_command_executed(commands::result const& res) {
   result.early_timeout = res.get_is_timeout();
   result.return_code = res.get_retval();
   result.exited_ok = res.get_exited_ok();
-  result.output = my_strdup(res.get_stdout().toStdString().c_str());
+  if (res.get_exited_ok() == true && res.get_is_timeout() == false) {
+    result.output = my_strdup(res.get_stdout().toStdString().c_str());
+  }
+  else {
+    result.output = my_strdup(res.get_stderr().toStdString().c_str());
+  }
 
   _mut_reap.lock();
   _to_reap.enqueue(result);
@@ -856,10 +861,6 @@ int checker::_execute_sync(host* hst) {
   hst->long_plugin_output = NULL;
   hst->perf_data = NULL;
 
-  connect(&(*cmd), SIGNAL(command_executed(commands::result const&)),
-	  this, SLOT(_command_executed(commands::result const&)),
-	  Qt::UniqueConnection);
-
   timeval start_cmd;
   gettimeofday(&start_cmd, NULL);
 
@@ -886,8 +887,11 @@ int checker::_execute_sync(host* hst) {
 	   cmd_result);
 
   char* output = NULL;
-  if (cmd_result.get_stdout() != "") {
+  if (cmd_result.get_exited_ok() == true) {
     output = my_strdup(cmd_result.get_stdout().toStdString().c_str());
+  }
+  else {
+    output = my_strdup(cmd_result.get_stderr().toStdString().c_str());
   }
 
   // send broker event.
@@ -925,7 +929,13 @@ int checker::_execute_sync(host* hst) {
   hst->execution_time = cmd_result.get_execution_time();
   hst->check_type = HOST_CHECK_ACTIVE;
 
-  char* tmp_plugin_output = my_strdup(cmd_result.get_stdout().toStdString().c_str());
+  char* tmp_plugin_output = NULL;
+  if (cmd_result.get_exited_ok() == true) {
+    tmp_plugin_output = my_strdup(cmd_result.get_stdout().toStdString().c_str());
+  }
+  else {
+    tmp_plugin_output = my_strdup(cmd_result.get_stderr().toStdString().c_str());
+  }
 
   // parse the output: short and long output, and perf data.
   parse_check_output(tmp_plugin_output,

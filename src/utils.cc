@@ -40,6 +40,7 @@
 #include "logging.hh"
 #include "shared.hh"
 #include "utils.hh"
+#include "commands/raw.hh"
 
 extern "C" int free_check_result_list(void);
 
@@ -48,57 +49,38 @@ extern "C" int free_check_result_list(void);
 /******************************************************************/
 
 /* executes a system command - used for notifications, event handlers, etc. */
-int my_system_r(nagios_macros* mac,
+int my_system_r(nagios_macros const* mac,
 		char* cmd,
 		int timeout,
                 int* early_timeout,
 		double* exectime,
 		char** output,
                 unsigned int max_output_length) {
-  pid_t pid = 0;
-  int status = 0;
-  int result = 0;
-  char buffer[MAX_INPUT_BUFFER] = "";
-  int fd[2];
-  FILE* fp = NULL;
-  int bytes_read = 0;
-  struct timeval start_time, end_time;
-  dbuf output_dbuf;
-  int dbuf_chunk = 1024;
-  int flags;
+  using namespace com::centreon::engine;
 
   log_debug_info(DEBUGL_FUNCTIONS, 0, "my_system_r()\n");
 
-  /* initialize return variables */
-  if (output != NULL)
+  // initialize return variables.
+  if (output != NULL) {
     *output = NULL;
-  *early_timeout = FALSE;
+  }
+  *early_timeout = false;
   *exectime = 0.0;
 
-  /* if no command was passed, return with no error */
-  if (cmd == NULL)
+  // if no command was passed, return with no error.
+  if (cmd == NULL) {
     return (STATE_OK);
+  }
 
   log_debug_info(DEBUGL_COMMANDS, 1, "Running command '%s'...\n", cmd);
 
-  /* create a pipe */
-  if (pipe(fd) == -1) {
-    logit(NSLOG_RUNTIME_WARNING, TRUE,
-          "Warning: pipe() in my_system() failed for command \"%s\"\n",
-          cmd);
-    return (STATE_UNKNOWN);
-  }
+  timeval start_time = timeval();
+  timeval end_time = timeval();
 
-  /* make the pipe non-blocking */
-  fcntl(fd[0], F_SETFL, O_NONBLOCK);
-  fcntl(fd[1], F_SETFL, O_NONBLOCK);
-
-  /* get the command start time */
+  // time to start command.
   gettimeofday(&start_time, NULL);
 
-  /* send data to event broker */
-  end_time.tv_sec = 0L;
-  end_time.tv_usec = 0L;
+  // send event broker.
   broker_system_command(NEBTYPE_SYSTEM_COMMAND_START,
 			NEBFLAG_NONE,
                         NEBATTR_NONE,
@@ -107,234 +89,49 @@ int my_system_r(nagios_macros* mac,
 			*exectime,
                         timeout,
 			*early_timeout,
-			result,
+			STATE_OK,
 			cmd,
 			NULL,
                         NULL);
 
-  /* fork */
-  pid = fork();
+  commands::raw raw_cmd("system", cmd);
+  commands::result cmd_result;
+  raw_cmd.run(cmd, *mac, timeout, cmd_result);
 
-  /* return an error if we couldn't fork */
-  if (pid == -1) {
-    logit(NSLOG_RUNTIME_WARNING, TRUE,
-          "Warning: fork() in my_system_r() failed for command \"%s\"\n",
-          cmd);
-
-    /* close both ends of the pipe */
-    close(fd[0]);
-    close(fd[1]);
-
-    return (STATE_UNKNOWN);
+  end_time = cmd_result.get_end_time();
+  *exectime = cmd_result.get_execution_time();
+  *early_timeout = cmd_result.get_is_timeout();
+  if (output != NULL && max_output_length > 0) {
+    if (cmd_result.get_stdout() != "") {
+      *output = my_strdup(cmd_result.get_stdout().left(max_output_length - 1).toStdString().c_str());
+    }
+    else if (cmd_result.get_stderr() != "") {
+      *output = my_strdup(cmd_result.get_stderr().left(max_output_length - 1).toStdString().c_str());
+    }
   }
 
-  /* execute the command in the child process */
-  if (pid == 0) {
+  int result = cmd_result.get_retval();
 
-    /* become process group leader */
-    setpgid(0, 0);
+  log_debug_info(DEBUGL_COMMANDS, 1,
+		 "Execution time=%.3f sec, early timeout=%d, result=%d, output=%s\n",
+		 *exectime,
+		 *early_timeout,
+		 result,
+		 (output == NULL ? "(null)" : *output));
 
-    /* set environment variables */
-    set_all_macro_environment_vars(mac, TRUE);
-
-    /* reset signal handling */
-    reset_sighandler();
-
-    /* close pipe for reading */
-    close(fd[0]);
-
-    /* prevent fd from being inherited by child processed */
-    flags = fcntl(fd[1], F_GETFD, 0);
-    flags |= FD_CLOEXEC;
-    fcntl(fd[1], F_SETFD, flags);
-
-    /* trap commands that timeout */
-    signal(SIGALRM, my_system_sighandler);
-    alarm(timeout);
-
-    /* run the command */
-    fp = (FILE*)popen(cmd, "r");
-
-    /* report an error if we couldn't run the command */
-    if (fp == NULL) {
-
-      strncpy(buffer, "(Error: Could not execute command)\n",
-              sizeof(buffer) - 1);
-      buffer[sizeof(buffer) - 1] = '\x0';
-
-      /* write the error back to the parent process */
-      if (write(fd[1], buffer, strlen(buffer) + 1) == -1)
-        logit(NSLOG_RUNTIME_WARNING, FALSE,
-              "Warning: Write failed. %s\n", strerror(errno));
-
-      result = STATE_CRITICAL;
-    }
-    else {
-
-      /* write all the lines of output back to the parent process */
-      while (fgets(buffer, sizeof(buffer) - 1, fp))
-        if (write(fd[1], buffer, strlen(buffer)) == -1)
-          logit(NSLOG_RUNTIME_WARNING, FALSE,
-                "Warning: Write failed. %s\n", strerror(errno));
-
-      /* close the command and get termination status */
-      status = pclose(fp);
-
-      /* report an error if we couldn't close the command */
-      if (status == -1)
-        result = STATE_CRITICAL;
-      else {
-        if (WEXITSTATUS(status) == 0 && WIFSIGNALED(status))
-          result = 128 + WTERMSIG(status);
-        result = WEXITSTATUS(status);
-      }
-    }
-
-    /* close pipe for writing */
-    close(fd[1]);
-
-    /* reset the alarm */
-    alarm(0);
-
-    /* clear environment variables */
-    set_all_macro_environment_vars(mac, FALSE);
-
-#ifndef DONT_USE_MEMORY_PERFORMANCE_TWEAKS
-    /* free allocated memory */
-    /* this needs to be done last, so we don't free memory for variables before they're used above */
-    if (config.get_free_child_process_memory() == true)
-      free_memory(mac);
-#endif
-
-    _exit(result);
-  }
-
-  /* parent waits for child to finish executing command */
-  else {
-
-    /* close pipe for writing */
-    close(fd[1]);
-
-    /* wait for child to exit */
-    waitpid(pid, &status, 0);
-
-    /* get the end time for running the command */
-    gettimeofday(&end_time, NULL);
-
-    /* return execution time in milliseconds */
-    *exectime = (double)((double)(end_time.tv_sec - start_time.tv_sec) +
-			 (double)((end_time.tv_usec - start_time.tv_usec) / 1000) / 1000.0);
-    if (*exectime < 0.0)
-      *exectime = 0.0;
-
-    /* get the exit code returned from the program */
-    result = WEXITSTATUS(status);
-
-    /* check for possibly missing scripts/binaries/etc */
-    if (result == 126 || result == 127) {
-      logit(NSLOG_RUNTIME_WARNING, TRUE,
-            "Warning: Attempting to execute the command \"%s\" resulted in a return code of %d.  Make sure the script or binary you are trying to execute actually exists...\n",
-            cmd,
-	    result);
-    }
-
-    /* check bounds on the return value */
-    if (result < -1 || result > 3)
-      result = STATE_UNKNOWN;
-
-    /* initialize dynamic buffer */
-    dbuf_init(&output_dbuf, dbuf_chunk);
-
-    /* Opsera patch to check timeout before attempting to read output via pipe. Originally by Sven Nierlein */
-    /* if there was a critical return code AND the command time exceeded the timeout thresholds, assume a timeout */
-    if (result == STATE_CRITICAL
-        && (end_time.tv_sec - start_time.tv_sec) >= timeout) {
-
-      /* set the early timeout flag */
-      *early_timeout = TRUE;
-
-      /* try to kill the command that timed out by sending termination signal to child process group */
-      kill((pid_t)(-pid), SIGTERM);
-      sleep(1);
-      kill((pid_t)(-pid), SIGKILL);
-    }
-
-    /* read output if timeout has not occurred */
-    else {
-
-      /* initialize output */
-      strcpy(buffer, "");
-
-      /* try and read the results from the command output (retry if we encountered a signal) */
-      do {
-        bytes_read = read(fd[0], buffer, sizeof(buffer) - 1);
-
-        /* append data we just read to dynamic buffer */
-        if (bytes_read > 0) {
-          buffer[bytes_read] = '\x0';
-          dbuf_strcat(&output_dbuf, buffer);
-        }
-
-        /* handle errors */
-        if (bytes_read == -1) {
-          /* we encountered a recoverable error, so try again */
-          if (errno == EINTR)
-            continue;
-          /* patch by Henning Brauer to prevent CPU hogging */
-          else if (errno == EAGAIN) {
-            struct pollfd pfd;
-
-            pfd.fd = fd[0];
-            pfd.events = POLLIN;
-            poll(&pfd, 1, -1);
-            continue;
-          }
-          else
-            break;
-        }
-
-        /* we're done */
-        if (bytes_read == 0)
-          break;
-
-      } while (1);
-
-      /* cap output length - this isn't necessary, but it keeps runaway plugin output from causing problems */
-      if (output_dbuf.used_size > max_output_length)
-        output_dbuf.buf[max_output_length] = '\x0';
-
-      if (output != NULL && output_dbuf.buf)
-        *output = my_strdup(output_dbuf.buf);
-
-    }
-
-    log_debug_info(DEBUGL_COMMANDS, 1,
-                   "Execution time=%.3f sec, early timeout=%d, result=%d, output=%s\n",
-                   *exectime,
-		   *early_timeout,
-		   result,
-                   (output_dbuf.buf == NULL) ? "(null)" : output_dbuf.buf);
-
-    /* send data to event broker */
-    broker_system_command(NEBTYPE_SYSTEM_COMMAND_END,
-			  NEBFLAG_NONE,
-                          NEBATTR_NONE,
-			  start_time,
-			  end_time,
-			  *exectime,
-                          timeout,
-			  *early_timeout,
-			  result,
-			  cmd,
-                          (output_dbuf.buf == NULL) ? NULL : output_dbuf.buf,
-			  NULL);
-
-    /* free memory */
-    dbuf_free(&output_dbuf);
-
-    /* close the pipe for reading */
-    close(fd[0]);
-  }
+  // send event broker.
+  broker_system_command(NEBTYPE_SYSTEM_COMMAND_END,
+			NEBFLAG_NONE,
+			NEBATTR_NONE,
+			start_time,
+			end_time,
+			*exectime,
+			timeout,
+			*early_timeout,
+			result,
+			cmd,
+			(output == NULL ? NULL : *output),
+			NULL);
 
   return (result);
 }
@@ -1595,14 +1392,6 @@ void sighandler(int sig) {
   /* else begin shutting down... */
   else if (sig < 16)
     sigshutdown = TRUE;
-}
-
-/* handle timeouts when executing commands via my_system_r() */
-void my_system_sighandler(int sig) {
-  (void)sig;
-
-  /* force the child process to exit... */
-  _exit(STATE_CRITICAL);
 }
 
 /******************************************************************/

@@ -141,7 +141,6 @@ int process_check_result_file(char* fname) {
   char* val = NULL;
   char* v1 = NULL;
   char* v2 = NULL;
-  int delete_file = FALSE;
   time_t current_time;
   check_result* new_cr = NULL;
 
@@ -562,5 +561,13 @@ void host_check_sighandler(int sig) {
   kill((pid_t) 0, SIGKILL);
 
   /* force the child process (service check) to exit... */
+  _exit(STATE_CRITICAL);
+}
+
+/* handle timeouts when executing commands via my_system_r() */
+void my_system_sighandler(int sig) {
+  (void)sig;
+
+  /* force the child process to exit... */
   _exit(STATE_CRITICAL);
 }

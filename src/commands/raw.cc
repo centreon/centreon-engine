@@ -155,14 +155,22 @@ void raw::run(QString const& processed_cmd,
   rproc.process->waitForFinished(timeout);
   gettimeofday(&rproc.end_time, NULL);
 
-  if (rproc.process->state() == QProcess::Running) {
+  if (rproc.process->error() == QProcess::FailedToStart) {
+    res.set_retval(STATE_CRITICAL);
+    res.set_is_timeout(false);
+    res.set_stdout("");
+    res.set_stderr(rproc.process->errorString());
+    res.set_exited_ok(false);
+  }
+  else if (rproc.process->state() == QProcess::Running) {
     rproc.process->kill();
     rproc.process->waitForFinished(-1);
 
     res.set_retval(STATE_CRITICAL);
     res.set_is_timeout(true);
     res.set_stdout("");
-    res.set_stderr("Process Timeout");
+    res.set_stderr("(Process Timeout)");
+    res.set_exited_ok(true);
   }
   else {
     if (rproc.process->exitCode() < -1 || rproc.process->exitCode() > 3) {
@@ -171,12 +179,12 @@ void raw::run(QString const& processed_cmd,
     res.set_is_timeout(false);
     res.set_stdout(rproc.process->readAllStandardOutput());
     res.set_stderr(rproc.process->readAllStandardError());
+    res.set_exited_ok(rproc.process->exitStatus() != QProcess::CrashExit);
   }
 
   res.set_cmd_id(rproc.cmd_id);
   res.set_start_time(rproc.start_time);
   res.set_end_time(rproc.end_time);
-  res.set_exited_ok(res.get_retval() != STATE_CRITICAL);
 
   _processes.erase(it);
 }
@@ -196,7 +204,7 @@ void raw::process_error(QProcess::ProcessError error) {
   }
   proc_info& proc = it.value();
   proc.stdout = "";
-  proc.stderr = proc.process->errorString();
+  proc.stderr = "(" + proc.process->errorString() + ")";
 }
 
 /**
@@ -206,8 +214,6 @@ void raw::process_error(QProcess::ProcessError error) {
  *  @param[in] exit_status The exit status.
  */
 void raw::process_finished(int exit_code, QProcess::ExitStatus exit_status) {
-  (void)exit_status;
-
   QHash<QObject*, proc_info>::iterator it = _processes.find(sender());
   if (it == _processes.end()) {
     logger(log_runtime_warning, basic) << "sender not found in processes.";
@@ -228,7 +234,7 @@ void raw::process_finished(int exit_code, QProcess::ExitStatus exit_status) {
       && proc.process->get_timeout() != -1
       && proc.end_time.tv_sec - proc.start_time.tv_sec >= proc.process->get_timeout() / 1000) {
     is_timeout = true;
-    proc.stderr = "Process Timeout";
+    proc.stderr = "(Process Timeout)";
   }
 
   result res(proc.cmd_id,
@@ -238,7 +244,7 @@ void raw::process_finished(int exit_code, QProcess::ExitStatus exit_status) {
 	     proc.end_time,
 	     exit_code,
 	     is_timeout,
-	     exit_code != STATE_CRITICAL);
+	     exit_status != QProcess::CrashExit || is_timeout == true);
   emit command_executed(res);
   _processes.erase(it);
 }
