@@ -34,6 +34,14 @@ set& set::instance() {
 }
 
 /**
+ *  Cleanup the set singleton.
+ */
+void set::cleanup() {
+  set& instance = set::instance();
+  instance._list.clear();
+}
+
+/**
  *  Add (or replace) a new command.
  *
  *  @param[in] cmd The new command.

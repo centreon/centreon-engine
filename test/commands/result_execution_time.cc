@@ -24,21 +24,20 @@
 
 using namespace com::centreon::engine::commands;
 
-double execution_time(timeval const& start, timeval const& end) {
-  double res = (double)(end.tv_sec - start.tv_sec)
-    + (double)(end.tv_usec - start.tv_usec);
+double execution_time(QDateTime const& start, QDateTime const& end) {
+  double res =
+    (double)(end.toMSecsSinceEpoch() / 1000 - start.toMSecsSinceEpoch() / 1000)
+    + (double)(end.toMSecsSinceEpoch() % 1000 - start.toMSecsSinceEpoch() % 1000);
   return (res < 0.0 ? 0.0 : res);
 }
 
 int main() {
   try {
-    timeval start;
-    start.tv_sec = 1306224989;
-    start.tv_usec = 113049;
+    QDateTime start = QDateTime::currentDateTime();
 
-    timeval end;
-    end.tv_sec = start.tv_sec + 10;
-    end.tv_usec = start.tv_usec + 20;
+    QDateTime end = start;
+    end.addSecs(10);
+    end.addMSecs(20);
 
     result res1(0, "", "", start, end);
     if (res1.get_execution_time() != execution_time(start, end)) {

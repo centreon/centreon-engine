@@ -42,6 +42,7 @@ namespace                         com {
 	  Q_OBJECT
 	public:
 	  static set&             instance();
+	  static void             cleanup();
 
 	  void                    add_command(command const& cmd);
 	  void                    add_command(QSharedPointer<command> cmd);

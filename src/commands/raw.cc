@@ -17,6 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <QCoreApplication>
 #include <QTimer>
 #include "engine.hh"
 #include "globals.hh"
@@ -54,7 +55,14 @@ raw::raw(raw const& right)
  *  Default destructor.
  */
 raw::~raw() throw() {
-
+  _mutex.lock();
+  while (_processes.empty() == false) {
+    process_info info = _processes.begin().value();
+    _mutex.unlock();
+    info.proc->wait();
+    _mutex.lock();
+  }
+  _mutex.unlock();
 }
 
 /**
@@ -91,39 +99,24 @@ commands::command* raw::clone() const {
 unsigned long raw::run(QString const& processed_cmd,
 		       nagios_macros const& macros,
 		       int timeout) {
-  timeout = (timeout <= 0 ? -1 : timeout * 1000);
+  process_info info;
+  info.proc = QSharedPointer<process>(new process(macros, timeout));
 
-  proc_info proc;
-  proc.process = QSharedPointer<eprocess>(new eprocess(macros, timeout));
-
-  if (connect(&(*proc.process),
-	      SIGNAL(error(QProcess::ProcessError)),
-	      this,
-	      SLOT(process_error(QProcess::ProcessError))) == false
-      || connect(&(*proc.process),
-		 SIGNAL(finished(int, QProcess::ExitStatus)),
-		 this,
-		 SLOT(process_finished(int, QProcess::ExitStatus))) == false
-      || connect(&(*proc.process),
-		 SIGNAL(started()),
-		 this,
-		 SLOT(process_started())) == false
-      || connect(&(*proc.process),
-		 SIGNAL(readyReadStandardOutput()),
-		 this,
-		 SLOT(process_stdout())) == false
-      || connect(&(*proc.process),
-		 SIGNAL(readyReadStandardError()),
-		 this,
-		 SLOT(process_stderr())) == false) {
+  if (connect(&(*info.proc),
+  	      SIGNAL(ended()),
+  	      this,
+  	      SLOT(ended())) == false) {
     throw (engine_error() << "connect process to commands::raw failed.");
   }
 
-  proc_info& rproc = _processes.insert(&(*proc.process), proc).value();
-  rproc.cmd_id = ++_id;
-  rproc.process->start(processed_cmd);
+  _mutex.lock();
+  info.cmd_id = ++_id;
+  _processes.insert(&(*info.proc), info);
+  _mutex.unlock();
 
-  return (_id);
+  info.proc->start(processed_cmd);
+
+  return (info.cmd_id);
 }
 
 /**
@@ -138,189 +131,45 @@ void raw::run(QString const& processed_cmd,
 	      nagios_macros const& macros,
 	      int timeout,
 	      result& res) {
-  timeout = (timeout <= 0 ? -1 : timeout * 1000);
+  _mutex.lock();
+  unsigned long id = ++_id;
+  _mutex.unlock();
 
-  proc_info proc;
-  proc.process = QSharedPointer<eprocess>(new eprocess(macros, timeout));
+  process proc(macros, timeout);
+  proc.start(processed_cmd);
+  proc.wait();
 
-  QHash<QObject*, proc_info>::iterator it =_processes.insert(&(*proc.process), proc);
-  proc_info& rproc = it.value();
-  rproc.cmd_id = ++_id;
+  res.set_cmd_id(id);
+  res.set_start_time(proc.get_start_time());
+  res.set_end_time(proc.get_end_time());
+  res.set_retval(proc.get_exit_code());
+  res.set_is_timeout(proc.get_is_timeout());
+  res.set_stdout(proc.get_stdout());
+  res.set_stderr(proc.get_stderr());
+  res.set_exited_ok(proc.get_is_executed());
+}
 
-  rproc.process->start(processed_cmd);
-
-  rproc.process->waitForStarted(-1);
-  gettimeofday(&rproc.start_time, NULL);
-
-  rproc.process->waitForFinished(timeout);
-  gettimeofday(&rproc.end_time, NULL);
-
-  if (rproc.process->error() == QProcess::FailedToStart) {
-    res.set_retval(STATE_CRITICAL);
-    res.set_is_timeout(false);
-    res.set_stdout("");
-    res.set_stderr(rproc.process->errorString());
-    res.set_exited_ok(false);
+/**
+ *  Slot to catch the end of processes et send the result by signal.
+ */
+void raw::ended() {
+  _mutex.lock();
+  QHash<QObject*, process_info>::iterator it = _processes.find(sender());
+  if (it == _processes.end()) {
+    logger(log_runtime_warning, basic) << "sender not found in processes.";
+    return;
   }
-  else if (rproc.process->state() == QProcess::Running) {
-    rproc.process->kill();
-    rproc.process->waitForFinished(-1);
-
-    res.set_retval(STATE_CRITICAL);
-    res.set_is_timeout(true);
-    res.set_stdout("");
-    res.set_stderr("(Process Timeout)");
-    res.set_exited_ok(true);
-  }
-  else {
-    if (rproc.process->exitCode() < -1 || rproc.process->exitCode() > 3) {
-      res.set_retval(STATE_UNKNOWN);
-    }
-    res.set_is_timeout(false);
-    res.set_stdout(rproc.process->readAllStandardOutput());
-    res.set_stderr(rproc.process->readAllStandardError());
-    res.set_exited_ok(rproc.process->exitStatus() != QProcess::CrashExit);
-  }
-
-  res.set_cmd_id(rproc.cmd_id);
-  res.set_start_time(rproc.start_time);
-  res.set_end_time(rproc.end_time);
-
+  process_info info = it.value();
   _processes.erase(it);
-}
+  _mutex.unlock();
 
-/**
- *  Slot to catch QProcess error.
- *
- *  @param[in] error Unused.
- */
-void raw::process_error(QProcess::ProcessError error) {
-  (void)error;
-
-  QHash<QObject*, proc_info>::iterator it = _processes.find(sender());
-  if (it == _processes.end()) {
-    logger(log_runtime_warning, basic) << "sender not found in processes.";
-    return;
-  }
-  proc_info& proc = it.value();
-  proc.stdout = "";
-  proc.stderr = "(" + proc.process->errorString() + ")";
-}
-
-/**
- *  Slot to catch QProcess ending.
- *
- *  @param[in] exit_code   The exit code of the process.
- *  @param[in] exit_status The exit status.
- */
-void raw::process_finished(int exit_code, QProcess::ExitStatus exit_status) {
-  QHash<QObject*, proc_info>::iterator it = _processes.find(sender());
-  if (it == _processes.end()) {
-    logger(log_runtime_warning, basic) << "sender not found in processes.";
-    return;
-  }
-  proc_info& proc = it.value();
-  gettimeofday(&proc.end_time, NULL);
-
-  if (exit_status == QProcess::CrashExit) {
-    exit_code = STATE_CRITICAL;
-  }
-  else if (exit_code < -1 || exit_code > 3) {
-    exit_code = STATE_UNKNOWN;
-  }
-
-  bool is_timeout = false;
-  if (exit_code == STATE_CRITICAL
-      && proc.process->get_timeout() != -1
-      && proc.end_time.tv_sec - proc.start_time.tv_sec >= proc.process->get_timeout() / 1000) {
-    is_timeout = true;
-    proc.stderr = "(Process Timeout)";
-  }
-
-  result res(proc.cmd_id,
-	     proc.stdout,
-	     proc.stderr,
-	     proc.start_time,
-	     proc.end_time,
-	     exit_code,
-	     is_timeout,
-	     exit_status != QProcess::CrashExit || is_timeout == true);
+  result res(info.cmd_id,
+  	     info.proc->get_stdout(),
+  	     info.proc->get_stderr(),
+  	     info.proc->get_start_time(),
+  	     info.proc->get_end_time(),
+  	     info.proc->get_exit_code(),
+  	     info.proc->get_is_timeout(),
+  	     info.proc->get_is_executed());
   emit command_executed(res);
-  _processes.erase(it);
-}
-
-/**
- *  Slot to catch QProcess starting.
- */
-void raw::process_started() {
-  QHash<QObject*, proc_info>::iterator it = _processes.find(sender());
-  if (it == _processes.end()) {
-    logger(log_runtime_warning, basic) << "sender not found in processes.";
-    return;
-  }
-  proc_info& proc = it.value();
-  gettimeofday(&proc.start_time, NULL);
-  if (proc.process->get_timeout() != -1) {
-    QTimer::singleShot(proc.process->get_timeout(), sender(), SLOT(kill()));
-  }
-}
-
-/**
- *  Slot to catch standard output.
- */
-void raw::process_stdout() {
-  QHash<QObject*, proc_info>::iterator it = _processes.find(sender());
-  if (it == _processes.end()) {
-    logger(log_runtime_warning, basic) << "sender not found in processes.";
-    return;
-  }
-  proc_info& proc = it.value();
-  proc.stdout += proc.process->readAllStandardOutput();
-}
-
-/**
- *  Slot to catch error output.
- */
-void raw::process_stderr() {
-  QHash<QObject*, proc_info>::iterator it = _processes.find(sender());
-  if (it == _processes.end()) {
-    logger(log_runtime_warning, basic) << "sender not found in processes.";
-    return;
-  }
-  proc_info& proc = it.value();
-  proc.stderr += proc.process->readAllStandardOutput();
-}
-
-/**
- *  Default constructor of private implementation of QProcess.
- *
- *  @param[in] macros The specific macros to build user environment.
- */
-raw::eprocess::eprocess(nagios_macros const& macros, int timeout)
-  : _macros(macros), _timeout(timeout) {
-
-}
-
-/**
- *  Default destructor.
- */
-raw::eprocess::~eprocess() {
-
-}
-
-/**
- *  Get the timeout value.
- *
- *  @return The timeout value, if no timeout return -1.
- */
-int raw::eprocess::get_timeout() {
-  return (_timeout);
-}
-
-/**
- *  Overload of QProcess::setupChildPorcess to build user environment before
- *  create process.
- */
-void raw::eprocess::setupChildProcess() {
-  set_all_macro_environment_vars(&_macros, true);
 }

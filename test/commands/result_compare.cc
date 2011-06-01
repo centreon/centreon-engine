@@ -32,9 +32,7 @@ using namespace com::centreon::engine::commands;
 
 int main() {
   try {
-    timeval time;
-    gettimeofday(&time, NULL);
-
+    QDateTime time = QDateTime::currentDateTime();
     result res(DEFAULT_ID,
 	       DEFAULT_STDOUT,
 	       DEFAULT_STDERR,

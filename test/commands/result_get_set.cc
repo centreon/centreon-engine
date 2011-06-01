@@ -33,8 +33,7 @@ using namespace com::centreon::engine::commands;
 
 int main() {
   try {
-    timeval time;
-    gettimeofday(&time, NULL);
+    QDateTime time = QDateTime::currentDateTime();
 
     result res;
     res.set_cmd_id(DEFAULT_ID);
@@ -61,14 +60,14 @@ int main() {
       return (1);
     }
 
-    if (res.get_start_time().tv_sec != time.tv_sec
-	|| res.get_start_time().tv_usec != time.tv_usec) {
+    if (res.get_start_time().tv_sec != time.toMSecsSinceEpoch() / 1000
+	|| res.get_start_time().tv_usec != time.toMSecsSinceEpoch() % 1000) {
       qDebug() << "error: start_time invalid value.";
       return (1);
     }
 
-    if (res.get_end_time().tv_sec != time.tv_sec
-	|| res.get_end_time().tv_usec != time.tv_usec) {
+    if (res.get_end_time().tv_sec != time.toMSecsSinceEpoch() / 1000
+	|| res.get_end_time().tv_usec != time.toMSecsSinceEpoch() % 1000) {
       qDebug() << "error: end_time invalid value.";
       return (1);
     }

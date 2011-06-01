@@ -136,7 +136,7 @@ commands::command& commands::command::operator=(commands::command const& right) 
  *
  *  @return The processed command line.
  */
-QString commands::command::process(nagios_macros* macros) const {
+QString commands::command::process_cmd(nagios_macros* macros) const {
   char* command_line = NULL;
   process_macros_r(macros, _command_line.toStdString().c_str(), &command_line, 0);
   QString processed_cmd(command_line);

@@ -20,82 +20,60 @@
 #ifndef CCE_COMMANDS_RAW_HH
 # define CCE_COMMANDS_RAW_HH
 
-# include <QObject>
 # include <QString>
-# include <QStringList>
-# include <QProcess>
 # include <QSharedPointer>
 # include <QHash>
+# include <QMutex>
 # include <sys/time.h>
 
 # include "commands/command.hh"
+# include "commands/process.hh"
 
-namespace                            com {
-  namespace                          centreon {
-    namespace                        engine {
-      namespace                      commands {
+namespace                               com {
+  namespace                             centreon {
+    namespace                           engine {
+      namespace                         commands {
 	/**
 	 *  @class raw raw.hh
 	 *  @brief Raw is a specific implementation of command.
 	 *
 	 *  Raw is a specific implementation of command.
 	 */
-	class                        raw : public command {
+	class                           raw : public command {
 	  Q_OBJECT
 	public:
-	                             raw(QString const& name = "",
-					 QString const& command_line = "");
-	                             raw(raw const& right);
-	                             ~raw() throw();
+	                                raw(QString const& name = "",
+					    QString const& command_line = "");
+	                                raw(raw const& right);
+	                                ~raw() throw();
 
-	  raw&                       operator=(raw const& right);
+	  raw&                          operator=(raw const& right);
 
-	  command*                   clone() const;
+	  command*                      clone() const;
 
-	  unsigned long              run(QString const& process_cmd,
-					 nagios_macros const& macros,
-					 int timeout);
+	  unsigned long                 run(QString const& process_cmd,
+					    nagios_macros const& macros,
+					    int timeout);
 
-	  void                       run(QString const& process_cmd,
-					 nagios_macros const& macros,
-					 int timeout,
-					 result& res);
+	  void                          run(QString const& process_cmd,
+					    nagios_macros const& macros,
+					    int timeout,
+					    result& res);
 
 	public slots:
-	  void                       process_error(QProcess::ProcessError error);
-	  void                       process_finished(int exit_code,
-						      QProcess::ExitStatus exit_status);
-	  void                       process_started();
-	  void                       process_stdout();
-	  void                       process_stderr();
+	  void                          ended();
 
 	private:
-	  class                      eprocess : public QProcess {
-	  public:
-	                             eprocess(nagios_macros const& macros,
-					      int timeout);
-	                             ~eprocess();
-
-	    int                      get_timeout();
-
-	  protected:
-	    void                     setupChildProcess();
-
-	  private:
-	    nagios_macros            _macros;
-	    int                      _timeout;
+	  struct                        process_info {
+	    QSharedPointer<process>     proc;
+	    unsigned long               cmd_id;
 	  };
 
-	  struct                     proc_info {
-	    QSharedPointer<eprocess> process;
-	    timeval                  start_time;
-	    timeval                  end_time;
-	    QString                  stdout;
-	    QString                  stderr;
-	    unsigned long            cmd_id;
-	  };
+	  QHash<QObject*, process_info> _processes;
+	  QMutex                        _mutex;
 
-	  QHash<QObject*, proc_info> _processes;
+	signals:
+	  void                          _empty_hash();
 	};
       }
     }

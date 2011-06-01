@@ -51,6 +51,17 @@ engine& engine::instance() {
 }
 
 /**
+ *  Cleanup the engine singleton.
+ */
+void engine::cleanup() {
+  engine& instance = engine::instance();
+  instance._rwlock.lockForWrite();
+  instance._objects.clear();
+  instance._id = 0;
+  instance._rwlock.unlock();
+}
+
+/**
  *  Write message into all objects logging.
  *
  *  @param[in] message   Message to log.

@@ -24,6 +24,7 @@ set(INC_DIR "${INCLUDE_DIR}/commands")
 # Produce moc files.
 qt4_wrap_cpp(QT_MOC_FILES
   "${INC_DIR}/command.hh"
+  "${INC_DIR}/process.hh"
   "${INC_DIR}/raw.hh"
   "${INC_DIR}/set.hh")
 
@@ -31,10 +32,12 @@ qt4_wrap_cpp(QT_MOC_FILES
 add_library("cce_commands"
   STATIC
   "${SRC_DIR}/command.cc"
+  "${SRC_DIR}/process.cc"
   "${SRC_DIR}/raw.cc"
   "${SRC_DIR}/result.cc"
   "${SRC_DIR}/set.cc"
   "${INC_DIR}/command.hh"
+  "${INC_DIR}/process.hh"
   "${INC_DIR}/raw.hh"
   "${INC_DIR}/result.hh"
   "${INC_DIR}/set.hh"

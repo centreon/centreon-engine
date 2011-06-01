@@ -21,7 +21,7 @@
 # define CCE_COMMANDS_RESULT_HH
 
 # include <QString>
-# include <QTime>
+# include <QDateTime>
 # include <sys/time.h>
 
 namespace                com {
@@ -40,8 +40,8 @@ namespace                com {
 	                 result(unsigned long cmd_id = 0,
 				QString const& stdout = "",
 				QString const& stderr = "",
-				timeval const& start_time = timeval(),
-				timeval const& end_time = timeval(),
+				QDateTime const& start_time = QDateTime(),
+				QDateTime const& end_time = QDateTime(),
 				int retval = 0,
 				bool is_timeout = false,
 				bool exit_ok = true);
@@ -64,8 +64,8 @@ namespace                com {
 
 	  void           set_cmd_id(unsigned long id) throw();
 	  void           set_retval(int retval) throw();
-	  void           set_start_time(timeval const& tv) throw();
-	  void           set_end_time(timeval const& tv) throw();
+	  void           set_start_time(QDateTime const& time) throw();
+	  void           set_end_time(QDateTime const& time) throw();
 	  void           set_stdout(QString const& str);
 	  void           set_stderr(QString const& str);
 	  void           set_exited_ok(bool value) throw();

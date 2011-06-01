@@ -36,19 +36,35 @@ using namespace com::centreon::engine::commands;
 result::result(unsigned long cmd_id,
 	       QString const& stdout,
 	       QString const& stderr,
-	       timeval const& start_time,
-	       timeval const& end_time,
+	       QDateTime const& start_time,
+	       QDateTime const& end_time,
 	       int retval,
 	       bool is_timeout,
 	       bool exited_ok)
   : _stdout(stdout),
     _stderr(stderr),
-    _start_time(start_time),
-    _end_time(end_time),
+    _start_time(),
+    _end_time(),
     _cmd_id(cmd_id),
     _retval(retval),
     _is_timeout(is_timeout),
     _exited_ok(exited_ok) {
+
+  if (start_time.isNull() == true) {
+    _start_time.tv_sec = 0;
+    _start_time.tv_usec = 0;
+  }
+  else {
+    set_start_time(start_time);
+  }
+
+  if (end_time.isNull() == true) {
+    _end_time.tv_sec = 0;
+    _end_time.tv_usec = 0;
+  }
+  else {
+    set_end_time(end_time);
+  }
 }
 
 /**
@@ -224,8 +240,9 @@ void result::set_retval(int retval) throw() {
  *
  *  @param[in] tv The start time.
  */
-void result::set_start_time(timeval const& tv) throw() {
-  _start_time = tv;
+void result::set_start_time(QDateTime const& time) throw() {
+  _start_time.tv_sec = time.toMSecsSinceEpoch() / 1000;
+  _start_time.tv_usec = time.toMSecsSinceEpoch() % 1000;
 }
 
 /**
@@ -233,8 +250,9 @@ void result::set_start_time(timeval const& tv) throw() {
  *
  *  @param[in] tv The end time.
  */
-void result::set_end_time(timeval const& tv) throw() {
-  _end_time = tv;
+void result::set_end_time(QDateTime const& time) throw() {
+  _end_time.tv_sec = time.toMSecsSinceEpoch() / 1000;
+  _end_time.tv_usec = time.toMSecsSinceEpoch() % 1000;
 }
 
 /**

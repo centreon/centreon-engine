@@ -54,7 +54,7 @@ int main() {
 
     // process command.
     raw cmd(__func__, CMD_LINE);
-    QString cmd_processed = cmd.process(&macros);
+    QString cmd_processed = cmd.process_cmd(&macros);
 
     delete[] hst.address;
     delete[] macro_x_names[MACRO_HOSTADDRESS];

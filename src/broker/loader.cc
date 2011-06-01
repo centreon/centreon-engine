@@ -43,6 +43,16 @@ loader& loader::instance() {
 }
 
 /**
+ *  Cleanup the loader singleton.
+ */
+void loader::cleanup() {
+  loader& instance = loader::instance();
+
+  instance._directory = "";
+  instance._modules.clear();
+}
+
+/**
  *  Load modules in the specify directory.
  *
  *  @return Number of modules loaded.

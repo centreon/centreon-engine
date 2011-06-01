@@ -45,6 +45,7 @@ namespace                                    com {
 	  Q_OBJECT
 	public:
 	  static checker&                    instance();
+	  static void                        cleanup();
 
 	  void                               reap();
 

@@ -48,8 +48,7 @@ int main() {
       return (1);
     }
 
-    timeval time;
-    gettimeofday(&time, NULL);
+    QDateTime time = QDateTime::currentDateTime();
 
     result res2(DEFAULT_ID,
 		DEFAULT_STDOUT,
@@ -65,10 +64,10 @@ int main() {
 	|| res2.get_retval() != DEFAULT_RETURN
 	|| res2.get_is_timeout() != DEFAULT_TIMEOUT
 	|| res2.get_exited_ok () != DEFAULT_EXIT_OK
-	|| res2.get_start_time().tv_sec != time.tv_sec
-	|| res2.get_start_time().tv_usec != time.tv_usec
-	|| res2.get_end_time().tv_sec != time.tv_sec
-	|| res2.get_end_time().tv_usec != time.tv_usec) {
+	|| res2.get_start_time().tv_sec != time.toMSecsSinceEpoch() / 1000
+	|| res2.get_start_time().tv_usec != time.toMSecsSinceEpoch() % 1000
+	|| res2.get_end_time().tv_sec != time.toMSecsSinceEpoch() / 1000
+	|| res2.get_end_time().tv_usec != time.toMSecsSinceEpoch() % 1000) {
       qDebug() << "error: Constructor failed.";
       return (1);
     }

@@ -52,7 +52,7 @@ namespace                        com {
 	  virtual QString const& get_name() const throw();
 	  virtual QString const& get_command_line() const throw();
 
-	  virtual QString        process(nagios_macros* macros) const;
+	  virtual QString        process_cmd(nagios_macros* macros) const;
 
 	  virtual unsigned long  run(QString const& processed_cmd,
 				     nagios_macros const& macors,

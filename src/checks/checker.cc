@@ -46,6 +46,20 @@ checker& checker::instance() {
 }
 
 /**
+ *  Cleanup the checker singleton.
+ */
+void checker::cleanup() {
+  checker& instance = checker::instance();
+  instance._mut_reap.lock();
+  instance._to_reap.clear();
+  instance._mut_reap.unlock();
+
+  instance._mut_id.lock();
+  instance._list_id.clear();
+  instance._mut_id.unlock();
+}
+
+/**
  *  Reap and process all result recive by execution process.
  */
 void checker::reap() {
@@ -297,7 +311,7 @@ void checker::run(host* hst,
 
   commands::set& cmd_set = commands::set::instance();
   QSharedPointer<commands::command> cmd = cmd_set.get_command(hst->check_command_ptr->name);
-  QString processed_cmd = cmd->process(&macros);
+  QString processed_cmd = cmd->process_cmd(&macros);
   char* tmp_processed_cmd = my_strdup(processed_cmd.toStdString().c_str());
 
   // send event broker.
@@ -481,7 +495,7 @@ void checker::run(service* svc,
 
   commands::set& cmd_set = commands::set::instance();
   QSharedPointer<commands::command> cmd = cmd_set.get_command(svc->check_command_ptr->name);
-  QString processed_cmd = cmd->process(&macros);
+  QString processed_cmd = cmd->process_cmd(&macros);
   char* tmp_processed_cmd = my_strdup(processed_cmd.toStdString().c_str());
 
   // send event broker.
@@ -822,7 +836,7 @@ int checker::_execute_sync(host* hst) {
 
   commands::set& cmd_set = commands::set::instance();
   QSharedPointer<commands::command> cmd = cmd_set.get_command(hst->check_command_ptr->name);
-  QString processed_cmd = cmd->process(&macros);
+  QString processed_cmd = cmd->process_cmd(&macros);
   char* tmp_processed_cmd = my_strdup(processed_cmd.toStdString().c_str());
 
   // send event broker.
