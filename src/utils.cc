@@ -1639,27 +1639,16 @@ char* get_next_string_from_buf(char* buf, int* start_index, int bufsize) {
 
 /* determines whether or not an object name (host, service, etc) contains illegal characters */
 int contains_illegal_object_chars(char* name) {
-  int x = 0;
-  int y = 0;
-  int ch = 0;
-
   if (name == NULL)
     return (FALSE);
 
-  x = (int)strlen(name) - 1;
+  std::string tmp(name);
+  std::string const& illegal_object_chars = config.get_illegal_object_chars().toStdString();
 
-  for (; x >= 0; x--) {
-
-    ch = (int)name[x];
-    char const* illegal_object_chars = config.get_illegal_object_chars().toStdString().c_str();
-    /* illegal user-specified characters */
-    if (illegal_object_chars != NULL)
-      for (y = 0; illegal_object_chars[y]; y++)
-        if (name[x] == illegal_object_chars[y])
-          return (TRUE);
+  if (tmp.find_first_of(illegal_object_chars) == std::string::npos) {
+    return (false);
   }
-
-  return (FALSE);
+  return (true);
 }
 
 /* escapes newlines in a string */

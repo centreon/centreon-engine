@@ -119,7 +119,6 @@ char* my_strsep(char** stringp, char const* delim) {
 
 /* open a file read-only via mmap() */
 mmapfile* mmap_fopen(char* filename) {
-  mmapfile* new_mmapfile = NULL;
   int fd = 0;
   void* mmap_buf = NULL;
   struct stat statbuf;
@@ -129,19 +128,14 @@ mmapfile* mmap_fopen(char* filename) {
   if (filename == NULL)
     return (NULL);
 
-  /* allocate memory */
-  new_mmapfile = new mmapfile;
-
   /* open the file */
   if ((fd = open(filename, mode)) == -1) {
-    delete[] new_mmapfile;
     return (NULL);
   }
 
   /* get file info */
   if ((fstat(fd, &statbuf)) == -1) {
     close(fd);
-    delete[] new_mmapfile;
     return (NULL);
   }
 
@@ -150,16 +144,17 @@ mmapfile* mmap_fopen(char* filename) {
 
   /* only mmap() if we have a file greater than 0 bytes */
   if (file_size > 0) {
-
     /* mmap() the file - allocate one extra byte for processing zero-byte files */
     if ((mmap_buf = (void*)mmap(0, file_size, PROT_READ, MAP_PRIVATE, fd, 0)) == MAP_FAILED) {
       close(fd);
-      delete[] new_mmapfile;
       return (NULL);
     }
   }
   else
     mmap_buf = NULL;
+
+  /* allocate memory */
+  mmapfile* new_mmapfile = new mmapfile();
 
   /* populate struct info for later use */
   new_mmapfile->path = my_strdup(filename);
@@ -185,7 +180,7 @@ int mmap_fclose(mmapfile* temp_mmapfile) {
 
   /* free memory */
   delete[] temp_mmapfile->path;
-  delete[] temp_mmapfile;
+  delete temp_mmapfile;
   return (OK);
 }
 
