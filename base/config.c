@@ -1276,7 +1276,7 @@ int read_main_config_file(char *main_config_file)
 			logit(NSLOG_CONFIG_WARNING,TRUE,"Warning: lock_file variable ignored. Priviledge drop should be handled by startup script.");
 
 		else if(!strcmp(variable,"nagios_user"))
-			logit(NSLOG_CONFIG_WARNING,TRUE,"Warning: nagios_user varible ignored. Priviledge drop should be handled by startup script.");
+			logit(NSLOG_CONFIG_WARNING,TRUE,"Warning: nagios_user variable ignored. Priviledge drop should be handled by startup script.");
 
 		else if(!strcmp(variable,"nagios_group"))
 			logit(NSLOG_CONFIG_WARNING,TRUE,"Warning: nagios_group variable ignored. Priviledge drop should be handled by startup script.");
