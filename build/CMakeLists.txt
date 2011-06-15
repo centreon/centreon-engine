@@ -29,26 +29,6 @@ add_definitions("-DENGINE_MINOR=${ENGINE_MINOR}")
 add_definitions("-DENGINE_PATCH=\"${ENGINE_PATCH}\"")
 add_definitions("-DENGINE_VERSION=\"${ENGINE_VERSION}\"")
 
-# Function chown.
-function(mkdir_chown)
-  if (APPLE OR (UNIX AND NOT CYGWIN))
-    if (NOT EXISTS "${ARGV2}")
-      file(MAKE_DIRECTORY "${ARGV2}")
-      execute_process(COMMAND "chown" "${ARGV0}:${ARGV1}" "${ARGV2}")
-    endif ()
-  else()
-    file(MAKE_DIRECTORY "${ARGV2}")
-  endif ()
-endfunction()
-
-function(chown)
-  if (APPLE OR (UNIX AND NOT CYGWIN))
-    if (EXISTS "${ARGV2}")
-      execute_process(COMMAND "chown" "${ARGV0}:${ARGV1}" "${ARGV2}")
-    endif ()
-  endif ()
-endfunction()
-
 # Testing.
 set(PROJECT_SOURCE_DIR "${PROJECT_SOURCE_DIR}/..")
 if (WITH_TESTING)
@@ -602,7 +582,7 @@ add_definitions(-DDEFAULT_COMMENT_FILE="${localstatedir}/comments.dat")
 add_definitions(-DDEFAULT_DOWNTIME_FILE="${localstatedir}/downtime.dat")
 add_definitions(-DDEFAULT_RETENTION_FILE="${localstatedir}/retention.dat")
 add_definitions(-DDEFAULT_COMMAND_FILE="${localstatedir}/rw/centengine.cmd")
-add_definitions(-DDEFAULT_CONFIG_FILE="${sysconfdir}/centengine.cfg")
+add_definitions(-DDEFAULT_CONFIG_FILE="${confdir}/centengine.cfg")
 add_definitions(-DDEFAULT_OBJECT_CACHE_FILE="${localstatedir}/objects.cache")
 add_definitions(-DDEFAULT_PRECACHED_OBJECT_FILE="${localstatedir}/objects.precache")
 add_definitions(-DDEFAULT_EVENT_BROKER_FILE="${localstatedir}/broker.socket")
@@ -728,6 +708,17 @@ install(TARGETS "centenginestats"
 
 # Create directories.
 install(CODE "
+  function(mkdir_chown user group path)
+    if (APPLE OR (UNIX AND NOT CYGWIN))
+      if (NOT EXISTS \"\${path}\")
+        file(MAKE_DIRECTORY \"\${path}\")
+        execute_process(COMMAND \"chown\" \"\${user}:\${group}\" \"\${path}\")
+      endif ()
+    else()
+      file(MAKE_DIRECTORY \"\${path}\")
+    endif ()
+  endfunction()
+
   file(MAKE_DIRECTORY \"${localstatedir}\")
   file(MAKE_DIRECTORY \"${bindir}\")
   file(MAKE_DIRECTORY \"${confdir}\")
