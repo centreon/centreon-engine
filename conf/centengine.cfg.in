@@ -41,29 +41,29 @@ log_file=@localstatedir@/centengine.log
 #         shown below), or keep them all in a single config file.
 
 # You can specify individual object config files as shown below:
-cfg_file=@sysconfdir@/objects/commands.cfg
-cfg_file=@sysconfdir@/objects/contacts.cfg
-cfg_file=@sysconfdir@/objects/timeperiods.cfg
-cfg_file=@sysconfdir@/objects/templates.cfg
+cfg_file=@confdir@/objects/commands.cfg
+cfg_file=@confdir@/objects/contacts.cfg
+cfg_file=@confdir@/objects/timeperiods.cfg
+cfg_file=@confdir@/objects/templates.cfg
 
 # Definitions for monitoring the local (Linux) host
-cfg_file=@sysconfdir@/objects/localhost.cfg
+cfg_file=@confdir@/objects/localhost.cfg
 
 # Definitions for monitoring a Windows machine
-#cfg_file=@sysconfdir@/objects/windows.cfg
+#cfg_file=@confdir@/objects/windows.cfg
 
 # Definitions for monitoring a router/switch
-#cfg_file=@sysconfdir@/objects/switch.cfg
+#cfg_file=@confdir@/objects/switch.cfg
 
 # Definitions for monitoring a network printer
-#cfg_file=@sysconfdir@/objects/printer.cfg
+#cfg_file=@confdir@/objects/printer.cfg
 
 # You can also tell Nagios to process all config files (with a .cfg extension)
 # in a particular directory by using the cfg_dir directive as shown below.
-#cfg_dir=@sysconfdir@/servers
-#cfg_dir=@sysconfdir@/printers
-#cfg_dir=@sysconfdir@/switches
-#cfg_dir=@sysconfdir@/routers
+#cfg_dir=@confdir@/servers
+#cfg_dir=@confdir@/printers
+#cfg_dir=@confdir@/switches
+#cfg_dir=@confdir@/routers
 
 
 # var:  object_cache_file
@@ -97,7 +97,7 @@ precached_object_file=@localstatedir@/objects.precache
 #         this file and restrictive permissions (600) can be placed on this
 #         file.
 
-resource_file=@sysconfdir@/resource.cfg
+resource_file=@confdir@/resource.cfg
 
 
 # var:    status_file
