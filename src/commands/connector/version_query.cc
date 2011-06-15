@@ -1,0 +1,68 @@
+/*
+** Copyright 2011      Merethis
+**
+** This file is part of Centreon Engine.
+**
+** Centreon Engine is free software: you can redistribute it and/or
+** modify it under the terms of the GNU General Public License version 2
+** as published by the Free Software Foundation.
+**
+** Centreon Engine is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+** General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with Centreon Engine. If not, see
+** <http://www.gnu.org/licenses/>.
+*/
+
+#include <QStringList>
+#include "error.hh"
+#include "commands/connector/version_query.hh"
+
+using namespace com::centreon::engine::commands::connector;
+
+version_query::version_query()
+  : request(request::version_q) {
+
+}
+
+version_query::version_query(version_query const& right)
+  : request(right) {
+
+}
+
+version_query::~version_query() throw() {
+
+}
+
+version_query& version_query::operator=(version_query const& right) {
+  if (this != &right) {
+    request::operator=(right);
+  }
+  return (*this);
+}
+
+request* version_query::clone() const {
+  return (new version_query(*this));
+}
+
+QByteArray version_query::build() {
+  return (QByteArray().setNum(_id) + cmd_ending());
+}
+
+void version_query::restore(QByteArray const& data) {
+  QList<QByteArray> list = data.split('\0');
+  if (list.size() != 1) {
+    throw (engine_error() << "bad request argument.");
+  }
+
+  bool ok;
+  unsigned int id = list[0].toUInt(&ok);
+  if (ok == false || id != _id) {
+    throw (engine_error() << "bad request id.");
+  }
+}
+
+

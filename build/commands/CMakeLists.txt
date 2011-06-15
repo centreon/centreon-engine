@@ -21,6 +21,9 @@
 set(SRC_DIR "${SRC_DIR}/commands")
 set(INC_DIR "${INCLUDE_DIR}/commands")
 
+# connector command is required.
+add_subdirectory("connector")
+
 # Produce moc files.
 qt4_wrap_cpp(QT_MOC_FILES
   "${INC_DIR}/command.hh"
@@ -44,11 +47,14 @@ add_library("cce_commands"
   ${QT_MOC_FILES})
 
 # Link target with required libraries.
-target_link_libraries("cce_commands" ${QT_LIBRARIES})
+target_link_libraries("cce_commands" "cce_connector" ${QT_LIBRARIES})
 
 if (WITH_TESTING)
   #Set directories.
   set(TEST_DIR "${TEST_DIR}/commands")
+
+  # Produce moc files.
+  qt4_wrap_cpp(QT_MOC_FILES "${TEST_DIR}/wait_process.hh")
 
   # Test result.
   add_executable("result_ctor" "${TEST_DIR}/result_ctor.cc")
@@ -93,7 +99,6 @@ if (WITH_TESTING)
   target_link_libraries("raw_run_sync" "cce_commands" "cce_core" ${QT_LIBRARIES})
   add_test("raw_run_sync" "raw_run_sync")
 
-  qt4_wrap_cpp(QT_MOC_FILES "${TEST_DIR}/wait_process.hh")
   add_executable("raw_run_async"
     "${TEST_DIR}/raw_run_async.cc"
     "${TEST_DIR}/wait_process.hh"
@@ -105,7 +110,7 @@ if (WITH_TESTING)
   target_link_libraries("raw_process" "cce_commands" "cce_core" ${QT_LIBRARIES})
   add_test("raw_process" "raw_process")
 
-  add_executable("raw_get_set" "${TEST_DIR}/raw_get_set.cc")
-  target_link_libraries("raw_get_set" "cce_commands" "cce_core" ${QT_LIBRARIES})
-  add_test("raw_get_set" "raw_get_set")
+  add_executable("raw_get" "${TEST_DIR}/raw_get.cc")
+  target_link_libraries("raw_get" "cce_commands" "cce_core" ${QT_LIBRARIES})
+  add_test("raw_get" "raw_get")
 endif ()

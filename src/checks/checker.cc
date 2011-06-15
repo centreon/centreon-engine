@@ -723,11 +723,11 @@ void checker::run_sync(host* hst,
  */
 void checker::_command_executed(commands::result const& res) {
   _mut_id.lock();
-  QHash<unsigned long, check_result>::iterator it = _list_id.find(res.get_cmd_id());
+  QHash<unsigned long, check_result>::iterator it = _list_id.find(res.get_command_id());
   if (it == _list_id.end()) {
     _mut_id.unlock();
     logger(log_runtime_warning, basic)
-      << "command id '" << res.get_cmd_id() << "' not found.";
+      << "command id '" << res.get_command_id() << "' not found.";
     return;
   }
 
@@ -738,9 +738,9 @@ void checker::_command_executed(commands::result const& res) {
 
   result.finish_time = res.get_end_time();
   result.early_timeout = res.get_is_timeout();
-  result.return_code = res.get_retval();
-  result.exited_ok = res.get_exited_ok();
-  if (res.get_exited_ok() == true && res.get_is_timeout() == false) {
+  result.return_code = res.get_exit_code();
+  result.exited_ok = res.get_is_executed();
+  if (res.get_is_executed() == true && res.get_is_timeout() == false) {
     result.output = my_strdup(res.get_stdout().toStdString().c_str());
   }
   else {
@@ -901,7 +901,7 @@ int checker::_execute_sync(host* hst) {
 	   cmd_result);
 
   char* output = NULL;
-  if (cmd_result.get_exited_ok() == true) {
+  if (cmd_result.get_is_executed() == true) {
     output = my_strdup(cmd_result.get_stdout().toStdString().c_str());
   }
   else {
@@ -917,7 +917,7 @@ int checker::_execute_sync(host* hst) {
 			cmd_result.get_execution_time(),
 			config.get_host_check_timeout(),
 			cmd_result.get_is_timeout(),
-			cmd_result.get_retval(),
+			cmd_result.get_exit_code(),
 			tmp_processed_cmd,
 			output,
 			NULL);
@@ -944,7 +944,7 @@ int checker::_execute_sync(host* hst) {
   hst->check_type = HOST_CHECK_ACTIVE;
 
   char* tmp_plugin_output = NULL;
-  if (cmd_result.get_exited_ok() == true) {
+  if (cmd_result.get_is_executed() == true) {
     tmp_plugin_output = my_strdup(cmd_result.get_stdout().toStdString().c_str());
   }
   else {
@@ -965,7 +965,7 @@ int checker::_execute_sync(host* hst) {
   if (hst->host_check_command == NULL) {
     delete[] hst->plugin_output;
     hst->plugin_output = my_strdup("(Host assumed to be UP)");
-    cmd_result.set_retval(STATE_OK);
+    cmd_result.set_exit_code(STATE_OK);
   }
 
   // make sure we have some data.
@@ -985,11 +985,11 @@ int checker::_execute_sync(host* hst) {
     let WARNING states indicate the host is up (fake the result to be STATE_OK)
   */
   if (config.get_use_aggressive_host_checking() == false
-      && cmd_result.get_retval() == STATE_WARNING) {
-    cmd_result.set_retval(STATE_OK);
+      && cmd_result.get_exit_code() == STATE_WARNING) {
+    cmd_result.set_exit_code(STATE_OK);
   }
 
-  int return_result = (cmd_result.get_retval() == STATE_OK ? HOST_UP : HOST_DOWN);
+  int return_result = (cmd_result.get_exit_code() == STATE_OK ? HOST_UP : HOST_DOWN);
 
   // get the end time of command.
   gettimeofday(&end_time, NULL);
@@ -1009,7 +1009,7 @@ int checker::_execute_sync(host* hst) {
 		    cmd_result.get_execution_time(),
                     config.get_host_check_timeout(),
 		    cmd_result.get_is_timeout(),
-                    cmd_result.get_retval(),
+                    cmd_result.get_exit_code(),
 		    tmp_processed_cmd,
 		    hst->plugin_output,
                     hst->long_plugin_output,

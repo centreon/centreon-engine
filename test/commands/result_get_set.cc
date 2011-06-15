@@ -36,22 +36,22 @@ int main() {
     QDateTime time = QDateTime::currentDateTime();
 
     result res;
-    res.set_cmd_id(DEFAULT_ID);
-    res.set_retval(DEFAULT_RETURN);
+    res.set_command_id(DEFAULT_ID);
+    res.set_exit_code(DEFAULT_RETURN);
     res.set_start_time(time);
     res.set_end_time(time);
     res.set_stdout(DEFAULT_STDOUT);
     res.set_stderr(DEFAULT_STDERR);
-    res.set_exited_ok(DEFAULT_EXIT_OK);
+    res.set_is_executed(DEFAULT_EXIT_OK);
     res.set_is_timeout(DEFAULT_TIMEOUT);
 
-    if (res.get_cmd_id() != DEFAULT_ID) {
-      qDebug() << "error: cmd_id invalid value.";
+    if (res.get_command_id() != DEFAULT_ID) {
+      qDebug() << "error: command_id invalid value.";
       return (1);
     }
 
-    if (res.get_retval() != DEFAULT_RETURN) {
-      qDebug() << "error: retval invalid value.";
+    if (res.get_exit_code() != DEFAULT_RETURN) {
+      qDebug() << "error: exit_code invalid value.";
       return (1);
     }
 
@@ -82,8 +82,8 @@ int main() {
       return (1);
     }
 
-    if (res.get_exited_ok() != DEFAULT_EXIT_OK) {
-      qDebug() << "error: exited_ok invalid value.";
+    if (res.get_is_executed() != DEFAULT_EXIT_OK) {
+      qDebug() << "error: is_executed invalid value.";
       return (1);
     }
 

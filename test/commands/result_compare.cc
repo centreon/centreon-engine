@@ -23,10 +23,10 @@
 
 using namespace com::centreon::engine::commands;
 
-#define DEFAULT_ID 42
-#define DEFAULT_STDOUT "stdout string test"
-#define DEFAULT_STDERR "stderr string test"
-#define DEFAULT_RETURN 0
+#define DEFAULT_ID      42
+#define DEFAULT_STDOUT  "stdout string test"
+#define DEFAULT_STDERR  "stderr string test"
+#define DEFAULT_RETURN  0
 #define DEFAULT_TIMEOUT true
 #define DEFAULT_EXIT_OK false
 

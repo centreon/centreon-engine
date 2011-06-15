@@ -17,44 +17,28 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <QCoreApplication>
 #include <QDebug>
 #include <exception>
-#include "commands/raw.hh"
+#include "commands/connector/command.hh"
 
-using namespace com::centreon::engine;
 using namespace com::centreon::engine::commands;
 
-#define CMD_NAME "command_name"
-#define CMD_LINE "command_name arg1 arg2"
+#define CMD_NAME    "command_name"
+#define CMD_LINE    "command_name arg1 arg2"
+#define CMD_PROCESS "./bin_connector_test_run"
 
-int main() {
+int main(int argc, char** argv) {
   try {
-    raw cmd1(CMD_NAME, CMD_LINE);
-    if (cmd1.get_name() != CMD_NAME
-	|| cmd1.get_command_line() != CMD_LINE) {
-      qDebug() << "error: Constructor failed.";
-      return (1);
-    }
+    QCoreApplication app(argc, argv);
 
-    raw cmd2(cmd1);
-    if (cmd2 != cmd1) {
-      qDebug() << "error: Default copy constructor failed.";
+    connector::command cmd(CMD_NAME, CMD_LINE, CMD_PROCESS);
+    if (!(cmd == cmd)) {
+      qDebug() << "error: operator== failed.";
       return (1);
     }
-
-    raw cmd3 = cmd2;
-    if (cmd3 != cmd2) {
-      qDebug() << "error: Default copy operator failed.";
-      return (1);
-    }
-
-    QSharedPointer<commands::command> cmd4(cmd3.clone());
-    if (cmd4.isNull() == true) {
-      qDebug() << "error: clone failed.";
-      return (1);
-    }
-    if (*cmd4 != cmd3) {
-      qDebug() << "error: clone failed.";
+    if (cmd != cmd) {
+      qDebug() << "error: operator!= failed.";
       return (1);
     }
   }
@@ -62,5 +46,6 @@ int main() {
     qDebug() << "error: " << e.what();
     return (1);
   }
+
   return (0);
 }

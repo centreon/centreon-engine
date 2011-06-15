@@ -28,9 +28,7 @@ using namespace com::centreon::engine::commands;
 
 int main() {
   try {
-    raw cmd;
-    cmd.set_name(DEFAULT_CMD_NAME);
-    cmd.set_command_line(DEFAULT_CMD_LINE);
+    raw cmd(DEFAULT_CMD_NAME, DEFAULT_CMD_LINE);
 
     if (cmd.get_name() != DEFAULT_CMD_NAME) {
       qDebug() << "error: name invalid value.";

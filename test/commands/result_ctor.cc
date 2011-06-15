@@ -34,12 +34,12 @@ using namespace com::centreon::engine::commands;
 int main() {
   try {
     result res1;
-    if (res1.get_cmd_id() != 0
+    if (res1.get_command_id() != 0
 	|| res1.get_stdout() != ""
 	|| res1.get_stderr() != ""
-	|| res1.get_retval() != 0
+	|| res1.get_exit_code() != 0
 	|| res1.get_is_timeout() != false
-	|| res1.get_exited_ok () != true
+	|| res1.get_is_executed () != true
 	|| res1.get_start_time().tv_sec != 0
 	|| res1.get_start_time().tv_usec != 0
 	|| res1.get_end_time().tv_sec != 0
@@ -58,12 +58,12 @@ int main() {
 		DEFAULT_RETURN,
 		DEFAULT_TIMEOUT,
 		DEFAULT_EXIT_OK);
-    if (res2.get_cmd_id() != DEFAULT_ID
+    if (res2.get_command_id() != DEFAULT_ID
 	|| res2.get_stdout() != DEFAULT_STDOUT
 	|| res2.get_stderr() != DEFAULT_STDERR
-	|| res2.get_retval() != DEFAULT_RETURN
+	|| res2.get_exit_code() != DEFAULT_RETURN
 	|| res2.get_is_timeout() != DEFAULT_TIMEOUT
-	|| res2.get_exited_ok () != DEFAULT_EXIT_OK
+	|| res2.get_is_executed() != DEFAULT_EXIT_OK
 	|| res2.get_start_time().tv_sec != time.toMSecsSinceEpoch() / 1000
 	|| res2.get_start_time().tv_usec != time.toMSecsSinceEpoch() % 1000
 	|| res2.get_end_time().tv_sec != time.toMSecsSinceEpoch() / 1000

@@ -237,9 +237,9 @@ int grab_servicegroup_macros(nagios_macros* mac, servicegroup* sg);
 int grab_contact_macros(nagios_macros* mac, contact* cntct);
 
 int grab_macro_value(nagios_macros* mac, char* macro_buffer, char** output, int* clean_options, int* free_macro);
-int grab_macrox_value(nagios_macros* mac, int macro_type, char* arg1, char* arg2, char** output, int* free_macro);
-int grab_custom_macro_value(nagios_macros* mac, char* macro_name, char* arg1, char* arg2, char** output);
-int grab_datetime_macro(nagios_macros* mac, int macro_type, char* arg1, char* arg2, char** output);
+int grab_macrox_value(nagios_macros* mac, int macro_type, char const* arg1, char const* arg2, char** output, int* free_macro);
+int grab_custom_macro_value(nagios_macros* mac, char* macro_name, char const* arg1, char const* arg2, char** output);
+int grab_datetime_macro(nagios_macros* mac, int macro_type, char const* arg1, char const* arg2, char** output);
 int grab_standard_host_macro(nagios_macros* mac, unsigned int macro_type, host* temp_host, char** output, int* free_macro);
 int grab_standard_hostgroup_macro(nagios_macros* mac, int macro_type, hostgroup* temp_hostgroup, char** output);
 int grab_standard_service_macro(nagios_macros* mac, unsigned int macro_type, service* temp_service, char** output, int* free_macro);

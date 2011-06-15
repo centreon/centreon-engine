@@ -20,43 +20,43 @@
 #ifndef TEST_COMMANDS_WAIT_PROCESS_HH
 # define TEST_COMMANDS_WAIT_PROCESS_HH
 
-# include <QCoreApplication>
-# include <QObject>
+# include <QEventLoop>
 # include "commands/command.hh"
 
-namespace com {
-  namespace centreon {
-    namespace engine {
-      namespace commands {
-	class end_process : public QObject {
+namespace               com {
+  namespace             centreon {
+    namespace           engine {
+      namespace         commands {
+	class           wait_process : public QObject {
 	  Q_OBJECT
 	public:
-	  end_process(commands::command const& cmd)
-	    : QObject(), _finished(false) {
+	  wait_process(commands::command const& cmd)
+	    : QObject() {
 	    connect(&cmd, SIGNAL(command_executed(commands::result const&)),
 		    this, SLOT(cmd_executed(commands::result const&)));
 	  }
 
-	  void wait() const throw() {
-	    while (_finished == false) {
-	      QCoreApplication::processEvents(QEventLoop::ExcludeUserInputEvents
-					      | QEventLoop::ExcludeSocketNotifiers);
-	    }
+	  void          wait() const throw() {
+	    QEventLoop loop;
+	    connect(this, SIGNAL(finished()), &loop, SLOT(quit()));
+	    loop.exec();
 	  }
 
 	  result const& get_result() const throw() {
 	    return (_res);
 	  }
 
+	signals:
+	  void          finished();
+
 	public slots:
-	  void cmd_executed(commands::result const& res) {
-	    _finished = true;
+	  void          cmd_executed(commands::result const& res) {
 	    _res = res;
+	    emit finished();
 	  }
 
 	private:
-	  result _res;
-	  bool   _finished;
+	  result        _res;
 	};
       }
     }

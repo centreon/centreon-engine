@@ -52,23 +52,23 @@ namespace                com {
 	  bool           operator==(result const& right) const throw();
 	  bool           operator!=(result const& right) const throw();
 
-	  unsigned long  get_cmd_id() const throw();
-	  int            get_retval() const throw();
+	  unsigned long  get_command_id() const throw();
+	  int            get_exit_code() const throw();
 	  double         get_execution_time() const throw();
 	  timeval const& get_start_time() const throw();
 	  timeval const& get_end_time() const throw();
 	  QString const& get_stdout() const throw();
 	  QString const& get_stderr() const throw();
-	  bool           get_exited_ok() const throw();
+	  bool           get_is_executed() const throw();
 	  bool           get_is_timeout() const throw();
 
-	  void           set_cmd_id(unsigned long id) throw();
-	  void           set_retval(int retval) throw();
+	  void           set_command_id(unsigned long id) throw();
+	  void           set_exit_code(int retval) throw();
 	  void           set_start_time(QDateTime const& time) throw();
 	  void           set_end_time(QDateTime const& time) throw();
 	  void           set_stdout(QString const& str);
 	  void           set_stderr(QString const& str);
-	  void           set_exited_ok(bool value) throw();
+	  void           set_is_executed(bool value) throw();
 	  void           set_is_timeout(bool value) throw();
 
 	private:
@@ -77,9 +77,9 @@ namespace                com {
 	  timeval        _start_time;
 	  timeval        _end_time;
 	  unsigned long  _cmd_id;
-	  int            _retval;
+	  int            _exit_code;
 	  bool           _is_timeout;
-	  bool           _exited_ok;
+	  bool           _is_executed;
 	};
       }
     }

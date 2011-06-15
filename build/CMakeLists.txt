@@ -24,6 +24,9 @@ set(ENGINE_MAJOR 1)
 set(ENGINE_MINOR 0)
 set(ENGINE_PATCH "0beta")
 set(ENGINE_VERSION "${ENGINE_MAJOR}.${ENGINE_MINOR}.${ENGINE_PATCH}")
+add_definitions("-DENGINE_MAJOR=${ENGINE_MAJOR}")
+add_definitions("-DENGINE_MINOR=${ENGINE_MINOR}")
+add_definitions("-DENGINE_PATCH=\"${ENGINE_PATCH}\"")
 add_definitions("-DENGINE_VERSION=\"${ENGINE_VERSION}\"")
 
 # Testing.

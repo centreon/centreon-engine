@@ -548,8 +548,8 @@ int grab_macro_value(nagios_macros* mac,
 
 int grab_macrox_value(nagios_macros* mac,
 		      int macro_type,
-		      char* arg1,
-                      char* arg2,
+		      char const* arg1,
+                      char const* arg2,
 		      char** output,
 		      int* free_macro) {
   host* temp_host = NULL;
@@ -1163,8 +1163,11 @@ int grab_macrox_value(nagios_macros* mac,
 }
 
 /* calculates the value of a custom macro */
-int grab_custom_macro_value(nagios_macros* mac, char* macro_name,
-                            char* arg1, char* arg2, char** output) {
+int grab_custom_macro_value(nagios_macros* mac,
+			    char* macro_name,
+                            char const* arg1,
+			    char const* arg2,
+			    char** output) {
   host* temp_host = NULL;
   hostgroup* temp_hostgroup = NULL;
   hostsmember* temp_hostsmember = NULL;
@@ -1359,8 +1362,8 @@ int grab_custom_macro_value(nagios_macros* mac, char* macro_name,
 /* calculates a date/time macro */
 int grab_datetime_macro(nagios_macros* mac,
 			int macro_type,
-			char* arg1,
-                        char* arg2,
+			char const* arg1,
+                        char const* arg2,
 			char** output) {
   time_t current_time = 0L;
   timeperiod* temp_timeperiod = NULL;

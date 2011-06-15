@@ -40,8 +40,8 @@ namespace                        com {
 	class                    command : public QObject {
 	  Q_OBJECT
 	public:
-	                         command(QString const& name = "",
-					 QString const& command_line = "");
+	                         command(QString const& name,
+					 QString const& command_line);
 	  virtual                ~command() throw();
 
 	  bool                   operator==(command const& right) const throw();

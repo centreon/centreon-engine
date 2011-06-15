@@ -110,7 +110,7 @@ int my_system_r(nagios_macros const* mac,
     }
   }
 
-  int result = cmd_result.get_retval();
+  int result = cmd_result.get_exit_code();
 
   log_debug_info(DEBUGL_COMMANDS, 1,
 		 "Execution time=%.3f sec, early timeout=%d, result=%d, output=%s\n",

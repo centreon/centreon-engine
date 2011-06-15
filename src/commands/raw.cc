@@ -91,8 +91,9 @@ commands::command* raw::clone() const {
 /**
  *  Run a command.
  *
- *  @param[in] args   The command arguments.
- *  @param[in] macros The macros data struct.
+ *  @param[in] args    The command arguments.
+ *  @param[in] macros  The macros data struct.
+ *  @param[in] timeout The command timeout.
  *
  *  @return The command id.
  */
@@ -139,14 +140,14 @@ void raw::run(QString const& processed_cmd,
   proc.start(processed_cmd);
   proc.wait();
 
-  res.set_cmd_id(id);
+  res.set_command_id(id);
   res.set_start_time(proc.get_start_time());
   res.set_end_time(proc.get_end_time());
-  res.set_retval(proc.get_exit_code());
+  res.set_exit_code(proc.get_exit_code());
   res.set_is_timeout(proc.get_is_timeout());
   res.set_stdout(proc.get_stdout());
   res.set_stderr(proc.get_stderr());
-  res.set_exited_ok(proc.get_is_executed());
+  res.set_is_executed(proc.get_is_executed());
 }
 
 /**

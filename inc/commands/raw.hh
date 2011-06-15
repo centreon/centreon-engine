@@ -42,8 +42,8 @@ namespace                               com {
 	class                           raw : public command {
 	  Q_OBJECT
 	public:
-	                                raw(QString const& name = "",
-					    QString const& command_line = "");
+	                                raw(QString const& name,
+					    QString const& command_line);
 	                                raw(raw const& right);
 	                                ~raw() throw();
 

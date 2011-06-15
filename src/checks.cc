@@ -325,13 +325,13 @@ int handle_async_service_check_result(service* temp_service, check_result* queue
 
   /* save old plugin output */
   if (temp_service->plugin_output)
-    old_plugin_output = my_strdup(temp_service->plugin_output);
+    old_plugin_output = temp_service->plugin_output;
 
   /* clear the old plugin output and perf data buffers */
-  delete[] temp_service->plugin_output;
   delete[] temp_service->long_plugin_output;
   delete[] temp_service->perf_data;
 
+  temp_service->plugin_output = NULL;
   temp_service->long_plugin_output = NULL;
   temp_service->perf_data = NULL;
 
@@ -2363,10 +2363,9 @@ int handle_async_host_check_result_3x(host* temp_host, check_result* queued_chec
 
   /* save old plugin output */
   if (temp_host->plugin_output)
-    old_plugin_output = my_strdup(temp_host->plugin_output);
+    old_plugin_output = temp_host->plugin_output;
 
   /* clear the old plugin output and perf data buffers */
-  delete[] temp_host->plugin_output;
   delete[] temp_host->long_plugin_output;
   delete[] temp_host->perf_data;
 

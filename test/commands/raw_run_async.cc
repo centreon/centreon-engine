@@ -17,6 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <QCoreApplication>
 #include <QDebug>
 #include <exception>
 #include "commands/raw.hh"
@@ -29,18 +30,17 @@ using namespace com::centreon::engine::commands;
 bool run_without_timeout() {
   nagios_macros macros = nagios_macros();
   raw cmd(__func__, "./bin_test_run --timeout=off");
-  end_process end_proc(cmd);
+  wait_process wait_proc(cmd);
 
   unsigned long id = cmd.run(cmd.get_command_line(), macros, -1);
-  end_proc.wait();
+  wait_proc.wait();
 
-  result const& cmd_res = end_proc.get_result();
-  if (cmd_res.get_cmd_id() != id
-      || cmd_res.get_retval() != STATE_OK
-      || cmd_res.get_execution_time() == 0
+  result const& cmd_res = wait_proc.get_result();
+  if (cmd_res.get_command_id() != id
+      || cmd_res.get_exit_code() != STATE_OK
       || cmd_res.get_stdout() != cmd.get_command_line()
       || cmd_res.get_stderr() != ""
-      || cmd_res.get_exited_ok() == false
+      || cmd_res.get_is_executed() == false
       || cmd_res.get_is_timeout() == true) {
     return (false);
   }
@@ -50,18 +50,18 @@ bool run_without_timeout() {
 bool run_with_timeout() {
   nagios_macros macros = nagios_macros();
   raw cmd(__func__, "./bin_test_run --timeout=on");
-  end_process end_proc(cmd);
+  wait_process wait_proc(cmd);
 
   unsigned long id = cmd.run(cmd.get_command_line(), macros, 1);
-  end_proc.wait();
+  wait_proc.wait();
 
-  result const& cmd_res = end_proc.get_result();
-  if (cmd_res.get_cmd_id() != id
-      || cmd_res.get_retval() != STATE_CRITICAL
+  result const& cmd_res = wait_proc.get_result();
+  if (cmd_res.get_command_id() != id
+      || cmd_res.get_exit_code() != STATE_CRITICAL
       || cmd_res.get_execution_time() == 0
       || cmd_res.get_stdout() != ""
       || cmd_res.get_stderr() != "(Process Timeout)"
-      || cmd_res.get_exited_ok() == false
+      || cmd_res.get_is_executed() == false
       || cmd_res.get_is_timeout() == false) {
     return (false);
   }
@@ -71,22 +71,22 @@ bool run_with_timeout() {
 bool run_with_environement_macros() {
   nagios_macros macros = nagios_macros();
   raw cmd(__func__, "./bin_test_run --check_macros");
-  end_process end_proc(cmd);
+  wait_process wait_proc(cmd);
 
   char const* argv = "default_arg";
   macros.argv[0] = new char[strlen(argv) + 1];
   strcpy(macros.argv[0], argv);
 
   unsigned long id = cmd.run(cmd.get_command_line(), macros, -1);
-  end_proc.wait();
+  wait_proc.wait();
 
-  result const& cmd_res = end_proc.get_result();
-  if (cmd_res.get_cmd_id() != id
-      || cmd_res.get_retval() != STATE_OK
+  result const& cmd_res = wait_proc.get_result();
+  if (cmd_res.get_command_id() != id
+      || cmd_res.get_exit_code() != STATE_OK
       || cmd_res.get_execution_time() == 0
       || cmd_res.get_stdout() != cmd.get_command_line()
       || cmd_res.get_stderr() != ""
-      || cmd_res.get_exited_ok() == false
+      || cmd_res.get_is_executed() == false
       || cmd_res.get_is_timeout() == true) {
     return (false);
   }

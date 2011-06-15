@@ -20,22 +20,26 @@
 #include <QCoreApplication>
 #include <QDebug>
 #include <exception>
-#include <string.h>
-#include "commands/raw.hh"
+#include "commands/connector/command.hh"
 #include "engine.hh"
+#include "../wait_process.hh"
 
+using namespace com::centreon::engine;
 using namespace com::centreon::engine::commands;
 
 bool run_without_timeout() {
   nagios_macros macros = nagios_macros();
-  raw cmd(__func__, "./bin_test_run --timeout=off");
+  connector::command cmd(__func__,
+			 "./bin_connector_test_run --timeout=off",
+			 "./bin_connector_test_run");
+  wait_process wait_proc(cmd);
 
-  result cmd_res;
-  cmd.run(cmd.get_command_line(), macros, -1, cmd_res);
+  unsigned long id = cmd.run(cmd.get_command_line(), macros, -1);
+  wait_proc.wait();
 
-  if (cmd_res.get_command_id() == 0
+  result const& cmd_res = wait_proc.get_result();
+  if (cmd_res.get_command_id() != id
       || cmd_res.get_exit_code() != STATE_OK
-      || cmd_res.get_execution_time() == 0
       || cmd_res.get_stdout() != cmd.get_command_line()
       || cmd_res.get_stderr() != ""
       || cmd_res.get_is_executed() == false
@@ -47,41 +51,22 @@ bool run_without_timeout() {
 
 bool run_with_timeout() {
   nagios_macros macros = nagios_macros();
-  raw cmd(__func__, "./bin_test_run --timeout=on");
+  connector::command cmd(__func__,
+			 "./bin_connector_test_run --timeout=on",
+			 "./bin_connector_test_run");
+  wait_process wait_proc(cmd);
 
-  result cmd_res;
-  cmd.run(cmd.get_command_line(), macros, 1, cmd_res);
+  unsigned long id = cmd.run(cmd.get_command_line(), macros, 1);
+  wait_proc.wait();
 
-  if (cmd_res.get_command_id() == 0
+  result const& cmd_res = wait_proc.get_result();
+  if (cmd_res.get_command_id() != id
       || cmd_res.get_exit_code() != STATE_CRITICAL
       || cmd_res.get_execution_time() == 0
       || cmd_res.get_stdout() != ""
       || cmd_res.get_stderr() != "(Process Timeout)"
       || cmd_res.get_is_executed() == false
       || cmd_res.get_is_timeout() == false) {
-    return (false);
-  }
-  return (true);
-}
-
-bool run_with_environement_macros() {
-  nagios_macros macros = nagios_macros();
-  raw cmd(__func__, "./bin_test_run --check_macros");
-
-  char const* argv = "default_arg";
-  macros.argv[0] = new char[strlen(argv) + 1];
-  strcpy(macros.argv[0], argv);
-
-  result cmd_res;
-  cmd.run(cmd.get_command_line(), macros, -1, cmd_res);
-
-  if (cmd_res.get_command_id() == 0
-      || cmd_res.get_exit_code() != STATE_OK
-      || cmd_res.get_execution_time() == 0
-      || cmd_res.get_stdout() != cmd.get_command_line()
-      || cmd_res.get_stderr() != ""
-      || cmd_res.get_is_executed() == false
-      || cmd_res.get_is_timeout() == true) {
     return (false);
   }
   return (true);
@@ -97,10 +82,6 @@ int main(int argc, char** argv) {
     }
     if (run_with_timeout() == false) {
       qDebug() << "error: raw::run with timeout failed.";
-      return (1);
-    }
-    if (run_with_environement_macros() == false) {
-      qDebug() << "error: raw::run with macros failed.";
       return (1);
     }
   }

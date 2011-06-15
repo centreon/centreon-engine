@@ -29,26 +29,26 @@ using namespace com::centreon::engine::commands;
  *  @param[in] stderr         The error output.
  *  @param[in] start_time     The command start time.
  *  @param[in] end_time       The command end time.
- *  @param[in] retval         The return value.
+ *  @param[in] exit_code      The return value.
  *  @param[in] timeout        Command run and timeout.
- *  @param[in] exited_ok      Command run and exit normaly.
+ *  @param[in] is_executed    Command run and exit normaly.
  */
 result::result(unsigned long cmd_id,
 	       QString const& stdout,
 	       QString const& stderr,
 	       QDateTime const& start_time,
 	       QDateTime const& end_time,
-	       int retval,
+	       int exit_code,
 	       bool is_timeout,
-	       bool exited_ok)
+	       bool is_executed)
   : _stdout(stdout),
     _stderr(stderr),
     _start_time(),
     _end_time(),
     _cmd_id(cmd_id),
-    _retval(retval),
+    _exit_code(exit_code),
     _is_timeout(is_timeout),
-    _exited_ok(exited_ok) {
+    _is_executed(is_executed) {
 
   if (start_time.isNull() == true) {
     _start_time.tv_sec = 0;
@@ -97,8 +97,8 @@ result& result::operator=(result const& right) {
     _start_time = right._start_time;
     _end_time = right._end_time;
     _cmd_id = right._cmd_id;
-    _retval = right._retval;
-    _exited_ok = right._exited_ok;
+    _exit_code = right._exit_code;
+    _is_executed = right._is_executed;
     _is_timeout = right._is_timeout;
   }
   return (*this);
@@ -119,8 +119,8 @@ bool result::operator==(result const& right) const throw() {
 	  && _end_time.tv_sec == right._end_time.tv_sec
 	  && _end_time.tv_usec == right._end_time.tv_usec
 	  && _cmd_id == right._cmd_id
-	  && _retval == right._retval
-	  && _exited_ok == right._exited_ok);
+	  && _exit_code == right._exit_code
+	  && _is_executed == right._is_executed);
 }
 
 /**
@@ -139,7 +139,7 @@ bool result::operator!=(result const& right) const throw() {
  *
  *  @return The command id.
  */
-unsigned long result::get_cmd_id() const throw() {
+unsigned long result::get_command_id() const throw() {
   return (_cmd_id);
 }
 
@@ -148,8 +148,8 @@ unsigned long result::get_cmd_id() const throw() {
  *
  *  @return The return value.
  */
-int result::get_retval() const throw() {
-  return (_retval);
+int result::get_exit_code() const throw() {
+  return (_exit_code);
 }
 
 /**
@@ -204,8 +204,8 @@ QString const& result::get_stderr() const throw() {
  *
  *  @return True if the execution success, false otherwise.
  */
-bool result::get_exited_ok() const throw() {
-  return (_exited_ok);
+bool result::get_is_executed() const throw() {
+  return (_is_executed);
 }
 
 /**
@@ -222,17 +222,17 @@ bool result::get_is_timeout() const throw() {
  *
  *  @param[in] id The command id.
  */
-void result::set_cmd_id(unsigned long id) throw() {
+void result::set_command_id(unsigned long id) throw() {
   _cmd_id = id;
 }
 
 /**
  *  Set the return value.
  *
- *  @param[in] retval The return value.
+ *  @param[in] exit_code The return value.
  */
-void result::set_retval(int retval) throw() {
-  _retval = retval;
+void result::set_exit_code(int exit_code) throw() {
+  _exit_code = exit_code;
 }
 
 /**
@@ -278,8 +278,8 @@ void result::set_stderr(QString const& str) {
  *
  *  @param[in] value The exited value.
  */
-void result::set_exited_ok(bool value) throw() {
-  _exited_ok = value;
+void result::set_is_executed(bool value) throw() {
+  _is_executed = value;
 }
 
 /**

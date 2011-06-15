@@ -2209,26 +2209,26 @@ host* find_host(char const* name) {
 }
 
 /* find a hostgroup from the list in memory */
-hostgroup* find_hostgroup(char* name) {
+hostgroup* find_hostgroup(char const* name) {
   hostgroup temp_hostgroup;
 
   if (name == NULL)
     return (NULL);
 
-  temp_hostgroup.group_name = name;
+  temp_hostgroup.group_name = const_cast<char*>(name);
   return ((hostgroup*)skiplist_find_first(object_skiplists[HOSTGROUP_SKIPLIST],
 					  &temp_hostgroup,
 					  NULL));
 }
 
 /* find a servicegroup from the list in memory */
-servicegroup* find_servicegroup(char* name) {
+servicegroup* find_servicegroup(char const* name) {
   servicegroup temp_servicegroup;
 
   if (name == NULL)
     return (NULL);
 
-  temp_servicegroup.group_name = name;
+  temp_servicegroup.group_name = const_cast<char*>(name);
   return ((servicegroup*)skiplist_find_first(object_skiplists[SERVICEGROUP_SKIPLIST],
 					     &temp_servicegroup,
 					     NULL));
@@ -2248,7 +2248,7 @@ contact* find_contact(char const* name) {
 }
 
 /* find a contact group from the list in memory */
-contactgroup* find_contactgroup(char* name) {
+contactgroup* find_contactgroup(char const* name) {
   contactgroup temp_contactgroup;
 
   if (name == NULL)

@@ -67,7 +67,7 @@ namespace                  com {
 
 	private slots:
 	  void             _finished(int exit_code,
-				  QProcess::ExitStatus exit_status);
+				     QProcess::ExitStatus exit_status);
 	  void             _started();
 	  void             _timedout();
 	  void             _error(QProcess::ProcessError error);
