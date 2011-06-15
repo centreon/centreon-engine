@@ -623,10 +623,10 @@ customvariablesmember* add_custom_variable_to_object(customvariablesmember** obj
 // Object Search Functions
 timeperiod* find_timeperiod(char const* name);                      // finds a timeperiod object
 host* find_host(char const* name);                                  // finds a host object
-hostgroup* find_hostgroup(char* name);                              // finds a hostgroup object
-servicegroup* find_servicegroup(char* name);                        // finds a servicegroup object
+hostgroup* find_hostgroup(char const* name);                        // finds a hostgroup object
+servicegroup* find_servicegroup(char const* name);                  // finds a servicegroup object
 contact* find_contact(char const* name);                            // finds a contact object
-contactgroup* find_contactgroup(char* name);                        // finds a contactgroup object
+contactgroup* find_contactgroup(char const* name);                  // finds a contactgroup object
 command* find_command(char const* name);                            // finds a command object
 service* find_service(char const* host_name, char const* svc_desc); // finds a service object
 

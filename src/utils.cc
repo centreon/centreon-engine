@@ -36,153 +36,51 @@
 #include "globals.hh"
 #include "broker.hh"
 #include "nebmods.hh"
-
-#ifdef EMBEDDEDPERL
-# include "epn_engine.hh"
-static PerlInterpreter* my_perl = NULL;
-int                     use_embedded_perl = TRUE;
-#endif
-
 #include "notifications.hh"
 #include "logging.hh"
 #include "shared.hh"
 #include "utils.hh"
+#include "commands/raw.hh"
+
+extern "C" int free_check_result_list(void);
 
 /******************************************************************/
 /******************** SYSTEM COMMAND FUNCTIONS ********************/
 /******************************************************************/
 
 /* executes a system command - used for notifications, event handlers, etc. */
-int my_system_r(nagios_macros* mac,
+int my_system_r(nagios_macros const* mac,
 		char* cmd,
 		int timeout,
                 int* early_timeout,
 		double* exectime,
 		char** output,
                 unsigned int max_output_length) {
-  pid_t pid = 0;
-  int status = 0;
-  int result = 0;
-  char buffer[MAX_INPUT_BUFFER] = "";
-  int fd[2];
-  FILE* fp = NULL;
-  int bytes_read = 0;
-  struct timeval start_time, end_time;
-  dbuf output_dbuf;
-  int dbuf_chunk = 1024;
-  int flags;
-#ifdef EMBEDDEDPERL
-  char fname[512] = "";
-  char* args[5] = { "", DO_CLEAN, "", "", NULL };
-  SV* plugin_hndlr_cr = NULL;
-  char* perl_output = NULL;
-  int count;
-  int use_epn = FALSE;
-# ifdef aTHX
-  dTHX;
-# endif
-  dSP;
-#endif
-
+  using namespace com::centreon::engine;
 
   log_debug_info(DEBUGL_FUNCTIONS, 0, "my_system_r()\n");
 
-  /* initialize return variables */
-  if (output != NULL)
+  // initialize return variables.
+  if (output != NULL) {
     *output = NULL;
-  *early_timeout = FALSE;
+  }
+  *early_timeout = false;
   *exectime = 0.0;
 
-  /* if no command was passed, return with no error */
-  if (cmd == NULL)
+  // if no command was passed, return with no error.
+  if (cmd == NULL) {
     return (STATE_OK);
+  }
 
   log_debug_info(DEBUGL_COMMANDS, 1, "Running command '%s'...\n", cmd);
 
-#ifdef EMBEDDEDPERL
-  /* get"filename" component of command */
-  strncpy(fname, cmd, strcspn(cmd, " "));
-  fname[strcspn(cmd, " ")] = '\x0';
+  timeval start_time = timeval();
+  timeval end_time = timeval();
 
-  /* should we use the embedded Perl interpreter to run this script? */
-  use_epn = file_uses_embedded_perl(fname);
-
-  /* if yes, do some initialization */
-  if (use_epn == TRUE) {
-    args[0] = fname;
-    args[2] = "";
-
-    if (strchr(cmd, ' ') == NULL)
-      args[3] = "";
-    else
-      args[3] = cmd + strlen(fname) + 1;
-
-    /* call our perl interpreter to compile and optionally cache the compiled script. */
-
-    ENTER;
-    SAVETMPS;
-    PUSHMARK(SP);
-
-    XPUSHs(sv_2mortal(newSVpv(args[0], 0)));
-    XPUSHs(sv_2mortal(newSVpv(args[1], 0)));
-    XPUSHs(sv_2mortal(newSVpv(args[2], 0)));
-    XPUSHs(sv_2mortal(newSVpv(args[3], 0)));
-
-    PUTBACK;
-
-    call_pv("Embed::Persistent::eval_file", G_EVAL);
-
-    SPAGAIN;
-
-    if (SvTRUE(ERRSV)) {
-      /*
-       * XXXX need pipe open to send the compilation failure message back to Centreon Engine ?
-       */
-      (void)POPs;
-
-      temp_buffer = my_strdup(SvPVX(ERRSV));
-
-      log_debug_info(DEBUGL_COMMANDS, 0,
-                     "Embedded perl failed to compile %s, compile error %s\n",
-                     fname,
-		     temp_buffer);
-      logit(NSLOG_RUNTIME_WARNING, TRUE, "%s\n", temp_buffer);
-      delete[] temp_buffer;
-
-      return (STATE_UNKNOWN);
-    }
-    else {
-      plugin_hndlr_cr = newSVsv(POPs);
-
-      log_debug_info(DEBUGL_COMMANDS, 0,
-                     "Embedded perl successfully compiled %s and returned plugin handler (Perl subroutine code ref)\n",
-                     fname);
-
-      PUTBACK;
-      FREETMPS;
-      LEAVE;
-    }
-  }
-#endif
-
-  /* create a pipe */
-  if (pipe(fd) == -1) {
-    logit(NSLOG_RUNTIME_WARNING, TRUE,
-          "Warning: pipe() in my_system() failed for command \"%s\"\n",
-          cmd);
-    return (STATE_UNKNOWN);
-  }
-
-  /* make the pipe non-blocking */
-  fcntl(fd[0], F_SETFL, O_NONBLOCK);
-  fcntl(fd[1], F_SETFL, O_NONBLOCK);
-
-  /* get the command start time */
+  // time to start command.
   gettimeofday(&start_time, NULL);
 
-  /* send data to event broker */
-  end_time.tv_sec = 0L;
-  end_time.tv_usec = 0L;
+  // send event broker.
   broker_system_command(NEBTYPE_SYSTEM_COMMAND_START,
 			NEBFLAG_NONE,
                         NEBATTR_NONE,
@@ -191,288 +89,49 @@ int my_system_r(nagios_macros* mac,
 			*exectime,
                         timeout,
 			*early_timeout,
-			result,
+			STATE_OK,
 			cmd,
 			NULL,
                         NULL);
 
-  /* fork */
-  pid = fork();
+  commands::raw raw_cmd("system", cmd);
+  commands::result cmd_result;
+  raw_cmd.run(cmd, *mac, timeout, cmd_result);
 
-  /* return an error if we couldn't fork */
-  if (pid == -1) {
-    logit(NSLOG_RUNTIME_WARNING, TRUE,
-          "Warning: fork() in my_system_r() failed for command \"%s\"\n",
-          cmd);
-
-    /* close both ends of the pipe */
-    close(fd[0]);
-    close(fd[1]);
-
-    return (STATE_UNKNOWN);
+  end_time = cmd_result.get_end_time();
+  *exectime = cmd_result.get_execution_time();
+  *early_timeout = cmd_result.get_is_timeout();
+  if (output != NULL && max_output_length > 0) {
+    if (cmd_result.get_stdout() != "") {
+      *output = my_strdup(cmd_result.get_stdout().left(max_output_length - 1).toStdString().c_str());
+    }
+    else if (cmd_result.get_stderr() != "") {
+      *output = my_strdup(cmd_result.get_stderr().left(max_output_length - 1).toStdString().c_str());
+    }
   }
 
-  /* execute the command in the child process */
-  if (pid == 0) {
+  int result = cmd_result.get_exit_code();
 
-    /* become process group leader */
-    setpgid(0, 0);
+  log_debug_info(DEBUGL_COMMANDS, 1,
+		 "Execution time=%.3f sec, early timeout=%d, result=%d, output=%s\n",
+		 *exectime,
+		 *early_timeout,
+		 result,
+		 (output == NULL ? "(null)" : *output));
 
-    /* set environment variables */
-    set_all_macro_environment_vars(mac, TRUE);
-
-    /* reset signal handling */
-    reset_sighandler();
-
-    /* close pipe for reading */
-    close(fd[0]);
-
-    /* prevent fd from being inherited by child processed */
-    flags = fcntl(fd[1], F_GETFD, 0);
-    flags |= FD_CLOEXEC;
-    fcntl(fd[1], F_SETFD, flags);
-
-    /* trap commands that timeout */
-    signal(SIGALRM, my_system_sighandler);
-    alarm(timeout);
-
-    /******** BEGIN EMBEDDED PERL CODE EXECUTION ********/
-
-#ifdef EMBEDDEDPERL
-    if (use_epn == TRUE) {
-
-      /* execute our previously compiled script - by call_pv("Embed::Persistent::eval_file",..) */
-      ENTER;
-      SAVETMPS;
-      PUSHMARK(SP);
-
-      XPUSHs(sv_2mortal(newSVpv(args[0], 0)));
-      XPUSHs(sv_2mortal(newSVpv(args[1], 0)));
-      XPUSHs(plugin_hndlr_cr);
-      XPUSHs(sv_2mortal(newSVpv(args[3], 0)));
-
-      PUTBACK;
-
-      count = call_pv("Embed::Persistent::run_package", G_ARRAY);
-      /* count is a debug hook. It should always be two (2), because the persistence framework tries to return two (2) args */
-
-      SPAGAIN;
-
-      perl_output = POPpx;
-      strip(perl_output);
-      strncpy(buffer, (perl_output == NULL) ? "" : perl_output, sizeof(buffer));
-      buffer[sizeof(buffer) - 1] = '\x0';
-      status = POPi;
-
-      PUTBACK;
-      FREETMPS;
-      LEAVE;
-
-      log_debug_info(DEBUGL_COMMANDS, 0,
-                     "Embedded perl ran command %s with output %d, %s\n",
-                     fname,
-		     status,
-		     buffer);
-
-      /* write the output back to the parent process */
-      if (write(fd[1], buffer, strlen(buffer) + 1) == -1)
-        logit(NSLOG_RUNTIME_WARNING, FALSE,
-	      "Warning: Write failed. %s\n", strerror(errno));
-
-      /* close pipe for writing */
-      close(fd[1]);
-
-      /* reset the alarm */
-      alarm(0);
-
-      _exit(status);
-    }
-#endif
-    /******** END EMBEDDED PERL CODE EXECUTION ********/
-
-    /* run the command */
-    fp = (FILE*)popen(cmd, "r");
-
-    /* report an error if we couldn't run the command */
-    if (fp == NULL) {
-
-      strncpy(buffer, "(Error: Could not execute command)\n",
-              sizeof(buffer) - 1);
-      buffer[sizeof(buffer) - 1] = '\x0';
-
-      /* write the error back to the parent process */
-      if (write(fd[1], buffer, strlen(buffer) + 1) == -1)
-        logit(NSLOG_RUNTIME_WARNING, FALSE,
-              "Warning: Write failed. %s\n", strerror(errno));
-
-      result = STATE_CRITICAL;
-    }
-    else {
-
-      /* write all the lines of output back to the parent process */
-      while (fgets(buffer, sizeof(buffer) - 1, fp))
-        if (write(fd[1], buffer, strlen(buffer)) == -1)
-          logit(NSLOG_RUNTIME_WARNING, FALSE,
-                "Warning: Write failed. %s\n", strerror(errno));
-
-      /* close the command and get termination status */
-      status = pclose(fp);
-
-      /* report an error if we couldn't close the command */
-      if (status == -1)
-        result = STATE_CRITICAL;
-      else {
-        if (WEXITSTATUS(status) == 0 && WIFSIGNALED(status))
-          result = 128 + WTERMSIG(status);
-        result = WEXITSTATUS(status);
-      }
-    }
-
-    /* close pipe for writing */
-    close(fd[1]);
-
-    /* reset the alarm */
-    alarm(0);
-
-    /* clear environment variables */
-    set_all_macro_environment_vars(mac, FALSE);
-
-#ifndef DONT_USE_MEMORY_PERFORMANCE_TWEAKS
-    /* free allocated memory */
-    /* this needs to be done last, so we don't free memory for variables before they're used above */
-    if (config.get_free_child_process_memory() == true)
-      free_memory(mac);
-#endif
-
-    _exit(result);
-  }
-
-  /* parent waits for child to finish executing command */
-  else {
-
-    /* close pipe for writing */
-    close(fd[1]);
-
-    /* wait for child to exit */
-    waitpid(pid, &status, 0);
-
-    /* get the end time for running the command */
-    gettimeofday(&end_time, NULL);
-
-    /* return execution time in milliseconds */
-    *exectime = (double)((double)(end_time.tv_sec - start_time.tv_sec) +
-			 (double)((end_time.tv_usec - start_time.tv_usec) / 1000) / 1000.0);
-    if (*exectime < 0.0)
-      *exectime = 0.0;
-
-    /* get the exit code returned from the program */
-    result = WEXITSTATUS(status);
-
-    /* check for possibly missing scripts/binaries/etc */
-    if (result == 126 || result == 127) {
-      logit(NSLOG_RUNTIME_WARNING, TRUE,
-            "Warning: Attempting to execute the command \"%s\" resulted in a return code of %d.  Make sure the script or binary you are trying to execute actually exists...\n",
-            cmd,
-	    result);
-    }
-
-    /* check bounds on the return value */
-    if (result < -1 || result > 3)
-      result = STATE_UNKNOWN;
-
-    /* initialize dynamic buffer */
-    dbuf_init(&output_dbuf, dbuf_chunk);
-
-    /* Opsera patch to check timeout before attempting to read output via pipe. Originally by Sven Nierlein */
-    /* if there was a critical return code AND the command time exceeded the timeout thresholds, assume a timeout */
-    if (result == STATE_CRITICAL
-        && (end_time.tv_sec - start_time.tv_sec) >= timeout) {
-
-      /* set the early timeout flag */
-      *early_timeout = TRUE;
-
-      /* try to kill the command that timed out by sending termination signal to child process group */
-      kill((pid_t)(-pid), SIGTERM);
-      sleep(1);
-      kill((pid_t)(-pid), SIGKILL);
-    }
-
-    /* read output if timeout has not occurred */
-    else {
-
-      /* initialize output */
-      strcpy(buffer, "");
-
-      /* try and read the results from the command output (retry if we encountered a signal) */
-      do {
-        bytes_read = read(fd[0], buffer, sizeof(buffer) - 1);
-
-        /* append data we just read to dynamic buffer */
-        if (bytes_read > 0) {
-          buffer[bytes_read] = '\x0';
-          dbuf_strcat(&output_dbuf, buffer);
-        }
-
-        /* handle errors */
-        if (bytes_read == -1) {
-          /* we encountered a recoverable error, so try again */
-          if (errno == EINTR)
-            continue;
-          /* patch by Henning Brauer to prevent CPU hogging */
-          else if (errno == EAGAIN) {
-            struct pollfd pfd;
-
-            pfd.fd = fd[0];
-            pfd.events = POLLIN;
-            poll(&pfd, 1, -1);
-            continue;
-          }
-          else
-            break;
-        }
-
-        /* we're done */
-        if (bytes_read == 0)
-          break;
-
-      } while (1);
-
-      /* cap output length - this isn't necessary, but it keeps runaway plugin output from causing problems */
-      if (output_dbuf.used_size > max_output_length)
-        output_dbuf.buf[max_output_length] = '\x0';
-
-      if (output != NULL && output_dbuf.buf)
-        *output = my_strdup(output_dbuf.buf);
-
-    }
-
-    log_debug_info(DEBUGL_COMMANDS, 1,
-                   "Execution time=%.3f sec, early timeout=%d, result=%d, output=%s\n",
-                   *exectime,
-		   *early_timeout,
-		   result,
-                   (output_dbuf.buf == NULL) ? "(null)" : output_dbuf.buf);
-
-    /* send data to event broker */
-    broker_system_command(NEBTYPE_SYSTEM_COMMAND_END,
-			  NEBFLAG_NONE,
-                          NEBATTR_NONE,
-			  start_time,
-			  end_time,
-			  *exectime,
-                          timeout,
-			  *early_timeout,
-			  result,
-			  cmd,
-                          (output_dbuf.buf == NULL) ? NULL : output_dbuf.buf,
-			  NULL);
-
-    /* free memory */
-    dbuf_free(&output_dbuf);
-
-    /* close the pipe for reading */
-    close(fd[0]);
-  }
+  // send event broker.
+  broker_system_command(NEBTYPE_SYSTEM_COMMAND_END,
+			NEBFLAG_NONE,
+			NEBATTR_NONE,
+			start_time,
+			end_time,
+			*exectime,
+			timeout,
+			*early_timeout,
+			result,
+			cmd,
+			(output == NULL ? NULL : *output),
+			NULL);
 
   return (result);
 }
@@ -516,15 +175,18 @@ int get_raw_command_line_r(nagios_macros* mac,
   clear_argv_macros(mac);
 
   /* make sure we've got all the requirements */
-  if (cmd_ptr == NULL || full_command == NULL)
+  if (cmd_ptr == NULL) {
     return (ERROR);
+  }
 
   log_debug_info(DEBUGL_COMMANDS | DEBUGL_CHECKS | DEBUGL_MACROS, 2,
                  "Raw Command Input: %s\n",
 		 cmd_ptr->command_line);
 
   /* get the full command line */
-  *full_command = my_strdup((cmd_ptr->command_line == NULL) ? "" : cmd_ptr->command_line);
+  if (full_command != NULL) {
+    *full_command = my_strdup(cmd_ptr->command_line == NULL ? "" : cmd_ptr->command_line);
+  }
 
   /* XXX: Crazy indent */
   /* get the command arguments */
@@ -572,9 +234,11 @@ int get_raw_command_line_r(nagios_macros* mac,
     }
   }
 
-  log_debug_info(DEBUGL_COMMANDS | DEBUGL_CHECKS | DEBUGL_MACROS, 2,
-                 "Expanded Command Output: %s\n",
-		 *full_command);
+  if (full_command != NULL) {
+    log_debug_info(DEBUGL_COMMANDS | DEBUGL_CHECKS | DEBUGL_MACROS, 2,
+		   "Expanded Command Output: %s\n",
+		   *full_command);
+  }
 
   return (OK);
 }
@@ -1730,540 +1394,9 @@ void sighandler(int sig) {
     sigshutdown = TRUE;
 }
 
-/* handle timeouts when executing service checks */
-/* 07/16/08 EG also called when parent process gets a TERM signal */
-void service_check_sighandler(int sig) {
-  struct timeval end_time;
-
-  (void)sig;
-
-  /* get the current time */
-  gettimeofday(&end_time, NULL);
-
-#ifdef SERVICE_CHECK_TIMEOUTS_RETURN_UNKNOWN
-  check_result_info.return_code = STATE_UNKNOWN;
-#else
-  check_result_info.return_code = STATE_CRITICAL;
-#endif
-  check_result_info.finish_time = end_time;
-  check_result_info.early_timeout = TRUE;
-
-  /* write check result to file */
-  if (check_result_info.output_file_fp) {
-
-    fprintf(check_result_info.output_file_fp, "finish_time=%lu.%lu\n",
-            static_cast<unsigned long>(check_result_info.finish_time.tv_sec),
-            static_cast<unsigned long>(check_result_info.finish_time.tv_usec));
-    fprintf(check_result_info.output_file_fp, "early_timeout=%d\n",
-            check_result_info.early_timeout);
-    fprintf(check_result_info.output_file_fp, "exited_ok=%d\n",
-            check_result_info.exited_ok);
-    fprintf(check_result_info.output_file_fp, "return_code=%d\n",
-            check_result_info.return_code);
-    fprintf(check_result_info.output_file_fp, "output=%s\n",
-            "(Service Check Timed Out)");
-
-    /* close the temp file */
-    fclose(check_result_info.output_file_fp);
-
-    /* move check result to queue directory */
-    move_check_result_to_queue(check_result_info.output_file);
-  }
-
-  /* free check result memory */
-  free_check_result(&check_result_info);
-
-  /* try to kill the command that timed out by sending termination signal to our process group */
-  /* we also kill ourselves while doing this... */
-  kill((pid_t) 0, SIGKILL);
-
-  /* force the child process (service check) to exit... */
-  _exit(STATE_CRITICAL);
-}
-
-/* handle timeouts when executing host checks */
-/* 07/16/08 EG also called when parent process gets a TERM signal */
-void host_check_sighandler(int sig) {
-  struct timeval end_time;
-
-  (void)sig;
-
-  /* get the current time */
-  gettimeofday(&end_time, NULL);
-
-  check_result_info.return_code = STATE_CRITICAL;
-  check_result_info.finish_time = end_time;
-  check_result_info.early_timeout = TRUE;
-
-  /* write check result to file */
-  if (check_result_info.output_file_fp) {
-
-    fprintf(check_result_info.output_file_fp, "finish_time=%lu.%lu\n",
-            static_cast<unsigned long>(check_result_info.finish_time.tv_sec),
-            static_cast<unsigned long>(check_result_info.finish_time.tv_usec));
-    fprintf(check_result_info.output_file_fp, "early_timeout=%d\n",
-            check_result_info.early_timeout);
-    fprintf(check_result_info.output_file_fp, "exited_ok=%d\n",
-            check_result_info.exited_ok);
-    fprintf(check_result_info.output_file_fp, "return_code=%d\n",
-            check_result_info.return_code);
-    fprintf(check_result_info.output_file_fp, "output=%s\n",
-            "(Host Check Timed Out)");
-
-    /* close the temp file */
-    fclose(check_result_info.output_file_fp);
-
-    /* move check result to queue directory */
-    move_check_result_to_queue(check_result_info.output_file);
-  }
-
-  /* free check result memory */
-  free_check_result(&check_result_info);
-
-  /* try to kill the command that timed out by sending termination signal to our process group */
-  /* we also kill ourselves while doing this... */
-  kill((pid_t) 0, SIGKILL);
-
-  /* force the child process (service check) to exit... */
-  _exit(STATE_CRITICAL);
-}
-
-
-/* handle timeouts when executing commands via my_system_r() */
-void my_system_sighandler(int sig) {
-  (void)sig;
-
-  /* force the child process to exit... */
-  _exit(STATE_CRITICAL);
-}
-
 /******************************************************************/
 /************************* IPC FUNCTIONS **************************/
 /******************************************************************/
-
-/* move check result to queue directory */
-int move_check_result_to_queue(char* checkresult_file) {
-  char* output_file = NULL;
-  int output_file_fd = -1;
-  mode_t new_umask = 077;
-  mode_t old_umask;
-  int result = 0;
-
-  /* save the file creation mask */
-  old_umask = umask(new_umask);
-
-  /* create a safe temp file */
-  std::ostringstream oss;
-  oss << config.get_check_result_path().toStdString() << "/cXXXXXX";
-  output_file = my_strdup(oss.str().c_str());
-  output_file_fd = mkstemp(output_file);
-
-  /* file created okay */
-  if (output_file_fd >= 0) {
-
-    log_debug_info(DEBUGL_CHECKS, 2,
-                   "Moving temp check result file '%s' to queue file '%s'...\n",
-                   checkresult_file,
-		   output_file);
-
-#ifdef __CYGWIN__
-    /* Cygwin cannot rename open files - gives Permission Denied */
-    /* close the file */
-    close(output_file_fd);
-#endif
-
-    /* move the original file */
-    result = my_rename(checkresult_file, output_file);
-
-#ifndef __CYGWIN__
-    /* close the file */
-    close(output_file_fd);
-#endif
-
-    /* create an ok-to-go indicator file */
-    std::string temp_buffer(output_file);
-    temp_buffer.append(".ok");
-    if ((output_file_fd = open(temp_buffer.c_str(), O_CREAT | O_WRONLY | O_TRUNC, S_IRUSR | S_IWUSR)) > 0)
-      close(output_file_fd);
-
-    /* delete the original file if it couldn't be moved */
-    if (result != 0)
-      unlink(checkresult_file);
-  }
-  else
-    result = -1;
-
-  /* reset the file creation mask */
-  umask(old_umask);
-
-  /* log a warning on errors */
-  if (result != 0)
-    logit(NSLOG_RUNTIME_WARNING, TRUE,
-          "Warning: Unable to move file '%s' to check results queue.\n",
-          checkresult_file);
-
-  /* free memory */
-  delete[] output_file;
-
-  return (OK);
-}
-
-/* processes files in the check result queue directory */
-int process_check_result_queue(char const* dirname) {
-  char file[MAX_FILENAME_LENGTH];
-  DIR* dirp = NULL;
-  struct dirent* dirfile = NULL;
-  int x = 0;
-  struct stat stat_buf;
-  struct stat ok_stat_buf;
-  int result = OK;
-
-  /* make sure we have what we need */
-  if (dirname == NULL) {
-    logit(NSLOG_CONFIG_ERROR, TRUE,
-          "Error: No check result queue directory specified.\n");
-    return (ERROR);
-  }
-
-  /* open the directory for reading */
-  if ((dirp = opendir(dirname)) == NULL) {
-    logit(NSLOG_CONFIG_ERROR, TRUE,
-          "Error: Could not open check result queue directory '%s' for reading.\n",
-          dirname);
-    return (ERROR);
-  }
-
-  log_debug_info(DEBUGL_CHECKS, 1,
-                 "Starting to read check result queue '%s'...\n",
-                 dirname);
-
-  /* process all files in the directory... */
-  while ((dirfile = readdir(dirp)) != NULL) {
-
-    /* create /path/to/file */
-    snprintf(file, sizeof(file), "%s/%s", dirname, dirfile->d_name);
-    file[sizeof(file) - 1] = '\x0';
-
-    /* process this if it's a check result file... */
-    x = strlen(dirfile->d_name);
-    if (x == 7 && dirfile->d_name[0] == 'c') {
-
-      if (stat(file, &stat_buf) == -1) {
-        logit(NSLOG_RUNTIME_WARNING, TRUE,
-              "Warning: Could not stat() check result file '%s'.\n",
-              file);
-        continue;
-      }
-
-      switch (stat_buf.st_mode & S_IFMT) {
-      case S_IFREG:
-        /* don't process symlinked files */
-        if (!S_ISREG(stat_buf.st_mode))
-          continue;
-        break;
-
-      default:
-        /* everything else we ignore */
-        continue;
-      }
-
-      /* at this point we have a regular file... */
-
-      /* can we find the associated ok-to-go file ? */
-      std::string temp_buffer(file);
-      temp_buffer.append(".ok");
-      result = stat(temp_buffer.c_str(), &ok_stat_buf);
-      if (result == -1)
-        continue;
-
-      /* process the file */
-      result = process_check_result_file(file);
-
-      /* break out if we encountered an error */
-      if (result == ERROR)
-        break;
-    }
-  }
-
-  closedir(dirp);
-
-  return (result);
-}
-
-/* reads check result(s) from a file */
-int process_check_result_file(char* fname) {
-  mmapfile* thefile = NULL;
-  char* input = NULL;
-  char* var = NULL;
-  char* val = NULL;
-  char* v1 = NULL;
-  char* v2 = NULL;
-  int delete_file = FALSE;
-  time_t current_time;
-  check_result* new_cr = NULL;
-
-  if (fname == NULL)
-    return (ERROR);
-
-  time(&current_time);
-
-  log_debug_info(DEBUGL_CHECKS, 1, "Processing check result file: '%s'\n", fname);
-
-  /* open the file for reading */
-  if ((thefile = mmap_fopen(fname)) == NULL) {
-    /* try removing the file - zero length files can't be mmap()'ed, so it might exist */
-    unlink(fname);
-
-    return (ERROR);
-  }
-
-  /* read in all lines from the file */
-  while (1) {
-
-    /* free memory */
-    delete[] input;
-
-    /* read the next line */
-    if ((input = mmap_fgets_multiline(thefile)) == NULL)
-      break;
-
-    /* skip comments */
-    if (input[0] == '#')
-      continue;
-
-    /* empty line indicates end of record */
-    else if (input[0] == '\n') {
-      /* we have something... */
-      if (new_cr) {
-        /* do we have the minimum amount of data? */
-        if (new_cr->host_name != NULL && new_cr->output != NULL) {
-
-          /* add check result to list in memory */
-          add_check_result_to_list(new_cr);
-
-          /* reset pointer */
-          new_cr = NULL;
-        }
-
-        /* discard partial input */
-        else {
-          free_check_result(new_cr);
-          init_check_result(new_cr);
-          new_cr->output_file = my_strdup(fname);
-        }
-      }
-    }
-
-    if ((var = my_strtok(input, "=")) == NULL)
-      continue;
-    if ((val = my_strtok(NULL, "\n")) == NULL)
-      continue;
-
-    /* found the file time */
-    if (!strcmp(var, "file_time")) {
-
-      /* file is too old - ignore check results it contains and delete it */
-      /* this will only work as intended if file_time comes before check results */
-      if (config.get_max_check_result_file_age() > 0
-          && (current_time - (strtoul(val, NULL, 0)) > config.get_max_check_result_file_age())) {
-        delete_file = TRUE;
-        break;
-      }
-    }
-
-    /* else we have check result data */
-    else {
-
-      /* allocate new check result if necessary */
-      if (new_cr == NULL) {
-        new_cr = new check_result;
-
-        /* init values */
-        init_check_result(new_cr);
-        new_cr->output_file = my_strdup(fname);
-      }
-
-      if (!strcmp(var, "host_name"))
-        new_cr->host_name = my_strdup(val);
-      else if (!strcmp(var, "service_description")) {
-        new_cr->service_description = my_strdup(val);
-        new_cr->object_check_type = SERVICE_CHECK;
-      }
-      else if (!strcmp(var, "check_type"))
-        new_cr->check_type = atoi(val);
-      else if (!strcmp(var, "check_options"))
-        new_cr->check_options = atoi(val);
-      else if (!strcmp(var, "scheduled_check"))
-        new_cr->scheduled_check = atoi(val);
-      else if (!strcmp(var, "reschedule_check"))
-        new_cr->reschedule_check = atoi(val);
-      else if (!strcmp(var, "latency"))
-        new_cr->latency = strtod(val, NULL);
-      else if (!strcmp(var, "start_time")) {
-        if ((v1 = strtok(val, ".")) == NULL)
-          continue;
-        if ((v2 = strtok(NULL, "\n")) == NULL)
-          continue;
-        new_cr->start_time.tv_sec = strtoul(v1, NULL, 0);
-        new_cr->start_time.tv_usec = strtoul(v2, NULL, 0);
-      }
-      else if (!strcmp(var, "finish_time")) {
-        if ((v1 = strtok(val, ".")) == NULL)
-          continue;
-        if ((v2 = strtok(NULL, "\n")) == NULL)
-          continue;
-        new_cr->finish_time.tv_sec = strtoul(v1, NULL, 0);
-        new_cr->finish_time.tv_usec = strtoul(v2, NULL, 0);
-      }
-      else if (!strcmp(var, "early_timeout"))
-        new_cr->early_timeout = atoi(val);
-      else if (!strcmp(var, "exited_ok"))
-        new_cr->exited_ok = atoi(val);
-      else if (!strcmp(var, "return_code"))
-        new_cr->return_code = atoi(val);
-      else if (!strcmp(var, "output"))
-        new_cr->output = my_strdup(val);
-    }
-  }
-
-  /* we have something */
-  if (new_cr) {
-    /* do we have the minimum amount of data? */
-    if (new_cr->host_name != NULL && new_cr->output != NULL) {
-
-      /* add check result to list in memory */
-      add_check_result_to_list(new_cr);
-
-      /* reset pointer */
-      new_cr = NULL;
-    }
-
-    /* discard partial input */
-    /* free memory for current check result record */
-    else {
-      free_check_result(new_cr);
-      delete new_cr;
-    }
-  }
-
-  /* free memory and close file */
-  delete[] input;
-  mmap_fclose(thefile);
-
-  /* delete the file (as well its ok-to-go file) if it's too old */
-  /* other (current) files are deleted later (when results are processed) */
-  delete_check_result_file(fname);
-
-  return (OK);
-}
-
-/* deletes as check result file, as well as its ok-to-go file */
-int delete_check_result_file(char const* fname) {
-  /* delete the result file */
-  unlink(fname);
-
-  /* delete the ok-to-go file */
-  std::string temp_buffer(fname);
-  temp_buffer.append(".ok");
-
-  unlink(temp_buffer.c_str());
-  return (OK);
-}
-
-/* reads the first host/service check result from the list in memory */
-check_result* read_check_result(void) {
-  check_result* first_cr = NULL;
-
-  if (check_result_list == NULL)
-    return (NULL);
-
-  first_cr = check_result_list;
-  check_result_list = check_result_list->next;
-
-  return (first_cr);
-}
-
-/* initializes a host/service check result */
-int init_check_result(check_result* info) {
-  if (info == NULL)
-    return (ERROR);
-
-  /* reset vars */
-  info->object_check_type = HOST_CHECK;
-  info->host_name = NULL;
-  info->service_description = NULL;
-  info->check_type = HOST_CHECK_ACTIVE;
-  info->check_options = CHECK_OPTION_NONE;
-  info->scheduled_check = FALSE;
-  info->reschedule_check = FALSE;
-  info->output_file_fp = NULL;
-  info->output_file_fd = -1;
-  info->latency = 0.0;
-  info->start_time.tv_sec = 0;
-  info->start_time.tv_usec = 0;
-  info->finish_time.tv_sec = 0;
-  info->finish_time.tv_usec = 0;
-  info->early_timeout = FALSE;
-  info->exited_ok = TRUE;
-  info->return_code = 0;
-  info->output = NULL;
-  info->next = NULL;
-
-  return (OK);
-}
-
-/* adds a new host/service check result to the list in memory */
-int add_check_result_to_list(check_result* new_cr) {
-  check_result* temp_cr = NULL;
-  check_result* last_cr = NULL;
-
-  if (new_cr == NULL)
-    return (ERROR);
-
-  /* add to list, sorted by finish time (asc) */
-
-  /* find insertion point*/
-  last_cr = check_result_list;
-  for (temp_cr = check_result_list; temp_cr != NULL; temp_cr = temp_cr->next) {
-    if (temp_cr->finish_time.tv_sec >= new_cr->finish_time.tv_sec) {
-      if (temp_cr->finish_time.tv_sec > new_cr->finish_time.tv_sec)
-        break;
-      else if (temp_cr->finish_time.tv_usec > new_cr->finish_time.tv_usec)
-        break;
-    }
-    last_cr = temp_cr;
-  }
-
-  /* item goes at head of list */
-  if (check_result_list == NULL || temp_cr == check_result_list) {
-    new_cr->next = check_result_list;
-    check_result_list = new_cr;
-  }
-
-  /* item goes in middle or at end of list */
-  else {
-    new_cr->next = temp_cr;
-    last_cr->next = new_cr;
-  }
-
-  return (OK);
-}
-
-/* frees all memory associated with the check result list */
-int free_check_result_list(void) {
-  check_result* this_cr = NULL;
-  check_result* next_cr = NULL;
-
-  for (this_cr = check_result_list; this_cr != NULL; this_cr = next_cr) {
-    next_cr = this_cr->next;
-    free_check_result(this_cr);
-    delete this_cr;
-  }
-
-  check_result_list = NULL;
-
-  return (OK);
-}
 
 /* frees memory associated with a host/service check result */
 int free_check_result(check_result* info) {
@@ -2506,27 +1639,16 @@ char* get_next_string_from_buf(char* buf, int* start_index, int bufsize) {
 
 /* determines whether or not an object name (host, service, etc) contains illegal characters */
 int contains_illegal_object_chars(char* name) {
-  int x = 0;
-  int y = 0;
-  int ch = 0;
-
   if (name == NULL)
     return (FALSE);
 
-  x = (int)strlen(name) - 1;
+  std::string tmp(name);
+  std::string const& illegal_object_chars = config.get_illegal_object_chars().toStdString();
 
-  for (; x >= 0; x--) {
-
-    ch = (int)name[x];
-    char const* illegal_object_chars = config.get_illegal_object_chars().toStdString().c_str();
-    /* illegal user-specified characters */
-    if (illegal_object_chars != NULL)
-      for (y = 0; illegal_object_chars[y]; y++)
-        if (name[x] == illegal_object_chars[y])
-          return (TRUE);
+  if (tmp.find_first_of(illegal_object_chars) == std::string::npos) {
+    return (false);
   }
-
-  return (FALSE);
+  return (true);
 }
 
 /* escapes newlines in a string */
@@ -2810,140 +1932,6 @@ int dbuf_strcat(dbuf* db, char const* buf) {
   db->used_size += buflen;
 
   return (OK);
-}
-
-/******************************************************************/
-/******************** EMBEDDED PERL FUNCTIONS *********************/
-/******************************************************************/
-
-/* initializes embedded perl interpreter */
-int init_embedded_perl(char** env) {
-#ifdef EMBEDDEDPERL
-  char** embedding;
-  int exitstatus = 0;
-  int argc = 2;
-  struct stat stat_buf;
-
-  /* make sure the P1 file exists... */
-  if (stat(config.get_p1_file().toStdString().c_str(), &stat_buf) != 0) {
-    use_embedded_perl = FALSE;
-    logit(NSLOG_RUNTIME_ERROR, TRUE, "Error: p1.pl file required for embedded Perl interpreter is missing!\n");
-  }
-  else {
-    embedding = new char* [2];
-    *embedding = my_strdup("");
-    *(embedding + 1) = my_strdup(config.get_p1_file().toStdString().c_str());
-
-    use_embedded_perl = TRUE;
-
-    PERL_SYS_INIT3(&argc, &embedding, &env);
-
-    if ((my_perl = perl_alloc()) == NULL) {
-      use_embedded_perl = FALSE;
-      logit(NSLOG_RUNTIME_ERROR, TRUE,
-            "Error: Could not allocate memory for embedded Perl interpreter!\n");
-    }
-  }
-
-  /* a fatal error occurred... */
-  if (use_embedded_perl == FALSE) {
-    logit(NSLOG_PROCESS_INFO | NSLOG_RUNTIME_ERROR, TRUE,
-          "Bailing out due to errors encountered while initializing the embedded Perl interpreter. (PID=%d)\n",
-          (int)getpid());
-    cleanup();
-    exit(ERROR);
-  }
-
-  perl_construct(my_perl);
-  exitstatus = perl_parse(my_perl, xs_init, 2, (char**)embedding, env);
-  if (!exitstatus)
-    exitstatus = perl_run(my_perl);
-#else
-  (void)env;
-#endif
-  return (OK);
-}
-
-/* closes embedded perl interpreter */
-int deinit_embedded_perl(void) {
-#ifdef EMBEDDEDPERL
-  PL_perl_destruct_level = 0;
-  perl_destruct(my_perl);
-  perl_free(my_perl);
-  PERL_SYS_TERM();
-#endif
-  return (OK);
-}
-
-/* checks to see if we should run a script using the embedded Perl interpreter */
-int file_uses_embedded_perl(char* fname) {
-  int use_epn = FALSE;
-#ifdef EMBEDDEDPERL
-  FILE* fp = NULL;
-  char line1[80] = "";
-  char linen[80] = "";
-  int line = 0;
-  char* ptr = NULL;
-  int found_epn_directive = FALSE;
-
-  if (config.get_enable_embedded_perl() == true) {
-    /* open the file, check if its a Perl script and see if we can use epn  */
-    fp = fopen(fname, "r");
-    if (fp != NULL) {
-
-      /* grab the first line - we should see Perl */
-      fgets(line1, 80, fp);
-
-      /* yep, its a Perl script... */
-      if (strstr(line1, "/bin/perl") != NULL) {
-
-        /* epn directives must be found in first ten lines of plugin */
-        for (line = 1; line < 10; line++) {
-
-          if (fgets(linen, 80, fp)) {
-
-            /* line contains Centreon Engine directives */
-            if (strstr(linen, "# nagios:")) {
-
-              ptr = strtok(linen, ":");
-
-              /* process each directive */
-              for (ptr = strtok(NULL, ","); ptr != NULL; ptr = strtok(NULL, ",")) {
-                strip(ptr);
-
-                if (!strcmp(ptr, "+epn")) {
-                  use_epn = TRUE;
-                  found_epn_directive = TRUE;
-                }
-                else if (!strcmp(ptr, "-epn")) {
-                  use_epn = FALSE;
-                  found_epn_directive = TRUE;
-                }
-              }
-            }
-
-            if (found_epn_directive == TRUE)
-              break;
-          }
-
-          /* EOF */
-          else
-            break;
-        }
-
-        /* if the plugin didn't tell us whether or not to use embedded Perl, use implicit value */
-        if (found_epn_directive == FALSE)
-          use_epn = (config.get_use_embedded_perl_implicitly() == true) ? TRUE : FALSE;
-      }
-
-      fclose(fp);
-    }
-  }
-#else
-  (void)fname;
-#endif
-
-  return (use_epn);
 }
 
 /******************************************************************/
@@ -3242,7 +2230,7 @@ void free_memory(nagios_macros* mac) {
   free_comment_data();
 
   /* free check result list */
-  free_check_result_list();
+  free_check_result_list(); // XXX: keep for compatibility layer.
 
   /* free memory for the high priority event list */
   this_event = event_list_high;

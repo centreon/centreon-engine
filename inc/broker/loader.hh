@@ -40,6 +40,7 @@ namespace                        com {
           Q_OBJECT
          public:
           static loader&         instance();
+	  static void            cleanup();
 
           unsigned int           load();
           void                   unload();

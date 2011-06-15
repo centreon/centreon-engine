@@ -18,6 +18,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <exception>
 #include <sstream>
 #include <stdlib.h>
 #include <stdio.h>
@@ -39,6 +40,8 @@
 #include "sehandlers.hh"
 #include "flapping.hh"
 #include "logging.hh"
+#include "logging/logger.hh"
+#include "checks/checker.hh"
 #include "checks.hh"
 
 /*#define DEBUG_CHECKS*/
@@ -46,130 +49,8 @@
 
 #define MAX_CMD_ARGS 4096
 
-#ifdef EMBEDDEDPERL
-# include "epn_engine.hh"
-#endif
-
-#ifdef EMBEDDEDPERL
-extern int                   use_embedded_perl;
-#endif
-
-/******************************************************************/
-/********************* MISCELLANEOUS FUNCTIONS ********************/
-/******************************************************************/
-
-/* extract check result */
-static void extract_check_result(FILE* fp, dbuf* checkresult_dbuf) {
-  char output_buffer[MAX_INPUT_BUFFER] = "";
-  char* temp_buffer;
-
-  /* initialize buffer */
-  strcpy(output_buffer, "");
-
-  /* get all lines of plugin output - escape newlines */
-  while (fgets(output_buffer, sizeof(output_buffer) - 1, fp)) {
-    temp_buffer = escape_newlines(output_buffer);
-    dbuf_strcat(checkresult_dbuf, temp_buffer);
-    delete[] temp_buffer;
-  }
-}
-
-/* convert a command line to an array of arguments, suitable for exec* functions */
-static int parse_command_line(char* cmd, char* argv[MAX_CMD_ARGS]) {
-  unsigned int argc = 0;
-  char* parsed_cmd;
-
-  /* Skip initial white-space characters. */
-  for (parsed_cmd = cmd; isspace(*cmd); ++cmd);
-
-  /* Parse command line. */
-  while (*cmd && (argc < MAX_CMD_ARGS - 1)) {
-    argv[argc++] = parsed_cmd;
-    switch (*cmd) {
-    case '\'':
-      ++cmd;
-      while ((*cmd) && (*cmd != '\''))
-        *(parsed_cmd++) = *(cmd++);
-      if (*cmd)
-        ++cmd;
-      break;
-
-    case '"':
-      ++cmd;
-      while ((*cmd) && (*cmd != '"')) {
-        if ((*cmd == '\\') && cmd[1] && strchr("\"\\\n", cmd[1]))
-          ++cmd;
-        *(parsed_cmd++) = *(cmd++);
-      }
-      if (*cmd)
-        ++cmd;
-      break;
-
-    default:
-      while ((*cmd) && !isspace(*cmd)) {
-        if ((*cmd == '\\') && cmd[1])
-          ++cmd;
-        *(parsed_cmd++) = *(cmd++);
-      }
-    }
-
-    while (isspace(*cmd))
-      ++cmd;
-    *(parsed_cmd++) = '\0';
-  }
-  argv[argc] = NULL;
-  return (OK);
-}
-
-/* run a check */
-static int run_check(char* processed_command, dbuf* checkresult_dbuf) {
-  char* argv[MAX_CMD_ARGS];
-  FILE* fp;
-  pid_t pid;
-  int pipefds[2];
-  int retval;
-
-  /* execute check with execvp */
-  if (pipe(pipefds)) {
-    logit(NSLOG_RUNTIME_WARNING, TRUE, "error creating pipe: %s\n", strerror(errno));
-    _exit(STATE_UNKNOWN);
-  }
-  if ((pid = fork()) < 0) {
-    logit(NSLOG_RUNTIME_WARNING, TRUE, "fork error: %s\n", strerror(errno));
-    _exit(STATE_UNKNOWN);
-  }
-  else if (!pid) {
-    if ((dup2(pipefds[1], STDOUT_FILENO) < 0)
-        || (dup2(pipefds[1], STDERR_FILENO) < 0)) {
-      logit(NSLOG_RUNTIME_WARNING, TRUE, "dup2 error: %s\n", strerror(errno));
-      _exit(STATE_UNKNOWN);
-    }
-    close(pipefds[1]);
-    parse_command_line(processed_command, argv);
-    if (!argv[0])
-      _exit(STATE_UNKNOWN);
-    execvp(argv[0], argv);
-    _exit(STATE_UNKNOWN);
-  }
-
-  /* prepare pipe reading */
-  close(pipefds[1]);
-  fp = fdopen(pipefds[0], "r");
-  if (!fp) {
-    logit(NSLOG_RUNTIME_WARNING, TRUE, "fdopen error: %s\n", strerror(errno));
-    _exit(STATE_UNKNOWN);
-  }
-
-  /* extract check result */
-  extract_check_result(fp, checkresult_dbuf);
-
-  /* close the process */
-  fclose(fp);
-  close(pipefds[0]);
-  if (waitpid(pid, &retval, 0) != pid)
-    retval = -1;
-  return (retval);
-}
+using namespace com::centreon::engine;
+using namespace com::centreon::engine::logging;
 
 /******************************************************************/
 /********************** CHECK REAPER FUNCTIONS ********************/
@@ -177,125 +58,13 @@ static int run_check(char* processed_command, dbuf* checkresult_dbuf) {
 
 /* reaps host and service check results */
 int reap_check_results(void) {
-  check_result* queued_check_result = NULL;
-  service* temp_service = NULL;
-  host* temp_host = NULL;
-  time_t current_time = 0L;
-  time_t reaper_start_time = 0L;
-  int reaped_checks = 0;
-
-  log_debug_info(DEBUGL_FUNCTIONS, 0, "reap_check_results() start\n");
-  log_debug_info(DEBUGL_CHECKS, 0, "Starting to reap check results.\n");
-
-  /* get the start time */
-  time(&reaper_start_time);
-
-  /* process files in the check result queue */
-  process_check_result_queue(config.get_check_result_path().toStdString().c_str());
-
-  /* read all check results that have come in... */
-  while ((queued_check_result = read_check_result())) {
-
-    reaped_checks++;
-
-    log_debug_info(DEBUGL_CHECKS, 2,
-                   "Found a check result (#%d) to handle...\n",
-                   reaped_checks);
-
-    /* service check */
-    if (queued_check_result->object_check_type == SERVICE_CHECK) {
-
-      /* make sure the service exists */
-      if ((temp_service = find_service(queued_check_result->host_name,
-				       queued_check_result->service_description)) == NULL) {
-
-        logit(NSLOG_RUNTIME_WARNING, TRUE,
-              "Warning: Check result queue contained results for service '%s' on host '%s', but the service could not be found!  Perhaps you forgot to define the service in your config files?\n",
-              queued_check_result->service_description,
-              queued_check_result->host_name);
-
-        /* delete the file that contains the check results, as well as the ok-to-go file */
-        delete_check_result_file(queued_check_result->output_file);
-
-        /* free memory */
-        free_check_result(queued_check_result);
-        delete queued_check_result;
-
-        /* TODO - add new service definition automatically */
-        continue;
-      }
-
-      log_debug_info(DEBUGL_CHECKS, 1,
-                     "Handling check result for service '%s' on host '%s'...\n",
-                     temp_service->description,
-                     temp_service->host_name);
-
-      /* process the check result */
-      handle_async_service_check_result(temp_service, queued_check_result);
-    }
-
-    /* host check */
-    else {
-      if ((temp_host = find_host(queued_check_result->host_name)) == NULL) {
-
-        /* make sure the host exists */
-        logit(NSLOG_RUNTIME_WARNING, TRUE,
-              "Warning: Check result queue contained results for host '%s', but the host could not be found!  Perhaps you forgot to define the host in your config files?\n",
-              queued_check_result->host_name);
-
-        /* delete the file that contains the check results, as well as the ok-to-go file */
-        delete_check_result_file(queued_check_result->output_file);
-
-        /* free memory */
-        free_check_result(queued_check_result);
-        delete queued_check_result;
-
-        /* TODO - add new host definition automatically */
-        continue;
-      }
-
-      log_debug_info(DEBUGL_CHECKS, 1,
-                     "Handling check result for host '%s'...\n",
-                     temp_host->name);
-
-      /* process the check result */
-      handle_async_host_check_result_3x(temp_host, queued_check_result);
-    }
-
-    /* delete the file that contains the check results, as well as the ok-to-go file */
-    /* files can contain multiple check results - in this case, the file will be removed when the first check result is processed */
-    delete_check_result_file(queued_check_result->output_file);
-
-    log_debug_info(DEBUGL_CHECKS | DEBUGL_IPC, 1,
-                   "Deleted check result file '%s'\n",
-                   queued_check_result->output_file);
-
-    /* free allocated memory */
-    free_check_result(queued_check_result);
-    delete queued_check_result;
-
-    /* break out if we've been here too long (max_check_reaper_time seconds) */
-    time(&current_time);
-    if ((current_time - reaper_start_time)
-        > static_cast<time_t>(config.get_max_check_reaper_time())) {
-      log_debug_info(DEBUGL_CHECKS, 0,
-                     "Breaking out of check result reaper: max reaper time exceeded\n");
-      break;
-    }
-
-    /* bail out if we encountered a signal */
-    if (sigshutdown == TRUE || sigrestart == TRUE) {
-      log_debug_info(DEBUGL_CHECKS, 0,
-                     "Breaking out of check result reaper: signal encountered\n");
-      break;
-    }
+  try {
+    checks::checker::instance().reap();
   }
-
-  log_debug_info(DEBUGL_CHECKS, 0,
-                 "Finished reaping %d check results\n",
-		 reaped_checks);
-  log_debug_info(DEBUGL_FUNCTIONS, 0, "reap_check_results() end\n");
-
+  catch (std::exception const& e) {
+    logger(log_runtime_error, basic) << "error: " << e.what();
+    return (ERROR);
+  }
   return (OK);
 }
 
@@ -413,626 +182,20 @@ int run_async_service_check(service* svc,
                             int reschedule_check,
 			    int* time_is_valid,
                             time_t* preferred_time) {
-  nagios_macros mac;
-  char* raw_command = NULL;
-  char* processed_command = NULL;
-  struct timeval start_time, end_time;
-  pid_t pid = 0;
-  int fork_error = FALSE;
-  int wait_result = 0;
-  host* temp_host = NULL;
-  int pclose_result = 0;
-  mode_t new_umask = 077;
-  mode_t old_umask;
-  char* output_file = NULL;
-  double old_latency = 0.0;
-  dbuf checkresult_dbuf;
-  int dbuf_chunk = 1024;
-  int neb_result = OK;
-#ifdef EMBEDDEDPERL
-  char fname[512] = "";
-  char* args[5] = { "", DO_CLEAN, "", "", NULL };
-  char* perl_plugin_output = NULL;
-  SV* plugin_hndlr_cr = NULL;
-  int count;
-  int use_epn = FALSE;
-# ifdef aTHX
-  dTHX;
-# endif
-  dSP;
-#endif
-
-  log_debug_info(DEBUGL_FUNCTIONS, 0, "run_async_service_check()\n");
-
-  /* make sure we have something */
-  if (svc == NULL)
-    return (ERROR);
-
-  /* is the service check viable at this time? */
-  if (check_service_check_viability(svc, check_options, time_is_valid, preferred_time) == ERROR)
-    return (ERROR);
-
-  /* find the host associated with this service */
-  if ((temp_host = svc->host_ptr) == NULL)
-    return (ERROR);
-
-  /******** GOOD TO GO FOR A REAL SERVICE CHECK AT THIS POINT* *******/
-
-  /* initialize start/end times */
-  start_time.tv_sec = 0L;
-  start_time.tv_usec = 0L;
-  end_time.tv_sec = 0L;
-  end_time.tv_usec = 0L;
-
-  /* send data to event broker */
-  neb_result = broker_service_check(NEBTYPE_SERVICECHECK_ASYNC_PRECHECK,
-				    NEBFLAG_NONE,
-				    NEBATTR_NONE, svc,
-				    SERVICE_CHECK_ACTIVE,
-				    start_time,
-				    end_time,
-				    svc->service_check_command,
-				    svc->latency,
-				    0.0,
-				    0,
-				    FALSE,
-				    0,
-				    NULL,
-				    NULL);
-
-  /* neb module wants to cancel the service check - the check will be rescheduled for a later time by the scheduling logic */
-  if (neb_result == NEBERROR_CALLBACKCANCEL) {
-    if (preferred_time)
-      *preferred_time += static_cast<time_t>(svc->check_interval * config.get_interval_length());
+  try {
+    checks::checker::instance().run(svc,
+				    check_options,
+				    latency,
+				    scheduled_check,
+				    reschedule_check,
+				    time_is_valid,
+				    preferred_time);
+  }
+  catch (std::exception const& e) {
+    logger(log_runtime_error, basic) << "error: " << e.what();
     return (ERROR);
   }
-
-  /* neb module wants to override (or cancel) the service check - perhaps it will check the service itself */
-  /* NOTE: if a module does this, it has to do a lot of the stuff found below to make sure things don't get whacked out of shape! */
-  /* NOTE: if would be easier for modules to override checks when the NEBTYPE_SERVICECHECK_INITIATE event is called (later) */
-  if (neb_result == NEBERROR_CALLBACKOVERRIDE)
-    return (OK);
-
-  log_debug_info(DEBUGL_CHECKS, 0,
-                 "Checking service '%s' on host '%s'...\n",
-                 svc->description,
-		 svc->host_name);
-
-  /* clear check options - we don't want old check options retained */
-  /* only clear check options for scheduled checks - ondemand checks shouldn't affected retained check options */
-  if (scheduled_check == TRUE)
-    svc->check_options = CHECK_OPTION_NONE;
-
-  /* update latency for macros, event broker, save old value for later */
-  old_latency = svc->latency;
-  svc->latency = latency;
-
-  /* grab the host and service macro variables */
-  memset(&mac, 0, sizeof(mac));
-  grab_host_macros(&mac, temp_host);
-  grab_service_macros(&mac, svc);
-
-  /* get the raw command line */
-  get_raw_command_line_r(&mac,
-			 svc->check_command_ptr,
-                         svc->service_check_command,
-			 &raw_command,
-			 0);
-  if (raw_command == NULL) {
-    clear_volatile_macros(&mac);
-    log_debug_info(DEBUGL_CHECKS, 0,
-                   "Raw check command for service '%s' on host '%s' was NULL - aborting.\n",
-                   svc->description,
-		   svc->host_name);
-    if (preferred_time)
-      *preferred_time += static_cast<time_t>(svc->check_interval * config.get_interval_length());
-    svc->latency = old_latency;
-    return (ERROR);
-  }
-
-  /* process any macros contained in the argument */
-  process_macros_r(&mac, raw_command, &processed_command, 0);
-  if (processed_command == NULL) {
-    clear_volatile_macros(&mac);
-    log_debug_info(DEBUGL_CHECKS, 0,
-                   "Processed check command for service '%s' on host '%s' was NULL - aborting.\n",
-                   svc->description,
-		   svc->host_name);
-    if (preferred_time)
-      *preferred_time += static_cast<time_t>(svc->check_interval * config.get_interval_length());
-    svc->latency = old_latency;
-    delete[] raw_command;
-    return (ERROR);
-  }
-
-  /* get the command start time */
-  gettimeofday(&start_time, NULL);
-
-  /* increment number of service checks that are currently running... */
-  currently_running_service_checks++;
-
-  /* set the execution flag */
-  svc->is_executing = TRUE;
-
-  /* start save check info */
-  check_result_info.object_check_type = SERVICE_CHECK;
-  check_result_info.check_type = SERVICE_CHECK_ACTIVE;
-  check_result_info.check_options = check_options;
-  check_result_info.scheduled_check = scheduled_check;
-  check_result_info.reschedule_check = reschedule_check;
-  check_result_info.start_time = start_time;
-  check_result_info.finish_time = start_time;
-  check_result_info.early_timeout = FALSE;
-  check_result_info.exited_ok = TRUE;
-  check_result_info.return_code = STATE_OK;
-  check_result_info.output = NULL;
-
-  /* send data to event broker */
-  neb_result = broker_service_check(NEBTYPE_SERVICECHECK_INITIATE,
-				    NEBFLAG_NONE,
-				    NEBATTR_NONE,
-				    svc,
-				    SERVICE_CHECK_ACTIVE,
-				    start_time,
-				    end_time,
-				    svc->service_check_command,
-				    svc->latency,
-				    0.0,
-				    config.get_service_check_timeout(),
-				    FALSE,
-				    0,
-				    processed_command,
-				    NULL);
-
-  /* neb module wants to override the service check - perhaps it will check the service itself */
-  if (neb_result == NEBERROR_CALLBACKOVERRIDE) {
-    clear_volatile_macros(&mac);
-    svc->latency = old_latency;
-    delete[] processed_command;
-    delete[] raw_command;
-    return (OK);
-  }
-
-  /* open a temp file for storing check output */
-  old_umask = umask(new_umask);
-  std::ostringstream oss;
-  oss << config.get_temp_path().toStdString() << "/checkXXXXXX";
-  output_file = my_strdup(oss.str().c_str());
-
-  check_result_info.output_file_fd = mkstemp(output_file);
-  if (check_result_info.output_file_fd >= 0)
-    check_result_info.output_file_fp = fdopen(check_result_info.output_file_fd, "w");
-  else {
-    check_result_info.output_file_fp = NULL;
-    check_result_info.output_file_fd = -1;
-  }
-  umask(old_umask);
-
-  log_debug_info(DEBUGL_CHECKS | DEBUGL_IPC, 1,
-                 "Check result output will be written to '%s' (fd=%d)\n",
-                 output_file,
-		 check_result_info.output_file_fd);
-
-
-  /* finish save check info */
-  check_result_info.host_name = my_strdup(svc->host_name);
-  check_result_info.service_description = my_strdup(svc->description);
-  check_result_info.output_file = (check_result_info.output_file_fd < 0 || output_file == NULL)
-    ? NULL : my_strdup(output_file);
-
-  /* free memory */
-  delete[] output_file;
-
-  /* write start of check result file */
-  /* if things go really bad later on down the line, the user will at least have a partial file to help debug missing output results */
-  if (check_result_info.output_file_fp) {
-
-    fprintf(check_result_info.output_file_fp, "### Active Check Result File ###\n");
-    fprintf(check_result_info.output_file_fp, "file_time=%lu\n",
-	    (unsigned long)check_result_info.start_time.tv_sec);
-    fprintf(check_result_info.output_file_fp, "\n");
-
-    fprintf(check_result_info.output_file_fp, "### Centreon Engine Service Check Result ###\n");
-    fprintf(check_result_info.output_file_fp, "# Time: %s",
-            ctime(&check_result_info.start_time.tv_sec));
-    fprintf(check_result_info.output_file_fp, "host_name=%s\n", check_result_info.host_name);
-    fprintf(check_result_info.output_file_fp, "service_description=%s\n",
-            check_result_info.service_description);
-    fprintf(check_result_info.output_file_fp, "check_type=%d\n", check_result_info.check_type);
-    fprintf(check_result_info.output_file_fp, "check_options=%d\n", check_result_info.check_options);
-    fprintf(check_result_info.output_file_fp, "scheduled_check=%d\n",
-	    check_result_info.scheduled_check);
-    fprintf(check_result_info.output_file_fp, "reschedule_check=%d\n",
-	    check_result_info.reschedule_check);
-    fprintf(check_result_info.output_file_fp, "latency=%f\n", svc->latency);
-    fprintf(check_result_info.output_file_fp, "start_time=%lu.%lu\n",
-            static_cast<unsigned long>(check_result_info.start_time.tv_sec),
-            static_cast<unsigned long>(check_result_info.start_time.tv_usec));
-
-    /* flush output or it'll get written again when we fork() */
-    fflush(check_result_info.output_file_fp);
-  }
-
-  /* initialize dynamic buffer for storing plugin output */
-  dbuf_init(&checkresult_dbuf, dbuf_chunk);
-
-  /* reset latency (permanent value will be set later) */
-  svc->latency = old_latency;
-
-  /* update check statistics */
-  update_check_stats((scheduled_check == TRUE)
-		     ? ACTIVE_SCHEDULED_SERVICE_CHECK_STATS
-		     : ACTIVE_ONDEMAND_SERVICE_CHECK_STATS,
-		     start_time.tv_sec);
-
-#ifdef EMBEDDEDPERL
-  /* get"filename" component of command */
-  strncpy(fname, processed_command, strcspn(processed_command, " "));
-  fname[strcspn(processed_command, " ")] = '\x0';
-
-  /* should we use the embedded Perl interpreter to run this script? */
-  use_epn = file_uses_embedded_perl(fname);
-
-  /* if yes, do some initialization */
-  if (use_epn == TRUE) {
-
-    log_debug_info(DEBUGL_CHECKS, 1,
-                   "** Using Embedded Perl interpreter to run service check...\n");
-
-    args[0] = fname;
-    args[2] = "";
-
-    if (strchr(processed_command, ' ') == NULL)
-      args[3] = "";
-    else
-      args[3] = processed_command + strlen(fname) + 1;
-
-    ENTER;
-    SAVETMPS;
-    PUSHMARK(SP);
-    XPUSHs(sv_2mortal(newSVpv(args[0], 0)));
-    XPUSHs(sv_2mortal(newSVpv(args[1], 0)));
-    XPUSHs(sv_2mortal(newSVpv(args[2], 0)));
-    XPUSHs(sv_2mortal(newSVpv(args[3], 0)));
-    PUTBACK;
-
-    /* call our perl interpreter to compile and optionally cache the command */
-
-    call_pv("Embed::Persistent::eval_file", G_SCALAR | G_EVAL);
-
-    SPAGAIN;
-
-    if (SvTRUE(ERRSV)) {
-
-      /*
-       * if SvTRUE(ERRSV)
-       *      write failure to IPC pipe
-       *      return
-       */
-
-      /* remove the top element of the Perl stack (undef) */
-      (void)POPs;
-
-      pclose_result = STATE_UNKNOWN;
-      perl_plugin_output = SvPVX(ERRSV);
-
-      log_debug_info(DEBUGL_CHECKS, 0,
-                     "Embedded Perl failed to compile %s, compile error %s - skipping plugin\n",
-                     fname,
-		     perl_plugin_output);
-
-      /* save plugin output */
-      if (perl_plugin_output != NULL) {
-        temp_buffer = escape_newlines(perl_plugin_output);
-        dbuf_strcat(&checkresult_dbuf, temp_buffer);
-        delete[] temp_buffer;
-      }
-
-      /* get the check finish time */
-      gettimeofday(&end_time, NULL);
-
-      /* record check result info */
-      check_result_info.exited_ok = FALSE;
-      check_result_info.return_code = pclose_result;
-      check_result_info.finish_time = end_time;
-
-      /* write check result to file */
-      if (check_result_info.output_file_fp) {
-
-        fprintf(check_result_info.output_file_fp,
-                "finish_time=%lu.%lu\n",
-                check_result_info.finish_time.tv_sec,
-                check_result_info.finish_time.tv_usec);
-        fprintf(check_result_info.output_file_fp, "early_timeout=%d\n",
-                check_result_info.early_timeout);
-        fprintf(check_result_info.output_file_fp, "exited_ok=%d\n",
-                check_result_info.exited_ok);
-        fprintf(check_result_info.output_file_fp, "return_code=%d\n",
-                check_result_info.return_code);
-        fprintf(check_result_info.output_file_fp, "output=%s\n",
-                (checkresult_dbuf.buf == NULL) ? "(null)" : checkresult_dbuf.buf);
-
-        /* close the temp file */
-        fclose(check_result_info.output_file_fp);
-
-        /* move check result to queue directory */
-        move_check_result_to_queue(check_result_info.output_file);
-      }
-
-      /* free memory */
-      dbuf_free(&checkresult_dbuf);
-
-      /* free check result memory */
-      free_check_result(&check_result_info);
-
-      return (OK);
-    }
-    else {
-
-      plugin_hndlr_cr = newSVsv(POPs);
-
-      log_debug_info(DEBUGL_CHECKS, 1,
-                     "Embedded Perl successfully compiled %s and returned code ref to plugin handler\n",
-                     fname);
-
-      PUTBACK;
-      FREETMPS;
-      LEAVE;
-    }
-  }
-#endif
-
-  /* plugin is a C plugin or a Perl plugin _without_ compilation errors */
-
-  /* fork a child process */
-  pid = fork();
-
-  /* an error occurred while trying to fork */
-  if (pid == -1) {
-
-    fork_error = TRUE;
-
-    logit(NSLOG_RUNTIME_WARNING, TRUE,
-          "Warning: The check of service '%s' on host '%s' could not be performed due to a fork() error: '%s'.  The check will be rescheduled.\n",
-          svc->description,
-	  svc->host_name,
-	  strerror(errno));
-
-    log_debug_info(DEBUGL_CHECKS, 0,
-                   "Check of service '%s' on host '%s' could not be performed due to a fork() error: '%s'!\n",
-                   svc->description,
-		   svc->host_name,
-		   strerror(errno));
-  }
-
-  /* if we are in the child process... */
-  else if (pid == 0) {
-
-    /* set environment variables */
-    set_all_macro_environment_vars(&mac, TRUE);
-
-    /* fork again if we're not in a large installation */
-    if (config.get_child_processes_fork_twice() == true) {
-
-      /* fork again... */
-      pid = fork();
-
-      /* an error occurred while trying to fork again */
-      if (pid == -1)
-        exit(STATE_UNKNOWN);
-    }
-
-    /* the grandchild (or child if large install tweaks are enabled) process should run the service check... */
-    if (pid == 0 || config.get_child_processes_fork_twice() == false) {
-
-      /* reset signal handling */
-      reset_sighandler();
-
-      /* become the process group leader */
-      setpgid(0, 0);
-
-      /* catch term signals at this process level */
-      signal(SIGTERM, service_check_sighandler);
-
-      /* catch plugins that don't finish in a timely manner */
-      signal(SIGALRM, service_check_sighandler);
-      alarm(config.get_service_check_timeout());
-
-      /* disable rotation of the debug file */
-      config.set_max_debug_file_size(0L);
-
-      /******** BEGIN EMBEDDED PERL INTERPRETER EXECUTION ********/
-#ifdef EMBEDDEDPERL
-      if (use_epn == TRUE) {
-
-        /* execute our previously compiled script - from call_pv("Embed::Persistent::eval_file",..) */
-        /* NB. args[2] is _now_ a code ref (to the Perl subroutine corresp to the plugin) returned by eval_file() */
-
-        ENTER;
-        SAVETMPS;
-        PUSHMARK(SP);
-
-        XPUSHs(sv_2mortal(newSVpv(args[0], 0)));
-        XPUSHs(sv_2mortal(newSVpv(args[1], 0)));
-        XPUSHs(plugin_hndlr_cr);
-        XPUSHs(sv_2mortal(newSVpv(args[3], 0)));
-
-        PUTBACK;
-
-        count = call_pv("Embed::Persistent::run_package", G_ARRAY);
-
-        SPAGAIN;
-
-        perl_plugin_output = POPpx;
-        pclose_result = POPi;
-
-        /* NOTE: 07/16/07 This has to be done before FREETMPS statement below, or the POPpx pointer will be invalid (Hendrik B.) */
-        /* get perl plugin output - escape newlines */
-        if (perl_plugin_output != NULL) {
-          temp_buffer = escape_newlines(perl_plugin_output);
-          dbuf_strcat(&checkresult_dbuf, temp_buffer);
-          delete[] temp_buffer;
-        }
-
-        PUTBACK;
-        FREETMPS;
-        LEAVE;
-
-        log_debug_info(DEBUGL_CHECKS, 1,
-                       "Embedded Perl ran %s: return (code=%d, plugin output=%s\n",
-                       fname, pclose_result,
-                       (perl_plugin_output == NULL) ? "NULL" : checkresult_dbuf.buf));
-
-      /* reset the alarm */
-      alarm(0);
-
-      /* get the check finish time */
-      gettimeofday(&end_time, NULL);
-
-      /* record check result info */
-      check_result_info.return_code = pclose_result;
-      check_result_info.finish_time = end_time;
-
-      /* write check result to file */
-      if (check_result_info.output_file_fp) {
-
-	fprintf(check_result_info.output_file_fp, "finish_time=%lu.%lu\n",
-		check_result_info.finish_time.tv_sec,
-		check_result_info.finish_time.tv_usec);
-	fprintf(check_result_info.output_file_fp, "early_timeout=%d\n",
-		check_result_info.early_timeout);
-	fprintf(check_result_info.output_file_fp, "exited_ok=%d\n",
-		check_result_info.exited_ok);
-	fprintf(check_result_info.output_file_fp, "return_code=%d\n",
-		check_result_info.return_code);
-	fprintf(check_result_info.output_file_fp, "output=%s\n",
-		(checkresult_dbuf.buf == NULL) ? "(null)" : checkresult_dbuf.buf);
-
-	/* close the temp file */
-	fclose(check_result_info.output_file_fp);
-
-	/* move check result to queue directory */
-	move_check_result_to_queue(check_result_info.output_file);
-      }
-
-      /* free memory */
-      dbuf_free(&checkresult_dbuf);
-
-      /* free check result memory */
-      free_check_result(&check_result_info);
-
-      /* return with plugin exit status - not really necessary... */
-      _exit(pclose_result);
-    }
-#endif
-    /******** END EMBEDDED PERL INTERPRETER EXECUTION ********/
-
-    /* run the plugin check command */
-    pclose_result = run_check(processed_command, &checkresult_dbuf);
-
-    /* reset the alarm */
-    alarm(0);
-
-    /* get the check finish time */
-    gettimeofday(&end_time, NULL);
-
-    /* record check result info */
-    check_result_info.finish_time = end_time;
-    check_result_info.early_timeout = FALSE;
-
-    /* test for execution error */
-    if (pclose_result == -1) {
-      pclose_result = STATE_UNKNOWN;
-      check_result_info.return_code = STATE_CRITICAL;
-      check_result_info.exited_ok = FALSE;
-    }
-    else {
-      if (WEXITSTATUS(pclose_result) == 0
-	  && WIFSIGNALED(pclose_result))
-	check_result_info.return_code = 128 + WTERMSIG(pclose_result);
-      else
-	check_result_info.return_code = WEXITSTATUS(pclose_result);
-    }
-
-    /* write check result to file */
-    if (check_result_info.output_file_fp) {
-
-      fprintf(check_result_info.output_file_fp, "finish_time=%lu.%lu\n",
-	      static_cast<unsigned long>(check_result_info.finish_time.tv_sec),
-	      static_cast<unsigned long>(check_result_info.finish_time.tv_usec));
-      fprintf(check_result_info.output_file_fp, "early_timeout=%d\n",
-	      check_result_info.early_timeout);
-      fprintf(check_result_info.output_file_fp, "exited_ok=%d\n",
-	      check_result_info.exited_ok);
-      fprintf(check_result_info.output_file_fp, "return_code=%d\n",
-	      check_result_info.return_code);
-      fprintf(check_result_info.output_file_fp, "output=%s\n",
-	      (checkresult_dbuf.buf == NULL) ? "(null)" : checkresult_dbuf.buf);
-
-      /* close the temp file */
-      fclose(check_result_info.output_file_fp);
-
-      /* move check result to queue directory */
-      move_check_result_to_queue(check_result_info.output_file);
-    }
-
-    /* free memory */
-    dbuf_free(&checkresult_dbuf);
-    delete[] raw_command;
-    delete[] processed_command;
-
-    /* free check result memory */
-    free_check_result(&check_result_info);
-
-    /* return with plugin exit status - not really necessary... */
-    _exit(pclose_result);
-  }
-
-  /* NOTE: this code is never reached if large install tweaks are enabled... */
-
-  /* unset environment variables */
-  set_all_macro_environment_vars(&mac, FALSE);
-
-  /* free allocated memory */
-  /* this needs to be done last, so we don't free memory for variables before they're used above */
-  if (config.get_free_child_process_memory() == true)
-    free_memory(&mac);
-
-  /* parent exits immediately - grandchild process is inherited by the INIT process, so we have no zombie problem... */
-  _exit(STATE_OK);
-}
-
-/* else the parent should wait for the first child to return... */
- else if (pid > 0) {
-   clear_volatile_macros(&mac);
-
-   log_debug_info(DEBUGL_CHECKS, 2,
-		  "Service check is executing in child process (pid=%lu)\n",
-		  (unsigned long)pid);
-
-   /* parent should close output file */
-   if (check_result_info.output_file_fp)
-     fclose(check_result_info.output_file_fp);
-
-   /* should this be done in first child process (after spawning grandchild) as well? */
-   /* free memory allocated for IPC functionality */
-   free_check_result(&check_result_info);
-
-   /* free memory */
-   delete[] raw_command;
-   delete[] processed_command;
-
-   /* wait for the first child to return */
-   /* don't do this if large install tweaks are enabled - we'll clean up children in event loop */
-   if (config.get_child_processes_fork_twice() == true)
-     wait_result = waitpid(pid, NULL, 0);
- }
-
-/* see if we were able to run the check... */
-if (fork_error == TRUE)
-  return (ERROR);
-
-return (OK);
+  return (OK);
 }
 
 /* handles asynchronous service check results */
@@ -1162,13 +325,13 @@ int handle_async_service_check_result(service* temp_service, check_result* queue
 
   /* save old plugin output */
   if (temp_service->plugin_output)
-    old_plugin_output = my_strdup(temp_service->plugin_output);
+    old_plugin_output = temp_service->plugin_output;
 
   /* clear the old plugin output and perf data buffers */
-  delete[] temp_service->plugin_output;
   delete[] temp_service->long_plugin_output;
   delete[] temp_service->perf_data;
 
+  temp_service->plugin_output = NULL;
   temp_service->long_plugin_output = NULL;
   temp_service->perf_data = NULL;
 
@@ -1186,7 +349,7 @@ int handle_async_service_check_result(service* temp_service, check_result* queue
 
   /* make sure the return code is within bounds */
   else if (queued_check_result->return_code < 0
-           || queued_check_result->return_code > 3) {
+	   || queued_check_result->return_code > 3) {
 
     logit(NSLOG_RUNTIME_WARNING, TRUE,
           "Warning: return (code of %d for check of service '%s' on host '%s' was out of bounds.%s\n",
@@ -2391,10 +1554,10 @@ int is_service_result_fresh(service* temp_service,
     if (temp_service->state_type == HARD_STATE
         || temp_service->current_state == STATE_OK)
       freshness_threshold = static_cast<int>((temp_service->check_interval * config.get_interval_length())
-        + temp_service->latency + config.get_additional_freshness_latency());
+					     + temp_service->latency + config.get_additional_freshness_latency());
     else
       freshness_threshold = static_cast<int>((temp_service->retry_interval * config.get_interval_length())
-        + temp_service->latency + config.get_additional_freshness_latency());
+					     + temp_service->latency + config.get_additional_freshness_latency());
   }
   else
     freshness_threshold = temp_service->freshness_threshold;
@@ -2839,7 +2002,7 @@ int is_host_result_fresh(host* temp_host,
     else
       interval = temp_host->retry_interval;
     freshness_threshold = static_cast<int>((interval * config.get_interval_length())
-      + temp_host->latency + config.get_additional_freshness_latency());
+					   + temp_host->latency + config.get_additional_freshness_latency());
   }
   else
     freshness_threshold = temp_host->freshness_threshold;
@@ -2950,389 +2113,25 @@ int run_sync_host_check_3x(host* hst,
 			   int check_options,
 			   int use_cached_result,
 			   unsigned long check_timestamp_horizon) {
-  int result = OK;
-  time_t current_time = 0L;
-  int host_result = HOST_UP;
-  char* old_plugin_output = NULL;
-  struct timeval start_time;
-  struct timeval end_time;
-
-  log_debug_info(DEBUGL_FUNCTIONS, 0, "run_sync_host_check_3x()\n");
-
-  /* make sure we have a host */
-  if (hst == NULL)
+  try {
+    checks::checker::instance().run_sync(hst,
+					 check_result_code,
+					 check_options,
+					 use_cached_result,
+					 check_timestamp_horizon);
+  }
+  catch (std::exception const& e) {
+    logger(log_runtime_error, basic) << "error: " << e.what();
     return (ERROR);
-
-  log_debug_info(DEBUGL_CHECKS, 0, "** Run sync check of host '%s'...\n", hst->name);
-
-  /* is the host check viable at this time? */
-  /* if not, return current state and bail out */
-  if (check_host_check_viability_3x(hst, check_options, NULL, NULL) == ERROR) {
-    if (check_result_code)
-      *check_result_code = hst->current_state;
-    log_debug_info(DEBUGL_CHECKS, 0, "Host check is not viable at this time.\n");
-    return (OK);
   }
 
-  /* get the current time */
-  time(&current_time);
-
-  /* high resolution start time for event broker */
-  gettimeofday(&start_time, NULL);
-
-  /* can we use the last cached host state? */
-  if (use_cached_result == TRUE
-      && !(check_options & CHECK_OPTION_FORCE_EXECUTION)) {
-
-    /* we can used the cached result, so return it and get out of here... */
-    if (hst->has_been_checked == TRUE
-        && (static_cast<unsigned long>(current_time - hst->last_check) <= check_timestamp_horizon)) {
-      if (check_result_code)
-        *check_result_code = hst->current_state;
-
-      log_debug_info(DEBUGL_CHECKS, 1, "* Using cached host state: %d\n", hst->current_state);
-
-      /* update check statistics */
-      update_check_stats(ACTIVE_ONDEMAND_HOST_CHECK_STATS, current_time);
-      update_check_stats(ACTIVE_CACHED_HOST_CHECK_STATS, current_time);
-
-      return (OK);
-    }
-  }
-
-  log_debug_info(DEBUGL_CHECKS, 1, "* Running actual host check: old state=%d\n", hst->current_state);
-
-  /******** GOOD TO GO FOR A REAL HOST CHECK AT THIS POINT* *******/
-
-  /* update check statistics */
-  update_check_stats(ACTIVE_ONDEMAND_HOST_CHECK_STATS, current_time);
-  update_check_stats(SERIAL_HOST_CHECK_STATS, start_time.tv_sec);
-
-  /* reset host check latency, since on-demand checks have none */
-  hst->latency = 0.0;
-
-  /* adjust host check attempt */
-  adjust_host_check_attempt_3x(hst, TRUE);
-
-  /* save old host state */
-  hst->last_state = hst->current_state;
-  if (hst->state_type == HARD_STATE)
-    hst->last_hard_state = hst->current_state;
-
-  /* save old plugin output for state stalking */
-  if (hst->plugin_output)
-    old_plugin_output = my_strdup(hst->plugin_output);
-
-  /* set the checked flag */
-  hst->has_been_checked = TRUE;
-
-  /* clear the freshness flag */
-  hst->is_being_freshened = FALSE;
-
-  /* clear check options - we don't want old check options retained */
-  hst->check_options = CHECK_OPTION_NONE;
-
-  /* set the check type */
-  hst->check_type = HOST_CHECK_ACTIVE;
-
-  /*********** EXECUTE THE CHECK AND PROCESS THE RESULTS **********/
-
-  /* send data to event broker */
-  end_time.tv_sec = 0L;
-  end_time.tv_usec = 0L;
-  broker_host_check(NEBTYPE_HOSTCHECK_INITIATE,
-		    NEBFLAG_NONE,
-                    NEBATTR_NONE,
-		    hst,
-		    HOST_CHECK_ACTIVE,
-                    hst->current_state,
-		    hst->state_type,
-		    start_time,
-                    end_time,
-		    hst->host_check_command,
-		    hst->latency,
-                    0.0,
-		    config.get_host_check_timeout(),
-		    FALSE,
-		    0,
-                    NULL,
-		    NULL,
-		    NULL,
-		    NULL,
-		    NULL);
-
-  /* execute the host check */
-  host_result = execute_sync_host_check_3x(hst);
-
-  /* process the host check result */
-  process_host_check_result_3x(hst,
-			       host_result,
-			       old_plugin_output,
-                               check_options,
-			       FALSE,
-			       use_cached_result,
-                               check_timestamp_horizon);
-  if (check_result_code)
-    *check_result_code = hst->current_state;
-
-  /* free memory */
-  delete[] old_plugin_output;
-
-  log_debug_info(DEBUGL_CHECKS, 1, "* Sync host check done: new state=%d\n", hst->current_state);
-
-  /* high resolution end time for event broker */
-  gettimeofday(&end_time, NULL);
-
-  /* send data to event broker */
-  broker_host_check(NEBTYPE_HOSTCHECK_PROCESSED,
-		    NEBFLAG_NONE,
-                    NEBATTR_NONE,
-		    hst,
-		    HOST_CHECK_ACTIVE,
-                    hst->current_state,
-		    hst->state_type,
-		    start_time,
-                    end_time,
-		    hst->host_check_command,
-		    hst->latency,
-                    hst->execution_time,
-                    config.get_host_check_timeout(),
-		    FALSE,
-                    hst->current_state,
-		    NULL,
-		    hst->plugin_output,
-                    hst->long_plugin_output,
-		    hst->perf_data,
-		    NULL);
-  return (result);
+  logger(dbg_functions, basic) << "end " << __PRETTY_FUNCTION__;
+  return (OK);
 }
 
-/* run an "alive" check on a host */
-/* on-demand host checks will use this... */
 int execute_sync_host_check_3x(host* hst) {
-  nagios_macros mac;
-  int result = STATE_OK;
-  int return_result = HOST_UP;
-  char* processed_command = NULL;
-  char* raw_command = NULL;
-  struct timeval start_time;
-  struct timeval end_time;
-  char* temp_ptr;
-  int early_timeout = FALSE;
-  double exectime;
-  char* temp_plugin_output = NULL;
-  int neb_result = OK;
-
-  log_debug_info(DEBUGL_FUNCTIONS, 0, "execute_sync_host_check_3x()\n");
-
-  if (hst == NULL)
-    return (HOST_DOWN);
-
-  log_debug_info(DEBUGL_CHECKS, 0, "** Executing sync check of host '%s'...\n", hst->name);
-
-  /* initialize start/end times */
-  start_time.tv_sec = 0L;
-  start_time.tv_usec = 0L;
-  end_time.tv_sec = 0L;
-  end_time.tv_usec = 0L;
-
-  /* send data to event broker */
-  neb_result = broker_host_check(NEBTYPE_HOSTCHECK_SYNC_PRECHECK,
-				 NEBFLAG_NONE,
-				 NEBATTR_NONE,
-				 hst,
-				 HOST_CHECK_ACTIVE,
-				 hst->current_state,
-				 hst->state_type,
-				 start_time,
-				 end_time,
-				 hst->host_check_command,
-				 hst->latency,
-				 0.0,
-				 config.get_host_check_timeout(),
-				 FALSE,
-				 0,
-				 NULL,
-				 NULL,
-				 NULL,
-				 NULL,
-				 NULL);
-
-  /* neb module wants to cancel the host check - return the current state of the host */
-  if (neb_result == NEBERROR_CALLBACKCANCEL)
-    return (hst->current_state);
-
-  /* neb module wants to override the host check - perhaps it will check the host itself */
-  /* NOTE: if a module does this, it must check the status of the host and populate the data structures BEFORE it returns from the callback! */
-  if (neb_result == NEBERROR_CALLBACKOVERRIDE)
-    return (hst->current_state);
-
-  /* grab the host macros */
-  memset(&mac, 0, sizeof(mac));
-  grab_host_macros(&mac, hst);
-
-  /* high resolution start time for event broker */
-  gettimeofday(&start_time, NULL);
-
-  /* get the last host check time */
-  time(&hst->last_check);
-
-  /* get the raw command line */
-  get_raw_command_line_r(&mac,
-			 hst->check_command_ptr,
-                         hst->host_check_command,
-			 &raw_command,
-			 0);
-  if (raw_command == NULL) {
-    clear_volatile_macros(&mac);
-    return (ERROR);
-  }
-
-  /* process any macros contained in the argument */
-  process_macros_r(&mac, raw_command, &processed_command, 0);
-  if (processed_command == NULL) {
-    clear_volatile_macros(&mac);
-    return (ERROR);
-  }
-
-  /* send data to event broker */
-  end_time.tv_sec = 0L;
-  end_time.tv_usec = 0L;
-  broker_host_check(NEBTYPE_HOSTCHECK_RAW_START,
-		    NEBFLAG_NONE,
-                    NEBATTR_NONE,
-		    hst,
-		    HOST_CHECK_ACTIVE,
-		    return_result,
-                    hst->state_type,
-		    start_time, end_time,
-                    hst->host_check_command,
-		    0.0,
-		    0.0,
-                    config.get_host_check_timeout(),
-		    early_timeout,
-                    result,
-		    processed_command,
-		    hst->plugin_output,
-                    hst->long_plugin_output,
-		    hst->perf_data,
-		    NULL);
-
-  log_debug_info(DEBUGL_COMMANDS, 1, "Raw host check command: %s\n", raw_command);
-  log_debug_info(DEBUGL_COMMANDS, 0, "Processed host check ommand: %s\n", processed_command);
-
-  /* clear plugin output and performance data buffers */
-  delete[] hst->plugin_output;
-  delete[] hst->long_plugin_output;
-  delete[] hst->perf_data;
-
-  hst->plugin_output = NULL;
-  hst->long_plugin_output = NULL;
-  hst->perf_data = NULL;
-
-  /* run the host check command */
-  result = my_system_r(&mac, processed_command,
-		       config.get_host_check_timeout(),
-		       &early_timeout,
-		       &exectime,
-		       &temp_plugin_output,
-		       MAX_PLUGIN_OUTPUT_LENGTH);
-  clear_volatile_macros(&mac);
-
-  /* if the check timed out, report an error */
-  if (early_timeout == TRUE) {
-
-    delete[] temp_plugin_output;
-    std::ostringstream oss;
-    oss << "Host check timed out after "
-	<< config.get_host_check_timeout()
-	<< " seconds" << std::endl;
-    temp_plugin_output = my_strdup(oss.str().c_str());
-
-    /* log the timeout */
-    logit(NSLOG_RUNTIME_WARNING, TRUE,
-          "Warning: Host check command '%s' for host '%s' timed out after %d seconds\n",
-          processed_command,
-	  hst->name,
-	  config.get_host_check_timeout());
-  }
-
-  /* calculate total execution time */
-  hst->execution_time = exectime;
-
-  /* record check type */
-  hst->check_type = HOST_CHECK_ACTIVE;
-
-  /* parse the output: short and long output, and perf data */
-  parse_check_output(temp_plugin_output,
-		     &hst->plugin_output,
-                     &hst->long_plugin_output,
-		     &hst->perf_data,
-		     TRUE,
-                     TRUE);
-
-  /* free memory */
-  delete[] temp_plugin_output;
-  delete[] raw_command;
-  delete[] processed_command;
-
-  processed_command = NULL;
-
-  /* a NULL host check command means we should assume the host is UP */
-  if (hst->host_check_command == NULL) {
-    delete[] hst->plugin_output;
-    hst->plugin_output = my_strdup("(Host assumed to be UP)");
-    result = STATE_OK;
-  }
-
-  /* make sure we have some data */
-  if (hst->plugin_output == NULL || !strcmp(hst->plugin_output, "")) {
-    delete[] hst->plugin_output;
-    hst->plugin_output = my_strdup("(No output returned from host check)");
-  }
-
-  /* replace semicolons in plugin output (but not performance data) with colons */
-  if ((temp_ptr = hst->plugin_output)) {
-    while ((temp_ptr = strchr(temp_ptr, ';')))
-      *temp_ptr = ':';
-  }
-
-  /* if we're not doing aggressive host checking, let WARNING states indicate the host is up (fake the result to be STATE_OK) */
-  if (config.get_use_aggressive_host_checking() == false && result == STATE_WARNING)
-    result = STATE_OK;
-
-  if (result == STATE_OK)
-    return_result = HOST_UP;
-  else
-    return_result = HOST_DOWN;
-
-  /* high resolution end time for event broker */
-  gettimeofday(&end_time, NULL);
-
-  /* send data to event broker */
-  broker_host_check(NEBTYPE_HOSTCHECK_RAW_END,
-		    NEBFLAG_NONE,
-                    NEBATTR_NONE,
-		    hst,
-		    HOST_CHECK_ACTIVE,
-		    return_result,
-                    hst->state_type,
-		    start_time,
-		    end_time,
-                    hst->host_check_command,
-		    0.0,
-		    exectime,
-                    config.get_host_check_timeout(),
-		    early_timeout,
-                    result,
-		    processed_command,
-		    hst->plugin_output,
-                    hst->long_plugin_output,
-		    hst->perf_data,
-		    NULL);
-
-  log_debug_info(DEBUGL_CHECKS, 0, "** Sync host check done: state=%d\n", return_result);
-  return (return_result);
+  (void)hst;
+  return (ERROR);
 }
 
 /* run a scheduled host check asynchronously */
@@ -3377,8 +2176,8 @@ int run_scheduled_host_check_3x(host* hst, int check_options, double latency) {
       /* if host has no check interval, schedule it again for 5 minutes from now */
       if (current_time >= preferred_time)
         preferred_time = current_time + static_cast<time_t>((hst->check_interval <= 0)
-					 ? 300
-					 : (hst->check_interval * config.get_interval_length()));
+							    ? 300
+							    : (hst->check_interval * config.get_interval_length()));
 
       /* make sure we rescheduled the next host check at a valid time */
       get_next_valid_time(preferred_time, &next_valid_time, hst->check_period_ptr);
@@ -3431,399 +2230,19 @@ int run_async_host_check_3x(host* hst,
                             int reschedule_check,
 			    int* time_is_valid,
                             time_t* preferred_time) {
-  nagios_macros mac;
-  char* raw_command = NULL;
-  char* processed_command = NULL;
-  struct timeval start_time, end_time;
-  pid_t pid = 0;
-  int fork_error = FALSE;
-  int wait_result = 0;
-  int pclose_result = 0;
-  mode_t new_umask = 077;
-  mode_t old_umask;
-  char* output_file = NULL;
-  double old_latency = 0.0;
-  dbuf checkresult_dbuf;
-  int dbuf_chunk = 1024;
-  int neb_result = OK;
-
-  log_debug_info(DEBUGL_FUNCTIONS, 0, "run_async_host_check_3x()\n");
-
-  /* make sure we have a host */
-  if (hst == NULL)
-    return (ERROR);
-
-  log_debug_info(DEBUGL_CHECKS, 0, "** Running async check of host '%s'...\n", hst->name);
-
-  /* is the host check viable at this time? */
-  if (check_host_check_viability_3x(hst, check_options, time_is_valid, preferred_time) == ERROR)
-    return (ERROR);
-
-  /* 08/04/07 EG don't execute a new host check if one is already running */
-  if (hst->is_executing == TRUE && !(check_options & CHECK_OPTION_FORCE_EXECUTION)) {
-    log_debug_info(DEBUGL_CHECKS, 1,
-                   "A check of this host is already being executed, so we'll pass for the moment...\n");
+  try {
+    checks::checker::instance().run(hst,
+				    check_options,
+				    latency,
+				    scheduled_check,
+				    reschedule_check,
+				    time_is_valid,
+				    preferred_time);
+  }
+  catch (std::exception const& e) {
+    logger(log_runtime_error, basic) << "error: " << e.what();
     return (ERROR);
   }
-
-  /******** GOOD TO GO FOR A REAL HOST CHECK AT THIS POINT* *******/
-  /* initialize start/end times */
-  start_time.tv_sec = 0L;
-  start_time.tv_usec = 0L;
-  end_time.tv_sec = 0L;
-  end_time.tv_usec = 0L;
-
-  /* send data to event broker */
-  neb_result = broker_host_check(NEBTYPE_HOSTCHECK_ASYNC_PRECHECK,
-				 NEBFLAG_NONE,
-				 NEBATTR_NONE,
-				 hst,
-				 HOST_CHECK_ACTIVE,
-				 hst->current_state,
-				 hst->state_type,
-				 start_time,
-				 end_time,
-				 hst->host_check_command,
-				 hst->latency,
-				 0.0,
-				 config.get_host_check_timeout(),
-				 FALSE,
-				 0,
-				 NULL,
-				 NULL,
-				 NULL,
-				 NULL,
-				 NULL);
-
-  /* neb module wants to cancel the host check - the check will be rescheduled for a later time by the scheduling logic */
-  if (neb_result == NEBERROR_CALLBACKCANCEL)
-    return (ERROR);
-
-  /* neb module wants to override the host check - perhaps it will check the host itself */
-  /* NOTE: if a module does this, it has to do a lot of the stuff found below to make sure things don't get whacked out of shape! */
-  if (neb_result == NEBERROR_CALLBACKOVERRIDE)
-    return (OK);
-
-  log_debug_info(DEBUGL_CHECKS, 0, "Checking host '%s'...\n", hst->name);
-
-  /* clear check options - we don't want old check options retained */
-  /* only clear options if this was a scheduled check - on demand check options shouldn't affect retained info */
-  if (scheduled_check == TRUE)
-    hst->check_options = CHECK_OPTION_NONE;
-
-  /* adjust host check attempt */
-  adjust_host_check_attempt_3x(hst, TRUE);
-
-  /* set latency (temporarily) for macros and event broker */
-  old_latency = hst->latency;
-  hst->latency = latency;
-
-  /* grab the host macro variables */
-  memset(&mac, 0, sizeof(mac));
-  grab_host_macros(&mac, hst);
-
-  /* get the raw command line */
-  get_raw_command_line_r(&mac,
-			 hst->check_command_ptr,
-                         hst->host_check_command,
-			 &raw_command,
-			 0);
-  if (raw_command == NULL) {
-    clear_volatile_macros(&mac);
-    log_debug_info(DEBUGL_CHECKS, 0,
-                   "Raw check command for host '%s' was NULL - aborting.\n",
-                   hst->name);
-    return (ERROR);
-  }
-
-  /* process any macros contained in the argument */
-  process_macros_r(&mac, raw_command, &processed_command, 0);
-  if (processed_command == NULL) {
-    clear_volatile_macros(&mac);
-    log_debug_info(DEBUGL_CHECKS, 0,
-                   "Processed check command for host '%s' was NULL - aborting.\n",
-                   hst->name);
-    return (ERROR);
-  }
-
-  /* get the command start time */
-  gettimeofday(&start_time, NULL);
-
-  /* set check time for on-demand checks, so they're not incorrectly detected as being orphaned - Luke Ross 5/16/08 */
-  /* NOTE: 06/23/08 EG not sure if there will be side effects to this or not.... */
-  if (scheduled_check == FALSE)
-    hst->next_check = start_time.tv_sec;
-
-  /* increment number of host checks that are currently running... */
-  currently_running_host_checks++;
-
-  /* set the execution flag */
-  hst->is_executing = TRUE;
-
-  /* open a temp file for storing check output */
-  old_umask = umask(new_umask);
-  std::ostringstream oss;
-  oss << config.get_temp_path().toStdString() << "/checkXXXXXX";
-  output_file = my_strdup(oss.str().c_str());
-
-  check_result_info.output_file_fd = mkstemp(output_file);
-  if (check_result_info.output_file_fd >= 0)
-    check_result_info.output_file_fp = fdopen(check_result_info.output_file_fd, "w");
-  else {
-    check_result_info.output_file_fp = NULL;
-    check_result_info.output_file_fd = -1;
-  }
-  umask(old_umask);
-
-  log_debug_info(DEBUGL_CHECKS | DEBUGL_IPC, 1,
-                 "Check result output will be written to '%s' (fd=%d)\n",
-                 output_file,
-		 check_result_info.output_file_fd);
-
-  /* save check info */
-  check_result_info.object_check_type = HOST_CHECK;
-  check_result_info.host_name = my_strdup(hst->name);
-  check_result_info.service_description = NULL;
-  check_result_info.check_type = HOST_CHECK_ACTIVE;
-  check_result_info.check_options = check_options;
-  check_result_info.scheduled_check = scheduled_check;
-  check_result_info.reschedule_check = reschedule_check;
-  check_result_info.output_file =
-    (check_result_info.output_file_fd < 0 || output_file == NULL) ? NULL : my_strdup(output_file);
-  check_result_info.latency = latency;
-  check_result_info.start_time = start_time;
-  check_result_info.finish_time = start_time;
-  check_result_info.early_timeout = FALSE;
-  check_result_info.exited_ok = TRUE;
-  check_result_info.return_code = STATE_OK;
-  check_result_info.output = NULL;
-
-  /* free memory */
-  delete[] output_file;
-
-  /* write initial check info to file */
-  /* if things go bad later on, the user will at least have something to go on when debugging... */
-  if (check_result_info.output_file_fp) {
-
-    fprintf(check_result_info.output_file_fp, "### Active Check Result File ###\n");
-    fprintf(check_result_info.output_file_fp, "file_time=%lu\n",
-	    (unsigned long)check_result_info.start_time.tv_sec);
-    fprintf(check_result_info.output_file_fp, "\n");
-
-    fprintf(check_result_info.output_file_fp, "### Centreon Engine Host Check Result ###\n");
-    fprintf(check_result_info.output_file_fp, "# Time: %s",
-	    ctime(&check_result_info.start_time.tv_sec));
-    fprintf(check_result_info.output_file_fp, "host_name=%s\n", check_result_info.host_name);
-    fprintf(check_result_info.output_file_fp, "check_type=%d\n", check_result_info.check_type);
-    fprintf(check_result_info.output_file_fp, "check_options=%d\n", check_result_info.check_options);
-    fprintf(check_result_info.output_file_fp, "scheduled_check=%d\n",
-	    check_result_info.scheduled_check);
-    fprintf(check_result_info.output_file_fp, "reschedule_check=%d\n",
-	    check_result_info.reschedule_check);
-    fprintf(check_result_info.output_file_fp, "latency=%f\n", hst->latency);
-    fprintf(check_result_info.output_file_fp, "start_time=%lu.%lu\n",
-            static_cast<unsigned long>(check_result_info.start_time.tv_sec),
-            static_cast<unsigned long>(check_result_info.start_time.tv_usec));
-
-    /* flush buffer or we'll end up writing twice when we fork() */
-    fflush(check_result_info.output_file_fp);
-  }
-
-  /* initialize dynamic buffer for storing plugin output */
-  dbuf_init(&checkresult_dbuf, dbuf_chunk);
-
-  /* send data to event broker */
-  broker_host_check(NEBTYPE_HOSTCHECK_INITIATE,
-		    NEBFLAG_NONE,
-                    NEBATTR_NONE,
-		    hst,
-		    HOST_CHECK_ACTIVE,
-                    hst->current_state,
-		    hst->state_type,
-		    start_time,
-                    end_time,
-		    hst->host_check_command,
-		    hst->latency,
-                    0.0,
-		    config.get_host_check_timeout(),
-		    FALSE,
-		    0,
-                    processed_command,
-		    NULL,
-		    NULL,
-		    NULL,
-		    NULL);
-
-  /* reset latency (permanent value for this check will get set later) */
-  hst->latency = old_latency;
-
-  /* update check statistics */
-  update_check_stats((scheduled_check == TRUE)
-		     ? ACTIVE_SCHEDULED_HOST_CHECK_STATS : ACTIVE_ONDEMAND_HOST_CHECK_STATS,
-                     start_time.tv_sec);
-  update_check_stats(PARALLEL_HOST_CHECK_STATS, start_time.tv_sec);
-
-  /* fork a child process */
-  pid = fork();
-
-  /* an error occurred while trying to fork */
-  if (pid == -1) {
-
-    fork_error = TRUE;
-
-    /* log an error */
-    logit(NSLOG_RUNTIME_WARNING, TRUE,
-          "Warning: The check of host '%s' could not be performed due to a fork() error: '%s'.\n",
-          hst->name,
-	  strerror(errno));
-
-    log_debug_info(DEBUGL_CHECKS, 0,
-                   "Check of host '%s' could not be performed due to a fork() error: '%s'!\n",
-                   hst->name,
-		   strerror(errno));
-  }
-
-  /* if we are in the child process... */
-  else if (pid == 0) {
-
-    /* set environment variables */
-    set_all_macro_environment_vars(&mac, TRUE);
-
-    /* fork again if we're not in a large installation */
-    if (config.get_child_processes_fork_twice() == true) {
-
-      /* fork again... */
-      pid = fork();
-
-      /* an error occurred while trying to fork again */
-      if (pid == -1)
-        exit(STATE_UNKNOWN);
-    }
-
-    /* the grandchild (or child if large install tweaks are enabled) process should run the host check... */
-    if (pid == 0 || config.get_child_processes_fork_twice() == false) {
-
-      /* reset signal handling */
-      reset_sighandler();
-
-      /* become the process group leader */
-      setpgid(0, 0);
-
-      /* catch term signals at this process level */
-      signal(SIGTERM, host_check_sighandler);
-
-      /* catch plugins that don't finish in a timely manner */
-      signal(SIGALRM, host_check_sighandler);
-      alarm(config.get_host_check_timeout());
-
-      /* disable rotation of the debug file */
-      config.set_max_debug_file_size(0L);
-
-      /* run the plugin check command */
-      pclose_result = run_check(processed_command, &checkresult_dbuf);
-
-      /* reset the alarm */
-      alarm(0);
-
-      /* get the check finish time */
-      gettimeofday(&end_time, NULL);
-
-      /* record check result info */
-      check_result_info.finish_time = end_time;
-      check_result_info.early_timeout = FALSE;
-
-      /* test for execution error */
-      if (pclose_result == -1) {
-        pclose_result = STATE_UNKNOWN;
-        check_result_info.return_code = STATE_CRITICAL;
-        check_result_info.exited_ok = FALSE;
-      }
-      else {
-        if (WEXITSTATUS(pclose_result) == 0
-            && WIFSIGNALED(pclose_result))
-          check_result_info.return_code = 128 + WTERMSIG(pclose_result);
-        else
-          check_result_info.return_code = WEXITSTATUS(pclose_result);
-      }
-
-      /* write check result to file */
-      if (check_result_info.output_file_fp) {
-
-        fprintf(check_result_info.output_file_fp, "finish_time=%lu.%lu\n",
-                static_cast<unsigned long>(check_result_info.finish_time.tv_sec),
-                static_cast<unsigned long>(check_result_info.finish_time.tv_usec));
-        fprintf(check_result_info.output_file_fp, "early_timeout=%d\n",
-                check_result_info.early_timeout);
-        fprintf(check_result_info.output_file_fp, "exited_ok=%d\n",
-                check_result_info.exited_ok);
-        fprintf(check_result_info.output_file_fp, "return_code=%d\n",
-                check_result_info.return_code);
-        fprintf(check_result_info.output_file_fp, "output=%s\n",
-                (checkresult_dbuf.buf == NULL) ? "(null)" : checkresult_dbuf.buf);
-
-        /* close the temp file */
-        fclose(check_result_info.output_file_fp);
-
-        /* move check result to queue directory */
-        move_check_result_to_queue(check_result_info.output_file);
-      }
-
-      /* free memory */
-      dbuf_free(&checkresult_dbuf);
-      delete[] raw_command;
-      delete[] processed_command;
-
-      /* free check result memory */
-      free_check_result(&check_result_info);
-
-      /* return with plugin exit status - not really necessary... */
-      _exit(pclose_result);
-    }
-
-    /* NOTE: this code is never reached if large install tweaks are enabled... */
-
-    /* unset environment variables */
-    set_all_macro_environment_vars(&mac, FALSE);
-
-    /* free allocated memory */
-    /* this needs to be done last, so we don't free memory for variables before they're used above */
-    if (config.get_free_child_process_memory() == true)
-      free_memory(&mac);
-
-    /* parent exits immediately - grandchild process is inherited by the INIT process, so we have no zombie problem... */
-    _exit(STATE_OK);
-  }
-
-  /* else the parent should wait for the first child to return... */
-  else if (pid > 0) {
-    clear_volatile_macros(&mac);
-
-    log_debug_info(DEBUGL_CHECKS, 2,
-                   "Host check is executing in child process (pid=%lu)\n",
-                   (unsigned long)pid);
-
-    /* parent should close output file */
-    if (check_result_info.output_file_fp)
-      fclose(check_result_info.output_file_fp);
-
-    /* should this be done in first child process (after spawning grandchild) as well? */
-    /* free memory allocated for IPC functionality */
-    free_check_result(&check_result_info);
-
-    /* free memory */
-    delete[] raw_command;
-    delete[] processed_command;
-
-    /* wait for the first child to return */
-    /* if large install tweaks are enabled, we'll clean up the zombie process later */
-    if (config.get_child_processes_fork_twice() == true)
-      wait_result = waitpid(pid, NULL, 0);
-  }
-
-  /* see if we were able to run the check... */
-  if (fork_error == TRUE)
-    return (ERROR);
-
   return (OK);
 }
 
@@ -3860,8 +2279,7 @@ int handle_async_host_check_result_3x(host* temp_host, check_result* queued_chec
   log_debug_info(DEBUGL_CHECKS, 2, "\tExec Time:          %.3f\n", temp_host->execution_time);
   log_debug_info(DEBUGL_CHECKS, 2, "\tLatency:            %.3f\n", temp_host->latency);
   log_debug_info(DEBUGL_CHECKS, 2, "\treturn (Status:      %d\n", queued_check_result->return_code);
-  log_debug_info(DEBUGL_CHECKS, 2, "\tOutput:             %s\n",
-                 (queued_check_result == NULL) ? "NULL" : queued_check_result->output);
+  log_debug_info(DEBUGL_CHECKS, 2, "\tOutput:             %s\n", queued_check_result->output);
 
   /* decrement the number of host checks still out there... */
   if (queued_check_result->check_type == HOST_CHECK_ACTIVE
@@ -3945,10 +2363,9 @@ int handle_async_host_check_result_3x(host* temp_host, check_result* queued_chec
 
   /* save old plugin output */
   if (temp_host->plugin_output)
-    old_plugin_output = my_strdup(temp_host->plugin_output);
+    old_plugin_output = temp_host->plugin_output;
 
   /* clear the old plugin output and perf data buffers */
-  delete[] temp_host->plugin_output;
   delete[] temp_host->long_plugin_output;
   delete[] temp_host->perf_data;
 
@@ -4012,7 +2429,7 @@ int handle_async_host_check_result_3x(host* temp_host, check_result* queued_chec
 
     /* make sure the return code is within bounds */
     else if (queued_check_result->return_code < 0
-             || queued_check_result->return_code > 3) {
+	     || queued_check_result->return_code > 3) {
 
       logit(NSLOG_RUNTIME_WARNING, TRUE,
             "Warning: return (code of %d for check of host '%s' was out of bounds.%s\n",

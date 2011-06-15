@@ -24,6 +24,9 @@ set(ENGINE_MAJOR 1)
 set(ENGINE_MINOR 0)
 set(ENGINE_PATCH "0beta")
 set(ENGINE_VERSION "${ENGINE_MAJOR}.${ENGINE_MINOR}.${ENGINE_PATCH}")
+add_definitions("-DENGINE_MAJOR=${ENGINE_MAJOR}")
+add_definitions("-DENGINE_MINOR=${ENGINE_MINOR}")
+add_definitions("-DENGINE_PATCH=\"${ENGINE_PATCH}\"")
 add_definitions("-DENGINE_VERSION=\"${ENGINE_VERSION}\"")
 
 # Function chown.
@@ -567,64 +570,6 @@ if (WITH_STARTUP_SCRIPT)
   endif ()
 endif ()
 
-# Embedded Perl.
-option(WITH_EMBEDDED_PERL "Enable embedded Perl" OFF)
-option(WITH_PERL_CACHE "Enable cacheing of internally compiled Perl scripts.")
-if (WITH_EMBEDDED_PERL)
-  message(STATUS "Embedded Perl is being compiled in.")
-  set(EMBEDDEDPERL TRUE)
-  set(EMBEDDED_PERL "Yes")
-  if (WITH_PERL_CACHE)
-    message(STATUS "Internally compiled Perl scripts will be cached.")
-    set(DOCLEAN 0)
-  else ()
-    message(STATUS "Internally compiled Perl scripts will NOT be cached.")
-    set(DOCLEAN 1)
-  endif ()
-  execute_process(COMMAND "perl" "-e" "use Config;exit -1 unless (\$Config{usethreads});"
-    RESULT_VARIABLE RETVAL)
-  if (RETVAL EQUAL 0)
-    message(STATUS "Using threaded Perl.")
-    set(THREADEDPERL TRUE)
-    set(THREADED_PERL "Yes")
-  else ()
-    message(STATUS "NOT using threaded Perl.")
-    set(THREADEDPERL FALSE)
-    set(THREADED_PERL "No")
-  endif ()
-  execute_process(COMMAND "perl" "-MExtUtils::Embed" "-e" "ccopts"
-    RESULT_VARIABLE RETVAL
-    OUTPUT_VARIABLE PERL_COMPILE_FLAGS)
-  if (NOT RETVAL EQUAL 0)
-    message(FATAL_ERROR "Could not retrieve embedded Perl compile flags.")
-  endif ()
-  execute_process(COMMAND "perl" "-MExtUtils::Embed" "-e" "ldopts"
-    RESULT_VARIABLE RETVAL
-    OUTPUT_VARIABLE PERL_LINK_FLAGS)
-  if (NOT RETVAL EQUAL 0)
-    message(FATAL_ERROR "Could not retrieve embedded Perl link flags.")
-  endif ()
-  string(STRIP "${PERL_LINK_FLAGS}" PERL_LINK_FLAGS)
-  set(PERL_SOURCES "${SRC_DIR}/perlxsi.c")
-  execute_process(COMMAND "perl" "-MExtUtils::Embed" "-e" "xsinit" "--" "-o" "${PERL_SOURCES}"
-    RESULT_VARIABLE RETVAL)
-  if (NOT RETVAL EQUAL 0)
-    message(FATAL_ERROR "Could not generate embedded Perl source file.")
-  endif ()
-else ()
-  set(EMBEDDED_PERL "No")
-endif ()
-
-if (EMBEDDEDPERL)
-  add_definitions(-DEMBEDDEDPERL)
-endif ()
-if (THREADEDPERL)
-  add_definitions(-DTHREADEDPERL)
-endif()
-if (DOCLEAN)
-  add_definitions(-DDOCLEAN)
-endif ()
-
 # Unit test.
 option(WITH_TESTING "Enable unit test" OFF)
 if (WITH_TESTING)
@@ -703,7 +648,6 @@ add_library("cce_core"
   "${INCLUDE_DIR}/config.hh"
   "${INCLUDE_DIR}/downtime.hh"
   "${INCLUDE_DIR}/engine.hh"
-  "${INCLUDE_DIR}/epn_engine.hh"
   "${INCLUDE_DIR}/error.hh"
   "${INCLUDE_DIR}/events.hh"
   "${INCLUDE_DIR}/flapping.hh"
@@ -730,13 +674,14 @@ add_library("cce_core"
   "${INCLUDE_DIR}/xpddefault.hh"
   "${INCLUDE_DIR}/xrddefault.hh"
   "${INCLUDE_DIR}/xsddefault.hh"
-  "${PERL_SOURCES}"
   ${QT_MOC_FILES})
 
 # Subdirectories with core features.
 add_subdirectory("broker")
+add_subdirectory("checks")
 add_subdirectory("conf")
 add_subdirectory("configuration")
+add_subdirectory("commands")
 add_subdirectory("compatibility")
 add_subdirectory("doc")
 add_subdirectory("logging")
@@ -748,11 +693,12 @@ target_link_libraries("cce_core"
   ${MATH_LIBRARIES}
   ${SOCKET_LIBRARIES}
   ${THREAD_LIBRARIES}
-  ${PERL_LINK_FLAGS}
   ${QT_LIBRARIES}
   "cce_logging"
   "cce_broker"
+  "cce_checks"
   "cce_configuration"
+  "cce_commands"
   "cce_compatibility")
 
 # centengine target.
@@ -761,7 +707,7 @@ add_executable("centengine"
 get_property(ENGINE_COMPILE_FLAGS
   TARGET "centengine"
   PROPERTY COMPILE_FLAGS)
-set(ENGINE_COMPILE_FLAGS "${ENGINE_COMPILE_FLAGS} ${PERL_COMPILE_FLAGS}")
+set(ENGINE_COMPILE_FLAGS "${ENGINE_COMPILE_FLAGS}")
 set_target_properties("centengine"
   PROPERTIES COMPILE_FLAGS "${ENGINE_COMPILE_FLAGS}")
 # Link centengine with required libraries.
@@ -953,10 +899,6 @@ message(STATUS "Configuration Summary")
 message(STATUS "---------------------")
 message(STATUS "")
 message(STATUS "    Version:                 ${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}")
-message(STATUS "    Embedded Perl:           ${EMBEDDED_PERL}")
-if (EMBEDDEDPERL)
-  message(STATUS "    Threaded Perl:           ${THREADED_PERL}")
-endif ()
 message(STATUS "    Unit test:               ${UNIT_TEST}")
 message(STATUS "    Extra Compilation Flags: ${CMAKE_CXX_FLAGS}")
 message(STATUS "    Prefix:                  ${localstatedir}")

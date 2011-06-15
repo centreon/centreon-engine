@@ -190,9 +190,11 @@ state::state()
   set_accept_passive_host_checks(DEFAULT_ACCEPT_PASSIVE_HOST_CHECKS);
   set_allow_empty_hostgroup_assignment(DEFAULT_ALLOW_EMPTY_HOSTGROUP_ASSIGNMENT);
 
-  _tab_string[temp_path] = DEFAULT_TEMP_PATH;
-  _tab_string[check_result_path] = DEFAULT_CHECK_RESULT_PATH;
   _tab_string[log_archive_path] = DEFAULT_LOG_ARCHIVE_PATH;
+
+  // Set macro.
+  delete[] _mac->x[MACRO_TEMPPATH];
+  _mac->x[MACRO_TEMPPATH] = my_strdup("/tmp");
 }
 
 /**
@@ -250,8 +252,6 @@ state& state::operator=(state const& right) {
 void state::reset() {
   _reset();
 
-  _tab_string[temp_path] = DEFAULT_TEMP_PATH;
-  _tab_string[check_result_path] = DEFAULT_CHECK_RESULT_PATH;
   _tab_string[log_archive_path] = DEFAULT_LOG_ARCHIVE_PATH;
 }
 
@@ -322,16 +322,11 @@ void state::parse(QString const& filename) {
   if(_tab_int[free_child_process_memory] == -1) {
     _tab_int[free_child_process_memory] = !_tab_bool[use_large_installation_tweaks];
   }
-  if (_tab_int[child_processes_fork_twice] == -1) {
-    _tab_int[child_processes_fork_twice] = !_tab_bool[use_large_installation_tweaks];
-  }
 
   delete[] _mac->x[MACRO_MAINCONFIGFILE];
   _mac->x[MACRO_MAINCONFIGFILE] = my_strdup(_filename.toStdString().c_str());
 
   // check path
-  set_temp_path(get_temp_path());
-  set_check_result_path(get_check_result_path());
   set_log_archive_path(get_log_archive_path());
 }
 
@@ -376,22 +371,6 @@ QString const& state::get_temp_file() const throw() {
 }
 
 /**
- *  Get the temporary path.
- *  @return The temporary path.
- */
-QString const& state::get_temp_path() const throw() {
-  return (_tab_string[temp_path]);
-}
-
-/**
- *  Get The Check result path.
- *  @return the check result path.
- */
-QString const& state::get_check_result_path() const throw() {
-  return (_tab_string[check_result_path]);
-}
-
-/**
  *  Get the global host event handler.
  *  @return The global host event handler.
  */
@@ -429,14 +408,6 @@ QString const& state::get_ochp_command() const throw() {
  */
 QString const& state::get_log_archive_path() const throw() {
   return (_tab_string[log_archive_path]);
-}
-
-/**
- *  Get the p1 filename.
- *  @return The p1 filename.
- */
-QString const& state::get_p1_file() const throw() {
-  return (_tab_string[p1_file]);
 }
 
 /**
@@ -669,14 +640,6 @@ unsigned int state::get_ochp_timeout() const throw() {
  */
 unsigned long state::get_max_debug_file_size() const throw() {
   return (_tab_ulong[max_debug_file_size]);
-}
-
-/**
- *  Get the max check result file age.
- *  @return The max check result file age.
- */
-unsigned long state::get_max_check_result_file_age() const throw() {
-  return (_tab_ulong[max_check_result_file_age]);
 }
 
 /**
@@ -1048,30 +1011,6 @@ bool state::get_free_child_process_memory() const throw() {
 }
 
 /**
- *  Get the child processes fork twice.
- *  @return The child processes fork twice.
- */
-bool state::get_child_processes_fork_twice() const throw() {
-  return (_tab_int[child_processes_fork_twice]);
-}
-
-/**
- *  Get the enable embedded perl.
- *  @return The enable embedded perl.
- */
-bool state::get_enable_embedded_perl() const throw() {
-  return (_tab_bool[enable_embedded_perl]);
-}
-
-/**
- *  Get the use embedded perl implicitly.
- *  @return The use embedded perl implicitly.
- */
-bool state::get_use_embedded_perl_implicitly() const throw() {
-  return (_tab_bool[use_embedded_perl_implicitly]);
-}
-
-/**
  *  Get the allow empty hostgroup assignment.
  *  @return The allow empty hostgroup assignment.
  */
@@ -1220,50 +1159,20 @@ void state::set_temp_file(QString const& value) {
 
 /**
  *  Set the temporary path.
- *  @param[in] value The path.
+ *  @param[in] value Unused.
  */
 void state::set_temp_path(QString const& value) {
-  // Check that temp path exists and is a directory.
-  QFileInfo qinfo(value);
-  if (!qinfo.exists())
-    throw (engine_error() << "temp_path '" << value
-                          << "' does not exist");
-  if (!qinfo.isDir())
-    throw (engine_error() << "temp_path '" << value
-                          << "' is not a directory");
-
-  // Set configuration variable.
-  _tab_string[temp_path] = value;
-
-  // Set macro.
-  delete[] _mac->x[MACRO_TEMPPATH];
-  _mac->x[MACRO_TEMPPATH] = my_strdup(value.toStdString().c_str());
-
-  // Set compatibility variable.
-  delete[] ::temp_path;
-  ::temp_path = my_strdup(_mac->x[MACRO_TEMPPATH]);
+  (void)value;
+  logger(log_config_warning, basic) << "warning: temp_path variable ignored";
 }
 
 /**
  *  Set the check result path.
- *  @param[in] value The path.
+ *  @param[in] value Unused.
  */
 void state::set_check_result_path(QString const& value) {
-  // Check that check result path exists and is a directory.
-  QFileInfo qinfo(value);
-  if (!qinfo.exists())
-    throw (engine_error() << "check_result_path '" << value
-                          << "' does not exist");
-  if (!qinfo.isDir())
-    throw (engine_error() << "check_result_path '" << value
-                          << "' is not a directory");
-
-  // Set configuration variable.
-  _tab_string[check_result_path] = value;
-
-  // Set compatibility variable.
-  delete[] ::check_result_path;
-  ::check_result_path = my_strdup(value.toStdString().c_str());
+  (void)value;
+  logger(log_config_warning, basic) << "warning: check_result_path variable ignored";
 }
 
 /**
@@ -1333,14 +1242,13 @@ void state::set_log_archive_path(QString const& value) {
 }
 
 /**
- *  Set the p1 filename.
- *  @param[in] value The filename.
+ *  p1 filename ignore.
+ *  @param[in] value Unused.
  */
 void state::set_p1_file(QString const& value) {
-  _tab_string[p1_file] = value;
-
-  delete[] ::p1_file;
-  ::p1_file = my_strdup(value.toStdString().c_str());
+  (void)value;
+  logger(log_config_warning, basic)
+    << "warning: p1_file variable ignored";
 }
 
 /**
@@ -1718,11 +1626,12 @@ void state::set_max_debug_file_size(unsigned long value) {
 
 /**
  *  Set the max check result file age.
- *  @param[in] value The max check result file age.
+ *  @param[in] value Unused.
  */
 void state::set_max_check_result_file_age(unsigned long value) {
-  _tab_ulong[max_check_result_file_age] = value;
-  ::max_check_result_file_age = value;
+  (void)value;
+  logger(log_config_warning, basic)
+    << "warning: max_check_result_file_age variable ignored";
 }
 
 /**
@@ -2155,29 +2064,32 @@ void state::set_free_child_process_memory(bool value) {
 
 /**
  *  Set the child processes fork twice.
- *  @param[in] value The child processes fork twice.
+ *  @param[in] value Unused.
  */
 void state::set_child_processes_fork_twice(bool value) {
-  _tab_int[child_processes_fork_twice] = value;
-  ::child_processes_fork_twice = value;
+  (void)value;
+  logger(log_config_warning, basic)
+    << "warning: child_processes_fork_twice variable ignored";
 }
 
 /**
- *  Set the enable embedded perl.
- *  @param[in] value The enable embedded perl.
+ *  Enable embedded perl ignore.
+ *  @param[in] value Unused.
  */
 void state::set_enable_embedded_perl(bool value) {
-  _tab_bool[enable_embedded_perl] = value;
-  ::enable_embedded_perl = value;
+  (void)value;
+  logger(log_config_warning, basic)
+    << "warning: enable_embedded_perl variable ignored";
 }
 
 /**
- *  Set the use embedded perl implicitly.
- *  @param[in] value The use embedded perl implicitly.
+ *  Use embedded perl implicitly ingore.
+ *  @param[in] value Unused.
  */
 void state::set_use_embedded_perl_implicitly(bool value) {
-  _tab_bool[use_embedded_perl_implicitly] = value;
-  ::use_embedded_perl_implicitly = value;
+  (void)value;
+  logger(log_config_warning, basic)
+    << "warning: use_embedded_perl_implicitly variable ignored";
 }
 
 /**
@@ -2469,7 +2381,6 @@ void state::_reset() {
   set_log_file(DEFAULT_LOG_FILE);
   set_temp_file(DEFAULT_TEMP_FILE);
   set_command_file(DEFAULT_COMMAND_FILE);
-  set_p1_file(DEFAULT_P1_FILE);
   set_debug_file(DEFAULT_DEBUG_FILE);
 
 
@@ -2510,7 +2421,6 @@ void state::_reset() {
   set_command_check_interval(DEFAULT_COMMAND_CHECK_INTERVAL);
   set_check_reaper_interval(DEFAULT_CHECK_REAPER_INTERVAL);
   set_max_check_reaper_time(DEFAULT_MAX_REAPER_TIME);
-  set_max_check_result_file_age(DEFAULT_MAX_CHECK_RESULT_AGE);
   set_service_freshness_check_interval(DEFAULT_FRESHNESS_CHECK_INTERVAL);
   set_host_freshness_check_interval(DEFAULT_FRESHNESS_CHECK_INTERVAL);
   set_auto_rescheduling_interval(DEFAULT_AUTO_RESCHEDULING_INTERVAL);
@@ -2569,12 +2479,8 @@ void state::_reset() {
   set_use_large_installation_tweaks(DEFAULT_USE_LARGE_INSTALLATION_TWEAKS);
   set_enable_environment_macros(DEFAULT_ENABLE_ENVIRONMENT_MACROS);
   set_free_child_process_memory(DEFAULT_FREE_CHILD_PROCESS_MEMORY);
-  _tab_int[child_processes_fork_twice] = DEFAULT_CHILD_PROCESSES_FORK_TWICE;
 
   set_additional_freshness_latency(DEFAULT_ADDITIONAL_FRESHNESS_LATENCY);
-
-  set_enable_embedded_perl(DEFAULT_ENABLE_EMBEDDED_PERL);
-  set_use_embedded_perl_implicitly(DEFAULT_USE_EMBEDDED_PERL_IMPLICITLY);
 
   set_external_command_buffer_slots(DEFAULT_EXTERNAL_COMMAND_BUFFER_SLOTS);
 

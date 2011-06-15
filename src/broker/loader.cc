@@ -43,6 +43,16 @@ loader& loader::instance() {
 }
 
 /**
+ *  Cleanup the loader singleton.
+ */
+void loader::cleanup() {
+  loader& instance = loader::instance();
+
+  instance._directory = "";
+  instance._modules.clear();
+}
+
+/**
  *  Load modules in the specify directory.
  *
  *  @return Number of modules loaded.
@@ -62,14 +72,14 @@ unsigned int loader::load() {
       module = add_module(dir.path() + "/" + it->fileName(), config_file);
       module->open();
       logit(NSLOG_INFO_MESSAGE, false,
-        "Event broker module `%s' initialized successfully.\n",
+        "Event broker module '%s' initialized successfully.\n",
         it->fileName().toStdString().c_str());
       ++loaded;
     }
     catch (error const& e) {
       del_module(module);
       logit(NSLOG_RUNTIME_ERROR, false,
-        "Error: Could not load module `%s' -> %s\n",
+        "Error: Could not load module '%s' -> %s\n",
         it->fileName().toStdString().c_str(),
         e.what());
     }
@@ -88,7 +98,7 @@ void loader::unload() {
        ++it) {
     it.value()->close();
     log_debug_info(DEBUGL_EVENTBROKER, 0,
-      "Module `%s' unloaded successfully.\n",
+      "Module '%s' unloaded successfully.\n",
       it.value()->get_filename().toStdString().c_str());
   }
   _modules.clear();
@@ -105,32 +115,54 @@ void loader::unload() {
 QSharedPointer<handle> loader::add_module(QString const& filename,
 					  QString const& args) {
   QSharedPointer<handle> module(new handle(filename, args));
-
-  connect(&(*module), SIGNAL(name_changed(QString const&, QString const&)),
-  	  this, SLOT(module_name_changed(QString const&, QString const&)));
-
   broker::compatibility& compatibility = broker::compatibility::instance();
-  connect(&(*module), SIGNAL(event_create(broker::handle*)),
-  	  &compatibility, SLOT(create_module(broker::handle*)));
-  connect(&(*module), SIGNAL(event_destroy(broker::handle*)),
-  	  &compatibility, SLOT(destroy_module(broker::handle*)));
-  connect(&(*module), SIGNAL(event_name(broker::handle*)),
-  	  &compatibility, SLOT(name_module(broker::handle*)));
-  connect(&(*module), SIGNAL(event_author(broker::handle*)),
-  	  &compatibility, SLOT(author_module(broker::handle*)));
-  connect(&(*module), SIGNAL(event_copyright(broker::handle*)),
-  	  &compatibility, SLOT(copyright_module(broker::handle*)));
-  connect(&(*module), SIGNAL(event_version(broker::handle*)),
-  	  &compatibility, SLOT(version_module(broker::handle*)));
-  connect(&(*module), SIGNAL(event_license(broker::handle*)),
-  	  &compatibility, SLOT(license_module(broker::handle*)));
-  connect(&(*module), SIGNAL(event_description(broker::handle*)),
-  	  &compatibility, SLOT(description_module(broker::handle*)));
-  connect(&(*module), SIGNAL(event_loaded(broker::handle*)),
-  	  &compatibility, SLOT(loaded_module(broker::handle*)));
-  connect(&(*module), SIGNAL(event_unloaded(broker::handle*)),
-  	  &compatibility, SLOT(unloaded_module(broker::handle*)));
 
+  if (connect(&(*module),
+	      SIGNAL(name_changed(QString const&, QString const&)),
+	      this,
+	      SLOT(module_name_changed(QString const&, QString const&))) == false
+      || connect(&(*module),
+		 SIGNAL(event_create(broker::handle*)),
+		 &compatibility,
+		 SLOT(create_module(broker::handle*))) == false
+      || connect(&(*module),
+		 SIGNAL(event_destroy(broker::handle*)),
+		 &compatibility,
+		 SLOT(destroy_module(broker::handle*))) == false
+      || connect(&(*module),
+		 SIGNAL(event_name(broker::handle*)),
+		 &compatibility,
+		 SLOT(name_module(broker::handle*))) == false
+      || connect(&(*module),
+		 SIGNAL(event_author(broker::handle*)),
+		 &compatibility,
+		 SLOT(author_module(broker::handle*))) == false
+      || connect(&(*module),
+		 SIGNAL(event_copyright(broker::handle*)),
+		 &compatibility,
+		 SLOT(copyright_module(broker::handle*))) == false
+      || connect(&(*module),
+		 SIGNAL(event_version(broker::handle*)),
+		 &compatibility,
+		 SLOT(version_module(broker::handle*))) == false
+      || connect(&(*module),
+		 SIGNAL(event_license(broker::handle*)),
+		 &compatibility,
+		 SLOT(license_module(broker::handle*))) == false
+      || connect(&(*module),
+		 SIGNAL(event_description(broker::handle*)),
+		 &compatibility,
+		 SLOT(description_module(broker::handle*))) == false
+      || connect(&(*module),
+		 SIGNAL(event_loaded(broker::handle*)),
+		 &compatibility,
+		 SLOT(loaded_module(broker::handle*))) == false
+      || connect(&(*module),
+		 SIGNAL(event_unloaded(broker::handle*)),
+		 &compatibility,
+		 SLOT(unloaded_module(broker::handle*))) == false) {
+    throw (engine_error() << "connect module to broker::compatibility failed.");
+  }
   return (_modules.insert(filename, module).value());
 }
 
@@ -189,7 +221,7 @@ void loader::module_name_changed(QString const& old_name,
       return;
     }
   }
-  throw (engine_error() << "Module `" << old_name << "' not found");
+  throw (engine_error() << "Module '" << old_name << "' not found");
 }
 
 /**************************************

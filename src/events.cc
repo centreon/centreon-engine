@@ -1059,7 +1059,6 @@ int event_execution_loop(void) {
   host* temp_host = NULL;
   service* temp_service = NULL;
   struct timespec delay;
-  pid_t wait_result;
 
   log_debug_info(DEBUGL_FUNCTIONS, 0, "event_execution_loop() start\n");
 
@@ -1126,11 +1125,6 @@ int event_execution_loop(void) {
     log_debug_info(DEBUGL_EVENTS, 1, "Current/Max Service Checks: %d/%d\n",
                    currently_running_service_checks,
                    config.get_max_parallel_service_checks());
-
-    /* get rid of terminated child processes (zombies) */
-    if (config.get_child_processes_fork_twice() == false) {
-      while ((wait_result = waitpid(-1, NULL, WNOHANG)) > 0);
-    }
 
     /* handle high priority events */
     if (event_list_high != NULL && (current_time >= event_list_high->run_time)) {

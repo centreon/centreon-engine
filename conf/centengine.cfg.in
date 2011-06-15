@@ -172,13 +172,6 @@ external_command_buffer_slots=4096
 temp_file=@localstatedir@/nagios.tmp
 
 
-# var:   temp_path
-# brif:  This is path where Centreon Engine can create temp files for service and host
-#        check results, etc.
-
-temp_path=@TMPDIR@
-
-
 # var:    event_broker_options
 # brief:  Controls what (if any) data gets sent to the event broker.
 # values: 0       = Broker nothing.
@@ -402,23 +395,6 @@ check_result_reaper_frequency=10
 #         back to Centreon Engine so it can perform other duties.
 
 max_check_result_reaper_time=30
-
-
-# var:    check_result_path
-# brief:  This is directory where Centreon Engine stores the results of host and
-#         service checks that have not yet been processed.
-#         Note: Make sure that only one instance of Centreon Engine has access
-#         to this directory!
-
-check_result_path=@CHECK_RESULT_DIR@
-
-
-# var:    max_check_result_file_age
-# brief:  This option determines the maximum age (in seconds) which check result
-#         files are considered to be valid. Files older than this threshold will
-#         be mercilessly deleted without further processing.
-
-max_check_result_file_age=3600
 
 
 # var:    cached_host_check_horizon

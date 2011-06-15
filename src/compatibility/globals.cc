@@ -33,10 +33,22 @@ int           verify_object_relationships(1);
 int           bare_update_checks(0);
 int           check_for_updates(0);
 int           update_available(0);
-unsigned long update_uid;
+unsigned long update_uid(0);
 char*         last_program_version(NULL);
 char*         new_program_version(NULL);
 
 // Retention flags.
 unsigned long retained_process_service_attribute_mask(0);
 unsigned long retained_service_attribute_mask(0);
+
+// Commands execution system.
+unsigned int  child_processes_fork_twice(-1);
+unsigned long max_check_result_file_age(-1);
+
+// Embedded_perl.
+unsigned int  enable_embedded_perl(false);
+unsigned int  use_embedded_perl_implicitly(false);
+
+// Old path.
+char const*   temp_path("/tmp");
+char const*   check_result_path("/tmp");

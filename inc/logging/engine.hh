@@ -54,6 +54,7 @@ namespace                    com {
 	  };
 
 	  static engine&     instance();
+	  static void        cleanup();
 
 	  void               log(char const* message,
 				 unsigned long long type,

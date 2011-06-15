@@ -76,7 +76,7 @@ unsigned int              currently_running_host_checks = 0;
 time_t                    program_start = 0L;
 time_t                    event_start = 0L;
 
-int                       embedded_perl_initialized = FALSE;
+int                       embedded_perl_initialized = false;
 
 host*                     host_list = NULL;
 host*                     host_list_tail = NULL;
@@ -109,8 +109,8 @@ int                       __nagios_object_structure_version = CURRENT_OBJECT_STR
 
 notification*             notification_list = NULL;
 
-check_result              check_result_info;
-check_result*             check_result_list = NULL;
+// check_result              check_result_info;
+// check_result*             check_result_list = NULL;
 
 dbuf                      check_result_dbuf;
 
@@ -156,8 +156,6 @@ unsigned int debug_verbosity;
 char* debug_file = NULL;
 unsigned long max_debug_file_size;
 char* command_file = NULL;
-char* temp_path = NULL;
-char* check_result_path = NULL;
 char* global_host_event_handler = NULL;
 char* global_service_event_handler = NULL;
 char* ocsp_command = NULL;
@@ -180,7 +178,6 @@ int additional_freshness_latency;
 unsigned long retained_host_attribute_mask;
 unsigned long retained_process_host_attribute_mask;
 unsigned long retained_contact_service_attribute_mask;
-unsigned long max_check_result_file_age;
 unsigned long retained_contact_host_attribute_mask;
 unsigned int obsess_over_services;
 unsigned int obsess_over_hosts;
@@ -248,8 +245,5 @@ unsigned int use_true_regexp_matching;
 unsigned int use_large_installation_tweaks;
 unsigned int enable_environment_macros;
 unsigned int free_child_process_memory;
-unsigned int child_processes_fork_twice;
-unsigned int enable_embedded_perl;
-unsigned int use_embedded_perl_implicitly;
 int external_command_buffer_slots;
 // auth_file;

@@ -201,7 +201,7 @@ int skiplist_free(skiplist** list) {
   /* free header and all list nodes */
   for (self = (*list)->head; self != NULL; self = next) {
     next = self->forward[0];
-    delete self;
+    delete[] self;
   }
 
   /* free list structure */

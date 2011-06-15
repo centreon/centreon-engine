@@ -30,7 +30,8 @@ add_library("cce_compatibility"
   STATIC
   "${SRC_DIR}/common.cc"
   "${SRC_DIR}/globals.cc"
-  "${SRC_DIR}/logging.cc")
+  "${SRC_DIR}/logging.cc"
+  "${SRC_DIR}/utils.cc")
 
 # Link target.
 target_link_libraries("cce_compatibility" "cce_core")

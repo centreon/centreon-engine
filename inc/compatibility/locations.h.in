@@ -20,23 +20,33 @@
 #ifndef CCE_LOCATIONS_H
 # define CCE_LOCATIONS_H
 
-# define DEFAULT_TEMP_FILE             "@localstatedir@/tempfile"
+# ifndef DEFAULT_TEMP_FILE
+#  define DEFAULT_TEMP_FILE             "@localstatedir@/tempfile"
+# endif // !DEFAULT_TEMP_FILE
 # define DEFAULT_TEMP_PATH             "@TMPDIR@"
 # define DEFAULT_CHECK_RESULT_PATH     "@CHECK_RESULT_DIR@"
 # define DEFAULT_STATUS_FILE           "@localstatedir@/status.dat"
-# define DEFAULT_LOG_FILE              "@localstatedir@/nagios.log"
-# define DEFAULT_LOG_ARCHIVE_PATH      "@LOG_ARCHIVE_DIR@"
-# define DEFAULT_DEBUG_FILE            "@localstatedir@/nagios.debug"
+# ifndef DEFAULT_LOG_FILE
+#  define DEFAULT_LOG_FILE              "@localstatedir@/nagios.log"
+# endif // !DEFAULT_LOG_FILE
+# ifndef DEFAULT_LOG_ARCHIVE_PATH
+#  define DEFAULT_LOG_ARCHIVE_PATH      "@LOG_ARCHIVE_DIR@"
+# endif // !DEFAULT_LOG_ARCHIVE_PATH
+# ifndef DEFAULT_DEBUG_FILE
+#  define DEFAULT_DEBUG_FILE            "@localstatedir@/nagios.debug"
+# endif // !DEFAULT_DEBUG_FILE
 # define DEFAULT_COMMENT_FILE          "@localstatedir@/comments.dat"
 # define DEFAULT_DOWNTIME_FILE         "@localstatedir@/downtime.dat"
 # define DEFAULT_RETENTION_FILE        "@localstatedir@/retention.dat"
-# define DEFAULT_COMMAND_FILE          "@localstatedir@/centengine.cmd"
-# define DEFAULT_CONFIG_FILE           "@confdir@/centengine.cfg"
+# ifndef DEFAULT_COMMAND_FILE
+#  define DEFAULT_COMMAND_FILE          "@localstatedir@/centengine.cmd"
+# endif // !DEFAULT_COMMAND_FILE
+# ifndef DEFAULT_CONFIG_FILE
+#  define DEFAULT_CONFIG_FILE           "@confdir@/centengine.cfg"
+# endif // !DEFAULT_CONFIG_FILE
 # define DEFAULT_LOCK_FILE             "@localstatedir@/centengine.lock"
 # define DEFAULT_OBJECT_CACHE_FILE     "@localstatedir@/objects.cache"
 # define DEFAULT_PRECACHED_OBJECT_FILE "@localstatedir@/objects.precache"
 # define DEFAULT_EVENT_BROKER_FILE     "@localstatedir@/broker.socket"
-# define DEFAULT_P1_FILE               "@bindir@/p1.pl" /* EMBEDDED PERL */
-# define DEFAULT_AUTH_FILE             ""               /* EMBEDDED PERL - IS THIS USED? */
 
 #endif /* !CCE_LOCATIONS_H */

@@ -548,8 +548,8 @@ int grab_macro_value(nagios_macros* mac,
 
 int grab_macrox_value(nagios_macros* mac,
 		      int macro_type,
-		      char* arg1,
-                      char* arg2,
+		      char const* arg1,
+                      char const* arg2,
 		      char** output,
 		      int* free_macro) {
   host* temp_host = NULL;
@@ -1163,8 +1163,11 @@ int grab_macrox_value(nagios_macros* mac,
 }
 
 /* calculates the value of a custom macro */
-int grab_custom_macro_value(nagios_macros* mac, char* macro_name,
-                            char* arg1, char* arg2, char** output) {
+int grab_custom_macro_value(nagios_macros* mac,
+			    char* macro_name,
+                            char const* arg1,
+			    char const* arg2,
+			    char** output) {
   host* temp_host = NULL;
   hostgroup* temp_hostgroup = NULL;
   hostsmember* temp_hostsmember = NULL;
@@ -1359,8 +1362,8 @@ int grab_custom_macro_value(nagios_macros* mac, char* macro_name,
 /* calculates a date/time macro */
 int grab_datetime_macro(nagios_macros* mac,
 			int macro_type,
-			char* arg1,
-                        char* arg2,
+			char const* arg1,
+                        char const* arg2,
 			char** output) {
   time_t current_time = 0L;
   timeperiod* temp_timeperiod = NULL;
@@ -1546,15 +1549,15 @@ int grab_standard_host_macro(nagios_macros* mac,
     break;
 
   case MACRO_HOSTATTEMPT:
-    *output = obj2pchar(temp_host->last_state);
+    *output = obj2pchar(temp_host->current_attempt);
     break;
 
   case MACRO_MAXHOSTATTEMPTS:
-    *output = obj2pchar(temp_host->last_state);
+    *output = obj2pchar(temp_host->max_attempts);
     break;
 
   case MACRO_HOSTDOWNTIME:
-    *output = obj2pchar(temp_host->last_state);
+    *output = obj2pchar(temp_host->scheduled_downtime_depth);
     break;
 
   case MACRO_HOSTPERCENTCHANGE:{
@@ -1961,7 +1964,7 @@ int grab_standard_service_macro(nagios_macros* mac,
     break;
 
   case MACRO_SERVICESTATEID:
-    *output = obj2pchar(temp_service->last_state);
+    *output = obj2pchar(temp_service->current_state);
     break;
 
   case MACRO_LASTSERVICESTATE:
@@ -1980,15 +1983,15 @@ int grab_standard_service_macro(nagios_macros* mac,
     break;
 
   case MACRO_SERVICEISVOLATILE:
-    *output = obj2pchar(temp_service->last_state);
+    *output = obj2pchar(temp_service->is_volatile);
     break;
 
   case MACRO_SERVICEATTEMPT:
-    *output = obj2pchar(temp_service->last_state);
+    *output = obj2pchar(temp_service->current_attempt);
     break;
 
   case MACRO_MAXSERVICEATTEMPTS:
-    *output = obj2pchar(temp_service->last_state);
+    *output = obj2pchar(temp_service->max_attempts);
     break;
 
   case MACRO_SERVICEEXECUTIONTIME:{
@@ -2030,7 +2033,7 @@ int grab_standard_service_macro(nagios_macros* mac,
     break;
 
   case MACRO_SERVICEDOWNTIME:
-    *output = obj2pchar(temp_service->last_state);
+    *output = obj2pchar(temp_service->scheduled_downtime_depth);
     break;
 
   case MACRO_SERVICEPERCENTCHANGE:{
@@ -2070,7 +2073,7 @@ int grab_standard_service_macro(nagios_macros* mac,
     break;
 
   case MACRO_SERVICENOTIFICATIONNUMBER:
-    *output = obj2pchar(temp_service->last_state);
+    *output = obj2pchar(temp_service->current_notification_number);
     break;
 
   case MACRO_SERVICENOTIFICATIONID:

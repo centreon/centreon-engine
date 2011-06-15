@@ -137,18 +137,6 @@
  *  creates to use when updating comment data, status data, etc. The
  *  file is deleted when it is no longer needed.
  *
- *  @subsection mainconfigurationfileoptionsconfigurationfilevariablestemppath Temp Path
- *
- *  @code
- *  Format:  temp_path=<dir_name>
- *  Example: temp_path=/tmp
- *  @endcode
- *
- *  This is a directory that Centreon Engine can use as scratch space
- *  for creating temporary files used during the monitoring process.
- *  You should run tmpwatch, or a similiar utility, on this directory
- *  occassionally to delete files older than 24 hours.
- *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariablesstatusfile Status File
  *
  *  @code
@@ -904,42 +892,6 @@
  *  This variable allows you to limit the amount of time that an
  *  individual reaper event will run before it hands control back over
  *  to Centreon Engine for other portions of the monitoring logic.
- *
- *  @subsection mainconfigurationfileoptionsconfigurationfilevariablescheckresultpath Check Result Path
- *
- *  @code
- *  Format:  check_result_path=<path>
- *  Example: check_result_path=/var/spool/centengine/checkresults
- *  @endcode
- *
- *  This options determines which directory Centreon Engine will use
- *  to temporarily store host and service check results before they are
- *  processed. This directory should not be used to store any other
- *  files, as Centreon Engine will periodically clean this directory
- *  of old file (see the @ref mainconfigurationfileoptionsconfigurationfilevariablesmaxcheckresultfileage
- *  "max_check_result_file_age" option for more information).
- *
- *  @note Make sure that only a single instance of Centreon Engine
- *  has access to the check result path. If multiple instances of
- *  Centreon Engine have their check result path set to the same
- *  directory, you will run into problems with check results being
- *  processed (incorrectly) by the wrong instance of Centreon Engine!
- *
- *  @subsection mainconfigurationfileoptionsconfigurationfilevariablesmaxcheckresultfileage Max Check Result File Age
- *
- *  @code
- *  Format:  max_check_result_file_age=<seconds>
- *  Example: max_check_result_file_age=3600
- *  @endcode
- *
- *  This options determines the maximum age in seconds that Centreon
- *  Engine will consider check result files found in the
- *  @ref mainconfigurationfileoptionsconfigurationfilevariablescheckresultpath "check_result_path" directory to be
- *  valid. Check result files that are older that this threshold will
- *  be deleted by Centreon Engine and the check results they contain
- *  will not be processed. By using a value of zero (0) with this
- *  option, Centreon Engine will process all check result files -
- *  even if they're older than your hardware :-).
  *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariableshostintercheckdelaymethod Host Inter-Check Delay Method
  *

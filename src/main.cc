@@ -51,6 +51,9 @@
 #include "logging/engine.hh"
 #include "engine.hh"
 #include "compatibility/common.h"
+#include "commands/set.hh"
+#include "commands/raw.hh"
+#include "checks/checker.hh"
 
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;
@@ -61,20 +64,16 @@ using namespace com::centreon::engine::logging;
 #endif /* !ENGINE_VERSION */
 
 // Error message when configuration parsing fail.
-#define ERROR_CONFIGURATION "    Check your configuration file(s) to ensure that they contain valid\n" \
-                            "    directives and data defintions. If you are upgrading from a\n" \
-                            "    previous version of Centreon Engine, you should be aware that some\n" \
-                            "    variables/definitions may have been removed or modified in this\n" \
-                            "    version. Make sure to read the documentation regarding the config\n" \
-                            "    files, as well as the version changelog to find out what has\n" \
-                            "    changed.\n\n"
+#define ERROR_CONFIGURATION						\
+  "    Check your configuration file(s) to ensure that they contain valid\n" \
+  "    directives and data defintions. If you are upgrading from a\n"	\
+  "    previous version of Centreon Engine, you should be aware that some\n" \
+  "    variables/definitions may have been removed or modified in this\n" \
+  "    version. Make sure to read the documentation regarding the config\n" \
+  "    files, as well as the version changelog to find out what has\n"	\
+  "    changed.\n\n"
 
-// Following main() declaration required by older versions of Perl ut 5.00503.
-#ifdef EMBEDDEDPERL
-int main(int argc, char** argv, char** env) {
-#else
 int main(int argc, char** argv) {
-#endif // EMBEDDEDPERL
   QCoreApplication app(argc, argv);
 
   configuration::applier::logging apply_log;
@@ -432,10 +431,6 @@ int main(int argc, char** argv) {
         if (sigrestart == TRUE) {
           // Clean up the status data.
           cleanup_status_data(config_file, TRUE);
-
-          // Cleanup embedded perl interpreter.
-          if (embedded_perl_initialized == TRUE)
-            deinit_embedded_perl();
         }
 
         // Send program data to broker.
@@ -445,20 +440,6 @@ int main(int argc, char** argv) {
                              NULL);
         cleanup();
         exit(ERROR);
-      }
-
-      /* initialize embedded Perl interpreter */
-      /* NOTE 02/15/08 embedded Perl must be initialized if compiled in, regardless of whether or not its enabled in the config file */
-      /* It compiled it, but not initialized, Centreon Engine will segfault in readdir() calls, as libperl takes this function over */
-      if (embedded_perl_initialized == FALSE) {
-        /*                                if(enable_embedded_perl==TRUE){*/
-#ifdef EMBEDDEDPERL
-        init_embedded_perl(env);
-#else
-        init_embedded_perl(NULL);
-#endif
-        embedded_perl_initialized = TRUE;
-        /*                                        }*/
       }
 
       // Handle signals (interrupts).
@@ -495,6 +476,16 @@ int main(int argc, char** argv) {
 
       // Update all status data (with retained information).
       update_all_status_data();
+
+      // Initialize command executon system.
+      commands::set& cmd_set = commands::set::instance();
+      void* ptr = NULL;
+      for (command* cmd = static_cast<command*>(skiplist_get_first(object_skiplists[COMMAND_SKIPLIST], &ptr));
+	   cmd != NULL;
+	   cmd = static_cast<command*>(skiplist_get_next(&ptr))) {
+	QSharedPointer<commands::command> new_command(new commands::raw(cmd->name, cmd->command_line));
+	cmd_set.add_command(new_command);
+      }
 
       // Log initial host and service state.
       log_host_states(INITIAL_STATES, NULL);
@@ -597,10 +588,6 @@ int main(int argc, char** argv) {
       if (sigrestart == FALSE)
         cleanup_status_data(config_file, TRUE);
 
-      // Cleanup embedded perl interpreter.
-      if (sigrestart == FALSE)
-        deinit_embedded_perl();
-
       // Shutdown stuff.
       if (sigshutdown == TRUE) {
         // Log a shutdown message.
@@ -619,6 +606,12 @@ int main(int argc, char** argv) {
     // Free misc memory.
     delete[] config_file;
   }
+
+  // unload singleton.
+  broker::loader::cleanup();
+  commands::set::cleanup();
+  checks::checker::cleanup();
+  logging::engine::cleanup();
 
   return (OK);
 }

@@ -161,7 +161,6 @@ int pre_flight_check(void) {
   int errors = 0;
   struct timeval tv[4];
   double runtime[4];
-  int temp_path_fd = -1;
 
   if (test_scheduling == TRUE)
     gettimeofday(&tv[0], NULL);
@@ -283,40 +282,6 @@ int pre_flight_check(void) {
   /**************************************************/
   if (verify_config == TRUE)
     printf("Checking misc settings...\n");
-
-  /* check if we can write to temp_path */
-  std::ostringstream oss;
-  oss << config.get_temp_path().toStdString() << "/centreonengineXXXXXX";
-  buf = my_strdup(oss.str().c_str());
-  if ((temp_path_fd = mkstemp(buf)) == -1) {
-    logit(NSLOG_VERIFICATION_ERROR, TRUE,
-          "\tError: Unable to write to temp_path ('%s') - %s\n",
-          config.get_temp_path().toStdString().c_str(),
-	  strerror(errno));
-    errors++;
-  }
-  else {
-    close(temp_path_fd);
-    remove(buf);
-  }
-  delete[] buf;
-
-  /* check if we can write to check_result_path */
-  oss.str("");
-  oss << config.get_check_result_path().toStdString() << "/centreonengineXXXXXX";
-  buf = my_strdup(oss.str().c_str());
-  if ((temp_path_fd = mkstemp(buf)) == -1) {
-    logit(NSLOG_VERIFICATION_WARNING, TRUE,
-          "\tError: Unable to write to check_result_path ('%s') - %s\n",
-          config.get_check_result_path().toStdString().c_str(),
-	  strerror(errno));
-    errors++;
-  }
-  else {
-    close(temp_path_fd);
-    remove(buf);
-  }
-  delete[] buf;
 
   /* warn if user didn't specify any illegal macro output chars */
   if (config.get_illegal_output_chars() == "") {
