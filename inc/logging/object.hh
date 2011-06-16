@@ -20,10 +20,6 @@
 #ifndef CCE_LOGGING_OBJECT_HH
 # define CCE_LOGGING_OBJECT_HH
 
-# ifndef __GNUG__
-#  define __PRETTY_FUNCTION__ __func__
-# endif // !__GNUG__
-
 namespace                 com {
   namespace               centreon {
     namespace             engine {
