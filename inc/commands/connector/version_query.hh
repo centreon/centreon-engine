@@ -34,6 +34,8 @@ namespace                  com {
 	                   ~version_query() throw();
 
 	    version_query& operator=(version_query const& right);
+	    bool           operator==(version_query const& right) const throw();
+	    bool           operator!=(version_query const& right) const throw();
 
 	    request*       clone() const;
 

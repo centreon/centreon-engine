@@ -92,4 +92,12 @@ if (WITH_TESTING)
   add_executable("request_version" "${TEST_DIR}/request_version.cc")
   target_link_libraries("request_version" "cce_commands" ${QT_LIBRARIES})
   add_test("request_version" "request_version")
+
+  add_executable("request_execute" "${TEST_DIR}/request_execute.cc")
+  target_link_libraries("request_execute" "cce_commands" ${QT_LIBRARIES})
+  add_test("request_execute" "request_execute")
+
+  add_executable("request_builder" "${TEST_DIR}/request_builder.cc")
+  target_link_libraries("request_builder" "cce_commands" ${QT_LIBRARIES})
+  add_test("request_builder" "request_builder")
 endif ()

@@ -35,6 +35,8 @@ namespace                     com {
 	                      ~version_response() throw();
 
 	    version_response& operator=(version_response const& right);
+	    bool              operator==(version_response const& right) const throw();
+	    bool              operator!=(version_response const& right) const throw();
 
 	    request*          clone() const;
 

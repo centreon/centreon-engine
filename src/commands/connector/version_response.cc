@@ -30,7 +30,7 @@ version_response::version_response(unsigned int major, unsigned int minor)
 
 version_response::version_response(version_response const& right)
   : request(right) {
-
+  operator=(right);
 }
 
 version_response::~version_response() throw() {
@@ -44,6 +44,16 @@ version_response& version_response::operator=(version_response const& right) {
     _minor = right._minor;
   }
   return (*this);
+}
+
+bool version_response::operator==(version_response const& right) const throw() {
+  return (request::operator==(right) == true
+	  && _major == right._major
+	  && _minor == right._minor);
+}
+
+bool version_response::operator!=(version_response const& right) const throw() {
+  return (!operator==(right));
 }
 
 request* version_response::clone() const {

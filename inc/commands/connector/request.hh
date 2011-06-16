@@ -43,6 +43,8 @@ namespace                            com {
 	    virtual                  ~request() throw();
 
 	    request&                 operator=(request const& right);
+	    bool                     operator==(request const& right) const throw();
+	    bool                     operator!=(request const& right) const throw();
 
 	    static QByteArray const& cmd_ending() throw();
 

@@ -34,6 +34,8 @@ namespace                  com {
 	                   ~quit_response() throw();
 
 	    quit_response& operator=(quit_response const& right);
+	    bool           operator==(quit_response const& right) const throw();
+	    bool           operator!=(quit_response const& right) const throw();
 
 	    request*       clone() const;
 

@@ -23,9 +23,9 @@
 using namespace com::centreon::engine::commands::connector;
 
 execute_query::execute_query(unsigned long cmd_id,
-		 QString const& cmd,
-		 QDateTime const& start_time,
-		 int timeout)
+			     QString const& cmd,
+			     QDateTime const& start_time,
+			     int timeout)
   : request(request::execute_q),
     _cmd(cmd),
     _start_time(start_time),
@@ -53,6 +53,18 @@ execute_query& execute_query::operator=(execute_query const& right) {
     _timeout = right._timeout;
   }
   return (*this);
+}
+
+bool execute_query::operator==(execute_query const& right) const throw() {
+  return (request::operator==(right) == true
+	  && _cmd == right._cmd
+	  && _start_time == right._start_time
+	  && _id == right._id
+	  && _timeout == right._timeout);
+}
+
+bool execute_query::operator!=(execute_query const& right) const throw() {
+  return (!operator==(right));
 }
 
 request* execute_query::clone() const {

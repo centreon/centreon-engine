@@ -41,6 +41,14 @@ request& request::operator=(request const& right) {
   return (*this);
 }
 
+bool request::operator==(request const& right) const throw() {
+  return (_id == right._id);
+}
+
+bool request::operator!=(request const& right) const throw() {
+  return (!operator==(right));
+}
+
 QByteArray const& request::cmd_ending() throw() {
   static QByteArray ending(4, '\0');
   return (ending);

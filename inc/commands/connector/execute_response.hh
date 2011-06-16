@@ -41,6 +41,8 @@ namespace                     com {
 	                      ~execute_response() throw();
 
 	    execute_response& operator=(execute_response const& right);
+	    bool              operator==(execute_response const& right) const throw();
+	    bool              operator!=(execute_response const& right) const throw();
 
 	    request*          clone() const;
 

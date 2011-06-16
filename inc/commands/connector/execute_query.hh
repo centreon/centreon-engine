@@ -40,6 +40,8 @@ namespace                    com {
 	                     ~execute_query() throw();
 
 	    execute_query&   operator=(execute_query const& right);
+	    bool             operator==(execute_query const& right) const throw();
+	    bool             operator!=(execute_query const& right) const throw();
 
 	    request*         clone() const;
 

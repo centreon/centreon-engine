@@ -42,6 +42,14 @@ quit_response& quit_response::operator=(quit_response const& right) {
   return (*this);
 }
 
+bool quit_response::operator==(quit_response const& right) const throw() {
+  return (request::operator==(right));
+}
+
+bool quit_response::operator!=(quit_response const& right) const throw() {
+  return (!operator==(right));
+}
+
 request* quit_response::clone() const {
   return (new quit_response(*this));
 }

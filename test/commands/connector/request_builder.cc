@@ -1,5 +1,5 @@
 /*
-** Copyright 2011 Merethis
+** Copyright 2011      Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -20,44 +20,42 @@
 #include <QCoreApplication>
 #include <QDebug>
 #include <exception>
-#include "commands/connector/quit_query.hh"
-#include "commands/connector/quit_response.hh"
-#include "check_request.hh"
+#include "commands/connector/request_builder.hh"
 
 using namespace com::centreon::engine::commands::connector;
 
-#define QUERY         "4" CMD_END
-#define RESPONSE      "5" CMD_END
+bool is_valid() {
+  request_builder& builder = request_builder::instance();
+  if (builder.build("0\0\0\0\0").isNull() == true
+      || builder.build("4\0\0\0\0").isNull() == true
+      || builder.build("5\0\0\0\0").isNull() == true) {
+    return (false);
+  }
+  return (true);
+}
+
+bool is_invalid() {
+  request_builder& builder = request_builder::instance();
+  try {
+    builder.build(".\0\0\0\0");
+  }
+  catch (...) {
+    return (true);
+  }
+  return (false);
+}
 
 int main(int argc, char** argv) {
   try {
     QCoreApplication app(argc, argv);
 
-    quit_query query;
-    if (check_request_valid(&query, REQUEST(QUERY)) == false) {
-      qDebug() << "error: query is valid failed.";
-      return (1);
-    }
-    if (check_request_invalid(&query) == false) {
-      qDebug() << "error: query is invalid failed.";
-      return (1);
-    }
-    if (check_request_clone(&query) == false) {
-      qDebug() << "error: query clone failed";
+    if (is_valid() == false) {
+      qDebug() << "error: is valid failed.";
       return (1);
     }
 
-    quit_response response;
-    if (check_request_valid(&response, REQUEST(RESPONSE)) == false) {
-      qDebug() << "error: response is valid failed.";
-      return (1);
-    }
-    if (check_request_invalid(&response) == false) {
-      qDebug() << "error: response is invalid failed.";
-      return (1);
-    }
-    if (check_request_clone(&response) == false) {
-      qDebug() << "error: response clone failed";
+    if (is_invalid() == false) {
+      qDebug() << "error: is invalid failed.";
       return (1);
     }
   }

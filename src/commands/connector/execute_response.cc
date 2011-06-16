@@ -62,6 +62,20 @@ execute_response& execute_response::operator=(execute_response const& right) {
   return (*this);
 }
 
+bool execute_response::operator==(execute_response const& right) const throw() {
+  return (request::operator==(right) == true
+	  && _stderr == right._stderr
+	  && _stdout == right._stdout
+	  && _end_time == right._end_time
+	  && _id == right._id
+	  && _exit_code == right._exit_code
+	  && _is_executed == right._is_executed);
+}
+
+bool execute_response::operator!=(execute_response const& right) const throw() {
+  return (!operator==(right));
+}
+
 request* execute_response::clone() const {
   return (new execute_response(*this));
 }

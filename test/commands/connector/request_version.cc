@@ -22,59 +22,42 @@
 #include <exception>
 #include "commands/connector/version_query.hh"
 #include "commands/connector/version_response.hh"
+#include "check_request.hh"
 
 using namespace com::centreon::engine::commands::connector;
 
-#define TOSTR_(x) #x
-#define TOSTR(x) TOSTR_(x)
-
-#define QUERY         "0\0\0\0\0"
-#define RESPONSE      "1\0" TOSTR(ENGINE_MAJOR) "\0" TOSTR(ENGINE_MINOR) "\0\0\0\0"
-#define BAD           ".\0\0\0\0"
-#define REQUEST(data) QByteArray((data), sizeof((data)) - 1)
-
-const int end_size = request::cmd_ending().size();
-
-bool check_valid(request* req, QByteArray request_data) {
-  QByteArray data = req->build();
-  if (data != request_data) {
-    return (false);
-  }
-  req->restore(data.remove(data.size() - end_size, end_size));
-  return (true);
-}
-
-bool check_invalid(request* req, QByteArray request_data) {
-  try {
-    req->restore(request_data.remove(request_data.size() - end_size, end_size));
-  }
-  catch (...) {
-    return (true);
-  }
-  return (false);
-}
+#define QUERY         "0" CMD_END
+#define RESPONSE      "1\0" TOSTR(ENGINE_MAJOR) "\0" TOSTR(ENGINE_MINOR) CMD_END
 
 int main(int argc, char** argv) {
   try {
     QCoreApplication app(argc, argv);
 
     version_query query;
-    if (check_valid(&query, REQUEST(QUERY)) == false) {
-      qDebug() << "error: version_query::check_valid failed.";
+    if (check_request_valid(&query, REQUEST(QUERY)) == false) {
+      qDebug() << "error: query is valid failed.";
       return (1);
     }
-    if (check_invalid(&query, REQUEST(BAD)) == false) {
-      qDebug() << "error: version_query::check_invalid failed.";
+    if (check_request_invalid(&query) == false) {
+      qDebug() << "error: query is invalid failed.";
+      return (1);
+    }
+    if (check_request_clone(&query) == false) {
+      qDebug() << "error: query clone failed";
       return (1);
     }
 
     version_response response(ENGINE_MAJOR, ENGINE_MINOR);
-    if (check_valid(&response, REQUEST(RESPONSE)) == false) {
-      qDebug() << "error: version_response::check_valid failed.";
+    if (check_request_valid(&response, REQUEST(RESPONSE)) == false) {
+      qDebug() << "error: response is valid failed.";
       return (1);
     }
-    if (check_invalid(&response, REQUEST(BAD)) == false) {
-      qDebug() << "error: version_response::check_invalid failed.";
+    if (check_request_invalid(&response) == false) {
+      qDebug() << "error: response is invalid failed.";
+      return (1);
+    }
+    if (check_request_clone(&response) == false) {
+      qDebug() << "error: response clone failed";
       return (1);
     }
   }

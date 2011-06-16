@@ -44,6 +44,14 @@ version_query& version_query::operator=(version_query const& right) {
   return (*this);
 }
 
+bool version_query::operator==(version_query const& right) const throw() {
+  return (request::operator==(right));
+}
+
+bool version_query::operator!=(version_query const& right) const throw() {
+  return (!operator==(right));
+}
+
 request* version_query::clone() const {
   return (new version_query(*this));
 }

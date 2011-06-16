@@ -42,6 +42,14 @@ quit_query& quit_query::operator=(quit_query const& right) {
   return (*this);
 }
 
+bool quit_query::operator==(quit_query const& right) const throw() {
+  return (request::operator==(right));
+}
+
+bool quit_query::operator!=(quit_query const& right) const throw() {
+  return (!operator==(right));
+}
+
 request* quit_query::clone() const {
   return (new quit_query(*this));
 }
