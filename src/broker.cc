@@ -536,8 +536,8 @@ void broker_program_status(int type,
   ds.obsess_over_services = config.get_obsess_over_services();
   ds.modified_host_attributes = modified_host_process_attributes;
   ds.modified_service_attributes = modified_service_process_attributes;
-  ds.global_host_event_handler = config.get_global_host_event_handler().toStdString().c_str();
-  ds.global_service_event_handler = config.get_global_service_event_handler().toStdString().c_str();
+  ds.global_host_event_handler = config.get_global_host_event_handler().toAscii().constData();
+  ds.global_service_event_handler = config.get_global_service_event_handler().toAscii().constData();
 
   /* make callbacks */
   neb_make_callbacks(NEBCALLBACK_PROGRAM_STATUS_DATA, (void*)&ds);

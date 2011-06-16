@@ -144,7 +144,7 @@ void handle::open() {
   }
 
   if (init(NEBMODULE_NORMAL_LOAD,
-	   _args.toStdString().c_str(),
+	   _args.toAscii().constData(),
 	   this) != OK) {
     close();
     throw (engine_error() << "Function nebmodule_init returned an error");
@@ -181,7 +181,7 @@ void handle::close() {
       if (deinit == NULL) {
 	logit(NSLOG_INFO_MESSAGE, false,
 	      "Cannot resolve symbole 'nebmodule_deinit' in module '%s'.\n",
-	      _filename.toStdString().c_str());
+	      _filename.toAscii().constData());
       }
       else {
 	deinit(NEBMODULE_FORCE_UNLOAD, NEBMODULE_NEB_SHUTDOWN);

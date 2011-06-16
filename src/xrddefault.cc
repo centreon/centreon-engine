@@ -269,8 +269,8 @@ int xrddefault_save_state_information(void) {
   fprintf(fp, "enable_flap_detection=%d\n", config.get_enable_flap_detection());
   fprintf(fp, "enable_failure_prediction=%d\n", config.get_enable_failure_prediction());
   fprintf(fp, "process_performance_data=%d\n", config.get_process_performance_data());
-  fprintf(fp, "global_host_event_handler=%s\n", config.get_global_host_event_handler().toStdString().c_str());
-  fprintf(fp, "global_service_event_handler=%s\n", config.get_global_service_event_handler().toStdString().c_str());
+  fprintf(fp, "global_host_event_handler=%s\n", config.get_global_host_event_handler().toAscii().constData());
+  fprintf(fp, "global_service_event_handler=%s\n", config.get_global_service_event_handler().toAscii().constData());
   fprintf(fp, "next_comment_id=%lu\n", next_comment_id);
   fprintf(fp, "next_downtime_id=%lu\n", next_downtime_id);
   fprintf(fp, "next_event_id=%lu\n", next_event_id);

@@ -318,20 +318,7 @@ void connector::command::_ready_read() {
   QList<QByteArray> responses;
 
   _mutex.lock();
-  QString err = _process.readAllStandardError();
-  if (err != "") {
-    write(1, "stderr: '", 9);
-    write(1, err.toStdString().c_str(), err.size());
-    write(1, "'", 1);
-  }
-
   data += _process.readAllStandardOutput();
-  if (data != "") {
-    write(1, "stdout: '", 9);
-    write(1, data.constData(), data.size());
-    write(1, "'\n", 2);
-  }
-
   while (data.size() > 0) {
     int pos = data.indexOf(request::cmd_ending());
     if (pos < 0) {

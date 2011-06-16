@@ -73,14 +73,14 @@ unsigned int loader::load() {
       module->open();
       logit(NSLOG_INFO_MESSAGE, false,
         "Event broker module '%s' initialized successfully.\n",
-        it->fileName().toStdString().c_str());
+        it->fileName().toAscii().constData());
       ++loaded;
     }
     catch (error const& e) {
       del_module(module);
       logit(NSLOG_RUNTIME_ERROR, false,
         "Error: Could not load module '%s' -> %s\n",
-        it->fileName().toStdString().c_str(),
+        it->fileName().toAscii().constData(),
         e.what());
     }
   }
@@ -99,7 +99,7 @@ void loader::unload() {
     it.value()->close();
     log_debug_info(DEBUGL_EVENTBROKER, 0,
       "Module '%s' unloaded successfully.\n",
-      it.value()->get_filename().toStdString().c_str());
+      it.value()->get_filename().toAscii().constData());
   }
   _modules.clear();
 }

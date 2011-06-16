@@ -262,7 +262,7 @@ void state::reset() {
  */
 void state::parse(QString const& filename) {
   std::ifstream ifs;
-  ifs.open(filename.toStdString().c_str(), std::ifstream::in);
+  ifs.open(filename.toAscii().constData(), std::ifstream::in);
   if (ifs.is_open() == false) {
     throw (engine_error() << "cannot open configuration file: '" << filename << "'");
   }
@@ -314,7 +314,7 @@ void state::parse(QString const& filename) {
   }
 
   if (!get_use_timezone().isEmpty()) {
-    set_environment_var("TZ", get_use_timezone().toStdString().c_str(), 1);
+    set_environment_var("TZ", get_use_timezone().toAscii().constData(), 1);
   }
   tzset();
 
@@ -324,7 +324,7 @@ void state::parse(QString const& filename) {
   }
 
   delete[] _mac->x[MACRO_MAINCONFIGFILE];
-  _mac->x[MACRO_MAINCONFIGFILE] = my_strdup(_filename.toStdString().c_str());
+  _mac->x[MACRO_MAINCONFIGFILE] = my_strdup(_filename.toAscii().constData());
 
   // check path
   set_log_archive_path(get_log_archive_path());
@@ -1106,7 +1106,7 @@ void state::set_log_file(QString const& value) {
   _tab_string[log_file] = value;
 
   delete[] _mac->x[MACRO_LOGFILE];
-  _mac->x[MACRO_LOGFILE] = my_strdup(value.toStdString().c_str());
+  _mac->x[MACRO_LOGFILE] = my_strdup(value.toAscii().constData());
 
   delete[] ::log_file;
   ::log_file = my_strdup(_mac->x[MACRO_LOGFILE]);
@@ -1129,7 +1129,7 @@ void state::set_debug_file(QString const& value) {
   _tab_string[debug_file] = value;
 
   delete[] ::debug_file;
-  ::debug_file = my_strdup(value.toStdString().c_str());
+  ::debug_file = my_strdup(value.toAscii().constData());
 }
 
 /**
@@ -1140,7 +1140,7 @@ void state::set_command_file(QString const& value) {
   _tab_string[command_file] = value;
 
   delete[] _mac->x[MACRO_COMMANDFILE];
-  _mac->x[MACRO_COMMANDFILE] = my_strdup(value.toStdString().c_str());
+  _mac->x[MACRO_COMMANDFILE] = my_strdup(value.toAscii().constData());
 
   delete[] ::command_file;
   ::command_file = my_strdup(_mac->x[MACRO_COMMANDFILE]);
@@ -1154,7 +1154,7 @@ void state::set_temp_file(QString const& value) {
   _tab_string[temp_file] = value;
 
   delete[] _mac->x[MACRO_TEMPFILE];
-  _mac->x[MACRO_TEMPFILE] = my_strdup(value.toStdString().c_str());
+  _mac->x[MACRO_TEMPFILE] = my_strdup(value.toAscii().constData());
 }
 
 /**
@@ -1183,7 +1183,7 @@ void state::set_global_host_event_handler(QString const& value) {
   _tab_string[global_host_event_handler] = value;
 
   delete[] ::global_host_event_handler;
-  ::global_host_event_handler = my_strdup(value.toStdString().c_str());
+  ::global_host_event_handler = my_strdup(value.toAscii().constData());
 }
 
 /**
@@ -1194,7 +1194,7 @@ void state::set_global_service_event_handler(QString const& value) {
   _tab_string[global_service_event_handler] = value;
 
   delete[] ::global_service_event_handler;
-  ::global_service_event_handler = my_strdup(value.toStdString().c_str());
+  ::global_service_event_handler = my_strdup(value.toAscii().constData());
 }
 
 /**
@@ -1205,7 +1205,7 @@ void state::set_ocsp_command(QString const& value) {
   _tab_string[ocsp_command] = value;
 
   delete[] ::ocsp_command;
-  ::ocsp_command = my_strdup(value.toStdString().c_str());
+  ::ocsp_command = my_strdup(value.toAscii().constData());
 }
 
 /**
@@ -1216,7 +1216,7 @@ void state::set_ochp_command(QString const& value) {
   _tab_string[ochp_command] = value;
 
   delete[] ::ochp_command;
-  ::ochp_command = my_strdup(value.toStdString().c_str());
+  ::ochp_command = my_strdup(value.toAscii().constData());
 }
 
 /**
@@ -1238,7 +1238,7 @@ void state::set_log_archive_path(QString const& value) {
 
   // Set compatibility variable.
   delete[] ::log_archive_path;
-  ::log_archive_path = my_strdup(value.toStdString().c_str());
+  ::log_archive_path = my_strdup(value.toAscii().constData());
 }
 
 /**
@@ -1259,7 +1259,7 @@ void state::set_illegal_object_chars(QString const& value) {
   _tab_string[illegal_object_chars] = value;
 
   delete[] ::illegal_object_chars;
-  ::illegal_object_chars = my_strdup(value.toStdString().c_str());
+  ::illegal_object_chars = my_strdup(value.toAscii().constData());
 }
 
 /**
@@ -1270,7 +1270,7 @@ void state::set_illegal_output_chars(QString const& value) {
   _tab_string[illegal_output_chars] = value;
 
   delete[] ::illegal_output_chars;
-  ::illegal_output_chars = my_strdup(value.toStdString().c_str());
+  ::illegal_output_chars = my_strdup(value.toAscii().constData());
 }
 
 /**
@@ -1281,7 +1281,7 @@ void state::set_use_timezone(QString const& value) {
   _tab_string[use_timezone] = value;
 
   delete[] ::use_timezone;
-  ::use_timezone = my_strdup(value.toStdString().c_str());
+  ::use_timezone = my_strdup(value.toAscii().constData());
 }
 
 /**
@@ -1346,8 +1346,8 @@ void state::set_command_check_interval(int value) {
  *  @param[in] value The check interval.
  */
 void state::set_command_check_interval(QString const& value) {
-  size_t pos = value.toStdString().find('s');
   std::string val = value.toStdString();
+  size_t pos = val.find('s');
 
   if (pos == std::string::npos) {
     _command_check_interval_is_seconds = false;
@@ -2516,7 +2516,7 @@ void state::_parse_resource_file(QString const& value) {
 
   // Open resource file.
   std::ifstream ifs;
-  ifs.open(resfile.toStdString().c_str());
+  ifs.open(resfile.toAscii().constData());
   if (ifs.fail()) {
     throw (engine_error() << "cannot open resource file: '"
                           << resfile << "'");
@@ -2563,7 +2563,7 @@ void state::_parse_resource_file(QString const& value) {
   ifs.close();
 
   delete[] _mac->x[MACRO_RESOURCEFILE];
-  _mac->x[MACRO_RESOURCEFILE] = my_strdup(resfile.toStdString().c_str());
+  _mac->x[MACRO_RESOURCEFILE] = my_strdup(resfile.toAscii().constData());
 }
 
 /**
@@ -2583,7 +2583,7 @@ void state::_set_auth_file(QString const& value) {
  */
 void state::_set_admin_email(QString const& value) {
   delete[] _mac->x[MACRO_ADMINEMAIL];
-  _mac->x[MACRO_ADMINEMAIL] = my_strdup(value.toStdString().c_str());
+  _mac->x[MACRO_ADMINEMAIL] = my_strdup(value.toAscii().constData());
 }
 
 /**
@@ -2592,7 +2592,7 @@ void state::_set_admin_email(QString const& value) {
  */
 void state::_set_admin_pager(QString const& value) {
   delete[] _mac->x[MACRO_ADMINPAGER];
-  _mac->x[MACRO_ADMINPAGER] = my_strdup(value.toStdString().c_str());
+  _mac->x[MACRO_ADMINPAGER] = my_strdup(value.toAscii().constData());
 }
 
 /**

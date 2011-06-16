@@ -284,8 +284,8 @@ int xsddefault_save_status_data(void) {
   fprintf(fp, "\tenable_flap_detection=%d\n", config.get_enable_flap_detection());
   fprintf(fp, "\tenable_failure_prediction=%d\n", config.get_enable_failure_prediction());
   fprintf(fp, "\tprocess_performance_data=%d\n", config.get_process_performance_data());
-  fprintf(fp, "\tglobal_host_event_handler=%s\n", config.get_global_host_event_handler().toStdString().c_str());
-  fprintf(fp, "\tglobal_service_event_handler=%s\n", config.get_global_service_event_handler().toStdString().c_str());
+  fprintf(fp, "\tglobal_host_event_handler=%s\n", config.get_global_host_event_handler().toAscii().constData());
+  fprintf(fp, "\tglobal_service_event_handler=%s\n", config.get_global_service_event_handler().toAscii().constData());
   fprintf(fp, "\tnext_comment_id=%lu\n", next_comment_id);
   fprintf(fp, "\tnext_downtime_id=%lu\n", next_downtime_id);
   fprintf(fp, "\tnext_event_id=%lu\n", next_event_id);
