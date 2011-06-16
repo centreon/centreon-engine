@@ -73,7 +73,7 @@ int obsessive_compulsive_service_check_processor(service* svc) {
   /* get the raw command line */
   get_raw_command_line_r(&mac,
 			 ocsp_command_ptr,
-                         config.get_ocsp_command().toAscii().constData(),
+                         qPrintable(config.get_ocsp_command()),
                          &raw_command, macro_options);
   if (raw_command == NULL) {
     clear_volatile_macros(&mac);
@@ -156,7 +156,7 @@ int obsessive_compulsive_host_check_processor(host* hst) {
   /* get the raw command line */
   get_raw_command_line_r(&mac,
 			 ochp_command_ptr,
-                         config.get_ochp_command().toAscii().constData(),
+                         qPrintable(config.get_ochp_command()),
                          &raw_command, macro_options);
   if (raw_command == NULL) {
     clear_volatile_macros(&mac);
@@ -306,7 +306,7 @@ int run_global_service_event_handler(nagios_macros* mac, service* svc) {
   /* get the raw command line */
   get_raw_command_line_r(mac,
 			 global_service_event_handler_ptr,
-                         config.get_global_service_event_handler().toAscii().constData(),
+                         qPrintable(config.get_global_service_event_handler()),
 			 &raw_command,
 			 macro_options);
   if (raw_command == NULL) {
@@ -330,7 +330,7 @@ int run_global_service_event_handler(nagios_macros* mac, service* svc) {
     std::ostringstream oss;
     oss << "GLOBAL SERVICE EVENT HANDLER: " << svc->host_name << ';'
 	<< svc->description << ";$SERVICESTATE$;$SERVICESTATETYPE$;$SERVICEATTEMPT$;"
-	<< config.get_global_service_event_handler().toAscii().constData() << std::endl;
+	<< qPrintable(config.get_global_service_event_handler()) << std::endl;
     raw_logentry = my_strdup(oss.str().c_str());
     process_macros_r(mac, raw_logentry, &processed_logentry, macro_options);
     logit(NSLOG_EVENT_HANDLER, FALSE, "%s", processed_logentry);
@@ -352,7 +352,7 @@ int run_global_service_event_handler(nagios_macros* mac, service* svc) {
 				    config.get_event_handler_timeout(),
 				    early_timeout,
 				    result,
-				    config.get_global_service_event_handler().toAscii().constData(),
+				    qPrintable(config.get_global_service_event_handler()),
 				    processed_command,
 				    NULL,
 				    NULL);
@@ -400,7 +400,7 @@ int run_global_service_event_handler(nagios_macros* mac, service* svc) {
                        config.get_event_handler_timeout(),
                        early_timeout,
 		       result,
-                       config.get_global_service_event_handler().toAscii().constData(),
+                       qPrintable(config.get_global_service_event_handler()),
 		       processed_command,
 		       command_output,
                        NULL);
@@ -653,7 +653,7 @@ int run_global_host_event_handler(nagios_macros* mac, host* hst) {
   /* get the raw command line */
   get_raw_command_line_r(mac,
 			 global_host_event_handler_ptr,
-                         config.get_global_host_event_handler().toAscii().constData(),
+                         qPrintable(config.get_global_host_event_handler()),
                          &raw_command,
 			 macro_options);
   if (raw_command == NULL)
@@ -676,7 +676,7 @@ int run_global_host_event_handler(nagios_macros* mac, host* hst) {
     std::ostringstream oss;
     oss << "GLOBAL HOST EVENT HANDLER: " << hst->name
 	<< "$HOSTSTATE$;$HOSTSTATETYPE$;$HOSTATTEMPT$;"
-	<< config.get_global_host_event_handler().toAscii().constData() << std::endl;
+	<< qPrintable(config.get_global_host_event_handler()) << std::endl;
     raw_logentry = my_strdup(oss.str().c_str());
     process_macros_r(mac, raw_logentry, &processed_logentry, macro_options);
     logit(NSLOG_EVENT_HANDLER, FALSE, "%s", processed_logentry);
@@ -697,7 +697,7 @@ int run_global_host_event_handler(nagios_macros* mac, host* hst) {
 				    exectime,
 				    config.get_event_handler_timeout(),
 				    early_timeout, result,
-				    config.get_global_host_event_handler().toAscii().constData(),
+				    qPrintable(config.get_global_host_event_handler()),
 				    processed_command,
 				    NULL,
 				    NULL);
@@ -745,7 +745,7 @@ int run_global_host_event_handler(nagios_macros* mac, host* hst) {
                        config.get_event_handler_timeout(),
                        early_timeout,
 		       result,
-                       config.get_global_host_event_handler().toAscii().constData(),
+                       qPrintable(config.get_global_host_event_handler()),
                        processed_command,
 		       command_output,
 		       NULL);

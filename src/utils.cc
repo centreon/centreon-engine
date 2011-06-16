@@ -103,10 +103,10 @@ int my_system_r(nagios_macros const* mac,
   *early_timeout = cmd_result.get_is_timeout();
   if (output != NULL && max_output_length > 0) {
     if (cmd_result.get_stdout() != "") {
-      *output = my_strdup(cmd_result.get_stdout().left(max_output_length - 1).toAscii().constData());
+      *output = my_strdup(qPrintable(cmd_result.get_stdout().left(max_output_length - 1)));
     }
     else if (cmd_result.get_stderr() != "") {
-      *output = my_strdup(cmd_result.get_stderr().left(max_output_length - 1).toAscii().constData());
+      *output = my_strdup(qPrintable(cmd_result.get_stderr().left(max_output_length - 1)));
     }
   }
 

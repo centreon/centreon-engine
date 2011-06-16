@@ -128,19 +128,19 @@ int neb_load_module(void* mod) {
     module->open();
     logit(NSLOG_INFO_MESSAGE, false,
           "Event broker module '%s' initialized successfully.\n",
-          module->get_filename().toAscii().constData());
+          qPrintable(module->get_filename()));
   }
   catch (error const& e) {
     logit(NSLOG_RUNTIME_ERROR, false,
           "Error: Could not load module '%s' -> %s\n",
-          module->get_filename().toAscii().constData(),
+          qPrintable(module->get_filename()),
           e.what());
     return (ERROR);
   }
   catch (...) {
     logit(NSLOG_RUNTIME_ERROR, false,
           "Error: Could not load module '%s'\n",
-          module->get_filename().toAscii().constData());
+          qPrintable(module->get_filename()));
     return (ERROR);
   }
   return (OK);
@@ -182,7 +182,7 @@ int neb_unload_module(void* mod, int flags, int reason) {
 
   log_debug_info(DEBUGL_EVENTBROKER, 0,
                  "Attempting to unload module '%s'\n",
-                 module->get_filename().toAscii().constData());
+                 qPrintable(module->get_filename()));
 
   module->close();
 
@@ -191,11 +191,11 @@ int neb_unload_module(void* mod, int flags, int reason) {
 
   log_debug_info(DEBUGL_EVENTBROKER, 0,
                  "Module '%s' unloaded successfully.\n",
-                 module->get_filename().toAscii().constData());
+                 qPrintable(module->get_filename()));
 
   logit(NSLOG_INFO_MESSAGE, false,
         "Event broker module '%s' deinitialized successfully.\n",
-        module->get_filename().toAscii().constData());
+        qPrintable(module->get_filename()));
 
   return (OK);
 }
@@ -246,7 +246,7 @@ int neb_set_module_info(void* handle, int type, char const* data) {
 
     log_debug_info(DEBUGL_EVENTBROKER, 0,
                    "set module info success: filename=%s, type='%d'\n",
-                   module->get_filename().toAscii().constData(),
+                   qPrintable(module->get_filename()),
                    type);
   }
   catch (...) {

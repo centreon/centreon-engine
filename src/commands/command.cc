@@ -138,7 +138,7 @@ commands::command& commands::command::operator=(commands::command const& right) 
  */
 QString commands::command::process_cmd(nagios_macros* macros) const {
   char* command_line = NULL;
-  process_macros_r(macros, _command_line.toAscii().constData(), &command_line, 0);
+  process_macros_r(macros, qPrintable(_command_line), &command_line, 0);
   QString processed_cmd(command_line);
   delete[] command_line;
   return (processed_cmd);

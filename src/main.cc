@@ -199,7 +199,7 @@ int main(int argc, char** argv) {
   // Make sure the config file uses an absolute path.
   if (config_file[0] != '/') {
     // Get absolute path of current working directory.
-    std::string buffer(QDir::currentPath().toAscii().constData());
+    std::string buffer(qPrintable(QDir::currentPath()));
 
     // Append a forward slash.
     buffer.append("/");

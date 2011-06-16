@@ -312,7 +312,7 @@ void checker::run(host* hst,
   commands::set& cmd_set = commands::set::instance();
   QSharedPointer<commands::command> cmd = cmd_set.get_command(hst->check_command_ptr->name);
   QString processed_cmd = cmd->process_cmd(&macros);
-  char* tmp_processed_cmd = my_strdup(processed_cmd.toAscii().constData());
+  char* tmp_processed_cmd = my_strdup(qPrintable(processed_cmd));
 
   // send event broker.
   broker_host_check(NEBTYPE_HOSTCHECK_INITIATE,
@@ -496,7 +496,7 @@ void checker::run(service* svc,
   commands::set& cmd_set = commands::set::instance();
   QSharedPointer<commands::command> cmd = cmd_set.get_command(svc->check_command_ptr->name);
   QString processed_cmd = cmd->process_cmd(&macros);
-  char* tmp_processed_cmd = my_strdup(processed_cmd.toAscii().constData());
+  char* tmp_processed_cmd = my_strdup(qPrintable(processed_cmd));
 
   // send event broker.
   res = broker_service_check(NEBTYPE_SERVICECHECK_INITIATE,
@@ -741,10 +741,10 @@ void checker::_command_executed(commands::result const& res) {
   result.return_code = res.get_exit_code();
   result.exited_ok = res.get_is_executed();
   if (res.get_is_executed() == true && res.get_is_timeout() == false) {
-    result.output = my_strdup(res.get_stdout().toAscii().constData());
+    result.output = my_strdup(qPrintable(res.get_stdout()));
   }
   else {
-    result.output = my_strdup(res.get_stderr().toAscii().constData());
+    result.output = my_strdup(qPrintable(res.get_stderr()));
   }
 
   _mut_reap.lock();
@@ -837,7 +837,7 @@ int checker::_execute_sync(host* hst) {
   commands::set& cmd_set = commands::set::instance();
   QSharedPointer<commands::command> cmd = cmd_set.get_command(hst->check_command_ptr->name);
   QString processed_cmd = cmd->process_cmd(&macros);
-  char* tmp_processed_cmd = my_strdup(processed_cmd.toAscii().constData());
+  char* tmp_processed_cmd = my_strdup(qPrintable(processed_cmd));
 
   // send event broker.
   broker_host_check(NEBTYPE_HOSTCHECK_RAW_START,
@@ -902,10 +902,10 @@ int checker::_execute_sync(host* hst) {
 
   char* output = NULL;
   if (cmd_result.get_is_executed() == true) {
-    output = my_strdup(cmd_result.get_stdout().toAscii().constData());
+    output = my_strdup(qPrintable(cmd_result.get_stdout()));
   }
   else {
-    output = my_strdup(cmd_result.get_stderr().toAscii().constData());
+    output = my_strdup(qPrintable(cmd_result.get_stderr()));
   }
 
   // send broker event.
@@ -945,10 +945,10 @@ int checker::_execute_sync(host* hst) {
 
   char* tmp_plugin_output = NULL;
   if (cmd_result.get_is_executed() == true) {
-    tmp_plugin_output = my_strdup(cmd_result.get_stdout().toAscii().constData());
+    tmp_plugin_output = my_strdup(qPrintable(cmd_result.get_stdout()));
   }
   else {
-    tmp_plugin_output = my_strdup(cmd_result.get_stderr().toAscii().constData());
+    tmp_plugin_output = my_strdup(qPrintable(cmd_result.get_stderr()));
   }
 
   // parse the output: short and long output, and perf data.

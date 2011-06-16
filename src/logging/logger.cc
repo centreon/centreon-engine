@@ -79,7 +79,7 @@ logger& logger::operator=(logger const& right) {
  *  @return This object.
  */
 logger& logger::operator<<(QString const& str) {
-  _buffer << str.toAscii().constData();
+  _buffer << qPrintable(str);
   return (*this);
 }
 

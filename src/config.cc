@@ -188,7 +188,7 @@ int pre_flight_check(void) {
   if (config.get_global_host_event_handler() != "") {
 
     /* check the event handler command */
-    buf = my_strdup(config.get_global_host_event_handler().toAscii().constData());
+    buf = my_strdup(qPrintable(config.get_global_host_event_handler()));
 
     /* get the command name, leave any arguments behind */
     temp_command_name = my_strtok(buf, "!");
@@ -210,7 +210,7 @@ int pre_flight_check(void) {
   if (config.get_global_service_event_handler() != "") {
 
     /* check the event handler command */
-    buf = my_strdup(config.get_global_service_event_handler().toAscii().constData());
+    buf = my_strdup(qPrintable(config.get_global_service_event_handler()));
 
     /* get the command name, leave any arguments behind */
     temp_command_name = my_strtok(buf, "!");
@@ -237,7 +237,7 @@ int pre_flight_check(void) {
 
   if (!config.get_ocsp_command().isEmpty()) {
 
-    buf = my_strdup(config.get_ocsp_command().toAscii().constData());
+    buf = my_strdup(qPrintable(config.get_ocsp_command()));
 
     /* get the command name, leave any arguments behind */
     temp_command_name = my_strtok(buf, "!");
@@ -258,7 +258,7 @@ int pre_flight_check(void) {
 
   if (!config.get_ochp_command().isEmpty()) {
 
-    buf = my_strdup(config.get_ochp_command().toAscii().constData());
+    buf = my_strdup(qPrintable(config.get_ochp_command()));
 
     /* get the command name, leave any arguments behind */
     temp_command_name = my_strtok(buf, "!");

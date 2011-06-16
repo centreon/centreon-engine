@@ -72,16 +72,16 @@ unsigned int loader::load() {
       module = add_module(dir.path() + "/" + it->fileName(), config_file);
       module->open();
       logit(NSLOG_INFO_MESSAGE, false,
-        "Event broker module '%s' initialized successfully.\n",
-        it->fileName().toAscii().constData());
+	    "Event broker module '%s' initialized successfully.\n",
+	    qPrintable(it->fileName()));
       ++loaded;
     }
     catch (error const& e) {
       del_module(module);
       logit(NSLOG_RUNTIME_ERROR, false,
-        "Error: Could not load module '%s' -> %s\n",
-        it->fileName().toAscii().constData(),
-        e.what());
+	    "Error: Could not load module '%s' -> %s\n",
+	    qPrintable(it->fileName()),
+	    e.what());
     }
   }
 
@@ -98,8 +98,8 @@ void loader::unload() {
        ++it) {
     it.value()->close();
     log_debug_info(DEBUGL_EVENTBROKER, 0,
-      "Module '%s' unloaded successfully.\n",
-      it.value()->get_filename().toAscii().constData());
+		   "Module '%s' unloaded successfully.\n",
+		   qPrintable(it.value()->get_filename()));
   }
   _modules.clear();
 }

@@ -228,7 +228,7 @@ error& error::operator<<(std::string const& str) throw () {
  *  @return This object.
  */
 error& error::operator<<(QString const& str) throw () {
-  return (operator<<(str.toAscii().constData()));
+  return (operator<<(qPrintable(str)));
 }
 
 /**
