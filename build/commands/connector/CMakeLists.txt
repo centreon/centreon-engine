@@ -85,6 +85,13 @@ if (WITH_TESTING)
   target_link_libraries("connector_get" "cce_commands" ${QT_LIBRARIES})
   add_test("connector_get" "connector_get")
 
+  add_executable("connector_restart"
+    "${TEST_DIR}/connector_restart.cc"
+    "${TEST_DIR}/../wait_process.hh"
+    ${QT_MOC_FILES})
+  target_link_libraries("connector_restart" "cce_commands" ${QT_LIBRARIES})
+  add_test("connector_restart" "connector_restart")
+
   add_executable("request_quit" "${TEST_DIR}/request_quit.cc")
   target_link_libraries("request_quit" "cce_commands" ${QT_LIBRARIES})
   add_test("request_quit" "request_quit")

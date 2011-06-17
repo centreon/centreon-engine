@@ -17,8 +17,6 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <QDebug>
-
 #include <QCoreApplication>
 #include <QList>
 #include <QSharedPointer>
@@ -35,7 +33,12 @@
 
 using namespace com::centreon::engine::commands;
 
-QSharedPointer<connector::request> wait() {
+/**
+ *  Wait and get request.
+ *
+ *  @return The request was send by engine.
+ */
+static QSharedPointer<connector::request> wait() {
   static connector::request_builder& req_builder = connector::request_builder::instance();
   static QList<QSharedPointer<connector::request> > requests;
   static QByteArray data;
@@ -44,8 +47,6 @@ QSharedPointer<connector::request> wait() {
     char buf[4096];
     int ret = read(0, buf, sizeof(buf) - 1);
     data.append(buf, ret);
-
-    write(2, buf, ret);
 
     while (data.size() > 0) {
       int pos = data.indexOf(connector::request::cmd_ending());
@@ -61,7 +62,6 @@ QSharedPointer<connector::request> wait() {
       }
       catch (std::exception const& e) {
 	(void)e;
-	qDebug() << e.what();
       }
     }
   }
@@ -71,7 +71,16 @@ QSharedPointer<connector::request> wait() {
   return (req);
 }
 
-QString execute_process(QStringList const& argv, int timeout, int* exit_code) {
+/**
+ *  Simulate a execution process.
+ *
+ *  @param[in] argv      The command arguments.
+ *  @param[in] timeout   The command timeout.
+ *  @param[in] exit_code The command exit code.
+ *
+ *  @return The raw query.
+ */
+static QString execute_process(QStringList const& argv, int timeout, int* exit_code) {
   QString output;
 
   for (QStringList::const_iterator it = argv.begin(), end = argv.end();
@@ -91,9 +100,22 @@ QString execute_process(QStringList const& argv, int timeout, int* exit_code) {
   if (argv[1] == "--timeout=on") {
     sleep(timeout / 1000  + 1);
   }
-
-  if (argv[1] == "--timeout=off") {
+  else if (argv[1] == "--timeout=off") {
     *exit_code = STATE_OK;
+  }
+  else if (argv[1].indexOf("--kill=") == 0) {
+    QString value = argv[1].right(argv[1].size() - 7);
+    qint64 time = value.toLongLong() / 1000;
+    qint64 now = QDateTime::currentDateTime().toMSecsSinceEpoch() / 1000;
+
+    if (now < time + 1) {
+      sleep(1);
+      char* ptr = NULL;
+      ptr[0] = 0;
+    }
+    else {
+      *exit_code = STATE_OK;
+    }
   }
   else {
     *exit_code = STATE_UNKNOWN;
@@ -101,18 +123,18 @@ QString execute_process(QStringList const& argv, int timeout, int* exit_code) {
   return (output);
 }
 
+/**
+ *  Simulate some behavior of connector.
+ */
 int main(int argc, char** argv) {
   try {
     QCoreApplication app(argc, argv);
 
     while (true) {
-      qDebug() << __func__ << "[" << __LINE__ << "]: start loop.";
       QSharedPointer<connector::request> req = wait();
-      qDebug() << __func__ << "[" << __LINE__ << "]: get request.";
 
       switch (req->get_id()) {
       case connector::request::version_q: {
-	qDebug() << __func__ << "[" << __LINE__ << "]: recv version_q";
 	connector::version_response version(ENGINE_MAJOR, ENGINE_MINOR);
 	QByteArray data = version.build();
 	write(1, data.constData(), data.size());
@@ -120,7 +142,6 @@ int main(int argc, char** argv) {
       }
 
       case connector::request::execute_q: {
-	qDebug() << __func__ << "[" << __LINE__ << "]: recv execute_q";
 	connector::execute_query const* exec_query = static_cast<connector::execute_query const*>(&(*req));
 	int exit_code = STATE_OK;
 	QString output = execute_process(exec_query->get_args(),
@@ -138,7 +159,6 @@ int main(int argc, char** argv) {
       }
 
       case connector::request::quit_q: {
-	qDebug() << __func__ << "[" << __LINE__ << "]: recv quit_q";
 	connector::quit_response quit;
 	QByteArray data = quit.build();
 	write(1, data.constData(), data.size());
@@ -146,14 +166,11 @@ int main(int argc, char** argv) {
       }
 
       default:
-	qDebug() << __func__ << "[" << __LINE__ << "]: bad request id.";
 	break;
       }
-      qDebug() << __func__ << "[" << __LINE__ << "]: end loop.";
     }
   }
   catch (std::exception const& e) {
-    qDebug() << __func__ << "[" << __LINE__ << "]: error: " << e.what();
     return (EXIT_FAILURE);
   }
   return (EXIT_SUCCESS);

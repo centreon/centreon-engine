@@ -18,9 +18,11 @@
 */
 
 #include "error.hh"
+#include "logging/logger.hh"
 #include "commands/set.hh"
 
 using namespace com::centreon::engine;
+using namespace com::centreon::engine::logging;
 using namespace com::centreon::engine::commands;
 
 /**
@@ -63,6 +65,7 @@ void set::add_command(QSharedPointer<command> cmd) {
     throw (engine_error() << "connect command to set failed.");
   }
   _list[cmd->get_name()] = cmd;
+  logger(dbg_commands, basic) << "add command " << cmd->get_name();
 }
 
 /**
@@ -72,6 +75,7 @@ void set::add_command(QSharedPointer<command> cmd) {
  */
 void set::remove_command(QString const& cmd_name) throw() {
   _list.remove(cmd_name);
+  logger(dbg_commands, basic) << "remove command " << cmd_name;
 }
 
 /**
@@ -100,7 +104,7 @@ void set::command_name_changed(QString const& old_name,
   (void)new_name;
 
   QSharedPointer<commands::command> cmd = get_command(old_name);
-  _list.remove(old_name);
+  remove_command(old_name);
   add_command(cmd);
 }
 

@@ -27,6 +27,10 @@ namespace               com {
     namespace           engine {
       namespace         commands {
 	namespace       connector {
+	/**
+	 *  @class quit_query commands/connector/.hh
+	 *  @brief Quit query ask connector to exit.
+	 */
 	  class         quit_query : public request {
 	  public:
 	                quit_query();

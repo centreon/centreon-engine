@@ -1,5 +1,5 @@
 /*
-** Copyright 2011      Merethis
+** Copyright 2011 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -23,6 +23,9 @@
 
 using namespace com::centreon::engine::commands::connector;
 
+/**
+ *  Default constructor.
+ */
 execute_response::execute_response(unsigned long cmd_id,
 		 bool is_executed,
 		 int exit_code,
@@ -39,15 +42,30 @@ execute_response::execute_response(unsigned long cmd_id,
 
 }
 
+/**
+ *  Default copy constructor.
+ *
+ *  @param[in] right The class to copy.
+ */
 execute_response::execute_response(execute_response const& right)
   : request(right) {
   operator=(right);
 }
 
+/**
+ *  Default destructor.
+ */
 execute_response::~execute_response() throw() {
 
 }
 
+/**
+ *  Default copy operator.
+ *
+ *  @param[in] right The class to copy.
+ *
+ *  @return This object.
+ */
 execute_response& execute_response::operator=(execute_response const& right) {
   if (this != &right) {
     request::operator=(right);
@@ -62,6 +80,13 @@ execute_response& execute_response::operator=(execute_response const& right) {
   return (*this);
 }
 
+/**
+ *  Compare two result.
+ *
+ *  @param[in] right The object to compare.
+ *
+ *  @return True if object have the same value.
+ */
 bool execute_response::operator==(execute_response const& right) const throw() {
   return (request::operator==(right) == true
 	  && _stderr == right._stderr
@@ -72,14 +97,31 @@ bool execute_response::operator==(execute_response const& right) const throw() {
 	  && _is_executed == right._is_executed);
 }
 
+/**
+ *  Compare two result.
+ *
+ *  @param[in] right The object to compare.
+ *
+ *  @return True if object have the different value.
+ */
 bool execute_response::operator!=(execute_response const& right) const throw() {
   return (!operator==(right));
 }
 
+/**
+ *  Get a pointer on a copy of the same object.
+ *
+ *  @return Return a pointer on a copy object.
+ */
 request* execute_response::clone() const {
   return (new execute_response(*this));
 }
 
+/**
+ *  Create the data with the request information.
+ *
+ *  @return The data request.
+ */
 QByteArray execute_response::build() {
   QByteArray query =
     QByteArray().setNum(_id) + '\0' +
@@ -91,6 +133,11 @@ QByteArray execute_response::build() {
   return (query + cmd_ending());
 }
 
+/**
+ *  Restore object with the data information.
+ *
+ *  @param[in] data The data of the request information.
+ */
 void execute_response::restore(QByteArray const& data) {
   QList<QByteArray> list = data.split('\0');
   if (list.size() != 7) {
@@ -128,26 +175,56 @@ void execute_response::restore(QByteArray const& data) {
   _stdout = list[6];
 }
 
+/**
+ *  Get the error string.
+ *
+ *  @return The error string.
+ */
 QString const& execute_response::get_stderr() const throw() {
  return (_stderr);
 }
 
+/**
+ *  Get the output string.
+ *
+ *  @return The output string.
+ */
 QString const& execute_response::get_stdout() const throw() {
  return (_stdout);
 }
 
+/**
+ *  Get the end time of execute command.
+ *
+ *  @return The date time.
+ */
 QDateTime const& execute_response::get_end_time() const throw() {
  return (_end_time);
 }
 
+/**
+ *  Get the command line id.
+ *
+ *  @return The command line id.
+ */
 unsigned long execute_response::get_command_id() const throw() {
  return (_cmd_id);
 }
 
+/**
+ *  Get the exit code value.
+ *
+ *  @return The exit code of the command line.
+ */
 int execute_response::get_exit_code() const throw() {
  return (_exit_code);
 }
 
+/**
+ *  Get is the command was executed.
+ *
+ *  @return True if the command was executed.
+ */
 bool execute_response::get_is_executed() const throw() {
  return (_is_executed);
 }

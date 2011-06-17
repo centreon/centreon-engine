@@ -24,13 +24,24 @@
 
 using namespace com::centreon::engine::commands;
 
-double execution_time(QDateTime const& start, QDateTime const& end) {
+/**
+ *  Calculate the execution time.
+ *
+ *  @param[in] start The start time.
+ *  @param[in] end   The end time.
+ *
+ *  @return The execution time, diff between end and start time.
+ */
+static double execution_time(QDateTime const& start, QDateTime const& end) {
   double res =
     (double)(end.toMSecsSinceEpoch() / 1000 - start.toMSecsSinceEpoch() / 1000)
     + (double)(end.toMSecsSinceEpoch() % 1000 - start.toMSecsSinceEpoch() % 1000);
   return (res < 0.0 ? 0.0 : res);
 }
 
+/**
+ *  Check if the result execution time works.
+ */
 int main() {
   try {
     QDateTime start = QDateTime::currentDateTime();

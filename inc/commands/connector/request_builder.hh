@@ -30,6 +30,10 @@ namespace                           com {
     namespace                       engine {
       namespace                     commands {
 	namespace                   connector {
+	/**
+	 *  @class request_builder commands/connector/request_builder.hh
+	 *  @brief Request builder is a request factory.
+	 */
 	  class                     request_builder {
 	  public:
 	    static request_builder& instance();

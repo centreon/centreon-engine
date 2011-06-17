@@ -27,7 +27,12 @@
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::commands;
 
-bool run_without_timeout() {
+/**
+ *  Check if the command line result are ok without timeout.
+ *
+ *  @return true if ok, false otherwise.
+ */
+static bool run_without_timeout() {
   nagios_macros macros = nagios_macros();
   raw cmd(__func__, "./bin_test_run --timeout=off");
   wait_process wait_proc(cmd);
@@ -47,7 +52,12 @@ bool run_without_timeout() {
   return (true);
 }
 
-bool run_with_timeout() {
+/**
+ *  Check if the command line result are ok with timeout.
+ *
+ *  @return true if ok, false otherwise.
+ */
+static bool run_with_timeout() {
   nagios_macros macros = nagios_macros();
   raw cmd(__func__, "./bin_test_run --timeout=on");
   wait_process wait_proc(cmd);
@@ -68,7 +78,12 @@ bool run_with_timeout() {
   return (true);
 }
 
-bool run_with_environement_macros() {
+/**
+ *  Check if the command line result are ok with some macros arguments.
+ *
+ *  @return true if ok, false otherwise.
+ */
+static bool run_with_environement_macros() {
   nagios_macros macros = nagios_macros();
   raw cmd(__func__, "./bin_test_run --check_macros");
   wait_process wait_proc(cmd);
@@ -93,6 +108,9 @@ bool run_with_environement_macros() {
   return (true);
 }
 
+/**
+ *  Check the asynchrone system for the raw command.
+ */
 int main(int argc, char** argv) {
   try {
     QCoreApplication app(argc, argv);

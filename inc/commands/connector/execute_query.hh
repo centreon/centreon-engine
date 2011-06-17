@@ -30,6 +30,13 @@ namespace                    com {
     namespace                engine {
       namespace              commands {
 	namespace            connector {
+	/**
+	 *  @class execute_query commands/connector/execute_query.hh
+	 *  @brief Execute query send a command to the connector.
+	 *
+	 *  Execution query is a request to send a command to the
+	 *  connector.
+	 */
 	  class              execute_query : public request {
 	  public:
 	                     execute_query(unsigned long cmd_id = 0,

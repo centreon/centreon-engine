@@ -23,20 +23,41 @@
 
 using namespace com::centreon::engine::commands::connector;
 
+/**
+ *  Default constructor.
+ *
+ *  @param[in] major The minimum major version was supported by the connector.
+ *  @param[in] minor The minimum minor version was supported by the connector.
+ */
 version_response::version_response(unsigned int major, unsigned int minor)
   : request(request::version_r), _major(major), _minor(minor) {
 
 }
 
+/**
+ *  Default copy constructor.
+ *
+ *  @param[in] right The class to copy.
+ */
 version_response::version_response(version_response const& right)
   : request(right) {
   operator=(right);
 }
 
+/**
+ *  Default destructor.
+ */
 version_response::~version_response() throw() {
 
 }
 
+/**
+ *  Default copy operator.
+ *
+ *  @param[in] right The class to copy.
+ *
+ *  @return This object.
+ */
 version_response& version_response::operator=(version_response const& right) {
   if (this != &right) {
     request::operator=(right);
@@ -46,20 +67,44 @@ version_response& version_response::operator=(version_response const& right) {
   return (*this);
 }
 
+/**
+ *  Compare two result.
+ *
+ *  @param[in] right The object to compare.
+ *
+ *  @return True if object have the same value.
+ */
 bool version_response::operator==(version_response const& right) const throw() {
   return (request::operator==(right) == true
 	  && _major == right._major
 	  && _minor == right._minor);
 }
 
+/**
+ *  Compare two result.
+ *
+ *  @param[in] right The object to compare.
+ *
+ *  @return True if object have the different value.
+ */
 bool version_response::operator!=(version_response const& right) const throw() {
   return (!operator==(right));
 }
 
+/**
+ *  Get a pointer on a copy of the same object.
+ *
+ *  @return Return a pointer on a copy object.
+ */
 request* version_response::clone() const {
   return (new version_response(*this));
 }
 
+/**
+ *  Create the data with the request information.
+ *
+ *  @return The data request.
+ */
 QByteArray version_response::build() {
   return (QByteArray().setNum(_id) + '\0' +
 	  QByteArray().setNum(_major) + '\0' +
@@ -67,6 +112,11 @@ QByteArray version_response::build() {
 	  cmd_ending());
 }
 
+/**
+ *  Restore object with the data information.
+ *
+ *  @param[in] data The data of the request information.
+ */
 void version_response::restore(QByteArray const& data) {
   QList<QByteArray> list = data.split('\0');
   if (list.size() != 3) {
@@ -90,10 +140,20 @@ void version_response::restore(QByteArray const& data) {
   }
 }
 
+/**
+ *  Get the minimum major version require.
+ *
+ *  @return The major version.
+ */
 unsigned int version_response::get_major() const throw() {
   return (_major);
 }
 
+/**
+ *  Get the minimum minor version require.
+ *
+ *  @return The minor version.
+ */
 unsigned int version_response::get_minor() const throw() {
   return (_minor);
 }

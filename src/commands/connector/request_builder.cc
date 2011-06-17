@@ -29,18 +29,28 @@
 
 using namespace com::centreon::engine::commands::connector;
 
+/**
+ *  Get instance of the request builder singleton.
+ *
+ *  @return This singleton.
+ */
 request_builder& request_builder::instance() {
   static request_builder instance;
   return (instance);
 }
-#include <QDebug>
+
+/**
+ *  Get a request object.
+ *
+ *  @return The request object build with data.
+ */
 QSharedPointer<request> request_builder::build(QByteArray const& data) const {
   int pos = data.indexOf('\0');
   QByteArray tmp = data.left(pos < 0 ? data.size() : pos);
 
   bool ok;
   unsigned int req_id = tmp.toUInt(&ok);
-  qDebug() << "res: " << data << " : " << data.indexOf('\0')  << " : " << tmp << " : " << req_id << " : " << ok << " : " << data.size();
+
   if (ok == false) {
     throw (engine_error() << "bad request id.");
   }
@@ -55,6 +65,9 @@ QSharedPointer<request> request_builder::build(QByteArray const& data) const {
   return (ret);
 }
 
+/**
+ *  Default constructor.
+ */
 request_builder::request_builder() {
   QSharedPointer<request> req(new version_query());
   _list.insert(req->get_id(), req);
@@ -71,6 +84,9 @@ request_builder::request_builder() {
   _list.insert(req->get_id(), req);
 }
 
+/**
+ *  Default destructor.
+ */
 request_builder::~request_builder() throw() {
 
 }

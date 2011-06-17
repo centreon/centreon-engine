@@ -22,6 +22,9 @@
 
 using namespace com::centreon::engine::commands::connector;
 
+/**
+ *  Default constructor.
+ */
 execute_query::execute_query(unsigned long cmd_id,
 			     QString const& cmd,
 			     QDateTime const& start_time,
@@ -34,15 +37,30 @@ execute_query::execute_query(unsigned long cmd_id,
 
 }
 
+/**
+ *  Default copy constructor.
+ *
+ *  @param[in] right The class to copy.
+ */
 execute_query::execute_query(execute_query const& right)
   : request(right) {
   operator=(right);
 }
 
+/**
+ *  Default destructor.
+ */
 execute_query::~execute_query() throw() {
 
 }
 
+/**
+ *  Default copy operator.
+ *
+ *  @param[in] right The class to copy.
+ *
+ *  @return This object.
+ */
 execute_query& execute_query::operator=(execute_query const& right) {
   if (this != &right) {
     request::operator=(right);
@@ -55,6 +73,13 @@ execute_query& execute_query::operator=(execute_query const& right) {
   return (*this);
 }
 
+/**
+ *  Compare two result.
+ *
+ *  @param[in] right The object to compare.
+ *
+ *  @return True if object have the same value.
+ */
 bool execute_query::operator==(execute_query const& right) const throw() {
   return (request::operator==(right) == true
 	  && _cmd == right._cmd
@@ -63,14 +88,31 @@ bool execute_query::operator==(execute_query const& right) const throw() {
 	  && _timeout == right._timeout);
 }
 
+/**
+ *  Compare two result.
+ *
+ *  @param[in] right The object to compare.
+ *
+ *  @return True if object have the different value.
+ */
 bool execute_query::operator!=(execute_query const& right) const throw() {
   return (!operator==(right));
 }
 
+/**
+ *  Get a pointer on a copy of the same object.
+ *
+ *  @return Return a pointer on a copy object.
+ */
 request* execute_query::clone() const {
   return (new execute_query(*this));
 }
 
+/**
+ *  Create the data with the request information.
+ *
+ *  @return The data request.
+ */
 QByteArray execute_query::build() {
   QByteArray query =
     QByteArray().setNum(_id) + '\0' +
@@ -81,6 +123,11 @@ QByteArray execute_query::build() {
   return (query + cmd_ending());
 }
 
+/**
+ *  Restore object with the data information.
+ *
+ *  @param[in] data The data of the request information.
+ */
 void execute_query::restore(QByteArray const& data) {
   QList<QByteArray> list = data.split('\0');
   if (list.size() < 5) {
@@ -112,22 +159,47 @@ void execute_query::restore(QByteArray const& data) {
   _cmd = list[4];
 }
 
+/**
+ *  Get the command line.
+ *
+ *  @return The command line.
+ */
 QString const& execute_query::get_command() const throw() {
  return (_cmd);
 }
 
+/**
+ *  Get the argument list.
+ *
+ *  @return The argument list.
+ */
 QStringList execute_query::get_args() const throw() {
-  return (_cmd.simplified().split(' '));
+  return (_cmd.simplified().split(' ')); // XXX: parse command line.
 }
 
+/**
+ *  Get the start date time.
+ *
+ *  @return The start date time.
+ */
 QDateTime const& execute_query::get_start_time() const throw() {
  return (_start_time);
 }
 
+/**
+ *  Get the command id.
+ *
+ *  @return The command id.
+ */
 unsigned long execute_query::get_command_id() const throw() {
  return (_cmd_id);
 }
 
+/**
+ *  Get the timeout value.
+ *
+ *  @return The timeout value.
+ */
 int execute_query::get_timeout() const throw() {
  return (_timeout);
 }

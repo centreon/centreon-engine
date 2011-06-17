@@ -18,28 +18,34 @@
 */
 
 #include <QCoreApplication>
+#include <QDateTime>
 #include <QDebug>
 #include <exception>
 #include "commands/connector/command.hh"
 #include "engine.hh"
+#include "../wait_process.hh"
 
 using namespace com::centreon::engine::commands;
 
 /**
- *  Check if the connector result are ok without timeout.
+ *  Check the restart of the connector when it stop.
  *
- *  @return true if ok, false otherwise.
+ *  @return True if connector restart after segfault.
  */
-static bool run_without_timeout() {
+static bool restart_with_segfault() {
   nagios_macros macros = nagios_macros();
+  QString command_line = "./bin_connector_test_run --kill="
+    + QString("%1").arg(QDateTime::currentDateTime().toMSecsSinceEpoch());
   connector::command cmd(__func__,
-			 "./bin_connector_test_run --timeout=off",
+			 command_line,
 			 "./bin_connector_test_run");
+  wait_process wait_proc(cmd);
 
-  result cmd_res;
-  cmd.run(cmd.get_command_line(), macros, -1, cmd_res);
+  unsigned long id = cmd.run(cmd.get_command_line(), macros, -1);
+  wait_proc.wait();
 
-  if (cmd_res.get_command_id() == 0
+  result const& cmd_res = wait_proc.get_result();
+  if (cmd_res.get_command_id() != id
       || cmd_res.get_exit_code() != STATE_OK
       || cmd_res.get_stdout() != cmd.get_command_line()
       || cmd_res.get_stderr() != ""
@@ -51,51 +57,56 @@ static bool run_without_timeout() {
 }
 
 /**
- *  Check if the connector result are ok with timeout.
+ *  Check the restart of the connector with a limit of execution.
  *
- *  @return true if ok, false otherwise.
+ *  @return True if connector restart after a number limit of execution.
  */
-static bool run_with_timeout() {
+static bool restart_with_execution_limit() {
   nagios_macros macros = nagios_macros();
   connector::command cmd(__func__,
-			 "./bin_connector_test_run --timeout=on",
+			 "./bin_connector_test_run --timeout=off",
 			 "./bin_connector_test_run");
 
-  result cmd_res;
-  cmd.run(cmd.get_command_line(), macros, 1, cmd_res);
+  cmd.set_max_check_for_restart(2);
+  wait_process wait_proc(cmd);
 
-  if (cmd_res.get_command_id() == 0
-      || cmd_res.get_exit_code() != STATE_CRITICAL
-      || cmd_res.get_execution_time() == 0
-      || cmd_res.get_stdout() != ""
-      || cmd_res.get_stderr() != "(Process Timeout)"
-      || cmd_res.get_is_executed() == false
-      || cmd_res.get_is_timeout() == false) {
-    return (false);
+  for (unsigned int i = 0; i < 3; ++i) {
+    unsigned long id = cmd.run(cmd.get_command_line(), macros, -1);
+    wait_proc.wait();
+
+    result const& cmd_res = wait_proc.get_result();
+    if (cmd_res.get_command_id() != id
+	|| cmd_res.get_exit_code() != STATE_OK
+	|| cmd_res.get_stdout() != cmd.get_command_line()
+	|| cmd_res.get_stderr() != ""
+	|| cmd_res.get_is_executed() == false
+	|| cmd_res.get_is_timeout() == true) {
+      return (false);
+    }
   }
   return (true);
 }
 
 /**
- *  Check if the connector result are ok with some macros arguments.
- *
- *  @return true if ok, false otherwise.
+ *  Check the restart of the connector.
  */
 int main(int argc, char** argv) {
   try {
     QCoreApplication app(argc, argv);
 
-    if (run_without_timeout() == false) {
-      qDebug() << "error: connector::run without timeout failed.";
+    if (restart_with_segfault() == false) {
+      qDebug() << "error: restart connector after segfault failed.";
       return (1);
     }
-    if (run_with_timeout() == false) {
-      qDebug() << "error: connector::run with timeout failed.";
+
+    if (restart_with_execution_limit() == false) {
+      qDebug() << "error: restart connector after execution limit failed.";
       return (1);
     }
   }
   catch (std::exception const& e) {
     qDebug() << "error: " << e.what();
+    return (1);
   }
   return (0);
 }

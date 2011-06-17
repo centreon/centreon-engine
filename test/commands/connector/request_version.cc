@@ -29,6 +29,9 @@ using namespace com::centreon::engine::commands::connector;
 #define QUERY         "0" CMD_END
 #define RESPONSE      "1\0" TOSTR(ENGINE_MAJOR) "\0" TOSTR(ENGINE_MINOR) CMD_END
 
+/**
+ *  Check the version request.
+ */
 int main(int argc, char** argv) {
   try {
     QCoreApplication app(argc, argv);

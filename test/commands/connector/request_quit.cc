@@ -29,6 +29,9 @@ using namespace com::centreon::engine::commands::connector;
 #define QUERY         "4" CMD_END
 #define RESPONSE      "5" CMD_END
 
+/**
+ *  Check the quit request.
+ */
 int main(int argc, char** argv) {
   try {
     QCoreApplication app(argc, argv);

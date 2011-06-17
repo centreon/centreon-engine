@@ -27,6 +27,14 @@ namespace                  com {
     namespace              engine {
       namespace            commands {
 	namespace          connector {
+	/**
+	 *  @class version_query commands/connector/version_query.hh
+	 *  @brief Version query ask the minimum version of engine
+	 *  supported by the connector.
+	 *
+	 *  Version query is a request, who ask the minimu version of
+	 *  engine supported by the connector.
+	 */
 	  class            version_query : public request {
 	  public:
 	                   version_query();

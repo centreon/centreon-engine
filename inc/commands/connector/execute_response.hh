@@ -29,6 +29,13 @@ namespace                     com {
     namespace                 engine {
       namespace               commands {
 	namespace             connector {
+	/**
+	 *  @class execute_response commands/connector/execute_response.hh
+	 *  @brief Execute response is the result of the command execution.
+	 *
+	 *  Execute reponse is a request who send the result of the command
+	 *  execution.
+	 */
 	  class               execute_response : public request {
 	  public:
 	                      execute_response(unsigned long cmd_id = 0,

@@ -26,6 +26,13 @@
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::commands;
 
+/**
+ *  Check if the command exist in the set command.
+ *
+ *  @param[in] name The command name.
+ *
+ *  @return True if the command exist, false otherwise.
+ */
 static bool command_exit(QString const& name) {
   try {
     set::instance().get_command(name);
@@ -36,6 +43,9 @@ static bool command_exit(QString const& name) {
   return (true);
 }
 
+/**
+ *  Check if the set command works.
+ */
 int main() {
   try {
     // get instance.

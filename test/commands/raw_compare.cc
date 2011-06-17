@@ -26,6 +26,9 @@ using namespace com::centreon::engine::commands;
 #define CMD_NAME "command_name"
 #define CMD_LINE "command_name arg1 arg2"
 
+/**
+ * Check comparison operator.
+ */
 int main() {
   try {
     raw cmd(CMD_NAME, CMD_LINE);

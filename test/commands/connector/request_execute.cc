@@ -39,6 +39,9 @@ using namespace com::centreon::engine::commands::connector;
 #define QUERY    "2\0" TOSTR(ID) "\0" TOSTR(TIMEOUT) "\0" TOSTR(TIMESTAMP) "\0" BINARY CMD_END
 #define RESPONSE "3\0" TOSTR(ID) "\0" TOSTR(IS_EXECUTED) "\0" TOSTR(STATE_OK) "\0" TOSTR(TIMESTAMP) "\0" STDERR "\0" STDOUT CMD_END
 
+/**
+ *  Check the execute request.
+ */
 int main(int argc, char** argv) {
   try {
     QCoreApplication app(argc, argv);

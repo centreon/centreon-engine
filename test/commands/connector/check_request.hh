@@ -30,8 +30,16 @@
 
 const int end_size = com::centreon::engine::commands::connector::request::cmd_ending().size();
 
-bool check_request_valid(com::centreon::engine::commands::connector::request* req,
-			 QByteArray request_data) {
+/**
+ *  Check if the request is valid.
+ *
+ *  @param[in] req          The request to check.
+ *  @param[in] request_data The valide result to compare the result request.
+ *
+ *  @return True if the request are ok, false otherwise.
+ */
+static bool check_request_valid(com::centreon::engine::commands::connector::request* req,
+				QByteArray request_data) {
   QByteArray data = req->build();
   if (data != request_data) {
     return (false);
@@ -40,7 +48,14 @@ bool check_request_valid(com::centreon::engine::commands::connector::request* re
   return (true);
 }
 
-bool check_request_invalid(com::centreon::engine::commands::connector::request* req) {
+/**
+ *  Check if the request is invalid.
+ *
+ *  @param[in] req The request to check.
+ *
+ *  @return True if the request failed, false otherwise.
+ */
+static bool check_request_invalid(com::centreon::engine::commands::connector::request* req) {
   try {
     QByteArray data = REQUEST(".\0\0\0\0");
     req->restore(data.remove(data.size() - end_size, end_size));
@@ -51,6 +66,13 @@ bool check_request_invalid(com::centreon::engine::commands::connector::request* 
   return (false);
 }
 
+/**
+ *  Check copy object with clone method.
+ *
+ *  @param[in] req The request to check.
+ *
+ *  @return True if copy object succed, false otherwise.
+ */
 template<class T> bool check_request_clone(T* req) {
   T* clone = static_cast<T*>(req->clone());
   bool ret = (*req == *clone);

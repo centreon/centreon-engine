@@ -21,19 +21,37 @@
 
 using namespace com::centreon::engine::commands::connector;
 
+/**
+ *  Default constructor.
+ */
 request::request(e_type id)
   : _id(id) {
 
 }
 
+/**
+ *  Default copy constructor.
+ *
+ *  @param[in] right The class to copy.
+ */
 request::request(request const& right) {
   operator=(right);
 }
 
+/**
+ *  Default destructor.
+ */
 request::~request() throw() {
 
 }
 
+/**
+ *  Default copy operator.
+ *
+ *  @param[in] right The class to copy.
+ *
+ *  @return This object.
+ */
 request& request::operator=(request const& right) {
   if (this != &right) {
     _id = right._id;
@@ -41,19 +59,43 @@ request& request::operator=(request const& right) {
   return (*this);
 }
 
+/**
+ *  Compare two result.
+ *
+ *  @param[in] right The object to compare.
+ *
+ *  @return True if object have the same value.
+ */
 bool request::operator==(request const& right) const throw() {
   return (_id == right._id);
 }
 
+/**
+ *  Compare two result.
+ *
+ *  @param[in] right The object to compare.
+ *
+ *  @return True if object have the different value.
+ */
 bool request::operator!=(request const& right) const throw() {
   return (!operator==(right));
 }
 
+/**
+ *  Get the data value of the command's ending.
+ *
+ *  @return The data value of the command's ending.
+ */
 QByteArray const& request::cmd_ending() throw() {
   static QByteArray ending(4, '\0');
   return (ending);
 }
 
+/**
+ *  Get the type id of the request.
+ *
+ *  @return The type id of the request.
+ */
 request::e_type request::get_id() const throw() {
   return (_id);
 }

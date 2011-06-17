@@ -29,6 +29,9 @@ using namespace com::centreon::engine::commands;
 #define CMD_LINE    "command_name arg1 arg2"
 #define CMD_PROCESS "./bin_connector_test_run"
 
+/**
+ *  Check constructor and copy object.
+ */
 int main(int argc, char** argv) {
   try {
     QCoreApplication app(argc, argv);

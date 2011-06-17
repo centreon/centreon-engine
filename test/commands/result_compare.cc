@@ -30,6 +30,9 @@ using namespace com::centreon::engine::commands;
 #define DEFAULT_TIMEOUT true
 #define DEFAULT_EXIT_OK false
 
+/**
+ *  Check the comparison operator.
+ */
 int main() {
   try {
     QDateTime time = QDateTime::currentDateTime();

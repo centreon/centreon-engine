@@ -31,6 +31,9 @@ using namespace com::centreon::engine::commands;
 #define CMD_LINE      "$USER1$/test -w $ARG1$ -c $$ARG1$$ $HOSTADDRESS$ $EMPTY$"
 #define CMD_PROCESSED CMD_USER1 "/test -w " CMD_ARG1 " -c $ARG1$ " CMD_HOSTADDR " "
 
+/**
+ *  Check the process command line replacement macros.
+ */
 int main() {
   try {
     nagios_macros macros = nagios_macros();

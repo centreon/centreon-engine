@@ -116,7 +116,8 @@ unsigned long raw::run(QString const& processed_cmd,
   _mutex.unlock();
 
   info.proc->start(processed_cmd);
-
+  logger(dbg_commands, basic) << "raw command (id=" << info.cmd_id
+			      << ") start '" << processed_cmd << "'.";
   return (info.cmd_id);
 }
 
@@ -138,6 +139,10 @@ void raw::run(QString const& processed_cmd,
 
   process proc(macros, timeout);
   proc.start(processed_cmd);
+
+  logger(dbg_commands, basic) << "raw command (id=" << id
+			      << ") start '" << processed_cmd << "'.";
+
   proc.wait();
 
   res.set_command_id(id);
@@ -157,6 +162,7 @@ void raw::ended() {
   _mutex.lock();
   QHash<QObject*, process_info>::iterator it = _processes.find(sender());
   if (it == _processes.end()) {
+    _mutex.unlock();
     logger(log_runtime_warning, basic) << "sender not found in processes.";
     return;
   }
@@ -172,5 +178,9 @@ void raw::ended() {
   	     info.proc->get_exit_code(),
   	     info.proc->get_is_timeout(),
   	     info.proc->get_is_executed());
+
+  logger(dbg_commands, basic)
+    << "raw command (id=" << info.cmd_id << ") finished.";
+
   emit command_executed(res);
 }

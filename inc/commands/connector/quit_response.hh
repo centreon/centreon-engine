@@ -27,6 +27,10 @@ namespace                  com {
     namespace              engine {
       namespace            commands {
 	namespace          connector {
+	/**
+	 *  @class quit_response commands/connector/quit_response.hh
+	 *  @brief Quit response notify engine of when the connector finish.
+	 */
 	  class            quit_response : public request {
 	  public:
 	                   quit_response();

@@ -27,6 +27,15 @@ namespace                            com {
     namespace                        engine {
       namespace                      commands {
 	namespace                    connector {
+	/**
+	 *  @class request commands/connector/request.hh
+	 *  @brief Request is an abstract object, have to implement
+	 *  to communicate between engine and a connector.
+	 *
+	 *  Request is an abstract object, have to implement
+	 *  to communicate between engine and a connector.
+	 *  You hav to implement clone, build and restore methods.
+	 */
 	  class                      request {
 	  public:
 	    enum                     e_type {

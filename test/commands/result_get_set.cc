@@ -31,6 +31,9 @@ using namespace com::centreon::engine::commands;
 #define DEFAULT_TIMEOUT true
 #define DEFAULT_EXIT_OK false
 
+/**
+ *  Check setter and getter return.
+ */
 int main() {
   try {
     QDateTime time = QDateTime::currentDateTime();

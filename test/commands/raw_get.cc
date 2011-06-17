@@ -26,6 +26,9 @@ using namespace com::centreon::engine::commands;
 #define DEFAULT_CMD_NAME "cmd"
 #define DEFAULT_CMD_LINE "ls -la /tmp"
 
+/**
+ *  Check getter return.
+ */
 int main() {
   try {
     raw cmd(DEFAULT_CMD_NAME, DEFAULT_CMD_LINE);

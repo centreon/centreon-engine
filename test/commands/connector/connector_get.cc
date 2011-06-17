@@ -28,6 +28,9 @@ using namespace com::centreon::engine::commands;
 #define DEFAULT_CMD_LINE    "ls -la /tmp"
 #define DEFAULT_CMD_PROCESS "./bin_connector_test_run"
 
+/**
+ *  Check getter return.
+ */
 int main(int argc, char** argv) {
   try {
     QCoreApplication app(argc, argv);

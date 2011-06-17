@@ -27,6 +27,14 @@ namespace                     com {
     namespace                 engine {
       namespace               commands {
 	namespace             connector {
+	/**
+	 *  @class version_response commands/connector/version_response.hh
+	 *  @brief Version response give the minimum version of engine
+	 *  supported by the connector.
+	 *
+	 *  Version response is the response request, who give the minimum
+	 *  version of engine supported by the connector.
+	 */
 	  class               version_response : public request {
 	  public:
 	                      version_response(unsigned int major = 0,

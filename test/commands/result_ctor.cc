@@ -31,6 +31,9 @@ using namespace com::centreon::engine::commands;
 #define DEFAULT_TIMEOUT true
 #define DEFAULT_EXIT_OK false
 
+/**
+ *  Check the constructor and copy object.
+ */
 int main() {
   try {
     result res1;

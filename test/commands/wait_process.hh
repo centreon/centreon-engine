@@ -27,6 +27,10 @@ namespace               com {
   namespace             centreon {
     namespace           engine {
       namespace         commands {
+	/**
+	 *  @class wait_process
+	 *  @brief Wait the response of the asynchrone command.
+	 */
 	class           wait_process : public QObject {
 	  Q_OBJECT
 	public:

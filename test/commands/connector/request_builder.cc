@@ -24,7 +24,12 @@
 
 using namespace com::centreon::engine::commands::connector;
 
-bool is_valid() {
+/**
+ *  Check valid build.
+ *
+ *  @return True if builder correctly build, false otherwise.
+ */
+static bool is_valid() {
   request_builder& builder = request_builder::instance();
   if (builder.build("0\0\0\0\0").isNull() == true
       || builder.build("4\0\0\0\0").isNull() == true
@@ -34,7 +39,12 @@ bool is_valid() {
   return (true);
 }
 
-bool is_invalid() {
+/**
+ *  Check invalid build.
+ *
+ *  @return True if builder cannot build, false otherwise.
+ */
+static bool is_invalid() {
   request_builder& builder = request_builder::instance();
   try {
     builder.build(".\0\0\0\0");
@@ -45,6 +55,9 @@ bool is_invalid() {
   return (false);
 }
 
+/**
+ *  Check request builder.
+ */
 int main(int argc, char** argv) {
   try {
     QCoreApplication app(argc, argv);

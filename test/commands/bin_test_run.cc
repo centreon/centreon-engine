@@ -23,6 +23,9 @@
 #include <stdlib.h>
 #include "engine.hh"
 
+/**
+ *  Simulate some behavior of plugin.
+ */
 int main(int argc, char** argv) {
   for (int i = 0; i < argc; ++i) {
     std::cout << argv[i];
@@ -35,16 +38,19 @@ int main(int argc, char** argv) {
     return (STATE_WARNING);
   }
 
+  // Never return to test the timeout.
   if (!strcmp(argv[1], "--timeout=on")) {
     while (true) {
       sleep(1);
     }
   }
 
+  // Check a classic return.
   if (!strcmp(argv[1], "--timeout=off")) {
     return (STATE_OK);
   }
 
+  // Check macros argument are ok.
   if (!strcmp(argv[1], "--check_macros")) {
     char const* arg = getenv("NAGIOS_ARG1");
     if (arg != NULL && !strcmp(arg, "default_arg")) {
