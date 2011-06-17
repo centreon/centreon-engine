@@ -88,7 +88,7 @@ service_start()
 
 	su - $user -c "touch $var_dir/centengine.log $retention_file"
 
-	su - $user -c "$binary $config_file > /dev/null  2>&1" &
+	su - $user -c "$binary $config_file > /dev/null  2>&1 &"
 	sleep 2
 	pid=$(pidofproc $binary)
 	if [ $? -ne 0 ]; then
