@@ -174,7 +174,49 @@ QString const& execute_query::get_command() const throw() {
  *  @return The argument list.
  */
 QStringList execute_query::get_args() const throw() {
-  return (_cmd.simplified().split(' ')); // XXX: parse command line.
+  static QString sep("\"'\t ");
+  QString line = _cmd.trimmed();
+  QStringList list;
+  QString tmp;
+  QChar c;
+  int escape = 0;
+
+  QString::const_iterator it = line.begin();
+  QString::const_iterator end = line.end();
+
+  if (c == 0 && it + 1 < end) {
+    while (it->isSpace() && ((it + 1)->isSpace() || *(it + 1) == '\'' || *(it + 1) == '"'))
+      ++it;
+    if (!(c = (sep.contains(*it) ? *it : ' ')).isSpace())
+      ++it;
+  }
+
+  for (; it != end; ++it) {
+    if (c == 0 && it + 1 < end) {
+      while (it->isSpace() && ((it + 1)->isSpace() || *(it + 1) == '\'' || *(it + 1) == '"'))
+	++it;
+      c = (sep.contains(*it) ? *it : ' ');
+      ++it;
+    }
+
+    if (*it == '\\') {
+      if (++escape % 2 == 0)
+	tmp += *it;
+      continue;
+    }
+
+    if (c == *it && escape % 2 == 0) {
+      list << tmp;
+      tmp = "";
+      c = (c.isSpace() && !sep.contains(*(it + 1)) ? ' ' : 0);
+    }
+    else
+      tmp += *it;
+    escape = 0;
+  }
+  if (tmp != "")
+    list << tmp;
+  return (list);
 }
 
 /**

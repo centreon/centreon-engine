@@ -807,7 +807,6 @@ int centreonengine__hostGetCheckOptions(soap* s,
 int centreonengine__hostGetCheckPassiveEnabled(soap* s,
                                                ns1__hostIDType* host_id,
                                                bool& val) {
-  // XXX: ici
   try {
     syncro::instance().waiting_callback();
 
