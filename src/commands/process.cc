@@ -31,11 +31,11 @@ using namespace com::centreon::engine::commands;
  *  @param[in] macros  The macros data struct.
  *  @param[in] timeout The timeout time, -1 disable timeout.
  */
-process::process(nagios_macros const& macros, int timeout)
+process::process(nagios_macros const& macros, unsigned int timeout)
   : QProcess(),
     _macros(macros),
     _executed_time(0),
-    _timeout(timeout > 0 ? timeout * 1000 : -1),
+    _timeout(timeout * 1000),
     _exit_code(0),
     _is_timeout(false),
     _is_executed(false) {
@@ -113,7 +113,7 @@ QDateTime const& process::get_end_time() const throw() {
  *
  *  @return The time on msec.
  */
-qint64 process::get_executed_time() const throw() {
+unsigned int process::get_executed_time() const throw() {
   return (_executed_time);
 }
 
@@ -167,7 +167,7 @@ bool process::get_is_executed() const throw() {
  *
  *  @return The timeout value.
  */
-int process::get_timeout() const throw() {
+unsigned int process::get_timeout() const throw() {
   return (_timeout);
 }
 
@@ -196,7 +196,7 @@ void process::setupChildProcess() {
  */
 void process::_finished(int exit_code, QProcess::ExitStatus exit_status) {
   _end_time = QDateTime::currentDateTime();
-  _executed_time = _end_time.toMSecsSinceEpoch() - _start_time.toMSecsSinceEpoch();
+  _executed_time = _end_time.toTime_t() - _start_time.toTime_t();
 
   if (error() == QProcess::FailedToStart) {
     _exit_code = STATE_CRITICAL;

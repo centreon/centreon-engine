@@ -42,7 +42,7 @@ namespace                    com {
 	                     execute_query(unsigned long cmd_id = 0,
 					   QString const& cmd = "",
 					   QDateTime const& start_time = QDateTime(),
-					   int timeout = 0);
+					   unsigned int timeout = 0);
 	                     execute_query(execute_query const& right);
 	                     ~execute_query() throw();
 
@@ -59,13 +59,13 @@ namespace                    com {
 	    QStringList      get_args() const throw();
 	    QDateTime const& get_start_time() const throw();
 	    unsigned long    get_command_id() const throw();
-	    int              get_timeout() const throw();
+	    unsigned int     get_timeout() const throw();
 
 	  private:
 	    QString          _cmd;
 	    QDateTime        _start_time;
 	    unsigned long    _cmd_id;
-	    int              _timeout;
+	    unsigned int     _timeout;
 	  };
 	}
       }

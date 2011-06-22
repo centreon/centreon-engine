@@ -53,11 +53,11 @@ namespace                               com {
 
 	  unsigned long                 run(QString const& process_cmd,
 					    nagios_macros const& macros,
-					    int timeout);
+					    unsigned int timeout);
 
 	  void                          run(QString const& process_cmd,
 					    nagios_macros const& macros,
-					    int timeout,
+					    unsigned int timeout,
 					    result& res);
 
 	public slots:

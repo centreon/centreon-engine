@@ -25,7 +25,6 @@
 # include <QHash>
 # include <QProcess>
 # include <QStringList>
-# include <QEventLoop>
 # include "commands/command.hh"
 # include "commands/connector/execute_query.hh"
 
@@ -56,11 +55,11 @@ namespace                              com {
 
 	    unsigned long              run(QString const& processed_cmd,
 					   nagios_macros const& macros,
-					   int timeout);
+					   unsigned int timeout);
 
 	    void                       run(QString const& processed_cmd,
 					   nagios_macros const& macros,
-					   int timeout,
+					   unsigned int timeout,
 					   result& res);
 
 	    QString const&             get_process() const throw();
@@ -81,7 +80,7 @@ namespace                              com {
 	    struct                     request_info {
 	      QSharedPointer<request>  req;
 	      QDateTime                start_time;
-	      int                      timeout;
+	      unsigned int             timeout;
 	      bool                     waiting_result;
 	    };
 
@@ -94,7 +93,6 @@ namespace                              com {
 
 	    QByteArray                 _read_data;
 	    QMutex                     _mutex;
-	    QEventLoop                 _loop;
 	    QString                    _process_command;
 	    QSharedPointer<QProcess>   _process;
 	    QHash<unsigned long, request_info>

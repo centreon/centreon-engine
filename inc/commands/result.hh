@@ -54,7 +54,7 @@ namespace                com {
 
 	  unsigned long  get_command_id() const throw();
 	  int            get_exit_code() const throw();
-	  double         get_execution_time() const throw();
+	  unsigned int   get_execution_time() const throw();
 	  timeval const& get_start_time() const throw();
 	  timeval const& get_end_time() const throw();
 	  QString const& get_stdout() const throw();

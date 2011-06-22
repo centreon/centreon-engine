@@ -32,11 +32,10 @@ using namespace com::centreon::engine::commands;
  *
  *  @return The execution time, diff between end and start time.
  */
-static double execution_time(QDateTime const& start, QDateTime const& end) {
-  double res =
-    (double)(end.toMSecsSinceEpoch() / 1000 - start.toMSecsSinceEpoch() / 1000)
-    + (double)(end.toMSecsSinceEpoch() % 1000 - start.toMSecsSinceEpoch() % 1000);
-  return (res < 0.0 ? 0.0 : res);
+static uint execution_time(QDateTime const& start, QDateTime const& end) {
+  if (end.toTime_t() < start.toTime_t())
+    return (0);
+  return (end.toTime_t() - start.toTime_t());
 }
 
 /**

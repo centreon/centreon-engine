@@ -37,7 +37,7 @@ static bool run_without_timeout() {
   raw cmd(__func__, "./bin_test_run --timeout=off");
   wait_process wait_proc(cmd);
 
-  unsigned long id = cmd.run(cmd.get_command_line(), macros, -1);
+  unsigned long id = cmd.run(cmd.get_command_line(), macros, 0);
   wait_proc.wait();
 
   result const& cmd_res = wait_proc.get_result();
@@ -68,7 +68,6 @@ static bool run_with_timeout() {
   result const& cmd_res = wait_proc.get_result();
   if (cmd_res.get_command_id() != id
       || cmd_res.get_exit_code() != STATE_CRITICAL
-      || cmd_res.get_execution_time() == 0
       || cmd_res.get_stdout() != ""
       || cmd_res.get_stderr() != "(Process Timeout)"
       || cmd_res.get_is_executed() == false
@@ -92,13 +91,12 @@ static bool run_with_environement_macros() {
   macros.argv[0] = new char[strlen(argv) + 1];
   strcpy(macros.argv[0], argv);
 
-  unsigned long id = cmd.run(cmd.get_command_line(), macros, -1);
+  unsigned long id = cmd.run(cmd.get_command_line(), macros, 0);
   wait_proc.wait();
 
   result const& cmd_res = wait_proc.get_result();
   if (cmd_res.get_command_id() != id
       || cmd_res.get_exit_code() != STATE_OK
-      || cmd_res.get_execution_time() == 0
       || cmd_res.get_stdout() != cmd.get_command_line()
       || cmd_res.get_stderr() != ""
       || cmd_res.get_is_executed() == false

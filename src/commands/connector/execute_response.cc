@@ -128,7 +128,7 @@ QByteArray execute_response::build() {
     QByteArray().setNum(static_cast<qulonglong>(_cmd_id)) + '\0' +
     QByteArray().setNum(_is_executed) + '\0' +
     QByteArray().setNum(_exit_code) + '\0' +
-    QByteArray().setNum(_end_time.toMSecsSinceEpoch()) + '\0';
+    QByteArray().setNum(_end_time.toTime_t()) + '\0';
   query += _stderr + '\0' + _stdout;
   return (query + cmd_ending());
 }
@@ -165,11 +165,11 @@ void execute_response::restore(QByteArray const& data) {
     throw (engine_error() << "bad request argument, invalid exit_code.");
   }
 
-  qint64 timestamp = list[4].toLongLong(&ok);
+  unsigned int timestamp = list[4].toUInt(&ok);
   if (ok == false) {
     throw (engine_error() << "bad request argument, invalid end_time.");
   }
-  _end_time.setMSecsSinceEpoch(timestamp);
+  _end_time.setTime_t(timestamp);
 
   _stderr = list[5];
   _stdout = list[6];

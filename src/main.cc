@@ -608,7 +608,7 @@ int main(int argc, char** argv) {
   }
 
   // unload singleton.
-  broker::loader::cleanup();
+  com::centreon::engine::broker::loader::cleanup();
   commands::set::cleanup();
   checks::checker::cleanup();
   logging::engine::cleanup();

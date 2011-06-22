@@ -18,6 +18,7 @@
 */
 
 #include <QMutexLocker>
+#include <QEventLoop>
 #include "globals.hh"
 #include "macros.hh"
 #include "objects.hh"
@@ -50,7 +51,6 @@ connector::command::command(QString const& name,
     _nbr_check(0),
     _is_good_version(false),
     _active_timer(false) {
-  connect(this, SIGNAL(_wait_ending()), &_loop, SLOT(quit()));
   _req_func.insert(request::version_r, &command::_req_version_r);
   _req_func.insert(request::execute_r, &command::_req_execute_r);
   _req_func.insert(request::quit_r, &command::_req_quit_r);
@@ -64,7 +64,6 @@ connector::command::command(QString const& name,
  */
 connector::command::command(command const& right)
   : commands::command(right), _active_timer(false) {
-  connect(this, SIGNAL(_wait_ending()), &_loop, SLOT(quit()));
   operator=(right);
 }
 
@@ -116,7 +115,7 @@ commands::command* connector::command::clone() const {
  */
 unsigned long connector::command::run(QString const& processed_cmd,
 				      nagios_macros const& macros,
-				      int timeout) {
+				      unsigned int timeout) {
   (void)macros;
 
   QMutexLocker locker(&_mutex);
@@ -127,8 +126,6 @@ unsigned long connector::command::run(QString const& processed_cmd,
     _start();
     locker.relock();
   }
-
-  timeout = (timeout > 0 ? timeout * 1000 : -1);
 
   if (_process->state() != QProcess::Running) {
     throw (engine_error() << _process_command << " not running.");
@@ -153,7 +150,7 @@ unsigned long connector::command::run(QString const& processed_cmd,
 
   if (_active_timer == false && timeout > 0) {
     _active_timer = true;
-    QTimer::singleShot(timeout, this, SLOT(_timeout()));
+    QTimer::singleShot(timeout * 1000, this, SLOT(_timeout()));
   }
 
   return (id);
@@ -169,7 +166,7 @@ unsigned long connector::command::run(QString const& processed_cmd,
  */
 void connector::command::run(QString const& processed_cmd,
 			     nagios_macros const& macros,
-			     int timeout,
+			     unsigned int timeout,
 			     result& res) {
   (void)macros;
 
@@ -181,8 +178,6 @@ void connector::command::run(QString const& processed_cmd,
     _start();
     locker.relock();
   }
-
-  timeout = (timeout > 0 ? timeout * 1000 : -1);
 
   if (_process->state() != QProcess::Running) {
     throw (engine_error() << _process_command << " not running.");
@@ -206,16 +201,24 @@ void connector::command::run(QString const& processed_cmd,
 
   if (_active_timer == false && timeout > 0) {
     _active_timer = true;
-    QTimer::singleShot(timeout, this, SLOT(_timeout()));
+    QTimer::singleShot(timeout * 1000, this, SLOT(_timeout()));
   }
 
-  locker.unlock();
-  _loop.exec();
-  locker.relock();
+  while (true) {
+    QEventLoop loop;
+    connect(this, SIGNAL(_wait_ending()), &loop, SLOT(quit()));
 
-  QHash<unsigned long, result>::iterator it = _results.find(id);
-  res = it.value();
-  _results.erase(it);
+    locker.unlock();
+    loop.exec();
+    locker.relock();
+
+    QHash<unsigned long, result>::iterator it = _results.find(id);
+    if (it != _results.end()) {
+      res = it.value();
+      _results.erase(it);
+      break;
+    }
+  }
 }
 
 /**
@@ -258,8 +261,8 @@ void connector::command::_timeout() {
   QHash<unsigned long, request_info>::iterator it = _queries.begin();
   while (it != _queries.end()) {
     request_info& info = it.value();
-    qint64 diff_time = now.toMSecsSinceEpoch() - info.start_time.toMSecsSinceEpoch();
-    if (diff_time > info.timeout) {
+    unsigned int diff_time = now.toTime_t() - info.start_time.toTime_t();
+    if (diff_time >= info.timeout) {
       unsigned long id = it.key();
       result res(id,
 		 "",
@@ -286,7 +289,7 @@ void connector::command::_timeout() {
        it != end;
        ++it) {
     if (it->timeout > 0) {
-      qint64 diff_time = now.toMSecsSinceEpoch() - it->start_time.toMSecsSinceEpoch();
+      unsigned int diff_time = now.toTime_t() - it->start_time.toTime_t();
       _active_timer = true;
       QTimer::singleShot(diff_time > 0 ? diff_time : 1, this, SLOT(_timeout()));
       break;
@@ -356,6 +359,8 @@ void connector::command::_ready_read() {
 void connector::command::_start() {
   QMutexLocker locker(&_mutex);
 
+  _nbr_check = 0;
+
   if (_process.isNull() == false) {
     disconnect(&(*_process), SIGNAL(readyReadStandardOutput()),
   	       this, SLOT(_ready_read()));
@@ -381,8 +386,11 @@ void connector::command::_start() {
   QByteArray const& data = version.build();
   _process->write(data.constData(), data.size());
 
+  QEventLoop loop;
+  connect(this, SIGNAL(_wait_ending()), &loop, SLOT(quit()));
+
   locker.unlock();
-  _loop.exec();
+  loop.exec();
   locker.relock();
 
   if (_is_good_version == false) {
@@ -468,7 +476,6 @@ void connector::command::_req_version_r(request* req) {
   else {
     _is_good_version = false;
   }
-
   emit _wait_ending();
 }
 
@@ -495,8 +502,8 @@ void connector::command::_req_execute_r(request* req) {
 
   bool is_timeout = false;
   if (info.timeout > 0) {
-    is_timeout = response->get_end_time().toMSecsSinceEpoch()
-      - info.start_time.toMSecsSinceEpoch() > info.timeout;
+    is_timeout = response->get_end_time().toTime_t()
+      - info.start_time.toTime_t() > info.timeout;
   }
 
   result res(response->get_command_id(),

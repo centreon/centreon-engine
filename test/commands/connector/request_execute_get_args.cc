@@ -50,7 +50,7 @@ int main(int argc, char** argv) {
     QCoreApplication app(argc, argv);
 
     for (unsigned int i = 0; lines[i].command != NULL; ++i) {
-      execute_query query(0, lines[i].command, QDateTime::currentDateTime(), -1);
+      execute_query query(0, lines[i].command, QDateTime::currentDateTime(), 0);
       QStringList list = query.get_args();
 
       QString result;

@@ -41,7 +41,7 @@ namespace                  com {
 	  Q_OBJECT
 	public:
 	                   process(nagios_macros const& macros = nagios_macros(),
-				   int timeout = -1);
+				   unsigned int timeout = 0);
 	                   process(process const& right);
 	                   ~process() throw();
 
@@ -49,13 +49,13 @@ namespace                  com {
 
 	  QDateTime const& get_start_time() const throw();
 	  QDateTime const& get_end_time() const throw();
-	  qint64           get_executed_time() const throw();
+	  unsigned int     get_executed_time() const throw();
 	  QString const&   get_stderr() const throw();
 	  QString const&   get_stdout() const throw();
 	  int              get_exit_code() const throw();
 	  bool             get_is_timeout() const throw();
 	  bool             get_is_executed() const throw();
-	  int              get_timeout() const throw();
+	  unsigned int     get_timeout() const throw();
 
 	  void             wait();
 
@@ -78,8 +78,8 @@ namespace                  com {
 	  QString          _stderr;
 	  QString          _stdout;
 	  nagios_macros    _macros;
-	  qint64           _executed_time;
-	  int              _timeout;
+	  unsigned int     _executed_time;
+	  unsigned int     _timeout;
 	  int              _exit_code;
 	  bool             _is_timeout;
 	  bool             _is_executed;

@@ -99,7 +99,7 @@ commands::command* raw::clone() const {
  */
 unsigned long raw::run(QString const& processed_cmd,
 		       nagios_macros const& macros,
-		       int timeout) {
+		       unsigned int timeout) {
   process_info info;
   info.proc = QSharedPointer<process>(new process(macros, timeout));
 
@@ -131,7 +131,7 @@ unsigned long raw::run(QString const& processed_cmd,
  */
 void raw::run(QString const& processed_cmd,
 	      nagios_macros const& macros,
-	      int timeout,
+	      unsigned int timeout,
 	      result& res) {
   _mutex.lock();
   unsigned long id = ++_id;

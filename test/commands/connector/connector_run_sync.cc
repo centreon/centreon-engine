@@ -37,7 +37,7 @@ static bool run_without_timeout() {
 			 "./bin_connector_test_run");
 
   result cmd_res;
-  cmd.run(cmd.get_command_line(), macros, -1, cmd_res);
+  cmd.run(cmd.get_command_line(), macros, 0, cmd_res);
 
   if (cmd_res.get_command_id() == 0
       || cmd_res.get_exit_code() != STATE_OK
@@ -66,7 +66,6 @@ static bool run_with_timeout() {
 
   if (cmd_res.get_command_id() == 0
       || cmd_res.get_exit_code() != STATE_CRITICAL
-      || cmd_res.get_execution_time() == 0
       || cmd_res.get_stdout() != ""
       || cmd_res.get_stderr() != "(Process Timeout)"
       || cmd_res.get_is_executed() == false

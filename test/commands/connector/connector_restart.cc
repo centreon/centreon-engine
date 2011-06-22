@@ -35,13 +35,13 @@ using namespace com::centreon::engine::commands;
 static bool restart_with_segfault() {
   nagios_macros macros = nagios_macros();
   QString command_line = "./bin_connector_test_run --kill="
-    + QString("%1").arg(QDateTime::currentDateTime().toMSecsSinceEpoch());
+    + QString("%1").arg(QDateTime::currentDateTime().toTime_t());
   connector::command cmd(__func__,
 			 command_line,
 			 "./bin_connector_test_run");
   wait_process wait_proc(cmd);
 
-  unsigned long id = cmd.run(cmd.get_command_line(), macros, -1);
+  unsigned long id = cmd.run(cmd.get_command_line(), macros, 0);
   wait_proc.wait();
 
   result const& cmd_res = wait_proc.get_result();
@@ -71,7 +71,7 @@ static bool restart_with_execution_limit() {
   wait_process wait_proc(cmd);
 
   for (unsigned int i = 0; i < 3; ++i) {
-    unsigned long id = cmd.run(cmd.get_command_line(), macros, -1);
+    unsigned long id = cmd.run(cmd.get_command_line(), macros, 0);
     wait_proc.wait();
 
     result const& cmd_res = wait_proc.get_result();

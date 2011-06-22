@@ -157,10 +157,10 @@ int result::get_exit_code() const throw() {
  *
  *  @return The execution time.
  */
-double result::get_execution_time() const throw() {
-  double res = (double)(_end_time.tv_sec - _start_time.tv_sec)
-    + (double)(_end_time.tv_usec - _start_time.tv_usec);
-  return (res < 0.0 ? 0.0 : res);
+unsigned int result::get_execution_time() const throw() {
+  if (_end_time.tv_sec < _start_time.tv_sec)
+    return (0);
+  return (_end_time.tv_sec - _start_time.tv_sec);
 }
 
 /**
@@ -241,8 +241,8 @@ void result::set_exit_code(int exit_code) throw() {
  *  @param[in] tv The start time.
  */
 void result::set_start_time(QDateTime const& time) throw() {
-  _start_time.tv_sec = time.toMSecsSinceEpoch() / 1000;
-  _start_time.tv_usec = time.toMSecsSinceEpoch() % 1000;
+  _start_time.tv_sec = time.toTime_t();
+  _start_time.tv_usec = 0;
 }
 
 /**
@@ -251,8 +251,8 @@ void result::set_start_time(QDateTime const& time) throw() {
  *  @param[in] tv The end time.
  */
 void result::set_end_time(QDateTime const& time) throw() {
-  _end_time.tv_sec = time.toMSecsSinceEpoch() / 1000;
-  _end_time.tv_usec = time.toMSecsSinceEpoch() % 1000;
+  _end_time.tv_sec = time.toTime_t();
+  _end_time.tv_usec = 0;
 }
 
 /**

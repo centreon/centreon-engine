@@ -80,7 +80,7 @@ static QSharedPointer<connector::request> wait() {
  *
  *  @return The raw query.
  */
-static QString execute_process(QStringList const& argv, int timeout, int* exit_code) {
+static QString execute_process(QStringList const& argv, unsigned int timeout, int* exit_code) {
   QString output;
 
   for (QStringList::const_iterator it = argv.begin(), end = argv.end();
@@ -98,15 +98,15 @@ static QString execute_process(QStringList const& argv, int timeout, int* exit_c
   }
 
   if (argv[1] == "--timeout=on") {
-    sleep(timeout / 1000  + 1);
+    sleep(timeout  + 1);
   }
   else if (argv[1] == "--timeout=off") {
     *exit_code = STATE_OK;
   }
   else if (argv[1].indexOf("--kill=") == 0) {
     QString value = argv[1].right(argv[1].size() - 7);
-    qint64 time = value.toLongLong() / 1000;
-    qint64 now = QDateTime::currentDateTime().toMSecsSinceEpoch() / 1000;
+    uint time = value.toUInt();
+    uint now = QDateTime::currentDateTime().toTime_t();
 
     if (now < time + 1) {
       sleep(1);

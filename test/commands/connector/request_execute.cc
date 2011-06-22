@@ -47,7 +47,7 @@ int main(int argc, char** argv) {
     QCoreApplication app(argc, argv);
 
     QDateTime time;
-    time.setMSecsSinceEpoch(TIMESTAMP);
+    time.setTime_t(TIMESTAMP);
     execute_query query(ID, BINARY, time, TIMEOUT);
     if (check_request_valid(&query, REQUEST(QUERY)) == false) {
       qDebug() << "error: query is valid failed.";

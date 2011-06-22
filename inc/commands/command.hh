@@ -56,11 +56,11 @@ namespace                        com {
 
 	  virtual unsigned long  run(QString const& processed_cmd,
 				     nagios_macros const& macors,
-				     int timeout) = 0;
+				     unsigned int timeout) = 0;
 
 	  virtual void           run(QString const& process_cmd,
 				     nagios_macros const& macros,
-				     int timeout,
+				     unsigned int timeout,
 				     result& res) = 0;
 
 	  virtual void           set_name(QString const& name);

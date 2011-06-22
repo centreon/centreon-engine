@@ -28,7 +28,7 @@ using namespace com::centreon::engine::commands::connector;
 execute_query::execute_query(unsigned long cmd_id,
 			     QString const& cmd,
 			     QDateTime const& start_time,
-			     int timeout)
+			     unsigned int timeout)
   : request(request::execute_q),
     _cmd(cmd),
     _start_time(start_time),
@@ -118,7 +118,7 @@ QByteArray execute_query::build() {
     QByteArray().setNum(_id) + '\0' +
     QByteArray().setNum(static_cast<qulonglong>(_cmd_id)) + '\0' +
     QByteArray().setNum(_timeout) + '\0' +
-    QByteArray().setNum(_start_time.toMSecsSinceEpoch()) + '\0';
+    QByteArray().setNum(_start_time.toTime_t()) + '\0';
   query += _cmd;
   return (query + cmd_ending());
 }
@@ -145,16 +145,16 @@ void execute_query::restore(QByteArray const& data) {
     throw (engine_error() << "bad request argument, invalid cmd_id.");
   }
 
-  _timeout = list[2].toInt(&ok);
+  _timeout = list[2].toUInt(&ok);
   if (ok == false) {
     throw (engine_error() << "bad request argument, invalid timeout.");
   }
 
-  qint64 timestamp = list[3].toLongLong(&ok);
+  unsigned int timestamp = list[3].toUInt(&ok);
   if (ok == false) {
     throw (engine_error() << "bad request argument, invalid start_time.");
   }
-  _start_time.setMSecsSinceEpoch(timestamp);
+  _start_time.setTime_t(timestamp);
 
   _cmd = list[4];
 }
@@ -242,6 +242,6 @@ unsigned long execute_query::get_command_id() const throw() {
  *
  *  @return The timeout value.
  */
-int execute_query::get_timeout() const throw() {
+unsigned int execute_query::get_timeout() const throw() {
  return (_timeout);
 }
