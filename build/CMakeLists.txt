@@ -441,6 +441,20 @@ else ()
   set(vardir "${localstatedir}/var")
 endif ()
 
+# incdir
+if (WITH_INCLUDE_DIR)
+  set(incdir "${WITH_INCLUDE_DIR}")
+else ()
+  set(incdir "${localstatedir}/include/centreon-engine")
+endif ()
+
+# incdir
+if (WITH_PKGCONFIG_DIR)
+  set(pkgconfigdir "${WITH_PKGCONFIG_DIR}")
+else ()
+  set(pkgconfigdir "/usr/lib/pkgconfig")
+endif ()
+
 # Check result dir.
 if (WITH_CHECK_RESULT_DIR)
   set(CHECK_RESULT_DIR "${WITH_CHECK_RESULT_DIR}")
@@ -569,6 +583,8 @@ configure_file("${SCRIPT_DIR}/centengine.sh.in"
   "${SCRIPT_DIR}/centengine.sh")
 configure_file("${SCRIPT_DIR}/ubuntu.conf.in"
   "${SCRIPT_DIR}/ubuntu.conf")
+configure_file("${SCRIPT_DIR}/centengine.pc.in"
+  "${SCRIPT_DIR}/centengine.pc")
 
 #  Locations definitions
 add_definitions(-DDEFAULT_TEMP_FILE="${localstatedir}/tempfile")
@@ -730,10 +746,15 @@ install(CODE "
 
 # Install header files for devel.
 install(DIRECTORY "${INCLUDE_DIR}/"
-  DESTINATION "${localstatedir}/include/centreon-engine/"
+  DESTINATION "${incdir}"
   COMPONENT "development"
   FILES_MATCHING PATTERN "*.hh"
   PATTERN "${INCLUDE_DIR}/compatibility/" EXCLUDE)
+
+# Install pkg-config files.
+install(FILES "${SCRIPT_DIR}/centengine.pc"
+  DESTINATION "${pkgconfigdir}"
+  COMPONENT "runtime")
 
 #
 # Error tests.
@@ -897,6 +918,8 @@ message(STATUS "    Binary Directory:        ${bindir}")
 message(STATUS "    Configuration Directory: ${confdir}")
 message(STATUS "    Library Directory:       ${libdir}")
 message(STATUS "    Var Directory:           ${vardir}")
+message(STATUS "    Include Directory:       ${incdir}")
+message(STATUS "    Pkg-config Directory:    ${pkgconfigdir}")
 message(STATUS "    Check Result Directory:  ${CHECK_RESULT_DIR}")
 message(STATUS "    Temporary Directory:     ${TMPDIR}")
 message(STATUS "    Startup Script:          ${STARTUP_SCRIPT}")

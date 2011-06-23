@@ -39,7 +39,7 @@ namespace                            com {
 	  class                      request {
 	  public:
 	    enum                     e_type {
-	      version_q = 0,
+	      version_q = 0u,
 	      version_r,
 	      execute_q,
 	      execute_r,
