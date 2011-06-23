@@ -133,6 +133,8 @@ void logging::apply(state const& config) {
   else if (config.get_log_file() != _log_file
       || config.get_log_archive_path() != _log_archive_path) {
     _add_log_file(config);
+    _del_stdout();
+    _del_stderr();
   }
 
   if (config.get_debug_file() == "") {

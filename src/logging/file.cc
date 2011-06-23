@@ -189,6 +189,7 @@ void file::log(char const* message,
   }
 
   _file->write(message);
+  _file->flush();
 
   _mutex->unlock();
 }
