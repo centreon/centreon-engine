@@ -272,13 +272,13 @@ void connector::command::_timeout() {
 		 STATE_CRITICAL,
 		 true,
 		 true);
-      it = _queries.erase(it);
       if (info.waiting_result == false) {
 	emit command_executed(res);
       }
       else {
 	_results.insert(id, res);
       }
+      it = _queries.erase(it);
       emit _wait_ending();
       continue;
     }

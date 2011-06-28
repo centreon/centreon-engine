@@ -93,6 +93,7 @@ static bool run_with_environement_macros() {
 
   unsigned long id = cmd.run(cmd.get_command_line(), macros, 0);
   wait_proc.wait();
+  delete[] macros.argv[0];
 
   result const& cmd_res = wait_proc.get_result();
   if (cmd_res.get_command_id() != id

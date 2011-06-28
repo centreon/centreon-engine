@@ -87,6 +87,7 @@ static bool run_with_environement_macros() {
 
   result cmd_res;
   cmd.run(cmd.get_command_line(), macros, 0, cmd_res);
+  delete[] macros.argv[0];
 
   if (cmd_res.get_command_id() == 0
       || cmd_res.get_exit_code() != STATE_OK
