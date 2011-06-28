@@ -340,7 +340,7 @@ struct                   host_struct {
   timeperiod*            notification_period_ptr;
   objectlist*            hostgroups_ptr;
   struct host_struct*    next;
-  struct host_struct*    nexthash;
+  struct host_struct*    nexthash; // unused?
 };
 
 // SERVICEGROUP structure
@@ -666,6 +666,9 @@ int check_for_circular_hostdependency_path(hostdependency* root_dep, hostdepende
 
 // Object Cleanup Functions
 int free_object_data(void); // frees all allocated memory for the object definitions
+
+int remove_host_by_id(char const* host_name);
+int remove_service_by_id(char const* host_name, char const* description);
 
 # ifdef __cplusplus
 }

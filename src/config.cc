@@ -312,7 +312,7 @@ int pre_flight_check(void) {
   if (test_scheduling == TRUE) {
 
     runtime[0] = (double)((double)(tv[1].tv_sec - tv[0].tv_sec)
-      + (double)((tv[1].tv_usec - tv[0].tv_usec) / 1000.0) / 1000.0);
+			  + (double)((tv[1].tv_usec - tv[0].tv_usec) / 1000.0) / 1000.0);
     if (verify_circular_paths == TRUE)
       runtime[1] = (double)((double)(tv[2].tv_sec - tv[1].tv_sec)
 			    + (double)((tv[2].tv_usec - tv[1].tv_usec) / 1000.0) / 1000.0);
@@ -341,7 +341,6 @@ int pre_flight_check(void) {
 /* do a pre-flight check to make sure object relationships make sense */
 int pre_flight_object_check(int* w, int* e) {
   contact* temp_contact = NULL;
-  commandsmember* temp_commandsmember = NULL;
   contactgroup* temp_contactgroup = NULL;
   contactsmember* temp_contactsmember = NULL;
   contactgroupsmember* temp_contactgroupsmember = NULL;
@@ -361,8 +360,6 @@ int pre_flight_object_check(int* w, int* e) {
   hostescalation* temp_he = NULL;
   servicedependency* temp_sd = NULL;
   hostdependency* temp_hd = NULL;
-  char* buf = NULL;
-  char* temp_command_name = NULL;
   int found = FALSE;
   int total_objects = 0;
   int warnings = 0;
@@ -395,10 +392,10 @@ int pre_flight_object_check(int* w, int* e) {
   /*****************************************/
   if (verify_config == TRUE)
     printf("Checking services...\n");
-  if (get_service_count() == 0) {
-    logit(NSLOG_VERIFICATION_ERROR, TRUE, "Error: There are no services defined!");
-    errors++;
-  }
+  // if (get_service_count() == 0) {
+  //   logit(NSLOG_VERIFICATION_ERROR, TRUE, "Error: There are no services defined!");
+  //   errors++;
+  // }
   total_objects = 0;
   for (temp_service = service_list;
        temp_service != NULL;
@@ -407,187 +404,7 @@ int pre_flight_object_check(int* w, int* e) {
     total_objects++;
     found = FALSE;
 
-    /* check for a valid host */
-    temp_host = find_host(temp_service->host_name);
-
-    /* we couldn't find an associated host! */
-    if (!temp_host) {
-      logit(NSLOG_VERIFICATION_ERROR, TRUE,
-            "Error: Host '%s' specified in service '%s' not defined anywhere!",
-            temp_service->host_name, temp_service->description);
-      errors++;
-    }
-
-    /* save the host pointer for later */
-    temp_service->host_ptr = temp_host;
-
-    /* add a reverse link from the host to the service for faster lookups later */
-    add_service_link_to_host(temp_host, temp_service);
-
-    /* check the event handler command */
-    if (temp_service->event_handler != NULL) {
-
-      /* check the event handler command */
-      buf = my_strdup(temp_service->event_handler);
-
-      /* get the command name, leave any arguments behind */
-      temp_command_name = my_strtok(buf, "!");
-
-      temp_command = find_command(temp_command_name);
-      if (temp_command == NULL) {
-        logit(NSLOG_VERIFICATION_ERROR, TRUE,
-              "Error: Event handler command '%s' specified in service '%s' for host '%s' not defined anywhere",
-              temp_command_name, temp_service->description,
-              temp_service->host_name);
-        errors++;
-      }
-
-      delete[] buf;
-
-      /* save the pointer to the event handler for later */
-      temp_service->event_handler_ptr = temp_command;
-    }
-
-    /* check the service check_command */
-    buf = my_strdup(temp_service->service_check_command);
-
-    /* get the command name, leave any arguments behind */
-    temp_command_name = my_strtok(buf, "!");
-
-    temp_command = find_command(temp_command_name);
-    if (temp_command == NULL) {
-      logit(NSLOG_VERIFICATION_ERROR, TRUE,
-            "Error: Service check command '%s' specified in service '%s' for host '%s' not defined anywhere!",
-            temp_command_name, temp_service->description,
-            temp_service->host_name);
-      errors++;
-    }
-
-    delete[] buf;
-
-    /* save the pointer to the check command for later */
-    temp_service->check_command_ptr = temp_command;
-
-    /* check for sane recovery options */
-    if (temp_service->notify_on_recovery == TRUE
-        && temp_service->notify_on_warning == FALSE
-        && temp_service->notify_on_critical == FALSE) {
-      logit(NSLOG_VERIFICATION_WARNING, TRUE,
-            "Warning: Recovery notification option in service '%s' for host '%s' doesn't make any sense - specify warning and/or critical options as well",
-            temp_service->description, temp_service->host_name);
-      warnings++;
-    }
-
-    /* reset the found flag */
-    found = FALSE;
-
-    /* check for valid contacts */
-    for (temp_contactsmember = temp_service->contacts;
-         temp_contactsmember != NULL;
-         temp_contactsmember = temp_contactsmember->next) {
-
-      temp_contact = find_contact(temp_contactsmember->contact_name);
-
-      if (temp_contact == NULL) {
-        logit(NSLOG_VERIFICATION_ERROR, TRUE,
-              "Error: Contact '%s' specified in service '%s' for host '%s' is not defined anywhere!",
-              temp_contactsmember->contact_name, temp_service->description,
-              temp_service->host_name);
-        errors++;
-      }
-
-      /* save the contact pointer for later */
-      temp_contactsmember->contact_ptr = temp_contact;
-    }
-
-    /* check all contact groupss */
-    for (temp_contactgroupsmember = temp_service->contact_groups;
-         temp_contactgroupsmember != NULL;
-         temp_contactgroupsmember = temp_contactgroupsmember->next) {
-
-      temp_contactgroup = find_contactgroup(temp_contactgroupsmember->group_name);
-
-      if (temp_contactgroup == NULL) {
-        logit(NSLOG_VERIFICATION_ERROR, TRUE,
-              "Error: Contact group '%s' specified in service '%s' for host '%s' is not defined anywhere!",
-              temp_contactgroupsmember->group_name, temp_service->description,
-              temp_service->host_name);
-        errors++;
-      }
-
-      /* save the contact group pointer for later */
-      temp_contactgroupsmember->group_ptr = temp_contactgroup;
-    }
-
-    /* check to see if there is at least one contact/group */
-    if (temp_service->contacts == NULL && temp_service->contact_groups == NULL) {
-      logit(NSLOG_VERIFICATION_WARNING, TRUE,
-            "Warning: Service '%s' on host '%s' has no default contacts or contactgroups defined!",
-            temp_service->description, temp_service->host_name);
-      warnings++;
-    }
-
-    /* verify service check timeperiod */
-    if (temp_service->check_period == NULL) {
-      logit(NSLOG_VERIFICATION_WARNING, TRUE,
-            "Warning: Service '%s' on host '%s' has no check time period defined!",
-            temp_service->description, temp_service->host_name);
-      warnings++;
-    }
-    else {
-      temp_timeperiod = find_timeperiod(temp_service->check_period);
-      if (temp_timeperiod == NULL) {
-        logit(NSLOG_VERIFICATION_ERROR, TRUE,
-              "Error: Check period '%s' specified for service '%s' on host '%s' is not defined anywhere!",
-              temp_service->check_period, temp_service->description,
-              temp_service->host_name);
-        errors++;
-      }
-
-      /* save the pointer to the check timeperiod for later */
-      temp_service->check_period_ptr = temp_timeperiod;
-    }
-
-    /* check service notification timeperiod */
-    if (temp_service->notification_period == NULL) {
-      logit(NSLOG_VERIFICATION_WARNING, TRUE,
-            "Warning: Service '%s' on host '%s' has no notification time period defined!",
-            temp_service->description, temp_service->host_name);
-      warnings++;
-    }
-
-    else {
-      temp_timeperiod = find_timeperiod(temp_service->notification_period);
-      if (temp_timeperiod == NULL) {
-        logit(NSLOG_VERIFICATION_ERROR, TRUE,
-              "Error: Notification period '%s' specified for service '%s' on host '%s' is not defined anywhere!",
-              temp_service->notification_period, temp_service->description,
-              temp_service->host_name);
-        errors++;
-      }
-
-      /* save the pointer to the notification timeperiod for later */
-      temp_service->notification_period_ptr = temp_timeperiod;
-    }
-
-    /* see if the notification interval is less than the check interval */
-    if (temp_service->notification_interval < temp_service->check_interval
-        && temp_service->notification_interval != 0) {
-      logit(NSLOG_VERIFICATION_WARNING, TRUE,
-            "Warning: Service '%s' on host '%s'  has a notification interval less than its check interval!  Notifications are only re-sent after checks are made, so the effective notification interval will be that of the check interval.",
-            temp_service->description, temp_service->host_name);
-      warnings++;
-    }
-
-    /* check for illegal characters in service description */
-    if (use_precached_objects == FALSE) {
-      if (contains_illegal_object_chars(temp_service->description) == TRUE) {
-        logit(NSLOG_VERIFICATION_ERROR, TRUE,
-              "Error: The description string for service '%s' on host '%s' contains one or more illegal characters.",
-              temp_service->description, temp_service->host_name);
-        errors++;
-      }
-    }
+    check_service(temp_service, &warnings, &errors);
   }
 
   if (verify_config == TRUE)
@@ -599,10 +416,10 @@ int pre_flight_object_check(int* w, int* e) {
   if (verify_config == TRUE)
     printf("Checking hosts...\n");
 
-  if (get_host_count() == 0) {
-    logit(NSLOG_VERIFICATION_ERROR, TRUE, "Error: There are no hosts defined!");
-    errors++;
-  }
+  // if (get_host_count() == 0) {
+  //   logit(NSLOG_VERIFICATION_ERROR, TRUE, "Error: There are no hosts defined!");
+  //   errors++;
+  // }
 
   total_objects = 0;
   for (temp_host = host_list; temp_host != NULL; temp_host = temp_host->next) {
@@ -610,187 +427,7 @@ int pre_flight_object_check(int* w, int* e) {
     total_objects++;
     found = FALSE;
 
-    /* make sure each host has at least one service associated with it */
-    /* 02/21/08 NOTE: this is extremely inefficient */
-    if (use_precached_objects == FALSE
-        && config.get_use_large_installation_tweaks() == false) {
-
-      for (temp_service = service_list;
-	   temp_service != NULL;
-           temp_service = temp_service->next) {
-        if (!strcmp(temp_service->host_name, temp_host->name)) {
-          found = TRUE;
-          break;
-        }
-      }
-
-      /* we couldn't find a service associated with this host! */
-      if (found == FALSE) {
-        logit(NSLOG_VERIFICATION_WARNING, TRUE,
-              "Warning: Host '%s' has no services associated with it!",
-              temp_host->name);
-        warnings++;
-      }
-
-      found = FALSE;
-    }
-
-    /* check the event handler command */
-    if (temp_host->event_handler != NULL) {
-
-      /* check the event handler command */
-      buf = my_strdup(temp_host->event_handler);
-
-      /* get the command name, leave any arguments behind */
-      temp_command_name = my_strtok(buf, "!");
-
-      temp_command = find_command(temp_command_name);
-      if (temp_command == NULL) {
-        logit(NSLOG_VERIFICATION_ERROR, TRUE,
-              "Error: Event handler command '%s' specified for host '%s' not defined anywhere",
-              temp_command_name, temp_host->name);
-        errors++;
-      }
-
-      delete[] buf;
-
-      /* save the pointer to the event handler command for later */
-      temp_host->event_handler_ptr = temp_command;
-    }
-
-    /* hosts that don't have check commands defined shouldn't ever be checked... */
-    if (temp_host->host_check_command != NULL) {
-
-      /* check the host check_command */
-      buf = my_strdup(temp_host->host_check_command);
-
-      /* get the command name, leave any arguments behind */
-      temp_command_name = my_strtok(buf, "!");
-
-      temp_command = find_command(temp_command_name);
-      if (temp_command == NULL) {
-        logit(NSLOG_VERIFICATION_ERROR, TRUE,
-              "Error: Host check command '%s' specified for host '%s' is not defined anywhere!",
-              temp_command_name, temp_host->name);
-        errors++;
-      }
-
-      /* save the pointer to the check command for later */
-      temp_host->check_command_ptr = temp_command;
-
-      delete[] buf;
-    }
-
-    /* check host check timeperiod */
-    if (temp_host->check_period != NULL) {
-      temp_timeperiod = find_timeperiod(temp_host->check_period);
-      if (temp_timeperiod == NULL) {
-        logit(NSLOG_VERIFICATION_ERROR, TRUE,
-              "Error: Check period '%s' specified for host '%s' is not defined anywhere!",
-              temp_host->check_period, temp_host->name);
-        errors++;
-      }
-
-      /* save the pointer to the check timeperiod for later */
-      temp_host->check_period_ptr = temp_timeperiod;
-    }
-
-    /* check all contacts */
-    for (temp_contactsmember = temp_host->contacts;
-	 temp_contactsmember != NULL;
-         temp_contactsmember = temp_contactsmember->next) {
-
-      temp_contact = find_contact(temp_contactsmember->contact_name);
-
-      if (temp_contact == NULL) {
-        logit(NSLOG_VERIFICATION_ERROR, TRUE,
-              "Error: Contact '%s' specified in host '%s' is not defined anywhere!",
-              temp_contactsmember->contact_name, temp_host->name);
-        errors++;
-      }
-
-      /* save the contact pointer for later */
-      temp_contactsmember->contact_ptr = temp_contact;
-    }
-
-    /* check all contact groups */
-    for (temp_contactgroupsmember = temp_host->contact_groups;
-         temp_contactgroupsmember != NULL;
-         temp_contactgroupsmember = temp_contactgroupsmember->next) {
-
-      temp_contactgroup = find_contactgroup(temp_contactgroupsmember->group_name);
-
-      if (temp_contactgroup == NULL) {
-        logit(NSLOG_VERIFICATION_ERROR, TRUE,
-              "Error: Contact group '%s' specified in host '%s' is not defined anywhere!",
-              temp_contactgroupsmember->group_name, temp_host->name);
-        errors++;
-      }
-
-      /* save the contact group pointer for later */
-      temp_contactgroupsmember->group_ptr = temp_contactgroup;
-    }
-
-    /* check to see if there is at least one contact/group */
-    if (temp_host->contacts == NULL && temp_host->contact_groups == NULL) {
-      logit(NSLOG_VERIFICATION_WARNING, TRUE,
-            "Warning: Host '%s' has no default contacts or contactgroups defined!",
-            temp_host->name);
-      warnings++;
-    }
-
-    /* check notification timeperiod */
-    if (temp_host->notification_period != NULL) {
-      temp_timeperiod = find_timeperiod(temp_host->notification_period);
-      if (temp_timeperiod == NULL) {
-        logit(NSLOG_VERIFICATION_ERROR, TRUE,
-              "Error: Notification period '%s' specified for host '%s' is not defined anywhere!",
-              temp_host->notification_period, temp_host->name);
-        errors++;
-      }
-
-      /* save the pointer to the notification timeperiod for later */
-      temp_host->notification_period_ptr = temp_timeperiod;
-    }
-
-    /* check all parent parent host */
-    for (temp_hostsmember = temp_host->parent_hosts;
-	 temp_hostsmember != NULL;
-         temp_hostsmember = temp_hostsmember->next) {
-
-      if ((temp_host2 = find_host(temp_hostsmember->host_name)) == NULL) {
-        logit(NSLOG_VERIFICATION_ERROR, TRUE,
-              "Error: '%s' is not a valid parent for host '%s'!",
-              temp_hostsmember->host_name, temp_host->name);
-        errors++;
-      }
-
-      /* save the parent host pointer for later */
-      temp_hostsmember->host_ptr = temp_host2;
-
-      /* add a reverse (child) link to make searches faster later on */
-      add_child_link_to_host(temp_host2, temp_host);
-    }
-
-    /* check for sane recovery options */
-    if (temp_host->notify_on_recovery == TRUE
-        && temp_host->notify_on_down == FALSE
-        && temp_host->notify_on_unreachable == FALSE) {
-      logit(NSLOG_VERIFICATION_WARNING, TRUE,
-            "Warning: Recovery notification option in host '%s' definition doesn't make any sense - specify down and/or unreachable options as well",
-            temp_host->name);
-      warnings++;
-    }
-
-    /* check for illegal characters in host name */
-    if (use_precached_objects == FALSE) {
-      if (contains_illegal_object_chars(temp_host->name) == TRUE) {
-        logit(NSLOG_VERIFICATION_ERROR, TRUE,
-              "Error: The name of host '%s' contains one or more illegal characters.",
-              temp_host->name);
-        errors++;
-      }
-    }
+    check_host(temp_host, &warnings, &errors);
   }
 
   if (verify_config == TRUE)
@@ -891,149 +528,14 @@ int pre_flight_object_check(int* w, int* e) {
   /*****************************************/
   if (verify_config == TRUE)
     printf("Checking contacts...\n");
-  if (contact_list == NULL) {
-    logit(NSLOG_VERIFICATION_ERROR, TRUE, "Error: There are no contacts defined!");
-    errors++;
-  }
+  // if (contact_list == NULL) {
+  //   logit(NSLOG_VERIFICATION_ERROR, TRUE, "Error: There are no contacts defined!");
+  //   errors++;
+  // }
   for (temp_contact = contact_list, total_objects = 0;
        temp_contact != NULL;
        temp_contact = temp_contact->next, total_objects++) {
-
-    /* check service notification commands */
-    if (temp_contact->service_notification_commands == NULL) {
-      logit(NSLOG_VERIFICATION_ERROR, TRUE,
-            "Error: Contact '%s' has no service notification commands defined!",
-            temp_contact->name);
-      errors++;
-    }
-    else
-      for (temp_commandsmember = temp_contact->service_notification_commands;
-           temp_commandsmember != NULL;
-           temp_commandsmember = temp_commandsmember->next) {
-
-        /* check the host notification command */
-        buf = my_strdup(temp_commandsmember->cmd);
-
-        /* get the command name, leave any arguments behind */
-        temp_command_name = my_strtok(buf, "!");
-
-        temp_command = find_command(temp_command_name);
-        if (temp_command == NULL) {
-          logit(NSLOG_VERIFICATION_ERROR, TRUE,
-                "Error: Service notification command '%s' specified for contact '%s' is not defined anywhere!",
-                temp_command_name, temp_contact->name);
-          errors++;
-        }
-
-        /* save pointer to the command for later */
-        temp_commandsmember->command_ptr = temp_command;
-
-        delete[] buf;
-      }
-
-    /* check host notification commands */
-    if (temp_contact->host_notification_commands == NULL) {
-      logit(NSLOG_VERIFICATION_ERROR, TRUE,
-            "Error: Contact '%s' has no host notification commands defined!",
-            temp_contact->name);
-      errors++;
-    }
-    else
-      for (temp_commandsmember = temp_contact->host_notification_commands;
-           temp_commandsmember != NULL;
-           temp_commandsmember = temp_commandsmember->next) {
-
-        /* check the host notification command */
-        buf = my_strdup(temp_commandsmember->cmd);
-
-        /* get the command name, leave any arguments behind */
-        temp_command_name = my_strtok(buf, "!");
-
-        temp_command = find_command(temp_command_name);
-        if (temp_command == NULL) {
-          logit(NSLOG_VERIFICATION_ERROR, TRUE,
-                "Error: Host notification command '%s' specified for contact '%s' is not defined anywhere!",
-                temp_command_name, temp_contact->name);
-          errors++;
-        }
-
-        /* save pointer to the command for later */
-        temp_commandsmember->command_ptr = temp_command;
-
-        delete[] buf;
-      }
-
-    /* check service notification timeperiod */
-    if (temp_contact->service_notification_period == NULL) {
-      logit(NSLOG_VERIFICATION_WARNING, TRUE,
-            "Warning: Contact '%s' has no service notification time period defined!",
-            temp_contact->name);
-      warnings++;
-    }
-
-    else {
-      temp_timeperiod = find_timeperiod(temp_contact->service_notification_period);
-      if (temp_timeperiod == NULL) {
-        logit(NSLOG_VERIFICATION_ERROR, TRUE,
-              "Error: Service notification period '%s' specified for contact '%s' is not defined anywhere!",
-              temp_contact->service_notification_period, temp_contact->name);
-        errors++;
-      }
-
-      /* save the pointer to the service notification timeperiod for later */
-      temp_contact->service_notification_period_ptr = temp_timeperiod;
-    }
-
-    /* check host notification timeperiod */
-    if (temp_contact->host_notification_period == NULL) {
-      logit(NSLOG_VERIFICATION_WARNING, TRUE,
-            "Warning: Contact '%s' has no host notification time period defined!",
-            temp_contact->name);
-      warnings++;
-    }
-
-    else {
-      temp_timeperiod = find_timeperiod(temp_contact->host_notification_period);
-      if (temp_timeperiod == NULL) {
-        logit(NSLOG_VERIFICATION_ERROR, TRUE,
-              "Error: Host notification period '%s' specified for contact '%s' is not defined anywhere!",
-              temp_contact->host_notification_period, temp_contact->name);
-        errors++;
-      }
-
-      /* save the pointer to the host notification timeperiod for later */
-      temp_contact->host_notification_period_ptr = temp_timeperiod;
-    }
-
-    /* check for sane host recovery options */
-    if (temp_contact->notify_on_host_recovery == TRUE
-        && temp_contact->notify_on_host_down == FALSE
-        && temp_contact->notify_on_host_unreachable == FALSE) {
-      logit(NSLOG_VERIFICATION_WARNING, TRUE,
-            "Warning: Host recovery notification option for contact '%s' doesn't make any sense - specify down and/or unreachable options as well",
-            temp_contact->name);
-      warnings++;
-    }
-
-    /* check for sane service recovery options */
-    if (temp_contact->notify_on_service_recovery == TRUE
-        && temp_contact->notify_on_service_critical == FALSE
-        && temp_contact->notify_on_service_warning == FALSE) {
-      logit(NSLOG_VERIFICATION_WARNING, TRUE,
-            "Warning: Service recovery notification option for contact '%s' doesn't make any sense - specify critical and/or warning options as well",
-            temp_contact->name);
-      warnings++;
-    }
-
-    /* check for illegal characters in contact name */
-    if (use_precached_objects == FALSE) {
-      if (contains_illegal_object_chars(temp_contact->name) == TRUE) {
-        logit(NSLOG_VERIFICATION_ERROR, TRUE,
-              "Error: The name of contact '%s' contains one or more illegal characters.",
-              temp_contact->name);
-        errors++;
-      }
-    }
+    check_contact(temp_contact, &warnings, &errors);
   }
 
   if (verify_config == TRUE)
@@ -1639,4 +1141,530 @@ int pre_flight_circular_check(int* w, int* e) {
   *e += errors;
 
   return ((errors > 0) ? ERROR : OK);
+}
+
+int check_service(service* svc, int* w, int* e) {
+  int errors = 0;
+  int warnings = 0;
+
+  /* check for a valid host */
+  host* temp_host = find_host(svc->host_name);
+
+  /* we couldn't find an associated host! */
+  if (!temp_host) {
+    logit(NSLOG_VERIFICATION_ERROR, TRUE,
+	  "Error: Host '%s' specified in service '%s' not defined anywhere!",
+	  svc->host_name, svc->description);
+    errors++;
+  }
+
+  /* save the host pointer for later */
+  svc->host_ptr = temp_host;
+
+  /* add a reverse link from the host to the service for faster lookups later */
+  add_service_link_to_host(temp_host, svc);
+
+  /* check the event handler command */
+  if (svc->event_handler != NULL) {
+
+    /* check the event handler command */
+    char* buf = my_strdup(svc->event_handler);
+
+    /* get the command name, leave any arguments behind */
+    char* temp_command_name = my_strtok(buf, "!");
+
+    command* temp_command = find_command(temp_command_name);
+    if (temp_command == NULL) {
+      logit(NSLOG_VERIFICATION_ERROR, TRUE,
+	    "Error: Event handler command '%s' specified in service '%s' for host '%s' not defined anywhere",
+	    temp_command_name, svc->description,
+	    svc->host_name);
+      errors++;
+    }
+
+    delete[] buf;
+
+    /* save the pointer to the event handler for later */
+    svc->event_handler_ptr = temp_command;
+  }
+
+  /* check the service check_command */
+  char* buf = my_strdup(svc->service_check_command);
+
+  /* get the command name, leave any arguments behind */
+  char* temp_command_name = my_strtok(buf, "!");
+
+  command* temp_command = find_command(temp_command_name);
+  if (temp_command == NULL) {
+    logit(NSLOG_VERIFICATION_ERROR, TRUE,
+	  "Error: Service check command '%s' specified in service '%s' for host '%s' not defined anywhere!",
+	  temp_command_name, svc->description,
+	  svc->host_name);
+    errors++;
+  }
+
+  delete[] buf;
+
+  /* save the pointer to the check command for later */
+  svc->check_command_ptr = temp_command;
+
+  /* check for sane recovery options */
+  if (svc->notify_on_recovery == TRUE
+      && svc->notify_on_warning == FALSE
+      && svc->notify_on_critical == FALSE) {
+    logit(NSLOG_VERIFICATION_WARNING, TRUE,
+	  "Warning: Recovery notification option in service '%s' for host '%s' doesn't make any sense - specify warning and/or critical options as well",
+	  svc->description, svc->host_name);
+    warnings++;
+  }
+
+  /* check for valid contacts */
+  for (contactsmember* temp_contactsmember = svc->contacts;
+       temp_contactsmember != NULL;
+       temp_contactsmember = temp_contactsmember->next) {
+
+    contact* temp_contact = find_contact(temp_contactsmember->contact_name);
+
+    if (temp_contact == NULL) {
+      logit(NSLOG_VERIFICATION_ERROR, TRUE,
+	    "Error: Contact '%s' specified in service '%s' for host '%s' is not defined anywhere!",
+	    temp_contactsmember->contact_name, svc->description,
+	    svc->host_name);
+      errors++;
+    }
+
+    /* save the contact pointer for later */
+    temp_contactsmember->contact_ptr = temp_contact;
+  }
+
+  /* check all contact groupss */
+  for (contactgroupsmember* temp_contactgroupsmember = svc->contact_groups;
+       temp_contactgroupsmember != NULL;
+       temp_contactgroupsmember = temp_contactgroupsmember->next) {
+
+    contactgroup* temp_contactgroup = find_contactgroup(temp_contactgroupsmember->group_name);
+
+    if (temp_contactgroup == NULL) {
+      logit(NSLOG_VERIFICATION_ERROR, TRUE,
+	    "Error: Contact group '%s' specified in service '%s' for host '%s' is not defined anywhere!",
+	    temp_contactgroupsmember->group_name, svc->description,
+	    svc->host_name);
+      errors++;
+    }
+
+    /* save the contact group pointer for later */
+    temp_contactgroupsmember->group_ptr = temp_contactgroup;
+  }
+
+  /* check to see if there is at least one contact/group */
+  if (svc->contacts == NULL && svc->contact_groups == NULL) {
+    logit(NSLOG_VERIFICATION_WARNING, TRUE,
+	  "Warning: Service '%s' on host '%s' has no default contacts or contactgroups defined!",
+	  svc->description, svc->host_name);
+    warnings++;
+  }
+
+  /* verify service check timeperiod */
+  if (svc->check_period == NULL) {
+    logit(NSLOG_VERIFICATION_WARNING, TRUE,
+	  "Warning: Service '%s' on host '%s' has no check time period defined!",
+	  svc->description, svc->host_name);
+    warnings++;
+  }
+  else {
+    timeperiod* temp_timeperiod = find_timeperiod(svc->check_period);
+    if (temp_timeperiod == NULL) {
+      logit(NSLOG_VERIFICATION_ERROR, TRUE,
+	    "Error: Check period '%s' specified for service '%s' on host '%s' is not defined anywhere!",
+	    svc->check_period, svc->description,
+	    svc->host_name);
+      errors++;
+    }
+
+    /* save the pointer to the check timeperiod for later */
+    svc->check_period_ptr = temp_timeperiod;
+  }
+
+  /* check service notification timeperiod */
+  if (svc->notification_period == NULL) {
+    logit(NSLOG_VERIFICATION_WARNING, TRUE,
+	  "Warning: Service '%s' on host '%s' has no notification time period defined!",
+	  svc->description, svc->host_name);
+    warnings++;
+  }
+
+  else {
+    timeperiod* temp_timeperiod = find_timeperiod(svc->notification_period);
+    if (temp_timeperiod == NULL) {
+      logit(NSLOG_VERIFICATION_ERROR, TRUE,
+	    "Error: Notification period '%s' specified for service '%s' on host '%s' is not defined anywhere!",
+	    svc->notification_period, svc->description,
+	    svc->host_name);
+      errors++;
+    }
+
+    /* save the pointer to the notification timeperiod for later */
+    svc->notification_period_ptr = temp_timeperiod;
+  }
+
+  /* see if the notification interval is less than the check interval */
+  if (svc->notification_interval < svc->check_interval
+      && svc->notification_interval != 0) {
+    logit(NSLOG_VERIFICATION_WARNING, TRUE,
+	  "Warning: Service '%s' on host '%s'  has a notification interval less than its check interval!  Notifications are only re-sent after checks are made, so the effective notification interval will be that of the check interval.",
+	  svc->description, svc->host_name);
+    warnings++;
+  }
+
+  /* check for illegal characters in service description */
+  if (use_precached_objects == FALSE) {
+    if (contains_illegal_object_chars(svc->description) == TRUE) {
+      logit(NSLOG_VERIFICATION_ERROR, TRUE,
+	    "Error: The description string for service '%s' on host '%s' contains one or more illegal characters.",
+	    svc->description, svc->host_name);
+      errors++;
+    }
+  }
+
+  *w += warnings;
+  *e += errors;
+  return (errors == 0);
+}
+
+int check_host(host* hst, int* w, int* e) {
+  int warnings = 0;
+  int errors = 0;
+
+  /* make sure each host has at least one service associated with it */
+  /* 02/21/08 NOTE: this is extremely inefficient */
+  if (use_precached_objects == FALSE
+      && config.get_use_large_installation_tweaks() == false) {
+
+    bool found = false;
+    for (service* temp_service = service_list;
+	 temp_service != NULL;
+	 temp_service = temp_service->next) {
+      if (!strcmp(temp_service->host_name, hst->name)) {
+	found = true;
+	break;
+      }
+    }
+
+    /* we couldn't find a service associated with this host! */
+    if (found == false) {
+      logit(NSLOG_VERIFICATION_WARNING, TRUE,
+	    "Warning: Host '%s' has no services associated with it!",
+	    hst->name);
+      warnings++;
+    }
+  }
+
+  /* check the event handler command */
+  if (hst->event_handler != NULL) {
+
+    /* check the event handler command */
+    char* buf = my_strdup(hst->event_handler);
+
+    /* get the command name, leave any arguments behind */
+    char* temp_command_name = my_strtok(buf, "!");
+
+    command* temp_command = find_command(temp_command_name);
+    if (temp_command == NULL) {
+      logit(NSLOG_VERIFICATION_ERROR, TRUE,
+	    "Error: Event handler command '%s' specified for host '%s' not defined anywhere",
+	    temp_command_name,
+	    hst->name);
+      errors++;
+    }
+
+    delete[] buf;
+
+    /* save the pointer to the event handler command for later */
+    hst->event_handler_ptr = temp_command;
+  }
+
+  /* hosts that don't have check commands defined shouldn't ever be checked... */
+  if (hst->host_check_command != NULL) {
+
+    /* check the host check_command */
+    char* buf = my_strdup(hst->host_check_command);
+
+    /* get the command name, leave any arguments behind */
+    char* temp_command_name = my_strtok(buf, "!");
+
+    command* temp_command = find_command(temp_command_name);
+    if (temp_command == NULL) {
+      logit(NSLOG_VERIFICATION_ERROR, TRUE,
+	    "Error: Host check command '%s' specified for host '%s' is not defined anywhere!",
+	    temp_command_name, hst->name);
+      errors++;
+    }
+
+    /* save the pointer to the check command for later */
+    hst->check_command_ptr = temp_command;
+
+    delete[] buf;
+  }
+
+  /* check host check timeperiod */
+  if (hst->check_period != NULL) {
+    timeperiod* temp_timeperiod = find_timeperiod(hst->check_period);
+    if (temp_timeperiod == NULL) {
+      logit(NSLOG_VERIFICATION_ERROR, TRUE,
+	    "Error: Check period '%s' specified for host '%s' is not defined anywhere!",
+	    hst->check_period,
+	    hst->name);
+      errors++;
+    }
+
+    /* save the pointer to the check timeperiod for later */
+    hst->check_period_ptr = temp_timeperiod;
+  }
+
+  /* check all contacts */
+  for (contactsmember* temp_contactsmember = hst->contacts;
+       temp_contactsmember != NULL;
+       temp_contactsmember = temp_contactsmember->next) {
+
+    contact* temp_contact = find_contact(temp_contactsmember->contact_name);
+
+    if (temp_contact == NULL) {
+      logit(NSLOG_VERIFICATION_ERROR, TRUE,
+	    "Error: Contact '%s' specified in host '%s' is not defined anywhere!",
+	    temp_contactsmember->contact_name, hst->name);
+      errors++;
+    }
+
+    /* save the contact pointer for later */
+    temp_contactsmember->contact_ptr = temp_contact;
+  }
+
+  /* check all contact groups */
+  for (contactgroupsmember* temp_contactgroupsmember = hst->contact_groups;
+       temp_contactgroupsmember != NULL;
+       temp_contactgroupsmember = temp_contactgroupsmember->next) {
+
+    contactgroup* temp_contactgroup = find_contactgroup(temp_contactgroupsmember->group_name);
+
+    if (temp_contactgroup == NULL) {
+      logit(NSLOG_VERIFICATION_ERROR, TRUE,
+	    "Error: Contact group '%s' specified in host '%s' is not defined anywhere!",
+	    temp_contactgroupsmember->group_name, hst->name);
+      errors++;
+    }
+
+    /* save the contact group pointer for later */
+    temp_contactgroupsmember->group_ptr = temp_contactgroup;
+  }
+
+  /* check to see if there is at least one contact/group */
+  if (hst->contacts == NULL && hst->contact_groups == NULL) {
+    logit(NSLOG_VERIFICATION_WARNING, TRUE,
+	  "Warning: Host '%s' has no default contacts or contactgroups defined!",
+	  hst->name);
+    warnings++;
+  }
+
+  /* check notification timeperiod */
+  if (hst->notification_period != NULL) {
+    timeperiod* temp_timeperiod = find_timeperiod(hst->notification_period);
+    if (temp_timeperiod == NULL) {
+      logit(NSLOG_VERIFICATION_ERROR, TRUE,
+	    "Error: Notification period '%s' specified for host '%s' is not defined anywhere!",
+	    hst->notification_period, hst->name);
+      errors++;
+    }
+
+    /* save the pointer to the notification timeperiod for later */
+    hst->notification_period_ptr = temp_timeperiod;
+  }
+
+  /* check all parent parent host */
+  for (hostsmember* temp_hostsmember = hst->parent_hosts;
+       temp_hostsmember != NULL;
+       temp_hostsmember = temp_hostsmember->next) {
+
+    host* hst2 = NULL;
+    if ((hst2 = find_host(temp_hostsmember->host_name)) == NULL) {
+      logit(NSLOG_VERIFICATION_ERROR, TRUE,
+	    "Error: '%s' is not a valid parent for host '%s'!",
+	    temp_hostsmember->host_name, hst->name);
+      errors++;
+    }
+
+    /* save the parent host pointer for later */
+    temp_hostsmember->host_ptr = hst2;
+
+    /* add a reverse (child) link to make searches faster later on */
+    add_child_link_to_host(hst2, hst);
+  }
+
+  /* check for sane recovery options */
+  if (hst->notify_on_recovery == TRUE
+      && hst->notify_on_down == FALSE
+      && hst->notify_on_unreachable == FALSE) {
+    logit(NSLOG_VERIFICATION_WARNING, TRUE,
+	  "Warning: Recovery notification option in host '%s' definition doesn't make any sense - specify down and/or unreachable options as well",
+	  hst->name);
+    warnings++;
+  }
+
+  /* check for illegal characters in host name */
+  if (use_precached_objects == FALSE) {
+    if (contains_illegal_object_chars(hst->name) == TRUE) {
+      logit(NSLOG_VERIFICATION_ERROR, TRUE,
+	    "Error: The name of host '%s' contains one or more illegal characters.",
+	    hst->name);
+      errors++;
+    }
+  }
+
+  *w += warnings;
+  *e += errors;
+  return (errors == 0);
+}
+
+int check_contact(contact* cntct, int* w, int* e) {
+  int warnings = 0;
+  int errors = 0;
+
+  /* check service notification commands */
+  if (cntct->service_notification_commands == NULL) {
+    logit(NSLOG_VERIFICATION_ERROR, TRUE,
+	  "Error: Contact '%s' has no service notification commands defined!",
+	  cntct->name);
+    errors++;
+  }
+  else
+    for (commandsmember* temp_commandsmember = cntct->service_notification_commands;
+	 temp_commandsmember != NULL;
+	 temp_commandsmember = temp_commandsmember->next) {
+
+      /* check the host notification command */
+      char* buf = my_strdup(temp_commandsmember->cmd);
+
+      /* get the command name, leave any arguments behind */
+      char* temp_command_name = my_strtok(buf, "!");
+
+      command* temp_command = find_command(temp_command_name);
+      if (temp_command == NULL) {
+	logit(NSLOG_VERIFICATION_ERROR, TRUE,
+	      "Error: Service notification command '%s' specified for contact '%s' is not defined anywhere!",
+	      temp_command_name, cntct->name);
+	errors++;
+      }
+
+      /* save pointer to the command for later */
+      temp_commandsmember->command_ptr = temp_command;
+
+      delete[] buf;
+    }
+
+  /* check host notification commands */
+  if (cntct->host_notification_commands == NULL) {
+    logit(NSLOG_VERIFICATION_ERROR, TRUE,
+	  "Error: Contact '%s' has no host notification commands defined!",
+	  cntct->name);
+    errors++;
+  }
+  else
+    for (commandsmember* temp_commandsmember = cntct->host_notification_commands;
+	 temp_commandsmember != NULL;
+	 temp_commandsmember = temp_commandsmember->next) {
+
+      /* check the host notification command */
+      char* buf = my_strdup(temp_commandsmember->cmd);
+
+      /* get the command name, leave any arguments behind */
+      char* temp_command_name = my_strtok(buf, "!");
+
+      command* temp_command = find_command(temp_command_name);
+      if (temp_command == NULL) {
+	logit(NSLOG_VERIFICATION_ERROR, TRUE,
+	      "Error: Host notification command '%s' specified for contact '%s' is not defined anywhere!",
+	      temp_command_name, cntct->name);
+	errors++;
+      }
+
+      /* save pointer to the command for later */
+      temp_commandsmember->command_ptr = temp_command;
+
+      delete[] buf;
+    }
+
+  /* check service notification timeperiod */
+  if (cntct->service_notification_period == NULL) {
+    logit(NSLOG_VERIFICATION_WARNING, TRUE,
+	  "Warning: Contact '%s' has no service notification time period defined!",
+	  cntct->name);
+    warnings++;
+  }
+
+  else {
+    timeperiod* temp_timeperiod = find_timeperiod(cntct->service_notification_period);
+    if (temp_timeperiod == NULL) {
+      logit(NSLOG_VERIFICATION_ERROR, TRUE,
+	    "Error: Service notification period '%s' specified for contact '%s' is not defined anywhere!",
+	    cntct->service_notification_period, cntct->name);
+      errors++;
+    }
+
+    /* save the pointer to the service notification timeperiod for later */
+    cntct->service_notification_period_ptr = temp_timeperiod;
+  }
+
+  /* check host notification timeperiod */
+  if (cntct->host_notification_period == NULL) {
+    logit(NSLOG_VERIFICATION_WARNING, TRUE,
+	  "Warning: Contact '%s' has no host notification time period defined!",
+	  cntct->name);
+    warnings++;
+  }
+
+  else {
+    timeperiod* temp_timeperiod = find_timeperiod(cntct->host_notification_period);
+    if (temp_timeperiod == NULL) {
+      logit(NSLOG_VERIFICATION_ERROR, TRUE,
+	    "Error: Host notification period '%s' specified for contact '%s' is not defined anywhere!",
+	    cntct->host_notification_period, cntct->name);
+      errors++;
+    }
+
+    /* save the pointer to the host notification timeperiod for later */
+    cntct->host_notification_period_ptr = temp_timeperiod;
+  }
+
+  /* check for sane host recovery options */
+  if (cntct->notify_on_host_recovery == TRUE
+      && cntct->notify_on_host_down == FALSE
+      && cntct->notify_on_host_unreachable == FALSE) {
+    logit(NSLOG_VERIFICATION_WARNING, TRUE,
+	  "Warning: Host recovery notification option for contact '%s' doesn't make any sense - specify down and/or unreachable options as well",
+	  cntct->name);
+    warnings++;
+  }
+
+  /* check for sane service recovery options */
+  if (cntct->notify_on_service_recovery == TRUE
+      && cntct->notify_on_service_critical == FALSE
+      && cntct->notify_on_service_warning == FALSE) {
+    logit(NSLOG_VERIFICATION_WARNING, TRUE,
+	  "Warning: Service recovery notification option for contact '%s' doesn't make any sense - specify critical and/or warning options as well",
+	  cntct->name);
+    warnings++;
+  }
+
+  /* check for illegal characters in contact name */
+  if (use_precached_objects == FALSE) {
+    if (contains_illegal_object_chars(cntct->name) == TRUE) {
+      logit(NSLOG_VERIFICATION_ERROR, TRUE,
+	    "Error: The name of contact '%s' contains one or more illegal characters.",
+	    cntct->name);
+      errors++;
+    }
+  }
+
+  *w += warnings;
+  *e += errors;
+  return (errors == 0);
 }

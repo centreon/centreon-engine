@@ -58,7 +58,7 @@ void checker::cleanup() {
   instance._list_id.clear();
   instance._mut_id.unlock();
 }
-
+#include <QDebug>
 /**
  *  Reap and process all result recive by execution process.
  */
@@ -115,6 +115,7 @@ void checker::reap() {
     }
     else {
       host* hst = find_host(result.host_name);
+      qDebug() << "[REAP] host: " << result.host_name << " - " << hex << hst;
       if (hst == NULL) {
         // check if the host exist.
 	logger(log_runtime_warning, basic)
@@ -170,7 +171,7 @@ void checker::push_check_result(check_result const& result) {
   _to_reap.enqueue(result);
   _mut_reap.unlock();
 }
-
+#include <QDebug>
 /**
  *  Run an host check without waiting check result.
  *
@@ -308,7 +309,7 @@ void checker::run(host* hst,
   check_result_info.service_description = NULL;
   check_result_info.latency = latency;
   check_result_info.next = NULL;
-
+  qDebug() << "host name : " << hst->name;
   commands::set& cmd_set = commands::set::instance();
   QSharedPointer<commands::command> cmd = cmd_set.get_command(hst->check_command_ptr->name);
   QString processed_cmd = cmd->process_cmd(&macros);

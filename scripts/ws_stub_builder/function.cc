@@ -226,12 +226,13 @@ void function::_build_exec_function() {
 	       "%3\n"
 	       "%4\n"
 	       "  int ret = soap_call_centreonengine__%5(s, end_point, action%6);\n"
+	       "%7\n"
 	       "  if (ret != SOAP_OK) {\n"
 	       "    soap_print_fault(s, stderr);\n"
 	       "    return (false);\n"
 	       "  }\n"
 	       "\n"
-	       "%7\n"
+	       "%8\n"
 	       "  return (true);\n"
 	       "}");
 
@@ -242,7 +243,9 @@ void function::_build_exec_function() {
     var += "  " + it->type + " _" + it->name + ";\n";
   }
 
+  QString alloc_var;
   QString init_var;
+  QString release_var;
   _list_pos = 0;
   for (QList<arg_info>::const_iterator it = _args_info.begin(), end = _args_info.end();
        it != end;
@@ -250,13 +253,17 @@ void function::_build_exec_function() {
     if (it->is_ref == false) {
       argument const& arg = _def.find_argument(it->type);
       QString base = "_" + it->name + (arg.is_primitive() ? "" : ".");
+      alloc_var += _build_exec_new(base, arg);
       init_var += _build_exec_struct(base, arg);
-      ++_nb_args;
+      release_var += _build_exec_delete(base, arg);
     }
   }
 
   if (init_var == "") {
     init_var = "  (void)args;\n";
+  }
+  else if (alloc_var != "") {
+    init_var = alloc_var + "\n" + init_var;
   }
 
   QString args;
@@ -282,6 +289,7 @@ void function::_build_exec_function() {
     .arg(init_var)
     .arg(_function)
     .arg(args)
+    .arg(release_var)
     .arg(display);
   _exec_function.replace("\n\n\n", "\n\n");
 }
@@ -337,6 +345,37 @@ QString function::_build_help_args(argument const& arg) const {
 }
 
 /**
+ *  Build the initialization allocation.
+ *
+ *  @param[in] base The variable name of the struct.
+ *  @param[in] arg  The argument to build init struct.
+ *
+ *  @return The allocation struct.
+ */
+QString function::_build_exec_new(QString const& base,
+				    argument const& arg) {
+  if (arg.is_primitive() == true) {
+    return ("");
+  }
+
+  QString ret;
+  QList<argument> const& args = arg.get_args();
+  for (QList<argument>::const_iterator it = args.begin(), end = args.end();
+       it != end;
+       ++it) {
+
+    if (it->is_primitive()) {
+      ret += _build_exec_new(base + it->get_name(), *it);
+    }
+    else {
+      ret += "  " + base + it->get_name() + " = new " + it->get_type() + "();\n";
+      ret += _build_exec_new(base + it->get_name() + "->", *it);
+    }
+  }
+  return (ret);
+}
+
+/**
  *  Build the initialization struct.
  *
  *  @param[in] base The variable name of the struct.
@@ -347,6 +386,7 @@ QString function::_build_help_args(argument const& arg) const {
 QString function::_build_exec_struct(QString const& base,
 				     argument const& arg) {
   if (arg.is_primitive() == true) {
+    ++_nb_args;
     return ("  " + base + " = args[" + QString("%1").arg(_list_pos++) + "]"
 	    + "." + _get_qstring_methode(arg.get_type()) + ";\n");
   }
@@ -358,6 +398,37 @@ QString function::_build_exec_struct(QString const& base,
        ++it) {
     char const* accessor = (it->is_primitive() ? "" : "->");
     ret += _build_exec_struct(base + it->get_name() + accessor, *it);
+  }
+  return (ret);
+}
+
+/**
+ *  Build the initialization deallocation.
+ *
+ *  @param[in] base The variable name of the struct.
+ *  @param[in] arg  The argument to build init struct.
+ *
+ *  @return The deallocation struct.
+ */
+QString function::_build_exec_delete(QString const& base,
+				     argument const& arg) {
+  if (arg.is_primitive() == true) {
+    return ("");
+  }
+
+  QString ret;
+  QList<argument> const& args = arg.get_args();
+  for (QList<argument>::const_iterator it = args.begin(), end = args.end();
+       it != end;
+       ++it) {
+
+    if (it->is_primitive()) {
+      ret += _build_exec_new(base + it->get_name(), *it);
+    }
+    else {
+      ret += "  delete " + base + it->get_name() + ";\n";
+      ret += _build_exec_new(base + it->get_name() + "->", *it);
+    }
   }
   return (ret);
 }

@@ -484,6 +484,20 @@
 	                      
      -->
 
+    <!-- removeHost() -->
+    <operation name="removeHost">
+      <documentation>Remove host.</documentation>
+      <input message="tns:hostRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- removeService() -->
+    <operation name="removeService">
+      <documentation>Remove service.</documentation>
+      <input message="tns:serviceRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
     <!--
 	 Features.
      -->
@@ -3356,6 +3370,18 @@
 	 Global operations.  
 	                     
      -->
+
+    <operation name="removeHost">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="removeService">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
 
     <operation name="getEventHandlersEnabled">
       <SOAP:operation style="rpc" soapAction=""/>

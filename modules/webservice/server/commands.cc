@@ -13252,6 +13252,104 @@ int centreonengine__notificationServiceSend(soap* s,
 }
 
 /**
+ *  Remove host.
+ *
+ *  @param[in]  s                 Unused.
+ *  @param[in]  host_id           Host to remove.
+ *  @param[out] res               Unused.
+ *
+ *  @return SOAP_OK on success.
+ */
+int centreonengine__removeHost(soap* s,
+			       ns1__hostIDType* host_id,
+			       centreonengine__removeHostResponse& res) {
+  (void)res;
+
+  try {
+    syncro::instance().waiting_callback();
+
+    log_debug_info(DEBUGL_FUNCTIONS, 2,
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   host_id->name.c_str());
+
+    if (!remove_host_by_id(host_id->name.c_str())) {
+      std::string* error = soap_new_std__string(s, 1);
+      *error = "Host `" + host_id->name + "' not found.";
+
+      log_debug_info(DEBUGL_COMMANDS, 2,
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
+
+      syncro::instance().worker_finish();
+      return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
+    }
+
+    syncro::instance().worker_finish();
+  }
+  catch (...) {
+    log_debug_info(DEBUGL_COMMANDS, 2,
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
+    syncro::instance().worker_finish();
+    return (soap_receiver_fault(s, "Runtime error.", "catch all"));
+
+  }
+  return (SOAP_OK);
+}
+
+/**
+ *  Remove service.
+ *
+ *  @param[in]  s                 Unused.
+ *  @param[in]  service_id        Service to remove.
+ *  @param[out] res               Unused.
+ *
+ *  @return SOAP_OK on success.
+ */
+int centreonengine__removeService(soap* s,
+				  ns1__serviceIDType* service_id,
+				  centreonengine__removeServiceResponse& res) {
+  (void)res;
+
+  try {
+    syncro::instance().waiting_callback();
+
+    log_debug_info(DEBUGL_FUNCTIONS, 2,
+                   "Webservice: %s({ %s, { %s } })\n",
+                   __func__,
+                   service_id->service.c_str(),
+                   service_id->host->name.c_str());
+
+    if (!remove_service_by_id(service_id->host->name.c_str(), service_id->service.c_str())) {
+      std::string* error = soap_new_std__string(s, 1);
+      *error = "Service `" + service_id->service
+        + "' with Host `" + service_id->host->name + "' not found.";
+
+      log_debug_info(DEBUGL_COMMANDS, 2,
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
+
+      syncro::instance().worker_finish();
+      return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
+    }
+
+    syncro::instance().worker_finish();
+  }
+  catch (...) {
+    log_debug_info(DEBUGL_COMMANDS, 2,
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
+    syncro::instance().worker_finish();
+    return (soap_receiver_fault(s, "Runtime error.", "catch all"));
+
+  }
+  return (SOAP_OK);
+}
+
+/**
  *  Check if event handlers are enabled globally.
  *
  *  @param[in]  s                 Unused.

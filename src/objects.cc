@@ -3372,3 +3372,273 @@ int free_object_data(void) {
 
   return (OK);
 }
+
+static int remove_service(service* this_service) {
+  // check we have find a service.
+  if (this_service == NULL) {
+    return (0);
+  }
+
+  // update host service list.
+  host* hst = find_host(this_service->host_name);
+  if (hst == NULL) {
+    return (0);
+  }
+
+  for (servicesmember* svcmbr = hst->services, *prev = NULL;
+       svcmbr != NULL;
+       svcmbr = svcmbr->next) {
+    if (svcmbr->service_ptr == this_service) {
+      if (prev == NULL)
+	hst->services = svcmbr->next;
+      else
+	prev->next = svcmbr->next;
+      delete[] svcmbr->host_name;
+      delete[] svcmbr->service_description;
+      delete svcmbr;
+      break;
+    }
+    prev = svcmbr;
+  }
+
+  // update the event list low.
+  for (timed_event* temp_event = event_list_low;
+    temp_event != NULL;
+    temp_event = temp_event->next) {
+    if (temp_event->event_data == this_service) {
+      remove_event(temp_event, &event_list_low, &event_list_low_tail);
+      delete temp_event;
+      break;
+    }
+  }
+
+  // update the event list high.
+  for (timed_event* temp_event = event_list_high;
+       temp_event != NULL;
+       temp_event = temp_event->next) {
+    if (temp_event->event_data == this_service) {
+      remove_event(temp_event, &event_list_high, &event_list_high_tail);
+      delete temp_event;
+      break;
+    }
+  }
+
+  // update the service skiplist.
+  skiplist_delete_all(object_skiplists[SERVICE_SKIPLIST], (void*)this_service);
+
+  /* free memory for contact groups */
+  contactgroupsmember* this_contactgroupsmember = this_service->contact_groups;
+  while (this_contactgroupsmember != NULL) {
+    contactgroupsmember* next_contactgroupsmember = this_contactgroupsmember->next;
+    delete[] this_contactgroupsmember->group_name;
+    delete this_contactgroupsmember;
+    this_contactgroupsmember = next_contactgroupsmember;
+  }
+
+  /* free memory for contacts */
+  contactsmember* this_contactsmember = this_service->contacts;
+  while (this_contactsmember != NULL) {
+    contactsmember* next_contactsmember = this_contactsmember->next;
+    delete[] this_contactsmember->contact_name;
+    delete this_contactsmember;
+    this_contactsmember = next_contactsmember;
+  }
+
+  /* free memory for custom variables */
+  customvariablesmember* this_customvariablesmember = this_service->custom_variables;
+  while (this_customvariablesmember != NULL) {
+    customvariablesmember* next_customvariablesmember = this_customvariablesmember->next;
+    delete[] this_customvariablesmember->variable_name;
+    delete[] this_customvariablesmember->variable_value;
+    delete this_customvariablesmember;
+    this_customvariablesmember = next_customvariablesmember;
+  }
+
+  // cleanup memory.
+  delete[] this_service->host_name;
+  delete[] this_service->description;
+  delete[] this_service->display_name;
+  delete[] this_service->service_check_command;
+  delete[] this_service->plugin_output;
+  delete[] this_service->long_plugin_output;
+  delete[] this_service->perf_data;
+
+  delete[] this_service->event_handler_args;
+  delete[] this_service->check_command_args;
+
+  free_objectlist(&this_service->servicegroups_ptr);
+  delete[] this_service->notification_period;
+  delete[] this_service->check_period;
+  delete[] this_service->event_handler;
+  delete[] this_service->failure_prediction_options;
+  delete[] this_service->notes;
+  delete[] this_service->notes_url;
+  delete[] this_service->action_url;
+  delete[] this_service->icon_image;
+  delete[] this_service->icon_image_alt;
+  delete this_service;
+
+  return (1);
+}
+#include <QDebug>
+static int remove_host(host* this_host) {
+  // check we have find a host.
+  if (this_host == NULL) {
+    return (0);
+  }
+
+  qDebug() << "[REMOVE] host: " << this_host->name << " - " << hex << this_host;
+
+  // update the event list low.
+  for (timed_event* temp_event = event_list_low;
+    temp_event != NULL;
+    temp_event = temp_event->next) {
+    if (temp_event->event_data == this_host) {
+      remove_event(temp_event, &event_list_low, &event_list_low_tail);
+      delete temp_event;
+      break;
+    }
+  }
+
+  // update the event list high.
+  for (timed_event* temp_event = event_list_high;
+       temp_event != NULL;
+       temp_event = temp_event->next) {
+    if (temp_event->event_data == this_host) {
+      remove_event(temp_event, &event_list_high, &event_list_high_tail);
+      delete temp_event;
+      break;
+    }
+  }
+
+  // update the host skiplist.
+  skiplist_delete_all(object_skiplists[HOST_SKIPLIST], (void*)this_host);
+
+  /* free memory for parent hosts */
+  hostsmember* this_hostsmember = this_host->parent_hosts;
+  while (this_hostsmember != NULL) {
+    hostsmember* next_hostsmember = this_hostsmember->next;
+    delete[] this_hostsmember->host_name;
+    delete this_hostsmember;
+    this_hostsmember = next_hostsmember;
+  }
+
+  /* free memory for child host links */
+  this_hostsmember = this_host->child_hosts;
+  while (this_hostsmember != NULL) {
+    hostsmember* next_hostsmember = this_hostsmember->next;
+    delete[] this_hostsmember->host_name;
+    delete this_hostsmember;
+    this_hostsmember = next_hostsmember;
+  }
+
+  /* free memory for service links */
+  servicesmember* this_servicesmember = this_host->services;
+  while (this_servicesmember != NULL) {
+    servicesmember* next_servicesmember = this_servicesmember->next;
+    service* svc = this_servicesmember->service_ptr;
+    delete[] this_servicesmember->host_name;
+    delete[] this_servicesmember->service_description;
+    delete this_servicesmember;
+    remove_service(svc);
+    this_servicesmember = next_servicesmember;
+  }
+
+  /* free memory for contact groups */
+  contactgroupsmember* this_contactgroupsmember = this_host->contact_groups;
+  while (this_contactgroupsmember != NULL) {
+    contactgroupsmember* next_contactgroupsmember = this_contactgroupsmember->next;
+    delete[] this_contactgroupsmember->group_name;
+    delete this_contactgroupsmember;
+    this_contactgroupsmember = next_contactgroupsmember;
+  }
+
+  /* free memory for contacts */
+  contactsmember* this_contactsmember = this_host->contacts;
+  while (this_contactsmember != NULL) {
+    contactsmember* next_contactsmember = this_contactsmember->next;
+    delete[] this_contactsmember->contact_name;
+    delete this_contactsmember;
+    this_contactsmember = next_contactsmember;
+  }
+
+  /* free memory for custom variables */
+  customvariablesmember* this_customvariablesmember = this_host->custom_variables;
+  while (this_customvariablesmember != NULL) {
+    customvariablesmember* next_customvariablesmember = this_customvariablesmember->next;
+    delete[] this_customvariablesmember->variable_name;
+    delete[] this_customvariablesmember->variable_value;
+    delete this_customvariablesmember;
+    this_customvariablesmember = next_customvariablesmember;
+  }
+
+  delete[] this_host->name;
+  delete[] this_host->display_name;
+  delete[] this_host->alias;
+  delete[] this_host->address;
+  delete[] this_host->plugin_output;
+  delete[] this_host->long_plugin_output;
+  delete[] this_host->perf_data;
+
+  free_objectlist(&this_host->hostgroups_ptr);
+  delete[] this_host->check_period;
+  delete[] this_host->host_check_command;
+  delete[] this_host->event_handler;
+  delete[] this_host->failure_prediction_options;
+  delete[] this_host->notification_period;
+  delete[] this_host->notes;
+  delete[] this_host->notes_url;
+  delete[] this_host->action_url;
+  delete[] this_host->icon_image;
+  delete[] this_host->icon_image_alt;
+  delete[] this_host->vrml_image;
+  delete[] this_host->statusmap_image;
+  delete this_host;
+
+  return (1);
+}
+
+int remove_host_by_id(char const* name) {
+  host* this_host = host_list;
+  host* prev_host = NULL;
+  while (this_host != NULL && strcmp(this_host->name, name)) {
+    prev_host = this_host;
+    this_host = this_host->next;
+  }
+
+  if (this_host != NULL) {
+    // update the host list.
+    if (prev_host == NULL)
+      host_list = this_host->next;
+    else
+      prev_host->next = this_host->next;
+    if (this_host->next == NULL)
+      host_list_tail = prev_host;
+    return (remove_host(this_host));
+  }
+  return (0);
+}
+
+int remove_service_by_id(char const* host_name, char const* description) {
+  service* this_service = service_list;
+  service* prev_service = NULL;
+  while (this_service != NULL) {
+    if (!strcmp(this_service->host_name, host_name)
+	&& !strcmp(this_service->description, description))
+      break;
+      prev_service = this_service;
+    this_service = this_service->next;
+  }
+
+  if (this_service != NULL) {
+    // update the service list.
+    if (prev_service == NULL)
+      service_list = this_service->next;
+    else
+      prev_service->next = this_service->next;
+    if (this_service->next == NULL)
+      service_list_tail = prev_service;
+    return (remove_service(this_service));
+  }
+  return (0);
+}
