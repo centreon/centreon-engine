@@ -3381,24 +3381,22 @@ static int remove_service(service* this_service) {
 
   // update host service list.
   host* hst = find_host(this_service->host_name);
-  if (hst == NULL) {
-    return (0);
-  }
-
-  for (servicesmember* svcmbr = hst->services, *prev = NULL;
-       svcmbr != NULL;
-       svcmbr = svcmbr->next) {
-    if (svcmbr->service_ptr == this_service) {
-      if (prev == NULL)
-	hst->services = svcmbr->next;
-      else
-	prev->next = svcmbr->next;
-      delete[] svcmbr->host_name;
-      delete[] svcmbr->service_description;
-      delete svcmbr;
-      break;
+  if (hst != NULL) {
+    for (servicesmember* svcmbr = hst->services, *prev = NULL;
+	 svcmbr != NULL;
+	 svcmbr = svcmbr->next) {
+      if (svcmbr->service_ptr == this_service) {
+	if (prev == NULL)
+	  hst->services = svcmbr->next;
+	else
+	  prev->next = svcmbr->next;
+	delete[] svcmbr->host_name;
+	delete[] svcmbr->service_description;
+	delete svcmbr;
+	break;
+      }
+      prev = svcmbr;
     }
-    prev = svcmbr;
   }
 
   // update the event list low.
@@ -3480,14 +3478,12 @@ static int remove_service(service* this_service) {
 
   return (1);
 }
-#include <QDebug>
+
 static int remove_host(host* this_host) {
   // check we have find a host.
   if (this_host == NULL) {
     return (0);
   }
-
-  qDebug() << "[REMOVE] host: " << this_host->name << " - " << hex << this_host;
 
   // update the event list low.
   for (timed_event* temp_event = event_list_low;
@@ -3540,7 +3536,7 @@ static int remove_host(host* this_host) {
     delete[] this_servicesmember->host_name;
     delete[] this_servicesmember->service_description;
     delete this_servicesmember;
-    remove_service(svc);
+    remove_service_by_id(svc->host_name, svc->description);
     this_servicesmember = next_servicesmember;
   }
 
@@ -3626,7 +3622,7 @@ int remove_service_by_id(char const* host_name, char const* description) {
     if (!strcmp(this_service->host_name, host_name)
 	&& !strcmp(this_service->description, description))
       break;
-      prev_service = this_service;
+    prev_service = this_service;
     this_service = this_service->next;
   }
 
