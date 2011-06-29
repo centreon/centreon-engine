@@ -76,6 +76,10 @@ namespace                       com {
 
 	  void                  _build_args_info(QString const& args_list);
 	  QString               _build_help_args(argument const& arg) const;
+	  QString               _build_exec_new(QString const& base,
+						argument const& arg);
+	  QString               _build_exec_delete(QString const& base,
+						   argument const& arg);
 	  QString               _build_exec_struct(QString const& base,
 						   argument const& arg);
 	  QString               _get_qstring_methode(QString type) const;
