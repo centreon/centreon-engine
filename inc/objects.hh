@@ -641,6 +641,7 @@ servicedependency* get_first_servicedependency_by_dependent_service(char* host_n
 servicedependency* get_next_servicedependency_by_dependent_service(char* host_name, char* svc_description, void** ptr);
 
 int add_object_to_objectlist(objectlist** list, void* object_ptr);
+int remove_object_to_objectlist(objectlist** list, void* object_ptr);
 int free_objectlist(objectlist** temp_list);
 
 // Object Query Functions
@@ -668,7 +669,18 @@ int check_for_circular_hostdependency_path(hostdependency* root_dep, hostdepende
 int free_object_data(void); // frees all allocated memory for the object definitions
 
 int remove_host_by_id(char const* host_name);
-int remove_service_by_id(char const* host_name, char const* description);
+int remove_hostgroup_by_id(char const* hostgroup_name);
+int remove_service_by_id(char const* host_name, char const* service_description);
+int remove_servicegroup_by_id(char const* servicegroup_name);
+int remove_contact_by_id(char const* contact_name);
+int remove_contactgroup_by_id(char const* contactgroup_name);
+int remove_command_by_id(char const* command_name);
+int remove_serviceescalation_by_id(char const* host_name, char const* service_description);
+int remove_servicedependency_by_id(char const* host_name, char const* service_description,
+				   char const* dependency_name,
+				   char const* dependency_service_description);
+int remove_hostescalation_by_id(char const* host_name);
+int remove_hostdependency_by_id(char const* host_name, char const* dependency_name);
 
 # ifdef __cplusplus
 }

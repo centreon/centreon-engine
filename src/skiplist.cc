@@ -376,7 +376,7 @@ int skiplist_delete_first(skiplist* list, void* data) {
   }
 
   /* we found a match! */
-  if (list->compare_function(nextnode->data, data) == 0) {
+  if (nextnode != NULL && list->compare_function(nextnode->data, data) == 0) {
 
     /* adjust level pointers to bypass (soon to be) removed node */
     for (level = 0; level <= top_level; level++) {

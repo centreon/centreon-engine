@@ -13300,6 +13300,54 @@ int centreonengine__removeHost(soap* s,
 }
 
 /**
+ *  Remove host group.
+ *
+ *  @param[in]  s                 Unused.
+ *  @param[in]  hostgroup_id      Host group to remove.
+ *  @param[out] res               Unused.
+ *
+ *  @return SOAP_OK on success.
+ */
+int centreonengine__removeHostGroup(soap* s,
+				    ns1__hostGroupIDType* hostgroup_id,
+				    centreonengine__removeHostGroupResponse& res) {
+  (void)res;
+
+  try {
+    syncro::instance().waiting_callback();
+
+    log_debug_info(DEBUGL_FUNCTIONS, 2,
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   hostgroup_id->name.c_str());
+
+    if (!remove_hostgroup_by_id(hostgroup_id->name.c_str())) {
+      std::string* error = soap_new_std__string(s, 1);
+      *error = "Host `" + hostgroup_id->name + "' not found.";
+
+      log_debug_info(DEBUGL_COMMANDS, 2,
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
+
+      syncro::instance().worker_finish();
+      return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
+    }
+
+    syncro::instance().worker_finish();
+  }
+  catch (...) {
+    log_debug_info(DEBUGL_COMMANDS, 2,
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
+    syncro::instance().worker_finish();
+    return (soap_receiver_fault(s, "Runtime error.", "catch all"));
+
+  }
+  return (SOAP_OK);
+}
+
+/**
  *  Remove service.
  *
  *  @param[in]  s                 Unused.
@@ -13326,6 +13374,304 @@ int centreonengine__removeService(soap* s,
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
         + "' with Host `" + service_id->host->name + "' not found.";
+
+      log_debug_info(DEBUGL_COMMANDS, 2,
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
+
+      syncro::instance().worker_finish();
+      return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
+    }
+
+    syncro::instance().worker_finish();
+  }
+  catch (...) {
+    log_debug_info(DEBUGL_COMMANDS, 2,
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
+    syncro::instance().worker_finish();
+    return (soap_receiver_fault(s, "Runtime error.", "catch all"));
+
+  }
+  return (SOAP_OK);
+}
+
+/**
+ *  Remove service group.
+ *
+ *  @param[in]  s                 Unused.
+ *  @param[in]  servicegroup_id   Service group to remove.
+ *  @param[out] res               Unused.
+ *
+ *  @return SOAP_OK on success.
+ */
+int centreonengine__removeServiceGroup(soap* s,
+				       ns1__serviceGroupIDType* servicegroup_id,
+				       centreonengine__removeServiceGroupResponse& res) {
+  (void)res;
+
+  try {
+    syncro::instance().waiting_callback();
+
+    log_debug_info(DEBUGL_FUNCTIONS, 2,
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   servicegroup_id->name.c_str());
+
+    if (!remove_servicegroup_by_id(servicegroup_id->name.c_str())) {
+      std::string* error = soap_new_std__string(s, 1);
+      *error = "Service `" + servicegroup_id->name + "' not found.";
+
+      log_debug_info(DEBUGL_COMMANDS, 2,
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
+
+      syncro::instance().worker_finish();
+      return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
+    }
+
+    syncro::instance().worker_finish();
+  }
+  catch (...) {
+    log_debug_info(DEBUGL_COMMANDS, 2,
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
+    syncro::instance().worker_finish();
+    return (soap_receiver_fault(s, "Runtime error.", "catch all"));
+
+  }
+  return (SOAP_OK);
+}
+
+/**
+ *  Remove contact.
+ *
+ *  @param[in]  s                 Unused.
+ *  @param[in]  contact_id        Contact to remove.
+ *  @param[out] res               Unused.
+ *
+ *  @return SOAP_OK on success.
+ */
+int centreonengine__removeContact(soap* s,
+				  ns1__contactIDType* contact_id,
+				  centreonengine__removeContactResponse& res) {
+  (void)res;
+
+  try {
+    syncro::instance().waiting_callback();
+
+    log_debug_info(DEBUGL_FUNCTIONS, 2,
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   contact_id->contact.c_str());
+
+    if (!remove_contact_by_id(contact_id->contact.c_str())) {
+      std::string* error = soap_new_std__string(s, 1);
+      *error = "Contact `" + contact_id->contact + "' not found.";
+
+      log_debug_info(DEBUGL_COMMANDS, 2,
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
+
+      syncro::instance().worker_finish();
+      return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
+    }
+
+    syncro::instance().worker_finish();
+  }
+  catch (...) {
+    log_debug_info(DEBUGL_COMMANDS, 2,
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
+    syncro::instance().worker_finish();
+    return (soap_receiver_fault(s, "Runtime error.", "catch all"));
+
+  }
+  return (SOAP_OK);
+}
+
+/**
+ *  Remove contact group.
+ *
+ *  @param[in]  s                 Unused.
+ *  @param[in]  contactgroup_id  Contact group to remove.
+ *  @param[out] res               Unused.
+ *
+ *  @return SOAP_OK on success.
+ */
+int centreonengine__removeContactGroup(soap* s,
+				       ns1__contactGroupIDType* contactgroup_id,
+				       centreonengine__removeContactGroupResponse& res) {
+  (void)res;
+
+  try {
+    syncro::instance().waiting_callback();
+
+    log_debug_info(DEBUGL_FUNCTIONS, 2,
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   contactgroup_id->name.c_str());
+
+    if (!remove_contactgroup_by_id(contactgroup_id->name.c_str())) {
+      std::string* error = soap_new_std__string(s, 1);
+      *error = "Contact group `" + contactgroup_id->name + "' not found.";
+
+      log_debug_info(DEBUGL_COMMANDS, 2,
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
+
+      syncro::instance().worker_finish();
+      return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
+    }
+
+    syncro::instance().worker_finish();
+  }
+  catch (...) {
+    log_debug_info(DEBUGL_COMMANDS, 2,
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
+    syncro::instance().worker_finish();
+    return (soap_receiver_fault(s, "Runtime error.", "catch all"));
+
+  }
+  return (SOAP_OK);
+}
+
+/**
+ *  Remove command.
+ *
+ *  @param[in]  s                 Unused.
+ *  @param[in]  command_id        Command to remove.
+ *  @param[out] res               Unused.
+ *
+ *  @return SOAP_OK on success.
+ */
+int centreonengine__removeCommand(soap* s,
+				  ns1__commandIDType* command_id,
+				  centreonengine__removeCommandResponse& res) {
+  (void)res;
+
+  try {
+    syncro::instance().waiting_callback();
+
+    log_debug_info(DEBUGL_FUNCTIONS, 2,
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   command_id->command.c_str());
+
+    int ret = remove_command_by_id(command_id->command.c_str());
+    if (ret != 1) {
+      std::string* error = soap_new_std__string(s, 1);
+      if (ret == 0)
+	*error = "Command `" + command_id->command + "' not found.";
+      else
+	*error = "Command `" + command_id->command + "' is currently used.";
+
+      log_debug_info(DEBUGL_COMMANDS, 2,
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
+
+      syncro::instance().worker_finish();
+      return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
+    }
+
+    syncro::instance().worker_finish();
+  }
+  catch (...) {
+    log_debug_info(DEBUGL_COMMANDS, 2,
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
+    syncro::instance().worker_finish();
+    return (soap_receiver_fault(s, "Runtime error.", "catch all"));
+
+  }
+  return (SOAP_OK);
+}
+
+/**
+ *  Remove service escalation.
+ *
+ *  @param[in]  s                    Unused.
+ *  @param[in]  serviceescalation_id Service escalation to remove.
+ *  @param[out] res                  Unused.
+ *
+ *  @return SOAP_OK on success.
+ */
+int centreonengine__removeServiceEscalation(soap* s,
+					    ns1__serviceEscalationIDType* escalation_id,
+					    centreonengine__removeServiceEscalationResponse& res) {
+  (void)res;
+
+  try {
+    syncro::instance().waiting_callback();
+
+    log_debug_info(DEBUGL_FUNCTIONS, 2,
+                   "Webservice: %s({%s, %s})\n",
+                   __func__,
+                   escalation_id->name.c_str(),
+		   escalation_id->description.c_str());
+
+    if (!remove_serviceescalation_by_id(escalation_id->name.c_str(),
+					escalation_id->description.c_str())) {
+      std::string* error = soap_new_std__string(s, 1);
+      *error = "Service escalation `" + escalation_id->name + " "
+	+ escalation_id->description + "' not found.";
+
+      log_debug_info(DEBUGL_COMMANDS, 2,
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
+
+      syncro::instance().worker_finish();
+      return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
+    }
+
+    syncro::instance().worker_finish();
+  }
+  catch (...) {
+    log_debug_info(DEBUGL_COMMANDS, 2,
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
+    syncro::instance().worker_finish();
+    return (soap_receiver_fault(s, "Runtime error.", "catch all"));
+
+  }
+  return (SOAP_OK);
+}
+
+/**
+ *  Remove service dependency.
+ *
+ *  @param[in]  s                    Unused.
+ *  @param[in]  servicedependency_id Service dependency to remove.
+ *  @param[out] res                  Unused.
+ *
+ *  @return SOAP_OK on success.
+ */
+int centreonengine__removeServiceDependency(soap* s,
+					    ns1__serviceDependencyIDType* dependency_id,
+					    centreonengine__removeServiceDependencyResponse& res) {
+  (void)res;
+
+  try {
+    syncro::instance().waiting_callback();
+
+    log_debug_info(DEBUGL_FUNCTIONS, 2,
+                   "Webservice: %s({%s, %s})\n",
+                   __func__,
+                   dependency_id->name.c_str(),
+		   dependency_id->description.c_str());
+
+    if (!remove_servicedependency_by_id(dependency_id->name.c_str(),
+					dependency_id->description.c_str())) {
+      std::string* error = soap_new_std__string(s, 1);
+      *error = "Service escalation `" + dependency_id->name + " "
+	+ dependency_id->description + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
                      "Webservice: %s failed. %s\n",

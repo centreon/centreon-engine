@@ -30,11 +30,25 @@
         </sequence>
       </complexType>
 
+      <!-- hostGroup identifier. -->
+      <complexType name="hostGroupIDType">
+        <sequence>
+          <element name="name" type="xsd:string"/>
+        </sequence>
+      </complexType>
+
       <!-- Service identifier. -->
       <complexType name="serviceIDType">
         <sequence>
           <element name="host" type="tns:hostIDType"/>
           <element name="service" type="xsd:string"/>
+        </sequence>
+      </complexType>
+
+      <!-- hostGroup identifier. -->
+      <complexType name="serviceGroupIDType">
+        <sequence>
+          <element name="name" type="xsd:string"/>
         </sequence>
       </complexType>
 
@@ -68,6 +82,13 @@
       <complexType name="contactIDType">
         <sequence>
           <element name="contact" type="xsd:string"/>
+        </sequence>
+      </complexType>
+
+      <!-- ContactGroup identifier. -->
+      <complexType name="contactGroupIDType">
+        <sequence>
+          <element name="name" type="xsd:string"/>
         </sequence>
       </complexType>
 
@@ -106,6 +127,22 @@
       <complexType name="timeperiodIDType">
 	<sequence>
 	  <element name="timeperiod" type="xsd:string"/>
+	</sequence>
+      </complexType>
+
+      <!-- Service escalation identifier. -->
+      <complexType name="serviceEscalationIDType">
+	<sequence>
+	  <element name="name" type="xsd:string"/>
+	  <element name="description" type="xsd:string"/>
+	</sequence>
+      </complexType>
+
+      <!-- Service dependency identifier. -->
+      <complexType name="serviceDependencyIDType">
+	<sequence>
+	  <element name="name" type="xsd:string"/>
+	  <element name="description" type="xsd:string"/>
 	</sequence>
       </complexType>
 
@@ -230,6 +267,15 @@
   </message>
 
   <!--
+	 Host Group Messages.
+  -->
+
+  <!-- Message sent when executing an operation on a host group. -->
+  <message name="hostGroupRequest">
+    <part name="hostGroup" type="tns:hostGroupIDType"/>
+  </message>
+
+  <!--
 	 Service messages.
    -->
 
@@ -278,6 +324,25 @@
   <message name="serviceUnsignedIntegerRequest">
     <part name="service" type="tns:serviceIDType"/>
     <part name="value" type="xsd:unsignedInt"/>
+  </message>
+
+  <!-- Service request no additional parameter.  -->
+  <message name="serviceEscalationRequest">
+    <part name="escalation" type="tns:serviceEscalationIDType"/>
+  </message>
+
+  <!-- Service request no additional parameter.  -->
+  <message name="serviceDependencyRequest">
+    <part name="dependency" type="tns:serviceDependencyIDType"/>
+  </message>
+
+  <!--
+	 Service Group Messages.
+  -->
+
+  <!-- Message sent when executing an operation on a host group. -->
+  <message name="serviceGroupRequest">
+    <part name="serviceGroup" type="tns:serviceGroupIDType"/>
   </message>
 
   <!--
@@ -357,6 +422,15 @@
   <message name="contactTimeperiodRequest">
     <part name="contact" type="tns:contactIDType"/>
     <part name="value" type="tns:timeperiodIDType"/>
+  </message>
+
+  <!--
+	 Contact Group Messages.
+  -->
+
+  <!-- Message sent when executing an operation on a contact group. -->
+  <message name="contactGroupRequest">
+    <part name="contactGroup" type="tns:contactGroupIDType"/>
   </message>
 
   <!--
@@ -491,10 +565,59 @@
       <output message="tns:defaultResponse"/>
     </operation>
 
+    <!-- removeHostGroup() -->
+    <operation name="removeHostGroup">
+      <documentation>Remove host group.</documentation>
+      <input message="tns:hostGroupRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
     <!-- removeService() -->
     <operation name="removeService">
       <documentation>Remove service.</documentation>
       <input message="tns:serviceRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- removeServiceGroup() -->
+    <operation name="removeServiceGroup">
+      <documentation>Remove service group.</documentation>
+      <input message="tns:serviceGroupRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- removeContact() -->
+    <operation name="removeContact">
+      <documentation>Remove contact.</documentation>
+      <input message="tns:contactRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- removeContactGroup() -->
+    <operation name="removeContactGroup">
+      <documentation>Remove contact group.</documentation>
+      <input message="tns:contactGroupRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- removeCommand() -->
+    <operation name="removeCommand">
+      <documentation>Remove command.</documentation>
+      <input message="tns:commandRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- removeServiceEscalation() -->
+    <operation name="removeServiceEscalation">
+      <documentation>Remove service escalation.</documentation>
+      <input message="tns:serviceEscalationRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- removeServiceDependency() -->
+    <operation name="removeServiceDependency">
+      <documentation>Remove service dependency.</documentation>
+      <input message="tns:serviceDependencyRequest"/>
       <output message="tns:defaultResponse"/>
     </operation>
 
@@ -3377,7 +3500,49 @@
       <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
     </operation>
 
+    <operation name="removeHostGroup">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
     <operation name="removeService">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="removeServiceGroup">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="removeContact">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="removeContactGroup">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="removeCommand">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="removeServiceEscalation">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="removeServiceDependency">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
       <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
