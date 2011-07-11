@@ -19,6 +19,7 @@
 
 #include <QBuffer>
 #include "error.hh"
+#include "commands/connector/error_response.hh"
 #include "commands/connector/execute_query.hh"
 #include "commands/connector/execute_response.hh"
 #include "commands/connector/version_query.hh"
@@ -77,10 +78,11 @@ request_builder::request_builder() {
   _list.insert(req->get_id(), req);
   req = QSharedPointer<request>(new execute_response());
   _list.insert(req->get_id(), req);
-
   req = QSharedPointer<request>(new quit_query());
   _list.insert(req->get_id(), req);
   req = QSharedPointer<request>(new quit_response());
+  _list.insert(req->get_id(), req);
+  req = QSharedPointer<request>(new error_response());
   _list.insert(req->get_id(), req);
 }
 

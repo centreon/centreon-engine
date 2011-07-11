@@ -51,12 +51,12 @@ extern "C" {
 # define XODTEMPLATE_HOSTEXTINFO           13
 # define XODTEMPLATE_SERVICEEXTINFO        14
 # define XODTEMPLATE_SERVICEGROUP          15
-
+# define XODTEMPLATE_CONNECTOR             16
 
 
 /***************** SKIP LISTS ****************/
 
-# define NUM_XOBJECT_SKIPLISTS                  15
+# define NUM_XOBJECT_SKIPLISTS                  16
 
 # define X_HOST_SKIPLIST                        1
 # define X_SERVICE_SKIPLIST                     2
@@ -72,7 +72,7 @@ extern "C" {
 # define X_SERVICEESCALATION_SKIPLIST           12
 # define X_HOSTEXTINFO_SKIPLIST                 13
 # define X_SERVICEEXTINFO_SKIPLIST              14
-
+# define X_CONNECTOR_SKIPLIST                   15
 
 /********** STRUCTURE DEFINITIONS **********/
 
@@ -132,10 +132,26 @@ typedef struct xodtemplate_command_struct{
   char       *command_name;
   char       *command_line;
 
+  char       *connector_name;
+
   int        has_been_resolved;
   int        register_object;
   struct xodtemplate_command_struct *next;
 }xodtemplate_command;
+
+/* CONNECTOR TEMPLATE STRUCTURE */
+typedef struct xodtemplate_connector_struct{
+  char       *tmpl;
+  char       *name;
+  int        _config_file;
+  int        _start_line;
+
+  char      *connector_name;
+  char      *connector_line;
+
+  int        register_object;
+  struct xodtemplate_connector_struct *next;
+}xodtemplate_connector;
 
 
 /* CONTACT TEMPLATE STRUCTURE */
@@ -874,6 +890,7 @@ int xodtemplate_resolve_serviceextinfo(xodtemplate_serviceextinfo *);
 
 int xodtemplate_sort_timeperiods(void);
 int xodtemplate_sort_commands(void);
+int xodtemplate_sort_connectors(void);
 int xodtemplate_sort_contactgroups(void);
 int xodtemplate_sort_hostgroups(void);
 int xodtemplate_sort_servicegroups(void);
@@ -891,6 +908,7 @@ int xodtemplate_merge_service_extinfo_object(xodtemplate_service *,xodtemplate_s
 
 xodtemplate_timeperiod *xodtemplate_find_timeperiod(char *);
 xodtemplate_command *xodtemplate_find_command(char *);
+xodtemplate_connector* xodtemplate_find_connector(char*);
 xodtemplate_contactgroup *xodtemplate_find_contactgroup(char *);
 xodtemplate_contactgroup *xodtemplate_find_real_contactgroup(char *);
 xodtemplate_hostgroup *xodtemplate_find_hostgroup(char *);
@@ -936,6 +954,7 @@ int xodtemplate_skiplist_compare_text(const char *val1a, const char *val1b, cons
 int xodtemplate_skiplist_compare_host_template(void *a, void *b);
 int xodtemplate_skiplist_compare_service_template(void *a, void *b);
 int xodtemplate_skiplist_compare_command_template(void *a, void *b);
+int xodtemplate_skiplist_compare_connector_template(void* a, void* b);
 int xodtemplate_skiplist_compare_timeperiod_template(void *a, void *b);
 int xodtemplate_skiplist_compare_contact_template(void *a, void *b);
 int xodtemplate_skiplist_compare_contactgroup_template(void *a, void *b);
@@ -955,6 +974,7 @@ int xodtemplate_skiplist_compare_contactgroup(void *a, void *b);
 int xodtemplate_skiplist_compare_hostgroup(void *a, void *b);
 int xodtemplate_skiplist_compare_servicegroup(void *a, void *b);
 int xodtemplate_skiplist_compare_command(void *a, void *b);
+int xodtemplate_skiplist_compare_connector(void* a, void* b);
 int xodtemplate_skiplist_compare_timeperiod(void *a, void *b);
 int xodtemplate_skiplist_compare_hostdependency(void *a, void *b);
 int xodtemplate_skiplist_compare_servicedependency(void *a, void *b);

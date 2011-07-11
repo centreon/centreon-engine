@@ -41,6 +41,12 @@
 #include "shared.hh"
 #include "utils.hh"
 #include "commands/raw.hh"
+#include "commands/set.hh"
+#include "checks/checker.hh"
+#include "broker/loader.hh"
+#include "logging/engine.hh"
+
+using namespace com::centreon::engine;
 
 extern "C" int free_check_result_list(void);
 
@@ -56,7 +62,6 @@ int my_system_r(nagios_macros const* mac,
 		double* exectime,
 		char** output,
                 unsigned int max_output_length) {
-  using namespace com::centreon::engine;
 
   log_debug_info(DEBUGL_FUNCTIONS, 0, "my_system_r()\n");
 
@@ -2216,6 +2221,12 @@ void cleanup(void) {
 
   /* free all allocated memory - including macros */
   free_memory(get_global_macros());
+
+  // unload singleton.
+  com::centreon::engine::broker::loader::cleanup();
+  commands::set::cleanup();
+  checks::checker::cleanup();
+  logging::engine::cleanup();
 }
 
 /* free the memory allocated to the linked lists */

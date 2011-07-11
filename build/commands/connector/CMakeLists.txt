@@ -36,6 +36,7 @@ add_library("cce_connector"
   "${SRC_DIR}/quit_response.cc"
   "${SRC_DIR}/execute_query.cc"
   "${SRC_DIR}/execute_response.cc"
+  "${SRC_DIR}/error_response.cc"
   "${INC_DIR}/command.hh"
   "${INC_DIR}/request_builder.hh"
   "${INC_DIR}/request.hh"
@@ -45,6 +46,7 @@ add_library("cce_connector"
   "${INC_DIR}/quit_response.hh"
   "${INC_DIR}/execute_query.hh"
   "${INC_DIR}/execute_response.hh"
+  "${INC_DIR}/error_response.hh"
   ${QT_MOC_FILES})
 
 # Link target with libraries.
@@ -98,6 +100,10 @@ if (WITH_TESTING)
 
   add_executable("request_version" "${TEST_DIR}/request_version.cc")
   target_link_libraries("request_version" "cce_commands" ${QT_LIBRARIES})
+  add_test("request_version" "request_version")
+
+  add_executable("request_error" "${TEST_DIR}/request_error.cc")
+  target_link_libraries("request_error" "cce_commands" ${QT_LIBRARIES})
   add_test("request_version" "request_version")
 
   add_executable("request_builder" "${TEST_DIR}/request_builder.cc")

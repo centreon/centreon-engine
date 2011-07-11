@@ -90,6 +90,7 @@ namespace                              com {
 	    void                       _req_quit_r(request* req);
 	    void                       _req_version_r(request* req);
 	    void                       _req_execute_r(request* req);
+	    void                       _req_error_r(request* req);
 
 	    QByteArray                 _read_data;
 	    QMutex                     _mutex;
@@ -105,6 +106,7 @@ namespace                              com {
 	    unsigned long              _nbr_check;
 	    bool                       _is_good_version;
 	    bool                       _active_timer;
+	    bool                       _is_exiting;
 
 	    static const unsigned long DEFAULT_MAX_CHECK = 10000;
 	  };

@@ -119,7 +119,7 @@ QByteArray execute_query::build() {
     QByteArray().setNum(static_cast<qulonglong>(_cmd_id)) + '\0' +
     QByteArray().setNum(_timeout) + '\0' +
     QByteArray().setNum(_start_time.toTime_t()) + '\0';
-  query += _cmd;
+  query += _cmd.toAscii();
   return (query + cmd_ending());
 }
 

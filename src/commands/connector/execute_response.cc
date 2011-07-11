@@ -129,7 +129,7 @@ QByteArray execute_response::build() {
     QByteArray().setNum(_is_executed) + '\0' +
     QByteArray().setNum(_exit_code) + '\0' +
     QByteArray().setNum(_end_time.toTime_t()) + '\0';
-  query += _stderr + '\0' + _stdout;
+  query += _stderr.toAscii() + '\0' + _stdout.toAscii();
   return (query + cmd_ending());
 }
 

@@ -44,7 +44,8 @@ namespace                            com {
 	      execute_q,
 	      execute_r,
 	      quit_q,
-	      quit_r
+	      quit_r,
+	      error_r
 	    };
 
 	                             request(e_type id);

@@ -37,10 +37,10 @@
 #include "macros.hh"
 #include "skiplist.hh"
 #include "logging.hh"
-
-/**** CORE OR CGI SPECIFIC HEADER FILES ****/
-
 #include "engine.hh"
+#include "commands/set.hh"
+#include "commands/raw.hh"
+#include "commands/connector/command.hh"
 
 /**** DATA INPUT-SPECIFIC HEADER FILES ****/
 
@@ -48,6 +48,7 @@
 
 static xodtemplate_timeperiod*        xodtemplate_timeperiod_list = NULL;
 static xodtemplate_command*           xodtemplate_command_list = NULL;
+static xodtemplate_connector*         xodtemplate_connector_list = NULL;
 static xodtemplate_contactgroup*      xodtemplate_contactgroup_list = NULL;
 static xodtemplate_hostgroup*         xodtemplate_hostgroup_list = NULL;
 static xodtemplate_servicegroup*      xodtemplate_servicegroup_list = NULL;
@@ -63,6 +64,7 @@ static xodtemplate_serviceextinfo*    xodtemplate_serviceextinfo_list = NULL;
 
 static xodtemplate_timeperiod*        xodtemplate_timeperiod_list_tail = NULL;
 static xodtemplate_command*           xodtemplate_command_list_tail = NULL;
+static xodtemplate_connector*         xodtemplate_connector_list_tail = NULL;
 static xodtemplate_contactgroup*      xodtemplate_contactgroup_list_tail = NULL;
 static xodtemplate_hostgroup*         xodtemplate_hostgroup_list_tail = NULL;
 static xodtemplate_servicegroup*      xodtemplate_servicegroup_list_tail = NULL;
@@ -681,7 +683,8 @@ int xodtemplate_process_config_file(char* filename, int options) {
           && strcmp(input, "hostdependency")
           && strcmp(input, "hostescalation")
           && strcmp(input, "hostextinfo")
-          && strcmp(input, "serviceextinfo")) {
+          && strcmp(input, "serviceextinfo")
+	  && strcmp(input, "connector")) {
         logit(NSLOG_CONFIG_ERROR, TRUE,
               "Error: Invalid object definition type '%s' in file '%s' on line %d.\n",
               input,
@@ -839,6 +842,7 @@ int xodtemplate_begin_object_definition(char* input,
   int result = OK;
   xodtemplate_timeperiod* new_timeperiod = NULL;
   xodtemplate_command* new_command = NULL;
+  xodtemplate_connector* new_connector = NULL;
   xodtemplate_contactgroup* new_contactgroup = NULL;
   xodtemplate_hostgroup* new_hostgroup = NULL;
   xodtemplate_servicegroup* new_servicegroup = NULL;
@@ -878,8 +882,8 @@ int xodtemplate_begin_object_definition(char* input,
     xodtemplate_current_object_type = XODTEMPLATE_HOSTESCALATION;
   else if (!strcmp(input, "hostextinfo"))
     xodtemplate_current_object_type = XODTEMPLATE_HOSTEXTINFO;
-  else if (!strcmp(input, "serviceextinfo"))
-    xodtemplate_current_object_type = XODTEMPLATE_SERVICEEXTINFO;
+  else if (!strcmp(input, "connector"))
+    xodtemplate_current_object_type = XODTEMPLATE_CONNECTOR;
   else
     return (ERROR);
 
@@ -892,6 +896,11 @@ int xodtemplate_begin_object_definition(char* input,
 
   case XODTEMPLATE_COMMAND:
     if (!(options & READ_COMMANDS))
+      return (OK);
+    break;
+
+  case XODTEMPLATE_CONNECTOR:
+    if (!(options & READ_CONNECTOR))
       return (OK);
     break;
 
@@ -967,6 +976,10 @@ int xodtemplate_begin_object_definition(char* input,
 
   case XODTEMPLATE_COMMAND:
     xod_begin_def(command);
+    break;
+
+  case XODTEMPLATE_CONNECTOR:
+    xod_begin_def(connector);
     break;
 
   case XODTEMPLATE_CONTACTGROUP:
@@ -1092,6 +1105,7 @@ int xodtemplate_add_object_property(char* input, int options) {
   char* customvarvalue = NULL;
   xodtemplate_timeperiod* temp_timeperiod = NULL;
   xodtemplate_command* temp_command = NULL;
+  xodtemplate_connector* temp_connector = NULL;
   xodtemplate_contactgroup* temp_contactgroup = NULL;
   xodtemplate_hostgroup* temp_hostgroup = NULL;
   xodtemplate_servicegroup* temp_servicegroup = NULL;
@@ -1121,6 +1135,11 @@ int xodtemplate_add_object_property(char* input, int options) {
 
   case XODTEMPLATE_COMMAND:
     if (!(options & READ_COMMANDS))
+      return (OK);
+    break;
+
+  case XODTEMPLATE_CONNECTOR:
+    if (!(options & READ_CONNECTOR))
       return (OK);
     break;
 
@@ -1240,7 +1259,7 @@ int xodtemplate_add_object_property(char* input, int options) {
     else if (!strcmp(variable, "timeperiod_name")) {
       temp_timeperiod->timeperiod_name = my_strdup(value);
 
-      /* add timeperiod to template skiplist for fast searches */
+      
       result = skiplist_insert(xobject_skiplists[X_TIMEPERIOD_SKIPLIST], (void*)temp_timeperiod);
       switch (result) {
       case SKIPLIST_ERROR_DUPLICATE:
@@ -1334,6 +1353,45 @@ int xodtemplate_add_object_property(char* input, int options) {
       temp_command->command_line = my_strdup(value);
     else if (!strcmp(variable, "register"))
       temp_command->register_object = (atoi(value) > 0) ? TRUE : FALSE;
+    else if (!strcmp(variable, "connector"))
+      temp_command->connector_name = my_strdup(value);
+    else {
+      logit(NSLOG_CONFIG_ERROR, TRUE,
+            "Error: Invalid command object directive '%s'.\n",
+            variable);
+      return (ERROR);
+    }
+    break;
+
+  case XODTEMPLATE_CONNECTOR:
+    temp_connector = (xodtemplate_connector*)xodtemplate_current_object;
+
+    if (!strcmp(variable, "connector_line"))
+      temp_connector->connector_line = my_strdup(value);
+    else if (!strcmp(variable, "connector_name")) {
+      temp_connector->connector_name = my_strdup(value);
+
+      /* add command to template skiplist for fast searches */
+      result = skiplist_insert(xobject_skiplists[X_CONNECTOR_SKIPLIST], (void*)temp_connector);
+      switch (result) {
+      case SKIPLIST_ERROR_DUPLICATE:
+        logit(NSLOG_CONFIG_WARNING, TRUE,
+              "Warning: Duplicate definition found for connector '%s' (config file '%s', starting on line %d)\n",
+              value,
+              xodtemplate_config_file_name(temp_connector->_config_file),
+              temp_connector->_start_line);
+        result = ERROR;
+        break;
+
+      case SKIPLIST_OK:
+        result = OK;
+        break;
+
+      default:
+        result = ERROR;
+        break;
+      }
+    }
     else {
       logit(NSLOG_CONFIG_ERROR, TRUE,
             "Error: Invalid command object directive '%s'.\n",
@@ -9792,6 +9850,32 @@ int xodtemplate_register_command(xodtemplate_command* this_command) {
   if (this_command->register_object == FALSE)
     return (OK);
 
+  // Initialize command executon system.
+  using namespace com::centreon::engine;
+  if (this_command->connector_name == NULL) {
+    QSharedPointer<commands::command> cmd_set(new commands::raw(this_command->command_name,
+								this_command->command_line));
+    commands::set::instance().add_command(cmd_set);
+  }
+  else {
+    xodtemplate_connector temp_connector;
+    temp_connector.connector_name = this_command->connector_name;
+    xodtemplate_connector* connector = (xodtemplate_connector*)skiplist_find_first(xobject_skiplists[X_CONNECTOR_SKIPLIST],
+										   &temp_connector,
+										   NULL);
+    if (connector == NULL) {
+      logit(NSLOG_CONFIG_ERROR, TRUE,
+	    "Error: Could not register command (config file '%s', starting on line %d)\n",
+	    xodtemplate_config_file_name(this_command->_config_file),
+	    this_command->_start_line);
+      return (ERROR);
+    }
+    QSharedPointer<commands::command> cmd_set(new commands::connector::command(connector->connector_name,
+									       this_command->command_line,
+									       connector->connector_line));
+    commands::set::instance().add_command(cmd_set);
+  }
+
   /* add the command */
   new_command = add_command(this_command->command_name, this_command->command_line);
 
@@ -9806,6 +9890,8 @@ int xodtemplate_register_command(xodtemplate_command* this_command) {
 
   return (OK);
 }
+
+
 
 /* registers a contactgroup definition */
 int xodtemplate_register_contactgroup(xodtemplate_contactgroup* this_contactgroup) {
@@ -10642,6 +10728,10 @@ int xodtemplate_sort_objects(void) {
   if (xodtemplate_sort_commands() == ERROR)
     return (ERROR);
 
+  /* sort connectors */
+  if (xodtemplate_sort_connectors() == ERROR)
+    return (ERROR);
+
   /* sort contactgroups */
   if (xodtemplate_sort_contactgroups() == ERROR)
     return (ERROR);
@@ -10817,6 +10907,58 @@ int xodtemplate_sort_commands() {
 
   /* list is now sorted */
   xodtemplate_command_list = new_command_list;
+
+  return (OK);
+}
+
+/* sort connectors by name */
+int xodtemplate_sort_connectors() {
+  xodtemplate_connector* new_connector_list = NULL;
+  xodtemplate_connector* temp_connector = NULL;
+  xodtemplate_connector* last_connector = NULL;
+  xodtemplate_connector* temp_connector_orig = NULL;
+  xodtemplate_connector* next_connector_orig = NULL;
+
+  /* sort all existing connectors */
+  for (temp_connector_orig = xodtemplate_connector_list;
+       temp_connector_orig != NULL;
+       temp_connector_orig = next_connector_orig) {
+
+    next_connector_orig = temp_connector_orig->next;
+
+    /* add connector to new list, sorted by connector name */
+    last_connector = new_connector_list;
+    for (temp_connector = new_connector_list;
+	 temp_connector != NULL;
+	 temp_connector = temp_connector->next) {
+      if (xodtemplate_compare_strings1(temp_connector_orig->connector_name,
+				       temp_connector->connector_name) <= 0)
+        break;
+      else
+        last_connector = temp_connector;
+    }
+
+    /* first item added to new sorted list */
+    if (new_connector_list == NULL) {
+      temp_connector_orig->next = NULL;
+      new_connector_list = temp_connector_orig;
+    }
+
+    /* item goes at head of new sorted list */
+    else if (temp_connector == new_connector_list) {
+      temp_connector_orig->next = new_connector_list;
+      new_connector_list = temp_connector_orig;
+    }
+
+    /* item goes in middle or at end of new sorted list */
+    else {
+      temp_connector_orig->next = temp_connector;
+      last_connector->next = temp_connector_orig;
+    }
+  }
+
+  /* list is now sorted */
+  xodtemplate_connector_list = new_connector_list;
 
   return (OK);
 }
@@ -11573,6 +11715,7 @@ int xodtemplate_cache_objects(char* cache_file) {
   xodtemplate_timeperiod* temp_timeperiod = NULL;
   xodtemplate_daterange* temp_daterange = NULL;
   xodtemplate_command* temp_command = NULL;
+  xodtemplate_connector* temp_connector = NULL;
   xodtemplate_contactgroup* temp_contactgroup = NULL;
   xodtemplate_hostgroup* temp_hostgroup = NULL;
   xodtemplate_servicegroup* temp_servicegroup = NULL;
@@ -11723,6 +11866,22 @@ int xodtemplate_cache_objects(char* cache_file) {
       fprintf(fp, "\tcommand_name\t%s\n", temp_command->command_name);
     if (temp_command->command_line)
       fprintf(fp, "\tcommand_line\t%s\n", temp_command->command_line);
+    fprintf(fp, "\t}\n\n");
+  }
+
+  /* cache connectors */
+  /*for(temp_connector=xodtemplate_connector_list;temp_connector!=NULL;temp_connector=temp_connector->next){ */
+  ptr = NULL;
+  for (temp_connector = (xodtemplate_connector*)skiplist_get_first(xobject_skiplists[X_CONNECTOR_SKIPLIST], &ptr);
+       temp_connector != NULL;
+       temp_connector = (xodtemplate_connector*)skiplist_get_next(&ptr)) {
+    if (temp_connector->register_object == FALSE)
+      continue;
+    fprintf(fp, "define connector {\n");
+    if (temp_connector->connector_name)
+      fprintf(fp, "\tcommand_name\t%s\n", temp_connector->connector_name);
+    if (temp_connector->connector_line)
+      fprintf(fp, "\tconnector_line\t%s\n", temp_connector->connector_line);
     fprintf(fp, "\t}\n\n");
   }
 
@@ -12346,6 +12505,7 @@ int xodtemplate_init_xobject_skiplists(void) {
   xobject_skiplists[X_HOST_SKIPLIST] = skiplist_new(16, 0.5, FALSE, FALSE, xodtemplate_skiplist_compare_host);
   xobject_skiplists[X_SERVICE_SKIPLIST] = skiplist_new(16, 0.5, FALSE, FALSE, xodtemplate_skiplist_compare_service);
   xobject_skiplists[X_COMMAND_SKIPLIST] = skiplist_new(16, 0.5, FALSE, FALSE, xodtemplate_skiplist_compare_command);
+  xobject_skiplists[X_CONNECTOR_SKIPLIST] = skiplist_new(16, 0.5, FALSE, FALSE, xodtemplate_skiplist_compare_connector);
   xobject_skiplists[X_TIMEPERIOD_SKIPLIST] = skiplist_new(16, 0.5, FALSE, FALSE, xodtemplate_skiplist_compare_timeperiod);
   xobject_skiplists[X_CONTACT_SKIPLIST] = skiplist_new(10, 0.5, FALSE, FALSE, xodtemplate_skiplist_compare_contact);
   xobject_skiplists[X_CONTACTGROUP_SKIPLIST] = skiplist_new(10, 0.5, FALSE, FALSE, xodtemplate_skiplist_compare_contactgroup);
@@ -12528,6 +12688,23 @@ int xodtemplate_skiplist_compare_command_template(void* a, void* b) {
   return (skiplist_compare_text(oa->name, NULL, ob->name, NULL));
 }
 
+int xodtemplate_skiplist_compare_connector_template(void* a, void* b) {
+  xodtemplate_connector* oa = NULL;
+  xodtemplate_connector* ob = NULL;
+
+  oa = (xodtemplate_connector*)a;
+  ob = (xodtemplate_connector*)b;
+
+  if (oa == NULL && ob == NULL)
+    return (0);
+  if (oa == NULL)
+    return (1);
+  if (ob == NULL)
+    return (-1);
+
+  return (skiplist_compare_text(oa->name, NULL, ob->name, NULL));
+}
+
 int xodtemplate_skiplist_compare_command(void* a, void* b) {
   xodtemplate_command* oa = NULL;
   xodtemplate_command* ob = NULL;
@@ -12545,6 +12722,26 @@ int xodtemplate_skiplist_compare_command(void* a, void* b) {
   return (skiplist_compare_text(oa->command_name,
 				NULL,
 				ob->command_name,
+				NULL));
+}
+
+int xodtemplate_skiplist_compare_connector(void* a, void* b) {
+  xodtemplate_connector* oa = NULL;
+  xodtemplate_connector* ob = NULL;
+
+  oa = (xodtemplate_connector*)a;
+  ob = (xodtemplate_connector*)b;
+
+  if (oa == NULL && ob == NULL)
+    return (0);
+  if (oa == NULL)
+    return (1);
+  if (ob == NULL)
+    return (-1);
+
+  return (skiplist_compare_text(oa->connector_name,
+				NULL,
+				ob->connector_name,
 				NULL));
 }
 
@@ -12895,6 +13092,8 @@ int xodtemplate_free_memory(void) {
   xodtemplate_daterange* next_daterange = NULL;
   xodtemplate_command* this_command = NULL;
   xodtemplate_command* next_command = NULL;
+  xodtemplate_connector* this_connector = NULL;
+  xodtemplate_connector* next_connector = NULL;
   xodtemplate_contactgroup* this_contactgroup = NULL;
   xodtemplate_contactgroup* next_contactgroup = NULL;
   xodtemplate_hostgroup* this_hostgroup = NULL;
@@ -12962,6 +13161,19 @@ int xodtemplate_free_memory(void) {
   }
   xodtemplate_command_list = NULL;
   xodtemplate_command_list_tail = NULL;
+
+  /* free memory allocated to connector list */
+  for (this_connector = xodtemplate_connector_list;
+       this_connector != NULL;
+       this_connector = next_connector) {
+    next_connector = this_connector->next;
+    delete[] this_connector->tmpl;
+    delete[] this_connector->name;
+    delete[] this_connector->connector_line;
+    delete this_connector;
+  }
+  xodtemplate_connector_list = NULL;
+  xodtemplate_connector_list_tail = NULL;
 
   /* free memory allocated to contactgroup list */
   for (this_contactgroup = xodtemplate_contactgroup_list;

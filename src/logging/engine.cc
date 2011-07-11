@@ -44,6 +44,8 @@ engine::~engine() throw() {
 
 /**
  *  Get instance of engine singleton.
+ *
+ *  @return 
  */
 engine& engine::instance() {
   static engine instance;

@@ -25,6 +25,7 @@
 #include "logging/logger.hh"
 #include "commands/result.hh"
 #include "commands/connector/request_builder.hh"
+#include "commands/connector/error_response.hh"
 #include "commands/connector/execute_response.hh"
 #include "commands/connector/version_response.hh"
 #include "commands/connector/version_query.hh"
@@ -50,10 +51,12 @@ connector::command::command(QString const& name,
     _max_check_for_restart(DEFAULT_MAX_CHECK),
     _nbr_check(0),
     _is_good_version(false),
-    _active_timer(false) {
+    _active_timer(false),
+    _is_exiting(false) {
   _req_func.insert(request::version_r, &command::_req_version_r);
   _req_func.insert(request::execute_r, &command::_req_execute_r);
   _req_func.insert(request::quit_r, &command::_req_quit_r);
+  _req_func.insert(request::error_r, &command::_req_error_r);
   _start();
 }
 
@@ -128,7 +131,7 @@ unsigned long connector::command::run(QString const& processed_cmd,
   }
 
   if (_process->state() != QProcess::Running) {
-    throw (engine_error() << _process_command << " not running.");
+    throw (engine_error() << _name << " not running.");
   }
 
   unsigned long id = ++_id;
@@ -180,7 +183,7 @@ void connector::command::run(QString const& processed_cmd,
   }
 
   if (_process->state() != QProcess::Running) {
-    throw (engine_error() << _process_command << " not running.");
+    throw (engine_error() << _name << " not running.");
   }
 
   unsigned long id = ++_id;
@@ -358,7 +361,6 @@ void connector::command::_ready_read() {
  */
 void connector::command::_start() {
   QMutexLocker locker(&_mutex);
-
   _nbr_check = 0;
 
   if (_process.isNull() == false) {
@@ -375,7 +377,7 @@ void connector::command::_start() {
   _process->start(_process_command);
   _process->waitForStarted(-1);
   if (_process->state() == QProcess::NotRunning) {
-    throw (engine_error() << "impossible to start '" << _process_command
+    throw (engine_error() << "impossible to start '" << _name
 	   << ", " << _process->errorString() << "'.");
   }
 
@@ -405,7 +407,7 @@ void connector::command::_start() {
   }
 
   logger(log_info_message, basic)
-    << "connector start" << _process_command << ".";
+    << "connector start \"" << _name << "\".";
 }
 
 /**
@@ -414,7 +416,7 @@ void connector::command::_start() {
 void connector::command::_exit() {
   QMutexLocker locker(&_mutex);
 
-  if (_process.isNull() == true) {
+  if (_process.isNull() == true || _is_exiting == true) {
     return;
   }
 
@@ -424,6 +426,8 @@ void connector::command::_exit() {
   if (_process->state() == QProcess::NotRunning) {
     return;
   }
+
+  _is_exiting = true;
 
   QEventLoop loop;
   connect(this, SIGNAL(_process_ending()), &loop, SLOT(quit()));
@@ -441,12 +445,14 @@ void connector::command::_exit() {
   if (_process->state() == QProcess::Running) {
     _process->kill();
     logger(log_info_message, basic)
-      << "connector kill " << _process_command << ".";
+      << "connector kill \"" << _name << "\".";
   }
   else {
     logger(log_info_message, basic)
-      << "connector stop" << _process_command << ".";
+      << "connector stop \"" << _name << "\".";
   }
+
+  _is_exiting = false;
 }
 
 /**
@@ -545,4 +551,31 @@ void connector::command::_req_execute_r(request* req) {
     _results.insert(res.get_command_id(), res);
   }
   emit _wait_ending();
+}
+
+/**
+ *  Process error response request.
+ *
+ *  @param[in] req The request to process.
+ */
+void connector::command::_req_error_r(request* req) {
+  error_response* response = static_cast<error_response*>(req);
+
+  switch (response->get_code()) {
+  case error_response::info:
+    logger(log_info_message, basic)
+      << "connector \"" << _name << "\" " << response->get_message();
+    break;
+
+  case error_response::warning:
+    logger(log_runtime_warning, basic)
+      << "connector \"" << _name << "\" " << response->get_message();
+    break;
+
+  case error_response::error:
+    logger(log_runtime_error, basic)
+      << "connector \"" << _name << "\" " << response->get_message();
+    _exit();
+    break;
+  }
 }
