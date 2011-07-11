@@ -131,7 +131,7 @@ unsigned long connector::command::run(QString const& processed_cmd,
   }
 
   if (_process->state() != QProcess::Running) {
-    throw (engine_error() << _name << " not running.");
+    throw (engine_error() << "connector \"" << _name << "\" not running.");
   }
 
   unsigned long id = ++_id;
@@ -148,8 +148,9 @@ unsigned long connector::command::run(QString const& processed_cmd,
   QByteArray const& data = query->build();
   _process->write(data.constData(), data.size());
 
-  logger(dbg_commands, basic) << "connector command (id=" << id
-			      << ") start '" << processed_cmd << "'.";
+  logger(dbg_commands, basic)
+    << "connector \"" << _name << "\" start (id="
+    << id << ") '" << processed_cmd << "'.";
 
   if (_active_timer == false && timeout > 0) {
     _active_timer = true;
@@ -183,7 +184,7 @@ void connector::command::run(QString const& processed_cmd,
   }
 
   if (_process->state() != QProcess::Running) {
-    throw (engine_error() << _name << " not running.");
+    throw (engine_error() << "connector \"" << _name << "\" not running.");
   }
 
   unsigned long id = ++_id;
@@ -199,8 +200,9 @@ void connector::command::run(QString const& processed_cmd,
   QByteArray const& data = query->build();
   _process->write(data.constData(), data.size());
 
-  logger(dbg_commands, basic) << "connector command (id=" << id
-			      << ") start '" << processed_cmd << "'.";
+  logger(dbg_commands, basic)
+    << "connector \"" << _name << "\" start (id="
+    << id << ") '" << processed_cmd << "'.";
 
   if (_active_timer == false && timeout > 0) {
     _active_timer = true;
@@ -310,7 +312,8 @@ void connector::command::_state_change(QProcess::ProcessState new_state) {
       _start();
     }
     catch (std::exception const& e) {
-      logger(log_runtime_warning, basic) << e.what();
+      logger(log_runtime_warning, basic)
+	<< "connector \"" << _name <<  "\" error: " << e.what();
     }
   }
 }
@@ -344,14 +347,16 @@ void connector::command::_ready_read() {
       QHash<request::e_type, void (command::*)(request*)>::iterator
 	it = _req_func.find(req->get_id());
       if (it == _req_func.end()) {
-	logger(log_runtime_warning, basic) << "bad request id.";
+	logger(log_runtime_warning, basic)
+	  << "connector \"" << _name << "\" bad request id.";
 	continue;
       }
 
       (this->*(it.value()))(&(*req));
     }
     catch (std::exception const& e) {
-      logger(log_runtime_warning, basic) << e.what();
+      logger(log_runtime_warning, basic)
+	<< "connector \"" << _name << "\" error: "<< e.what();
     }
   }
 }
@@ -377,8 +382,7 @@ void connector::command::_start() {
   _process->start(_process_command);
   _process->waitForStarted(-1);
   if (_process->state() == QProcess::NotRunning) {
-    throw (engine_error() << "impossible to start '" << _name
-	   << ", " << _process->errorString() << "'.");
+    throw (engine_error() << _process->errorString());
   }
 
   connect(&(*_process), SIGNAL(stateChanged(QProcess::ProcessState)),
@@ -407,7 +411,7 @@ void connector::command::_start() {
   }
 
   logger(log_info_message, basic)
-    << "connector start \"" << _name << "\".";
+    << "connector \"" << _name << "\" start.";
 }
 
 /**
@@ -445,11 +449,11 @@ void connector::command::_exit() {
   if (_process->state() == QProcess::Running) {
     _process->kill();
     logger(log_info_message, basic)
-      << "connector kill \"" << _name << "\".";
+      << "connector \"" << _name << "\" kill.";
   }
   else {
     logger(log_info_message, basic)
-      << "connector stop \"" << _name << "\".";
+      << "connector \"" << _name << "\" stop.";
   }
 
   _is_exiting = false;
@@ -541,7 +545,8 @@ void connector::command::_req_execute_r(request* req) {
   }
 
   logger(dbg_commands, basic)
-    << "connector command (id=" << res.get_command_id() << ") finished.";
+    << "connector \"" << _name << "\" finished (id="
+    << res.get_command_id() << ").";
 
   if (info.waiting_result == false) {
     emit command_executed(res);
