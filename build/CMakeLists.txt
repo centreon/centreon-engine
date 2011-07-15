@@ -850,6 +850,62 @@ if (WITH_TESTING)
     "${TEST_DIR}/error/assignment.cc")
   target_link_libraries("${TEST_NAME}" "cce_core")
   add_test("${TEST_NAME}" "${TEST_NAME}")
+
+
+  # Remove command.
+  set(TEST_NAME "remove_command")
+  add_executable("${TEST_NAME}"
+    "${TEST_DIR}/object/remove_command.cc")
+  target_link_libraries("${TEST_NAME}" "cce_core")
+  add_test("${TEST_NAME}" "${TEST_NAME}")
+  # Remove contact.
+  set(TEST_NAME "remove_contact")
+  add_executable("${TEST_NAME}"
+    "${TEST_DIR}/object/remove_contact.cc")
+  target_link_libraries("${TEST_NAME}" "cce_core")
+  add_test("${TEST_NAME}" "${TEST_NAME}")
+  # Remove contactgroup.
+  set(TEST_NAME "remove_contactgroup")
+  add_executable("${TEST_NAME}"
+    "${TEST_DIR}/object/remove_contactgroup.cc")
+  target_link_libraries("${TEST_NAME}" "cce_core")
+  add_test("${TEST_NAME}" "${TEST_NAME}")
+  # Remove servicegroup.
+  set(TEST_NAME "remove_servicegroup")
+  add_executable("${TEST_NAME}"
+    "${TEST_DIR}/object/remove_servicegroup.cc")
+  target_link_libraries("${TEST_NAME}" "cce_core")
+  add_test("${TEST_NAME}" "${TEST_NAME}")
+  # Remove hostgroup.
+  set(TEST_NAME "remove_hostgroup")
+  add_executable("${TEST_NAME}"
+    "${TEST_DIR}/object/remove_hostgroup.cc")
+  target_link_libraries("${TEST_NAME}" "cce_core")
+  add_test("${TEST_NAME}" "${TEST_NAME}")
+  # Remove serviceescalation.
+  set(TEST_NAME "remove_serviceescalation")
+  add_executable("${TEST_NAME}"
+    "${TEST_DIR}/object/remove_serviceescalation.cc")
+  target_link_libraries("${TEST_NAME}" "cce_core")
+  add_test("${TEST_NAME}" "${TEST_NAME}")
+  # Remove servicedependency.
+  set(TEST_NAME "remove_servicedependency")
+  add_executable("${TEST_NAME}"
+    "${TEST_DIR}/object/remove_servicedependency.cc")
+  target_link_libraries("${TEST_NAME}" "cce_core")
+  add_test("${TEST_NAME}" "${TEST_NAME}")
+  # Remove host.
+  set(TEST_NAME "remove_host")
+  add_executable("${TEST_NAME}"
+    "${TEST_DIR}/object/remove_host.cc")
+  target_link_libraries("${TEST_NAME}" "cce_core")
+  add_test("${TEST_NAME}" "${TEST_NAME}")
+  # Remove service.
+  set(TEST_NAME "remove_service")
+  add_executable("${TEST_NAME}"
+    "${TEST_DIR}/object/remove_service.cc")
+  target_link_libraries("${TEST_NAME}" "cce_core")
+  add_test("${TEST_NAME}" "${TEST_NAME}")
 endif ()
 
 #

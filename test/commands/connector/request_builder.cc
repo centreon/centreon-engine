@@ -20,6 +20,7 @@
 #include <QCoreApplication>
 #include <QDebug>
 #include <exception>
+#include "error.hh"
 #include "commands/connector/request_builder.hh"
 
 using namespace com::centreon::engine::commands::connector;
@@ -62,15 +63,11 @@ int main(int argc, char** argv) {
   try {
     QCoreApplication app(argc, argv);
 
-    if (is_valid() == false) {
-      qDebug() << "error: is valid failed.";
-      return (1);
-    }
+    if (is_valid() == false)
+      throw (engine_error() << "is valid failed.");
 
-    if (is_invalid() == false) {
-      qDebug() << "error: is invalid failed.";
-      return (1);
-    }
+    if (is_invalid() == false)
+      throw (engine_error() << "is invalid failed.");
   }
   catch (std::exception const& e) {
     qDebug() << "error: " << e.what();

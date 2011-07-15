@@ -20,6 +20,7 @@
 #include <QDebug>
 #include <exception>
 #include <sys/time.h>
+#include "error.hh"
 #include "commands/result.hh"
 
 using namespace com::centreon::engine::commands;
@@ -48,52 +49,34 @@ int main() {
     res.set_is_executed(DEFAULT_EXIT_OK);
     res.set_is_timeout(DEFAULT_TIMEOUT);
 
-    if (res.get_command_id() != DEFAULT_ID) {
-      qDebug() << "error: command_id invalid value.";
-      return (1);
-    }
+    if (res.get_command_id() != DEFAULT_ID)
+      throw (engine_error() << "command_id invalid value.");
 
-    if (res.get_exit_code() != DEFAULT_RETURN) {
-      qDebug() << "error: exit_code invalid value.";
-      return (1);
-    }
+    if (res.get_exit_code() != DEFAULT_RETURN)
+      throw (engine_error() << "exit_code invalid value.");
 
-    if (res.get_execution_time() != 0.0) {
-      qDebug() << "error: execution_time invalid value.";
-      return (1);
-    }
+    if (res.get_execution_time() != 0.0)
+      throw (engine_error() << "execution_time invalid value.");
 
     if (res.get_start_time().tv_sec != static_cast<unsigned int>(time.toTime_t())
-	|| res.get_start_time().tv_usec != 0) {
-      qDebug() << "error: start_time invalid value.";
-      return (1);
-    }
+	|| res.get_start_time().tv_usec != 0)
+      throw (engine_error() << "start_time invalid value.");
 
     if (res.get_end_time().tv_sec != static_cast<unsigned int>(time.toTime_t())
-	|| res.get_end_time().tv_usec != 0) {
-      qDebug() << "error: end_time invalid value.";
-      return (1);
-    }
+	|| res.get_end_time().tv_usec != 0)
+      throw (engine_error() << "end_time invalid value.");
 
-    if (res.get_stdout() != DEFAULT_STDOUT) {
-      qDebug() << "error: stdout invalid value.";
-      return (1);
-    }
+    if (res.get_stdout() != DEFAULT_STDOUT)
+      throw (engine_error() << "stdout invalid value.");
 
-    if (res.get_stderr() != DEFAULT_STDERR) {
-      qDebug() << "error: stderr invalid value.";
-      return (1);
-    }
+    if (res.get_stderr() != DEFAULT_STDERR)
+      throw (engine_error() << "stderr invalid value.");
 
-    if (res.get_is_executed() != DEFAULT_EXIT_OK) {
-      qDebug() << "error: is_executed invalid value.";
-      return (1);
-    }
+    if (res.get_is_executed() != DEFAULT_EXIT_OK)
+      throw (engine_error() << "is_executed invalid value.");
 
-    if (res.get_is_timeout() != DEFAULT_TIMEOUT) {
-      qDebug() << "error: timeout invalid value.";
-      return (1);
-    }
+    if (res.get_is_timeout() != DEFAULT_TIMEOUT)
+      throw (engine_error() << "timeout invalid value.");
   }
   catch (std::exception const& e) {
     qDebug() << "error: " << e.what();

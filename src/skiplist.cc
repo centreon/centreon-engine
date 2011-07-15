@@ -389,7 +389,7 @@ int skiplist_delete_first(skiplist* list, void* data) {
     }
 
     /* free node memory */
-    delete nextnode;
+    delete[] nextnode;
 
     /* adjust top/current level of list is necessary */
     while (list->head->forward[top_level] == NULL && top_level > 0)
@@ -404,6 +404,7 @@ int skiplist_delete_first(skiplist* list, void* data) {
 
   /* free memory */
   delete[] update;
+
   return (deleted);
 }
 

@@ -141,8 +141,10 @@
       <!-- Service dependency identifier. -->
       <complexType name="serviceDependencyIDType">
 	<sequence>
-	  <element name="name" type="xsd:string"/>
-	  <element name="description" type="xsd:string"/>
+	  <element name="hostName" type="xsd:string"/>
+	  <element name="serviceDescription" type="xsd:string"/>
+	  <element name="dependentHostName" type="xsd:string"/>
+	  <element name="dependentServiceDescription" type="xsd:string"/>
 	</sequence>
       </complexType>
 

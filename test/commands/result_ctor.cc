@@ -20,6 +20,7 @@
 #include <QDebug>
 #include <exception>
 #include <sys/time.h>
+#include "error.hh"
 #include "commands/result.hh"
 
 using namespace com::centreon::engine::commands;
@@ -46,10 +47,8 @@ int main() {
 	|| res1.get_start_time().tv_sec != 0
 	|| res1.get_start_time().tv_usec != 0
 	|| res1.get_end_time().tv_sec != 0
-	|| res1.get_end_time().tv_usec != 0) {
-      qDebug() << "error: Default constructor failed.";
-      return (1);
-    }
+	|| res1.get_end_time().tv_usec != 0)
+      throw (engine_error() << "Default constructor failed.");
 
     QDateTime time = QDateTime::currentDateTime();
 
@@ -70,22 +69,16 @@ int main() {
 	|| res2.get_start_time().tv_sec != static_cast<unsigned int>(time.toTime_t())
 	|| res2.get_start_time().tv_usec != 0
 	|| res2.get_end_time().tv_sec != static_cast<unsigned int>(time.toTime_t())
-	|| res2.get_end_time().tv_usec != 0) {
-      qDebug() << "error: Constructor failed.";
-      return (1);
-    }
+	|| res2.get_end_time().tv_usec != 0)
+      throw (engine_error() << "Constructor failed.");
 
     result res3(res2);
-    if (res2 != res3) {
-      qDebug() << "error: Default copy constructor failed.";
-      return (1);
-    }
+    if (res2 != res3)
+      throw (engine_error() << "Default copy constructor failed.");
 
     result res4 = res3;
-    if (res2 != res4) {
-      qDebug() << "error: Default copy operator failed.";
-      return (1);
-    }
+    if (res2 != res4)
+      throw (engine_error() << "Default copy operator failed.");
   }
   catch (std::exception const& e) {
     qDebug() << "error: " << e.what();

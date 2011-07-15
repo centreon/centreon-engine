@@ -1137,8 +1137,10 @@ int pre_flight_circular_check(int* w, int* e) {
   }
 
   /* update warning and error count */
-  *w += warnings;
-  *e += errors;
+  if (w != NULL)
+    *w += warnings;
+  if (e != NULL)
+    *e += errors;
 
   return ((errors > 0) ? ERROR : OK);
 }
@@ -1326,8 +1328,10 @@ int check_service(service* svc, int* w, int* e) {
     }
   }
 
-  *w += warnings;
-  *e += errors;
+  if (w != NULL)
+    *w += warnings;
+  if (e != NULL)
+    *e += errors;
   return (errors == 0);
 }
 
@@ -1519,8 +1523,10 @@ int check_host(host* hst, int* w, int* e) {
     }
   }
 
-  *w += warnings;
-  *e += errors;
+  if (w != NULL)
+    *w += warnings;
+  if (e != NULL)
+    *e += errors;
   return (errors == 0);
 }
 
@@ -1664,7 +1670,9 @@ int check_contact(contact* cntct, int* w, int* e) {
     }
   }
 
-  *w += warnings;
-  *e += errors;
+  if (w != NULL)
+    *w += warnings;
+  if (e != NULL)
+    *e += errors;
   return (errors == 0);
 }

@@ -19,6 +19,7 @@
 
 #include <QDebug>
 #include <exception>
+#include "error.hh"
 #include "commands/result.hh"
 
 using namespace com::centreon::engine::commands;
@@ -44,14 +45,10 @@ int main() {
 	       DEFAULT_RETURN,
 	       DEFAULT_TIMEOUT,
 	       DEFAULT_EXIT_OK);
-    if (!(res == res)) {
-      qDebug() << "error: operator== failed.";
-      return (1);
-    }
-    if (res != res) {
-      qDebug() << "error: operator!= failed.";
-      return (1);
-    }
+    if (!(res == res))
+      throw (engine_error() << "operator== failed.");
+    if (res != res)
+      throw (engine_error() << "operator!= failed.");
   }
   catch (std::exception const& e) {
     qDebug() << "error: " << e.what();

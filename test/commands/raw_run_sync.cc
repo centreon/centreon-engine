@@ -21,6 +21,7 @@
 #include <QDebug>
 #include <exception>
 #include <string.h>
+#include "error.hh"
 #include "commands/raw.hh"
 #include "engine.hh"
 
@@ -106,18 +107,12 @@ int main(int argc, char** argv) {
   try {
     QCoreApplication app(argc, argv);
 
-    if (run_without_timeout() == false) {
-      qDebug() << "error: raw::run without timeout failed.";
-      return (1);
-    }
-    if (run_with_timeout() == false) {
-      qDebug() << "error: raw::run with timeout failed.";
-      return (1);
-    }
-    if (run_with_environement_macros() == false) {
-      qDebug() << "error: raw::run with macros failed.";
-      return (1);
-    }
+    if (run_without_timeout() == false)
+      throw (engine_error() << "raw::run without timeout failed.");
+    if (run_with_timeout() == false)
+      throw (engine_error() << "raw::run with timeout failed.");
+    if (run_with_environement_macros() == false)
+      throw (engine_error() << "raw::run with macros failed.");
   }
   catch (std::exception const& e) {
     qDebug() << "error: " << e.what();

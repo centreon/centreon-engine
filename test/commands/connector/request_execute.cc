@@ -20,6 +20,7 @@
 #include <QCoreApplication>
 #include <QDebug>
 #include <exception>
+#include "error.hh"
 #include "commands/connector/execute_query.hh"
 #include "commands/connector/execute_response.hh"
 #include "check_request.hh"
@@ -49,32 +50,20 @@ int main(int argc, char** argv) {
     QDateTime time;
     time.setTime_t(TIMESTAMP);
     execute_query query(ID, BINARY, time, TIMEOUT);
-    if (check_request_valid(&query, REQUEST(QUERY)) == false) {
-      qDebug() << "error: query is valid failed.";
-      return (1);
-    }
-    if (check_request_invalid(&query) == false) {
-      qDebug() << "error: query is invalid failed.";
-      return (1);
-    }
-    if (check_request_clone(&query) == false) {
-      qDebug() << "error: query clone failed";
-      return (1);
-    }
+    if (check_request_valid(&query, REQUEST(QUERY)) == false)
+      throw (engine_error() << "query is valid failed.");
+    if (check_request_invalid(&query) == false)
+      throw (engine_error() << "query is invalid failed.");
+    if (check_request_clone(&query) == false)
+      throw (engine_error() << "query clone failed");
 
     execute_response response(ID, IS_EXECUTED, STATE_OK, time, STDERR, STDOUT);
-    if (check_request_valid(&response, REQUEST(RESPONSE)) == false) {
-      qDebug() << "error: response is valid failed.";
-      return (1);
-    }
-    if (check_request_invalid(&response) == false) {
-      qDebug() << "error: response is invalid failed.";
-      return (1);
-    }
-    if (check_request_clone(&response) == false) {
-      qDebug() << "error: response clone failed";
-      return (1);
-    }
+    if (check_request_valid(&response, REQUEST(RESPONSE)) == false)
+      throw (engine_error() << "response is valid failed.");
+    if (check_request_invalid(&response) == false)
+      throw (engine_error() << "response is invalid failed.");
+    if (check_request_clone(&response) == false)
+      throw (engine_error() << "response clone failed");
   }
   catch (std::exception const& e) {
     qDebug() << "error: " << e.what();

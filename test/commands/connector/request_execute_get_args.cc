@@ -20,6 +20,7 @@
 #include <QCoreApplication>
 #include <QDebug>
 #include <exception>
+#include "error.hh"
 #include "commands/connector/execute_query.hh"
 
 using namespace com::centreon::engine::commands::connector;
@@ -62,10 +63,8 @@ int main(int argc, char** argv) {
 	  result += ' ';
 	}
       }
-      if (result != lines[i].result) {
-	qDebug() << "error: command '" << lines[i].command << "' failed.";
-	return (1);
-      }
+      if (result != lines[i].result)
+	throw (engine_error() << "command '" << lines[i].command << "' failed.");
     }
 
   }

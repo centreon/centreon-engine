@@ -19,6 +19,7 @@
 
 #include <QDebug>
 #include <exception>
+#include "error.hh"
 #include "commands/raw.hh"
 #include "globals.hh"
 #include "objects.hh"
@@ -64,10 +65,8 @@ int main() {
     delete[] macro_user[0];
     delete[] macros.argv[0];
 
-    if (cmd_processed != CMD_PROCESSED) {
-      qDebug() << "command::process failed.";
-      return (1);
-    }
+    if (cmd_processed != CMD_PROCESSED)
+      throw (engine_error() << "command::process failed.");
   }
   catch (std::exception const& e) {
     qDebug() << "error: " << e.what();

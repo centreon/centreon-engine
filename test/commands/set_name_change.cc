@@ -20,6 +20,7 @@
 
 #include <QDebug>
 #include <exception>
+#include "error.hh"
 #include "commands/set.hh"
 #include "commands/raw.hh"
 
@@ -65,19 +66,15 @@ int main() {
     QSharedPointer<commands::command> new_cmd = cmd_set.get_command("cmd");
 
     // check if the old command name is not found.
-    if (command_exist("raw") == true) {
-      qDebug() << "error: command name changed failed.";
-      return (1);
-    }
+    if (command_exist("raw") == true)
+      throw (engine_error() << "command name changed failed.");
 
     // remove new name.
     cmd_set.remove_command("cmd");
 
     // check if the old command name is not found.
-    if (command_exist("cmd") == true) {
-      qDebug() << "error: command name changed failed.";
-      return (1);
-    }
+    if (command_exist("cmd") == true)
+      throw (engine_error() << "command name changed failed.");
   }
   catch (std::exception const& e) {
     qDebug() << "error: " << e.what();

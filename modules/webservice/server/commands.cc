@@ -13662,16 +13662,21 @@ int centreonengine__removeServiceDependency(soap* s,
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-                   "Webservice: %s({%s, %s})\n",
+                   "Webservice: %s({%s, %s, %s, %s})\n",
                    __func__,
-                   dependency_id->name.c_str(),
-		   dependency_id->description.c_str());
+                   dependency_id->hostName.c_str(),
+		   dependency_id->serviceDescription.c_str(),
+		   dependency_id->dependentHostName.c_str(),
+		   dependency_id->dependentServiceDescription.c_str());
 
-    if (!remove_servicedependency_by_id(dependency_id->name.c_str(),
-					dependency_id->description.c_str())) {
+    if (!remove_servicedependency_by_id(dependency_id->hostName.c_str(),
+					dependency_id->serviceDescription.c_str(),
+					dependency_id->dependentHostName.c_str(),
+					dependency_id->dependentServiceDescription.c_str())) {
       std::string* error = soap_new_std__string(s, 1);
-      *error = "Service escalation `" + dependency_id->name + " "
-	+ dependency_id->description + "' not found.";
+      *error = "Service dependency `" + dependency_id->hostName + " "
+	+ dependency_id->serviceDescription + " " + dependency_id->dependentHostName
+	+ dependency_id->dependentServiceDescription + "' not found.";
 
       log_debug_info(DEBUGL_COMMANDS, 2,
                      "Webservice: %s failed. %s\n",

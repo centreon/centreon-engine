@@ -20,6 +20,7 @@
 
 #include <QDebug>
 #include <exception>
+#include "error.hh"
 #include "commands/set.hh"
 #include "commands/raw.hh"
 
@@ -62,32 +63,23 @@ int main() {
     cmd_set.add_command(pcmd3);
 
     // get commands.
-    if (command_exit("raw1") == false) {
-      qDebug() << "error: get_command failed, 'raw1' not found.";
-      return (1);
-    }
-    if (command_exit("pcmd3") == false) {
-      qDebug() << "error: get_command failed, 'pcmd3' not found.";
-      return (1);
-    }
+    if (command_exit("raw1") == false)
+      throw (engine_error() << "get_command failed, 'raw1' not found.");
 
-    if (command_exit("undef") == true) {
-      qDebug() << "error: get_command failed, 'undef' found.";
-      return (1);
-    }
+    if (command_exit("pcmd3") == false)
+      throw (engine_error() << "get_command failed, 'pcmd3' not found.");
+
+    if (command_exit("undef") == true)
+      throw (engine_error() << "get_command failed, 'undef' found.");
 
     // remove commands.
     cmd_set.remove_command("pcmd3");
-    if (command_exit("pcmd3") == true) {
-      qDebug() << "error: remove_command failed, 'pcmd3' found.";
-      return (1);
-    }
+    if (command_exit("pcmd3") == true)
+      throw (engine_error() << "remove_command failed, 'pcmd3' found.");
 
     cmd_set.remove_command("raw1");
-    if (command_exit("raw1") == true) {
-      qDebug() << "error: remove_command failed, 'raw1' found.";
-      return (1);
-    }
+    if (command_exit("raw1") == true)
+      throw (engine_error() << "remove_command failed, 'raw1' found.");
 
     cmd_set.remove_command("undef");
   }

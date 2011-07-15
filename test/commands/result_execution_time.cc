@@ -20,6 +20,7 @@
 #include <QDebug>
 #include <exception>
 #include <sys/time.h>
+#include "error.hh"
 #include "commands/result.hh"
 
 using namespace com::centreon::engine::commands;
@@ -50,16 +51,12 @@ int main() {
     end.addMSecs(20);
 
     result res1(0, "", "", start, end);
-    if (res1.get_execution_time() != execution_time(start, end)) {
-      qDebug() << "error: execution_time invalid value.";
-      return (1);
-    }
+    if (res1.get_execution_time() != execution_time(start, end))
+      throw (engine_error() << "execution_time invalid value.");
 
     result res2(0, "", "", end, start);
-    if (res2.get_execution_time() != 0) {
-      qDebug() << "error: execution_time != 0";
-      return (1);
-    }
+    if (res2.get_execution_time() != 0)
+      throw (engine_error() << "execution_time != 0");
   }
   catch (std::exception const& e) {
     qDebug() << "error: " << e.what();

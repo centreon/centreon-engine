@@ -19,6 +19,7 @@
 
 #include <QDebug>
 #include <exception>
+#include "error.hh"
 #include "commands/raw.hh"
 
 using namespace com::centreon::engine::commands;
@@ -33,15 +34,11 @@ int main() {
   try {
     raw cmd(DEFAULT_CMD_NAME, DEFAULT_CMD_LINE);
 
-    if (cmd.get_name() != DEFAULT_CMD_NAME) {
-      qDebug() << "error: name invalid value.";
-      return (1);
-    }
+    if (cmd.get_name() != DEFAULT_CMD_NAME)
+      throw (engine_error() << "name invalid value.");
 
-    if (cmd.get_command_line() != DEFAULT_CMD_LINE) {
-      qDebug() << "error: command_line invalid value.";
-      return (1);
-    }
+    if (cmd.get_command_line() != DEFAULT_CMD_LINE)
+      throw (engine_error() << "command_line invalid value.");
   }
   catch (std::exception const& e) {
     qDebug() << "error: " << e.what();

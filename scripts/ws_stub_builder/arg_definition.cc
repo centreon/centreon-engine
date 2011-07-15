@@ -149,8 +149,10 @@ arg_definition::arg_definition() {
   serviceescalation_id.add(arg_string).set_name("description").set_help("service_description");
 
   argument servicedependency_id("ns1__serviceDependencyIDType", "dependency");
-  servicedependency_id.add(arg_string).set_name("name").set_help("host_name");
-  servicedependency_id.add(arg_string).set_name("description").set_help("service_description");
+  servicedependency_id.add(arg_string).set_name("hostName").set_help("host_name");
+  servicedependency_id.add(arg_string).set_name("serviceDescription").set_help("service_description");
+  servicedependency_id.add(arg_string).set_name("dependentHostName").set_help("dependent_host_name");
+  servicedependency_id.add(arg_string).set_name("dependentServiceDescription").set_help("dependent_service_description");
 
   _list.push_back(arg_bool);
   _list.push_back(arg_double);

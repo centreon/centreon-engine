@@ -19,6 +19,7 @@
 
 #include <QDebug>
 #include <exception>
+#include "error.hh"
 #include "commands/raw.hh"
 
 using namespace com::centreon::engine;
@@ -34,32 +35,23 @@ int main() {
   try {
     raw cmd1(CMD_NAME, CMD_LINE);
     if (cmd1.get_name() != CMD_NAME
-	|| cmd1.get_command_line() != CMD_LINE) {
-      qDebug() << "error: Constructor failed.";
-      return (1);
-    }
+	|| cmd1.get_command_line() != CMD_LINE)
+      throw (engine_error() << "Constructor failed.");
 
     raw cmd2(cmd1);
-    if (cmd2 != cmd1) {
-      qDebug() << "error: Default copy constructor failed.";
-      return (1);
-    }
+    if (cmd2 != cmd1)
+      throw (engine_error() << "Default copy constructor failed.");
 
     raw cmd3 = cmd2;
-    if (cmd3 != cmd2) {
-      qDebug() << "error: Default copy operator failed.";
-      return (1);
-    }
+    if (cmd3 != cmd2)
+      throw (engine_error() << "Default copy operator failed.");
 
     QSharedPointer<commands::command> cmd4(cmd3.clone());
-    if (cmd4.isNull() == true) {
-      qDebug() << "error: clone failed.";
-      return (1);
-    }
-    if (*cmd4 != cmd3) {
-      qDebug() << "error: clone failed.";
-      return (1);
-    }
+    if (cmd4.isNull() == true)
+      throw (engine_error() << "clone failed.");
+
+    if (*cmd4 != cmd3)
+      throw (engine_error() << "clone failed.");
   }
   catch (std::exception const& e) {
     qDebug() << "error: " << e.what();

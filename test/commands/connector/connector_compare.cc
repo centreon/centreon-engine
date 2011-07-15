@@ -20,6 +20,7 @@
 #include <QCoreApplication>
 #include <QDebug>
 #include <exception>
+#include "error.hh"
 #include "commands/connector/command.hh"
 
 using namespace com::centreon::engine::commands;
@@ -36,14 +37,10 @@ int main(int argc, char** argv) {
     QCoreApplication app(argc, argv);
 
     connector::command cmd(CMD_NAME, CMD_LINE, CMD_PROCESS);
-    if (!(cmd == cmd)) {
-      qDebug() << "error: operator== failed.";
-      return (1);
-    }
-    if (cmd != cmd) {
-      qDebug() << "error: operator!= failed.";
-      return (1);
-    }
+    if (!(cmd == cmd))
+      throw (engine_error() << "operator== failed.");
+    if (cmd != cmd)
+      throw (engine_error() << "operator!= failed.");
   }
   catch (std::exception const& e) {
     qDebug() << "error: " << e.what();

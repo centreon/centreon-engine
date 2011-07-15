@@ -21,6 +21,7 @@
 #include <QDateTime>
 #include <QDebug>
 #include <exception>
+#include "error.hh"
 #include "commands/connector/command.hh"
 #include "engine.hh"
 #include "../wait_process.hh"
@@ -94,15 +95,11 @@ int main(int argc, char** argv) {
   try {
     QCoreApplication app(argc, argv);
 
-    if (restart_with_segfault() == false) {
-      qDebug() << "error: restart connector after segfault failed.";
-      return (1);
-    }
+    if (restart_with_segfault() == false)
+      throw (engine_error() << "restart connector after segfault failed.");
 
-    if (restart_with_execution_limit() == false) {
-      qDebug() << "error: restart connector after execution limit failed.";
-      return (1);
-    }
+    if (restart_with_execution_limit() == false)
+      throw (engine_error() << "restart connector after execution limit failed.");
   }
   catch (std::exception const& e) {
     qDebug() << "error: " << e.what();

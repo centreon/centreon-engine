@@ -20,6 +20,7 @@
 #include <QCoreApplication>
 #include <QDebug>
 #include <exception>
+#include "error.hh"
 #include "commands/connector/command.hh"
 
 using namespace com::centreon::engine::commands;
@@ -39,20 +40,14 @@ int main(int argc, char** argv) {
 			   DEFAULT_CMD_LINE,
 			   DEFAULT_CMD_PROCESS);
 
-    if (cmd.get_name() != DEFAULT_CMD_NAME) {
-      qDebug() << "error: name invalid value.";
-      return (1);
-    }
+    if (cmd.get_name() != DEFAULT_CMD_NAME)
+      throw (engine_error() << "name invalid value.");
 
-    if (cmd.get_command_line() != DEFAULT_CMD_LINE) {
-      qDebug() << "error: command_line invalid value.";
-      return (1);
-    }
+    if (cmd.get_command_line() != DEFAULT_CMD_LINE)
+      throw (engine_error() << "command_line invalid value.");
 
-    if (cmd.get_process() != DEFAULT_CMD_PROCESS) {
-      qDebug() << "error: process invalid value.";
-      return (1);
-    }
+    if (cmd.get_process() != DEFAULT_CMD_PROCESS)
+      throw (engine_error() << "process invalid value.");
   }
   catch (std::exception const& e) {
     qDebug() << "error: " << e.what();

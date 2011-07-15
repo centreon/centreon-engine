@@ -20,6 +20,7 @@
 #include <QCoreApplication>
 #include <QDebug>
 #include <exception>
+#include "error.hh"
 #include "commands/connector/command.hh"
 #include "engine.hh"
 #include "../wait_process.hh"
@@ -90,14 +91,10 @@ int main(int argc, char** argv) {
   try {
     QCoreApplication app(argc, argv);
 
-    if (run_without_timeout() == false) {
-      qDebug() << "error: raw::run without timeout failed.";
-      return (1);
-    }
-    if (run_with_timeout() == false) {
-      qDebug() << "error: raw::run with timeout failed.";
-      return (1);
-    }
+    if (run_without_timeout() == false)
+      throw (engine_error() << "raw::run without timeout failed.");
+    if (run_with_timeout() == false)
+      throw (engine_error() << "raw::run with timeout failed.");
   }
   catch (std::exception const& e) {
     qDebug() << "error: " << e.what();

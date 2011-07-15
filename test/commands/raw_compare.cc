@@ -19,6 +19,7 @@
 
 #include <QDebug>
 #include <exception>
+#include "error.hh"
 #include "commands/raw.hh"
 
 using namespace com::centreon::engine::commands;
@@ -32,14 +33,10 @@ using namespace com::centreon::engine::commands;
 int main() {
   try {
     raw cmd(CMD_NAME, CMD_LINE);
-    if (!(cmd == cmd)) {
-      qDebug() << "error: operator== failed.";
-      return (1);
-    }
-    if (cmd != cmd) {
-      qDebug() << "error: operator!= failed.";
-      return (1);
-    }
+    if (!(cmd == cmd))
+      throw (engine_error() << "operator== failed.");
+    if (cmd != cmd)
+      throw (engine_error() << "operator!= failed.");
   }
   catch (std::exception const& e) {
     qDebug() << "error: " << e.what();
