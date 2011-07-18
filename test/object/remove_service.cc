@@ -88,7 +88,9 @@ static void remove_service_with_contactgroups() {
   contactgroupsmember* cgm = add_contactgroup_to_service(svc, "contactgroup_name");
   cgm->group_ptr = cgroup;
 
-  if (remove_service_by_id("service_host_name_1", "service_description") != 1)
+  if (remove_service_by_id("service_host_name_1", "service_description") != 1
+      || service_list != NULL
+      || service_list_tail != NULL)
     throw (engine_error() << "remove service with contact groups failed.");
 
   delete[] cgroup->group_name;
@@ -112,8 +114,10 @@ static void remove_service_with_contacts() {
   contactsmember* cm = add_contact_to_service(svc, "contact_name");
   cm->contact_ptr = cntct;
 
-  if (remove_service_by_id("service_host_name_1", "service_description") != 1)
-    throw (engine_error() << "remove service with contact groups failed.");
+  if (remove_service_by_id("service_host_name_1", "service_description") != 1
+      || service_list != NULL
+      || service_list_tail != NULL)
+    throw (engine_error() << "remove service with contacts failed.");
 
   delete[] cntct->name;
   delete[] cntct->alias;
@@ -125,23 +129,86 @@ static void remove_service_with_contacts() {
 static void remove_service_with_customvaraiables() {
   init_object_skiplists();
 
-  // service* svc = add_service("service_host_name_1", "service_description", "display_name",
-  // 			     "check_period", 0, 42, 0, 0, 0, 42.0, 0.0, 0.0, "notification_period",
-  // 			     0, 0, 0, 0, 0, 0, 0, 0, "event_handler", 0, "check_command", 0, 0,
-  // 			     0.0, 0.0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "failure_prediction_options",
-  // 			     0, 0, "notes", "notes_url", "action_url", "icon_image", "icon_image_alt",
-  // 			     0, 0, 0);
-  // contact* cntct = add_contact("contact_name", NULL, NULL, NULL, NULL, NULL,
-  // 			       NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-  // contactsmember* cm = add_contact_to_service(svc, "contact_name");
-  // cm->contact_ptr = cntct;
+  service* svc = add_service("service_host_name_1", "service_description", "display_name",
+  			     "check_period", 0, 42, 0, 0, 0, 42.0, 0.0, 0.0, "notification_period",
+  			     0, 0, 0, 0, 0, 0, 0, 0, "event_handler", 0, "check_command", 0, 0,
+  			     0.0, 0.0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "failure_prediction_options",
+  			     0, 0, "notes", "notes_url", "action_url", "icon_image", "icon_image_alt",
+  			     0, 0, 0);
+  add_custom_variable_to_service(svc, "varname", "varvalue");
 
-  // if (remove_service_by_id("service_host_name_1", "service_description") != 1)
-  //   throw (engine_error() << "remove service with contact groups failed.");
+  if (remove_service_by_id("service_host_name_1", "service_description") != 1
+      || service_list != NULL
+      || service_list_tail != NULL)
+    throw (engine_error() << "remove service with custom variables failed.");
 
-  // delete[] cntct->name;
-  // delete[] cntct->alias;
-  // delete cntct;
+  free_object_skiplists();
+}
+
+static void remove_service_with_serviceescalation() {
+  init_object_skiplists();
+
+  service* svc = add_service("service_host_name_1", "service_description", "display_name",
+  			     "check_period", 0, 42, 0, 0, 0, 42.0, 0.0, 0.0, "notification_period",
+  			     0, 0, 0, 0, 0, 0, 0, 0, "event_handler", 0, "check_command", 0, 0,
+  			     0.0, 0.0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "failure_prediction_options",
+  			     0, 0, "notes", "notes_url", "action_url", "icon_image", "icon_image_alt",
+  			     0, 0, 0);
+  serviceescalation* se = add_serviceescalation("serviceescalation_host_name_1",
+						"serviceescalation_description",
+						0, 0, 0.0,
+						"serviceescalation_escalation_period",
+						0, 0, 0, 0);
+  se->service_ptr = svc;
+
+  if (remove_service_by_id("service_host_name_1", "service_description") != 1
+      || service_list != NULL
+      || service_list_tail != NULL)
+    throw (engine_error() << "remove service with serviceescalation failed.");
+
+  free_object_skiplists();
+}
+
+static void remove_service_with_servicedependency() {
+  init_object_skiplists();
+
+  service* svc = add_service("service_host_name_1", "service_description", "display_name",
+  			     "check_period", 0, 42, 0, 0, 0, 42.0, 0.0, 0.0, "notification_period",
+  			     0, 0, 0, 0, 0, 0, 0, 0, "event_handler", 0, "check_command", 0, 0,
+  			     0.0, 0.0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "failure_prediction_options",
+  			     0, 0, "notes", "notes_url", "action_url", "icon_image", "icon_image_alt",
+  			     0, 0, 0);
+  servicedependency* sd = add_service_dependency("service_dependency_dependent_host_name_3",
+						 "service_dependency_dependent_service_description",
+						 "service_dependency_host_name_3",
+						 "service_dependency_service_description",
+						 0, 0, 0, 0, 0, 0, 0,
+						 "service_dependency_dependency_period");
+  sd->master_service_ptr = svc;
+
+  if (remove_service_by_id("service_host_name_1", "service_description") != 1
+      || service_list != NULL
+      || service_list_tail != NULL)
+    throw (engine_error() << "remove service with servicedependency (master) failed.");
+
+  svc = add_service("service_host_name_1", "service_description", "display_name",
+  		    "check_period", 0, 42, 0, 0, 0, 42.0, 0.0, 0.0, "notification_period",
+  		    0, 0, 0, 0, 0, 0, 0, 0, "event_handler", 0, "check_command", 0, 0,
+  		    0.0, 0.0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "failure_prediction_options",
+  		    0, 0, "notes", "notes_url", "action_url", "icon_image", "icon_image_alt",
+  		    0, 0, 0);
+  sd = add_service_dependency("service_dependency_dependent_host_name_3",
+  			      "service_dependency_dependent_service_description",
+  			      "service_dependency_host_name_3",
+  			      "service_dependency_service_description",
+  			      0, 0, 0, 0, 0, 0, 0,
+  			      "service_dependency_dependency_period");
+  sd->dependent_service_ptr = svc;
+
+  if (remove_service_by_id("service_host_name_1", "service_description") != 1
+      || service_list != NULL
+      || service_list_tail != NULL)
+    throw (engine_error() << "remove service with servicedependency (dependency) failed.");
 
   free_object_skiplists();
 }
@@ -153,6 +220,8 @@ int main(void) {
     remove_service_with_contactgroups();
     remove_service_with_contacts();
     remove_service_with_customvaraiables();
+    remove_service_with_serviceescalation();
+    remove_service_with_servicedependency();
   }
   catch (std::exception const& e) {
     qDebug() << "error: " << e.what();

@@ -3491,6 +3491,7 @@ static int remove_service(service* this_service) {
   // update the servicedependency list.
   for (servicedependency* dep = servicedependency_list, *prev = NULL; dep != NULL; dep = dep->next) {
     if (dep->master_service_ptr == this_service || dep->dependent_service_ptr == this_service) {
+      skiplist_delete(object_skiplists[SERVICEDEPENDENCY_SKIPLIST], dep);
       if (prev == NULL)
 	servicedependency_list = dep->next;
       else
@@ -3512,6 +3513,7 @@ static int remove_service(service* this_service) {
   for (serviceescalation* escalation = serviceescalation_list, *prev = NULL;
        escalation != NULL;
        prev = escalation, escalation = escalation->next) {
+      skiplist_delete(object_skiplists[SERVICEESCALATION_SKIPLIST], escalation);
     if (escalation->service_ptr == this_service) {
       if (prev == NULL)
 	serviceescalation_list = escalation->next;
@@ -3696,6 +3698,7 @@ static int remove_host(host* this_host) {
   // update the hostdependency list.
   for (hostdependency* dep = hostdependency_list, *prev = NULL; dep != NULL; dep = dep->next) {
     if (dep->master_host_ptr == this_host || dep->dependent_host_ptr == this_host) {
+      skiplist_delete(object_skiplists[HOSTDEPENDENCY_SKIPLIST], dep);
       if (prev == NULL)
 	hostdependency_list = dep->next;
       else
@@ -3715,6 +3718,7 @@ static int remove_host(host* this_host) {
   for (hostescalation* escalation = hostescalation_list, *prev = NULL;
        escalation != NULL;
        prev = escalation, escalation = escalation->next) {
+    skiplist_delete(object_skiplists[HOSTESCALATION_SKIPLIST], escalation);
     if (escalation->host_ptr == this_host) {
       if (prev == NULL)
 	hostescalation_list = escalation->next;
