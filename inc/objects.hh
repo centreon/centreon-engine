@@ -190,7 +190,7 @@ struct                   contact_struct {
   timeperiod*            service_notification_period_ptr;
   objectlist*            contactgroups_ptr;
   struct contact_struct* next;
-  struct ontact_struct*  nexthash;
+  struct contact_struct* nexthash;
 };
 
 // SERVICESMEMBER structure
@@ -680,8 +680,8 @@ int remove_servicedependency_by_id(char const* host_name,
 				   char const* service_description,
 				   char const* dependency_name,
 				   char const* dependency_service_description);
-// int remove_hostescalation_by_id(char const* host_name);
-// int remove_hostdependency_by_id(char const* host_name, char const* dependency_name);
+int remove_hostescalation_by_id(char const* host_name);
+int remove_hostdependency_by_id(char const* host_name, char const* dependency_name);
 
 # ifdef __cplusplus
 }

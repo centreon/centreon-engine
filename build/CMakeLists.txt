@@ -906,6 +906,19 @@ if (WITH_TESTING)
     "${TEST_DIR}/object/remove_service.cc")
   target_link_libraries("${TEST_NAME}" "cce_core")
   add_test("${TEST_NAME}" "${TEST_NAME}")
+
+  # Remove hostescalation.
+  set(TEST_NAME "remove_hostescalation")
+  add_executable("${TEST_NAME}"
+    "${TEST_DIR}/object/remove_hostescalation.cc")
+  target_link_libraries("${TEST_NAME}" "cce_core")
+  add_test("${TEST_NAME}" "${TEST_NAME}")
+  # Remove hostdependency.
+  set(TEST_NAME "remove_hostdependency")
+  add_executable("${TEST_NAME}"
+    "${TEST_DIR}/object/remove_hostdependency.cc")
+  target_link_libraries("${TEST_NAME}" "cce_core")
+  add_test("${TEST_NAME}" "${TEST_NAME}")
 endif ()
 
 #

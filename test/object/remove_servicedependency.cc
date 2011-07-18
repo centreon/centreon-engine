@@ -56,13 +56,13 @@ static void remove_all_servicedependency() {
 				     "service_dependency_service_description",
 				     "service_dependency_dependent_host_name_1",
 				     "service_dependency_dependent_service_description") != 1
-      || remove_servicedependency_by_id("service_dependency_host_name_1",
+      || remove_servicedependency_by_id("service_dependency_host_name_2",
 					"service_dependency_service_description",
-					"service_dependency_dependent_host_name_1",
+					"service_dependency_dependent_host_name_2",
 					"service_dependency_dependent_service_description") != 1
-      || remove_servicedependency_by_id("service_dependency_host_name_1",
+      || remove_servicedependency_by_id("service_dependency_host_name_3",
 					"service_dependency_service_description",
-					"service_dependency_dependent_host_name_1",
+					"service_dependency_dependent_host_name_3",
 					"service_dependency_dependent_service_description") != 1
       || servicedependency_list != NULL
       || servicedependency_list_tail != NULL)

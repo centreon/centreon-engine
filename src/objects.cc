@@ -3466,7 +3466,7 @@ static int remove_service(service* this_service) {
     }
   }
 
-  // update the event list low.
+ // update the event list low.
   for (timed_event* temp_event = event_list_low;
     temp_event != NULL;
     temp_event = temp_event->next) {
@@ -4241,5 +4241,88 @@ int remove_servicedependency_by_id(char const* host_name,
   delete[] this_servicedependency->service_description;
   delete[] this_servicedependency->dependency_period;
   delete this_servicedependency;
+  return (1);
+}
+
+int remove_hostescalation_by_id(char const* host_name) {
+  if (host_name == NULL)
+    return (0);
+
+  hostescalation* this_hostescalation = hostescalation_list;
+  hostescalation* prev_hostescalation = NULL;
+  while (this_hostescalation != NULL
+	 && strcmp(this_hostescalation->host_name, host_name)) {
+    prev_hostescalation = this_hostescalation;
+    this_hostescalation = this_hostescalation->next;
+  }
+
+  // check we have find a contact group.
+  if (this_hostescalation == NULL) {
+    return (0);
+  }
+
+  // update the hostescalation list.
+  if (prev_hostescalation == NULL)
+    hostescalation_list = this_hostescalation->next;
+  else
+    prev_hostescalation->next = this_hostescalation->next;
+  if (this_hostescalation->next == NULL)
+    hostescalation_list_tail = prev_hostescalation;
+
+  contactgroupsmember* this_contactgroupsmembers = this_hostescalation->contact_groups;
+  while (this_contactgroupsmembers != NULL) {
+    contactgroupsmember* tmp = this_contactgroupsmembers->next;
+
+    delete[] this_contactgroupsmembers->group_name;
+    delete this_contactgroupsmembers;
+    this_contactgroupsmembers = tmp;
+  }
+
+  contactsmember* this_contactsmember = this_hostescalation->contacts;
+  while (this_contactsmember != NULL) {
+    contactsmember* tmp = this_contactsmember->next;
+
+    delete[] this_contactsmember->contact_name;
+    delete this_contactsmember;
+    this_contactsmember = tmp;
+  }
+
+  delete[] this_hostescalation->host_name;
+  delete[] this_hostescalation->escalation_period;
+  delete this_hostescalation;
+  return (1);
+}
+
+int remove_hostdependency_by_id(char const* host_name,
+				char const* dependent_host_name) {
+  if (host_name == NULL || dependent_host_name == NULL)
+     return (0);
+
+  hostdependency* this_hostdependency = hostdependency_list;
+  hostdependency* prev_hostdependency = NULL;
+  while (this_hostdependency != NULL
+	 && strcmp(this_hostdependency->host_name, host_name)
+	 && strcmp(this_hostdependency->dependent_host_name, dependent_host_name)) {
+    prev_hostdependency = this_hostdependency;
+    this_hostdependency = this_hostdependency->next;
+  }
+
+  // check we have find a contact group.
+  if (this_hostdependency == NULL) {
+    return (0);
+  }
+
+  // update the hostdependency list.
+  if (prev_hostdependency == NULL)
+    hostdependency_list = this_hostdependency->next;
+  else
+    prev_hostdependency->next = this_hostdependency->next;
+  if (this_hostdependency->next == NULL)
+    hostdependency_list_tail = prev_hostdependency;
+
+  delete[] this_hostdependency->dependent_host_name;
+  delete[] this_hostdependency->host_name;
+  delete[] this_hostdependency->dependency_period;
+  delete this_hostdependency;
   return (1);
 }
