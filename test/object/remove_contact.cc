@@ -27,6 +27,9 @@
 
 using namespace com::centreon::engine;
 
+/**
+ *  Create new contact.
+ */
 static contact* create_contact(char const* name) {
   char* addr[MAX_CONTACT_ADDRESSES];;
   for (unsigned int i = 0; i < MAX_CONTACT_ADDRESSES; ++i)
@@ -38,12 +41,18 @@ static contact* create_contact(char const* name) {
 		      0, 0, 0, 0, 0, 0, 0, 0));
 }
 
+/**
+ *  Cleanup contactgroup memory.
+ */
 static void free_contactgroup(contactgroup* group) {
   delete[] group->group_name;
   delete[] group->alias;
   delete group;
 }
 
+/**
+ *  Reset object list.
+ */
 static void reset_list() {
   host_list = NULL;
   host_list_tail = NULL;
@@ -57,6 +66,9 @@ static void reset_list() {
   hostescalation_list_tail = NULL;
 }
 
+/**
+ *  Check if remove contact works with some contacts.
+ */
 static void remove_all_contacts() {
   reset_list();
   init_object_skiplists();
@@ -75,6 +87,9 @@ static void remove_all_contacts() {
   free_object_skiplists();
 }
 
+/**
+ *  Check if remove contact works with invalid call.
+ */
 static void remove_contact_failed() {
   init_object_skiplists();
 
@@ -86,6 +101,9 @@ static void remove_contact_failed() {
   free_object_skiplists();
 }
 
+/**
+ *  Check if remove contact works with some contactgroup.
+ */
 static void remove_contact_with_contactgroup() {
   reset_list();
   init_object_skiplists();
@@ -104,6 +122,9 @@ static void remove_contact_with_contactgroup() {
   free_object_skiplists();
 }
 
+/**
+ *  Check if remove contact works with some host.
+ */
 static void remove_contact_with_host() {
   reset_list();
   init_object_skiplists();
@@ -159,6 +180,9 @@ static void remove_contact_with_host() {
   free_object_skiplists();
 }
 
+/**
+ *  Check if remove contact works with some service.
+ */
 static void remove_contact_with_service() {
   reset_list();
   init_object_skiplists();
@@ -204,6 +228,9 @@ static void remove_contact_with_service() {
   free_object_skiplists();
 }
 
+/**
+ *  Check if remove contact works with some hostescalation.
+ */
 static void remove_contact_with_hostescalation() {
   reset_list();
   init_object_skiplists();
@@ -236,6 +263,9 @@ static void remove_contact_with_hostescalation() {
   free_object_skiplists();
 }
 
+/**
+ *  Check if remove contact works with some serviceescalation.
+ */
 static void remove_contact_with_serviceescalation() {
   reset_list();
   init_object_skiplists();
@@ -270,6 +300,9 @@ static void remove_contact_with_serviceescalation() {
   free_object_skiplists();
 }
 
+/**
+ *  Check if remove contact works with some command.
+ */
 static void remove_contact_with_command() {
   reset_list();
   init_object_skiplists();
@@ -293,6 +326,9 @@ static void remove_contact_with_command() {
   free_object_skiplists();
 }
 
+/**
+ *  Check if remove contact works with some customvariable.
+ */
 static void remove_contact_with_customvariable() {
   reset_list();
   init_object_skiplists();
@@ -308,6 +344,9 @@ static void remove_contact_with_customvariable() {
   free_object_skiplists();
 }
 
+/**
+ *  Check if remove contact works.
+ */
 int main(void) {
   try {
     remove_all_contacts();

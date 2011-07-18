@@ -27,6 +27,9 @@
 
 using namespace com::centreon::engine;
 
+/**
+ *  Check if remove command works with some commands.
+ */
 static void remove_all_commands() {
   init_object_skiplists();
 
@@ -44,6 +47,9 @@ static void remove_all_commands() {
   free_object_skiplists();
 }
 
+/**
+ *  Check if remove command works with invalid call.
+ */
 static void remove_command_failed() {
   init_object_skiplists();
 
@@ -55,6 +61,9 @@ static void remove_command_failed() {
   free_object_skiplists();
 }
 
+/**
+ *  Check if remove command works with host dependency.
+ */
 static void try_to_remove_command() {
   init_object_skiplists();
 
@@ -113,6 +122,9 @@ static void try_to_remove_command() {
   free_object_skiplists();
 }
 
+/**
+ *  Check if remove command works.
+ */
 int main(void) {
   try {
     remove_all_commands();

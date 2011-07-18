@@ -27,6 +27,9 @@
 
 using namespace com::centreon::engine;
 
+/**
+ *  Cleanup service memory.
+ */
 static void free_service(service* svc) {
   delete[] svc->perf_data;
   delete[] svc->plugin_output;
@@ -41,6 +44,9 @@ static void free_service(service* svc) {
   delete svc;
 }
 
+/**
+ *  Check if remove servicegroup works with some servicegroup.
+ */
 static void remove_all_servicegroup() {
   init_object_skiplists();
 
@@ -72,6 +78,9 @@ static void remove_all_servicegroup() {
   free_object_skiplists();
 }
 
+/**
+ *  Check the return value with invalid call.
+ */
 static void remove_servicegroup_failed() {
   init_object_skiplists();
 
@@ -83,6 +92,9 @@ static void remove_servicegroup_failed() {
   free_object_skiplists();
 }
 
+/**
+ *  Check if remove servicegroup works with some services.
+ */
 static void remove_servicegroup_with_services() {
   init_object_skiplists();
 
@@ -127,6 +139,10 @@ static void remove_servicegroup_with_services() {
   free_object_skiplists();
 }
 
+/**
+ *  Check if the remove service groups works.
+ *  For better check execute this test with valgrind.
+ */
 int main(void) {
   try {
     remove_all_servicegroup();

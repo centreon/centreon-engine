@@ -27,6 +27,9 @@
 
 using namespace com::centreon::engine;
 
+/**
+ *  Check if remove servicedependency works with some servicedependency.
+ */
 static void remove_all_servicedependency() {
   init_object_skiplists();
 
@@ -68,6 +71,9 @@ static void remove_all_servicedependency() {
   free_object_skiplists();
 }
 
+/**
+ *  Check if remove servicedependency works with invalid call.
+ */
 static void remove_servicedependency_failed() {
   init_object_skiplists();
 
@@ -79,6 +85,9 @@ static void remove_servicedependency_failed() {
   free_object_skiplists();
 }
 
+/**
+ *  Check if remove servicedependency works.
+ */
 int main(void) {
   try {
     remove_all_servicedependency();

@@ -27,6 +27,9 @@
 
 using namespace com::centreon::engine;
 
+/**
+ *  Check if remove service works with some services.
+ */
 static void remove_all_service() {
   init_object_skiplists();
 
@@ -59,6 +62,9 @@ static void remove_all_service() {
   free_object_skiplists();
 }
 
+/**
+ *  Check if remove service works with invalid call.
+ */
 static void remove_service_failed() {
   init_object_skiplists();
 
@@ -74,6 +80,9 @@ static void remove_service_failed() {
   free_object_skiplists();
 }
 
+/**
+ *  Check if remove service works with some contactgroups.
+ */
 static void remove_service_with_contactgroups() {
   init_object_skiplists();
 
@@ -100,6 +109,9 @@ static void remove_service_with_contactgroups() {
   free_object_skiplists();
 }
 
+/**
+ *  Check if remove service works with some contacts.
+ */
 static void remove_service_with_contacts() {
   init_object_skiplists();
 
@@ -126,7 +138,10 @@ static void remove_service_with_contacts() {
   free_object_skiplists();
 }
 
-static void remove_service_with_customvaraiables() {
+/**
+ *  Check if remove service works with some customvariables.
+ */
+static void remove_service_with_customvariables() {
   init_object_skiplists();
 
   service* svc = add_service("service_host_name_1", "service_description", "display_name",
@@ -145,6 +160,9 @@ static void remove_service_with_customvaraiables() {
   free_object_skiplists();
 }
 
+/**
+ *  Check if remove service works with some serviceescalation.
+ */
 static void remove_service_with_serviceescalation() {
   init_object_skiplists();
 
@@ -169,6 +187,9 @@ static void remove_service_with_serviceescalation() {
   free_object_skiplists();
 }
 
+/**
+ *  Check if remove service works with some servicedependency.
+ */
 static void remove_service_with_servicedependency() {
   init_object_skiplists();
 
@@ -213,15 +234,54 @@ static void remove_service_with_servicedependency() {
   free_object_skiplists();
 }
 
+/**
+ *  Check if remove service works with some host.
+ */
+static void remove_service_with_host() {
+  init_object_skiplists();
+
+  service* svc = add_service("host_name_1", "service_description", "display_name",
+  			     "check_period", 0, 42, 0, 0, 0, 42.0, 0.0, 0.0, "notification_period",
+  			     0, 0, 0, 0, 0, 0, 0, 0, "event_handler", 0, "check_command", 0, 0,
+  			     0.0, 0.0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "failure_prediction_options",
+  			     0, 0, "notes", "notes_url", "action_url", "icon_image", "icon_image_alt",
+  			     0, 0, 0);
+  host* hst = add_host("host_name_1", "host_display_name", "host_alias",
+  		       "localhost", NULL, 0, 0.0, 0.0, 42, 0, 0, 0, 0, 0,
+  		       0.0, 0.0, NULL, 0, NULL, 0, 0, NULL, 0, 0, 0.0,
+  		       0.0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 0, 0, NULL,
+  		       NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0,
+  		       0.0, 0.0, 0.0, 0, 0, 0, 0, 0);
+  add_service_link_to_host(hst, svc);
+
+  if (remove_service_by_id("host_name_1", "service_description") != 1
+      || service_list != NULL
+      || service_list_tail != NULL)
+    throw (engine_error() << "remove service with host failed.");
+
+
+  delete[] hst->name;
+  delete[] hst->display_name;
+  delete[] hst->alias;
+  delete[] hst->address;
+  delete hst;
+
+  free_object_skiplists();
+}
+
+/**
+ *  Check if remove service works with.
+ */
 int main(void) {
   try {
     remove_all_service();
     remove_service_failed();
     remove_service_with_contactgroups();
     remove_service_with_contacts();
-    remove_service_with_customvaraiables();
+    remove_service_with_customvariables();
     remove_service_with_serviceescalation();
     remove_service_with_servicedependency();
+    remove_service_with_host();
   }
   catch (std::exception const& e) {
     qDebug() << "error: " << e.what();

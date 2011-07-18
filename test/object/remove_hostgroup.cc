@@ -27,6 +27,9 @@
 
 using namespace com::centreon::engine;
 
+/**
+ *  Cleanup host memory.
+ */
 static void free_host(host* hst) {
   delete[] hst->plugin_output;
   delete[] hst->long_plugin_output;
@@ -50,6 +53,9 @@ static void free_host(host* hst) {
   delete hst;
 }
 
+/**
+ *  Check if remove service works with some hostgroup.
+ */
 static void remove_all_hostgroup() {
   init_object_skiplists();
 
@@ -81,6 +87,9 @@ static void remove_all_hostgroup() {
   free_object_skiplists();
 }
 
+/**
+ *  Check if remove service works with invalid call.
+ */
 static void remove_hostgroup_failed() {
   init_object_skiplists();
 
@@ -92,6 +101,9 @@ static void remove_hostgroup_failed() {
   free_object_skiplists();
 }
 
+/**
+ *  Check if remove service works with some hosts.
+ */
 static void remove_hostgroup_with_hosts() {
   init_object_skiplists();
 
@@ -139,6 +151,9 @@ static void remove_hostgroup_with_hosts() {
   free_object_skiplists();
 }
 
+/**
+ *  Check if remove service works.
+ */
 int main(void) {
   try {
     remove_all_hostgroup();

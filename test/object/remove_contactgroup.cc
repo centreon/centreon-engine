@@ -27,6 +27,9 @@
 
 using namespace com::centreon::engine;
 
+/**
+ *  Reset object list.
+ */
 static void reset_list() {
   host_list = NULL;
   host_list_tail = NULL;
@@ -38,6 +41,9 @@ static void reset_list() {
   hostescalation_list_tail = NULL;
 }
 
+/**
+ *  Check if remove contactgroup works with some contactgroups.
+ */
 static void remove_all_contactgroups() {
   reset_list();
   init_object_skiplists();
@@ -56,6 +62,9 @@ static void remove_all_contactgroups() {
   free_object_skiplists();
 }
 
+/**
+ *  Check if remove contactgroup works with invalid call.
+ */
 static void remove_contactgroup_failed() {
   init_object_skiplists();
 
@@ -67,6 +76,9 @@ static void remove_contactgroup_failed() {
   free_object_skiplists();
 }
 
+/**
+ *  Check if remove contactgroup works with some host.
+ */
 static void remove_contactgroup_with_host() {
   reset_list();
   init_object_skiplists();
@@ -112,6 +124,9 @@ static void remove_contactgroup_with_host() {
   free_object_skiplists();
 }
 
+/**
+ *  Check if remove contactgroup works with some service.
+ */
 static void remove_contactgroup_with_service() {
   reset_list();
   init_object_skiplists();
@@ -147,6 +162,9 @@ static void remove_contactgroup_with_service() {
   free_object_skiplists();
 }
 
+/**
+ *  Check if remove contactgroup works with some hostescalation.
+ */
 static void remove_contactgroup_with_hostescalation() {
   reset_list();
   init_object_skiplists();
@@ -169,6 +187,9 @@ static void remove_contactgroup_with_hostescalation() {
   free_object_skiplists();
 }
 
+/**
+ *  Check if remove contactgroup works with some serviceescalation.
+ */
 static void remove_contactgroup_with_serviceescalation() {
   reset_list();
   init_object_skiplists();
@@ -193,6 +214,9 @@ static void remove_contactgroup_with_serviceescalation() {
   free_object_skiplists();
 }
 
+/**
+ *  Check if remove contactgroup works.
+ */
 int main() {
   try {
     remove_all_contactgroups();

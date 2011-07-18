@@ -27,6 +27,9 @@
 
 using namespace com::centreon::engine;
 
+/**
+ *  Check if remove serviceescalation works with some serviceescalation.
+ */
 static void remove_all_serviceescalation() {
   init_object_skiplists();
 
@@ -59,6 +62,9 @@ static void remove_all_serviceescalation() {
   free_object_skiplists();
 }
 
+/**
+ *  Check if remove serviceescalation works with invalid call.
+ */
 static void remove_serviceescalation_failed() {
   init_object_skiplists();
 
@@ -76,6 +82,9 @@ static void remove_serviceescalation_failed() {
   free_object_skiplists();
 }
 
+/**
+ *  Check if remove serviceescalation works with contactgroups.
+ */
 static void remove_serviceescalation_with_contactgroups() {
   init_object_skiplists();
 
@@ -101,6 +110,9 @@ static void remove_serviceescalation_with_contactgroups() {
   free_object_skiplists();
 }
 
+/**
+ *  Check if remove serviceescalation works with some contacts.
+ */
 static void remove_serviceescalation_with_contacts() {
   init_object_skiplists();
 
@@ -127,6 +139,9 @@ static void remove_serviceescalation_with_contacts() {
   free_object_skiplists();
 }
 
+/**
+ *  Check if remove serviceescalation works.
+ */
 int main(void) {
   try {
     remove_all_serviceescalation();

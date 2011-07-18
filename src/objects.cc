@@ -3714,7 +3714,7 @@ static int remove_host(host* this_host) {
     prev = dep;
   }
 
-  // update the hostdependencyt list.
+  // update the hostescalation list.
   for (hostescalation* escalation = hostescalation_list, *prev = NULL;
        escalation != NULL;
        prev = escalation, escalation = escalation->next) {
