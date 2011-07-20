@@ -56,6 +56,7 @@ add_executable("centenginews"
   "${MODULE_DIR}/client/webservice.hh"
   "${MODULE_DIR}/client/error.hh"
   "${MODULE_DIR}/client/ssl.hh")
+add_dependencies("centenginews" "ws_stub_builder")
 
 # Compiler-specific addon to avoid some warnings.
 if (CMAKE_COMPILER_IS_GNUCXX)
