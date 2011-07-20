@@ -3442,9 +3442,8 @@ static int remove_contactgroup_to_contactgroupsmember(contactgroupsmember** grou
 
 static int remove_service(service* this_service) {
   // check we have find a service.
-  if (this_service == NULL) {
+  if (this_service == NULL)
     return (0);
-  }
 
   // update host service list.
   host* hst = find_host(this_service->host_name);
@@ -3602,9 +3601,8 @@ int remove_service_by_id(char const* host_name, char const* description) {
   }
 
   // check we have find a service.
-  if (this_service == NULL) {
+  if (this_service == NULL)
     return (0);
-  }
 
   // update the service list.
   if (prev_service == NULL)
@@ -3618,9 +3616,8 @@ int remove_service_by_id(char const* host_name, char const* description) {
 
 static int remove_servicegroup(servicegroup* this_servicegroup) {
   // update service list.
-  for (service* svc = service_list; svc != NULL; svc = svc->next) {
+  for (service* svc = service_list; svc != NULL; svc = svc->next)
     remove_object_to_objectlist(&svc->servicegroups_ptr, this_servicegroup);
-  }
 
   servicesmember* this_servicesmember = this_servicegroup->members;
   while (this_servicesmember != NULL) {
@@ -3630,6 +3627,9 @@ static int remove_servicegroup(servicegroup* this_servicegroup) {
     delete this_servicesmember;
     this_servicesmember = next_servicesmember;
   }
+
+  // update the servicegroup skiplist.
+  skiplist_delete_all(object_skiplists[SERVICEGROUP_SKIPLIST], (void*)this_servicegroup);
 
   delete[] this_servicegroup->group_name;
   delete[] this_servicegroup->alias;
@@ -3653,9 +3653,8 @@ int remove_servicegroup_by_id(char const* name) {
   }
 
   // check we have find a service group.
-  if (this_servicegroup == NULL) {
+  if (this_servicegroup == NULL)
     return (0);
-  }
 
   // update the servicegroup list.
   if (prev_servicegroup == NULL)
@@ -3669,9 +3668,8 @@ int remove_servicegroup_by_id(char const* name) {
 
 static int remove_host(host* this_host) {
   // check we have find a host.
-  if (this_host == NULL) {
+  if (this_host == NULL)
     return (0);
-  }
 
   // update the event list low.
   for (timed_event* temp_event = event_list_low;
@@ -3832,9 +3830,8 @@ int remove_host_by_id(char const* name) {
   }
 
   // check we have find a host.
-  if (this_host == NULL) {
+  if (this_host == NULL)
     return (0);
-  }
 
   // update the host list.
   if (prev_host == NULL)
@@ -3848,9 +3845,8 @@ int remove_host_by_id(char const* name) {
 
 static int remove_hostgroup(hostgroup* this_hostgroup) {
   // update host list.
-  for (host* hst = host_list; hst != NULL; hst = hst->next) {
+  for (host* hst = host_list; hst != NULL; hst = hst->next)
     remove_object_to_objectlist(&hst->hostgroups_ptr, this_hostgroup);
-  }
 
   hostsmember* this_hostsmember = this_hostgroup->members;
   while (this_hostsmember != NULL) {
@@ -3859,6 +3855,9 @@ static int remove_hostgroup(hostgroup* this_hostgroup) {
     delete this_hostsmember;
     this_hostsmember = next_hostsmember;
   }
+
+  // update the hostgroup skiplist.
+  skiplist_delete_all(object_skiplists[HOSTGROUP_SKIPLIST], (void*)this_hostgroup);
 
   delete[] this_hostgroup->group_name;
   delete[] this_hostgroup->alias;
@@ -3882,9 +3881,8 @@ int remove_hostgroup_by_id(char const* name) {
   }
 
   // check we have find a host group.
-  if (this_hostgroup == NULL) {
+  if (this_hostgroup == NULL)
     return (0);
-  }
 
   // update the hostgroup list.
   if (prev_hostgroup == NULL)
@@ -3962,7 +3960,7 @@ static int remove_contact(contact* this_contact) {
     this_customvariablesmember = next_customvariablesmember;
   }
 
-  // update the contactgroup skiplist.
+  // update the contact skiplist.
   skiplist_delete_all(object_skiplists[CONTACT_SKIPLIST], (void*)this_contact);
 
   // update the object list.
@@ -3993,9 +3991,8 @@ int remove_contact_by_id(char const* name) {
   }
 
   // check we have find a contact.
-  if (this_contact == NULL) {
+  if (this_contact == NULL)
     return (0);
-  }
 
   // update the contact list.
   if (prev_contact == NULL)
@@ -4009,9 +4006,8 @@ int remove_contact_by_id(char const* name) {
 
 static int remove_contactgroup(contactgroup* this_contactgroup) {
   // check we have find a contact group.
-  if (this_contactgroup == NULL) {
+  if (this_contactgroup == NULL)
     return (0);
-  }
 
   // remove contactgroup from host.
   host* this_host = host_list;
@@ -4030,14 +4026,16 @@ static int remove_contactgroup(contactgroup* this_contactgroup) {
   // remove contactgroup from hostescalation.
   hostescalation* this_hostescalation = hostescalation_list;
   while (this_hostescalation != NULL) {
-    remove_contactgroup_to_contactgroupsmember(&this_hostescalation->contact_groups, this_contactgroup);
+    remove_contactgroup_to_contactgroupsmember(&this_hostescalation->contact_groups,
+					       this_contactgroup);
     this_hostescalation = this_hostescalation->next;
   }
 
   // remove contactgroup from serviceescalation.
   serviceescalation* this_serviceescalation = serviceescalation_list;
   while (this_serviceescalation != NULL) {
-    remove_contactgroup_to_contactgroupsmember(&this_serviceescalation->contact_groups, this_contactgroup);
+    remove_contactgroup_to_contactgroupsmember(&this_serviceescalation->contact_groups,
+					       this_contactgroup);
     this_serviceescalation = this_serviceescalation->next;
   }
 
@@ -4064,9 +4062,8 @@ int remove_contactgroup_by_id(char const* name) {
   }
 
   // check we have find a contact group.
-  if (this_contactgroup == NULL) {
+  if (this_contactgroup == NULL)
     return (0);
-  }
 
   // update the contactgroup list.
   if (prev_contactgroup == NULL)
@@ -4079,6 +4076,9 @@ int remove_contactgroup_by_id(char const* name) {
 }
 
 static int remove_command(command* this_command) {
+  // update the command skiplist.
+  skiplist_delete_all(object_skiplists[COMMAND_SKIPLIST], (void*)this_command);
+
   delete[] this_command->name;
   delete[] this_command->command_line;
   delete this_command;
@@ -4100,9 +4100,8 @@ int remove_command_by_id(char const* name) {
   }
 
   // check we have find a command.
-  if (this_command == NULL) {
+  if (this_command == NULL)
     return (0);
-  }
 
   // check if command are use by a host.
   for (host* hst = host_list; hst != NULL; hst = hst->next) {
@@ -4162,10 +4161,9 @@ int remove_serviceescalation_by_id(char const* host_name,
     this_serviceescalation = this_serviceescalation->next;
   }
 
-  // check we have find a contact group.
-  if (this_serviceescalation == NULL) {
+  // check we have find a serviceescalation.
+  if (this_serviceescalation == NULL)
     return (0);
-  }
 
   // update the serviceescalation list.
   if (prev_serviceescalation == NULL)
@@ -4192,6 +4190,9 @@ int remove_serviceescalation_by_id(char const* host_name,
     delete this_contactsmember;
     this_contactsmember = tmp;
   }
+
+  // update the serviceescalation skiplist.
+  skiplist_delete_all(object_skiplists[SERVICEESCALATION_SKIPLIST], (void*)this_serviceescalation);
 
   delete[] this_serviceescalation->host_name;
   delete[] this_serviceescalation->description;
@@ -4222,10 +4223,9 @@ int remove_servicedependency_by_id(char const* host_name,
     this_servicedependency = this_servicedependency->next;
   }
 
-  // check we have find a contact group.
-  if (this_servicedependency == NULL) {
+  // check we have find a servicedependency.
+  if (this_servicedependency == NULL)
     return (0);
-  }
 
   // update the servicedependency list.
   if (prev_servicedependency == NULL)
@@ -4234,6 +4234,9 @@ int remove_servicedependency_by_id(char const* host_name,
     prev_servicedependency->next = this_servicedependency->next;
   if (this_servicedependency->next == NULL)
     servicedependency_list_tail = prev_servicedependency;
+
+  // update the servicedependency skiplist.
+  skiplist_delete_all(object_skiplists[SERVICEDEPENDENCY_SKIPLIST], (void*)this_servicedependency);
 
   delete[] this_servicedependency->dependent_host_name;
   delete[] this_servicedependency->dependent_service_description;
@@ -4256,10 +4259,9 @@ int remove_hostescalation_by_id(char const* host_name) {
     this_hostescalation = this_hostescalation->next;
   }
 
-  // check we have find a contact group.
-  if (this_hostescalation == NULL) {
+  // check we have find a hostescalation.
+  if (this_hostescalation == NULL)
     return (0);
-  }
 
   // update the hostescalation list.
   if (prev_hostescalation == NULL)
@@ -4287,6 +4289,9 @@ int remove_hostescalation_by_id(char const* host_name) {
     this_contactsmember = tmp;
   }
 
+  // update the hostescalation skiplist.
+  skiplist_delete_all(object_skiplists[HOSTESCALATION_SKIPLIST], (void*)this_hostescalation);
+
   delete[] this_hostescalation->host_name;
   delete[] this_hostescalation->escalation_period;
   delete this_hostescalation;
@@ -4307,10 +4312,9 @@ int remove_hostdependency_by_id(char const* host_name,
     this_hostdependency = this_hostdependency->next;
   }
 
-  // check we have find a contact group.
-  if (this_hostdependency == NULL) {
+  // check we have find a hostdependency.
+  if (this_hostdependency == NULL)
     return (0);
-  }
 
   // update the hostdependency list.
   if (prev_hostdependency == NULL)
@@ -4320,9 +4324,146 @@ int remove_hostdependency_by_id(char const* host_name,
   if (this_hostdependency->next == NULL)
     hostdependency_list_tail = prev_hostdependency;
 
+  // update the hostdependency skiplist.
+  skiplist_delete_all(object_skiplists[HOSTDEPENDENCY_SKIPLIST], (void*)this_hostdependency);
+
   delete[] this_hostdependency->dependent_host_name;
   delete[] this_hostdependency->host_name;
   delete[] this_hostdependency->dependency_period;
   delete this_hostdependency;
   return (1);
+}
+
+static int remove_timerange(timerange* this_timerange) {
+  while (this_timerange != NULL) {
+    timerange* tmp = this_timerange->next;
+    delete this_timerange;
+    this_timerange = tmp;
+  }
+  return (1);
+}
+
+static int remove_daterange(daterange* this_daterange) {
+  while (this_daterange != NULL) {
+    daterange* tmp = this_daterange->next;
+    remove_timerange(this_daterange->times);
+    delete this_daterange;
+    this_daterange = tmp;
+  }
+  return (1);
+}
+
+static int remove_timeperiodexclusions(timeperiodexclusion* this_timeperiodexclusion) {
+  while (this_timeperiodexclusion != NULL) {
+    timeperiodexclusion* tmp = this_timeperiodexclusion->next;
+    delete[] this_timeperiodexclusion->timeperiod_name;
+    delete this_timeperiodexclusion;
+    this_timeperiodexclusion = tmp;
+  }
+  return (1);
+}
+
+static int remove_timeperiod(timeperiod* this_timeperiod) {
+  if (this_timeperiod == NULL)
+    return (0);
+
+  // remove all timerange.
+  for (unsigned int i = 0;
+       i < sizeof(this_timeperiod->days) / sizeof(*this_timeperiod->days);
+       ++i) {
+    remove_timerange(this_timeperiod->days[i]);
+  }
+
+  // remove all exceptions.
+  for (unsigned int i = 0;
+       i < sizeof(this_timeperiod->exceptions) / sizeof(*this_timeperiod->exceptions);
+       ++i) {
+    remove_daterange(this_timeperiod->exceptions[i]);
+  }
+
+  // remove all exclusions.
+  remove_timeperiodexclusions(this_timeperiod->exclusions);
+
+  // remove all timeperiod used by contacts.
+  for (contact* cntct = contact_list; cntct != NULL; cntct = cntct->next) {
+    if (cntct->host_notification_period_ptr == this_timeperiod)
+      cntct->host_notification_period_ptr = NULL;
+    if (cntct->service_notification_period_ptr == this_timeperiod)
+      cntct->service_notification_period_ptr = NULL;
+  }
+
+  // remove all timeperiod used by hosts.
+  for (host* hst = host_list; hst != NULL; hst = hst->next) {
+    if (hst->check_period_ptr == this_timeperiod)
+      hst->check_period_ptr = NULL;
+    if (hst->notification_period_ptr == this_timeperiod)
+      hst->notification_period_ptr = NULL;
+  }
+
+  // remove all timeperiod used by services.
+  for (service* svc = service_list; svc != NULL; svc = svc->next) {
+    if (svc->check_period_ptr == this_timeperiod)
+      svc->check_period_ptr = NULL;
+    if (svc->notification_period_ptr == this_timeperiod)
+      svc->notification_period_ptr = NULL;
+  }
+
+  // remove all timeperiod used by serviceescalations.
+  for (serviceescalation* se = serviceescalation_list; se != NULL; se = se->next) {
+    if (se->escalation_period_ptr == this_timeperiod)
+      se->escalation_period_ptr = NULL;
+  }
+
+  // remove all timeperiod used by servicedependencies.
+  for (servicedependency* sd = servicedependency_list; sd != NULL; sd = sd->next) {
+    if (sd->dependency_period_ptr == this_timeperiod)
+      sd->dependency_period_ptr = NULL;
+  }
+
+  // remove all timeperiod used by hostescalations.
+  for (hostescalation* he = hostescalation_list; he != NULL; he = he->next) {
+    if (he->escalation_period_ptr == this_timeperiod)
+      he->escalation_period_ptr = NULL;
+  }
+
+  // remove all timeperiod used by hostdependencies.
+  for (hostdependency* hd = hostdependency_list; hd != NULL; hd = hd->next) {
+    if (hd->dependency_period_ptr == this_timeperiod)
+      hd->dependency_period_ptr = NULL;
+  }
+
+  // update the timeperiod skiplist.
+  skiplist_delete_all(object_skiplists[TIMEPERIOD_SKIPLIST], (void*)this_timeperiod);
+
+  delete[] this_timeperiod->name;
+  delete[] this_timeperiod->alias;
+  delete this_timeperiod;
+
+  return (1);
+}
+
+int remove_timeperiod_by_id(char const* name) {
+  if (name == NULL)
+    return (0);
+
+  timeperiod* this_timeperiod = timeperiod_list;
+  timeperiod* prev_timeperiod = NULL;
+  while (this_timeperiod != NULL
+	 && strcmp(this_timeperiod->name, name)) {
+    prev_timeperiod = this_timeperiod;
+    this_timeperiod = this_timeperiod->next;
+  }
+
+  // check we have find a timeperiod.
+  if (this_timeperiod == NULL)
+    return (0);
+
+  // update the timeperiod list.
+  if (prev_timeperiod == NULL)
+    timeperiod_list = this_timeperiod->next;
+  else
+    prev_timeperiod->next = this_timeperiod->next;
+  if (this_timeperiod->next == NULL)
+    timeperiod_list_tail = prev_timeperiod;
+  return (remove_timeperiod(this_timeperiod));
 }

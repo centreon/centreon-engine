@@ -13701,6 +13701,54 @@ int centreonengine__removeServiceDependency(soap* s,
 }
 
 /**
+ *  Remove timeperiod.
+ *
+ *  @param[in]  s                 Unused.
+ *  @param[in]  timeperiod_id     Timeperiod to remove.
+ *  @param[out] res               Unused.
+ *
+ *  @return SOAP_OK on success.
+ */
+int centreonengine__removeTimeperiod(soap* s,
+				     ns1__timeperiodIDType* timeperiod_id,
+				     centreonengine__removeHostResponse& res) {
+  (void)res;
+
+  try {
+    syncro::instance().waiting_callback();
+
+    log_debug_info(DEBUGL_FUNCTIONS, 2,
+                   "Webservice: %s(%s)\n",
+                   __func__,
+                   timeperiod_id->timeperiod.c_str());
+
+    if (!remove_timeperiod_by_id(timeperiod_id->timeperiod.c_str())) {
+      std::string* error = soap_new_std__string(s, 1);
+      *error = "Host `" + timeperiod_id->timeperiod + "' not found.";
+
+      log_debug_info(DEBUGL_COMMANDS, 2,
+                     "Webservice: %s failed. %s\n",
+                     __func__,
+                     error->c_str());
+
+      syncro::instance().worker_finish();
+      return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
+    }
+
+    syncro::instance().worker_finish();
+  }
+  catch (...) {
+    log_debug_info(DEBUGL_COMMANDS, 2,
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
+    syncro::instance().worker_finish();
+    return (soap_receiver_fault(s, "Runtime error.", "catch all"));
+
+  }
+  return (SOAP_OK);
+}
+
+/**
  *  Check if event handlers are enabled globally.
  *
  *  @param[in]  s                 Unused.

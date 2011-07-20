@@ -906,7 +906,6 @@ if (WITH_TESTING)
     "${TEST_DIR}/object/remove_service.cc")
   target_link_libraries("${TEST_NAME}" "cce_core")
   add_test("${TEST_NAME}" "${TEST_NAME}")
-
   # Remove hostescalation.
   set(TEST_NAME "remove_hostescalation")
   add_executable("${TEST_NAME}"
@@ -917,6 +916,12 @@ if (WITH_TESTING)
   set(TEST_NAME "remove_hostdependency")
   add_executable("${TEST_NAME}"
     "${TEST_DIR}/object/remove_hostdependency.cc")
+  target_link_libraries("${TEST_NAME}" "cce_core")
+  add_test("${TEST_NAME}" "${TEST_NAME}")
+  # Remove timeperiod.
+  set(TEST_NAME "remove_timeperiod")
+  add_executable("${TEST_NAME}"
+    "${TEST_DIR}/object/remove_timeperiod.cc")
   target_link_libraries("${TEST_NAME}" "cce_core")
   add_test("${TEST_NAME}" "${TEST_NAME}")
 endif ()

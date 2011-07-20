@@ -477,6 +477,14 @@
     <part name="notification" type="tns:notificationType"/>
   </message>
 
+  <!--
+         Timeperiod.
+  -->
+
+  <!-- Add a timeperiod. -->
+  <message name="timeperiodRequest">
+    <part name="timeperiod" type="tns:timeperiodIDType"/>
+  </message>
 
   <!-- Not validated messages. -->
 
@@ -620,6 +628,13 @@
     <operation name="removeServiceDependency">
       <documentation>Remove service dependency.</documentation>
       <input message="tns:serviceDependencyRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- removeTimeperiod() -->
+    <operation name="removeTimeperiod">
+      <documentation>Remove timeperiod.</documentation>
+      <input message="tns:timeperiodRequest"/>
       <output message="tns:defaultResponse"/>
     </operation>
 

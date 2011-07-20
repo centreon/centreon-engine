@@ -682,6 +682,7 @@ int remove_servicedependency_by_id(char const* host_name,
 				   char const* dependency_service_description);
 int remove_hostescalation_by_id(char const* host_name);
 int remove_hostdependency_by_id(char const* host_name, char const* dependency_name);
+int remove_timeperiod_by_id(char const* name);
 
 # ifdef __cplusplus
 }
