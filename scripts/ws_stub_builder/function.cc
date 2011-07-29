@@ -19,6 +19,7 @@
 
 #include <QRegExp>
 #include <QStringList>
+#include <QRegExp>
 
 #include "error.hh"
 #include "arg_definition.hh"
@@ -387,8 +388,18 @@ QString function::_build_exec_struct(QString const& base,
 				     argument const& arg) {
   if (arg.is_primitive() == true) {
     ++_nb_args;
-    return ("  " + base + " = args[" + QString("%1").arg(_list_pos++) + "]"
-	    + "." + _get_qstring_methode(arg.get_type()) + ";\n");
+    bool is_pointer = !(arg.is_primitive() && (!arg.is_optional() || arg.is_array()));
+    if (is_pointer == false)
+      return ("  " + base + " = " + _get_qstring_methode(arg.get_type())
+	      + "(args[" + QString("%1").arg(_list_pos++) + "]);\n");
+    else {
+      QString varname(base);
+      varname.replace(QRegExp("[->\\.]"), "_");
+      return ("  " + arg.get_type() + " " + varname
+	      + "(" + _get_qstring_methode(arg.get_type())
+	      + "(args[" + QString("%1").arg(_list_pos++) + "])" + ");\n"
+	      + "  " + base + " = &" + varname + ";\n");
+    }
   }
 
   QString ret;
@@ -441,6 +452,10 @@ QString function::_build_exec_delete(QString const& base,
  *  @return Return the QString methode name to translate the type.
  */
 QString function::_get_qstring_methode(QString type) const {
+  if (type == "std::vector<std::string>") {
+    return ("toStdVector");
+  }
+
   type.replace("time_t", "long long");
   type.replace("ULONG64", "unsigned long long");
   type.replace("bool", "int");
@@ -459,8 +474,6 @@ QString function::_get_qstring_methode(QString type) const {
       ret += *it;
     }
   }
-
-  ret += "()";
   return (ret);
 }
 

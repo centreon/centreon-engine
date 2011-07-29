@@ -179,11 +179,62 @@ void builder::_build_source() {
   stream << copyright << "\n";
 
   QFileInfo file_info(_header_dst);
-  stream << "#include <QString>\n"
-	 << "#include <ostream>\n\n"
+  stream << "#include <QStringList>\n"
+	 << "#include <ostream>\n"
 	 << "#include \"error.hh\"\n"
 	 << "#include \"" << file_info.fileName() << "\"\n\n"
 	 << "using namespace com::centreon::engine::modules::client;\n\n";
+
+  stream << "static std::string toStdString(QString const& str) {\n"
+	 << "  return (str.toStdString());\n"
+	 << "}\n\n";
+
+  stream << "static double toDouble(QString const& str) {\n"
+	 << "  return (str.toDouble());\n"
+	 << "}\n\n";
+
+  stream << "static int toInt(QString const& str) {\n"
+	 << "  return (str.toInt());\n"
+	 << "}\n\n";
+
+  stream << "static long long toLongLong(QString const& str) {\n"
+	 << "  return (str.toLongLong());\n"
+	 << "}\n\n";
+
+  stream << "static unsigned int toUInt(QString const& str) {\n"
+	 << "  return (str.toUInt());\n"
+	 << "}\n\n";
+
+  stream << "static unsigned long long toULongLong(QString const& str) {\n"
+	 << "  return (str.toULongLong());\n"
+	 << "}\n\n";
+
+  stream << "static std::vector<std::string> toStdVector(QString const& str) {\n"
+	 << "  QStringList tmp(str.split(','));\n"
+	 << "  std::vector<std::string> tab;\n"
+	 << "  for (QStringList::const_iterator it = tmp.begin(), end = tmp.end();\n"
+	 << "      it != end;\n"
+	 << "      ++it)\n"
+	 << "    tab.push_back(it->toStdString());\n"
+	 << "  return (tab);\n"
+	 << "}\n\n";
+
+
+  stream << "static std::ostream& operator<<(std::ostream& os, "
+	 << "std::vector<std::string> const& cls) {\n"
+	 << "  os << \"{\";\n"
+	 << "  for (std::vector<std::string>::const_iterator it = cls.begin(), end = cls.end();\n"
+	 << "        it != end;\n"
+	 << "      ++it) {\n"
+	 << "    if (it + 1 != end)\n"
+	 << "      os << *it << \", \";\n"
+	 << "    else\n"
+	 << "      os << *it;\n"
+	 << "  }\n"
+	 << "  os << \"}\";\n"
+	 << "\n"
+	 << "  return (os);\n"
+	 << "}\n\n";
 
   QList<argument> args = arg_definition::instance().get_arguments();
   for (QList<argument>::const_iterator it = args.begin(), end = args.end();

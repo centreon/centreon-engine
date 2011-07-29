@@ -460,9 +460,9 @@ struct                   service_struct {
 
   host*                  host_ptr;
   command*               event_handler_ptr;
-  char*                  event_handler_args;
+  char*                  event_handler_args; // unused?
   command*               check_command_ptr;
-  char*                  check_command_args;
+  char*                  check_command_args; // unused?
   timeperiod*            check_period_ptr;
   timeperiod*            notification_period_ptr;
   objectlist*            servicegroups_ptr;
@@ -598,7 +598,7 @@ hostgroup* add_hostgroup(char const* name, char const* alias, char const* notes,
 hostsmember* add_host_to_hostgroup(hostgroup* temp_hostgroup, char const* host_name);                    // adds a host to a hostgroup definition
 servicegroup* add_servicegroup(char const* name, char const* alias, char const* notes, char const* notes_url, char const* action_url);              // adds a servicegroup definition
 servicesmember* add_service_to_servicegroup(servicegroup* temp_servicegroup, char const* host_name, char const* svc_description); // adds a service to a servicegroup definition
-contact* add_contact(char const* name, char const* alias, char const* email, char const* pager, char** addresses, char const* svc_notification_period, char const* host_notification_period,int notify_service_ok,int notify_service_critical,int notify_service_warning, int notify_service_unknown, int notify_service_flapping, int notify_service_downtime, int notify_host_up, int notify_host_down, int notify_host_unreachable, int notify_host_flapping, int notify_host_downtime, int host_notifications_enabled, int service_notifications_enabled, int can_submit_commands, int retain_status_information, int retain_nonstatus_information); // adds a contact definition
+contact* add_contact(char const* name, char const* alias, char const* email, char const* pager, char const* const* addresses, char const* svc_notification_period, char const* host_notification_period,int notify_service_ok,int notify_service_critical,int notify_service_warning, int notify_service_unknown, int notify_service_flapping, int notify_service_downtime, int notify_host_up, int notify_host_down, int notify_host_unreachable, int notify_host_flapping, int notify_host_downtime, int host_notifications_enabled, int service_notifications_enabled, int can_submit_commands, int retain_status_information, int retain_nonstatus_information); // adds a contact definition
 commandsmember* add_host_notification_command_to_contact(contact* cntct, char const* command_name);          // adds a host notification command to a contact definition
 commandsmember* add_service_notification_command_to_contact(contact* cntct, char const* command_name);       // adds a service notification command to a contact definition
 customvariablesmember* add_custom_variable_to_contact(contact* cntct, char const* varname, char const* varvalue); // adds a custom variable to a service definition

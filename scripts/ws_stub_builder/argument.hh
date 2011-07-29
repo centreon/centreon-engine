@@ -37,7 +37,9 @@ namespace                        com {
 	public:
 	                         argument(QString const& type = "",
 					  QString const& name = "",
-					  QString const& help = "");
+					  QString const& help = "",
+					  bool is_optional = false,
+					  bool is_array = false);
 	                         argument(argument const& right);
 	                         ~argument() throw();
 
@@ -48,9 +50,13 @@ namespace                        com {
 	  QString const&         get_type() const throw();
 	  QString const&         get_name() const throw();
 	  QString const&         get_help() const throw();
+	  bool                   is_optional() const throw();
+	  bool                   is_array() const throw();
 
 	  argument&              set_name(QString const& name);
 	  argument&              set_help(QString const& help);
+	  argument&              set_is_optional(bool value) throw();
+	  argument&              set_is_array(bool value) throw();
 
 	  argument&              add(argument const& arg);
 	  QList<argument> const& get_args() const throw();
@@ -62,6 +68,8 @@ namespace                        com {
 	  QString                _name;
 	  QString                _help;
 	  QList<argument>        _list;
+	  bool                   _is_optional;
+	  bool                   _is_array;
 	};
       }
     }

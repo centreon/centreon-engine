@@ -30,10 +30,71 @@
         </sequence>
       </complexType>
 
+      <!-- Host type. -->
+      <complexType name="hostType">
+        <sequence>
+          <element name="name" type="xsd:string"/>
+          <element name="alias" type="xsd:string"/>
+          <element name="displayName" type="xsd:string" minOccurs="0"/>
+          <element name="address" type="xsd:string"/>
+          <element name="parents" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+          <element name="hostgroups" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+          <element name="checkCommand" type="xsd:string" minOccurs="0"/>
+          <element name="initialState" type="xsd:string" minOccurs="0"/>
+          <element name="maxCheckAttempts" type="xsd:unsignedInt"/>
+          <element name="checkInterval" type="xsd:unsignedInt" minOccurs="0"/>
+          <element name="retryInterval" type="xsd:unsignedInt" minOccurs="0"/>
+          <element name="activeChecksEnabled" type="xsd:boolean" minOccurs="0"/>
+          <element name="passiveChecksEnabled" type="xsd:boolean" minOccurs="0"/>
+          <element name="checkPeriod" type="xsd:string"/>
+          <element name="obsessOverHost" type="xsd:boolean" minOccurs="0"/>
+          <element name="checkFreshness" type="xsd:boolean" minOccurs="0"/>
+          <element name="freshnessThreshold" type="xsd:unsignedInt" minOccurs="0"/>
+          <element name="eventHandler" type="xsd:string" minOccurs="0"/>
+          <element name="eventHandlerEnabled" type="xsd:boolean" minOccurs="0"/>
+          <element name="lowFlapThreshold" type="xsd:unsignedInt" minOccurs="0"/>
+          <element name="highFlapThreshold" type="xsd:unsignedInt" minOccurs="0"/>
+          <element name="flapDetectionEnabled" type="xsd:boolean" minOccurs="0"/>
+          <element name="flapDetectionOptions" type="xsd:string" minOccurs="0"/>
+          <element name="processPerfData" type="xsd:boolean" minOccurs="0"/>
+          <element name="retainStatusInformation" type="xsd:boolean" minOccurs="0"/>
+          <element name="retainNonstatusInformation" type="xsd:boolean" minOccurs="0"/>
+          <element name="contacts" type="xsd:string" minOccurs="1" maxOccurs="unbounded"/>
+          <element name="contactGroups" type="xsd:string" minOccurs="1" maxOccurs="unbounded"/>
+          <element name="notificationInterval" type="xsd:unsignedInt"/>
+          <element name="firstNotificationDelay" type="xsd:unsignedInt" minOccurs="0"/>
+          <element name="notificationPeriod" type="xsd:string"/>
+          <element name="notificationOptions" type="xsd:string" minOccurs="0"/>
+          <element name="notificationsEnabled" type="xsd:boolean" minOccurs="0"/>
+          <element name="stalkingOptions" type="xsd:string" minOccurs="0"/>
+          <element name="notes" type="xsd:string" minOccurs="0"/>
+          <element name="notesUrl" type="xsd:string" minOccurs="0"/>
+          <element name="actionUrl" type="xsd:string" minOccurs="0"/>
+          <element name="iconImage" type="xsd:string" minOccurs="0"/>
+          <element name="iconImageAlt" type="xsd:string" minOccurs="0"/>
+          <element name="vrmlImage" type="xsd:string" minOccurs="0"/>
+          <element name="statusmapImage" type="xsd:string" minOccurs="0"/>
+	  <element name="customVariables" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+        </sequence>
+      </complexType>
+
       <!-- hostGroup identifier. -->
       <complexType name="hostGroupIDType">
         <sequence>
           <element name="name" type="xsd:string"/>
+        </sequence>
+      </complexType>
+
+      <!-- hostGroup type. -->
+      <complexType name="hostGroupType">
+        <sequence>
+          <element name="name" type="xsd:string"/>
+          <element name="alias" type="xsd:string"/>
+          <element name="hosts" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+          <element name="hostgroups" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+	  <element name="notes" type="xsd:string" minOccurs="0"/>
+	  <element name="notesUrl" type="xsd:string" minOccurs="0"/>
+	  <element name="actionUrl" type="xsd:string" minOccurs="0"/>
         </sequence>
       </complexType>
 
@@ -45,10 +106,69 @@
         </sequence>
       </complexType>
 
-      <!-- hostGroup identifier. -->
+      <!-- Service type -->
+      <complexType name="serviceType">
+        <sequence>
+          <element name="hostName" type="xsd:string"/>
+          <element name="hostgroupName" type="xsd:string" minOccurs="0"/>
+          <element name="serviceDescription" type="xsd:string"/>
+          <element name="displayName" type="xsd:string" minOccurs="0"/>
+          <element name="servicegroups" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+          <element name="isVolatile" type="xsd:boolean" minOccurs="0"/>
+          <element name="checkCommand" type="xsd:string"/>
+          <element name="initialState" type="xsd:string" minOccurs="0"/>
+          <element name="maxCheckAttempts" type="xsd:unsignedInt"/>
+          <element name="checkInterval" type="xsd:unsignedInt"/>
+          <element name="retryInterval" type="xsd:unsignedInt"/>
+          <element name="activeChecksEnabled" type="xsd:boolean" minOccurs="0"/>
+          <element name="passiveChecksEnabled" type="xsd:boolean" minOccurs="0"/>
+          <element name="checkPeriod" type="xsd:string"/>
+          <element name="obsessOverService" type="xsd:boolean" minOccurs="0"/>
+          <element name="checkFreshness" type="xsd:boolean" minOccurs="0"/>
+          <element name="freshnessThreshold" type="xsd:unsignedInt" minOccurs="0"/>
+          <element name="eventHandler" type="xsd:string" minOccurs="0"/>
+          <element name="eventHandlerEnabled" type="xsd:boolean" minOccurs="0"/>
+          <element name="lowFlapThreshold" type="xsd:unsignedInt" minOccurs="0"/>
+          <element name="highFlapThreshold" type="xsd:unsignedInt" minOccurs="0"/>
+          <element name="flapDetectionEnabled" type="xsd:boolean" minOccurs="0"/>
+	  <element name="flapDetectionOptions" type="xsd:string" minOccurs="0"/>
+          <element name="processPerfData" type="xsd:boolean" minOccurs="0"/>
+          <element name="retainStatusInformation" type="xsd:boolean" minOccurs="0"/>
+          <element name="retainNonstatusInformation" type="xsd:boolean" minOccurs="0"/>
+          <element name="notificationInterval" type="xsd:unsignedInt"/>
+          <element name="firstNotificationDelay" type="xsd:unsignedInt" minOccurs="0"/>
+          <element name="notificationPeriod" type="xsd:string"/>
+	  <element name="notificationOptions" type="xsd:string" minOccurs="0"/>
+          <element name="notificationsEnabled" type="xsd:boolean" minOccurs="0"/>
+          <element name="contacts" type="xsd:string" minOccurs="1" maxOccurs="unbounded"/>
+          <element name="contactGroups" type="xsd:string" minOccurs="1" maxOccurs="unbounded"/>
+          <element name="stalkingOptions" type="xsd:string" minOccurs="0"/>
+          <element name="notes" type="xsd:string" minOccurs="0"/>
+          <element name="notesUrl" type="xsd:string" minOccurs="0"/>
+          <element name="actionUrl" type="xsd:string" minOccurs="0"/>
+          <element name="iconImage" type="xsd:string" minOccurs="0"/>
+          <element name="iconImageAlt" type="xsd:string" minOccurs="0"/>
+	  <element name="customVariables" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+        </sequence>
+      </complexType>
+
+      <!-- serviceGroup identifier. -->
       <complexType name="serviceGroupIDType">
         <sequence>
           <element name="name" type="xsd:string"/>
+        </sequence>
+      </complexType>
+
+      <!-- serviceGroup type. -->
+      <complexType name="serviceGroupType">
+        <sequence>
+          <element name="name" type="xsd:string"/>
+          <element name="alias" type="xsd:string"/>
+          <element name="services" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+          <element name="servicegroups" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+	  <element name="notes" type="xsd:string" minOccurs="0"/>
+	  <element name="notesUrl" type="xsd:string" minOccurs="0"/>
+	  <element name="actionUrl" type="xsd:string" minOccurs="0"/>
         </sequence>
       </complexType>
 
@@ -78,6 +198,14 @@
         </sequence>
       </complexType>
 
+      <!-- Command type. -->
+      <complexType name="commandType">
+        <sequence>
+          <element name="name" type="xsd:string"/>
+          <element name="commandLine" type="xsd:string"/>
+        </sequence>
+      </complexType>
+
       <!-- Contact identifier. -->
       <complexType name="contactIDType">
         <sequence>
@@ -85,10 +213,44 @@
         </sequence>
       </complexType>
 
+      <!-- Contact type. -->
+      <complexType name="contactType">
+        <sequence>
+          <element name="name" type="xsd:string"/>
+          <element name="alias" type="xsd:string" minOccurs="0"/>
+	  <element name="contactgroups" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+	  <element name="hostNotificationsEnabled" type="xsd:boolean"/>
+	  <element name="serviceNotificationsEnabled" type="xsd:boolean"/>
+	  <element name="hostNotificationPeriod" type="xsd:string"/>
+	  <element name="serviceNotificationPeriod" type="xsd:string"/>
+	  <element name="hostNotificationOptions" type="xsd:string"/>
+	  <element name="serviceNotificationOptions" type="xsd:string"/>
+	  <element name="hostNotificationCommands" type="xsd:string" minOccurs="1" maxOccurs="unbounded"/>
+	  <element name="serviceNotificationCommands" type="xsd:string" minOccurs="1" maxOccurs="unbounded"/>
+	  <element name="email" type="xsd:string" minOccurs="0"/>
+	  <element name="pager" type="xsd:string" minOccurs="0"/>
+	  <element name="address" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+	  <element name="canSubmitCommands" type="xsd:boolean" minOccurs="0"/>
+	  <element name="retainStatusInformation" type="xsd:boolean" minOccurs="0"/>
+	  <element name="retainNonstatusInformation" type="xsd:boolean" minOccurs="0"/>
+	  <element name="customVariables" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+        </sequence>
+      </complexType>
+
       <!-- ContactGroup identifier. -->
       <complexType name="contactGroupIDType">
         <sequence>
           <element name="name" type="xsd:string"/>
+        </sequence>
+      </complexType>
+
+      <!-- ContactGroup type. -->
+      <complexType name="contactGroupType">
+        <sequence>
+          <element name="name" type="xsd:string"/>
+          <element name="alias" type="xsd:string"/>
+	  <element name="contacts" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+	  <element name="contactgroups" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
         </sequence>
       </complexType>
 
@@ -268,6 +430,11 @@
     <part name="value" type="xsd:unsignedInt"/>
   </message>
 
+  <!-- Host add request. -->
+  <message name="addHostRequest">
+    <part name="host" type="tns:hostType"/>
+  </message>
+
   <!--
 	 Host Group Messages.
   -->
@@ -276,6 +443,12 @@
   <message name="hostGroupRequest">
     <part name="hostGroup" type="tns:hostGroupIDType"/>
   </message>
+
+  <!-- Host group add request. -->
+  <message name="addHostGroupRequest">
+    <part name="hostGroup" type="tns:hostGroupType"/>
+  </message>
+
 
   <!--
 	 Service messages.
@@ -338,6 +511,11 @@
     <part name="dependency" type="tns:serviceDependencyIDType"/>
   </message>
 
+  <!-- Service add request. -->
+  <message name="addServiceRequest">
+    <part name="service" type="tns:serviceType"/>
+  </message>
+
   <!--
 	 Service Group Messages.
   -->
@@ -345,6 +523,11 @@
   <!-- Message sent when executing an operation on a host group. -->
   <message name="serviceGroupRequest">
     <part name="serviceGroup" type="tns:serviceGroupIDType"/>
+  </message>
+
+  <!-- Service group add request. -->
+  <message name="addServiceGroupRequest">
+    <part name="serviceGroup" type="tns:serviceGroupType"/>
   </message>
 
   <!--
@@ -393,6 +576,11 @@
     <part name="command" type="tns:commandIDType"/>
   </message>
 
+  <!-- Command add request. -->
+  <message name="addCommandRequest">
+    <part name="command" type="tns:commandType"/>
+  </message>
+
   <!--
 	 Contact messages.
    -->
@@ -426,6 +614,11 @@
     <part name="value" type="tns:timeperiodIDType"/>
   </message>
 
+  <!-- Contact add request. -->
+  <message name="addContactRequest">
+    <part name="contact" type="tns:contactType"/>
+  </message>
+
   <!--
 	 Contact Group Messages.
   -->
@@ -433,6 +626,11 @@
   <!-- Message sent when executing an operation on a contact group. -->
   <message name="contactGroupRequest">
     <part name="contactGroup" type="tns:contactGroupIDType"/>
+  </message>
+
+  <!-- Contact group add request. -->
+  <message name="addContactGroupRequest">
+    <part name="contactGroup" type="tns:contactGroupType"/>
   </message>
 
   <!--
@@ -567,6 +765,63 @@
 	 Global operations.  
 	                      
      -->
+
+    <!--
+	 Add object operations.
+    -->
+
+    <!-- addCommand() -->
+    <operation name="addCommand">
+      <documentation>Add command.</documentation>
+      <input message="tns:addCommandRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- addContactGroup() -->
+    <operation name="addContactGroup">
+      <documentation>Add contact group.</documentation>
+      <input message="tns:addContactGroupRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- addHostGroup() -->
+    <operation name="addHostGroup">
+      <documentation>Add host group.</documentation>
+      <input message="tns:addHostGroupRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- addServiceGroup() -->
+    <operation name="addServiceGroup">
+      <documentation>Add service group.</documentation>
+      <input message="tns:addServiceGroupRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- addHost() -->
+    <operation name="addHost">
+      <documentation>Add Host.</documentation>
+      <input message="tns:addHostRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- addService() -->
+    <operation name="addService">
+      <documentation>Add service.</documentation>
+      <input message="tns:addServiceRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- addContact() -->
+    <operation name="addContact">
+      <documentation>Add contact.</documentation>
+      <input message="tns:addContactRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!--
+	 Remove object operations.
+    -->
 
     <!-- removeHost() -->
     <operation name="removeHost">
@@ -3510,6 +3765,56 @@
 	 Global operations.  
 	                     
      -->
+
+    <!--
+         Add object operations.
+    -->
+
+    <operation name="addCommand">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="addContactGroup">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="addHostGroup">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="addServiceGroup">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="addHost">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="addService">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="addContact">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <!--
+         Remove object operations.
+    -->
 
     <operation name="removeHost">
       <SOAP:operation style="rpc" soapAction=""/>

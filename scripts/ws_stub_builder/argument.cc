@@ -30,11 +30,15 @@ using namespace com::centreon::engine::script;
  */
 argument::argument(QString const& type,
 		   QString const& name,
-		   QString const& help)
-  : _type(type), _name(name), _help(help) {
-  if (_help == "") {
-    _help = _name;
-  }
+		   QString const& help,
+		   bool is_optional,
+		   bool is_array)
+  : _type(type),
+    _name(name),
+    _help(help == "" ? name : help),
+    _is_optional(is_optional),
+    _is_array(is_array) {
+
 }
 
 /**
@@ -66,6 +70,8 @@ argument& argument::operator=(argument const& right) {
     _type = right._type;
     _help = right._help;
     _list = right._list;
+    _is_optional = right._is_optional;
+    _is_array = right._is_array;
   }
   return (*this);
 }
@@ -81,7 +87,9 @@ bool argument::operator==(argument const& right) const throw() {
   return (_name == right._name
 	  && _type == right._type
 	  && _help == right._help
-	  && _list == right._list);
+	  && _list == right._list
+	  && _is_optional == right._is_optional
+	  && _is_array == right._is_array);
 }
 
 /**
@@ -123,6 +131,24 @@ QString const& argument::get_help() const throw() {
 }
 
 /**
+ *  Return if argument is optional.
+ *
+ *  @return True if is optional, false otherwise.
+ */
+bool argument::is_optional() const throw() {
+  return (_is_optional);
+}
+
+/**
+ *  Return if argument is an array.
+ *
+ *  @return True if is an array, false otherwise.
+ */
+bool argument::is_array() const throw() {
+  return (_is_array);
+}
+
+/**
  *  Set the variable name.
  *
  *  @param[in] name The variable name.
@@ -146,6 +172,30 @@ argument& argument::set_name(QString const& name) {
  */
 argument& argument::set_help(QString const& help) {
   _help = help;
+  return (*this);
+}
+
+/**
+ *  Set if the argument is optional.
+ *
+ *  @param[in] value enable optional argument.
+ *
+ *  @return Return this object.
+ */
+argument& argument::set_is_optional(bool value) throw() {
+  _is_optional = value;
+  return (*this);
+}
+
+/**
+ *  Set if the argument is an array.
+ *
+ *  @param[in] value enable array argument.
+ *
+ *  @return Return this object.
+ */
+argument& argument::set_is_array(bool value) throw() {
+  _is_array = value;
   return (*this);
 }
 
