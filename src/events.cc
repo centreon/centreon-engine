@@ -656,7 +656,7 @@ void init_timing_loop(void) {
   /* add an external command check event if needed */
   if (config.get_check_external_commands() == true) {
     if (config.get_command_check_interval() == -1)
-      interval_to_use = (unsigned long)60;
+      interval_to_use = (unsigned long)5;
     else
       interval_to_use = (unsigned long)config.get_command_check_interval();
     schedule_new_event(EVENT_COMMAND_CHECK,
