@@ -133,8 +133,8 @@ int service_notification(service* svc,
   if (notification_list != NULL) {
 
     /* grab the macro variables */
-    grab_host_macros(mac, temp_host);
-    grab_service_macros(mac, svc);
+    grab_host_macros_r(mac, temp_host);
+    grab_service_macros_r(mac, svc);
 
     /* if this notification has an author, attempt to lookup the associated contact */
     if (not_author != NULL) {
@@ -229,10 +229,10 @@ int service_notification(service* svc,
          temp_notification = temp_notification->next) {
 
       /* grab the macro variables for this contact */
-      grab_contact_macros(mac, temp_notification->cntct);
+      grab_contact_macros_r(mac, temp_notification->cntct);
 
       /* clear summary macros (they are customized for each contact) */
-      clear_summary_macros(mac);
+      clear_summary_macros_r(mac);
 
       /* notify this contact */
       result = notify_contact_of_service(mac,
@@ -253,7 +253,7 @@ int service_notification(service* svc,
     free_notification_list();
 
     /* clear summary macros so they will be regenerated without contact filters when needed next */
-    clear_summary_macros(mac);
+    clear_summary_macros_r(mac);
 
     if (type == NOTIFICATION_NORMAL) {
 
@@ -1311,7 +1311,7 @@ int host_notification(host* hst,
 
   /* clear volatile macros */
   mac = get_global_macros();
-  clear_volatile_macros(mac);
+  clear_volatile_macros_r(mac);
 
   log_debug_info(DEBUGL_NOTIFICATIONS, 0, "Notification viability test passed.\n");
 
@@ -1362,7 +1362,7 @@ int host_notification(host* hst,
   if (notification_list != NULL) {
 
     /* grab the macro variables */
-    grab_host_macros(mac, hst);
+    grab_host_macros_r(mac, hst);
 
     /* if this notification has an author, attempt to lookup the associated contact */
     if (not_author != NULL) {
@@ -1459,10 +1459,10 @@ int host_notification(host* hst,
          temp_notification = temp_notification->next) {
 
       /* grab the macro variables for this contact */
-      grab_contact_macros(mac, temp_notification->cntct);
+      grab_contact_macros_r(mac, temp_notification->cntct);
 
       /* clear summary macros (they are customized for each contact) */
-      clear_summary_macros(mac);
+      clear_summary_macros_r(mac);
 
       /* notify this contact */
       result = notify_contact_of_host(mac,
@@ -1483,7 +1483,7 @@ int host_notification(host* hst,
     free_notification_list();
 
     /* clear summary macros so they will be regenerated without contact filters when needednext */
-    clear_summary_macros(mac);
+    clear_summary_macros_r(mac);
 
     if (type == NOTIFICATION_NORMAL) {
 

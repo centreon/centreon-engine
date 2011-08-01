@@ -185,7 +185,7 @@ void process::wait() {
  *  create process.
  */
 void process::setupChildProcess() {
-  set_all_macro_environment_vars(&_macros, true);
+  set_all_macro_environment_vars_r(&_macros, true);
 }
 
 /**

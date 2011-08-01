@@ -263,7 +263,7 @@ void checker::run(host* hst,
   // get current host macros.
   nagios_macros macros;
   memset(&macros, 0, sizeof(macros));
-  grab_host_macros(&macros, hst);
+  grab_host_macros_r(&macros, hst);
   get_raw_command_line_r(&macros,
 			 hst->check_command_ptr,
                          hst->host_check_command,
@@ -361,7 +361,7 @@ void checker::run(host* hst,
   _mut_id.unlock();
 
   // cleanup.
-  clear_volatile_macros(&macros);
+  clear_volatile_macros_r(&macros);
 
   logger(dbg_functions, basic) << "end " << Q_FUNC_INFO;;
 }
@@ -455,8 +455,8 @@ void checker::run(service* svc,
   // get current host and service macros.
   nagios_macros macros;
   memset(&macros, 0, sizeof(macros));
-  grab_host_macros(&macros, svc->host_ptr);
-  grab_service_macros(&macros, svc);
+  grab_host_macros_r(&macros, svc->host_ptr);
+  grab_service_macros_r(&macros, svc);
   get_raw_command_line_r(&macros,
 			 svc->check_command_ptr,
 			 svc->service_check_command,
@@ -522,7 +522,7 @@ void checker::run(service* svc,
 
   // service check was override by neb_module.
   if (res == NEBERROR_CALLBACKOVERRIDE) {
-    clear_volatile_macros(&macros);
+    clear_volatile_macros_r(&macros);
     return;
   }
 
@@ -545,7 +545,7 @@ void checker::run(service* svc,
   _mut_id.unlock();
 
   // cleanup.
-  clear_volatile_macros(&macros);
+  clear_volatile_macros_r(&macros);
 
   logger(dbg_functions, basic) << "end " << Q_FUNC_INFO;
 }
@@ -821,7 +821,7 @@ int checker::_execute_sync(host* hst) {
   // get current host mocros.
   nagios_macros macros;
   memset(&macros, 0, sizeof(macros));
-  grab_host_macros(&macros, hst);
+  grab_host_macros_r(&macros, hst);
   get_raw_command_line_r(&macros,
 			 hst->check_command_ptr,
                          hst->host_check_command,
@@ -924,7 +924,7 @@ int checker::_execute_sync(host* hst) {
 
   delete[] output;
 
-  clear_volatile_macros(&macros);
+  clear_volatile_macros_r(&macros);
 
   // if the command timeout.
   if (cmd_result.get_is_timeout() == true) {

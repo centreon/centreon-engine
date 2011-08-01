@@ -181,8 +181,8 @@ int log_service_event(service* svc) {
 
   nagios_macros mac;
   memset(&mac, 0, sizeof(mac));
-  grab_host_macros(&mac, svc->host_ptr);
-  grab_service_macros(&mac, svc);
+  grab_host_macros_r(&mac, svc->host_ptr);
+  grab_service_macros_r(&mac, svc);
 
   std::string buffer = "SERVICE ALERT: " + std::string(svc->host_name) + ";"
     + svc->description + ";$SERVICESTATE$;$SERVICESTATETYPE$;$SERVICEATTEMPT$;"
@@ -190,8 +190,8 @@ int log_service_event(service* svc) {
 
   char* processed_buffer = NULL;
   process_macros_r(&mac, buffer.c_str(), &processed_buffer, 0);
-  clear_host_macros(&mac);
-  clear_service_macros(&mac);
+  clear_host_macros_r(&mac);
+  clear_service_macros_r(&mac);
 
   logger(log_options, basic) << processed_buffer;
 
@@ -215,7 +215,7 @@ int log_host_event(host* hst) {
 
   nagios_macros mac;
   memset(&mac, 0, sizeof(mac));
-  grab_host_macros(&mac, hst);
+  grab_host_macros_r(&mac, hst);
 
   unsigned long log_options = NSLOG_HOST_UP;
   unsigned long nslog_options[] = {
@@ -238,7 +238,7 @@ int log_host_event(host* hst) {
 
   logger(log_options, basic) << processed_buffer;
 
-  clear_host_macros(&mac);
+  clear_host_macros_r(&mac);
   delete[] processed_buffer;
 
   return (OK);
@@ -269,7 +269,7 @@ int log_host_states(unsigned int type, time_t* timestamp) {
       continue;
     }
 
-    grab_host_macros(&mac, host);
+    grab_host_macros_r(&mac, host);
 
     std::string buffer = (type == INITIAL_STATES ? "INITIAL" : "CURRENT")
       + std::string(" HOST STATE: ") + std::string(host->name)
@@ -281,7 +281,7 @@ int log_host_states(unsigned int type, time_t* timestamp) {
 
     logger(log_info_message, basic) << processed_buffer;
 
-    clear_host_macros(&mac);
+    clear_host_macros_r(&mac);
     delete[] processed_buffer;
   }
 
@@ -316,8 +316,8 @@ int log_service_states(unsigned int type, time_t* timestamp) {
       continue;
     }
 
-    grab_host_macros(&mac, service->host_ptr);
-    grab_service_macros(&mac, service);
+    grab_host_macros_r(&mac, service->host_ptr);
+    grab_service_macros_r(&mac, service);
 
     std::string buffer = (type == INITIAL_STATES ? "INITIAL" : "CURRENT")
       + std::string(" SERVICE STATE: ") + std::string(service->host_name)
@@ -330,8 +330,8 @@ int log_service_states(unsigned int type, time_t* timestamp) {
 
     logger(log_info_message, basic) << processed_buffer;
 
-    clear_host_macros(&mac);
-    clear_service_macros(&mac);
+    clear_host_macros_r(&mac);
+    clear_service_macros_r(&mac);
     delete[] processed_buffer;
   }
 

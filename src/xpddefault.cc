@@ -412,20 +412,20 @@ int xpddefault_update_service_performance_data(service* svc) {
    */
   memset(&mac, 0, sizeof(mac));
   hst = find_host(svc->host_name);
-  grab_host_macros(&mac, hst);
-  grab_service_macros(&mac, svc);
+  grab_host_macros_r(&mac, hst);
+  grab_service_macros_r(&mac, svc);
 
   /* run the performance data command */
   xpddefault_run_service_performance_data_command(&mac, svc);
 
   /* get rid of used memory we won't need anymore */
-  clear_argv_macros(&mac);
+  clear_argv_macros_r(&mac);
 
   /* update the performance data file */
   xpddefault_update_service_performance_data_file(&mac, svc);
 
   /* now free() it all */
-  clear_volatile_macros(&mac);
+  clear_volatile_macros_r(&mac);
 
   return (OK);
 }
@@ -448,19 +448,19 @@ int xpddefault_update_host_performance_data(host* hst) {
 
   /* set up macros and get to work */
   memset(&mac, 0, sizeof(mac));
-  grab_host_macros(&mac, hst);
+  grab_host_macros_r(&mac, hst);
 
   /* run the performance data command*/
   xpddefault_run_host_performance_data_command(&mac, hst);
 
   /* no more commands to run, so we won't need this any more */
-  clear_argv_macros(&mac);
+  clear_argv_macros_r(&mac);
 
   /* update the performance data file */
   xpddefault_update_host_performance_data_file(&mac, hst);
 
   /* free() all */
-  clear_volatile_macros(&mac);
+  clear_volatile_macros_r(&mac);
 
   return (OK);
 }
@@ -815,7 +815,7 @@ int xpddefault_process_host_perfdata_file(void) {
                          xpddefault_host_perfdata_file_processing_command,
                          &raw_command_line, macro_options);
   if (raw_command_line == NULL) {
-    clear_volatile_macros(&mac);
+    clear_volatile_macros_r(&mac);
     return (ERROR);
   }
 
@@ -826,7 +826,7 @@ int xpddefault_process_host_perfdata_file(void) {
   /* process any macros in the raw command line */
   process_macros_r(&mac, raw_command_line, &processed_command_line, macro_options);
   if (processed_command_line == NULL) {
-    clear_volatile_macros(&mac);
+    clear_volatile_macros_r(&mac);
     return (ERROR);
   }
 
@@ -846,7 +846,7 @@ int xpddefault_process_host_perfdata_file(void) {
 	      &exectime,
 	      NULL,
 	      0);
-  clear_volatile_macros(&mac);
+  clear_volatile_macros_r(&mac);
 
   /* re-open and unlock the performance data file */
   xpddefault_open_host_perfdata_file();
@@ -890,7 +890,7 @@ int xpddefault_process_service_perfdata_file(void) {
                          xpddefault_service_perfdata_file_processing_command,
                          &raw_command_line, macro_options);
   if (raw_command_line == NULL) {
-    clear_volatile_macros(&mac);
+    clear_volatile_macros_r(&mac);
     return (ERROR);
   }
 
@@ -901,7 +901,7 @@ int xpddefault_process_service_perfdata_file(void) {
   /* process any macros in the raw command line */
   process_macros_r(&mac, raw_command_line, &processed_command_line, macro_options);
   if (processed_command_line == NULL) {
-    clear_volatile_macros(&mac);
+    clear_volatile_macros_r(&mac);
     return (ERROR);
   }
 
@@ -926,7 +926,7 @@ int xpddefault_process_service_perfdata_file(void) {
   xpddefault_open_service_perfdata_file();
   pthread_mutex_unlock(&xpddefault_service_perfdata_fp_lock);
 
-  clear_volatile_macros(&mac);
+  clear_volatile_macros_r(&mac);
 
   /* check to see if the command timed out */
   if (early_timeout == TRUE)

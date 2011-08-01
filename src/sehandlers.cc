@@ -67,8 +67,8 @@ int obsessive_compulsive_service_check_processor(service* svc) {
 
   /* update service macros */
   memset(&mac, 0, sizeof(mac));
-  grab_host_macros(&mac, temp_host);
-  grab_service_macros(&mac, svc);
+  grab_host_macros_r(&mac, temp_host);
+  grab_service_macros_r(&mac, svc);
 
   /* get the raw command line */
   get_raw_command_line_r(&mac,
@@ -76,7 +76,7 @@ int obsessive_compulsive_service_check_processor(service* svc) {
                          qPrintable(config.get_ocsp_command()),
                          &raw_command, macro_options);
   if (raw_command == NULL) {
-    clear_volatile_macros(&mac);
+    clear_volatile_macros_r(&mac);
     return (ERROR);
   }
 
@@ -90,7 +90,7 @@ int obsessive_compulsive_service_check_processor(service* svc) {
 		   &processed_command,
                    macro_options);
   if (processed_command == NULL) {
-    clear_volatile_macros(&mac);
+    clear_volatile_macros_r(&mac);
     return (ERROR);
   }
 
@@ -107,7 +107,7 @@ int obsessive_compulsive_service_check_processor(service* svc) {
 	      NULL,
 	      0);
 
-  clear_volatile_macros(&mac);
+  clear_volatile_macros_r(&mac);
 
   /* check to see if the command timed out */
   if (early_timeout == TRUE)
@@ -151,7 +151,7 @@ int obsessive_compulsive_host_check_processor(host* hst) {
 
   /* update macros */
   memset(&mac, 0, sizeof(mac));
-  grab_host_macros(&mac, hst);
+  grab_host_macros_r(&mac, hst);
 
   /* get the raw command line */
   get_raw_command_line_r(&mac,
@@ -159,7 +159,7 @@ int obsessive_compulsive_host_check_processor(host* hst) {
                          qPrintable(config.get_ochp_command()),
                          &raw_command, macro_options);
   if (raw_command == NULL) {
-    clear_volatile_macros(&mac);
+    clear_volatile_macros_r(&mac);
     return (ERROR);
   }
 
@@ -173,7 +173,7 @@ int obsessive_compulsive_host_check_processor(host* hst) {
 		   &processed_command,
                    macro_options);
   if (processed_command == NULL) {
-    clear_volatile_macros(&mac);
+    clear_volatile_macros_r(&mac);
     return (ERROR);
   }
 
@@ -189,7 +189,7 @@ int obsessive_compulsive_host_check_processor(host* hst) {
 	      &exectime,
 	      NULL,
 	      0);
-  clear_volatile_macros(&mac);
+  clear_volatile_macros_r(&mac);
 
   /* check to see if the command timed out */
   if (early_timeout == TRUE)
@@ -244,8 +244,8 @@ int handle_service_event(service* svc) {
 
   /* update service macros */
   memset(&mac, 0, sizeof(mac));
-  grab_host_macros(&mac, temp_host);
-  grab_service_macros(&mac, svc);
+  grab_host_macros_r(&mac, temp_host);
+  grab_service_macros_r(&mac, svc);
 
   /* run the global service event handler */
   run_global_service_event_handler(&mac, svc);
@@ -253,7 +253,7 @@ int handle_service_event(service* svc) {
   /* run the event handler command if there is one */
   if (svc->event_handler != NULL)
     run_service_event_handler(&mac, svc);
-  clear_volatile_macros(&mac);
+  clear_volatile_macros_r(&mac);
 
   /* send data to event broker */
   broker_external_command(NEBTYPE_EXTERNALCOMMAND_CHECK,
@@ -593,7 +593,7 @@ int handle_host_event(host* hst) {
 
   /* update host macros */
   memset(&mac, 0, sizeof(mac));
-  grab_host_macros(&mac, hst);
+  grab_host_macros_r(&mac, hst);
 
   /* run the global host event handler */
   run_global_host_event_handler(&mac, hst);
