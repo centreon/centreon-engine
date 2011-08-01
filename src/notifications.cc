@@ -50,10 +50,8 @@ int service_notification(service* svc,
   int result = OK;
   int contacts_notified = 0;
   int increment_notification_number = FALSE;
-  nagios_macros *mac;           /* XXX: global macros */
+  nagios_macros mac;
   int neb_result;
-
-  mac = get_global_macros();
 
   log_debug_info(DEBUGL_FUNCTIONS, 0, "service_notification()\n");
 
@@ -105,7 +103,8 @@ int service_notification(service* svc,
   log_debug_info(DEBUGL_NOTIFICATIONS, 2, "Creating list of contacts to be notified.\n");
 
   /* create the contact notification list for this service */
-  create_notification_list_from_service(mac, svc, options, &escalated);
+  memset(&mac, 0, sizeof(mac));
+  create_notification_list_from_service(&mac, svc, options, &escalated);
 
   /* send data to event broker */
   end_time.tv_sec = 0L;
@@ -133,8 +132,8 @@ int service_notification(service* svc,
   if (notification_list != NULL) {
 
     /* grab the macro variables */
-    grab_host_macros_r(mac, temp_host);
-    grab_service_macros_r(mac, svc);
+    grab_host_macros_r(&mac, temp_host);
+    grab_service_macros_r(&mac, svc);
 
     /* if this notification has an author, attempt to lookup the associated contact */
     if (not_author != NULL) {
@@ -151,77 +150,77 @@ int service_notification(service* svc,
     }
 
     /* get author and comment macros */
-    delete[] mac->x[MACRO_NOTIFICATIONAUTHOR];
-    delete[] mac->x[MACRO_NOTIFICATIONAUTHORNAME];
-    delete[] mac->x[MACRO_NOTIFICATIONAUTHORALIAS];
-    delete[] mac->x[MACRO_NOTIFICATIONCOMMENT];
+    delete[] mac.x[MACRO_NOTIFICATIONAUTHOR];
+    delete[] mac.x[MACRO_NOTIFICATIONAUTHORNAME];
+    delete[] mac.x[MACRO_NOTIFICATIONAUTHORALIAS];
+    delete[] mac.x[MACRO_NOTIFICATIONCOMMENT];
 
-    mac->x[MACRO_NOTIFICATIONAUTHOR] = not_author ? my_strdup(not_author) : 0;
-    mac->x[MACRO_NOTIFICATIONCOMMENT] = not_data ? my_strdup(not_data) : 0;
+    mac.x[MACRO_NOTIFICATIONAUTHOR] = not_author ? my_strdup(not_author) : 0;
+    mac.x[MACRO_NOTIFICATIONCOMMENT] = not_data ? my_strdup(not_data) : 0;
     if (temp_contact != NULL) {
-      mac->x[MACRO_NOTIFICATIONAUTHORNAME] = my_strdup(temp_contact->name);
-      mac->x[MACRO_NOTIFICATIONAUTHORALIAS] = my_strdup(temp_contact->alias);
+      mac.x[MACRO_NOTIFICATIONAUTHORNAME] = my_strdup(temp_contact->name);
+      mac.x[MACRO_NOTIFICATIONAUTHORALIAS] = my_strdup(temp_contact->alias);
     }
     else {
-      mac->x[MACRO_NOTIFICATIONAUTHORNAME] = 0;
-      mac->x[MACRO_NOTIFICATIONAUTHORALIAS] = 0;
+      mac.x[MACRO_NOTIFICATIONAUTHORNAME] = 0;
+      mac.x[MACRO_NOTIFICATIONAUTHORALIAS] = 0;
     }
 
     /* NOTE: these macros are deprecated and will likely disappear in next major release */
     /* if this is an acknowledgement, get author and comment macros */
     if (type == NOTIFICATION_ACKNOWLEDGEMENT) {
 
-      delete[] mac->x[MACRO_SERVICEACKAUTHOR];
-      delete[] mac->x[MACRO_SERVICEACKAUTHORNAME];
-      delete[] mac->x[MACRO_SERVICEACKAUTHORALIAS];
-      delete[] mac->x[MACRO_SERVICEACKCOMMENT];
+      delete[] mac.x[MACRO_SERVICEACKAUTHOR];
+      delete[] mac.x[MACRO_SERVICEACKAUTHORNAME];
+      delete[] mac.x[MACRO_SERVICEACKAUTHORALIAS];
+      delete[] mac.x[MACRO_SERVICEACKCOMMENT];
 
-      mac->x[MACRO_SERVICEACKAUTHOR] = not_author ? my_strdup(not_author) : 0;
-      mac->x[MACRO_SERVICEACKCOMMENT] = not_data ? my_strdup(not_data) : 0;
+      mac.x[MACRO_SERVICEACKAUTHOR] = not_author ? my_strdup(not_author) : 0;
+      mac.x[MACRO_SERVICEACKCOMMENT] = not_data ? my_strdup(not_data) : 0;
       if (temp_contact != NULL) {
-        mac->x[MACRO_SERVICEACKAUTHORNAME] = my_strdup(temp_contact->name);
-        mac->x[MACRO_SERVICEACKAUTHORALIAS] = my_strdup(temp_contact->alias);
+        mac.x[MACRO_SERVICEACKAUTHORNAME] = my_strdup(temp_contact->name);
+        mac.x[MACRO_SERVICEACKAUTHORALIAS] = my_strdup(temp_contact->alias);
       }
       else {
-        mac->x[MACRO_SERVICEACKAUTHORNAME] = 0;
-        mac->x[MACRO_SERVICEACKAUTHORALIAS] = 0;
+        mac.x[MACRO_SERVICEACKAUTHORNAME] = 0;
+        mac.x[MACRO_SERVICEACKAUTHORALIAS] = 0;
       }
     }
 
     /* set the notification type macro */
-    delete[] mac->x[MACRO_NOTIFICATIONTYPE];
+    delete[] mac.x[MACRO_NOTIFICATIONTYPE];
     if (type == NOTIFICATION_ACKNOWLEDGEMENT)
-      mac->x[MACRO_NOTIFICATIONTYPE] = my_strdup("ACKNOWLEDGEMENT");
+      mac.x[MACRO_NOTIFICATIONTYPE] = my_strdup("ACKNOWLEDGEMENT");
     else if (type == NOTIFICATION_FLAPPINGSTART)
-      mac->x[MACRO_NOTIFICATIONTYPE] = my_strdup("FLAPPINGSTART");
+      mac.x[MACRO_NOTIFICATIONTYPE] = my_strdup("FLAPPINGSTART");
     else if (type == NOTIFICATION_FLAPPINGSTOP)
-      mac->x[MACRO_NOTIFICATIONTYPE] = my_strdup("FLAPPINGSTOP");
+      mac.x[MACRO_NOTIFICATIONTYPE] = my_strdup("FLAPPINGSTOP");
     else if (type == NOTIFICATION_FLAPPINGDISABLED)
-      mac->x[MACRO_NOTIFICATIONTYPE] = my_strdup("FLAPPINGDISABLED");
+      mac.x[MACRO_NOTIFICATIONTYPE] = my_strdup("FLAPPINGDISABLED");
     else if (type == NOTIFICATION_DOWNTIMESTART)
-      mac->x[MACRO_NOTIFICATIONTYPE] = my_strdup("DOWNTIMESTART");
+      mac.x[MACRO_NOTIFICATIONTYPE] = my_strdup("DOWNTIMESTART");
     else if (type == NOTIFICATION_DOWNTIMEEND)
-      mac->x[MACRO_NOTIFICATIONTYPE] = my_strdup("DOWNTIMEEND");
+      mac.x[MACRO_NOTIFICATIONTYPE] = my_strdup("DOWNTIMEEND");
     else if (type == NOTIFICATION_DOWNTIMECANCELLED)
-      mac->x[MACRO_NOTIFICATIONTYPE] = my_strdup("DOWNTIMECANCELLED");
+      mac.x[MACRO_NOTIFICATIONTYPE] = my_strdup("DOWNTIMECANCELLED");
     else if (type == NOTIFICATION_CUSTOM)
-      mac->x[MACRO_NOTIFICATIONTYPE] = my_strdup("CUSTOM");
+      mac.x[MACRO_NOTIFICATIONTYPE] = my_strdup("CUSTOM");
     else if (svc->current_state == STATE_OK)
-      mac->x[MACRO_NOTIFICATIONTYPE] = my_strdup("RECOVERY");
+      mac.x[MACRO_NOTIFICATIONTYPE] = my_strdup("RECOVERY");
     else
-      mac->x[MACRO_NOTIFICATIONTYPE] = my_strdup("PROBLEM");
+      mac.x[MACRO_NOTIFICATIONTYPE] = my_strdup("PROBLEM");
 
     /* set the notification number macro */
-    delete[] mac->x[MACRO_SERVICENOTIFICATIONNUMBER];
-    mac->x[MACRO_SERVICENOTIFICATIONNUMBER] = obj2pchar(svc->current_notification_number);
+    delete[] mac.x[MACRO_SERVICENOTIFICATIONNUMBER];
+    mac.x[MACRO_SERVICENOTIFICATIONNUMBER] = obj2pchar(svc->current_notification_number);
 
     /* the $NOTIFICATIONNUMBER$ macro is maintained for backward compatability */
-    delete[] mac->x[MACRO_NOTIFICATIONNUMBER];
-    mac->x[MACRO_NOTIFICATIONNUMBER] = my_strdup((mac->x[MACRO_SERVICENOTIFICATIONNUMBER] == NULL) ? "" : mac->x[MACRO_SERVICENOTIFICATIONNUMBER]);
+    delete[] mac.x[MACRO_NOTIFICATIONNUMBER];
+    mac.x[MACRO_NOTIFICATIONNUMBER] = my_strdup((mac.x[MACRO_SERVICENOTIFICATIONNUMBER] == NULL) ? "" : mac.x[MACRO_SERVICENOTIFICATIONNUMBER]);
 
     /* set the notification id macro */
-    delete[] mac->x[MACRO_SERVICENOTIFICATIONID];
-    mac->x[MACRO_SERVICENOTIFICATIONID] = obj2pchar(svc->current_notification_id);
+    delete[] mac.x[MACRO_SERVICENOTIFICATIONID];
+    mac.x[MACRO_SERVICENOTIFICATIONID] = obj2pchar(svc->current_notification_id);
 
     /* notify each contact (duplicates have been removed) */
     for (temp_notification = notification_list;
@@ -229,20 +228,20 @@ int service_notification(service* svc,
          temp_notification = temp_notification->next) {
 
       /* grab the macro variables for this contact */
-      grab_contact_macros_r(mac, temp_notification->cntct);
+      grab_contact_macros_r(&mac, temp_notification->cntct);
 
       /* clear summary macros (they are customized for each contact) */
-      clear_summary_macros_r(mac);
+      clear_summary_macros_r(&mac);
 
       /* notify this contact */
-      result = notify_contact_of_service(mac,
-					 temp_notification->cntct,
-					 svc,
-					 type,
-					 not_author,
-					 not_data,
-					 options,
-					 escalated);
+      result = notify_contact_of_service(&mac,
+                 temp_notification->cntct,
+                 svc,
+                 type,
+                 not_author,
+                 not_data,
+                 options,
+                 escalated);
 
       /* keep track of how many contacts were notified */
       if (result == OK)
@@ -253,7 +252,7 @@ int service_notification(service* svc,
     free_notification_list();
 
     /* clear summary macros so they will be regenerated without contact filters when needed next */
-    clear_summary_macros_r(mac);
+    clear_summary_macros_r(&mac);
 
     if (type == NOTIFICATION_NORMAL) {
 
@@ -1286,7 +1285,7 @@ int host_notification(host* hst,
   int result = OK;
   int contacts_notified = 0;
   int increment_notification_number = FALSE;
-  nagios_macros* mac;           /* XXX: global macros */
+  nagios_macros mac;
   int neb_result;
 
   /* get the current time */
@@ -1310,8 +1309,7 @@ int host_notification(host* hst,
   }
 
   /* clear volatile macros */
-  mac = get_global_macros();
-  clear_volatile_macros_r(mac);
+  clear_volatile_macros_r(&mac);
 
   log_debug_info(DEBUGL_NOTIFICATIONS, 0, "Notification viability test passed.\n");
 
@@ -1334,7 +1332,7 @@ int host_notification(host* hst,
   log_debug_info(DEBUGL_NOTIFICATIONS, 2, "Creating list of contacts to be notified.\n");
 
   /* create the contact notification list for this host */
-  create_notification_list_from_host(mac, hst, options, &escalated);
+  create_notification_list_from_host(&mac, hst, options, &escalated);
 
   /* send data to event broker */
   end_time.tv_sec = 0L;
@@ -1362,7 +1360,7 @@ int host_notification(host* hst,
   if (notification_list != NULL) {
 
     /* grab the macro variables */
-    grab_host_macros_r(mac, hst);
+    grab_host_macros_r(&mac, hst);
 
     /* if this notification has an author, attempt to lookup the associated contact */
     if (not_author != NULL) {
@@ -1380,78 +1378,78 @@ int host_notification(host* hst,
     }
 
     /* get author and comment macros */
-    delete[] mac->x[MACRO_NOTIFICATIONAUTHOR];
-    delete[] mac->x[MACRO_NOTIFICATIONAUTHORNAME];
-    delete[] mac->x[MACRO_NOTIFICATIONAUTHORALIAS];
-    delete[] mac->x[MACRO_NOTIFICATIONCOMMENT];
+    delete[] mac.x[MACRO_NOTIFICATIONAUTHOR];
+    delete[] mac.x[MACRO_NOTIFICATIONAUTHORNAME];
+    delete[] mac.x[MACRO_NOTIFICATIONAUTHORALIAS];
+    delete[] mac.x[MACRO_NOTIFICATIONCOMMENT];
 
-    mac->x[MACRO_NOTIFICATIONAUTHOR] = not_author ? my_strdup(not_author) : 0;
-    mac->x[MACRO_NOTIFICATIONCOMMENT] = not_data ? my_strdup(not_data) : 0;
+    mac.x[MACRO_NOTIFICATIONAUTHOR] = not_author ? my_strdup(not_author) : 0;
+    mac.x[MACRO_NOTIFICATIONCOMMENT] = not_data ? my_strdup(not_data) : 0;
     if (temp_contact != NULL) {
-      mac->x[MACRO_NOTIFICATIONAUTHORNAME] = my_strdup(temp_contact->name);
-      mac->x[MACRO_NOTIFICATIONAUTHORALIAS] = my_strdup(temp_contact->alias);
+      mac.x[MACRO_NOTIFICATIONAUTHORNAME] = my_strdup(temp_contact->name);
+      mac.x[MACRO_NOTIFICATIONAUTHORALIAS] = my_strdup(temp_contact->alias);
     }
     else {
-      mac->x[MACRO_NOTIFICATIONAUTHORNAME] = 0;
-      mac->x[MACRO_NOTIFICATIONAUTHORALIAS] = 0;
+      mac.x[MACRO_NOTIFICATIONAUTHORNAME] = 0;
+      mac.x[MACRO_NOTIFICATIONAUTHORALIAS] = 0;
     }
 
     /* NOTE: these macros are deprecated and will likely disappear in next major release */
     /* if this is an acknowledgement, get author and comment macros */
     if (type == NOTIFICATION_ACKNOWLEDGEMENT) {
 
-      delete[] mac->x[MACRO_HOSTACKAUTHOR];
-      delete[] mac->x[MACRO_HOSTACKCOMMENT];
-      delete[] mac->x[MACRO_SERVICEACKAUTHORNAME];
-      delete[] mac->x[MACRO_SERVICEACKAUTHORALIAS];
+      delete[] mac.x[MACRO_HOSTACKAUTHOR];
+      delete[] mac.x[MACRO_HOSTACKCOMMENT];
+      delete[] mac.x[MACRO_SERVICEACKAUTHORNAME];
+      delete[] mac.x[MACRO_SERVICEACKAUTHORALIAS];
 
-      mac->x[MACRO_HOSTACKAUTHOR] = not_author ? my_strdup(not_author) : 0;
-      mac->x[MACRO_HOSTACKCOMMENT] = not_data ? my_strdup(not_data) : 0;
+      mac.x[MACRO_HOSTACKAUTHOR] = not_author ? my_strdup(not_author) : 0;
+      mac.x[MACRO_HOSTACKCOMMENT] = not_data ? my_strdup(not_data) : 0;
 
       if (temp_contact != NULL) {
-        mac->x[MACRO_SERVICEACKAUTHORNAME] = my_strdup(temp_contact->name);
-        mac->x[MACRO_SERVICEACKAUTHORALIAS] = my_strdup(temp_contact->alias);
+        mac.x[MACRO_SERVICEACKAUTHORNAME] = my_strdup(temp_contact->name);
+        mac.x[MACRO_SERVICEACKAUTHORALIAS] = my_strdup(temp_contact->alias);
       }
       else {
-        mac->x[MACRO_SERVICEACKAUTHORNAME] = 0;
-        mac->x[MACRO_SERVICEACKAUTHORALIAS] = 0;
+        mac.x[MACRO_SERVICEACKAUTHORNAME] = 0;
+        mac.x[MACRO_SERVICEACKAUTHORALIAS] = 0;
       }
     }
 
     /* set the notification type macro */
-    delete[] mac->x[MACRO_NOTIFICATIONTYPE];
+    delete[] mac.x[MACRO_NOTIFICATIONTYPE];
     if (type == NOTIFICATION_ACKNOWLEDGEMENT)
-      mac->x[MACRO_NOTIFICATIONTYPE] = my_strdup("ACKNOWLEDGEMENT");
+      mac.x[MACRO_NOTIFICATIONTYPE] = my_strdup("ACKNOWLEDGEMENT");
     else if (type == NOTIFICATION_FLAPPINGSTART)
-      mac->x[MACRO_NOTIFICATIONTYPE] = my_strdup("FLAPPINGSTART");
+      mac.x[MACRO_NOTIFICATIONTYPE] = my_strdup("FLAPPINGSTART");
     else if (type == NOTIFICATION_FLAPPINGSTOP)
-      mac->x[MACRO_NOTIFICATIONTYPE] = my_strdup("FLAPPINGSTOP");
+      mac.x[MACRO_NOTIFICATIONTYPE] = my_strdup("FLAPPINGSTOP");
     else if (type == NOTIFICATION_FLAPPINGDISABLED)
-      mac->x[MACRO_NOTIFICATIONTYPE] = my_strdup("FLAPPINGDISABLED");
+      mac.x[MACRO_NOTIFICATIONTYPE] = my_strdup("FLAPPINGDISABLED");
     else if (type == NOTIFICATION_DOWNTIMESTART)
-      mac->x[MACRO_NOTIFICATIONTYPE] = my_strdup("DOWNTIMESTART");
+      mac.x[MACRO_NOTIFICATIONTYPE] = my_strdup("DOWNTIMESTART");
     else if (type == NOTIFICATION_DOWNTIMEEND)
-      mac->x[MACRO_NOTIFICATIONTYPE] = my_strdup("DOWNTIMEEND");
+      mac.x[MACRO_NOTIFICATIONTYPE] = my_strdup("DOWNTIMEEND");
     else if (type == NOTIFICATION_DOWNTIMECANCELLED)
-      mac->x[MACRO_NOTIFICATIONTYPE] = my_strdup("DOWNTIMECANCELLED");
+      mac.x[MACRO_NOTIFICATIONTYPE] = my_strdup("DOWNTIMECANCELLED");
     else if (type == NOTIFICATION_CUSTOM)
-      mac->x[MACRO_NOTIFICATIONTYPE] = my_strdup("CUSTOM");
+      mac.x[MACRO_NOTIFICATIONTYPE] = my_strdup("CUSTOM");
     else if (hst->current_state == HOST_UP)
-      mac->x[MACRO_NOTIFICATIONTYPE] = my_strdup("RECOVERY");
+      mac.x[MACRO_NOTIFICATIONTYPE] = my_strdup("RECOVERY");
     else
-      mac->x[MACRO_NOTIFICATIONTYPE] = my_strdup("PROBLEM");
+      mac.x[MACRO_NOTIFICATIONTYPE] = my_strdup("PROBLEM");
 
     /* set the notification number macro */
-    delete[] mac->x[MACRO_HOSTNOTIFICATIONNUMBER];
-    mac->x[MACRO_HOSTNOTIFICATIONNUMBER] = obj2pchar(hst->current_notification_number);
+    delete[] mac.x[MACRO_HOSTNOTIFICATIONNUMBER];
+    mac.x[MACRO_HOSTNOTIFICATIONNUMBER] = obj2pchar(hst->current_notification_number);
 
     /* the $NOTIFICATIONNUMBER$ macro is maintained for backward compatability */
-    delete[] mac->x[MACRO_NOTIFICATIONNUMBER];
-    mac->x[MACRO_NOTIFICATIONNUMBER] = my_strdup((mac->x[MACRO_HOSTNOTIFICATIONNUMBER] == NULL) ? "" : mac->x[MACRO_HOSTNOTIFICATIONNUMBER]);
+    delete[] mac.x[MACRO_NOTIFICATIONNUMBER];
+    mac.x[MACRO_NOTIFICATIONNUMBER] = my_strdup((mac.x[MACRO_HOSTNOTIFICATIONNUMBER] == NULL) ? "" : mac.x[MACRO_HOSTNOTIFICATIONNUMBER]);
 
     /* set the notification id macro */
-    delete[] mac->x[MACRO_HOSTNOTIFICATIONID];
-    mac->x[MACRO_HOSTNOTIFICATIONID] = obj2pchar(hst->current_notification_id);
+    delete[] mac.x[MACRO_HOSTNOTIFICATIONID];
+    mac.x[MACRO_HOSTNOTIFICATIONID] = obj2pchar(hst->current_notification_id);
 
     /* notify each contact (duplicates have been removed) */
     for (temp_notification = notification_list;
@@ -1459,20 +1457,20 @@ int host_notification(host* hst,
          temp_notification = temp_notification->next) {
 
       /* grab the macro variables for this contact */
-      grab_contact_macros_r(mac, temp_notification->cntct);
+      grab_contact_macros_r(&mac, temp_notification->cntct);
 
       /* clear summary macros (they are customized for each contact) */
-      clear_summary_macros_r(mac);
+      clear_summary_macros_r(&mac);
 
       /* notify this contact */
-      result = notify_contact_of_host(mac,
-				      temp_notification->cntct,
-				      hst,
-				      type,
-				      not_author,
-				      not_data,
-				      options,
-				      escalated);
+      result = notify_contact_of_host(&mac,
+                 temp_notification->cntct,
+                 hst,
+                 type,
+                 not_author,
+                 not_data,
+                 options,
+                 escalated);
 
       /* keep track of how many contacts were notified */
       if (result == OK)
@@ -1483,7 +1481,7 @@ int host_notification(host* hst,
     free_notification_list();
 
     /* clear summary macros so they will be regenerated without contact filters when needednext */
-    clear_summary_macros_r(mac);
+    clear_summary_macros_r(&mac);
 
     if (type == NOTIFICATION_NORMAL) {
 
