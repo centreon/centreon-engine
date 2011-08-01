@@ -486,21 +486,26 @@ void service_check_sighandler(int sig) {
 
   /* write check result to file */
   if (check_result_info.output_file_fp) {
+    FILE* fp;
 
-    fprintf(check_result_info.output_file_fp, "finish_time=%lu.%lu\n",
+    /* avoid races with signal handling */
+    fp = check_result_info.output_file_fp;
+    check_result_info.output_file_fp = NULL;
+
+    fprintf(fp, "finish_time=%lu.%lu\n",
             static_cast<unsigned long>(check_result_info.finish_time.tv_sec),
             static_cast<unsigned long>(check_result_info.finish_time.tv_usec));
-    fprintf(check_result_info.output_file_fp, "early_timeout=%d\n",
+    fprintf(fp, "early_timeout=%d\n",
             check_result_info.early_timeout);
-    fprintf(check_result_info.output_file_fp, "exited_ok=%d\n",
+    fprintf(fp, "exited_ok=%d\n",
             check_result_info.exited_ok);
-    fprintf(check_result_info.output_file_fp, "return_code=%d\n",
+    fprintf(fp, "return_code=%d\n",
             check_result_info.return_code);
-    fprintf(check_result_info.output_file_fp, "output=%s\n",
+    fprintf(fp, "output=%s\n",
             "(Service Check Timed Out)");
 
     /* close the temp file */
-    fclose(check_result_info.output_file_fp);
+    fclose(fp);
 
     /* move check result to queue directory */
     move_check_result_to_queue(check_result_info.output_file);
@@ -533,21 +538,26 @@ void host_check_sighandler(int sig) {
 
   /* write check result to file */
   if (check_result_info.output_file_fp) {
+    FILE* fp;
 
-    fprintf(check_result_info.output_file_fp, "finish_time=%lu.%lu\n",
+    /* avoid races with signal handling */
+    fp = check_result_info.output_file_fp;
+    check_result_info.output_file_fp = NULL;
+
+    fprintf(fp, "finish_time=%lu.%lu\n",
             static_cast<unsigned long>(check_result_info.finish_time.tv_sec),
             static_cast<unsigned long>(check_result_info.finish_time.tv_usec));
-    fprintf(check_result_info.output_file_fp, "early_timeout=%d\n",
+    fprintf(fp, "early_timeout=%d\n",
             check_result_info.early_timeout);
-    fprintf(check_result_info.output_file_fp, "exited_ok=%d\n",
+    fprintf(fp, "exited_ok=%d\n",
             check_result_info.exited_ok);
-    fprintf(check_result_info.output_file_fp, "return_code=%d\n",
+    fprintf(fp, "return_code=%d\n",
             check_result_info.return_code);
-    fprintf(check_result_info.output_file_fp, "output=%s\n",
+    fprintf(fp, "output=%s\n",
             "(Host Check Timed Out)");
 
     /* close the temp file */
-    fclose(check_result_info.output_file_fp);
+    fclose(fp);
 
     /* move check result to queue directory */
     move_check_result_to_queue(check_result_info.output_file);
