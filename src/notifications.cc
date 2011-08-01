@@ -122,10 +122,14 @@ int service_notification(service* svc,
 					escalated,
 					0,
 					NULL);
-  if (NEBERROR_CALLBACKCANCEL == neb_result)
+  if (NEBERROR_CALLBACKCANCEL == neb_result) {
+    free_notification_list();
     return (ERROR);
-  else if (NEBERROR_CALLBACKOVERRIDE == neb_result)
+  }
+  else if (NEBERROR_CALLBACKOVERRIDE == neb_result) {
+    free_notification_list();
     return (OK);
+  }
 
   /* XXX: crazy indent */
   /* we have contacts to notify... */
@@ -1169,6 +1173,9 @@ int create_notification_list_from_service(nagios_macros* mac,
   /* set the escalation flag */
   *escalated = escalate_notification;
 
+  /* make sure there aren't any leftover contacts */
+  free_notification_list();
+
   /* set the escalation macro */
   delete[] mac->x[MACRO_NOTIFICATIONISESCALATED];
   mac->x[MACRO_NOTIFICATIONISESCALATED] = obj2pchar(escalate_notification);
@@ -1350,10 +1357,14 @@ int host_notification(host* hst,
 					escalated,
 					0,
 					NULL);
-  if (NEBERROR_CALLBACKCANCEL == neb_result)
+  if (NEBERROR_CALLBACKCANCEL == neb_result) {
+    free_notification_list();
     return (ERROR);
-  else if (NEBERROR_CALLBACKOVERRIDE == neb_result)
+  }
+  else if (NEBERROR_CALLBACKOVERRIDE == neb_result) {
+    free_notification_list();
     return (OK);
+  }
 
   /* XXX: crazy indent */
   /* there are contacts to be notified... */
@@ -2336,6 +2347,9 @@ int create_notification_list_from_host(nagios_macros* mac,
 
   /* set the escalation flag */
   *escalated = escalate_notification;
+
+  /* make sure there aren't any leftover contacts */
+  free_notification_list();
 
   /* set the escalation macro */
   delete[] mac->x[MACRO_NOTIFICATIONISESCALATED];
