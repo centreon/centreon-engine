@@ -145,7 +145,7 @@ void webservice::set_action(QString const& action) {
  *
  *  @return Return true if the execution succeed, false otherwise.
  */
-bool webservice::execute(QString const& function, QList<QString> const& args) {
+bool webservice::execute(QString const& function, QHash<QString, QString> const& args) {
   return (_gen.execute(function,
 		       &_soap_ctx,
 		       _end_point.toStdString().c_str(),

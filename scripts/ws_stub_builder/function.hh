@@ -94,7 +94,6 @@ namespace                       com {
 	  QString               _exec_prototype;
 	  QString               _help_function;
 	  QString               _exec_function;
-	  unsigned int          _nb_args;
 	  unsigned int          _list_pos;
 	};
       }

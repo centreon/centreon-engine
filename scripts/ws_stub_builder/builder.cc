@@ -22,6 +22,7 @@
 #include <QString>
 #include <QFileInfo>
 #include <QTextStream>
+#include <QRegExp>
 
 #include "error.hh"
 #include "arg_definition.hh"
@@ -145,7 +146,6 @@ void builder::_build_header() {
   stream << "#ifndef CCE_MOD_WS_CLIENT_AUTO_GEN_HH\n"
 	 << "# define CCE_MOD_WS_CLIENT_AUTO_GEN_HH\n\n"
 	 << "# include <QHash>\n"
-	 << "# include <QList>\n"
 	 << "# include <QString>\n"
 	 << "# include \"" << file_info.fileName() << "\"\n\n"
 	 << "class auto_gen {\n"
@@ -153,14 +153,14 @@ void builder::_build_header() {
 	 << "  static auto_gen& instance();\n\n"
 	 << "  void show_help() const;\n"
 	 << "  void show_help(QString const& name) const;\n"
-	 << "  bool execute(QString const& name, soap* s, char const* end_point, char const* action, QList<QString> const& args) const;\n\n"
+	 << "  bool execute(QString const& name, soap* s, char const* end_point, char const* action, QHash<QString, QString> const& args) const;\n\n"
 	 << "private:\n"
 	 << "  auto_gen();\n"
 	 << "  auto_gen(auto_gen const& right);\n"
 	 << "  ~auto_gen() throw();\n\n"
 	 << "  auto_gen& operator=(auto_gen const& right);\n\n"
 	 << "  QHash<QString, void (*)()> _help;\n"
-	 << "  QHash<QString, bool (*)(soap*, char const*, char const*, QList<QString> const&)> _exec;\n"
+	 << "  QHash<QString, bool (*)(soap*, char const*, char const*, QHash<QString, QString> const&)> _exec;\n"
 	 << "};\n\n"
 	 << "#endif // !CCE_MOD_WS_CLIENT_AUTO_GEN_HH\n";
 }
@@ -280,8 +280,8 @@ void builder::_build_source() {
 	 << "  }\n"
 	 << "  it.value()();\n"
 	 << "}\n\n"
-	 << "bool auto_gen::execute(QString const& name, soap* s, char const* end_point, char const* action, QList<QString> const& args) const {\n"
-	 << "  QHash<QString, bool (*)(soap*, char const*, char const*, QList<QString> const&)>::const_iterator it = _exec.find(name);\n"
+	 << "bool auto_gen::execute(QString const& name, soap* s, char const* end_point, char const* action, QHash<QString, QString> const& args) const {\n"
+	 << "  QHash<QString, bool (*)(soap*, char const*, char const*, QHash<QString, QString> const&)>::const_iterator it = _exec.find(name);\n"
 	 << "  if (it == _exec.end()) {\n"
 	 << "    throw (error(\"function not found.\"));\n"
 	 << "  }\n"
@@ -319,7 +319,7 @@ void builder::_build_source() {
 QString builder::_build_ostream_struct(QString const& base,
 					argument const& arg) {
   if (arg.is_primitive() == true) {
-    return ("  os << " + base + ";\n");
+    return ("  os << \"" + arg.get_help() + " = \" << " + base + " << std::endl;\n");
   }
 
   QString ret;

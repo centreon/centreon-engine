@@ -47,9 +47,9 @@ static char const* OPTIONS = "a:c:e:f:hk:lp:s";
 static void usage(char const* appname) {
   std::cout << "usage: " << appname
 #ifdef WITH_OPENSSL
-	    << " [-a action] [-e end_point] [-h] [-l] [-s [-c cacert] [-k keyfile] [-p password]] function [arg ...]" << std::endl
+	    << " [-a action] [-e end_point] [-h] [-l] [-s [-c cacert] [-k keyfile] [-p password]] [-f] function [arg ...]" << std::endl
 #else
-	    << " [-a action] [-e end_point] [-h] [-l] function [arg ...]" << std::endl
+	    << " [-a action] [-e end_point] [-h] [-l] [-f] function [arg ...]" << std::endl
 #endif // !WITH_OPENSSL
 	    << " -a, --action    override the default SOAP action. " << std::endl
 	    << " -e, --end_point override the default SOAP service location." << std::endl
@@ -84,13 +84,12 @@ static void show_prototype() {
  *
  *  @return The function arguments.
  */
-static QList<QString> parse_option(QHash<char, QString>& opt, int argc, char** argv) {
+static QHash<QString, QString> parse_option(QHash<char, QString>& opt, int argc, char** argv) {
 #ifdef HAVE_GETOPT_LONG
   static struct option const long_opt[] = {
     { "action",    required_argument, NULL, 'a' },
     { "end_point", required_argument, NULL, 'e' },
     { "function",  required_argument, NULL, 'f' },
-    { "help",      no_argument,       NULL, 'h' },
     { "list",      no_argument,       NULL, 'l' },
 # ifdef WITH_OPENSSL
     { "keyfile",   required_argument, NULL, 'k' },
@@ -134,7 +133,6 @@ static QList<QString> parse_option(QHash<char, QString>& opt, int argc, char** a
       break;
 #endif // !WITH_OPENSSL
 
-    case 'h':
     default:
       usage(appname);
     }
@@ -153,9 +151,19 @@ static QList<QString> parse_option(QHash<char, QString>& opt, int argc, char** a
     opt['f'] = argv[optind++];
   }
 
-  QList<QString> args;
+  QHash<QString, QString> args;
   for (int i = optind; i < argc; ++i) {
-    args.push_back(argv[i]);
+    QString tmp(argv[i]);
+    int pos = tmp.indexOf('=');
+    if (pos != -1) {
+      QString key = tmp.left(pos);
+      QString val = tmp.right(tmp.size() - pos - 1);
+      args.insert(key, val);
+    }
+    else if (i + 1 < argc)
+      args.insert(tmp, argv[++i]);
+    else
+      usage(appname);
   }
 
   return (args);
@@ -165,14 +173,21 @@ int main(int argc, char** argv) {
   int ret = EXIT_SUCCESS;
 
   try {
-    QHash<char, QString> opt;
-    QList<QString> args = parse_option(opt, argc, argv);
-
-    if (args.size() == 1 && args.front() == "help") {
-      std::cout << "usage: " << argv[0] << " ";
-        auto_gen::instance().show_help(opt['f']);
+    if (argc >= 2 && (!strcmp(argv[1], "--help") || !strcmp(argv[1], "-h"))) {
+      if (argc == 2) {
+        std::cout << "usage: " << argv[0] << std::endl;
+        auto_gen::instance().show_help();
+      }
+      else {
+        std::cout << "usage: " << argv[0] << " ";
+        for (int i = 2; i < argc; ++i)
+          auto_gen::instance().show_help(argv[i]);
+      }
     }
     else {
+      QHash<char, QString> opt;
+      QHash<QString, QString> args = parse_option(opt, argc, argv);
+
       webservice ws(opt['s'] == "true", opt['k'], opt['p'], opt['c']);
       ws.set_end_point(opt['e']);
       ws.set_action(opt['a']);
