@@ -113,12 +113,9 @@ int skiplist_compare_text(const char* val1a,
   return (result);
 }
 
-int skiplist_compare_host(void* a, void* b) {
-  host* oa = NULL;
-  host* ob = NULL;
-
-  oa = (host*)a;
-  ob = (host*)b;
+int skiplist_compare_host(void const* a, void const* b) {
+  host const* oa = static_cast<host const*>(a);
+  host const* ob = static_cast<host const*>(b);
 
   if (oa == NULL && ob == NULL)
     return (0);
@@ -130,12 +127,9 @@ int skiplist_compare_host(void* a, void* b) {
   return (skiplist_compare_text(oa->name, NULL, ob->name, NULL));
 }
 
-int skiplist_compare_service(void* a, void* b) {
-  service* oa = NULL;
-  service* ob = NULL;
-
-  oa = (service*)a;
-  ob = (service*)b;
+int skiplist_compare_service(void const* a, void const* b) {
+  service const* oa = static_cast<service const*>(a);
+  service const* ob = static_cast<service const*>(b);
 
   if (oa == NULL && ob == NULL)
     return (0);
@@ -150,12 +144,9 @@ int skiplist_compare_service(void* a, void* b) {
 				ob->description));
 }
 
-int skiplist_compare_command(void* a, void* b) {
-  command* oa = NULL;
-  command* ob = NULL;
-
-  oa = (command*)a;
-  ob = (command*)b;
+int skiplist_compare_command(void const* a, void const* b) {
+  command const* oa = static_cast<command const*>(a);
+  command const* ob = static_cast<command const*>(b);
 
   if (oa == NULL && ob == NULL)
     return (0);
@@ -167,12 +158,9 @@ int skiplist_compare_command(void* a, void* b) {
   return (skiplist_compare_text(oa->name, NULL, ob->name, NULL));
 }
 
-int skiplist_compare_timeperiod(void* a, void* b) {
-  timeperiod* oa = NULL;
-  timeperiod* ob = NULL;
-
-  oa = (timeperiod*)a;
-  ob = (timeperiod*)b;
+int skiplist_compare_timeperiod(void const* a, void const* b) {
+  timeperiod const* oa = static_cast<timeperiod const*>(a);
+  timeperiod const* ob = static_cast<timeperiod const*>(b);
 
   if (oa == NULL && ob == NULL)
     return (0);
@@ -184,12 +172,9 @@ int skiplist_compare_timeperiod(void* a, void* b) {
   return (skiplist_compare_text(oa->name, NULL, ob->name, NULL));
 }
 
-int skiplist_compare_contact(void* a, void* b) {
-  contact* oa = NULL;
-  contact* ob = NULL;
-
-  oa = (contact*)a;
-  ob = (contact*)b;
+int skiplist_compare_contact(void const* a, void const* b) {
+  contact const* oa = static_cast<contact const*>(a);
+  contact const* ob = static_cast<contact const*>(b);
 
   if (oa == NULL && ob == NULL)
     return (0);
@@ -201,12 +186,9 @@ int skiplist_compare_contact(void* a, void* b) {
   return (skiplist_compare_text(oa->name, NULL, ob->name, NULL));
 }
 
-int skiplist_compare_contactgroup(void* a, void* b) {
-  contactgroup* oa = NULL;
-  contactgroup* ob = NULL;
-
-  oa = (contactgroup*)a;
-  ob = (contactgroup*)b;
+int skiplist_compare_contactgroup(void const* a, void const* b) {
+  contactgroup const* oa = static_cast<contactgroup const*>(a);
+  contactgroup const* ob = static_cast<contactgroup const*>(b);
 
   if (oa == NULL && ob == NULL)
     return (0);
@@ -218,12 +200,9 @@ int skiplist_compare_contactgroup(void* a, void* b) {
   return (skiplist_compare_text(oa->group_name, NULL, ob->group_name, NULL));
 }
 
-int skiplist_compare_hostgroup(void* a, void* b) {
-  hostgroup* oa = NULL;
-  hostgroup* ob = NULL;
-
-  oa = (hostgroup*)a;
-  ob = (hostgroup*)b;
+int skiplist_compare_hostgroup(void const* a, void const* b) {
+  hostgroup const* oa = static_cast<hostgroup const*>(a);
+  hostgroup const* ob = static_cast<hostgroup const*>(b);
 
   if (oa == NULL && ob == NULL)
     return (0);
@@ -235,12 +214,9 @@ int skiplist_compare_hostgroup(void* a, void* b) {
   return (skiplist_compare_text(oa->group_name, NULL, ob->group_name, NULL));
 }
 
-int skiplist_compare_servicegroup(void* a, void* b) {
-  servicegroup* oa = NULL;
-  servicegroup* ob = NULL;
-
-  oa = (servicegroup*)a;
-  ob = (servicegroup*)b;
+int skiplist_compare_servicegroup(void const* a, void const* b) {
+  servicegroup const* oa = static_cast<servicegroup const*>(a);
+  servicegroup const* ob = static_cast<servicegroup const*>(b);
 
   if (oa == NULL && ob == NULL)
     return (0);
@@ -252,12 +228,9 @@ int skiplist_compare_servicegroup(void* a, void* b) {
   return (skiplist_compare_text(oa->group_name, NULL, ob->group_name, NULL));
 }
 
-int skiplist_compare_hostescalation(void* a, void* b) {
-  hostescalation* oa = NULL;
-  hostescalation* ob = NULL;
-
-  oa = (hostescalation*)a;
-  ob = (hostescalation*)b;
+int skiplist_compare_hostescalation(void const* a, void const* b) {
+  hostescalation const* oa = static_cast<hostescalation const*>(a);
+  hostescalation const* ob = static_cast<hostescalation const*>(b);
 
   if (oa == NULL && ob == NULL)
     return (0);
@@ -269,12 +242,9 @@ int skiplist_compare_hostescalation(void* a, void* b) {
   return (skiplist_compare_text(oa->host_name, NULL, ob->host_name, NULL));
 }
 
-int skiplist_compare_serviceescalation(void* a, void* b) {
-  serviceescalation* oa = NULL;
-  serviceescalation* ob = NULL;
-
-  oa = (serviceescalation*)a;
-  ob = (serviceescalation*)b;
+int skiplist_compare_serviceescalation(void const* a, void const* b) {
+  serviceescalation const* oa = static_cast<serviceescalation const*>(a);
+  serviceescalation const* ob = static_cast<serviceescalation const*>(b);
 
   if (oa == NULL && ob == NULL)
     return (0);
@@ -290,12 +260,9 @@ int skiplist_compare_serviceescalation(void* a, void* b) {
 }
 
 
-int skiplist_compare_hostdependency(void* a, void* b) {
-  hostdependency* oa = NULL;
-  hostdependency* ob = NULL;
-
-  oa = (hostdependency*)a;
-  ob = (hostdependency*)b;
+int skiplist_compare_hostdependency(void const* a, void const* b) {
+  hostdependency const* oa = static_cast<hostdependency const*>(a);
+  hostdependency const* ob = static_cast<hostdependency const*>(b);
 
   if (oa == NULL && ob == NULL)
     return (0);
@@ -310,12 +277,9 @@ int skiplist_compare_hostdependency(void* a, void* b) {
 				NULL));
 }
 
-int skiplist_compare_servicedependency(void* a, void* b) {
-  servicedependency* oa = NULL;
-  servicedependency* ob = NULL;
-
-  oa = (servicedependency*)a;
-  ob = (servicedependency*)b;
+int skiplist_compare_servicedependency(void const* a, void const* b) {
+  servicedependency const* oa = static_cast<servicedependency const*>(a);
+  servicedependency const* ob = static_cast<servicedependency const*>(b);
 
   if (oa == NULL && ob == NULL)
     return (0);

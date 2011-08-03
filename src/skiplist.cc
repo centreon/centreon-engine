@@ -26,7 +26,7 @@ skiplist* skiplist_new(int max_levels,
 		       float level_probability,
                        int allow_duplicates,
 		       int append_duplicates,
-                       int (*compare_function)(void*, void*)) {
+                       int (*compare_function)(void const*, void const*)) {
   skiplist* newlist = NULL;
 
   /* alloc memory for new list structure */
@@ -341,12 +341,12 @@ void* skiplist_find_next(skiplist* list, void* data, void** node_ptr) {
 }
 
 /* delete (all) matching item(s) from list */
-int skiplist_delete(skiplist* list, void* data) {
+int skiplist_delete(skiplist* list, void const* data) {
   return (skiplist_delete_all(list, data));
 }
 
 /* delete first matching item from list */
-int skiplist_delete_first(skiplist* list, void* data) {
+int skiplist_delete_first(skiplist* list, void const* data) {
   skiplistnode** update = NULL;
   skiplistnode* thisnode = NULL;
   skiplistnode* nextnode = NULL;
@@ -409,7 +409,7 @@ int skiplist_delete_first(skiplist* list, void* data) {
 }
 
 /* delete all matching items from list */
-int skiplist_delete_all(skiplist* list, void* data) {
+int skiplist_delete_all(skiplist* list, void const* data) {
   int deleted = 0;
   int total_deleted = 0;
 
@@ -420,7 +420,7 @@ int skiplist_delete_all(skiplist* list, void* data) {
 }
 
 /* delete specific node from list */
-int skiplist_delete_node(skiplist* list, void* node_ptr) {
+int skiplist_delete_node(skiplist* list, void const* node_ptr) {
   void* data = NULL;
   skiplistnode** update = NULL;
   skiplistnode* thenode = NULL;

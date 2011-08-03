@@ -13478,6 +13478,95 @@ int centreonengine__addHost(soap* s,
 }
 
 /**
+ *  Add host dependency.
+ *
+ *  @param[in]  s                 Unused.
+ *  @param[in]  hostdependency    Host dependency to add.
+ *  @param[out] res               Unused.
+ *
+ *  @return SOAP_OK on success.
+ */
+int centreonengine__addHostDependency(soap* s,
+                                      ns1__hostDependencyType* hostdependency,
+                                      centreonengine__addHostDependencyResponse& res) {
+  (void)res;
+
+  try {
+    syncro::instance().waiting_callback();
+
+    log_debug_info(DEBUGL_FUNCTIONS, 2,
+                   "Webservice: %s({%s, %s})\n",
+                   __func__,
+		   hostdependency->dependentHostName.c_str(),
+		   hostdependency->hostName.c_str());
+
+    add_hostdependency(*hostdependency);
+
+    syncro::instance().worker_finish();
+  }
+  catch (std::exception const& e) {
+    log_debug_info(DEBUGL_COMMANDS, 2,
+                   "Webservice: %s failed: %s.\n",
+                   __func__,
+		   e.what());
+    syncro::instance().worker_finish();
+    return (soap_receiver_fault(s, "Runtime error.", "invalid argument"));
+  }
+  catch (...) {
+    log_debug_info(DEBUGL_COMMANDS, 2,
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
+    syncro::instance().worker_finish();
+    return (soap_receiver_fault(s, "Runtime error.", "catch all"));
+  }
+  return (SOAP_OK);
+}
+
+/**
+ *  Add host escalation.
+ *
+ *  @param[in]  s                 Unused.
+ *  @param[in]  hostescalation    Host escalation to add.
+ *  @param[out] res               Unused.
+ *
+ *  @return SOAP_OK on success.
+ */
+int centreonengine__addHostEscalation(soap* s,
+                                      ns1__hostEscalationType* hostescalation,
+                                      centreonengine__addHostEscalationResponse& res) {
+  (void)res;
+
+  try {
+    syncro::instance().waiting_callback();
+
+    log_debug_info(DEBUGL_FUNCTIONS, 2,
+                   "Webservice: %s(%s)\n",
+                   __func__,
+		   hostescalation->hostName.c_str());
+
+    add_hostescalation(*hostescalation);
+
+    syncro::instance().worker_finish();
+  }
+  catch (std::exception const& e) {
+    log_debug_info(DEBUGL_COMMANDS, 2,
+                   "Webservice: %s failed: %s.\n",
+                   __func__,
+		   e.what());
+    syncro::instance().worker_finish();
+    return (soap_receiver_fault(s, "Runtime error.", "invalid argument"));
+  }
+  catch (...) {
+    log_debug_info(DEBUGL_COMMANDS, 2,
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
+    syncro::instance().worker_finish();
+    return (soap_receiver_fault(s, "Runtime error.", "catch all"));
+  }
+  return (SOAP_OK);
+}
+
+/**
  *  Add service.
  *
  *  @param[in]  s                 Unused.
@@ -13523,6 +13612,98 @@ int centreonengine__addService(soap* s,
 }
 
 /**
+ *  Add service dependency.
+ *
+ *  @param[in]  s                 Unused.
+ *  @param[in]  servicedependency Service dependency to add.
+ *  @param[out] res               Unused.
+ *
+ *  @return SOAP_OK on success.
+ */
+int centreonengine__addServiceDependency(soap* s,
+                                         ns1__serviceDependencyType* servicedependency,
+                                         centreonengine__addServiceDependencyResponse& res) {
+  (void)res;
+
+  try {
+    syncro::instance().waiting_callback();
+
+    log_debug_info(DEBUGL_FUNCTIONS, 2,
+                   "Webservice: %s({%s, %s, %s, %s})\n",
+                   __func__,
+		   servicedependency->dependentHostName.c_str(),
+		   servicedependency->dependentServiceDescription.c_str(),
+		   servicedependency->hostName.c_str(),
+		   servicedependency->serviceDescription.c_str());
+
+    add_servicedependency(*servicedependency);
+
+    syncro::instance().worker_finish();
+  }
+  catch (std::exception const& e) {
+    log_debug_info(DEBUGL_COMMANDS, 2,
+                   "Webservice: %s failed: %s.\n",
+                   __func__,
+		   e.what());
+    syncro::instance().worker_finish();
+    return (soap_receiver_fault(s, "Runtime error.", "invalid argument"));
+  }
+  catch (...) {
+    log_debug_info(DEBUGL_COMMANDS, 2,
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
+    syncro::instance().worker_finish();
+    return (soap_receiver_fault(s, "Runtime error.", "catch all"));
+  }
+  return (SOAP_OK);
+}
+
+/**
+ *  Add service escalation.
+ *
+ *  @param[in]  s                 Unused.
+ *  @param[in]  serviceescalation Service escalation to add.
+ *  @param[out] res               Unused.
+ *
+ *  @return SOAP_OK on success.
+ */
+int centreonengine__addServiceEscalation(soap* s,
+                                         ns1__serviceEscalationType* serviceescalation,
+                                         centreonengine__addServiceEscalationResponse& res) {
+  (void)res;
+
+  try {
+    syncro::instance().waiting_callback();
+
+    log_debug_info(DEBUGL_FUNCTIONS, 2,
+                   "Webservice: %s({%s, %s})\n",
+                   __func__,
+		   serviceescalation->hostName.c_str(),
+		   serviceescalation->serviceDescription.c_str());
+
+    add_serviceescalation(*serviceescalation);
+
+    syncro::instance().worker_finish();
+  }
+  catch (std::exception const& e) {
+    log_debug_info(DEBUGL_COMMANDS, 2,
+                   "Webservice: %s failed: %s.\n",
+                   __func__,
+		   e.what());
+    syncro::instance().worker_finish();
+    return (soap_receiver_fault(s, "Runtime error.", "invalid argument"));
+  }
+  catch (...) {
+    log_debug_info(DEBUGL_COMMANDS, 2,
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
+    syncro::instance().worker_finish();
+    return (soap_receiver_fault(s, "Runtime error.", "catch all"));
+  }
+  return (SOAP_OK);
+}
+
+/**
  *  Add contact.
  *
  *  @param[in]  s                 Unused.
@@ -13545,6 +13726,50 @@ int centreonengine__addContact(soap* s,
 		   contact->name.c_str());
 
     add_contact(*contact);
+
+    syncro::instance().worker_finish();
+  }
+  catch (std::exception const& e) {
+    log_debug_info(DEBUGL_COMMANDS, 2,
+                   "Webservice: %s failed: %s.\n",
+                   __func__,
+		   e.what());
+    syncro::instance().worker_finish();
+    return (soap_receiver_fault(s, "Runtime error.", "invalid argument"));
+  }
+  catch (...) {
+    log_debug_info(DEBUGL_COMMANDS, 2,
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
+    syncro::instance().worker_finish();
+    return (soap_receiver_fault(s, "Runtime error.", "catch all"));
+  }
+  return (SOAP_OK);
+}
+
+/**
+ *  Add timeperiod.
+ *
+ *  @param[in]  s                 Unused.
+ *  @param[in]  tperiod           Timeperiod to add.
+ *  @param[out] res               Unused.
+ *
+ *  @return SOAP_OK on success.
+ */
+int centreonengine__addTimeperiod(soap* s,
+                                  ns1__timeperiodType* tperiod,
+                                  centreonengine__addTimeperiodResponse& res) {
+  (void)res;
+
+  try {
+    syncro::instance().waiting_callback();
+
+    log_debug_info(DEBUGL_FUNCTIONS, 2,
+                   "Webservice: %s(%s)\n",
+                   __func__,
+		   tperiod->name.c_str());
+
+    add_timeperiod(*tperiod);
 
     syncro::instance().worker_finish();
   }

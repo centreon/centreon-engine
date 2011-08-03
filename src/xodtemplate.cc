@@ -3168,7 +3168,8 @@ int xodtemplate_add_object_property(char* input, int options) {
         temp_hostdependency->hostgroup_name = my_strdup(value);
       temp_hostdependency->have_hostgroup_name = TRUE;
     }
-    else if (!strcmp(variable, "host") || !strcmp(variable, "host_name")
+    else if (!strcmp(variable, "host")
+             || !strcmp(variable, "host_name")
              || !strcmp(variable, "master_host")
              || !strcmp(variable, "master_host_name")) {
       if (strcmp(value, XODTEMPLATE_NULL))
@@ -12423,12 +12424,9 @@ int xodtemplate_skiplist_compare_text(const char* val1a,
   return (result);
 }
 
-int xodtemplate_skiplist_compare_host_template(void* a, void* b) {
-  xodtemplate_host* oa = NULL;
-  xodtemplate_host* ob = NULL;
-
-  oa = (xodtemplate_host*)a;
-  ob = (xodtemplate_host*)b;
+int xodtemplate_skiplist_compare_host_template(void const* a, void const* b) {
+  xodtemplate_host const* oa = static_cast<xodtemplate_host const*>(a);
+  xodtemplate_host const* ob = static_cast<xodtemplate_host const*>(b);
 
   if (oa == NULL && ob == NULL)
     return (0);
@@ -12440,12 +12438,9 @@ int xodtemplate_skiplist_compare_host_template(void* a, void* b) {
   return (skiplist_compare_text(oa->name, NULL, ob->name, NULL));
 }
 
-int xodtemplate_skiplist_compare_host(void* a, void* b) {
-  xodtemplate_host* oa = NULL;
-  xodtemplate_host* ob = NULL;
-
-  oa = (xodtemplate_host*)a;
-  ob = (xodtemplate_host*)b;
+int xodtemplate_skiplist_compare_host(void const* a, void const* b) {
+  xodtemplate_host const* oa = static_cast<xodtemplate_host const*>(a);
+  xodtemplate_host const* ob = static_cast<xodtemplate_host const*>(b);
 
   if (oa == NULL && ob == NULL)
     return (0);
@@ -12457,12 +12452,9 @@ int xodtemplate_skiplist_compare_host(void* a, void* b) {
   return (skiplist_compare_text(oa->host_name, NULL, ob->host_name, NULL));
 }
 
-int xodtemplate_skiplist_compare_service_template(void* a, void* b) {
-  xodtemplate_service* oa = NULL;
-  xodtemplate_service* ob = NULL;
-
-  oa = (xodtemplate_service*)a;
-  ob = (xodtemplate_service*)b;
+int xodtemplate_skiplist_compare_service_template(void const* a, void const* b) {
+  xodtemplate_service const* oa = static_cast<xodtemplate_service const*>(a);
+  xodtemplate_service const* ob = static_cast<xodtemplate_service const*>(b);
 
   if (oa == NULL && ob == NULL)
     return (0);
@@ -12474,12 +12466,9 @@ int xodtemplate_skiplist_compare_service_template(void* a, void* b) {
   return (skiplist_compare_text(oa->name, NULL, ob->name, NULL));
 }
 
-int xodtemplate_skiplist_compare_service(void* a, void* b) {
-  xodtemplate_service* oa = NULL;
-  xodtemplate_service* ob = NULL;
-
-  oa = (xodtemplate_service*)a;
-  ob = (xodtemplate_service*)b;
+int xodtemplate_skiplist_compare_service(void const* a, void const* b) {
+  xodtemplate_service const* oa = static_cast<xodtemplate_service const*>(a);
+  xodtemplate_service const* ob = static_cast<xodtemplate_service const*>(b);
 
   if (oa == NULL && ob == NULL)
     return (0);
@@ -12494,12 +12483,9 @@ int xodtemplate_skiplist_compare_service(void* a, void* b) {
 				ob->service_description));
 }
 
-int xodtemplate_skiplist_compare_timeperiod_template(void* a, void* b) {
-  xodtemplate_timeperiod* oa = NULL;
-  xodtemplate_timeperiod* ob = NULL;
-
-  oa = (xodtemplate_timeperiod*)a;
-  ob = (xodtemplate_timeperiod*)b;
+int xodtemplate_skiplist_compare_timeperiod_template(void const* a, void const* b) {
+  xodtemplate_timeperiod const* oa = static_cast<xodtemplate_timeperiod const*>(a);
+  xodtemplate_timeperiod const* ob = static_cast<xodtemplate_timeperiod const*>(b);
 
   if (oa == NULL && ob == NULL)
     return (0);
@@ -12511,12 +12497,9 @@ int xodtemplate_skiplist_compare_timeperiod_template(void* a, void* b) {
   return (skiplist_compare_text(oa->name, NULL, ob->name, NULL));
 }
 
-int xodtemplate_skiplist_compare_timeperiod(void* a, void* b) {
-  xodtemplate_timeperiod* oa = NULL;
-  xodtemplate_timeperiod* ob = NULL;
-
-  oa = (xodtemplate_timeperiod*)a;
-  ob = (xodtemplate_timeperiod*)b;
+int xodtemplate_skiplist_compare_timeperiod(void const* a, void const* b) {
+  xodtemplate_timeperiod const* oa = static_cast<xodtemplate_timeperiod const*>(a);
+  xodtemplate_timeperiod const* ob = static_cast<xodtemplate_timeperiod const*>(b);
 
   if (oa == NULL && ob == NULL)
     return (0);
@@ -12531,12 +12514,9 @@ int xodtemplate_skiplist_compare_timeperiod(void* a, void* b) {
 				NULL));
 }
 
-int xodtemplate_skiplist_compare_command_template(void* a, void* b) {
-  xodtemplate_command* oa = NULL;
-  xodtemplate_command* ob = NULL;
-
-  oa = (xodtemplate_command*)a;
-  ob = (xodtemplate_command*)b;
+int xodtemplate_skiplist_compare_command_template(void const* a, void const* b) {
+  xodtemplate_command const* oa = static_cast<xodtemplate_command const*>(a);
+  xodtemplate_command const* ob = static_cast<xodtemplate_command const*>(b);
 
   if (oa == NULL && ob == NULL)
     return (0);
@@ -12548,12 +12528,9 @@ int xodtemplate_skiplist_compare_command_template(void* a, void* b) {
   return (skiplist_compare_text(oa->name, NULL, ob->name, NULL));
 }
 
-int xodtemplate_skiplist_compare_command(void* a, void* b) {
-  xodtemplate_command* oa = NULL;
-  xodtemplate_command* ob = NULL;
-
-  oa = (xodtemplate_command*)a;
-  ob = (xodtemplate_command*)b;
+int xodtemplate_skiplist_compare_command(void const* a, void const* b) {
+  xodtemplate_command const* oa = static_cast<xodtemplate_command const*>(a);
+  xodtemplate_command const* ob = static_cast<xodtemplate_command const*>(b);
 
   if (oa == NULL && ob == NULL)
     return (0);
@@ -12568,12 +12545,9 @@ int xodtemplate_skiplist_compare_command(void* a, void* b) {
 				NULL));
 }
 
-int xodtemplate_skiplist_compare_contact_template(void* a, void* b) {
-  xodtemplate_contact* oa = NULL;
-  xodtemplate_contact* ob = NULL;
-
-  oa = (xodtemplate_contact*)a;
-  ob = (xodtemplate_contact*)b;
+int xodtemplate_skiplist_compare_contact_template(void const* a, void const* b) {
+  xodtemplate_contact const* oa = static_cast<xodtemplate_contact const*>(a);
+  xodtemplate_contact const* ob = static_cast<xodtemplate_contact const*>(b);
 
   if (oa == NULL && ob == NULL)
     return (0);
@@ -12585,12 +12559,9 @@ int xodtemplate_skiplist_compare_contact_template(void* a, void* b) {
   return (skiplist_compare_text(oa->name, NULL, ob->name, NULL));
 }
 
-int xodtemplate_skiplist_compare_contact(void* a, void* b) {
-  xodtemplate_contact* oa = NULL;
-  xodtemplate_contact* ob = NULL;
-
-  oa = (xodtemplate_contact*)a;
-  ob = (xodtemplate_contact*)b;
+int xodtemplate_skiplist_compare_contact(void const* a, void const* b) {
+  xodtemplate_contact const* oa = static_cast<xodtemplate_contact const*>(a);
+  xodtemplate_contact const* ob = static_cast<xodtemplate_contact const*>(b);
 
   if (oa == NULL && ob == NULL)
     return (0);
@@ -12605,12 +12576,9 @@ int xodtemplate_skiplist_compare_contact(void* a, void* b) {
 				NULL));
 }
 
-int xodtemplate_skiplist_compare_contactgroup_template(void* a, void* b) {
-  xodtemplate_contactgroup* oa = NULL;
-  xodtemplate_contactgroup* ob = NULL;
-
-  oa = (xodtemplate_contactgroup*)a;
-  ob = (xodtemplate_contactgroup*)b;
+int xodtemplate_skiplist_compare_contactgroup_template(void const* a, void const* b) {
+  xodtemplate_contactgroup const* oa = static_cast<xodtemplate_contactgroup const*>(a);
+  xodtemplate_contactgroup const* ob = static_cast<xodtemplate_contactgroup const*>(b);
 
   if (oa == NULL && ob == NULL)
     return (0);
@@ -12622,12 +12590,9 @@ int xodtemplate_skiplist_compare_contactgroup_template(void* a, void* b) {
   return (skiplist_compare_text(oa->name, NULL, ob->name, NULL));
 }
 
-int xodtemplate_skiplist_compare_contactgroup(void* a, void* b) {
-  xodtemplate_contactgroup* oa = NULL;
-  xodtemplate_contactgroup* ob = NULL;
-
-  oa = (xodtemplate_contactgroup*)a;
-  ob = (xodtemplate_contactgroup*)b;
+int xodtemplate_skiplist_compare_contactgroup(void const* a, void const* b) {
+  xodtemplate_contactgroup const* oa = static_cast<xodtemplate_contactgroup const*>(a);
+  xodtemplate_contactgroup const* ob = static_cast<xodtemplate_contactgroup const*>(b);
 
   if (oa == NULL && ob == NULL)
     return (0);
@@ -12642,12 +12607,9 @@ int xodtemplate_skiplist_compare_contactgroup(void* a, void* b) {
 				NULL));
 }
 
-int xodtemplate_skiplist_compare_hostgroup_template(void* a, void* b) {
-  xodtemplate_hostgroup* oa = NULL;
-  xodtemplate_hostgroup* ob = NULL;
-
-  oa = (xodtemplate_hostgroup*)a;
-  ob = (xodtemplate_hostgroup*)b;
+int xodtemplate_skiplist_compare_hostgroup_template(void const* a, void const* b) {
+  xodtemplate_hostgroup const* oa = static_cast<xodtemplate_hostgroup const*>(a);
+  xodtemplate_hostgroup const* ob = static_cast<xodtemplate_hostgroup const*>(b);
 
   if (oa == NULL && ob == NULL)
     return (0);
@@ -12659,12 +12621,9 @@ int xodtemplate_skiplist_compare_hostgroup_template(void* a, void* b) {
   return (skiplist_compare_text(oa->name, NULL, ob->name, NULL));
 }
 
-int xodtemplate_skiplist_compare_hostgroup(void* a, void* b) {
-  xodtemplate_hostgroup* oa = NULL;
-  xodtemplate_hostgroup* ob = NULL;
-
-  oa = (xodtemplate_hostgroup*)a;
-  ob = (xodtemplate_hostgroup*)b;
+int xodtemplate_skiplist_compare_hostgroup(void const* a, void const* b) {
+  xodtemplate_hostgroup const* oa = static_cast<xodtemplate_hostgroup const*>(a);
+  xodtemplate_hostgroup const* ob = static_cast<xodtemplate_hostgroup const*>(b);
 
   if (oa == NULL && ob == NULL)
     return (0);
@@ -12679,12 +12638,9 @@ int xodtemplate_skiplist_compare_hostgroup(void* a, void* b) {
 				NULL));
 }
 
-int xodtemplate_skiplist_compare_servicegroup_template(void* a, void* b) {
-  xodtemplate_servicegroup* oa = NULL;
-  xodtemplate_servicegroup* ob = NULL;
-
-  oa = (xodtemplate_servicegroup*)a;
-  ob = (xodtemplate_servicegroup*)b;
+int xodtemplate_skiplist_compare_servicegroup_template(void const* a, void const* b) {
+  xodtemplate_servicegroup const* oa = static_cast<xodtemplate_servicegroup const*>(a);
+  xodtemplate_servicegroup const* ob = static_cast<xodtemplate_servicegroup const*>(b);
 
   if (oa == NULL && ob == NULL)
     return (0);
@@ -12696,12 +12652,9 @@ int xodtemplate_skiplist_compare_servicegroup_template(void* a, void* b) {
   return (skiplist_compare_text(oa->name, NULL, ob->name, NULL));
 }
 
-int xodtemplate_skiplist_compare_servicegroup(void* a, void* b) {
-  xodtemplate_servicegroup* oa = NULL;
-  xodtemplate_servicegroup* ob = NULL;
-
-  oa = (xodtemplate_servicegroup*)a;
-  ob = (xodtemplate_servicegroup*)b;
+int xodtemplate_skiplist_compare_servicegroup(void const* a, void const* b) {
+  xodtemplate_servicegroup const* oa = static_cast<xodtemplate_servicegroup const*>(a);
+  xodtemplate_servicegroup const* ob = static_cast<xodtemplate_servicegroup const*>(b);
 
   if (oa == NULL && ob == NULL)
     return (0);
@@ -12716,13 +12669,9 @@ int xodtemplate_skiplist_compare_servicegroup(void* a, void* b) {
 				NULL));
 }
 
-int xodtemplate_skiplist_compare_hostdependency_template(void* a,
-                                                         void* b) {
-  xodtemplate_hostdependency* oa = NULL;
-  xodtemplate_hostdependency* ob = NULL;
-
-  oa = (xodtemplate_hostdependency*)a;
-  ob = (xodtemplate_hostdependency*)b;
+int xodtemplate_skiplist_compare_hostdependency_template(void const* a, void const* b) {
+  xodtemplate_hostdependency const* oa = static_cast<xodtemplate_hostdependency const*>(a);
+  xodtemplate_hostdependency const* ob = static_cast<xodtemplate_hostdependency const*>(b);
 
   if (oa == NULL && ob == NULL)
     return (0);
@@ -12734,12 +12683,9 @@ int xodtemplate_skiplist_compare_hostdependency_template(void* a,
   return (skiplist_compare_text(oa->name, NULL, ob->name, NULL));
 }
 
-int xodtemplate_skiplist_compare_hostdependency(void* a, void* b) {
-  xodtemplate_hostdependency* oa = NULL;
-  xodtemplate_hostdependency* ob = NULL;
-
-  oa = (xodtemplate_hostdependency*)a;
-  ob = (xodtemplate_hostdependency*)b;
+int xodtemplate_skiplist_compare_hostdependency(void const* a, void const* b) {
+  xodtemplate_hostdependency const* oa = static_cast<xodtemplate_hostdependency const*>(a);
+  xodtemplate_hostdependency const* ob = static_cast<xodtemplate_hostdependency const*>(b);
 
   if (oa == NULL && ob == NULL)
     return (0);
@@ -12754,13 +12700,9 @@ int xodtemplate_skiplist_compare_hostdependency(void* a, void* b) {
 				NULL));
 }
 
-int xodtemplate_skiplist_compare_servicedependency_template(void* a,
-                                                            void* b) {
-  xodtemplate_servicedependency* oa = NULL;
-  xodtemplate_servicedependency* ob = NULL;
-
-  oa = (xodtemplate_servicedependency*)a;
-  ob = (xodtemplate_servicedependency*)b;
+int xodtemplate_skiplist_compare_servicedependency_template(void const* a, void const* b) {
+  xodtemplate_servicedependency const* oa = static_cast<xodtemplate_servicedependency const*>(a);
+  xodtemplate_servicedependency const* ob = static_cast<xodtemplate_servicedependency const*>(b);
 
   if (oa == NULL && ob == NULL)
     return (0);
@@ -12772,12 +12714,9 @@ int xodtemplate_skiplist_compare_servicedependency_template(void* a,
   return (skiplist_compare_text(oa->name, NULL, ob->name, NULL));
 }
 
-int xodtemplate_skiplist_compare_servicedependency(void* a, void* b) {
-  xodtemplate_servicedependency* oa = NULL;
-  xodtemplate_servicedependency* ob = NULL;
-
-  oa = (xodtemplate_servicedependency*)a;
-  ob = (xodtemplate_servicedependency*)b;
+int xodtemplate_skiplist_compare_servicedependency(void const* a, void const* b) {
+  xodtemplate_servicedependency const* oa = static_cast<xodtemplate_servicedependency const*>(a);
+  xodtemplate_servicedependency const* ob = static_cast<xodtemplate_servicedependency const*>(b);
 
   if (oa == NULL && ob == NULL)
     return (0);
@@ -12792,13 +12731,9 @@ int xodtemplate_skiplist_compare_servicedependency(void* a, void* b) {
 				ob->dependent_service_description));
 }
 
-int xodtemplate_skiplist_compare_hostescalation_template(void* a,
-                                                         void* b) {
-  xodtemplate_hostescalation* oa = NULL;
-  xodtemplate_hostescalation* ob = NULL;
-
-  oa = (xodtemplate_hostescalation*)a;
-  ob = (xodtemplate_hostescalation*)b;
+int xodtemplate_skiplist_compare_hostescalation_template(void const* a, void const* b) {
+  xodtemplate_hostescalation const* oa = static_cast<xodtemplate_hostescalation const*>(a);
+  xodtemplate_hostescalation const* ob = static_cast<xodtemplate_hostescalation const*>(b);
 
   if (oa == NULL && ob == NULL)
     return (0);
@@ -12810,12 +12745,9 @@ int xodtemplate_skiplist_compare_hostescalation_template(void* a,
   return (skiplist_compare_text(oa->name, NULL, ob->name, NULL));
 }
 
-int xodtemplate_skiplist_compare_hostescalation(void* a, void* b) {
-  xodtemplate_hostescalation* oa = NULL;
-  xodtemplate_hostescalation* ob = NULL;
-
-  oa = (xodtemplate_hostescalation*)a;
-  ob = (xodtemplate_hostescalation*)b;
+int xodtemplate_skiplist_compare_hostescalation(void const* a, void const* b) {
+  xodtemplate_hostescalation const* oa = static_cast<xodtemplate_hostescalation const*>(a);
+  xodtemplate_hostescalation const* ob = static_cast<xodtemplate_hostescalation const*>(b);
 
   if (oa == NULL && ob == NULL)
     return (0);
@@ -12830,13 +12762,9 @@ int xodtemplate_skiplist_compare_hostescalation(void* a, void* b) {
 				NULL));
 }
 
-int xodtemplate_skiplist_compare_serviceescalation_template(void* a,
-                                                            void* b) {
-  xodtemplate_serviceescalation* oa = NULL;
-  xodtemplate_serviceescalation* ob = NULL;
-
-  oa = (xodtemplate_serviceescalation*)a;
-  ob = (xodtemplate_serviceescalation*)b;
+int xodtemplate_skiplist_compare_serviceescalation_template(void const* a, void const* b) {
+  xodtemplate_serviceescalation const* oa = static_cast<xodtemplate_serviceescalation const*>(a);
+  xodtemplate_serviceescalation const* ob = static_cast<xodtemplate_serviceescalation const*>(b);
 
   if (oa == NULL && ob == NULL)
     return (0);
@@ -12848,12 +12776,9 @@ int xodtemplate_skiplist_compare_serviceescalation_template(void* a,
   return (skiplist_compare_text(oa->name, NULL, ob->name, NULL));
 }
 
-int xodtemplate_skiplist_compare_serviceescalation(void* a, void* b) {
-  xodtemplate_serviceescalation* oa = NULL;
-  xodtemplate_serviceescalation* ob = NULL;
-
-  oa = (xodtemplate_serviceescalation*)a;
-  ob = (xodtemplate_serviceescalation*)b;
+int xodtemplate_skiplist_compare_serviceescalation(void const* a, void const* b) {
+  xodtemplate_serviceescalation const* oa = static_cast<xodtemplate_serviceescalation const*>(a);
+  xodtemplate_serviceescalation const* ob = static_cast<xodtemplate_serviceescalation const*>(b);
 
   if (oa == NULL && ob == NULL)
     return (0);
@@ -12868,12 +12793,9 @@ int xodtemplate_skiplist_compare_serviceescalation(void* a, void* b) {
 				ob->service_description));
 }
 
-int xodtemplate_skiplist_compare_hostextinfo_template(void* a, void* b) {
-  xodtemplate_hostextinfo* oa = NULL;
-  xodtemplate_hostextinfo* ob = NULL;
-
-  oa = (xodtemplate_hostextinfo*)a;
-  ob = (xodtemplate_hostextinfo*)b;
+int xodtemplate_skiplist_compare_hostextinfo_template(void const* a, void const* b) {
+  xodtemplate_hostextinfo const* oa = static_cast<xodtemplate_hostextinfo const*>(a);
+  xodtemplate_hostextinfo const* ob = static_cast<xodtemplate_hostextinfo const*>(b);
 
   if (oa == NULL && ob == NULL)
     return (0);
@@ -12885,13 +12807,9 @@ int xodtemplate_skiplist_compare_hostextinfo_template(void* a, void* b) {
   return (skiplist_compare_text(oa->name, NULL, ob->name, NULL));
 }
 
-int xodtemplate_skiplist_compare_serviceextinfo_template(void* a,
-                                                         void* b) {
-  xodtemplate_serviceextinfo* oa = NULL;
-  xodtemplate_serviceextinfo* ob = NULL;
-
-  oa = (xodtemplate_serviceextinfo*)a;
-  ob = (xodtemplate_serviceextinfo*)b;
+int xodtemplate_skiplist_compare_serviceextinfo_template(void const* a, void const* b) {
+  xodtemplate_serviceextinfo const* oa = static_cast<xodtemplate_serviceextinfo const*>(a);
+  xodtemplate_serviceextinfo const* ob = static_cast<xodtemplate_serviceextinfo const*>(b);
 
   if (oa == NULL && ob == NULL)
     return (0);

@@ -18,6 +18,7 @@
 */
 
 #include <QRegExp>
+#include <QHash>
 #include <QScopedArrayPointer>
 #include "engine.hh"
 #include "error.hh"
@@ -25,9 +26,35 @@
 #include "free_object.hh"
 #include "add_object.hh"
 
-// TODO: add check host dependency for child.
-
 using namespace com::centreon::engine;
+
+/**
+ *  Parse and return object options.
+ *
+ *  @param[in] opt         The option to parse.
+ *  @param[in] pattern     The option list.
+ *  @param[in] default_opt The default option.
+ *
+ *  @return The options list.
+ */
+static QHash<char, bool> get_options(std::string const* opt,
+                                     QString const& pattern,
+                                     char const* default_opt) {
+  QHash<char, bool> res;
+  QString _opt(opt ? opt->c_str() : default_opt);
+  _opt.toLower().trimmed();
+  if (_opt.contains(QRegExp("[^" + pattern + "na, ]", Qt::CaseInsensitive)))
+    return (res);
+
+  for (QString::const_iterator it = pattern.begin(), end = pattern.end(); it != end; ++it)
+    if (_opt == "n")
+      res[it->toAscii()] = false;
+    else if (_opt == "a")
+      res[it->toAscii()] = true;
+    else
+      res[it->toAscii()] = (_opt.indexOf(*it) != -1);
+  return (res);
+}
 
 /**
  *  Add somme custom variable to a generic object with custom variables member list.
@@ -402,19 +429,16 @@ void modules::add_servicegroup(ns1__serviceGroupType const& svcgrp) {
  */
 void modules::add_host(ns1__hostType const& hst) {
   // check all arguments and set default option for optional options.
-  QString notification_options(hst.notificationOptions ? hst.notificationOptions->c_str() : "a");
-  notification_options.toLower().trimmed();
-  if (notification_options.contains(QRegExp("[^durfsna, ]", Qt::CaseInsensitive)))
+  QHash<char, bool> notif_opt = get_options(hst.notificationOptions, "durfs", "a");
+  if (notif_opt.empty())
     throw (engine_error() << "host '" << hst.name << "' invalid notification options.");
 
-  QString flap_detection_options(hst.flapDetectionOptions ? hst.flapDetectionOptions->c_str() : "a");
-  flap_detection_options.toLower().trimmed();
-  if (flap_detection_options.contains(QRegExp("[^oduna, ]", Qt::CaseInsensitive)))
+  QHash<char, bool> flap_detection_opt = get_options(hst.flapDetectionOptions, "odu", "a");
+  if (flap_detection_opt.empty())
     throw (engine_error() << "host '" << hst.name << "' invalid flap detection options.");
 
-  QString stalking_options(hst.stalkingOptions ? hst.stalkingOptions->c_str() : "a");
-  stalking_options.toLower().trimmed();
-  if (stalking_options.contains(QRegExp("[^oduna, ]", Qt::CaseInsensitive)))
+  QHash<char, bool> stalk_opt = get_options(hst.stalkingOptions, "odu", "a");
+  if (stalk_opt.empty())
     throw (engine_error() << "host '" << hst.name << "' invalid stalking options.");
 
   int initial_state = 0;
@@ -478,36 +502,7 @@ void modules::add_host(ns1__hostType const& hst) {
   bool check_freshness = (hst.checkFreshness ? *hst.checkFreshness : false);
   int freshness_threshold = (hst.freshnessThreshold ? *hst.freshnessThreshold : false);
 
-  bool notify_up = (notification_options.indexOf('r') != -1);
-  bool notify_down = (notification_options.indexOf('d') != -1);
-  bool notify_unreachable = (notification_options.indexOf('u') != -1);
-  bool notify_flapping = (notification_options.indexOf('f') != -1);
-  bool notify_downtime = (notification_options.indexOf('s') != -1);
-  if (notification_options == "a") {
-    notify_up = true;
-    notify_down = true;
-    notify_unreachable = true;
-    notify_flapping = true;
-    notify_downtime = true;
-  }
-
-  bool flap_detection_on_up = flap_detection_options.indexOf('o');
-  bool flap_detection_on_down = flap_detection_options.indexOf('d');
-  bool flap_detection_on_unreachable = flap_detection_options.indexOf('u');
-  if (flap_detection_options == "a") {
-    flap_detection_on_up = true;
-    flap_detection_on_down = true;
-    flap_detection_on_unreachable = true;
-  }
-
-  bool stalk_on_up = stalking_options.indexOf('o');
-  bool stalk_on_down = stalking_options.indexOf('d');
-  bool stalk_on_unreachable = stalking_options.indexOf('u');
-  if (stalking_options == "a") {
-    stalk_on_up = true;
-    stalk_on_down = true;
-    stalk_on_unreachable = true;
-  }
+  // XXX: add check host dependency for child.
 
   // create a new host.
   host* new_hst = ::add_host(hst.name.c_str(),
@@ -519,11 +514,11 @@ void modules::add_host(ns1__hostType const& hst) {
 			     check_interval,
 			     retry_interval,
 			     hst.maxCheckAttempts,
-			     notify_up,
-			     notify_down,
-			     notify_unreachable,
-			     notify_flapping,
-			     notify_downtime,
+			     notif_opt['r'],
+                             notif_opt['d'],
+                             notif_opt['u'],
+                             notif_opt['f'],
+                             notif_opt['s'],
 			     hst.notificationInterval,
 			     first_notification_delay,
 			     hst.notificationPeriod.c_str(),
@@ -536,12 +531,12 @@ void modules::add_host(ns1__hostType const& hst) {
 			     flap_detection_enabled,
 			     low_flap_threshold,
 			     high_flap_threshold,
-			     flap_detection_on_up,
-			     flap_detection_on_down,
-			     flap_detection_on_unreachable,
-			     stalk_on_up,
-			     stalk_on_down,
-			     stalk_on_unreachable,
+                             flap_detection_opt['o'],
+                             flap_detection_opt['d'],
+                             flap_detection_opt['u'],
+                             stalk_opt['o'],
+                             stalk_opt['d'],
+                             stalk_opt['u'],
 			     process_perfdata,
 			     false, // XXX: no documentation for
 			     NULL,  // failure_prediction_options in nagios 3.
@@ -610,7 +605,7 @@ void modules::add_host(ns1__hostType const& hst) {
   // update initial state.
   new_hst->initial_state = initial_state;
 
-  // XXX: host services are update by add service.
+  // host services are update by add service.
 }
 
 /**
@@ -620,21 +615,18 @@ void modules::add_host(ns1__hostType const& hst) {
  */
 void modules::add_service(ns1__serviceType const& svc) {
   // check all arguments and set default option for optional options.
-  QString notification_options(svc.notificationOptions ? svc.notificationOptions->c_str() : "a");
-  notification_options.toLower().trimmed();
-  if (notification_options.contains(QRegExp("[^wucrfsna, ]", Qt::CaseInsensitive)))
+  QHash<char, bool> notif_opt = get_options(svc.notificationOptions, "wucrfs", "a");
+  if (notif_opt.empty())
     throw (engine_error() << "service '" << svc.hostName << ", "
 	   << svc.serviceDescription << "' invalid notification options.");
 
-  QString stalking_options(svc.stalkingOptions ? svc.stalkingOptions->c_str() : "a");
-  stalking_options.toLower().trimmed();
-  if (stalking_options.contains(QRegExp("[^owucna, ]", Qt::CaseInsensitive)))
+  QHash<char, bool> stalk_opt = get_options(svc.stalkingOptions, "owuc", "a");
+  if (stalk_opt.empty())
     throw (engine_error() << "service '" << svc.hostName << ", "
 	   << svc.serviceDescription << "' invalid stalking options.");
 
-  QString flap_detection_options(svc.flapDetectionOptions ? svc.flapDetectionOptions->c_str() : "a");
-  flap_detection_options.toLower().trimmed();
-  if (flap_detection_options.contains(QRegExp("[^owucna, ]", Qt::CaseInsensitive)))
+  QHash<char, bool> flap_detection_opt = get_options(svc.flapDetectionOptions, "owuc", "a");
+  if (flap_detection_opt.empty())
     throw (engine_error() << "service '" << svc.hostName << ", "
 	   << svc.serviceDescription << "' invalid flap detection options.");
 
@@ -686,43 +678,6 @@ void modules::add_service(ns1__serviceType const& svc) {
   char const* icon_image = (svc.iconImage ? svc.iconImage->c_str() : NULL);
   char const* icon_image_alt = (svc.iconImageAlt ? svc.iconImageAlt->c_str() : NULL);
 
-  bool notify_recovery = (notification_options.indexOf('r') != -1);
-  bool notify_unknown = (notification_options.indexOf('u') != -1);
-  bool notify_warning = (notification_options.indexOf('w') != -1);
-  bool notify_critical = (notification_options.indexOf('c') != -1);
-  bool notify_flapping = (notification_options.indexOf('f') != -1);
-  bool notify_downtime = (notification_options.indexOf('s') != -1);
-  if (notification_options == "a") {
-    notify_recovery = true;
-    notify_unknown = true;
-    notify_warning = true;
-    notify_critical = true;
-    notify_flapping = true;
-    notify_downtime = true;
-  }
-
-  bool flap_detection_on_ok = (flap_detection_options.indexOf('o') != -1);
-  bool flap_detection_on_unknown = (flap_detection_options.indexOf('u') != -1);
-  bool flap_detection_on_warning = (flap_detection_options.indexOf('w') != -1);
-  bool flap_detection_on_critical = (flap_detection_options.indexOf('c') != -1);
-  if (flap_detection_options == "a") {
-    flap_detection_on_ok = true;
-    flap_detection_on_unknown = true;
-    flap_detection_on_warning = true;
-    flap_detection_on_critical = true;
-  }
-
-  bool stalk_on_ok = (stalking_options.indexOf('o') != -1);
-  bool stalk_on_unknown = (stalking_options.indexOf('u') != -1);
-  bool stalk_on_warning = (stalking_options.indexOf('w') != -1);
-  bool stalk_on_critical = (stalking_options.indexOf('c') != -1);
-  if (stalking_options == "a") {
-    stalk_on_ok = true;
-    stalk_on_unknown = true;
-    stalk_on_warning = true;
-    stalk_on_critical = true;
-  }
-
   bool active_checks_enabled = (svc.activeChecksEnabled ? *svc.activeChecksEnabled : true);
   bool passive_checks_enabled = (svc.passiveChecksEnabled ? *svc.passiveChecksEnabled : true);
   bool obsess_over_service = (svc.obsessOverService ? *svc.obsessOverService : true);
@@ -759,12 +714,12 @@ void modules::add_service(ns1__serviceType const& svc) {
 				   svc.notificationInterval,
 				   first_notification_delay,
 				   svc.notificationPeriod.c_str(),
-				   notify_recovery,
-				   notify_unknown,
-				   notify_warning,
-				   notify_critical,
-				   notify_flapping,
-				   notify_downtime,
+				   notif_opt['r'],
+				   notif_opt['u'],
+				   notif_opt['w'],
+				   notif_opt['c'],
+				   notif_opt['f'],
+				   notif_opt['s'],
 				   notifications_enabled,
 				   is_volatile,
 				   event_handler,
@@ -774,14 +729,14 @@ void modules::add_service(ns1__serviceType const& svc) {
 				   flap_detection_enabled,
 				   low_flap_threshold,
 				   high_flap_threshold,
-				   flap_detection_on_ok,
-				   flap_detection_on_warning,
-				   flap_detection_on_unknown,
-				   flap_detection_on_critical,
-				   stalk_on_ok,
-				   stalk_on_warning,
-				   stalk_on_unknown,
-				   stalk_on_critical,
+				   flap_detection_opt['o'],
+				   flap_detection_opt['u'],
+				   flap_detection_opt['w'],
+				   flap_detection_opt['c'],
+				   stalk_opt['o'],
+				   stalk_opt['u'],
+				   stalk_opt['w'],
+				   stalk_opt['c'],
 				   process_perfdata,
 				   false,
 				   NULL,
@@ -848,15 +803,13 @@ void modules::add_service(ns1__serviceType const& svc) {
  */
 void modules::add_contact(ns1__contactType const& cntct) {
   // check all arguments and set default option for optional options.
-  QString service_options(cntct.serviceNotificationOptions.c_str());
-  service_options.toLower().trimmed();
-  if (service_options.contains(QRegExp("[^rcwufsna, ]", Qt::CaseInsensitive)))
+  QHash<char, bool> service_opt = get_options(&cntct.serviceNotificationOptions, "rcwufs", "a");
+  if (service_opt.empty())
     throw (engine_error() << "contact '" << cntct.name
-	   << "' invalid service notification options.");
+           << "' invalid service notification options.");
 
-  QString host_options(cntct.hostNotificationOptions.c_str());
-  host_options.toLower().trimmed();
-  if (host_options.contains(QRegExp("[^rdufsna, ]", Qt::CaseInsensitive)))
+  QHash<char, bool> host_opt = get_options(&cntct.hostNotificationOptions, "rdufs", "a");
+  if (host_opt.empty())
     throw (engine_error() << "contact '" << cntct.name
 	   << "' invalid host notification options.");
 
@@ -880,49 +833,6 @@ void modules::add_contact(ns1__contactType const& cntct) {
   bool retain_nonstatus_information = (cntct.retainNonstatusInformation
 				       ? *cntct.retainNonstatusInformation : true);
 
-  bool notify_service_ok = (service_options.indexOf('r') != -1);
-  bool notify_service_critical = (service_options.indexOf('c') != -1);
-  bool notify_service_warning = (service_options.indexOf('w') != -1);
-  bool notify_service_unknown = (service_options.indexOf('u') != -1);
-  bool notify_service_flapping = (service_options.indexOf('f') != -1);
-  bool notify_service_downtime = (service_options.indexOf('s') != -1);
-  if (service_options == "n") {
-    notify_service_ok = false;
-    notify_service_critical = false;
-    notify_service_warning = false;
-    notify_service_unknown = false;
-    notify_service_flapping = false;
-    notify_service_downtime = false;
-  }
-  else if (service_options == "a" || service_options == "") {
-    notify_service_ok = true;
-    notify_service_critical = true;
-    notify_service_warning = true;
-    notify_service_unknown = true;
-    notify_service_flapping = true;
-    notify_service_downtime = true;
-  }
-
-  bool notify_host_up = (host_options.indexOf('r') != -1);
-  bool notify_host_down = (host_options.indexOf('d') != -1);
-  bool notify_host_unreachable = (host_options.indexOf('u') != -1);
-  bool notify_host_flapping = (host_options.indexOf('f') != -1);
-  bool notify_host_downtime = (host_options.indexOf('s') != -1);
-  if (host_options == "n") {
-    notify_host_up = false;
-    notify_host_down = false;
-    notify_host_unreachable = false;
-    notify_host_flapping = false;
-    notify_host_downtime = false;
-  }
-  else if (host_options == "a" || host_options == "") {
-    notify_host_up = true;
-    notify_host_down = true;
-    notify_host_unreachable = true;
-    notify_host_flapping = true;
-    notify_host_downtime = true;
-  }
-
   // create a address array.
   QScopedArrayPointer<char const*> address(new char const*[MAX_CONTACT_ADDRESSES]);
   memset(&(*address), 0, sizeof(*address) * MAX_CONTACT_ADDRESSES);
@@ -937,17 +847,17 @@ void modules::add_contact(ns1__contactType const& cntct) {
 				     &(*address),
 				     cntct.serviceNotificationPeriod.c_str(),
 				     cntct.hostNotificationPeriod.c_str(),
-				     notify_service_ok,
-				     notify_service_critical,
-				     notify_service_warning,
-				     notify_service_unknown,
-				     notify_service_flapping,
-				     notify_service_downtime,
-				     notify_host_up,
-				     notify_host_down,
-				     notify_host_unreachable,
-				     notify_host_flapping,
-				     notify_host_downtime,
+                                     service_opt['r'],
+                                     service_opt['c'],
+                                     service_opt['w'],
+                                     service_opt['u'],
+                                     service_opt['f'],
+                                     service_opt['s'],
+                                     host_opt['r'],
+                                     host_opt['d'],
+                                     host_opt['u'],
+                                     host_opt['f'],
+                                     host_opt['s'],
 				     cntct.hostNotificationsEnabled,
 				     cntct.serviceNotificationsEnabled,
 				     can_submit_commands,
@@ -982,4 +892,254 @@ void modules::add_contact(ns1__contactType const& cntct) {
   // update timeperiod pointer.
   new_cntct->host_notification_period_ptr = host_notification_period;
   new_cntct->service_notification_period_ptr = service_notification_period;
+}
+
+/**
+ *  Add a new host dependency into the engine.
+ *
+ *  @param[in] hostdependency The struct with all information to create new host dependency.
+ */
+void modules::add_hostdependency(ns1__hostDependencyType const& hstdependency) {
+  // XXX: hostgroups_name is not implemented yet.
+  if (!hstdependency.hostgroupsName.empty())
+    throw (engine_error() << "hostdependency '" << hstdependency.dependentHostName
+           << ", " << hstdependency.hostName
+           << "' hostgroups name is not implemented yet.");
+
+  // XXX: dependency_hostgroups_name is not implemented yet.
+  if (!hstdependency.dependentHostgroupsName.empty())
+    throw (engine_error() << "hostdependency '" << hstdependency.dependentHostName
+           << ", " << hstdependency.hostName
+           << "' dependent host name is not implemented yet.");
+
+  // check all arguments and set default option for optional options.
+  if (!hstdependency.executionFailureCriteria && !hstdependency.notificationFailureCriteria) {
+    throw (engine_error() << "hostdependency '" << hstdependency.dependentHostName
+           << ", " << hstdependency.hostName << "' have no notification failure criteria and "
+           << "no execution failure criteria define.");
+  }
+
+  QHash<char, bool> execution_opt = get_options(hstdependency.executionFailureCriteria, "odup", "n");
+  if (execution_opt.empty())
+    throw (engine_error() << "hostdependency '" << hstdependency.dependentHostName
+	   << ", " << hstdependency.hostName << "' invalid execution failure criteria.");
+
+  QHash<char, bool> notif_opt = get_options(hstdependency.notificationFailureCriteria, "odup", "n");
+  if (notif_opt.empty())
+    throw (engine_error() << "hostdependency '" << hstdependency.dependentHostName
+	   << ", " << hstdependency.hostName << "' notification failure criteria.");
+
+  char const* dependency_period = (hstdependency.dependencyPeriod
+                                   ? hstdependency.dependencyPeriod->c_str() : NULL);
+  bool inherits_parent = (hstdependency.inheritsParent ? *hstdependency.inheritsParent : true);
+
+  if (hstdependency.executionFailureCriteria != NULL) {
+    add_host_dependency(hstdependency.dependentHostName.c_str(),
+                        hstdependency.hostName.c_str(),
+                        EXECUTION_DEPENDENCY,
+                        inherits_parent,
+                        execution_opt['o'],
+                        execution_opt['d'],
+                        execution_opt['u'],
+                        execution_opt['p'],
+                        dependency_period);
+  }
+
+  if (hstdependency.notificationFailureCriteria != NULL) {
+    add_host_dependency(hstdependency.dependentHostName.c_str(),
+                        hstdependency.hostName.c_str(),
+                        NOTIFICATION_DEPENDENCY,
+                        inherits_parent,
+                        notif_opt['o'],
+                        notif_opt['d'],
+                        notif_opt['u'],
+                        notif_opt['p'],
+                        dependency_period);
+  }
+}
+
+/**
+ *  Add a new host escalation into the engine.
+ *
+ *  @param[in] hostescalation The struct with all information to create new host escalation.
+ */
+void modules::add_hostescalation(ns1__hostEscalationType const& hstescalation) {
+  // XXX: hostgroups_name is not implemented yet.
+  if (!hstescalation.hostgroupsName.empty())
+    throw (engine_error() << "hostescalation '" << hstescalation.hostName
+           << "' hostgroups name is not implemented yet.");
+
+  // check all arguments and set default option for optional options.
+  QHash<char, bool> escalation_opt = get_options(hstescalation.escalationOptions, "dur" , "a");
+  if (escalation_opt.empty())
+    throw (engine_error() << "hostescalation '" << hstescalation.hostName
+           << "' invalid escalation options.");
+
+  char const* escalation_period = (hstescalation.escalationPeriod
+                                   ? hstescalation.escalationPeriod->c_str() : NULL);
+  hostescalation* new_hstescalation = ::add_hostescalation(hstescalation.hostName.c_str(),
+                                                         hstescalation.firstNotification,
+                                                         hstescalation.lastNotification,
+                                                         hstescalation.notificationInterval,
+                                                         escalation_period,
+                                                         escalation_opt['d'],
+                                                         escalation_opt['u'],
+                                                         escalation_opt['r']);
+  if (new_hstescalation == NULL)
+    throw (engine_error() << "hostescalation '" << hstescalation.hostName << "' invalid host name.");
+
+  if (_add_contactgroups_to_object(hstescalation.contactGroups,
+                                   &new_hstescalation->contact_groups) == false) {
+    free_hostescalation(new_hstescalation);
+    throw (engine_error() << "hostescalation '" << hstescalation.hostName
+           << "' invalid contactgroups.");
+  }
+
+  if (_add_contacts_to_object(hstescalation.contacts, &new_hstescalation->contacts) == false) {
+    free_hostescalation(new_hstescalation);
+    throw (engine_error() << "hostescalation '" << hstescalation.hostName << "' invalid contacts.");
+  }
+}
+
+/**
+ *  Add a new service dependency into the engine.
+ *
+ *  @param[in] servicedependency The struct with all
+ *  information to create new service dependency.
+ */
+void modules::add_servicedependency(ns1__serviceDependencyType const& svcdependency) {
+  // XXX: hostgroups_name is not implemented yet.
+  if (!svcdependency.hostgroupsName.empty())
+    throw (engine_error() << "hostdependency '" << svcdependency.dependentHostName
+           << ", " << svcdependency.dependentServiceDescription
+	   << ", " << svcdependency.hostName
+           << ", " << svcdependency.serviceDescription
+           << "' hostgroups name is not implemented yet.");
+
+  // XXX: dependency_hostgroups_name is not implemented yet.
+  if (!svcdependency.dependentHostgroupsName.empty())
+    throw (engine_error() << "hostdependency '" << svcdependency.dependentHostName
+           << ", " << svcdependency.dependentServiceDescription
+	   << ", " << svcdependency.hostName
+           << ", " << svcdependency.serviceDescription
+           << "' dependent host name is not implemented yet.");
+
+  // check all arguments and set default option for optional options.
+  if (!svcdependency.executionFailureCriteria
+      && !svcdependency.notificationFailureCriteria)
+    throw (engine_error() << "servicedependency '" << svcdependency.dependentHostName
+           << ", " << svcdependency.dependentServiceDescription
+	   << ", " << svcdependency.hostName
+           << ", " << svcdependency.serviceDescription
+           << "' have no notification failure criteria and "
+           << "no execution failure criteria define.");
+
+  QHash<char, bool> execution_opt = get_options(svcdependency.executionFailureCriteria, "owucp", "n");
+  if (execution_opt.empty())
+    throw (engine_error() << "servicedependency '" << svcdependency.dependentHostName
+           << ", " << svcdependency.dependentServiceDescription
+	   << ", " << svcdependency.hostName
+           << ", " << svcdependency.serviceDescription
+           << "' execution failure criteria.");
+
+  QHash<char, bool> notif_opt = get_options(svcdependency.notificationFailureCriteria, "owucp", "n");
+  if (notif_opt.empty())
+    throw (engine_error() << "servicedependency '" << svcdependency.dependentHostName
+           << ", " << svcdependency.dependentServiceDescription
+	   << ", " << svcdependency.hostName
+           << ", " << svcdependency.serviceDescription
+           << "' notification failure criteria.");
+
+  char const* dependency_period = (svcdependency.dependencyPeriod
+                                   ? svcdependency.dependencyPeriod->c_str() : NULL);
+  bool inherits_parent = (svcdependency.inheritsParent
+                          ? *svcdependency.inheritsParent : true);
+
+  if (svcdependency.executionFailureCriteria != NULL)
+    add_service_dependency(svcdependency.dependentHostName.c_str(),
+                           svcdependency.dependentServiceDescription.c_str(),
+                           svcdependency.hostName.c_str(),
+                           svcdependency.serviceDescription.c_str(),
+                           EXECUTION_DEPENDENCY,
+                           inherits_parent,
+                           execution_opt['o'],
+                           execution_opt['w'],
+                           execution_opt['u'],
+                           execution_opt['c'],
+                           execution_opt['p'],
+                           dependency_period);
+
+  if (svcdependency.notificationFailureCriteria != NULL)
+    add_service_dependency(svcdependency.dependentHostName.c_str(),
+                           svcdependency.dependentServiceDescription.c_str(),
+                           svcdependency.hostName.c_str(),
+                           svcdependency.serviceDescription.c_str(),
+                           NOTIFICATION_DEPENDENCY,
+                           inherits_parent,
+                           notif_opt['o'],
+                           notif_opt['w'],
+                           notif_opt['u'],
+                           notif_opt['c'],
+                           notif_opt['p'],
+                           dependency_period);
+}
+
+/**
+ *  Add a new service escalation into the engine.
+ *
+ *  @param[in] serviceescalation The struct with all
+ *  information to create new service escalation.
+ */
+void modules::add_serviceescalation(ns1__serviceEscalationType const& svcescalation) {
+  // XXX: servicegroups_name is not implemented yet.
+  if (!svcescalation.hostgroupsName.empty())
+    throw (engine_error() << "serviceescalation '" << svcescalation.hostName << ", "
+           << svcescalation.serviceDescription << "' hostgroups name is not implemented yet.");
+
+  // check all arguments and set default option for optional options.
+  QHash<char, bool> escalation_opt = get_options(svcescalation.escalationOptions, "wucr" , "a");
+  if (escalation_opt.empty())
+    throw (engine_error() << "serviceescalation '" << svcescalation.hostName << ", "
+           << svcescalation.serviceDescription << "' invalid escalation options.");
+
+  char const* escalation_period = (svcescalation.escalationPeriod
+                                   ? svcescalation.escalationPeriod->c_str() : NULL);
+  serviceescalation* new_svcescalation =
+    ::add_serviceescalation(svcescalation.hostName.c_str(),
+                            svcescalation.serviceDescription.c_str(),
+                            svcescalation.firstNotification,
+                            svcescalation.lastNotification,
+                            svcescalation.notificationInterval,
+                            escalation_period,
+                            escalation_opt['w'],
+                            escalation_opt['u'],
+                            escalation_opt['c'],
+                            escalation_opt['r']);
+  if (new_svcescalation == NULL)
+    throw (engine_error() << "serviceescalation '" << svcescalation.hostName << ", "
+           << svcescalation.serviceDescription << "' invalid host name.");
+
+  if (_add_contactgroups_to_object(svcescalation.contactGroups,
+                                   &new_svcescalation->contact_groups) == false) {
+    free_serviceescalation(new_svcescalation);
+    throw (engine_error() << "serviceescalation '" << svcescalation.hostName  << ", "
+           << svcescalation.serviceDescription << "' invalid contactgroups.");
+  }
+
+  if (_add_contacts_to_object(svcescalation.contacts, &new_svcescalation->contacts) == false) {
+    free_serviceescalation(new_svcescalation);
+    throw (engine_error() << "serviceescalation '" << svcescalation.hostName << ", "
+           << svcescalation.serviceDescription << "' invalid contacts.");
+  }
+}
+
+/**
+ *  Add a new timeperiod into the engine.
+ *
+ *  @param[in] tperiod The struct with all
+ *  information to create new timeperiod.
+ */
+void modules::add_timeperiod(ns1__timeperiodType const& tperiod) {
+  throw (engine_error() << "timeperiod '" << tperiod.name
+         << "' add timeperiod not implemented yet.");
 }

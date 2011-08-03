@@ -33,6 +33,11 @@ namespace       com {
 	void    add_host(ns1__hostType const& host);
 	void    add_service(ns1__serviceType const& service);
 	void    add_contact(ns1__contactType const& contact);
+	void    add_hostdependency(ns1__hostDependencyType const& hostdependency);
+	void    add_hostescalation(ns1__hostEscalationType const& hostescalation);
+	void    add_servicedependency(ns1__serviceDependencyType const& servicedependency);
+	void    add_serviceescalation(ns1__serviceEscalationType const& serviceescalation);
+        void    add_timeperiod(ns1__timeperiodType const& tperiod);
       }
     }
   }

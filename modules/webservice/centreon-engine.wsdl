@@ -78,6 +78,35 @@
         </sequence>
       </complexType>
 
+      <!-- hostDependency type -->
+      <complexType name="hostDependencyType">
+        <sequence>
+          <element name="dependentHostName" type="xsd:string"/>
+          <element name="dependentHostgroupsName" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+          <element name="hostName" type="xsd:string"/>
+          <element name="hostgroupsName" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+	  <element name="inheritsParent" type="xsd:boolean" minOccurs="0"/>
+	  <element name="executionFailureCriteria" type="xsd:string" minOccurs="0"/>
+	  <element name="notificationFailureCriteria" type="xsd:string" minOccurs="0"/>
+	  <element name="dependencyPeriod" type="xsd:string" minOccurs="0"/>
+        </sequence>
+      </complexType>
+
+      <!-- hostEscalation type -->
+      <complexType name="hostEscalationType">
+        <sequence>
+          <element name="hostName" type="xsd:string"/>
+          <element name="hostgroupsName" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+          <element name="contacts" type="xsd:string" minOccurs="1" maxOccurs="unbounded"/>
+          <element name="contactGroups" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+	  <element name="firstNotification" type="xsd:unsignedInt"/>
+	  <element name="lastNotification" type="xsd:unsignedInt"/>
+	  <element name="notificationInterval" type="xsd:unsignedInt"/>
+	  <element name="escalationPeriod" type="xsd:string" minOccurs="0"/>
+	  <element name="escalationOptions" type="xsd:string" minOccurs="0"/>
+        </sequence>
+      </complexType>
+
       <!-- hostGroup identifier. -->
       <complexType name="hostGroupIDType">
         <sequence>
@@ -149,6 +178,38 @@
           <element name="iconImage" type="xsd:string" minOccurs="0"/>
           <element name="iconImageAlt" type="xsd:string" minOccurs="0"/>
 	  <element name="customVariables" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+        </sequence>
+      </complexType>
+
+      <!-- serviceDependency type -->
+      <complexType name="serviceDependencyType">
+        <sequence>
+          <element name="dependentHostName" type="xsd:string"/>
+          <element name="dependentHostgroupsName" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+          <element name="dependentServiceDescription" type="xsd:string"/>
+          <element name="hostName" type="xsd:string"/>
+          <element name="hostgroupsName" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+          <element name="serviceDescription" type="xsd:string"/>
+	  <element name="inheritsParent" type="xsd:boolean" minOccurs="0"/>
+	  <element name="executionFailureCriteria" type="xsd:string" minOccurs="0"/>
+	  <element name="notificationFailureCriteria" type="xsd:string" minOccurs="0"/>
+	  <element name="dependencyPeriod" type="xsd:string" minOccurs="0"/>
+        </sequence>
+      </complexType>
+
+      <!-- serviceEscalation type -->
+      <complexType name="serviceEscalationType">
+        <sequence>
+          <element name="hostName" type="xsd:string"/>
+          <element name="hostgroupsName" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+          <element name="serviceDescription" type="xsd:string"/>
+          <element name="contacts" type="xsd:string" minOccurs="1" maxOccurs="unbounded"/>
+          <element name="contactGroups" type="xsd:string" minOccurs="1" maxOccurs="unbounded"/>
+	  <element name="firstNotification" type="xsd:unsignedInt"/>
+	  <element name="lastNotification" type="xsd:unsignedInt"/>
+	  <element name="notificationInterval" type="xsd:unsignedInt"/>
+	  <element name="escalationPeriod" type="xsd:string" minOccurs="0"/>
+	  <element name="escalationOptions" type="xsd:string" minOccurs="0"/>
         </sequence>
       </complexType>
 
@@ -289,6 +350,15 @@
       <complexType name="timeperiodIDType">
 	<sequence>
 	  <element name="timeperiod" type="xsd:string"/>
+	</sequence>
+      </complexType>
+
+      <!-- Timeperiod identifier. -->
+      <complexType name="timeperiodType">
+	<sequence>
+	  <element name="name" type="xsd:string"/>
+	  <element name="alias" type="xsd:string"/>
+	  <!-- XXX: other info missing -->
 	</sequence>
       </complexType>
 
@@ -435,6 +505,16 @@
     <part name="host" type="tns:hostType"/>
   </message>
 
+  <!-- Add a host dependency. -->
+  <message name="addHostDependencyRequest">
+    <part name="hostdependency" type="tns:hostDependencyType"/>
+  </message>
+
+  <!-- Add a host escalation. -->
+  <message name="addHostEscalationRequest">
+    <part name="hostescalation" type="tns:hostEscalationType"/>
+  </message>
+
   <!--
 	 Host Group Messages.
   -->
@@ -516,8 +596,18 @@
     <part name="service" type="tns:serviceType"/>
   </message>
 
+  <!-- Add a service dependency. -->
+  <message name="addServiceDependencyRequest">
+    <part name="servicedependency" type="tns:serviceDependencyType"/>
+  </message>
+
+  <!-- Add a service escalation. -->
+  <message name="addServiceEscalationRequest">
+    <part name="serviceescalation" type="tns:serviceEscalationType"/>
+  </message>
+
   <!--
-	 Service Group Messages.
+	 service Group Messages.
   -->
 
   <!-- Message sent when executing an operation on a host group. -->
@@ -684,6 +774,11 @@
     <part name="timeperiod" type="tns:timeperiodIDType"/>
   </message>
 
+  <!-- Add a timeperiod. -->
+  <message name="addTimeperiodRequest">
+    <part name="timeperiod" type="tns:timeperiodType"/>
+  </message>
+
   <!-- Not validated messages. -->
 
   <!-- Message sent when executing an operation on a contactgroup. -->
@@ -816,6 +911,41 @@
     <operation name="addContact">
       <documentation>Add contact.</documentation>
       <input message="tns:addContactRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- addHostDependency() -->
+    <operation name="addHostDependency">
+      <documentation>Add host dependency.</documentation>
+      <input message="tns:addHostDependencyRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- addHostEscalation() -->
+    <operation name="addHostEscalation">
+      <documentation>Add host escalation.</documentation>
+      <input message="tns:addHostEscalationRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- addServiceDependency() -->
+    <operation name="addServiceDependency">
+      <documentation>Add Service dependency.</documentation>
+      <input message="tns:addServiceDependencyRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- addServiceEscalation() -->
+    <operation name="addServiceEscalation">
+      <documentation>Add service escalation.</documentation>
+      <input message="tns:addServiceEscalationRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- addTimeperiod() -->
+    <operation name="addTimeperiod">
+      <documentation>Add timeperiod.</documentation>
+      <input message="tns:addTimeperiodRequest"/>
       <output message="tns:defaultResponse"/>
     </operation>
 
@@ -3807,6 +3937,36 @@
     </operation>
 
     <operation name="addContact">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="addHostDependency">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="addHostEscalation">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="addServiceDependency">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="addServiceEscalation">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="addTimeperiod">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
       <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>

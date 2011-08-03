@@ -42,11 +42,11 @@ typedef struct  skiplist_struct {
   unsigned long items;
   int           allow_duplicates;
   int           append_duplicates;
-  int           (*compare_function)(void*, void*);
+  int           (*compare_function)(void const*, void const*);
   skiplistnode* head;
 }               skiplist;
 
-skiplist* skiplist_new(int max_levels, float level_probability, int allow_duplicates, int append_duplicates, int (*compare_function)(void*, void*));
+skiplist* skiplist_new(int max_levels, float level_probability, int allow_duplicates, int append_duplicates, int (*compare_function)(void const*, void const*));
 int skiplist_insert(skiplist* list, void* data);
 skiplistnode* skiplist_new_node(skiplist* list, int node_levels);
 int skiplist_random_level(skiplist* list);
@@ -58,10 +58,10 @@ void* skiplist_get_first(skiplist* list, void** node_ptr);
 void* skiplist_get_next(void** node_ptr);
 void* skiplist_find_first(skiplist* list, void* data, void** node_ptr);
 void* skiplist_find_next(skiplist* list, void* data, void** node_ptr);
-int skiplist_delete(skiplist* list, void* data);
-int skiplist_delete_first(skiplist* list, void* data);
-int skiplist_delete_all(skiplist* list, void* data);
-int skiplist_delete_node(skiplist* list, void* node_ptr);
+int skiplist_delete(skiplist* list, void const* data);
+int skiplist_delete_first(skiplist* list, void const* data);
+int skiplist_delete_all(skiplist* list, void const* data);
+int skiplist_delete_node(skiplist* list, void const* node_ptr);
 
 # ifdef __cplusplus
 }

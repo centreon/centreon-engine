@@ -40,6 +40,9 @@ namespace                            com {
 	void                         free_host(host const* hst);
 	void                         free_service(service const* svc);
 	void                         free_contact(contact const* cntct);
+        void                         free_hostescalation(hostescalation const* hstescalation);
+        void                         free_serviceescalation(serviceescalation const* svcescalation);
+        void                         free_timeperiod(timeperiod const* tperiod);
       }
     }
   }

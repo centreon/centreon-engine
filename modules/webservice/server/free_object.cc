@@ -17,10 +17,18 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "globals.hh"
 #include "free_object.hh"
 
 using namespace com::centreon::engine;
 
+/**
+ *  Cleanup memory of contactsmember.
+ *
+ *  @param[in] member The contact member to cleanup memory.
+ *
+ *  @return The next contactsmember.
+ */
 contactsmember const* modules::free_contactsmember(contactsmember const* member) {
   if (member == NULL)
     return (NULL);
@@ -31,6 +39,13 @@ contactsmember const* modules::free_contactsmember(contactsmember const* member)
   return (next);
 }
 
+/**
+ *  Cleanup memory of contactgroupsmember.
+ *
+ *  @param[in] member The contact groups member to cleanup memory.
+ *
+ *  @return The next contactgroupsmember.
+ */
 contactgroupsmember const* modules::free_contactgroupsmember(contactgroupsmember const* member) {
   if (member == NULL)
     return (NULL);
@@ -41,6 +56,13 @@ contactgroupsmember const* modules::free_contactgroupsmember(contactgroupsmember
   return (next);
 }
 
+/**
+ *  Cleanup memory of hostsmember.
+ *
+ *  @param[in] member The host member to cleanup memory.
+ *
+ *  @return The next hostsmember.
+ */
 hostsmember const* modules::free_hostsmember(hostsmember const* member) {
   if (member == NULL)
     return (NULL);
@@ -51,6 +73,13 @@ hostsmember const* modules::free_hostsmember(hostsmember const* member) {
   return (next);
 }
 
+/**
+ *  Cleanup memory of servicesmember.
+ *
+ *  @param[in] member The service member to cleanup memory.
+ *
+ *  @return The next servicesmember.
+ */
 servicesmember const* modules::free_servicesmember(servicesmember const* member) {
   if (member == NULL)
     return (NULL);
@@ -62,6 +91,13 @@ servicesmember const* modules::free_servicesmember(servicesmember const* member)
   return (next);
 }
 
+/**
+ *  Cleanup memory of commandsmember.
+ *
+ *  @param[in] member The command member to cleanup memory.
+ *
+ *  @return The next commandsmember.
+ */
 commandsmember const* modules::free_commandsmember(commandsmember const* member) {
   if (member == NULL)
     return (NULL);
@@ -72,6 +108,13 @@ commandsmember const* modules::free_commandsmember(commandsmember const* member)
   return (next);
 }
 
+/**
+ *  Cleanup memory of customvariablesmember.
+ *
+ *  @param[in] member The customvariable member to cleanup memory.
+ *
+ *  @return The next customvariablesmember.
+ */
 customvariablesmember const* modules::free_customvariablesmember(customvariablesmember const* member) {
   if (member == NULL)
     return (NULL);
@@ -83,6 +126,11 @@ customvariablesmember const* modules::free_customvariablesmember(customvariables
   return (next);
 }
 
+/**
+ *  Cleanup memory of objectlist.
+ *
+ *  @param[in] objlist The object to cleanup memory.
+ */
 void modules::free_objectlist(objectlist const* objlist) {
   if (objlist == NULL)
     return;
@@ -94,6 +142,11 @@ void modules::free_objectlist(objectlist const* objlist) {
   }
 }
 
+/**
+ *  Cleanup memory of contactgroup.
+ *
+ *  @param[in] group The contactgroup to cleanup memory.
+ */
 void modules::free_contactgroup(contactgroup const* group) {
   if (group == NULL)
     return;
@@ -101,11 +154,18 @@ void modules::free_contactgroup(contactgroup const* group) {
   contactsmember const* member = group->members;
   while ((member = free_contactsmember(member)));
 
+  skiplist_delete(object_skiplists[CONTACTGROUP_SKIPLIST], group);
+
   delete[] group->group_name;
   delete[] group->alias;
   delete group;
 }
 
+/**
+ *  Cleanup memory of hostgroup.
+ *
+ *  @param[in] group The hostgroup to cleanup memory.
+ */
 void modules::free_hostgroup(hostgroup const* group) {
   if (group == NULL)
     return;
@@ -113,6 +173,8 @@ void modules::free_hostgroup(hostgroup const* group) {
   hostsmember const* member = group->members;
   while ((member = free_hostsmember(member)));
 
+  skiplist_delete(object_skiplists[HOSTGROUP_SKIPLIST], group);
+
   delete[] group->group_name;
   delete[] group->alias;
   delete[] group->notes;
@@ -121,6 +183,11 @@ void modules::free_hostgroup(hostgroup const* group) {
   delete group;
 }
 
+/**
+ *  Cleanup memory of servicegroup.
+ *
+ *  @param[in] group The servicegroup to cleanup memory.
+ */
 void modules::free_servicegroup(servicegroup const* group) {
   if (group == NULL)
     return;
@@ -128,6 +195,8 @@ void modules::free_servicegroup(servicegroup const* group) {
   servicesmember const* member = group->members;
   while ((member = free_servicesmember(member)));
 
+  skiplist_delete(object_skiplists[SERVICEGROUP_SKIPLIST], group);
+
   delete[] group->group_name;
   delete[] group->alias;
   delete[] group->notes;
@@ -136,6 +205,11 @@ void modules::free_servicegroup(servicegroup const* group) {
   delete group;
 }
 
+/**
+ *  Cleanup memory of host.
+ *
+ *  @param[in] hst The host to cleanup memory.
+ */
 void modules::free_host(host const* hst) {
   if (hst == NULL)
     return;
@@ -159,6 +233,7 @@ void modules::free_host(host const* hst) {
   while ((varmember = free_customvariablesmember(varmember)));
 
   free_objectlist(hst->hostgroups_ptr);
+  skiplist_delete(object_skiplists[HOST_SKIPLIST], hst);
 
   delete[] hst->name;
   delete[] hst->display_name;
@@ -188,6 +263,11 @@ void modules::free_host(host const* hst) {
   delete hst;
 }
 
+/**
+ *  Cleanup memory of service.
+ *
+ *  @param[in] svc The service to cleanup memory.
+ */
 void modules::free_service(service const* svc) {
   if (svc == NULL)
     return;
@@ -202,6 +282,7 @@ void modules::free_service(service const* svc) {
   while ((varmember = free_customvariablesmember(varmember)));
 
   free_objectlist(svc->servicegroups_ptr);
+  skiplist_delete(object_skiplists[SERVICE_SKIPLIST], svc);
 
   delete[] svc->host_name;
   delete[] svc->description;
@@ -231,6 +312,11 @@ void modules::free_service(service const* svc) {
   delete svc;
 }
 
+/**
+ *  Cleanup memory of contact.
+ *
+ *  @param[in] cntct The contact to cleanup memory.
+ */
 void modules::free_contact(contact const* cntct) {
   if (cntct == NULL)
     return;
@@ -245,6 +331,7 @@ void modules::free_contact(contact const* cntct) {
   while ((varmember = free_customvariablesmember(varmember)));
 
   free_objectlist(cntct->contactgroups_ptr);
+  skiplist_delete(object_skiplists[CONTACT_SKIPLIST], cntct);
 
   // host_notification_period_ptr: not free;
   // service_notification_period_ptr: not free;
@@ -258,4 +345,64 @@ void modules::free_contact(contact const* cntct) {
   delete[] cntct->host_notification_period;
   delete[] cntct->service_notification_period;
   delete cntct;
+}
+
+/**
+ *  Cleanup memory of hostescalation.
+ *
+ *  @param[in] hstescalation The hostescalation to cleanup memory.
+ */
+void modules::free_hostescalation(hostescalation const* hstescalation) {
+  if (hstescalation == NULL)
+    return;
+
+  contactgroupsmember const* cgmember = hstescalation->contact_groups;
+  while ((cgmember = free_contactgroupsmember(cgmember)));
+
+  contactsmember const* cntctmember = hstescalation->contacts;
+  while ((cntctmember = free_contactsmember(cntctmember)));
+
+  skiplist_delete(object_skiplists[HOSTESCALATION_SKIPLIST], hstescalation);
+
+  // host_ptr: not free;
+  // escalation_period_ptr: not free;
+
+  delete[] hstescalation->host_name;
+  delete[] hstescalation->escalation_period;
+  delete hstescalation;
+}
+
+/**
+ *  Cleanup memory of serviceescalation.
+ *
+ *  @param[in] svcescalation The serviceescalation to cleanup memory.
+ */
+void modules::free_serviceescalation(serviceescalation const* svcescalation) {
+  if (svcescalation == NULL)
+    return;
+
+  contactgroupsmember const* cgmember = svcescalation->contact_groups;
+  while ((cgmember = free_contactgroupsmember(cgmember)));
+
+  contactsmember const* cntctmember = svcescalation->contacts;
+  while ((cntctmember = free_contactsmember(cntctmember)));
+
+  skiplist_delete(object_skiplists[SERVICEESCALATION_SKIPLIST], svcescalation);
+
+  // service_ptr: not free;
+  // escalation_period_ptr: not free;
+
+  delete[] svcescalation->host_name;
+  delete[] svcescalation->description;
+  delete[] svcescalation->escalation_period;
+  delete svcescalation;
+}
+
+/**
+ *  Cleanup memory of serviceescalation.
+ *
+ *  @param[in] svcescalation The serviceescalation to cleanup memory.
+ */
+void modules::free_timeperiod(timeperiod const* tperiod) {
+
 }
