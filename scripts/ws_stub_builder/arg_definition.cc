@@ -287,6 +287,50 @@ arg_definition::arg_definition() {
     .set_help("statusmap_image")
     .set_is_optional(true);
 
+  argument hostdependency_type("ns1__hostDependencyType", "hostdependency");
+  hostdependency_type.add(arg_string).set_name("dependentHostName")
+    .set_help("dependent_host_name");
+  hostdependency_type.add(arg_string).set_name("hostName")
+    .set_help("host_name");
+  hostdependency_type.add(arg_vectorstr).set_name("dependentHostgroupsName")
+    .set_help("dependent_hostgroups_name");
+  hostdependency_type.add(arg_vectorstr).set_name("hostgroupsName")
+    .set_help("hostgroups_name");
+  hostdependency_type.add(arg_bool).set_name("inheritsParent")
+    .set_help("inherits_parent")
+    .set_is_optional(true);
+  hostdependency_type.add(arg_string).set_name("executionFailureCriteria")
+    .set_help("execution_failure_criteria")
+    .set_is_optional(true);
+  hostdependency_type.add(arg_string).set_name("notificationFailureCriteria")
+    .set_help("notification_failure_criteria")
+    .set_is_optional(true);
+  hostdependency_type.add(arg_string).set_name("dependencyPeriod")
+    .set_help("dependency_period")
+    .set_is_optional(true);
+
+  argument hostescalation_type("ns1__hostEscalationType", "hostescalation");
+  hostescalation_type.add(arg_string).set_name("hostName")
+    .set_help("host_name");
+  hostescalation_type.add(arg_vectorstr).set_name("contacts")
+    .set_help("contacts");
+  hostescalation_type.add(arg_uint).set_name("firstNotification")
+    .set_help("first_notification");
+  hostescalation_type.add(arg_uint).set_name("lastNotification")
+    .set_help("last_notification");
+  hostescalation_type.add(arg_uint).set_name("notificationInterval")
+    .set_help("notification_interval");
+  hostescalation_type.add(arg_vectorstr).set_name("hostgroupsName")
+    .set_help("hostgroups_name");
+  hostescalation_type.add(arg_vectorstr).set_name("contactGroups")
+    .set_help("contact_groups");
+  hostescalation_type.add(arg_string).set_name("escalationPeriod")
+    .set_help("escalation_period")
+    .set_is_optional(true);
+  hostescalation_type.add(arg_string).set_name("escalationOptions")
+    .set_help("escalation_options")
+    .set_is_optional(true);
+
   argument hostgroup_id("ns1__hostGroupIDType", "hostGroup");
   hostgroup_id.add(arg_string).set_name("name")
     .set_help("hostgroup_id");
@@ -441,11 +485,40 @@ arg_definition::arg_definition() {
   timeperiod_id.add(arg_string).set_name("timeperiod")
     .set_help("timeperiod_id");
 
+  argument timeperiod_type("ns1__timeperiodType", "tperiod");
+  timeperiod_type.add(arg_string).set_name("name");
+  timeperiod_type.add(arg_string).set_name("alias");
+  // XXX: update when wsdl update.
+
   argument serviceescalation_id("ns1__serviceEscalationIDType", "escalation");
   serviceescalation_id.add(arg_string).set_name("name")
     .set_help("host_name");
   serviceescalation_id.add(arg_string).set_name("description")
     .set_help("service_description");
+
+  argument serviceescalation_type("ns1__serviceEscalationType", "svcescalation");
+  serviceescalation_type.add(arg_string).set_name("hostName")
+    .set_help("host_name");
+  serviceescalation_type.add(arg_string).set_name("serviceDescription")
+    .set_help("service_description");
+  serviceescalation_type.add(arg_vectorstr).set_name("contacts")
+    .set_help("contacts");
+  serviceescalation_type.add(arg_vectorstr).set_name("contactGroups")
+    .set_help("contact_groups");
+  serviceescalation_type.add(arg_uint).set_name("firstNotification")
+    .set_help("first_notification");
+  serviceescalation_type.add(arg_uint).set_name("lastNotification")
+    .set_help("last_notification");
+  serviceescalation_type.add(arg_uint).set_name("notificationInterval")
+    .set_help("notification_interval");
+  serviceescalation_type.add(arg_vectorstr).set_name("hostgroupsName")
+    .set_help("hostgroups_name");
+  serviceescalation_type.add(arg_string).set_name("escalationPeriod")
+    .set_help("escalation_period")
+    .set_is_optional(true);
+  serviceescalation_type.add(arg_string).set_name("escalationOptions")
+    .set_help("escalation_options")
+    .set_is_optional(true);
 
   argument servicedependency_id("ns1__serviceDependencyIDType", "dependency");
   servicedependency_id.add(arg_string).set_name("hostName")
@@ -456,6 +529,33 @@ arg_definition::arg_definition() {
     .set_help("dependent_host_name");
   servicedependency_id.add(arg_string).set_name("dependentServiceDescription")
     .set_help("dependent_service_description");
+
+  argument servicedependency_type("ns1__serviceDependencyType", "svcdependency");
+  servicedependency_type.add(arg_string).set_name("dependentHostName")
+    .set_help("dependent_host_name");
+  servicedependency_type.add(arg_string).set_name("dependentServiceDescription")
+    .set_help("dependent_service_description");
+  servicedependency_type.add(arg_string).set_name("hostName")
+    .set_help("host_name");
+  servicedependency_type.add(arg_vectorstr).set_name("dependentHostgroupsName")
+    .set_help("dependent_hostgroups_name");
+  servicedependency_type.add(arg_vectorstr).set_name("hostgroupsName")
+    .set_help("hostgroups_name");
+  servicedependency_type.add(arg_string).set_name("serviceDescription")
+    .set_help("service_description");
+  servicedependency_type.add(arg_bool).set_name("inheritsParent")
+    .set_help("inherits_parent")
+    .set_is_optional(true);
+  servicedependency_type.add(arg_string).set_name("executionFailureCriteria")
+    .set_help("execution_failure_criteria")
+    .set_is_optional(true);
+  servicedependency_type.add(arg_string).set_name("notificationFailureCriteria")
+    .set_help("notification_failure_criteria")
+    .set_is_optional(true);
+  servicedependency_type.add(arg_string).set_name("dependencyPeriod")
+    .set_help("dependency_period")
+    .set_is_optional(true);
+
 
   _list.push_back(arg_bool);
   _list.push_back(arg_double);
@@ -477,14 +577,19 @@ arg_definition::arg_definition() {
   _list.push_back(host_type);
   _list.push_back(hostgroup_id);
   _list.push_back(hostgroup_type);
+  _list.push_back(hostdependency_type);
+  _list.push_back(hostescalation_type);
   _list.push_back(notification);
   _list.push_back(service_id);
   _list.push_back(service_type);
   _list.push_back(servicegroup_id);
   _list.push_back(servicegroup_type);
   _list.push_back(timeperiod_id);
+  _list.push_back(timeperiod_type);
   _list.push_back(serviceescalation_id);
+  _list.push_back(serviceescalation_type);
   _list.push_back(servicedependency_id);
+  _list.push_back(servicedependency_type);
 
   // argument param_1("centreonengine__addCommandResponse", "_param_1");
   // param_.add().set_name("");
@@ -1161,6 +1266,26 @@ arg_definition::arg_definition() {
   // argument param_168("centreonengine__notificationServiceSendResponse", "_param_168");
   // param_168.add().set_name("");
   // _list.push_back(param_168);
+
+  // argument param_169("centreonengine__addHostDependencyResponse", "_param_169");
+  // param_169.add().set_name("");
+  // _list.push_back(param_169);
+
+  // argument param_170("centreonengine__addHostEscalationResponse", "_param_170");
+  // param_170.add().set_name("");
+  // _list.push_back(param_170);
+
+  // argument param_171("centreonengine__addServiceDependencyResponse", "_param_171");
+  // param_171.add().set_name("");
+  // _list.push_back(param_171);
+
+  // argument param_172("centreonengine__addServiceEscalationResponse", "_param_172");
+  // param_172.add().set_name("");
+  // _list.push_back(param_172);
+
+  // argument param_173("centreonengine__addTimeperiodResponse", "_param_173");
+  // param_173.add().set_name("");
+  // _list.push_back(param_173);
 }
 
 /**
