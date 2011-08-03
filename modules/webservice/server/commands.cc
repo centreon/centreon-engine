@@ -878,6 +878,7 @@ int centreonengine__hostGetCheckPeriod(soap* s,
     }
 
     if (host->check_period != NULL) {
+      res.val = soap_new_ns1__timeperiodIDType(s, 1);
       res.val->timeperiod = host->check_period;
     }
 
@@ -3678,6 +3679,7 @@ int centreonengine__hostGetNotificationsPeriod(soap* s,
     }
 
     if (host->notification_period != NULL) {
+      res.val = soap_new_ns1__timeperiodIDType(s, 1);
       res.val->timeperiod = host->notification_period;
     }
     syncro::instance().worker_finish();
@@ -6444,6 +6446,7 @@ int centreonengine__serviceGetCheckPeriod(soap* s,
     }
 
     if (service->check_period != NULL) {
+      res.val = soap_new_ns1__timeperiodIDType(s, 1);
       res.val->timeperiod = service->check_period;
     }
     syncro::instance().worker_finish();
@@ -9326,6 +9329,7 @@ int centreonengine__serviceGetNotificationsPeriod(soap* s,
     }
 
     if (service->notification_period != NULL) {
+      res.val = soap_new_ns1__timeperiodIDType(s, 1);
       res.val->timeperiod = service->notification_period;
     }
     syncro::instance().worker_finish();
@@ -12571,6 +12575,7 @@ int centreonengine__downtimeAddToHost(soap* s,
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
     }
+    res.downtimeid = soap_new_ns1__downtimeIDType(s, 1);
     res.downtimeid->downtime = downtime_id;
 
     delete[] author;
@@ -12662,6 +12667,7 @@ int centreonengine__downtimeAddAndPropagateToHost(soap* s,
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
     }
+    res.downtimeid = soap_new_ns1__downtimeIDType(s, 1);
     res.downtimeid->downtime = downtime_id;
 
     schedule_and_propagate_downtime(host,
@@ -12763,6 +12769,7 @@ int centreonengine__downtimeAddAndPropagateTriggeredToHost(soap* s,
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
     }
+    res.downtimeid = soap_new_ns1__downtimeIDType(s, 1);
     res.downtimeid->downtime = downtime_id;
 
     schedule_and_propagate_downtime(host,
@@ -12961,6 +12968,7 @@ int centreonengine__downtimeAddToService(soap* s,
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
     }
+    res.downtimeid = soap_new_ns1__downtimeIDType(s, 1);
     res.downtimeid->downtime = downtime_id;
 
     delete[] author;
@@ -14444,6 +14452,7 @@ int centreonengine__getHostsEventHandler(soap* s,
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2, "Webservice: %s()\n", __func__);
+    res.command = soap_new_ns1__commandIDType(s, 1);
     res.command->command = global_host_event_handler;
     syncro::instance().worker_finish();
   }
@@ -14641,6 +14650,7 @@ int centreonengine__getServicesEventHandler(soap* s,
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2, "Webservice: %s()\n", __func__);
+    res.command = soap_new_ns1__commandIDType(s, 1);
     res.command->command = global_service_event_handler;
     syncro::instance().worker_finish();
   }
@@ -15851,6 +15861,7 @@ int centreonengine__contactGetNotificationsOnHostCommand(soap* s,
     }
 
     if (contact->host_notification_commands->cmd != NULL) {
+      res.command = soap_new_ns1__commandIDType(s, 1);
       res.command->command = contact->host_notification_commands->cmd;
     }
     syncro::instance().worker_finish();
@@ -16182,6 +16193,7 @@ int centreonengine__contactGetNotificationsOnHostTimeperiod(soap* s,
     }
 
     if (contact->host_notification_period_ptr->name != NULL) {
+      res.val = soap_new_ns1__timeperiodIDType(s, 1);
       res.val->timeperiod = contact->host_notification_period_ptr->name;
     }
     syncro::instance().worker_finish();
@@ -16278,6 +16290,7 @@ int centreonengine__contactGetNotificationsOnServiceCommand(soap* s,
     }
 
     if (contact->service_notification_commands->cmd != NULL) {
+      res.command = soap_new_ns1__commandIDType(s, 1);
       res.command->command = contact->service_notification_commands->cmd;
     }
     syncro::instance().worker_finish();
@@ -16609,6 +16622,7 @@ int centreonengine__contactGetNotificationsOnServiceTimeperiod(soap* s,
     }
 
     if (contact->service_notification_period_ptr->name != NULL) {
+      res.val = soap_new_ns1__timeperiodIDType(s, 1);
       res.val->timeperiod = contact->service_notification_period_ptr->name;
     }
     syncro::instance().worker_finish();
