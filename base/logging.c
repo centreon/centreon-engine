@@ -409,7 +409,7 @@ int rotate_log_file(time_t rotation_time){
 	int rename_result=0;
 	int stat_result=-1;
 	struct stat log_file_stat;
-	int ret;
+	int ret = 0;
 
 	if(log_rotation_method==LOG_ROTATION_NONE){
 		return OK;

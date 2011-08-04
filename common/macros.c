@@ -1509,7 +1509,7 @@ int grab_standard_host_macro(nagios_macros *mac, int macro_type, host *temp_host
 	int total_host_services_warning=0;
 	int total_host_services_unknown=0;
 	int total_host_services_critical=0;
-	int ret;
+	int ret = 0;
 
 	if(temp_host==NULL || output==NULL || free_macro==NULL)
 		return ERROR;
@@ -1889,7 +1889,7 @@ int grab_standard_service_macro(nagios_macros *mac, int macro_type, service *tem
 	int seconds=0;
 	char *buf1=NULL;
 	char *buf2=NULL;
-	int ret;
+	int ret = 0;
 
 	if(temp_service==NULL || output==NULL)
 		return ERROR;
