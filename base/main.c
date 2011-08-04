@@ -479,24 +479,24 @@ int main(int argc, char **argv){
 			  return (ERROR);
 			}
 			close(fd);
-			if (mac->x[MACRO_STATUSDATAFILE] == NULL
-			    || (fd = open(mac->x[MACRO_STATUSDATAFILE], O_RDWR)) == -1) {
-				printf("Error: status_file %s.\n",
-				       mac->x[MACRO_STATUSDATAFILE] == NULL
-				       ? " undefine"
-				       : strerror(errno));
-				return (ERROR);
-				}
-			close(fd);
-			if (mac->x[MACRO_RETENTIONDATAFILE] == NULL
-			    || (fd = open(mac->x[MACRO_RETENTIONDATAFILE], O_RDWR)) == -1) {
-				printf("Error: state_retention_file %s.\n",
-				       mac->x[MACRO_RETENTIONDATAFILE] == NULL
-				       ? " undefine"
-				       : strerror(errno));
-				return (ERROR);
-				}
-			close(fd);
+			/* if (mac->x[MACRO_STATUSDATAFILE] == NULL */
+			/*     || (fd = open(mac->x[MACRO_STATUSDATAFILE], O_RDWR)) == -1) { */
+			/* 	printf("Error: status_file %s.\n", */
+			/* 	       mac->x[MACRO_STATUSDATAFILE] == NULL */
+			/* 	       ? " undefine" */
+			/* 	       : strerror(errno)); */
+			/* 	return (ERROR); */
+			/* 	} */
+			/* close(fd); */
+			/* if (mac->x[MACRO_RETENTIONDATAFILE] == NULL */
+			/*     || (fd = open(mac->x[MACRO_RETENTIONDATAFILE], O_RDWR)) == -1) { */
+			/* 	printf("Error: state_retention_file %s.\n", */
+			/* 	       mac->x[MACRO_RETENTIONDATAFILE] == NULL */
+			/* 	       ? " undefine" */
+			/* 	       : strerror(errno)); */
+			/* 	return (ERROR); */
+			/* 	} */
+			/* close(fd); */
 			DIR* dir;
 			if (temp_path == NULL || (dir = opendir(temp_path)) == NULL) {
 			  printf("Error: temp_path %s.\n",
