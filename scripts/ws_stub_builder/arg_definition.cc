@@ -116,7 +116,6 @@ arg_definition::arg_definition() {
 
   argument contact_type("ns1__contactType", "contact");
   contact_type.add(arg_string).set_name("name");
-  contact_type.add(arg_vectorstr).set_name("contactgroups");
   contact_type.add(arg_bool).set_name("hostNotificationsEnabled")
     .set_help("host_notifications_enabled");
   contact_type.add(arg_bool).set_name("serviceNotificationsEnabled")
@@ -130,12 +129,20 @@ arg_definition::arg_definition() {
   contact_type.add(arg_string).set_name("serviceNotificationOptions")
     .set_help("service_notification_options");
   contact_type.add(arg_vectorstr).set_name("hostNotificationCommands")
-    .set_help("host_notification_commands");
+    .set_help("host_notification_commands")
+    .set_is_array(true);
   contact_type.add(arg_vectorstr).set_name("serviceNotificationCommands")
-    .set_help("service_notification_commands");
-  contact_type.add(arg_vectorstr).set_name("address");
+    .set_help("service_notification_commands")
+    .set_is_array(true);
+  contact_type.add(arg_vectorstr).set_name("address")
+    .set_is_array(true);
   contact_type.add(arg_vectorstr).set_name("customVariables")
-    .set_help("custom_variables");
+    .set_help("custom_variables")
+    .set_is_optional(true)
+    .set_is_array(true);
+  contact_type.add(arg_vectorstr).set_name("contactgroups")
+    .set_is_optional(true)
+    .set_is_array(true);
   contact_type.add(arg_string).set_name("alias")
     .set_is_optional(true);
   contact_type.add(arg_string).set_name("email")
@@ -159,8 +166,12 @@ arg_definition::arg_definition() {
   argument contactgroup_type("ns1__contactGroupType", "contactGroup");
   contactgroup_type.add(arg_string).set_name("name");
   contactgroup_type.add(arg_string).set_name("alias");
-  contactgroup_type.add(arg_vectorstr).set_name("contacts");
-  contactgroup_type.add(arg_vectorstr).set_name("contactgroups");
+  contactgroup_type.add(arg_vectorstr).set_name("contacts")
+    .set_is_optional(true)
+    .set_is_array(true);
+  contactgroup_type.add(arg_vectorstr).set_name("contactgroups")
+    .set_is_optional(true)
+    .set_is_array(true);
 
   argument downtime_id("ns1__downtimeIDType", "downtime");
   downtime_id.add(arg_ulong64).set_name("downtime");
@@ -182,21 +193,29 @@ arg_definition::arg_definition() {
   host_type.add(arg_string).set_name("name");
   host_type.add(arg_string).set_name("alias");
   host_type.add(arg_string).set_name("address");
-  host_type.add(arg_vectorstr).set_name("parents");
-  host_type.add(arg_vectorstr).set_name("hostgroups");
   host_type.add(arg_uint).set_name("maxCheckAttempts")
     .set_help("max_check_attempts");
   host_type.add(arg_string).set_name("checkPeriod")
     .set_help("check_period");
-  host_type.add(arg_vectorstr).set_name("contacts");
+  host_type.add(arg_vectorstr).set_name("contacts")
+    .set_is_array(true);
   host_type.add(arg_vectorstr).set_name("contactGroups")
-    .set_help("contact_groups");
+    .set_help("contact_groups")
+    .set_is_array(true);
   host_type.add(arg_uint).set_name("notificationInterval")
     .set_help("notification_interval");
   host_type.add(arg_string).set_name("notificationPeriod")
     .set_help("notification_period");
   host_type.add(arg_vectorstr).set_name("customVariables")
-    .set_help("custom_variables");
+    .set_help("custom_variables")
+    .set_is_optional(true)
+    .set_is_array(true);
+  host_type.add(arg_vectorstr).set_name("parents")
+    .set_is_optional(true)
+    .set_is_array(true);
+  host_type.add(arg_vectorstr).set_name("hostgroups")
+    .set_is_optional(true)
+    .set_is_array(true);
   host_type.add(arg_string).set_name("displayName")
     .set_help("display_name")
     .set_is_optional(true);
@@ -293,9 +312,13 @@ arg_definition::arg_definition() {
   hostdependency_type.add(arg_string).set_name("hostName")
     .set_help("host_name");
   hostdependency_type.add(arg_vectorstr).set_name("dependentHostgroupsName")
-    .set_help("dependent_hostgroups_name");
+    .set_help("dependent_hostgroups_name")
+    .set_is_optional(true)
+    .set_is_array(true);
   hostdependency_type.add(arg_vectorstr).set_name("hostgroupsName")
-    .set_help("hostgroups_name");
+    .set_help("hostgroups_name")
+    .set_is_optional(true)
+    .set_is_array(true);
   hostdependency_type.add(arg_bool).set_name("inheritsParent")
     .set_help("inherits_parent")
     .set_is_optional(true);
@@ -313,17 +336,21 @@ arg_definition::arg_definition() {
   hostescalation_type.add(arg_string).set_name("hostName")
     .set_help("host_name");
   hostescalation_type.add(arg_vectorstr).set_name("contacts")
-    .set_help("contacts");
+    .set_help("contacts")
+    .set_is_array(true);
   hostescalation_type.add(arg_uint).set_name("firstNotification")
     .set_help("first_notification");
   hostescalation_type.add(arg_uint).set_name("lastNotification")
     .set_help("last_notification");
   hostescalation_type.add(arg_uint).set_name("notificationInterval")
     .set_help("notification_interval");
-  hostescalation_type.add(arg_vectorstr).set_name("hostgroupsName")
-    .set_help("hostgroups_name");
   hostescalation_type.add(arg_vectorstr).set_name("contactGroups")
-    .set_help("contact_groups");
+    .set_help("contact_groups")
+    .set_is_array(true);
+  hostescalation_type.add(arg_vectorstr).set_name("hostgroupsName")
+    .set_help("hostgroups_name")
+    .set_is_optional(true)
+    .set_is_array(true);
   hostescalation_type.add(arg_string).set_name("escalationPeriod")
     .set_help("escalation_period")
     .set_is_optional(true);
@@ -338,8 +365,12 @@ arg_definition::arg_definition() {
   argument hostgroup_type("ns1__hostGroupType", "hostGroup");
   hostgroup_type.add(arg_string).set_name("name");
   hostgroup_type.add(arg_string).set_name("alias");
-  hostgroup_type.add(arg_vectorstr).set_name("hosts");
-  hostgroup_type.add(arg_vectorstr).set_name("hostgroups");
+  hostgroup_type.add(arg_vectorstr).set_name("hosts")
+    .set_is_optional(true)
+    .set_is_array(true);
+  hostgroup_type.add(arg_vectorstr).set_name("hostgroups")
+    .set_is_optional(true)
+    .set_is_array(true);
   hostgroup_type.add(arg_string).set_name("notes")
     .set_is_optional(true);
   hostgroup_type.add(arg_string).set_name("notesUrl")
@@ -366,7 +397,6 @@ arg_definition::arg_definition() {
     .set_help("host_name");
   service_type.add(arg_string).set_name("serviceDescription")
     .set_help("service_description");
-  service_type.add(arg_vectorstr).set_name("servicegroups");
   service_type.add(arg_string).set_name("checkCommand")
     .set_help("check_command");
   service_type.add(arg_uint).set_name("maxCheckAttempts")
@@ -381,14 +411,22 @@ arg_definition::arg_definition() {
     .set_help("notification_interval");
   service_type.add(arg_string).set_name("notificationPeriod")
     .set_help("notification_period");
-  service_type.add(arg_vectorstr).set_name("contacts");
+  service_type.add(arg_vectorstr).set_name("contacts")
+    .set_is_array(true);
   service_type.add(arg_vectorstr).set_name("contactGroups")
-    .set_help("contact_groups");
+    .set_help("contact_groups")
+    .set_is_array(true);
   service_type.add(arg_vectorstr).set_name("customVariables")
-    .set_help("custom_variables");
-  service_type.add(arg_string).set_name("hostgroupName")
+    .set_help("custom_variables")
+    .set_is_optional(true)
+    .set_is_array(true);
+  service_type.add(arg_vectorstr).set_name("servicegroups")
+    .set_is_optional(true)
+    .set_is_array(true);
+  service_type.add(arg_vectorstr).set_name("hostgroupName")
     .set_help("hostgroup_name")
-    .set_is_optional(true);
+    .set_is_optional(true)
+    .set_is_array(true);
   service_type.add(arg_string).set_name("displayName")
     .set_help("display_name")
     .set_is_optional(true);
@@ -470,8 +508,12 @@ arg_definition::arg_definition() {
   argument servicegroup_type("ns1__serviceGroupType", "serviceGroup");
   servicegroup_type.add(arg_string).set_name("name");
   servicegroup_type.add(arg_string).set_name("alias");
-  servicegroup_type.add(arg_vectorstr).set_name("services");
-  servicegroup_type.add(arg_vectorstr).set_name("servicegroups");
+  servicegroup_type.add(arg_vectorstr).set_name("services")
+    .set_is_optional(true)
+    .set_is_array(true);
+  servicegroup_type.add(arg_vectorstr).set_name("servicegroups")
+    .set_is_optional(true)
+    .set_is_array(true);
   servicegroup_type.add(arg_string).set_name("notes")
     .set_is_optional(true);
   servicegroup_type.add(arg_string).set_name("notesUrl")
@@ -502,9 +544,11 @@ arg_definition::arg_definition() {
   serviceescalation_type.add(arg_string).set_name("serviceDescription")
     .set_help("service_description");
   serviceescalation_type.add(arg_vectorstr).set_name("contacts")
-    .set_help("contacts");
+    .set_help("contacts")
+    .set_is_array(true);
   serviceescalation_type.add(arg_vectorstr).set_name("contactGroups")
-    .set_help("contact_groups");
+    .set_help("contact_groups")
+    .set_is_array(true);
   serviceescalation_type.add(arg_uint).set_name("firstNotification")
     .set_help("first_notification");
   serviceescalation_type.add(arg_uint).set_name("lastNotification")
@@ -512,7 +556,9 @@ arg_definition::arg_definition() {
   serviceescalation_type.add(arg_uint).set_name("notificationInterval")
     .set_help("notification_interval");
   serviceescalation_type.add(arg_vectorstr).set_name("hostgroupsName")
-    .set_help("hostgroups_name");
+    .set_help("hostgroups_name")
+    .set_is_optional(true)
+    .set_is_array(true);
   serviceescalation_type.add(arg_string).set_name("escalationPeriod")
     .set_help("escalation_period")
     .set_is_optional(true);
@@ -537,12 +583,16 @@ arg_definition::arg_definition() {
     .set_help("dependent_service_description");
   servicedependency_type.add(arg_string).set_name("hostName")
     .set_help("host_name");
-  servicedependency_type.add(arg_vectorstr).set_name("dependentHostgroupsName")
-    .set_help("dependent_hostgroups_name");
-  servicedependency_type.add(arg_vectorstr).set_name("hostgroupsName")
-    .set_help("hostgroups_name");
   servicedependency_type.add(arg_string).set_name("serviceDescription")
     .set_help("service_description");
+  servicedependency_type.add(arg_vectorstr).set_name("dependentHostgroupsName")
+    .set_help("dependent_hostgroups_name")
+    .set_is_optional(true)
+    .set_is_array(true);
+  servicedependency_type.add(arg_vectorstr).set_name("hostgroupsName")
+    .set_help("hostgroups_name")
+    .set_is_optional(true)
+    .set_is_array(true);
   servicedependency_type.add(arg_bool).set_name("inheritsParent")
     .set_help("inherits_parent")
     .set_is_optional(true);

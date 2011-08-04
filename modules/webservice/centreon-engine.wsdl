@@ -139,7 +139,7 @@
       <complexType name="serviceType">
         <sequence>
           <element name="hostName" type="xsd:string"/>
-          <element name="hostgroupName" type="xsd:string" minOccurs="0"/>
+          <element name="hostgroupName" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
           <element name="serviceDescription" type="xsd:string"/>
           <element name="displayName" type="xsd:string" minOccurs="0"/>
           <element name="servicegroups" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>

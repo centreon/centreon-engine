@@ -383,21 +383,26 @@ QString function::_build_exec_new(QString const& base,
 QString function::_build_exec_struct(QString const& base,
 				     argument const& arg) {
   if (arg.is_primitive() == true) {
-    bool is_pointer = !(arg.is_primitive() && (!arg.is_optional() || arg.is_array()));
-    if (is_pointer == false) {
+    if (!arg.is_optional()) {
       return ("  if (args.find(\"" + arg.get_help() + "\") == args.end())\n"
               "    throw (error(\"argument \\\"" + arg.get_help() + "\\\" missing.\"));\n"
               "  " + base + " = " + _get_qstring_methode(arg.get_type())
 	      + "(args[\"" + arg.get_help() + "\"]);\n");
     }
+    else if (arg.is_array()) {
+      return ("  if (args.find(\"" + arg.get_help() + "\") != args.end()) {\n"
+              "    " + base + " = " + _get_qstring_methode(arg.get_type())
+	      + "(args[\"" + arg.get_help() + "\"]);\n"
+              "  }\n");
+    }
     else {
       QString varname(base);
       varname.replace(QRegExp("[->\\.]"), "_");
-      return ("  if (args.find(\"" + arg.get_help() + "\") != args.end()) {\n"
-              "    " + arg.get_type() + " " + varname
-	      + "(" + _get_qstring_methode(arg.get_type())
-	      + "(args[\"" + arg.get_help() + "\"])" + ");\n"
-	      + "  " + base + " = &" + varname + ";\n"
+      return ("  " + arg.get_type() + " " + varname + ";\n"
+              "  if (args.find(\"" + arg.get_help() + "\") != args.end()) {\n"
+              "    " + varname + " = " + _get_qstring_methode(arg.get_type())
+	      + "(args[\"" + arg.get_help() + "\"])" + ";\n"
+	      + "    " + base + " = &" + varname + ";\n"
               "  }\n");
     }
   }
