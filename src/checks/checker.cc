@@ -490,7 +490,7 @@ void checker::run(service* svc,
   check_result_info.output_file = NULL;
   check_result_info.host_name = my_strdup(svc->host_name);
   check_result_info.service_description = my_strdup(svc->description);
-  check_result_info.latency = 0.0;
+  check_result_info.latency = latency;
   check_result_info.next = NULL;
 
   commands::set& cmd_set = commands::set::instance();
