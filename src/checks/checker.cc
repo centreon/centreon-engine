@@ -170,7 +170,7 @@ void checker::push_check_result(check_result const& result) {
   _to_reap.enqueue(result);
   _mut_reap.unlock();
 }
-#include <QDebug>
+
 /**
  *  Run an host check without waiting check result.
  *
@@ -490,7 +490,7 @@ void checker::run(service* svc,
   check_result_info.output_file = NULL;
   check_result_info.host_name = my_strdup(svc->host_name);
   check_result_info.service_description = my_strdup(svc->description);
-  check_result_info.latency = 0.0;
+  check_result_info.latency = latency;
   check_result_info.next = NULL;
 
   commands::set& cmd_set = commands::set::instance();
@@ -731,8 +731,7 @@ void checker::_command_executed(commands::result const& res) {
     return;
   }
 
-  check_result result;
-  result = it.value();
+  check_result result = it.value();
   _list_id.erase(it);
   _mut_id.unlock();
 

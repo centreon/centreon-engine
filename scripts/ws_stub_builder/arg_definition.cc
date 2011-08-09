@@ -135,7 +135,8 @@ arg_definition::arg_definition() {
     .set_help("service_notification_commands")
     .set_is_array(true);
   contact_type.add(arg_vectorstr).set_name("address")
-    .set_is_array(true);
+    .set_is_array(true)
+    .set_is_optional(true);
   contact_type.add(arg_vectorstr).set_name("customVariables")
     .set_help("custom_variables")
     .set_is_optional(true)
@@ -198,10 +199,12 @@ arg_definition::arg_definition() {
   host_type.add(arg_string).set_name("checkPeriod")
     .set_help("check_period");
   host_type.add(arg_vectorstr).set_name("contacts")
-    .set_is_array(true);
+    .set_is_array(true)
+    .set_is_optional(true);
   host_type.add(arg_vectorstr).set_name("contactGroups")
     .set_help("contact_groups")
-    .set_is_array(true);
+    .set_is_array(true)
+    .set_is_optional(true);
   host_type.add(arg_uint).set_name("notificationInterval")
     .set_help("notification_interval");
   host_type.add(arg_string).set_name("notificationPeriod")
@@ -412,10 +415,12 @@ arg_definition::arg_definition() {
   service_type.add(arg_string).set_name("notificationPeriod")
     .set_help("notification_period");
   service_type.add(arg_vectorstr).set_name("contacts")
-    .set_is_array(true);
+    .set_is_array(true)
+    .set_is_optional(true);
   service_type.add(arg_vectorstr).set_name("contactGroups")
     .set_help("contact_groups")
-    .set_is_array(true);
+    .set_is_array(true)
+    .set_is_optional(true);
   service_type.add(arg_vectorstr).set_name("customVariables")
     .set_help("custom_variables")
     .set_is_optional(true)

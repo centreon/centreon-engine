@@ -59,8 +59,8 @@
           <element name="processPerfData" type="xsd:boolean" minOccurs="0"/>
           <element name="retainStatusInformation" type="xsd:boolean" minOccurs="0"/>
           <element name="retainNonstatusInformation" type="xsd:boolean" minOccurs="0"/>
-          <element name="contacts" type="xsd:string" minOccurs="1" maxOccurs="unbounded"/>
-          <element name="contactGroups" type="xsd:string" minOccurs="1" maxOccurs="unbounded"/>
+          <element name="contacts" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+          <element name="contactGroups" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
           <element name="notificationInterval" type="xsd:unsignedInt"/>
           <element name="firstNotificationDelay" type="xsd:unsignedInt" minOccurs="0"/>
           <element name="notificationPeriod" type="xsd:string"/>
@@ -169,8 +169,8 @@
           <element name="notificationPeriod" type="xsd:string"/>
 	  <element name="notificationOptions" type="xsd:string" minOccurs="0"/>
           <element name="notificationsEnabled" type="xsd:boolean" minOccurs="0"/>
-          <element name="contacts" type="xsd:string" minOccurs="1" maxOccurs="unbounded"/>
-          <element name="contactGroups" type="xsd:string" minOccurs="1" maxOccurs="unbounded"/>
+          <element name="contacts" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+          <element name="contactGroups" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
           <element name="stalkingOptions" type="xsd:string" minOccurs="0"/>
           <element name="notes" type="xsd:string" minOccurs="0"/>
           <element name="notesUrl" type="xsd:string" minOccurs="0"/>

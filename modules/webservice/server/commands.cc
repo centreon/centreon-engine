@@ -13293,7 +13293,7 @@ int centreonengine__addCommand(soap* s,
                    __func__,
 		   e.what());
     syncro::instance().worker_finish();
-    return (soap_receiver_fault(s, "Runtime error.", "invalid argument"));
+    return (soap_receiver_fault(s, "invalid argument", e.what()));
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
@@ -13339,7 +13339,7 @@ int centreonengine__addContactGroup(soap* s,
                    __func__,
 		   e.what());
     syncro::instance().worker_finish();
-    return (soap_receiver_fault(s, "Runtime error.", "invalid argument"));
+    return (soap_receiver_fault(s, "invalid argument", e.what()));
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
@@ -13384,7 +13384,7 @@ int centreonengine__addHostGroup(soap* s,
                    __func__,
 		   e.what());
     syncro::instance().worker_finish();
-    return (soap_receiver_fault(s, "Runtime error.", "invalid argument"));
+    return (soap_receiver_fault(s, "invalid argument", e.what()));
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
@@ -13429,7 +13429,7 @@ int centreonengine__addServiceGroup(soap* s,
                    __func__,
 		   e.what());
     syncro::instance().worker_finish();
-    return (soap_receiver_fault(s, "Runtime error.", "invalid argument"));
+    return (soap_receiver_fault(s, "invalid argument", e.what()));
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
@@ -13473,7 +13473,7 @@ int centreonengine__addHost(soap* s,
                    __func__,
 		   e.what());
     syncro::instance().worker_finish();
-    return (soap_receiver_fault(s, "Runtime error.", "invalid argument"));
+    return (soap_receiver_fault(s, "invalid argument", e.what()));
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
@@ -13518,7 +13518,7 @@ int centreonengine__addHostDependency(soap* s,
                    __func__,
 		   e.what());
     syncro::instance().worker_finish();
-    return (soap_receiver_fault(s, "Runtime error.", "invalid argument"));
+    return (soap_receiver_fault(s, "invalid argument", e.what()));
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
@@ -13562,7 +13562,7 @@ int centreonengine__addHostEscalation(soap* s,
                    __func__,
 		   e.what());
     syncro::instance().worker_finish();
-    return (soap_receiver_fault(s, "Runtime error.", "invalid argument"));
+    return (soap_receiver_fault(s, "invalid argument", e.what()));
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
@@ -13607,7 +13607,7 @@ int centreonengine__addService(soap* s,
                    __func__,
 		   e.what());
     syncro::instance().worker_finish();
-    return (soap_receiver_fault(s, "Runtime error.", "invalid argument"));
+    return (soap_receiver_fault(s, "invalid argument", e.what()));
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
@@ -13654,7 +13654,7 @@ int centreonengine__addServiceDependency(soap* s,
                    __func__,
 		   e.what());
     syncro::instance().worker_finish();
-    return (soap_receiver_fault(s, "Runtime error.", "invalid argument"));
+    return (soap_receiver_fault(s, "invalid argument", e.what()));
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
@@ -13699,7 +13699,7 @@ int centreonengine__addServiceEscalation(soap* s,
                    __func__,
 		   e.what());
     syncro::instance().worker_finish();
-    return (soap_receiver_fault(s, "Runtime error.", "invalid argument"));
+    return (soap_receiver_fault(s, "invalid argument", e.what()));
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
@@ -13743,7 +13743,7 @@ int centreonengine__addContact(soap* s,
                    __func__,
 		   e.what());
     syncro::instance().worker_finish();
-    return (soap_receiver_fault(s, "Runtime error.", "invalid argument"));
+    return (soap_receiver_fault(s, "invalid argument", e.what()));
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,
@@ -13787,7 +13787,7 @@ int centreonengine__addTimeperiod(soap* s,
                    __func__,
 		   e.what());
     syncro::instance().worker_finish();
-    return (soap_receiver_fault(s, "Runtime error.", "invalid argument"));
+    return (soap_receiver_fault(s, "invalid argument", e.what()));
   }
   catch (...) {
     log_debug_info(DEBUGL_COMMANDS, 2,

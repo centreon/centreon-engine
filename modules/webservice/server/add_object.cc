@@ -23,6 +23,7 @@
 #include "engine.hh"
 #include "error.hh"
 #include "objects.hh"
+#include "schedule_object.hh"
 #include "free_object.hh"
 #include "add_object.hh"
 
@@ -263,8 +264,8 @@ static bool _add_object_to_objectlist(std::vector<std::string> const& objects,
  *  @param[in] cmd The struct with all information to create new command.
  */
 void modules::add_command(ns1__commandType const& cmd) {
-  if (::add_command(cmd.name.c_str(), cmd.commandLine.c_str()) != OK)
-    throw (engine_error() << "command '" << cmd.name << "' already exist.");
+  if (::add_command(cmd.name.c_str(), cmd.commandLine.c_str()) == NULL)
+    throw (engine_error() << "command '" << cmd.name << "' create failed.");
 }
 
 /**
@@ -276,8 +277,8 @@ void modules::add_contactgroup(ns1__contactGroupType const& cntctgrp) {
   // create a new contactgroup.
   contactgroup* group = ::add_contactgroup(cntctgrp.name.c_str(),
 					   cntctgrp.alias.c_str());
-  if (group != OK)
-    throw (engine_error() << "contactgroup '" << cntctgrp.name << "' already exist.");
+  if (group == NULL)
+    throw (engine_error() << "contactgroup '" << cntctgrp.name << "' create failed.");
 
   // add all contacts into the contactgroup.
   if (_add_contacts_to_object(cntctgrp.contacts, &group->members) == false) {
@@ -322,8 +323,8 @@ void modules::add_hostgroup(ns1__hostGroupType const& hstgrp) {
 				     notes,
 				     notes_url,
 				     action_url);
-  if (group != OK)
-    throw (engine_error() << "hostgroup '" << hstgrp.name << "' already exist.");
+  if (group == NULL)
+    throw (engine_error() << "hostgroup '" << hstgrp.name << "' create failed.");
 
   // add all host into the hostgroup.
   if (_add_hosts_to_object(hstgrp.hosts, &group->members) == false) {
@@ -372,8 +373,8 @@ void modules::add_servicegroup(ns1__serviceGroupType const& svcgrp) {
 					   notes,
 					   notes_url,
 					   action_url);
-  if (group != OK)
-    throw (engine_error() << "servicegroup '" << svcgrp.name << "' already exist.");
+  if (group == NULL)
+    throw (engine_error() << "servicegroup '" << svcgrp.name << "' create failed.");
 
   // add all services into the servicegroup.
   for (std::vector<std::string>::const_iterator it = svcgrp.services.begin(),
@@ -429,15 +430,19 @@ void modules::add_servicegroup(ns1__serviceGroupType const& svcgrp) {
  */
 void modules::add_host(ns1__hostType const& hst) {
   // check all arguments and set default option for optional options.
-  QHash<char, bool> notif_opt = get_options(hst.notificationOptions, "durfs", "a");
+  if (hst.contacts.empty() == true && hst.contactGroups.empty() == true)
+    throw (engine_error() << "host '" << hst.name
+           << "' no contact or no contact groups are defined.");
+
+  QHash<char, bool> notif_opt = get_options(hst.notificationOptions, "durfs", "n");
   if (notif_opt.empty())
     throw (engine_error() << "host '" << hst.name << "' invalid notification options.");
 
-  QHash<char, bool> flap_detection_opt = get_options(hst.flapDetectionOptions, "odu", "a");
+  QHash<char, bool> flap_detection_opt = get_options(hst.flapDetectionOptions, "odu", "n");
   if (flap_detection_opt.empty())
     throw (engine_error() << "host '" << hst.name << "' invalid flap detection options.");
 
-  QHash<char, bool> stalk_opt = get_options(hst.stalkingOptions, "odu", "a");
+  QHash<char, bool> stalk_opt = get_options(hst.stalkingOptions, "odu", "n");
   if (stalk_opt.empty())
     throw (engine_error() << "host '" << hst.name << "' invalid stalking options.");
 
@@ -461,12 +466,14 @@ void modules::add_host(ns1__hostType const& hst) {
   if (notification_period == NULL)
     throw (engine_error() << "host '" << hst.name << "' invalid notification period.");
 
-  command* cmd_event_handler = find_command(hst.eventHandler->c_str());
-  if (cmd_event_handler == NULL)
-    throw (engine_error() << "host '" << hst.name << "' invalid event handler.");
+  command* cmd_event_handler = NULL;
+  if (hst.eventHandler != NULL
+      && (cmd_event_handler = find_command(hst.eventHandler->c_str())) == NULL)
+      throw (engine_error() << "host '" << hst.name << "' invalid event handler.");
 
-  command* cmd_check_command = find_command(hst.checkCommand->c_str());
-  if (cmd_check_command == NULL)
+  command* cmd_check_command = NULL;
+  if (hst.checkCommand != NULL
+      && (cmd_check_command = find_command(hst.checkCommand->c_str())) == NULL)
     throw (engine_error() << "host '" << hst.name << "' invalid check command.");
 
   char const* display_name = (hst.displayName ? hst.displayName->c_str() : NULL);
@@ -560,6 +567,8 @@ void modules::add_host(ns1__hostType const& hst) {
 			     retain_status_information,
 			     retain_nonstatus_information,
 			     obsess_over_host);
+  if (new_hst == NULL)
+    throw (engine_error() << "host '" << hst.name << "' create failed.");
 
   // add host parents.
   if (_add_hosts_to_object(hst.parents, &new_hst->parent_hosts) == false) {
@@ -605,6 +614,9 @@ void modules::add_host(ns1__hostType const& hst) {
   // update initial state.
   new_hst->initial_state = initial_state;
 
+  // add into scheduler.
+  schedule_host(new_hst);
+
   // host services are update by add service.
 }
 
@@ -615,17 +627,21 @@ void modules::add_host(ns1__hostType const& hst) {
  */
 void modules::add_service(ns1__serviceType const& svc) {
   // check all arguments and set default option for optional options.
-  QHash<char, bool> notif_opt = get_options(svc.notificationOptions, "wucrfs", "a");
+  if (svc.contacts.empty() == true && svc.contactGroups.empty() == true)
+    throw (engine_error() << "service '" << svc.hostName << "', "
+           << svc.serviceDescription << "' no contact or no contact groups are defined.");
+
+  QHash<char, bool> notif_opt = get_options(svc.notificationOptions, "wucrfs", "n");
   if (notif_opt.empty())
     throw (engine_error() << "service '" << svc.hostName << ", "
 	   << svc.serviceDescription << "' invalid notification options.");
 
-  QHash<char, bool> stalk_opt = get_options(svc.stalkingOptions, "owuc", "a");
+  QHash<char, bool> stalk_opt = get_options(svc.stalkingOptions, "owuc", "n");
   if (stalk_opt.empty())
     throw (engine_error() << "service '" << svc.hostName << ", "
 	   << svc.serviceDescription << "' invalid stalking options.");
 
-  QHash<char, bool> flap_detection_opt = get_options(svc.flapDetectionOptions, "owuc", "a");
+  QHash<char, bool> flap_detection_opt = get_options(svc.flapDetectionOptions, "owuc", "n");
   if (flap_detection_opt.empty())
     throw (engine_error() << "service '" << svc.hostName << ", "
 	   << svc.serviceDescription << "' invalid flap detection options.");
@@ -655,12 +671,16 @@ void modules::add_service(ns1__serviceType const& svc) {
     throw (engine_error() << "service '" << svc.hostName << ", "
 	   << svc.serviceDescription << "' invalid notification period.");
 
-  command* cmd_event_handler = find_command(svc.eventHandler->c_str());
-  if (cmd_event_handler == NULL)
-    throw (engine_error() << "service '" << svc.hostName << ", "
-	   << svc.serviceDescription << "' invalid event handler.");
+  command* cmd_event_handler = NULL;
+  if (svc.eventHandler != NULL) {
+    std::string cmd_name(*svc.eventHandler, 0, svc.eventHandler->find('!'));
+    if ((cmd_event_handler = find_command(cmd_name.c_str())) == NULL)
+      throw (engine_error() << "service '" << svc.hostName << ", "
+             << svc.serviceDescription << "' invalid event handler.");
+  }
 
-  command* cmd_check_command = find_command(svc.checkCommand.c_str());
+  std::string cmd_name(svc.checkCommand, 0, svc.checkCommand.find('!'));
+  command* cmd_check_command = find_command(cmd_name.c_str());
   if (cmd_check_command == NULL)
     throw (engine_error() << "service '" << svc.hostName << ", "
 	   << svc.serviceDescription << "' invalid check command.");
@@ -750,6 +770,9 @@ void modules::add_service(ns1__serviceType const& svc) {
 				   retain_status_information,
 				   retain_nonstatus_information,
 				   obsess_over_service);
+  if (new_svc == NULL)
+    throw (engine_error() << "service '" << svc.hostName << ", "
+	   << svc.serviceDescription << "' create failed.");
 
   if (_add_custom_variables_to_object(svc.customVariables,
 				      &new_svc->custom_variables) == false) {
@@ -803,12 +826,12 @@ void modules::add_service(ns1__serviceType const& svc) {
  */
 void modules::add_contact(ns1__contactType const& cntct) {
   // check all arguments and set default option for optional options.
-  QHash<char, bool> service_opt = get_options(&cntct.serviceNotificationOptions, "rcwufs", "a");
+  QHash<char, bool> service_opt = get_options(&cntct.serviceNotificationOptions, "rcwufs", "n");
   if (service_opt.empty())
     throw (engine_error() << "contact '" << cntct.name
            << "' invalid service notification options.");
 
-  QHash<char, bool> host_opt = get_options(&cntct.hostNotificationOptions, "rdufs", "a");
+  QHash<char, bool> host_opt = get_options(&cntct.hostNotificationOptions, "rdufs", "n");
   if (host_opt.empty())
     throw (engine_error() << "contact '" << cntct.name
 	   << "' invalid host notification options.");
@@ -844,7 +867,7 @@ void modules::add_contact(ns1__contactType const& cntct) {
 				     alias,
 				     email,
 				     pager,
-				     &(*address),
+				     (cntct.address.empty() ? NULL : &(*address)),
 				     cntct.serviceNotificationPeriod.c_str(),
 				     cntct.hostNotificationPeriod.c_str(),
                                      service_opt['r'],
@@ -863,6 +886,8 @@ void modules::add_contact(ns1__contactType const& cntct) {
 				     can_submit_commands,
 				     retain_status_information,
 				     retain_nonstatus_information);
+  if (new_cntct == NULL)
+    throw (engine_error() << "contact '" << cntct.name << "' create failed.");
 
   if (_add_object_to_objectlist(cntct.contactgroups,
 				&new_cntct->contactgroups_ptr,
@@ -970,7 +995,7 @@ void modules::add_hostescalation(ns1__hostEscalationType const& hstescalation) {
            << "' hostgroups name is not implemented yet.");
 
   // check all arguments and set default option for optional options.
-  QHash<char, bool> escalation_opt = get_options(hstescalation.escalationOptions, "dur" , "a");
+  QHash<char, bool> escalation_opt = get_options(hstescalation.escalationOptions, "dur" , "n");
   if (escalation_opt.empty())
     throw (engine_error() << "hostescalation '" << hstescalation.hostName
            << "' invalid escalation options.");
@@ -1097,7 +1122,7 @@ void modules::add_serviceescalation(ns1__serviceEscalationType const& svcescalat
            << svcescalation.serviceDescription << "' hostgroups name is not implemented yet.");
 
   // check all arguments and set default option for optional options.
-  QHash<char, bool> escalation_opt = get_options(svcescalation.escalationOptions, "wucr" , "a");
+  QHash<char, bool> escalation_opt = get_options(svcescalation.escalationOptions, "wucr" , "n");
   if (escalation_opt.empty())
     throw (engine_error() << "serviceescalation '" << svcescalation.hostName << ", "
            << svcescalation.serviceDescription << "' invalid escalation options.");
