@@ -43,7 +43,7 @@ namespace                    com {
 
           logger&            operator=(logger const& right);
           template           <typename T>
-          logger&            operator<<(T obj) {
+          logger&            operator<<(T const& obj) {
             _buffer << obj;
             return (*this);
           }
