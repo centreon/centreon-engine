@@ -17,7 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <time.h>
+#include <QDateTime>
 #include "logging/engine.hh"
 #include "logging/logger.hh"
 
@@ -36,8 +36,8 @@ using namespace com::centreon::engine::logging;
  *  @param[in] verbosity Verbosity level.
  */
 logger::logger(unsigned long long type, unsigned int verbosity)
-  : _type(type), _verbosity(verbosity) {
-  _buffer << "[" << time(NULL) << "] ";
+  : _stream(&_buffer), _type(type), _verbosity(verbosity) {
+  _stream << "[" << QDateTime::currentMSecsSinceEpoch() << "] ";
 }
 
 /**
@@ -45,7 +45,8 @@ logger::logger(unsigned long long type, unsigned int verbosity)
  *
  *  @param[in] right The class to copy.
  */
-logger::logger(logger const& right) {
+logger::logger(logger const& right)
+  : _stream(&_buffer) {
   operator=(right);
 }
 
@@ -53,8 +54,8 @@ logger::logger(logger const& right) {
  *  Default destructor.
  */
 logger::~logger() {
-  std::string buf = _trim(_buffer.str()) + "\n";
-  engine::instance().log(buf.c_str(), _type, _verbosity);
+  _stream << flush;
+  engine::instance().log(qPrintable(_buffer.trimmed() + "\n"), _type, _verbosity);
 }
 
 /**
@@ -66,41 +67,23 @@ logger::~logger() {
  */
 logger& logger::operator=(logger const& right) {
   if (this != &right) {
-    _buffer << right._buffer.str();
+    right._stream.flush();
+    _stream.flush();
+    _buffer = right._buffer;
+    _type = right._type;
+    _verbosity = right._verbosity;
   }
   return (*this);
 }
 
 /**
- *  Append a QString to the message buffer.
+ *  Append a std:string to the message buffer.
  *
  *  @param[in] str String to append.
  *
  *  @return This object.
  */
-logger& logger::operator<<(QString const& str) {
-  _buffer << qPrintable(str);
+logger& logger::operator<<(std::string const& str) {
+  _stream << str.c_str();
   return (*this);
-}
-
-/**
- *  Trim a string.
- *
- *  @param[in] str The string.
- *
- *  @return The trimming stream.
- */
-std::string logger::_trim(std::string str) throw() {
-  const char* whitespaces = " \t\r\n";
-  size_t pos = str.find_last_not_of(whitespaces);
-
-  if (pos == std::string::npos)
-    str.clear();
-  else
-    {
-      str.erase(pos + 1);
-      if ((pos = str.find_first_not_of(whitespaces)) != std::string::npos)
-        str.erase(0, pos);
-    }
-  return (str);
 }

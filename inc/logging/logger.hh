@@ -21,40 +21,40 @@
 # define CCE_LOGGING_LOGGER_HH
 
 # include <QString>
-# include <sstream>
+# include <QTextStream>
 # include <string>
 # include "logging/object.hh"
 
-namespace                    com {
-  namespace                  centreon {
-    namespace                engine {
-      namespace              logging {
+namespace                     com {
+  namespace                   centreon {
+    namespace                 engine {
+      namespace               logging {
         /**
          *  @class logger logger.hh
          *  @brief Simple logging class.
          *
          *  Simple logging class used by the engine to write log data.
          */
-        class                logger {
+        class                 logger {
          public:
-                             logger(unsigned long long type, unsigned int verbosity);
-                             logger(logger const& right);
-                             ~logger();
+                              logger(unsigned long long type, unsigned int verbosity);
+                              logger(logger const& right);
+                              ~logger();
 
-          logger&            operator=(logger const& right);
-          template           <typename T>
-          logger&            operator<<(T obj) {
-            _buffer << obj;
+          logger&             operator=(logger const& right);
+          template            <typename T>
+          logger&             operator<<(T const& obj) {
+            _stream << obj;
             return (*this);
           }
-          logger&            operator<<(QString const& str);
+
+          logger&             operator<<(std::string const& str);
 
          private:
-          std::string        _trim(std::string str) throw();
-
-          std::ostringstream _buffer;
-          unsigned long long _type;
-          unsigned int       _verbosity;
+          QString             _buffer;
+          mutable QTextStream _stream;
+          unsigned long long  _type;
+          unsigned int        _verbosity;
         };
       }
     }
