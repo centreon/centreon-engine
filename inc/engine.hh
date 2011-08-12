@@ -26,9 +26,9 @@
 # include <sys/time.h>
 # include <pthread.h>
 
-# ifdef __cplusplus
-extern "C" {
-# endif
+// # ifdef __cplusplus
+// extern "C" {
+// # endif
 
   /************* MISC LENGTH/SIZE DEFINITIONS ***********/
 
@@ -123,7 +123,7 @@ typedef struct check_stats_struct {
 
   /******************** FUNCTIONS **********************/
 
-# ifdef __cplusplus
-}
-# endif
+// # ifdef __cplusplus
+// }
+// # endif
 #endif // !CCE_ENGINE_HH

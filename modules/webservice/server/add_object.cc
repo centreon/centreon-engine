@@ -26,8 +26,11 @@
 #include "schedule_object.hh"
 #include "free_object.hh"
 #include "add_object.hh"
+#include "logging/logger.hh"
+#include "globals.hh"
 
 using namespace com::centreon::engine;
+using namespace com::centreon::engine::logging;
 
 /**
  *  Parse and return object options.
@@ -281,21 +284,21 @@ void modules::add_contactgroup(ns1__contactGroupType const& cntctgrp) {
     throw (engine_error() << "contactgroup '" << cntctgrp.name << "' create failed.");
 
   // add all contacts into the contactgroup.
-  if (_add_contacts_to_object(cntctgrp.contacts, &group->members) == false) {
+  if (_add_contacts_to_object(cntctgrp.members, &group->members) == false) {
     free_contactgroup(group);
-    throw (engine_error() << "contactgroup '" << cntctgrp.name << "' invalid contact.");
+    throw (engine_error() << "contactgroup '" << cntctgrp.name << "' invalid member.");
   }
 
   // add the content of other contactgroups into this contactgroup.
-  for (std::vector<std::string>::const_iterator it = cntctgrp.contactgroups.begin(),
-	 end = cntctgrp.contactgroups.end();
+  for (std::vector<std::string>::const_iterator it = cntctgrp.contactgroupMembers.begin(),
+	 end = cntctgrp.contactgroupMembers.end();
        it != end;
        ++it) {
     // check if the contactgroup exist.
     contactgroup* fgroup = find_contactgroup(it->c_str());
     if (fgroup == NULL) {
       free_contactgroup(group);
-      throw (engine_error() << "contactgroup '" << cntctgrp.name << "' invalid contactgroup.");
+      throw (engine_error() << "contactgroup '" << cntctgrp.name << "' invalid group member.");
     }
 
     contactsmember* cntctmembers = fgroup->members;
@@ -305,6 +308,9 @@ void modules::add_contactgroup(ns1__contactGroupType const& cntctgrp) {
       cntctmembers = cntctmembers->next;
     }
   }
+
+  for (contactsmember const* cm = group->members; cm != NULL; cm = cm->next)
+    add_object_to_objectlist(&cm->contact_ptr->contactgroups_ptr, group);
 }
 
 /**
@@ -327,21 +333,21 @@ void modules::add_hostgroup(ns1__hostGroupType const& hstgrp) {
     throw (engine_error() << "hostgroup '" << hstgrp.name << "' create failed.");
 
   // add all host into the hostgroup.
-  if (_add_hosts_to_object(hstgrp.hosts, &group->members) == false) {
+  if (hstgrp.members.empty() || _add_hosts_to_object(hstgrp.members, &group->members) == false) {
     free_hostgroup(group);
-    throw (engine_error() << "hostgroup '" << hstgrp.name << "' invalid host.");
+    throw (engine_error() << "hostgroup '" << hstgrp.name << "' invalid member.");
   }
 
   // add the content of other hostgroups into this hostgroup.
-  for (std::vector<std::string>::const_iterator it = hstgrp.hostgroups.begin(),
-	 end = hstgrp.hostgroups.end();
+  for (std::vector<std::string>::const_iterator it = hstgrp.hostgroupMembers.begin(),
+	 end = hstgrp.hostgroupMembers.end();
        it != end;
        ++it) {
     // check if the hostgroup exist.
     hostgroup* fgroup = find_hostgroup(it->c_str());
     if (fgroup == NULL) {
       free_hostgroup(group);
-      throw (engine_error() << "hostgroup '" << hstgrp.name << "' invalid hstgroup.");
+      throw (engine_error() << "hostgroup '" << hstgrp.name << "' invalid group member.");
     }
 
     hostsmember* hstmembers = fgroup->members;
@@ -351,6 +357,9 @@ void modules::add_hostgroup(ns1__hostGroupType const& hstgrp) {
       hstmembers = hstmembers->next;
     }
   }
+
+  for (hostsmember const* hm = group->members; hm != NULL; hm = hm->next)
+    add_object_to_objectlist(&hm->host_ptr->hostgroups_ptr, group);
 }
 
 /**
@@ -360,8 +369,8 @@ void modules::add_hostgroup(ns1__hostGroupType const& hstgrp) {
  */
 void modules::add_servicegroup(ns1__serviceGroupType const& svcgrp) {
   // check if service have host name and service description.
-  if (svcgrp.services.size() % 2)
-    throw (engine_error() << "servicegroup '" << svcgrp.name << "' invalid services.");
+  if (svcgrp.members.size() % 2)
+    throw (engine_error() << "servicegroup '" << svcgrp.name << "' invalid members.");
 
   char const* notes = (svcgrp.notes ? svcgrp.notes->c_str() : NULL);
   char const* notes_url = (svcgrp.notesUrl ? svcgrp.notesUrl->c_str() : NULL);
@@ -377,8 +386,8 @@ void modules::add_servicegroup(ns1__serviceGroupType const& svcgrp) {
     throw (engine_error() << "servicegroup '" << svcgrp.name << "' create failed.");
 
   // add all services into the servicegroup.
-  for (std::vector<std::string>::const_iterator it = svcgrp.services.begin(),
-  	 end = svcgrp.services.end();
+  for (std::vector<std::string>::const_iterator it = svcgrp.members.begin(),
+  	 end = svcgrp.members.end();
        it != end;
        ++it) {
     std::string host_name = *it; // the first iterator is the host name.
@@ -388,7 +397,7 @@ void modules::add_servicegroup(ns1__serviceGroupType const& svcgrp) {
     service* svc = find_service(host_name.c_str(), service_description.c_str());
     if (svc == NULL) {
       free_servicegroup(group);
-      throw (engine_error() << "servicegroup '" << svcgrp.name << "' invalid service.");
+      throw (engine_error() << "servicegroup '" << svcgrp.name << "' invalid member.");
     }
 
     // create a new servicegroupsmember and add it into the servicegroup list.
@@ -400,8 +409,8 @@ void modules::add_servicegroup(ns1__serviceGroupType const& svcgrp) {
   }
 
   // add the content of other servicegroups into this servicegroup.
-  for (std::vector<std::string>::const_iterator it = svcgrp.servicegroups.begin(),
-	 end = svcgrp.servicegroups.end();
+  for (std::vector<std::string>::const_iterator it = svcgrp.servicegroupMembers.begin(),
+	 end = svcgrp.servicegroupMembers.end();
        it != end;
        ++it) {
     // check if the servicegroup exist.
@@ -409,7 +418,7 @@ void modules::add_servicegroup(ns1__serviceGroupType const& svcgrp) {
     if (fgroup == NULL) {
       free_servicegroup(group);
       throw (engine_error() << "servicegroup '" << svcgrp.name
-	     << "' invalid svcgroup '" << *it << "'.");
+	     << "' invalid group member '" << *it << "'.");
     }
 
     servicesmember* svcmembers = fgroup->members;
@@ -421,6 +430,9 @@ void modules::add_servicegroup(ns1__serviceGroupType const& svcgrp) {
       svcmembers = svcmembers->next;
     }
   }
+
+  for (servicesmember const* sm = group->members; sm != NULL; sm = sm->next)
+    add_object_to_objectlist(&sm->service_ptr->servicegroups_ptr, group);
 }
 
 /**
@@ -545,7 +557,7 @@ void modules::add_host(ns1__hostType const& hst) {
                              stalk_opt['d'],
                              stalk_opt['u'],
 			     process_perfdata,
-			     false, // XXX: no documentation for
+			     true, // XXX: no documentation for
 			     NULL,  // failure_prediction_options in nagios 3.
 			     check_freshness,
 			     freshness_threshold,
@@ -556,8 +568,8 @@ void modules::add_host(ns1__hostType const& hst) {
 			     icon_image_alt,
 			     vrml_image,
 			     statusmap_image,
-			     0,     // XXX: 2d_coords not used in centreon.
-			     0,
+			     -1,     // XXX: 2d_coords not used in centreon.
+			     -1,
 			     false,
 			     0,     // XXX: 3d_coords not used in centreon.
 			     0,
@@ -758,7 +770,7 @@ void modules::add_service(ns1__serviceType const& svc) {
 				   stalk_opt['w'],
 				   stalk_opt['c'],
 				   process_perfdata,
-				   false,
+				   true,
 				   NULL,
 				   check_freshness,
 				   freshness_threshold,
@@ -817,6 +829,11 @@ void modules::add_service(ns1__serviceType const& svc) {
 
   // update host services.
   add_service_link_to_host(hst, new_svc);
+
+  ++hst->total_services;
+  hst->total_service_check_interval += static_cast<unsigned long>(new_svc->check_interval);
+
+  schedule_service(new_svc);
 }
 
 /**
@@ -954,32 +971,66 @@ void modules::add_hostdependency(ns1__hostDependencyType const& hstdependency) {
     throw (engine_error() << "hostdependency '" << hstdependency.dependentHostName
 	   << ", " << hstdependency.hostName << "' notification failure criteria.");
 
-  char const* dependency_period = (hstdependency.dependencyPeriod
-                                   ? hstdependency.dependencyPeriod->c_str() : NULL);
+  host* dependent_host_ptr = find_host(hstdependency.dependentHostName.c_str());
+  if (dependent_host_ptr == NULL)
+    throw (engine_error() << "hostdependency '" << hstdependency.dependentHostName << ", "
+	   << hstdependency.hostName << "' invalid dependent host name.");
+
+  host* master_host_ptr = find_host(hstdependency.hostName.c_str());
+  if (master_host_ptr == NULL)
+    throw (engine_error() << "hostdependency '" << hstdependency.dependentHostName << ", "
+	   << hstdependency.hostName << "' invalid host name.");
+
+  char const* dependency_period = NULL;
+  timeperiod* dependency_period_ptr = NULL;
+
+  if (hstdependency.dependencyPeriod != NULL) {
+    dependency_period = hstdependency.dependencyPeriod->c_str();
+    if ((dependency_period_ptr = find_timeperiod(dependency_period)) == NULL)
+      throw (engine_error() << "hostdependency '" << hstdependency.dependentHostName
+             << ", " << hstdependency.hostName << "' invalid dependency period.");
+  }
+
   bool inherits_parent = (hstdependency.inheritsParent ? *hstdependency.inheritsParent : true);
 
   if (hstdependency.executionFailureCriteria != NULL) {
-    add_host_dependency(hstdependency.dependentHostName.c_str(),
-                        hstdependency.hostName.c_str(),
-                        EXECUTION_DEPENDENCY,
-                        inherits_parent,
-                        execution_opt['o'],
-                        execution_opt['d'],
-                        execution_opt['u'],
-                        execution_opt['p'],
-                        dependency_period);
+    hostdependency* new_hstdependency =
+      add_host_dependency(hstdependency.dependentHostName.c_str(),
+                          hstdependency.hostName.c_str(),
+                          EXECUTION_DEPENDENCY,
+                          inherits_parent,
+                          execution_opt['o'],
+                          execution_opt['d'],
+                          execution_opt['u'],
+                          execution_opt['p'],
+                          dependency_period);
+    if (new_hstdependency == NULL)
+      throw (engine_error() << "hostdependency '" << hstdependency.dependentHostName
+             << ", " << hstdependency.hostName << "' create failed.");
+
+    new_hstdependency->master_host_ptr = master_host_ptr;
+    new_hstdependency->dependent_host_ptr = dependent_host_ptr;
+    new_hstdependency->dependency_period_ptr = dependency_period_ptr;
   }
 
   if (hstdependency.notificationFailureCriteria != NULL) {
-    add_host_dependency(hstdependency.dependentHostName.c_str(),
-                        hstdependency.hostName.c_str(),
-                        NOTIFICATION_DEPENDENCY,
-                        inherits_parent,
-                        notif_opt['o'],
-                        notif_opt['d'],
-                        notif_opt['u'],
-                        notif_opt['p'],
-                        dependency_period);
+    hostdependency* new_hstdependency =
+      add_host_dependency(hstdependency.dependentHostName.c_str(),
+                          hstdependency.hostName.c_str(),
+                          NOTIFICATION_DEPENDENCY,
+                          inherits_parent,
+                          notif_opt['o'],
+                          notif_opt['d'],
+                          notif_opt['u'],
+                          notif_opt['p'],
+                          dependency_period);
+    if (new_hstdependency == NULL)
+      throw (engine_error() << "hostdependency '" << hstdependency.dependentHostName
+             << ", " << hstdependency.hostName << "' create failed.");
+
+    new_hstdependency->master_host_ptr = master_host_ptr;
+    new_hstdependency->dependent_host_ptr = dependent_host_ptr;
+    new_hstdependency->dependency_period_ptr = dependency_period_ptr;
   }
 }
 
@@ -995,21 +1046,37 @@ void modules::add_hostescalation(ns1__hostEscalationType const& hstescalation) {
            << "' hostgroups name is not implemented yet.");
 
   // check all arguments and set default option for optional options.
+  if (hstescalation.contacts.empty() == true && hstescalation.contactGroups.empty() == true)
+    throw (engine_error() << "hostescalation '" << hstescalation.hostName
+           << "' no contact or no contact groups are defined.");
+
   QHash<char, bool> escalation_opt = get_options(hstescalation.escalationOptions, "dur" , "n");
   if (escalation_opt.empty())
     throw (engine_error() << "hostescalation '" << hstescalation.hostName
            << "' invalid escalation options.");
 
-  char const* escalation_period = (hstescalation.escalationPeriod
-                                   ? hstescalation.escalationPeriod->c_str() : NULL);
-  hostescalation* new_hstescalation = ::add_hostescalation(hstescalation.hostName.c_str(),
-                                                         hstescalation.firstNotification,
-                                                         hstescalation.lastNotification,
-                                                         hstescalation.notificationInterval,
-                                                         escalation_period,
-                                                         escalation_opt['d'],
-                                                         escalation_opt['u'],
-                                                         escalation_opt['r']);
+  host* hst = find_host(hstescalation.hostName.c_str());
+  if (hst == NULL)
+    throw (engine_error() << "hostescalation '" << hstescalation.hostName << "' invalid host.");
+
+  char const* escalation_period = NULL;
+  timeperiod* escalation_period_ptr = NULL;
+  if (hstescalation.escalationPeriod != NULL) {
+    escalation_period = hstescalation.escalationPeriod->c_str();
+    if ((escalation_period_ptr = find_timeperiod(escalation_period)) == NULL)
+      throw (engine_error() << "hostescalation '" << hstescalation.hostName
+             << "' invalid check period.");
+  }
+
+  hostescalation* new_hstescalation =
+    ::add_hostescalation(hstescalation.hostName.c_str(),
+                         hstescalation.firstNotification,
+                         hstescalation.lastNotification,
+                         hstescalation.notificationInterval,
+                         escalation_period,
+                         escalation_opt['d'],
+                         escalation_opt['u'],
+                         escalation_opt['r']);
   if (new_hstescalation == NULL)
     throw (engine_error() << "hostescalation '" << hstescalation.hostName << "' invalid host name.");
 
@@ -1024,6 +1091,9 @@ void modules::add_hostescalation(ns1__hostEscalationType const& hstescalation) {
     free_hostescalation(new_hstescalation);
     throw (engine_error() << "hostescalation '" << hstescalation.hostName << "' invalid contacts.");
   }
+
+  new_hstescalation->host_ptr = hst;
+  new_hstescalation->escalation_period_ptr = escalation_period_ptr;
 }
 
 /**
@@ -1075,38 +1145,92 @@ void modules::add_servicedependency(ns1__serviceDependencyType const& svcdepende
            << ", " << svcdependency.serviceDescription
            << "' notification failure criteria.");
 
-  char const* dependency_period = (svcdependency.dependencyPeriod
-                                   ? svcdependency.dependencyPeriod->c_str() : NULL);
+
+  service* dependent_service_ptr = find_service(svcdependency.dependentHostName.c_str(),
+                                                svcdependency.dependentServiceDescription.c_str());
+  if (dependent_service_ptr == NULL)
+    throw (engine_error() << "servicedependency '" << svcdependency.dependentHostName
+           << ", " << svcdependency.dependentServiceDescription
+	   << ", " << svcdependency.hostName
+           << ", " << svcdependency.serviceDescription
+           << "' invalid dependent host name.");
+
+  service* master_service_ptr = find_service(svcdependency.hostName.c_str(),
+                                             svcdependency.serviceDescription.c_str());
+  if (master_service_ptr == NULL)
+    throw (engine_error() << "servicedependency '" << svcdependency.dependentHostName
+           << ", " << svcdependency.dependentServiceDescription
+	   << ", " << svcdependency.hostName
+           << ", " << svcdependency.serviceDescription
+	   << "' invalid host name.");
+
+  char const* dependency_period = NULL;
+  timeperiod* dependency_period_ptr = NULL;
+
+  if (svcdependency.dependencyPeriod != NULL) {
+    dependency_period = svcdependency.dependencyPeriod->c_str();
+    if ((dependency_period_ptr = find_timeperiod(dependency_period)) == NULL)
+      throw (engine_error() << "servicedependency '" << svcdependency.dependentHostName
+             << ", " << svcdependency.dependentServiceDescription
+             << ", " << svcdependency.hostName
+             << ", " << svcdependency.serviceDescription
+             << "' invalid dependency period.");
+  }
+
   bool inherits_parent = (svcdependency.inheritsParent
                           ? *svcdependency.inheritsParent : true);
 
-  if (svcdependency.executionFailureCriteria != NULL)
-    add_service_dependency(svcdependency.dependentHostName.c_str(),
-                           svcdependency.dependentServiceDescription.c_str(),
-                           svcdependency.hostName.c_str(),
-                           svcdependency.serviceDescription.c_str(),
-                           EXECUTION_DEPENDENCY,
-                           inherits_parent,
-                           execution_opt['o'],
-                           execution_opt['w'],
-                           execution_opt['u'],
-                           execution_opt['c'],
-                           execution_opt['p'],
-                           dependency_period);
+  if (svcdependency.executionFailureCriteria != NULL) {
+    servicedependency* new_svcdependency =
+      add_service_dependency(svcdependency.dependentHostName.c_str(),
+                             svcdependency.dependentServiceDescription.c_str(),
+                             svcdependency.hostName.c_str(),
+                             svcdependency.serviceDescription.c_str(),
+                             EXECUTION_DEPENDENCY,
+                             inherits_parent,
+                             execution_opt['o'],
+                             execution_opt['w'],
+                             execution_opt['u'],
+                             execution_opt['c'],
+                             execution_opt['p'],
+                             dependency_period);
+    if (new_svcdependency == NULL)
+      throw (engine_error() << "servicedependency '" << svcdependency.dependentHostName
+             << ", " << svcdependency.dependentServiceDescription
+             << ", " << svcdependency.hostName
+             << ", " << svcdependency.serviceDescription
+             << "' create failed.");
 
-  if (svcdependency.notificationFailureCriteria != NULL)
-    add_service_dependency(svcdependency.dependentHostName.c_str(),
-                           svcdependency.dependentServiceDescription.c_str(),
-                           svcdependency.hostName.c_str(),
-                           svcdependency.serviceDescription.c_str(),
-                           NOTIFICATION_DEPENDENCY,
-                           inherits_parent,
-                           notif_opt['o'],
-                           notif_opt['w'],
-                           notif_opt['u'],
-                           notif_opt['c'],
-                           notif_opt['p'],
-                           dependency_period);
+    new_svcdependency->master_service_ptr = master_service_ptr;
+    new_svcdependency->dependent_service_ptr = dependent_service_ptr;
+    new_svcdependency->dependency_period_ptr = dependency_period_ptr;
+  }
+
+  if (svcdependency.notificationFailureCriteria != NULL) {
+    servicedependency* new_svcdependency =
+      add_service_dependency(svcdependency.dependentHostName.c_str(),
+                             svcdependency.dependentServiceDescription.c_str(),
+                             svcdependency.hostName.c_str(),
+                             svcdependency.serviceDescription.c_str(),
+                             NOTIFICATION_DEPENDENCY,
+                             inherits_parent,
+                             notif_opt['o'],
+                             notif_opt['w'],
+                             notif_opt['u'],
+                             notif_opt['c'],
+                             notif_opt['p'],
+                             dependency_period);
+    if (new_svcdependency == NULL)
+      throw (engine_error() << "servicedependency '" << svcdependency.dependentHostName
+             << ", " << svcdependency.dependentServiceDescription
+             << ", " << svcdependency.hostName
+             << ", " << svcdependency.serviceDescription
+             << "' create failed.");
+
+    new_svcdependency->master_service_ptr = master_service_ptr;
+    new_svcdependency->dependent_service_ptr = dependent_service_ptr;
+    new_svcdependency->dependency_period_ptr = dependency_period_ptr;
+  }
 }
 
 /**
@@ -1122,13 +1246,30 @@ void modules::add_serviceescalation(ns1__serviceEscalationType const& svcescalat
            << svcescalation.serviceDescription << "' hostgroups name is not implemented yet.");
 
   // check all arguments and set default option for optional options.
+  if (svcescalation.contacts.empty() == true && svcescalation.contactGroups.empty() == true)
+    throw (engine_error() << "serviceescalation '" << svcescalation.hostName
+           << "' no contact or no contact groups are defined.");
+
   QHash<char, bool> escalation_opt = get_options(svcescalation.escalationOptions, "wucr" , "n");
   if (escalation_opt.empty())
     throw (engine_error() << "serviceescalation '" << svcescalation.hostName << ", "
            << svcescalation.serviceDescription << "' invalid escalation options.");
 
-  char const* escalation_period = (svcescalation.escalationPeriod
-                                   ? svcescalation.escalationPeriod->c_str() : NULL);
+  service* svc = find_service(svcescalation.hostName.c_str(),
+                              svcescalation.serviceDescription.c_str());
+  if (svc == NULL)
+    throw (engine_error() << "serviceescalation '" << svcescalation.hostName << ", "
+           << svcescalation.serviceDescription << "' invalid service.");
+
+  char const* escalation_period = NULL;
+  timeperiod* escalation_period_ptr = NULL;
+  if (svcescalation.escalationPeriod != NULL) {
+    escalation_period = svcescalation.escalationPeriod->c_str();
+    if ((escalation_period_ptr = find_timeperiod(escalation_period)) == NULL)
+      throw (engine_error() << "serviceescalation '" << svcescalation.hostName << ", "
+             << svcescalation.serviceDescription << "' invalid check period.");
+  }
+
   serviceescalation* new_svcescalation =
     ::add_serviceescalation(svcescalation.hostName.c_str(),
                             svcescalation.serviceDescription.c_str(),
@@ -1156,6 +1297,9 @@ void modules::add_serviceescalation(ns1__serviceEscalationType const& svcescalat
     throw (engine_error() << "serviceescalation '" << svcescalation.hostName << ", "
            << svcescalation.serviceDescription << "' invalid contacts.");
   }
+
+  new_svcescalation->service_ptr = svc;
+  new_svcescalation->escalation_period_ptr = escalation_period_ptr;
 }
 
 /**

@@ -55,6 +55,8 @@
 #include "commands/raw.hh"
 #include "checks/checker.hh"
 
+#include "logging/dumpers.hh"
+
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;
 
@@ -514,6 +516,8 @@ int main(int argc, char** argv) {
                              NULL);
         cleanup();
       }
+
+      dump_object_list();
 
       /***** Start monitoring all services. *****/
       // (doesn't return until a restart or shutdown signal is encountered).

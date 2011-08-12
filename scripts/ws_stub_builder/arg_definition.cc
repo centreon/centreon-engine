@@ -167,10 +167,11 @@ arg_definition::arg_definition() {
   argument contactgroup_type("ns1__contactGroupType", "contactGroup");
   contactgroup_type.add(arg_string).set_name("name");
   contactgroup_type.add(arg_string).set_name("alias");
-  contactgroup_type.add(arg_vectorstr).set_name("contacts")
+  contactgroup_type.add(arg_vectorstr).set_name("members")
     .set_is_optional(true)
     .set_is_array(true);
-  contactgroup_type.add(arg_vectorstr).set_name("contactgroups")
+  contactgroup_type.add(arg_vectorstr).set_name("contactgroupMembers")
+    .set_help("contactgroup_members")
     .set_is_optional(true)
     .set_is_array(true);
 
@@ -338,17 +339,19 @@ arg_definition::arg_definition() {
   argument hostescalation_type("ns1__hostEscalationType", "hostescalation");
   hostescalation_type.add(arg_string).set_name("hostName")
     .set_help("host_name");
-  hostescalation_type.add(arg_vectorstr).set_name("contacts")
-    .set_help("contacts")
-    .set_is_array(true);
   hostescalation_type.add(arg_uint).set_name("firstNotification")
     .set_help("first_notification");
   hostescalation_type.add(arg_uint).set_name("lastNotification")
     .set_help("last_notification");
   hostescalation_type.add(arg_uint).set_name("notificationInterval")
     .set_help("notification_interval");
+  hostescalation_type.add(arg_vectorstr).set_name("contacts")
+    .set_help("contacts")
+    .set_is_optional(true)
+    .set_is_array(true);
   hostescalation_type.add(arg_vectorstr).set_name("contactGroups")
     .set_help("contact_groups")
+    .set_is_optional(true)
     .set_is_array(true);
   hostescalation_type.add(arg_vectorstr).set_name("hostgroupsName")
     .set_help("hostgroups_name")
@@ -368,10 +371,11 @@ arg_definition::arg_definition() {
   argument hostgroup_type("ns1__hostGroupType", "hostGroup");
   hostgroup_type.add(arg_string).set_name("name");
   hostgroup_type.add(arg_string).set_name("alias");
-  hostgroup_type.add(arg_vectorstr).set_name("hosts")
+  hostgroup_type.add(arg_vectorstr).set_name("members")
     .set_is_optional(true)
     .set_is_array(true);
-  hostgroup_type.add(arg_vectorstr).set_name("hostgroups")
+  hostgroup_type.add(arg_vectorstr).set_name("hostgroupMembers")
+    .set_help("hostgroup_members")
     .set_is_optional(true)
     .set_is_array(true);
   hostgroup_type.add(arg_string).set_name("notes")
@@ -486,6 +490,9 @@ arg_definition::arg_definition() {
   service_type.add(arg_uint).set_name("firstNotificationDelay")
     .set_help("first_notification_delay")
     .set_is_optional(true);
+  service_type.add(arg_string).set_name("notificationOptions")
+    .set_help("notification_options")
+    .set_is_optional(true);
   service_type.add(arg_bool).set_name("notificationsEnabled")
     .set_help("notifications_enabled")
     .set_is_optional(true);
@@ -513,10 +520,11 @@ arg_definition::arg_definition() {
   argument servicegroup_type("ns1__serviceGroupType", "serviceGroup");
   servicegroup_type.add(arg_string).set_name("name");
   servicegroup_type.add(arg_string).set_name("alias");
-  servicegroup_type.add(arg_vectorstr).set_name("services")
+  servicegroup_type.add(arg_vectorstr).set_name("members")
     .set_is_optional(true)
     .set_is_array(true);
-  servicegroup_type.add(arg_vectorstr).set_name("servicegroups")
+  servicegroup_type.add(arg_vectorstr).set_name("servicegroupMembers")
+    .set_help("servicegroup_members")
     .set_is_optional(true)
     .set_is_array(true);
   servicegroup_type.add(arg_string).set_name("notes")
@@ -548,18 +556,20 @@ arg_definition::arg_definition() {
     .set_help("host_name");
   serviceescalation_type.add(arg_string).set_name("serviceDescription")
     .set_help("service_description");
-  serviceescalation_type.add(arg_vectorstr).set_name("contacts")
-    .set_help("contacts")
-    .set_is_array(true);
-  serviceescalation_type.add(arg_vectorstr).set_name("contactGroups")
-    .set_help("contact_groups")
-    .set_is_array(true);
   serviceescalation_type.add(arg_uint).set_name("firstNotification")
     .set_help("first_notification");
   serviceescalation_type.add(arg_uint).set_name("lastNotification")
     .set_help("last_notification");
   serviceescalation_type.add(arg_uint).set_name("notificationInterval")
     .set_help("notification_interval");
+  serviceescalation_type.add(arg_vectorstr).set_name("contacts")
+    .set_help("contacts")
+    .set_is_optional(true)
+    .set_is_array(true);
+  serviceescalation_type.add(arg_vectorstr).set_name("contactGroups")
+    .set_help("contact_groups")
+    .set_is_optional(true)
+    .set_is_array(true);
   serviceescalation_type.add(arg_vectorstr).set_name("hostgroupsName")
     .set_help("hostgroups_name")
     .set_is_optional(true)
@@ -1341,6 +1351,11 @@ arg_definition::arg_definition() {
   // argument param_173("centreonengine__addTimeperiodResponse", "_param_173");
   // param_173.add().set_name("");
   // _list.push_back(param_173);
+
+
+  // argument param_174("centreonengine__dumpObjectListResponse", "_param_174");
+  // param_174.add().set_name("");
+  // _list.push_back(param_174);
 }
 
 /**

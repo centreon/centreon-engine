@@ -97,7 +97,7 @@
         <sequence>
           <element name="hostName" type="xsd:string"/>
           <element name="hostgroupsName" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
-          <element name="contacts" type="xsd:string" minOccurs="1" maxOccurs="unbounded"/>
+          <element name="contacts" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
           <element name="contactGroups" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
 	  <element name="firstNotification" type="xsd:unsignedInt"/>
 	  <element name="lastNotification" type="xsd:unsignedInt"/>
@@ -119,8 +119,8 @@
         <sequence>
           <element name="name" type="xsd:string"/>
           <element name="alias" type="xsd:string"/>
-          <element name="hosts" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
-          <element name="hostgroups" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+          <element name="members" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+          <element name="hostgroupMembers" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
 	  <element name="notes" type="xsd:string" minOccurs="0"/>
 	  <element name="notesUrl" type="xsd:string" minOccurs="0"/>
 	  <element name="actionUrl" type="xsd:string" minOccurs="0"/>
@@ -203,8 +203,8 @@
           <element name="hostName" type="xsd:string"/>
           <element name="hostgroupsName" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
           <element name="serviceDescription" type="xsd:string"/>
-          <element name="contacts" type="xsd:string" minOccurs="1" maxOccurs="unbounded"/>
-          <element name="contactGroups" type="xsd:string" minOccurs="1" maxOccurs="unbounded"/>
+          <element name="contacts" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+          <element name="contactGroups" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
 	  <element name="firstNotification" type="xsd:unsignedInt"/>
 	  <element name="lastNotification" type="xsd:unsignedInt"/>
 	  <element name="notificationInterval" type="xsd:unsignedInt"/>
@@ -225,8 +225,8 @@
         <sequence>
           <element name="name" type="xsd:string"/>
           <element name="alias" type="xsd:string"/>
-          <element name="services" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
-          <element name="servicegroups" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+          <element name="members" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+          <element name="servicegroupMembers" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
 	  <element name="notes" type="xsd:string" minOccurs="0"/>
 	  <element name="notesUrl" type="xsd:string" minOccurs="0"/>
 	  <element name="actionUrl" type="xsd:string" minOccurs="0"/>
@@ -310,8 +310,8 @@
         <sequence>
           <element name="name" type="xsd:string"/>
           <element name="alias" type="xsd:string"/>
-	  <element name="contacts" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
-	  <element name="contactgroups" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+	  <element name="members" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+	  <element name="contactgroupMembers" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
         </sequence>
       </complexType>
 
@@ -860,6 +860,17 @@
 	 Global operations.  
 	                      
      -->
+
+    <!--
+         Debug object operations.
+    -->
+
+    <!-- dumpObjectList -->
+    <operation name="dumpObjectList">
+      <documentation>Dump all object list</documentation>
+      <input message="tns:emptyRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
 
     <!--
 	 Add object operations.
@@ -3895,6 +3906,16 @@
 	 Global operations.  
 	                     
      -->
+
+    <!--
+	 Debug object operations.
+    -->
+
+    <operation name="dumpObjectList">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
 
     <!--
          Add object operations.

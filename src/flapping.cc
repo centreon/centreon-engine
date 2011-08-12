@@ -216,8 +216,7 @@ void check_for_host_flapping(host* hst,
     wait_threshold = static_cast<unsigned long>(hst->notification_interval * config.get_interval_length());
   else
     wait_threshold = static_cast<unsigned long>((hst->total_service_check_interval
-      * config.get_interval_length())
-      / hst->total_services);
+                                                 * config.get_interval_length()) / hst->total_services);
 
   update_history = update;
 

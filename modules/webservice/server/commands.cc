@@ -34,6 +34,7 @@
 #include "checks.hh"
 #include "syncro.hh"
 #include "add_object.hh"
+#include "logging/dumpers.hh"
 
 using namespace com::centreon::engine::modules;
 
@@ -13256,6 +13257,48 @@ int centreonengine__notificationServiceSend(soap* s,
                    __func__);
     syncro::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
+  }
+  return (SOAP_OK);
+}
+
+/**
+ *  Dump all object list.
+ *
+ *  @param[in]  s                 Unused.
+ *  @param[out] res               Unused.
+ *
+ *  @return SOAP_OK on success.
+ */
+int centreonengine__dumpObjectList(soap* s,
+                                   centreonengine__dumpObjectListResponse& res) {
+  (void)res;
+
+  try {
+    syncro::instance().waiting_callback();
+
+    log_debug_info(DEBUGL_FUNCTIONS, 2,
+                   "Webservice: %s()\n",
+                   __func__);
+
+    com::centreon::engine::logging::dump_object_list();
+
+    syncro::instance().worker_finish();
+  }
+  catch (std::exception const& e) {
+    log_debug_info(DEBUGL_COMMANDS, 2,
+                   "Webservice: %s failed: %s.\n",
+                   __func__,
+		   e.what());
+    syncro::instance().worker_finish();
+    return (soap_receiver_fault(s, "invalid argument", e.what()));
+  }
+  catch (...) {
+    log_debug_info(DEBUGL_COMMANDS, 2,
+                   "Webservice: %s failed. catch all.\n",
+                   __func__);
+    syncro::instance().worker_finish();
+    return (soap_receiver_fault(s, "Runtime error.", "catch all"));
+
   }
   return (SOAP_OK);
 }

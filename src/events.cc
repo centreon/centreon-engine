@@ -155,7 +155,6 @@ void init_timing_loop(void) {
     }
 
     if (schedule_check == TRUE) {
-
       scheduling_info.total_scheduled_hosts++;
 
       /* this is used later in inter-check delay calculations */
@@ -173,19 +172,29 @@ void init_timing_loop(void) {
   if (test_scheduling == TRUE)
     gettimeofday(&tv[2], NULL);
 
-  scheduling_info.average_services_per_host =
-    (double)((double)scheduling_info.total_services / (double)scheduling_info.total_hosts);
-  scheduling_info.average_scheduled_services_per_host =
-    (double)((double)scheduling_info.total_scheduled_services / (double)scheduling_info.total_hosts);
+  if (scheduling_info.total_hosts == 0) {
+    scheduling_info.average_services_per_host = 0;
+    scheduling_info.average_scheduled_services_per_host = 0;
+  }
+  else {
+    scheduling_info.average_services_per_host =
+      (double)((double)scheduling_info.total_services / (double)scheduling_info.total_hosts);
+    scheduling_info.average_scheduled_services_per_host =
+      (double)((double)scheduling_info.total_scheduled_services / (double)scheduling_info.total_hosts);
+  }
 
   /* adjust the check interval total to correspond to the interval length */
   scheduling_info.service_check_interval_total =
     (scheduling_info.service_check_interval_total * config.get_interval_length());
 
   /* calculate the average check interval for services */
-  scheduling_info.average_service_check_interval =
-    (double)((double)scheduling_info.service_check_interval_total
-             / (double)scheduling_info.total_scheduled_services);
+  if (scheduling_info.total_scheduled_services == 0)
+    scheduling_info.average_service_check_interval = 0;
+  else {
+    scheduling_info.average_service_check_interval =
+      (double)((double)scheduling_info.service_check_interval_total
+               / (double)scheduling_info.total_scheduled_services);
+  }
 
   /******** DETERMINE SERVICE SCHEDULING PARAMS  ********/
 
@@ -254,10 +263,6 @@ void init_timing_loop(void) {
 
   case configuration::state::ilf_smart:
   default:
-    /* protect against a divide by zero problem - shouldn't happen, but just in case... */
-    if (scheduling_info.total_hosts == 0)
-      scheduling_info.total_hosts = 1;
-
     scheduling_info.service_interleave_factor =
       (int)(ceil(scheduling_info.average_scheduled_services_per_host));
 

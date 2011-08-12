@@ -63,7 +63,7 @@ void checker::cleanup() {
  *  Reap and process all result recive by execution process.
  */
 void checker::reap() {
-  logger(dbg_functions, basic) << "start " << Q_FUNC_INFO;;
+  logger(dbg_functions, basic) << "start " << Q_FUNC_INFO;
   logger(dbg_checks, basic) << "Starting to reap check results.";
 
   // time to start reaping.
@@ -157,7 +157,7 @@ void checker::reap() {
 
   logger(dbg_checks, basic)
     << "Finished reaping " << reaped_checks << " check results";
-  logger(dbg_functions, basic) << "end " << Q_FUNC_INFO;;
+  logger(dbg_functions, basic) << "end " << Q_FUNC_INFO;
 }
 
 /**
@@ -189,7 +189,7 @@ void checker::run(host* hst,
 		  bool reschedule_check,
 		  int* time_is_valid,
 		  time_t* preferred_time) {
-  logger(dbg_functions, basic) << "start " << Q_FUNC_INFO;;
+  logger(dbg_functions, basic) << "start " << Q_FUNC_INFO;
 
   if (hst == NULL) {
     throw (engine_error() << "host pointer is NULL.");
@@ -363,7 +363,7 @@ void checker::run(host* hst,
   // cleanup.
   clear_volatile_macros(&macros);
 
-  logger(dbg_functions, basic) << "end " << Q_FUNC_INFO;;
+  logger(dbg_functions, basic) << "end " << Q_FUNC_INFO;
 }
 
 /**

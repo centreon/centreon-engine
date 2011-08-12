@@ -22,6 +22,25 @@
 
 using namespace com::centreon::engine;
 
+template <class T>
+static void _remove_object_list(T const* obj, T** head, T** tail) {
+  T* current = *head;
+  T* prev = NULL;
+  while (current != NULL) {
+    if (current == obj) {
+      if (prev == NULL)
+        *head = current->next;
+      else
+        prev->next = current->next;
+      if (current->next == NULL)
+        *tail = prev;
+      break;
+    }
+    prev = current;
+    current = current->next;
+  }
+}
+
 /**
  *  Cleanup memory of contactsmember.
  *
@@ -155,6 +174,7 @@ void modules::free_contactgroup(contactgroup const* group) {
   while ((member = free_contactsmember(member)));
 
   skiplist_delete(object_skiplists[CONTACTGROUP_SKIPLIST], group);
+  _remove_object_list(group, &contactgroup_list, &contactgroup_list_tail);
 
   delete[] group->group_name;
   delete[] group->alias;
@@ -174,6 +194,7 @@ void modules::free_hostgroup(hostgroup const* group) {
   while ((member = free_hostsmember(member)));
 
   skiplist_delete(object_skiplists[HOSTGROUP_SKIPLIST], group);
+  _remove_object_list(group, &hostgroup_list, &hostgroup_list_tail);
 
   delete[] group->group_name;
   delete[] group->alias;
@@ -196,6 +217,7 @@ void modules::free_servicegroup(servicegroup const* group) {
   while ((member = free_servicesmember(member)));
 
   skiplist_delete(object_skiplists[SERVICEGROUP_SKIPLIST], group);
+  _remove_object_list(group, &servicegroup_list, &servicegroup_list_tail);
 
   delete[] group->group_name;
   delete[] group->alias;
@@ -234,6 +256,7 @@ void modules::free_host(host const* hst) {
 
   free_objectlist(hst->hostgroups_ptr);
   skiplist_delete(object_skiplists[HOST_SKIPLIST], hst);
+  _remove_object_list(hst, &host_list, &host_list_tail);
 
   delete[] hst->name;
   delete[] hst->display_name;
@@ -283,6 +306,7 @@ void modules::free_service(service const* svc) {
 
   free_objectlist(svc->servicegroups_ptr);
   skiplist_delete(object_skiplists[SERVICE_SKIPLIST], svc);
+  _remove_object_list(svc, &service_list, &service_list_tail);
 
   delete[] svc->host_name;
   delete[] svc->description;
@@ -332,6 +356,7 @@ void modules::free_contact(contact const* cntct) {
 
   free_objectlist(cntct->contactgroups_ptr);
   skiplist_delete(object_skiplists[CONTACT_SKIPLIST], cntct);
+  _remove_object_list(cntct, &contact_list, &contact_list_tail);
 
   // host_notification_period_ptr: not free;
   // service_notification_period_ptr: not free;
@@ -363,6 +388,7 @@ void modules::free_hostescalation(hostescalation const* hstescalation) {
   while ((cntctmember = free_contactsmember(cntctmember)));
 
   skiplist_delete(object_skiplists[HOSTESCALATION_SKIPLIST], hstescalation);
+  _remove_object_list(hstescalation, &hostescalation_list, &hostescalation_list_tail);
 
   // host_ptr: not free;
   // escalation_period_ptr: not free;
@@ -388,6 +414,7 @@ void modules::free_serviceescalation(serviceescalation const* svcescalation) {
   while ((cntctmember = free_contactsmember(cntctmember)));
 
   skiplist_delete(object_skiplists[SERVICEESCALATION_SKIPLIST], svcescalation);
+  _remove_object_list(svcescalation, &serviceescalation_list, &serviceescalation_list_tail);
 
   // service_ptr: not free;
   // escalation_period_ptr: not free;
