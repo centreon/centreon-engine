@@ -809,12 +809,13 @@ int xodtemplate_add_member_to_memberlist(xodtemplate_memberlist **,char *,char *
 int xodtemplate_free_memberlist(xodtemplate_memberlist **);
 void xodtemplate_remove_memberlist_item(xodtemplate_memberlist *,xodtemplate_memberlist **);
 
+void xodtemplate_free_timeperiod(xodtemplate_timeperiod const* tperiod);
 
 int xodtemplate_begin_object_definition(char *,int,int,int);
 int xodtemplate_add_object_property(char *,int);
 int xodtemplate_end_object_definition(int);
 
-int xodtemplate_parse_timeperiod_directive(xodtemplate_timeperiod *,char *,char *);
+int xodtemplate_parse_timeperiod_directive(xodtemplate_timeperiod *,char const*,char const*);
 xodtemplate_daterange *xodtemplate_add_exception_to_timeperiod(xodtemplate_timeperiod *,int,int,int,int,int,int,int,int,int,int,int,int,char *);
 int xodtemplate_get_month_from_string(char *,int *);
 int xodtemplate_get_weekday_from_string(char *,int *);

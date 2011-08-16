@@ -3706,7 +3706,9 @@ xodtemplate_customvariablesmember* xodtemplate_add_custom_variable_to_object(xod
 }
 
 /* parses a timeperod directive... :-) */
-int xodtemplate_parse_timeperiod_directive(xodtemplate_timeperiod* tperiod, char* var, char* val) {
+int xodtemplate_parse_timeperiod_directive(xodtemplate_timeperiod* tperiod,
+                                           char const* var,
+                                           char const* val) {
   char* input = NULL;
   char temp_buffer[5][MAX_INPUT_BUFFER] = { "", "", "", "", "" };
   int items = 0;
@@ -12825,12 +12827,30 @@ int xodtemplate_skiplist_compare_serviceextinfo_template(void const* a, void con
 /********************** CLEANUP FUNCTIONS *************************/
 /******************************************************************/
 
+void xodtemplate_free_timeperiod(xodtemplate_timeperiod const* tperiod) {
+  delete[] tperiod->tmpl;
+  delete[] tperiod->name;
+  delete[] tperiod->timeperiod_name;
+  delete[] tperiod->alias;
+  for (int x = 0; x < 7; x++)
+    delete[] tperiod->timeranges[x];
+  for (int x = 0; x < DATERANGE_TYPES; x++) {
+    xodtemplate_daterange* this_daterange = tperiod->exceptions[x];
+    while (this_daterange != NULL) {
+      xodtemplate_daterange* next_daterange = this_daterange->next;
+      delete[] this_daterange->timeranges;
+      delete this_daterange;
+      this_daterange = next_daterange;
+    }
+  }
+  delete[] tperiod->exclusions;
+  delete tperiod;
+}
+
 /* frees memory */
 int xodtemplate_free_memory(void) {
   xodtemplate_timeperiod* this_timeperiod = NULL;
   xodtemplate_timeperiod* next_timeperiod = NULL;
-  xodtemplate_daterange* this_daterange = NULL;
-  xodtemplate_daterange* next_daterange = NULL;
   xodtemplate_command* this_command = NULL;
   xodtemplate_command* next_command = NULL;
   xodtemplate_contactgroup* this_contactgroup = NULL;
@@ -12866,23 +12886,7 @@ int xodtemplate_free_memory(void) {
        this_timeperiod != NULL;
        this_timeperiod = next_timeperiod) {
     next_timeperiod = this_timeperiod->next;
-    delete[] this_timeperiod->tmpl;
-    delete[] this_timeperiod->name;
-    delete[] this_timeperiod->timeperiod_name;
-    delete[] this_timeperiod->alias;
-    for (x = 0; x < 7; x++)
-      delete[] this_timeperiod->timeranges[x];
-    for (x = 0; x < DATERANGE_TYPES; x++) {
-      for (this_daterange = this_timeperiod->exceptions[x];
-           this_daterange != NULL;
-	   this_daterange = next_daterange) {
-        next_daterange = this_daterange->next;
-        delete[] this_daterange->timeranges;
-        delete this_daterange;
-      }
-    }
-    delete[] this_timeperiod->exclusions;
-    delete this_timeperiod;
+    xodtemplate_free_timeperiod(this_timeperiod);
   }
   xodtemplate_timeperiod_list = NULL;
   xodtemplate_timeperiod_list_tail = NULL;

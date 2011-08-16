@@ -543,7 +543,12 @@ arg_definition::arg_definition() {
   argument timeperiod_type("ns1__timeperiodType", "tperiod");
   timeperiod_type.add(arg_string).set_name("name");
   timeperiod_type.add(arg_string).set_name("alias");
-  // XXX: update when wsdl update.
+  timeperiod_type.add(arg_vectorstr).set_name("range")
+    .set_is_optional(true)
+    .set_is_array(true);
+  timeperiod_type.add(arg_vectorstr).set_name("exclude")
+    .set_is_optional(true)
+    .set_is_array(true);
 
   argument serviceescalation_id("ns1__serviceEscalationIDType", "escalation");
   serviceescalation_id.add(arg_string).set_name("name")

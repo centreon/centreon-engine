@@ -25,9 +25,10 @@
 #include "objects.hh"
 #include "schedule_object.hh"
 #include "free_object.hh"
-#include "add_object.hh"
 #include "logging/logger.hh"
 #include "globals.hh"
+#include "xodtemplate.hh"
+#include "add_object.hh"
 
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;
@@ -1283,7 +1284,7 @@ void modules::add_serviceescalation(ns1__serviceEscalationType const& svcescalat
                             escalation_opt['r']);
   if (new_svcescalation == NULL)
     throw (engine_error() << "serviceescalation '" << svcescalation.hostName << ", "
-           << svcescalation.serviceDescription << "' invalid host name.");
+           << svcescalation.serviceDescription << "' create failed.");
 
   if (_add_contactgroups_to_object(svcescalation.contactGroups,
                                    &new_svcescalation->contact_groups) == false) {
@@ -1309,6 +1310,52 @@ void modules::add_serviceescalation(ns1__serviceEscalationType const& svcescalat
  *  information to create new timeperiod.
  */
 void modules::add_timeperiod(ns1__timeperiodType const& tperiod) {
-  throw (engine_error() << "timeperiod '" << tperiod.name
-         << "' add timeperiod not implemented yet.");
+  if (find_timeperiod(tperiod.name.c_str()) != NULL)
+    throw (engine_error() << "timeperiod '" << tperiod.name << "' timeperiod already exist.");
+
+  xodtemplate_timeperiod* tmpl_tperiod = new xodtemplate_timeperiod();
+  memset(tmpl_tperiod, 0, sizeof(*tmpl_tperiod));
+
+  tmpl_tperiod->timeperiod_name = my_strdup(tperiod.name.c_str());
+  tmpl_tperiod->alias = my_strdup(tperiod.alias.c_str());
+  tmpl_tperiod->register_object = true;
+  for (std::vector<std::string>::const_iterator it = tperiod.range.begin(),
+         end = tperiod.range.end();
+       it != end;
+       ++it) {
+    std::string base(*it);
+
+    // trim.
+    base.erase(0, base.find_first_not_of(' '));
+    base.erase(base.find_last_not_of(' ') + 1);
+
+    size_t pos = base.find_first_of(' ');
+    std::string key(base, 0, pos);
+    std::string value(base, pos + 1);
+
+    // trim.
+    key.erase(key.find_last_not_of(' ') + 1);
+    value.erase(0, value.find_first_not_of(' '));
+
+    if (xodtemplate_parse_timeperiod_directive(tmpl_tperiod,
+                                               key.c_str(),
+                                               value.c_str()) == ERROR) {
+      throw (engine_error() << "timeperiod '" << tperiod.name << "' invalid exception.");
+    }
+  }
+
+  std::string exclude;
+  for (std::vector<std::string>::const_iterator it = tperiod.exclude.begin(),
+         end = tperiod.exclude.end();
+       it != end;
+       ++it) {
+    exclude += *it;
+    if (it + 1 != end)
+      exclude += ", ";
+  }
+
+  int res = xodtemplate_register_timeperiod(tmpl_tperiod);
+  xodtemplate_free_timeperiod(tmpl_tperiod);
+  if (res != OK)
+    throw (engine_error() << "timeperiod '" << tperiod.name << "' create failed.");
 }

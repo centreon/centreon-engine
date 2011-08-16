@@ -426,10 +426,62 @@ void modules::free_serviceescalation(serviceescalation const* svcescalation) {
 }
 
 /**
+ *  Cleanup memory of timeperiodexclusion.
+ *
+ *  @param[in] tpexclusions The timeperiodexclusion to cleanup memory.
+ */
+void modules::free_timeperiodexclusion(timeperiodexclusion const* tpexclusions) {
+  if (tpexclusions == NULL)
+    return;
+
+  delete[] tpexclusions->timeperiod_name;
+  delete tpexclusions;
+}
+
+/**
+ *  Cleanup memory of daterange.
+ *
+ *  @param[in] tpexclusions The daterange to cleanup memory.
+ */
+void modules::free_daterange(daterange const* drange) {
+  if (drange == NULL)
+    return;
+
+  free_timerange(drange->times);
+  delete drange;
+}
+
+/**
+ *  Cleanup memory of timerange.
+ *
+ *  @param[in] tpexclusions The timerange to cleanup memory.
+ */
+void modules::free_timerange(timerange const* trange) {
+  while (trange != NULL) {
+    timerange const* tmp = trange->next;
+    delete trange;
+    trange = tmp;
+  }
+}
+
+/**
  *  Cleanup memory of serviceescalation.
  *
  *  @param[in] svcescalation The serviceescalation to cleanup memory.
  */
 void modules::free_timeperiod(timeperiod const* tperiod) {
+  if (tperiod == NULL)
+    return;
 
+  skiplist_delete(object_skiplists[TIMEPERIOD_SKIPLIST], tperiod);
+  _remove_object_list(tperiod, &timeperiod_list, &timeperiod_list_tail);
+
+  free_timerange(*tperiod->days);
+  for (unsigned int i = 0; i < DATERANGE_TYPES; ++i)
+    free_daterange(tperiod->exceptions[i]);
+  free_timeperiodexclusion(tperiod->exclusions);
+
+  delete[] tperiod->name;
+  delete[] tperiod->alias;
+  delete tperiod;
 }

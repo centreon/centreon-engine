@@ -42,6 +42,9 @@ namespace                            com {
 	void                         free_contact(contact const* cntct);
         void                         free_hostescalation(hostescalation const* hstescalation);
         void                         free_serviceescalation(serviceescalation const* svcescalation);
+        void                         free_timeperiodexclusion(timeperiodexclusion const* exclusions);
+        void                         free_daterange(daterange const* drange);
+        void                         free_timerange(timerange const* trange);
         void                         free_timeperiod(timeperiod const* tperiod);
       }
     }
