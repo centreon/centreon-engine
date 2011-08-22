@@ -61,13 +61,13 @@
  *  @subsection quickstartprerequisitescentos CentOS
  *
  *  @code
- *    yum install gcc-c++ qt4-devel cmake make
+ *    yum install gcc-c++ qt4-devel cmake make gsoap-devel
  *  @endcode
  *
  *  @subsection quickstartprerequisitesubuntu Ubuntu
  *
  *  @code
- *    apt-get install g++ qt4-dev cmake make
+ *    apt-get install build-essentialqt4-dev cmake gsoap
  *  @endcode
  *
  *  @section quickstartaccount Create Account Information
@@ -107,11 +107,6 @@
  *  and
  *  <a href="http://www.nagiosplugins.org/">http://www.nagiosplugins.org</a>
  *  for links to the latest versions).
- *
- *  @code
- *    wget http://www.centreon.com/downloads/centreon-engine.tar.gz
- *    wget http://prdownloads.sourceforge.net/sourceforge/nagiosplug/nagios-plugins-1.4.15.tar.gz
- *  @endcode
  *
  *  @section quickstartcompile Compile and Install Centreon Engine
  *
