@@ -184,6 +184,10 @@
  *    <td>Where rotated archive logs will be stored.</td>
  *  </tr>
  *  <tr>
+ *    <td>WITH_RW_DIR</td>
+ *    <td>Where the external command pipe will be stored.</td>
+ *  </tr>
+ *  <tr>
  *    <td>WITH_TEMP_DIR</td>
  *    <td>Temporary directory used by Centreon Engine. Default to /tmp.</td>
  *  </tr>
