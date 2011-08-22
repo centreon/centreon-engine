@@ -38,7 +38,7 @@
  *  @section quickstartwhatyoullendwith What You'll End Up With
  *
  *    - Centreon Engine and the Nagios plugins will be installed
- *      underneath @em /usr/local/centengine
+ *      underneath @em /usr/local/centreon-engine
  *    - Centreon Engine will be configured to monitor a few aspects of
  *      your local system (CPU load, disk usage, etc.)
  *
@@ -122,7 +122,7 @@
  *  the user you created earlier like so :
  *
  *  @code
- *    cmake -DWITH_USER=centreon -DWITH_GROUP=centreon .
+ *    cmake -DWITH_USER=centreon -DWITH_GROUP=centreon -DWITH_PREFIX=/usr/local/centreon-engine .
  *  @endcode
  *
  *  Compile the Centreon Engine source code.
@@ -144,17 +144,17 @@
  *  @section quickstartcustomize Customize Configuration
  *
  *  Sample configuration files have now been installed in the
- *  @em /usr/local/centengine/etc directory. These sample files should
- *  work fine for getting started with Centreon Engine. You'll need to
- *  make just one change before you proceed ...
+ *  @em /usr/local/centreon-engine/etc directory. These sample files
+ *  should work fine for getting started with Centreon Engine. You'll
+ *  need to make just one change before you proceed ...
  *
- *  Edit the /usr/local/centengine/etc/objects/contacts.cfg config file
- *  with your favorite editor and change the email address associated
- *  with the centengineadmin contact definition to the address you'd
- *  like to use for receiving alerts.
+ *  Edit the /usr/local/centreon-engine/etc/objects/contacts.cfg config
+ *  file with your favorite editor and change the email address
+ *  associated with the centengineadmin contact definition to the
+ *  address you'd like to use for receiving alerts.
  *
  *  @code
- *    vi /usr/local/centengine/etc/objects/contacts.cfg
+ *    vi /usr/local/centreon-engine/etc/objects/contacts.cfg
  *  @endcode
  *
  *  @section quickstartplugins Compile and Install the Centreon Engine Plugins
@@ -190,7 +190,7 @@
  *  Verify the sample Centreon Engine configuration files.
  *
  *  @code
- *    /usr/local/centengine/bin/centengine -v /usr/local/centengine/etc/centengine.cfg
+ *    /usr/local/centreon-engine/bin/centengine -v /usr/local/centreon-engine/etc/centengine.cfg
  *  @endcode
  *
  *  If there are no errors, start Centreon Engine.
