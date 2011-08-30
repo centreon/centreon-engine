@@ -1026,6 +1026,7 @@ int handle_host_state(host* hst) {
       hst->current_notification_number = 0;
       hst->notified_on_down = FALSE;
       hst->notified_on_unreachable = FALSE;
+      host_other_props[hst->name].initial_notif_time = 0;
     }
   }
 

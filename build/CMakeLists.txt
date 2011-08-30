@@ -860,6 +860,44 @@ if (WITH_TESTING)
 endif ()
 
 #
+# Notifications tests.
+#
+if (WITH_TESTING)
+  # First notification delay on host.
+  set(TEST_NAME "notifications_first_notif_delay_host")
+  add_executable("${TEST_NAME}"
+    "${TEST_DIR}/notifications/first_notif_delay/common.cc"
+    "${TEST_DIR}/notifications/first_notif_delay/common.hh"
+    "${TEST_DIR}/notifications/first_notif_delay/host.cc")
+  target_link_libraries("${TEST_NAME}" "cce_core")
+  add_test("${TEST_NAME}" "${TEST_NAME}")
+  # First notification delay on service.
+  set(TEST_NAME "notifications_first_notif_delay_service")
+  add_executable("${TEST_NAME}"
+    "${TEST_DIR}/notifications/first_notif_delay/common.cc"
+    "${TEST_DIR}/notifications/first_notif_delay/common.hh"
+    "${TEST_DIR}/notifications/first_notif_delay/service.cc")
+  target_link_libraries("${TEST_NAME}" "cce_core")
+  add_test("${TEST_NAME}" "${TEST_NAME}")
+  # First notification delay on host recovery.
+  set(TEST_NAME "notifications_first_notif_delay_host_recovery")
+  add_executable("${TEST_NAME}"
+    "${TEST_DIR}/notifications/first_notif_delay/common.cc"
+    "${TEST_DIR}/notifications/first_notif_delay/common.hh"
+    "${TEST_DIR}/notifications/first_notif_delay/host_recovery.cc")
+  target_link_libraries("${TEST_NAME}" "cce_core")
+  add_test("${TEST_NAME}" "${TEST_NAME}")
+  # First notification delay on service recovery.
+  set(TEST_NAME "notifications_first_notif_delay_service_recovery")
+  add_executable("${TEST_NAME}"
+    "${TEST_DIR}/notifications/first_notif_delay/common.cc"
+    "${TEST_DIR}/notifications/first_notif_delay/common.hh"
+    "${TEST_DIR}/notifications/first_notif_delay/service_recovery.cc")
+  target_link_libraries("${TEST_NAME}" "cce_core")
+  add_test("${TEST_NAME}" "${TEST_NAME}")
+endif ()
+
+#
 # Stats tests.
 #
 if (WITH_TESTING)
