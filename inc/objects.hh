@@ -343,6 +343,11 @@ struct                   host_struct {
   struct host_struct*    nexthash;
 };
 
+// Other HOST structure.
+struct                   host_other_properties {
+  time_t                 initial_notif_time;
+};
+
 // SERVICEGROUP structure
 typedef struct                servicegroup_struct {
   char*                       group_name;
@@ -468,6 +473,11 @@ struct                   service_struct {
   objectlist*            servicegroups_ptr;
   struct service_struct* next;
   struct service_struct* nexthash;
+};
+
+// Other SERVICE structure.
+struct                   service_other_properties {
+  time_t                 initial_notif_time;
 };
 
 // SERVICE ESCALATION structure

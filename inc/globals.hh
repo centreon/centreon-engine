@@ -22,6 +22,8 @@
 #ifndef CCE_GLOBALS_HH_
 # define CCE_GLOBALS_HH_
 
+# include <QHash>
+# include <QString>
 # include <stdio.h>
 # include "checks.hh"
 # include "comments.hh"
@@ -86,8 +88,10 @@ extern int                       embedded_perl_initialized;
 
 extern host*                     host_list;
 extern host*                     host_list_tail;
+extern QHash<QString, host_other_properties> host_other_props;
 extern service*                  service_list;
 extern service*                  service_list_tail;
+extern QHash<QPair<QString, QString>, service_other_properties> service_other_props;
 extern contact*                  contact_list;
 extern contact*                  contact_list_tail;
 extern contactgroup*             contactgroup_list;
