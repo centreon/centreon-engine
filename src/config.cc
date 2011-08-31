@@ -277,19 +277,6 @@ int pre_flight_check(void) {
     delete[] buf;
   }
 
-  /**************************************************/
-  /* check various settings...                      */
-  /**************************************************/
-  if (verify_config == TRUE)
-    printf("Checking misc settings...\n");
-
-  /* warn if user didn't specify any illegal macro output chars */
-  if (config.get_illegal_output_chars() == "") {
-    logit(NSLOG_VERIFICATION_WARNING, TRUE, "%s",
-          "Warning: Nothing specified for illegal_macro_output_chars variable!\n");
-    warnings++;
-  }
-
   /* count number of services associated with each host (we need this for flap detection)... */
   for (temp_service = service_list;
        temp_service != NULL;

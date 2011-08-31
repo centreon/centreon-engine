@@ -600,6 +600,7 @@ namespace                   com {
 	  static const float               DEFAULT_HIGH_SERVICE_FLAP_THRESHOLD;
 	  static const float               DEFAULT_LOW_HOST_FLAP_THRESHOLD;
 	  static const float               DEFAULT_HIGH_HOST_FLAP_THRESHOLD;
+          static const char * const        DEFAULT_ILLEGAL_OUTPUT_CHARS;
 	};
       }
     }

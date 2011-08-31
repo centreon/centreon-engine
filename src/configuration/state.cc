@@ -37,6 +37,7 @@ const float state::DEFAULT_LOW_SERVICE_FLAP_THRESHOLD  = 20.0;
 const float state::DEFAULT_HIGH_SERVICE_FLAP_THRESHOLD = 30.0;
 const float state::DEFAULT_LOW_HOST_FLAP_THRESHOLD     = 20.0;
 const float state::DEFAULT_HIGH_HOST_FLAP_THRESHOLD    = 30.0;
+const char* const state::DEFAULT_ILLEGAL_OUTPUT_CHARS  = "`~$&|'\"<>";
 
 /**************************************
 *                                     *
@@ -2487,6 +2488,8 @@ void state::_reset() {
   set_debug_level(DEFAULT_DEBUG_LEVEL);
   set_debug_verbosity(DEFAULT_DEBUG_VERBOSITY);
   set_max_debug_file_size(DEFAULT_MAX_DEBUG_FILE_SIZE);
+
+  set_illegal_output_chars(DEFAULT_ILLEGAL_OUTPUT_CHARS);
 
   set_date_format(DEFAULT_DATE_FORMAT);
 
