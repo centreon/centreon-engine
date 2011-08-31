@@ -935,6 +935,15 @@ if (WITH_TESTING)
   set(TEST_NAME "running_engine_empty_servicegroup")
   add_test("${TEST_NAME}"
     "centengine" "-v" "${TEST_DIR}/running/etc/empty_servicegroup.cfg")
+  # Empty host group assignment error.
+  set(TEST_NAME "running_engine_empty_hostgroup_assignment_error")
+  add_test("${TEST_NAME}"
+    "centengine" "-v" "${TEST_DIR}/running/etc/empty_hostgroup_assignment_error.cfg")
+  set_tests_properties("${TEST_NAME}" PROPERTIES WILL_FAIL TRUE)
+  # Empty host group assignment success.
+  set(TEST_NAME "running_engine_empty_hostgroup_assignment_success")
+  add_test("${TEST_NAME}"
+    "centengine" "-v" "${TEST_DIR}/running/etc/empty_hostgroup_assignment_success.cfg")
   # broker_module with only path to module.
   set(TEST_NAME "running_engine_broker_module_without_args")
   add_test("${TEST_NAME}"
