@@ -932,6 +932,10 @@ if (WITH_TESTING)
     "centengine" "-v" "${TEST_DIR}/running/etc/empty_groups.cfg")
   set_tests_properties("running_engine_empty_groups"
     PROPERTIES WILL_FAIL TRUE)
+  # broker_module with only path to module.
+  set(TEST_NAME "running_engine_broker_module_without_args")
+  add_test("${TEST_NAME}"
+    "centengine" "-v" "${TEST_DIR}/running/etc/broker_module_without_args.cfg")
 endif ()
 
 # Package.
