@@ -902,15 +902,15 @@ endif ()
 #
 if (WITH_TESTING)
   # Non-existent configuration file.
-  add_test("running_stats_no_config_file"
+  set(TEST_NAME "running_stats_no_config_file")
+  add_test("${TEST_NAME}"
     "centenginestats" "-c" "${TEST_DIR}/running/etc/does_not_exist.cfg")
-  set_tests_properties("running_stats_no_config_file"
-    PROPERTIES WILL_FAIL TRUE)
+  set_tests_properties("${TEST_NAME}" PROPERTIES WILL_FAIL TRUE)
   # Non-existent status file.
-  add_test("running_stats_no_status_file"
-    "centenginestats" "-c" "${TEST_DIR}/running/etc/no_status.cfg")
-  set_tests_properties("running_stats_no_status_file"
-    PROPERTIES WILL_FAIL TRUE)
+  set(TEST_NAME "running_stats_no_status_file")
+  add_test("${TEST_NAME}"
+    "centenginestats" "-c" "${TEST_DIR}/running/etc/no_status_file.cfg")
+  set_tests_properties("${TEST_NAME}" PROPERTIES WILL_FAIL TRUE)
 endif ()
 
 #
