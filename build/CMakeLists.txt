@@ -922,11 +922,6 @@ if (WITH_TESTING)
     "centengine" "-v" "${TEST_DIR}/running/etc/no_service.cfg")
   set_tests_properties("running_engine_no_service"
     PROPERTIES WILL_FAIL TRUE)
-  # Without any contactgroup.
-  add_test("running_engine_no_contactgroup"
-    "centengine" "-v" "${TEST_DIR}/running/etc/no_contactgroup.cfg")
-  set_tests_properties("running_engine_no_contactgroup"
-    PROPERTIES WILL_FAIL TRUE)
   # Empty host group.
   set(TEST_NAME "running_engine_empty_hostgroup")
   add_test("${TEST_NAME}"
@@ -944,6 +939,12 @@ if (WITH_TESTING)
   set(TEST_NAME "running_engine_empty_hostgroup_assignment_success")
   add_test("${TEST_NAME}"
     "centengine" "-v" "${TEST_DIR}/running/etc/empty_hostgroup_assignment_success.cfg")
+  # Invalid contactgroup on contact.
+  set(TEST_NAME "invalid_contactgroup_on_contact")
+  add_test("${TEST_NAME}"
+    "centengine" "-v" "${TEST_DIR}/running/etc/invalid_contactgroup_on_contact.cfg")
+  set_tests_properties("${TEST_NAME}"
+    PROPERTIES WILL_FAIL TRUE)
   # broker_module with only path to module.
   set(TEST_NAME "running_engine_broker_module_without_args")
   add_test("${TEST_NAME}"
