@@ -1,0 +1,36 @@
+/*
+** Copyright 1999-2010 Ethan Galstad
+** Copyright 2011      Merethis
+**
+** This file is part of Centreon Engine.
+**
+** Centreon Engine is free software: you can redistribute it and/or
+** modify it under the terms of the GNU General Public License version 2
+** as published by the Free Software Foundation.
+**
+** Centreon Engine is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+** General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with Centreon Engine. If not, see
+** <http://www.gnu.org/licenses/>.
+*/
+
+#ifndef CCE_MACROS_PROCESS_HH_
+# define CCE_MACROS_PROCESS_HH_
+
+# include "macros/defines.hh"
+
+extern "C" {
+  int process_macros_r(nagios_macros* mac,
+        char const* input_buffer,
+        char** output_buffer,
+        int options);
+  int process_macros(char const* input_buffer,
+        char** output_buffer,
+        int options);
+}
+
+#endif /* !CCE_MACROS_PROCESS_HH_ */

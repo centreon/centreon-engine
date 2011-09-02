@@ -542,3 +542,8 @@ char* resize_string(char* str, size_t size) {
   delete[] str;
   return (new_str);
 }
+
+template <>
+char* obj2pchar<char const*>(char const* str) {
+  return (my_strdup(str ? str : ""));
+}

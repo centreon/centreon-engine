@@ -64,7 +64,8 @@ char* resize_string(char* str, size_t size);
 #  include <sstream>
 #  include <string>
 #  include <string.h>
-template <class T> char* obj2pchar(T obj) {
+template <class T>
+char* obj2pchar(T obj) {
   std::ostringstream oss;
   oss << obj;
   std::string const& str = oss.str();
@@ -72,6 +73,8 @@ template <class T> char* obj2pchar(T obj) {
   strcpy(buf, str.c_str());
   return (buf);
 }
+template <>
+char* obj2pchar<char const*>(char const* str);
 # endif
 
 #endif // !CCE_SHARED_HH
