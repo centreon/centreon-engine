@@ -285,6 +285,9 @@ int grab_standard_service_macro_r(nagios_macros* mac,
 
       // Set the free macro flag.
       *free_macro = it->second;
+
+      // Successful execution.
+      retval = OK;
     }
     // Non-existent macro.
     else {

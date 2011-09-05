@@ -880,6 +880,28 @@ if (WITH_TESTING)
 endif ()
 
 #
+# Macros tests.
+#
+if (WITH_TESTING)
+  # Grab standard host macro.
+  set(TEST_NAME "macros_grab_standard_host_macro")
+  add_executable("${TEST_NAME}"
+    "${TEST_DIR}/macros/grab_standard_host_macro.cc"
+    "${TEST_DIR}/macros/minimal_setup.cc"
+    "${TEST_DIR}/macros/minimal_setup.hh")
+  target_link_libraries("${TEST_NAME}" "cce_core")
+  add_test("${TEST_NAME}" "${TEST_NAME}")
+  # Grab standard service macro.
+  set(TEST_NAME "macros_grab_standard_service_macro")
+  add_executable("${TEST_NAME}"
+    "${TEST_DIR}/macros/grab_standard_service_macro.cc"
+    "${TEST_DIR}/macros/minimal_setup.cc"
+    "${TEST_DIR}/macros/minimal_setup.hh")
+  target_link_libraries("${TEST_NAME}" "cce_core")
+  add_test("${TEST_NAME}" "${TEST_NAME}")
+endif ()
+
+#
 # Notifications tests.
 #
 if (WITH_TESTING)
