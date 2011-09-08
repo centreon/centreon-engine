@@ -64,6 +64,8 @@ namespace                               com {
 	  void                          ended();
 
 	private:
+          static void                   _deletelater_process(process* obj);
+
 	  struct                        process_info {
 	    QSharedPointer<process>     proc;
 	    unsigned long               cmd_id;

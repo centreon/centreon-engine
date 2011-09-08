@@ -101,7 +101,8 @@ unsigned long raw::run(QString const& processed_cmd,
 		       nagios_macros const& macros,
 		       unsigned int timeout) {
   process_info info;
-  info.proc = QSharedPointer<process>(new process(macros, timeout));
+  info.proc = QSharedPointer<process>(new process(macros, timeout),
+                                      &_deletelater_process);
 
   if (connect(&(*info.proc),
   	      SIGNAL(ended()),
@@ -183,4 +184,8 @@ void raw::ended() {
     << "raw command (id=" << info.cmd_id << ") finished.";
 
   emit command_executed(res);
+}
+
+void raw::_deletelater_process(process* obj) {
+  obj->deleteLater();
 }
