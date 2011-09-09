@@ -682,6 +682,7 @@ add_subdirectory("compatibility")
 add_subdirectory("doc")
 add_subdirectory("logging")
 add_subdirectory("modules")
+add_subdirectory("objects")
 add_subdirectory("scripts")
 
 # Link target with required libraries.
@@ -695,7 +696,8 @@ target_link_libraries("cce_core"
   "cce_checks"
   "cce_configuration"
   "cce_commands"
-  "cce_compatibility")
+  "cce_compatibility"
+  "cce_objects")
 
 # centengine target.
 add_executable("centengine"
@@ -706,6 +708,18 @@ get_property(ENGINE_COMPILE_FLAGS
 set(ENGINE_COMPILE_FLAGS "${ENGINE_COMPILE_FLAGS}")
 set_target_properties("centengine"
   PROPERTIES COMPILE_FLAGS "${ENGINE_COMPILE_FLAGS}")
+get_property(ENGINE_LINK_FLAGS
+  TARGET "centengine"
+  PROPERTY LINK_FLAGS)
+set(ENGINE_LINK_FLAGS "${ENGINE_LINK_FLAGS}")
+
+if (CMAKE_COMPILER_IS_GNUCXX)
+  set(ENGINE_LINK_FLAGS
+    "${ENGINE_LINK_FLAGS} -Wl,-whole-archive -lcce_objects -L./objects -Wl,-no-whole-archive")
+endif ()
+
+set_target_properties("centengine"
+  PROPERTIES LINK_FLAGS "${ENGINE_LINK_FLAGS}")
 # Link centengine with required libraries.
 target_link_libraries("centengine"
   "cce_core")

@@ -311,10 +311,14 @@ arg_definition::arg_definition() {
     .set_is_optional(true);
 
   argument hostdependency_type("ns1__hostDependencyType", "hostdependency");
-  hostdependency_type.add(arg_string).set_name("dependentHostName")
-    .set_help("dependent_host_name");
-  hostdependency_type.add(arg_string).set_name("hostName")
-    .set_help("host_name");
+  hostdependency_type.add(arg_vectorstr).set_name("dependentHostsName")
+    .set_help("dependents_host_name")
+    .set_is_optional(true)
+    .set_is_array(true);
+  hostdependency_type.add(arg_vectorstr).set_name("hostsName")
+    .set_help("hosts_name")
+    .set_is_optional(true)
+    .set_is_array(true);
   hostdependency_type.add(arg_vectorstr).set_name("dependentHostgroupsName")
     .set_help("dependent_hostgroups_name")
     .set_is_optional(true)
@@ -337,14 +341,16 @@ arg_definition::arg_definition() {
     .set_is_optional(true);
 
   argument hostescalation_type("ns1__hostEscalationType", "hostescalation");
-  hostescalation_type.add(arg_string).set_name("hostName")
-    .set_help("host_name");
   hostescalation_type.add(arg_uint).set_name("firstNotification")
     .set_help("first_notification");
   hostescalation_type.add(arg_uint).set_name("lastNotification")
     .set_help("last_notification");
   hostescalation_type.add(arg_uint).set_name("notificationInterval")
     .set_help("notification_interval");
+  hostescalation_type.add(arg_vectorstr).set_name("hostsName")
+    .set_help("hosts_name")
+    .set_is_optional(true)
+    .set_is_array(true);
   hostescalation_type.add(arg_vectorstr).set_name("contacts")
     .set_help("contacts")
     .set_is_optional(true)
@@ -557,8 +563,6 @@ arg_definition::arg_definition() {
     .set_help("service_description");
 
   argument serviceescalation_type("ns1__serviceEscalationType", "svcescalation");
-  serviceescalation_type.add(arg_string).set_name("hostName")
-    .set_help("host_name");
   serviceescalation_type.add(arg_string).set_name("serviceDescription")
     .set_help("service_description");
   serviceescalation_type.add(arg_uint).set_name("firstNotification")
@@ -567,6 +571,10 @@ arg_definition::arg_definition() {
     .set_help("last_notification");
   serviceescalation_type.add(arg_uint).set_name("notificationInterval")
     .set_help("notification_interval");
+  serviceescalation_type.add(arg_vectorstr).set_name("hostsName")
+    .set_help("hosts_name")
+    .set_is_optional(true)
+    .set_is_array(true);
   serviceescalation_type.add(arg_vectorstr).set_name("contacts")
     .set_help("contacts")
     .set_is_optional(true)
@@ -597,14 +605,18 @@ arg_definition::arg_definition() {
     .set_help("dependent_service_description");
 
   argument servicedependency_type("ns1__serviceDependencyType", "svcdependency");
-  servicedependency_type.add(arg_string).set_name("dependentHostName")
-    .set_help("dependent_host_name");
   servicedependency_type.add(arg_string).set_name("dependentServiceDescription")
     .set_help("dependent_service_description");
-  servicedependency_type.add(arg_string).set_name("hostName")
-    .set_help("host_name");
   servicedependency_type.add(arg_string).set_name("serviceDescription")
     .set_help("service_description");
+  servicedependency_type.add(arg_vectorstr).set_name("dependentHostsName")
+    .set_help("dependent_hosts_name")
+    .set_is_optional(true)
+    .set_is_array(true);
+  servicedependency_type.add(arg_vectorstr).set_name("hostsName")
+    .set_help("hosts_name")
+    .set_is_optional(true)
+    .set_is_array(true);
   servicedependency_type.add(arg_vectorstr).set_name("dependentHostgroupsName")
     .set_help("dependent_hostgroups_name")
     .set_is_optional(true)

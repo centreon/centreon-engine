@@ -81,9 +81,9 @@
       <!-- hostDependency type -->
       <complexType name="hostDependencyType">
         <sequence>
-          <element name="dependentHostName" type="xsd:string"/>
+          <element name="dependentHostsName" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
           <element name="dependentHostgroupsName" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
-          <element name="hostName" type="xsd:string"/>
+          <element name="hostsName" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
           <element name="hostgroupsName" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
 	  <element name="inheritsParent" type="xsd:boolean" minOccurs="0"/>
 	  <element name="executionFailureCriteria" type="xsd:string" minOccurs="0"/>
@@ -95,7 +95,7 @@
       <!-- hostEscalation type -->
       <complexType name="hostEscalationType">
         <sequence>
-          <element name="hostName" type="xsd:string"/>
+          <element name="hostsName" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
           <element name="hostgroupsName" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
           <element name="contacts" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
           <element name="contactGroups" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
@@ -184,10 +184,10 @@
       <!-- serviceDependency type -->
       <complexType name="serviceDependencyType">
         <sequence>
-          <element name="dependentHostName" type="xsd:string"/>
+          <element name="dependentHostsName" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
           <element name="dependentHostgroupsName" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
           <element name="dependentServiceDescription" type="xsd:string"/>
-          <element name="hostName" type="xsd:string"/>
+          <element name="hostsName" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
           <element name="hostgroupsName" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
           <element name="serviceDescription" type="xsd:string"/>
 	  <element name="inheritsParent" type="xsd:boolean" minOccurs="0"/>
@@ -200,7 +200,7 @@
       <!-- serviceEscalation type -->
       <complexType name="serviceEscalationType">
         <sequence>
-          <element name="hostName" type="xsd:string"/>
+          <element name="hostsName" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
           <element name="hostgroupsName" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
           <element name="serviceDescription" type="xsd:string"/>
           <element name="contacts" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>

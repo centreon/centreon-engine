@@ -26,21 +26,21 @@ namespace       com {
   namespace     centreon {
     namespace   engine {
       namespace modules {
-	void    add_command(ns1__commandType const& command);
-	void    add_contactgroup(ns1__contactGroupType const& contactgroup);
-	void    add_hostgroup(ns1__hostGroupType const& hostgroup);
-	void    add_servicegroup(ns1__serviceGroupType const& servicegroup);
-	void    add_host(ns1__hostType const& host);
-	void    add_service(ns1__serviceType const& service);
-	void    add_contact(ns1__contactType const& contact);
-	void    add_hostdependency(ns1__hostDependencyType const& hostdependency);
-	void    add_hostescalation(ns1__hostEscalationType const& hostescalation);
-	void    add_servicedependency(ns1__serviceDependencyType const& servicedependency);
-	void    add_serviceescalation(ns1__serviceEscalationType const& serviceescalation);
-        void    add_timeperiod(ns1__timeperiodType const& tperiod);
+	void    create_command(ns1__commandType const& command);
+	void    create_contactgroup(ns1__contactGroupType const& contactgroup);
+	void    create_hostgroup(ns1__hostGroupType const& hostgroup);
+	void    create_servicegroup(ns1__serviceGroupType const& servicegroup);
+	void    create_host(ns1__hostType const& host);
+	void    create_service(ns1__serviceType const& service);
+	void    create_contact(ns1__contactType const& contact);
+	void    create_hostdependency(ns1__hostDependencyType const& hostdependency);
+	void    create_hostescalation(ns1__hostEscalationType const& hostescalation);
+	void    create_servicedependency(ns1__serviceDependencyType const& servicedependency);
+	void    create_serviceescalation(ns1__serviceEscalationType const& serviceescalation);
+        void    create_timeperiod(ns1__timeperiodType const& tperiod);
       }
     }
   }
 }
 
-#endif // !CCE_MOD_WS_SERVER_ADD_OBJECT_HH
+#endif // !CCE_MOD_WS_SERVER_CREATE_OBJECT_HH

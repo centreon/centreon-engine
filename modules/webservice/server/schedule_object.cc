@@ -80,7 +80,7 @@ static void _update_host_schedule_info(host const* hst) {
   }
 }
 
-static void _update_service_schedule_indo(service const* svc) {
+static void _update_service_schedule_info(service const* svc) {
   logger(dbg_events, most) << "Determining service scheduling parameters.";
 
   if (svc == NULL)
@@ -257,7 +257,7 @@ void modules::schedule_service(service* svc) {
     << "Actual Check Time: " << svc->next_check << " --> " << ctime(&svc->next_check);
 
   // update scheduling info.
-  _update_service_schedule_indo(svc);
+  _update_service_schedule_info(svc);
 
   // update status of all services.
   update_service_status(svc, false);

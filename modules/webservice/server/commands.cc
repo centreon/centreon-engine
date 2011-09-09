@@ -33,7 +33,7 @@
 #include "commands.hh"
 #include "checks.hh"
 #include "syncro.hh"
-#include "add_object.hh"
+#include "create_object.hh"
 #include "logging/dumpers.hh"
 
 using namespace com::centreon::engine::modules;
@@ -13326,7 +13326,7 @@ int centreonengine__addCommand(soap* s,
 		   command->name.c_str(),
 		   command->commandLine.c_str());
 
-    add_command(*command);
+    create_command(*command);
 
     syncro::instance().worker_finish();
   }
@@ -13372,7 +13372,7 @@ int centreonengine__addContactGroup(soap* s,
 		   contactGroup->name.c_str(),
 		   contactGroup->alias.c_str());
 
-    add_contactgroup(*contactGroup);
+    create_contactgroup(*contactGroup);
 
     syncro::instance().worker_finish();
   }
@@ -13417,7 +13417,7 @@ int centreonengine__addHostGroup(soap* s,
 		   hostGroup->name.c_str(),
 		   hostGroup->alias.c_str());
 
-    add_hostgroup(*hostGroup);
+    create_hostgroup(*hostGroup);
 
     syncro::instance().worker_finish();
   }
@@ -13462,7 +13462,7 @@ int centreonengine__addServiceGroup(soap* s,
 		   serviceGroup->name.c_str(),
 		   serviceGroup->alias.c_str());
 
-    add_servicegroup(*serviceGroup);
+    create_servicegroup(*serviceGroup);
 
     syncro::instance().worker_finish();
   }
@@ -13506,7 +13506,7 @@ int centreonengine__addHost(soap* s,
                    __func__,
 		   host->name.c_str());
 
-    add_host(*host);
+    create_host(*host);
 
     syncro::instance().worker_finish();
   }
@@ -13546,12 +13546,10 @@ int centreonengine__addHostDependency(soap* s,
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-                   "Webservice: %s({%s, %s})\n",
-                   __func__,
-		   hostdependency->dependentHostName.c_str(),
-		   hostdependency->hostName.c_str());
+                   "Webservice: %s()\n",
+                   __func__);
 
-    add_hostdependency(*hostdependency);
+    create_hostdependency(*hostdependency);
 
     syncro::instance().worker_finish();
   }
@@ -13591,11 +13589,10 @@ int centreonengine__addHostEscalation(soap* s,
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-                   "Webservice: %s(%s)\n",
-                   __func__,
-		   hostescalation->hostName.c_str());
+                   "Webservice: %s()\n",
+                   __func__);
 
-    add_hostescalation(*hostescalation);
+    create_hostescalation(*hostescalation);
 
     syncro::instance().worker_finish();
   }
@@ -13640,7 +13637,7 @@ int centreonengine__addService(soap* s,
 		   service->hostName.c_str(),
 		   service->serviceDescription.c_str());
 
-    add_service(*service);
+    create_service(*service);
 
     syncro::instance().worker_finish();
   }
@@ -13680,14 +13677,12 @@ int centreonengine__addServiceDependency(soap* s,
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-                   "Webservice: %s({%s, %s, %s, %s})\n",
+                   "Webservice: %s({%s, %s})\n",
                    __func__,
-		   servicedependency->dependentHostName.c_str(),
 		   servicedependency->dependentServiceDescription.c_str(),
-		   servicedependency->hostName.c_str(),
 		   servicedependency->serviceDescription.c_str());
 
-    add_servicedependency(*servicedependency);
+    create_servicedependency(*servicedependency);
 
     syncro::instance().worker_finish();
   }
@@ -13727,12 +13722,11 @@ int centreonengine__addServiceEscalation(soap* s,
     syncro::instance().waiting_callback();
 
     log_debug_info(DEBUGL_FUNCTIONS, 2,
-                   "Webservice: %s({%s, %s})\n",
+                   "Webservice: %s({%s})\n",
                    __func__,
-		   serviceescalation->hostName.c_str(),
 		   serviceescalation->serviceDescription.c_str());
 
-    add_serviceescalation(*serviceescalation);
+    create_serviceescalation(*serviceescalation);
 
     syncro::instance().worker_finish();
   }
@@ -13776,7 +13770,7 @@ int centreonengine__addContact(soap* s,
                    __func__,
 		   contact->name.c_str());
 
-    add_contact(*contact);
+    create_contact(*contact);
 
     syncro::instance().worker_finish();
   }
@@ -13820,7 +13814,7 @@ int centreonengine__addTimeperiod(soap* s,
                    __func__,
 		   tperiod->name.c_str());
 
-    add_timeperiod(*tperiod);
+    create_timeperiod(*tperiod);
 
     syncro::instance().worker_finish();
   }
