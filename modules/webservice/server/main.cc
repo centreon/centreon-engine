@@ -62,7 +62,7 @@ static configuration* gl_config = NULL;
  *
  *  @return 0 on success.
  */
-int callback_external_command(int callback_type, void* data) {
+int callback_webservice(int callback_type, void* data) {
   (void)callback_type;
 
   nebstruct_external_command_data* neb_data = static_cast<nebstruct_external_command_data*>(data);
@@ -109,8 +109,8 @@ extern "C" int nebmodule_deinit(int flags, int reason) {
     delete gl_webservice;
     delete gl_config;
 
-    neb_deregister_callback(NEBCALLBACK_EXTERNAL_COMMAND_DATA,
-			    callback_external_command);
+    neb_deregister_callback(NEBCALLBACK_WEBSERVICE_DATA,
+			    callback_webservice);
   }
   catch (std::exception const& e) {
       logit(NSLOG_RUNTIME_ERROR, false,
@@ -175,10 +175,10 @@ extern "C" int nebmodule_init(int flags, char const* args, void* handle) {
     }
 
     // Register callbacks.
-    if (neb_register_callback(NEBCALLBACK_EXTERNAL_COMMAND_DATA,
+    if (neb_register_callback(NEBCALLBACK_WEBSERVICE_DATA,
 			      gl_mod_handle,
 			      0,
-			      callback_external_command) != 0) {
+			      callback_webservice) != 0) {
       throw (engine_error() << "register callback failed");
     }
 

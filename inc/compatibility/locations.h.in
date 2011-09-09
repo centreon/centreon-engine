@@ -23,30 +23,65 @@
 # ifndef DEFAULT_TEMP_FILE
 #  define DEFAULT_TEMP_FILE             "@localstatedir@/tempfile"
 # endif // !DEFAULT_TEMP_FILE
-# define DEFAULT_TEMP_PATH             "@TMPDIR@"
-# define DEFAULT_CHECK_RESULT_PATH     "@CHECK_RESULT_DIR@"
-# define DEFAULT_STATUS_FILE           "@localstatedir@/status.dat"
+
+# ifndef DEFAULT_TEMP_PATH
+#  define DEFAULT_TEMP_PATH             "@TMPDIR@"
+# endif // !DEFAULT_TEMP_PATH
+
+# ifndef DEFAULT_CHECK_RESULT_PATH
+#  define DEFAULT_CHECK_RESULT_PATH     "@CHECK_RESULT_DIR@"
+# endif // !DEFAULT_CHECK_RESULT_PATH
+
+# ifndef DEFAULT_STATUS_FILE
+#  define DEFAULT_STATUS_FILE           "@localstatedir@/status.dat"
+# endif // !DEFAULT_STATUS_FILE
+
 # ifndef DEFAULT_LOG_FILE
 #  define DEFAULT_LOG_FILE              "@localstatedir@/nagios.log"
 # endif // !DEFAULT_LOG_FILE
+
 # ifndef DEFAULT_LOG_ARCHIVE_PATH
 #  define DEFAULT_LOG_ARCHIVE_PATH      "@LOG_ARCHIVE_DIR@"
 # endif // !DEFAULT_LOG_ARCHIVE_PATH
+
 # ifndef DEFAULT_DEBUG_FILE
 #  define DEFAULT_DEBUG_FILE            "@localstatedir@/nagios.debug"
 # endif // !DEFAULT_DEBUG_FILE
-# define DEFAULT_COMMENT_FILE          "@localstatedir@/comments.dat"
-# define DEFAULT_DOWNTIME_FILE         "@localstatedir@/downtime.dat"
-# define DEFAULT_RETENTION_FILE        "@localstatedir@/retention.dat"
+
+# ifndef DEFAULT_COMMENT_FILE
+#  define DEFAULT_COMMENT_FILE          "@localstatedir@/comments.dat"
+# endif // !DEFAULT_COMMENT_FILE
+
+# ifndef DEFAULT_DOWNTIME_FILE
+#  define DEFAULT_DOWNTIME_FILE         "@localstatedir@/downtime.dat"
+#endif // !DEFAULT_DOWNTIME_FILE
+
+# ifndef DEFAULT_RETENTION_FILE
+#  define DEFAULT_RETENTION_FILE        "@localstatedir@/retention.dat"
+# endif // !DEFAULT_RETENTION_FILE
+
 # ifndef DEFAULT_COMMAND_FILE
 #  define DEFAULT_COMMAND_FILE          "@localstatedir@/centengine.cmd"
 # endif // !DEFAULT_COMMAND_FILE
+
 # ifndef DEFAULT_CONFIG_FILE
 #  define DEFAULT_CONFIG_FILE           "@confdir@/centengine.cfg"
 # endif // !DEFAULT_CONFIG_FILE
-# define DEFAULT_LOCK_FILE             "@localstatedir@/centengine.lock"
-# define DEFAULT_OBJECT_CACHE_FILE     "@localstatedir@/objects.cache"
-# define DEFAULT_PRECACHED_OBJECT_FILE "@localstatedir@/objects.precache"
-# define DEFAULT_EVENT_BROKER_FILE     "@localstatedir@/broker.socket"
+
+# ifndef DEFAULT_LOCK_FILE
+#  define DEFAULT_LOCK_FILE             "@localstatedir@/centengine.lock"
+# endif // !DEFAULT_LOCK_FILE
+
+# ifndef DEFAULT_OBJECT_CACHE_FILE
+#  define DEFAULT_OBJECT_CACHE_FILE     "@localstatedir@/objects.cache"
+# endif // !DEFAULT_OBJECT_CACHE_FILE
+
+# ifndef DEFAULT_PRECACHED_OBJECT_FILE
+#  define DEFAULT_PRECACHED_OBJECT_FILE "@localstatedir@/objects.precache"
+# endif // !DEFAULT_PRECACHED_OBJECT_FILE
+
+# ifndef DEFAULT_EVENT_BROKER_FILE
+#  define DEFAULT_EVENT_BROKER_FILE     "@localstatedir@/broker.socket"
+# endif // !DEFAULT_EVENT_BROKER_FILE
 
 #endif /* !CCE_LOCATIONS_H */
