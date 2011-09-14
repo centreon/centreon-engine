@@ -19,7 +19,7 @@
 
 # Set directories.
 set(SRC_DIR "${SRC_DIR}/checks")
-set(INC_DIR "${INCLUDE_DIR}/checks")
+set(INC_DIR "${INCLUDE_DIR}/com/centreon/engine/checks")
 set(TEST_DIR "${TEST_DIR}/checks")
 
 # Produce moc files.

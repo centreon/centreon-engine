@@ -19,7 +19,7 @@
 
 # Set directories.
 set(SRC_DIR "${SRC_DIR}/configuration")
-set(INC_DIR "${INCLUDE_DIR}/configuration")
+set(INC_DIR "${INCLUDE_DIR}/com/centreon/engine/configuration")
 
 # Subdirectory.
 add_subdirectory("applier")

@@ -1,5 +1,5 @@
 /*
-** Copyright 2011      Merethis
+** Copyright 2011 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -23,7 +23,7 @@
 # include <QHash>
 # include <QSharedPointer>
 # include <QByteArray>
-# include "commands/connector/request.hh"
+# include "com/centreon/engine/commands/connector/request.hh"
 
 namespace                           com {
   namespace                         centreon {
