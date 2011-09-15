@@ -18,6 +18,8 @@
 */
 
 #include "error.hh"
+#include "globals.hh"
+#include "skiplist.hh"
 #include "logging/logger.hh"
 #include "objects/utils.hh"
 #include "objects/hostdependency.hh"
@@ -98,9 +100,15 @@ void objects::link(hostdependency* obj, timeperiod* dependency_period) {
  *  @param[in] obj The hostdependency to cleanup memory.
  */
 void objects::release(hostdependency const* obj) {
+  if (obj == NULL)
+    return;
+
+  skiplist_delete(object_skiplists[HOSTDEPENDENCY_SKIPLIST], obj);
+  remove_object_list(obj, &hostdependency_list, &hostdependency_list_tail);
+
   delete[] obj->dependent_host_name;
   delete[] obj->host_name;
   delete[] obj->dependency_period;
 
-  delete[] obj;
+  delete obj;
 }

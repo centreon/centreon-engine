@@ -536,11 +536,13 @@ void broker_program_status(int type,
   ds.obsess_over_services = config.get_obsess_over_services();
   ds.modified_host_attributes = modified_host_process_attributes;
   ds.modified_service_attributes = modified_service_process_attributes;
-  ds.global_host_event_handler = qPrintable(config.get_global_host_event_handler());
-  ds.global_service_event_handler = qPrintable(config.get_global_service_event_handler());
+  ds.global_host_event_handler = my_strdup(qPrintable(config.get_global_host_event_handler()));
+  ds.global_service_event_handler = my_strdup(qPrintable(config.get_global_service_event_handler()));
 
   /* make callbacks */
   neb_make_callbacks(NEBCALLBACK_PROGRAM_STATUS_DATA, (void*)&ds);
+  delete[] ds.global_host_event_handler;
+  delete[] ds.global_service_event_handler;
 }
 
 /* sends host status updates to broker */

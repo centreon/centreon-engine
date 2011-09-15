@@ -203,6 +203,28 @@ void objects::release(service const* obj) {
   skiplist_delete(object_skiplists[SERVICE_SKIPLIST], obj);
   remove_object_list(obj, &service_list, &service_list_tail);
 
+  // update the event list low.
+  for (timed_event* temp_event = event_list_low;
+    temp_event != NULL;
+    temp_event = temp_event->next) {
+    if (temp_event->event_data == obj) {
+      remove_event(temp_event, &event_list_low, &event_list_low_tail);
+      delete temp_event;
+      break;
+    }
+  }
+
+  // update the event list high.
+  for (timed_event* temp_event = event_list_high;
+       temp_event != NULL;
+       temp_event = temp_event->next) {
+    if (temp_event->event_data == obj) {
+      remove_event(temp_event, &event_list_high, &event_list_high_tail);
+      delete temp_event;
+      break;
+    }
+  }
+
   delete[] obj->host_name;
   delete[] obj->description;
   delete[] obj->display_name;

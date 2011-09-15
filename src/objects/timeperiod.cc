@@ -61,15 +61,16 @@ void objects::add_timeperiod(QString const& name,
                              QString const& alias,
                              QVector<QString> const& range,
                              QVector<QString> const& exclude) {
-  char const* name_str = qPrintable(name);
-
-  if (find_timeperiod(name_str) != NULL)
+  char* name_str = my_strdup(qPrintable(name));
+  if (find_timeperiod(name_str) != NULL) {
+    delete[] name_str;
     throw (engine_error() << "timeperiod '" << name << "' timeperiod already exist.");
+  }
 
   xodtemplate_timeperiod* tmpl_tperiod = new xodtemplate_timeperiod();
   memset(tmpl_tperiod, 0, sizeof(*tmpl_tperiod));
 
-  tmpl_tperiod->timeperiod_name = my_strdup(name_str);
+  tmpl_tperiod->timeperiod_name = name_str;
   tmpl_tperiod->alias = my_strdup(qPrintable(alias));
   tmpl_tperiod->register_object = true;
   for (QVector<QString>::const_iterator it = range.begin(), end = range.end();
@@ -117,7 +118,8 @@ void objects::release(timeperiod const* obj) {
   skiplist_delete(object_skiplists[TIMEPERIOD_SKIPLIST], obj);
   remove_object_list(obj, &timeperiod_list, &timeperiod_list_tail);
 
-  release(*obj->days);
+  for (unsigned int i = 0; i < 7; ++i)
+    release(obj->days[i]);
   for (unsigned int i = 0; i < DATERANGE_TYPES; ++i)
     release(obj->exceptions[i]);
   release(obj->exclusions);

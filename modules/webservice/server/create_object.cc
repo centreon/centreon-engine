@@ -164,8 +164,7 @@ static void _extract_object_from_objectgroup(QVector<T*> const& groups,
  *  @param[in] cmd The struct with all information to create new command.
  */
 void modules::create_command(ns1__commandType const& cmd) {
-  if (::add_command(cmd.name.c_str(), cmd.commandLine.c_str()) == NULL)
-    throw (engine_error() << "command '" << cmd.name << "' create failed.");
+  add_command(cmd.name.c_str(), cmd.commandLine.c_str());
 }
 
 /**
@@ -175,11 +174,8 @@ void modules::create_command(ns1__commandType const& cmd) {
  */
 void modules::create_contactgroup(ns1__contactGroupType const& cntctgrp) {
   // create a new contactgroup.
-  contactgroup* group = ::add_contactgroup(cntctgrp.name.c_str(),
-					   cntctgrp.alias.c_str());
-  if (group == NULL)
-    throw (engine_error() << "contactgroup '" << cntctgrp.name << "' create failed.");
-
+  contactgroup* group = add_contactgroup(cntctgrp.name.c_str(),
+                                         cntctgrp.alias.c_str());
   // add all contacts into the contactgroup.
   QVector<contact*> cntct_members =
     _find<contact>(cntctgrp.members, (void* (*)(char const*))&find_contact);
@@ -217,13 +213,11 @@ void modules::create_hostgroup(ns1__hostGroupType const& hstgrp) {
   char const* action_url = (hstgrp.actionUrl ? hstgrp.actionUrl->c_str() : NULL);
 
   // create a new hostgroup.
-  hostgroup* group = ::add_hostgroup(hstgrp.name.c_str(),
-				     hstgrp.alias.c_str(),
-				     notes,
-				     notes_url,
-				     action_url);
-  if (group == NULL)
-    throw (engine_error() << "hostgroup '" << hstgrp.name << "' create failed.");
+  hostgroup* group = add_hostgroup(hstgrp.name.c_str(),
+                                   hstgrp.alias.c_str(),
+                                   notes,
+                                   notes_url,
+                                   action_url);
 
   // add all host into the hostgroup.
   QVector<host*> hst_members = _find<host>(hstgrp.members, (void* (*)(char const*))&find_host);
@@ -265,13 +259,11 @@ void modules::create_servicegroup(ns1__serviceGroupType const& svcgrp) {
   char const* action_url = (svcgrp.actionUrl ? svcgrp.actionUrl->c_str() : NULL);
 
   // create a new service group.
-  servicegroup* group = ::add_servicegroup(svcgrp.name.c_str(),
-					   svcgrp.alias.c_str(),
-					   notes,
-					   notes_url,
-					   action_url);
-  if (group == NULL)
-    throw (engine_error() << "servicegroup '" << svcgrp.name << "' create failed.");
+  servicegroup* group = add_servicegroup(svcgrp.name.c_str(),
+                                         svcgrp.alias.c_str(),
+                                         notes,
+                                         notes_url,
+                                         action_url);
 
   // add all services into the servicegroup.
   QVector<service*> svc_members = _find(svcgrp.members);
@@ -343,7 +335,7 @@ void modules::create_host(ns1__hostType const& hst) {
   command* cmd_event_handler = NULL;
   if (hst.eventHandler != NULL
       && (cmd_event_handler = find_command(hst.eventHandler->c_str())) == NULL)
-      throw (engine_error() << "host '" << hst.name << "' invalid event handler.");
+    throw (engine_error() << "host '" << hst.name << "' invalid event handler.");
 
   command* cmd_check_command = NULL;
   if (hst.checkCommand != NULL
@@ -386,63 +378,61 @@ void modules::create_host(ns1__hostType const& hst) {
   // XXX: add check host dependency for child.
 
   // create a new host.
-  host* new_hst = ::add_host(hst.name.c_str(),
-			     display_name,
-			     hst.alias.c_str(),
-			     hst.address.c_str(),
-			     hst.checkPeriod.c_str(),
-			     initial_state,
-			     check_interval,
-			     retry_interval,
-			     hst.maxCheckAttempts,
-			     notif_opt['r'],
-                             notif_opt['d'],
-                             notif_opt['u'],
-                             notif_opt['f'],
-                             notif_opt['s'],
-			     hst.notificationInterval,
-			     first_notification_delay,
-			     hst.notificationPeriod.c_str(),
-			     notifications_enabled,
-			     check_command,
-			     active_checks_enabled,
-			     passive_checks_enabled,
-			     event_handler,
-			     event_handler_enabled,
-			     flap_detection_enabled,
-			     low_flap_threshold,
-			     high_flap_threshold,
-                             flap_detection_opt['o'],
-                             flap_detection_opt['d'],
-                             flap_detection_opt['u'],
-                             stalk_opt['o'],
-                             stalk_opt['d'],
-                             stalk_opt['u'],
-			     process_perfdata,
-			     true,   // no documentation for
-			     NULL,   // failure_prediction_options in nagios 3.
-			     check_freshness,
-			     freshness_threshold,
-			     notes,
-			     notes_url,
-			     action_url,
-			     icon_image,
-			     icon_image_alt,
-			     vrml_image,
-			     statusmap_image,
-			     -1,     // 2d_coords not used in centreon.
-			     -1,
-			     false,
-			     0,      // 3d_coords not used in centreon.
-			     0,
-			     0,
-			     false,
-			     true,
-			     retain_status_information,
-			     retain_nonstatus_information,
-			     obsess_over_host);
-  if (new_hst == NULL)
-    throw (engine_error() << "host '" << hst.name << "' create failed.");
+  host* new_hst = add_host(hst.name.c_str(),
+                           display_name,
+                           hst.alias.c_str(),
+                           hst.address.c_str(),
+                           hst.checkPeriod.c_str(),
+                           initial_state,
+                           check_interval,
+                           retry_interval,
+                           hst.maxCheckAttempts,
+                           notif_opt['r'],
+                           notif_opt['d'],
+                           notif_opt['u'],
+                           notif_opt['f'],
+                           notif_opt['s'],
+                           hst.notificationInterval,
+                           first_notification_delay,
+                           hst.notificationPeriod.c_str(),
+                           notifications_enabled,
+                           check_command,
+                           active_checks_enabled,
+                           passive_checks_enabled,
+                           event_handler,
+                           event_handler_enabled,
+                           flap_detection_enabled,
+                           low_flap_threshold,
+                           high_flap_threshold,
+                           flap_detection_opt['o'],
+                           flap_detection_opt['d'],
+                           flap_detection_opt['u'],
+                           stalk_opt['o'],
+                           stalk_opt['d'],
+                           stalk_opt['u'],
+                           process_perfdata,
+                           true,   // no documentation for
+                           NULL,   // failure_prediction_options in nagios 3.
+                           check_freshness,
+                           freshness_threshold,
+                           notes,
+                           notes_url,
+                           action_url,
+                           icon_image,
+                           icon_image_alt,
+                           vrml_image,
+                           statusmap_image,
+                           -1,     // 2d_coords not used in centreon.
+                           -1,
+                           false,
+                           0,      // 3d_coords not used in centreon.
+                           0,
+                           0,
+                           false,
+                           true,
+                           retain_status_information,
+                           retain_nonstatus_information,
+                           obsess_over_host);
 
   // add host parents.
   QVector<host*> hst_parents = _find<host>(hst.parents, (void* (*)(char const*))&find_host);
@@ -595,58 +585,55 @@ void modules::create_service(ns1__serviceType const& svc) {
   int freshness_threshold = (svc.freshnessThreshold ? *svc.freshnessThreshold : false);
 
   // create a new service.
-  service* new_svc = ::add_service(svc.hostName.c_str(),
-				   svc.serviceDescription.c_str(),
-				   display_name,
-				   svc.checkPeriod.c_str(),
-				   initial_state,
-				   svc.maxCheckAttempts,
-				   true, // no documentation for parallelize in nagios 3.
-				   passive_checks_enabled,
-				   svc.checkInterval,
-				   svc.retryInterval,
-				   svc.notificationInterval,
-				   first_notification_delay,
-				   svc.notificationPeriod.c_str(),
-				   notif_opt['r'],
-				   notif_opt['u'],
-				   notif_opt['w'],
-				   notif_opt['c'],
-				   notif_opt['f'],
-				   notif_opt['s'],
-				   notifications_enabled,
-				   is_volatile,
-				   event_handler,
-				   event_handler_enabled,
-				   svc.checkCommand.c_str(),
-				   active_checks_enabled,
-				   flap_detection_enabled,
-				   low_flap_threshold,
-				   high_flap_threshold,
-				   flap_detection_opt['o'],
-				   flap_detection_opt['u'],
-				   flap_detection_opt['w'],
-				   flap_detection_opt['c'],
-				   stalk_opt['o'],
-				   stalk_opt['u'],
-				   stalk_opt['w'],
-				   stalk_opt['c'],
-				   process_perfdata,
-				   true,
-				   NULL,
-				   check_freshness,
-				   freshness_threshold,
-				   notes,
-				   notes_url,
-				   action_url,
-				   icon_image,
-				   icon_image_alt,
-				   retain_status_information,
-				   retain_nonstatus_information,
-				   obsess_over_service);
-  if (new_svc == NULL)
-    throw (engine_error() << "service '" << svc.hostName << ", "
-	   << svc.serviceDescription << "' create failed.");
+  service* new_svc = add_service(svc.hostName.c_str(),
+                                 svc.serviceDescription.c_str(),
+                                 display_name,
+                                 svc.checkPeriod.c_str(),
+                                 initial_state,
+                                 svc.maxCheckAttempts,
+                                 true, // no documentation for parallelize in nagios 3.
+                                 passive_checks_enabled,
+                                 svc.checkInterval,
+                                 svc.retryInterval,
+                                 svc.notificationInterval,
+                                 first_notification_delay,
+                                 svc.notificationPeriod.c_str(),
+                                 notif_opt['r'],
+                                 notif_opt['u'],
+                                 notif_opt['w'],
+                                 notif_opt['c'],
+                                 notif_opt['f'],
+                                 notif_opt['s'],
+                                 notifications_enabled,
+                                 is_volatile,
+                                 event_handler,
+                                 event_handler_enabled,
+                                 svc.checkCommand.c_str(),
+                                 active_checks_enabled,
+                                 flap_detection_enabled,
+                                 low_flap_threshold,
+                                 high_flap_threshold,
+                                 flap_detection_opt['o'],
+                                 flap_detection_opt['u'],
+                                 flap_detection_opt['w'],
+                                 flap_detection_opt['c'],
+                                 stalk_opt['o'],
+                                 stalk_opt['u'],
+                                 stalk_opt['w'],
+                                 stalk_opt['c'],
+                                 process_perfdata,
+                                 true,
+                                 NULL,
+                                 check_freshness,
+                                 freshness_threshold,
+                                 notes,
+                                 notes_url,
+                                 action_url,
+                                 icon_image,
+                                 icon_image_alt,
+                                 retain_status_information,
+                                 retain_nonstatus_information,
+                                 obsess_over_service);
 
   QVector<contact*> svc_contacts =
     _find<contact>(svc.contacts, (void* (*)(char const*))&find_contact);
@@ -737,31 +724,29 @@ void modules::create_contact(ns1__contactType const& cntct) {
     address[i] = cntct.address[i].c_str();
 
   // create a new contact.
-  contact* new_cntct = ::add_contact(cntct.name.c_str(),
-				     alias,
-				     email,
-				     pager,
-				     (cntct.address.empty() ? NULL : &(*address)),
-				     cntct.serviceNotificationPeriod.c_str(),
-				     cntct.hostNotificationPeriod.c_str(),
-                                     service_opt['r'],
-                                     service_opt['c'],
-                                     service_opt['w'],
-                                     service_opt['u'],
-                                     service_opt['f'],
-                                     service_opt['s'],
-                                     host_opt['r'],
-                                     host_opt['d'],
-                                     host_opt['u'],
-                                     host_opt['f'],
-                                     host_opt['s'],
-				     cntct.hostNotificationsEnabled,
-				     cntct.serviceNotificationsEnabled,
-				     can_submit_commands,
-				     retain_status_information,
-				     retain_nonstatus_information);
-  if (new_cntct == NULL)
-    throw (engine_error() << "contact '" << cntct.name << "' create failed.");
+  contact* new_cntct = add_contact(cntct.name.c_str(),
+                                   alias,
+                                   email,
+                                   pager,
+                                   (cntct.address.empty() ? NULL : &(*address)),
+                                   cntct.serviceNotificationPeriod.c_str(),
+                                   cntct.hostNotificationPeriod.c_str(),
+                                   service_opt['r'],
+                                   service_opt['c'],
+                                   service_opt['w'],
+                                   service_opt['u'],
+                                   service_opt['f'],
+                                   service_opt['s'],
+                                   host_opt['r'],
+                                   host_opt['d'],
+                                   host_opt['u'],
+                                   host_opt['f'],
+                                   host_opt['s'],
+                                   cntct.hostNotificationsEnabled,
+                                   cntct.serviceNotificationsEnabled,
+                                   can_submit_commands,
+                                   retain_status_information,
+                                   retain_nonstatus_information);
 
   QVector<contactgroup*> cntct_contactgroups =
     _find<contactgroup>(cntct.contactgroups, (void* (*)(char const*))&find_contactgroup);
@@ -881,9 +866,6 @@ void modules::create_hostdependency(ns1__hostDependencyType const& hstdependency
                               execution_opt['u'],
                               execution_opt['p'],
                               dependency_period);
-        if (new_hstdependency == NULL)
-          throw (engine_error() << "hostdependency '" << (*it_dep)->name
-                 << ", " << (*it)->name << "' create failed.");
 
         try {
           objects::link(new_hstdependency, dependency_period_ptr);
@@ -906,9 +888,6 @@ void modules::create_hostdependency(ns1__hostDependencyType const& hstdependency
                               notif_opt['u'],
                               notif_opt['p'],
                               dependency_period);
-        if (new_hstdependency == NULL)
-          throw (engine_error() << "hostdependency '" << (*it_dep)->name
-                 << ", " << (*it)->name << "' create failed.");
 
         try {
           objects::link(new_hstdependency, dependency_period_ptr);
@@ -975,17 +954,14 @@ void modules::create_hostescalation(ns1__hostEscalationType const& hstescalation
        it != end;
        ++it) {
     hostescalation* new_hstescalation =
-      ::add_hostescalation((*it)->name,
-                           hstescalation.firstNotification,
-                           hstescalation.lastNotification,
-                           hstescalation.notificationInterval,
-                           escalation_period,
-                           escalation_opt['d'],
-                           escalation_opt['u'],
-                           escalation_opt['r']);
-    if (new_hstescalation == NULL)
-      throw (engine_error() << "hostescalation '" << (*it)->name
-             << "' create failed.");
+      add_hostescalation((*it)->name,
+                         hstescalation.firstNotification,
+                         hstescalation.lastNotification,
+                         hstescalation.notificationInterval,
+                         escalation_period,
+                         escalation_opt['d'],
+                         escalation_opt['u'],
+                         escalation_opt['r']);
 
     try {
       objects::link(new_hstescalation,
@@ -1085,10 +1061,6 @@ void modules::create_servicedependency(ns1__serviceDependencyType const& svcdepe
                                  execution_opt['c'],
                                  execution_opt['p'],
                                  dependency_period);
-        if (new_svcdependency == NULL)
-          throw (engine_error() << "servicedependency '" << (*it_dep)->name
-                 << ", " << dependent_service_description << ", " << (*it)->name
-                 << ", " << service_description << "' create failed.");
 
         try {
           objects::link(new_svcdependency, dependency_period_ptr);
@@ -1114,10 +1086,6 @@ void modules::create_servicedependency(ns1__serviceDependencyType const& svcdepe
                                  notif_opt['c'],
                                  notif_opt['p'],
                                  dependency_period);
-        if (new_svcdependency == NULL)
-          throw (engine_error() << "servicedependency '" << (*it_dep)->name
-                 << ", " << dependent_service_description << ", " << (*it)->name
-                 << ", " << service_description << "' create failed.");
 
         try {
           objects::link(new_svcdependency, dependency_period_ptr);
@@ -1186,19 +1154,16 @@ void modules::create_serviceescalation(ns1__serviceEscalationType const& svcesca
        it != end;
        ++it) {
     serviceescalation* new_svcescalation =
-      ::add_serviceescalation((*it)->name,
-                              service_description,
-                              svcescalation.firstNotification,
-                              svcescalation.lastNotification,
-                              svcescalation.notificationInterval,
-                              escalation_period,
-                              escalation_opt['w'],
-                              escalation_opt['u'],
-                              escalation_opt['c'],
-                              escalation_opt['r']);
-    if (new_svcescalation == NULL)
-      throw (engine_error() << "serviceescalation '" << (*it)->name << ", "
-             << service_description << "' create failed.");
+      add_serviceescalation((*it)->name,
+                            service_description,
+                            svcescalation.firstNotification,
+                            svcescalation.lastNotification,
+                            svcescalation.notificationInterval,
+                            escalation_period,
+                            escalation_opt['w'],
+                            escalation_opt['u'],
+                            escalation_opt['c'],
+                            escalation_opt['r']);
 
     try {
       objects::link(new_svcescalation,

@@ -18,6 +18,8 @@
 */
 
 #include "error.hh"
+#include "globals.hh"
+#include "skiplist.hh"
 #include "logging/logger.hh"
 #include "objects/utils.hh"
 #include "objects/servicedependency.hh"
@@ -109,6 +111,12 @@ void objects::link(servicedependency* obj,
  *  @param[in] obj The hostdependency to cleanup memory.
  */
 void objects::release(servicedependency const* obj) {
+  if (obj == NULL)
+    return;
+
+  skiplist_delete(object_skiplists[SERVICEDEPENDENCY_SKIPLIST], obj);
+  remove_object_list(obj, &servicedependency_list, &servicedependency_list_tail);
+
   delete[] obj->dependent_host_name;
   delete[] obj->dependent_service_description;
   delete[] obj->host_name;

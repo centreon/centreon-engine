@@ -17,29 +17,30 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef CCE_OBJECTS_TIMEPERIODEXCLUSION_HH
-# define CCE_OBJECTS_TIMEPERIODEXCLUSION_HH
+#include <QDebug>
+#include <exception>
+#include "macros.hh"
+#include "add_object_to_member.hh"
+#include "create_object.hh"
 
-# include "objects.hh"
+using namespace com::centreon::engine::objects;
+using namespace test::objects;
 
-# ifdef __cplusplus
-extern "C" {
-# endif
-
-  void release_timeperiodexclusion(timeperiodexclusion const* obj);
-
-# ifdef __cplusplus
-}
-
-namespace       com {
-  namespace     centreon {
-    namespace   engine {
-      namespace objects {
-        void    release(timeperiodexclusion const* obj);
-      }
-    }
+int main() {
+  try {
+    add_with_null_member(&add_hosts_to_object);
+    add_without_objects(&add_hosts_to_object);
+    add_with_objects(&add_hosts_to_object,
+                     &create_host,
+                     1);
+    add_with_objects(&add_hosts_to_object,
+                     &create_host,
+                     10);
   }
+  catch (std::exception const& e) {
+    qDebug() << "error: " << e.what();
+    free_memory(get_global_macros());
+    return (1);
+  }
+  return (0);
 }
-# endif
-
-#endif // !CCE_OBJECTS_TIMEPERIODEXCLUSION_HH
