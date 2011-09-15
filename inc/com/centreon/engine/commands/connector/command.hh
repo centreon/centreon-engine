@@ -1,5 +1,5 @@
 /*
-** Copyright 2011      Merethis
+** Copyright 2011 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -25,8 +25,8 @@
 # include <QHash>
 # include <QProcess>
 # include <QStringList>
-# include "commands/command.hh"
-# include "commands/connector/execute_query.hh"
+# include "com/centreon/engine/commands/command.hh"
+# include "com/centreon/engine/commands/connector/execute_query.hh"
 
 namespace                              com {
   namespace                            centreon {

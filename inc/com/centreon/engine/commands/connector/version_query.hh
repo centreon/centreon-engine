@@ -1,5 +1,5 @@
 /*
-** Copyright 2011      Merethis
+** Copyright 2011 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -20,7 +20,7 @@
 #ifndef CCE_COMMANDS_CONNECTOR_VERSION_QUERY_HH
 # define CCE_COMMANDS_CONNECTOR_VERSION_QUERY_HH
 
-# include "commands/connector/request.hh"
+# include "com/centreon/engine/commands/connector/request.hh"
 
 namespace                  com {
   namespace                centreon {

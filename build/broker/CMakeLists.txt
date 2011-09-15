@@ -19,7 +19,7 @@
 
 # Set directories.
 set(SRC_DIR "${SRC_DIR}/broker")
-set(INC_DIR "${INCLUDE_DIR}/broker")
+set(INC_DIR "${INCLUDE_DIR}/com/centreon/engine/broker")
 
 # Produce moc files.
 qt4_wrap_cpp(QT_MOC_FILES

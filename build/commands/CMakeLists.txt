@@ -19,7 +19,7 @@
 
 # Set directories.
 set(SRC_DIR "${SRC_DIR}/commands")
-set(INC_DIR "${INCLUDE_DIR}/commands")
+set(INC_DIR "${INCLUDE_DIR}/com/centreon/engine/commands")
 
 # connector command is required.
 add_subdirectory("connector")

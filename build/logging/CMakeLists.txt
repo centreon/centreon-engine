@@ -19,7 +19,7 @@
 
 # Set directories.
 set(SRC_DIR "${SRC_DIR}/logging")
-set(INC_DIR "${INCLUDE_DIR}/logging")
+set(INC_DIR "${INCLUDE_DIR}/com/centreon/engine/logging")
 
 # cce_logging target.
 add_library("cce_logging"

@@ -109,7 +109,7 @@ extern "C" int nebmodule_deinit(int flags, int reason) {
     delete gl_webservice;
     delete gl_config;
 
-    neb_deregister_callback(NEBCALLBACK_WEBSERVICE_DATA,
+    neb_deregister_callback(NEBCALLBACK_EXTERNAL_COMMAND_DATA,
 			    callback_webservice);
   }
   catch (std::exception const& e) {
@@ -175,7 +175,7 @@ extern "C" int nebmodule_init(int flags, char const* args, void* handle) {
     }
 
     // Register callbacks.
-    if (neb_register_callback(NEBCALLBACK_WEBSERVICE_DATA,
+    if (neb_register_callback(NEBCALLBACK_EXTERNAL_COMMAND_DATA,
 			      gl_mod_handle,
 			      0,
 			      callback_webservice) != 0) {

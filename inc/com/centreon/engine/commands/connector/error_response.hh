@@ -20,7 +20,7 @@
 #ifndef CCE_COMMANDS_CONNECTOR_ERROR_RESPONSE_HH
 # define CCE_COMMANDS_CONNECTOR_ERROR_RESPONSE_HH
 
-# include "commands/connector/request.hh"
+# include "com/centreon/engine/commands/connector/request.hh"
 
 namespace                     com {
   namespace                   centreon {
