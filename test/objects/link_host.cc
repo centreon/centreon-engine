@@ -83,11 +83,25 @@ static bool create_and_link(bool has_parents,
          contactgroups,
          hostgroups,
          customvar,
-         0,
+         42,
          check_period,
          notification_period,
          cmd_event_handler,
          cmd_check_command);
+
+    if (obj->initial_state != 42
+        || !obj->check_period_ptr
+        || obj->check_period_ptr != check_period
+        || !obj->notification_period_ptr
+        || obj->notification_period_ptr != notification_period
+        || obj->event_handler_ptr != cmd_event_handler
+        || obj->check_command_ptr != cmd_check_command
+        || (has_parents && !obj->parent_hosts)
+        || (has_contacts && !obj->contacts)
+        || (has_contactgroups && !obj->contact_groups)
+        || (has_hostgroups && !obj->hostgroups_ptr)
+        || (has_custom_variables && !obj->custom_variables))
+      ret = false;
   }
   catch (std::exception const& e) {
     (void)e;

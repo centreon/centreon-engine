@@ -70,6 +70,13 @@ static bool create_and_link(bool has_host_notification_period,
          hst_notif_cmd,
          svc_notif_cmd,
          customvar);
+    if ((has_host_notification_period && !obj->host_notification_period_ptr)
+        || (has_service_notification_period && !obj->service_notification_period_ptr)
+        || (has_contactgroups && !obj->contactgroups_ptr)
+        || (has_host_notification_commands && !obj->host_notification_commands)
+        || (has_service_notification_commands && !obj->service_notification_commands)
+        || (has_custom_variables && !obj->custom_variables))
+      ret = false;
   }
   catch (std::exception const& e) {
     (void)e;

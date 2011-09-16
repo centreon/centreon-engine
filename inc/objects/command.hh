@@ -26,6 +26,7 @@
 extern "C" {
 # endif
 
+  bool link_command(command const* obj);
   void release_command(command const* obj);
 
 # ifdef __cplusplus
@@ -35,6 +36,7 @@ namespace       com {
   namespace     centreon {
     namespace   engine {
       namespace objects {
+        void    link(command const* obj);
         void    release(command const* obj);
         bool    add_commands_to_object(QVector<command*> const& commands,
                                        commandsmember** list_command);

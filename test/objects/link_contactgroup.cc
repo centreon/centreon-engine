@@ -48,6 +48,8 @@ static bool create_and_link(bool has_contacts, bool has_contactgroups) {
     link(obj,
          contacts,
          contactgroups);
+    if (has_contacts && !obj->members)
+      ret = false;
   }
   catch (std::exception const& e) {
     (void)e;

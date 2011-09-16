@@ -19,6 +19,8 @@
 
 #include "error.hh"
 #include "globals.hh"
+#include "commands/set.hh"
+#include "commands/raw.hh"
 #include "logging/logger.hh"
 #include "objects/utils.hh"
 #include "objects/command.hh"
@@ -26,6 +28,26 @@
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;
 using namespace com::centreon::engine::objects::utils;
+
+/**
+ *  Wrapper C
+ *
+ *  @see com::centreon::engine::objects::link
+ */
+bool link_command(command const* obj) {
+  try {
+    objects::link(obj);
+  }
+  catch (std::exception const& e) {
+    logger(log_runtime_error, basic) << e.what();
+    return (false);
+  }
+  catch (...) {
+    logger(log_runtime_error, basic) << Q_FUNC_INFO << " unknow exception.";
+    return (false);
+  }
+  return (true);
+}
 
 /**
  *  Wrapper C
@@ -45,6 +67,26 @@ void release_command(command const* obj) {
 }
 
 /**
+ *  Link a command into the command set.
+ *
+ *  @param[in,out] obj Object to link with a correct name.
+ */
+void objects::link(command const* obj) {
+  // check object contents.
+  if (obj == NULL)
+    throw (engine_error() << "command is a NULL pointer.");
+  if (obj->name == NULL)
+    throw (engine_error() << "command invalid name.");
+  if (obj->command_line == NULL)
+    throw (engine_error() << "command invalid command line.");
+
+  // update command executon system.
+  commands::set& cmd_set = commands::set::instance();
+  QSharedPointer<commands::command> new_command(new commands::raw(obj->name, obj->command_line));
+  cmd_set.add_command(new_command);
+}
+
+/**
  *  Cleanup memory of command.
  *
  *  @param[in] obj The command to cleanup memory.
@@ -55,6 +97,9 @@ void objects::release(command const* obj) {
 
   skiplist_delete(object_skiplists[COMMAND_SKIPLIST], obj);
   remove_object_list(obj, &command_list, &command_list_tail);
+
+  // update command executon system.
+  commands::set::instance().remove_command(obj->name);
 
   delete[] obj->name;
   delete[] obj->command_line;

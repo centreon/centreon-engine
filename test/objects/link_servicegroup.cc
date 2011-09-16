@@ -48,6 +48,8 @@ static bool create_and_link(bool has_services, bool has_servicegroups) {
     link(obj,
          services,
          servicegroups);
+    if (has_services && !obj->members)
+      ret = false;
   }
   catch (std::exception const& e) {
     (void)e;

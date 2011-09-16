@@ -48,6 +48,8 @@ static bool create_and_link(bool has_hosts, bool has_hostgroups) {
     link(obj,
          hosts,
          hostgroups);
+    if (has_hosts && !obj->members)
+      ret = false;
   }
   catch (std::exception const& e) {
     (void)e;

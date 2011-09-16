@@ -40,6 +40,10 @@ static bool create_and_link(bool has_dependency_period) {
 
   try {
     link(obj, dependency_period);
+    if (!obj->master_service_ptr
+        || !obj->dependent_service_ptr
+        || obj->dependency_period_ptr != dependency_period)
+      ret = false;
   }
   catch (std::exception const& e) {
     (void)e;

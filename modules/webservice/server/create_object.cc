@@ -28,6 +28,7 @@
 #include "schedule_object.hh"
 #include "globals.hh"
 #include "logging/logger.hh"
+#include "objects/command.hh"
 #include "objects/contact.hh"
 #include "objects/contactgroup.hh"
 #include "objects/host.hh"
@@ -133,7 +134,9 @@ static QVector<service*> _find(std::vector<std::string> const& objs) {
        it != end;
        ++it) {
     // check if the object exist..
-    void* obj = find_service(it->c_str(), (++it)->c_str());
+    char const* host_name = it->c_str();
+    char const* service_description = (++it)->c_str();
+    void* obj = find_service(host_name, service_description);
     if (obj == NULL)
       return (res);
     res.push_back(static_cast<service*>(obj));
@@ -164,7 +167,11 @@ static void _extract_object_from_objectgroup(QVector<T*> const& groups,
  *  @param[in] cmd The struct with all information to create new command.
  */
 void modules::create_command(ns1__commandType const& cmd) {
-  add_command(cmd.name.c_str(), cmd.commandLine.c_str());
+  command* obj = add_command(cmd.name.c_str(), cmd.commandLine.c_str());
+  if (obj == NULL)
+    throw (engine_error() << "comand '" << cmd.name.c_str()
+           << "' invalid name or command line.");
+  objects::link(obj);
 }
 
 /**
@@ -267,7 +274,7 @@ void modules::create_servicegroup(ns1__serviceGroupType const& svcgrp) {
 
   // add all services into the servicegroup.
   QVector<service*> svc_members = _find(svcgrp.members);
-  if (static_cast<int>(svcgrp.members.size()) != svc_members.size()) {
+  if (static_cast<int>(svcgrp.members.size() / 2) != svc_members.size()) {
     objects::release(group);
     throw (engine_error() << "servicegroup '" << svcgrp.name << "' invalid group member.");
   }
@@ -802,8 +809,12 @@ void modules::create_hostdependency(ns1__hostDependencyType const& hstdependency
            << "criteria and no execution failure criteria define.");
 
   if (hstdependency.hostgroupsName.empty() == true
-      && hstdependency.dependentHostgroupsName.empty() == true)
+      && hstdependency.hostsName.empty() == true)
     throw (engine_error() << "hostdependency have no hosts and no host groups define.");
+  if (hstdependency.dependentHostgroupsName.empty() == true
+      && hstdependency.dependentHostsName.empty() == true)
+    throw (engine_error() << "hostdependency have no dependency hosts "
+           << "and no dependency host groups define.");
 
   QHash<char, bool> execution_opt = get_options(hstdependency.executionFailureCriteria, "odup", "n");
   if (execution_opt.empty())
@@ -838,7 +849,7 @@ void modules::create_hostdependency(ns1__hostDependencyType const& hstdependency
 
   QVector<hostgroup*> hstdep_dependent_hostgroups =
     _find<hostgroup>(hstdependency.dependentHostgroupsName, (void* (*)(char const*))&find_hostgroup);
-  if (static_cast<int>(hstdependency.dependentHostsName.size()) != hstdep_dependent_hostgroups.size())
+  if (static_cast<int>(hstdependency.dependentHostgroupsName.size()) != hstdep_dependent_hostgroups.size())
     throw (engine_error() << "hostdependency invalid dependent host groups name.");
 
   _extract_object_from_objectgroup(hstdep_dependent_hostgroups, hstdep_dependent_hosts);
@@ -991,8 +1002,13 @@ void modules::create_servicedependency(ns1__serviceDependencyType const& svcdepe
            << "criteria and no execution failure criteria define.");
 
   if (svcdependency.hostgroupsName.empty() == true
-      && svcdependency.dependentHostgroupsName.empty() == true)
+      && svcdependency.hostsName.empty() == true)
     throw (engine_error() << "serviceependency have no hosts and no host groups define.");
+
+  if (svcdependency.dependentHostsName.empty() == true
+      && svcdependency.dependentHostgroupsName.empty() == true)
+    throw (engine_error() << "serviceependency have no dependency hosts "
+           << "and no dependency host groups define.");
 
   QHash<char, bool> execution_opt = get_options(svcdependency.executionFailureCriteria, "owucp", "n");
   if (execution_opt.empty())
@@ -1027,7 +1043,7 @@ void modules::create_servicedependency(ns1__serviceDependencyType const& svcdepe
 
   QVector<hostgroup*> svcdep_dependent_hostgroups =
     _find<hostgroup>(svcdependency.dependentHostgroupsName, (void* (*)(char const*))&find_hostgroup);
-  if (static_cast<int>(svcdependency.dependentHostsName.size()) != svcdep_dependent_hostgroups.size())
+  if (static_cast<int>(svcdependency.dependentHostgroupsName.size()) != svcdep_dependent_hostgroups.size())
     throw (engine_error() << "servicedependency invalid dependent host groups name.");
 
   _extract_object_from_objectgroup(svcdep_dependent_hostgroups, svcdep_dependent_hosts);

@@ -312,7 +312,7 @@ arg_definition::arg_definition() {
 
   argument hostdependency_type("ns1__hostDependencyType", "hostdependency");
   hostdependency_type.add(arg_vectorstr).set_name("dependentHostsName")
-    .set_help("dependents_host_name")
+    .set_help("dependent_hosts_name")
     .set_is_optional(true)
     .set_is_array(true);
   hostdependency_type.add(arg_vectorstr).set_name("hostsName")

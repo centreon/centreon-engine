@@ -58,6 +58,11 @@ static bool create_and_link(bool has_contacts,
          contacts,
          contactgroups,
          escalation_period);
+    if (!obj->service_ptr
+        || (has_contacts && !obj->contacts)
+        || (has_contactgroups && !obj->contact_groups)
+        || obj->escalation_period_ptr != escalation_period)
+      ret = false;
   }
   catch (std::exception const& e) {
     (void)e;
