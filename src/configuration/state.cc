@@ -2637,8 +2637,9 @@ void state::_parse_resource_file(QString const& value) {
       key = key.substr(5, key.size() - 6);
       if (_str2obj<unsigned int>(key.c_str(), &user_index) == false
 	  || user_index > MAX_USER_MACROS || user_index == 0) {
-	logger(log_config_warning, basic) << "warning: [" << _filename
-          << ":" << _cur_line << "] bad variable name '" << key << "'";
+	logger(log_config_warning, basic)
+          << "warning: [" << _filename << ":" << _cur_line
+          << "] bad variable name '" << key << "'";
 	continue;
       }
 
@@ -2647,8 +2648,9 @@ void state::_parse_resource_file(QString const& value) {
       macro_user[user_index - 1] = my_strdup(_trim(value).c_str());
     }
     else
-      logger(log_config_warning, basic) << "warning: [" << _filename
-        << ":" << _cur_line << "] bad variable name '" << key << "'";
+      logger(log_config_warning, basic)
+        << "warning: [" << _filename << ":" << _cur_line
+        << "] bad variable name '" << key << "'";
   }
 
   _cur_line = save_cur_line;

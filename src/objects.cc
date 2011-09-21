@@ -1453,13 +1453,14 @@ service* add_service(char* host_name, char* description,
     return (NULL);
   }
   else if (!host_name || !host_name[0]) {
-    logger(log_config_error, basic) << "error: host name of service '"
-      << description << "' is not set";
+    logger(log_config_error, basic)
+      << "error: host name of service '" << description << "' is not set";
     return (NULL);
   }
   else if (!check_command || !check_command[0]) {
-    logger(log_config_error, basic) << "error: check command of service '"
-      << description << "' on host '" << host_name << "' is not set";
+    logger(log_config_error, basic)
+      << "error: check command of service '" << description
+      << "' on host '" << host_name << "' is not set";
     return (NULL);
   }
 

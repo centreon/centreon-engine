@@ -87,9 +87,9 @@ int log_debug_info(int type, unsigned int verbosity, char const* fmt, ...) {
     }
 
     logger(static_cast<unsigned long long>(type) << 32, verbosity)
-      << "[" << now.tv_sec << "." << now.tv_usec << "] "
-      << "[" << type << "." << verbosity << "] "
-      << "[pid=" << getpid() << "] " << buffer;
+      << "[" << now.tv_sec << "." << now.tv_usec << "] " \
+      "[" << type << "." << verbosity << "] "            \
+      "[pid=" << getpid() << "] " << buffer;
   }
   va_end(ap);
 

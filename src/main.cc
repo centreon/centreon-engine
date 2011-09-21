@@ -157,18 +157,18 @@ int main(int argc, char** argv) {
   // Just display the license.
   if (TRUE == display_license) {
     logger(log_info_message, basic)
-      << "Centreon Engine is free software: you can redistribute it and/or modify\n"
-      << "it under the terms of the GNU General Public License version 2 as\n"
-      << "published by the Free Software Foundation.\n"
-      << "\n"
-      << "Centreon Engine is distributed in the hope that it will be useful, but\n"
-      << "WITHOUT ANY WARRANTY; without even the implied warranty of\n"
-      << "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU\n"
-      << "General Public License for more details.\n"
-      << "\n"
-      << "You should have received a copy of the GNU General Public License along\n"
-      << "with Centreon Engine. If not, see <http://www.gnu.org/licenses/>.\n\n"
-      << "Centreon Engine version: " << get_program_version() << "\n";
+      << "Centreon Engine is free software: you can redistribute it and/or modify\n" \
+      "it under the terms of the GNU General Public License version 2 as\n" \
+      "published by the Free Software Foundation.\n"                    \
+      "\n"                                                              \
+      "Centreon Engine is distributed in the hope that it will be useful, but\n" \
+      "WITHOUT ANY WARRANTY; without even the implied warranty of\n"    \
+      "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU\n" \
+      "General Public License for more details.\n"                      \
+      "\n"                                                              \
+      "You should have received a copy of the GNU General Public License along\n" \
+      "with Centreon Engine. If not, see <http://www.gnu.org/licenses/>.\n\n" \
+      "Centreon Engine version: " << get_program_version() << "\n";
     exit(EXIT_SUCCESS);
   }
 
@@ -179,18 +179,18 @@ int main(int argc, char** argv) {
   // If there are no command line options or if an error occured, print usage.
   if ((TRUE == error) || (TRUE == display_help)) {
     logger(log_info_message, basic)
-      << "Usage: " << argv[0] << " [options] <main_config_file>\n"
-      << "\nOptions:\n"
-      << "  -v, --verify-config         Verify all configuration data.\n"
-      << "  -s, --test-scheduling       Shows projected/recommended check\n"
-      << "                              scheduling and other diagnostic info\n"
-      << "                              based on the current configuration\n"
-      << "                              files.\n"
-      << "  -x, --dont-verify-paths     Don't check for circular object paths -\n"
-      << "                              USE WITH CAUTION !\n"
-      << "  -p, --precache-objects      Precache object configuration - use with\n"
-      << "                              -v or -s options.\n"
-      << "  -u, --use-precached-objects Use precached object config file.\n";
+      << "Usage: " << argv[0] << " [options] <main_config_file>\n"      \
+      "\nOptions:\n"                                                    \
+      "  -v, --verify-config         Verify all configuration data.\n"  \
+      "  -s, --test-scheduling       Shows projected/recommended check\n" \
+      "                              scheduling and other diagnostic info\n" \
+      "                              based on the current configuration\n" \
+      "                              files.\n"                          \
+      "  -x, --dont-verify-paths     Don't check for circular object paths -\n" \
+      "                              USE WITH CAUTION !\n"              \
+      "  -p, --precache-objects      Precache object configuration - use with\n" \
+      "                              -v or -s options.\n"               \
+      "  -u, --use-precached-objects Use precached object config file.\n";
     exit(ERROR);
   }
 
@@ -310,10 +310,10 @@ int main(int argc, char** argv) {
 
       if (precache_objects == TRUE)
         logger(log_info_message, basic)
-          << "\n"
-          << "OBJECT PRECACHING\n"
-          << "-----------------\n"
-          << "Object config files were precached.\n";
+          << "\n"                                       \
+          "OBJECT PRECACHING\n"                         \
+          "-----------------\n"                         \
+          "Object config files were precached.\n";
     }
 
 #undef TEST_TIMEPERIODS
@@ -390,8 +390,9 @@ int main(int argc, char** argv) {
       }
 
       // This must be logged after we read config data, as user may have changed location of main log file.
-      logger(log_process_info, basic) << "Centreon Engine "
-        << ENGINE_VERSION << " starting ... (PID=" << getpid() << ")";
+      logger(log_process_info, basic)
+        << "Centreon Engine " << ENGINE_VERSION
+        << " starting ... (PID=" << getpid() << ")";
 
       // Log the local time - may be different than clock time due to timezone offset.
       now = time(NULL);
@@ -418,13 +419,17 @@ int main(int argc, char** argv) {
       // There was a problem reading the config files.
       if (result != OK)
         logger(log_process_info | log_runtime_error | log_config_error, basic)
-          << "Bailing out due to one or more errors encountered in the configuration files. "
-          << "Run Centreon Engine from the command line with the -v option to verify your config before restarting. (PID=" << getpid() << ")";
+          << "Bailing out due to one or more errors encountered in the " \
+          "configuration files. Run Centreon Engine from the command "  \
+          "line with the -v option to verify your config before restarting. " \
+          "(PID=" << getpid() << ")";
       // Run the pre-flight check to make sure everything looks okay.
       else if ((result = pre_flight_check()) != OK)
         logger(log_process_info | log_runtime_error | log_verification_error, basic)
-          << "Bailing out due to errors encountered while running the pre-flight check.  "
-          << "Run Centreon Engine from the command line with the -v option to verify your config before restarting. (PID=" << getpid() << ")\n";
+          << "Bailing out due to errors encountered while running the " \
+          "pre-flight check.  Run Centreon Engine from the command line " \
+          "with the -v option to verify your config before restarting. " \
+          "(PID=" << getpid() << ")\n";
 
       // An error occurred that prevented us from (re)starting.
       if (result != OK) {
