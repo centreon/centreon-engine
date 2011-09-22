@@ -38,7 +38,6 @@ using namespace com::centreon::engine::commands;
 raw::raw(QString const& name,
 	 QString const& command_line)
   : command(name, command_line) {
-
 }
 
 /**
@@ -58,8 +57,11 @@ raw::~raw() throw() {
   _mutex.lock();
   while (_processes.empty() == false) {
     process_info info = _processes.begin().value();
+
+    QEventLoop loop;
+    connect(this, SIGNAL(command_executed(commands::result const&)), &loop, SLOT(quit()));
     _mutex.unlock();
-    info.proc->wait();
+    loop.exec();
     _mutex.lock();
   }
   _mutex.unlock();
@@ -101,12 +103,12 @@ unsigned long raw::run(QString const& processed_cmd,
 		       nagios_macros const& macros,
 		       unsigned int timeout) {
   process_info info;
-  info.proc = QSharedPointer<process>(new process(macros, timeout));
+  info.proc = QSharedPointer<process>(new process(macros, timeout), &_deletelater_process);
 
   if (connect(&(*info.proc),
-  	      SIGNAL(ended()),
+  	      SIGNAL(process_ended()),
   	      this,
-  	      SLOT(ended())) == false) {
+  	      SLOT(raw_ended())) == false) {
     throw (engine_error() << "connect process to commands::raw failed.");
   }
 
@@ -116,8 +118,10 @@ unsigned long raw::run(QString const& processed_cmd,
   _mutex.unlock();
 
   info.proc->start(processed_cmd);
-  logger(dbg_commands, basic) << "raw command (id=" << info.cmd_id
-			      << ") start '" << processed_cmd << "'.";
+  logger(dbg_commands, basic)
+    << "raw command (id=" << info.cmd_id
+    << ") start '" << processed_cmd << "'.";
+
   return (info.cmd_id);
 }
 
@@ -140,8 +144,9 @@ void raw::run(QString const& processed_cmd,
   process proc(macros, timeout);
   proc.start(processed_cmd);
 
-  logger(dbg_commands, basic) << "raw command (id=" << id
-			      << ") start '" << processed_cmd << "'.";
+  logger(dbg_commands, basic)
+    << "raw command (id=" << id
+    << ") start '" << processed_cmd << "'.";
 
   proc.wait();
 
@@ -158,7 +163,7 @@ void raw::run(QString const& processed_cmd,
 /**
  *  Slot to catch the end of processes et send the result by signal.
  */
-void raw::ended() {
+void raw::raw_ended() {
   _mutex.lock();
   QHash<QObject*, process_info>::iterator it = _processes.find(sender());
   if (it == _processes.end()) {
@@ -183,4 +188,8 @@ void raw::ended() {
     << "raw command (id=" << info.cmd_id << ") finished.";
 
   emit command_executed(res);
+}
+
+void raw::_deletelater_process(process* obj) {
+  obj->deleteLater();
 }

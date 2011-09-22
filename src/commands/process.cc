@@ -19,7 +19,6 @@
 
 #include <QEventLoop>
 #include <QTimer>
-
 #include "engine.hh"
 #include "commands/process.hh"
 
@@ -42,7 +41,7 @@ process::process(nagios_macros const& macros, unsigned int timeout)
   connect(this, SIGNAL(error(QProcess::ProcessError)),
           this, SLOT(_error(QProcess::ProcessError)));
   connect(this, SIGNAL(finished(int, QProcess::ExitStatus)),
-	  this, SLOT(_finished(int, QProcess::ExitStatus)));
+          this, SLOT(_finished(int, QProcess::ExitStatus)));
   connect(this, SIGNAL(started()), this, SLOT(_started()));
 }
 
@@ -55,7 +54,7 @@ process::process(process const& right) : QProcess() {
   connect(this, SIGNAL(error(QProcess::ProcessError)),
           this, SLOT(_error(QProcess::ProcessError)));
   connect(this, SIGNAL(finished(int, QProcess::ExitStatus)),
-	  this, SLOT(_finished(int, QProcess::ExitStatus)));
+          this, SLOT(_finished(int, QProcess::ExitStatus)));
   connect(this, SIGNAL(started()), this, SLOT(_started()));
   operator=(right);
 }
@@ -175,9 +174,11 @@ unsigned int process::get_timeout() const throw() {
  *  Wait the end of the process (blocking).
  */
 void process::wait() {
-  QEventLoop loop;
-  connect(this, SIGNAL(ended()), &loop, SLOT(quit()));
-  loop.exec();
+  if (ProcessState() != QProcess::NotRunning) {
+    QEventLoop loop;
+    connect(this, SIGNAL(process_ended()), &loop, SLOT(quit()));
+    loop.exec();
+  }
 }
 
 /**
@@ -226,7 +227,7 @@ void process::_finished(int exit_code, QProcess::ExitStatus exit_status) {
     _is_executed = (exit_status != QProcess::CrashExit);
   }
 
-  emit ended();
+  emit process_ended();
 }
 
 /**

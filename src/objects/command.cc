@@ -17,6 +17,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <QCoreApplication>
+#include <QThread>
 #include "error.hh"
 #include "globals.hh"
 #include "commands/set.hh"
@@ -83,6 +85,9 @@ void objects::link(command const* obj) {
   // update command executon system.
   commands::set& cmd_set = commands::set::instance();
   QSharedPointer<commands::command> new_command(new commands::raw(obj->name, obj->command_line));
+  QThread* main(QCoreApplication::instance()->thread());
+  if (main != QThread::currentThread())
+    new_command->moveToThread(main);
   cmd_set.add_command(new_command);
 }
 

@@ -111,6 +111,12 @@ int main(int argc, char** argv) {
   if (argc < 2)
     error = TRUE;
 
+  // load singleton.
+  logging::engine::instance();
+  com::centreon::engine::broker::loader::instance();
+  checks::checker::instance();
+  commands::set::instance();
+
   // Process all command line arguments.
 #ifdef HAVE_GETOPT_H
   while ((c = getopt_long(argc, argv, "+hVvsxpu", long_options, &option_index)) != -1) {
@@ -612,9 +618,9 @@ int main(int argc, char** argv) {
   }
 
   // unload singleton.
-  com::centreon::engine::broker::loader::cleanup();
   commands::set::cleanup();
   checks::checker::cleanup();
+  com::centreon::engine::broker::loader::cleanup();
   logging::engine::cleanup();
 
   return (OK);
