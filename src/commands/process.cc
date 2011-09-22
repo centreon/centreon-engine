@@ -174,7 +174,7 @@ unsigned int process::get_timeout() const throw() {
  *  Wait the end of the process (blocking).
  */
 void process::wait() {
-  if (ProcessState() != QProcess::NotRunning) {
+  if (state() != QProcess::NotRunning) {
     QEventLoop loop;
     connect(this, SIGNAL(process_ended()), &loop, SLOT(quit()));
     loop.exec();
