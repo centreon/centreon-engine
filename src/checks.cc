@@ -1913,7 +1913,8 @@ void check_for_orphaned_hosts(void) {
       temp_host->is_executing = FALSE;
 
       /* schedule an immediate check of the host */
-      schedule_host_check(temp_host, current_time,
+      schedule_host_check(temp_host,
+                          current_time,
                           CHECK_OPTION_ORPHAN_CHECK);
     }
   }

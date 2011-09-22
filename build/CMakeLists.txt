@@ -941,6 +941,18 @@ if (WITH_TESTING)
 endif ()
 
 #
+# Events tests.
+#
+if (WITH_TESTING)
+  # Check handle timed event.
+  set(TEST_NAME "handle_timed_event")
+  add_executable("${TEST_NAME}"
+    "${TEST_DIR}/events/handle_timed_event.cc")
+  target_link_libraries("${TEST_NAME}" "cce_core")
+  add_test("${TEST_NAME}" "${TEST_NAME}")
+endif ()
+
+#
 # Stats tests.
 #
 if (WITH_TESTING)
