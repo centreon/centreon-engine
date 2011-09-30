@@ -47,6 +47,7 @@ namespace                                    com {
 	  static checker&                    instance();
 	  static void                        cleanup();
 
+          bool                               reaper_is_empty();
 	  void                               reap();
 
 	  void                               push_check_result(check_result const& result);

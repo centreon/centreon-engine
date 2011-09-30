@@ -181,7 +181,7 @@ typedef struct   nebstruct_comment_struct{
   char const*    service_description;
   time_t         entry_time;
   char const*    author_name;
-  char*          comment_data;
+  char const*    comment_data;
   int            persistent;
   int            source;
   int            entry_type;
@@ -200,11 +200,11 @@ typedef struct   nebstruct_downtime_struct{
   struct timeval timestamp;
 
   int            downtime_type;
-  char*          host_name;
-  char*          service_description;
+  char const*    host_name;
+  char const*    service_description;
   time_t         entry_time;
-  char*          author_name;
-  char*          comment_data;
+  char const*    author_name;
+  char const*    comment_data;
   time_t         start_time;
   time_t         end_time;
   int            fixed;

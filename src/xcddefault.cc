@@ -35,7 +35,7 @@
 /******************************************************************/
 
 /* initialize comment data */
-int xcddefault_initialize_comment_data(char* main_config_file) {
+int xcddefault_initialize_comment_data(char const* main_config_file) {
   comment* temp_comment = NULL;
 
   (void)main_config_file;
@@ -58,7 +58,7 @@ int xcddefault_initialize_comment_data(char* main_config_file) {
 }
 
 /* removes invalid and old comments from the comment file */
-int xcddefault_cleanup_comment_data(char* main_config_file) {
+int xcddefault_cleanup_comment_data(char const* main_config_file) {
   (void)main_config_file;
 
   /* nothing to do anymore */
@@ -74,7 +74,7 @@ int xcddefault_add_new_host_comment(int entry_type,
                                     char const* host_name,
                                     time_t entry_time,
                                     char const* author_name,
-                                    char* comment_data,
+                                    char const* comment_data,
 				    int persistent,
                                     int source,
 				    int expires,
@@ -114,7 +114,7 @@ int xcddefault_add_new_service_comment(int entry_type,
                                        char const* svc_description,
                                        time_t entry_time,
                                        char const* author_name,
-                                       char* comment_data,
+                                       char const* comment_data,
                                        int persistent,
 				       int source,
                                        int expires,

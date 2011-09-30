@@ -48,7 +48,7 @@ char* my_strdup(char const* str) {
 }
 
 /* fix the problem with strtok() skipping empty options between tokens */
-char* my_strtok(char* buffer, char const* tokens) {
+char* my_strtok(char const* buffer, char const* tokens) {
   char* token_position = NULL;
   char* sequence_head = NULL;
   static char* my_strtok_buffer = NULL;

@@ -768,11 +768,11 @@ int check_for_expired_downtime(void) {
 
 /* save a host or service downtime */
 int add_new_downtime(int type,
-                     char* host_name,
-                     char* service_description,
+                     char const* host_name,
+                     char const* service_description,
                      time_t entry_time,
-                     char* author,
-                     char* comment_data,
+                     char const* author,
+                     char const* comment_data,
                      time_t start_time,
                      time_t end_time,
                      int fixed,
@@ -804,10 +804,10 @@ int add_new_downtime(int type,
 }
 
 /* saves a host downtime entry */
-int add_new_host_downtime(char* host_name,
+int add_new_host_downtime(char const* host_name,
                           time_t entry_time,
-                          char* author,
-                          char* comment_data,
+                          char const* author,
+                          char const* comment_data,
                           time_t start_time,
                           time_t end_time,
                           int fixed,
@@ -856,11 +856,11 @@ int add_new_host_downtime(char* host_name,
 }
 
 /* saves a service downtime entry */
-int add_new_service_downtime(char* host_name,
-                             char* service_description,
+int add_new_service_downtime(char const* host_name,
+                             char const* service_description,
                              time_t entry_time,
-                             char* author,
-                             char* comment_data,
+                             char const* author,
+                             char const* comment_data,
                              time_t start_time,
                              time_t end_time,
                              int fixed,
@@ -995,10 +995,10 @@ int delete_service_downtime(unsigned long downtime_id) {
 ** All char* must be set or NULL - "" will silently fail to match.
 ** Returns number deleted.
 */
-int delete_downtime_by_hostname_service_description_start_time_comment(char* hostname,
-								       char* service_description,
+int delete_downtime_by_hostname_service_description_start_time_comment(char const* hostname,
+								       char const* service_description,
 								       time_t start_time,
-								       char* comment) {
+								       char const* comment) {
   scheduled_downtime *temp_downtime;
   int deleted(0);
 
@@ -1045,10 +1045,10 @@ int delete_downtime_by_hostname_service_description_start_time_comment(char* hos
 /******************************************************************/
 
 /* adds a host downtime entry to the list in memory */
-int add_host_downtime(char* host_name,
+int add_host_downtime(char const* host_name,
                       time_t entry_time,
-                      char* author,
-                      char* comment_data,
+                      char const* author,
+                      char const* comment_data,
                       time_t start_time,
                       time_t end_time,
                       int fixed,
@@ -1070,11 +1070,11 @@ int add_host_downtime(char* host_name,
 }
 
 /* adds a service downtime entry to the list in memory */
-int add_service_downtime(char* host_name,
-                         char* svc_description,
+int add_service_downtime(char const* host_name,
+                         char const* svc_description,
                          time_t entry_time,
-                         char* author,
-                         char* comment_data,
+                         char const* author,
+                         char const* comment_data,
                          time_t start_time,
                          time_t end_time,
                          int fixed,
@@ -1096,11 +1096,11 @@ int add_service_downtime(char* host_name,
 
 /* adds a host or service downtime entry to the list in memory */
 int add_downtime(int downtime_type,
-                 char* host_name,
-                 char* svc_description,
+                 char const* host_name,
+                 char const* svc_description,
                  time_t entry_time,
-                 char* author,
-                 char* comment_data,
+                 char const* author,
+                 char const* comment_data,
                  time_t start_time,
                  time_t end_time,
                  int fixed,

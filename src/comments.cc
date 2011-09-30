@@ -33,12 +33,12 @@ static comment* comment_hashlist[COMMENT_HASHSLOTS];
 /******************************************************************/
 
 /* initializes comment data */
-int initialize_comment_data(char* config_file) {
+int initialize_comment_data(char const* config_file) {
   return (xcddefault_initialize_comment_data(config_file));
 }
 
 /* removes old/invalid comments */
-int cleanup_comment_data(char* config_file) {
+int cleanup_comment_data(char const* config_file) {
   return (xcddefault_cleanup_comment_data(config_file));
 }
 
@@ -53,7 +53,7 @@ int add_new_comment(unsigned int type,
 		    char const* svc_description,
                     time_t entry_time,
 		    char const* author_name,
-                    char* comment_data,
+                    char const* comment_data,
 		    int persistent, int source,
                     int expires,
 		    time_t expire_time,
@@ -110,7 +110,7 @@ int add_new_host_comment(int entry_type,
 			 char const* host_name,
                          time_t entry_time,
 			 char const* author_name,
-                         char* comment_data,
+                         char const* comment_data,
 			 int persistent,
 			 int source,
                          int expires,
@@ -160,7 +160,7 @@ int add_new_service_comment(int entry_type,
                             char const* svc_description,
                             time_t entry_time,
 			    char const* author_name,
-                            char* comment_data,
+                            char const* comment_data,
 			    int persistent,
                             int source,
 			    int expires,
@@ -307,14 +307,14 @@ int delete_service_comment(unsigned long comment_id) {
 }
 
 /* deletes all comments for a particular host or service */
-int delete_all_comments(unsigned int type, char* host_name, char* svc_description) {
+int delete_all_comments(unsigned int type, char const* host_name, char const* svc_description) {
   if (type == HOST_COMMENT)
     return (delete_all_host_comments(host_name));
   return (delete_all_service_comments(host_name, svc_description));
 }
 
 /* deletes all comments for a particular host */
-int delete_all_host_comments(char* host_name) {
+int delete_all_host_comments(char const* host_name) {
   comment* temp_comment = NULL;
 
   if (host_name == NULL)
@@ -351,7 +351,7 @@ int delete_host_acknowledgement_comments(host* hst) {
 }
 
 /* deletes all comments for a particular service */
-int delete_all_service_comments(char* host_name, char* svc_description) {
+int delete_all_service_comments(char const* host_name, char const* svc_description) {
   comment* temp_comment = NULL;
   comment* next_comment = NULL;
 
@@ -463,7 +463,7 @@ int add_host_comment(int entry_type,
 		     char const* host_name,
                      time_t entry_time,
 		     char const* author,
-                     char* comment_data,
+                     char const* comment_data,
 		     unsigned long comment_id,
                      int persistent,
 		     int expires,
@@ -489,7 +489,7 @@ int add_service_comment(int entry_type,
                         char const* svc_description,
 			time_t entry_time,
                         char const* author,
-			char* comment_data,
+			char const* comment_data,
                         unsigned long comment_id,
 			int persistent,
                         int expires,
@@ -516,7 +516,7 @@ int add_comment(unsigned int comment_type,
 		char const* svc_description,
                 time_t entry_time,
 		char const* author,
-                char* comment_data,
+                char const* comment_data,
 		unsigned long comment_id,
                 int persistent,
 		int expires,
@@ -680,7 +680,7 @@ void free_comment_data(void) {
 /******************************************************************/
 
 /* get the number of comments associated with a particular host */
-int number_of_host_comments(char* host_name) {
+int number_of_host_comments(char const* host_name) {
   comment* temp_comment = NULL;
   int total_comments = 0;
 
@@ -697,7 +697,7 @@ int number_of_host_comments(char* host_name) {
 }
 
 /* get the number of comments associated with a particular service */
-int number_of_service_comments(char* host_name, char* svc_description) {
+int number_of_service_comments(char const* host_name, char const* svc_description) {
   comment* temp_comment = NULL;
   int total_comments = 0;
 
@@ -718,11 +718,11 @@ int number_of_service_comments(char* host_name, char* svc_description) {
 /********************* TRAVERSAL FUNCTIONS ************************/
 /******************************************************************/
 
-comment* get_first_comment_by_host(char* host_name) {
+comment* get_first_comment_by_host(char const* host_name) {
   return (get_next_comment_by_host(host_name, NULL));
 }
 
-comment* get_next_comment_by_host(char* host_name, comment* start) {
+comment* get_next_comment_by_host(char const* host_name, comment* start) {
   comment* temp_comment = NULL;
 
   if (host_name == NULL || comment_hashlist == NULL)

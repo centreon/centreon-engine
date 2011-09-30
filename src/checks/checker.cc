@@ -60,6 +60,19 @@ void checker::cleanup() {
 }
 
 /**
+ *  Check if the reaper queue is empty.
+ *
+ *  @return True if the reper queue is empty, otherwise false.
+ */
+bool checker::reaper_is_empty() {
+  _mut_reap.lock();
+  bool is_empty = _to_reap.isEmpty();
+  _mut_reap.unlock();
+  return (is_empty);
+}
+
+
+/**
  *  Reap and process all result recive by execution process.
  */
 void checker::reap() {

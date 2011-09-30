@@ -347,7 +347,7 @@ int get_service_count(void) {
 /******************************************************************/
 
 /* add a new timeperiod to the list in memory */
-timeperiod* add_timeperiod(char* name, char* alias) {
+timeperiod* add_timeperiod(char const* name, char const* alias) {
   timeperiod* new_timeperiod = NULL;
   int result = OK;
 
@@ -406,7 +406,7 @@ timeperiod* add_timeperiod(char* name, char* alias) {
 }
 
 /* adds a new exclusion to a timeperiod */
-timeperiodexclusion* add_exclusion_to_timeperiod(timeperiod* period, char* name) {
+timeperiodexclusion* add_exclusion_to_timeperiod(timeperiod* period, char const* name) {
   timeperiodexclusion* new_timeperiodexclusion = NULL;
 
   /* make sure we have enough data */
@@ -548,26 +548,26 @@ timerange* add_timerange_to_daterange(daterange* drange,
 }
 
 /* add a new host definition */
-host* add_host(char* name, char* display_name, char* alias,
-               char* address, char* check_period, int initial_state,
+host* add_host(char const* name, char const* display_name, char const* alias,
+               char const* address, char const* check_period, int initial_state,
                double check_interval, double retry_interval,
                int max_attempts, int notify_up, int notify_down,
                int notify_unreachable, int notify_flapping,
                int notify_downtime, double notification_interval,
                double first_notification_delay,
-               char* notification_period, int notifications_enabled,
-               char* check_command, int checks_enabled,
-               int accept_passive_checks, char* event_handler,
+               char const* notification_period, int notifications_enabled,
+               char const* check_command, int checks_enabled,
+               int accept_passive_checks, char const* event_handler,
                int event_handler_enabled, int flap_detection_enabled,
                double low_flap_threshold, double high_flap_threshold,
                int flap_detection_on_up, int flap_detection_on_down,
                int flap_detection_on_unreachable, int stalk_on_up,
                int stalk_on_down, int stalk_on_unreachable,
                int process_perfdata, int failure_prediction_enabled,
-               char* failure_prediction_options, int check_freshness,
-               int freshness_threshold, char* notes, char* notes_url,
-               char* action_url, char* icon_image, char* icon_image_alt,
-               char* vrml_image, char* statusmap_image, int x_2d,
+               char const* failure_prediction_options, int check_freshness,
+               int freshness_threshold, char const* notes, char const* notes_url,
+               char const* action_url, char const* icon_image, char const* icon_image_alt,
+               char const* vrml_image, char const* statusmap_image, int x_2d,
                int y_2d, int have_2d_coords, double x_3d, double y_3d,
                double z_3d, int have_3d_coords, int should_be_drawn,
                int retain_status_information,
@@ -795,7 +795,7 @@ host* add_host(char* name, char* display_name, char* alias,
   return (new_host);
 }
 
-hostsmember* add_parent_host_to_host(host* hst, char* host_name) {
+hostsmember* add_parent_host_to_host(host* hst, char const* host_name) {
   hostsmember* new_hostsmember = NULL;
 
   /* make sure we have the data we need */
@@ -870,7 +870,7 @@ servicesmember* add_service_link_to_host(host* hst, service* service_ptr) {
 }
 
 /* add a new contactgroup to a host */
-contactgroupsmember* add_contactgroup_to_host(host* hst, char* group_name) {
+contactgroupsmember* add_contactgroup_to_host(host* hst, char const* group_name) {
   contactgroupsmember* new_contactgroupsmember = NULL;
 
   if (hst == NULL || (group_name == NULL || !strcmp(group_name, ""))) {
@@ -894,21 +894,23 @@ contactgroupsmember* add_contactgroup_to_host(host* hst, char* group_name) {
 }
 
 /* adds a contact to a host */
-contactsmember* add_contact_to_host(host* hst, char* contact_name) {
+contactsmember* add_contact_to_host(host* hst, char const* contact_name) {
   return (add_contact_to_object(&hst->contacts, contact_name));
 }
 
 /* adds a custom variable to a host */
-customvariablesmember* add_custom_variable_to_host(host* hst, char* varname, char* varvalue) {
+customvariablesmember* add_custom_variable_to_host(host* hst,
+                                                   char const* varname,
+                                                   char const* varvalue) {
   return (add_custom_variable_to_object(&hst->custom_variables, varname, varvalue));
 }
 
 /* add a new host group to the list in memory */
-hostgroup* add_hostgroup(char* name,
-			 char* alias,
-			 char* notes,
-                         char* notes_url,
-			 char* action_url) {
+hostgroup* add_hostgroup(char const* name,
+			 char const* alias,
+			 char const* notes,
+                         char const* notes_url,
+			 char const* action_url) {
   hostgroup* new_hostgroup = NULL;
   int result = OK;
 
@@ -974,7 +976,7 @@ hostgroup* add_hostgroup(char* name,
 }
 
 /* add a new host to a host group */
-hostsmember* add_host_to_hostgroup(hostgroup* temp_hostgroup, char* host_name) {
+hostsmember* add_host_to_hostgroup(hostgroup* temp_hostgroup, char const* host_name) {
   hostsmember* new_member = NULL;
   hostsmember* last_member = NULL;
   hostsmember* temp_member = NULL;
@@ -1021,11 +1023,11 @@ hostsmember* add_host_to_hostgroup(hostgroup* temp_hostgroup, char* host_name) {
 }
 
 /* add a new service group to the list in memory */
-servicegroup* add_servicegroup(char* name,
-			       char* alias,
-			       char* notes,
-                               char* notes_url,
-			       char* action_url) {
+servicegroup* add_servicegroup(char const* name,
+			       char const* alias,
+			       char const* notes,
+                               char const* notes_url,
+			       char const* action_url) {
   servicegroup* new_servicegroup = NULL;
   int result = OK;
 
@@ -1095,8 +1097,8 @@ servicegroup* add_servicegroup(char* name,
 
 /* add a new service to a service group */
 servicesmember* add_service_to_servicegroup(servicegroup* temp_servicegroup,
-                                            char* host_name,
-                                            char* svc_description) {
+                                            char const* host_name,
+                                            char const* svc_description) {
   servicesmember* new_member = NULL;
   servicesmember* last_member = NULL;
   servicesmember* temp_member = NULL;
@@ -1156,9 +1158,9 @@ servicesmember* add_service_to_servicegroup(servicegroup* temp_servicegroup,
 }
 
 /* add a new contact to the list in memory */
-contact* add_contact(char* name, char* alias, char* email, char* pager,
-                     char** addresses, char* svc_notification_period,
-                     char* host_notification_period,
+contact* add_contact(char const* name, char const* alias, char const* email, char const* pager,
+                     char** addresses, char const* svc_notification_period,
+                     char const* host_notification_period,
                      int notify_service_ok, int notify_service_critical,
                      int notify_service_warning,
                      int notify_service_unknown,
@@ -1277,7 +1279,7 @@ contact* add_contact(char* name, char* alias, char* email, char* pager,
 }
 
 /* adds a host notification command to a contact definition */
-commandsmember* add_host_notification_command_to_contact(contact*  cntct, char* command_name) {
+commandsmember* add_host_notification_command_to_contact(contact*  cntct, char const* command_name) {
   commandsmember* new_commandsmember = NULL;
 
   /* make sure we have the data we need */
@@ -1301,7 +1303,7 @@ commandsmember* add_host_notification_command_to_contact(contact*  cntct, char* 
 }
 
 /* adds a service notification command to a contact definition */
-commandsmember* add_service_notification_command_to_contact(contact*  cntct, char* command_name) {
+commandsmember* add_service_notification_command_to_contact(contact*  cntct, char const* command_name) {
   commandsmember* new_commandsmember = NULL;
 
   /* make sure we have the data we need */
@@ -1325,12 +1327,14 @@ commandsmember* add_service_notification_command_to_contact(contact*  cntct, cha
 }
 
 /* adds a custom variable to a contact */
-customvariablesmember* add_custom_variable_to_contact(contact* cntct, char* varname, char* varvalue) {
+customvariablesmember* add_custom_variable_to_contact(contact* cntct,
+                                                      char const* varname,
+                                                      char const* varvalue) {
   return (add_custom_variable_to_object(&cntct->custom_variables, varname, varvalue));
 }
 
 /* add a new contact group to the list in memory */
-contactgroup* add_contactgroup(char* name, char* alias) {
+contactgroup* add_contactgroup(char const* name, char const* alias) {
   contactgroup* new_contactgroup = NULL;
   int result = OK;
 
@@ -1388,7 +1392,7 @@ contactgroup* add_contactgroup(char* name, char* alias) {
 }
 
 /* add a new member to a contact group */
-contactsmember* add_contact_to_contactgroup(contactgroup* grp, char* contact_name) {
+contactsmember* add_contact_to_contactgroup(contactgroup* grp, char const* contact_name) {
   contactsmember* new_contactsmember = NULL;
 
   /* make sure we have the data we need */
@@ -1412,19 +1416,19 @@ contactsmember* add_contact_to_contactgroup(contactgroup* grp, char* contact_nam
 }
 
 /* add a new service to the list in memory */
-service* add_service(char* host_name, char* description,
-                     char* display_name, char* check_period,
+service* add_service(char const* host_name, char const* description,
+                     char const* display_name, char const* check_period,
                      int initial_state, int max_attempts,
                      int parallelize, int accept_passive_checks,
                      double check_interval, double retry_interval,
                      double notification_interval,
                      double first_notification_delay,
-                     char* notification_period, int notify_recovery,
+                     char const* notification_period, int notify_recovery,
                      int notify_unknown, int notify_warning,
                      int notify_critical, int notify_flapping,
                      int notify_downtime, int notifications_enabled,
-                     int is_volatile, char* event_handler,
-                     int event_handler_enabled, char* check_command,
+                     int is_volatile, char const* event_handler,
+                     int event_handler_enabled, char const* check_command,
                      int checks_enabled, int flap_detection_enabled,
                      double low_flap_threshold,
                      double high_flap_threshold,
@@ -1435,10 +1439,10 @@ service* add_service(char* host_name, char* description,
                      int stalk_on_warning, int stalk_on_unknown,
                      int stalk_on_critical, int process_perfdata,
                      int failure_prediction_enabled,
-                     char* failure_prediction_options,
+                     char const* failure_prediction_options,
                      int check_freshness, int freshness_threshold,
-                     char* notes, char* notes_url, char* action_url,
-                     char* icon_image, char* icon_image_alt,
+                     char const* notes, char const* notes_url, char const* action_url,
+                     char const* icon_image, char const* icon_image_alt,
                      int retain_status_information,
                      int retain_nonstatus_information,
                      int obsess_over_service) {
@@ -1642,7 +1646,7 @@ service* add_service(char* host_name, char* description,
 }
 
 /* adds a contact group to a service */
-contactgroupsmember* add_contactgroup_to_service(service* svc, char* group_name) {
+contactgroupsmember* add_contactgroup_to_service(service* svc, char const* group_name) {
   contactgroupsmember* new_contactgroupsmember = NULL;
 
   /* bail out if we weren't given the data we need */
@@ -1666,17 +1670,19 @@ contactgroupsmember* add_contactgroup_to_service(service* svc, char* group_name)
 }
 
 /* adds a contact to a service */
-contactsmember* add_contact_to_service(service* svc, char* contact_name) {
+contactsmember* add_contact_to_service(service* svc, char const* contact_name) {
   return (add_contact_to_object(&svc->contacts, contact_name));
 }
 
 /* adds a custom variable to a service */
-customvariablesmember* add_custom_variable_to_service(service* svc, char* varname, char* varvalue) {
+customvariablesmember* add_custom_variable_to_service(service* svc,
+                                                      char const* varname,
+                                                      char const* varvalue) {
   return (add_custom_variable_to_object(&svc->custom_variables, varname, varvalue));
 }
 
 /* add a new command to the list in memory */
-command* add_command(char* name, char* value) {
+command* add_command(char const* name, char const* value) {
   command* new_command = NULL;
   int result = OK;
 
@@ -1818,7 +1824,8 @@ serviceescalation* add_serviceescalation(char* host_name,
 }
 
 /* adds a contact group to a service escalation */
-contactgroupsmember* add_contactgroup_to_serviceescalation(serviceescalation* se, char* group_name) {
+contactgroupsmember* add_contactgroup_to_serviceescalation(serviceescalation* se,
+                                                           char const* group_name) {
   contactgroupsmember* new_contactgroupsmember = NULL;
 
   /* bail out if we weren't given the data we need */
@@ -1842,15 +1849,16 @@ contactgroupsmember* add_contactgroup_to_serviceescalation(serviceescalation* se
 }
 
 /* adds a contact to a service escalation */
-contactsmember* add_contact_to_serviceescalation(serviceescalation* se, char* contact_name) {
+contactsmember* add_contact_to_serviceescalation(serviceescalation* se,
+                                                 char const* contact_name) {
   return (add_contact_to_object(&se->contacts, contact_name));
 }
 
 /* adds a service dependency definition */
-servicedependency* add_service_dependency(char* dependent_host_name,
-                                          char* dependent_service_description,
-                                          char* host_name,
-                                          char* service_description,
+servicedependency* add_service_dependency(char const* dependent_host_name,
+                                          char const* dependent_service_description,
+                                          char const* host_name,
+                                          char const* service_description,
                                           int dependency_type,
                                           int inherits_parent,
                                           int fail_on_ok,
@@ -1858,7 +1866,7 @@ servicedependency* add_service_dependency(char* dependent_host_name,
                                           int fail_on_unknown,
                                           int fail_on_critical,
                                           int fail_on_pending,
-                                          char* dependency_period) {
+                                          char const* dependency_period) {
   servicedependency* new_servicedependency = NULL;
   int result = OK;
 
@@ -1937,15 +1945,15 @@ servicedependency* add_service_dependency(char* dependent_host_name,
 }
 
 /* adds a host dependency definition */
-hostdependency* add_host_dependency(char* dependent_host_name,
-                                    char* host_name,
+hostdependency* add_host_dependency(char const* dependent_host_name,
+                                    char const* host_name,
                                     int dependency_type,
                                     int inherits_parent,
 				    int fail_on_up,
                                     int fail_on_down,
                                     int fail_on_unreachable,
                                     int fail_on_pending,
-                                    char* dependency_period) {
+                                    char const* dependency_period) {
   hostdependency* new_hostdependency = NULL;
   int result = OK;
 
@@ -2010,11 +2018,11 @@ hostdependency* add_host_dependency(char* dependent_host_name,
 }
 
 /* add a new host escalation to the list in memory */
-hostescalation* add_hostescalation(char* host_name,
+hostescalation* add_hostescalation(char const* host_name,
                                    int first_notification,
                                    int last_notification,
                                    double notification_interval,
-                                   char* escalation_period,
+                                   char const* escalation_period,
                                    int escalate_on_down,
                                    int escalate_on_unreachable,
                                    int escalate_on_recovery) {
@@ -2085,7 +2093,7 @@ hostescalation* add_hostescalation(char* host_name,
 }
 
 /* adds a contact group to a host escalation */
-contactgroupsmember* add_contactgroup_to_hostescalation(hostescalation* he, char* group_name) {
+contactgroupsmember* add_contactgroup_to_hostescalation(hostescalation* he, char const* group_name) {
   contactgroupsmember* new_contactgroupsmember = NULL;
 
   /* bail out if we weren't given the data we need */
@@ -2109,12 +2117,12 @@ contactgroupsmember* add_contactgroup_to_hostescalation(hostescalation* he, char
 }
 
 /* adds a contact to a host escalation */
-contactsmember* add_contact_to_hostescalation(hostescalation* he, char* contact_name) {
+contactsmember* add_contact_to_hostescalation(hostescalation* he, char const* contact_name) {
   return (add_contact_to_object(&he->contacts, contact_name));
 }
 
 /* adds a contact to an object */
-contactsmember* add_contact_to_object(contactsmember** object_ptr, char* contactname) {
+contactsmember* add_contact_to_object(contactsmember** object_ptr, char const* contactname) {
   contactsmember* new_contactsmember = NULL;
 
   /* make sure we have the data we need */

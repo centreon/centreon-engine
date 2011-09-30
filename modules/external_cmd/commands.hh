@@ -18,11 +18,12 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef CCE_COMMANDS_HH
-# define CCE_COMMANDS_HH
+#ifndef CCE_EX_COMMANDS_HH
+# define CCE_EX_COMMANDS_HH
 
 # include <sys/time.h>
 # include "objects.hh"
+# include "compatibility.hh"
 
 # ifdef __cplusplus
 extern "C" {
@@ -31,14 +32,7 @@ extern "C" {
 // External Command Functions
 int check_for_external_commands(void);                                      // checks for any external commands
 int process_external_commands_from_file(char* fname, int delete_file);      // process external commands in a file
-int process_external_command1(char* cmd);                                   // top-level external command processor
-int process_external_command2(int cmd, time_t entry_time, char* args);      // process an external command
-int process_host_command(int cmd, time_t entry_time, char* args);           // process an external host command
-int process_hostgroup_command(int cmd, time_t entry_time, char* args);      // process an external hostgroup command
-int process_service_command(int cmd, time_t entry_time, char* args);        // process an external service command
-int process_servicegroup_command(int cmd, time_t entry_time, char* args);   // process an external servicegroup command
-int process_contact_command(int cmd, time_t entry_time, char* args);        // process an external contact command
-int process_contactgroup_command(int cmd, time_t entry_time, char* args);   // process an external contactgroup command
+int process_external_command(char const* cmd);                              // external command processor
 
 // External Command Implementations
 int cmd_add_comment(int cmd,time_t entry_time,char* args);                  // add a service or host comment
@@ -125,4 +119,4 @@ void set_service_notification_number(service* svc, int num);               // se
 }
 # endif
 
-#endif // !CCE_COMMANDS_HH
+#endif // !CCE_EX_COMMANDS_HH

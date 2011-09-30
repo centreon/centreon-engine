@@ -43,7 +43,7 @@ typedef struct  mmapfile_struct {
 # define ARRAY_SIZE(ary) (sizeof(ary) / sizeof(ary[0]))
 
 char* my_strdup(char const* str);
-char* my_strtok(char* buffer, char const* tokens);
+char* my_strtok(char const* buffer, char const* tokens);
 char* my_strsep(char** stringp, const char* delim);
 mmapfile* mmap_fopen(char* filename);
 int mmap_fclose(mmapfile* temp_mmapfile);

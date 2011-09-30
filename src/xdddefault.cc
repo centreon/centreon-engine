@@ -135,10 +135,10 @@ int xdddefault_cleanup_downtime_data(char* main_config_file) {
 /******************************************************************/
 
 /* adds a new scheduled host downtime entry */
-int xdddefault_add_new_host_downtime(char* host_name,
+int xdddefault_add_new_host_downtime(char const* host_name,
 				     time_t entry_time,
-                                     char* author,
-				     char* comment,
+                                     char const* author,
+				     char const* comment,
                                      time_t start_time,
 				     time_t end_time,
                                      int fixed,
@@ -174,11 +174,11 @@ int xdddefault_add_new_host_downtime(char* host_name,
 }
 
 /* adds a new scheduled service downtime entry */
-int xdddefault_add_new_service_downtime(char* host_name,
-                                        char* service_description,
+int xdddefault_add_new_service_downtime(char const* host_name,
+                                        char const* service_description,
                                         time_t entry_time,
-					char* author,
-                                        char* comment,
+					char const* author,
+                                        char const* comment,
                                         time_t start_time,
                                         time_t end_time,
 					int fixed,

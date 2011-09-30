@@ -66,7 +66,7 @@ namespace                 com {
           dbg_perfdata             = 16ull << 32,
           dbg_notifications        = 32ull << 32,
           dbg_eventbroker          = 64ull << 32,
-          dbg_externalcommands     = 128ull << 32,
+          dbg_external_command     = 128ull << 32,
           dbg_commands             = 256ull << 32,
           dbg_downtime             = 512ull << 32,
           dbg_comments             = 1024ull << 32,

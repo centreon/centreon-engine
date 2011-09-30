@@ -210,7 +210,28 @@ state::state(state const& right) {
 /**
  *  Destructor.
  */
-state::~state() throw() {}
+state::~state() throw() {
+  delete[] ::log_file;
+  delete[] ::debug_file;
+  delete[] ::command_file;
+  delete[] ::global_host_event_handler;
+  delete[] ::global_service_event_handler;
+  delete[] ::ocsp_command;
+  delete[] ::ochp_command;
+  delete[] ::log_archive_path;
+  delete[] ::illegal_object_chars;
+  delete[] ::illegal_output_chars;
+  delete[] ::use_timezone;
+
+  delete[] _mac->x[MACRO_TEMPPATH];
+  delete[] _mac->x[MACRO_LOGFILE];
+  delete[] _mac->x[MACRO_MAINCONFIGFILE];
+  delete[] _mac->x[MACRO_COMMANDFILE];
+  delete[] _mac->x[MACRO_TEMPFILE];
+  delete[] _mac->x[MACRO_RESOURCEFILE];
+  delete[] _mac->x[MACRO_ADMINEMAIL];
+  delete[] _mac->x[MACRO_ADMINPAGER];
+}
 
 /**
  *  Assignment operator.
