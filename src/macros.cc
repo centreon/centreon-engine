@@ -26,10 +26,10 @@
 #include "globals.hh"
 #include "utils.hh"
 #include "shared.hh"
-#include "logging.hh"
 #include "macros.hh"
+#include "logging/logger.hh"
 
-extern "C" {
+using namespace com::centreon::engine::logging;
 
 /******************************************************************/
 /********************** MACRO GRAB FUNCTIONS **********************/
@@ -485,9 +485,8 @@ int grab_standard_hostgroup_macro_r(nagios_macros* mac,
     break;
 
   default:
-    log_debug_info(DEBUGL_MACROS, 0,
-                   "UNHANDLED HOSTGROUP MACRO #%d! THIS IS A BUG!\n",
-                   macro_type);
+    logger(dbg_macros, basic)
+      << "UNHANDLED HOSTGROUP MACRO #" << macro_type << "! THIS IS A BUG!";
     return (ERROR);
   }
 
@@ -608,9 +607,8 @@ int grab_standard_servicegroup_macro_r(nagios_macros* mac,
     break;
 
   default:
-    log_debug_info(DEBUGL_MACROS, 0,
-                   "UNHANDLED SERVICEGROUP MACRO #%d! THIS IS A BUG!\n",
-                   macro_type);
+    logger(dbg_macros, basic)
+      << "UNHANDLED SERVICEGROUP MACRO #" << macro_type << "! THIS IS A BUG!";
     return (ERROR);
   }
 
@@ -706,9 +704,8 @@ int grab_standard_contact_macro_r(nagios_macros* mac,
     break;
 
   default:
-    log_debug_info(DEBUGL_MACROS, 0,
-                   "UNHANDLED CONTACT MACRO #%d! THIS IS A BUG!\n",
-                   macro_type);
+    logger(dbg_macros, basic)
+      << "UNHANDLED CONTACT MACRO #" << macro_type << "! THIS IS A BUG!";
     return (ERROR);
   }
   return (OK);
@@ -778,10 +775,9 @@ int grab_standard_contactgroup_macro(int macro_type,
     break;
 
   default:
-    log_debug_info(DEBUGL_MACROS, 0,
-                   "UNHANDLED CONTACTGROUP MACRO #%d! THIS IS A BUG!\n",
-                   macro_type);
-    return (ERROR);
+    logger(dbg_macros, basic)
+      << "UNHANDLED CONTACTGROUP MACRO #" << macro_type << "! THIS IS A BUG!";
+      return (ERROR);
   }
   return (OK);
 }
@@ -1563,5 +1559,3 @@ int set_macro_environment_var(char const* name, char const* value, int set) {
 
   return (OK);
 }
-
-} // extern "C"

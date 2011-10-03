@@ -22,7 +22,7 @@
 #include <QPair>
 #include <sstream>
 #include "engine.hh"
-#include "logging.hh"
+#include "logging/logger.hh"
 #include "macros/clear_service.hh"
 #include "macros/clear_servicegroup.hh"
 #include "macros/defines.hh"
@@ -31,6 +31,7 @@
 #include "macros/misc.hh"
 
 using namespace com::centreon::engine::macros;
+using namespace com::centreon::engine::logging;
 
 /**************************************
 *                                     *
@@ -291,10 +292,8 @@ int grab_standard_service_macro_r(nagios_macros* mac,
     }
     // Non-existent macro.
     else {
-      log_debug_info(DEBUGL_MACROS,
-        0,
-        "UNHANDLED SERVICE MACRO #%d! THIS IS A BUG!\n",
-        macro_type);
+      logger(dbg_macros, basic)
+        << "UNHANDLED SERVICE MACRO #" << macro_type << "! THIS IS A BUG!";
       retval = ERROR;
     }
   }

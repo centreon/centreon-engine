@@ -30,9 +30,11 @@
 #include <signal.h>
 
 #include "common.hh"
-#include "logging.hh"
 #include "globals.hh"
+#include "logging/logger.hh"
 #include "utils.hh"
+
+using namespace com::centreon::engine::logging;
 
 static int   command_file_fd = -1;
 static int   command_file_created = FALSE;
@@ -61,12 +63,12 @@ int open_command_file(void) {
     /* create the external command file as a named pipe (FIFO) */
     if ((result = mkfifo(config.get_command_file().toStdString().c_str(),
                          S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP)) != 0) {
-
-      logit(NSLOG_RUNTIME_ERROR, TRUE,
-            "Error: Could not create external command file '%s' as named pipe: (%d) -> %s.  If this file already exists and you are sure that another copy of Centreon Engine is not running, you should delete this file.\n",
-            config.get_command_file().toStdString().c_str(),
-            errno,
-            strerror(errno));
+      logger(log_runtime_error, basic)
+        << "Error: Could not create external command file '"
+        << config.get_command_file() << "' as named pipe: (" << errno
+        << ") -> " << strerror(errno) << ".  If this file already exists and " \
+        "you are sure that another copy of Centreon Engine is not running, " \
+        "you should delete this file.";
       return (ERROR);
     }
   }
@@ -74,10 +76,9 @@ int open_command_file(void) {
   /* open the command file for reading (non-blocked) - O_TRUNC flag cannot be used due to errors on some systems */
   /* NOTE: file must be opened read-write for poll() to work */
   if ((command_file_fd = open(config.get_command_file().toStdString().c_str(), O_RDWR | O_NONBLOCK)) < 0) {
-    logit(NSLOG_RUNTIME_ERROR, TRUE,
-          "Error: Could not open external command file for reading via open(): (%d) -> %s\n",
-          errno,
-          strerror(errno));
+    logger(log_runtime_error, basic)
+      << "Error: Could not open external command file for reading " \
+      "via open(): (" << errno << ") -> " << strerror(errno);
     return (ERROR);
   }
 
@@ -86,35 +87,32 @@ int open_command_file(void) {
     int flags;
     flags = fcntl(command_file_fd, F_GETFL);
     if (flags < 0) {
-      logit(NSLOG_RUNTIME_ERROR, TRUE,
-        "Error: Could not get file descriptor flags on external command via fcntl(): (%d) -> %s\n",
-        errno,
-        strerror(errno));
+      logger(log_runtime_error, basic)
+        << "Error: Could not get file descriptor flags on external " \
+        "command via fcntl(): (" << errno << ") -> " << strerror(errno);
       return (ERROR);
     }
     flags |= FD_CLOEXEC;
     if (fcntl(command_file_fd, F_SETFL, flags) == -1) {
-      logit(NSLOG_RUNTIME_ERROR, TRUE,
-        "Error: Could not set close-on-exec flag on external command via fcntl(): (%d) -> %s\n",
-        errno,
-        strerror(errno));
+      logger(log_runtime_error, basic)
+        << "Error: Could not set close-on-exec flag on external " \
+        "command via fcntl(): (" << errno << ") -> " << strerror(errno);
       return (ERROR);
     }
   }
 
   /* re-open the FIFO for use with fgets() */
   if ((command_file_fp = (FILE*)fdopen(command_file_fd, "r")) == NULL) {
-    logit(NSLOG_RUNTIME_ERROR, TRUE,
-          "Error: Could not open external command file for reading via fdopen(): (%d) -> %s\n",
-          errno,
-          strerror(errno));
+    logger(log_runtime_error, basic)
+      << "Error: Could not open external command file for " \
+      "reading via fdopen(): (" << errno << ") -> " << strerror(errno);
     return (ERROR);
   }
 
   /* initialize worker thread */
   if (init_command_file_worker_thread() == ERROR) {
-    logit(NSLOG_RUNTIME_ERROR, TRUE,
-          "Error: Could not initialize command file worker thread.\n");
+    logger(log_runtime_error, basic)
+      << "Error: Could not initialize command file worker thread.";
 
     /* close the command file */
     fclose(command_file_fp);
@@ -274,15 +272,18 @@ void* command_file_worker_thread(void* arg) {
 
       switch (errno) {
       case EBADF:
-        logit(logging_options, FALSE, "command_file_worker_thread(): poll(): EBADF");
+        logger(logging_options, basic)
+          << "command_file_worker_thread(): poll(): EBADF";
         break;
 
       case ENOMEM:
-        logit(logging_options, FALSE, "command_file_worker_thread(): poll(): ENOMEM");
+        logger(logging_options, basic)
+          << "command_file_worker_thread(): poll(): ENOMEM";
         break;
 
       case EFAULT:
-        logit(logging_options, FALSE, "command_file_worker_thread(): poll(): EFAULT");
+        logger(logging_options, basic)
+          << "command_file_worker_thread(): poll(): EFAULT";
         break;
 
       case EINTR:
@@ -293,7 +294,8 @@ void* command_file_worker_thread(void* arg) {
         break;
 
       default:
-        logit(logging_options, FALSE, "command_file_worker_thread(): poll(): Unknown errno value.");
+        logger(logging_options, basic)
+          << "command_file_worker_thread(): poll(): Unknown errno value.";
         break;
       }
 

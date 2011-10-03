@@ -43,8 +43,8 @@
 #include "notifications.hh"
 #include "config.hh"
 #include "utils.hh"
-#include "logging.hh"
 #include "broker/loader.hh"
+#include "logging.hh"
 #include "configuration/applier/logging.hh"
 #include "logging/logger.hh"
 #include "logging/broker.hh"
@@ -68,7 +68,7 @@ using namespace com::centreon::engine::logging;
   "    variables/definitions may have been removed or modified in this\n" \
   "    version. Make sure to read the documentation regarding the config\n" \
   "    files, as well as the version changelog to find out what has\n"	\
-  "    changed.\n\n"
+  "    changed.\n"
 
 int main(int argc, char** argv) {
   QCoreApplication app(argc, argv);
@@ -164,7 +164,7 @@ int main(int argc, char** argv) {
       << "\n"
       << "You should have received a copy of the GNU General Public License along\n"
       << "with Centreon Engine. If not, see <http://www.gnu.org/licenses/>.\n\n"
-      << "Centreon Engine version: " << get_program_version() << "\n";
+      << "Centreon Engine version: " << get_program_version();
     exit(EXIT_SUCCESS);
   }
 
@@ -186,7 +186,7 @@ int main(int argc, char** argv) {
       << "                              USE WITH CAUTION !\n"
       << "  -p, --precache-objects      Precache object configuration - use with\n"
       << "                              -v or -s options.\n"
-      << "  -u, --use-precached-objects Use precached object config file.\n";
+      << "  -u, --use-precached-objects Use precached object config file.";
     exit(ERROR);
   }
 
@@ -288,13 +288,13 @@ int main(int argc, char** argv) {
 
     if (result != OK) {
       logger(log_config_error, basic)
-        << "\n    One or more problems occurred while processing the config files.\n\n";
+        << "\n    One or more problems occurred while processing the config files.\n";
     }
 
     // Run the pre-flight check to make sure everything looks okay.
     if ((OK == result) && ((result = pre_flight_check()) != OK)) {
       logger(log_config_error, basic)
-        << "\n    One or more problems occurred during the pre-flight check.\n\n";
+        << "\n    One or more problems occurred during the pre-flight check.\n";
     }
 
     if (OK == result) {
@@ -309,7 +309,7 @@ int main(int argc, char** argv) {
           << "\n"
           << "OBJECT PRECACHING\n"
           << "-----------------\n"
-          << "Object config files were precached.\n";
+          << "Object config files were precached.";
     }
 
 #undef TEST_TIMEPERIODS
@@ -367,9 +367,6 @@ int main(int argc, char** argv) {
         throw ;
       }
 
-      // Open debug log.
-      open_debug_log();
-
       // Initialize modules.
       neb_init_modules();
       neb_init_callback_list();
@@ -396,7 +393,7 @@ int main(int argc, char** argv) {
       logger(log_process_info, basic) << "Local time is " << datestring;
 
       // Write log version/info.
-      write_log_file_info(NULL);
+      logger(log_process_info, basic) <<  "LOG VERSION: " << LOG_VERSION_2;
 
       // Load modules.
       neb_load_all_modules();
@@ -420,7 +417,7 @@ int main(int argc, char** argv) {
       else if ((result = pre_flight_check()) != OK)
         logger(log_process_info | log_runtime_error | log_verification_error, basic)
           << "Bailing out due to errors encountered while running the pre-flight check.  "
-          << "Run Centreon Engine from the command line with the -v option to verify your config before restarting. (PID=" << getpid() << ")\n";
+          << "Run Centreon Engine from the command line with the -v option to verify your config before restarting. (PID=" << getpid() << ")";
 
       // An error occurred that prevented us from (re)starting.
       if (result != OK) {
@@ -538,7 +535,7 @@ int main(int argc, char** argv) {
           }
         }
 
-        write_to_all_logs(buffer, NSLOG_PROCESS_INFO);
+        logger(log_process_info, basic) << buffer;
         delete[] buffer;
       }
 
@@ -584,9 +581,6 @@ int main(int argc, char** argv) {
 
       // Clean up after ourselves.
       cleanup();
-
-      // Close debug log.
-      close_debug_log();
 
     } while (sigrestart == TRUE && sigshutdown == FALSE);
 

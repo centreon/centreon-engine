@@ -19,6 +19,7 @@
 */
 
 #include <sstream>
+#include <iomanip>
 #include <stdlib.h>
 #include <stdio.h>
 #include <sys/types.h>
@@ -37,7 +38,6 @@
 #include "broker.hh"
 #include "nebmods.hh"
 #include "notifications.hh"
-#include "logging.hh"
 #include "shared.hh"
 #include "utils.hh"
 #include "commands/raw.hh"
@@ -45,8 +45,10 @@
 #include "checks/checker.hh"
 #include "broker/loader.hh"
 #include "logging/engine.hh"
+#include "logging/logger.hh"
 
 using namespace com::centreon::engine;
+using namespace com::centreon::engine::logging;
 
 extern "C" int free_check_result_list(void);
 
@@ -63,7 +65,7 @@ int my_system_r(nagios_macros const* mac,
 		char** output,
                 unsigned int max_output_length) {
 
-  log_debug_info(DEBUGL_FUNCTIONS, 0, "my_system_r()\n");
+  logger(dbg_functions, basic) << "my_system_r()";
 
   // initialize return variables.
   if (output != NULL) {
@@ -77,7 +79,7 @@ int my_system_r(nagios_macros const* mac,
     return (STATE_OK);
   }
 
-  log_debug_info(DEBUGL_COMMANDS, 1, "Running command '%s'...\n", cmd);
+  logger(dbg_commands, more) << "Running command '" << cmd << "'...";
 
   timeval start_time = timeval();
   timeval end_time = timeval();
@@ -117,12 +119,12 @@ int my_system_r(nagios_macros const* mac,
 
   int result = cmd_result.get_exit_code();
 
-  log_debug_info(DEBUGL_COMMANDS, 1,
-		 "Execution time=%.3f sec, early timeout=%d, result=%d, output=%s\n",
-		 *exectime,
-		 *early_timeout,
-		 result,
-		 (output == NULL ? "(null)" : *output));
+  logger(dbg_commands, more)
+    << std::fixed << std::setprecision(3)
+    << "Execution time=" << *exectime
+    << " sec, early timeout=" << *early_timeout
+    << ", result=" << result << ", output="
+    << (output == NULL ? "(null)" : *output);
 
   // send event broker.
   broker_system_command(NEBTYPE_SYSTEM_COMMAND_END,
@@ -174,7 +176,7 @@ int get_raw_command_line_r(nagios_macros* mac,
   int arg_index = 0;
   int escaped = FALSE;
 
-  log_debug_info(DEBUGL_FUNCTIONS, 0, "get_raw_command_line_r()\n");
+  logger(dbg_functions, basic) << "get_raw_command_line_r()";
 
   /* clear the argv macros */
   clear_argv_macros_r(mac);
@@ -184,9 +186,8 @@ int get_raw_command_line_r(nagios_macros* mac,
     return (ERROR);
   }
 
-  log_debug_info(DEBUGL_COMMANDS | DEBUGL_CHECKS | DEBUGL_MACROS, 2,
-                 "Raw Command Input: %s\n",
-		 cmd_ptr->command_line);
+  logger(dbg_commands | dbg_checks | dbg_macros, most)
+    << "Raw Command Input: " << cmd_ptr->command_line;
 
   /* get the full command line */
   if (full_command != NULL) {
@@ -240,9 +241,8 @@ int get_raw_command_line_r(nagios_macros* mac,
   }
 
   if (full_command != NULL) {
-    log_debug_info(DEBUGL_COMMANDS | DEBUGL_CHECKS | DEBUGL_MACROS, 2,
-		   "Expanded Command Output: %s\n",
-		   *full_command);
+    logger(dbg_commands | dbg_checks | dbg_macros, most)
+      << "Expanded Command Output: " << *full_command;
   }
 
   return (OK);
@@ -341,7 +341,7 @@ int check_time_against_period(time_t test_time, timeperiod* tperiod) {
   int year = 0;
   int shift;
 
-  log_debug_info(DEBUGL_FUNCTIONS, 0, "check_time_against_period()\n");
+  logger(dbg_functions, basic) << "check_time_against_period()";
 
   /* if no period was specified, assume the time is good */
   if (tperiod == NULL)
@@ -1123,7 +1123,7 @@ static void _get_next_valid_time(time_t pref_time,
 void get_next_valid_time(time_t pref_time, time_t* valid_time, timeperiod* tperiod) {
   time_t current_time = (time_t)0L;
 
-  log_debug_info(DEBUGL_FUNCTIONS, 0, "get_next_valid_time()\n");
+  logger(dbg_functions, basic) << "get_next_valid_time()";
 
   /* get time right now, preferred time must be now or in the future */
   time(&current_time);
@@ -1718,11 +1718,9 @@ int my_rename(char const* source, char const* dest) {
 
       /* try copying the file */
       if (my_fcopy(source, dest) == ERROR) {
-        logit(NSLOG_RUNTIME_ERROR, TRUE,
-              "Error: Unable to rename file '%s' to '%s': %s\n",
-	      source,
-              dest,
-	      strerror(errno));
+        logger(log_runtime_error, basic)
+          << "Error: Unable to rename file '" << source
+          << "' to '" << dest << "': " << strerror(errno);
         return (-1);
       }
 
@@ -1734,11 +1732,9 @@ int my_rename(char const* source, char const* dest) {
     }
     /* some other error occurred */
     else {
-      logit(NSLOG_RUNTIME_ERROR, TRUE,
-            "Error: Unable to rename file '%s' to '%s': %s\n",
-	    source,
-            dest,
-	    strerror(errno));
+      logger(log_runtime_error, basic)
+        << "Error: Unable to rename file '" << source
+        << "' to '" << dest << "': " << strerror(errno);
       return (rename_result);
     }
   }
@@ -1759,10 +1755,9 @@ int my_fdcopy(char const* source, char const* dest, int dest_fd) {
 
   /* open source file for reading */
   if ((source_fd = open(source, O_RDONLY, 0644)) < 0) {
-    logit(NSLOG_RUNTIME_ERROR, TRUE,
-          "Error: Unable to open file '%s' for reading: %s\n",
-	  source,
-          strerror(errno));
+    logger(log_runtime_error, basic)
+      << "Error: Unable to open file '" << source
+      << "' for reading: " << strerror(errno);
     return (ERROR);
   }
 
@@ -1771,10 +1766,9 @@ int my_fdcopy(char const* source, char const* dest, int dest_fd) {
    * we've written all of it
    */
   if (fstat(source_fd, &st) < 0) {
-    logit(NSLOG_RUNTIME_ERROR, TRUE,
-          "Error: Unable to stat source file '%s' for my_fcopy(): %s\n",
-          source,
-	  strerror(errno));
+    logger(log_runtime_error, basic)
+      << "Error: Unable to stat source file '" << source
+      << "' for my_fcopy(): " << strerror(errno);
     close(source_fd);
     return (ERROR);
   }
@@ -1804,10 +1798,9 @@ int my_fdcopy(char const* source, char const* dest, int dest_fd) {
     if (rd_result < 0) {
       if (errno == EAGAIN || errno == EINTR)
         continue;
-      logit(NSLOG_RUNTIME_ERROR, TRUE,
-            "Error: my_fcopy() failed to read from '%s': %s\n",
-	    source,
-            strerror(errno));
+      logger(log_runtime_error, basic)
+        << "Error: my_fcopy() failed to read from '" << source
+        << "': " << strerror(errno);
       break;
     }
 
@@ -1817,10 +1810,9 @@ int my_fdcopy(char const* source, char const* dest, int dest_fd) {
       if (wr_result < 0) {
         if (errno == EAGAIN || errno == EINTR)
           continue;
-        logit(NSLOG_RUNTIME_ERROR, TRUE,
-              "Error: my_fcopy() failed to write to '%s': %s\n",
-	      dest,
-              strerror(errno));
+        logger(log_runtime_error, basic)
+          << "Error: my_fcopy() failed to write to '" << dest
+          << "': " << strerror(errno);
         break;
       }
       loop_wr += wr_result;
@@ -1859,10 +1851,9 @@ int my_fcopy(char const* source, char const* dest) {
 
   /* open destination file for writing */
   if ((dest_fd = open(dest, O_WRONLY | O_TRUNC | O_CREAT | O_APPEND, 0644)) < 0) {
-    logit(NSLOG_RUNTIME_ERROR, TRUE,
-          "Error: Unable to open file '%s' for writing: %s\n",
-	  dest,
-          strerror(errno));
+    logger(log_runtime_error, basic)
+      << "Error: Unable to open file '" << dest
+      << "' for writing: " << strerror(errno);
     return (ERROR);
   }
 
@@ -2306,24 +2297,24 @@ int reset_variables(void) {
   config.reset();
 
   logging_options =
-    NSLOG_RUNTIME_ERROR | NSLOG_RUNTIME_WARNING |
-    NSLOG_VERIFICATION_ERROR | NSLOG_VERIFICATION_WARNING |
-    NSLOG_CONFIG_ERROR | NSLOG_CONFIG_WARNING | NSLOG_PROCESS_INFO |
-    NSLOG_HOST_NOTIFICATION | NSLOG_SERVICE_NOTIFICATION |
-    NSLOG_EVENT_HANDLER | NSLOG_EXTERNAL_COMMAND | NSLOG_PASSIVE_CHECK |
-    NSLOG_HOST_UP | NSLOG_HOST_DOWN | NSLOG_HOST_UNREACHABLE |
-    NSLOG_SERVICE_OK | NSLOG_SERVICE_WARNING | NSLOG_SERVICE_UNKNOWN |
-    NSLOG_SERVICE_CRITICAL | NSLOG_INFO_MESSAGE;
+    log_runtime_error | log_runtime_warning |
+    log_verification_error | log_verification_warning |
+    log_config_error | log_config_warning | log_process_info |
+    log_host_notification | log_service_notification |
+    log_event_handler | log_external_command | log_passive_check |
+    log_host_up | log_host_down | log_host_unreachable |
+    log_service_ok | log_service_warning | log_service_unknown |
+    log_service_critical | log_info_message;
 
   syslog_options =
-    NSLOG_RUNTIME_ERROR | NSLOG_RUNTIME_WARNING |
-    NSLOG_VERIFICATION_ERROR | NSLOG_VERIFICATION_WARNING |
-    NSLOG_CONFIG_ERROR | NSLOG_CONFIG_WARNING | NSLOG_PROCESS_INFO |
-    NSLOG_HOST_NOTIFICATION | NSLOG_SERVICE_NOTIFICATION |
-    NSLOG_EVENT_HANDLER | NSLOG_EXTERNAL_COMMAND | NSLOG_PASSIVE_CHECK |
-    NSLOG_HOST_UP | NSLOG_HOST_DOWN | NSLOG_HOST_UNREACHABLE |
-    NSLOG_SERVICE_OK | NSLOG_SERVICE_WARNING | NSLOG_SERVICE_UNKNOWN |
-    NSLOG_SERVICE_CRITICAL | NSLOG_INFO_MESSAGE;
+    log_runtime_error | log_runtime_warning |
+    log_verification_error | log_verification_warning |
+    log_config_error | log_config_warning | log_process_info |
+    log_host_notification | log_service_notification |
+    log_event_handler | log_external_command | log_passive_check |
+    log_host_up | log_host_down | log_host_unreachable |
+    log_service_ok | log_service_warning | log_service_unknown |
+    log_service_critical | log_info_message;
 
   modified_host_process_attributes = MODATTR_NONE;
   modified_service_process_attributes = MODATTR_NONE;

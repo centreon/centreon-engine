@@ -50,8 +50,6 @@ namespace                    com {
           logger&            operator<<(QString const& str);
 
          private:
-          std::string        _trim(std::string str) throw();
-
           std::ostringstream _buffer;
           unsigned long long _type;
           unsigned int       _verbosity;

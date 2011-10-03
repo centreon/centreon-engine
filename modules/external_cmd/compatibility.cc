@@ -23,9 +23,11 @@
 #include "globals.hh"
 #include "flapping.hh"
 #include "sretention.hh"
-#include "logging.hh"
 #include "commands.hh"
+#include "logging/logger.hh"
 #include "compatibility.hh"
+
+using namespace com::centreon::engine::logging;
 
 int process_external_command1(char* cmd) {
   char* temp_buffer = NULL;
@@ -35,7 +37,8 @@ int process_external_command1(char* cmd) {
   int command_type = CMD_NONE;
   char* temp_ptr = NULL;
 
-  log_debug_info(DEBUGL_FUNCTIONS, 0, "process_external_command1()\n");
+  logger(dbg_functions, basic)
+    << "process_external_command1()";
 
   if (cmd == NULL)
     return (ERROR);
@@ -43,7 +46,8 @@ int process_external_command1(char* cmd) {
   /* strip the command of newlines and carriage returns */
   strip(cmd);
 
-  log_debug_info(DEBUGL_EXTERNALCOMMANDS, 2, "Raw command entry: %s\n", cmd);
+  logger(dbg_external_command, most)
+    << "Raw command entry: " << cmd;
 
   /* get the command entry time */
   if ((temp_ptr = my_strtok(cmd, "[")) == NULL)
@@ -518,10 +522,9 @@ int process_external_command1(char* cmd) {
   /**** UNKNOWN COMMAND* ***/
   else {
     /* log the bad external command */
-    logit(NSLOG_EXTERNAL_COMMAND | NSLOG_RUNTIME_WARNING, TRUE,
-          "Warning: Unrecognized external command -> %s;%s\n",
-          command_id,
-          args);
+    logger(log_external_command | log_runtime_warning, basic)
+      << "Warning: Unrecognized external command -> "
+      << command_id << ";" << args;
 
     /* free memory */
     delete[] command_id;
@@ -542,11 +545,11 @@ int process_external_command1(char* cmd) {
       || command_type == CMD_PROCESS_HOST_CHECK_RESULT) {
     /* passive checks are logged in checks.c as well, as some my bypass external commands by getting dropped in checkresults dir */
     if (config.get_log_passive_checks() == true)
-      write_to_all_logs(temp_buffer, NSLOG_PASSIVE_CHECK);
+      logger(log_passive_check, basic) << temp_buffer;
   }
   else {
     if (config.get_log_external_commands() == true)
-      write_to_all_logs(temp_buffer, NSLOG_EXTERNAL_COMMAND);
+      logger(log_external_command, basic) << temp_buffer;
   }
   delete[] temp_buffer;
 
@@ -583,10 +586,14 @@ int process_external_command1(char* cmd) {
 int process_external_command2(int cmd,
                               time_t entry_time,
                               char* args) {
-  log_debug_info(DEBUGL_FUNCTIONS, 0, "process_external_command2()\n");
-  log_debug_info(DEBUGL_EXTERNALCOMMANDS, 1, "External Command Type: %d\n", cmd);
-  log_debug_info(DEBUGL_EXTERNALCOMMANDS, 1, "Command Entry Time: %lu\n", (unsigned long)entry_time);
-  log_debug_info(DEBUGL_EXTERNALCOMMANDS, 1, "Command Arguments: %s\n", (args == NULL) ? "" : args);
+  logger(dbg_functions, basic)
+    << "process_external_command2()";
+  logger(dbg_external_command, more)
+    << "External Command Type: " << cmd;
+  logger(dbg_external_command, more)
+    << "Command Entry Time: " << (unsigned long)entry_time;
+  logger(dbg_external_command, more)
+    << "Command Arguments: " << (args == NULL ? "" : args);
 
   /* how shall we execute the command? */
   switch (cmd) {

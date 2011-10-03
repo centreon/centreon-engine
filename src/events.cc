@@ -19,6 +19,7 @@
 */
 
 #include <QCoreApplication>
+#include <iomanip>
 #include <stdlib.h>
 #include <stdio.h>
 #include <sys/types.h>
@@ -33,7 +34,7 @@
 #include "sretention.hh"
 #include "utils.hh"
 #include "notifications.hh"
-#include "logging.hh"
+#include "logging/file.hh"
 #include "logging/logger.hh"
 #include "events.hh"
 
@@ -78,10 +79,12 @@ static void _exec_event_command_check(timed_event* event) {
 }
 
 static void _exec_event_log_rotation(timed_event* event) {
+  (void)event;
+
   logger(dbg_events, basic) << "** Log File Rotation Event";
 
   /* rotate the log file */
-  rotate_log_file(event->run_time);
+  file::rotate_all();
 }
 
 static void _exec_event_program_shutdown(timed_event* event) {
@@ -212,7 +215,7 @@ static void _exec_event_expire_comment(timed_event* event) {
 }
 
 static void _exec_event_user_function(timed_event* event) {
-  logger(dbg_events, basic) << "** User Function Event  " ;
+  logger(dbg_events, basic) << "** User Function Event";
 
   /* run a user-defined function */
   if (event->event_data != NULL) {
@@ -240,7 +243,7 @@ void init_timing_loop(void) {
   struct timeval tv[9];
   double runtime[9];
 
-  log_debug_info(DEBUGL_FUNCTIONS, 0, "init_timing_loop() start");
+  logger(dbg_functions, basic) << "init_timing_loop()";
 
   /* get the time right now */
   time(&current_time);
@@ -302,10 +305,10 @@ void init_timing_loop(void) {
     else {
       temp_service->should_be_scheduled = FALSE;
 
-      log_debug_info(DEBUGL_EVENTS, 1,
-                     "Service '%s' on host '%s' should not be scheduled.",
-                     temp_service->description,
-		     temp_service->host_name);
+      logger(dbg_events, more)
+        << "Service '" << temp_service->description
+        << "' on host '" << temp_service->host_name
+        << "' should not be scheduled.";
     }
 
     scheduling_info.total_services++;
@@ -345,7 +348,8 @@ void init_timing_loop(void) {
     else {
       temp_host->should_be_scheduled = FALSE;
 
-      log_debug_info(DEBUGL_EVENTS, 1, "Host '%s' should not be scheduled.", temp_host->name);
+      logger(dbg_events, more)
+        << "Host '" << temp_host->name << "' should not be scheduled.";
     }
 
     scheduling_info.total_hosts++;
@@ -370,7 +374,7 @@ void init_timing_loop(void) {
 
   /******** DETERMINE SERVICE SCHEDULING PARAMS  ********/
 
-  log_debug_info(DEBUGL_EVENTS, 2, "Determining service scheduling parameters...");
+  logger(dbg_events, most) << "Determining service scheduling parameters...";
 
   /* default max service check spread (in minutes) */
   scheduling_info.max_service_check_spread = config.get_max_service_check_spread();
@@ -416,14 +420,17 @@ void init_timing_loop(void) {
     else
       scheduling_info.service_inter_check_delay = 0.0;
 
-    log_debug_info(DEBUGL_EVENTS, 1, "Total scheduled service checks:  %d",
-                   scheduling_info.total_scheduled_services);
-    log_debug_info(DEBUGL_EVENTS, 1,
-                   "Average service check interval:  %0.2f sec",
-                   scheduling_info.average_service_check_interval);
-    log_debug_info(DEBUGL_EVENTS, 1,
-                   "Service inter-check delay:       %0.2f sec",
-                   scheduling_info.service_inter_check_delay);
+    logger(dbg_events, more)
+      << "Total scheduled service checks:  "
+      << scheduling_info.total_scheduled_services;
+    logger(dbg_events, more)
+      << std::fixed << std::setprecision(2)
+      << "Average service check interval:  "
+      << scheduling_info.average_service_check_interval << " sec";
+    logger(dbg_events, more)
+      << std::fixed << std::setprecision(2)
+      << "Service inter-check delay:       "
+      << scheduling_info.service_inter_check_delay << " sec";
   }
 
   /* how should we determine the service interleave factor? */
@@ -442,12 +449,15 @@ void init_timing_loop(void) {
     scheduling_info.service_interleave_factor =
       (int)(ceil(scheduling_info.average_scheduled_services_per_host));
 
-    log_debug_info(DEBUGL_EVENTS, 1, "Total scheduled service checks: %d",
-                   scheduling_info.total_scheduled_services);
-    log_debug_info(DEBUGL_EVENTS, 1, "Total hosts:                    %d",
-                   scheduling_info.total_hosts);
-    log_debug_info(DEBUGL_EVENTS, 1, "Service Interleave factor:      %d",
-                   scheduling_info.service_interleave_factor);
+    logger(dbg_events, more)
+      << "Total scheduled service checks: "
+      << scheduling_info.total_scheduled_services;
+    logger(dbg_events, more)
+      << "Total hosts:                    "
+      << scheduling_info.total_hosts;
+    logger(dbg_events, more)
+      << "Service Interleave factor:      "
+      << scheduling_info.service_interleave_factor;
   }
 
   /* calculate number of service interleave blocks */
@@ -461,47 +471,54 @@ void init_timing_loop(void) {
   scheduling_info.first_service_check = (time_t) 0L;
   scheduling_info.last_service_check = (time_t) 0L;
 
-  log_debug_info(DEBUGL_EVENTS, 1, "Total scheduled services: %d",
-                 scheduling_info.total_scheduled_services);
-  log_debug_info(DEBUGL_EVENTS, 1, "Service Interleave factor: %d",
-                 scheduling_info.service_interleave_factor);
-  log_debug_info(DEBUGL_EVENTS, 1, "Total service interleave blocks: %d",
-                 total_interleave_blocks);
-  log_debug_info(DEBUGL_EVENTS, 1, "Service inter-check delay: %2.1f",
-                 scheduling_info.service_inter_check_delay);
+  logger(dbg_events, more)
+    << "Total scheduled services: "
+    << scheduling_info.total_scheduled_services;
+  logger(dbg_events, more)
+    << "Service Interleave factor: "
+    << scheduling_info.service_interleave_factor;
+  logger(dbg_events, more)
+    << "Total service interleave blocks: "
+    << total_interleave_blocks;
+  logger(dbg_events, more)
+    << std::fixed << std::setprecision(1)
+    << "Service inter-check delay: "
+    << scheduling_info.service_inter_check_delay;
 
   if (test_scheduling == TRUE)
     gettimeofday(&tv[3], NULL);
 
   /******** SCHEDULE SERVICE CHECKS  ********/
 
-  log_debug_info(DEBUGL_EVENTS, 2, "Scheduling service checks...");
+  logger(dbg_events, most) << "Scheduling service checks...";
 
   /* determine check times for service checks (with interleaving to minimize remote load) */
   current_interleave_block = 0;
   for (temp_service = service_list;
        temp_service != NULL && scheduling_info.service_interleave_factor > 0;) {
 
-    log_debug_info(DEBUGL_EVENTS, 2, "Current Interleave Block: %d", current_interleave_block);
+    logger(dbg_events, most)
+      << "Current Interleave Block: " << current_interleave_block;
 
     for (interleave_block_index = 0;
          interleave_block_index < scheduling_info.service_interleave_factor && temp_service != NULL;
 	 temp_service = temp_service->next) {
 
-      log_debug_info(DEBUGL_EVENTS, 2, "Service '%s' on host '%s'",
-                     temp_service->description,
-		     temp_service->host_name);
+      logger(dbg_events, most)
+        << "Service '" << temp_service->description
+        << "' on host '" << temp_service->host_name << "'";
+
       /* skip this service if it shouldn't be scheduled */
       if (temp_service->should_be_scheduled == FALSE) {
-        log_debug_info(DEBUGL_EVENTS, 2, "Service check should not be scheduled.");
+        logger(dbg_events, most) << "Service check should not be scheduled.";
         continue;
       }
 
       /* skip services that are already scheduled for the future (from retention data), but reschedule ones that were supposed to happen while we weren't running... */
       if (temp_service->next_check > current_time) {
-        log_debug_info(DEBUGL_EVENTS, 2,
-                       "Service is already scheduled to be checked in the future: %s",
-                       ctime(&temp_service->next_check));
+        logger(dbg_events, most)
+          << "Service is already scheduled to be checked in the future: "
+          << ctime(&temp_service->next_check);
         continue;
       }
 
@@ -511,38 +528,40 @@ void init_timing_loop(void) {
 
       mult_factor = current_interleave_block + (interleave_block_index * total_interleave_blocks);
 
-      log_debug_info(DEBUGL_EVENTS, 2, "CIB: %d, IBI: %d, TIB: %d, SIF: %d",
-                     current_interleave_block,
-		     interleave_block_index,
-                     total_interleave_blocks,
-                     scheduling_info.service_interleave_factor);
-      log_debug_info(DEBUGL_EVENTS, 2, "Mult factor: %d", mult_factor);
+      logger(dbg_events, most)
+        << "CIB: " << current_interleave_block
+        << ", IBI: " << interleave_block_index
+        << ", TIB: " << total_interleave_blocks
+        << ", SIF: " << scheduling_info.service_interleave_factor;
+
+      logger(dbg_events, most) << "Mult factor: " << mult_factor;
 
       /* set the preferred next check time for the service */
       temp_service->next_check =
 	(time_t)(current_time + (mult_factor * scheduling_info.service_inter_check_delay));
 
-      log_debug_info(DEBUGL_EVENTS, 2, "Preferred Check Time: %lu --> %s",
-                     (unsigned long)temp_service->next_check,
-                     ctime(&temp_service->next_check));
+      logger(dbg_events, most)
+        << "Preferred Check Time: " << temp_service->next_check
+        << " --> " << ctime(&temp_service->next_check);
 
       /* make sure the service can actually be scheduled when we want */
       is_valid_time = check_time_against_period(temp_service->next_check,
 						temp_service->check_period_ptr);
       if (is_valid_time == ERROR) {
-        log_debug_info(DEBUGL_EVENTS, 2,
-                       "Preferred Time is Invalid In Timeperiod '%s': %lu --> %s",
-                       temp_service->check_period_ptr->name,
-                       (unsigned long)temp_service->next_check,
-                       ctime(&temp_service->next_check));
+        logger(dbg_events, most)
+          << "Preferred Time is Invalid In Timeperiod '"
+          << temp_service->check_period_ptr->name
+          << "': " << temp_service->next_check
+          << " --> " << ctime(&temp_service->next_check);
+
         get_next_valid_time(temp_service->next_check, &next_valid_time,
 			    temp_service->check_period_ptr);
         temp_service->next_check = next_valid_time;
       }
 
-      log_debug_info(DEBUGL_EVENTS, 2, "Actual Check Time: %lu --> %s",
-                     (unsigned long)temp_service->next_check,
-                     ctime(&temp_service->next_check));
+      logger(dbg_events, most)
+        << "Actual Check Time: " << temp_service->next_check
+        << " --> " << ctime(&temp_service->next_check);
 
       if (scheduling_info.first_service_check == (time_t)0
           || (temp_service->next_check < scheduling_info.first_service_check))
@@ -594,7 +613,7 @@ void init_timing_loop(void) {
 
   /******** DETERMINE HOST SCHEDULING PARAMS  ********/
 
-  log_debug_info(DEBUGL_EVENTS, 2, "Determining host scheduling parameters...");
+  logger(dbg_events, most) << "Determining host scheduling parameters...";
 
   scheduling_info.first_host_check = (time_t)0L;
   scheduling_info.last_host_check = (time_t)0L;
@@ -650,16 +669,20 @@ void init_timing_loop(void) {
     else
       scheduling_info.host_inter_check_delay = 0.0;
 
-    log_debug_info(DEBUGL_EVENTS, 2, "Total scheduled host checks:  %d",
-                   scheduling_info.total_scheduled_hosts);
-    log_debug_info(DEBUGL_EVENTS, 2, "Host check interval total:    %lu",
-                   scheduling_info.host_check_interval_total);
-    log_debug_info(DEBUGL_EVENTS, 2,
-                   "Average host check interval:  %0.2f sec",
-                   scheduling_info.average_host_check_interval);
-    log_debug_info(DEBUGL_EVENTS, 2,
-                   "Host inter-check delay:       %0.2f sec",
-                   scheduling_info.host_inter_check_delay);
+    logger(dbg_events, most)
+      << "Total scheduled host checks:  "
+      << scheduling_info.total_scheduled_hosts;
+    logger(dbg_events, most)
+      << "Host check interval total:    "
+      << scheduling_info.host_check_interval_total;
+    logger(dbg_events, most)
+      << std::fixed << std::setprecision(2)
+      << "Average host check interval:  "
+      << scheduling_info.average_host_check_interval << " sec";
+    logger(dbg_events, most)
+      << std::fixed << std::setprecision(2)
+      << "Host inter-check delay:       "
+      << scheduling_info.host_inter_check_delay << " sec";
   }
 
   if (test_scheduling == TRUE)
@@ -667,25 +690,25 @@ void init_timing_loop(void) {
 
   /******** SCHEDULE HOST CHECKS  ********/
 
-  log_debug_info(DEBUGL_EVENTS, 2, "Scheduling host checks...");
+  logger(dbg_events, most) << "Scheduling host checks...";
 
   /* determine check times for host checks */
   mult_factor = 0;
   for (temp_host = host_list; temp_host != NULL; temp_host = temp_host->next) {
 
-    log_debug_info(DEBUGL_EVENTS, 2, "Host '%s'", temp_host->name);
+    logger(dbg_events, most) << "Host '" <<  temp_host->name << "'";
 
     /* skip hosts that shouldn't be scheduled */
     if (temp_host->should_be_scheduled == FALSE) {
-      log_debug_info(DEBUGL_EVENTS, 2, "Host check should not be scheduled.");
+      logger(dbg_events, most) << "Host check should not be scheduled.";
       continue;
     }
 
     /* skip hosts that are already scheduled for the future (from retention data), but reschedule ones that were supposed to be checked before we started */
     if (temp_host->next_check > current_time) {
-      log_debug_info(DEBUGL_EVENTS, 2,
-                     "Host is already scheduled to be checked in the future: %s",
-                     ctime(&temp_host->next_check));
+      logger(dbg_events, most)
+        << "Host is already scheduled to be checked in the future: "
+        << ctime(&temp_host->next_check);
       continue;
     }
 
@@ -693,9 +716,9 @@ void init_timing_loop(void) {
     temp_host->next_check = (time_t)(current_time
 				     + (mult_factor * scheduling_info.host_inter_check_delay));
 
-    log_debug_info(DEBUGL_EVENTS, 2, "Preferred Check Time: %lu --> %s",
-                   (unsigned long)temp_host->next_check,
-		   ctime(&temp_host->next_check));
+    logger(dbg_events, most)
+      << "Preferred Check Time: " << temp_host->next_check
+      << " --> " << ctime(&temp_host->next_check);
 
     /* make sure the host can actually be scheduled at this time */
     is_valid_time = check_time_against_period(temp_host->next_check,
@@ -707,9 +730,9 @@ void init_timing_loop(void) {
       temp_host->next_check = next_valid_time;
     }
 
-    log_debug_info(DEBUGL_EVENTS, 2, "Actual Check Time: %lu --> %s",
-                   (unsigned long)temp_host->next_check,
-		   ctime(&temp_host->next_check));
+    logger(dbg_events, most)
+      << "Actual Check Time: " << temp_host->next_check
+      << " --> " << ctime(&temp_host->next_check);
 
     if (scheduling_info.first_host_check == (time_t) 0
         || (temp_host->next_check < scheduling_info.first_host_check))
@@ -914,7 +937,7 @@ void init_timing_loop(void) {
     printf("\n\n");
   }
 
-  log_debug_info(DEBUGL_FUNCTIONS, 0, "init_timing_loop() end");
+  logger(dbg_functions, basic) << "init_timing_loop()";
 }
 
 /* displays service check scheduling information */
@@ -1066,7 +1089,7 @@ void schedule_new_event(int event_type,
   timed_event** event_list_tail = NULL;
   timed_event* new_event = NULL;
 
-  log_debug_info(DEBUGL_FUNCTIONS, 0, "schedule_new_event()");
+  logger(dbg_functions, basic) << "schedule_new_event()";
 
   if (high_priority == TRUE) {
     event_list = &event_list_high;
@@ -1100,7 +1123,7 @@ void reschedule_event(timed_event* event,
   time_t current_time = 0L;
   time_t (*timingfunc)(void);
 
-  log_debug_info(DEBUGL_FUNCTIONS, 0, "reschedule_event()");
+  logger(dbg_functions, basic) << "reschedule_event()";
 
   /* reschedule recurring events... */
   if (event->recurring == TRUE) {
@@ -1131,7 +1154,7 @@ void add_event(timed_event* event,
   timed_event* temp_event = NULL;
   timed_event* first_event = NULL;
 
-  log_debug_info(DEBUGL_FUNCTIONS, 0, "add_event()");
+  logger(dbg_functions, basic) << "add_event()";
 
   event->next = NULL;
   event->prev = NULL;
@@ -1192,7 +1215,7 @@ void remove_event(timed_event* event,
                   timed_event** event_list_tail) {
   timed_event* temp_event = NULL;
 
-  log_debug_info(DEBUGL_FUNCTIONS, 0, "remove_event()");
+  logger(dbg_functions, basic) << "remove_event()";
 
   /* send event data to broker */
   broker_timed_event(NEBTYPE_TIMEDEVENT_REMOVE,
@@ -1241,7 +1264,7 @@ int event_execution_loop(void) {
   service* temp_service = NULL;
   struct timespec delay;
 
-  log_debug_info(DEBUGL_FUNCTIONS, 0, "event_execution_loop() start");
+  logger(dbg_functions, basic) << "event_execution_loop()";
 
   time(&last_time);
 
@@ -1268,8 +1291,8 @@ int event_execution_loop(void) {
 
     /* if we don't have any events to handle, exit */
     if (event_list_high == NULL && event_list_low == NULL) {
-      log_debug_info(DEBUGL_EVENTS, 0,
-                     "There aren't any events that need to be handled! Exiting...");
+      logger(dbg_events, basic)
+        << "There aren't any events that need to be handled! Exiting...";
       break;
     }
 
@@ -1290,22 +1313,25 @@ int event_execution_loop(void) {
     /* keep track of the last time */
     last_time = current_time;
 
-    log_debug_info(DEBUGL_EVENTS, 1, "** Event Check Loop");
+    logger(dbg_events, more) << "** Event Check Loop";
     if (event_list_high != NULL)
-      log_debug_info(DEBUGL_EVENTS, 1, "Next High Priority Event Time: %s",
-                     ctime(&event_list_high->run_time));
+      logger(dbg_events, more)
+        << "Next High Priority Event Time: "
+        << ctime(&event_list_high->run_time);
     else
-      log_debug_info(DEBUGL_EVENTS, 1,
-                     "No high priority events are scheduled...");
+      logger(dbg_events, more)
+        << "No high priority events are scheduled...";
     if (event_list_low != NULL)
-      log_debug_info(DEBUGL_EVENTS, 1, "Next Low Priority Event Time:  %s",
-                     ctime(&event_list_low->run_time));
+      logger(dbg_events, more)
+        << "Next Low Priority Event Time:  "
+        << ctime(&event_list_low->run_time);
     else
-      log_debug_info(DEBUGL_EVENTS, 1,
-                     "No low priority events are scheduled...");
-    log_debug_info(DEBUGL_EVENTS, 1, "Current/Max Service Checks: %d/%d",
-                   currently_running_service_checks,
-                   config.get_max_parallel_service_checks());
+      logger(dbg_events, more)
+        << "No low priority events are scheduled...";
+    logger(dbg_events, more)
+      << "Current/Max Service Checks: "
+      << currently_running_service_checks << '/'
+      << config.get_max_parallel_service_checks();
 
     /* handle high priority events */
     if (event_list_high != NULL && (current_time >= event_list_high->run_time)) {
@@ -1345,27 +1371,27 @@ int event_execution_loop(void) {
 
           /* Move it at least 5 seconds (to overcome the current peak), with a random 10 seconds (to spread the load) */
           nudge_seconds = 5 + (rand() % 10);
-          log_debug_info(DEBUGL_EVENTS | DEBUGL_CHECKS, 0,
-                         "**WARNING** Max concurrent service checks (%d) has been reached!  Nudging %s:%s by %d seconds...",
-                         config.get_max_parallel_service_checks(),
-                         temp_service->host_name,
-			 temp_service->description,
-                         nudge_seconds);
+          logger(dbg_events | dbg_checks, basic)
+            << "**WARNING** Max concurrent service checks ("
+            << config.get_max_parallel_service_checks()
+            << ") has been reached!  Nudging " << temp_service->host_name
+            << ":" << temp_service->description << " by "
+            << nudge_seconds << " seconds...";
 
-          logit(NSLOG_RUNTIME_WARNING, TRUE,
-                "\tMax concurrent service checks (%d) has been reached.  Nudging %s:%s by %d seconds...",
-                config.get_max_parallel_service_checks(),
-                temp_service->host_name,
-		temp_service->description,
-                nudge_seconds);
+          logger(log_runtime_warning, basic)
+            << "\tMax concurrent service checks ("
+            << config.get_max_parallel_service_checks()
+            << ") has been reached.  Nudging " << temp_service->host_name
+            << ":" << temp_service->description << " by " << nudge_seconds
+            << " seconds...";
           run_event = FALSE;
         }
 
         /* don't run a service check if active checks are disabled */
         if (config.get_execute_service_checks() == false) {
 
-          log_debug_info(DEBUGL_EVENTS | DEBUGL_CHECKS, 1,
-                         "We're not executing service checks right now, so we'll skip this event.");
+          logger(dbg_events | dbg_checks, more)
+            << "We're not executing service checks right now, so we'll skip this event.";
 
           run_event = FALSE;
         }
@@ -1420,8 +1446,8 @@ int event_execution_loop(void) {
         /* don't run a host check if active checks are disabled */
         if (config.get_execute_host_checks() == false) {
 
-          log_debug_info(DEBUGL_EVENTS | DEBUGL_CHECKS, 1,
-                         "We're not executing host checks right now, so we'll skip this event.");
+          logger(dbg_events | dbg_checks, more)
+            << "We're not executing host checks right now, so we'll skip this event.";
 
           run_event = FALSE;
         }
@@ -1468,7 +1494,7 @@ int event_execution_loop(void) {
         if (event_list_low != NULL)
           event_list_low->prev = NULL;
 
-        log_debug_info(DEBUGL_EVENTS, 1, "Running event...");
+        logger(dbg_events, more) << "Running event...";
 
         /* handle the event */
         handle_timed_event(temp_event);
@@ -1485,8 +1511,8 @@ int event_execution_loop(void) {
       /* wait a while so we don't hog the CPU... */
       else {
 
-        log_debug_info(DEBUGL_EVENTS, 2,
-                       "Did not execute scheduled event.  Idling for a bit...");
+        logger(dbg_events, most)
+          << "Did not execute scheduled event.  Idling for a bit...";
 
         delay.tv_sec = (time_t)config.get_sleep_time();
         delay.tv_nsec = (long)((config.get_sleep_time() - (double)delay.tv_sec) * 1000000000);
@@ -1501,8 +1527,8 @@ int event_execution_loop(void) {
           && (event_list_low == NULL
               || (current_time < event_list_low->run_time))) {
 
-	log_debug_info(DEBUGL_EVENTS, 2,
-		       "No events to execute at the moment.  Idling for a bit...");
+	logger(dbg_events, most)
+          << "No events to execute at the moment.  Idling for a bit...";
 
 	/* check for external commands if we're supposed to check as often as possible */
 	if (config.get_command_check_interval() == -1) {
@@ -1543,7 +1569,6 @@ int event_execution_loop(void) {
     }
   }
 
-  log_debug_info(DEBUGL_FUNCTIONS, 0, "event_execution_loop() end");
   return (OK);
 }
 
@@ -1570,7 +1595,7 @@ int handle_timed_event(timed_event* event) {
     NULL
   };
 
-  logger(dbg_functions, basic) << "handle_timed_event() start";
+  logger(dbg_functions, basic) << "handle_timed_event()";
 
   /* send event data to broker */
   broker_timed_event(NEBTYPE_TIMEDEVENT_EXECUTE,
@@ -1589,7 +1614,6 @@ int handle_timed_event(timed_event* event) {
   else if (event->event_type == EVENT_USER_FUNCTION)
     _exec_event_user_function(event);
 
-  logger(dbg_functions, basic) << "handle_timed_event() end";
   return (OK);
 }
 
@@ -1617,7 +1641,7 @@ void adjust_check_scheduling(void) {
   double current_exec_time_offset = 0.0;
   double new_run_time_offset = 0.0;
 
-  log_debug_info(DEBUGL_FUNCTIONS, 0, "adjust_check_scheduling() start");
+  logger(dbg_functions, basic) << "adjust_check_scheduling()";
 
   /* TODO:
      - Track host check overhead on a per-host basis
@@ -1788,8 +1812,6 @@ void adjust_check_scheduling(void) {
 
   /* resort event list (some events may be out of order at this point) */
   resort_event_list(&event_list_low, &event_list_low_tail);
-
-  log_debug_info(DEBUGL_FUNCTIONS, 0, "adjust_check_scheduling() end");
 }
 
 /* attempts to compensate for a change in the system time */
@@ -1804,30 +1826,31 @@ void compensate_for_system_time_change(unsigned long last_time, unsigned long cu
   int seconds = 0;
   time_t (*timingfunc)(void);
 
-  log_debug_info(DEBUGL_FUNCTIONS, 0, "compensate_for_system_time_change() start");
+  logger(dbg_functions, basic) << "compensate_for_system_time_change()";
 
   /* we moved back in time... */
   if (last_time > current_time) {
     time_difference = last_time - current_time;
     get_time_breakdown(time_difference, &days, &hours, &minutes, &seconds);
-    log_debug_info(DEBUGL_EVENTS, 0,
-                   "Detected a backwards time change of %dd %dh %dm %ds.",
-                   days, hours, minutes, seconds);
+    logger(dbg_events, basic)
+      << "Detected a backwards time change of " << days << "d "
+      << hours << "h " << minutes << "m " << seconds << "s.";
   }
   /* we moved into the future... */
   else {
     time_difference = current_time - last_time;
     get_time_breakdown(time_difference, &days, &hours, &minutes, &seconds);
-    log_debug_info(DEBUGL_EVENTS, 0,
-                   "Detected a forwards time change of %dd %dh %dm %ds.",
-                   days, hours, minutes, seconds);
+    logger(dbg_events, basic)
+      << "Detected a forwards time change of " << days << "d "
+      << hours << "h " << minutes << "m " << seconds << "s.";
   }
 
   /* log the time change */
-  logit(NSLOG_PROCESS_INFO | NSLOG_RUNTIME_WARNING, TRUE,
-        "Warning: A system time change of %dd %dh %dm %ds (%s in time) has been detected.  Compensating...",
-        days, hours, minutes, seconds,
-        (last_time > current_time) ? "backwards" : "forwards");
+  logger(log_process_info | log_runtime_warning, basic)
+    << "Warning: A system time change of " << days << "d " << hours << "h "
+    << minutes << "m " << seconds << "s ("
+    << (last_time > current_time ? "backwards" : "forwards")
+    << " in time) has been detected.  Compensating...";
 
   /* adjust the next run time for all high priority timed events */
   for (temp_event = event_list_high;
@@ -1972,7 +1995,7 @@ void resort_event_list(timed_event** event_list, timed_event** event_list_tail) 
   timed_event* temp_event = NULL;
   timed_event* next_event = NULL;
 
-  log_debug_info(DEBUGL_FUNCTIONS, 0, "resort_event_list()");
+  logger(dbg_functions, basic) << "resort_event_list()";
 
   /* move current event list to temp list */
   temp_event_list = *event_list;
@@ -1994,7 +2017,7 @@ void adjust_timestamp_for_time_change(time_t last_time,
 				      time_t current_time,
                                       unsigned long time_difference,
                                       time_t * ts) {
-  log_debug_info(DEBUGL_FUNCTIONS, 0, "adjust_timestamp_for_time_change()");
+  logger(dbg_functions, basic) << "adjust_timestamp_for_time_change()";
 
   /* we shouldn't do anything with epoch values */
   if (*ts == (time_t)0)

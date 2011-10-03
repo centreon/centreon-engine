@@ -112,11 +112,11 @@ extern "C" int nebmodule_deinit(int flags, int reason) {
   }
   catch (std::exception const& e) {
       logger(log_runtime_error, basic)
-	<< "external command runtime error `" << e.what() << "'.\n";
+	<< "external command runtime error `" << e.what() << "'.";
   }
   catch (...) {
       logger(log_runtime_error, basic)
-	<< "external command runtime error `unknown'\n";
+	<< "external command runtime error `unknown'";
   }
   return (0);
 }
@@ -182,12 +182,12 @@ extern "C" int nebmodule_init(int flags, char const* args, void* handle) {
   }
   catch (std::exception const& e) {
       logger(log_runtime_error, basic)
-	<< "external command runtime error `" << e.what() << "'.\n";
+	<< "external command runtime error `" << e.what() << "'.";
     return (1);
   }
   catch (...) {
       logger(log_runtime_error, basic)
-	<< "external command runtime error `unknown'.\n";
+	<< "external command runtime error `unknown'.";
     return (1);
   }
 

@@ -26,10 +26,13 @@
 #include "perfdata.hh"
 #include "broker.hh"
 #include "neberrors.hh"
-#include "logging.hh"
 #include "notifications.hh"
 #include "utils.hh"
+#include "logging.hh"
+#include "logging/logger.hh"
 #include "sehandlers.hh"
+
+using namespace com::centreon::engine::logging;
 
 /******************************************************************/
 /************* OBSESSIVE COMPULSIVE HANDLER FUNCTIONS *************/
@@ -45,8 +48,8 @@ int obsessive_compulsive_service_check_processor(service* svc) {
   int macro_options = STRIP_ILLEGAL_MACRO_CHARS | ESCAPE_MACRO_CHARS;
   nagios_macros mac;
 
-  log_debug_info(DEBUGL_FUNCTIONS, 0,
-                 "obsessive_compulsive_service_check_processor()\n");
+  logger(dbg_functions, basic)
+    << "obsessive_compulsive_service_check_processor()";
 
   if (svc == NULL)
     return (ERROR);
@@ -80,9 +83,9 @@ int obsessive_compulsive_service_check_processor(service* svc) {
     return (ERROR);
   }
 
-  log_debug_info(DEBUGL_CHECKS, 2,
-                 "Raw obsessive compulsive service processor command line: %s\n",
-                 raw_command);
+  logger(dbg_checks, most)
+    << "Raw obsessive compulsive service processor "    \
+    "command line: " << raw_command;
 
   /* process any macros in the raw command line */
   process_macros_r(&mac,
@@ -94,9 +97,9 @@ int obsessive_compulsive_service_check_processor(service* svc) {
     return (ERROR);
   }
 
-  log_debug_info(DEBUGL_CHECKS, 2,
-                 "Processed obsessive compulsive service processor command line: %s\n",
-                 processed_command);
+  logger(dbg_checks, most)
+    << "Processed obsessive compulsive service " \
+    "processor command line: " << processed_command;
 
   /* run the command */
   my_system_r(&mac,
@@ -111,12 +114,10 @@ int obsessive_compulsive_service_check_processor(service* svc) {
 
   /* check to see if the command timed out */
   if (early_timeout == TRUE)
-    logit(NSLOG_RUNTIME_WARNING, TRUE,
-          "Warning: OCSP command '%s' for service '%s' on host '%s' timed out after %d seconds\n",
-          processed_command,
-	  svc->description,
-	  svc->host_name,
-          config.get_ocsp_timeout());
+    logger(log_runtime_warning, basic)
+      << "Warning: OCSP command '" << processed_command << "' for service '"
+      << svc->description << "' on host '" << svc->host_name
+      << "' timed out after " << config.get_ocsp_timeout() << " seconds";
 
   /* free memory */
   delete[] raw_command;
@@ -134,7 +135,7 @@ int obsessive_compulsive_host_check_processor(host* hst) {
   int macro_options = STRIP_ILLEGAL_MACRO_CHARS | ESCAPE_MACRO_CHARS;
   nagios_macros mac;
 
-  log_debug_info(DEBUGL_FUNCTIONS, 0, "obsessive_compulsive_host_check_processor()\n");
+  logger(dbg_functions, basic) << "obsessive_compulsive_host_check_processor()";
 
   if (hst == NULL)
     return (ERROR);
@@ -163,9 +164,8 @@ int obsessive_compulsive_host_check_processor(host* hst) {
     return (ERROR);
   }
 
-  log_debug_info(DEBUGL_CHECKS, 2,
-                 "Raw obsessive compulsive host processor command line: %s\n",
-                 raw_command);
+  logger(dbg_checks, most)
+    << "Raw obsessive compulsive host processor command line: " << raw_command;
 
   /* process any macros in the raw command line */
   process_macros_r(&mac,
@@ -177,9 +177,9 @@ int obsessive_compulsive_host_check_processor(host* hst) {
     return (ERROR);
   }
 
-  log_debug_info(DEBUGL_CHECKS, 2,
-                 "Processed obsessive compulsive host processor command line: %s\n",
-                 processed_command);
+  logger(dbg_checks, most)
+    << "Processed obsessive compulsive host processor " \
+    "command line: " << processed_command;
 
   /* run the command */
   my_system_r(&mac,
@@ -193,11 +193,10 @@ int obsessive_compulsive_host_check_processor(host* hst) {
 
   /* check to see if the command timed out */
   if (early_timeout == TRUE)
-    logit(NSLOG_RUNTIME_WARNING, TRUE,
-          "Warning: OCHP command '%s' for host '%s' timed out after %d seconds\n",
-          processed_command,
-	  hst->name,
-	  config.get_ochp_timeout());
+    logger(log_runtime_warning, basic)
+      << "Warning: OCHP command '" << processed_command << "' for host '"
+      << hst->name << "' timed out after " << config.get_ochp_timeout()
+      << " seconds";
 
   /* free memory */
   delete[] raw_command;
@@ -215,7 +214,7 @@ int handle_service_event(service* svc) {
   host* temp_host = NULL;
   nagios_macros mac;
 
-  log_debug_info(DEBUGL_FUNCTIONS, 0, "handle_service_event()\n");
+  logger(dbg_functions, basic) << "handle_service_event()";
 
   if (svc == NULL)
     return (ERROR);
@@ -283,7 +282,7 @@ int run_global_service_event_handler(nagios_macros* mac, service* svc) {
   int neb_result = OK;
   int macro_options = STRIP_ILLEGAL_MACRO_CHARS | ESCAPE_MACRO_CHARS;
 
-  log_debug_info(DEBUGL_FUNCTIONS, 0, "run_global_service_event_handler()\n");
+  logger(dbg_functions, basic) << "run_global_service_event_handler()";
 
   if (svc == NULL)
     return (ERROR);
@@ -296,9 +295,9 @@ int run_global_service_event_handler(nagios_macros* mac, service* svc) {
   if (config.get_global_service_event_handler().isEmpty())
     return (ERROR);
 
-  log_debug_info(DEBUGL_EVENTHANDLERS, 1,
-                 "Running global event handler for service '%s' on host '%s'...\n",
-                 svc->description, svc->host_name);
+  logger(dbg_eventhandlers, more)
+    << "Running global event handler for service '"
+    << svc->description << "' on host '" << svc->host_name << "'...";
 
   /* get start time */
   gettimeofday(&start_time, NULL);
@@ -313,18 +312,17 @@ int run_global_service_event_handler(nagios_macros* mac, service* svc) {
     return (ERROR);
   }
 
-  log_debug_info(DEBUGL_EVENTHANDLERS, 2,
-                 "Raw global service event handler command line: %s\n",
-                 raw_command);
+  logger(dbg_eventhandlers, most)
+    << "Raw global service event handler command line: " << raw_command;
 
   /* process any macros in the raw command line */
   process_macros_r(mac, raw_command, &processed_command, macro_options);
   if (processed_command == NULL)
     return (ERROR);
 
-  log_debug_info(DEBUGL_EVENTHANDLERS, 2,
-                 "Processed global service event handler command line: %s\n",
-                 processed_command);
+  logger(dbg_eventhandlers, most)
+    << "Processed global service event handler "        \
+    "command line: " << processed_command;
 
   if (config.get_log_event_handlers() == true) {
     std::ostringstream oss;
@@ -333,7 +331,7 @@ int run_global_service_event_handler(nagios_macros* mac, service* svc) {
 	<< qPrintable(config.get_global_service_event_handler()) << std::endl;
     raw_logentry = my_strdup(oss.str().c_str());
     process_macros_r(mac, raw_logentry, &processed_logentry, macro_options);
-    logit(NSLOG_EVENT_HANDLER, FALSE, "%s", processed_logentry);
+    logger(log_event_handler, basic) << processed_logentry;
   }
 
   /* send event data to broker */
@@ -378,10 +376,10 @@ int run_global_service_event_handler(nagios_macros* mac, service* svc) {
 
   /* check to see if the event handler timed out */
   if (early_timeout == TRUE)
-    logit(NSLOG_EVENT_HANDLER | NSLOG_RUNTIME_WARNING, TRUE,
-          "Warning: Global service event handler command '%s' timed out after %d seconds\n",
-          processed_command,
-	  config.get_event_handler_timeout());
+    logger(log_event_handler | log_runtime_warning, basic)
+      << "Warning: Global service event handler command '"
+      << processed_command << "' timed out after "
+      << config.get_event_handler_timeout() << " seconds";
 
   /* get end time */
   gettimeofday(&end_time, NULL);
@@ -431,7 +429,7 @@ int run_service_event_handler(nagios_macros* mac, service* svc) {
   int macro_options = STRIP_ILLEGAL_MACRO_CHARS | ESCAPE_MACRO_CHARS;
 
 
-  log_debug_info(DEBUGL_FUNCTIONS, 0, "run_service_event_handler()\n");
+  logger(dbg_functions, basic) << "run_service_event_handler()";
 
   if (svc == NULL)
     return (ERROR);
@@ -440,10 +438,9 @@ int run_service_event_handler(nagios_macros* mac, service* svc) {
   if (svc->event_handler == NULL)
     return (ERROR);
 
-  log_debug_info(DEBUGL_EVENTHANDLERS, 1,
-                 "Running event handler for service '%s' on host '%s'...\n",
-                 svc->description,
-		 svc->host_name);
+  logger(dbg_eventhandlers, more)
+    << "Running event handler for service '" << svc->description
+    << "' on host '" << svc->host_name <<"'...";
 
   /* get start time */
   gettimeofday(&start_time, NULL);
@@ -457,18 +454,16 @@ int run_service_event_handler(nagios_macros* mac, service* svc) {
   if (raw_command == NULL)
     return (ERROR);
 
-  log_debug_info(DEBUGL_EVENTHANDLERS, 2,
-                 "Raw service event handler command line: %s\n",
-                 raw_command);
+  logger(dbg_eventhandlers, most)
+    << "Raw service event handler command line: " << raw_command;
 
   /* process any macros in the raw command line */
   process_macros_r(mac, raw_command, &processed_command, macro_options);
   if (processed_command == NULL)
     return (ERROR);
 
-  log_debug_info(DEBUGL_EVENTHANDLERS, 2,
-                 "Processed service event handler command line: %s\n",
-                 processed_command);
+  logger(dbg_eventhandlers, most)
+    << "Processed service event handler command line: " << processed_command;
 
   if (config.get_log_event_handlers() == true) {
     std::ostringstream oss;
@@ -478,7 +473,7 @@ int run_service_event_handler(nagios_macros* mac, service* svc) {
 	<< svc->event_handler << std::endl;
     raw_logentry = my_strdup(oss.str().c_str());
     process_macros_r(mac, raw_logentry, &processed_logentry, macro_options);
-    logit(NSLOG_EVENT_HANDLER, FALSE, "%s", processed_logentry);
+    logger(log_event_handler, basic) << processed_logentry;
   }
 
   /* send event data to broker */
@@ -523,10 +518,10 @@ int run_service_event_handler(nagios_macros* mac, service* svc) {
 
   /* check to see if the event handler timed out */
   if (early_timeout == TRUE)
-    logit(NSLOG_EVENT_HANDLER | NSLOG_RUNTIME_WARNING, TRUE,
-          "Warning: Service event handler command '%s' timed out after %d seconds\n",
-          processed_command,
-	  config.get_event_handler_timeout());
+    logger(log_event_handler | log_runtime_warning, basic)
+      << "Warning: Service event handler command '" << processed_command
+      << "' timed out after " << config.get_event_handler_timeout()
+      << " seconds";
 
   /* get end time */
   gettimeofday(&end_time, NULL);
@@ -568,7 +563,7 @@ int run_service_event_handler(nagios_macros* mac, service* svc) {
 int handle_host_event(host* hst) {
   nagios_macros mac;
 
-  log_debug_info(DEBUGL_FUNCTIONS, 0, "handle_host_event()\n");
+  logger(dbg_functions, basic) << "handle_host_event()";
 
   if (hst == NULL)
     return (ERROR);
@@ -630,7 +625,7 @@ int run_global_host_event_handler(nagios_macros* mac, host* hst) {
   int neb_result = OK;
   int macro_options = STRIP_ILLEGAL_MACRO_CHARS | ESCAPE_MACRO_CHARS;
 
-  log_debug_info(DEBUGL_FUNCTIONS, 0, "run_global_host_event_handler()\n");
+  logger(dbg_functions, basic) << "run_global_host_event_handler()";
 
   if (hst == NULL)
     return (ERROR);
@@ -643,9 +638,8 @@ int run_global_host_event_handler(nagios_macros* mac, host* hst) {
   if (config.get_global_host_event_handler() == "")
     return (ERROR);
 
-  log_debug_info(DEBUGL_EVENTHANDLERS, 1,
-                 "Running global event handler for host '%s'..\n",
-                 hst->name);
+  logger(dbg_eventhandlers, more)
+    << "Running global event handler for host '" << hst->name << "'...";
 
   /* get start time */
   gettimeofday(&start_time, NULL);
@@ -659,18 +653,17 @@ int run_global_host_event_handler(nagios_macros* mac, host* hst) {
   if (raw_command == NULL)
     return (ERROR);
 
-  log_debug_info(DEBUGL_EVENTHANDLERS, 2,
-                 "Raw global host event handler command line: %s\n",
-                 raw_command);
+  logger(dbg_eventhandlers, most)
+    << "Raw global host event handler command line: " << raw_command;
 
   /* process any macros in the raw command line */
   process_macros_r(mac, raw_command, &processed_command, macro_options);
   if (processed_command == NULL)
     return (ERROR);
 
-  log_debug_info(DEBUGL_EVENTHANDLERS, 2,
-                 "Processed global host event handler command line: %s\n",
-                 processed_command);
+  logger(dbg_eventhandlers, most)
+    << "Processed global host event handler " \
+    "command line: " << processed_command;
 
   if (config.get_log_event_handlers() == true) {
     std::ostringstream oss;
@@ -679,7 +672,7 @@ int run_global_host_event_handler(nagios_macros* mac, host* hst) {
 	<< qPrintable(config.get_global_host_event_handler()) << std::endl;
     raw_logentry = my_strdup(oss.str().c_str());
     process_macros_r(mac, raw_logentry, &processed_logentry, macro_options);
-    logit(NSLOG_EVENT_HANDLER, FALSE, "%s", processed_logentry);
+    logger(log_event_handler, basic) << processed_logentry;
   }
 
   /* send event data to broker */
@@ -723,10 +716,10 @@ int run_global_host_event_handler(nagios_macros* mac, host* hst) {
 
   /* check for a timeout in the execution of the event handler command */
   if (early_timeout == TRUE)
-    logit(NSLOG_EVENT_HANDLER | NSLOG_RUNTIME_WARNING, TRUE,
-          "Warning: Global host event handler command '%s' timed out after %d seconds\n",
-          processed_command,
-	  config.get_event_handler_timeout());
+    logger(log_event_handler | log_runtime_warning, basic)
+      << "Warning: Global host event handler command '"
+      << processed_command << "' timed out after "
+      << config.get_event_handler_timeout() << " seconds";
 
   /* get end time */
   gettimeofday(&end_time, NULL);
@@ -775,7 +768,7 @@ int run_host_event_handler(nagios_macros* mac, host* hst) {
   int neb_result = OK;
   int macro_options = STRIP_ILLEGAL_MACRO_CHARS | ESCAPE_MACRO_CHARS;
 
-  log_debug_info(DEBUGL_FUNCTIONS, 0, "run_host_event_handler()\n");
+  logger(dbg_functions, basic) << "run_host_event_handler()";
 
   if (hst == NULL)
     return (ERROR);
@@ -784,8 +777,8 @@ int run_host_event_handler(nagios_macros* mac, host* hst) {
   if (hst->event_handler == NULL)
     return (ERROR);
 
-  log_debug_info(DEBUGL_EVENTHANDLERS, 1,
-                 "Running event handler for host '%s'..\n", hst->name);
+  logger(dbg_eventhandlers, more)
+    << "Running event handler for host '" << hst->name << "'...";
 
   /* get start time */
   gettimeofday(&start_time, NULL);
@@ -799,18 +792,16 @@ int run_host_event_handler(nagios_macros* mac, host* hst) {
   if (raw_command == NULL)
     return (ERROR);
 
-  log_debug_info(DEBUGL_EVENTHANDLERS, 2,
-                 "Raw host event handler command line: %s\n",
-                 raw_command);
+  logger(dbg_eventhandlers, most)
+    << "Raw host event handler command line: " << raw_command;
 
   /* process any macros in the raw command line */
   process_macros_r(mac, raw_command, &processed_command, macro_options);
   if (processed_command == NULL)
     return (ERROR);
 
-  log_debug_info(DEBUGL_EVENTHANDLERS, 2,
-                 "Processed host event handler command line: %s\n",
-                 processed_command);
+  logger(dbg_eventhandlers, most)
+    << "Processed host event handler command line: " << processed_command;
 
   if (config.get_log_event_handlers() == true) {
     std::ostringstream oss;
@@ -819,7 +810,7 @@ int run_host_event_handler(nagios_macros* mac, host* hst) {
 	<< hst->event_handler << std::endl;
     raw_logentry = my_strdup(oss.str().c_str());
     process_macros_r(mac, raw_logentry, &processed_logentry, macro_options);
-    logit(NSLOG_EVENT_HANDLER, FALSE, "%s", processed_logentry);
+    logger(log_event_handler, basic) << processed_logentry;
   }
 
   /* send event data to broker */
@@ -864,10 +855,10 @@ int run_host_event_handler(nagios_macros* mac, host* hst) {
 
   /* check to see if the event handler timed out */
   if (early_timeout == TRUE)
-    logit(NSLOG_EVENT_HANDLER | NSLOG_RUNTIME_WARNING, TRUE,
-          "Warning: Host event handler command '%s' timed out after %d seconds\n",
-          processed_command,
-	  config.get_event_handler_timeout());
+    logger(log_event_handler | log_runtime_warning, basic)
+      << "Warning: Host event handler command '" << processed_command
+      << "' timed out after " << config.get_event_handler_timeout()
+      << " seconds";
 
   /* get end time */
   gettimeofday(&end_time, NULL);
@@ -910,7 +901,7 @@ int handle_host_state(host* hst) {
   int state_change = FALSE;
   time_t current_time = 0L;
 
-  log_debug_info(DEBUGL_FUNCTIONS, 0, "handle_host_state()\n");
+  logger(dbg_functions, basic) << "handle_host_state()";
 
   /* get current time */
   time(&current_time);

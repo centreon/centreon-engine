@@ -20,10 +20,11 @@
 #include "common.hh"
 #include "nebmodules.hh"
 #include "error.hh"
-#include "logging.hh"
+#include "logging/logger.hh"
 #include "broker/handle.hh"
 
 using namespace com::centreon::engine::broker;
+using namespace com::centreon::engine::logging;
 
 /**************************************
  *                                     *
@@ -179,9 +180,9 @@ void handle::close() {
       typedef int (*func_deinit)(int, int);
       func_deinit deinit = (func_deinit)_handle->resolve("nebmodule_deinit");
       if (deinit == NULL) {
-	logit(NSLOG_INFO_MESSAGE, false,
-	      "Cannot resolve symbole 'nebmodule_deinit' in module '%s'.\n",
-	      qPrintable(_filename));
+	logger(log_info_message, basic)
+          << "Cannot resolve symbole 'nebmodule_deinit' in module '"
+          << _filename << "'.";
       }
       else {
 	deinit(NEBMODULE_FORCE_UNLOAD, NEBMODULE_NEB_SHUTDOWN);

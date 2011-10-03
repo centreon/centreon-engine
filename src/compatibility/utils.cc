@@ -26,8 +26,10 @@
 #include <fcntl.h>
 #include <dirent.h>
 #include "globals.hh"
-#include "compatibility/logging.h"
 #include "compatibility/nagios.h"
+#include "logging/logger.hh"
+
+using namespace com::centreon::engine::logging;
 
 check_result  check_result_info;
 check_result* check_result_list = NULL;
@@ -149,7 +151,7 @@ int process_check_result_file(char* fname) {
 
   time(&current_time);
 
-  log_debug_info(DEBUGL_CHECKS, 1, "Processing check result file: '%s'\n", fname);
+  logger(dbg_checks, more) << "Processing check result file: '" << fname << "'";
 
   /* open the file for reading */
   if ((thefile = mmap_fopen(fname)) == NULL) {
@@ -295,22 +297,21 @@ int process_check_result_queue(char const* dirname) {
 
   /* make sure we have what we need */
   if (dirname == NULL) {
-    logit(NSLOG_CONFIG_ERROR, TRUE,
-          "Error: No check result queue directory specified.\n");
+    logger(log_config_error, basic)
+      << "Error: No check result queue directory specified.";
     return (ERROR);
   }
 
   /* open the directory for reading */
   if ((dirp = opendir(dirname)) == NULL) {
-    logit(NSLOG_CONFIG_ERROR, TRUE,
-          "Error: Could not open check result queue directory '%s' for reading.\n",
-          dirname);
+    logger(log_config_error, basic)
+      << "Error: Could not open check result queue directory '"
+      << dirname << "' for reading.";
     return (ERROR);
   }
 
-  log_debug_info(DEBUGL_CHECKS, 1,
-                 "Starting to read check result queue '%s'...\n",
-                 dirname);
+  logger(dbg_checks, more)
+    << "Starting to read check result queue '" << dirname << "'...";
 
   /* process all files in the directory... */
   while ((dirfile = readdir(dirp)) != NULL) {
@@ -324,9 +325,8 @@ int process_check_result_queue(char const* dirname) {
     if (x == 7 && dirfile->d_name[0] == 'c') {
 
       if (stat(file, &stat_buf) == -1) {
-        logit(NSLOG_RUNTIME_WARNING, TRUE,
-              "Warning: Could not stat() check result file '%s'.\n",
-              file);
+        logger(log_runtime_warning, basic)
+          << "Warning: Could not stat() check result file '" << file << "'.";
         continue;
       }
 
@@ -415,10 +415,9 @@ int move_check_result_to_queue(char* checkresult_file) {
   /* file created okay */
   if (output_file_fd >= 0) {
 
-    log_debug_info(DEBUGL_CHECKS, 2,
-                   "Moving temp check result file '%s' to queue file '%s'...\n",
-                   checkresult_file,
-		   output_file);
+    logger(dbg_checks, most)
+      << "Moving temp check result file '" << checkresult_file
+      << "' to queue file '" << output_file << "'...";
 
 #ifdef __CYGWIN__
     /* Cygwin cannot rename open files - gives Permission Denied */
@@ -452,9 +451,9 @@ int move_check_result_to_queue(char* checkresult_file) {
 
   /* log a warning on errors */
   if (result != 0)
-    logit(NSLOG_RUNTIME_WARNING, TRUE,
-          "Warning: Unable to move file '%s' to check results queue.\n",
-          checkresult_file);
+    logger(log_runtime_warning, basic)
+      << "Warning: Unable to move file '" << checkresult_file
+      << "' to check results queue.";
 
   /* free memory */
   delete[] output_file;

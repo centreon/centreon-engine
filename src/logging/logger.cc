@@ -53,8 +53,8 @@ logger::logger(logger const& right) {
  *  Default destructor.
  */
 logger::~logger() {
-  std::string buf = _trim(_buffer.str()) + "\n";
-  engine::instance().log(buf.c_str(), _type, _verbosity);
+  _buffer << "\n";
+  engine::instance().log(_buffer.str().c_str(), _type, _verbosity);
 }
 
 /**
@@ -81,26 +81,4 @@ logger& logger::operator=(logger const& right) {
 logger& logger::operator<<(QString const& str) {
   _buffer << qPrintable(str);
   return (*this);
-}
-
-/**
- *  Trim a string.
- *
- *  @param[in] str The string.
- *
- *  @return The trimming stream.
- */
-std::string logger::_trim(std::string str) throw() {
-  const char* whitespaces = " \t\r\n";
-  size_t pos = str.find_last_not_of(whitespaces);
-
-  if (pos == std::string::npos)
-    str.clear();
-  else
-    {
-      str.erase(pos + 1);
-      if ((pos = str.find_first_not_of(whitespaces)) != std::string::npos)
-        str.erase(0, pos);
-    }
-  return (str);
 }

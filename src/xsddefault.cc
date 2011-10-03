@@ -34,10 +34,10 @@
 #include "macros.hh"
 #include "skiplist.hh"
 #include "utils.hh"
-#include "logging.hh"
-
-/**** IMPLEMENTATION SPECIFIC HEADER FILES ****/
+#include "logging/logger.hh"
 #include "xsddefault.hh"
+
+using namespace com::centreon::engine::logging;
 
 static char* xsddefault_status_log = NULL;
 static char* xsddefault_temp_file = NULL;
@@ -195,7 +195,8 @@ int xsddefault_save_status_data(void) {
   int high_external_command_buffer_slots = 0;
   int result = OK;
 
-  log_debug_info(DEBUGL_FUNCTIONS, 0, "save_status_data()\n");
+  logger(dbg_functions, basic)
+    << "save_status_data()";
 
   /* open a safe temp file for output */
   if (xsddefault_temp_file == NULL)
@@ -204,13 +205,14 @@ int xsddefault_save_status_data(void) {
   oss << xsddefault_temp_file << "XXXXXX";
   temp_file = my_strdup(oss.str().c_str());
 
-  log_debug_info(DEBUGL_STATUSDATA, 2, "Writing status data to temp file '%s'\n", temp_file);
+  logger(dbg_statusdata, basic)
+    << "Writing status data to temp file '" << temp_file << "'.";
 
   if ((fd = mkstemp(temp_file)) == -1) {
     /* log an error */
-    logit(NSLOG_RUNTIME_ERROR, TRUE,
-          "Error: Unable to create temp file for writing status data: %s\n",
-          strerror(errno));
+    logger(log_runtime_error, basic)
+      << "Error: Unable to create temp file for writing status data: "
+      << strerror(errno);
 
     /* free memory */
     delete[] temp_file;
@@ -224,9 +226,10 @@ int xsddefault_save_status_data(void) {
     unlink(temp_file);
 
     /* log an error */
-    logit(NSLOG_RUNTIME_ERROR, TRUE,
-          "Error: Unable to open temp file '%s' for writing status data: %s\n",
-          temp_file, strerror(errno));
+    logger(log_runtime_error, basic)
+      << "Error: Unable to open temp file '"
+      << temp_file << "' for writing status data: "
+      << strerror(errno);
 
     /* free memory */
     delete[] temp_file;
@@ -590,9 +593,9 @@ int xsddefault_save_status_data(void) {
     /* move the temp file to the status log (overwrite the old status log) */
     if (my_rename(temp_file, xsddefault_status_log)) {
       unlink(temp_file);
-      logit(NSLOG_RUNTIME_ERROR, TRUE,
-            "Error: Unable to update status data file '%s': %s",
-            xsddefault_status_log, strerror(errno));
+      logger(log_runtime_error, basic)
+        << "Error: Unable to update status data file '"
+        << xsddefault_status_log << "': " << strerror(errno);
       result = ERROR;
     }
   }
@@ -602,8 +605,9 @@ int xsddefault_save_status_data(void) {
 
     /* remove temp file and log an error */
     unlink(temp_file);
-    logit(NSLOG_RUNTIME_ERROR, TRUE,
-          "Error: Unable to save status file: %s", strerror(errno));
+    logger(log_runtime_error, basic)
+      << "Error: Unable to save status file: "
+      << strerror(errno);
   }
 
   /* free memory */

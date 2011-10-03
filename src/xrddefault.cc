@@ -37,14 +37,13 @@
 #include "flapping.hh"
 #include "notifications.hh"
 #include "utils.hh"
-#include "logging.hh"
-
-/**** STATE INFORMATION SPECIFIC HEADER FILES ****/
-
+#include "logging/logger.hh"
 #include "xrddefault.hh"
 
-static char*               xrddefault_retention_file = NULL;
-static char*               xrddefault_temp_file = NULL;
+using namespace com::centreon::engine::logging;
+
+static char* xrddefault_retention_file = NULL;
+static char* xrddefault_temp_file = NULL;
 
 /******************************************************************/
 /********************* CONFIG INITIALIZATION  *********************/
@@ -59,9 +58,9 @@ int xrddefault_grab_config_info(char* main_config_file) {
 
   /* open the main config file for reading */
   if ((thefile = mmap_fopen(main_config_file)) == NULL) {
-    log_debug_info(DEBUGL_RETENTIONDATA, 2,
-                   "Error: Cannot open main configuration file '%s' for reading!\n",
-                   main_config_file);
+    logger(dbg_retentiondata, most)
+      << "Error: Cannot open main configuration file '"
+      << main_config_file << "' for reading!";
 
     delete[] xrddefault_retention_file;
     delete[] xrddefault_temp_file;
@@ -193,12 +192,12 @@ int xrddefault_save_state_information(void) {
   unsigned long process_host_attribute_mask = 0L;
   unsigned long process_service_attribute_mask = 0L;
 
-  log_debug_info(DEBUGL_FUNCTIONS, 0, "xrddefault_save_state_information()\n");
+  logger(dbg_functions, basic) << "xrddefault_save_state_information()";
 
   /* make sure we have everything */
   if (xrddefault_retention_file == NULL || xrddefault_temp_file == NULL) {
-    logit(NSLOG_RUNTIME_ERROR, TRUE,
-          "Error: We don't have the required file names to store retention data!\n");
+    logger(log_runtime_error, basic)
+      << "Error: We don't have the required file names to store retention data!";
     return (ERROR);
   }
 
@@ -209,9 +208,8 @@ int xrddefault_save_state_information(void) {
   if ((fd = mkstemp(temp_file)) == -1)
     return (ERROR);
 
-  log_debug_info(DEBUGL_RETENTIONDATA, 2,
-                 "Writing retention data to temp file '%s'\n",
-                 temp_file);
+  logger(dbg_retentiondata, most)
+    << "Writing retention data to temp file '" << temp_file << "'";
 
   fp = (FILE*) fdopen(fd, "w");
   if (fp == NULL) {
@@ -219,10 +217,9 @@ int xrddefault_save_state_information(void) {
     close(fd);
     unlink(temp_file);
 
-    logit(NSLOG_RUNTIME_ERROR, TRUE,
-          "Error: Could not open temp state retention file '%s' for writing!\n",
-          temp_file);
-
+    logger(log_runtime_error, basic)
+      << "Error: Could not open temp state retention file '"
+      << temp_file << "' for writing!";
     delete[] temp_file;
 
     return (ERROR);
@@ -524,9 +521,9 @@ int xrddefault_save_state_information(void) {
     /* move the temp file to the retention file (overwrite the old retention file) */
     if (my_rename(temp_file, xrddefault_retention_file)) {
       unlink(temp_file);
-      logit(NSLOG_RUNTIME_ERROR, TRUE,
-            "Error: Unable to update retention file '%s': %s",
-            xrddefault_retention_file, strerror(errno));
+      logger(log_runtime_error, basic)
+        << "Error: Unable to update retention file '"
+        << xrddefault_retention_file << "': " << strerror(errno);
       result = ERROR;
     }
   }
@@ -536,8 +533,8 @@ int xrddefault_save_state_information(void) {
 
     /* remove temp file and log an error */
     unlink(temp_file);
-    logit(NSLOG_RUNTIME_ERROR, TRUE,
-          "Error: Unable to save retention file: %s", strerror(errno));
+    logger(log_runtime_error, basic)
+      << "Error: Unable to save retention file: " << strerror(errno);
   }
 
   /* free memory */
@@ -604,11 +601,12 @@ int xrddefault_read_state_information(void) {
   double runtime[2];
   int found_directive = FALSE;
 
-  log_debug_info(DEBUGL_FUNCTIONS, 0, "xrddefault_read_state_information() start\n");
+  logger(dbg_functions, basic) << "xrddefault_read_state_information()";
 
   /* make sure we have what we need */
   if (xrddefault_retention_file == NULL) {
-    logit(NSLOG_RUNTIME_ERROR, TRUE, "Error: We don't have a filename for retention data!\n");
+    logger(log_runtime_error, basic)
+      << "Error: We don't have a filename for retention data!";
     return (ERROR);
   }
 

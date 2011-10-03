@@ -941,7 +941,7 @@ int checker::_execute_sync(host* hst) {
 
   // if the command timeout.
   if (cmd_result.get_is_timeout() == true) {
-    QString output("Host check timed out after %1  seconds\n");
+    QString output("Host check timed out after %1  seconds");
     output.arg(config.get_host_check_timeout());
 
     cmd_result.set_stdout(output);

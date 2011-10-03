@@ -20,11 +20,12 @@
 #include <signal.h>
 
 #include "ssl.hh"
-#include "logging.hh"
+#include "logging/logger.hh"
 #include "webservice.hh"
 #include "error.hh"
 
 using namespace com::centreon::engine::modules;
+using namespace com::centreon::engine::logging;
 
 /**
  *  Default Constructor.
@@ -38,9 +39,9 @@ webservice::webservice(configuration const& config)
     _config(config) {
 #ifndef WITH_OPENSSL
   if (config.get_ssl_enable() == true) {
-    logit(NSLOG_CONFIG_WARNING, false,
-	  "webservice configuration enable ssl but webservice module was "
-	  "compiled without openssl library.");
+    logger(log_config_warning, basic)
+      << "webservice configuration enable ssl but webservice module was " \
+      "compiled without openssl library.";
   }
 #endif // !WITH_OPENSSL
 
@@ -67,9 +68,8 @@ void  webservice::run() {
       }
       char buf_error[1024];
       soap_sprint_fault(&_soap_ctx, buf_error, sizeof(buf_error));
-      logit(NSLOG_RUNTIME_ERROR, false,
-	    "webservice runtime error `%s'.\n",
-	    buf_error);
+      logger(log_runtime_error, basic)
+        << "webservice runtime error `" << buf_error << "'.";
       break;
     }
 
@@ -77,9 +77,8 @@ void  webservice::run() {
     if (!soap_cpy) {
       char buf_error[1024];
       soap_sprint_fault(&_soap_ctx, buf_error, sizeof(buf_error));
-      logit(NSLOG_RUNTIME_ERROR, false,
-	    "webservice runtime error `%s'.\n",
-	    buf_error);
+      logger(log_runtime_error, basic)
+        << "webservice runtime error `" << buf_error << "'.";
       break;
     }
 
@@ -88,9 +87,8 @@ void  webservice::run() {
 	&& soap_ssl_accept(soap_cpy) != SOAP_OK) {
       char buf_error[1024];
       soap_sprint_fault(soap_cpy, buf_error, sizeof(buf_error));
-      logit(NSLOG_RUNTIME_ERROR, false,
-	    "webservice runtime error `%s'.\n",
-	    buf_error);
+      logger(log_runtime_error, basic)
+        << "webservice runtime error `" << buf_error << "'.";
       continue;
     }
 #endif // !WITH_OPENSSL

@@ -23,13 +23,14 @@
 #include "nebcallbacks.hh"
 #include "nebstructs.hh"
 #include "broker.hh"
-#include "logging.hh"
 #include "configuration.hh"
 #include "error.hh"
 #include "syncro.hh"
 #include "webservice.hh"
+#include "logging/logger.hh"
 
 using namespace com::centreon::engine::modules;
+using namespace com::centreon::engine::logging;
 
 /**************************************
  *                                     *
@@ -113,13 +114,12 @@ extern "C" int nebmodule_deinit(int flags, int reason) {
 			    callback_webservice);
   }
   catch (std::exception const& e) {
-      logit(NSLOG_RUNTIME_ERROR, false,
-	    "webservice runtime error `%s'.\n",
-	    e.what());
+    logger(log_runtime_error, basic)
+      << "webservice runtime error `" << e.what() << "'.";
   }
   catch (...) {
-      logit(NSLOG_RUNTIME_ERROR, false,
-	    "webservice runtime error `unknown'\n");
+    logger(log_runtime_error, basic)
+      << "webservice runtime error `unknown'";
   }
   return (0);
 }
@@ -187,14 +187,13 @@ extern "C" int nebmodule_init(int flags, char const* args, void* handle) {
     gl_webservice->start();
   }
   catch (std::exception const& e) {
-      logit(NSLOG_RUNTIME_ERROR, false,
-	    "webservice runtime error `%s'.\n",
-	    e.what());
-    return (1);
+    logger(log_runtime_error, basic)
+      << "webservice runtime error `" << e.what() << "'.";
+      return (1);
   }
   catch (...) {
-      logit(NSLOG_RUNTIME_ERROR, false,
-	    "webservice runtime error `unknown'.\n");
+    logger(log_runtime_error, basic)
+      << "webservice runtime error `unknown'.";
     return (1);
   }
 

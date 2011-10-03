@@ -186,7 +186,7 @@ int log_service_event(service* svc) {
 
   std::string buffer = "SERVICE ALERT: " + std::string(svc->host_name) + ";"
     + svc->description + ";$SERVICESTATE$;$SERVICESTATETYPE$;$SERVICEATTEMPT$;"
-    + (svc->plugin_output ? svc->plugin_output : "") + "\n";
+    + (svc->plugin_output ? svc->plugin_output : "");
 
   char* processed_buffer = NULL;
   process_macros_r(&mac, buffer.c_str(), &processed_buffer, 0);
@@ -231,7 +231,7 @@ int log_host_event(host* hst) {
 
   std::string buffer = "HOST ALERT: " + std::string(hst->name)
     + ";$HOSTSTATE$;$HOSTSTATETYPE$;$HOSTATTEMPT$;"
-    + (hst->plugin_output ? hst->plugin_output : "") + "\n";
+    + (hst->plugin_output ? hst->plugin_output : "");
 
   char* processed_buffer = NULL;
   process_macros_r(&mac, buffer.c_str(), &processed_buffer, 0);
@@ -274,7 +274,7 @@ int log_host_states(unsigned int type, time_t* timestamp) {
     std::string buffer = (type == INITIAL_STATES ? "INITIAL" : "CURRENT")
       + std::string(" HOST STATE: ") + std::string(host->name)
       + ";$HOSTSTATE$;$HOSTSTATETYPE$;$HOSTATTEMPT$;"
-      + (host->plugin_output ? host->plugin_output : "") + "\n";
+      + (host->plugin_output ? host->plugin_output : "");
 
     char* processed_buffer = NULL;
     process_macros_r(&mac, buffer.c_str(), &processed_buffer, 0);
@@ -323,7 +323,7 @@ int log_service_states(unsigned int type, time_t* timestamp) {
       + std::string(" SERVICE STATE: ") + std::string(service->host_name)
       + ';' + service->description
       + ";$SERVICESTATE$;$SERVICESTATETYPE$;$SERVICEATTEMPT$;"
-      + (service->plugin_output != NULL ? service->plugin_output : "") + "\n";
+      + (service->plugin_output != NULL ? service->plugin_output : "");
 
     char* processed_buffer = NULL;
     process_macros_r(&mac, buffer.c_str(), &processed_buffer, 0);
@@ -349,10 +349,6 @@ int log_service_states(unsigned int type, time_t* timestamp) {
 int rotate_log_file(time_t rotation_time) {
   (void)rotation_time;
 
-  // update the last log rotation time and status log.
-  last_log_rotation = time(NULL);
-  update_program_status(FALSE);
-
   file::rotate_all();
   return (OK);
 }
@@ -369,7 +365,7 @@ int write_log_file_info(time_t* timestamp) {
   (void)timestamp;
 
   logger(log_process_info, basic)
-    <<  "LOG VERSION: " << LOG_VERSION_2 << "\n";
+    <<  "LOG VERSION: " << LOG_VERSION_2;
   return (OK);
 }
 

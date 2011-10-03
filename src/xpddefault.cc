@@ -30,11 +30,10 @@
 #include "macros.hh"
 #include "utils.hh"
 #include "events.hh"
-#include "logging.hh"
-
-/**** DATA INPUT-SPECIFIC HEADER FILES ****/
-
+#include "logging/logger.hh"
 #include "xpddefault.hh"
+
+using namespace com::centreon::engine::logging;
 
 static int             xpddefault_perfdata_timeout;
 
@@ -81,9 +80,9 @@ int xpddefault_grab_config_info(char* config_file) {
 
   /* open the config file for reading */
   if ((thefile = mmap_fopen(config_file)) == NULL) {
-    logit(NSLOG_CONFIG_ERROR, TRUE,
-          "Error: Could not open main config file '%s' for reading performance variables!\n",
-          config_file);
+    logger(log_config_error, basic)
+      << "Error: Could not open main config file '"
+      << config_file << "' for reading performance variables!";
     return (ERROR);
   }
 
@@ -226,9 +225,9 @@ int xpddefault_initialize_performance_data(char* config_file) {
     temp_command_name = my_strtok(temp_buffer, "!");
 
     if ((temp_command = find_command(temp_command_name)) == NULL) {
-      logit(NSLOG_RUNTIME_WARNING, TRUE,
-            "Warning: Host performance command '%s' was not found - host performance data will not be processed!\n",
-            temp_command_name);
+      logger(log_runtime_warning, basic)
+        << "Warning: Host performance command '" << temp_command_name
+        << "' was not found - host performance data will not be processed!";
 
       delete[] xpddefault_host_perfdata_command;
       xpddefault_host_perfdata_command = NULL;
@@ -247,9 +246,9 @@ int xpddefault_initialize_performance_data(char* config_file) {
     temp_command_name = my_strtok(temp_buffer, "!");
 
     if ((temp_command = find_command(temp_command_name)) == NULL) {
-      logit(NSLOG_RUNTIME_WARNING, TRUE,
-            "Warning: Service performance command '%s' was not found - service performance data will not be processed!\n",
-            temp_command_name);
+      logger(log_runtime_warning, basic)
+        << "Warning: Service performance command '" << temp_command_name
+        << "' was not found - service performance data will not be processed!";
 
       delete[] xpddefault_service_perfdata_command;
       xpddefault_service_perfdata_command = NULL;
@@ -268,9 +267,9 @@ int xpddefault_initialize_performance_data(char* config_file) {
     /* get the command name, leave any arguments behind */
     temp_command_name = my_strtok(temp_buffer, "!");
     if ((temp_command = find_command(temp_command_name)) == NULL) {
-      logit(NSLOG_RUNTIME_WARNING, TRUE,
-            "Warning: Host performance file processing command '%s' was not found - host performance data file will not be processed!\n",
-            temp_command_name);
+      logger(log_runtime_warning, basic)
+        << "Warning: Host performance file processing command '" << temp_command_name
+        << "' was not found - host performance data file will not be processed!";
 
       delete[] xpddefault_host_perfdata_file_processing_command;
       xpddefault_host_perfdata_file_processing_command = NULL;
@@ -289,9 +288,10 @@ int xpddefault_initialize_performance_data(char* config_file) {
     /* get the command name, leave any arguments behind */
     temp_command_name = my_strtok(temp_buffer, "!");
     if ((temp_command = find_command(temp_command_name)) == NULL) {
-      logit(NSLOG_RUNTIME_WARNING, TRUE,
-            "Warning: Service performance file processing command '%s' was not found - service performance data file will not be processed!\n",
-            temp_command_name);
+      logger(log_runtime_warning, basic)
+        << "Warning: Service performance file processing command '"
+        << temp_command_name << "' was not found - service performance " \
+        "data file will not be processed!";
 
       delete[] xpddefault_service_perfdata_file_processing_command;
       xpddefault_service_perfdata_file_processing_command = NULL;
@@ -478,7 +478,7 @@ int xpddefault_run_service_performance_data_command(nagios_macros* mac, service*
   int result = OK;
   int macro_options = STRIP_ILLEGAL_MACRO_CHARS | ESCAPE_MACRO_CHARS;
 
-  log_debug_info(DEBUGL_FUNCTIONS, 0, "run_service_performance_data_command()\n");
+  logger(dbg_functions, basic) << "run_service_performance_data_command()";
 
   if (svc == NULL)
     return (ERROR);
@@ -495,18 +495,17 @@ int xpddefault_run_service_performance_data_command(nagios_macros* mac, service*
   if (raw_command_line == NULL)
     return (ERROR);
 
-  log_debug_info(DEBUGL_PERFDATA, 2,
-                 "Raw service performance data command line: %s\n",
-                 raw_command_line);
+  logger(dbg_perfdata, most)
+    << "Raw service performance data command line: " << raw_command_line;
 
   /* process any macros in the raw command line */
   process_macros_r(mac, raw_command_line, &processed_command_line, macro_options);
   if (processed_command_line == NULL)
     return (ERROR);
 
-  log_debug_info(DEBUGL_PERFDATA, 2,
-                 "Processed service performance data command line: %s\n",
-                 processed_command_line);
+  logger(dbg_perfdata, most)
+    << "Processed service performance data " \
+    "command line: " << processed_command_line;
 
   /* run the command */
   my_system_r(mac, processed_command_line, xpddefault_perfdata_timeout,
@@ -514,9 +513,11 @@ int xpddefault_run_service_performance_data_command(nagios_macros* mac, service*
 
   /* check to see if the command timed out */
   if (early_timeout == TRUE)
-    logit(NSLOG_RUNTIME_WARNING, TRUE,
-          "Warning: Service performance data command '%s' for service '%s' on host '%s' timed out after %d seconds\n",
-          processed_command_line, svc->description, svc->host_name, xpddefault_perfdata_timeout);
+    logger(log_runtime_warning, basic)
+      << "Warning: Service performance data command '" << processed_command_line
+      << "' for service '" << svc->description << "' on host '"
+      <<  svc->host_name << "' timed out after " << xpddefault_perfdata_timeout
+      << " seconds";
 
   /* free memory */
   delete[] raw_command_line;
@@ -534,7 +535,7 @@ int xpddefault_run_host_performance_data_command(nagios_macros* mac, host* hst) 
   int result = OK;
   int macro_options = STRIP_ILLEGAL_MACRO_CHARS | ESCAPE_MACRO_CHARS;
 
-  log_debug_info(DEBUGL_FUNCTIONS, 0, "run_host_performance_data_command()\n");
+  logger(dbg_functions, basic) << "run_host_performance_data_command()";
 
   if (hst == NULL)
     return (ERROR);
@@ -551,15 +552,15 @@ int xpddefault_run_host_performance_data_command(nagios_macros* mac, host* hst) 
   if (raw_command_line == NULL)
     return (ERROR);
 
-  log_debug_info(DEBUGL_PERFDATA, 2,
-                 "Raw host performance data command line: %s\n",
-                 raw_command_line);
+  logger(dbg_perfdata, most)
+    << "Raw host performance data command line: " << raw_command_line;
 
   /* process any macros in the raw command line */
   process_macros_r(mac, raw_command_line, &processed_command_line, macro_options);
 
-  log_debug_info(DEBUGL_PERFDATA, 2, "Processed host performance data command line: %s\n",
-                 processed_command_line);
+  logger(dbg_perfdata, most)
+    << "Processed host performance data " \
+    "command line: " << processed_command_line;
 
   /* run the command */
   my_system_r(mac,
@@ -574,10 +575,11 @@ int xpddefault_run_host_performance_data_command(nagios_macros* mac, host* hst) 
 
   /* check to see if the command timed out */
   if (early_timeout == TRUE)
-    logit(NSLOG_RUNTIME_WARNING, TRUE,
-          "Warning: Host performance data command '%s' for host '%s' timed out after %d seconds\n",
-          processed_command_line, hst->name,
-          xpddefault_perfdata_timeout);
+    logger(log_runtime_warning, basic)
+      << "Warning: Host performance data command '"
+      << processed_command_line << "' for host '" << hst->name
+      << "' timed out after " << xpddefault_perfdata_timeout
+      << " seconds";
 
   /* free memory */
   delete[] raw_command_line;
@@ -603,9 +605,9 @@ int xpddefault_open_host_perfdata_file(void) {
 					  (xpddefault_host_perfdata_file_append == TRUE) ? "a" : "w");
 
     if (xpddefault_host_perfdata_fp == NULL) {
-      logit(NSLOG_RUNTIME_WARNING, TRUE,
-            "Warning: File '%s' could not be opened - host performance data will not be written to file!\n",
-            xpddefault_host_perfdata_file);
+      logger(log_runtime_warning, basic)
+        << "Warning: File '" << xpddefault_host_perfdata_fp << "' could not be " \
+        "opened - host performance data will not be written to file!";
 
       return (ERROR);
     }
@@ -628,9 +630,9 @@ int xpddefault_open_service_perfdata_file(void) {
 	      (xpddefault_service_perfdata_file_append == TRUE) ? "a" : "w");
 
     if (xpddefault_service_perfdata_fp == NULL) {
-      logit(NSLOG_RUNTIME_WARNING, TRUE,
-            "Warning: File '%s' could not be opened - service performance data will not be written to file!\n",
-            xpddefault_service_perfdata_file);
+      logger(log_runtime_warning, basic)
+        << "Warning: File '" << xpddefault_service_perfdata_file << "' could " \
+        "not be opened - service performance data will not be written to file!";
 
       return (ERROR);
     }
@@ -705,7 +707,7 @@ int xpddefault_update_service_performance_data_file(nagios_macros* mac, service*
   char* processed_output = NULL;
   int result = OK;
 
-  log_debug_info(DEBUGL_FUNCTIONS, 0, "update_service_performance_data_file()\n");
+  logger(dbg_functions, basic) << "update_service_performance_data_file()";
 
   if (svc == NULL)
     return (ERROR);
@@ -718,18 +720,16 @@ int xpddefault_update_service_performance_data_file(nagios_macros* mac, service*
   /* get the raw line to write */
   raw_output = my_strdup(xpddefault_service_perfdata_file_template);
 
-  log_debug_info(DEBUGL_PERFDATA, 2,
-                 "Raw service performance data file output: %s\n",
-                 raw_output);
+  logger(dbg_perfdata, most)
+    << "Raw service performance data file output: " << raw_output;
 
   /* process any macros in the raw output line */
   process_macros_r(mac, raw_output, &processed_output, 0);
   if (processed_output == NULL)
     return (ERROR);
 
-  log_debug_info(DEBUGL_PERFDATA, 2,
-                 "Processed service performance data file output: %s\n",
-                 processed_output);
+  logger(dbg_perfdata, most)
+    << "Processed service performance data file output: " << processed_output;
 
   /* lock, write to and unlock host performance data file */
   pthread_mutex_lock(&xpddefault_service_perfdata_fp_lock);
@@ -751,7 +751,7 @@ int xpddefault_update_host_performance_data_file(nagios_macros* mac, host* hst) 
   char* processed_output = NULL;
   int result = OK;
 
-  log_debug_info(DEBUGL_FUNCTIONS, 0, "update_host_performance_data_file()\n");
+  logger(dbg_functions, basic) << "update_host_performance_data_file()";
 
   if (hst == NULL)
     return (ERROR);
@@ -764,17 +764,16 @@ int xpddefault_update_host_performance_data_file(nagios_macros* mac, host* hst) 
   /* get the raw output */
   raw_output = my_strdup(xpddefault_host_perfdata_file_template);
 
-  log_debug_info(DEBUGL_PERFDATA, 2,
-                 "Raw host performance file output: %s\n", raw_output);
+  logger(dbg_perfdata, most)
+    << "Raw host performance file output: " << raw_output;
 
   /* process any macros in the raw output */
   process_macros_r(mac, raw_output, &processed_output, 0);
   if (processed_output == NULL)
     return (ERROR);
 
-  log_debug_info(DEBUGL_PERFDATA, 2,
-                 "Processed host performance data file output: %s\n",
-                 processed_output);
+  logger(dbg_perfdata, most)
+    << "Processed host performance data file output: " << processed_output;
 
   /* lock, write to and unlock host performance data file */
   pthread_mutex_lock(&xpddefault_host_perfdata_fp_lock);
@@ -800,7 +799,7 @@ int xpddefault_process_host_perfdata_file(void) {
   int macro_options = STRIP_ILLEGAL_MACRO_CHARS | ESCAPE_MACRO_CHARS;
   nagios_macros mac;
 
-  log_debug_info(DEBUGL_FUNCTIONS, 0, "process_host_perfdata_file()\n");
+  logger(dbg_functions, basic) << "process_host_perfdata_file()";
 
   /* we don't have a command */
   if (xpddefault_host_perfdata_file_processing_command == NULL)
@@ -819,9 +818,8 @@ int xpddefault_process_host_perfdata_file(void) {
     return (ERROR);
   }
 
-  log_debug_info(DEBUGL_PERFDATA, 2,
-                 "Raw host performance data file processing command line: %s\n",
-                 raw_command_line);
+  logger(dbg_perfdata, most)
+    << "Raw host performance data file processing command line: " << raw_command_line;
 
   /* process any macros in the raw command line */
   process_macros_r(&mac, raw_command_line, &processed_command_line, macro_options);
@@ -830,9 +828,9 @@ int xpddefault_process_host_perfdata_file(void) {
     return (ERROR);
   }
 
-  log_debug_info(DEBUGL_PERFDATA, 2,
-                 "Processed host performance data file processing command line: %s\n",
-                 processed_command_line);
+  logger(dbg_perfdata, most)
+    << "Processed host performance data file " \
+    "processing command line: " << processed_command_line;
 
   /* lock and close the performance data file */
   pthread_mutex_lock(&xpddefault_host_perfdata_fp_lock);
@@ -854,9 +852,10 @@ int xpddefault_process_host_perfdata_file(void) {
 
   /* check to see if the command timed out */
   if (early_timeout == TRUE)
-    logit(NSLOG_RUNTIME_WARNING, TRUE,
-          "Warning: Host performance data file processing command '%s' timed out after %d seconds\n",
-          processed_command_line, xpddefault_perfdata_timeout);
+    logger(log_runtime_warning, basic)
+      << "Warning: Host performance data file processing command '"
+      << processed_command_line << "' timed out after "
+      << xpddefault_perfdata_timeout << " seconds";
 
   /* free memory */
   delete[] raw_command_line;
@@ -875,7 +874,7 @@ int xpddefault_process_service_perfdata_file(void) {
   int macro_options = STRIP_ILLEGAL_MACRO_CHARS | ESCAPE_MACRO_CHARS;
   nagios_macros mac;
 
-  log_debug_info(DEBUGL_FUNCTIONS, 0, "process_service_perfdata_file()\n");
+  logger(dbg_functions, basic) << "process_service_perfdata_file()";
 
   /* we don't have a command */
   if (xpddefault_service_perfdata_file_processing_command == NULL)
@@ -894,9 +893,9 @@ int xpddefault_process_service_perfdata_file(void) {
     return (ERROR);
   }
 
-  log_debug_info(DEBUGL_PERFDATA, 2,
-                 "Raw service performance data file processing command line: %s\n",
-                 raw_command_line);
+  logger(dbg_perfdata, most)
+    << "Raw service performance data file processing "  \
+    "command line: " << raw_command_line;
 
   /* process any macros in the raw command line */
   process_macros_r(&mac, raw_command_line, &processed_command_line, macro_options);
@@ -905,9 +904,9 @@ int xpddefault_process_service_perfdata_file(void) {
     return (ERROR);
   }
 
-  log_debug_info(DEBUGL_PERFDATA, 2,
-                 "Processed service performance data file processing command line: %s\n",
-                 processed_command_line);
+  logger(dbg_perfdata, most)
+    << "Processed service performance data file processing " \
+    "command line: " << processed_command_line;
 
   /* lock and close the performance data file */
   pthread_mutex_lock(&xpddefault_service_perfdata_fp_lock);
@@ -930,9 +929,10 @@ int xpddefault_process_service_perfdata_file(void) {
 
   /* check to see if the command timed out */
   if (early_timeout == TRUE)
-    logit(NSLOG_RUNTIME_WARNING, TRUE,
-          "Warning: Service performance data file processing command '%s' timed out after %d seconds\n",
-          processed_command_line, xpddefault_perfdata_timeout);
+    logger(log_runtime_warning, basic)
+      << "Warning: Service performance data file processing command '"
+      << processed_command_line << "' timed out after "
+      << xpddefault_perfdata_timeout << " seconds";
 
   /* free memory */
   delete[] raw_command_line;

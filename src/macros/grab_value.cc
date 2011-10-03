@@ -22,9 +22,11 @@
 #include <stdlib.h>
 #include "engine.hh"
 #include "globals.hh"
-#include "logging.hh"
+#include "logging/logger.hh"
 #include "macros/grab_value.hh"
 #include "macros.hh"
+
+using namespace com::centreon::engine::logging;
 
 /**************************************
 *                                     *
@@ -1022,7 +1024,8 @@ int grab_macro_value_r(nagios_macros* mac,
       continue;
 
     if (!strcmp(macro_name, macro_x_names[x])) {
-      log_debug_info(DEBUGL_MACROS, 2, "  macros[%d] (%s) match.\n", x, macro_x_names[x]);
+      logger(dbg_macros, most)
+        << "  macros[" << x << "] (" << macro_x_names[x] << ") match.";
 
       /* get the macro value */
       result = grab_macrox_value_r(mac, x, arg[0], arg[1], output, free_macro);
@@ -1032,13 +1035,15 @@ int grab_macro_value_r(nagios_macros* mac,
       if ((x >= 16 && x <= 19) || (x >= 49 && x <= 52)
           || (x >= 99 && x <= 100) || (x >= 124 && x <= 127)) {
         *clean_options |= (STRIP_ILLEGAL_MACRO_CHARS | ESCAPE_MACRO_CHARS);
-        log_debug_info(DEBUGL_MACROS, 2, "  New clean options: %d\n", *clean_options);
+        logger(dbg_macros, most)
+          << "  New clean options: " << *clean_options;
       }
       /* url macros should get cleaned */
       if ((x >= 125 && x <= 126) || (x >= 128 && x <= 129)
           || (x >= 77 && x <= 78) || (x >= 74 && x <= 75)) {
         *clean_options |= URL_ENCODE_MACRO_CHARS;
-        log_debug_info(DEBUGL_MACROS, 2, "  New clean options: %d\n", *clean_options);
+        logger(dbg_macros, most)
+          << "  New clean options: " << *clean_options;
       }
 
       break;
@@ -1155,9 +1160,8 @@ int grab_macro_value_r(nagios_macros* mac,
   }
   /* no macro matched... */
   else {
-    log_debug_info(DEBUGL_MACROS, 0,
-                   " WARNING: Could not find a macro matching '%s'!\n",
-                   macro_name);
+    logger(dbg_macros, basic)
+      << " WARNING: Could not find a macro matching '" << macro_name << "'!";
     result = ERROR;
   }
 
@@ -1204,10 +1208,8 @@ int grab_macrox_value_r(nagios_macros* mac,
       redirector.routines.find(macro_type));
     if (redirector.routines.end() == it) {
       retval = ERROR;
-      log_debug_info(DEBUGL_MACROS,
-        0,
-        "UNHANDLED MACRO #%d! THIS IS A BUG!\n",
-        macro_type);
+      logger(dbg_macros, basic)
+        << "UNHANDLED MACRO #" << macro_type << "! THIS IS A BUG!";
     }
     else
       retval = (**it)(mac, macro_type, arg1, arg2, output, free_macro);

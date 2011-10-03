@@ -21,12 +21,13 @@
 #include <QFile>
 #include <unistd.h>
 #include "broker/compatibility.hh"
-#include "broker/loader.hh"
 #include "error.hh"
-#include "logging.hh"
+#include "logging/logger.hh"
+#include "broker/loader.hh"
 
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::broker;
+using namespace com::centreon::engine::logging;
 
 /**************************************
  *                                     *
@@ -71,17 +72,16 @@ unsigned int loader::load() {
     try {
       module = add_module(dir.path() + "/" + it->fileName(), config_file);
       module->open();
-      logit(NSLOG_INFO_MESSAGE, false,
-	    "Event broker module '%s' initialized successfully.\n",
-	    qPrintable(it->fileName()));
+      logger(log_info_message, basic)
+        << "Event broker module '" << it->fileName()
+        << "' initialized successfully.";
       ++loaded;
     }
     catch (error const& e) {
       del_module(module);
-      logit(NSLOG_RUNTIME_ERROR, false,
-	    "Error: Could not load module '%s' -> %s\n",
-	    qPrintable(it->fileName()),
-	    e.what());
+      logger(log_runtime_error, basic)
+        << "Error: Could not load module '" << it->fileName()
+        << "' -> " << e.what();
     }
   }
 
@@ -97,9 +97,8 @@ void loader::unload() {
        it != end;
        ++it) {
     it.value()->close();
-    log_debug_info(DEBUGL_EVENTBROKER, 0,
-		   "Module '%s' unloaded successfully.\n",
-		   qPrintable(it.value()->get_filename()));
+    logger(dbg_eventbroker, basic)
+      << "Module '" << it.value()->get_filename() << "' unloaded successfully.";
   }
   _modules.clear();
 }

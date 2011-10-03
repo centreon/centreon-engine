@@ -23,7 +23,6 @@
 #include "xodtemplate.hh"
 #include "globals.hh"
 #include "skiplist.hh"
-#include "logging.hh"
 #include "engine.hh"
 #include "objects.hh"
 #include "logging/logger.hh"
@@ -354,7 +353,8 @@ timeperiod* add_timeperiod(char const* name, char const* alias) {
   /* make sure we have the data we need */
   if ((name == NULL || !strcmp(name, ""))
       || (alias == NULL || !strcmp(alias, ""))) {
-    logit(NSLOG_CONFIG_ERROR, TRUE, "Error: Name or alias for timeperiod is NULL\n");
+    logger(log_config_error, basic)
+      << "Error: Name or alias for timeperiod is NULL";
     return (NULL);
   }
 
@@ -370,7 +370,8 @@ timeperiod* add_timeperiod(char const* name, char const* alias) {
   result = skiplist_insert(object_skiplists[TIMEPERIOD_SKIPLIST], (void*)new_timeperiod);
   switch (result) {
   case SKIPLIST_ERROR_DUPLICATE:
-    logit(NSLOG_CONFIG_ERROR, TRUE, "Error: Timeperiod '%s' has already been defined\n", name);
+    logger(log_config_error, basic)
+      << "Error: Timeperiod '" << name << "' has already been defined";
     result = ERROR;
     break;
 
@@ -379,7 +380,8 @@ timeperiod* add_timeperiod(char const* name, char const* alias) {
     break;
 
   default:
-    logit(NSLOG_CONFIG_ERROR, TRUE, "Error: Could not add timeperiod '%s' to skiplist\n", name);
+    logger(log_config_error, basic)
+      << "Error: Could not add timeperiod '" << name << "' to skiplist";
     result = ERROR;
     break;
   }
@@ -434,21 +436,21 @@ timerange* add_timerange_to_timeperiod(timeperiod* period,
     return (NULL);
 
   if (day < 0 || day > 6) {
-    logit(NSLOG_CONFIG_ERROR, TRUE,
-	  "Error: Day %d is not valid for timeperiod '%s'\n",
-	  day, period->name);
+    logger(log_config_error, basic)
+      << "Error: Day " << day
+      << " is not valid for timeperiod '" << period->name << "'";
     return (NULL);
   }
   if (start_time > 86400) {
-    logit(NSLOG_CONFIG_ERROR, TRUE,
-	  "Error: Start time %lu on day %d is not valid for timeperiod '%s'\n",
-	  start_time, day, period->name);
+    logger(log_config_error, basic)
+      << "Error: Start time " << start_time << " on day " << day
+      << " is not valid for timeperiod '" << period->name << "'";
     return (NULL);
   }
   if (end_time > 86400) {
-    logit(NSLOG_CONFIG_ERROR, TRUE,
-          "Error: End time %lu on day %d is not value for timeperiod '%s'\n",
-          end_time, day, period->name);
+    logger(log_config_error, basic)
+      << "Error: End time " << end_time << " on day " << day
+      << " is not value for timeperiod '" << period->name << "'";
     return (NULL);
   }
 
@@ -522,15 +524,13 @@ timerange* add_timerange_to_daterange(daterange* drange,
     return (NULL);
 
   if (start_time > 86400) {
-    logit(NSLOG_CONFIG_ERROR, TRUE,
-          "Error: Start time %lu is not valid for timeperiod\n",
-          start_time);
+    logger(log_config_error, basic)
+      << "Error: Start time " << start_time << " is not valid for timeperiod";
     return (NULL);
   }
   if (end_time > 86400) {
-    logit(NSLOG_CONFIG_ERROR, TRUE,
-          "Error: End time %lu is not value for timeperiod\n",
-          end_time);
+    logger(log_config_error, basic)
+      << "Error: End time " << end_time << " is not value for timeperiod";
     return (NULL);
   }
 
@@ -579,39 +579,35 @@ host* add_host(char const* name, char const* display_name, char const* alias,
   /* make sure we have the data we need */
   if ((name == NULL || !strcmp(name, ""))
       || (address == NULL || !strcmp(address, ""))) {
-    logit(NSLOG_CONFIG_ERROR, TRUE,
-          "Error: Host name or address is NULL\n");
+    logger(log_config_error, basic)
+      << "Error: Host name or address is NULL";
     return (NULL);
   }
 
   /* check values */
   if (max_attempts <= 0) {
-    logit(NSLOG_CONFIG_ERROR, TRUE,
-          "Error: Invalid max_check_attempts value for host '%s'\n",
-          name);
+    logger(log_config_error, basic)
+      << "Error: Invalid max_check_attempts value for host '" << name << "'";
     return (NULL);
   }
   if (check_interval < 0) {
-    logit(NSLOG_CONFIG_ERROR, TRUE,
-          "Error: Invalid check_interval value for host '%s'\n", name);
+    logger(log_config_error, basic)
+      << "Error: Invalid check_interval value for host '" << name << "'";
     return (NULL);
   }
   if (notification_interval < 0) {
-    logit(NSLOG_CONFIG_ERROR, TRUE,
-          "Error: Invalid notification_interval value for host '%s'\n",
-          name);
+    logger(log_config_error, basic)
+      << "Error: Invalid notification_interval value for host '" << name << "'";
     return (NULL);
   }
   if (first_notification_delay < 0) {
-    logit(NSLOG_CONFIG_ERROR, TRUE,
-          "Error: Invalid first_notification_delay value for host '%s'\n",
-          name);
+    logger(log_config_error, basic)
+      << "Error: Invalid first_notification_delay value for host '" << name << "'";
     return (NULL);
   }
   if (freshness_threshold < 0) {
-    logit(NSLOG_CONFIG_ERROR, TRUE,
-          "Error: Invalid freshness_threshold value for host '%s'\n",
-          name);
+    logger(log_config_error, basic)
+      << "Error: Invalid freshness_threshold value for host '" << name << "'";
     return (NULL);
   }
 
@@ -741,8 +737,8 @@ host* add_host(char const* name, char const* display_name, char const* alias,
   result = skiplist_insert(object_skiplists[HOST_SKIPLIST], (void*)new_host);
   switch (result) {
   case SKIPLIST_ERROR_DUPLICATE:
-    logit(NSLOG_CONFIG_ERROR, TRUE,
-          "Error: Host '%s' has already been defined\n", name);
+    logger(log_config_error, basic)
+      << "Error: Host '" << name << "' has already been defined";
     result = ERROR;
     break;
 
@@ -751,8 +747,8 @@ host* add_host(char const* name, char const* display_name, char const* alias,
     break;
 
   default:
-    logit(NSLOG_CONFIG_ERROR, TRUE,
-          "Error: Could not add host '%s' to skiplist\n", name);
+    logger(log_config_error, basic)
+      << "Error: Could not add host '" << name << "' to skiplist";
     result = ERROR;
     break;
   }
@@ -800,16 +796,15 @@ hostsmember* add_parent_host_to_host(host* hst, char const* host_name) {
 
   /* make sure we have the data we need */
   if (hst == NULL || host_name == NULL || !strcmp(host_name, "")) {
-    logit(NSLOG_CONFIG_ERROR, TRUE,
-          "Error: Host is NULL or parent host name is NULL\n");
+    logger(log_config_error, basic)
+      << "Error: Host is NULL or parent host name is NULL";
     return (NULL);
   }
 
   /* a host cannot be a parent/child of itself */
   if (!strcmp(host_name, hst->name)) {
-    logit(NSLOG_CONFIG_ERROR, TRUE,
-          "Error: Host '%s' cannot be a child/parent of itself\n",
-          hst->name);
+    logger(log_config_error, basic)
+      << "Error: Host '" << hst->name << "' cannot be a child/parent of itself";
     return (NULL);
   }
 
@@ -874,8 +869,8 @@ contactgroupsmember* add_contactgroup_to_host(host* hst, char const* group_name)
   contactgroupsmember* new_contactgroupsmember = NULL;
 
   if (hst == NULL || (group_name == NULL || !strcmp(group_name, ""))) {
-    logit(NSLOG_CONFIG_ERROR, TRUE,
-          "Error: Host or contactgroup member is NULL\n");
+    logger(log_config_error, basic)
+      << "Error: Host or contactgroup member is NULL";
     return (NULL);
   }
 
@@ -916,7 +911,8 @@ hostgroup* add_hostgroup(char const* name,
 
   /* make sure we have the data we need */
   if (name == NULL || !strcmp(name, "")) {
-    logit(NSLOG_CONFIG_ERROR, TRUE, "Error: Hostgroup name is NULL\n");
+    logger(log_config_error, basic)
+      << "Error: Hostgroup name is NULL";
     return (NULL);
   }
 
@@ -938,8 +934,8 @@ hostgroup* add_hostgroup(char const* name,
   result = skiplist_insert(object_skiplists[HOSTGROUP_SKIPLIST], (void*)new_hostgroup);
   switch (result) {
   case SKIPLIST_ERROR_DUPLICATE:
-    logit(NSLOG_CONFIG_ERROR, TRUE,
-          "Error: Hostgroup '%s' has already been defined\n", name);
+    logger(log_config_error, basic)
+      << "Error: Hostgroup '" << name << "' has already been defined";
     result = ERROR;
     break;
 
@@ -948,8 +944,8 @@ hostgroup* add_hostgroup(char const* name,
     break;
 
   default:
-    logit(NSLOG_CONFIG_ERROR, TRUE,
-          "Error: Could not add hostgroup '%s' to skiplist\n", name);
+    logger(log_config_error, basic)
+      << "Error: Could not add hostgroup '" << name << "' to skiplist";
     result = ERROR;
     break;
   }
@@ -983,7 +979,7 @@ hostsmember* add_host_to_hostgroup(hostgroup* temp_hostgroup, char const* host_n
 
   /* make sure we have the data we need */
   if (temp_hostgroup == NULL || (host_name == NULL || !strcmp(host_name, ""))) {
-    logit(NSLOG_CONFIG_ERROR, TRUE, "Error: Hostgroup or group member is NULL\n");
+    logger(log_config_error, basic) << "Error: Hostgroup or group member is NULL";
     return (NULL);
   }
 
@@ -1033,7 +1029,7 @@ servicegroup* add_servicegroup(char const* name,
 
   /* make sure we have the data we need */
   if (name == NULL || !strcmp(name, "")) {
-    logit(NSLOG_CONFIG_ERROR, TRUE, "Error: Servicegroup name is NULL\n");
+    logger(log_config_error, basic) << "Error: Servicegroup name is NULL";
     return (NULL);
   }
 
@@ -1058,8 +1054,8 @@ servicegroup* add_servicegroup(char const* name,
   result = skiplist_insert(object_skiplists[SERVICEGROUP_SKIPLIST], (void*)new_servicegroup);
   switch (result) {
   case SKIPLIST_ERROR_DUPLICATE:
-    logit(NSLOG_CONFIG_ERROR, TRUE,
-          "Error: Servicegroup '%s' has already been defined\n", name);
+    logger(log_config_error, basic)
+      << "Error: Servicegroup '" << name << "' has already been defined";
     result = ERROR;
     break;
 
@@ -1068,8 +1064,8 @@ servicegroup* add_servicegroup(char const* name,
     break;
 
   default:
-    logit(NSLOG_CONFIG_ERROR, TRUE,
-          "Error: Could not add servicegroup '%s' to skiplist\n", name);
+    logger(log_config_error, basic)
+      << "Error: Could not add servicegroup '" << name << "' to skiplist";
     result = ERROR;
     break;
   }
@@ -1107,7 +1103,7 @@ servicesmember* add_service_to_servicegroup(servicegroup* temp_servicegroup,
   if (temp_servicegroup == NULL
       || (host_name == NULL || !strcmp(host_name, ""))
       || (svc_description == NULL || !strcmp(svc_description, ""))) {
-    logit(NSLOG_CONFIG_ERROR, TRUE, "Error: Servicegroup or group member is NULL\n");
+    logger(log_config_error, basic) << "Error: Servicegroup or group member is NULL";
     return (NULL);
   }
 
@@ -1179,7 +1175,7 @@ contact* add_contact(char const* name, char const* alias, char const* email, cha
 
   /* make sure we have the data we need */
   if (name == NULL || !strcmp(name, "")) {
-    logit(NSLOG_CONFIG_ERROR, TRUE, "Error: Contact name is NULL\n");
+    logger(log_config_error, basic) << "Error: Contact name is NULL";
     return (NULL);
   }
 
@@ -1236,7 +1232,8 @@ contact* add_contact(char const* name, char const* alias, char const* email, cha
     result = skiplist_insert(object_skiplists[CONTACT_SKIPLIST], (void*)new_contact);
     switch (result) {
     case SKIPLIST_ERROR_DUPLICATE:
-      logit(NSLOG_CONFIG_ERROR, TRUE, "Error: Contact '%s' has already been defined\n", name);
+      logger(log_config_error, basic)
+        << "Error: Contact '" << name << "' has already been defined";
       result = ERROR;
       break;
 
@@ -1245,7 +1242,8 @@ contact* add_contact(char const* name, char const* alias, char const* email, cha
       break;
 
     default:
-      logit(NSLOG_CONFIG_ERROR, TRUE, "Error: Could not add contact '%s' to skiplist\n", name);
+      logger(log_config_error, basic)
+        << "Error: Could not add contact '" << name << "' to skiplist";
       result = ERROR;
       break;
     }
@@ -1284,7 +1282,8 @@ commandsmember* add_host_notification_command_to_contact(contact*  cntct, char c
 
   /* make sure we have the data we need */
   if (cntct == NULL || (command_name == NULL || !strcmp(command_name, ""))) {
-    logit(NSLOG_CONFIG_ERROR, TRUE, "Error: Contact or host notification command is NULL\n");
+    logger(log_config_error, basic)
+      << "Error: Contact or host notification command is NULL";
     return (NULL);
   }
 
@@ -1308,7 +1307,8 @@ commandsmember* add_service_notification_command_to_contact(contact*  cntct, cha
 
   /* make sure we have the data we need */
   if (cntct == NULL || (command_name == NULL || !strcmp(command_name, ""))) {
-    logit(NSLOG_CONFIG_ERROR, TRUE, "Error: Contact or service notification command is NULL\n");
+    logger(log_config_error, basic)
+      << "Error: Contact or service notification command is NULL";
     return (NULL);
   }
 
@@ -1340,7 +1340,7 @@ contactgroup* add_contactgroup(char const* name, char const* alias) {
 
   /* make sure we have the data we need */
   if (name == NULL || !strcmp(name, "")) {
-    logit(NSLOG_CONFIG_ERROR, TRUE, "Error: Contactgroup name is NULL\n");
+    logger(log_config_error, basic) << "Error: Contactgroup name is NULL";
     return (NULL);
   }
 
@@ -1356,7 +1356,8 @@ contactgroup* add_contactgroup(char const* name, char const* alias) {
   result = skiplist_insert(object_skiplists[CONTACTGROUP_SKIPLIST], (void*)new_contactgroup);
   switch (result) {
   case SKIPLIST_ERROR_DUPLICATE:
-    logit(NSLOG_CONFIG_ERROR, TRUE, "Error: Contactgroup '%s' has already been defined\n", name);
+    logger(log_config_error, basic)
+      << "Error: Contactgroup '" << name << "' has already been defined";
     result = ERROR;
     break;
 
@@ -1365,7 +1366,8 @@ contactgroup* add_contactgroup(char const* name, char const* alias) {
     break;
 
   default:
-    logit(NSLOG_CONFIG_ERROR, TRUE, "Error: Could not add contactgroup '%s' to skiplist\n", name);
+    logger(log_config_error, basic)
+      << "Error: Could not add contactgroup '" << name << "' to skiplist";
     result = ERROR;
     break;
   }
@@ -1397,7 +1399,8 @@ contactsmember* add_contact_to_contactgroup(contactgroup* grp, char const* conta
 
   /* make sure we have the data we need */
   if (grp == NULL || (contact_name == NULL || !strcmp(contact_name, ""))) {
-    logit(NSLOG_CONFIG_ERROR, TRUE, "Error: Contactgroup or contact name is NULL\n");
+    logger(log_config_error, basic)
+      << "Error: Contactgroup or contact name is NULL";
     return (NULL);
   }
 
@@ -1457,13 +1460,14 @@ service* add_service(char const* host_name, char const* description,
     return (NULL);
   }
   else if (!host_name || !host_name[0]) {
-    logger(log_config_error, basic) << "error: host name of service '"
-      << description << "' is not set";
+    logger(log_config_error, basic)
+      << "error: host name of service '" << description << "' is not set";
     return (NULL);
   }
   else if (!check_command || !check_command[0]) {
-    logger(log_config_error, basic) << "error: check command of service '"
-      << description << "' on host '" << host_name << "' is not set";
+    logger(log_config_error, basic)
+      << "error: check command of service '" << description
+      << "' on host '" << host_name << "' is not set";
     return (NULL);
   }
 
@@ -1472,16 +1476,17 @@ service* add_service(char const* host_name, char const* description,
       || check_interval < 0
       || retry_interval <= 0
       || notification_interval < 0) {
-    logit(NSLOG_CONFIG_ERROR, TRUE,
-          "Error: Invalid max_attempts, check_interval, retry_interval, or notification_interval value for service '%s' on host '%s'\n",
-          description, host_name);
+    logger(log_config_error, basic)
+      << "Error: Invalid max_attempts, check_interval, retry_interval, or " \
+      "notification_interval value for service '"
+      << description << "' on host '" << host_name << "'";
     return (NULL);
   }
 
   if (first_notification_delay < 0) {
-    logit(NSLOG_CONFIG_ERROR, TRUE,
-          "Error: Invalid first_notification_delay value for service '%s' on host '%s'\n",
-          description, host_name);
+    logger(log_config_error, basic)
+      << "Error: Invalid first_notification_delay value for service '"
+      << description << "' on host '" << host_name << "'";
     return (NULL);
   }
 
@@ -1599,9 +1604,9 @@ service* add_service(char const* host_name, char const* description,
   result = skiplist_insert(object_skiplists[SERVICE_SKIPLIST], (void*)new_service);
   switch (result) {
   case SKIPLIST_ERROR_DUPLICATE:
-    logit(NSLOG_CONFIG_ERROR, TRUE,
-          "Error: Service '%s' on host '%s' has already been defined\n",
-          description, host_name);
+    logger(log_config_error, basic)
+      << "Error: Service '" << description << "' on host '"
+      << host_name << "' has already been defined";
     result = ERROR;
     break;
 
@@ -1610,9 +1615,9 @@ service* add_service(char const* host_name, char const* description,
     break;
 
   default:
-    logit(NSLOG_CONFIG_ERROR, TRUE,
-          "Error: Could not add service '%s' on host '%s' to skiplist\n",
-          description, host_name);
+    logger(log_config_error, basic)
+      << "Error: Could not add service '" << description << "' on host '"
+      << host_name << "' to skiplist";
     result = ERROR;
     break;
   }
@@ -1651,7 +1656,8 @@ contactgroupsmember* add_contactgroup_to_service(service* svc, char const* group
 
   /* bail out if we weren't given the data we need */
   if (svc == NULL || (group_name == NULL || !strcmp(group_name, ""))) {
-    logit(NSLOG_CONFIG_ERROR, TRUE, "Error: Service or contactgroup name is NULL\n");
+    logger(log_config_error, basic)
+      << "Error: Service or contactgroup name is NULL";
     return (NULL);
   }
 
@@ -1689,8 +1695,8 @@ command* add_command(char const* name, char const* value) {
   /* make sure we have the data we need */
   if ((name == NULL || !strcmp(name, ""))
       || (value == NULL || !strcmp(value, ""))) {
-    logit(NSLOG_CONFIG_ERROR, TRUE,
-          "Error: Command name of command line is NULL\n");
+    logger(log_config_error, basic)
+      << "Error: Command name of command line is NULL";
     return (NULL);
   }
 
@@ -1706,7 +1712,8 @@ command* add_command(char const* name, char const* value) {
   result = skiplist_insert(object_skiplists[COMMAND_SKIPLIST], (void*)new_command);
   switch (result) {
   case SKIPLIST_ERROR_DUPLICATE:
-    logit(NSLOG_CONFIG_ERROR, TRUE, "Error: Command '%s' has already been defined\n", name);
+    logger(log_config_error, basic)
+      << "Error: Command '" << name << "' has already been defined";
     result = ERROR;
     break;
 
@@ -1715,7 +1722,8 @@ command* add_command(char const* name, char const* value) {
     break;
 
   default:
-    logit(NSLOG_CONFIG_ERROR, TRUE, "Error: Could not add command '%s' to skiplist\n", name);
+    logger(log_config_error, basic)
+      << "Error: Could not add command '" << name << "' to skiplist";
     result = ERROR;
     break;
   }
@@ -1758,7 +1766,8 @@ serviceescalation* add_serviceescalation(char* host_name,
   /* make sure we have the data we need */
   if ((host_name == NULL || !strcmp(host_name, ""))
       || (description == NULL || !strcmp(description, ""))) {
-    logit(NSLOG_CONFIG_ERROR, TRUE, "Error: Service escalation host name or description is NULL\n");
+    logger(log_config_error, basic)
+      << "Error: Service escalation host name or description is NULL";
     return (NULL);
   }
 
@@ -1794,9 +1803,9 @@ serviceescalation* add_serviceescalation(char* host_name,
     break;
 
   default:
-    logit(NSLOG_CONFIG_ERROR, TRUE,
-          "Error: Could not add escalation for service '%s' on host '%s' to skiplist\n",
-          description, host_name);
+    logger(log_config_error, basic)
+      << "Error: Could not add escalation for service '" << description
+      << "' on host '" << host_name << "' to skiplist";
     result = ERROR;
     break;
   }
@@ -1830,7 +1839,8 @@ contactgroupsmember* add_contactgroup_to_serviceescalation(serviceescalation* se
 
   /* bail out if we weren't given the data we need */
   if (se == NULL || (group_name == NULL || !strcmp(group_name, ""))) {
-    logit(NSLOG_CONFIG_ERROR, TRUE, "Error: Service escalation or contactgroup name is NULL\n");
+    logger(log_config_error, basic)
+      << "Error: Service escalation or contactgroup name is NULL";
     return (NULL);
   }
 
@@ -1874,15 +1884,17 @@ servicedependency* add_service_dependency(char const* dependent_host_name,
   if ((host_name == NULL || !strcmp(host_name, ""))
       || (service_description == NULL
           || !strcmp(service_description, ""))) {
-    logit(NSLOG_CONFIG_ERROR, TRUE,
-          "Error: NULL master service description/host name in service dependency definition\n");
+    logger(log_config_error, basic)
+      << "Error: NULL master service description/host " \
+      "name in service dependency definition";
     return (NULL);
   }
   if ((dependent_host_name == NULL || !strcmp(dependent_host_name, ""))
       || (dependent_service_description == NULL
           || !strcmp(dependent_service_description, ""))) {
-    logit(NSLOG_CONFIG_ERROR, TRUE,
-          "Error: NULL dependent service description/host name in service dependency definition\n");
+    logger(log_config_error, basic)
+      << "Error: NULL dependent service description/host "      \
+      "name in service dependency definition";
     return (NULL);
   }
 
@@ -1916,7 +1928,8 @@ servicedependency* add_service_dependency(char const* dependent_host_name,
     break;
 
   default:
-    logit(NSLOG_CONFIG_ERROR, TRUE, "Error: Could not add service dependency to skiplist\n");
+    logger(log_config_error, basic)
+      << "Error: Could not add service dependency to skiplist";
     result = ERROR;
     break;
   }
@@ -1960,7 +1973,8 @@ hostdependency* add_host_dependency(char const* dependent_host_name,
   /* make sure we have what we need */
   if ((dependent_host_name == NULL || !strcmp(dependent_host_name, ""))
       || (host_name == NULL || !strcmp(host_name, ""))) {
-    logit(NSLOG_CONFIG_ERROR, TRUE, "Error: NULL host name in host dependency definition\n");
+    logger(log_config_error, basic)
+      << "Error: NULL host name in host dependency definition";
     return (NULL);
   }
 
@@ -1992,7 +2006,8 @@ hostdependency* add_host_dependency(char const* dependent_host_name,
     break;
 
   default:
-    logit(NSLOG_CONFIG_ERROR, TRUE, "Error: Could not add host dependency to skiplist\n");
+    logger(log_config_error, basic)
+      << "Error: Could not add host dependency to skiplist";
     result = ERROR;
     break;
   }
@@ -2031,7 +2046,8 @@ hostescalation* add_hostescalation(char const* host_name,
 
   /* make sure we have the data we need */
   if (host_name == NULL || !strcmp(host_name, "")) {
-    logit(NSLOG_CONFIG_ERROR, TRUE, "Error: Host escalation host name is NULL\n");
+    logger(log_config_error, basic)
+      << "Error: Host escalation host name is NULL";
     return (NULL);
   }
 
@@ -2064,9 +2080,9 @@ hostescalation* add_hostescalation(char const* host_name,
     break;
 
   default:
-    logit(NSLOG_CONFIG_ERROR, TRUE,
-	  "Error: Could not add hostescalation '%s' to skiplist\n",
-          host_name);
+    logger(log_config_error, basic)
+      << "Error: Could not add hostescalation '"
+      << host_name << "' to skiplist";
     result = ERROR;
     break;
   }
@@ -2098,7 +2114,8 @@ contactgroupsmember* add_contactgroup_to_hostescalation(hostescalation* he, char
 
   /* bail out if we weren't given the data we need */
   if (he == NULL || (group_name == NULL || !strcmp(group_name, ""))) {
-    logit(NSLOG_CONFIG_ERROR, TRUE, "Error: Host escalation or contactgroup name is NULL\n");
+    logger(log_config_error, basic)
+      << "Error: Host escalation or contactgroup name is NULL";
     return (NULL);
   }
 
@@ -2127,12 +2144,14 @@ contactsmember* add_contact_to_object(contactsmember** object_ptr, char const* c
 
   /* make sure we have the data we need */
   if (object_ptr == NULL) {
-    logit(NSLOG_CONFIG_ERROR, TRUE, "Error: Contact object is NULL\n");
+    logger(log_config_error, basic)
+      << "Error: Contact object is NULL";
     return (NULL);
   }
 
   if (contactname == NULL || !strcmp(contactname, "")) {
-    logit(NSLOG_CONFIG_ERROR, TRUE, "Error: Contact name is NULL\n");
+    logger(log_config_error, basic)
+      << "Error: Contact name is NULL";
     return (NULL);
   }
 
@@ -2158,12 +2177,14 @@ customvariablesmember* add_custom_variable_to_object(customvariablesmember** obj
 
   /* make sure we have the data we need */
   if (object_ptr == NULL) {
-    logit(NSLOG_CONFIG_ERROR, TRUE, "Error: Custom variable object is NULL\n");
+    logger(log_config_error, basic)
+      << "Error: Custom variable object is NULL";
     return (NULL);
   }
 
   if (varname == NULL || !strcmp(varname, "")) {
-    logit(NSLOG_CONFIG_ERROR, TRUE, "Error: Custom variable name is NULL\n");
+    logger(log_config_error, basic)
+      << "Error: Custom variable name is NULL";
     return (NULL);
   }
 

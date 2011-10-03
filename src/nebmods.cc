@@ -24,12 +24,13 @@
 #include "globals.hh"
 #include "neberrors.hh"
 #include "utils.hh"
-#include "logging.hh"
 #include "broker/loader.hh"
 #include "broker/handle.hh"
+#include "logging/logger.hh"
 #include "nebmods.hh"
 
 using namespace com::centreon::engine;
+using namespace com::centreon::engine::logging;
 
 /*#define DEBUG*/
 
@@ -58,16 +59,14 @@ int neb_add_module(char const* filename, char const* args, int should_be_loaded)
 
   try {
     broker::loader::instance().add_module(filename, args);
-    log_debug_info(DEBUGL_EVENTBROKER, 0,
-                   "Added module: name='%s', args='%s'\n",
-                   filename,
-                   args);
+    logger(dbg_eventbroker, basic)
+      << "Added module: name='" << filename
+      << "', args='" << args << "'";
   }
   catch (...) {
-    log_debug_info(DEBUGL_EVENTBROKER, 0,
-                   "Counld not add module: name='%s', args='%s'\n",
-                   filename,
-                   args);
+    logger(dbg_eventbroker, basic)
+      << "Counld not add module: name='" << filename
+      << "', args='" << args << "'";
     return (ERROR);
   }
   return (OK);
@@ -77,10 +76,10 @@ int neb_add_module(char const* filename, char const* args, int should_be_loaded)
 int neb_free_module_list(void) {
   try {
     broker::loader::instance().unload();
-    log_debug_info(DEBUGL_EVENTBROKER, 0, "unload all modules success.\n");
+    logger(dbg_eventbroker, basic) << "unload all modules success.";
   }
   catch (...) {
-    log_debug_info(DEBUGL_EVENTBROKER, 0, "unload all modules failed.\n");
+    logger(dbg_eventbroker, basic) << "unload all modules failed.";
     return (ERROR);
   }
   return (OK);
@@ -107,7 +106,7 @@ int neb_load_all_modules(void) {
         ++unloaded;
   }
   catch (...) {
-    log_debug_info(DEBUGL_EVENTBROKER, 0, "Counld not load all modules\n");
+    logger(dbg_eventbroker, basic) << "Counld not load all modules";
     return (-1);
   }
   return (unloaded);
@@ -126,21 +125,19 @@ int neb_load_module(void* mod) {
 
   try {
     module->open();
-    logit(NSLOG_INFO_MESSAGE, false,
-          "Event broker module '%s' initialized successfully.\n",
-          qPrintable(module->get_filename()));
+    logger(log_info_message, basic)
+      << "Event broker module '" << module->get_filename()
+      << "' initialized successfully.";
   }
   catch (error const& e) {
-    logit(NSLOG_RUNTIME_ERROR, false,
-          "Error: Could not load module '%s' -> %s\n",
-          qPrintable(module->get_filename()),
-          e.what());
+    logger(log_runtime_error, basic)
+      << "Error: Could not load module '"
+      << module->get_filename() << "' -> " << e.what();
     return (ERROR);
   }
   catch (...) {
-    logit(NSLOG_RUNTIME_ERROR, false,
-          "Error: Could not load module '%s'\n",
-          qPrintable(module->get_filename()));
+    logger(log_runtime_error, basic)
+      << "Error: Could not load module '" << module->get_filename() << "'";
     return (ERROR);
   }
   return (OK);
@@ -158,10 +155,10 @@ int neb_unload_all_modules(int flags, int reason) {
          ++it) {
       neb_unload_module(&**it, flags, reason);
     }
-    log_debug_info(DEBUGL_EVENTBROKER, 0, "load all modules success.\n");
+    logger(dbg_eventbroker, basic) << "load all modules success.";
   }
   catch (...) {
-    log_debug_info(DEBUGL_EVENTBROKER, 0, "load all modules failed.\n");
+    logger(dbg_eventbroker, basic) << "load all modules failed.";
     return (ERROR);
   }
   return (OK);
@@ -180,22 +177,21 @@ int neb_unload_module(void* mod, int flags, int reason) {
   if (module->is_loaded() == false)
     return (OK);
 
-  log_debug_info(DEBUGL_EVENTBROKER, 0,
-                 "Attempting to unload module '%s'\n",
-                 qPrintable(module->get_filename()));
+  logger(dbg_eventbroker, basic)
+    << "Attempting to unload module '" << module->get_filename() << "'";
 
   module->close();
 
   /* deregister all of the module's callbacks */
   neb_deregister_module_callbacks(module);
 
-  log_debug_info(DEBUGL_EVENTBROKER, 0,
-                 "Module '%s' unloaded successfully.\n",
-                 qPrintable(module->get_filename()));
+  logger(dbg_eventbroker, basic)
+    << "Module '" << module->get_filename()
+    << "' unloaded successfully.";
 
-  logit(NSLOG_INFO_MESSAGE, false,
-        "Event broker module '%s' deinitialized successfully.\n",
-        qPrintable(module->get_filename()));
+  logger(log_info_message, basic)
+    << "Event broker module '" << module->get_filename()
+    << "' deinitialized successfully.";
 
   return (OK);
 }
@@ -244,13 +240,12 @@ int neb_set_module_info(void* handle, int type, char const* data) {
       break;
     }
 
-    log_debug_info(DEBUGL_EVENTBROKER, 0,
-                   "set module info success: filename=%s, type='%d'\n",
-                   qPrintable(module->get_filename()),
-                   type);
+    logger(dbg_eventbroker, basic)
+      << "set module info success: filename='"
+      << module->get_filename() << "', type='" << type << "'";
   }
   catch (...) {
-    log_debug_info(DEBUGL_EVENTBROKER, 0, "Counld not set module info.\n");
+    logger(dbg_eventbroker, basic) << "Counld not set module info.";
     return (ERROR);
   }
 
@@ -393,7 +388,8 @@ int neb_make_callbacks(int callback_type, void* data) {
   if (callback_type < 0 || callback_type >= NEBCALLBACK_NUMITEMS)
     return (ERROR);
 
-  log_debug_info(DEBUGL_EVENTBROKER, 1, "Making callbacks (type %d)...\n", callback_type);
+  logger(dbg_eventbroker, more)
+    << "Making callbacks (type " << callback_type << ")...";
 
   /* make the callbacks... */
   for (temp_callback = neb_callback_list[callback_type];
@@ -405,11 +401,10 @@ int neb_make_callbacks(int callback_type, void* data) {
     temp_callback = next_callback;
 
     total_callbacks++;
-    log_debug_info(DEBUGL_EVENTBROKER, 2,
-                   "Callback #%d (type %d) return (code = %d\n",
-                   total_callbacks,
-                   callback_type,
-                   cbresult);
+    logger(dbg_eventbroker, most)
+      << "Callback #" << total_callbacks
+      << " (type " << callback_type
+      << ") return (code = " << cbresult;
 
     /* module wants to cancel callbacks to other modules (and potentially cancel the default handling of an event) */
     if (cbresult == NEBERROR_CALLBACKCANCEL)

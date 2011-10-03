@@ -28,8 +28,10 @@
 #include "statusdata.hh"
 #include "broker.hh"
 #include "notifications.hh"
-#include "logging.hh"
+#include "logging/logger.hh"
 #include "flapping.hh"
+
+using namespace com::centreon::engine::logging;
 
 /******************************************************************/
 /******************** FLAP DETECTION FUNCTIONS ********************/
@@ -53,15 +55,14 @@ void check_for_service_flapping(service* svc,
 
   /* large install tweaks skips all flap detection logic - including state change calculation */
 
-  log_debug_info(DEBUGL_FUNCTIONS, 0, "check_for_service_flapping()\n");
+  logger(dbg_functions, basic) << "check_for_service_flapping()";
 
   if (svc == NULL)
     return;
 
-  log_debug_info(DEBUGL_FLAPPING, 1,
-                 "Checking service '%s' on host '%s' for flapping...\n",
-                 svc->description,
-		 svc->host_name);
+  logger(dbg_flapping, more)
+    << "Checking service '" << svc->description
+    << "' on host '" << svc->host_name << "' for flapping...";
 
   /* if this is a soft service state and not a soft recovery, don't record this in the history */
   /* only hard states and soft recoveries get recorded for flap detection */
@@ -131,13 +132,12 @@ void check_for_service_flapping(service* svc,
 
   svc->percent_state_change = curved_percent_change;
 
-  log_debug_info(DEBUGL_FLAPPING, 2,
-                 "LFT=%.2f, HFT=%.2f, CPC=%.2f, PSC=%.2f%%\n",
-                 low_threshold,
-		 high_threshold,
-		 curved_percent_change,
-                 curved_percent_change);
-
+  logger(dbg_flapping, most)
+    << std::fixed << std::setprecision(2)
+    << "LFT=" << low_threshold
+    << ", HFT=" << high_threshold
+    << ", CPC=" << curved_percent_change
+    << ", PSC=" << curved_percent_change << "%";
 
   /* don't do anything if we don't have flap detection enabled on a program-wide basis */
   if (config.get_enable_flap_detection() == false)
@@ -160,10 +160,10 @@ void check_for_service_flapping(service* svc,
   else if (curved_percent_change >= high_threshold)
     is_flapping = TRUE;
 
-  log_debug_info(DEBUGL_FLAPPING, 1,
-                 "Service %s flapping (%.2f%% state change).\n",
-                 (is_flapping == TRUE) ? "is" : "is not",
-                 curved_percent_change);
+  logger(dbg_flapping, more)
+    << std::fixed << std::setprecision(2)
+    << "Service " << (is_flapping == true ? "is" : "is not")
+    << " flapping (" << curved_percent_change << "% state change).";
 
   /* did the service just start flapping? */
   if (is_flapping == TRUE && svc->is_flapping == FALSE)
@@ -200,14 +200,13 @@ void check_for_host_flapping(host* hst,
   double low_curve_value = 0.75;
   double high_curve_value = 1.25;
 
-  log_debug_info(DEBUGL_FUNCTIONS, 0, "check_for_host_flapping()\n");
+  logger(dbg_functions, basic) << "check_for_host_flapping()";
 
   if (hst == NULL)
     return;
 
-  log_debug_info(DEBUGL_FLAPPING, 1,
-                 "Checking host '%s' for flapping...\n",
-		 hst->name);
+  logger(dbg_flapping, more)
+    << "Checking host '" << hst->name << "' for flapping...";
 
   time(&current_time);
 
@@ -287,13 +286,12 @@ void check_for_host_flapping(host* hst,
 
   hst->percent_state_change = curved_percent_change;
 
-  log_debug_info(DEBUGL_FLAPPING, 2,
-                 "LFT=%.2f, HFT=%.2f, CPC=%.2f, PSC=%.2f%%\n",
-                 low_threshold,
-		 high_threshold,
-		 curved_percent_change,
-                 curved_percent_change);
-
+  logger(dbg_flapping, most)
+    << std::fixed << std::setprecision(2)
+    << "LFT=" << low_threshold
+    << ", HFT=" << high_threshold
+    << ", CPC=" << curved_percent_change
+    << ", PSC=" << curved_percent_change << "%";
 
   /* don't do anything if we don't have flap detection enabled on a program-wide basis */
   if (config.get_enable_flap_detection() == false)
@@ -318,10 +316,9 @@ void check_for_host_flapping(host* hst,
   else if (curved_percent_change >= high_threshold)
     is_flapping = TRUE;
 
-  log_debug_info(DEBUGL_FLAPPING, 1,
-                 "Host %s flapping (%.2f%% state change).\n",
-                 (is_flapping == TRUE) ? "is" : "is not",
-                 curved_percent_change);
+  logger(dbg_flapping, more)
+    << "Host " << (is_flapping == true ? "is" : "is not")
+    << " flapping (" << curved_percent_change << "% state change).";
 
   /* did the host just start flapping? */
   if (is_flapping == TRUE && hst->is_flapping == FALSE)
@@ -351,23 +348,22 @@ void set_service_flap(service* svc,
                       int allow_flapstart_notification) {
   char* temp_buffer = NULL;
 
-  log_debug_info(DEBUGL_FUNCTIONS, 0, "set_service_flap()\n");
+  logger(dbg_functions, basic) << "set_service_flap()";
 
   if (svc == NULL)
     return;
 
-  log_debug_info(DEBUGL_FLAPPING, 1,
-                 "Service '%s' on host '%s' started flapping!\n",
-                 svc->description,
-		 svc->host_name);
+  logger(dbg_flapping, more)
+    << "Service '" << svc->description << "' on host '"
+    << svc->host_name << "' started flapping!";
 
   /* log a notice - this one is parsed by the history CGI */
-  logit(NSLOG_RUNTIME_WARNING, FALSE,
-        "SERVICE FLAPPING ALERT: %s;%s;STARTED; Service appears to have started flapping (%2.1f%% change >= %2.1f%% threshold)\n",
-        svc->host_name,
-	svc->description,
-	percent_change,
-        high_threshold);
+  logger(log_runtime_warning, basic)
+    << std::fixed << std::setprecision(1)
+    << "SERVICE FLAPPING ALERT: " << svc->host_name
+    << ";" << svc->description
+    << ";STARTED; Service appears to have started flapping ("
+    << percent_change << "% change >= " << high_threshold << "% threshold)";
 
   /* add a non-persistent comment to the service */
   std::ostringstream oss;
@@ -428,23 +424,22 @@ void clear_service_flap(service* svc,
                         double high_threshold,
 			double low_threshold) {
 
-  log_debug_info(DEBUGL_FUNCTIONS, 0, "clear_service_flap()\n");
+  logger(dbg_functions, basic) << "clear_service_flap()";
 
   if (svc == NULL)
     return;
 
-  log_debug_info(DEBUGL_FLAPPING, 1,
-                 "Service '%s' on host '%s' stopped flapping.\n",
-                 svc->description,
-		 svc->host_name);
+  logger(dbg_flapping, more)
+    << "Service '" << svc->description << "' on host '"
+    << svc->host_name << "' stopped flapping.";
 
   /* log a notice - this one is parsed by the history CGI */
-  logit(NSLOG_INFO_MESSAGE, FALSE,
-        "SERVICE FLAPPING ALERT: %s;%s;STOPPED; Service appears to have stopped flapping (%2.1f%% change < %2.1f%% threshold)\n",
-        svc->host_name,
-	svc->description,
-	percent_change,
-	low_threshold);
+  logger(log_info_message, basic)
+    << std::fixed << std::setprecision(1)
+    << "SERVICE FLAPPING ALERT: " << svc->host_name
+    << ";" << svc->description
+    << ";STOPPED; Service appears to have stopped flapping ("
+    << percent_change << "% change < " << low_threshold << "% threshold)";
 
   /* delete the comment we added earlier */
   if (svc->flapping_comment_id != 0)
@@ -494,19 +489,19 @@ void set_host_flap(host* hst,
                    int allow_flapstart_notification) {
   char* temp_buffer = NULL;
 
-  log_debug_info(DEBUGL_FUNCTIONS, 0, "set_host_flap()\n");
+  logger(dbg_functions, basic) << "set_host_flap()";
 
   if (hst == NULL)
     return;
 
-  log_debug_info(DEBUGL_FLAPPING, 1, "Host '%s' started flapping!\n", hst->name);
+  logger(dbg_flapping, more) << "Host '" << hst->name << "' started flapping!";
 
   /* log a notice - this one is parsed by the history CGI */
-  logit(NSLOG_RUNTIME_WARNING, FALSE,
-        "HOST FLAPPING ALERT: %s;STARTED; Host appears to have started flapping (%2.1f%% change > %2.1f%% threshold)\n",
-        hst->name,
-	percent_change,
-	high_threshold);
+  logger(log_runtime_warning, basic)
+    << std::fixed << std::setprecision(1)
+    << "HOST FLAPPING ALERT: " << hst->name
+    << ";STARTED; Host appears to have started flapping ("
+    << percent_change << "% change > " << high_threshold << "% threshold)";
 
   /* add a non-persistent comment to the host */
   std::ostringstream oss;
@@ -565,19 +560,19 @@ void clear_host_flap(host* hst,
                      double high_threshold,
 		     double low_threshold) {
 
-  log_debug_info(DEBUGL_FUNCTIONS, 0, "clear_host_flap()\n");
+  logger(dbg_functions, basic) << "clear_host_flap()";
 
   if (hst == NULL)
     return;
 
-  log_debug_info(DEBUGL_FLAPPING, 1, "Host '%s' stopped flapping.\n", hst->name);
+  logger(dbg_flapping, basic) << "Host '" << hst->name << "' stopped flapping.";
 
   /* log a notice - this one is parsed by the history CGI */
-  logit(NSLOG_INFO_MESSAGE, FALSE,
-        "HOST FLAPPING ALERT: %s;STOPPED; Host appears to have stopped flapping (%2.1f%% change < %2.1f%% threshold)\n",
-        hst->name,
-	percent_change,
-	low_threshold);
+  logger(log_info_message, basic)
+    << std::fixed << std::setprecision(1)
+    << "HOST FLAPPING ALERT: " << hst->name
+    << ";STOPPED; Host appears to have stopped flapping (" << percent_change
+    << "% change < " << low_threshold << "% threshold)";
 
   /* delete the comment we added earlier */
   if (hst->flapping_comment_id != 0)
@@ -628,8 +623,7 @@ void enable_flap_detection_routines(void) {
   service* temp_service = NULL;
   unsigned long attr = MODATTR_FLAP_DETECTION_ENABLED;
 
-  log_debug_info(DEBUGL_FUNCTIONS, 0,
-                 "enable_flap_detection_routines()\n");
+  logger(dbg_functions, basic) << "enable_flap_detection_routines()";
 
   /* bail out if we're already set */
   if (config.get_enable_flap_detection() == true)
@@ -668,7 +662,7 @@ void disable_flap_detection_routines(void) {
   service* temp_service = NULL;
   unsigned long attr = MODATTR_FLAP_DETECTION_ENABLED;
 
-  log_debug_info(DEBUGL_FUNCTIONS, 0, "disable_flap_detection_routines()\n");
+  logger(dbg_functions, basic) << "disable_flap_detection_routines()";
 
   /* bail out if we're already set */
   if (config.get_enable_flap_detection() == false)
@@ -705,12 +699,13 @@ void disable_flap_detection_routines(void) {
 void enable_host_flap_detection(host* hst) {
   unsigned long attr = MODATTR_FLAP_DETECTION_ENABLED;
 
-  log_debug_info(DEBUGL_FUNCTIONS, 0, "enable_host_flap_detection()\n");
+  logger(dbg_functions, basic) << "enable_host_flap_detection()";
 
   if (hst == NULL)
     return;
 
-  log_debug_info(DEBUGL_FLAPPING, 1, "Enabling flap detection for host '%s'.\n", hst->name);
+  logger(dbg_flapping, more)
+    << "Enabling flap detection for host '" << hst->name << "'.";
 
   /* nothing to do... */
   if (hst->flap_detection_enabled == TRUE)
@@ -743,12 +738,13 @@ void enable_host_flap_detection(host* hst) {
 void disable_host_flap_detection(host* hst) {
   unsigned long attr = MODATTR_FLAP_DETECTION_ENABLED;
 
-  log_debug_info(DEBUGL_FUNCTIONS, 0, "disable_host_flap_detection()\n");
+  logger(dbg_functions, basic) << "disable_host_flap_detection()";
 
   if (hst == NULL)
     return;
 
-  log_debug_info(DEBUGL_FLAPPING, 1, "Disabling flap detection for host '%s'.\n", hst->name);
+  logger(dbg_functions, more)
+    << "Disabling flap detection for host '" << hst->name << "'.";
 
   /* nothing to do... */
   if (hst->flap_detection_enabled == FALSE)
@@ -776,7 +772,7 @@ void disable_host_flap_detection(host* hst) {
 
 /* handles the details for a host when flap detection is disabled (globally or per-host) */
 void handle_host_flap_detection_disabled(host* hst) {
-  log_debug_info(DEBUGL_FUNCTIONS, 0, "handle_host_flap_detection_disabled()\n");
+  logger(dbg_functions, basic) << "handle_host_flap_detection_disabled()";
 
   if (hst == NULL)
     return;
@@ -791,9 +787,9 @@ void handle_host_flap_detection_disabled(host* hst) {
     hst->flapping_comment_id = 0;
 
     /* log a notice - this one is parsed by the history CGI */
-    logit(NSLOG_INFO_MESSAGE, FALSE,
-          "HOST FLAPPING ALERT: %s;DISABLED; Flap detection has been disabled\n",
-          hst->name);
+  logger(log_info_message, basic)
+    << "HOST FLAPPING ALERT: " << hst->name
+    << ";DISABLED; Flap detection has been disabled";
 
     /* send data to event broker */
     broker_flapping_data(NEBTYPE_FLAPPING_STOP,
@@ -834,15 +830,14 @@ void handle_host_flap_detection_disabled(host* hst) {
 void enable_service_flap_detection(service* svc) {
   unsigned long attr = MODATTR_FLAP_DETECTION_ENABLED;
 
-  log_debug_info(DEBUGL_FUNCTIONS, 0, "enable_service_flap_detection()\n");
+  logger(dbg_functions, basic) << "enable_service_flap_detection()";
 
   if (svc == NULL)
     return;
 
-  log_debug_info(DEBUGL_FLAPPING, 1,
-                 "Enabling flap detection for service '%s' on host '%s'.\n",
-                 svc->description,
-		 svc->host_name);
+  logger(dbg_flapping, more)
+    << "Enabling flap detection for service '" << svc->description
+    << "' on host '" << svc->host_name << "'.";
 
   /* nothing to do... */
   if (svc->flap_detection_enabled == TRUE)
@@ -875,15 +870,14 @@ void enable_service_flap_detection(service* svc) {
 void disable_service_flap_detection(service* svc) {
   unsigned long attr = MODATTR_FLAP_DETECTION_ENABLED;
 
-  log_debug_info(DEBUGL_FUNCTIONS, 0, "disable_service_flap_detection()\n");
+  logger(dbg_functions, basic) << "disable_service_flap_detection()";
 
   if (svc == NULL)
     return;
 
-  log_debug_info(DEBUGL_FLAPPING, 1,
-                 "Disabling flap detection for service '%s' on host '%s'.\n",
-                 svc->description,
-		 svc->host_name);
+  logger(dbg_flapping, more)
+    << "Disabling flap detection for service '" << svc->description
+    << "' on host '" << svc->host_name << "'.";
 
   /* nothing to do... */
   if (svc->flap_detection_enabled == FALSE)
@@ -911,7 +905,7 @@ void disable_service_flap_detection(service* svc) {
 
 /* handles the details for a service when flap detection is disabled (globally or per-service) */
 void handle_service_flap_detection_disabled(service* svc) {
-  log_debug_info(DEBUGL_FUNCTIONS, 0, "handle_service_flap_detection_disabled()\n");
+  logger(dbg_functions, basic) << "handle_service_flap_detection_disabled()";
 
   if (svc == NULL)
     return;
@@ -926,10 +920,9 @@ void handle_service_flap_detection_disabled(service* svc) {
     svc->flapping_comment_id = 0;
 
     /* log a notice - this one is parsed by the history CGI */
-    logit(NSLOG_INFO_MESSAGE, FALSE,
-          "SERVICE FLAPPING ALERT: %s;%s;DISABLED; Flap detection has been disabled\n",
-          svc->host_name,
-	  svc->description);
+  logger(log_info_message, basic)
+    << "SERVICE FLAPPING ALERT: " << svc->host_name
+    << ";" << svc->description << ";DISABLED; Flap detection has been disabled";
 
     /* send data to event broker */
     broker_flapping_data(NEBTYPE_FLAPPING_STOP,

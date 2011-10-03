@@ -21,10 +21,12 @@
 /*********** COMMON HEADER FILES ***********/
 
 #include "broker.hh"
-#include "logging.hh"
 #include "globals.hh"
 #include "xrddefault.hh"      /* default routines */
+#include "logging/logger.hh"
 #include "sretention.hh"
+
+using namespace com::centreon::engine::logging;
 
 /******************************************************************/
 /************* TOP-LEVEL STATE INFORMATION FUNCTIONS **************/
@@ -65,7 +67,8 @@ int save_state_information(int autosave) {
     return (ERROR);
 
   if (autosave == TRUE)
-    logit(NSLOG_PROCESS_INFO, FALSE, "Auto-save of retention data completed successfully.\n");
+    logger(log_process_info, basic)
+      << "Auto-save of retention data completed successfully.";
 
   return (OK);
 }

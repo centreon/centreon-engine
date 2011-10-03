@@ -19,6 +19,8 @@
 
 #include <algorithm>
 #include <string.h>
+#include "statusdata.hh"
+#include "globals.hh"
 #include "error.hh"
 #include "logging/file.hh"
 
@@ -115,6 +117,10 @@ file& file::operator=(file const& right) {
  *  Archive all files.
  */
 void file::rotate_all() {
+  // update the last log rotation time and status log.
+  last_log_rotation = time(NULL);
+  update_program_status(FALSE);
+
   _rwlock.lockForRead();
   for (QList<file*>::iterator it = _files.begin(), end = _files.end();
        it != end;

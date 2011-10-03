@@ -35,12 +35,13 @@
 #include "notifications.hh"
 #include "utils.hh"
 #include "flapping.hh"
-#include "logging.hh"
 #include "commands.hh"
 #include "processing.hh"
+#include "logging/logger.hh"
 #include "checks/checker.hh"
 
 using namespace com::centreon::engine;
+using namespace com::centreon::engine::logging;
 
 /******************************************************************/
 /****************** EXTERNAL COMMAND PROCESSING *******************/
@@ -51,7 +52,7 @@ int check_for_external_commands(void) {
   char* buffer = NULL;
   int update_status = FALSE;
 
-  log_debug_info(DEBUGL_FUNCTIONS, 0, "check_for_external_commands()\n");
+  logger(dbg_functions, basic) << "check_for_external_commands()";
 
   /* bail out if we shouldn't be checking for external commands */
   if (config.get_check_external_commands() == false)
@@ -113,21 +114,21 @@ int process_external_commands_from_file(char* fname, int delete_file) {
   mmapfile* thefile = NULL;
   char* input = NULL;
 
-  log_debug_info(DEBUGL_FUNCTIONS, 0, "process_external_commands_from_file()\n");
+  logger(dbg_functions, basic) << "process_external_commands_from_file()";
 
   if (fname == NULL)
     return (ERROR);
 
-  log_debug_info(DEBUGL_EXTERNALCOMMANDS, 1,
-                 "Processing commands from file '%s'.  File will %s deleted after processing.\n",
-                 fname,
-                 (delete_file == TRUE) ? "be" : "NOT be");
+  logger(dbg_external_command, more)
+    << "Processing commands from file '" << fname
+    << "'.  File will " << (delete_file == TRUE ? "be" : "NOT be")
+    << " deleted after processing.";
 
   /* open the config file for reading */
   if ((thefile = mmap_fopen(fname)) == NULL) {
-    logit(NSLOG_INFO_MESSAGE, FALSE,
-          "Error: Cannot open file '%s' to process external commands!",
-          fname);
+    logger(log_info_message, basic)
+      << "Error: Cannot open file '" << fname
+      << "' to process external commands!";
     return (ERROR);
   }
 
@@ -542,19 +543,19 @@ int process_passive_service_check(time_t check_time,
 
   /* we couldn't find the host */
   if (real_host_name == NULL) {
-    logit(NSLOG_RUNTIME_WARNING, TRUE,
-          "Warning:  Passive check result was received for service '%s' on host '%s', but the host could not be found!\n",
-          svc_description,
-          host_name);
+    logger(log_runtime_warning, basic)
+      << "Warning:  Passive check result was received for service '"
+      << svc_description << "' on host '" << host_name
+      << "', but the host could not be found!";
     return (ERROR);
   }
 
   /* make sure the service exists */
   if ((temp_service = find_service(real_host_name, svc_description)) == NULL) {
-    logit(NSLOG_RUNTIME_WARNING, TRUE,
-          "Warning:  Passive check result was received for service '%s' on host '%s', but the service could not be found!\n",
-          svc_description,
-          host_name);
+    logger(log_runtime_warning, basic)
+      << "Warning:  Passive check result was received for service '"
+      << svc_description << "' on host '" << host_name
+      << "', but the service could not be found!";
     return (ERROR);
   }
 
@@ -675,9 +676,9 @@ int process_passive_host_check(time_t check_time,
 
   /* we couldn't find the host */
   if (temp_host == NULL) {
-    logit(NSLOG_RUNTIME_WARNING, TRUE,
-          "Warning:  Passive check result was received for host '%s', but the host could not be found!\n",
-          host_name);
+    logger(log_runtime_warning, basic)
+      << "Warning:  Passive check result was received for host '"
+      << host_name << "', but the host could not be found!";
     return (ERROR);
   }
 
