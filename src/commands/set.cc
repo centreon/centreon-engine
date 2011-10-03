@@ -25,22 +25,25 @@ using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;
 using namespace com::centreon::engine::commands;
 
+set* set::_instance = NULL;
+
 /**
  *  Get instance of the commands set singleton.
  *
  *  @return This singleton.
  */
 set& set::instance() {
-  static set instance;
-  return (instance);
+  if (_instance == NULL)
+    _instance = new set();
+  return (*_instance);
 }
 
 /**
  *  Cleanup the set singleton.
  */
 void set::cleanup() {
-  set& instance = set::instance();
-  instance._list.clear();
+  delete _instance;
+  _instance = NULL;
 }
 
 /**

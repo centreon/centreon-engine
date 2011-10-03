@@ -21,6 +21,8 @@
 
 using namespace com::centreon::engine::logging;
 
+engine* engine::_instance = NULL;
+
 /**************************************
  *                                     *
  *           Public Methods            *
@@ -31,7 +33,7 @@ using namespace com::centreon::engine::logging;
  *  Default constructor.
  */
 engine::engine()
-  : _id(0) {
+  : _type(0), _id(0), _verbosity(0) {
 
 }
 
@@ -48,19 +50,17 @@ engine::~engine() throw() {
  *  @return 
  */
 engine& engine::instance() {
-  static engine instance;
-  return (instance);
+  if (_instance == NULL)
+    _instance = new engine();
+  return (*_instance);
 }
 
 /**
  *  Cleanup the engine singleton.
  */
 void engine::cleanup() {
-  engine& instance = engine::instance();
-  instance._rwlock.lockForWrite();
-  instance._objects.clear();
-  instance._id = 0;
-  instance._rwlock.unlock();
+  delete _instance;
+  _instance = NULL;
 }
 
 /**

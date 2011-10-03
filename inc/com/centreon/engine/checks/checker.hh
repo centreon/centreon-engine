@@ -89,6 +89,7 @@ namespace                                    com {
 	  QHash<unsigned long, check_result> _list_id;
 	  QMutex                             _mut_reap;
 	  QMutex                             _mut_id;
+          static checker*                    _instance;
 	};
       }
     }

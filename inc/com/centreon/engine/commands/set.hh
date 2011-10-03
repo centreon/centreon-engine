@@ -63,6 +63,7 @@ namespace                         com {
 	  set&                    operator=(set const& right);
 
 	  QHash<QString, QSharedPointer<command> > _list;
+          static set*             _instance;
 	};
       }
     }

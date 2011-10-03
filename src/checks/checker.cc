@@ -35,28 +35,25 @@
 using namespace com::centreon::engine::logging;
 using namespace com::centreon::engine::checks;
 
+checker* checker::_instance = NULL;
+
 /**
  *  Get instance of the checker singleton.
  *
  *  @return This singleton.
  */
 checker& checker::instance() {
-  static checker instance;
-  return (instance);
+  if (_instance == NULL)
+    _instance = new checker();
+  return (*_instance);
 }
 
 /**
  *  Cleanup the checker singleton.
  */
 void checker::cleanup() {
-  checker& instance = checker::instance();
-  instance._mut_reap.lock();
-  instance._to_reap.clear();
-  instance._mut_reap.unlock();
-
-  instance._mut_id.lock();
-  instance._list_id.clear();
-  instance._mut_id.unlock();
+  delete _instance;
+  _instance = NULL;
 }
 
 /**

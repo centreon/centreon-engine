@@ -29,6 +29,8 @@ using namespace com::centreon::engine;
 using namespace com::centreon::engine::broker;
 using namespace com::centreon::engine::logging;
 
+loader* loader::_instance = NULL;
+
 /**************************************
  *                                     *
  *           Public Methods            *
@@ -39,18 +41,17 @@ using namespace com::centreon::engine::logging;
  *  Get instance of loader singleton.
  */
 loader& loader::instance() {
-  static loader instance;
-  return (instance);
+  if (_instance == NULL)
+    _instance = new loader();
+  return (*_instance);
 }
 
 /**
  *  Cleanup the loader singleton.
  */
 void loader::cleanup() {
-  loader& instance = loader::instance();
-
-  instance._directory = "";
-  instance._modules.clear();
+  delete _instance;
+  _instance = NULL;
 }
 
 /**

@@ -68,6 +68,7 @@ namespace                        com {
 
           QString                _directory;
           QMultiHash<QString, QSharedPointer<handle> > _modules;
+          static loader*         _instance;
         };
       }
     }

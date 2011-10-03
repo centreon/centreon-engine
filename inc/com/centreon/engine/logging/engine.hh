@@ -54,7 +54,7 @@ namespace                    com {
 	  };
 
 	  static engine&     instance();
-	  static void        cleanup();
+          static void        cleanup();
 
 	  void               log(char const* message,
 				 unsigned long long type,
@@ -75,7 +75,10 @@ namespace                    com {
 
 	  QHash<unsigned long, obj_info> _objects;
 	  QReadWriteLock     _rwlock;
+          static engine*     _instance;
+          unsigned long long _type;
 	  unsigned long      _id;
+          unsigned int       _verbosity;
 	};
       }
     }
