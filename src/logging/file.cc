@@ -117,11 +117,12 @@ file& file::operator=(file const& right) {
  *  Archive all files.
  */
 void file::rotate_all() {
+  _rwlock.lockForRead();
+
   // update the last log rotation time and status log.
   last_log_rotation = time(NULL);
   update_program_status(FALSE);
 
-  _rwlock.lockForRead();
   for (QList<file*>::iterator it = _files.begin(), end = _files.end();
        it != end;
        ++it) {

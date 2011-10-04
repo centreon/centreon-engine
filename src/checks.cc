@@ -20,7 +20,6 @@
 
 #include <exception>
 #include <sstream>
-#include <iomanip>
 #include <stdlib.h>
 #include <stdio.h>
 #include <sys/types.h>
@@ -2245,10 +2244,10 @@ int handle_async_host_check_result_3x(host* temp_host, check_result* queued_chec
     << "\tExited OK?:         "
     << (queued_check_result->exited_ok == true ? "Yes" : "No");
   logger(dbg_checks, most)
-    << std::fixed << std::setprecision(3)
+    << fixed << setprecision(3)
     << "\tExec Time:          " << temp_host->execution_time;
   logger(dbg_checks, most)
-    << std::fixed << std::setprecision(3)
+    << fixed << setprecision(3)
     << "\tLatency:            " << temp_host->latency;
   logger(dbg_checks, most)
     << "\treturn (Status:     " <<  queued_check_result->return_code;

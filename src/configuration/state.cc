@@ -22,12 +22,13 @@
 #include <string>
 #include <limits.h>
 #include "broker.hh"
-#include "configuration/state.hh"
 #include "engine.hh"
 #include "error.hh"
 #include "globals.hh"
 #include "logging/logger.hh"
 #include "macros.hh"
+#include "macros/misc.hh"
+#include "configuration/state.hh"
 
 using namespace com::centreon::engine::configuration;
 using namespace com::centreon::engine::logging;

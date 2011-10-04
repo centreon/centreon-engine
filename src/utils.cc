@@ -120,7 +120,7 @@ int my_system_r(nagios_macros const* mac,
   int result = cmd_result.get_exit_code();
 
   logger(dbg_commands, more)
-    << std::fixed << std::setprecision(3)
+    << fixed << setprecision(3)
     << "Execution time=" << *exectime
     << " sec, early timeout=" << *early_timeout
     << ", result=" << result << ", output="

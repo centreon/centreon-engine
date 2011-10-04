@@ -634,15 +634,6 @@ add_library("cce_core"
   "${SRC_DIR}/comments.cc"
   "${SRC_DIR}/downtime.cc"
   "${SRC_DIR}/macros.cc"
-  "${SRC_DIR}/macros/clear_host.cc"
-  "${SRC_DIR}/macros/clear_hostgroup.cc"
-  "${SRC_DIR}/macros/clear_service.cc"
-  "${SRC_DIR}/macros/clear_servicegroup.cc"
-  "${SRC_DIR}/macros/grab_host.cc"
-  "${SRC_DIR}/macros/grab_service.cc"
-  "${SRC_DIR}/macros/grab_value.cc"
-  "${SRC_DIR}/macros/misc.cc"
-  "${SRC_DIR}/macros/process.cc"
   "${SRC_DIR}/objects.cc"
   "${SRC_DIR}/shared.cc"
   "${SRC_DIR}/skiplist.cc"
@@ -667,17 +658,6 @@ add_library("cce_core"
   "${INCLUDE_DIR}/com/centreon/engine/globals.hh"
   "${INCLUDE_DIR}/com/centreon/engine/logging.hh"
   "${INCLUDE_DIR}/com/centreon/engine/macros.hh"
-  "${INCLUDE_DIR}/com/centreon/engine/macros/defines.hh"
-  "${INCLUDE_DIR}/com/centreon/engine/macros/clear_host.hh"
-  "${INCLUDE_DIR}/com/centreon/engine/macros/clear_hostgroup.hh"
-  "${INCLUDE_DIR}/com/centreon/engine/macros/clear_service.hh"
-  "${INCLUDE_DIR}/com/centreon/engine/macros/clear_servicegroup.hh"
-  "${INCLUDE_DIR}/com/centreon/engine/macros/grab.hh"
-  "${INCLUDE_DIR}/com/centreon/engine/macros/grab_host.hh"
-  "${INCLUDE_DIR}/com/centreon/engine/macros/grab_service.hh"
-  "${INCLUDE_DIR}/com/centreon/engine/macros/grab_value.hh"
-  "${INCLUDE_DIR}/com/centreon/engine/macros/misc.hh"
-  "${INCLUDE_DIR}/com/centreon/engine/macros/process.hh"
   "${INCLUDE_DIR}/com/centreon/engine/nebcallbacks.hh"
   "${INCLUDE_DIR}/com/centreon/engine/neberrors.hh"
   "${INCLUDE_DIR}/com/centreon/engine/nebmods.hh"
@@ -709,6 +689,7 @@ add_subdirectory("commands")
 add_subdirectory("compatibility")
 add_subdirectory("doc")
 add_subdirectory("logging")
+add_subdirectory("macros")
 add_subdirectory("modules")
 add_subdirectory("scripts")
 
@@ -720,9 +701,10 @@ target_link_libraries("cce_core"
   ${QT_LIBRARIES}
   "cce_logging"
   "cce_broker"
-  "cce_checks"
   "cce_configuration"
+  "cce_checks"
   "cce_commands"
+  "cce_macros"
   "cce_compatibility")
 
 # centengine target.
@@ -876,28 +858,6 @@ if (WITH_TESTING)
   set(TEST_NAME "error_assignment")
   add_executable("${TEST_NAME}"
     "${TEST_DIR}/error/assignment.cc")
-  target_link_libraries("${TEST_NAME}" "cce_core")
-  add_test("${TEST_NAME}" "${TEST_NAME}")
-endif ()
-
-#
-# Macros tests.
-#
-if (WITH_TESTING)
-  # Grab standard host macro.
-  set(TEST_NAME "macros_grab_standard_host_macro")
-  add_executable("${TEST_NAME}"
-    "${TEST_DIR}/macros/grab_standard_host_macro.cc"
-    "${TEST_DIR}/macros/minimal_setup.cc"
-    "${TEST_DIR}/macros/minimal_setup.hh")
-  target_link_libraries("${TEST_NAME}" "cce_core")
-  add_test("${TEST_NAME}" "${TEST_NAME}")
-  # Grab standard service macro.
-  set(TEST_NAME "macros_grab_standard_service_macro")
-  add_executable("${TEST_NAME}"
-    "${TEST_DIR}/macros/grab_standard_service_macro.cc"
-    "${TEST_DIR}/macros/minimal_setup.cc"
-    "${TEST_DIR}/macros/minimal_setup.hh")
   target_link_libraries("${TEST_NAME}" "cce_core")
   add_test("${TEST_NAME}" "${TEST_NAME}")
 endif ()

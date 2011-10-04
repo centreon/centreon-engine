@@ -33,8 +33,8 @@ engine* engine::_instance = NULL;
  *  Default constructor.
  */
 engine::engine()
-  : _type(0), _id(0), _verbosity(0) {
-
+  : _id(0) {
+  memset(_type, 0, sizeof(_type));
 }
 
 /**
@@ -47,7 +47,7 @@ engine::~engine() throw() {
 /**
  *  Get instance of engine singleton.
  *
- *  @return 
+ *  @return An instance on the engine.
  */
 engine& engine::instance() {
   if (_instance == NULL)
@@ -63,6 +63,14 @@ void engine::cleanup() {
   _instance = NULL;
 }
 
+bool engine::is_logged(unsigned long long type,
+                       unsigned int verbosity) const throw() {
+  if (verbosity > most)
+    return (false);
+  return ((_type[verbosity] & type));
+}
+
+
 /**
  *  Write message into all objects logging.
  *
@@ -75,7 +83,8 @@ void engine::log(char const* message,
 		 unsigned int verbosity) throw() {
   if (message != NULL) {
     _rwlock.lockForRead();
-    for (QHash<unsigned long, obj_info>::iterator it = _objects.begin(), end = _objects.end();
+    for (QHash<unsigned long, obj_info>::iterator it = _objects.begin(),
+           end = _objects.end();
 	 it != end;
 	 ++it) {
       obj_info& info = it.value();
@@ -96,6 +105,8 @@ unsigned long engine::add_object(obj_info const& info) {
   _rwlock.lockForWrite();
   unsigned int id = ++_id;
   _objects.insert(id, info);
+  for (unsigned int i = 0, end = info.verbosity; i <= end; ++i)
+    _type[i] |= info.type;
   _rwlock.unlock();
   return (id);
 }
@@ -107,12 +118,23 @@ unsigned long engine::add_object(obj_info const& info) {
  */
 void engine::remove_object(unsigned long id) throw() {
   _rwlock.lockForWrite();
-  QHash<unsigned long, obj_info>::iterator it = _objects.find(id);
-  if (it != _objects.end()) {
-    if (it.key() + 1 == id) {
-      --_id;
+  memset(_type, 0, sizeof(_type));
+  QHash<unsigned long, obj_info>::iterator it_erase = _objects.end();
+  for (QHash<unsigned long, obj_info>::iterator it = _objects.begin(),
+         end = _objects.end();
+       it != end;
+       ++it) {
+    if (it.key() != id) {
+      for (unsigned int i = 0, end = it.value().verbosity; i <= end; ++i)
+        _type[i] |= it.value().type;
     }
-    _objects.erase(it);
+    else
+      it_erase = it;
+  }
+  if (it_erase != _objects.end()) {
+    if (it_erase.key() + 1 == id)
+      --_id;
+    _objects.erase(it_erase);
   }
   _rwlock.unlock();
 }
@@ -128,11 +150,24 @@ void engine::update_object(unsigned long id,
 			   unsigned long long type,
 			   unsigned int verbosity) throw() {
   _rwlock.lockForWrite();
-  QHash<unsigned long, obj_info>::iterator it = _objects.find(id);
-  if (it != _objects.end()) {
-    obj_info& info = it.value();
+  memset(_type, 0, sizeof(_type));
+  QHash<unsigned long, obj_info>::iterator it_erase = _objects.end();
+  for (QHash<unsigned long, obj_info>::iterator it = _objects.begin(),
+         end = _objects.end();
+       it != end;
+       ++it) {
+    if (it.key() != id) {
+      for (unsigned int i = 0, end = it.value().verbosity; i <= end; ++i)
+        _type[i] |= it.value().type;
+    }
+    else
+      it_erase = it;
+  }
+  if (it_erase != _objects.end()) {
+    obj_info& info = it_erase.value();
     info.type = type;
     info.verbosity = verbosity;
+    _type[verbosity] |= type;
   }
   _rwlock.unlock();
 }

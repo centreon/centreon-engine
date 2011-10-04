@@ -39,7 +39,7 @@ add_library("cce_logging"
   "${INC_DIR}/engine.hh")
 
 # Link target with necessary libraries.
-target_link_libraries("cce_logging" ${QT_LIBRARIES})
+target_link_libraries("cce_logging" ${QT_LIBRARIES} "cce_core")
 
 if (WITH_TESTING)
   # Set directories.

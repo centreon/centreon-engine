@@ -424,11 +424,11 @@ void init_timing_loop(void) {
       << "Total scheduled service checks:  "
       << scheduling_info.total_scheduled_services;
     logger(dbg_events, more)
-      << std::fixed << std::setprecision(2)
+      << fixed << setprecision(2)
       << "Average service check interval:  "
       << scheduling_info.average_service_check_interval << " sec";
     logger(dbg_events, more)
-      << std::fixed << std::setprecision(2)
+      << fixed << setprecision(2)
       << "Service inter-check delay:       "
       << scheduling_info.service_inter_check_delay << " sec";
   }
@@ -481,7 +481,7 @@ void init_timing_loop(void) {
     << "Total service interleave blocks: "
     << total_interleave_blocks;
   logger(dbg_events, more)
-    << std::fixed << std::setprecision(1)
+    << fixed << setprecision(1)
     << "Service inter-check delay: "
     << scheduling_info.service_inter_check_delay;
 
@@ -676,11 +676,11 @@ void init_timing_loop(void) {
       << "Host check interval total:    "
       << scheduling_info.host_check_interval_total;
     logger(dbg_events, most)
-      << std::fixed << std::setprecision(2)
+      << fixed << setprecision(2)
       << "Average host check interval:  "
       << scheduling_info.average_host_check_interval << " sec";
     logger(dbg_events, most)
-      << std::fixed << std::setprecision(2)
+      << fixed << setprecision(2)
       << "Host inter-check delay:       "
       << scheduling_info.host_inter_check_delay << " sec";
   }

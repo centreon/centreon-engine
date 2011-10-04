@@ -56,6 +56,9 @@ namespace                    com {
 	  static engine&     instance();
           static void        cleanup();
 
+          bool               is_logged(unsigned long long type,
+                                       unsigned int verbosity) const throw();
+
 	  void               log(char const* message,
 				 unsigned long long type,
 				 unsigned int verbosity) throw();
@@ -76,9 +79,8 @@ namespace                    com {
 	  QHash<unsigned long, obj_info> _objects;
 	  QReadWriteLock     _rwlock;
           static engine*     _instance;
-          unsigned long long _type;
+          unsigned long long _type[3];
 	  unsigned long      _id;
-          unsigned int       _verbosity;
 	};
       }
     }

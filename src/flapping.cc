@@ -133,7 +133,7 @@ void check_for_service_flapping(service* svc,
   svc->percent_state_change = curved_percent_change;
 
   logger(dbg_flapping, most)
-    << std::fixed << std::setprecision(2)
+    << fixed << setprecision(2)
     << "LFT=" << low_threshold
     << ", HFT=" << high_threshold
     << ", CPC=" << curved_percent_change
@@ -161,7 +161,7 @@ void check_for_service_flapping(service* svc,
     is_flapping = TRUE;
 
   logger(dbg_flapping, more)
-    << std::fixed << std::setprecision(2)
+    << fixed << setprecision(2)
     << "Service " << (is_flapping == true ? "is" : "is not")
     << " flapping (" << curved_percent_change << "% state change).";
 
@@ -287,7 +287,7 @@ void check_for_host_flapping(host* hst,
   hst->percent_state_change = curved_percent_change;
 
   logger(dbg_flapping, most)
-    << std::fixed << std::setprecision(2)
+    << fixed << setprecision(2)
     << "LFT=" << low_threshold
     << ", HFT=" << high_threshold
     << ", CPC=" << curved_percent_change
@@ -359,7 +359,7 @@ void set_service_flap(service* svc,
 
   /* log a notice - this one is parsed by the history CGI */
   logger(log_runtime_warning, basic)
-    << std::fixed << std::setprecision(1)
+    << fixed << setprecision(1)
     << "SERVICE FLAPPING ALERT: " << svc->host_name
     << ";" << svc->description
     << ";STARTED; Service appears to have started flapping ("
@@ -435,7 +435,7 @@ void clear_service_flap(service* svc,
 
   /* log a notice - this one is parsed by the history CGI */
   logger(log_info_message, basic)
-    << std::fixed << std::setprecision(1)
+    << fixed << setprecision(1)
     << "SERVICE FLAPPING ALERT: " << svc->host_name
     << ";" << svc->description
     << ";STOPPED; Service appears to have stopped flapping ("
@@ -498,7 +498,7 @@ void set_host_flap(host* hst,
 
   /* log a notice - this one is parsed by the history CGI */
   logger(log_runtime_warning, basic)
-    << std::fixed << std::setprecision(1)
+    << fixed << setprecision(1)
     << "HOST FLAPPING ALERT: " << hst->name
     << ";STARTED; Host appears to have started flapping ("
     << percent_change << "% change > " << high_threshold << "% threshold)";
@@ -569,7 +569,7 @@ void clear_host_flap(host* hst,
 
   /* log a notice - this one is parsed by the history CGI */
   logger(log_info_message, basic)
-    << std::fixed << std::setprecision(1)
+    << fixed << setprecision(1)
     << "HOST FLAPPING ALERT: " << hst->name
     << ";STOPPED; Host appears to have stopped flapping (" << percent_change
     << "% change < " << low_threshold << "% threshold)";

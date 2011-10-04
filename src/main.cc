@@ -382,6 +382,14 @@ int main(int argc, char** argv) {
         result = ERROR;
       }
 
+      logger(log_info_message, basic) << "log_info_message, basic";
+      logger(log_info_message, more) << "log_info_message, more";
+      logger(log_info_message, most) << "log_info_message, most";
+      logger(dbg_functions, basic) << "dbg_functions, basic";
+      logger(dbg_functions, more) << "dbg_functions, more";
+      logger(dbg_functions, most) << "dbg_functions, most";
+      exit(1);
+
       // This must be logged after we read config data, as user may have changed location of main log file.
       logger(log_process_info, basic) << "Centreon Engine "
         << ENGINE_VERSION << " starting ... (PID=" << getpid() << ")";
