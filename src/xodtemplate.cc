@@ -670,10 +670,14 @@ int xodtemplate_process_config_file(char* filename, int options) {
       }
 
       /* check validity of object type */
-      if (strcmp(input, "timeperiod") && strcmp(input, "command")
-          && strcmp(input, "contact") && strcmp(input, "contactgroup")
-          && strcmp(input, "host") && strcmp(input, "hostgroup")
-          && strcmp(input, "servicegroup") && strcmp(input, "service")
+      if (strcmp(input, "timeperiod")
+          && strcmp(input, "command")
+          && strcmp(input, "contact")
+          && strcmp(input, "contactgroup")
+          && strcmp(input, "host")
+          && strcmp(input, "hostgroup")
+          && strcmp(input, "servicegroup")
+          && strcmp(input, "service")
           && strcmp(input, "servicedependency")
           && strcmp(input, "serviceescalation")
           && strcmp(input, "hostgroupescalation")
@@ -798,30 +802,30 @@ int xodtemplate_process_config_file(char* filename, int options) {
     new_##type = new xodtemplate_##type;				\
     memset(new_##type, 0, sizeof(*new_##type));				\
     									\
-    new_##type->register_object=TRUE;					\
-    new_##type->_config_file=config_file;				\
-    new_##type->_start_line=start_line;					\
+    new_##type->register_object = true;					\
+    new_##type->_config_file = config_file;				\
+    new_##type->_start_line = start_line;                               \
 									\
     /* precached object files are already sorted, so add to tail */	\
-    if(presorted_objects==TRUE){					\
+    if (presorted_objects == true) {					\
 									\
-      if(xodtemplate_##type##_list==NULL){				\
-	xodtemplate_##type##_list=new_##type;				\
-	xodtemplate_##type##_list_tail=xodtemplate_##type##_list;	\
+      if (xodtemplate_##type##_list == NULL) {				\
+	xodtemplate_##type##_list = new_##type;				\
+	xodtemplate_##type##_list_tail = xodtemplate_##type##_list;	\
       } else {								\
-	xodtemplate_##type##_list_tail->next=new_##type;		\
-	xodtemplate_##type##_list_tail=new_##type;			\
+	xodtemplate_##type##_list_tail->next = new_##type;		\
+	xodtemplate_##type##_list_tail = new_##type;			\
       }									\
       									\
       /* update current object pointer */				\
-      xodtemplate_current_object=xodtemplate_##type##_list_tail;	\
+      xodtemplate_current_object = xodtemplate_##type##_list_tail;	\
     } else {								\
       /* add new object to head of list in memory */			\
-      new_##type->next=xodtemplate_##type##_list;			\
-      xodtemplate_##type##_list=new_##type;				\
+      new_##type->next = xodtemplate_##type##_list;			\
+      xodtemplate_##type##_list = new_##type;				\
       									\
       /* update current object pointer */				\
-      xodtemplate_current_object=xodtemplate_##type##_list;		\
+      xodtemplate_current_object = xodtemplate_##type##_list;		\
     }									\
   } while (0)
 
@@ -830,6 +834,8 @@ int xodtemplate_begin_object_definition(char* input,
 					int options,
                                         int config_file,
                                         int start_line) {
+  (void)options;
+
   int result = OK;
   xodtemplate_timeperiod* new_timeperiod = NULL;
   xodtemplate_command* new_command = NULL;
@@ -847,188 +853,8 @@ int xodtemplate_begin_object_definition(char* input,
   xodtemplate_hostextinfo* new_hostextinfo = NULL;
   xodtemplate_serviceextinfo* new_serviceextinfo = NULL;
 
-  if (!strcmp(input, "service"))
+  if (!strcmp(input, "service")) {
     xodtemplate_current_object_type = XODTEMPLATE_SERVICE;
-  else if (!strcmp(input, "host"))
-    xodtemplate_current_object_type = XODTEMPLATE_HOST;
-  else if (!strcmp(input, "command"))
-    xodtemplate_current_object_type = XODTEMPLATE_COMMAND;
-  else if (!strcmp(input, "contact"))
-    xodtemplate_current_object_type = XODTEMPLATE_CONTACT;
-  else if (!strcmp(input, "contactgroup"))
-    xodtemplate_current_object_type = XODTEMPLATE_CONTACTGROUP;
-  else if (!strcmp(input, "hostgroup"))
-    xodtemplate_current_object_type = XODTEMPLATE_HOSTGROUP;
-  else if (!strcmp(input, "servicegroup"))
-    xodtemplate_current_object_type = XODTEMPLATE_SERVICEGROUP;
-  else if (!strcmp(input, "timeperiod"))
-    xodtemplate_current_object_type = XODTEMPLATE_TIMEPERIOD;
-  else if (!strcmp(input, "servicedependency"))
-    xodtemplate_current_object_type = XODTEMPLATE_SERVICEDEPENDENCY;
-  else if (!strcmp(input, "serviceescalation"))
-    xodtemplate_current_object_type = XODTEMPLATE_SERVICEESCALATION;
-  else if (!strcmp(input, "hostdependency"))
-    xodtemplate_current_object_type = XODTEMPLATE_HOSTDEPENDENCY;
-  else if (!strcmp(input, "hostescalation"))
-    xodtemplate_current_object_type = XODTEMPLATE_HOSTESCALATION;
-  else if (!strcmp(input, "hostextinfo"))
-    xodtemplate_current_object_type = XODTEMPLATE_HOSTEXTINFO;
-  else if (!strcmp(input, "connector"))
-    xodtemplate_current_object_type = XODTEMPLATE_CONNECTOR;
-  else
-    return (ERROR);
-
-  /* check to see if we should process this type of object */
-  switch (xodtemplate_current_object_type) {
-  case XODTEMPLATE_TIMEPERIOD:
-    if (!(options & READ_TIMEPERIODS))
-      return (OK);
-    break;
-
-  case XODTEMPLATE_COMMAND:
-    if (!(options & READ_COMMANDS))
-      return (OK);
-    break;
-
-  case XODTEMPLATE_CONNECTOR:
-    if (!(options & READ_CONNECTOR))
-      return (OK);
-    break;
-
-  case XODTEMPLATE_CONTACT:
-    if (!(options & READ_CONTACTS))
-      return (OK);
-    break;
-
-  case XODTEMPLATE_CONTACTGROUP:
-    if (!(options & READ_CONTACTGROUPS))
-      return (OK);
-    break;
-
-  case XODTEMPLATE_HOST:
-    if (!(options & READ_HOSTS))
-      return (OK);
-    break;
-
-  case XODTEMPLATE_HOSTGROUP:
-    if (!(options & READ_HOSTGROUPS))
-      return (OK);
-    break;
-
-  case XODTEMPLATE_SERVICEGROUP:
-    if (!(options & READ_SERVICEGROUPS))
-      return (OK);
-    break;
-
-  case XODTEMPLATE_SERVICE:
-    if (!(options & READ_SERVICES))
-      return (OK);
-    break;
-
-  case XODTEMPLATE_SERVICEDEPENDENCY:
-    if (!(options & READ_SERVICEDEPENDENCIES))
-      return (OK);
-    break;
-
-  case XODTEMPLATE_SERVICEESCALATION:
-    if (!(options & READ_SERVICEESCALATIONS))
-      return (OK);
-    break;
-
-  case XODTEMPLATE_HOSTDEPENDENCY:
-    if (!(options & READ_HOSTDEPENDENCIES))
-      return (OK);
-    break;
-
-  case XODTEMPLATE_HOSTESCALATION:
-    if (!(options & READ_HOSTESCALATIONS))
-      return (OK);
-    break;
-
-  case XODTEMPLATE_HOSTEXTINFO:
-    if (!(options & READ_HOSTEXTINFO))
-      return (OK);
-    break;
-
-  case XODTEMPLATE_SERVICEEXTINFO:
-    if (!(options & READ_SERVICEEXTINFO))
-      return (OK);
-    break;
-
-  default:
-    return (ERROR);
-  }
-
-  /* add a new (blank) object */
-  switch (xodtemplate_current_object_type) {
-  case XODTEMPLATE_TIMEPERIOD:
-    xod_begin_def(timeperiod);
-    break;
-
-  case XODTEMPLATE_COMMAND:
-    xod_begin_def(command);
-    break;
-
-  case XODTEMPLATE_CONNECTOR:
-    xod_begin_def(connector);
-    break;
-
-  case XODTEMPLATE_CONTACTGROUP:
-    xod_begin_def(contactgroup);
-    break;
-
-  case XODTEMPLATE_HOSTGROUP:
-    xod_begin_def(hostgroup);
-    break;
-
-  case XODTEMPLATE_SERVICEGROUP:
-    xod_begin_def(servicegroup);
-    break;
-
-  case XODTEMPLATE_SERVICEDEPENDENCY:
-    xod_begin_def(servicedependency);
-    break;
-
-  case XODTEMPLATE_SERVICEESCALATION:
-    xod_begin_def(serviceescalation);
-    new_serviceescalation->first_notification = -2;
-    new_serviceescalation->last_notification = -2;
-    break;
-
-  case XODTEMPLATE_CONTACT:
-    xod_begin_def(contact);
-
-    new_contact->host_notifications_enabled = TRUE;
-    new_contact->service_notifications_enabled = TRUE;
-    new_contact->can_submit_commands = TRUE;
-    new_contact->retain_status_information = TRUE;
-    new_contact->retain_nonstatus_information = TRUE;
-    break;
-
-  case XODTEMPLATE_HOST:
-    xod_begin_def(host);
-    new_host->check_interval = 5.0;
-    new_host->retry_interval = 1.0;
-    new_host->active_checks_enabled = TRUE;
-    new_host->passive_checks_enabled = TRUE;
-    new_host->obsess_over_host = TRUE;
-    new_host->max_check_attempts = -2;
-    new_host->event_handler_enabled = TRUE;
-    new_host->flap_detection_enabled = TRUE;
-    new_host->flap_detection_on_up = TRUE;
-    new_host->flap_detection_on_down = TRUE;
-    new_host->flap_detection_on_unreachable = TRUE;
-    new_host->notifications_enabled = TRUE;
-    new_host->notification_interval = 30.0;
-    new_host->process_perf_data = TRUE;
-    new_host->failure_prediction_enabled = TRUE;
-    new_host->x_2d = -1;
-    new_host->y_2d = -1;
-    new_host->retain_status_information = TRUE;
-    new_host->retain_nonstatus_information = TRUE;
-    break;
-
-  case XODTEMPLATE_SERVICE:
     xod_begin_def(service);
 
     new_service->initial_state = STATE_OK;
@@ -1054,32 +880,99 @@ int xodtemplate_begin_object_definition(char* input,
 
     /* true service, so is not from host group, must be set AFTER have_initial_state */
     xodtemplate_unset_service_is_from_hostgroup(new_service);
-    break;
+  }
+  else if (!strcmp(input, "host")) {
+    xodtemplate_current_object_type = XODTEMPLATE_HOST;
+    xod_begin_def(host);
 
-  case XODTEMPLATE_HOSTDEPENDENCY:
+    new_host->check_interval = 5.0;
+    new_host->retry_interval = 1.0;
+    new_host->active_checks_enabled = TRUE;
+    new_host->passive_checks_enabled = TRUE;
+    new_host->obsess_over_host = TRUE;
+    new_host->max_check_attempts = -2;
+    new_host->event_handler_enabled = TRUE;
+    new_host->flap_detection_enabled = TRUE;
+    new_host->flap_detection_on_up = TRUE;
+    new_host->flap_detection_on_down = TRUE;
+    new_host->flap_detection_on_unreachable = TRUE;
+    new_host->notifications_enabled = TRUE;
+    new_host->notification_interval = 30.0;
+    new_host->process_perf_data = TRUE;
+    new_host->failure_prediction_enabled = TRUE;
+    new_host->x_2d = -1;
+    new_host->y_2d = -1;
+    new_host->retain_status_information = TRUE;
+    new_host->retain_nonstatus_information = TRUE;
+  }
+  else if (!strcmp(input, "command")) {
+    xodtemplate_current_object_type = XODTEMPLATE_COMMAND;
+    xod_begin_def(command);
+  }
+  else if (!strcmp(input, "contact")) {
+    xodtemplate_current_object_type = XODTEMPLATE_CONTACT;
+    xod_begin_def(contact);
+
+    new_contact->host_notifications_enabled = TRUE;
+    new_contact->service_notifications_enabled = TRUE;
+    new_contact->can_submit_commands = TRUE;
+    new_contact->retain_status_information = TRUE;
+    new_contact->retain_nonstatus_information = TRUE;
+  }
+  else if (!strcmp(input, "timeperiod")) {
+    xodtemplate_current_object_type = XODTEMPLATE_TIMEPERIOD;
+    xod_begin_def(timeperiod);
+  }
+  else if (!strcmp(input, "contactgroup")) {
+    xodtemplate_current_object_type = XODTEMPLATE_CONTACTGROUP;
+    xod_begin_def(contactgroup);
+  }
+  else if (!strcmp(input, "hostgroup")) {
+    xodtemplate_current_object_type = XODTEMPLATE_HOSTGROUP;
+    xod_begin_def(hostgroup);
+  }
+  else if (!strcmp(input, "servicegroup")) {
+    xodtemplate_current_object_type = XODTEMPLATE_SERVICEGROUP;
+    xod_begin_def(servicegroup);
+  }
+  else if (!strcmp(input, "servicedependency")) {
+    xodtemplate_current_object_type = XODTEMPLATE_SERVICEDEPENDENCY;
+    xod_begin_def(servicedependency);
+  }
+  else if (!strcmp(input, "serviceescalation")) {
+    xodtemplate_current_object_type = XODTEMPLATE_SERVICEESCALATION;
+    xod_begin_def(serviceescalation);
+
+    new_serviceescalation->first_notification = -2;
+    new_serviceescalation->last_notification = -2;
+  }
+  else if (!strcmp(input, "hostdependency")) {
+    xodtemplate_current_object_type = XODTEMPLATE_HOSTDEPENDENCY;
     xod_begin_def(hostdependency);
-    break;
-
-  case XODTEMPLATE_HOSTESCALATION:
+  }
+  else if (!strcmp(input, "hostescalation")) {
+    xodtemplate_current_object_type = XODTEMPLATE_HOSTESCALATION;
     xod_begin_def(hostescalation);
+
     new_hostescalation->first_notification = -2;
     new_hostescalation->last_notification = -2;
-    break;
-
-  case XODTEMPLATE_HOSTEXTINFO:
+  }
+  else if (!strcmp(input, "serviceextinfo")) {
+    xod_begin_def(serviceextinfo);
+  }
+  else if (!strcmp(input, "hostextinfo")) {
+    xodtemplate_current_object_type = XODTEMPLATE_HOSTEXTINFO;
     xod_begin_def(hostextinfo);
 
     new_hostextinfo->x_2d = -1;
     new_hostextinfo->y_2d = -1;
-    break;
-
-  case XODTEMPLATE_SERVICEEXTINFO:
-    xod_begin_def(serviceextinfo);
-    break;
-
-  default:
-    return (ERROR);
   }
+  else if (!strcmp(input, "connector")) {
+    xodtemplate_current_object_type = XODTEMPLATE_CONNECTOR;
+    xod_begin_def(connector);
+  }
+  else
+    return (ERROR);
 
   return (result);
 }
@@ -1088,6 +981,8 @@ int xodtemplate_begin_object_definition(char* input,
 
 /* adds a property to an object definition */
 int xodtemplate_add_object_property(char* input, int options) {
+  (void)options;
+
   int result = OK;
   char* variable = NULL;
   char* value = NULL;
@@ -1117,87 +1012,6 @@ int xodtemplate_add_object_property(char* input, int options) {
   if (use_precached_objects == TRUE)
     force_skiplists = TRUE;
 
-  /* check to see if we should process this type of object */
-  switch (xodtemplate_current_object_type) {
-  case XODTEMPLATE_TIMEPERIOD:
-    if (!(options & READ_TIMEPERIODS))
-      return (OK);
-    break;
-
-  case XODTEMPLATE_COMMAND:
-    if (!(options & READ_COMMANDS))
-      return (OK);
-    break;
-
-  case XODTEMPLATE_CONNECTOR:
-    if (!(options & READ_CONNECTOR))
-      return (OK);
-    break;
-
-  case XODTEMPLATE_CONTACT:
-    if (!(options & READ_CONTACTS))
-      return (OK);
-    break;
-
-  case XODTEMPLATE_CONTACTGROUP:
-    if (!(options & READ_CONTACTGROUPS))
-      return (OK);
-    break;
-
-  case XODTEMPLATE_HOST:
-    if (!(options & READ_HOSTS))
-      return (OK);
-    break;
-
-  case XODTEMPLATE_HOSTGROUP:
-    if (!(options & READ_HOSTGROUPS))
-      return (OK);
-    break;
-
-  case XODTEMPLATE_SERVICEGROUP:
-    if (!(options & READ_SERVICEGROUPS))
-      return (OK);
-    break;
-
-  case XODTEMPLATE_SERVICE:
-    if (!(options & READ_SERVICES))
-      return (OK);
-    break;
-
-  case XODTEMPLATE_SERVICEDEPENDENCY:
-    if (!(options & READ_SERVICEDEPENDENCIES))
-      return (OK);
-    break;
-
-  case XODTEMPLATE_SERVICEESCALATION:
-    if (!(options & READ_SERVICEESCALATIONS))
-      return (OK);
-    break;
-
-  case XODTEMPLATE_HOSTDEPENDENCY:
-    if (!(options & READ_HOSTDEPENDENCIES))
-      return (OK);
-    break;
-
-  case XODTEMPLATE_HOSTESCALATION:
-    if (!(options & READ_HOSTESCALATIONS))
-      return (OK);
-    break;
-
-  case XODTEMPLATE_HOSTEXTINFO:
-    if (!(options & READ_HOSTEXTINFO))
-      return (OK);
-    break;
-
-  case XODTEMPLATE_SERVICEEXTINFO:
-    if (!(options & READ_SERVICEEXTINFO))
-      return (OK);
-    break;
-
-  default:
-    return (ERROR);
-  }
-
   /* get variable name */
   variable = my_strdup(input);
 
@@ -1217,28 +1031,27 @@ int xodtemplate_add_object_property(char* input, int options) {
   strip(value);
 
   switch (xodtemplate_current_object_type) {
-  case XODTEMPLATE_TIMEPERIOD:
-    temp_timeperiod = (xodtemplate_timeperiod*)xodtemplate_current_object;
+  case XODTEMPLATE_SERVICE:
+    temp_service = (xodtemplate_service*)xodtemplate_current_object;
 
     if (!strcmp(variable, "use"))
-      temp_timeperiod->tmpl = my_strdup(value);
+      temp_service->tmpl = my_strdup(value);
     else if (!strcmp(variable, "name")) {
-      temp_timeperiod->name = my_strdup(value);
+      temp_service->name = my_strdup(value);
 
-      /* add timeperiod to template skiplist for fast searches */
-      result = skiplist_insert(xobject_template_skiplists[X_TIMEPERIOD_SKIPLIST],
-			       (void*)temp_timeperiod);
+      /* add service to template skiplist for fast searches */
+      result = skiplist_insert(xobject_template_skiplists[X_SERVICE_SKIPLIST], (void*)temp_service);
       switch (result) {
-      case SKIPLIST_ERROR_DUPLICATE:
-        logger(log_config_warning, basic)
-          << "Warning: Duplicate definition found for timeperiod '" << value
-          << "' (config file '" << xodtemplate_config_file_name(temp_timeperiod->_config_file)
-          << "', starting on line " << temp_timeperiod->_start_line << ")";
-        result = ERROR;
-        break;
-
       case SKIPLIST_OK:
         result = OK;
+        break;
+
+      case SKIPLIST_ERROR_DUPLICATE:
+        logger(log_config_warning, basic)
+          << "Warning: Duplicate definition found for service '" << value
+          << "' (config file '" << xodtemplate_config_file_name(temp_service->_config_file)
+          << "', starting on line " << temp_service->_start_line << ")";
+        result = ERROR;
         break;
 
       default:
@@ -1246,1032 +1059,378 @@ int xodtemplate_add_object_property(char* input, int options) {
         break;
       }
     }
-    else if (!strcmp(variable, "timeperiod_name")) {
-      temp_timeperiod->timeperiod_name = my_strdup(value);
+    else if (!strcmp(variable, "host") || !strcmp(variable, "hosts")
+             || !strcmp(variable, "host_name")) {
+      if (strcmp(value, XODTEMPLATE_NULL))
+        temp_service->host_name = my_strdup(value);
+      temp_service->have_host_name = TRUE;
 
-      result = skiplist_insert(xobject_skiplists[X_TIMEPERIOD_SKIPLIST], (void*)temp_timeperiod);
-      switch (result) {
-      case SKIPLIST_ERROR_DUPLICATE:
-        logger(log_config_warning, basic)
-          << "Warning: Duplicate definition found for timeperiod '" << value
-          << "' (config file '" << xodtemplate_config_file_name(temp_timeperiod->_config_file)
-          << "', starting on line " << temp_timeperiod->_start_line << ")";
-        result = ERROR;
-        break;
+      /* NOTE: services are added to the skiplist in xodtemplate_duplicate_services(), except if daemon is using precached config */
+      if (result == OK && force_skiplists == TRUE
+          && temp_service->host_name != NULL
+          && temp_service->service_description != NULL) {
+        /* add service to template skiplist for fast searches */
+        result = skiplist_insert(xobject_skiplists[X_SERVICE_SKIPLIST], (void*)temp_service);
+        switch (result) {
+	case SKIPLIST_OK:
+          result = OK;
+          break;
 
-      case SKIPLIST_OK:
-        result = OK;
-        break;
-
-      default:
-        result = ERROR;
-        break;
-      }
-    }
-    else if (!strcmp(variable, "alias"))
-      temp_timeperiod->alias = my_strdup(value);
-    else if (!strcmp(variable, "exclude"))
-      temp_timeperiod->exclusions = my_strdup(value);
-    else if (!strcmp(variable, "register"))
-      temp_timeperiod->register_object = (atoi(value) > 0) ? TRUE : FALSE;
-    else if (xodtemplate_parse_timeperiod_directive(temp_timeperiod, variable, value) == OK)
-      result = OK;
-    else {
-      logger(log_config_error, basic)
-        << "Error: Invalid timeperiod object directive '" << variable << "'.";
-      return (ERROR);
-    }
-    break;
-
-  case XODTEMPLATE_COMMAND:
-    temp_command = (xodtemplate_command*)xodtemplate_current_object;
-
-    if (!strcmp(variable, "use"))
-      temp_command->tmpl = my_strdup(value);
-    else if (!strcmp(variable, "name")) {
-      temp_command->name = my_strdup(value);
-
-      /* add command to template skiplist for fast searches */
-      result = skiplist_insert(xobject_template_skiplists[X_COMMAND_SKIPLIST], (void*)temp_command);
-      switch (result) {
-      case SKIPLIST_ERROR_DUPLICATE:
-        logger(log_config_warning, basic)
-          << "Warning: Duplicate definition found for command '" << value
-          << "' (config file '" << xodtemplate_config_file_name(temp_command->_config_file)
-          << "', starting on line " << temp_command->_start_line << ")";
-        result = ERROR;
-        break;
-
-      case SKIPLIST_OK:
-        result = OK;
-        break;
-
-      default:
-        result = ERROR;
-        break;
-      }
-    }
-    else if (!strcmp(variable, "command_name")) {
-      temp_command->command_name = my_strdup(value);
-
-      /* add command to template skiplist for fast searches */
-      result = skiplist_insert(xobject_skiplists[X_COMMAND_SKIPLIST], (void*)temp_command);
-      switch (result) {
-      case SKIPLIST_ERROR_DUPLICATE:
-        logger(log_config_warning, basic)
-          << "Warning: Duplicate definition found for command '" << value
-          << "' (config file '" << xodtemplate_config_file_name(temp_command->_config_file)
-          << "', starting on line " << temp_command->_start_line << ")";
-        result = ERROR;
-        break;
-
-      case SKIPLIST_OK:
-        result = OK;
-        break;
-
-      default:
-        result = ERROR;
-        break;
-      }
-    }
-    else if (!strcmp(variable, "command_line"))
-      temp_command->command_line = my_strdup(value);
-    else if (!strcmp(variable, "register"))
-      temp_command->register_object = (atoi(value) > 0) ? TRUE : FALSE;
-    else if (!strcmp(variable, "connector"))
-      temp_command->connector_name = my_strdup(value);
-    else {
-      logger(log_config_error, basic)
-        << "Error: Invalid command object directive '" << variable << "'.";
-      return (ERROR);
-    }
-    break;
-
-  case XODTEMPLATE_CONNECTOR:
-    temp_connector = (xodtemplate_connector*)xodtemplate_current_object;
-
-    if (!strcmp(variable, "connector_line"))
-      temp_connector->connector_line = my_strdup(value);
-    else if (!strcmp(variable, "connector_name")) {
-      temp_connector->connector_name = my_strdup(value);
-
-      /* add command to template skiplist for fast searches */
-      result = skiplist_insert(xobject_skiplists[X_CONNECTOR_SKIPLIST], (void*)temp_connector);
-      switch (result) {
-      case SKIPLIST_ERROR_DUPLICATE:
-        logger(log_config_warning, basic)
-          << "Warning: Duplicate definition found for connector '" << value
-          << "' (config file '" << xodtemplate_config_file_name(temp_connector->_config_file)
-          << "', starting on line " << temp_connector->_start_line << ")";
-        result = ERROR;
-        break;
-
-      case SKIPLIST_OK:
-        result = OK;
-        break;
-
-      default:
-        result = ERROR;
-        break;
-      }
-    }
-    else {
-      logger(log_config_error, basic)
-        << "Error: Invalid command object directive '" << variable << "'.";
-      return (ERROR);
-    }
-    break;
-
-  case XODTEMPLATE_CONTACTGROUP:
-    temp_contactgroup = (xodtemplate_contactgroup*)xodtemplate_current_object;
-    if (!strcmp(variable, "use"))
-      temp_contactgroup->tmpl = my_strdup(value);
-    else if (!strcmp(variable, "name")) {
-      temp_contactgroup->name = my_strdup(value);
-
-      /* add contactgroup to template skiplist for fast searches */
-      result = skiplist_insert(xobject_template_skiplists[X_CONTACTGROUP_SKIPLIST],
-			       (void*)temp_contactgroup);
-      switch (result) {
-      case SKIPLIST_ERROR_DUPLICATE:
-        logger(log_config_warning, basic)
-          << "Warning: Duplicate definition found for contactgroup '" << value
-          << "' (config file '" << xodtemplate_config_file_name(temp_contactgroup->_config_file)
-          << "', starting on line " << temp_contactgroup->_start_line << ")";
-        result = ERROR;
-        break;
-
-      case SKIPLIST_OK:
-        result = OK;
-        break;
-
-      default:
-        result = ERROR;
-        break;
-      }
-    }
-    else if (!strcmp(variable, "contactgroup_name")) {
-      temp_contactgroup->contactgroup_name = my_strdup(value);
-
-      /* add contactgroup to template skiplist for fast searches */
-      result = skiplist_insert(xobject_skiplists[X_CONTACTGROUP_SKIPLIST], (void*)temp_contactgroup);
-      switch (result) {
-      case SKIPLIST_ERROR_DUPLICATE:
-        logger(log_config_warning, basic)
-          << "Warning: Duplicate definition found for contactgroup '" << value
-          << "' (config file '" << xodtemplate_config_file_name(temp_contactgroup->_config_file)
-          << "', starting on line " << temp_contactgroup->_start_line << ")";
-        result = ERROR;
-        break;
-
-      case SKIPLIST_OK:
-        result = OK;
-        break;
-
-      default:
-        result = ERROR;
-        break;
-      }
-    }
-    else if (!strcmp(variable, "alias"))
-      temp_contactgroup->alias = my_strdup(value);
-    else if (!strcmp(variable, "members")) {
-      if (strcmp(value, XODTEMPLATE_NULL)) {
-        if (temp_contactgroup->members == NULL)
-          temp_contactgroup->members = my_strdup(value);
-        else {
-          temp_contactgroup->members = resize_string(temp_contactgroup->members,
-						     strlen(temp_contactgroup->members) + strlen(value) + 2);
-          strcat(temp_contactgroup->members, ",");
-          strcat(temp_contactgroup->members, value);
-        }
-        if (temp_contactgroup->members == NULL)
+        case SKIPLIST_ERROR_DUPLICATE:
+          logger(log_config_warning, basic)
+            << "Warning: Duplicate definition found for service '" << value
+            << "' (config file '" << xodtemplate_config_file_name(temp_service->_config_file)
+            << "', starting on line " << temp_service->_start_line << ")";
           result = ERROR;
-      }
-      temp_contactgroup->have_members = TRUE;
-    }
-    else if (!strcmp(variable, "contactgroup_members")) {
-      if (strcmp(value, XODTEMPLATE_NULL)) {
-        if (temp_contactgroup->contactgroup_members == NULL)
-          temp_contactgroup->contactgroup_members = my_strdup(value);
-        else {
-          temp_contactgroup->contactgroup_members = resize_string(temp_contactgroup->contactgroup_members,
-								  strlen(temp_contactgroup->contactgroup_members) + strlen(value) + 2);
-          strcat(temp_contactgroup->contactgroup_members, ",");
-          strcat(temp_contactgroup->contactgroup_members, value);
-        }
-        if (temp_contactgroup->contactgroup_members == NULL)
+          break;
+
+        default:
           result = ERROR;
-      }
-      temp_contactgroup->have_contactgroup_members = TRUE;
-    }
-    else if (!strcmp(variable, "register"))
-      temp_contactgroup->register_object = (atoi(value) > 0) ? TRUE : FALSE;
-    else {
-      logger(log_config_error, basic)
-        << "Error: Invalid contactgroup object directive '" << variable << "'.";
-      return (ERROR);
-    }
-
-    break;
-
-  case XODTEMPLATE_HOSTGROUP:
-    temp_hostgroup = (xodtemplate_hostgroup*)xodtemplate_current_object;
-
-    if (!strcmp(variable, "use"))
-      temp_hostgroup->tmpl = my_strdup(value);
-    else if (!strcmp(variable, "name")) {
-      temp_hostgroup->name = my_strdup(value);
-
-      /* add hostgroup to template skiplist for fast searches */
-      result = skiplist_insert(xobject_template_skiplists[X_HOSTGROUP_SKIPLIST],
-			       (void*)temp_hostgroup);
-      switch (result) {
-      case SKIPLIST_ERROR_DUPLICATE:
-        logger(log_config_warning, basic)
-          << "Warning: Duplicate definition found for hostgroup '" << value
-          << "' (config file '" << xodtemplate_config_file_name(temp_hostgroup->_config_file)
-          << "', starting on line " << temp_hostgroup->_start_line << ")";
-        result = ERROR;
-        break;
-
-      case SKIPLIST_OK:
-        result = OK;
-        break;
-
-      default:
-        result = ERROR;
-        break;
-      }
-    }
-    else if (!strcmp(variable, "hostgroup_name")) {
-      temp_hostgroup->hostgroup_name = my_strdup(value);
-
-      /* add hostgroup to template skiplist for fast searches */
-      result = skiplist_insert(xobject_skiplists[X_HOSTGROUP_SKIPLIST], (void*)temp_hostgroup);
-      switch (result) {
-      case SKIPLIST_ERROR_DUPLICATE:
-        logger(log_config_warning, basic)
-          << "Warning: Duplicate definition found for hostgroup '" << value
-          << "' (config file '" << xodtemplate_config_file_name(temp_hostgroup->_config_file)
-          << "', starting on line " << temp_hostgroup->_start_line << ")";
-        result = ERROR;
-        break;
-
-      case SKIPLIST_OK:
-        result = OK;
-        break;
-
-      default:
-        result = ERROR;
-        break;
-      }
-    }
-    else if (!strcmp(variable, "alias"))
-      temp_hostgroup->alias = my_strdup(value);
-    else if (!strcmp(variable, "members")) {
-      if (strcmp(value, XODTEMPLATE_NULL)) {
-        if (temp_hostgroup->members == NULL)
-          temp_hostgroup->members = my_strdup(value);
-        else {
-          temp_hostgroup->members = resize_string(temp_hostgroup->members,
-						  strlen(temp_hostgroup->members) + strlen(value) + 2);
-          strcat(temp_hostgroup->members, ",");
-          strcat(temp_hostgroup->members, value);
+          break;
         }
-        if (temp_hostgroup->members == NULL)
-          result = ERROR;
       }
-      temp_hostgroup->have_members = TRUE;
     }
-    else if (!strcmp(variable, "hostgroup_members")) {
-      if (strcmp(value, XODTEMPLATE_NULL)) {
-        if (temp_hostgroup->hostgroup_members == NULL)
-          temp_hostgroup->hostgroup_members = my_strdup(value);
-        else {
-          temp_hostgroup->hostgroup_members = resize_string(temp_hostgroup->hostgroup_members,
-							    strlen(temp_hostgroup->hostgroup_members) + strlen(value) + 2);
-          strcat(temp_hostgroup->hostgroup_members, ",");
-          strcat(temp_hostgroup->hostgroup_members, value);
+    else if (!strcmp(variable, "service_description")
+             || !strcmp(variable, "description")) {
+      if (strcmp(value, XODTEMPLATE_NULL))
+        temp_service->service_description = my_strdup(value);
+      temp_service->have_service_description = TRUE;
+
+      /* NOTE: services are added to the skiplist in xodtemplate_duplicate_services(), except if daemon is using precached config */
+      if (result == OK && force_skiplists == TRUE
+          && temp_service->host_name != NULL
+          && temp_service->service_description != NULL) {
+        /* add service to template skiplist for fast searches */
+        result = skiplist_insert(xobject_skiplists[X_SERVICE_SKIPLIST], (void*)temp_service);
+        switch (result) {
+        case SKIPLIST_OK:
+          result = OK;
+          break;
+
+        case SKIPLIST_ERROR_DUPLICATE:
+          logger(log_config_warning, basic)
+            << "Warning: Duplicate definition found for service '" << value
+            << "' (config file '" << xodtemplate_config_file_name(temp_service->_config_file)
+            << "', starting on line " << temp_service->_start_line << ")";
+          result = ERROR;
+          break;
+
+        default:
+          result = ERROR;
+          break;
         }
-        if (temp_hostgroup->hostgroup_members == NULL)
-          result = ERROR;
-      }
-      temp_hostgroup->have_hostgroup_members = TRUE;
-    }
-    else if (!strcmp(variable, "notes")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_hostgroup->notes = my_strdup(value);
-      temp_hostgroup->have_notes = TRUE;
-    }
-    else if (!strcmp(variable, "notes_url")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_hostgroup->notes_url = my_strdup(value);
-      temp_hostgroup->have_notes_url = TRUE;
-    }
-    else if (!strcmp(variable, "action_url")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_hostgroup->action_url = my_strdup(value);
-      temp_hostgroup->have_action_url = TRUE;
-    }
-    else if (!strcmp(variable, "register"))
-      temp_hostgroup->register_object = (atoi(value) > 0) ? TRUE : FALSE;
-    else {
-      logger(log_config_error, basic)
-        << "Error: Invalid hostgroup object directive '" << variable << "'.";
-      return (ERROR);
-    }
-
-    break;
-
-  case XODTEMPLATE_SERVICEGROUP:
-    temp_servicegroup = (xodtemplate_servicegroup*)xodtemplate_current_object;
-
-    if (!strcmp(variable, "use"))
-      temp_servicegroup->tmpl = my_strdup(value);
-    else if (!strcmp(variable, "name")) {
-      temp_servicegroup->name = my_strdup(value);
-
-      /* add servicegroup to template skiplist for fast searches */
-      result = skiplist_insert(xobject_template_skiplists[X_SERVICEGROUP_SKIPLIST],
-			       (void*)temp_servicegroup);
-      switch (result) {
-      case SKIPLIST_ERROR_DUPLICATE:
-        logger(log_config_warning, basic)
-          << "Warning: Duplicate definition found for servicegroup '" << value
-          << "' (config file '" << xodtemplate_config_file_name(temp_servicegroup->_config_file)
-          << "', starting on line " << temp_servicegroup->_start_line << ")";
-        result = ERROR;
-        break;
-
-      case SKIPLIST_OK:
-        result = OK;
-        break;
-
-      default:
-        result = ERROR;
-        break;
       }
     }
-    else if (!strcmp(variable, "servicegroup_name")) {
-      temp_servicegroup->servicegroup_name = my_strdup(value);
-
-      /* add servicegroup to template skiplist for fast searches */
-      result = skiplist_insert(xobject_skiplists[X_SERVICEGROUP_SKIPLIST], (void*)temp_servicegroup);
-      switch (result) {
-      case SKIPLIST_ERROR_DUPLICATE:
-        logger(log_config_warning, basic)
-          << "Warning: Duplicate definition found for servicegroup '" << value
-          << "' (config file '" << xodtemplate_config_file_name(temp_servicegroup->_config_file)
-          << "', starting on line " << temp_servicegroup->_start_line << ")";
-        result = ERROR;
-        break;
-
-      case SKIPLIST_OK:
-        result = OK;
-        break;
-
-      default:
-        result = ERROR;
-        break;
-      }
-    }
-    else if (!strcmp(variable, "alias"))
-      temp_servicegroup->alias = my_strdup(value);
-    else if (!strcmp(variable, "members")) {
-      if (strcmp(value, XODTEMPLATE_NULL)) {
-        if (temp_servicegroup->members == NULL)
-          temp_servicegroup->members = my_strdup(value);
-        else {
-          temp_servicegroup->members = resize_string(temp_servicegroup->members,
-						     strlen(temp_servicegroup->members) + strlen(value) + 2);
-          strcat(temp_servicegroup->members, ",");
-          strcat(temp_servicegroup->members, value);
-        }
-        if (temp_servicegroup->members == NULL)
-          result = ERROR;
-      }
-      temp_servicegroup->have_members = TRUE;
-    }
-    else if (!strcmp(variable, "servicegroup_members")) {
-      if (strcmp(value, XODTEMPLATE_NULL)) {
-        if (temp_servicegroup->servicegroup_members == NULL)
-          temp_servicegroup->servicegroup_members = my_strdup(value);
-        else {
-          temp_servicegroup->servicegroup_members =
-	    resize_string(temp_servicegroup->servicegroup_members,
-                          strlen(temp_servicegroup-> servicegroup_members) + strlen(value) + 2);
-          strcat(temp_servicegroup->servicegroup_members, ",");
-          strcat(temp_servicegroup->servicegroup_members, value);
-        }
-        if (temp_servicegroup->servicegroup_members == NULL)
-          result = ERROR;
-      }
-      temp_servicegroup->have_servicegroup_members = TRUE;
-    }
-    else if (!strcmp(variable, "notes")) {
+    else if (!strcmp(variable, "display_name")) {
       if (strcmp(value, XODTEMPLATE_NULL))
-        temp_servicegroup->notes = my_strdup(value);
-      temp_servicegroup->have_notes = TRUE;
-    }
-    else if (!strcmp(variable, "notes_url")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_servicegroup->notes_url = my_strdup(value);
-      temp_servicegroup->have_notes_url = TRUE;
-    }
-    else if (!strcmp(variable, "action_url")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_servicegroup->action_url = my_strdup(value);
-      temp_servicegroup->have_action_url = TRUE;
-    }
-    else if (!strcmp(variable, "register"))
-      temp_servicegroup->register_object = (atoi(value) > 0) ? TRUE : FALSE;
-    else {
-      logger(log_config_error, basic)
-        << "Error: Invalid servicegroup object directive '" << variable << "'.";
-      return (ERROR);
-    }
-
-    break;
-
-  case XODTEMPLATE_SERVICEDEPENDENCY:
-    temp_servicedependency = (xodtemplate_servicedependency*)xodtemplate_current_object;
-
-    if (!strcmp(variable, "use"))
-      temp_servicedependency->tmpl = my_strdup(value);
-    else if (!strcmp(variable, "name")) {
-      temp_servicedependency->name = my_strdup(value);
-
-      /* add dependency to template skiplist for fast searches */
-      result = skiplist_insert(xobject_template_skiplists[X_SERVICEDEPENDENCY_SKIPLIST],
-			       (void*)temp_servicedependency);
-      switch (result) {
-      case SKIPLIST_ERROR_DUPLICATE:
-        logger(log_config_warning, basic)
-          << "Warning: Duplicate definition found for service dependency '" << variable
-          << "' (config file '" << xodtemplate_config_file_name(temp_servicedependency->_config_file)
-          << "', starting on line " << temp_servicedependency->_start_line << ")";
-        result = ERROR;
-        break;
-
-      case SKIPLIST_OK:
-        result = OK;
-        break;
-
-      default:
-        result = ERROR;
-        break;
-      }
-    }
-    else if (!strcmp(variable, "servicegroup")
-             || !strcmp(variable, "servicegroups")
-             || !strcmp(variable, "servicegroup_name")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_servicedependency->servicegroup_name = my_strdup(value);
-      temp_servicedependency->have_servicegroup_name = TRUE;
+        temp_service->display_name = my_strdup(value);
+      temp_service->have_display_name = TRUE;
     }
     else if (!strcmp(variable, "hostgroup")
              || !strcmp(variable, "hostgroups")
              || !strcmp(variable, "hostgroup_name")) {
       if (strcmp(value, XODTEMPLATE_NULL))
-        temp_servicedependency->hostgroup_name = my_strdup(value);
-      temp_servicedependency->have_hostgroup_name = TRUE;
+        temp_service->hostgroup_name = my_strdup(value);
+      temp_service->have_hostgroup_name = TRUE;
     }
-    else if (!strcmp(variable, "host") || !strcmp(variable, "host_name")
-             || !strcmp(variable, "master_host")
-             || !strcmp(variable, "master_host_name")) {
+    else if (!strcmp(variable, "service_groups")
+             || !strcmp(variable, "servicegroups")) {
       if (strcmp(value, XODTEMPLATE_NULL))
-        temp_servicedependency->host_name = my_strdup(value);
-      temp_servicedependency->have_host_name = TRUE;
+        temp_service->service_groups = my_strdup(value);
+      temp_service->have_service_groups = TRUE;
     }
-    else if (!strcmp(variable, "description")
-             || !strcmp(variable, "service_description")
-             || !strcmp(variable, "master_description")
-             || !strcmp(variable, "master_service_description")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_servicedependency->service_description = my_strdup(value);
-      temp_servicedependency->have_service_description = TRUE;
-    }
-    else if (!strcmp(variable, "dependent_servicegroup")
-             || !strcmp(variable, "dependent_servicegroups")
-             || !strcmp(variable, "dependent_servicegroup_name")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_servicedependency->dependent_servicegroup_name = my_strdup(value);
-      temp_servicedependency->have_dependent_servicegroup_name = TRUE;
-    }
-    else if (!strcmp(variable, "dependent_hostgroup")
-             || !strcmp(variable, "dependent_hostgroups")
-             || !strcmp(variable, "dependent_hostgroup_name")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_servicedependency->dependent_hostgroup_name = my_strdup(value);
-      temp_servicedependency->have_dependent_hostgroup_name = TRUE;
-    }
-    else if (!strcmp(variable, "dependent_host")
-             || !strcmp(variable, "dependent_host_name")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_servicedependency->dependent_host_name = my_strdup(value);
-      temp_servicedependency->have_dependent_host_name = TRUE;
-
-      /* NOTE: dependencies are added to the skiplist in xodtemplate_duplicate_objects(), except if daemon is using precached config */
-      if (result == OK && force_skiplists == TRUE
-          && temp_servicedependency->dependent_host_name != NULL
-          && temp_servicedependency->dependent_service_description != NULL) {
-        /* add servicedependency to template skiplist for fast searches */
-        result = skiplist_insert(xobject_skiplists[X_SERVICEDEPENDENCY_SKIPLIST],
-				 (void*)temp_servicedependency);
-        switch (result) {
-        case SKIPLIST_OK:
-          result = OK;
-          break;
-
-        default:
-          result = ERROR;
-          break;
+    else if (!strcmp(variable, "check_command")) {
+      if (strcmp(value, XODTEMPLATE_NULL)) {
+        if (value[0] == '!') {
+          temp_service->have_important_check_command = TRUE;
+          temp_ptr = value + 1;
         }
+        else
+          temp_ptr = value;
+        temp_service->check_command = my_strdup(temp_ptr);
       }
+      temp_service->have_check_command = TRUE;
     }
-    else if (!strcmp(variable, "dependent_description")
-             || !strcmp(variable, "dependent_service_description")) {
+    else if (!strcmp(variable, "check_period")) {
       if (strcmp(value, XODTEMPLATE_NULL))
-        temp_servicedependency->dependent_service_description = my_strdup(value);
-      temp_servicedependency->have_dependent_service_description = TRUE;
-
-      /* NOTE: dependencies are added to the skiplist in xodtemplate_duplicate_objects(), except if daemon is using precached config */
-      if (result == OK && force_skiplists == TRUE
-          && temp_servicedependency->dependent_host_name != NULL
-          && temp_servicedependency->dependent_service_description != NULL) {
-        /* add servicedependency to template skiplist for fast searches */
-        result = skiplist_insert(xobject_skiplists[X_SERVICEDEPENDENCY_SKIPLIST],
-				 (void*)temp_servicedependency);
-        switch (result) {
-        case SKIPLIST_OK:
-          result = OK;
-          break;
-
-        default:
-          result = ERROR;
-          break;
-        }
-      }
+        temp_service->check_period = my_strdup(value);
+      temp_service->have_check_period = TRUE;
     }
-    else if (!strcmp(variable, "dependency_period")) {
+    else if (!strcmp(variable, "event_handler")) {
       if (strcmp(value, XODTEMPLATE_NULL))
-        temp_servicedependency->dependency_period = my_strdup(value);
-      temp_servicedependency->have_dependency_period = TRUE;
+        temp_service->event_handler = my_strdup(value);
+      temp_service->have_event_handler = TRUE;
     }
-    else if (!strcmp(variable, "inherits_parent")) {
-      temp_servicedependency->inherits_parent = (atoi(value) > 0) ? TRUE : FALSE;
-      temp_servicedependency->have_inherits_parent = TRUE;
-    }
-    else if (!strcmp(variable, "execution_failure_options")
-             || !strcmp(variable, "execution_failure_criteria")) {
-      for (temp_ptr = strtok(value, ", ");
-	   temp_ptr != NULL;
-           temp_ptr = strtok(NULL, ", ")) {
-        if (!strcmp(temp_ptr, "o") || !strcmp(temp_ptr, "ok"))
-          temp_servicedependency->fail_execute_on_ok = TRUE;
-        else if (!strcmp(temp_ptr, "u") || !strcmp(temp_ptr, "unknown"))
-          temp_servicedependency->fail_execute_on_unknown = TRUE;
-        else if (!strcmp(temp_ptr, "w") || !strcmp(temp_ptr, "warning"))
-          temp_servicedependency->fail_execute_on_warning = TRUE;
-        else if (!strcmp(temp_ptr, "c") || !strcmp(temp_ptr, "critical"))
-          temp_servicedependency->fail_execute_on_critical = TRUE;
-        else if (!strcmp(temp_ptr, "p") || !strcmp(temp_ptr, "pending"))
-          temp_servicedependency->fail_execute_on_pending = TRUE;
-        else if (!strcmp(temp_ptr, "n") || !strcmp(temp_ptr, "none")) {
-          temp_servicedependency->fail_execute_on_ok = FALSE;
-          temp_servicedependency->fail_execute_on_unknown = FALSE;
-          temp_servicedependency->fail_execute_on_warning = FALSE;
-          temp_servicedependency->fail_execute_on_critical = FALSE;
-        }
-        else if (!strcmp(temp_ptr, "a") || !strcmp(temp_ptr, "all")) {
-          temp_servicedependency->fail_execute_on_ok = TRUE;
-          temp_servicedependency->fail_execute_on_unknown = TRUE;
-          temp_servicedependency->fail_execute_on_warning = TRUE;
-          temp_servicedependency->fail_execute_on_critical = TRUE;
-        }
-        else {
-          logger(log_config_error, basic)
-            << "Error: Invalid execution dependency option '" << temp_ptr
-            << "' in servicedependency definition.";
-          return (ERROR);
-        }
-      }
-      temp_servicedependency->have_execution_dependency_options = TRUE;
-    }
-    else if (!strcmp(variable, "notification_failure_options")
-             || !strcmp(variable, "notification_failure_criteria")) {
-      for (temp_ptr = strtok(value, ", ");
-	   temp_ptr != NULL;
-           temp_ptr = strtok(NULL, ", ")) {
-        if (!strcmp(temp_ptr, "o") || !strcmp(temp_ptr, "ok"))
-          temp_servicedependency->fail_notify_on_ok = TRUE;
-        else if (!strcmp(temp_ptr, "u") || !strcmp(temp_ptr, "unknown"))
-          temp_servicedependency->fail_notify_on_unknown = TRUE;
-        else if (!strcmp(temp_ptr, "w") || !strcmp(temp_ptr, "warning"))
-          temp_servicedependency->fail_notify_on_warning = TRUE;
-        else if (!strcmp(temp_ptr, "c")
-                 || !strcmp(temp_ptr, "critical"))
-          temp_servicedependency->fail_notify_on_critical = TRUE;
-        else if (!strcmp(temp_ptr, "p") || !strcmp(temp_ptr, "pending"))
-          temp_servicedependency->fail_notify_on_pending = TRUE;
-        else if (!strcmp(temp_ptr, "n") || !strcmp(temp_ptr, "none")) {
-          temp_servicedependency->fail_notify_on_ok = FALSE;
-          temp_servicedependency->fail_notify_on_unknown = FALSE;
-          temp_servicedependency->fail_notify_on_warning = FALSE;
-          temp_servicedependency->fail_notify_on_critical = FALSE;
-          temp_servicedependency->fail_notify_on_pending = FALSE;
-        }
-        else if (!strcmp(temp_ptr, "a") || !strcmp(temp_ptr, "all")) {
-          temp_servicedependency->fail_notify_on_ok = TRUE;
-          temp_servicedependency->fail_notify_on_unknown = TRUE;
-          temp_servicedependency->fail_notify_on_warning = TRUE;
-          temp_servicedependency->fail_notify_on_critical = TRUE;
-          temp_servicedependency->fail_notify_on_pending = TRUE;
-        }
-        else {
-          logger(log_config_error, basic)
-            << "Error: Invalid notification dependency option '" << temp_ptr
-            << "' in servicedependency definition.";
-          return (ERROR);
-        }
-      }
-      temp_servicedependency->have_notification_dependency_options = TRUE;
-    }
-    else if (!strcmp(variable, "register"))
-      temp_servicedependency->register_object = (atoi(value) > 0) ? TRUE : FALSE;
-    else {
-      logger(log_config_error, basic)
-        << "Error: Invalid servicedependency object directive '"
-        << variable << "'.";
-      return (ERROR);
-    }
-    break;
-
-  case XODTEMPLATE_SERVICEESCALATION:
-    temp_serviceescalation = (xodtemplate_serviceescalation*)xodtemplate_current_object;
-
-    if (!strcmp(variable, "use"))
-      temp_serviceescalation->tmpl = my_strdup(value);
-    else if (!strcmp(variable, "name")) {
-      temp_serviceescalation->name = my_strdup(value);
-
-      /* add escalation to template skiplist for fast searches */
-      result = skiplist_insert(xobject_template_skiplists[X_SERVICEESCALATION_SKIPLIST],
-			       (void*)temp_serviceescalation);
-      switch (result) {
-      case SKIPLIST_ERROR_DUPLICATE:
-        logger(log_config_warning, basic)
-          << "Warning: Duplicate definition found for service escalation '" << value
-          << "' (config file '" << xodtemplate_config_file_name(temp_serviceescalation->_config_file)
-          << "', starting on line " << temp_serviceescalation->_start_line << ")";
-        result = ERROR;
-        break;
-
-      case SKIPLIST_OK:
-        result = OK;
-        break;
-
-      default:
-        result = ERROR;
-        break;
-      }
-    }
-    else if (!strcmp(variable, "host") || !strcmp(variable, "host_name")) {
+    else if (!strcmp(variable, "notification_period")) {
       if (strcmp(value, XODTEMPLATE_NULL))
-        temp_serviceescalation->host_name = my_strdup(value);
-      temp_serviceescalation->have_host_name = TRUE;
-
-      /* NOTE: escalations are added to the skiplist in xodtemplate_duplicate_objects(), except if daemon is using precached config */
-      if (result == OK && force_skiplists == TRUE
-          && temp_serviceescalation->host_name != NULL
-          && temp_serviceescalation->service_description != NULL) {
-        /* add serviceescalation to template skiplist for fast searches */
-        result = skiplist_insert(xobject_skiplists[X_SERVICEESCALATION_SKIPLIST],
-				 (void*)temp_serviceescalation);
-        switch (result) {
-        case SKIPLIST_OK:
-          result = OK;
-          break;
-
-        default:
-          result = ERROR;
-          break;
-        }
-      }
-    }
-    else if (!strcmp(variable, "description")
-	     || !strcmp(variable, "service_description")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_serviceescalation->service_description = my_strdup(value);
-      temp_serviceescalation->have_service_description = TRUE;
-
-      /* NOTE: escalations are added to the skiplist in xodtemplate_duplicate_objects(), except if daemon is using precached config */
-      if (result == OK && force_skiplists == TRUE
-          && temp_serviceescalation->host_name != NULL
-          && temp_serviceescalation->service_description != NULL) {
-        /* add serviceescalation to template skiplist for fast searches */
-        result = skiplist_insert(xobject_skiplists[X_SERVICEESCALATION_SKIPLIST],
-				 (void*)temp_serviceescalation);
-        switch (result) {
-        case SKIPLIST_OK:
-          result = OK;
-          break;
-
-        default:
-          result = ERROR;
-          break;
-        }
-      }
-    }
-    else if (!strcmp(variable, "servicegroup")
-             || !strcmp(variable, "servicegroups")
-             || !strcmp(variable, "servicegroup_name")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_serviceescalation->servicegroup_name = my_strdup(value);
-      temp_serviceescalation->have_servicegroup_name = TRUE;
-    }
-    else if (!strcmp(variable, "hostgroup")
-             || !strcmp(variable, "hostgroups")
-             || !strcmp(variable, "hostgroup_name")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_serviceescalation->hostgroup_name = my_strdup(value);
-      temp_serviceescalation->have_hostgroup_name = TRUE;
+        temp_service->notification_period = my_strdup(value);
+      temp_service->have_notification_period = TRUE;
     }
     else if (!strcmp(variable, "contact_groups")) {
       if (strcmp(value, XODTEMPLATE_NULL))
-        temp_serviceescalation->contact_groups = my_strdup(value);
-      temp_serviceescalation->have_contact_groups = TRUE;
+        temp_service->contact_groups = my_strdup(value);
+      temp_service->have_contact_groups = TRUE;
     }
     else if (!strcmp(variable, "contacts")) {
       if (strcmp(value, XODTEMPLATE_NULL))
-        temp_serviceescalation->contacts = my_strdup(value);
-      temp_serviceescalation->have_contacts = TRUE;
+        temp_service->contacts = my_strdup(value);
+      temp_service->have_contacts = TRUE;
     }
-    else if (!strcmp(variable, "escalation_period")) {
+    else if (!strcmp(variable, "failure_prediction_options")) {
       if (strcmp(value, XODTEMPLATE_NULL))
-        temp_serviceescalation->escalation_period = my_strdup(value);
-      temp_serviceescalation->have_escalation_period = TRUE;
+        temp_service->failure_prediction_options = my_strdup(value);
+      temp_service->have_failure_prediction_options = TRUE;
     }
-    else if (!strcmp(variable, "first_notification")) {
-      temp_serviceescalation->first_notification = atoi(value);
-      temp_serviceescalation->have_first_notification = TRUE;
+    else if (!strcmp(variable, "notes")) {
+      if (strcmp(value, XODTEMPLATE_NULL))
+        temp_service->notes = my_strdup(value);
+      temp_service->have_notes = TRUE;
     }
-    else if (!strcmp(variable, "last_notification")) {
-      temp_serviceescalation->last_notification = atoi(value);
-      temp_serviceescalation->have_last_notification = TRUE;
+    else if (!strcmp(variable, "notes_url")) {
+      if (strcmp(value, XODTEMPLATE_NULL))
+        temp_service->notes_url = my_strdup(value);
+      temp_service->have_notes_url = TRUE;
     }
-    else if (!strcmp(variable, "notification_interval")) {
-      temp_serviceescalation->notification_interval = strtod(value, NULL);
-      temp_serviceescalation->have_notification_interval = TRUE;
+    else if (!strcmp(variable, "action_url")) {
+      if (strcmp(value, XODTEMPLATE_NULL))
+        temp_service->action_url = my_strdup(value);
+      temp_service->have_action_url = TRUE;
     }
-    else if (!strcmp(variable, "escalation_options")) {
+    else if (!strcmp(variable, "icon_image")) {
+      if (strcmp(value, XODTEMPLATE_NULL))
+        temp_service->icon_image = my_strdup(value);
+      temp_service->have_icon_image = TRUE;
+    }
+    else if (!strcmp(variable, "icon_image_alt")) {
+      if (strcmp(value, XODTEMPLATE_NULL))
+        temp_service->icon_image_alt = my_strdup(value);
+      temp_service->have_icon_image_alt = TRUE;
+    }
+    else if (!strcmp(variable, "initial_state")) {
+      if (!strcmp(value, "o") || !strcmp(value, "ok"))
+        temp_service->initial_state = STATE_OK;
+      else if (!strcmp(value, "w") || !strcmp(value, "warning"))
+        temp_service->initial_state = STATE_WARNING;
+      else if (!strcmp(value, "u") || !strcmp(value, "unknown"))
+        temp_service->initial_state = STATE_UNKNOWN;
+      else if (!strcmp(value, "c") || !strcmp(value, "critical"))
+        temp_service->initial_state = STATE_CRITICAL;
+      else {
+        logger(log_config_error, basic)
+          << "Error: Invalid initial state '" << value
+          << "' in service definition.";
+        result = ERROR;
+      }
+      temp_service->have_initial_state = TRUE;
+    }
+    else if (!strcmp(variable, "max_check_attempts")) {
+      temp_service->max_check_attempts = atoi(value);
+      temp_service->have_max_check_attempts = TRUE;
+    }
+    else if (!strcmp(variable, "check_interval")
+             || !strcmp(variable, "normal_check_interval")) {
+      temp_service->check_interval = strtod(value, NULL);
+      temp_service->have_check_interval = TRUE;
+    }
+    else if (!strcmp(variable, "retry_interval")
+             || !strcmp(variable, "retry_check_interval")) {
+      temp_service->retry_interval = strtod(value, NULL);
+      temp_service->have_retry_interval = TRUE;
+    }
+    else if (!strcmp(variable, "active_checks_enabled")) {
+      temp_service->active_checks_enabled = (atoi(value) > 0) ? TRUE : FALSE;
+      temp_service->have_active_checks_enabled = TRUE;
+    }
+    else if (!strcmp(variable, "passive_checks_enabled")) {
+      temp_service->passive_checks_enabled = (atoi(value) > 0) ? TRUE : FALSE;
+      temp_service->have_passive_checks_enabled = TRUE;
+    }
+    else if (!strcmp(variable, "parallelize_check")) {
+      temp_service->parallelize_check = atoi(value);
+      temp_service->have_parallelize_check = TRUE;
+    }
+    else if (!strcmp(variable, "is_volatile")) {
+      temp_service->is_volatile = (atoi(value) > 0) ? TRUE : FALSE;
+      temp_service->have_is_volatile = TRUE;
+    }
+    else if (!strcmp(variable, "obsess_over_service")) {
+      temp_service->obsess_over_service = (atoi(value) > 0) ? TRUE : FALSE;
+      temp_service->have_obsess_over_service = TRUE;
+    }
+    else if (!strcmp(variable, "event_handler_enabled")) {
+      temp_service->event_handler_enabled = (atoi(value) > 0) ? TRUE : FALSE;
+      temp_service->have_event_handler_enabled = TRUE;
+    }
+    else if (!strcmp(variable, "check_freshness")) {
+      temp_service->check_freshness = (atoi(value) > 0) ? TRUE : FALSE;
+      temp_service->have_check_freshness = TRUE;
+    }
+    else if (!strcmp(variable, "freshness_threshold")) {
+      temp_service->freshness_threshold = atoi(value);
+      temp_service->have_freshness_threshold = TRUE;
+    }
+    else if (!strcmp(variable, "low_flap_threshold")) {
+      temp_service->low_flap_threshold = strtod(value, NULL);
+      temp_service->have_low_flap_threshold = TRUE;
+    }
+    else if (!strcmp(variable, "high_flap_threshold")) {
+      temp_service->high_flap_threshold = strtod(value, NULL);
+      temp_service->have_high_flap_threshold = TRUE;
+    }
+    else if (!strcmp(variable, "flap_detection_enabled")) {
+      temp_service->flap_detection_enabled = (atoi(value) > 0) ? TRUE : FALSE;
+      temp_service->have_flap_detection_enabled = TRUE;
+    }
+    else if (!strcmp(variable, "flap_detection_options")) {
+      /* user is specifying something, so discard defaults... */
+      temp_service->flap_detection_on_ok = FALSE;
+      temp_service->flap_detection_on_warning = FALSE;
+      temp_service->flap_detection_on_unknown = FALSE;
+      temp_service->flap_detection_on_critical = FALSE;
+
       for (temp_ptr = strtok(value, ", ");
 	   temp_ptr != NULL;
            temp_ptr = strtok(NULL, ", ")) {
-        if (!strcmp(temp_ptr, "w") || !strcmp(temp_ptr, "warning"))
-          temp_serviceescalation->escalate_on_warning = TRUE;
+        if (!strcmp(temp_ptr, "o") || !strcmp(temp_ptr, "ok"))
+          temp_service->flap_detection_on_ok = TRUE;
+        else if (!strcmp(temp_ptr, "w") || !strcmp(temp_ptr, "warning"))
+          temp_service->flap_detection_on_warning = TRUE;
         else if (!strcmp(temp_ptr, "u") || !strcmp(temp_ptr, "unknown"))
-          temp_serviceescalation->escalate_on_unknown = TRUE;
+          temp_service->flap_detection_on_unknown = TRUE;
         else if (!strcmp(temp_ptr, "c") || !strcmp(temp_ptr, "critical"))
-          temp_serviceescalation->escalate_on_critical = TRUE;
-        else if (!strcmp(temp_ptr, "r") || !strcmp(temp_ptr, "recovery"))
-          temp_serviceescalation->escalate_on_recovery = TRUE;
+          temp_service->flap_detection_on_critical = TRUE;
         else if (!strcmp(temp_ptr, "n") || !strcmp(temp_ptr, "none")) {
-          temp_serviceescalation->escalate_on_warning = FALSE;
-          temp_serviceescalation->escalate_on_unknown = FALSE;
-          temp_serviceescalation->escalate_on_critical = FALSE;
-          temp_serviceescalation->escalate_on_recovery = FALSE;
+          temp_service->flap_detection_on_ok = FALSE;
+          temp_service->flap_detection_on_warning = FALSE;
+          temp_service->flap_detection_on_unknown = FALSE;
+          temp_service->flap_detection_on_critical = FALSE;
         }
         else if (!strcmp(temp_ptr, "a") || !strcmp(temp_ptr, "all")) {
-          temp_serviceescalation->escalate_on_warning = TRUE;
-          temp_serviceescalation->escalate_on_unknown = TRUE;
-          temp_serviceescalation->escalate_on_critical = TRUE;
-          temp_serviceescalation->escalate_on_recovery = TRUE;
+          temp_service->flap_detection_on_ok = TRUE;
+          temp_service->flap_detection_on_warning = TRUE;
+          temp_service->flap_detection_on_unknown = TRUE;
+          temp_service->flap_detection_on_critical = TRUE;
         }
         else {
           logger(log_config_error, basic)
-            << "Error: Invalid escalation option '" << temp_ptr
-            << "' in serviceescalation definition.";
+            << "Error: Invalid flap detection option '" << temp_ptr
+            << "' in service definition.";
           return (ERROR);
         }
       }
-      temp_serviceescalation->have_escalation_options = TRUE;
+      temp_service->have_flap_detection_options = TRUE;
     }
-    else if (!strcmp(variable, "register"))
-      temp_serviceescalation->register_object = (atoi(value) > 0) ? TRUE : FALSE;
-    else {
-      logger(log_config_error, basic)
-        << "Error: Invalid serviceescalation object directive '" << variable << "'.";
-      return (ERROR);
-    }
-
-    break;
-
-  case XODTEMPLATE_CONTACT:
-    temp_contact = (xodtemplate_contact*)xodtemplate_current_object;
-
-    if (!strcmp(variable, "use"))
-      temp_contact->tmpl = my_strdup(value);
-    else if (!strcmp(variable, "name")) {
-      temp_contact->name = my_strdup(value);
-
-      /* add contact to template skiplist for fast searches */
-      result = skiplist_insert(xobject_template_skiplists[X_CONTACT_SKIPLIST], (void*)temp_contact);
-      switch (result) {
-      case SKIPLIST_ERROR_DUPLICATE:
-        logger(log_config_warning, basic)
-          << "Warning: Duplicate definition found for contact '" << value
-          << "' (config file '" << xodtemplate_config_file_name(temp_contact->_config_file)
-          << "', starting on line " << temp_contact->_start_line << ")";
-        result = ERROR;
-        break;
-
-      case SKIPLIST_OK:
-        result = OK;
-        break;
-
-      default:
-        result = ERROR;
-        break;
-      }
-    }
-    else if (!strcmp(variable, "contact_name")) {
-      temp_contact->contact_name = my_strdup(value);
-
-      /* add contact to template skiplist for fast searches */
-      result = skiplist_insert(xobject_skiplists[X_CONTACT_SKIPLIST], (void*)temp_contact);
-      switch (result) {
-      case SKIPLIST_ERROR_DUPLICATE:
-        logger(log_config_warning, basic)
-          << "Warning: Duplicate definition found for contact '" << value
-          << "' (config file '" << xodtemplate_config_file_name(temp_contact->_config_file)
-          << "', starting on line " << temp_contact->_start_line << ")";
-        result = ERROR;
-        break;
-
-      case SKIPLIST_OK:
-        result = OK;
-        break;
-
-      default:
-        result = ERROR;
-        break;
-      }
-    }
-    else if (!strcmp(variable, "alias"))
-      temp_contact->alias = my_strdup(value);
-    else if (!strcmp(variable, "contact_groups")
-	     || !strcmp(variable, "contactgroups")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_contact->contact_groups = my_strdup(value);
-      temp_contact->have_contact_groups = TRUE;
-    }
-    else if (!strcmp(variable, "email")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_contact->email = my_strdup(value);
-      temp_contact->have_email = TRUE;
-    }
-    else if (!strcmp(variable, "pager")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_contact->pager = my_strdup(value);
-      temp_contact->have_pager = TRUE;
-    }
-    else if (strstr(variable, "address") == variable) {
-      x = atoi(variable + 7);
-      if (x < 1 || x > MAX_XODTEMPLATE_CONTACT_ADDRESSES)
-        result = ERROR;
-      else if (strcmp(value, XODTEMPLATE_NULL))
-        temp_contact->address[x - 1] = my_strdup(value);
-      if (result == OK)
-        temp_contact->have_address[x - 1] = TRUE;
-    }
-    else if (!strcmp(variable, "host_notification_period")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_contact->host_notification_period = my_strdup(value);
-      temp_contact->have_host_notification_period = TRUE;
-    }
-    else if (!strcmp(variable, "host_notification_commands")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_contact->host_notification_commands = my_strdup(value);
-      temp_contact->have_host_notification_commands = TRUE;
-    }
-    else if (!strcmp(variable, "service_notification_period")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_contact->service_notification_period = my_strdup(value);
-      temp_contact->have_service_notification_period = TRUE;
-    }
-    else if (!strcmp(variable, "service_notification_commands")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_contact->service_notification_commands = my_strdup(value);
-      temp_contact->have_service_notification_commands = TRUE;
-    }
-    else if (!strcmp(variable, "host_notification_options")) {
-      for (temp_ptr = strtok(value, ", ");
-	   temp_ptr != NULL;
-           temp_ptr = strtok(NULL, ", ")) {
-        if (!strcmp(temp_ptr, "d") || !strcmp(temp_ptr, "down"))
-          temp_contact->notify_on_host_down = TRUE;
-        else if (!strcmp(temp_ptr, "u") || !strcmp(temp_ptr, "unreachable"))
-          temp_contact->notify_on_host_unreachable = TRUE;
-        else if (!strcmp(temp_ptr, "r") || !strcmp(temp_ptr, "recovery"))
-          temp_contact->notify_on_host_recovery = TRUE;
-        else if (!strcmp(temp_ptr, "f") || !strcmp(temp_ptr, "flapping"))
-          temp_contact->notify_on_host_flapping = TRUE;
-        else if (!strcmp(temp_ptr, "s") || !strcmp(temp_ptr, "downtime"))
-          temp_contact->notify_on_host_downtime = TRUE;
-        else if (!strcmp(temp_ptr, "n") || !strcmp(temp_ptr, "none")) {
-          temp_contact->notify_on_host_down = FALSE;
-          temp_contact->notify_on_host_unreachable = FALSE;
-          temp_contact->notify_on_host_recovery = FALSE;
-          temp_contact->notify_on_host_flapping = FALSE;
-          temp_contact->notify_on_host_downtime = FALSE;
-        }
-        else if (!strcmp(temp_ptr, "a") || !strcmp(temp_ptr, "all")) {
-          temp_contact->notify_on_host_down = TRUE;
-          temp_contact->notify_on_host_unreachable = TRUE;
-          temp_contact->notify_on_host_recovery = TRUE;
-          temp_contact->notify_on_host_flapping = TRUE;
-          temp_contact->notify_on_host_downtime = TRUE;
-        }
-        else {
-          logger(log_config_error, basic)
-            << "Error: Invalid host notification option '" << temp_ptr
-            << "' in contact definition.";
-          return (ERROR);
-        }
-      }
-      temp_contact->have_host_notification_options = TRUE;
-    }
-    else if (!strcmp(variable, "service_notification_options")) {
+    else if (!strcmp(variable, "notification_options")) {
       for (temp_ptr = strtok(value, ", ");
 	   temp_ptr != NULL;
            temp_ptr = strtok(NULL, ", ")) {
         if (!strcmp(temp_ptr, "u") || !strcmp(temp_ptr, "unknown"))
-          temp_contact->notify_on_service_unknown = TRUE;
+          temp_service->notify_on_unknown = TRUE;
         else if (!strcmp(temp_ptr, "w") || !strcmp(temp_ptr, "warning"))
-          temp_contact->notify_on_service_warning = TRUE;
+          temp_service->notify_on_warning = TRUE;
         else if (!strcmp(temp_ptr, "c") || !strcmp(temp_ptr, "critical"))
-          temp_contact->notify_on_service_critical = TRUE;
+          temp_service->notify_on_critical = TRUE;
         else if (!strcmp(temp_ptr, "r") || !strcmp(temp_ptr, "recovery"))
-          temp_contact->notify_on_service_recovery = TRUE;
+          temp_service->notify_on_recovery = TRUE;
         else if (!strcmp(temp_ptr, "f") || !strcmp(temp_ptr, "flapping"))
-          temp_contact->notify_on_service_flapping = TRUE;
+          temp_service->notify_on_flapping = TRUE;
         else if (!strcmp(temp_ptr, "s") || !strcmp(temp_ptr, "downtime"))
-          temp_contact->notify_on_service_downtime = TRUE;
+          temp_service->notify_on_downtime = TRUE;
         else if (!strcmp(temp_ptr, "n") || !strcmp(temp_ptr, "none")) {
-          temp_contact->notify_on_service_unknown = FALSE;
-          temp_contact->notify_on_service_warning = FALSE;
-          temp_contact->notify_on_service_critical = FALSE;
-          temp_contact->notify_on_service_recovery = FALSE;
-          temp_contact->notify_on_service_flapping = FALSE;
-          temp_contact->notify_on_service_downtime = FALSE;
+          temp_service->notify_on_unknown = FALSE;
+          temp_service->notify_on_warning = FALSE;
+          temp_service->notify_on_critical = FALSE;
+          temp_service->notify_on_recovery = FALSE;
+          temp_service->notify_on_flapping = FALSE;
+          temp_service->notify_on_downtime = FALSE;
         }
         else if (!strcmp(temp_ptr, "a") || !strcmp(temp_ptr, "all")) {
-          temp_contact->notify_on_service_unknown = TRUE;
-          temp_contact->notify_on_service_warning = TRUE;
-          temp_contact->notify_on_service_critical = TRUE;
-          temp_contact->notify_on_service_recovery = TRUE;
-          temp_contact->notify_on_service_flapping = TRUE;
-          temp_contact->notify_on_service_downtime = TRUE;
+          temp_service->notify_on_unknown = TRUE;
+          temp_service->notify_on_warning = TRUE;
+          temp_service->notify_on_critical = TRUE;
+          temp_service->notify_on_recovery = TRUE;
+          temp_service->notify_on_flapping = TRUE;
+          temp_service->notify_on_downtime = TRUE;
         }
         else {
           logger(log_config_error, basic)
-            << "Error: Invalid service notification option '" << temp_ptr
-            << "' in contact definition.";
+            << "Error: Invalid notification option '" << temp_ptr
+            << "' in service definition.";
           return (ERROR);
         }
       }
-      temp_contact->have_service_notification_options = TRUE;
+      temp_service->have_notification_options = TRUE;
     }
-    else if (!strcmp(variable, "host_notifications_enabled")) {
-      temp_contact->host_notifications_enabled = (atoi(value) > 0) ? TRUE : FALSE;
-      temp_contact->have_host_notifications_enabled = TRUE;
+    else if (!strcmp(variable, "notifications_enabled")) {
+      temp_service->notifications_enabled = (atoi(value) > 0) ? TRUE : FALSE;
+      temp_service->have_notifications_enabled = TRUE;
     }
-    else if (!strcmp(variable, "service_notifications_enabled")) {
-      temp_contact->service_notifications_enabled = (atoi(value) > 0) ? TRUE : FALSE;
-      temp_contact->have_service_notifications_enabled = TRUE;
+    else if (!strcmp(variable, "notification_interval")) {
+      temp_service->notification_interval = strtod(value, NULL);
+      temp_service->have_notification_interval = TRUE;
     }
-    else if (!strcmp(variable, "can_submit_commands")) {
-      temp_contact->can_submit_commands = (atoi(value) > 0) ? TRUE : FALSE;
-      temp_contact->have_can_submit_commands = TRUE;
+    else if (!strcmp(variable, "first_notification_delay")) {
+      temp_service->first_notification_delay = strtod(value, NULL);
+      temp_service->have_first_notification_delay = TRUE;
+    }
+    else if (!strcmp(variable, "stalking_options")) {
+      for (temp_ptr = strtok(value, ", ");
+	   temp_ptr != NULL;
+           temp_ptr = strtok(NULL, ", ")) {
+        if (!strcmp(temp_ptr, "o") || !strcmp(temp_ptr, "ok"))
+          temp_service->stalk_on_ok = TRUE;
+        else if (!strcmp(temp_ptr, "w") || !strcmp(temp_ptr, "warning"))
+          temp_service->stalk_on_warning = TRUE;
+        else if (!strcmp(temp_ptr, "u") || !strcmp(temp_ptr, "unknown"))
+          temp_service->stalk_on_unknown = TRUE;
+        else if (!strcmp(temp_ptr, "c")
+                 || !strcmp(temp_ptr, "critical"))
+          temp_service->stalk_on_critical = TRUE;
+        else if (!strcmp(temp_ptr, "n") || !strcmp(temp_ptr, "none")) {
+          temp_service->stalk_on_ok = FALSE;
+          temp_service->stalk_on_warning = FALSE;
+          temp_service->stalk_on_unknown = FALSE;
+          temp_service->stalk_on_critical = FALSE;
+        }
+        else if (!strcmp(temp_ptr, "a") || !strcmp(temp_ptr, "all")) {
+          temp_service->stalk_on_ok = TRUE;
+          temp_service->stalk_on_warning = TRUE;
+          temp_service->stalk_on_unknown = TRUE;
+          temp_service->stalk_on_critical = TRUE;
+        }
+        else {
+          logger(log_config_error, basic)
+            << "Error: Invalid stalking option '" << temp_ptr
+            << "' in service definition.";
+          return (ERROR);
+        }
+      }
+      temp_service->have_stalking_options = TRUE;
+    }
+    else if (!strcmp(variable, "process_perf_data")) {
+      temp_service->process_perf_data = (atoi(value) > 0) ? TRUE : FALSE;
+      temp_service->have_process_perf_data = TRUE;
+    }
+    else if (!strcmp(variable, "failure_prediction_enabled")) {
+      temp_service->failure_prediction_enabled = (atoi(value) > 0) ? TRUE : FALSE;
+      temp_service->have_failure_prediction_enabled = TRUE;
     }
     else if (!strcmp(variable, "retain_status_information")) {
-      temp_contact->retain_status_information = (atoi(value) > 0) ? TRUE : FALSE;
-      temp_contact->have_retain_status_information = TRUE;
+      temp_service->retain_status_information = (atoi(value) > 0) ? TRUE : FALSE;
+      temp_service->have_retain_status_information = TRUE;
     }
     else if (!strcmp(variable, "retain_nonstatus_information")) {
-      temp_contact->retain_nonstatus_information = (atoi(value) > 0) ? TRUE : FALSE;
-      temp_contact->have_retain_nonstatus_information = TRUE;
+      temp_service->retain_nonstatus_information = (atoi(value) > 0) ? TRUE : FALSE;
+      temp_service->have_retain_nonstatus_information = TRUE;
     }
     else if (!strcmp(variable, "register"))
-      temp_contact->register_object = (atoi(value) > 0) ? TRUE : FALSE;
+      temp_service->register_object = (atoi(value) > 0) ? TRUE : FALSE;
     else if (variable[0] == '_') {
       /* get the variable name */
       customvarname = my_strdup(variable + 1);
 
       /* make sure we have a variable name */
-      if (customvarname == NULL || !strcmp(customvarname, "")) {
+      if (!strcmp(customvarname, "")) {
         logger(log_config_error, basic) << "Error: Null custom variable name.";
         delete[] customvarname;
         return (ERROR);
@@ -2284,7 +1443,7 @@ int xodtemplate_add_object_property(char* input, int options) {
         customvarvalue = NULL;
 
       /* add the custom variable */
-      if (xodtemplate_add_custom_variable_to_contact(temp_contact,
+      if (xodtemplate_add_custom_variable_to_service(temp_service,
 						     customvarname,
 						     customvarvalue) == NULL) {
         delete[] customvarname;
@@ -2298,10 +1457,9 @@ int xodtemplate_add_object_property(char* input, int options) {
     }
     else {
       logger(log_config_error, basic)
-        << "Error: Invalid contact object directive '" << variable << "'.";
+        << "Error: Invalid service object directive '" << variable << "'.";
       return (ERROR);
     }
-
     break;
 
   case XODTEMPLATE_HOST:
@@ -2315,16 +1473,16 @@ int xodtemplate_add_object_property(char* input, int options) {
       /* add host to template skiplist for fast searches */
       result = skiplist_insert(xobject_template_skiplists[X_HOST_SKIPLIST], (void*)temp_host);
       switch (result) {
+      case SKIPLIST_OK:
+        result = OK;
+        break;
+
       case SKIPLIST_ERROR_DUPLICATE:
         logger(log_config_warning, basic)
           << "Warning: Duplicate definition found for host '" << value
           << "' (config file '" << xodtemplate_config_file_name(temp_host->_config_file)
           << "', starting on line " << temp_host->_start_line << ")";
         result = ERROR;
-        break;
-
-      case SKIPLIST_OK:
-        result = OK;
         break;
 
       default:
@@ -2338,16 +1496,16 @@ int xodtemplate_add_object_property(char* input, int options) {
       /* add host to template skiplist for fast searches */
       result = skiplist_insert(xobject_skiplists[X_HOST_SKIPLIST], (void*)temp_host);
       switch (result) {
+      case SKIPLIST_OK:
+        result = OK;
+        break;
+
       case SKIPLIST_ERROR_DUPLICATE:
         logger(log_config_warning, basic)
           << "Warning: Duplicate definition found for host '" << value
           << "' (config file '" << xodtemplate_config_file_name(temp_host->_config_file)
           << "', starting on line " << temp_host->_start_line << ")";
         result = ERROR;
-        break;
-
-      case SKIPLIST_OK:
-        result = OK;
         break;
 
       default:
@@ -2719,27 +1877,28 @@ int xodtemplate_add_object_property(char* input, int options) {
     }
     break;
 
-  case XODTEMPLATE_SERVICE:
-    temp_service = (xodtemplate_service*)xodtemplate_current_object;
+  case XODTEMPLATE_TIMEPERIOD:
+    temp_timeperiod = (xodtemplate_timeperiod*)xodtemplate_current_object;
 
     if (!strcmp(variable, "use"))
-      temp_service->tmpl = my_strdup(value);
+      temp_timeperiod->tmpl = my_strdup(value);
     else if (!strcmp(variable, "name")) {
-      temp_service->name = my_strdup(value);
+      temp_timeperiod->name = my_strdup(value);
 
-      /* add service to template skiplist for fast searches */
-      result = skiplist_insert(xobject_template_skiplists[X_SERVICE_SKIPLIST], (void*)temp_service);
+      /* add timeperiod to template skiplist for fast searches */
+      result = skiplist_insert(xobject_template_skiplists[X_TIMEPERIOD_SKIPLIST],
+			       (void*)temp_timeperiod);
       switch (result) {
-      case SKIPLIST_ERROR_DUPLICATE:
-        logger(log_config_warning, basic)
-          << "Warning: Duplicate definition found for service '" << value
-          << "' (config file '" << xodtemplate_config_file_name(temp_service->_config_file)
-          << "', starting on line " << temp_service->_start_line << ")";
-        result = ERROR;
-        break;
-
       case SKIPLIST_OK:
         result = OK;
+        break;
+
+      case SKIPLIST_ERROR_DUPLICATE:
+        logger(log_config_warning, basic)
+          << "Warning: Duplicate definition found for timeperiod '" << value
+          << "' (config file '" << xodtemplate_config_file_name(temp_timeperiod->_config_file)
+          << "', starting on line " << temp_timeperiod->_start_line << ")";
+        result = ERROR;
         break;
 
       default:
@@ -2747,378 +1906,247 @@ int xodtemplate_add_object_property(char* input, int options) {
         break;
       }
     }
-    else if (!strcmp(variable, "host") || !strcmp(variable, "hosts")
-             || !strcmp(variable, "host_name")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_service->host_name = my_strdup(value);
-      temp_service->have_host_name = TRUE;
+    else if (!strcmp(variable, "timeperiod_name")) {
+      temp_timeperiod->timeperiod_name = my_strdup(value);
 
-      /* NOTE: services are added to the skiplist in xodtemplate_duplicate_services(), except if daemon is using precached config */
-      if (result == OK && force_skiplists == TRUE
-          && temp_service->host_name != NULL
-          && temp_service->service_description != NULL) {
-        /* add service to template skiplist for fast searches */
-        result = skiplist_insert(xobject_skiplists[X_SERVICE_SKIPLIST], (void*)temp_service);
-        switch (result) {
-        case SKIPLIST_ERROR_DUPLICATE:
-          logger(log_config_warning, basic)
-            << "Warning: Duplicate definition found for service '" << value
-            << "' (config file '" << xodtemplate_config_file_name(temp_service->_config_file)
-            << "', starting on line " << temp_service->_start_line << ")";
-          result = ERROR;
-          break;
+      result = skiplist_insert(xobject_skiplists[X_TIMEPERIOD_SKIPLIST], (void*)temp_timeperiod);
+      switch (result) {
+      case SKIPLIST_OK:
+        result = OK;
+        break;
 
-	case SKIPLIST_OK:
-          result = OK;
-          break;
-
-        default:
-          result = ERROR;
-          break;
-        }
-      }
-    }
-    else if (!strcmp(variable, "service_description")
-             || !strcmp(variable, "description")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_service->service_description = my_strdup(value);
-      temp_service->have_service_description = TRUE;
-
-      /* NOTE: services are added to the skiplist in xodtemplate_duplicate_services(), except if daemon is using precached config */
-      if (result == OK && force_skiplists == TRUE
-          && temp_service->host_name != NULL
-          && temp_service->service_description != NULL) {
-        /* add service to template skiplist for fast searches */
-        result = skiplist_insert(xobject_skiplists[X_SERVICE_SKIPLIST], (void*)temp_service);
-        switch (result) {
-        case SKIPLIST_ERROR_DUPLICATE:
-          logger(log_config_warning, basic)
-            << "Warning: Duplicate definition found for service '" << value
-            << "' (config file '" << xodtemplate_config_file_name(temp_service->_config_file)
-            << "', starting on line " << temp_service->_start_line << ")";
-          result = ERROR;
-          break;
-
-        case SKIPLIST_OK:
-          result = OK;
-          break;
-
-        default:
-          result = ERROR;
-          break;
-        }
-      }
-    }
-    else if (!strcmp(variable, "display_name")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_service->display_name = my_strdup(value);
-      temp_service->have_display_name = TRUE;
-    }
-    else if (!strcmp(variable, "hostgroup")
-             || !strcmp(variable, "hostgroups")
-             || !strcmp(variable, "hostgroup_name")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_service->hostgroup_name = my_strdup(value);
-      temp_service->have_hostgroup_name = TRUE;
-    }
-    else if (!strcmp(variable, "service_groups")
-             || !strcmp(variable, "servicegroups")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_service->service_groups = my_strdup(value);
-      temp_service->have_service_groups = TRUE;
-    }
-    else if (!strcmp(variable, "check_command")) {
-      if (strcmp(value, XODTEMPLATE_NULL)) {
-        if (value[0] == '!') {
-          temp_service->have_important_check_command = TRUE;
-          temp_ptr = value + 1;
-        }
-        else
-          temp_ptr = value;
-        temp_service->check_command = my_strdup(temp_ptr);
-      }
-      temp_service->have_check_command = TRUE;
-    }
-    else if (!strcmp(variable, "check_period")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_service->check_period = my_strdup(value);
-      temp_service->have_check_period = TRUE;
-    }
-    else if (!strcmp(variable, "event_handler")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_service->event_handler = my_strdup(value);
-      temp_service->have_event_handler = TRUE;
-    }
-    else if (!strcmp(variable, "notification_period")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_service->notification_period = my_strdup(value);
-      temp_service->have_notification_period = TRUE;
-    }
-    else if (!strcmp(variable, "contact_groups")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_service->contact_groups = my_strdup(value);
-      temp_service->have_contact_groups = TRUE;
-    }
-    else if (!strcmp(variable, "contacts")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_service->contacts = my_strdup(value);
-      temp_service->have_contacts = TRUE;
-    }
-    else if (!strcmp(variable, "failure_prediction_options")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_service->failure_prediction_options = my_strdup(value);
-      temp_service->have_failure_prediction_options = TRUE;
-    }
-    else if (!strcmp(variable, "notes")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_service->notes = my_strdup(value);
-      temp_service->have_notes = TRUE;
-    }
-    else if (!strcmp(variable, "notes_url")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_service->notes_url = my_strdup(value);
-      temp_service->have_notes_url = TRUE;
-    }
-    else if (!strcmp(variable, "action_url")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_service->action_url = my_strdup(value);
-      temp_service->have_action_url = TRUE;
-    }
-    else if (!strcmp(variable, "icon_image")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_service->icon_image = my_strdup(value);
-      temp_service->have_icon_image = TRUE;
-    }
-    else if (!strcmp(variable, "icon_image_alt")) {
-      if (strcmp(value, XODTEMPLATE_NULL))
-        temp_service->icon_image_alt = my_strdup(value);
-      temp_service->have_icon_image_alt = TRUE;
-    }
-    else if (!strcmp(variable, "initial_state")) {
-      if (!strcmp(value, "o") || !strcmp(value, "ok"))
-        temp_service->initial_state = STATE_OK;
-      else if (!strcmp(value, "w") || !strcmp(value, "warning"))
-        temp_service->initial_state = STATE_WARNING;
-      else if (!strcmp(value, "u") || !strcmp(value, "unknown"))
-        temp_service->initial_state = STATE_UNKNOWN;
-      else if (!strcmp(value, "c") || !strcmp(value, "critical"))
-        temp_service->initial_state = STATE_CRITICAL;
-      else {
-        logger(log_config_error, basic)
-          << "Error: Invalid initial state '" << value
-          << "' in service definition.";
+      case SKIPLIST_ERROR_DUPLICATE:
+        logger(log_config_warning, basic)
+          << "Warning: Duplicate definition found for timeperiod '" << value
+          << "' (config file '" << xodtemplate_config_file_name(temp_timeperiod->_config_file)
+          << "', starting on line " << temp_timeperiod->_start_line << ")";
         result = ERROR;
-      }
-      temp_service->have_initial_state = TRUE;
-    }
-    else if (!strcmp(variable, "max_check_attempts")) {
-      temp_service->max_check_attempts = atoi(value);
-      temp_service->have_max_check_attempts = TRUE;
-    }
-    else if (!strcmp(variable, "check_interval")
-             || !strcmp(variable, "normal_check_interval")) {
-      temp_service->check_interval = strtod(value, NULL);
-      temp_service->have_check_interval = TRUE;
-    }
-    else if (!strcmp(variable, "retry_interval")
-             || !strcmp(variable, "retry_check_interval")) {
-      temp_service->retry_interval = strtod(value, NULL);
-      temp_service->have_retry_interval = TRUE;
-    }
-    else if (!strcmp(variable, "active_checks_enabled")) {
-      temp_service->active_checks_enabled = (atoi(value) > 0) ? TRUE : FALSE;
-      temp_service->have_active_checks_enabled = TRUE;
-    }
-    else if (!strcmp(variable, "passive_checks_enabled")) {
-      temp_service->passive_checks_enabled = (atoi(value) > 0) ? TRUE : FALSE;
-      temp_service->have_passive_checks_enabled = TRUE;
-    }
-    else if (!strcmp(variable, "parallelize_check")) {
-      temp_service->parallelize_check = atoi(value);
-      temp_service->have_parallelize_check = TRUE;
-    }
-    else if (!strcmp(variable, "is_volatile")) {
-      temp_service->is_volatile = (atoi(value) > 0) ? TRUE : FALSE;
-      temp_service->have_is_volatile = TRUE;
-    }
-    else if (!strcmp(variable, "obsess_over_service")) {
-      temp_service->obsess_over_service = (atoi(value) > 0) ? TRUE : FALSE;
-      temp_service->have_obsess_over_service = TRUE;
-    }
-    else if (!strcmp(variable, "event_handler_enabled")) {
-      temp_service->event_handler_enabled = (atoi(value) > 0) ? TRUE : FALSE;
-      temp_service->have_event_handler_enabled = TRUE;
-    }
-    else if (!strcmp(variable, "check_freshness")) {
-      temp_service->check_freshness = (atoi(value) > 0) ? TRUE : FALSE;
-      temp_service->have_check_freshness = TRUE;
-    }
-    else if (!strcmp(variable, "freshness_threshold")) {
-      temp_service->freshness_threshold = atoi(value);
-      temp_service->have_freshness_threshold = TRUE;
-    }
-    else if (!strcmp(variable, "low_flap_threshold")) {
-      temp_service->low_flap_threshold = strtod(value, NULL);
-      temp_service->have_low_flap_threshold = TRUE;
-    }
-    else if (!strcmp(variable, "high_flap_threshold")) {
-      temp_service->high_flap_threshold = strtod(value, NULL);
-      temp_service->have_high_flap_threshold = TRUE;
-    }
-    else if (!strcmp(variable, "flap_detection_enabled")) {
-      temp_service->flap_detection_enabled = (atoi(value) > 0) ? TRUE : FALSE;
-      temp_service->have_flap_detection_enabled = TRUE;
-    }
-    else if (!strcmp(variable, "flap_detection_options")) {
-      /* user is specifying something, so discard defaults... */
-      temp_service->flap_detection_on_ok = FALSE;
-      temp_service->flap_detection_on_warning = FALSE;
-      temp_service->flap_detection_on_unknown = FALSE;
-      temp_service->flap_detection_on_critical = FALSE;
+        break;
 
+      default:
+        result = ERROR;
+        break;
+      }
+    }
+    else if (!strcmp(variable, "alias"))
+      temp_timeperiod->alias = my_strdup(value);
+    else if (!strcmp(variable, "exclude"))
+      temp_timeperiod->exclusions = my_strdup(value);
+    else if (!strcmp(variable, "register"))
+      temp_timeperiod->register_object = (atoi(value) > 0) ? TRUE : FALSE;
+    else if (xodtemplate_parse_timeperiod_directive(temp_timeperiod, variable, value) == OK)
+      result = OK;
+    else {
+      logger(log_config_error, basic)
+        << "Error: Invalid timeperiod object directive '" << variable << "'.";
+      return (ERROR);
+    }
+    break;
+
+  case XODTEMPLATE_CONTACT:
+    temp_contact = (xodtemplate_contact*)xodtemplate_current_object;
+
+    if (!strcmp(variable, "use"))
+      temp_contact->tmpl = my_strdup(value);
+    else if (!strcmp(variable, "name")) {
+      temp_contact->name = my_strdup(value);
+
+      /* add contact to template skiplist for fast searches */
+      result = skiplist_insert(xobject_template_skiplists[X_CONTACT_SKIPLIST], (void*)temp_contact);
+      switch (result) {
+      case SKIPLIST_OK:
+        result = OK;
+        break;
+
+      case SKIPLIST_ERROR_DUPLICATE:
+        logger(log_config_warning, basic)
+          << "Warning: Duplicate definition found for contact '" << value
+          << "' (config file '" << xodtemplate_config_file_name(temp_contact->_config_file)
+          << "', starting on line " << temp_contact->_start_line << ")";
+        result = ERROR;
+        break;
+
+      default:
+        result = ERROR;
+        break;
+      }
+    }
+    else if (!strcmp(variable, "contact_name")) {
+      temp_contact->contact_name = my_strdup(value);
+
+      /* add contact to template skiplist for fast searches */
+      result = skiplist_insert(xobject_skiplists[X_CONTACT_SKIPLIST], (void*)temp_contact);
+      switch (result) {
+      case SKIPLIST_OK:
+        result = OK;
+        break;
+
+      case SKIPLIST_ERROR_DUPLICATE:
+        logger(log_config_warning, basic)
+          << "Warning: Duplicate definition found for contact '" << value
+          << "' (config file '" << xodtemplate_config_file_name(temp_contact->_config_file)
+          << "', starting on line " << temp_contact->_start_line << ")";
+        result = ERROR;
+        break;
+
+      default:
+        result = ERROR;
+        break;
+      }
+    }
+    else if (!strcmp(variable, "alias"))
+      temp_contact->alias = my_strdup(value);
+    else if (!strcmp(variable, "contact_groups")
+	     || !strcmp(variable, "contactgroups")) {
+      if (strcmp(value, XODTEMPLATE_NULL))
+        temp_contact->contact_groups = my_strdup(value);
+      temp_contact->have_contact_groups = TRUE;
+    }
+    else if (!strcmp(variable, "email")) {
+      if (strcmp(value, XODTEMPLATE_NULL))
+        temp_contact->email = my_strdup(value);
+      temp_contact->have_email = TRUE;
+    }
+    else if (!strcmp(variable, "pager")) {
+      if (strcmp(value, XODTEMPLATE_NULL))
+        temp_contact->pager = my_strdup(value);
+      temp_contact->have_pager = TRUE;
+    }
+    else if (strstr(variable, "address") == variable) {
+      x = atoi(variable + 7);
+      if (x < 1 || x > MAX_XODTEMPLATE_CONTACT_ADDRESSES)
+        result = ERROR;
+      else if (strcmp(value, XODTEMPLATE_NULL))
+        temp_contact->address[x - 1] = my_strdup(value);
+      if (result == OK)
+        temp_contact->have_address[x - 1] = TRUE;
+    }
+    else if (!strcmp(variable, "host_notification_period")) {
+      if (strcmp(value, XODTEMPLATE_NULL))
+        temp_contact->host_notification_period = my_strdup(value);
+      temp_contact->have_host_notification_period = TRUE;
+    }
+    else if (!strcmp(variable, "host_notification_commands")) {
+      if (strcmp(value, XODTEMPLATE_NULL))
+        temp_contact->host_notification_commands = my_strdup(value);
+      temp_contact->have_host_notification_commands = TRUE;
+    }
+    else if (!strcmp(variable, "service_notification_period")) {
+      if (strcmp(value, XODTEMPLATE_NULL))
+        temp_contact->service_notification_period = my_strdup(value);
+      temp_contact->have_service_notification_period = TRUE;
+    }
+    else if (!strcmp(variable, "service_notification_commands")) {
+      if (strcmp(value, XODTEMPLATE_NULL))
+        temp_contact->service_notification_commands = my_strdup(value);
+      temp_contact->have_service_notification_commands = TRUE;
+    }
+    else if (!strcmp(variable, "host_notification_options")) {
       for (temp_ptr = strtok(value, ", ");
 	   temp_ptr != NULL;
            temp_ptr = strtok(NULL, ", ")) {
-        if (!strcmp(temp_ptr, "o") || !strcmp(temp_ptr, "ok"))
-          temp_service->flap_detection_on_ok = TRUE;
-        else if (!strcmp(temp_ptr, "w") || !strcmp(temp_ptr, "warning"))
-          temp_service->flap_detection_on_warning = TRUE;
-        else if (!strcmp(temp_ptr, "u") || !strcmp(temp_ptr, "unknown"))
-          temp_service->flap_detection_on_unknown = TRUE;
-        else if (!strcmp(temp_ptr, "c") || !strcmp(temp_ptr, "critical"))
-          temp_service->flap_detection_on_critical = TRUE;
+        if (!strcmp(temp_ptr, "d") || !strcmp(temp_ptr, "down"))
+          temp_contact->notify_on_host_down = TRUE;
+        else if (!strcmp(temp_ptr, "u") || !strcmp(temp_ptr, "unreachable"))
+          temp_contact->notify_on_host_unreachable = TRUE;
+        else if (!strcmp(temp_ptr, "r") || !strcmp(temp_ptr, "recovery"))
+          temp_contact->notify_on_host_recovery = TRUE;
+        else if (!strcmp(temp_ptr, "f") || !strcmp(temp_ptr, "flapping"))
+          temp_contact->notify_on_host_flapping = TRUE;
+        else if (!strcmp(temp_ptr, "s") || !strcmp(temp_ptr, "downtime"))
+          temp_contact->notify_on_host_downtime = TRUE;
         else if (!strcmp(temp_ptr, "n") || !strcmp(temp_ptr, "none")) {
-          temp_service->flap_detection_on_ok = FALSE;
-          temp_service->flap_detection_on_warning = FALSE;
-          temp_service->flap_detection_on_unknown = FALSE;
-          temp_service->flap_detection_on_critical = FALSE;
+          temp_contact->notify_on_host_down = FALSE;
+          temp_contact->notify_on_host_unreachable = FALSE;
+          temp_contact->notify_on_host_recovery = FALSE;
+          temp_contact->notify_on_host_flapping = FALSE;
+          temp_contact->notify_on_host_downtime = FALSE;
         }
         else if (!strcmp(temp_ptr, "a") || !strcmp(temp_ptr, "all")) {
-          temp_service->flap_detection_on_ok = TRUE;
-          temp_service->flap_detection_on_warning = TRUE;
-          temp_service->flap_detection_on_unknown = TRUE;
-          temp_service->flap_detection_on_critical = TRUE;
+          temp_contact->notify_on_host_down = TRUE;
+          temp_contact->notify_on_host_unreachable = TRUE;
+          temp_contact->notify_on_host_recovery = TRUE;
+          temp_contact->notify_on_host_flapping = TRUE;
+          temp_contact->notify_on_host_downtime = TRUE;
         }
         else {
           logger(log_config_error, basic)
-            << "Error: Invalid flap detection option '" << temp_ptr
-            << "' in service definition.";
+            << "Error: Invalid host notification option '" << temp_ptr
+            << "' in contact definition.";
           return (ERROR);
         }
       }
-      temp_service->have_flap_detection_options = TRUE;
+      temp_contact->have_host_notification_options = TRUE;
     }
-    else if (!strcmp(variable, "notification_options")) {
+    else if (!strcmp(variable, "service_notification_options")) {
       for (temp_ptr = strtok(value, ", ");
 	   temp_ptr != NULL;
            temp_ptr = strtok(NULL, ", ")) {
         if (!strcmp(temp_ptr, "u") || !strcmp(temp_ptr, "unknown"))
-          temp_service->notify_on_unknown = TRUE;
+          temp_contact->notify_on_service_unknown = TRUE;
         else if (!strcmp(temp_ptr, "w") || !strcmp(temp_ptr, "warning"))
-          temp_service->notify_on_warning = TRUE;
+          temp_contact->notify_on_service_warning = TRUE;
         else if (!strcmp(temp_ptr, "c") || !strcmp(temp_ptr, "critical"))
-          temp_service->notify_on_critical = TRUE;
+          temp_contact->notify_on_service_critical = TRUE;
         else if (!strcmp(temp_ptr, "r") || !strcmp(temp_ptr, "recovery"))
-          temp_service->notify_on_recovery = TRUE;
+          temp_contact->notify_on_service_recovery = TRUE;
         else if (!strcmp(temp_ptr, "f") || !strcmp(temp_ptr, "flapping"))
-          temp_service->notify_on_flapping = TRUE;
+          temp_contact->notify_on_service_flapping = TRUE;
         else if (!strcmp(temp_ptr, "s") || !strcmp(temp_ptr, "downtime"))
-          temp_service->notify_on_downtime = TRUE;
+          temp_contact->notify_on_service_downtime = TRUE;
         else if (!strcmp(temp_ptr, "n") || !strcmp(temp_ptr, "none")) {
-          temp_service->notify_on_unknown = FALSE;
-          temp_service->notify_on_warning = FALSE;
-          temp_service->notify_on_critical = FALSE;
-          temp_service->notify_on_recovery = FALSE;
-          temp_service->notify_on_flapping = FALSE;
-          temp_service->notify_on_downtime = FALSE;
+          temp_contact->notify_on_service_unknown = FALSE;
+          temp_contact->notify_on_service_warning = FALSE;
+          temp_contact->notify_on_service_critical = FALSE;
+          temp_contact->notify_on_service_recovery = FALSE;
+          temp_contact->notify_on_service_flapping = FALSE;
+          temp_contact->notify_on_service_downtime = FALSE;
         }
         else if (!strcmp(temp_ptr, "a") || !strcmp(temp_ptr, "all")) {
-          temp_service->notify_on_unknown = TRUE;
-          temp_service->notify_on_warning = TRUE;
-          temp_service->notify_on_critical = TRUE;
-          temp_service->notify_on_recovery = TRUE;
-          temp_service->notify_on_flapping = TRUE;
-          temp_service->notify_on_downtime = TRUE;
+          temp_contact->notify_on_service_unknown = TRUE;
+          temp_contact->notify_on_service_warning = TRUE;
+          temp_contact->notify_on_service_critical = TRUE;
+          temp_contact->notify_on_service_recovery = TRUE;
+          temp_contact->notify_on_service_flapping = TRUE;
+          temp_contact->notify_on_service_downtime = TRUE;
         }
         else {
           logger(log_config_error, basic)
-            << "Error: Invalid notification option '" << temp_ptr
-            << "' in service definition.";
+            << "Error: Invalid service notification option '" << temp_ptr
+            << "' in contact definition.";
           return (ERROR);
         }
       }
-      temp_service->have_notification_options = TRUE;
+      temp_contact->have_service_notification_options = TRUE;
     }
-    else if (!strcmp(variable, "notifications_enabled")) {
-      temp_service->notifications_enabled = (atoi(value) > 0) ? TRUE : FALSE;
-      temp_service->have_notifications_enabled = TRUE;
+    else if (!strcmp(variable, "host_notifications_enabled")) {
+      temp_contact->host_notifications_enabled = (atoi(value) > 0) ? TRUE : FALSE;
+      temp_contact->have_host_notifications_enabled = TRUE;
     }
-    else if (!strcmp(variable, "notification_interval")) {
-      temp_service->notification_interval = strtod(value, NULL);
-      temp_service->have_notification_interval = TRUE;
+    else if (!strcmp(variable, "service_notifications_enabled")) {
+      temp_contact->service_notifications_enabled = (atoi(value) > 0) ? TRUE : FALSE;
+      temp_contact->have_service_notifications_enabled = TRUE;
     }
-    else if (!strcmp(variable, "first_notification_delay")) {
-      temp_service->first_notification_delay = strtod(value, NULL);
-      temp_service->have_first_notification_delay = TRUE;
-    }
-    else if (!strcmp(variable, "stalking_options")) {
-      for (temp_ptr = strtok(value, ", ");
-	   temp_ptr != NULL;
-           temp_ptr = strtok(NULL, ", ")) {
-        if (!strcmp(temp_ptr, "o") || !strcmp(temp_ptr, "ok"))
-          temp_service->stalk_on_ok = TRUE;
-        else if (!strcmp(temp_ptr, "w") || !strcmp(temp_ptr, "warning"))
-          temp_service->stalk_on_warning = TRUE;
-        else if (!strcmp(temp_ptr, "u") || !strcmp(temp_ptr, "unknown"))
-          temp_service->stalk_on_unknown = TRUE;
-        else if (!strcmp(temp_ptr, "c")
-                 || !strcmp(temp_ptr, "critical"))
-          temp_service->stalk_on_critical = TRUE;
-        else if (!strcmp(temp_ptr, "n") || !strcmp(temp_ptr, "none")) {
-          temp_service->stalk_on_ok = FALSE;
-          temp_service->stalk_on_warning = FALSE;
-          temp_service->stalk_on_unknown = FALSE;
-          temp_service->stalk_on_critical = FALSE;
-        }
-        else if (!strcmp(temp_ptr, "a") || !strcmp(temp_ptr, "all")) {
-          temp_service->stalk_on_ok = TRUE;
-          temp_service->stalk_on_warning = TRUE;
-          temp_service->stalk_on_unknown = TRUE;
-          temp_service->stalk_on_critical = TRUE;
-        }
-        else {
-          logger(log_config_error, basic)
-            << "Error: Invalid stalking option '" << temp_ptr
-            << "' in service definition.";
-          return (ERROR);
-        }
-      }
-      temp_service->have_stalking_options = TRUE;
-    }
-    else if (!strcmp(variable, "process_perf_data")) {
-      temp_service->process_perf_data = (atoi(value) > 0) ? TRUE : FALSE;
-      temp_service->have_process_perf_data = TRUE;
-    }
-    else if (!strcmp(variable, "failure_prediction_enabled")) {
-      temp_service->failure_prediction_enabled = (atoi(value) > 0) ? TRUE : FALSE;
-      temp_service->have_failure_prediction_enabled = TRUE;
+    else if (!strcmp(variable, "can_submit_commands")) {
+      temp_contact->can_submit_commands = (atoi(value) > 0) ? TRUE : FALSE;
+      temp_contact->have_can_submit_commands = TRUE;
     }
     else if (!strcmp(variable, "retain_status_information")) {
-      temp_service->retain_status_information = (atoi(value) > 0) ? TRUE : FALSE;
-      temp_service->have_retain_status_information = TRUE;
+      temp_contact->retain_status_information = (atoi(value) > 0) ? TRUE : FALSE;
+      temp_contact->have_retain_status_information = TRUE;
     }
     else if (!strcmp(variable, "retain_nonstatus_information")) {
-      temp_service->retain_nonstatus_information = (atoi(value) > 0) ? TRUE : FALSE;
-      temp_service->have_retain_nonstatus_information = TRUE;
+      temp_contact->retain_nonstatus_information = (atoi(value) > 0) ? TRUE : FALSE;
+      temp_contact->have_retain_nonstatus_information = TRUE;
     }
     else if (!strcmp(variable, "register"))
-      temp_service->register_object = (atoi(value) > 0) ? TRUE : FALSE;
+      temp_contact->register_object = (atoi(value) > 0) ? TRUE : FALSE;
     else if (variable[0] == '_') {
       /* get the variable name */
       customvarname = my_strdup(variable + 1);
 
       /* make sure we have a variable name */
-      if (!strcmp(customvarname, "")) {
+      if (customvarname == NULL || !strcmp(customvarname, "")) {
         logger(log_config_error, basic) << "Error: Null custom variable name.";
         delete[] customvarname;
         return (ERROR);
@@ -3131,7 +2159,7 @@ int xodtemplate_add_object_property(char* input, int options) {
         customvarvalue = NULL;
 
       /* add the custom variable */
-      if (xodtemplate_add_custom_variable_to_service(temp_service,
+      if (xodtemplate_add_custom_variable_to_contact(temp_contact,
 						     customvarname,
 						     customvarvalue) == NULL) {
         delete[] customvarname;
@@ -3145,9 +2173,795 @@ int xodtemplate_add_object_property(char* input, int options) {
     }
     else {
       logger(log_config_error, basic)
-        << "Error: Invalid service object directive '" << variable << "'.";
+        << "Error: Invalid contact object directive '" << variable << "'.";
       return (ERROR);
     }
+
+    break;
+
+  case XODTEMPLATE_COMMAND:
+    temp_command = (xodtemplate_command*)xodtemplate_current_object;
+
+    if (!strcmp(variable, "use"))
+      temp_command->tmpl = my_strdup(value);
+    else if (!strcmp(variable, "name")) {
+      temp_command->name = my_strdup(value);
+
+      /* add command to template skiplist for fast searches */
+      result = skiplist_insert(xobject_template_skiplists[X_COMMAND_SKIPLIST], (void*)temp_command);
+      switch (result) {
+      case SKIPLIST_OK:
+        result = OK;
+        break;
+
+      case SKIPLIST_ERROR_DUPLICATE:
+        logger(log_config_warning, basic)
+          << "Warning: Duplicate definition found for command '" << value
+          << "' (config file '" << xodtemplate_config_file_name(temp_command->_config_file)
+          << "', starting on line " << temp_command->_start_line << ")";
+        result = ERROR;
+        break;
+
+      default:
+        result = ERROR;
+        break;
+      }
+    }
+    else if (!strcmp(variable, "command_name")) {
+      temp_command->command_name = my_strdup(value);
+
+      /* add command to template skiplist for fast searches */
+      result = skiplist_insert(xobject_skiplists[X_COMMAND_SKIPLIST], (void*)temp_command);
+      switch (result) {
+      case SKIPLIST_OK:
+        result = OK;
+        break;
+
+      case SKIPLIST_ERROR_DUPLICATE:
+        logger(log_config_warning, basic)
+          << "Warning: Duplicate definition found for command '" << value
+          << "' (config file '" << xodtemplate_config_file_name(temp_command->_config_file)
+          << "', starting on line " << temp_command->_start_line << ")";
+        result = ERROR;
+        break;
+
+      default:
+        result = ERROR;
+        break;
+      }
+    }
+    else if (!strcmp(variable, "command_line"))
+      temp_command->command_line = my_strdup(value);
+    else if (!strcmp(variable, "register"))
+      temp_command->register_object = (atoi(value) > 0) ? TRUE : FALSE;
+    else if (!strcmp(variable, "connector"))
+      temp_command->connector_name = my_strdup(value);
+    else {
+      logger(log_config_error, basic)
+        << "Error: Invalid command object directive '" << variable << "'.";
+      return (ERROR);
+    }
+    break;
+
+  case XODTEMPLATE_CONNECTOR:
+    temp_connector = (xodtemplate_connector*)xodtemplate_current_object;
+
+    if (!strcmp(variable, "connector_line"))
+      temp_connector->connector_line = my_strdup(value);
+    else if (!strcmp(variable, "connector_name")) {
+      temp_connector->connector_name = my_strdup(value);
+
+      /* add command to template skiplist for fast searches */
+      result = skiplist_insert(xobject_skiplists[X_CONNECTOR_SKIPLIST], (void*)temp_connector);
+      switch (result) {
+      case SKIPLIST_OK:
+        result = OK;
+        break;
+
+      case SKIPLIST_ERROR_DUPLICATE:
+        logger(log_config_warning, basic)
+          << "Warning: Duplicate definition found for connector '" << value
+          << "' (config file '" << xodtemplate_config_file_name(temp_connector->_config_file)
+          << "', starting on line " << temp_connector->_start_line << ")";
+        result = ERROR;
+        break;
+
+      default:
+        result = ERROR;
+        break;
+      }
+    }
+    else {
+      logger(log_config_error, basic)
+        << "Error: Invalid command object directive '" << variable << "'.";
+      return (ERROR);
+    }
+    break;
+
+  case XODTEMPLATE_CONTACTGROUP:
+    temp_contactgroup = (xodtemplate_contactgroup*)xodtemplate_current_object;
+    if (!strcmp(variable, "use"))
+      temp_contactgroup->tmpl = my_strdup(value);
+    else if (!strcmp(variable, "name")) {
+      temp_contactgroup->name = my_strdup(value);
+
+      /* add contactgroup to template skiplist for fast searches */
+      result = skiplist_insert(xobject_template_skiplists[X_CONTACTGROUP_SKIPLIST],
+			       (void*)temp_contactgroup);
+      switch (result) {
+      case SKIPLIST_OK:
+        result = OK;
+        break;
+
+      case SKIPLIST_ERROR_DUPLICATE:
+        logger(log_config_warning, basic)
+          << "Warning: Duplicate definition found for contactgroup '" << value
+          << "' (config file '" << xodtemplate_config_file_name(temp_contactgroup->_config_file)
+          << "', starting on line " << temp_contactgroup->_start_line << ")";
+        result = ERROR;
+        break;
+
+      default:
+        result = ERROR;
+        break;
+      }
+    }
+    else if (!strcmp(variable, "contactgroup_name")) {
+      temp_contactgroup->contactgroup_name = my_strdup(value);
+
+      /* add contactgroup to template skiplist for fast searches */
+      result = skiplist_insert(xobject_skiplists[X_CONTACTGROUP_SKIPLIST], (void*)temp_contactgroup);
+      switch (result) {
+      case SKIPLIST_OK:
+        result = OK;
+        break;
+
+      case SKIPLIST_ERROR_DUPLICATE:
+        logger(log_config_warning, basic)
+          << "Warning: Duplicate definition found for contactgroup '" << value
+          << "' (config file '" << xodtemplate_config_file_name(temp_contactgroup->_config_file)
+          << "', starting on line " << temp_contactgroup->_start_line << ")";
+        result = ERROR;
+        break;
+
+      default:
+        result = ERROR;
+        break;
+      }
+    }
+    else if (!strcmp(variable, "alias"))
+      temp_contactgroup->alias = my_strdup(value);
+    else if (!strcmp(variable, "members")) {
+      if (strcmp(value, XODTEMPLATE_NULL)) {
+        if (temp_contactgroup->members == NULL)
+          temp_contactgroup->members = my_strdup(value);
+        else {
+          temp_contactgroup->members = resize_string(temp_contactgroup->members,
+						     strlen(temp_contactgroup->members) + strlen(value) + 2);
+          strcat(temp_contactgroup->members, ",");
+          strcat(temp_contactgroup->members, value);
+        }
+        if (temp_contactgroup->members == NULL)
+          result = ERROR;
+      }
+      temp_contactgroup->have_members = TRUE;
+    }
+    else if (!strcmp(variable, "contactgroup_members")) {
+      if (strcmp(value, XODTEMPLATE_NULL)) {
+        if (temp_contactgroup->contactgroup_members == NULL)
+          temp_contactgroup->contactgroup_members = my_strdup(value);
+        else {
+          temp_contactgroup->contactgroup_members = resize_string(temp_contactgroup->contactgroup_members,
+								  strlen(temp_contactgroup->contactgroup_members) + strlen(value) + 2);
+          strcat(temp_contactgroup->contactgroup_members, ",");
+          strcat(temp_contactgroup->contactgroup_members, value);
+        }
+        if (temp_contactgroup->contactgroup_members == NULL)
+          result = ERROR;
+      }
+      temp_contactgroup->have_contactgroup_members = TRUE;
+    }
+    else if (!strcmp(variable, "register"))
+      temp_contactgroup->register_object = (atoi(value) > 0) ? TRUE : FALSE;
+    else {
+      logger(log_config_error, basic)
+        << "Error: Invalid contactgroup object directive '" << variable << "'.";
+      return (ERROR);
+    }
+
+    break;
+
+  case XODTEMPLATE_HOSTGROUP:
+    temp_hostgroup = (xodtemplate_hostgroup*)xodtemplate_current_object;
+
+    if (!strcmp(variable, "use"))
+      temp_hostgroup->tmpl = my_strdup(value);
+    else if (!strcmp(variable, "name")) {
+      temp_hostgroup->name = my_strdup(value);
+
+      /* add hostgroup to template skiplist for fast searches */
+      result = skiplist_insert(xobject_template_skiplists[X_HOSTGROUP_SKIPLIST],
+			       (void*)temp_hostgroup);
+      switch (result) {
+      case SKIPLIST_OK:
+        result = OK;
+        break;
+
+      case SKIPLIST_ERROR_DUPLICATE:
+        logger(log_config_warning, basic)
+          << "Warning: Duplicate definition found for hostgroup '" << value
+          << "' (config file '" << xodtemplate_config_file_name(temp_hostgroup->_config_file)
+          << "', starting on line " << temp_hostgroup->_start_line << ")";
+        result = ERROR;
+        break;
+
+      default:
+        result = ERROR;
+        break;
+      }
+    }
+    else if (!strcmp(variable, "hostgroup_name")) {
+      temp_hostgroup->hostgroup_name = my_strdup(value);
+
+      /* add hostgroup to template skiplist for fast searches */
+      result = skiplist_insert(xobject_skiplists[X_HOSTGROUP_SKIPLIST], (void*)temp_hostgroup);
+      switch (result) {
+      case SKIPLIST_OK:
+        result = OK;
+        break;
+
+      case SKIPLIST_ERROR_DUPLICATE:
+        logger(log_config_warning, basic)
+          << "Warning: Duplicate definition found for hostgroup '" << value
+          << "' (config file '" << xodtemplate_config_file_name(temp_hostgroup->_config_file)
+          << "', starting on line " << temp_hostgroup->_start_line << ")";
+        result = ERROR;
+        break;
+
+      default:
+        result = ERROR;
+        break;
+      }
+    }
+    else if (!strcmp(variable, "alias"))
+      temp_hostgroup->alias = my_strdup(value);
+    else if (!strcmp(variable, "members")) {
+      if (strcmp(value, XODTEMPLATE_NULL)) {
+        if (temp_hostgroup->members == NULL)
+          temp_hostgroup->members = my_strdup(value);
+        else {
+          temp_hostgroup->members = resize_string(temp_hostgroup->members,
+						  strlen(temp_hostgroup->members) + strlen(value) + 2);
+          strcat(temp_hostgroup->members, ",");
+          strcat(temp_hostgroup->members, value);
+        }
+        if (temp_hostgroup->members == NULL)
+          result = ERROR;
+      }
+      temp_hostgroup->have_members = TRUE;
+    }
+    else if (!strcmp(variable, "hostgroup_members")) {
+      if (strcmp(value, XODTEMPLATE_NULL)) {
+        if (temp_hostgroup->hostgroup_members == NULL)
+          temp_hostgroup->hostgroup_members = my_strdup(value);
+        else {
+          temp_hostgroup->hostgroup_members = resize_string(temp_hostgroup->hostgroup_members,
+							    strlen(temp_hostgroup->hostgroup_members) + strlen(value) + 2);
+          strcat(temp_hostgroup->hostgroup_members, ",");
+          strcat(temp_hostgroup->hostgroup_members, value);
+        }
+        if (temp_hostgroup->hostgroup_members == NULL)
+          result = ERROR;
+      }
+      temp_hostgroup->have_hostgroup_members = TRUE;
+    }
+    else if (!strcmp(variable, "notes")) {
+      if (strcmp(value, XODTEMPLATE_NULL))
+        temp_hostgroup->notes = my_strdup(value);
+      temp_hostgroup->have_notes = TRUE;
+    }
+    else if (!strcmp(variable, "notes_url")) {
+      if (strcmp(value, XODTEMPLATE_NULL))
+        temp_hostgroup->notes_url = my_strdup(value);
+      temp_hostgroup->have_notes_url = TRUE;
+    }
+    else if (!strcmp(variable, "action_url")) {
+      if (strcmp(value, XODTEMPLATE_NULL))
+        temp_hostgroup->action_url = my_strdup(value);
+      temp_hostgroup->have_action_url = TRUE;
+    }
+    else if (!strcmp(variable, "register"))
+      temp_hostgroup->register_object = (atoi(value) > 0) ? TRUE : FALSE;
+    else {
+      logger(log_config_error, basic)
+        << "Error: Invalid hostgroup object directive '" << variable << "'.";
+      return (ERROR);
+    }
+
+    break;
+
+  case XODTEMPLATE_SERVICEGROUP:
+    temp_servicegroup = (xodtemplate_servicegroup*)xodtemplate_current_object;
+
+    if (!strcmp(variable, "use"))
+      temp_servicegroup->tmpl = my_strdup(value);
+    else if (!strcmp(variable, "name")) {
+      temp_servicegroup->name = my_strdup(value);
+
+      /* add servicegroup to template skiplist for fast searches */
+      result = skiplist_insert(xobject_template_skiplists[X_SERVICEGROUP_SKIPLIST],
+			       (void*)temp_servicegroup);
+      switch (result) {
+      case SKIPLIST_OK:
+        result = OK;
+        break;
+
+      case SKIPLIST_ERROR_DUPLICATE:
+        logger(log_config_warning, basic)
+          << "Warning: Duplicate definition found for servicegroup '" << value
+          << "' (config file '" << xodtemplate_config_file_name(temp_servicegroup->_config_file)
+          << "', starting on line " << temp_servicegroup->_start_line << ")";
+        result = ERROR;
+        break;
+
+      default:
+        result = ERROR;
+        break;
+      }
+    }
+    else if (!strcmp(variable, "servicegroup_name")) {
+      temp_servicegroup->servicegroup_name = my_strdup(value);
+
+      /* add servicegroup to template skiplist for fast searches */
+      result = skiplist_insert(xobject_skiplists[X_SERVICEGROUP_SKIPLIST], (void*)temp_servicegroup);
+      switch (result) {
+      case SKIPLIST_OK:
+        result = OK;
+        break;
+
+      case SKIPLIST_ERROR_DUPLICATE:
+        logger(log_config_warning, basic)
+          << "Warning: Duplicate definition found for servicegroup '" << value
+          << "' (config file '" << xodtemplate_config_file_name(temp_servicegroup->_config_file)
+          << "', starting on line " << temp_servicegroup->_start_line << ")";
+        result = ERROR;
+        break;
+
+      default:
+        result = ERROR;
+        break;
+      }
+    }
+    else if (!strcmp(variable, "alias"))
+      temp_servicegroup->alias = my_strdup(value);
+    else if (!strcmp(variable, "members")) {
+      if (strcmp(value, XODTEMPLATE_NULL)) {
+        if (temp_servicegroup->members == NULL)
+          temp_servicegroup->members = my_strdup(value);
+        else {
+          temp_servicegroup->members = resize_string(temp_servicegroup->members,
+						     strlen(temp_servicegroup->members) + strlen(value) + 2);
+          strcat(temp_servicegroup->members, ",");
+          strcat(temp_servicegroup->members, value);
+        }
+        if (temp_servicegroup->members == NULL)
+          result = ERROR;
+      }
+      temp_servicegroup->have_members = TRUE;
+    }
+    else if (!strcmp(variable, "servicegroup_members")) {
+      if (strcmp(value, XODTEMPLATE_NULL)) {
+        if (temp_servicegroup->servicegroup_members == NULL)
+          temp_servicegroup->servicegroup_members = my_strdup(value);
+        else {
+          temp_servicegroup->servicegroup_members =
+	    resize_string(temp_servicegroup->servicegroup_members,
+                          strlen(temp_servicegroup-> servicegroup_members) + strlen(value) + 2);
+          strcat(temp_servicegroup->servicegroup_members, ",");
+          strcat(temp_servicegroup->servicegroup_members, value);
+        }
+        if (temp_servicegroup->servicegroup_members == NULL)
+          result = ERROR;
+      }
+      temp_servicegroup->have_servicegroup_members = TRUE;
+    }
+    else if (!strcmp(variable, "notes")) {
+      if (strcmp(value, XODTEMPLATE_NULL))
+        temp_servicegroup->notes = my_strdup(value);
+      temp_servicegroup->have_notes = TRUE;
+    }
+    else if (!strcmp(variable, "notes_url")) {
+      if (strcmp(value, XODTEMPLATE_NULL))
+        temp_servicegroup->notes_url = my_strdup(value);
+      temp_servicegroup->have_notes_url = TRUE;
+    }
+    else if (!strcmp(variable, "action_url")) {
+      if (strcmp(value, XODTEMPLATE_NULL))
+        temp_servicegroup->action_url = my_strdup(value);
+      temp_servicegroup->have_action_url = TRUE;
+    }
+    else if (!strcmp(variable, "register"))
+      temp_servicegroup->register_object = (atoi(value) > 0) ? TRUE : FALSE;
+    else {
+      logger(log_config_error, basic)
+        << "Error: Invalid servicegroup object directive '" << variable << "'.";
+      return (ERROR);
+    }
+
+    break;
+
+  case XODTEMPLATE_SERVICEDEPENDENCY:
+    temp_servicedependency = (xodtemplate_servicedependency*)xodtemplate_current_object;
+
+    if (!strcmp(variable, "use"))
+      temp_servicedependency->tmpl = my_strdup(value);
+    else if (!strcmp(variable, "name")) {
+      temp_servicedependency->name = my_strdup(value);
+
+      /* add dependency to template skiplist for fast searches */
+      result = skiplist_insert(xobject_template_skiplists[X_SERVICEDEPENDENCY_SKIPLIST],
+			       (void*)temp_servicedependency);
+      switch (result) {
+      case SKIPLIST_OK:
+        result = OK;
+        break;
+
+      case SKIPLIST_ERROR_DUPLICATE:
+        logger(log_config_warning, basic)
+          << "Warning: Duplicate definition found for service dependency '" << variable
+          << "' (config file '" << xodtemplate_config_file_name(temp_servicedependency->_config_file)
+          << "', starting on line " << temp_servicedependency->_start_line << ")";
+        result = ERROR;
+        break;
+
+      default:
+        result = ERROR;
+        break;
+      }
+    }
+    else if (!strcmp(variable, "servicegroup")
+             || !strcmp(variable, "servicegroups")
+             || !strcmp(variable, "servicegroup_name")) {
+      if (strcmp(value, XODTEMPLATE_NULL))
+        temp_servicedependency->servicegroup_name = my_strdup(value);
+      temp_servicedependency->have_servicegroup_name = TRUE;
+    }
+    else if (!strcmp(variable, "hostgroup")
+             || !strcmp(variable, "hostgroups")
+             || !strcmp(variable, "hostgroup_name")) {
+      if (strcmp(value, XODTEMPLATE_NULL))
+        temp_servicedependency->hostgroup_name = my_strdup(value);
+      temp_servicedependency->have_hostgroup_name = TRUE;
+    }
+    else if (!strcmp(variable, "host") || !strcmp(variable, "host_name")
+             || !strcmp(variable, "master_host")
+             || !strcmp(variable, "master_host_name")) {
+      if (strcmp(value, XODTEMPLATE_NULL))
+        temp_servicedependency->host_name = my_strdup(value);
+      temp_servicedependency->have_host_name = TRUE;
+    }
+    else if (!strcmp(variable, "description")
+             || !strcmp(variable, "service_description")
+             || !strcmp(variable, "master_description")
+             || !strcmp(variable, "master_service_description")) {
+      if (strcmp(value, XODTEMPLATE_NULL))
+        temp_servicedependency->service_description = my_strdup(value);
+      temp_servicedependency->have_service_description = TRUE;
+    }
+    else if (!strcmp(variable, "dependent_servicegroup")
+             || !strcmp(variable, "dependent_servicegroups")
+             || !strcmp(variable, "dependent_servicegroup_name")) {
+      if (strcmp(value, XODTEMPLATE_NULL))
+        temp_servicedependency->dependent_servicegroup_name = my_strdup(value);
+      temp_servicedependency->have_dependent_servicegroup_name = TRUE;
+    }
+    else if (!strcmp(variable, "dependent_hostgroup")
+             || !strcmp(variable, "dependent_hostgroups")
+             || !strcmp(variable, "dependent_hostgroup_name")) {
+      if (strcmp(value, XODTEMPLATE_NULL))
+        temp_servicedependency->dependent_hostgroup_name = my_strdup(value);
+      temp_servicedependency->have_dependent_hostgroup_name = TRUE;
+    }
+    else if (!strcmp(variable, "dependent_host")
+             || !strcmp(variable, "dependent_host_name")) {
+      if (strcmp(value, XODTEMPLATE_NULL))
+        temp_servicedependency->dependent_host_name = my_strdup(value);
+      temp_servicedependency->have_dependent_host_name = TRUE;
+
+      /* NOTE: dependencies are added to the skiplist in xodtemplate_duplicate_objects(), except if daemon is using precached config */
+      if (result == OK && force_skiplists == TRUE
+          && temp_servicedependency->dependent_host_name != NULL
+          && temp_servicedependency->dependent_service_description != NULL) {
+        /* add servicedependency to template skiplist for fast searches */
+        result = skiplist_insert(xobject_skiplists[X_SERVICEDEPENDENCY_SKIPLIST],
+				 (void*)temp_servicedependency);
+        switch (result) {
+        case SKIPLIST_OK:
+          result = OK;
+          break;
+
+        default:
+          result = ERROR;
+          break;
+        }
+      }
+    }
+    else if (!strcmp(variable, "dependent_description")
+             || !strcmp(variable, "dependent_service_description")) {
+      if (strcmp(value, XODTEMPLATE_NULL))
+        temp_servicedependency->dependent_service_description = my_strdup(value);
+      temp_servicedependency->have_dependent_service_description = TRUE;
+
+      /* NOTE: dependencies are added to the skiplist in xodtemplate_duplicate_objects(), except if daemon is using precached config */
+      if (result == OK && force_skiplists == TRUE
+          && temp_servicedependency->dependent_host_name != NULL
+          && temp_servicedependency->dependent_service_description != NULL) {
+        /* add servicedependency to template skiplist for fast searches */
+        result = skiplist_insert(xobject_skiplists[X_SERVICEDEPENDENCY_SKIPLIST],
+				 (void*)temp_servicedependency);
+        switch (result) {
+        case SKIPLIST_OK:
+          result = OK;
+          break;
+
+        default:
+          result = ERROR;
+          break;
+        }
+      }
+    }
+    else if (!strcmp(variable, "dependency_period")) {
+      if (strcmp(value, XODTEMPLATE_NULL))
+        temp_servicedependency->dependency_period = my_strdup(value);
+      temp_servicedependency->have_dependency_period = TRUE;
+    }
+    else if (!strcmp(variable, "inherits_parent")) {
+      temp_servicedependency->inherits_parent = (atoi(value) > 0) ? TRUE : FALSE;
+      temp_servicedependency->have_inherits_parent = TRUE;
+    }
+    else if (!strcmp(variable, "execution_failure_options")
+             || !strcmp(variable, "execution_failure_criteria")) {
+      for (temp_ptr = strtok(value, ", ");
+	   temp_ptr != NULL;
+           temp_ptr = strtok(NULL, ", ")) {
+        if (!strcmp(temp_ptr, "o") || !strcmp(temp_ptr, "ok"))
+          temp_servicedependency->fail_execute_on_ok = TRUE;
+        else if (!strcmp(temp_ptr, "u") || !strcmp(temp_ptr, "unknown"))
+          temp_servicedependency->fail_execute_on_unknown = TRUE;
+        else if (!strcmp(temp_ptr, "w") || !strcmp(temp_ptr, "warning"))
+          temp_servicedependency->fail_execute_on_warning = TRUE;
+        else if (!strcmp(temp_ptr, "c") || !strcmp(temp_ptr, "critical"))
+          temp_servicedependency->fail_execute_on_critical = TRUE;
+        else if (!strcmp(temp_ptr, "p") || !strcmp(temp_ptr, "pending"))
+          temp_servicedependency->fail_execute_on_pending = TRUE;
+        else if (!strcmp(temp_ptr, "n") || !strcmp(temp_ptr, "none")) {
+          temp_servicedependency->fail_execute_on_ok = FALSE;
+          temp_servicedependency->fail_execute_on_unknown = FALSE;
+          temp_servicedependency->fail_execute_on_warning = FALSE;
+          temp_servicedependency->fail_execute_on_critical = FALSE;
+        }
+        else if (!strcmp(temp_ptr, "a") || !strcmp(temp_ptr, "all")) {
+          temp_servicedependency->fail_execute_on_ok = TRUE;
+          temp_servicedependency->fail_execute_on_unknown = TRUE;
+          temp_servicedependency->fail_execute_on_warning = TRUE;
+          temp_servicedependency->fail_execute_on_critical = TRUE;
+        }
+        else {
+          logger(log_config_error, basic)
+            << "Error: Invalid execution dependency option '" << temp_ptr
+            << "' in servicedependency definition.";
+          return (ERROR);
+        }
+      }
+      temp_servicedependency->have_execution_dependency_options = TRUE;
+    }
+    else if (!strcmp(variable, "notification_failure_options")
+             || !strcmp(variable, "notification_failure_criteria")) {
+      for (temp_ptr = strtok(value, ", ");
+	   temp_ptr != NULL;
+           temp_ptr = strtok(NULL, ", ")) {
+        if (!strcmp(temp_ptr, "o") || !strcmp(temp_ptr, "ok"))
+          temp_servicedependency->fail_notify_on_ok = TRUE;
+        else if (!strcmp(temp_ptr, "u") || !strcmp(temp_ptr, "unknown"))
+          temp_servicedependency->fail_notify_on_unknown = TRUE;
+        else if (!strcmp(temp_ptr, "w") || !strcmp(temp_ptr, "warning"))
+          temp_servicedependency->fail_notify_on_warning = TRUE;
+        else if (!strcmp(temp_ptr, "c")
+                 || !strcmp(temp_ptr, "critical"))
+          temp_servicedependency->fail_notify_on_critical = TRUE;
+        else if (!strcmp(temp_ptr, "p") || !strcmp(temp_ptr, "pending"))
+          temp_servicedependency->fail_notify_on_pending = TRUE;
+        else if (!strcmp(temp_ptr, "n") || !strcmp(temp_ptr, "none")) {
+          temp_servicedependency->fail_notify_on_ok = FALSE;
+          temp_servicedependency->fail_notify_on_unknown = FALSE;
+          temp_servicedependency->fail_notify_on_warning = FALSE;
+          temp_servicedependency->fail_notify_on_critical = FALSE;
+          temp_servicedependency->fail_notify_on_pending = FALSE;
+        }
+        else if (!strcmp(temp_ptr, "a") || !strcmp(temp_ptr, "all")) {
+          temp_servicedependency->fail_notify_on_ok = TRUE;
+          temp_servicedependency->fail_notify_on_unknown = TRUE;
+          temp_servicedependency->fail_notify_on_warning = TRUE;
+          temp_servicedependency->fail_notify_on_critical = TRUE;
+          temp_servicedependency->fail_notify_on_pending = TRUE;
+        }
+        else {
+          logger(log_config_error, basic)
+            << "Error: Invalid notification dependency option '" << temp_ptr
+            << "' in servicedependency definition.";
+          return (ERROR);
+        }
+      }
+      temp_servicedependency->have_notification_dependency_options = TRUE;
+    }
+    else if (!strcmp(variable, "register"))
+      temp_servicedependency->register_object = (atoi(value) > 0) ? TRUE : FALSE;
+    else {
+      logger(log_config_error, basic)
+        << "Error: Invalid servicedependency object directive '"
+        << variable << "'.";
+      return (ERROR);
+    }
+    break;
+
+  case XODTEMPLATE_SERVICEESCALATION:
+    temp_serviceescalation = (xodtemplate_serviceescalation*)xodtemplate_current_object;
+
+    if (!strcmp(variable, "use"))
+      temp_serviceescalation->tmpl = my_strdup(value);
+    else if (!strcmp(variable, "name")) {
+      temp_serviceescalation->name = my_strdup(value);
+
+      /* add escalation to template skiplist for fast searches */
+      result = skiplist_insert(xobject_template_skiplists[X_SERVICEESCALATION_SKIPLIST],
+			       (void*)temp_serviceescalation);
+      switch (result) {
+      case SKIPLIST_OK:
+        result = OK;
+        break;
+
+      case SKIPLIST_ERROR_DUPLICATE:
+        logger(log_config_warning, basic)
+          << "Warning: Duplicate definition found for service escalation '" << value
+          << "' (config file '" << xodtemplate_config_file_name(temp_serviceescalation->_config_file)
+          << "', starting on line " << temp_serviceescalation->_start_line << ")";
+        result = ERROR;
+        break;
+
+      default:
+        result = ERROR;
+        break;
+      }
+    }
+    else if (!strcmp(variable, "host") || !strcmp(variable, "host_name")) {
+      if (strcmp(value, XODTEMPLATE_NULL))
+        temp_serviceescalation->host_name = my_strdup(value);
+      temp_serviceescalation->have_host_name = TRUE;
+
+      /* NOTE: escalations are added to the skiplist in xodtemplate_duplicate_objects(), except if daemon is using precached config */
+      if (result == OK && force_skiplists == TRUE
+          && temp_serviceescalation->host_name != NULL
+          && temp_serviceescalation->service_description != NULL) {
+        /* add serviceescalation to template skiplist for fast searches */
+        result = skiplist_insert(xobject_skiplists[X_SERVICEESCALATION_SKIPLIST],
+				 (void*)temp_serviceescalation);
+        switch (result) {
+        case SKIPLIST_OK:
+          result = OK;
+          break;
+
+        default:
+          result = ERROR;
+          break;
+        }
+      }
+    }
+    else if (!strcmp(variable, "description")
+	     || !strcmp(variable, "service_description")) {
+      if (strcmp(value, XODTEMPLATE_NULL))
+        temp_serviceescalation->service_description = my_strdup(value);
+      temp_serviceescalation->have_service_description = TRUE;
+
+      /* NOTE: escalations are added to the skiplist in xodtemplate_duplicate_objects(), except if daemon is using precached config */
+      if (result == OK && force_skiplists == TRUE
+          && temp_serviceescalation->host_name != NULL
+          && temp_serviceescalation->service_description != NULL) {
+        /* add serviceescalation to template skiplist for fast searches */
+        result = skiplist_insert(xobject_skiplists[X_SERVICEESCALATION_SKIPLIST],
+				 (void*)temp_serviceescalation);
+        switch (result) {
+        case SKIPLIST_OK:
+          result = OK;
+          break;
+
+        default:
+          result = ERROR;
+          break;
+        }
+      }
+    }
+    else if (!strcmp(variable, "servicegroup")
+             || !strcmp(variable, "servicegroups")
+             || !strcmp(variable, "servicegroup_name")) {
+      if (strcmp(value, XODTEMPLATE_NULL))
+        temp_serviceescalation->servicegroup_name = my_strdup(value);
+      temp_serviceescalation->have_servicegroup_name = TRUE;
+    }
+    else if (!strcmp(variable, "hostgroup")
+             || !strcmp(variable, "hostgroups")
+             || !strcmp(variable, "hostgroup_name")) {
+      if (strcmp(value, XODTEMPLATE_NULL))
+        temp_serviceescalation->hostgroup_name = my_strdup(value);
+      temp_serviceescalation->have_hostgroup_name = TRUE;
+    }
+    else if (!strcmp(variable, "contact_groups")) {
+      if (strcmp(value, XODTEMPLATE_NULL))
+        temp_serviceescalation->contact_groups = my_strdup(value);
+      temp_serviceescalation->have_contact_groups = TRUE;
+    }
+    else if (!strcmp(variable, "contacts")) {
+      if (strcmp(value, XODTEMPLATE_NULL))
+        temp_serviceescalation->contacts = my_strdup(value);
+      temp_serviceescalation->have_contacts = TRUE;
+    }
+    else if (!strcmp(variable, "escalation_period")) {
+      if (strcmp(value, XODTEMPLATE_NULL))
+        temp_serviceescalation->escalation_period = my_strdup(value);
+      temp_serviceescalation->have_escalation_period = TRUE;
+    }
+    else if (!strcmp(variable, "first_notification")) {
+      temp_serviceescalation->first_notification = atoi(value);
+      temp_serviceescalation->have_first_notification = TRUE;
+    }
+    else if (!strcmp(variable, "last_notification")) {
+      temp_serviceescalation->last_notification = atoi(value);
+      temp_serviceescalation->have_last_notification = TRUE;
+    }
+    else if (!strcmp(variable, "notification_interval")) {
+      temp_serviceescalation->notification_interval = strtod(value, NULL);
+      temp_serviceescalation->have_notification_interval = TRUE;
+    }
+    else if (!strcmp(variable, "escalation_options")) {
+      for (temp_ptr = strtok(value, ", ");
+	   temp_ptr != NULL;
+           temp_ptr = strtok(NULL, ", ")) {
+        if (!strcmp(temp_ptr, "w") || !strcmp(temp_ptr, "warning"))
+          temp_serviceescalation->escalate_on_warning = TRUE;
+        else if (!strcmp(temp_ptr, "u") || !strcmp(temp_ptr, "unknown"))
+          temp_serviceescalation->escalate_on_unknown = TRUE;
+        else if (!strcmp(temp_ptr, "c") || !strcmp(temp_ptr, "critical"))
+          temp_serviceescalation->escalate_on_critical = TRUE;
+        else if (!strcmp(temp_ptr, "r") || !strcmp(temp_ptr, "recovery"))
+          temp_serviceescalation->escalate_on_recovery = TRUE;
+        else if (!strcmp(temp_ptr, "n") || !strcmp(temp_ptr, "none")) {
+          temp_serviceescalation->escalate_on_warning = FALSE;
+          temp_serviceescalation->escalate_on_unknown = FALSE;
+          temp_serviceescalation->escalate_on_critical = FALSE;
+          temp_serviceescalation->escalate_on_recovery = FALSE;
+        }
+        else if (!strcmp(temp_ptr, "a") || !strcmp(temp_ptr, "all")) {
+          temp_serviceescalation->escalate_on_warning = TRUE;
+          temp_serviceescalation->escalate_on_unknown = TRUE;
+          temp_serviceescalation->escalate_on_critical = TRUE;
+          temp_serviceescalation->escalate_on_recovery = TRUE;
+        }
+        else {
+          logger(log_config_error, basic)
+            << "Error: Invalid escalation option '" << temp_ptr
+            << "' in serviceescalation definition.";
+          return (ERROR);
+        }
+      }
+      temp_serviceescalation->have_escalation_options = TRUE;
+    }
+    else if (!strcmp(variable, "register"))
+      temp_serviceescalation->register_object = (atoi(value) > 0) ? TRUE : FALSE;
+    else {
+      logger(log_config_error, basic)
+        << "Error: Invalid serviceescalation object directive '" << variable << "'.";
+      return (ERROR);
+    }
+
     break;
 
   case XODTEMPLATE_HOSTDEPENDENCY:
@@ -3162,16 +2976,16 @@ int xodtemplate_add_object_property(char* input, int options) {
       result = skiplist_insert(xobject_template_skiplists[X_HOSTDEPENDENCY_SKIPLIST],
 			       (void*)temp_hostdependency);
       switch (result) {
+      case SKIPLIST_OK:
+        result = OK;
+        break;
+
       case SKIPLIST_ERROR_DUPLICATE:
         logger(log_config_warning, basic)
           << "Warning: Duplicate definition found for host dependency '" << value
           << "' (config file '" << xodtemplate_config_file_name(temp_hostdependency-> _config_file)
           << "', starting on line " << temp_hostdependency->_start_line << ")";
         result = ERROR;
-        break;
-
-      case SKIPLIST_OK:
-        result = OK;
         break;
 
       default:
@@ -3321,16 +3135,16 @@ int xodtemplate_add_object_property(char* input, int options) {
       result = skiplist_insert(xobject_template_skiplists[X_HOSTESCALATION_SKIPLIST],
 			       (void*)temp_hostescalation);
       switch (result) {
+      case SKIPLIST_OK:
+        result = OK;
+        break;
+
       case SKIPLIST_ERROR_DUPLICATE:
         logger(log_config_warning, basic)
           << "Warning: Duplicate definition found for host escalation '" << value
           << "' (config file '" << xodtemplate_config_file_name(temp_hostescalation->_config_file)
           << "', starting on line " << temp_hostescalation->_start_line << ")";
         result = ERROR;
-        break;
-
-      case SKIPLIST_OK:
-        result = OK;
         break;
 
       default:
@@ -3444,16 +3258,16 @@ int xodtemplate_add_object_property(char* input, int options) {
       result = skiplist_insert(xobject_template_skiplists[X_HOSTEXTINFO_SKIPLIST],
 			       (void*)temp_hostextinfo);
       switch (result) {
+      case SKIPLIST_OK:
+        result = OK;
+        break;
+
       case SKIPLIST_ERROR_DUPLICATE:
         logger(log_config_warning, basic)
           << "Warning: Duplicate definition found for extended host info '" << value
           << "' (config file '" << xodtemplate_config_file_name(temp_hostextinfo->_config_file)
           << "', starting on line " << temp_hostextinfo->_start_line << ")";
         result = ERROR;
-        break;
-
-      case SKIPLIST_OK:
-        result = OK;
         break;
 
       default:
@@ -3575,16 +3389,16 @@ int xodtemplate_add_object_property(char* input, int options) {
       result = skiplist_insert(xobject_template_skiplists[X_SERVICEEXTINFO_SKIPLIST],
 			       (void*)temp_serviceextinfo);
       switch (result) {
+      case SKIPLIST_OK:
+        result = OK;
+        break;
+
       case SKIPLIST_ERROR_DUPLICATE:
         logger(log_config_warning, basic)
           << "Warning: Duplicate definition found for extended service info '" << value
           << "' (config file '" << xodtemplate_config_file_name(temp_serviceextinfo->_config_file)
           << "', starting on line " << temp_serviceextinfo->_start_line << ")";
         result = ERROR;
-        break;
-
-      case SKIPLIST_OK:
-        result = OK;
         break;
 
       default:
@@ -4533,6 +4347,10 @@ int xodtemplate_duplicate_services(void) {
 
     result = skiplist_insert(xobject_skiplists[X_SERVICE_SKIPLIST], (void*)temp_service);
     switch (result) {
+    case SKIPLIST_OK:
+      result = OK;
+      break;
+
     case SKIPLIST_ERROR_DUPLICATE:
       logger(log_config_warning, basic)
         << "Warning: Duplicate definition found for service '"
@@ -4541,10 +4359,6 @@ int xodtemplate_duplicate_services(void) {
         << xodtemplate_config_file_name(temp_service->_config_file)
         << "', starting on line " << temp_service->_start_line << ")";
       result = ERROR;
-      break;
-
-    case SKIPLIST_OK:
-      result = OK;
       break;
 
     default:
@@ -4576,6 +4390,10 @@ int xodtemplate_duplicate_services(void) {
 
     result = skiplist_insert(xobject_skiplists[X_SERVICE_SKIPLIST], (void*)temp_service);
     switch (result) {
+    case SKIPLIST_OK:
+      result = OK;
+      break;
+
     case SKIPLIST_ERROR_DUPLICATE:
       logger(log_config_warning, basic)
         << "Warning: Duplicate definition found for service '"
@@ -4584,10 +4402,6 @@ int xodtemplate_duplicate_services(void) {
         << xodtemplate_config_file_name(temp_service->_config_file)
         << "', starting on line " << temp_service->_start_line << ")";
       result = ERROR;
-      break;
-
-    case SKIPLIST_OK:
-      result = OK;
       break;
 
     default:
