@@ -212,14 +212,6 @@
  *    <td>Enable or disable startup script installation. If enabled, your platform will be detected and the appropriate startup script automatically chosen. If detection fails, make sure that the @em lsb_release utility is available on your system.</td>
  *  </tr>
  *  <tr>
- *    <td>WITH_EMBEDDED_PERL</td>
- *    <td>Enable or disable embedded Perl. Default is disabled.</td>
- *  </tr>
- *  <tr>
- *    <td>WITH_PERL_CACHE</td>
- *    <td>If embedded Perl is enabled, enable or disable script caching.</td>
- *  </tr>
- *  <tr>
  *    <td>WITH_DOCUMENTATION</td>
  *    <td>Enable or disable documentation generation. @em Doxygen must be present on your machine.</td>
  *  </tr>

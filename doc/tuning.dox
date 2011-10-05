@@ -93,13 +93,7 @@
  *  monitoring host if you have a lot of service checks. If you want to
  *  use Perl plugins, consider compiling them into true executables
  *  using perlcc(1) (a utility which is part of the standard Perl
- *  distribution) or compiling Centreon Engine with an embedded Perl
- *  interpreter (see below).
- *
- *  - Use the embedded Perl interpreter. If you're using a lot of Perl
- *  scripts for service checks, etc., you will probably find that
- *  compiling the @link usingtheembeddedperlinterpreter embedded Perl interpreter
- *  @endlink into the Centreon Engine binary will speed things up.
+ *  distribution).
  *
  *  - Optimize host check commands. If you're checking host states
  *  using the check_ping plugin you'll find that host checks will be

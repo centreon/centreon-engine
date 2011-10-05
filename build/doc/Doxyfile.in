@@ -41,7 +41,6 @@ INPUT                  = ../../doc/about.dox                   \
                          ../../doc/stalking.dox                \
                          ../../doc/perfdata.dox                \
                          ../../doc/downtime.dox                \
-                         ../../doc/embeddedperl.dox            \
                          ../../doc/adaptive.dox                \
                          ../../doc/dependencychecks.dox        \
                          ../../doc/cachedchecks.dox            \
@@ -58,8 +57,7 @@ INPUT                  = ../../doc/about.dox                   \
                          ../../doc/int-snmptrap.dox            \
                          ../../doc/int-tcpwrappers.dox         \
                          ../../doc/addons.dox                  \
-                         ../../doc/pluginapi.dox               \
-                         ../../doc/epnplugins.dox
+                         ../../doc/pluginapi.dox
 OUTPUT_DIRECTORY       = 
 OUTPUT_LANGUAGE        = English
 RECURSIVE              = NO

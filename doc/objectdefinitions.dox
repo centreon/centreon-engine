@@ -60,6 +60,7 @@
  *  - @ref objectdefinitionsobjecttypescontactgroupdefinition "Contact group definitions"
  *  - @ref objectdefinitionsobjecttypestimeperioddefinition "Time period definitions"
  *  - @ref objectdefinitionsobjecttypescommanddefinition "Command definitions"
+ *  - @ref objectdefinitionsobjecttypesconnectordefinition "Connector definitions"
  *  - @ref objectdefinitionsobjecttypesservicedependencydefinition "Service dependency definitions"
  *  - @ref objectdefinitionsobjecttypesserviceescalationdefinition "Service escalation definitions"
  *  - @ref objectdefinitionsobjecttypeshostdependencydefinition "Host dependency definitions"
@@ -1819,6 +1820,7 @@
  *  define command{
  *    @b command_name command_name
  *    @b command_line command_line
+ *    connector    connector_name
  *  }
  *  @endcode
  *
@@ -1876,6 +1878,65 @@
  *        the command. More information on how arguments in command
  *        definitions are processed during runtime can be found in the
  *        documentation on @link understandingmacrosandhowtheywork macros @endlink.
+ *
+ *        @note Centreon-Engine does not support the shell commands in command_line.
+ *        You need to define a command without shell features.
+ *    </td>
+ *  </tr>
+ *  <tr>
+ *    <td>connector</td>
+ *    <td>
+ *      This directive is used for link a command with a connector. When this directive
+ *      is not empty, the command is replace by the connector. When the connector is
+ *      call the command_line argument is use.
+ *    </td>
+ *  </tr>
+ *  </table>
+ *
+ *  @subsection objectdefinitionsobjecttypesconnectordefinition Connector Definition
+ *
+ *  @subsubsection objectdefinitionsobjecttypesconnectordefinitiondescription Description
+ *
+ *  A connector is just like a command with better performences. A connector run on
+ *  background and it is never close. A connector is define by a name and a command line.
+ *
+ *  @subsubsection objectdefinitionsobjecttypesconnectordefinitiondefinitionformat Definition Format
+ *
+ *  @note Directives using a bold font are required, while those are
+ *  optional.
+ *
+ *  @code
+ *  define connector{
+ *    @b connector_name connector_name
+ *    @b connector_line connector_line
+ *  }
+ *  @endcode
+ *
+ *  @subsubsection objectdefinitionsobjecttypesconnectordefinitionexampledefinition Example Definition
+ *
+ *  @code
+ *  define connector{
+ *    connector_name connector_icmp
+ *    connector_line /usr/local/centengine/libexec/connector_icmp
+ *  }
+ *  @endcode
+ *
+ *  @subsubsection objectdefinitionsobjecttypesconnectordefinitiondirectivedescriptions Directive Descriptions
+ *
+ *  <table>
+ *    <tr>
+ *      <td>connector_name</td>
+ *      <td>
+ *  	  This directive is the short name used to identify the connector. It
+ *        is referenced in @ref objectdefinitionsobjecttypesconnectordefinition "command"
+ *        definitions.
+ *      </td>
+ *    </tr>
+ *    <tr>
+ *      <td>connector_line</td>
+ *      <td>
+ *        This directive is used to define the path of the binary connector and
+ *        the optional argument. It is possible to use the Centreon-Engine macros.
  *    </td>
  *  </tr>
  *  </table>

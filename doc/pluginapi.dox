@@ -200,12 +200,5 @@
  *  plugins. Information on obtaining the official Centreon Engine
  *  plugins can be found @link plugins.html here @endlink.
  *
- *  @section centenginepluginapiperlplugins Perl Plugins
- *
- *  Centreon Engine features an optional @link usingtheembeddedperlinterpreter
- *  embedded Perl interpreter @endlink which can speed up the execution
- *  of Perl plugins. More information on developing Perl plugins for
- *  use with the embedded Perl interpreter can be found @link
- *  usingtheembeddedperlinterpreter here @endlink.
  */
 

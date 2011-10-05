@@ -1841,33 +1841,6 @@
  *  information on freshness checking can be found @link serviceandhostfreshnesschecks
  *  here @endlink.
  *
- *  @subsection mainconfigurationfileoptionsconfigurationfilevariablesembeddedperlinterpreteroption Embedded Perl Interpreter Option
- *
- *  @code
- *  Format:  enable_embedded_perl=<0/1>
- *  Example: enable_embedded_perl=1
- *  @endcode
- *
- *  This setting determines whether or not the embedded Perl
- *  interpreter is enabled on a program-wide basis. Centreon Engine
- *  must be compiled with support for embedded Perl for this option to
- *  have an effect. More information on the embedded Perl interpreter
- *  can be found @link usingtheembeddedperlinterpreter here @endlink.
- *
- *  @subsection mainconfigurationfileoptionsconfigurationfilevariablesembeddedperlimplicituseoption Embedded Perl Implicit Use Option
- *
- *  @code
- *  Format:  use_embedded_perl_implicitly=<0/1>
- *  Example: use_embedded_perl_implicitly=1
- *  @endcode
- *
- *  This setting determines whether or not the embedded Perl
- *  interpreter should be used for Perl plugins/scripts that do not
- *  explicitly enable/disable it. Centreon Engine must be compiled
- *  with support for embedded Perl for this option to have an effect.
- *  More information on the embedded Perl interpreter and the effect of
- *  this setting can be found @link usingtheembeddedperlinterpreter here @endlink.
- *
  *  @subsection mainconfigurationfileoptionsconfigurationfilevariablesdateformat Date Format
  *
  *  @code
