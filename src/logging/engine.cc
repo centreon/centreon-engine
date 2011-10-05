@@ -83,13 +83,13 @@ void engine::log(char const* message,
 		 unsigned int verbosity) throw() {
   if (message != NULL) {
     _rwlock.lockForRead();
-    for (QHash<unsigned long, obj_info>::iterator it = _objects.begin(),
+    for (QVector<obj_info>::iterator it = _objects.begin(),
            end = _objects.end();
 	 it != end;
 	 ++it) {
-      obj_info& info = it.value();
-      if (verbosity <= info.verbosity && (type & info.type)) {
-	info.obj->log(message, type, verbosity);
+      obj_info& info(*it);
+      if (verbosity <= info.verbosity() && (type & info.type())) {
+	info._obj->log(message, type, verbosity);
       }
     }
     _rwlock.unlock();
@@ -100,15 +100,17 @@ void engine::log(char const* message,
  *  Add a new object logging into engine.
  *
  *  @param[in] info The object logging with type and verbosity.
+ *
+ *  @return The object id.
  */
-unsigned long engine::add_object(obj_info const& info) {
+unsigned long engine::add_object(obj_info& info) {
   _rwlock.lockForWrite();
-  unsigned int id = ++_id;
-  _objects.insert(id, info);
-  for (unsigned int i = 0, end = info.verbosity; i <= end; ++i)
-    _type[i] |= info.type;
+  info._id = _id++;
+  _objects.push_back(info);
+  for (unsigned int i = 0, end = info.verbosity(); i <= end; ++i)
+    _type[i] |= info.type();
   _rwlock.unlock();
-  return (id);
+  return (info._id);
 }
 
 /**
@@ -119,24 +121,35 @@ unsigned long engine::add_object(obj_info const& info) {
 void engine::remove_object(unsigned long id) throw() {
   _rwlock.lockForWrite();
   memset(_type, 0, sizeof(_type));
-  QHash<unsigned long, obj_info>::iterator it_erase = _objects.end();
-  for (QHash<unsigned long, obj_info>::iterator it = _objects.begin(),
+  QVector<obj_info>::iterator it_erase = _objects.end();
+  for (QVector<obj_info>::iterator it = _objects.begin(),
          end = _objects.end();
        it != end;
        ++it) {
-    if (it.key() != id) {
-      for (unsigned int i = 0, end = it.value().verbosity; i <= end; ++i)
-        _type[i] |= it.value().type;
+    obj_info& obj(*it);
+    if (obj._id != id) {
+      for (unsigned int i = 0, end = obj.verbosity(); i <= end; ++i)
+        _type[i] |= obj.type();
     }
     else
       it_erase = it;
   }
   if (it_erase != _objects.end()) {
-    if (it_erase.key() + 1 == id)
+    if (it_erase->id() + 1 == id)
       --_id;
     _objects.erase(it_erase);
   }
   _rwlock.unlock();
+}
+
+/**
+ *  Remove an object logging.
+ *
+ *  @param[in] id The object info.
+ */
+void engine::remove_object(obj_info& obj) throw() {
+  remove_object(obj.id());
+  obj._id = 0;
 }
 
 /**
@@ -151,22 +164,23 @@ void engine::update_object(unsigned long id,
 			   unsigned int verbosity) throw() {
   _rwlock.lockForWrite();
   memset(_type, 0, sizeof(_type));
-  QHash<unsigned long, obj_info>::iterator it_erase = _objects.end();
-  for (QHash<unsigned long, obj_info>::iterator it = _objects.begin(),
+  QVector<obj_info>::iterator it_erase = _objects.end();
+  for (QVector<obj_info>::iterator it = _objects.begin(),
          end = _objects.end();
        it != end;
        ++it) {
-    if (it.key() != id) {
-      for (unsigned int i = 0, end = it.value().verbosity; i <= end; ++i)
-        _type[i] |= it.value().type;
+    obj_info& obj(*it);
+    if (obj._id != id) {
+      for (unsigned int i = 0, end = obj.verbosity(); i <= end; ++i)
+        _type[i] |= obj.type();
     }
     else
       it_erase = it;
   }
   if (it_erase != _objects.end()) {
-    obj_info& info = it_erase.value();
-    info.type = type;
-    info.verbosity = verbosity;
+    obj_info& info(*it_erase);
+    info._type = type;
+    info._verbosity = verbosity;
     _type[verbosity] |= type;
   }
   _rwlock.unlock();
@@ -176,7 +190,7 @@ void engine::update_object(unsigned long id,
  *  Default constructor.
  */
 engine::obj_info::obj_info()
-  : type(0), verbosity(0) {
+  : _type(0), _id(0), _verbosity(0) {
 
 }
 
@@ -187,10 +201,10 @@ engine::obj_info::obj_info()
  *  @param[in] _type      Message type to log with this object.
  *  @param[in] _verbosity Verbosity level.
  */
-engine::obj_info::obj_info(QSharedPointer<object> _obj,
-			   unsigned long long _type,
-			   unsigned int _verbosity)
-  : obj(_obj), type(_type), verbosity(_verbosity) {
+engine::obj_info::obj_info(QSharedPointer<object> obj,
+			   unsigned long long type,
+			   unsigned int verbosity)
+  : _obj(obj), _type(type), _verbosity(verbosity) {
 
 }
 
@@ -200,7 +214,7 @@ engine::obj_info::obj_info(QSharedPointer<object> _obj,
  *  @param[in] right The class to copy.
  */
 engine::obj_info::obj_info(obj_info const& right)
-  : type(0), verbosity(0) {
+  : _type(0), _id(0), _verbosity(0) {
   operator=(right);
 }
 
@@ -218,9 +232,37 @@ engine::obj_info::~obj_info() throw() {
  */
 engine::obj_info& engine::obj_info::operator=(obj_info const& right) {
   if (this != &right) {
-    obj = right.obj;
-    type = right.type;
-    verbosity = right.verbosity;
+    _obj = right._obj;
+    _type = right._type;
+    _id = right._id;
+    _verbosity = right._verbosity;
   }
   return (*this);
+}
+
+/**
+ *  Get the type.
+ *
+ *  @return The Type.
+ */
+unsigned long long engine::obj_info::type() const throw() {
+  return (_type);
+}
+
+/**
+ *  Get the id.
+ *
+ *  @return The id.
+ */
+unsigned long engine::obj_info::id() const throw() {
+  return (_id);
+}
+
+/**
+ *  Get the verbosity.
+ *
+ *  @return The verbosity.
+ */
+unsigned int engine::obj_info::verbosity() const throw() {
+  return (_verbosity);
 }

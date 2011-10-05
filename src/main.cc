@@ -268,9 +268,10 @@ int main(int argc, char** argv) {
     try {
       config.parse(config_file);
       apply_log.apply(config);
-      engine::instance().add_object(engine::obj_info(QSharedPointer<logging::broker>(new logging::broker),
-                                                     log_all,
-                                                     basic));
+      engine::obj_info obj(QSharedPointer<logging::broker>(new logging::broker),
+                           log_all,
+                           basic);
+      engine::instance().add_object(obj);
 
       // Read object config files.
       result = read_all_object_data(config_file);

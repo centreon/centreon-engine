@@ -21,7 +21,7 @@
 # define CCE_LOGGING_ENGINE_HH
 
 # include <QSharedPointer>
-# include <QHash>
+# include <QVector>
 # include <QReadWriteLock>
 
 # include "logging/object.hh"
@@ -38,7 +38,9 @@ namespace                    com {
          */
 	class                engine {
 	public:
-	  struct                   obj_info {
+	  class                    obj_info {
+            friend class engine;
+          public:
 	                           obj_info();
 	                           obj_info(QSharedPointer<object> obj,
 					    unsigned long long type,
@@ -46,11 +48,17 @@ namespace                    com {
 	                           obj_info(obj_info const& right);
 	                           ~obj_info() throw();
 
-	    obj_info&              operator=(obj_info const& right);
+            obj_info&              operator=(obj_info const& right);
 
-	    QSharedPointer<object> obj;
-	    unsigned long long     type;
-	    unsigned int           verbosity;
+            unsigned long long     type() const throw();
+            unsigned long          id() const throw();
+            unsigned int           verbosity() const throw();
+
+          private:
+	    QSharedPointer<object> _obj;
+	    unsigned long long     _type;
+            unsigned long          _id;
+	    unsigned int           _verbosity;
 	  };
 
 	  static engine&     instance();
@@ -63,8 +71,9 @@ namespace                    com {
 				 unsigned long long type,
 				 unsigned int verbosity) throw();
 
-	  unsigned long      add_object(obj_info const& info);
+	  unsigned long      add_object(obj_info& info);
 	  void               remove_object(unsigned long id) throw();
+	  void               remove_object(obj_info& obj) throw();
 	  void               update_object(unsigned long id,
 					   unsigned long long type,
 					   unsigned int verbosity) throw();
@@ -76,7 +85,7 @@ namespace                    com {
 	                     engine(engine const& right);
 	  engine&            operator=(engine const& right);
 
-	  QHash<unsigned long, obj_info> _objects;
+	  QVector<obj_info>  _objects;
 	  QReadWriteLock     _rwlock;
           static engine*     _instance;
           unsigned long long _type[3];
