@@ -107,6 +107,14 @@ logger::~logger() {
   (this->*(_redirector->flush))();
 }
 
+
+/**
+ *  Default copy operator.
+ *
+ *  @param[in] right The object to copy.
+ *
+ *  @return This object.
+ */
 logger& logger::operator=(logger const& right) {
   if (this != &right) {
     _type = right._type;
@@ -118,71 +126,178 @@ logger& logger::operator=(logger const& right) {
   return (*this);
 }
 
+/**
+ *  Add a QString into the logger buffer.
+ *
+ *  @param[in] obj The QString.
+ *
+ *  @return This object.
+ */
 logger& logger::operator<<(QString const& obj) {
   return ((this->*(_redirector->redirect_qstring))(obj));
 }
 
+/**
+ *  Add a std::string into the logger buffer.
+ *
+ *  @param[in] obj The std::string.
+ *
+ *  @return This object.
+ */
 logger& logger::operator<<(std::string const& obj) {
   return ((this->*(_redirector->redirect_std_string))(obj));
 }
 
+/**
+ *  Add a string into the logger buffer.
+ *
+ *  @param[in] obj The string.
+ *
+ *  @return This object.
+ */
 logger& logger::operator<<(char const* obj) {
   return ((this->*(_redirector->redirect_string))(obj));
 }
 
+/**
+ *  Add a char into the logger buffer.
+ *
+ *  @param[in] obj The char.
+ *
+ *  @return This object.
+ */
 logger& logger::operator<<(char obj) {
   return ((this->*(_redirector->redirect_char))(obj));
 }
 
+/**
+ *  Add an integer into the logger buffer.
+ *
+ *  @param[in] obj The integer.
+ *
+ *  @return This object.
+ */
 logger& logger::operator<<(int obj) {
   return ((this->*(_redirector->redirect_int))(obj));
 }
 
+/**
+ *  Add a unsigned integer into the logger buffer.
+ *
+ *  @param[in] obj The unsigned integer.
+ *
+ *  @return This object.
+ */
 logger& logger::operator<<(unsigned int obj) {
   return ((this->*(_redirector->redirect_uint))(obj));
 }
 
+/**
+ *  Add a long integer into the logger buffer.
+ *
+ *  @param[in] obj The long integer.
+ *
+ *  @return This object.
+ */
 logger& logger::operator<<(long obj) {
   return ((this->*(_redirector->redirect_long))(obj));
 }
 
+/**
+ *  Add a unsigned long integer into the logger buffer.
+ *
+ *  @param[in] obj The unsigned long integer.
+ *
+ *  @return This object.
+ */
 logger& logger::operator<<(unsigned long obj) {
   return ((this->*(_redirector->redirect_ulong))(obj));
 }
 
+/**
+ *  Add a long long interger into the logger buffer.
+ *
+ *  @param[in] obj The long long integer.
+ *
+ *  @return This object.
+ */
 logger& logger::operator<<(long long obj) {
   return ((this->*(_redirector->redirect_long_long))(obj));
 }
 
+/**
+ *  Add a unsigned long long integer into the logger buffer.
+ *
+ *  @param[in] obj The unsigned long long integer.
+ *
+ *  @return This object.
+ */
 logger& logger::operator<<(unsigned long long obj) {
   return ((this->*(_redirector->redirect_ulong_long))(obj));
 }
 
+/**
+ *  Add a double into the logger buffer.
+ *
+ *  @param[in] obj The double.
+ *
+ *  @return This object.
+ */
 logger& logger::operator<<(double obj) {
   return ((this->*(_redirector->redirect_double))(obj));
 }
 
+/**
+ *  Set the logger flags.
+ *
+ *  @param[in] obj The flags.
+ *
+ *  @return This object.
+ */
 logger& logger::operator<<(e_flags obj) {
   return ((this->*(_redirector->redirect_flags))(obj));
 }
 
+/**
+ *  Set the logger precision.
+ *
+ *  @param[in] obj The precision.
+ *
+ *  @return This object.
+ */
 logger& logger::operator<<(s_setprecision const& obj) {
   return ((this->*(_redirector->redirect_setprecision))(obj));
 }
 
+/**
+ *  Add a pointer into the logger buffer.
+ *
+ *  @param[in] obj The pointer.
+ *
+ *  @return This object.
+ */
 logger& logger::operator<<(void const* obj) {
   return ((this->*(_redirector->redirect_void_ptr))(obj));
 }
 
+/**
+ *  Inisialization of the logger buffer.
+ */
 void logger::_init() {
   _buffer << "[" << time(NULL) << "] ";
 }
 
+/**
+ *  Send the content of the logger buffer at the engine.
+ */
 void logger::_flush() {
   _buffer << "\n";
   engine::instance().log(_buffer.str().c_str(), _type, _verbosity);
 }
 
+/**
+ *  Do nothing.
+ */
 void logger::_nothing() {
 
 }
