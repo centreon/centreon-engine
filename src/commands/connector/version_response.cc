@@ -124,8 +124,8 @@ void version_response::restore(QByteArray const& data) {
   }
 
   bool ok;
-  unsigned int id = list[0].toUInt(&ok);
-  if (ok == false || id != _id) {
+  int id = list[0].toInt(&ok);
+  if (ok == false || id < 0 || id != _id) {
     throw (engine_error() << "bad request id.");
   }
 

@@ -67,9 +67,9 @@ int main() {
 	|| res2.get_exit_code() != DEFAULT_RETURN
 	|| res2.get_is_timeout() != DEFAULT_TIMEOUT
 	|| res2.get_is_executed() != DEFAULT_EXIT_OK
-	|| res2.get_start_time().tv_sec != static_cast<unsigned int>(time.toTime_t())
+	|| res2.get_start_time().tv_sec != static_cast<time_t>(time.toTime_t())
 	|| res2.get_start_time().tv_usec != 0
-	|| res2.get_end_time().tv_sec != static_cast<unsigned int>(time.toTime_t())
+	|| res2.get_end_time().tv_sec != static_cast<time_t>(time.toTime_t())
 	|| res2.get_end_time().tv_usec != 0) {
       qDebug() << "error: Constructor failed.";
       return (1);
