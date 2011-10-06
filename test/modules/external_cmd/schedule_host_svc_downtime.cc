@@ -52,7 +52,7 @@ static void check_schedule_host_svc_downtime() {
     throw (engine_error() << "service link to host failed.");
 
   scheduled_downtime_list = NULL;
-  char const* cmd("[1317196300] SCHEDULE_HOST_SVC_DOWNTIME;name;1317196300;9910748700;0;0;7200;user;comment");
+  char const* cmd("[1317196300] SCHEDULE_HOST_SVC_DOWNTIME;name;1317196300;2000000000;0;0;7200;user;comment");
   process_external_command(cmd);
 
   if (!scheduled_downtime_list)

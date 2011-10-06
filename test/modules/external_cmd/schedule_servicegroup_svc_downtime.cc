@@ -49,7 +49,7 @@ static void check_schedule_servicegroup_svc_downtime() {
   member->service_ptr = svc;
 
   scheduled_downtime_list = NULL;
-  char const* cmd("[1317196300] SCHEDULE_SERVICEGROUP_SVC_DOWNTIME;group;1317196300;9910748700;0;0;7200;user;comment");
+  char const* cmd("[1317196300] SCHEDULE_SERVICEGROUP_SVC_DOWNTIME;group;1317196300;2000000000;0;0;7200;user;comment");
   process_external_command(cmd);
 
   if (!scheduled_downtime_list)

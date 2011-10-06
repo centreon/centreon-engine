@@ -50,7 +50,9 @@
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;
 
-extern "C" int free_check_result_list(void);
+int free_check_result_list(void) {
+  return (0);
+}
 
 /******************************************************************/
 /******************** SYSTEM COMMAND FUNCTIONS ********************/
@@ -2232,7 +2234,7 @@ void free_memory(nagios_macros* mac) {
   free_comment_data();
 
   /* free check result list */
-  free_check_result_list(); // XXX: keep for compatibility layer.
+  // free_check_result_list(); // XXX: keep for compatibility layer.
 
   /* free memory for the high priority event list */
   this_event = event_list_high;

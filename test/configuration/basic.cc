@@ -260,7 +260,6 @@ static std::map<QString, QString> build_configuration(QString const& mainconf, Q
  *  @param[in] my_conf  The configuration value.
  */
 void test_configuration(QString const& filename, std::map<QString, QString>& my_conf) {
-  configuration::state config;
   config.parse(filename);
 
   QString date_format[] = { "us", "euro", "iso8601", "strict-iso8601" };

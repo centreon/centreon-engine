@@ -101,6 +101,7 @@ int schedule_downtime(int type,
 /* unschedules a host or service downtime */
 int unschedule_downtime(int type, unsigned long downtime_id) {
   scheduled_downtime* temp_downtime = NULL;
+  scheduled_downtime* next_downtime = NULL;
   host* hst = NULL;
   service* svc = NULL;
   timed_event* temp_event = NULL;
@@ -208,7 +209,8 @@ int unschedule_downtime(int type, unsigned long downtime_id) {
   while (1) {
     for (temp_downtime = scheduled_downtime_list;
          temp_downtime != NULL;
-         temp_downtime = temp_downtime->next) {
+         temp_downtime = next_downtime) {
+      next_downtime = temp_downtime->next;
       if (temp_downtime->triggered_by == downtime_id) {
         unschedule_downtime(ANY_DOWNTIME, temp_downtime->downtime_id);
         break;
@@ -747,7 +749,6 @@ int check_for_expired_downtime(void) {
   for (temp_downtime = scheduled_downtime_list;
        temp_downtime != NULL;
        temp_downtime = next_downtime) {
-
     next_downtime = temp_downtime->next;
 
     /* this entry should be removed */
@@ -1004,7 +1005,8 @@ int delete_downtime_by_hostname_service_description_start_time_comment(char cons
 								       char const* service_description,
 								       time_t start_time,
 								       char const* comment) {
-  scheduled_downtime *temp_downtime;
+  scheduled_downtime* temp_downtime;
+  scheduled_downtime* next_downtime;
   int deleted(0);
 
   /* Do not allow deletion of everything - must have at least 1 filter on. */
@@ -1016,7 +1018,9 @@ int delete_downtime_by_hostname_service_description_start_time_comment(char cons
 
   for (temp_downtime = scheduled_downtime_list;
        temp_downtime != NULL;
-       temp_downtime = temp_downtime->next) {
+       temp_downtime = next_downtime) {
+    next_downtime = temp_downtime->next;
+
     if ((start_time != 0) && (temp_downtime->start_time != start_time))
       continue ;
     if ((comment != NULL)

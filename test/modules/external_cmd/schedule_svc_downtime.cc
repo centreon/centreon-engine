@@ -49,7 +49,7 @@ static void check_schedule_svc_downtime() {
 
   scheduled_downtime_list = NULL;
 
-  char const* cmd("[1317196300] SCHEDULE_SVC_DOWNTIME;name;description;1317196300;9917196342;0;0;7200;user;comment");
+  char const* cmd("[1317196300] SCHEDULE_SVC_DOWNTIME;name;description;1317196300;2000000000;0;0;7200;user;comment");
   process_external_command(cmd);
 
   if (!scheduled_downtime_list)
