@@ -18,6 +18,7 @@
 */
 
 #include <stddef.h>
+#include <limits.h>
 
 // Features now handled by startup script.
 int           daemon_dumps_core(0);
@@ -42,8 +43,8 @@ unsigned long retained_process_service_attribute_mask(0);
 unsigned long retained_service_attribute_mask(0);
 
 // Commands execution system.
-unsigned int  child_processes_fork_twice(-1);
-unsigned long max_check_result_file_age(-1);
+unsigned int  child_processes_fork_twice(UINT_MAX);
+unsigned long max_check_result_file_age(ULONG_MAX);
 
 // Embedded_perl.
 unsigned int  enable_embedded_perl(false);

@@ -67,7 +67,7 @@ bool engine::is_logged(unsigned long long type,
                        unsigned int verbosity) const throw() {
   if (verbosity > most)
     return (false);
-  return ((_type[verbosity] & type));
+  return (static_cast<bool>(_type[verbosity] & type));
 }
 
 

@@ -25,6 +25,7 @@
 #include <QDateTime>
 #include <stdlib.h>
 #include "engine.hh"
+#include "error.hh"
 #include "commands/connector/quit_response.hh"
 #include "commands/connector/version_response.hh"
 #include "commands/connector/execute_response.hh"
@@ -137,7 +138,8 @@ int main(int argc, char** argv) {
       case connector::request::version_q: {
 	connector::version_response version(ENGINE_MAJOR, ENGINE_MINOR);
 	QByteArray data = version.build();
-	write(1, data.constData(), data.size());
+	if (write(1, data.constData(), data.size()) != data.size())
+          throw (engine_error() << "write query version failed.");
 	break;
       }
 
@@ -154,14 +156,16 @@ int main(int argc, char** argv) {
 					    "",
 					    output);
 	QByteArray data = execute.build();
-	write(1, data.constData(), data.size());
+	if (write(1, data.constData(), data.size()) != data.size())
+          throw (engine_error() << "write query execute failed.");
 	break;
       }
 
       case connector::request::quit_q: {
 	connector::quit_response quit;
 	QByteArray data = quit.build();
-	write(1, data.constData(), data.size());
+	if (write(1, data.constData(), data.size()) != data.size())
+          throw (engine_error() << "write query quit failed.");
 	return (EXIT_SUCCESS);
       }
 

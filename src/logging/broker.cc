@@ -69,7 +69,7 @@ void broker::log(char const* message,
 		      NEBFLAG_NONE,
 		      NEBATTR_NONE,
 		      copy,
-		      type,
+		      static_cast<unsigned long>(type),
 		      time(NULL),
 		      NULL);
 

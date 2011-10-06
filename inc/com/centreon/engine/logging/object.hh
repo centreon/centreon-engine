@@ -94,7 +94,7 @@ namespace                 com {
          */
         class             object {
          public:
-          virtual         ~object() {};
+          virtual         ~object() {}
 
           virtual void    log(char const* message,
                             unsigned long long type,
