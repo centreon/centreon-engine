@@ -17,12 +17,15 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <QCoreApplication>
 #include <QDebug>
 #include <exception>
+#include "logging/engine.hh"
 #include "error.hh"
 #include "commands.hh"
 #include "globals.hh"
-#include "error.hh"
+
+using namespace com::centreon::engine;
 
 /**
  *  Run enter_active_mode test.
@@ -39,9 +42,12 @@ static void check_enter_active_mode() {
 /**
  *  Check processing of enter_active_mode works.
  */
-int main(void) {
+int main(int argc, char** argv) {
+  QCoreApplication app(argc, argv);
   try {
+    logging::engine& engine = logging::engine::instance();
     check_enter_active_mode();
+    engine.cleanup();
   }
   catch (std::exception const& e) {
     qDebug() << "error: " << e.what();

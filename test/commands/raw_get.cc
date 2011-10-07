@@ -17,6 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <QCoreApplication>
 #include <QDebug>
 #include <exception>
 #include "commands/raw.hh"
@@ -29,7 +30,8 @@ using namespace com::centreon::engine::commands;
 /**
  *  Check getter return.
  */
-int main() {
+int main(int argc, char** argv) {
+  QCoreApplication app(argc, argv);
   try {
     raw cmd(DEFAULT_CMD_NAME, DEFAULT_CMD_LINE);
 

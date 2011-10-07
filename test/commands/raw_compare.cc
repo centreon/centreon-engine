@@ -17,6 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <QCoreApplication>
 #include <QDebug>
 #include <exception>
 #include "commands/raw.hh"
@@ -29,7 +30,8 @@ using namespace com::centreon::engine::commands;
 /**
  * Check comparison operator.
  */
-int main() {
+int main(int argc, char** argv) {
+  QCoreApplication app(argc, argv);
   try {
     raw cmd(CMD_NAME, CMD_LINE);
     if (!(cmd == cmd)) {

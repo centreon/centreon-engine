@@ -17,6 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <QCoreApplication>
 #include <QDebug>
 #include <exception>
 #include "commands/raw.hh"
@@ -30,7 +31,8 @@ using namespace com::centreon::engine::commands;
 /**
  *  Check constructor and copy object.
  */
-int main() {
+int main(int argc, char** argv) {
+  QCoreApplication app(argc, argv);
   try {
     raw cmd1(CMD_NAME, CMD_LINE);
     if (cmd1.get_name() != CMD_NAME

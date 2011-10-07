@@ -17,6 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <QCoreApplication>
 #include <QDebug>
 #include <QTemporaryFile>
 #include <QFile>
@@ -71,7 +72,8 @@ static void check_exist_file() {
 /**
  *  Check the parsing argument.
  */
-int main(void) {
+int main(int argc, char** argv) {
+  QCoreApplication app(argc, argv);
   try {
     config.set_log_archive_path(QDir::tempPath());
 

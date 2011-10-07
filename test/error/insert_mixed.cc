@@ -17,6 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <QCoreApplication>
 #include <string>
 #include <string.h>
 #include "error.hh"
@@ -28,7 +29,8 @@ using namespace com::centreon::engine;
  *
  *  @return 0 on success.
  */
-int main() {
+int main(int argc, char** argv) {
+  QCoreApplication app(argc, argv);
   // Insertions.
   error e;
   e << 'f' << "oo" << std::string(" bar baz") << 42 << 789654321456ull

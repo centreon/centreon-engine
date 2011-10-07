@@ -17,6 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <QCoreApplication>
 #include <QDebug>
 #include <exception>
 #include <sys/time.h>
@@ -34,7 +35,8 @@ using namespace com::centreon::engine::commands;
 /**
  *  Check the constructor and copy object.
  */
-int main() {
+int main(int argc, char** argv) {
+  QCoreApplication app(argc, argv);
   try {
     result res1;
     if (res1.get_command_id() != 0

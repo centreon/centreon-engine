@@ -17,12 +17,15 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <QCoreApplication>
 #include <QDebug>
 #include <exception>
+#include "logging/engine.hh"
 #include "error.hh"
 #include "commands.hh"
 #include "globals.hh"
-#include "error.hh"
+
+using namespace com::centreon::engine;
 
 /**
  *  Run del_downtime_by_host_name test.
@@ -71,9 +74,12 @@ static void check_del_downtime_by_host_name() {
 /**
  *  Check processing of del_downtime_by_host_name works.
  */
-int main(void) {
+int main(int argc, char** argv) {
+  QCoreApplication app(argc, argv);
   try {
+    logging::engine& engine = logging::engine::instance();
     check_del_downtime_by_host_name();
+    engine.cleanup();
   }
   catch (std::exception const& e) {
     qDebug() << "error: " << e.what();

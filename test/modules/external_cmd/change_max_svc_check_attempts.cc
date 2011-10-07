@@ -17,12 +17,15 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <QCoreApplication>
 #include <QDebug>
 #include <exception>
+#include "logging/engine.hh"
 #include "error.hh"
 #include "commands.hh"
 #include "globals.hh"
-#include "error.hh"
+
+using namespace com::centreon::engine;
 
 /**
  *  Run change_max_svc_check_attempts test.
@@ -58,9 +61,12 @@ static void check_change_max_svc_check_attempts() {
 /**
  *  Check processing of change_max_svc_check_attempts works.
  */
-int main(void) {
+int main(int argc, char** argv) {
+  QCoreApplication app(argc, argv);
   try {
+    logging::engine& engine = logging::engine::instance();
     check_change_max_svc_check_attempts();
+    engine.cleanup();
   }
   catch (std::exception const& e) {
     qDebug() << "error: " << e.what();

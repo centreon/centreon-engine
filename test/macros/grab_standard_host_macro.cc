@@ -17,6 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <QCoreApplication>
 #include <iostream>
 #include <math.h>
 #include <stdlib.h>
@@ -85,7 +86,8 @@
  *
  *  @return 0 on success.
  */
-int main() {
+int main(int argc, char** argv) {
+  QCoreApplication app(argc, argv);
   // Create minimal context.
   com::centreon::engine::test::minimal_setup();
 

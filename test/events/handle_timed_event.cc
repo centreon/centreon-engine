@@ -17,6 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <QCoreApplication>
 #include <QDebug>
 #include <exception>
 #include "globals.hh"
@@ -402,7 +403,8 @@ static void check_event_user_function() {
 /**
  *  Check the handle timed event working.
  */
-int main(void) {
+int main(int argc, char** argv) {
+  QCoreApplication app(argc, argv);
   try {
     check_event_service_check();
     check_event_command_check();

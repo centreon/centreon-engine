@@ -17,12 +17,15 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <QCoreApplication>
 #include <QDebug>
 #include <exception>
+#include "logging/engine.hh"
 #include "error.hh"
 #include "commands.hh"
 #include "globals.hh"
-#include "error.hh"
+
+using namespace com::centreon::engine;
 
 /**
  *  Run stop_obsessing_over_host test.
@@ -57,9 +60,12 @@ static void check_stop_obsessing_over_host() {
 /**
  *  Check processing of stop_obsessing_over_host works.
  */
-int main(void) {
+int main(int argc, char** argv) {
+  QCoreApplication app(argc, argv);
   try {
+    logging::engine& engine = logging::engine::instance();
     check_stop_obsessing_over_host();
+    engine.cleanup();
   }
   catch (std::exception const& e) {
     qDebug() << "error: " << e.what();

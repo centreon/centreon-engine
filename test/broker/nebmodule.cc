@@ -17,6 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <QCoreApplication>
 #include <QDebug>
 #include <exception>
 #include <limits.h>
@@ -103,7 +104,8 @@ void check_nebmodule() {
 /**
  *  Check the nebmodule working.
  */
-int main(void) {
+int main(int argc, char** argv) {
+  QCoreApplication app(argc, argv);
   try {
     check_nebmodule();
   }

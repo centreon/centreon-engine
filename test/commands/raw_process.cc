@@ -17,6 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <QCoreApplication>
 #include <QDebug>
 #include <exception>
 #include "commands/raw.hh"
@@ -34,7 +35,8 @@ using namespace com::centreon::engine::commands;
 /**
  *  Check the process command line replacement macros.
  */
-int main() {
+int main(int argc, char** argv) {
+  QCoreApplication app(argc, argv);
   try {
     nagios_macros macros = nagios_macros();
 

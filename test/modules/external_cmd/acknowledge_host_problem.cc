@@ -17,12 +17,15 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <QCoreApplication>
 #include <QDebug>
 #include <exception>
-#include "error.hh"
+#include "logging/engine.hh"
 #include "commands.hh"
 #include "globals.hh"
 #include "error.hh"
+
+using namespace com::centreon::engine;
 
 /**
  *  Run acknowledge_host_problem test.
@@ -58,9 +61,12 @@ static void check_acknowledge_host_problem() {
 /**
  *  Check processing of acknowledge_host_problem works.
  */
-int main(void) {
+int main(int argc, char** argv) {
+  QCoreApplication app(argc, argv);
   try {
+    logging::engine& engine = logging::engine::instance();
     check_acknowledge_host_problem();
+    engine.cleanup();
   }
   catch (std::exception const& e) {
     qDebug() << "error: " << e.what();

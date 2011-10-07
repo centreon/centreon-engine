@@ -17,6 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <QCoreApplication>
 #include <iostream>
 #include <string.h>
 #include <unistd.h>
@@ -27,6 +28,7 @@
  *  Simulate some behavior of plugin.
  */
 int main(int argc, char** argv) {
+  QCoreApplication app(argc, argv);
   for (int i = 0; i < argc; ++i) {
     std::cout << argv[i];
     if (i + 1 != argc) {

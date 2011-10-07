@@ -17,7 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-
+#include <QCoreApplication>
 #include <QDebug>
 #include <exception>
 #include "commands/set.hh"
@@ -46,7 +46,8 @@ static bool command_exit(QString const& name) {
 /**
  *  Check if the set command works.
  */
-int main() {
+int main(int argc, char** argv) {
+  QCoreApplication app(argc, argv);
   try {
     // get instance.
     set& cmd_set = set::instance();

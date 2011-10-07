@@ -17,6 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <QCoreApplication>
 #include <limits.h>
 #include <sstream>
 #include <string.h>
@@ -29,7 +30,8 @@ using namespace com::centreon::engine;
  *
  *  @return 0 on success.
  */
-int main() {
+int main(int argc, char** argv) {
+  QCoreApplication app(argc, argv);
   // Insert longs.
   error e;
   e << 78l << 96321l << 0l << -1l << LONG_MIN;

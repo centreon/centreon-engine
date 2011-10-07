@@ -17,6 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <QCoreApplication>
 #include <QDebug>
 #include <exception>
 #include <sys/time.h>
@@ -34,7 +35,8 @@ using namespace com::centreon::engine::commands;
 /**
  *  Check setter and getter return.
  */
-int main() {
+int main(int argc, char** argv) {
+  QCoreApplication app(argc, argv);
   try {
     QDateTime time = QDateTime::currentDateTime();
 

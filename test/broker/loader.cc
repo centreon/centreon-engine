@@ -17,6 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <QCoreApplication>
 #include <QDebug>
 #include <exception>
 #include <limits.h>
@@ -102,7 +103,8 @@ void check_chage_name() {
 /**
  *  Check the broker loader working.
  */
-int main(void) {
+int main(int argc, char** argv) {
+  QCoreApplication app(argc, argv);
   try {
     check_directory();
     check_load();

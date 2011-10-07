@@ -17,6 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <QCoreApplication>
 #include <limits.h>
 #include <sstream>
 #include <string.h>
@@ -29,7 +30,8 @@ using namespace com::centreon::engine;
  *
  *  @return 0 on success.
  */
-int main() {
+int main(int argc, char** argv) {
+  QCoreApplication app(argc, argv);
   // Insert unsigned long longs.
   error e;
   e << 42ull << 1ull << 7896ull << ULLONG_MAX - 789;

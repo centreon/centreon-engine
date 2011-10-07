@@ -17,6 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <QCoreApplication>
 #include <QDebug>
 #include <QDir>
 #include <QFile>
@@ -57,7 +58,8 @@ static void check_file(QString const& filename, QString const& text) {
  *  - file rotate.
  *  - file truncate.
  */
-int main(void) {
+int main(int argc, char** argv) {
+  QCoreApplication app(argc, argv);
   try {
     // Get instance of logging engine.
     engine& engine = engine::instance();

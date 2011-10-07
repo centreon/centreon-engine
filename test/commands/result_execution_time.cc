@@ -17,6 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <QCoreApplication>
 #include <QDebug>
 #include <exception>
 #include <sys/time.h>
@@ -41,7 +42,8 @@ static uint execution_time(QDateTime const& start, QDateTime const& end) {
 /**
  *  Check if the result execution time works.
  */
-int main() {
+int main(int argc, char** argv) {
+  QCoreApplication app(argc, argv);
   try {
     QDateTime start = QDateTime::currentDateTime();
 

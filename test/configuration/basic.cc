@@ -17,6 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <QCoreApplication>
 #include <QDebug>
 #include <QTemporaryFile>
 #include <QDir>
@@ -586,7 +587,8 @@ void test_configuration(QString const& filename, std::map<QString, QString>& my_
 /**
  *  Check the configuration working.
  */
-int main(void) {
+int main(int argc, char** argv) {
+  QCoreApplication app(argc, argv);
   try {
     srandom(time(NULL));
 

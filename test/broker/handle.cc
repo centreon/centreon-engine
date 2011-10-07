@@ -17,6 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <QCoreApplication>
 #include <QDebug>
 #include <exception>
 
@@ -111,7 +112,8 @@ void check_copy() {
 /**
  *  Check the broker handle working.
  */
-int main(void) {
+int main(int argc, char** argv) {
+  QCoreApplication app(argc, argv);
   try {
     check_open_noexist_module();
     check_open_exist_module();

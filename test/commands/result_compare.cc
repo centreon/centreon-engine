@@ -17,6 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <QCoreApplication>
 #include <QDebug>
 #include <exception>
 #include "commands/result.hh"
@@ -33,7 +34,8 @@ using namespace com::centreon::engine::commands;
 /**
  *  Check the comparison operator.
  */
-int main() {
+int main(int argc, char** argv) {
+  QCoreApplication app(argc, argv);
   try {
     QDateTime time = QDateTime::currentDateTime();
     result res(DEFAULT_ID,
