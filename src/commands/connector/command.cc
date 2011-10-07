@@ -93,6 +93,8 @@ connector::command& connector::command::operator=(connector::command const& righ
     _max_check_for_restart = right._max_check_for_restart;
     _nbr_check = right._nbr_check;
     _is_good_version = right._is_good_version;
+    _active_timer = right._active_timer;
+    _is_exiting = right._is_exiting;
     _start();
   }
   return (*this);
