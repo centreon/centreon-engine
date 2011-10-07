@@ -56,6 +56,7 @@ static void check_change_host_notification_timeperiod() {
   delete[] hst->display_name;
   delete[] hst->alias;
   delete[] hst->address;
+  delete[] hst->notification_period;
   delete hst;
 
   delete[] tperiod->name;

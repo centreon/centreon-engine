@@ -81,6 +81,8 @@ static void check_schedule_host_downtime() {
   _release_host(hst_parent);
   _release_host(hst_child);
 
+  // delete_all_comments(HOST_COMMENT, "parent", NULL);
+  // delete_all_comments(HOST_COMMENT, "child", NULL);
   free_object_skiplists();
 }
 

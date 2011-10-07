@@ -57,6 +57,7 @@ static void check_change_svc_check_timeperiod() {
   delete[] svc->description;
   delete[] svc->service_check_command;
   delete[] svc->display_name;
+  delete[] svc->check_period;
   delete svc;
 
   delete[] tperiod->name;

@@ -51,6 +51,7 @@ static void check_change_contact_svc_notification_timeperiod() {
 
   delete[] cntct->name;
   delete[] cntct->alias;
+  delete[] cntct->service_notification_period;
   delete cntct;
 
   delete[] tperiod->name;
