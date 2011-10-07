@@ -331,6 +331,8 @@ int register_downtime(int type, unsigned long downtime_id) {
                     (time_t)0,
                     &(temp_downtime->comment_id));
 
+  delete[] temp_buffer;
+
   /*** SCHEDULE DOWNTIME - FLEXIBLE (NON-FIXED) DOWNTIME IS HANDLED AT A LATER POINT ***/
 
   /* only non-triggered downtime is scheduled... */
