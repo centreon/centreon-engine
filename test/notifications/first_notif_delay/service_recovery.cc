@@ -21,7 +21,8 @@
 #include <string.h>
 #include <time.h>
 #include "checks.hh"
-#include "common.hh"
+#include "test/testing.hh"
+#include "test/notifications/first_notif_delay/common.hh"
 #include "globals.hh"
 
 using namespace com::centreon::engine;
@@ -34,6 +35,8 @@ using namespace com::centreon::engine;
 int main(int argc, char* argv[]) {
   // Qt Core object.
   QCoreApplication app(argc, argv);
+
+  testing init;
 
   // Return value.
   int retval(0);

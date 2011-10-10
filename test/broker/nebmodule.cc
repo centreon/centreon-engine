@@ -21,12 +21,13 @@
 #include <QDebug>
 #include <exception>
 #include <limits.h>
-
+#include "test/testing.hh"
 #include "error.hh"
 #include "nebmods.hh"
-#include "mod_load.hh"
+#include "test/broker/mod_load.hh"
 #include "broker/loader.hh"
 
+using namespace com::centreon::engine;
 using namespace com::centreon::engine::broker;
 
 static const char* MOD_LIB_NAME        = "./broker_mod_load.so";
@@ -107,6 +108,8 @@ void check_nebmodule() {
 int main(int argc, char** argv) {
   QCoreApplication app(argc, argv);
   try {
+    testing init;
+
     check_nebmodule();
   }
   catch (std::exception const& e) {

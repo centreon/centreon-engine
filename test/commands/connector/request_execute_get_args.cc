@@ -20,8 +20,10 @@
 #include <QCoreApplication>
 #include <QDebug>
 #include <exception>
+#include "test/testing.hh"
 #include "commands/connector/execute_query.hh"
 
+using namespace com::centreon::engine;
 using namespace com::centreon::engine::commands::connector;
 
 struct line {
@@ -46,8 +48,9 @@ line lines[] = {
  *  Check the execute request.
  */
 int main(int argc, char** argv) {
+  QCoreApplication app(argc, argv);
   try {
-    QCoreApplication app(argc, argv);
+    testing init;
 
     for (unsigned int i = 0; lines[i].command != NULL; ++i) {
       execute_query query(0, lines[i].command, QDateTime::currentDateTime(), 0);

@@ -17,8 +17,9 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "logging/engine.hh"
 #include "globals.hh"
-#include "minimal_setup.hh"
+#include "test/macros/minimal_setup.hh"
 
 using namespace com::centreon::engine;
 
@@ -28,6 +29,8 @@ using namespace com::centreon::engine;
 void com::centreon::engine::test::minimal_setup() {
     // Interval length is 1 second.
   config.set_interval_length(1);
+
+  logging::engine::instance();
 
   // Create skiplists.
   if (init_object_skiplists())
@@ -207,4 +210,59 @@ void com::centreon::engine::test::minimal_setup() {
   cntct->service_notification_commands->command_ptr = cmd;
 
   return ;
+}
+
+/*
+ *  Cleanup the minimal setup.
+ */
+void com::centreon::engine::test::cleanup_setup() {
+
+  delete host_list->services;
+  delete[] host_list->contacts->contact_name;
+  delete host_list->contacts;
+  delete[] host_list->name;
+  delete[] host_list->display_name;
+  delete[] host_list->alias;
+  delete[] host_list->address;
+  delete[] host_list->host_check_command;
+  delete[] host_list->plugin_output;
+  delete[] host_list->long_plugin_output;
+  delete[] host_list->perf_data;
+  delete[] host_list->action_url;
+  delete[] host_list->notes_url;
+  delete[] host_list->notes;
+  delete host_list;
+
+  delete[] service_list->contacts->contact_name;
+  delete service_list->contacts;
+  delete[] service_list->host_name;
+  delete[] service_list->description;
+  delete[] service_list->service_check_command;
+  delete[] service_list->display_name;
+  delete[] service_list->plugin_output;
+  delete[] service_list->long_plugin_output;
+  delete[] service_list->perf_data;
+  delete[] service_list->action_url;
+  delete[] service_list->notes_url;
+  delete[] service_list->notes;
+  delete service_list;
+
+  delete[] contact_list->host_notification_commands->cmd;
+  delete contact_list->host_notification_commands;
+  delete[] contact_list->service_notification_commands->cmd;
+  delete contact_list->service_notification_commands;
+  delete[] contact_list->name;
+  delete[] contact_list->alias;
+  delete[] contact_list->email;
+  delete[] contact_list->service_notification_period;
+  delete contact_list;
+
+  delete[] command_list->name;
+  delete[] command_list->command_line;
+  delete command_list;
+
+  // Cleanup skiplists.
+  free_object_skiplists();
+
+  logging::engine::instance().cleanup();
 }

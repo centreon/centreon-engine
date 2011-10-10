@@ -20,6 +20,7 @@
 #include <QCoreApplication>
 #include <QDebug>
 #include <exception>
+#include "test/testing.hh"
 #include "globals.hh"
 #include "events.hh"
 #include "error.hh"
@@ -406,6 +407,8 @@ static void check_event_user_function() {
 int main(int argc, char** argv) {
   QCoreApplication app(argc, argv);
   try {
+    testing init;
+
     check_event_service_check();
     check_event_command_check();
     check_event_log_rotation();

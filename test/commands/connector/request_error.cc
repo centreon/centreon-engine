@@ -20,9 +20,11 @@
 #include <QCoreApplication>
 #include <QDebug>
 #include <exception>
+#include "test/testing.hh"
 #include "commands/connector/error_response.hh"
-#include "check_request.hh"
+#include "test/commands/connector/check_request.hh"
 
+using namespace com::centreon::engine;
 using namespace com::centreon::engine::commands::connector;
 
 #define MESSAGE  "warning"
@@ -33,8 +35,9 @@ using namespace com::centreon::engine::commands::connector;
  *  Check the error request.
  */
 int main(int argc, char** argv) {
+  QCoreApplication app(argc, argv);
   try {
-    QCoreApplication app(argc, argv);
+    testing init;
 
     error_response response(MESSAGE, static_cast<error_response::e_code>(CODE));
     if (check_request_valid(&response, REQUEST(RESPONSE)) == false) {

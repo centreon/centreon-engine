@@ -21,8 +21,10 @@
 #include <QDebug>
 #include <exception>
 #include <sys/time.h>
+#include "test/testing.hh"
 #include "commands/result.hh"
 
+using namespace com::centreon::engine;
 using namespace com::centreon::engine::commands;
 
 #define DEFAULT_ID 42
@@ -38,6 +40,8 @@ using namespace com::centreon::engine::commands;
 int main(int argc, char** argv) {
   QCoreApplication app(argc, argv);
   try {
+    testing init;
+
     QDateTime time = QDateTime::currentDateTime();
 
     result res;

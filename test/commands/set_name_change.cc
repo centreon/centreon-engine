@@ -20,6 +20,7 @@
 #include <QCoreApplication>
 #include <QDebug>
 #include <exception>
+#include "test/testing.hh"
 #include "commands/set.hh"
 #include "commands/raw.hh"
 
@@ -49,6 +50,8 @@ static bool command_exist(QString const& name) {
 int main(int argc, char** argv) {
   QCoreApplication app(argc, argv);
   try {
+    testing init;
+
     // get instance.
     set& cmd_set = set::instance();
 

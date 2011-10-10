@@ -18,7 +18,8 @@
 
 #include <QCoreApplication>
 #include <QFile>
-#include "common.hh"
+#include "test/testing.hh"
+#include "test/notifications/first_notif_delay/common.hh"
 #include "globals.hh"
 #include "objects.hh"
 

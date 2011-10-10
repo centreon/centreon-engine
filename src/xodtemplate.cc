@@ -214,6 +214,7 @@ int xodtemplate_read_config_data(char* main_config_file, int options, int cache,
           std::ostringstream oss;
           oss << config_base_dir << '/' << temp_buffer;
           config_file = my_strdup(oss.str().c_str());
+          delete[] temp_buffer;
         }
         else
           config_file = temp_buffer;
@@ -234,6 +235,7 @@ int xodtemplate_read_config_data(char* main_config_file, int options, int cache,
           std::ostringstream oss;
           oss << config_base_dir << '/' << temp_buffer;
           config_file = my_strdup(oss.str().c_str());
+          delete[] temp_buffer;
         }
         else
           config_file = temp_buffer;

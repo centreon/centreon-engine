@@ -317,16 +317,16 @@ struct grab_host_redirection {
     routines[MACRO_TOTALHOSTSERVICESCRITICAL].second = false;
     // Acknowledgement author.
     routines[MACRO_HOSTACKAUTHOR].first = &get_macro_copy<host, MACRO_HOSTACKAUTHOR>;
-    routines[MACRO_HOSTACKAUTHOR].second = false;
+    routines[MACRO_HOSTACKAUTHOR].second = true;
     // Acknowledgement author name.
     routines[MACRO_HOSTACKAUTHORNAME].first = &get_macro_copy<host, MACRO_HOSTACKAUTHORNAME>;
-    routines[MACRO_HOSTACKAUTHORNAME].second = false;
+    routines[MACRO_HOSTACKAUTHORNAME].second = true;
     // Acknowledgement author alias.
     routines[MACRO_HOSTACKAUTHORALIAS].first = &get_macro_copy<host, MACRO_HOSTACKAUTHORALIAS>;
-    routines[MACRO_HOSTACKAUTHORALIAS].second = false;
+    routines[MACRO_HOSTACKAUTHORALIAS].second = true;
     // Acknowledgement comment.
     routines[MACRO_HOSTACKCOMMENT].first = &get_macro_copy<host, MACRO_HOSTACKCOMMENT>;
-    routines[MACRO_HOSTACKCOMMENT].second = false;
+    routines[MACRO_HOSTACKCOMMENT].second = true;
 
     // Optimize routines.
     routines.squeeze();

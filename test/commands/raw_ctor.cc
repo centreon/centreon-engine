@@ -20,6 +20,7 @@
 #include <QCoreApplication>
 #include <QDebug>
 #include <exception>
+#include "test/testing.hh"
 #include "commands/raw.hh"
 
 using namespace com::centreon::engine;
@@ -34,6 +35,8 @@ using namespace com::centreon::engine::commands;
 int main(int argc, char** argv) {
   QCoreApplication app(argc, argv);
   try {
+    testing init;
+
     raw cmd1(CMD_NAME, CMD_LINE);
     if (cmd1.get_name() != CMD_NAME
 	|| cmd1.get_command_line() != CMD_LINE) {

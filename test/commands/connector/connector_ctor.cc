@@ -20,6 +20,7 @@
 #include <QCoreApplication>
 #include <QDebug>
 #include <exception>
+#include "test/testing.hh"
 #include "commands/connector/command.hh"
 
 using namespace com::centreon::engine;
@@ -33,13 +34,14 @@ using namespace com::centreon::engine::commands;
  *  Check constructor and copy object.
  */
 int main(int argc, char** argv) {
+  QCoreApplication app(argc, argv);
   try {
-    QCoreApplication app(argc, argv);
+    testing init;
 
     connector::command cmd1(CMD_NAME, CMD_LINE, CMD_PROCESS);
     if (cmd1.get_name() != CMD_NAME
-	|| cmd1.get_command_line() != CMD_LINE
-	|| cmd1.get_process() != CMD_PROCESS) {
+        || cmd1.get_command_line() != CMD_LINE
+        || cmd1.get_process() != CMD_PROCESS) {
       qDebug() << "error: Constructor failed.";
       return (1);
     }

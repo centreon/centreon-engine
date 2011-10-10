@@ -332,8 +332,9 @@ int main(int argc, char** argv) {
   /* display stats */
   display_stats();
 
-  if (nagiostats_file)
-    delete[]nagiostats_file;
+  delete[] nagiostats_file;
+  delete[] main_config_file;
+  delete[] status_file;
 
   /* Return based on error. */
   if (result == ERROR)

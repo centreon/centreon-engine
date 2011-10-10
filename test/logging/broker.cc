@@ -20,7 +20,7 @@
 #include <QCoreApplication>
 #include <QDebug>
 #include <exception>
-
+#include "test/testing.hh"
 #include "broker.hh"
 #include "broker/loader.hh"
 #include "common.hh"
@@ -54,6 +54,8 @@ static const char*        LOG_MESSAGE  = "~!@#$%^&*()_+09/qwerty \n";
 int main(int argc, char** argv) {
   QCoreApplication app(argc, argv);
   try {
+    testing init;
+
     // Add event logged data to broker.
     config.set_event_broker_options(BROKER_LOGGED_DATA);
 

@@ -21,9 +21,9 @@
 #include <QDebug>
 #include <exception>
 #include <limits.h>
-
+#include "test/testing.hh"
 #include "error.hh"
-#include "mod_load.hh"
+#include "test/broker/mod_load.hh"
 #include "broker/compatibility.hh"
 #include "broker/loader.hh"
 
@@ -78,6 +78,8 @@ void check_compatibility() {
 int main(int argc, char** argv) {
   QCoreApplication app(argc, argv);
   try {
+    testing init;
+
     check_compatibility();
   }
   catch (std::exception const& e) {

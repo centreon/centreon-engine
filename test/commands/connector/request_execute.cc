@@ -20,11 +20,13 @@
 #include <QCoreApplication>
 #include <QDebug>
 #include <exception>
+#include "test/testing.hh"
 #include "commands/connector/execute_query.hh"
 #include "commands/connector/execute_response.hh"
-#include "check_request.hh"
+#include "test/commands/connector/check_request.hh"
 #include "engine.hh"
 
+using namespace com::centreon::engine;
 using namespace com::centreon::engine::commands::connector;
 
 #define ID        1
@@ -43,8 +45,9 @@ using namespace com::centreon::engine::commands::connector;
  *  Check the execute request.
  */
 int main(int argc, char** argv) {
+  QCoreApplication app(argc, argv);
   try {
-    QCoreApplication app(argc, argv);
+    testing init;
 
     QDateTime time;
     time.setTime_t(TIMESTAMP);

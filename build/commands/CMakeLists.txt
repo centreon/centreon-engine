@@ -58,19 +58,19 @@ if (WITH_TESTING)
 
   # Test result.
   add_executable("result_ctor" "${TEST_DIR}/result_ctor.cc")
-  target_link_libraries("result_ctor" "cce_commands" ${QT_LIBRARIES})
+  target_link_libraries("result_ctor" "cce_core")
   add_test("result_ctor" "result_ctor")
 
   add_executable("result_get_set" "${TEST_DIR}/result_get_set.cc")
-  target_link_libraries("result_get_set" "cce_commands" ${QT_LIBRARIES})
+  target_link_libraries("result_get_set" "cce_core")
   add_test("result_get_set" "result_get_set")
 
   add_executable("result_execution_time" "${TEST_DIR}/result_execution_time.cc")
-  target_link_libraries("result_execution_time" "cce_commands" ${QT_LIBRARIES})
+  target_link_libraries("result_execution_time" "cce_core")
   add_test("result_execution_time" "result_execution_time")
 
   add_executable("result_compare" "${TEST_DIR}/result_compare.cc")
-  target_link_libraries("result_compare" "cce_commands" ${QT_LIBRARIES})
+  target_link_libraries("result_compare" "cce_core")
   add_test("result_compare" "result_compare")
 
   # Test set.

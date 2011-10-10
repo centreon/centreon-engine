@@ -21,8 +21,9 @@
 #include <string.h>
 #include <time.h>
 #include <unistd.h>
+#include "test/testing.hh"
 #include "checks.hh"
-#include "common.hh"
+#include "test/notifications/first_notif_delay/common.hh"
 #include "globals.hh"
 
 using namespace com::centreon::engine;
@@ -37,6 +38,8 @@ using namespace com::centreon::engine;
 static int check(check_result& cr) {
   // Remove flag file.
   QFile::remove(FLAG_FILE);
+
+  testing init;
 
   // Return value.
   int retval(0);

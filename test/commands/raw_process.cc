@@ -20,10 +20,12 @@
 #include <QCoreApplication>
 #include <QDebug>
 #include <exception>
+#include "test/testing.hh"
 #include "commands/raw.hh"
 #include "globals.hh"
 #include "objects.hh"
 
+using namespace com::centreon::engine;
 using namespace com::centreon::engine::commands;
 
 #define CMD_HOSTADDR  "localhost"
@@ -38,6 +40,8 @@ using namespace com::centreon::engine::commands;
 int main(int argc, char** argv) {
   QCoreApplication app(argc, argv);
   try {
+    testing init;
+
     nagios_macros macros = nagios_macros();
 
     // add macros arg1.

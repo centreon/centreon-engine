@@ -331,6 +331,9 @@ int service_notification(service* svc,
   /* update the status log with the service information */
   update_service_status(svc, FALSE);
 
+  /* clear volatile macros */
+  clear_volatile_macros_r(&mac);
+
   return (OK);
 }
 
@@ -1321,9 +1324,6 @@ int host_notification(host* hst,
   /* allocate memory for local macro */
   memset(&mac, 0, sizeof(mac));
 
-  /* clear volatile macros */
-  clear_volatile_macros_r(&mac);
-
   logger(dbg_notifications, basic) << "Notification viability test passed.";
 
   /* should the notification number be increased? */
@@ -1568,6 +1568,9 @@ int host_notification(host* hst,
 
   /* update the status log with the host info */
   update_host_status(hst, FALSE);
+
+  /* clear volatile macros */
+  clear_volatile_macros_r(&mac);
 
   return (OK);
 }

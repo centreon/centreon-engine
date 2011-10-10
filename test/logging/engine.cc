@@ -21,11 +21,12 @@
 #include <QDebug>
 #include <exception>
 #include <time.h>
-
-#include "test.hh"
+#include "test/testing.hh"
+#include "test/logging/test.hh"
 #include "logging/engine.hh"
 #include "error.hh"
 
+using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;
 
 /**************************************
@@ -51,6 +52,8 @@ static const char*        LOG_MESSAGE  = "~!@#$%^&*()_+09/qwerty \n";
 int main(int argc, char** argv) {
   QCoreApplication app(argc, argv);
   try {
+    testing init;
+
     // Get instance of logging engine.
     engine& engine = engine::instance();
 

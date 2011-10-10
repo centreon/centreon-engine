@@ -23,6 +23,7 @@
 
 using namespace com::centreon::engine::broker;
 
+compatibility* compatibility::_instance = NULL;
 nebmodule* neb_module_list = NULL;
 
 /**************************************
@@ -35,9 +36,19 @@ nebmodule* neb_module_list = NULL;
  *  Get instance of compatibility singleton.
  */
 compatibility& compatibility::instance() {
-  static compatibility instance;
-  return (instance);
+  if (_instance == NULL)
+    _instance = new compatibility();
+  return (*_instance);
 }
+
+/**
+ *  Cleanup instance of compatibility singleton.
+ */
+void compatibility::cleanup() {
+  delete _instance;
+  _instance = NULL;
+}
+
 
 /**
  *  Slot for notify when module was create.

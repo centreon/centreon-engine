@@ -20,7 +20,6 @@
 #include <QCoreApplication>
 #include <QDebug>
 #include <stdlib.h>
-
 #include "nebmods.hh"
 #include "nebstructs.hh"
 #include "broker.hh"

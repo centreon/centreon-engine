@@ -20,10 +20,12 @@
 #include <QCoreApplication>
 #include <QDebug>
 #include <exception>
+#include "test/testing.hh"
 #include "commands/connector/version_query.hh"
 #include "commands/connector/version_response.hh"
-#include "check_request.hh"
+#include "test/commands/connector/check_request.hh"
 
+using namespace com::centreon::engine;
 using namespace com::centreon::engine::commands::connector;
 
 #define QUERY         "0" CMD_END
@@ -33,8 +35,9 @@ using namespace com::centreon::engine::commands::connector;
  *  Check the version request.
  */
 int main(int argc, char** argv) {
+  QCoreApplication app(argc, argv);
   try {
-    QCoreApplication app(argc, argv);
+    testing init;
 
     version_query query;
     if (check_request_valid(&query, REQUEST(QUERY)) == false) {

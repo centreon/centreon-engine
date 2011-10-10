@@ -234,16 +234,16 @@ struct grab_service_redirection {
     routines[MACRO_SERVICEGROUPNAMES].second = true;
     // Acknowledgement author.
     routines[MACRO_SERVICEACKAUTHOR].first = &get_macro_copy<service, MACRO_SERVICEACKAUTHOR>;
-    routines[MACRO_SERVICEACKAUTHOR].second = false;
+    routines[MACRO_SERVICEACKAUTHOR].second = true;
     // Acknowledgement author name.
     routines[MACRO_SERVICEACKAUTHORNAME].first = &get_macro_copy<service, MACRO_SERVICEACKAUTHORNAME>;
-    routines[MACRO_SERVICEACKAUTHORNAME].second = false;
+    routines[MACRO_SERVICEACKAUTHORNAME].second = true;
     // Acknowledgement author alias.
     routines[MACRO_SERVICEACKAUTHORALIAS].first = &get_macro_copy<service, MACRO_SERVICEACKAUTHORALIAS>;
-    routines[MACRO_SERVICEACKAUTHORALIAS].second = false;
+    routines[MACRO_SERVICEACKAUTHORALIAS].second = true;
     // Acknowledgement comment.
     routines[MACRO_SERVICEACKCOMMENT].first = &get_macro_copy<service, MACRO_SERVICEACKCOMMENT>;
-    routines[MACRO_SERVICEACKCOMMENT].second = false;
+    routines[MACRO_SERVICEACKCOMMENT].second = true;
 
     // Optimize routines.
     routines.squeeze();

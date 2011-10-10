@@ -23,7 +23,7 @@
 #include <QFile>
 #include <exception>
 #include <math.h>
-
+#include "test/testing.hh"
 #include "globals.hh"
 #include "common.hh"
 #include "error.hh"
@@ -31,6 +31,7 @@
 #include "logging/file.hh"
 #include "logging/object.hh"
 
+using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;
 
 /**
@@ -61,6 +62,8 @@ static void check_file(QString const& filename, QString const& text) {
 int main(int argc, char** argv) {
   QCoreApplication app(argc, argv);
   try {
+    testing init;
+
     // Get instance of logging engine.
     engine& engine = engine::instance();
     unsigned int id1 = 0;

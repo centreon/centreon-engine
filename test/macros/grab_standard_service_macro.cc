@@ -22,9 +22,12 @@
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
+#include "test/testing.hh"
 #include "globals.hh"
 #include "macros/grab_service.hh"
-#include "minimal_setup.hh"
+#include "test/macros/minimal_setup.hh"
+
+using namespace com::centreon::engine;
 
 // Stringification macros.
 #define XSTR(x) #x
@@ -83,8 +86,10 @@
  */
 int main(int argc, char** argv) {
   QCoreApplication app(argc, argv);
+  testing init;
+
   // Create minimal context.
-  com::centreon::engine::test::minimal_setup();
+  test::minimal_setup();
 
   // Set service values.
   delete [] service_list->description;
@@ -221,10 +226,10 @@ int main(int argc, char** argv) {
     char* output(NULL);
     int free_macro;
     if (grab_standard_service_macro_r(&mac,
-          macro_values[i].macro_id,
-          service_list,
-          &output,
-          &free_macro)
+                                      macro_values[i].macro_id,
+                                      service_list,
+                                      &output,
+                                      &free_macro)
         != OK)
       retval |= 1;
     else {
@@ -246,8 +251,43 @@ int main(int argc, char** argv) {
       }
       if (free_macro)
         delete [] output;
+      else
+        std::cout << macro_values[i].macro_id << std::endl;
     }
   }
+
+  delete service_list->servicegroups_ptr->next->next;
+  delete service_list->servicegroups_ptr->next;
+  delete service_list->servicegroups_ptr;
+
+  delete[] sg1->group_name;
+  delete[] sg1->alias;
+  delete[] sg1->members->host_name;
+  delete[] sg1->members->service_description;
+  delete sg1->members;
+  delete sg1;
+
+  delete[] sg2->group_name;
+  delete[] sg2->alias;
+  delete[] sg2->members->host_name;
+  delete[] sg2->members->service_description;
+  delete sg2->members;
+  delete sg2;
+
+  delete[] sg3->group_name;
+  delete[] sg3->alias;
+  delete[] sg3->members->host_name;
+  delete[] sg3->members->service_description;
+  delete sg3->members;
+  delete sg3;
+
+  delete [] mac.x[MACRO_SERVICEACKAUTHOR];
+  delete [] mac.x[MACRO_SERVICEACKAUTHORNAME];
+  delete [] mac.x[MACRO_SERVICEACKAUTHORALIAS];
+  delete [] mac.x[MACRO_SERVICEACKCOMMENT];
+
+  // Cleanup the minimal setup.
+  test::cleanup_setup();
 
   return (retval);
 }

@@ -20,9 +20,10 @@
 #include <QCoreApplication>
 #include <QDebug>
 #include <exception>
+#include "test/testing.hh"
 #include "commands/raw.hh"
 #include "engine.hh"
-#include "wait_process.hh"
+#include "test/commands/wait_process.hh"
 
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::commands;
@@ -111,8 +112,9 @@ static bool run_with_environement_macros() {
  *  Check the asynchrone system for the raw command.
  */
 int main(int argc, char** argv) {
+  QCoreApplication app(argc, argv);
   try {
-    QCoreApplication app(argc, argv);
+    testing init;
 
     if (run_without_timeout() == false) {
       qDebug() << "error: raw::run without timeout failed.";

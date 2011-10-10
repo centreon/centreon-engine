@@ -20,9 +20,11 @@
 #include <QCoreApplication>
 #include <QDebug>
 #include <exception>
+#include "test/testing.hh"
 #include "commands/connector/command.hh"
 #include "engine.hh"
 
+using namespace com::centreon::engine;
 using namespace com::centreon::engine::commands;
 
 /**
@@ -81,8 +83,9 @@ static bool run_with_timeout() {
  *  @return true if ok, false otherwise.
  */
 int main(int argc, char** argv) {
+  QCoreApplication app(argc, argv);
   try {
-    QCoreApplication app(argc, argv);
+    testing init;
 
     if (run_without_timeout() == false) {
       qDebug() << "error: connector::run without timeout failed.";

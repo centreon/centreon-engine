@@ -20,11 +20,10 @@
 #include <QCoreApplication>
 #include <QDebug>
 #include <string.h>
-
 #include "nebmods.hh"
 #include "error.hh"
 #include "broker/handle.hh"
-#include "mod_load.hh"
+#include "test/broker/mod_load.hh"
 
 using namespace com::centreon::engine;
 

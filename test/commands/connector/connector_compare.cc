@@ -20,8 +20,10 @@
 #include <QCoreApplication>
 #include <QDebug>
 #include <exception>
+#include "test/testing.hh"
 #include "commands/connector/command.hh"
 
+using namespace com::centreon::engine;
 using namespace com::centreon::engine::commands;
 
 #define CMD_NAME    "command_name"
@@ -32,8 +34,9 @@ using namespace com::centreon::engine::commands;
  * Check comparison operator.
  */
 int main(int argc, char** argv) {
+  QCoreApplication app(argc, argv);
   try {
-    QCoreApplication app(argc, argv);
+    testing init;
 
     connector::command cmd(CMD_NAME, CMD_LINE, CMD_PROCESS);
     if (!(cmd == cmd)) {

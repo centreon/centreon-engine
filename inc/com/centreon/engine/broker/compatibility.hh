@@ -39,6 +39,7 @@ namespace                       com {
 	  Q_OBJECT
 	  public:
 	  static compatibility& instance();
+          static void           cleanup();
 
 	public slots:
 	  void                  create_module(broker::handle* module);
@@ -58,6 +59,8 @@ namespace                       com {
 	  virtual               ~compatibility() throw();
 
 	  compatibility&        operator=(compatibility const& right);
+
+          static compatibility* _instance;
 	};
       }
     }

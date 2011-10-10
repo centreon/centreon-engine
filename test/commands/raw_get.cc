@@ -20,8 +20,10 @@
 #include <QCoreApplication>
 #include <QDebug>
 #include <exception>
+#include "test/testing.hh"
 #include "commands/raw.hh"
 
+using namespace com::centreon::engine;
 using namespace com::centreon::engine::commands;
 
 #define DEFAULT_CMD_NAME "cmd"
@@ -33,6 +35,8 @@ using namespace com::centreon::engine::commands;
 int main(int argc, char** argv) {
   QCoreApplication app(argc, argv);
   try {
+    testing init;
+
     raw cmd(DEFAULT_CMD_NAME, DEFAULT_CMD_LINE);
 
     if (cmd.get_name() != DEFAULT_CMD_NAME) {

@@ -615,6 +615,10 @@ add_definitions(-DDEFAULT_AUTH_FILE="")
 # Include directories.
 include_directories("${INCLUDE_DIR}")
 include_directories("${INCLUDE_DIR}/com/centreon/engine")
+if (WITH_TESTING)
+  include_directories("${PROJECT_SOURCE_DIR}")
+endif ()
+
 
 # Library engine target.
 add_library("cce_core"
@@ -699,11 +703,11 @@ target_link_libraries("cce_core"
   ${SOCKET_LIBRARIES}
   ${THREAD_LIBRARIES}
   ${QT_LIBRARIES}
+  "cce_commands"
   "cce_logging"
   "cce_broker"
   "cce_configuration"
   "cce_checks"
-  "cce_commands"
   "cce_macros"
   "cce_compatibility")
 

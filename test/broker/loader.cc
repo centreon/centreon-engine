@@ -21,7 +21,7 @@
 #include <QDebug>
 #include <exception>
 #include <limits.h>
-
+#include "test/testing.hh"
 #include "error.hh"
 #include "broker/loader.hh"
 
@@ -106,6 +106,8 @@ void check_chage_name() {
 int main(int argc, char** argv) {
   QCoreApplication app(argc, argv);
   try {
+    testing init;
+
     check_directory();
     check_load();
     check_unload();

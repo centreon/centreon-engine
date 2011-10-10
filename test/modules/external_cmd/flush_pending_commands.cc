@@ -20,6 +20,7 @@
 #include <QCoreApplication>
 #include <QDebug>
 #include <exception>
+#include "test/testing.hh"
 #include "logging/engine.hh"
 #include "error.hh"
 #include "commands.hh"
@@ -42,6 +43,8 @@ static void check_flush_pending_commands() {
 int main(int argc, char** argv) {
   QCoreApplication app(argc, argv);
   try {
+    testing init;
+
     logging::engine& engine = logging::engine::instance();
     check_flush_pending_commands();
     engine.cleanup();

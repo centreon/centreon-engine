@@ -21,8 +21,10 @@
 #include <QDebug>
 #include <exception>
 #include <sys/time.h>
+#include "test/testing.hh"
 #include "commands/result.hh"
 
+using namespace com::centreon::engine;
 using namespace com::centreon::engine::commands;
 
 /**
@@ -45,6 +47,8 @@ static uint execution_time(QDateTime const& start, QDateTime const& end) {
 int main(int argc, char** argv) {
   QCoreApplication app(argc, argv);
   try {
+    testing init;
+
     QDateTime start = QDateTime::currentDateTime();
 
     QDateTime end = start;

@@ -22,9 +22,12 @@
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
+#include "test/testing.hh"
 #include "globals.hh"
 #include "macros/grab_host.hh"
-#include "minimal_setup.hh"
+#include "test/macros/minimal_setup.hh"
+
+using namespace com::centreon::engine;
 
 // Stringification macros.
 #define XSTR(x) #x
@@ -88,8 +91,10 @@
  */
 int main(int argc, char** argv) {
   QCoreApplication app(argc, argv);
+  testing init;
+
   // Create minimal context.
-  com::centreon::engine::test::minimal_setup();
+  test::minimal_setup();
 
   // Service must be OK.
   service_list->current_state = 0;
@@ -258,6 +263,42 @@ int main(int argc, char** argv) {
         delete [] output;
     }
   }
+
+  delete host_list->hostgroups_ptr->next->next;
+  delete host_list->hostgroups_ptr->next;
+  delete host_list->hostgroups_ptr;
+
+  delete[] hg1->group_name;
+  delete[] hg1->alias;
+  delete[] hg1->members->host_name;
+  delete hg1->members;
+  delete hg1;
+
+  delete[] hg2->group_name;
+  delete[] hg2->alias;
+  delete[] hg2->members->host_name;
+  delete hg2->members;
+  delete hg2;
+
+  delete[] hg3->group_name;
+  delete[] hg3->alias;
+  delete[] hg3->members->host_name;
+  delete hg3->members;
+  delete hg3;
+
+  delete [] mac.x[MACRO_TOTALHOSTSERVICES];
+  delete [] mac.x[MACRO_TOTALHOSTSERVICESOK];
+  delete [] mac.x[MACRO_TOTALHOSTSERVICESWARNING];
+  delete [] mac.x[MACRO_TOTALHOSTSERVICESUNKNOWN];
+  delete [] mac.x[MACRO_TOTALHOSTSERVICESCRITICAL];
+
+  delete [] mac.x[MACRO_HOSTACKAUTHOR];
+  delete [] mac.x[MACRO_HOSTACKAUTHORNAME];
+  delete [] mac.x[MACRO_HOSTACKAUTHORALIAS];
+  delete [] mac.x[MACRO_HOSTACKCOMMENT];
+
+  // Cleanup the minimal setup.
+  test::cleanup_setup();
 
   return (retval);
 }

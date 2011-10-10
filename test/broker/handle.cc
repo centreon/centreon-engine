@@ -20,11 +20,12 @@
 #include <QCoreApplication>
 #include <QDebug>
 #include <exception>
-
+#include "test/testing.hh"
 #include "error.hh"
 #include "broker/handle.hh"
-#include "mod_load.hh"
+#include "test/broker/mod_load.hh"
 
+using namespace com::centreon::engine;
 using namespace com::centreon::engine::broker;
 
 static const char* MOD_LIB_UNKNOW  = "./broker_mod_unknow.so";
@@ -115,6 +116,8 @@ void check_copy() {
 int main(int argc, char** argv) {
   QCoreApplication app(argc, argv);
   try {
+    testing init;
+
     check_open_noexist_module();
     check_open_exist_module();
     check_copy();

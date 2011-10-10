@@ -20,8 +20,10 @@
 #include <QCoreApplication>
 #include <QDebug>
 #include <exception>
+#include "test/testing.hh"
 #include "commands/raw.hh"
 
+using namespace com::centreon::engine;
 using namespace com::centreon::engine::commands;
 
 #define CMD_NAME "command_name"
@@ -33,6 +35,8 @@ using namespace com::centreon::engine::commands;
 int main(int argc, char** argv) {
   QCoreApplication app(argc, argv);
   try {
+    testing init;
+
     raw cmd(CMD_NAME, CMD_LINE);
     if (!(cmd == cmd)) {
       qDebug() << "error: operator== failed.";

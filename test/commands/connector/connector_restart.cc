@@ -21,10 +21,12 @@
 #include <QDateTime>
 #include <QDebug>
 #include <exception>
+#include "test/testing.hh"
 #include "commands/connector/command.hh"
 #include "engine.hh"
-#include "../wait_process.hh"
+#include "test/commands/wait_process.hh"
 
+using namespace com::centreon::engine;
 using namespace com::centreon::engine::commands;
 
 /**
@@ -64,8 +66,8 @@ static bool restart_with_segfault() {
 static bool restart_with_execution_limit() {
   nagios_macros macros = nagios_macros();
   connector::command cmd(__func__,
-			 "./bin_connector_test_run --timeout=off",
-			 "./bin_connector_test_run");
+        		 "./bin_connector_test_run --timeout=off",
+        		 "./bin_connector_test_run");
 
   cmd.set_max_check_for_restart(2);
   wait_process wait_proc(cmd);
@@ -76,11 +78,11 @@ static bool restart_with_execution_limit() {
 
     result const& cmd_res = wait_proc.get_result();
     if (cmd_res.get_command_id() != id
-	|| cmd_res.get_exit_code() != STATE_OK
-	|| cmd_res.get_stdout() != cmd.get_command_line()
-	|| cmd_res.get_stderr() != ""
-	|| cmd_res.get_is_executed() == false
-	|| cmd_res.get_is_timeout() == true) {
+        || cmd_res.get_exit_code() != STATE_OK
+        || cmd_res.get_stdout() != cmd.get_command_line()
+        || cmd_res.get_stderr() != ""
+        || cmd_res.get_is_executed() == false
+        || cmd_res.get_is_timeout() == true) {
       return (false);
     }
   }
@@ -91,8 +93,9 @@ static bool restart_with_execution_limit() {
  *  Check the restart of the connector.
  */
 int main(int argc, char** argv) {
+  QCoreApplication app(argc, argv);
   try {
-    QCoreApplication app(argc, argv);
+    testing init;
 
     if (restart_with_segfault() == false) {
       qDebug() << "error: restart connector after segfault failed.";

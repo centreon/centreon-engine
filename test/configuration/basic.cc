@@ -27,7 +27,7 @@
 #include <limits.h>
 #include <fstream>
 #include <map>
-
+#include "test/testing.hh"
 #include "engine.hh"
 #include "globals.hh"
 #include "macros.hh"
@@ -590,6 +590,8 @@ void test_configuration(QString const& filename, std::map<QString, QString>& my_
 int main(int argc, char** argv) {
   QCoreApplication app(argc, argv);
   try {
+    testing init;
+
     srandom(time(NULL));
 
     QTemporaryFile mainconf("centengine.cfg");

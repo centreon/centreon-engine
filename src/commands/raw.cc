@@ -186,6 +186,11 @@ void raw::ended() {
   emit command_executed(res);
 }
 
+/**
+ *  Set the object to delete later.
+ *
+ *  @param[in] obj The object to delete later.
+ */
 void raw::_deletelater_process(process* obj) {
   obj->deleteLater();
 }

@@ -20,6 +20,7 @@
 #include <QCoreApplication>
 #include <QDebug>
 #include <exception>
+#include "test/testing.hh"
 #include "logging/engine.hh"
 #include "commands.hh"
 #include "globals.hh"
@@ -79,6 +80,8 @@ static void check_acknowledge_svc_problem() {
 int main(int argc, char** argv) {
   QCoreApplication app(argc, argv);
   try {
+    testing init;
+
     logging::engine& engine = logging::engine::instance();
     check_acknowledge_svc_problem();
     engine.cleanup();

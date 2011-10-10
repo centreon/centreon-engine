@@ -20,9 +20,8 @@
 #include <QCoreApplication>
 #include <QDebug>
 #include <string.h>
-
 #include "nebmods.hh"
-#include "mod_load.hh"
+#include "test/broker/mod_load.hh"
 
 /**************************************
  *                                     *

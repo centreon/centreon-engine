@@ -20,8 +20,10 @@
 #include <QCoreApplication>
 #include <QDebug>
 #include <exception>
+#include "test/testing.hh"
 #include "commands/connector/request_builder.hh"
 
+using namespace com::centreon::engine;
 using namespace com::centreon::engine::commands::connector;
 
 /**
@@ -59,8 +61,9 @@ static bool is_invalid() {
  *  Check request builder.
  */
 int main(int argc, char** argv) {
+  QCoreApplication app(argc, argv);
   try {
-    QCoreApplication app(argc, argv);
+    testing init;
 
     if (is_valid() == false) {
       qDebug() << "error: is valid failed.";

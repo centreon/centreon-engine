@@ -18,7 +18,7 @@
 */
 
 #include "error.hh"
-#include "test.hh"
+#include "test/logging/test.hh"
 
 using namespace com::centreon::engine::logging;
 

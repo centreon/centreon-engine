@@ -23,7 +23,7 @@
 #include <QFile>
 #include <QDir>
 #include <exception>
-
+#include "test/testing.hh"
 #include "globals.hh"
 #include "configuration/state.hh"
 
@@ -75,6 +75,8 @@ static void check_exist_file() {
 int main(int argc, char** argv) {
   QCoreApplication app(argc, argv);
   try {
+    testing init;
+
     config.set_log_archive_path(QDir::tempPath());
 
     check_directory();
