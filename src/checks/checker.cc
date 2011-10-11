@@ -773,7 +773,14 @@ checker::checker() {
  *  Default destructor.
  */
 checker::~checker() throw() {
-
+  _mut_reap.lock();
+  for (QQueue<check_result>::iterator it = _to_reap.begin(),
+         end = _to_reap.end();
+       it != end;
+       ++it)
+    free_check_result(&*it);
+  _to_reap.clear();
+  _mut_reap.unlock();
 }
 
 /**

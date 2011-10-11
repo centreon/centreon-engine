@@ -26,6 +26,7 @@ namespace                  com {
   namespace                centreon {
     namespace              engine {
       int                  first_notif_delay_default_setup();
+      void                 first_notif_delay_default_cleanup();
     }
   }
 }

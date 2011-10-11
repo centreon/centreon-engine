@@ -25,9 +25,9 @@
 #include "error.hh"
 #include "commands.hh"
 #include "globals.hh"
+#include "checks/checker.hh"
 
 using namespace com::centreon::engine;
-#include "checks/checker.hh"
 
 /**
  *  Run process_host_check_result test.
@@ -54,6 +54,7 @@ static void check_process_host_check_result() {
   delete[] hst->display_name;
   delete[] hst->alias;
   delete[] hst->address;
+  delete[] hst->plugin_output;
   delete hst;
 
   free_object_skiplists();

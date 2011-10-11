@@ -209,3 +209,45 @@ int com::centreon::engine::first_notif_delay_default_setup() {
 
   return (retval);
 }
+
+/**
+ *  Cleanup a default setup for use with first_notification_delay
+ *  unit tests.
+ */
+void com::centreon::engine::first_notif_delay_default_cleanup() {
+  delete[] host_list->contacts->contact_name;
+  delete host_list->contacts;
+  delete[] host_list->name;
+  delete[] host_list->display_name;
+  delete[] host_list->alias;
+  delete[] host_list->address;
+  delete[] host_list->host_check_command;
+  delete[] host_list->plugin_output;
+  delete host_list;
+
+  delete[] service_list->contacts->contact_name;
+  delete service_list->contacts;
+  delete[] service_list->host_name;
+  delete[] service_list->description;
+  delete[] service_list->display_name;
+  delete[] service_list->service_check_command;
+  delete[] service_list->plugin_output;
+  delete service_list;
+
+  delete[] contact_list->service_notification_commands->cmd;
+  delete contact_list->service_notification_commands;
+  delete[] contact_list->host_notification_commands->cmd;
+  delete contact_list->host_notification_commands;
+  delete[] contact_list->name;
+  delete[] contact_list->alias;
+  delete[] contact_list->email;
+  delete contact_list;
+
+  delete[] command_list->name;
+  delete[] command_list->command_line;
+  delete command_list;
+
+  delete event_list_low;
+
+  free_object_skiplists();
+}

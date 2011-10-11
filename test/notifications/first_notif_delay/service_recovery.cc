@@ -75,6 +75,8 @@ int main(int argc, char* argv[]) {
 
     // Check that FND was not respected.
     retval |= !QFile::exists(FLAG_FILE);
+
+    first_notif_delay_default_cleanup();
   }
 
   // Remove flag file.
