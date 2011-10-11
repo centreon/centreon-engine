@@ -29,7 +29,7 @@ using namespace com::centreon::engine::commands::connector;
 
 #define MESSAGE  "warning"
 #define CODE     1
-#define RESPONSE "6\0" MESSAGE "\0" TOSTR(CODE) CMD_END
+#define RESPONSE "6\0" TOSTR(CODE) "\0" MESSAGE CMD_END
 
 /**
  *  Check the error request.
