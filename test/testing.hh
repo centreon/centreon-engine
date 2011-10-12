@@ -25,6 +25,7 @@
 # include "checks/checker.hh"
 # include "commands/set.hh"
 # include "logging/engine.hh"
+# include "events/loop.hh"
 
 namespace com {
   namespace centreon {
@@ -42,9 +43,11 @@ namespace com {
           checks::checker::instance();
           broker::loader::instance();
           broker::compatibility::instance();
+          events::loop::instance();
         }
 
         ~testing() throw() {
+          events::loop::cleanup();
           broker::compatibility::cleanup();
           broker::loader::cleanup();
           checks::checker::cleanup();

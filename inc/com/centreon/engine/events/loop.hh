@@ -29,6 +29,13 @@ namespace              com {
   namespace            centreon {
     namespace          engine {
       namespace        events {
+	/**
+	 *  @class loop loop.hh
+	 *  @brief Create Centreon Engine event loop on a new thread.
+	 *
+         *  Events loop is a singleton to create a new thread
+         *  and dispatch the Centreon Engine events.
+	 */
         class          loop : public QThread {
           Q_OBJECT
         public:
@@ -40,7 +47,7 @@ namespace              com {
           void         restart();
 
         private slots:
-          void         _update();
+          void         _dispatching();
 
         private:
                        loop();

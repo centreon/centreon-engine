@@ -32,26 +32,43 @@ using namespace com::centreon::engine::events;
 
 loop* loop::_instance = NULL;
 
+/**
+ *  Get instance of the events loop singleton.
+ *
+ *  @return The singleton.
+ */
 loop& loop::instance() {
   if (_instance == NULL)
     _instance = new loop();
   return (*_instance);
 }
 
+/**
+ *  Cleanup the loop singleton.
+ */
 void loop::cleanup() {
   delete _instance;
   _instance = NULL;
 }
 
+/**
+ *  Default constructor.
+ */
 loop::loop() {
 
 }
 
+/**
+ *  Default destructor.
+ */
 loop::~loop() throw() {
 
 }
 
-void loop::_update() {
+/**
+ *  Slot to dispatch Centreon Engine events.
+ */
+void loop::_dispatching() {
   bool quit = false;
 
   while (!quit) {
@@ -336,10 +353,14 @@ void loop::_update() {
   }
 
   int sec = static_cast<int>(config.get_sleep_time());
-  int delay = sec * 1000 + (config.get_sleep_time() - static_cast<float>(sec)) * 1000;
+  int delay = sec * 1000 + static_cast<int>(config.get_sleep_time()
+                                            - static_cast<float>(sec)) * 1000;
   QTimer::singleShot(delay, this, SLOT(_update()));
 }
 
+/**
+ *  Start the events loop thread.
+ */
 void loop::run() {
   logger(dbg_functions, basic) << "events::loop::run()";
 

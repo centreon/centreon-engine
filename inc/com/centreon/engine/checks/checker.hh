@@ -52,14 +52,14 @@ namespace                                    com {
 
 	  void                               push_check_result(check_result const& result);
 
-	  void                               run(host* hst,
+	  bool                               run(host* hst,
 						 int check_options = CHECK_OPTION_NONE,
 						 double latency = 0.0,
 						 bool scheduled_check = false,
 						 bool reschedule_check = false,
 						 int* time_is_valid = NULL,
 						 time_t* preferred_time = NULL);
-	  void                               run(service* svc,
+	  bool                               run(service* svc,
 						 int check_options = CHECK_OPTION_NONE,
 						 double latency = 0.0,
 						 bool scheduled_check = false,

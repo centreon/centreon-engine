@@ -193,8 +193,10 @@ void checker::push_check_result(check_result const& result) {
  *  @param[in]  reschedule_check If the check are reschedule.
  *  @param[out] time_is_valid    Host check viable at this time.
  *  @param[out] preferred_time   The next preferred check time.
+ *
+ *  @return True is the check start correctly.
  */
-void checker::run(host* hst,
+bool checker::run(host* hst,
 		  int check_options,
 		  double latency,
 		  bool scheduled_check,
@@ -256,7 +258,7 @@ void checker::run(host* hst,
   }
   // host check was override by neb_module.
   if (res == NEBERROR_CALLBACKOVERRIDE) {
-    return;
+    return (true);
   }
 
   logger(dbg_functions, basic) << "Checking host '" << hst->name << "'...";
@@ -364,22 +366,21 @@ void checker::run(host* hst,
           this, SLOT(_command_executed(cce_commands_result const&)),
           Qt::UniqueConnection);
 
-  // connect(&(*cmd), SIGNAL(command_executed(commands::result const&)),
-  //         this, SLOT(_command_executed(commands::result const&)),
-  //         Qt::UniqueConnection);
-
   // run command.
   unsigned long id = cmd->run(processed_cmd,
 			      macros,
 			      config.get_host_check_timeout());
-  _mut_id.lock();
-  _list_id[id] = check_result_info;
-  _mut_id.unlock();
+  if (id != 0) {
+    _mut_id.lock();
+    _list_id[id] = check_result_info;
+    _mut_id.unlock();
+  }
 
   // cleanup.
   clear_volatile_macros_r(&macros);
 
   logger(dbg_functions, basic) << "end " << Q_FUNC_INFO;;
+  return (id);
 }
 
 /**
@@ -392,8 +393,10 @@ void checker::run(host* hst,
  *  @param[in] reschedule_check If the check are reschedule.
  *  @param[in] time_is_valid    Service check viable at this time.
  *  @param[in] preferred_time   The next preferred check time.
+ *
+ *  @return True is the check start correctly.
  */
-void checker::run(service* svc,
+bool checker::run(service* svc,
 		  int check_options,
 		  double latency,
 		  bool scheduled_check,
@@ -452,7 +455,7 @@ void checker::run(service* svc,
 
   // service check was override by neb_module.
   if (res == NEBERROR_CALLBACKOVERRIDE) {
-    return;
+    return (true);
   }
 
   logger(dbg_checks, basic)
@@ -539,7 +542,7 @@ void checker::run(service* svc,
   // service check was override by neb_module.
   if (res == NEBERROR_CALLBACKOVERRIDE) {
     clear_volatile_macros_r(&macros);
-    return;
+    return (true);
   }
 
   // update statistics.
@@ -556,14 +559,17 @@ void checker::run(service* svc,
   unsigned long id = cmd->run(processed_cmd,
 			      macros,
 			      config.get_service_check_timeout());
-  _mut_id.lock();
-  _list_id[id] = check_result_info;
-  _mut_id.unlock();
+  if (id != 0) {
+    _mut_id.lock();
+    _list_id[id] = check_result_info;
+    _mut_id.unlock();
+  }
 
   // cleanup.
   clear_volatile_macros_r(&macros);
 
   logger(dbg_functions, basic) << "end " << Q_FUNC_INFO;
+  return (id);
 }
 
 /**

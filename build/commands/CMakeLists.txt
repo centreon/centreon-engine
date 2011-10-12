@@ -54,7 +54,8 @@ if (WITH_TESTING)
   set(TEST_DIR "${TEST_DIR}/commands")
 
   # Produce moc files.
-  qt4_wrap_cpp(QT_MOC_FILES "${TEST_DIR}/wait_process.hh")
+  qt4_wrap_cpp(QT_MOC_FILES
+    "${TEST_DIR}/wait_process.hh")
 
   # Test result.
   add_executable("result_ctor" "${TEST_DIR}/result_ctor.cc")
