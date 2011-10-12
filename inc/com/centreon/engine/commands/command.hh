@@ -67,7 +67,7 @@ namespace                        com {
 	  virtual void           set_command_line(QString const& command_line);
 
 	signals:
-	  void                   command_executed(commands::result const& res);
+	  void                   command_executed(cce_commands_result const& res);
 	  void                   name_changed(QString const& old_name,
 					      QString const& new_name);
 

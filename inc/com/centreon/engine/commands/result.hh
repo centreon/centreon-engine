@@ -86,4 +86,6 @@ namespace                com {
   }
 }
 
+typedef com::centreon::engine::commands::result cce_commands_result;
+
 #endif // !CCE_COMMANDS_RESULT_HH

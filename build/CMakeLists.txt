@@ -692,6 +692,7 @@ add_subdirectory("configuration")
 add_subdirectory("commands")
 add_subdirectory("compatibility")
 add_subdirectory("doc")
+add_subdirectory("events")
 add_subdirectory("logging")
 add_subdirectory("macros")
 add_subdirectory("modules")
@@ -704,6 +705,7 @@ target_link_libraries("cce_core"
   ${THREAD_LIBRARIES}
   ${QT_LIBRARIES}
   "cce_commands"
+  "cce_events"
   "cce_logging"
   "cce_broker"
   "cce_configuration"
@@ -900,18 +902,6 @@ if (WITH_TESTING)
     "${TEST_DIR}/notifications/first_notif_delay/common.cc"
     "${TEST_DIR}/notifications/first_notif_delay/common.hh"
     "${TEST_DIR}/notifications/first_notif_delay/service_recovery.cc")
-  target_link_libraries("${TEST_NAME}" "cce_core")
-  add_test("${TEST_NAME}" "${TEST_NAME}")
-endif ()
-
-#
-# Events tests.
-#
-if (WITH_TESTING)
-  # Check handle timed event.
-  set(TEST_NAME "handle_timed_event")
-  add_executable("${TEST_NAME}"
-    "${TEST_DIR}/events/handle_timed_event.cc")
   target_link_libraries("${TEST_NAME}" "cce_core")
   add_test("${TEST_NAME}" "${TEST_NAME}")
 endif ()

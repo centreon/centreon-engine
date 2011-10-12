@@ -49,6 +49,7 @@
 #include "logging/logger.hh"
 #include "logging/broker.hh"
 #include "logging/engine.hh"
+#include "events/loop.hh"
 #include "engine.hh"
 #include "compatibility/common.h"
 
@@ -502,7 +503,11 @@ int main(int argc, char** argv) {
 
       /***** Start monitoring all services. *****/
       // (doesn't return until a restart or shutdown signal is encountered).
-      event_execution_loop();
+      events::loop& loop(events::loop::instance());
+      QObject::connect(&loop, SIGNAL(shutdown()), &app, SLOT(quit()));
+      QObject::connect(&loop, SIGNAL(restart()), &app, SLOT(quit()));
+      loop.start();
+      app.exec();
 
       /* 03/01/2007 EG Moved from sighandler() to prevent FUTEX locking problems under NPTL */
       // Did we catch a signal ?

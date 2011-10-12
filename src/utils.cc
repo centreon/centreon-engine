@@ -46,6 +46,7 @@
 #include "broker/loader.hh"
 #include "logging/engine.hh"
 #include "logging/logger.hh"
+#include "events/loop.hh"
 
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;
@@ -2216,7 +2217,8 @@ void cleanup(void) {
   free_memory(get_global_macros());
 
   // unload singleton.
-  com::centreon::engine::broker::loader::cleanup();
+  events::loop::cleanup();
+  broker::loader::cleanup();
   commands::set::cleanup();
   checks::checker::cleanup();
   logging::engine::cleanup();

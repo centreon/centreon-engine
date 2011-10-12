@@ -36,8 +36,8 @@ namespace               com {
 	public:
 	  wait_process(commands::command const& cmd)
 	    : QObject() {
-	    connect(&cmd, SIGNAL(command_executed(commands::result const&)),
-		    this, SLOT(cmd_executed(commands::result const&)));
+	    connect(&cmd, SIGNAL(command_executed(cce_commands_result const&)),
+		    this, SLOT(cmd_executed(cce_commands_result const&)));
 	  }
 
 	  void          wait() const throw() {
@@ -54,7 +54,7 @@ namespace               com {
 	  void          finished();
 
 	public slots:
-	  void          cmd_executed(commands::result const& res) {
+	  void          cmd_executed(cce_commands_result const& res) {
 	    _res = res;
 	    emit finished();
 	  }

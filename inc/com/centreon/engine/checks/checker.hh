@@ -74,7 +74,7 @@ namespace                                    com {
 						      unsigned long check_timestamp_horizon);
 
 	private slots:
-	  void                               _command_executed(commands::result const& res);
+	  void                               _command_executed(cce_commands_result const& res);
 
 	private:
 	                                     checker();

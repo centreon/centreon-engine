@@ -18,6 +18,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <QMetaType>
+
 #include <string.h>
 #include <sys/time.h>
 
@@ -358,9 +360,13 @@ void checker::run(host* hst,
                      start_time.tv_sec);
   update_check_stats(PARALLEL_HOST_CHECK_STATS, start_time.tv_sec);
 
-  connect(&(*cmd), SIGNAL(command_executed(commands::result const&)),
-	  this, SLOT(_command_executed(commands::result const&)),
-	  Qt::UniqueConnection);
+  connect(&(*cmd), SIGNAL(command_executed(cce_commands_result const&)),
+          this, SLOT(_command_executed(cce_commands_result const&)),
+          Qt::UniqueConnection);
+
+  // connect(&(*cmd), SIGNAL(command_executed(commands::result const&)),
+  //         this, SLOT(_command_executed(commands::result const&)),
+  //         Qt::UniqueConnection);
 
   // run command.
   unsigned long id = cmd->run(processed_cmd,
@@ -542,9 +548,9 @@ void checker::run(service* svc,
 		     : ACTIVE_ONDEMAND_SERVICE_CHECK_STATS,
 		     start_time.tv_sec);
 
-  connect(&(*cmd), SIGNAL(command_executed(commands::result const&)),
-	  this, SLOT(_command_executed(commands::result const&)),
-	  Qt::UniqueConnection);
+  connect(&(*cmd), SIGNAL(command_executed(cce_commands_result const&)),
+          this, SLOT(_command_executed(cce_commands_result const&)),
+          Qt::UniqueConnection);
 
   // run command.
   unsigned long id = cmd->run(processed_cmd,
@@ -731,7 +737,8 @@ void checker::run_sync(host* hst,
  *
  *  @param[in] res The result of the execution.
  */
-void checker::_command_executed(commands::result const& res) {
+// void checker::_command_executed(commands::result const& res) {
+void checker::_command_executed(cce_commands_result const& res) {
   _mut_id.lock();
   QHash<unsigned long, check_result>::iterator it = _list_id.find(res.get_command_id());
   if (it == _list_id.end()) {
@@ -766,7 +773,7 @@ void checker::_command_executed(commands::result const& res) {
  *  Default constructor.
  */
 checker::checker() {
-
+  qRegisterMetaType<commands::result>("cce_commands_result");
 }
 
 /**
