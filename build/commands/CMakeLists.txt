@@ -28,6 +28,8 @@ add_subdirectory("connector")
 qt4_wrap_cpp(QT_MOC_FILES
   "${INC_DIR}/command.hh"
   "${INC_DIR}/process.hh"
+  "${INC_DIR}/basic_process.hh"
+  "${INC_DIR}/process_manager.hh"
   "${INC_DIR}/raw.hh"
   "${INC_DIR}/set.hh")
 
@@ -36,11 +38,15 @@ add_library("cce_commands"
   STATIC
   "${SRC_DIR}/command.cc"
   "${SRC_DIR}/process.cc"
+  "${SRC_DIR}/basic_process.cc"
+  "${SRC_DIR}/process_manager.cc"
   "${SRC_DIR}/raw.cc"
   "${SRC_DIR}/result.cc"
   "${SRC_DIR}/set.cc"
   "${INC_DIR}/command.hh"
   "${INC_DIR}/process.hh"
+  "${INC_DIR}/basic_process.hh"
+  "${INC_DIR}/process_manager.hh"
   "${INC_DIR}/raw.hh"
   "${INC_DIR}/result.hh"
   "${INC_DIR}/set.hh"

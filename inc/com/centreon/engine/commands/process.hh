@@ -22,8 +22,8 @@
 
 # include <QString>
 # include <QDateTime>
-# include <QProcess>
-
+// # include <QProcess>
+# include "commands/basic_process.hh"
 # include "macros.hh"
 
 namespace                  com {
@@ -37,7 +37,7 @@ namespace                  com {
 	 *  Process is a specific implementation of QProcess, and add
 	 *  somme features like timeout.
 	 */
-	class              process : public QProcess {
+	class              process : public basic_process { // QProcess {
 	  Q_OBJECT
 	public:
 	                   process(nagios_macros const& macros = nagios_macros(),

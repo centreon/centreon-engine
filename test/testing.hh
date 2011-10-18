@@ -26,19 +26,21 @@
 # include "commands/set.hh"
 # include "logging/engine.hh"
 # include "events/loop.hh"
+# include "commands/process_manager.hh"
 
-namespace com {
-  namespace centreon {
+namespace     com {
+  namespace   centreon {
     namespace engine {
       /**
        *  @class testing testing.hh
        *  @brief Class testing init and destroy all
        *  engine needs to make unit test.
        */
-      class testing {
+      class   testing {
       public:
-        testing() {
+              testing() {
           logging::engine::instance();
+          commands::process_manager::instance();
           commands::set::instance();
           checks::checker::instance();
           broker::loader::instance();
@@ -46,12 +48,13 @@ namespace com {
           events::loop::instance();
         }
 
-        ~testing() throw() {
+              ~testing() throw() {
           events::loop::cleanup();
           broker::compatibility::cleanup();
           broker::loader::cleanup();
           checks::checker::cleanup();
           commands::set::cleanup();
+          commands::process_manager::cleanup();
           logging::engine::cleanup();
         }
       };

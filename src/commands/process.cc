@@ -1,5 +1,5 @@
 /*
-** Copyright 2011      Merethis
+** Copyright 2011 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -19,7 +19,6 @@
 
 #include <QEventLoop>
 #include <QTimer>
-
 #include "engine.hh"
 #include "commands/process.hh"
 
@@ -32,7 +31,7 @@ using namespace com::centreon::engine::commands;
  *  @param[in] timeout The timeout time, -1 disable timeout.
  */
 process::process(nagios_macros const& macros, unsigned int timeout)
-  : QProcess(),
+  : basic_process(), // QProcess(),
     _macros(macros),
     _executed_time(0),
     _timeout(timeout * 1000),
@@ -51,7 +50,9 @@ process::process(nagios_macros const& macros, unsigned int timeout)
  *
  *  @param[in] right The copy object.
  */
-process::process(process const& right) : QProcess() {
+process::process(process const& right)
+  //  : QProcess() {
+  : basic_process() {
   connect(this, SIGNAL(error(QProcess::ProcessError)),
           this, SLOT(_error(QProcess::ProcessError)));
   connect(this, SIGNAL(finished(int, QProcess::ExitStatus)),
