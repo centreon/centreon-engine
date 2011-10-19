@@ -23,10 +23,11 @@
 # include <QTimer>
 # include <QMutex>
 # include <QHash>
-# include <QProcess>
+// # include <QProcess>
 # include <QStringList>
-# include "com/centreon/engine/commands/command.hh"
-# include "com/centreon/engine/commands/connector/execute_query.hh"
+# include "commands/command.hh"
+# include "commands/basic_process.hh"
+# include "commands/connector/execute_query.hh"
 
 namespace                              com {
   namespace                            centreon {
@@ -95,7 +96,8 @@ namespace                              com {
 	    QByteArray                 _read_data;
 	    QMutex                     _mutex;
 	    QString                    _process_command;
-	    QSharedPointer<QProcess>   _process;
+	    QSharedPointer<basic_process>
+                                       _process;
 	    QHash<unsigned long, request_info>
 	                               _queries;
 	    QHash<unsigned long, result>

@@ -40,6 +40,7 @@ process_manager::process_manager()
     _is_modify(false),
     _quit(false) {
   qRegisterMetaType<QProcess::ExitStatus>("QProcess::ExitStatus");
+  qRegisterMetaType<QProcess::ProcessState>("QProcess::ProcessState");
   start();
 }
 

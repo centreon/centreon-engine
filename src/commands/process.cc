@@ -176,7 +176,9 @@ unsigned int process::get_timeout() const throw() {
  *  Wait the end of the process (blocking).
  */
 void process::wait() {
-  waitForFinished(-1);
+  QEventLoop loop;
+  connect(this, SIGNAL(finished(int, QProcess::ExitStatus)), &loop, SLOT(quit()));
+  loop.exec();
 }
 
 /**
@@ -237,6 +239,7 @@ void process::_started() {
   if (_timeout > 0) {
     QTimer::singleShot(_timeout, this, SLOT(_timedout()));
   }
+  closeWriteChannel();
 }
 
 /**

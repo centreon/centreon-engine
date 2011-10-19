@@ -269,6 +269,8 @@ void basic_process::terminate() {
  *  @param[in] args The arguments of the programe.
  */
 void basic_process::_start(char** args) {
+  QMutexLocker locker(&_mtx);
+
   if (_pid)
     return;
 
@@ -285,6 +287,7 @@ void basic_process::_start(char** args) {
   }
 
   if (!_pid) {
+    locker.unlock();
     close(_pipe_out[0]);
     close(_pipe_err[0]);
     close(_pipe_in[1]);
@@ -300,19 +303,23 @@ void basic_process::_start(char** args) {
     exit(EXIT_FAILURE);
   }
 
-  QMutexLocker locker(&_mtx);
-
   close(_pipe_out[1]);
   close(_pipe_err[1]);
   close(_pipe_in[0]);
-
-  emit started();
   _state = QProcess::Starting;
-  emit stateChanged(_state);
-  _state = QProcess::Running;
-  emit stateChanged(_state);
-  _internal_state = running;
 
+  locker.unlock();
+  emit started();
+  emit stateChanged(_state);
+  locker.relock();
+
+  _state = QProcess::Running;
+
+  locker.unlock();
+  emit stateChanged(_state);
+  locker.relock();
+
+  _internal_state = running;
   process_manager::instance().add_process(this);
 }
 

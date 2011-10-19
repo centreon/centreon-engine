@@ -147,8 +147,7 @@ unsigned long connector::command::run(QString const& processed_cmd,
 
   _queries.insert(id, info);
 
-  QByteArray const& data = query->build();
-  _process->write(data.constData(), data.size());
+  _process->write(query->build());
 
   logger(dbg_commands, basic)
     << "connector \"" << _name << "\" start (id="
@@ -199,8 +198,7 @@ void connector::command::run(QString const& processed_cmd,
   request_info info = { query, now, timeout, true };
   _queries.insert(id, info);
 
-  QByteArray const& data = query->build();
-  _process->write(data.constData(), data.size());
+  _process->write(query->build());
 
   logger(dbg_commands, basic)
     << "connector \"" << _name << "\" start (id="
@@ -376,7 +374,7 @@ void connector::command::_start() {
     disconnect(&(*_process), SIGNAL(stateChanged(QProcess::ProcessState)),
   	       this, SLOT(_state_change(QProcess::ProcessState)));
   }
-  _process = QSharedPointer<QProcess>(new QProcess, &QObject::deleteLater);
+  _process = QSharedPointer<basic_process>(new basic_process, &QObject::deleteLater);
   connect(&(*_process), SIGNAL(readyReadStandardOutput()),
 	  this, SLOT(_ready_read()));
 
@@ -391,8 +389,7 @@ void connector::command::_start() {
 	  this, SLOT(_state_change(QProcess::ProcessState)));
 
   version_query version;
-  QByteArray const& data = version.build();
-  _process->write(data.constData(), data.size());
+  _process->write(version.build());
 
   QEventLoop loop;
   connect(this, SIGNAL(_wait_ending()), &loop, SLOT(quit()));
@@ -407,10 +404,8 @@ void connector::command::_start() {
 
   for (QHash<unsigned long, request_info>::iterator it = _queries.begin(), end = _queries.end();
        it != end;
-       ++it) {
-    QByteArray const& data = it->req->build();
-    _process->write(data.constData(), data.size());
-  }
+       ++it)
+    _process->write(it->req->build());
 
   logger(log_info_message, basic)
     << "connector \"" << _name << "\" start.";
@@ -440,8 +435,7 @@ void connector::command::_exit() {
   QTimer::singleShot(5000, &loop, SLOT(quit()));
 
   quit_query quit;
-  QByteArray const& data = quit.build();
-  _process->write(data.constData(), data.size());
+  _process->write(quit.build());
 
   locker.unlock();
   loop.exec();
