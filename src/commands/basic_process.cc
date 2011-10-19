@@ -1,3 +1,22 @@
+/*
+** Copyright 2011 Merethis
+**
+** This file is part of Centreon Engine.
+**
+** Centreon Engine is free software: you can redistribute it and/or
+** modify it under the terms of the GNU General Public License version 2
+** as published by the Free Software Foundation.
+**
+** Centreon Engine is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+** General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with Centreon Engine. If not, see
+** <http://www.gnu.org/licenses/>.
+*/
+
 #include <stdlib.h>
 #include <unistd.h>
 #include <signal.h>
@@ -43,6 +62,7 @@ basic_process::~basic_process() throw() {
 void basic_process::closeReadChannel(QProcess::ProcessChannel channel) {
   QMutexLocker locker(&_mtx);
   int* fd(channel == QProcess::StandardOutput ? &_pipe_out[0] : &_pipe_err[0]);
+  process_manager::instance().remove_fd(*fd);
   if (*fd) {
     close(*fd);
     *fd = 0;
@@ -319,6 +339,8 @@ void basic_process::_finish() throw() {
   }
 
   _internal_state = ended;
+
+  _cond.wakeOne();
 }
 
 /**
@@ -384,6 +406,7 @@ void basic_process::_read_fd(int fd) {
  */
 void basic_process::_close_fd(int fd) {
   QMutexLocker locker(&_mtx);
+
   if (fd == _pipe_out[0]) {
     close(_pipe_out[0]);
     _pipe_out[0] = 0;

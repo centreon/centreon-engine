@@ -26,6 +26,7 @@ namespace com {
           static void                  cleanup();
 
           void                         add_process(basic_process* p);
+          void                         remove_fd(int fd);
           void                         remove_process(basic_process* p);
 
         protected:

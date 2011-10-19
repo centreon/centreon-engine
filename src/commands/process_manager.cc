@@ -17,13 +17,15 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <QDebug>
 #include <QTimer>
 #include <QMutexLocker>
 #include <QMetaType>
 #include <sys/wait.h>
+#include <errno.h>
+#include "logging/logger.hh"
 #include "commands/process_manager.hh"
 
+using namespace com::centreon::engine::logging;
 using namespace com::centreon::engine::commands;
 
 process_manager* process_manager::_instance = NULL;
@@ -46,15 +48,7 @@ process_manager::process_manager()
  */
 process_manager::~process_manager() throw() {
   _quit = true;
-  if (wait() == false) {
-    for (QHash<int, basic_process*>::const_iterator it(_processes_by_fd.begin()),
-           end(_processes_by_fd.end());
-         it != end;
-         ++it)
-      it.value()->kill();
-    _processes_by_fd.clear();
-    _processes_by_pid.clear();
-  }
+  wait();
   delete[] _fds;
 }
 
@@ -100,42 +94,69 @@ void process_manager::add_process(basic_process* p) {
 void process_manager::remove_process(basic_process* p) {
   if (p) {
     QMutexLocker locker(&_mtx);
-    _processes_by_fd.remove(p->_pipe_out[0]);
-    _processes_by_fd.remove(p->_pipe_err[0]);
+    if (!p->_pipe_out[0])
+      _processes_by_fd.remove(p->_pipe_out[0]);
+    if (!p->_pipe_err[0])
+      _processes_by_fd.remove(p->_pipe_err[0]);
     _processes_by_pid.remove(p->_pid);
     _is_modify = true;
   }
 }
 
 /**
+ *  Remove fd in the process by fd.
+ *
+ *  @param[in] fd The file descriptor to remove.
+ */
+void process_manager::remove_fd(int fd) {
+  QMutexLocker locker(&_mtx);
+  _processes_by_fd.remove(fd);
+  _is_modify = true;
+}
+
+
+/**
  *  The main loop.
  */
 void process_manager::run() {
   while (!(_quit && !_fds_size)) {
+    _wait_processes();
+
     if (_is_modify)
       _build_pollfd();
 
-    _wait_processes();
-
     int ret = poll(_fds, _fds_size, 100);
-    if (ret == 0)
+    if (ret == 0 || (ret == -1 && errno == EINTR))
       continue;
+    else if (ret == -1) {
+      logger(log_runtime_warning, basic)
+	<< "poll failed (" << strerror(errno) << ")";
+      continue;
+    }
+
+    QMutexLocker locker(&_mtx);
 
     int j(0);
     for (unsigned int i(0); i < _fds_size && j < ret; ++i) {
       if (_fds[i].revents & POLLIN) {
-        QHash<int, basic_process*>::iterator it(_processes_by_fd.find(_fds[i].fd));
-        it.value()->_read_fd(_fds[i].fd);
+	QHash<int, basic_process*>::iterator it(_processes_by_fd.find(_fds[i].fd));
+	it.value()->_read_fd(_fds[i].fd);
+	++j;
       }
-      else if (_fds[i].revents & POLLHUP) {
-        QHash<int, basic_process*>::iterator it(_processes_by_fd.find(_fds[i].fd));
-        basic_process* p(it.value());
+      else if (_fds[i].revents & (POLLHUP | POLLNVAL | POLLERR)) {
+	QHash<int, basic_process*>::iterator it(_processes_by_fd.find(_fds[i].fd));
+	basic_process* p(it.value());
         p->_close_fd(_fds[i].fd);
-        QMutexLocker locker(&_mtx);
-        _processes_by_fd.erase(it);
-        _is_modify = true;
         if (!p->_pid)
           p->_finish();
+	
+	if (_fds[i].revents & (POLLNVAL | POLLERR))
+	  logger(log_runtime_warning, basic)
+	    << "file descriptor " << _fds[i].fd << " is invalid.";
+
+        _processes_by_fd.erase(it);
+        _is_modify = true;
+	++j;
       }
     }
   }

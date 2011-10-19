@@ -176,9 +176,7 @@ unsigned int process::get_timeout() const throw() {
  *  Wait the end of the process (blocking).
  */
 void process::wait() {
-  QEventLoop loop;
-  connect(this, SIGNAL(ended()), &loop, SLOT(quit()));
-  loop.exec();
+  waitForFinished(-1);
 }
 
 /**
