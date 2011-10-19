@@ -17,14 +17,13 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <iostream>
 #include <stdlib.h>
 #include <unistd.h>
 #include <signal.h>
 #include <errno.h>
 #include "commands/process_manager.hh"
 #include "commands/basic_process.hh"
-
-#include <iostream>
 
 using namespace com::centreon::engine::commands;
 
@@ -33,6 +32,7 @@ using namespace com::centreon::engine::commands;
  */
 basic_process::basic_process()
   : QObject(),
+    _mtx(QMutex::Recursive),
     _perror(QProcess::UnknownError),
     _state(QProcess::NotRunning),
     _pid(0),
@@ -191,7 +191,7 @@ void basic_process::start(QString const& program, QStringList const& arguments) 
   delete[] args;
 }
 
-/** 
+/**
  *  Start program like a command line.
  *
  *  @param[in] program The command line.
@@ -308,16 +308,10 @@ void basic_process::_start(char** args) {
   close(_pipe_in[0]);
   _state = QProcess::Starting;
 
-  locker.unlock();
   emit started();
   emit stateChanged(_state);
-  locker.relock();
-
   _state = QProcess::Running;
-
-  locker.unlock();
   emit stateChanged(_state);
-  locker.relock();
 
   _internal_state = running;
   process_manager::instance().add_process(this);

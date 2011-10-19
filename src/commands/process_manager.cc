@@ -150,7 +150,7 @@ void process_manager::run() {
         p->_close_fd(_fds[i].fd);
         if (!p->_pid)
           p->_finish();
-	
+
 	if (_fds[i].revents & (POLLNVAL | POLLERR))
 	  logger(log_runtime_warning, basic)
 	    << "file descriptor " << _fds[i].fd << " is invalid.";
