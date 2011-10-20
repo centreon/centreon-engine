@@ -32,7 +32,6 @@ using namespace com::centreon::engine::commands;
  */
 basic_process::basic_process()
   : QObject(),
-    _mtx(QMutex::Recursive),
     _perror(QProcess::UnknownError),
     _state(QProcess::NotRunning),
     _pid(0),
@@ -62,10 +61,11 @@ basic_process::~basic_process() throw() {
 void basic_process::closeReadChannel(QProcess::ProcessChannel channel) {
   QMutexLocker locker(&_mtx);
   int* fd(channel == QProcess::StandardOutput ? &_pipe_out[0] : &_pipe_err[0]);
-  process_manager::instance().remove_fd(*fd);
   if (*fd) {
+    process_manager::instance().lock();
     close(*fd);
     *fd = 0;
+    process_manager::instance().unlock();
   }
 }
 
@@ -225,7 +225,7 @@ bool basic_process::waitForStarted(int msecs) {
   QMutexLocker locker(&_mtx);
   if (_internal_state != not_running)
     return (true);
-  _cond.wait(&_mtx, msecs == -1 ? ULONG_MAX : msecs);
+  _cond_started.wait(&_mtx, msecs == -1 ? ULONG_MAX : msecs);
   return (_internal_state != not_running);
 }
 
@@ -241,7 +241,7 @@ bool basic_process::waitForFinished(int msecs) {
   QMutexLocker locker(&_mtx);
   if (_internal_state == ended)
     return (true);
-  _cond.wait(&_mtx, msecs == -1 ? ULONG_MAX : msecs);
+  _cond_ended.wait(&_mtx, msecs == -1 ? ULONG_MAX : msecs);
   return (_internal_state == ended);
 }
 
@@ -276,18 +276,26 @@ void basic_process::_start(char** args) {
 
   _cleanup();
 
+  process_manager& pm(process_manager::instance());
+  pm.lock();
+
   if (pipe(_pipe_out) == -1
       || pipe(_pipe_err) == -1
       || pipe(_pipe_in) == -1
       || (_pid = vfork()) == -1) {
+    pm.unlock();
     _perror = QProcess::FailedToStart;
-    _internal_state = ended;
+
+    locker.unlock();
     emit error(_perror);
+    locker.relock();
+
+    _internal_state = ended;
+    _cond_ended.wakeOne();
     return;
   }
 
   if (!_pid) {
-    locker.unlock();
     close(_pipe_out[0]);
     close(_pipe_err[0]);
     close(_pipe_in[1]);
@@ -306,15 +314,25 @@ void basic_process::_start(char** args) {
   close(_pipe_out[1]);
   close(_pipe_err[1]);
   close(_pipe_in[0]);
-  _state = QProcess::Starting;
 
-  emit started();
-  emit stateChanged(_state);
-  _state = QProcess::Running;
-  emit stateChanged(_state);
+  _tmp_pid = _pid;
+
+  pm.add_process(this);
+  pm.unlock();
 
   _internal_state = running;
-  process_manager::instance().add_process(this);
+  _cond_started.wakeOne();
+  _state = QProcess::Starting;
+
+  locker.unlock();
+  emit started();
+  emit stateChanged(_state);
+  locker.relock();
+
+  _state = QProcess::Running;
+
+  locker.unlock();
+  emit stateChanged(_state);
 }
 
 /**
@@ -329,19 +347,24 @@ void basic_process::_finish() throw() {
   if (_pipe_out[0] || _pipe_err[0])
     return;
 
-  emit finished(WIFEXITED(_status) ? WEXITSTATUS(_status) : 0,
-                WIFSIGNALED(_status) ? QProcess::CrashExit : QProcess::NormalExit);
   _state = QProcess::NotRunning;
+  int exit_code(WIFEXITED(_status) ? WEXITSTATUS(_status) : 0);
+  QProcess::ExitStatus exit_status(WIFSIGNALED(_status)
+                                   ? QProcess::CrashExit : QProcess::NormalExit);
+  locker.unlock();
+  emit finished(exit_code, exit_status);
   emit stateChanged(_state);
+  locker.relock();
 
   if (WIFSIGNALED(_status) == QProcess::CrashExit) {
     _perror = QProcess::Crashed;
+    locker.unlock();
     emit error(_perror);
+    locker.relock();
   }
 
   _internal_state = ended;
-
-  _cond.wakeOne();
+  _cond_ended.wakeOne();
 }
 
 /**
@@ -386,6 +409,7 @@ void basic_process::_read_fd(int fd) {
     int ret = read(fd, buf, sizeof(buf));
     if (ret > 0) {
       _output.append(buf, ret);
+      locker.unlock();
       emit readyReadStandardOutput();
     }
   }
@@ -394,6 +418,7 @@ void basic_process::_read_fd(int fd) {
     int ret = read(fd, buf, sizeof(buf));
     if (ret > 0) {
       _error.append(buf, ret);
+      locker.unlock();
       emit readyReadStandardError();
     }
   }
@@ -407,7 +432,6 @@ void basic_process::_read_fd(int fd) {
  */
 void basic_process::_close_fd(int fd) {
   QMutexLocker locker(&_mtx);
-
   if (fd == _pipe_out[0]) {
     close(_pipe_out[0]);
     _pipe_out[0] = 0;
@@ -417,6 +441,17 @@ void basic_process::_close_fd(int fd) {
     _pipe_err[0] = 0;
   }
 }
+
+/**
+ *  Set the status code.
+ *
+ *  @param[in] status The status to update.
+ */
+void basic_process::_set_status(int status) {
+  QMutexLocker locker(&_mtx);
+  _status = status;
+}
+
 
 /**
  *  Split a command line in a array of arguments.

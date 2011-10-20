@@ -83,9 +83,11 @@ namespace com {
           void                   _cleanup() throw();
           void                   _read_fd(int fd);
           void                   _close_fd(int fd);
-          QStringList            _split_command_line(QString const& command_line);
+          void                   _set_status(int status);
+          static QStringList     _split_command_line(QString const& command_line);
 
-          QWaitCondition         _cond;
+          QWaitCondition         _cond_started;
+          QWaitCondition         _cond_ended;
           mutable QMutex         _mtx;
           QByteArray             _output;
           QByteArray             _error;

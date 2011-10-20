@@ -17,7 +17,6 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <QTimer>
 #include <QMutexLocker>
 #include <QMetaType>
 #include <sys/wait.h>
@@ -73,13 +72,14 @@ void process_manager::cleanup() {
 }
 
 /**
- *  Add a new basic process in the process manager.
+ *  Add a new basic process in the process manager. (WARNING:
+ *  you need to lock the process manager before call this
+ *  function and unlock it after).
  *
  *  @param[in] p The basic_process to add in the process_manager.
  */
 void process_manager::add_process(basic_process* p) {
   if (p) {
-    QMutexLocker locker(&_mtx);
     _processes_by_fd.insert(p->_pipe_out[0], p);
     _processes_by_fd.insert(p->_pipe_err[0], p);
     _processes_by_pid.insert(p->_pid, p);
@@ -88,33 +88,33 @@ void process_manager::add_process(basic_process* p) {
 }
 
 /**
- *  Remove a basic process.
+ *  Remove a basic process (WARNING: you need to lock the process
+ *  manager before call this function and unlock it after).
  *
  *  @param[in] p The basic_process to remove in the process_manager.
  */
 void process_manager::remove_process(basic_process* p) {
   if (p) {
-    QMutexLocker locker(&_mtx);
-    if (!p->_pipe_out[0])
-      _processes_by_fd.remove(p->_pipe_out[0]);
-    if (!p->_pipe_err[0])
-      _processes_by_fd.remove(p->_pipe_err[0]);
+    _processes_by_fd.remove(p->_pipe_out[0]);
+    _processes_by_fd.remove(p->_pipe_err[0]);
     _processes_by_pid.remove(p->_pid);
     _is_modify = true;
   }
 }
 
 /**
- *  Remove fd in the process by fd.
- *
- *  @param[in] fd The file descriptor to remove.
+ *  Lock the process manager.
  */
-void process_manager::remove_fd(int fd) {
-  QMutexLocker locker(&_mtx);
-  _processes_by_fd.remove(fd);
-  _is_modify = true;
+void process_manager::lock() {
+  _mtx.lock();
 }
 
+/**
+ *  Unlock the process manager.
+ */
+void process_manager::unlock() {
+  _mtx.unlock();
+}
 
 /**
  *  The main loop.
@@ -126,7 +126,7 @@ void process_manager::run() {
     if (_is_modify)
       _build_pollfd();
 
-    int ret = poll(_fds, _fds_size, 100);
+    int ret = poll(_fds, _fds_size, 10);
     if (ret == 0 || (ret == -1 && errno == EINTR))
       continue;
     else if (ret == -1) {
@@ -139,25 +139,32 @@ void process_manager::run() {
 
     int j(0);
     for (unsigned int i(0); i < _fds_size && j < ret; ++i) {
+      if (_fds[i].revents)
+        ++j;
+
       if (_fds[i].revents & POLLIN) {
 	QHash<int, basic_process*>::iterator it(_processes_by_fd.find(_fds[i].fd));
-	it.value()->_read_fd(_fds[i].fd);
-	++j;
+        if (it != _processes_by_fd.end())
+          it.value()->_read_fd(_fds[i].fd);
       }
       else if (_fds[i].revents & (POLLHUP | POLLNVAL | POLLERR)) {
 	QHash<int, basic_process*>::iterator it(_processes_by_fd.find(_fds[i].fd));
-	basic_process* p(it.value());
+        if (it == _processes_by_fd.end()) {
+          logger(log_runtime_warning, basic)
+            << "file descriptor (" << _fds[i].fd << ") not found.";
+          continue;
+        }
+        basic_process* p(it.value());
         p->_close_fd(_fds[i].fd);
         if (!p->_pid)
           p->_finish();
 
-	if (_fds[i].revents & (POLLNVAL | POLLERR))
-	  logger(log_runtime_warning, basic)
-	    << "file descriptor " << _fds[i].fd << " is invalid.";
+        if (_fds[i].revents & (POLLNVAL | POLLERR))
+          logger(log_runtime_warning, basic)
+            << "file descriptor " << _fds[i].fd << " is invalid.";
 
         _processes_by_fd.erase(it);
         _is_modify = true;
-	++j;
       }
     }
   }
@@ -198,7 +205,9 @@ void process_manager::_wait_processes() {
     QMutexLocker locker(&_mtx);
     QHash<pid_t, basic_process*>::iterator it = _processes_by_pid.find(pid);
     if (it != _processes_by_pid.end()) {
-      it.value()->_finish();
+      basic_process* p(it.value());
+      p->_set_status(status);
+      p->_finish();
       _processes_by_pid.erase(it);
     }
   }
