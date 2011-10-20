@@ -315,8 +315,6 @@ void basic_process::_start(char** args) {
   close(_pipe_err[1]);
   close(_pipe_in[0]);
 
-  _tmp_pid = _pid;
-
   pm.add_process(this);
   pm.unlock();
 
