@@ -264,6 +264,14 @@ void basic_process::terminate() {
 }
 
 /**
+ *  This function is called in the child process
+ *  context just before the program is executed.
+ */
+void basic_process::setupChildProcess() {
+
+}
+
+/**
  *  Internal methode to start program.
  *
  *  @param[in] args The arguments of the programe.
@@ -282,7 +290,7 @@ void basic_process::_start(char** args) {
   if (pipe(_pipe_out) == -1
       || pipe(_pipe_err) == -1
       || pipe(_pipe_in) == -1
-      || (_pid = vfork()) == -1) {
+      || (_pid = fork()) == -1) {
     pm.unlock();
     _perror = QProcess::FailedToStart;
 
@@ -305,6 +313,7 @@ void basic_process::_start(char** args) {
       close(_pipe_in[0]);
       close(_pipe_out[1]);
       close(_pipe_err[1]);
+      setupChildProcess();
       execvp(args[0], args);
     }
     std::cout << "error: " << strerror(errno) << std::endl;

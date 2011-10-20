@@ -68,6 +68,9 @@ namespace com {
           void                   started();
           void                   stateChanged(QProcess::ProcessState newState);
 
+        protected:
+          virtual void           setupChildProcess();
+
         private:
           enum                   e_state {
             not_running = 0,
