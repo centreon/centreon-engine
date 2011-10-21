@@ -83,7 +83,7 @@ namespace com {
 
           void                   _start(char** args);
           void                   _finish() throw();
-          void                   _cleanup() throw();
+          void                   _close_all() throw();
           void                   _read_fd(int fd);
           void                   _close_fd(int fd);
           void                   _set_status(int status);

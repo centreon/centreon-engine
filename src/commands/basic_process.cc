@@ -50,7 +50,6 @@ basic_process::basic_process()
  */
 basic_process::~basic_process() throw() {
   waitForFinished(-1);
-  _cleanup();
 }
 
 /**
@@ -282,7 +281,13 @@ void basic_process::_start(char** args) {
   if (_pid)
     return;
 
-  _cleanup();
+  _output.clear();
+  _error.clear();
+  _perror = QProcess::UnknownError;
+  _state = QProcess::NotRunning;
+  _pid = 0;
+  _status = 0;
+  _internal_state = not_running;
 
   process_manager& pm(process_manager::instance());
   pm.lock();
@@ -292,6 +297,8 @@ void basic_process::_start(char** args) {
       || pipe(_pipe_in) == -1
       || (_pid = fork()) == -1) {
     pm.unlock();
+    _pid = 0;
+    _close_all();
     _perror = QProcess::FailedToStart;
 
     locker.unlock();
@@ -354,14 +361,10 @@ void basic_process::_finish() throw() {
   if (_pipe_out[0] || _pipe_err[0])
     return;
 
+  _internal_state = ended;
+  _cond_ended.wakeOne();
+
   _state = QProcess::NotRunning;
-  int exit_code(WIFEXITED(_status) ? WEXITSTATUS(_status) : 0);
-  QProcess::ExitStatus exit_status(WIFSIGNALED(_status)
-                                   ? QProcess::CrashExit : QProcess::NormalExit);
-  locker.unlock();
-  emit finished(exit_code, exit_status);
-  emit stateChanged(_state);
-  locker.relock();
 
   if (WIFSIGNALED(_status) == QProcess::CrashExit) {
     _perror = QProcess::Crashed;
@@ -370,36 +373,13 @@ void basic_process::_finish() throw() {
     locker.relock();
   }
 
-  _internal_state = ended;
-  _cond_ended.wakeOne();
-}
-
-/**
- *  Cleanup all internal data of basic process.
- */
-void basic_process::_cleanup() throw() {
-  _output.clear();
-  _error.clear();
-  _perror = QProcess::UnknownError;
-  _state = QProcess::NotRunning;
-  _pid = 0;
-  _status = 0;
-  _internal_state = not_running;
-
-  for (unsigned int i(0); i < 2; ++i) {
-    if (_pipe_out[i]) {
-      close(_pipe_out[i]);
-      _pipe_out[i] = 0;
-    }
-    if (_pipe_err[i]) {
-      close(_pipe_err[i]);
-      _pipe_err[i] = 0;
-    }
-    if (_pipe_in[i]) {
-      close(_pipe_in[i]);
-      _pipe_in[i] = 0;
-    }
-  }
+  int exit_code(WIFEXITED(_status) ? WEXITSTATUS(_status) : 0);
+  QProcess::ExitStatus exit_status(WIFSIGNALED(_status)
+                                   ? QProcess::CrashExit : QProcess::NormalExit);
+  locker.unlock();
+  emit finished(exit_code, exit_status);
+  emit stateChanged(_state);
+  locker.relock();
 }
 
 /**
@@ -446,6 +426,26 @@ void basic_process::_close_fd(int fd) {
   else if (fd == _pipe_err[0]) {
     close(_pipe_err[0]);
     _pipe_err[0] = 0;
+  }
+}
+
+/**
+ *  Close all pipe.
+ */
+void basic_process::_close_all() throw() {
+  for (unsigned int i(0); i < 2; ++i) {
+    if (_pipe_out[i]) {
+      close(_pipe_out[i]);
+      _pipe_out[i] = 0;
+    }
+    if (_pipe_err[i]) {
+      close(_pipe_err[i]);
+      _pipe_err[i] = 0;
+    }
+    if (_pipe_in[i]) {
+      close(_pipe_in[i]);
+      _pipe_in[i] = 0;
+    }
   }
 }
 
