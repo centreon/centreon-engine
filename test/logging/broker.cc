@@ -20,7 +20,7 @@
 #include <QCoreApplication>
 #include <QDebug>
 #include <exception>
-#include "test/testing.hh"
+#include "test/unittest.hh"
 #include "broker.hh"
 #include "broker/loader.hh"
 #include "common.hh"
@@ -51,53 +51,52 @@ static const char*        LOG_MESSAGE  = "~!@#$%^&*()_+09/qwerty \n";
 /**
  *  Check the logging broker working.
  */
-int main(int argc, char** argv) {
-  QCoreApplication app(argc, argv);
-  try {
-    testing init;
+int main_test() {
+  // Add event logged data to broker.
+  config.set_event_broker_options(BROKER_LOGGED_DATA);
 
-    // Add event logged data to broker.
-    config.set_event_broker_options(BROKER_LOGGED_DATA);
+  // Get instance of the module loader.
+  broker::loader& loader(broker::loader::instance());
 
-    // Get instance of the module loader.
-    broker::loader& loader(broker::loader::instance());
+  // Load dummy module.
+  loader.set_directory(".");
+  if (loader.load() != 1)
+    throw (engine_error() << "module loading failed");
 
-    // Load dummy module.
-    loader.set_directory(".");
-    if (loader.load() != 1)
-      throw (engine_error() << "module loading failed");
+  // Get instance of logging engine.
+  logging::engine& engine(logging::engine::instance());
 
-    // Get instance of logging engine.
-    logging::engine& engine(logging::engine::instance());
+  // Add new object (broker) to log into engine.
+  QSharedPointer<logging::broker> obj(new logging::broker);
+  logging::engine::obj_info info(obj,
+                                 logging::log_all,
+                                 logging::most);
+  unsigned int id = engine.add_object(info);
 
-    // Add new object (broker) to log into engine.
-    QSharedPointer<logging::broker> obj(new logging::broker);
-    logging::engine::obj_info info(obj,
-      logging::log_all,
-      logging::most);
-    unsigned int id = engine.add_object(info);
-
-    // Send message on all different logging type.
-    for (unsigned int i = 0; i < NB_LOG_TYPE; ++i) {
-      engine.log(LOG_MESSAGE, 1ull << i, 0);
-    }
-
-    // Send message on all different debug logging type.
-    for (unsigned int i = 0; i < NB_DBG_TYPE; ++i) {
-      engine.log(LOG_MESSAGE, 1ull << (i + 32), 0);
-    }
-
-    // Remove object (broker).
-    engine.remove_object(id);
+  // Send message on all different logging type.
+  for (unsigned int i = 0; i < NB_LOG_TYPE; ++i) {
+    engine.log(LOG_MESSAGE, 1ull << i, 0);
   }
-  catch (std::exception const& e) {
-    qDebug() << "error: " << e.what();
-    return (1);
+
+  // Send message on all different debug logging type.
+  for (unsigned int i = 0; i < NB_DBG_TYPE; ++i) {
+    engine.log(LOG_MESSAGE, 1ull << (i + 32), 0);
   }
-  catch (...) {
-    qDebug() << "error: catch all.";
-    return (1);
-  }
+
+  // Remove object (broker).
+  engine.remove_object(id);
+
   return (0);
 }
 
+/**
+ *  Init unit test.
+ */
+int main(int argc, char** argv) {
+  QCoreApplication app(argc, argv);
+  unittest utest(&main_test);
+  QObject::connect(&utest, SIGNAL(finished()), &app, SLOT(quit()));
+  utest.start();
+  app.exec();
+  return (utest.ret());
+}

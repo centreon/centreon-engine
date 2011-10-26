@@ -21,7 +21,7 @@
 #include <QDebug>
 #include <exception>
 #include <limits.h>
-#include "test/testing.hh"
+#include "test/unittest.hh"
 #include "error.hh"
 #include "broker/loader.hh"
 
@@ -103,23 +103,23 @@ void check_chage_name() {
 /**
  *  Check the broker loader working.
  */
+int main_test() {
+  check_directory();
+  check_load();
+  check_unload();
+  check_chage_name();
+
+  return (0);
+}
+
+/**
+ *  Init the unit test.
+ */
 int main(int argc, char** argv) {
   QCoreApplication app(argc, argv);
-  try {
-    testing init;
-
-    check_directory();
-    check_load();
-    check_unload();
-    check_chage_name();
-  }
-  catch (std::exception const& e) {
-    qDebug() << "error: " << e.what();
-    return (1);
-  }
-  catch (...) {
-    qDebug() << "error: catch all.";
-    return (1);
-  }
-  return (0);
+  unittest utest(&main_test);
+  QObject::connect(&utest, SIGNAL(finished()), &app, SLOT(quit()));
+  utest.start();
+  app.exec();
+  return (utest.ret());
 }

@@ -20,7 +20,7 @@
 #include <QCoreApplication>
 #include <QDebug>
 #include <exception>
-#include "test/testing.hh"
+#include "test/unittest.hh"
 #include "logging/engine.hh"
 #include "error.hh"
 #include "commands.hh"
@@ -62,18 +62,21 @@ static void check_delay_svc_notification() {
 /**
  *  Check processing of delay_svc_notification works.
  */
+int main_test() {
+  logging::engine& engine = logging::engine::instance();
+  check_delay_svc_notification();
+  engine.cleanup();
+  return (0);
+}
+
+/**
+ *  Init unit test.
+ */
 int main(int argc, char** argv) {
   QCoreApplication app(argc, argv);
-  try {
-    testing init;
-
-    logging::engine& engine = logging::engine::instance();
-    check_delay_svc_notification();
-    engine.cleanup();
-  }
-  catch (std::exception const& e) {
-    qDebug() << "error: " << e.what();
-    return (1);
-  }
-  return (0);
+  unittest utest(&main_test);
+  QObject::connect(&utest, SIGNAL(finished()), &app, SLOT(quit()));
+  utest.start();
+  app.exec();
+  return (utest.ret());
 }

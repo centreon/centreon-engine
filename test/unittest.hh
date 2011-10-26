@@ -17,30 +17,59 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TEST_TESTING_HH
-# define TEST_TESTING_HH
+#ifndef TEST_UNITTEST_HH
+# define TEST_UNITTEST_HH
 
+# include <QThread>
+# include <QDebug>
 # include "broker/compatibility.hh"
 # include "broker/loader.hh"
 # include "checks/checker.hh"
 # include "commands/set.hh"
 # include "logging/engine.hh"
 # include "events/loop.hh"
-# include "commands/process_manager.hh"
 
 namespace     com {
   namespace   centreon {
     namespace engine {
       /**
-       *  @class testing testing.hh
-       *  @brief Class testing init and destroy all
-       *  engine needs to make unit test.
+       *  @class unittest unittest.hh
+       *  @brief Class unittest init and destroy all
+       *  engine needs to make unit test and run
+       *  unit test.
        */
-      class   testing {
+      class   unittest : public QThread {
       public:
-              testing() {
+        unittest(int (*func)())
+          : QThread(), _func(func), _ret(1) {
+          _init();
+        }
+
+        ~unittest() throw() {
+          wait();
+          _deinit();
+        }
+
+        int   ret() const throw() {
+          return (_ret);
+        }
+
+      protected:
+        void  run() {
+          try {
+            _ret = (*_func)();
+          }
+          catch (std::exception const& e) {
+            qDebug() << "error: " << e.what();
+          }
+          catch (...) {
+            qDebug() << "error: catch all...";
+          }
+        }
+
+      private:
+        void  _init() {
           logging::engine::instance();
-          commands::process_manager::instance();
           commands::set::instance();
           checks::checker::instance();
           broker::loader::instance();
@@ -48,18 +77,20 @@ namespace     com {
           events::loop::instance();
         }
 
-              ~testing() throw() {
+        void  _deinit() {
           events::loop::cleanup();
           broker::compatibility::cleanup();
           broker::loader::cleanup();
           checks::checker::cleanup();
           commands::set::cleanup();
-          commands::process_manager::cleanup();
           logging::engine::cleanup();
         }
+
+        int  (*_func)();
+        int   _ret;
       };
     }
   }
 }
 
-#endif // !TEST_TESTING_HH
+#endif // !TEST_UNITTEST_HH

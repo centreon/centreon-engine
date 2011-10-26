@@ -23,7 +23,7 @@
 #include <QFile>
 #include <QDir>
 #include <exception>
-#include "test/testing.hh"
+#include "test/unittest.hh"
 #include "globals.hh"
 #include "configuration/state.hh"
 
@@ -72,24 +72,24 @@ static void check_exist_file() {
 /**
  *  Check the parsing argument.
  */
+int main_test() {
+  config.set_log_archive_path(QDir::tempPath());
+
+  check_directory();
+  check_noexist_file();
+  check_exist_file();
+
+  return (0);
+}
+
+/**
+ *  Init unit test.
+ */
 int main(int argc, char** argv) {
   QCoreApplication app(argc, argv);
-  try {
-    testing init;
-
-    config.set_log_archive_path(QDir::tempPath());
-
-    check_directory();
-    check_noexist_file();
-    check_exist_file();
-  }
-  catch (std::exception const& e) {
-    qDebug() << "error: " << e.what();
-    return (1);
-  }
-  catch (...) {
-    qDebug() << "error: catch all.";
-    return (1);
-  }
-  return (0);
+  unittest utest(&main_test);
+  QObject::connect(&utest, SIGNAL(finished()), &app, SLOT(quit()));
+  utest.start();
+  app.exec();
+  return (utest.ret());
 }

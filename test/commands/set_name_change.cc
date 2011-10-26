@@ -20,7 +20,8 @@
 #include <QCoreApplication>
 #include <QDebug>
 #include <exception>
-#include "test/testing.hh"
+#include "error.hh"
+#include "test/unittest.hh"
 #include "commands/set.hh"
 #include "commands/raw.hh"
 
@@ -47,46 +48,45 @@ static bool command_exist(QString const& name) {
 /**
  *  Check if the change name system works.
  */
-int main(int argc, char** argv) {
-  QCoreApplication app(argc, argv);
-  try {
-    testing init;
+int main_test() {
+  // get instance.
+  set& cmd_set = set::instance();
 
-    // get instance.
-    set& cmd_set = set::instance();
+  // add command.
+  raw raw("raw", "raw argv1 argv2");
+  cmd_set.add_command(raw);
 
-    // add command.
-    raw raw("raw", "raw argv1 argv2");
-    cmd_set.add_command(raw);
+  // get command.
+  QSharedPointer<commands::command> cmd = cmd_set.get_command("raw");
 
-    // get command.
-    QSharedPointer<commands::command> cmd = cmd_set.get_command("raw");
+  // change command name.
+  cmd->set_name("cmd");
 
-    // change command name.
-    cmd->set_name("cmd");
+  // get command with new name.
+  QSharedPointer<commands::command> new_cmd = cmd_set.get_command("cmd");
 
-    // get command with new name.
-    QSharedPointer<commands::command> new_cmd = cmd_set.get_command("cmd");
+  // check if the old command name is not found.
+  if (command_exist("raw") == true)
+    throw (engine_error() << "error: command name changed failed.");
 
-    // check if the old command name is not found.
-    if (command_exist("raw") == true) {
-      qDebug() << "error: command name changed failed.";
-      return (1);
-    }
+  // remove new name.
+  cmd_set.remove_command("cmd");
 
-    // remove new name.
-    cmd_set.remove_command("cmd");
-
-    // check if the old command name is not found.
-    if (command_exist("cmd") == true) {
-      qDebug() << "error: command name changed failed.";
-      return (1);
-    }
-  }
-  catch (std::exception const& e) {
-    qDebug() << "error: " << e.what();
-    return (1);
-  }
+  // check if the old command name is not found.
+  if (command_exist("cmd") == true)
+    throw (engine_error() << "error: command name changed failed.");
 
   return (0);
+}
+
+/**
+ *  Init unit test.
+ */
+int main(int argc, char** argv) {
+  QCoreApplication app(argc, argv);
+  unittest utest(&main_test);
+  QObject::connect(&utest, SIGNAL(finished()), &app, SLOT(quit()));
+  utest.start();
+  app.exec();
+  return (utest.ret());
 }

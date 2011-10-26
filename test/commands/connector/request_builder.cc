@@ -20,7 +20,8 @@
 #include <QCoreApplication>
 #include <QDebug>
 #include <exception>
-#include "test/testing.hh"
+#include "error.hh"
+#include "test/unittest.hh"
 #include "commands/connector/request_builder.hh"
 
 using namespace com::centreon::engine;
@@ -60,24 +61,24 @@ static bool is_invalid() {
 /**
  *  Check request builder.
  */
+int main_test() {
+  if (is_valid() == false)
+    throw (engine_error() << "error: is valid failed.");
+
+  if (is_invalid() == false)
+    throw (engine_error() << "error: is invalid failed.");
+
+  return (0);
+}
+
+/**
+ *  Init the unit test.
+ */
 int main(int argc, char** argv) {
   QCoreApplication app(argc, argv);
-  try {
-    testing init;
-
-    if (is_valid() == false) {
-      qDebug() << "error: is valid failed.";
-      return (1);
-    }
-
-    if (is_invalid() == false) {
-      qDebug() << "error: is invalid failed.";
-      return (1);
-    }
-  }
-  catch (std::exception const& e) {
-    qDebug() << "error: " << e.what();
-    return (1);
-  }
-  return (0);
+  unittest utest(&main_test);
+  QObject::connect(&utest, SIGNAL(finished()), &app, SLOT(quit()));
+  utest.start();
+  app.exec();
+  return (utest.ret());
 }

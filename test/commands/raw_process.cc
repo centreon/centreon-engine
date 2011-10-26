@@ -20,7 +20,8 @@
 #include <QCoreApplication>
 #include <QDebug>
 #include <exception>
-#include "test/testing.hh"
+#include "error.hh"
+#include "test/unittest.hh"
 #include "commands/raw.hh"
 #include "globals.hh"
 #include "objects.hh"
@@ -37,48 +38,49 @@ using namespace com::centreon::engine::commands;
 /**
  *  Check the process command line replacement macros.
  */
-int main(int argc, char** argv) {
-  QCoreApplication app(argc, argv);
-  try {
-    testing init;
+int main_test() {
+  nagios_macros macros = nagios_macros();
 
-    nagios_macros macros = nagios_macros();
+  // add macros arg1.
+  macros.argv[0] = new char[strlen(CMD_ARG1) + 1];
+  strcpy(macros.argv[0], CMD_ARG1);
 
-    // add macros arg1.
-    macros.argv[0] = new char[strlen(CMD_ARG1) + 1];
-    strcpy(macros.argv[0], CMD_ARG1);
+  // add macros user1.
+  macro_user[0] = new char[strlen(CMD_USER1) + 1];
+  strcpy(macro_user[0], CMD_USER1);
 
-    // add macros user1.
-    macro_user[0] = new char[strlen(CMD_USER1) + 1];
-    strcpy(macro_user[0], CMD_USER1);
+  // add macros hostaddress.
+  macro_x_names[MACRO_HOSTADDRESS] = new char[strlen("HOSTADDRESS") + 1];
+  strcpy(macro_x_names[MACRO_HOSTADDRESS], "HOSTADDRESS");
 
-    // add macros hostaddress.
-    macro_x_names[MACRO_HOSTADDRESS] = new char[strlen("HOSTADDRESS") + 1];
-    strcpy(macro_x_names[MACRO_HOSTADDRESS], "HOSTADDRESS");
+  host hst = host();
+  hst.address = new char[strlen(CMD_HOSTADDR) + 1];
+  strcpy(hst.address, CMD_HOSTADDR);
+  macros.host_ptr = &hst;
 
-    host hst = host();
-    hst.address = new char[strlen(CMD_HOSTADDR) + 1];
-    strcpy(hst.address, CMD_HOSTADDR);
-    macros.host_ptr = &hst;
+  // process command.
+  raw cmd(__func__, CMD_LINE);
+  QString cmd_processed = cmd.process_cmd(&macros);
 
-    // process command.
-    raw cmd(__func__, CMD_LINE);
-    QString cmd_processed = cmd.process_cmd(&macros);
+  delete[] hst.address;
+  delete[] macro_x_names[MACRO_HOSTADDRESS];
+  delete[] macro_user[0];
+  delete[] macros.argv[0];
 
-    delete[] hst.address;
-    delete[] macro_x_names[MACRO_HOSTADDRESS];
-    delete[] macro_user[0];
-    delete[] macros.argv[0];
-
-    if (cmd_processed != CMD_PROCESSED) {
-      qDebug() << "command::process failed.";
-      return (1);
-    }
-  }
-  catch (std::exception const& e) {
-    qDebug() << "error: " << e.what();
-    return (1);
-  }
+  if (cmd_processed != CMD_PROCESSED)
+    throw (engine_error() << "command::process failed.");
 
   return (0);
+}
+
+/**
+ *  Init unit test.
+ */
+int main(int argc, char** argv) {
+  QCoreApplication app(argc, argv);
+  unittest utest(&main_test);
+  QObject::connect(&utest, SIGNAL(finished()), &app, SLOT(quit()));
+  utest.start();
+  app.exec();
+  return (utest.ret());
 }

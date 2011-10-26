@@ -20,7 +20,8 @@
 #include <QFile>
 #include <string.h>
 #include <time.h>
-#include "test/testing.hh"
+#include "error.hh"
+#include "test/unittest.hh"
 #include "checks.hh"
 #include "test/notifications/first_notif_delay/common.hh"
 #include "globals.hh"
@@ -32,12 +33,7 @@ using namespace com::centreon::engine;
  *
  *  @return 0 on success.
  */
-int main(int argc, char* argv[]) {
-  // Qt Core object.
-  QCoreApplication app(argc, argv);
-
-  testing init;
-
+int main_test() {
   // Return value.
   int retval(0);
 
@@ -82,4 +78,16 @@ int main(int argc, char* argv[]) {
   //QFile::remove(FLAG_FILE);
 
   return (retval);
+}
+
+/**
+ *  Init unit test.
+ */
+int main(int argc, char** argv) {
+  QCoreApplication app(argc, argv);
+  unittest utest(&main_test);
+  QObject::connect(&utest, SIGNAL(finished()), &app, SLOT(quit()));
+  utest.start();
+  app.exec();
+  return (utest.ret());
 }

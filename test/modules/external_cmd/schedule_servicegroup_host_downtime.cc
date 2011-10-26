@@ -20,7 +20,7 @@
 #include <QCoreApplication>
 #include <QDebug>
 #include <exception>
-#include "test/testing.hh"
+#include "test/unittest.hh"
 #include "logging/engine.hh"
 #include "error.hh"
 #include "commands.hh"
@@ -32,7 +32,7 @@ using namespace com::centreon::engine;
  *  Run schedule_servicegroup_host_downtime test.
  */
 static void check_schedule_servicegroup_host_downtime() {
-    init_object_skiplists();
+  init_object_skiplists();
 
   host* hst = add_host("name", NULL, NULL, "localhost", NULL, 0, 0.0, 0.0, 42,
                        0, 0, 0, 0, 0, 0.0, 0.0, NULL, 0, NULL, 0, 0, NULL, 0,
@@ -93,18 +93,21 @@ static void check_schedule_servicegroup_host_downtime() {
 /**
  *  Check processing of schedule_servicegroup_host_downtime works.
  */
+int main_test() {
+  logging::engine& engine = logging::engine::instance();
+  check_schedule_servicegroup_host_downtime();
+  engine.cleanup();
+  return (0);
+}
+
+/**
+ *  Init unit test.
+ */
 int main(int argc, char** argv) {
   QCoreApplication app(argc, argv);
-  try {
-    testing init;
-
-    logging::engine& engine = logging::engine::instance();
-    check_schedule_servicegroup_host_downtime();
-    engine.cleanup();
-  }
-  catch (std::exception const& e) {
-    qDebug() << "error: " << e.what();
-    return (1);
-  }
-  return (0);
+  unittest utest(&main_test);
+  QObject::connect(&utest, SIGNAL(finished()), &app, SLOT(quit()));
+  utest.start();
+  app.exec();
+  return (utest.ret());
 }

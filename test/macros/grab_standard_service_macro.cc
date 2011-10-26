@@ -22,7 +22,7 @@
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
-#include "test/testing.hh"
+#include "test/unittest.hh"
 #include "globals.hh"
 #include "macros/grab_service.hh"
 #include "test/macros/minimal_setup.hh"
@@ -84,10 +84,7 @@ using namespace com::centreon::engine;
  *
  *  @return 0 on success.
  */
-int main(int argc, char** argv) {
-  QCoreApplication app(argc, argv);
-  testing init;
-
+int main_test() {
   // Create minimal context.
   test::minimal_setup();
 
@@ -290,4 +287,16 @@ int main(int argc, char** argv) {
   test::cleanup_setup();
 
   return (retval);
+}
+
+/**
+ *  Init unit test.
+ */
+int main(int argc, char** argv) {
+  QCoreApplication app(argc, argv);
+  unittest utest(&main_test);
+  QObject::connect(&utest, SIGNAL(finished()), &app, SLOT(quit()));
+  utest.start();
+  app.exec();
+  return (utest.ret());
 }

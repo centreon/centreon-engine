@@ -20,7 +20,8 @@
 #include <QCoreApplication>
 #include <QDebug>
 #include <exception>
-#include "test/testing.hh"
+#include "error.hh"
+#include "test/unittest.hh"
 #include "commands/connector/command.hh"
 #include "engine.hh"
 #include "test/commands/wait_process.hh"
@@ -87,24 +88,24 @@ static bool run_with_timeout() {
  *
  *  @return true if ok, false otherwise.
  */
-int main(int argc, char** argv) {
-  QCoreApplication app(argc, argv);
-  try {
-    testing init;
+int main_test() {
+  if (run_without_timeout() == false)
+    throw (engine_error() << "error: raw::run without timeout failed.");
 
-    if (run_without_timeout() == false) {
-      qDebug() << "error: raw::run without timeout failed.";
-      return (1);
-    }
-    if (run_with_timeout() == false) {
-      qDebug() << "error: raw::run with timeout failed.";
-      return (1);
-    }
-  }
-  catch (std::exception const& e) {
-    qDebug() << "error: " << e.what();
-    return (1);
-  }
+  if (run_with_timeout() == false)
+    throw (engine_error() << "error: raw::run with timeout failed.");
 
   return (0);
+}
+
+/**
+ *  Init the unit test.
+ */
+int main(int argc, char** argv) {
+  QCoreApplication app(argc, argv);
+  unittest utest(&main_test);
+  QObject::connect(&utest, SIGNAL(finished()), &app, SLOT(quit()));
+  utest.start();
+  app.exec();
+  return (utest.ret());
 }

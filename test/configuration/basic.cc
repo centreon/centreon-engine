@@ -27,7 +27,7 @@
 #include <limits.h>
 #include <fstream>
 #include <map>
-#include "test/testing.hh"
+#include "test/unittest.hh"
 #include "engine.hh"
 #include "globals.hh"
 #include "macros.hh"
@@ -587,30 +587,33 @@ void test_configuration(QString const& filename, std::map<QString, QString>& my_
 /**
  *  Check the configuration working.
  */
+int main_test() {
+  srandom(time(NULL));
+
+  QTemporaryFile mainconf("centengine.cfg");
+  QTemporaryFile resource("resource.cfg");
+
+  if (mainconf.open() == false || resource.open() == false)
+    throw (engine_error() << "open temporary file failed.");
+
+  QString mainconf_path = QDir::tempPath() + "/" + mainconf.fileName();
+  QString resource_path = QDir::tempPath() + "/" + resource.fileName();
+
+  std::map<QString, QString> my_conf = build_configuration(mainconf_path, resource_path);
+  test_configuration(mainconf_path, my_conf);
+
+  return (0);
+}
+
+/**
+ *  Init unit test.
+ */
 int main(int argc, char** argv) {
   QCoreApplication app(argc, argv);
-  try {
-    testing init;
-
-    srandom(time(NULL));
-
-    QTemporaryFile mainconf("centengine.cfg");
-    QTemporaryFile resource("resource.cfg");
-
-    if (mainconf.open() == false || resource.open() == false) {
-      throw (engine_error() << "open temporary file failed.");
-    }
-
-    QString mainconf_path = QDir::tempPath() + "/" + mainconf.fileName();
-    QString resource_path = QDir::tempPath() + "/" + resource.fileName();
-
-    std::map<QString, QString> my_conf = build_configuration(mainconf_path, resource_path);
-    test_configuration(mainconf_path, my_conf);
-  }
-  catch (std::exception const& e) {
-    qDebug() << "error: " << e.what();
-    return (1);
-  }
-  return (0);
+  unittest utest(&main_test);
+  QObject::connect(&utest, SIGNAL(finished()), &app, SLOT(quit()));
+  utest.start();
+  app.exec();
+  return (utest.ret());
 }
 

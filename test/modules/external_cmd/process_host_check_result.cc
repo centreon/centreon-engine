@@ -20,7 +20,7 @@
 #include <QCoreApplication>
 #include <QDebug>
 #include <exception>
-#include "test/testing.hh"
+#include "test/unittest.hh"
 #include "logging/engine.hh"
 #include "error.hh"
 #include "commands.hh"
@@ -63,18 +63,21 @@ static void check_process_host_check_result() {
 /**
  *  Check processing of process_host_check_result works.
  */
+int main_test() {
+  logging::engine& engine = logging::engine::instance();
+  check_process_host_check_result();
+  engine.cleanup();
+  return (0);
+}
+
+/**
+ *  Init unit test.
+ */
 int main(int argc, char** argv) {
   QCoreApplication app(argc, argv);
-  try {
-    testing init;
-
-    logging::engine& engine = logging::engine::instance();
-    check_process_host_check_result();
-    engine.cleanup();
-  }
-  catch (std::exception const& e) {
-    qDebug() << "error: " << e.what();
-    return (1);
-  }
-  return (0);
+  unittest utest(&main_test);
+  QObject::connect(&utest, SIGNAL(finished()), &app, SLOT(quit()));
+  utest.start();
+  app.exec();
+  return (utest.ret());
 }

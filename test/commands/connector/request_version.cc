@@ -20,7 +20,8 @@
 #include <QCoreApplication>
 #include <QDebug>
 #include <exception>
-#include "test/testing.hh"
+#include "error.hh"
+#include "test/unittest.hh"
 #include "commands/connector/version_query.hh"
 #include "commands/connector/version_response.hh"
 #include "test/commands/connector/check_request.hh"
@@ -34,42 +35,34 @@ using namespace com::centreon::engine::commands::connector;
 /**
  *  Check the version request.
  */
+int main_test() {
+  version_query query;
+  if (check_request_valid(&query, REQUEST(QUERY)) == false)
+    throw (engine_error() << "error: query is valid failed.");
+  if (check_request_invalid(&query) == false)
+    throw (engine_error() << "error: query is invalid failed.");
+  if (check_request_clone(&query) == false)
+    throw (engine_error() << "error: query clone failed");
+
+  version_response response(ENGINE_MAJOR, ENGINE_MINOR);
+  if (check_request_valid(&response, REQUEST(RESPONSE)) == false)
+    throw (engine_error() << "error: response is valid failed.");
+  if (check_request_invalid(&response) == false)
+    throw (engine_error() << "error: response is invalid failed.");
+  if (check_request_clone(&response) == false)
+    throw (engine_error() << "error: response clone failed");
+
+  return (0);
+}
+
+/**
+ *  Init the unit test.
+ */
 int main(int argc, char** argv) {
   QCoreApplication app(argc, argv);
-  try {
-    testing init;
-
-    version_query query;
-    if (check_request_valid(&query, REQUEST(QUERY)) == false) {
-      qDebug() << "error: query is valid failed.";
-      return (1);
-    }
-    if (check_request_invalid(&query) == false) {
-      qDebug() << "error: query is invalid failed.";
-      return (1);
-    }
-    if (check_request_clone(&query) == false) {
-      qDebug() << "error: query clone failed";
-      return (1);
-    }
-
-    version_response response(ENGINE_MAJOR, ENGINE_MINOR);
-    if (check_request_valid(&response, REQUEST(RESPONSE)) == false) {
-      qDebug() << "error: response is valid failed.";
-      return (1);
-    }
-    if (check_request_invalid(&response) == false) {
-      qDebug() << "error: response is invalid failed.";
-      return (1);
-    }
-    if (check_request_clone(&response) == false) {
-      qDebug() << "error: response clone failed";
-      return (1);
-    }
-  }
-  catch (std::exception const& e) {
-    qDebug() << "error: " << e.what();
-    return (1);
-  }
-  return (0);
+  unittest utest(&main_test);
+  QObject::connect(&utest, SIGNAL(finished()), &app, SLOT(quit()));
+  utest.start();
+  app.exec();
+  return (utest.ret());
 }

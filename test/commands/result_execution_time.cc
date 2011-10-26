@@ -21,7 +21,8 @@
 #include <QDebug>
 #include <exception>
 #include <sys/time.h>
-#include "test/testing.hh"
+#include "error.hh"
+#include "test/unittest.hh"
 #include "commands/result.hh"
 
 using namespace com::centreon::engine;
@@ -44,33 +45,32 @@ static uint execution_time(QDateTime const& start, QDateTime const& end) {
 /**
  *  Check if the result execution time works.
  */
-int main(int argc, char** argv) {
-  QCoreApplication app(argc, argv);
-  try {
-    testing init;
+int main_test() {
+  QDateTime start = QDateTime::currentDateTime();
 
-    QDateTime start = QDateTime::currentDateTime();
+  QDateTime end = start;
+  end.addSecs(10);
+  end.addMSecs(20);
 
-    QDateTime end = start;
-    end.addSecs(10);
-    end.addMSecs(20);
+  result res1(0, "", "", start, end);
+  if (res1.get_execution_time() != execution_time(start, end))
+    throw (engine_error() << "error: execution_time invalid value.");
 
-    result res1(0, "", "", start, end);
-    if (res1.get_execution_time() != execution_time(start, end)) {
-      qDebug() << "error: execution_time invalid value.";
-      return (1);
-    }
-
-    result res2(0, "", "", end, start);
-    if (res2.get_execution_time() != 0) {
-      qDebug() << "error: execution_time != 0";
-      return (1);
-    }
-  }
-  catch (std::exception const& e) {
-    qDebug() << "error: " << e.what();
-    return (1);
-  }
+  result res2(0, "", "", end, start);
+  if (res2.get_execution_time() != 0)
+    throw (engine_error() << "error: execution_time != 0");
 
   return (0);
+}
+
+/**
+ *  Init unit test.
+ */
+int main(int argc, char** argv) {
+  QCoreApplication app(argc, argv);
+  unittest utest(&main_test);
+  QObject::connect(&utest, SIGNAL(finished()), &app, SLOT(quit()));
+  utest.start();
+  app.exec();
+  return (utest.ret());
 }

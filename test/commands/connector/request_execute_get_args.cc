@@ -20,7 +20,8 @@
 #include <QCoreApplication>
 #include <QDebug>
 #include <exception>
-#include "test/testing.hh"
+#include "error.hh"
+#include "test/unittest.hh"
 #include "commands/connector/execute_query.hh"
 
 using namespace com::centreon::engine;
@@ -47,34 +48,35 @@ line lines[] = {
 /**
  *  Check the execute request.
  */
-int main(int argc, char** argv) {
-  QCoreApplication app(argc, argv);
-  try {
-    testing init;
+int main_test() {
+  for (unsigned int i = 0; lines[i].command != NULL; ++i) {
+    execute_query query(0, lines[i].command, QDateTime::currentDateTime(), 0);
+    QStringList list = query.get_args();
 
-    for (unsigned int i = 0; lines[i].command != NULL; ++i) {
-      execute_query query(0, lines[i].command, QDateTime::currentDateTime(), 0);
-      QStringList list = query.get_args();
-
-      QString result;
-      for (QStringList::const_iterator it = list.begin(), end = list.end();
-	   it != end;
-	   ++it) {
-	result += *it;
-	if (it + 1 != end) {
-	  result += ' ';
-	}
-      }
-      if (result != lines[i].result) {
-	qDebug() << "error: command '" << lines[i].command << "' failed.";
-	return (1);
+    QString result;
+    for (QStringList::const_iterator it = list.begin(), end = list.end();
+         it != end;
+         ++it) {
+      result += *it;
+      if (it + 1 != end) {
+        result += ' ';
       }
     }
+    if (result != lines[i].result)
+      throw (engine_error() << "error: command '" << lines[i].command << "' failed.");
+  }
 
-  }
-  catch (std::exception const& e) {
-    qDebug() << "error: " << e.what();
-    return (1);
-  }
   return (0);
+}
+
+/**
+ *  Init the unit test.
+ */
+int main(int argc, char** argv) {
+  QCoreApplication app(argc, argv);
+  unittest utest(&main_test);
+  QObject::connect(&utest, SIGNAL(finished()), &app, SLOT(quit()));
+  utest.start();
+  app.exec();
+  return (utest.ret());
 }

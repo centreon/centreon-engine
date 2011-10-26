@@ -20,7 +20,8 @@
 #include <QCoreApplication>
 #include <QDebug>
 #include <exception>
-#include "test/testing.hh"
+#include "error.hh"
+#include "test/unittest.hh"
 #include "commands/raw.hh"
 
 using namespace com::centreon::engine;
@@ -32,25 +33,25 @@ using namespace com::centreon::engine::commands;
 /**
  * Check comparison operator.
  */
-int main(int argc, char** argv) {
-  QCoreApplication app(argc, argv);
-  try {
-    testing init;
+int main_test() {
+  raw cmd(CMD_NAME, CMD_LINE);
+  if (!(cmd == cmd))
+    throw (engine_error() << "error: operator== failed.");
 
-    raw cmd(CMD_NAME, CMD_LINE);
-    if (!(cmd == cmd)) {
-      qDebug() << "error: operator== failed.";
-      return (1);
-    }
-    if (cmd != cmd) {
-      qDebug() << "error: operator!= failed.";
-      return (1);
-    }
-  }
-  catch (std::exception const& e) {
-    qDebug() << "error: " << e.what();
-    return (1);
-  }
+  if (cmd != cmd)
+    throw (engine_error() << "error: operator!= failed.");
 
   return (0);
+}
+
+/**
+ *  Init the unit test.
+ */
+int main(int argc, char** argv) {
+  QCoreApplication app(argc, argv);
+  unittest utest(&main_test);
+  QObject::connect(&utest, SIGNAL(finished()), &app, SLOT(quit()));
+  utest.start();
+  app.exec();
+  return (utest.ret());
 }

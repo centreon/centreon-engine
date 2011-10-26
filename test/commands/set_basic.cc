@@ -20,7 +20,8 @@
 #include <QCoreApplication>
 #include <QDebug>
 #include <exception>
-#include "test/testing.hh"
+#include "error.hh"
+#include "test/unittest.hh"
 #include "commands/set.hh"
 #include "commands/raw.hh"
 
@@ -47,58 +48,52 @@ static bool command_exit(QString const& name) {
 /**
  *  Check if the set command works.
  */
-int main(int argc, char** argv) {
-  QCoreApplication app(argc, argv);
-  try {
-    testing init;
+int main_test() {
+  // get instance.
+  set& cmd_set = set::instance();
 
-    // get instance.
-    set& cmd_set = set::instance();
+  // add commands.
+  raw raw1("raw1", "raw1 argv1 argv2");
+  cmd_set.add_command(raw1);
 
-    // add commands.
-    raw raw1("raw1", "raw1 argv1 argv2");
-    cmd_set.add_command(raw1);
+  QSharedPointer<commands::command> pcmd2(raw1.clone());
+  cmd_set.add_command(pcmd2);
 
-    QSharedPointer<commands::command> pcmd2(raw1.clone());
-    cmd_set.add_command(pcmd2);
+  QSharedPointer<commands::command> pcmd3(new raw("pcmd3", "pcmd3 argv1 argv2"));
+  cmd_set.add_command(pcmd3);
 
-    QSharedPointer<commands::command> pcmd3(new raw("pcmd3", "pcmd3 argv1 argv2"));
-    cmd_set.add_command(pcmd3);
+  // get commands.
+  if (command_exit("raw1") == false)
+    throw (engine_error() << "error: get_command failed, 'raw1' not found.");
 
-    // get commands.
-    if (command_exit("raw1") == false) {
-      qDebug() << "error: get_command failed, 'raw1' not found.";
-      return (1);
-    }
-    if (command_exit("pcmd3") == false) {
-      qDebug() << "error: get_command failed, 'pcmd3' not found.";
-      return (1);
-    }
+  if (command_exit("pcmd3") == false)
+    throw (engine_error() << "error: get_command failed, 'pcmd3' not found.");
 
-    if (command_exit("undef") == true) {
-      qDebug() << "error: get_command failed, 'undef' found.";
-      return (1);
-    }
+  if (command_exit("undef") == true)
+    throw (engine_error() << "error: get_command failed, 'undef' found.");
 
-    // remove commands.
-    cmd_set.remove_command("pcmd3");
-    if (command_exit("pcmd3") == true) {
-      qDebug() << "error: remove_command failed, 'pcmd3' found.";
-      return (1);
-    }
+  // remove commands.
+  cmd_set.remove_command("pcmd3");
+  if (command_exit("pcmd3") == true)
+    throw (engine_error() << "error: remove_command failed, 'pcmd3' found.");
 
-    cmd_set.remove_command("raw1");
-    if (command_exit("raw1") == true) {
-      qDebug() << "error: remove_command failed, 'raw1' found.";
-      return (1);
-    }
+  cmd_set.remove_command("raw1");
+  if (command_exit("raw1") == true)
+    throw (engine_error() << "error: remove_command failed, 'raw1' found.");
 
-    cmd_set.remove_command("undef");
-  }
-  catch (std::exception const& e) {
-    qDebug() << "error: " << e.what();
-    return (1);
-  }
+  cmd_set.remove_command("undef");
 
   return (0);
+}
+
+/**
+ *  Init unit test.
+ */
+int main(int argc, char** argv) {
+  QCoreApplication app(argc, argv);
+  unittest utest(&main_test);
+  QObject::connect(&utest, SIGNAL(finished()), &app, SLOT(quit()));
+  utest.start();
+  app.exec();
+  return (utest.ret());
 }

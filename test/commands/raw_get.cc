@@ -20,7 +20,8 @@
 #include <QCoreApplication>
 #include <QDebug>
 #include <exception>
-#include "test/testing.hh"
+#include "error.hh"
+#include "test/unittest.hh"
 #include "commands/raw.hh"
 
 using namespace com::centreon::engine;
@@ -32,27 +33,26 @@ using namespace com::centreon::engine::commands;
 /**
  *  Check getter return.
  */
-int main(int argc, char** argv) {
-  QCoreApplication app(argc, argv);
-  try {
-    testing init;
+int main_test() {
+  raw cmd(DEFAULT_CMD_NAME, DEFAULT_CMD_LINE);
 
-    raw cmd(DEFAULT_CMD_NAME, DEFAULT_CMD_LINE);
+  if (cmd.get_name() != DEFAULT_CMD_NAME)
+    throw (engine_error() << "error: name invalid value.");
 
-    if (cmd.get_name() != DEFAULT_CMD_NAME) {
-      qDebug() << "error: name invalid value.";
-      return (1);
-    }
-
-    if (cmd.get_command_line() != DEFAULT_CMD_LINE) {
-      qDebug() << "error: command_line invalid value.";
-      return (1);
-    }
-  }
-  catch (std::exception const& e) {
-    qDebug() << "error: " << e.what();
-    return (1);
-  }
+  if (cmd.get_command_line() != DEFAULT_CMD_LINE)
+    throw (engine_error() << "error: command_line invalid value.");
 
   return (0);
+}
+
+/**
+ *  Init unit test.
+ */
+int main(int argc, char** argv) {
+  QCoreApplication app(argc, argv);
+  unittest utest(&main_test);
+  QObject::connect(&utest, SIGNAL(finished()), &app, SLOT(quit()));
+  utest.start();
+  app.exec();
+  return (utest.ret());
 }

@@ -20,7 +20,8 @@
 #include <QCoreApplication>
 #include <QDebug>
 #include <exception>
-#include "test/testing.hh"
+#include "error.hh"
+#include "test/unittest.hh"
 #include "commands/result.hh"
 
 using namespace com::centreon::engine;
@@ -36,33 +37,33 @@ using namespace com::centreon::engine::commands;
 /**
  *  Check the comparison operator.
  */
-int main(int argc, char** argv) {
-  QCoreApplication app(argc, argv);
-  try {
-    testing init;
+int main_test() {
+  QDateTime time = QDateTime::currentDateTime();
+  result res(DEFAULT_ID,
+             DEFAULT_STDOUT,
+             DEFAULT_STDERR,
+             time,
+             time,
+             DEFAULT_RETURN,
+             DEFAULT_TIMEOUT,
+             DEFAULT_EXIT_OK);
+  if (!(res == res))
+    throw (engine_error() << "error: operator== failed.");
 
-    QDateTime time = QDateTime::currentDateTime();
-    result res(DEFAULT_ID,
-	       DEFAULT_STDOUT,
-	       DEFAULT_STDERR,
-	       time,
-	       time,
-	       DEFAULT_RETURN,
-	       DEFAULT_TIMEOUT,
-	       DEFAULT_EXIT_OK);
-    if (!(res == res)) {
-      qDebug() << "error: operator== failed.";
-      return (1);
-    }
-    if (res != res) {
-      qDebug() << "error: operator!= failed.";
-      return (1);
-    }
-  }
-  catch (std::exception const& e) {
-    qDebug() << "error: " << e.what();
-    return (1);
-  }
+  if (res != res)
+    throw (engine_error() << "error: operator!= failed.");
 
   return (0);
+}
+
+/**
+ *  Init unit test.
+ */
+int main(int argc, char** argv) {
+  QCoreApplication app(argc, argv);
+  unittest utest(&main_test);
+  QObject::connect(&utest, SIGNAL(finished()), &app, SLOT(quit()));
+  utest.start();
+  app.exec();
+  return (utest.ret());
 }

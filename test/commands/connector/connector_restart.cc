@@ -21,7 +21,8 @@
 #include <QDateTime>
 #include <QDebug>
 #include <exception>
-#include "test/testing.hh"
+#include "error.hh"
+#include "test/unittest.hh"
 #include "commands/connector/command.hh"
 #include "engine.hh"
 #include "test/commands/wait_process.hh"
@@ -92,24 +93,24 @@ static bool restart_with_execution_limit() {
 /**
  *  Check the restart of the connector.
  */
+int main_test() {
+  if (restart_with_segfault() == false)
+    throw (engine_error() << "error: restart connector after segfault failed.");
+
+  if (restart_with_execution_limit() == false)
+    throw (engine_error() << "error: restart connector after execution limit failed.");
+
+  return (0);
+}
+
+/**
+ *  Init the unit test.
+ */
 int main(int argc, char** argv) {
   QCoreApplication app(argc, argv);
-  try {
-    testing init;
-
-    if (restart_with_segfault() == false) {
-      qDebug() << "error: restart connector after segfault failed.";
-      return (1);
-    }
-
-    if (restart_with_execution_limit() == false) {
-      qDebug() << "error: restart connector after execution limit failed.";
-      return (1);
-    }
-  }
-  catch (std::exception const& e) {
-    qDebug() << "error: " << e.what();
-    return (1);
-  }
-  return (0);
+  unittest utest(&main_test);
+  QObject::connect(&utest, SIGNAL(finished()), &app, SLOT(quit()));
+  utest.start();
+  app.exec();
+  return (utest.ret());
 }

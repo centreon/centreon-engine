@@ -20,7 +20,7 @@
 #include <QCoreApplication>
 #include <QDebug>
 #include <exception>
-#include "test/testing.hh"
+#include "test/unittest.hh"
 #include "globals.hh"
 #include "events.hh"
 #include "error.hh"
@@ -404,36 +404,36 @@ static void check_event_user_function() {
 /**
  *  Check the handle timed event working.
  */
+int main_test() {
+  check_event_service_check();
+  check_event_command_check();
+  check_event_log_rotation();
+  check_event_program_shutdown();
+  check_event_program_restart();
+  check_event_check_reaper();
+  check_event_orphan_check();
+  check_event_retention_save();
+  check_event_status_save();
+  check_event_scheduled_downtime();
+  check_event_sfreshness_check();
+  check_event_expire_downtime();
+  check_event_host_check();
+  check_event_hfreshness_check();
+  check_event_reschedule_checks();
+  check_event_expire_comment();
+  check_event_user_function();
+
+  return (0);
+}
+
+/**
+ *  Init unit test.
+ */
 int main(int argc, char** argv) {
   QCoreApplication app(argc, argv);
-  try {
-    testing init;
-
-    check_event_service_check();
-    check_event_command_check();
-    check_event_log_rotation();
-    check_event_program_shutdown();
-    check_event_program_restart();
-    check_event_check_reaper();
-    check_event_orphan_check();
-    check_event_retention_save();
-    check_event_status_save();
-    check_event_scheduled_downtime();
-    check_event_sfreshness_check();
-    check_event_expire_downtime();
-    check_event_host_check();
-    check_event_hfreshness_check();
-    check_event_reschedule_checks();
-    check_event_expire_comment();
-    check_event_user_function();
-  }
-  catch (std::exception const& e) {
-    qDebug() << "error: " << e.what();
-    return (1);
-  }
-  catch (...) {
-    qDebug() << "error: catch all.";
-    return (1);
-  }
-  return (0);
+  unittest utest(&main_test);
+  QObject::connect(&utest, SIGNAL(finished()), &app, SLOT(quit()));
+  utest.start();
+  app.exec();
+  return (utest.ret());
 }

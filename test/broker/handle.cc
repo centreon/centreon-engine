@@ -20,7 +20,7 @@
 #include <QCoreApplication>
 #include <QDebug>
 #include <exception>
-#include "test/testing.hh"
+#include "test/unittest.hh"
 #include "error.hh"
 #include "broker/handle.hh"
 #include "test/broker/mod_load.hh"
@@ -113,22 +113,22 @@ void check_copy() {
 /**
  *  Check the broker handle working.
  */
+int main_test() {
+  check_open_noexist_module();
+  check_open_exist_module();
+  check_copy();
+
+  return (0);
+}
+
+/**
+ *  Init the unit test.
+ */
 int main(int argc, char** argv) {
   QCoreApplication app(argc, argv);
-  try {
-    testing init;
-
-    check_open_noexist_module();
-    check_open_exist_module();
-    check_copy();
-  }
-  catch (std::exception const& e) {
-    qDebug() << "error: " << e.what();
-    return (1);
-  }
-  catch (...) {
-    qDebug() << "error: catch all.";
-    return (1);
-  }
-  return (0);
+  unittest utest(&main_test);
+  QObject::connect(&utest, SIGNAL(finished()), &app, SLOT(quit()));
+  utest.start();
+  app.exec();
+  return (utest.ret());
 }

@@ -21,7 +21,7 @@
 #include <QDebug>
 #include <exception>
 #include <limits.h>
-#include "test/testing.hh"
+#include "test/unittest.hh"
 #include "error.hh"
 #include "test/broker/mod_load.hh"
 #include "broker/compatibility.hh"
@@ -36,7 +36,7 @@ extern nebmodule* neb_module_list;
 /**
  *  Check broker compatibility.
  */
-void check_compatibility() {
+int main_test() {
   loader& loader = loader::instance();
 
   loader.add_module(MOD_LIB_COMPT_NAME, MOD_LIB_COMPT_NAME)->open();
@@ -70,25 +70,17 @@ void check_compatibility() {
   }
 
   loader.unload();
+  return (0);
 }
 
 /**
- *  Check the broker compatibility working.
+ *  Init the unit test.
  */
 int main(int argc, char** argv) {
   QCoreApplication app(argc, argv);
-  try {
-    testing init;
-
-    check_compatibility();
-  }
-  catch (std::exception const& e) {
-    qDebug() << "error: " << e.what();
-    return (1);
-  }
-  catch (...) {
-    qDebug() << "error: catch all.";
-    return (1);
-  }
-  return (0);
+  unittest utest(&main_test);
+  QObject::connect(&utest, SIGNAL(finished()), &app, SLOT(quit()));
+  utest.start();
+  app.exec();
+  return (utest.ret());
 }
