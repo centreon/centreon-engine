@@ -52,7 +52,8 @@ connector::command::command(QString const& name,
     _nbr_check(0),
     _is_good_version(false),
     _active_timer(false),
-    _is_exiting(false) {
+    _is_exiting(false),
+    _state_already_change(false) {
   _req_func.insert(request::version_r, &command::_req_version_r);
   _req_func.insert(request::execute_r, &command::_req_execute_r);
   _req_func.insert(request::quit_r, &command::_req_quit_r);
@@ -95,6 +96,7 @@ connector::command& connector::command::operator=(connector::command const& righ
     _is_good_version = right._is_good_version;
     _active_timer = right._active_timer;
     _is_exiting = right._is_exiting;
+    _state_already_change = right._state_already_change;
     _start();
   }
   return (*this);
@@ -308,8 +310,14 @@ void connector::command::_timeout() {
 void connector::command::_state_change(QProcess::ProcessState new_state) {
   if (new_state == QProcess::NotRunning) {
     try {
-      _exit();
-      _start();
+      if (_state_already_change == false) {
+        _state_already_change = true;
+        _exit();
+        _start();
+        _state_already_change = false;
+      }
+      else
+        emit _wait_ending();
     }
     catch (std::exception const& e) {
       logger(log_runtime_warning, basic)
