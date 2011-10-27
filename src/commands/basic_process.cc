@@ -1,4 +1,22 @@
-#include <QDebug>
+/*
+** Copyright 2011 Merethis
+**
+** This file is part of Centreon Engine.
+**
+** Centreon Engine is free software: you can redistribute it and/or
+** modify it under the terms of the GNU General Public License version 2
+** as published by the Free Software Foundation.
+**
+** Centreon Engine is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+** General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with Centreon Engine. If not, see
+** <http://www.gnu.org/licenses/>.
+*/
+
 #include <QBuffer>
 #include <QTimer>
 #include <QEventLoop>
@@ -34,6 +52,7 @@ basic_process::basic_process(QObject* parent)
     _pipe_out[i] = -1;
     _pipe_err[i] = -1;
     _pipe_in[i] = -1;
+    _pipe_dead[i] = -1;
   }
 }
 
@@ -41,8 +60,10 @@ basic_process::basic_process(QObject* parent)
  *  Default destructor.
  */
 basic_process::~basic_process() throw() {
-  kill();
-  waitForFinished(-1);
+  if (_pstate != QProcess::NotRunning) {
+    kill();
+    waitForFinished(-1);
+  }
   delete _notifier_output;
   delete _notifier_error;
   delete _notifier_dead;
@@ -254,6 +275,8 @@ bool basic_process::waitForFinished(int msecs) {
     QEventLoop loop;
     QObject::connect(this, SIGNAL(finished(int, QProcess::ExitStatus)),
                      &loop, SLOT(quit()));
+    QObject::connect(this, SIGNAL(error(QProcess::ProcessError)),
+                     &loop, SLOT(quit()));
     if (msecs > 0)
       QTimer::singleShot(msecs, &loop, SLOT(quit()));
     loop.exec();
@@ -306,9 +329,10 @@ bool basic_process::waitForBytesWritten(int msecs) {
  *  @return True if process started, otherwise false.
  */
 bool basic_process::waitForStarted(int msecs) {
-  if (msecs && _pstate != QProcess::Running) {
+  if (msecs && _pstate == QProcess::Starting) {
     QEventLoop loop;
     QObject::connect(this, SIGNAL(started()), &loop, SLOT(quit()));
+    QObject::connect(this, SIGNAL(error(QProcess::ProcessError)), &loop, SLOT(quit()));
     if (msecs > 0)
       QTimer::singleShot(msecs, &loop, SLOT(quit()));
     loop.exec();
@@ -563,7 +587,6 @@ void basic_process::_start_process(OpenMode mode) {
   }
 
   setProcessState(QProcess::Starting);
-  emit started();
 
   if ((_pid = fork()) == -1) {
     _close_pipe();
@@ -584,20 +607,18 @@ void basic_process::_start_process(OpenMode mode) {
 
   _notifier_output = new QSocketNotifier(_pipe_out[0], QSocketNotifier::Read, this);
   QObject::connect(_notifier_output, SIGNAL(activated(int)),
-                   this, SLOT(_notification_standard_output()),
-                   Qt::UniqueConnection);
+                   this, SLOT(_notification_standard_output()));
 
   _notifier_error = new QSocketNotifier(_pipe_err[0], QSocketNotifier::Read, this);
   QObject::connect(_notifier_error, SIGNAL(activated(int)),
-                   this, SLOT(_notification_standard_error()),
-                   Qt::UniqueConnection);
+                   this, SLOT(_notification_standard_error()));
 
   _notifier_dead = new QSocketNotifier(_pipe_dead[0], QSocketNotifier::Read, this);
   QObject::connect(_notifier_dead, SIGNAL(activated(int)),
-                   this, SLOT(_notification_dead()),
-                   Qt::UniqueConnection);
+                   this, SLOT(_notification_dead()));
 
   setProcessState(QProcess::Running);
+  emit started();
 }
 
 /**
