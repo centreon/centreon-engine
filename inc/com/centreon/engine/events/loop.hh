@@ -22,13 +22,14 @@
 #ifndef CCE_EVENTS_LOOP_HH
 # define CCE_EVENTS_LOOP_HH
 
-# include <QThread>
+# include <QCoreApplication>
+# include <QObject>
 # include "events.hh"
 
-namespace              com {
-  namespace            centreon {
-    namespace          engine {
-      namespace        events {
+namespace                   com {
+  namespace                 centreon {
+    namespace               engine {
+      namespace             events {
 	/**
 	 *  @class loop loop.hh
 	 *  @brief Create Centreon Engine event loop on a new thread.
@@ -36,29 +37,30 @@ namespace              com {
          *  Events loop is a singleton to create a new thread
          *  and dispatch the Centreon Engine events.
 	 */
-        class          loop : public QThread {
+        class               loop : public QObject {
           Q_OBJECT
         public:
-          static loop& instance();
-          static void  cleanup();
+          static loop&      instance();
+          static void       cleanup();
+
+          void              run();
 
         signals:
-          void         shutdown();
-          void         restart();
+          void              shutdown();
+          void              restart();
 
         private slots:
-          void         _dispatching();
+          void              _dispatching();
 
         private:
-                       loop();
-                       ~loop() throw();
+                            loop();
+                            ~loop() throw();
 
-          void         run();
-
-          static loop* _instance;
-          timed_event  _sleep_event;
-          time_t       _last_time;
-          time_t       _last_status_update;
+          QCoreApplication* _app;
+          static loop*      _instance;
+          timed_event       _sleep_event;
+          time_t            _last_time;
+          time_t            _last_status_update;
         };
       }
     }

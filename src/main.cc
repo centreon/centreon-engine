@@ -504,10 +504,7 @@ int main(int argc, char** argv) {
       /***** Start monitoring all services. *****/
       // (doesn't return until a restart or shutdown signal is encountered).
       events::loop& loop(events::loop::instance());
-      QObject::connect(&loop, SIGNAL(shutdown()), &app, SLOT(quit()));
-      QObject::connect(&loop, SIGNAL(restart()), &app, SLOT(quit()));
-      loop.start();
-      app.exec();
+      loop.run();
 
       /* 03/01/2007 EG Moved from sighandler() to prevent FUTEX locking problems under NPTL */
       // Did we catch a signal ?

@@ -54,7 +54,9 @@ void loop::cleanup() {
 /**
  *  Default constructor.
  */
-loop::loop() {
+loop::loop()
+  : QObject(),
+    _app(QCoreApplication::instance()) {
 
 }
 
@@ -89,6 +91,8 @@ void loop::_dispatching() {
       emit shutdown();
       return;
     }
+
+    QCoreApplication::processEvents();
 
     // get the current time.
     time_t current_time;
@@ -380,6 +384,8 @@ void loop::run() {
   _sleep_event.next = NULL;
   _sleep_event.prev = NULL;
 
+  QObject::connect(this, SIGNAL(shutdown()), _app, SLOT(quit()));
+  QObject::connect(this, SIGNAL(restart()), _app, SLOT(quit()));
   QTimer::singleShot(0, this, SLOT(_dispatching()));
-  exec();
+  _app->exec();
 }
