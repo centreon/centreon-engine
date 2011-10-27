@@ -64,7 +64,8 @@ void set::add_command(QSharedPointer<command> cmd) {
   if (connect(&(*cmd),
 	      SIGNAL(name_changed(QString const&, QString const&)),
 	      this,
-	      SLOT(command_name_changed(QString const&, QString const&))) == false) {
+	      SLOT(command_name_changed(QString const&, QString const&)),
+              Qt::DirectConnection) == false) {
     throw (engine_error() << "connect command to set failed.");
   }
   _list[cmd->get_name()] = cmd;
