@@ -57,7 +57,8 @@ if (WITH_TESTING)
   set(TEST_DIR "${TEST_DIR}/commands/connector")
 
   # Produce moc files.
-  qt4_wrap_cpp(QT_MOC_FILES "${TEST_DIR}/../wait_process.hh")
+  qt4_wrap_cpp(QT_MOC_FILES
+    "${TEST_DIR}/../wait_process.hh")
 
   # Test binary.
   add_executable("bin_connector_test_run" "${TEST_DIR}/bin_connector_test_run.cc")

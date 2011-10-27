@@ -380,8 +380,7 @@ void connector::command::_start() {
 
   _process->closeReadChannel(QProcess::StandardError);
   _process->start(_process_command);
-  _process->waitForStarted(-1);
-  if (_process->state() == QProcess::NotRunning) {
+  if (_process->waitForStarted(-1) == false) {
     throw (engine_error() << _process->errorString());
   }
 
