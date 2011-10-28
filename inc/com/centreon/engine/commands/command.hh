@@ -20,6 +20,7 @@
 #ifndef CCE_COMMANDS_COMMAND_HH
 # define CCE_COMMANDS_COMMAND_HH
 
+# include <QMutex>
 # include <QObject>
 # include <QString>
 
@@ -72,13 +73,17 @@ namespace                        com {
 					      QString const& new_name);
 
 	protected:
-	  static unsigned long   _id;
-
 	                         command(command const& right);
 	  command&               operator=(command const& right);
 
+          static unsigned long   get_uniq_id();
+
 	  QString                _name;
 	  QString                _command_line;
+
+        private:
+          static QMutex          _mtx;
+	  static unsigned long   _id;
 	};
       }
     }

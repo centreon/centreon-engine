@@ -17,10 +17,12 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <QMutexLocker>
 #include "commands/command.hh"
 
 using namespace com::centreon::engine;
 
+QMutex        commands::command::_mtx;
 unsigned long commands::command::_id = 0;
 
 /**
@@ -142,4 +144,14 @@ QString commands::command::process_cmd(nagios_macros* macros) const {
   QString processed_cmd(command_line);
   delete[] command_line;
   return (processed_cmd);
+}
+
+/**
+ *  Get the unique command id.
+ *
+ *  @return The unique command id.
+ */
+unsigned long commands::command::get_uniq_id() {
+  QMutexLocker locker(&_mtx);
+  return (++_id);
 }

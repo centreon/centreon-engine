@@ -138,7 +138,7 @@ unsigned long connector::command::run(QString const& processed_cmd,
     throw (engine_error() << "connector \"" << _name << "\" not running.");
   }
 
-  unsigned long id = ++_id;
+  unsigned long id = get_uniq_id();
 
   QDateTime now = QDateTime::currentDateTime();
   QSharedPointer<request> query(new execute_query(id,
@@ -190,7 +190,7 @@ void connector::command::run(QString const& processed_cmd,
     throw (engine_error() << "connector \"" << _name << "\" not running.");
   }
 
-  unsigned long id = ++_id;
+  unsigned long id = get_uniq_id();
 
   QDateTime now = QDateTime::currentDateTime();
   QSharedPointer<request> query(new execute_query(id,
