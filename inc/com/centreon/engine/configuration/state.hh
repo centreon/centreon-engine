@@ -501,6 +501,18 @@ namespace                   com {
 	    }
 	  };
 
+	  template<class T, class U, void (state::*ptr)(T)>
+	  struct              cpp_suck_cast {
+	    static bool       set_generic_cast(QString const& value, state& config) {
+	      U ret;
+	      if (_str2obj(value, &ret) == false) {
+		return (false);
+	      }
+	      (config.*ptr)(static_cast<T>(ret));
+	      return (true);
+	    }
+	  };
+
 	  typedef std::map<QString, bool (*)(QString const&, state& config)> methods;
 
 	  QString             _tab_string[max_string];

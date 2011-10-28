@@ -57,7 +57,7 @@ state::state()
   _lst_method["resource_file"]                               = &cpp_suck<QString const&, &state::_parse_resource_file>::set_generic;;
   _lst_method["log_file"]                                    = &cpp_suck<QString const&, &state::set_log_file>::set_generic;
   _lst_method["broker_module_directory"]                     = &cpp_suck<QString const&, &state::set_broker_module_directory>::set_generic;
-  _lst_method["debug_level"]                                 = &cpp_suck<unsigned long, &state::set_debug_level>::set_generic;
+  _lst_method["debug_level"]                                 = &cpp_suck_cast<unsigned long, int, &state::set_debug_level>::set_generic_cast;
   _lst_method["debug_verbosity"]                             = &cpp_suck<unsigned int, &state::set_debug_verbosity>::set_generic;
   _lst_method["debug_file"]                                  = &cpp_suck<QString const&, &state::set_debug_file>::set_generic;
   _lst_method["max_debug_file_size"]                         = &cpp_suck<unsigned long, &state::set_max_debug_file_size>::set_generic;
