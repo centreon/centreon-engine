@@ -364,7 +364,7 @@ bool checker::run(host* hst,
 
   connect(&(*cmd), SIGNAL(command_executed(cce_commands_result const&)),
           this, SLOT(_command_executed(cce_commands_result const&)),
-          Qt::UniqueConnection);
+          Qt::QueuedConnection);
 
   _mut_id.lock();
   // run command.
@@ -552,7 +552,7 @@ bool checker::run(service* svc,
 
   connect(&(*cmd), SIGNAL(command_executed(cce_commands_result const&)),
           this, SLOT(_command_executed(cce_commands_result const&)),
-          Qt::UniqueConnection);
+          Qt::QueuedConnection);
 
 
   _mut_id.lock();
