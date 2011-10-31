@@ -23,6 +23,7 @@ config_file=@confdir@/centengine.cfg
 status_file=$var_dir/status.dat
 retention_file=$var_dir/retention.dat
 command_file=$var_dir/centengine.cmd
+log_file=$var_dir/centengine.log
 lock_file=@LOCK_FILE@
 pid_file=@PID_FILE@
 user=@USER@
@@ -86,7 +87,7 @@ service_start()
     if [ ! -f $pid_file ]; then
 	check_configuration
 
-	su - $user -c "touch $var_dir/centengine.log $retention_file"
+	su - $user -c "touch $log_file $retention_file"
 
 	su - $user -c "$binary $config_file > /dev/null  2>&1 &"
 	sleep 2
@@ -105,7 +106,7 @@ service_stop()
 {
     pid=$(pidofproc $binary)
     if [ $? -eq 0 ]; then
-	kill $pid
+	kill -TERM $pid
 
 	for i in $(seq 1 $timeout); do
 	    pidofproc $binary > /dev/null 2>&1
@@ -118,7 +119,7 @@ service_stop()
 
 	pidofproc $binary > /dev/null 2>&1
 	if [ $? -eq 0 ]; then
-	    kill -TERM $pid
+	    kill -KILL $pid
 	fi
     fi
     rm -f $lock_file $command_file $pid_file
