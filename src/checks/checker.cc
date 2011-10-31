@@ -223,8 +223,8 @@ bool checker::run(host* hst,
   // don't execute a new host check if one is already running.
   if (hst->is_executing == true
       && !(check_options & CHECK_OPTION_FORCE_EXECUTION)) {
-    throw (engine_error() << "A check of this host is already being executed, "
-	   << "so we'll pass for the moment...");
+    throw (engine_error() << "A check of this host (" << hst->name
+	   << ") is already being executed, so we'll pass for the moment...");
   }
 
   timeval start_time = timeval();
@@ -366,15 +366,14 @@ bool checker::run(host* hst,
           this, SLOT(_command_executed(cce_commands_result const&)),
           Qt::UniqueConnection);
 
+  _mut_id.lock();
   // run command.
   unsigned long id = cmd->run(processed_cmd,
 			      macros,
 			      config.get_host_check_timeout());
-  if (id != 0) {
-    _mut_id.lock();
+  if (id != 0)
     _list_id[id] = check_result_info;
-    _mut_id.unlock();
-  }
+  _mut_id.unlock();
 
   // cleanup.
   clear_volatile_macros_r(&macros);
@@ -555,15 +554,15 @@ bool checker::run(service* svc,
           this, SLOT(_command_executed(cce_commands_result const&)),
           Qt::UniqueConnection);
 
+
+  _mut_id.lock();
   // run command.
   unsigned long id = cmd->run(processed_cmd,
 			      macros,
 			      config.get_service_check_timeout());
-  if (id != 0) {
-    _mut_id.lock();
+  if (id != 0)
     _list_id[id] = check_result_info;
-    _mut_id.unlock();
-  }
+  _mut_id.unlock();
 
   // cleanup.
   clear_volatile_macros_r(&macros);
@@ -778,7 +777,8 @@ void checker::_command_executed(cce_commands_result const& res) {
 /**
  *  Default constructor.
  */
-checker::checker() {
+checker::checker()
+  : _mut_id(QMutex::Recursive) {
   qRegisterMetaType<commands::result>("cce_commands_result");
 }
 
