@@ -667,7 +667,7 @@ int check_time_against_period(time_t test_time, timeperiod* tperiod) {
   time_t day_range_end = (time_t)0L;
   int test_time_year = 0;
   int test_time_mon = 0;
-  int test_time_mday = 0;
+  // int test_time_mday = 0;
   int test_time_wday = 0;
   int year = 0;
   int shift;
@@ -696,7 +696,7 @@ int check_time_against_period(time_t test_time, timeperiod* tperiod) {
   t = localtime_r((time_t*)&test_time, &tm_s);
   test_time_year = t->tm_year;
   test_time_mon = t->tm_mon;
-  test_time_mday = t->tm_mday;
+  // test_time_mday = t->tm_mday;
   test_time_wday = t->tm_wday;
 
   /* calculate the start of the day (midnight, 00:00 hours) when the specified test time occurs */
@@ -1012,12 +1012,16 @@ static void _get_next_valid_time(time_t pref_time,
   int month = 0;                /* new */
   int pref_time_year = 0;
   int pref_time_mon = 0;
+#ifdef TEST_TIMEPERIODS_B
   int pref_time_mday = 0;
+#endif // !TEST_TIMEPERIODS_B
   int pref_time_wday = 0;
   int current_time_year = 0;
   int current_time_mon = 0;
   int current_time_mday = 0;
+#ifdef TEST_TIMEPERIODS_B
   int current_time_wday = 0;
+#endif // !TEST_TIMEPERIODS_B
   int shift;
 
   /* preferred time must be now or in the future */
@@ -1050,7 +1054,9 @@ static void _get_next_valid_time(time_t pref_time,
   /* save pref time values for later */
   pref_time_year = t->tm_year;
   pref_time_mon = t->tm_mon;
+#ifdef TEST_TIMEPERIODS_B
   pref_time_mday = t->tm_mday;
+#endif // !TEST_TIMEPERIODS_B
   pref_time_wday = t->tm_wday;
 
   /* save current time values for later */
@@ -1058,7 +1064,9 @@ static void _get_next_valid_time(time_t pref_time,
   current_time_year = t->tm_year;
   current_time_mon = t->tm_mon;
   current_time_mday = t->tm_mday;
+#ifdef TEST_TIMEPERIODS_B
   current_time_wday = t->tm_wday;
+#endif // !TEST_TIMEPERIODS_B
 
 #ifdef TEST_TIMEPERIODS_B
   printf("PREF TIME:    %lu = %s", (unsigned long)preferred_time, ctime(&preferred_time));
@@ -1998,7 +2006,6 @@ int process_check_result_file(char* fname) {
   char* val = NULL;
   char* v1 = NULL;
   char* v2 = NULL;
-  int delete_file = FALSE;
   time_t current_time;
   check_result* new_cr = NULL;
 
@@ -2065,10 +2072,8 @@ int process_check_result_file(char* fname) {
       /* file is too old - ignore check results it contains and delete it */
       /* this will only work as intended if file_time comes before check results */
       if (config.get_max_check_result_file_age() > 0
-          && (current_time - (strtoul(val, NULL, 0)) > config.get_max_check_result_file_age())) {
-        delete_file = TRUE;
+          && (current_time - (strtoul(val, NULL, 0)) > config.get_max_check_result_file_age()))
         break;
-      }
     }
 
     /* else we have check result data */
@@ -2508,7 +2513,6 @@ char* get_next_string_from_buf(char* buf, int* start_index, int bufsize) {
 int contains_illegal_object_chars(char* name) {
   int x = 0;
   int y = 0;
-  int ch = 0;
 
   if (name == NULL)
     return (FALSE);
@@ -2516,8 +2520,6 @@ int contains_illegal_object_chars(char* name) {
   x = (int)strlen(name) - 1;
 
   for (; x >= 0; x--) {
-
-    ch = (int)name[x];
     char const* illegal_object_chars = config.get_illegal_object_chars().toStdString().c_str();
     /* illegal user-specified characters */
     if (illegal_object_chars != NULL)
@@ -3191,6 +3193,9 @@ int generate_check_stats(void) {
 	     check_statistics[check_type].minute_stats[2],
 	     left_value,
 	     right_value);
+#else
+      (void)left_value;
+      (void)right_value;
 #endif
       /* record last update time */
       check_statistics[check_type].last_update = current_time;

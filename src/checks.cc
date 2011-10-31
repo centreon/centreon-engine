@@ -419,7 +419,6 @@ int run_async_service_check(service* svc,
   struct timeval start_time, end_time;
   pid_t pid = 0;
   int fork_error = FALSE;
-  int wait_result = 0;
   host* temp_host = NULL;
   int pclose_result = 0;
   mode_t new_umask = 077;
@@ -1025,7 +1024,8 @@ int run_async_service_check(service* svc,
    /* wait for the first child to return */
    /* don't do this if large install tweaks are enabled - we'll clean up children in event loop */
    if (config.get_child_processes_fork_twice() == true)
-     wait_result = waitpid(pid, NULL, 0);
+     if (waitpid(pid, NULL, 0) == -1)
+       return (ERROR);
  }
 
 /* see if we were able to run the check... */
@@ -3438,7 +3438,6 @@ int run_async_host_check_3x(host* hst,
   struct timeval start_time, end_time;
   pid_t pid = 0;
   int fork_error = FALSE;
-  int wait_result = 0;
   int pclose_result = 0;
   mode_t new_umask = 077;
   mode_t old_umask;
@@ -3818,7 +3817,8 @@ int run_async_host_check_3x(host* hst,
     /* wait for the first child to return */
     /* if large install tweaks are enabled, we'll clean up the zombie process later */
     if (config.get_child_processes_fork_twice() == true)
-      wait_result = waitpid(pid, NULL, 0);
+      if (waitpid(pid, NULL, 0) == -1)
+        return (ERROR);
   }
 
   /* see if we were able to run the check... */
