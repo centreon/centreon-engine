@@ -505,6 +505,18 @@ namespace                   com {
 	    }
 	  };
 
+	  template<class T, class U, void (state::*ptr)(T)>
+	  struct              cpp_suck_cast {
+	    static bool       set_generic(QString const& value, state& config) {
+	      U ret;
+	      if (_str2obj(value, &ret) == false) {
+		return (false);
+	      }
+	      (config.*ptr)(static_cast<T>(ret));
+	      return (true);
+	    }
+	  };
+
 	  template<void (state::*ptr)(QString const&)>
 	  struct              cpp_suck<QString const&, ptr> {
 	    static bool       set_generic(QString const& value, state& config) {
