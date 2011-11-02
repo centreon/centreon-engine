@@ -554,7 +554,6 @@ bool checker::run(service* svc,
           this, SLOT(_command_executed(cce_commands_result const&)),
           Qt::QueuedConnection);
 
-
   _mut_id.lock();
   // run command.
   unsigned long id = cmd->run(processed_cmd,
@@ -744,6 +743,8 @@ void checker::run_sync(host* hst,
  */
 // void checker::_command_executed(commands::result const& res) {
 void checker::_command_executed(cce_commands_result const& res) {
+  logger(dbg_functions, basic) << "start " << Q_FUNC_INFO;
+
   _mut_id.lock();
   QHash<unsigned long, check_result>::iterator it = _list_id.find(res.get_command_id());
   if (it == _list_id.end()) {
@@ -752,6 +753,9 @@ void checker::_command_executed(cce_commands_result const& res) {
       << "command id '" << res.get_command_id() << "' not found.";
     return;
   }
+
+  logger(dbg_checks, basic)
+    << "command id (" << res.get_command_id() << ") executed.";
 
   check_result result;
   result = it.value();
@@ -772,6 +776,8 @@ void checker::_command_executed(cce_commands_result const& res) {
   _mut_reap.lock();
   _to_reap.enqueue(result);
   _mut_reap.unlock();
+
+  logger(dbg_functions, basic) << "end " << Q_FUNC_INFO;
 }
 
 /**

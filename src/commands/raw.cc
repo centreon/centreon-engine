@@ -116,12 +116,11 @@ unsigned long raw::run(QString const& processed_cmd,
   _processes.insert(&(*info.proc), info);
   _mutex.unlock();
 
-  info.proc->start(processed_cmd);
-
   logger(dbg_commands, basic)
     << "raw command (id=" << info.cmd_id
     << ") start '" << processed_cmd << "'.";
 
+  info.proc->start(processed_cmd);
   info.proc->waitForStarted(-1);
   return (info.cmd_id);
 }
@@ -143,12 +142,12 @@ void raw::run(QString const& processed_cmd,
   _mutex.unlock();
 
   process proc(macros, timeout);
-  proc.start(processed_cmd);
 
   logger(dbg_commands, basic)
     << "raw command (id=" << id
     << ") start '" << processed_cmd << "'.";
 
+  proc.start(processed_cmd);
   proc.wait();
 
   res.set_command_id(id);
