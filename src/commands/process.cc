@@ -21,7 +21,9 @@
 #include <QTimer>
 #include "engine.hh"
 #include "commands/process.hh"
+#include "logging/logger.hh"
 
+using namespace com::centreon::engine::logging;
 using namespace com::centreon::engine::commands;
 
 /**
@@ -194,6 +196,8 @@ void process::setupChildProcess() {
  *  @param[in] exit_status The exit status.
  */
 void process::_finished(int exit_code, QProcess::ExitStatus exit_status) {
+  logger(dbg_functions, basic) << "start " << Q_FUNC_INFO;
+
   _end_time = QDateTime::currentDateTime();
   _executed_time = _end_time.toTime_t() - _start_time.toTime_t();
 
@@ -226,28 +230,37 @@ void process::_finished(int exit_code, QProcess::ExitStatus exit_status) {
   }
 
   emit ended();
+  logger(dbg_functions, basic) << "end " << Q_FUNC_INFO;
 }
 
 /**
  *  Slot to catch QProcess starting.
  */
 void process::_started() {
+  logger(dbg_functions, basic) << "start " << Q_FUNC_INFO;
+
   _start_time = QDateTime::currentDateTime();
   _is_timeout = false;
   if (_timeout > 0) {
     QTimer::singleShot(_timeout, this, SLOT(_timedout()));
   }
   closeWriteChannel();
+
+  logger(dbg_functions, basic) << "end " << Q_FUNC_INFO;
 }
 
 /**
  *  Slot to catch process timeout.
  */
 void process::_timedout() {
+  logger(dbg_functions, basic) << "start " << Q_FUNC_INFO;
+
   if (state() == QProcess::Running) {
     kill();
     _is_timeout = true;
   }
+
+  logger(dbg_functions, basic) << "end " << Q_FUNC_INFO;
 }
 
 /**
@@ -256,9 +269,13 @@ void process::_timedout() {
  *  @param[in] error Error type of QProcess.
  */
 void process::_error(QProcess::ProcessError error) {
+  logger(dbg_functions, basic) << "start " << Q_FUNC_INFO;
+
   if (error == QProcess::FailedToStart) {
     _start_time = QDateTime::currentDateTime();
     _is_timeout = false;
     emit finished(exitCode(), exitStatus());
   }
+
+  logger(dbg_functions, basic) << "end " << Q_FUNC_INFO;
 }

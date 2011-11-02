@@ -100,6 +100,8 @@ commands::command* raw::clone() const {
 unsigned long raw::run(QString const& processed_cmd,
 		       nagios_macros const& macros,
 		       unsigned int timeout) {
+  logger(dbg_functions, basic) << "start " << Q_FUNC_INFO;
+
   process_info info;
   info.proc = QSharedPointer<process>(new process(macros, timeout),
                                       &_deletelater_process);
@@ -122,6 +124,8 @@ unsigned long raw::run(QString const& processed_cmd,
 
   info.proc->start(processed_cmd);
   info.proc->waitForStarted(-1);
+
+  logger(dbg_functions, basic) << "end " << Q_FUNC_INFO;
   return (info.cmd_id);
 }
 
@@ -137,6 +141,8 @@ void raw::run(QString const& processed_cmd,
 	      nagios_macros const& macros,
 	      unsigned int timeout,
 	      result& res) {
+  logger(dbg_functions, basic) << "start " << Q_FUNC_INFO;
+
   _mutex.lock();
   unsigned long id = get_uniq_id();
   _mutex.unlock();
@@ -158,12 +164,16 @@ void raw::run(QString const& processed_cmd,
   res.set_stdout(proc.get_stdout());
   res.set_stderr(proc.get_stderr());
   res.set_is_executed(proc.get_is_executed());
+
+  logger(dbg_functions, basic) << "end " << Q_FUNC_INFO;
 }
 
 /**
  *  Slot to catch the end of processes et send the result by signal.
  */
 void raw::ended() {
+  logger(dbg_functions, basic) << "start " << Q_FUNC_INFO;
+
   _mutex.lock();
   QHash<QObject*, process_info>::iterator it = _processes.find(sender());
   if (it == _processes.end()) {
@@ -188,6 +198,7 @@ void raw::ended() {
     << "raw command (id=" << info.cmd_id << ") finished.";
 
   emit command_executed(res);
+  logger(dbg_functions, basic) << "end " << Q_FUNC_INFO;
 }
 
 /**

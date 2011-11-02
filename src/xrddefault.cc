@@ -21,10 +21,13 @@
 
 /*********** COMMON HEADER FILES ***********/
 
+#include <QTextStream>
+#include <QByteArray>
 #include <sstream>
 #include <stdlib.h>
 #include <stdio.h>
 #include <errno.h>
+#include <fcntl.h>
 #include "common.hh"
 #include "globals.hh"
 #include "objects.hh"
@@ -43,7 +46,7 @@
 using namespace com::centreon::engine::logging;
 
 static char* xrddefault_retention_file = NULL;
-static char* xrddefault_temp_file = NULL;
+static int   xrddefault_retention_file_fd = -1;
 
 /******************************************************************/
 /********************* CONFIG INITIALIZATION  *********************/
@@ -63,10 +66,7 @@ int xrddefault_grab_config_info(char* main_config_file) {
       << main_config_file << "' for reading!";
 
     delete[] xrddefault_retention_file;
-    delete[] xrddefault_temp_file;
-
     xrddefault_retention_file = NULL;
-    xrddefault_temp_file = NULL;
 
     return (ERROR);
   }
@@ -96,8 +96,6 @@ int xrddefault_grab_config_info(char* main_config_file) {
   /* initialize locations if necessary  */
   if (xrddefault_retention_file == NULL)
     xrddefault_retention_file = my_strdup(DEFAULT_RETENTION_FILE);
-  if (xrddefault_temp_file == NULL)
-    xrddefault_temp_file = my_strdup(DEFAULT_TEMP_FILE);
 
   /* save the retention file macro */
   delete[] mac->x[MACRO_RETENTIONDATAFILE];
@@ -130,10 +128,6 @@ int xrddefault_grab_config_directives(char* input) {
       || !strcmp(varname, "state_retention_file"))
     xrddefault_retention_file = my_strdup(varvalue);
 
-  /* temp file definition */
-  else if (!strcmp(varname, "temp_file"))
-    xrddefault_temp_file = my_strdup(varvalue);
-
   /* free memory */
   delete[] varname;
   delete[] varvalue;
@@ -150,6 +144,18 @@ int xrddefault_initialize_retention_data(char* config_file) {
   /* grab configuration data */
   if (xrddefault_grab_config_info(config_file) == ERROR)
     return (ERROR);
+
+  if (xrddefault_retention_file_fd == -1) {
+    if ((xrddefault_retention_file_fd = open(xrddefault_retention_file,
+                                             O_WRONLY | O_CREAT,
+                                             S_IRUSR | S_IWUSR)) == -1) {
+      logger(log_runtime_error, basic)
+        << "Error: Unable to open retention file '"
+        << xrddefault_retention_file << "': " << strerror(errno);
+      return (ERROR);
+    }
+  }
+
   return (OK);
 }
 
@@ -159,10 +165,12 @@ int xrddefault_cleanup_retention_data(char* config_file) {
 
   /* free memory */
   delete[] xrddefault_retention_file;
-  delete[] xrddefault_temp_file;
-
   xrddefault_retention_file = NULL;
-  xrddefault_temp_file = NULL;
+
+  if (xrddefault_retention_file_fd != -1) {
+    close(xrddefault_retention_file_fd);
+    xrddefault_retention_file_fd = -1;
+  }
 
   return (OK);
 }
@@ -172,375 +180,317 @@ int xrddefault_cleanup_retention_data(char* config_file) {
 /******************************************************************/
 
 int xrddefault_save_state_information(void) {
-  char* temp_file = NULL;
-  customvariablesmember* temp_customvariablesmember = NULL;
-  time_t current_time = 0L;
-  int result = OK;
-  FILE* fp = NULL;
-  host* temp_host = NULL;
-  service* temp_service = NULL;
-  contact* temp_contact = NULL;
-  comment* temp_comment = NULL;
-  scheduled_downtime* temp_downtime = NULL;
-  unsigned int x = 0;
-  int fd = 0;
-  unsigned long host_attribute_mask = 0L;
-  unsigned long service_attribute_mask = 0L;
-  unsigned long contact_attribute_mask = 0L;
-  unsigned long contact_host_attribute_mask = 0L;
-  unsigned long contact_service_attribute_mask = 0L;
-  unsigned long process_host_attribute_mask = 0L;
-  unsigned long process_service_attribute_mask = 0L;
-
   logger(dbg_functions, basic) << "xrddefault_save_state_information()";
 
   /* make sure we have everything */
-  if (xrddefault_retention_file == NULL || xrddefault_temp_file == NULL) {
+  if (xrddefault_retention_file == NULL || xrddefault_retention_file_fd == -1) {
     logger(log_runtime_error, basic)
       << "Error: We don't have the required file names to store retention data!";
     return (ERROR);
   }
 
-  /* open a safe temp file for output */
-  std::ostringstream oss;
-  oss << xrddefault_temp_file << "XXXXXX";
-  temp_file = my_strdup(oss.str().c_str());
-  if ((fd = mkstemp(temp_file)) == -1)
-    return (ERROR);
-
-  logger(dbg_retentiondata, most)
-    << "Writing retention data to temp file '" << temp_file << "'";
-
-  fp = (FILE*) fdopen(fd, "w");
-  if (fp == NULL) {
-
-    close(fd);
-    unlink(temp_file);
-
-    logger(log_runtime_error, basic)
-      << "Error: Could not open temp state retention file '"
-      << temp_file << "' for writing!";
-    delete[] temp_file;
-
-    return (ERROR);
-  }
-
   /* what attributes should be masked out? */
   /* NOTE: host/service/contact-specific values may be added in the future, but for now we only have global masks */
-  process_host_attribute_mask = config.get_retained_process_host_attribute_mask();
-  process_service_attribute_mask = config.get_retained_process_host_attribute_mask();
-  host_attribute_mask = config.get_retained_host_attribute_mask();
-  service_attribute_mask = config.get_retained_host_attribute_mask();
-  contact_host_attribute_mask = config.get_retained_contact_host_attribute_mask();
-  contact_service_attribute_mask = config.get_retained_contact_service_attribute_mask();
+  unsigned long process_host_attribute_mask = config.get_retained_process_host_attribute_mask();
+  unsigned long process_service_attribute_mask = config.get_retained_process_host_attribute_mask();
+  unsigned long host_attribute_mask = config.get_retained_host_attribute_mask();
+  unsigned long service_attribute_mask = config.get_retained_host_attribute_mask();
+  unsigned long contact_host_attribute_mask = config.get_retained_contact_host_attribute_mask();
+  unsigned long contact_service_attribute_mask = config.get_retained_contact_service_attribute_mask();
+  unsigned long contact_attribute_mask = 0L;
+
+  QByteArray data;
+  QTextStream stream(&data);
 
   /* write version info to status file */
-  fprintf(fp, "##############################################\n");
-  fprintf(fp, "#    CENTREON ENGINE STATE RETENTION FILE    #\n");
-  fprintf(fp, "#                                            #\n");
-  fprintf(fp, "# THIS FILE IS AUTOMATICALLY GENERATED BY    #\n");
-  fprintf(fp, "# CENTREON ENGINE. DO NOT MODIFY THIS FILE ! #\n");
-  fprintf(fp, "##############################################\n");
+  stream << "##############################################\n"
+         << "#    CENTREON ENGINE STATE RETENTION FILE    #\n"
+         << "#                                            #\n"
+         << "# THIS FILE IS AUTOMATICALLY GENERATED BY    #\n"
+         << "# CENTREON ENGINE. DO NOT MODIFY THIS FILE ! #\n"
+         << "##############################################\n";
 
+  time_t current_time;
   time(&current_time);
 
   /* write file info */
-  fprintf(fp, "info {\n");
-  fprintf(fp, "created=%lu\n", static_cast<unsigned long>(current_time));
-  fprintf(fp, "}\n");
+  stream << "info {\n"
+         << "created=" << static_cast<unsigned long>(current_time) << "\n"
+         << "}\n";
 
   /* save program state information */
-  fprintf(fp, "program {\n");
-  fprintf(fp, "modified_host_attributes=%lu\n", (modified_host_process_attributes & ~process_host_attribute_mask));
-  fprintf(fp, "modified_service_attributes=%lu\n", (modified_service_process_attributes & ~process_service_attribute_mask));
-  fprintf(fp, "enable_notifications=%d\n", config.get_enable_notifications());
-  fprintf(fp, "active_service_checks_enabled=%d\n", config.get_execute_service_checks());
-  fprintf(fp, "passive_service_checks_enabled=%d\n", config.get_accept_passive_service_checks());
-  fprintf(fp, "active_host_checks_enabled=%d\n", config.get_execute_host_checks());
-  fprintf(fp, "passive_host_checks_enabled=%d\n", config.get_accept_passive_host_checks());
-  fprintf(fp, "enable_event_handlers=%d\n", config.get_enable_event_handlers());
-  fprintf(fp, "obsess_over_services=%d\n", config.get_obsess_over_services());
-  fprintf(fp, "obsess_over_hosts=%d\n", config.get_obsess_over_hosts());
-  fprintf(fp, "check_service_freshness=%d\n", config.get_check_service_freshness());
-  fprintf(fp, "check_host_freshness=%d\n", config.get_check_host_freshness());
-  fprintf(fp, "enable_flap_detection=%d\n", config.get_enable_flap_detection());
-  fprintf(fp, "enable_failure_prediction=%d\n", config.get_enable_failure_prediction());
-  fprintf(fp, "process_performance_data=%d\n", config.get_process_performance_data());
-  fprintf(fp, "global_host_event_handler=%s\n", qPrintable(config.get_global_host_event_handler()));
-  fprintf(fp, "global_service_event_handler=%s\n", qPrintable(config.get_global_service_event_handler()));
-  fprintf(fp, "next_comment_id=%lu\n", next_comment_id);
-  fprintf(fp, "next_downtime_id=%lu\n", next_downtime_id);
-  fprintf(fp, "next_event_id=%lu\n", next_event_id);
-  fprintf(fp, "next_problem_id=%lu\n", next_problem_id);
-  fprintf(fp, "next_notification_id=%lu\n", next_notification_id);
-  fprintf(fp, "}\n");
+  stream << "program {\n"
+         << "modified_host_attributes=" << (modified_host_process_attributes & ~process_host_attribute_mask) << "\n"
+         << "modified_service_attributes=" << (modified_service_process_attributes & ~process_service_attribute_mask) << "\n"
+         << "enable_notifications=" << config.get_enable_notifications() << "\n"
+         << "active_service_checks_enabled=" << config.get_execute_service_checks() << "\n"
+         << "passive_service_checks_enabled=" << config.get_accept_passive_service_checks() << "\n"
+         << "active_host_checks_enabled=" << config.get_execute_host_checks() << "\n"
+         << "passive_host_checks_enabled=" << config.get_accept_passive_host_checks() << "\n"
+         << "enable_event_handlers=" << config.get_enable_event_handlers() << "\n"
+         << "obsess_over_services=" << config.get_obsess_over_services() << "\n"
+         << "obsess_over_hosts=" << config.get_obsess_over_hosts() << "\n"
+         << "check_service_freshness=" << config.get_check_service_freshness() << "\n"
+         << "check_host_freshness=" << config.get_check_host_freshness() << "\n"
+         << "enable_flap_detection=" << config.get_enable_flap_detection() << "\n"
+         << "enable_failure_prediction=" << config.get_enable_failure_prediction() << "\n"
+         << "process_performance_data=" << config.get_process_performance_data() << "\n"
+         << "global_host_event_handler=" << qPrintable(config.get_global_host_event_handler()) << "\n"
+         << "global_service_event_handler=" << qPrintable(config.get_global_service_event_handler()) << "\n"
+         << "next_comment_id=" << next_comment_id << "\n"
+         << "next_downtime_id=" << next_downtime_id << "\n"
+         << "next_event_id=" << next_event_id << "\n"
+         << "next_problem_id=" << next_problem_id << "\n"
+         << "next_notification_id=" << next_notification_id << "\n"
+         << "}\n";
 
   /* save host state information */
-  for (temp_host = host_list;
+  for (host* temp_host = host_list;
        temp_host != NULL;
        temp_host = temp_host->next) {
 
-    fprintf(fp, "host {\n");
-    fprintf(fp, "host_name=%s\n", temp_host->name);
-    fprintf(fp, "modified_attributes=%lu\n", (temp_host->modified_attributes & ~host_attribute_mask));
-    fprintf(fp, "check_command=%s\n", (temp_host->host_check_command == NULL) ? "" : temp_host->host_check_command);
-    fprintf(fp, "check_period=%s\n", (temp_host->check_period == NULL) ? "" : temp_host->check_period);
-    fprintf(fp, "notification_period=%s\n", (temp_host->notification_period == NULL) ? "" : temp_host->notification_period);
-    fprintf(fp, "event_handler=%s\n", (temp_host->event_handler == NULL) ? "" : temp_host->event_handler);
-    fprintf(fp, "has_been_checked=%d\n", temp_host->has_been_checked);
-    fprintf(fp, "check_execution_time=%.3f\n", temp_host->execution_time);
-    fprintf(fp, "check_latency=%.3f\n", temp_host->latency);
-    fprintf(fp, "check_type=%d\n", temp_host->check_type);
-    fprintf(fp, "current_state=%d\n", temp_host->current_state);
-    fprintf(fp, "last_state=%d\n", temp_host->last_state);
-    fprintf(fp, "last_hard_state=%d\n", temp_host->last_hard_state);
-    fprintf(fp, "last_event_id=%lu\n", temp_host->last_event_id);
-    fprintf(fp, "current_event_id=%lu\n", temp_host->current_event_id);
-    fprintf(fp, "current_problem_id=%lu\n", temp_host->current_problem_id);
-    fprintf(fp, "last_problem_id=%lu\n", temp_host->last_problem_id);
-    fprintf(fp, "plugin_output=%s\n", (temp_host->plugin_output == NULL) ? "" : temp_host->plugin_output);
-    fprintf(fp, "long_plugin_output=%s\n", (temp_host->long_plugin_output == NULL) ? "" : temp_host->long_plugin_output);
-    fprintf(fp, "performance_data=%s\n", (temp_host->perf_data == NULL) ? "" : temp_host->perf_data);
-    fprintf(fp, "last_check=%lu\n", static_cast<unsigned long>(temp_host->last_check));
-    fprintf(fp, "next_check=%lu\n", static_cast<unsigned long>(temp_host->next_check));
-    fprintf(fp, "check_options=%d\n", temp_host->check_options);
-    fprintf(fp, "current_attempt=%d\n", temp_host->current_attempt);
-    fprintf(fp, "max_attempts=%d\n", temp_host->max_attempts);
-    fprintf(fp, "normal_check_interval=%f\n", temp_host->check_interval);
-    fprintf(fp, "retry_check_interval=%f\n", temp_host->check_interval);
-    fprintf(fp, "state_type=%d\n", temp_host->state_type);
-    fprintf(fp, "last_state_change=%lu\n", static_cast<unsigned long>(temp_host->last_state_change));
-    fprintf(fp, "last_hard_state_change=%lu\n", static_cast<unsigned long>(temp_host->last_hard_state_change));
-    fprintf(fp, "last_time_up=%lu\n", static_cast<unsigned long>(temp_host->last_time_up));
-    fprintf(fp, "last_time_down=%lu\n", static_cast<unsigned long>(temp_host->last_time_down));
-    fprintf(fp, "last_time_unreachable=%lu\n", static_cast<unsigned long>(temp_host->last_time_unreachable));
-    fprintf(fp, "notified_on_down=%d\n", temp_host->notified_on_down);
-    fprintf(fp, "notified_on_unreachable=%d\n", temp_host->notified_on_unreachable);
-    fprintf(fp, "last_notification=%lu\n", static_cast<unsigned long>(temp_host->last_host_notification));
-    fprintf(fp, "current_notification_number=%d\n", temp_host->current_notification_number);
-    fprintf(fp, "current_notification_id=%lu\n", temp_host->current_notification_id);
-    fprintf(fp, "notifications_enabled=%d\n", temp_host->notifications_enabled);
-    fprintf(fp, "problem_has_been_acknowledged=%d\n", temp_host->problem_has_been_acknowledged);
-    fprintf(fp, "acknowledgement_type=%d\n", temp_host->acknowledgement_type);
-    fprintf(fp, "active_checks_enabled=%d\n", temp_host->checks_enabled);
-    fprintf(fp, "passive_checks_enabled=%d\n", temp_host->accept_passive_host_checks);
-    fprintf(fp, "event_handler_enabled=%d\n", temp_host->event_handler_enabled);
-    fprintf(fp, "flap_detection_enabled=%d\n", temp_host->flap_detection_enabled);
-    fprintf(fp, "failure_prediction_enabled=%d\n", temp_host->failure_prediction_enabled);
-    fprintf(fp, "process_performance_data=%d\n", temp_host->process_performance_data);
-    fprintf(fp, "obsess_over_host=%d\n", temp_host->obsess_over_host);
-    fprintf(fp, "is_flapping=%d\n", temp_host->is_flapping);
-    fprintf(fp, "percent_state_change=%.2f\n", temp_host->percent_state_change);
-    fprintf(fp, "check_flapping_recovery_notification=%d\n", temp_host->check_flapping_recovery_notification);
-    fprintf(fp, "state_history=");
-    for (x = 0; x < MAX_STATE_HISTORY_ENTRIES; x++)
-      fprintf(fp, "%s%d", (x > 0) ? "," : "", temp_host->state_history[(x + temp_host->state_history_index) % MAX_STATE_HISTORY_ENTRIES]);
-    fprintf(fp, "\n");
+    stream << "host {\n"
+           << "host_name=" << temp_host->name << "\n"
+           << "modified_attributes=" << (temp_host->modified_attributes & ~host_attribute_mask) << "\n"
+           << "check_command=" << (temp_host->host_check_command ? temp_host->host_check_command : "") << "\n"
+           << "check_period=" << (temp_host->check_period ? temp_host->check_period : "") << "\n"
+           << "notification_period=" << (temp_host->notification_period ? temp_host->notification_period : "") << "\n"
+           << "event_handler=" << (temp_host->event_handler ? temp_host->event_handler : "") << "\n"
+           << "has_been_checked=" << temp_host->has_been_checked << "\n"
+           << "check_execution_time=" << qSetRealNumberPrecision(3) << ::fixed<< temp_host->execution_time << reset << "\n"
+           << "check_latency=" << qSetRealNumberPrecision(3) << ::fixed << temp_host->latency << reset << "\n"
+           << "check_type=" << temp_host->check_type << "\n"
+           << "current_state=" << temp_host->current_state << "\n"
+           << "last_state=" << temp_host->last_state << "\n"
+           << "last_hard_state=" << temp_host->last_hard_state << "\n"
+           << "last_event_id=" << temp_host->last_event_id << "\n"
+           << "current_event_id=" << temp_host->current_event_id << "\n"
+           << "current_problem_id=" << temp_host->current_problem_id << "\n"
+           << "last_problem_id=" << temp_host->last_problem_id << "\n"
+           << "plugin_output=" << (temp_host->plugin_output ? temp_host->plugin_output : "") << "\n"
+           << "long_plugin_output=" << (temp_host->long_plugin_output ? temp_host->long_plugin_output : "") << "\n"
+           << "performance_data=" << (temp_host->perf_data ? temp_host->perf_data : "") << "\n"
+           << "last_check=" << static_cast<unsigned long>(temp_host->last_check) << "\n"
+           << "next_check=" << static_cast<unsigned long>(temp_host->next_check) << "\n"
+           << "check_options=" << temp_host->check_options << "\n"
+           << "current_attempt=" << temp_host->current_attempt << "\n"
+           << "max_attempts=" << temp_host->max_attempts << "\n"
+           << "normal_check_interval=" << temp_host->check_interval << "\n"
+           << "retry_check_interval=" << temp_host->check_interval << "\n"
+           << "state_type=" << temp_host->state_type << "\n"
+           << "last_state_change=" << static_cast<unsigned long>(temp_host->last_state_change) << "\n"
+           << "last_hard_state_change=" << static_cast<unsigned long>(temp_host->last_hard_state_change) << "\n"
+           << "last_time_up=" << static_cast<unsigned long>(temp_host->last_time_up) << "\n"
+           << "last_time_down=" << static_cast<unsigned long>(temp_host->last_time_down) << "\n"
+           << "last_time_unreachable=" << static_cast<unsigned long>(temp_host->last_time_unreachable) << "\n"
+           << "notified_on_down=" << temp_host->notified_on_down << "\n"
+           << "notified_on_unreachable=" << temp_host->notified_on_unreachable << "\n"
+           << "last_notification=" << static_cast<unsigned long>(temp_host->last_host_notification) << "\n"
+           << "current_notification_number=" << temp_host->current_notification_number << "\n"
+           << "current_notification_id=" << temp_host->current_notification_id << "\n"
+           << "notifications_enabled=" << temp_host->notifications_enabled << "\n"
+           << "problem_has_been_acknowledged=" << temp_host->problem_has_been_acknowledged << "\n"
+           << "acknowledgement_type=" << temp_host->acknowledgement_type << "\n"
+           << "active_checks_enabled=" << temp_host->checks_enabled << "\n"
+           << "passive_checks_enabled=" << temp_host->accept_passive_host_checks << "\n"
+           << "event_handler_enabled=" << temp_host->event_handler_enabled << "\n"
+           << "flap_detection_enabled=" << temp_host->flap_detection_enabled << "\n"
+           << "failure_prediction_enabled=" << temp_host->failure_prediction_enabled << "\n"
+           << "process_performance_data=" << temp_host->process_performance_data << "\n"
+           << "obsess_over_host=" << temp_host->obsess_over_host << "\n"
+           << "is_flapping=" << temp_host->is_flapping << "\n"
+           << "percent_state_change=" << qSetRealNumberPrecision(2) << ::fixed << temp_host->percent_state_change << reset << "\n"
+           << "check_flapping_recovery_notification=" << temp_host->check_flapping_recovery_notification << "\n";
+    stream << "state_history=";
+    for (unsigned int x = 0; x < MAX_STATE_HISTORY_ENTRIES; x++)
+      stream << (x > 0 ? "," : "") << temp_host->state_history[(x + temp_host->state_history_index) % MAX_STATE_HISTORY_ENTRIES];
+    stream << "\n";
 
     /* custom variables */
-    for (temp_customvariablesmember = temp_host->custom_variables;
+    for (customvariablesmember* temp_customvariablesmember = temp_host->custom_variables;
          temp_customvariablesmember != NULL;
          temp_customvariablesmember = temp_customvariablesmember->next) {
       if (temp_customvariablesmember->variable_name)
-        fprintf(fp, "_%s=%d;%s\n",
-                temp_customvariablesmember->variable_name,
-                temp_customvariablesmember->has_been_modified,
-                (temp_customvariablesmember->variable_value == NULL) ? "" : temp_customvariablesmember->variable_value);
+        stream << "_" << temp_customvariablesmember->variable_name << "="
+               << temp_customvariablesmember->has_been_modified << ";"
+               << (temp_customvariablesmember->variable_value
+                   ? temp_customvariablesmember->variable_value : "") << "\n";
     }
 
-    fprintf(fp, "}\n");
+    stream << "}\n";
   }
 
   /* save service state information */
-  for (temp_service = service_list;
+  for (service* temp_service = service_list;
        temp_service != NULL;
        temp_service = temp_service->next) {
 
-    fprintf(fp, "service {\n");
-    fprintf(fp, "host_name=%s\n", temp_service->host_name);
-    fprintf(fp, "service_description=%s\n", temp_service->description);
-    fprintf(fp, "modified_attributes=%lu\n", (temp_service->modified_attributes & ~service_attribute_mask));
-    fprintf(fp, "check_command=%s\n", (temp_service->service_check_command == NULL) ? "" : temp_service->service_check_command);
-    fprintf(fp, "check_period=%s\n", (temp_service->check_period == NULL) ? "" : temp_service->check_period);
-    fprintf(fp, "notification_period=%s\n", (temp_service->notification_period == NULL) ? "" : temp_service->notification_period);
-    fprintf(fp, "event_handler=%s\n", (temp_service->event_handler == NULL) ? "" : temp_service->event_handler);
-    fprintf(fp, "has_been_checked=%d\n", temp_service->has_been_checked);
-    fprintf(fp, "check_execution_time=%.3f\n", temp_service->execution_time);
-    fprintf(fp, "check_latency=%.3f\n", temp_service->latency);
-    fprintf(fp, "check_type=%d\n", temp_service->check_type);
-    fprintf(fp, "current_state=%d\n", temp_service->current_state);
-    fprintf(fp, "last_state=%d\n", temp_service->last_state);
-    fprintf(fp, "last_hard_state=%d\n", temp_service->last_hard_state);
-    fprintf(fp, "last_event_id=%lu\n", temp_service->last_event_id);
-    fprintf(fp, "current_event_id=%lu\n", temp_service->current_event_id);
-    fprintf(fp, "current_problem_id=%lu\n", temp_service->current_problem_id);
-    fprintf(fp, "last_problem_id=%lu\n", temp_service->last_problem_id);
-    fprintf(fp, "current_attempt=%d\n", temp_service->current_attempt);
-    fprintf(fp, "max_attempts=%d\n", temp_service->max_attempts);
-    fprintf(fp, "normal_check_interval=%f\n", temp_service->check_interval);
-    fprintf(fp, "retry_check_interval=%f\n", temp_service->retry_interval);
-    fprintf(fp, "state_type=%d\n", temp_service->state_type);
-    fprintf(fp, "last_state_change=%lu\n", static_cast<unsigned long>(temp_service->last_state_change));
-    fprintf(fp, "last_hard_state_change=%lu\n", static_cast<unsigned long>(temp_service->last_hard_state_change));
-    fprintf(fp, "last_time_ok=%lu\n", static_cast<unsigned long>(temp_service->last_time_ok));
-    fprintf(fp, "last_time_warning=%lu\n", static_cast<unsigned long>(temp_service->last_time_warning));
-    fprintf(fp, "last_time_unknown=%lu\n", static_cast<unsigned long>(temp_service->last_time_unknown));
-    fprintf(fp, "last_time_critical=%lu\n", static_cast<unsigned long>(temp_service->last_time_critical));
-    fprintf(fp, "plugin_output=%s\n", (temp_service->plugin_output == NULL) ? "" : temp_service->plugin_output);
-    fprintf(fp, "long_plugin_output=%s\n", (temp_service->long_plugin_output == NULL) ? "" : temp_service->long_plugin_output);
-    fprintf(fp, "performance_data=%s\n", (temp_service->perf_data == NULL) ? "" : temp_service->perf_data);
-    fprintf(fp, "last_check=%lu\n", static_cast<unsigned long>(temp_service->last_check));
-    fprintf(fp, "next_check=%lu\n", static_cast<unsigned long>(temp_service->next_check));
-    fprintf(fp, "check_options=%d\n", temp_service->check_options);
-    fprintf(fp, "notified_on_unknown=%d\n", temp_service->notified_on_unknown);
-    fprintf(fp, "notified_on_warning=%d\n", temp_service->notified_on_warning);
-    fprintf(fp, "notified_on_critical=%d\n", temp_service->notified_on_critical);
-    fprintf(fp, "current_notification_number=%d\n", temp_service->current_notification_number);
-    fprintf(fp, "current_notification_id=%lu\n", temp_service->current_notification_id);
-    fprintf(fp, "last_notification=%lu\n", static_cast<unsigned long>(temp_service->last_notification));
-    fprintf(fp, "notifications_enabled=%d\n", temp_service->notifications_enabled);
-    fprintf(fp, "active_checks_enabled=%d\n", temp_service->checks_enabled);
-    fprintf(fp, "passive_checks_enabled=%d\n", temp_service->accept_passive_service_checks);
-    fprintf(fp, "event_handler_enabled=%d\n", temp_service->event_handler_enabled);
-    fprintf(fp, "problem_has_been_acknowledged=%d\n", temp_service->problem_has_been_acknowledged);
-    fprintf(fp, "acknowledgement_type=%d\n", temp_service->acknowledgement_type);
-    fprintf(fp, "flap_detection_enabled=%d\n", temp_service->flap_detection_enabled);
-    fprintf(fp, "failure_prediction_enabled=%d\n", temp_service->failure_prediction_enabled);
-    fprintf(fp, "process_performance_data=%d\n", temp_service->process_performance_data);
-    fprintf(fp, "obsess_over_service=%d\n", temp_service->obsess_over_service);
-    fprintf(fp, "is_flapping=%d\n", temp_service->is_flapping);
-    fprintf(fp, "percent_state_change=%.2f\n", temp_service->percent_state_change);
-    fprintf(fp, "check_flapping_recovery_notification=%d\n", temp_service->check_flapping_recovery_notification);
+    stream << "service {\n"
+           << "host_name=" << temp_service->host_name << "\n"
+           << "service_description=" << temp_service->description << "\n"
+           << "modified_attributes=" << (temp_service->modified_attributes & ~service_attribute_mask) << "\n"
+           << "check_command=" << (temp_service->service_check_command ? temp_service->service_check_command : "") << "\n"
+           << "check_period=" << (temp_service->check_period ? temp_service->check_period : "") << "\n"
+           << "notification_period=" << (temp_service->notification_period ? temp_service->notification_period : "") << "\n"
+           << "event_handler=" << (temp_service->event_handler ? temp_service->event_handler : "") << "\n"
+           << "has_been_checked=" << temp_service->has_been_checked << "\n"
+           << "check_execution_time=" << qSetRealNumberPrecision(3) << ::fixed << temp_service->execution_time << reset << "\n"
+           << "check_latency=" << qSetRealNumberPrecision(3) << ::fixed << temp_service->latency << reset << "\n"
+           << "check_type=" << temp_service->check_type << "\n"
+           << "current_state=" << temp_service->current_state << "\n"
+           << "last_state=" << temp_service->last_state << "\n"
+           << "last_hard_state=" << temp_service->last_hard_state << "\n"
+           << "last_event_id=" << temp_service->last_event_id << "\n"
+           << "current_event_id=" << temp_service->current_event_id << "\n"
+           << "current_problem_id=" << temp_service->current_problem_id << "\n"
+           << "last_problem_id=" << temp_service->last_problem_id << "\n"
+           << "current_attempt=" << temp_service->current_attempt << "\n"
+           << "max_attempts=" << temp_service->max_attempts << "\n"
+           << "normal_check_interval=" << temp_service->check_interval << "\n"
+           << "retry_check_interval=" << temp_service->retry_interval << "\n"
+           << "state_type=" << temp_service->state_type << "\n"
+           << "last_state_change=" << static_cast<unsigned long>(temp_service->last_state_change) << "\n"
+           << "last_hard_state_change=" << static_cast<unsigned long>(temp_service->last_hard_state_change) << "\n"
+           << "last_time_ok=" << static_cast<unsigned long>(temp_service->last_time_ok) << "\n"
+           << "last_time_warning=" << static_cast<unsigned long>(temp_service->last_time_warning) << "\n"
+           << "last_time_unknown=" << static_cast<unsigned long>(temp_service->last_time_unknown) << "\n"
+           << "last_time_critical=" << static_cast<unsigned long>(temp_service->last_time_critical) << "\n"
+           << "plugin_output=" << (temp_service->plugin_output ? temp_service->plugin_output : "") << "\n"
+           << "long_plugin_output=" << (temp_service->long_plugin_output ? temp_service->long_plugin_output : "") << "\n"
+           << "performance_data=" << (temp_service->perf_data ? temp_service->perf_data : "") << "\n"
+           << "last_check=" << static_cast<unsigned long>(temp_service->last_check) << "\n"
+           << "next_check=" << static_cast<unsigned long>(temp_service->next_check) << "\n"
+           << "check_options=" << temp_service->check_options << "\n"
+           << "notified_on_unknown=" << temp_service->notified_on_unknown << "\n"
+           << "notified_on_warning=" << temp_service->notified_on_warning << "\n"
+           << "notified_on_critical=" << temp_service->notified_on_critical << "\n"
+           << "current_notification_number=" << temp_service->current_notification_number << "\n"
+           << "current_notification_id=" << temp_service->current_notification_id << "\n"
+           << "last_notification=" << static_cast<unsigned long>(temp_service->last_notification) << "\n"
+           << "notifications_enabled=" << temp_service->notifications_enabled << "\n"
+           << "active_checks_enabled=" << temp_service->checks_enabled << "\n"
+           << "passive_checks_enabled=" << temp_service->accept_passive_service_checks << "\n"
+           << "event_handler_enabled=" << temp_service->event_handler_enabled << "\n"
+           << "problem_has_been_acknowledged=" << temp_service->problem_has_been_acknowledged << "\n"
+           << "acknowledgement_type=" << temp_service->acknowledgement_type << "\n"
+           << "flap_detection_enabled=" << temp_service->flap_detection_enabled << "\n"
+           << "failure_prediction_enabled=" << temp_service->failure_prediction_enabled << "\n"
+           << "process_performance_data=" << temp_service->process_performance_data << "\n"
+           << "obsess_over_service=" << temp_service->obsess_over_service << "\n"
+           << "is_flapping=" << temp_service->is_flapping << "\n"
+           << "percent_state_change=" << qSetRealNumberPrecision(2) << ::fixed << temp_service->percent_state_change << reset << "\n"
+           << "check_flapping_recovery_notification=" << temp_service->check_flapping_recovery_notification << "\n";
 
-    fprintf(fp, "state_history=");
-    for (x = 0; x < MAX_STATE_HISTORY_ENTRIES; x++)
-      fprintf(fp, "%s%d", (x > 0) ? "," : "", temp_service->state_history[(x + temp_service->state_history_index) % MAX_STATE_HISTORY_ENTRIES]);
-    fprintf(fp, "\n");
+    stream << "state_history=";
+    for (unsigned int x = 0; x < MAX_STATE_HISTORY_ENTRIES; x++)
+      stream << (x > 0 ? "," : "") << temp_service->state_history[(x + temp_service->state_history_index) % MAX_STATE_HISTORY_ENTRIES];
+    stream << "\n";
 
     /* custom variables */
-    for (temp_customvariablesmember = temp_service->custom_variables;
+    for (customvariablesmember* temp_customvariablesmember = temp_service->custom_variables;
          temp_customvariablesmember != NULL;
          temp_customvariablesmember = temp_customvariablesmember->next) {
       if (temp_customvariablesmember->variable_name)
-        fprintf(fp, "_%s=%d;%s\n",
-                temp_customvariablesmember->variable_name,
-                temp_customvariablesmember->has_been_modified,
-                (temp_customvariablesmember->variable_value == NULL) ? "" : temp_customvariablesmember->variable_value);
+        stream << "_" << temp_customvariablesmember->variable_name << "="
+               << temp_customvariablesmember->has_been_modified << ";"
+               << (temp_customvariablesmember->variable_value
+                   ? temp_customvariablesmember->variable_value : "") << "\n";
     }
-
-    fprintf(fp, "}\n");
+    stream << "}\n";
   }
 
   /* save contact state information */
-  for (temp_contact = contact_list;
+  for (contact* temp_contact = contact_list;
        temp_contact != NULL;
        temp_contact = temp_contact->next) {
 
-    fprintf(fp, "contact {\n");
-    fprintf(fp, "contact_name=%s\n", temp_contact->name);
-    fprintf(fp, "modified_attributes=%lu\n", (temp_contact->modified_attributes & ~contact_attribute_mask));
-    fprintf(fp, "modified_host_attributes=%lu\n", (temp_contact->modified_host_attributes & ~contact_host_attribute_mask));
-    fprintf(fp, "modified_service_attributes=%lu\n", (temp_contact->modified_service_attributes & ~contact_service_attribute_mask));
-    fprintf(fp, "host_notification_period=%s\n", (temp_contact->host_notification_period == NULL) ? "" : temp_contact->host_notification_period);
-    fprintf(fp, "service_notification_period=%s\n", (temp_contact->service_notification_period == NULL) ? "" : temp_contact->service_notification_period);
-    fprintf(fp, "last_host_notification=%lu\n", static_cast<unsigned long>(temp_contact->last_host_notification));
-    fprintf(fp, "last_service_notification=%lu\n", static_cast<unsigned long>(temp_contact->last_service_notification));
-    fprintf(fp, "host_notifications_enabled=%d\n", temp_contact->host_notifications_enabled);
-    fprintf(fp, "service_notifications_enabled=%d\n", temp_contact->service_notifications_enabled);
+    stream << "contact {\n"
+           << "contact_name=" << temp_contact->name << "\n"
+           << "modified_attributes=" << (temp_contact->modified_attributes & ~contact_attribute_mask) << "\n"
+           << "modified_host_attributes=" << (temp_contact->modified_host_attributes & ~contact_host_attribute_mask) << "\n"
+           << "modified_service_attributes=" << (temp_contact->modified_service_attributes & ~contact_service_attribute_mask) << "\n"
+           << "host_notification_period=" << (temp_contact->host_notification_period ? temp_contact->host_notification_period : "") << "\n"
+           << "service_notification_period=" << (temp_contact->service_notification_period ? temp_contact->service_notification_period : "") << "\n"
+           << "last_host_notification=" << static_cast<unsigned long>(temp_contact->last_host_notification) << "\n"
+           << "last_service_notification=" << static_cast<unsigned long>(temp_contact->last_service_notification) << "\n"
+           << "host_notifications_enabled=" << temp_contact->host_notifications_enabled << "\n"
+           << "service_notifications_enabled=" << temp_contact->service_notifications_enabled << "\n";
 
     /* custom variables */
-    for (temp_customvariablesmember = temp_contact->custom_variables;
+    for (customvariablesmember* temp_customvariablesmember = temp_contact->custom_variables;
          temp_customvariablesmember != NULL;
          temp_customvariablesmember = temp_customvariablesmember->next) {
       if (temp_customvariablesmember->variable_name)
-        fprintf(fp, "_%s=%d;%s\n",
-                temp_customvariablesmember->variable_name,
-                temp_customvariablesmember->has_been_modified,
-                (temp_customvariablesmember->variable_value == NULL) ? "" : temp_customvariablesmember->variable_value);
+        stream << "_" << temp_customvariablesmember->variable_name << "="
+               << temp_customvariablesmember->has_been_modified << ";"
+               << (temp_customvariablesmember->variable_value
+                   ? temp_customvariablesmember->variable_value : "") << "\n";
     }
 
-    fprintf(fp, "}\n");
+    stream << "}\n";
   }
 
   /* save all comments */
-  for (temp_comment = comment_list;
+  for (comment* temp_comment = comment_list;
        temp_comment != NULL;
        temp_comment = temp_comment->next) {
 
     if (temp_comment->comment_type == HOST_COMMENT)
-      fprintf(fp, "hostcomment {\n");
+      stream << "hostcomment {\n";
     else
-      fprintf(fp, "servicecomment {\n");
-    fprintf(fp, "host_name=%s\n", temp_comment->host_name);
+      stream << "servicecomment {\n";
+    stream << "host_name=" << temp_comment->host_name << "\n";
     if (temp_comment->comment_type == SERVICE_COMMENT)
-      fprintf(fp, "service_description=%s\n", temp_comment->service_description);
-    fprintf(fp, "entry_type=%d\n", temp_comment->entry_type);
-    fprintf(fp, "comment_id=%lu\n", temp_comment->comment_id);
-    fprintf(fp, "source=%d\n", temp_comment->source);
-    fprintf(fp, "persistent=%d\n", temp_comment->persistent);
-    fprintf(fp, "entry_time=%lu\n", static_cast<unsigned long>(temp_comment->entry_time));
-    fprintf(fp, "expires=%d\n", temp_comment->expires);
-    fprintf(fp, "expire_time=%lu\n", static_cast<unsigned long>(temp_comment->expire_time));
-    fprintf(fp, "author=%s\n", temp_comment->author);
-    fprintf(fp, "comment_data=%s\n", temp_comment->comment_data);
-    fprintf(fp, "}\n");
+      stream << "service_description=" << temp_comment->service_description << "\n";
+    stream << "entry_type=" << temp_comment->entry_type << "\n"
+           << "comment_id=" << temp_comment->comment_id << "\n"
+           << "source=" << temp_comment->source << "\n"
+           << "persistent=" << temp_comment->persistent << "\n"
+           << "entry_time=" << static_cast<unsigned long>(temp_comment->entry_time) << "\n"
+           << "expires=" << temp_comment->expires << "\n"
+           << "expire_time=" << static_cast<unsigned long>(temp_comment->expire_time) << "\n"
+           << "author=" << temp_comment->author << "\n"
+           << "comment_data=" << temp_comment->comment_data << "\n"
+           << "}\n";
   }
 
   /* save all downtime */
-  for (temp_downtime = scheduled_downtime_list;
+  for (scheduled_downtime* temp_downtime = scheduled_downtime_list;
        temp_downtime != NULL;
        temp_downtime = temp_downtime->next) {
 
     if (temp_downtime->type == HOST_DOWNTIME)
-      fprintf(fp, "hostdowntime {\n");
+      stream << "hostdowntime {\n";
     else
-      fprintf(fp, "servicedowntime {\n");
-    fprintf(fp, "host_name=%s\n", temp_downtime->host_name);
+      stream << "servicedowntime {\n";
+    stream << "host_name=" << temp_downtime->host_name << "\n";
     if (temp_downtime->type == SERVICE_DOWNTIME)
-      fprintf(fp, "service_description=%s\n", temp_downtime->service_description);
-    fprintf(fp, "downtime_id=%lu\n", temp_downtime->downtime_id);
-    fprintf(fp, "entry_time=%lu\n", static_cast<unsigned long>(temp_downtime->entry_time));
-    fprintf(fp, "start_time=%lu\n", static_cast<unsigned long>(temp_downtime->start_time));
-    fprintf(fp, "end_time=%lu\n", static_cast<unsigned long>(temp_downtime->end_time));
-    fprintf(fp, "triggered_by=%lu\n", temp_downtime->triggered_by);
-    fprintf(fp, "fixed=%d\n", temp_downtime->fixed);
-    fprintf(fp, "duration=%lu\n", temp_downtime->duration);
-    fprintf(fp, "author=%s\n", temp_downtime->author);
-    fprintf(fp, "comment=%s\n", temp_downtime->comment);
-    fprintf(fp, "}\n");
+      stream << "service_description=" << temp_downtime->service_description << "\n";
+    stream << "downtime_id=" << temp_downtime->downtime_id << "\n"
+           << "entry_time=" << static_cast<unsigned long>(temp_downtime->entry_time) << "\n"
+           << "start_time=" << static_cast<unsigned long>(temp_downtime->start_time) << "\n"
+           << "end_time=" << static_cast<unsigned long>(temp_downtime->end_time) << "\n"
+           << "triggered_by=" << temp_downtime->triggered_by << "\n"
+           << "fixed=" << temp_downtime->fixed << "\n"
+           << "duration=" << temp_downtime->duration << "\n"
+           << "author=" << temp_downtime->author << "\n"
+           << "comment=" << temp_downtime->comment << "\n"
+           << "}\n";
   }
 
-  fflush(fp);
-  result = fclose(fp);
-  fsync(fd);
+  // flush data.
+  stream.flush();
 
-  /* save/close was successful */
-  if (result == 0) {
-    result = OK;
-
-    /* move the temp file to the retention file (overwrite the old retention file) */
-    if (my_rename(temp_file, xrddefault_retention_file)) {
-      unlink(temp_file);
-      logger(log_runtime_error, basic)
-        << "Error: Unable to update retention file '"
-        << xrddefault_retention_file << "': " << strerror(errno);
-      result = ERROR;
-    }
-  }
-  /* a problem occurred saving the file */
-  else {
-    result = ERROR;
-
-    /* remove temp file and log an error */
-    unlink(temp_file);
+  if (ftruncate(xrddefault_retention_file_fd, 0) == -1
+      || fsync(xrddefault_retention_file_fd) == -1) {
     logger(log_runtime_error, basic)
-      << "Error: Unable to save retention file: " << strerror(errno);
+      << "Error: Unable to update retention file '"
+      << xrddefault_retention_file << "': " << strerror(errno);
+    return (ERROR);
   }
 
-  /* free memory */
-  delete[] temp_file;
-
-  return (result);
+  write(xrddefault_retention_file_fd, data.constData(), data.size());
+  return (OK);
 }
 
 /******************************************************************/

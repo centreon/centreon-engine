@@ -42,12 +42,11 @@ namespace     com {
       public:
         unittest(int (*func)())
           : QThread(), _func(func), _ret(1) {
-          _init();
+
         }
 
         ~unittest() throw() {
           wait();
-          _deinit();
         }
 
         int   ret() const throw() {
@@ -57,7 +56,9 @@ namespace     com {
       protected:
         void  run() {
           try {
+            _init();
             _ret = (*_func)();
+            _deinit();
           }
           catch (std::exception const& e) {
             qDebug() << "error: " << e.what();
