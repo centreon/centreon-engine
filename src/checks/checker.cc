@@ -362,6 +362,9 @@ bool checker::run(host* hst,
                      start_time.tv_sec);
   update_check_stats(PARALLEL_HOST_CHECK_STATS, start_time.tv_sec);
 
+  disconnect(&(*cmd), SIGNAL(command_executed(cce_commands_result const&)),
+             this, SLOT(_command_executed(cce_commands_result const&)));
+
   connect(&(*cmd), SIGNAL(command_executed(cce_commands_result const&)),
           this, SLOT(_command_executed(cce_commands_result const&)),
           Qt::QueuedConnection);
@@ -550,10 +553,12 @@ bool checker::run(service* svc,
 		     : ACTIVE_ONDEMAND_SERVICE_CHECK_STATS,
 		     start_time.tv_sec);
 
+  disconnect(&(*cmd), SIGNAL(command_executed(cce_commands_result const&)),
+             this, SLOT(_command_executed(cce_commands_result const&)));
+
   connect(&(*cmd), SIGNAL(command_executed(cce_commands_result const&)),
           this, SLOT(_command_executed(cce_commands_result const&)),
           Qt::QueuedConnection);
-
 
   _mut_id.lock();
   // run command.
