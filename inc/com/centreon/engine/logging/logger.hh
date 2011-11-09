@@ -122,6 +122,15 @@ namespace                    com {
         }
 
         template<>
+        inline logger& logger::_builder(e_flags obj) {
+	  if (obj == fixed)
+	    _buffer << std::fixed;
+	  else
+	    _buffer << std::scientific;
+          return (*this);
+        }
+
+        template<>
         inline logger& logger::_builder(s_setprecision const& obj) {
           _buffer << std::setprecision(obj.precision);
           return (*this);

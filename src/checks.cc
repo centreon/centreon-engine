@@ -2252,7 +2252,7 @@ int handle_async_host_check_result_3x(host* temp_host, check_result* queued_chec
     << fixed << setprecision(3)
     << "\tLatency:            " << temp_host->latency;
   logger(dbg_checks, most)
-    << "\treturn (Status:     " <<  queued_check_result->return_code;
+    << "\treturn Status:      " <<  queued_check_result->return_code;
   logger(dbg_checks, most)
     << "\tOutput:             " <<  queued_check_result->output;
 
