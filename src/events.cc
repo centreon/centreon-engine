@@ -516,7 +516,7 @@ void init_timing_loop(void) {
       if (temp_service->next_check > current_time) {
         logger(dbg_events, most)
           << "Service is already scheduled to be checked in the future: "
-          << ctime(&temp_service->next_check);
+          << my_ctime(&temp_service->next_check);
         continue;
       }
 
@@ -540,7 +540,7 @@ void init_timing_loop(void) {
 
       logger(dbg_events, most)
         << "Preferred Check Time: " << temp_service->next_check
-        << " --> " << ctime(&temp_service->next_check);
+        << " --> " << my_ctime(&temp_service->next_check);
 
       /* make sure the service can actually be scheduled when we want */
       is_valid_time = check_time_against_period(temp_service->next_check,
@@ -550,7 +550,7 @@ void init_timing_loop(void) {
           << "Preferred Time is Invalid In Timeperiod '"
           << temp_service->check_period_ptr->name
           << "': " << temp_service->next_check
-          << " --> " << ctime(&temp_service->next_check);
+          << " --> " << my_ctime(&temp_service->next_check);
 
         get_next_valid_time(temp_service->next_check, &next_valid_time,
 			    temp_service->check_period_ptr);
@@ -559,7 +559,7 @@ void init_timing_loop(void) {
 
       logger(dbg_events, most)
         << "Actual Check Time: " << temp_service->next_check
-        << " --> " << ctime(&temp_service->next_check);
+        << " --> " << my_ctime(&temp_service->next_check);
 
       if (scheduling_info.first_service_check == (time_t)0
           || (temp_service->next_check < scheduling_info.first_service_check))
@@ -706,7 +706,7 @@ void init_timing_loop(void) {
     if (temp_host->next_check > current_time) {
       logger(dbg_events, most)
         << "Host is already scheduled to be checked in the future: "
-        << ctime(&temp_host->next_check);
+        << my_ctime(&temp_host->next_check);
       continue;
     }
 
@@ -716,7 +716,7 @@ void init_timing_loop(void) {
 
     logger(dbg_events, most)
       << "Preferred Check Time: " << temp_host->next_check
-      << " --> " << ctime(&temp_host->next_check);
+      << " --> " << my_ctime(&temp_host->next_check);
 
     /* make sure the host can actually be scheduled at this time */
     is_valid_time = check_time_against_period(temp_host->next_check,
@@ -730,7 +730,7 @@ void init_timing_loop(void) {
 
     logger(dbg_events, most)
       << "Actual Check Time: " << temp_host->next_check
-      << " --> " << ctime(&temp_host->next_check);
+      << " --> " << my_ctime(&temp_host->next_check);
 
     if (scheduling_info.first_host_check == (time_t) 0
         || (temp_host->next_check < scheduling_info.first_host_check))
@@ -1283,7 +1283,7 @@ int handle_timed_event(timed_event* event) {
 
   logger(dbg_events, basic)
     << "** Timed Event ** Type: " << event->event_type
-    << ", Run Time: " << ctime(&event->run_time);
+    << ", Run Time: " << my_ctime(&event->run_time);
 
   /* how should we handle the event? */
   if (event->event_type < sizeof(tab_exec_event) / sizeof(*tab_exec_event))

@@ -66,7 +66,7 @@ int service_notification(service* svc,
     << "', Service: '" << svc->description
     << "', Type: " << type << ", Options: " << options
     << ", Current State: " << svc->current_state
-    << ", Last Notification: " << ctime(&svc->last_notification);
+    << ", Last Notification: " << my_ctime(&svc->last_notification);
 
   /* if we couldn't find the host, return an error */
   if ((temp_host = svc->host_ptr) == NULL) {
@@ -267,7 +267,7 @@ int service_notification(service* svc,
 
         logger(dbg_notifications, basic)
           << contacts_notified << " contacts were notified.  " \
-          "Next possible notification time: " << ctime(&svc->next_notification);
+          "Next possible notification time: " << my_ctime(&svc->next_notification);
 
         /* update the last notification time for this service (this is needed for rescheduling later notifications) */
         svc->last_notification = current_time;
@@ -289,7 +289,7 @@ int service_notification(service* svc,
 
         logger(dbg_notifications, basic)
           << "No contacts were notified.  Next possible notification time: "
-          << ctime(&svc->next_notification);
+          << my_ctime(&svc->next_notification);
       }
 
     }
@@ -402,7 +402,7 @@ int check_service_notification_viability(service* svc, unsigned int type, int op
 
       logger(dbg_notifications, more)
         << "Next possible notification time: "
-        << ctime(&svc->next_notification);
+        << my_ctime(&svc->next_notification);
     }
 
     return (ERROR);
@@ -627,7 +627,7 @@ int check_service_notification_viability(service* svc, unsigned int type, int op
       "about this service.";
     logger(dbg_notifications, more)
       << "Next valid notification time: "
-      << ctime(&svc->next_notification);
+      << my_ctime(&svc->next_notification);
     return (ERROR);
   }
 
@@ -1311,7 +1311,7 @@ int host_notification(host* hst,
     << "** Host Notification Attempt ** Host: '" << hst->name
     << "', Type: " << type << ", Options: " << options
     << ", Current State: " << hst->current_state
-    << ", Last Notification: " << ctime(&hst->last_host_notification);
+    << ", Last Notification: " << my_ctime(&hst->last_host_notification);
 
 
   /* check viability of sending out a host notification */
@@ -1519,7 +1519,7 @@ int host_notification(host* hst,
         logger(dbg_notifications, basic)
           << contacts_notified << " contacts were notified.  " \
           "Next possible notification time: "
-          << ctime(&hst->next_host_notification);
+          << my_ctime(&hst->next_host_notification);
       }
 
       /* we didn't end up notifying anyone */
@@ -1530,7 +1530,7 @@ int host_notification(host* hst,
 
         logger(dbg_notifications, basic)
           << "No contacts were notified.  Next possible notification time: "
-          << ctime(&hst->next_host_notification);
+          << my_ctime(&hst->next_host_notification);
       }
     }
 
@@ -1626,7 +1626,7 @@ int check_host_notification_viability(host* hst,
 
       logger(dbg_notifications, more)
         << "Next possible notification time: "
-        << ctime(&hst->next_host_notification);
+        << my_ctime(&hst->next_host_notification);
     }
 
     return (ERROR);
@@ -1831,7 +1831,7 @@ int check_host_notification_viability(host* hst,
       << "Its not yet time to re-notify the contacts about this host problem...";
     logger(dbg_notifications, more)
       << "Next acceptable notification time: "
-      << ctime(&hst->next_host_notification);
+      << my_ctime(&hst->next_host_notification);
     return (ERROR);
   }
 

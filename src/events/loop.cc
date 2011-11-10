@@ -116,14 +116,14 @@ void loop::_dispatching() {
     if (event_list_high != NULL)
       logger(dbg_events, more)
         << "Next High Priority Event Time: "
-        << ctime(&event_list_high->run_time);
+        << my_ctime(&event_list_high->run_time);
     else
       logger(dbg_events, more)
         << "No high priority events are scheduled...";
     if (event_list_low != NULL)
       logger(dbg_events, more)
         << "Next Low Priority Event Time:  "
-        << ctime(&event_list_low->run_time);
+        << my_ctime(&event_list_low->run_time);
     else
       logger(dbg_events, more)
         << "No low priority events are scheduled...";

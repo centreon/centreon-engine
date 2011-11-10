@@ -166,6 +166,14 @@ int my_system(char* cmd,
 		      max_output_length));
 }
 
+// same like unix ctime without the '\n' at the end of the string.
+char const* my_ctime(time_t const* t) {
+  char* buf(ctime(t));
+  if (buf != NULL)
+    buf[strlen(buf) - 1] = 0;
+  return (buf);
+}
+
 /* given a "raw" command, return the "expanded" or "whole" command line */
 int get_raw_command_line_r(nagios_macros* mac,
 			   command* cmd_ptr,
