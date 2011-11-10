@@ -482,7 +482,8 @@ int xrddefault_save_state_information(void) {
   stream.flush();
 
   if (ftruncate(xrddefault_retention_file_fd, 0) == -1
-      || fsync(xrddefault_retention_file_fd) == -1) {
+      || fsync(xrddefault_retention_file_fd) == -1
+      || lseek(xrddefault_retention_file_fd, 0, SEEK_SET) == (off_t)-1) {
     logger(log_runtime_error, basic)
       << "Error: Unable to update retention file '"
       << xrddefault_retention_file << "': " << strerror(errno);

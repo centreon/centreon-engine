@@ -533,7 +533,8 @@ int xsddefault_save_status_data(void) {
   stream.flush();
 
   if (ftruncate(xsddefault_status_log_fd, 0) == -1
-      || fsync(xsddefault_status_log_fd) == -1) {
+      || fsync(xsddefault_status_log_fd) == -1
+      || lseek(xsddefault_status_log_fd, 0, SEEK_SET) == (off_t)-1) {
     logger(log_runtime_error, basic)
       << "Error: Unable to update status data file '"
       << xsddefault_status_log << "': " << strerror(errno);
