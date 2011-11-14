@@ -34,13 +34,19 @@ int main(int argc, char** argv) {
   QCoreApplication app(argc, argv);
   // Insert unsigned long longs.
   error e;
-  e << 42ull << 1ull << 7896ull << ULLONG_MAX - 789;
-  e << ULLONG_MAX << 0ull;
+  e << 42ull << 1ull << 7896ull;
+
+#ifdef ULLONG_MAX
+  e << ULLONG_MAX - 789 << ULLONG_MAX << 0ull;
+#endif // !ULLONG_MAX
 
   // Conversion reference.
   std::ostringstream oss;
-  oss << 42ull << 1ull << 7896ull << ULLONG_MAX - 789
-      << ULLONG_MAX << 0ull;
+  oss << 42ull << 1ull << 7896ull;
+
+#ifdef ULLONG_MAX
+  oss << ULLONG_MAX - 789 << ULLONG_MAX << 0ull;
+#endif // !ULLONG_MAX
 
   // Check.
   return (strcmp(oss.str().c_str(), e.what()));

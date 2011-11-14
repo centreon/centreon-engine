@@ -35,12 +35,18 @@ int main(int argc, char** argv) {
   // Insert long longs.
   error e;
   e << 74654646541515ll << 0ll << -1ll << 5465451141125787ll;
+
+#ifdef LLONG_MAX
   e << LLONG_MAX << 42ll << LLONG_MIN;
+#endif // !LLONG_MAX
 
   // Conversion reference.
   std::ostringstream oss;
-  oss << 74654646541515ll << 0ll << -1ll << 5465451141125787ll
-      << LLONG_MAX << 42ll << LLONG_MIN;
+  oss << 74654646541515ll << 0ll << -1ll << 5465451141125787ll;
+
+#ifdef LLONG_MAX
+  oss << LLONG_MAX << 42ll << LLONG_MIN;
+#endif // !LLONG_MAX
 
   // Check.
   return (strcmp(oss.str().c_str(), e.what()));
