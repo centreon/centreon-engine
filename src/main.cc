@@ -339,7 +339,7 @@ int main(int argc, char** argv) {
 
   // Else start to monitor things.
   else {
-    char* buffer;
+    char* buffer(NULL);
     // Keep monitoring things until we get a shutdown command.
     do {
       // Reset program variables.

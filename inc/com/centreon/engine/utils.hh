@@ -41,7 +41,7 @@ typedef struct  dbuf_struct {
 // Monitoring/Event Handler Functions
 int my_system_r(nagios_macros const* mac, char* cmd,int timeout,int* early_timeout,double* exectime,char** output,unsigned int max_output_length); // thread-safe version of the above
 int my_system(char* cmd,int timeout,int* early_timeout,double* exectime,char** output,int max_output_length);                                // executes a command via popen(), but also protects against timeouts
-
+char const* my_ctime(time_t const*t); // same like unix ctime without the '\n' at the end of the string.
 // Miscellaneous Functions
 int get_raw_command_line_r(nagios_macros* mac, command* cmd_ptr, char const* cmd, char** full_command, int macro_options); // thread-safe version of get_raw_command_line_r()
 int get_raw_command_line(command* cmd_ptr, char* cmd, char** full_command, int macro_options);                             // given a raw command line, determine the actual command to run Manipulates global_macros.argv and is thus not threadsafe

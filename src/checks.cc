@@ -153,7 +153,7 @@ int run_scheduled_service_check(service* svc,
 
         logger(dbg_checks, more)
           << "Rescheduled next service check for "
-          << ctime(&next_valid_time);
+          << my_ctime(&next_valid_time);
       }
     }
 
@@ -1009,7 +1009,8 @@ int handle_async_service_check_result(service* temp_service, check_result* queue
   if (reschedule_check == TRUE) {
 
     logger(dbg_checks, more)
-      << "Rescheduling next check of service at " << ctime(&next_service_check);
+      << "Rescheduling next check of service at "
+      << my_ctime(&next_service_check);
 
     /* default is to reschedule service check unless a test below fails... */
     temp_service->should_be_scheduled = TRUE;
@@ -1155,7 +1156,7 @@ void schedule_service_check(service* svc, time_t check_time, int options) {
     << "Scheduling a " << (options & CHECK_OPTION_FORCE_EXECUTION ? "forced" : "non-forced")
     << ", active check of service '" << svc->description
     << "' on host '" << svc->host_name
-    << "' @ " << ctime(&check_time);
+    << "' @ " << my_ctime(&check_time);
 
   /* don't schedule a check if active checks of this service are disabled */
   if (svc->checks_enabled == FALSE
@@ -1185,7 +1186,7 @@ void schedule_service_check(service* svc, time_t check_time, int options) {
   if (found == TRUE && temp_event != NULL) {
     logger(dbg_checks, most)
       << "Found another service check event for this service @ "
-      << ctime(&temp_event->run_time);
+      << my_ctime(&temp_event->run_time);
 
     /* use the originally scheduled check unless we decide otherwise */
     use_original_event = TRUE;
@@ -1653,7 +1654,7 @@ void schedule_host_check(host* hst, time_t check_time, int options) {
 
   logger(dbg_checks, basic)
     << "Scheduling a " << (options & CHECK_OPTION_FORCE_EXECUTION ? "forced" : "non-forced")
-    << ", active check of host '" << hst->name << "' @ " << ctime(&check_time);
+    << ", active check of host '" << hst->name << "' @ " << my_ctime(&check_time);
 
   /* don't schedule a check if active checks of this host are disabled */
   if (hst->checks_enabled == FALSE
@@ -1689,7 +1690,7 @@ void schedule_host_check(host* hst, time_t check_time, int options) {
 
     logger(dbg_checks, most)
       << "Found another host check event for this host @ "
-      << ctime(&temp_event->run_time);
+      << my_ctime(&temp_event->run_time);
 
     /* use the originally scheduled check unless we decide otherwise */
     use_original_event = TRUE;
@@ -2166,7 +2167,7 @@ int run_scheduled_host_check_3x(host* hst, int check_options, double latency) {
         hst->should_be_scheduled = TRUE;
 
         logger(dbg_checks, more)
-          << "Rescheduled next host check for " << ctime(&next_valid_time);
+          << "Rescheduled next host check for " << my_ctime(&next_valid_time);
       }
     }
 
@@ -2937,7 +2938,7 @@ int process_host_check_result_3x(host* hst,
   /* reschedule the next check of the host (usually ONLY for scheduled, active checks, unless overridden above) */
   if (reschedule_check == TRUE) {
     logger(dbg_checks, more)
-      << "Rescheduling next check of host at " << ctime(&next_check);
+      << "Rescheduling next check of host at " << my_ctime(&next_check);
 
     /* default is to reschedule host check unless a test below fails... */
     hst->should_be_scheduled = TRUE;
