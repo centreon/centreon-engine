@@ -466,14 +466,14 @@ endif ()
 if (WITH_LOG_ARCHIVE_DIR)
   set(LOG_ARCHIVE_DIR "${WITH_LOG_ARCHIVE_DIR}")
 else ()
-  set(LOG_ARCHIVE_DIR "${localstatedir}/archives")
+  set(LOG_ARCHIVE_DIR "${vardir}/archives")
 endif ()
 
 # RW dir.
 if (WITH_RW_DIR)
   set(RW_DIR "${WITH_RW_DIR}")
 else ()
-  set(RW_DIR "${localstatedir}/rw")
+  set(RW_DIR "${vardir}/rw")
 endif ()
 
 # Temporary check result dir.
@@ -495,6 +495,13 @@ if (WITH_GROUP)
   set(GROUP "${WITH_GROUP}")
 else ()
   set(GROUP "root")
+endif ()
+
+# Path for Centreon Engine plugin.
+if (WITH_LIBEXECDIR)
+  set(libexecdir "${WITH_LIBEXECDIR}")
+else ()
+  set(libexecdir "/usr/lib/nagios/plugins")
 endif ()
 
 # Check which startup script to use.
@@ -772,16 +779,16 @@ install(CODE "
   mkdir_chown(\"${USER}\" \"${GROUP}\" \"${TMPDIR}\")
   mkdir_chown(\"${USER}\" \"${GROUP}\" \"${LOG_ARCHIVE_DIR}\")
 
-  touch_chown(\"${USER}\" \"${GROUP}\" \"${localstatedir}/status.dat\")
-  touch_chown(\"${USER}\" \"${GROUP}\" \"${localstatedir}/centengine.cmd\")
-  touch_chown(\"${USER}\" \"${GROUP}\" \"${localstatedir}/centengine.log\")
-  touch_chown(\"${USER}\" \"${GROUP}\" \"${localstatedir}/centengine.debug\")
-  touch_chown(\"${USER}\" \"${GROUP}\" \"${localstatedir}/comments.dat\")
-  touch_chown(\"${USER}\" \"${GROUP}\" \"${localstatedir}/downtime.dat\")
-  touch_chown(\"${USER}\" \"${GROUP}\" \"${localstatedir}/retention.dat\")
-  touch_chown(\"${USER}\" \"${GROUP}\" \"${localstatedir}/objects.cache\")
-  touch_chown(\"${USER}\" \"${GROUP}\" \"${localstatedir}/objects.precache\")
-  touch_chown(\"${USER}\" \"${GROUP}\" \"${localstatedir}/broker.socket\")
+  touch_chown(\"${USER}\" \"${GROUP}\" \"${vardir}/status.dat\")
+  touch_chown(\"${USER}\" \"${GROUP}\" \"${RW_DIR}/centengine.cmd\")
+  touch_chown(\"${USER}\" \"${GROUP}\" \"${vardir}/centengine.log\")
+  touch_chown(\"${USER}\" \"${GROUP}\" \"${vardir}/centengine.debug\")
+  touch_chown(\"${USER}\" \"${GROUP}\" \"${vardir}/comments.dat\")
+  touch_chown(\"${USER}\" \"${GROUP}\" \"${vardir}/downtime.dat\")
+  touch_chown(\"${USER}\" \"${GROUP}\" \"${vardir}/retention.dat\")
+  touch_chown(\"${USER}\" \"${GROUP}\" \"${vardir}/objects.cache\")
+  touch_chown(\"${USER}\" \"${GROUP}\" \"${vardir}/objects.precache\")
+  touch_chown(\"${USER}\" \"${GROUP}\" \"${vardir}/broker.socket\")
   touch_chown(\"${USER}\" \"${GROUP}\" \"${bindir}/p1.pl\")")
 
 # Install header files for devel.
