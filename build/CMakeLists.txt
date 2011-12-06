@@ -595,7 +595,7 @@ configure_file("${SCRIPT_DIR}/centengine.pc.in"
 
 #  Locations definitions
 add_definitions(-DDEFAULT_TEMP_FILE="${localstatedir}/tempfile")
-add_definitions(-DDEFAULT_TEMP_PATH="/tmp")
+add_definitions(-DDEFAULT_TEMP_PATH="${TMPDIR}")
 add_definitions(-DDEFAULT_CHECK_RESULT_PATH="${CHECK_RESULT_DIR}")
 add_definitions(-DDEFAULT_STATUS_FILE="${vardir}/status.dat")
 add_definitions(-DDEFAULT_LOG_FILE="${vardir}/centengine.log")
@@ -607,7 +607,7 @@ add_definitions(-DDEFAULT_RETENTION_FILE="${vardir}/retention.dat")
 add_definitions(-DDEFAULT_COMMAND_FILE="${RW_DIR}/centengine.cmd")
 add_definitions(-DDEFAULT_CONFIG_FILE="${confdir}/centengine.cfg")
 add_definitions(-DDEFAULT_OBJECT_CACHE_FILE="${vardir}/objects.cache")
-add_definitions(-DDEFAULT_PRECACHED_OBJECT_FILE="${varir}/objects.precache")
+add_definitions(-DDEFAULT_PRECACHED_OBJECT_FILE="${vardir}/objects.precache")
 add_definitions(-DDEFAULT_EVENT_BROKER_FILE="${vardir}/broker.socket")
 add_definitions(-DDEFAULT_P1_FILE="${bindir}/p1.pl")
 add_definitions(-DDEFAULT_AUTH_FILE="")

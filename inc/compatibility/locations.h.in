@@ -33,11 +33,11 @@
 # endif // !DEFAULT_CHECK_RESULT_PATH
 
 # ifndef DEFAULT_STATUS_FILE
-#  define DEFAULT_STATUS_FILE           "@localstatedir@/status.dat"
+#  define DEFAULT_STATUS_FILE           "@vardir@/status.dat"
 # endif // !DEFAULT_STATUS_FILE
 
 # ifndef DEFAULT_LOG_FILE
-#  define DEFAULT_LOG_FILE              "@localstatedir@/nagios.log"
+#  define DEFAULT_LOG_FILE              "@vardir@/centengine.log"
 # endif // !DEFAULT_LOG_FILE
 
 # ifndef DEFAULT_LOG_ARCHIVE_PATH
@@ -45,23 +45,23 @@
 # endif // !DEFAULT_LOG_ARCHIVE_PATH
 
 # ifndef DEFAULT_DEBUG_FILE
-#  define DEFAULT_DEBUG_FILE            "@localstatedir@/nagios.debug"
+#  define DEFAULT_DEBUG_FILE            "@vardir@/centengine.debug"
 # endif // !DEFAULT_DEBUG_FILE
 
 # ifndef DEFAULT_COMMENT_FILE
-#  define DEFAULT_COMMENT_FILE          "@localstatedir@/comments.dat"
+#  define DEFAULT_COMMENT_FILE          "@vardir@/comments.dat"
 # endif // !DEFAULT_COMMENT_FILE
 
 # ifndef DEFAULT_DOWNTIME_FILE
-#  define DEFAULT_DOWNTIME_FILE         "@localstatedir@/downtime.dat"
+#  define DEFAULT_DOWNTIME_FILE         "@vardir@/downtime.dat"
 #endif // !DEFAULT_DOWNTIME_FILE
 
 # ifndef DEFAULT_RETENTION_FILE
-#  define DEFAULT_RETENTION_FILE        "@localstatedir@/retention.dat"
+#  define DEFAULT_RETENTION_FILE        "@vardir@/retention.dat"
 # endif // !DEFAULT_RETENTION_FILE
 
 # ifndef DEFAULT_COMMAND_FILE
-#  define DEFAULT_COMMAND_FILE          "@localstatedir@/centengine.cmd"
+#  define DEFAULT_COMMAND_FILE          "@RW_DIR@/centengine.cmd"
 # endif // !DEFAULT_COMMAND_FILE
 
 # ifndef DEFAULT_CONFIG_FILE
@@ -69,19 +69,19 @@
 # endif // !DEFAULT_CONFIG_FILE
 
 # ifndef DEFAULT_LOCK_FILE
-#  define DEFAULT_LOCK_FILE             "@localstatedir@/centengine.lock"
+#  define DEFAULT_LOCK_FILE             "@LOCK_FILE@"
 # endif // !DEFAULT_LOCK_FILE
 
 # ifndef DEFAULT_OBJECT_CACHE_FILE
-#  define DEFAULT_OBJECT_CACHE_FILE     "@localstatedir@/objects.cache"
+#  define DEFAULT_OBJECT_CACHE_FILE     "@vardir@/objects.cache"
 # endif // !DEFAULT_OBJECT_CACHE_FILE
 
 # ifndef DEFAULT_PRECACHED_OBJECT_FILE
-#  define DEFAULT_PRECACHED_OBJECT_FILE "@localstatedir@/objects.precache"
+#  define DEFAULT_PRECACHED_OBJECT_FILE "@vardir@/objects.precache"
 # endif // !DEFAULT_PRECACHED_OBJECT_FILE
 
 # ifndef DEFAULT_EVENT_BROKER_FILE
-#  define DEFAULT_EVENT_BROKER_FILE     "@localstatedir@/broker.socket"
+#  define DEFAULT_EVENT_BROKER_FILE     "@vardir@/broker.socket"
 # endif // !DEFAULT_EVENT_BROKER_FILE
 
 #endif /* !CCE_LOCATIONS_H */
