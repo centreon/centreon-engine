@@ -31,7 +31,7 @@
 #         historical purposes. This should be the first option specified in the
 #         config file!
 
-log_file=@localstatedir@/centengine.log
+log_file=@vardir@/centengine.log
 
 
 # var:    cfg_file
@@ -70,7 +70,7 @@ cfg_file=@confdir@/objects/localhost.cfg
 # brief: This option determines where object definitions are cached when
 #        Centreon Engine starts/restarts.
 
-object_cache_file=@localstatedir@/objects.cache
+object_cache_file=@vardir@/objects.cache
 
 
 # var:    precached_object_file
@@ -85,7 +85,7 @@ object_cache_file=@localstatedir@/objects.cache
 #         a large and/or complex configuration. Read the documentation section
 #         on optimizing Centreon Engine to find our more about how this feature works.
 
-precached_object_file=@localstatedir@/objects.precache
+precached_object_file=@vardir@/objects.precache
 
 
 # var:    resource_file
@@ -105,7 +105,7 @@ resource_file=@confdir@/resource.cfg
 #         is stored. The contents of the status file are deleted every time
 #         Centreon Engine restarts.
 
-status_file=@localstatedir@/status.dat
+status_file=@vardir@/status.dat
 
 
 # var:    status_update_interval
@@ -150,7 +150,7 @@ command_check_interval=-1
 #         on the file, as the file is deleted every time its contents are
 #         processed.
 
-command_file=@localstatedir@/rw/centengine.cmd
+command_file=@RW_DIR@/centengine.cmd
 
 
 # var:    external_command_buffer_slots
@@ -169,7 +169,7 @@ external_command_buffer_slots=4096
 #         is created, used, and deleted throughout the time that Centreon Engine
 #         is running.
 
-temp_file=@localstatedir@/nagios.tmp
+temp_file=@localstatedir@/tempfile
 
 
 # var:    event_broker_options
@@ -209,7 +209,7 @@ log_rotation_method=d
 # brief:  This is the directory where archived (rotated) log files should be
 #         placed (assuming you've chosen to do log rotation).
 
-log_archive_path=@localstatedir@/archives
+log_archive_path=@LOG_ARCHIVE_DIR@
 
 
 # var:    use_syslog
@@ -544,7 +544,7 @@ retain_state_information=1
 #         network when Centreon Engine is restarted. This file is used only if
 #         the retain_state_information variable is set to 1.
 
-state_retention_file=@localstatedir@/retention.dat
+state_retention_file=@vardir@/retention.dat
 
 
 # var:    retention_update_interval
@@ -1127,7 +1127,7 @@ debug_verbosity=1
 # brief:  This option determines where Centreon Engine should write debugging
 #         information.
 
-debug_file=@localstatedir@/nagios.debug
+debug_file=@vardir@/centengine.debug
 
 
 # var:    max_debug_file_size
@@ -1138,5 +1138,3 @@ debug_file=@localstatedir@/nagios.debug
 #         doesn't get out of control when debugging Centreon Engine.
 
 max_debug_file_size=1000000
-
-
