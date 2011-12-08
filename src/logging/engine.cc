@@ -105,7 +105,7 @@ void engine::log(char const* message,
  */
 unsigned long engine::add_object(obj_info& info) {
   _rwlock.lockForWrite();
-  info._id = _id++;
+  info._id = ++_id;
   _objects.push_back(info);
   for (unsigned int i = 0, end = info.verbosity(); i <= end; ++i)
     _type[i] |= info.type();
