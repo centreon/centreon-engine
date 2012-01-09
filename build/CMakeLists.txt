@@ -448,11 +448,16 @@ else ()
   set(incdir "${localstatedir}/include/centreon-engine")
 endif ()
 
-# incdir
-if (WITH_PKGCONFIG_DIR)
-  set(pkgconfigdir "${WITH_PKGCONFIG_DIR}")
+# pkg-config dir.
+option(WITH_PKGCONFIG_SCRIPT "Generate and install pkg-config script." ON)
+if (WITH_PKGCONFIG_SCRIPT)
+  if (WITH_PKGCONFIG_DIR)
+    set(pkgconfigdir "${WITH_PKGCONFIG_DIR}")
+  else ()
+    set(pkgconfigdir "/usr/lib/pkgconfig")
+  endif ()
 else ()
-  set(pkgconfigdir "/usr/lib/pkgconfig")
+  set(pkgconfigdir "Not installed")
 endif ()
 
 # Check result dir.
@@ -799,9 +804,11 @@ install(DIRECTORY "${INCLUDE_DIR}/"
   PATTERN "${INCLUDE_DIR}/compatibility/" EXCLUDE)
 
 # Install pkg-config files.
-install(FILES "${SCRIPT_DIR}/centengine.pc"
-  DESTINATION "${pkgconfigdir}"
-  COMPONENT "runtime")
+if (WITH_PKGCONFIG_SCRIPT)
+  install(FILES "${SCRIPT_DIR}/centengine.pc"
+    DESTINATION "${pkgconfigdir}"
+    COMPONENT "runtime")
+endif ()
 
 #
 # Error tests.

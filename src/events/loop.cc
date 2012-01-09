@@ -357,8 +357,9 @@ void loop::_dispatching() {
   }
 
   int sec = static_cast<int>(config.get_sleep_time());
-  int delay = sec * 1000 + static_cast<int>(config.get_sleep_time()
-                                            - static_cast<float>(sec)) * 1000;
+  int delay
+    = sec * 1000
+      + static_cast<int>((config.get_sleep_time() - sec) * 1000);
   QTimer::singleShot(delay, this, SLOT(_dispatching()));
 }
 
