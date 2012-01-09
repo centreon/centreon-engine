@@ -39,15 +39,18 @@ using namespace com::centreon::engine::commands;
 /**
  *  Default constructor.
  *
- *  @param[in] name         The command name.
- *  @param[in] command_line The command line.
- *  @param[in] process_name The deamon process name.
+ *  @param[in] connector_name The command name.
+ *  @param[in] connector_line The deamon process name.
+ *  @param[in] command_name   The command name.
+ *  @param[in] command_line   The command line.
  */
-connector::command::command(QString const& name,
-			    QString const& command_line,
-			    QString const& process_command)
-  : commands::command(name, command_line),
-    _process_command(process_command),
+connector::command::command(QString const& connector_name,
+			    QString const& connector_line,
+                            QString const& command_name,
+			    QString const& command_line)
+  : commands::command(command_name, command_line),
+    _connector_name(connector_name),
+    _connector_line(connector_line),
     _max_check_for_restart(DEFAULT_MAX_CHECK),
     _nbr_check(0),
     _is_good_version(false),
@@ -89,7 +92,8 @@ connector::command& connector::command::operator=(connector::command const& righ
   if (this != &right) {
     _exit();
     commands::command::operator=(right);
-    _process_command = right._process_command;
+    _connector_name = right._connector_name;
+    _connector_line = right._connector_line;
     _req_func = right._req_func;
     _max_check_for_restart = right._max_check_for_restart;
     _nbr_check = right._nbr_check;
@@ -229,12 +233,21 @@ void connector::command::run(QString const& processed_cmd,
 }
 
 /**
- * Get the connector process.
+ * Get the connector name.
  *
- *  @return The connector process.
+ *  @return The connector name.
  */
-QString const& connector::command::get_process() const throw() {
-  return (_process_command);
+QString const& connector::command::get_connector_name() const throw() {
+  return (_connector_name);
+}
+
+/**
+ * Get the connector line.
+ *
+ *  @return The connector line.
+ */
+QString const& connector::command::get_connector_line() const throw() {
+  return (_connector_line);
 }
 
 /**
@@ -292,13 +305,16 @@ void connector::command::_timeout() {
     break;
   }
 
-  for (QHash<unsigned long, request_info>::const_iterator it = _queries.begin(), end = _queries.end();
+  for (QHash<unsigned long, request_info>::const_iterator it
+         = _queries.begin(), end = _queries.end();
        it != end;
        ++it) {
     if (it->timeout > 0) {
       unsigned int diff_time = now.toTime_t() - it->start_time.toTime_t();
       _active_timer = true;
-      QTimer::singleShot(diff_time > 0 ? diff_time : 1, this, SLOT(_timeout()));
+      QTimer::singleShot(diff_time > 0 ? diff_time : 1,
+                         this,
+                         SLOT(_timeout()));
       break;
     }
   }
@@ -347,7 +363,8 @@ void connector::command::_ready_read() {
   }
 
   request_builder& req_builder = request_builder::instance();
-  for (QList<QByteArray>::const_iterator it = responses.begin(), end = responses.end();
+  for (QList<QByteArray>::const_iterator it = responses.begin(),
+         end = responses.end();
        it != end;
        ++it) {
     try {
@@ -382,12 +399,13 @@ void connector::command::_start() {
     disconnect(&(*_process), SIGNAL(stateChanged(QProcess::ProcessState)),
   	       this, SLOT(_state_change(QProcess::ProcessState)));
   }
-  _process = QSharedPointer<basic_process>(new basic_process, &QObject::deleteLater);
+  _process = QSharedPointer<basic_process>(new basic_process,
+                                           &QObject::deleteLater);
   connect(&(*_process), SIGNAL(readyReadStandardOutput()),
 	  this, SLOT(_ready_read()));
 
   _process->closeReadChannel(QProcess::StandardError);
-  _process->start(_process_command);
+  _process->start(_connector_line);
   if (_process->waitForStarted(-1) == false) {
     throw (engine_error() << _process->errorString());
   }
@@ -409,7 +427,8 @@ void connector::command::_start() {
     throw (engine_error() << "bad process version.");
   }
 
-  for (QHash<unsigned long, request_info>::iterator it = _queries.begin(), end = _queries.end();
+  for (QHash<unsigned long, request_info>::iterator it = _queries.begin(),
+         end = _queries.end();
        it != end;
        ++it)
     _process->write(it->req->build());
@@ -572,17 +591,17 @@ void connector::command::_req_error_r(request* req) {
   switch (response->get_code()) {
   case error_response::info:
     logger(log_info_message, basic)
-      << "connector \"" << _name << "\" " << response->get_message();
+      << "connector \"" << _connector_name << "\" " << response->get_message();
     break;
 
   case error_response::warning:
     logger(log_runtime_warning, basic)
-      << "connector \"" << _name << "\" " << response->get_message();
+      << "connector \"" << _connector_name << "\" " << response->get_message();
     break;
 
   case error_response::error:
     logger(log_runtime_error, basic)
-      << "connector \"" << _name << "\" " << response->get_message();
+      << "connector \"" << _connector_name << "\" " << response->get_message();
     _exit();
     break;
   }

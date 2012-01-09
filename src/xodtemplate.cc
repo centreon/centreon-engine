@@ -9660,8 +9660,9 @@ int xodtemplate_register_command(xodtemplate_command* this_command) {
       return (ERROR);
     }
     QSharedPointer<commands::command> cmd_set(new commands::connector::command(connector->connector_name,
-									       this_command->command_line,
-									       connector->connector_line));
+                                                                               connector->connector_line,
+                                                                               this_command->command_name,
+                                                                               this_command->command_line));
     commands::set::instance().add_command(cmd_set);
   }
 

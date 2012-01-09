@@ -40,8 +40,10 @@ static bool restart_with_segfault() {
   QString command_line = "./bin_connector_test_run --kill="
     + QString("%1").arg(QDateTime::currentDateTime().toTime_t());
   connector::command cmd(__func__,
-			 command_line,
-			 "./bin_connector_test_run");
+			 "./bin_connector_test_run",
+                         __func__,
+			 command_line);
+
   wait_process wait_proc(cmd);
 
   unsigned long id = cmd.run(cmd.get_command_line(), macros, 0);
@@ -67,8 +69,9 @@ static bool restart_with_segfault() {
 static bool restart_with_execution_limit() {
   nagios_macros macros = nagios_macros();
   connector::command cmd(__func__,
-        		 "./bin_connector_test_run --timeout=off",
-        		 "./bin_connector_test_run");
+        		 "./bin_connector_test_run",
+                         __func__,
+        		 "./bin_connector_test_run --timeout=off");
 
   cmd.set_max_check_for_restart(2);
   wait_process wait_proc(cmd);

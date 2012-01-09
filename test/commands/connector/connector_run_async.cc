@@ -37,8 +37,10 @@ using namespace com::centreon::engine::commands;
 static bool run_without_timeout() {
   nagios_macros macros = nagios_macros();
   connector::command cmd(__func__,
-			 "./bin_connector_test_run --timeout=off",
-			 "./bin_connector_test_run");
+			 "./bin_connector_test_run",
+                         __func__,
+			 "./bin_connector_test_run --timeout=off");
+
   wait_process wait_proc(cmd);
 
   unsigned long id = cmd.run(cmd.get_command_line(), macros, 0);
@@ -64,8 +66,10 @@ static bool run_without_timeout() {
 static bool run_with_timeout() {
   nagios_macros macros = nagios_macros();
   connector::command cmd(__func__,
-			 "./bin_connector_test_run --timeout=on",
-			 "./bin_connector_test_run");
+			 "./bin_connector_test_run",
+                         __func__,
+			 "./bin_connector_test_run --timeout=on");
+
   wait_process wait_proc(cmd);
 
   unsigned long id = cmd.run(cmd.get_command_line(), macros, 1);

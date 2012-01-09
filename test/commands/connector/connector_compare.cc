@@ -27,15 +27,16 @@
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::commands;
 
-#define CMD_NAME    "command_name"
-#define CMD_LINE    "command_name arg1 arg2"
-#define CMD_PROCESS "./bin_connector_test_run"
+#define CMD_NAME       "command_name"
+#define CMD_LINE       "command_name arg1 arg2"
+#define CONNECTOR_NAME "connector_test"
+#define CONNECTOR_LINE "./bin_connector_test_run"
 
 /**
  * Check comparison operator.
  */
 int main_test() {
-  connector::command cmd(CMD_NAME, CMD_LINE, CMD_PROCESS);
+  connector::command cmd(CONNECTOR_NAME, CONNECTOR_LINE, CMD_NAME, CMD_LINE);
   if (!(cmd == cmd))
     throw (engine_error() << "error: operator== failed.");
 

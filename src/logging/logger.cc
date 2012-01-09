@@ -41,8 +41,8 @@ logger::redirector const logger::_redir_nothing = {
   &logger::_nothing<unsigned long long>,
   &logger::_nothing<double>,
   &logger::_nothing<e_flags>,
-  &logger::_builder<s_setprecision const&>,
-  &logger::_builder<void const*>,
+  &logger::_nothing<s_setprecision const&>,
+  &logger::_nothing<void const*>,
   &logger::_nothing,
   &logger::_nothing
 };

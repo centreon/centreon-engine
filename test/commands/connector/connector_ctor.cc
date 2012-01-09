@@ -27,18 +27,20 @@
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::commands;
 
-#define CMD_NAME    "command_name"
-#define CMD_LINE    "command_name arg1 arg2"
-#define CMD_PROCESS "./bin_connector_test_run"
+#define CMD_NAME       "command_name"
+#define CMD_LINE       "command_name arg1 arg2"
+#define CONNECTOR_NAME "connector_test"
+#define CONNECTOR_LINE "./bin_connector_test_run"
 
 /**
  *  Check constructor and copy object.
  */
 int main_test() {
-  connector::command cmd1(CMD_NAME, CMD_LINE, CMD_PROCESS);
+  connector::command cmd1(CONNECTOR_NAME, CONNECTOR_LINE, CMD_NAME, CMD_LINE);
   if (cmd1.get_name() != CMD_NAME
+      || cmd1.get_connector_name() != CONNECTOR_NAME
       || cmd1.get_command_line() != CMD_LINE
-      || cmd1.get_process() != CMD_PROCESS)
+      || cmd1.get_connector_line() != CONNECTOR_LINE)
     throw (engine_error() << "error: Constructor failed.");
 
   connector::command cmd2(cmd1);

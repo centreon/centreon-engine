@@ -44,9 +44,10 @@ namespace                              com {
 	  class                        command : public commands::command {
 	    Q_OBJECT
 	  public:
-	                               command(QString const& name,
-					       QString const& command_line,
-					       QString const& process_command);
+	                               command(QString const& connector_name,
+                                               QString const& connector_line,
+                                               QString const& command_name,
+					       QString const& command_line);
 	                               command(command const& right);
 	                               ~command() throw();
 
@@ -63,7 +64,8 @@ namespace                              com {
 					   unsigned int timeout,
 					   result& res);
 
-	    QString const&             get_process() const throw();
+	    QString const&             get_connector_name() const throw();
+	    QString const&             get_connector_line() const throw();
 
 	    unsigned long              get_max_check_for_restart() throw();
 	    void                       set_max_check_for_restart(unsigned long value) throw();
@@ -95,7 +97,8 @@ namespace                              com {
 
 	    QByteArray                 _read_data;
 	    QMutex                     _mutex;
-	    QString                    _process_command;
+	    QString                    _connector_name;
+	    QString                    _connector_line;
 	    QSharedPointer<basic_process>
                                        _process;
 	    QHash<unsigned long, request_info>
