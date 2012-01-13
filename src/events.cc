@@ -1205,6 +1205,8 @@ void add_event(timed_event* event,
 		     NEBATTR_NONE,
 		     event,
                      NULL);
+
+  quick_timed_event.insert(event);
 }
 
 /* remove an event from the queue */
@@ -1224,6 +1226,8 @@ void remove_event(timed_event* event,
 
   if (*event_list == NULL || event == NULL)
     return;
+
+  quick_timed_event.erase(event);
 
   if (*event_list == event) {
     event->prev = NULL;

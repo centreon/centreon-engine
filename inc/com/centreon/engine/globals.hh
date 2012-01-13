@@ -31,6 +31,7 @@
 # include "downtime.hh"
 # include "engine.hh"
 # include "events.hh"
+# include "hash_timed_event.hh"
 # include "nebmods.hh"
 # include "notifications.hh"
 # include "objects.hh"
@@ -48,6 +49,8 @@ extern command*                  ochp_command_ptr;
 
 extern unsigned long             logging_options;
 extern unsigned long             syslog_options;
+
+extern com::centreon::engine::hash_timed_event quick_timed_event;
 
 extern time_t                    last_command_check;
 extern time_t                    last_command_status_update;

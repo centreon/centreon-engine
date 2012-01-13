@@ -1168,18 +1168,11 @@ void schedule_service_check(service* svc, time_t check_time, int options) {
   use_original_event = FALSE;
   found = FALSE;
 
-#ifdef PERFORMANCE_INCREASE_BUT_VERY_BAD_IDEA_INDEED
-  /* WARNING! 1/19/07 on-demand async service checks will end up causing mutliple scheduled checks of a service to appear in the queue if the code below is skipped */
-  /* if(use_large_installation_tweaks==FALSE)... skip code below */
-#endif
-
-  /* see if there are any other scheduled checks of this service in the queue */
-  for (temp_event = event_list_low; temp_event != NULL; temp_event = temp_event->next) {
-    if (temp_event->event_type == EVENT_SERVICE_CHECK
-        && svc == (service*)temp_event->event_data) {
+  if ((temp_event = quick_timed_event.find(svc))) {
+    if (temp_event->event_type == EVENT_SERVICE_CHECK)
       found = TRUE;
-      break;
-    }
+    else
+      temp_event = NULL;
   }
 
   /* we found another service check event for this service in the queue - what should we do? */
