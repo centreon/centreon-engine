@@ -121,7 +121,6 @@ int main_test() {
 
   if (run_with_environement_macros() == false)
     throw (engine_error() << "error: raw::run with macros failed.");
-
   return (0);
 }
 

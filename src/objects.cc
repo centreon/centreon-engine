@@ -112,12 +112,9 @@ int skiplist_compare_text(const char* val1a,
   return (result);
 }
 
-int skiplist_compare_host(void* a, void* b) {
-  host* oa = NULL;
-  host* ob = NULL;
-
-  oa = (host*)a;
-  ob = (host*)b;
+int skiplist_compare_host(void const* a, void const* b) {
+  host const* oa = static_cast<host const*>(a);
+  host const* ob = static_cast<host const*>(b);
 
   if (oa == NULL && ob == NULL)
     return (0);
@@ -129,12 +126,9 @@ int skiplist_compare_host(void* a, void* b) {
   return (skiplist_compare_text(oa->name, NULL, ob->name, NULL));
 }
 
-int skiplist_compare_service(void* a, void* b) {
-  service* oa = NULL;
-  service* ob = NULL;
-
-  oa = (service*)a;
-  ob = (service*)b;
+int skiplist_compare_service(void const* a, void const* b) {
+  service const* oa = static_cast<service const*>(a);
+  service const* ob = static_cast<service const*>(b);
 
   if (oa == NULL && ob == NULL)
     return (0);
@@ -149,12 +143,9 @@ int skiplist_compare_service(void* a, void* b) {
 				ob->description));
 }
 
-int skiplist_compare_command(void* a, void* b) {
-  command* oa = NULL;
-  command* ob = NULL;
-
-  oa = (command*)a;
-  ob = (command*)b;
+int skiplist_compare_command(void const* a, void const* b) {
+  command const* oa = static_cast<command const*>(a);
+  command const* ob = static_cast<command const*>(b);
 
   if (oa == NULL && ob == NULL)
     return (0);
@@ -166,12 +157,9 @@ int skiplist_compare_command(void* a, void* b) {
   return (skiplist_compare_text(oa->name, NULL, ob->name, NULL));
 }
 
-int skiplist_compare_timeperiod(void* a, void* b) {
-  timeperiod* oa = NULL;
-  timeperiod* ob = NULL;
-
-  oa = (timeperiod*)a;
-  ob = (timeperiod*)b;
+int skiplist_compare_timeperiod(void const* a, void const* b) {
+  timeperiod const* oa = static_cast<timeperiod const*>(a);
+  timeperiod const* ob = static_cast<timeperiod const*>(b);
 
   if (oa == NULL && ob == NULL)
     return (0);
@@ -183,12 +171,9 @@ int skiplist_compare_timeperiod(void* a, void* b) {
   return (skiplist_compare_text(oa->name, NULL, ob->name, NULL));
 }
 
-int skiplist_compare_contact(void* a, void* b) {
-  contact* oa = NULL;
-  contact* ob = NULL;
-
-  oa = (contact*)a;
-  ob = (contact*)b;
+int skiplist_compare_contact(void const* a, void const* b) {
+  contact const* oa = static_cast<contact const*>(a);
+  contact const* ob = static_cast<contact const*>(b);
 
   if (oa == NULL && ob == NULL)
     return (0);
@@ -200,12 +185,9 @@ int skiplist_compare_contact(void* a, void* b) {
   return (skiplist_compare_text(oa->name, NULL, ob->name, NULL));
 }
 
-int skiplist_compare_contactgroup(void* a, void* b) {
-  contactgroup* oa = NULL;
-  contactgroup* ob = NULL;
-
-  oa = (contactgroup*)a;
-  ob = (contactgroup*)b;
+int skiplist_compare_contactgroup(void const* a, void const* b) {
+  contactgroup const* oa = static_cast<contactgroup const*>(a);
+  contactgroup const* ob = static_cast<contactgroup const*>(b);
 
   if (oa == NULL && ob == NULL)
     return (0);
@@ -217,12 +199,9 @@ int skiplist_compare_contactgroup(void* a, void* b) {
   return (skiplist_compare_text(oa->group_name, NULL, ob->group_name, NULL));
 }
 
-int skiplist_compare_hostgroup(void* a, void* b) {
-  hostgroup* oa = NULL;
-  hostgroup* ob = NULL;
-
-  oa = (hostgroup*)a;
-  ob = (hostgroup*)b;
+int skiplist_compare_hostgroup(void const* a, void const* b) {
+  hostgroup const* oa = static_cast<hostgroup const*>(a);
+  hostgroup const* ob = static_cast<hostgroup const*>(b);
 
   if (oa == NULL && ob == NULL)
     return (0);
@@ -234,12 +213,9 @@ int skiplist_compare_hostgroup(void* a, void* b) {
   return (skiplist_compare_text(oa->group_name, NULL, ob->group_name, NULL));
 }
 
-int skiplist_compare_servicegroup(void* a, void* b) {
-  servicegroup* oa = NULL;
-  servicegroup* ob = NULL;
-
-  oa = (servicegroup*)a;
-  ob = (servicegroup*)b;
+int skiplist_compare_servicegroup(void const* a, void const* b) {
+  servicegroup const* oa = static_cast<servicegroup const*>(a);
+  servicegroup const* ob = static_cast<servicegroup const*>(b);
 
   if (oa == NULL && ob == NULL)
     return (0);
@@ -251,12 +227,9 @@ int skiplist_compare_servicegroup(void* a, void* b) {
   return (skiplist_compare_text(oa->group_name, NULL, ob->group_name, NULL));
 }
 
-int skiplist_compare_hostescalation(void* a, void* b) {
-  hostescalation* oa = NULL;
-  hostescalation* ob = NULL;
-
-  oa = (hostescalation*)a;
-  ob = (hostescalation*)b;
+int skiplist_compare_hostescalation(void const* a, void const* b) {
+  hostescalation const* oa = static_cast<hostescalation const*>(a);
+  hostescalation const* ob = static_cast<hostescalation const*>(b);
 
   if (oa == NULL && ob == NULL)
     return (0);
@@ -268,12 +241,9 @@ int skiplist_compare_hostescalation(void* a, void* b) {
   return (skiplist_compare_text(oa->host_name, NULL, ob->host_name, NULL));
 }
 
-int skiplist_compare_serviceescalation(void* a, void* b) {
-  serviceescalation* oa = NULL;
-  serviceescalation* ob = NULL;
-
-  oa = (serviceescalation*)a;
-  ob = (serviceescalation*)b;
+int skiplist_compare_serviceescalation(void const* a, void const* b) {
+  serviceescalation const* oa = static_cast<serviceescalation const*>(a);
+  serviceescalation const* ob = static_cast<serviceescalation const*>(b);
 
   if (oa == NULL && ob == NULL)
     return (0);
@@ -289,12 +259,9 @@ int skiplist_compare_serviceescalation(void* a, void* b) {
 }
 
 
-int skiplist_compare_hostdependency(void* a, void* b) {
-  hostdependency* oa = NULL;
-  hostdependency* ob = NULL;
-
-  oa = (hostdependency*)a;
-  ob = (hostdependency*)b;
+int skiplist_compare_hostdependency(void const* a, void const* b) {
+  hostdependency const* oa = static_cast<hostdependency const*>(a);
+  hostdependency const* ob = static_cast<hostdependency const*>(b);
 
   if (oa == NULL && ob == NULL)
     return (0);
@@ -309,12 +276,9 @@ int skiplist_compare_hostdependency(void* a, void* b) {
 				NULL));
 }
 
-int skiplist_compare_servicedependency(void* a, void* b) {
-  servicedependency* oa = NULL;
-  servicedependency* ob = NULL;
-
-  oa = (servicedependency*)a;
-  ob = (servicedependency*)b;
+int skiplist_compare_servicedependency(void const* a, void const* b) {
+  servicedependency const* oa = static_cast<servicedependency const*>(a);
+  servicedependency const* ob = static_cast<servicedependency const*>(b);
 
   if (oa == NULL && ob == NULL)
     return (0);
@@ -548,30 +512,61 @@ timerange* add_timerange_to_daterange(daterange* drange,
 }
 
 /* add a new host definition */
-host* add_host(char const* name, char const* display_name, char const* alias,
-               char const* address, char const* check_period, int initial_state,
-               double check_interval, double retry_interval,
-               int max_attempts, int notify_up, int notify_down,
-               int notify_unreachable, int notify_flapping,
-               int notify_downtime, double notification_interval,
+host* add_host(char const* name,
+	       char const* display_name,
+	       char const* alias,
+               char const* address,
+	       char const* check_period,
+	       int initial_state,
+               double check_interval,
+	       double retry_interval,
+               int max_attempts,
+	       int notify_up,
+	       int notify_down,
+               int notify_unreachable,
+	       int notify_flapping,
+               int notify_downtime,
+	       double notification_interval,
                double first_notification_delay,
-               char const* notification_period, int notifications_enabled,
-               char const* check_command, int checks_enabled,
-               int accept_passive_checks, char const* event_handler,
-               int event_handler_enabled, int flap_detection_enabled,
-               double low_flap_threshold, double high_flap_threshold,
-               int flap_detection_on_up, int flap_detection_on_down,
-               int flap_detection_on_unreachable, int stalk_on_up,
-               int stalk_on_down, int stalk_on_unreachable,
-               int process_perfdata, int failure_prediction_enabled,
-               char const* failure_prediction_options, int check_freshness,
-               int freshness_threshold, char const* notes, char const* notes_url,
-               char const* action_url, char const* icon_image, char const* icon_image_alt,
-               char const* vrml_image, char const* statusmap_image, int x_2d,
-               int y_2d, int have_2d_coords, double x_3d, double y_3d,
-               double z_3d, int have_3d_coords, int should_be_drawn,
+               char const* notification_period,
+	       int notifications_enabled,
+               char const* check_command,
+	       int checks_enabled,
+               int accept_passive_checks,
+	       char const* event_handler,
+               int event_handler_enabled,
+	       int flap_detection_enabled,
+               double low_flap_threshold,
+	       double high_flap_threshold,
+               int flap_detection_on_up,
+	       int flap_detection_on_down,
+               int flap_detection_on_unreachable,
+	       int stalk_on_up,
+               int stalk_on_down,
+	       int stalk_on_unreachable,
+               int process_perfdata,
+	       int failure_prediction_enabled,
+               char const* failure_prediction_options,
+	       int check_freshness,
+               int freshness_threshold,
+	       char const* notes,
+	       char const* notes_url,
+               char const* action_url,
+	       char const* icon_image,
+	       char const* icon_image_alt,
+               char const* vrml_image,
+	       char const* statusmap_image,
+	       int x_2d,
+               int y_2d,
+	       int have_2d_coords,
+	       double x_3d,
+	       double y_3d,
+               double z_3d,
+	       int have_3d_coords,
+	       int should_be_drawn,
                int retain_status_information,
-               int retain_nonstatus_information, int obsess_over_host) {
+               int retain_nonstatus_information,
+	       int obsess_over_host) {
   host* new_host = NULL;
   int result = OK;
   unsigned int x = 0;
@@ -1154,16 +1149,24 @@ servicesmember* add_service_to_servicegroup(servicegroup* temp_servicegroup,
 }
 
 /* add a new contact to the list in memory */
-contact* add_contact(char const* name, char const* alias, char const* email, char const* pager,
-                     char** addresses, char const* svc_notification_period,
+contact* add_contact(char const* name,
+		     char const* alias,
+		     char const* email,
+		     char const* pager,
+                     char const* const* addresses,
+		     char const* svc_notification_period,
                      char const* host_notification_period,
-                     int notify_service_ok, int notify_service_critical,
+                     int notify_service_ok,
+		     int notify_service_critical,
                      int notify_service_warning,
                      int notify_service_unknown,
                      int notify_service_flapping,
-                     int notify_service_downtime, int notify_host_up,
-                     int notify_host_down, int notify_host_unreachable,
-                     int notify_host_flapping, int notify_host_downtime,
+                     int notify_service_downtime,
+		     int notify_host_up,
+                     int notify_host_down,
+		     int notify_host_unreachable,
+                     int notify_host_flapping,
+		     int notify_host_downtime,
                      int host_notifications_enabled,
                      int service_notifications_enabled,
                      int can_submit_commands,
@@ -1277,7 +1280,7 @@ contact* add_contact(char const* name, char const* alias, char const* email, cha
 }
 
 /* adds a host notification command to a contact definition */
-commandsmember* add_host_notification_command_to_contact(contact*  cntct, char const* command_name) {
+commandsmember* add_host_notification_command_to_contact(contact* cntct, char const* command_name) {
   commandsmember* new_commandsmember = NULL;
 
   /* make sure we have the data we need */
@@ -1419,33 +1422,52 @@ contactsmember* add_contact_to_contactgroup(contactgroup* grp, char const* conta
 }
 
 /* add a new service to the list in memory */
-service* add_service(char const* host_name, char const* description,
-                     char const* display_name, char const* check_period,
-                     int initial_state, int max_attempts,
-                     int parallelize, int accept_passive_checks,
-                     double check_interval, double retry_interval,
+service* add_service(char const* host_name,
+		     char const* description,
+                     char const* display_name,
+		     char const* check_period,
+                     int initial_state,
+		     int max_attempts,
+                     int parallelize,
+		     int accept_passive_checks,
+                     double check_interval,
+		     double retry_interval,
                      double notification_interval,
                      double first_notification_delay,
-                     char const* notification_period, int notify_recovery,
-                     int notify_unknown, int notify_warning,
-                     int notify_critical, int notify_flapping,
-                     int notify_downtime, int notifications_enabled,
-                     int is_volatile, char const* event_handler,
-                     int event_handler_enabled, char const* check_command,
-                     int checks_enabled, int flap_detection_enabled,
+                     char const* notification_period,
+		     int notify_recovery,
+                     int notify_unknown,
+		     int notify_warning,
+                     int notify_critical,
+		     int notify_flapping,
+                     int notify_downtime,
+		     int notifications_enabled,
+                     int is_volatile,
+		     char const* event_handler,
+                     int event_handler_enabled,
+		     char const* check_command,
+                     int checks_enabled,
+		     int flap_detection_enabled,
                      double low_flap_threshold,
                      double high_flap_threshold,
                      int flap_detection_on_ok,
                      int flap_detection_on_warning,
                      int flap_detection_on_unknown,
-                     int flap_detection_on_critical, int stalk_on_ok,
-                     int stalk_on_warning, int stalk_on_unknown,
-                     int stalk_on_critical, int process_perfdata,
+                     int flap_detection_on_critical,
+		     int stalk_on_ok,
+                     int stalk_on_warning,
+		     int stalk_on_unknown,
+                     int stalk_on_critical,
+		     int process_perfdata,
                      int failure_prediction_enabled,
                      char const* failure_prediction_options,
-                     int check_freshness, int freshness_threshold,
-                     char const* notes, char const* notes_url, char const* action_url,
-                     char const* icon_image, char const* icon_image_alt,
+                     int check_freshness,
+		     int freshness_threshold,
+                     char const* notes,
+		     char const* notes_url,
+		     char const* action_url,
+                     char const* icon_image,
+		     char const* icon_image_alt,
                      int retain_status_information,
                      int retain_nonstatus_information,
                      int obsess_over_service) {
@@ -1631,6 +1653,7 @@ service* add_service(char const* host_name, char const* description,
     delete[] new_service->notification_period;
     delete[] new_service->event_handler;
     delete[] new_service->service_check_command;
+    delete[] new_service->display_name;
     delete[] new_service->description;
     delete[] new_service->host_name;
     delete new_service;
@@ -1750,12 +1773,12 @@ command* add_command(char const* name, char const* value) {
 }
 
 /* add a new service escalation to the list in memory */
-serviceescalation* add_serviceescalation(char* host_name,
-                                         char* description,
+serviceescalation* add_serviceescalation(char const* host_name,
+                                         char const* description,
                                          int first_notification,
                                          int last_notification,
                                          double notification_interval,
-                                         char* escalation_period,
+                                         char const* escalation_period,
                                          int escalate_on_warning,
                                          int escalate_on_unknown,
                                          int escalate_on_critical,
@@ -2320,109 +2343,109 @@ service* find_service(char const* host_name, char const* svc_desc) {
 /******************* OBJECT TRAVERSAL FUNCTIONS *******************/
 /******************************************************************/
 
-hostescalation* get_first_hostescalation_by_host(char* host_name, void** ptr) {
+hostescalation* get_first_hostescalation_by_host(char const* host_name, void** ptr) {
   hostescalation temp_hostescalation;
 
   if (host_name == NULL)
     return (NULL);
 
-  temp_hostescalation.host_name = host_name;
+  temp_hostescalation.host_name = const_cast<char*>(host_name);
   return ((hostescalation*)skiplist_find_first(object_skiplists[HOSTESCALATION_SKIPLIST],
 					       &temp_hostescalation,
 					       ptr));
 }
 
-hostescalation* get_next_hostescalation_by_host(char* host_name, void** ptr) {
+hostescalation* get_next_hostescalation_by_host(char const* host_name, void** ptr) {
   hostescalation temp_hostescalation;
 
   if (host_name == NULL)
     return (NULL);
 
-  temp_hostescalation.host_name = host_name;
+  temp_hostescalation.host_name = const_cast<char*>(host_name);
   return ((hostescalation*)skiplist_find_next(object_skiplists[HOSTESCALATION_SKIPLIST],
 					      &temp_hostescalation,
 					      ptr));
 }
 
-serviceescalation* get_first_serviceescalation_by_service(char* host_name,
-                                                          char* svc_description,
+serviceescalation* get_first_serviceescalation_by_service(char const* host_name,
+                                                          char const* svc_description,
                                                           void** ptr) {
   serviceescalation temp_serviceescalation;
 
   if (host_name == NULL || svc_description == NULL)
     return (NULL);
 
-  temp_serviceescalation.host_name = host_name;
-  temp_serviceescalation.description = svc_description;
+  temp_serviceescalation.host_name = const_cast<char*>(host_name);
+  temp_serviceescalation.description = const_cast<char*>(svc_description);
   return ((serviceescalation*)skiplist_find_first(object_skiplists[SERVICEESCALATION_SKIPLIST],
 						  &temp_serviceescalation,
 						  ptr));
 }
 
-serviceescalation* get_next_serviceescalation_by_service(char* host_name,
-                                                         char* svc_description,
+serviceescalation* get_next_serviceescalation_by_service(char const* host_name,
+                                                         char const* svc_description,
                                                          void** ptr) {
   serviceescalation temp_serviceescalation;
 
   if (host_name == NULL || svc_description == NULL)
     return (NULL);
 
-  temp_serviceescalation.host_name = host_name;
-  temp_serviceescalation.description = svc_description;
+  temp_serviceescalation.host_name = const_cast<char*>(host_name);
+  temp_serviceescalation.description = const_cast<char*>(svc_description);
   return ((serviceescalation*)skiplist_find_next(object_skiplists[SERVICEESCALATION_SKIPLIST],
 						 &temp_serviceescalation,
 						 ptr));
 }
 
-hostdependency* get_first_hostdependency_by_dependent_host(char* host_name, void** ptr) {
+hostdependency* get_first_hostdependency_by_dependent_host(char const* host_name, void** ptr) {
   hostdependency temp_hostdependency;
 
   if (host_name == NULL)
     return (NULL);
 
-  temp_hostdependency.dependent_host_name = host_name;
+  temp_hostdependency.dependent_host_name = const_cast<char*>(host_name);
   return ((hostdependency*)skiplist_find_first(object_skiplists[HOSTDEPENDENCY_SKIPLIST],
 					       &temp_hostdependency,
 					       ptr));
 }
 
-hostdependency* get_next_hostdependency_by_dependent_host(char* host_name, void** ptr) {
+hostdependency* get_next_hostdependency_by_dependent_host(char const* host_name, void** ptr) {
   hostdependency temp_hostdependency;
 
   if (host_name == NULL || ptr == NULL)
     return (NULL);
 
-  temp_hostdependency.dependent_host_name = host_name;
+  temp_hostdependency.dependent_host_name = const_cast<char*>(host_name);
   return ((hostdependency*)skiplist_find_next(object_skiplists[HOSTDEPENDENCY_SKIPLIST],
 					      &temp_hostdependency,
 					      ptr));
 }
 
-servicedependency* get_first_servicedependency_by_dependent_service(char* host_name,
-                                                                    char* svc_description,
+servicedependency* get_first_servicedependency_by_dependent_service(char const* host_name,
+                                                                    char const* svc_description,
                                                                     void** ptr) {
   servicedependency temp_servicedependency;
 
   if (host_name == NULL || svc_description == NULL)
     return (NULL);
 
-  temp_servicedependency.dependent_host_name = host_name;
-  temp_servicedependency.dependent_service_description = svc_description;
+  temp_servicedependency.dependent_host_name = const_cast<char*>(host_name);
+  temp_servicedependency.dependent_service_description = const_cast<char*>(svc_description);
   return ((servicedependency*)skiplist_find_first(object_skiplists[SERVICEDEPENDENCY_SKIPLIST],
 						  &temp_servicedependency,
 						  ptr));
 }
 
-servicedependency* get_next_servicedependency_by_dependent_service(char* host_name,
-                                                                   char* svc_description,
+servicedependency* get_next_servicedependency_by_dependent_service(char const* host_name,
+                                                                   char const* svc_description,
                                                                    void** ptr) {
   servicedependency temp_servicedependency;
 
   if (host_name == NULL || svc_description == NULL || ptr == NULL)
     return (NULL);
 
-  temp_servicedependency.dependent_host_name = host_name;
-  temp_servicedependency.dependent_service_description = svc_description;
+  temp_servicedependency.dependent_host_name = const_cast<char*>(host_name);
+  temp_servicedependency.dependent_service_description = const_cast<char*>(svc_description);
   return ((servicedependency*)skiplist_find_next(object_skiplists[SERVICEDEPENDENCY_SKIPLIST],
 						 &temp_servicedependency,
 						 ptr));
@@ -2455,6 +2478,24 @@ int add_object_to_objectlist(objectlist** list, void* object_ptr) {
   *list = new_item;
 
   return (OK);
+}
+
+/* remove a object to a list of objects */
+int remove_object_to_objectlist(objectlist** list, void* object_ptr) {
+  if (list == NULL)
+    return (ERROR);
+
+  for (objectlist* obj = *list, *prev = NULL; obj != NULL; prev = obj, obj = obj->next) {
+    if (obj == object_ptr) {
+      if (prev == NULL)
+	*list = obj->next;
+      else
+	prev->next = obj->next;
+      delete obj;
+      return (OK);
+    }
+  }
+  return (ERROR);
 }
 
 /* frees memory allocated to a temporary object list */
@@ -3400,4 +3441,1078 @@ int free_object_data(void) {
   free_object_skiplists();
 
   return (OK);
+}
+
+static int remove_contact_to_contactsmember(contactsmember** cntctsmember,
+					    contact* cntct) {
+  contactsmember* this_item = *cntctsmember;
+  contactsmember* prev_item = NULL;
+  while (this_item != NULL && this_item->contact_ptr != cntct) {
+    prev_item = this_item;
+    this_item = this_item->next;
+  }
+
+  // check we have find a contacts member.
+  if (this_item == NULL)
+    return (0);
+
+  // update list.
+  if (prev_item == NULL)
+    *cntctsmember = this_item->next;
+  else
+    prev_item->next = this_item->next;
+  delete[] this_item->contact_name;
+  delete this_item;
+  return (1);
+}
+
+static int remove_contactgroup_to_contactgroupsmember(contactgroupsmember** groupsmember,
+						      contactgroup* group) {
+  contactgroupsmember* this_item = *groupsmember;
+  contactgroupsmember* prev_item = NULL;
+  while (this_item != NULL && this_item->group_ptr != group) {
+    prev_item = this_item;
+    this_item = this_item->next;
+  }
+
+  // check we have find a contact groups member.
+  if (this_item == NULL)
+    return (0);
+
+  // update list.
+  if (prev_item == NULL)
+    *groupsmember = this_item->next;
+  else
+    prev_item->next = this_item->next;
+  delete[] this_item->group_name;
+  delete this_item;
+  return (1);
+}
+
+static int remove_service(service* this_service) {
+  // check we have find a service.
+  if (this_service == NULL)
+    return (0);
+
+  // update host service list.
+  host* hst = find_host(this_service->host_name);
+  if (hst != NULL) {
+    for (servicesmember* svcmbr = hst->services, *prev = NULL;
+	 svcmbr != NULL;
+	 svcmbr = svcmbr->next) {
+      if (svcmbr->service_ptr == this_service) {
+	if (prev == NULL)
+	  hst->services = svcmbr->next;
+	else
+	  prev->next = svcmbr->next;
+	delete[] svcmbr->host_name;
+	delete[] svcmbr->service_description;
+	delete svcmbr;
+	break;
+      }
+      prev = svcmbr;
+    }
+  }
+
+ // update the event list low.
+  for (timed_event* temp_event = event_list_low;
+    temp_event != NULL;
+    temp_event = temp_event->next) {
+    if (temp_event->event_data == this_service) {
+      remove_event(temp_event, &event_list_low, &event_list_low_tail);
+      delete temp_event;
+      break;
+    }
+  }
+
+  // update the event list high.
+  for (timed_event* temp_event = event_list_high;
+       temp_event != NULL;
+       temp_event = temp_event->next) {
+    if (temp_event->event_data == this_service) {
+      remove_event(temp_event, &event_list_high, &event_list_high_tail);
+      delete temp_event;
+      break;
+    }
+  }
+
+  // update the servicedependency list.
+  for (servicedependency* dep = servicedependency_list, *prev = NULL; dep != NULL; dep = dep->next) {
+    if (dep->master_service_ptr == this_service || dep->dependent_service_ptr == this_service) {
+      skiplist_delete(object_skiplists[SERVICEDEPENDENCY_SKIPLIST], dep);
+      if (prev == NULL)
+	servicedependency_list = dep->next;
+      else
+	prev->next = dep->next;
+      if (dep->next == NULL)
+	servicedependency_list_tail = prev;
+      delete[] dep->dependent_host_name;
+      delete[] dep->dependent_service_description;
+      delete[] dep->host_name;
+      delete[] dep->service_description;
+      delete[] dep->dependency_period;
+      delete dep;
+      break;
+    }
+    prev = dep;
+  }
+
+  // update the serviceescalation list.
+  for (serviceescalation* escalation = serviceescalation_list, *prev = NULL;
+       escalation != NULL;
+       prev = escalation, escalation = escalation->next) {
+      skiplist_delete(object_skiplists[SERVICEESCALATION_SKIPLIST], escalation);
+    if (escalation->service_ptr == this_service) {
+      if (prev == NULL)
+	serviceescalation_list = escalation->next;
+      else
+	prev->next = escalation->next;
+      if (escalation->next == NULL)
+	serviceescalation_list_tail = prev;
+      delete[] escalation->host_name;
+      delete[] escalation->description;
+      delete[] escalation->escalation_period;
+      delete escalation;
+      break;
+    }
+  }
+
+  // update the service skiplist.
+  skiplist_delete_all(object_skiplists[SERVICE_SKIPLIST], (void*)this_service);
+
+  /* free memory for contact groups */
+  contactgroupsmember* this_contactgroupsmember = this_service->contact_groups;
+  while (this_contactgroupsmember != NULL) {
+    contactgroupsmember* next_contactgroupsmember = this_contactgroupsmember->next;
+    delete[] this_contactgroupsmember->group_name;
+    delete this_contactgroupsmember;
+    this_contactgroupsmember = next_contactgroupsmember;
+  }
+
+  /* free memory for contacts */
+  contactsmember* this_contactsmember = this_service->contacts;
+  while (this_contactsmember != NULL) {
+    contactsmember* next_contactsmember = this_contactsmember->next;
+    delete[] this_contactsmember->contact_name;
+    delete this_contactsmember;
+    this_contactsmember = next_contactsmember;
+  }
+
+  /* free memory for custom variables */
+  customvariablesmember* this_customvariablesmember = this_service->custom_variables;
+  while (this_customvariablesmember != NULL) {
+    customvariablesmember* next_customvariablesmember = this_customvariablesmember->next;
+    delete[] this_customvariablesmember->variable_name;
+    delete[] this_customvariablesmember->variable_value;
+    delete this_customvariablesmember;
+    this_customvariablesmember = next_customvariablesmember;
+  }
+
+  // cleanup memory.
+  delete[] this_service->host_name;
+  delete[] this_service->description;
+  delete[] this_service->display_name;
+  delete[] this_service->service_check_command;
+  delete[] this_service->plugin_output;
+  delete[] this_service->long_plugin_output;
+  delete[] this_service->perf_data;
+
+  delete[] this_service->event_handler_args;
+  delete[] this_service->check_command_args;
+
+  free_objectlist(&this_service->servicegroups_ptr);
+  delete[] this_service->notification_period;
+  delete[] this_service->check_period;
+  delete[] this_service->event_handler;
+  delete[] this_service->failure_prediction_options;
+  delete[] this_service->notes;
+  delete[] this_service->notes_url;
+  delete[] this_service->action_url;
+  delete[] this_service->icon_image;
+  delete[] this_service->icon_image_alt;
+  delete this_service;
+
+  return (1);
+}
+
+int remove_service_by_id(char const* host_name, char const* description) {
+  if (host_name == NULL || description == NULL)
+    return (0);
+
+  service* this_service = service_list;
+  service* prev_service = NULL;
+  while (this_service != NULL) {
+    if (!strcmp(this_service->host_name, host_name)
+	&& !strcmp(this_service->description, description))
+      break;
+    prev_service = this_service;
+    this_service = this_service->next;
+  }
+
+  // check we have find a service.
+  if (this_service == NULL)
+    return (0);
+
+  // update the service list.
+  if (prev_service == NULL)
+    service_list = this_service->next;
+  else
+    prev_service->next = this_service->next;
+  if (this_service->next == NULL)
+    service_list_tail = prev_service;
+  return (remove_service(this_service));
+}
+
+static int remove_servicegroup(servicegroup* this_servicegroup) {
+  // update service list.
+  for (service* svc = service_list; svc != NULL; svc = svc->next)
+    remove_object_to_objectlist(&svc->servicegroups_ptr, this_servicegroup);
+
+  servicesmember* this_servicesmember = this_servicegroup->members;
+  while (this_servicesmember != NULL) {
+    servicesmember* next_servicesmember = this_servicesmember->next;
+    delete[] this_servicesmember->host_name;
+    delete[] this_servicesmember->service_description;
+    delete this_servicesmember;
+    this_servicesmember = next_servicesmember;
+  }
+
+  // update the servicegroup skiplist.
+  skiplist_delete_all(object_skiplists[SERVICEGROUP_SKIPLIST], (void*)this_servicegroup);
+
+  delete[] this_servicegroup->group_name;
+  delete[] this_servicegroup->alias;
+  delete[] this_servicegroup->notes;
+  delete[] this_servicegroup->notes_url;
+  delete[] this_servicegroup->action_url;
+  delete this_servicegroup;
+
+  return (1);
+}
+
+int remove_servicegroup_by_id(char const* name) {
+  if (name == NULL)
+    return (0);
+
+  servicegroup* this_servicegroup = servicegroup_list;
+  servicegroup* prev_servicegroup = NULL;
+  while (this_servicegroup != NULL && strcmp(this_servicegroup->group_name, name)) {
+    prev_servicegroup = this_servicegroup;
+    this_servicegroup = this_servicegroup->next;
+  }
+
+  // check we have find a service group.
+  if (this_servicegroup == NULL)
+    return (0);
+
+  // update the servicegroup list.
+  if (prev_servicegroup == NULL)
+    servicegroup_list = this_servicegroup->next;
+  else
+    prev_servicegroup->next = this_servicegroup->next;
+  if (this_servicegroup->next == NULL)
+    servicegroup_list_tail = prev_servicegroup;
+  return (remove_servicegroup(this_servicegroup));
+}
+
+static int remove_host(host* this_host) {
+  // check we have find a host.
+  if (this_host == NULL)
+    return (0);
+
+  // update the event list low.
+  for (timed_event* temp_event = event_list_low;
+    temp_event != NULL;
+    temp_event = temp_event->next) {
+    if (temp_event->event_data == this_host) {
+      remove_event(temp_event, &event_list_low, &event_list_low_tail);
+      delete temp_event;
+      break;
+    }
+  }
+
+  // update the event list high.
+  for (timed_event* temp_event = event_list_high;
+       temp_event != NULL;
+       temp_event = temp_event->next) {
+    if (temp_event->event_data == this_host) {
+      remove_event(temp_event, &event_list_high, &event_list_high_tail);
+      delete temp_event;
+      break;
+    }
+  }
+
+  // update the hostdependency list.
+  for (hostdependency* dep = hostdependency_list, *prev = NULL; dep != NULL; dep = dep->next) {
+    if (dep->master_host_ptr == this_host || dep->dependent_host_ptr == this_host) {
+      skiplist_delete(object_skiplists[HOSTDEPENDENCY_SKIPLIST], dep);
+      if (prev == NULL)
+	hostdependency_list = dep->next;
+      else
+	prev->next = dep->next;
+      if (dep->next == NULL)
+	hostdependency_list_tail = prev;
+      delete[] dep->dependent_host_name;
+      delete[] dep->host_name;
+      delete[] dep->dependency_period;
+      delete dep;
+      break;
+    }
+    prev = dep;
+  }
+
+  // update the hostescalation list.
+  for (hostescalation* escalation = hostescalation_list, *prev = NULL;
+       escalation != NULL;
+       prev = escalation, escalation = escalation->next) {
+    skiplist_delete(object_skiplists[HOSTESCALATION_SKIPLIST], escalation);
+    if (escalation->host_ptr == this_host) {
+      if (prev == NULL)
+	hostescalation_list = escalation->next;
+      else
+	prev->next = escalation->next;
+      if (escalation->next == NULL)
+	hostescalation_list_tail = prev;
+      delete[] escalation->host_name;
+      delete[] escalation->escalation_period;
+      delete escalation;
+      break;
+    }
+  }
+
+  // update the host skiplist.
+  skiplist_delete_all(object_skiplists[HOST_SKIPLIST], (void*)this_host);
+
+  /* free memory for parent hosts */
+  hostsmember* this_hostsmember = this_host->parent_hosts;
+  while (this_hostsmember != NULL) {
+    hostsmember* next_hostsmember = this_hostsmember->next;
+    delete[] this_hostsmember->host_name;
+    delete this_hostsmember;
+    this_hostsmember = next_hostsmember;
+  }
+
+  /* free memory for child host links */
+  this_hostsmember = this_host->child_hosts;
+  while (this_hostsmember != NULL) {
+    hostsmember* next_hostsmember = this_hostsmember->next;
+    delete[] this_hostsmember->host_name;
+    delete this_hostsmember;
+    this_hostsmember = next_hostsmember;
+  }
+
+  /* free memory for service links */
+  servicesmember* this_servicesmember = this_host->services;
+  while (this_servicesmember != NULL) {
+    servicesmember* next_servicesmember = this_servicesmember->next;
+    service* svc = this_servicesmember->service_ptr;
+    delete[] this_servicesmember->host_name;
+    delete[] this_servicesmember->service_description;
+    delete this_servicesmember;
+    remove_service_by_id(svc->host_name, svc->description);
+    this_servicesmember = next_servicesmember;
+  }
+
+  /* free memory for contact groups */
+  contactgroupsmember* this_contactgroupsmember = this_host->contact_groups;
+  while (this_contactgroupsmember != NULL) {
+    contactgroupsmember* next_contactgroupsmember = this_contactgroupsmember->next;
+    delete[] this_contactgroupsmember->group_name;
+    delete this_contactgroupsmember;
+    this_contactgroupsmember = next_contactgroupsmember;
+  }
+
+  /* free memory for contacts */
+  contactsmember* this_contactsmember = this_host->contacts;
+  while (this_contactsmember != NULL) {
+    contactsmember* next_contactsmember = this_contactsmember->next;
+    delete[] this_contactsmember->contact_name;
+    delete this_contactsmember;
+    this_contactsmember = next_contactsmember;
+  }
+
+  /* free memory for custom variables */
+  customvariablesmember* this_customvariablesmember = this_host->custom_variables;
+  while (this_customvariablesmember != NULL) {
+    customvariablesmember* next_customvariablesmember = this_customvariablesmember->next;
+    delete[] this_customvariablesmember->variable_name;
+    delete[] this_customvariablesmember->variable_value;
+    delete this_customvariablesmember;
+    this_customvariablesmember = next_customvariablesmember;
+  }
+
+  delete[] this_host->name;
+  delete[] this_host->display_name;
+  delete[] this_host->alias;
+  delete[] this_host->address;
+  delete[] this_host->plugin_output;
+  delete[] this_host->long_plugin_output;
+  delete[] this_host->perf_data;
+
+  free_objectlist(&this_host->hostgroups_ptr);
+  delete[] this_host->check_period;
+  delete[] this_host->host_check_command;
+  delete[] this_host->event_handler;
+  delete[] this_host->failure_prediction_options;
+  delete[] this_host->notification_period;
+  delete[] this_host->notes;
+  delete[] this_host->notes_url;
+  delete[] this_host->action_url;
+  delete[] this_host->icon_image;
+  delete[] this_host->icon_image_alt;
+  delete[] this_host->vrml_image;
+  delete[] this_host->statusmap_image;
+  delete this_host;
+
+  return (1);
+}
+
+int remove_host_by_id(char const* name) {
+  if (name == NULL)
+    return (0);
+
+  host* this_host = host_list;
+  host* prev_host = NULL;
+  while (this_host != NULL && strcmp(this_host->name, name)) {
+    prev_host = this_host;
+    this_host = this_host->next;
+  }
+
+  // check we have find a host.
+  if (this_host == NULL)
+    return (0);
+
+  // update the host list.
+  if (prev_host == NULL)
+    host_list = this_host->next;
+  else
+    prev_host->next = this_host->next;
+  if (this_host->next == NULL)
+    host_list_tail = prev_host;
+  return (remove_host(this_host));
+}
+
+static int remove_hostgroup(hostgroup* this_hostgroup) {
+  // update host list.
+  for (host* hst = host_list; hst != NULL; hst = hst->next)
+    remove_object_to_objectlist(&hst->hostgroups_ptr, this_hostgroup);
+
+  hostsmember* this_hostsmember = this_hostgroup->members;
+  while (this_hostsmember != NULL) {
+    hostsmember* next_hostsmember = this_hostsmember->next;
+    delete[] this_hostsmember->host_name;
+    delete this_hostsmember;
+    this_hostsmember = next_hostsmember;
+  }
+
+  // update the hostgroup skiplist.
+  skiplist_delete_all(object_skiplists[HOSTGROUP_SKIPLIST], (void*)this_hostgroup);
+
+  delete[] this_hostgroup->group_name;
+  delete[] this_hostgroup->alias;
+  delete[] this_hostgroup->notes;
+  delete[] this_hostgroup->notes_url;
+  delete[] this_hostgroup->action_url;
+  delete this_hostgroup;
+
+  return (1);
+}
+
+int remove_hostgroup_by_id(char const* name) {
+  if (name == NULL)
+    return (0);
+
+  hostgroup* this_hostgroup = hostgroup_list;
+  hostgroup* prev_hostgroup = NULL;
+  while (this_hostgroup != NULL && strcmp(this_hostgroup->group_name, name)) {
+    prev_hostgroup = this_hostgroup;
+    this_hostgroup = this_hostgroup->next;
+  }
+
+  // check we have find a host group.
+  if (this_hostgroup == NULL)
+    return (0);
+
+  // update the hostgroup list.
+  if (prev_hostgroup == NULL)
+    hostgroup_list = this_hostgroup->next;
+  else
+    prev_hostgroup->next = this_hostgroup->next;
+  if (this_hostgroup->next == NULL)
+    hostgroup_list_tail = prev_hostgroup;
+  return (remove_hostgroup(this_hostgroup));
+}
+
+static int remove_contact(contact* this_contact) {
+  // remove contact from contactgroup.
+  contactgroup* this_contactgroup = contactgroup_list;
+  while (this_contactgroup != NULL) {
+    remove_contact_to_contactsmember(&this_contactgroup->members, this_contact);
+    this_contactgroup = this_contactgroup->next;
+  }
+
+  // remove contact from host.
+  host* this_host = host_list;
+  while (this_host != NULL) {
+    remove_contact_to_contactsmember(&this_host->contacts, this_contact);
+    this_host = this_host->next;
+  }
+
+  // remove contact from service.
+  service* this_service = service_list;
+  while (this_service != NULL) {
+    remove_contact_to_contactsmember(&this_service->contacts, this_contact);
+    this_service = this_service->next;
+  }
+
+  // remove contact from hostescalation.
+  hostescalation* this_hostescalation = hostescalation_list;
+  while (this_hostescalation != NULL) {
+    remove_contact_to_contactsmember(&this_hostescalation->contacts, this_contact);
+    this_hostescalation = this_hostescalation->next;
+  }
+
+  // remove contact from serviceescalation.
+  serviceescalation* this_serviceescalation = serviceescalation_list;
+  while (this_serviceescalation != NULL) {
+    remove_contact_to_contactsmember(&this_serviceescalation->contacts, this_contact);
+    this_serviceescalation = this_serviceescalation->next;
+  }
+
+  /* free memory for the host notification commands */
+  commandsmember* this_commandsmember = this_contact->host_notification_commands;
+  while (this_commandsmember != NULL) {
+    commandsmember* next_commandsmember = this_commandsmember->next;
+    if (this_commandsmember->cmd != NULL)
+      delete[] this_commandsmember->cmd;
+    delete this_commandsmember;
+    this_commandsmember = next_commandsmember;
+  }
+
+  /* free memory for the service notification commands */
+  this_commandsmember = this_contact->service_notification_commands;
+  while (this_commandsmember != NULL) {
+    commandsmember* next_commandsmember = this_commandsmember->next;
+    if (this_commandsmember->cmd != NULL)
+      delete[] this_commandsmember->cmd;
+    delete this_commandsmember;
+    this_commandsmember = next_commandsmember;
+  }
+
+  /* free memory for custom variables */
+  customvariablesmember* this_customvariablesmember = this_contact->custom_variables;
+  while (this_customvariablesmember != NULL) {
+    customvariablesmember* next_customvariablesmember = this_customvariablesmember->next;
+    delete[] this_customvariablesmember->variable_name;
+    delete[] this_customvariablesmember->variable_value;
+    delete this_customvariablesmember;
+    this_customvariablesmember = next_customvariablesmember;
+  }
+
+  // update the contact skiplist.
+  skiplist_delete_all(object_skiplists[CONTACT_SKIPLIST], (void*)this_contact);
+
+  // update the object list.
+  free_objectlist(&this_contact->contactgroups_ptr);
+
+  for (unsigned int i = 0; i < MAX_CONTACT_ADDRESSES; ++i)
+    delete[] this_contact->address[i];
+  delete[] this_contact->name;
+  delete[] this_contact->alias;
+  delete[] this_contact->email;
+  delete[] this_contact->pager;
+  delete[] this_contact->host_notification_period;
+  delete[] this_contact->service_notification_period;
+  delete this_contact;
+
+  return (1);
+}
+
+int remove_contact_by_id(char const* name) {
+  if (name == NULL)
+    return (0);
+
+  contact* this_contact = contact_list;
+  contact* prev_contact = NULL;
+  while (this_contact != NULL && strcmp(this_contact->name, name)) {
+    prev_contact = this_contact;
+    this_contact = this_contact->next;
+  }
+
+  // check we have find a contact.
+  if (this_contact == NULL)
+    return (0);
+
+  // update the contact list.
+  if (prev_contact == NULL)
+    contact_list = this_contact->next;
+  else
+    prev_contact->next = this_contact->next;
+  if (this_contact->next == NULL)
+    contact_list_tail = prev_contact;
+  return (remove_contact(this_contact));
+}
+
+static int remove_contactgroup(contactgroup* this_contactgroup) {
+  // check we have find a contact group.
+  if (this_contactgroup == NULL)
+    return (0);
+
+  // remove contactgroup from host.
+  host* this_host = host_list;
+  while (this_host != NULL) {
+    remove_contactgroup_to_contactgroupsmember(&this_host->contact_groups, this_contactgroup);
+    this_host = this_host->next;
+  }
+
+  // remove contactgroup from service.
+  service* this_service = service_list;
+  while (this_service != NULL) {
+    remove_contactgroup_to_contactgroupsmember(&this_service->contact_groups, this_contactgroup);
+    this_service = this_service->next;
+  }
+
+  // remove contactgroup from hostescalation.
+  hostescalation* this_hostescalation = hostescalation_list;
+  while (this_hostescalation != NULL) {
+    remove_contactgroup_to_contactgroupsmember(&this_hostescalation->contact_groups,
+					       this_contactgroup);
+    this_hostescalation = this_hostescalation->next;
+  }
+
+  // remove contactgroup from serviceescalation.
+  serviceescalation* this_serviceescalation = serviceescalation_list;
+  while (this_serviceescalation != NULL) {
+    remove_contactgroup_to_contactgroupsmember(&this_serviceescalation->contact_groups,
+					       this_contactgroup);
+    this_serviceescalation = this_serviceescalation->next;
+  }
+
+  // update the contactgroup skiplist.
+  skiplist_delete_all(object_skiplists[CONTACTGROUP_SKIPLIST], (void*)this_contactgroup);
+
+  delete[] this_contactgroup->group_name;
+  delete[] this_contactgroup->alias;
+  delete this_contactgroup;
+
+  return (1);
+}
+
+int remove_contactgroup_by_id(char const* name) {
+  if (name == NULL)
+    return (0);
+
+  contactgroup* this_contactgroup = contactgroup_list;
+  contactgroup* prev_contactgroup = NULL;
+  while (this_contactgroup != NULL
+	 && strcmp(this_contactgroup->group_name, name)) {
+    prev_contactgroup = this_contactgroup;
+    this_contactgroup = this_contactgroup->next;
+  }
+
+  // check we have find a contact group.
+  if (this_contactgroup == NULL)
+    return (0);
+
+  // update the contactgroup list.
+  if (prev_contactgroup == NULL)
+    contactgroup_list = this_contactgroup->next;
+  else
+    prev_contactgroup->next = this_contactgroup->next;
+  if (this_contactgroup->next == NULL)
+    contactgroup_list_tail = prev_contactgroup;
+  return (remove_contactgroup(this_contactgroup));
+}
+
+static int remove_command(command* this_command) {
+  // update the command skiplist.
+  skiplist_delete_all(object_skiplists[COMMAND_SKIPLIST], (void*)this_command);
+
+  delete[] this_command->name;
+  delete[] this_command->command_line;
+  delete this_command;
+
+  return (1);
+}
+
+
+int remove_command_by_id(char const* name) {
+  if (name == NULL)
+    return (0);
+
+  command* this_command = command_list;
+  command* prev_command = NULL;
+  while (this_command != NULL
+	 && strcmp(this_command->name, name)) {
+    prev_command = this_command;
+    this_command = this_command->next;
+  }
+
+  // check we have find a command.
+  if (this_command == NULL)
+    return (0);
+
+  // check if command are use by a host.
+  for (host* hst = host_list; hst != NULL; hst = hst->next) {
+    if (hst->event_handler_ptr == this_command
+	|| hst->check_command_ptr == this_command) {
+      return (2);
+    }
+  }
+
+  // check if command are use by a service.
+  for (service* svc = service_list; svc != NULL; svc = svc->next) {
+    if (svc->event_handler_ptr == this_command
+	|| svc->check_command_ptr == this_command) {
+      return (2);
+    }
+  }
+
+  // check if command are use by a contact.
+  for (contact* cntct = contact_list; cntct != NULL; cntct = cntct->next) {
+    for (commandsmember* cntctsmember = cntct->host_notification_commands;
+	 cntctsmember != NULL;
+	 cntctsmember = cntctsmember->next) {
+      if (cntctsmember->command_ptr == this_command) {
+	return (2);
+      }
+    }
+    for (commandsmember* cntctsmember = cntct->service_notification_commands;
+	 cntctsmember != NULL;
+	 cntctsmember = cntctsmember->next) {
+      if (cntctsmember->command_ptr == this_command) {
+	return (2);
+      }
+    }
+  }
+
+  // update the command list.
+  if (prev_command == NULL)
+    command_list = this_command->next;
+  else
+    prev_command->next = this_command->next;
+  if (this_command->next == NULL)
+    command_list_tail = prev_command;
+  return (remove_command(this_command));
+}
+
+int remove_serviceescalation_by_id(char const* host_name,
+				   char const* service_description) {
+  if (host_name == NULL || service_description == NULL)
+    return (0);
+
+  serviceescalation* this_serviceescalation = serviceescalation_list;
+  serviceescalation* prev_serviceescalation = NULL;
+  while (this_serviceescalation != NULL
+	 && strcmp(this_serviceescalation->host_name, host_name)
+	 && strcmp(this_serviceescalation->description, service_description)) {
+    prev_serviceescalation = this_serviceescalation;
+    this_serviceescalation = this_serviceescalation->next;
+  }
+
+  // check we have find a serviceescalation.
+  if (this_serviceescalation == NULL)
+    return (0);
+
+  // update the serviceescalation list.
+  if (prev_serviceescalation == NULL)
+    serviceescalation_list = this_serviceescalation->next;
+  else
+    prev_serviceescalation->next = this_serviceescalation->next;
+  if (this_serviceescalation->next == NULL)
+    serviceescalation_list_tail = prev_serviceescalation;
+
+  contactgroupsmember* this_contactgroupsmembers = this_serviceescalation->contact_groups;
+  while (this_contactgroupsmembers != NULL) {
+    contactgroupsmember* tmp = this_contactgroupsmembers->next;
+
+    delete[] this_contactgroupsmembers->group_name;
+    delete this_contactgroupsmembers;
+    this_contactgroupsmembers = tmp;
+  }
+
+  contactsmember* this_contactsmember = this_serviceescalation->contacts;
+  while (this_contactsmember != NULL) {
+    contactsmember* tmp = this_contactsmember->next;
+
+    delete[] this_contactsmember->contact_name;
+    delete this_contactsmember;
+    this_contactsmember = tmp;
+  }
+
+  // update the serviceescalation skiplist.
+  skiplist_delete_all(object_skiplists[SERVICEESCALATION_SKIPLIST], (void*)this_serviceescalation);
+
+  delete[] this_serviceescalation->host_name;
+  delete[] this_serviceescalation->description;
+  delete[] this_serviceescalation->escalation_period;
+  delete this_serviceescalation;
+  return (1);
+}
+
+int remove_servicedependency_by_id(char const* host_name,
+				   char const* service_description,
+				   char const* dependent_host_name,
+				   char const* dependent_service_description) {
+  if (host_name == NULL
+      || service_description == NULL
+      || dependent_host_name == NULL
+      || dependent_service_description == NULL)
+    return (0);
+
+  servicedependency* this_servicedependency = servicedependency_list;
+  servicedependency* prev_servicedependency = NULL;
+  while (this_servicedependency != NULL
+	 && strcmp(this_servicedependency->host_name, host_name)
+	 && strcmp(this_servicedependency->service_description, service_description)
+	 && strcmp(this_servicedependency->dependent_host_name, dependent_host_name)
+	 && strcmp(this_servicedependency->dependent_service_description,
+		   dependent_service_description)) {
+    prev_servicedependency = this_servicedependency;
+    this_servicedependency = this_servicedependency->next;
+  }
+
+  // check we have find a servicedependency.
+  if (this_servicedependency == NULL)
+    return (0);
+
+  // update the servicedependency list.
+  if (prev_servicedependency == NULL)
+    servicedependency_list = this_servicedependency->next;
+  else
+    prev_servicedependency->next = this_servicedependency->next;
+  if (this_servicedependency->next == NULL)
+    servicedependency_list_tail = prev_servicedependency;
+
+  // update the servicedependency skiplist.
+  skiplist_delete_all(object_skiplists[SERVICEDEPENDENCY_SKIPLIST], (void*)this_servicedependency);
+
+  delete[] this_servicedependency->dependent_host_name;
+  delete[] this_servicedependency->dependent_service_description;
+  delete[] this_servicedependency->host_name;
+  delete[] this_servicedependency->service_description;
+  delete[] this_servicedependency->dependency_period;
+  delete this_servicedependency;
+  return (1);
+}
+
+int remove_hostescalation_by_id(char const* host_name) {
+  if (host_name == NULL)
+    return (0);
+
+  hostescalation* this_hostescalation = hostescalation_list;
+  hostescalation* prev_hostescalation = NULL;
+  while (this_hostescalation != NULL
+	 && strcmp(this_hostescalation->host_name, host_name)) {
+    prev_hostescalation = this_hostescalation;
+    this_hostescalation = this_hostescalation->next;
+  }
+
+  // check we have find a hostescalation.
+  if (this_hostescalation == NULL)
+    return (0);
+
+  // update the hostescalation list.
+  if (prev_hostescalation == NULL)
+    hostescalation_list = this_hostescalation->next;
+  else
+    prev_hostescalation->next = this_hostescalation->next;
+  if (this_hostescalation->next == NULL)
+    hostescalation_list_tail = prev_hostescalation;
+
+  contactgroupsmember* this_contactgroupsmembers = this_hostescalation->contact_groups;
+  while (this_contactgroupsmembers != NULL) {
+    contactgroupsmember* tmp = this_contactgroupsmembers->next;
+
+    delete[] this_contactgroupsmembers->group_name;
+    delete this_contactgroupsmembers;
+    this_contactgroupsmembers = tmp;
+  }
+
+  contactsmember* this_contactsmember = this_hostescalation->contacts;
+  while (this_contactsmember != NULL) {
+    contactsmember* tmp = this_contactsmember->next;
+
+    delete[] this_contactsmember->contact_name;
+    delete this_contactsmember;
+    this_contactsmember = tmp;
+  }
+
+  // update the hostescalation skiplist.
+  skiplist_delete_all(object_skiplists[HOSTESCALATION_SKIPLIST], (void*)this_hostescalation);
+
+  delete[] this_hostescalation->host_name;
+  delete[] this_hostescalation->escalation_period;
+  delete this_hostescalation;
+  return (1);
+}
+
+int remove_hostdependency_by_id(char const* host_name,
+				char const* dependent_host_name) {
+  if (host_name == NULL || dependent_host_name == NULL)
+     return (0);
+
+  hostdependency* this_hostdependency = hostdependency_list;
+  hostdependency* prev_hostdependency = NULL;
+  while (this_hostdependency != NULL
+	 && strcmp(this_hostdependency->host_name, host_name)
+	 && strcmp(this_hostdependency->dependent_host_name, dependent_host_name)) {
+    prev_hostdependency = this_hostdependency;
+    this_hostdependency = this_hostdependency->next;
+  }
+
+  // check we have find a hostdependency.
+  if (this_hostdependency == NULL)
+    return (0);
+
+  // update the hostdependency list.
+  if (prev_hostdependency == NULL)
+    hostdependency_list = this_hostdependency->next;
+  else
+    prev_hostdependency->next = this_hostdependency->next;
+  if (this_hostdependency->next == NULL)
+    hostdependency_list_tail = prev_hostdependency;
+
+  // update the hostdependency skiplist.
+  skiplist_delete_all(object_skiplists[HOSTDEPENDENCY_SKIPLIST], (void*)this_hostdependency);
+
+  delete[] this_hostdependency->dependent_host_name;
+  delete[] this_hostdependency->host_name;
+  delete[] this_hostdependency->dependency_period;
+  delete this_hostdependency;
+  return (1);
+}
+
+static int remove_timerange(timerange* this_timerange) {
+  while (this_timerange != NULL) {
+    timerange* tmp = this_timerange->next;
+    delete this_timerange;
+    this_timerange = tmp;
+  }
+  return (1);
+}
+
+static int remove_daterange(daterange* this_daterange) {
+  while (this_daterange != NULL) {
+    daterange* tmp = this_daterange->next;
+    remove_timerange(this_daterange->times);
+    delete this_daterange;
+    this_daterange = tmp;
+  }
+  return (1);
+}
+
+static int remove_timeperiodexclusions(timeperiodexclusion* this_timeperiodexclusion) {
+  while (this_timeperiodexclusion != NULL) {
+    timeperiodexclusion* tmp = this_timeperiodexclusion->next;
+    delete[] this_timeperiodexclusion->timeperiod_name;
+    delete this_timeperiodexclusion;
+    this_timeperiodexclusion = tmp;
+  }
+  return (1);
+}
+
+static int remove_timeperiod(timeperiod* this_timeperiod) {
+  if (this_timeperiod == NULL)
+    return (0);
+
+  // remove all timerange.
+  for (unsigned int i = 0;
+       i < sizeof(this_timeperiod->days) / sizeof(*this_timeperiod->days);
+       ++i) {
+    remove_timerange(this_timeperiod->days[i]);
+  }
+
+  // remove all exceptions.
+  for (unsigned int i = 0;
+       i < sizeof(this_timeperiod->exceptions) / sizeof(*this_timeperiod->exceptions);
+       ++i) {
+    remove_daterange(this_timeperiod->exceptions[i]);
+  }
+
+  // remove all exclusions.
+  remove_timeperiodexclusions(this_timeperiod->exclusions);
+
+  // remove all timeperiod used by contacts.
+  for (contact* cntct = contact_list; cntct != NULL; cntct = cntct->next) {
+    if (cntct->host_notification_period_ptr == this_timeperiod)
+      cntct->host_notification_period_ptr = NULL;
+    if (cntct->service_notification_period_ptr == this_timeperiod)
+      cntct->service_notification_period_ptr = NULL;
+  }
+
+  // remove all timeperiod used by hosts.
+  for (host* hst = host_list; hst != NULL; hst = hst->next) {
+    if (hst->check_period_ptr == this_timeperiod)
+      hst->check_period_ptr = NULL;
+    if (hst->notification_period_ptr == this_timeperiod)
+      hst->notification_period_ptr = NULL;
+  }
+
+  // remove all timeperiod used by services.
+  for (service* svc = service_list; svc != NULL; svc = svc->next) {
+    if (svc->check_period_ptr == this_timeperiod)
+      svc->check_period_ptr = NULL;
+    if (svc->notification_period_ptr == this_timeperiod)
+      svc->notification_period_ptr = NULL;
+  }
+
+  // remove all timeperiod used by serviceescalations.
+  for (serviceescalation* se = serviceescalation_list; se != NULL; se = se->next) {
+    if (se->escalation_period_ptr == this_timeperiod)
+      se->escalation_period_ptr = NULL;
+  }
+
+  // remove all timeperiod used by servicedependencies.
+  for (servicedependency* sd = servicedependency_list; sd != NULL; sd = sd->next) {
+    if (sd->dependency_period_ptr == this_timeperiod)
+      sd->dependency_period_ptr = NULL;
+  }
+
+  // remove all timeperiod used by hostescalations.
+  for (hostescalation* he = hostescalation_list; he != NULL; he = he->next) {
+    if (he->escalation_period_ptr == this_timeperiod)
+      he->escalation_period_ptr = NULL;
+  }
+
+  // remove all timeperiod used by hostdependencies.
+  for (hostdependency* hd = hostdependency_list; hd != NULL; hd = hd->next) {
+    if (hd->dependency_period_ptr == this_timeperiod)
+      hd->dependency_period_ptr = NULL;
+  }
+
+  // update the timeperiod skiplist.
+  skiplist_delete_all(object_skiplists[TIMEPERIOD_SKIPLIST], (void*)this_timeperiod);
+
+  delete[] this_timeperiod->name;
+  delete[] this_timeperiod->alias;
+  delete this_timeperiod;
+
+  return (1);
+}
+
+int remove_timeperiod_by_id(char const* name) {
+  if (name == NULL)
+    return (0);
+
+  timeperiod* this_timeperiod = timeperiod_list;
+  timeperiod* prev_timeperiod = NULL;
+  while (this_timeperiod != NULL
+	 && strcmp(this_timeperiod->name, name)) {
+    prev_timeperiod = this_timeperiod;
+    this_timeperiod = this_timeperiod->next;
+  }
+
+  // check we have find a timeperiod.
+  if (this_timeperiod == NULL)
+    return (0);
+
+  // update the timeperiod list.
+  if (prev_timeperiod == NULL)
+    timeperiod_list = this_timeperiod->next;
+  else
+    prev_timeperiod->next = this_timeperiod->next;
+  if (this_timeperiod->next == NULL)
+    timeperiod_list_tail = prev_timeperiod;
+  return (remove_timeperiod(this_timeperiod));
 }

@@ -347,7 +347,7 @@ int check_time_against_period(time_t test_time, timeperiod* tperiod) {
   time_t day_range_end = (time_t)0L;
   int test_time_year = 0;
   int test_time_mon = 0;
-  int test_time_mday = 0;
+  // int test_time_mday = 0;
   int test_time_wday = 0;
   int year = 0;
   int shift;
@@ -376,7 +376,7 @@ int check_time_against_period(time_t test_time, timeperiod* tperiod) {
   t = localtime_r((time_t*)&test_time, &tm_s);
   test_time_year = t->tm_year;
   test_time_mon = t->tm_mon;
-  test_time_mday = t->tm_mday;
+  // test_time_mday = t->tm_mday;
   test_time_wday = t->tm_wday;
 
   /* calculate the start of the day (midnight, 00:00 hours) when the specified test time occurs */
@@ -692,12 +692,16 @@ static void _get_next_valid_time(time_t pref_time,
   int month = 0;                /* new */
   int pref_time_year = 0;
   int pref_time_mon = 0;
+#ifdef TEST_TIMEPERIODS_B
   int pref_time_mday = 0;
+#endif
   int pref_time_wday = 0;
   int current_time_year = 0;
   int current_time_mon = 0;
   int current_time_mday = 0;
+#ifdef TEST_TIMEPERIODS_B
   int current_time_wday = 0;
+#endif
   int shift;
 
   /* preferred time must be now or in the future */
@@ -730,7 +734,9 @@ static void _get_next_valid_time(time_t pref_time,
   /* save pref time values for later */
   pref_time_year = t->tm_year;
   pref_time_mon = t->tm_mon;
+#ifdef TEST_TIMEPERIODS_B
   pref_time_mday = t->tm_mday;
+#endif
   pref_time_wday = t->tm_wday;
 
   /* save current time values for later */
@@ -738,7 +744,9 @@ static void _get_next_valid_time(time_t pref_time,
   current_time_year = t->tm_year;
   current_time_mon = t->tm_mon;
   current_time_mday = t->tm_mday;
+#ifdef TEST_TIMEPERIODS_B
   current_time_wday = t->tm_wday;
+#endif
 
 #ifdef TEST_TIMEPERIODS_B
   printf("PREF TIME:    %lu = %s", (unsigned long)preferred_time, ctime(&preferred_time));
@@ -2064,8 +2072,10 @@ int generate_check_stats(void) {
   int check_type = 0;
   float this_bucket_weight = 0.0;
   float last_bucket_weight = 0.0;
+#ifdef DEBUG_CHECK_STATS2
   int left_value = 0;
   int right_value = 0;
+#endif
 
   time(&current_time);
 
@@ -2151,14 +2161,18 @@ int generate_check_stats(void) {
       /* determine value by weighting this/last buckets... */
       /* if this is the current bucket, use its full value + weighted % of last bucket */
       if (x == 0) {
+#ifdef DEBUG_CHECK_STATS2
         right_value = this_bucket_value;
         left_value = (int)floor(last_bucket_value * last_bucket_weight);
+#endif
         bucket_value = (int)(this_bucket_value + floor(last_bucket_value * last_bucket_weight));
       }
       /* otherwise use weighted % of this and last bucket */
       else {
+#ifdef DEBUG_CHECK_STATS2
         right_value = (int)ceil(this_bucket_value * this_bucket_weight);
         left_value = (int)floor(last_bucket_value * last_bucket_weight);
+#endif
         bucket_value = (int)(ceil(this_bucket_value * this_bucket_weight) + floor(last_bucket_value * last_bucket_weight));
       }
 

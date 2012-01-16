@@ -43,7 +43,7 @@ namespace                  com {
 	                   process(nagios_macros const& macros = nagios_macros(),
 				   unsigned int timeout = 0);
 	                   process(process const& right);
-	                   ~process() throw();
+                           ~process() throw();
 
 	  process&         operator=(process const& right);
 
@@ -60,7 +60,7 @@ namespace                  com {
 	  void             wait();
 
 	signals:
-	  void             ended();
+          void             process_ended();
 
 	protected:
 	  void             setupChildProcess();

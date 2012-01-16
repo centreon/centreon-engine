@@ -52,7 +52,6 @@ int main_test() {
 
   if (res != res)
     throw (engine_error() << "error: operator!= failed.");
-
   return (0);
 }
 

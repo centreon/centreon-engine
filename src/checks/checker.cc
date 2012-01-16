@@ -75,7 +75,7 @@ bool checker::reaper_is_empty() {
  *  Reap and process all result recive by execution process.
  */
 void checker::reap() {
-  logger(dbg_functions, basic) << "start " << Q_FUNC_INFO;;
+  logger(dbg_functions, basic) << "start " << Q_FUNC_INFO;
   logger(dbg_checks, basic) << "Starting to reap check results.";
 
   // time to start reaping.
@@ -169,7 +169,7 @@ void checker::reap() {
 
   logger(dbg_checks, basic)
     << "Finished reaping " << reaped_checks << " check results";
-  logger(dbg_functions, basic) << "end " << Q_FUNC_INFO;;
+  logger(dbg_functions, basic) << "end " << Q_FUNC_INFO;
 }
 
 /**
@@ -196,14 +196,14 @@ void checker::push_check_result(check_result const& result) {
  *
  *  @return True is the check start correctly.
  */
-bool checker::run(host* hst,
+void checker::run(host* hst,
 		  int check_options,
 		  double latency,
 		  bool scheduled_check,
 		  bool reschedule_check,
 		  int* time_is_valid,
 		  time_t* preferred_time) {
-  logger(dbg_functions, basic) << "start " << Q_FUNC_INFO;;
+  logger(dbg_functions, basic) << "start " << Q_FUNC_INFO;
 
   if (hst == NULL) {
     throw (engine_error() << "host pointer is NULL.");
@@ -258,7 +258,7 @@ bool checker::run(host* hst,
   }
   // host check was override by neb_module.
   if (res == NEBERROR_CALLBACKOVERRIDE) {
-    return (true);
+    return;
   }
 
   logger(dbg_functions, basic) << "Checking host '" << hst->name << "'...";
@@ -381,8 +381,7 @@ bool checker::run(host* hst,
   // cleanup.
   clear_volatile_macros_r(&macros);
 
-  logger(dbg_functions, basic) << "end " << Q_FUNC_INFO;;
-  return (id);
+  logger(dbg_functions, basic) << "end " << Q_FUNC_INFO;
 }
 
 /**
@@ -398,7 +397,7 @@ bool checker::run(host* hst,
  *
  *  @return True is the check start correctly.
  */
-bool checker::run(service* svc,
+void checker::run(service* svc,
 		  int check_options,
 		  double latency,
 		  bool scheduled_check,
@@ -457,7 +456,7 @@ bool checker::run(service* svc,
 
   // service check was override by neb_module.
   if (res == NEBERROR_CALLBACKOVERRIDE) {
-    return (true);
+    return;
   }
 
   logger(dbg_checks, basic)
@@ -544,7 +543,7 @@ bool checker::run(service* svc,
   // service check was override by neb_module.
   if (res == NEBERROR_CALLBACKOVERRIDE) {
     clear_volatile_macros_r(&macros);
-    return (true);
+    return;
   }
 
   // update statistics.
@@ -573,7 +572,6 @@ bool checker::run(service* svc,
   clear_volatile_macros_r(&macros);
 
   logger(dbg_functions, basic) << "end " << Q_FUNC_INFO;
-  return (id);
 }
 
 /**
@@ -762,9 +760,8 @@ void checker::_command_executed(cce_commands_result const& res) {
 
   logger(dbg_checks, basic)
     << "command id (" << res.get_command_id() << ") executed.";
+  check_result result = it.value();
 
-  check_result result;
-  result = it.value();
   _list_id.erase(it);
   _mut_id.unlock();
 

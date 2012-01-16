@@ -30,11 +30,206 @@
         </sequence>
       </complexType>
 
+      <!-- Host type. -->
+      <complexType name="hostType">
+        <sequence>
+          <element name="name" type="xsd:string"/>
+          <element name="alias" type="xsd:string"/>
+          <element name="displayName" type="xsd:string" minOccurs="0"/>
+          <element name="address" type="xsd:string"/>
+          <element name="parents" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+          <element name="hostgroups" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+          <element name="checkCommand" type="xsd:string" minOccurs="0"/>
+          <element name="initialState" type="xsd:string" minOccurs="0"/>
+          <element name="maxCheckAttempts" type="xsd:unsignedInt"/>
+          <element name="checkInterval" type="xsd:unsignedInt" minOccurs="0"/>
+          <element name="retryInterval" type="xsd:unsignedInt" minOccurs="0"/>
+          <element name="activeChecksEnabled" type="xsd:boolean" minOccurs="0"/>
+          <element name="passiveChecksEnabled" type="xsd:boolean" minOccurs="0"/>
+          <element name="checkPeriod" type="xsd:string"/>
+          <element name="obsessOverHost" type="xsd:boolean" minOccurs="0"/>
+          <element name="checkFreshness" type="xsd:boolean" minOccurs="0"/>
+          <element name="freshnessThreshold" type="xsd:unsignedInt" minOccurs="0"/>
+          <element name="eventHandler" type="xsd:string" minOccurs="0"/>
+          <element name="eventHandlerEnabled" type="xsd:boolean" minOccurs="0"/>
+          <element name="lowFlapThreshold" type="xsd:unsignedInt" minOccurs="0"/>
+          <element name="highFlapThreshold" type="xsd:unsignedInt" minOccurs="0"/>
+          <element name="flapDetectionEnabled" type="xsd:boolean" minOccurs="0"/>
+          <element name="flapDetectionOptions" type="xsd:string" minOccurs="0"/>
+          <element name="processPerfData" type="xsd:boolean" minOccurs="0"/>
+          <element name="retainStatusInformation" type="xsd:boolean" minOccurs="0"/>
+          <element name="retainNonstatusInformation" type="xsd:boolean" minOccurs="0"/>
+          <element name="contacts" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+          <element name="contactGroups" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+          <element name="notificationInterval" type="xsd:unsignedInt"/>
+          <element name="firstNotificationDelay" type="xsd:unsignedInt" minOccurs="0"/>
+          <element name="notificationPeriod" type="xsd:string"/>
+          <element name="notificationOptions" type="xsd:string" minOccurs="0"/>
+          <element name="notificationsEnabled" type="xsd:boolean" minOccurs="0"/>
+          <element name="stalkingOptions" type="xsd:string" minOccurs="0"/>
+          <element name="notes" type="xsd:string" minOccurs="0"/>
+          <element name="notesUrl" type="xsd:string" minOccurs="0"/>
+          <element name="actionUrl" type="xsd:string" minOccurs="0"/>
+          <element name="iconImage" type="xsd:string" minOccurs="0"/>
+          <element name="iconImageAlt" type="xsd:string" minOccurs="0"/>
+          <element name="vrmlImage" type="xsd:string" minOccurs="0"/>
+          <element name="statusmapImage" type="xsd:string" minOccurs="0"/>
+	  <element name="customVariables" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+        </sequence>
+      </complexType>
+
+      <!-- hostDependency type -->
+      <complexType name="hostDependencyType">
+        <sequence>
+          <element name="dependentHostsName" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+          <element name="dependentHostgroupsName" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+          <element name="hostsName" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+          <element name="hostgroupsName" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+	  <element name="inheritsParent" type="xsd:boolean" minOccurs="0"/>
+	  <element name="executionFailureCriteria" type="xsd:string" minOccurs="0"/>
+	  <element name="notificationFailureCriteria" type="xsd:string" minOccurs="0"/>
+	  <element name="dependencyPeriod" type="xsd:string" minOccurs="0"/>
+        </sequence>
+      </complexType>
+
+      <!-- hostEscalation type -->
+      <complexType name="hostEscalationType">
+        <sequence>
+          <element name="hostsName" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+          <element name="hostgroupsName" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+          <element name="contacts" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+          <element name="contactGroups" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+	  <element name="firstNotification" type="xsd:unsignedInt"/>
+	  <element name="lastNotification" type="xsd:unsignedInt"/>
+	  <element name="notificationInterval" type="xsd:unsignedInt"/>
+	  <element name="escalationPeriod" type="xsd:string" minOccurs="0"/>
+	  <element name="escalationOptions" type="xsd:string" minOccurs="0"/>
+        </sequence>
+      </complexType>
+
+      <!-- hostGroup identifier. -->
+      <complexType name="hostGroupIDType">
+        <sequence>
+          <element name="name" type="xsd:string"/>
+        </sequence>
+      </complexType>
+
+      <!-- hostGroup type. -->
+      <complexType name="hostGroupType">
+        <sequence>
+          <element name="name" type="xsd:string"/>
+          <element name="alias" type="xsd:string"/>
+          <element name="members" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+          <element name="hostgroupMembers" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+	  <element name="notes" type="xsd:string" minOccurs="0"/>
+	  <element name="notesUrl" type="xsd:string" minOccurs="0"/>
+	  <element name="actionUrl" type="xsd:string" minOccurs="0"/>
+        </sequence>
+      </complexType>
+
       <!-- Service identifier. -->
       <complexType name="serviceIDType">
         <sequence>
           <element name="host" type="tns:hostIDType"/>
           <element name="service" type="xsd:string"/>
+        </sequence>
+      </complexType>
+
+      <!-- Service type -->
+      <complexType name="serviceType">
+        <sequence>
+          <element name="hostName" type="xsd:string"/>
+          <element name="hostgroupName" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+          <element name="serviceDescription" type="xsd:string"/>
+          <element name="displayName" type="xsd:string" minOccurs="0"/>
+          <element name="servicegroups" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+          <element name="isVolatile" type="xsd:boolean" minOccurs="0"/>
+          <element name="checkCommand" type="xsd:string"/>
+          <element name="initialState" type="xsd:string" minOccurs="0"/>
+          <element name="maxCheckAttempts" type="xsd:unsignedInt"/>
+          <element name="checkInterval" type="xsd:unsignedInt"/>
+          <element name="retryInterval" type="xsd:unsignedInt"/>
+          <element name="activeChecksEnabled" type="xsd:boolean" minOccurs="0"/>
+          <element name="passiveChecksEnabled" type="xsd:boolean" minOccurs="0"/>
+          <element name="checkPeriod" type="xsd:string"/>
+          <element name="obsessOverService" type="xsd:boolean" minOccurs="0"/>
+          <element name="checkFreshness" type="xsd:boolean" minOccurs="0"/>
+          <element name="freshnessThreshold" type="xsd:unsignedInt" minOccurs="0"/>
+          <element name="eventHandler" type="xsd:string" minOccurs="0"/>
+          <element name="eventHandlerEnabled" type="xsd:boolean" minOccurs="0"/>
+          <element name="lowFlapThreshold" type="xsd:unsignedInt" minOccurs="0"/>
+          <element name="highFlapThreshold" type="xsd:unsignedInt" minOccurs="0"/>
+          <element name="flapDetectionEnabled" type="xsd:boolean" minOccurs="0"/>
+	  <element name="flapDetectionOptions" type="xsd:string" minOccurs="0"/>
+          <element name="processPerfData" type="xsd:boolean" minOccurs="0"/>
+          <element name="retainStatusInformation" type="xsd:boolean" minOccurs="0"/>
+          <element name="retainNonstatusInformation" type="xsd:boolean" minOccurs="0"/>
+          <element name="notificationInterval" type="xsd:unsignedInt"/>
+          <element name="firstNotificationDelay" type="xsd:unsignedInt" minOccurs="0"/>
+          <element name="notificationPeriod" type="xsd:string"/>
+	  <element name="notificationOptions" type="xsd:string" minOccurs="0"/>
+          <element name="notificationsEnabled" type="xsd:boolean" minOccurs="0"/>
+          <element name="contacts" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+          <element name="contactGroups" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+          <element name="stalkingOptions" type="xsd:string" minOccurs="0"/>
+          <element name="notes" type="xsd:string" minOccurs="0"/>
+          <element name="notesUrl" type="xsd:string" minOccurs="0"/>
+          <element name="actionUrl" type="xsd:string" minOccurs="0"/>
+          <element name="iconImage" type="xsd:string" minOccurs="0"/>
+          <element name="iconImageAlt" type="xsd:string" minOccurs="0"/>
+	  <element name="customVariables" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+        </sequence>
+      </complexType>
+
+      <!-- serviceDependency type -->
+      <complexType name="serviceDependencyType">
+        <sequence>
+          <element name="dependentHostsName" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+          <element name="dependentHostgroupsName" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+          <element name="dependentServiceDescription" type="xsd:string"/>
+          <element name="hostsName" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+          <element name="hostgroupsName" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+          <element name="serviceDescription" type="xsd:string"/>
+	  <element name="inheritsParent" type="xsd:boolean" minOccurs="0"/>
+	  <element name="executionFailureCriteria" type="xsd:string" minOccurs="0"/>
+	  <element name="notificationFailureCriteria" type="xsd:string" minOccurs="0"/>
+	  <element name="dependencyPeriod" type="xsd:string" minOccurs="0"/>
+        </sequence>
+      </complexType>
+
+      <!-- serviceEscalation type -->
+      <complexType name="serviceEscalationType">
+        <sequence>
+          <element name="hostsName" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+          <element name="hostgroupsName" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+          <element name="serviceDescription" type="xsd:string"/>
+          <element name="contacts" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+          <element name="contactGroups" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+	  <element name="firstNotification" type="xsd:unsignedInt"/>
+	  <element name="lastNotification" type="xsd:unsignedInt"/>
+	  <element name="notificationInterval" type="xsd:unsignedInt"/>
+	  <element name="escalationPeriod" type="xsd:string" minOccurs="0"/>
+	  <element name="escalationOptions" type="xsd:string" minOccurs="0"/>
+        </sequence>
+      </complexType>
+
+      <!-- serviceGroup identifier. -->
+      <complexType name="serviceGroupIDType">
+        <sequence>
+          <element name="name" type="xsd:string"/>
+        </sequence>
+      </complexType>
+
+      <!-- serviceGroup type. -->
+      <complexType name="serviceGroupType">
+        <sequence>
+          <element name="name" type="xsd:string"/>
+          <element name="alias" type="xsd:string"/>
+          <element name="members" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+          <element name="servicegroupMembers" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+	  <element name="notes" type="xsd:string" minOccurs="0"/>
+	  <element name="notesUrl" type="xsd:string" minOccurs="0"/>
+	  <element name="actionUrl" type="xsd:string" minOccurs="0"/>
         </sequence>
       </complexType>
 
@@ -64,10 +259,59 @@
         </sequence>
       </complexType>
 
+      <!-- Command type. -->
+      <complexType name="commandType">
+        <sequence>
+          <element name="name" type="xsd:string"/>
+          <element name="commandLine" type="xsd:string"/>
+        </sequence>
+      </complexType>
+
       <!-- Contact identifier. -->
       <complexType name="contactIDType">
         <sequence>
           <element name="contact" type="xsd:string"/>
+        </sequence>
+      </complexType>
+
+      <!-- Contact type. -->
+      <complexType name="contactType">
+        <sequence>
+          <element name="name" type="xsd:string"/>
+          <element name="alias" type="xsd:string" minOccurs="0"/>
+	  <element name="contactgroups" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+	  <element name="hostNotificationsEnabled" type="xsd:boolean"/>
+	  <element name="serviceNotificationsEnabled" type="xsd:boolean"/>
+	  <element name="hostNotificationPeriod" type="xsd:string"/>
+	  <element name="serviceNotificationPeriod" type="xsd:string"/>
+	  <element name="hostNotificationOptions" type="xsd:string"/>
+	  <element name="serviceNotificationOptions" type="xsd:string"/>
+	  <element name="hostNotificationCommands" type="xsd:string" minOccurs="1" maxOccurs="unbounded"/>
+	  <element name="serviceNotificationCommands" type="xsd:string" minOccurs="1" maxOccurs="unbounded"/>
+	  <element name="email" type="xsd:string" minOccurs="0"/>
+	  <element name="pager" type="xsd:string" minOccurs="0"/>
+	  <element name="address" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+	  <element name="canSubmitCommands" type="xsd:boolean" minOccurs="0"/>
+	  <element name="retainStatusInformation" type="xsd:boolean" minOccurs="0"/>
+	  <element name="retainNonstatusInformation" type="xsd:boolean" minOccurs="0"/>
+	  <element name="customVariables" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+        </sequence>
+      </complexType>
+
+      <!-- ContactGroup identifier. -->
+      <complexType name="contactGroupIDType">
+        <sequence>
+          <element name="name" type="xsd:string"/>
+        </sequence>
+      </complexType>
+
+      <!-- ContactGroup type. -->
+      <complexType name="contactGroupType">
+        <sequence>
+          <element name="name" type="xsd:string"/>
+          <element name="alias" type="xsd:string"/>
+	  <element name="members" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+	  <element name="contactgroupMembers" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
         </sequence>
       </complexType>
 
@@ -106,6 +350,34 @@
       <complexType name="timeperiodIDType">
 	<sequence>
 	  <element name="timeperiod" type="xsd:string"/>
+	</sequence>
+      </complexType>
+
+      <!-- Timeperiod identifier. -->
+      <complexType name="timeperiodType">
+	<sequence>
+	  <element name="name" type="xsd:string"/>
+	  <element name="alias" type="xsd:string"/>
+	  <element name="range" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+	  <element name="exclude" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+	</sequence>
+      </complexType>
+
+      <!-- Service escalation identifier. -->
+      <complexType name="serviceEscalationIDType">
+	<sequence>
+	  <element name="name" type="xsd:string"/>
+	  <element name="description" type="xsd:string"/>
+	</sequence>
+      </complexType>
+
+      <!-- Service dependency identifier. -->
+      <complexType name="serviceDependencyIDType">
+	<sequence>
+	  <element name="hostName" type="xsd:string"/>
+	  <element name="serviceDescription" type="xsd:string"/>
+	  <element name="dependentHostName" type="xsd:string"/>
+	  <element name="dependentServiceDescription" type="xsd:string"/>
 	</sequence>
       </complexType>
 
@@ -229,6 +501,36 @@
     <part name="value" type="xsd:unsignedInt"/>
   </message>
 
+  <!-- Host add request. -->
+  <message name="addHostRequest">
+    <part name="host" type="tns:hostType"/>
+  </message>
+
+  <!-- Add a host dependency. -->
+  <message name="addHostDependencyRequest">
+    <part name="hostdependency" type="tns:hostDependencyType"/>
+  </message>
+
+  <!-- Add a host escalation. -->
+  <message name="addHostEscalationRequest">
+    <part name="hostescalation" type="tns:hostEscalationType"/>
+  </message>
+
+  <!--
+	 Host Group Messages.
+  -->
+
+  <!-- Message sent when executing an operation on a host group. -->
+  <message name="hostGroupRequest">
+    <part name="hostGroup" type="tns:hostGroupIDType"/>
+  </message>
+
+  <!-- Host group add request. -->
+  <message name="addHostGroupRequest">
+    <part name="hostGroup" type="tns:hostGroupType"/>
+  </message>
+
+
   <!--
 	 Service messages.
    -->
@@ -280,6 +582,45 @@
     <part name="value" type="xsd:unsignedInt"/>
   </message>
 
+  <!-- Service request no additional parameter.  -->
+  <message name="serviceEscalationRequest">
+    <part name="escalation" type="tns:serviceEscalationIDType"/>
+  </message>
+
+  <!-- Service request no additional parameter.  -->
+  <message name="serviceDependencyRequest">
+    <part name="dependency" type="tns:serviceDependencyIDType"/>
+  </message>
+
+  <!-- Service add request. -->
+  <message name="addServiceRequest">
+    <part name="service" type="tns:serviceType"/>
+  </message>
+
+  <!-- Add a service dependency. -->
+  <message name="addServiceDependencyRequest">
+    <part name="servicedependency" type="tns:serviceDependencyType"/>
+  </message>
+
+  <!-- Add a service escalation. -->
+  <message name="addServiceEscalationRequest">
+    <part name="serviceescalation" type="tns:serviceEscalationType"/>
+  </message>
+
+  <!--
+	 service Group Messages.
+  -->
+
+  <!-- Message sent when executing an operation on a host group. -->
+  <message name="serviceGroupRequest">
+    <part name="serviceGroup" type="tns:serviceGroupIDType"/>
+  </message>
+
+  <!-- Service group add request. -->
+  <message name="addServiceGroupRequest">
+    <part name="serviceGroup" type="tns:serviceGroupType"/>
+  </message>
+
   <!--
 	 Acknowledgement messages.
    -->
@@ -326,6 +667,11 @@
     <part name="command" type="tns:commandIDType"/>
   </message>
 
+  <!-- Command add request. -->
+  <message name="addCommandRequest">
+    <part name="command" type="tns:commandType"/>
+  </message>
+
   <!--
 	 Contact messages.
    -->
@@ -357,6 +703,25 @@
   <message name="contactTimeperiodRequest">
     <part name="contact" type="tns:contactIDType"/>
     <part name="value" type="tns:timeperiodIDType"/>
+  </message>
+
+  <!-- Contact add request. -->
+  <message name="addContactRequest">
+    <part name="contact" type="tns:contactType"/>
+  </message>
+
+  <!--
+	 Contact Group Messages.
+  -->
+
+  <!-- Message sent when executing an operation on a contact group. -->
+  <message name="contactGroupRequest">
+    <part name="contactGroup" type="tns:contactGroupIDType"/>
+  </message>
+
+  <!-- Contact group add request. -->
+  <message name="addContactGroupRequest">
+    <part name="contactGroup" type="tns:contactGroupType"/>
   </message>
 
   <!--
@@ -401,6 +766,19 @@
     <part name="notification" type="tns:notificationType"/>
   </message>
 
+  <!--
+         Timeperiod.
+  -->
+
+  <!-- Add a timeperiod. -->
+  <message name="timeperiodRequest">
+    <part name="timeperiod" type="tns:timeperiodIDType"/>
+  </message>
+
+  <!-- Add a timeperiod. -->
+  <message name="addTimeperiodRequest">
+    <part name="timeperiod" type="tns:timeperiodType"/>
+  </message>
 
   <!-- Not validated messages. -->
 
@@ -483,6 +861,179 @@
 	 Global operations.  
 	                      
      -->
+
+    <!--
+         Debug object operations.
+    -->
+
+    <!-- dumpObjectList -->
+    <operation name="dumpObjectList">
+      <documentation>Dump all object list</documentation>
+      <input message="tns:emptyRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!--
+	 Add object operations.
+    -->
+
+    <!-- addCommand() -->
+    <operation name="addCommand">
+      <documentation>Add command.</documentation>
+      <input message="tns:addCommandRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- addContactGroup() -->
+    <operation name="addContactGroup">
+      <documentation>Add contact group.</documentation>
+      <input message="tns:addContactGroupRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- addHostGroup() -->
+    <operation name="addHostGroup">
+      <documentation>Add host group.</documentation>
+      <input message="tns:addHostGroupRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- addServiceGroup() -->
+    <operation name="addServiceGroup">
+      <documentation>Add service group.</documentation>
+      <input message="tns:addServiceGroupRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- addHost() -->
+    <operation name="addHost">
+      <documentation>Add Host.</documentation>
+      <input message="tns:addHostRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- addService() -->
+    <operation name="addService">
+      <documentation>Add service.</documentation>
+      <input message="tns:addServiceRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- addContact() -->
+    <operation name="addContact">
+      <documentation>Add contact.</documentation>
+      <input message="tns:addContactRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- addHostDependency() -->
+    <operation name="addHostDependency">
+      <documentation>Add host dependency.</documentation>
+      <input message="tns:addHostDependencyRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- addHostEscalation() -->
+    <operation name="addHostEscalation">
+      <documentation>Add host escalation.</documentation>
+      <input message="tns:addHostEscalationRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- addServiceDependency() -->
+    <operation name="addServiceDependency">
+      <documentation>Add Service dependency.</documentation>
+      <input message="tns:addServiceDependencyRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- addServiceEscalation() -->
+    <operation name="addServiceEscalation">
+      <documentation>Add service escalation.</documentation>
+      <input message="tns:addServiceEscalationRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- addTimeperiod() -->
+    <operation name="addTimeperiod">
+      <documentation>Add timeperiod.</documentation>
+      <input message="tns:addTimeperiodRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!--
+	 Remove object operations.
+    -->
+
+    <!-- removeHost() -->
+    <operation name="removeHost">
+      <documentation>Remove host.</documentation>
+      <input message="tns:hostRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- removeHostGroup() -->
+    <operation name="removeHostGroup">
+      <documentation>Remove host group.</documentation>
+      <input message="tns:hostGroupRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- removeService() -->
+    <operation name="removeService">
+      <documentation>Remove service.</documentation>
+      <input message="tns:serviceRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- removeServiceGroup() -->
+    <operation name="removeServiceGroup">
+      <documentation>Remove service group.</documentation>
+      <input message="tns:serviceGroupRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- removeContact() -->
+    <operation name="removeContact">
+      <documentation>Remove contact.</documentation>
+      <input message="tns:contactRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- removeContactGroup() -->
+    <operation name="removeContactGroup">
+      <documentation>Remove contact group.</documentation>
+      <input message="tns:contactGroupRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- removeCommand() -->
+    <operation name="removeCommand">
+      <documentation>Remove command.</documentation>
+      <input message="tns:commandRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- removeServiceEscalation() -->
+    <operation name="removeServiceEscalation">
+      <documentation>Remove service escalation.</documentation>
+      <input message="tns:serviceEscalationRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- removeServiceDependency() -->
+    <operation name="removeServiceDependency">
+      <documentation>Remove service dependency.</documentation>
+      <input message="tns:serviceDependencyRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- removeTimeperiod() -->
+    <operation name="removeTimeperiod">
+      <documentation>Remove timeperiod.</documentation>
+      <input message="tns:timeperiodRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
 
     <!--
 	 Features.
@@ -3356,6 +3907,150 @@
 	 Global operations.  
 	                     
      -->
+
+    <!--
+	 Debug object operations.
+    -->
+
+    <operation name="dumpObjectList">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <!--
+         Add object operations.
+    -->
+
+    <operation name="addCommand">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="addContactGroup">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="addHostGroup">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="addServiceGroup">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="addHost">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="addService">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="addContact">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="addHostDependency">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="addHostEscalation">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="addServiceDependency">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="addServiceEscalation">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="addTimeperiod">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <!--
+         Remove object operations.
+    -->
+
+    <operation name="removeHost">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="removeHostGroup">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="removeService">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="removeServiceGroup">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="removeContact">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="removeContactGroup">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="removeCommand">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="removeServiceEscalation">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="removeServiceDependency">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
 
     <operation name="getEventHandlersEnabled">
       <SOAP:operation style="rpc" soapAction=""/>

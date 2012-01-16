@@ -825,12 +825,13 @@ int xodtemplate_add_member_to_memberlist(xodtemplate_memberlist **,char *,char *
 int xodtemplate_free_memberlist(xodtemplate_memberlist **);
 void xodtemplate_remove_memberlist_item(xodtemplate_memberlist *,xodtemplate_memberlist **);
 
+void xodtemplate_free_timeperiod(xodtemplate_timeperiod const* tperiod);
 
 int xodtemplate_begin_object_definition(char *,int,int,int);
 int xodtemplate_add_object_property(char *,int);
 int xodtemplate_end_object_definition(int);
 
-int xodtemplate_parse_timeperiod_directive(xodtemplate_timeperiod *,char *,char *);
+int xodtemplate_parse_timeperiod_directive(xodtemplate_timeperiod *,char const*,char const*);
 xodtemplate_daterange *xodtemplate_add_exception_to_timeperiod(xodtemplate_timeperiod *,int,int,int,int,int,int,int,int,int,int,int,int,char *);
 int xodtemplate_get_month_from_string(char *,int *);
 int xodtemplate_get_weekday_from_string(char *,int *);
@@ -951,35 +952,35 @@ int xodtemplate_init_xobject_skiplists(void);
 int xodtemplate_free_xobject_skiplists(void);
 
 int xodtemplate_skiplist_compare_text(const char *val1a, const char *val1b, const char *val2a, const char *val2b);
-int xodtemplate_skiplist_compare_host_template(void *a, void *b);
-int xodtemplate_skiplist_compare_service_template(void *a, void *b);
-int xodtemplate_skiplist_compare_command_template(void *a, void *b);
-int xodtemplate_skiplist_compare_connector_template(void* a, void* b);
-int xodtemplate_skiplist_compare_timeperiod_template(void *a, void *b);
-int xodtemplate_skiplist_compare_contact_template(void *a, void *b);
-int xodtemplate_skiplist_compare_contactgroup_template(void *a, void *b);
-int xodtemplate_skiplist_compare_hostgroup_template(void *a, void *b);
-int xodtemplate_skiplist_compare_servicegroup_template(void *a, void *b);
-int xodtemplate_skiplist_compare_hostdependency_template(void *a, void *b);
-int xodtemplate_skiplist_compare_servicedependency_template(void *a, void *b);
-int xodtemplate_skiplist_compare_hostescalation_template(void *a, void *b);
-int xodtemplate_skiplist_compare_serviceescalation_template(void *a, void *b);
-int xodtemplate_skiplist_compare_hostextinfo_template(void *a, void *b);
-int xodtemplate_skiplist_compare_serviceextinfo_template(void *a, void *b);
+int xodtemplate_skiplist_compare_host_template(void const* a, void const* b);
+int xodtemplate_skiplist_compare_service_template(void const* a, void const* b);
+int xodtemplate_skiplist_compare_connector_template(void const* a, void const* b);
+int xodtemplate_skiplist_compare_command_template(void const* a, void const* b);
+int xodtemplate_skiplist_compare_timeperiod_template(void const* a, void const* b);
+int xodtemplate_skiplist_compare_contact_template(void const* a, void const* b);
+int xodtemplate_skiplist_compare_contactgroup_template(void const* a, void const* b);
+int xodtemplate_skiplist_compare_hostgroup_template(void const* a, void const* b);
+int xodtemplate_skiplist_compare_servicegroup_template(void const* a, void const* b);
+int xodtemplate_skiplist_compare_hostdependency_template(void const* a, void const* b);
+int xodtemplate_skiplist_compare_servicedependency_template(void const* a, void const* b);
+int xodtemplate_skiplist_compare_hostescalation_template(void const* a, void const* b);
+int xodtemplate_skiplist_compare_serviceescalation_template(void const* a, void const* b);
+int xodtemplate_skiplist_compare_hostextinfo_template(void const* a, void const* b);
+int xodtemplate_skiplist_compare_serviceextinfo_template(void const* a, void const* b);
 
-int xodtemplate_skiplist_compare_host(void *a, void *b);
-int xodtemplate_skiplist_compare_service(void *a, void *b);
-int xodtemplate_skiplist_compare_contact(void *a, void *b);
-int xodtemplate_skiplist_compare_contactgroup(void *a, void *b);
-int xodtemplate_skiplist_compare_hostgroup(void *a, void *b);
-int xodtemplate_skiplist_compare_servicegroup(void *a, void *b);
-int xodtemplate_skiplist_compare_command(void *a, void *b);
-int xodtemplate_skiplist_compare_connector(void* a, void* b);
-int xodtemplate_skiplist_compare_timeperiod(void *a, void *b);
-int xodtemplate_skiplist_compare_hostdependency(void *a, void *b);
-int xodtemplate_skiplist_compare_servicedependency(void *a, void *b);
-int xodtemplate_skiplist_compare_hostescalation(void *a, void *b);
-int xodtemplate_skiplist_compare_serviceescalation(void *a, void *b);
+int xodtemplate_skiplist_compare_host(void const* a, void const* b);
+int xodtemplate_skiplist_compare_service(void const* a, void const* b);
+int xodtemplate_skiplist_compare_contact(void const* a, void const* b);
+int xodtemplate_skiplist_compare_contactgroup(void const* a, void const* b);
+int xodtemplate_skiplist_compare_hostgroup(void const* a, void const* b);
+int xodtemplate_skiplist_compare_servicegroup(void const* a, void const* b);
+int xodtemplate_skiplist_compare_command(void const* a, void const* b);
+int xodtemplate_skiplist_compare_connector(void const* a, void const* b);
+int xodtemplate_skiplist_compare_timeperiod(void const* a, void const* b);
+int xodtemplate_skiplist_compare_hostdependency(void const* a, void const* b);
+int xodtemplate_skiplist_compare_servicedependency(void const* a, void const* b);
+int xodtemplate_skiplist_compare_hostescalation(void const* a, void const* b);
+int xodtemplate_skiplist_compare_serviceescalation(void const* a, void const* b);
 
 # ifdef __cplusplus
 }

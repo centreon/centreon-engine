@@ -45,7 +45,7 @@ namespace                               com {
 	                                raw(QString const& name,
 					    QString const& command_line);
 	                                raw(raw const& right);
-	                                ~raw() throw();
+                                        ~raw() throw();
 
 	  raw&                          operator=(raw const& right);
 
@@ -60,8 +60,8 @@ namespace                               com {
 					    unsigned int timeout,
 					    result& res);
 
-	public slots:
-	  void                          ended();
+        public slots:
+	  void                          raw_ended();
 
 	private:
           static void                   _deletelater_process(process* obj);

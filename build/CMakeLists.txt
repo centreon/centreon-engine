@@ -710,6 +710,7 @@ add_subdirectory("events")
 add_subdirectory("logging")
 add_subdirectory("macros")
 add_subdirectory("modules")
+add_subdirectory("objects")
 add_subdirectory("scripts")
 
 # Link target with required libraries.
@@ -718,14 +719,15 @@ target_link_libraries("cce_core"
   ${SOCKET_LIBRARIES}
   ${THREAD_LIBRARIES}
   ${QT_LIBRARIES}
-  "cce_commands"
   "cce_events"
   "cce_logging"
   "cce_broker"
   "cce_configuration"
   "cce_checks"
   "cce_macros"
-  "cce_compatibility")
+  "cce_commands"
+  "cce_compatibility"
+  "cce_objects")
 
 # centengine target.
 add_executable("centengine"
@@ -736,6 +738,18 @@ get_property(ENGINE_COMPILE_FLAGS
 set(ENGINE_COMPILE_FLAGS "${ENGINE_COMPILE_FLAGS}")
 set_target_properties("centengine"
   PROPERTIES COMPILE_FLAGS "${ENGINE_COMPILE_FLAGS}")
+get_property(ENGINE_LINK_FLAGS
+  TARGET "centengine"
+  PROPERTY LINK_FLAGS)
+set(ENGINE_LINK_FLAGS "${ENGINE_LINK_FLAGS}")
+
+if (CMAKE_COMPILER_IS_GNUCXX)
+  set(ENGINE_LINK_FLAGS
+    "${ENGINE_LINK_FLAGS} -Wl,-whole-archive -lcce_objects -L./objects -Wl,-no-whole-archive")
+endif ()
+
+set_target_properties("centengine"
+  PROPERTIES LINK_FLAGS "${ENGINE_LINK_FLAGS}")
 # Link centengine with required libraries.
 target_link_libraries("centengine"
   "cce_core")
@@ -882,6 +896,80 @@ if (WITH_TESTING)
     "${TEST_DIR}/error/assignment.cc")
   target_link_libraries("${TEST_NAME}" "cce_core")
   add_test("${TEST_NAME}" "${TEST_NAME}")
+
+
+  # Remove command.
+  set(TEST_NAME "remove_command")
+  add_executable("${TEST_NAME}"
+    "${TEST_DIR}/objects/remove_command.cc")
+  target_link_libraries("${TEST_NAME}" "cce_core")
+  add_test("${TEST_NAME}" "${TEST_NAME}")
+  # Remove contact.
+  set(TEST_NAME "remove_contact")
+  add_executable("${TEST_NAME}"
+    "${TEST_DIR}/objects/remove_contact.cc")
+  target_link_libraries("${TEST_NAME}" "cce_core")
+  add_test("${TEST_NAME}" "${TEST_NAME}")
+  # Remove contactgroup.
+  set(TEST_NAME "remove_contactgroup")
+  add_executable("${TEST_NAME}"
+    "${TEST_DIR}/objects/remove_contactgroup.cc")
+  target_link_libraries("${TEST_NAME}" "cce_core")
+  add_test("${TEST_NAME}" "${TEST_NAME}")
+  # Remove servicegroup.
+  set(TEST_NAME "remove_servicegroup")
+  add_executable("${TEST_NAME}"
+    "${TEST_DIR}/objects/remove_servicegroup.cc")
+  target_link_libraries("${TEST_NAME}" "cce_core")
+  add_test("${TEST_NAME}" "${TEST_NAME}")
+  # Remove hostgroup.
+  set(TEST_NAME "remove_hostgroup")
+  add_executable("${TEST_NAME}"
+    "${TEST_DIR}/objects/remove_hostgroup.cc")
+  target_link_libraries("${TEST_NAME}" "cce_core")
+  add_test("${TEST_NAME}" "${TEST_NAME}")
+  # Remove serviceescalation.
+  set(TEST_NAME "remove_serviceescalation")
+  add_executable("${TEST_NAME}"
+    "${TEST_DIR}/objects/remove_serviceescalation.cc")
+  target_link_libraries("${TEST_NAME}" "cce_core")
+  add_test("${TEST_NAME}" "${TEST_NAME}")
+  # Remove servicedependency.
+  set(TEST_NAME "remove_servicedependency")
+  add_executable("${TEST_NAME}"
+    "${TEST_DIR}/objects/remove_servicedependency.cc")
+  target_link_libraries("${TEST_NAME}" "cce_core")
+  add_test("${TEST_NAME}" "${TEST_NAME}")
+  # Remove host.
+  set(TEST_NAME "remove_host")
+  add_executable("${TEST_NAME}"
+    "${TEST_DIR}/objects/remove_host.cc")
+  target_link_libraries("${TEST_NAME}" "cce_core")
+  add_test("${TEST_NAME}" "${TEST_NAME}")
+  # Remove service.
+  set(TEST_NAME "remove_service")
+  add_executable("${TEST_NAME}"
+    "${TEST_DIR}/objects/remove_service.cc")
+  target_link_libraries("${TEST_NAME}" "cce_core")
+  add_test("${TEST_NAME}" "${TEST_NAME}")
+  # Remove hostescalation.
+  set(TEST_NAME "remove_hostescalation")
+  add_executable("${TEST_NAME}"
+    "${TEST_DIR}/objects/remove_hostescalation.cc")
+  target_link_libraries("${TEST_NAME}" "cce_core")
+  add_test("${TEST_NAME}" "${TEST_NAME}")
+  # Remove hostdependency.
+  set(TEST_NAME "remove_hostdependency")
+  add_executable("${TEST_NAME}"
+    "${TEST_DIR}/objects/remove_hostdependency.cc")
+  target_link_libraries("${TEST_NAME}" "cce_core")
+  add_test("${TEST_NAME}" "${TEST_NAME}")
+  # Remove timeperiod.
+  set(TEST_NAME "remove_timeperiod")
+  add_executable("${TEST_NAME}"
+    "${TEST_DIR}/objects/remove_timeperiod.cc")
+  target_link_libraries("${TEST_NAME}" "cce_core")
+  add_test("${TEST_NAME}" "${TEST_NAME}")
 endif ()
 
 #
@@ -946,7 +1034,7 @@ if (WITH_TESTING)
   add_test("running_engine_no_service"
     "centengine" "-v" "${TEST_DIR}/running/etc/no_service.cfg")
   set_tests_properties("running_engine_no_service"
-    PROPERTIES WILL_FAIL TRUE)
+    PROPERTIES WILL_SUCCESS TRUE)
   # Empty host group.
   set(TEST_NAME "running_engine_empty_hostgroup")
   add_test("${TEST_NAME}"

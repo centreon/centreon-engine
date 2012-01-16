@@ -40,7 +40,6 @@ int main_test() {
 
   if (cmd != cmd)
     throw (engine_error() << "error: operator!= failed.");
-
   return (0);
 }
 

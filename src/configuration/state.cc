@@ -212,6 +212,15 @@ state::state(state const& right) {
  *  Destructor.
  */
 state::~state() throw() {
+  delete[] _mac->x[MACRO_LOGFILE];
+  delete[] _mac->x[MACRO_TEMPPATH];
+  delete[] _mac->x[MACRO_MAINCONFIGFILE];
+  delete[] _mac->x[MACRO_COMMANDFILE];
+  delete[] _mac->x[MACRO_TEMPFILE];
+  delete[] _mac->x[MACRO_RESOURCEFILE];
+  delete[] _mac->x[MACRO_ADMINEMAIL];
+  delete[] _mac->x[MACRO_ADMINPAGER];
+
   delete[] ::log_file;
   delete[] ::debug_file;
   delete[] ::command_file;
@@ -223,15 +232,6 @@ state::~state() throw() {
   delete[] ::illegal_object_chars;
   delete[] ::illegal_output_chars;
   delete[] ::use_timezone;
-
-  delete[] _mac->x[MACRO_TEMPPATH];
-  delete[] _mac->x[MACRO_LOGFILE];
-  delete[] _mac->x[MACRO_MAINCONFIGFILE];
-  delete[] _mac->x[MACRO_COMMANDFILE];
-  delete[] _mac->x[MACRO_TEMPFILE];
-  delete[] _mac->x[MACRO_RESOURCEFILE];
-  delete[] _mac->x[MACRO_ADMINEMAIL];
-  delete[] _mac->x[MACRO_ADMINPAGER];
 }
 
 /**

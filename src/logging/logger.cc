@@ -17,7 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <time.h>
+#include <QDateTime>
 #include "logging/logger.hh"
 
 using namespace com::centreon::engine::logging;
@@ -301,3 +301,4 @@ void logger::_flush() {
 void logger::_nothing() {
 
 }
+

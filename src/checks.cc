@@ -178,14 +178,13 @@ int run_async_service_check(service* svc,
 			    int* time_is_valid,
                             time_t* preferred_time) {
   try {
-    if (checks::checker::instance().run(svc,
-                                        check_options,
-                                        latency,
-                                        scheduled_check,
-                                        reschedule_check,
-                                        time_is_valid,
-                                        preferred_time) == false)
-      return (ERROR);
+    checks::checker::instance().run(svc,
+                                    check_options,
+                                    latency,
+                                    scheduled_check,
+                                    reschedule_check,
+                                    time_is_valid,
+                                    preferred_time);
   }
   catch (std::exception const& e) {
     logger(log_runtime_error, basic) << "error: " << e.what();
@@ -2187,14 +2186,13 @@ int run_async_host_check_3x(host* hst,
 			    int* time_is_valid,
                             time_t* preferred_time) {
   try {
-    if (checks::checker::instance().run(hst,
-                                        check_options,
-                                        latency,
-                                        scheduled_check,
-                                        reschedule_check,
-                                        time_is_valid,
-                                        preferred_time) == false)
-      return (ERROR);
+    checks::checker::instance().run(hst,
+                                    check_options,
+                                    latency,
+                                    scheduled_check,
+                                    reschedule_check,
+                                    time_is_valid,
+                                    preferred_time);
   }
   catch (std::exception const& e) {
     logger(log_runtime_error, basic) << "error: " << e.what();

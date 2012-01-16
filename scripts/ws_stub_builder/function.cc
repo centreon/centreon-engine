@@ -19,6 +19,7 @@
 
 #include <QRegExp>
 #include <QStringList>
+#include <QRegExp>
 
 #include "error.hh"
 #include "arg_definition.hh"
@@ -41,8 +42,7 @@ char const* com::centreon::engine::script::function::_pattern =
  */
 function::function(QString const& data)
   : _def(arg_definition::instance()),
-    _data(data),
-    _nb_args(3) {
+    _data(data) {
 
 }
 
@@ -80,7 +80,6 @@ function& function::operator=(function const& right) {
     _exec_prototype = right._exec_prototype;
     _help_function = right._help_function;
     _exec_function = right._exec_function;
-    _nb_args = right._nb_args;
   }
   return (*this);
 }
@@ -191,7 +190,7 @@ void function::_build_help_prototype() {
  *  Build the execute function prototype.
  */
 void function::_build_exec_prototype() {
-  QString func("bool exec_%1(soap* s, char const* end_point, char const* action, QList<QString> const& args)");
+  QString func("bool exec_%1(soap* s, char const* end_point, char const* action, QHash<QString, QString> const& args)");
   _exec_prototype = func.arg(_new_function);
 }
 
@@ -212,17 +211,14 @@ void function::_build_help_function() {
     }
   }
 
-  _help_function = func.arg(_new_function).arg(_new_function + usage);
+  _help_function = func.arg(_new_function).arg(_new_function + " " + usage);
 }
 
 /**
  *  Build the execute function code.
  */
 void function::_build_exec_function() {
-  QString func("bool exec_%1(soap* s, char const* end_point, char const* action, QList<QString> const& args) {\n"
-	       "  if (args.size() != %2) {\n"
-	       "    throw (error(\"function call with invalid arguments.\"));\n"
-	       "  }\n\n"
+  QString func("bool exec_%1(soap* s, char const* end_point, char const* action, QHash<QString, QString> const& args) {\n"
 	       "%3\n"
 	       "%4\n"
 	       "  int ret = soap_call_centreonengine__%5(s, end_point, action%6);\n"
@@ -284,7 +280,6 @@ void function::_build_exec_function() {
 
   _exec_function = func
     .arg(_new_function)
-    .arg(_nb_args - 3)
     .arg(var)
     .arg(init_var)
     .arg(_function)
@@ -331,7 +326,9 @@ void function::_build_args_info(QString const& args_list) {
  */
 QString function::_build_help_args(argument const& arg) const {
   if (arg.is_primitive() == true) {
-    return (" " + arg.get_help());
+    if (arg.is_optional() == false)
+      return (" " + arg.get_help());
+    return (" [" + arg.get_help() + "]");
   }
 
   QString ret;
@@ -386,9 +383,28 @@ QString function::_build_exec_new(QString const& base,
 QString function::_build_exec_struct(QString const& base,
 				     argument const& arg) {
   if (arg.is_primitive() == true) {
-    ++_nb_args;
-    return ("  " + base + " = args[" + QString("%1").arg(_list_pos++) + "]"
-	    + "." + _get_qstring_methode(arg.get_type()) + ";\n");
+    if (!arg.is_optional()) {
+      return ("  if (args.find(\"" + arg.get_help() + "\") == args.end())\n"
+              "    throw (error(\"argument \\\"" + arg.get_help() + "\\\" missing.\"));\n"
+              "  " + base + " = " + _get_qstring_methode(arg.get_type())
+	      + "(args[\"" + arg.get_help() + "\"]);\n");
+    }
+    else if (arg.is_array()) {
+      return ("  if (args.find(\"" + arg.get_help() + "\") != args.end()) {\n"
+              "    " + base + " = " + _get_qstring_methode(arg.get_type())
+	      + "(args[\"" + arg.get_help() + "\"]);\n"
+              "  }\n");
+    }
+    else {
+      QString varname(base);
+      varname.replace(QRegExp("[->\\.]"), "_");
+      return ("  " + arg.get_type() + " " + varname + ";\n"
+              "  if (args.find(\"" + arg.get_help() + "\") != args.end()) {\n"
+              "    " + varname + " = " + _get_qstring_methode(arg.get_type())
+	      + "(args[\"" + arg.get_help() + "\"])" + ";\n"
+	      + "    " + base + " = &" + varname + ";\n"
+              "  }\n");
+    }
   }
 
   QString ret;
@@ -441,6 +457,10 @@ QString function::_build_exec_delete(QString const& base,
  *  @return Return the QString methode name to translate the type.
  */
 QString function::_get_qstring_methode(QString type) const {
+  if (type == "std::vector<std::string>") {
+    return ("toStdVector");
+  }
+
   type.replace("time_t", "long long");
   type.replace("ULONG64", "unsigned long long");
   type.replace("bool", "int");
@@ -459,8 +479,6 @@ QString function::_get_qstring_methode(QString type) const {
       ret += *it;
     }
   }
-
-  ret += "()";
   return (ret);
 }
 

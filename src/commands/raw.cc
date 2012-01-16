@@ -38,7 +38,6 @@ using namespace com::centreon::engine::commands;
 raw::raw(QString const& name,
 	 QString const& command_line)
   : command(name, command_line) {
-
 }
 
 /**
@@ -58,8 +57,11 @@ raw::~raw() throw() {
   _mutex.lock();
   while (_processes.empty() == false) {
     process_info info = _processes.begin().value();
+
+    QEventLoop loop;
+    connect(this, SIGNAL(command_executed(commands::result const&)), &loop, SLOT(quit()));
     _mutex.unlock();
-    info.proc->wait();
+    loop.exec();
     _mutex.lock();
   }
   _mutex.unlock();
@@ -107,9 +109,9 @@ unsigned long raw::run(QString const& processed_cmd,
                                       &_deletelater_process);
 
   if (connect(&(*info.proc),
-  	      SIGNAL(ended()),
+  	      SIGNAL(process_ended()),
   	      this,
-  	      SLOT(ended())) == false) {
+  	      SLOT(raw_ended())) == false) {
     throw (engine_error() << "connect process to commands::raw failed.");
   }
 
@@ -123,8 +125,10 @@ unsigned long raw::run(QString const& processed_cmd,
     << ") start '" << processed_cmd << "'.";
 
   info.proc->start(processed_cmd);
-  info.proc->waitForStarted(-1);
 
+  logger(dbg_commands, basic)
+    << "raw command (id=" << info.cmd_id
+    << ") start '" << processed_cmd << "'.";
   logger(dbg_functions, basic) << "end " << Q_FUNC_INFO;
   return (info.cmd_id);
 }
@@ -171,9 +175,8 @@ void raw::run(QString const& processed_cmd,
 /**
  *  Slot to catch the end of processes et send the result by signal.
  */
-void raw::ended() {
+void raw::raw_ended() {
   logger(dbg_functions, basic) << "start " << Q_FUNC_INFO;
-
   _mutex.lock();
   QHash<QObject*, process_info>::iterator it = _processes.find(sender());
   if (it == _processes.end()) {

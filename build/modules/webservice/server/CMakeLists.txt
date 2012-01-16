@@ -42,6 +42,8 @@ qt4_wrap_cpp(QT_WS_MOC_FILES
 # webservice target.
 add_library("webservice"
   SHARED
+  "${MODULE_DIR}/server/schedule_object.cc"
+  "${MODULE_DIR}/server/create_object.cc"
   "${MODULE_DIR}/server/soapC.cpp"
   "${MODULE_DIR}/server/soapServer.cpp"
   "${MODULE_DIR}/server/commands.cc"
@@ -50,6 +52,8 @@ add_library("webservice"
   "${MODULE_DIR}/server/ssl.cc"
   "${MODULE_DIR}/server/main.cc"
   "${MODULE_DIR}/server/syncro.cc"
+  "${MODULE_DIR}/server/schedule_object.hh"
+  "${MODULE_DIR}/server/create_object.hh"
   "${MODULE_DIR}/server/webservice.hh"
   "${MODULE_DIR}/server/configuration.hh"
   "${MODULE_DIR}/server/ssl.hh"

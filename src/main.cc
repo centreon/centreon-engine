@@ -44,8 +44,10 @@
 #include "config.hh"
 #include "utils.hh"
 #include "broker/loader.hh"
-#include "logging.hh"
+#include "checks/checker.hh"
+#include "commands/set.hh"
 #include "configuration/applier/logging.hh"
+#include "logging.hh"
 #include "logging/logger.hh"
 #include "logging/broker.hh"
 #include "logging/engine.hh"
@@ -106,6 +108,12 @@ int main(int argc, char** argv) {
   // Make sure we have the correct number of command line arguments.
   if (argc < 2)
     error = TRUE;
+
+  // load singleton.
+  logging::engine::instance();
+  com::centreon::engine::broker::loader::instance();
+  checks::checker::instance();
+  commands::set::instance();
 
   // Process all command line arguments.
 #ifdef HAVE_GETOPT_H
@@ -591,5 +599,10 @@ int main(int argc, char** argv) {
     delete[] config_file;
   }
 
+  // unload singleton.
+  commands::set::cleanup();
+  checks::checker::cleanup();
+  com::centreon::engine::broker::loader::cleanup();
+  logging::engine::cleanup();
   return (OK);
 }
