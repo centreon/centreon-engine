@@ -1,5 +1,5 @@
 ##
-## Copyright 2011 Merethis
+## Copyright 2011-2012 Merethis
 ##
 ## This file is part of Centreon Engine.
 ##
@@ -45,6 +45,7 @@ include_directories("${MODULE_DIR}/client")
 
 # centenginews target.
 add_executable("centenginews"
+  "${MODULE_DIR}/client/centreonengine.nsmap"
   "${MODULE_DIR}/client/soapC.cpp"
   "${MODULE_DIR}/client/soapClient.cpp"
   "${MODULE_DIR}/client/auto_gen.cc"
@@ -52,6 +53,8 @@ add_executable("centenginews"
   "${MODULE_DIR}/client/error.cc"
   "${MODULE_DIR}/client/ssl.cc"
   "${MODULE_DIR}/client/main.cc"
+  "${MODULE_DIR}/client/soapH.h"
+  "${MODULE_DIR}/client/soapStub.h"
   "${MODULE_DIR}/client/auto_gen.hh"
   "${MODULE_DIR}/client/webservice.hh"
   "${MODULE_DIR}/client/error.hh"
@@ -66,9 +69,9 @@ if (CMAKE_COMPILER_IS_GNUCXX)
     "${MODULE_DIR}/client/soapC.cpp"
     COMPILE_FLAGS)
   if (compile_flags)
-    set(compile_flags "${compile_flags} -Wno-unused-parameter")
+    set(compile_flags "${compile_flags} -Wno-unused-parameter -Wno-vla")
   else ()
-    set(compile_flags "-Wno-unused-parameter")
+    set(compile_flags "-Wno-unused-parameter -Wno-vla")
   endif ()
   set_source_files_properties("${MODULE_DIR}/client/soapC.cpp"
     PROPERTIES COMPILE_FLAGS "${compile_flags}")

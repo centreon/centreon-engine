@@ -1,5 +1,5 @@
 ##
-## Copyright 2011 Merethis
+## Copyright 2011-2012 Merethis
 ##
 ## This file is part of Centreon Engine.
 ##
@@ -42,6 +42,7 @@ qt4_wrap_cpp(QT_WS_MOC_FILES
 # webservice target.
 add_library("webservice"
   SHARED
+  "${MODULE_DIR}/server/centreonengine.nsmap"
   "${MODULE_DIR}/server/schedule_object.cc"
   "${MODULE_DIR}/server/create_object.cc"
   "${MODULE_DIR}/server/soapC.cpp"
@@ -52,6 +53,8 @@ add_library("webservice"
   "${MODULE_DIR}/server/ssl.cc"
   "${MODULE_DIR}/server/main.cc"
   "${MODULE_DIR}/server/syncro.cc"
+  "${MODULE_DIR}/server/soapH.h"
+  "${MODULE_DIR}/server/soapStub.h"
   "${MODULE_DIR}/server/schedule_object.hh"
   "${MODULE_DIR}/server/create_object.hh"
   "${MODULE_DIR}/server/webservice.hh"
@@ -71,9 +74,9 @@ if (CMAKE_COMPILER_IS_GNUCXX)
     "${MODULE_DIR}/server/soapC.cpp"
     COMPILE_FLAGS)
   if (compile_flags)
-    set(compile_flags "${compile_flags} -Wno-unused-parameter")
+    set(compile_flags "${compile_flags} -Wno-unused-parameter -Wno-vla")
   else ()
-    set(compile_flags "-Wno-unused-parameter")
+    set(compile_flags "-Wno-unused-parameter -Wno-vla")
   endif ()
   set_source_files_properties("${MODULE_DIR}/server/soapC.cpp"
     PROPERTIES COMPILE_FLAGS "${compile_flags}")
