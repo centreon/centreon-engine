@@ -20,7 +20,7 @@
 #ifndef CCE_COMMANDS_RAW_HH
 # define CCE_COMMANDS_RAW_HH
 
-# include <QString>
+# include <string>
 # include <QSharedPointer>
 # include <QHash>
 # include <QMutex>
@@ -42,8 +42,8 @@ namespace                               com {
 	class                           raw : public command {
 	  Q_OBJECT
 	public:
-	                                raw(QString const& name,
-					    QString const& command_line);
+	                                raw(std::string const& name,
+					    std::string const& command_line);
 	                                raw(raw const& right);
                                         ~raw() throw();
 
@@ -51,11 +51,11 @@ namespace                               com {
 
 	  command*                      clone() const;
 
-	  unsigned long                 run(QString const& process_cmd,
+	  unsigned long                 run(std::string const& process_cmd,
 					    nagios_macros const& macros,
 					    unsigned int timeout);
 
-	  void                          run(QString const& process_cmd,
+	  void                          run(std::string const& process_cmd,
 					    nagios_macros const& macros,
 					    unsigned int timeout,
 					    result& res);

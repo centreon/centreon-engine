@@ -41,9 +41,9 @@ QReadWriteLock file::_rwlock;
  *  @param[in] file       The file name.
  *  @param[in] size_limit The file's size limit.
  */
-file::file(QString const& file, unsigned long long size_limit)
+file::file(std::string const& file, unsigned long long size_limit)
   : _mutex(new QMutex),
-    _file(new QFile(file)),
+    _file(new QFile(file.c_str())),
     _size_limit(size_limit) {
   _file->open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Append);
   if (_file->QFile::error() != QFile::NoError) {
@@ -60,9 +60,9 @@ file::file(QString const& file, unsigned long long size_limit)
  *  @param[in] file         The file name.
  *  @param[in] archive_path The archive path for the rotation.
  */
-file::file(QString const& file, QString const& archive_path)
+file::file(std::string const& file, std::string const& archive_path)
   : _mutex(new QMutex),
-    _file(new QFile(file)),
+    _file(new QFile(file.c_str())),
     _archive_path(archive_path),
     _size_limit(0) {
   _file->open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Append);
@@ -145,19 +145,20 @@ void file::rotate() {
 
   localtime_r(&now, &t);
 
-  QString old_name = _file->fileName();
-  QString new_name = QString("%1/%2-%3-%4-%5-%6.log")
+  std::string old_name = qPrintable(_file->fileName());
+  // XXX: todo.
+  std::string new_name;/* = QString("%1/%2-%3-%4-%5-%6.log")
     .arg(_archive_path)
     .arg(old_name)
     .arg(t.tm_mon + 1, 2, 10, QLatin1Char('0'))
     .arg(t.tm_mday, 2, 10, QLatin1Char('0'))
     .arg(t.tm_year + 1900)
     .arg(t.tm_hour, 2, 10, QLatin1Char('0'));
-
+                       */
     _file->close();
-    if ((QFile::exists(new_name) == false || QFile::remove(new_name) == true)
-	&& _file->rename(new_name) == true) {
-      _file->setFileName(old_name);
+    if ((QFile::exists(new_name.c_str()) == false || QFile::remove(new_name.c_str()) == true)
+	&& _file->rename(new_name.c_str()) == true) {
+      _file->setFileName(old_name.c_str());
     }
     _file->open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Append);
   _mutex->unlock();
@@ -184,13 +185,13 @@ void file::log(char const* message,
   if ((_size_limit > 0)
       && (static_cast<unsigned long long>(_file->size() + strlen(message))
           >= _size_limit)) {
-    QString old_name = _file->fileName();
-    QString new_name = old_name + ".old";
+    std::string old_name = qPrintable(_file->fileName());
+    std::string new_name = old_name + ".old";
 
     _file->close();
-    if ((QFile::exists(new_name) == false || QFile::remove(new_name) == true)
-	&& _file->rename(new_name) == true) {
-    _file->setFileName(old_name);
+    if ((QFile::exists(new_name.c_str()) == false || QFile::remove(new_name.c_str()) == true)
+	&& _file->rename(new_name.c_str()) == true) {
+      _file->setFileName(old_name.c_str());
     }
     _file->open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Append);
   }
@@ -206,7 +207,7 @@ void file::log(char const* message,
  *
  *  @param[in] path The new archive path.
  */
-void file::set_archive_path(QString const& path) throw() {
+void file::set_archive_path(std::string const& path) throw() {
   _mutex->lock();
   _archive_path = path;
   _mutex->unlock();
@@ -217,9 +218,9 @@ void file::set_archive_path(QString const& path) throw() {
  *
  *  @return The archive path.
  */
-QString file::get_archive_path() const throw() {
+std::string file::get_archive_path() const throw() {
   _mutex->lock();
-  QString path = _archive_path;
+  std::string path = _archive_path;
   _mutex->unlock();
   return (path);
 }
@@ -252,9 +253,9 @@ unsigned long long file::get_size_limit() const throw() {
  *
  *  @return The file name.
  */
-QString file::get_file_name() throw() {
+std::string file::get_file_name() throw() {
   _mutex->lock();
-  QString filename = _file->fileName();
+  std::string filename = qPrintable(_file->fileName());
   _mutex->unlock();
   return (filename);
 }

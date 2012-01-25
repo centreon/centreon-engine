@@ -125,7 +125,7 @@ unsigned int process::get_executed_time() const throw() {
  *
  *  @return The standard error string.
  */
-QString const& process::get_stderr() const throw() {
+std::string const& process::get_stderr() const throw() {
   return (_stderr);
 }
 
@@ -134,7 +134,7 @@ QString const& process::get_stderr() const throw() {
  *
  *  @return The standard output string.
  */
-QString const& process::get_stdout() const throw() {
+std::string const& process::get_stdout() const throw() {
   return (_stdout);
 }
 
@@ -207,7 +207,7 @@ void process::_finished(int exit_code, QProcess::ExitStatus exit_status) {
 
   if (error() == QProcess::FailedToStart) {
     _exit_code = STATE_CRITICAL;
-    _stderr = "(" + errorString() + ")";
+    _stderr = "(" + errorString().toStdString() + ")";
     _stdout = "";
     _is_executed = false;
   }
@@ -228,8 +228,8 @@ void process::_finished(int exit_code, QProcess::ExitStatus exit_status) {
       _exit_code = exit_code;
     }
 
-    _stderr = readAllStandardError();
-    _stdout = readAllStandardOutput();
+    _stderr = qPrintable(readAllStandardError());
+    _stdout = qPrintable(readAllStandardOutput());
     _is_executed = (exit_status != QProcess::CrashExit);
   }
 

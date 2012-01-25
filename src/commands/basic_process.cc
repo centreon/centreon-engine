@@ -117,7 +117,7 @@ QProcess::ExitStatus basic_process::exitStatus() const {
   return (WIFSIGNALED(_status) ? QProcess::CrashExit : QProcess::NormalExit);
 }
 
-//  QString basic_process::nativeArguments() const {
+//  std::string basic_process::nativeArguments() const {
 //    throw (engine_error() << "basic_process: " << Q_FUNC_INFO << " not implemented yet.");
 //  }
 
@@ -173,7 +173,7 @@ QProcess::ProcessChannel basic_process::readChannel() const {
 //    setProcessEnvironment(QProcessEnvironmentPrivate::fromList(environment));
 //  }
 
-//  void basic_process::setNativeArguments(QString const& arguments) {
+//  void basic_process::setNativeArguments(std::string const& arguments) {
 //    throw (engine_error() << "basic_process: " << Q_FUNC_INFO << " not implemented yet.");
 //  }
 
@@ -194,15 +194,15 @@ void basic_process::setReadChannel(QProcess::ProcessChannel channel) {
   _channel = channel;
 }
 
-//  void basic_process::setStandardErrorFile(QString const& fileName, OpenMode mode) {
+//  void basic_process::setStandardErrorFile(std::string const& fileName, OpenMode mode) {
 //    throw (engine_error() << "basic_process: " << Q_FUNC_INFO << " not implemented yet.");
 //  }
 
-//  void basic_process::setStandardInputFile(QString const& fileName) {
+//  void basic_process::setStandardInputFile(std::string const& fileName) {
 //    throw (engine_error() << "basic_process: " << Q_FUNC_INFO << " not implemented yet.");
 //  }
 
-//  void basic_process::setStandardOutputFile(QString const& fileName, OpenMode mode) {
+//  void basic_process::setStandardOutputFile(std::string const& fileName, OpenMode mode) {
 //    throw (engine_error() << "basic_process: " << Q_FUNC_INFO << " not implemented yet.");
 //  }
 
@@ -215,7 +215,7 @@ void basic_process::setReadChannel(QProcess::ProcessChannel channel) {
  *
  *  @param[in] dir The working directory.
  */
-void basic_process::setWorkingDirectory(QString const& dir) {
+void basic_process::setWorkingDirectory(std::string const& dir) {
   _working_directory = dir;
 }
 
@@ -226,7 +226,7 @@ void basic_process::setWorkingDirectory(QString const& dir) {
  *  @param[in] arguments The arguments of the program.
  *  @param[in] mode      Set the openning mode.
  */
-void basic_process::start(QString const& program, QStringList const& arguments, OpenMode mode) {
+void basic_process::start(std::string const& program, QStringList const& arguments, OpenMode mode) {
   if (_pstate != QProcess::NotRunning)
     return;
 
@@ -242,14 +242,16 @@ void basic_process::start(QString const& program, QStringList const& arguments, 
  *  @param[in] program The binary name.
  *  @param[in] mode    Set the openning mode.
  */
-void basic_process::start(QString const& program, OpenMode mode) {
+void basic_process::start(std::string const& program, OpenMode mode) {
   if (_pstate != QProcess::NotRunning)
     return;
 
-  _arguments = _split_command_line(program);
+  /*
+  // XXX: todo.
+   _arguments = _split_command_line(program);
   _program = _arguments.first();
   _arguments.removeFirst();
-
+  */
   _start_process(mode);
 }
 
@@ -346,7 +348,7 @@ bool basic_process::waitForStarted(int msecs) {
  *
  *  @return The working directory path.
  */
-QString basic_process::workingDirectory() const {
+std::string basic_process::workingDirectory() const {
   return (_working_directory);
 }
 
@@ -640,7 +642,7 @@ void basic_process::_exec_child() {
     char** args(_build_args(_program, _arguments));
     // char** env = NULL;
 
-    _chdir(qPrintable(_working_directory));
+    _chdir(_working_directory.c_str());
 
     setupChildProcess();
     execvp(args[0], args);
@@ -806,9 +808,9 @@ int basic_process::_dup2(int fildes, int fildes2) throw() {
  *
  *  @return Array of arguments.
  */
-char** basic_process::_build_args(QString const& program, QStringList const& arguments) {
+char** basic_process::_build_args(std::string const& program, QStringList const& arguments) {
   char** args(new char*[arguments.size() + 2]);
-  args[0] = qstrdup(qPrintable(program));
+  args[0] = qstrdup(program.c_str());
 
   unsigned int i(1);
   for (QStringList::const_iterator it(arguments.begin()),
@@ -827,18 +829,19 @@ char** basic_process::_build_args(QString const& program, QStringList const& arg
  *
  *  @return Array of string.
  */
-QStringList basic_process::_split_command_line(QString const& command_line) {
+QStringList basic_process::_split_command_line(std::string const& command_line) {
   QStringList args;
-  QString tmp;
+  std::string tmp;
   int count(0);
   bool in(false);
-
+  /*
+    // XXX: todo.
   for (int i(0), end(command_line.size()); i < end; ++i) {
-    if (command_line.at(i) == QLatin1Char('"')) {
+    if (command_line[i] =='"') {
       ++count;
       if (count == 3) {
         count = 0;
-        tmp += command_line.at(i);
+        tmp += command_line[i];
       }
       continue;
     }
@@ -847,16 +850,17 @@ QStringList basic_process::_split_command_line(QString const& command_line) {
         in = !in;
       count = 0;
     }
-    if (!in && command_line.at(i).isSpace()) {
-      if (!tmp.isEmpty()) {
+    if (!in && command_line[i].isSpace()) {
+      if (!tmp.empty()) {
         args += tmp;
         tmp.clear();
       }
     }
     else
-      tmp += command_line.at(i);
+      tmp += command_line[i];
   }
-  if (!tmp.isEmpty())
+  if (!tmp.empty())
     args += tmp;
+  */
   return (args);
 }

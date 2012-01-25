@@ -20,7 +20,7 @@
 #ifndef CCE_COMMANDS_CONNECTOR_EXECUTE_RESPONSE_HH
 # define CCE_COMMANDS_CONNECTOR_EXECUTE_RESPONSE_HH
 
-# include <QString>
+# include <string>
 # include <QDateTime>
 # include "com/centreon/engine/commands/connector/request.hh"
 
@@ -42,8 +42,8 @@ namespace                     com {
 					       bool is_executed = false,
 					       int exit_code = 0,
 					       QDateTime const& end_time = QDateTime(),
-					       QString const& stderr = "",
-					       QString const& stdout = "");
+					       std::string const& stderr = "",
+					       std::string const& stdout = "");
 	                      execute_response(execute_response const& right);
 	                      ~execute_response() throw();
 
@@ -56,16 +56,16 @@ namespace                     com {
 	    QByteArray        build();
 	    void              restore(QByteArray const& data);
 
-	    QString const&    get_stderr() const throw();
-	    QString const&    get_stdout() const throw();
+	    std::string const&    get_stderr() const throw();
+	    std::string const&    get_stdout() const throw();
 	    QDateTime const&  get_end_time() const throw();
 	    unsigned long     get_command_id() const throw();
 	    int               get_exit_code() const throw();
 	    bool              get_is_executed() const throw();
 
 	  private:
-	    QString           _stderr;
-	    QString           _stdout;
+	    std::string           _stderr;
+	    std::string           _stdout;
 	    QDateTime         _end_time;
 	    unsigned long     _cmd_id;
 	    int               _exit_code;

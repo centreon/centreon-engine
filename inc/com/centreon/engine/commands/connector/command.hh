@@ -44,10 +44,10 @@ namespace                              com {
 	  class                        command : public commands::command {
 	    Q_OBJECT
 	  public:
-	                               command(QString const& connector_name,
-                                               QString const& connector_line,
-                                               QString const& command_name,
-					       QString const& command_line);
+	                               command(std::string const& connector_name,
+                                               std::string const& connector_line,
+                                               std::string const& command_name,
+					       std::string const& command_line);
 	                               command(command const& right);
 	                               ~command() throw();
 
@@ -55,17 +55,17 @@ namespace                              com {
 
 	    commands::command*         clone() const;
 
-	    unsigned long              run(QString const& processed_cmd,
+	    unsigned long              run(std::string const& processed_cmd,
 					   nagios_macros const& macros,
 					   unsigned int timeout);
 
-	    void                       run(QString const& processed_cmd,
+	    void                       run(std::string const& processed_cmd,
 					   nagios_macros const& macros,
 					   unsigned int timeout,
 					   result& res);
 
-	    QString const&             get_connector_name() const throw();
-	    QString const&             get_connector_line() const throw();
+	    std::string const&             get_connector_name() const throw();
+	    std::string const&             get_connector_line() const throw();
 
 	    unsigned long              get_max_check_for_restart() throw();
 	    void                       set_max_check_for_restart(unsigned long value) throw();
@@ -97,8 +97,8 @@ namespace                              com {
 
 	    QByteArray                 _read_data;
 	    QMutex                     _mutex;
-	    QString                    _connector_name;
-	    QString                    _connector_line;
+	    std::string                    _connector_name;
+	    std::string                    _connector_line;
 	    QSharedPointer<basic_process>
                                        _process;
 	    QHash<unsigned long, request_info>

@@ -99,7 +99,7 @@ void objects::link(contact* obj,
                    QVector<contactgroup*> const& contactgroups,
                    QVector<command*> const& host_notification_commands,
                    QVector<command*> const& service_notification_commands,
-                   QVector<QString> const& custom_variables) {
+                   QVector<std::string> const& custom_variables) {
   // check object contents.
   if (obj == NULL)
     throw (engine_error() << "contact is a NULL pointer.");

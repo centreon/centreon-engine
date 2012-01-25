@@ -22,7 +22,7 @@
 
 # ifdef __cplusplus
 #  include <QVector>
-#  include <QString>
+#  include <string>
 # endif
 # include "objects.hh"
 

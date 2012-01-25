@@ -41,7 +41,7 @@ namespace                     com {
 	      error = 2
 	    };
 
-	                      error_response(QString const& message = "",
+	                      error_response(std::string const& message = "",
 					     e_code code = info);
 	                      error_response(error_response const& right);
 	                      ~error_response() throw();
@@ -55,11 +55,11 @@ namespace                     com {
 	    QByteArray        build();
 	    void              restore(QByteArray const& data);
 
-	    QString const&    get_message() const throw();
+	    std::string const&    get_message() const throw();
 	    e_code            get_code() const throw();
 
 	  private:
-	    QString           _message;
+	    std::string           _message;
 	    e_code            _code;
 	  };
 	}

@@ -20,7 +20,7 @@
 #ifndef CCE_COMMANDS_RESULT_HH
 # define CCE_COMMANDS_RESULT_HH
 
-# include <QString>
+# include <string>
 # include <QDateTime>
 # include <sys/time.h>
 
@@ -38,8 +38,8 @@ namespace                com {
 	class            result {
 	public:
 	                 result(unsigned long cmd_id = 0,
-				QString const& stdout = "",
-				QString const& stderr = "",
+				std::string const& stdout = "",
+				std::string const& stderr = "",
 				QDateTime const& start_time = QDateTime(),
 				QDateTime const& end_time = QDateTime(),
 				int retval = 0,
@@ -57,8 +57,8 @@ namespace                com {
 	  unsigned int   get_execution_time() const throw();
 	  timeval const& get_start_time() const throw();
 	  timeval const& get_end_time() const throw();
-	  QString const& get_stdout() const throw();
-	  QString const& get_stderr() const throw();
+	  std::string const& get_stdout() const throw();
+	  std::string const& get_stderr() const throw();
 	  bool           get_is_executed() const throw();
 	  bool           get_is_timeout() const throw();
 
@@ -66,14 +66,14 @@ namespace                com {
 	  void           set_exit_code(int retval) throw();
 	  void           set_start_time(QDateTime const& time) throw();
 	  void           set_end_time(QDateTime const& time) throw();
-	  void           set_stdout(QString const& str);
-	  void           set_stderr(QString const& str);
+	  void           set_stdout(std::string const& str);
+	  void           set_stderr(std::string const& str);
 	  void           set_is_executed(bool value) throw();
 	  void           set_is_timeout(bool value) throw();
 
 	private:
-	  QString        _stdout;
-	  QString        _stderr;
+	  std::string        _stdout;
+	  std::string        _stderr;
 	  timeval        _start_time;
 	  timeval        _end_time;
 	  unsigned long  _cmd_id;

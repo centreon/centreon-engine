@@ -22,7 +22,7 @@
 
 # ifdef __cplusplus
 #  include <QVector>
-#  include <QString>
+#  include <string>
 # endif
 # include "objects.hh"
 
@@ -40,7 +40,7 @@ namespace       com {
     namespace   engine {
       namespace objects {
         customvariablesmember const* release(customvariablesmember const* obj);
-        bool    add_custom_variables_to_object(QVector<QString> const& custom_vars,
+        bool    add_custom_variables_to_object(QVector<std::string> const& custom_vars,
                                                customvariablesmember** list_customvar);
       }
     }

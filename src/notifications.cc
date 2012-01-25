@@ -576,10 +576,13 @@ int check_service_notification_viability(service* svc, unsigned int type, int op
       && svc->current_state != STATE_OK) {
 
     /* get the time at which a notification should have been sent */
+    // XXX: todo.
+    /*
     time_t& initial_notif_time(service_other_props[
-                                                   qMakePair(QString(svc->host_ptr->name), QString(svc->description))].initial_notif_time);
-
+                                                   qMakePair(std::string(svc->host_ptr->name), QString(svc->description))].initial_notif_time);
+    */
     /* if not set, set it to now */
+    /*
     if (!initial_notif_time)
       initial_notif_time = time(NULL);
 
@@ -591,6 +594,7 @@ int check_service_notification_viability(service* svc, unsigned int type, int op
         << "Not enough time has elapsed since the service changed to a non-OK state, so we should not notify about this problem yet";
       return (ERROR);
     }
+    */
   }
 
   /* if this service is currently flapping, don't send the notification */
@@ -1784,9 +1788,12 @@ int check_host_notification_viability(host* hst,
       && hst->current_state != HOST_UP) {
 
     /* get the time at which a notification should have been sent */
+    /*
+    // XXX: todo.
     time_t& initial_notif_time(host_other_props[hst->name].initial_notif_time);
-
+    */
     /* if not set, set it to now */
+    /*
     if (!initial_notif_time)
       initial_notif_time = time(NULL);
 
@@ -1798,6 +1805,7 @@ int check_host_notification_viability(host* hst,
         << "Not enough time has elapsed since the host changed to a non-UP state (or since program start), so we shouldn't notify about this problem yet.";
       return (ERROR);
     }
+    */
   }
 
   /* if this host is currently flapping, don't send the notification */

@@ -22,7 +22,7 @@
 
 # ifdef __cplusplus
 #  include <QVector>
-#  include <QString>
+#  include <string>
 # endif
 # include "objects.hh"
 
@@ -52,7 +52,7 @@ namespace       com {
                      QVector<contactgroup*> const& contactgroups,
                      QVector<command*> const& host_notification_commands,
                      QVector<command*> const& service_notification_commands,
-                     QVector<QString> const& custom_variables);
+                     QVector<std::string> const& custom_variables);
         void    release(contact const* obj);
         bool    add_contacts_to_object(QVector<contact*> const& contacts,
                                        contactsmember** list_contact);

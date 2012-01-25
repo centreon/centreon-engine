@@ -29,7 +29,7 @@ using namespace com::centreon::engine::commands::connector;
  *  @param[in] message   The error message.
  *  @param[in] code The exit code value.
  */
-error_response::error_response(QString const& message, e_code code)
+error_response::error_response(std::string const& message, e_code code)
   : request(request::error_r), _message(message), _code(code) {
 
 }
@@ -108,7 +108,7 @@ request* error_response::clone() const {
 QByteArray error_response::build() {
   return (QByteArray().setNum(_id) + '\0' +
 	  QByteArray().setNum(_code) + '\0' +
-	  _message.toAscii() + cmd_ending());
+	  _message.c_str() + cmd_ending());
 }
 
 /**
@@ -135,7 +135,7 @@ void error_response::restore(QByteArray const& data) {
 
   _code = static_cast<e_code>(code);
 
-  _message = list[2];
+  _message = list[2].constData();
   if (ok == false) {
     throw (engine_error() << "bad request argument, invalid message.");
   }
@@ -146,7 +146,7 @@ void error_response::restore(QByteArray const& data) {
  *
  *  @return The error message.
  */
-QString const& error_response::get_message() const throw() {
+std::string const& error_response::get_message() const throw() {
   return (_message);
 }
 

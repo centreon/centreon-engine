@@ -49,7 +49,7 @@ namespace       com {
                      QVector<contact*> const& contacts,
                      QVector<contactgroup*> const& contactgroups,
                      QVector<servicegroup*> const& servicegroups,
-                     QVector<QString> const& custom_variables,
+                     QVector<std::string> const& custom_variables,
                      int initial_state,
                      timeperiod* check_period,
                      timeperiod* notification_period,

@@ -60,18 +60,18 @@ void loader::cleanup() {
  *  @return Number of modules loaded.
  */
 unsigned int loader::load() {
-  QDir dir(_directory);
+  QDir dir(_directory.c_str());
   QStringList filters("*.so");
   QFileInfoList files = dir.entryInfoList(filters);
   QSharedPointer<handle> module;
   unsigned int loaded(0);
 
   for (QFileInfoList::const_iterator it = files.begin(), end = files.end(); it != end; ++it) {
-    QString config_file(dir.path() + "/" + it->baseName() + ".cfg");
-    if (dir.exists(config_file) == false)
+    std::string config_file(dir.path().toStdString() + "/" + it->baseName().toStdString() + ".cfg");
+    if (dir.exists(config_file.c_str()) == false)
       config_file = "";
     try {
-      module = add_module(dir.path() + "/" + it->fileName(), config_file);
+      module = add_module(dir.path().toStdString() + "/" + it->fileName().toStdString(), config_file);
       module->open();
       logger(log_info_message, basic)
         << "Event broker module '" << it->fileName()
@@ -93,7 +93,7 @@ unsigned int loader::load() {
  *  Unload all modules.
  */
 void loader::unload() {
-  for (QMultiHash<QString, QSharedPointer<handle> >::iterator
+  for (QMultiHash<std::string, QSharedPointer<handle> >::iterator
 	 it = _modules.begin(), end = _modules.end();
        it != end;
        ++it) {
@@ -112,15 +112,15 @@ void loader::unload() {
  *
  *  @return The new object module.
  */
-QSharedPointer<handle> loader::add_module(QString const& filename,
-					  QString const& args) {
+QSharedPointer<handle> loader::add_module(std::string const& filename,
+					  std::string const& args) {
   QSharedPointer<handle> module(new handle(filename, args));
   broker::compatibility& compatibility = broker::compatibility::instance();
 
   if (connect(&(*module),
-	      SIGNAL(name_changed(QString const&, QString const&)),
+	      SIGNAL(name_changed(std::string const&, QString const&)),
 	      this,
-	      SLOT(module_name_changed(QString const&, QString const&))) == false
+	      SLOT(module_name_changed(std::string const&, QString const&))) == false
       || connect(&(*module),
 		 SIGNAL(event_create(broker::handle*)),
 		 &compatibility,
@@ -163,7 +163,8 @@ QSharedPointer<handle> loader::add_module(QString const& filename,
 		 SLOT(unloaded_module(broker::handle*))) == false) {
     throw (engine_error() << "connect module to broker::compatibility failed.");
   }
-  return (_modules.insert(filename, module).value());
+  // XXX: todo.
+  // return (_modules.insert(filename, module).value());
 }
 
 /**
@@ -172,7 +173,8 @@ QSharedPointer<handle> loader::add_module(QString const& filename,
  *  @param[in] module Modile to remove.
  */
 void loader::del_module(QSharedPointer<handle> const& module) {
-  _modules.remove(module->get_name(), module);
+  // XXX: todo.
+  // _modules.remove(module->get_name(), module);
 }
 
 /**
@@ -180,7 +182,7 @@ void loader::del_module(QSharedPointer<handle> const& module) {
  *
  *  @return The directory.
  */
-QString const& loader::get_directory() const throw() {
+std::string const& loader::get_directory() const throw() {
   return (_directory);
 }
 
@@ -198,7 +200,7 @@ QList<QSharedPointer<handle> > loader::get_modules() const throw() {
  *
  *  @param[in] directory The Directory path content modules.
  */
-void loader::set_directory(QString const& directory) {
+void loader::set_directory(std::string const& directory) {
   _directory = directory;
 }
 
@@ -208,9 +210,11 @@ void loader::set_directory(QString const& directory) {
  *  @param[in] old_name The old name of the module.
  *  @param[in] new_name The new name of the module.
  */
-void loader::module_name_changed(QString const& old_name,
-				 QString const& new_name) {
-  for (QMultiHash<QString, QSharedPointer<handle> >::iterator
+void loader::module_name_changed(std::string const& old_name,
+				 std::string const& new_name) {
+  /*
+  // XXX: todo.
+  for (QMultiHash<std::string, QSharedPointer<handle> >::iterator
 	 it = _modules.find(old_name), end = _modules.end();
        it != end && it.key() == old_name;
        ++it) {
@@ -221,6 +225,7 @@ void loader::module_name_changed(QString const& old_name,
       return;
     }
   }
+  */
   throw (engine_error() << "Module '" << old_name << "' not found");
 }
 

@@ -20,7 +20,7 @@
 #ifndef CCE_COMMANDS_PROCESS_HH
 # define CCE_COMMANDS_PROCESS_HH
 
-# include <QString>
+# include <string>
 # include <QDateTime>
 // # include <QProcess>
 # include "commands/basic_process.hh"
@@ -50,8 +50,8 @@ namespace                  com {
 	  QDateTime const& get_start_time() const throw();
 	  QDateTime const& get_end_time() const throw();
 	  unsigned int     get_executed_time() const throw();
-	  QString const&   get_stderr() const throw();
-	  QString const&   get_stdout() const throw();
+	  std::string const&   get_stderr() const throw();
+	  std::string const&   get_stdout() const throw();
 	  int              get_exit_code() const throw();
 	  bool             get_is_timeout() const throw();
 	  bool             get_is_executed() const throw();
@@ -75,8 +75,8 @@ namespace                  com {
 	private:
 	  QDateTime        _start_time;
 	  QDateTime        _end_time;
-	  QString          _stderr;
-	  QString          _stdout;
+	  std::string          _stderr;
+	  std::string          _stdout;
 	  nagios_macros    _macros;
 	  unsigned int     _executed_time;
 	  unsigned int     _timeout;

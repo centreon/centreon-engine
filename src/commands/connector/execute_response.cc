@@ -30,8 +30,8 @@ execute_response::execute_response(unsigned long cmd_id,
 		 bool is_executed,
 		 int exit_code,
 		 QDateTime const& end_time,
-		 QString const& err,
-		 QString const& out)
+		 std::string const& err,
+		 std::string const& out)
   : request(request::execute_r),
     _stderr(err),
     _stdout(out),
@@ -129,7 +129,9 @@ QByteArray execute_response::build() {
     QByteArray().setNum(_is_executed) + '\0' +
     QByteArray().setNum(_exit_code) + '\0' +
     QByteArray().setNum(_end_time.toTime_t()) + '\0';
-  query += _stderr.toAscii() + '\0' + _stdout.toAscii();
+  query += _stderr.c_str();
+  query += '\0';
+  query += _stdout.c_str();
   return (query + cmd_ending());
 }
 
@@ -171,8 +173,8 @@ void execute_response::restore(QByteArray const& data) {
   }
   _end_time.setTime_t(timestamp);
 
-  _stderr = list[5];
-  _stdout = list[6];
+  _stderr = list[5].constData();
+  _stdout = list[6].constData();
 }
 
 /**
@@ -180,7 +182,7 @@ void execute_response::restore(QByteArray const& data) {
  *
  *  @return The error string.
  */
-QString const& execute_response::get_stderr() const throw() {
+std::string const& execute_response::get_stderr() const throw() {
  return (_stderr);
 }
 
@@ -189,7 +191,7 @@ QString const& execute_response::get_stderr() const throw() {
  *
  *  @return The output string.
  */
-QString const& execute_response::get_stdout() const throw() {
+std::string const& execute_response::get_stdout() const throw() {
  return (_stdout);
 }
 

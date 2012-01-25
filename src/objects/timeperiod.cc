@@ -57,10 +57,12 @@ void release_timeperiod(timeperiod const* obj) {
  *  @param[in] range   The time range of the timeperiod.
  *  @param[in] exclude The time exclution of the timeperiod.
  */
-void objects::add_timeperiod(QString const& name,
-                             QString const& alias,
-                             QVector<QString> const& range,
-                             QVector<QString> const& exclude) {
+void objects::add_timeperiod(std::string const& name,
+                             std::string const& alias,
+                             QVector<std::string> const& range,
+                             QVector<std::string> const& exclude) {
+  /*
+    // XXX: todo.
   char* name_str = my_strdup(qPrintable(name));
   if (find_timeperiod(name_str) != NULL) {
     delete[] name_str;
@@ -73,14 +75,14 @@ void objects::add_timeperiod(QString const& name,
   tmpl_tperiod->timeperiod_name = name_str;
   tmpl_tperiod->alias = my_strdup(qPrintable(alias));
   tmpl_tperiod->register_object = true;
-  for (QVector<QString>::const_iterator it = range.begin(), end = range.end();
+  for (QVector<std::string>::const_iterator it = range.begin(), end = range.end();
        it != end;
        ++it) {
-    QString base(it->trimmed());
+    std::string base(it->trimmed());
 
     int pos = base.indexOf(' ');
-    QString key(base.left(pos).trimmed());
-    QString value(base.mid(pos + 1).trimmed());
+    std::string key(base.left(pos).trimmed());
+    std::string value(base.mid(pos + 1).trimmed());
 
     if (pos == -1 || xodtemplate_parse_timeperiod_directive(tmpl_tperiod,
                                                             qPrintable(key),
@@ -90,8 +92,8 @@ void objects::add_timeperiod(QString const& name,
     }
   }
 
-  QString exclude_str;
-  for (QVector<QString>::const_iterator it = exclude.begin(), end = exclude.end();
+  std::string exclude_str;
+  for (QVector<std::string>::const_iterator it = exclude.begin(), end = exclude.end();
        it != end;
        ++it) {
     exclude_str += *it;
@@ -104,6 +106,7 @@ void objects::add_timeperiod(QString const& name,
   xodtemplate_free_timeperiod(tmpl_tperiod);
   if (res != OK)
     throw (engine_error() << "timeperiod '" << name << "' create failed.");
+  */
 }
 
 /**

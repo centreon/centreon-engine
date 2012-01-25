@@ -26,7 +26,7 @@ using namespace com::centreon::engine::commands::connector;
  *  Default constructor.
  */
 execute_query::execute_query(unsigned long cmd_id,
-			     QString const& cmd,
+			     std::string const& cmd,
 			     QDateTime const& start_time,
 			     unsigned int timeout)
   : request(request::execute_q),
@@ -119,7 +119,7 @@ QByteArray execute_query::build() {
     QByteArray().setNum(static_cast<qulonglong>(_cmd_id)) + '\0' +
     QByteArray().setNum(_timeout) + '\0' +
     QByteArray().setNum(_start_time.toTime_t()) + '\0';
-  query += _cmd.toAscii();
+  query += _cmd.c_str();
   return (query + cmd_ending());
 }
 
@@ -156,7 +156,7 @@ void execute_query::restore(QByteArray const& data) {
   }
   _start_time.setTime_t(timestamp);
 
-  _cmd = list[4];
+  _cmd = list[4].constData();
 }
 
 /**
@@ -164,7 +164,7 @@ void execute_query::restore(QByteArray const& data) {
  *
  *  @return The command line.
  */
-QString const& execute_query::get_command() const throw() {
+std::string const& execute_query::get_command() const throw() {
  return (_cmd);
 }
 
@@ -174,15 +174,17 @@ QString const& execute_query::get_command() const throw() {
  *  @return The argument list.
  */
 QStringList execute_query::get_args() const throw() {
-  static QString sep("\"'\t ");
-  QString line = _cmd.trimmed();
+  static std::string sep("\"'\t ");
+  /*
+  // XXX: todo.
+  std::string line = _cmd.trimmed();
   QStringList list;
-  QString tmp;
+  std::string tmp;
   QChar c;
   int escape = 0;
 
-  QString::const_iterator it = line.begin();
-  QString::const_iterator end = line.end();
+  std::string::const_iterator it = line.begin();
+  std::string::const_iterator end = line.end();
 
   if (c == 0 && it + 1 < end) {
     while (it->isSpace() && ((it + 1)->isSpace() || *(it + 1) == '\'' || *(it + 1) == '"'))
@@ -217,6 +219,7 @@ QStringList execute_query::get_args() const throw() {
   if (tmp != "")
     list << tmp;
   return (list);
+  */
 }
 
 /**

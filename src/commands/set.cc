@@ -62,13 +62,14 @@ void set::add_command(command const& cmd) {
  */
 void set::add_command(QSharedPointer<command> cmd) {
   if (connect(&(*cmd),
-	      SIGNAL(name_changed(QString const&, QString const&)),
+	      SIGNAL(name_changed(std::string const&, QString const&)),
 	      this,
-	      SLOT(command_name_changed(QString const&, QString const&)),
+	      SLOT(command_name_changed(std::string const&, QString const&)),
               Qt::DirectConnection) == false) {
     throw (engine_error() << "connect command to set failed.");
   }
-  _list[cmd->get_name()] = cmd;
+  // XXX: todo.
+  // _list[cmd->get_name()] = cmd;
   logger(dbg_commands, basic) << "add command " << cmd->get_name();
 }
 
@@ -77,8 +78,9 @@ void set::add_command(QSharedPointer<command> cmd) {
  *
  *  @param[in] cmd_name The command name.
  */
-void set::remove_command(QString const& cmd_name) throw() {
-  _list.remove(cmd_name);
+void set::remove_command(std::string const& cmd_name) throw() {
+  // XXX: todo.
+  // _list.remove(cmd_name);
   logger(dbg_commands, basic) << "remove command " << cmd_name;
 }
 
@@ -89,12 +91,15 @@ void set::remove_command(QString const& cmd_name) throw() {
  *
  *  @return The shared pointer on a command object.
  */
-QSharedPointer<commands::command> set::get_command(QString const& cmd_name) {
-  QHash<QString, QSharedPointer<command> >::iterator it = _list.find(cmd_name);
+QSharedPointer<commands::command> set::get_command(std::string const& cmd_name) {
+  /*
+  // XXX: todo.
+  QHash<std::string, QSharedPointer<command> >::iterator it = _list.find(cmd_name);
   if (it == _list.end()) {
     throw (engine_error() << "command '" << cmd_name << "' not found.");
   }
   return (it.value());
+  */
 }
 
 /**
@@ -103,8 +108,8 @@ QSharedPointer<commands::command> set::get_command(QString const& cmd_name) {
  *  @param[in] old_name The old name of the command.
  *  @param[in] new_name The new name of the command.
  */
-void set::command_name_changed(QString const& old_name,
-			       QString const& new_name) {
+void set::command_name_changed(std::string const& old_name,
+			       std::string const& new_name) {
   (void)new_name;
 
   QSharedPointer<commands::command> cmd = get_command(old_name);

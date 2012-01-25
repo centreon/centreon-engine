@@ -325,8 +325,8 @@ void checker::run(host* hst,
 
   commands::set& cmd_set = commands::set::instance();
   QSharedPointer<commands::command> cmd = cmd_set.get_command(hst->check_command_ptr->name);
-  QString processed_cmd = cmd->process_cmd(&macros);
-  char* tmp_processed_cmd = my_strdup(qPrintable(processed_cmd));
+  std::string processed_cmd = cmd->process_cmd(&macros);
+  char* tmp_processed_cmd = my_strdup(processed_cmd.c_str());
 
   // send event broker.
   broker_host_check(NEBTYPE_HOSTCHECK_INITIATE,
@@ -515,8 +515,8 @@ void checker::run(service* svc,
 
   commands::set& cmd_set = commands::set::instance();
   QSharedPointer<commands::command> cmd = cmd_set.get_command(svc->check_command_ptr->name);
-  QString processed_cmd = cmd->process_cmd(&macros);
-  char* tmp_processed_cmd = my_strdup(qPrintable(processed_cmd));
+  std::string processed_cmd = cmd->process_cmd(&macros);
+  char* tmp_processed_cmd = my_strdup(processed_cmd.c_str());
 
   // send event broker.
   res = broker_service_check(NEBTYPE_SERVICECHECK_INITIATE,
@@ -770,10 +770,10 @@ void checker::_command_executed(cce_commands_result const& res) {
   result.return_code = res.get_exit_code();
   result.exited_ok = res.get_is_executed();
   if (res.get_is_executed() == true && res.get_is_timeout() == false) {
-    result.output = my_strdup(qPrintable(res.get_stdout()));
+    result.output = my_strdup(res.get_stdout().c_str());
   }
   else {
-    result.output = my_strdup(qPrintable(res.get_stderr()));
+    result.output = my_strdup(res.get_stderr().c_str());
   }
 
   _mut_reap.lock();
@@ -875,8 +875,8 @@ int checker::_execute_sync(host* hst) {
 
   commands::set& cmd_set = commands::set::instance();
   QSharedPointer<commands::command> cmd = cmd_set.get_command(hst->check_command_ptr->name);
-  QString processed_cmd = cmd->process_cmd(&macros);
-  char* tmp_processed_cmd = my_strdup(qPrintable(processed_cmd));
+  std::string processed_cmd = cmd->process_cmd(&macros);
+  char* tmp_processed_cmd = my_strdup(processed_cmd.c_str());
 
   // send event broker.
   broker_host_check(NEBTYPE_HOSTCHECK_RAW_START,
@@ -941,10 +941,10 @@ int checker::_execute_sync(host* hst) {
 
   char* output = NULL;
   if (cmd_result.get_is_executed() == true) {
-    output = my_strdup(qPrintable(cmd_result.get_stdout()));
+    output = my_strdup(cmd_result.get_stdout().c_str());
   }
   else {
-    output = my_strdup(qPrintable(cmd_result.get_stderr()));
+    output = my_strdup(cmd_result.get_stderr().c_str());
   }
 
   // send broker event.
@@ -967,11 +967,13 @@ int checker::_execute_sync(host* hst) {
 
   // if the command timeout.
   if (cmd_result.get_is_timeout() == true) {
-    QString output = QString("Host check timed out after %1  seconds")
+    /*
+    // XXX: todo.
+    std::string output = QString("Host check timed out after %1  seconds")
       .arg(config.get_host_check_timeout());
 
     cmd_result.set_stdout(output);
-
+    */
     logger(log_runtime_warning, basic)
       << "Warning: Host check command '" << processed_cmd
       << "' for host '" << hst->name << "' timed out after "
@@ -984,10 +986,10 @@ int checker::_execute_sync(host* hst) {
 
   char* tmp_plugin_output = NULL;
   if (cmd_result.get_is_executed() == true) {
-    tmp_plugin_output = my_strdup(qPrintable(cmd_result.get_stdout()));
+    tmp_plugin_output = my_strdup(cmd_result.get_stdout().c_str());
   }
   else {
-    tmp_plugin_output = my_strdup(qPrintable(cmd_result.get_stderr()));
+    tmp_plugin_output = my_strdup(cmd_result.get_stderr().c_str());
   }
 
   // parse the output: short and long output, and perf data.

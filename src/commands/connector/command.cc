@@ -44,10 +44,10 @@ using namespace com::centreon::engine::commands;
  *  @param[in] command_name   The command name.
  *  @param[in] command_line   The command line.
  */
-connector::command::command(QString const& connector_name,
-			    QString const& connector_line,
-                            QString const& command_name,
-			    QString const& command_line)
+connector::command::command(std::string const& connector_name,
+			    std::string const& connector_line,
+                            std::string const& command_name,
+			    std::string const& command_line)
   : commands::command(command_name, command_line),
     _connector_name(connector_name),
     _connector_line(connector_line),
@@ -124,7 +124,7 @@ commands::command* connector::command::clone() const {
  *
  *  @return The command id.
  */
-unsigned long connector::command::run(QString const& processed_cmd,
+unsigned long connector::command::run(std::string const& processed_cmd,
 				      nagios_macros const& macros,
 				      unsigned int timeout) {
   (void)macros;
@@ -175,7 +175,7 @@ unsigned long connector::command::run(QString const& processed_cmd,
  *  @param[in]  timeout The command timeout.
  *  @param[out] res     The result of the command.
  */
-void connector::command::run(QString const& processed_cmd,
+void connector::command::run(std::string const& processed_cmd,
 			     nagios_macros const& macros,
 			     unsigned int timeout,
 			     result& res) {
@@ -237,7 +237,7 @@ void connector::command::run(QString const& processed_cmd,
  *
  *  @return The connector name.
  */
-QString const& connector::command::get_connector_name() const throw() {
+std::string const& connector::command::get_connector_name() const throw() {
   return (_connector_name);
 }
 
@@ -246,7 +246,7 @@ QString const& connector::command::get_connector_name() const throw() {
  *
  *  @return The connector line.
  */
-QString const& connector::command::get_connector_line() const throw() {
+std::string const& connector::command::get_connector_line() const throw() {
   return (_connector_line);
 }
 

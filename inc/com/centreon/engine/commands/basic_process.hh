@@ -21,7 +21,7 @@
 # define CCE_COMMANDS_BASIC_PROCESS_HH
 
 # include <QIODevice>
-# include <QString>
+# include <string>
 # include <QStringList>
 # include <QByteArray>
 # include <QProcess>
@@ -52,7 +52,7 @@ namespace                          com {
           QProcess::ProcessError   error() const;
           int                      exitCode() const;
           QProcess::ExitStatus     exitStatus() const;
-          // QString                  nativeArguments() const;
+          // std::string                  nativeArguments() const;
           Q_PID                    pid() const;
           // ProcessChannelMode       processChannelMode() const;
           // QProcessEnvironment      processEnvironment() const;
@@ -60,23 +60,23 @@ namespace                          com {
           QByteArray               readAllStandardOutput();
           QProcess::ProcessChannel readChannel() const;
           // void                     setEnvironment(QStringList const& environment); // (deprecated)
-          // void                     setNativeArguments(QString const& arguments);
+          // void                     setNativeArguments(std::string const& arguments);
           // void                     setProcessChannelMode(ProcessChannelMode mode);
           // void                     setProcessEnvironment(QProcessEnvironment const& environment);
           void                     setReadChannel(QProcess::ProcessChannel channel);
-          // void                     setStandardErrorFile(QString const& fileName, OpenMode mode = Truncate);
-          // void                     setStandardInputFile(QString const& fileName);
-          // void                     setStandardOutputFile(QString const& fileName, OpenMode mode = Truncate);
+          // void                     setStandardErrorFile(std::string const& fileName, OpenMode mode = Truncate);
+          // void                     setStandardInputFile(std::string const& fileName);
+          // void                     setStandardOutputFile(std::string const& fileName, OpenMode mode = Truncate);
           // void                     setStandardOutputProcess(QProcess* destination);
-          void                     setWorkingDirectory(QString const& dir);
-          void                     start(QString const& program, QStringList const& arguments, OpenMode mode = ReadWrite);
-          void                     start(QString const& program, OpenMode mode = ReadWrite);
+          void                     setWorkingDirectory(std::string const& dir);
+          void                     start(std::string const& program, QStringList const& arguments, OpenMode mode = ReadWrite);
+          void                     start(std::string const& program, OpenMode mode = ReadWrite);
           QProcess::ProcessState   state() const;
           bool                     waitForFinished(int msecs = 30000);
           bool                     waitForReadyRead(int msecs = 30000);
           bool                     waitForBytesWritten(int msecs = 30000);
           bool                     waitForStarted(int msecs = 30000);
-          QString                  workingDirectory() const;
+          std::string                  workingDirectory() const;
 
           // QIODevice
           qint64                   bytesAvailable() const;
@@ -126,13 +126,13 @@ namespace                          com {
           static void              _close(int& fd) throw();
           static int               _chdir(char const* working_directory) throw();
           static int               _dup2(int fildes, int fildes2) throw();
-          static char**            _build_args(QString const& program, QStringList const& arguments);
-          static QStringList       _split_command_line(QString const& command_line);
+          static char**            _build_args(std::string const& program, QStringList const& arguments);
+          static QStringList       _split_command_line(std::string const& command_line);
 
           // QProcessEnvironment      _environment;
           QStringList              _arguments;
-          QString                  _program;
-          QString                  _working_directory;
+          std::string                  _program;
+          std::string                  _working_directory;
           QByteArray               _standard_output;
           QByteArray               _standard_error;
           QSocketNotifier*         _notifier_output;

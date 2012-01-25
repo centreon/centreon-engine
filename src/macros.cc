@@ -854,7 +854,7 @@ char const* clean_macro_chars(char* macro, int options) {
       /* illegal user-specified characters */
       illegal_char = FALSE;
       char const* illegal_output_chars
-        = my_strdup(qPrintable(config.get_illegal_output_chars()));
+        = my_strdup(config.get_illegal_output_chars().c_str());
       if (illegal_output_chars != NULL) {
         for (z = 0; illegal_output_chars[z] != '\x0'; z++) {
           if (ch == (int)illegal_output_chars[z]) {

@@ -21,7 +21,7 @@
 # define CCE_COMMANDS_SET_HH
 
 # include <QObject>
-# include <QString>
+# include <string>
 # include <QHash>
 # include <QSharedPointer>
 
@@ -47,13 +47,13 @@ namespace                         com {
 	  void                    add_command(command const& cmd);
 	  void                    add_command(QSharedPointer<command> cmd);
 
-	  void                    remove_command(QString const& cmd_name) throw();
+	  void                    remove_command(std::string const& cmd_name) throw();
 
-	  QSharedPointer<command> get_command(QString const& cmd_name);
+	  QSharedPointer<command> get_command(std::string const& cmd_name);
 
 	public slots:
-	  void                    command_name_changed(QString const& old_name,
-						       QString const& new_name);
+	  void                    command_name_changed(std::string const& old_name,
+						       std::string const& new_name);
 
 	private:
 	  set();
@@ -62,7 +62,7 @@ namespace                         com {
 
 	  set&                    operator=(set const& right);
 
-	  QHash<QString, QSharedPointer<command> > _list;
+	  QHash<std::string, QSharedPointer<command> > _list;
           static set*             _instance;
 	};
       }

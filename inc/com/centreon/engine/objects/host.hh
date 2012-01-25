@@ -22,7 +22,7 @@
 
 # ifdef __cplusplus
 #  include <QVector>
-#  include <QString>
+#  include <string>
 # endif
 # include "objects.hh"
 
@@ -55,7 +55,7 @@ namespace       com {
                      QVector<contact*> const& contacts,
                      QVector<contactgroup*> const& contactgroups,
                      QVector<hostgroup*> const& hostgroups,
-                     QVector<QString> const& custom_variables,
+                     QVector<std::string> const& custom_variables,
                      int initial_state,
                      timeperiod* check_period,
                      timeperiod* notification_period,

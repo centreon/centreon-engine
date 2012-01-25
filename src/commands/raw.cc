@@ -35,8 +35,8 @@ using namespace com::centreon::engine::commands;
  *  @param[in] name         The command name.
  *  @param[in] command_line The command line.
  */
-raw::raw(QString const& name,
-	 QString const& command_line)
+raw::raw(std::string const& name,
+	 std::string const& command_line)
   : command(name, command_line) {
 }
 
@@ -99,7 +99,7 @@ commands::command* raw::clone() const {
  *
  *  @return The command id.
  */
-unsigned long raw::run(QString const& processed_cmd,
+unsigned long raw::run(std::string const& processed_cmd,
 		       nagios_macros const& macros,
 		       unsigned int timeout) {
   logger(dbg_functions, basic) << "start " << Q_FUNC_INFO;
@@ -141,7 +141,7 @@ unsigned long raw::run(QString const& processed_cmd,
  *  @param[in]  timeout The command timeout.
  *  @param[out] res     The result of the command.
  */
-void raw::run(QString const& processed_cmd,
+void raw::run(std::string const& processed_cmd,
 	      nagios_macros const& macros,
 	      unsigned int timeout,
 	      result& res) {

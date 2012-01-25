@@ -21,7 +21,7 @@
 # define CCE_OBJECTS_UTILS_HH
 
 # include <QVector>
-# include <QString>
+# include <string>
 # include <QHash>
 # include "objects.hh"
 
@@ -57,8 +57,8 @@ namespace             com {
             return (vec);
           }
 
-          inline QVector<QString> tab2qvec(char** tab) {
-            QVector<QString> vec;
+          inline QVector<std::string> tab2qvec(char** tab) {
+            QVector<std::string> vec;
             for (unsigned int i = 0; tab[i] != NULL; ++i)
               vec.push_back(tab[i]);
             return (vec);

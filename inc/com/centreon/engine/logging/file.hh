@@ -22,7 +22,7 @@
 
 # include <QSharedPointer>
 # include <QFile>
-# include <QString>
+# include <string>
 # include <QList>
 # include <QMutex>
 # include <QReadWriteLock>
@@ -41,10 +41,10 @@ namespace                        com {
          */
 	class                    file : public object {
 	public:
-	                         file(QString const& file,
+	                         file(std::string const& file,
 				      unsigned long long size_limit = 0);
-	                         file(QString const& file,
-				      QString const& archive_path);
+	                         file(std::string const& file,
+				      std::string const& archive_path);
 	                         file(file const& right);
 	                         ~file() throw();
 
@@ -57,18 +57,18 @@ namespace                        com {
 				     unsigned long long type,
 				     unsigned int verbosity) throw();
 
-	  void                   set_archive_path(QString const& path) throw();
-	  QString                get_archive_path() const throw();
+	  void                   set_archive_path(std::string const& path) throw();
+	  std::string                get_archive_path() const throw();
 
 	  void                   set_size_limit(unsigned long long size) throw();
 	  unsigned long long     get_size_limit() const throw();
 
-	  QString                get_file_name() throw();
+	  std::string                get_file_name() throw();
 
 	private:
 	  QSharedPointer<QMutex> _mutex;
 	  QSharedPointer<QFile>  _file;
-	  QString                _archive_path;
+	  std::string                _archive_path;
 	  unsigned long long     _size_limit;
 
 	  static QList<file*>    _files;

@@ -55,8 +55,8 @@ namespace                    com {
                              ~logger();
 
           logger&            operator=(logger const& right);
-          logger&            operator<<(QString const& obj);
           logger&            operator<<(std::string const& obj);
+          logger&            operator<<(QString const& obj);
           logger&            operator<<(char const* obj);
           logger&            operator<<(char obj);
           logger&            operator<<(int obj);
@@ -72,8 +72,8 @@ namespace                    com {
 
          private:
           struct             redirector {
-            logger& (logger::*redirect_qstring)(QString const&);
-            logger& (logger::*redirect_std_string)(std::string const&);
+            logger& (logger::*redirect_qstring)(std::string const&);
+            logger& (logger::*redirect_std_string)(QString const&);
             logger& (logger::*redirect_string)(char const*);
             logger& (logger::*redirect_char)(char);
             logger& (logger::*redirect_int)(int);

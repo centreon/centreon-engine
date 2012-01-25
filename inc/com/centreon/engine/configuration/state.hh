@@ -20,7 +20,7 @@
 #ifndef CCE_CONFIGURATION_STATE_HH
 # define CCE_CONFIGURATION_STATE_HH
 
-# include <QString>
+# include <string>
 # include <sstream>
 # include <string>
 # include <map>
@@ -92,21 +92,21 @@ namespace                   com {
 	  state&              operator=(state const& right);
 
 	  void                reset();
-	  void                parse(QString const& filename);
+	  void                parse(std::string const& filename);
 
-	  QString const&      get_log_file() const throw();
-	  QString const&      get_broker_module_directory() const throw();
-	  QString const&      get_debug_file() const throw();
-	  QString const&      get_command_file() const throw();
-	  QString const&      get_temp_file() const throw();
-	  QString const&      get_global_host_event_handler() const throw();
-	  QString const&      get_global_service_event_handler() const throw();
-	  QString const&      get_ocsp_command() const throw();
-	  QString const&      get_ochp_command() const throw();
-	  QString const&      get_log_archive_path() const throw();
-	  QString const&      get_illegal_object_chars() const throw();
-	  QString const&      get_illegal_output_chars() const throw();
-	  QString const&      get_use_timezone() const throw();
+	  std::string const&      get_log_file() const throw();
+	  std::string const&      get_broker_module_directory() const throw();
+	  std::string const&      get_debug_file() const throw();
+	  std::string const&      get_command_file() const throw();
+	  std::string const&      get_temp_file() const throw();
+	  std::string const&      get_global_host_event_handler() const throw();
+	  std::string const&      get_global_service_event_handler() const throw();
+	  std::string const&      get_ocsp_command() const throw();
+	  std::string const&      get_ochp_command() const throw();
+	  std::string const&      get_log_archive_path() const throw();
+	  std::string const&      get_illegal_object_chars() const throw();
+	  std::string const&      get_illegal_output_chars() const throw();
+	  std::string const&      get_use_timezone() const throw();
 	  int                 get_additional_freshness_latency() const throw();
 	  unsigned long       get_debug_level() const throw();
 	  unsigned int        get_debug_verbosity() const throw();
@@ -192,27 +192,27 @@ namespace                   com {
 	  e_inter_check_delay get_host_inter_check_delay_method() const throw();
 	  e_interleave_factor get_service_interleave_factor_method() const throw();
 
-	  void                set_log_file(QString const& value);
-	  void                set_broker_module_directory(QString const& value);
-	  void                set_debug_file(QString const& value);
-	  void                set_command_file(QString const& value);
-	  void                set_temp_file(QString const& value);
-	  void                set_temp_path(QString const& value);
-	  void                set_check_result_path(QString const& value);
-	  void                set_global_host_event_handler(QString const& value);
-	  void                set_global_service_event_handler(QString const& value);
-	  void                set_ocsp_command(QString const& value);
-	  void                set_ochp_command(QString const& value);
-	  void                set_log_archive_path(QString const& value);
-	  void                set_p1_file(QString const& value);
-	  void                set_illegal_object_chars(QString const& value);
-	  void                set_illegal_output_chars(QString const& value);
-	  void                set_use_timezone(QString const& value);
+	  void                set_log_file(std::string const& value);
+	  void                set_broker_module_directory(std::string const& value);
+	  void                set_debug_file(std::string const& value);
+	  void                set_command_file(std::string const& value);
+	  void                set_temp_file(std::string const& value);
+	  void                set_temp_path(std::string const& value);
+	  void                set_check_result_path(std::string const& value);
+	  void                set_global_host_event_handler(std::string const& value);
+	  void                set_global_service_event_handler(std::string const& value);
+	  void                set_ocsp_command(std::string const& value);
+	  void                set_ochp_command(std::string const& value);
+	  void                set_log_archive_path(std::string const& value);
+	  void                set_p1_file(std::string const& value);
+	  void                set_illegal_object_chars(std::string const& value);
+	  void                set_illegal_output_chars(std::string const& value);
+	  void                set_use_timezone(std::string const& value);
 	  void                set_additional_freshness_latency(int value);
 	  void                set_debug_level(unsigned long value);
 	  void                set_debug_verbosity(unsigned int value);
 	  void                set_command_check_interval(int value);
-	  void                set_command_check_interval(QString const& value);
+	  void                set_command_check_interval(std::string const& value);
 	  void                set_external_command_buffer_slots(int value);
 	  void                set_max_service_check_spread(unsigned int value);
 	  void                set_max_host_check_spread(unsigned int value);
@@ -243,7 +243,7 @@ namespace                   com {
 	  void                set_cached_host_check_horizon(unsigned long value);
 	  void                set_cached_service_check_horizon(unsigned long value);
 	  void                set_event_broker_options(unsigned long value);
-	  void                set_event_broker_options(QString const& value);
+	  void                set_event_broker_options(std::string const& value);
 	  void                set_use_syslog(bool value);
 	  void                set_log_notifications(bool value);
 	  void                set_log_service_retries(bool value);
@@ -293,15 +293,15 @@ namespace                   com {
 	  void                set_low_host_flap_threshold(float value);
 	  void                set_high_host_flap_threshold(float value);
 	  void                set_date_format(e_date_format value);
-	  void                set_date_format(QString const& value);
+	  void                set_date_format(std::string const& value);
 	  void                set_log_rotation_method(e_log_rotation value);
-	  void                set_log_rotation_method(QString const& value);
+	  void                set_log_rotation_method(std::string const& value);
 	  void                set_service_inter_check_delay_method(e_inter_check_delay value);
-	  void                set_service_inter_check_delay_method(QString const& value);
+	  void                set_service_inter_check_delay_method(std::string const& value);
 	  void                set_host_inter_check_delay_method(e_inter_check_delay value);
-	  void                set_host_inter_check_delay_method(QString const& value);
+	  void                set_host_inter_check_delay_method(std::string const& value);
 	  void                set_service_interleave_factor_method(e_interleave_factor value);
-	  void                set_service_interleave_factor_method(QString const& value);
+	  void                set_service_interleave_factor_method(std::string const& value);
 
 	private:
 	  /**
@@ -450,31 +450,31 @@ namespace                   com {
 	  };
 
 	  void                _reset();
-	  void                _parse_resource_file(QString const& value);
+	  void                _parse_resource_file(std::string const& value);
 
-	  void                _set_auth_file(QString const& value);
-	  void                _set_admin_email(QString const& value);
-	  void                _set_admin_pager(QString const& value);
-	  void                _set_retained_service_attribute_mask(QString const& value);
-	  void                _set_retained_process_service_attribute_mask(QString const& value);
-	  void                _set_max_service_check_spread(QString const& value);
-	  void                _set_aggregate_status_updates(QString const& value);
-	  void                _set_broker_module(QString const& value);
-	  void                _set_bare_update_check(QString const& value);
-	  void                _set_check_for_updates(QString const& value);
-	  void                _set_comment_file(QString const& value);
-	  void                _set_daemon_dumps_core(QString const& value);
-	  void                _set_downtime_file(QString const& value);
-	  void                _set_lock_file(QString const& value);
-	  void                _set_user(QString const& value);
-	  void                _set_group(QString const& value);
+	  void                _set_auth_file(std::string const& value);
+	  void                _set_admin_email(std::string const& value);
+	  void                _set_admin_pager(std::string const& value);
+	  void                _set_retained_service_attribute_mask(std::string const& value);
+	  void                _set_retained_process_service_attribute_mask(std::string const& value);
+	  void                _set_max_service_check_spread(std::string const& value);
+	  void                _set_aggregate_status_updates(std::string const& value);
+	  void                _set_broker_module(std::string const& value);
+	  void                _set_bare_update_check(std::string const& value);
+	  void                _set_check_for_updates(std::string const& value);
+	  void                _set_comment_file(std::string const& value);
+	  void                _set_daemon_dumps_core(std::string const& value);
+	  void                _set_downtime_file(std::string const& value);
+	  void                _set_lock_file(std::string const& value);
+	  void                _set_user(std::string const& value);
+	  void                _set_group(std::string const& value);
 
 	  static std::string  _getline(std::ifstream& ifs) throw();
 	  static std::string& _trim(std::string& str) throw();
 
 	  template<class T>
-	  static bool         _str2obj(QString const& value, T* ret) {
-	    std::istringstream iss(value.toStdString());
+	  static bool         _str2obj(std::string const& value, T* ret) {
+	    std::istringstream iss(value);
 	    if (!(iss >> *ret) || !iss.eof()) {
 	      return (false);
 	    }
@@ -483,7 +483,7 @@ namespace                   com {
 
 	  template<class T, void (state::*ptr)(T)>
 	  struct              cpp_suck {
-	    static bool       set_generic(QString const& value, state& config) {
+	    static bool       set_generic(std::string const& value, state& config) {
 	      T ret;
 	      if (_str2obj(value, &ret) == false) {
 		return (false);
@@ -493,9 +493,9 @@ namespace                   com {
 	    }
 	  };
 
-	  template<void (state::*ptr)(QString const&)>
-	  struct              cpp_suck<QString const&, ptr> {
-	    static bool       set_generic(QString const& value, state& config) {
+	  template<void (state::*ptr)(std::string const&)>
+	  struct              cpp_suck<std::string const&, ptr> {
+	    static bool       set_generic(std::string const& value, state& config) {
 	      (config.*ptr)(value);
 	      return (true);
 	    }
@@ -503,7 +503,7 @@ namespace                   com {
 
 	  template<class T, class U, void (state::*ptr)(T)>
 	  struct              cpp_suck_cast {
-	    static bool       set_generic_cast(QString const& value, state& config) {
+	    static bool       set_generic_cast(std::string const& value, state& config) {
 	      U ret;
 	      if (_str2obj(value, &ret) == false) {
 		return (false);
@@ -513,16 +513,16 @@ namespace                   com {
 	    }
 	  };
 
-	  typedef std::map<QString, bool (*)(QString const&, state& config)> methods;
+	  typedef std::map<std::string, bool (*)(std::string const&, state& config)> methods;
 
-	  QString             _tab_string[max_string];
+	  std::string             _tab_string[max_string];
 	  unsigned long       _tab_ulong[max_ulong];
 	  float               _tab_float[max_float];
 	  int                 _tab_int[max_int];
 	  unsigned int        _tab_uint[max_uint];
 	  bool                _tab_bool[max_bool];
 
-	  QString             _filename;
+	  std::string             _filename;
 	  methods             _lst_method;
 	  unsigned int        _cur_line;
 	  bool                _command_check_interval_is_seconds;

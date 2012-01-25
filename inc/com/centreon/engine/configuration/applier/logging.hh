@@ -21,7 +21,7 @@
 # define CCE_CONFIGURATION_APPLIER_LOGGING_HH
 
 # include <QSharedPointer>
-# include <QString>
+# include <string>
 
 # include "logging/object.hh"
 # include "logging/file.hh"
@@ -65,9 +65,9 @@ namespace                      com {
 	    void               _del_stdout();
 	    void               _del_stderr();
 
-	    QString            _log_file;
-	    QString            _log_archive_path;
-	    QString            _debug_file;
+	    std::string            _log_file;
+	    std::string            _log_archive_path;
+	    std::string            _debug_file;
 	    unsigned long      _debug_limit;
 	    unsigned long      _debug_level;
 	    unsigned int       _debug_verbosity;

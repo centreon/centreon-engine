@@ -111,6 +111,8 @@ int my_system_r(nagios_macros const* mac,
   end_time = cmd_result.get_end_time();
   *exectime = cmd_result.get_execution_time();
   *early_timeout = cmd_result.get_is_timeout();
+  /*
+  // XXX: todo.
   if (output != NULL && max_output_length > 0) {
     if (cmd_result.get_stdout() != "") {
       *output = my_strdup(qPrintable(cmd_result.get_stdout().left(max_output_length - 1)));
@@ -119,7 +121,7 @@ int my_system_r(nagios_macros const* mac,
       *output = my_strdup(qPrintable(cmd_result.get_stderr().left(max_output_length - 1)));
     }
   }
-
+  */
   int result = cmd_result.get_exit_code();
 
   logger(dbg_commands, more)
@@ -1667,7 +1669,7 @@ int contains_illegal_object_chars(char* name) {
     return (FALSE);
 
   std::string tmp(name);
-  std::string const& illegal_object_chars = config.get_illegal_object_chars().toStdString();
+  std::string const& illegal_object_chars = config.get_illegal_object_chars();
 
   if (tmp.find_first_of(illegal_object_chars) == std::string::npos) {
     return (false);

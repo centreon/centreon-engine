@@ -22,7 +22,7 @@
 
 # include <QMutex>
 # include <QObject>
-# include <QString>
+# include <string>
 
 # include "macros.hh"
 # include "commands/result.hh"
@@ -41,8 +41,8 @@ namespace                        com {
 	class                    command : public QObject {
 	  Q_OBJECT
 	public:
-	                         command(QString const& name,
-					 QString const& command_line);
+	                         command(std::string const& name,
+					 std::string const& command_line);
 	  virtual                ~command() throw();
 
 	  bool                   operator==(command const& right) const throw();
@@ -50,27 +50,27 @@ namespace                        com {
 
 	  virtual command*       clone() const = 0;
 
-	  virtual QString const& get_name() const throw();
-	  virtual QString const& get_command_line() const throw();
+	  virtual std::string const& get_name() const throw();
+	  virtual std::string const& get_command_line() const throw();
 
-	  virtual QString        process_cmd(nagios_macros* macros) const;
+	  virtual std::string        process_cmd(nagios_macros* macros) const;
 
-	  virtual unsigned long  run(QString const& processed_cmd,
+	  virtual unsigned long  run(std::string const& processed_cmd,
 				     nagios_macros const& macors,
 				     unsigned int timeout) = 0;
 
-	  virtual void           run(QString const& process_cmd,
+	  virtual void           run(std::string const& process_cmd,
 				     nagios_macros const& macros,
 				     unsigned int timeout,
 				     result& res) = 0;
 
-	  virtual void           set_name(QString const& name);
-	  virtual void           set_command_line(QString const& command_line);
+	  virtual void           set_name(std::string const& name);
+	  virtual void           set_command_line(std::string const& command_line);
 
 	signals:
 	  void                   command_executed(cce_commands_result const& res);
-	  void                   name_changed(QString const& old_name,
-					      QString const& new_name);
+	  void                   name_changed(std::string const& old_name,
+					      std::string const& new_name);
 
 	protected:
 	                         command(command const& right);
@@ -78,8 +78,8 @@ namespace                        com {
 
           static unsigned long   get_uniq_id();
 
-	  QString                _name;
-	  QString                _command_line;
+	  std::string                _name;
+	  std::string                _command_line;
 
         private:
           static QMutex          _mtx;

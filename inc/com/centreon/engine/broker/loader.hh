@@ -21,7 +21,7 @@
 # define CCE_MODULES_LOADER_HH
 
 # include <QObject>
-# include <QString>
+# include <string>
 # include <QMultiHash>
 # include <QSharedPointer>
 # include "broker/handle.hh"
@@ -45,19 +45,19 @@ namespace                        com {
           unsigned int           load();
           void                   unload();
 
-          QSharedPointer<handle> add_module(QString const& filename = "",
-                                            QString const& args = "");
+          QSharedPointer<handle> add_module(std::string const& filename = "",
+                                            std::string const& args = "");
           void                   del_module(QSharedPointer<handle> const& module);
 
-          QString const&         get_directory() const throw();
+          std::string const&         get_directory() const throw();
           QList<QSharedPointer<handle> >
                                  get_modules() const throw();
 
-          void                   set_directory(QString const& directory);
+          void                   set_directory(std::string const& directory);
 
          public slots:
-          void                   module_name_changed(QString const& old_name,
-                                                     QString const& new_name);
+          void                   module_name_changed(std::string const& old_name,
+                                                     std::string const& new_name);
 
          private:
                                  loader();
@@ -66,8 +66,8 @@ namespace                        com {
 
           loader&                operator=(loader const& right);
 
-          QString                _directory;
-          QMultiHash<QString, QSharedPointer<handle> > _modules;
+          std::string                _directory;
+          QMultiHash<std::string, QSharedPointer<handle> > _modules;
           static loader*         _instance;
         };
       }

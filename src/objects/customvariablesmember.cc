@@ -67,12 +67,14 @@ customvariablesmember const* objects::release(customvariablesmember const* obj) 
  *
  *  @return True if insert sucessfuly, false otherwise.
  */
-bool objects::add_custom_variables_to_object(QVector<QString> const& custom_vars,
+bool objects::add_custom_variables_to_object(QVector<std::string> const& custom_vars,
                                              customvariablesmember** list_customvar) {
   if (list_customvar == NULL)
     return (false);
 
-  for (QVector<QString>::const_iterator it = custom_vars.begin(),
+  /*
+    // XXX: todo.
+  for (QVector<std::string>::const_iterator it = custom_vars.begin(),
          end = custom_vars.end();
        it != end;
        ++it) {
@@ -81,8 +83,8 @@ bool objects::add_custom_variables_to_object(QVector<QString> const& custom_vars
     if (pos == -1)
       return (false);
 
-    QString key(it->left(pos).trimmed());
-    QString value(it->mid(pos + 1).trimmed());
+    std::string key(it->left(pos).trimmed());
+    std::string value(it->mid(pos + 1).trimmed());
 
     // add a new custom var into object.
     if (key.isEmpty() || value.isEmpty() || key[0] != '_'
@@ -91,5 +93,6 @@ bool objects::add_custom_variables_to_object(QVector<QString> const& custom_vars
                                          qPrintable(value)) == NULL)
       return (false);
   }
+  */
   return (true);
 }

@@ -29,8 +29,8 @@ using namespace com::centreon::engine::logging;
  **************************************/
 
 logger::redirector const logger::_redir_nothing = {
-  &logger::_nothing<QString const&>,
   &logger::_nothing<std::string const&>,
+  &logger::_nothing<QString const&>,
   &logger::_nothing<char const*>,
   &logger::_nothing<char>,
   &logger::_nothing<int>,
@@ -48,8 +48,8 @@ logger::redirector const logger::_redir_nothing = {
 };
 
 logger::redirector const logger::_redir_builder = {
-  &logger::_builder<QString const&>,
   &logger::_builder<std::string const&>,
+  &logger::_builder<QString const&>,
   &logger::_builder<char const*>,
   &logger::_builder<char>,
   &logger::_builder<int>,
@@ -127,13 +127,13 @@ logger& logger::operator=(logger const& right) {
 }
 
 /**
- *  Add a QString into the logger buffer.
+ *  Add a std::string into the logger buffer.
  *
- *  @param[in] obj The QString.
+ *  @param[in] obj The std::string.
  *
  *  @return This object.
  */
-logger& logger::operator<<(QString const& obj) {
+logger& logger::operator<<(std::string const& obj) {
   return ((this->*(_redirector->redirect_qstring))(obj));
 }
 
@@ -144,7 +144,7 @@ logger& logger::operator<<(QString const& obj) {
  *
  *  @return This object.
  */
-logger& logger::operator<<(std::string const& obj) {
+logger& logger::operator<<(QString const& obj) {
   return ((this->*(_redirector->redirect_std_string))(obj));
 }
 

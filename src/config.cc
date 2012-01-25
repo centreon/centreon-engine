@@ -191,7 +191,7 @@ int pre_flight_check(void) {
   if (config.get_global_host_event_handler() != "") {
 
     /* check the event handler command */
-    buf = my_strdup(qPrintable(config.get_global_host_event_handler()));
+    buf = my_strdup(config.get_global_host_event_handler().c_str());
 
     /* get the command name, leave any arguments behind */
     temp_command_name = my_strtok(buf, "!");
@@ -213,7 +213,7 @@ int pre_flight_check(void) {
   if (config.get_global_service_event_handler() != "") {
 
     /* check the event handler command */
-    buf = my_strdup(qPrintable(config.get_global_service_event_handler()));
+    buf = my_strdup(config.get_global_service_event_handler().c_str());
 
     /* get the command name, leave any arguments behind */
     temp_command_name = my_strtok(buf, "!");
@@ -238,9 +238,9 @@ int pre_flight_check(void) {
   if (verify_config == TRUE)
     printf("Checking obsessive compulsive processor commands...\n");
 
-  if (!config.get_ocsp_command().isEmpty()) {
+  if (!config.get_ocsp_command().empty()) {
 
-    buf = my_strdup(qPrintable(config.get_ocsp_command()));
+    buf = my_strdup(config.get_ocsp_command().c_str());
 
     /* get the command name, leave any arguments behind */
     temp_command_name = my_strtok(buf, "!");
@@ -259,9 +259,9 @@ int pre_flight_check(void) {
     delete[] buf;
   }
 
-  if (!config.get_ochp_command().isEmpty()) {
+  if (!config.get_ochp_command().empty()) {
 
-    buf = my_strdup(qPrintable(config.get_ochp_command()));
+    buf = my_strdup(config.get_ochp_command().c_str());
 
     /* get the command name, leave any arguments behind */
     temp_command_name = my_strtok(buf, "!");

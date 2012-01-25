@@ -31,8 +31,8 @@ unsigned long commands::command::_id = 0;
  *  @param[in] name         The command name.
  *  @param[in] command_line The command line.
  */
-commands::command::command(QString const& name,
-			   QString const& command_line)
+commands::command::command(std::string const& name,
+			   std::string const& command_line)
   : QObject(),
     _name(name),
     _command_line(command_line) {
@@ -73,7 +73,7 @@ bool commands::command::operator!=(command const& right) const throw() {
  *
  *  @return The command name.
  */
-QString const& commands::command::get_name() const throw() {
+std::string const& commands::command::get_name() const throw() {
   return (_name);
 }
 
@@ -82,7 +82,7 @@ QString const& commands::command::get_name() const throw() {
  *
  *  @return The command line.
  */
-QString const& commands::command::get_command_line() const throw() {
+std::string const& commands::command::get_command_line() const throw() {
   return (_command_line);
 }
 
@@ -91,8 +91,8 @@ QString const& commands::command::get_command_line() const throw() {
  *
  *  @param[in] name The command name.
  */
-void commands::command::set_name(QString const& name) {
-  QString old_name = _name;
+void commands::command::set_name(std::string const& name) {
+  std::string old_name = _name;
   _name = name;
   emit name_changed(old_name, _name);
 }
@@ -102,7 +102,7 @@ void commands::command::set_name(QString const& name) {
  *
  *  @param[in] command_line The command line.
  */
-void commands::command::set_command_line(QString const& command_line) {
+void commands::command::set_command_line(std::string const& command_line) {
   _command_line = command_line;
 }
 
@@ -138,10 +138,10 @@ commands::command& commands::command::operator=(commands::command const& right) 
  *
  *  @return The processed command line.
  */
-QString commands::command::process_cmd(nagios_macros* macros) const {
+std::string commands::command::process_cmd(nagios_macros* macros) const {
   char* command_line = NULL;
-  process_macros_r(macros, qPrintable(_command_line), &command_line, 0);
-  QString processed_cmd(command_line);
+  process_macros_r(macros, _command_line.c_str(), &command_line, 0);
+  std::string processed_cmd(command_line);
   delete[] command_line;
   return (processed_cmd);
 }
