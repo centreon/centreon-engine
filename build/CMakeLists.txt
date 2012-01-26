@@ -509,78 +509,94 @@ else ()
   set(libexecdir "/usr/lib/nagios/plugins")
 endif ()
 
+# Check OS distributor.
+if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
+  message(STATUS "Attempting to determine OS distributor.")
+  execute_process(COMMAND "lsb_release" "--short" "--id"
+    RESULT_VARIABLE RETCODE
+    OUTPUT_VARIABLE OS_DISTRIBUTOR
+    ERROR_QUIET)
+  if (RETCODE EQUAL 0)
+    string(REGEX REPLACE "\n$" "" OS_DISTRIBUTOR "${OS_DISTRIBUTOR}")
+  else ()
+    set(OS_DISTRIBUTOR "${CMAKE_SYSTEM_NAME}")
+  endif ()
+elseif ()
+  set(OS_DISTRIBUTOR "${CMAKE_SYSTEM_NAME}")
+endif ()
+
+# Set startup script to auto if not define.
+if (NOT WITH_STARTUP_SCRIPT)
+  set(WITH_STARTUP_SCRIPT "auto")
+endif ()
+
 # Check which startup script to use.
-option(WITH_STARTUP_SCRIPT "Generate and install startup script." ON)
 set(STARTUP_SCRIPT "No")
-if (WITH_STARTUP_SCRIPT)
-  # Linux platform.
+if (WITH_STARTUP_SCRIPT STREQUAL "auto")
   if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
-    message(STATUS "Attempting to determine OS distributor.")
-    execute_process(COMMAND "lsb_release" "--short" "--id"
-      RESULT_VARIABLE RETCODE
-      OUTPUT_VARIABLE OS_DISTRIBUTOR
-      ERROR_QUIET)
-    if (RETCODE EQUAL 0)
-      # CentOS
-      if (OS_DISTRIBUTOR STREQUAL "CentOS\n")
-        message(STATUS "Generating CentOS startup script.")
-        set(STARTUP_SCRIPT "CentOS init script")
-
-         # Lock file.
-        if (WITH_LOCK_FILE)
-          set(LOCK_FILE "${WITH_LOCK_FILE}")
-        else ()
-          set(LOCK_FILE "/var/lock/subsys/centengine.lock")
-        endif ()
-	string(REGEX REPLACE "/[^/]*$" "" LOCK_DIR "${LOCK_FILE}")
-	file(MAKE_DIRECTORY "${LOCK_DIR}")
-
-        # PID file.
-        if (WITH_PID_FILE)
-          set(PID_FILE "${WITH_PID_FILE}")
-        else ()
-          set(PID_FILE "/var/run/centengine.pid")
-        endif ()
-	string(REGEX REPLACE "/[^/]*$" "" PID_DIR "${PID_FILE}")
-	file(MAKE_DIRECTORY "${PID_DIR}")
-
-        # Startup dir.
-        if (WITH_STARTUP_DIR)
-          set(STARTUP_DIR "${WITH_STARTUP_DIR}")
-        else ()
-          set(STARTUP_DIR "/etc/init.d")
-        endif ()
-
-        install(PROGRAMS "${SCRIPT_DIR}/centengine.sh"
-          DESTINATION "${STARTUP_DIR}"
-          COMPONENT "runtime"
-          RENAME "centengine")
-      # Ubuntu
-      elseif (OS_DISTRIBUTOR STREQUAL "Ubuntu\n")
-        message(STATUS "Generating Ubuntu startup script.")
-        set(STARTUP_SCRIPT "Ubuntu upstart script")
-
-        # Startup dir.
-        if (WITH_STARTUP_DIR)
-          set(STARTUP_DIR "${WITH_STARTUP_DIR}")
-        else ()
-          set(STARTUP_DIR "/etc/init")
-        endif ()
-
-        install(FILES "${SCRIPT_DIR}/ubuntu.conf"
-          DESTINATION "${STARTUP_DIR}"
-          COMPONENT "runtime"
-          RENAME "centengine.conf")
-      else ()
-        message(STATUS "Unsupported distributor: ${OS_DISTRIBUTOR}")
-      endif ()
+    if (OS_DISTRIBUTOR STREQUAL "Ubuntu")
+      set(WITH_STARTUP_SCRIPT "upstart")
     else ()
-      message(STATUS "Could not get Linux distributor name, not startup script will be installed.")
+      set(WITH_STARTUP_SCRIPT "sysv")
     endif ()
   else ()
     message(STATUS "Centreon Engine does not provide startup script for ${CMAKE_SYSTEM_NAME}")
-    set(OS_DISTRIBUTOR "${CMAKE_SYSTEM_NAME}")
   endif ()
+endif ()
+
+# Create upstart file.
+if (WITH_STARTUP_SCRIPT STREQUAL "upstart")
+  message(STATUS "Generating upstart script.")
+  set(STARTUP_SCRIPT "Generic upstart script")
+
+  # Startup dir.
+  if (WITH_STARTUP_DIR)
+    set(STARTUP_DIR "${WITH_STARTUP_DIR}")
+  else ()
+    set(STARTUP_DIR "/etc/init")
+  endif ()
+
+  install(FILES "${SCRIPT_DIR}/upstart.conf"
+    DESTINATION "${STARTUP_DIR}"
+    COMPONENT "runtime"
+    RENAME "centengine.conf")
+# Create sysv start script.
+elseif (WITH_STARTUP_SCRIPT STREQUAL "sysv")
+  message(STATUS "Generating generic startup script.")
+  set(STARTUP_SCRIPT "Generic init script")
+
+  # Lock file.
+  if (WITH_LOCK_FILE)
+    set(LOCK_FILE "${WITH_LOCK_FILE}")
+  else ()
+    set(LOCK_FILE "/var/lock/subsys/centengine.lock")
+  endif ()
+  string(REGEX REPLACE "/[^/]*$" "" LOCK_DIR "${LOCK_FILE}")
+  file(MAKE_DIRECTORY "${LOCK_DIR}")
+
+  # PID file.
+  if (WITH_PID_FILE)
+    set(PID_FILE "${WITH_PID_FILE}")
+  else ()
+    set(PID_FILE "/var/run/centengine.pid")
+  endif ()
+  string(REGEX REPLACE "/[^/]*$" "" PID_DIR "${PID_FILE}")
+  file(MAKE_DIRECTORY "${PID_DIR}")
+
+  # Startup dir.
+  if (WITH_STARTUP_DIR)
+    set(STARTUP_DIR "${WITH_STARTUP_DIR}")
+  else ()
+    set(STARTUP_DIR "/etc/init.d")
+  endif ()
+
+  install(PROGRAMS "${SCRIPT_DIR}/centengine.sh"
+    DESTINATION "${STARTUP_DIR}"
+    COMPONENT "runtime"
+    RENAME "centengine")
+else ()
+  message(STATUS "Invalid option WITH_STARTUP_SCRIPT")
+  set(STARTUP_SCRIPT "No")
 endif ()
 
 # Unit test.
@@ -600,8 +616,8 @@ configure_file("${INCLUDE_DIR}/compatibility/common.h.in"
   "${INCLUDE_DIR}/compatibility/common.h")
 configure_file("${SCRIPT_DIR}/centengine.sh.in"
   "${SCRIPT_DIR}/centengine.sh")
-configure_file("${SCRIPT_DIR}/ubuntu.conf.in"
-  "${SCRIPT_DIR}/ubuntu.conf")
+configure_file("${SCRIPT_DIR}/upstart.conf.in"
+  "${SCRIPT_DIR}/upstart.conf")
 configure_file("${SCRIPT_DIR}/centengine.pc.in"
   "${SCRIPT_DIR}/centengine.pc")
 
