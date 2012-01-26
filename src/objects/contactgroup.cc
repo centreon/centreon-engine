@@ -78,8 +78,8 @@ void release_contactgroup(contactgroup const* obj) {
  *  @param[in]     groups  The table with contact groups member name.
  */
 void objects::link(contactgroup* obj,
-                   QVector<contact*> const& members,
-                   QVector<contactgroup*> const& groups) {
+                   std::vector<contact*> const& members,
+                   std::vector<contactgroup*> const& groups) {
   // check object contents.
   if (obj == NULL)
     throw (engine_error() << "contactgroup is a NULL pointer.");
@@ -91,7 +91,7 @@ void objects::link(contactgroup* obj,
     throw (engine_error() << "contactgroup '" << obj->group_name << "' invalid member.");
 
   // add the content of other contactgroups into this contactgroup.
-  for (QVector<contactgroup*>::const_iterator it = groups.begin(), end = groups.end();
+  for (std::vector<contactgroup*>::const_iterator it = groups.begin(), end = groups.end();
        it != end;
        ++it) {
     if (*it == NULL)
@@ -137,12 +137,12 @@ void objects::release(contactgroup const* obj) {
  *
  *  @return True if insert sucessfuly, false otherwise.
  */
-bool objects::add_contactgroups_to_object(QVector<contactgroup*> const& contactgroups,
+bool objects::add_contactgroups_to_object(std::vector<contactgroup*> const& contactgroups,
                                           contactgroupsmember** list_contactgroup) {
   if (list_contactgroup == NULL)
     return (false);
 
-  for (QVector<contactgroup*>::const_iterator it = contactgroups.begin(),
+  for (std::vector<contactgroup*>::const_iterator it = contactgroups.begin(),
          end = contactgroups.end();
        it != end;
        ++it) {

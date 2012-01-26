@@ -83,7 +83,7 @@ void engine::log(char const* message,
 		 unsigned int verbosity) throw() {
   if (message != NULL) {
     _rwlock.lockForRead();
-    for (QVector<obj_info>::iterator it = _objects.begin(),
+    for (std::vector<obj_info>::iterator it = _objects.begin(),
            end = _objects.end();
 	 it != end;
 	 ++it) {
@@ -121,8 +121,8 @@ unsigned long engine::add_object(obj_info& info) {
 void engine::remove_object(unsigned long id) throw() {
   _rwlock.lockForWrite();
   memset(_type, 0, sizeof(_type));
-  QVector<obj_info>::iterator it_erase = _objects.end();
-  for (QVector<obj_info>::iterator it = _objects.begin(),
+  std::vector<obj_info>::iterator it_erase = _objects.end();
+  for (std::vector<obj_info>::iterator it = _objects.begin(),
          end = _objects.end();
        it != end;
        ++it) {
@@ -164,8 +164,8 @@ void engine::update_object(unsigned long id,
 			   unsigned int verbosity) throw() {
   _rwlock.lockForWrite();
   memset(_type, 0, sizeof(_type));
-  QVector<obj_info>::iterator it_erase = _objects.end();
-  for (QVector<obj_info>::iterator it = _objects.begin(),
+  std::vector<obj_info>::iterator it_erase = _objects.end();
+  for (std::vector<obj_info>::iterator it = _objects.begin(),
          end = _objects.end();
        it != end;
        ++it) {

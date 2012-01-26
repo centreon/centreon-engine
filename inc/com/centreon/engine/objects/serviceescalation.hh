@@ -21,7 +21,7 @@
 # define CCE_OBJECTS_SERVICEESCALATION_HH
 
 # ifdef __cplusplus
-#  include <QVector>
+#  include <vector>
 # endif
 # include "objects.hh"
 
@@ -43,8 +43,8 @@ namespace       com {
     namespace   engine {
       namespace objects {
         void    link(serviceescalation* obj,
-                     QVector<contact*> const& contacts = QVector<contact*>(),
-                     QVector<contactgroup*> const& contactgroups = QVector<contactgroup*>(),
+                     std::vector<contact*> const& contacts = std::vector<contact*>(),
+                     std::vector<contactgroup*> const& contactgroups = std::vector<contactgroup*>(),
                      timeperiod* escalation_period = NULL);
         void    release(serviceescalation const* obj);
       }

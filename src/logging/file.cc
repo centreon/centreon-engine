@@ -26,8 +26,8 @@
 
 using namespace com::centreon::engine::logging;
 
-QList<file*>   file::_files;
-QReadWriteLock file::_rwlock;
+std::list<file*> file::_files;
+QReadWriteLock   file::_rwlock;
 
 /**************************************
  *                                     *
@@ -79,7 +79,7 @@ file::file(std::string const& file, std::string const& archive_path)
  */
 file::~file() throw() {
   _rwlock.lockForWrite();
-  QList<file*>::iterator it = std::find(_files.begin(), _files.end(), this);
+  std::list<file*>::iterator it = std::find(_files.begin(), _files.end(), this);
   if (it != _files.end()) {
     _files.erase(it);
   }
@@ -123,7 +123,7 @@ void file::rotate_all() {
   last_log_rotation = time(NULL);
   update_program_status(FALSE);
 
-  for (QList<file*>::iterator it = _files.begin(), end = _files.end();
+  for (std::list<file*>::iterator it = _files.begin(), end = _files.end();
        it != end;
        ++it) {
     (*it)->rotate();

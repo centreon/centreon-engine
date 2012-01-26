@@ -22,7 +22,7 @@
 
 # include <QTimer>
 # include <QMutex>
-# include <QHash>
+# include <map>
 // # include <QProcess>
 # include <QStringList>
 # include "commands/command.hh"
@@ -101,11 +101,11 @@ namespace                              com {
 	    std::string                    _connector_line;
 	    QSharedPointer<basic_process>
                                        _process;
-	    QHash<unsigned long, request_info>
+	    std::map<unsigned long, request_info>
 	                               _queries;
-	    QHash<unsigned long, result>
+	    std::map<unsigned long, result>
 	                               _results;
-	    QHash<request::e_type, void (command::*)(request*)>
+	    std::map<request::e_type, void (command::*)(request*)>
 	                               _req_func;
 	    unsigned long              _max_check_for_restart;
 	    unsigned long              _nbr_check;

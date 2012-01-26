@@ -21,7 +21,7 @@
 # define CCE_OBJECTS_SERVICEGROUP_HH
 
 # ifdef __cplusplus
-#  include <QVector>
+#  include <vector>
 #  include <string>
 # endif
 # include "objects.hh"
@@ -42,8 +42,8 @@ namespace       com {
     namespace   engine {
       namespace objects {
         void    link(servicegroup* obj,
-                     QVector<service*> const& members,
-                     QVector<servicegroup*> const& groups);
+                     std::vector<service*> const& members,
+                     std::vector<servicegroup*> const& groups);
         void    release(servicegroup const* obj);
       }
     }

@@ -579,7 +579,7 @@ int check_service_notification_viability(service* svc, unsigned int type, int op
     // XXX: todo.
     /*
     time_t& initial_notif_time(service_other_props[
-                                                   qMakePair(std::string(svc->host_ptr->name), QString(svc->description))].initial_notif_time);
+                                                   qMakePair(std::string(svc->host_ptr->name), std::string(svc->description))].initial_notif_time);
     */
     /* if not set, set it to now */
     /*

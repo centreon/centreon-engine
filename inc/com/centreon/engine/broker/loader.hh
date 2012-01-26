@@ -50,7 +50,7 @@ namespace                        com {
           void                   del_module(QSharedPointer<handle> const& module);
 
           std::string const&         get_directory() const throw();
-          QList<QSharedPointer<handle> >
+          std::list<QSharedPointer<handle> >
                                  get_modules() const throw();
 
           void                   set_directory(std::string const& directory);

@@ -18,7 +18,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <QHash>
+#include <map>
 #include <stdlib.h>
 #include "engine.hh"
 #include "globals.hh"
@@ -712,7 +712,7 @@ static int handle_summary_macro(nagios_macros* mac,
 
 // Redirection object.
 struct grab_value_redirection {
-  typedef QHash<unsigned int, int (*)(nagios_macros*, int, char const*, char const*, char**, int*)> entry;
+  typedef std::map<unsigned int, int (*)(nagios_macros*, int, char const*, char const*, char**, int*)> entry;
   entry routines;
   grab_value_redirection() {
     // Host macros.
@@ -947,9 +947,6 @@ struct grab_value_redirection {
          i < sizeof(summary_ids) / sizeof(*summary_ids);
          ++i)
       routines[summary_ids[i]] = &handle_summary_macro;
-
-    // Optimize routines.
-    routines.squeeze();
   }
 } static const redirector;
 
@@ -1212,7 +1209,7 @@ int grab_macrox_value_r(nagios_macros* mac,
         << "UNHANDLED MACRO #" << macro_type << "! THIS IS A BUG!";
     }
     else
-      retval = (**it)(mac, macro_type, arg1, arg2, output, free_macro);
+      retval = (*it->second)(mac, macro_type, arg1, arg2, output, free_macro);
   }
   return (retval);
 }

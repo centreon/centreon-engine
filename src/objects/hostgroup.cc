@@ -79,8 +79,8 @@ void release_hostgroup(hostgroup const* obj) {
  *  @param[in]     groups  The table with host groups member name.
  */
 void objects::link(hostgroup* obj,
-                   QVector<host*> const& members,
-                   QVector<hostgroup*> const& groups) {
+                   std::vector<host*> const& members,
+                   std::vector<hostgroup*> const& groups) {
   // check object contents.
   if (obj == NULL)
     throw (engine_error() << "hostgroup is a NULL pointer.");
@@ -92,7 +92,7 @@ void objects::link(hostgroup* obj,
     throw (engine_error() << "hostgroup '" << obj->group_name << "' invalid member.");
 
   // add the content of other hostgroups into this hostgroup.
-  for (QVector<hostgroup*>::const_iterator it = groups.begin(),
+  for (std::vector<hostgroup*>::const_iterator it = groups.begin(),
 	 end = groups.end();
        it != end;
        ++it) {

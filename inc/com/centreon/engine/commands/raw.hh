@@ -22,7 +22,7 @@
 
 # include <string>
 # include <QSharedPointer>
-# include <QHash>
+# include <map>
 # include <QMutex>
 # include <sys/time.h>
 
@@ -71,7 +71,7 @@ namespace                               com {
 	    unsigned long               cmd_id;
 	  };
 
-	  QHash<QObject*, process_info> _processes;
+	  std::map<QObject*, process_info> _processes;
 	  QMutex                        _mutex;
 
 	signals:

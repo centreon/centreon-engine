@@ -21,7 +21,7 @@
 # define CCE_OBJECTS_HOSTGROUP_HH
 
 # ifdef __cplusplus
-#  include <QVector>
+#  include <vector>
 # endif
 # include "objects.hh"
 
@@ -42,8 +42,8 @@ namespace       com {
     namespace   engine {
       namespace objects {
         void    link(hostgroup* obj,
-                     QVector<host*> const& members,
-                     QVector<hostgroup*> const& groups);
+                     std::vector<host*> const& members,
+                     std::vector<hostgroup*> const& groups);
         void    release(hostgroup const* obj);
       }
     }

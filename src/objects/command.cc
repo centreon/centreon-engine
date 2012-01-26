@@ -119,12 +119,12 @@ void objects::release(command const* obj) {
  *
  *  @return True if insert sucessfuly, false otherwise.
  */
-bool objects::add_commands_to_object(QVector<command*> const& commands,
+bool objects::add_commands_to_object(std::vector<command*> const& commands,
                                      commandsmember** list_command) {
   if (list_command == NULL)
     return (false);
 
-  for (QVector<command*>::const_iterator it = commands.begin(),
+  for (std::vector<command*>::const_iterator it = commands.begin(),
 	 end = commands.end();
        it != end;
        ++it) {

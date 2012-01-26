@@ -42,8 +42,8 @@ namespace       com {
       namespace objects {
         void    add_timeperiod(std::string const& name,
                                std::string const& alias,
-                               QVector<std::string> const& range,
-                               QVector<std::string> const& exclude);
+                               std::vector<std::string> const& range,
+                               std::vector<std::string> const& exclude);
         void    release(timeperiod const* obj);
       }
     }

@@ -20,7 +20,7 @@
 #ifndef CCE_COMMANDS_CONNECTOR_REQUEST_BUILDER_HH
 # define CCE_COMMANDS_CONNECTOR_REQUEST_BUILDER_HH
 
-# include <QHash>
+# include <map>
 # include <QSharedPointer>
 # include <QByteArray>
 # include "com/centreon/engine/commands/connector/request.hh"
@@ -47,7 +47,7 @@ namespace                           com {
 
 	    request_builder&        operator=(request_builder const& right);
 
-	    QHash<unsigned int, QSharedPointer<request> >
+	    std::map<unsigned int, QSharedPointer<request> >
 	                            _list;
 	  };
 	}

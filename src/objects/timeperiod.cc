@@ -59,8 +59,8 @@ void release_timeperiod(timeperiod const* obj) {
  */
 void objects::add_timeperiod(std::string const& name,
                              std::string const& alias,
-                             QVector<std::string> const& range,
-                             QVector<std::string> const& exclude) {
+                             std::vector<std::string> const& range,
+                             std::vector<std::string> const& exclude) {
   /*
     // XXX: todo.
   char* name_str = my_strdup(qPrintable(name));
@@ -75,7 +75,7 @@ void objects::add_timeperiod(std::string const& name,
   tmpl_tperiod->timeperiod_name = name_str;
   tmpl_tperiod->alias = my_strdup(qPrintable(alias));
   tmpl_tperiod->register_object = true;
-  for (QVector<std::string>::const_iterator it = range.begin(), end = range.end();
+  for (std::vector<std::string>::const_iterator it = range.begin(), end = range.end();
        it != end;
        ++it) {
     std::string base(it->trimmed());
@@ -93,7 +93,7 @@ void objects::add_timeperiod(std::string const& name,
   }
 
   std::string exclude_str;
-  for (QVector<std::string>::const_iterator it = exclude.begin(), end = exclude.end();
+  for (std::vector<std::string>::const_iterator it = exclude.begin(), end = exclude.end();
        it != end;
        ++it) {
     exclude_str += *it;

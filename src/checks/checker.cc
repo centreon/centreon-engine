@@ -750,7 +750,7 @@ void checker::_command_executed(cce_commands_result const& res) {
   logger(dbg_functions, basic) << "start " << Q_FUNC_INFO;
 
   _mut_id.lock();
-  QHash<unsigned long, check_result>::iterator it = _list_id.find(res.get_command_id());
+  std::map<unsigned long, check_result>::iterator it = _list_id.find(res.get_command_id());
   if (it == _list_id.end()) {
     _mut_id.unlock();
     logger(log_runtime_warning, basic)
@@ -760,7 +760,7 @@ void checker::_command_executed(cce_commands_result const& res) {
 
   logger(dbg_checks, basic)
     << "command id (" << res.get_command_id() << ") executed.";
-  check_result result = it.value();
+  check_result result = it->second;
 
   _list_id.erase(it);
   _mut_id.unlock();

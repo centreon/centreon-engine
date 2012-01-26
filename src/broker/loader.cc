@@ -118,9 +118,9 @@ QSharedPointer<handle> loader::add_module(std::string const& filename,
   broker::compatibility& compatibility = broker::compatibility::instance();
 
   if (connect(&(*module),
-	      SIGNAL(name_changed(std::string const&, QString const&)),
+	      SIGNAL(name_changed(std::string const&, std::string const&)),
 	      this,
-	      SLOT(module_name_changed(std::string const&, QString const&))) == false
+	      SLOT(module_name_changed(std::string const&, std::string const&))) == false
       || connect(&(*module),
 		 SIGNAL(event_create(broker::handle*)),
 		 &compatibility,
@@ -191,8 +191,8 @@ std::string const& loader::get_directory() const throw() {
  *
  *  @return All modules in a const map.
  */
-QList<QSharedPointer<handle> > loader::get_modules() const throw() {
-  return (_modules.values());
+std::list<QSharedPointer<handle> > loader::get_modules() const throw() {
+  return (_modules.values().toStdList());
 }
 
 /**

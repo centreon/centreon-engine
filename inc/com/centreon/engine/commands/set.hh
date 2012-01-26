@@ -22,7 +22,7 @@
 
 # include <QObject>
 # include <string>
-# include <QHash>
+# include <map>
 # include <QSharedPointer>
 
 # include "commands/command.hh"
@@ -62,7 +62,7 @@ namespace                         com {
 
 	  set&                    operator=(set const& right);
 
-	  QHash<std::string, QSharedPointer<command> > _list;
+	  std::map<std::string, QSharedPointer<command> > _list;
           static set*             _instance;
 	};
       }

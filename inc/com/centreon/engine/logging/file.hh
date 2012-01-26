@@ -23,7 +23,7 @@
 # include <QSharedPointer>
 # include <QFile>
 # include <string>
-# include <QList>
+# include <list>
 # include <QMutex>
 # include <QReadWriteLock>
 
@@ -71,7 +71,7 @@ namespace                        com {
 	  std::string                _archive_path;
 	  unsigned long long     _size_limit;
 
-	  static QList<file*>    _files;
+	  static std::list<file*>    _files;
 	  static QReadWriteLock  _rwlock;
 	};
       }

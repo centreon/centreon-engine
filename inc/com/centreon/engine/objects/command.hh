@@ -38,7 +38,7 @@ namespace       com {
       namespace objects {
         void    link(command const* obj);
         void    release(command const* obj);
-        bool    add_commands_to_object(QVector<command*> const& commands,
+        bool    add_commands_to_object(std::vector<command*> const& commands,
                                        commandsmember** list_command);
       }
     }

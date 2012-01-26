@@ -113,11 +113,11 @@ void release_host(host const* obj) {
  *  @param[in]     cmd_check_command   Set host check command.
  */
 void objects::link(host* obj,
-                   QVector<host*> const& parents,
-                   QVector<contact*> const& contacts,
-                   QVector<contactgroup*> const& contactgroups,
-                   QVector<hostgroup*> const& hostgroups,
-                   QVector<std::string> const& custom_variables,
+                   std::vector<host*> const& parents,
+                   std::vector<contact*> const& contacts,
+                   std::vector<contactgroup*> const& contactgroups,
+                   std::vector<hostgroup*> const& hostgroups,
+                   std::vector<std::string> const& custom_variables,
                    int initial_state,
                    timeperiod* check_period,
                    timeperiod* notification_period,
@@ -164,7 +164,7 @@ void objects::link(host* obj,
   if (add_contactgroups_to_object(contactgroups, &obj->contact_groups) == false)
     throw (engine_error() << "host '" << obj->name << "' invalid contact groups.");
 
-  for (QVector<hostgroup*>::const_iterator it = hostgroups.begin(),
+  for (std::vector<hostgroup*>::const_iterator it = hostgroups.begin(),
          end = hostgroups.end();
        it != end;
        ++it) {
@@ -268,12 +268,12 @@ void objects::release(host const* obj) {
  *
  *  @return True if insert sucessfuly, false otherwise.
  */
-bool objects::add_hosts_to_object(QVector<host*> const& hosts,
+bool objects::add_hosts_to_object(std::vector<host*> const& hosts,
                                   hostsmember** list_host) {
   if (list_host == NULL)
     return (false);
 
-  for (QVector<host*>::const_iterator it = hosts.begin(),
+  for (std::vector<host*>::const_iterator it = hosts.begin(),
          end = hosts.end();
        it != end;
        ++it) {

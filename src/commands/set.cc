@@ -62,9 +62,9 @@ void set::add_command(command const& cmd) {
  */
 void set::add_command(QSharedPointer<command> cmd) {
   if (connect(&(*cmd),
-	      SIGNAL(name_changed(std::string const&, QString const&)),
+	      SIGNAL(name_changed(std::string const&, std::string const&)),
 	      this,
-	      SLOT(command_name_changed(std::string const&, QString const&)),
+	      SLOT(command_name_changed(std::string const&, std::string const&)),
               Qt::DirectConnection) == false) {
     throw (engine_error() << "connect command to set failed.");
   }
@@ -94,7 +94,7 @@ void set::remove_command(std::string const& cmd_name) throw() {
 QSharedPointer<commands::command> set::get_command(std::string const& cmd_name) {
   /*
   // XXX: todo.
-  QHash<std::string, QSharedPointer<command> >::iterator it = _list.find(cmd_name);
+  std::map<std::string, QSharedPointer<command> >::iterator it = _list.find(cmd_name);
   if (it == _list.end()) {
     throw (engine_error() << "command '" << cmd_name << "' not found.");
   }

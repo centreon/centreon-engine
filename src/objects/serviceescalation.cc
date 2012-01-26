@@ -85,8 +85,8 @@ void release_serviceescalation(serviceescalation const* obj) {
  *  @param[in]     escalation_period Set service escalation escalation period.
  */
 void objects::link(serviceescalation* obj,
-                   QVector<contact*> const& contacts,
-                   QVector<contactgroup*> const& contactgroups,
+                   std::vector<contact*> const& contacts,
+                   std::vector<contactgroup*> const& contactgroups,
                    timeperiod* escalation_period) {
   // check object contents.
   if (obj == NULL)

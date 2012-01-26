@@ -56,7 +56,7 @@ raw::raw(raw const& right)
 raw::~raw() throw() {
   _mutex.lock();
   while (_processes.empty() == false) {
-    process_info info = _processes.begin().value();
+    process_info info = _processes.begin()->second;
 
     QEventLoop loop;
     connect(this, SIGNAL(command_executed(commands::result const&)), &loop, SLOT(quit()));
@@ -117,7 +117,7 @@ unsigned long raw::run(std::string const& processed_cmd,
 
   _mutex.lock();
   info.cmd_id = get_uniq_id();
-  _processes.insert(&(*info.proc), info);
+  _processes.insert(std::pair<QObject*, process_info>(&(*info.proc), info));
   _mutex.unlock();
 
   logger(dbg_commands, basic)
@@ -178,13 +178,13 @@ void raw::run(std::string const& processed_cmd,
 void raw::raw_ended() {
   logger(dbg_functions, basic) << "start " << Q_FUNC_INFO;
   _mutex.lock();
-  QHash<QObject*, process_info>::iterator it = _processes.find(sender());
+  std::map<QObject*, process_info>::iterator it = _processes.find(sender());
   if (it == _processes.end()) {
     _mutex.unlock();
     logger(log_runtime_warning, basic) << "sender not found in processes.";
     return;
   }
-  process_info info = it.value();
+  process_info info = it->second;
   _processes.erase(it);
   _mutex.unlock();
 

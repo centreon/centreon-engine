@@ -21,7 +21,7 @@
 # define CCE_LOGGING_ENGINE_HH
 
 # include <QSharedPointer>
-# include <QVector>
+# include <vector>
 # include <QReadWriteLock>
 
 # include "logging/object.hh"
@@ -85,7 +85,7 @@ namespace                    com {
 	                     engine(engine const& right);
 	  engine&            operator=(engine const& right);
 
-	  QVector<obj_info>  _objects;
+	  std::vector<obj_info>  _objects;
 	  QReadWriteLock     _rwlock;
           static engine*     _instance;
           unsigned long long _type[3];

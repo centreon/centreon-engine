@@ -18,6 +18,8 @@
 */
 
 #include <QStringList>
+#include <QVector>
+#include <vector>
 #include "error.hh"
 #include "commands/connector/quit_query.hh"
 
@@ -106,7 +108,7 @@ QByteArray quit_query::build() {
  *  @param[in] data The data of the request information.
  */
 void quit_query::restore(QByteArray const& data) {
-  QList<QByteArray> list = data.split('\0');
+  std::vector<QByteArray> list = data.split('\0').toVector().toStdVector();
   if (list.size() != 1) {
     throw (engine_error() << "bad request argument.");
   }

@@ -21,7 +21,7 @@
 # define CCE_OBJECTS_HOST_HH
 
 # ifdef __cplusplus
-#  include <QVector>
+#  include <vector>
 #  include <string>
 # endif
 # include "objects.hh"
@@ -51,18 +51,18 @@ namespace       com {
     namespace   engine {
       namespace objects {
         void    link(host* obj,
-                     QVector<host*> const& parents,
-                     QVector<contact*> const& contacts,
-                     QVector<contactgroup*> const& contactgroups,
-                     QVector<hostgroup*> const& hostgroups,
-                     QVector<std::string> const& custom_variables,
+                     std::vector<host*> const& parents,
+                     std::vector<contact*> const& contacts,
+                     std::vector<contactgroup*> const& contactgroups,
+                     std::vector<hostgroup*> const& hostgroups,
+                     std::vector<std::string> const& custom_variables,
                      int initial_state,
                      timeperiod* check_period,
                      timeperiod* notification_period,
                      command* cmd_event_handler = NULL,
                      command* cmd_check_command = NULL);
         void    release(host const* obj);
-        bool    add_hosts_to_object(QVector<host*> const& hosts,
+        bool    add_hosts_to_object(std::vector<host*> const& hosts,
                                     hostsmember** list_host);
       }
     }

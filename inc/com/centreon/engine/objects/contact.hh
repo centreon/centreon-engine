@@ -21,7 +21,7 @@
 # define CCE_OBJECTS_CONTACT_HH
 
 # ifdef __cplusplus
-#  include <QVector>
+#  include <vector>
 #  include <string>
 # endif
 # include "objects.hh"
@@ -49,12 +49,12 @@ namespace       com {
         void    link(contact* obj,
                      timeperiod* host_notification_period,
                      timeperiod* service_notification_period,
-                     QVector<contactgroup*> const& contactgroups,
-                     QVector<command*> const& host_notification_commands,
-                     QVector<command*> const& service_notification_commands,
-                     QVector<std::string> const& custom_variables);
+                     std::vector<contactgroup*> const& contactgroups,
+                     std::vector<command*> const& host_notification_commands,
+                     std::vector<command*> const& service_notification_commands,
+                     std::vector<std::string> const& custom_variables);
         void    release(contact const* obj);
-        bool    add_contacts_to_object(QVector<contact*> const& contacts,
+        bool    add_contacts_to_object(std::vector<contact*> const& contacts,
                                        contactsmember** list_contact);
       }
     }

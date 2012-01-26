@@ -21,7 +21,7 @@
 # define CCE_OBJECTS_CONTACTGROUP_HH
 
 # ifdef __cplusplus
-#  include <QVector>
+#  include <vector>
 #  include <string>
 # endif
 # include "objects.hh"
@@ -43,10 +43,10 @@ namespace       com {
     namespace   engine {
       namespace objects {
         void    link(contactgroup* obj,
-                     QVector<contact*> const& members,
-                     QVector<contactgroup*> const& groups);
+                     std::vector<contact*> const& members,
+                     std::vector<contactgroup*> const& groups);
         void    release(contactgroup const* obj);
-        bool    add_contactgroups_to_object(QVector<contactgroup*> const& contactgroups,
+        bool    add_contactgroups_to_object(std::vector<contactgroup*> const& contactgroups,
                                             contactgroupsmember** list_contactgroup);
       }
     }

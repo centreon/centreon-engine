@@ -18,7 +18,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <QHash>
+#include <map>
 #include <QPair>
 #include <sstream>
 #include "engine.hh"
@@ -118,7 +118,7 @@ static char* get_service_state(service& svc, nagios_macros* mac) {
 
 // Redirection object.
 struct grab_service_redirection {
-  typedef QHash<unsigned int, QPair<char* (*)(service&, nagios_macros* mac), bool> > entry;
+  typedef std::map<unsigned int, QPair<char* (*)(service&, nagios_macros* mac), bool> > entry;
   entry routines;
   grab_service_redirection() {
     // Description.
@@ -244,9 +244,6 @@ struct grab_service_redirection {
     // Acknowledgement comment.
     routines[MACRO_SERVICEACKCOMMENT].first = &get_macro_copy<service, MACRO_SERVICEACKCOMMENT>;
     routines[MACRO_SERVICEACKCOMMENT].second = true;
-
-    // Optimize routines.
-    routines.squeeze();
   }
 } static const redirector;
 
@@ -282,10 +279,10 @@ int grab_standard_service_macro_r(nagios_macros* mac,
     // Found matching routine.
     if (it != redirector.routines.end()) {
       // Call routine.
-      *output = (*it->first)(*svc, mac);
+      *output = (*it->second.first)(*svc, mac);
 
       // Set the free macro flag.
-      *free_macro = it->second;
+      *free_macro = it->second.second;
 
       // Successful execution.
       retval = OK;

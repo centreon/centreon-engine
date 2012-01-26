@@ -18,6 +18,8 @@
 */
 
 #include <QStringList>
+#include <QVector>
+#include <vector>
 #include "error.hh"
 #include "commands/connector/execute_response.hh"
 
@@ -141,7 +143,7 @@ QByteArray execute_response::build() {
  *  @param[in] data The data of the request information.
  */
 void execute_response::restore(QByteArray const& data) {
-  QList<QByteArray> list = data.split('\0');
+  std::vector<QByteArray> list = data.split('\0').toVector().toStdVector();
   if (list.size() != 7) {
     throw (engine_error() << "bad request argument.");
   }

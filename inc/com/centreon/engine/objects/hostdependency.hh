@@ -21,7 +21,7 @@
 # define CCE_OBJECTS_HOSTDEPENDENCY_HH
 
 # ifdef __cplusplus
-#  include <QVector>
+#  include <vector>
 #  include <string>
 # endif
 # include "objects.hh"

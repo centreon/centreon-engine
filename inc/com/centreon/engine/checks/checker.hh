@@ -23,7 +23,7 @@
 # include <QSharedPointer>
 # include <QObject>
 # include <QQueue>
-# include <QHash>
+# include <map>
 # include <QMutex>
 # include "objects.hh"
 # include "commands/command.hh"
@@ -86,7 +86,7 @@ namespace                                    com {
 	  int                                _execute_sync(host* hst);
 
 	  QQueue<check_result>               _to_reap;
-	  QHash<unsigned long, check_result> _list_id;
+	  std::map<unsigned long, check_result> _list_id;
 	  QMutex                             _mut_reap;
 	  QMutex                             _mut_id;
           static checker*                    _instance;

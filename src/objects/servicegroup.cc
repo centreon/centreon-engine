@@ -78,8 +78,8 @@ void release_servicegroup(servicegroup const* obj) {
  *  @param[in]     groups  The table with service groups member name.
  */
 void objects::link(servicegroup* obj,
-                   QVector<service*> const& members,
-                   QVector<servicegroup*> const& groups) {
+                   std::vector<service*> const& members,
+                   std::vector<servicegroup*> const& groups) {
   // check object contents.
   if (obj == NULL)
     throw (engine_error() << "servicegroup is a NULL pointer.");
@@ -87,7 +87,7 @@ void objects::link(servicegroup* obj,
     throw (engine_error() << "servicegroup invalid group name.");
 
   // add all services into the servicegroup.
-  for (QVector<service*>::const_iterator it = members.begin(),
+  for (std::vector<service*>::const_iterator it = members.begin(),
   	 end = members.end();
        it != end;
        ++it) {
@@ -103,7 +103,7 @@ void objects::link(servicegroup* obj,
   }
 
   // add the content of other servicegroups into this servicegroup.
-  for (QVector<servicegroup*>::const_iterator it = groups.begin(),
+  for (std::vector<servicegroup*>::const_iterator it = groups.begin(),
 	 end = groups.end();
        it != end;
        ++it) {
