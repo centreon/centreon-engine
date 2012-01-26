@@ -21,8 +21,8 @@
 # define CCE_COMMANDS_BASIC_PROCESS_HH
 
 # include <QIODevice>
+# include <list>
 # include <string>
-# include <QStringList>
 # include <QByteArray>
 # include <QProcess>
 # include <QSocketNotifier>
@@ -48,7 +48,7 @@ namespace                          com {
 
           void                     closeReadChannel(QProcess::ProcessChannel channel);
           void                     closeWriteChannel();
-          // QStringList              environment() const; // (deprecated)
+          // std::list<std::string>              environment() const; // (deprecated)
           QProcess::ProcessError   error() const;
           int                      exitCode() const;
           QProcess::ExitStatus     exitStatus() const;
@@ -59,7 +59,7 @@ namespace                          com {
           QByteArray               readAllStandardError();
           QByteArray               readAllStandardOutput();
           QProcess::ProcessChannel readChannel() const;
-          // void                     setEnvironment(QStringList const& environment); // (deprecated)
+          // void                     setEnvironment(std::list<std::string> const& environment); // (deprecated)
           // void                     setNativeArguments(std::string const& arguments);
           // void                     setProcessChannelMode(ProcessChannelMode mode);
           // void                     setProcessEnvironment(QProcessEnvironment const& environment);
@@ -69,7 +69,7 @@ namespace                          com {
           // void                     setStandardOutputFile(std::string const& fileName, OpenMode mode = Truncate);
           // void                     setStandardOutputProcess(QProcess* destination);
           void                     setWorkingDirectory(std::string const& dir);
-          void                     start(std::string const& program, QStringList const& arguments, OpenMode mode = ReadWrite);
+          void                     start(std::string const& program, std::list<std::string> const& arguments, OpenMode mode = ReadWrite);
           void                     start(std::string const& program, OpenMode mode = ReadWrite);
           QProcess::ProcessState   state() const;
           bool                     waitForFinished(int msecs = 30000);
@@ -126,11 +126,11 @@ namespace                          com {
           static void              _close(int& fd) throw();
           static int               _chdir(char const* working_directory) throw();
           static int               _dup2(int fildes, int fildes2) throw();
-          static char**            _build_args(std::string const& program, QStringList const& arguments);
-          static QStringList       _split_command_line(std::string const& command_line);
+          static char**            _build_args(std::string const& program, std::list<std::string> const& arguments);
+          static std::list<std::string>       _split_command_line(std::string const& command_line);
 
           // QProcessEnvironment      _environment;
-          QStringList              _arguments;
+          std::list<std::string>              _arguments;
           std::string                  _program;
           std::string                  _working_directory;
           QByteArray               _standard_output;

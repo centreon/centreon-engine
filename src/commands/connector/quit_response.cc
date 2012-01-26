@@ -17,7 +17,6 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <QStringList>
 #include <QVector>
 #include <vector>
 #include "error.hh"

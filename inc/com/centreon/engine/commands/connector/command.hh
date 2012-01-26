@@ -23,8 +23,6 @@
 # include <QTimer>
 # include <QMutex>
 # include <map>
-// # include <QProcess>
-# include <QStringList>
 # include "commands/command.hh"
 # include "commands/basic_process.hh"
 # include "commands/connector/execute_query.hh"

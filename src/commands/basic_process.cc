@@ -86,7 +86,7 @@ void basic_process::closeWriteChannel() {
   _close(_pipe_in[1]);
 }
 
-//  QStringList basic_process::environment() const {
+//  std::list<std::string> basic_process::environment() const {
 //    return (_environment.toStringList());
 //  }
 
@@ -169,7 +169,7 @@ QProcess::ProcessChannel basic_process::readChannel() const {
   return (_channel);
 }
 
-//  void basic_process::setEnvironment(QStringList const& environment) {
+//  void basic_process::setEnvironment(std::list<std::string> const& environment) {
 //    setProcessEnvironment(QProcessEnvironmentPrivate::fromList(environment));
 //  }
 
@@ -226,7 +226,7 @@ void basic_process::setWorkingDirectory(std::string const& dir) {
  *  @param[in] arguments The arguments of the program.
  *  @param[in] mode      Set the openning mode.
  */
-void basic_process::start(std::string const& program, QStringList const& arguments, OpenMode mode) {
+void basic_process::start(std::string const& program, std::list<std::string> const& arguments, OpenMode mode) {
   if (_pstate != QProcess::NotRunning)
     return;
 
@@ -808,16 +808,16 @@ int basic_process::_dup2(int fildes, int fildes2) throw() {
  *
  *  @return Array of arguments.
  */
-char** basic_process::_build_args(std::string const& program, QStringList const& arguments) {
+char** basic_process::_build_args(std::string const& program, std::list<std::string> const& arguments) {
   char** args(new char*[arguments.size() + 2]);
   args[0] = qstrdup(program.c_str());
 
   unsigned int i(1);
-  for (QStringList::const_iterator it(arguments.begin()),
+  for (std::list<std::string>::const_iterator it(arguments.begin()),
          end(arguments.end());
        it != end;
        ++it)
-    args[i++] = qstrdup(qPrintable(*it));
+    args[i++] = qstrdup(it->c_str());
   args[i] = NULL;
   return (args);
 }
@@ -829,8 +829,8 @@ char** basic_process::_build_args(std::string const& program, QStringList const&
  *
  *  @return Array of string.
  */
-QStringList basic_process::_split_command_line(std::string const& command_line) {
-  QStringList args;
+std::list<std::string> basic_process::_split_command_line(std::string const& command_line) {
+  std::list<std::string> args;
   std::string tmp;
   int count(0);
   bool in(false);

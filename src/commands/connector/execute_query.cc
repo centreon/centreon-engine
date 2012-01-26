@@ -175,12 +175,12 @@ std::string const& execute_query::get_command() const throw() {
  *
  *  @return The argument list.
  */
-QStringList execute_query::get_args() const throw() {
+std::list<std::string> execute_query::get_args() const throw() {
   static std::string sep("\"'\t ");
   /*
   // XXX: todo.
   std::string line = _cmd.trimmed();
-  QStringList list;
+  std::list<std::string> list;
   std::string tmp;
   QChar c;
   int escape = 0;

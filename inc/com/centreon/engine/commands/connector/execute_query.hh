@@ -20,8 +20,8 @@
 #ifndef CCE_COMMANDS_CONNECTOR_EXECUTE_QUERY_HH
 # define CCE_COMMANDS_CONNECTOR_EXECUTE_QUERY_HH
 
+# include <list>
 # include <string>
-# include <QStringList>
 # include <QDateTime>
 # include "com/centreon/engine/commands/connector/request.hh"
 
@@ -56,7 +56,7 @@ namespace                    com {
 	    void             restore(QByteArray const& data);
 
 	    std::string const&   get_command() const throw();
-	    QStringList      get_args() const throw();
+            std::list<std::string> get_args() const throw();
 	    QDateTime const& get_start_time() const throw();
 	    unsigned long    get_command_id() const throw();
 	    unsigned int     get_timeout() const throw();
