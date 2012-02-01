@@ -1168,7 +1168,7 @@ void schedule_service_check(service* svc, time_t check_time, int options) {
   use_original_event = FALSE;
   found = FALSE;
 
-  if ((temp_event = quick_timed_event.find(svc))) {
+  if ((temp_event = quick_timed_event.find(hash_timed_event::low, svc))) {
     if (temp_event->event_type == EVENT_SERVICE_CHECK)
       found = TRUE;
     else

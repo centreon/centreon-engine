@@ -61,10 +61,10 @@ hash_timed_event& hash_timed_event::operator=(hash_timed_event const& right) {
  *
  *  @param[in] event  The event to remove.
  */
-void hash_timed_event::erase(timed_event* event) {
+void hash_timed_event::erase(priority p, timed_event* event) {
   if (!event)
     return;
-  _hevent.erase(event->event_data);
+  _hevent[p].erase(event->event_data);
 }
 
 /**
@@ -72,9 +72,9 @@ void hash_timed_event::erase(timed_event* event) {
  *
  *  @param[in] ptr  The event data.
  */
-timed_event* hash_timed_event::find(void* ptr) {
-  htable::iterator it(_hevent.find(ptr));
-  if (it == _hevent.end())
+timed_event* hash_timed_event::find(priority p, void* ptr) {
+  htable::iterator it(_hevent[p].find(ptr));
+  if (it == _hevent[p].end())
     return (NULL);
   return (it->second);
 }
@@ -84,10 +84,10 @@ timed_event* hash_timed_event::find(void* ptr) {
  *
  *  @param[in] event  The event to add.
  */
-void hash_timed_event::insert(timed_event* event) {
+void hash_timed_event::insert(priority p, timed_event* event) {
   if (!event || !event->event_data)
     return;
-  _hevent[event->event_data] = event;
+  _hevent[p][event->event_data] = event;
 }
 
 /**
@@ -99,7 +99,8 @@ void hash_timed_event::insert(timed_event* event) {
  */
 hash_timed_event& hash_timed_event::_internal_copy(hash_timed_event const& right) {
   if (this != &right) {
-    _hevent = right._hevent;
+    _hevent[0] = right._hevent[0];
+    _hevent[1] = right._hevent[1];
   }
   return (*this);
 }

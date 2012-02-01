@@ -45,17 +45,22 @@ namespace                 com {
        */
       class               hash_timed_event {
       public:
+        enum              priority {
+          low = 0,
+          high = 1
+        };
+
                           hash_timed_event();
                           hash_timed_event(hash_timed_event const& right);
                           ~hash_timed_event();
         hash_timed_event& operator=(hash_timed_event const& right);
-        void              erase(timed_event* event);
-        timed_event*      find(void* ptr);
-        void              insert(timed_event* event);
+        void              erase(priority p, timed_event* event);
+        timed_event*      find(priority p, void* ptr);
+        void              insert(priority p, timed_event* event);
 
       private:
         hash_timed_event& _internal_copy(hash_timed_event const& right);
-        htable            _hevent;
+        htable            _hevent[2];
       };
     }
   }
