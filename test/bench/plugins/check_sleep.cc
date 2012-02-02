@@ -67,9 +67,10 @@ int main (int argc, char **argv) {
       status = STATUS_OK;
   }
   if (timeout == -1)
-    timeout = ((rand() % 15) % 10) + 1;
+    timeout = ((rand() % 9) % 6);
 
-  sleep(timeout);
+  if (timeout)
+    sleep(timeout);
 
   switch (status) {
   case STATUS_OK:
