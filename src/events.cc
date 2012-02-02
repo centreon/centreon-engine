@@ -1211,7 +1211,10 @@ void add_event(timed_event* event,
 		     event,
                      NULL);
 
-  quick_timed_event.insert(event);
+  if (*event_list == event_list_low_tail)
+    quick_timed_event.insert(hash_timed_event::low, event);
+  else if (*event_list == event_list_high_tail)
+    quick_timed_event.insert(hash_timed_event::high, event);
 }
 
 /* remove an event from the queue */
@@ -1232,7 +1235,10 @@ void remove_event(timed_event* event,
   if (*event_list == NULL || event == NULL)
     return;
 
-  quick_timed_event.erase(event);
+  if (*event_list == event_list_low_tail)
+    quick_timed_event.erase(hash_timed_event::low, event);
+  else if (*event_list == event_list_high_tail)
+    quick_timed_event.erase(hash_timed_event::high, event);
 
   if (*event_list == event) {
     event->prev = NULL;
