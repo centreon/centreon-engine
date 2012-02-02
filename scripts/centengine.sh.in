@@ -83,6 +83,10 @@ check_configuration()
 
 service_start()
 {
+    if [ -f $pid_file ] && [ ! -d "/proc/$(cat $pid_file)" ]; then
+	rm -f $pid_file > /dev/null 2>&1
+    fi
+
     if [ ! -f $pid_file ]; then
 	check_configuration
 
