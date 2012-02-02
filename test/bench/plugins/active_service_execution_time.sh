@@ -19,7 +19,12 @@
 ##
 
 bin=$(locate /bin/nagiostats | head -n1)
-data=$($bin | grep 'Active Service Execution Time' | tr '/' ' ' | sed 's/  */ /g' | cut -d: -f2)
+data=$($bin)
+if [ $? -ne 0 ]; then
+    echo "read nagios statistics failed!"
+    exit 2
+fi
+data=$(echo "$data" | grep 'Active Service Execution Time' | tr '/' ' ' | sed 's/  */ /g' | cut -d: -f2)
 
 min=$(echo "$data" | cut -d ' ' -f2)
 avg=$(echo "$data" | cut -d ' ' -f4)

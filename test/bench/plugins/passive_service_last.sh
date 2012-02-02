@@ -19,7 +19,12 @@
 ##
 
 bin=$(locate /bin/nagiostats | head -n1)
-data=$($bin | grep 'Passive Services Last' | tr '/' ' ' | sed 's/  */ /g' | cut -d: -f2)
+data=$($bin)
+if [ $? -ne 0 ]; then
+    echo "read nagios statistics failed!"
+    exit 2
+fi
+data=$(echo "$data" | grep 'Passive Services Last' | tr '/' ' ' | sed 's/  */ /g' | cut -d: -f2)
 
 one=$(echo "$data" | cut -d ' ' -f2)
 five=$(echo "$data" | cut -d ' ' -f3)

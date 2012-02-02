@@ -24,7 +24,7 @@ if [ $# -ne 1 ]; then
     exit 3
 fi
 
-pid=$(ps axf -o'pid comm' | grep "[^_] $1$" | sed 's/^ *//' | cut -d ' ' -f1)
+pid=$(ps axf -o'pid comm' | grep "[^_] $1$" | sed 's/^ *//' | head -n1 | cut -d ' ' -f1)
 # check pid information.
 if [ ! -d "/proc/$pid" ]; then
     echo "process not running!"

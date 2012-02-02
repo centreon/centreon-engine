@@ -90,9 +90,9 @@ int main (int argc, char **argv) {
   }
 
   std::cout << ": timeout=" << timeout << ", status=" << status;
-
   if (optind < argc)
     std::cout << ", output='" << argv[optind] << "'";
+  std::cout << "|timeout=" << timeout << ";status=" << status;
   std::cout << std::endl;
   return (status);
 }
