@@ -1,6 +1,6 @@
 /*
 ** Copyright 2003-2008 Ethan Galstad
-** Copyright 2011      Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -18,9 +18,14 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <errno.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <errno.h>
+#include <unistd.h>
+#ifdef HAVE_GETOPT_H
+#  include <getopt.h>
+#endif // HAVE_GETOPT_H
+#include "com/centreon/engine/version.hh"
 #include "common.hh"
 #include "engine.hh"
 
@@ -29,10 +34,6 @@
 #define STATUS_PROGRAM_DATA        2
 #define STATUS_HOST_DATA           3
 #define STATUS_SERVICE_DATA        4
-
-#ifndef ENGINE_VERSION
-# define ENGINE_VERSION "(unknown)"
-#endif /* !ENGINE_VERSION */
 
 char* main_config_file = NULL;
 char* status_file = NULL;
@@ -263,9 +264,9 @@ int main(int argc, char** argv) {
     }
   }
 
-  printf("\nCentreon Engine Stats %s\n", ENGINE_VERSION);
+  printf("\nCentreon Engine Stats %s\n", CENTREON_ENGINE_VERSION_STRING);
   printf("Copyright 2003-2008 Ethan Galstad\n");
-  printf("Copyright 2011 Merethis\n");
+  printf("Copyright 2011-2012 Merethis\n");
   printf("License: GPLv2\n\n");
 
   /* just display the license */

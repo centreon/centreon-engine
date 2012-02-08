@@ -1,5 +1,5 @@
 /*
-** Copyright 2011 Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -98,7 +98,6 @@ namespace                   com {
 	  QString const&      get_broker_module_directory() const throw();
 	  QString const&      get_debug_file() const throw();
 	  QString const&      get_command_file() const throw();
-	  QString const&      get_temp_file() const throw();
 	  QString const&      get_global_host_event_handler() const throw();
 	  QString const&      get_global_service_event_handler() const throw();
 	  QString const&      get_ocsp_command() const throw();
@@ -313,7 +312,6 @@ namespace                   com {
 	    broker_module_directory,
 	    debug_file,
 	    command_file,
-	    temp_file,
 	    global_host_event_handler,
 	    global_service_event_handler,
 	    ocsp_command,

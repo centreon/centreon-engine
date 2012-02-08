@@ -1,5 +1,5 @@
 ##
-## Copyright 2011 Merethis
+## Copyright 2011-2012 Merethis
 ##
 ## This file is part of Centreon Engine.
 ##
@@ -42,7 +42,7 @@ target_link_libraries("externalcmd" ${QT_LIBRARIES})
 
 # Install rule.
 install(TARGETS "externalcmd"
-  DESTINATION "${libdir}/"
+  DESTINATION "${PREFIX_LIB}"
   COMPONENT "runtime")
 
 if (WITH_TESTING)

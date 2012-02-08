@@ -1,5 +1,5 @@
 /*
-** Copyright 2011 Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -129,7 +129,6 @@ static std::map<QString, QString> build_configuration(QString const& mainconf, Q
   var["debug_file"] = "debug_file.tmp";
   var["max_debug_file_size"] = obj2str(my_rand(0));
   var["command_file"] = "command_file.tmp";
-  var["temp_file"] = "temp_file.tmp";
   var["global_host_event_handler"] = "host-event-handler";
   var["global_service_event_handler"] = "service-event-handler";
   var["ocsp_command"] = "ocsp-command";
@@ -509,9 +508,6 @@ void test_configuration(QString const& filename, std::map<QString, QString>& my_
   }
   if (my_conf["command_file"] != config.get_command_file()) {
     throw (engine_error() << "command_file: init with '" << my_conf["command_file"] << "'");
-  }
-  if (my_conf["temp_file"] != config.get_temp_file()) {
-    throw (engine_error() << "temp_file: init with '" << my_conf["temp_file"] << "'");
   }
   if (my_conf["global_host_event_handler"] != config.get_global_host_event_handler()) {
     throw (engine_error() << "global_host_event_handler: init with '" << my_conf["global_host_event_handler"] << "'");

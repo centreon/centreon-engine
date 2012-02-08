@@ -1,7 +1,7 @@
 /*
 ** Copyright 1999-2009 Ethan Galstad
 ** Copyright 2009-2010 Nagios Core Development Team and Community Contributors
-** Copyright 2011      Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -32,6 +32,11 @@
 #include <string.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <unistd.h>
+#ifdef HAVE_GETOPT_H
+#  include <getopt.h>
+#endif // HAVE_GETOPT_H
+#include "com/centreon/engine/version.hh"
 #include "comments.hh"
 #include "downtime.hh"
 #include "globals.hh"
@@ -57,11 +62,6 @@
 
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;
-
-// Engine version if not defined by build system.
-#ifndef ENGINE_VERSION
-# define ENGINE_VERSION "(unknown)"
-#endif /* !ENGINE_VERSION */
 
 // Error message when configuration parsing fail.
 #define ERROR_CONFIGURATION						\
@@ -394,7 +394,8 @@ int main(int argc, char** argv) {
 
       // This must be logged after we read config data, as user may have changed location of main log file.
       logger(log_process_info, basic) << "Centreon Engine "
-        << ENGINE_VERSION << " starting ... (PID=" << getpid() << ")";
+        << CENTREON_ENGINE_VERSION_STRING << " starting ... (PID="
+        << getpid() << ")";
 
       // Log the local time - may be different than clock time due to timezone offset.
       now = time(NULL);

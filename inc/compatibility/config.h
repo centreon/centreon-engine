@@ -1,5 +1,5 @@
 /*
-** Copyright 2011      Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -56,20 +56,14 @@
 
 /***** HEADER FILES *****/
 
-# include <arpa/inet.h>
 # include <ctype.h>
 # include <dirent.h>
 # include <errno.h>
 # include <fcntl.h>
-# include <grp.h>
 # include <libgen.h>
 # include <limits.h>
 # include <math.h>
-# include <netdb.h>
-# include <netinet/in.h>
-# include <poll.h>
 # include <pthread.h>
-# include <pwd.h>
 # include <regex.h>
 # include <signal.h>
 # include <stdarg.h>
@@ -78,7 +72,6 @@
 # include <string.h>
 # include <syslog.h>
 # include <sys/mman.h>
-# include <sys/socket.h>
 # include <sys/stat.h>
 # include <sys/time.h>
 # include <sys/types.h>

@@ -1,5 +1,5 @@
 /*
-** Copyright 2011 Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -27,6 +27,7 @@
 #include "test/unittest.hh"
 #include "engine.hh"
 #include "error.hh"
+#include "com/centreon/engine/version.hh"
 #include "commands/connector/quit_response.hh"
 #include "commands/connector/version_response.hh"
 #include "commands/connector/execute_response.hh"
@@ -137,7 +138,9 @@ int main(int argc, char** argv) {
 
       switch (req->get_id()) {
       case connector::request::version_q: {
-	connector::version_response version(ENGINE_MAJOR, ENGINE_MINOR);
+	connector::version_response version(
+                                      CENTREON_ENGINE_VERSION_MAJOR,
+                                      CENTREON_ENGINE_VERSION_MINOR);
 	QByteArray data = version.build();
 	if (write(1, data.constData(), data.size()) != data.size())
           throw (engine_error() << "write query version failed.");

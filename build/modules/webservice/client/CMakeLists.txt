@@ -40,7 +40,6 @@ add_custom_command(OUTPUT
   "ws_stub_builder")
 
 # Include directories.
-include_directories("${INCLUDE_DIR}")
 include_directories("${MODULE_DIR}/client")
 
 # centenginews target.
@@ -100,5 +99,5 @@ target_link_libraries("centenginews"
 
 # Install rule.
 install(TARGETS "centenginews"
-  DESTINATION "${bindir}/"
+  DESTINATION "${PREFIX_BIN}/"
   COMPONENT "runtime")

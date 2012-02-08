@@ -1,5 +1,5 @@
 ##
-## Copyright 2011 Merethis
+## Copyright 2011-2012 Merethis
 ##
 ## This file is part of Centreon Engine.
 ##
@@ -19,7 +19,7 @@
 
 # Set directories.
 set(SRC_DIR "${SRC_DIR}/logging")
-set(INC_DIR "${INCLUDE_DIR}/com/centreon/engine/logging")
+set(INC_DIR "${INC_DIR}/com/centreon/engine/logging")
 
 # cce_logging target.
 add_library("cce_logging"

@@ -1,5 +1,5 @@
 ##
-## Copyright 2011 Merethis
+## Copyright 2011-2012 Merethis
 ##
 ## This file is part of Centreon Engine.
 ##
@@ -17,62 +17,63 @@
 ## <http://www.gnu.org/licenses/>.
 ##
 
-# Global options.
+#
+# Global settings.
+#
+
+# Set necessary settings.
 cmake_minimum_required(VERSION 2.8)
 project("Centreon Engine" C CXX)
-set(ENGINE_MAJOR 1)
-set(ENGINE_MINOR 1)
-set(ENGINE_PATCH 0)
-set(ENGINE_VERSION "${ENGINE_MAJOR}.${ENGINE_MINOR}.${ENGINE_PATCH}")
-add_definitions("-DENGINE_MAJOR=${ENGINE_MAJOR}")
-add_definitions("-DENGINE_MINOR=${ENGINE_MINOR}")
-add_definitions("-DENGINE_PATCH=\"${ENGINE_PATCH}\"")
-add_definitions("-DENGINE_VERSION=\"${ENGINE_VERSION}\"")
-
-# Testing.
 set(PROJECT_SOURCE_DIR "${PROJECT_SOURCE_DIR}/..")
-if (WITH_TESTING)
-  include(CTest)
-endif ()
+set(INC_DIR "${PROJECT_SOURCE_DIR}/inc")
+set(SCRIPT_DIR "${PROJECT_SOURCE_DIR}/scripts")
+set(SRC_DIR "${PROJECT_SOURCE_DIR}/src")
+set(TEST_DIR "${PROJECT_SOURCE_DIR}/test")
+include_directories("${INC_DIR}")
+include_directories("${INC_DIR}/com/centreon/engine") # XXX: remove when possible
+
+# Version.
+set(CENTREON_ENGINE_MAJOR 1)
+set(CENTREON_ENGINE_MINOR 2)
+set(CENTREON_ENGINE_PATCH 0)
+set(CENTREON_ENGINE_VERSION "${CENTREON_ENGINE_MAJOR}.${CENTREON_ENGINE_MINOR}.${CENTREON_ENGINE_PATCH}")
+configure_file("${INC_DIR}/com/centreon/engine/version.hh.in"
+  "${INC_DIR}/com/centreon/engine/version.hh")
+
+#
+# Check and/or find required components.
+#
 
 # Check libraries to link with.
 include(CheckLibraryExists)
-check_library_exists("m" "ceil" "${CMAKE_LIBRARY_PATH}" MATHLIB)
-if (MATHLIB)
+check_library_exists("m" "ceil" "${CMAKE_LIBRARY_PATH}" MATH_LIB_FOUND)
+if (MATH_LIB_FOUND)
   set(MATH_LIBRARIES "m")
 endif ()
-check_library_exists("nsl" "getservbyname" "${CMAKE_LIBRARY_PATH}" NSLLIB)
-if (NSLLIBS)
-  set(SOCKET_LIBRARIES "${SOCKET_LIBRARIES} nsl")
+check_library_exists("nsl" "getservbyname" "${CMAKE_LIBRARY_PATH}" NSL_LIB_FOUND)
+if (NSL_LIB_FOUND)
+  set(NSL_LIBRARIES "nsl")
 endif ()
-check_library_exists("socket" "connect" "${CMAKE_LIBRARY_PATH}" SOCKETLIBS)
-if (SOCKETLIBS)
-  set(SOCKET_LIBRARIES "${SOCKET_LIBRARIES} socket")
+check_library_exists("socket" "connect" "${CMAKE_LIBRARY_PATH}" SOCKET_LIB_FOUND)
+if (SOCKET_LIB_FOUND)
+  set(SOCKET_LIBRARIES "socket")
 endif ()
 
 # Find pthreads.
-set(CMAKE_THREAD_PREFER_PTHREAD)
+set(CMAKE_THREAD_PREFER_PTHREAD TRUE)
 include(FindThreads)
 if (NOT CMAKE_USE_PTHREADS_INIT)
-  message(FATAL_ERROR "Could not find pthreads.")
+  message(FATAL_ERROR "Could not find pthread's library.")
 endif ()
-set(THREAD_LIBRARIES "${CMAKE_THREAD_LIBS_INIT}")
+set(PTHREAD_LIBRARIES "${CMAKE_THREAD_LIBS_INIT}")
 
 # Find Qt.
 find_package(Qt4 COMPONENTS QtCore REQUIRED)
 include(${QT_USE_FILE})
 
-# Set directories.
-set(INCLUDE_DIR "${PROJECT_SOURCE_DIR}/inc")
-set(SCRIPT_DIR "${PROJECT_SOURCE_DIR}/scripts")
-set(SRC_DIR "${PROJECT_SOURCE_DIR}/src")
-if (WITH_TESTING)
-  set(TEST_DIR "${PROJECT_SOURCE_DIR}/test")
-endif ()
-
 # Check headers.
 include(CheckIncludeFileCXX)
-check_include_file_cxx("arpa/inet.h" HAVE_ARPA_INET_H)
+check_include_file_cxx("algorithm" HAVE_ALGORITHM)
 check_include_file_cxx("ctype.h" HAVE_CTYPE_H)
 check_include_file_cxx("dirent.h" HAVE_DIRENT_H)
 check_include_file_cxx("errno.h" HAVE_ERRNO_H)
@@ -80,66 +81,57 @@ check_include_file_cxx("exception" HAVE_EXCEPTION)
 check_include_file_cxx("fcntl.h" HAVE_FCNTL_H)
 check_include_file_cxx("fstream" HAVE_FSTREAM)
 check_include_file_cxx("getopt.h" HAVE_GETOPT_H)
-check_include_file_cxx("grp.h" HAVE_GRP_H)
 check_include_file_cxx("iomanip" HAVE_IOMANIP)
 check_include_file_cxx("iostream" HAVE_IOSTREAM)
 check_include_file_cxx("libgen.h" HAVE_LIBGEN_H)
 check_include_file_cxx("limits.h" HAVE_LIMITS_H)
 check_include_file_cxx("map" HAVE_MAP)
 check_include_file_cxx("math.h" HAVE_MATH_H)
-check_include_file_cxx("netdb.h" HAVE_NETDB_H)
-check_include_file_cxx("netinet/in.h" HAVE_NETINET_IN_H)
-check_include_file_cxx("poll.h" HAVE_POLL_H)
 check_include_file_cxx("pthread.h" HAVE_PTHREAD_H)
-check_include_file_cxx("pwd.h" HAVE_PWD_H)
 check_include_file_cxx("regex.h" HAVE_REGEX_H)
 check_include_file_cxx("signal.h" HAVE_SIGNAL_H)
 check_include_file_cxx("sstream" HAVE_SSTREAM)
 check_include_file_cxx("stdarg.h" HAVE_STDARG_H) # In logging.
+check_include_file_cxx("stddef.h" HAVE_STDDEF_H)
 check_include_file_cxx("stdio.h" HAVE_STDIO_H)
 check_include_file_cxx("stdlib.h" HAVE_STDLIB_H)
 check_include_file_cxx("string" HAVE_STRING)
 check_include_file_cxx("string.h" HAVE_STRING_H)
 check_include_file_cxx("syslog.h" HAVE_SYSLOG_H)
+check_include_file_cxx("sys/ioctl.h" HAVE_SYS_IOCTL_H)
 check_include_file_cxx("sys/mman.h" HAVE_SYS_MMAN_H)
-check_include_file_cxx("sys/socket.h" HAVE_SYS_SOCKET_H)
 check_include_file_cxx("sys/stat.h" HAVE_SYS_STAT_H)
 check_include_file_cxx("sys/time.h" HAVE_SYS_TIME_H)
 check_include_file_cxx("sys/types.h" HAVE_SYS_TYPES_H)
 check_include_file_cxx("sys/wait.h" HAVE_SYS_WAIT_H)
 check_include_file_cxx("time.h" HAVE_TIME_H)
 check_include_file_cxx("unistd.h" HAVE_UNISTD_H)
-if (NOT HAVE_ARPA_INET_H
+if (NOT HAVE_ALGORITHM
     OR NOT HAVE_CTYPE_H
     OR NOT HAVE_DIRENT_H
     OR NOT HAVE_ERRNO_H
     OR NOT HAVE_EXCEPTION
     OR NOT HAVE_FCNTL_H
     OR NOT HAVE_FSTREAM
-#    OR NOT HAVE_GETOPT_H Optionnal header
-    OR NOT HAVE_GRP_H
     OR NOT HAVE_IOMANIP
     OR NOT HAVE_IOSTREAM
     OR NOT HAVE_LIBGEN_H
     OR NOT HAVE_LIMITS_H
     OR NOT HAVE_MAP
     OR NOT HAVE_MATH_H
-    OR NOT HAVE_NETDB_H
-    OR NOT HAVE_NETINET_IN_H
-    OR NOT HAVE_POLL_H
     OR NOT HAVE_PTHREAD_H
-    OR NOT HAVE_PWD_H
     OR NOT HAVE_REGEX_H
     OR NOT HAVE_SIGNAL_H
     OR NOT HAVE_SSTREAM
     OR NOT HAVE_STDARG_H
+    OR NOT HAVE_STDDEF_H
     OR NOT HAVE_STDIO_H
     OR NOT HAVE_STDLIB_H
     OR NOT HAVE_STRING
     OR NOT HAVE_STRING_H
     OR NOT HAVE_SYSLOG_H
+    OR NOT HAVE_SYS_IOCTL_H
     OR NOT HAVE_SYS_MMAN_H
-    OR NOT HAVE_SYS_SOCKET_H
     OR NOT HAVE_SYS_STAT_H
     OR NOT HAVE_SYS_TIME_H
     OR NOT HAVE_SYS_TYPES_H
@@ -154,24 +146,19 @@ include(CheckFunctionExists)
 set(CMAKE_REQUIRED_LIBRARIES
   "${MATH_LIBRARIES}"
   "${SOCKET_LIBRARIES}"
-  "${THREAD_LIBRARIES}")
-check_function_exists("alarm" HAVE_ALARM)
+  "${PTHREAD_LIBRARIES}")
 check_function_exists("atoi" HAVE_ATOI)
 check_function_exists("ceil" HAVE_CEIL)
-check_function_exists("chmod" HAVE_CHMOD)
-check_function_exists("chown" HAVE_CHOWN)
-check_function_exists("clearerr" HAVE_CLEARERR)
-check_function_exists("closedir" HAVE_CLOSEDIR)
+check_function_exists("chdir" HAVE_CHDIR)
 check_function_exists("close" HAVE_CLOSE)
+check_function_exists("closedir" HAVE_CLOSEDIR)
 check_function_exists("ctime" HAVE_CTIME)
 check_function_exists("dirname" HAVE_DIRNAME)
 check_function_exists("dup2" HAVE_DUP2)
 check_function_exists("execvp" HAVE_EXECVP)
 check_function_exists("exit" HAVE_EXIT)
 check_function_exists("_exit" HAVE__EXIT)
-check_function_exists("fchmod" HAVE_FCHMOD)
 check_function_exists("fclose" HAVE_FCLOSE)
-check_function_exists("fcntl" HAVE_FCNTL)
 check_function_exists("fdopen" HAVE_FDOPEN)
 check_function_exists("fflush" HAVE_FFLUSH)
 check_function_exists("fgets" HAVE_FGETS)
@@ -181,69 +168,45 @@ check_function_exists("fork" HAVE_FORK)
 check_function_exists("fprintf" HAVE_FPRINTF)
 check_function_exists("fputc" HAVE_FPUTC)
 check_function_exists("fputs" HAVE_FPUTS)
-check_function_exists("free" HAVE_FREE)
 check_function_exists("fsync" HAVE_FSYNC)
-check_function_exists("ftell" HAVE_FTELL)
+check_function_exists("ftruncate" HAVE_FTRUNCATE)
 check_function_exists("fwrite" HAVE_FWRITE)
-check_function_exists("getcwd" HAVE_GETCWD)
-check_function_exists("getgrent" HAVE_GETGRENT)
 check_function_exists("getopt" HAVE_GETOPT)
 check_function_exists("getpid" HAVE_GETPID)
-check_function_exists("getpwent" HAVE_GETPWENT)
 check_function_exists("gettimeofday" HAVE_GETTIMEOFDAY)
 check_function_exists("gmtime_r" HAVE_GMTIME_R)
-check_function_exists("isspace" HAVE_ISSPACE)
+check_function_exists("ioctl" HAVE_IOCTL)
 check_function_exists("kill" HAVE_KILL)
 check_function_exists("localtime_r" HAVE_LOCALTIME_R)
+check_function_exists("lseek" HAVE_LSEEK)
 check_function_exists("memcpy" HAVE_MEMCPY)
 check_function_exists("memmove" HAVE_MEMMOVE)
 check_function_exists("memset" HAVE_MEMSET)
-check_function_exists("mkfifo" HAVE_MKFIFO)
 check_function_exists("mkstemp" HAVE_MKSTEMP)
 check_function_exists("mktime" HAVE_MKTIME)
 check_function_exists("mmap" HAVE_MMAP)
 check_function_exists("munmap" HAVE_MUNMAP)
-check_function_exists("nanosleep" HAVE_NANOSLEEP)
 check_function_exists("open" HAVE_OPEN)
 check_function_exists("opendir" HAVE_OPENDIR)
-check_function_exists("pathconf" HAVE_PATHCONF)
-check_function_exists("pclose" HAVE_PCLOSE)
-check_function_exists("perror" HAVE_PERROR)
+check_function_exists("openlog" HAVE_OPENLOG)
 check_function_exists("pipe" HAVE_PIPE)
-check_function_exists("poll" HAVE_POLL)
-check_function_exists("popen" HAVE_POPEN)
-check_function_exists("pow" HAVE_POW)
 check_function_exists("printf" HAVE_PRINTF)
-check_function_exists("pthread_cancel" HAVE_PTHREAD_CANCEL)
-check_function_exists("pthread_create" HAVE_PTHREAD_CREATE)
-check_function_exists("pthread_join" HAVE_PTHREAD_JOIN)
-check_function_exists("pthread_mutex_init" HAVE_PTHREAD_MUTEX_INIT)
 check_function_exists("pthread_mutex_lock" HAVE_PTHREAD_MUTEX_LOCK)
-check_function_exists("pthread_mutex_trylock" HAVE_PTHREAD_MUTEX_TRYLOCK)
 check_function_exists("pthread_mutex_unlock" HAVE_PTHREAD_MUTEX_UNLOCK)
-check_function_exists("pthread_setcancelstate" HAVE_PTHREAD_SETCANCELSTATE)
-check_function_exists("pthread_setcanceltype" HAVE_PTHREAD_SETCANCELTYPE)
-check_function_exists("pthread_sigmask" HAVE_PTHREAD_SIGMASK)
-check_function_exists("pthread_testcancel" HAVE_PTHREAD_TESTCANCEL)
 check_function_exists("putchar" HAVE_PUTCHAR)
 check_function_exists("putenv" HAVE_PUTENV)
 check_function_exists("puts" HAVE_PUTS)
 check_function_exists("qsort" HAVE_QSORT)
 check_function_exists("rand" HAVE_RAND)
-check_function_exists("readdir" HAVE_READDIR)
 check_function_exists("read" HAVE_READ)
+check_function_exists("readdir" HAVE_READDIR)
 check_function_exists("regcomp" HAVE_REGCOMP)
 check_function_exists("regexec" HAVE_REGEXEC)
 check_function_exists("regfree" HAVE_REGFREE)
-check_function_exists("remove" HAVE_REMOVE)
 check_function_exists("rename" HAVE_RENAME)
-check_function_exists("select" HAVE_SELECT)
 check_function_exists("setbuf" HAVE_SETBUF)
 check_function_exists("setenv" HAVE_SETENV)
-check_function_exists("setpgid" HAVE_SETPGID)
-check_function_exists("sigfillset" HAVE_SIGFILLSET)
 check_function_exists("signal" HAVE_SIGNAL)
-check_function_exists("sleep" HAVE_SLEEP)
 check_function_exists("snprintf" HAVE_SNPRINTF)
 check_function_exists("sprintf" HAVE_SPRINTF)
 check_function_exists("sscanf" HAVE_SSCANF)
@@ -255,41 +218,33 @@ check_function_exists("strcspn" HAVE_STRCSPN)
 check_function_exists("strerror" HAVE_STRERROR)
 check_function_exists("strftime" HAVE_STRFTIME)
 check_function_exists("strlen" HAVE_STRLEN)
-check_function_exists("strncat" HAVE_STRNCAT)
-check_function_exists("strncpy" HAVE_STRNCPY)
 check_function_exists("strpbrk" HAVE_STRPBRK)
 check_function_exists("strstr" HAVE_STRSTR)
 check_function_exists("strtod" HAVE_STRTOD)
 check_function_exists("strtok" HAVE_STRTOK)
-check_function_exists("strtol" HAVE_STRTOL)
 check_function_exists("strtoul" HAVE_STRTOUL)
 check_function_exists("syslog" HAVE_SYSLOG)
 check_function_exists("time" HAVE_TIME)
 check_function_exists("toupper" HAVE_TOUPPER)
+check_function_exists("tzset" HAVE_TZSET)
 check_function_exists("umask" HAVE_UMASK)
 check_function_exists("unlink" HAVE_UNLINK)
 check_function_exists("unsetenv" HAVE_UNSETENV)
-check_function_exists("vasprintf" HAVE_VASPRINTF)
-check_function_exists("vfprintf" HAVE_VFPRINTF)
+check_function_exists("vsnprintf" HAVE_VSNPRINTF)
 check_function_exists("waitpid" HAVE_WAITPID)
 check_function_exists("write" HAVE_WRITE)
-if (NOT HAVE_ALARM
-    OR NOT HAVE_ATOI
+if (NOT HAVE_ATOI
     OR NOT HAVE_CEIL
-    OR NOT HAVE_CHMOD
-    OR NOT HAVE_CHOWN
-    OR NOT HAVE_CLEARERR
-    OR NOT HAVE_CLOSEDIR
+    OR NOT HAVE_CHDIR
     OR NOT HAVE_CLOSE
+    OR NOT HAVE_CLOSEDIR
     OR NOT HAVE_CTIME
     OR NOT HAVE_DIRNAME
     OR NOT HAVE_DUP2
     OR NOT HAVE_EXECVP
     OR NOT HAVE_EXIT
     OR NOT HAVE__EXIT
-    OR NOT HAVE_FCHMOD
     OR NOT HAVE_FCLOSE
-    OR NOT HAVE_FCNTL
     OR NOT HAVE_FDOPEN
     OR NOT HAVE_FFLUSH
     OR NOT HAVE_FGETS
@@ -299,69 +254,45 @@ if (NOT HAVE_ALARM
 #    OR NOT HAVE_FPRINTF # Does not work with Clang.
     OR NOT HAVE_FPUTC
     OR NOT HAVE_FPUTS
-    OR NOT HAVE_FREE
     OR NOT HAVE_FSYNC
-    OR NOT HAVE_FTELL
+    OR NOT HAVE_FTRUNCATE
     OR NOT HAVE_FWRITE
-    OR NOT HAVE_GETCWD
-    OR NOT HAVE_GETGRENT
     OR NOT HAVE_GETOPT
     OR NOT HAVE_GETPID
-    OR NOT HAVE_GETPWENT
     OR NOT HAVE_GETTIMEOFDAY
     OR NOT HAVE_GMTIME_R
-    OR NOT HAVE_ISSPACE
+    OR NOT HAVE_IOCTL
     OR NOT HAVE_KILL
     OR NOT HAVE_LOCALTIME_R
+    OR NOT HAVE_LSEEK
     OR NOT HAVE_MEMCPY
     OR NOT HAVE_MEMMOVE
     OR NOT HAVE_MEMSET
-    OR NOT HAVE_MKFIFO
     OR NOT HAVE_MKSTEMP
     OR NOT HAVE_MKTIME
     OR NOT HAVE_MMAP
     OR NOT HAVE_MUNMAP
-    OR NOT HAVE_NANOSLEEP
     OR NOT HAVE_OPEN
     OR NOT HAVE_OPENDIR
-    OR NOT HAVE_PATHCONF
-    OR NOT HAVE_PCLOSE
-    OR NOT HAVE_PERROR
+    OR NOT HAVE_OPENLOG
     OR NOT HAVE_PIPE
-    OR NOT HAVE_POLL
-    OR NOT HAVE_POPEN
-    OR NOT HAVE_POW
     OR NOT HAVE_PRINTF
-    OR NOT HAVE_PTHREAD_CANCEL
-    OR NOT HAVE_PTHREAD_CREATE
-    OR NOT HAVE_PTHREAD_JOIN
-    OR NOT HAVE_PTHREAD_MUTEX_INIT
     OR NOT HAVE_PTHREAD_MUTEX_LOCK
-    OR NOT HAVE_PTHREAD_MUTEX_TRYLOCK
     OR NOT HAVE_PTHREAD_MUTEX_UNLOCK
-    OR NOT HAVE_PTHREAD_SETCANCELSTATE
-    OR NOT HAVE_PTHREAD_SETCANCELTYPE
-    OR NOT HAVE_PTHREAD_SIGMASK
-    OR NOT HAVE_PTHREAD_TESTCANCEL
     OR NOT HAVE_PUTCHAR
     OR NOT HAVE_PUTENV
     OR NOT HAVE_PUTS
     OR NOT HAVE_QSORT
     OR NOT HAVE_RAND
-    OR NOT HAVE_READDIR
     OR NOT HAVE_READ
+    OR NOT HAVE_READDIR
     OR NOT HAVE_REGCOMP
     OR NOT HAVE_REGEXEC
     OR NOT HAVE_REGFREE
-    OR NOT HAVE_REMOVE
     OR NOT HAVE_RENAME
-    OR NOT HAVE_SELECT
     OR NOT HAVE_SETBUF
     OR NOT HAVE_SETENV
-    OR NOT HAVE_SETPGID
-    OR NOT HAVE_SIGFILLSET
     OR NOT HAVE_SIGNAL
-    OR NOT HAVE_SLEEP
     OR NOT HAVE_SNPRINTF
     OR NOT HAVE_SPRINTF
     OR NOT HAVE_SSCANF
@@ -373,22 +304,19 @@ if (NOT HAVE_ALARM
     OR NOT HAVE_STRERROR
     OR NOT HAVE_STRFTIME
     OR NOT HAVE_STRLEN
-    OR NOT HAVE_STRNCAT
-    OR NOT HAVE_STRNCPY
     OR NOT HAVE_STRPBRK
     OR NOT HAVE_STRSTR
     OR NOT HAVE_STRTOD
     OR NOT HAVE_STRTOK
-    OR NOT HAVE_STRTOL
     OR NOT HAVE_STRTOUL
     OR NOT HAVE_SYSLOG
     OR NOT HAVE_TIME
     OR NOT HAVE_TOUPPER
+    OR NOT HAVE_TZSET
     OR NOT HAVE_UMASK
     OR NOT HAVE_UNLINK
     OR NOT HAVE_UNSETENV
-    OR NOT HAVE_VASPRINTF
-    OR NOT HAVE_VFPRINTF
+    OR NOT HAVE_VSNPRINTF
     OR NOT HAVE_WAITPID
     OR NOT HAVE_WRITE)
   message(FATAL_ERROR "Could not find all mandatory functions.")
@@ -406,86 +334,84 @@ if (HAVE_TZNAME)
   add_definitions(-DHAVE_TZNAME)
 endif ()
 
-# localstatedir is the prefix.
+#
+# Options.
+#
+
+# Main directory.
 if (WITH_PREFIX)
-  set(localstatedir "${WITH_PREFIX}")
-else ()
-  set(localstatedir "${CMAKE_INSTALL_PREFIX}")
+  set(CMAKE_INSTALL_PREFIX "${WITH_PREFIX}")
 endif ()
 
-# bindir.
+# Executable directory.
 if (WITH_PREFIX_BIN)
-  set(bindir "${WITH_PREFIX_BIN}")
+  set(PREFIX_BIN "${WITH_PREFIX_BIN}")
 else ()
-  set(bindir "${localstatedir}/bin")
+  set(PREFIX_BIN "${CMAKE_INSTALL_PREFIX}/bin")
 endif ()
 
-# confdir.
+# Configuration directory.
 if (WITH_PREFIX_CONF)
-  set(confdir "${WITH_PREFIX_CONF}")
+  set(PREFIX_CONF "${WITH_PREFIX_CONF}")
 else ()
-  set(confdir "${localstatedir}/etc")
+  set(PREFIX_CONF "${CMAKE_INSTALL_PREFIX}/etc")
 endif ()
 
-# libdir
+# Library directory.
 if (WITH_PREFIX_LIB)
-  set(libdir "${WITH_PREFIX_LIB}")
+  set(PREFIX_LIB "${WITH_PREFIX_LIB}")
 else ()
-  set(libdir "${localstatedir}/lib/centreon-engine")
+  set(PREFIX_LIB "${CMAKE_INSTALL_PREFIX}/lib/centreon-engine")
 endif ()
 
-# vardir.
-if (WITH_PREFIX_VAR)
-  set(vardir "${WITH_PREFIX_VAR}")
+# Development headers directory.
+if (WITH_PREFIX_INC)
+  set(PREFIX_INC "${WITH_PREFIX_INC}")
 else ()
-  set(vardir "${localstatedir}/var")
+  set(PREFIX_INC "${CMAKE_INSTALL_PREFIX}/include/centreon-engine")
 endif ()
 
-# incdir
-if (WITH_INCLUDE_DIR)
-  set(incdir "${WITH_INCLUDE_DIR}")
-else ()
-  set(incdir "${localstatedir}/include/centreon-engine")
-endif ()
-
-# pkg-config dir.
+# pkg-config directory.
 option(WITH_PKGCONFIG_SCRIPT "Generate and install pkg-config script." ON)
 if (WITH_PKGCONFIG_SCRIPT)
+  # Generate pkg-config file.
+  message(STATUS "Generating pkg-config file.")
+  configure_file("${SCRIPT_DIR}/centengine.pc.in"
+    "${SCRIPT_DIR}/centengine.pc")
+
+  # pkg-config file install directory.
   if (WITH_PKGCONFIG_DIR)
-    set(pkgconfigdir "${WITH_PKGCONFIG_DIR}")
+    set(PKGCONFIG_DIR "${WITH_PKGCONFIG_DIR}")
   else ()
-    set(pkgconfigdir "/usr/lib/pkgconfig")
+    set(PKGCONFIG_DIR "/usr/lib/pkgconfig")
   endif ()
-else ()
-  set(pkgconfigdir "Not installed")
+
+  # Install rule.
+  install(FILES "${SCRIPT_DIR}/centengine.pc"
+    DESTINATION "${PKGCONFIG_DIR}"
+    COMPONENT "runtime")
+
 endif ()
 
-# Check result dir.
-if (WITH_CHECK_RESULT_DIR)
-  set(CHECK_RESULT_DIR "${WITH_CHECK_RESULT_DIR}")
+# var directory.
+if (WITH_VAR_DIR)
+  set(VAR_DIR "${WITH_VAR_DIR}")
 else ()
-  set(CHECK_RESULT_DIR "${localstatedir}/spool/checkresults")
+  set(VAR_DIR "${CMAKE_INSTALL_PREFIX}/var")
 endif ()
 
 # Log archive dir.
 if (WITH_LOG_ARCHIVE_DIR)
   set(LOG_ARCHIVE_DIR "${WITH_LOG_ARCHIVE_DIR}")
 else ()
-  set(LOG_ARCHIVE_DIR "${vardir}/archives")
+  set(LOG_ARCHIVE_DIR "${VAR_DIR}/archives")
 endif ()
 
 # RW dir.
 if (WITH_RW_DIR)
   set(RW_DIR "${WITH_RW_DIR}")
 else ()
-  set(RW_DIR "${vardir}/rw")
-endif ()
-
-# Temporary check result dir.
-if (WITH_TEMP_DIR)
-  set(TMPDIR "${WITH_TEMP_DIR}")
-else ()
-  set(TMPDIR "/tmp")
+  set(RW_DIR "${VAR_DIR}/rw")
 endif ()
 
 # User used to run Centreon Engine.
@@ -500,13 +426,6 @@ if (WITH_GROUP)
   set(GROUP "${WITH_GROUP}")
 else ()
   set(GROUP "root")
-endif ()
-
-# Path for Centreon Engine plugin.
-if (WITH_LIBEXECDIR)
-  set(libexecdir "${WITH_LIBEXECDIR}")
-else ()
-  set(libexecdir "/usr/lib/nagios/plugins")
 endif ()
 
 # Check OS distributor.
@@ -531,7 +450,6 @@ if (NOT WITH_STARTUP_SCRIPT)
 endif ()
 
 # Check which startup script to use.
-set(STARTUP_SCRIPT "No")
 if (WITH_STARTUP_SCRIPT STREQUAL "auto")
   if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
     if (OS_DISTRIBUTOR STREQUAL "Ubuntu")
@@ -540,14 +458,16 @@ if (WITH_STARTUP_SCRIPT STREQUAL "auto")
       set(WITH_STARTUP_SCRIPT "sysv")
     endif ()
   else ()
-    message(STATUS "Centreon Engine does not provide startup script for ${CMAKE_SYSTEM_NAME}")
+    message(STATUS "Centreon Engine does not provide startup script for ${CMAKE_SYSTEM_NAME}.")
   endif ()
 endif ()
 
 # Create upstart file.
 if (WITH_STARTUP_SCRIPT STREQUAL "upstart")
+  # Generate Upstart script.
   message(STATUS "Generating upstart script.")
-  set(STARTUP_SCRIPT "Generic upstart script")
+  configure_file("${SCRIPT_DIR}/upstart.conf.in"
+    "${SCRIPT_DIR}/upstart.conf")
 
   # Startup dir.
   if (WITH_STARTUP_DIR)
@@ -556,15 +476,17 @@ if (WITH_STARTUP_SCRIPT STREQUAL "upstart")
     set(STARTUP_DIR "/etc/init")
   endif ()
 
+  # Script install rule.
   install(FILES "${SCRIPT_DIR}/upstart.conf"
     DESTINATION "${STARTUP_DIR}"
     COMPONENT "runtime"
     RENAME "centengine.conf")
-# Create sysv start script.
-elseif (WITH_STARTUP_SCRIPT STREQUAL "sysv")
-  message(STATUS "Generating generic startup script.")
-  set(STARTUP_SCRIPT "Generic init script")
 
+  # String printed in summary.
+  set(STARTUP_SCRIPT "Upstart configuration file")
+
+# Create SysV start script.
+elseif (WITH_STARTUP_SCRIPT STREQUAL "sysv")
   # Lock file.
   if (WITH_LOCK_FILE)
     set(LOCK_FILE "${WITH_LOCK_FILE}")
@@ -572,7 +494,6 @@ elseif (WITH_STARTUP_SCRIPT STREQUAL "sysv")
     set(LOCK_FILE "/var/lock/subsys/centengine.lock")
   endif ()
   string(REGEX REPLACE "/[^/]*$" "" LOCK_DIR "${LOCK_FILE}")
-  file(MAKE_DIRECTORY "${LOCK_DIR}")
 
   # PID file.
   if (WITH_PID_FILE)
@@ -581,7 +502,11 @@ elseif (WITH_STARTUP_SCRIPT STREQUAL "sysv")
     set(PID_FILE "/var/run/centengine.pid")
   endif ()
   string(REGEX REPLACE "/[^/]*$" "" PID_DIR "${PID_FILE}")
-  file(MAKE_DIRECTORY "${PID_DIR}")
+
+  # Generate SysV script.
+  message(STATUS "Generating generic startup script.")
+  configure_file("${SCRIPT_DIR}/centengine.sh.in"
+    "${SCRIPT_DIR}/centengine.sh")
 
   # Startup dir.
   if (WITH_STARTUP_DIR)
@@ -590,21 +515,26 @@ elseif (WITH_STARTUP_SCRIPT STREQUAL "sysv")
     set(STARTUP_DIR "/etc/init.d")
   endif ()
 
+  # Script install rule.
   install(PROGRAMS "${SCRIPT_DIR}/centengine.sh"
     DESTINATION "${STARTUP_DIR}"
     COMPONENT "runtime"
     RENAME "centengine")
+
+  # String printed in summary.
+  set(STARTUP_SCRIPT "SysV-style script")
+
 else ()
-  message(STATUS "Invalid option WITH_STARTUP_SCRIPT")
-  set(STARTUP_SCRIPT "No")
+  # Default.
+  message(STATUS "Invalid value for option WITH_STARTUP_SCRIPT (must be one of 'auto', 'sysv' or 'upstart').")
+  set(STARTUP_SCRIPT "disabled")
 endif ()
 
 # Unit test.
-option(WITH_TESTING "Enable unit test" OFF)
+option(WITH_TESTING "Build unit tests." OFF)
 if (WITH_TESTING)
-  set(UNIT_TEST "Yes")
-else ()
-  set(UNIT_TEST "No")
+  include(CTest)
+  include_directories("${PROJECT_SOURCE_DIR}")
 endif ()
 
 # Configure files.
@@ -612,45 +542,28 @@ configure_file("${PROJECT_SOURCE_DIR}/build/doc/Doxyfile.in"
   "${PROJECT_SOURCE_DIR}/build/doc/Doxyfile")
 configure_file("${PROJECT_SOURCE_DIR}/build/doc/header.tex.in"
   "${PROJECT_SOURCE_DIR}/build/doc/header.tex")
-configure_file("${INCLUDE_DIR}/compatibility/common.h.in"
-  "${INCLUDE_DIR}/compatibility/common.h")
-configure_file("${SCRIPT_DIR}/centengine.sh.in"
-  "${SCRIPT_DIR}/centengine.sh")
-configure_file("${SCRIPT_DIR}/upstart.conf.in"
-  "${SCRIPT_DIR}/upstart.conf")
-configure_file("${SCRIPT_DIR}/centengine.pc.in"
-  "${SCRIPT_DIR}/centengine.pc")
+configure_file("${INC_DIR}/compatibility/common.h.in"
+  "${INC_DIR}/compatibility/common.h")
 
-#  Locations definitions
-add_definitions(-DDEFAULT_TEMP_FILE="${localstatedir}/tempfile")
-add_definitions(-DDEFAULT_TEMP_PATH="${TMPDIR}")
-add_definitions(-DDEFAULT_CHECK_RESULT_PATH="${CHECK_RESULT_DIR}")
-add_definitions(-DDEFAULT_STATUS_FILE="${vardir}/status.dat")
-add_definitions(-DDEFAULT_LOG_FILE="${vardir}/centengine.log")
+# Locations definitions
+add_definitions(-DDEFAULT_STATUS_FILE="${VAR_DIR}/status.dat")
+add_definitions(-DDEFAULT_LOG_FILE="${VAR_DIR}/centengine.log")
 add_definitions(-DDEFAULT_LOG_ARCHIVE_PATH="${LOG_ARCHIVE_DIR}")
-add_definitions(-DDEFAULT_DEBUG_FILE="${vardir}/centengine.debug")
-add_definitions(-DDEFAULT_COMMENT_FILE="${vardir}/comments.dat")
-add_definitions(-DDEFAULT_DOWNTIME_FILE="${vardir}/downtime.dat")
-add_definitions(-DDEFAULT_RETENTION_FILE="${vardir}/retention.dat")
+add_definitions(-DDEFAULT_DEBUG_FILE="${VAR_DIR}/centengine.debug")
+add_definitions(-DDEFAULT_RETENTION_FILE="${VAR_DIR}/retention.dat")
 add_definitions(-DDEFAULT_COMMAND_FILE="${RW_DIR}/centengine.cmd")
-add_definitions(-DDEFAULT_CONFIG_FILE="${confdir}/centengine.cfg")
-add_definitions(-DDEFAULT_OBJECT_CACHE_FILE="${vardir}/objects.cache")
-add_definitions(-DDEFAULT_PRECACHED_OBJECT_FILE="${vardir}/objects.precache")
-add_definitions(-DDEFAULT_EVENT_BROKER_FILE="${vardir}/broker.socket")
-add_definitions(-DDEFAULT_P1_FILE="${bindir}/p1.pl")
-add_definitions(-DDEFAULT_AUTH_FILE="")
+add_definitions(-DDEFAULT_CONFIG_FILE="${PREFIX_CONF}/centengine.cfg")
+add_definitions(-DDEFAULT_OBJECT_CACHE_FILE="${VAR_DIR}/objects.cache")
+add_definitions(-DDEFAULT_PRECACHED_OBJECT_FILE="${VAR_DIR}/objects.precache")
 
-# Include directories.
-include_directories("${INCLUDE_DIR}")
-include_directories("${INCLUDE_DIR}/com/centreon/engine")
-if (WITH_TESTING)
-  include_directories("${PROJECT_SOURCE_DIR}")
-endif ()
-
+#
+# Targets.
+#
 
 # Library engine target.
-add_library("cce_core"
-  STATIC
+add_library("cce_core" STATIC
+  ${QT_MOC_FILES}
+  # Sources.
   "${SRC_DIR}/broker.cc"
   "${SRC_DIR}/checks.cc"
   "${SRC_DIR}/config.cc"
@@ -678,41 +591,43 @@ add_library("cce_core"
   "${SRC_DIR}/xpddefault.cc"
   "${SRC_DIR}/xrddefault.cc"
   "${SRC_DIR}/xsddefault.cc"
-  "${INCLUDE_DIR}/com/centreon/engine/broker.hh"
-  "${INCLUDE_DIR}/com/centreon/engine/checks.hh"
-  "${INCLUDE_DIR}/com/centreon/engine/comments.hh"
-  "${INCLUDE_DIR}/com/centreon/engine/common.hh"
-  "${INCLUDE_DIR}/com/centreon/engine/config.hh"
-  "${INCLUDE_DIR}/com/centreon/engine/downtime.hh"
-  "${INCLUDE_DIR}/com/centreon/engine/engine.hh"
-  "${INCLUDE_DIR}/com/centreon/engine/error.hh"
-  "${INCLUDE_DIR}/com/centreon/engine/events.hh"
-  "${INCLUDE_DIR}/com/centreon/engine/flapping.hh"
-  "${INCLUDE_DIR}/com/centreon/engine/globals.hh"
-  "${INCLUDE_DIR}/com/centreon/engine/hash_timed_event.hh"
-  "${INCLUDE_DIR}/com/centreon/engine/logging.hh"
-  "${INCLUDE_DIR}/com/centreon/engine/macros.hh"
-  "${INCLUDE_DIR}/com/centreon/engine/nebcallbacks.hh"
-  "${INCLUDE_DIR}/com/centreon/engine/neberrors.hh"
-  "${INCLUDE_DIR}/com/centreon/engine/nebmods.hh"
-  "${INCLUDE_DIR}/com/centreon/engine/nebmodules.hh"
-  "${INCLUDE_DIR}/com/centreon/engine/nebstructs.hh"
-  "${INCLUDE_DIR}/com/centreon/engine/notifications.hh"
-  "${INCLUDE_DIR}/com/centreon/engine/objects.hh"
-  "${INCLUDE_DIR}/com/centreon/engine/perfdata.hh"
-  "${INCLUDE_DIR}/com/centreon/engine/sehandlers.hh"
-  "${INCLUDE_DIR}/com/centreon/engine/shared.hh"
-  "${INCLUDE_DIR}/com/centreon/engine/skiplist.hh"
-  "${INCLUDE_DIR}/com/centreon/engine/sretention.hh"
-  "${INCLUDE_DIR}/com/centreon/engine/statusdata.hh"
-  "${INCLUDE_DIR}/com/centreon/engine/utils.hh"
-  "${INCLUDE_DIR}/com/centreon/engine/xcddefault.hh"
-  "${INCLUDE_DIR}/com/centreon/engine/xdddefault.hh"
-  "${INCLUDE_DIR}/com/centreon/engine/xodtemplate.hh"
-  "${INCLUDE_DIR}/com/centreon/engine/xpddefault.hh"
-  "${INCLUDE_DIR}/com/centreon/engine/xrddefault.hh"
-  "${INCLUDE_DIR}/com/centreon/engine/xsddefault.hh"
-  ${QT_MOC_FILES})
+  # Headers.
+  "${INC_DIR}/com/centreon/engine/broker.hh"
+  "${INC_DIR}/com/centreon/engine/checks.hh"
+  "${INC_DIR}/com/centreon/engine/comments.hh"
+  "${INC_DIR}/com/centreon/engine/common.hh"
+  "${INC_DIR}/com/centreon/engine/config.hh"
+  "${INC_DIR}/com/centreon/engine/downtime.hh"
+  "${INC_DIR}/com/centreon/engine/engine.hh"
+  "${INC_DIR}/com/centreon/engine/error.hh"
+  "${INC_DIR}/com/centreon/engine/events.hh"
+  "${INC_DIR}/com/centreon/engine/flapping.hh"
+  "${INC_DIR}/com/centreon/engine/globals.hh"
+  "${INC_DIR}/com/centreon/engine/hash_timed_event.hh"
+  "${INC_DIR}/com/centreon/engine/logging.hh"
+  "${INC_DIR}/com/centreon/engine/macros.hh"
+  "${INC_DIR}/com/centreon/engine/nebcallbacks.hh"
+  "${INC_DIR}/com/centreon/engine/neberrors.hh"
+  "${INC_DIR}/com/centreon/engine/nebmods.hh"
+  "${INC_DIR}/com/centreon/engine/nebmodules.hh"
+  "${INC_DIR}/com/centreon/engine/nebstructs.hh"
+  "${INC_DIR}/com/centreon/engine/notifications.hh"
+  "${INC_DIR}/com/centreon/engine/objects.hh"
+  "${INC_DIR}/com/centreon/engine/perfdata.hh"
+  "${INC_DIR}/com/centreon/engine/sehandlers.hh"
+  "${INC_DIR}/com/centreon/engine/shared.hh"
+  "${INC_DIR}/com/centreon/engine/skiplist.hh"
+  "${INC_DIR}/com/centreon/engine/sretention.hh"
+  "${INC_DIR}/com/centreon/engine/statusdata.hh"
+  "${INC_DIR}/com/centreon/engine/utils.hh"
+  "${INC_DIR}/com/centreon/engine/version.hh"
+  "${INC_DIR}/com/centreon/engine/xcddefault.hh"
+  "${INC_DIR}/com/centreon/engine/xdddefault.hh"
+  "${INC_DIR}/com/centreon/engine/xodtemplate.hh"
+  "${INC_DIR}/com/centreon/engine/xpddefault.hh"
+  "${INC_DIR}/com/centreon/engine/xrddefault.hh"
+  "${INC_DIR}/com/centreon/engine/xsddefault.hh"
+)
 
 # Subdirectories with core features.
 add_subdirectory("broker")
@@ -732,8 +647,8 @@ add_subdirectory("scripts")
 # Link target with required libraries.
 target_link_libraries("cce_core"
   ${MATH_LIBRARIES}
+  ${PTHREAD_LIBRARIES}
   ${SOCKET_LIBRARIES}
-  ${THREAD_LIBRARIES}
   ${QT_LIBRARIES}
   "cce_events"
   "cce_logging"
@@ -743,43 +658,32 @@ target_link_libraries("cce_core"
   "cce_macros"
   "cce_commands"
   "cce_compatibility"
-  "cce_objects")
+  "cce_objects"
+)
 
 # centengine target.
 add_executable("centengine"
   "${SRC_DIR}/main.cc")
-get_property(ENGINE_COMPILE_FLAGS
-  TARGET "centengine"
-  PROPERTY COMPILE_FLAGS)
-set(ENGINE_COMPILE_FLAGS "${ENGINE_COMPILE_FLAGS}")
-set_target_properties("centengine"
-  PROPERTIES COMPILE_FLAGS "${ENGINE_COMPILE_FLAGS}")
-get_property(ENGINE_LINK_FLAGS
-  TARGET "centengine"
-  PROPERTY LINK_FLAGS)
-set(ENGINE_LINK_FLAGS "${ENGINE_LINK_FLAGS}")
-
 if (CMAKE_COMPILER_IS_GNUCXX)
-  set(ENGINE_LINK_FLAGS
-    "${ENGINE_LINK_FLAGS} -Wl,-whole-archive -lcce_objects -L./objects -Wl,-no-whole-archive")
+  target_link_libraries("centengine"
+    "-Wl,-whole-archive -lcce_objects -L./objects -Wl,-no-whole-archive")
 endif ()
 
-set_target_properties("centengine"
-  PROPERTIES LINK_FLAGS "${ENGINE_LINK_FLAGS}")
 # Link centengine with required libraries.
 target_link_libraries("centengine"
   "cce_core")
-# Install rule.
-install(TARGETS "centengine"
-  DESTINATION "${bindir}"
-  COMPONENT "runtime")
 
 # centenginestats target.
 add_executable("centenginestats"
   "${SRC_DIR}/centenginestats.cc")
-# Install rule.
-install(TARGETS "centenginestats"
-  DESTINATION "${bindir}"
+
+#
+# Install stuff.
+#
+
+# Install rules.
+install(TARGETS "centengine" "centenginestats"
+  DESTINATION "${PREFIX_BIN}"
   COMPONENT "runtime")
 
 # Create directories.
@@ -806,46 +710,51 @@ install(CODE "
     endif ()
   endfunction()
 
-  mkdir_chown(\"${USER}\" \"${GROUP}\" \"${localstatedir}\")
-  mkdir_chown(\"${USER}\" \"${GROUP}\" \"${RW_DIR}\")
-  mkdir_chown(\"${USER}\" \"${GROUP}\" \"${bindir}\")
-  mkdir_chown(\"${USER}\" \"${GROUP}\" \"${confdir}\")
-  mkdir_chown(\"${USER}\" \"${GROUP}\" \"${libdir}\")
-  mkdir_chown(\"${USER}\" \"${GROUP}\" \"${vardir}\")
-  mkdir_chown(\"${USER}\" \"${GROUP}\" \"${CHECK_RESULT_DIR}\")
-  mkdir_chown(\"${USER}\" \"${GROUP}\" \"${TMPDIR}\")
+  mkdir_chown(\"${USER}\" \"${GROUP}\" \"${CMAKE_INSTALL_PREFIX}\")
+  mkdir_chown(\"${USER}\" \"${GROUP}\" \"${PREFIX_BIN}\")
+  mkdir_chown(\"${USER}\" \"${GROUP}\" \"${PREFIX_CONF}\")
+  mkdir_chown(\"${USER}\" \"${GROUP}\" \"${PREFIX_INC}\")
+  mkdir_chown(\"${USER}\" \"${GROUP}\" \"${PREFIX_LIB}\")
+  mkdir_chown(\"${USER}\" \"${GROUP}\" \"${VAR_DIR}\")
   mkdir_chown(\"${USER}\" \"${GROUP}\" \"${LOG_ARCHIVE_DIR}\")
+  mkdir_chown(\"${USER}\" \"${GROUP}\" \"${RW_DIR}\")
+  if (LOCK_DIR)
+    mkdir_chown(\"${USER}\" \"${GROUP}\" \"${LOCK_DIR}\")
+  endif ()
+  if (PID_DIR)
+    mkdir_chown(\"${USER}\" \"${GROUP}\" \"${PID_DIR}\")
+  endif ()
 
-  touch_chown(\"${USER}\" \"${GROUP}\" \"${vardir}/status.dat\")
+  touch_chown(\"${USER}\" \"${GROUP}\" \"${VAR_DIR}/status.dat\")
+  touch_chown(\"${USER}\" \"${GROUP}\" \"${VAR_DIR}/centengine.log\")
+  touch_chown(\"${USER}\" \"${GROUP}\" \"${VAR_DIR}/centengine.debug\")
+  touch_chown(\"${USER}\" \"${GROUP}\" \"${VAR_DIR}/retention.dat\")
   touch_chown(\"${USER}\" \"${GROUP}\" \"${RW_DIR}/centengine.cmd\")
-  touch_chown(\"${USER}\" \"${GROUP}\" \"${vardir}/centengine.log\")
-  touch_chown(\"${USER}\" \"${GROUP}\" \"${vardir}/centengine.debug\")
-  touch_chown(\"${USER}\" \"${GROUP}\" \"${vardir}/comments.dat\")
-  touch_chown(\"${USER}\" \"${GROUP}\" \"${vardir}/downtime.dat\")
-  touch_chown(\"${USER}\" \"${GROUP}\" \"${vardir}/retention.dat\")
-  touch_chown(\"${USER}\" \"${GROUP}\" \"${vardir}/objects.cache\")
-  touch_chown(\"${USER}\" \"${GROUP}\" \"${vardir}/objects.precache\")
-  touch_chown(\"${USER}\" \"${GROUP}\" \"${vardir}/broker.socket\")
-  touch_chown(\"${USER}\" \"${GROUP}\" \"${bindir}/p1.pl\")")
+  touch_chown(\"${USER}\" \"${GROUP}\" \"${VAR_DIR}/objects.cache\")
+  touch_chown(\"${USER}\" \"${GROUP}\" \"${VAR_DIR}/objects.precache\")
+")
 
-# Install header files for devel.
-install(DIRECTORY "${INCLUDE_DIR}/"
-  DESTINATION "${incdir}"
+# Install header files for development.
+install(DIRECTORY "${INC_DIR}/"
+  DESTINATION "${PREFIX_INC}"
   COMPONENT "development"
   FILES_MATCHING PATTERN "*.hh"
-  PATTERN "${INCLUDE_DIR}/compatibility/" EXCLUDE)
-
-# Install pkg-config files.
-if (WITH_PKGCONFIG_SCRIPT)
-  install(FILES "${SCRIPT_DIR}/centengine.pc"
-    DESTINATION "${pkgconfigdir}"
-    COMPONENT "runtime")
-endif ()
+  PATTERN "${INC_DIR}/compatibility/" EXCLUDE)
 
 #
-# Error tests.
+# Packaging.
 #
+
+include("package.cmake")
+
+#
+# Unit tests.
+#
+
 if (WITH_TESTING)
+  #
+  # Error tests.
+  #
   # Integer insertion.
   set(TEST_NAME "error_insert_integer")
   add_executable("${TEST_NAME}"
@@ -986,12 +895,10 @@ if (WITH_TESTING)
     "${TEST_DIR}/objects/remove_timeperiod.cc")
   target_link_libraries("${TEST_NAME}" "cce_core")
   add_test("${TEST_NAME}" "${TEST_NAME}")
-endif ()
 
-#
-# Notifications tests.
-#
-if (WITH_TESTING)
+  #
+  # Notifications tests.
+  #
   # First notification delay on host.
   set(TEST_NAME "notifications_first_notif_delay_host")
   add_executable("${TEST_NAME}"
@@ -1024,12 +931,10 @@ if (WITH_TESTING)
     "${TEST_DIR}/notifications/first_notif_delay/service_recovery.cc")
   target_link_libraries("${TEST_NAME}" "cce_core")
   add_test("${TEST_NAME}" "${TEST_NAME}")
-endif ()
 
-#
-# Stats tests.
-#
-if (WITH_TESTING)
+  #
+  # Stats tests.
+  #
   # Non-existent configuration file.
   set(TEST_NAME "running_stats_no_config_file")
   add_test("${TEST_NAME}"
@@ -1040,13 +945,11 @@ if (WITH_TESTING)
   add_test("${TEST_NAME}"
     "centenginestats" "-c" "${TEST_DIR}/running/etc/no_status_file.cfg")
   set_tests_properties("${TEST_NAME}" PROPERTIES WILL_FAIL TRUE)
-endif ()
 
-#
-# Engine tests.
-#
-# Without any service.
-if (WITH_TESTING)
+  #
+  # Engine tests.
+  #
+  # Without any service.
   add_test("running_engine_no_service"
     "centengine" "-v" "${TEST_DIR}/running/etc/no_service.cfg")
   set_tests_properties("running_engine_no_service"
@@ -1080,68 +983,55 @@ if (WITH_TESTING)
     "centengine" "-v" "${TEST_DIR}/running/etc/broker_module_without_args.cfg")
 endif ()
 
-# Package.
-set(CPACK_PACKAGE_NAME "Centreon-Engine")
-set(CPACK_PACKAGE_VENDOR "Merethis")
-set(CPACK_PACKAGE_VERSION_MAJOR "${ENGINE_MAJOR}")
-set(CPACK_PACKAGE_VERSION_MINOR "${ENGINE_MINOR}")
-set(CPACK_PACKAGE_VERSION_PATCH "${ENGINE_PATCH}")
-set(CPACK_PACKAGE_DESCRIPTION_SUMMARY
-  "Centreon Engine monitors your IT infrastructure.")
-set(CPACK_PACKAGE_FILE_NAME
-  "centreon-engine-${ENGINE_VERSION}")
-set(CPACK_PACKAGE_INSTALL_DIRECTORY "Centreon-Engine")
-set(CPACK_RESOURCE_FILE_LICENSE "${PROJECT_SOURCE_DIR}/license.txt")
-set(CPACK_PACKAGE_CONTACT "Matthieu Kermagoret <mkermagoret@merethis.com>")
-if (CPACK_BINARY_DEB)
-  # Configure files.
-  configure_file("${SCRIPT_DIR}/deb/postinst.in" "${SCRIPT_DIR}/deb/postinst")
-
-  set(DEB_PACKAGE "Yes")
-  set(CPACK_DEBIAN_PACKAGE_SECTION "net")
-  set(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA
-    "${SCRIPT_DIR}/deb/postinst"
-    "${SCRIPT_DIR}/deb/prerm")
-else ()
-  set(DEB_PACKAGE "No")
-endif ()
-if (CPACK_BINARY_RPM)
-  # Configure files.
-  configure_file("${SCRIPT_DIR}/rpm/postinst.in" "${SCRIPT_DIR}/rpm/postinst")
-
-  set(RPM_PACKAGE "Yes")
-  set(CPACK_RPM_PACKAGE_RELEASE 1)
-  set(CPACK_RPM_PACKAGE_LICENSE "GPLv2")
-  set(CPACK_RPM_POST_INSTALL_SCRIPT_FILE "${SCRIPT_DIR}/rpm/postinst")
-  set(CPACK_RPM_PRE_UNINSTALL_SCRIPT_FILE "${SCRIPT_DIR}/rpm/prerm")
-else ()
-  set(RPM_PACKAGE "No")
-endif ()
-include(CPack)
-
+#
 # Print summary.
+#
+
 message(STATUS "")
 message(STATUS "")
 message(STATUS "Configuration Summary")
 message(STATUS "---------------------")
 message(STATUS "")
-message(STATUS "    Version:                 ${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}")
-message(STATUS "    Unit test:               ${UNIT_TEST}")
-message(STATUS "    Extra Compilation Flags: ${CMAKE_CXX_FLAGS}")
-message(STATUS "    Prefix:                  ${localstatedir}")
-message(STATUS "    Binary Directory:        ${bindir}")
-message(STATUS "    Configuration Directory: ${confdir}")
-message(STATUS "    Library Directory:       ${libdir}")
-message(STATUS "    Var Directory:           ${vardir}")
-message(STATUS "    Include Directory:       ${incdir}")
-message(STATUS "    Pkg-config Directory:    ${pkgconfigdir}")
-message(STATUS "    Check Result Directory:  ${CHECK_RESULT_DIR}")
-message(STATUS "    RW Directory:            ${RW_DIR}")
-message(STATUS "    Temporary Directory:     ${TMPDIR}")
-message(STATUS "    Startup Script:          ${STARTUP_SCRIPT}")
-message(STATUS "    User:                    ${USER}")
-message(STATUS "    Group:                   ${GROUP}")
-message(STATUS "    Deb Package Creation:    ${DEB_PACKAGE}")
-message(STATUS "    RPM Package Creation:    ${RPM_PACKAGE}")
+message(STATUS "  Project")
+message(STATUS "    - Name                       Centreon Engine")
+message(STATUS "    - Version                    ${CENTREON_ENGINE_VERSION}")
 message(STATUS "")
+message(STATUS "  System")
+message(STATUS "    - Name                       ${CMAKE_SYSTEM_NAME}")
+message(STATUS "    - Version                    ${CMAKE_SYSTEM_VERSION}")
+message(STATUS "    - Processor                  ${CMAKE_SYSTEM_PROCESSOR}")
+message(STATUS "")
+message(STATUS "  Build")
+message(STATUS "    - Compiler                   ${CMAKE_CXX_COMPILER} (${CMAKE_CXX_COMPILER_ID})")
+message(STATUS "    - Extra compilation flags    ${CMAKE_CXX_FLAGS}")
+if (WITH_TESTING)
+  message(STATUS "    - Unit tests                 enabled")
+else ()
+  message(STATUS "    - Unit tests                 disabled")
+endif ()
+if (WITH_PKGCONFIG_SCRIPT)
+  message(STATUS "    - pkg-config script          enabled")
+else ()
+  message(STATUS "    - pkg-config script          disabled")
+endif ()
+message(STATUS "    - Startup script             ${STARTUP_SCRIPT}")
+message(STATUS "")
+message(STATUS "  Install")
+message(STATUS "    - Prefix                     ${CMAKE_INSTALL_PREFIX}")
+message(STATUS "    - Binary prefix              ${PREFIX_BIN}")
+message(STATUS "    - Configuration prefix       ${PREFIX_CONF}")
+message(STATUS "    - Library prefix             ${PREFIX_LIB}")
+message(STATUS "    - Include prefix             ${PREFIX_INC}")
+message(STATUS "    - var directory              ${VAR_DIR}")
+message(STATUS "    - Log archive directory      ${LOG_ARCHIVE_DIR}")
+message(STATUS "    - RW directory               ${RW_DIR}")
+if (WITH_PKGCONFIG_SCRIPT)
+  message(STATUS "    - pkg-config directory       ${PKGCONFIG_DIR}")
+endif ()
+if (STARTUP_DIR)
+  message(STATUS "    - Startup directory          ${STARTUP_DIR}")
+endif ()
+message(STATUS "    - User                       ${USER}")
+message(STATUS "    - Group                      ${GROUP}")
+message(STATUS "    - Package                    ${PACKAGE_LIST}")
 message(STATUS "")
