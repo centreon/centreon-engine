@@ -603,7 +603,7 @@ namespace                   com {
 	  static const bool                DEFAULT_USE_REGEXP_MATCHES                          = false;
 	  static const bool                DEFAULT_USE_TRUE_REGEXP_MATCHING                    = false;
 	  static const bool                DEFAULT_USE_LARGE_INSTALLATION_TWEAKS               = false;
-	  static const bool                DEFAULT_ENABLE_ENVIRONMENT_MACROS                   = true;
+	  static const bool                DEFAULT_ENABLE_ENVIRONMENT_MACROS                   = false;
 	  static const bool                DEFAULT_ALLOW_EMPTY_HOSTGROUP_ASSIGNMENT            = false;
 	  static const float               DEFAULT_SLEEP_TIME;
 	  static const float               DEFAULT_LOW_SERVICE_FLAP_THRESHOLD;

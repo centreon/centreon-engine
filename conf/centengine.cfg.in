@@ -1061,10 +1061,10 @@ use_large_installation_tweaks=0
 #         executed. Enabling this option can cause performance issues in large
 #         installations, as it will consume a bit more memory and (more
 #         importantly) consume more CPU.
-# values: 0 = Disable environment variable macros.
-#         1 = Enable environment variable macros (default).
+# values: 0 = Disable environment variable macros (default).
+#         1 = Enable environment variable macros.
 
-enable_environment_macros=1
+enable_environment_macros=0
 
 
 # var:    free_child_process_memory
