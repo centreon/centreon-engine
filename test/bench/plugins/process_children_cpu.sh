@@ -27,7 +27,7 @@ fi
 save_file="/tmp/.$(basename $1)_process_children_cpu"
 pid=$(ps axf -o'pid comm' | grep "[^_] $1$" | sed 's/^ *//' | head -n1 | cut -d ' ' -f1)
 # check pid information.
-if [ ! -d "/proc/$pid" ]; then
+if [ -z "$pid" ] || [ ! -d "/proc/$pid" ]; then
     echo "process not running!"
     exit 3
 fi
