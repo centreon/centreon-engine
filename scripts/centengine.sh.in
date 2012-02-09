@@ -12,7 +12,7 @@
 # Required-Start: $local_fs
 # Required-Stop:
 # Default-Start: 2 3 4 5
-# Default-Stop: 0 6
+# Default-Stop: 0 1 6
 # Short-Description: Start and stop Centreon Engine
 ### END INIT INFO
 

@@ -1,5 +1,5 @@
 ##
-## Copyright 2011 Merethis
+## Copyright 2011-2012 Merethis
 ##
 ## This file is part of Centreon Engine.
 ##
@@ -46,7 +46,7 @@ configure_file("${SRC_DIR}/objects/windows.cfg.in"
 option(WITH_SAMPLE_CONFIG "Install sample configuration files." ON)
 if (WITH_SAMPLE_CONFIG)
   install(DIRECTORY "${SRC_DIR}/"
-    DESTINATION "${confdir}/"
+    DESTINATION "${PREFIX_CONF}"
     COMPONENT "runtime"
     FILES_MATCHING PATTERN "*.cfg")
 endif ()

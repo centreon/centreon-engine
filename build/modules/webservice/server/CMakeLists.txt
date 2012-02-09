@@ -93,5 +93,5 @@ target_link_libraries("webservice"
 
 # Install rule.
 install(TARGETS "webservice"
-  DESTINATION "${libdir}/"
+  DESTINATION "${PREFIX_LIB}/"
   COMPONENT "runtime")

@@ -1,5 +1,5 @@
 ##
-## Copyright 2011 Merethis
+## Copyright 2011-2012 Merethis
 ##
 ## This file is part of Centreon Engine.
 ##
@@ -19,15 +19,14 @@
 
 # Set directories.
 set(SRC_DIR "${SRC_DIR}/compatibility")
-set(INC_DIR "${INCLUDE_DIR}/compatibility")
+set(INC_DIR "${INC_DIR}/compatibility")
 
 # Configure files.
-configure_file("${INCLUDE_DIR}/compatibility/locations.h.in"
-  "${INCLUDE_DIR}/compatibility/locations.h")
+configure_file("${INC_DIR}/locations.h.in"
+  "${INC_DIR}/locations.h")
 
 # cce_compatibility target.
-add_library("cce_compatibility"
-  STATIC
+add_library("cce_compatibility" STATIC
   "${SRC_DIR}/common.cc"
   "${SRC_DIR}/globals.cc"
   "${SRC_DIR}/logging.cc"
@@ -36,8 +35,8 @@ add_library("cce_compatibility"
 # Link target.
 target_link_libraries("cce_compatibility" "cce_core")
 
-# Install header files for devel.
+# Install header files for development.
 install(DIRECTORY "${INC_DIR}"
-  DESTINATION "${localstatedir}/include/centreon-engine/"
+  DESTINATION "${PREFIX_INC}"
   COMPONENT "development"
   FILES_MATCHING PATTERN "*.h")

@@ -1,5 +1,5 @@
 ##
-## Copyright 2011 Merethis
+## Copyright 2011-2012 Merethis
 ##
 ## This file is part of Centreon Scheduler.
 ##
@@ -19,7 +19,7 @@
 
 # Set directories.
 set(SRC_DIR "${SRC_DIR}/commands")
-set(INC_DIR "${INCLUDE_DIR}/com/centreon/engine/commands")
+set(INC_DIR "${INC_DIR}/com/centreon/engine/commands")
 
 # connector command is required.
 add_subdirectory("connector")

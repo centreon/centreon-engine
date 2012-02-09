@@ -1,6 +1,6 @@
 /*
 ** Copyright 1999-2009 Ethan Galstad
-** Copyright 2011      Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -30,8 +30,8 @@
 #include <math.h>
 #include <errno.h>
 #include <dirent.h>
-#include <poll.h>
 #include <signal.h>
+#include <time.h>
 #include "engine.hh"
 #include "comments.hh"
 #include "globals.hh"
@@ -311,7 +311,9 @@ int set_environment_var(char const* name, char const* value, int set) {
 
 /* Checks if the given time is in daylight time saving period. */
 int is_dst_time(time_t* time) {
-  return (localtime(time)->tm_isdst);
+  struct tm my_tm;
+  localtime_r(time, &my_tm);
+  return (my_tm.tm_isdst);
 }
 
 /* Returns the shift in seconds if the given times are across the daylight time saving period change. */

@@ -194,7 +194,9 @@ state::state()
 
   _tab_string[log_archive_path] = DEFAULT_LOG_ARCHIVE_PATH;
 
-  // Set macro.
+  // Set macros.
+  delete[] _mac->x[MACRO_TEMPFILE];
+  _mac->x[MACRO_TEMPFILE] = my_strdup("/tmp/centengine.tmp");
   delete[] _mac->x[MACRO_TEMPPATH];
   _mac->x[MACRO_TEMPPATH] = my_strdup("/tmp");
 }
@@ -383,14 +385,6 @@ QString const& state::get_debug_file() const throw() {
  */
 QString const& state::get_command_file() const throw() {
   return (_tab_string[command_file]);
-}
-
-/**
- *  Get the temporary filename.
- *  @return The temporary filename.
- */
-QString const& state::get_temp_file() const throw() {
-  return (_tab_string[temp_file]);
 }
 
 /**
@@ -1174,10 +1168,8 @@ void state::set_command_file(QString const& value) {
  *  @param[in] value The filename.
  */
 void state::set_temp_file(QString const& value) {
-  _tab_string[temp_file] = value;
-
-  delete[] _mac->x[MACRO_TEMPFILE];
-  _mac->x[MACRO_TEMPFILE] = my_strdup(qPrintable(value));
+  (void)value;
+  logger(log_config_warning, basic) << "warning: temp_file variable ignored";
 }
 
 /**
@@ -2402,7 +2394,6 @@ std::string& state::_trim(std::string& str) throw() {
  */
 void state::_reset() {
   set_log_file(DEFAULT_LOG_FILE);
-  set_temp_file(DEFAULT_TEMP_FILE);
   set_command_file(DEFAULT_COMMAND_FILE);
   set_debug_file(DEFAULT_DEBUG_FILE);
 

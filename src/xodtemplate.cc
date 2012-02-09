@@ -20,6 +20,7 @@
 
 /*********** COMMON HEADER FILES ***********/
 
+#include <ctype.h>
 #include <sstream>
 #include <stdlib.h>
 #include <stdio.h>

@@ -1,5 +1,5 @@
 ##
-## Copyright 2011 Merethis
+## Copyright 2011-2012 Merethis
 ##
 ## This file is part of Centreon Engine.
 ##
@@ -19,7 +19,7 @@
 
 # Set directories.
 set(SRC_DIR "${SRC_DIR}/broker")
-set(INC_DIR "${INCLUDE_DIR}/com/centreon/engine/broker")
+set(INC_DIR "${INC_DIR}/com/centreon/engine/broker")
 
 # Produce moc files.
 qt4_wrap_cpp(QT_MOC_FILES
