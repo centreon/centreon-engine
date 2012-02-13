@@ -126,9 +126,6 @@ unsigned long raw::run(QString const& processed_cmd,
 
   info.proc->start(processed_cmd);
 
-  logger(dbg_commands, basic)
-    << "raw command (id=" << info.cmd_id
-    << ") start '" << processed_cmd << "'.";
   logger(dbg_functions, basic) << "end " << Q_FUNC_INFO;
   return (info.cmd_id);
 }
