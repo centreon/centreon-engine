@@ -223,8 +223,10 @@ void checker::run(host* hst,
   // don't execute a new host check if one is already running.
   if (hst->is_executing == true
       && !(check_options & CHECK_OPTION_FORCE_EXECUTION)) {
-    throw (engine_error() << "A check of this host (" << hst->name
-	   << ") is already being executed, so we'll pass for the moment...");
+    logger(dbg_checks, basic)
+      << "A check of this host (" << hst->name
+      << ") is already being executed, so we'll pass for the moment...";
+    return;
   }
 
   timeval start_time = timeval();

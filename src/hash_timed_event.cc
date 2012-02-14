@@ -57,6 +57,15 @@ hash_timed_event& hash_timed_event::operator=(hash_timed_event const& right) {
 }
 
 /**
+ *  Clear hash list.
+ *
+ *  @param[in] p  The hash list to clear.
+ */
+void hash_timed_event::clear(priority p) {
+  _hevent[p].clear();
+}
+
+/**
  *  Remove timed event.
  *
  *  @param[in] event  The event to remove.
