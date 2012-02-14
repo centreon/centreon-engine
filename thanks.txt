@@ -166,6 +166,7 @@ since 1999.  If I missed your name, let me know.
 * Bernard Li
 * Joerg Linge
 * Michael Little
+* Michel Loiseleur
 * Shad Lords
 * Larry Low
 * Michael Lubben
@@ -299,4 +300,3 @@ since 1999.  If I missed your name, let me know.
 * Mitch Wright 
 * Michal Zimen
 * Pawel Zuzelski
-* Michel Loiseleur
