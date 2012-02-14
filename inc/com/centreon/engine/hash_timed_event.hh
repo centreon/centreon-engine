@@ -54,6 +54,7 @@ namespace                 com {
                           hash_timed_event(hash_timed_event const& right);
                           ~hash_timed_event();
         hash_timed_event& operator=(hash_timed_event const& right);
+        void              clear(priority p);
         void              erase(priority p, timed_event* event);
         timed_event*      find(priority p, void* ptr);
         void              insert(priority p, timed_event* event);

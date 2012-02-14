@@ -2256,6 +2256,7 @@ void free_memory(nagios_macros* mac) {
 
   /* reset the event pointer */
   event_list_high = NULL;
+  quick_timed_event.clear(hash_timed_event::high);
 
   /* free memory for the low priority event list */
   this_event = event_list_low;
@@ -2267,6 +2268,7 @@ void free_memory(nagios_macros* mac) {
 
   /* reset the event pointer */
   event_list_low = NULL;
+  quick_timed_event.clear(hash_timed_event::low);
 
   /* free any notification list that may have been overlooked */
   free_notification_list();

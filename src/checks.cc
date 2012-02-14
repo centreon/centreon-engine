@@ -1668,14 +1668,11 @@ void schedule_host_check(host* hst, time_t check_time, int options) {
 #endif
 
   /* see if there are any other scheduled checks of this host in the queue */
-  for (temp_event = event_list_low;
-       temp_event != NULL;
-       temp_event = temp_event->next) {
-    if (temp_event->event_type == EVENT_HOST_CHECK
-        && hst == (host*)temp_event->event_data) {
+  if ((temp_event = quick_timed_event.find(hash_timed_event::low, hst))) {
+    if (temp_event->event_type == EVENT_HOST_CHECK)
       found = TRUE;
-      break;
-    }
+    else
+      temp_event = NULL;
   }
 
   /* we found another host check event for this host in the queue - what should we do? */

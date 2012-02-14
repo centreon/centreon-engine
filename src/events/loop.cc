@@ -146,6 +146,7 @@ void loop::_dispatching() {
       timed_event* temp_event = event_list_high;
       event_list_high = event_list_high->next;
       event_list_high->prev = NULL;
+      quick_timed_event.erase(hash_timed_event::high, temp_event);
 
       // handle the event.
       handle_timed_event(temp_event);
@@ -290,6 +291,7 @@ void loop::_dispatching() {
         // we may have just removed the only item from the list.
         if (event_list_low != NULL)
           event_list_low->prev = NULL;
+        quick_timed_event.erase(hash_timed_event::low, temp_event);
 
         logger(dbg_events, more) << "Running event...";
 
