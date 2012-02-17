@@ -53,11 +53,10 @@ if (WITH_TESTING)
     "${TEST_DIR}/mod_compatibility.cc")
   set_target_properties("broker_mod_compatibility" PROPERTIES PREFIX "")
 
-  # XXX: compilation failed, undefine ref...
-  # # Test loader.
-  # add_executable("broker_loader" "${TEST_DIR}/loader.cc")
-  # target_link_libraries("broker_loader" ${QT_LIBRARIES} "cce_core")
-  # add_test("broker_loader" "broker_loader")
+  # Test loader.
+  add_executable("broker_loader" "${TEST_DIR}/loader.cc")
+  target_link_libraries("broker_loader" ${QT_LIBRARIES} "cce_core")
+  add_test("broker_loader" "broker_loader")
 
   # Test handle.
   add_executable("broker_handle" "${TEST_DIR}/handle.cc")
@@ -69,9 +68,9 @@ if (WITH_TESTING)
   target_link_libraries("broker_nebmodule" ${QT_LIBRARIES} "cce_core")
   add_test("broker_nebmodule" "broker_nebmodule")
 
-  # XXX: compilation failed, undefine ref...
-  # # Test compatibility.
-  # add_executable("broker_compatibility" "${TEST_DIR}/compatibility.cc")
-  # target_link_libraries("broker_compatibility" ${QT_LIBRARIES} "cce_configuration" "cce_core" "cce_configuration")
-  # add_test("broker_compatibility" "broker_compatibility")
+  # Test compatibility.
+  add_executable("broker_compatibility" "${TEST_DIR}/compatibility.cc")
+  target_link_libraries("broker_compatibility" ${QT_LIBRARIES} "cce_configuration" "cce_core" "cce_configuration")
+  add_test("broker_compatibility" "broker_compatibility")
+
 endif ()

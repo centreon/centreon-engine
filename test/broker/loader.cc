@@ -1,5 +1,5 @@
 /*
-** Copyright 2011      Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -76,7 +76,7 @@ void check_unload() {
 /**
  *  Check loader change name.
  */
-void check_chage_name() {
+void check_change_name() {
   loader& loader = loader::instance();
 
   QSharedPointer<handle> module = loader.add_module(MOD_LIB_NAME,
@@ -107,8 +107,7 @@ int main_test() {
   check_directory();
   check_load();
   check_unload();
-  check_chage_name();
-
+  check_change_name();
   return (0);
 }
 
@@ -117,7 +116,7 @@ int main_test() {
  */
 int main(int argc, char** argv) {
   QCoreApplication app(argc, argv);
-  unittest utest(&main_test);
+  com::centreon::engine::unittest utest(&main_test);
   QObject::connect(&utest, SIGNAL(finished()), &app, SLOT(quit()));
   utest.start();
   app.exec();

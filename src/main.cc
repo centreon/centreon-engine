@@ -383,8 +383,11 @@ int main(int argc, char** argv) {
       try {
         com::centreon::engine::broker::loader& loader(
           com::centreon::engine::broker::loader::instance());
-        loader.set_directory(config.get_broker_module_directory());
-        loader.load();
+        QString const& mod_dir(config.get_broker_module_directory());
+        if (!mod_dir.isEmpty()) {
+          loader.set_directory(mod_dir);
+          loader.load();
+        }
       }
       catch (std::exception const& e) {
         logger(log_info_message, basic)
