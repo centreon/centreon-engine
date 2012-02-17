@@ -29,6 +29,7 @@ configure_file("${INC_DIR}/locations.h.in"
 add_library("cce_compatibility" STATIC
   # Sources.
   "${SRC_DIR}/common.cc"
+  "${SRC_DIR}/embedded_perl.cc"
   "${SRC_DIR}/globals.cc"
   "${SRC_DIR}/logging.cc"
   "${SRC_DIR}/utils.cc"
@@ -38,6 +39,7 @@ add_library("cce_compatibility" STATIC
   "${INC_DIR}/common.h"
   "${INC_DIR}/config.h"
   "${INC_DIR}/downtime.h"
+  "${INC_DIR}/embedded_perl.h"
   "${INC_DIR}/epn_nagios.h"
   "${INC_DIR}/locations.h"
   "${INC_DIR}/logging.h"

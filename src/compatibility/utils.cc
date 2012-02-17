@@ -1,6 +1,6 @@
 /*
 ** Copyright 1999-2009 Ethan Galstad
-** Copyright 2011      Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -33,24 +33,6 @@ using namespace com::centreon::engine::logging;
 
 check_result  check_result_info;
 check_result* check_result_list = NULL;
-
-/******************************************************************/
-/******************** EMBEDDED PERL FUNCTIONS *********************/
-/******************************************************************/
-
-int init_embedded_perl(char** env) {
-  (void)env;
-  return (OK);
-}
-
-int deinit_embedded_perl(void) {
-  return (OK);
-}
-
-int file_uses_embedded_perl(char* fname) {
-  (void)fname;
-  return (false);
-}
 
 /******************************************************************/
 /************************* IPC FUNCTIONS **************************/

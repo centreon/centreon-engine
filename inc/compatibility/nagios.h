@@ -24,6 +24,7 @@
 # define CCE_COMPATIBILITY_NAGIOS_H
 
 # include "config.h"
+# include "embedded_perl.h"
 # include "logging.h"
 # include "common.h"
 # include "locations.h"
@@ -58,10 +59,6 @@
 extern "C" {
 # endif
 
-
-int init_embedded_perl(char** env);       // initialized embedded perl interpreter
-int deinit_embedded_perl(void);           // cleans up embedded perl
-int file_uses_embedded_perl(char* fname); // tests whether or not the embedded perl interpreter should be used on a file
 
 void service_check_sighandler(int sig);   // handles timeouts when executing service checks
 void host_check_sighandler(int sig);      // handles timeouts when executing host checks
