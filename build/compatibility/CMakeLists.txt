@@ -33,7 +33,7 @@ add_library("cce_compatibility" STATIC
   "${SRC_DIR}/embedded_perl.cc"
   "${SRC_DIR}/globals.cc"
   "${SRC_DIR}/logging.cc"
-  "${SRC_DIR}/utils.cc"
+  "${SRC_DIR}/sighandlers.cc"
   # Headers.
   "${INC_DIR}/broker.h"
   "${INC_DIR}/check_result.h"
@@ -56,6 +56,7 @@ add_library("cce_compatibility" STATIC
   "${INC_DIR}/objects.h"
   "${INC_DIR}/perfdata.h"
   "${INC_DIR}/shared.h"
+  "${INC_DIR}/sighandlers.h"
   "${INC_DIR}/skiplist.h"
   "${INC_DIR}/sretention.h"
   "${INC_DIR}/statusdata.h"

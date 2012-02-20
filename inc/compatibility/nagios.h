@@ -27,6 +27,7 @@
 # include "config.h"
 # include "embedded_perl.h"
 # include "logging.h"
+# include "sighandlers.h"
 # include "common.h"
 # include "locations.h"
 # include "objects.h"
@@ -55,17 +56,5 @@
 
 # define ILF_USER  0 /* user-specified interleave factor */
 # define ILF_SMART 1 /* smart interleave */
-
-# ifdef __cplusplus
-extern "C" {
-# endif
-
-void service_check_sighandler(int sig);   // handles timeouts when executing service checks
-void host_check_sighandler(int sig);      // handles timeouts when executing host checks
-void my_system_sighandler(int sig);
-
-# ifdef __cplusplus
-}
-# endif
 
 #endif /* !CCE_COMPATIBILITY_NAGIOS_H */
