@@ -285,6 +285,31 @@ extern "C" {
       << (void*)write_to_all_logs << "\n"
       << std::endl;
 
+    // npcdmod 0.6.16
+    std::cout
+      << "npcdmod 0.6.16\n"
+      << "find_host: "
+      << (void*)find_host << "\n"
+      << "find_service: "
+      << (void*)find_service << "\n"
+      << "my_rename: "
+      << (void*)my_rename << "\n"
+      << "neb_deregister_callback: "
+      << (void*)neb_deregister_callback << "\n"
+      << "neb_register_callback: "
+      << (void*)neb_register_callback << "\n"
+      << "neb_set_module_info: "
+      << (void*)neb_set_module_info << "\n"
+      << "process_performance_data: "
+      << process_performance_data << "\n"
+      << "schedule_new_event: "
+      << (void*)schedule_new_event << "\n"
+      << "strip: "
+      << (void*)strip << "\n"
+      << "write_to_all_logs: "
+      << (void*)write_to_all_logs << "\n"
+      << std::endl;
+
     return ;
   }
 }
