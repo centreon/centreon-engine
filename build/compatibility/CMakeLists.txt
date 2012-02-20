@@ -28,6 +28,7 @@ configure_file("${INC_DIR}/locations.h.in"
 # cce_compatibility target.
 add_library("cce_compatibility" STATIC
   # Sources.
+  "${SRC_DIR}/check_result.cc"
   "${SRC_DIR}/common.cc"
   "${SRC_DIR}/embedded_perl.cc"
   "${SRC_DIR}/globals.cc"
@@ -35,6 +36,7 @@ add_library("cce_compatibility" STATIC
   "${SRC_DIR}/utils.cc"
   # Headers.
   "${INC_DIR}/broker.h"
+  "${INC_DIR}/check_result.h"
   "${INC_DIR}/comments.h"
   "${INC_DIR}/common.h"
   "${INC_DIR}/config.h"
