@@ -49,19 +49,24 @@ namespace                 com {
           low = 0,
           high = 1
         };
+        enum              type {
+          service_check = 0,
+          host_check = 1
+        };
 
                           hash_timed_event();
                           hash_timed_event(hash_timed_event const& right);
                           ~hash_timed_event();
         hash_timed_event& operator=(hash_timed_event const& right);
         void              clear(priority p);
+        void              clear(priority p, type t);
         void              erase(priority p, timed_event* event);
-        timed_event*      find(priority p, void* ptr);
+        timed_event*      find(priority p, type t, void* ptr);
         void              insert(priority p, timed_event* event);
 
       private:
         hash_timed_event& _internal_copy(hash_timed_event const& right);
-        htable            _hevent[2];
+        htable            _hevent[2][2];
       };
     }
   }
