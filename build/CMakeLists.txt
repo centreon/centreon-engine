@@ -569,7 +569,6 @@ add_definitions(-DDEFAULT_PRECACHED_OBJECT_FILE="${VAR_DIR}/objects.precache")
 
 # Library engine target.
 add_library("cce_core" STATIC
-  ${QT_MOC_FILES}
   # Sources.
   "${SRC_DIR}/broker.cc"
   "${SRC_DIR}/checks.cc"
