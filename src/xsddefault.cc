@@ -22,7 +22,7 @@
 /*********** COMMON HEADER FILES ***********/
 
 #include <QTextStream>
-#include <QByteArray>
+#include <string>
 #include <stdlib.h>
 #include <stdio.h>
 #include <sys/stat.h>
@@ -205,7 +205,7 @@ int xsddefault_save_status_data(void) {
   /* generate check statistics */
   generate_check_stats();
 
-  QByteArray data;
+  std::string data;
   QTextStream stream(&data);
 
   /* write version info to status file */

@@ -22,7 +22,7 @@
 
 # include <map>
 # include <QSharedPointer>
-# include <QByteArray>
+# include <string>
 # include "com/centreon/engine/commands/connector/request.hh"
 
 namespace                           com {
@@ -38,7 +38,7 @@ namespace                           com {
 	  public:
 	    static request_builder& instance();
 
-	    QSharedPointer<request> build(QByteArray const& data) const;
+	    QSharedPointer<request> build(std::string const& data) const;
 
 	  private:
 	                            request_builder();

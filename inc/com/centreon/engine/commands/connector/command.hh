@@ -93,7 +93,7 @@ namespace                              com {
 	    void                       _req_execute_r(request* req);
 	    void                       _req_error_r(request* req);
 
-	    QByteArray                 _read_data;
+	    std::string                 _read_data;
 	    QMutex                     _mutex;
 	    std::string                    _connector_name;
 	    std::string                    _connector_line;

@@ -45,12 +45,13 @@ request_builder& request_builder::instance() {
  *
  *  @return The request object build with data.
  */
-QSharedPointer<request> request_builder::build(QByteArray const& data) const {
-  int pos = data.indexOf('\0');
-  QByteArray tmp = data.left(pos < 0 ? data.size() : pos);
+QSharedPointer<request> request_builder::build(std::string const& data) const {
+  // XXX: todo.
+  int pos = 0;//data.indexOf('\0');
+  std::string tmp;// = data.left(pos < 0 ? data.size() : pos);
 
   bool ok;
-  unsigned int req_id = tmp.toUInt(&ok);
+  unsigned int req_id;// = tmp.toUInt(&ok);
 
   if (ok == false) {
     throw (engine_error() << "bad request id.");

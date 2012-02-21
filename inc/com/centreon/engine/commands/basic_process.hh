@@ -23,7 +23,7 @@
 # include <QIODevice>
 # include <list>
 # include <string>
-# include <QByteArray>
+# include <string>
 # include <QProcess>
 # include <QSocketNotifier>
 # include <QSharedPointer>
@@ -56,8 +56,8 @@ namespace                          com {
           Q_PID                    pid() const;
           // ProcessChannelMode       processChannelMode() const;
           // QProcessEnvironment      processEnvironment() const;
-          QByteArray               readAllStandardError();
-          QByteArray               readAllStandardOutput();
+          std::string               readAllStandardError();
+          std::string               readAllStandardOutput();
           QProcess::ProcessChannel readChannel() const;
           // void                     setEnvironment(std::list<std::string> const& environment); // (deprecated)
           // void                     setNativeArguments(std::string const& arguments);
@@ -77,6 +77,7 @@ namespace                          com {
           bool                     waitForBytesWritten(int msecs = 30000);
           bool                     waitForStarted(int msecs = 30000);
           std::string                  workingDirectory() const;
+          qint64                   writeData(std::string const& data);
 
           // QIODevice
           qint64                   bytesAvailable() const;
@@ -119,7 +120,7 @@ namespace                          com {
           void                     _exec_child();
           void                     _close_pipe() throw();
           void                     _emit_finished();
-          static bool              _read(int fd, QByteArray* str);
+          static bool              _read(int fd, std::string* str);
           static qint64            _available_bytes(int fd) throw();
           static pid_t             _waitpid(pid_t pid, int* status, int options) throw();
           static qint64            _read(int fd, void* buf, qint64 nbyte) throw();
@@ -133,8 +134,8 @@ namespace                          com {
           std::list<std::string>              _arguments;
           std::string                  _program;
           std::string                  _working_directory;
-          QByteArray               _standard_output;
-          QByteArray               _standard_error;
+          std::string               _standard_output;
+          std::string               _standard_error;
           QSocketNotifier*         _notifier_output;
           QSocketNotifier*         _notifier_error;
           QSocketNotifier*         _notifier_dead;

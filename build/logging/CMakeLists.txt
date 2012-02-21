@@ -30,7 +30,7 @@ add_library("cce_logging"
   "${SRC_DIR}/logger.cc"
   "${SRC_DIR}/broker.cc"
   "${SRC_DIR}/engine.cc"
-  "${SRC_DIR}/dumpers.cc"
+#  "${SRC_DIR}/dumpers.cc"  # XXX: todo.
   "${INC_DIR}/object.hh"
   "${INC_DIR}/standard.hh"
   "${INC_DIR}/file.hh"

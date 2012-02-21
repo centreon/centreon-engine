@@ -115,12 +115,12 @@ request* execute_query::clone() const {
  *
  *  @return The data request.
  */
-QByteArray execute_query::build() {
-  QByteArray query =
-    QByteArray().setNum(_id) + '\0' +
-    QByteArray().setNum(static_cast<qulonglong>(_cmd_id)) + '\0' +
-    QByteArray().setNum(_timeout) + '\0' +
-    QByteArray().setNum(_start_time.toTime_t()) + '\0';
+std::string execute_query::build() {
+  std::string query =
+    std::string().setNum(_id) + '\0' +
+    std::string().setNum(static_cast<qulonglong>(_cmd_id)) + '\0' +
+    std::string().setNum(_timeout) + '\0' +
+    std::string().setNum(_start_time.toTime_t()) + '\0';
   query += _cmd.c_str();
   return (query + cmd_ending());
 }
@@ -130,8 +130,8 @@ QByteArray execute_query::build() {
  *
  *  @param[in] data The data of the request information.
  */
-void execute_query::restore(QByteArray const& data) {
-  std::vector<QByteArray> list = data.split('\0').toVector().toStdVector();
+void execute_query::restore(std::string const& data) {
+  std::vector<std::string> list = data.split('\0').toVector().toStdVector();
   if (list.size() < 5) {
     throw (engine_error() << "bad request argument.");
   }

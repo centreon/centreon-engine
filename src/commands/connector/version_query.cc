@@ -99,8 +99,8 @@ request* version_query::clone() const {
  *
  *  @return The data request.
  */
-QByteArray version_query::build() {
-  return (QByteArray().setNum(_id) + cmd_ending());
+std::string version_query::build() {
+  return (std::string().setNum(_id) + cmd_ending());
 }
 
 /**
@@ -108,8 +108,8 @@ QByteArray version_query::build() {
  *
  *  @param[in] data The data of the request information.
  */
-void version_query::restore(QByteArray const& data) {
-  std::vector<QByteArray> list = data.split('\0').toVector().toStdVector();
+void version_query::restore(std::string const& data) {
+  std::vector<std::string> list = data.split('\0').toVector().toStdVector();
   if (list.size() != 1) {
     throw (engine_error() << "bad request argument.");
   }

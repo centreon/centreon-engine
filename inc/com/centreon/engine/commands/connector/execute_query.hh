@@ -52,8 +52,8 @@ namespace                    com {
 
 	    request*         clone() const;
 
-	    QByteArray       build();
-	    void             restore(QByteArray const& data);
+	    std::string       build();
+	    void             restore(std::string const& data);
 
 	    std::string const&   get_command() const throw();
             std::list<std::string> get_args() const throw();

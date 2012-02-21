@@ -20,7 +20,7 @@
 #ifndef CCE_COMMANDS_CONNECTOR_REQUEST_HH
 # define CCE_COMMANDS_CONNECTOR_REQUEST_HH
 
-# include <QByteArray>
+# include <string>
 
 namespace                            com {
   namespace                          centreon {
@@ -56,13 +56,13 @@ namespace                            com {
 	    bool                     operator==(request const& right) const throw();
 	    bool                     operator!=(request const& right) const throw();
 
-	    static QByteArray const& cmd_ending() throw();
+	    static std::string const& cmd_ending() throw();
 
 	    virtual e_type           get_id() const throw();
 
 	    virtual request*         clone() const = 0;
-	    virtual QByteArray       build() = 0;
-	    virtual void             restore(QByteArray const& data) = 0;
+	    virtual std::string       build() = 0;
+	    virtual void             restore(std::string const& data) = 0;
 
 	  protected:
 	    e_type                   _id;

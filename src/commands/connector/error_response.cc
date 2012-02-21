@@ -106,9 +106,9 @@ request* error_response::clone() const {
  *
  *  @return The data request.
  */
-QByteArray error_response::build() {
-  return (QByteArray().setNum(_id) + '\0' +
-	  QByteArray().setNum(_code) + '\0' +
+std::string error_response::build() {
+  return (std::string().setNum(_id) + '\0' +
+	  std::string().setNum(_code) + '\0' +
 	  _message.c_str() + cmd_ending());
 }
 
@@ -117,8 +117,8 @@ QByteArray error_response::build() {
  *
  *  @param[in] data The data of the request information.
  */
-void error_response::restore(QByteArray const& data) {
-  std::vector<QByteArray> list = data.split('\0').toVector().toStdVector();
+void error_response::restore(std::string const& data) {
+  std::vector<std::string> list = data.split('\0').toVector().toStdVector();
   if (list.size() != 3) {
     throw (engine_error() << "bad request argument.");
   }

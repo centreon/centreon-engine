@@ -153,7 +153,7 @@ unsigned long connector::command::run(std::string const& processed_cmd,
 
   _queries.insert(std::pair<unsigned long, request_info>(id, info));
 
-  _process->write(query->build());
+  _process->writeData(query->build());
 
   logger(dbg_commands, basic)
     << "connector \"" << _name << "\" start (id="
@@ -204,7 +204,7 @@ void connector::command::run(std::string const& processed_cmd,
   request_info info = { query, now, timeout, true };
   _queries.insert(std::pair<unsigned long, request_info>(id, info));
 
-  _process->write(query->build());
+  _process->writeData(query->build());
 
   logger(dbg_commands, basic)
     << "connector \"" << _name << "\" start (id="
@@ -349,24 +349,27 @@ void connector::command::_state_change(QProcess::ProcessState new_state) {
  *  Slot notify when process as output data.
  */
 void connector::command::_ready_read() {
-  std::list<QByteArray> responses;
+  std::list<std::string> responses;
 
   {
     QMutexLocker locker(&_mutex);
 
     _read_data += _process->readAllStandardOutput();
     while (_read_data.size() > 0) {
+      /*
+        // XXX: todo.
       int pos = _read_data.indexOf(request::cmd_ending());
       if (pos < 0) {
 	break;
       }
       responses.push_back(_read_data.left(pos));
       _read_data.remove(0, pos + request::cmd_ending().size());
+      */
     }
   }
 
   request_builder& req_builder = request_builder::instance();
-  for (std::list<QByteArray>::const_iterator it = responses.begin(),
+  for (std::list<std::string>::const_iterator it = responses.begin(),
          end = responses.end();
        it != end;
        ++it) {
@@ -417,7 +420,7 @@ void connector::command::_start() {
 	  this, SLOT(_state_change(QProcess::ProcessState)));
 
   version_query version;
-  _process->write(version.build());
+  _process->writeData(version.build());
 
   QEventLoop loop;
   connect(this, SIGNAL(_wait_ending()), &loop, SLOT(quit()));
@@ -434,7 +437,7 @@ void connector::command::_start() {
          end = _queries.end();
        it != end;
        ++it)
-    _process->write(it->second.req->build());
+    _process->writeData(it->second.req->build());
 
   logger(log_info_message, basic)
     << "connector \"" << _name << "\" start.";
@@ -464,7 +467,7 @@ void connector::command::_exit() {
   QTimer::singleShot(5000, &loop, SLOT(quit()));
 
   quit_query quit;
-  _process->write(quit.build());
+  _process->writeData(quit.build());
 
   locker.unlock();
   loop.exec();

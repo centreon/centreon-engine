@@ -17,6 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <sstream>
 #include "globals.hh"
 #include "engine.hh"
 #include "logging/dumpers.hh"
@@ -28,8 +29,7 @@ static inline char const* checkstr(char const* str) throw() {
 }
 
 void logging::dump_object_list() {
-  QByteArray data;
-  QTextStream stream(&data);
+  std::ostringstream stream;
 
   stream << scheduling_info;
 
@@ -69,8 +69,7 @@ void logging::dump_object_list() {
   for (hostescalation const* obj = hostescalation_list; obj != NULL; obj = obj->next)
     stream << *obj;
 
-  stream.flush();
-  logger(dbg_functions, basic) << data.constData();
+  logger(dbg_functions, basic) << stream.str();
 }
 
 QTextStream& logging::operator<<(QTextStream& stream, host const& obj) {

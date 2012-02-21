@@ -143,8 +143,8 @@ Q_PID basic_process::pid() const {
  *
  *  @return The data.
  */
-QByteArray basic_process::readAllStandardError() {
-  QByteArray error(_standard_error);
+std::string basic_process::readAllStandardError() {
+  std::string error(_standard_error);
   _standard_error.clear();
   return (error);
 }
@@ -154,8 +154,8 @@ QByteArray basic_process::readAllStandardError() {
  *
  *  @return The data.
  */
-QByteArray basic_process::readAllStandardOutput() {
-  QByteArray output(_standard_output);
+std::string basic_process::readAllStandardOutput() {
+  std::string output(_standard_output);
   _standard_output.clear();
   return (output);
 }
@@ -358,7 +358,7 @@ std::string basic_process::workingDirectory() const {
  *  @return The number of bytes available.
  */
 qint64 basic_process::bytesAvailable() const {
-  QByteArray const* buffer(_channel == QProcess::StandardOutput
+  std::string const* buffer(_channel == QProcess::StandardOutput
                            ? &_standard_output
                            : &_standard_error);
   return (QIODevice::bytesAvailable() + buffer->size());
@@ -389,8 +389,8 @@ bool basic_process::isSequential() const {
  */
 bool basic_process::canReadLine() const {
   QBuffer buffer(_channel == QProcess::StandardOutput
-                 ? const_cast<QByteArray*>(&_standard_output)
-                 : const_cast<QByteArray*>(&_standard_error));
+                 ? const_cast<std::string*>(&_standard_output)
+                 : const_cast<std::string*>(&_standard_error));
   return (buffer.canReadLine() || QIODevice::canReadLine());
 }
 
@@ -413,7 +413,7 @@ void basic_process::close() {
  *  data are read, othrewise false.
  */
 bool basic_process::atEnd() const {
-  QByteArray const* buffer(_channel == QProcess::StandardOutput
+  std::string const* buffer(_channel == QProcess::StandardOutput
                            ? &_standard_output
                            : &_standard_error);
   return (QIODevice::atEnd() && (!isOpen() || buffer->isEmpty()));
@@ -465,7 +465,7 @@ void basic_process::setupChildProcess() {
  *  @return Return the number of bytes read.
  */
 qint64 basic_process::readData(char* data, qint64 maxlen) {
-  QByteArray* buffer(_channel == QProcess::StandardOutput
+  std::string* buffer(_channel == QProcess::StandardOutput
                      ? &_standard_output
                      : &_standard_error);
   qint64 to_read(qMin((int)maxlen, buffer->size()));
@@ -486,6 +486,17 @@ qint64 basic_process::readData(char* data, qint64 maxlen) {
  */
 qint64 basic_process::writeData(char const* data, qint64 len) {
   return (::write(_pipe_in[1], data, len));
+}
+
+/**
+ *  Write data on the standard input.
+ *
+ *  @param[in] data The buffer to write.
+ *
+ *  @return Return the number of bytes written.
+ */
+qint64 basic_process::writeData(std::string const& data) {
+  return (::write(_pipe_in[1], data.c_str(), data.size()));
 }
 
 /**
@@ -679,14 +690,14 @@ void basic_process::_emit_finished() {
 }
 
 /**
- *  Internal read to fill a QByteArray.
+ *  Internal read to fill a std::string.
  *
  *  @param[in] fd  The file descriptor to read.
  *  @param[in] str The buffer to fill.
  *
  *  @return True if data was read, otherwise false.
  */
-bool basic_process::_read(int fd, QByteArray* str) {
+bool basic_process::_read(int fd, std::string* str) {
   qint64 len(_available_bytes(fd));
   if (len <= 0)
     return (false);

@@ -22,7 +22,7 @@
 /*********** COMMON HEADER FILES ***********/
 
 #include <QTextStream>
-#include <QByteArray>
+#include <string>
 #include <sstream>
 #include <stdlib.h>
 #include <stdio.h>
@@ -201,7 +201,7 @@ int xrddefault_save_state_information(void) {
   unsigned long contact_service_attribute_mask = config.get_retained_contact_service_attribute_mask();
   unsigned long contact_attribute_mask = 0L;
 
-  QByteArray data;
+  std::string data;
   QTextStream stream(&data);
 
   /* write version info to status file */
