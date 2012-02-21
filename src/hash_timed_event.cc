@@ -59,31 +59,48 @@ hash_timed_event& hash_timed_event::operator=(hash_timed_event const& right) {
 /**
  *  Clear hash list.
  *
- *  @param[in] p  The hash list to clear.
+ *  @param[in] p  The hash list priority to clear.
  */
 void hash_timed_event::clear(priority p) {
-  _hevent[p].clear();
+  _hevent[service_check][p].clear();
+  _hevent[host_check][p].clear();
+}
+
+/**
+ *  Clear hash list.
+ *
+ *  @param[in] p  The hash list priority to clear.
+ *  @param[in] t  The hash list type to clear.
+ */
+void hash_timed_event::clear(priority p, type t) {
+  _hevent[t][p].clear();
 }
 
 /**
  *  Remove timed event.
  *
+ *  @param[in] p      The hash list priority.
  *  @param[in] event  The event to remove.
  */
 void hash_timed_event::erase(priority p, timed_event* event) {
   if (!event)
     return;
-  _hevent[p].erase(event->event_data);
+  if (event->event_type == EVENT_SERVICE_CHECK)
+    _hevent[service_check][p].erase(event->event_data);
+  else if (event->event_type == EVENT_HOST_CHECK)
+    _hevent[host_check][p].erase(event->event_data);
 }
 
 /**
  *  Find an event with it's data.
  *
+ *  @param[in] p    The hash list priority.
+ *  @param[in] t    The hash list priority.
  *  @param[in] ptr  The event data.
  */
-timed_event* hash_timed_event::find(priority p, void* ptr) {
-  htable::iterator it(_hevent[p].find(ptr));
-  if (it == _hevent[p].end())
+timed_event* hash_timed_event::find(priority p, type t, void* ptr) {
+  htable::iterator it(_hevent[t][p].find(ptr));
+  if (it == _hevent[t][p].end())
     return (NULL);
   return (it->second);
 }
@@ -91,12 +108,16 @@ timed_event* hash_timed_event::find(priority p, void* ptr) {
 /**
  *  Add timed event.
  *
+ *  @param[in] p      The hash list priority.
  *  @param[in] event  The event to add.
  */
 void hash_timed_event::insert(priority p, timed_event* event) {
   if (!event || !event->event_data)
     return;
-  _hevent[p][event->event_data] = event;
+  if (event->event_type == EVENT_SERVICE_CHECK)
+    _hevent[service_check][p][event->event_data] = event;
+  else if (event->event_type == EVENT_HOST_CHECK)
+    _hevent[host_check][p][event->event_data] = event;
 }
 
 /**
@@ -108,8 +129,10 @@ void hash_timed_event::insert(priority p, timed_event* event) {
  */
 hash_timed_event& hash_timed_event::_internal_copy(hash_timed_event const& right) {
   if (this != &right) {
-    _hevent[0] = right._hevent[0];
-    _hevent[1] = right._hevent[1];
+    _hevent[service_check][low] = right._hevent[service_check][low];
+    _hevent[service_check][high] = right._hevent[service_check][high];
+    _hevent[host_check][low] = right._hevent[host_check][low];
+    _hevent[host_check][high] = right._hevent[host_check][high];
   }
   return (*this);
 }
