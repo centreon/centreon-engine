@@ -830,7 +830,6 @@ int grab_custom_object_macro(char* macro_name,
 char const* clean_macro_chars(char* macro, int options) {
   int x = 0;
   int y = 0;
-  int z = 0;
   int ch = 0;
   int len = 0;
 
