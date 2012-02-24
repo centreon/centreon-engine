@@ -25,6 +25,31 @@
 #define HOST_TIMEOUT_OUTPUT "(Host Check Timed Out)\n"
 #define SERVICE_TIMEOUT_OUTPUT "(Service Check Timed Out)\n"
 
+/**
+ *  Helper signal handler function.
+ *
+ *  @param[in] msg  Message to write on output.
+ *  @param[in] size Size of msg.
+ *  @param[in] ret  Exit code.
+ */
+static void sighandler_helper(
+              char const* msg,
+              unsigned int size,
+              int ret) {
+  // Write output.
+  ssize_t wb(42);
+  while ((wb > 0) && size) {
+    wb = write(STDOUT_FILENO, msg, size);
+    size -= wb;
+    msg += wb;
+  }
+
+  // Exit.
+  _Exit(ret);
+
+  return ;
+}
+
 extern "C" {
   /**
    *  Handle timeouts when executing host checks.
@@ -33,20 +58,10 @@ extern "C" {
    */
   void host_check_sighandler(int sig) {
     (void)sig;
-
-    // Write output.
-    char const* output(HOST_TIMEOUT_OUTPUT);
-    size_t size(sizeof(HOST_TIMEOUT_OUTPUT) - 1);
-    ssize_t wb(42);
-    while ((wb > 0) && size) {
-      wb = write(STDOUT_FILENO, output, size);
-      size -= wb;
-      output += wb;
-    }
-
-    // Exit.
-    _Exit(STATE_CRITICAL);
-
+    sighandler_helper(
+      HOST_TIMEOUT_OUTPUT,
+      sizeof(HOST_TIMEOUT_OUTPUT) - 1,
+      STATE_CRITICAL);
     return ;
   }
 
@@ -57,10 +72,7 @@ extern "C" {
    */
   void my_system_sighandler(int sig) {
     (void)sig;
-
-    // Exit.
-    _Exit(STATE_CRITICAL);
-
+    sighandler_helper(NULL, 0, STATE_CRITICAL);
     return ;
   }
 
@@ -71,20 +83,10 @@ extern "C" {
    */
   void service_check_sighandler(int sig) {
     (void)sig;
-
-    // Write output.
-    char const* output(SERVICE_TIMEOUT_OUTPUT);
-    size_t size(sizeof(SERVICE_TIMEOUT_OUTPUT) - 1);
-    ssize_t wb(42);
-    while ((wb > 0) && size) {
-      wb = write(STDOUT_FILENO, output, size);
-      size -= wb;
-      output += wb;
-    }
-
-    // Exit.
-    _Exit(STATE_UNKNOWN);
-
+    sighandler_helper(
+      SERVICE_TIMEOUT_OUTPUT,
+      sizeof(SERVICE_TIMEOUT_OUTPUT) - 1,
+      STATE_UNKNOWN);
     return ;
   }
 }
