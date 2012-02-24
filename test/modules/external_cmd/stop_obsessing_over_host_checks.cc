@@ -1,5 +1,5 @@
 /*
-** Copyright 2011 Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -17,36 +17,28 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <exception>
 #include <QCoreApplication>
 #include <QDebug>
-#include <exception>
-#include "test/unittest.hh"
-#include "logging/engine.hh"
-#include "error.hh"
+#include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/logging/engine.hh"
 #include "commands.hh"
-#include "globals.hh"
+#include "test/unittest.hh"
 
 using namespace com::centreon::engine;
 
 /**
  *  Run stop_obsessing_over_host_checks test.
  */
-static void check_stop_obsessing_over_host_checks() {
+static int check_stop_obsessing_over_host_checks() {
   config.set_obsess_over_hosts(true);
   char const* cmd("[1317196300] STOP_OBSESSING_OVER_HOST_CHECKS");
   process_external_command(cmd);
 
   if (config.get_obsess_over_hosts())
     throw (engine_error() << "stop_obsessing_over_host_checks failed.");
-}
 
-/**
- *  Check processing of stop_obsessing_over_host_checks works.
- */
-int main_test() {
-  logging::engine& engine = logging::engine::instance();
-  check_stop_obsessing_over_host_checks();
-  engine.cleanup();
   return (0);
 }
 
@@ -55,7 +47,7 @@ int main_test() {
  */
 int main(int argc, char** argv) {
   QCoreApplication app(argc, argv);
-  unittest utest(&main_test);
+  unittest utest(&check_stop_obsessing_over_host_checks);
   QObject::connect(&utest, SIGNAL(finished()), &app, SLOT(quit()));
   utest.start();
   app.exec();

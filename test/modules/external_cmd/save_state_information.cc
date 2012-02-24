@@ -1,5 +1,5 @@
 /*
-** Copyright 2011 Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -17,18 +17,18 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <exception>
 #include <QCoreApplication>
 #include <QDebug>
-#include <exception>
-#include "test/unittest.hh"
-#include "logging/engine.hh"
-#include "error.hh"
+#include "com/centreon/engine/broker.hh"
+#include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/logging/engine.hh"
+#include "com/centreon/engine/nebstructs.hh"
 #include "commands.hh"
-#include "globals.hh"
+#include "test/unittest.hh"
 
 using namespace com::centreon::engine;
-#include "broker.hh"
-#include "nebstructs.hh"
 
 /**
  *  callback used by broker.
@@ -54,7 +54,7 @@ static int broker_callback(int callback_type, void* data) {
 /**
  *  Run save_state_information test.
  */
-static void check_save_state_information() {
+static int check_save_state_information() {
   config.set_retain_state_information(true);
 
   // register broker callback to catch event.
@@ -73,15 +73,7 @@ static void check_save_state_information() {
 
   // release callback.
   neb_deregister_module_callbacks(module_id);
-}
 
-/**
- *  Check processing of save_state_information works.
- */
-int main_test() {
-  logging::engine& engine = logging::engine::instance();
-  check_save_state_information();
-  engine.cleanup();
   return (0);
 }
 
@@ -90,7 +82,7 @@ int main_test() {
  */
 int main(int argc, char** argv) {
   QCoreApplication app(argc, argv);
-  unittest utest(&main_test);
+  unittest utest(&check_save_state_information);
   QObject::connect(&utest, SIGNAL(finished()), &app, SLOT(quit()));
   utest.start();
   app.exec();

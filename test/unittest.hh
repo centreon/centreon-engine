@@ -18,16 +18,16 @@
 */
 
 #ifndef TEST_UNITTEST_HH
-# define TEST_UNITTEST_HH
+#  define TEST_UNITTEST_HH
 
-# include <QThread>
-# include <QDebug>
-# include "broker/compatibility.hh"
-# include "broker/loader.hh"
-# include "checks/checker.hh"
-# include "commands/set.hh"
-# include "logging/engine.hh"
-# include "events/loop.hh"
+#  include <QDebug>
+#  include <QThread>
+#  include "com/centreon/engine/broker/compatibility.hh"
+#  include "com/centreon/engine/broker/loader.hh"
+#  include "com/centreon/engine/checks/checker.hh"
+#  include "com/centreon/engine/commands/set.hh"
+#  include "com/centreon/engine/events/loop.hh"
+#  include "com/centreon/engine/logging/engine.hh"
 
 namespace     com {
   namespace   centreon {
@@ -40,16 +40,14 @@ namespace     com {
        */
       class   unittest : public QThread {
       public:
-        unittest(int (*func)())
-          : QThread(), _func(func), _ret(1) {
+              unittest(int (*func)())
+          : QThread(), _func(func), _ret(1) {}
 
-        }
-
-        ~unittest() throw() {
+              ~unittest() throw () {
           wait();
         }
 
-        int   ret() const throw() {
+        int   ret() const throw () {
           return (_ret);
         }
 

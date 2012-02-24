@@ -1,5 +1,5 @@
 /*
-** Copyright 2011 Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -17,21 +17,21 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <exception>
 #include <QCoreApplication>
 #include <QDebug>
-#include <exception>
-#include "test/unittest.hh"
-#include "logging/engine.hh"
-#include "error.hh"
+#include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/logging/engine.hh"
 #include "commands.hh"
-#include "globals.hh"
+#include "test/unittest.hh"
 
 using namespace com::centreon::engine;
 
 /**
  *  Run enable_svc_event_handler test.
  */
-static void check_enable_svc_event_handler() {
+static int check_enable_svc_event_handler() {
   init_object_skiplists();
 
   service* svc = add_service("name", "description", NULL,
@@ -57,15 +57,7 @@ static void check_enable_svc_event_handler() {
   delete svc;
 
   free_object_skiplists();
-}
 
-/**
- *  Check processing of enable_svc_event_handler works.
- */
-int main_test() {
-  logging::engine& engine = logging::engine::instance();
-  check_enable_svc_event_handler();
-  engine.cleanup();
   return (0);
 }
 
@@ -74,7 +66,7 @@ int main_test() {
  */
 int main(int argc, char** argv) {
   QCoreApplication app(argc, argv);
-  unittest utest(&main_test);
+  unittest utest(&check_enable_svc_event_handler);
   QObject::connect(&utest, SIGNAL(finished()), &app, SLOT(quit()));
   utest.start();
   app.exec();

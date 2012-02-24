@@ -76,8 +76,6 @@ using namespace com::centreon::engine::logging;
 int main(int argc, char** argv) {
   QCoreApplication app(argc, argv);
 
-  configuration::applier::logging apply_log;
-
   int error = FALSE;
   int display_license = FALSE;
   int display_help = FALSE;
@@ -217,6 +215,7 @@ int main(int argc, char** argv) {
   }
 
   // We're just verifying the configuration.
+  configuration::applier::logging apply_log;
   int result = ERROR;
   if (TRUE == verify_config) {
     // Reset program variables.

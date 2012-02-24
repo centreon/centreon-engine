@@ -1,5 +1,5 @@
 /*
-** Copyright 2011 Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -17,23 +17,23 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <QTemporaryFile>
-#include <QString>
+#include <exception>
 #include <QCoreApplication>
 #include <QDebug>
-#include <exception>
-#include "test/unittest.hh"
-#include "logging/engine.hh"
-#include "error.hh"
+#include <QString>
+#include <QTemporaryFile>
+#include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/logging/engine.hh"
 #include "commands.hh"
-#include "globals.hh"
+#include "test/unittest.hh"
 
 using namespace com::centreon::engine;
 
 /**
  *  Run process_file test.
  */
-static void check_process_file() {
+static int check_process_file() {
   QTemporaryFile tmp("external_commands.cmd");
   if (!tmp.open())
     throw (engine_error() << "impossible to create temporary file.");
@@ -46,15 +46,7 @@ static void check_process_file() {
 
   if (!config.get_enable_notifications())
     throw (engine_error() << "process_file failed.");
-}
 
-/**
- *  Check processing of process_file works.
- */
-int main_test() {
-  logging::engine& engine = logging::engine::instance();
-  check_process_file();
-  engine.cleanup();
   return (0);
 }
 
@@ -63,7 +55,7 @@ int main_test() {
  */
 int main(int argc, char** argv) {
   QCoreApplication app(argc, argv);
-  unittest utest(&main_test);
+  unittest utest(&check_process_file);
   QObject::connect(&utest, SIGNAL(finished()), &app, SLOT(quit()));
   utest.start();
   app.exec();

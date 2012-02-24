@@ -17,13 +17,13 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <exception>
 #include <QCoreApplication>
 #include <QDebug>
-#include <exception>
-#include "com/centreon/engine/commands.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/engine.hh"
+#include "commands.hh"
 #include "test/unittest.hh"
 
 using namespace com::centreon::engine;
@@ -31,7 +31,7 @@ using namespace com::centreon::engine;
 /**
  *  Run stop_obsessing_over_svc test.
  */
-static void check_stop_obsessing_over_svc() {
+static int check_stop_obsessing_over_svc() {
   init_object_skiplists();
 
   service* svc = add_service("name", "description", NULL,
@@ -57,14 +57,7 @@ static void check_stop_obsessing_over_svc() {
   delete svc;
 
   free_object_skiplists();
-}
 
-/**
- *  Check processing of stop_obsessing_over_svc works.
- */
-int main_test() {
-  logging::engine::instance();
-  check_stop_obsessing_over_svc();
   return (0);
 }
 
@@ -73,7 +66,7 @@ int main_test() {
  */
 int main(int argc, char** argv) {
   QCoreApplication app(argc, argv);
-  unittest utest(&main_test);
+  unittest utest(&check_stop_obsessing_over_svc);
   QObject::connect(&utest, SIGNAL(finished()), &app, SLOT(quit()));
   utest.start();
   app.exec();

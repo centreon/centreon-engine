@@ -1,5 +1,5 @@
 /*
-** Copyright 2011 Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -17,35 +17,27 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <exception>
 #include <QCoreApplication>
 #include <QDebug>
-#include <exception>
-#include "test/unittest.hh"
-#include "logging/engine.hh"
-#include "error.hh"
+#include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/logging/engine.hh"
 #include "commands.hh"
-#include "globals.hh"
+#include "test/unittest.hh"
 
 using namespace com::centreon::engine;
 
 /**
  *  Run restart_program test.
  */
-static void check_restart_program() {
+static int check_restart_program() {
   char const* cmd("[1317196300] RESTART_PROGRAM");
   process_external_command(cmd);
 
   if (!event_list_high)
     throw (engine_error() << "restart_program failed.");
-}
 
-/**
- *  Check processing of restart_program works.
- */
-int main_test() {
-  logging::engine& engine = logging::engine::instance();
-  check_restart_program();
-  engine.cleanup();
   return (0);
 }
 
@@ -54,7 +46,7 @@ int main_test() {
  */
 int main(int argc, char** argv) {
   QCoreApplication app(argc, argv);
-  unittest utest(&main_test);
+  unittest utest(&check_restart_program);
   QObject::connect(&utest, SIGNAL(finished()), &app, SLOT(quit()));
   utest.start();
   app.exec();

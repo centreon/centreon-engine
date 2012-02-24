@@ -1,5 +1,5 @@
 /*
-** Copyright 2011 Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -17,36 +17,31 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <exception>
 #include <QCoreApplication>
 #include <QDebug>
-#include <exception>
-#include "test/unittest.hh"
-#include "logging/engine.hh"
-#include "error.hh"
+#include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/logging/engine.hh"
 #include "commands.hh"
-#include "globals.hh"
+#include "test/unittest.hh"
 
 using namespace com::centreon::engine;
 
 /**
  *  Run enter_standby_mode test.
  */
-static void check_enter_standby_mode() {
+static int check_enter_standby_mode() {
+  // Action.
   enable_notifications = true;
   char const* cmd("[1317196300] ENTER_STANDBY_MODE");
   process_external_command(cmd);
 
+  // Result.
   if (enable_notifications)
-    throw (engine_error() << "enter_standby_mode failed.");
-}
+    throw (engine_error() << "enter_standby_mode failed");
 
-/**
- *  Check processing of enter_standby_mode works.
- */
-int main_test() {
-  logging::engine& engine = logging::engine::instance();
-  check_enter_standby_mode();
-  engine.cleanup();
+  // Success.
   return (0);
 }
 
@@ -55,7 +50,7 @@ int main_test() {
  */
 int main(int argc, char** argv) {
   QCoreApplication app(argc, argv);
-  unittest utest(&main_test);
+  unittest utest(&check_enter_standby_mode);
   QObject::connect(&utest, SIGNAL(finished()), &app, SLOT(quit()));
   utest.start();
   app.exec();

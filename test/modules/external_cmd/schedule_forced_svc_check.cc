@@ -1,5 +1,5 @@
 /*
-** Copyright 2011 Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -17,21 +17,21 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <exception>
 #include <QCoreApplication>
 #include <QDebug>
-#include <exception>
-#include "test/unittest.hh"
-#include "logging/engine.hh"
-#include "error.hh"
+#include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/logging/engine.hh"
 #include "commands.hh"
-#include "globals.hh"
+#include "test/unittest.hh"
 
 using namespace com::centreon::engine;
 
 /**
  *  Run schedule_forced_svc_check test.
  */
-static void check_schedule_forced_svc_check() {
+static int check_schedule_forced_svc_check() {
   init_object_skiplists();
 
   service* svc = add_service("name", "description", NULL,
@@ -58,15 +58,7 @@ static void check_schedule_forced_svc_check() {
   delete svc;
 
   free_object_skiplists();
-}
 
-/**
- *  Check processing of schedule_forced_svc_check works.
- */
-int main_test() {
-  logging::engine& engine = logging::engine::instance();
-  check_schedule_forced_svc_check();
-  engine.cleanup();
   return (0);
 }
 
@@ -75,7 +67,7 @@ int main_test() {
  */
 int main(int argc, char** argv) {
   QCoreApplication app(argc, argv);
-  unittest utest(&main_test);
+  unittest utest(&check_schedule_forced_svc_check);
   QObject::connect(&utest, SIGNAL(finished()), &app, SLOT(quit()));
   utest.start();
   app.exec();

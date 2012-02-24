@@ -17,36 +17,28 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <exception>
 #include <QCoreApplication>
 #include <QDebug>
-#include <exception>
-#include "test/unittest.hh"
-#include "com/centreon/engine/commands.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/engine.hh"
+#include "commands.hh"
+#include "test/unittest.hh"
 
 using namespace com::centreon::engine;
 
 /**
  *  Run stop_obsessing_over_svc_checks test.
  */
-static void check_stop_obsessing_over_svc_checks() {
+static int check_stop_obsessing_over_svc_checks() {
   config.set_obsess_over_services(true);
   char const* cmd("[1317196300] STOP_OBSESSING_OVER_SVC_CHECKS");
   process_external_command(cmd);
 
   if (config.get_obsess_over_services())
     throw (engine_error() << "stop_obsessing_over_svc_checks failed.");
-}
 
-/**
- *  Check processing of stop_obsessing_over_svc_checks works.
- */
-int main_test() {
-  logging::engine::load();
-  check_stop_obsessing_over_svc_checks();
-  logging::engine::unload();
   return (0);
 }
 
@@ -55,7 +47,7 @@ int main_test() {
  */
 int main(int argc, char** argv) {
   QCoreApplication app(argc, argv);
-  unittest utest(&main_test);
+  unittest utest(&check_stop_obsessing_over_svc_checks);
   QObject::connect(&utest, SIGNAL(finished()), &app, SLOT(quit()));
   utest.start();
   app.exec();

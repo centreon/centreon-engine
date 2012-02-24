@@ -17,21 +17,21 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <exception>
 #include <QCoreApplication>
 #include <QDebug>
-#include <exception>
-#include "test/unittest.hh"
-#include "logging/engine.hh"
+#include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/logging/engine.hh"
 #include "commands.hh"
-#include "globals.hh"
-#include "error.hh"
+#include "test/unittest.hh"
 
 using namespace com::centreon::engine;
 
 /**
  *  Run acknowledge_svc_problem test.
  */
-static void check_acknowledge_svc_problem() {
+static int check_acknowledge_svc_problem() {
   init_object_skiplists();
 
   host* hst = add_host("name", NULL, NULL, "localhost", NULL, 0, 0.0, 0.0, 42,
@@ -72,15 +72,7 @@ static void check_acknowledge_svc_problem() {
   delete hst;
 
   free_object_skiplists();
-}
 
-/**
- *  Check processing of acknowledge_svc_problem works.
- */
-int main_test() {
-  logging::engine::load();
-  check_acknowledge_svc_problem();
-  logging::engine::unload();
   return (0);
 }
 
@@ -89,7 +81,7 @@ int main_test() {
  */
 int main(int argc, char** argv) {
   QCoreApplication app(argc, argv);
-  unittest utest(&main_test);
+  unittest utest(&check_acknowledge_svc_problem);
   QObject::connect(&utest, SIGNAL(finished()), &app, SLOT(quit()));
   utest.start();
   app.exec();

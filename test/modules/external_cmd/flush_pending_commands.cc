@@ -1,5 +1,5 @@
 /*
-** Copyright 2011 Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -17,33 +17,24 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <exception>
 #include <QCoreApplication>
 #include <QDebug>
-#include <exception>
-#include "test/unittest.hh"
-#include "logging/engine.hh"
-#include "error.hh"
+#include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/logging/engine.hh"
 #include "commands.hh"
-#include "globals.hh"
+#include "test/unittest.hh"
 
 using namespace com::centreon::engine;
 
 /**
  *  Run flush_pending_commands test.
  */
-static void check_flush_pending_commands() {
+static int check_flush_pending_commands() {
   char const* cmd("[1317196300] FLUSH_PENDING_COMMANDS");
   process_external_command(cmd);
-  // flush_pending_commands do nothing.
-}
-
-/**
- *  Check processing of flush_pending_commands works.
- */
-int main_test() {
-  logging::engine& engine = logging::engine::instance();
-  check_flush_pending_commands();
-  engine.cleanup();
+  // We have no way to detect whether this worked or not.
   return (0);
 }
 
@@ -52,7 +43,7 @@ int main_test() {
  */
 int main(int argc, char** argv) {
   QCoreApplication app(argc, argv);
-  unittest utest(&main_test);
+  unittest utest(&check_flush_pending_commands);
   QObject::connect(&utest, SIGNAL(finished()), &app, SLOT(quit()));
   utest.start();
   app.exec();
