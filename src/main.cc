@@ -365,12 +365,14 @@ int main(int argc, char** argv) {
           << "error while processing a config file: " << e.what();
       }
 
-      /* NOTE 11/06/07 EG moved to after we read config files, as user may have overridden timezone offset */
-      /* get program (re)start time and save as macro */
+      // Get program (re)start time and save as macro. Needs to be done
+      // after we read config files, as user may have overridden
+      // timezone offset.
       program_start = time(NULL);
-      delete[] mac->x[MACRO_PROCESSSTARTTIME];
+      delete [] mac->x[MACRO_PROCESSSTARTTIME];
       try {
-        mac->x[MACRO_PROCESSSTARTTIME] = obj2pchar<unsigned long>(program_start);
+        mac->x[MACRO_PROCESSSTARTTIME]
+          = obj2pchar<unsigned long>(program_start);
       }
       catch (...) {
         cleanup();
@@ -500,16 +502,18 @@ int main(int argc, char** argv) {
 
       // Get event start time and save as macro.
       event_start = time(NULL);
-      delete[] mac->x[MACRO_EVENTSTARTTIME];
+      delete [] mac->x[MACRO_EVENTSTARTTIME];
       try {
-        mac->x[MACRO_EVENTSTARTTIME] = obj2pchar<unsigned long>(event_start);
+        mac->x[MACRO_EVENTSTARTTIME]
+          = obj2pchar<unsigned long>(event_start);
       }
-      catch(...) {
+      catch (...) {
         // Send program data to broker.
-        broker_program_state(NEBTYPE_PROCESS_SHUTDOWN,
-                             NEBFLAG_PROCESS_INITIATED,
-                             NEBATTR_SHUTDOWN_ABNORMAL,
-                             NULL);
+        broker_program_state(
+          NEBTYPE_PROCESS_SHUTDOWN,
+          NEBFLAG_PROCESS_INITIATED,
+          NEBATTR_SHUTDOWN_ABNORMAL,
+          NULL);
         cleanup();
       }
 
@@ -600,7 +604,9 @@ int main(int argc, char** argv) {
     } while (sigrestart == TRUE && sigshutdown == FALSE);
 
     // Free misc memory.
-    delete[] config_file;
+    delete [] config_file;
+    delete [] mac->x[MACRO_PROCESSSTARTTIME];
+    delete [] mac->x[MACRO_EVENTSTARTTIME];
   }
 
   // unload singleton.
