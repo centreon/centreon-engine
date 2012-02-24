@@ -25,7 +25,7 @@
 #  endif // CCE_BEGIN
 #  define CCE_BEGIN() namespace com { \
                         namespace centreon { \
-                          namespace broker {
+                          namespace engine {
 
 #  ifdef CCE_END
 #    undef CCE_END
