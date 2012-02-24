@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2012 Merethis
+** Copyright 2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -17,9 +17,19 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef CCE_COMPATIBILITY_NEBMODULES_H
-# define CCE_COMPATIBILITY_NEBMODULES_H
+#ifndef CCE_COMPATIBILITY_EMBEDDED_PERL_H
+#  define CCE_COMPATIBILITY_EMBEDDED_PERL_H
 
-# include "com/centreon/engine/nebmodules.hh"
+#  ifdef __cplusplus
+extern "C" {
+#  endif // C++
 
-#endif // !CCE_COMPATIBILITY_NEBMODULES_H
+int deinit_embedded_perl();
+int file_uses_embedded_perl(void const* param);
+int init_embedded_perl(void const* param);
+
+#  ifdef __cplusplus
+}
+#  endif // C++
+
+#endif // !CCE_COMPATIBILITY_EMBEDDED_PERL_H

@@ -118,7 +118,7 @@ char* my_strsep(char** stringp, char const* delim) {
 }
 
 /* open a file read-only via mmap() */
-mmapfile* mmap_fopen(char* filename) {
+mmapfile* mmap_fopen(char const* filename) {
   int fd = 0;
   void* mmap_buf = NULL;
   struct stat statbuf;

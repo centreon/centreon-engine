@@ -1,6 +1,6 @@
 /*
 ** Copyright 1999-2011 Ethan Galstad
-** Copyright 2011      Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -45,7 +45,7 @@ typedef struct  mmapfile_struct {
 char* my_strdup(char const* str);
 char* my_strtok(char const* buffer, char const* tokens);
 char* my_strsep(char** stringp, const char* delim);
-mmapfile* mmap_fopen(char* filename);
+mmapfile* mmap_fopen(char const* filename);
 int mmap_fclose(mmapfile* temp_mmapfile);
 char* mmap_fgets(mmapfile* temp_mmapfile);
 char* mmap_fgets_multiline(mmapfile*  temp_mmapfile);

@@ -23,8 +23,11 @@
 #ifndef CCE_COMPATIBILITY_NAGIOS_H
 # define CCE_COMPATIBILITY_NAGIOS_H
 
+# include "check_result.h"
 # include "config.h"
+# include "embedded_perl.h"
 # include "logging.h"
+# include "sighandlers.h"
 # include "common.h"
 # include "locations.h"
 # include "objects.h"
@@ -53,32 +56,5 @@
 
 # define ILF_USER  0 /* user-specified interleave factor */
 # define ILF_SMART 1 /* smart interleave */
-
-# ifdef __cplusplus
-extern "C" {
-# endif
-
-
-int init_embedded_perl(char** env);       // initialized embedded perl interpreter
-int deinit_embedded_perl(void);           // cleans up embedded perl
-int file_uses_embedded_perl(char* fname); // tests whether or not the embedded perl interpreter should be used on a file
-
-void service_check_sighandler(int sig);   // handles timeouts when executing service checks
-void host_check_sighandler(int sig);      // handles timeouts when executing host checks
-void my_system_sighandler(int sig);
-
-// IPC Functions
-int process_check_result_queue(char const* dirname);
-int process_check_result_file(char* fname);
-int delete_check_result_file(char const* fname);
-check_result* read_check_result(void);     // reads a host/service check result from the list in memory
-int init_check_result(check_result* info);
-int add_check_result_to_list(check_result* new_cr);
-int free_check_result_list(void);
-int move_check_result_to_queue(char* checkresult_file);
-
-# ifdef __cplusplus
-}
-# endif
 
 #endif /* !CCE_COMPATIBILITY_NAGIOS_H */

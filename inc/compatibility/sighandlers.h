@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2012 Merethis
+** Copyright 2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -17,9 +17,19 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef CCE_COMPATIBILITY_NEBMODULES_H
-# define CCE_COMPATIBILITY_NEBMODULES_H
+#ifndef CCE_COMPATIBILITY_SIGHANDLERS_H
+#  define CCE_COMPATIBILITY_SIGHANDLERS_H
 
-# include "com/centreon/engine/nebmodules.hh"
+#  ifdef __cplusplus
+extern "C" {
+#  endif // C++
 
-#endif // !CCE_COMPATIBILITY_NEBMODULES_H
+void host_check_sighandler(int sig);
+void my_system_sighandler(int sig);
+void service_check_sighandler(int sig);
+
+#  ifdef __cplusplus
+}
+#  endif // C++
+
+#endif // !CCE_COMPATIBILITY_SIGHANDLERS_H

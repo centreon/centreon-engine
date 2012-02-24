@@ -1,5 +1,5 @@
 /*
-** Copyright 2011 Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -120,16 +120,15 @@ logging& logging::operator=(logging& right) {
  *  @param[in] config The new configuration.
  */
 void logging::apply(state const& config) {
-  if (config.get_use_syslog() == true && _syslog_id == 0) {
+  // Syslog.
+  if (config.get_use_syslog() == true && _syslog_id == 0)
     _add_syslog();
-  }
-  else if (config.get_use_syslog() == false && _syslog_id != 0) {
+  else if (config.get_use_syslog() == false && _syslog_id != 0)
     _del_syslog();
-  }
 
-  if (config.get_log_file() == "") {
+  // Standard log file.
+  if (config.get_log_file() == "")
     _del_log_file();
-  }
   else if (config.get_log_file() != _log_file
       || config.get_log_archive_path() != _log_archive_path) {
     _add_log_file(config);
@@ -137,15 +136,17 @@ void logging::apply(state const& config) {
     _del_stderr();
   }
 
-  if (config.get_debug_file() == "") {
+  // Debug file.
+  if ((config.get_debug_file() == "")
+      || !config.get_debug_level()
+      || !config.get_debug_verbosity()
+      || !config.get_max_debug_file_size())
     _del_debug();
-  }
   else if (config.get_debug_file() != _debug_file
 	   || config.get_max_debug_file_size() != _debug_limit
 	   || config.get_debug_level() != _debug_level
-	   || config.get_debug_verbosity() != _debug_verbosity) {
+	   || config.get_debug_verbosity() != _debug_verbosity)
     _add_debug(config);
-  }
 }
 
 /**

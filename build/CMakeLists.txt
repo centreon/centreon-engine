@@ -30,6 +30,7 @@ set(SCRIPT_DIR "${PROJECT_SOURCE_DIR}/scripts")
 set(SRC_DIR "${PROJECT_SOURCE_DIR}/src")
 set(TEST_DIR "${PROJECT_SOURCE_DIR}/test")
 include_directories("${INC_DIR}")
+include_directories("${INC_DIR}/compatibility")
 include_directories("${INC_DIR}/com/centreon/engine") # XXX: remove when possible
 
 # Version.
@@ -568,7 +569,6 @@ add_definitions(-DDEFAULT_PRECACHED_OBJECT_FILE="${VAR_DIR}/objects.precache")
 
 # Library engine target.
 add_library("cce_core" STATIC
-  ${QT_MOC_FILES}
   # Sources.
   "${SRC_DIR}/broker.cc"
   "${SRC_DIR}/checks.cc"
@@ -672,7 +672,7 @@ add_executable("centengine"
   "${SRC_DIR}/main.cc")
 if (CMAKE_COMPILER_IS_GNUCXX)
   target_link_libraries("centengine"
-    "-Wl,-whole-archive -lcce_objects -L./objects -Wl,-no-whole-archive")
+    "-Wl,-whole-archive -lcce_objects -L./objects -lcce_compatibility -L./compatibility -Wl,-no-whole-archive")
 endif ()
 
 # Link centengine with required libraries.
@@ -987,6 +987,34 @@ if (WITH_TESTING)
   set(TEST_NAME "running_engine_broker_module_without_args")
   add_test("${TEST_NAME}"
     "centengine" "-v" "${TEST_DIR}/running/etc/broker_module_without_args.cfg")
+  # Check that all symbols required by modules are present.
+  set(TEST_NAME "running_engine_broker_modules_symbols")
+  add_library("running_engine_broker_modules_symbols_checker" SHARED
+    "${TEST_DIR}/running/modules_symbols_checker.cc")
+  set_property(TARGET "running_engine_broker_modules_symbols_checker"
+    PROPERTY PREFIX "")
+  add_library("running_engine_broker_modules_symbols" SHARED
+    "${TEST_DIR}/running/modules_symbols.cc")
+  set_property(TARGET "running_engine_broker_modules_symbols"
+    PROPERTY PREFIX "")
+  get_property(EXTERNAL_COMMAND_PATH
+    TARGET "externalcmd"
+    PROPERTY LOCATION)
+  get_property(MODULE_PATH
+    TARGET "running_engine_broker_modules_symbols_checker"
+    PROPERTY LOCATION)
+  get_property(MODULE_ARGS
+    TARGET "running_engine_broker_modules_symbols"
+    PROPERTY LOCATION)
+  set(CFG_CONTENT
+"command_file=/tmp/running_engine_broker_modules_symbols.tmp
+broker_module=${EXTERNAL_COMMAND_PATH}
+broker_module=${MODULE_PATH} ${MODULE_ARGS}")
+  configure_file("${TEST_DIR}/running/etc/minimal.cfg.in"
+    "${TEST_DIR}/running/etc/modules_symbols.cfg")
+  add_test("${TEST_NAME}"
+    "centengine" "${TEST_DIR}/running/etc/modules_symbols.cfg")
+
 endif ()
 
 #
