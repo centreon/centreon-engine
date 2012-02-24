@@ -1,5 +1,5 @@
 /*
-** Copyright 2011 Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -21,10 +21,10 @@
 #include <QDebug>
 #include <exception>
 #include "test/unittest.hh"
-#include "logging/engine.hh"
-#include "error.hh"
-#include "commands.hh"
-#include "globals.hh"
+#include "com/centreon/engine/commands.hh"
+#include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/logging/engine.hh"
 
 using namespace com::centreon::engine;
 
@@ -44,10 +44,9 @@ static void check_stop_obsessing_over_svc_checks() {
  *  Check processing of stop_obsessing_over_svc_checks works.
  */
 int main_test() {
-  logging::engine& engine = logging::engine::instance();
+  logging::engine::load();
   check_stop_obsessing_over_svc_checks();
-  engine.cleanup();
-
+  logging::engine::unload();
   return (0);
 }
 

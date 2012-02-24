@@ -1,5 +1,5 @@
 /*
-** Copyright 2011      Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -17,120 +17,217 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include "logging/engine.hh"
+#include <assert.h>
+#include <QReadLocker>
+#include <QWriteLocker>
+#include <stdlib.h>
+#include <string.h>
+#include "com/centreon/engine/logging/engine.hh"
 
 using namespace com::centreon::engine::logging;
 
-engine* engine::_instance = NULL;
+// logging::engine class instance.
+std::auto_ptr<engine> engine::_instance;
 
 /**************************************
- *                                     *
- *           Public Methods            *
- *                                     *
- **************************************/
+*                                     *
+*       obj_info Public Methods       *
+*                                     *
+**************************************/
 
 /**
  *  Default constructor.
  */
-engine::engine()
-  : _id(0) {
-  memset(_type, 0, sizeof(_type));
-}
+engine::obj_info::obj_info() : _id(0), _type(0), _verbosity(0) {}
 
 /**
- *  Default destructor.
- */
-engine::~engine() throw() {
-
-}
-
-/**
- *  Get instance of engine singleton.
+ *  Constructor.
  *
- *  @return An instance on the engine.
- */
-engine& engine::instance() {
-  if (_instance == NULL)
-    _instance = new engine();
-  return (*_instance);
-}
-
-/**
- *  Cleanup the engine singleton.
- */
-void engine::cleanup() {
-  delete _instance;
-  _instance = NULL;
-}
-
-bool engine::is_logged(unsigned long long type,
-                       unsigned int verbosity) const throw() {
-  if (verbosity > most)
-    return (false);
-  return (static_cast<bool>(_type[verbosity] & type));
-}
-
-
-/**
- *  Write message into all objects logging.
- *
- *  @param[in] message   Message to log.
- *  @param[in] type      Logging types.
+ *  @param[in] obj       Pointer on object logging.
+ *  @param[in] type      Message type to log with this object.
  *  @param[in] verbosity Verbosity level.
  */
-void engine::log(char const* message,
-		 unsigned long long type,
-		 unsigned int verbosity) throw() {
-  if (message != NULL) {
-    _rwlock.lockForRead();
-    for (QVector<obj_info>::iterator it = _objects.begin(),
-           end = _objects.end();
-	 it != end;
-	 ++it) {
-      obj_info& info(*it);
-      if (verbosity <= info.verbosity() && (type & info.type())) {
-	info._obj->log(message, type, verbosity);
-      }
-    }
-    _rwlock.unlock();
-  }
+engine::obj_info::obj_info(
+                    QSharedPointer<object> obj,
+                    unsigned long long type,
+                    unsigned int verbosity)
+  : _id(0), _obj(obj), _type(type), _verbosity(verbosity) {}
+
+/**
+ *  Copy constructor.
+ *
+ *  @param[in] right Object to copy.
+ */
+engine::obj_info::obj_info(obj_info const& right) {
+  _internal_copy(right);
 }
+
+/**
+ *  Destructor.
+ */
+engine::obj_info::~obj_info() throw () {}
+
+/**
+ *  Assignment operator.
+ *
+ *  @param[in] right Object to copy.
+ */
+engine::obj_info& engine::obj_info::operator=(obj_info const& right) {
+  if (this != &right)
+    _internal_copy(right);
+  return (*this);
+}
+
+/**
+ *  Get the ID.
+ *
+ *  @return The ID.
+ */
+unsigned long engine::obj_info::id() const throw () {
+  return (_id);
+}
+
+/**
+ *  Get the type.
+ *
+ *  @return The type.
+ */
+unsigned long long engine::obj_info::type() const throw () {
+  return (_type);
+}
+
+/**
+ *  Get the verbosity.
+ *
+ *  @return The verbosity.
+ */
+unsigned int engine::obj_info::verbosity() const throw () {
+  return (_verbosity);
+}
+
+/**************************************
+*                                     *
+*      obj_info Private Methods       *
+*                                     *
+**************************************/
+
+/**
+ *  Copy internal data members.
+ *
+ *  @param[in] right Object to copy.
+ */
+void engine::obj_info::_internal_copy(engine::obj_info const& right) {
+  _id = right._id;
+  _obj = right._obj;
+  _type = right._type;
+  _verbosity = right._verbosity;
+  return ;
+}
+
+/**************************************
+*                                     *
+*           Public Methods            *
+*                                     *
+**************************************/
+
+/**
+ *  Destructor.
+ */
+engine::~engine() throw () {}
 
 /**
  *  Add a new object logging into engine.
  *
  *  @param[in] info The object logging with type and verbosity.
  *
- *  @return The object id.
+ *  @return The object ID.
  */
 unsigned long engine::add_object(obj_info& info) {
-  _rwlock.lockForWrite();
+  QReadLocker lock(&_rwlock);
   info._id = ++_id;
   _objects.push_back(info);
   for (unsigned int i = 0, end = info.verbosity(); i <= end; ++i)
     _type[i] |= info.type();
-  _rwlock.unlock();
   return (info._id);
 }
 
 /**
- *  Remove an object logging.
+ *  Get instance of engine singleton.
  *
- *  @param[in] id The object's id.
+ *  @return An instance of engine.
  */
-void engine::remove_object(unsigned long id) throw() {
-  _rwlock.lockForWrite();
+engine& engine::instance() {
+  return (*_instance);
+}
+
+/**
+ *  Check whether a log entry should be logged according to its
+ *  properties.
+ *
+ *  @param[in] type Log type.
+ *  @param[in] verbosity Log verbosity.
+ *
+ *  @return true if entry will be logged if processed.
+ */
+bool engine::is_logged(
+               unsigned long long type,
+               unsigned int verbosity) const throw () {
+  return ((verbosity > most)
+          ? false
+          : static_cast<bool>(_type[verbosity] & type));
+}
+
+/**
+ *  Load engine instance.
+ */
+void engine::load() {
+  if (!_instance.get())
+    _instance.reset(new engine);
+  return ;
+}
+
+/**
+ *  Write message into all logging objects.
+ *
+ *  @param[in] message   Message to log.
+ *  @param[in] type      Logging types.
+ *  @param[in] verbosity Verbosity level.
+ */
+void engine::log(
+               char const* message,
+               unsigned long long type,
+               unsigned int verbosity) throw () {
+  if (message != NULL) {
+    QReadLocker lock(&_rwlock);
+    for (std::vector<obj_info>::iterator it = _objects.begin(),
+           end = _objects.end();
+	 it != end;
+	 ++it) {
+      obj_info& info(*it);
+      if (verbosity <= info.verbosity() && (type & info.type()))
+	info._obj->log(message, type, verbosity);
+    }
+  }
+  return ;
+}
+
+/**
+ *  Remove a logging object.
+ *
+ *  @param[in] id The object's ID.
+ */
+void engine::remove_object(unsigned long id) throw () {
+  QWriteLocker lock(&_rwlock);
   memset(_type, 0, sizeof(_type));
-  QVector<obj_info>::iterator it_erase = _objects.end();
-  for (QVector<obj_info>::iterator it = _objects.begin(),
+  std::vector<obj_info>::iterator it_erase(_objects.end());
+  for (std::vector<obj_info>::iterator it = _objects.begin(),
          end = _objects.end();
        it != end;
        ++it) {
     obj_info& obj(*it);
-    if (obj._id != id) {
+    if (obj._id != id)
       for (unsigned int i = 0, end = obj.verbosity(); i <= end; ++i)
         _type[i] |= obj.type();
-    }
     else
       it_erase = it;
   }
@@ -139,17 +236,26 @@ void engine::remove_object(unsigned long id) throw() {
       --_id;
     _objects.erase(it_erase);
   }
-  _rwlock.unlock();
+  return ;
 }
 
 /**
- *  Remove an object logging.
+ *  Remove a logging object.
  *
- *  @param[in] id The object info.
+ *  @param[in] obj The object info.
  */
-void engine::remove_object(obj_info& obj) throw() {
+void engine::remove_object(obj_info& obj) throw () {
   remove_object(obj.id());
   obj._id = 0;
+  return ;
+}
+
+/**
+ *  Unload engine singleton.
+ */
+void engine::unload() {
+  _instance.reset();
+  return ;
 }
 
 /**
@@ -162,18 +268,17 @@ void engine::remove_object(obj_info& obj) throw() {
 void engine::update_object(unsigned long id,
 			   unsigned long long type,
 			   unsigned int verbosity) throw() {
-  _rwlock.lockForWrite();
+  QWriteLocker lock(&_rwlock);
   memset(_type, 0, sizeof(_type));
-  QVector<obj_info>::iterator it_erase = _objects.end();
-  for (QVector<obj_info>::iterator it = _objects.begin(),
+  std::vector<obj_info>::iterator it_erase(_objects.end());
+  for (std::vector<obj_info>::iterator it = _objects.begin(),
          end = _objects.end();
        it != end;
        ++it) {
     obj_info& obj(*it);
-    if (obj._id != id) {
+    if (obj._id != id)
       for (unsigned int i = 0, end = obj.verbosity(); i <= end; ++i)
         _type[i] |= obj.type();
-    }
     else
       it_erase = it;
   }
@@ -183,86 +288,51 @@ void engine::update_object(unsigned long id,
     info._verbosity = verbosity;
     _type[verbosity] |= type;
   }
-  _rwlock.unlock();
+  return ;
 }
+
+/**************************************
+*                                     *
+*           Private Methods           *
+*                                     *
+**************************************/
 
 /**
  *  Default constructor.
  */
-engine::obj_info::obj_info()
-  : _type(0), _id(0), _verbosity(0) {
-
+engine::engine() : _id(0) {
+  memset(_type, 0, sizeof(_type));
 }
 
 /**
- *  Constructor.
+ *  Assignment operator.
  *
- *  @param[in] _obj       Pointer on object logging.
- *  @param[in] _type      Message type to log with this object.
- *  @param[in] _verbosity Verbosity level.
+ *  @param[in] right Object to copy.
  */
-engine::obj_info::obj_info(QSharedPointer<object> obj,
-			   unsigned long long type,
-			   unsigned int verbosity)
-  : _obj(obj), _type(type), _verbosity(verbosity) {
-
+engine::engine(engine const& right) {
+  _internal_copy(right);
 }
 
 /**
- *  Default copy constructor.
+ *  Assignment operator.
  *
- *  @param[in] right The class to copy.
- */
-engine::obj_info::obj_info(obj_info const& right)
-  : _type(0), _id(0), _verbosity(0) {
-  operator=(right);
-}
-
-/**
- *  Default destructor.
- */
-engine::obj_info::~obj_info() throw() {
-
-}
-
-/**
- *  Default copy operator.
+ *  @param[in] right Object to copy.
  *
- *  @param[in] right The class to copy.
+ *  @return This object.
  */
-engine::obj_info& engine::obj_info::operator=(obj_info const& right) {
-  if (this != &right) {
-    _obj = right._obj;
-    _type = right._type;
-    _id = right._id;
-    _verbosity = right._verbosity;
-  }
+engine& engine::operator=(engine const& right) {
+  _internal_copy(right);
   return (*this);
 }
 
 /**
- *  Get the type.
+ *  Copy internal data members.
  *
- *  @return The Type.
+ *  @param[in] right Object to copy.
  */
-unsigned long long engine::obj_info::type() const throw() {
-  return (_type);
-}
-
-/**
- *  Get the id.
- *
- *  @return The id.
- */
-unsigned long engine::obj_info::id() const throw() {
-  return (_id);
-}
-
-/**
- *  Get the verbosity.
- *
- *  @return The verbosity.
- */
-unsigned int engine::obj_info::verbosity() const throw() {
-  return (_verbosity);
+void engine::_internal_copy(engine const& right) {
+  (void)right;
+  assert(!"logging engine is not copyable");
+  abort();
+  return ;
 }

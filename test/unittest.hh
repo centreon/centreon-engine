@@ -1,5 +1,5 @@
 /*
-** Copyright 2011      Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -70,7 +70,7 @@ namespace     com {
 
       private:
         void  _init() {
-          logging::engine::instance();
+          logging::engine::load();
           commands::set::instance();
           checks::checker::instance();
           broker::loader::instance();
@@ -84,7 +84,7 @@ namespace     com {
           broker::loader::cleanup();
           checks::checker::cleanup();
           commands::set::cleanup();
-          logging::engine::cleanup();
+          logging::engine::unload();
         }
 
         int  (*_func)();

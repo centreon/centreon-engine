@@ -1,5 +1,5 @@
 /*
-** Copyright 2011 Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -63,9 +63,9 @@ static void check_acknowledge_host_problem() {
  *  Check processing of acknowledge_host_problem works.
  */
 int main_test() {
-  logging::engine& engine = logging::engine::instance();
+  logging::engine::load();
   check_acknowledge_host_problem();
-  engine.cleanup();
+  logging::engine::unload();
   return (0);
 }
 

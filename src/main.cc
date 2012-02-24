@@ -109,8 +109,8 @@ int main(int argc, char** argv) {
   if (argc < 2)
     error = TRUE;
 
-  // load singleton.
-  logging::engine::instance();
+  // Load singletons.
+  logging::engine::load();
   com::centreon::engine::broker::loader::instance();
   checks::checker::instance();
   commands::set::instance();
@@ -609,10 +609,11 @@ int main(int argc, char** argv) {
     delete [] mac->x[MACRO_EVENTSTARTTIME];
   }
 
-  // unload singleton.
+  // Unload singletons.
   commands::set::cleanup();
   checks::checker::cleanup();
   com::centreon::engine::broker::loader::cleanup();
-  logging::engine::cleanup();
-  return (OK);
+  logging::engine::unload();
+
+  return (EXIT_SUCCESS);
 }

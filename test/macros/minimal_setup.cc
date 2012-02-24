@@ -1,5 +1,5 @@
 /*
-** Copyright 2011 Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -30,7 +30,7 @@ void com::centreon::engine::test::minimal_setup() {
     // Interval length is 1 second.
   config.set_interval_length(1);
 
-  logging::engine::instance();
+  logging::engine::load();
 
   // Create skiplists.
   if (init_object_skiplists())
@@ -264,5 +264,5 @@ void com::centreon::engine::test::cleanup_setup() {
   // Cleanup skiplists.
   free_object_skiplists();
 
-  logging::engine::instance().cleanup();
+  logging::engine::instance().unload();
 }

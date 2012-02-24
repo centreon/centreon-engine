@@ -1,7 +1,7 @@
 /*
 ** Copyright 1999-2009 Ethan Galstad
 ** Copyright 2009-2010 Nagios Core Development Team and Community Contributors
-** Copyright 2011      Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -20,6 +20,7 @@
 */
 
 #include <QTimer>
+#include <stdlib.h>
 #include <time.h>
 #include "globals.hh"
 #include "broker.hh"
