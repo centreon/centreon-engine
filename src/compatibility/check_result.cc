@@ -170,7 +170,11 @@ extern "C" {
       temp_buffer.append(".ok");
       output_file_fd = open(
                          temp_buffer.c_str(),
-                         O_CREAT | O_WRONLY | O_TRUNC, S_IRUSR | S_IWUSR,
+                         O_CREAT
+                         | O_WRONLY
+                         | O_TRUNC
+                         | S_IRUSR
+                         | S_IWUSR,
                          0660);
       if (output_file_fd > 0)
         close(output_file_fd);
