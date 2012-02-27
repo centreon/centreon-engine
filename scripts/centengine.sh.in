@@ -16,10 +16,10 @@
 # Short-Description: Start and stop Centreon Engine
 ### END INIT INFO
 
-prefix=@localstatedir@
-var_dir=@vardir@
-binary=@bindir@/centengine
-config_file=@confdir@/centengine.cfg
+prefix=@CMAKE_INSTALL_PREFIX@
+var_dir=@VAR_DIR@
+binary=@PREFIX_BIN@/centengine
+config_file=@PREFIX_CONF@/centengine.cfg
 status_file=$var_dir/status.dat
 retention_file=$var_dir/retention.dat
 command_file=$var_dir/centengine.cmd
