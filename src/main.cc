@@ -110,7 +110,7 @@ int main(int argc, char** argv) {
   // Load singletons.
   logging::engine::load();
   broker::loader::load();
-  checks::checker::instance();
+  checks::checker::load();
   commands::set::instance();
 
   // Process all command line arguments.
@@ -608,7 +608,7 @@ int main(int argc, char** argv) {
 
   // Unload singletons.
   commands::set::cleanup();
-  checks::checker::cleanup();
+  checks::checker::unload();
   broker::loader::unload();
   logging::engine::unload();
 

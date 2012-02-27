@@ -2249,7 +2249,7 @@ void cleanup() {
   events::loop::cleanup();
   broker::loader::unload();
   commands::set::cleanup();
-  checks::checker::cleanup();
+  checks::checker::unload();
   logging::engine::unload();
 
   return ;
