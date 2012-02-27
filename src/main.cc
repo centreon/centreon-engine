@@ -111,7 +111,7 @@ int main(int argc, char** argv) {
   logging::engine::load();
   broker::loader::load();
   checks::checker::load();
-  commands::set::instance();
+  commands::set::load();
 
   // Process all command line arguments.
 #ifdef HAVE_GETOPT_H
@@ -607,7 +607,7 @@ int main(int argc, char** argv) {
   }
 
   // Unload singletons.
-  commands::set::cleanup();
+  commands::set::unload();
   checks::checker::unload();
   broker::loader::unload();
   logging::engine::unload();

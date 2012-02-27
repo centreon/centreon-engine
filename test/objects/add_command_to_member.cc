@@ -19,6 +19,7 @@
 
 #include <exception>
 #include <QDebug>
+#include "com/centreon/engine/commands/set.hh"
 #include "com/centreon/engine/logging/engine.hh"
 #include "com/centreon/engine/macros.hh"
 #include "test/objects/create_object.hh"
@@ -29,6 +30,7 @@ using namespace test::objects;
 
 int main() {
   com::centreon::engine::logging::engine::load();
+  com::centreon::engine::commands::set::load();
   try {
     add_with_null_member(&add_commands_to_object);
     add_without_objects(&add_commands_to_object);

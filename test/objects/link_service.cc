@@ -19,6 +19,7 @@
 
 #include <exception>
 #include <QDebug>
+#include "com/centreon/engine/commands/set.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/logging/engine.hh"
 #include "com/centreon/engine/macros.hh"
@@ -253,6 +254,7 @@ static void link_with_valid_objects() {
 
 int main() {
   com::centreon::engine::logging::engine::load();
+  com::centreon::engine::commands::set::load();
   try {
     link_null_pointer();
     link_null_name();

@@ -19,6 +19,7 @@
 
 #include <exception>
 #include <QDebug>
+#include "com/centreon/engine/commands/set.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/logging/engine.hh"
 #include "com/centreon/engine/macros.hh"
@@ -29,6 +30,7 @@ using namespace test::objects;
 
 int main() {
   com::centreon::engine::logging::engine::load();
+  com::centreon::engine::commands::set::load();
   try {
     release_null_pointer(static_cast<command const*>(NULL));
     release_objects(&create_command,

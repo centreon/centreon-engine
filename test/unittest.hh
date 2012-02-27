@@ -69,7 +69,7 @@ namespace     com {
       private:
         void  _init() {
           logging::engine::load();
-          commands::set::instance();
+          commands::set::load();
           checks::checker::load();
           broker::loader::load();
           broker::compatibility::instance();
@@ -81,7 +81,7 @@ namespace     com {
           broker::compatibility::cleanup();
           broker::loader::unload();
           checks::checker::unload();
-          commands::set::cleanup();
+          commands::set::unload();
           logging::engine::unload();
         }
 
