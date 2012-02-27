@@ -2246,10 +2246,10 @@ void cleanup() {
   free_memory(get_global_macros());
 
   // Unload singletons.
-  events::loop::cleanup();
   broker::loader::unload();
-  commands::set::unload();
+  events::loop::unload();
   checks::checker::unload();
+  commands::set::unload();
   logging::engine::unload();
 
   return ;

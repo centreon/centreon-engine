@@ -1,7 +1,7 @@
 /*
 ** Copyright 1999-2009 Ethan Galstad
 ** Copyright 2009-2010 Nagios Core Development Team and Community Contributors
-** Copyright 2011      Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -20,47 +20,54 @@
 */
 
 #ifndef CCE_EVENTS_LOOP_HH
-# define CCE_EVENTS_LOOP_HH
+#  define CCE_EVENTS_LOOP_HH
 
-# include <QCoreApplication>
-# include <QObject>
-# include "events.hh"
+#  include <memory>
+#  include <QCoreApplication>
+#  include <QObject>
+#  include <time.h>
+#  include "com/centreon/engine/events.hh"
 
 namespace                   com {
   namespace                 centreon {
     namespace               engine {
       namespace             events {
-	/**
-	 *  @class loop loop.hh
-	 *  @brief Create Centreon Engine event loop on a new thread.
-	 *
+        /**
+         *  @class loop loop.hh
+         *  @brief Create Centreon Engine event loop on a new thread.
+         *
          *  Events loop is a singleton to create a new thread
          *  and dispatch the Centreon Engine events.
-	 */
+         */
         class               loop : public QObject {
           Q_OBJECT
-        public:
-          static loop&      instance();
-          static void       cleanup();
 
+        public:
+                            ~loop() throw ();
+          static loop&      instance();
+          static void       load();
           void              run();
+          static void       unload();
 
         signals:
-          void              shutdown();
           void              restart();
+          void              shutdown();
 
         private slots:
           void              _dispatching();
 
         private:
                             loop();
-                            ~loop() throw();
+                            loop(loop const& right);
+          loop&             operator=(loop const& right);
+          void              _internal_copy(loop const& right);
 
           QCoreApplication* _app;
-          static loop*      _instance;
-          timed_event       _sleep_event;
-          time_t            _last_time;
+          static std::auto_ptr<loop>
+                            _instance;
           time_t            _last_status_update;
+          time_t            _last_time;
+          timed_event       _sleep_event;
         };
       }
     }

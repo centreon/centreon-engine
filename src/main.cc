@@ -109,9 +109,10 @@ int main(int argc, char** argv) {
 
   // Load singletons.
   logging::engine::load();
-  broker::loader::load();
-  checks::checker::load();
   commands::set::load();
+  checks::checker::load();
+  events::loop::load();
+  broker::loader::load();
 
   // Process all command line arguments.
 #ifdef HAVE_GETOPT_H
@@ -607,9 +608,10 @@ int main(int argc, char** argv) {
   }
 
   // Unload singletons.
-  commands::set::unload();
-  checks::checker::unload();
   broker::loader::unload();
+  events::loop::unload();
+  checks::checker::unload();
+  commands::set::unload();
   logging::engine::unload();
 
   return (EXIT_SUCCESS);

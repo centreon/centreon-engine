@@ -71,15 +71,15 @@ namespace     com {
           logging::engine::load();
           commands::set::load();
           checks::checker::load();
+          events::loop::load();
           broker::loader::load();
           broker::compatibility::instance();
-          events::loop::instance();
         }
 
         void  _deinit() {
-          events::loop::cleanup();
           broker::compatibility::cleanup();
           broker::loader::unload();
+          events::loop::unload();
           checks::checker::unload();
           commands::set::unload();
           logging::engine::unload();
