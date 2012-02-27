@@ -73,11 +73,11 @@ namespace     com {
           checks::checker::load();
           events::loop::load();
           broker::loader::load();
-          broker::compatibility::instance();
+          broker::compatibility::load();
         }
 
         void  _deinit() {
-          broker::compatibility::cleanup();
+          broker::compatibility::unload();
           broker::loader::unload();
           events::loop::unload();
           checks::checker::unload();

@@ -48,6 +48,7 @@
 #include "notifications.hh"
 #include "config.hh"
 #include "utils.hh"
+#include "broker/compatibility.hh"
 #include "broker/loader.hh"
 #include "checks/checker.hh"
 #include "commands/set.hh"
@@ -113,6 +114,7 @@ int main(int argc, char** argv) {
   checks::checker::load();
   events::loop::load();
   broker::loader::load();
+  broker::compatibility::load();
 
   // Process all command line arguments.
 #ifdef HAVE_GETOPT_H
@@ -608,6 +610,7 @@ int main(int argc, char** argv) {
   }
 
   // Unload singletons.
+  broker::compatibility::unload();
   broker::loader::unload();
   events::loop::unload();
   checks::checker::unload();

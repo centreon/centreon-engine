@@ -43,6 +43,7 @@
 #include "commands/raw.hh"
 #include "commands/set.hh"
 #include "checks/checker.hh"
+#include "broker/compatibility.hh"
 #include "broker/loader.hh"
 #include "logging/engine.hh"
 #include "logging/logger.hh"
@@ -2246,6 +2247,7 @@ void cleanup() {
   free_memory(get_global_macros());
 
   // Unload singletons.
+  broker::compatibility::unload();
   broker::loader::unload();
   events::loop::unload();
   checks::checker::unload();

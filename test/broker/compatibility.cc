@@ -17,15 +17,16 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <QCoreApplication>
-#include <QDebug>
 #include <exception>
 #include <limits.h>
-#include "test/unittest.hh"
-#include "error.hh"
+#include <QCoreApplication>
+#include <QDebug>
+#include "com/centreon/engine/broker/compatibility.hh"
+#include "com/centreon/engine/broker/loader.hh"
+#include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/nebmodules.hh"
 #include "test/broker/mod_load.hh"
-#include "broker/compatibility.hh"
-#include "broker/loader.hh"
+#include "test/unittest.hh"
 
 using namespace com::centreon::engine::broker;
 
