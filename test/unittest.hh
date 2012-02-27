@@ -71,7 +71,7 @@ namespace     com {
           logging::engine::load();
           commands::set::instance();
           checks::checker::instance();
-          broker::loader::instance();
+          broker::loader::load();
           broker::compatibility::instance();
           events::loop::instance();
         }
@@ -79,7 +79,7 @@ namespace     com {
         void  _deinit() {
           events::loop::cleanup();
           broker::compatibility::cleanup();
-          broker::loader::cleanup();
+          broker::loader::unload();
           checks::checker::cleanup();
           commands::set::cleanup();
           logging::engine::unload();

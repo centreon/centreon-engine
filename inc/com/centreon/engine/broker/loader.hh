@@ -1,5 +1,5 @@
 /*
-** Copyright 2011 Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -18,13 +18,14 @@
 */
 
 #ifndef CCE_MODULES_LOADER_HH
-# define CCE_MODULES_LOADER_HH
+#  define CCE_MODULES_LOADER_HH
 
-# include <QObject>
-# include <QString>
-# include <QMultiHash>
-# include <QSharedPointer>
-# include "broker/handle.hh"
+#  include <memory>
+#  include <QMultiHash>
+#  include <QObject>
+#  include <QSharedPointer>
+#  include <QString>
+#  include "com/centreon/engine/broker/handle.hh"
 
 namespace                        com {
   namespace                      centreon {
@@ -38,37 +39,37 @@ namespace                        com {
          */
         class                    loader : public QObject {
           Q_OBJECT
-         public:
-          static loader&         instance();
-	  static void            cleanup();
 
-          unsigned int           load();
-          void                   unload();
-
-          QSharedPointer<handle> add_module(QString const& filename = "",
-                                            QString const& args = "");
-          void                   del_module(QSharedPointer<handle> const& module);
-
-          QString const&         get_directory() const throw();
+        public:
+          virtual                ~loader() throw ();
+          QSharedPointer<handle> add_module(
+                                   QString const& filename = "",
+                                   QString const& args = "");
+          void                   del_module(
+                                   QSharedPointer<handle> const& mod);
           QList<QSharedPointer<handle> >
-                                 get_modules() const throw();
+                                 get_modules() const;
+          static loader&         instance();
+          static void            load();
+          unsigned int           load_directory(QString const& dir);
+          static void            unload();
+          void                   unload_modules();
 
-          void                   set_directory(QString const& directory);
+        public slots:
+          void                   module_name_changed(
+                                   QString const& old_name,
+                                   QString const& new_name);
 
-         public slots:
-          void                   module_name_changed(QString const& old_name,
-                                                     QString const& new_name);
-
-         private:
+        private:
                                  loader();
                                  loader(loader const& right);
-          virtual                ~loader() throw();
-
           loader&                operator=(loader const& right);
+          void                   _internal_copy(loader const& right);
 
-          QString                _directory;
-          QMultiHash<QString, QSharedPointer<handle> > _modules;
-          static loader*         _instance;
+          static std::auto_ptr<loader>
+                                 _instance;
+          QMultiHash<QString, QSharedPointer<handle> >
+                                 _modules;
         };
       }
     }

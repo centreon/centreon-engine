@@ -2247,7 +2247,7 @@ void cleanup() {
 
   // Unload singletons.
   events::loop::cleanup();
-  broker::loader::cleanup();
+  broker::loader::unload();
   commands::set::cleanup();
   checks::checker::cleanup();
   logging::engine::unload();

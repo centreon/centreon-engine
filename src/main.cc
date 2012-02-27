@@ -109,7 +109,7 @@ int main(int argc, char** argv) {
 
   // Load singletons.
   logging::engine::load();
-  com::centreon::engine::broker::loader::instance();
+  broker::loader::load();
   checks::checker::instance();
   commands::set::instance();
 
@@ -385,10 +385,8 @@ int main(int argc, char** argv) {
         com::centreon::engine::broker::loader& loader(
           com::centreon::engine::broker::loader::instance());
         QString const& mod_dir(config.get_broker_module_directory());
-        if (!mod_dir.isEmpty()) {
-          loader.set_directory(mod_dir);
-          loader.load();
-        }
+        if (!mod_dir.isEmpty())
+          loader.load_directory(mod_dir);
       }
       catch (std::exception const& e) {
         logger(log_info_message, basic)
@@ -611,7 +609,7 @@ int main(int argc, char** argv) {
   // Unload singletons.
   commands::set::cleanup();
   checks::checker::cleanup();
-  com::centreon::engine::broker::loader::cleanup();
+  broker::loader::unload();
   logging::engine::unload();
 
   return (EXIT_SUCCESS);
