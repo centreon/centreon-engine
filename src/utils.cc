@@ -52,10 +52,6 @@
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;
 
-int free_check_result_list(void) {
-  return (0);
-}
-
 /******************************************************************/
 /******************** SYSTEM COMMAND FUNCTIONS ********************/
 /******************************************************************/
