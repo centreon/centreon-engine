@@ -830,10 +830,8 @@ int grab_custom_object_macro(char* macro_name,
 char const* clean_macro_chars(char* macro, int options) {
   int x = 0;
   int y = 0;
-  int z = 0;
   int ch = 0;
   int len = 0;
-  int illegal_char = 0;
 
   if (macro == NULL)
     return ("");
@@ -852,21 +850,7 @@ char const* clean_macro_chars(char* macro, int options) {
         continue;
 
       /* illegal user-specified characters */
-      illegal_char = FALSE;
-      char const* illegal_output_chars
-        = my_strdup(config.get_illegal_output_chars().c_str());
-      if (illegal_output_chars != NULL) {
-        for (z = 0; illegal_output_chars[z] != '\x0'; z++) {
-          if (ch == (int)illegal_output_chars[z]) {
-            illegal_char = TRUE;
-            break;
-          }
-        }
-        delete[] illegal_output_chars;
-      }
-      delete[] illegal_output_chars;
-
-      if (illegal_char == FALSE)
+      if (config.get_illegal_output_chars().find(ch) == std::string::npos)
         macro[y++] = macro[x];
     }
 

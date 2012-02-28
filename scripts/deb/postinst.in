@@ -5,12 +5,12 @@ set -e
 
 case "$1" in
     configure)
-	if [ @GROUP@ != "root" ]; then
-	    groupadd -f @GROUP@
+	if [ "@GROUP@" != "root" ]; then
+	    groupadd -f "@GROUP@"
 	fi
 
-	if [ @USER@ != "root" ]; then
-	    useradd -M -N -G @GROUP@ @USER@
+	if [ "@USER@" != "root" ]; then
+	    useradd -d "$(dirname @PID_FILE@)" -M -N -G "@GROUP@" "@USER@"
 	fi
 
 	if [ -f "/etc/init.d/centengine" ]; then

@@ -83,6 +83,10 @@ check_configuration()
 
 service_start()
 {
+    if [ -f $pid_file ] && [ ! -d "/proc/$(cat $pid_file)" ]; then
+	rm -f $pid_file > /dev/null 2>&1
+    fi
+
     if [ ! -f $pid_file ]; then
 	check_configuration
 
@@ -118,7 +122,7 @@ service_stop()
 
 	pidofproc $binary > /dev/null 2>&1
 	if [ $? -eq 0 ]; then
-	    kill -TERM $pid
+	    kill -KILL $pid
 	fi
     fi
     rm -f $lock_file $command_file $pid_file

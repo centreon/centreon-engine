@@ -1162,6 +1162,11 @@ void add_event(timed_event* event,
   event->next = NULL;
   event->prev = NULL;
 
+  if (*event_list == event_list_low)
+    quick_timed_event.insert(hash_timed_event::low, event);
+  else if (*event_list == event_list_high)
+    quick_timed_event.insert(hash_timed_event::high, event);
+
   first_event = *event_list;
 
   /* add the event to the head of the list if there are no other events */
@@ -1210,8 +1215,6 @@ void add_event(timed_event* event,
 		     NEBATTR_NONE,
 		     event,
                      NULL);
-
-  quick_timed_event.insert(event);
 }
 
 /* remove an event from the queue */
@@ -1232,7 +1235,10 @@ void remove_event(timed_event* event,
   if (*event_list == NULL || event == NULL)
     return;
 
-  quick_timed_event.erase(event);
+  if (*event_list == event_list_low)
+    quick_timed_event.erase(hash_timed_event::low, event);
+  else if (*event_list == event_list_high)
+    quick_timed_event.erase(hash_timed_event::high, event);
 
   if (*event_list == event) {
     event->prev = NULL;
@@ -1684,6 +1690,10 @@ void resort_event_list(timed_event** event_list, timed_event** event_list_tail) 
   logger(dbg_functions, basic) << "resort_event_list()";
 
   /* move current event list to temp list */
+  if (*event_list == event_list_low)
+    quick_timed_event.clear(hash_timed_event::low);
+  else if (*event_list == event_list_high)
+    quick_timed_event.clear(hash_timed_event::high);
   temp_event_list = *event_list;
   *event_list = NULL;
 

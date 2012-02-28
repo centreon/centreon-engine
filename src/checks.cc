@@ -1144,7 +1144,6 @@ int handle_async_service_check_result(service* temp_service, check_result* queue
 void schedule_service_check(service* svc, time_t check_time, int options) {
   timed_event* temp_event = NULL;
   timed_event* new_event = NULL;
-  int found = FALSE;
   int use_original_event = TRUE;
 
   logger(dbg_functions, basic) << "schedule_service_check()";
@@ -1166,17 +1165,14 @@ void schedule_service_check(service* svc, time_t check_time, int options) {
   }
   /* default is to use the new event */
   use_original_event = FALSE;
-  found = FALSE;
 
-  if ((temp_event = quick_timed_event.find(svc))) {
-    if (temp_event->event_type == EVENT_SERVICE_CHECK)
-      found = TRUE;
-    else
-      temp_event = NULL;
-  }
+  temp_event = quick_timed_event.find(
+                                   hash_timed_event::low,
+                                   hash_timed_event::service_check,
+                                   svc);
 
   /* we found another service check event for this service in the queue - what should we do? */
-  if (found == TRUE && temp_event != NULL) {
+  if (temp_event != NULL) {
     logger(dbg_checks, most)
       << "Found another service check event for this service @ "
       << my_ctime(&temp_event->run_time);
@@ -1637,7 +1633,6 @@ int perform_scheduled_host_check(host* hst, int check_options, double latency) {
 void schedule_host_check(host* hst, time_t check_time, int options) {
   timed_event* temp_event = NULL;
   timed_event* new_event = NULL;
-  int found = FALSE;
   int use_original_event = TRUE;
 
   logger(dbg_functions, basic) << "schedule_host_check()";
@@ -1660,7 +1655,6 @@ void schedule_host_check(host* hst, time_t check_time, int options) {
 
   /* default is to use the new event */
   use_original_event = FALSE;
-  found = FALSE;
 
 #ifdef PERFORMANCE_INCREASE_BUT_VERY_BAD_IDEA_INDEED
   /* WARNING! 1/19/07 on-demand async host checks will end up causing mutliple scheduled checks of a host to appear in the queue if the code below is skipped */
@@ -1668,18 +1662,13 @@ void schedule_host_check(host* hst, time_t check_time, int options) {
 #endif
 
   /* see if there are any other scheduled checks of this host in the queue */
-  for (temp_event = event_list_low;
-       temp_event != NULL;
-       temp_event = temp_event->next) {
-    if (temp_event->event_type == EVENT_HOST_CHECK
-        && hst == (host*)temp_event->event_data) {
-      found = TRUE;
-      break;
-    }
-  }
+  temp_event = quick_timed_event.find(
+                                   hash_timed_event::low,
+                                   hash_timed_event::host_check,
+                                   hst);
 
   /* we found another host check event for this host in the queue - what should we do? */
-  if (found == TRUE && temp_event != NULL) {
+  if (temp_event != NULL) {
 
     logger(dbg_checks, most)
       << "Found another host check event for this host @ "
