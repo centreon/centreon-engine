@@ -388,10 +388,12 @@ bool basic_process::isSequential() const {
  *  @return True if a line is available.
  */
 bool basic_process::canReadLine() const {
-  QBuffer buffer(_channel == QProcess::StandardOutput
-                 ? const_cast<std::string*>(&_standard_output)
-                 : const_cast<std::string*>(&_standard_error));
-  return (buffer.canReadLine() || QIODevice::canReadLine());
+  bool ok(false);
+  if (_channel == QProcess::StandardOutput)
+    ok = (_standard_output.find('\n') != std::string::npos);
+  else
+    ok = (_standard_error.find('\n') != std::string::npos);
+  return (ok || QIODevice::canReadLine());
 }
 
 /**
@@ -413,10 +415,12 @@ void basic_process::close() {
  *  data are read, othrewise false.
  */
 bool basic_process::atEnd() const {
-  std::string const* buffer(_channel == QProcess::StandardOutput
-                           ? &_standard_output
-                           : &_standard_error);
-  return (QIODevice::atEnd() && (!isOpen() || buffer->isEmpty()));
+  bool empty(false);
+  if (_channel == QProcess::StandardOutput)
+    empty = _standard_output.empty();
+  else
+    empty = _standard_error.empty();
+  return (QIODevice::atEnd() && (!isOpen() || empty));
 }
 
 /**
@@ -465,13 +469,13 @@ void basic_process::setupChildProcess() {
  *  @return Return the number of bytes read.
  */
 qint64 basic_process::readData(char* data, qint64 maxlen) {
-  std::string* buffer(_channel == QProcess::StandardOutput
-                     ? &_standard_output
-                     : &_standard_error);
-  qint64 to_read(qMin((int)maxlen, buffer->size()));
+  std::string& buffer(_channel == QProcess::StandardOutput
+                     ? _standard_output
+                     : _standard_error);
+  qint64 to_read((unsigned int)maxlen < buffer.size() ? maxlen : buffer.size());
   if (to_read > 0) {
-    memcpy(data, buffer->constData(), to_read);
-    buffer->right(buffer->size() - to_read);
+    memcpy(data, buffer.c_str(), to_read);
+    buffer.erase(0, to_read);
   }
   return (to_read);
 }

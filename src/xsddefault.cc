@@ -21,7 +21,7 @@
 
 /*********** COMMON HEADER FILES ***********/
 
-#include <QTextStream>
+#include <sstream>
 #include <string>
 #include <stdlib.h>
 #include <stdio.h>
@@ -205,8 +205,8 @@ int xsddefault_save_status_data(void) {
   /* generate check statistics */
   generate_check_stats();
 
-  std::string data;
-  QTextStream stream(&data);
+  std::ostringstream stream;
+  std::streamsize ss(stream.precision());
 
   /* write version info to status file */
   stream << "#############################################\n"
@@ -316,8 +316,8 @@ int xsddefault_save_status_data(void) {
            << "\tevent_handler=" << (temp_host->event_handler ? temp_host->event_handler : "") << "\n"
            << "\thas_been_checked=" << temp_host->has_been_checked << "\n"
            << "\tshould_be_scheduled=" << temp_host->should_be_scheduled << "\n"
-           << "\tcheck_execution_time=" << qSetRealNumberPrecision(3) << ::fixed << temp_host->execution_time << reset << "\n"
-           << "\tcheck_latency=" << qSetRealNumberPrecision(3) << ::fixed << temp_host->latency << reset << "\n"
+           << "\tcheck_execution_time=" << std::setprecision(3) << std::fixed << temp_host->execution_time << std::setprecision(ss) << "\n"
+           << "\tcheck_latency=" << std::setprecision(3) << std::fixed << temp_host->latency << std::setprecision(ss) << "\n"
            << "\tcheck_type=" << temp_host->check_type << "\n"
            << "\tcurrent_state=" << temp_host->current_state << "\n"
            << "\tlast_hard_state=" << temp_host->last_hard_state << "\n"
@@ -356,7 +356,7 @@ int xsddefault_save_status_data(void) {
            << "\tobsess_over_host=" << temp_host->obsess_over_host << "\n"
            << "\tlast_update=" << static_cast<unsigned long>(current_time) << "\n"
            << "\tis_flapping=" << temp_host->is_flapping << "\n"
-           << "\tpercent_state_change=" << qSetRealNumberPrecision(2) << ::fixed << temp_host->percent_state_change << reset << "\n"
+           << "\tpercent_state_change=" << std::setprecision(2) << std::fixed << temp_host->percent_state_change << std::setprecision(ss) << "\n"
            << "\tscheduled_downtime_depth=" << temp_host->scheduled_downtime_depth << "\n";
     /*
       fprintf(fp,"\tstate_history=");
@@ -393,8 +393,8 @@ int xsddefault_save_status_data(void) {
            << "\tevent_handler=" << (temp_service->event_handler ? temp_service->event_handler : "") << "\n"
            << "\thas_been_checked=" << temp_service->has_been_checked << "\n"
            << "\tshould_be_scheduled=" << temp_service->should_be_scheduled << "\n"
-           << "\tcheck_execution_time=" << qSetRealNumberPrecision(3) << ::fixed << temp_service->execution_time << reset << "\n"
-           << "\tcheck_latency=" << qSetRealNumberPrecision(3) << ::fixed << temp_service->latency << reset << "\n"
+           << "\tcheck_execution_time=" << std::setprecision(3) << std::fixed << temp_service->execution_time << std::setprecision(ss) << "\n"
+           << "\tcheck_latency=" << std::setprecision(3) << std::fixed << temp_service->latency << std::setprecision(ss) << "\n"
            << "\tcheck_type=" << temp_service->check_type << "\n"
            << "\tcurrent_state=" << temp_service->current_state << "\n"
            << "\tlast_hard_state=" << temp_service->last_hard_state << "\n"
@@ -434,7 +434,7 @@ int xsddefault_save_status_data(void) {
            << "\tobsess_over_service=" << temp_service->obsess_over_service << "\n"
            << "\tlast_update=" << static_cast<unsigned long>(current_time) << "\n"
            << "\tis_flapping=" << temp_service->is_flapping << "\n"
-           << "\tpercent_state_change=" << qSetRealNumberPrecision(2) << ::fixed << temp_service->percent_state_change << reset << "\n"
+           << "\tpercent_state_change=" << std::setprecision(2) << std::fixed << temp_service->percent_state_change << std::setprecision(ss) << "\n"
            << "\tscheduled_downtime_depth=" << temp_service->scheduled_downtime_depth << "\n";
     /*
       fprintf(fp,"\tstate_history=");
@@ -529,9 +529,6 @@ int xsddefault_save_status_data(void) {
            << "\t}\n\n";
   }
 
-  // flush data.
-  stream.flush();
-
   if (ftruncate(xsddefault_status_log_fd, 0) == -1
       || fsync(xsddefault_status_log_fd) == -1
       || lseek(xsddefault_status_log_fd, 0, SEEK_SET) == (off_t)-1) {
@@ -541,6 +538,7 @@ int xsddefault_save_status_data(void) {
     return (ERROR);
   }
 
-  write(xsddefault_status_log_fd, data.constData(), data.size());
+  std::string data(stream.str());
+  write(xsddefault_status_log_fd, data.c_str(), data.size());
   return (OK);
 }

@@ -228,8 +228,8 @@ void process::_finished(int exit_code, QProcess::ExitStatus exit_status) {
       _exit_code = exit_code;
     }
 
-    _stderr = qPrintable(readAllStandardError());
-    _stdout = qPrintable(readAllStandardOutput());
+    _stderr = readAllStandardError();
+    _stdout = readAllStandardOutput();
     _is_executed = (exit_status != QProcess::CrashExit);
   }
 

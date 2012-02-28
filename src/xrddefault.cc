@@ -21,7 +21,6 @@
 
 /*********** COMMON HEADER FILES ***********/
 
-#include <QTextStream>
 #include <string>
 #include <sstream>
 #include <stdlib.h>
@@ -201,8 +200,8 @@ int xrddefault_save_state_information(void) {
   unsigned long contact_service_attribute_mask = config.get_retained_contact_service_attribute_mask();
   unsigned long contact_attribute_mask = 0L;
 
-  std::string data;
-  QTextStream stream(&data);
+  std::ostringstream stream;
+  std::streamsize ss(stream.precision());
 
   /* write version info to status file */
   stream << "##############################################\n"
@@ -259,8 +258,8 @@ int xrddefault_save_state_information(void) {
            << "notification_period=" << (temp_host->notification_period ? temp_host->notification_period : "") << "\n"
            << "event_handler=" << (temp_host->event_handler ? temp_host->event_handler : "") << "\n"
            << "has_been_checked=" << temp_host->has_been_checked << "\n"
-           << "check_execution_time=" << qSetRealNumberPrecision(3) << ::fixed<< temp_host->execution_time << reset << "\n"
-           << "check_latency=" << qSetRealNumberPrecision(3) << ::fixed << temp_host->latency << reset << "\n"
+           << "check_execution_time=" << std::setprecision(3) << std::fixed<< temp_host->execution_time << std::setprecision(ss) << "\n"
+           << "check_latency=" << std::setprecision(3) << std::fixed << temp_host->latency << std::setprecision(ss) << "\n"
            << "check_type=" << temp_host->check_type << "\n"
            << "current_state=" << temp_host->current_state << "\n"
            << "last_state=" << temp_host->last_state << "\n"
@@ -301,7 +300,7 @@ int xrddefault_save_state_information(void) {
            << "process_performance_data=" << temp_host->process_performance_data << "\n"
            << "obsess_over_host=" << temp_host->obsess_over_host << "\n"
            << "is_flapping=" << temp_host->is_flapping << "\n"
-           << "percent_state_change=" << qSetRealNumberPrecision(2) << ::fixed << temp_host->percent_state_change << reset << "\n"
+           << "percent_state_change=" << std::setprecision(2) << std::fixed << temp_host->percent_state_change << std::setprecision(ss) << "\n"
            << "check_flapping_recovery_notification=" << temp_host->check_flapping_recovery_notification << "\n";
     stream << "state_history=";
     for (unsigned int x = 0; x < MAX_STATE_HISTORY_ENTRIES; x++)
@@ -336,8 +335,8 @@ int xrddefault_save_state_information(void) {
            << "notification_period=" << (temp_service->notification_period ? temp_service->notification_period : "") << "\n"
            << "event_handler=" << (temp_service->event_handler ? temp_service->event_handler : "") << "\n"
            << "has_been_checked=" << temp_service->has_been_checked << "\n"
-           << "check_execution_time=" << qSetRealNumberPrecision(3) << ::fixed << temp_service->execution_time << reset << "\n"
-           << "check_latency=" << qSetRealNumberPrecision(3) << ::fixed << temp_service->latency << reset << "\n"
+           << "check_execution_time=" << std::setprecision(3) << std::fixed << temp_service->execution_time << std::setprecision(ss) << "\n"
+           << "check_latency=" << std::setprecision(3) << std::fixed << temp_service->latency << std::setprecision(ss) << "\n"
            << "check_type=" << temp_service->check_type << "\n"
            << "current_state=" << temp_service->current_state << "\n"
            << "last_state=" << temp_service->last_state << "\n"
@@ -380,7 +379,7 @@ int xrddefault_save_state_information(void) {
            << "process_performance_data=" << temp_service->process_performance_data << "\n"
            << "obsess_over_service=" << temp_service->obsess_over_service << "\n"
            << "is_flapping=" << temp_service->is_flapping << "\n"
-           << "percent_state_change=" << qSetRealNumberPrecision(2) << ::fixed << temp_service->percent_state_change << reset << "\n"
+           << "percent_state_change=" << std::setprecision(2) << std::fixed << temp_service->percent_state_change << std::setprecision(ss) << "\n"
            << "check_flapping_recovery_notification=" << temp_service->check_flapping_recovery_notification << "\n";
 
     stream << "state_history=";
@@ -480,9 +479,6 @@ int xrddefault_save_state_information(void) {
            << "}\n";
   }
 
-  // flush data.
-  stream.flush();
-
   if (ftruncate(xrddefault_retention_file_fd, 0) == -1
       || fsync(xrddefault_retention_file_fd) == -1
       || lseek(xrddefault_retention_file_fd, 0, SEEK_SET) == (off_t)-1) {
@@ -492,7 +488,8 @@ int xrddefault_save_state_information(void) {
     return (ERROR);
   }
 
-  write(xrddefault_retention_file_fd, data.constData(), data.size());
+  std::string data(stream.str());
+  write(xrddefault_retention_file_fd, data.c_str(), data.size());
   return (OK);
 }
 

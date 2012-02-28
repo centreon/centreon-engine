@@ -20,6 +20,7 @@
 */
 
 #include <QTimer>
+#include <stdlib.h>
 #include <time.h>
 #include "globals.hh"
 #include "broker.hh"

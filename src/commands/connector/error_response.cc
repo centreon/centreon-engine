@@ -17,7 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <QVector>
+#include <sstream>
 #include <vector>
 #include "error.hh"
 #include "commands/connector/error_response.hh"
@@ -107,9 +107,12 @@ request* error_response::clone() const {
  *  @return The data request.
  */
 std::string error_response::build() {
-  return (std::string().setNum(_id) + '\0' +
-	  std::string().setNum(_code) + '\0' +
-	  _message.c_str() + cmd_ending());
+  std::ostringstream oss;
+  oss << _id << '\0'
+      << _code << '\0'
+      << _message;
+  oss.write(cmd_ending().c_str(), cmd_ending().size());
+  return (oss.str());
 }
 
 /**
@@ -118,28 +121,35 @@ std::string error_response::build() {
  *  @param[in] data The data of the request information.
  */
 void error_response::restore(std::string const& data) {
-  std::vector<std::string> list = data.split('\0').toVector().toStdVector();
+  std::vector<std::string> list;
+  size_t last(0);
+  size_t pos(data.find('\0', last));
+  while (pos != std::string::npos) {
+    list.push_back(data.substr(last, pos - last));
+    last = pos + 1;
+    pos = data.find('\0', last);
+  }
+  if (last != data.size())
+    list.push_back(data.substr(last));
+
   if (list.size() != 3) {
     throw (engine_error() << "bad request argument.");
   }
 
-  bool ok;
-  int id = list[0].toInt(&ok);
-  if (ok == false || id < 0 || id != _id) {
+  int id(0);
+  std::istringstream iss(list[0]);
+  if ((!(iss >> id) || !iss.eof()) || id < 0 || id != _id)
     throw (engine_error() << "bad request id.");
+
+  {
+    unsigned int code(0);
+    std::istringstream iss(list[1]);
+    if ((!(iss >> code) || !iss.eof()) || code > error)
+      throw (engine_error() << "bad request argument, invalid code.");
+    _code = static_cast<e_code>(code);
   }
 
-  unsigned int code = list[1].toUInt(&ok);
-  if (ok == false || code > error) {
-    throw (engine_error() << "bad request argument, invalid code.");
-  }
-
-  _code = static_cast<e_code>(code);
-
-  _message = list[2].constData();
-  if (ok == false) {
-    throw (engine_error() << "bad request argument, invalid message.");
-  }
+  _message = list[2];
 }
 
 /**

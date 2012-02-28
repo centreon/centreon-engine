@@ -17,7 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <QVector>
+#include <sstream>
 #include <vector>
 #include "error.hh"
 #include "commands/connector/execute_response.hh"
@@ -124,16 +124,16 @@ request* execute_response::clone() const {
  *  @return The data request.
  */
 std::string execute_response::build() {
-  std::string query =
-    std::string().setNum(_id) + '\0' +
-    std::string().setNum(static_cast<qulonglong>(_cmd_id)) + '\0' +
-    std::string().setNum(_is_executed) + '\0' +
-    std::string().setNum(_exit_code) + '\0' +
-    std::string().setNum(_end_time.toTime_t()) + '\0';
-  query += _stderr.c_str();
-  query += '\0';
-  query += _stdout.c_str();
-  return (query + cmd_ending());
+  std::ostringstream oss;
+  oss << _id << '\0'
+      << static_cast<qulonglong>(_cmd_id) << '\0'
+      << _is_executed << '\0'
+      << _exit_code << '\0'
+      << _end_time.toTime_t() << '\0'
+      << _stderr.c_str() << '\0'
+      << _stdout.c_str();
+  oss.write(cmd_ending().c_str(), cmd_ending().size());
+  return (oss.str());
 }
 
 /**
@@ -142,40 +142,54 @@ std::string execute_response::build() {
  *  @param[in] data The data of the request information.
  */
 void execute_response::restore(std::string const& data) {
-  std::vector<std::string> list = data.split('\0').toVector().toStdVector();
+  std::vector<std::string> list;
+  size_t last(0);
+  size_t pos(data.find('\0', last));
+  while (pos != std::string::npos) {
+    list.push_back(data.substr(last, pos - last));
+    last = pos + 1;
+    pos = data.find('\0', last);
+  }
+  if (last != data.size())
+    list.push_back(data.substr(last));
+
   if (list.size() != 7) {
     throw (engine_error() << "bad request argument.");
   }
 
-  bool ok;
-  int id = list[0].toInt(&ok);
-  if (ok == false || id < 0 || id != _id) {
+  int id(0);
+  std::istringstream iss(list[0]);
+  if ((!(iss >> id) || !iss.eof()) || id < 0 || id != _id)
     throw (engine_error() << "bad request id.");
+
+  {
+    std::istringstream iss(list[1]);
+    if (!(iss >> _cmd_id) || !iss.eof())
+      throw (engine_error() << "bad request argument, invalid cmd_id.");
   }
 
-  _cmd_id = list[1].toULong(&ok);
-  if (ok == false) {
-    throw (engine_error() << "bad request argument, invalid cmd_id.");
+  {
+    std::istringstream iss(list[2]);
+    if (!(iss >> _is_executed) || !iss.eof())
+      throw (engine_error() << "bad request argument, invalid is_executed.");
   }
 
-  _is_executed = list[2].toInt(&ok);
-  if (ok == false) {
-    throw (engine_error() << "bad request argument, invalid is_executed.");
+  {
+    std::istringstream iss(list[3]);
+    if (!(iss >> _exit_code) || !iss.eof())
+      throw (engine_error() << "bad request argument, invalid exit_code.");
   }
 
-  _exit_code = list[3].toInt(&ok);
-  if (ok == false) {
-    throw (engine_error() << "bad request argument, invalid exit_code.");
+  {
+    unsigned int timestamp;
+    std::istringstream iss(list[4]);
+    if (!(iss >> timestamp) || !iss.eof())
+      throw (engine_error() << "bad request argument, invalid end_time.");
+    _end_time.setTime_t(timestamp);
   }
 
-  unsigned int timestamp = list[4].toUInt(&ok);
-  if (ok == false) {
-    throw (engine_error() << "bad request argument, invalid end_time.");
-  }
-  _end_time.setTime_t(timestamp);
-
-  _stderr = list[5].constData();
-  _stdout = list[6].constData();
+  _stderr = list[5];
+  _stdout = list[6];
 }
 
 /**

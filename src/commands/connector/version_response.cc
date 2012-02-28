@@ -17,7 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <QVector>
+#include <sstream>
 #include <vector>
 #include "error.hh"
 #include "commands/connector/version_response.hh"
@@ -107,10 +107,12 @@ request* version_response::clone() const {
  *  @return The data request.
  */
 std::string version_response::build() {
-  return (std::string().setNum(_id) + '\0' +
-	  std::string().setNum(_major) + '\0' +
-	  std::string().setNum(_minor) +
-	  cmd_ending());
+  std::ostringstream oss;
+  oss << _id << '\0'
+      << _major << '\0'
+      << _minor;
+  oss.write(cmd_ending().c_str(), cmd_ending().size());
+  return (oss.str());
 }
 
 /**
@@ -119,25 +121,36 @@ std::string version_response::build() {
  *  @param[in] data The data of the request information.
  */
 void version_response::restore(std::string const& data) {
-  std::vector<std::string> list = data.split('\0').toVector().toStdVector();
+  std::vector<std::string> list;
+  size_t last(0);
+  size_t pos(data.find('\0', last));
+  while (pos != std::string::npos) {
+    list.push_back(data.substr(last, pos - last));
+    last = pos + 1;
+    pos = data.find('\0', last);
+  }
+  if (last != data.size())
+    list.push_back(data.substr(last));
+
   if (list.size() != 3) {
     throw (engine_error() << "bad request argument.");
   }
 
-  bool ok;
-  int id = list[0].toInt(&ok);
-  if (ok == false || id < 0 || id != _id) {
+  int id(0);
+  std::istringstream iss(list[0]);
+  if ((!(iss >> id) || !iss.eof()) || id < 0 || id != _id)
     throw (engine_error() << "bad request id.");
+
+  {
+    std::istringstream iss(list[1]);
+    if ((!(iss >> _major) || !iss.eof()))
+      throw (engine_error() << "bad request argument, invalid major.");
   }
 
-  _major = list[1].toUInt(&ok);
-  if (ok == false) {
-    throw (engine_error() << "bad request argument, invalid major.");
-  }
-
-  _minor = list[2].toUInt(&ok);
-  if (ok == false) {
-    throw (engine_error() << "bad request argument, invalid minor.");
+  {
+    std::istringstream iss(list[2]);
+    if ((!(iss >> _minor) || !iss.eof()))
+      throw (engine_error() << "bad request argument, invalid minor.");
   }
 }
 
