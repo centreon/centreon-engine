@@ -113,8 +113,8 @@ int main(int argc, char** argv) {
   commands::set::load();
   checks::checker::load();
   events::loop::load();
-  broker::loader::load();
-  broker::compatibility::load();
+  com::centreon::engine::broker::loader::load();
+  com::centreon::engine::broker::compatibility::load();
 
   // Process all command line arguments.
 #ifdef HAVE_GETOPT_H
@@ -610,8 +610,8 @@ int main(int argc, char** argv) {
   }
 
   // Unload singletons.
-  broker::compatibility::unload();
-  broker::loader::unload();
+  com::centreon::engine::broker::compatibility::unload();
+  com::centreon::engine::broker::loader::unload();
   events::loop::unload();
   checks::checker::unload();
   commands::set::unload();
