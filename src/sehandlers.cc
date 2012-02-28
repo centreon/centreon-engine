@@ -271,7 +271,6 @@ int handle_service_event(service* svc) {
 int run_global_service_event_handler(nagios_macros* mac, service* svc) {
   char* raw_command = NULL;
   char* processed_command = NULL;
-  char* raw_logentry = NULL;
   char* processed_logentry = NULL;
   char* command_output = NULL;
   int early_timeout = FALSE;
@@ -329,7 +328,7 @@ int run_global_service_event_handler(nagios_macros* mac, service* svc) {
     oss << "GLOBAL SERVICE EVENT HANDLER: " << svc->host_name << ';'
 	<< svc->description << ";$SERVICESTATE$;$SERVICESTATETYPE$;$SERVICEATTEMPT$;"
 	<< qPrintable(config.get_global_service_event_handler()) << std::endl;
-    raw_logentry = my_strdup(oss.str().c_str());
+    char const* raw_logentry(oss.str().c_str());
     process_macros_r(mac, raw_logentry, &processed_logentry, macro_options);
     logger(log_event_handler, basic) << processed_logentry;
   }
@@ -360,7 +359,6 @@ int run_global_service_event_handler(nagios_macros* mac, service* svc) {
       || (neb_result == NEBERROR_CALLBACKOVERRIDE)) {
     delete[] processed_command;
     delete[] raw_command;
-    delete[] raw_logentry;
     delete[] processed_logentry;
     return ((neb_result == NEBERROR_CALLBACKCANCEL) ? ERROR : OK);
   }
@@ -407,7 +405,6 @@ int run_global_service_event_handler(nagios_macros* mac, service* svc) {
   delete[] command_output;
   delete[] raw_command;
   delete[] processed_command;
-  delete[] raw_logentry;
   delete[] processed_logentry;
 
   return (OK);
@@ -417,7 +414,6 @@ int run_global_service_event_handler(nagios_macros* mac, service* svc) {
 int run_service_event_handler(nagios_macros* mac, service* svc) {
   char* raw_command = NULL;
   char* processed_command = NULL;
-  char* raw_logentry = NULL;
   char* processed_logentry = NULL;
   char* command_output = NULL;
   int early_timeout = FALSE;
@@ -471,7 +467,7 @@ int run_service_event_handler(nagios_macros* mac, service* svc) {
 	<< svc->description
 	<< ";$SERVICESTATE$;$SERVICESTATETYPE$;$SERVICEATTEMPT$;"
 	<< svc->event_handler << std::endl;
-    raw_logentry = my_strdup(oss.str().c_str());
+    char const* raw_logentry(oss.str().c_str());
     process_macros_r(mac, raw_logentry, &processed_logentry, macro_options);
     logger(log_event_handler, basic) << processed_logentry;
   }
@@ -502,7 +498,6 @@ int run_service_event_handler(nagios_macros* mac, service* svc) {
       || (neb_result == NEBERROR_CALLBACKOVERRIDE)) {
     delete[] processed_command;
     delete[] raw_command;
-    delete[] raw_logentry;
     delete[] processed_logentry;
     return ((neb_result == NEBERROR_CALLBACKCANCEL) ? ERROR : OK);
   }
@@ -549,7 +544,6 @@ int run_service_event_handler(nagios_macros* mac, service* svc) {
   delete[] command_output;
   delete[] raw_command;
   delete[] processed_command;
-  delete[] raw_logentry;
   delete[] processed_logentry;
 
   return (OK);
@@ -614,7 +608,6 @@ int handle_host_event(host* hst) {
 int run_global_host_event_handler(nagios_macros* mac, host* hst) {
   char* raw_command = NULL;
   char* processed_command = NULL;
-  char* raw_logentry = NULL;
   char* processed_logentry = NULL;
   char* command_output = NULL;
   int early_timeout = FALSE;
@@ -670,7 +663,7 @@ int run_global_host_event_handler(nagios_macros* mac, host* hst) {
     oss << "GLOBAL HOST EVENT HANDLER: " << hst->name
 	<< "$HOSTSTATE$;$HOSTSTATETYPE$;$HOSTATTEMPT$;"
 	<< qPrintable(config.get_global_host_event_handler()) << std::endl;
-    raw_logentry = my_strdup(oss.str().c_str());
+    char const* raw_logentry(oss.str().c_str());
     process_macros_r(mac, raw_logentry, &processed_logentry, macro_options);
     logger(log_event_handler, basic) << processed_logentry;
   }
@@ -700,7 +693,6 @@ int run_global_host_event_handler(nagios_macros* mac, host* hst) {
       || (neb_result == NEBERROR_CALLBACKOVERRIDE)) {
     delete[] processed_command;
     delete[] raw_command;
-    delete[] raw_logentry;
     delete[] processed_logentry;
     return ((neb_result == NEBERROR_CALLBACKCANCEL) ? ERROR : OK);
   }
@@ -747,7 +739,6 @@ int run_global_host_event_handler(nagios_macros* mac, host* hst) {
   delete[] command_output;
   delete[] raw_command;
   delete[] processed_command;
-  delete[] raw_logentry;
   delete[] processed_logentry;
 
   return (OK);
@@ -757,7 +748,6 @@ int run_global_host_event_handler(nagios_macros* mac, host* hst) {
 int run_host_event_handler(nagios_macros* mac, host* hst) {
   char* raw_command = NULL;
   char* processed_command = NULL;
-  char* raw_logentry = NULL;
   char* processed_logentry = NULL;
   char* command_output = NULL;
   int early_timeout = FALSE;
@@ -808,7 +798,7 @@ int run_host_event_handler(nagios_macros* mac, host* hst) {
     oss << "HOST EVENT HANDLER: " << hst->name
 	<< ";$HOSTSTATE$;$HOSTSTATETYPE$;$HOSTATTEMPT$;"
 	<< hst->event_handler << std::endl;
-    raw_logentry = my_strdup(oss.str().c_str());
+    char const* raw_logentry(oss.str().c_str());
     process_macros_r(mac, raw_logentry, &processed_logentry, macro_options);
     logger(log_event_handler, basic) << processed_logentry;
   }
@@ -839,7 +829,6 @@ int run_host_event_handler(nagios_macros* mac, host* hst) {
       || (neb_result == NEBERROR_CALLBACKOVERRIDE)) {
     delete[] processed_command;
     delete[] raw_command;
-    delete[] raw_logentry;
     delete[] processed_logentry;
     return ((neb_result == NEBERROR_CALLBACKCANCEL) ? ERROR : OK);
   }
@@ -886,7 +875,6 @@ int run_host_event_handler(nagios_macros* mac, host* hst) {
   delete[] command_output;
   delete[] raw_command;
   delete[] processed_command;
-  delete[] raw_logentry;
   delete[] processed_logentry;
 
   return (OK);

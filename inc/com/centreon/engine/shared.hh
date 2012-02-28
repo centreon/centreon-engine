@@ -48,11 +48,11 @@ char* my_strsep(char** stringp, const char* delim);
 mmapfile* mmap_fopen(char const* filename);
 int mmap_fclose(mmapfile* temp_mmapfile);
 char* mmap_fgets(mmapfile* temp_mmapfile);
-char* mmap_fgets_multiline(mmapfile*  temp_mmapfile);
+char* mmap_fgets_multiline(mmapfile* temp_mmapfile);
 void strip(char* buffer);
 int hashfunc(const char* name1, const char* name2, int hashslots);
 int compare_hashdata(const char* val1a, const char* val1b, const char* val2a, const char* val2b);
-void get_datetime_string(time_t* raw_time, char* buffer, int buffer_length, int type);
+void get_datetime_string(time_t const* raw_time, char* buffer, int buffer_length, int type);
 void get_time_breakdown(unsigned long raw_time, int* days, int* hours, int* minutes, int* seconds);
 char* resize_string(char* str, size_t size);
 

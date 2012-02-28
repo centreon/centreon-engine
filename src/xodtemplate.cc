@@ -114,7 +114,7 @@ static char const* xodtemplate_config_file_name(int config_file) {
 /******************************************************************/
 
 /* process all config files - both core and CGIs pass in name of main config file */
-int xodtemplate_read_config_data(char* main_config_file, int options, int cache, int precache) {
+int xodtemplate_read_config_data(char const* main_config_file, int options, int cache, int precache) {
   char* config_file = NULL;
   char* config_base_dir = NULL;
   char* input = NULL;
@@ -453,7 +453,7 @@ int xodtemplate_read_config_data(char* main_config_file, int options, int cache,
 }
 
 /* grab config variable from main config file */
-int xodtemplate_grab_config_info(char* main_config_file) {
+int xodtemplate_grab_config_info(char const* main_config_file) {
   char* input = NULL;
   char* var = NULL;
   char* val = NULL;

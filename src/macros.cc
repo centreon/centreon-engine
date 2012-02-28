@@ -650,8 +650,6 @@ int grab_standard_contact_macro_r(nagios_macros* mac,
                                   char** output) {
   contactgroup* temp_contactgroup = NULL;
   objectlist* temp_objectlist = NULL;
-  char* buf1 = NULL;
-  char* buf2 = NULL;
 
   (void)mac;
 
@@ -678,29 +676,23 @@ int grab_standard_contact_macro_r(nagios_macros* mac,
       *output = my_strdup(temp_contact->pager);
     break;
 
-  case MACRO_CONTACTGROUPNAMES:
+  case MACRO_CONTACTGROUPNAMES: {
+    std::string buf;
     /* get the contactgroup names */
     /* find all contactgroups this contact is a member of */
     for (temp_objectlist = temp_contact->contactgroups_ptr;
          temp_objectlist != NULL;
          temp_objectlist = temp_objectlist->next) {
-
       if ((temp_contactgroup = (contactgroup*)temp_objectlist->object_ptr) == NULL)
         continue;
 
-      std::ostringstream oss;
-      if (buf2)
-        oss << buf2 << ',';
-      oss << temp_contactgroup->group_name;
-      buf1 = my_strdup(oss.str().c_str());
-      delete[] buf2;
-      buf2 = buf1;
+      if (!buf.empty())
+        buf.append(",");
+      buf.append(temp_contactgroup->group_name);
     }
-    if (buf2) {
-      *output = my_strdup(buf2);
-      delete[] buf2;
-      buf2 = NULL;
-    }
+    if (!buf.empty())
+      *output = my_strdup(buf.c_str());
+  }
     break;
 
   default:

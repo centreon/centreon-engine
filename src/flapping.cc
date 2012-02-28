@@ -345,8 +345,6 @@ void set_service_flap(service* svc,
                       double high_threshold,
 		      double low_threshold,
                       int allow_flapstart_notification) {
-  char* temp_buffer = NULL;
-
   logger(dbg_functions, basic) << "set_service_flap()";
 
   if (svc == NULL)
@@ -372,20 +370,18 @@ void set_service_flap(service* svc,
       << percent_change << "% change >= " << high_threshold
       << "% threshold).  When the service state stabilizes and the flapping "
       << "stops, notifications will be re-enabled.";
-  temp_buffer = my_strdup(oss.str().c_str());
 
   add_new_service_comment(FLAPPING_COMMENT,
 			  svc->host_name,
                           svc->description,
 			  time(NULL),
                           "(Centreon Engine Process)",
-			  temp_buffer,
+			  oss.str().c_str(),
 			  0,
                           COMMENTSOURCE_INTERNAL,
 			  FALSE,
 			  (time_t)0,
                           &(svc->flapping_comment_id));
-  delete[] temp_buffer;
 
   /* set the flapping indicator */
   svc->is_flapping = TRUE;
@@ -486,8 +482,6 @@ void set_host_flap(host* hst,
                    double high_threshold,
 		   double low_threshold,
                    int allow_flapstart_notification) {
-  char* temp_buffer = NULL;
-
   logger(dbg_functions, basic) << "set_host_flap()";
 
   if (hst == NULL)
@@ -510,18 +504,17 @@ void set_host_flap(host* hst,
       << percent_change << "% change > " << high_threshold
       << "% threshold).  When the host state stabilizes and the "
       << "flapping stops, notifications will be re-enabled.";
-  temp_buffer = my_strdup(oss.str().c_str());
+
   add_new_host_comment(FLAPPING_COMMENT,
 		       hst->name,
 		       time(NULL),
                        "(Centreon Engine Process)",
-		       temp_buffer,
+		       oss.str().c_str(),
 		       0,
                        COMMENTSOURCE_INTERNAL,
 		       FALSE,
 		       (time_t)0,
                        &(hst->flapping_comment_id));
-  delete[] temp_buffer;
 
   /* set the flapping indicator */
   hst->is_flapping = TRUE;

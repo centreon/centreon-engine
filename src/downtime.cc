@@ -37,12 +37,12 @@ using namespace com::centreon::engine::logging;
 /******************************************************************/
 
 /* initializes scheduled downtime data */
-int initialize_downtime_data(char* config_file) {
+int initialize_downtime_data(char const* config_file) {
   return (xdddefault_initialize_downtime_data(config_file));
 }
 
 /* cleans up scheduled downtime data */
-int cleanup_downtime_data(char* config_file) {
+int cleanup_downtime_data(char const* config_file) {
   int result = xdddefault_cleanup_downtime_data(config_file);
 
   /* free memory allocated to downtime data */
@@ -56,11 +56,11 @@ int cleanup_downtime_data(char* config_file) {
 
 /* schedules a host or service downtime */
 int schedule_downtime(int type,
-                      char* host_name,
-                      char* service_description,
+                      char const* host_name,
+                      char const* service_description,
                       time_t entry_time,
-                      char* author,
-                      char* comment_data,
+                      char const* author,
+                      char const* comment_data,
                       time_t start_time,
                       time_t end_time,
                       int fixed,
@@ -225,7 +225,6 @@ int unschedule_downtime(int type, unsigned long downtime_id) {
 
 /* registers scheduled downtime (schedules it, adds comments, etc.) */
 int register_downtime(int type, unsigned long downtime_id) {
-  char* temp_buffer = NULL;
   char start_time_string[MAX_DATETIME_LENGTH] = "";
   char end_time_string[MAX_DATETIME_LENGTH] = "";
   scheduled_downtime* temp_downtime = NULL;
@@ -265,25 +264,20 @@ int register_downtime(int type, unsigned long downtime_id) {
   minutes = ((temp_downtime->duration - (hours * 3600)) / 60);
   seconds = temp_downtime->duration - (hours * 3600) - (minutes * 60);
   type_string = temp_downtime->type == HOST_DOWNTIME ? "host" : "service";
-  if (temp_downtime->fixed == TRUE) {
-    std::ostringstream oss;
+  std::ostringstream oss;
+  if (temp_downtime->fixed == TRUE)
     oss << "This " << type_string
         << " has been scheduled for fixed downtime from "
         << start_time_string << " to " << end_time_string
         << " Notifications for the " << type_string
         << " will not be sent out during that time period.";
-    temp_buffer = my_strdup(oss.str().c_str());
-  }
-  else {
-    std::ostringstream oss;
+  else
     oss << "This " << type_string
         << " has been scheduled for flexible downtime starting between "
         << start_time_string << " and " << end_time_string
         << " and lasting for a period of " << hours << " hours and "
         << minutes << " minutes. Notifications for the " << type_string
         << " will not be sent out during that time period.";
-    temp_buffer = my_strdup(oss.str().c_str());
-  }
 
   logger(dbg_downtime, basic) << "Scheduled Downtime Details:";
   if (temp_downtime->type == HOST_DOWNTIME) {
@@ -311,7 +305,7 @@ int register_downtime(int type, unsigned long downtime_id) {
                     svc->description,
                     time(NULL),
                     "(Centreon Engine Process)",
-                    temp_buffer,
+                    oss.str().c_str(),
                     0,
                     COMMENTSOURCE_INTERNAL,
                     FALSE,
@@ -324,14 +318,12 @@ int register_downtime(int type, unsigned long downtime_id) {
                     NULL,
                     time(NULL),
                     "(Centreon Engine Process)",
-                    temp_buffer,
+                    oss.str().c_str(),
                     0,
                     COMMENTSOURCE_INTERNAL,
                     FALSE,
                     (time_t)0,
                     &(temp_downtime->comment_id));
-
-  delete[] temp_buffer;
 
   /*** SCHEDULE DOWNTIME - FLEXIBLE (NON-FIXED) DOWNTIME IS HANDLED AT A LATER POINT ***/
 

@@ -411,7 +411,7 @@ int compare_hashdata(char const* val1a,
  * given a date/time in time_t format, produce a corresponding
  * date/time string, including timezone
  */
-void get_datetime_string(time_t* raw_time,
+void get_datetime_string(time_t const* raw_time,
 			 char* buffer,
                          int buffer_length,
 			 int type) {

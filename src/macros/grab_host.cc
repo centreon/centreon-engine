@@ -122,10 +122,7 @@ static char* get_host_check_type(host& hst, nagios_macros* mac) {
 static char* get_host_group_names(host& hst, nagios_macros* mac) {
   (void)mac;
 
-  // Variables.
-  char* buf1(NULL);
-  char* buf2(NULL);
-
+  std::string buf;
   // Find all hostgroups this host is associated with.
   for (objectlist* temp_objectlist = hst.hostgroups_ptr;
        temp_objectlist != NULL;
@@ -133,14 +130,12 @@ static char* get_host_group_names(host& hst, nagios_macros* mac) {
     hostgroup* temp_hostgroup(
       static_cast<hostgroup*>(temp_objectlist->object_ptr));
     if (temp_hostgroup) {
-      std::ostringstream oss;
-      oss << (buf2 ? buf2 : "") << (buf2 ? "," : "") << temp_hostgroup->group_name;
-      buf1 = my_strdup(oss.str().c_str());
-      delete [] buf2;
-      buf2 = buf1;
+      if (!buf.empty())
+        buf.append(",");
+      buf.append(temp_hostgroup->group_name);
     }
   }
-  return (buf2 ? buf2 : my_strdup(""));
+  return (my_strdup(buf.c_str()));
 }
 
 /**

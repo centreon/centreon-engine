@@ -84,11 +84,7 @@ int check_for_external_commands(void) {
       break;
     }
 
-    if (external_command_buffer.buffer[external_command_buffer.tail])
-      buffer = my_strdup(((char**)external_command_buffer.buffer)[external_command_buffer.tail]);
-
-    /* free memory allocated for buffer slot */
-    delete[] ((char**)external_command_buffer.buffer)[external_command_buffer.tail];
+    buffer = ((char**)external_command_buffer.buffer)[external_command_buffer.tail];
     ((char**)external_command_buffer.buffer)[external_command_buffer.tail] = NULL;
 
     /* adjust tail counter and number of items */
@@ -462,59 +458,42 @@ void cmd_signal_process(int cmd, char* args) {
 
 /* processes results of an external service check */
 int cmd_process_service_check_result(int cmd, time_t check_time, char* args) {
-  char* temp_ptr = NULL;
-  char* host_name = NULL;
-  char* svc_description = NULL;
-  int return_code = 0;
-  char* output = NULL;
-  int result = 0;
-
   (void)cmd;
 
   /* get the host name */
-  if ((temp_ptr = my_strtok(args, ";")) == NULL)
+  char const* host_name(my_strtok(args, ";"));
+  if (!host_name)
     return (ERROR);
-  host_name = my_strdup(temp_ptr);
 
   /* get the service description */
-  if ((temp_ptr = my_strtok(NULL, ";")) == NULL) {
-    delete[] host_name;
+  char const* svc_description(my_strtok(NULL, ";"));
+  if (!svc_description)
     return (ERROR);
-  }
-  svc_description = my_strdup(temp_ptr);
 
   /* get the service check return code */
-  if ((temp_ptr = my_strtok(NULL, ";")) == NULL) {
-    delete[] host_name;
-    delete[] svc_description;
+  char const* temp_ptr(my_strtok(NULL, ";"));
+  if (!temp_ptr)
     return (ERROR);
-  }
-  return_code = atoi(temp_ptr);
+  int return_code(atoi(temp_ptr));
 
   /* get the plugin output (may be empty) */
-  if ((temp_ptr = my_strtok(NULL, "\n")) == NULL)
-    output = my_strdup("");
-  else
-    output = my_strdup(temp_ptr);
+  char const* output(my_strtok(NULL, "\n"));
+  if (!output)
+    output = "";
 
   /* submit the passive check result */
-  result = process_passive_service_check(check_time,
-                                         host_name,
-                                         svc_description,
-                                         return_code,
-                                         output);
-  /* free memory */
-  delete[] host_name;
-  delete[] svc_description;
-  delete[] output;
-
+  int result = process_passive_service_check(check_time,
+                                             host_name,
+                                             svc_description,
+                                             return_code,
+                                             output);
   return (result);
 }
 
 /* submits a passive service check result for later processing */
 int process_passive_service_check(time_t check_time,
                                   char const* host_name,
-                                  char* svc_description,
+                                  char const* svc_description,
                                   int return_code,
                                   char const* output) {
   host* temp_host = NULL;
@@ -606,49 +585,40 @@ int process_passive_service_check(time_t check_time,
 
 /* process passive host check result */
 int cmd_process_host_check_result(int cmd, time_t check_time, char* args) {
-  char* temp_ptr = NULL;
-  char* host_name = NULL;
-  int return_code = 0;
-  char* output = NULL;
-  int result = 0;
-
   (void)cmd;
 
   /* get the host name */
-  if ((temp_ptr = my_strtok(args, ";")) == NULL)
+  char const* host_name(my_strtok(args, ";"));
+  if (!host_name)
     return (ERROR);
-  host_name = my_strdup(temp_ptr);
 
   /* get the host check return code */
-  if ((temp_ptr = my_strtok(NULL, ";")) == NULL) {
-    delete[] host_name;
+  char const* temp_ptr(my_strtok(NULL, ";"));
+  if (!temp_ptr)
     return (ERROR);
-  }
-  return_code = atoi(temp_ptr);
+  int return_code(atoi(temp_ptr));
 
   /* get the plugin output (may be empty) */
-  if ((temp_ptr = my_strtok(NULL, "\n")) == NULL)
-    output = my_strdup("");
-  else
-    output = my_strdup(temp_ptr);
+  char const* output(my_strtok(NULL, "\n"));
+  if (!output)
+    output = "";
 
   /* submit the check result */
-  result = process_passive_host_check(check_time, host_name, return_code, output);
-
-  /* free memory */
-  delete[] host_name;
-  delete[] output;
+  int result = process_passive_host_check(check_time,
+                                          host_name,
+                                          return_code,
+                                          output);
 
   return (result);
 }
 
 /* process passive host check result */
 int process_passive_host_check(time_t check_time,
-                               char* host_name,
+                               char const* host_name,
                                int return_code,
                                char const* output) {
-  host* temp_host = NULL;
-  char* real_host_name = NULL;
+  host const* temp_host = NULL;
+  char const* real_host_name = NULL;
 
   /* skip this host check result if we aren't accepting passive host checks */
   if (config.get_accept_passive_service_checks() == false)
@@ -2608,8 +2578,8 @@ void disable_contact_service_notifications(contact* cntct) {
 /* schedules downtime for all hosts "beyond" a given host */
 void schedule_and_propagate_downtime(host* temp_host,
                                      time_t entry_time,
-                                     char* author,
-                                     char* comment_data,
+                                     char const* author,
+                                     char const* comment_data,
                                      time_t start_time,
                                      time_t end_time,
                                      int fixed,

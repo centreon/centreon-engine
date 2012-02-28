@@ -33,8 +33,8 @@ int init_command_file_worker_thread(void);
 int shutdown_command_file_worker_thread(void);
 void cleanup_command_file_worker_thread(void* arg);
 void* command_file_worker_thread(void* arg);
-int submit_external_command(char* cmd, int* buffer_items);
-int submit_raw_external_command(char* cmd, time_t* ts, int* buffer_items);
+int submit_external_command(char const* cmd, int* buffer_items);
+int submit_raw_external_command(char const* cmd, time_t* ts, int* buffer_items);
 
 # ifdef __cplusplus
 }

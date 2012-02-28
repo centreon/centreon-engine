@@ -34,7 +34,7 @@ using namespace com::centreon::engine::logging;
 /******************************************************************/
 
 /* read all host configuration data from external source */
-int read_object_config_data(char* main_config_file,
+int read_object_config_data(char const* main_config_file,
 			    int options,
 			    int cache,
 			    int precache) {

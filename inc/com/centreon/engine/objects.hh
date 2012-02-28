@@ -570,7 +570,7 @@ typedef struct host_cursor_struct {
 }              host_cursor;
 
 // Functions
-int read_object_config_data(char* main_config_file, int options, int cache, int precache); // reads all external configuration data of specific types
+int read_object_config_data(char const* main_config_file, int options, int cache, int precache); // reads all external configuration data of specific types
 
 // Object Skiplist Functions
 int init_object_skiplists(void);
