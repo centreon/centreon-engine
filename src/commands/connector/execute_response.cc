@@ -18,6 +18,7 @@
 */
 
 #include <QStringList>
+#include <time.h>
 #include "error.hh"
 #include "commands/connector/execute_response.hh"
 
@@ -127,8 +128,7 @@ QByteArray execute_response::build() {
     QByteArray().setNum(_id) + '\0' +
     QByteArray().setNum(static_cast<qulonglong>(_cmd_id)) + '\0' +
     QByteArray().setNum(_is_executed) + '\0' +
-    QByteArray().setNum(_exit_code) + '\0' +
-    QByteArray().setNum(_end_time.toTime_t()) + '\0';
+    QByteArray().setNum(_exit_code) + '\0';
   query += _stderr.toAscii() + '\0' + _stdout.toAscii();
   return (query + cmd_ending());
 }
@@ -140,7 +140,7 @@ QByteArray execute_response::build() {
  */
 void execute_response::restore(QByteArray const& data) {
   QList<QByteArray> list = data.split('\0');
-  if (list.size() != 7) {
+  if (list.size() != 6) {
     throw (engine_error() << "bad request argument.");
   }
 
@@ -165,14 +165,9 @@ void execute_response::restore(QByteArray const& data) {
     throw (engine_error() << "bad request argument, invalid exit_code.");
   }
 
-  unsigned int timestamp = list[4].toUInt(&ok);
-  if (ok == false) {
-    throw (engine_error() << "bad request argument, invalid end_time.");
-  }
-  _end_time.setTime_t(timestamp);
-
-  _stderr = list[5];
-  _stdout = list[6];
+  _end_time.setTime_t(time(NULL));
+  _stderr = list[4];
+  _stdout = list[5];
 }
 
 /**
