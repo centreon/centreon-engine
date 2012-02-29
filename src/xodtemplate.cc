@@ -9644,30 +9644,42 @@ int xodtemplate_register_command(xodtemplate_command* this_command) {
     return (OK);
 
   // Initialize command executon system.
-  using namespace com::centreon::engine;
-  if (this_command->connector_name == NULL) {
-    QSharedPointer<commands::command> cmd_set(new commands::raw(this_command->command_name,
-								this_command->command_line));
-    commands::set::instance().add_command(cmd_set);
-  }
-  else {
-    xodtemplate_connector temp_connector;
-    temp_connector.connector_name = this_command->connector_name;
-    xodtemplate_connector* connector = (xodtemplate_connector*)skiplist_find_first(xobject_skiplists[X_CONNECTOR_SKIPLIST],
-										   &temp_connector,
-										   NULL);
-    if (connector == NULL) {
-      logger(log_config_error, basic)
-        << "Error: Could not register command (config file '"
-        << xodtemplate_config_file_name(this_command->_config_file)
-        << "', starting on line " << this_command->_start_line << ")";
-      return (ERROR);
+  try {
+    using namespace com::centreon::engine;
+    if (this_command->connector_name == NULL) {
+      QSharedPointer<commands::command> cmd_set(
+        new commands::raw(this_command->command_name,this_command->command_line));
+      commands::set::instance().add_command(cmd_set);
     }
-    QSharedPointer<commands::command> cmd_set(new commands::connector::command(connector->connector_name,
-                                                                               connector->connector_line,
-                                                                               this_command->command_name,
-                                                                               this_command->command_line));
-    commands::set::instance().add_command(cmd_set);
+    else {
+      xodtemplate_connector temp_connector;
+      temp_connector.connector_name = this_command->connector_name;
+      xodtemplate_connector* connector =
+        (xodtemplate_connector*)skiplist_find_first(
+                                  xobject_skiplists[X_CONNECTOR_SKIPLIST],
+                                  &temp_connector,
+                                  NULL);
+      if (connector == NULL) {
+        logger(log_config_error, basic)
+          << "Error: Could not register command (config file '"
+          << xodtemplate_config_file_name(this_command->_config_file)
+          << "', starting on line " << this_command->_start_line << ")";
+        return (ERROR);
+      }
+      QSharedPointer<commands::command> cmd_set(new commands::connector::command(connector->connector_name,
+                                                                                 connector->connector_line,
+                                                                                 this_command->command_name,
+                                                                                 this_command->command_line));
+      commands::set::instance().add_command(cmd_set);
+    }
+  }
+  catch (std::exception const& e) {
+    logger(log_config_error, basic)
+      << "Error: Could not register command (config file '"
+      << xodtemplate_config_file_name(this_command->_config_file)
+      << "', starting on line " << this_command->_start_line << "): "
+      << e.what();
+    return (ERROR);
   }
 
   /* add the command */
