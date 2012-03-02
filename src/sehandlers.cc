@@ -328,8 +328,7 @@ int run_global_service_event_handler(nagios_macros* mac, service* svc) {
     oss << "GLOBAL SERVICE EVENT HANDLER: " << svc->host_name << ';'
 	<< svc->description << ";$SERVICESTATE$;$SERVICESTATETYPE$;$SERVICEATTEMPT$;"
 	<< qPrintable(config.get_global_service_event_handler()) << std::endl;
-    char const* raw_logentry(oss.str().c_str());
-    process_macros_r(mac, raw_logentry, &processed_logentry, macro_options);
+    process_macros_r(mac, oss.str().c_str(), &processed_logentry, macro_options);
     logger(log_event_handler, basic) << processed_logentry;
   }
 
@@ -467,8 +466,7 @@ int run_service_event_handler(nagios_macros* mac, service* svc) {
 	<< svc->description
 	<< ";$SERVICESTATE$;$SERVICESTATETYPE$;$SERVICEATTEMPT$;"
 	<< svc->event_handler << std::endl;
-    char const* raw_logentry(oss.str().c_str());
-    process_macros_r(mac, raw_logentry, &processed_logentry, macro_options);
+    process_macros_r(mac, oss.str().c_str(), &processed_logentry, macro_options);
     logger(log_event_handler, basic) << processed_logentry;
   }
 
@@ -663,8 +661,7 @@ int run_global_host_event_handler(nagios_macros* mac, host* hst) {
     oss << "GLOBAL HOST EVENT HANDLER: " << hst->name
 	<< "$HOSTSTATE$;$HOSTSTATETYPE$;$HOSTATTEMPT$;"
 	<< qPrintable(config.get_global_host_event_handler()) << std::endl;
-    char const* raw_logentry(oss.str().c_str());
-    process_macros_r(mac, raw_logentry, &processed_logentry, macro_options);
+    process_macros_r(mac, oss.str().c_str(), &processed_logentry, macro_options);
     logger(log_event_handler, basic) << processed_logentry;
   }
 
@@ -798,8 +795,7 @@ int run_host_event_handler(nagios_macros* mac, host* hst) {
     oss << "HOST EVENT HANDLER: " << hst->name
 	<< ";$HOSTSTATE$;$HOSTSTATETYPE$;$HOSTATTEMPT$;"
 	<< hst->event_handler << std::endl;
-    char const* raw_logentry(oss.str().c_str());
-    process_macros_r(mac, raw_logentry, &processed_logentry, macro_options);
+    process_macros_r(mac, oss.str().c_str(), &processed_logentry, macro_options);
     logger(log_event_handler, basic) << processed_logentry;
   }
 
