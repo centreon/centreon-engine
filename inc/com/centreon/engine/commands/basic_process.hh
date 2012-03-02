@@ -108,7 +108,7 @@ namespace                          com {
 
         private slots:
           void                     _notification_standard_output();
-          void                     _notification_standard_error();
+          // void                     _notification_standard_error();
           void                     _notification_dead();
 
         private:
@@ -123,10 +123,12 @@ namespace                          com {
           static qint64            _available_bytes(int fd) throw();
           static pid_t             _waitpid(pid_t pid, int* status, int options) throw();
           static qint64            _read(int fd, void* buf, qint64 nbyte) throw();
+          static void              _clean_args(char** args) throw ();
           static void              _close(int& fd) throw();
           static int               _chdir(char const* working_directory) throw();
           static int               _dup2(int fildes, int fildes2) throw();
           static char**            _build_args(QString const& program, QStringList const& arguments);
+          static void              _set_cloexec(int fd);
           static QStringList       _split_command_line(QString const& command_line);
 
           // QProcessEnvironment      _environment;
@@ -134,17 +136,17 @@ namespace                          com {
           QString                  _program;
           QString                  _working_directory;
           QByteArray               _standard_output;
-          QByteArray               _standard_error;
+          // QByteArray               _standard_error;
           QSocketNotifier*         _notifier_output;
-          QSocketNotifier*         _notifier_error;
+          // QSocketNotifier*         _notifier_error;
           QSocketNotifier*         _notifier_dead;
           QProcess::ProcessChannel _channel;
           QProcess::ProcessError   _perror;
           QProcess::ProcessState   _pstate;
           pid_t                    _pid;
           int                      _pipe_out[2];
-          int                      _pipe_err[2];
-          int                      _pipe_in[2];
+          // int                      _pipe_err[2];
+          // int                      _pipe_in[2];
           int                      _pipe_dead[2];
           int                      _status;
         };

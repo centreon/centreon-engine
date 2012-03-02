@@ -29,6 +29,7 @@
 #include <sys/wait.h>
 #include <fcntl.h>
 #include <sys/ioctl.h>
+#include "error.hh"
 #include "commands/basic_process.hh"
 
 using namespace com::centreon::engine::commands;
@@ -41,7 +42,7 @@ using namespace com::centreon::engine::commands;
 basic_process::basic_process(QObject* parent)
   : QIODevice(parent),
     _notifier_output(NULL),
-    _notifier_error(NULL),
+    // _notifier_error(NULL),
     _notifier_dead(NULL),
     _channel(QProcess::StandardOutput),
     _perror(QProcess::UnknownError),
@@ -50,8 +51,8 @@ basic_process::basic_process(QObject* parent)
     _status(0) {
   for (unsigned int i(0); i < 2; ++i) {
     _pipe_out[i] = -1;
-    _pipe_err[i] = -1;
-    _pipe_in[i] = -1;
+    // _pipe_err[i] = -1;
+    // _pipe_in[i] = -1;
     _pipe_dead[i] = -1;
   }
 }
@@ -65,7 +66,7 @@ basic_process::~basic_process() throw() {
     waitForFinished(-1);
   }
   delete _notifier_output;
-  delete _notifier_error;
+  // delete _notifier_error;
   delete _notifier_dead;
 }
 
@@ -75,15 +76,17 @@ basic_process::~basic_process() throw() {
  *  @param[in] channel The selected channel ({ StandardOutput, StandardError }).
  */
 void basic_process::closeReadChannel(QProcess::ProcessChannel channel) {
-  int& fd(channel == QProcess::StandardOutput ? _pipe_out[0] : _pipe_err[0]);
-  _close(fd);
+  // int& fd(channel == QProcess::StandardOutput ? _pipe_out[0] : _pipe_err[0]);
+  // _close(fd);
+  if (channel == QProcess::StandardOutput)
+    _close(_pipe_out[0]);
 }
 
 /**
  *  Close the standard input.
  */
 void basic_process::closeWriteChannel() {
-  _close(_pipe_in[1]);
+  // _close(_pipe_in[1]);
 }
 
 //  QStringList basic_process::environment() const {
@@ -144,9 +147,10 @@ Q_PID basic_process::pid() const {
  *  @return The data.
  */
 QByteArray basic_process::readAllStandardError() {
-  QByteArray error(_standard_error);
-  _standard_error.clear();
-  return (error);
+  // QByteArray error(_standard_error);
+  // _standard_error.clear();
+  // return (error);
+  return (QByteArray());
 }
 
 /**
@@ -296,8 +300,8 @@ bool basic_process::waitForReadyRead(int msecs) {
   (void)msecs;
 
   if (_pstate == QProcess::NotRunning
-      || (_channel == QProcess::StandardOutput && _pipe_out[0] == -1)
-      || (_channel == QProcess::StandardError && _pipe_err[0] == -1))
+      || (_channel == QProcess::StandardOutput && _pipe_out[0] == -1))
+    // || (_channel == QProcess::StandardError && _pipe_err[0] == -1))
     return (false);
   // XXX: not implemented yet.
   return (false);
@@ -356,10 +360,13 @@ QString basic_process::workingDirectory() const {
  *  @return The number of bytes available.
  */
 qint64 basic_process::bytesAvailable() const {
-  QByteArray const* buffer(_channel == QProcess::StandardOutput
-                           ? &_standard_output
-                           : &_standard_error);
-  return (QIODevice::bytesAvailable() + buffer->size());
+  if (_channel != QProcess::StandardOutput)
+    return (0);
+  return (QIODevice::bytesAvailable() + _standard_output.size());
+  // QByteArray const* buffer(_channel == QProcess::StandardOutput
+  //                          ? &_standard_output
+  //                          : &_standard_error);
+  // return (QIODevice::bytesAvailable() + buffer->size());
 }
 
 /**
@@ -386,9 +393,12 @@ bool basic_process::isSequential() const {
  *  @return True if a line is available.
  */
 bool basic_process::canReadLine() const {
-  QBuffer buffer(_channel == QProcess::StandardOutput
-                 ? const_cast<QByteArray*>(&_standard_output)
-                 : const_cast<QByteArray*>(&_standard_error));
+  if (_channel != QProcess::StandardOutput)
+    return (false);
+  // QBuffer buffer(_channel == QProcess::StandardOutput
+  //                ? const_cast<QByteArray*>(&_standard_output)
+  //                : const_cast<QByteArray*>(&_standard_error));
+  QBuffer buffer(const_cast<QByteArray*>(&_standard_output));
   return (buffer.canReadLine() || QIODevice::canReadLine());
 }
 
@@ -411,10 +421,13 @@ void basic_process::close() {
  *  data are read, othrewise false.
  */
 bool basic_process::atEnd() const {
-  QByteArray const* buffer(_channel == QProcess::StandardOutput
-                           ? &_standard_output
-                           : &_standard_error);
-  return (QIODevice::atEnd() && (!isOpen() || buffer->isEmpty()));
+  if (_channel != QProcess::StandardOutput)
+    return (true);
+  return (QIODevice::atEnd() && (!isOpen() || _standard_output.isEmpty()));
+  // QByteArray const* buffer(_channel == QProcess::StandardOutput
+  //                          ? &_standard_output
+  //                          : &_standard_error);
+  // return (QIODevice::atEnd() && (!isOpen() || buffer->isEmpty()));
 }
 
 /**
@@ -463,13 +476,12 @@ void basic_process::setupChildProcess() {
  *  @return Return the number of bytes read.
  */
 qint64 basic_process::readData(char* data, qint64 maxlen) {
-  QByteArray* buffer(_channel == QProcess::StandardOutput
-                     ? &_standard_output
-                     : &_standard_error);
-  qint64 to_read(qMin((int)maxlen, buffer->size()));
+  if (_channel != QProcess::StandardOutput)
+    return (0);
+  qint64 to_read(qMin((int)maxlen, _standard_output.size()));
   if (to_read > 0) {
-    memcpy(data, buffer->constData(), to_read);
-    buffer->right(buffer->size() - to_read);
+    memcpy(data, _standard_output.constData(), to_read);
+    _standard_output.right(_standard_output.size() - to_read);
   }
   return (to_read);
 }
@@ -483,7 +495,10 @@ qint64 basic_process::readData(char* data, qint64 maxlen) {
  *  @return Return the number of bytes written.
  */
 qint64 basic_process::writeData(char const* data, qint64 len) {
-  return (::write(_pipe_in[1], data, len));
+  // return (::write(_pipe_in[1], data, len));
+  (void)data;
+  (void)len;
+  return (0);
 }
 
 /**
@@ -509,28 +524,28 @@ void basic_process::_notification_standard_output() {
   }
 }
 
-/**
- *  Slot call when something append (data to read,
- *  close pipe) on the standard error.
- *  if data are available, all data is read and
- *  readyReadStandardError is emit and if the
- *  pipe is close the notification system is close.
- */
-void basic_process::_notification_standard_error() {
-  if (_pipe_err[0] == -1 || !_notifier_error)
-    return;
+// /**
+//  *  Slot call when something append (data to read,
+//  *  close pipe) on the standard error.
+//  *  if data are available, all data is read and
+//  *  readyReadStandardError is emit and if the
+//  *  pipe is close the notification system is close.
+//  */
+// void basic_process::_notification_standard_error() {
+//   if (_pipe_err[0] == -1 || !_notifier_error)
+//     return;
 
-  if (_read(_pipe_err[0], &_standard_error))
-    emit readyReadStandardError();
-  else {
-    _notifier_error->setEnabled(false);
-    _notifier_error->deleteLater();
-    _notifier_error = NULL;
+//   if (_read(_pipe_err[0], &_standard_error))
+//     emit readyReadStandardError();
+//   else {
+//     _notifier_error->setEnabled(false);
+//     _notifier_error->deleteLater();
+//     _notifier_error = NULL;
 
-    _close(_pipe_err[0]);
-    _emit_finished();
-  }
-}
+//     _close(_pipe_err[0]);
+//     _emit_finished();
+//   }
+// }
 
 /**
  *  Slot call when the process finished.
@@ -546,7 +561,7 @@ void basic_process::_notification_dead() {
   _notifier_dead->deleteLater();
   _notifier_dead = NULL;
 
-  _close(_pipe_in[1]);
+  // _close(_pipe_in[1]);
   _close(_pipe_dead[0]);
 
   _waitpid(_pid, &_status, 0);
@@ -564,90 +579,95 @@ void basic_process::_notification_dead() {
  *  @param[in] mode Set the mode of IODevice.
  */
 void basic_process::_start_process(OpenMode mode) {
-  QIODevice::open(mode);
+  int old_fd(-1);
+  char** args(NULL);
+  try {
+    if ((old_fd = dup(1)) == -1)
+      throw (engine_error() << "start process failed on dup: "
+             << strerror(errno));
 
-  _standard_output.clear();
-  _standard_error.clear();
-  delete _notifier_output;
-  delete _notifier_error;
-  delete _notifier_dead;
-  _perror = QProcess::UnknownError;
-  _status = 0;
+    QIODevice::open(mode);
 
-  if (pipe(_pipe_out) == -1
-      || pipe(_pipe_err) == -1
-      || pipe(_pipe_in) == -1
-      || pipe(_pipe_dead) == -1) {
-    _close_pipe();
-    setProcessState(QProcess::NotRunning);
-    setErrorString("Resource error (pipe failure).");
-    _perror = QProcess::FailedToStart;
-    emit error(_perror);
-    return;
-  }
+    _standard_output.clear();
+    // _standard_error.clear();
+    delete _notifier_output;
+    // delete _notifier_error;
+    delete _notifier_dead;
+    _perror = QProcess::UnknownError;
+    _status = 0;
 
-  setProcessState(QProcess::Starting);
-
-  if ((_pid = fork()) == -1) {
-    _close_pipe();
-    setProcessState(QProcess::NotRunning);
-    setErrorString("Resource error (fork failure).");
-    _perror = QProcess::FailedToStart;
-    emit error(_perror);
-    return;
-  }
-
-  if (!_pid)
-    _exec_child();
-
-  _close(_pipe_out[1]);
-  _close(_pipe_err[1]);
-  _close(_pipe_in[0]);
-  _close(_pipe_dead[1]);
-
-  _notifier_output = new QSocketNotifier(_pipe_out[0], QSocketNotifier::Read, this);
-  QObject::connect(_notifier_output, SIGNAL(activated(int)),
-                   this, SLOT(_notification_standard_output()));
-
-  _notifier_error = new QSocketNotifier(_pipe_err[0], QSocketNotifier::Read, this);
-  QObject::connect(_notifier_error, SIGNAL(activated(int)),
-                   this, SLOT(_notification_standard_error()));
-
-  _notifier_dead = new QSocketNotifier(_pipe_dead[0], QSocketNotifier::Read, this);
-  QObject::connect(_notifier_dead, SIGNAL(activated(int)),
-                   this, SLOT(_notification_dead()));
-
-  setProcessState(QProcess::Running);
-  emit started();
-}
-
-/**
- *  Exec child bind all pipe on different input/output,
- *  call setupChildProcess before call execvp.
- */
-void basic_process::_exec_child() {
-  _close(_pipe_out[0]);
-  _close(_pipe_err[0]);
-  _close(_pipe_in[1]);
-  _close(_pipe_dead[0]);
-  if (_dup2(_pipe_out[1], 1) != -1
-      && _dup2(_pipe_err[1], 2) != -1
-      && _dup2(_pipe_in[0], 0) != -1) {
-    _close(_pipe_in[0]);
-    _close(_pipe_out[1]);
-    _close(_pipe_err[1]);
-
-    char** args(_build_args(_program, _arguments));
-    // char** env = NULL;
-
+    args = _build_args(_program, _arguments);
     _chdir(qPrintable(_working_directory));
 
-    setupChildProcess();
-    execvp(args[0], args);
+    if (pipe(_pipe_out) == -1
+        // || pipe(_pipe_err) == -1
+        // || pipe(_pipe_in) == -1
+        || pipe(_pipe_dead) == -1)
+      throw (engine_error() << "start process failed on pipe: "
+             << strerror(errno));
+
+    if (_dup2(_pipe_out[1], 1) == -1)
+      // || _dup2(_pipe_err[1], 2) == -1
+      // || _dup2(_pipe_in[0], 0) == -1) {
+      throw (engine_error() << "start process failed on dup2: "
+             << strerror(errno));
+
+    _close(_pipe_out[1]);
+    // _close(_pipe_err[1]);
+    // _close(_pipe_in[0]);
+
+    _set_cloexec(_pipe_out[0]);
+    // _set_cloexec(_pipe_err[0]);
+    // _set_cloexec(_pipe_in[1]);
+
+    setProcessState(QProcess::Starting);
+
+    if ((_pid = vfork()) == -1)
+      throw (engine_error() << "start process failed on fork: "
+             << strerror(errno));
+
+    if (!_pid) {
+      execvp(args[0], args);
+      ::_exit(-1);
+    }
+
+    _close(_pipe_dead[1]);
+
+    _notifier_output = new QSocketNotifier(
+                             _pipe_out[0],
+                             QSocketNotifier::Read,
+                             this);
+    QObject::connect(_notifier_output, SIGNAL(activated(int)),
+                     this, SLOT(_notification_standard_output()));
+
+    // _notifier_error = new QSocketNotifier(
+    //                         _pipe_err[0],
+    //                         QSocketNotifier::Read,
+    //                         this);
+    // QObject::connect(_notifier_error, SIGNAL(activated(int)),
+    //                  this, SLOT(_notification_standard_error()));
+
+    // _notifier_dead = new QSocketNotifier(
+    //                        _pipe_dead[0],
+    //                        QSocketNotifier::Read,
+    //                        this);
+    // QObject::connect(_notifier_dead, SIGNAL(activated(int)),
+    //                  this, SLOT(_notification_dead()));
+
+    setProcessState(QProcess::Running);
+    emit started();
+  }
+  catch (std::exception const& e) {
+    _close_pipe();
+    setProcessState(QProcess::NotRunning);
+    setErrorString(e.what());
+    _perror = QProcess::FailedToStart;
+    emit error(_perror);
   }
 
-  std::cerr << "error: " << strerror(errno) << std::endl;
-  ::exit(-1);
+  if (old_fd != -1)
+    dup2(old_fd, 1);
+  _clean_args(args);
 }
 
 /**
@@ -656,8 +676,8 @@ void basic_process::_exec_child() {
 void basic_process::_close_pipe() throw() {
   for (unsigned int i(0); i < 2; ++i) {
     _close(_pipe_out[i]);
-    _close(_pipe_err[i]);
-    _close(_pipe_in[i]);
+    // _close(_pipe_err[i]);
+    // _close(_pipe_in[i]);
     _close(_pipe_dead[i]);
   }
 }
@@ -670,8 +690,8 @@ void basic_process::_close_pipe() throw() {
  */
 void basic_process::_emit_finished() {
   if (_pipe_out[0] == -1
-      && _pipe_err[0] == -1
-      && _pipe_in[1] == -1
+      // && _pipe_err[0] == -1
+      // && _pipe_in[1] == -1
       && _pid == 0)
     emit finished(exitCode(), exitStatus());
 }
@@ -700,6 +720,17 @@ bool basic_process::_read(int fd, QByteArray* str) {
     len -= size;
   }
   return (true);
+}
+
+/**
+ *  Release memory.
+ *
+ *  @param[in] args Arguments array to release memory.
+ */
+void basic_process::_clean_args(char** args) throw () {
+  for (unsigned int i(0); args[i]; ++i)
+    delete[] args[i];
+  delete[] args;
 }
 
 /**
@@ -818,6 +849,21 @@ char** basic_process::_build_args(QString const& program, QStringList const& arg
     args[i++] = qstrdup(qPrintable(*it));
   args[i] = NULL;
   return (args);
+}
+
+/**
+ *  Set the close-on-exec flag on the file descriptor.
+ *
+ *  @param[in] fd The file descriptor to set close on exec.
+ */
+void basic_process::_set_cloexec(int fd) {
+  int flags(fcntl(fd, F_GETFL));
+  if (flags < 0)
+    throw (engine_error() << "Could not get file descriptor flags: "
+           << strerror(errno));
+  if (fcntl(fd, F_SETFL, flags | FD_CLOEXEC) == -1)
+    throw (engine_error() << "Could not set close-on-exec flag: "
+           << strerror(errno));
 }
 
 /**
