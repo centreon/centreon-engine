@@ -89,7 +89,7 @@ int main_test() {
 
   // Remove object (broker).
   for (unsigned int i = 0; i < NB_LOG_TYPE * NB_LOG_LEVEL + NB_DBG_TYPE; ++i) {
-    engine.remove_object(i);
+    engine.remove_object(id[i]);
   }
 
   // Check if all object was remove.

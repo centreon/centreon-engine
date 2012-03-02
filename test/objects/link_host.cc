@@ -1,5 +1,5 @@
 /*
-** Copyright 2011 Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -17,18 +17,20 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <QDebug>
 #include <exception>
-#include "error.hh"
-#include "utils.hh"
-#include "macros.hh"
-#include "objects/host.hh"
-#include "objects/contact.hh"
-#include "objects/contactgroup.hh"
-#include "objects/hostgroup.hh"
-#include "objects/timeperiod.hh"
-#include "objects/command.hh"
-#include "create_object.hh"
+#include <QDebug>
+#include "com/centreon/engine/commands/set.hh"
+#include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/logging/engine.hh"
+#include "com/centreon/engine/macros.hh"
+#include "com/centreon/engine/objects/command.hh"
+#include "com/centreon/engine/objects/contact.hh"
+#include "com/centreon/engine/objects/contactgroup.hh"
+#include "com/centreon/engine/objects/host.hh"
+#include "com/centreon/engine/objects/hostgroup.hh"
+#include "com/centreon/engine/objects/timeperiod.hh"
+#include "com/centreon/engine/utils.hh"
+#include "test/objects/create_object.hh"
 
 using namespace com::centreon::engine::objects;
 using namespace test::objects;
@@ -235,6 +237,8 @@ static void link_with_valid_objects() {
 }
 
 int main() {
+  com::centreon::engine::logging::engine::load();
+  com::centreon::engine::commands::set::load();
   try {
     link_null_pointer();
     link_null_name();

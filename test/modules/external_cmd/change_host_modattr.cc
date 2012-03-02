@@ -1,5 +1,5 @@
 /*
-** Copyright 2011 Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -17,21 +17,21 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <exception>
 #include <QCoreApplication>
 #include <QDebug>
-#include <exception>
-#include "test/unittest.hh"
-#include "logging/engine.hh"
-#include "error.hh"
+#include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/logging/engine.hh"
 #include "commands.hh"
-#include "globals.hh"
+#include "test/unittest.hh"
 
 using namespace com::centreon::engine;
 
 /**
  *  Run change_host_modattr test.
  */
-static void check_change_host_modattr() {
+static int check_change_host_modattr() {
   init_object_skiplists();
 
   host* hst = add_host("name", NULL, NULL, "localhost", NULL, 0, 0.0, 0.0, 42,
@@ -56,15 +56,7 @@ static void check_change_host_modattr() {
   delete hst;
 
   free_object_skiplists();
-}
 
-/**
- *  Check processing of change_host_modattr works.
- */
-int main_test() {
-  logging::engine& engine = logging::engine::instance();
-  check_change_host_modattr();
-  engine.cleanup();
   return (0);
 }
 
@@ -73,7 +65,7 @@ int main_test() {
  */
 int main(int argc, char** argv) {
   QCoreApplication app(argc, argv);
-  unittest utest(&main_test);
+  unittest utest(&check_change_host_modattr);
   QObject::connect(&utest, SIGNAL(finished()), &app, SLOT(quit()));
   utest.start();
   app.exec();

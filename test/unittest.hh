@@ -1,5 +1,5 @@
 /*
-** Copyright 2011      Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -18,16 +18,16 @@
 */
 
 #ifndef TEST_UNITTEST_HH
-# define TEST_UNITTEST_HH
+#  define TEST_UNITTEST_HH
 
-# include <QThread>
-# include <QDebug>
-# include "broker/compatibility.hh"
-# include "broker/loader.hh"
-# include "checks/checker.hh"
-# include "commands/set.hh"
-# include "logging/engine.hh"
-# include "events/loop.hh"
+#  include <QDebug>
+#  include <QThread>
+#  include "com/centreon/engine/broker/compatibility.hh"
+#  include "com/centreon/engine/broker/loader.hh"
+#  include "com/centreon/engine/checks/checker.hh"
+#  include "com/centreon/engine/commands/set.hh"
+#  include "com/centreon/engine/events/loop.hh"
+#  include "com/centreon/engine/logging/engine.hh"
 
 namespace     com {
   namespace   centreon {
@@ -40,16 +40,14 @@ namespace     com {
        */
       class   unittest : public QThread {
       public:
-        unittest(int (*func)())
-          : QThread(), _func(func), _ret(1) {
+              unittest(int (*func)())
+          : QThread(), _func(func), _ret(1) {}
 
-        }
-
-        ~unittest() throw() {
+              ~unittest() throw () {
           wait();
         }
 
-        int   ret() const throw() {
+        int   ret() const throw () {
           return (_ret);
         }
 
@@ -70,21 +68,21 @@ namespace     com {
 
       private:
         void  _init() {
-          logging::engine::instance();
-          commands::set::instance();
-          checks::checker::instance();
-          broker::loader::instance();
-          broker::compatibility::instance();
-          events::loop::instance();
+          logging::engine::load();
+          commands::set::load();
+          checks::checker::load();
+          events::loop::load();
+          broker::loader::load();
+          broker::compatibility::load();
         }
 
         void  _deinit() {
-          events::loop::cleanup();
-          broker::compatibility::cleanup();
-          broker::loader::cleanup();
-          checks::checker::cleanup();
-          commands::set::cleanup();
-          logging::engine::cleanup();
+          broker::compatibility::unload();
+          broker::loader::unload();
+          events::loop::unload();
+          checks::checker::unload();
+          commands::set::unload();
+          logging::engine::unload();
         }
 
         int  (*_func)();

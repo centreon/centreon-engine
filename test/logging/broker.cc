@@ -1,5 +1,5 @@
 /*
-** Copyright 2011 Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -59,8 +59,7 @@ int main_test() {
   broker::loader& loader(broker::loader::instance());
 
   // Load dummy module.
-  loader.set_directory(".");
-  if (loader.load() != 1)
+  if (loader.load_directory(".") != 1)
     throw (engine_error() << "module loading failed");
 
   // Get instance of logging engine.

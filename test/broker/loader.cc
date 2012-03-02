@@ -1,5 +1,5 @@
 /*
-** Copyright 2011      Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -32,71 +32,48 @@ static const char* MOD_LIB_NAME = "./broker_mod_load.so";
 bool mod_test_load_quit = false;
 
 /**
- *  Check loader get/set directory.
- */
-void check_directory() {
-  loader& loader = loader::instance();
-
-  if (loader.get_directory() != "") {
-    throw (engine_error() << __func__ << ": directory is already set.");
-  }
-
-  loader.set_directory("./");
-  if (loader.get_directory() != "./") {
-    throw (engine_error() << __func__ << ": set directory failed.");
-  }
-}
-
-/**
  *  Check loader load method.
  */
 void check_load() {
-  loader& loader = loader::instance();
-
-  loader.load();
-  QList<QSharedPointer<handle> > modules = loader.get_modules();
-  if (modules.size() != 2) {
+  loader& loader(loader::instance());
+  loader.load_directory("./");
+  QList<QSharedPointer<handle> > modules(loader.get_modules());
+  if (modules.size() != 2)
     throw (engine_error() << __func__ << ": load modules failed.");
-  }
 }
 
 /**
  *  Check loader unload method.
  */
 void check_unload() {
-  loader& loader = loader::instance();
-
-  loader.unload();
-  QList<QSharedPointer<handle> > modules = loader.get_modules();
-  if (mod_test_load_quit == false || modules.size() != 0) {
+  loader& loader(loader::instance());
+  loader.unload_modules();
+  QList<QSharedPointer<handle> > modules(loader.get_modules());
+  if ((false == mod_test_load_quit) || (modules.size() != 0))
     throw (engine_error() << __func__ << ": unload modules failed.");
-  }
 }
 
 /**
  *  Check loader change name.
  */
-void check_chage_name() {
-  loader& loader = loader::instance();
-
-  QSharedPointer<handle> module = loader.add_module(MOD_LIB_NAME,
-						    MOD_LIB_NAME);
-  if (loader.get_modules().size() != 1) {
+void check_change_name() {
+  // Load module with initial name.
+  loader& loader(loader::instance());
+  QSharedPointer<handle>
+    module(loader.add_module(MOD_LIB_NAME, MOD_LIB_NAME));
+  if (loader.get_modules().size() != 1)
     throw (engine_error() << __func__ << ": add module failed.");
-  }
 
+  // Change name.
   QString new_name = "New Name";
   module->set_name(new_name);
 
-  QList<QSharedPointer<handle> > modules = loader.get_modules();
-  if (modules.size() != 1) {
+  // Check content.
+  QList<QSharedPointer<handle> > modules(loader.get_modules());
+  if (modules.size() != 1)
     throw (engine_error() << __func__ << ": set name failed.");
-  }
-
-  if ((*modules.begin())->get_name() != new_name) {
+  if ((*modules.begin())->get_name() != new_name)
     throw (engine_error() << __func__ << ": set name failed.");
-  }
-
   loader.del_module(module);
 }
 
@@ -104,11 +81,9 @@ void check_chage_name() {
  *  Check the broker loader working.
  */
 int main_test() {
-  check_directory();
   check_load();
   check_unload();
-  check_chage_name();
-
+  check_change_name();
   return (0);
 }
 
@@ -117,7 +92,7 @@ int main_test() {
  */
 int main(int argc, char** argv) {
   QCoreApplication app(argc, argv);
-  unittest utest(&main_test);
+  com::centreon::engine::unittest utest(&main_test);
   QObject::connect(&utest, SIGNAL(finished()), &app, SLOT(quit()));
   utest.start();
   app.exec();

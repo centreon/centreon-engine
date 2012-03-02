@@ -1,6 +1,6 @@
 /*
 ** Copyright 1999-2009 Ethan Galstad
-** Copyright 2011      Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -30,8 +30,8 @@
 #include <math.h>
 #include <errno.h>
 #include <dirent.h>
-#include <poll.h>
 #include <signal.h>
+#include <time.h>
 #include "engine.hh"
 #include "comments.hh"
 #include "globals.hh"
@@ -43,6 +43,7 @@
 #include "commands/raw.hh"
 #include "commands/set.hh"
 #include "checks/checker.hh"
+#include "broker/compatibility.hh"
 #include "broker/loader.hh"
 #include "logging/engine.hh"
 #include "logging/logger.hh"
@@ -50,10 +51,6 @@
 
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;
-
-int free_check_result_list(void) {
-  return (0);
-}
 
 /******************************************************************/
 /******************** SYSTEM COMMAND FUNCTIONS ********************/
@@ -313,7 +310,9 @@ int set_environment_var(char const* name, char const* value, int set) {
 
 /* Checks if the given time is in daylight time saving period. */
 int is_dst_time(time_t* time) {
-  return (localtime(time)->tm_isdst);
+  struct tm my_tm;
+  localtime_r(time, &my_tm);
+  return (my_tm.tm_isdst);
 }
 
 /* Returns the shift in seconds if the given times are across the daylight time saving period change. */
@@ -2226,26 +2225,34 @@ int generate_check_stats(void) {
 /*********************** CLEANUP FUNCTIONS ************************/
 /******************************************************************/
 
-/* do some cleanup before we exit */
-void cleanup(void) {
-  /* unload modules */
-  if (test_scheduling == FALSE && verify_config == FALSE) {
+/**
+ *  Do some cleanup before we exit.
+ */
+void cleanup() {
+  // Unload modules.
+  if ((FALSE == test_scheduling) && (FALSE == verify_config)) {
     neb_free_callback_list();
-    neb_unload_all_modules(NEBMODULE_FORCE_UNLOAD,
-                           (sigshutdown == TRUE) ? NEBMODULE_NEB_SHUTDOWN : NEBMODULE_NEB_RESTART);
+    neb_unload_all_modules(
+      NEBMODULE_FORCE_UNLOAD,
+      (TRUE == sigshutdown)
+      ? NEBMODULE_NEB_SHUTDOWN
+      : NEBMODULE_NEB_RESTART);
     neb_free_module_list();
     neb_deinit_modules();
   }
 
-  /* free all allocated memory - including macros */
+  // Free all allocated memory - including macros.
   free_memory(get_global_macros());
 
-  // unload singleton.
-  events::loop::cleanup();
-  broker::loader::cleanup();
-  commands::set::cleanup();
-  checks::checker::cleanup();
-  logging::engine::cleanup();
+  // Unload singletons.
+  broker::compatibility::unload();
+  broker::loader::unload();
+  events::loop::unload();
+  checks::checker::unload();
+  commands::set::unload();
+  logging::engine::unload();
+
+  return ;
 }
 
 /* free the memory allocated to the linked lists */

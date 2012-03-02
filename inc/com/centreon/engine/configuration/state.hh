@@ -1,5 +1,5 @@
 /*
-** Copyright 2011 Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -93,20 +93,19 @@ namespace                   com {
 
 	  void                reset();
 	  void                parse(std::string const& filename);
-
-	  std::string const&      get_log_file() const throw();
-	  std::string const&      get_broker_module_directory() const throw();
-	  std::string const&      get_debug_file() const throw();
-	  std::string const&      get_command_file() const throw();
-	  std::string const&      get_temp_file() const throw();
-	  std::string const&      get_global_host_event_handler() const throw();
-	  std::string const&      get_global_service_event_handler() const throw();
-	  std::string const&      get_ocsp_command() const throw();
-	  std::string const&      get_ochp_command() const throw();
-	  std::string const&      get_log_archive_path() const throw();
-	  std::string const&      get_illegal_object_chars() const throw();
-	  std::string const&      get_illegal_output_chars() const throw();
-	  std::string const&      get_use_timezone() const throw();
+	  std::string const&  get_log_file() const throw();
+	  std::string const&  get_broker_module_directory() const throw();
+	  std::string const&  get_debug_file() const throw();
+	  std::string const&  get_command_file() const throw();
+	  std::string const&  get_temp_file() const throw();
+	  std::string const&  get_global_host_event_handler() const throw();
+	  std::string const&  get_global_service_event_handler() const throw();
+	  std::string const&  get_ocsp_command() const throw();
+	  std::string const&  get_ochp_command() const throw();
+	  std::string const&  get_log_archive_path() const throw();
+	  std::string const&  get_illegal_object_chars() const throw();
+	  std::string const&  get_illegal_output_chars() const throw();
+	  std::string const&  get_use_timezone() const throw();
 	  int                 get_additional_freshness_latency() const throw();
 	  unsigned long       get_debug_level() const throw();
 	  unsigned int        get_debug_verbosity() const throw();
@@ -313,7 +312,6 @@ namespace                   com {
 	    broker_module_directory,
 	    debug_file,
 	    command_file,
-	    temp_file,
 	    global_host_event_handler,
 	    global_service_event_handler,
 	    ocsp_command,
@@ -605,7 +603,7 @@ namespace                   com {
 	  static const bool                DEFAULT_USE_REGEXP_MATCHES                          = false;
 	  static const bool                DEFAULT_USE_TRUE_REGEXP_MATCHING                    = false;
 	  static const bool                DEFAULT_USE_LARGE_INSTALLATION_TWEAKS               = false;
-	  static const bool                DEFAULT_ENABLE_ENVIRONMENT_MACROS                   = true;
+	  static const bool                DEFAULT_ENABLE_ENVIRONMENT_MACROS                   = false;
 	  static const bool                DEFAULT_ALLOW_EMPTY_HOSTGROUP_ASSIGNMENT            = false;
 	  static const float               DEFAULT_SLEEP_TIME;
 	  static const float               DEFAULT_LOW_SERVICE_FLAP_THRESHOLD;

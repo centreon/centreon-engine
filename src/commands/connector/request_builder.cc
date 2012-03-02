@@ -17,7 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <QBuffer>
+#include <sstream>
 #include "error.hh"
 #include "commands/connector/error_response.hh"
 #include "commands/connector/execute_query.hh"
@@ -46,18 +46,13 @@ request_builder& request_builder::instance() {
  *  @return The request object build with data.
  */
 QSharedPointer<request> request_builder::build(std::string const& data) const {
-  // XXX: todo.
-  int pos = 0;//data.indexOf('\0');
-  std::string tmp;// = data.left(pos < 0 ? data.size() : pos);
-
-  bool ok;
-  unsigned int req_id;// = tmp.toUInt(&ok);
-
-  if (ok == false) {
+  unsigned int req_id(0);
+  std::istringstream iss(data.substr(0, data.find('\0')));
+  if (!(iss >> req_id) || !iss.eof())
     throw (engine_error() << "bad request id.");
-  }
 
-  std::map<unsigned int, QSharedPointer<request> >::const_iterator it = _list.find(req_id);
+  std::map<unsigned int, QSharedPointer<request> >::const_iterator
+    it(_list.find(req_id));
   if (it == _list.end()) {
     throw (engine_error() << "bad request id.");
   }

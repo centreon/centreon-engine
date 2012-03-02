@@ -1,5 +1,5 @@
 /*
-** Copyright 2011 Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -17,34 +17,25 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <exception>
 #include <QCoreApplication>
 #include <QDebug>
-#include <exception>
-#include "test/unittest.hh"
-#include "logging/engine.hh"
-#include "error.hh"
+#include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/logging/engine.hh"
 #include "commands.hh"
-#include "globals.hh"
+#include "test/unittest.hh"
 
 using namespace com::centreon::engine;
 
 /**
  *  Run change_svc_check_command test.
  */
-static void check_change_svc_check_command() {
+static int check_change_svc_check_command() {
+  // Send external command.
   char const* cmd("[1317196300] CHANGE_SVC_CHECK_COMMAND");
   process_external_command(cmd);
-
-  // change_svc_check_command do nothing (security patch).
-}
-
-/**
- *  Check processing of change_svc_check_command works.
- */
-int main_test() {
-  logging::engine& engine = logging::engine::instance();
-  check_change_svc_check_command();
-  engine.cleanup();
+  // External command does nothing due to security patch.
   return (0);
 }
 
@@ -53,7 +44,7 @@ int main_test() {
  */
 int main(int argc, char** argv) {
   QCoreApplication app(argc, argv);
-  unittest utest(&main_test);
+  unittest utest(&check_change_svc_check_command);
   QObject::connect(&utest, SIGNAL(finished()), &app, SLOT(quit()));
   utest.start();
   app.exec();

@@ -1,6 +1,6 @@
 /*
 ** Copyright 2002-2006 Ethan Galstad
-** Copyright 2011      Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -19,52 +19,49 @@
 */
 
 #ifndef CCE_NEBMODULES_HH
-# define CCE_NEBMODULES_HH
+#  define CCE_NEBMODULES_HH
 
-# ifdef HAVE_PTHREAD_HH
 #  include <pthread.h>
-# endif // !HAVE_PTHREAD_HH
 
-# ifdef __cplusplus
+#  ifdef __cplusplus
 extern "C" {
-# endif
+#  endif
 
-/***** MODULE VERSION INFORMATION *****/
+// Module version information.
+#  define NEB_API_VERSION(x) int __neb_api_version = x;
+#  define CURRENT_NEB_API_VERSION 3
 
-# define NEB_API_VERSION(x) int __neb_api_version = x;
-# define CURRENT_NEB_API_VERSION    3
+// Module information.
+#  define NEBMODULE_MODINFO_NUMITEMS 6
+#  define NEBMODULE_MODINFO_TITLE 0
+#  define NEBMODULE_MODINFO_AUTHOR 1
+#  define NEBMODULE_MODINFO_COPYRIGHT 2
+#  define NEBMODULE_MODINFO_VERSION 3
+#  define NEBMODULE_MODINFO_LICENSE 4
+#  define NEBMODULE_MODINFO_DESC 5
 
-/***** MODULE INFORMATION *****/
+// Module load/unload options.
+#  define NEBMODULE_NORMAL_LOAD 0
+#  define NEBMODULE_REQUEST_UNLOAD 0
+#  define NEBMODULE_FORCE_UNLOAD 1
 
-# define NEBMODULE_MODINFO_NUMITEMS  6
-# define NEBMODULE_MODINFO_TITLE     0
-# define NEBMODULE_MODINFO_AUTHOR    1
-# define NEBMODULE_MODINFO_COPYRIGHT 2
-# define NEBMODULE_MODINFO_VERSION   3
-# define NEBMODULE_MODINFO_LICENSE   4
-# define NEBMODULE_MODINFO_DESC      5
+// Modules unload reasons.
+#  define NEBMODULE_NEB_SHUTDOWN 1
+#  define NEBMODULE_NEB_RESTART 2
+#  define NEBMODULE_ERROR_NO_INIT 3
+#  define NEBMODULE_ERROR_BAD_INIT 4
+#  define NEBMODULE_ERROR_API_VERSION 5
 
-/***** MODULE LOAD/UNLOAD OPTIONS *****/
-
-# define NEBMODULE_NORMAL_LOAD       0    /* module is being loaded normally */
-# define NEBMODULE_REQUEST_UNLOAD    0    /* request module to unload (but don't force it) */
-# define NEBMODULE_FORCE_UNLOAD      1    /* force module to unload */
-
-/***** MODULES UNLOAD REASONS *****/
-
-# define NEBMODULE_NEB_SHUTDOWN      1    /* event broker is shutting down */
-# define NEBMODULE_NEB_RESTART       2    /* event broker is restarting */
-# define NEBMODULE_ERROR_NO_INIT     3    /* _module_init() function was not found in module */
-# define NEBMODULE_ERROR_BAD_INIT    4    /* _module_init() function returned a bad code */
-# define NEBMODULE_ERROR_API_VERSION 5    /* module version is incompatible with current api */
-
-/***** MODULE FUNCTIONS *****/
+// Module functions.
 int neb_set_module_info(void* handle, int type, char const* data);
 
-/***** MODULE STRUCTURES *****/
-
-// NEB module structure
-typedef struct nebmodule_struct {
+/**
+ *  @struct nebmodule nebmodules.hh "com/centreon/engine/nebmodules.hh"
+ *  @brief  NEB module structure.
+ *
+ *  Store information related to a NEB module.
+ */
+typedef struct             nebmodule_struct {
   char*                    filename;
   char*                    args;
   char*                    info[NEBMODULE_MODINFO_NUMITEMS];
@@ -73,14 +70,12 @@ typedef struct nebmodule_struct {
   void*                    module_handle;
   void*                    init_func;
   void*                    deinit_func;
-#ifdef HAVE_PTHREAD_HH
   pthread_t                thread_id;
-#endif // !HAVE_PTHREAD_HH
   struct nebmodule_struct* next;
 }                          nebmodule;
 
-# ifdef __cplusplus
+#  ifdef __cplusplus
 }
-# endif
+#  endif
 
 #endif // !CCE_NEBMODULES_HH

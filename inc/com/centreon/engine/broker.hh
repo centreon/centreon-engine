@@ -168,33 +168,33 @@ extern "C" {
 # define NEBATTR_DOWNTIME_STOP_NORMAL             1
 # define NEBATTR_DOWNTIME_STOP_CANCELLED          2
 
-void broker_program_state(int type, int flags, int attr, struct timeval* timestamp);
-void broker_timed_event(int type, int flags, int attr, timed_event* event, struct timeval* timestamp);
-void broker_log_data(int type, int flags, int attr, char* data, unsigned long data_type, time_t entry_time, struct timeval* timestamp);
-void broker_system_command(int type, int flags, int attr, struct timeval start_time, struct timeval end_time, double exectime, int timeout, int early_timeout, int retcode, char* cmd, char* output, struct timeval* timestamp);
-int broker_event_handler(int type, int flags, int attr, unsigned int eventhandler_type, void* data, int state, int state_type, struct timeval start_time, struct timeval end_time, double exectime, int timeout, int early_timeout, int retcode, char const* cmd, char* cmdline, char* output, struct timeval* timestamp);
-int broker_host_check(int type, int flags, int attr, host* hst, int check_type, int state, int state_type, struct timeval start_time, struct timeval end_time, char* cmd, double latency, double exectime, int timeout, int early_timeout, int retcode, char* cmdline, char* output, char* long_output, char* perfdata, struct timeval* timestamp);
-int broker_service_check(int type, int flags, int attr, service* svc, int check_type, struct timeval start_time, struct timeval end_time, char* cmd, double latency, double exectime, int timeout, int early_timeout, int retcode, char* cmdline, struct timeval* timestamp);
-void broker_comment_data(int type, int flags, int attr, int comment_type, int entry_type, char const* host_name, char const* svc_description, time_t entry_time, char const* author_name, char const* comment_data, int persistent, int source, int expires, time_t expire_time, unsigned long comment_id, struct timeval* timestamp);
-void broker_downtime_data(int type, int flags, int attr, int downtime_type, char const* host_name, char const* svc_description, time_t entry_time, char const* author_name, char const* comment_data, time_t start_time, time_t end_time, int fixed, unsigned long triggered_by, unsigned long duration, unsigned long downtime_id, struct timeval* timestamp);
-void broker_flapping_data(int type, int flags, int attr, unsigned int flapping_type, void* data, double percent_change, double high_threshold, double low_threshold, struct timeval* timestamp);
-void broker_program_status(int type, int flags, int attr, struct timeval* timestamp);
-void broker_host_status(int type, int flags, int attr, host* hst, struct timeval* timestamp);
-void broker_service_status(int type, int flags, int attr, service* svc, struct timeval* timestamp);
-void broker_contact_status(int type, int flags, int attr, contact* cntct, struct timeval* timestamp);
-int broker_notification_data(int type, int flags, int attr, unsigned int notification_type, int reason_type, struct timeval start_time, struct timeval end_time, void* data, char* ack_author, char* ack_data, int escalated, int contacts_notified, struct timeval* timestamp);
-int broker_contact_notification_data(int type, int flags, int attr, unsigned int notification_type, int reason_type, struct timeval start_time, struct timeval end_time, void* data, contact* cntct, char* ack_author, char* ack_data, int escalated, struct timeval* timestamp);
-int broker_contact_notification_method_data(int type, int flags, int attr, unsigned int notification_type, int reason_type, struct timeval start_time, struct timeval end_time, void* data, contact* cntct, char* cmd, char* ack_author, char* ack_data, int escalated, struct timeval* timestamp);
-void broker_adaptive_program_data(int type, int flags, int attr, int command_type, unsigned long modhattr, unsigned long modhattrs, unsigned long modsattr, unsigned long modsattrs, struct timeval* timestamp);
-void broker_adaptive_host_data(int type, int flags, int attr, host* hst, int command_type, unsigned long modattr, unsigned long modattrs, struct timeval* timestamp);
-void broker_adaptive_service_data(int type, int flags, int attr, service* svc, int command_type, unsigned long modattr, unsigned long modattrs, struct timeval* timestamp);
-void broker_adaptive_contact_data(int type, int flags, int attr, contact* cntct, int command_type, unsigned long modattr, unsigned long modattrs, unsigned long modhattr, unsigned long modhattrs, unsigned long modsattr, unsigned long modsattrs, struct timeval* timestamp);
-void broker_external_command(int type, int flags, int attr, int command_type, time_t entry_time, char* command_string, char* command_args, struct timeval* timestamp);
-void broker_aggregated_status_data(int type, int flags, int attr, struct timeval* timestamp);
-void broker_retention_data(int type, int flags, int attr, struct timeval* timestamp);
-void broker_acknowledgement_data(int type, int flags, int attr, int acknowledgement_type, void* data, char* ack_author, char* ack_data, int subtype, int notify_contacts, int persistent_comment, struct timeval* timestamp);
-void broker_statechange_data(int type, int flags, int attr, int statechange_type, void* data, int state, int state_type, int current_attempt, int max_attempts, struct timeval* timestamp);
-struct timeval get_broker_timestamp(struct timeval* timestamp);
+void broker_program_state(int type, int flags, int attr, struct timeval const* timestamp);
+void broker_timed_event(int type, int flags, int attr, timed_event* event, struct timeval const* timestamp);
+void broker_log_data(int type, int flags, int attr, char* data, unsigned long data_type, time_t entry_time, struct timeval const* timestamp);
+void broker_system_command(int type, int flags, int attr, struct timeval start_time, struct timeval end_time, double exectime, int timeout, int early_timeout, int retcode, char* cmd, char* output, struct timeval const* timestamp);
+int broker_event_handler(int type, int flags, int attr, unsigned int eventhandler_type, void* data, int state, int state_type, struct timeval start_time, struct timeval end_time, double exectime, int timeout, int early_timeout, int retcode, char const* cmd, char* cmdline, char* output, struct timeval const* timestamp);
+int broker_host_check(int type, int flags, int attr, host* hst, int check_type, int state, int state_type, struct timeval start_time, struct timeval end_time, char const* cmd, double latency, double exectime, int timeout, int early_timeout, int retcode, char* cmdline, char* output, char* long_output, char* perfdata, struct timeval const* timestamp);
+int broker_service_check(int type, int flags, int attr, service* svc, int check_type, struct timeval start_time, struct timeval end_time, char const* cmd, double latency, double exectime, int timeout, int early_timeout, int retcode, char* cmdline, struct timeval const* timestamp);
+void broker_comment_data(int type, int flags, int attr, int comment_type, int entry_type, char const* host_name, char const* svc_description, time_t entry_time, char const* author_name, char const* comment_data, int persistent, int source, int expires, time_t expire_time, unsigned long comment_id, struct timeval const* timestamp);
+void broker_downtime_data(int type, int flags, int attr, int downtime_type, char const* host_name, char const* svc_description, time_t entry_time, char const* author_name, char const* comment_data, time_t start_time, time_t end_time, int fixed, unsigned long triggered_by, unsigned long duration, unsigned long downtime_id, struct timeval const* timestamp);
+void broker_flapping_data(int type, int flags, int attr, unsigned int flapping_type, void* data, double percent_change, double high_threshold, double low_threshold, struct timeval const* timestamp);
+void broker_program_status(int type, int flags, int attr, struct timeval const* timestamp);
+void broker_host_status(int type, int flags, int attr, host* hst, struct timeval const* timestamp);
+void broker_service_status(int type, int flags, int attr, service* svc, struct timeval const* timestamp);
+void broker_contact_status(int type, int flags, int attr, contact* cntct, struct timeval const* timestamp);
+int broker_notification_data(int type, int flags, int attr, unsigned int notification_type, int reason_type, struct timeval start_time, struct timeval end_time, void* data, char* ack_author, char* ack_data, int escalated, int contacts_notified, struct timeval const* timestamp);
+int broker_contact_notification_data(int type, int flags, int attr, unsigned int notification_type, int reason_type, struct timeval start_time, struct timeval end_time, void* data, contact* cntct, char* ack_author, char* ack_data, int escalated, struct timeval const* timestamp);
+int broker_contact_notification_method_data(int type, int flags, int attr, unsigned int notification_type, int reason_type, struct timeval start_time, struct timeval end_time, void* data, contact* cntct, char const* cmd, char* ack_author, char* ack_data, int escalated, struct timeval const* timestamp);
+void broker_adaptive_program_data(int type, int flags, int attr, int command_type, unsigned long modhattr, unsigned long modhattrs, unsigned long modsattr, unsigned long modsattrs, struct timeval const* timestamp);
+void broker_adaptive_host_data(int type, int flags, int attr, host* hst, int command_type, unsigned long modattr, unsigned long modattrs, struct timeval const* timestamp);
+void broker_adaptive_service_data(int type, int flags, int attr, service* svc, int command_type, unsigned long modattr, unsigned long modattrs, struct timeval const* timestamp);
+void broker_adaptive_contact_data(int type, int flags, int attr, contact* cntct, int command_type, unsigned long modattr, unsigned long modattrs, unsigned long modhattr, unsigned long modhattrs, unsigned long modsattr, unsigned long modsattrs, struct timeval const* timestamp);
+void broker_external_command(int type, int flags, int attr, int command_type, time_t entry_time, char* command_string, char* command_args, struct timeval const* timestamp);
+void broker_aggregated_status_data(int type, int flags, int attr, struct timeval const* timestamp);
+void broker_retention_data(int type, int flags, int attr, struct timeval const* timestamp);
+void broker_acknowledgement_data(int type, int flags, int attr, int acknowledgement_type, void* data, char* ack_author, char* ack_data, int subtype, int notify_contacts, int persistent_comment, struct timeval const* timestamp);
+void broker_statechange_data(int type, int flags, int attr, int statechange_type, void* data, int state, int state_type, int current_attempt, int max_attempts, struct timeval const* timestamp);
+struct timeval get_broker_timestamp(struct timeval const* timestamp);
 
 # ifdef __cplusplus
 }

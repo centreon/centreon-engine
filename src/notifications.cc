@@ -576,13 +576,9 @@ int check_service_notification_viability(service* svc, unsigned int type, int op
       && svc->current_state != STATE_OK) {
 
     /* get the time at which a notification should have been sent */
-    // XXX: todo.
-    /*
-    time_t& initial_notif_time(service_other_props[
-                                                   qMakePair(std::string(svc->host_ptr->name), std::string(svc->description))].initial_notif_time);
-    */
+    time_t& initial_notif_time(service_other_props[std::make_pair(svc->host_ptr->name, svc->description)].initial_notif_time);
+
     /* if not set, set it to now */
-    /*
     if (!initial_notif_time)
       initial_notif_time = time(NULL);
 
@@ -594,7 +590,6 @@ int check_service_notification_viability(service* svc, unsigned int type, int op
         << "Not enough time has elapsed since the service changed to a non-OK state, so we should not notify about this problem yet";
       return (ERROR);
     }
-    */
   }
 
   /* if this service is currently flapping, don't send the notification */
@@ -799,7 +794,6 @@ int notify_contact_of_service(nagios_macros* mac,
   char* command_name_ptr = NULL;
   char* raw_command = NULL;
   char* processed_command = NULL;
-  char* temp_buffer = NULL;
   char* processed_buffer = NULL;
   int early_timeout = FALSE;
   double exectime;
@@ -905,104 +899,77 @@ int notify_contact_of_service(nagios_macros* mac,
 
     /* log the notification to program log file */
     if (config.get_log_notifications() == true) {
+      std::ostringstream oss;
       switch (type) {
-      case NOTIFICATION_CUSTOM:{
-        std::ostringstream oss;
+      case NOTIFICATION_CUSTOM:
         oss << "SERVICE NOTIFICATION: " << cntct->name << ';'
             << svc->host_name << ';' << svc->description
             << ";CUSTOM ($SEVICESTATE$);" << command_name_ptr
             << ";$SERVICEOUTPUT$;$NOTIFICATIONAUTHOR$;$NOTIFICATIONCOMMENT$"
             << std::endl;
-        temp_buffer = my_strdup(oss.str().c_str());
-      }
         break;
 
-      case NOTIFICATION_ACKNOWLEDGEMENT:{
-        std::ostringstream oss;
+      case NOTIFICATION_ACKNOWLEDGEMENT:
         oss << "SERVICE NOTIFICATION: " << cntct->name << ';'
             << svc->host_name << ';' << svc->description
             << ";ACKNOWLEDGEMENT ($SERVICESTATE$);" << command_name_ptr
             << ";$SERVICEOUTPUT$;$NOTIFICATIONAUTHOR$;$NOTIFICATIONCOMMENT$"
             << std::endl;
-        temp_buffer = my_strdup(oss.str().c_str());
-      }
         break;
 
-      case NOTIFICATION_FLAPPINGSTART:{
-        std::ostringstream oss;
+      case NOTIFICATION_FLAPPINGSTART:
         oss << "SERVICE NOTIFICATION: " << cntct->name << ';'
             << svc->host_name << ';' << svc->description
             << ";FLAPPINGSTART ($SERVICESTATE$);" << command_name_ptr
             << ";$SERVICEOUTPUT$" << std::endl;
-        temp_buffer = my_strdup(oss.str().c_str());
-      }
         break;
 
-      case NOTIFICATION_FLAPPINGSTOP:{
-        std::ostringstream oss;
+      case NOTIFICATION_FLAPPINGSTOP:
         oss << "SERVICE NOTIFICATION: " << cntct->name << ';'
             << svc->host_name << ';' << svc->description
             << ";FLAPPINGSTOP ($SERVICESTATE$);"
             << command_name_ptr << ";$SERVICEOUTPUT$" << std::endl;
-        temp_buffer = my_strdup(oss.str().c_str());
-      }
         break;
 
-      case NOTIFICATION_FLAPPINGDISABLED:{
-        std::ostringstream oss;
+      case NOTIFICATION_FLAPPINGDISABLED:
         oss << "SERVICE NOTIFICATION: " << cntct->name << ';'
             << svc->host_name << ';' << svc->description
             << ";FLAPPINGDISABLED ($SERVICESTATE$);"
             << command_name_ptr << ";$SERVICEOUTPUT$" << std::endl;
-        temp_buffer = my_strdup(oss.str().c_str());
-      }
         break;
 
-      case NOTIFICATION_DOWNTIMESTART:{
-        std::ostringstream oss;
+      case NOTIFICATION_DOWNTIMESTART:
         oss << "SERVICE NOTIFICATION: " << cntct->name << ';'
             << svc->host_name << ';' << svc->description
             << ";DOWNTIMESTART ($SERVICESTATE$);" << command_name_ptr
             << ";$SERVICEOUTPUT$" << std::endl;
-        temp_buffer = my_strdup(oss.str().c_str());
-      }
         break;
 
-      case NOTIFICATION_DOWNTIMEEND:{
-        std::ostringstream oss;
+      case NOTIFICATION_DOWNTIMEEND:
         oss << "SERVICE NOTIFICATION: " << cntct->name << ';'
             << svc->host_name << ';' << svc->description
             << ";DOWNTIMEEND ($SERVICESTATE$);" << command_name_ptr
             << ";$SERVICEOUTPUT$" << std::endl;
-        temp_buffer = my_strdup(oss.str().c_str());
-      }
         break;
 
-      case NOTIFICATION_DOWNTIMECANCELLED:{
-        std::ostringstream oss;
+      case NOTIFICATION_DOWNTIMECANCELLED:
         oss << "SERVICE NOTIFICATION: " << cntct->name << ';'
             << svc->host_name << ';' << svc->description
             << ";DOWNTIMECANCELLED ($SERVICESTATE$);"
             << command_name_ptr << ";$SERVICEOUTPUT$" << std::endl;
-        temp_buffer = my_strdup(oss.str().c_str());
-      }
         break;
 
-      default:{
-        std::ostringstream oss;
+      default:
         oss << "SERVICE NOTIFICATION: " << cntct->name << ';'
             << svc->host_name << ';' << svc->description
             << ";$SERVICESTATE$;" << command_name_ptr
             << ";$SERVICEOUTPUT$" << std::endl;
-        temp_buffer = my_strdup(oss.str().c_str());
-      }
         break;
       }
 
-      process_macros_r(mac, temp_buffer, &processed_buffer, 0);
+      process_macros_r(mac, oss.str().c_str(), &processed_buffer, 0);
       logger(log_service_notification, basic) << processed_buffer;
 
-      delete[] temp_buffer;
       delete[] processed_buffer;
     }
 
@@ -1788,12 +1755,9 @@ int check_host_notification_viability(host* hst,
       && hst->current_state != HOST_UP) {
 
     /* get the time at which a notification should have been sent */
-    /*
-    // XXX: todo.
     time_t& initial_notif_time(host_other_props[hst->name].initial_notif_time);
-    */
+
     /* if not set, set it to now */
-    /*
     if (!initial_notif_time)
       initial_notif_time = time(NULL);
 
@@ -1805,7 +1769,6 @@ int check_host_notification_viability(host* hst,
         << "Not enough time has elapsed since the host changed to a non-UP state (or since program start), so we shouldn't notify about this problem yet.";
       return (ERROR);
     }
-    */
   }
 
   /* if this host is currently flapping, don't send the notification */
@@ -1977,7 +1940,6 @@ int notify_contact_of_host(nagios_macros* mac,
   commandsmember* temp_commandsmember = NULL;
   char* command_name = NULL;
   char* command_name_ptr = NULL;
-  char* temp_buffer = NULL;
   char* processed_buffer = NULL;
   char* raw_command = NULL;
   char* processed_command = NULL;
@@ -2087,105 +2049,77 @@ int notify_contact_of_host(nagios_macros* mac,
 
     /* log the notification to program log file */
     if (config.get_log_notifications() == true) {
+      std::ostringstream oss;
       switch (type) {
-      case NOTIFICATION_CUSTOM:{
-        std::ostringstream oss;
+      case NOTIFICATION_CUSTOM:
         oss << "HOST NOTIFICATION: " << cntct->name
             << ';' << hst->name
             << ";CUSTOM ($HOSTSTATE$);"
             << command_name_ptr
             << ";$HOSTOUTPUT$;$NOTIFICATIONAUTHOR$;$NOTIFICATIONCOMMENT$"
             << std::endl;
-        temp_buffer = my_strdup(oss.str().c_str());
-      }
         break;
 
-      case NOTIFICATION_ACKNOWLEDGEMENT:{
-        std::ostringstream oss;
+      case NOTIFICATION_ACKNOWLEDGEMENT:
         oss << "HOST NOTIFICATION: " << cntct->name
             << ';' << hst->name
             << ";ACKNOWLEDGEMENT ($HOSTSTATE$);"
             << command_name_ptr
             << ";$HOSTOUTPUT$;$NOTIFICATIONAUTHOR$;$NOTIFICATIONCOMMENT$"
             << std::endl;
-        temp_buffer = my_strdup(oss.str().c_str());
-      }
         break;
 
-      case NOTIFICATION_FLAPPINGSTART:{
-        std::ostringstream oss;
+      case NOTIFICATION_FLAPPINGSTART:
         oss << "HOST NOTIFICATION: " << cntct->name
             << ';' << hst->name
             << ";FLAPPINGSTART ($HOSTSTATE$);"
             << command_name_ptr << ";$HOSTOUTPUT$" << std::endl;
-        temp_buffer = my_strdup(oss.str().c_str());
-      }
         break;
 
-      case NOTIFICATION_FLAPPINGSTOP:{
-        std::ostringstream oss;
+      case NOTIFICATION_FLAPPINGSTOP:
         oss << "HOST NOTIFICATION: " << cntct->name
             << ';' << hst->name
             << ";FLAPPINGSTOP ($HOSTSTATE$);"
             << command_name_ptr << ";$HOSTOUTPUT$" << std::endl;
-        temp_buffer = my_strdup(oss.str().c_str());
-      }
         break;
 
-      case NOTIFICATION_FLAPPINGDISABLED:{
-        std::ostringstream oss;
+      case NOTIFICATION_FLAPPINGDISABLED:
         oss << "HOST NOTIFICATION: " << cntct->name
             << ';' << hst->name
             << ";FLAPPINGDISABLED ($HOSTSTATE$);"
             << command_name_ptr << ";$HOSTOUTPUT$" << std::endl;
-        temp_buffer = my_strdup(oss.str().c_str());
-      }
         break;
 
-      case NOTIFICATION_DOWNTIMESTART:{
-        std::ostringstream oss;
+      case NOTIFICATION_DOWNTIMESTART:
         oss << "HOST NOTIFICATION: " << cntct->name
             << ';' << hst->name
             << ";DOWNTIMESTART ($HOSTSTATE$);"
             << command_name_ptr << ";$HOSTOUTPUT$" << std::endl;
-        temp_buffer = my_strdup(oss.str().c_str());
-      }
         break;
 
-      case NOTIFICATION_DOWNTIMEEND:{
-        std::ostringstream oss;
+      case NOTIFICATION_DOWNTIMEEND:
         oss << "HOST NOTIFICATION: " << cntct->name
             << ';' << hst->name
             << ";DOWNTIMEEND ($HOSTSTATE$);"
             << command_name_ptr << ";$HOSTOUTPUT$" << std::endl;
-        temp_buffer = my_strdup(oss.str().c_str());
-      }
         break;
 
-      case NOTIFICATION_DOWNTIMECANCELLED:{
-        std::ostringstream oss;
+      case NOTIFICATION_DOWNTIMECANCELLED:
         oss << "HOST NOTIFICATION: " << cntct->name
             << ';' << hst->name
             << ";DOWNTIMECANCELLED ($HOSTSTATE$);"
             << command_name_ptr << ";$HOSTOUTPUT$" << std::endl;
-        temp_buffer = my_strdup(oss.str().c_str());
-      }
         break;
 
-      default:{
-        std::ostringstream oss;
+      default:
         oss << "HOST NOTIFICATION: " << cntct->name
             << ';' << hst->name << ";$HOSTSTATE$;"
             << command_name_ptr << ";$HOSTOUTPUT$" << std::endl;
-        temp_buffer = my_strdup(oss.str().c_str());
-      }
         break;
       }
 
-      process_macros_r(mac, temp_buffer, &processed_buffer, 0);
+      process_macros_r(mac, oss.str().c_str(), &processed_buffer, 0);
       logger(log_host_notification, basic) << processed_buffer;
-
-      delete[] temp_buffer;
       delete[] processed_buffer;
     }
 

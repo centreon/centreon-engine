@@ -1,5 +1,5 @@
 /*
-** Copyright 2011      Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -17,15 +17,16 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <QCoreApplication>
-#include <QDebug>
 #include <exception>
 #include <limits.h>
-#include "test/unittest.hh"
-#include "error.hh"
+#include <QCoreApplication>
+#include <QDebug>
+#include "com/centreon/engine/broker/compatibility.hh"
+#include "com/centreon/engine/broker/loader.hh"
+#include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/nebmodules.hh"
 #include "test/broker/mod_load.hh"
-#include "broker/compatibility.hh"
-#include "broker/loader.hh"
+#include "test/unittest.hh"
 
 using namespace com::centreon::engine::broker;
 
@@ -78,7 +79,7 @@ int main_test() {
  */
 int main(int argc, char** argv) {
   QCoreApplication app(argc, argv);
-  unittest utest(&main_test);
+  com::centreon::engine::unittest utest(&main_test);
   QObject::connect(&utest, SIGNAL(finished()), &app, SLOT(quit()));
   utest.start();
   app.exec();

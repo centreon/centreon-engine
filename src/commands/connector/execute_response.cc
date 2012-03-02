@@ -19,6 +19,7 @@
 
 #include <sstream>
 #include <vector>
+#include <time.h>
 #include "error.hh"
 #include "commands/connector/execute_response.hh"
 
@@ -129,7 +130,6 @@ std::string execute_response::build() {
       << static_cast<qulonglong>(_cmd_id) << '\0'
       << _is_executed << '\0'
       << _exit_code << '\0'
-      << _end_time.toTime_t() << '\0'
       << _stderr.c_str() << '\0'
       << _stdout.c_str();
   oss.write(cmd_ending().c_str(), cmd_ending().size());
@@ -153,7 +153,7 @@ void execute_response::restore(std::string const& data) {
   if (last != data.size())
     list.push_back(data.substr(last));
 
-  if (list.size() != 7) {
+  if (list.size() != 6) {
     throw (engine_error() << "bad request argument.");
   }
 
@@ -180,16 +180,9 @@ void execute_response::restore(std::string const& data) {
       throw (engine_error() << "bad request argument, invalid exit_code.");
   }
 
-  {
-    unsigned int timestamp;
-    std::istringstream iss(list[4]);
-    if (!(iss >> timestamp) || !iss.eof())
-      throw (engine_error() << "bad request argument, invalid end_time.");
-    _end_time.setTime_t(timestamp);
-  }
-
-  _stderr = list[5];
-  _stdout = list[6];
+  _end_time.setTime_t(time(NULL));
+  _stderr = list[4];
+  _stdout = list[5];
 }
 
 /**

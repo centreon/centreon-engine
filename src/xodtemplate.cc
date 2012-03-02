@@ -20,6 +20,7 @@
 
 /*********** COMMON HEADER FILES ***********/
 
+#include <ctype.h>
 #include <sstream>
 #include <stdlib.h>
 #include <stdio.h>
@@ -113,7 +114,7 @@ static char const* xodtemplate_config_file_name(int config_file) {
 /******************************************************************/
 
 /* process all config files - both core and CGIs pass in name of main config file */
-int xodtemplate_read_config_data(char* main_config_file, int options, int cache, int precache) {
+int xodtemplate_read_config_data(char const* main_config_file, int options, int cache, int precache) {
   char* config_file = NULL;
   char* config_base_dir = NULL;
   char* input = NULL;
@@ -452,7 +453,7 @@ int xodtemplate_read_config_data(char* main_config_file, int options, int cache,
 }
 
 /* grab config variable from main config file */
-int xodtemplate_grab_config_info(char* main_config_file) {
+int xodtemplate_grab_config_info(char const* main_config_file) {
   char* input = NULL;
   char* var = NULL;
   char* val = NULL;
@@ -9643,30 +9644,42 @@ int xodtemplate_register_command(xodtemplate_command* this_command) {
     return (OK);
 
   // Initialize command executon system.
-  using namespace com::centreon::engine;
-  if (this_command->connector_name == NULL) {
-    QSharedPointer<commands::command> cmd_set(new commands::raw(this_command->command_name,
-								this_command->command_line));
-    commands::set::instance().add_command(cmd_set);
-  }
-  else {
-    xodtemplate_connector temp_connector;
-    temp_connector.connector_name = this_command->connector_name;
-    xodtemplate_connector* connector = (xodtemplate_connector*)skiplist_find_first(xobject_skiplists[X_CONNECTOR_SKIPLIST],
-										   &temp_connector,
-										   NULL);
-    if (connector == NULL) {
-      logger(log_config_error, basic)
-        << "Error: Could not register command (config file '"
-        << xodtemplate_config_file_name(this_command->_config_file)
-        << "', starting on line " << this_command->_start_line << ")";
-      return (ERROR);
+  try {
+    using namespace com::centreon::engine;
+    if (this_command->connector_name == NULL) {
+      QSharedPointer<commands::command> cmd_set(
+        new commands::raw(this_command->command_name,this_command->command_line));
+      commands::set::instance().add_command(cmd_set);
     }
-    QSharedPointer<commands::command> cmd_set(new commands::connector::command(connector->connector_name,
-                                                                               connector->connector_line,
-                                                                               this_command->command_name,
-                                                                               this_command->command_line));
-    commands::set::instance().add_command(cmd_set);
+    else {
+      xodtemplate_connector temp_connector;
+      temp_connector.connector_name = this_command->connector_name;
+      xodtemplate_connector* connector =
+        (xodtemplate_connector*)skiplist_find_first(
+                                  xobject_skiplists[X_CONNECTOR_SKIPLIST],
+                                  &temp_connector,
+                                  NULL);
+      if (connector == NULL) {
+        logger(log_config_error, basic)
+          << "Error: Could not register command (config file '"
+          << xodtemplate_config_file_name(this_command->_config_file)
+          << "', starting on line " << this_command->_start_line << ")";
+        return (ERROR);
+      }
+      QSharedPointer<commands::command> cmd_set(new commands::connector::command(connector->connector_name,
+                                                                                 connector->connector_line,
+                                                                                 this_command->command_name,
+                                                                                 this_command->command_line));
+      commands::set::instance().add_command(cmd_set);
+    }
+  }
+  catch (std::exception const& e) {
+    logger(log_config_error, basic)
+      << "Error: Could not register command (config file '"
+      << xodtemplate_config_file_name(this_command->_config_file)
+      << "', starting on line " << this_command->_start_line << "): "
+      << e.what();
+    return (ERROR);
   }
 
   /* add the command */

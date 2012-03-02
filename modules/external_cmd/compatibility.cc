@@ -30,7 +30,6 @@
 using namespace com::centreon::engine::logging;
 
 int process_external_command1(char* cmd) {
-  char* temp_buffer = NULL;
   char* command_id = NULL;
   char* args = NULL;
   time_t entry_time = 0L;
@@ -539,19 +538,17 @@ int process_external_command1(char* cmd) {
   /* log the external command */
   std::ostringstream oss;
   oss << "EXTERNAL COMMAND: " << command_id << ';' << args << std::endl;
-  temp_buffer = my_strdup(oss.str().c_str());
 
   if (command_type == CMD_PROCESS_SERVICE_CHECK_RESULT
       || command_type == CMD_PROCESS_HOST_CHECK_RESULT) {
     /* passive checks are logged in checks.c as well, as some my bypass external commands by getting dropped in checkresults dir */
     if (config.get_log_passive_checks() == true)
-      logger(log_passive_check, basic) << temp_buffer;
+      logger(log_passive_check, basic) << oss.str();
   }
   else {
     if (config.get_log_external_commands() == true)
-      logger(log_external_command, basic) << temp_buffer;
+      logger(log_external_command, basic) << oss.str();
   }
-  delete[] temp_buffer;
 
   /* send data to event broker */
   broker_external_command(NEBTYPE_EXTERNALCOMMAND_START,

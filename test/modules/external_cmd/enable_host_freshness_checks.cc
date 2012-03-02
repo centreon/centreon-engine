@@ -1,5 +1,5 @@
 /*
-** Copyright 2011 Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -17,36 +17,31 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <exception>
 #include <QCoreApplication>
 #include <QDebug>
-#include <exception>
-#include "test/unittest.hh"
-#include "logging/engine.hh"
-#include "error.hh"
+#include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/logging/engine.hh"
 #include "commands.hh"
-#include "globals.hh"
+#include "test/unittest.hh"
 
 using namespace com::centreon::engine;
 
 /**
  *  Run enable_host_freshness_checks test.
  */
-static void check_enable_host_freshness_checks() {
+static int check_enable_host_freshness_checks() {
+  // Action.
   config.set_check_host_freshness(false);
   char const* cmd("[1317196300] ENABLE_HOST_FRESHNESS_CHECKS");
   process_external_command(cmd);
 
+  // Check.
   if (!config.get_check_host_freshness())
     throw (engine_error() << "enable_host_freshness_checks failed.");
-}
 
-/**
- *  Check processing of enable_host_freshness_checks works.
- */
-int main_test() {
-  logging::engine& engine = logging::engine::instance();
-  check_enable_host_freshness_checks();
-  engine.cleanup();
+  // Success.
   return (0);
 }
 
@@ -55,7 +50,7 @@ int main_test() {
  */
 int main(int argc, char** argv) {
   QCoreApplication app(argc, argv);
-  unittest utest(&main_test);
+  unittest utest(&check_enable_host_freshness_checks);
   QObject::connect(&utest, SIGNAL(finished()), &app, SLOT(quit()));
   utest.start();
   app.exec();

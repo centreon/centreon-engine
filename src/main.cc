@@ -1,7 +1,7 @@
 /*
 ** Copyright 1999-2009 Ethan Galstad
 ** Copyright 2009-2010 Nagios Core Development Team and Community Contributors
-** Copyright 2011      Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -32,6 +32,11 @@
 #include <string.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <unistd.h>
+#ifdef HAVE_GETOPT_H
+#  include <getopt.h>
+#endif // HAVE_GETOPT_H
+#include "com/centreon/engine/version.hh"
 #include "comments.hh"
 #include "downtime.hh"
 #include "globals.hh"
@@ -43,6 +48,7 @@
 #include "notifications.hh"
 #include "config.hh"
 #include "utils.hh"
+#include "broker/compatibility.hh"
 #include "broker/loader.hh"
 #include "checks/checker.hh"
 #include "commands/set.hh"
@@ -58,11 +64,6 @@
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;
 
-// Engine version if not defined by build system.
-#ifndef ENGINE_VERSION
-# define ENGINE_VERSION "(unknown)"
-#endif /* !ENGINE_VERSION */
-
 // Error message when configuration parsing fail.
 #define ERROR_CONFIGURATION						\
   "    Check your configuration file(s) to ensure that they contain valid\n" \
@@ -75,8 +76,6 @@ using namespace com::centreon::engine::logging;
 
 int main(int argc, char** argv) {
   QCoreApplication app(argc, argv);
-
-  configuration::applier::logging apply_log;
 
   int error = FALSE;
   int display_license = FALSE;
@@ -109,11 +108,13 @@ int main(int argc, char** argv) {
   if (argc < 2)
     error = TRUE;
 
-  // load singleton.
-  logging::engine::instance();
-  com::centreon::engine::broker::loader::instance();
-  checks::checker::instance();
-  commands::set::instance();
+  // Load singletons.
+  logging::engine::load();
+  commands::set::load();
+  checks::checker::load();
+  events::loop::load();
+  com::centreon::engine::broker::loader::load();
+  com::centreon::engine::broker::compatibility::load();
 
   // Process all command line arguments.
 #ifdef HAVE_GETOPT_H
@@ -217,6 +218,7 @@ int main(int argc, char** argv) {
   }
 
   // We're just verifying the configuration.
+  configuration::applier::logging apply_log;
   int result = ERROR;
   if (TRUE == verify_config) {
     // Reset program variables.
@@ -365,12 +367,14 @@ int main(int argc, char** argv) {
           << "error while processing a config file: " << e.what();
       }
 
-      /* NOTE 11/06/07 EG moved to after we read config files, as user may have overridden timezone offset */
-      /* get program (re)start time and save as macro */
+      // Get program (re)start time and save as macro. Needs to be done
+      // after we read config files, as user may have overridden
+      // timezone offset.
       program_start = time(NULL);
-      delete[] mac->x[MACRO_PROCESSSTARTTIME];
+      delete [] mac->x[MACRO_PROCESSSTARTTIME];
       try {
-        mac->x[MACRO_PROCESSSTARTTIME] = obj2pchar<unsigned long>(program_start);
+        mac->x[MACRO_PROCESSSTARTTIME]
+          = obj2pchar<unsigned long>(program_start);
       }
       catch (...) {
         cleanup();
@@ -383,8 +387,9 @@ int main(int argc, char** argv) {
       try {
         com::centreon::engine::broker::loader& loader(
           com::centreon::engine::broker::loader::instance());
-        loader.set_directory(config.get_broker_module_directory());
-        loader.load();
+        std::string const& mod_dir(config.get_broker_module_directory());
+        if (!mod_dir.empty())
+          loader.load_directory(mod_dir);
       }
       catch (std::exception const& e) {
         logger(log_info_message, basic)
@@ -394,7 +399,8 @@ int main(int argc, char** argv) {
 
       // This must be logged after we read config data, as user may have changed location of main log file.
       logger(log_process_info, basic) << "Centreon Engine "
-        << ENGINE_VERSION << " starting ... (PID=" << getpid() << ")";
+        << CENTREON_ENGINE_VERSION_STRING << " starting ... (PID="
+        << getpid() << ")";
 
       // Log the local time - may be different than clock time due to timezone offset.
       now = time(NULL);
@@ -496,16 +502,18 @@ int main(int argc, char** argv) {
 
       // Get event start time and save as macro.
       event_start = time(NULL);
-      delete[] mac->x[MACRO_EVENTSTARTTIME];
+      delete [] mac->x[MACRO_EVENTSTARTTIME];
       try {
-        mac->x[MACRO_EVENTSTARTTIME] = obj2pchar<unsigned long>(event_start);
+        mac->x[MACRO_EVENTSTARTTIME]
+          = obj2pchar<unsigned long>(event_start);
       }
-      catch(...) {
+      catch (...) {
         // Send program data to broker.
-        broker_program_state(NEBTYPE_PROCESS_SHUTDOWN,
-                             NEBFLAG_PROCESS_INITIATED,
-                             NEBATTR_SHUTDOWN_ABNORMAL,
-                             NULL);
+        broker_program_state(
+          NEBTYPE_PROCESS_SHUTDOWN,
+          NEBFLAG_PROCESS_INITIATED,
+          NEBATTR_SHUTDOWN_ABNORMAL,
+          NULL);
         cleanup();
       }
 
@@ -596,13 +604,18 @@ int main(int argc, char** argv) {
     } while (sigrestart == TRUE && sigshutdown == FALSE);
 
     // Free misc memory.
-    delete[] config_file;
+    delete [] config_file;
+    delete [] mac->x[MACRO_PROCESSSTARTTIME];
+    delete [] mac->x[MACRO_EVENTSTARTTIME];
   }
 
-  // unload singleton.
-  commands::set::cleanup();
-  checks::checker::cleanup();
-  com::centreon::engine::broker::loader::cleanup();
-  logging::engine::cleanup();
-  return (OK);
+  // Unload singletons.
+  com::centreon::engine::broker::compatibility::unload();
+  com::centreon::engine::broker::loader::unload();
+  events::loop::unload();
+  checks::checker::unload();
+  commands::set::unload();
+  logging::engine::unload();
+
+  return (EXIT_SUCCESS);
 }

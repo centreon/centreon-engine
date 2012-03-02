@@ -1,5 +1,5 @@
 /*
-** Copyright 2011 Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -17,36 +17,28 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <exception>
 #include <QCoreApplication>
 #include <QDebug>
-#include <exception>
-#include "test/unittest.hh"
-#include "logging/engine.hh"
-#include "error.hh"
+#include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/logging/engine.hh"
 #include "commands.hh"
-#include "globals.hh"
+#include "test/unittest.hh"
 
 using namespace com::centreon::engine;
 
 /**
  *  Run start_accepting_passive_svc_checks test.
  */
-static void check_start_accepting_passive_svc_checks() {
+static int check_start_accepting_passive_svc_checks() {
   config.set_accept_passive_service_checks(false);
   char const* cmd("[1317196300] START_ACCEPTING_PASSIVE_SVC_CHECKS");
   process_external_command(cmd);
 
   if (!config.get_accept_passive_service_checks())
     throw (engine_error() << "start_accepting_passive_svc_checks failed.");
-}
 
-/**
- *  Check processing of start_accepting_passive_svc_checks works.
- */
-int main_test() {
-  logging::engine& engine = logging::engine::instance();
-  check_start_accepting_passive_svc_checks();
-  engine.cleanup();
   return (0);
 }
 
@@ -55,7 +47,7 @@ int main_test() {
  */
 int main(int argc, char** argv) {
   QCoreApplication app(argc, argv);
-  unittest utest(&main_test);
+  unittest utest(&check_start_accepting_passive_svc_checks);
   QObject::connect(&utest, SIGNAL(finished()), &app, SLOT(quit()));
   utest.start();
   app.exec();

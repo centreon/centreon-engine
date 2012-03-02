@@ -1,5 +1,5 @@
 /*
-** Copyright 2011      Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -18,53 +18,56 @@
 */
 
 #ifndef CCE_COMMANDS_SET_HH
-# define CCE_COMMANDS_SET_HH
+#  define CCE_COMMANDS_SET_HH
 
-# include <QObject>
-# include <string>
-# include <map>
-# include <QSharedPointer>
+#  include <map>
+#  include <memory>
+#  include <QObject>
+#  include <QSharedPointer>
+#  include <string>
+#  include "com/centreon/engine/commands/command.hh"
 
-# include "commands/command.hh"
+namespace             com {
+  namespace           centreon {
+    namespace         engine {
+      namespace       commands {
+        /**
+         *  @class set set.hh
+         *  @brief Store all command.
+         *
+         *  Set is a singleton to store all command class and have a simple
+         *  access to used it.
+         */
+        class         set : public QObject {
+          Q_OBJECT
 
-namespace                         com {
-  namespace                       centreon {
-    namespace                     engine {
-      namespace                   commands {
-	/**
-	 *  @class set set.hh
-	 *  @brief Store all command.
-	 *
-	 *  Set is a singleton to store all command class and have a simple
-	 *  access to used it.
-	 */
-	class                     set : public QObject {
-	  Q_OBJECT
-	public:
-	  static set&             instance();
-	  static void             cleanup();
+        public:
+                      ~set() throw ();
+          void        add_command(command const& cmd);
+          void        add_command(QSharedPointer<command> cmd);
+          QSharedPointer<command>
+                      get_command(std::string const& cmd_name);
+          static set& instance();
+          static void load();
+          void        remove_command(std::string const& cmd_name);
+          static void unload();
 
-	  void                    add_command(command const& cmd);
-	  void                    add_command(QSharedPointer<command> cmd);
+        public slots:
+          void        command_name_changed(
+                        std::string const& old_name,
+                        std::string const& new_name);
 
-	  void                    remove_command(std::string const& cmd_name) throw();
+        private:
+                      set();
+                      set(set const& right);
+          set&        operator=(set const& right);
+          void        _internal_copy(set const& right);
 
-	  QSharedPointer<command> get_command(std::string const& cmd_name);
-
-	public slots:
-	  void                    command_name_changed(std::string const& old_name,
-						       std::string const& new_name);
-
-	private:
-	  set();
-	  set(set const& right);
-	  ~set() throw();
-
-	  set&                    operator=(set const& right);
-
-	  std::map<std::string, QSharedPointer<command> > _list;
-          static set*             _instance;
-	};
+          static std::auto_ptr<set>
+                      _instance;
+          std::map<std::string, QSharedPointer<command> >
+                      _list;
+        };
       }
     }
   }

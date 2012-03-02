@@ -49,9 +49,9 @@ typedef struct                      scheduled_downtime_struct {
   struct scheduled_downtime_struct* next;
 }                                   scheduled_downtime;
 
-int initialize_downtime_data(char* config_file); // initializes scheduled downtime data
-int cleanup_downtime_data(char* config_file);    // cleans up scheduled downtime data
-int schedule_downtime(int type, char* host_name, char* service_description, time_t entry_time, char* author, char* comment_data, time_t start_time, time_t end_time, int fixed, unsigned long triggered_by, unsigned long duration, unsigned long* new_downtime_id);
+int initialize_downtime_data(char const* config_file); // initializes scheduled downtime data
+int cleanup_downtime_data(char const* config_file);    // cleans up scheduled downtime data
+int schedule_downtime(int type, char const* host_name, char const* service_description, time_t entry_time, char const* author, char const* comment_data, time_t start_time, time_t end_time, int fixed, unsigned long triggered_by, unsigned long duration, unsigned long* new_downtime_id);
 int unschedule_downtime(int type,unsigned long downtime_id);
 int register_downtime(int type, unsigned long downtime_id);
 int handle_scheduled_downtime_by_id(unsigned long downtime_id);

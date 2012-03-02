@@ -693,15 +693,11 @@ void processing::_wrapper_send_custom_host_notification(host* hst,
   if ((buf[0] = my_strtok(args, ";"))
       && (buf[1] = my_strtok(NULL, ";"))
       && (buf[2] = my_strtok(NULL, ";"))) {
-    buf[1] = my_strdup(buf[1]);
-    buf[2] = my_strdup(buf[2]);
     host_notification(hst,
                       NOTIFICATION_CUSTOM,
                       buf[1],
                       buf[2],
                       atoi(buf[0]));
-    delete[] buf[1];
-    delete[] buf[2];
   }
 }
 
@@ -766,14 +762,10 @@ void processing::_wrapper_send_custom_service_notification(service* svc,
   if ((buf[0] = my_strtok(args, ";"))
       && (buf[1] = my_strtok(NULL, ";"))
       && (buf[2] = my_strtok(NULL, ";"))) {
-    buf[1] = my_strdup(buf[1]);
-    buf[2] = my_strdup(buf[2]);
     service_notification(svc,
                          NOTIFICATION_CUSTOM,
                          buf[1],
                          buf[2],
                          atoi(buf[0]));
-    delete[] buf[1];
-    delete[] buf[2];
   }
 }

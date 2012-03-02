@@ -67,24 +67,19 @@ static char* get_service_group_names(service& svc, nagios_macros* mac) {
   (void)mac;
 
   // Find all servicegroups this service is associated with.
-  char* buf1(NULL);
-  char* buf2(NULL);
+  std::string buf;
   for (objectlist* temp_objectlist = svc.servicegroups_ptr;
        temp_objectlist != NULL;
        temp_objectlist = temp_objectlist->next) {
     servicegroup* temp_servicegroup(
       static_cast<servicegroup*>(temp_objectlist->object_ptr));
     if (temp_servicegroup) {
-      std::ostringstream oss;
-      if (buf2)
-        oss << buf2 << ',';
-      oss << temp_servicegroup->group_name;
-      buf1 = my_strdup(oss.str().c_str());
-      delete [] buf2;
-      buf2 = buf1;
+      if (!buf.empty())
+        buf.append(",");
+      buf.append(temp_servicegroup->group_name);
     }
   }
-  return (buf2 ? buf2 : my_strdup(""));
+  return (my_strdup(buf.c_str()));
 }
 
 /**

@@ -1,5 +1,5 @@
 /*
-** Copyright 2011      Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -23,6 +23,7 @@
 #include "macros.hh"
 #include "objects.hh"
 #include "logging/logger.hh"
+#include "com/centreon/engine/version.hh"
 #include "commands/result.hh"
 #include "commands/connector/request_builder.hh"
 #include "commands/connector/error_response.hh"
@@ -506,9 +507,9 @@ void connector::command::_req_version_r(request* req) {
   QMutexLocker locker(&_mutex);
   version_response* res = static_cast<version_response*>(req);
 
-  if (res->get_major() < ENGINE_MAJOR
-      || (res->get_major() == ENGINE_MAJOR
-	  && res->get_minor() <= ENGINE_MINOR)) {
+  if (res->get_major() < CENTREON_ENGINE_VERSION_MAJOR
+      || (res->get_major() == CENTREON_ENGINE_VERSION_MAJOR
+	  && res->get_minor() <= CENTREON_ENGINE_VERSION_MINOR)) {
     _is_good_version = true;
   }
   else {

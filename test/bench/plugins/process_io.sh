@@ -18,17 +18,16 @@
 ## <http://www.gnu.org/licenses/>.
 ##
 
-save_file="/tmp/.process_io.data"
-
 # check script argument.
 if [ $# -ne 1 ]; then
     echo "usage: $0 process_name"
     exit 3
 fi
 
-pid=$(ps axf -o'pid comm' | grep "[^_] $1$" | sed 's/^ *//' | cut -d ' ' -f1)
+save_file="/tmp/.$(basename $1)_process_io.data"
+pid=$(ps axf -o'pid comm' | grep "[^_] $1$" | sed 's/^ *//' | head -n1 | cut -d ' ' -f1)
 # check pid information.
-if [ ! -d "/proc/$pid" ]; then
+if [ -z "$pid" ] || [ ! -d "/proc/$pid" ]; then
     echo "process not running!"
     exit 3
 fi

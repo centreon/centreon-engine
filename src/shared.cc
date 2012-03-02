@@ -118,7 +118,7 @@ char* my_strsep(char** stringp, char const* delim) {
 }
 
 /* open a file read-only via mmap() */
-mmapfile* mmap_fopen(char* filename) {
+mmapfile* mmap_fopen(char const* filename) {
   int fd = 0;
   void* mmap_buf = NULL;
   struct stat statbuf;
@@ -411,7 +411,7 @@ int compare_hashdata(char const* val1a,
  * given a date/time in time_t format, produce a corresponding
  * date/time string, including timezone
  */
-void get_datetime_string(time_t* raw_time,
+void get_datetime_string(time_t const* raw_time,
 			 char* buffer,
                          int buffer_length,
 			 int type) {

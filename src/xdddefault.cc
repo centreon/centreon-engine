@@ -35,7 +35,7 @@
 /******************************************************************/
 
 /* initialize downtime data */
-int xdddefault_initialize_downtime_data(char* main_config_file) {
+int xdddefault_initialize_downtime_data(char const* main_config_file) {
   scheduled_downtime* temp_downtime = NULL;
 
   (void)main_config_file;
@@ -123,7 +123,7 @@ int xdddefault_validate_downtime_data(void) {
 }
 
 /* removes invalid and old downtime entries from the downtime file */
-int xdddefault_cleanup_downtime_data(char* main_config_file) {
+int xdddefault_cleanup_downtime_data(char const* main_config_file) {
   (void)main_config_file;
 
   /* we don't need to do any cleanup... */

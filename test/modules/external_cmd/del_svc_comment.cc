@@ -1,5 +1,5 @@
 /*
-** Copyright 2011 Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -17,21 +17,21 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <exception>
 #include <QCoreApplication>
 #include <QDebug>
-#include <exception>
-#include "test/unittest.hh"
-#include "logging/engine.hh"
-#include "error.hh"
+#include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/logging/engine.hh"
 #include "commands.hh"
-#include "globals.hh"
+#include "test/unittest.hh"
 
 using namespace com::centreon::engine;
 
 /**
  *  Run del_svc_comment test.
  */
-static void check_del_svc_comment() {
+static int check_del_svc_comment() {
   init_object_skiplists();
 
   next_comment_id = 1;
@@ -56,15 +56,7 @@ static void check_del_svc_comment() {
     throw (engine_error() << "del_svc_comment failed.");
 
   free_object_skiplists();
-}
 
-/**
- *  Check processing of del_svc_comment works.
- */
-int main_test() {
-  logging::engine& engine = logging::engine::instance();
-  check_del_svc_comment();
-  engine.cleanup();
   return (0);
 }
 
@@ -73,7 +65,7 @@ int main_test() {
  */
 int main(int argc, char** argv) {
   QCoreApplication app(argc, argv);
-  unittest utest(&main_test);
+  unittest utest(&check_del_svc_comment);
   QObject::connect(&utest, SIGNAL(finished()), &app, SLOT(quit()));
   utest.start();
   app.exec();

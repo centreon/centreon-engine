@@ -375,7 +375,7 @@ void* command_file_worker_thread(void* arg) {
 }
 
 /* submits an external command for processing */
-int submit_external_command(char* cmd, int* buffer_items) {
+int submit_external_command(char const* cmd, int* buffer_items) {
   int result = OK;
 
   if (cmd == NULL || external_command_buffer.buffer == NULL) {
@@ -415,8 +415,7 @@ int submit_external_command(char* cmd, int* buffer_items) {
 
 /* submits a raw external command (without timestamp) for processing */
 // XXX: submit_raw_external_command not used.
-int submit_raw_external_command(char* cmd, time_t* ts, int* buffer_items) {
-  char* newcmd = NULL;
+int submit_raw_external_command(char const* cmd, time_t* ts, int* buffer_items) {
   int result = OK;
   time_t timestamp;
 
@@ -432,13 +431,8 @@ int submit_raw_external_command(char* cmd, time_t* ts, int* buffer_items) {
   /* create the command string */
   std::ostringstream oss;
   oss << '[' << timestamp << "] " << cmd;
-  newcmd = my_strdup(oss.str().c_str());
 
   /* submit the command */
-  result = submit_external_command(newcmd, buffer_items);
-
-  /* free allocated memory */
-  delete[] newcmd;
-
+  result = submit_external_command(oss.str().c_str(), buffer_items);
   return (result);
 }
