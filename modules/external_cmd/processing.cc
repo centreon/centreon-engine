@@ -592,11 +592,11 @@ bool processing::execute(QString const& cmd) const {
     // passive checks are logged in checks.c.
     if (config.get_log_passive_checks() == true)
       logger(log_passive_check, basic)
-        << "EXTERNAL COMMAND: " << command_id << ';' << args;
+        << "EXTERNAL COMMAND: " << command_name << ';' << args;
   }
   else if (config.get_log_external_commands() == true)
     logger(log_external_command, basic)
-      << "EXTERNAL COMMAND: " << command_id << ';' << args;
+      << "EXTERNAL COMMAND: " << command_name << ';' << args;
 
   logger(dbg_external_command, more) << "External command id: " << command_id;
   logger(dbg_external_command, more) << "Command entry time: " << entry_time;

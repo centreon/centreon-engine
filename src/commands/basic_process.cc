@@ -30,6 +30,7 @@
 #include <fcntl.h>
 #include <sys/ioctl.h>
 #include "error.hh"
+#include "commands/command_line.hh"
 #include "commands/basic_process.hh"
 
 using namespace com::centreon::engine::commands;
@@ -234,9 +235,8 @@ void basic_process::start(QString const& program, QStringList const& arguments, 
   if (_pstate != QProcess::NotRunning)
     return;
 
-  _program = program;
-  _arguments = arguments;
-
+  command_line cmdline(program, arguments);
+  _args = cmdline.get_argv();
   _start_process(mode);
 }
 
@@ -250,10 +250,8 @@ void basic_process::start(QString const& program, OpenMode mode) {
   if (_pstate != QProcess::NotRunning)
     return;
 
-  _arguments = _split_command_line(program);
-  _program = _arguments.first();
-  _arguments.removeFirst();
-
+  command_line cmdline(program);
+  _args = cmdline.get_argv();
   _start_process(mode);
 }
 
@@ -596,7 +594,6 @@ void basic_process::_start_process(OpenMode mode) {
     _perror = QProcess::UnknownError;
     _status = 0;
 
-    args = _build_args(_program, _arguments);
     _chdir(qPrintable(_working_directory));
 
     if (pipe(_pipe_out) == -1
@@ -627,7 +624,7 @@ void basic_process::_start_process(OpenMode mode) {
              << strerror(errno));
 
     if (!_pid) {
-      execvp(args[0], args);
+      execvp(_args[0], _args);
       ::_exit(-1);
     }
 
@@ -830,28 +827,6 @@ int basic_process::_dup2(int fildes, int fildes2) throw() {
 }
 
 /**
- *  Create and array of arguments to call execvp.
- *
- *  @param[in] progname  The program name.
- *  @param[in] arguments The program arguments.
- *
- *  @return Array of arguments.
- */
-char** basic_process::_build_args(QString const& program, QStringList const& arguments) {
-  char** args(new char*[arguments.size() + 2]);
-  args[0] = qstrdup(qPrintable(program));
-
-  unsigned int i(1);
-  for (QStringList::const_iterator it(arguments.begin()),
-         end(arguments.end());
-       it != end;
-       ++it)
-    args[i++] = qstrdup(qPrintable(*it));
-  args[i] = NULL;
-  return (args);
-}
-
-/**
  *  Set the close-on-exec flag on the file descriptor.
  *
  *  @param[in] fd The file descriptor to set close on exec.
@@ -864,45 +839,4 @@ void basic_process::_set_cloexec(int fd) {
   if (fcntl(fd, F_SETFL, flags | FD_CLOEXEC) == -1)
     throw (engine_error() << "Could not set close-on-exec flag: "
            << strerror(errno));
-}
-
-/**
- *  Split command line on array of string.
- *
- *  @param[in] command_line The command line to split.
- *
- *  @return Array of string.
- */
-QStringList basic_process::_split_command_line(QString const& command_line) {
-  QStringList args;
-  QString tmp;
-  int count(0);
-  bool in(false);
-
-  for (int i(0), end(command_line.size()); i < end; ++i) {
-    if (command_line.at(i) == QLatin1Char('"')) {
-      ++count;
-      if (count == 3) {
-        count = 0;
-        tmp += command_line.at(i);
-      }
-      continue;
-    }
-    if (count) {
-      if (count == 1)
-        in = !in;
-      count = 0;
-    }
-    if (!in && command_line.at(i).isSpace()) {
-      if (!tmp.isEmpty()) {
-        args += tmp;
-        tmp.clear();
-      }
-    }
-    else
-      tmp += command_line.at(i);
-  }
-  if (!tmp.isEmpty())
-    args += tmp;
-  return (args);
 }

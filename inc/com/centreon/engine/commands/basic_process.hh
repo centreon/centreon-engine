@@ -127,13 +127,10 @@ namespace                          com {
           static void              _close(int& fd) throw();
           static int               _chdir(char const* working_directory) throw();
           static int               _dup2(int fildes, int fildes2) throw();
-          static char**            _build_args(QString const& program, QStringList const& arguments);
           static void              _set_cloexec(int fd);
-          static QStringList       _split_command_line(QString const& command_line);
 
+          char**                   _args;
           // QProcessEnvironment      _environment;
-          QStringList              _arguments;
-          QString                  _program;
           QString                  _working_directory;
           QByteArray               _standard_output;
           // QByteArray               _standard_error;
