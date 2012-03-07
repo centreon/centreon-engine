@@ -239,7 +239,7 @@ int handle_async_service_check_result(service* temp_service, check_result* queue
     << ", SCHEDULED: " << (queued_check_result->scheduled_check == TRUE ? "Yes" : "No")
     << ", RESCHEDULE: " << (queued_check_result->reschedule_check == TRUE ? "Yes" : "No")
     << ", EXITED OK: " << (queued_check_result->exited_ok == TRUE ? "Yes" : "No")
-    << ", return (CODE: " << queued_check_result->return_code
+    << ", return CODE: " << queued_check_result->return_code
     << ", OUTPUT: " << queued_check_result->output;
 
   /* decrement the number of service checks still out there... */
