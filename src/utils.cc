@@ -2248,7 +2248,6 @@ void cleanup() {
   events::loop::unload();
   checks::checker::unload();
   commands::set::unload();
-  logging::engine::unload();
 
   return ;
 }
