@@ -226,6 +226,9 @@ void checker::run(
   logger(dbg_functions, basic) << "start " << Q_FUNC_INFO;
   if (!hst)
     throw (engine_error() << "attempt to run check on NULL host");
+  if (!hst->check_command_ptr)
+    throw (engine_error() << "attempt to run active check on host '"
+           << hst->name << "' with no check command");
   logger(dbg_checks, basic)
     << "** Running async check of host '" << hst->name << "'...";
 
@@ -438,6 +441,10 @@ void checker::run(
   else if (!svc->host_ptr)
     throw (engine_error()
            << "attempt to run check on service with NULL host");
+  else if (!svc->check_command_ptr)
+    throw (engine_error() << "attempt to run active check on service '"
+           << svc->description << "' on host '" << svc->host_ptr->name
+           << "' with no check command");
   logger(dbg_checks, basic)
     << "** Running async check of service '" << svc->description
     << "' on host '" << svc->host_name << "'...";
