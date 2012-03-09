@@ -1,5 +1,5 @@
 /*
-** Copyright 2011      Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -18,66 +18,73 @@
 */
 
 #include <QCoreApplication>
+#include <QMutexLocker>
 #include <QTimer>
-#include "engine.hh"
-#include "globals.hh"
-#include "error.hh"
-#include "logging/logger.hh"
-#include "commands/raw.hh"
+#include "com/centreon/engine/commands/raw.hh"
+#include "com/centreon/engine/engine.hh"
+#include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/logging/logger.hh"
 
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;
 using namespace com::centreon::engine::commands;
 
+/**************************************
+*                                     *
+*           Public Methods            *
+*                                     *
+**************************************/
+
 /**
- *  Default constructor.
+ *  Constructor.
  *
  *  @param[in] name         The command name.
  *  @param[in] command_line The command line.
  */
-raw::raw(QString const& name,
-	 QString const& command_line)
-  : command(name, command_line) {
-}
+raw::raw(QString const& name, QString const& command_line)
+  : command(name, command_line) {}
 
 /**
- *  Default copy constructor
+ *  Copy constructor
  *
- *  @param[in] right The copy class.
+ *  @param[in] right Object to copy.
  */
-raw::raw(raw const& right)
-  : command(right) {
-  operator=(right);
-}
+raw::raw(raw const& right) : command(right) {}
 
 /**
- *  Default destructor.
+ *  Destructor.
  */
-raw::~raw() throw() {
-  _mutex.lock();
-  while (_processes.empty() == false) {
-    process_info info = _processes.begin().value();
-
+raw::~raw() throw () {
+  QMutexLocker lock(&_mutex);
+  while (!_processes.empty()) {
+    // XXX MK : code below seems broken to me, as vtable is not
+    // guaranteed upon destruction. Also, the event loop might not catch
+    // signal of process between checking of emptiness and connection of
+    // signal.
+    process_info info(_processes.begin().value());
     QEventLoop loop;
-    connect(this, SIGNAL(command_executed(commands::result const&)), &loop, SLOT(quit()));
-    _mutex.unlock();
+    connect(
+      this,
+      SIGNAL(command_executed(commands::result const&)),
+      &loop,
+      SLOT(quit()));
+    lock.unlock();
     loop.exec();
-    _mutex.lock();
+    lock.relock();
   }
-  _mutex.unlock();
 }
 
 /**
- *  Default copy operator.
+ *  Assignment operator.
  *
- *  @param[in] right The copy class.
+ *  @param[in] right Object to copy.
  *
  *  @return This object.
  */
 raw& raw::operator=(raw const& right) {
-  if (this != &right) {
+  if (this != &right)
     command::operator=(right);
-  }
   return (*this);
 }
 
@@ -99,33 +106,40 @@ commands::command* raw::clone() const {
  *
  *  @return The command id.
  */
-unsigned long raw::run(QString const& processed_cmd,
-		       nagios_macros const& macros,
-		       unsigned int timeout) {
+unsigned long raw::run(
+                     QString const& processed_cmd,
+                     nagios_macros const& macros,
+                     unsigned int timeout) {
+  // Debug.
   logger(dbg_functions, basic) << "start " << Q_FUNC_INFO;
 
+  // Create process.
   process_info info;
-  info.proc = QSharedPointer<process>(new process(macros, timeout),
-                                      &_deletelater_process);
+  info.proc = QSharedPointer<process>(
+                new process(macros, timeout),
+                &_deletelater_process);
 
-  if (connect(&(*info.proc),
+  // Connect to process.
+  if (!connect(&(*info.proc),
   	      SIGNAL(process_ended()),
   	      this,
-  	      SLOT(raw_ended())) == false) {
+  	      SLOT(raw_ended())))
     throw (engine_error() << "connect process to commands::raw failed.");
+
+  // Store process information.
+  {
+    QMutexLocker lock(&_mutex);
+    info.cmd_id = get_uniq_id();
+    _processes.insert(&(*info.proc), info);
   }
 
-  _mutex.lock();
-  info.cmd_id = get_uniq_id();
-  _processes.insert(&(*info.proc), info);
-  _mutex.unlock();
-
+  // Start process.
   logger(dbg_commands, basic)
     << "raw command (id=" << info.cmd_id
     << ") start '" << processed_cmd << "'.";
-
   info.proc->start(processed_cmd);
 
+  // Debug.
   logger(dbg_functions, basic) << "end " << Q_FUNC_INFO;
   return (info.cmd_id);
 }
@@ -138,25 +152,32 @@ unsigned long raw::run(QString const& processed_cmd,
  *  @param[in]  timeout The command timeout.
  *  @param[out] res     The result of the command.
  */
-void raw::run(QString const& processed_cmd,
-	      nagios_macros const& macros,
-	      unsigned int timeout,
-	      result& res) {
+void raw::run(
+            QString const& processed_cmd,
+            nagios_macros const& macros,
+            unsigned int timeout,
+            result& res) {
+  // Debug.
   logger(dbg_functions, basic) << "start " << Q_FUNC_INFO;
 
-  _mutex.lock();
-  unsigned long id = get_uniq_id();
-  _mutex.unlock();
+  // Get process ID.
+  unsigned long id;
+  {
+    QMutexLocker lock(&_mutex);
+    id = get_uniq_id();
+  }
 
+  // Create and run process.
   process proc(macros, timeout);
-
   logger(dbg_commands, basic)
     << "raw command (id=" << id
     << ") start '" << processed_cmd << "'.";
-
   proc.start(processed_cmd);
+
+  // Wait for completion.
   proc.wait();
 
+  // Provide result on process execution.
   res.set_command_id(id);
   res.set_start_time(proc.get_start_time());
   res.set_end_time(proc.get_end_time());
@@ -166,40 +187,58 @@ void raw::run(QString const& processed_cmd,
   res.set_stderr(proc.get_stderr());
   res.set_is_executed(proc.get_is_executed());
 
+  // Debug.
   logger(dbg_functions, basic) << "end " << Q_FUNC_INFO;
+  return ;
 }
 
 /**
  *  Slot to catch the end of processes et send the result by signal.
  */
 void raw::raw_ended() {
+  // Debug.
   logger(dbg_functions, basic) << "start " << Q_FUNC_INFO;
-  _mutex.lock();
-  QHash<QObject*, process_info>::iterator it = _processes.find(sender());
-  if (it == _processes.end()) {
-    _mutex.unlock();
-    logger(log_runtime_warning, basic) << "sender not found in processes.";
-    return;
+
+  // Find process info.
+  process_info info;
+  {
+    QMutexLocker lock(&_mutex);
+    QHash<QObject*, process_info>::iterator
+      it(_processes.find(sender()));
+    if (it == _processes.end()) {
+      logger(log_runtime_warning, basic) << "sender not found in processes.";
+      return ;
+    }
+    info = it.value();
+    _processes.erase(it);
   }
-  process_info info = it.value();
-  _processes.erase(it);
-  _mutex.unlock();
 
-  result res(info.cmd_id,
-  	     info.proc->get_stdout(),
-  	     info.proc->get_stderr(),
-  	     info.proc->get_start_time(),
-  	     info.proc->get_end_time(),
-  	     info.proc->get_exit_code(),
-  	     info.proc->get_is_timeout(),
-  	     info.proc->get_is_executed());
+  // Build check result.
+  result res(
+           info.cmd_id,
+           info.proc->get_stdout(),
+           info.proc->get_stderr(),
+           info.proc->get_start_time(),
+           info.proc->get_end_time(),
+           info.proc->get_exit_code(),
+           info.proc->get_is_timeout(),
+           info.proc->get_is_executed());
 
+  // Debug.
   logger(dbg_commands, basic)
     << "raw command (id=" << info.cmd_id << ") finished.";
 
+  // Command finished executing.
   emit command_executed(res);
   logger(dbg_functions, basic) << "end " << Q_FUNC_INFO;
+  return ;
 }
+
+/**************************************
+*                                     *
+*           Private Methods           *
+*                                     *
+**************************************/
 
 /**
  *  Set the object to delete later.
@@ -208,4 +247,5 @@ void raw::raw_ended() {
  */
 void raw::_deletelater_process(process* obj) {
   obj->deleteLater();
+  return ;
 }

@@ -1,5 +1,5 @@
 /*
-** Copyright 2011 Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -275,12 +275,18 @@ QProcess::ProcessState basic_process::state() const {
  *  @return True if process finished, otherwise false.
  */
 bool basic_process::waitForFinished(int msecs) {
+  QEventLoop loop;
+  QObject::connect(
+    this,
+    SIGNAL(finished(int, QProcess::ExitStatus)),
+    &loop,
+    SLOT(quit()));
+  QObject::connect(
+    this,
+    SIGNAL(error(QProcess::ProcessError)),
+    &loop,
+    SLOT(quit()));
   if (msecs && _pstate == QProcess::Running) {
-    QEventLoop loop;
-    QObject::connect(this, SIGNAL(finished(int, QProcess::ExitStatus)),
-                     &loop, SLOT(quit()));
-    QObject::connect(this, SIGNAL(error(QProcess::ProcessError)),
-                     &loop, SLOT(quit()));
     if (msecs > 0)
       QTimer::singleShot(msecs, &loop, SLOT(quit()));
     loop.exec();
@@ -333,10 +339,18 @@ bool basic_process::waitForBytesWritten(int msecs) {
  *  @return True if process started, otherwise false.
  */
 bool basic_process::waitForStarted(int msecs) {
+  QEventLoop loop;
+  QObject::connect(
+    this,
+    SIGNAL(started()),
+    &loop,
+    SLOT(quit()));
+  QObject::connect(
+    this,
+    SIGNAL(error(QProcess::ProcessError)),
+    &loop,
+    SLOT(quit()));
   if (msecs && _pstate == QProcess::Starting) {
-    QEventLoop loop;
-    QObject::connect(this, SIGNAL(started()), &loop, SLOT(quit()));
-    QObject::connect(this, SIGNAL(error(QProcess::ProcessError)), &loop, SLOT(quit()));
     if (msecs > 0)
       QTimer::singleShot(msecs, &loop, SLOT(quit()));
     loop.exec();
@@ -647,12 +661,15 @@ void basic_process::_start_process(OpenMode mode) {
     // QObject::connect(_notifier_error, SIGNAL(activated(int)),
     //                  this, SLOT(_notification_standard_error()));
 
-    // _notifier_dead = new QSocketNotifier(
-    //                        _pipe_dead[0],
-    //                        QSocketNotifier::Read,
-    //                        this);
-    // QObject::connect(_notifier_dead, SIGNAL(activated(int)),
-    //                  this, SLOT(_notification_dead()));
+    _notifier_dead = new QSocketNotifier(
+                           _pipe_dead[0],
+                           QSocketNotifier::Read,
+                           this);
+    QObject::connect(
+               _notifier_dead,
+               SIGNAL(activated(int)),
+               this,
+               SLOT(_notification_dead()));
 
     setProcessState(QProcess::Running);
     emit started();

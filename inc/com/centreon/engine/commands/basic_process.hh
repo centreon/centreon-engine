@@ -1,5 +1,5 @@
 /*
-** Copyright 2011 Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -42,9 +42,10 @@ namespace                          com {
          */
         class                      basic_process : public QIODevice {
           Q_OBJECT
+
         public:
-          basic_process(QObject* parent = 0);
-          virtual ~basic_process() throw();
+                                   basic_process(QObject* parent = 0);
+          virtual                  ~basic_process() throw();
 
           void                     closeReadChannel(QProcess::ProcessChannel channel);
           void                     closeWriteChannel();
@@ -112,8 +113,8 @@ namespace                          com {
           void                     _notification_dead();
 
         private:
-          basic_process(basic_process const&);
-          basic_process& operator=(basic_process const&);
+                                   basic_process(basic_process const&);
+          basic_process&           operator=(basic_process const&);
 
           void                     _start_process(OpenMode mode);
           void                     _exec_child();
