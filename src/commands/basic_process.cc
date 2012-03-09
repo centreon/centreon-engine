@@ -26,7 +26,6 @@
 #include <signal.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/ioctl.h>
 #include <sys/wait.h>
 #include <unistd.h>
 #include "com/centreon/engine/commands/basic_process.hh"
@@ -554,20 +553,6 @@ basic_process::basic_process(basic_process const& right) : QIODevice() {
 basic_process& basic_process::operator=(basic_process const& right) {
   _internal_copy(right);
   return (*this);
-}
-
-/**
- *  Get the number of bytes available on the specific
- *  file descriptor.
- *
- *  @param[in] fd The file descriptor.
- *
- *  @return The number of bytes available.
- */
-qint64 basic_process::_available_bytes(int fd) throw () {
-  int nbytes(0);
-  int ret(::ioctl(fd, FIONREAD, (char*)&nbytes));
-  return (ret != -1 ? nbytes : -1);
 }
 
 /**

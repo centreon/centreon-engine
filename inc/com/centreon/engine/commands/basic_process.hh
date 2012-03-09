@@ -128,7 +128,6 @@ namespace                          com {
                                      basic_process const& right);
           basic_process&           operator=(
                                      basic_process const& right);
-          static qint64            _available_bytes(int fd) throw ();
           static char**            _build_args(
                                      QString const& program,
                                      QStringList const& arguments);
