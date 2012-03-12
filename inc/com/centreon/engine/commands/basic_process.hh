@@ -147,15 +147,13 @@ namespace                          com {
                                      void* buffer,
                                      qint64 nbyte) throw ();
           static void              _set_cloexec(int fd);
-          static QStringList       _split_command_line(
-                                     QString const& command_line);
           void                     _start_process(OpenMode mode);
           static pid_t             _waitpid(
                                      pid_t pid,
                                      int* status,
                                      int options) throw ();
 
-          QStringList              _arguments;
+          char**                   _args;
           QProcess::ProcessChannel _channel;
           // QProcessEnvironment      _environment;
           QSocketNotifier*         _notifier_dead;

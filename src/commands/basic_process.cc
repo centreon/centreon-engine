@@ -29,8 +29,10 @@
 #include <sys/wait.h>
 #include <unistd.h>
 #include "com/centreon/engine/commands/basic_process.hh"
+#include "com/centreon/engine/commands/command_line.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
+
 
 using namespace com::centreon::engine::commands;
 
@@ -316,12 +318,12 @@ void basic_process::start(
                       QString const& program,
                       QStringList const& arguments,
                       OpenMode mode) {
-  if (QProcess::NotRunning == _pstate) {
-    _program = program;
-    _arguments = arguments;
+  if (_pstate == QProcess::NotRunning) {
+    command_line cmdline(program, arguments);
+    _args = cmdline.get_argv();
     _start_process(mode);
   }
-  return ;
+  return;
 }
 
 /**
@@ -331,13 +333,12 @@ void basic_process::start(
  *  @param[in] mode    Set the openning mode.
  */
 void basic_process::start(QString const& program, OpenMode mode) {
-  if (QProcess::NotRunning == _pstate) {
-    _arguments = _split_command_line(program);
-    _program = _arguments.first();
-    _arguments.removeFirst();
+  if (_pstate == QProcess::NotRunning) {
+    command_line cmdline(program);
+    _args = cmdline.get_argv();
     _start_process(mode);
   }
-  return ;
+  return;
 }
 
 /**
@@ -736,48 +737,6 @@ void basic_process::_set_cloexec(int fd) {
 }
 
 /**
- *  Split command line on array of string.
- *
- *  @param[in] command_line The command line to split.
- *
- *  @return Array of string.
- */
-QStringList basic_process::_split_command_line(
-                             QString const& command_line) {
-  QStringList args;
-  QString tmp;
-  int count(0);
-  bool in(false);
-
-  for (int i(0), end(command_line.size()); i < end; ++i) {
-    if (command_line.at(i) == QLatin1Char('"')) {
-      ++count;
-      if (count == 3) {
-        count = 0;
-        tmp += command_line.at(i);
-      }
-      continue;
-    }
-    if (count) {
-      if (count == 1)
-        in = !in;
-      count = 0;
-    }
-    if (!in && command_line.at(i).isSpace()) {
-      if (!tmp.isEmpty()) {
-        args += tmp;
-        tmp.clear();
-      }
-    }
-    else
-      tmp += command_line.at(i);
-  }
-  if (!tmp.isEmpty())
-    args += tmp;
-  return (args);
-}
-
-/**
  *  Start the process and initialize all
  *  notification system and all internal
  *  variables.
@@ -786,7 +745,6 @@ QStringList basic_process::_split_command_line(
  */
 void basic_process::_start_process(OpenMode mode) {
   int old_fd[3] = { -1, -1, -1 };
-  char** args(NULL);
   try {
     // As we will use vfork, we need to backup standard FDs.
     if (((old_fd[0] = dup(STDIN_FILENO)) < 0)
@@ -814,7 +772,7 @@ void basic_process::_start_process(OpenMode mode) {
     _notifier_output = NULL;
     _perror = QProcess::UnknownError;
     _status = 0;
-    args = _build_args(_program, _arguments);
+
     _chdir(qPrintable(_working_directory));
 
     // Open communication pipes.
@@ -876,7 +834,7 @@ void basic_process::_start_process(OpenMode mode) {
 
     // Child execution.
     if (!_pid) {
-      execvp(args[0], args);
+      execvp(_args[0], _args);
       ::_exit(EXIT_FAILURE);
     }
 
@@ -938,9 +896,6 @@ void basic_process::_start_process(OpenMode mode) {
       dup2(old_fd[i], i);
       _close(old_fd[i]);
     }
-
-  // Clean open pipes.
-  _clean_args(args);
 
   return ;
 }
@@ -1036,3 +991,4 @@ void basic_process::_notification_standard_output() {
     _emit_finished();
   }
 }
+
