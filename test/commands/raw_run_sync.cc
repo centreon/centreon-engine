@@ -17,14 +17,15 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <exception>
 #include <QCoreApplication>
 #include <QDebug>
-#include <exception>
 #include <string.h>
-#include "error.hh"
+#include "com/centreon/engine/commands/raw.hh"
+#include "com/centreon/engine/engine.hh"
+#include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/globals.hh"
 #include "test/unittest.hh"
-#include "commands/raw.hh"
-#include "engine.hh"
 
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::commands;
@@ -81,6 +82,8 @@ static bool run_with_timeout() {
  *  @return true if ok, false otherwise.
  */
 static bool run_with_environement_macros() {
+  config.set_enable_environment_macros(true);
+
   nagios_macros macros = nagios_macros();
   raw cmd(__func__, "./bin_test_run --check_macros");
 

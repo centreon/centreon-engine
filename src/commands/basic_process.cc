@@ -30,6 +30,7 @@
 #include <unistd.h>
 #include "com/centreon/engine/commands/basic_process.hh"
 #include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/globals.hh"
 
 using namespace com::centreon::engine::commands;
 
@@ -854,9 +855,23 @@ void basic_process::_start_process(OpenMode mode) {
 
     // Here we go !
     setProcessState(QProcess::Starting);
-    if (-1 == (_pid = vfork())) {
-      char const* msg(strerror(errno));
-      throw (engine_error() << "start process failed on fork: " << msg);
+    bool env_macros(config.get_enable_environment_macros());
+    if (!env_macros) {
+      if (-1 == (_pid = vfork())) {
+        char const* msg(strerror(errno));
+        throw (engine_error()
+               << "could not start process because of a vfork error: "
+               << msg);
+      }
+    }
+    else {
+      if (-1 == (_pid = fork())) {
+        char const* msg(strerror(errno));
+        throw (engine_error()
+               << "could not start process because of a fork error: "
+               << msg);
+      }
+      setupChildProcess();
     }
 
     // Child execution.

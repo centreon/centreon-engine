@@ -1,5 +1,5 @@
 /*
-** Copyright 2011 Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -17,14 +17,15 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <exception>
 #include <QCoreApplication>
 #include <QDebug>
-#include <exception>
-#include "error.hh"
-#include "test/unittest.hh"
-#include "commands/raw.hh"
-#include "engine.hh"
+#include "com/centreon/engine/commands/raw.hh"
+#include "com/centreon/engine/engine.hh"
+#include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/globals.hh"
 #include "test/commands/wait_process.hh"
+#include "test/unittest.hh"
 
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::commands;
@@ -85,6 +86,8 @@ static bool run_with_timeout() {
  *  @return true if ok, false otherwise.
  */
 static bool run_with_environement_macros() {
+  config.set_enable_environment_macros(true);
+
   nagios_macros macros = nagios_macros();
   raw cmd(__func__, "./bin_test_run --check_macros");
   wait_process wait_proc(cmd);
