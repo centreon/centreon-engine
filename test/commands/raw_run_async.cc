@@ -36,23 +36,22 @@ using namespace com::centreon::engine::commands;
  *  @return true if ok, false otherwise.
  */
 static bool run_without_timeout() {
-  nagios_macros macros = nagios_macros();
+  // Raw command object and its waiter.
   raw cmd(__func__, "./bin_test_run --timeout=off");
   wait_process wait_proc(cmd);
 
-  unsigned long id = cmd.run(cmd.get_command_line(), macros, 0);
+  // Run command and wait for it to exit.
+  unsigned long id(cmd.run(cmd.get_command_line(), nagios_macros(), 0));
   wait_proc.wait();
 
+  // Check result.
   result const& cmd_res = wait_proc.get_result();
-  if (cmd_res.get_command_id() != id
-      || cmd_res.get_exit_code() != STATE_OK
-      || cmd_res.get_stdout() != cmd.get_command_line()
-      || cmd_res.get_stderr() != ""
-      || cmd_res.get_is_executed() == false
-      || cmd_res.get_is_timeout() == true) {
-    return (false);
-  }
-  return (true);
+  return (!((cmd_res.get_command_id() != id)
+            || (cmd_res.get_exit_code() != STATE_OK)
+            || (cmd_res.get_stdout() != cmd.get_command_line())
+            || (cmd_res.get_stderr() != "")
+            || !cmd_res.get_is_executed()
+            || cmd_res.get_is_timeout()));
 }
 
 /**
@@ -61,23 +60,22 @@ static bool run_without_timeout() {
  *  @return true if ok, false otherwise.
  */
 static bool run_with_timeout() {
-  nagios_macros macros = nagios_macros();
+  // Raw command object and its waiter.
   raw cmd(__func__, "./bin_test_run --timeout=on");
   wait_process wait_proc(cmd);
 
-  unsigned long id = cmd.run(cmd.get_command_line(), macros, 1);
+  // Run command and wait for it to exit.
+  unsigned long id(cmd.run(cmd.get_command_line(), nagios_macros(), 1));
   wait_proc.wait();
 
+  // Check result.
   result const& cmd_res = wait_proc.get_result();
-  if (cmd_res.get_command_id() != id
-      || cmd_res.get_exit_code() != STATE_CRITICAL
-      || cmd_res.get_stdout() != ""
-      || cmd_res.get_stderr() != "(Process Timeout)"
-      || cmd_res.get_is_executed() == false
-      || cmd_res.get_is_timeout() == false) {
-    return (false);
-  }
-  return (true);
+  return (!((cmd_res.get_command_id() != id)
+            || (cmd_res.get_exit_code() != STATE_CRITICAL)
+            || (cmd_res.get_stdout() != "")
+            || (cmd_res.get_stderr() != "(Process Timeout)")
+            || !cmd_res.get_is_executed()
+            || !cmd_res.get_is_timeout()));
 }
 
 /**
@@ -85,45 +83,97 @@ static bool run_with_timeout() {
  *
  *  @return true if ok, false otherwise.
  */
-static bool run_with_environement_macros() {
+static bool run_with_environment_macros() {
+  // Enable environment macros in configuration.
   config.set_enable_environment_macros(true);
 
-  nagios_macros macros = nagios_macros();
-  raw cmd(__func__, "./bin_test_run --check_macros");
-  wait_process wait_proc(cmd);
-
+  // Get environment macros.
+  nagios_macros macros;
   char const* argv = "default_arg";
   macros.argv[0] = new char[strlen(argv) + 1];
   strcpy(macros.argv[0], argv);
 
-  unsigned long id = cmd.run(cmd.get_command_line(), macros, 0);
-  wait_proc.wait();
-  delete[] macros.argv[0];
+  // Raw command object and its waiter.
+  raw cmd(__func__, "./bin_test_run --check_macros");
+  wait_process wait_proc(cmd);
 
+  // Run command and wait for it to exit.
+  unsigned long id(cmd.run(cmd.get_command_line(), macros, 0));
+  wait_proc.wait();
+  delete [] macros.argv[0];
+
+  // Check result.
   result const& cmd_res = wait_proc.get_result();
-  if (cmd_res.get_command_id() != id
-      || cmd_res.get_exit_code() != STATE_OK
-      || cmd_res.get_stdout() != cmd.get_command_line()
-      || cmd_res.get_stderr() != ""
-      || cmd_res.get_is_executed() == false
-      || cmd_res.get_is_timeout() == true) {
-    return (false);
-  }
-  return (true);
+  return (!((cmd_res.get_command_id() != id)
+            || (cmd_res.get_exit_code() != STATE_OK)
+            || (cmd_res.get_stdout() != cmd.get_command_line())
+            || (cmd_res.get_stderr() != "")
+            || !cmd_res.get_is_executed()
+            || cmd_res.get_is_timeout()));
+}
+
+/**
+ *  Check if single quotes are supported.
+ *
+ *  @return true if ok, false otherwise.
+ */
+static bool run_with_single_quotes() {
+  // Raw command object and its waiter.
+  raw cmd(__func__, "'./bin_test_run' '--timeout'='off'");
+  wait_process wait_proc(cmd);
+
+  // Run command and wait for it to exit.
+  unsigned long id(cmd.run(cmd.get_command_line(), nagios_macros(), 0));
+  wait_proc.wait();
+
+  // Check result.
+  result const& cmd_res = wait_proc.get_result();
+  return (!((cmd_res.get_command_id() != id)
+            || (cmd_res.get_exit_code() != STATE_OK)
+            || (cmd_res.get_stdout() != "./bin_test_run --timeout=off")
+            || (cmd_res.get_stderr() != "")
+            || !cmd_res.get_is_executed()
+            || cmd_res.get_is_timeout()));
+}
+
+/**
+ *  Check if double quotes are supported.
+ *
+ *  @return true if ok, false otherwise.
+ */
+static bool run_with_double_quotes() {
+  // Raw command object and its waiter.
+  raw cmd(__func__, "\"./bin_test_run\" \"--timeout\"=\"off\"");
+  wait_process wait_proc(cmd);
+
+  // Run command and wait for it to exit.
+  unsigned long id(cmd.run(cmd.get_command_line(), nagios_macros(), 0));
+  wait_proc.wait();
+
+  // Check result.
+  result const& cmd_res = wait_proc.get_result();
+  return (!((cmd_res.get_command_id() != id)
+            || (cmd_res.get_exit_code() != STATE_OK)
+            || (cmd_res.get_stdout() != "./bin_test_run --timeout=off")
+            || (cmd_res.get_stderr() != "")
+            || !cmd_res.get_is_executed()
+            || cmd_res.get_is_timeout()));
 }
 
 /**
  *  Check the asynchrone system for the raw command.
  */
 int main_test() {
-  if (run_without_timeout() == false)
-    throw (engine_error() << "error: raw::run without timeout failed.");
-
-  if (run_with_timeout() == false)
-    throw (engine_error() << "error: raw::run with timeout failed.");
-
-  if (run_with_environement_macros() == false)
-    throw (engine_error() << "error: raw::run with macros failed.");
+  if (!run_without_timeout())
+    throw (engine_error() << "raw::run without timeout failed");
+  if (!run_with_timeout())
+    throw (engine_error() << "raw::run with timeout failed");
+  if (!run_with_environment_macros())
+    throw (engine_error() << "raw::run with macros failed");
+  if (!run_with_single_quotes())
+    throw (engine_error() << "raw::run with single quotes failed");
+  if (!run_with_double_quotes())
+    throw (engine_error() << "raw::run with double quotes failed");
   return (0);
 }
 
