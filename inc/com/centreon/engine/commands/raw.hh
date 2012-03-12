@@ -1,5 +1,5 @@
 /*
-** Copyright 2011      Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -18,65 +18,65 @@
 */
 
 #ifndef CCE_COMMANDS_RAW_HH
-# define CCE_COMMANDS_RAW_HH
+#  define CCE_COMMANDS_RAW_HH
 
-# include <QString>
-# include <QSharedPointer>
-# include <QHash>
-# include <QMutex>
-# include <sys/time.h>
+#  include <QHash>
+#  include <QMutex>
+#  include <QSharedPointer>
+#  include <QString>
+#  include <sys/time.h>
+#  include "com/centreon/engine/commands/command.hh"
+#  include "com/centreon/engine/commands/process.hh"
 
-# include "commands/command.hh"
-# include "commands/process.hh"
+namespace                 com {
+  namespace               centreon {
+    namespace             engine {
+      namespace           commands {
+        /**
+         *  @class raw raw.hh
+         *  @brief Raw is a specific implementation of command.
+         *
+         *  Raw is a specific implementation of command.
+         */
+        class             raw : public command {
+          Q_OBJECT
 
-namespace                               com {
-  namespace                             centreon {
-    namespace                           engine {
-      namespace                         commands {
-	/**
-	 *  @class raw raw.hh
-	 *  @brief Raw is a specific implementation of command.
-	 *
-	 *  Raw is a specific implementation of command.
-	 */
-	class                           raw : public command {
-	  Q_OBJECT
-	public:
-	                                raw(QString const& name,
-					    QString const& command_line);
-	                                raw(raw const& right);
-                                        ~raw() throw();
+        public:
+                          raw(
+                            QString const& name,
+                            QString const& command_line);
+                          raw(raw const& right);
+                          ~raw() throw ();
+          raw&            operator=(raw const& right);
+          command*        clone() const;
+          unsigned long   run(
+                            QString const& process_cmd,
+                            nagios_macros const& macros,
+                            unsigned int timeout);
+          void            run(
+                            QString const& process_cmd,
+                            nagios_macros const& macros,
+                            unsigned int timeout,
+                            result& res);
 
-	  raw&                          operator=(raw const& right);
-
-	  command*                      clone() const;
-
-	  unsigned long                 run(QString const& process_cmd,
-					    nagios_macros const& macros,
-					    unsigned int timeout);
-
-	  void                          run(QString const& process_cmd,
-					    nagios_macros const& macros,
-					    unsigned int timeout,
-					    result& res);
+        signals:
+          void            _empty_hash();
 
         public slots:
-	  void                          raw_ended();
+          void            raw_ended();
 
-	private:
-          static void                   _deletelater_process(process* obj);
+        private:
+          struct                    process_info {
+            unsigned long           cmd_id;
+            QSharedPointer<process> proc;
+          };
 
-	  struct                        process_info {
-	    QSharedPointer<process>     proc;
-	    unsigned long               cmd_id;
-	  };
+          static void     _deletelater_process(process* obj);
 
-	  QHash<QObject*, process_info> _processes;
-	  QMutex                        _mutex;
-
-	signals:
-	  void                          _empty_hash();
-	};
+          QMutex          _mutex;
+          QHash<QObject*, process_info>
+                          _processes;
+        };
       }
     }
   }

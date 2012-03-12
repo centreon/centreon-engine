@@ -609,13 +609,12 @@ int main(int argc, char** argv) {
     delete [] mac->x[MACRO_EVENTSTARTTIME];
   }
 
-  // Unload singletons.
+  // Unload singletons (except logging).
   com::centreon::engine::broker::compatibility::unload();
   com::centreon::engine::broker::loader::unload();
   events::loop::unload();
   checks::checker::unload();
   commands::set::unload();
-  logging::engine::unload();
 
   return (EXIT_SUCCESS);
 }

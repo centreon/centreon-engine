@@ -1,5 +1,5 @@
 /*
-** Copyright 2011 Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -17,87 +17,161 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <QBuffer>
-#include <QTimer>
-#include <QEventLoop>
-#include <iostream>
-#include <stdlib.h>
-#include <signal.h>
-#include <unistd.h>
-#include <sys/types.h>
+#include <assert.h>
 #include <errno.h>
-#include <sys/wait.h>
 #include <fcntl.h>
-#include <sys/ioctl.h>
-#include "error.hh"
-#include "commands/command_line.hh"
-#include "commands/basic_process.hh"
+#include <QBuffer>
+#include <QEventLoop>
+#include <QTimer>
+#include <signal.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/wait.h>
+#include <unistd.h>
+#include "com/centreon/engine/commands/basic_process.hh"
+#include "com/centreon/engine/commands/command_line.hh"
+#include "com/centreon/engine/error.hh"
+
 
 using namespace com::centreon::engine::commands;
 
+/**************************************
+*                                     *
+*           Public Methods            *
+*                                     *
+**************************************/
+
 /**
- *  Default constructor.
+ *  Constructor.
  *
  *  @param[in] parent The parent of this object (optional parameter).
  */
 basic_process::basic_process(QObject* parent)
   : QIODevice(parent),
-    _notifier_output(NULL),
-    // _notifier_error(NULL),
-    _notifier_dead(NULL),
     _channel(QProcess::StandardOutput),
+    _notifier_dead(NULL),
+    _notifier_error(NULL),
+    _notifier_output(NULL),
     _perror(QProcess::UnknownError),
+    _pid((pid_t)-1),
     _pstate(QProcess::NotRunning),
-    _pid(0),
-    _status(0) {
+    _status(0),
+    _want_err(true),
+    _want_in(true),
+    _want_out(true) {
   for (unsigned int i(0); i < 2; ++i) {
-    _pipe_out[i] = -1;
-    // _pipe_err[i] = -1;
-    // _pipe_in[i] = -1;
     _pipe_dead[i] = -1;
+    _pipe_err[i] = -1;
+    _pipe_in[i] = -1;
+    _pipe_out[i] = -1;
   }
 }
 
 /**
- *  Default destructor.
+ *  Destructor.
  */
-basic_process::~basic_process() throw() {
+basic_process::~basic_process() throw () {
   if (_pstate != QProcess::NotRunning) {
     kill();
     waitForFinished(-1);
   }
-  delete _notifier_output;
-  // delete _notifier_error;
   delete _notifier_dead;
+  delete _notifier_error;
+  delete _notifier_output;
+}
+
+/**
+ *  Check if the process is finished and no data is available.
+ *
+ *  @return True if the process is not running, and all
+ *          data are read, false otherwise.
+ */
+bool basic_process::atEnd() const {
+  QByteArray const* buffer((_channel == QProcess::StandardOutput)
+                           ? &_standard_output
+                           : &_standard_error);
+  return (QIODevice::atEnd() && (!isOpen() || buffer->isEmpty()));
+}
+
+/**
+ *  Get number of bytes available in the current channel.
+ *
+ *  @return The number of bytes available.
+ */
+qint64 basic_process::bytesAvailable() const {
+  QByteArray const* buffer(_channel == QProcess::StandardOutput
+                           ? &_standard_output
+                           : &_standard_error);
+  return (QIODevice::bytesAvailable() + buffer->size());
+}
+
+/**
+ *  Get number bytes to write in the current channel.
+ *
+ *  @return The number of bytes to write.
+ */
+qint64 basic_process::bytesToWrite() const {
+  return (0);
+}
+
+/**
+ *  Get if a line is available in the current channel.
+ *
+ *  @return True if a line is available.
+ */
+bool basic_process::canReadLine() const {
+  // XXX : QBuffer might modify our QByteArrays
+  QBuffer buffer(_channel == QProcess::StandardOutput
+                 ? const_cast<QByteArray*>(&_standard_output)
+                 : const_cast<QByteArray*>(&_standard_error));
+  return (buffer.canReadLine() || QIODevice::canReadLine());
+}
+
+/**
+ *  Close all communication with the process and kill it.
+ */
+void basic_process::close() {
+  emit aboutToClose();
+  while (waitForBytesWritten(-1))
+    ;
+  kill();
+  waitForFinished(-1);
+  QIODevice::close();
+  return ;
 }
 
 /**
  *  Close the selected channel (standard output or standard error).
  *
- *  @param[in] channel The selected channel ({ StandardOutput, StandardError }).
+ *  @param[in] channel The selected channel ({ StandardOutput,
+ *                     StandardError }).
  */
 void basic_process::closeReadChannel(QProcess::ProcessChannel channel) {
-  // int& fd(channel == QProcess::StandardOutput ? _pipe_out[0] : _pipe_err[0]);
-  // _close(fd);
-  if (channel == QProcess::StandardOutput)
+  if (QProcess::StandardOutput == channel) {
     _close(_pipe_out[0]);
+    _want_out = false;
+  }
+  else {
+    _close(_pipe_err[0]);
+    _want_err = false;
+  }
+  return ;
 }
 
 /**
  *  Close the standard input.
  */
 void basic_process::closeWriteChannel() {
-  // _close(_pipe_in[1]);
+  _close(_pipe_in[1]);
+  _want_in = false;
+  return ;
 }
-
-//  QStringList basic_process::environment() const {
-//    return (_environment.toStringList());
-//  }
 
 /**
  *  Get the process error.
  *
- *  @return The process error ({ FailedToStart, Crashed, Timedout, WriteError, ReadError, UnknownError }).
+ *  @return The process error ({ FailedToStart, Crashed, Timedout,
+ *          WriteError, ReadError, UnknownError }).
  */
 QProcess::ProcessError basic_process::error() const {
   return (_perror);
@@ -118,7 +192,18 @@ int basic_process::exitCode() const {
  *  @return The exit status ({ NormalExit, CrashExit }).
  */
 QProcess::ExitStatus basic_process::exitStatus() const {
-  return (WIFSIGNALED(_status) ? QProcess::CrashExit : QProcess::NormalExit);
+  return (WIFEXITED(_status)
+          ? QProcess::NormalExit
+          : QProcess::CrashExit);
+}
+
+/**
+ *  This IODevice is sequential.
+ *
+ *  @return Always true.
+ */
+bool basic_process::isSequential() const {
+  return (true);
 }
 
 //  QString basic_process::nativeArguments() const {
@@ -148,10 +233,9 @@ Q_PID basic_process::pid() const {
  *  @return The data.
  */
 QByteArray basic_process::readAllStandardError() {
-  // QByteArray error(_standard_error);
-  // _standard_error.clear();
-  // return (error);
-  return (QByteArray());
+  QByteArray error(_standard_error);
+  _standard_error.clear();
+  return (error);
 }
 
 /**
@@ -174,10 +258,6 @@ QProcess::ProcessChannel basic_process::readChannel() const {
   return (_channel);
 }
 
-//  void basic_process::setEnvironment(QStringList const& environment) {
-//    setProcessEnvironment(QProcessEnvironmentPrivate::fromList(environment));
-//  }
-
 //  void basic_process::setNativeArguments(QString const& arguments) {
 //    throw (engine_error() << "basic_process: " << Q_FUNC_INFO << " not implemented yet.");
 //  }
@@ -197,6 +277,7 @@ QProcess::ProcessChannel basic_process::readChannel() const {
  */
 void basic_process::setReadChannel(QProcess::ProcessChannel channel) {
   _channel = channel;
+  return ;
 }
 
 //  void basic_process::setStandardErrorFile(QString const& fileName, OpenMode mode) {
@@ -222,6 +303,7 @@ void basic_process::setReadChannel(QProcess::ProcessChannel channel) {
  */
 void basic_process::setWorkingDirectory(QString const& dir) {
   _working_directory = dir;
+  return ;
 }
 
 /**
@@ -231,13 +313,16 @@ void basic_process::setWorkingDirectory(QString const& dir) {
  *  @param[in] arguments The arguments of the program.
  *  @param[in] mode      Set the openning mode.
  */
-void basic_process::start(QString const& program, QStringList const& arguments, OpenMode mode) {
-  if (_pstate != QProcess::NotRunning)
-    return;
-
-  command_line cmdline(program, arguments);
-  _args = cmdline.get_argv();
-  _start_process(mode);
+void basic_process::start(
+                      QString const& program,
+                      QStringList const& arguments,
+                      OpenMode mode) {
+  if (_pstate == QProcess::NotRunning) {
+    command_line cmdline(program, arguments);
+    _args = cmdline.get_argv();
+    _start_process(mode);
+  }
+  return;
 }
 
 /**
@@ -247,12 +332,12 @@ void basic_process::start(QString const& program, QStringList const& arguments, 
  *  @param[in] mode    Set the openning mode.
  */
 void basic_process::start(QString const& program, OpenMode mode) {
-  if (_pstate != QProcess::NotRunning)
-    return;
-
-  command_line cmdline(program);
-  _args = cmdline.get_argv();
-  _start_process(mode);
+  if (_pstate == QProcess::NotRunning) {
+    command_line cmdline(program);
+    _args = cmdline.get_argv();
+    _start_process(mode);
+  }
+  return;
 }
 
 /**
@@ -265,6 +350,22 @@ QProcess::ProcessState basic_process::state() const {
 }
 
 /**
+ *  Blocks until the process as data to write, or
+ *  until timeout have passed.
+ *
+ *  @param[in] msecs The timeout.
+ *
+ *  @return True if process has data to write, otherwise false.
+ */
+bool basic_process::waitForBytesWritten(int msecs) {
+  (void)msecs;
+  if (_pstate == QProcess::NotRunning)
+    return (false);
+  // XXX: not implemented yet.
+  return (true);
+}
+
+/**
  *  Blocks until the process has finished, or
  *  until timeout have passed.
  *
@@ -273,12 +374,18 @@ QProcess::ProcessState basic_process::state() const {
  *  @return True if process finished, otherwise false.
  */
 bool basic_process::waitForFinished(int msecs) {
+  QEventLoop loop;
+  QObject::connect(
+    this,
+    SIGNAL(finished(int, QProcess::ExitStatus)),
+    &loop,
+    SLOT(quit()));
+  QObject::connect(
+    this,
+    SIGNAL(error(QProcess::ProcessError)),
+    &loop,
+    SLOT(quit()));
   if (msecs && _pstate == QProcess::Running) {
-    QEventLoop loop;
-    QObject::connect(this, SIGNAL(finished(int, QProcess::ExitStatus)),
-                     &loop, SLOT(quit()));
-    QObject::connect(this, SIGNAL(error(QProcess::ProcessError)),
-                     &loop, SLOT(quit()));
     if (msecs > 0)
       QTimer::singleShot(msecs, &loop, SLOT(quit()));
     loop.exec();
@@ -296,30 +403,14 @@ bool basic_process::waitForFinished(int msecs) {
  */
 bool basic_process::waitForReadyRead(int msecs) {
   (void)msecs;
-
-  if (_pstate == QProcess::NotRunning
-      || (_channel == QProcess::StandardOutput && _pipe_out[0] == -1))
-    // || (_channel == QProcess::StandardError && _pipe_err[0] == -1))
+  if ((QProcess::NotRunning == _pstate)
+      || ((QProcess::StandardOutput == _channel)
+          && (-1 == _pipe_out[0]))
+      || ((QProcess::StandardError == _channel)
+          && (-1 == _pipe_err[0])))
     return (false);
   // XXX: not implemented yet.
   return (false);
-}
-
-/**
- *  Blocks until the process as data to write, or
- *  until timeout have passed.
- *
- *  @param[in] msecs The timeout.
- *
- *  @return True if process has data to write, otherwise false.
- */
-bool basic_process::waitForBytesWritten(int msecs) {
-  (void)msecs;
-
-  if (_pstate == QProcess::NotRunning)
-    return (false);
-  // XXX: not implemented yet.
-  return (true);
 }
 
 /**
@@ -331,10 +422,18 @@ bool basic_process::waitForBytesWritten(int msecs) {
  *  @return True if process started, otherwise false.
  */
 bool basic_process::waitForStarted(int msecs) {
+  QEventLoop loop;
+  QObject::connect(
+    this,
+    SIGNAL(started()),
+    &loop,
+    SLOT(quit()));
+  QObject::connect(
+    this,
+    SIGNAL(error(QProcess::ProcessError)),
+    &loop,
+    SLOT(quit()));
   if (msecs && _pstate == QProcess::Starting) {
-    QEventLoop loop;
-    QObject::connect(this, SIGNAL(started()), &loop, SLOT(quit()));
-    QObject::connect(this, SIGNAL(error(QProcess::ProcessError)), &loop, SLOT(quit()));
     if (msecs > 0)
       QTimer::singleShot(msecs, &loop, SLOT(quit()));
     loop.exec();
@@ -353,117 +452,28 @@ QString basic_process::workingDirectory() const {
 }
 
 /**
- *  Get number bytes available in the current channel.
- *
- *  @return The number of bytes available.
- */
-qint64 basic_process::bytesAvailable() const {
-  if (_channel != QProcess::StandardOutput)
-    return (0);
-  return (QIODevice::bytesAvailable() + _standard_output.size());
-  // QByteArray const* buffer(_channel == QProcess::StandardOutput
-  //                          ? &_standard_output
-  //                          : &_standard_error);
-  // return (QIODevice::bytesAvailable() + buffer->size());
-}
-
-/**
- *  Get number bytes to write in the current channel.
- *
- *  @return The number of bytes to write.
- */
-qint64 basic_process::bytesToWrite() const {
-  return (0);
-}
-
-/**
- *  This IODevice is sequential.
- *
- *  @return Always true.
- */
-bool basic_process::isSequential() const {
-  return (true);
-}
-
-/**
- *  Get if a line is available in the current channel.
- *
- *  @return True if a line is available.
- */
-bool basic_process::canReadLine() const {
-  if (_channel != QProcess::StandardOutput)
-    return (false);
-  // QBuffer buffer(_channel == QProcess::StandardOutput
-  //                ? const_cast<QByteArray*>(&_standard_output)
-  //                : const_cast<QByteArray*>(&_standard_error));
-  QBuffer buffer(const_cast<QByteArray*>(&_standard_output));
-  return (buffer.canReadLine() || QIODevice::canReadLine());
-}
-
-/**
- *  Close all communication with the process and kill it.
- */
-void basic_process::close() {
-  emit aboutToClose();
-  while (waitForBytesWritten(-1))
-    ;
-  kill();
-  waitForFinished(-1);
-  QIODevice::close();
-}
-
-/**
- *  Get if the process is finished and no data are available.
- *
- *  @return True if the process is not running, and all
- *  data are read, othrewise false.
- */
-bool basic_process::atEnd() const {
-  if (_channel != QProcess::StandardOutput)
-    return (true);
-  return (QIODevice::atEnd() && (!isOpen() || _standard_output.isEmpty()));
-  // QByteArray const* buffer(_channel == QProcess::StandardOutput
-  //                          ? &_standard_output
-  //                          : &_standard_error);
-  // return (QIODevice::atEnd() && (!isOpen() || buffer->isEmpty()));
-}
-
-/**
  *  Send a KILL signal to the process.
  */
 void basic_process::kill() {
-  if (_pid)
+  if (_pid != (pid_t)-1)
     ::kill(_pid, SIGKILL);
+  return ;
 }
 
 /**
  *  Send a TERM signal to the process.
  */
 void basic_process::terminate() {
-  if (_pid)
+  if (_pid != (pid_t)-1)
     ::kill(_pid, SIGTERM);
+  return ;
 }
 
-/**
- *  Set the state of the process.
- *
- *  @param[in] state The state of the process
- *  ({ NotRunning, Starting, Running }).
- */
-void basic_process::setProcessState(QProcess::ProcessState state) {
-  if (_pstate != state) {
-    _pstate = state;
-    emit stateChanged(state);
-  }
-}
-
-/**
- *  This function is called in the child process
- *  just before the program is executed.
- */
-void basic_process::setupChildProcess() {
-
-}
+/**************************************
+*                                     *
+*          Protected Methods          *
+*                                     *
+**************************************/
 
 /**
  *  Read data on the current channel.
@@ -485,6 +495,27 @@ qint64 basic_process::readData(char* data, qint64 maxlen) {
 }
 
 /**
+ *  Set the state of the process.
+ *
+ *  @param[in] state The state of the process
+ *  ({ NotRunning, Starting, Running }).
+ */
+void basic_process::setProcessState(QProcess::ProcessState state) {
+  if (_pstate != state) {
+    _pstate = state;
+    emit stateChanged(state);
+  }
+}
+
+/**
+ *  This function is called in the child process
+ *  just before the program is executed.
+ */
+void basic_process::setupChildProcess() {
+  return ;
+}
+
+/**
  *  Write data on the standard input.
  *
  *  @param[in] data The buffer to write.
@@ -493,10 +524,434 @@ qint64 basic_process::readData(char* data, qint64 maxlen) {
  *  @return Return the number of bytes written.
  */
 qint64 basic_process::writeData(char const* data, qint64 len) {
-  // return (::write(_pipe_in[1], data, len));
-  (void)data;
-  (void)len;
-  return (0);
+  return ((_pipe_in[1] >= 0)
+          ? ::write(_pipe_in[1], data, len)
+          : 0);
+}
+
+/**************************************
+*                                     *
+*           Private Methods           *
+*                                     *
+**************************************/
+
+/**
+ *  Copy constructor.
+ *
+ *  @param[in] right Object to copy.
+ */
+basic_process::basic_process(basic_process const& right) : QIODevice() {
+  _internal_copy(right);
+}
+
+/**
+ *  Assignment operator.
+ *
+ *  @param[in] right Object to copy.
+ *
+ *  @return This object.
+ */
+basic_process& basic_process::operator=(basic_process const& right) {
+  _internal_copy(right);
+  return (*this);
+}
+
+/**
+ *  Create and array of arguments to call execvp.
+ *
+ *  @param[in] progname  The program name.
+ *  @param[in] arguments The program arguments.
+ *
+ *  @return Array of arguments.
+ */
+char** basic_process::_build_args(QString const& program, QStringList const& arguments) {
+  char** args(new char*[arguments.size() + 2]);
+  args[0] = qstrdup(qPrintable(program));
+  unsigned int i(1);
+  for (QStringList::const_iterator
+         it(arguments.begin()),
+         end(arguments.end());
+       it != end;
+       ++it)
+    args[i++] = qstrdup(qPrintable(*it));
+  args[i] = NULL;
+  return (args);
+}
+
+/**
+ *  Like C library chdir, without signal interupt.
+ *
+ *  @param[in] wd The working directory path.
+ */
+int basic_process::_chdir(char const* wd) throw () {
+  // Argument checking.
+  if (!wd || wd[0] == 0)
+    return (0);
+
+  // Action.
+  int ret;
+  do {
+    ret = chdir(wd);
+  } while (ret == -1 && errno == EINTR);
+  return (ret);
+}
+
+/**
+ *  Release memory.
+ *
+ *  @param[in] args Arguments array to release memory.
+ */
+void basic_process::_clean_args(char** args) throw () {
+  for (unsigned int i(0); args[i]; ++i)
+    delete [] args[i];
+  delete [] args;
+  return ;
+}
+
+/**
+ *  Like C library close, without signal internupt.
+ *
+ *  @param[in] fd The file descriptor to close.
+ */
+void basic_process::_close(int& fd) throw () {
+  // Argument checking.
+  if (fd == -1)
+    return ;
+
+  // Action.
+  int ret;
+  do {
+    ret = ::close(fd);
+  } while (ret == -1 && errno == EINTR);
+  fd = -1;
+  return ;
+}
+
+/**
+ *  Close all pipe open.
+ */
+void basic_process::_close_pipes() throw () {
+  for (unsigned int i(0); i < 2; ++i) {
+    _close(_pipe_dead[i]);
+    _close(_pipe_err[i]);
+    _close(_pipe_in[i]);
+    _close(_pipe_out[i]);
+  }
+  return ;
+}
+
+/**
+ *  Like C library dup2, without signal internupt.
+ *
+ *  @param[in] files  old file descriptor.
+ *  @param[in] files2 new file descriptor.
+ */
+int basic_process::_dup2(int fildes, int fildes2) throw () {
+  int ret;
+  do {
+    ret = dup2(fildes, fildes2);
+  } while (ret == -1 && errno == EINTR);
+  return (ret);
+}
+
+/**
+ *  Emit finished signal if all data of standard
+ *  output, standard error as read, if all data
+ *  was write in standard input and if the process
+ *  was dead.
+ */
+void basic_process::_emit_finished() {
+  if ((-1 == _pipe_err[0])
+      && (-1 == _pipe_in[1])
+      && (-1 == _pipe_out[0])
+      && (0 == _pid))
+    emit finished(exitCode(), exitStatus());
+  return ;
+}
+
+/**
+ *  Copy internal data members.
+ *
+ *  @param[in] right Object to copy.
+ */
+void basic_process::_internal_copy(basic_process const& right) {
+  (void)right;
+  assert(!"processes are not copyable (basic_process)");
+  abort();
+  return ;
+}
+
+/**
+ *  Internal read to fill a QByteArray.
+ *
+ *  @param[in] fd  The file descriptor to read.
+ *  @param[in] str The buffer to fill.
+ *
+ *  @return True if data was read, otherwise false.
+ */
+bool basic_process::_read(int fd, QByteArray* str) {
+  char buffer[1024];
+  qint64 size(_read(fd, buffer, sizeof(buffer)));
+  if (size <= 0)
+    return (false);
+  str->append(buffer, size);
+  return (true);
+}
+
+/**
+ *  Like C library read, without signal internupt.
+ *
+ *  @param[in] fd     The file descriptor to read.
+ *  @param[in] buffer The buffer to store data.
+ *  @param[in] nbytes The maximum bytes to read.
+ *
+ *  @return The number of bytes to read.
+ */
+qint64 basic_process::_read(int fd, void* buffer, qint64 nbyte) throw () {
+  size_t ret;
+  do {
+    ret = ::read(fd, buffer, static_cast<size_t>(nbyte));
+  } while (ret == static_cast<size_t>(-1) && errno == EINTR);
+  return (static_cast<int>(ret) == -1 ? -1 : static_cast<qint64>(ret));
+}
+
+/**
+ *  Set the close-on-exec flag on the file descriptor.
+ *
+ *  @param[in] fd The file descriptor to set close on exec.
+ */
+void basic_process::_set_cloexec(int fd) {
+  int flags(fcntl(fd, F_GETFL));
+  if (flags < 0) {
+    char const* msg(strerror(errno));
+    throw (engine_error() << "Could not get file descriptor flags: "
+           << msg);
+  }
+  if (fcntl(fd, F_SETFL, flags | FD_CLOEXEC) == -1) {
+    char const* msg(strerror(errno));
+    throw (engine_error() << "Could not set close-on-exec flag: "
+           << msg);
+  }
+  return ;
+}
+
+/**
+ *  Start the process and initialize all
+ *  notification system and all internal
+ *  variables.
+ *
+ *  @param[in] mode Set the mode of IODevice.
+ */
+void basic_process::_start_process(OpenMode mode) {
+  int old_fd[3] = { -1, -1, -1 };
+  try {
+    // As we will use vfork, we need to backup standard FDs.
+    if (((old_fd[0] = dup(STDIN_FILENO)) < 0)
+        || ((old_fd[1] = dup(STDOUT_FILENO)) < 0)
+        || ((old_fd[2] = dup(STDERR_FILENO)) < 0)) {
+      char const* msg(strerror(errno));
+      for (unsigned int i(0); i < 3; ++i)
+        _close(old_fd[i]);
+      throw (engine_error() << "start process failed on dup: " << msg);
+    }
+
+    // Backup FDs do not need to be inherited.
+    for (unsigned int i(0); i < 3; ++i)
+      _set_cloexec(old_fd[i]);
+
+    // Initialize.
+    QIODevice::open(mode);
+    _standard_error.clear();
+    _standard_output.clear();
+    delete _notifier_dead;
+    _notifier_dead = NULL;
+    delete _notifier_error;
+    _notifier_error = NULL;
+    delete _notifier_output;
+    _notifier_output = NULL;
+    _perror = QProcess::UnknownError;
+    _status = 0;
+
+    _chdir(qPrintable(_working_directory));
+
+    // Open communication pipes.
+    if ((pipe(_pipe_dead) == -1)
+        || (_want_err && (pipe(_pipe_err) == -1))
+        || (_want_in && (pipe(_pipe_in) == -1))
+        || (_want_out && (pipe(_pipe_out) == -1))) {
+      char const* msg(strerror(errno));
+      for (unsigned int i(0); i < 2; ++i) {
+        _close(_pipe_err[i]);
+        _close(_pipe_in[i]);
+        _close(_pipe_out[i]);
+      }
+      throw (engine_error() << "start process failed on pipe: " << msg);
+    }
+
+    // Duplicate FDs.
+    if ((_want_err && (_dup2(_pipe_err[1], STDERR_FILENO) == -1))
+        || (_want_in && (_dup2(_pipe_in[0], STDIN_FILENO) == -1))
+        || (_want_out && (_dup2(_pipe_out[1], STDOUT_FILENO) == -1))) {
+      char const* msg(strerror(errno));
+      throw (engine_error() << "start process failed on dup2: " << msg);
+    }
+
+    // Close useless pipes.
+    _close(_pipe_err[1]);
+    _close(_pipe_in[0]);
+    _close(_pipe_out[1]);
+
+    // Do not inheritate parent ends of the pipes.
+    _set_cloexec(_pipe_dead[0]);
+    if (_want_err)
+      _set_cloexec(_pipe_err[0]);
+    if (_want_in)
+      _set_cloexec(_pipe_in[1]);
+    if (_want_out)
+      _set_cloexec(_pipe_out[0]);
+
+    // Here we go !
+    setProcessState(QProcess::Starting);
+    if (-1 == (_pid = vfork())) {
+      char const* msg(strerror(errno));
+      throw (engine_error() << "start process failed on fork: " << msg);
+    }
+
+    // Child execution.
+    if (!_pid) {
+      execvp(_args[0], _args);
+      ::_exit(EXIT_FAILURE);
+    }
+
+    // Close dead pipe end.
+    _close(_pipe_dead[1]);
+
+    // Get notified if process exits.
+    _notifier_dead = new QSocketNotifier(
+                           _pipe_dead[0],
+                           QSocketNotifier::Read,
+                           this);
+    QObject::connect(
+               _notifier_dead,
+               SIGNAL(activated(int)),
+               this,
+               SLOT(_notification_dead()));
+
+    // Get notified of process' stderr.
+    if (_want_err) {
+      _notifier_error = new QSocketNotifier(
+                              _pipe_err[0],
+                              QSocketNotifier::Read,
+                              this);
+      QObject::connect(
+                 _notifier_error,
+                 SIGNAL(activated(int)),
+                 this,
+                 SLOT(_notification_standard_error()));
+    }
+
+    // Get notified of process' stdout.
+    if (_want_out) {
+      _notifier_output = new QSocketNotifier(
+                               _pipe_out[0],
+                               QSocketNotifier::Read,
+                               this);
+      QObject::connect(
+                 _notifier_output,
+                 SIGNAL(activated(int)),
+                 this,
+                 SLOT(_notification_standard_output()));
+    }
+
+    // Process if now fully running.
+    setProcessState(QProcess::Running);
+    emit started();
+  }
+  catch (std::exception const& e) {
+    _close_pipes();
+    setProcessState(QProcess::NotRunning);
+    setErrorString(e.what());
+    _perror = QProcess::FailedToStart;
+    emit error(_perror);
+  }
+
+  // Restore original FDs.
+  for (unsigned int i(0); i < 3; ++i)
+    if (old_fd[i] >= 0) {
+      dup2(old_fd[i], i);
+      _close(old_fd[i]);
+    }
+
+  return ;
+}
+
+/**
+ *  Like C library waitpid, without signal internupt.
+ *
+ *  @param[in] pid     Wait for the child whose process ID
+ *                     is equal to the value of pid.
+ *  @param[in] status  Store status information in the
+ *                     variable to which it points.
+ *  @param[in] options Specific constant of waitpid.
+ *
+ *  @return Retrun the pid on sucess, otherwise -1.
+ */
+pid_t basic_process::_waitpid(
+                       pid_t pid,
+                       int* status,
+                       int options) throw () {
+  pid_t ret;
+  do {
+    ret = ::waitpid(pid, status, options);
+  } while (ret == -1 && errno == EINTR);
+  return (ret);
+}
+
+/**
+ *  Slot call when the process finished.
+ *  The notification system is close and
+ *  waitpid if call to get the status of
+ *  the child.
+ */
+void basic_process::_notification_dead() {
+  if (_pipe_dead[0] == -1 || !_notifier_dead)
+    return;
+
+  _notifier_dead->setEnabled(false);
+  _notifier_dead->deleteLater();
+  _notifier_dead = NULL;
+
+  _close(_pipe_in[1]);
+  _close(_pipe_dead[0]);
+
+  _waitpid(_pid, &_status, 0);
+  _pid = 0;
+
+  setProcessState(QProcess::NotRunning);
+  _emit_finished();
+}
+
+/**
+ *  Slot call when something append (data to read,
+ *  close pipe) on the standard error.
+ *  if data are available, all data is read and
+ *  readyReadStandardError is emit and if the
+ *  pipe is close the notification system is close.
+ */
+void basic_process::_notification_standard_error() {
+  if (_pipe_err[0] == -1 || !_notifier_error)
+    return;
+
+  if (_read(_pipe_err[0], &_standard_error))
+    emit readyReadStandardError();
+  else {
+    _notifier_error->setEnabled(false);
+    _notifier_error->deleteLater();
+    _notifier_error = NULL;
+
+    _close(_pipe_err[0]);
+    _emit_finished();
+  }
 }
 
 /**
@@ -522,321 +977,3 @@ void basic_process::_notification_standard_output() {
   }
 }
 
-// /**
-//  *  Slot call when something append (data to read,
-//  *  close pipe) on the standard error.
-//  *  if data are available, all data is read and
-//  *  readyReadStandardError is emit and if the
-//  *  pipe is close the notification system is close.
-//  */
-// void basic_process::_notification_standard_error() {
-//   if (_pipe_err[0] == -1 || !_notifier_error)
-//     return;
-
-//   if (_read(_pipe_err[0], &_standard_error))
-//     emit readyReadStandardError();
-//   else {
-//     _notifier_error->setEnabled(false);
-//     _notifier_error->deleteLater();
-//     _notifier_error = NULL;
-
-//     _close(_pipe_err[0]);
-//     _emit_finished();
-//   }
-// }
-
-/**
- *  Slot call when the process finished.
- *  The notification system is close and
- *  waitpid if call to get the status of
- *  the child.
- */
-void basic_process::_notification_dead() {
-  if (_pipe_dead[0] == -1 || !_notifier_dead)
-    return;
-
-  _notifier_dead->setEnabled(false);
-  _notifier_dead->deleteLater();
-  _notifier_dead = NULL;
-
-  // _close(_pipe_in[1]);
-  _close(_pipe_dead[0]);
-
-  _waitpid(_pid, &_status, 0);
-  _pid = 0;
-
-  setProcessState(QProcess::NotRunning);
-  _emit_finished();
-}
-
-/**
- *  Start the process and initialize all
- *  notification system and all internal
- *  variables.
- *
- *  @param[in] mode Set the mode of IODevice.
- */
-void basic_process::_start_process(OpenMode mode) {
-  int old_fd(-1);
-  char** args(NULL);
-  try {
-    if ((old_fd = dup(1)) == -1)
-      throw (engine_error() << "start process failed on dup: "
-             << strerror(errno));
-
-    QIODevice::open(mode);
-
-    _standard_output.clear();
-    // _standard_error.clear();
-    delete _notifier_output;
-    // delete _notifier_error;
-    delete _notifier_dead;
-    _perror = QProcess::UnknownError;
-    _status = 0;
-
-    _chdir(qPrintable(_working_directory));
-
-    if (pipe(_pipe_out) == -1
-        // || pipe(_pipe_err) == -1
-        // || pipe(_pipe_in) == -1
-        || pipe(_pipe_dead) == -1)
-      throw (engine_error() << "start process failed on pipe: "
-             << strerror(errno));
-
-    if (_dup2(_pipe_out[1], 1) == -1)
-      // || _dup2(_pipe_err[1], 2) == -1
-      // || _dup2(_pipe_in[0], 0) == -1) {
-      throw (engine_error() << "start process failed on dup2: "
-             << strerror(errno));
-
-    _close(_pipe_out[1]);
-    // _close(_pipe_err[1]);
-    // _close(_pipe_in[0]);
-
-    _set_cloexec(_pipe_out[0]);
-    // _set_cloexec(_pipe_err[0]);
-    // _set_cloexec(_pipe_in[1]);
-
-    setProcessState(QProcess::Starting);
-
-    if ((_pid = vfork()) == -1)
-      throw (engine_error() << "start process failed on fork: "
-             << strerror(errno));
-
-    if (!_pid) {
-      execvp(_args[0], _args);
-      ::_exit(-1);
-    }
-
-    _close(_pipe_dead[1]);
-
-    _notifier_output = new QSocketNotifier(
-                             _pipe_out[0],
-                             QSocketNotifier::Read,
-                             this);
-    QObject::connect(_notifier_output, SIGNAL(activated(int)),
-                     this, SLOT(_notification_standard_output()));
-
-    // _notifier_error = new QSocketNotifier(
-    //                         _pipe_err[0],
-    //                         QSocketNotifier::Read,
-    //                         this);
-    // QObject::connect(_notifier_error, SIGNAL(activated(int)),
-    //                  this, SLOT(_notification_standard_error()));
-
-    // _notifier_dead = new QSocketNotifier(
-    //                        _pipe_dead[0],
-    //                        QSocketNotifier::Read,
-    //                        this);
-    // QObject::connect(_notifier_dead, SIGNAL(activated(int)),
-    //                  this, SLOT(_notification_dead()));
-
-    setProcessState(QProcess::Running);
-    emit started();
-  }
-  catch (std::exception const& e) {
-    _close_pipe();
-    setProcessState(QProcess::NotRunning);
-    setErrorString(e.what());
-    _perror = QProcess::FailedToStart;
-    emit error(_perror);
-  }
-
-  if (old_fd != -1)
-    dup2(old_fd, 1);
-  _clean_args(args);
-}
-
-/**
- *  Close all pipe open.
- */
-void basic_process::_close_pipe() throw() {
-  for (unsigned int i(0); i < 2; ++i) {
-    _close(_pipe_out[i]);
-    // _close(_pipe_err[i]);
-    // _close(_pipe_in[i]);
-    _close(_pipe_dead[i]);
-  }
-}
-
-/**
- *  Emit finished signal if all data of standard
- *  output, standard error as read, if all data
- *  was write in standard input and if the process
- *  was dead.
- */
-void basic_process::_emit_finished() {
-  if (_pipe_out[0] == -1
-      // && _pipe_err[0] == -1
-      // && _pipe_in[1] == -1
-      && _pid == 0)
-    emit finished(exitCode(), exitStatus());
-}
-
-/**
- *  Internal read to fill a QByteArray.
- *
- *  @param[in] fd  The file descriptor to read.
- *  @param[in] str The buffer to fill.
- *
- *  @return True if data was read, otherwise false.
- */
-bool basic_process::_read(int fd, QByteArray* str) {
-  qint64 len(_available_bytes(fd));
-  if (len <= 0)
-    return (false);
-
-  char buffer[1024];
-  while (len > 0) {
-    qint64 min(static_cast<qint64>(sizeof(buffer)) > len
-               ? len : static_cast<qint64>(sizeof(buffer)));
-    qint64 size(_read(fd, buffer, min));
-    if (size <= 0)
-      return (false);
-    str->append(buffer, size);
-    len -= size;
-  }
-  return (true);
-}
-
-/**
- *  Release memory.
- *
- *  @param[in] args Arguments array to release memory.
- */
-void basic_process::_clean_args(char** args) throw () {
-  for (unsigned int i(0); args[i]; ++i)
-    delete[] args[i];
-  delete[] args;
-}
-
-/**
- *  Get the number of bytes available on the specific
- *  file descriptor.
- *
- *  @param[in] fd The file descriptor.
- *
- *  @return The number of bytes available.
- */
-qint64 basic_process::_available_bytes(int fd) throw() {
-  int nbytes(0);
-  int ret(::ioctl(fd, FIONREAD, (char*)&nbytes));
-  return (ret != -1 ? nbytes : -1);
-}
-
-/**
- *  Like C library waitpid, without signal internupt.
- *
- *  @param[in] pid     Wait for the child whose process ID
- *                     is equal to the value of pid.
- *  @param[in] status  Store status information in the
- *                     variable to which it points.
- *  @param[in] options Specific constant of waitpid.
- *
- *  @return Retrun the pid on sucess, otherwise -1.
- */
-pid_t basic_process::_waitpid(pid_t pid, int* status, int options) throw() {
-  pid_t ret;
-  do {
-    ret = ::waitpid(pid, status, options);
-  } while (ret == -1 && errno == EINTR);
-  return (ret);
-}
-
-/**
- *  Like C library read, without signal internupt.
- *
- *  @param[in] fd     The file descriptor to read.
- *  @param[in] buffer The buffer to store data.
- *  @param[in] nbytes The maximum bytes to read.
- *
- *  @return The number of bytes to read.
- */
-qint64 basic_process::_read(int fd, void* buffer, qint64 nbyte) throw() {
-  size_t ret;
-  do {
-    ret = ::read(fd, buffer, static_cast<size_t>(nbyte));
-  } while (ret == static_cast<size_t>(-1) && errno == EINTR);
-  return (static_cast<int>(ret) == -1 ? -1 : static_cast<qint64>(ret));
-}
-
-/**
- *  Like C library close, without signal internupt.
- *
- *  @param[in] fd The file descriptor to close.
- */
-void basic_process::_close(int& fd) throw() {
-  if (fd == -1)
-    return;
-
-  int ret;
-  do {
-    ret = ::close(fd);
-  } while (ret == -1 && errno == EINTR);
-  fd = -1;
-}
-
-/**
- *  Like C library chdir, without signal interupt.
- *
- *  @param[in] working_directory The working directory path.
- */
-int basic_process::_chdir(char const* working_directory) throw() {
-  if (!working_directory || working_directory[0] == 0)
-    return (0);
-
-  int ret;
-  do {
-    ret = chdir(working_directory);
-  } while (ret == -1 && errno == EINTR);
-  return (ret);
-}
-
-/**
- *  Like C library dup2, without signal internupt.
- *
- *  @param[in] files  old file descriptor.
- *  @param[in] files2 new file descriptor.
- */
-int basic_process::_dup2(int fildes, int fildes2) throw() {
-  int ret;
-  do {
-    ret = dup2(fildes, fildes2);
-  } while (ret == -1 && errno == EINTR);
-  return (ret);
-}
-
-/**
- *  Set the close-on-exec flag on the file descriptor.
- *
- *  @param[in] fd The file descriptor to set close on exec.
- */
-void basic_process::_set_cloexec(int fd) {
-  int flags(fcntl(fd, F_GETFL));
-  if (flags < 0)
-    throw (engine_error() << "Could not get file descriptor flags: "
-           << strerror(errno));
-  if (fcntl(fd, F_SETFL, flags | FD_CLOEXEC) == -1)
-    throw (engine_error() << "Could not set close-on-exec flag: "
-           << strerror(errno));
-}

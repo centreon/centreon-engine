@@ -540,6 +540,7 @@ endif ()
 # Unit test.
 option(WITH_TESTING "Build unit tests." OFF)
 if (WITH_TESTING)
+  set(CTEST_TESTING_TIMEOUT 20)
   include(CTest)
   include_directories("${PROJECT_SOURCE_DIR}")
 endif ()
@@ -674,6 +675,10 @@ if (CMAKE_COMPILER_IS_GNUCXX)
   target_link_libraries("centengine"
     "-Wl,-whole-archive -lcce_objects -L./objects -lcce_compatibility -L./compatibility -Wl,-no-whole-archive")
 endif ()
+get_property(CENTENGINE_BINARY
+    TARGET "centengine"
+    PROPERTY LOCATION)
+configure_file("${TEST_DIR}/paths.hh.in" "${TEST_DIR}/paths.hh")
 
 # Link centengine with required libraries.
 target_link_libraries("centengine"
@@ -955,6 +960,10 @@ if (WITH_TESTING)
   #
   # Engine tests.
   #
+  set(CENTENGINE_RUNNER "centengine_must_run")
+  add_executable("${CENTENGINE_RUNNER}"
+    "${TEST_DIR}/running/centengine_must_run.cc")
+  target_link_libraries("${CENTENGINE_RUNNER}" "cce_core")
   # Without any service.
   add_test("running_engine_no_service"
     "centengine" "-v" "${TEST_DIR}/running/etc/no_service.cfg")
@@ -1014,6 +1023,24 @@ broker_module=${MODULE_PATH} ${MODULE_ARGS}")
     "${TEST_DIR}/running/etc/modules_symbols.cfg")
   add_test("${TEST_NAME}"
     "centengine" "${TEST_DIR}/running/etc/modules_symbols.cfg")
+  # Active check of host with no command.
+  set(CFG_CONTENT
+    "cfg_file=${TEST_DIR}/running/etc/host_with_no_check_cmd_objects.cfg")
+  configure_file("${TEST_DIR}/running/etc/minimal.cfg.in"
+    "${TEST_DIR}/running/etc/host_with_no_check_cmd.cfg")
+  set(TEST_NAME "running_host_check_with_no_check_cmd")
+  add_test("${TEST_NAME}"
+    "${CENTENGINE_RUNNER}" "${TEST_DIR}/running/etc/host_with_no_check_cmd.cfg" "5")
+  # Active check of service with no command.
+  set(CFG_CONTENT
+    "cfg_file=${TEST_DIR}/running/etc/service_with_no_check_cmd_objects.cfg")
+  configure_file("${TEST_DIR}/running/etc/minimal.cfg.in"
+    "${TEST_DIR}/running/etc/service_with_no_check_cmd.cfg")
+  set(TEST_NAME "running_service_check_with_no_check_cmd")
+  add_test("${TEST_NAME}"
+    "centengine" "-v" "${TEST_DIR}/running/etc/service_with_no_check_cmd.cfg")
+  set_tests_properties("${TEST_NAME}"
+    PROPERTIES WILL_FAIL TRUE)
 
 endif ()
 
