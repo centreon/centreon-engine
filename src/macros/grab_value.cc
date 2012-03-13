@@ -1,6 +1,6 @@
 /*
 ** Copyright 1999-2010 Ethan Galstad
-** Copyright 2011      Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -20,11 +20,10 @@
 
 #include <QHash>
 #include <stdlib.h>
-#include "engine.hh"
-#include "globals.hh"
-#include "logging/logger.hh"
-#include "macros/grab_value.hh"
-#include "macros.hh"
+#include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/logging/logger.hh"
+#include "com/centreon/engine/macros/grab_value.hh"
+#include "com/centreon/engine/macros.hh"
 
 using namespace com::centreon::engine::logging;
 

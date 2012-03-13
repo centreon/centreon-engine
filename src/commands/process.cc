@@ -20,7 +20,6 @@
 #include <QEventLoop>
 #include <QTimer>
 #include "com/centreon/engine/commands/process.hh"
-#include "com/centreon/engine/engine.hh"
 #include "com/centreon/engine/logging/logger.hh"
 
 using namespace com::centreon::engine::commands;

@@ -1,5 +1,5 @@
 /*
-** Copyright 2011 Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -17,12 +17,11 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <QVector>
 #include <QString>
+#include <QVector>
 #include <string.h>
-#include "engine.hh"
-#include "objects/timeperiod.hh"
-#include "create_object.hh"
+#include "com/centreon/engine/objects/timeperiod.hh"
+#include "test/objects/create_object.hh"
 
 using namespace com::centreon::engine::objects;
 using namespace test;

@@ -26,10 +26,13 @@ set(TEST_DIR "${TEST_DIR}/checks")
 qt4_wrap_cpp(QT_MOC_FILES "${INC_DIR}/checker.hh")
 
 # cce_checks target.
-add_library("cce_checks"
-  STATIC
+add_library("cce_checks" STATIC
+  # Sources.
   "${SRC_DIR}/checker.cc"
+  "${SRC_DIR}/stats.cc"
+  # Headers.
   "${INC_DIR}/checker.hh"
+  "${INC_DIR}/stats.hh"
   ${QT_MOC_FILES})
 
 # Link target with required libraries.

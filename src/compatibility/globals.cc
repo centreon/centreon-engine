@@ -44,6 +44,7 @@ unsigned long retained_process_service_attribute_mask(0);
 unsigned long retained_service_attribute_mask(0);
 
 // Commands execution system.
+circular_buffer check_result_buffer;
 check_result check_result_info;
 check_result* check_result_list(NULL);
 unsigned int child_processes_fork_twice(UINT_MAX);

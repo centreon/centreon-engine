@@ -1,6 +1,6 @@
 /*
 ** Copyright 1999-2010 Ethan Galstad
-** Copyright 2011      Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -21,14 +21,13 @@
 #include <QHash>
 #include <QPair>
 #include <sstream>
-#include "engine.hh"
-#include "logging/logger.hh"
-#include "macros/clear_host.hh"
-#include "macros/clear_hostgroup.hh"
-#include "macros/defines.hh"
-#include "macros/grab.hh"
-#include "macros/grab_host.hh"
-#include "macros/misc.hh"
+#include "com/centreon/engine/logging/logger.hh"
+#include "com/centreon/engine/macros/clear_host.hh"
+#include "com/centreon/engine/macros/clear_hostgroup.hh"
+#include "com/centreon/engine/macros/defines.hh"
+#include "com/centreon/engine/macros/grab.hh"
+#include "com/centreon/engine/macros/grab_host.hh"
+#include "com/centreon/engine/macros/misc.hh"
 
 using namespace com::centreon::engine::macros;
 using namespace com::centreon::engine::logging;

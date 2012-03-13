@@ -1,6 +1,6 @@
 /*
 ** Copyright 1999-2008 Ethan Galstad
-** Copyright 2011      Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -22,7 +22,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <errno.h>
-#include "engine.hh"
 #include "globals.hh"
 #include "utils.hh"
 #include "notifications.hh"

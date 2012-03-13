@@ -1,6 +1,6 @@
 /*
 ** Copyright 1999-2009 Ethan Galstad
-** Copyright 2011      Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -66,11 +66,6 @@ int my_fcopy(char const* source, char const* dest);                             
 int dbuf_init(dbuf* db, int chunk_size);
 int dbuf_free(dbuf* db);
 int dbuf_strcat(dbuf* db, char const* buf);
-
-// Check Statistics Functions
-int init_check_stats(void);
-int update_check_stats(int check_type, time_t check_time);
-int generate_check_stats(void);
 
 // Cleanup Functions
 void cleanup(void);                        // cleanup after ourselves (before quitting or restarting)

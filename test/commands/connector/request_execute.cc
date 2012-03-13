@@ -17,15 +17,14 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <exception>
 #include <QCoreApplication>
 #include <QDebug>
-#include <exception>
-#include "error.hh"
-#include "test/unittest.hh"
-#include "commands/connector/execute_query.hh"
-#include "commands/connector/execute_response.hh"
+#include "com/centreon/engine/commands/connector/execute_query.hh"
+#include "com/centreon/engine/commands/connector/execute_response.hh"
+#include "com/centreon/engine/error.hh"
 #include "test/commands/connector/check_request.hh"
-#include "engine.hh"
+#include "test/unittest.hh"
 
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::commands::connector;

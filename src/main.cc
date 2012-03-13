@@ -58,7 +58,6 @@
 #include "logging/broker.hh"
 #include "logging/engine.hh"
 #include "events/loop.hh"
-#include "engine.hh"
 #include "compatibility/common.h"
 
 using namespace com::centreon::engine;

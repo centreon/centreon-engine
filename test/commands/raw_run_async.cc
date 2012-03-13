@@ -21,7 +21,6 @@
 #include <QCoreApplication>
 #include <QDebug>
 #include "com/centreon/engine/commands/raw.hh"
-#include "com/centreon/engine/engine.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
 #include "test/commands/wait_process.hh"

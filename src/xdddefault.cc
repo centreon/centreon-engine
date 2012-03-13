@@ -1,6 +1,6 @@
 /*
 ** Copyright 2001-2007 Ethan Galstad
-** Copyright 2011      Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -18,17 +18,12 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-/*********** COMMON HEADER FILES ***********/
-
-#include "common.hh"
-#include "downtime.hh"
-#include "globals.hh"
-#include "macros.hh"
-#include "objects.hh"
-#include "engine.hh"
-
-/**** IMPLEMENTATION SPECIFIC HEADER FILES ****/
-#include "xdddefault.hh"
+#include "com/centreon/engine/common.hh"
+#include "com/centreon/engine/downtime.hh"
+#include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/macros.hh"
+#include "com/centreon/engine/objects.hh"
+#include "com/centreon/engine/xdddefault.hh"
 
 /******************************************************************/
 /*********** DOWNTIME INITIALIZATION/CLEANUP FUNCTIONS ************/

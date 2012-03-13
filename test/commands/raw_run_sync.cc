@@ -22,7 +22,6 @@
 #include <QDebug>
 #include <string.h>
 #include "com/centreon/engine/commands/raw.hh"
-#include "com/centreon/engine/engine.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
 #include "test/unittest.hh"

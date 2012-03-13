@@ -25,9 +25,8 @@
 #ifdef HAVE_GETOPT_H
 #  include <getopt.h>
 #endif // HAVE_GETOPT_H
+#include "com/centreon/engine/common.hh"
 #include "com/centreon/engine/version.hh"
-#include "common.hh"
-#include "engine.hh"
 
 #define STATUS_NO_DATA             0
 #define STATUS_INFO_DATA           1

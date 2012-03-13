@@ -1,6 +1,6 @@
 /*
 ** Copyright 2003-2007 Ethan Galstad
-** Copyright 2011      Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -19,14 +19,13 @@
 */
 
 #ifndef CCE_NEBSTRUCTS_HH
-# define CCE_NEBSTRUCTS_HH
+#  define CCE_NEBSTRUCTS_HH
 
-# include "objects.hh"
-# include "engine.hh"
+#  include "com/centreon/engine/objects.hh"
 
-# ifdef __cplusplus
+#  ifdef __cplusplus
 extern "C" {
-# endif
+#  endif
 
 /****** STRUCTURES *************************/
 
@@ -493,8 +492,8 @@ typedef struct   nebstruct_statechange_struct{
   void*          object_ptr;
 }                nebstruct_statechange_data;
 
-# ifdef __cplusplus
+#  ifdef __cplusplus
 }
-# endif
+#  endif
 
 #endif // !CCE_NEBSTRUCTS_HH

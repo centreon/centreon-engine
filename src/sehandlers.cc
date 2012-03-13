@@ -1,6 +1,6 @@
 /*
 ** Copyright 1999-2010 Ethan Galstad
-** Copyright 2011      Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -19,18 +19,17 @@
 */
 
 #include <sstream>
-#include "comments.hh"
-#include "downtime.hh"
-#include "engine.hh"
-#include "globals.hh"
-#include "perfdata.hh"
-#include "broker.hh"
-#include "neberrors.hh"
-#include "notifications.hh"
-#include "utils.hh"
-#include "logging.hh"
-#include "logging/logger.hh"
-#include "sehandlers.hh"
+#include "com/centreon/engine/broker.hh"
+#include "com/centreon/engine/comments.hh"
+#include "com/centreon/engine/downtime.hh"
+#include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/logging.hh"
+#include "com/centreon/engine/logging/logger.hh"
+#include "com/centreon/engine/neberrors.hh"
+#include "com/centreon/engine/notifications.hh"
+#include "com/centreon/engine/perfdata.hh"
+#include "com/centreon/engine/sehandlers.hh"
+#include "com/centreon/engine/utils.hh"
 
 using namespace com::centreon::engine::logging;
 

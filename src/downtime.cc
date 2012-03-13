@@ -1,6 +1,6 @@
 /*
 ** Copyright 2000-2008 Ethan Galstad
-** Copyright 2011      Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -20,15 +20,14 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include "xdddefault.hh"
-#include "engine.hh"
-#include "comments.hh"
-#include "globals.hh"
-#include "statusdata.hh"
-#include "broker.hh"
-#include "notifications.hh"
-#include "logging/logger.hh"
-#include "downtime.hh"
+#include "com/centreon/engine/broker.hh"
+#include "com/centreon/engine/comments.hh"
+#include "com/centreon/engine/downtime.hh"
+#include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/logging/logger.hh"
+#include "com/centreon/engine/notifications.hh"
+#include "com/centreon/engine/statusdata.hh"
+#include "com/centreon/engine/xdddefault.hh"
 
 using namespace com::centreon::engine::logging;
 

@@ -1,7 +1,7 @@
 /*
 ** Copyright 1999-2008 Ethan Galstad
 ** Copyright 2009-2010 Nagios Core Development Team and Community Contributors
-** Copyright 2011      Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -20,15 +20,14 @@
 */
 
 #include <sstream>
-#include "engine.hh"
-#include "statusdata.hh"
-#include "broker.hh"
-#include "globals.hh"
-#include "neberrors.hh"
-#include "utils.hh"
-#include "shared.hh"
-#include "logging/logger.hh"
-#include "notifications.hh"
+#include "com/centreon/engine/broker.hh"
+#include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/logging/logger.hh"
+#include "com/centreon/engine/neberrors.hh"
+#include "com/centreon/engine/notifications.hh"
+#include "com/centreon/engine/shared.hh"
+#include "com/centreon/engine/statusdata.hh"
+#include "com/centreon/engine/utils.hh"
 
 using namespace com::centreon::engine::logging;
 

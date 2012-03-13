@@ -17,21 +17,20 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <fstream>
+#include <limits.h>
+#include <map>
 #include <QCoreApplication>
 #include <QDebug>
-#include <QTemporaryFile>
 #include <QDir>
+#include <QTemporaryFile>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include <limits.h>
-#include <fstream>
-#include <map>
+#include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/macros.hh"
 #include "test/unittest.hh"
-#include "engine.hh"
-#include "globals.hh"
-#include "macros.hh"
-#include "error.hh"
 
 using namespace com::centreon::engine;
 

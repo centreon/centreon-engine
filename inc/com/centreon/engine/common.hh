@@ -1,7 +1,7 @@
 /*
 ** Copyright 1999-2009 Ethan Galstad
 ** Copyright 2009-2011 Nagios Core Development Team and Community Contributors
-** Copyright 2011      Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -25,6 +25,7 @@
 /*# define DEBUG_CHECK_IPC 1 */
 /*# define DEBUG_CHECK_IPC2 1*/
 
+# include "checks/stats.hh"
 # include "shared.hh"
 
 /* daemon is thread safe */
@@ -378,23 +379,6 @@
 # define LOG_VERSION_2           "2.0"
 
 
-
-/*************************** CHECK STATISTICS ****************************/
-
-# define ACTIVE_SCHEDULED_SERVICE_CHECK_STATS 0
-# define ACTIVE_ONDEMAND_SERVICE_CHECK_STATS  1
-# define PASSIVE_SERVICE_CHECK_STATS          2
-# define ACTIVE_SCHEDULED_HOST_CHECK_STATS    3
-# define ACTIVE_ONDEMAND_HOST_CHECK_STATS     4
-# define PASSIVE_HOST_CHECK_STATS             5
-# define ACTIVE_CACHED_HOST_CHECK_STATS       6
-# define ACTIVE_CACHED_SERVICE_CHECK_STATS    7
-# define EXTERNAL_COMMAND_STATS               8
-# define PARALLEL_HOST_CHECK_STATS            9
-# define SERIAL_HOST_CHECK_STATS              10
-# define MAX_CHECK_STATS_TYPES                11
-
-
 /************************* GENERAL DEFINITIONS  **************************/
 
 # define OK				0
@@ -492,5 +476,31 @@
 # define MODATTR_CHECK_TIMEPERIOD                16384
 # define MODATTR_CUSTOM_VARIABLE                 32768
 # define MODATTR_NOTIFICATION_TIMEPERIOD         65536
+
+/******************* DEFAULT VALUES *******************/
+
+# define DEFAULT_ORPHAN_CHECK_INTERVAL  60      /* seconds between checks for orphaned hosts and services */
+
+/******************** HOST STATUS *********************/
+
+# define HOST_UP			0
+# define HOST_DOWN			1
+# define HOST_UNREACHABLE		2
+
+/****************** SERVICE STATES ********************/
+
+# define STATE_OK			0
+# define STATE_WARNING			1
+# define STATE_CRITICAL			2
+# define STATE_UNKNOWN			3       /* changed from -1 on 02/24/2001 */
+
+/***************** STATE CHANGE TYPES *****************/
+
+# define HOST_STATECHANGE               0
+# define SERVICE_STATECHANGE            1
+
+/******************* THREAD STUFF ********************/
+
+# define TOTAL_WORKER_THREADS           1
 
 #endif // !CCE_COMMON_HH

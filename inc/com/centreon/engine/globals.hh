@@ -1,7 +1,7 @@
 /*
 ** Copyright 1999-2009 Ethan Galstad
 ** Copyright 2009-2010 Nagios Core Development Team and Community Contributors
-** Copyright 2011      Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -19,24 +19,25 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef CCE_GLOBALS_HH_
-# define CCE_GLOBALS_HH_
+#ifndef CCE_GLOBALS_HH
+#  define CCE_GLOBALS_HH
 
-# include <QHash>
-# include <QString>
-# include <stdio.h>
-# include "checks.hh"
-# include "comments.hh"
-# include "configuration/state.hh"
-# include "downtime.hh"
-# include "engine.hh"
-# include "events.hh"
-# include "hash_timed_event.hh"
-# include "nebmods.hh"
-# include "notifications.hh"
-# include "objects.hh"
-# include "skiplist.hh"
-# include "utils.hh"
+#  include <QHash>
+#  include <QString>
+#  include <stdio.h>
+#  include "com/centreon/engine/checks.hh"
+#  include "com/centreon/engine/circular_buffer.hh"
+#  include "com/centreon/engine/comments.hh"
+#  include "com/centreon/engine/configuration/state.hh"
+#  include "com/centreon/engine/downtime.hh"
+#  include "com/centreon/engine/events.hh"
+#  include "com/centreon/engine/events/sched_info.hh"
+#  include "com/centreon/engine/hash_timed_event.hh"
+#  include "com/centreon/engine/nebmods.hh"
+#  include "com/centreon/engine/notifications.hh"
+#  include "com/centreon/engine/objects.hh"
+#  include "com/centreon/engine/skiplist.hh"
+#  include "com/centreon/engine/utils.hh"
 
 extern com::centreon::engine::configuration::state config;
 extern char*                     config_file;
@@ -128,7 +129,6 @@ extern check_result*             check_result_list;
 extern dbuf                      check_result_dbuf;
 
 extern circular_buffer           external_command_buffer;
-extern circular_buffer           check_result_buffer;
 extern pthread_t                 worker_threads[];
 
 extern check_stats               check_statistics[];

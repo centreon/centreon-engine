@@ -1,6 +1,6 @@
 /*
 ** Copyright 1999-2010 Ethan Galstad
-** Copyright 2011      Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -25,7 +25,6 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <math.h>
-#include "engine.hh"
 #include "downtime.hh"
 #include "comments.hh"
 #include "globals.hh"

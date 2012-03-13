@@ -1,6 +1,6 @@
 /*
 ** Copyright 2001-2009 Ethan Galstad
-** Copyright 2011      Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -18,18 +18,15 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-/*********** COMMON HEADER FILES ***********/
-
-#include <sstream>
 #include <iomanip>
-#include "engine.hh"
-#include "comments.hh"
-#include "globals.hh"
-#include "statusdata.hh"
-#include "broker.hh"
-#include "notifications.hh"
-#include "logging/logger.hh"
-#include "flapping.hh"
+#include <sstream>
+#include "com/centreon/engine/broker.hh"
+#include "com/centreon/engine/comments.hh"
+#include "com/centreon/engine/flapping.hh"
+#include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/logging/logger.hh"
+#include "com/centreon/engine/notifications.hh"
+#include "com/centreon/engine/statusdata.hh"
 
 using namespace com::centreon::engine::logging;
 

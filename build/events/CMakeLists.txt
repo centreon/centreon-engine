@@ -26,10 +26,12 @@ qt4_wrap_cpp(QT_MOC_FILES
   "${INC_DIR}/loop.hh")
 
 # cce_macros target.
-add_library("cce_events"
-  STATIC
+add_library("cce_events" STATIC
+  # Sources.
   "${SRC_DIR}/loop.cc"
+  # Headers.
   "${INC_DIR}/loop.hh"
+  "${INC_DIR}/sched_info.hh"
   ${QT_MOC_FILES})
 
 # Link target with necessary libraries.

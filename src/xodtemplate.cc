@@ -1,6 +1,6 @@
 /*
 ** Copyright 2001-2009 Ethan Galstad
-** Copyright 2011      Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -17,8 +17,6 @@
 ** along with Centreon Engine. If not, see
 ** <http://www.gnu.org/licenses/>.
 */
-
-/*********** COMMON HEADER FILES ***********/
 
 #include <ctype.h>
 #include <sstream>
@@ -37,7 +35,6 @@
 #include "objects.hh"
 #include "macros.hh"
 #include "skiplist.hh"
-#include "engine.hh"
 #include "commands/set.hh"
 #include "commands/raw.hh"
 #include "commands/connector/command.hh"

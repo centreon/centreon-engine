@@ -1,6 +1,6 @@
 /*
 ** Copyright 1999-2010 Ethan Galstad
-** Copyright 2011      Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -29,7 +29,6 @@
 #include <signal.h>
 #include "globals.hh"
 #include "neberrors.hh"
-#include "engine.hh"
 #include "comments.hh"
 #include "statusdata.hh"
 #include "downtime.hh"

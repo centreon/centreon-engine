@@ -1,5 +1,5 @@
 /*
-** Copyright 2011 Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -17,21 +17,21 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <sstream>
-#include <pthread.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <unistd.h>
-#include <string.h>
 #include <errno.h>
-#include <stdio.h>
+#include <fcntl.h>
 #include <poll.h>
+#include <pthread.h>
 #include <signal.h>
-
-#include "common.hh"
-#include "globals.hh"
-#include "logging/logger.hh"
+#include <sstream>
+#include <stdio.h>
+#include <string.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include "com/centreon/engine/common.hh"
+#include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/logging/logger.hh"
+#include "nagios.h"
 #include "utils.hh"
 
 using namespace com::centreon::engine::logging;

@@ -1,6 +1,6 @@
 /*
 ** Copyright 2000-2008 Ethan Galstad
-** Copyright 2011      Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -18,20 +18,18 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-/*********** COMMON HEADER FILES ***********/
-
-#include <stdlib.h>
-#include <stdio.h>
-#include <sys/types.h>
-#include <sys/stat.h>
 #include <fcntl.h>
-#include "common.hh"
-#include "objects.hh"
-#include "macros.hh"
-#include "utils.hh"
-#include "events.hh"
-#include "logging/logger.hh"
-#include "xpddefault.hh"
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include "com/centreon/engine/common.hh"
+#include "com/centreon/engine/events.hh"
+#include "com/centreon/engine/logging/logger.hh"
+#include "com/centreon/engine/macros.hh"
+#include "com/centreon/engine/objects.hh"
+#include "com/centreon/engine/utils.hh"
+#include "com/centreon/engine/xpddefault.hh"
 
 using namespace com::centreon::engine::logging;
 

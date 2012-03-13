@@ -1,7 +1,7 @@
 /*
 ** Copyright 1999-2009 Ethan Galstad
 ** Copyright 2009-2010 Nagios Core Development Team and Community Contributors
-** Copyright 2011      Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -19,7 +19,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include "globals.hh"
+#include "com/centreon/engine/globals.hh"
 
 com::centreon::engine::configuration::state config;
 char*                     config_file = NULL;
@@ -113,13 +113,9 @@ int                       __nagios_object_structure_version = CURRENT_OBJECT_STR
 
 notification*             notification_list = NULL;
 
-// check_result              check_result_info;
-// check_result*             check_result_list = NULL;
-
 dbuf                      check_result_dbuf;
 
 circular_buffer           external_command_buffer;
-circular_buffer           check_result_buffer;
 pthread_t                 worker_threads[TOTAL_WORKER_THREADS];
 
 check_stats               check_statistics[MAX_CHECK_STATS_TYPES];

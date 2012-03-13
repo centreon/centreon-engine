@@ -1,6 +1,6 @@
 /*
 ** Copyright 1999-2010 Ethan Galstad
-** Copyright 2011      Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -18,16 +18,15 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <sstream>
 #include <iomanip>
-#include <stdlib.h>
+#include <sstream>
 #include <stdio.h>
-#include "engine.hh"
-#include "globals.hh"
-#include "utils.hh"
-#include "shared.hh"
-#include "macros.hh"
-#include "logging/logger.hh"
+#include <stdlib.h>
+#include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/logging/logger.hh"
+#include "com/centreon/engine/macros.hh"
+#include "com/centreon/engine/shared.hh"
+#include "com/centreon/engine/utils.hh"
 
 using namespace com::centreon::engine::logging;
 

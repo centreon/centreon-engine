@@ -19,7 +19,7 @@
 
 #include <stdlib.h>
 #include <unistd.h>
-#include "com/centreon/engine/engine.hh"
+#include "common.h"
 #include "sighandlers.h"
 
 #define HOST_TIMEOUT_OUTPUT "(Host Check Timed Out)\n"

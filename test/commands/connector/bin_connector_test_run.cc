@@ -17,22 +17,21 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <QByteArray>
 #include <QCoreApplication>
+#include <QDateTime>
 #include <QList>
 #include <QSharedPointer>
-#include <QByteArray>
 #include <QString>
-#include <QDateTime>
 #include <stdlib.h>
-#include "test/unittest.hh"
-#include "engine.hh"
-#include "error.hh"
+#include "com/centreon/engine/commands/connector/execute_query.hh"
+#include "com/centreon/engine/commands/connector/execute_response.hh"
+#include "com/centreon/engine/commands/connector/quit_response.hh"
+#include "com/centreon/engine/commands/connector/request_builder.hh"
+#include "com/centreon/engine/commands/connector/version_response.hh"
+#include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/version.hh"
-#include "commands/connector/quit_response.hh"
-#include "commands/connector/version_response.hh"
-#include "commands/connector/execute_response.hh"
-#include "commands/connector/execute_query.hh"
-#include "commands/connector/request_builder.hh"
+#include "test/unittest.hh"
 
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::commands;

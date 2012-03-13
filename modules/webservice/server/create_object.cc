@@ -1,5 +1,5 @@
 /*
-** Copyright 2011 Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -22,7 +22,6 @@
 #include <QHash>
 #include <QScopedArrayPointer>
 #include <algorithm>
-#include "engine.hh"
 #include "error.hh"
 #include "objects.hh"
 #include "schedule_object.hh"

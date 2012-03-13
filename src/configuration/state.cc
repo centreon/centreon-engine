@@ -1,5 +1,5 @@
 /*
-** Copyright 2011 Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -18,17 +18,16 @@
 */
 
 #include <fstream>
+#include <limits.h>
 #include <QFileInfo>
 #include <string>
-#include <limits.h>
-#include "broker.hh"
-#include "engine.hh"
-#include "error.hh"
-#include "globals.hh"
-#include "logging/logger.hh"
-#include "macros.hh"
-#include "macros/misc.hh"
-#include "configuration/state.hh"
+#include "com/centreon/engine/broker.hh"
+#include "com/centreon/engine/configuration/state.hh"
+#include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/logging/logger.hh"
+#include "com/centreon/engine/macros.hh"
+#include "com/centreon/engine/macros/misc.hh"
 
 using namespace com::centreon::engine::configuration;
 using namespace com::centreon::engine::logging;

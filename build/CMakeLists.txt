@@ -601,11 +601,11 @@ add_library("cce_core" STATIC
   # Headers.
   "${INC_DIR}/com/centreon/engine/broker.hh"
   "${INC_DIR}/com/centreon/engine/checks.hh"
+  "${INC_DIR}/com/centreon/engine/circular_buffer.hh"
   "${INC_DIR}/com/centreon/engine/comments.hh"
   "${INC_DIR}/com/centreon/engine/common.hh"
   "${INC_DIR}/com/centreon/engine/config.hh"
   "${INC_DIR}/com/centreon/engine/downtime.hh"
-  "${INC_DIR}/com/centreon/engine/engine.hh"
   "${INC_DIR}/com/centreon/engine/error.hh"
   "${INC_DIR}/com/centreon/engine/events.hh"
   "${INC_DIR}/com/centreon/engine/flapping.hh"

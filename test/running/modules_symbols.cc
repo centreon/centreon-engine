@@ -19,6 +19,7 @@
 
 #include <iostream>
 #include <time.h>
+#include "com/centreon/engine/events/sched_info.hh"
 #include "downtime.h"
 #include "nagios.h"
 #include "nebstructs.h"

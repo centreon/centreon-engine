@@ -1,6 +1,6 @@
 /*
 ** Copyright 1999-2008 Ethan Galstad
-** Copyright 2011      Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -20,12 +20,11 @@
 
 #include <stdio.h>
 #include <string.h>
-#include "xodtemplate.hh"
-#include "globals.hh"
-#include "skiplist.hh"
-#include "engine.hh"
-#include "objects.hh"
-#include "logging/logger.hh"
+#include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/logging/logger.hh"
+#include "com/centreon/engine/objects.hh"
+#include "com/centreon/engine/skiplist.hh"
+#include "com/centreon/engine/xodtemplate.hh"
 
 using namespace com::centreon::engine::logging;
 
