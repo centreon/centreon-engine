@@ -1,7 +1,7 @@
 /*
 ** Copyright 1999-2010 Ethan Galstad
 ** Copyright 2009      Nagios Core Development Team and Community Contributors
-** Copyright 2011      Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -480,19 +480,37 @@ int xrddefault_save_state_information(void) {
            << "}\n";
   }
 
-  // flush data.
+  // Write data in buffer.
   stream.flush();
 
-  if (ftruncate(xrddefault_retention_file_fd, 0) == -1
-      || fsync(xrddefault_retention_file_fd) == -1
-      || lseek(xrddefault_retention_file_fd, 0, SEEK_SET) == (off_t)-1) {
+  // Prepare retention file for overwrite.
+  if ((ftruncate(xrddefault_retention_file_fd, 0) == -1)
+      || (fsync(xrddefault_retention_file_fd) == -1)
+      || (lseek(xrddefault_retention_file_fd, 0, SEEK_SET)
+          == (off_t)-1)) {
+    char const* msg(strerror(errno));
     logger(log_runtime_error, basic)
       << "Error: Unable to update retention file '"
-      << xrddefault_retention_file << "': " << strerror(errno);
+      << xrddefault_retention_file << "': " << msg;
     return (ERROR);
   }
 
-  write(xrddefault_retention_file_fd, data.constData(), data.size());
+  // Write retention file.
+  char const* data_ptr(data.constData());
+  unsigned int size(data.size());
+  while (size > 0) {
+    ssize_t wb(write(xrddefault_retention_file_fd, data_ptr, size));
+    if (wb <= 0) {
+      char const* msg(strerror(errno));
+      logger(log_runtime_error, basic)
+        << "Error: Unable to update retention file '"
+        << xrddefault_retention_file << "': " << msg;
+      return (ERROR);
+    }
+    data_ptr += wb;
+    size -= wb;
+  }
+
   return (OK);
 }
 

@@ -1,7 +1,7 @@
 /*
 ** Copyright 2000-2009 Ethan Galstad
 ** Copyright 2009      Nagios Core Development Team and Community Contributors
-** Copyright 2011      Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -529,18 +529,35 @@ int xsddefault_save_status_data(void) {
            << "\t}\n\n";
   }
 
-  // flush data.
+  // Write data in buffer.
   stream.flush();
 
-  if (ftruncate(xsddefault_status_log_fd, 0) == -1
-      || fsync(xsddefault_status_log_fd) == -1
-      || lseek(xsddefault_status_log_fd, 0, SEEK_SET) == (off_t)-1) {
+  // Prepare status file for overwrite.
+  if ((ftruncate(xsddefault_status_log_fd, 0) == -1)
+      || (fsync(xsddefault_status_log_fd) == -1)
+      || (lseek(xsddefault_status_log_fd, 0, SEEK_SET) == (off_t)-1)) {
+    char const* msg(strerror(errno));
     logger(log_runtime_error, basic)
       << "Error: Unable to update status data file '"
-      << xsddefault_status_log << "': " << strerror(errno);
+      << xsddefault_status_log << "': " << msg;
     return (ERROR);
   }
 
-  write(xsddefault_status_log_fd, data.constData(), data.size());
+  // Write status file.
+  char const* data_ptr(data.constData());
+  unsigned int size(data.size());
+  while (size > 0) {
+    ssize_t wb(write(xsddefault_status_log_fd, data_ptr, size));
+    if (wb <= 0) {
+      char const* msg(strerror(errno));
+      logger(log_runtime_error, basic)
+        << "Error: Unable to update status data file '"
+        << xsddefault_status_log << "': " << msg;
+      return (ERROR);
+    }
+    data_ptr += wb;
+    size -= wb;
+  }
+
   return (OK);
 }
