@@ -1,26 +1,25 @@
 /*
-** Copyright 2011 Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
-** Centreon Clib is free software: you can redistribute it
-** and/or modify it under the terms of the GNU Affero General Public
-** License as published by the Free Software Foundation, either version
-** 3 of the License, or (at your option) any later version.
+** Centreon Engine is free software: you can redistribute it and/or
+** modify it under the terms of the GNU General Public License version 2
+** as published by the Free Software Foundation.
 **
-** Centreon Clib is distributed in the hope that it will be
-** useful, but WITHOUT ANY WARRANTY; without even the implied warranty
-** of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-** Affero General Public License for more details.
+** Centreon Engine is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+** General Public License for more details.
 **
-** You should have received a copy of the GNU Affero General Public
-** License along with Centreon Clib. If not, see
+** You should have received a copy of the GNU General Public License
+** along with Centreon Engine. If not, see
 ** <http://www.gnu.org/licenses/>.
 */
 
 #include <string.h>
-#include "error.hh"
-#include "commands/command_line.hh"
+#include "com/centreon/engine/commands/command_line.hh"
+#include "com/centreon/engine/error.hh"
 
 using namespace com::centreon::engine::commands;
 
@@ -33,12 +32,7 @@ using namespace com::centreon::engine::commands;
 /**
  *  Default constructor.
  */
-command_line::command_line()
-  : _argc(0),
-    _argv(NULL),
-    _size(0) {
-
-}
+command_line::command_line() : _argc(0), _argv(NULL), _size(0) {}
 
 /**
  *  Parse command line.
@@ -46,9 +40,7 @@ command_line::command_line()
  *  @param[in] cmdline  The command line to parse.
  */
 command_line::command_line(QString const& cmdline)
-  : _argc(0),
-    _argv(NULL),
-    _size(0) {
+  : _argc(0), _argv(NULL), _size(0) {
   parse(cmdline.toStdString());
 }
 
@@ -62,8 +54,7 @@ command_line::command_line(
                 QString const& appname,
                 QStringList const& args) {
   std::string cmdline(appname.toStdString());
-  for (QStringList::const_iterator
-         it(args.begin()), end(args.end());
+  for (QStringList::const_iterator it(args.begin()), end(args.end());
        it != end;
        ++it)
     cmdline += " " + (*it).toStdString();
@@ -75,8 +66,7 @@ command_line::command_line(
  *
  *  @param[in] right  The object to copy.
  */
-command_line::command_line(command_line const& right)
-  : _argv(NULL) {
+command_line::command_line(command_line const& right) : _argv(NULL) {
   _internal_copy(right);
 }
 
@@ -95,7 +85,8 @@ command_line::~command_line() throw () {
  *  @return This object.
  */
 command_line& command_line::operator=(command_line const& right) {
-  return (_internal_copy(right));
+  _internal_copy(right);
+  return (*this);
 }
 
 /**
@@ -146,50 +137,70 @@ char** command_line::get_argv() const throw () {
  *  @param[in] cmdline  The command line to parse.
  */
 void command_line::parse(std::string const& cmdline) {
+  // Allocate buffer.
   _release();
-
   char* str(new char[cmdline.size() + 1]);
   _size = 0;
   str[_size] = 0;
 
+  // Status variables.
   bool escap(false);
   char sep(0);
   char last(0);
   for (size_t i(0), end(cmdline.size()); i < end; ++i) {
+    // Current processed char.
     char c(cmdline[i]);
+
+    // Is this an escaped character ?
     escap = (last == '\\' ? !escap : false);
+    if (escap) {
+      switch (c) {
+      case 'n':
+        c = '\n';
+        break ;
+      case 'r':
+        c = '\r';
+        break ;
+      case 't':
+        c = '\t';
+        break ;
+      }
+    }
+
+    // End of token.
     if (!sep && isblank(c)) {
       if (last && !isblank(last) && str[_size - 1]) {
         str[_size++] = 0;
         ++_argc;
       }
     }
+    // Quotes.
     else if (!escap && (c == '\'' || c == '"')) {
       if (!sep)
         sep = c;
-      else if (sep == c) {
-        str[_size++] = 0;
-        ++_argc;
+      else if (sep == c)
         sep = 0;
-      }
-      else if (c != '\\' || (escap && c == last))
+      else if ((c != '\\') || escap)
         str[_size++] = c;
     }
-    else if (c != '\\' || (escap && c == last))
+    else if ((c != '\\') || escap)
       str[_size++] = c;
     last = c;
   }
 
+  // Not-terminated quote.
   if (sep) {
-    delete[] str;
+    delete [] str;
     throw (engine_error() << "missing separator '" << sep << "'");
   }
 
+  // Terminate string if not already done so.
   if (last && _size && str[_size - 1]) {
     str[_size] = 0;
     ++_argc;
   }
 
+  // Put tokens in table.
   _size = 0;
   _argv = new char*[_argc + 1];
   _argv[_argc] = NULL;
@@ -198,8 +209,11 @@ void command_line::parse(std::string const& cmdline) {
     while (str[_size++]);
   }
 
+  // If no token were found, avoid memory leak.
   if (!_argv[0])
-    delete[] str;
+    delete [] str;
+
+  return ;
 }
 
 /**************************************
@@ -212,10 +226,8 @@ void command_line::parse(std::string const& cmdline) {
  *  Internal copy.
  *
  *  @param[in] right  The object to copy.
- *
- *  @return This object.
  */
-command_line& command_line::_internal_copy(command_line const& right) {
+void command_line::_internal_copy(command_line const& right) {
   if (this != &right) {
     _argc = right._argc;
     _size = right._size;
@@ -232,7 +244,7 @@ command_line& command_line::_internal_copy(command_line const& right) {
       }
     }
   }
-  return (*this);
+  return ;
 }
 
 /**
