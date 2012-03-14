@@ -1,5 +1,5 @@
 /*
-** Copyright 2011      Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -17,15 +17,15 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <QCoreApplication>
-#include <QDebug>
 #include <exception>
 #include <limits.h>
-#include "test/unittest.hh"
-#include "error.hh"
-#include "nebmods.hh"
+#include <QCoreApplication>
+#include <QDebug>
+#include "com/centreon/engine/broker/loader.hh"
+#include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/nebmods.hh"
 #include "test/broker/mod_load.hh"
-#include "broker/loader.hh"
+#include "test/unittest.hh"
 
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::broker;

@@ -1,6 +1,6 @@
 /*
 ** Copyright 1999-2010 Ethan Galstad
-** Copyright 2011      Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -19,12 +19,12 @@
 */
 
 #ifndef CCE_COMPATIBILITY_COMMENTS_H
-# define CCE_COMPATIBILITY_COMMENTS_H
+#  define CCE_COMPATIBILITY_COMMENTS_H
 
-# include "config.h"
-# include "common.h"
-# include "objects.h"
-# include "comments.hh"
+#  include "com/centreon/engine/comments.hh"
+#  include "common.h"
+#  include "config.h"
+#  include "objects.h"
 
 /*
 ** If you are going to be adding a lot of comments in sequence,
@@ -33,4 +33,4 @@
 */
 extern int defer_comment_sorting;
 
-#endif /* !CCE_COMPATIBILITY_COMMENTS_H */
+#endif // !CCE_COMPATIBILITY_COMMENTS_H

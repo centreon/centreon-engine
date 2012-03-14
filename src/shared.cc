@@ -1,6 +1,6 @@
 /*
 ** Copyright 1999-2011 Ethan Galstad
-** Copyright 2011      Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -18,24 +18,24 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <stdio.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <sys/mman.h>
-#include <unistd.h>
 #include <fcntl.h>
-#include "common.hh"
-#include "globals.hh"
-#include "utils.hh"
-#include "shared.hh"
+#include <stdio.h>
+#include <sys/mman.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include "com/centreon/engine/common.hh"
+#include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/shared.hh"
+#include "com/centreon/engine/utils.hh"
 
 #ifdef HAVE_TZNAME
-# ifdef CYGWIN
-extern char*                  _tzname[2] __declspec(dllimport);
-# else
-extern char*                  tzname[2];
-# endif
-#endif
+#  ifdef CYGWIN
+extern char* _tzname[2] __declspec(dllimport);
+#  else
+extern char* tzname[2];
+#  endif // Cygwin
+#endif // HAVE_TZNAME
 
 /*
  * This file holds random utility functions shared by cgi's and

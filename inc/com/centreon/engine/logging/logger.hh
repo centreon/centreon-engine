@@ -1,5 +1,5 @@
 /*
-** Copyright 2011      Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -18,14 +18,14 @@
 */
 
 #ifndef CCE_LOGGING_LOGGER_HH
-# define CCE_LOGGING_LOGGER_HH
+#  define CCE_LOGGING_LOGGER_HH
 
-# include <QString>
-# include <sstream>
-# include <string>
-# include <iomanip>
-# include "logging/object.hh"
-# include "logging/engine.hh"
+#  include <iomanip>
+#  include <QString>
+#  include <sstream>
+#  include <string>
+#  include "com/centreon/engine/logging/engine.hh"
+#  include "com/centreon/engine/logging/object.hh"
 
 namespace                    com {
   namespace                  centreon {

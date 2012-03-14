@@ -77,8 +77,6 @@ namespace                      com {
                                  unsigned long check_timestamp_horizon);
           static void          unload();
 
-
-
         private slots:
           void                 _command_executed(cce_commands_result const& res);
 

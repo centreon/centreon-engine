@@ -1,5 +1,5 @@
 /*
-** Copyright 2011 Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -18,34 +18,35 @@
 */
 
 #ifndef CCE_OBJECTS_CUSTOMVARIABLESMEMBER_HH
-# define CCE_OBJECTS_CUSTOMVARIABLESMEMBER_HH
+#  define CCE_OBJECTS_CUSTOMVARIABLESMEMBER_HH
 
-# ifdef __cplusplus
-#  include <QVector>
-#  include <QString>
-# endif
-# include "objects.hh"
+#  include "com/centreon/engine/objects.hh"
 
-# ifdef __cplusplus
+#  ifdef __cplusplus
+#    include <QString>
+#    include <QVector>
 extern "C" {
-# endif
+#  endif // C++
 
-  customvariablesmember const* release_customvariablesmember(customvariablesmember const* obj);
+customvariablesmember const* release_customvariablesmember(
+                               customvariablesmember const* obj);
 
-# ifdef __cplusplus
+#  ifdef __cplusplus
 }
 
-namespace       com {
-  namespace     centreon {
-    namespace   engine {
-      namespace objects {
-        customvariablesmember const* release(customvariablesmember const* obj);
-        bool    add_custom_variables_to_object(QVector<QString> const& custom_vars,
-                                               customvariablesmember** list_customvar);
+namespace                            com {
+  namespace                          centreon {
+    namespace                        engine {
+      namespace                      objects {
+        bool                         add_custom_variables_to_object(
+                                       QVector<QString> const& custom_vars,
+                                       customvariablesmember** list_customvar);
+        customvariablesmember const* release(
+                                       customvariablesmember const* obj);
       }
     }
   }
 }
-# endif
+#  endif // C++
 
 #endif // !CCE_OBJECTS_CUSTOMVARIABLESMEMBER_HH

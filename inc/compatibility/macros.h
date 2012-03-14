@@ -1,5 +1,5 @@
 /*
-** Copyright 2011      Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -18,11 +18,11 @@
 */
 
 #ifndef CCE_COMPATIBILITY_MACROS_H
-# define CCE_COMPATIBILITY_MACROS_H
+#  define CCE_COMPATIBILITY_MACROS_H
 
-# include "config.h"
-# include "common.h"
-# include "objects.h"
-# include "macros.hh"
+#  include "com/centreon/engine/macros.hh"
+#  include "common.h"
+#  include "config.h"
+#  include "objects.h"
 
-#endif /* !CCE_COMPATIBILITY_MACROS_H */
+#endif // !CCE_COMPATIBILITY_MACROS_H

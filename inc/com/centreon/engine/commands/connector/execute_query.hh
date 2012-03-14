@@ -1,5 +1,5 @@
 /*
-** Copyright 2011 Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -18,59 +18,59 @@
 */
 
 #ifndef CCE_COMMANDS_CONNECTOR_EXECUTE_QUERY_HH
-# define CCE_COMMANDS_CONNECTOR_EXECUTE_QUERY_HH
+#  define CCE_COMMANDS_CONNECTOR_EXECUTE_QUERY_HH
 
-# include <QString>
-# include <QStringList>
-# include <QDateTime>
-# include "com/centreon/engine/commands/connector/request.hh"
+#  include <QDateTime>
+#  include <QString>
+#  include <QStringList>
+#  include "com/centreon/engine/commands/connector/request.hh"
+#  include "com/centreon/engine/namespace.hh"
 
-namespace                    com {
-  namespace                  centreon {
-    namespace                engine {
-      namespace              commands {
-	namespace            connector {
-	/**
-	 *  @class execute_query commands/connector/execute_query.hh
-	 *  @brief Execute query send a command to the connector.
-	 *
-	 *  Execution query is a request to send a command to the
-	 *  connector.
-	 */
-	  class              execute_query : public request {
-	  public:
-	                     execute_query(unsigned long cmd_id = 0,
-					   QString const& cmd = "",
-					   QDateTime const& start_time = QDateTime(),
-					   unsigned int timeout = 0);
-	                     execute_query(execute_query const& right);
-	                     ~execute_query() throw();
+CCE_BEGIN()
 
-	    execute_query&   operator=(execute_query const& right);
-	    bool             operator==(execute_query const& right) const throw();
-	    bool             operator!=(execute_query const& right) const throw();
+namespace              commands {
+  namespace            connector {
+    /**
+     *  @class execute_query commands/connector/execute_query.hh
+     *  @brief Execute query send a command to the connector.
+     *
+     *  Execution query is a request to send a command to the
+     *  connector.
+     */
+    class              execute_query : public request {
+    public:
+                       execute_query(
+                         unsigned long cmd_id = 0,
+                         QString const& cmd = "",
+                         QDateTime const& start_time = QDateTime(),
+                         unsigned int timeout = 0);
+                       execute_query(execute_query const& right);
+                       ~execute_query() throw ();
+      execute_query&   operator=(execute_query const& right);
+      bool             operator==(
+                         execute_query const& right) const throw ();
+      bool             operator!=(
+                         execute_query const& right) const throw ();
+      QByteArray       build();
+      request*         clone() const;
+      QStringList      get_args() const throw ();
+      QString const&   get_command() const throw ();
+      unsigned long    get_command_id() const throw ();
+      QDateTime const& get_start_time() const throw ();
+      unsigned int     get_timeout() const throw ();
+      void             restore(QByteArray const& data);
 
-	    request*         clone() const;
+    private:
+      void             _internal_copy(execute_query const& right);
 
-	    QByteArray       build();
-	    void             restore(QByteArray const& data);
-
-	    QString const&   get_command() const throw();
-	    QStringList      get_args() const throw();
-	    QDateTime const& get_start_time() const throw();
-	    unsigned long    get_command_id() const throw();
-	    unsigned int     get_timeout() const throw();
-
-	  private:
-	    QString          _cmd;
-	    QDateTime        _start_time;
-	    unsigned long    _cmd_id;
-	    unsigned int     _timeout;
-	  };
-	}
-      }
-    }
+      QString          _cmd;
+      unsigned long    _cmd_id;
+      QDateTime        _start_time;
+      unsigned int     _timeout;
+    };
   }
 }
+
+CCE_END()
 
 #endif // !CCE_COMMANDS_CONNECTOR_EXECUTE_QUERY_HH

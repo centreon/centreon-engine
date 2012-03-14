@@ -1,5 +1,5 @@
 /*
-** Copyright 2011 Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -17,19 +17,19 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <exception>
+#include <math.h>
 #include <QCoreApplication>
 #include <QDebug>
 #include <QDir>
 #include <QFile>
-#include <exception>
-#include <math.h>
+#include "com/centreon/engine/common.hh"
+#include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/logging/engine.hh"
+#include "com/centreon/engine/logging/file.hh"
+#include "com/centreon/engine/logging/object.hh"
 #include "test/unittest.hh"
-#include "globals.hh"
-#include "common.hh"
-#include "error.hh"
-#include "logging/engine.hh"
-#include "logging/file.hh"
-#include "logging/object.hh"
 
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;

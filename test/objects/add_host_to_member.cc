@@ -1,5 +1,5 @@
 /*
-** Copyright 2011 Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -17,11 +17,11 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <QDebug>
 #include <exception>
-#include "macros.hh"
-#include "add_object_to_member.hh"
-#include "create_object.hh"
+#include <QDebug>
+#include "com/centreon/engine/macros.hh"
+#include "test/objects/add_object_to_member.hh"
+#include "test/objects/create_object.hh"
 
 using namespace com::centreon::engine::objects;
 using namespace test::objects;

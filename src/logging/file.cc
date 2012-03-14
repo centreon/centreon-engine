@@ -1,5 +1,5 @@
 /*
-** Copyright 2011 Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -19,10 +19,10 @@
 
 #include <algorithm>
 #include <string.h>
-#include "statusdata.hh"
-#include "globals.hh"
-#include "error.hh"
-#include "logging/file.hh"
+#include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/logging/file.hh"
+#include "com/centreon/engine/statusdata.hh"
 
 using namespace com::centreon::engine::logging;
 

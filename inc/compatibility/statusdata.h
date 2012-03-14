@@ -1,6 +1,6 @@
 /*
 ** Copyright 2000-2007 Ethan Galstad
-** Copyright 2011      Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -19,9 +19,9 @@
 */
 
 #ifndef CCE_COMPATIBILITY_STATUSDATA_H
-# define CCE_COMPATIBILITY_STATUSDATA_H
+#  define CCE_COMPATIBILITY_STATUSDATA_H
 
-# include "objects.h"
-# include "statusdata.hh"
+#  include "com/centreon/engine/statusdata.hh"
+#  include "objects.h"
 
-#endif /* !CCE_COMPATIBILITY_STATUSDATA_H */
+#endif // !CCE_COMPATIBILITY_STATUSDATA_H

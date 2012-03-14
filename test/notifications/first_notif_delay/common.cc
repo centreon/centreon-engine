@@ -1,5 +1,6 @@
 /*
-** Copyright 2011 Merethis
+** Copyright 2011-2012 Merethis
+**
 ** This file is part of Centreon Engine.
 **
 ** Centreon Engine is free software: you can redistribute it and/or
@@ -18,9 +19,9 @@
 
 #include <QCoreApplication>
 #include <QFile>
+#include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/objects.hh"
 #include "test/notifications/first_notif_delay/common.hh"
-#include "globals.hh"
-#include "objects.hh"
 
 using namespace com::centreon::engine;
 

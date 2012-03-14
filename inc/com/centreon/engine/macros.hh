@@ -1,6 +1,6 @@
 /*
 ** Copyright 1999-2010 Ethan Galstad
-** Copyright 2011      Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -19,27 +19,23 @@
 */
 
 #ifndef CCE_MACROS_HH
-# define CCE_MACROS_HH
+#  define CCE_MACROS_HH
 
-# include "macros/clear_host.hh"
-# include "macros/clear_hostgroup.hh"
-# include "macros/clear_service.hh"
-# include "macros/clear_servicegroup.hh"
-# include "macros/defines.hh"
-# include "macros/grab_host.hh"
-# include "macros/grab_service.hh"
-# include "macros/grab_value.hh"
-# include "macros/misc.hh"
-# include "macros/process.hh"
+#  include "com/centreon/engine/macros/clear_host.hh"
+#  include "com/centreon/engine/macros/clear_hostgroup.hh"
+#  include "com/centreon/engine/macros/clear_service.hh"
+#  include "com/centreon/engine/macros/clear_servicegroup.hh"
+#  include "com/centreon/engine/macros/defines.hh"
+#  include "com/centreon/engine/macros/grab_host.hh"
+#  include "com/centreon/engine/macros/grab_service.hh"
+#  include "com/centreon/engine/macros/grab_value.hh"
+#  include "com/centreon/engine/macros/misc.hh"
+#  include "com/centreon/engine/macros/process.hh"
 
-# ifdef __cplusplus
+#  ifdef __cplusplus
 extern "C" {
-# endif
+#  endif // C++
 
-/*
- * These functions updates **macros with the values from
- * their respective object type.
- */
 int grab_hostgroup_macros(hostgroup* hg);
 int grab_servicegroup_macros(servicegroup* sg);
 int grab_contact_macros(contact* cntct);
@@ -75,7 +71,7 @@ int grab_custom_object_macro(char* macro_name,
       customvariablesmember* vars,
       char** output);
 
-/* thread-safe version of the above */
+// Thread-safe version of the above.
 int grab_hostgroup_macros_r(nagios_macros* mac,
       hostgroup* hg);
 int grab_servicegroup_macros_r(nagios_macros* mac,
@@ -150,8 +146,8 @@ int set_argv_macro_environment_vars_r(nagios_macros* mac, int set);
 int set_custom_macro_environment_vars_r(nagios_macros* mac, int set);
 int set_contact_address_environment_vars_r(nagios_macros* mac, int set);
 
-# ifdef __cplusplus
+#  ifdef __cplusplus
 }
-# endif
+#  endif // C++
 
 #endif // !CCE_MACROS_HH

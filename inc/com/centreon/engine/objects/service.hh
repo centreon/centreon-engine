@@ -1,5 +1,5 @@
 /*
-** Copyright 2011 Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -18,48 +18,50 @@
 */
 
 #ifndef CCE_OBJECTS_SERVICE_HH
-# define CCE_OBJECTS_SERVICE_HH
+#  define CCE_OBJECTS_SERVICE_HH
 
-# include "objects.hh"
+#  include "com/centreon/engine/objects.hh"
 
-# ifdef __cplusplus
+#  ifdef __cplusplus
 extern "C" {
-# endif
+#  endif // C++
 
-  bool link_service(service* obj,
-                    contact** contacts,
-                    contactgroup** contactgroups,
-                    servicegroup** servicegroups,
-                    char** custom_variables,
-                    int initial_state,
-                    timeperiod* check_period,
-                    timeperiod* notification_period,
-                    command* cmd_event_handler,
-                    command* cmd_check_command);
-  void release_service(service const* obj);
+bool link_service(
+       service* obj,
+       contact** contacts,
+       contactgroup** contactgroups,
+       servicegroup** servicegroups,
+       char** custom_variables,
+       int initial_state,
+       timeperiod* check_period,
+       timeperiod* notification_period,
+       command* cmd_event_handler,
+       command* cmd_check_command);
+void release_service(service const* obj);
 
-# ifdef __cplusplus
+#  ifdef __cplusplus
 }
 
 namespace       com {
   namespace     centreon {
     namespace   engine {
       namespace objects {
-        void    link(service* obj,
-                     QVector<contact*> const& contacts,
-                     QVector<contactgroup*> const& contactgroups,
-                     QVector<servicegroup*> const& servicegroups,
-                     QVector<QString> const& custom_variables,
-                     int initial_state,
-                     timeperiod* check_period,
-                     timeperiod* notification_period,
-                     command* cmd_event_handler = NULL,
-                     command* cmd_check_command = NULL);
+        void    link(
+                  service* obj,
+                  QVector<contact*> const& contacts,
+                  QVector<contactgroup*> const& contactgroups,
+                  QVector<servicegroup*> const& servicegroups,
+                  QVector<QString> const& custom_variables,
+                  int initial_state,
+                  timeperiod* check_period,
+                  timeperiod* notification_period,
+                  command* cmd_event_handler = NULL,
+                  command* cmd_check_command = NULL);
         void    release(service const* obj);
       }
     }
   }
 }
-# endif
+#  endif // C++
 
 #endif // !CCE_OBJECTS_SERVICE_HH

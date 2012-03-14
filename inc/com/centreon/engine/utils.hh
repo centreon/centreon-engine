@@ -19,16 +19,12 @@
 */
 
 #ifndef CCE_UTILS_HH
-# define CCE_UTILS_HH
+#  define CCE_UTILS_HH
 
-# include <sys/time.h>
-# include "macros.hh"
-# include "objects.hh"
-# include "checks.hh"
-
-# ifdef __cplusplus
-extern "C" {
-# endif
+#  include <sys/time.h>
+#  include "com/centreon/engine/checks.hh"
+#  include "com/centreon/engine/macros.hh"
+#  include "com/centreon/engine/objects.hh"
 
 // DBUF structure - dynamic string storage
 typedef struct  dbuf_struct {
@@ -37,6 +33,10 @@ typedef struct  dbuf_struct {
   unsigned long allocated_size;
   unsigned long chunk_size;
 }               dbuf;
+
+#  ifdef __cplusplus
+extern "C" {
+#  endif // C++
 
 // Monitoring/Event Handler Functions
 int my_system_r(nagios_macros const* mac, char* cmd,int timeout,int* early_timeout,double* exectime,char** output,unsigned int max_output_length); // thread-safe version of the above
@@ -76,8 +76,8 @@ int reset_variables(void);                 // reset all global variables
 int free_check_result(check_result* info); // frees memory associated with a host/service check result
 int parse_check_output(char* buf, char** short_output, char** long_output, char** perf_data, int escape_newlines_please, int newlines_are_escaped);
 
-# ifdef __cplusplus
+#  ifdef __cplusplus
 }
-# endif
+#  endif // C++
 
 #endif // !CCE_UTILS_HH

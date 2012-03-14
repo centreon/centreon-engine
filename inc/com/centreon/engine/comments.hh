@@ -1,6 +1,6 @@
 /*
 ** Copyright 1999-2010 Ethan Galstad
-** Copyright 2011      Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -19,31 +19,27 @@
 */
 
 #ifndef CCE_COMMENTS_HH
-# define CCE_COMMENTS_HH
+#  define CCE_COMMENTS_HH
 
-# include <sys/time.h>
-# include "objects.hh"
+#  include <time.h>
+#  include "com/centreon/engine/objects.hh"
 
-# ifdef __cplusplus
-extern "C" {
-# endif
+// Comment sources.
+#  define COMMENTSOURCE_INTERNAL  0
+#  define COMMENTSOURCE_EXTERNAL  1
 
-// Comment Sources
-# define COMMENTSOURCE_INTERNAL  0
-# define COMMENTSOURCE_EXTERNAL  1
+// Comment types.
+#  define HOST_COMMENT		 1
+#  define SERVICE_COMMENT	 2
 
-// Comment Types
-# define HOST_COMMENT		 1
-# define SERVICE_COMMENT	 2
+// Entry types.
+#  define USER_COMMENT            1
+#  define DOWNTIME_COMMENT        2
+#  define FLAPPING_COMMENT        3
+#  define ACKNOWLEDGEMENT_COMMENT 4
 
-// Entry Types
-# define USER_COMMENT            1
-# define DOWNTIME_COMMENT        2
-# define FLAPPING_COMMENT        3
-# define ACKNOWLEDGEMENT_COMMENT 4
-
-// Chained Hash Limits
-# define COMMENT_HASHSLOTS       1024
+// Chained hash limits.
+#  define COMMENT_HASHSLOTS       1024
 
 // COMMENT structure
 typedef struct           comment_struct {
@@ -62,6 +58,10 @@ typedef struct           comment_struct {
   struct comment_struct* next;
   struct comment_struct* nexthash;
 }                        comment;
+
+#  ifdef __cplusplus
+extern "C" {
+#  endif // C++
 
 int initialize_comment_data(char const* config_file);                            // initializes comment data
 int cleanup_comment_data(char const* config_file);                               // cleans up comment data
@@ -100,8 +100,8 @@ comment* find_service_comment(unsigned long comment_id);                    // f
 comment* find_host_comment(unsigned long comment_id);                       // finds a specific host comment
 comment* find_comment(unsigned long comment_id, unsigned int comment_type); // finds a specific comment
 
-# ifdef __cplusplus
+#  ifdef __cplusplus
 }
-# endif
+#  endif // C++
 
 #endif // !CCE_COMMENTS_HH

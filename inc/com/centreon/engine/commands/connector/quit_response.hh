@@ -1,5 +1,5 @@
 /*
-** Copyright 2011 Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -18,38 +18,36 @@
 */
 
 #ifndef CCE_COMMANDS_CONNECTOR_QUIT_RESPONSE_HH
-# define CCE_COMMANDS_CONNECTOR_QUIT_RESPONSE_HH
+#  define CCE_COMMANDS_CONNECTOR_QUIT_RESPONSE_HH
 
-# include "com/centreon/engine/commands/connector/request.hh"
+#  include "com/centreon/engine/commands/connector/request.hh"
+#  include "com/centreon/engine/namespace.hh"
 
-namespace                  com {
-  namespace                centreon {
-    namespace              engine {
-      namespace            commands {
-	namespace          connector {
-	/**
-	 *  @class quit_response commands/connector/quit_response.hh
-	 *  @brief Quit response notify engine of when the connector finish.
-	 */
-	  class            quit_response : public request {
-	  public:
-	                   quit_response();
-	                   quit_response(quit_response const& right);
-	                   ~quit_response() throw();
+CCE_BEGIN()
 
-	    quit_response& operator=(quit_response const& right);
-	    bool           operator==(quit_response const& right) const throw();
-	    bool           operator!=(quit_response const& right) const throw();
-
-	    request*       clone() const;
-
-	    QByteArray     build();
-	    void           restore(QByteArray const& data);
-	  };
-	}
-      }
-    }
+namespace            commands {
+  namespace          connector {
+    /**
+     *  @class quit_response commands/connector/quit_response.hh
+     *  @brief Quit response notify engine of when the connector finish.
+     */
+    class            quit_response : public request {
+    public:
+                     quit_response();
+                     quit_response(quit_response const& right);
+                     ~quit_response() throw ();
+      quit_response& operator=(quit_response const& right);
+      bool           operator==(
+                       quit_response const& right) const throw ();
+      bool           operator!=(
+                       quit_response const& right) const throw ();
+      QByteArray     build();
+      request*       clone() const;
+      void           restore(QByteArray const& data);
+    };
   }
 }
+
+CCE_END()
 
 #endif // !CCE_COMMANDS_CONNECTOR_QUIT_RESPONSE_HH

@@ -1,5 +1,5 @@
 /*
-** Copyright 2011 Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -18,11 +18,11 @@
 */
 
 #ifndef CCE_LOGGING_DUMPERS_HH
-# define CCE_LOGGING_DUMPERS_HH
+#  define CCE_LOGGING_DUMPERS_HH
 
-# include <QTextStream>
-# include "logging/logger.hh"
-# include "objects.hh"
+#  include <QTextStream>
+#  include "com/centreon/engine/logging/logger.hh"
+#  include "com/centreon/engine/objects.hh"
 
 struct sched_info_struct;
 

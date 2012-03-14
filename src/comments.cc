@@ -1,6 +1,6 @@
 /*
 ** Copyright 1999-2010 Ethan Galstad
-** Copyright 2011      Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -20,11 +20,11 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include "xcddefault.hh"
-#include "broker.hh"
-#include "utils.hh"
-#include "comments.hh"
-#include "globals.hh"
+#include "com/centreon/engine/broker.hh"
+#include "com/centreon/engine/comments.hh"
+#include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/utils.hh"
+#include "com/centreon/engine/xcddefault.hh"
 
 static comment* comment_hashlist[COMMENT_HASHSLOTS];
 

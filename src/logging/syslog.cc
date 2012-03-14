@@ -1,5 +1,5 @@
 /*
-** Copyright 2011      Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -18,7 +18,7 @@
 */
 
 #include <syslog.h>
-#include "logging/syslog.hh"
+#include "com/centreon/engine/logging/syslog.hh"
 
 using namespace com::centreon::engine;
 

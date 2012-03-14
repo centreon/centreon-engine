@@ -25,8 +25,8 @@ extern "C" {
 #  endif // C++
 
 int deinit_embedded_perl();
-int file_uses_embedded_perl(void const* param);
 int init_embedded_perl(void const* param);
+int file_uses_embedded_perl(void const* param);
 
 #  ifdef __cplusplus
 }

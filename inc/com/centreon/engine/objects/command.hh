@@ -1,5 +1,5 @@
 /*
-** Copyright 2011 Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -18,32 +18,33 @@
 */
 
 #ifndef CCE_OBJECTS_COMMAND_HH
-# define CCE_OBJECTS_COMMAND_HH
+#  define CCE_OBJECTS_COMMAND_HH
 
-# include "objects.hh"
+#  include "com/centreon/engine/objects.hh"
 
-# ifdef __cplusplus
+#  ifdef __cplusplus
 extern "C" {
-# endif
+#  endif // C++
 
-  bool link_command(command const* obj);
-  void release_command(command const* obj);
+bool link_command(command const* obj);
+void release_command(command const* obj);
 
-# ifdef __cplusplus
+#  ifdef __cplusplus
 }
 
 namespace       com {
   namespace     centreon {
     namespace   engine {
       namespace objects {
+        bool    add_commands_to_object(
+                  QVector<command*> const& commands,
+                  commandsmember** list_command);
         void    link(command const* obj);
         void    release(command const* obj);
-        bool    add_commands_to_object(QVector<command*> const& commands,
-                                       commandsmember** list_command);
       }
     }
   }
 }
-# endif
+#  endif // C++
 
 #endif // !CCE_OBJECTS_COMMAND_HH

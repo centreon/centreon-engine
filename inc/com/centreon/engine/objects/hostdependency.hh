@@ -1,5 +1,5 @@
 /*
-** Copyright 2011 Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -18,36 +18,36 @@
 */
 
 #ifndef CCE_OBJECTS_HOSTDEPENDENCY_HH
-# define CCE_OBJECTS_HOSTDEPENDENCY_HH
+#  define CCE_OBJECTS_HOSTDEPENDENCY_HH
 
-# ifdef __cplusplus
-#  include <QVector>
-#  include <QString>
-# endif
-# include "objects.hh"
+#  include "com/centreon/engine/objects.hh"
 
-# ifdef __cplusplus
+#  ifdef __cplusplus
+#    include <QString>
+#    include <QVector>
 extern "C" {
-# endif
+#  endif // C++
 
-  bool link_hostdependency(hostdependency* obj,
-                           timeperiod* dependency_period);
-  void release_hostdependency(hostdependency const* obj);
+bool link_hostdependency(
+       hostdependency* obj,
+       timeperiod* dependency_period);
+void release_hostdependency(hostdependency const* obj);
 
-# ifdef __cplusplus
+#  ifdef __cplusplus
 }
 
 namespace       com {
   namespace     centreon {
     namespace   engine {
       namespace objects {
-        void    link(hostdependency* obj,
-                     timeperiod* dependency_period = NULL);
+        void    link(
+                  hostdependency* obj,
+                  timeperiod* dependency_period = NULL);
         void    release(hostdependency const* obj);
       }
     }
   }
 }
-# endif
+#  endif // C++
 
 #endif // !CCE_OBJECTS_HOSTDEPENDENCY_HH

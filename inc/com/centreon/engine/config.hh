@@ -1,6 +1,6 @@
 /*
 ** Copyright 2002-2006 Ethan Galstad
-** Copyright 2011      Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -19,13 +19,13 @@
 */
 
 #ifndef CCE_CONFIG_HH
-# define CCE_CONFIG_HH
+#  define CCE_CONFIG_HH
 
-# include "objects.hh"
+#  include "com/centreon/engine/objects.hh"
 
-# ifdef __cplusplus
+#  ifdef __cplusplus
 extern "C" {
-# endif
+#  endif // C++
 
 // Configuration Functions
 int read_all_object_data(char* main_config_file); // reads all object config data
@@ -39,8 +39,8 @@ int check_service(service* svc, int* w, int* e);
 int check_host(host* hst, int* w, int* e);
 int check_contact(contact* cntct, int* w, int* e);
 
-# ifdef __cplusplus
+#  ifdef __cplusplus
 }
-# endif
+#  endif // C++
 
 #endif // !CCE_CONFIG_HH

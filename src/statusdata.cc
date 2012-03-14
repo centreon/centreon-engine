@@ -1,6 +1,6 @@
 /*
 ** Copyright 2000-2006 Ethan Galstad
-** Copyright 2011      Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -18,12 +18,10 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-/*********** COMMON HEADER FILES ***********/
-
-#include "xsddefault.hh"      /* default routines */
-#include "broker.hh"
-#include "globals.hh"
-#include "statusdata.hh"
+#include "com/centreon/engine/broker.hh"
+#include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/statusdata.hh"
+#include "com/centreon/engine/xsddefault.hh"
 
 /******************************************************************/
 /****************** TOP-LEVEL OUTPUT FUNCTIONS ********************/

@@ -1,5 +1,5 @@
 /*
-** Copyright 2011 Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -18,15 +18,15 @@
 */
 
 #ifndef TEST_COMMANDS_CONNECTOR_CHECK_REQUEST_HH
-# define TEST_COMMANDS_CONNECTOR_CHECK_REQUEST_HH
+#  define TEST_COMMANDS_CONNECTOR_CHECK_REQUEST_HH
 
-# include <QByteArray>
-# include "commands/connector/request.hh"
+#  include <QByteArray>
+#  include "com/centreon/engine/commands/connector/request.hh"
 
-# define CMD_END       "\0\0\0\0"
-# define TOSTR_(x)     #x
-# define TOSTR(x)      TOSTR_(x)
-# define REQUEST(data) QByteArray((data), sizeof((data)) - 1)
+#  define CMD_END       "\0\0\0\0"
+#  define TOSTR_(x)     #x
+#  define TOSTR(x)      TOSTR_(x)
+#  define REQUEST(data) QByteArray((data), sizeof((data)) - 1)
 
 const int end_size = com::centreon::engine::commands::connector::request::cmd_ending().size();
 

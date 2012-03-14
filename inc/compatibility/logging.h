@@ -1,5 +1,5 @@
 /*
-** Copyright 2011      Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -18,9 +18,9 @@
 */
 
 #ifndef CCE_COMPATIBILITY_LOGGING_H
-# define CCE_COMPATIBILITY_LOGGING_H
+#  define CCE_COMPATIBILITY_LOGGING_H
 
-# include "objects.h"
-# include "logging.hh"
+#  include "com/centreon/engine/logging.hh"
+#  include "objects.h"
 
-#endif /* !CCE_COMPATIBILITY_LOGGING_H */
+#endif // !CCE_COMPATIBILITY_LOGGING_H

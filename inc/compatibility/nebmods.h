@@ -1,5 +1,5 @@
 /*
-** Copyright 2011      Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -18,11 +18,11 @@
 */
 
 #ifndef CCE_COMPATIBILITY_NEBMODS_H
-# define CCE_COMPATIBILITY_NEBMODS_H
+#  define CCE_COMPATIBILITY_NEBMODS_H
 
-# include "config.h"
-# include "nebcallbacks.h"
-# include "nebmodules.h"
-# include "nebmods.hh"
+#  include "com/centreon/engine/nebmods.hh"
+#  include "config.h"
+#  include "nebcallbacks.h"
+#  include "nebmodules.h"
 
-#endif /* !CCE_COMPATIBILITY_NEBMODS_H */
+#endif // !CCE_COMPATIBILITY_NEBMODS_H

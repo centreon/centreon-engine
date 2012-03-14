@@ -1,6 +1,6 @@
 /*
 ** Copyright 2002-2006 Ethan Galstad
-** Copyright 2011      Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -19,13 +19,9 @@
 */
 
 #ifndef CCE_EVENTS_HH
-# define CCE_EVENTS_HH
+#  define CCE_EVENTS_HH
 
-# include <sys/time.h>
-
-# ifdef __cplusplus
-extern "C" {
-# endif
+#  include <time.h>
 
 // Event Types
 # define EVENT_SERVICE_CHECK          0	  // active service check
@@ -62,9 +58,13 @@ typedef struct               timed_event_struct {
   struct timed_event_struct* prev;
 }                            timed_event;
 
+#  ifdef __cplusplus
+extern "C" {
+#  endif // C++
+
 // Setup Functions
-void init_timing_loop(void);        // setup the initial scheduling queue
-void display_scheduling_info(void); // displays service check scheduling information
+void init_timing_loop();        // setup the initial scheduling queue
+void display_scheduling_info(); // displays service check scheduling information
 
 // Event Queue Functions
 void schedule_new_event(int event_type, int high_priority, time_t run_time, int recurring, unsigned long event_interval, void* timing_func, int compensate_for_time_change, void* event_data, void* event_args, int event_options); // schedules a new timed event
@@ -78,8 +78,8 @@ void compensate_for_system_time_change(unsigned long last_time, unsigned long cu
 void resort_event_list(timed_event** event_list, timed_event** event_list_tail);                    // resorts event list by event run time for system time changes
 void adjust_timestamp_for_time_change(time_t last_time, time_t current_time, unsigned long time_difference, time_t* ts); // adjusts a timestamp variable for a system time change
 
-# ifdef __cplusplus
+#  ifdef __cplusplus
 }
-# endif
+#  endif // C++
 
 #endif // !CCE_EVENTS_HH

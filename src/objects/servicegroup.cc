@@ -1,5 +1,5 @@
 /*
-** Copyright 2011 Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -17,13 +17,13 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include "error.hh"
-#include "globals.hh"
-#include "skiplist.hh"
-#include "logging/logger.hh"
-#include "objects/utils.hh"
-#include "objects/servicesmember.hh"
-#include "objects/servicegroup.hh"
+#include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/logging/logger.hh"
+#include "com/centreon/engine/objects/servicegroup.hh"
+#include "com/centreon/engine/objects/servicesmember.hh"
+#include "com/centreon/engine/objects/utils.hh"
+#include "com/centreon/engine/skiplist.hh"
 
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;

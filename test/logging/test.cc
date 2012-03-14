@@ -1,5 +1,5 @@
 /*
-** Copyright 2011 Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -17,71 +17,57 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include "error.hh"
+#include "com/centreon/engine/error.hh"
 #include "test/logging/test.hh"
 
 using namespace com::centreon::engine::logging;
 
 /**************************************
- *                                     *
- *           Static Objects            *
- *                                     *
- **************************************/
+*                                     *
+*           Static Objects            *
+*                                     *
+**************************************/
 
-unsigned int test::_nb_instance = 0;
+unsigned int test::_nb_instance(0);
 
 /**************************************
- *                                     *
- *           Public Methods            *
- *                                     *
- **************************************/
+*                                     *
+*           Public Methods            *
+*                                     *
+**************************************/
 
 /**
- *  Default constructor.
+ *  Constructor.
  *
  *  @param[in] msg        The message.
  *  @param[in] type       The logging types.
  *  @param[in] verbosity  The verbosity level.
  *  @param[in] total_call The number of log are call.
  */
-test::test(std::string const& msg,
-	   unsigned long long type,
-	   unsigned int verbosity,
-	   unsigned int total_call)
+test::test(
+        std::string const& msg,
+        unsigned long long type,
+        unsigned int verbosity,
+        unsigned int total_call)
   : _msg(msg),
-    _type(type),
-    _verbosity(verbosity),
+    _nb_call(0),
     _total_call(total_call),
-    _nb_call(0) {
+    _type(type),
+    _verbosity(verbosity) {
   ++_nb_instance;
 }
 
 /**
- *  Default destructor
+ *  Destructor
  */
 test::~test() {
   --_nb_instance;
   if (_total_call != _nb_call) {
     throw (engine_error() << _total_call
-	   << " " << _nb_call
-	   << " " << _type
-	   << " " << _verbosity
-	   << " bad lob call.");
-  }
-}
-
-/**
- *  Log message.
- *
- *  @param[in] message   The message.
- *  @param[in] type      The logging types.
- *  @param[in] verbosity The verbosity level.
- */
-void test::log(char const* message,
-	       unsigned long long type,
-	       unsigned int verbosity) throw() {
-  if (message == _msg && (type & _type) && verbosity <= _verbosity) {
-    ++_nb_call;
+           << " " << _nb_call
+           << " " << _type
+           << " " << _verbosity
+           << " bad lob call.");
   }
 }
 
@@ -92,4 +78,22 @@ void test::log(char const* message,
  */
 unsigned int test::get_nb_instance() {
   return (_nb_instance);
+}
+
+/**
+ *  Log message.
+ *
+ *  @param[in] message   The message.
+ *  @param[in] type      The logging types.
+ *  @param[in] verbosity The verbosity level.
+ */
+void test::log(
+             char const* message,
+             unsigned long long type,
+             unsigned int verbosity) throw () {
+  if ((message == _msg)
+      && (type & _type)
+      && (verbosity <= _verbosity))
+    ++_nb_call;
+  return ;
 }

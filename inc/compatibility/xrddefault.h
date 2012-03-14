@@ -1,5 +1,5 @@
 /*
-** Copyright 2011      Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -18,8 +18,8 @@
 */
 
 #ifndef CCE_COMPATIBILITY_XRDDEFAULT_H
-# define CCE_COMPATIBILITY_XRDDEFAULT_H
+#  define CCE_COMPATIBILITY_XRDDEFAULT_H
 
-# include "xrddefault.hh"
+#  include "com/centreon/engine/xrddefault.hh"
 
-#endif /* !CCE_COMPATIBILITY_XRDDEFAULT_H */
+#endif // !CCE_COMPATIBILITY_XRDDEFAULT_H

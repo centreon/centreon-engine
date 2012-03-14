@@ -1,6 +1,6 @@
 /*
 ** Copyright 1999-2006 Ethan Galstad
-** Copyright 2011      Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -18,13 +18,11 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-/*********** COMMON HEADER FILES ***********/
-
-#include "broker.hh"
-#include "globals.hh"
-#include "xrddefault.hh"      /* default routines */
-#include "logging/logger.hh"
-#include "sretention.hh"
+#include "com/centreon/engine/broker.hh"
+#include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/logging/logger.hh"
+#include "com/centreon/engine/sretention.hh"
+#include "com/centreon/engine/xrddefault.hh"
 
 using namespace com::centreon::engine::logging;
 

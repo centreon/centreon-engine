@@ -1,6 +1,6 @@
 /*
 ** Copyright 1999-2010 Ethan Galstad
-** Copyright 2011      Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -18,9 +18,9 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include "logging/logger.hh"
-#include "macros/process.hh"
-#include "macros.hh"
+#include "com/centreon/engine/logging/logger.hh"
+#include "com/centreon/engine/macros.hh"
+#include "com/centreon/engine/macros/process.hh"
 
 using namespace com::centreon::engine::logging;
 

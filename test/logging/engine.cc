@@ -1,5 +1,5 @@
 /*
-** Copyright 2011 Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -17,23 +17,23 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <exception>
 #include <QCoreApplication>
 #include <QDebug>
-#include <exception>
 #include <time.h>
-#include "test/unittest.hh"
+#include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/logging/engine.hh"
 #include "test/logging/test.hh"
-#include "logging/engine.hh"
-#include "error.hh"
+#include "test/unittest.hh"
 
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;
 
 /**************************************
- *                                     *
- *           Global Objects            *
- *                                     *
- **************************************/
+*                                     *
+*           Global Objects            *
+*                                     *
+**************************************/
 
 static const unsigned int NB_LOG_TYPE  = 21;
 static const unsigned int NB_LOG_LEVEL = 3;
@@ -41,10 +41,10 @@ static const unsigned int NB_DBG_TYPE  = 18;
 static const char*        LOG_MESSAGE  = "~!@#$%^&*()_+09/qwerty \n";
 
 /**************************************
- *                                     *
- *         Exported Functions          *
- *                                     *
- **************************************/
+*                                     *
+*         Exported Functions          *
+*                                     *
+**************************************/
 
 /**
  *  Check the engine working.

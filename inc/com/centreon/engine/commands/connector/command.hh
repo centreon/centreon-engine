@@ -1,5 +1,5 @@
 /*
-** Copyright 2011 Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -18,105 +18,106 @@
 */
 
 #ifndef CCE_COMMANDS_CONNECTOR_COMMAND_HH
-# define CCE_COMMANDS_CONNECTOR_COMMAND_HH
+#  define CCE_COMMANDS_CONNECTOR_COMMAND_HH
 
-# include <QTimer>
-# include <QMutex>
-# include <QHash>
-// # include <QProcess>
-# include <QStringList>
-# include "commands/command.hh"
-# include "commands/basic_process.hh"
-# include "commands/connector/execute_query.hh"
+#  include <QHash>
+#  include <QMutex>
+#  include <QStringList>
+#  include <QTimer>
+#  include "com/centreon/engine/commands/basic_process.hh"
+#  include "com/centreon/engine/commands/command.hh"
+#  include "com/centreon/engine/commands/connector/execute_query.hh"
 
 namespace                              com {
   namespace                            centreon {
     namespace                          engine {
       namespace                        commands {
-	namespace                      connector {
-	/**
-	 *  @class command commands/connector/command.hh
-	 *  @brief Command is a specific implementation of commands::command.
-	 *
-	 *  Command is a specific implementation of commands::command who
-	 *  provide connector, is more efficiente that a raw command.
-	 */
-	  class                        command : public commands::command {
-	    Q_OBJECT
-	  public:
-	                               command(QString const& connector_name,
-                                               QString const& connector_line,
-                                               QString const& command_name,
-					       QString const& command_line);
-	                               command(command const& right);
-	                               ~command() throw();
+        namespace                      connector {
+        /**
+         *  @class command commands/connector/command.hh
+         *  @brief Command is a specific implementation of commands::command.
+         *
+         *  Command is a specific implementation of commands::command who
+         *  provide connector, is more efficiente that a raw command.
+         */
+          class                        command : public commands::command {
+            Q_OBJECT
 
-	    command&                   operator=(command const& right);
+          public:
+                                       command(
+                                         QString const& connector_name,
+                                         QString const& connector_line,
+                                         QString const& command_name,
+                                         QString const& command_line);
+                                       command(command const& right);
+                                       ~command() throw();
 
-	    commands::command*         clone() const;
+            command&                   operator=(command const& right);
 
-	    unsigned long              run(QString const& processed_cmd,
-					   nagios_macros const& macros,
-					   unsigned int timeout);
+            commands::command*         clone() const;
 
-	    void                       run(QString const& processed_cmd,
-					   nagios_macros const& macros,
-					   unsigned int timeout,
-					   result& res);
+            unsigned long              run(QString const& processed_cmd,
+                                           nagios_macros const& macros,
+                                           unsigned int timeout);
 
-	    QString const&             get_connector_name() const throw();
-	    QString const&             get_connector_line() const throw();
+            void                       run(QString const& processed_cmd,
+                                           nagios_macros const& macros,
+                                           unsigned int timeout,
+                                           result& res);
 
-	    unsigned long              get_max_check_for_restart() throw();
-	    void                       set_max_check_for_restart(unsigned long value) throw();
+            QString const&             get_connector_name() const throw();
+            QString const&             get_connector_line() const throw();
 
-	  signals:
-	    void                       _wait_ending();
-	    void                       _process_ending();
+            unsigned long              get_max_check_for_restart() throw();
+            void                       set_max_check_for_restart(unsigned long value) throw();
 
-	  private slots:
-	    void                       _timeout();
-	    void                       _state_change(QProcess::ProcessState new_state);
-	    void                       _ready_read();
+          signals:
+            void                       _wait_ending();
+            void                       _process_ending();
 
-	  private:
-	    struct                     request_info {
-	      QSharedPointer<request>  req;
-	      QDateTime                start_time;
-	      unsigned int             timeout;
-	      bool                     waiting_result;
-	    };
+          private slots:
+            void                       _timeout();
+            void                       _state_change(QProcess::ProcessState new_state);
+            void                       _ready_read();
 
-	    void                       _exit();
-	    void                       _start();
+          private:
+            struct                     request_info {
+              QSharedPointer<request>  req;
+              QDateTime                start_time;
+              unsigned int             timeout;
+              bool                     waiting_result;
+            };
 
-	    void                       _req_quit_r(request* req);
-	    void                       _req_version_r(request* req);
-	    void                       _req_execute_r(request* req);
-	    void                       _req_error_r(request* req);
+            void                       _exit();
+            void                       _start();
 
-	    QByteArray                 _read_data;
-	    QMutex                     _mutex;
-	    QString                    _connector_name;
-	    QString                    _connector_line;
-	    QSharedPointer<basic_process>
+            void                       _req_quit_r(request* req);
+            void                       _req_version_r(request* req);
+            void                       _req_execute_r(request* req);
+            void                       _req_error_r(request* req);
+
+            QByteArray                 _read_data;
+            QMutex                     _mutex;
+            QString                    _connector_name;
+            QString                    _connector_line;
+            QSharedPointer<basic_process>
                                        _process;
-	    QHash<unsigned long, request_info>
-	                               _queries;
-	    QHash<unsigned long, result>
-	                               _results;
-	    QHash<request::e_type, void (command::*)(request*)>
-	                               _req_func;
-	    unsigned long              _max_check_for_restart;
-	    unsigned long              _nbr_check;
-	    bool                       _is_good_version;
-	    bool                       _active_timer;
-	    bool                       _is_exiting;
+            QHash<unsigned long, request_info>
+                                       _queries;
+            QHash<unsigned long, result>
+                                       _results;
+            QHash<request::e_type, void (command::*)(request*)>
+                                       _req_func;
+            unsigned long              _max_check_for_restart;
+            unsigned long              _nbr_check;
+            bool                       _is_good_version;
+            bool                       _active_timer;
+            bool                       _is_exiting;
             bool                       _state_already_change;
 
-	    static const unsigned long DEFAULT_MAX_CHECK = 10000;
-	  };
-	}
+            static const unsigned long DEFAULT_MAX_CHECK = 10000;
+          };
+        }
       }
     }
   }

@@ -23,10 +23,6 @@
 
 #  include <pthread.h>
 
-#  ifdef __cplusplus
-extern "C" {
-#  endif
-
 // Module version information.
 #  define NEB_API_VERSION(x) int __neb_api_version = x;
 #  define CURRENT_NEB_API_VERSION 3
@@ -52,8 +48,15 @@ extern "C" {
 #  define NEBMODULE_ERROR_BAD_INIT 4
 #  define NEBMODULE_ERROR_API_VERSION 5
 
-// Module functions.
+#  ifdef __cplusplus
+extern "C" {
+#  endif // C++
+
 int neb_set_module_info(void* handle, int type, char const* data);
+
+#  ifdef __cplusplus
+}
+#  endif // C++
 
 /**
  *  @struct nebmodule nebmodules.hh "com/centreon/engine/nebmodules.hh"
@@ -73,9 +76,5 @@ typedef struct             nebmodule_struct {
   pthread_t                thread_id;
   struct nebmodule_struct* next;
 }                          nebmodule;
-
-#  ifdef __cplusplus
-}
-#  endif
 
 #endif // !CCE_NEBMODULES_HH

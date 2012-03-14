@@ -17,8 +17,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include "logging/engine.hh"
-#include "configuration/applier/logging.hh"
+#include "com/centreon/engine/configuration/applier/logging.hh"
+#include "com/centreon/engine/logging/engine.hh"
 
 using namespace com::centreon::engine::logging;
 using namespace com::centreon::engine::configuration::applier;

@@ -1,5 +1,5 @@
 /*
-** Copyright 2011 Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -19,15 +19,15 @@
 
 #include <QDebug>
 #include <exception>
-#include "error.hh"
-#include "utils.hh"
-#include "macros.hh"
-#include "objects/hostescalation.hh"
-#include "objects/timeperiod.hh"
-#include "objects/contact.hh"
-#include "objects/contactgroup.hh"
-#include "objects/host.hh"
-#include "create_object.hh"
+#include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/macros.hh"
+#include "com/centreon/engine/objects/contact.hh"
+#include "com/centreon/engine/objects/contactgroup.hh"
+#include "com/centreon/engine/objects/host.hh"
+#include "com/centreon/engine/objects/hostescalation.hh"
+#include "com/centreon/engine/objects/timeperiod.hh"
+#include "com/centreon/engine/utils.hh"
+#include "test/objects/create_object.hh"
 
 using namespace com::centreon::engine::objects;
 using namespace test::objects;

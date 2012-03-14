@@ -1,5 +1,5 @@
 /*
-** Copyright 2011 Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -18,34 +18,34 @@
 */
 
 #ifndef TEST_OBJECTS_RELEASE_HH
-# define TEST_OBJECTS_RELEASE_HH
+#  define TEST_OBJECTS_RELEASE_HH
 
-# include <QList>
-# include <algorithm>
-# include "error.hh"
-# include "globals.hh"
-# include "objects/command.hh"
-# include "objects/contact.hh"
-# include "objects/contactgroup.hh"
-# include "objects/host.hh"
-# include "objects/hostdependency.hh"
-# include "objects/hostescalation.hh"
-# include "objects/hostgroup.hh"
-# include "objects/service.hh"
-# include "objects/servicedependency.hh"
-# include "objects/serviceescalation.hh"
-# include "objects/servicegroup.hh"
-# include "objects/timeperiod.hh"
-# include "objects/commandsmember.hh"
-# include "objects/hostsmember.hh"
-# include "objects/servicesmember.hh"
-# include "objects/contactsmember.hh"
-# include "objects/contactgroupsmember.hh"
-# include "objects/customvariablesmember.hh"
-# include "objects/timerange.hh"
-# include "objects/daterange.hh"
-# include "objects/timeperiodexclusion.hh"
-# include "objects/objectlist.hh"
+#  include <algorithm>
+#  include <QList>
+#  include "com/centreon/engine/error.hh"
+#  include "com/centreon/engine/globals.hh"
+#  include "com/centreon/engine/objects/command.hh"
+#  include "com/centreon/engine/objects/commandsmember.hh"
+#  include "com/centreon/engine/objects/contact.hh"
+#  include "com/centreon/engine/objects/contactgroup.hh"
+#  include "com/centreon/engine/objects/contactgroupsmember.hh"
+#  include "com/centreon/engine/objects/contactsmember.hh"
+#  include "com/centreon/engine/objects/customvariablesmember.hh"
+#  include "com/centreon/engine/objects/daterange.hh"
+#  include "com/centreon/engine/objects/host.hh"
+#  include "com/centreon/engine/objects/hostdependency.hh"
+#  include "com/centreon/engine/objects/hostescalation.hh"
+#  include "com/centreon/engine/objects/hostgroup.hh"
+#  include "com/centreon/engine/objects/hostsmember.hh"
+#  include "com/centreon/engine/objects/objectlist.hh"
+#  include "com/centreon/engine/objects/service.hh"
+#  include "com/centreon/engine/objects/servicedependency.hh"
+#  include "com/centreon/engine/objects/serviceescalation.hh"
+#  include "com/centreon/engine/objects/servicegroup.hh"
+#  include "com/centreon/engine/objects/servicesmember.hh"
+#  include "com/centreon/engine/objects/timeperiod.hh"
+#  include "com/centreon/engine/objects/timeperiodexclusion.hh"
+#  include "com/centreon/engine/objects/timerange.hh"
 
 namespace test {
   namespace objects {

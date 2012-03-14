@@ -17,36 +17,36 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <exception>
 #include <QCoreApplication>
 #include <QDebug>
-#include <exception>
+#include "com/centreon/engine/broker.hh"
+#include "com/centreon/engine/broker/loader.hh"
+#include "com/centreon/engine/common.hh"
+#include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/logging/broker.hh"
+#include "com/centreon/engine/logging/engine.hh"
+#include "com/centreon/engine/logging/object.hh"
 #include "test/unittest.hh"
-#include "broker.hh"
-#include "broker/loader.hh"
-#include "common.hh"
-#include "error.hh"
-#include "globals.hh"
-#include "logging/engine.hh"
-#include "logging/broker.hh"
-#include "logging/object.hh"
 
 using namespace com::centreon::engine;
 
 /**************************************
- *                                     *
- *           Global Objects            *
- *                                     *
- **************************************/
+*                                     *
+*           Global Objects            *
+*                                     *
+**************************************/
 
 static const unsigned int NB_DBG_TYPE  = 18;
 static const unsigned int NB_LOG_TYPE  = 21;
 static const char*        LOG_MESSAGE  = "~!@#$%^&*()_+09/qwerty \n";
 
 /**************************************
- *                                     *
- *         Exported Functions          *
- *                                     *
- **************************************/
+*                                     *
+*         Exported Functions          *
+*                                     *
+**************************************/
 
 /**
  *  Check the logging broker working.

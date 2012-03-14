@@ -1,6 +1,6 @@
 /*
 ** Copyright 2002-2006 Ethan Galstad
-** Copyright 2011      Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -19,19 +19,19 @@
 */
 
 #ifndef CCE_SRETENTION_HH
-# define CCE_SRETENTION_HH
+#  define CCE_SRETENTION_HH
 
-# ifdef __cplusplus
+#  ifdef __cplusplus
 extern "C" {
-# endif
+#  endif // C++
 
 int initialize_retention_data(char* config_file);
 int cleanup_retention_data(char* config_file);
 int save_state_information(int autosave); // saves all host and state information
 int read_initial_state_information(void); // reads in initial host and state information
 
-# ifdef __cplusplus
+#  ifdef __cplusplus
 }
-# endif
+#  endif // C++
 
 #endif // !CCE_SRETENTION_HH

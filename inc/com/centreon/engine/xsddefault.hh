@@ -1,6 +1,6 @@
 /*
 ** Copyright 1999-2006 Ethan Galstad
-** Copyright 2011      Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -19,11 +19,11 @@
 */
 
 #ifndef CCE_XSDDEFAULT_HH
-# define CCE_XSDDEFAULT_HH
+#  define CCE_XSDDEFAULT_HH
 
-# ifdef __cplusplus
+#  ifdef __cplusplus
 extern "C" {
-# endif
+#  endif // C++
 
 int xsddefault_initialize_status_data(char* config_file);
 int xsddefault_cleanup_status_data(char* config_file, int delete_status_data);
@@ -32,8 +32,8 @@ int xsddefault_save_status_data(void);
 int xsddefault_grab_config_info(char* config_file);
 int xsddefault_grab_config_directives(char* input);
 
-# ifdef __cplusplus
+#  ifdef __cplusplus
 }
-# endif
+#  endif // C++
 
 #endif // !CCE_XSDDEFAULT_HH

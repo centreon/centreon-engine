@@ -1,6 +1,6 @@
 /*
 ** Copyright 2002-2006 Ethan Galstad
-** Copyright 2011      Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -19,17 +19,17 @@
 */
 
 #ifndef CCE_FLAPPING_HH
-# define CCE_FLAPPING_HH
+#  define CCE_FLAPPING_HH
 
-# include "objects.hh"
-
-# ifdef __cplusplus
-extern "C" {
-# endif
+#  include "com/centreon/engine/objects.hh"
 
 // Flapping Types
-# define HOST_FLAPPING    0
-# define SERVICE_FLAPPING 1
+#  define HOST_FLAPPING    0
+#  define SERVICE_FLAPPING 1
+
+#  ifdef __cplusplus
+extern "C" {
+#  endif // C++
 
 // Flap Detection Functions
 void check_for_service_flapping(service* svc, int update, int allow_flapstart_notification);               // determines whether or not a service is "flapping" between states
@@ -47,8 +47,8 @@ void enable_service_flap_detection(service* svc);          // enables flap detec
 void disable_service_flap_detection(service* svc);         // disables flap detection for a particular service
 void handle_service_flap_detection_disabled(service* svc); // handles the details when flap detection is disabled globally or on a per-service basis
 
-# ifdef __cplusplus
+#  ifdef __cplusplus
 }
-# endif
+#  endif // C++
 
 #endif // !CCE_FLAPPING_HH

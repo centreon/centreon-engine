@@ -1,6 +1,6 @@
 /*
 ** Copyright 1999-2008 Ethan Galstad
-** Copyright 2011      Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -19,37 +19,33 @@
 */
 
 #ifndef CCE_OBJECTS_HH
-# define CCE_OBJECTS_HH
+#  define CCE_OBJECTS_HH
 
-# include <sys/time.h>
-# include "common.hh"
-
-# ifdef __cplusplus
-extern "C" {
-# endif
+#  include <time.h>
+#  include "com/centreon/engine/common.hh"
 
 // Current Object Revision
-# define CURRENT_OBJECT_STRUCTURE_VERSION 307 // increment when changes are made to data structures...
+#  define CURRENT_OBJECT_STRUCTURE_VERSION 307 // increment when changes are made to data structures...
 
 // Object Size Limits
-# define MAX_STATE_HISTORY_ENTRIES        21   // max number of old states to keep track of for flap detection
-# define MAX_CONTACT_ADDRESSES            6    // max number of custom addresses a contact can have
+#  define MAX_STATE_HISTORY_ENTRIES        21   // max number of old states to keep track of for flap detection
+#  define MAX_CONTACT_ADDRESSES            6    // max number of custom addresses a contact can have
 
 // Skip Lists
-# define NUM_OBJECT_SKIPLISTS             12
+#  define NUM_OBJECT_SKIPLISTS             12
 
-# define HOST_SKIPLIST                    0
-# define SERVICE_SKIPLIST                 1
-# define COMMAND_SKIPLIST                 2
-# define TIMEPERIOD_SKIPLIST              3
-# define CONTACT_SKIPLIST                 4
-# define CONTACTGROUP_SKIPLIST            5
-# define HOSTGROUP_SKIPLIST               6
-# define SERVICEGROUP_SKIPLIST            7
-# define HOSTDEPENDENCY_SKIPLIST          8
-# define SERVICEDEPENDENCY_SKIPLIST       9
-# define HOSTESCALATION_SKIPLIST          10
-# define SERVICEESCALATION_SKIPLIST       11
+#  define HOST_SKIPLIST                    0
+#  define SERVICE_SKIPLIST                 1
+#  define COMMAND_SKIPLIST                 2
+#  define TIMEPERIOD_SKIPLIST              3
+#  define CONTACT_SKIPLIST                 4
+#  define CONTACTGROUP_SKIPLIST            5
+#  define HOSTGROUP_SKIPLIST               6
+#  define SERVICEGROUP_SKIPLIST            7
+#  define HOSTDEPENDENCY_SKIPLIST          8
+#  define SERVICEDEPENDENCY_SKIPLIST       9
+#  define HOSTESCALATION_SKIPLIST          10
+#  define SERVICEESCALATION_SKIPLIST       11
 
 // Data Structures
 typedef struct host_struct host;
@@ -569,6 +565,10 @@ typedef struct host_cursor_struct {
   host*        current_host_pointer;
 }              host_cursor;
 
+#  ifdef __cplusplus
+extern "C" {
+#  endif // C++
+
 // Functions
 int read_object_config_data(char const* main_config_file, int options, int cache, int precache); // reads all external configuration data of specific types
 
@@ -694,8 +694,8 @@ int remove_hostescalation_by_id(char const* host_name);
 int remove_hostdependency_by_id(char const* host_name, char const* dependency_name);
 int remove_timeperiod_by_id(char const* name);
 
-# ifdef __cplusplus
+#  ifdef __cplusplus
 }
-# endif
+#  endif // C++
 
 #endif // !CCE_OBJECTS_HH

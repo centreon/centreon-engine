@@ -1,5 +1,5 @@
 /*
-** Copyright 2011 Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -18,51 +18,52 @@
 */
 
 #include <QStringList>
-#include "error.hh"
-#include "commands/connector/error_response.hh"
+#include "com/centreon/engine/commands/connector/error_response.hh"
+#include "com/centreon/engine/error.hh"
 
 using namespace com::centreon::engine::commands::connector;
 
+/**************************************
+*                                     *
+*           Public Methods            *
+*                                     *
+**************************************/
+
 /**
- *  Default constructor.
+ *  Constructor.
  *
- *  @param[in] message   The error message.
- *  @param[in] code The exit code value.
+ *  @param[in] message The error message.
+ *  @param[in] code    The exit code value.
  */
 error_response::error_response(QString const& message, e_code code)
-  : request(request::error_r), _message(message), _code(code) {
-
-}
+  : request(request::error_r), _code(code), _message(message) {}
 
 /**
- *  Default copy constructor.
+ *  Copy constructor.
  *
- *  @param[in] right The class to copy.
+ *  @param[in] right Object to copy.
  */
 error_response::error_response(error_response const& right)
   : request(right) {
-  operator=(right);
+  _internal_copy(right);
 }
 
 /**
- *  Default destructor.
+ *  Destructor.
  */
-error_response::~error_response() throw() {
-
-}
+error_response::~error_response() throw () {}
 
 /**
- *  Default copy operator.
+ *  Assignment operator.
  *
- *  @param[in] right The class to copy.
+ *  @param[in] right Object to copy.
  *
  *  @return This object.
  */
 error_response& error_response::operator=(error_response const& right) {
   if (this != &right) {
     request::operator=(right);
-    _message = right._message;
-    _code = right._code;
+    _internal_copy(right);
   }
   return (*this);
 }
@@ -72,12 +73,13 @@ error_response& error_response::operator=(error_response const& right) {
  *
  *  @param[in] right The object to compare.
  *
- *  @return True if object have the same value.
+ *  @return True if objects have the same value.
  */
-bool error_response::operator==(error_response const& right) const throw() {
-  return (request::operator==(right) == true
-	  && _message == right._message
-	  && _code == right._code);
+bool error_response::operator==(
+                       error_response const& right) const throw () {
+  return (request::operator==(right)
+          && (_code == right._code)
+          && (_message == right._message));
 }
 
 /**
@@ -85,10 +87,22 @@ bool error_response::operator==(error_response const& right) const throw() {
  *
  *  @param[in] right The object to compare.
  *
- *  @return True if object have the different value.
+ *  @return True if objects have different values.
  */
-bool error_response::operator!=(error_response const& right) const throw() {
+bool error_response::operator!=(
+                       error_response const& right) const throw () {
   return (!operator==(right));
+}
+
+/**
+ *  Create the data with the request information.
+ *
+ *  @return The data request.
+ */
+QByteArray error_response::build() {
+  return (QByteArray().setNum(_id) + '\0' +
+          QByteArray().setNum(_code) + '\0' +
+          _message.toAscii() + cmd_ending());
 }
 
 /**
@@ -101,14 +115,21 @@ request* error_response::clone() const {
 }
 
 /**
- *  Create the data with the request information.
+ *  Get the code error of connector.
  *
- *  @return The data request.
+ *  @return The code value.
  */
-QByteArray error_response::build() {
-  return (QByteArray().setNum(_id) + '\0' +
-	  QByteArray().setNum(_code) + '\0' +
-	  _message.toAscii() + cmd_ending());
+error_response::e_code error_response::get_code() const throw () {
+  return (_code);
+}
+
+/**
+ *  Get the error message.
+ *
+ *  @return The error message.
+ */
+QString const& error_response::get_message() const throw () {
+  return (_message);
 }
 
 /**
@@ -141,20 +162,19 @@ void error_response::restore(QByteArray const& data) {
   }
 }
 
-/**
- *  Get the error message.
- *
- *  @return The error message.
- */
-QString const& error_response::get_message() const throw() {
-  return (_message);
-}
+/**************************************
+*                                     *
+*           Private Methods           *
+*                                     *
+**************************************/
 
 /**
- *  Get the code error of connector.
+ *  Copy internal data members.
  *
- *  @return The code value.
+ *  @param[in] right Object to copy.
  */
-error_response::e_code error_response::get_code() const throw() {
-  return (_code);
+void error_response::_internal_copy(error_response const& right) {
+  _code = right._code;
+  _message = right._message;
+  return ;
 }

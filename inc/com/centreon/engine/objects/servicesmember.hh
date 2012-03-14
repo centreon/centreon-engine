@@ -1,5 +1,5 @@
 /*
-** Copyright 2011 Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -18,17 +18,17 @@
 */
 
 #ifndef CCE_OBJECTS_SERVICESMEMBER_HH
-# define CCE_OBJECTS_SERVICESMEMBER_HH
+#  define CCE_OBJECTS_SERVICESMEMBER_HH
 
-# include "objects.hh"
+#  include "com/centreon/engine/objects.hh"
 
-# ifdef __cplusplus
+#  ifdef __cplusplus
 extern "C" {
-# endif
+#  endif // C++
 
-  servicesmember const* release_servicesmember(servicesmember const* obj);
+servicesmember const* release_servicesmember(servicesmember const* obj);
 
-# ifdef __cplusplus
+#  ifdef __cplusplus
 }
 
 namespace                     com {
@@ -40,6 +40,6 @@ namespace                     com {
     }
   }
 }
-# endif
+#  endif // C++
 
 #endif // !CCE_OBJECTS_SERVICESMEMBER_HH

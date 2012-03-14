@@ -18,15 +18,15 @@
 */
 
 #ifndef CCE_CONFIGURATION_STATE_HH
-# define CCE_CONFIGURATION_STATE_HH
+#  define CCE_CONFIGURATION_STATE_HH
 
-# include <QString>
-# include <sstream>
-# include <string>
-# include <map>
+#  include <map>
+#  include <QString>
+#  include <sstream>
+#  include <string>
+#  include "com/centreon/engine/error.hh"
 
-# include "error.hh"
-
+// Forward declaration.
 struct nagios_macros;
 
 namespace                   com {

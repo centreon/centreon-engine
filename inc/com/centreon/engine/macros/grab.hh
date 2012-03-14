@@ -1,6 +1,6 @@
 /*
 ** Copyright 1999-2010 Ethan Galstad
-** Copyright 2011      Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -18,14 +18,14 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef CCE_MACROS_GRAB_HH_
-# define CCE_MACROS_GRAB_HH_
+#ifndef CCE_MACROS_GRAB_HH
+#  define CCE_MACROS_GRAB_HH
 
-# include <iomanip>
-# include <sstream>
-# include <time.h>
-# include "macros/process.hh"
-# include "shared.hh"
+#  include <iomanip>
+#  include <sstream>
+#  include <time.h>
+#  include "com/centreon/engine/macros/process.hh"
+#  include "com/centreon/engine/shared.hh"
 
 namespace        com {
   namespace      centreon {
@@ -169,4 +169,4 @@ namespace        com {
   }
 }
 
-#endif /* !CCE_MACROS_GRAB_HH_ */
+#endif // !CCE_MACROS_GRAB_HH

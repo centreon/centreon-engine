@@ -1,5 +1,5 @@
 /*
-** Copyright 2011 Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -18,39 +18,40 @@
 */
 
 #ifndef CCE_OBJECTS_SERVICEESCALATION_HH
-# define CCE_OBJECTS_SERVICEESCALATION_HH
+#  define CCE_OBJECTS_SERVICEESCALATION_HH
 
-# ifdef __cplusplus
-#  include <QVector>
-# endif
-# include "objects.hh"
+#  include "com/centreon/engine/objects.hh"
 
-# ifdef __cplusplus
+#  ifdef __cplusplus
+#    include <QVector>
+
 extern "C" {
-# endif
+#  endif // C++
 
-  bool link_serviceescalation(serviceescalation* obj,
-                              contact** contacts,
-                              contactgroup** contactgroups,
-                              timeperiod* escalation_period);
-  void release_serviceescalation(serviceescalation const* obj);
+bool link_serviceescalation(
+       serviceescalation* obj,
+       contact** contacts,
+       contactgroup** contactgroups,
+       timeperiod* escalation_period);
+void release_serviceescalation(serviceescalation const* obj);
 
-# ifdef __cplusplus
+#  ifdef __cplusplus
 }
 
 namespace       com {
   namespace     centreon {
     namespace   engine {
       namespace objects {
-        void    link(serviceescalation* obj,
-                     QVector<contact*> const& contacts = QVector<contact*>(),
-                     QVector<contactgroup*> const& contactgroups = QVector<contactgroup*>(),
-                     timeperiod* escalation_period = NULL);
+        void    link(
+                  serviceescalation* obj,
+                  QVector<contact*> const& contacts = QVector<contact*>(),
+                  QVector<contactgroup*> const& contactgroups = QVector<contactgroup*>(),
+                  timeperiod* escalation_period = NULL);
         void    release(serviceescalation const* obj);
       }
     }
   }
 }
-# endif
+#  endif // C++
 
 #endif // !CCE_OBJECTS_SERVICEESCALATION_HH

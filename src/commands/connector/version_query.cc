@@ -1,5 +1,5 @@
 /*
-** Copyright 2011 Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -18,18 +18,15 @@
 */
 
 #include <QStringList>
-#include "error.hh"
-#include "commands/connector/version_query.hh"
+#include "com/centreon/engine/commands/connector/version_query.hh"
+#include "com/centreon/engine/error.hh"
 
 using namespace com::centreon::engine::commands::connector;
 
 /**
  *  Default constructor.
  */
-version_query::version_query()
-  : request(request::version_q) {
-
-}
+version_query::version_query() : request(request::version_q) {}
 
 /**
  *  Default copy constructor.
@@ -44,9 +41,7 @@ version_query::version_query(version_query const& right)
 /**
  *  Default destructor.
  */
-version_query::~version_query() throw() {
-
-}
+version_query::~version_query() throw () {}
 
 /**
  *  Default copy operator.

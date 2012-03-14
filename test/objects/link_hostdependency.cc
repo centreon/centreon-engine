@@ -1,5 +1,5 @@
 /*
-** Copyright 2011 Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -17,14 +17,14 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <QDebug>
 #include <exception>
-#include "error.hh"
-#include "utils.hh"
-#include "macros.hh"
-#include "objects/hostdependency.hh"
-#include "objects/timeperiod.hh"
-#include "create_object.hh"
+#include <QDebug>
+#include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/macros.hh"
+#include "com/centreon/engine/objects/hostdependency.hh"
+#include "com/centreon/engine/objects/timeperiod.hh"
+#include "com/centreon/engine/utils.hh"
+#include "test/objects/create_object.hh"
 
 using namespace com::centreon::engine::objects;
 using namespace test::objects;

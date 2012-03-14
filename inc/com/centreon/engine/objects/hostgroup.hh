@@ -1,5 +1,5 @@
 /*
-** Copyright 2011 Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -18,37 +18,37 @@
 */
 
 #ifndef CCE_OBJECTS_HOSTGROUP_HH
-# define CCE_OBJECTS_HOSTGROUP_HH
+#  define CCE_OBJECTS_HOSTGROUP_HH
 
-# ifdef __cplusplus
-#  include <QVector>
-# endif
-# include "objects.hh"
+#  include "com/centreon/engine/objects.hh"
 
-# ifdef __cplusplus
+#  ifdef __cplusplus
+#    include <QVector>
 extern "C" {
-# endif
+#  endif // C++
 
-  bool link_hostgroup(hostgroup* obj,
-                      host** members,
-                      hostgroup** groups);
-  void release_hostgroup(hostgroup const* obj);
+bool link_hostgroup(
+       hostgroup* obj,
+       host** members,
+       hostgroup** groups);
+void release_hostgroup(hostgroup const* obj);
 
-# ifdef __cplusplus
+#  ifdef __cplusplus
 }
 
 namespace       com {
   namespace     centreon {
     namespace   engine {
       namespace objects {
-        void    link(hostgroup* obj,
-                     QVector<host*> const& members,
-                     QVector<hostgroup*> const& groups);
+        void    link(
+                  hostgroup* obj,
+                  QVector<host*> const& members,
+                  QVector<hostgroup*> const& groups);
         void    release(hostgroup const* obj);
       }
     }
   }
 }
-# endif
+#  endif // C++
 
 #endif // !CCE_OBJECTS_HOSTGROUP_HH

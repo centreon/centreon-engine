@@ -1,6 +1,6 @@
 /*
 ** Copyright 1999-2006 Ethan Galstad
-** Copyright 2011      Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -19,8 +19,8 @@
 */
 
 #ifndef CCE_COMPATIBILITY_XSDDEFAULT_H
-# define CCE_COMPATIBILITY_XSDDEFAULT_H
+#  define CCE_COMPATIBILITY_XSDDEFAULT_H
 
-# include "xsddefault.hh"
+#  include "com/centreon/engine/xsddefault.hh"
 
-#endif /* !CCE_COMPATIBILITY_XSDDEFAULT_H */
+#endif // !CCE_COMPATIBILITY_XSDDEFAULT_H

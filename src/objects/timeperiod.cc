@@ -1,5 +1,5 @@
 /*
-** Copyright 2011 Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -17,16 +17,16 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include "error.hh"
-#include "globals.hh"
-#include "skiplist.hh"
-#include "xodtemplate.hh"
-#include "logging/logger.hh"
-#include "objects/utils.hh"
-#include "objects/timerange.hh"
-#include "objects/daterange.hh"
-#include "objects/timeperiodexclusion.hh"
-#include "objects/timeperiod.hh"
+#include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/logging/logger.hh"
+#include "com/centreon/engine/objects/daterange.hh"
+#include "com/centreon/engine/objects/timeperiod.hh"
+#include "com/centreon/engine/objects/timeperiodexclusion.hh"
+#include "com/centreon/engine/objects/timerange.hh"
+#include "com/centreon/engine/objects/utils.hh"
+#include "com/centreon/engine/skiplist.hh"
+#include "com/centreon/engine/xodtemplate.hh"
 
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;

@@ -1,7 +1,7 @@
 /*
 ** Copyright 1999-2008 Ethan Galstad
 ** Copyright 2009-2010 Nagios Core Development Team and Community Contributors
-** Copyright 2011      Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -20,30 +20,26 @@
 */
 
 #ifndef CCE_NOTIFICATIONS_HH
-# define CCE_NOTIFICATIONS_HH
+#  define CCE_NOTIFICATIONS_HH
 
-# include <sys/time.h>
-# include "macros.hh"
-# include "objects.hh"
-
-# ifdef __cplusplus
-extern "C" {
-# endif
+#  include <sys/time.h>
+#  include "com/centreon/engine/macros.hh"
+#  include "com/centreon/engine/objects.hh"
 
 // Notification Types
-# define HOST_NOTIFICATION               0
-# define SERVICE_NOTIFICATION            1
+#  define HOST_NOTIFICATION               0
+#  define SERVICE_NOTIFICATION            1
 
 // Notification Reason Types
-# define NOTIFICATION_NORMAL             0
-# define NOTIFICATION_ACKNOWLEDGEMENT    1
-# define NOTIFICATION_FLAPPINGSTART      2
-# define NOTIFICATION_FLAPPINGSTOP       3
-# define NOTIFICATION_FLAPPINGDISABLED   4
-# define NOTIFICATION_DOWNTIMESTART      5
-# define NOTIFICATION_DOWNTIMEEND        6
-# define NOTIFICATION_DOWNTIMECANCELLED  7
-# define NOTIFICATION_CUSTOM             99
+#  define NOTIFICATION_NORMAL             0
+#  define NOTIFICATION_ACKNOWLEDGEMENT    1
+#  define NOTIFICATION_FLAPPINGSTART      2
+#  define NOTIFICATION_FLAPPINGSTOP       3
+#  define NOTIFICATION_FLAPPINGDISABLED   4
+#  define NOTIFICATION_DOWNTIMESTART      5
+#  define NOTIFICATION_DOWNTIMEEND        6
+#  define NOTIFICATION_DOWNTIMECANCELLED  7
+#  define NOTIFICATION_CUSTOM             99
 
 // NOTIFY_LIST structure
 typedef struct               notify_list_struct {
@@ -51,6 +47,9 @@ typedef struct               notify_list_struct {
   struct notify_list_struct* next;
 }                            notification;
 
+#  ifdef __cplusplus
+extern "C" {
+#  endif // C++
 
 // Notification Functions
 int service_notification(service* svc, unsigned int type, char* not_author, char* not_data, int options);       // notify all contacts about a service (problem or recovery)
@@ -72,8 +71,8 @@ time_t get_next_host_notification_time(host* hst, time_t offset);               
 notification* find_notification(contact* cntct);                                                                // finds a notification object
 int add_notification(nagios_macros* mac, contact* cntct);                                                       // adds a notification instance
 
-# ifdef __cplusplus
+#  ifdef __cplusplus
 }
-# endif
+#  endif // C++
 
 #endif // !CCE_NOTIFICATIONS_HH

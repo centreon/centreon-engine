@@ -1,7 +1,7 @@
 /*
 ** Copyright 2002-2010 Ethan Galstad
 ** Copyright 2010      Nagios Core Development Team
-** Copyright 2011      Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -20,13 +20,13 @@
 */
 
 #include <unistd.h>
-#include "globals.hh"
-#include "nebstructs.hh"
-#include "nebmods.hh"
-#include "notifications.hh"
-#include "sehandlers.hh"
-#include "flapping.hh"
-#include "broker.hh"
+#include "com/centreon/engine/broker.hh"
+#include "com/centreon/engine/flapping.hh"
+#include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/nebmods.hh"
+#include "com/centreon/engine/nebstructs.hh"
+#include "com/centreon/engine/notifications.hh"
+#include "com/centreon/engine/sehandlers.hh"
 
 /******************************************************************/
 /************************* EVENT FUNCTIONS ************************/

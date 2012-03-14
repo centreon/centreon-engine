@@ -18,15 +18,15 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <sstream>
-#include <stdlib.h>
-#include <stdio.h>
 #include <errno.h>
-#include "globals.hh"
-#include "utils.hh"
-#include "notifications.hh"
-#include "logging/logger.hh"
-#include "config.hh"
+#include <sstream>
+#include <stdio.h>
+#include <stdlib.h>
+#include "com/centreon/engine/config.hh"
+#include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/logging/logger.hh"
+#include "com/centreon/engine/notifications.hh"
+#include "com/centreon/engine/utils.hh"
 
 using namespace com::centreon::engine::logging;
 

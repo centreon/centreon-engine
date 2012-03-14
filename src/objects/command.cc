@@ -1,5 +1,5 @@
 /*
-** Copyright 2011 Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -19,13 +19,13 @@
 
 #include <QCoreApplication>
 #include <QThread>
-#include "error.hh"
-#include "globals.hh"
-#include "commands/set.hh"
-#include "commands/raw.hh"
-#include "logging/logger.hh"
-#include "objects/utils.hh"
-#include "objects/command.hh"
+#include "com/centreon/engine/commands/raw.hh"
+#include "com/centreon/engine/commands/set.hh"
+#include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/logging/logger.hh"
+#include "com/centreon/engine/objects/command.hh"
+#include "com/centreon/engine/objects/utils.hh"
 
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;

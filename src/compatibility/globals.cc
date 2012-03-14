@@ -17,8 +17,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <stddef.h>
 #include <limits.h>
+#include <stddef.h>
 #include "globals.h"
 
 // Features now handled by startup script.

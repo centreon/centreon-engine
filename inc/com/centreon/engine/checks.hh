@@ -1,6 +1,6 @@
 /*
 ** Copyright 2002-2006 Ethan Galstad
-** Copyright 2011      Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -19,22 +19,18 @@
 */
 
 #ifndef CCE_CHECKS_HH
-# define CCE_CHECKS_HH
+#  define CCE_CHECKS_HH
 
-# include <sys/time.h>
-# include "objects.hh"
+#  include <sys/time.h>
+#  include "com/centreon/engine/objects.hh"
 
-# ifdef __cplusplus
-extern "C" {
-# endif
+// Service dependency values
+#  define DEPENDENCIES_OK     0
+#  define DEPENDENCIES_FAILED 1
 
-// Service Dependency Values
-# define DEPENDENCIES_OK     0
-# define DEPENDENCIES_FAILED 1
-
-// Object Check Types
-# define SERVICE_CHECK       0
-# define HOST_CHECK          1
+// Object check types
+#  define SERVICE_CHECK       0
+#  define HOST_CHECK          1
 
 // CHECK_RESULT structure
 typedef struct                check_result_struct {
@@ -58,8 +54,12 @@ typedef struct                check_result_struct {
   struct check_result_struct* next;
 }                             check_result;
 
+#  ifdef __cplusplus
+extern "C" {
+#  endif // C++
+
 // Common Check Fucntions
-int reap_check_results(void);
+int reap_check_results();
 
 // Service Check Functions
 int run_scheduled_service_check(service* svc, int check_options, double latency);
@@ -95,8 +95,8 @@ int check_host_check_viability_3x(host* hst, int check_options, int* time_is_val
 int adjust_host_check_attempt_3x(host* hst, int is_active);
 int determine_host_reachability(host* hst);
 
-# ifdef __cplusplus
+#  ifdef __cplusplus
 }
-# endif
+#  endif // C++
 
 #endif // !CCE_CHECKS_HH

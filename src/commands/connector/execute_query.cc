@@ -1,5 +1,5 @@
 /*
-** Copyright 2011      Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -17,58 +17,57 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include "error.hh"
-#include "commands/connector/execute_query.hh"
+#include "com/centreon/engine/commands/connector/execute_query.hh"
+#include "com/centreon/engine/error.hh"
 
 using namespace com::centreon::engine::commands::connector;
+
+/**************************************
+*                                     *
+*           Public Methods            *
+*                                     *
+**************************************/
 
 /**
  *  Default constructor.
  */
-execute_query::execute_query(unsigned long cmd_id,
-			     QString const& cmd,
-			     QDateTime const& start_time,
-			     unsigned int timeout)
+execute_query::execute_query(
+                 unsigned long cmd_id,
+                 QString const& cmd,
+                 QDateTime const& start_time,
+                 unsigned int timeout)
   : request(request::execute_q),
     _cmd(cmd),
-    _start_time(start_time),
     _cmd_id(cmd_id),
-    _timeout(timeout) {
-
-}
+    _start_time(start_time),
+    _timeout(timeout) {}
 
 /**
- *  Default copy constructor.
+ *  Copy constructor.
  *
- *  @param[in] right The class to copy.
+ *  @param[in] right Object to copy.
  */
 execute_query::execute_query(execute_query const& right)
   : request(right) {
-  operator=(right);
+  _internal_copy(right);
 }
 
 /**
- *  Default destructor.
+ *  Destructor.
  */
-execute_query::~execute_query() throw() {
-
-}
+execute_query::~execute_query() throw () {}
 
 /**
- *  Default copy operator.
+ *  Assignment operator.
  *
- *  @param[in] right The class to copy.
+ *  @param[in] right Object to copy.
  *
  *  @return This object.
  */
 execute_query& execute_query::operator=(execute_query const& right) {
   if (this != &right) {
     request::operator=(right);
-
-    _cmd = right._cmd;
-    _start_time = right._start_time;
-    _id = right._id;
-    _timeout = right._timeout;
+    _internal_copy(right);
   }
   return (*this);
 }
@@ -78,14 +77,15 @@ execute_query& execute_query::operator=(execute_query const& right) {
  *
  *  @param[in] right The object to compare.
  *
- *  @return True if object have the same value.
+ *  @return True if objects have the same values.
  */
-bool execute_query::operator==(execute_query const& right) const throw() {
-  return (request::operator==(right) == true
-	  && _cmd == right._cmd
-	  && _start_time == right._start_time
-	  && _id == right._id
-	  && _timeout == right._timeout);
+bool execute_query::operator==(
+                      execute_query const& right) const throw () {
+  return (request::operator==(right)
+          && (_cmd == right._cmd)
+          && (_cmd_id == right._cmd_id)
+          && (_start_time == right._start_time)
+          && (_timeout == right._timeout));
 }
 
 /**
@@ -93,19 +93,11 @@ bool execute_query::operator==(execute_query const& right) const throw() {
  *
  *  @param[in] right The object to compare.
  *
- *  @return True if object have the different value.
+ *  @return True if objects have the different values.
  */
-bool execute_query::operator!=(execute_query const& right) const throw() {
+bool execute_query::operator!=(
+                      execute_query const& right) const throw () {
   return (!operator==(right));
-}
-
-/**
- *  Get a pointer on a copy of the same object.
- *
- *  @return Return a pointer on a copy object.
- */
-request* execute_query::clone() const {
-  return (new execute_query(*this));
 }
 
 /**
@@ -124,48 +116,12 @@ QByteArray execute_query::build() {
 }
 
 /**
- *  Restore object with the data information.
+ *  Get a pointer on a copy of the same object.
  *
- *  @param[in] data The data of the request information.
+ *  @return Return a pointer on a copy object.
  */
-void execute_query::restore(QByteArray const& data) {
-  QList<QByteArray> list = data.split('\0');
-  if (list.size() < 5) {
-    throw (engine_error() << "bad request argument.");
-  }
-
-  bool ok;
-  int id = list[0].toInt(&ok);
-  if (ok == false || id < 0 || id != _id) {
-    throw (engine_error() << "bad request id.");
-  }
-
-  _cmd_id = list[1].toULong(&ok);
-  if (ok == false) {
-    throw (engine_error() << "bad request argument, invalid cmd_id.");
-  }
-
-  _timeout = list[2].toUInt(&ok);
-  if (ok == false) {
-    throw (engine_error() << "bad request argument, invalid timeout.");
-  }
-
-  unsigned int timestamp = list[3].toUInt(&ok);
-  if (ok == false) {
-    throw (engine_error() << "bad request argument, invalid start_time.");
-  }
-  _start_time.setTime_t(timestamp);
-
-  _cmd = list[4];
-}
-
-/**
- *  Get the command line.
- *
- *  @return The command line.
- */
-QString const& execute_query::get_command() const throw() {
- return (_cmd);
+request* execute_query::clone() const {
+  return (new execute_query(*this));
 }
 
 /**
@@ -173,7 +129,7 @@ QString const& execute_query::get_command() const throw() {
  *
  *  @return The argument list.
  */
-QStringList execute_query::get_args() const throw() {
+QStringList execute_query::get_args() const throw () {
   static QString sep("\"'\t ");
   QString line = _cmd.trimmed();
   QStringList list;
@@ -194,15 +150,15 @@ QStringList execute_query::get_args() const throw() {
   for (; it != end; ++it) {
     if (c == 0 && it + 1 < end) {
       while (it->isSpace() && ((it + 1)->isSpace() || *(it + 1) == '\'' || *(it + 1) == '"'))
-	++it;
+        ++it;
       c = (sep.contains(*it) ? *it : ' ');
       ++it;
     }
 
     if (*it == '\\') {
       if (++escape % 2 == 0)
-	tmp += *it;
-      continue;
+        tmp += *it;
+      continue ;
     }
 
     if (c == *it && escape % 2 == 0) {
@@ -220,12 +176,12 @@ QStringList execute_query::get_args() const throw() {
 }
 
 /**
- *  Get the start date time.
+ *  Get the command line.
  *
- *  @return The start date time.
+ *  @return The command line.
  */
-QDateTime const& execute_query::get_start_time() const throw() {
- return (_start_time);
+QString const& execute_query::get_command() const throw () {
+  return (_cmd);
 }
 
 /**
@@ -233,8 +189,17 @@ QDateTime const& execute_query::get_start_time() const throw() {
  *
  *  @return The command id.
  */
-unsigned long execute_query::get_command_id() const throw() {
- return (_cmd_id);
+unsigned long execute_query::get_command_id() const throw () {
+  return (_cmd_id);
+}
+
+/**
+ *  Get the start date time.
+ *
+ *  @return The start date time.
+ */
+QDateTime const& execute_query::get_start_time() const throw () {
+ return (_start_time);
 }
 
 /**
@@ -242,6 +207,58 @@ unsigned long execute_query::get_command_id() const throw() {
  *
  *  @return The timeout value.
  */
-unsigned int execute_query::get_timeout() const throw() {
+unsigned int execute_query::get_timeout() const throw () {
  return (_timeout);
+}
+
+/**
+ *  Restore object with the data information.
+ *
+ *  @param[in] data The data of the request information.
+ */
+void execute_query::restore(QByteArray const& data) {
+  QList<QByteArray> list = data.split('\0');
+  if (list.size() < 5)
+    throw (engine_error() << "bad request argument");
+
+  bool ok;
+  int id = list[0].toInt(&ok);
+  if (!ok || id < 0 || id != _id)
+    throw (engine_error() << "bad request id");
+
+  _cmd_id = list[1].toULong(&ok);
+  if (!ok)
+    throw (engine_error() << "bad request argument, invalid cmd_id");
+
+  _timeout = list[2].toUInt(&ok);
+  if (!ok)
+    throw (engine_error() << "bad request argument, invalid timeout");
+
+  unsigned int timestamp = list[3].toUInt(&ok);
+  if (!ok)
+    throw (engine_error()
+           << "bad request argument, invalid start_time");
+
+  _start_time.setTime_t(timestamp);
+
+  _cmd = list[4];
+}
+
+/**************************************
+*                                     *
+*           Private Methods           *
+*                                     *
+**************************************/
+
+/**
+ *  Copy internal data members.
+ *
+ *  @param[in] right Object to copy.
+ */
+void execute_query::_internal_copy(execute_query const& right) {
+  _cmd = right._cmd;
+  _cmd_id = right._cmd_id;
+  _start_time = right._start_time;
+  _timeout = right._timeout;
+  return ;
 }

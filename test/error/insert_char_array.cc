@@ -1,5 +1,5 @@
 /*
-** Copyright 2011 Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -19,7 +19,7 @@
 
 #include <QCoreApplication>
 #include <string.h>
-#include "error.hh"
+#include "com/centreon/engine/error.hh"
 
 using namespace com::centreon::engine;
 

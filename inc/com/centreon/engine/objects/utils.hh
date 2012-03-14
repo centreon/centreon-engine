@@ -1,5 +1,5 @@
 /*
-** Copyright 2011 Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -18,12 +18,12 @@
 */
 
 #ifndef CCE_OBJECTS_UTILS_HH
-# define CCE_OBJECTS_UTILS_HH
+#  define CCE_OBJECTS_UTILS_HH
 
-# include <QVector>
-# include <QString>
-# include <QHash>
-# include "objects.hh"
+#  include <QHash>
+#  include <QString>
+#  include <QVector>
+#  include "com/centreon/engine/objects.hh"
 
 namespace             com {
   namespace           centreon {

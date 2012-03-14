@@ -1,5 +1,5 @@
 /*
-** Copyright 2011 Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -18,38 +18,34 @@
 */
 
 #ifndef CCE_COMMANDS_CONNECTOR_QUIT_QUERY_HH
-# define CCE_COMMANDS_CONNECTOR_QUIT_QUERY_HH
+#  define CCE_COMMANDS_CONNECTOR_QUIT_QUERY_HH
 
-# include "com/centreon/engine/commands/connector/request.hh"
+#  include "com/centreon/engine/commands/connector/request.hh"
+#  include "com/centreon/engine/namespace.hh"
 
-namespace               com {
-  namespace             centreon {
-    namespace           engine {
-      namespace         commands {
-	namespace       connector {
-	/**
-	 *  @class quit_query commands/connector/.hh
-	 *  @brief Quit query ask connector to exit.
-	 */
-	  class         quit_query : public request {
-	  public:
-	                quit_query();
-	                quit_query(quit_query const& right);
-	                ~quit_query() throw();
+CCE_BEGIN()
 
-	    quit_query& operator=(quit_query const& right);
-	    bool        operator==(quit_query const& right) const throw();
-	    bool        operator!=(quit_query const& right) const throw();
-
-	    request*    clone() const;
-
-	    QByteArray  build();
-	    void        restore(QByteArray const& data);
-	  };
-	}
-      }
-    }
+namespace         commands {
+  namespace       connector {
+    /**
+     *  @class quit_query commands/connector/.hh
+     *  @brief Quit query ask connector to exit.
+     */
+    class         quit_query : public request {
+    public:
+                  quit_query();
+                  quit_query(quit_query const& right);
+                  ~quit_query() throw ();
+      quit_query& operator=(quit_query const& right);
+      bool        operator==(quit_query const& right) const throw();
+      bool        operator!=(quit_query const& right) const throw();
+      QByteArray  build();
+      request*    clone() const;
+      void        restore(QByteArray const& data);
+    };
   }
 }
+
+CCE_END()
 
 #endif // !CCE_COMMANDS_CONNECTOR_QUIT_QUERY_HH

@@ -17,8 +17,8 @@
 ## <http://www.gnu.org/licenses/>.
 ##
 
-# external_cmd module is required.
-add_subdirectory("external_cmd")
+# External commands module is required.
+add_subdirectory("external_commands")
 
 # webservice module is optional.
 add_subdirectory("webservice")

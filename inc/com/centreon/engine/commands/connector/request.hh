@@ -1,5 +1,5 @@
 /*
-** Copyright 2011 Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -18,59 +18,59 @@
 */
 
 #ifndef CCE_COMMANDS_CONNECTOR_REQUEST_HH
-# define CCE_COMMANDS_CONNECTOR_REQUEST_HH
+#  define CCE_COMMANDS_CONNECTOR_REQUEST_HH
 
-# include <QByteArray>
+#  include <QByteArray>
+#  include "com/centreon/engine/namespace.hh"
 
-namespace                            com {
-  namespace                          centreon {
-    namespace                        engine {
-      namespace                      commands {
-	namespace                    connector {
-	/**
-	 *  @class request commands/connector/request.hh
-	 *  @brief Request is an abstract object, have to implement
-	 *  to communicate between engine and a connector.
-	 *
-	 *  Request is an abstract object, have to implement
-	 *  to communicate between engine and a connector.
-	 *  You hav to implement clone, build and restore methods.
-	 */
-	  class                      request {
-	  public:
-	    enum                     e_type {
-	      version_q = 0,
-	      version_r,
-	      execute_q,
-	      execute_r,
-	      quit_q,
-	      quit_r,
-	      error_r
-	    };
+CCE_BEGIN()
 
-	                             request(e_type id);
-	                             request(request const& right);
-	    virtual                  ~request() throw();
+namespace                      commands {
+  namespace                    connector {
+    /**
+     *  @class request commands/connector/request.hh
+     *  @brief Request is an abstract object, have to implement
+     *  to communicate between engine and a connector.
+     *
+     *  Request is an abstract object, have to implement
+     *  to communicate between engine and a connector.
+     *  You hav to implement clone, build and restore methods.
+     */
+    class                      request {
+    public:
+      enum                     e_type {
+        version_q = 0,
+        version_r,
+        execute_q,
+        execute_r,
+        quit_q,
+        quit_r,
+        error_r
+      };
 
-	    request&                 operator=(request const& right);
-	    bool                     operator==(request const& right) const throw();
-	    bool                     operator!=(request const& right) const throw();
+                               request(e_type id);
+                               request(request const& right);
+      virtual                  ~request() throw ();
+      request&                 operator=(request const& right);
+      bool                     operator==(
+                                 request const& right) const throw ();
+      bool                     operator!=(
+                                 request const& right) const throw ();
+      virtual QByteArray       build() = 0;
+      virtual request*         clone() const = 0;
+      static QByteArray const& cmd_ending() throw ();
+      virtual e_type           get_id() const throw ();
+      virtual void             restore(QByteArray const& data) = 0;
 
-	    static QByteArray const& cmd_ending() throw();
+    protected:
+      e_type                   _id;
 
-	    virtual e_type           get_id() const throw();
-
-	    virtual request*         clone() const = 0;
-	    virtual QByteArray       build() = 0;
-	    virtual void             restore(QByteArray const& data) = 0;
-
-	  protected:
-	    e_type                   _id;
-	  };
-	}
-      }
-    }
+    private:
+      void                     _internal_copy(request const& right);
+    };
   }
 }
+
+CCE_END()
 
 #endif // !CCE_COMMANDS_CONNECTOR_REQUEST_HH

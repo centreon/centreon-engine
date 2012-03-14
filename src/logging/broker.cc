@@ -1,5 +1,5 @@
 /*
-** Copyright 2011      Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -18,33 +18,27 @@
 */
 
 #include <string.h>
-
-#include "broker.hh"
-#include "logging/object.hh"
-#include "logging/broker.hh"
+#include "com/centreon/engine/broker.hh"
+#include "com/centreon/engine/logging/broker.hh"
+#include "com/centreon/engine/logging/object.hh"
 
 using namespace com::centreon::engine::logging;
 
 /**************************************
- *                                     *
- *           Public Methods            *
- *                                     *
- **************************************/
+*                                     *
+*           Public Methods            *
+*                                     *
+**************************************/
 
 /**
  *  Default constructor.
  */
-broker::broker()
-  : _mutex(QMutex::Recursive), _thread(NULL) {
-
-}
+broker::broker() : _mutex(QMutex::Recursive), _thread(NULL) {}
 
 /**
  *  Default destructor.
  */
-broker::~broker() throw() {
-
-}
+broker::~broker() throw () {}
 
 /**
  *  Send message to broker.
@@ -55,7 +49,7 @@ broker::~broker() throw() {
  */
 void broker::log(char const* message,
 	  unsigned long long type,
-	  unsigned int verbosity) throw() {
+	  unsigned int verbosity) throw () {
   (void)verbosity;
 
   if (message != NULL && (type & dbg_all) == 0) {

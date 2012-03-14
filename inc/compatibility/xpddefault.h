@@ -1,5 +1,5 @@
 /*
-** Copyright 2011      Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -18,9 +18,9 @@
 */
 
 #ifndef CCE_COMPATIBILITY_XPDDEFAULT_H
-# define CCE_COMPATIBILITY_XPDDEFAULT_H
+#  define CCE_COMPATIBILITY_XPDDEFAULT_H
 
-# include "objects.h"
-# include "xpddefault.hh"
+#  include "com/centreon/engine/xpddefault.hh"
+#  include "objects.h"
 
-#endif /* !CCE_COMPATIBILITY_XPDDEFAULT_H */
+#endif // !CCE_COMPATIBILITY_XPDDEFAULT_H

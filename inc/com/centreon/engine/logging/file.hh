@@ -1,5 +1,5 @@
 /*
-** Copyright 2011      Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -18,16 +18,15 @@
 */
 
 #ifndef CCE_LOGGING_FILE_HH
-# define CCE_LOGGING_FILE_HH
+#  define CCE_LOGGING_FILE_HH
 
-# include <QSharedPointer>
-# include <QFile>
-# include <QString>
-# include <QList>
-# include <QMutex>
-# include <QReadWriteLock>
-
-# include "logging/object.hh"
+#  include <QFile>
+#  include <QList>
+#  include <QMutex>
+#  include <QReadWriteLock>
+#  include <QSharedPointer>
+#  include <QString>
+#  include "com/centreon/engine/logging/object.hh"
 
 namespace                        com {
   namespace                      centreon {

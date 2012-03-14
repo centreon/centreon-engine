@@ -1,6 +1,6 @@
 /*
 ** Copyright 2000-2004 Ethan Galstad
-** Copyright 2011      Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -19,21 +19,21 @@
 */
 
 #ifndef CCE_PERFDATA_HH
-# define CCE_PERFDATA_HH
+#  define CCE_PERFDATA_HH
 
-# include "objects.hh"
+#  include "com/centreon/engine/objects.hh"
 
-# ifdef __cplusplus
+#  ifdef __cplusplus
 extern "C" {
-# endif
+#  endif // C++
 
 int initialize_performance_data(char* config_file); // initializes performance data
 int cleanup_performance_data(char* config_file);    // cleans up performance data
 int update_service_performance_data(service* svc);  // updates service performance data
 int update_host_performance_data(host* hst);        // updates host performance data
 
-# ifdef __cplusplus
+#  ifdef __cplusplus
 }
-# endif
+#  endif // C++
 
 #endif // !CCE_PERFDATA_HH

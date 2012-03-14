@@ -1,5 +1,5 @@
 /*
-** Copyright 2011 Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -18,11 +18,11 @@
 */
 
 #ifndef CCE_ERROR_HH
-# define CCE_ERROR_HH
+#  define CCE_ERROR_HH
 
-# include <QString>
-# include <exception>
-# include <string>
+#  include <exception>
+#  include <QString>
+#  include <string>
 
 namespace            com {
   namespace          centreon {
@@ -67,10 +67,10 @@ namespace            com {
   }
 }
 
-# ifdef NDEBUG
-#  define engine_error() com::centreon::engine::error()
-# else
-#  define engine_error() com::centreon::engine::error(__FILE__, __func__, __LINE__)
-# endif // !NDEBUG
+#  ifdef NDEBUG
+#    define engine_error() com::centreon::engine::error()
+#  else
+#    define engine_error() com::centreon::engine::error(__FILE__, __func__, __LINE__)
+#   endif // !NDEBUG
 
 #endif // !CCE_ERROR_HH

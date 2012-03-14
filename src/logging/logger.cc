@@ -1,5 +1,5 @@
 /*
-** Copyright 2011 Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -18,7 +18,7 @@
 */
 
 #include <QDateTime>
-#include "logging/logger.hh"
+#include "com/centreon/engine/logging/logger.hh"
 
 using namespace com::centreon::engine::logging;
 

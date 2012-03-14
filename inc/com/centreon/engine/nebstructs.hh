@@ -23,12 +23,6 @@
 
 #  include "com/centreon/engine/objects.hh"
 
-#  ifdef __cplusplus
-extern "C" {
-#  endif
-
-/****** STRUCTURES *************************/
-
 /* process data structure */
 typedef struct   nebstruct_process_struct{
   int            type;
@@ -491,9 +485,5 @@ typedef struct   nebstruct_statechange_struct{
 
   void*          object_ptr;
 }                nebstruct_statechange_data;
-
-#  ifdef __cplusplus
-}
-#  endif
 
 #endif // !CCE_NEBSTRUCTS_HH

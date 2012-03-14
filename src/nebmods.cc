@@ -1,6 +1,6 @@
 /*
 ** Copyright 2002-2008 Ethan Galstad
-** Copyright 2011      Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -18,21 +18,19 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
-#include <stdio.h>
 #include <errno.h>
-#include "globals.hh"
-#include "neberrors.hh"
-#include "utils.hh"
-#include "broker/loader.hh"
-#include "broker/handle.hh"
-#include "logging/logger.hh"
-#include "nebmods.hh"
+#include <stdio.h>
+#include <stdlib.h>
+#include "com/centreon/engine/broker/handle.hh"
+#include "com/centreon/engine/broker/loader.hh"
+#include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/logging/logger.hh"
+#include "com/centreon/engine/neberrors.hh"
+#include "com/centreon/engine/nebmods.hh"
+#include "com/centreon/engine/utils.hh"
 
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;
-
-/*#define DEBUG*/
 
 /****************************************************************************/
 /****************************************************************************/

@@ -1,6 +1,6 @@
 /*
 ** Copyright 1999-2010 Ethan Galstad
-** Copyright 2011      Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -18,24 +18,32 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef CCE_MACROS_GRAB_SERVICE_HH_
-# define CCE_MACROS_GRAB_SERVICE_HH_
+#ifndef CCE_MACROS_GRAB_SERVICE_HH
+#  define CCE_MACROS_GRAB_SERVICE_HH
 
-# include "macros/defines.hh"
-# include "objects.hh"
+#  include "com/centreon/engine/macros/defines.hh"
+#  include "com/centreon/engine/objects.hh"
 
+#  ifdef __cplusplus
 extern "C" {
-  int grab_standard_service_macro_r(nagios_macros* mac,
-        int macro_type,
-        service* svc,
-        char** output,
-        int* free_macro);
-  int grab_standard_service_macro(int macro_type,
-        service* svc,
-        char** output,
-        int* free_macro);
-  int grab_service_macros_r(nagios_macros* mac, service* svc);
-  int grab_service_macros(service* svc);
-}
+#  endif // C++
 
-#endif /* !CCE_MACROS_GRAB_SERVICE_HH_ */
+int grab_standard_service_macro_r(
+      nagios_macros* mac,
+      int macro_type,
+      service* svc,
+      char** output,
+      int* free_macro);
+int grab_standard_service_macro(
+      int macro_type,
+      service* svc,
+      char** output,
+      int* free_macro);
+int grab_service_macros_r(nagios_macros* mac, service* svc);
+int grab_service_macros(service* svc);
+
+#  ifdef __cplusplus
+}
+#  endif // C++
+
+#endif // !CCE_MACROS_GRAB_SERVICE_HH

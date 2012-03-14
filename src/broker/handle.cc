@@ -1,5 +1,5 @@
 /*
-** Copyright 2011 Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -17,71 +17,59 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include "common.hh"
-#include "nebmodules.hh"
-#include "error.hh"
-#include "logging/logger.hh"
-#include "broker/handle.hh"
+#include "com/centreon/engine/broker/handle.hh"
+#include "com/centreon/engine/common.hh"
+#include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/logging/logger.hh"
+#include "com/centreon/engine/nebmodules.hh"
 
 using namespace com::centreon::engine::broker;
 using namespace com::centreon::engine::logging;
 
 /**************************************
- *                                     *
- *           Public Methods            *
- *                                     *
- **************************************/
+*                                     *
+*           Public Methods            *
+*                                     *
+**************************************/
 
 /**
- *  Default constructor.
+ *  Constructor.
  *
  *  @param[in] filename The module filename.
- *  @param[in] args The module args.
+ *  @param[in] args     The module args.
  */
 handle::handle(QString const& filename, QString const& args)
-  : QObject(), _filename(filename), _name(filename), _args(args) {
+  : _args(args), _filename(filename), _name(filename) {
   emit event_create(this);
 }
 
 /**
- *  Default copy constructor.
+ *  Copy constructor.
  *
  *  @param[in] right The object to copy.
  */
 handle::handle(handle const& right) : QObject() {
-  operator=(right);
+  _internal_copy(right);
   emit event_create(this);
 }
 
 /**
- *  Default destructor.
+ *  Destructor.
  */
-handle::~handle() throw() {
+handle::~handle() throw () {
   emit event_destroy(this);
-  if (_handle.data() != NULL) {
-    _handle.clear();
-  }
 }
 
 /**
- *  Copy operator.
+ *  Assignment operator.
  *
  *  @param[in] right The object to copy.
  *
  *  @return This object.
  */
 handle& handle::operator=(handle const& right) {
-  if (this != &right) {
-    _author = right._author;
-    _copyright = right._copyright;
-    _description = right._description;
-    _filename = right._filename;
-    _license = right._license;
-    _name = right._name;
-    _version = right._version;
-    _args = right._args;
-    _handle = right._handle;
-  }
+  if (this != &right)
+    _internal_copy(right);
   return (*this);
 }
 
@@ -92,16 +80,16 @@ handle& handle::operator=(handle const& right) {
  *
  *  @return true or false.
  */
-bool handle::operator==(handle const& right) const throw() {
-  return (_author == right._author
-	  && _copyright == right._copyright
-	  && _description == right._description
-	  && _filename == right._filename
-	  && _license == right._license
-	  && _name == right._name
-	  && _version == right._version
-	  && _args == right._args
-	  && _handle.data() == right._handle.data());
+bool handle::operator==(handle const& right) const throw () {
+  return ((_args == right._args)
+          && (_author == right._author)
+	  && (_copyright == right._copyright)
+          && (_description == right._description)
+          && (_filename == right._filename)
+	  && (_license == right._license)
+          && (_name == right._name)
+          && (_version == right._version)
+	  && (_handle.data() == right._handle.data()));
 }
 
 /**
@@ -111,17 +99,129 @@ bool handle::operator==(handle const& right) const throw() {
  *
  *  @return true or false.
  */
-bool handle::operator!=(handle const& right) const throw() {
+bool handle::operator!=(handle const& right) const throw () {
   return (!operator==(right));
+}
+
+/**
+ *  Close and unload module.
+ */
+void handle::close() {
+  if (_handle.data() != NULL) {
+    if (_handle->isLoaded()) {
+      typedef int (*func_deinit)(int, int);
+      func_deinit deinit = (func_deinit)_handle->resolve("nebmodule_deinit");
+      if (deinit == NULL) {
+	logger(log_info_message, basic)
+          << "Cannot resolve symbole 'nebmodule_deinit' in module '"
+          << _filename << "'.";
+      }
+      else {
+	deinit(NEBMODULE_FORCE_UNLOAD, NEBMODULE_NEB_SHUTDOWN);
+      }
+      _handle->unload();
+    }
+    _handle.clear();
+  }
+  emit event_unloaded(this);
+}
+
+/**
+ *  Get the module's arguments.
+ *
+ *  @return The arguments.
+ */
+QString const& handle::get_args() const throw () {
+  return (_args);
+}
+
+/**
+ *  Get the module's author name.
+ *
+ *  @return The author name.
+ */
+QString const& handle::get_author() const throw () {
+  return (_author);
+}
+
+/**
+ *  Get the module's copyright.
+ *
+ *  @return The copyright.
+ */
+QString const& handle::get_copyright() const throw () {
+  return (_copyright);
+}
+
+/**
+ *  Get the module's description.
+ *
+ *  @return The description.
+ */
+QString const& handle::get_description() const throw () {
+  return (_description);
+}
+
+/**
+ *  Get the module's filename.
+ *
+ *  @return The filename.
+ */
+QString const& handle::get_filename() const throw () {
+  return (_filename);
+}
+
+/**
+ *  Get the handle of the module.
+ *
+ *  @return pointer on a QLibrary.
+ */
+QLibrary* handle::get_handle() const throw () {
+  return (_handle.data());
+}
+
+/**
+ *  Get the module's license.
+ *
+ *  @return The license.
+ */
+QString const& handle::get_license() const throw () {
+  return (_license);
+}
+
+/**
+ *  Get the module's name.
+ *
+ *  @return The name.
+ */
+QString const& handle::get_name() const throw () {
+  return (_name);
+}
+
+/**
+ *  Get the module's version.
+ *
+ *  @return The version.
+ */
+QString const& handle::get_version() const throw () {
+  return (_version);
+}
+
+/**
+ *  Check if the module is loaded.
+ *
+ *  @return true if the module is loaded, false otherwise.
+ */
+bool handle::is_loaded() {
+  return (_handle.data() != NULL && _handle->isLoaded());
 }
 
 /**
  *  Open and load module.
  */
 void handle::open() {
-  if (is_loaded() == true) {
-    return;
-  }
+  if (is_loaded())
+    return ;
 
   _handle = QSharedPointer<QLibrary>(new QLibrary(_filename));
   _handle->setLoadHints(QLibrary::ResolveAllSymbolsHint
@@ -161,127 +261,13 @@ void handle::open() {
  *  @param[in] args The module arguments.
  */
 void handle::open(QString const& filename, QString const& args) {
-  if (is_loaded() == true) {
-    return;
-  }
+  if (is_loaded())
+    return ;
 
   close();
   _filename = filename;
   _args = args;
   open();
-}
-
-/**
- *  Close and unload module.
- */
-void handle::close() {
-  if (_handle.data() != NULL) {
-    if (_handle->isLoaded()) {
-      typedef int (*func_deinit)(int, int);
-      func_deinit deinit = (func_deinit)_handle->resolve("nebmodule_deinit");
-      if (deinit == NULL) {
-	logger(log_info_message, basic)
-          << "Cannot resolve symbole 'nebmodule_deinit' in module '"
-          << _filename << "'.";
-      }
-      else {
-	deinit(NEBMODULE_FORCE_UNLOAD, NEBMODULE_NEB_SHUTDOWN);
-      }
-      _handle->unload();
-    }
-    _handle.clear();
-  }
-  emit event_unloaded(this);
-}
-
-/**
- *  Check if the module is loaded.
- *
- *  @return true if the module is loaded, false otherwise.
- */
-bool handle::is_loaded() {
-  return (_handle.data() != NULL && _handle->isLoaded());
-}
-
-/**
- *  Get the handle of the module.
- *
- *  @return pointer on a QLibrary.
- */
-QLibrary* handle::get_handle() const throw() {
-  return (_handle.data());
-}
-
-/**
- *  Get the module's author name.
- *
- *  @return The author name.
- */
-QString const& handle::get_author() const throw() {
-  return (_author);
-}
-
-/**
- *  Get the module's copyright.
- *
- *  @return The copyright.
- */
-QString const& handle::get_copyright() const throw() {
-  return (_copyright);
-}
-
-/**
- *  Get the module's description.
- *
- *  @return The description.
- */
-QString const& handle::get_description() const throw() {
-  return (_description);
-}
-
-/**
- *  Get the module's filename.
- *
- *  @return The filename.
- */
-QString const& handle::get_filename() const throw() {
-  return (_filename);
-}
-
-/**
- *  Get the module's license.
- *
- *  @return The license.
- */
-QString const& handle::get_license() const throw() {
-  return (_license);
-}
-
-/**
- *  Get the module's name.
- *
- *  @return The name.
- */
-QString const& handle::get_name() const throw() {
-  return (_name);
-}
-
-/**
- *  Get the module's version.
- *
- *  @return The version.
- */
-QString const& handle::get_version() const throw() {
-  return (_version);
-}
-
-/**
- *  Get the module's arguments.
- *
- *  @return The arguments.
- */
-QString const& handle::get_args() const throw() {
-  return (_args);
 }
 
 /**
@@ -344,4 +330,28 @@ void handle::set_name(QString const& name) {
 void handle::set_version(QString const& version) {
   _version = version;
   emit event_version(this);
+}
+
+/**************************************
+*                                     *
+*           Private Methods           *
+*                                     *
+**************************************/
+
+/**
+ *  Copy internal data members.
+ *
+ *  @param[in] right Object to copy.
+ */
+void handle::_internal_copy(handle const& right) {
+  _args = right._args;
+  _author = right._author;
+  _copyright = right._copyright;
+  _description = right._description;
+  _filename = right._filename;
+  _handle = right._handle;
+  _license = right._license;
+  _name = right._name;
+  _version = right._version;
+  return ;
 }

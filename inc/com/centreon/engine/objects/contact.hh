@@ -1,5 +1,5 @@
 /*
-** Copyright 2011 Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -18,48 +18,49 @@
 */
 
 #ifndef CCE_OBJECTS_CONTACT_HH
-# define CCE_OBJECTS_CONTACT_HH
+#  define CCE_OBJECTS_CONTACT_HH
 
-# ifdef __cplusplus
-#  include <QVector>
-#  include <QString>
-# endif
-# include "objects.hh"
+#  include "com/centreon/engine/objects.hh"
 
-# ifdef __cplusplus
+#  ifdef __cplusplus
+#    include <QString>
+#    include <QVector>
 extern "C" {
-# endif
+#  endif // C++
 
-  bool link_contact(contact* obj,
-                    timeperiod* host_notification_period,
-                    timeperiod* service_notification_period,
-                    contactgroup** contactgroups,
-                    command** host_notification_commands,
-                    command** service_notification_commands,
-                    char** custom_variables);
-  void release_contact(contact const* obj);
+bool link_contact(
+       contact* obj,
+       timeperiod* host_notification_period,
+       timeperiod* service_notification_period,
+       contactgroup** contactgroups,
+       command** host_notification_commands,
+       command** service_notification_commands,
+       char** custom_variables);
+void release_contact(contact const* obj);
 
-# ifdef __cplusplus
+#  ifdef __cplusplus
 }
 
 namespace       com {
   namespace     centreon {
     namespace   engine {
       namespace objects {
-        void    link(contact* obj,
-                     timeperiod* host_notification_period,
-                     timeperiod* service_notification_period,
-                     QVector<contactgroup*> const& contactgroups,
-                     QVector<command*> const& host_notification_commands,
-                     QVector<command*> const& service_notification_commands,
-                     QVector<QString> const& custom_variables);
+        bool    add_contacts_to_object(
+                  QVector<contact*> const& contacts,
+                  contactsmember** list_contact);
+        void    link(
+                  contact* obj,
+                  timeperiod* host_notification_period,
+                  timeperiod* service_notification_period,
+                  QVector<contactgroup*> const& contactgroups,
+                  QVector<command*> const& host_notification_commands,
+                  QVector<command*> const& service_notification_commands,
+                  QVector<QString> const& custom_variables);
         void    release(contact const* obj);
-        bool    add_contacts_to_object(QVector<contact*> const& contacts,
-                                       contactsmember** list_contact);
       }
     }
   }
 }
-# endif
+#  endif // C++
 
 #endif // !CCE_OBJECTS_CONTACT_HH

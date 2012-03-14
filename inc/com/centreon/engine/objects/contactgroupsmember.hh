@@ -1,5 +1,5 @@
 /*
-** Copyright 2011 Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -18,15 +18,16 @@
 */
 
 #ifndef CCE_OBJECTS_CONTACTGROUPSMEMBER_HH
-# define CCE_OBJECTS_CONTACTGROUPSMEMBER_HH
+#  define CCE_OBJECTS_CONTACTGROUPSMEMBER_HH
 
-# include "objects.hh"
+#  include "com/centreon/engine/objects.hh"
 
-# ifdef __cplusplus
+#  ifdef __cplusplus
 extern "C" {
-# endif
+#  endif // C++
 
-  contactgroupsmember const* release_contactgroupsmember(contactgroupsmember const* obj);
+contactgroupsmember const* release_contactgroupsmember(
+                             contactgroupsmember const* obj);
 
 # ifdef __cplusplus
 }
@@ -35,11 +36,12 @@ namespace                          com {
   namespace                        centreon {
     namespace                      engine {
       namespace                    objects {
-        contactgroupsmember const* release(contactgroupsmember const* obj);
+        contactgroupsmember const* release(
+                                     contactgroupsmember const* obj);
       }
     }
   }
 }
-# endif
+#  endif // C++
 
 #endif // !CCE_OBJECTS_CONTACTGROUPSMEMBER_HH

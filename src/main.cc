@@ -19,11 +19,14 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <QCoreApplication>
 #include <errno.h>
 #include <exception>
+#ifdef HAVE_GETOPT_H
+#  include <getopt.h>
+#endif // HAVE_GETOPT_H
 #include <iostream>
 #include <limits.h>
+#include <QCoreApplication>
 #include <QDir>
 #include <signal.h>
 #include <stdio.h>
@@ -33,32 +36,28 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
-#ifdef HAVE_GETOPT_H
-#  include <getopt.h>
-#endif // HAVE_GETOPT_H
+#include "com/centreon/engine/broker.hh"
+#include "com/centreon/engine/broker/compatibility.hh"
+#include "com/centreon/engine/broker/loader.hh"
+#include "com/centreon/engine/checks/checker.hh"
+#include "com/centreon/engine/commands/set.hh"
+#include "com/centreon/engine/comments.hh"
+#include "com/centreon/engine/config.hh"
+#include "com/centreon/engine/configuration/applier/logging.hh"
+#include "com/centreon/engine/downtime.hh"
+#include "com/centreon/engine/events/loop.hh"
+#include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/logging.hh"
+#include "com/centreon/engine/logging/broker.hh"
+#include "com/centreon/engine/logging/engine.hh"
+#include "com/centreon/engine/logging/logger.hh"
+#include "com/centreon/engine/nebmods.hh"
+#include "com/centreon/engine/notifications.hh"
+#include "com/centreon/engine/perfdata.hh"
+#include "com/centreon/engine/sretention.hh"
+#include "com/centreon/engine/statusdata.hh"
+#include "com/centreon/engine/utils.hh"
 #include "com/centreon/engine/version.hh"
-#include "comments.hh"
-#include "downtime.hh"
-#include "globals.hh"
-#include "statusdata.hh"
-#include "sretention.hh"
-#include "perfdata.hh"
-#include "broker.hh"
-#include "nebmods.hh"
-#include "notifications.hh"
-#include "config.hh"
-#include "utils.hh"
-#include "broker/compatibility.hh"
-#include "broker/loader.hh"
-#include "checks/checker.hh"
-#include "commands/set.hh"
-#include "configuration/applier/logging.hh"
-#include "logging.hh"
-#include "logging/logger.hh"
-#include "logging/broker.hh"
-#include "logging/engine.hh"
-#include "events/loop.hh"
-#include "compatibility/common.h"
 
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;
@@ -173,7 +172,7 @@ int main(int argc, char** argv) {
       << "\n"
       << "You should have received a copy of the GNU General Public License along\n"
       << "with Centreon Engine. If not, see <http://www.gnu.org/licenses/>.\n\n"
-      << "Centreon Engine version: " << get_program_version();
+      << "Centreon Engine version: " << CENTREON_ENGINE_VERSION_STRING;
     exit(EXIT_SUCCESS);
   }
 

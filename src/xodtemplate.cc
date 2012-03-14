@@ -19,27 +19,27 @@
 */
 
 #include <ctype.h>
-#include <sstream>
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <unistd.h>
-#include <errno.h>
 #include <dirent.h>
-#include <regex.h>
+#include <errno.h>
 #include <libgen.h>
-#include "common.hh"
-#include "globals.hh"
-#include "objects.hh"
-#include "macros.hh"
-#include "skiplist.hh"
-#include "commands/set.hh"
-#include "commands/raw.hh"
-#include "commands/connector/command.hh"
-#include "logging/logger.hh"
-#include "xodtemplate.hh"
+#include <regex.h>
+#include <sstream>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <unistd.h>
+#include "com/centreon/engine/commands/connector/command.hh"
+#include "com/centreon/engine/commands/raw.hh"
+#include "com/centreon/engine/commands/set.hh"
+#include "com/centreon/engine/common.hh"
+#include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/logging/logger.hh"
+#include "com/centreon/engine/macros.hh"
+#include "com/centreon/engine/objects.hh"
+#include "com/centreon/engine/skiplist.hh"
+#include "com/centreon/engine/xodtemplate.hh"
 
 using namespace com::centreon::engine::logging;
 

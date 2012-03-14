@@ -1,5 +1,5 @@
 /*
-** Copyright 2011 Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -17,15 +17,15 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <QCoreApplication>
 #include <iostream>
 #include <math.h>
+#include <QCoreApplication>
 #include <stdlib.h>
 #include <string.h>
-#include "test/unittest.hh"
-#include "globals.hh"
-#include "macros/grab_host.hh"
+#include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/macros/grab_host.hh"
 #include "test/macros/minimal_setup.hh"
+#include "test/unittest.hh"
 
 using namespace com::centreon::engine;
 

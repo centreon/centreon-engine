@@ -1,5 +1,5 @@
 /*
-** Copyright 2011 Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -17,8 +17,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include "logging/logger.hh"
-#include "objects/hostsmember.hh"
+#include "com/centreon/engine/logging/logger.hh"
+#include "com/centreon/engine/objects/hostsmember.hh"
 
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;

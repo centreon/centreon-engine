@@ -1,5 +1,5 @@
 /*
-** Copyright 2011      Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -18,10 +18,10 @@
 */
 
 #ifndef CCE_COMPATIBILITY_OBJECTS_H
-# define CCE_COMPATIBILITY_OBJECTS_H
+#  define CCE_COMPATIBILITY_OBJECTS_H
 
-# include "config.h"
-# include "common.h"
-# include "objects.hh"
+#  include "com/centreon/engine/objects.hh"
+#  include "common.h"
+#  include "config.h"
 
-#endif /* !CCE_COMPATIBILITY_OBJECTS_H */
+#endif // !CCE_COMPATIBILITY_OBJECTS_H

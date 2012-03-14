@@ -1,5 +1,5 @@
 /*
-** Copyright 2011      Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -18,16 +18,14 @@
 */
 
 #include <stddef.h>
-#include "hash_timed_event.hh"
+#include "com/centreon/engine/hash_timed_event.hh"
 
 using namespace com::centreon::engine;
 
 /**
  *  Default constructor.
  */
-hash_timed_event::hash_timed_event() {
-
-}
+hash_timed_event::hash_timed_event() {}
 
 /**
  *  Copy constructor
@@ -41,9 +39,7 @@ hash_timed_event::hash_timed_event(hash_timed_event const& right) {
 /**
  *  Destructor.
  */
-hash_timed_event::~hash_timed_event() {
-
-}
+hash_timed_event::~hash_timed_event() {}
 
 /**
  *  Copy operator.

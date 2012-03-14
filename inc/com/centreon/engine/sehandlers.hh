@@ -1,6 +1,6 @@
 /*
 ** Copyright 2002-2006 Ethan Galstad
-** Copyright 2011      Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -19,20 +19,20 @@
 */
 
 #ifndef CCE_SEHANDLERS_HH
-# define CCE_SEHANDLERS_HH
+#  define CCE_SEHANDLERS_HH
 
-# include "macros.hh"
-# include "objects.hh"
-
-# ifdef __cplusplus
-extern "C" {
-# endif
+#  include "com/centreon/engine/macros.hh"
+#  include "com/centreon/engine/objects.hh"
 
 // Event Handler Types
-# define HOST_EVENTHANDLER           0
-# define SERVICE_EVENTHANDLER        1
-# define GLOBAL_HOST_EVENTHANDLER    2
-# define GLOBAL_SERVICE_EVENTHANDLER 3
+#  define HOST_EVENTHANDLER           0
+#  define SERVICE_EVENTHANDLER        1
+#  define GLOBAL_HOST_EVENTHANDLER    2
+#  define GLOBAL_SERVICE_EVENTHANDLER 3
+
+#  ifdef __cplusplus
+extern "C" {
+#  endif // C++
 
 // Event Handler Functions
 int obsessive_compulsive_service_check_processor(service* svc);         // distributed monitoring craziness...
@@ -45,8 +45,8 @@ int run_global_host_event_handler(nagios_macros* mac, host* hst);       // runs 
 int run_host_event_handler(nagios_macros* mac, host* hst);              // runs the event handler for a specific host
 int handle_host_state(host* hst);                                       // top level host state handler
 
-# ifdef __cplusplus
+#  ifdef __cplusplus
 }
-# endif
+#  endif // C++
 
 #endif // !CCE_SEHANDLERS_HH

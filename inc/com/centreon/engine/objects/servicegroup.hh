@@ -1,5 +1,5 @@
 /*
-** Copyright 2011 Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -18,37 +18,38 @@
 */
 
 #ifndef CCE_OBJECTS_SERVICEGROUP_HH
-# define CCE_OBJECTS_SERVICEGROUP_HH
+#  define CCE_OBJECTS_SERVICEGROUP_HH
+
+#  include "com/centreon/engine/objects.hh"
 
 # ifdef __cplusplus
-#  include <QVector>
-#  include <QString>
-# endif
-# include "objects.hh"
-
-# ifdef __cplusplus
+#    include <QString>
+#    include <QVector>
 extern "C" {
-# endif
+#  endif // C++
 
-  bool link_servicegroup(servicegroup* obj,
-                         service** members,
-                         servicegroup** groups);
-  void release_servicegroup(servicegroup const* obj);
+bool link_servicegroup(
+       servicegroup* obj,
+       service** members,
+       servicegroup** groups);
+void release_servicegroup(servicegroup const* obj);
 
-# ifdef __cplusplus
+#  ifdef __cplusplus
 }
+
 namespace       com {
   namespace     centreon {
     namespace   engine {
       namespace objects {
-        void    link(servicegroup* obj,
-                     QVector<service*> const& members,
-                     QVector<servicegroup*> const& groups);
+        void    link(
+                  servicegroup* obj,
+                  QVector<service*> const& members,
+                  QVector<servicegroup*> const& groups);
         void    release(servicegroup const* obj);
       }
     }
   }
 }
-# endif
+#  endif // C++
 
 #endif // !CCE_OBJECTS_SERVICEGROUP_HH

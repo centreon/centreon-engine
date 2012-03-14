@@ -1,5 +1,5 @@
 /*
-** Copyright 2011 Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -20,19 +20,19 @@
 #include <QCoreApplication>
 #include <QDebug>
 #include <stdlib.h>
-#include "nebmods.hh"
-#include "nebstructs.hh"
-#include "broker.hh"
-#include "error.hh"
-#include "logging/object.hh"
+#include "com/centreon/engine/broker.hh"
+#include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/logging/object.hh"
+#include "com/centreon/engine/nebmods.hh"
+#include "com/centreon/engine/nebstructs.hh"
 
 using namespace com::centreon::engine::logging;
 
 /**************************************
- *                                     *
- *           Global Objects            *
- *                                     *
- **************************************/
+*                                     *
+*           Global Objects            *
+*                                     *
+**************************************/
 
 // Specify the event broker API version.
 NEB_API_VERSION(CURRENT_NEB_API_VERSION)
@@ -41,10 +41,10 @@ NEB_API_VERSION(CURRENT_NEB_API_VERSION)
 static const char* LOG_MESSAGE  = "~!@#$%^&*()_+09/qwerty \n";
 
 /**************************************
- *                                     *
- *         Callback Function           *
- *                                     *
- **************************************/
+*                                     *
+*         Callback Function           *
+*                                     *
+**************************************/
 
 /**
  *  @brief Function that process log data.

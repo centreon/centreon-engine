@@ -19,30 +19,28 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-/*********** COMMON HEADER FILES ***********/
-
-#include <QTextStream>
-#include <QByteArray>
-#include <sstream>
-#include <stdlib.h>
-#include <stdio.h>
 #include <errno.h>
 #include <fcntl.h>
-#include <sys/types.h>
+#include <QByteArray>
+#include <QTextStream>
+#include <sstream>
+#include <stdio.h>
+#include <stdlib.h>
 #include <sys/stat.h>
-#include "common.hh"
-#include "globals.hh"
-#include "objects.hh"
-#include "statusdata.hh"
-#include "macros.hh"
-#include "sretention.hh"
-#include "comments.hh"
-#include "downtime.hh"
-#include "flapping.hh"
-#include "notifications.hh"
-#include "utils.hh"
-#include "logging/logger.hh"
-#include "xrddefault.hh"
+#include <sys/types.h>
+#include "com/centreon/engine/comments.hh"
+#include "com/centreon/engine/common.hh"
+#include "com/centreon/engine/downtime.hh"
+#include "com/centreon/engine/flapping.hh"
+#include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/logging/logger.hh"
+#include "com/centreon/engine/macros.hh"
+#include "com/centreon/engine/notifications.hh"
+#include "com/centreon/engine/objects.hh"
+#include "com/centreon/engine/sretention.hh"
+#include "com/centreon/engine/statusdata.hh"
+#include "com/centreon/engine/utils.hh"
+#include "com/centreon/engine/xrddefault.hh"
 
 using namespace com::centreon::engine::logging;
 

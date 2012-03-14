@@ -1,5 +1,5 @@
 /*
-** Copyright 2011      Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -18,10 +18,10 @@
 */
 
 #ifndef CCE_COMPATIBILITY_BROKER_H
-# define CCE_COMPATIBILITY_BROKER_H
+#  define CCE_COMPATIBILITY_BROKER_H
 
-# include "config.h"
-# include "nagios.h"
-# include "broker.hh"
+#  include "com/centreon/engine/broker.hh"
+#  include "config.h"
+#  include "nagios.h"
 
-#endif /* !CCE_COMPATIBILITY_BROKER_H */
+#endif // !CCE_COMPATIBILITY_BROKER_H

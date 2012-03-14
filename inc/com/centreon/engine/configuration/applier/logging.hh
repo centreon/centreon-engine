@@ -1,5 +1,5 @@
 /*
-** Copyright 2011 Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -18,17 +18,16 @@
 */
 
 #ifndef CCE_CONFIGURATION_APPLIER_LOGGING_HH
-# define CCE_CONFIGURATION_APPLIER_LOGGING_HH
+#  define CCE_CONFIGURATION_APPLIER_LOGGING_HH
 
-# include <QSharedPointer>
-# include <QString>
-
-# include "logging/object.hh"
-# include "logging/file.hh"
-# include "logging/syslog.hh"
-# include "logging/standard.hh"
-# include "configuration/state.hh"
-# include "configuration/applier/base.hh"
+#  include <QSharedPointer>
+#  include <QString>
+#  include "com/centreon/engine/configuration/applier/base.hh"
+#  include "com/centreon/engine/configuration/state.hh"
+#  include "com/centreon/engine/logging/file.hh"
+#  include "com/centreon/engine/logging/object.hh"
+#  include "com/centreon/engine/logging/standard.hh"
+#  include "com/centreon/engine/logging/syslog.hh"
 
 namespace                      com {
   namespace                    centreon {

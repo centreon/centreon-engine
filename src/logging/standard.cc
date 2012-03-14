@@ -1,5 +1,5 @@
 /*
-** Copyright 2011      Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -17,17 +17,18 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <QMutexLocker>
 #include <stdio.h>
 #include <string.h>
-#include "logging/standard.hh"
+#include "com/centreon/engine/logging/standard.hh"
 
 using namespace com::centreon::engine::logging;
 
 /**************************************
- *                                     *
- *           Public Methods            *
- *                                     *
- **************************************/
+*                                     *
+*           Public Methods            *
+*                                     *
+**************************************/
 
 /**
  *  Default constructor.
@@ -35,36 +36,32 @@ using namespace com::centreon::engine::logging;
  *  @param[in] is_stdout Select stdout or stderr to logging the message.
  */
 standard::standard(bool is_stdout) {
-  _file = (is_stdout == true ? stdout : stderr);
+  _file = (is_stdout ? stdout : stderr);
 }
 
 /**
- *  Default destructor.
+ *  Destructor.
  */
-standard::~standard() throw() {
-
-}
+standard::~standard() throw () {}
 
 /**
- *  Default copy constructor.
+ *  Copy constructor.
  *
- *  @param[in] right The class to copy.
+ *  @param[in] right Object to copy.
  */
 standard::standard(standard const& right)
-  : object(right),
-    _file(0) {
-  operator=(right);
+  : object(right), _file(0) {
+  _internal_copy(right);
 }
 
 /**
- *  Default copy operator.
+ *  Assignment operator.
  *
- *  @param[in] right The class to copy.
+ *  @param[in] right Object to copy.
  */
 standard& standard::operator=(standard const& right) {
-  if (this != &right) {
-    _file = right._file;
-  }
+  if (this != &right)
+    _internal_copy(right);
   return (*this);
 }
 
@@ -75,15 +72,33 @@ standard& standard::operator=(standard const& right) {
  *  @param[in] type      Logging types.
  *  @param[in] verbosity Verbosity level.
  */
-void standard::log(char const* message,
-		   unsigned long long type,
-		   unsigned int verbosity) throw() {
+void standard::log(
+                 char const* message,
+                 unsigned long long type,
+                 unsigned int verbosity) throw () {
   (void)type;
   (void)verbosity;
 
-  if (message != NULL) {
-    _mutex.lock();
+  if (message) {
+    QMutexLocker lock(&_mutex);
     fwrite(message, strlen(message), 1, _file);
-    _mutex.unlock();
   }
+
+  return ;
+}
+
+/**************************************
+*                                     *
+*           Private Methods           *
+*                                     *
+**************************************/
+
+/**
+ *  Copy internal data members.
+ *
+ *  @param[in] right Object to copy.
+ */
+void standard::_internal_copy(standard const& right) {
+  _file = right._file;
+  return ;
 }

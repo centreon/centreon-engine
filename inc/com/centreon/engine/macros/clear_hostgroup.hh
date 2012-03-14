@@ -1,6 +1,6 @@
 /*
 ** Copyright 1999-2010 Ethan Galstad
-** Copyright 2011      Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -18,14 +18,20 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef CCE_MACROS_CLEAR_HOSTGROUP_HH_
-# define CCE_MACROS_CLEAR_HOSTGROUP_HH_
+#ifndef CCE_MACROS_CLEAR_HOSTGROUP_HH
+#  define CCE_MACROS_CLEAR_HOSTGROUP_HH
 
-# include "macros/defines.hh"
+#  include "com/centreon/engine/macros/defines.hh"
 
+#  ifdef __cplusplus
 extern "C" {
-  int clear_hostgroup_macros_r(nagios_macros* mac);
-  int clear_hostgroup_macros();
-}
+#  endif // C++
 
-#endif /* !CCE_MACROS_CLEAR_HOSTGROUP_HH_ */
+int clear_hostgroup_macros_r(nagios_macros* mac);
+int clear_hostgroup_macros();
+
+#  ifdef __cplusplus
+}
+#  endif // C++
+
+#endif // !CCE_MACROS_CLEAR_HOSTGROUP_HH

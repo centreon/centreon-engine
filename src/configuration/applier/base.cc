@@ -1,5 +1,5 @@
 /*
-** Copyright 2011 Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -17,7 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include "configuration/applier/base.hh"
+#include "com/centreon/engine/configuration/applier/base.hh"
 
 using namespace com::centreon::engine::configuration::applier;
 

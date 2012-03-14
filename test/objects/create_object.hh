@@ -1,5 +1,5 @@
 /*
-** Copyright 2011 Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -18,12 +18,12 @@
 */
 
 #ifndef TEST_OBJECTS_CREATE_OBJECT_HH
-# define TEST_OBJECTS_CREATE_OBJECT_HH
+#  define TEST_OBJECTS_CREATE_OBJECT_HH
 
-# include "objects.hh"
+#  include "com/centreon/engine/objects.hh"
 
-namespace test {
-  namespace objects {
+namespace                  test {
+  namespace                objects {
     objectlist*            create_objectlist(unsigned int id);
     timerange*             create_timerange(unsigned int id);
     daterange*             create_daterange(unsigned int id);

@@ -18,24 +18,24 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <QCoreApplication>
 #include <iomanip>
-#include <stdlib.h>
+#include <math.h>
+#include <QCoreApplication>
 #include <stdio.h>
+#include <stdlib.h>
 #include <sys/types.h>
 #include <sys/wait.h>
-#include <math.h>
-#include "downtime.hh"
-#include "comments.hh"
-#include "globals.hh"
-#include "statusdata.hh"
-#include "broker.hh"
-#include "sretention.hh"
-#include "utils.hh"
-#include "notifications.hh"
-#include "logging/file.hh"
-#include "logging/logger.hh"
-#include "events.hh"
+#include "com/centreon/engine/broker.hh"
+#include "com/centreon/engine/comments.hh"
+#include "com/centreon/engine/downtime.hh"
+#include "com/centreon/engine/events.hh"
+#include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/logging/file.hh"
+#include "com/centreon/engine/logging/logger.hh"
+#include "com/centreon/engine/notifications.hh"
+#include "com/centreon/engine/sretention.hh"
+#include "com/centreon/engine/statusdata.hh"
+#include "com/centreon/engine/utils.hh"
 
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;

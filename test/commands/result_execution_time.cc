@@ -1,5 +1,5 @@
 /*
-** Copyright 2011 Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -17,13 +17,13 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <exception>
 #include <QCoreApplication>
 #include <QDebug>
-#include <exception>
-#include <sys/time.h>
-#include "error.hh"
+#include <time.h>
+#include "com/centreon/engine/commands/result.hh"
+#include "com/centreon/engine/error.hh"
 #include "test/unittest.hh"
-#include "commands/result.hh"
 
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::commands;

@@ -1,5 +1,6 @@
 /*
-** Copyright 2011 Merethis
+** Copyright 2011-2012 Merethis
+**
 ** This file is part of Centreon Engine.
 **
 ** Centreon Engine is free software: you can redistribute it and/or
@@ -21,10 +22,10 @@
 #include <string.h>
 #include <time.h>
 #include <unistd.h>
-#include "test/unittest.hh"
-#include "checks.hh"
+#include "com/centreon/engine/checks.hh"
+#include "com/centreon/engine/globals.hh"
 #include "test/notifications/first_notif_delay/common.hh"
-#include "globals.hh"
+#include "test/unittest.hh"
 
 using namespace com::centreon::engine;
 

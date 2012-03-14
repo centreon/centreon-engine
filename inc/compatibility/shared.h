@@ -1,5 +1,5 @@
 /*
-** Copyright 2011      Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -18,8 +18,8 @@
 */
 
 #ifndef CCE_COMPATIBILITY_SHARED_H
-# define CCE_COMPATIBILITY_SHARED_H
+#  define CCE_COMPATIBILITY_SHARED_H
 
-# include "shared.hh"
+#  include "com/centreon/engine/shared.hh"
 
-#endif /* !CCE_COMPATIBILITY_SHARED_H */
+#endif // !CCE_COMPATIBILITY_SHARED_H

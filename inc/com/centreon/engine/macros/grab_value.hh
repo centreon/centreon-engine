@@ -1,6 +1,6 @@
 /*
 ** Copyright 1999-2010 Ethan Galstad
-** Copyright 2011      Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -18,32 +18,42 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef CCE_MACROS_GRAB_VALUE_HH_
-# define CCE_MACROS_GRAB_VALUE_HH_
+#ifndef CCE_MACROS_GRAB_VALUE_HH
+#  define CCE_MACROS_GRAB_VALUE_HH
 
-# include "macros/defines.hh"
+#  include "com/centreon/engine/macros/defines.hh"
 
+#  ifdef __cplusplus
 extern "C" {
-  int grab_macro_value_r(nagios_macros* mac,
-        char* macro_buffer,
-        char** output,
-        int* clean_options,
-        int* free_macro);
-  int grab_macro_value(char* macro_buffer,
-        char** output,
-        int* clean_options,
-        int* free_macro);
-  int grab_macrox_value_r(nagios_macros* mac,
-        int macro_type,
-        char const* arg1,
-        char const* arg2,
-        char** output,
-        int* free_macro);
-  int grab_macrox_value(int macro_type,
-        char const* arg1,
-        char const* arg2,
-        char** output,
-        int* free_macro);
-}
+#  endif // C++
 
-#endif /* !CCE_MACROS_GRAB_VALUE_HH_ */
+int grab_macro_value_r(
+      nagios_macros* mac,
+      char* macro_buffer,
+      char** output,
+      int* clean_options,
+      int* free_macro);
+int grab_macro_value(
+      char* macro_buffer,
+      char** output,
+      int* clean_options,
+      int* free_macro);
+int grab_macrox_value_r(
+      nagios_macros* mac,
+      int macro_type,
+      char const* arg1,
+      char const* arg2,
+      char** output,
+      int* free_macro);
+int grab_macrox_value(
+      int macro_type,
+      char const* arg1,
+      char const* arg2,
+      char** output,
+      int* free_macro);
+
+#  ifdef __cplusplus
+}
+#  endif // C++
+
+#endif // !CCE_MACROS_GRAB_VALUE_HH

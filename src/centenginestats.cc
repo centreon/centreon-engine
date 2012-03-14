@@ -19,12 +19,12 @@
 */
 
 #include <errno.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <unistd.h>
 #ifdef HAVE_GETOPT_H
 #  include <getopt.h>
 #endif // HAVE_GETOPT_H
+#include <stdlib.h>
+#include <stdio.h>
+#include <unistd.h>
 #include "com/centreon/engine/common.hh"
 #include "com/centreon/engine/version.hh"
 

@@ -33,7 +33,6 @@
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
 
-
 using namespace com::centreon::engine::commands;
 
 /**************************************

@@ -1,5 +1,5 @@
 /*
-** Copyright 2011 Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -18,50 +18,53 @@
 */
 
 #ifndef TEST_COMMANDS_WAIT_PROCESS_HH
-# define TEST_COMMANDS_WAIT_PROCESS_HH
+#  define TEST_COMMANDS_WAIT_PROCESS_HH
 
-# include <QEventLoop>
-# include "commands/command.hh"
+#  include <QEventLoop>
+#  include "com/centreon/engine/commands/command.hh"
 
 namespace               com {
   namespace             centreon {
     namespace           engine {
       namespace         commands {
-	/**
-	 *  @class wait_process
-	 *  @brief Wait the response of the asynchrone command.
-	 */
-	class           wait_process : public QObject {
-	  Q_OBJECT
-	public:
-	  wait_process(commands::command const& cmd)
-	    : QObject() {
-	    connect(&cmd, SIGNAL(command_executed(cce_commands_result const&)),
-		    this, SLOT(cmd_executed(cce_commands_result const&)));
-	  }
+        /**
+         *  @class wait_process
+         *  @brief Wait the response of the asynchrone command.
+         */
+        class           wait_process : public QObject {
+          Q_OBJECT
 
-	  void          wait() const throw() {
-	    QEventLoop loop;
-	    connect(this, SIGNAL(finished()), &loop, SLOT(quit()));
-	    loop.exec();
-	  }
+        public:
+          wait_process(commands::command const& cmd) : QObject() {
+            connect(
+              &cmd,
+              SIGNAL(command_executed(cce_commands_result const&)),
+              this,
+              SLOT(cmd_executed(cce_commands_result const&)));
+          }
 
-	  result const& get_result() const throw() {
-	    return (_res);
-	  }
+          result const& get_result() const throw () {
+            return (_res);
+          }
 
-	signals:
-	  void          finished();
+          void          wait() const throw () {
+            QEventLoop loop;
+            connect(this, SIGNAL(finished()), &loop, SLOT(quit()));
+            loop.exec();
+          }
 
-	public slots:
-	  void          cmd_executed(cce_commands_result const& res) {
-	    _res = res;
-	    emit finished();
-	  }
+        signals:
+          void          finished();
 
-	private:
-	  result        _res;
-	};
+        public slots:
+          void          cmd_executed(cce_commands_result const& res) {
+            _res = res;
+            emit finished();
+          }
+
+        private:
+          result        _res;
+        };
       }
     }
   }

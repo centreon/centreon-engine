@@ -22,10 +22,10 @@
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
-#include "test/unittest.hh"
-#include "globals.hh"
-#include "macros/grab_service.hh"
+#include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/macros/grab_service.hh"
 #include "test/macros/minimal_setup.hh"
+#include "test/unittest.hh"
 
 using namespace com::centreon::engine;
 

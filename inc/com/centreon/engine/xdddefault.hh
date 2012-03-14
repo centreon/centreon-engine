@@ -1,6 +1,6 @@
 /*
 ** Copyright 2001-2006 Ethan Galstad
-** Copyright 2011      Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -19,18 +19,18 @@
 */
 
 #ifndef CCE_XDDDEFAULT_HH
-# define CCE_XDDDEFAULT_HH
+#  define CCE_XDDDEFAULT_HH
 
-# include <sys/types.h>
+#  include <sys/types.h>
 
-# ifdef __cplusplus
+#  define XDDDEFAULT_NO_DATA      0
+#  define XDDDEFAULT_INFO_DATA    1
+#  define XDDDEFAULT_HOST_DATA    2
+#  define XDDDEFAULT_SERVICE_DATA 3
+
+#  ifdef __cplusplus
 extern "C" {
-# endif
-
-# define XDDDEFAULT_NO_DATA      0
-# define XDDDEFAULT_INFO_DATA    1
-# define XDDDEFAULT_HOST_DATA    2
-# define XDDDEFAULT_SERVICE_DATA 3
+#  endif // C++
 
 int xdddefault_initialize_downtime_data(char const* main_config_file);
 int xdddefault_validate_downtime_data(void);
@@ -44,8 +44,8 @@ int xdddefault_delete_host_downtime(unsigned long downtime_id);
 int xdddefault_delete_service_downtime(unsigned long downtime_id);
 int xdddefault_delete_downtime(int type, unsigned long downtime_id);
 
-# ifdef __cplusplus
+#  ifdef __cplusplus
 }
-# endif
+#  endif // C++
 
 #endif // !CCE_XDDDEFAULT_HH

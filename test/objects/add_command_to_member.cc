@@ -22,8 +22,8 @@
 #include "com/centreon/engine/commands/set.hh"
 #include "com/centreon/engine/logging/engine.hh"
 #include "com/centreon/engine/macros.hh"
-#include "test/objects/create_object.hh"
 #include "test/objects/add_object_to_member.hh"
+#include "test/objects/create_object.hh"
 
 using namespace com::centreon::engine::objects;
 using namespace test::objects;

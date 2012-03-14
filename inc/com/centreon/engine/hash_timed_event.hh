@@ -1,5 +1,5 @@
 /*
-** Copyright 2011      Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -17,21 +17,21 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef CCE_HASH_TIMED_EVENT_HH_
-# define CCE_HASH_TIMED_EVENT_HH_
+#ifndef CCE_HASH_TIMED_EVENT_HH
+#  define CCE_HASH_TIMED_EVENT_HH
 
-# if defined(__GXX_EXPERIMENTAL_CXX0X__)
-# include <unordered_map>
-# define htable std::unordered_map<void*, timed_event*>
-# elif defined(__GNUC__) && __GNUC__ >= 4
-#  include <tr1/unordered_map>
-#  define htable std::tr1::unordered_map<void*, timed_event*>
-# else
-#  include <map>
-#  define htable std::map<void*, timed_event*>
-# endif // CPP0X, GNUC4
+#  if defined(__GXX_EXPERIMENTAL_CXX0X__)
+#    include <unordered_map>
+#    define htable std::unordered_map<void*, timed_event*>
+#  elif defined(__GNUC__) && __GNUC__ >= 4
+#    include <tr1/unordered_map>
+#    define htable std::tr1::unordered_map<void*, timed_event*>
+#  else
+#    include <map>
+#    define htable std::map<void*, timed_event*>
+#  endif // CPP0X, GNUC4
 
-# include "events.hh"
+#  include "com/centreon/engine/events.hh"
 
 namespace                 com {
   namespace               centreon {
@@ -72,4 +72,4 @@ namespace                 com {
   }
 }
 
-#endif // !CCE_HASH_TIMED_EVENT_HH_
+#endif // !CCE_HASH_TIMED_EVENT_HH

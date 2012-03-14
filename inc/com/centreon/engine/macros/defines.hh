@@ -1,6 +1,6 @@
 /*
 ** Copyright 1999-2010 Ethan Galstad
-** Copyright 2011      Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -21,7 +21,7 @@
 #ifndef CCE_MACROS_DEFINES_HH_
 # define CCE_MACROS_DEFINES_HH_
 
-# include "objects.hh"
+# include "com/centreon/engine/objects.hh"
 
 // Length Limitations
 # define MAX_COMMAND_ARGUMENTS                  32   // maximum number of $ARGx$ macros

@@ -1,5 +1,5 @@
 /*
-** Copyright 2011 Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -18,37 +18,37 @@
 */
 
 #ifndef CCE_OBJECTS_TIMEPERIOD_HH
-# define CCE_OBJECTS_TIMEPERIOD_HH
+#  define CCE_OBJECTS_TIMEPERIOD_HH
 
-# include "objects.hh"
+#  include "com/centreon/engine/objects.hh"
 
-# ifdef __cplusplus
+#  ifdef __cplusplus
 extern "C" {
-# endif
+#  endif // C++
 
   // void add_timeperiod(char const* name,
   //                     char const* alias,
   //                     char const** range,
   //                     char const** exclude);
+void release_timeperiod(timeperiod const* obj);
 
-  void release_timeperiod(timeperiod const* obj);
-
-# ifdef __cplusplus
+#  ifdef __cplusplus
 }
 
 namespace       com {
   namespace     centreon {
     namespace   engine {
       namespace objects {
-        void    add_timeperiod(QString const& name,
-                               QString const& alias,
-                               QVector<QString> const& range,
-                               QVector<QString> const& exclude);
+        void    add_timeperiod(
+                  QString const& name,
+                  QString const& alias,
+                  QVector<QString> const& range,
+                  QVector<QString> const& exclude);
         void    release(timeperiod const* obj);
       }
     }
   }
 }
-# endif
+#  endif // C++
 
 #endif // !CCE_OBJECTS_TIMEPERIOD_HH

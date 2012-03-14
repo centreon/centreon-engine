@@ -17,6 +17,10 @@
 ## <http://www.gnu.org/licenses/>.
 ##
 
+# Directories.
+set(SRC_DIR "${MODULE_DIR}/server/src")
+set(INC_DIR "${MODULE_DIR}/server/inc/com/centreon/engine/webservice/server")
+
 # Generate webservice header from WSDL.
 add_custom_command(OUTPUT "${MODULE_DIR}/server/centreon-engine-ws.hh"
   COMMAND "${WSDL2H_PROGRAM}" "-o" "${MODULE_DIR}/server/centreon-engine-ws.hh" "-t${MODULE_DIR}/typemap.dat" "${MODULE_DIR}/centreon-engine.wsdl")
@@ -33,35 +37,39 @@ add_custom_command(OUTPUT
 
 # Include directories.
 include_directories("${MODULE_DIR}/server")
-include_directories("${MODULE_DIR}/../external_cmd")
+include_directories("${MODULE_DIR}/server/inc")
+include_directories("${MODULE_DIR}/../external_commands/inc")
 
 # Qt moc files.
 qt4_wrap_cpp(QT_WS_MOC_FILES
-  "${MODULE_DIR}/server/webservice.hh")
+  "${INC_DIR}/webservice.hh")
 
 # webservice target.
-add_library("webservice"
-  SHARED
+add_library("webservice" SHARED
+  # Auto-generated.
   "${MODULE_DIR}/server/centreonengine.nsmap"
-  "${MODULE_DIR}/server/schedule_object.cc"
-  "${MODULE_DIR}/server/create_object.cc"
   "${MODULE_DIR}/server/soapC.cpp"
   "${MODULE_DIR}/server/soapServer.cpp"
-  "${MODULE_DIR}/server/commands.cc"
-  "${MODULE_DIR}/server/webservice.cc"
-  "${MODULE_DIR}/server/configuration.cc"
-  "${MODULE_DIR}/server/ssl.cc"
-  "${MODULE_DIR}/server/main.cc"
-  "${MODULE_DIR}/server/syncro.cc"
   "${MODULE_DIR}/server/soapH.h"
   "${MODULE_DIR}/server/soapStub.h"
-  "${MODULE_DIR}/server/schedule_object.hh"
-  "${MODULE_DIR}/server/create_object.hh"
-  "${MODULE_DIR}/server/webservice.hh"
-  "${MODULE_DIR}/server/configuration.hh"
-  "${MODULE_DIR}/server/ssl.hh"
-  "${MODULE_DIR}/server/syncro.hh"
-  ${QT_WS_MOC_FILES})
+  ${QT_WS_MOC_FILES}
+  # Sources.
+  "${SRC_DIR}/commands.cc"
+  "${SRC_DIR}/configuration.cc"
+  "${SRC_DIR}/create_object.cc"
+  "${SRC_DIR}/main.cc"
+  "${SRC_DIR}/schedule_object.cc"
+  "${SRC_DIR}/ssl.cc"
+  "${SRC_DIR}/syncro.cc"
+  "${SRC_DIR}/webservice.cc"
+  # Headers.
+  "${INC_DIR}/configuration.hh"
+  "${INC_DIR}/create_object.hh"
+  "${INC_DIR}/schedule_object.hh"
+  "${INC_DIR}/ssl.hh"
+  "${INC_DIR}/syncro.hh"
+  "${INC_DIR}/webservice.hh"
+)
 
 # Prettier name.
 set_target_properties("webservice" PROPERTIES PREFIX "")

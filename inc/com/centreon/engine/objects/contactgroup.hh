@@ -1,5 +1,5 @@
 /*
-** Copyright 2011 Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -18,40 +18,41 @@
 */
 
 #ifndef CCE_OBJECTS_CONTACTGROUP_HH
-# define CCE_OBJECTS_CONTACTGROUP_HH
+#  define CCE_OBJECTS_CONTACTGROUP_HH
 
-# ifdef __cplusplus
-#  include <QVector>
-#  include <QString>
-# endif
-# include "objects.hh"
+#  include "com/centreon/engine/objects.hh"
 
-# ifdef __cplusplus
+#  ifdef __cplusplus
+#    include <QString>
+#    include <QVector>
 extern "C" {
-# endif
+#  endif // C++
 
-  bool link_contactgroup(contactgroup* obj,
-                         contact** members,
-                         contactgroup** groups);
-  void release_contactgroup(contactgroup const* obj);
+bool link_contactgroup(
+       contactgroup* obj,
+       contact** members,
+       contactgroup** groups);
+void release_contactgroup(contactgroup const* obj);
 
-# ifdef __cplusplus
+#  ifdef __cplusplus
 }
 
 namespace       com {
   namespace     centreon {
     namespace   engine {
       namespace objects {
-        void    link(contactgroup* obj,
-                     QVector<contact*> const& members,
-                     QVector<contactgroup*> const& groups);
+        bool    add_contactgroups_to_object(
+                  QVector<contactgroup*> const& contactgroups,
+                  contactgroupsmember** list_contactgroup);
+        void    link(
+                  contactgroup* obj,
+                  QVector<contact*> const& members,
+                  QVector<contactgroup*> const& groups);
         void    release(contactgroup const* obj);
-        bool    add_contactgroups_to_object(QVector<contactgroup*> const& contactgroups,
-                                            contactgroupsmember** list_contactgroup);
       }
     }
   }
 }
-# endif
+#  endif // C++
 
 #endif // !CCE_OBJECTS_CONTACTGROUP_HH

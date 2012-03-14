@@ -1,5 +1,5 @@
 /*
-** Copyright 2011 Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -17,15 +17,15 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <exception>
 #include <QCoreApplication>
 #include <QDebug>
-#include <exception>
+#include "com/centreon/engine/broker.hh"
+#include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/events.hh"
+#include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/nebstructs.hh"
 #include "test/unittest.hh"
-#include "globals.hh"
-#include "events.hh"
-#include "error.hh"
-#include "broker.hh"
-#include "nebstructs.hh"
 
 using namespace com::centreon::engine;
 

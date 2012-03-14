@@ -1,5 +1,5 @@
 /*
-** Copyright 2011      Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -18,8 +18,8 @@
 */
 
 #include <QStringList>
-#include "error.hh"
-#include "commands/connector/version_response.hh"
+#include "com/centreon/engine/commands/connector/version_response.hh"
+#include "com/centreon/engine/error.hh"
 
 using namespace com::centreon::engine::commands::connector;
 
@@ -30,9 +30,7 @@ using namespace com::centreon::engine::commands::connector;
  *  @param[in] minor The minimum minor version was supported by the connector.
  */
 version_response::version_response(unsigned int major, unsigned int minor)
-  : request(request::version_r), _major(major), _minor(minor) {
-
-}
+  : request(request::version_r), _major(major), _minor(minor) {}
 
 /**
  *  Default copy constructor.

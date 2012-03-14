@@ -1,5 +1,5 @@
 /*
-** Copyright 2011 Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -18,17 +18,17 @@
 */
 
 #ifndef CCE_OBJECTS_TIMERANGE_HH
-# define CCE_OBJECTS_TIMERANGE_HH
+#  define CCE_OBJECTS_TIMERANGE_HH
 
-# include "objects.hh"
+#  include "com/centreon/engine/objects.hh"
 
-# ifdef __cplusplus
+#  ifdef __cplusplus
 extern "C" {
-# endif
+#  endif // C++
 
-  void release_timerange(timerange const* obj);
+void release_timerange(timerange const* obj);
 
-# ifdef __cplusplus
+#  ifdef __cplusplus
 }
 
 namespace       com {
@@ -40,6 +40,6 @@ namespace       com {
     }
   }
 }
-# endif
+# endif // C++
 
 #endif // !CCE_OBJECTS_TIMERANGE_HH

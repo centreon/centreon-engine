@@ -18,35 +18,35 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <sstream>
-#include <iomanip>
-#include <stdlib.h>
-#include <stdio.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <sys/wait.h>
-#include <unistd.h>
-#include <fcntl.h>
-#include <math.h>
-#include <errno.h>
 #include <dirent.h>
+#include <errno.h>
+#include <fcntl.h>
+#include <iomanip>
+#include <math.h>
 #include <signal.h>
+#include <sstream>
+#include <stdio.h>
+#include <stdlib.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <sys/wait.h>
 #include <time.h>
-#include "comments.hh"
-#include "globals.hh"
-#include "broker.hh"
-#include "nebmods.hh"
-#include "notifications.hh"
-#include "shared.hh"
-#include "utils.hh"
-#include "commands/raw.hh"
-#include "commands/set.hh"
-#include "checks/checker.hh"
-#include "broker/compatibility.hh"
-#include "broker/loader.hh"
-#include "logging/engine.hh"
-#include "logging/logger.hh"
-#include "events/loop.hh"
+#include <unistd.h>
+#include "com/centreon/engine/broker.hh"
+#include "com/centreon/engine/broker/compatibility.hh"
+#include "com/centreon/engine/broker/loader.hh"
+#include "com/centreon/engine/checks/checker.hh"
+#include "com/centreon/engine/commands/raw.hh"
+#include "com/centreon/engine/commands/set.hh"
+#include "com/centreon/engine/comments.hh"
+#include "com/centreon/engine/events/loop.hh"
+#include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/logging/engine.hh"
+#include "com/centreon/engine/logging/logger.hh"
+#include "com/centreon/engine/nebmods.hh"
+#include "com/centreon/engine/notifications.hh"
+#include "com/centreon/engine/shared.hh"
+#include "com/centreon/engine/utils.hh"
 
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;

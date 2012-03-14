@@ -1,5 +1,5 @@
 /*
-** Copyright 2011      Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -18,43 +18,42 @@
 */
 
 #ifndef CCE_LOGGING_STANDARD_HH
-# define CCE_LOGGING_STANDARD_HH
+#  define CCE_LOGGING_STANDARD_HH
 
-# include <QMutex>
-# include <stdio.h>
+#  include <QMutex>
+#  include <stdio.h>
+#  include "com/centreon/engine/logging/object.hh"
+#  include "com/centreon/engine/namespace.hh"
 
-# include "object.hh"
+CCE_BEGIN()
 
-namespace           com {
-  namespace         centreon {
-    namespace       engine {
-      namespace     logging {
-	/**
-	 *  @class standard standard.hh
-	 *  @brief Call console for all logging message.
-	 *
-	 *  Call console for all logging message.
-	 *  You can select stdout or stderr.
-	 */
-	class       standard : public object {
-	public:
-	            standard(bool is_stdout = true);
-	            standard(standard const& right);
-	            ~standard() throw();
+namespace     logging {
+  /**
+   *  @class standard standard.hh
+   *  @brief Call console for all logging message.
+   *
+   *  Call console for all logging message. You can select stdout or
+   *  stderr.
+   */
+  class       standard : public object {
+  public:
+              standard(bool is_stdout = true);
+              standard(standard const& right);
+              ~standard() throw ();
+    standard& operator=(standard const& right);
+    void      log(
+                char const* message,
+                unsigned long long type,
+                unsigned int verbosity) throw ();
 
-	  standard& operator=(standard const& right);
+  private:
+    void      _internal_copy(standard const& right);
 
-	  void      log(char const* message,
-			unsigned long long type,
-			unsigned int verbosity) throw();
-
-	private:
-	  QMutex    _mutex;
-	  FILE*     _file;
-	};
-      }
-    }
-  }
+    FILE*     _file;
+    QMutex    _mutex;
+  };
 }
+
+CCE_END()
 
 #endif // !CCE_LOGGING_STANDARD_HH

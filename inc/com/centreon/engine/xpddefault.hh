@@ -1,6 +1,6 @@
 /*
 ** Copyright 2001-2006 Ethan Galstad
-** Copyright 2011      Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -19,16 +19,16 @@
 */
 
 #ifndef CCE_XPDDEFAULT_HH
-# define CCE_XPDDEFAULT_HH
+#  define CCE_XPDDEFAULT_HH
 
-# include "objects.hh"
+#  include "com/centreon/engine/objects.hh"
 
-# ifdef __cplusplus
+#  define DEFAULT_HOST_PERFDATA_FILE_TEMPLATE "[HOSTPERFDATA]\t$TIMET$\t$HOSTNAME$\t$HOSTEXECUTIONTIME$\t$HOSTOUTPUT$\t$HOSTPERFDATA$"
+#  define DEFAULT_SERVICE_PERFDATA_FILE_TEMPLATE "[SERVICEPERFDATA]\t$TIMET$\t$HOSTNAME$\t$SERVICEDESC$\t$SERVICEEXECUTIONTIME$\t$SERVICELATENCY$\t$SERVICEOUTPUT$\t$SERVICEPERFDATA$"
+
+#  ifdef __cplusplus
 extern "C" {
-# endif
-
-# define DEFAULT_HOST_PERFDATA_FILE_TEMPLATE "[HOSTPERFDATA]\t$TIMET$\t$HOSTNAME$\t$HOSTEXECUTIONTIME$\t$HOSTOUTPUT$\t$HOSTPERFDATA$"
-# define DEFAULT_SERVICE_PERFDATA_FILE_TEMPLATE "[SERVICEPERFDATA]\t$TIMET$\t$HOSTNAME$\t$SERVICEDESC$\t$SERVICEEXECUTIONTIME$\t$SERVICELATENCY$\t$SERVICEOUTPUT$\t$SERVICEPERFDATA$"
+#  endif // C++
 
 int xpddefault_initialize_performance_data(char* config_file);
 int xpddefault_cleanup_performance_data(char* config_file);
@@ -46,16 +46,16 @@ int xpddefault_update_host_performance_data_file(nagios_macros* mac, host* hst);
 
 void xpddefault_preprocess_file_templates(char* tmpl);
 
-int xpddefault_open_host_perfdata_file(void);
-int xpddefault_open_service_perfdata_file(void);
-int xpddefault_close_host_perfdata_file(void);
-int xpddefault_close_service_perfdata_file(void);
+int xpddefault_open_host_perfdata_file();
+int xpddefault_open_service_perfdata_file();
+int xpddefault_close_host_perfdata_file();
+int xpddefault_close_service_perfdata_file();
 
-int xpddefault_process_host_perfdata_file(void);
-int xpddefault_process_service_perfdata_file(void);
+int xpddefault_process_host_perfdata_file();
+int xpddefault_process_service_perfdata_file();
 
-# ifdef __cplusplus
+#  ifdef __cplusplus
 }
-# endif
+#  endif // C++
 
 #endif // !CCE_XPDDEFAULT_HH

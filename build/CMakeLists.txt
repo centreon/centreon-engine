@@ -31,7 +31,6 @@ set(SRC_DIR "${PROJECT_SOURCE_DIR}/src")
 set(TEST_DIR "${PROJECT_SOURCE_DIR}/test")
 include_directories("${INC_DIR}")
 include_directories("${INC_DIR}/compatibility")
-include_directories("${INC_DIR}/com/centreon/engine") # XXX: remove when possible
 
 # Version.
 set(CENTREON_ENGINE_MAJOR 1)

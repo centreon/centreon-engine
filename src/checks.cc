@@ -18,33 +18,30 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <errno.h>
 #include <exception>
+#include <signal.h>
 #include <sstream>
 #include <stdlib.h>
 #include <stdio.h>
-#include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/types.h>
 #include <sys/wait.h>
-#include <errno.h>
-#include <signal.h>
-#include "globals.hh"
-#include "neberrors.hh"
-#include "comments.hh"
-#include "statusdata.hh"
-#include "downtime.hh"
-#include "broker.hh"
-#include "perfdata.hh"
-#include "utils.hh"
-#include "notifications.hh"
-#include "sehandlers.hh"
-#include "flapping.hh"
-#include "logging.hh"
-#include "logging/logger.hh"
-#include "checks/checker.hh"
-#include "checks.hh"
-
-/*#define DEBUG_CHECKS*/
-/*#define DEBUG_HOST_CHECKS 1*/
+#include "com/centreon/engine/broker.hh"
+#include "com/centreon/engine/checks.hh"
+#include "com/centreon/engine/checks/checker.hh"
+#include "com/centreon/engine/comments.hh"
+#include "com/centreon/engine/downtime.hh"
+#include "com/centreon/engine/flapping.hh"
+#include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/logging.hh"
+#include "com/centreon/engine/logging/logger.hh"
+#include "com/centreon/engine/neberrors.hh"
+#include "com/centreon/engine/notifications.hh"
+#include "com/centreon/engine/perfdata.hh"
+#include "com/centreon/engine/sehandlers.hh"
+#include "com/centreon/engine/statusdata.hh"
+#include "com/centreon/engine/utils.hh"
 
 #define MAX_CMD_ARGS 4096
 

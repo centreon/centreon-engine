@@ -1,5 +1,5 @@
 /*
-** Copyright 2011 Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -18,21 +18,19 @@
 */
 
 #ifndef CCE_OBJECTS_OBJECTLIST_HH
-# define CCE_OBJECTS_OBJECTLIST_HH
+#  define CCE_OBJECTS_OBJECTLIST_HH
 
-# ifdef __cplusplus
-#  include <QVector>
-#  include <QString>
-# endif
-# include "objects.hh"
+#  include "com/centreon/engine/objects.hh"
 
-# ifdef __cplusplus
+#  ifdef __cplusplus
+#    include <QString>
+#    include <QVector>
 extern "C" {
-# endif
+#  endif // C++
 
-  void release_objectlist(objectlist const* obj);
+void release_objectlist(objectlist const* obj);
 
-# ifdef __cplusplus
+#  ifdef __cplusplus
 }
 
 namespace       com {
@@ -44,6 +42,6 @@ namespace       com {
     }
   }
 }
-# endif
+#  endif // C++
 
 #endif // !CCE_OBJECTS_OBJECTLIST_HH

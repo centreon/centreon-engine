@@ -1,5 +1,5 @@
 /*
-** Copyright 2011      Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -17,45 +17,45 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include "commands/connector/request.hh"
+#include "com/centreon/engine/commands/connector/request.hh"
 
 using namespace com::centreon::engine::commands::connector;
 
+/**************************************
+*                                     *
+*           Public Methods            *
+*                                     *
+**************************************/
+
 /**
- *  Default constructor.
+ *  Constructor.
  */
-request::request(e_type id)
-  : _id(id) {
-
-}
+request::request(e_type id) : _id(id) {}
 
 /**
- *  Default copy constructor.
+ *  Copy constructor.
  *
- *  @param[in] right The class to copy.
+ *  @param[in] right Object to copy.
  */
 request::request(request const& right) {
-  operator=(right);
+  _internal_copy(right);
 }
 
 /**
- *  Default destructor.
+ *  Destructor.
  */
-request::~request() throw() {
-
-}
+request::~request() throw () {}
 
 /**
- *  Default copy operator.
+ *  Assignment operator.
  *
- *  @param[in] right The class to copy.
+ *  @param[in] right Object to copy.
  *
  *  @return This object.
  */
 request& request::operator=(request const& right) {
-  if (this != &right) {
-    _id = right._id;
-  }
+  if (this != &right)
+    _internal_copy(right);
   return (*this);
 }
 
@@ -64,9 +64,9 @@ request& request::operator=(request const& right) {
  *
  *  @param[in] right The object to compare.
  *
- *  @return True if object have the same value.
+ *  @return True if objects have the same value.
  */
-bool request::operator==(request const& right) const throw() {
+bool request::operator==(request const& right) const throw () {
   return (_id == right._id);
 }
 
@@ -75,9 +75,9 @@ bool request::operator==(request const& right) const throw() {
  *
  *  @param[in] right The object to compare.
  *
- *  @return True if object have the different value.
+ *  @return True if objects have different values.
  */
-bool request::operator!=(request const& right) const throw() {
+bool request::operator!=(request const& right) const throw () {
   return (!operator==(right));
 }
 
@@ -86,7 +86,7 @@ bool request::operator!=(request const& right) const throw() {
  *
  *  @return The data value of the command's ending.
  */
-QByteArray const& request::cmd_ending() throw() {
+QByteArray const& request::cmd_ending() throw () {
   static QByteArray ending(4, '\0');
   return (ending);
 }
@@ -96,6 +96,22 @@ QByteArray const& request::cmd_ending() throw() {
  *
  *  @return The type id of the request.
  */
-request::e_type request::get_id() const throw() {
+request::e_type request::get_id() const throw () {
   return (_id);
+}
+
+/**************************************
+*                                     *
+*           Private Methods           *
+*                                     *
+**************************************/
+
+/**
+ *  Copy internal data members.
+ *
+ *  @param[in] right Object to copy.
+ */
+void request::_internal_copy(request const& right) {
+  _id = right._id;
+  return ;
 }

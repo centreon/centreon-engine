@@ -1,5 +1,5 @@
 /*
-** Copyright 2011 Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -17,14 +17,14 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <exception>
 #include <QCoreApplication>
 #include <QDebug>
-#include <exception>
-#include "error.hh"
-#include "test/unittest.hh"
-#include "commands/connector/quit_query.hh"
-#include "commands/connector/quit_response.hh"
+#include "com/centreon/engine/commands/connector/quit_query.hh"
+#include "com/centreon/engine/commands/connector/quit_response.hh"
+#include "com/centreon/engine/error.hh"
 #include "test/commands/connector/check_request.hh"
+#include "test/unittest.hh"
 
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::commands::connector;

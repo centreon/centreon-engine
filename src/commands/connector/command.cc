@@ -19,19 +19,19 @@
 
 #include <QMutexLocker>
 #include <QEventLoop>
-#include "globals.hh"
-#include "macros.hh"
-#include "objects.hh"
-#include "logging/logger.hh"
+#include "com/centreon/engine/commands/connector/command.hh"
+#include "com/centreon/engine/commands/connector/error_response.hh"
+#include "com/centreon/engine/commands/connector/execute_response.hh"
+#include "com/centreon/engine/commands/connector/quit_query.hh"
+#include "com/centreon/engine/commands/connector/request_builder.hh"
+#include "com/centreon/engine/commands/connector/version_query.hh"
+#include "com/centreon/engine/commands/connector/version_response.hh"
+#include "com/centreon/engine/commands/result.hh"
+#include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/logging/logger.hh"
+#include "com/centreon/engine/macros.hh"
+#include "com/centreon/engine/objects.hh"
 #include "com/centreon/engine/version.hh"
-#include "commands/result.hh"
-#include "commands/connector/request_builder.hh"
-#include "commands/connector/error_response.hh"
-#include "commands/connector/execute_response.hh"
-#include "commands/connector/version_response.hh"
-#include "commands/connector/version_query.hh"
-#include "commands/connector/quit_query.hh"
-#include "commands/connector/command.hh"
 
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;

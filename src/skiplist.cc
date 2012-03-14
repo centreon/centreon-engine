@@ -1,6 +1,6 @@
 /*
-** Copyright 2008 Ethan Galstad
-** Copyright 2011 Merethis
+** Copyright 2008      Ethan Galstad
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -19,8 +19,8 @@
 */
 
 #include <stdlib.h>
-#include "common.hh"
-#include "skiplist.hh"
+#include "com/centreon/engine/common.hh"
+#include "com/centreon/engine/skiplist.hh"
 
 skiplist* skiplist_new(int max_levels,
 		       float level_probability,

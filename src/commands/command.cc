@@ -1,5 +1,5 @@
 /*
-** Copyright 2011      Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -18,7 +18,7 @@
 */
 
 #include <QMutexLocker>
-#include "commands/command.hh"
+#include "com/centreon/engine/commands/command.hh"
 
 using namespace com::centreon::engine;
 
@@ -35,16 +35,12 @@ commands::command::command(QString const& name,
 			   QString const& command_line)
   : QObject(),
     _name(name),
-    _command_line(command_line) {
-
-}
+    _command_line(command_line) {}
 
 /**
  *  Default destructor.
  */
-commands::command::~command() throw() {
-
-}
+commands::command::~command() throw () {}
 
 /**
  *  Compare two result.

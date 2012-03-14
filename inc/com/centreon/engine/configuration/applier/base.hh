@@ -1,5 +1,5 @@
 /*
-** Copyright 2011 Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -18,7 +18,7 @@
 */
 
 #ifndef CCE_CONFIGURATION_APPLIER_BASE_HH
-# define CCE_CONFIGURATION_APPLIER_BASE_HH
+#  define CCE_CONFIGURATION_APPLIER_BASE_HH
 
 namespace                com {
   namespace              centreon {

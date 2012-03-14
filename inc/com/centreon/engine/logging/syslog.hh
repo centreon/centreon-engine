@@ -1,5 +1,5 @@
 /*
-** Copyright 2011      Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -18,10 +18,10 @@
 */
 
 #ifndef CCE_LOGGING_SYSLOG_HH
-# define CCE_LOGGING_SYSLOG_HH
+#  define CCE_LOGGING_SYSLOG_HH
 
-# include <QMutex>
-# include "logging/object.hh"
+#  include <QMutex>
+#  include "com/centreon/engine/logging/object.hh"
 
 namespace                com {
   namespace              centreon {
@@ -40,10 +40,11 @@ namespace                com {
 
 	  static syslog& instance();
 
-	  void           set_facility(int facility) throw();
-	  void           log(char const* message,
-			     unsigned long long type,
-			     unsigned int verbosity) throw();
+	  void           set_facility(int facility) throw ();
+	  void           log(
+                           char const* message,
+                           unsigned long long type,
+                           unsigned int verbosity) throw ();
 
 	private:
 	                 syslog(syslog const& right);

@@ -1,6 +1,6 @@
 /*
 ** Copyright 2001-2008 Ethan Galstad
-** Copyright 2011      Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -19,62 +19,50 @@
 */
 
 #ifndef CCE_XODTEMPLATE_HH
-# define CCE_XODTEMPLATE_HH
+#  define CCE_XODTEMPLATE_HH
 
-# include "common.hh"
+#  include "com/centreon/engine/common.hh"
 
-# ifdef __cplusplus
-extern "C" {
-# endif
+// General definitions.
+#  define XODTEMPLATE_NULL                  "null"
+#  define MAX_XODTEMPLATE_INPUT_BUFFER      1024
+#  define MAX_XODTEMPLATE_CONTACT_ADDRESSES 6
+#  define XODTEMPLATE_NONE                  0
+#  define XODTEMPLATE_TIMEPERIOD            1
+#  define XODTEMPLATE_COMMAND               2
+#  define XODTEMPLATE_CONTACT               3
+#  define XODTEMPLATE_CONTACTGROUP          4
+#  define XODTEMPLATE_HOST                  5
+#  define XODTEMPLATE_HOSTGROUP             6
+#  define XODTEMPLATE_SERVICE               7
+#  define XODTEMPLATE_SERVICEDEPENDENCY     8
+#  define XODTEMPLATE_HOSTGROUPESCALATION   9  // No longer implemented.
+#  define XODTEMPLATE_SERVICEESCALATION     10
+#  define XODTEMPLATE_HOSTESCALATION        11
+#  define XODTEMPLATE_HOSTDEPENDENCY        12
+#  define XODTEMPLATE_HOSTEXTINFO           13
+#  define XODTEMPLATE_SERVICEEXTINFO        14
+#  define XODTEMPLATE_SERVICEGROUP          15
+#  define XODTEMPLATE_CONNECTOR             16
 
-/*********** GENERAL DEFINITIONS ************/
+// Skip lists.
+#  define X_HOST_SKIPLIST                   1
+#  define X_SERVICE_SKIPLIST                2
+#  define X_COMMAND_SKIPLIST                3
+#  define X_TIMEPERIOD_SKIPLIST             4
+#  define X_CONTACT_SKIPLIST                5
+#  define X_CONTACTGROUP_SKIPLIST           6
+#  define X_HOSTGROUP_SKIPLIST              7
+#  define X_SERVICEGROUP_SKIPLIST           8
+#  define X_HOSTDEPENDENCY_SKIPLIST         9
+#  define X_SERVICEDEPENDENCY_SKIPLIST      10
+#  define X_HOSTESCALATION_SKIPLIST         11
+#  define X_SERVICEESCALATION_SKIPLIST      12
+#  define X_HOSTEXTINFO_SKIPLIST            13
+#  define X_SERVICEEXTINFO_SKIPLIST         14
+#  define X_CONNECTOR_SKIPLIST              15
+#  define NUM_XOBJECT_SKIPLISTS             16
 
-# define XODTEMPLATE_NULL                  "null"
-
-# define MAX_XODTEMPLATE_INPUT_BUFFER      1024
-
-# define MAX_XODTEMPLATE_CONTACT_ADDRESSES 6
-
-# define XODTEMPLATE_NONE                  0
-# define XODTEMPLATE_TIMEPERIOD            1
-# define XODTEMPLATE_COMMAND               2
-# define XODTEMPLATE_CONTACT               3
-# define XODTEMPLATE_CONTACTGROUP          4
-# define XODTEMPLATE_HOST                  5
-# define XODTEMPLATE_HOSTGROUP             6
-# define XODTEMPLATE_SERVICE               7
-# define XODTEMPLATE_SERVICEDEPENDENCY     8
-# define XODTEMPLATE_HOSTGROUPESCALATION   9      /* no longer implemented */
-# define XODTEMPLATE_SERVICEESCALATION     10
-# define XODTEMPLATE_HOSTESCALATION        11
-# define XODTEMPLATE_HOSTDEPENDENCY        12
-# define XODTEMPLATE_HOSTEXTINFO           13
-# define XODTEMPLATE_SERVICEEXTINFO        14
-# define XODTEMPLATE_SERVICEGROUP          15
-# define XODTEMPLATE_CONNECTOR             16
-
-
-/***************** SKIP LISTS ****************/
-
-# define NUM_XOBJECT_SKIPLISTS                  16
-
-# define X_HOST_SKIPLIST                        1
-# define X_SERVICE_SKIPLIST                     2
-# define X_COMMAND_SKIPLIST                     3
-# define X_TIMEPERIOD_SKIPLIST                  4
-# define X_CONTACT_SKIPLIST                     5
-# define X_CONTACTGROUP_SKIPLIST                6
-# define X_HOSTGROUP_SKIPLIST                   7
-# define X_SERVICEGROUP_SKIPLIST                8
-# define X_HOSTDEPENDENCY_SKIPLIST              9
-# define X_SERVICEDEPENDENCY_SKIPLIST           10
-# define X_HOSTESCALATION_SKIPLIST              11
-# define X_SERVICEESCALATION_SKIPLIST           12
-# define X_HOSTEXTINFO_SKIPLIST                 13
-# define X_SERVICEEXTINFO_SKIPLIST              14
-# define X_CONNECTOR_SKIPLIST                   15
-
-/********** STRUCTURE DEFINITIONS **********/
 
 /* CUSTOMVARIABLESMEMBER structure */
 typedef struct xodtemplate_customvariablesmember_struct{
@@ -790,7 +778,9 @@ typedef struct xodtemplate_service_cursor_struct{
 
 
 
-/********* FUNCTION DEFINITIONS **********/
+#  ifdef __cplusplus
+extern "C" {
+#  endif
 
 int xodtemplate_read_config_data(char const*,int,int,int);       /* top-level routine processes all config files */
 int xodtemplate_grab_config_info(char const*);                   /* grabs variables from main config file */
@@ -982,9 +972,9 @@ int xodtemplate_skiplist_compare_servicedependency(void const* a, void const* b)
 int xodtemplate_skiplist_compare_hostescalation(void const* a, void const* b);
 int xodtemplate_skiplist_compare_serviceescalation(void const* a, void const* b);
 
-# ifdef __cplusplus
+#  ifdef __cplusplus
 }
-# endif
+#  endif
 
 #endif // !CCE_XODTEMPLATE_HH
 

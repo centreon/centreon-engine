@@ -1,6 +1,6 @@
 /*
 ** Copyright 1999-2010 Ethan Galstad
-** Copyright 2011      Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -18,8 +18,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include "macros/defines.hh"
-#include "macros/misc.hh"
+#include "com/centreon/engine/macros/defines.hh"
+#include "com/centreon/engine/macros/misc.hh"
 
 // Scoped to this file to prevent (unintentional) mischief.
 static nagios_macros global_macros;

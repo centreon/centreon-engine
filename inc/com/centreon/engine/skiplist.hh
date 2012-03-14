@@ -1,6 +1,6 @@
 /*
-** Copyright 2008 Ethan Galstad
-** Copyright 2011 Merethis
+** Copyright 2008      Ethan Galstad
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -19,16 +19,12 @@
 */
 
 #ifndef CCE_SKIPLIST_HH
-# define CCE_SKIPLIST_HH
+#  define CCE_SKIPLIST_HH
 
-# ifdef __cplusplus
-extern "C" {
-# endif
-
-# define SKIPLIST_OK              0
-# define SKIPLIST_ERROR_ARGS      1
-# define SKIPLIST_ERROR_MEMORY    2
-# define SKIPLIST_ERROR_DUPLICATE 3
+#  define SKIPLIST_OK              0
+#  define SKIPLIST_ERROR_ARGS      1
+#  define SKIPLIST_ERROR_MEMORY    2
+#  define SKIPLIST_ERROR_DUPLICATE 3
 
 typedef struct                skiplistnode_struct {
   void*                       data;
@@ -45,6 +41,10 @@ typedef struct  skiplist_struct {
   int           (*compare_function)(void const*, void const*);
   skiplistnode* head;
 }               skiplist;
+
+#  ifdef __cplusplus
+extern "C" {
+#  endif // C++
 
 skiplist* skiplist_new(int max_levels, float level_probability, int allow_duplicates, int append_duplicates, int (*compare_function)(void const*, void const*));
 int skiplist_insert(skiplist* list, void* data);
@@ -63,8 +63,8 @@ int skiplist_delete_first(skiplist* list, void const* data);
 int skiplist_delete_all(skiplist* list, void const* data);
 int skiplist_delete_node(skiplist* list, void const* node_ptr);
 
-# ifdef __cplusplus
+#  ifdef __cplusplus
 }
-# endif
+#  endif // C++
 
 #endif // !CCE_SKIPLIST_HH

@@ -17,6 +17,10 @@
 ## <http://www.gnu.org/licenses/>.
 ##
 
+# Directories.
+set(SRC_DIR "${MODULE_DIR}/client/src")
+set(INC_DIR "${MODULE_DIR}/client/inc/com/centreon/engine/webservice/client")
+
 # Generate webservice header from WSDL.
 add_custom_command(OUTPUT "${MODULE_DIR}/client/centreon-engine-ws.hh"
   COMMAND "${WSDL2H_PROGRAM}" "-o" "${MODULE_DIR}/client/centreon-engine-ws.hh" "-t${MODULE_DIR}/typemap.dat" "${MODULE_DIR}/centreon-engine.wsdl")
@@ -41,23 +45,28 @@ add_custom_command(OUTPUT
 
 # Include directories.
 include_directories("${MODULE_DIR}/client")
+include_directories("${MODULE_DIR}/client/inc")
 
 # centenginews target.
 add_executable("centenginews"
+  # Auto-generated.
   "${MODULE_DIR}/client/centreonengine.nsmap"
   "${MODULE_DIR}/client/soapC.cpp"
   "${MODULE_DIR}/client/soapClient.cpp"
   "${MODULE_DIR}/client/auto_gen.cc"
-  "${MODULE_DIR}/client/webservice.cc"
-  "${MODULE_DIR}/client/error.cc"
-  "${MODULE_DIR}/client/ssl.cc"
-  "${MODULE_DIR}/client/main.cc"
   "${MODULE_DIR}/client/soapH.h"
   "${MODULE_DIR}/client/soapStub.h"
   "${MODULE_DIR}/client/auto_gen.hh"
-  "${MODULE_DIR}/client/webservice.hh"
-  "${MODULE_DIR}/client/error.hh"
-  "${MODULE_DIR}/client/ssl.hh")
+  # Sources.
+  "${SRC_DIR}/error.cc"
+  "${SRC_DIR}/main.cc"
+  "${SRC_DIR}/ssl.cc"
+  "${SRC_DIR}/webservice.cc"
+  # Headers.
+  "${INC_DIR}/error.hh"
+  "${INC_DIR}/ssl.hh"
+  "${INC_DIR}/webservice.hh"
+)
 add_dependencies("centenginews" "ws_stub_builder")
 
 # Check compiler version supports flags.

@@ -1,6 +1,6 @@
 /*
 ** Copyright 2000-2008 Ethan Galstad
-** Copyright 2011      Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -19,14 +19,10 @@
 */
 
 #ifndef CCE_DOWTIME_HH
-# define CCE_DOWTIME_HH
+#  define CCE_DOWTIME_HH
 
-# include <sys/time.h>
-# include "objects.hh"
-
-# ifdef __cplusplus
-extern "C" {
-# endif
+#  include <time.h>
+#  include "com/centreon/engine/objects.hh"
 
 // SCHEDULED_DOWNTIME_ENTRY structure
 typedef struct                      scheduled_downtime_struct {
@@ -48,6 +44,10 @@ typedef struct                      scheduled_downtime_struct {
   int                               incremented_pending_downtime;
   struct scheduled_downtime_struct* next;
 }                                   scheduled_downtime;
+
+#  ifdef __cplusplus
+extern "C" {
+#  endif // C++
 
 int initialize_downtime_data(char const* config_file); // initializes scheduled downtime data
 int cleanup_downtime_data(char const* config_file);    // cleans up scheduled downtime data
@@ -85,8 +85,8 @@ void free_downtime_data(void); // frees memory allocated to scheduled downtime l
 
 int delete_downtime_by_hostname_service_description_start_time_comment(char const*, char const*, time_t, char const*);
 
-# ifdef __cplusplus
+#  ifdef __cplusplus
 }
-# endif
+#  endif // C++
 
 #endif // !CCE_DOWTIME_HH

@@ -254,4 +254,4 @@ extern unsigned int free_child_process_memory;
 extern int external_command_buffer_slots;
 // auth_file;
 
-#endif /* !CCE_GLOBALS_HH_ */
+#endif // !CCE_GLOBALS_HH

@@ -1,6 +1,6 @@
 /*
 ** Copyright 1999-2010 Ethan Galstad
-** Copyright 2011      Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -18,13 +18,19 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef CCE_MACROS_MISC_HH_
-# define CCE_MACROS_MISC_HH_
+#ifndef CCE_MACROS_MISC_HH
+#  define CCE_MACROS_MISC_HH
 
-# include "macros/defines.hh"
+#  include "com/centreon/engine/macros/defines.hh"
 
+#  ifdef __cplusplus
 extern "C" {
-  nagios_macros* get_global_macros();
+#  endif // C++
+
+nagios_macros* get_global_macros();
+
+#  ifdef __cplusplus
 }
+#  endif // C++
 
 #endif /* !CCE_MACROS_MISC_HH_ */

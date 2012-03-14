@@ -1,5 +1,5 @@
 /*
-** Copyright 2011 Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -18,42 +18,40 @@
 */
 
 #ifndef CCE_COMMANDS_CONNECTOR_VERSION_QUERY_HH
-# define CCE_COMMANDS_CONNECTOR_VERSION_QUERY_HH
+#  define CCE_COMMANDS_CONNECTOR_VERSION_QUERY_HH
 
-# include "com/centreon/engine/commands/connector/request.hh"
+#  include "com/centreon/engine/commands/connector/request.hh"
+#  include "com/centreon/engine/namespace.hh"
 
-namespace                  com {
-  namespace                centreon {
-    namespace              engine {
-      namespace            commands {
-	namespace          connector {
-	/**
-	 *  @class version_query commands/connector/version_query.hh
-	 *  @brief Version query ask the minimum version of engine
-	 *  supported by the connector.
-	 *
-	 *  Version query is a request, who ask the minimu version of
-	 *  engine supported by the connector.
-	 */
-	  class            version_query : public request {
-	  public:
-	                   version_query();
-	                   version_query(version_query const& right);
-	                   ~version_query() throw();
+CCE_BEGIN()
 
-	    version_query& operator=(version_query const& right);
-	    bool           operator==(version_query const& right) const throw();
-	    bool           operator!=(version_query const& right) const throw();
-
-	    request*       clone() const;
-
-	    QByteArray     build();
-	    void           restore(QByteArray const& data);
-	  };
-	}
-      }
-    }
+namespace            commands {
+  namespace          connector {
+    /**
+     *  @class version_query commands/connector/version_query.hh
+     *  @brief Version query ask the minimum version of engine
+     *  supported by the connector.
+     *
+     *  Version query is a request, who ask the minimum version of
+     *  engine supported by the connector.
+     */
+    class            version_query : public request {
+    public:
+                     version_query();
+                     version_query(version_query const& right);
+                     ~version_query() throw ();
+      version_query& operator=(version_query const& right);
+      bool           operator==(
+                       version_query const& right) const throw ();
+      bool           operator!=(
+                       version_query const& right) const throw ();
+      QByteArray     build();
+      request*       clone() const;
+      void           restore(QByteArray const& data);
+    };
   }
 }
+
+CCE_END()
 
 #endif // !CCE_COMMANDS_CONNECTOR_VERSION_QUERY_HH

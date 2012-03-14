@@ -1,5 +1,5 @@
 /*
-** Copyright 2011 Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -20,27 +20,27 @@
 #include <QCoreApplication>
 #include <QDebug>
 #include <string.h>
-#include "nebmods.hh"
-#include "error.hh"
-#include "broker/handle.hh"
+#include "com/centreon/engine/broker/handle.hh"
+#include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/nebmods.hh"
 #include "test/broker/mod_load.hh"
 
 using namespace com::centreon::engine;
 
 /**************************************
- *                                     *
- *           Global Objects            *
- *                                     *
- **************************************/
+*                                     *
+*           Global Objects            *
+*                                     *
+**************************************/
 
 // Specify the event broker API version.
 NEB_API_VERSION(CURRENT_NEB_API_VERSION)
 
 /**************************************
- *                                     *
- *         Exported Functions          *
- *                                     *
- **************************************/
+*                                     *
+*         Exported Functions          *
+*                                     *
+**************************************/
 
 /**
  *  @brief Module exit point.

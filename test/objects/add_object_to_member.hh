@@ -1,5 +1,5 @@
 /*
-** Copyright 2011 Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -18,11 +18,11 @@
 */
 
 #ifndef TEST_OBJECTS_ADD_OBJECT_TO_MEMBER_HH
-# define TEST_OBJECTS_ADD_OBJECT_TO_MEMBER_HH
+#  define TEST_OBJECTS_ADD_OBJECT_TO_MEMBER_HH
 
-# include <QVector>
-# include "error.hh"
-# include "release.hh"
+#  include <QVector>
+#  include "com/centreon/engine/error.hh"
+#  include "test/objects/release.hh"
 
 namespace test{
   namespace objects {

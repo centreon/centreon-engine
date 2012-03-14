@@ -1,5 +1,5 @@
 /*
-** Copyright 2011      Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -18,11 +18,11 @@
 */
 
 #ifndef CCE_COMPATIBILITY_NEBSTRUCTS_H
-# define CCE_COMPATIBILITY_NEBSTRUCTS_H
+#  define CCE_COMPATIBILITY_NEBSTRUCTS_H
 
-# include "config.h"
-# include "objects.h"
-# include "nagios.h"
-# include "nebstructs.hh"
+#  include "com/centreon/engine/nebstructs.hh"
+#  include "config.h"
+#  include "objects.h"
+#  include "nagios.h"
 
-#endif /* !CCE_COMPATIBILITY_NEBSTRUCTS_H */
+#endif // !CCE_COMPATIBILITY_NEBSTRUCTS_H

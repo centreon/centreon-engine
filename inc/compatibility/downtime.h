@@ -1,6 +1,6 @@
 /*
 ** Copyright 2000-2008 Ethan Galstad
-** Copyright 2011      Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -19,12 +19,12 @@
 */
 
 #ifndef CCE_COMPATIBILITY_DOWNTIME_H
-# define CCE_COMPATIBILITY_DOWNTIME_H
+#  define CCE_COMPATIBILITY_DOWNTIME_H
 
-# include "config.h"
-# include "common.h"
-# include "objects.h"
-# include "downtime.hh"
+#  include "com/centreon/engine/downtime.hh"
+#  include "common.h"
+#  include "config.h"
+#  include "objects.h"
 
 /*
 ** If you are going to be adding a lot of downtime in sequence,
@@ -33,4 +33,4 @@
 */
 extern int defer_downtime_sorting;
 
-#endif /* !CCE_COMPATIBILITY_DOWNTIME_H */
+#endif // !CCE_COMPATIBILITY_DOWNTIME_H

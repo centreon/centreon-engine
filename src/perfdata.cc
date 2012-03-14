@@ -1,6 +1,6 @@
 /*
 ** Copyright 2000-2004 Ethan Galstad
-** Copyright 2011      Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -18,11 +18,9 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-/*********** COMMON HEADER FILES ***********/
-
-#include "globals.hh"
-#include "xpddefault.hh"
-#include "perfdata.hh"
+#include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/perfdata.hh"
+#include "com/centreon/engine/xpddefault.hh"
 
 /******************************************************************/
 /************** INITIALIZATION & CLEANUP FUNCTIONS ****************/

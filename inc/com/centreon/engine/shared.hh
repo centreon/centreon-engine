@@ -19,14 +19,10 @@
 */
 
 #ifndef CCE_SHARED_HH
-# define CCE_SHARED_HH
+#  define CCE_SHARED_HH
 
-# include <sys/types.h>
-# include <sys/time.h>
-
-# ifdef __cplusplus
-extern "C" {
-# endif
+#  include <sys/time.h>
+#  include <sys/types.h>
 
 // mmapfile structure - used for reading files via mmap()
 typedef struct  mmapfile_struct {
@@ -42,6 +38,10 @@ typedef struct  mmapfile_struct {
 // only usable on compile-time initialized arrays, for obvious reasons
 # define ARRAY_SIZE(ary) (sizeof(ary) / sizeof(ary[0]))
 
+#  ifdef __cplusplus
+extern "C" {
+#  endif // C++
+
 char* my_strdup(char const* str);
 char* my_strtok(char const* buffer, char const* tokens);
 char* my_strsep(char** stringp, const char* delim);
@@ -56,14 +56,13 @@ void get_datetime_string(time_t const* raw_time, char* buffer, int buffer_length
 void get_time_breakdown(unsigned long raw_time, int* days, int* hours, int* minutes, int* seconds);
 char* resize_string(char* str, size_t size);
 
-# ifdef __cplusplus
+#  ifdef __cplusplus
 }
-# endif
 
-# ifdef __cplusplus
-#  include <sstream>
-#  include <string>
-#  include <string.h>
+#    include <sstream>
+#    include <string>
+#    include <string.h>
+
 template <class T>
 char* obj2pchar(T obj) {
   std::ostringstream oss;
@@ -73,8 +72,10 @@ char* obj2pchar(T obj) {
   strcpy(buf, str.c_str());
   return (buf);
 }
+
 template <>
 char* obj2pchar<char const*>(char const* str);
-# endif
+
+#  endif // C++
 
 #endif // !CCE_SHARED_HH

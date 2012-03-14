@@ -1,5 +1,5 @@
 /*
-** Copyright 2011 Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -17,15 +17,15 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <exception>
 #include <QCoreApplication>
 #include <QDebug>
-#include <QTemporaryFile>
-#include <QFile>
 #include <QDir>
-#include <exception>
+#include <QFile>
+#include <QTemporaryFile>
+#include "com/centreon/engine/configuration/state.hh"
+#include "com/centreon/engine/globals.hh"
 #include "test/unittest.hh"
-#include "globals.hh"
-#include "configuration/state.hh"
 
 using namespace com::centreon::engine;
 

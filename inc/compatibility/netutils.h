@@ -1,5 +1,5 @@
 /*
-** Copyright          2011      Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -18,9 +18,9 @@
 */
 
 #ifndef CCE_COMPATIBILITY_NETUTILS_H
-# define CCE_COMPATIBILITY_NETUTILS_H
+#  define CCE_COMPATIBILITY_NETUTILS_H
 
-# include "netutils.hh"
+#  include "com/centreon/engine/netutils.hh"
 
-#endif /* !CCE_COMPATIBILITY_NETUTILS_H */
+#endif // !CCE_COMPATIBILITY_NETUTILS_H
 

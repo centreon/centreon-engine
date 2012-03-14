@@ -1,5 +1,5 @@
 /*
-** Copyright 2011      Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -18,21 +18,18 @@
 */
 
 #include <QStringList>
-#include "error.hh"
-#include "commands/connector/quit_query.hh"
+#include "com/centreon/engine/commands/connector/quit_query.hh"
+#include "com/centreon/engine/error.hh"
 
 using namespace com::centreon::engine::commands::connector;
 
 /**
  *  Default constructor.
  */
-quit_query::quit_query()
-  : request(request::quit_q) {
-
-}
+quit_query::quit_query() : request(request::quit_q) {}
 
 /**
- *  Default copy constructor.
+ *  Copy constructor.
  *
  *  @param[in] right The class to copy.
  */
@@ -42,11 +39,9 @@ quit_query::quit_query(quit_query const& right)
 }
 
 /**
- *  Default destructor.
+ *  Destructor.
  */
-quit_query::~quit_query() throw() {
-
-}
+quit_query::~quit_query() throw () {}
 
 /**
  *  Default copy operator.

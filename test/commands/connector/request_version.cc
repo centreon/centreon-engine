@@ -20,12 +20,12 @@
 #include <QCoreApplication>
 #include <QDebug>
 #include <exception>
-#include "error.hh"
-#include "test/unittest.hh"
+#include "com/centreon/engine/commands/connector/version_query.hh"
+#include "com/centreon/engine/commands/connector/version_response.hh"
+#include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/version.hh"
-#include "commands/connector/version_query.hh"
-#include "commands/connector/version_response.hh"
 #include "test/commands/connector/check_request.hh"
+#include "test/unittest.hh"
 
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::commands::connector;
