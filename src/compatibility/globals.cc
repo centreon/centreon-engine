@@ -56,4 +56,5 @@ unsigned int use_embedded_perl_implicitly(false);
 
 // Old path.
 char const* check_result_path("/tmp");
+char const* p1_file(NULL);
 char const* temp_path("/tmp");
