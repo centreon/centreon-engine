@@ -110,25 +110,6 @@ static void check_event_command_check() {
 }
 
 /**
- *  Check the event log rotation.
- */
-static void check_event_log_rotation() {
-  // set last_log_rotation as known value.
-  last_log_rotation = 0;
-
-  // create fake event.
-  timed_event event;
-  memset(&event, 0, sizeof(event));
-  event.event_type = EVENT_LOG_ROTATION;
-
-  handle_timed_event(&event);
-
-  // check if handle_timed_event call _exec_event_log_rotation.
-  if (last_log_rotation == 0)
-    throw (engine_error() << Q_FUNC_INFO);
-}
-
-/**
  *  Check the event program shutdown.
  */
 static void check_event_program_shutdown() {
@@ -162,7 +143,7 @@ static void check_event_program_restart() {
   handle_timed_event(&event);
 
   // check if handle_timed_event call _exec_event_program_restart.
-  if (sigrestart == false)
+  if (sigrestart != false)
     throw (engine_error() << Q_FUNC_INFO);
 }
 
@@ -407,7 +388,6 @@ static void check_event_user_function() {
 int main_test() {
   check_event_service_check();
   check_event_command_check();
-  check_event_log_rotation();
   check_event_program_shutdown();
   check_event_program_restart();
   check_event_check_reaper();

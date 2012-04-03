@@ -435,12 +435,6 @@ int main(int argc, char** argv) {
 
       // An error occurred that prevented us from (re)starting.
       if (result != OK) {
-        // If we were restarting, we need to cleanup from the previous run.
-        if (sigrestart == TRUE) {
-          // Clean up the status data.
-          cleanup_status_data(config_file, TRUE);
-        }
-
         // Send program data to broker.
         broker_program_state(NEBTYPE_PROCESS_SHUTDOWN,
                              NEBFLAG_PROCESS_INITIATED,
@@ -459,9 +453,8 @@ int main(int argc, char** argv) {
                            NEBATTR_NONE,
                            NULL);
 
-      // Initialize status data unless we're starting.
-      if (sigrestart == FALSE)
-        initialize_status_data(config_file);
+      // Initialize status data.
+      initialize_status_data(config_file);
 
       // Read initial service and host state information.
       initialize_retention_data(config_file);
@@ -488,9 +481,6 @@ int main(int argc, char** argv) {
       // Log initial host and service state.
       log_host_states(INITIAL_STATES, NULL);
       log_service_states(INITIAL_STATES, NULL);
-
-      // Reset the restart flag.
-      sigrestart = FALSE;
 
       // Send program data to broker.
       broker_program_state(NEBTYPE_PROCESS_EVENTLOOPSTART,
@@ -522,34 +512,19 @@ int main(int argc, char** argv) {
 
       /* 03/01/2007 EG Moved from sighandler() to prevent FUTEX locking problems under NPTL */
       // Did we catch a signal ?
-      if (caught_signal == TRUE) {
-        if (sig_id == SIGHUP) {
-          try {
-            buffer = my_strdup("Caught SIGHUP, restarting ...");
-          }
-          catch(...) {
-            // Send program data to broker.
-            broker_program_state(NEBTYPE_PROCESS_SHUTDOWN,
-                                 NEBFLAG_PROCESS_INITIATED,
-                                 NEBATTR_SHUTDOWN_ABNORMAL,
-                                 NULL);
-            cleanup();
-          }
+      if (sigshutdown == TRUE) {
+        try {
+          std::ostringstream oss;
+          oss << "Caught SIG" << sigs[sig_id] << ", shutting down ...";
+          buffer = my_strdup(oss.str().c_str());
         }
-        else {
-          try {
-            std::ostringstream oss;
-            oss << "Caught SIG" << sigs[sig_id] << ", shutting down ...";
-            buffer = my_strdup(oss.str().c_str());
-          }
-          catch(...) {
-            // Send program data to broker.
-            broker_program_state(NEBTYPE_PROCESS_SHUTDOWN,
-                                 NEBFLAG_PROCESS_INITIATED,
-                                 NEBATTR_SHUTDOWN_ABNORMAL,
-                                 NULL);
-            cleanup();
-          }
+        catch(...) {
+          // Send program data to broker.
+          broker_program_state(NEBTYPE_PROCESS_SHUTDOWN,
+                               NEBFLAG_PROCESS_INITIATED,
+                               NEBATTR_SHUTDOWN_ABNORMAL,
+                               NULL);
+          cleanup();
         }
 
         logger(log_process_info, basic) << buffer;
@@ -566,11 +541,6 @@ int main(int argc, char** argv) {
                              NEBFLAG_USER_INITIATED,
                              NEBATTR_SHUTDOWN_NORMAL,
                              NULL);
-      else if (sigrestart == TRUE)
-        broker_program_state(NEBTYPE_PROCESS_RESTART,
-                             NEBFLAG_USER_INITIATED,
-                             NEBATTR_RESTART_NORMAL,
-                             NULL);
 
       // Save service and host state information.
       save_state_information(FALSE);
@@ -585,9 +555,8 @@ int main(int argc, char** argv) {
       // Clean up the comment data.
       cleanup_comment_data(config_file);
 
-      // Clean up the status data unless we're restarting.
-      if (sigrestart == FALSE)
-        cleanup_status_data(config_file, TRUE);
+      // Clean up the status data.
+      cleanup_status_data(config_file, TRUE);
 
       // Shutdown stuff.
       if (sigshutdown == TRUE) {
@@ -599,7 +568,7 @@ int main(int argc, char** argv) {
       // Clean up after ourselves.
       cleanup();
 
-    } while (sigrestart == TRUE && sigshutdown == FALSE);
+    } while (sigshutdown == FALSE);
 
     // Free misc memory.
     delete [] config_file;

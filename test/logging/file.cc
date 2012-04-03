@@ -17,12 +17,15 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <errno.h>
 #include <exception>
 #include <math.h>
 #include <QCoreApplication>
 #include <QDebug>
 #include <QDir>
 #include <QFile>
+#include <stdio.h>
+#include <string.h>
 #include "com/centreon/engine/common.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
@@ -64,6 +67,7 @@ int main_test() {
   engine& engine = engine::instance();
   unsigned int id1 = 0;
   unsigned int id2 = 0;
+  unsigned int id3 = 0;
 
   {
     // Add new object (file) to log into engine and test limit size.
@@ -71,26 +75,34 @@ int main_test() {
     engine::obj_info info1(obj1, log_all, most);
     id1 = engine.add_object(info1);
 
-    // Add new object (file) to log into engine and test rotation.
-    QSharedPointer<file> obj2(new file("./test_logging_file_rotate.log", "./"));
+    // Add new object (file) to log into engine and test no limit size.
+    QSharedPointer<file> obj2(new file("./test_logging_file.log"));
     engine::obj_info info2(obj2, log_all, most);
     id2 = engine.add_object(info2);
+
+    // Add new object (file) to log into engine and test reopen.
+    QSharedPointer<file> obj3(new file("./test_logging_file_reopen.log"));
+    engine::obj_info info3(obj3, log_all, most);
+    id3 = engine.add_object(info3);
   }
 
   // Send message to all object.
   engine.log("012345", log_info_message, basic);
   engine.log("0123456789", log_info_message, basic);
-  // Make a rotation for obj2.
-  file::rotate_all();
+  // Reopen files.
+  if (rename("./test_logging_file_reopen.log", "./test_logging_file_reopen.log.old"))
+    throw (engine_error() << "rename failed: " << strerror(errno));
+  file::reopen();
   // Send message to all object.
   engine.log("qwerty", log_info_message, basic);
 
   // Cleanup.
+  engine.remove_object(id3);
   engine.remove_object(id2);
   engine.remove_object(id1);
 
   QDir dir("./");
-  QStringList filters("test_logging_file_*.log*");
+  QStringList filters("test_logging_file*.log*");
   QFileInfoList files = dir.entryInfoList(filters);
 
   // Check the content of all file log.
@@ -103,10 +115,13 @@ int main_test() {
     else if (it->fileName() == "test_logging_file_size_limit.log.old") {
       check_file(it->fileName(), "0123456789");
     }
-    else if (it->fileName() == "test_logging_file_rotate.log") {
+    else if (it->fileName() == "test_logging_file.log") {
+      check_file(it->fileName(), "0123450123456789qwerty");
+    }
+    else if (it->fileName() == "test_logging_file_reopen.log") {
       check_file(it->fileName(), "qwerty");
     }
-    else if (it->fileName().indexOf("test_logging_file_rotate.log") != -1) {
+    else if (it->fileName() == "test_logging_file_reopen.log.old") {
       check_file(it->fileName(), "0123450123456789");
     }
     else {

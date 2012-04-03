@@ -103,7 +103,6 @@ static std::map<QString, QString> build_configuration(QString const& mainconf, Q
   std::map<QString, QString> var;
 
   QString date_format[] = { "us", "euro", "iso8601", "strict-iso8601" };
-  QString log_rotation[] = { "n", "h", "d", "w", "m" };
   QString check_delay[] = { "n", "d", "s", "" };
 
   int cmd_check_interval = my_rand(-1, 10000);
@@ -127,6 +126,7 @@ static std::map<QString, QString> build_configuration(QString const& mainconf, Q
   var["debug_verbosity"] = obj2str(my_rand(0, 2));
   var["debug_file"] = "debug_file.tmp";
   var["max_debug_file_size"] = obj2str(my_rand(0));
+  var["max_log_file_size"] = obj2str(my_rand(0));
   var["command_file"] = "command_file.tmp";
   var["global_host_event_handler"] = "host-event-handler";
   var["global_service_event_handler"] = "service-event-handler";
@@ -171,7 +171,6 @@ static std::map<QString, QString> build_configuration(QString const& mainconf, Q
   var["cached_service_check_horizon"] = obj2str(my_rand(0));
   var["enable_predictive_service_dependency_checks"] = obj2str(my_rand(0, 1));
   var["soft_state_dependencies"] = obj2str(my_rand(0, 1));
-  var["log_rotation_method"] = log_rotation[my_rand(0, 4)];
   var["log_archive_path"] = "./";
   var["enable_event_handlers"] = obj2str(my_rand(0, 1));
   var["enable_notifications"] = obj2str(my_rand(0, 1));
@@ -262,7 +261,6 @@ void test_configuration(QString const& filename, std::map<QString, QString>& my_
   config.parse(filename);
 
   QString date_format[] = { "us", "euro", "iso8601", "strict-iso8601" };
-  QString log_rotation[] = { "n", "h", "d", "w", "m" };
   QString check_delay[] = { "n", "d", "s", "" };
 
   if (my_conf["date_format"] != date_format[config.get_date_format()]) {
@@ -276,6 +274,9 @@ void test_configuration(QString const& filename, std::map<QString, QString>& my_
   }
   if (my_conf["max_debug_file_size"] != obj2str(config.get_max_debug_file_size())) {
     throw (engine_error() << "max_debug_file_size: init with '" << my_conf["max_debug_file_size"] << "'");
+  }
+  if (my_conf["max_log_file_size"] != obj2str(config.get_max_log_file_size())) {
+    throw (engine_error() << "max_log_file_size: init with '" << my_conf["max_log_file_size"] << "'");
   }
   if (my_conf["use_syslog"] != obj2str(config.get_use_syslog())) {
     throw (engine_error() << "use_syslog: init with '" << my_conf["use_syslog"] << "'");
@@ -520,9 +521,6 @@ void test_configuration(QString const& filename, std::map<QString, QString>& my_
   if (my_conf["ochp_command"] != config.get_ochp_command()) {
     throw (engine_error() << "ochp_command: init with '" << my_conf["ochp_command"] << "'");
   }
-  if (my_conf["log_archive_path"] != config.get_log_archive_path()) {
-    throw (engine_error() << "log_archive_path: init with '" << my_conf["log_archive_path"] << "'");
-  }
   if (my_conf["log_file"] != config.get_log_file()) {
     throw (engine_error() << "log_file: init with '" << my_conf["log_file"] << "'");
   }
@@ -535,46 +533,43 @@ void test_configuration(QString const& filename, std::map<QString, QString>& my_
   if (my_conf["use_regexp_matching"] != obj2str(config.get_use_regexp_matches())) {
     throw (engine_error() << "use_regexp_matching: init with '" << my_conf["use_regexp_matching"] << "'");
   }
-  if (my_conf["log_rotation_method"] != log_rotation[config.get_log_rotation_method()]) {
-    throw (engine_error() << "log_rotation_method: init with '" << my_conf["log_rotation_method"] << "'");
-  }
   if (my_conf["command_check_interval"] != obj2str(config.get_command_check_interval() / config.get_interval_length()) &&
       my_conf["command_check_interval"] != obj2str(config.get_command_check_interval()) + "s") {
-    throw (engine_error() << "command_check_interval: init with '" << my_conf["log_rotation_method"] << "'");
+    throw (engine_error() << "command_check_interval: init with '" << my_conf["command_check_interval"] << "'");
   }
   if (my_conf["service_interleave_factor"] == "s") {
     if (config.get_service_interleave_factor_method() != configuration::state::ilf_smart) {
-      throw (engine_error() << "service_interleave_factor: init with '" << my_conf["log_rotation_method"] << "'");
+      throw (engine_error() << "service_interleave_factor: init with '" << my_conf["service_interleave_factor"] << "'");
     }
   }
   else {
     if (my_conf["service_interleave_factor"] != obj2str(scheduling_info.service_interleave_factor) &&
 	scheduling_info.service_interleave_factor != 1) {
-      throw (engine_error() << "service_interleave_factor: init with '" << my_conf["log_rotation_method"] << "'");
+      throw (engine_error() << "service_interleave_factor: init with '" << my_conf["service_interleave_factor"] << "'");
     }
   }
   if (my_conf["service_inter_check_delay_method"] != check_delay[config.get_service_inter_check_delay_method()] &&
       my_conf["service_inter_check_delay_method"] != obj2str(scheduling_info.service_inter_check_delay)) {
-      throw (engine_error() << "service_inter_check_delay_method: init with '" << my_conf["log_rotation_method"] << "'");
+      throw (engine_error() << "service_inter_check_delay_method: init with '" << my_conf["service_inter_check_delay_method"] << "'");
   }
   if (my_conf["host_inter_check_delay_method"] != check_delay[config.get_host_inter_check_delay_method()] &&
       my_conf["host_inter_check_delay_method"] != obj2str(scheduling_info.host_inter_check_delay)) {
-      throw (engine_error() << "host_inter_check_delay_method: init with '" << my_conf["log_rotation_method"] << "'");
+      throw (engine_error() << "host_inter_check_delay_method: init with '" << my_conf["host_inter_check_delay_method"] << "'");
   }
 
   nagios_macros* mac = get_global_macros();
   if (mac->x[MACRO_ADMINEMAIL] != NULL &&
       my_conf["admin_email"] != mac->x[MACRO_ADMINEMAIL]) {
-    throw (engine_error() << "admin_email: init with '" << my_conf["log_rotation_method"] << "'");
+    throw (engine_error() << "admin_email: init with '" << my_conf["admin_email"] << "'");
   }
   if (mac->x[MACRO_ADMINPAGER] &&
       my_conf["admin_pager"] != mac->x[MACRO_ADMINPAGER]) {
-    throw (engine_error() << "admin_pager: init with '" << my_conf["log_rotation_method"] << "'");
+    throw (engine_error() << "admin_pager: init with '" << my_conf["admin_pager"] << "'");
   }
 
   for (unsigned int i = 0; i < MAX_USER_MACROS; ++i) {
     if (macro_user[i] != "USER" + obj2str(i + 1)) {
-      throw (engine_error() << "resource_file: init with '" << my_conf["log_rotation_method"] << "'");
+      throw (engine_error() << "resource_file: init with '" << macro_user[i] << "'");
     }
   }
 }

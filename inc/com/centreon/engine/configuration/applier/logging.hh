@@ -46,9 +46,7 @@ namespace                      com {
 	                       logging(state const& config);
 	                       logging(logging& right);
 	                       ~logging() throw();
-
 	    logging&           operator=(logging& right);
-
 	    void               apply(state const& config);
 
 	  private:
@@ -57,24 +55,23 @@ namespace                      com {
 	    void               _add_syslog();
 	    void               _add_log_file(state const& config);
 	    void               _add_debug(state const& config);
-
 	    void               _del_syslog();
 	    void               _del_log_file();
 	    void               _del_debug();
 	    void               _del_stdout();
 	    void               _del_stderr();
 
-	    QString            _log_file;
-	    QString            _log_archive_path;
 	    QString            _debug_file;
-	    unsigned long      _debug_limit;
-	    unsigned long      _debug_level;
-	    unsigned int       _debug_verbosity;
-	    unsigned long      _stdout_id;
-	    unsigned long      _stderr_id;
-	    unsigned long      _syslog_id;
-	    unsigned long      _file_id;
 	    unsigned long      _debug_id;
+	    unsigned long      _debug_level;
+	    unsigned long      _debug_limit;
+	    unsigned int       _debug_verbosity;
+	    QString            _log_file;
+	    unsigned long      _log_id;
+            unsigned long      _log_limit;
+	    unsigned long      _stderr_id;
+	    unsigned long      _stdout_id;
+	    unsigned long      _syslog_id;
 	  };
 	}
       }

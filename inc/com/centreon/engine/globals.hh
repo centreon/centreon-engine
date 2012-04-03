@@ -66,6 +66,7 @@ extern unsigned long             next_event_id;
 extern unsigned long             next_problem_id;
 extern unsigned long             next_notification_id;
 
+extern int                       sighup;
 extern int                       sigshutdown;
 extern int                       sigrestart;
 

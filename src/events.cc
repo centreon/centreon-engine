@@ -79,11 +79,7 @@ static void _exec_event_command_check(timed_event* event) {
 
 static void _exec_event_log_rotation(timed_event* event) {
   (void)event;
-
-  logger(dbg_events, basic) << "** Log File Rotation Event";
-
-  /* rotate the log file */
-  file::rotate_all();
+  // logger(dbg_events, basic) << "** Log File Rotation Event";
 }
 
 static void _exec_event_program_shutdown(timed_event* event) {
@@ -102,8 +98,7 @@ static void _exec_event_program_restart(timed_event* event) {
   (void)event;
   logger(dbg_events, basic) << "** Program Restart Event";
 
-  /* set the restart flag */
-  sigrestart = TRUE;
+  // XXX todo: do the same think when receive SIGHUP.
 
   /* log the restart */
   logger(log_process_info, basic)
@@ -876,19 +871,6 @@ void init_timing_loop(void) {
 		       NULL,
 		       0);
   }
-
-  /* add a log rotation event if necessary */
-  if (config.get_log_rotation_method() != LOG_ROTATION_NONE)
-    schedule_new_event(EVENT_LOG_ROTATION,
-		       TRUE,
-		       get_next_log_rotation_time(),
-                       TRUE,
-		       0,
-		       (void*)get_next_log_rotation_time,
-		       TRUE,
-		       NULL,
-                       NULL,
-		       0);
 
   /* add a retention data save event if needed */
   if (config.get_retain_state_information() == true

@@ -1318,50 +1318,7 @@ time_t calculate_time_from_weekday_of_month(int year,
 
 /* get the next time to schedule a log rotation */
 time_t get_next_log_rotation_time(void) {
-  time_t current_time;
-  struct tm* t, tm_s;
-  int is_dst_now = FALSE;
-  time_t run_time;
-
-  time(&current_time);
-  t = localtime_r(&current_time, &tm_s);
-  t->tm_min = 0;
-  t->tm_sec = 0;
-  is_dst_now = (t->tm_isdst > 0) ? TRUE : FALSE;
-
-  switch (config.get_log_rotation_method()) {
-  case LOG_ROTATION_HOURLY:
-    t->tm_hour++;
-    run_time = mktime(t);
-    break;
-
-  case LOG_ROTATION_DAILY:
-    t->tm_mday++;
-    t->tm_hour = 0;
-    run_time = mktime(t);
-    break;
-
-  case LOG_ROTATION_WEEKLY:
-    t->tm_mday += (7 - t->tm_wday);
-    t->tm_hour = 0;
-    run_time = mktime(t);
-    break;
-
-  case LOG_ROTATION_MONTHLY:
-  default:
-    t->tm_mon++;
-    t->tm_mday = 1;
-    t->tm_hour = 0;
-    run_time = mktime(t);
-    break;
-  }
-
-  if (is_dst_now == TRUE && t->tm_isdst == 0)
-    run_time += 3600;
-  else if (is_dst_now == FALSE && t->tm_isdst > 0)
-    run_time -= 3600;
-
-  return (run_time);
+  return (0);
 }
 
 /******************************************************************/
@@ -1396,24 +1353,23 @@ void reset_sighandler(void) {
 
 /* handle signals */
 void sighandler(int sig) {
-  int x = 0;
-
-  caught_signal = TRUE;
+  caught_signal = true;
 
   if (sig < 0)
     sig = -sig;
 
-  for (x = 0; sigs[x] != (char*)NULL; x++);
+  int x;
+  for (x = 0; sigs[x] != (char*)NULL; ++x);
   sig %= x;
 
   sig_id = sig;
 
-  /* we received a SIGHUP, so restart... */
+  /* we received a SIGHUP */
   if (sig == SIGHUP)
-    sigrestart = TRUE;
+    sighup = true;
   /* else begin shutting down... */
   else if (sig < 16)
-    sigshutdown = TRUE;
+    sigshutdown = true;
 }
 
 /******************************************************************/

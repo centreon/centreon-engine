@@ -40,38 +40,27 @@ namespace                        com {
          */
 	class                    file : public object {
 	public:
-	                         file(QString const& file,
-				      unsigned long long size_limit = 0);
-	                         file(QString const& file,
-				      QString const& archive_path);
+	                         file(
+                                   QString const& file,
+                                   unsigned long long size_limit = 0);
 	                         file(file const& right);
 	                         ~file() throw();
-
 	  file&                  operator=(file const& right);
-
-	  static void            rotate_all();
-	  void                   rotate();
-
-	  void                   log(char const* message,
-				     unsigned long long type,
-				     unsigned int verbosity) throw();
-
-	  void                   set_archive_path(QString const& path) throw();
-	  QString                get_archive_path() const throw();
-
-	  void                   set_size_limit(unsigned long long size) throw();
-	  unsigned long long     get_size_limit() const throw();
-
 	  QString                get_file_name() throw();
+	  unsigned long long     get_size_limit() const throw();
+	  void                   log(
+                                   char const* message,
+                                   unsigned long long type,
+                                   unsigned int verbosity) throw();
+          static void            reopen();
+	  void                   set_size_limit(unsigned long long size) throw();
 
 	private:
 	  QSharedPointer<QMutex> _mutex;
 	  QSharedPointer<QFile>  _file;
-	  QString                _archive_path;
+          static QList<file*>    _files;
+          static QReadWriteLock  _rwlock;
 	  unsigned long long     _size_limit;
-
-	  static QList<file*>    _files;
-	  static QReadWriteLock  _rwlock;
 	};
       }
     }

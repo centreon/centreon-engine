@@ -26,6 +26,7 @@
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/events/loop.hh"
 #include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/logging/file.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/statusdata.hh"
 
@@ -89,7 +90,6 @@ void loop::run() {
 
   // Connect signals and slots.
   QObject::connect(this, SIGNAL(shutdown()), _app, SLOT(quit()));
-  QObject::connect(this, SIGNAL(restart()), _app, SLOT(quit()));
   QTimer::singleShot(0, this, SLOT(_dispatching()));
   _app->exec();
 
@@ -121,10 +121,6 @@ void loop::_dispatching() {
       emit shutdown();
       return ;
     }
-    else if (sigrestart) {
-      emit restart();
-      return ;
-    }
 
     // If we don't have any events to handle, exit.
     if (!event_list_high && !event_list_low) {
@@ -133,6 +129,11 @@ void loop::_dispatching() {
         << "Exiting...";
       emit shutdown();
       return ;
+    }
+
+    if (sighup) {
+      file::reopen();
+      sighup = false;
     }
 
     // Process some events.

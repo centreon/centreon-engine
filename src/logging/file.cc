@@ -46,29 +46,9 @@ file::file(QString const& file, unsigned long long size_limit)
     _file(new QFile(file)),
     _size_limit(size_limit) {
   _file->open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Append);
-  if (_file->QFile::error() != QFile::NoError) {
+  if (_file->QFile::error() != QFile::NoError)
     throw (engine_error() << file << ": " << _file->errorString());
-  }
-  _rwlock.lockForWrite();
-  _files.push_back(this);
-  _rwlock.unlock();
-}
 
-/**
- *  Constructor.
- *
- *  @param[in] file         The file name.
- *  @param[in] archive_path The archive path for the rotation.
- */
-file::file(QString const& file, QString const& archive_path)
-  : _mutex(new QMutex),
-    _file(new QFile(file)),
-    _archive_path(archive_path),
-    _size_limit(0) {
-  _file->open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Append);
-  if (_file->QFile::error() != QFile::NoError) {
-    throw (engine_error() << file << ": " << _file->errorString());
-  }
   _rwlock.lockForWrite();
   _files.push_back(this);
   _rwlock.unlock();
@@ -79,10 +59,10 @@ file::file(QString const& file, QString const& archive_path)
  */
 file::~file() throw() {
   _rwlock.lockForWrite();
-  QList<file*>::iterator it = std::find(_files.begin(), _files.end(), this);
-  if (it != _files.end()) {
+  QList<file*>::iterator
+    it(std::find(_files.begin(), _files.end(), this));
+  if (it != _files.end())
     _files.erase(it);
-  }
   _rwlock.unlock();
 }
 
@@ -92,7 +72,8 @@ file::~file() throw() {
  * @param[in] right The class to copy.
  */
 file::file(file const& right)
-  : object(right), _size_limit(0) {
+  : object(right),
+    _size_limit(0) {
   operator=(right);
 }
 
@@ -106,7 +87,6 @@ file& file::operator=(file const& right) {
     right._mutex->lock();
     _mutex = right._mutex;
     _file = right._file;
-    _archive_path = right._archive_path;
     _size_limit = right._size_limit;
     right._mutex->unlock();
   }
@@ -114,53 +94,27 @@ file& file::operator=(file const& right) {
 }
 
 /**
- *  Archive all files.
+ *  Get the file name.
+ *
+ *  @return The file name.
  */
-void file::rotate_all() {
-  _rwlock.lockForRead();
-
-  // update the last log rotation time and status log.
-  last_log_rotation = time(NULL);
-  update_program_status(FALSE);
-
-  for (QList<file*>::iterator it = _files.begin(), end = _files.end();
-       it != end;
-       ++it) {
-    (*it)->rotate();
-  }
-  _rwlock.unlock();
+QString file::get_file_name() throw() {
+  _mutex->lock();
+  QString filename = _file->fileName();
+  _mutex->unlock();
+  return (filename);
 }
 
- /**
- *  Archive file.
+/**
+ *  Get the size limit.
+ *
+ *  @return The size limit.
  */
-void file::rotate() {
-  if (_size_limit > 0) {
-    return;
-  }
-
+unsigned long long file::get_size_limit() const throw() {
   _mutex->lock();
-  time_t now = time(NULL);
-  tm t;
-
-  localtime_r(&now, &t);
-
-  QString old_name = _file->fileName();
-  QString new_name = QString("%1/%2-%3-%4-%5-%6.log")
-    .arg(_archive_path)
-    .arg(old_name)
-    .arg(t.tm_mon + 1, 2, 10, QLatin1Char('0'))
-    .arg(t.tm_mday, 2, 10, QLatin1Char('0'))
-    .arg(t.tm_year + 1900)
-    .arg(t.tm_hour, 2, 10, QLatin1Char('0'));
-
-    _file->close();
-    if ((QFile::exists(new_name) == false || QFile::remove(new_name) == true)
-	&& _file->rename(new_name) == true) {
-      _file->setFileName(old_name);
-    }
-    _file->open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Append);
+  unsigned long long size = _size_limit;
   _mutex->unlock();
+  return (size);
 }
 
 /**
@@ -170,9 +124,10 @@ void file::rotate() {
  *  @param[in] type      Logging types.
  *  @param[in] verbosity Verbosity level.
  */
-void file::log(char const* message,
-	       unsigned long long type,
-	       unsigned int verbosity) throw() {
+void file::log(
+             char const* message,
+             unsigned long long type,
+             unsigned int verbosity) throw() {
   (void)type;
   (void)verbosity;
 
@@ -202,26 +157,22 @@ void file::log(char const* message,
 }
 
 /**
- *  Set the archive path.
- *
- *  @param[in] path The new archive path.
+ *  Close and open all files.
  */
-void file::set_archive_path(QString const& path) throw() {
-  _mutex->lock();
-  _archive_path = path;
-  _mutex->unlock();
-}
-
-/**
- *  Get the archive path.
- *
- *  @return The archive path.
- */
-QString file::get_archive_path() const throw() {
-  _mutex->lock();
-  QString path = _archive_path;
-  _mutex->unlock();
-  return (path);
+void file::reopen() {
+  _rwlock.lockForWrite();
+  for (QList<file*>::iterator it(_files.begin()), end(_files.end());
+       it != end;
+       ++it) {
+    (*it)->_mutex->lock();
+    (*it)->_file->close();
+    (*it)->_file->open(
+                    QIODevice::WriteOnly
+                    | QIODevice::Text
+                    | QIODevice::Append);
+    (*it)->_mutex->unlock();
+  }
+  _rwlock.unlock();
 }
 
 /**
@@ -233,28 +184,4 @@ void file::set_size_limit(unsigned long long size) throw() {
   _mutex->lock();
   _size_limit = (size > 0 ? size : 0);
   _mutex->unlock();
-}
-
-/**
- *  Get the size limit.
- *
- *  @return The size limit.
- */
-unsigned long long file::get_size_limit() const throw() {
-  _mutex->lock();
-  unsigned long long size = _size_limit;
-  _mutex->unlock();
-  return (size);
-}
-
-/**
- *  Get the file name.
- *
- *  @return The file name.
- */
-QString file::get_file_name() throw() {
-  _mutex->lock();
-  QString filename = _file->fileName();
-  _mutex->unlock();
-  return (filename);
 }

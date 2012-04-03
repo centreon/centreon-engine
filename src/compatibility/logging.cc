@@ -348,9 +348,7 @@ int log_service_states(unsigned int type, time_t* timestamp) {
  */
 int rotate_log_file(time_t rotation_time) {
   (void)rotation_time;
-
-  file::rotate_all();
-  return (OK);
+  return (ERROR);
 }
 
 /**

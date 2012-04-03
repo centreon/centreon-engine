@@ -27,14 +27,15 @@ using namespace com::centreon::engine::configuration::applier;
  *  Default constructor.
  */
 logging::logging()
-  : _debug_limit(0),
+  : _debug_id(0),
     _debug_level(0),
+    _debug_limit(0),
     _debug_verbosity(0),
-    _stdout_id(0),
+    _log_id(0),
+    _log_limit(0),
     _stderr_id(0),
-    _syslog_id(0),
-    _file_id(0),
-    _debug_id(0) {
+    _stdout_id(0),
+    _syslog_id(0) {
   _add_stdout();
   _add_stderr();
 }
@@ -45,14 +46,15 @@ logging::logging()
  *  @param[in] config The initial confiuration.
  */
 logging::logging(state const& config)
-  : _debug_limit(0),
+  : _debug_id(0),
     _debug_level(0),
+    _debug_limit(0),
     _debug_verbosity(0),
-    _stdout_id(0),
+    _log_id(0),
+    _log_limit(0),
     _stderr_id(0),
-    _syslog_id(0),
-    _file_id(0),
-    _debug_id(0) {
+    _stdout_id(0),
+    _syslog_id(0) {
   _add_stdout();
   _add_stderr();
   apply(config);
@@ -65,14 +67,15 @@ logging::logging(state const& config)
  */
 logging::logging(logging& right)
   : base(right),
-    _debug_limit(0),
+    _debug_id(0),
     _debug_level(0),
+    _debug_limit(0),
     _debug_verbosity(0),
-    _stdout_id(0),
+    _log_id(0),
+    _log_limit(0),
     _stderr_id(0),
-    _syslog_id(0),
-    _file_id(0),
-    _debug_id(0) {
+    _stdout_id(0),
+    _syslog_id(0) {
   operator=(right);
 }
 
@@ -94,21 +97,22 @@ logging::~logging() throw() {
  */
 logging& logging::operator=(logging& right) {
   if (this != &right) {
-    _log_file = right._log_file;
-    _log_archive_path = right._log_archive_path;
     _debug_file = right._debug_file;
-    _debug_limit = right._debug_limit;
-    _debug_level = right._debug_verbosity;
-    _stdout_id = right._stdout_id;
-    _stderr_id = right._stderr_id;
-    _syslog_id = right._syslog_id;
-    _file_id = right._file_id;
     _debug_id = right._debug_id;
+    _debug_level = right._debug_level;
+    _debug_limit = right._debug_limit;
+    _debug_verbosity = right._debug_verbosity;
+    _log_file = right._log_file;
+    _log_id = right._log_id;
+    _log_limit = right._log_limit;
+    _stderr_id = right._stderr_id;
+    _stdout_id = right._stdout_id;
+    _syslog_id = right._syslog_id;
 
     right._stdout_id = 0;
     right._stderr_id = 0;
     right._syslog_id = 0;
-    right._file_id = 0;
+    right._log_id = 0;
     right._debug_id = 0;
   }
   return (*this);
@@ -130,17 +134,14 @@ void logging::apply(state const& config) {
   if (config.get_log_file() == "")
     _del_log_file();
   else if (config.get_log_file() != _log_file
-      || config.get_log_archive_path() != _log_archive_path) {
+           || config.get_max_log_file_size() != _log_limit) {
     _add_log_file(config);
     _del_stdout();
     _del_stderr();
   }
 
   // Debug file.
-  if ((config.get_debug_file() == "")
-      || !config.get_debug_level()
-      || !config.get_debug_verbosity()
-      || !config.get_max_debug_file_size())
+  if (config.get_debug_file() == "")
     _del_debug();
   else if (config.get_debug_file() != _debug_file
 	   || config.get_max_debug_file_size() != _debug_limit
@@ -203,21 +204,18 @@ void logging::_add_syslog() {
  *  Add file object logging.
  */
 void logging::_add_log_file(state const& config) {
-  if (_file_id != 0) {
-    ::engine::instance().remove_object(_file_id);
-  }
-  QSharedPointer<file> obj(new file(config.get_log_file(), config.get_log_archive_path()));
+  _del_log_file();
+  QSharedPointer<file> obj(new file(config.get_log_file(),
+                                    config.get_max_log_file_size()));
   ::engine::obj_info info(obj, log_all, most);
-  _file_id = ::engine::instance().add_object(info);
+  _log_id = ::engine::instance().add_object(info);
 }
 
 /**
  *  Add debug object logging.
  */
 void logging::_add_debug(state const& config) {
-  if (_debug_id != 0) {
-    ::engine::instance().remove_object(_debug_id);
-  }
+  _del_debug();
   QSharedPointer<file> obj(new file(config.get_debug_file(),
 				    config.get_max_debug_file_size()));
   ::engine::obj_info info(obj,
@@ -240,9 +238,9 @@ void logging::_del_syslog() {
  *  Remove file object logging.
  */
 void logging::_del_log_file() {
-  if (_file_id != 0) {
-    ::engine::instance().remove_object(_file_id);
-    _file_id = 0;
+  if (_log_id != 0) {
+    ::engine::instance().remove_object(_log_id);
+    _log_id = 0;
   }
 }
 

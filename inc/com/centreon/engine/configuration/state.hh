@@ -54,18 +54,6 @@ namespace                   com {
 	  };
 
 	  /**
-	   *  @enum state::e_log_rotation
-	   *  Logging rotation modes
-	   */
-	  enum                e_log_rotation {
-	    rot_none = 0,
-	    rot_hourly,
-	    rot_daily,
-	    rot_weekly,
-	    rot_monthly
-	  };
-
-	  /**
 	   *  @enum state::e_inter_check_delay
 	   *  Inter-check delay calculation types
 	   */
@@ -102,7 +90,6 @@ namespace                   com {
 	  QString const&      get_global_service_event_handler() const throw();
 	  QString const&      get_ocsp_command() const throw();
 	  QString const&      get_ochp_command() const throw();
-	  QString const&      get_log_archive_path() const throw();
 	  QString const&      get_illegal_object_chars() const throw();
 	  QString const&      get_illegal_output_chars() const throw();
 	  QString const&      get_use_timezone() const throw();
@@ -132,6 +119,7 @@ namespace                   com {
 	  unsigned int        get_ocsp_timeout() const throw();
 	  unsigned int        get_ochp_timeout() const throw();
 	  unsigned long       get_max_debug_file_size() const throw();
+	  unsigned long       get_max_log_file_size() const throw();
 	  unsigned long       get_retained_host_attribute_mask() const throw();
 	  unsigned long       get_retained_process_host_attribute_mask() const throw();
 	  unsigned long       get_retained_contact_host_attribute_mask() const throw();
@@ -186,7 +174,6 @@ namespace                   com {
 	  float               get_low_host_flap_threshold() const throw();
 	  float               get_high_host_flap_threshold() const throw();
 	  e_date_format       get_date_format() const throw();
-	  e_log_rotation      get_log_rotation_method() const throw();
 	  e_inter_check_delay get_service_inter_check_delay_method() const throw();
 	  e_inter_check_delay get_host_inter_check_delay_method() const throw();
 	  e_interleave_factor get_service_interleave_factor_method() const throw();
@@ -234,6 +221,7 @@ namespace                   com {
 	  void                set_ocsp_timeout(unsigned int value);
 	  void                set_ochp_timeout(unsigned int value);
 	  void                set_max_debug_file_size(unsigned long value);
+	  void                set_max_log_file_size(unsigned long value);
 	  void                set_max_check_result_file_age(unsigned long value);
 	  void                set_retained_host_attribute_mask(unsigned long value);
 	  void                set_retained_process_host_attribute_mask(unsigned long value);
@@ -293,7 +281,6 @@ namespace                   com {
 	  void                set_high_host_flap_threshold(float value);
 	  void                set_date_format(e_date_format value);
 	  void                set_date_format(QString const& value);
-	  void                set_log_rotation_method(e_log_rotation value);
 	  void                set_log_rotation_method(QString const& value);
 	  void                set_service_inter_check_delay_method(e_inter_check_delay value);
 	  void                set_service_inter_check_delay_method(QString const& value);
@@ -316,7 +303,6 @@ namespace                   com {
 	    global_service_event_handler,
 	    ocsp_command,
 	    ochp_command,
-	    log_archive_path,
 	    illegal_object_chars,
 	    illegal_output_chars,
 	    use_timezone,
@@ -330,6 +316,7 @@ namespace                   com {
 	  enum                e_var_ulong {
 	    debug_level = 0,
 	    max_debug_file_size,
+	    max_log_file_size,
 	    retained_host_attribute_mask,
 	    retained_process_host_attribute_mask,
 	    retained_contact_host_attribute_mask,
@@ -393,7 +380,6 @@ namespace                   com {
 	    ocsp_timeout,
 	    ochp_timeout,
 	    date_format,
-	    log_rotation_method,
 	    service_inter_check_delay_method,
 	    host_inter_check_delay_method,
 	    service_interleave_factor_method,
@@ -553,12 +539,13 @@ namespace                   com {
 	  static const unsigned int        DEFAULT_NOTIFICATION_TIMEOUT                        = 30;
 	  static const unsigned int        DEFAULT_OCSP_TIMEOUT                                = 15;
 	  static const unsigned int        DEFAULT_OCHP_TIMEOUT                                = 15;
+	  static const unsigned int        DEFAULT_LOG_ROTATION                                = 0;
 	  static const e_date_format       DEFAULT_DATE_FORMAT                                 = us;
-	  static const e_log_rotation      DEFAULT_LOG_ROTATION                                = rot_none;
 	  static const e_inter_check_delay DEFAULT_SERVICE_INTER_CHECK_DELAY_METHOD            = icd_smart;
 	  static const e_inter_check_delay DEFAULT_HOST_INTER_CHECK_DELAY_METHOD               = icd_smart;
 	  static const e_interleave_factor DEFAULT_SERVICE_INTERLEAVE_FACTOR_METHOD            = ilf_smart;
 	  static const unsigned long       DEFAULT_MAX_DEBUG_FILE_SIZE                         = 1000000;
+	  static const unsigned long       DEFAULT_MAX_LOG_FILE_SIZE                           = 0;
 	  static const unsigned long       DEFAULT_RETAINED_HOST_ATTRIBUTE_MASK                = 0L;
 	  static const unsigned long       DEFAULT_RETAINED_PROCESS_HOST_ATTRIBUTE_MASK        = 0L;
 	  static const unsigned long       DEFAULT_RETAINED_CONTACT_HOST_ATTRIBUTE_MASK        = 0L;

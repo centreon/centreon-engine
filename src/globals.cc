@@ -48,6 +48,7 @@ unsigned long             next_event_id = 0L;
 unsigned long             next_problem_id = 0L;
 unsigned long             next_notification_id = 0L;
 
+int                       sighup = true;
 int                       sigshutdown = FALSE;
 int                       sigrestart = FALSE;
 

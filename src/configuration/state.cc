@@ -55,6 +55,7 @@ state::state()
 
   _lst_method["resource_file"]                               = &cpp_suck<QString const&, &state::_parse_resource_file>::set_generic;;
   _lst_method["log_file"]                                    = &cpp_suck<QString const&, &state::set_log_file>::set_generic;
+  _lst_method["max_log_file_size"]                           = &cpp_suck<unsigned long, &state::set_max_log_file_size>::set_generic;
   _lst_method["broker_module_directory"]                     = &cpp_suck<QString const&, &state::set_broker_module_directory>::set_generic;
   _lst_method["debug_level"]                                 = &cpp_suck_cast<unsigned long, int, &state::set_debug_level>::set_generic_cast;
   _lst_method["debug_verbosity"]                             = &cpp_suck<unsigned int, &state::set_debug_verbosity>::set_generic;
@@ -191,7 +192,8 @@ state::state()
   set_accept_passive_host_checks(DEFAULT_ACCEPT_PASSIVE_HOST_CHECKS);
   set_allow_empty_hostgroup_assignment(DEFAULT_ALLOW_EMPTY_HOSTGROUP_ASSIGNMENT);
 
-  _tab_string[log_archive_path] = DEFAULT_LOG_ARCHIVE_PATH;
+  ::log_rotation_method = 0;
+  ::log_archive_path = my_strdup(DEFAULT_LOG_ARCHIVE_PATH);
 
   // Set macros.
   delete[] _mac->x[MACRO_TEMPFILE];
@@ -222,6 +224,7 @@ state::~state() throw() {
   delete[] _mac->x[MACRO_ADMINEMAIL];
   delete[] _mac->x[MACRO_ADMINPAGER];
 
+  delete[] ::log_archive_path;
   delete[] ::log_file;
   delete[] ::debug_file;
   delete[] ::command_file;
@@ -229,7 +232,6 @@ state::~state() throw() {
   delete[] ::global_service_event_handler;
   delete[] ::ocsp_command;
   delete[] ::ochp_command;
-  delete[] ::log_archive_path;
   delete[] ::illegal_object_chars;
   delete[] ::illegal_output_chars;
   delete[] ::use_timezone;
@@ -275,8 +277,6 @@ state& state::operator=(state const& right) {
  */
 void state::reset() {
   _reset();
-
-  _tab_string[log_archive_path] = DEFAULT_LOG_ARCHIVE_PATH;
 }
 
 /**
@@ -349,9 +349,6 @@ void state::parse(QString const& filename) {
 
   delete[] _mac->x[MACRO_MAINCONFIGFILE];
   _mac->x[MACRO_MAINCONFIGFILE] = my_strdup(qPrintable(_filename));
-
-  // check path
-  set_log_archive_path(get_log_archive_path());
 }
 
 /**
@@ -416,14 +413,6 @@ QString const& state::get_ocsp_command() const throw() {
  */
 QString const& state::get_ochp_command() const throw() {
   return (_tab_string[ochp_command]);
-}
-
-/**
- *  Get the logging archive path.
- *  @return The logging archive path.
- */
-QString const& state::get_log_archive_path() const throw() {
-  return (_tab_string[log_archive_path]);
 }
 
 /**
@@ -656,6 +645,14 @@ unsigned int state::get_ochp_timeout() const throw() {
  */
 unsigned long state::get_max_debug_file_size() const throw() {
   return (_tab_ulong[max_debug_file_size]);
+}
+
+/**
+ *  Get the max log file size.
+ *  @return The max log file size.
+ */
+unsigned long state::get_max_log_file_size() const throw() {
+  return (_tab_ulong[max_log_file_size]);
 }
 
 /**
@@ -1083,14 +1080,6 @@ state::e_date_format state::get_date_format() const throw() {
 }
 
 /**
- *  Get the logging rotation method.
- *  @return The logging rotation method.
- */
-state::e_log_rotation state::get_log_rotation_method() const throw() {
-  return (static_cast<e_log_rotation>(_tab_uint[log_rotation_method]));
-}
-
-/**
  *  Get the service inter check delay method.
  *  @return The service inter check delay method.
  */
@@ -1238,21 +1227,9 @@ void state::set_ochp_command(QString const& value) {
  *  @param[in] value The path.
  */
 void state::set_log_archive_path(QString const& value) {
-  // Check that log_archive_path exists and is a directory.
-  QFileInfo qinfo(value);
-  if (!qinfo.exists())
-    throw (engine_error() << "log_archive_path '" << value
-                          << "' does not exist");
-  if (!qinfo.isDir())
-    throw (engine_error() << "log_archive_path '" << value
-                          << "' is not a directory");
-
-  // Set configuration variable.
-  _tab_string[log_archive_path] = value;
-
-  // Set compatibility variable.
-  delete[] ::log_archive_path;
-  ::log_archive_path = my_strdup(qPrintable(value));
+  (void)value;
+  logger(log_config_warning, basic)
+    << "warning: log_archive_path variable ignored";
 }
 
 /**
@@ -1636,6 +1613,14 @@ void state::set_ochp_timeout(unsigned int value) {
 void state::set_max_debug_file_size(unsigned long value) {
   _tab_ulong[max_debug_file_size] = value;
   ::max_debug_file_size = value;
+}
+
+/**
+ *  Set the max log file size.
+ *  @param[in] value The size.
+ */
+void state::set_max_log_file_size(unsigned long value) {
+  _tab_ulong[max_log_file_size] = value;
 }
 
 /**
@@ -2208,35 +2193,10 @@ void state::set_date_format(QString const& value) {
  *  Set the logging rotation method.
  *  @param[in] value The logging rotation method.
  */
-void state::set_log_rotation_method(e_log_rotation value) {
-  _tab_uint[log_rotation_method] = value;
-  ::log_rotation_method = value;
-}
-
-/**
- *  Set the logging rotation method.
- *  @param[in] value The logging rotation method.
- */
 void state::set_log_rotation_method(QString const& value) {
-  if (value == "n") {
-    _tab_uint[log_rotation_method] = rot_none;
-  }
-  else if (value == "h") {
-    _tab_uint[log_rotation_method] = rot_hourly;
-  }
-  else if (value == "d") {
-    _tab_uint[log_rotation_method] = rot_daily;
-  }
-  else if (value == "w") {
-    _tab_uint[log_rotation_method] = rot_weekly;
-  }
-  else if (value == "m") {
-    _tab_uint[log_rotation_method] = rot_monthly;
-  }
-  else {
-    throw (engine_error() << "log_rotation_method: invalid value.");
-  }
-  ::log_rotation_method = _tab_uint[log_rotation_method];
+  (void)value;
+  logger(log_config_warning, basic) << "warning: log_rotation_method "
+    "variable ignored: Centreon Engine does not check for updates";
 }
 
 /**
@@ -2458,8 +2418,6 @@ void state::_reset() {
   set_retained_contact_host_attribute_mask(DEFAULT_RETAINED_CONTACT_HOST_ATTRIBUTE_MASK);
   set_retained_contact_service_attribute_mask(DEFAULT_RETAINED_CONTACT_SERVICE_ATTRIBUTE_MASK);
 
-  set_log_rotation_method(DEFAULT_LOG_ROTATION);
-
   set_max_parallel_service_checks(DEFAULT_MAX_PARALLEL_SERVICE_CHECKS);
 
   set_enable_notifications(DEFAULT_ENABLE_NOTIFICATIONS);
@@ -2500,6 +2458,7 @@ void state::_reset() {
   set_debug_level(DEFAULT_DEBUG_LEVEL);
   set_debug_verbosity(DEFAULT_DEBUG_VERBOSITY);
   set_max_debug_file_size(DEFAULT_MAX_DEBUG_FILE_SIZE);
+  set_max_log_file_size(DEFAULT_MAX_LOG_FILE_SIZE);
 
   set_illegal_output_chars(DEFAULT_ILLEGAL_OUTPUT_CHARS);
 

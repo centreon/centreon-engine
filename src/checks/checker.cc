@@ -173,7 +173,7 @@ void checker::reap() {
       }
 
       // Caught signal, need to break.
-      if (sigshutdown || sigrestart) {
+      if (sigshutdown) {
         logger(dbg_checks, basic)
           << "Breaking out of check result reaper: signal encountered";
         break ;
