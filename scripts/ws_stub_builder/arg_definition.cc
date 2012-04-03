@@ -105,6 +105,10 @@ arg_definition::arg_definition() {
   command_id.add(arg_string).set_name("command")
     .set_help("command_id");
 
+  argument resource_id("ns1__resourceUserIDType", "resource");
+  resource_id.add(arg_uint).set_name("id")
+    .set_help("resource_id");
+
   argument command_type("ns1__commandType", "command");
   command_type.add(arg_string).set_name("name");
   command_type.add(arg_string).set_name("commandLine")
@@ -648,6 +652,7 @@ arg_definition::arg_definition() {
   _list.push_back(acknowledgement);
   _list.push_back(check_result);
   _list.push_back(command_id);
+  _list.push_back(resource_id);
   _list.push_back(command_type);
   _list.push_back(contact_id);
   _list.push_back(contact_type);

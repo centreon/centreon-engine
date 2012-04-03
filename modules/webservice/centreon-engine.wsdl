@@ -381,6 +381,13 @@
 	</sequence>
       </complexType>
 
+      <!-- Resource user identifier. -->
+      <complexType name="resourceUserIDType">
+	<sequence>
+	  <element name="id" type="xsd::unsignedInt"/>
+	</sequence>
+      </complexType>
+
     </schema>
   </types>
 
@@ -854,6 +861,12 @@
     <part name="notification" type="tns:notificationType"/>
   </message>
 
+  <!-- Configuration messages. -->
+  <message name="updateResourceUserRequest">
+    <part name="resource" type="tns:resourceUserIDType"/>
+    <part name="value" type="xsd:string"/>
+  </message>
+
   <portType name="commandPortType">
 
     <!--
@@ -861,6 +874,16 @@
 	 Global operations.  
 	                      
      -->
+
+    <!--
+	Configuration modification.
+    -->
+    <operation name="updateResourceUser">
+      <documentation>Update resource user.</documentation>
+      <input message="tns:updateResourceUserRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
 
     <!--
          Debug object operations.
@@ -3907,6 +3930,16 @@
 	 Global operations.  
 	                     
      -->
+
+    <!--
+	Configuration modification.
+    -->
+
+    <operation name="updateResourceUser">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
 
     <!--
 	 Debug object operations.

@@ -61,8 +61,53 @@ extern char*         global_host_event_handler;
 extern char*         global_service_event_handler;
 extern command*      global_host_event_handler_ptr;
 extern command*      global_service_event_handler_ptr;
+extern char*         macro_user[];
 extern unsigned long modified_host_process_attributes;
 extern unsigned long modified_service_process_attributes;
+
+/**
+ *  Update content of USERn macros.
+ *
+ *  @param[in]  s           Unused.
+ *  @param[in]  resource_id Resource to modify data (index start by 1).
+ *  @param[out] val         Result of operation.
+ *
+ *  @return SOAP_OK on success.
+ */
+int centreonengine__updateResourceUser(soap* s,
+                                       ns1__resourceUserIDType* resource_id,
+                                       std::string value) {
+  try {
+    syncro::instance().waiting_callback();
+
+    logger(dbg_functions, most)
+	<< "Webservice: " << __func__ << "(" << resource_id->id << ")";
+
+    if (resource_id->id == 0 || resource_id->id >= MAX_USER_MACROS) {
+      std::string* error = soap_new_std__string(s, 1);
+      *error = "invalid resource id.";
+
+      logger(dbg_commands, most)
+        << "Webservice: " << __func__ << " failed. " << *error;
+
+      syncro::instance().worker_finish();
+      return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
+    }
+
+    unsigned int pos(resource_id->id - 1);
+    delete[] macro_user[pos];
+    macro_user[pos] = my_strdup(value.c_str());
+
+    syncro::instance().worker_finish();
+  }
+  catch (...) {
+    logger(dbg_commands, most)
+      << "Webservice: " << __func__ << " failed. catch all.";
+    syncro::instance().worker_finish();
+    return (soap_receiver_fault(s, "Runtime error.", "catch all"));
+  }
+  return (SOAP_OK);
+}
 
 /**
  *  Restart Engine.
