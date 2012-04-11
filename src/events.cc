@@ -792,7 +792,8 @@ void init_timing_loop(void) {
 		       0);
 
   /* add a check result reaper event */
-  schedule_new_event(EVENT_CHECK_REAPER, TRUE,
+  schedule_new_event(EVENT_CHECK_REAPER,
+                     TRUE,
                      current_time + config.get_check_reaper_interval(),
 		     TRUE,
                      config.get_check_reaper_interval(),

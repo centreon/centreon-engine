@@ -188,6 +188,10 @@ void builder::_build_source() {
          << "  return (str.toDouble());\n"
          << "}\n\n";
 
+  stream << "static float toFloat(QString const& str) {\n"
+         << "  return (str.toFloat());\n"
+         << "}\n\n";
+
   stream << "static int toInt(QString const& str) {\n"
          << "  return (str.toInt());\n"
          << "}\n\n";

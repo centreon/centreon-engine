@@ -107,10 +107,11 @@ int main(int argc, char** argv) {
     error = TRUE;
 
   // Load singletons.
-  logging::engine::load();
-  commands::set::load();
-  checks::checker::load();
-  events::loop::load();
+  com::centreon::engine::logging::engine::load();
+  com::centreon::engine::configuration::applier::logging::load();
+  com::centreon::engine::commands::set::load();
+  com::centreon::engine::checks::checker::load();
+  com::centreon::engine::events::loop::load();
   com::centreon::engine::broker::loader::load();
   com::centreon::engine::broker::compatibility::load();
 
@@ -216,7 +217,6 @@ int main(int argc, char** argv) {
   }
 
   // We're just verifying the configuration.
-  configuration::applier::logging apply_log;
   int result = ERROR;
   if (TRUE == verify_config) {
     // Reset program variables.
@@ -276,7 +276,7 @@ int main(int argc, char** argv) {
     // Read in the configuration files (main config file and all host config files).
     try {
       config.parse(config_file);
-      apply_log.apply(config);
+      configuration::applier::logging::instance().apply(config);
       engine::obj_info obj(QSharedPointer<logging::broker>(new logging::broker),
                            log_all,
                            basic);
@@ -357,7 +357,7 @@ int main(int argc, char** argv) {
       // and resource config files).
       try {
         config.parse(config_file);
-        apply_log.apply(config);
+        configuration::applier::logging::instance().apply(config);
         result = OK;
       }
       catch(std::exception const &e) {
@@ -579,9 +579,10 @@ int main(int argc, char** argv) {
   // Unload singletons (except logging).
   com::centreon::engine::broker::compatibility::unload();
   com::centreon::engine::broker::loader::unload();
-  events::loop::unload();
-  checks::checker::unload();
-  commands::set::unload();
+  com::centreon::engine::events::loop::unload();
+  com::centreon::engine::checks::checker::unload();
+  com::centreon::engine::commands::set::unload();
+  com::centreon::engine::configuration::applier::logging::load();
 
   return (EXIT_SUCCESS);
 }

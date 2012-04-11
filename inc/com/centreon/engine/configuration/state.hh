@@ -198,6 +198,7 @@ namespace                   com {
 	  void                set_debug_level(unsigned long value);
 	  void                set_debug_verbosity(unsigned int value);
 	  void                set_command_check_interval(int value);
+	  void                set_command_check_interval(int value, bool is_second);
 	  void                set_command_check_interval(QString const& value);
 	  void                set_external_command_buffer_slots(int value);
 	  void                set_max_service_check_spread(unsigned int value);

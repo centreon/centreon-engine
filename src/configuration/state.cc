@@ -1334,6 +1334,17 @@ void state::set_command_check_interval(int value) {
 
 /**
  *  Set the command check interval.
+ *
+ *  @param[in] value     Time interval.
+ *  @param[in] is_second Is value is in second.
+ */
+void state::set_command_check_interval(int value, bool is_second) {
+  _command_check_interval_is_seconds = is_second;
+  set_command_check_interval(value);
+}
+
+/**
+ *  Set the command check interval.
  *  @param[in] value The check interval.
  */
 void state::set_command_check_interval(QString const& value) {

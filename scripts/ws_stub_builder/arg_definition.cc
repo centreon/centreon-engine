@@ -81,6 +81,7 @@ QList<argument> const& arg_definition::get_arguments() const throw() {
  *  Default constructor.
  */
 arg_definition::arg_definition() {
+  argument arg_float("float", "value");
   argument arg_bool("bool", "value");
   argument arg_double("double", "value");
   argument arg_int("int", "value");
@@ -642,12 +643,13 @@ arg_definition::arg_definition() {
     .set_help("dependency_period")
     .set_is_optional(true);
 
-
+  _list.push_back(arg_float);
   _list.push_back(arg_bool);
   _list.push_back(arg_double);
   _list.push_back(arg_int);
   _list.push_back(arg_string);
   _list.push_back(arg_time);
+  _list.push_back(arg_ulong64);
   _list.push_back(arg_uint);
   _list.push_back(acknowledgement);
   _list.push_back(check_result);

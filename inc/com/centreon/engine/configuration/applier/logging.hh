@@ -42,14 +42,17 @@ namespace                      com {
 	 */
 	  class                logging : public base {
 	  public:
+	    void               apply(state const& config);
+            static logging&    instance();
+            static void        load();
+            static void        unload();
+
+	  private:
 	                       logging();
 	                       logging(state const& config);
 	                       logging(logging& right);
 	                       ~logging() throw();
 	    logging&           operator=(logging& right);
-	    void               apply(state const& config);
-
-	  private:
 	    void               _add_stdout();
 	    void               _add_stderr();
 	    void               _add_syslog();
@@ -66,6 +69,7 @@ namespace                      com {
 	    unsigned long      _debug_level;
 	    unsigned long      _debug_limit;
 	    unsigned int       _debug_verbosity;
+            static logging*    _instance;
 	    QString            _log_file;
 	    unsigned long      _log_id;
             unsigned long      _log_limit;

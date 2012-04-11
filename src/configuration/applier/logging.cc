@@ -23,6 +23,65 @@
 using namespace com::centreon::engine::logging;
 using namespace com::centreon::engine::configuration::applier;
 
+logging* logging::_instance = NULL;
+
+/**
+ *  Get the singleton instance of logging applier.
+ *
+ *  @return Singleton instance.
+ */
+logging& logging::instance() {
+  return (*_instance);
+}
+
+/**
+ *  Load logging applier singleton.
+ */
+void logging::load() {
+  if (!_instance)
+    _instance = new logging;
+}
+
+/**
+ *  Unload logging applier singleton.
+ */
+void logging::unload() {
+  delete _instance;
+  _instance = NULL;
+}
+
+/**
+ *  Apply new configuration.
+ *
+ *  @param[in] config The new configuration.
+ */
+void logging::apply(state const& config) {
+  // Syslog.
+  if (config.get_use_syslog() == true && _syslog_id == 0)
+    _add_syslog();
+  else if (config.get_use_syslog() == false && _syslog_id != 0)
+    _del_syslog();
+
+  // Standard log file.
+  if (config.get_log_file() == "")
+    _del_log_file();
+  else if (config.get_log_file() != _log_file
+           || config.get_max_log_file_size() != _log_limit) {
+    _add_log_file(config);
+    _del_stdout();
+    _del_stderr();
+  }
+
+  // Debug file.
+  if (config.get_debug_file() == "")
+    _del_debug();
+  else if (config.get_debug_file() != _debug_file
+	   || config.get_max_debug_file_size() != _debug_limit
+	   || config.get_debug_level() != _debug_level
+	   || config.get_debug_verbosity() != _debug_verbosity)
+    _add_debug(config);
+}
+
 /**
  *  Default constructor.
  */
@@ -119,43 +178,11 @@ logging& logging::operator=(logging& right) {
 }
 
 /**
- *  Apply new configuration.
- *
- *  @param[in] config The new configuration.
- */
-void logging::apply(state const& config) {
-  // Syslog.
-  if (config.get_use_syslog() == true && _syslog_id == 0)
-    _add_syslog();
-  else if (config.get_use_syslog() == false && _syslog_id != 0)
-    _del_syslog();
-
-  // Standard log file.
-  if (config.get_log_file() == "")
-    _del_log_file();
-  else if (config.get_log_file() != _log_file
-           || config.get_max_log_file_size() != _log_limit) {
-    _add_log_file(config);
-    _del_stdout();
-    _del_stderr();
-  }
-
-  // Debug file.
-  if (config.get_debug_file() == "")
-    _del_debug();
-  else if (config.get_debug_file() != _debug_file
-	   || config.get_max_debug_file_size() != _debug_limit
-	   || config.get_debug_level() != _debug_level
-	   || config.get_debug_verbosity() != _debug_verbosity)
-    _add_debug(config);
-}
-
-/**
  *  Add stdout object logging.
  */
 void logging::_add_stdout() {
   if (_stdout_id == 0) {
-    QSharedPointer<standard> obj(new standard());
+    QSharedPointer<standard> obj(new com::centreon::engine::logging::standard());
     unsigned long long type(log_process_info
       | log_event_handler
       | log_external_command

@@ -55,6 +55,7 @@ add_library("webservice" SHARED
   ${QT_WS_MOC_FILES}
   # Sources.
   "${SRC_DIR}/commands.cc"
+  "${SRC_DIR}/commands_nagioscfg.cc"
   "${SRC_DIR}/configuration.cc"
   "${SRC_DIR}/create_object.cc"
   "${SRC_DIR}/main.cc"

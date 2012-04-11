@@ -21,12 +21,12 @@
 #include <string>
 #include <string.h>
 #include <strings.h>
-#include "centreonengine.nsmap" // gSOAP namespaces.
 #include "soapH.h"
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/checks.hh"
 #include "com/centreon/engine/downtime.hh"
 #include "com/centreon/engine/external_commands/commands.hh"
+#include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/dumpers.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/notifications.hh"
@@ -36,34 +36,8 @@
 #include "com/centreon/engine/webservice/server/create_object.hh"
 #include "com/centreon/engine/webservice/server/syncro.hh"
 
-using namespace com::centreon::engine::modules;
 using namespace com::centreon::engine::logging;
-
-extern int           sigrestart;
-extern int           sigshutdown;
-extern int           enable_event_handlers;
-extern int           enable_failure_prediction;
-extern int           enable_flap_detection;
-extern int           execute_host_checks;
-extern int           accept_passive_host_checks;
-extern char*         global_host_event_handler;
-extern int           check_host_freshness;
-extern int           obsess_over_hosts;
-extern int           enable_notifications;
-extern int           process_performance_data;
-extern int           execute_service_checks;
-extern int           accept_passive_service_checks;
-extern char*         global_service_event_handler;
-extern int           check_service_freshness;
-extern int           obsess_over_services;
-extern int           enable_event_handlers;
-extern char*         global_host_event_handler;
-extern char*         global_service_event_handler;
-extern command*      global_host_event_handler_ptr;
-extern command*      global_service_event_handler_ptr;
-extern char*         macro_user[];
-extern unsigned long modified_host_process_attributes;
-extern unsigned long modified_service_process_attributes;
+using namespace com::centreon::engine::modules;
 
 /**
  *  Update content of USERn macros.

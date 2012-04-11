@@ -34,8 +34,10 @@ unsigned long commands::command::_id = 0;
 commands::command::command(QString const& name,
 			   QString const& command_line)
   : QObject(),
-    _name(name),
-    _command_line(command_line) {}
+    _command_line(command_line),
+    _name(name) {
+
+}
 
 /**
  *  Default destructor.

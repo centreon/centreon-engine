@@ -412,6 +412,26 @@
     <part name="value" type="xsd:boolean"/>
   </message>
 
+  <!-- Request with a unsinged integer. -->
+  <message name="unsignedIntRequest">
+    <part name="value" type="xsd:unsignedInt"/>
+  </message>
+
+  <!-- Request with a integer. -->
+  <message name="integerRequest">
+    <part name="value" type="xsd:int"/>
+  </message>
+
+  <!-- Request with a float. -->
+  <message name="floatRequest">
+    <part name="value" type="xsd:float"/>
+  </message>
+
+  <!-- Request with a unsigned long. -->
+  <message name="unsignedLongRequest">
+    <part name="value" type="xsd:unsignedLong"/>
+  </message>
+
   <!-- Returns a boolean value. -->
   <message name="booleanResponse">
     <part name="val" type="xsd:boolean"/>
@@ -867,6 +887,11 @@
     <part name="value" type="xsd:string"/>
   </message>
 
+  <message name="commandCheckIntervalRequest">
+    <part name="value" type="xsd:int"/>
+    <part name="isSecond" type="xsd:boolean"/>
+  </message>
+
   <portType name="commandPortType">
 
     <!--
@@ -878,9 +903,298 @@
     <!--
 	Configuration modification.
     -->
+
+    <!-- updateResourceUser -->
     <operation name="updateResourceUser">
       <documentation>Update resource user.</documentation>
       <input message="tns:updateResourceUserRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- setCommandCheckInterval -->
+    <operation name="setCommandCheckInterval">
+      <documentation>Set new value for command check interval variable.</documentation>
+      <input message="tns:commandCheckIntervalRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- setCheckExternalCommands -->
+    <operation name="setCheckExternalCommands">
+      <documentation>Set new value for check external commands variable.</documentation>
+      <input message="tns:booleanRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- setUseAggressiveHostChecking -->
+    <operation name="setUseAggressiveHostChecking">
+      <documentation>Set new value for use aggressibe host checking variable.</documentation>
+      <input message="tns:booleanRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- setGlobalHostEventHandler -->
+    <operation name="setGlobalHostEventHandler">
+      <documentation>Set new value for global host event handler variable.</documentation>
+      <input message="tns:commandRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- setGlobalServiceEventHandler -->
+    <operation name="setGlobalServiceEventHandler">
+      <documentation>Set new value for global service event handler variable.</documentation>
+      <input message="tns:commandRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- setSoftStateDependencies -->
+    <operation name="setSoftStateDependencies">
+      <documentation>Set new value for soft state dependencies variable.</documentation>
+      <input message="tns:booleanRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- setCheckServiceFreshness -->
+    <operation name="setCheckServiceFreshness">
+      <documentation>Set new value for check service freshness variable.</documentation>
+      <input message="tns:booleanRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- setServiceFreshnessCheckInterval -->
+    <operation name="setServiceFreshnessCheckInterval">
+      <documentation>Set new value for service freshness check interval variable.</documentation>
+      <input message="tns:unsignedIntRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- setCheckHostFreshness -->
+    <operation name="setCheckHostFreshness">
+      <documentation>Set new value for check host freshness variable.</documentation>
+      <input message="tns:booleanRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- setHostFreshnessCheckInterval -->
+    <operation name="setHostFreshnessCheckInterval">
+      <documentation>Set new value for host freshness check interval variable.</documentation>
+      <input message="tns:unsignedIntRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- setAdditionalFreshnessLatency -->
+    <operation name="setAdditionalFreshnessLatency">
+      <documentation>Set new value for additional freshness latency variable.</documentation>
+      <input message="tns:integerRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- setLowServiceFlapThreshold -->
+    <operation name="setLowServiceFlapThreshold">
+      <documentation>Set new value for low service flap threshold variable.</documentation>
+      <input message="tns:floatRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- setHighServiceFlapThreshold -->
+    <operation name="setHighServiceFlapThreshold">
+      <documentation>Set new value for hight service flap threshold variable.</documentation>
+      <input message="tns:floatRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- setLowHostFlapThreshold -->
+    <operation name="setLowHostFlapThreshold">
+      <documentation>Set new value for low host flap threshold variable.</documentation>
+      <input message="tns:floatRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- setHighHostFlapThreshold -->
+    <operation name="setHighHostFlapThreshold">
+      <documentation>Set new value for high host flap threshold variable.</documentation>
+      <input message="tns:floatRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- setExecuteServiceChecks -->
+    <operation name="setExecuteServiceChecks">
+      <documentation>Set new value for execute service checks variable.</documentation>
+      <input message="tns:booleanRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- setAcceptPassiveServiceChecks -->
+    <operation name="setAcceptPassiveServiceChecks">
+      <documentation>Set new value for accept passive service checks variable.</documentation>
+      <input message="tns:booleanRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- setExecuteHostChecks -->
+    <operation name="setExecuteHostChecks">
+      <documentation>Set new value for execute host checks variable.</documentation>
+      <input message="tns:booleanRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- setAcceptPassiveHostChecks -->
+    <operation name="setAcceptPassiveHostChecks">
+      <documentation>Set new value for accept passive host checks variable.</documentation>
+      <input message="tns:booleanRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- setLogNotifications -->
+    <operation name="setLogNotifications">
+      <documentation>Set new value for log notifications variable.</documentation>
+      <input message="tns:booleanRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- setLogServiceRetries -->
+    <operation name="setLogServiceRetries">
+      <documentation>Set new value for log service retries variable.</documentation>
+      <input message="tns:booleanRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- setLogHostRetries -->
+    <operation name="setLogHostRetries">
+      <documentation>Set new value for log host retries variable.</documentation>
+      <input message="tns:booleanRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- setLogEventHandlers -->
+    <operation name="setLogEventHandlers">
+      <documentation>Set new value for log event handlers variable.</documentation>
+      <input message="tns:booleanRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- setLogInitialState -->
+    <operation name="setLogInitialState">
+      <documentation>Set new value for log initial state variable.</documentation>
+      <input message="tns:booleanRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- setLogExternalCommands -->
+    <operation name="setLogExternalCommands">
+      <documentation>Set new value for log external commands variable.</documentation>
+      <input message="tns:booleanRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- setLogPassiveChecks -->
+    <operation name="setLogPassiveChecks">
+      <documentation>Set new value for log passive chechs variable.</documentation>
+      <input message="tns:booleanRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- setServiceCheckTimeout -->
+    <operation name="setServiceCheckTimeout">
+      <documentation>Set new value for service check timeout variable.</documentation>
+      <input message="tns:unsignedIntRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- setHostCheckTimeout -->
+    <operation name="setHostCheckTimeout">
+      <documentation>Set new value for host check timeout variable.</documentation>
+      <input message="tns:unsignedIntRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- setEventHandlerTimeout -->
+    <operation name="setEventHandlerTimeout">
+      <documentation>Set new value for event handler timeout variable.</documentation>
+      <input message="tns:unsignedIntRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- setNotificationTimeout -->
+    <operation name="setNotificationTimeout">
+      <documentation>Set new value for notification timeout variable.</documentation>
+      <input message="tns:unsignedIntRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- setOcspTimeout -->
+    <operation name="setOcspTimeout">
+      <documentation>Set new value for ocsp timeout variable.</documentation>
+      <input message="tns:unsignedIntRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- setOchpTimeout -->
+    <operation name="setOchpTimeout">
+      <documentation>Set new value for ochp timeout variable.</documentation>
+      <input message="tns:unsignedIntRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- setRetentionUpdateInterval -->
+    <operation name="setRetentionUpdateInterval">
+      <documentation>Set new value for retention update interval variable.</documentation>
+      <input message="tns:unsignedIntRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- setSleepTime -->
+    <operation name="setSleepTime">
+      <documentation>Set new value for sleep time variable.</documentation>
+      <input message="tns:floatRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- setserviceinterleavefactor -->
+    <operation name="setServiceInterleaveFactor">
+      <documentation>Set new value for service inter leave factor variable.</documentation>
+      <input message="tns:booleanRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- setMaxConcurrentChecks -->
+    <operation name="setMaxConcurrentChecks">
+      <documentation>Set new value for max concurrent checks variable.</documentation>
+      <input message="tns:unsignedIntRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- setCheckResultReaperFrequency -->
+    <operation name="setCheckResultReaperFrequency">
+      <documentation>Set new value for check result reaper frequency variable.</documentation>
+      <input message="tns:unsignedIntRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- setUseLargeInstallationTweaks -->
+    <operation name="setUseLargeInstallationTweaks">
+      <documentation>Set new value for use large installation tweaks variable.</documentation>
+      <input message="tns:booleanRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- setDebugVerbosity -->
+    <operation name="setDebugVerbosity">
+      <documentation>Set new value for debug verbosity variable.</documentation>
+      <input message="tns:unsignedIntRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- setDebugLevel -->
+    <operation name="setDebugLevel">
+      <documentation>Set new value for debug level variable.</documentation>
+      <input message="tns:integerRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- setMaxDebugFileSize -->
+    <operation name="setMaxDebugFileSize">
+      <documentation>Set new value for max debug file size variable.</documentation>
+      <input message="tns:unsignedLongRequest"/>
       <output message="tns:defaultResponse"/>
     </operation>
 
@@ -3936,6 +4250,252 @@
     -->
 
     <operation name="updateResourceUser">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="setCommandCheckInterval">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="setCheckExternalCommands">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="setUseAggressiveHostChecking">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="setGlobalHostEventHandler">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="setGlobalServiceEventHandler">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="setSoftStateDependencies">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="setCheckServiceFreshness">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="setServiceFreshnessCheckInterval">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="setCheckHostFreshness">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="setHostFreshnessCheckInterval">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="setAdditionalFreshnessLatency">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="setLowServiceFlapThreshold">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="setHighServiceFlapThreshold">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="setLowHostFlapThreshold">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="setHighHostFlapThreshold">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="setExecuteServiceChecks">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="setAcceptPassiveServiceChecks">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="setExecuteHostChecks">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="setAcceptPassiveHostChecks">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="setLogNotifications">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="setLogServiceRetries">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="setLogHostRetries">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="setLogEventHandlers">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="setLogInitialState">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="setLogExternalCommands">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="setLogPassiveChecks">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="setServiceCheckTimeout">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="setHostCheckTimeout">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="setEventHandlerTimeout">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="setNotificationTimeout">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="setOcspTimeout">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="setOchpTimeout">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="setRetentionUpdateInterval">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="setSleepTime">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="setServiceInterleaveFactor">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="setMaxConcurrentChecks">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="setCheckResultReaperFrequency">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="setUseLargeInstallationTweaks">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="setDebugVerbosity">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="setDebugLevel">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="setMaxDebugFileSize">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
       <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
