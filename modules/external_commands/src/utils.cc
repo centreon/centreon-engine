@@ -29,9 +29,9 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include "com/centreon/engine/common.hh"
-#include "com/centreon/engine/external_commands/utils.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
+#include "com/centreon/engine/modules/external_commands/utils.hh"
 #include "nagios.h"
 
 using namespace com::centreon::engine::logging;

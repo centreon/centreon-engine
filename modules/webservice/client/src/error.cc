@@ -18,9 +18,9 @@
 */
 
 #include <string.h>
-#include "com/centreon/engine/webservice/client/error.hh"
+#include "com/centreon/engine/modules/webservice/error.hh"
 
-using namespace com::centreon::engine::modules::client;
+using namespace com::centreon::engine::modules::webservice;
 
 error::error(char const* message) throw () {
   strncpy(_message, message, sizeof(_message) - 1);

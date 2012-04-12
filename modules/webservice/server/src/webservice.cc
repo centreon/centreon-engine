@@ -20,10 +20,10 @@
 #include <signal.h>
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/logging/logger.hh"
-#include "com/centreon/engine/webservice/server/ssl.hh"
-#include "com/centreon/engine/webservice/server/webservice.hh"
+#include "com/centreon/engine/modules/webservice/ssl.hh"
+#include "com/centreon/engine/modules/webservice/webservice.hh"
 
-using namespace com::centreon::engine::modules;
+using namespace com::centreon::engine::modules::webservice;
 using namespace com::centreon::engine::logging;
 
 /**
@@ -34,8 +34,8 @@ using namespace com::centreon::engine::logging;
  */
 webservice::webservice(configuration const& config)
   : QThread(0),
-    _is_end(false),
-    _config(config) {
+    _config(config),
+    _is_end(false) {
 #ifndef WITH_OPENSSL
   if (config.get_ssl_enable() == true) {
     logger(log_config_warning, basic)

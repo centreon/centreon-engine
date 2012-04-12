@@ -21,12 +21,13 @@
 #include <time.h>
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
+#include "com/centreon/engine/modules/webservice/schedule_object.hh"
 #include "com/centreon/engine/statusdata.hh"
 #include "com/centreon/engine/utils.hh"
-#include "com/centreon/engine/webservice/server/schedule_object.hh"
 
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;
+using namespace com::centreon::engine::modules;
 
 static void _update_host_schedule_info(host const* hst) {
   logger(dbg_events, most) << "Determining host scheduling parameters.";
@@ -157,7 +158,7 @@ static void _update_service_schedule_info(service const* svc) {
     << "Service inter-check delay:       " << scheduling_info.service_inter_check_delay;
 }
 
-void modules::schedule_host(host* hst) {
+void webservice::schedule_host(host* hst) {
   if (hst == NULL) {
     logger(dbg_events, most) << "Scheduling host. Host pointer is NULL.";
     return;
@@ -219,7 +220,7 @@ void modules::schedule_host(host* hst) {
                      hst->check_options);
 }
 
-void modules::schedule_service(service* svc) {
+void webservice::schedule_service(service* svc) {
   if (svc == NULL) {
     logger(dbg_events, most) << "Scheduling service. Service pointer is NULL.";
     return;

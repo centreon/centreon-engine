@@ -17,8 +17,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef CCE_EXTERNAL_COMMANDS_UTILS_HH
-#  define CCE_EXTERNAL_COMMANDS_UTILS_HH
+#ifndef CCE_MOD_EXTCMD_UTILS_HH
+#  define CCE_MOD_EXTCMD_UTILS_HH
 
 #  include <time.h>
 
@@ -39,4 +39,4 @@ int submit_raw_external_command(char const* cmd, time_t* ts, int* buffer_items);
 }
 #  endif // C++
 
-#endif // !CCE_EXTERNAL_COMMANDS_UTILS_HH
+#endif // !CCE_MOD_EXTCMD_UTILS_HH

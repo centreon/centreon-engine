@@ -22,11 +22,11 @@
 #include "com/centreon/engine/configuration/state.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
-#include "com/centreon/engine/webservice/server/syncro.hh"
+#include "com/centreon/engine/modules/webservice/syncro.hh"
 #include "soapH.h"
 
 using namespace com::centreon::engine::logging;
-using namespace com::centreon::engine::modules;
+using namespace com::centreon::engine::modules::webservice;
 
 /**
  *  Set global variable command_check_interval.

@@ -176,9 +176,9 @@ void builder::_build_source() {
   QFileInfo file_info(_header_dst);
   stream << "#include <QStringList>\n"
          << "#include <ostream>\n"
-         << "#include \"com/centreon/engine/webservice/client/error.hh\"\n"
+         << "#include \"com/centreon/engine/modules/webservice/error.hh\"\n"
          << "#include \"" << file_info.fileName() << "\"\n\n"
-         << "using namespace com::centreon::engine::modules::client;\n\n";
+         << "using namespace com::centreon::engine::modules::webservice;\n\n";
 
   stream << "static std::string toStdString(QString const& str) {\n"
          << "  return (str.toStdString());\n"

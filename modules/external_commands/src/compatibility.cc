@@ -20,11 +20,11 @@
 
 #include <stdlib.h>
 #include "com/centreon/engine/broker.hh"
-#include "com/centreon/engine/external_commands/commands.hh"
-#include "com/centreon/engine/external_commands/compatibility.hh"
 #include "com/centreon/engine/flapping.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
+#include "com/centreon/engine/modules/external_commands/commands.hh"
+#include "com/centreon/engine/modules/external_commands/compatibility.hh"
 #include "com/centreon/engine/sretention.hh"
 
 using namespace com::centreon::engine::logging;

@@ -25,19 +25,19 @@
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/checks.hh"
 #include "com/centreon/engine/downtime.hh"
-#include "com/centreon/engine/external_commands/commands.hh"
+#include "com/centreon/engine/modules/external_commands/commands.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/dumpers.hh"
 #include "com/centreon/engine/logging/logger.hh"
+#include "com/centreon/engine/modules/webservice/create_object.hh"
+#include "com/centreon/engine/modules/webservice/syncro.hh"
 #include "com/centreon/engine/notifications.hh"
 #include "com/centreon/engine/objects.hh"
 #include "com/centreon/engine/sretention.hh"
 #include "com/centreon/engine/statusdata.hh"
-#include "com/centreon/engine/webservice/server/create_object.hh"
-#include "com/centreon/engine/webservice/server/syncro.hh"
 
 using namespace com::centreon::engine::logging;
-using namespace com::centreon::engine::modules;
+using namespace com::centreon::engine::modules::webservice;
 
 /**
  *  Update content of USERn macros.

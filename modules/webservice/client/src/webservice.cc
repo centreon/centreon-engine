@@ -18,11 +18,11 @@
 */
 
 #include <signal.h>
-#include "com/centreon/engine/webservice/client/error.hh"
-#include "com/centreon/engine/webservice/client/ssl.hh"
-#include "com/centreon/engine/webservice/client/webservice.hh"
+#include "com/centreon/engine/modules/webservice/error.hh"
+#include "com/centreon/engine/modules/webservice/ssl.hh"
+#include "com/centreon/engine/modules/webservice/webservice.hh"
 
-using namespace com::centreon::engine::modules::client;
+using namespace com::centreon::engine::modules::webservice;
 
 /**
  *  Default constructor.
@@ -32,11 +32,13 @@ using namespace com::centreon::engine::modules::client;
  *  @param[in] password   The password (for authentication).
  *  @param[in] cacert     the certificate path (for authentication).
  */
-webservice::webservice(bool ssl_enable,
-		       QString const& keyfile,
-		       QString const& password,
-		       QString const& cacert)
-  : _ssl_enable(ssl_enable), _gen(auto_gen::instance()) {
+webservice::webservice(
+              bool ssl_enable,
+              QString const& keyfile,
+              QString const& password,
+              QString const& cacert)
+  : _gen(auto_gen::instance()),
+    _ssl_enable(ssl_enable) {
 #ifndef WITH_OPENSSL
   (void)keyfile;
   (void)password;
@@ -91,12 +93,20 @@ webservice::~webservice() {
 }
 
 /**
- *  Get the endpoint address.
+ *  Execute soap function.
  *
- *  @return The endpoint address.
+ *  @param[in] function The webservice function name.
+ *  @param[in] args     The arguments of this function.
+ *
+ *  @return Return true if the execution succeed, false otherwise.
  */
-QString const& webservice::get_end_point() const throw() {
-  return (_end_point);
+bool webservice::execute(QString const& function, QHash<QString, QString> const& args) {
+  return (_gen.execute(
+            function,
+            &_soap_ctx,
+            _end_point.toStdString().c_str(),
+            _action.toStdString().c_str(),
+            args));
 }
 
 /**
@@ -109,21 +119,21 @@ QString const& webservice::get_action() const throw() {
 }
 
 /**
+ *  Get the endpoint address.
+ *
+ *  @return The endpoint address.
+ */
+QString const& webservice::get_end_point() const throw() {
+  return (_end_point);
+}
+
+/**
  *  Check if ssl is enable.
  *
  *  @return Return true if ssl is enable, false otherwise.
  */
 bool webservice::is_ssl_enable() const throw() {
   return (_ssl_enable);
-}
-
-/**
- *  Set the endpoint address.
- *
- *  @param[in] end_point The endpoint address.
- */
-void webservice::set_end_point(QString const& end_point) {
-  _end_point = end_point;
 }
 
 /**
@@ -135,23 +145,14 @@ void webservice::set_action(QString const& action) {
   _action = action;
 }
 
-
 /**
- *  Execute soap function.
+ *  Set the endpoint address.
  *
- *  @param[in] function The webservice function name.
- *  @param[in] args     The arguments of this function.
- *
- *  @return Return true if the execution succeed, false otherwise.
+ *  @param[in] end_point The endpoint address.
  */
-bool webservice::execute(QString const& function, QHash<QString, QString> const& args) {
-  return (_gen.execute(function,
-		       &_soap_ctx,
-		       _end_point.toStdString().c_str(),
-		       _action.toStdString().c_str(),
-		       args));
+void webservice::set_end_point(QString const& end_point) {
+  _end_point = end_point;
 }
-
 
 #ifdef WITH_OPENSSL
 /**

@@ -22,15 +22,15 @@
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/logging/logger.hh"
+#include "com/centreon/engine/modules/webservice/configuration.hh"
+#include "com/centreon/engine/modules/webservice/syncro.hh"
+#include "com/centreon/engine/modules/webservice/webservice.hh"
 #include "com/centreon/engine/nebcallbacks.hh"
 #include "com/centreon/engine/nebmodules.hh"
 #include "com/centreon/engine/nebstructs.hh"
-#include "com/centreon/engine/webservice/server/configuration.hh"
-#include "com/centreon/engine/webservice/server/syncro.hh"
-#include "com/centreon/engine/webservice/server/webservice.hh"
 
-using namespace com::centreon::engine::modules;
 using namespace com::centreon::engine::logging;
+using namespace com::centreon::engine::modules::webservice;
 
 /**************************************
  *                                     *

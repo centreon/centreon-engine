@@ -19,7 +19,7 @@
 
 # Directories.
 set(SRC_DIR "${MODULE_DIR}/server/src")
-set(INC_DIR "${MODULE_DIR}/server/inc/com/centreon/engine/webservice/server")
+set(INC_DIR "${MODULE_DIR}/server/inc/com/centreon/engine/modules/webservice")
 
 # Generate webservice header from WSDL.
 add_custom_command(OUTPUT "${MODULE_DIR}/server/centreon-engine-ws.hh"

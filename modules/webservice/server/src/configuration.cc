@@ -19,9 +19,9 @@
 
 #include <QFile>
 #include "com/centreon/engine/error.hh"
-#include "com/centreon/engine/webservice/server/configuration.hh"
+#include "com/centreon/engine/modules/webservice/configuration.hh"
 
-using namespace com::centreon::engine::modules;
+using namespace com::centreon::engine::modules::webservice;
 
 /**
  *  Default Constructor.
@@ -29,12 +29,12 @@ using namespace com::centreon::engine::modules;
  *  @param[in] filename The configuration filename.
  */
 configuration::configuration(QString const& filename)
-  : _filename(filename),
+  : _accept_timeout(500),
+    _filename(filename),
     _port(80),
-    _ssl_enable(false),
     _recv_timeout(5),
     _send_timeout(5),
-    _accept_timeout(500) {
+    _ssl_enable(false) {
   _keytab["/webservice"] = NULL;
   _keytab["/webservice/host"] = &configuration::_set_host;
   _keytab["/webservice/port"] = &configuration::_set_port;
@@ -57,12 +57,12 @@ configuration::~configuration() throw() {
 }
 
 /**
- *  Set the configuration filename.
+ *  Get the accept socket timeout.
  *
- *  @param[in] filename The configuration filename.
+ *  @return The timeout in micosecond.
  */
-void configuration::set_filename(QString const& filename) {
-  _filename = filename;
+int configuration::get_accept_timeout() const throw() {
+  return (_accept_timeout);
 }
 
 /**
@@ -111,12 +111,21 @@ int configuration::get_send_timeout() const throw() {
 }
 
 /**
- *  Get the accept socket timeout.
+ *  Get the certificate path (for authentication).
  *
- *  @return The timeout in micosecond.
+ *  @return The certificate path.
  */
-int configuration::get_accept_timeout() const throw() {
-  return (_accept_timeout);
+QString const& configuration::get_ssl_cacert() const throw() {
+  return (_ssl_cacert);
+}
+
+/**
+ *  Get the Diffie-Helman path (for authentication).
+ *
+ *  @return The Diffie-Helman path.
+ */
+QString const& configuration::get_ssl_dh() const throw() {
+  return (_ssl_dh);
 }
 
 /**
@@ -135,24 +144,6 @@ bool configuration::get_ssl_enable() const throw() {
  */
 QString const& configuration::get_ssl_keyfile() const throw() {
   return (_ssl_keyfile);
-}
-
-/**
- *  Get the certificate path (for authentication).
- *
- *  @return The certificate path.
- */
-QString const& configuration::get_ssl_cacert() const throw() {
-  return (_ssl_cacert);
-}
-
-/**
- *  Get the Diffie-Helman path (for authentication).
- *
- *  @return The Diffie-Helman path.
- */
-QString const& configuration::get_ssl_dh() const throw() {
-  return (_ssl_dh);
 }
 
 /**
@@ -192,6 +183,26 @@ void configuration::parse() {
     _reader.readNext();
   }
   file.close();
+}
+
+/**
+ *  Set the configuration filename.
+ *
+ *  @param[in] filename The configuration filename.
+ */
+void configuration::set_filename(QString const& filename) {
+  _filename = filename;
+}
+
+/**
+ *  Set the accept socket timeout.
+ */
+void configuration::_set_accept_timeout() {
+  bool ok;
+  _accept_timeout = _reader.readElementText().toInt(&ok) * -1000;
+  if (ok == false) {
+    throw (engine_error() << "line " << _reader.lineNumber());
+  }
 }
 
 /**
@@ -235,14 +246,17 @@ void configuration::_set_send_timeout() {
 }
 
 /**
- *  Set the accept socket timeout.
+ *  Set the certificate path (for authentication).
  */
-void configuration::_set_accept_timeout() {
-  bool ok;
-  _accept_timeout = _reader.readElementText().toInt(&ok) * -1000;
-  if (ok == false) {
-    throw (engine_error() << "line " << _reader.lineNumber());
-  }
+void configuration::_set_ssl_cacert() {
+  _ssl_cacert = _reader.readElementText();
+}
+
+/**
+ *  Set the Diffie-Helman path (for authentication).
+ */
+void configuration::_set_ssl_dh() {
+  _ssl_dh = _reader.readElementText();
 }
 
 /**
@@ -266,20 +280,6 @@ void configuration::_set_ssl_enable() {
  */
 void configuration::_set_ssl_keyfile() {
   _ssl_keyfile = _reader.readElementText();
-}
-
-/**
- *  Set the certificate path (for authentication).
- */
-void configuration::_set_ssl_cacert() {
-  _ssl_cacert = _reader.readElementText();
-}
-
-/**
- *  Set the Diffie-Helman path (for authentication).
- */
-void configuration::_set_ssl_dh() {
-  _ssl_dh = _reader.readElementText();
 }
 
 /**

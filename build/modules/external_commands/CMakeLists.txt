@@ -20,7 +20,7 @@
 # Set directories.
 set(MODULE_DIR "${PROJECT_SOURCE_DIR}/modules/external_commands")
 set(SRC_DIR "${MODULE_DIR}/src")
-set(INC_DIR "${MODULE_DIR}/inc/com/centreon/engine/external_commands")
+set(INC_DIR "${MODULE_DIR}/inc/com/centreon/engine/modules/external_commands")
 
 # Include directories.
 include_directories("${MODULE_DIR}/inc")

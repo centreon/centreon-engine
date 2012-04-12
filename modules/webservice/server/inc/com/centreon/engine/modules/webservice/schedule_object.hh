@@ -17,21 +17,18 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef CCE_MOD_WS_SERVER_SCHEDULE_OBJECT_HH
-#  define CCE_MOD_WS_SERVER_SCHEDULE_OBJECT_HH
+#ifndef CCE_MOD_WS_SCHEDULE_OBJECT_HH
+#  define CCE_MOD_WS_SCHEDULE_OBJECT_HH
 
+#  include "com/centreon/engine/modules/webservice/namespace.hh"
 #  include "com/centreon/engine/objects/host.hh"
 #  include "com/centreon/engine/objects/service.hh"
 
-namespace       com {
-  namespace     centreon {
-    namespace   engine {
-      namespace modules {
-        void    schedule_host(host* hst);
-        void    schedule_service(service* svc);
-      }
-    }
-  }
-}
+CCE_MOD_WS_BEGIN()
 
-#endif // !CCE_MOD_WS_SERVER_SCHEDULE_OBJECT_HH
+void schedule_host(host* hst);
+void schedule_service(service* svc);
+
+CCE_MOD_WS_END()
+
+#endif // !CCE_MOD_WS_SCHEDULE_OBJECT_HH

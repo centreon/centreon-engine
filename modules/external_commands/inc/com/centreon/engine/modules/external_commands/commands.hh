@@ -18,11 +18,11 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef CCE_EXTERNAL_COMMANDS_COMMANDS_HH
-#  define CCE_EXTERNAL_COMMANDS_COMMANDS_HH
+#ifndef CCE_MOD_EXTCMD_COMMANDS_HH
+#  define CCE_MOD_EXTCMD_COMMANDS_HH
 
 #  include <time.h>
-#  include "com/centreon/engine/external_commands/compatibility.hh"
+#  include "com/centreon/engine/modules/external_commands/compatibility.hh"
 #  include "com/centreon/engine/objects.hh"
 
 #  ifdef __cplusplus
@@ -119,4 +119,4 @@ void set_service_notification_number(service* svc, int num);               // se
 }
 #  endif // C++
 
-#endif // !CCE_EXTERNAL_COMMANDS_COMMANDS_HH
+#endif // !CCE_MOD_EXTCMD_COMMANDS_HH

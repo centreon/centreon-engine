@@ -18,8 +18,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef CCE_EXTERNAL_COMMANDS_COMPATIBILITY_HH
-#  define CCE_EXTERNAL_COMMANDS_COMPATIBILITY_HH
+#ifndef CCE_MOD_EXTCMD_COMPATIBILITY_HH
+#  define CCE_MOD_EXTCMD_COMPATIBILITY_HH
 
 #  include <time.h>
 #  include "com/centreon/engine/objects.hh"
@@ -62,4 +62,4 @@ int process_contactgroup_command(
 }
 #  endif // C++
 
-#endif // !CCE_EXTERNAL_COMMANDS_COMPATIBILITY_HH
+#endif // !CCE_MOD_EXTCMD_COMPATIBILITY_HH

@@ -32,9 +32,9 @@
 #include "soapH.h"
 #include "centreonengine.nsmap" // gSOAP namespaces.
 #include "auto_gen.hh"
-#include "com/centreon/engine/webservice/client/webservice.hh"
+#include "com/centreon/engine/modules/webservice/webservice.hh"
 
-using namespace com::centreon::engine::modules::client;
+using namespace com::centreon::engine::modules::webservice;
 
 static char const* OPTIONS = "a:c:e:f:hk:lp:s";
 

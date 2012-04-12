@@ -29,13 +29,13 @@
 #include "com/centreon/engine/checks/checker.hh"
 #include "com/centreon/engine/comments.hh"
 #include "com/centreon/engine/downtime.hh"
-#include "com/centreon/engine/external_commands/commands.hh"
-#include "com/centreon/engine/external_commands/processing.hh"
-#include "com/centreon/engine/external_commands/utils.hh"
 #include "com/centreon/engine/flapping.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/notifications.hh"
+#include "com/centreon/engine/modules/external_commands/commands.hh"
+#include "com/centreon/engine/modules/external_commands/processing.hh"
+#include "com/centreon/engine/modules/external_commands/utils.hh"
 #include "com/centreon/engine/statusdata.hh"
 #include "com/centreon/engine/sretention.hh"
 
@@ -153,7 +153,7 @@ int process_external_commands_from_file(char* fname, int delete_file) {
 
 /* external command processor */
 int process_external_command(char const* cmd) {
-  static external_command::processing process;
+  static modules::external_command::processing process;
   process.execute(cmd);
   return (OK);
 }

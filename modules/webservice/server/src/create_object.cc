@@ -25,6 +25,8 @@
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
+#include "com/centreon/engine/modules/webservice/create_object.hh"
+#include "com/centreon/engine/modules/webservice/schedule_object.hh"
 #include "com/centreon/engine/objects/command.hh"
 #include "com/centreon/engine/objects/contact.hh"
 #include "com/centreon/engine/objects/contactgroup.hh"
@@ -37,11 +39,10 @@
 #include "com/centreon/engine/objects/serviceescalation.hh"
 #include "com/centreon/engine/objects/servicegroup.hh"
 #include "com/centreon/engine/objects/timeperiod.hh"
-#include "com/centreon/engine/webservice/server/create_object.hh"
-#include "com/centreon/engine/webservice/server/schedule_object.hh"
 
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;
+using namespace com::centreon::engine::modules;
 
 /**
  *  Parse and return object options.
@@ -164,7 +165,7 @@ static void _extract_object_from_objectgroup(QVector<T*> const& groups,
  *
  *  @param[in] cmd The struct with all information to create new command.
  */
-void modules::create_command(ns1__commandType const& cmd) {
+void webservice::create_command(ns1__commandType const& cmd) {
   command* obj = add_command(cmd.name.c_str(), cmd.commandLine.c_str());
   if (obj == NULL)
     throw (engine_error() << "comand '" << cmd.name.c_str()
@@ -177,7 +178,7 @@ void modules::create_command(ns1__commandType const& cmd) {
  *
  *  @param[in] cntctgrp The struct with all information to create new contactgroup.
  */
-void modules::create_contactgroup(ns1__contactGroupType const& cntctgrp) {
+void webservice::create_contactgroup(ns1__contactGroupType const& cntctgrp) {
   // create a new contactgroup.
   contactgroup* group = add_contactgroup(cntctgrp.name.c_str(),
                                          cntctgrp.alias.c_str());
@@ -212,7 +213,7 @@ void modules::create_contactgroup(ns1__contactGroupType const& cntctgrp) {
  *
  *  @param[in] hstgrp The struct with all information to create new hostgroup.
  */
-void modules::create_hostgroup(ns1__hostGroupType const& hstgrp) {
+void webservice::create_hostgroup(ns1__hostGroupType const& hstgrp) {
   char const* notes = (hstgrp.notes ? hstgrp.notes->c_str() : NULL);
   char const* notes_url = (hstgrp.notesUrl ? hstgrp.notesUrl->c_str() : NULL);
   char const* action_url = (hstgrp.actionUrl ? hstgrp.actionUrl->c_str() : NULL);
@@ -254,7 +255,7 @@ void modules::create_hostgroup(ns1__hostGroupType const& hstgrp) {
  *
  *  @param[in] svcgrp The struct with all information to create new servicegroup.
  */
-void modules::create_servicegroup(ns1__serviceGroupType const& svcgrp) {
+void webservice::create_servicegroup(ns1__serviceGroupType const& svcgrp) {
   // check if service have host name and service description.
   if (svcgrp.members.size() % 2)
     throw (engine_error() << "servicegroup '" << svcgrp.name << "' invalid members.");
@@ -299,7 +300,7 @@ void modules::create_servicegroup(ns1__serviceGroupType const& svcgrp) {
  *
  *  @param[in] hst The struct with all information to create new host.
  */
-void modules::create_host(ns1__hostType const& hst) {
+void webservice::create_host(ns1__hostType const& hst) {
   // check all arguments and set default option for optional options.
   if (hst.contacts.empty() == true && hst.contactGroups.empty() == true)
     throw (engine_error() << "host '" << hst.name
@@ -494,7 +495,7 @@ void modules::create_host(ns1__hostType const& hst) {
  *
  *  @param[in] svc The struct with all information to create new service.
  */
-void modules::create_service(ns1__serviceType const& svc) {
+void webservice::create_service(ns1__serviceType const& svc) {
   // check all arguments and set default option for optional options.
   if (svc.contacts.empty() == true && svc.contactGroups.empty() == true)
     throw (engine_error() << "service '" << svc.hostName << "', "
@@ -690,7 +691,7 @@ void modules::create_service(ns1__serviceType const& svc) {
  *
  *  @param[in] cntct The struct with all information to create new contact.
  */
-void modules::create_contact(ns1__contactType const& cntct) {
+void webservice::create_contact(ns1__contactType const& cntct) {
   // check all arguments and set default option for optional options.
   QHash<char, bool> service_opt = get_options(&cntct.serviceNotificationOptions, "rcwufs", "n");
   if (service_opt.empty())
@@ -799,7 +800,7 @@ void modules::create_contact(ns1__contactType const& cntct) {
  *
  *  @param[in] hostdependency The struct with all information to create new host dependency.
  */
-void modules::create_hostdependency(ns1__hostDependencyType const& hstdependency) {
+void webservice::create_hostdependency(ns1__hostDependencyType const& hstdependency) {
   // check all arguments and set default option for optional options.
   if (!hstdependency.executionFailureCriteria
       && !hstdependency.notificationFailureCriteria)
@@ -916,7 +917,7 @@ void modules::create_hostdependency(ns1__hostDependencyType const& hstdependency
  *
  *  @param[in] hostescalation The struct with all information to create new host escalation.
  */
-void modules::create_hostescalation(ns1__hostEscalationType const& hstescalation) {
+void webservice::create_hostescalation(ns1__hostEscalationType const& hstescalation) {
   // check all arguments and set default option for optional options.
   if (hstescalation.contacts.empty() == true && hstescalation.contactGroups.empty() == true)
     throw (engine_error() << "hostescalation no contact and no contact groups are defined.");
@@ -992,7 +993,7 @@ void modules::create_hostescalation(ns1__hostEscalationType const& hstescalation
  *  @param[in] servicedependency The struct with all
  *  information to create new service dependency.
  */
-void modules::create_servicedependency(ns1__serviceDependencyType const& svcdependency) {
+void webservice::create_servicedependency(ns1__serviceDependencyType const& svcdependency) {
   // check all arguments and set default option for optional options.
   if (!svcdependency.executionFailureCriteria
       && !svcdependency.notificationFailureCriteria)
@@ -1120,7 +1121,7 @@ void modules::create_servicedependency(ns1__serviceDependencyType const& svcdepe
  *  @param[in] serviceescalation The struct with all
  *  information to create new service escalation.
  */
-void modules::create_serviceescalation(ns1__serviceEscalationType const& svcescalation) {
+void webservice::create_serviceescalation(ns1__serviceEscalationType const& svcescalation) {
   // check all arguments and set default option for optional options.
   if (svcescalation.contacts.empty() == true && svcescalation.contactGroups.empty() == true)
     throw (engine_error() << "serviceescalation no contact and no contact groups are defined.");
@@ -1199,7 +1200,7 @@ void modules::create_serviceescalation(ns1__serviceEscalationType const& svcesca
  *  @param[in] tperiod The struct with all
  *  information to create new timeperiod.
  */
-void modules::create_timeperiod(ns1__timeperiodType const& tperiod) {
+void webservice::create_timeperiod(ns1__timeperiodType const& tperiod) {
   objects::add_timeperiod(tperiod.name.c_str(),
                           tperiod.alias.c_str(),
                           std2qt(tperiod.range),

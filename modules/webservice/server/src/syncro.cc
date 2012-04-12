@@ -17,22 +17,22 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include "com/centreon/engine/webservice/server/syncro.hh"
+#include "com/centreon/engine/modules/webservice/syncro.hh"
 
-using namespace com::centreon::engine::modules;
+using namespace com::centreon::engine::modules::webservice;
 
 syncro& syncro::instance() {
   static syncro instance;
   return (instance);
 }
 
-syncro::syncro()
-  : _thread_count(0), _can_run(false) {
-
-}
-
-syncro::~syncro() {
-
+void syncro::waiting_callback() {
+  _mutex.lock();
+  ++_thread_count;
+  while (_can_run == false) {
+    _condition.wait(&_mutex);
+  }
+  _mutex.unlock();
 }
 
 void syncro::wakeup_worker() {
@@ -46,15 +46,6 @@ void syncro::wakeup_worker() {
   _mutex.unlock();
 }
 
-void syncro::waiting_callback() {
-  _mutex.lock();
-  ++_thread_count;
-  while (_can_run == false) {
-    _condition.wait(&_mutex);
-  }
-  _mutex.unlock();
-}
-
 void syncro::worker_finish() {
   _mutex.lock();
   --_thread_count;
@@ -63,4 +54,14 @@ void syncro::worker_finish() {
   if (_thread_count == 0) {
     _condition.wakeAll();
   }
+}
+
+syncro::syncro()
+  : _can_run(false),
+    _thread_count(0) {
+
+}
+
+syncro::~syncro() {
+
 }

@@ -21,12 +21,12 @@
 #include <stddef.h>
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/error.hh"
-#include "com/centreon/engine/external_commands/commands.hh"
-#include "com/centreon/engine/external_commands/utils.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/nebcallbacks.hh"
 #include "com/centreon/engine/nebmodules.hh"
 #include "com/centreon/engine/nebstructs.hh"
+#include "com/centreon/engine/modules/external_commands/commands.hh"
+#include "com/centreon/engine/modules/external_commands/utils.hh"
 
 using namespace com::centreon::engine::logging;
 
