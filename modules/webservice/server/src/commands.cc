@@ -21,13 +21,14 @@
 #include <string>
 #include <string.h>
 #include <strings.h>
+#include "centreonengine.nsmap"
 #include "soapH.h"
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/checks.hh"
 #include "com/centreon/engine/downtime.hh"
 #include "com/centreon/engine/modules/external_commands/commands.hh"
 #include "com/centreon/engine/globals.hh"
-#include "com/centreon/engine/logging/dumpers.hh"
+// #include "com/centreon/engine/logging/dumpers.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/modules/webservice/create_object.hh"
 #include "com/centreon/engine/modules/webservice/syncro.hh"
@@ -45,12 +46,16 @@ using namespace com::centreon::engine::modules::webservice;
  *  @param[in]  s           Unused.
  *  @param[in]  resource_id Resource to modify data (index start by 1).
  *  @param[out] val         Result of operation.
+ *  @param[out] res         Unused.
  *
  *  @return SOAP_OK on success.
  */
 int centreonengine__updateResourceUser(soap* s,
                                        ns1__resourceUserIDType* resource_id,
-                                       std::string value) {
+                                       std::string value,
+                                       centreonengine__updateResourceUserResponse& res) {
+  (void) res;
+
   try {
     syncro::instance().waiting_callback();
 
@@ -11951,39 +11956,39 @@ int centreonengine__notificationServiceSend(soap* s,
   return (SOAP_OK);
 }
 
-/**
- *  Dump all object list.
- *
- *  @param[in]  s                 Unused.
- *  @param[out] res               Unused.
- *
- *  @return SOAP_OK on success.
- */
-int centreonengine__dumpObjectList(soap* s,
-                                   centreonengine__dumpObjectListResponse& res) {
-  (void)res;
+// /**
+//  *  Dump all object list.
+//  *
+//  *  @param[in]  s                 Unused.
+//  *  @param[out] res               Unused.
+//  *
+//  *  @return SOAP_OK on success.
+//  */
+// int centreonengine__dumpObjectList(soap* s,
+//                                    centreonengine__dumpObjectListResponse& res) {
+//   (void)res;
 
-  try {
-    syncro::instance().waiting_callback();
-    logger(dbg_functions, most) << "Webservice: " << __func__ << "()";
-    com::centreon::engine::logging::dump_object_list();
-    syncro::instance().worker_finish();
-  }
-  catch (std::exception const& e) {
-    logger(dbg_commands, most)
-      << "Webservice: " << __func__ << " failed: " << e.what() << ".";
-    syncro::instance().worker_finish();
-    return (soap_receiver_fault(s, "invalid argument", e.what()));
-  }
-  catch (...) {
-    logger(dbg_commands, most)
-      << "Webservice: " << __func__ << " failed. catch all.";
-    syncro::instance().worker_finish();
-    return (soap_receiver_fault(s, "Runtime error.", "catch all"));
+//   try {
+//     syncro::instance().waiting_callback();
+//     logger(dbg_functions, most) << "Webservice: " << __func__ << "()";
+//     com::centreon::engine::logging::dump_object_list();
+//     syncro::instance().worker_finish();
+//   }
+//   catch (std::exception const& e) {
+//     logger(dbg_commands, most)
+//       << "Webservice: " << __func__ << " failed: " << e.what() << ".";
+//     syncro::instance().worker_finish();
+//     return (soap_receiver_fault(s, "invalid argument", e.what()));
+//   }
+//   catch (...) {
+//     logger(dbg_commands, most)
+//       << "Webservice: " << __func__ << " failed. catch all.";
+//     syncro::instance().worker_finish();
+//     return (soap_receiver_fault(s, "Runtime error.", "catch all"));
 
-  }
-  return (SOAP_OK);
-}
+//   }
+//   return (SOAP_OK);
+// }
 
 /**
  *  Add command.

@@ -22,11 +22,68 @@
 #include "com/centreon/engine/configuration/state.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
+#include "com/centreon/engine/modules/webservice/configuration/save.hh"
 #include "com/centreon/engine/modules/webservice/syncro.hh"
 #include "soapH.h"
 
 using namespace com::centreon::engine::logging;
 using namespace com::centreon::engine::modules::webservice;
+
+
+/**
+ *  Save all engine objects.
+ *
+ *  @param[in]  s           Unused.
+ *  @param[in]  filename    The file name to save objects.
+ *  @param[out] res         Unused.
+ *
+ *  @return SOAP_OK on success.
+ */
+int centreonengine__saveAllObject(soap* s,
+                                  std::string filename,
+                                  centreonengine__saveAllObjectResponse& res) {
+  (void)res;
+  try {
+    syncro::instance().waiting_callback();
+
+    logger(dbg_functions, most)
+      << "Webservice: " << __func__ << "(" << filename << ")";
+
+    configuration::save save;
+    save.add_list(command_list);
+    save.add_list(contact_list);
+    save.add_list(contactgroup_list);
+    save.add_list(host_list);
+    save.add_list(hostescalation_list);
+    save.add_list(hostdependency_list);
+    save.add_list(hostgroup_list);
+    save.add_list(service_list);
+    save.add_list(servicedependency_list);
+    save.add_list(serviceescalation_list);
+    save.add_list(servicegroup_list);
+    save.add_list(timeperiod_list);
+    save.backup(filename);
+
+    syncro::instance().worker_finish();
+  }
+  catch (std::exception const& e) {
+    std::string* error = soap_new_std__string(s, 1);
+    *error = e.what();
+
+    logger(dbg_commands, most)
+      << "Webservice: " << __func__ << " failed. " << *error;
+
+    syncro::instance().worker_finish();
+    return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
+  }
+  catch (...) {
+    logger(dbg_commands, most)
+      << "Webservice: " << __func__ << " failed. catch all.";
+    syncro::instance().worker_finish();
+    return (soap_receiver_fault(s, "Runtime error.", "catch all"));
+  }
+  return (SOAP_OK);
+}
 
 /**
  *  Set global variable command_check_interval.

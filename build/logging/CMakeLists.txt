@@ -30,7 +30,7 @@ add_library("cce_logging"
   "${SRC_DIR}/logger.cc"
   "${SRC_DIR}/broker.cc"
   "${SRC_DIR}/engine.cc"
-  "${SRC_DIR}/dumpers.cc"
+  # "${SRC_DIR}/dumpers.cc"
   "${INC_DIR}/object.hh"
   "${INC_DIR}/standard.hh"
   "${INC_DIR}/file.hh"
@@ -38,7 +38,7 @@ add_library("cce_logging"
   "${INC_DIR}/logger.hh"
   "${INC_DIR}/broker.hh"
   "${INC_DIR}/engine.hh"
-  "${INC_DIR}/dumpers.hh"
+  # "${INC_DIR}/dumpers.hh"
 )
 
 # Link target with necessary libraries.

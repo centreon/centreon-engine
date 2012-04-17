@@ -384,7 +384,7 @@
       <!-- Resource user identifier. -->
       <complexType name="resourceUserIDType">
 	<sequence>
-	  <element name="id" type="xsd::unsignedInt"/>
+	  <element name="id" type="xsd:unsignedInt"/>
 	</sequence>
       </complexType>
 
@@ -406,6 +406,11 @@
   <!--
 	 Typed messages.
    -->
+
+  <!-- Request with a string. -->
+  <message name="stringRequest">
+    <part name="value" type="xsd:string"/>
+  </message>
 
   <!-- Request with a boolean. -->
   <message name="booleanRequest">
@@ -901,6 +906,17 @@
      -->
 
     <!--
+	Configuration backup.
+    -->
+
+    <!-- saveAllObject -->
+    <operation name="saveAllObject">
+      <documentation>Save all engine object into a file.</documentation>
+      <input message="tns:stringRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!--
 	Configuration modification.
     -->
 
@@ -1187,7 +1203,7 @@
     <!-- setDebugLevel -->
     <operation name="setDebugLevel">
       <documentation>Set new value for debug level variable.</documentation>
-      <input message="tns:integerRequest"/>
+      <input message="tns:unsignedLongRequest"/>
       <output message="tns:defaultResponse"/>
     </operation>
 
@@ -1204,11 +1220,11 @@
     -->
 
     <!-- dumpObjectList -->
-    <operation name="dumpObjectList">
-      <documentation>Dump all object list</documentation>
-      <input message="tns:emptyRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
+    <!-- <operation name="dumpObjectList"> -->
+    <!--   <documentation>Dump all object list</documentation> -->
+    <!--   <input message="tns:emptyRequest"/> -->
+    <!--   <output message="tns:defaultResponse"/> -->
+    <!-- </operation> -->
 
     <!--
 	 Add object operations.
@@ -1366,11 +1382,11 @@
     </operation>
 
     <!-- removeTimeperiod() -->
-    <operation name="removeTimeperiod">
-      <documentation>Remove timeperiod.</documentation>
-      <input message="tns:timeperiodRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
+    <!-- <operation name="removeTimeperiod"> -->
+    <!--   <documentation>Remove timeperiod.</documentation> -->
+    <!--   <input message="tns:timeperiodRequest"/> -->
+    <!--   <output message="tns:defaultResponse"/> -->
+    <!-- </operation> -->
 
     <!--
 	 Features.
@@ -1832,11 +1848,11 @@
      -->
 
     <!-- hostGetCustomVariable(host) -->
-    <operation name="hostGetCustomVariable">
-      <documentation>Get the value of a host custom variable.</documentation>
-      <input message="tns:hostStringRequest"/>
-      <output message="tns:stringResponse"/>
-    </operation>
+    <!-- <operation name="hostGetCustomVariable"> -->
+    <!--   <documentation>Get the value of a host custom variable.</documentation> -->
+    <!--   <input message="tns:hostStringRequest"/> -->
+    <!--   <output message="tns:stringResponse"/> -->
+    <!-- </operation> -->
 
     <!-- hostGetCustomVariables(host) -->
     <!-- XXX -->
@@ -4067,172 +4083,172 @@
     <!-- Not validated commands. -->
 
     <!-- deleteComment(unsigned long commentid) -->
-    <operation name="deleteComment">
-      <documentation>Delete a comment.</documentation>
-      <input message="tns:IDRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
+    <!-- <operation name="deleteComment"> -->
+    <!--   <documentation>Delete a comment.</documentation> -->
+    <!--   <input message="tns:IDRequest"/> -->
+    <!--   <output message="tns:defaultResponse"/> -->
+    <!-- </operation> -->
 
     <!-- deleteHostAllComments(string host) -->
-    <operation name="deleteHostAllComments">
-      <documentation>Delete all comments of a host.</documentation>
-      <input message="tns:hostRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
+    <!-- <operation name="deleteHostAllComments"> -->
+    <!--   <documentation>Delete all comments of a host.</documentation> -->
+    <!--   <input message="tns:hostRequest"/> -->
+    <!--   <output message="tns:defaultResponse"/> -->
+    <!-- </operation> -->
 
     <!-- deleteServiceAllComments(string host, string service) -->
-    <operation name="deleteServiceAllComments">
-      <documentation>Delete all comments of a service.</documentation>
-      <input message="tns:serviceRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
+    <!-- <operation name="deleteServiceAllComments"> -->
+    <!--   <documentation>Delete all comments of a service.</documentation> -->
+    <!--   <input message="tns:serviceRequest"/> -->
+    <!--   <output message="tns:defaultResponse"/> -->
+    <!-- </operation> -->
 
     <!-- flushPendingCommands() -->
-    <operation name="flushPendingCommands">
-      <documentation>Discard commands already sent but not yet processed.</documentation>
-      <input message="tns:emptyRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
+    <!-- <operation name="flushPendingCommands"> -->
+    <!--   <documentation>Discard commands already sent but not yet processed.</documentation> -->
+    <!--   <input message="tns:emptyRequest"/> -->
+    <!--   <output message="tns:defaultResponse"/> -->
+    <!-- </operation> -->
 
     <!-- newHostComment(string host, string comment, string user, bool persistent) -->
-    <operation name="newHostComment">
-      <documentation>Add a comment on a host.</documentation>
-      <input message="tns:newHostCommentRequest"/>
-      <output message="tns:newCommentResponse"/>
-    </operation>
+    <!-- <operation name="newHostComment"> -->
+    <!--   <documentation>Add a comment on a host.</documentation> -->
+    <!--   <input message="tns:newHostCommentRequest"/> -->
+    <!--   <output message="tns:newCommentResponse"/> -->
+    <!-- </operation> -->
 
     <!-- newServiceComment(string host, string service, string comment, string user, bool persistent) -->
-    <operation name="newServiceComment">
-      <documentation>Add a comment on a service.</documentation>
-      <input message="tns:newServiceCommentRequest"/>
-      <output message="tns:newCommentResponse"/>
-    </operation>
+    <!-- <operation name="newServiceComment"> -->
+    <!--   <documentation>Add a comment on a service.</documentation> -->
+    <!--   <input message="tns:newServiceCommentRequest"/> -->
+    <!--   <output message="tns:newCommentResponse"/> -->
+    <!-- </operation> -->
 
     <!-- scheduleHostgroupHostDowntime(string hostgroup, downtimeType downtime) -->
-    <operation name="scheduleHostgroupHostDowntime">
-      <documentation>Schedule a downtime on all hosts of a host group.</documentation>
-      <input message="tns:scheduleDowntimeRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
+    <!-- <operation name="scheduleHostgroupHostDowntime"> -->
+    <!--   <documentation>Schedule a downtime on all hosts of a host group.</documentation> -->
+    <!--   <input message="tns:scheduleDowntimeRequest"/> -->
+    <!--   <output message="tns:defaultResponse"/> -->
+    <!-- </operation> -->
 
     <!-- scheduleHostgroupServiceDowntime(string hostgroup, downtimeType downtime) -->
-    <operation name="scheduleHostgroupServiceDowntime">
-      <documentation>Schedule a downtime on all services of the hosts of the host group.</documentation>
-      <input message="tns:scheduleDowntimeRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
+    <!-- <operation name="scheduleHostgroupServiceDowntime"> -->
+    <!--   <documentation>Schedule a downtime on all services of the hosts of the host group.</documentation> -->
+    <!--   <input message="tns:scheduleDowntimeRequest"/> -->
+    <!--   <output message="tns:defaultResponse"/> -->
+    <!-- </operation> -->
 
     <!-- scheduleServicegroupHostDowntime(string servicegroup, downtimeType downtime) -->
-    <operation name="scheduleServicegroupHostDowntime">
-      <documentation>Schedule a downtime on all hosts related to services members of the service group.</documentation>
-      <input message="tns:scheduleDowntimeRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
+    <!-- <operation name="scheduleServicegroupHostDowntime"> -->
+    <!--   <documentation>Schedule a downtime on all hosts related to services members of the service group.</documentation> -->
+    <!--   <input message="tns:scheduleDowntimeRequest"/> -->
+    <!--   <output message="tns:defaultResponse"/> -->
+    <!-- </operation> -->
 
     <!-- scheduleServicegroupServiceDowntime(string servicegroup, downtimeType downtime) -->
-    <operation name="scheduleServicegroupServiceDowntime">
-      <documentation>Schedule a downtime on all services of the service group.</documentation>
-      <input message="tns:scheduleDowntimeRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
+    <!-- <operation name="scheduleServicegroupServiceDowntime"> -->
+    <!--   <documentation>Schedule a downtime on all services of the service group.</documentation> -->
+    <!--   <input message="tns:scheduleDowntimeRequest"/> -->
+    <!--   <output message="tns:defaultResponse"/> -->
+    <!-- </operation> -->
 
     <!-- setContactgroupHostNotificationsEnabled(string contactgroup) -->
-    <operation name="setContactgroupHostNotificationsEnabled">
-      <documentation>Enable hosts notifications for each member of the contact group.</documentation>
-      <input message="tns:contactgroupRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
+    <!-- <operation name="setContactgroupHostNotificationsEnabled"> -->
+    <!--   <documentation>Enable hosts notifications for each member of the contact group.</documentation> -->
+    <!--   <input message="tns:contactgroupRequest"/> -->
+    <!--   <output message="tns:defaultResponse"/> -->
+    <!-- </operation> -->
 
     <!-- setContactgroupServiceNotificationsEnabled(string contactgroup) -->
-    <operation name="setContactgroupServiceNotificationsEnabled">
-      <documentation>Enable services notifications for each member of the contact group.</documentation>
-      <input message="tns:contactgroupRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
+    <!-- <operation name="setContactgroupServiceNotificationsEnabled"> -->
+    <!--   <documentation>Enable services notifications for each member of the contact group.</documentation> -->
+    <!--   <input message="tns:contactgroupRequest"/> -->
+    <!--   <output message="tns:defaultResponse"/> -->
+    <!-- </operation> -->
 
     <!-- setHostgroupHostActiveChecksEnabled(string hostgroup, bool enable) -->
-    <operation name="setHostgroupHostActiveChecksEnabled">
-      <documentation>Enable or disable active checks of all hosts of the host group.</documentation>
-      <input message="tns:hostgroupEnableRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
+    <!-- <operation name="setHostgroupHostActiveChecksEnabled"> -->
+    <!--   <documentation>Enable or disable active checks of all hosts of the host group.</documentation> -->
+    <!--   <input message="tns:hostgroupEnableRequest"/> -->
+    <!--   <output message="tns:defaultResponse"/> -->
+    <!-- </operation> -->
 
     <!-- setHostgroupHostNotificationsEnabled(string hostgroup, bool enable) -->
-    <operation name="setHostgroupHostNotificationsEnabled">
-      <documentation>Enable or disable notifications on all hosts of the host group.</documentation>
-      <input message="tns:hostgroupEnableRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
+    <!-- <operation name="setHostgroupHostNotificationsEnabled"> -->
+    <!--   <documentation>Enable or disable notifications on all hosts of the host group.</documentation> -->
+    <!--   <input message="tns:hostgroupEnableRequest"/> -->
+    <!--   <output message="tns:defaultResponse"/> -->
+    <!-- </operation> -->
 
     <!-- setHostgroupHostPassiveChecksEnabled(string hostgroup, bool enable) -->
-    <operation name="setHostgroupHostPassiveChecksEnabled">
-      <documentation>Enable or disable passive checks of all hosts of the host group.</documentation>
-      <input message="tns:hostgroupEnableRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
+    <!-- <operation name="setHostgroupHostPassiveChecksEnabled"> -->
+    <!--   <documentation>Enable or disable passive checks of all hosts of the host group.</documentation> -->
+    <!--   <input message="tns:hostgroupEnableRequest"/> -->
+    <!--   <output message="tns:defaultResponse"/> -->
+    <!-- </operation> -->
 
     <!-- setHostgroupServiceActiveChecksEnabled(string hostgroup, bool enable) -->
-    <operation name="setHostgroupServiceActiveChecksEnabled">
-      <documentation>Enable or disable active checks of all services of hosts of the host group.</documentation>
-      <input message="tns:hostgroupEnableRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
+    <!-- <operation name="setHostgroupServiceActiveChecksEnabled"> -->
+    <!--   <documentation>Enable or disable active checks of all services of hosts of the host group.</documentation> -->
+    <!--   <input message="tns:hostgroupEnableRequest"/> -->
+    <!--   <output message="tns:defaultResponse"/> -->
+    <!-- </operation> -->
 
     <!-- setHostgroupServiceNotificationsEnabled(string hostgroup, bool enable) -->
-    <operation name="setHostgroupServiceNotificationsEnabled">
-      <documentation>Enable or disable notifications of all services of hosts of the host group.</documentation>
-      <input message="tns:hostgroupEnableRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
+    <!-- <operation name="setHostgroupServiceNotificationsEnabled"> -->
+    <!--   <documentation>Enable or disable notifications of all services of hosts of the host group.</documentation> -->
+    <!--   <input message="tns:hostgroupEnableRequest"/> -->
+    <!--   <output message="tns:defaultResponse"/> -->
+    <!-- </operation> -->
 
     <!-- setHostgroupServicePassiveChecksEnabled(string hostgroup, bool enable) -->
-    <operation name="setHostgroupServicePassiveChecksEnabled">
-      <documentation>Enable or disable passive checks of all services of hosts of the host group.</documentation>
-      <input message="tns:hostgroupEnableRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
+    <!-- <operation name="setHostgroupServicePassiveChecksEnabled"> -->
+    <!--   <documentation>Enable or disable passive checks of all services of hosts of the host group.</documentation> -->
+    <!--   <input message="tns:hostgroupEnableRequest"/> -->
+    <!--   <output message="tns:defaultResponse"/> -->
+    <!-- </operation> -->
 
     <!-- setServicegroupHostActiveChecksEnabled(string servicegroup, bool enable) -->
-    <operation name="setServicegroupHostActiveChecksEnabled">
-      <documentation>Enable or disable active checks of hosts of services of the service group.</documentation>
-      <input message="tns:servicegroupEnableRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
+    <!-- <operation name="setServicegroupHostActiveChecksEnabled"> -->
+    <!--   <documentation>Enable or disable active checks of hosts of services of the service group.</documentation> -->
+    <!--   <input message="tns:servicegroupEnableRequest"/> -->
+    <!--   <output message="tns:defaultResponse"/> -->
+    <!-- </operation> -->
 
     <!-- setServicegroupHostNotificationsEnabled(string servicegroup, bool enable) -->
-    <operation name="setServicegroupHostNotificationsEnabled">
-      <documentation>Enable or disable notifications of hosts of services of the service group.</documentation>
-      <input message="tns:servicegroupEnableRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
+    <!-- <operation name="setServicegroupHostNotificationsEnabled"> -->
+    <!--   <documentation>Enable or disable notifications of hosts of services of the service group.</documentation> -->
+    <!--   <input message="tns:servicegroupEnableRequest"/> -->
+    <!--   <output message="tns:defaultResponse"/> -->
+    <!-- </operation> -->
 
     <!-- setServicegroupHostPassiveChecksEnabled(string servicegroup, bool enable) -->
-    <operation name="setServicegroupHostPassiveChecksEnabled">
-      <documentation>Enable or disable passive checks of hosts of services of the service group.</documentation>
-      <input message="tns:servicegroupEnableRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
+    <!-- <operation name="setServicegroupHostPassiveChecksEnabled"> -->
+    <!--   <documentation>Enable or disable passive checks of hosts of services of the service group.</documentation> -->
+    <!--   <input message="tns:servicegroupEnableRequest"/> -->
+    <!--   <output message="tns:defaultResponse"/> -->
+    <!-- </operation> -->
 
     <!-- setServicegroupServiceActiveChecksEnabled(string servicegroup, bool enable) -->
-    <operation name="setServicegroupServiceActiveChecksEnabled">
-      <documentation>Enable or disable active checks of services of the service group.</documentation>
-      <input message="tns:servicegroupEnableRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
+    <!-- <operation name="setServicegroupServiceActiveChecksEnabled"> -->
+    <!--   <documentation>Enable or disable active checks of services of the service group.</documentation> -->
+    <!--   <input message="tns:servicegroupEnableRequest"/> -->
+    <!--   <output message="tns:defaultResponse"/> -->
+    <!-- </operation> -->
 
     <!-- setServicegroupServiceNotificationsEnabled(string servicegroup, bool enable) -->
-    <operation name="setServicegroupServiceNotificationsEnabled">
-      <documentation>Enable or disable notifications of services of the service group.</documentation>
-      <input message="tns:servicegroupEnableRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
+    <!-- <operation name="setServicegroupServiceNotificationsEnabled"> -->
+    <!--   <documentation>Enable or disable notifications of services of the service group.</documentation> -->
+    <!--   <input message="tns:servicegroupEnableRequest"/> -->
+    <!--   <output message="tns:defaultResponse"/> -->
+    <!-- </operation> -->
 
     <!-- setServicegroupServicePassiveChecksEnabled(string servicegroup, bool enable) -->
-    <operation name="setServicegroupServicePassiveChecksEnabled">
-      <documentation>Enable or disable passive checks of services of the service group.</documentation>
-      <input message="tns:servicegroupEnableRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
+    <!-- <operation name="setServicegroupServicePassiveChecksEnabled"> -->
+    <!--   <documentation>Enable or disable passive checks of services of the service group.</documentation> -->
+    <!--   <input message="tns:servicegroupEnableRequest"/> -->
+    <!--   <output message="tns:defaultResponse"/> -->
+    <!-- </operation> -->
 
   </portType>
 
@@ -4244,6 +4260,16 @@
 	 Global operations.  
 	                     
      -->
+
+    <!--
+	Configuration backup.
+    -->
+
+    <operation name="saveAllObject">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
 
     <!--
 	Configuration modification.
@@ -4505,11 +4531,11 @@
 	 Debug object operations.
     -->
 
-    <operation name="dumpObjectList">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
+    <!-- <operation name="dumpObjectList"> -->
+    <!--   <SOAP:operation style="rpc" soapAction=""/> -->
+    <!--   <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input> -->
+    <!--   <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output> -->
+    <!-- </operation> -->
 
     <!--
          Add object operations.
@@ -4644,6 +4670,12 @@
       <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
       <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
     </operation>
+
+    <!-- <operation name="removeTimeperiod"> -->
+    <!--   <SOAP:operation style="rpc" soapAction=""/> -->
+    <!--   <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input> -->
+    <!--   <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output> -->
+    <!-- </operation> -->
 
     <operation name="getEventHandlersEnabled">
       <SOAP:operation style="rpc" soapAction=""/>
@@ -5011,6 +5043,12 @@
       <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
       <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
     </operation>
+
+    <!-- <operation name="hostGetCustomVariable"> -->
+    <!--   <SOAP:operation style="rpc" soapAction=""/> -->
+    <!--   <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input> -->
+    <!--   <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output> -->
+    <!-- </operation> -->
 
     <operation name="hostGetDowntimeDepth">
       <SOAP:operation style="rpc" soapAction=""/>
