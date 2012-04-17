@@ -74,7 +74,6 @@ if (WITH_WEBSERVICE)
   else ()
     # Find libgsoap++.
     find_library(GSOAP_LIBRARIES "gsoap++")
-    set(GSOAP_LIBRARIES "/usr/local/lib/libgsoap++.a")
     if (NOT GSOAP_LIBRARIES)
       message(FATAL_ERROR "Could not find gSOAP's libgsoap++.")
     endif ()

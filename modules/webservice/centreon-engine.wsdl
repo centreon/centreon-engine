@@ -909,9 +909,9 @@
 	Configuration backup.
     -->
 
-    <!-- saveAllObject -->
-    <operation name="saveAllObject">
-      <documentation>Save all engine object into a file.</documentation>
+    <!-- saveAllObjects -->
+    <operation name="saveAllObjects">
+      <documentation>Save all engine objects into a file.</documentation>
       <input message="tns:stringRequest"/>
       <output message="tns:defaultResponse"/>
     </operation>
@@ -4265,7 +4265,7 @@
 	Configuration backup.
     -->
 
-    <operation name="saveAllObject">
+    <operation name="saveAllObjects">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
       <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>

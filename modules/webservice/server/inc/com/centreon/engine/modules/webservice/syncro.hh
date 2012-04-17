@@ -45,10 +45,13 @@ private:
                  syncro(syncro const& right);
                  ~syncro();
   syncro&        operator=(syncro const& right);
+  bool           _thread_count_is_null() const;
 
   bool           _can_run;
-  QWaitCondition _condition;
-  QMutex         _mutex;
+  QWaitCondition _cnd_main;
+  QWaitCondition _cnd_worker;
+  QMutex         _mtx_main;
+  mutable QMutex _mtx_worker;
   unsigned int   _thread_count;
 };
 
