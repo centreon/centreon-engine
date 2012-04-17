@@ -20,8 +20,9 @@
 #ifndef CCE_MOD_WS_WERBSERVICE_HH
 #  define CCE_MOD_WS_WERBSERVICE_HH
 
-#  include <QThread>
+#  include <QRunnable>
 #  include <QString>
+#  include <QThread>
 #  include "soapH.h"
 #  include "com/centreon/engine/modules/webservice/configuration.hh"
 
@@ -47,6 +48,16 @@ namespace                         com {
             void                  run();
 
           private:
+            class                 query : public QRunnable {
+            public:
+                                  query(soap* s = NULL);
+                                  ~query();
+              void                run();
+
+            private:
+              soap*               _soap;
+            };
+
                                   webservice(webservice const& right);
                                   webservice& operator=(webservice const& right);
             void                  _init();

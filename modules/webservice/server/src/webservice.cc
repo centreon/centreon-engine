@@ -17,6 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <QThreadPool>
 #include <signal.h>
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/logging/logger.hh"
@@ -59,6 +60,9 @@ webservice::~webservice() throw() {
  *  Start the webservice.
  */
 void  webservice::run() {
+  QThreadPool pool;
+  pool.setMaxThreadCount(10);
+
   while (_is_end != true) {
     SOAP_SOCKET s = soap_accept(&_soap_ctx);
     if (!soap_valid_socket(s)) {
@@ -92,12 +96,10 @@ void  webservice::run() {
     }
 #endif // !WITH_OPENSSL
 
-    soap_serve(soap_cpy);
-
-    soap_destroy(soap_cpy);
-    soap_end(soap_cpy);
-    soap_free(soap_cpy);
+    pool.start(new query(soap_cpy));
   }
+
+  pool.waitForDone();
 
   soap_destroy(&_soap_ctx); // remove deserialized class instances (C++ only).
   soap_end(&_soap_ctx);     // clean up and remove deserialized data.
@@ -110,6 +112,9 @@ void  webservice::run() {
 #endif // !WITH_OPENSSL
 }
 
+/**
+ *  Initilize webservice.
+ */
 void webservice::_init() {
 #ifdef WITH_OPENSSL
   if (_config.get_ssl_enable() == true) {
@@ -161,6 +166,43 @@ void webservice::_init() {
   }
 }
 
+/**
+ *  Do nothing.
+ *
+ *  @param[in] x  Unused.
+ */
 void webservice::_sigpipe_handle(int x) {
   (void)x;
+}
+
+/**
+ *  Constructor.
+ *  Set qrunnable with auto delete.
+ *
+ *  @param[in] s  The soap context.
+ */
+webservice::query::query(soap* s)
+  : _soap(s) {
+  setAutoDelete(true);
+}
+
+/**
+ *  Destructor.
+ */
+webservice::query::~query() {
+
+}
+
+/**
+ *  Execute soap query.
+ */
+void webservice::query::run() {
+  if (!_soap)
+    return;
+
+  soap_serve(_soap);
+
+  soap_destroy(_soap);
+  soap_end(_soap);
+  soap_free(_soap);
 }

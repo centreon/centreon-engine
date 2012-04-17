@@ -65,7 +65,6 @@ int centreonengine__updateResourceUser(soap* s,
     unsigned int pos(resource_id->id - 1);
     delete[] macro_user[pos];
     macro_user[pos] = my_strdup(value.c_str());
-    std::cout << "USER" << pos + 1 << "=" << value << std::endl;
     syncro::instance().worker_finish();
   }
   catch (...) {
