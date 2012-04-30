@@ -582,7 +582,7 @@ int main(int argc, char** argv) {
   com::centreon::engine::events::loop::unload();
   com::centreon::engine::checks::checker::unload();
   com::centreon::engine::commands::set::unload();
-  com::centreon::engine::configuration::applier::logging::load();
+  com::centreon::engine::configuration::applier::logging::unload();
 
   return (EXIT_SUCCESS);
 }
