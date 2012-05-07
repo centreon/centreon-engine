@@ -1,7 +1,7 @@
 /*
 ** Copyright 1999-2009 Ethan Galstad
 ** Copyright 2009-2010 Nagios Core Development Team and Community Contributors
-** Copyright 2011      Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -24,6 +24,7 @@
 #include <exception>
 #include <iostream>
 #include <limits.h>
+#include <memory>
 #include <QDir>
 #include <signal.h>
 #include <stdio.h>
@@ -74,7 +75,8 @@ using namespace com::centreon::engine::logging;
 int main(int argc, char** argv) {
   QCoreApplication app(argc, argv);
 
-  configuration::applier::logging apply_log;
+  std::auto_ptr<configuration::applier::logging>
+    apply_log(new configuration::applier::logging);
 
   int error = FALSE;
   int display_license = FALSE;
@@ -268,7 +270,7 @@ int main(int argc, char** argv) {
     // Read in the configuration files (main config file and all host config files).
     try {
       config.parse(config_file);
-      apply_log.apply(config);
+      apply_log->apply(config);
       engine::obj_info obj(QSharedPointer<logging::broker>(new logging::broker),
                            log_all,
                            basic);
@@ -349,7 +351,7 @@ int main(int argc, char** argv) {
       // and resource config files).
       try {
         config.parse(config_file);
-        apply_log.apply(config);
+        apply_log->apply(config);
         result = OK;
       }
       catch(std::exception const &e) {
@@ -590,6 +592,9 @@ int main(int argc, char** argv) {
     // Free misc memory.
     delete[] config_file;
   }
+
+  // Remove log files.
+  apply_log.reset();
 
   return (OK);
 }
