@@ -61,7 +61,7 @@ webservice::~webservice() throw() {
  */
 void  webservice::run() {
   QThreadPool pool;
-  pool.setMaxThreadCount(10);
+  pool.setMaxThreadCount(_config.get_thread_count());
 
   while (_is_end != true) {
     SOAP_SOCKET s = soap_accept(&_soap_ctx);

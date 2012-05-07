@@ -34,8 +34,10 @@ configuration::configuration(QString const& filename)
     _port(80),
     _recv_timeout(5),
     _send_timeout(5),
-    _ssl_enable(false) {
+    _ssl_enable(false),
+    _thread_count(1) {
   _keytab["/webservice"] = NULL;
+  _keytab["/webservice/thread_count"] = &configuration::_set_thread_count;
   _keytab["/webservice/host"] = &configuration::_set_host;
   _keytab["/webservice/port"] = &configuration::_set_port;
   _keytab["/webservice/recv_timeout"] = &configuration::_set_recv_timeout;
@@ -153,6 +155,15 @@ QString const& configuration::get_ssl_keyfile() const throw() {
  */
 QString const& configuration::get_ssl_password() const throw() {
   return (_ssl_password);
+}
+
+/**
+ *  Get the thread count for the thread pool size.
+ *
+ *  @return The thread count.
+ */
+unsigned int configuration::get_thread_count() const throw() {
+  return (_thread_count);
 }
 
 /**
@@ -287,4 +298,15 @@ void configuration::_set_ssl_keyfile() {
  */
 void configuration::_set_ssl_password() {
   _ssl_password = _reader.readElementText();
+}
+
+/**
+ *  Set the thread count.
+ */
+void configuration::_set_thread_count() {
+  bool ok;
+  _thread_count = _reader.readElementText().toUInt(&ok);
+  if (ok == false || _thread_count == 0) {
+    throw (engine_error() << "line " << _reader.lineNumber());
+  }
 }

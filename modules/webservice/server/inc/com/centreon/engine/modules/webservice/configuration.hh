@@ -49,6 +49,7 @@ public:
   bool             get_ssl_enable() const throw();
   QString const&   get_ssl_keyfile() const throw();
   QString const&   get_ssl_password() const throw();
+  unsigned int     get_thread_count() const throw();
   void             parse();
   void             set_filename(QString const& filename);
 
@@ -65,6 +66,7 @@ private:
   void             _set_ssl_enable();
   void             _set_ssl_keyfile();
   void             _set_ssl_password();
+  void             _set_thread_count();
 
   int              _accept_timeout;
   QString          _filename;
@@ -81,6 +83,7 @@ private:
   bool             _ssl_enable;
   QString          _ssl_keyfile;
   QString          _ssl_password;
+  unsigned int     _thread_count;
 };
 
 CCE_MOD_WS_END()
