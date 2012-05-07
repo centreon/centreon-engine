@@ -21,7 +21,7 @@
 #include <QCoreApplication>
 #include <QDebug>
 #include "com/centreon/engine/error.hh"
-#include "com/centreon/engine/external_commands/commands.hh"
+#include "com/centreon/engine/modules/external_commands/commands.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/engine.hh"
 #include "test/unittest.hh"
