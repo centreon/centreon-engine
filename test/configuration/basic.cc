@@ -23,7 +23,7 @@
 #include <QCoreApplication>
 #include <QDebug>
 #include <QDir>
-#include <QTemporaryFile>
+#include <QFile>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
@@ -578,19 +578,29 @@ void test_configuration(QString const& filename, std::map<QString, QString>& my_
  *  Check the configuration working.
  */
 int main_test() {
+  // Initialize random number generation.
   srandom(time(NULL));
 
-  QTemporaryFile mainconf("centengine.cfg");
-  QTemporaryFile resource("resource.cfg");
+  // Generate temporary file names.
+  QString mainconf_path(QDir::tempPath() + "/centengine.cfg.%1");
+  mainconf_path = mainconf_path.arg(random());
+  QString resource_path(QDir::tempPath() + "/resource.cfg.%1");
+  resource_path = resource_path.arg(random());
 
-  if (mainconf.open() == false || resource.open() == false)
-    throw (engine_error() << "open temporary file failed.");
+  // Test.
+  try {
+    std::map<QString, QString> my_conf = build_configuration(mainconf_path, resource_path);
+    test_configuration(mainconf_path, my_conf);
+  }
 
-  QString mainconf_path = QDir::tempPath() + "/" + mainconf.fileName();
-  QString resource_path = QDir::tempPath() + "/" + resource.fileName();
-
-  std::map<QString, QString> my_conf = build_configuration(mainconf_path, resource_path);
-  test_configuration(mainconf_path, my_conf);
+  // Remove temporary files.
+  catch (...) {
+    QFile::remove(mainconf_path);
+    QFile::remove(resource_path);
+    throw ;
+  }
+  QFile::remove(mainconf_path);
+  QFile::remove(resource_path);
 
   return (0);
 }

@@ -73,13 +73,21 @@ void logging::apply(state const& config) {
   }
 
   // Debug file.
-  if (config.get_debug_file() == "")
+  if ((config.get_debug_file() == "")
+      || !config.get_debug_level()
+      || !config.get_debug_verbosity()) {
     _del_debug();
-  else if (config.get_debug_file() != _debug_file
-	   || config.get_max_debug_file_size() != _debug_limit
-	   || config.get_debug_level() != _debug_level
-	   || config.get_debug_verbosity() != _debug_verbosity)
+    _debug_file = config.get_debug_file();
+    _debug_level = config.get_debug_level();
+    _debug_verbosity = config.get_debug_verbosity();
+  }
+  else if ((config.get_debug_file() != _debug_file)
+           || (config.get_max_debug_file_size() != _debug_limit)
+           || (config.get_debug_level() != _debug_level)
+           || (config.get_debug_verbosity() != _debug_verbosity))
     _add_debug(config);
+
+  return ;
 }
 
 /**
@@ -243,12 +251,15 @@ void logging::_add_log_file(state const& config) {
  */
 void logging::_add_debug(state const& config) {
   _del_debug();
-  QSharedPointer<file> obj(new file(config.get_debug_file(),
-				    config.get_max_debug_file_size()));
-  ::engine::obj_info info(obj,
-			  config.get_debug_level(),
-			  config.get_debug_verbosity());
+  QSharedPointer<file> obj(new file(
+                                 config.get_debug_file(),
+                                 config.get_max_debug_file_size()));
+  ::engine::obj_info info(
+                       obj,
+                       config.get_debug_level(),
+                       config.get_debug_verbosity());
   _debug_id = ::engine::instance().add_object(info);
+  return ;
 }
 
 /**
