@@ -61,6 +61,11 @@
 #  define NEBCALLBACK_STATE_CHANGE_DATA                 30
 #  define NEBCALLBACK_CONTACT_STATUS_DATA               31
 #  define NEBCALLBACK_ADAPTIVE_CONTACT_DATA             32
+#  define NEBCALLBACK_CUSTOM_VARIABLE_DATA             100
+#  define NEBCALLBACK_GROUP_DATA                       101
+#  define NEBCALLBACK_GROUP_MEMBER_DATA                102
+#  define NEBCALLBACK_MODULE_DATA                      103
+#  define NEBCALLBACK_RELATION_DATA                    104
 
 #  ifdef __cplusplus
 extern "C" {
