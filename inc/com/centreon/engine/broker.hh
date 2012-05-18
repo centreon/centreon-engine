@@ -52,7 +52,8 @@
 #  define BROKER_GROUP_MEMBER_DATA                 (1 << 22)
 #  define BROKER_MODULE_DATA                       (1 << 23)
 #  define BROKER_RELATION_DATA                     (1 << 24)
-#  define BROKER_EVERYTHING                        (1 << 25)
+#  define BROKER_COMMAND_DATA                      (1 << 25)
+#  define BROKER_EVERYTHING                        (~0)
 
 /*
 ** Event types.
@@ -173,60 +174,80 @@
 #  define NEBTYPE_STATECHANGE_START                1800    /* NOT IMPLEMENTED. */
 #  define NEBTYPE_STATECHANGE_END                  1801
 
+/* Commands. */
+#  define NEBTYPE_COMMAND_ADD                      1900
+#  define NEBTYPE_COMMAND_DELETE                   1901
+#  define NEBTYPE_COMMAND_UPDATE                   1902
+
 /* Contacts. */
-#  define NEBTYPE_CONTACT_ADD                      1900
-#  define NEBTYPE_CONTACT_DELETE                   1901
+#  define NEBTYPE_CONTACT_ADD                      2000
+#  define NEBTYPE_CONTACT_DELETE                   2001
 #  define NEBTYPE_CONTACT_UPDATE                   NEBTYPE_ADAPTIVECONTACT_UPDATE
 
+/* Contact groups. */
+#  define NEBTYPE_CONTACTGROUP_ADD                 2100
+#  define NEBTYPE_CONTACTGROUP_DELETE              2101
+#  define NEBTYPE_CONTACTGROUP_UPDATE              2102
+
+/* Contact custom variables. */
+#  define NEBTYPE_CONTACTCUSTOMVARIABLE_ADD        2200
+#  define NEBTYPE_CONTACTCUSTOMVARIABLE_DELETE     2201
+#  define NEBTYPE_CONTACTCUSTOMVARIABLE_UPDATE     2202
+
+/* Contact group members. */
+#  define NEBTYPE_CONTACTGROUPMEMBER_ADD           2300
+#  define NEBTYPE_CONTACTGROUPMEMBER_DELETE        2301
+#  define NEBTYPE_CONTACTGROUPMEMBER_UPDATE        2302
+
 /* Dependencies. */
-#  define NEBTYPE_DEPENDENCY_ADD                   2000
-#  define NEBTYPE_DEPENDENCY_DELETE                2001
+#  define NEBTYPE_DEPENDENCY_ADD                   2400
+#  define NEBTYPE_DEPENDENCY_DELETE                2401
 
 /* Hosts. */
-#  define NEBTYPE_HOST_ADD                         2100
-#  define NEBTYPE_HOST_DELETE                      2101
+#  define NEBTYPE_HOST_ADD                         2500
+#  define NEBTYPE_HOST_DELETE                      2501
 #  define NEBTYPE_HOST_UPDATE                      NEBTYPE_ADAPTIVEHOST_UPDATE
 
 /* Host custom variables. */
-#  define NEBTYPE_HOSTCUSTOMVARIABLE_ADD           2200
-#  define NEBTYPE_HOSTCUSTOMVARIABLE_DELETE        2201
-#  define NEBTYPE_HOSTCUSTOMVARIABLE_UPDATE        2102
+#  define NEBTYPE_HOSTCUSTOMVARIABLE_ADD           2600
+#  define NEBTYPE_HOSTCUSTOMVARIABLE_DELETE        2601
+#  define NEBTYPE_HOSTCUSTOMVARIABLE_UPDATE        2602
 
 /* Host groups. */
-#  define NEBTYPE_HOSTGROUP_ADD                    2300
-#  define NEBTYPE_HOSTGROUP_DELETE                 2301
-#  define NEBTYPE_HOSTGROUP_UPDATE                 2302
+#  define NEBTYPE_HOSTGROUP_ADD                    2700
+#  define NEBTYPE_HOSTGROUP_DELETE                 2701
+#  define NEBTYPE_HOSTGROUP_UPDATE                 2702
 
 /* Host group members. */
-#  define NEBTYPE_HOSTGROUPMEMBER_ADD              2400
-#  define NEBTYPE_HOSTGROUPMEMBER_DELETE           2401
+#  define NEBTYPE_HOSTGROUPMEMBER_ADD              2800
+#  define NEBTYPE_HOSTGROUPMEMBER_DELETE           2801
 
 /* Modules. */
-#  define NEBTYPE_MODULE_ADD                       2500
-#  define NEBTYPE_MODULE_DELETE                    2500
+#  define NEBTYPE_MODULE_ADD                       2900
+#  define NEBTYPE_MODULE_DELETE                    2900
 
 /* Parents. */
-#  define NEBTYPE_PARENT_ADD                       2600
-#  define NEBTYPE_PARENT_DELETE                    2601
+#  define NEBTYPE_PARENT_ADD                       3000
+#  define NEBTYPE_PARENT_DELETE                    3001
 
 /* Services. */
-#  define NEBTYPE_SERVICE_ADD                      2700
-#  define NEBTYPE_SERVICE_DELETE                   2701
+#  define NEBTYPE_SERVICE_ADD                      3100
+#  define NEBTYPE_SERVICE_DELETE                   3101
 #  define NEBTYPE_SERVICE_UPDATE                   NEBTYPE_ADAPTIVESERVICE_UPDATE
 
 /* Service custom variables. */
-#  define NEBTYPE_SERVICECUSTOMVARIABLE_ADD        2800
-#  define NEBTYPE_SERVICECUSTOMVARIABLE_DELETE     2801
-#  define NEBTYPE_SERVICECUSTOMVARIABLE_UPDATE     2802
+#  define NEBTYPE_SERVICECUSTOMVARIABLE_ADD        3200
+#  define NEBTYPE_SERVICECUSTOMVARIABLE_DELETE     3201
+#  define NEBTYPE_SERVICECUSTOMVARIABLE_UPDATE     3202
 
 /* Service group. */
-#  define NEBTYPE_SERVICEGROUP_ADD                 2900
-#  define NEBTYPE_SERVICEGROUP_DELETE              2901
-#  define NEBTYPE_SERVICEGROUP_UPDATE              2902
+#  define NEBTYPE_SERVICEGROUP_ADD                 3300
+#  define NEBTYPE_SERVICEGROUP_DELETE              3301
+#  define NEBTYPE_SERVICEGROUP_UPDATE              3302
 
 /*  Service group members. */
-#  define NEBTYPE_SERVICEGROUPMEMBER_ADD           3000
-#  define NEBTYPE_SERVICEGROUPMEMBER_DELETE        3001
+#  define NEBTYPE_SERVICEGROUPMEMBER_ADD           3400
+#  define NEBTYPE_SERVICEGROUPMEMBER_DELETE        3401
 
 /*
 ** Event flags.
@@ -314,6 +335,13 @@ void           broker_aggregated_status_data(
                  int type,
                  int flags,
                  int attr,
+                 struct timeval const* timestamp);
+void           broker_command_data(
+                 int type,
+                 int flags,
+                 int attr,
+                 char const* name,
+                 char const* cmd_line,
                  struct timeval const* timestamp);
 void           broker_comment_data(
                  int type,

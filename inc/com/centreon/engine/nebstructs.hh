@@ -111,6 +111,17 @@ typedef struct   nebstruct_aggregated_status_struct {
   struct timeval timestamp;
 }                nebstruct_aggregated_status_data;
 
+/* Command data structure. */
+typedef struct   nebstruct_command_struct {
+  int            type;
+  int            flags;
+  int            attr;
+  struct timeval timestamp;
+
+  char const*    cmd_line;
+  char const*    cmd_name;
+}                nebstruct_command_data;
+
 /* Comment data structure. */
 typedef struct   nebstruct_comment_struct {
   int            type;

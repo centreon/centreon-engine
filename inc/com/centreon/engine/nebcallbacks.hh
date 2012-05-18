@@ -23,21 +23,17 @@
 
 #  include "com/centreon/engine/nebmodules.hh"
 
-// Callback types.
-#  define NEBCALLBACK_NUMITEMS                          33    /* total number of callback types we have */
-
-#  define NEBCALLBACK_RESERVED0                         0     /* reserved for future use */
-#  define NEBCALLBACK_RESERVED1                         1
-#  define NEBCALLBACK_RESERVED2                         2
-#  define NEBCALLBACK_RESERVED3                         3
-#  define NEBCALLBACK_RESERVED4                         4
-
-#  define NEBCALLBACK_RAW_DATA                          5
-#  define NEBCALLBACK_NEB_DATA                          6
-
-#  define NEBCALLBACK_PROCESS_DATA                      7
-#  define NEBCALLBACK_TIMED_EVENT_DATA                  8
-#  define NEBCALLBACK_LOG_DATA                          9
+/* Callback types. */
+#  define NEBCALLBACK_RESERVED0                          0  /* Reserved for future use. */
+#  define NEBCALLBACK_RESERVED1                          1
+#  define NEBCALLBACK_RESERVED2                          2
+#  define NEBCALLBACK_RESERVED3                          3
+#  define NEBCALLBACK_RESERVED4                          4
+#  define NEBCALLBACK_RAW_DATA                           5
+#  define NEBCALLBACK_NEB_DATA                           6
+#  define NEBCALLBACK_PROCESS_DATA                       7
+#  define NEBCALLBACK_TIMED_EVENT_DATA                   8
+#  define NEBCALLBACK_LOG_DATA                           9
 #  define NEBCALLBACK_SYSTEM_COMMAND_DATA               10
 #  define NEBCALLBACK_EVENT_HANDLER_DATA                11
 #  define NEBCALLBACK_NOTIFICATION_DATA                 12
@@ -61,22 +57,30 @@
 #  define NEBCALLBACK_STATE_CHANGE_DATA                 30
 #  define NEBCALLBACK_CONTACT_STATUS_DATA               31
 #  define NEBCALLBACK_ADAPTIVE_CONTACT_DATA             32
-#  define NEBCALLBACK_CUSTOM_VARIABLE_DATA             100
-#  define NEBCALLBACK_GROUP_DATA                       101
-#  define NEBCALLBACK_GROUP_MEMBER_DATA                102
-#  define NEBCALLBACK_MODULE_DATA                      103
-#  define NEBCALLBACK_RELATION_DATA                    104
+#  define NEBCALLBACK_COMMAND_DATA                      33
+#  define NEBCALLBACK_CUSTOM_VARIABLE_DATA              34
+#  define NEBCALLBACK_GROUP_DATA                        35
+#  define NEBCALLBACK_GROUP_MEMBER_DATA                 36
+#  define NEBCALLBACK_MODULE_DATA                       37
+#  define NEBCALLBACK_RELATION_DATA                     38
+#  define NEBCALLBACK_NUMITEMS                          39 /* Total number of callback types we have. */
 
 #  ifdef __cplusplus
 extern "C" {
-#  endif // C++
+#  endif /* C++ */
 
-int neb_register_callback(int callback_type, void* mod_handle, int priority, int (*callback_func)(int,void*));
-int neb_deregister_callback(int callback_type, int (*callback_func)(int,void*));
+int neb_deregister_callback(
+      int callback_type,
+      int (* callback_func)(int, void*));
 int neb_deregister_module_callbacks(void* mod);
+int neb_register_callback(
+      int callback_type,
+      void* mod_handle,
+      int priority,
+      int (* callback_func)(int, void*));
 
 #  ifdef __cplusplus
 }
-#  endif // C++
+#  endif /* C++ */
 
-#endif // !CCE_NEBCALLBACKS_HH
+#endif /* !CCE_NEBCALLBACKS_HH */

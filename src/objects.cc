@@ -21,6 +21,7 @@
 #include <memory>
 #include <stdio.h>
 #include <string.h>
+#include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/objects.hh"
@@ -40,27 +41,39 @@ extern "C" {
 /**
  *  Adds a child host to a host definition.
  *
- *  @param[in] hst       Host.
- *  @param[in] child_ptr Child.
+ *  @param[in] parent Parent host.
+ *  @param[in] child  Child host.
  *
  *  @return Host member.
  */
-hostsmember* add_child_link_to_host(host* hst, host* child_ptr) {
+hostsmember* add_child_link_to_host(host* parent, host* child) {
   // Return value.
   std::auto_ptr<hostsmember> new_hostsmember;
 
   // Make sure we have the data we need.
-  if (hst && child_ptr) {
+  if (parent && child) {
     // Allocate memory.
     new_hostsmember.reset(new hostsmember);
 
     // Initialize values.
     new_hostsmember->host_name = NULL;
-    new_hostsmember->host_ptr = child_ptr;
+    new_hostsmember->host_ptr = child;
 
     // Add the child entry to the host definition.
-    new_hostsmember->next = hst->child_hosts;
-    hst->child_hosts = new_hostsmember.get();
+    new_hostsmember->next = parent->child_hosts;
+    parent->child_hosts = new_hostsmember.get();
+
+    // Notify event broker.
+    timeval tv(get_broker_timestamp(NULL));
+    broker_relation_data(
+      NEBTYPE_PARENT_ADD,
+      NEBFLAG_NONE,
+      NEBATTR_NONE,
+      parent,
+      NULL,
+      child,
+      NULL,
+      &tv);
   }
 
   return (new_hostsmember.release());
@@ -75,7 +88,6 @@ hostsmember* add_child_link_to_host(host* hst, host* child_ptr) {
  *  @return New command object.
  */
 command* add_command(char const* name, char const* value) {
-
   // Make sure we have the data we need.
   if (!name || !name[0] || !value || !value[0]) {
     logger(log_config_error, basic)
@@ -129,6 +141,16 @@ command* add_command(char const* name, char const* value) {
     command_list_tail->next = new_command.get();
     command_list_tail = new_command.get();
   }
+
+  // Notify event broker.
+  timeval tv(get_broker_timestamp(NULL));
+  broker_command_data(
+    NEBTYPE_COMMAND_ADD,
+    NEBFLAG_NONE,
+    NEBATTR_NONE,
+    name,
+    value,
+    &tv);
 
   return (new_command.release());
 }
@@ -319,6 +341,22 @@ contact* add_contact(
     contact_list_tail = new_contact.get();
   }
 
+  // Notify event broker.
+  timeval tv(get_broker_timestamp(NULL));
+  broker_adaptive_contact_data(
+    NEBTYPE_CONTACT_ADD,
+    NEBFLAG_NONE,
+    NEBATTR_NONE,
+    new_contact.get(),
+    CMD_NONE,
+    MODATTR_ALL,
+    MODATTR_ALL,
+    MODATTR_ALL,
+    MODATTR_ALL,
+    MODATTR_ALL,
+    MODATTR_ALL,
+    &tv);
+
   return (new_contact.release());
 }
 
@@ -351,6 +389,9 @@ contactsmember* add_contact_to_contactgroup(
   new_contactsmember->next = grp->members;
   grp->members = new_contactsmember.get();
 
+  // Notify event broker.
+  // XXX
+
   return (new_contactsmember.release());
 }
 
@@ -363,6 +404,7 @@ contactsmember* add_contact_to_contactgroup(
  *  @return Contact membership object.
  */
 contactsmember* add_contact_to_host(host* hst, char const* contact_name) {
+  // XXX: event broker
   return (add_contact_to_object(&hst->contacts, contact_name));
 }
 
@@ -377,6 +419,7 @@ contactsmember* add_contact_to_host(host* hst, char const* contact_name) {
 contactsmember* add_contact_to_hostescalation(
                   hostescalation* he,
                   char const* contact_name) {
+  // XXX: event broker
   return (add_contact_to_object(&he->contacts, contact_name));
 }
 
@@ -428,6 +471,7 @@ contactsmember* add_contact_to_object(
 contactsmember* add_contact_to_service(
                   service* svc,
                   char const* contact_name) {
+  // XXX: event broker
   return (add_contact_to_object(&svc->contacts, contact_name));
 }
 
@@ -442,6 +486,7 @@ contactsmember* add_contact_to_service(
 contactsmember* add_contact_to_serviceescalation(
                   serviceescalation* se,
                   char const* contact_name) {
+  // XXX: event broker
   return (add_contact_to_object(&se->contacts, contact_name));
 }
 
@@ -505,6 +550,15 @@ contactgroup* add_contactgroup(char const* name, char const* alias) {
     contactgroup_list_tail = new_contactgroup.get();
   }
 
+  // Notify event broker.
+  timeval tv(get_broker_timestamp(NULL));
+  broker_group(
+    NEBTYPE_CONTACTGROUP_ADD,
+    NEBFLAG_NONE,
+    NEBATTR_NONE,
+    new_contactgroup.get(),
+    &tv);
+
   return (new_contactgroup.release());
 }
 
@@ -540,6 +594,9 @@ contactgroupsmember* add_contactgroup_to_host(
   // Add the new member to the head of the member list.
   new_contactgroupsmember->next = hst->contact_groups;
   hst->contact_groups = new_contactgroupsmember.get();
+
+  // Notify event broker.
+  // XXX
 
   return (new_contactgroupsmember.release());
 }
@@ -577,6 +634,9 @@ contactgroupsmember* add_contactgroup_to_hostescalation(
   new_contactgroupsmember->next = he->contact_groups;
   he->contact_groups = new_contactgroupsmember.get();
 
+  // Notify event broker.
+  // XXX
+
   return (new_contactgroupsmember.release());
 }
 
@@ -612,6 +672,9 @@ contactgroupsmember* add_contactgroup_to_service(
   // Add this contactgroup to the service.
   new_contactgroupsmember->next = svc->contact_groups;
   svc->contact_groups = new_contactgroupsmember.get();
+
+  // Notify event broker.
+  // XXX
 
   return (new_contactgroupsmember.release());
 }
@@ -649,6 +712,9 @@ contactgroupsmember* add_contactgroup_to_serviceescalation(
   new_contactgroupsmember->next = se->contact_groups;
   se->contact_groups = new_contactgroupsmember.get();
 
+  // Notify event broker.
+  // XXX
+
   return (new_contactgroupsmember.release());
 }
 
@@ -665,10 +731,24 @@ customvariablesmember* add_custom_variable_to_contact(
                          contact* cntct,
                          char const* varname,
                          char const* varvalue) {
-  return (add_custom_variable_to_object(
-            &cntct->custom_variables,
-            varname,
-            varvalue));
+  // Add custom variable to contact.
+  customvariablesmember* retval(add_custom_variable_to_object(
+                                  &cntct->custom_variables,
+                                  varname,
+                                  varvalue));
+
+  // Notify event broker.
+  timeval tv(get_broker_timestamp(NULL));
+  broker_custom_variable(
+    NEBTYPE_CONTACTCUSTOMVARIABLE_ADD,
+    NEBFLAG_NONE,
+    NEBATTR_NONE,
+    cntct,
+    varname,
+    varvalue,
+    &tv);
+
+  return (retval);
 }
 
 /**
@@ -684,10 +764,24 @@ customvariablesmember* add_custom_variable_to_host(
                          host* hst,
                          char const* varname,
                          char const* varvalue) {
-  return (add_custom_variable_to_object(
-            &hst->custom_variables,
-            varname,
-            varvalue));
+  // Add custom variable to host.
+  customvariablesmember* retval(add_custom_variable_to_object(
+                                  &hst->custom_variables,
+                                  varname,
+                                  varvalue));
+
+  // Notify event broker.
+  timeval tv(get_broker_timestamp(NULL));
+  broker_custom_variable(
+    NEBTYPE_HOSTCUSTOMVARIABLE_ADD,
+    NEBFLAG_NONE,
+    NEBATTR_NONE,
+    hst,
+    varname,
+    varvalue,
+    &tv);
+
+  return (retval);
 }
 
 /**
@@ -747,10 +841,24 @@ customvariablesmember* add_custom_variable_to_service(
                          service* svc,
                          char const* varname,
                          char const* varvalue) {
-  return (add_custom_variable_to_object(
-            &svc->custom_variables,
-            varname,
-            varvalue));
+  // Add custom variable to service.
+  customvariablesmember* retval(add_custom_variable_to_object(
+                                  &svc->custom_variables,
+                                  varname,
+                                  varvalue));
+
+  // Notify event broker.
+  timeval tv(get_broker_timestamp(NULL));
+  broker_custom_variable(
+    NEBTYPE_SERVICECUSTOMVARIABLE_ADD,
+    NEBFLAG_NONE,
+    NEBATTR_NONE,
+    svc,
+    varname,
+    varvalue,
+    &tv);
+
+  return (retval);
 }
 
 /**
@@ -814,6 +922,9 @@ daterange* add_exception_to_timeperiod(
   new_daterange->next = period->exceptions[type];
   period->exceptions[type] = new_daterange.get();
 
+  // Notify event broker.
+  // XXX
+
   return (new_daterange.release());
 }
 
@@ -840,6 +951,9 @@ timeperiodexclusion* add_exclusion_to_timeperiod(
   new_timeperiodexclusion->timeperiod_name = my_strdup(name);
   new_timeperiodexclusion->next = period->exclusions;
   period->exclusions = new_timeperiodexclusion.get();
+
+  // Notify event broker.
+  // XXX
 
   return (new_timeperiodexclusion.release());
 }
@@ -1210,6 +1324,18 @@ host* add_host(
     host_list_tail = new_host.get();
   }
 
+  // Notify event broker.
+  timeval tv(get_broker_timestamp(NULL));
+  broker_adaptive_host_data(
+    NEBTYPE_HOST_ADD,
+    NEBFLAG_NONE,
+    NEBATTR_NONE,
+    new_host.get(),
+    CMD_NONE,
+    MODATTR_ALL,
+    MODATTR_ALL,
+    &tv);
+
   return (new_host.release());
 }
 
@@ -1308,6 +1434,9 @@ hostdependency* add_host_dependency(
     hostdependency_list_tail = new_hostdependency.get();
   }
 
+  // Notify event broker.
+  // XXX
+
   return (new_hostdependency.release());
 }
 
@@ -1339,6 +1468,9 @@ commandsmember* add_host_notification_command_to_contact(
   // Add the notification command.
   new_commandsmember->next = cntct->host_notification_commands;
   cntct->host_notification_commands = new_commandsmember.get();
+
+  // Notify event broker.
+  // XXX
 
   return (new_commandsmember.release());
 }
@@ -1393,6 +1525,9 @@ hostsmember* add_host_to_hostgroup(
     new_member->next = NULL;
     last_member->next = new_member.get();
   }
+
+  // Notify event broker.
+  // XXX
 
   return (new_member.release());
 }
@@ -1482,6 +1617,9 @@ hostescalation* add_hostescalation(
     hostescalation_list_tail = new_hostescalation.get();
   }
 
+  // Notify event broker.
+  // XXX
+
   return (new_hostescalation.release());
 }
 
@@ -1562,6 +1700,15 @@ hostgroup* add_hostgroup(
     hostgroup_list_tail = new_hostgroup.get();
   }
 
+  // Notify event broker.
+  timeval tv(get_broker_timestamp(NULL));
+  broker_group(
+    NEBTYPE_HOSTGROUP_ADD,
+    NEBFLAG_NONE,
+    NEBATTR_NONE,
+    new_hostgroup.get(),
+    &tv);
+
   return (new_hostgroup.release());
 }
 
@@ -1601,6 +1748,9 @@ hostsmember* add_parent_host_to_host(
   // Add the parent host entry to the host definition */
   new_hostsmember->next = hst->parent_hosts;
   hst->parent_hosts = new_hostsmember.get();
+
+  // Notify event broker.
+  // XXX
 
   return (new_hostsmember.release());
 }
@@ -1948,6 +2098,18 @@ service* add_service(
     service_list_tail = new_service.get();
   }
 
+  // Notify event broker.
+  timeval tv(get_broker_timestamp(NULL));
+  broker_adaptive_service_data(
+    NEBTYPE_SERVICE_ADD,
+    NEBFLAG_NONE,
+    NEBATTR_NONE,
+    new_service.get(),
+    CMD_NONE,
+    MODATTR_ALL,
+    MODATTR_ALL,
+    &tv);
+
   return (new_service.release());
 }
 
@@ -2081,6 +2243,9 @@ servicedependency* add_service_dependency(
     servicedependency_list_tail = new_servicedependency.get();
   }
 
+  // Notify event broker.
+  // XXX
+
   return (new_servicedependency.release());
 }
 
@@ -2107,6 +2272,9 @@ servicesmember* add_service_link_to_host(host* hst, service* svc) {
   // Add the child entry to the host definition.
   new_servicesmember->next = hst->services;
   hst->services = new_servicesmember.get();
+
+  // Notify event broker.
+  // XXX
 
   return (new_servicesmember.release());
 }
@@ -2139,6 +2307,9 @@ commandsmember* add_service_notification_command_to_contact(
   // Add the notification command.
   new_commandsmember->next = cntct->service_notification_commands;
   cntct->service_notification_commands = new_commandsmember.get();
+
+  // Notify event broker.
+  // XXX
 
   return (new_commandsmember.release());
 }
@@ -2212,6 +2383,9 @@ servicesmember* add_service_to_servicegroup(
     new_member->next = NULL;
     last_member->next = new_member.get();
   }
+
+  // Notify event broker.
+  // XXX
 
   return (new_member.release());
 }
@@ -2316,6 +2490,9 @@ serviceescalation* add_serviceescalation(
     serviceescalation_list_tail = new_serviceescalation.get();
   }
 
+  // Notify event broker.
+  // XXX
+
   return (new_serviceescalation.release());
 }
 
@@ -2396,6 +2573,15 @@ servicegroup* add_servicegroup(
     servicegroup_list_tail = new_servicegroup.get();
   }
 
+  // Notify event broker.
+  timeval tv(get_broker_timestamp(NULL));
+  broker_group(
+    NEBTYPE_SERVICEGROUP_ADD,
+    NEBFLAG_NONE,
+    NEBATTR_NONE,
+    new_servicegroup.get(),
+    &tv);
+
   return (new_servicegroup.release());
 }
 
@@ -2462,6 +2648,9 @@ timeperiod* add_timeperiod(char const* name, char const* alias) {
     timeperiod_list_tail = new_timeperiod.get();
   }
 
+  // Notify event broker.
+  // XXX
+
   return (new_timeperiod.release());
 }
 
@@ -2511,6 +2700,9 @@ timerange* add_timerange_to_timeperiod(
   new_timerange->next = period->days[day];
   period->days[day] = new_timerange.get();
 
+  // Notify event broker.
+  // XXX
+
   return (new_timerange.release());
 }
 
@@ -2550,6 +2742,9 @@ timerange* add_timerange_to_daterange(
   // list for this date range.
   new_timerange->next = drange->times;
   drange->times = new_timerange.get();
+
+  // Notify event broker.
+  // XXX
 
   return (new_timerange.release());
 }

@@ -308,6 +308,42 @@ void broker_aggregated_status_data(
 }
 
 /**
+ *  Send command data to broker.
+ *
+ *  @param[in] type      Type.
+ *  @param[in] flags     Flags.
+ *  @param[in] attr      Attributes.
+ *  @param[in] name      Command name.
+ *  @param[in] cmd_line  Command line.
+ *  @param[in] timestamp Timestamp.
+ */
+void broker_command_data(
+       int type,
+       int flags,
+       int attr,
+       char const* name,
+       char const* cmd_line,
+       struct timeval const* timestamp) {
+  // Config check.
+  if (!(config.get_event_broker_options() & BROKER_COMMAND_DATA))
+    return ;
+
+  // Fill struct with relevant data.
+  nebstruct_command_data ds;
+  ds.type = type;
+  ds.flags = flags;
+  ds.attr = attr;
+  ds.timestamp = get_broker_timestamp(timestamp);
+  ds.cmd_name = name;
+  ds.cmd_line = cmd_line;
+
+  // Make callback.
+  neb_make_callbacks(NEBCALLBACK_COMMAND_DATA, &ds);
+
+  return ;
+}
+
+/**
  *  Send comment data to broker.
  *
  *  @param[in] type            Type.
