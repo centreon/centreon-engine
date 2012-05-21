@@ -39,6 +39,10 @@
 #  include "com/centreon/engine/skiplist.hh"
 #  include "com/centreon/engine/utils.hh"
 
+#  ifdef __cplusplus
+extern "C" {
+#  endif /* C++ */
+
 extern com::centreon::engine::configuration::state config;
 extern char*                     config_file;
 
@@ -181,9 +185,9 @@ extern unsigned int use_retained_scheduling_info;
 extern unsigned int retention_scheduling_horizon;
 extern int additional_freshness_latency;
 extern unsigned long retained_host_attribute_mask;
-// retained_service_attribute_mask;
+/* retained_service_attribute_mask; */
 extern unsigned long retained_process_host_attribute_mask;
-// retained_process_service_attribute_mask;
+/* retained_process_service_attribute_mask; */
 extern unsigned long retained_contact_service_attribute_mask;
 extern unsigned long retained_contact_host_attribute_mask;
 extern unsigned int obsess_over_services;
@@ -221,7 +225,7 @@ extern unsigned int max_check_reaper_time;
 extern float sleep_time;
 extern unsigned int interval_length;
 extern unsigned int check_external_commands;
-// command_check_interval_is_seconds;
+/* command_check_interval_is_seconds; */
 extern int command_check_interval;
 extern unsigned int check_orphaned_services;
 extern unsigned int check_orphaned_hosts;
@@ -253,6 +257,10 @@ extern unsigned int use_large_installation_tweaks;
 extern unsigned int enable_environment_macros;
 extern unsigned int free_child_process_memory;
 extern int external_command_buffer_slots;
-// auth_file;
+/* auth_file; */
 
-#endif // !CCE_GLOBALS_HH
+#  ifdef __cplusplus
+}
+#  endif /* C++ */
+
+#endif /* !CCE_GLOBALS_HH */
