@@ -611,7 +611,7 @@ contactsmember*        add_contact_to_contactgroup(
 /* Adds a contact to a host definition. */
 contactsmember*        add_contact_to_host(host* hst, char const* contact_name);
 /* Adds a contact to a host escalation definition. */
-contactsmember*        add_contact_to_hostescalation(
+contactsmember*        add_contact_to_host_escalation(
                          hostescalation* he,
                          char const* contact_name);
 /* Adds a contact to an object. */
@@ -635,7 +635,7 @@ contactgroupsmember*   add_contactgroup_to_host(
                          host* hst,
                          char const* group_name);
 /* Adds a contact group to a host escalation definition. */
-contactgroupsmember*   add_contactgroup_to_hostescalation(
+contactgroupsmember*   add_contactgroup_to_host_escalation(
                          hostescalation* he,
                          char const* group_name);
 /* Adds a contact group to a service definition. */

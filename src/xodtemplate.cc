@@ -10495,7 +10495,7 @@ int xodtemplate_register_hostescalation(xodtemplate_hostescalation* this_hostesc
 	 contact_group = strtok(NULL, ",")) {
 
       strip(contact_group);
-      new_contactgroupsmember = add_contactgroup_to_hostescalation(new_hostescalation,
+      new_contactgroupsmember = add_contactgroup_to_host_escalation(new_hostescalation,
 								   contact_group);
       if (new_contactgroupsmember == NULL) {
         logger(log_config_error, basic)
@@ -10516,7 +10516,7 @@ int xodtemplate_register_hostescalation(xodtemplate_hostescalation* this_hostesc
 	 contact_name = strtok(NULL, ", ")) {
 
       strip(contact_name);
-      new_contactsmember = add_contact_to_hostescalation(new_hostescalation, contact_name);
+      new_contactsmember = add_contact_to_host_escalation(new_hostescalation, contact_name);
       if (new_contactsmember == NULL) {
         logger(log_config_error, basic)
           << "Error: Could not add contact '" << contact_name

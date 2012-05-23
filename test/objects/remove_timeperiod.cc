@@ -222,7 +222,7 @@ static void remove_timeperiod_with_serviceescalations() {
   init_object_skiplists();
 
   timeperiod* t = add_timeperiod("timeperiod_name", "timeperiod_alias");
-  serviceescalation* se = add_serviceescalation("host_name", "description",
+  serviceescalation* se = add_service_escalation("host_name", "description",
 						0, 0, 0.0, NULL, 0, 0, 0, 0);
   se->escalation_period_ptr = t;
 

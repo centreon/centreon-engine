@@ -241,8 +241,8 @@ static void remove_contact_with_hostescalation() {
   cgroup->members->contact_ptr = cntct;
 
   hostescalation* he = add_host_escalation("host_name", 0, 0, 0.0, NULL, 0, 0, 0);
-  contactgroupsmember* cgm = add_contactgroup_to_hostescalation(he, "contactgroup_name");
-  add_contact_to_hostescalation(he, "contact_name_1");
+  contactgroupsmember* cgm = add_contactgroup_to_host_escalation(he, "contactgroup_name");
+  add_contact_to_host_escalation(he, "contact_name_1");
 
   he->contacts->contact_ptr = cntct;
   he->contact_groups->group_ptr = cgroup;
@@ -275,7 +275,7 @@ static void remove_contact_with_serviceescalation() {
   add_contact_to_contactgroup(cgroup, "contact_name_1");
   cgroup->members->contact_ptr = cntct;
 
-  serviceescalation* se = add_serviceescalation("service_name", "service_description",
+  serviceescalation* se = add_service_escalation("service_name", "service_description",
 						0, 0, 0.0, NULL, 0, 0, 0, 0);
   contactgroupsmember* cgm = add_contactgroup_to_serviceescalation(se, "contactgroup_name");
   add_contact_to_serviceescalation(se, "contact_name_1");

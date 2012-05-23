@@ -107,7 +107,7 @@ servicegroup* objects::create_servicegroup(unsigned int id) {
 }
 
 serviceescalation* objects::create_serviceescalation(unsigned int id) {
-  return (add_serviceescalation(qPrintable(QString("name_%1").arg(id)),
+  return (add_service_escalation(qPrintable(QString("name_%1").arg(id)),
                                 qPrintable(QString("description_%1").arg(id)),
                                 1,
                                 1,

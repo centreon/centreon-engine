@@ -172,7 +172,7 @@ static void remove_service_with_serviceescalation() {
   			     0.0, 0.0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "failure_prediction_options",
   			     0, 0, "notes", "notes_url", "action_url", "icon_image", "icon_image_alt",
   			     0, 0, 0);
-  serviceescalation* se = add_serviceescalation("serviceescalation_host_name_1",
+  serviceescalation* se = add_service_escalation("serviceescalation_host_name_1",
 						"serviceescalation_description",
 						0, 0, 0.0,
 						"serviceescalation_escalation_period",

@@ -80,8 +80,8 @@ static void remove_host_escalation_with_contactgroups() {
                                            0, 0, 0.0,
                                            "hostescalation_escalation_period",
                                            0, 0, 0);
-  contactgroup* cgroup = add_contact_group("contactgroup_name", "contactgroup_alias");
-  contactgroupsmember* cgm = add_contact_group_to_hostescalation(he, "contactgroup_name");
+  contactgroup* cgroup = add_contactgroup("contactgroup_name", "contactgroup_alias");
+  contactgroupsmember* cgm = add_contactgroup_to_host_escalation(he, "contactgroup_name");
   cgm->group_ptr = cgroup;
 
   if (remove_host_escalation_by_id("hostescalation_host_name_1") != 1
@@ -128,7 +128,7 @@ static void remove_host_escalation_with_contacts() {
  */
 int main(void) {
   try {
-    remove_all_hostescalation();
+    remove_all_host_escalation();
     remove_host_escalation_failed();
     remove_host_escalation_with_contactgroups();
     remove_host_escalation_with_contacts();

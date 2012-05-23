@@ -79,7 +79,7 @@ static void remove_service_dependency_failed() {
 
   if (remove_service_dependency_by_id("", "", "", "") == 1)
     throw (engine_error() << "service dependency remove but dosen't exist.");
-  if (remove_servicedependency_by_id(NULL, NULL, NULL, NULL) == 1)
+  if (remove_service_dependency_by_id(NULL, NULL, NULL, NULL) == 1)
     throw (engine_error() << "service dependency remove but pointer is NULL.");
 
   free_object_skiplists();

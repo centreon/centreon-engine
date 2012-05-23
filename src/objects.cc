@@ -420,7 +420,7 @@ contactsmember* add_contact_to_host(host* hst, char const* contact_name) {
  *
  *  @return Contact membership object.
  */
-contactsmember* add_contact_to_hostescalation(
+contactsmember* add_contact_to_host_escalation(
                   hostescalation* he,
                   char const* contact_name) {
   // XXX: event broker
@@ -613,7 +613,7 @@ contactgroupsmember* add_contactgroup_to_host(
  *
  *  @return Contact group membership object.
  */
-contactgroupsmember* add_contactgroup_to_hostescalation(
+contactgroupsmember* add_contactgroup_to_host_escalation(
                        hostescalation* he,
                        char const* group_name) {
   // Bail out if we weren't given the data we need.
