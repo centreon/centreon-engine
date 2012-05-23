@@ -21,14 +21,14 @@
 #include <iomanip>
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
-#include "com/centreon/engine/modules/webservice/configuration/save.hh"
+#include "com/centreon/engine/modules/webservice/configuration/save/objects.hh"
 
-using namespace com::centreon::engine::modules::webservice::configuration;
+using namespace com::centreon::engine::modules::webservice::configuration::save;
 
 /**
  *  Default constructor.
  */
-save::save() {
+objects::objects() {
 
 }
 
@@ -37,14 +37,14 @@ save::save() {
  *
  *  @param[in] right  The object to copy.
  */
-save::save(save const& right) {
+objects::objects(objects const& right) {
   _internal_copy(right);
 }
 
 /**
  *  Destructor.
  */
-save::~save() throw () {
+objects::~objects() throw () {
 
 }
 
@@ -55,7 +55,7 @@ save::~save() throw () {
  *
  *  @return This object.
  */
-save& save::operator=(save const& right) {
+objects& objects::operator=(objects const& right) {
   return (_internal_copy(right));
 }
 
@@ -64,7 +64,7 @@ save& save::operator=(save const& right) {
  *
  *  @param[in] obj  The object to save.
  */
-save& save::operator<<(command const& obj) {
+objects& objects::operator<<(command const& obj) {
   _stream << "define command{\n";
   _add_string("name", obj.name);
   _add_string("command_line", obj.command_line);
@@ -77,7 +77,7 @@ save& save::operator<<(command const& obj) {
  *
  *  @param[in] obj  The object to save.
  */
-save& save::operator<<(contact const& obj) {
+objects& objects::operator<<(contact const& obj) {
   std::string host_notification_options;
   if (obj.notify_on_host_down) host_notification_options += ",d";
   if (obj.notify_on_host_unreachable) host_notification_options += ",u";
@@ -130,7 +130,7 @@ save& save::operator<<(contact const& obj) {
  *
  *  @param[in] obj  The object to save.
  */
-save& save::operator<<(contactgroup const& obj) {
+objects& objects::operator<<(contactgroup const& obj) {
   _stream << "define contactgroup{\n";
   _add_string("contactgroup_name", obj.group_name);
   _add_string("alias", obj.alias);
@@ -144,7 +144,7 @@ save& save::operator<<(contactgroup const& obj) {
  *
  *  @param[in] obj  The object to save.
  */
-save& save::operator<<(host const& obj) {
+objects& objects::operator<<(host const& obj) {
   std::string initial_state("o");
   if (obj.initial_state == HOST_DOWN) initial_state = "d";
   else if (obj.initial_state == HOST_UNREACHABLE) initial_state = "u";
@@ -224,7 +224,7 @@ save& save::operator<<(host const& obj) {
  *
  *  @param[in] obj  The object to save.
  */
-save& save::operator<<(hostdependency const& obj) {
+objects& objects::operator<<(hostdependency const& obj) {
   std::string failure_criteria;
   if (obj.fail_on_up) failure_criteria += ",o";
   if (obj.fail_on_down) failure_criteria += ",d";
@@ -253,7 +253,7 @@ save& save::operator<<(hostdependency const& obj) {
  *
  *  @param[in] obj  The object to save.
  */
-save& save::operator<<(hostescalation const& obj) {
+objects& objects::operator<<(hostescalation const& obj) {
   std::string escalation_options;
   if (obj.escalate_on_down) escalation_options += ",d";
   if (obj.escalate_on_unreachable) escalation_options += ",u";
@@ -279,7 +279,7 @@ save& save::operator<<(hostescalation const& obj) {
  *
  *  @param[in] obj  The object to save.
  */
-save& save::operator<<(hostgroup const& obj) {
+objects& objects::operator<<(hostgroup const& obj) {
   _stream << "define hostgroup{\n";
   _add_string("hostgroup_name", obj.group_name);
   _add_string("alias", obj.alias);
@@ -296,7 +296,7 @@ save& save::operator<<(hostgroup const& obj) {
  *
  *  @param[in] obj  The object to save.
  */
-save& save::operator<<(service const& obj) {
+objects& objects::operator<<(service const& obj) {
   std::string initial_state("o");
   if (obj.initial_state == STATE_WARNING) initial_state = "w";
   else if (obj.initial_state == STATE_UNKNOWN) initial_state = "u";
@@ -373,7 +373,7 @@ save& save::operator<<(service const& obj) {
  *
  *  @param[in] obj  The object to save.
  */
-save& save::operator<<(servicedependency const& obj) {
+objects& objects::operator<<(servicedependency const& obj) {
   std::string failure_criteria;
   if (obj.fail_on_ok) failure_criteria += ",o";
   if (obj.fail_on_warning) failure_criteria += ",w";
@@ -405,7 +405,7 @@ save& save::operator<<(servicedependency const& obj) {
  *
  *  @param[in] obj  The object to save.
  */
-save& save::operator<<(serviceescalation const& obj) {
+objects& objects::operator<<(serviceescalation const& obj) {
   std::string escalation_options;
   if (obj.escalate_on_warning) escalation_options += ",w";
   if (obj.escalate_on_unknown) escalation_options += ",u";
@@ -433,7 +433,7 @@ save& save::operator<<(serviceescalation const& obj) {
  *
  *  @param[in] obj  The object to save.
  */
-save& save::operator<<(servicegroup const& obj) {
+objects& objects::operator<<(servicegroup const& obj) {
   _stream << "define servicegroup{\n";
   _add_string("servicegroup_name", obj.group_name);
   _add_string("alias", obj.alias);
@@ -450,7 +450,7 @@ save& save::operator<<(servicegroup const& obj) {
  *
  *  @param[in] obj  The object to save.
  */
-save& save::operator<<(timeperiod const& obj) {
+objects& objects::operator<<(timeperiod const& obj) {
   _stream << "define timeperiod{\n";
   _add_string("timeperiod_name", obj.name);
   _add_string("alias", obj.alias);
@@ -469,7 +469,7 @@ save& save::operator<<(timeperiod const& obj) {
  *
  *  @param[in] filename  The file path to save buffer.
  */
-void save::backup(std::string const& filename) const {
+void objects::backup(std::string const& filename) const {
   std::ofstream output(filename.c_str());
   if (!output.is_open())
     throw (engine_error() << "save configuration: open file '"
@@ -480,7 +480,7 @@ void save::backup(std::string const& filename) const {
 /**
  *  Clear buffer.
  */
-void save::clear() {
+void objects::clear() {
   _stream.str("");
 }
 
@@ -489,7 +489,7 @@ void save::clear() {
  *
  *  @return The save string.
  */
-std::string save::to_string() const {
+std::string objects::to_string() const {
   return (_stream.str());
 }
 
@@ -500,7 +500,7 @@ std::string save::to_string() const {
  *  @param[in] key  The key name.
  *  @param[in] obj  The object to write.
  */
-void save::_add_commands(char const* key, commandsmember const* obj) {
+void objects::_add_commands(char const* key, commandsmember const* obj) {
   if (!obj)
     return;
   _stream << "  " << key << " ";
@@ -514,7 +514,7 @@ void save::_add_commands(char const* key, commandsmember const* obj) {
  *  @param[in] key  The key name.
  *  @param[in] obj  The object to write.
  */
-void save::_add_contacts(char const* key, contactsmember const* obj) {
+void objects::_add_contacts(char const* key, contactsmember const* obj) {
   if (!obj)
     return;
   _stream << "  " << key << " ";
@@ -528,7 +528,7 @@ void save::_add_contacts(char const* key, contactsmember const* obj) {
  *  @param[in] key  The key name.
  *  @param[in] obj  The object to write.
  */
-void save::_add_contactgroups(
+void objects::_add_contactgroups(
              char const* key,
              contactgroupsmember const* obj) {
   if (!obj)
@@ -543,7 +543,7 @@ void save::_add_contactgroups(
  *
  *  @param[in] obj  The object to write.
  */
-void save::_add_customvariables(customvariablesmember const* obj) {
+void objects::_add_customvariables(customvariablesmember const* obj) {
   for (customvariablesmember const* cvm(obj); cvm; cvm = cvm->next)
     _add_string(cvm->variable_name, cvm->variable_value);
 }
@@ -553,7 +553,7 @@ void save::_add_customvariables(customvariablesmember const* obj) {
  *
  *  @param[in] obj  The object to write.
  */
-void save::_add_daterange(daterange const* obj) {
+void objects::_add_daterange(daterange const* obj) {
   typedef std::string (*func)(daterange const*);
   static func tab[] = {
     &_build_daterange_calendar_date,
@@ -579,7 +579,7 @@ void save::_add_daterange(daterange const* obj) {
  *  @param[in] key  The key name.
  *  @param[in] obj  The object to write.
  */
-void save::_add_hosts(char const* key, hostsmember const* obj) {
+void objects::_add_hosts(char const* key, hostsmember const* obj) {
   if (!obj)
     return;
   _stream << "  " << key << " ";
@@ -594,7 +594,7 @@ void save::_add_hosts(char const* key, hostsmember const* obj) {
  *  @param[in] value  The value to write.
  */
 template<typename T>
-void save::_add_line(char const* key, T value) {
+void objects::_add_line(char const* key, T value) {
   _stream << "  " << key << " " << value << "\n";
 }
 
@@ -604,7 +604,7 @@ void save::_add_line(char const* key, T value) {
  *  @param[in] key  The key name.
  *  @param[in] obj  The object to write.
  */
-void save::_add_services(char const* key, servicesmember const* obj) {
+void objects::_add_services(char const* key, servicesmember const* obj) {
   if (!obj)
     return;
   _stream << "  " << key << " ";
@@ -619,7 +619,7 @@ void save::_add_services(char const* key, servicesmember const* obj) {
  *  @param[in] key    The key name.
  *  @param[in] value  The value to write.
  */
-void save::_add_string(char const* key, char const* value) {
+void objects::_add_string(char const* key, char const* value) {
   if (value && value[0])
     _stream << "  " << key << " " << value << "\n";
 }
@@ -630,7 +630,7 @@ void save::_add_string(char const* key, char const* value) {
  *  @param[in] key    The key name.
  *  @param[in] value  The value to write.
  */
-void save::_add_string(char const* key, std::string const& value) {
+void objects::_add_string(char const* key, std::string const& value) {
   if (!value.empty())
     _stream << "  " << key << " " << value << "\n";
 }
@@ -641,7 +641,7 @@ void save::_add_string(char const* key, std::string const& value) {
  *  @param[in] key  The key name.
  *  @param[in] obj  The object to write.
  */
-void save::_add_timeperiodexclusion(
+void objects::_add_timeperiodexclusion(
              char const* key,
              timeperiodexclusion const* obj) {
   if (!obj)
@@ -657,7 +657,7 @@ void save::_add_timeperiodexclusion(
  *  @param[in] key  The key name.
  *  @param[in] obj  The object to write.
  */
-void save::_add_timerange(char const* key, timerange const* obj) {
+void objects::_add_timerange(char const* key, timerange const* obj) {
   if (!obj)
     return;
   _stream << "  " << key << " ";
@@ -681,7 +681,7 @@ void save::_add_timerange(char const* key, timerange const* obj) {
  *
  *  @return The string representation.
  */
-std::string save::_build_daterange_calendar_date(daterange const* obj) {
+std::string objects::_build_daterange_calendar_date(daterange const* obj) {
   if (!obj || obj->type != DATERANGE_CALENDAR_DATE)
     return ("");
   std::ostringstream oss;
@@ -698,7 +698,7 @@ std::string save::_build_daterange_calendar_date(daterange const* obj) {
  *
  *  @return The string representation.
  */
-std::string save::_build_daterange_month_date(daterange const* obj) {
+std::string objects::_build_daterange_month_date(daterange const* obj) {
   if (!obj || obj->type != DATERANGE_MONTH_DATE)
     return ("");
   std::ostringstream oss;
@@ -715,7 +715,7 @@ std::string save::_build_daterange_month_date(daterange const* obj) {
  *
  *  @return The string representation.
  */
-std::string save::_build_daterange_month_day(daterange const* obj) {
+std::string objects::_build_daterange_month_day(daterange const* obj) {
   if (!obj || obj->type != DATERANGE_MONTH_DAY)
     return ("");
   std::ostringstream oss;
@@ -732,7 +732,7 @@ std::string save::_build_daterange_month_day(daterange const* obj) {
  *
  *  @return The string representation.
  */
-std::string save::_build_daterange_month_week_day(
+std::string objects::_build_daterange_month_week_day(
                     daterange const* obj) {
   if (!obj || obj->type != DATERANGE_MONTH_WEEK_DAY)
     return ("");
@@ -751,7 +751,7 @@ std::string save::_build_daterange_month_week_day(
  *
  *  @return The string representation.
  */
-std::string save::_build_daterange_week_day(daterange const* obj) {
+std::string objects::_build_daterange_week_day(daterange const* obj) {
   if (!obj || obj->type != DATERANGE_WEEK_DAY)
     return ("");
   std::ostringstream oss;
@@ -768,7 +768,7 @@ std::string save::_build_daterange_week_day(daterange const* obj) {
  *
  *  @return The month name.
  */
-char const* save::_get_month(unsigned int index) {
+char const* objects::_get_month(unsigned int index) {
   static char const* month[] = {
     "january",
     "february",
@@ -796,7 +796,7 @@ char const* save::_get_month(unsigned int index) {
  *
  *  @return The weekday name.
  */
-char const* save::_get_weekday(unsigned int index) {
+char const* objects::_get_weekday(unsigned int index) {
   static char const* days[] = {
     "sunday",
     "monday",
@@ -819,7 +819,7 @@ char const* save::_get_weekday(unsigned int index) {
  *
  *  @return This object.
  */
-save& save::_internal_copy(save const& right) {
+objects& objects::_internal_copy(objects const& right) {
   if (&right != this) {
     _stream.str(right._stream.str());
   }

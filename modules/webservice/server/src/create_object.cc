@@ -178,7 +178,7 @@ void webservice::create_command(ns1__commandType const& cmd) {
  *
  *  @param[in] cntctgrp The struct with all information to create new contactgroup.
  */
-void webservice::create_contactgroup(ns1__contactGroupType const& cntctgrp) {
+void webservice::create_contact_group(ns1__contactGroupType const& cntctgrp) {
   // create a new contactgroup.
   contactgroup* group = add_contactgroup(cntctgrp.name.c_str(),
                                          cntctgrp.alias.c_str());
@@ -213,7 +213,7 @@ void webservice::create_contactgroup(ns1__contactGroupType const& cntctgrp) {
  *
  *  @param[in] hstgrp The struct with all information to create new hostgroup.
  */
-void webservice::create_hostgroup(ns1__hostGroupType const& hstgrp) {
+void webservice::create_host_group(ns1__hostGroupType const& hstgrp) {
   char const* notes = (hstgrp.notes ? hstgrp.notes->c_str() : NULL);
   char const* notes_url = (hstgrp.notesUrl ? hstgrp.notesUrl->c_str() : NULL);
   char const* action_url = (hstgrp.actionUrl ? hstgrp.actionUrl->c_str() : NULL);
@@ -255,7 +255,7 @@ void webservice::create_hostgroup(ns1__hostGroupType const& hstgrp) {
  *
  *  @param[in] svcgrp The struct with all information to create new servicegroup.
  */
-void webservice::create_servicegroup(ns1__serviceGroupType const& svcgrp) {
+void webservice::create_service_group(ns1__serviceGroupType const& svcgrp) {
   // check if service have host name and service description.
   if (svcgrp.members.size() % 2)
     throw (engine_error() << "servicegroup '" << svcgrp.name << "' invalid members.");
@@ -800,7 +800,7 @@ void webservice::create_contact(ns1__contactType const& cntct) {
  *
  *  @param[in] hostdependency The struct with all information to create new host dependency.
  */
-void webservice::create_hostdependency(ns1__hostDependencyType const& hstdependency) {
+void webservice::create_host_dependency(ns1__hostDependencyType const& hstdependency) {
   // check all arguments and set default option for optional options.
   if (!hstdependency.executionFailureCriteria
       && !hstdependency.notificationFailureCriteria)
@@ -917,7 +917,7 @@ void webservice::create_hostdependency(ns1__hostDependencyType const& hstdepende
  *
  *  @param[in] hostescalation The struct with all information to create new host escalation.
  */
-void webservice::create_hostescalation(ns1__hostEscalationType const& hstescalation) {
+void webservice::create_host_escalation(ns1__hostEscalationType const& hstescalation) {
   // check all arguments and set default option for optional options.
   if (hstescalation.contacts.empty() == true && hstescalation.contactGroups.empty() == true)
     throw (engine_error() << "hostescalation no contact and no contact groups are defined.");
@@ -964,7 +964,7 @@ void webservice::create_hostescalation(ns1__hostEscalationType const& hstescalat
        it != end;
        ++it) {
     hostescalation* new_hstescalation =
-      add_hostescalation((*it)->name,
+      add_host_escalation((*it)->name,
                          hstescalation.firstNotification,
                          hstescalation.lastNotification,
                          hstescalation.notificationInterval,
@@ -993,7 +993,7 @@ void webservice::create_hostescalation(ns1__hostEscalationType const& hstescalat
  *  @param[in] servicedependency The struct with all
  *  information to create new service dependency.
  */
-void webservice::create_servicedependency(ns1__serviceDependencyType const& svcdependency) {
+void webservice::create_service_dependency(ns1__serviceDependencyType const& svcdependency) {
   // check all arguments and set default option for optional options.
   if (!svcdependency.executionFailureCriteria
       && !svcdependency.notificationFailureCriteria)
@@ -1121,7 +1121,7 @@ void webservice::create_servicedependency(ns1__serviceDependencyType const& svcd
  *  @param[in] serviceescalation The struct with all
  *  information to create new service escalation.
  */
-void webservice::create_serviceescalation(ns1__serviceEscalationType const& svcescalation) {
+void webservice::create_service_escalation(ns1__serviceEscalationType const& svcescalation) {
   // check all arguments and set default option for optional options.
   if (svcescalation.contacts.empty() == true && svcescalation.contactGroups.empty() == true)
     throw (engine_error() << "serviceescalation no contact and no contact groups are defined.");
@@ -1169,7 +1169,7 @@ void webservice::create_serviceescalation(ns1__serviceEscalationType const& svce
        it != end;
        ++it) {
     serviceescalation* new_svcescalation =
-      add_serviceescalation((*it)->name,
+      add_service_escalation((*it)->name,
                             service_description,
                             svcescalation.firstNotification,
                             svcescalation.lastNotification,

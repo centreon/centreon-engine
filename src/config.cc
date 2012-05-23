@@ -366,9 +366,9 @@ int pre_flight_object_check(int* w, int* e) {
            buf2, temp_se->first_notification, temp_se->last_notification,
            temp_se->notification_interval, ptr);
   }
-  for (temp_he = get_first_hostescalation_by_host(buf1, &ptr);
+  for (temp_he = get_first_host_escalation_by_host(buf1, &ptr);
        temp_he != NULL;
-       temp_he = get_next_hostescalation_by_host(buf1, &ptr)) {
+       temp_he = get_next_host_escalation_by_host(buf1, &ptr)) {
     printf("FOUND ESCALATION FOR HOST '%s': %d-%d/%d, PTR=%p\n", buf1,
            temp_he->first_notification, temp_he->last_notification,
            temp_he->notification_interval, ptr);

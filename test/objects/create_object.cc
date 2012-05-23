@@ -207,7 +207,7 @@ hostgroup* objects::create_hostgroup(unsigned int id) {
 }
 
 hostescalation* objects::create_hostescalation(unsigned int id) {
-  return (add_hostescalation(qPrintable(QString("name_%1").arg(id)),
+  return (add_host_escalation(qPrintable(QString("name_%1").arg(id)),
                              5,
                              5,
                              60.0,

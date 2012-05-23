@@ -21,6 +21,7 @@
 #  define CCE_CONFIGURATION_STATE_HH
 
 #  include <map>
+#  include <QList>
 #  include <QString>
 #  include <sstream>
 #  include <string>
@@ -82,6 +83,8 @@ namespace                   com {
 	  void                reset();
 	  void                parse(QString const& filename);
 
+	  QString const&      get_admin_email() const throw();
+	  QString const&      get_admin_pager() const throw();
 	  QString const&      get_log_file() const throw();
 	  QString const&      get_broker_module_directory() const throw();
 	  QString const&      get_debug_file() const throw();
@@ -93,7 +96,16 @@ namespace                   com {
 	  QString const&      get_illegal_object_chars() const throw();
 	  QString const&      get_illegal_output_chars() const throw();
 	  QString const&      get_use_timezone() const throw();
+          QString const&      get_status_file() const throw();
+          QString const&      get_state_retention_file() const throw();
+          QString const&      get_object_cache_file() const throw();
+          QString const&      get_precached_object_file() const throw();
+          QList<QString> const& get_broker_module() const throw();
+          QList<QString> const& get_cfg_dir() const throw();
+          QList<QString> const& get_cfg_file() const throw();
+          QList<QString> const& get_resource_file() const throw();
 	  int                 get_additional_freshness_latency() const throw();
+          int                 get_perfdata_timeout() const throw();
 	  unsigned long       get_debug_level() const throw();
 	  unsigned int        get_debug_verbosity() const throw();
 	  int                 get_command_check_interval() const throw();
@@ -296,16 +308,22 @@ namespace                   com {
 	   *  List all string variable
 	   */
 	  enum                e_var_string {
-	    log_file = 0,
+            admin_email = 0,
+            admin_pager,
 	    broker_module_directory,
-	    debug_file,
 	    command_file,
+	    debug_file,
 	    global_host_event_handler,
 	    global_service_event_handler,
-	    ocsp_command,
-	    ochp_command,
 	    illegal_object_chars,
 	    illegal_output_chars,
+	    log_file,
+            precached_object_file,
+            object_cache_file,
+	    ochp_command,
+	    ocsp_command,
+            state_retention_file,
+            status_file,
 	    use_timezone,
 	    max_string
 	  };
@@ -315,16 +333,16 @@ namespace                   com {
 	   *  List all unsigned long variable
 	   */
 	  enum                e_var_ulong {
-	    debug_level = 0,
+	    cached_host_check_horizon = 0,
+	    cached_service_check_horizon,
+	    debug_level,
+	    event_broker_options,
 	    max_debug_file_size,
 	    max_log_file_size,
 	    retained_host_attribute_mask,
 	    retained_process_host_attribute_mask,
 	    retained_contact_host_attribute_mask,
 	    retained_contact_service_attribute_mask,
-	    cached_host_check_horizon,
-	    cached_service_check_horizon,
-	    event_broker_options,
 	    max_ulong
 	  };
 
@@ -333,11 +351,11 @@ namespace                   com {
 	   *  List all float variable
 	   */
 	  enum                e_var_float {
-	    sleep_time = 0,
-	    low_service_flap_threshold,
+	    high_host_flap_threshold = 0,
 	    high_service_flap_threshold,
 	    low_host_flap_threshold,
-	    high_host_flap_threshold,
+	    low_service_flap_threshold,
+	    sleep_time,
 	    max_float
 	  };
 
@@ -347,10 +365,11 @@ namespace                   com {
 	   */
 	  enum                e_var_int {
 	    additional_freshness_latency = 0,
+	    child_processes_fork_twice,
 	    command_check_interval,
 	    external_command_buffer_slots,
 	    free_child_process_memory,
-	    child_processes_fork_twice,
+            perfdata_timeout,
 	    max_int
 	  };
 
@@ -359,31 +378,31 @@ namespace                   com {
 	   *  List all unsigned int variable
 	   */
 	  enum                e_var_uint {
-	    debug_verbosity = 0,
-	    max_service_check_spread,
+	    auto_rescheduling_interval = 0,
+	    auto_rescheduling_window,
+	    check_reaper_interval,
+	    date_format,
+	    debug_verbosity,
+	    event_handler_timeout,
+	    host_check_timeout,
+	    host_freshness_check_interval,
+	    host_inter_check_delay_method,
+	    interval_length,
+	    max_check_reaper_time,
 	    max_host_check_spread,
 	    max_parallel_service_checks,
-	    check_reaper_interval,
-	    max_check_reaper_time,
-	    interval_length,
+	    max_service_check_spread,
+	    notification_timeout,
+	    ochp_timeout,
+	    ocsp_timeout,
+	    retention_scheduling_horizon,
+	    retention_update_interval,
+	    service_check_timeout,
 	    service_freshness_check_interval,
-	    host_freshness_check_interval,
-	    auto_rescheduling_interval,
-	    auto_rescheduling_window,
+	    service_inter_check_delay_method,
+	    service_interleave_factor_method,
 	    status_update_interval,
 	    time_change_threshold,
-	    retention_update_interval,
-	    retention_scheduling_horizon,
-	    service_check_timeout,
-	    host_check_timeout,
-	    event_handler_timeout,
-	    notification_timeout,
-	    ocsp_timeout,
-	    ochp_timeout,
-	    date_format,
-	    service_inter_check_delay_method,
-	    host_inter_check_delay_method,
-	    service_interleave_factor_method,
 	    max_uint
 	  };
 
@@ -392,45 +411,45 @@ namespace                   com {
 	   *  List all bool variable
 	   */
 	  enum                e_var_bool {
-	    use_syslog = 0,
-	    log_notifications,
-	    log_service_retries,
-	    log_host_retries,
-	    log_event_handlers,
-	    log_external_commands,
-	    log_passive_checks,
-	    log_initial_state,
-	    retain_state_information,
-	    use_retained_program_state,
-	    use_retained_scheduling_info,
-	    obsess_over_services,
-	    obsess_over_hosts,
-	    translate_passive_host_checks,
-	    passive_host_checks_are_soft,
-	    use_aggressive_host_checking,
+	    accept_passive_host_checks = 0,
+	    accept_passive_service_checks,
+	    allow_empty_hostgroup_assignment,
+	    auto_reschedule_checks,
+	    check_external_commands,
+	    check_host_freshness,
+	    check_orphaned_hosts,
+	    check_orphaned_services,
+	    check_service_freshness,
+	    enable_environment_macros,
+	    enable_event_handlers,
+	    enable_failure_prediction,
+	    enable_flap_detection,
+	    enable_notifications,
 	    enable_predictive_host_dependency_checks,
 	    enable_predictive_service_dependency_checks,
-	    soft_state_dependencies,
-	    enable_event_handlers,
-	    enable_notifications,
-	    execute_service_checks,
-	    accept_passive_service_checks,
 	    execute_host_checks,
-	    accept_passive_host_checks,
-	    check_external_commands,
-	    check_orphaned_services,
-	    check_orphaned_hosts,
-	    check_service_freshness,
-	    check_host_freshness,
-	    auto_reschedule_checks,
+	    execute_service_checks,
+	    log_event_handlers,
+	    log_external_commands,
+	    log_host_retries,
+	    log_notifications,
+	    log_initial_state,
+	    log_passive_checks,
+	    log_service_retries,
+	    passive_host_checks_are_soft,
 	    process_performance_data,
-	    enable_flap_detection,
-	    enable_failure_prediction,
-	    use_regexp_matches,
-	    use_true_regexp_matching,
+	    obsess_over_hosts,
+	    obsess_over_services,
+	    retain_state_information,
+	    soft_state_dependencies,
+	    translate_passive_host_checks,
+	    use_aggressive_host_checking,
 	    use_large_installation_tweaks,
-	    enable_environment_macros,
-	    allow_empty_hostgroup_assignment,
+	    use_regexp_matches,
+	    use_retained_program_state,
+	    use_retained_scheduling_info,
+	    use_syslog,
+	    use_true_regexp_matching,
 	    max_bool
 	  };
 
@@ -453,6 +472,14 @@ namespace                   com {
 	  void                _set_lock_file(QString const& value);
 	  void                _set_user(QString const& value);
 	  void                _set_group(QString const& value);
+          void                _set_status_file(QString const& value);
+          void                _set_perfdata_timeout(int value);
+          void                _add_cfg_dir(QString const& value);
+          void                _add_cfg_file(QString const& value);
+          void                _add_resource_file(QString const& value);
+          void                _set_state_retention_file(QString const& value);
+          void                _set_object_cache_file(QString const& value);
+          void                _set_precached_object_file(QString const& value);
 
 	  static std::string  _getline(std::ifstream& ifs) throw();
 	  static std::string& _trim(std::string& str) throw();
@@ -508,7 +535,11 @@ namespace                   com {
 	  bool                _tab_bool[max_bool];
 
 	  QString             _filename;
+          QList<QString>      _lst_broker_module;
+          QList<QString>      _lst_cfg_dir;
+          QList<QString>      _lst_cfg_file;
 	  methods             _lst_method;
+          QList<QString>      _lst_resource_file;
 	  unsigned int        _cur_line;
 	  bool                _command_check_interval_is_seconds;
 	  nagios_macros       *_mac;

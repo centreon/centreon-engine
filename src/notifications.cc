@@ -1108,9 +1108,9 @@ int should_service_notification_be_escalated(service* svc) {
   logger(dbg_functions, basic) << "should_service_notification_be_escalated()";
 
   /* search the service escalation list */
-  for (temp_se = get_first_serviceescalation_by_service(svc->host_name, svc->description, &ptr);
+  for (temp_se = get_first_service_escalation_by_service(svc->host_name, svc->description, &ptr);
        temp_se != NULL;
-       temp_se = get_next_serviceescalation_by_service(svc->host_name, svc->description, &ptr)) {
+       temp_se = get_next_service_escalation_by_service(svc->host_name, svc->description, &ptr)) {
 
     /* we found a matching entry, so escalate this notification! */
     if (is_valid_escalation_for_service_notification(svc, temp_se, NOTIFICATION_OPTION_NONE) == TRUE) {
@@ -1165,9 +1165,9 @@ int create_notification_list_from_service(nagios_macros* mac,
       << "Adding contacts from service escalation(s) to notification list.";
 
     /* search all the escalation entries for valid matches */
-    for (temp_se = get_first_serviceescalation_by_service(svc->host_name, svc->description, &ptr);
+    for (temp_se = get_first_service_escalation_by_service(svc->host_name, svc->description, &ptr);
          temp_se != NULL;
-         temp_se = get_next_serviceescalation_by_service(svc->host_name, svc->description, &ptr)) {
+         temp_se = get_next_service_escalation_by_service(svc->host_name, svc->description, &ptr)) {
 
       /* skip this entry if it isn't appropriate */
       if (is_valid_escalation_for_service_notification(svc, temp_se, options) == FALSE)
@@ -2257,9 +2257,9 @@ int should_host_notification_be_escalated(host* hst) {
     return (FALSE);
 
   /* search the host escalation list */
-  for (temp_he = get_first_hostescalation_by_host(hst->name, &ptr);
+  for (temp_he = get_first_host_escalation_by_host(hst->name, &ptr);
        temp_he != NULL;
-       temp_he = get_next_hostescalation_by_host(hst->name, &ptr)) {
+       temp_he = get_next_host_escalation_by_host(hst->name, &ptr)) {
 
     /* we found a matching entry, so escalate this notification! */
     if (is_valid_escalation_for_host_notification
@@ -2312,9 +2312,9 @@ int create_notification_list_from_host(nagios_macros* mac,
       << "Adding contacts from host escalation(s) to notification list.";
 
     /* check all the host escalation entries */
-    for (temp_he = get_first_hostescalation_by_host(hst->name, &ptr);
+    for (temp_he = get_first_host_escalation_by_host(hst->name, &ptr);
          temp_he != NULL;
-         temp_he = get_next_hostescalation_by_host(hst->name, &ptr)) {
+         temp_he = get_next_host_escalation_by_host(hst->name, &ptr)) {
 
       /* see if this escalation if valid for this notification */
       if (is_valid_escalation_for_host_notification(hst, temp_he, options) == FALSE)

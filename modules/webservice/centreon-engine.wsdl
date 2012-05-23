@@ -916,6 +916,90 @@
       <output message="tns:defaultResponse"/>
     </operation>
 
+    <!-- saveCommands -->
+    <operation name="saveCommands">
+      <documentation>Save commands into a file.</documentation>
+      <input message="tns:stringRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- saveContacts -->
+    <operation name="saveContacts">
+      <documentation>Save contacts into a file.</documentation>
+      <input message="tns:stringRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- saveContactgroups -->
+    <operation name="saveContactgroups">
+      <documentation>Save contactgroups into a file.</documentation>
+      <input message="tns:stringRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- saveHosts -->
+    <operation name="saveHosts">
+      <documentation>Save hosts into a file.</documentation>
+      <input message="tns:stringRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- saveHostEscalations -->
+    <operation name="saveHostEscalations">
+      <documentation>Save host escalations into a file.</documentation>
+      <input message="tns:stringRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- saveHostDependencies -->
+    <operation name="saveHostDependencies">
+      <documentation>Save host dependencies into a file.</documentation>
+      <input message="tns:stringRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- saveHostGroups -->
+    <operation name="saveHostGroups">
+      <documentation>Save host groups into a file.</documentation>
+      <input message="tns:stringRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- saveServices -->
+    <operation name="saveServices">
+      <documentation>Save services into a file.</documentation>
+      <input message="tns:stringRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- saveServiceDependencies -->
+    <operation name="saveServiceDependencies">
+      <documentation>Save service dependencies into a file.</documentation>
+      <input message="tns:stringRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- saveServiceEscalations -->
+    <operation name="saveServiceEscalations">
+      <documentation>Save Service escalations into a file.</documentation>
+      <input message="tns:stringRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- saveServiceGroups -->
+    <operation name="saveServiceGroups">
+      <documentation>Save service groups into a file.</documentation>
+      <input message="tns:stringRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- saveTimeperiods -->
+    <operation name="saveTimeperiods">
+      <documentation>Save timeperiods into a file.</documentation>
+      <input message="tns:stringRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
     <!--
 	Configuration modification.
     -->
@@ -4266,6 +4350,78 @@
     -->
 
     <operation name="saveAllObjects">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="saveCommands">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="saveContacts">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="saveContactgroups">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="saveHosts">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="saveHostEscalations">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="saveHostDependencies">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="saveHostGroups">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="saveServices">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="saveServiceDependencies">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="saveServiceEscalations">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="saveServiceGroups">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="saveTimeperiods">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
       <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>

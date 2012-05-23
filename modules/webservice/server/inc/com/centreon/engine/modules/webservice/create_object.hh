@@ -26,16 +26,16 @@
 CCE_MOD_WS_BEGIN()
 
 void create_contact(ns1__contactType const& contact);
-void create_contactgroup(ns1__contactGroupType const& contactgroup);
+void create_contact_group(ns1__contactGroupType const& contactgroup);
 void create_command(ns1__commandType const& command);
 void create_host(ns1__hostType const& host);
-void create_hostdependency(ns1__hostDependencyType const& hostdependency);
-void create_hostescalation(ns1__hostEscalationType const& hostescalation);
-void create_hostgroup(ns1__hostGroupType const& hostgroup);
+void create_host_dependency(ns1__hostDependencyType const& hostdependency);
+void create_host_escalation(ns1__hostEscalationType const& hostescalation);
+void create_host_group(ns1__hostGroupType const& hostgroup);
 void create_service(ns1__serviceType const& service);
-void create_servicedependency(ns1__serviceDependencyType const& servicedependency);
-void create_serviceescalation(ns1__serviceEscalationType const& serviceescalation);
-void create_servicegroup(ns1__serviceGroupType const& servicegroup);
+void create_service_dependency(ns1__serviceDependencyType const& servicedependency);
+void create_service_escalation(ns1__serviceEscalationType const& serviceescalation);
+void create_service_group(ns1__serviceGroupType const& servicegroup);
 void create_timeperiod(ns1__timeperiodType const& tperiod);
 
 CCE_MOD_WS_END()

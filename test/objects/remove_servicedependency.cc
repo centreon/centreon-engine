@@ -30,7 +30,7 @@ using namespace com::centreon::engine;
 /**
  *  Check if remove servicedependency works with some servicedependency.
  */
-static void remove_all_servicedependency() {
+static void remove_all_service_dependency() {
   init_object_skiplists();
 
   add_service_dependency("service_dependency_dependent_host_name_1",
@@ -52,21 +52,21 @@ static void remove_all_servicedependency() {
 			 0, 0, 0, 0, 0, 0, 0,
 			 "service_dependency_dependency_period");
 
-  if (remove_servicedependency_by_id("service_dependency_host_name_1",
-				     "service_dependency_service_description",
-				     "service_dependency_dependent_host_name_1",
-				     "service_dependency_dependent_service_description") != 1
-      || remove_servicedependency_by_id("service_dependency_host_name_2",
-					"service_dependency_service_description",
-					"service_dependency_dependent_host_name_2",
-					"service_dependency_dependent_service_description") != 1
-      || remove_servicedependency_by_id("service_dependency_host_name_3",
-					"service_dependency_service_description",
-					"service_dependency_dependent_host_name_3",
-					"service_dependency_dependent_service_description") != 1
+  if (remove_service_dependency_by_id("service_dependency_host_name_1",
+                                      "service_dependency_service_description",
+                                      "service_dependency_dependent_host_name_1",
+                                      "service_dependency_dependent_service_description") != 1
+      || remove_service_dependency_by_id("service_dependency_host_name_2",
+                                         "service_dependency_service_description",
+                                         "service_dependency_dependent_host_name_2",
+                                         "service_dependency_dependent_service_description") != 1
+      || remove_service_dependency_by_id("service_dependency_host_name_3",
+                                         "service_dependency_service_description",
+                                         "service_dependency_dependent_host_name_3",
+                                         "service_dependency_dependent_service_description") != 1
       || servicedependency_list != NULL
       || servicedependency_list_tail != NULL)
-    throw (engine_error() << "remove all servicedependency failed.");
+    throw (engine_error() << "remove all service dependency failed.");
 
   free_object_skiplists();
 }
@@ -74,13 +74,13 @@ static void remove_all_servicedependency() {
 /**
  *  Check if remove servicedependency works with invalid call.
  */
-static void remove_servicedependency_failed() {
+static void remove_service_dependency_failed() {
   init_object_skiplists();
 
-  if (remove_servicedependency_by_id("", "", "", "") == 1)
-    throw (engine_error() << "servicedependency remove but dosen't exist.");
+  if (remove_service_dependency_by_id("", "", "", "") == 1)
+    throw (engine_error() << "service dependency remove but dosen't exist.");
   if (remove_servicedependency_by_id(NULL, NULL, NULL, NULL) == 1)
-    throw (engine_error() << "servicedependency remove but pointer is NULL.");
+    throw (engine_error() << "service dependency remove but pointer is NULL.");
 
   free_object_skiplists();
 }
@@ -90,8 +90,8 @@ static void remove_servicedependency_failed() {
  */
 int main(void) {
   try {
-    remove_all_servicedependency();
-    remove_servicedependency_failed();
+    remove_all_service_dependency();
+    remove_service_dependency_failed();
   }
   catch (std::exception const& e) {
     qDebug() << "error: " << e.what();

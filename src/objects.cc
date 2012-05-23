@@ -1546,7 +1546,7 @@ hostsmember* add_host_to_hostgroup(
  *
  *  @return New host escalation.
  */
-hostescalation* add_hostescalation(
+hostescalation* add_host_escalation(
                   char const* host_name,
                   int first_notification,
                   int last_notification,
@@ -2406,7 +2406,7 @@ servicesmember* add_service_to_servicegroup(
  *
  *  @return New service escalation.
  */
-serviceescalation* add_serviceescalation(
+serviceescalation* add_service_escalation(
                      char const* host_name,
                      char const* description,
                      int first_notification,
@@ -3848,7 +3848,7 @@ int remove_host_by_id(char const* name) {
  *
  *  @return 0 on successful removal.
  */
-int remove_hostdependency_by_id(
+int remove_host_dependency_by_id(
       char const* host_name,
       char const* dependent_host_name) {
   if (!host_name || !dependent_host_name)
@@ -3899,7 +3899,7 @@ int remove_hostdependency_by_id(
  *
  *  @return 1 on successful removal.
  */
-int remove_hostescalation_by_id(char const* host_name) {
+int remove_host_escalation_by_id(char const* host_name) {
   if (!host_name)
     return (0);
 
@@ -3963,7 +3963,7 @@ int remove_hostescalation_by_id(char const* host_name) {
  *
  *  @return 1 on successful removal.
  */
-static int remove_hostgroup(hostgroup* this_hostgroup) {
+static int remove_host_group(hostgroup* this_hostgroup) {
   // Update host list.
   for (host* hst = host_list; hst; hst = hst->next)
     remove_object_to_objectlist(&hst->hostgroups_ptr, this_hostgroup);
@@ -4025,7 +4025,7 @@ int remove_hostgroup_by_id(char const* name) {
   if (!this_hostgroup->next)
     hostgroup_list_tail = prev_hostgroup;
 
-  return (remove_hostgroup(this_hostgroup));
+  return (remove_host_group(this_hostgroup));
 }
 
 /**
@@ -4245,7 +4245,7 @@ int remove_service_by_id(
  *
  *  @return 1 on successful removal.
  */
-int remove_servicedependency_by_id(
+int remove_service_dependency_by_id(
       char const* host_name,
       char const* service_description,
       char const* dependent_host_name,
@@ -4310,7 +4310,7 @@ int remove_servicedependency_by_id(
  *
  *  @return 1 on successful removal.
  */
-int remove_serviceescalation_by_id(
+int remove_service_escalation_by_id(
       char const* host_name,
       char const* service_description) {
   if (!host_name || !service_description)
@@ -4383,7 +4383,7 @@ int remove_serviceescalation_by_id(
  *
  *  @return 1 on successful removal.
  */
-static int remove_servicegroup(servicegroup* this_servicegroup) {
+static int remove_service_group(servicegroup* this_servicegroup) {
   // Update service list.
   for (service* svc(service_list); svc; svc = svc->next)
     remove_object_to_objectlist(
@@ -4450,7 +4450,7 @@ int remove_servicegroup_by_id(char const* name) {
   if (!this_servicegroup->next)
     servicegroup_list_tail = prev_servicegroup;
 
-  return (remove_servicegroup(this_servicegroup));
+  return (remove_service_group(this_servicegroup));
 }
 
 /**
@@ -4910,7 +4910,7 @@ timeperiod* find_timeperiod(char const* name) {
  *
  *  @see get_next_hostdependency_by_dependent_host
  */
-hostdependency* get_first_hostdependency_by_dependent_host(
+hostdependency* get_first_host_dependency_by_dependent_host(
                   char const* host_name,
                   void** ptr) {
   if (!host_name)
@@ -4933,9 +4933,9 @@ hostdependency* get_first_hostdependency_by_dependent_host(
  *
  *  @return Host escalation object if found, NULL otherwise.
  *
- *  @see get_next_hostescalation_by_host
+ *  @see get_next_host_escalation_by_host
  */
-hostescalation* get_first_hostescalation_by_host(
+hostescalation* get_first_host_escalation_by_host(
                   char const* host_name,
                   void** ptr) {
   if (!host_name)
@@ -4961,7 +4961,7 @@ hostescalation* get_first_hostescalation_by_host(
  *
  *  @see get_next_servicedependency_by_dependent_service
  */
-servicedependency* get_first_servicedependency_by_dependent_service(
+servicedependency* get_first_service_dependency_by_dependent_service(
                      char const* host_name,
                      char const* svc_description,
                      void** ptr) {
@@ -4989,9 +4989,9 @@ servicedependency* get_first_servicedependency_by_dependent_service(
  *
  *  @return Service escalation object if found, NULL otherwise.
  *
- *  @see get_next_serviceescalation_by_service
+ *  @see get_next_service_escalation_by_service
  */
-serviceescalation* get_first_serviceescalation_by_service(
+serviceescalation* get_first_service_escalation_by_service(
                      char const* host_name,
                      char const* svc_description,
                      void** ptr) {
@@ -5019,7 +5019,7 @@ serviceescalation* get_first_serviceescalation_by_service(
  *
  *  @see get_first_hostdependency_by_dependent_host
  */
-hostdependency* get_next_hostdependency_by_dependent_host(
+hostdependency* get_next_host_dependency_by_dependent_host(
                   char const* host_name,
                   void** ptr) {
   if (!host_name || !ptr)
@@ -5043,9 +5043,9 @@ hostdependency* get_next_hostdependency_by_dependent_host(
  *
  *  @return Next host escalation if found, NULL otherwise.
  *
- *  @see get_first_hostescalation_by_host
+ *  @see get_first_host_escalation_by_host
  */
-hostescalation* get_next_hostescalation_by_host(
+hostescalation* get_next_host_escalation_by_host(
                   char const* host_name,
                   void** ptr) {
   if (!host_name)
@@ -5069,9 +5069,9 @@ hostescalation* get_next_hostescalation_by_host(
  *
  *  @return Next service dependency if found, NULL otherwise.
  *
- *  @see get_first_servicedependency_by_dependent_service
+ *  @see get_first_service_dependency_by_dependent_service
  */
-servicedependency* get_next_servicedependency_by_dependent_service(
+servicedependency* get_next_service_dependency_by_dependent_service(
                      char const* host_name,
                      char const* svc_description,
                      void** ptr) {
@@ -5099,9 +5099,9 @@ servicedependency* get_next_servicedependency_by_dependent_service(
  *
  *  @return Next service escalation if found, NULL otherwise.
  *
- *  @see get_first_serviceescalation_by_service
+ *  @see get_first_service_escalation_by_service
  */
-serviceescalation* get_next_serviceescalation_by_service(
+serviceescalation* get_next_service_escalation_by_service(
                      char const* host_name,
                      char const* svc_description,
                      void** ptr) {
@@ -5247,10 +5247,10 @@ int is_escalated_contact_for_host(host* hst, contact* cntct) {
   void* ptr(NULL);
   for (hostescalation*
          temp_hostescalation(
-           get_first_hostescalation_by_host(hst->name, &ptr));
+           get_first_host_escalation_by_host(hst->name, &ptr));
        temp_hostescalation;
        temp_hostescalation
-         = get_next_hostescalation_by_host(hst->name, &ptr)) {
+         = get_next_host_escalation_by_host(hst->name, &ptr)) {
     // Search all contacts of this host escalation.
     for (contactsmember*
            temp_contactsmember(temp_hostescalation->contacts);
@@ -5293,12 +5293,12 @@ int is_escalated_contact_for_service(service* svc, contact* cntct) {
   // Search all the service escalations.
   void* ptr(NULL);
   for (serviceescalation* temp_serviceescalation(
-                            get_first_serviceescalation_by_service(
+                            get_first_service_escalation_by_service(
                               svc->host_name,
                               svc->description,
                               &ptr));
        temp_serviceescalation;
-       temp_serviceescalation = get_next_serviceescalation_by_service(
+       temp_serviceescalation = get_next_service_escalation_by_service(
                                   svc->host_name,
                                   svc->description,
                                   &ptr)) {

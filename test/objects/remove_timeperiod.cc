@@ -282,7 +282,7 @@ static void remove_timeperiod_with_hostescalations() {
   init_object_skiplists();
 
   timeperiod* t = add_timeperiod("timeperiod_name", "timeperiod_alias");
-  hostescalation* he = add_hostescalation("host_name", 0, 0, 0.0,
+  hostescalation* he = add_host_escalation("host_name", 0, 0, 0.0,
 					  "escalation_period", 0, 0, 0);
   he->escalation_period_ptr = t;
 

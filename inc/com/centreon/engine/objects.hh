@@ -762,7 +762,7 @@ hostsmember*           add_host_to_hostgroup(
                          hostgroup* temp_hostgroup,
                          char const* host_name);
 /* Adds a host escalation definition. */
-hostescalation*        add_hostescalation(
+hostescalation*        add_host_escalation(
                          char const* host_name,
                          int first_notification,
                          int last_notification,
@@ -861,7 +861,7 @@ servicesmember*        add_service_to_servicegroup(
                          char const* host_name,
                          char const* svc_description);
 /* Adds a service escalation definition. */
-serviceescalation*     add_serviceescalation(
+serviceescalation*     add_service_escalation(
                          char const* host_name,
                          char const* description,
                          int first_notification,
@@ -904,20 +904,20 @@ int remove_command_by_id(char const* command_name);
 int remove_contact_by_id(char const* contact_name);
 int remove_contactgroup_by_id(char const* contactgroup_name);
 int remove_host_by_id(char const* host_name);
-int remove_hostdependency_by_id(
+int remove_host_dependency_by_id(
       char const* host_name,
       char const* dependency_name);
-int remove_hostescalation_by_id(char const* host_name);
+int remove_host_escalation_by_id(char const* host_name);
 int remove_hostgroup_by_id(char const* hostgroup_name);
 int remove_service_by_id(
       char const* host_name,
       char const* service_description);
-int remove_servicedependency_by_id(
+int remove_service_dependency_by_id(
       char const* host_name,
       char const* service_description,
       char const* dependency_name,
       char const* dependency_service_description);
-int remove_serviceescalation_by_id(
+int remove_service_escalation_by_id(
       char const* host_name,
       char const* service_description);
 int remove_servicegroup_by_id(char const* servicegroup_name);
@@ -960,31 +960,31 @@ timeperiod*   find_timeperiod(char const* name);
 /*
 ** Object traversal functions.
 */
-hostdependency*    get_first_hostdependency_by_dependent_host(
+hostdependency*    get_first_host_dependency_by_dependent_host(
                      char const* host_name,
                      void** ptr);
-hostescalation*    get_first_hostescalation_by_host(
+hostescalation*    get_first_host_escalation_by_host(
                      char const* host_name,
                      void** ptr);
-servicedependency* get_first_servicedependency_by_dependent_service(
-                     char const* host_name,
-                     char const* svc_description,
-                     void** ptr);
-serviceescalation* get_first_serviceescalation_by_service(
+servicedependency* get_first_service_dependency_by_dependent_service(
                      char const* host_name,
                      char const* svc_description,
                      void** ptr);
-hostdependency*    get_next_hostdependency_by_dependent_host(
-                     char const* host_name,
-                     void** ptr);
-hostescalation*    get_next_hostescalation_by_host(
-                     char const* host_name,
-                     void** ptr);
-servicedependency* get_next_servicedependency_by_dependent_service(
+serviceescalation* get_first_service_escalation_by_service(
                      char const* host_name,
                      char const* svc_description,
                      void** ptr);
-serviceescalation* get_next_serviceescalation_by_service(
+hostdependency*    get_next_host_dependency_by_dependent_host(
+                     char const* host_name,
+                     void** ptr);
+hostescalation*    get_next_host_escalation_by_host(
+                     char const* host_name,
+                     void** ptr);
+servicedependency* get_next_service_dependency_by_dependent_service(
+                     char const* host_name,
+                     char const* svc_description,
+                     void** ptr);
+serviceescalation* get_next_service_escalation_by_service(
                      char const* host_name,
                      char const* svc_description,
                      void** ptr);

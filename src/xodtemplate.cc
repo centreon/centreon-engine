@@ -9932,7 +9932,7 @@ int xodtemplate_register_serviceescalation(xodtemplate_serviceescalation* this_s
   }
 
   /* add the serviceescalation */
-  new_serviceescalation = add_serviceescalation(this_serviceescalation->host_name,
+  new_serviceescalation = add_service_escalation(this_serviceescalation->host_name,
 						this_serviceescalation->service_description,
 						this_serviceescalation->first_notification,
 						this_serviceescalation->last_notification,
@@ -10469,7 +10469,7 @@ int xodtemplate_register_hostescalation(xodtemplate_hostescalation* this_hostesc
   }
 
   /* add the hostescalation */
-  new_hostescalation = add_hostescalation(this_hostescalation->host_name,
+  new_hostescalation = add_host_escalation(this_hostescalation->host_name,
 					  this_hostescalation->first_notification,
 					  this_hostescalation->last_notification,
 					  this_hostescalation->notification_interval,

@@ -179,13 +179,13 @@ state::state()
   _lst_method["nagios_group"]                                = &cpp_suck<QString const&, &state::_set_group>::set_generic;
   _lst_method["lock_file"]                                   = &cpp_suck<QString const&, &state::_set_lock_file>::set_generic;
 
-  _lst_method["status_file"]                                 = NULL; // ignore external variables
-  _lst_method["perfdata_timeout"]                            = NULL; // ignore external variables
-  _lst_method["cfg_file"]                                    = NULL;
-  _lst_method["cfg_dir"]                                     = NULL;
-  _lst_method["state_retention_file"]                        = NULL;
-  _lst_method["object_cache_file"]                           = NULL;
-  _lst_method["precached_object_file"]                       = NULL;
+  _lst_method["status_file"]                                 = &cpp_suck<QString const&, &state::_set_status_file>::set_generic;
+  _lst_method["perfdata_timeout"]                            = &cpp_suck<int, &state::_set_perfdata_timeout>::set_generic;
+  _lst_method["cfg_file"]                                    = &cpp_suck<QString const&, &state::_add_cfg_file>::set_generic;
+  _lst_method["cfg_dir"]                                     = &cpp_suck<QString const&, &state::_add_cfg_dir>::set_generic;
+  _lst_method["state_retention_file"]                        = &cpp_suck<QString const&, &state::_set_state_retention_file>::set_generic;
+  _lst_method["object_cache_file"]                           = &cpp_suck<QString const&, &state::_set_object_cache_file>::set_generic;
+  _lst_method["precached_object_file"]                       = &cpp_suck<QString const&, &state::_set_precached_object_file>::set_generic;
 
   _reset();
 
@@ -352,6 +352,22 @@ void state::parse(QString const& filename) {
 }
 
 /**
+ *  Get the admin email.
+ *  @return The admin email.
+ */
+QString const& state::get_admin_email() const throw() {
+  return (_tab_string[admin_email]);
+}
+
+/**
+ *  Get the admin pager.
+ *  @return The admin pager.
+ */
+QString const& state::get_admin_pager() const throw() {
+  return (_tab_string[admin_pager]);
+}
+
+/**
  *  Get the logging filename.
  *  @return The logging filename.
  */
@@ -437,6 +453,78 @@ QString const& state::get_illegal_output_chars() const throw() {
  */
 QString const& state::get_use_timezone() const throw() {
   return (_tab_string[use_timezone]);
+}
+
+/**
+ *  Get status file.
+ *  @return The status file path.
+ */
+QString const& state::get_status_file() const throw() {
+ return (_tab_string[status_file]);
+}
+
+/**
+ *  Get state retention file.
+ *  @return The state retention file path.
+ */
+QString const& state::get_state_retention_file() const throw() {
+ return (_tab_string[state_retention_file]);
+}
+
+/**
+ *  Get object cache file.
+ *  @return The object cache file path.
+ */
+QString const& state::get_object_cache_file() const throw() {
+ return (_tab_string[object_cache_file]);
+}
+
+/**
+ *  Get precached object file.
+ *  @return The precached object file path.
+ */
+QString const& state::get_precached_object_file() const throw() {
+ return (_tab_string[precached_object_file]);
+}
+
+/**
+ *  Get broker module.
+ *  @return The list of broker module.
+ */
+QList<QString> const& state::get_broker_module() const throw() {
+ return (_lst_broker_module);
+}
+
+/**
+ *  Get condifugration dir path.
+ *  @return The list of configuration dir path.
+ */
+QList<QString> const& state::get_cfg_dir() const throw() {
+ return (_lst_cfg_dir);
+}
+
+/**
+ *  Get configuration file path.
+ *  @return The list of configuration file path.
+ */
+QList<QString> const& state::get_cfg_file() const throw() {
+ return (_lst_cfg_file);
+}
+
+/**
+ *  Get resource file path.
+ *  @return The list of resource file path.
+ */
+QList<QString> const& state::get_resource_file() const throw() {
+ return (_lst_resource_file);
+}
+
+/**
+ *  Get perfdata timeout.
+ *  @return The perfdata timeout.
+ */
+int state::get_perfdata_timeout() const throw() {
+ return (_tab_int[perfdata_timeout]);
 }
 
 /**
@@ -2367,7 +2455,6 @@ void state::_reset() {
   set_command_file(DEFAULT_COMMAND_FILE);
   set_debug_file(DEFAULT_DEBUG_FILE);
 
-
   set_use_regexp_matches(DEFAULT_USE_REGEXP_MATCHES);
   set_use_true_regexp_matching(DEFAULT_USE_TRUE_REGEXP_MATCHING);
 
@@ -2480,6 +2567,17 @@ void state::_reset() {
 
   set_ocsp_command("");
   set_ochp_command("");
+
+  _set_status_file("");
+  _set_perfdata_timeout(0);
+  _set_state_retention_file("");
+  _set_object_cache_file("");
+  _set_precached_object_file("");
+
+  _lst_broker_module.clear();
+  _lst_cfg_dir.clear();
+  _lst_cfg_file.clear();
+  _lst_resource_file.clear();
 }
 
 /**
@@ -2549,6 +2647,7 @@ void state::_parse_resource_file(QString const& value) {
 
   delete[] _mac->x[MACRO_RESOURCEFILE];
   _mac->x[MACRO_RESOURCEFILE] = my_strdup(qPrintable(resfile));
+  _add_resource_file(resfile);
 }
 
 /**
@@ -2567,6 +2666,7 @@ void state::_set_auth_file(QString const& value) {
  *  @param[in] value The admin email.
  */
 void state::_set_admin_email(QString const& value) {
+  _tab_string[admin_email] = value;
   delete[] _mac->x[MACRO_ADMINEMAIL];
   _mac->x[MACRO_ADMINEMAIL] = my_strdup(qPrintable(value));
 }
@@ -2576,6 +2676,7 @@ void state::_set_admin_email(QString const& value) {
  *  @param[in] value The admin pager.
  */
 void state::_set_admin_pager(QString const& value) {
+  _tab_string[admin_pager] = value;
   delete[] _mac->x[MACRO_ADMINPAGER];
   _mac->x[MACRO_ADMINPAGER] = my_strdup(qPrintable(value));
 }
@@ -2633,6 +2734,7 @@ void state::_set_broker_module(QString const& value) {
 
   // Add module.
   neb_add_module(val.c_str(), args.c_str(), TRUE);
+  _lst_broker_module.push_back(val.c_str());
 
   return ;
 }
@@ -2658,7 +2760,7 @@ void state::_set_check_for_updates(QString const& value) {
 }
 
 /**
- * Comment file ignored.
+ *  Comment file ignored.
  */
 void state::_set_comment_file(QString const& value) {
   (void)value;
@@ -2669,7 +2771,7 @@ void state::_set_comment_file(QString const& value) {
 }
 
 /**
- * Daemon dumps core ignored.
+ *  Daemon dumps core ignored.
  */
 void state::_set_daemon_dumps_core(QString const& value) {
   (void)value;
@@ -2680,7 +2782,7 @@ void state::_set_daemon_dumps_core(QString const& value) {
 }
 
 /**
- * Downtime file ignored.
+ *  Downtime file ignored.
  */
 void state::_set_downtime_file(QString const& value) {
   (void)value;
@@ -2691,7 +2793,7 @@ void state::_set_downtime_file(QString const& value) {
 }
 
 /**
- * Lock file ignored.
+ *  Lock file ignored.
  */
 void state::_set_lock_file(QString const& value) {
   (void)value;
@@ -2701,7 +2803,7 @@ void state::_set_lock_file(QString const& value) {
 }
 
 /**
- * User ignored.
+ *  User ignored.
  */
 void state::_set_user(QString const& value) {
   (void)value;
@@ -2711,7 +2813,7 @@ void state::_set_user(QString const& value) {
 }
 
 /**
- * Group ignored.
+ *  Group ignored.
  */
 void state::_set_group(QString const& value) {
   (void)value;
@@ -2719,4 +2821,69 @@ void state::_set_group(QString const& value) {
     "variable ignored: priviledge drop should be handled by startup " \
     "script";
   return ;
+}
+
+/**
+ *  Set status file.
+ *  @param[in] value  The status file path.
+ */
+void state::_set_status_file(QString const& value) {
+  _tab_string[status_file] = value;
+  return ;
+}
+
+/**
+ *  Set prefdata timeout.
+ *  @param[in] value  The perfdata timeout.
+ */
+void state::_set_perfdata_timeout(int value) {
+  _tab_int[perfdata_timeout] = value;
+}
+
+/**
+ *  Add configuration directory.
+ *  @param[in] value  The configuration directory path.
+ */
+void state::_add_cfg_dir(QString const& value) {
+  _lst_cfg_dir.push_back(value);
+}
+
+/**
+ *  Add configuration file.
+ *  @param[in] value  The configuration file path.
+ */
+void state::_add_cfg_file(QString const& value) {
+  _lst_cfg_file.push_back(value);
+}
+
+/**
+ *  Add resource file.
+ *  @param[in] value  The resource file path.
+ */
+void state::_add_resource_file(QString const& value) {
+  _lst_resource_file.push_back(value);
+}
+
+/**
+ *  Set state retention file.
+ *  @param[in] value  The state retention file path.
+ */
+void state::_set_state_retention_file(QString const& value) {
+  _tab_string[state_retention_file] = value;
+}
+
+/**
+ *  Set object cache file.
+ *  @param[in] value  The object cache file path.
+ */
+void state::_set_object_cache_file(QString const& value) {
+  _tab_string[object_cache_file] = value;
+}
+
+/**
+ *  Set precached object file.
+ *  @param[in] value  The precached object file path.
+ */
+void state::_set_precached_object_file(QString const& value) {
+  _tab_string[precached_object_file] = value;
 }

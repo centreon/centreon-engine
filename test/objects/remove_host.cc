@@ -175,7 +175,7 @@ static void remove_host_with_hostescalation() {
 		       0, "failure_prediction_options", 0, 0, "notes", "notes_url",
 		       "action_url", "icon_image", "icon_image_alt", "vrml_image",
 		       "statusmap_image", 0, 0, 0, 0.0, 0.0, 0.0, 0, 0, 0, 0, 0);
-  hostescalation* he = add_hostescalation("hostescalation_host_name_1",
+  hostescalation* he = add_host_escalation("hostescalation_host_name_1",
 					  0, 0, 0.0,
 					  "hostescalation_escalation_period",
 					  0, 0, 0);

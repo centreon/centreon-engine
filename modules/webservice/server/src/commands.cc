@@ -12003,7 +12003,7 @@ int centreonengine__addContactGroup(soap* s,
       << "Webservice: " << __func__ << "({" << contactGroup->name.c_str()
       << ", " << contactGroup->alias.c_str() << "})";
 
-    create_contactgroup(*contactGroup);
+    create_contact_group(*contactGroup);
 
     syncro::instance().worker_finish();
   }
@@ -12043,7 +12043,7 @@ int centreonengine__addHostGroup(soap* s,
       << "Webservice: " << __func__ << "({" << hostGroup->name
       << ", " << hostGroup->alias << "})";
 
-    create_hostgroup(*hostGroup);
+    create_host_group(*hostGroup);
 
     syncro::instance().worker_finish();
   }
@@ -12083,7 +12083,7 @@ int centreonengine__addServiceGroup(soap* s,
       << "Webservice: " << __func__ << "({" << serviceGroup->name
       << ", " << serviceGroup->alias << "})";
 
-    create_servicegroup(*serviceGroup);
+    create_service_group(*serviceGroup);
 
     syncro::instance().worker_finish();
   }
@@ -12161,7 +12161,7 @@ int centreonengine__addHostDependency(soap* s,
     logger(dbg_functions, most)
       << "Webservice: " << __func__ << "()";
 
-    create_hostdependency(*hostdependency);
+    create_host_dependency(*hostdependency);
 
     syncro::instance().worker_finish();
   }
@@ -12200,7 +12200,7 @@ int centreonengine__addHostEscalation(soap* s,
     logger(dbg_functions, most)
       << "Webservice: " << __func__ << "()";
 
-    create_hostescalation(*hostescalation);
+    create_host_escalation(*hostescalation);
 
     syncro::instance().worker_finish();
   }
@@ -12282,7 +12282,7 @@ int centreonengine__addServiceDependency(soap* s,
       << servicedependency->dependentServiceDescription << ", "
       << servicedependency->serviceDescription << "})";
 
-    create_servicedependency(*servicedependency);
+    create_service_dependency(*servicedependency);
 
     syncro::instance().worker_finish();
   }
@@ -12322,7 +12322,7 @@ int centreonengine__addServiceEscalation(soap* s,
       << "Webservice: " << __func__ << "({"
       << serviceescalation->serviceDescription << "})";
 
-    create_serviceescalation(*serviceescalation);
+    create_service_escalation(*serviceescalation);
 
     syncro::instance().worker_finish();
   }
@@ -12747,8 +12747,8 @@ int centreonengine__removeServiceEscalation(soap* s,
       << "Webservice: " << __func__ << "({" << escalation_id->name
       << ", " << escalation_id->description << "})";
 
-    if (!remove_serviceescalation_by_id(escalation_id->name.c_str(),
-					escalation_id->description.c_str())) {
+    if (!remove_service_escalation_by_id(escalation_id->name.c_str(),
+                                         escalation_id->description.c_str())) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service escalation `" + escalation_id->name + " "
 	+ escalation_id->description + "' not found.";
@@ -12795,7 +12795,7 @@ int centreonengine__removeServiceDependency(soap* s,
       << dependency_id->dependentHostName << ", "
       << dependency_id->dependentServiceDescription << "})";
 
-    if (!remove_servicedependency_by_id(dependency_id->hostName.c_str(),
+    if (!remove_service_dependency_by_id(dependency_id->hostName.c_str(),
 					dependency_id->serviceDescription.c_str(),
 					dependency_id->dependentHostName.c_str(),
 					dependency_id->dependentServiceDescription.c_str())) {

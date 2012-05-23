@@ -30,7 +30,7 @@ using namespace com::centreon::engine;
 /**
  *  Check if remove hostdependency works with some hostdependency.
  */
-static void remove_all_hostdependency() {
+static void remove_all_host_dependency() {
   init_object_skiplists();
 
   add_host_dependency("host_dependency_dependent_host_name_1",
@@ -45,15 +45,15 @@ static void remove_all_hostdependency() {
 		      "host_dependency_host_name_4",
 		      0, 0, 0, 0, 0, 0,
 		      "host_dependency_dependency_period");
-  if (remove_hostdependency_by_id("host_dependency_host_name_2",
-				  "host_dependency_dependent_host_name_2") != 1
-      || remove_hostdependency_by_id("host_dependency_host_name_1",
-				     "host_dependency_dependent_host_name_1") != 1
-      || remove_hostdependency_by_id("host_dependency_host_name_3",
-				     "host_dependency_dependent_host_name_3") != 1
+  if (remove_host_dependency_by_id("host_dependency_host_name_2",
+                                   "host_dependency_dependent_host_name_2") != 1
+      || remove_host_dependency_by_id("host_dependency_host_name_1",
+                                      "host_dependency_dependent_host_name_1") != 1
+      || remove_host_dependency_by_id("host_dependency_host_name_3",
+                                      "host_dependency_dependent_host_name_3") != 1
       || hostdependency_list != NULL
       || hostdependency_list_tail != NULL)
-    throw (engine_error() << "remove all hostdependency failed.");
+    throw (engine_error() << "remove all host dependency failed.");
 
   free_object_skiplists();
 }
@@ -61,13 +61,13 @@ static void remove_all_hostdependency() {
 /**
  *  Check if remove hostdependency works with invalid call.
  */
-static void remove_hostdependency_failed() {
+static void remove_host_dependency_failed() {
   init_object_skiplists();
 
-  if (remove_hostdependency_by_id("", "") == 1)
-    throw (engine_error() << "hostdependency remove but dosen't exist.");
-  if (remove_hostdependency_by_id(NULL, NULL) == 1)
-    throw (engine_error() << "hostdependency remove but pointer is NULL.");
+  if (remove_host_dependency_by_id("", "") == 1)
+    throw (engine_error() << "host dependency remove but dosen't exist.");
+  if (remove_host_dependency_by_id(NULL, NULL) == 1)
+    throw (engine_error() << "host dependency remove but pointer is NULL.");
 
   free_object_skiplists();
 }
@@ -77,8 +77,8 @@ static void remove_hostdependency_failed() {
  */
 int main(void) {
   try {
-    remove_all_hostdependency();
-    remove_hostdependency_failed();
+    remove_all_host_dependency();
+    remove_host_dependency_failed();
   }
   catch (std::exception const& e) {
     qDebug() << "error: " << e.what();

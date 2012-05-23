@@ -22,7 +22,7 @@
 #include "com/centreon/engine/configuration/state.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
-#include "com/centreon/engine/modules/webservice/configuration/save.hh"
+#include "com/centreon/engine/modules/webservice/configuration/save/objects.hh"
 #include "com/centreon/engine/modules/webservice/syncro.hh"
 #include "soapH.h"
 
@@ -95,7 +95,7 @@ int centreonengine__saveAllObjects(soap* s,
     logger(dbg_functions, most)
       << "Webservice: " << __func__ << "(" << filename << ")";
 
-    configuration::save save;
+    configuration::save::objects save;
     save.add_list(command_list);
     save.add_list(contact_list);
     save.add_list(contactgroup_list);
@@ -107,6 +107,534 @@ int centreonengine__saveAllObjects(soap* s,
     save.add_list(servicedependency_list);
     save.add_list(serviceescalation_list);
     save.add_list(servicegroup_list);
+    save.add_list(timeperiod_list);
+    save.backup(filename);
+
+    syncro::instance().worker_finish();
+  }
+  catch (std::exception const& e) {
+    std::string* error = soap_new_std__string(s, 1);
+    *error = e.what();
+
+    logger(dbg_commands, most)
+      << "Webservice: " << __func__ << " failed. " << *error;
+
+    syncro::instance().worker_finish();
+    return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
+  }
+  catch (...) {
+    logger(dbg_commands, most)
+      << "Webservice: " << __func__ << " failed. catch all.";
+    syncro::instance().worker_finish();
+    return (soap_receiver_fault(s, "Runtime error.", "catch all"));
+  }
+  return (SOAP_OK);
+}
+
+/**
+ *  Save command objects.
+ *
+ *  @param[in]  s            Unused.
+ *  @param[in]  filename     The file name to save objects.
+ *  @param[out] res          Unused.
+ *
+ *  @return SOAP_OK on success.
+ */
+int centreonengine__saveCommands(soap* s,
+                                 std::string filename,
+                                 centreonengine__saveCommandsResponse& res) {
+  (void)res;
+  try {
+    syncro::instance().waiting_callback();
+
+    logger(dbg_functions, most)
+      << "Webservice: " << __func__ << "(" << filename << ")";
+
+    configuration::save::objects save;
+    save.add_list(command_list);
+    save.backup(filename);
+
+    syncro::instance().worker_finish();
+  }
+  catch (std::exception const& e) {
+    std::string* error = soap_new_std__string(s, 1);
+    *error = e.what();
+
+    logger(dbg_commands, most)
+      << "Webservice: " << __func__ << " failed. " << *error;
+
+    syncro::instance().worker_finish();
+    return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
+  }
+  catch (...) {
+    logger(dbg_commands, most)
+      << "Webservice: " << __func__ << " failed. catch all.";
+    syncro::instance().worker_finish();
+    return (soap_receiver_fault(s, "Runtime error.", "catch all"));
+  }
+  return (SOAP_OK);
+}
+
+/**
+ *  Save contact objects.
+ *
+ *  @param[in]  s            Unused.
+ *  @param[in]  filename     The file name to save objects.
+ *  @param[out] res          Unused.
+ *
+ *  @return SOAP_OK on success.
+ */
+int centreonengine__saveContacts(soap* s,
+                                 std::string filename,
+                                 centreonengine__saveContactsResponse& res) {
+  (void)res;
+  try {
+    syncro::instance().waiting_callback();
+
+    logger(dbg_functions, most)
+      << "Webservice: " << __func__ << "(" << filename << ")";
+
+    configuration::save::objects save;
+    save.add_list(contact_list);
+    save.backup(filename);
+
+    syncro::instance().worker_finish();
+  }
+  catch (std::exception const& e) {
+    std::string* error = soap_new_std__string(s, 1);
+    *error = e.what();
+
+    logger(dbg_commands, most)
+      << "Webservice: " << __func__ << " failed. " << *error;
+
+    syncro::instance().worker_finish();
+    return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
+  }
+  catch (...) {
+    logger(dbg_commands, most)
+      << "Webservice: " << __func__ << " failed. catch all.";
+    syncro::instance().worker_finish();
+    return (soap_receiver_fault(s, "Runtime error.", "catch all"));
+  }
+  return (SOAP_OK);
+}
+
+/**
+ *  Save contactgroup objects.
+ *
+ *  @param[in]  s            Unused.
+ *  @param[in]  filename     The file name to save objects.
+ *  @param[out] res          Unused.
+ *
+ *  @return SOAP_OK on success.
+ */
+int centreonengine__saveContactgroups(soap* s,
+                                      std::string filename,
+                                      centreonengine__saveContactgroupsResponse& res) {
+  (void)res;
+  try {
+    syncro::instance().waiting_callback();
+
+    logger(dbg_functions, most)
+      << "Webservice: " << __func__ << "(" << filename << ")";
+
+    configuration::save::objects save;
+    save.add_list(contactgroup_list);
+    save.backup(filename);
+
+    syncro::instance().worker_finish();
+  }
+  catch (std::exception const& e) {
+    std::string* error = soap_new_std__string(s, 1);
+    *error = e.what();
+
+    logger(dbg_commands, most)
+      << "Webservice: " << __func__ << " failed. " << *error;
+
+    syncro::instance().worker_finish();
+    return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
+  }
+  catch (...) {
+    logger(dbg_commands, most)
+      << "Webservice: " << __func__ << " failed. catch all.";
+    syncro::instance().worker_finish();
+    return (soap_receiver_fault(s, "Runtime error.", "catch all"));
+  }
+  return (SOAP_OK);
+}
+
+/**
+ *  Save host objects.
+ *
+ *  @param[in]  s            Unused.
+ *  @param[in]  filename     The file name to save objects.
+ *  @param[out] res          Unused.
+ *
+ *  @return SOAP_OK on success.
+ */
+int centreonengine__saveHosts(soap* s,
+                              std::string filename,
+                              centreonengine__saveHostsResponse& res) {
+  (void)res;
+  try {
+    syncro::instance().waiting_callback();
+
+    logger(dbg_functions, most)
+      << "Webservice: " << __func__ << "(" << filename << ")";
+
+    configuration::save::objects save;
+    save.add_list(host_list);
+    save.backup(filename);
+
+    syncro::instance().worker_finish();
+  }
+  catch (std::exception const& e) {
+    std::string* error = soap_new_std__string(s, 1);
+    *error = e.what();
+
+    logger(dbg_commands, most)
+      << "Webservice: " << __func__ << " failed. " << *error;
+
+    syncro::instance().worker_finish();
+    return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
+  }
+  catch (...) {
+    logger(dbg_commands, most)
+      << "Webservice: " << __func__ << " failed. catch all.";
+    syncro::instance().worker_finish();
+    return (soap_receiver_fault(s, "Runtime error.", "catch all"));
+  }
+  return (SOAP_OK);
+}
+
+/**
+ *  Save host escalations objects.
+ *
+ *  @param[in]  s            Unused.
+ *  @param[in]  filename     The file name to save objects.
+ *  @param[out] res          Unused.
+ *
+ *  @return SOAP_OK on success.
+ */
+int centreonengine__saveHostEscalations(soap* s,
+                                        std::string filename,
+                                        centreonengine__saveHostEscalationsResponse& res) {
+  (void)res;
+  try {
+    syncro::instance().waiting_callback();
+
+    logger(dbg_functions, most)
+      << "Webservice: " << __func__ << "(" << filename << ")";
+
+    configuration::save::objects save;
+    save.add_list(hostescalation_list);
+    save.backup(filename);
+
+    syncro::instance().worker_finish();
+  }
+  catch (std::exception const& e) {
+    std::string* error = soap_new_std__string(s, 1);
+    *error = e.what();
+
+    logger(dbg_commands, most)
+      << "Webservice: " << __func__ << " failed. " << *error;
+
+    syncro::instance().worker_finish();
+    return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
+  }
+  catch (...) {
+    logger(dbg_commands, most)
+      << "Webservice: " << __func__ << " failed. catch all.";
+    syncro::instance().worker_finish();
+    return (soap_receiver_fault(s, "Runtime error.", "catch all"));
+  }
+  return (SOAP_OK);
+}
+
+/**
+ *  Save host dependencies objects.
+ *
+ *  @param[in]  s            Unused.
+ *  @param[in]  filename     The file name to save objects.
+ *  @param[out] res          Unused.
+ *
+ *  @return SOAP_OK on success.
+ */
+int centreonengine__saveHostDependencies(soap* s,
+                                         std::string filename,
+                                         centreonengine__saveHostDependenciesResponse& res) {
+  (void)res;
+  try {
+    syncro::instance().waiting_callback();
+
+    logger(dbg_functions, most)
+      << "Webservice: " << __func__ << "(" << filename << ")";
+
+    configuration::save::objects save;
+    save.add_list(hostdependency_list);
+    save.backup(filename);
+
+    syncro::instance().worker_finish();
+  }
+  catch (std::exception const& e) {
+    std::string* error = soap_new_std__string(s, 1);
+    *error = e.what();
+
+    logger(dbg_commands, most)
+      << "Webservice: " << __func__ << " failed. " << *error;
+
+    syncro::instance().worker_finish();
+    return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
+  }
+  catch (...) {
+    logger(dbg_commands, most)
+      << "Webservice: " << __func__ << " failed. catch all.";
+    syncro::instance().worker_finish();
+    return (soap_receiver_fault(s, "Runtime error.", "catch all"));
+  }
+  return (SOAP_OK);
+}
+
+/**
+ *  Save host groups objects.
+ *
+ *  @param[in]  s            Unused.
+ *  @param[in]  filename     The file name to save objects.
+ *  @param[out] res          Unused.
+ *
+ *  @return SOAP_OK on success.
+ */
+int centreonengine__saveHostGroups(soap* s,
+                                   std::string filename,
+                                   centreonengine__saveHostGroupsResponse& res) {
+  (void)res;
+  try {
+    syncro::instance().waiting_callback();
+
+    logger(dbg_functions, most)
+      << "Webservice: " << __func__ << "(" << filename << ")";
+
+    configuration::save::objects save;
+    save.add_list(hostgroup_list);
+    save.backup(filename);
+
+    syncro::instance().worker_finish();
+  }
+  catch (std::exception const& e) {
+    std::string* error = soap_new_std__string(s, 1);
+    *error = e.what();
+
+    logger(dbg_commands, most)
+      << "Webservice: " << __func__ << " failed. " << *error;
+
+    syncro::instance().worker_finish();
+    return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
+  }
+  catch (...) {
+    logger(dbg_commands, most)
+      << "Webservice: " << __func__ << " failed. catch all.";
+    syncro::instance().worker_finish();
+    return (soap_receiver_fault(s, "Runtime error.", "catch all"));
+  }
+  return (SOAP_OK);
+}
+
+/**
+ *  Save service objects.
+ *
+ *  @param[in]  s            Unused.
+ *  @param[in]  filename     The file name to save objects.
+ *  @param[out] res          Unused.
+ *
+ *  @return SOAP_OK on success.
+ */
+int centreonengine__saveServices(soap* s,
+                                 std::string filename,
+                                 centreonengine__saveServicesResponse& res) {
+  (void)res;
+  try {
+    syncro::instance().waiting_callback();
+
+    logger(dbg_functions, most)
+      << "Webservice: " << __func__ << "(" << filename << ")";
+
+    configuration::save::objects save;
+    save.add_list(service_list);
+    save.backup(filename);
+
+    syncro::instance().worker_finish();
+  }
+  catch (std::exception const& e) {
+    std::string* error = soap_new_std__string(s, 1);
+    *error = e.what();
+
+    logger(dbg_commands, most)
+      << "Webservice: " << __func__ << " failed. " << *error;
+
+    syncro::instance().worker_finish();
+    return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
+  }
+  catch (...) {
+    logger(dbg_commands, most)
+      << "Webservice: " << __func__ << " failed. catch all.";
+    syncro::instance().worker_finish();
+    return (soap_receiver_fault(s, "Runtime error.", "catch all"));
+  }
+  return (SOAP_OK);
+}
+
+/**
+ *  Save service dependencies objects.
+ *
+ *  @param[in]  s            Unused.
+ *  @param[in]  filename     The file name to save objects.
+ *  @param[out] res          Unused.
+ *
+ *  @return SOAP_OK on success.
+ */
+int centreonengine__saveServiceDependencies(soap* s,
+                                            std::string filename,
+                                            centreonengine__saveServiceDependenciesResponse& res) {
+  (void)res;
+  try {
+    syncro::instance().waiting_callback();
+
+    logger(dbg_functions, most)
+      << "Webservice: " << __func__ << "(" << filename << ")";
+
+    configuration::save::objects save;
+    save.add_list(servicedependency_list);
+    save.backup(filename);
+
+    syncro::instance().worker_finish();
+  }
+  catch (std::exception const& e) {
+    std::string* error = soap_new_std__string(s, 1);
+    *error = e.what();
+
+    logger(dbg_commands, most)
+      << "Webservice: " << __func__ << " failed. " << *error;
+
+    syncro::instance().worker_finish();
+    return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
+  }
+  catch (...) {
+    logger(dbg_commands, most)
+      << "Webservice: " << __func__ << " failed. catch all.";
+    syncro::instance().worker_finish();
+    return (soap_receiver_fault(s, "Runtime error.", "catch all"));
+  }
+  return (SOAP_OK);
+}
+
+/**
+ *  Save service escalations objects.
+ *
+ *  @param[in]  s            Unused.
+ *  @param[in]  filename     The file name to save objects.
+ *  @param[out] res          Unused.
+ *
+ *  @return SOAP_OK on success.
+ */
+int centreonengine__saveServiceEscalations(soap* s,
+                                           std::string filename,
+                                           centreonengine__saveServiceEscalationsResponse& res) {
+  (void)res;
+  try {
+    syncro::instance().waiting_callback();
+
+    logger(dbg_functions, most)
+      << "Webservice: " << __func__ << "(" << filename << ")";
+
+    configuration::save::objects save;
+    save.add_list(serviceescalation_list);
+    save.backup(filename);
+
+    syncro::instance().worker_finish();
+  }
+  catch (std::exception const& e) {
+    std::string* error = soap_new_std__string(s, 1);
+    *error = e.what();
+
+    logger(dbg_commands, most)
+      << "Webservice: " << __func__ << " failed. " << *error;
+
+    syncro::instance().worker_finish();
+    return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
+  }
+  catch (...) {
+    logger(dbg_commands, most)
+      << "Webservice: " << __func__ << " failed. catch all.";
+    syncro::instance().worker_finish();
+    return (soap_receiver_fault(s, "Runtime error.", "catch all"));
+  }
+  return (SOAP_OK);
+}
+
+/**
+ *  Save service groups objects.
+ *
+ *  @param[in]  s            Unused.
+ *  @param[in]  filename     The file name to save objects.
+ *  @param[out] res          Unused.
+ *
+ *  @return SOAP_OK on success.
+ */
+int centreonengine__saveServiceGroups(soap* s,
+                                      std::string filename,
+                                      centreonengine__saveServiceGroupsResponse& res) {
+  (void)res;
+  try {
+    syncro::instance().waiting_callback();
+
+    logger(dbg_functions, most)
+      << "Webservice: " << __func__ << "(" << filename << ")";
+
+    configuration::save::objects save;
+    save.add_list(servicegroup_list);
+    save.backup(filename);
+
+    syncro::instance().worker_finish();
+  }
+  catch (std::exception const& e) {
+    std::string* error = soap_new_std__string(s, 1);
+    *error = e.what();
+
+    logger(dbg_commands, most)
+      << "Webservice: " << __func__ << " failed. " << *error;
+
+    syncro::instance().worker_finish();
+    return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
+  }
+  catch (...) {
+    logger(dbg_commands, most)
+      << "Webservice: " << __func__ << " failed. catch all.";
+    syncro::instance().worker_finish();
+    return (soap_receiver_fault(s, "Runtime error.", "catch all"));
+  }
+  return (SOAP_OK);
+}
+
+/**
+ *  Save timeperiod objects.
+ *
+ *  @param[in]  s            Unused.
+ *  @param[in]  filename     The file name to save objects.
+ *  @param[out] res          Unused.
+ *
+ *  @return SOAP_OK on success.
+ */
+int centreonengine__saveTimeperiods(soap* s,
+                                    std::string filename,
+                                    centreonengine__saveTimeperiodsResponse& res) {
+  (void)res;
+  try {
+    syncro::instance().waiting_callback();
+
+    logger(dbg_functions, most)
+      << "Webservice: " << __func__ << "(" << filename << ")";
+
+    configuration::save::objects save;
     save.add_list(timeperiod_list);
     save.backup(filename);
 

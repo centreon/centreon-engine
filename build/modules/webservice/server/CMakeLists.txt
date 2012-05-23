@@ -21,6 +21,9 @@
 set(SRC_DIR "${MODULE_DIR}/server/src")
 set(INC_DIR "${MODULE_DIR}/server/inc/com/centreon/engine/modules/webservice")
 
+# Include directories.
+include_directories("${MODULE_DIR}/inc")
+
 # Generate webservice header from WSDL.
 add_custom_command(OUTPUT "${MODULE_DIR}/server/centreon-engine-ws.hh"
   COMMAND "${WSDL2H_PROGRAM}" "-o" "${MODULE_DIR}/server/centreon-engine-ws.hh" "-t${MODULE_DIR}/typemap.dat" "${MODULE_DIR}/centreon-engine.wsdl")
@@ -57,7 +60,9 @@ add_library("webservice" SHARED
   "${SRC_DIR}/commands.cc"
   "${SRC_DIR}/commands_configuration.cc"
   "${SRC_DIR}/configuration.cc"
-  "${SRC_DIR}/configuration/save.cc"
+  "${SRC_DIR}/configuration/save/objects.cc"
+  "${SRC_DIR}/configuration/save/resource.cc"
+  "${SRC_DIR}/configuration/save/state.cc"
   "${SRC_DIR}/create_object.cc"
   "${SRC_DIR}/main.cc"
   "${SRC_DIR}/schedule_object.cc"
@@ -66,7 +71,9 @@ add_library("webservice" SHARED
   "${SRC_DIR}/webservice.cc"
   # Headers.
   "${INC_DIR}/configuration.hh"
-  "${INC_DIR}/configuration/save.hh"
+  "${INC_DIR}/configuration/save/objects.hh"
+  "${INC_DIR}/configuration/save/resource.hh"
+  "${INC_DIR}/configuration/save/state.hh"
   "${INC_DIR}/create_object.hh"
   "${INC_DIR}/schedule_object.hh"
   "${INC_DIR}/ssl.hh"
@@ -111,3 +118,16 @@ target_link_libraries("webservice"
 install(TARGETS "webservice"
   DESTINATION "${PREFIX_LIB}/"
   COMPONENT "runtime")
+
+if (WITH_TESTING)
+  #Set directories.
+  set(TEST_DIR "${TEST_DIR}/modules/webservice/server")
+
+  # Test calling enter_standby_mode.
+  set(TEST_NAME "modules_webservice_")
+  add_executable("${TEST_NAME}"
+    "${TEST_DIR}/configuration/save/resource.cc")
+  target_link_libraries("${TEST_NAME}" ${QT_LIBRARIES} "cce_core" "webservice")
+  add_test("${TEST_NAME}" "${TEST_NAME}")
+
+endif ()

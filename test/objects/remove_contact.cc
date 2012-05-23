@@ -240,7 +240,7 @@ static void remove_contact_with_hostescalation() {
   add_contact_to_contactgroup(cgroup, "contact_name_1");
   cgroup->members->contact_ptr = cntct;
 
-  hostescalation* he = add_hostescalation("host_name", 0, 0, 0.0, NULL, 0, 0, 0);
+  hostescalation* he = add_host_escalation("host_name", 0, 0, 0.0, NULL, 0, 0, 0);
   contactgroupsmember* cgm = add_contactgroup_to_hostescalation(he, "contactgroup_name");
   add_contact_to_hostescalation(he, "contact_name_1");
 

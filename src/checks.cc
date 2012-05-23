@@ -922,9 +922,9 @@ int handle_async_service_check_result(service* temp_service, check_result* queue
 
         /* check services that THIS ONE depends on for notification AND execution */
         /* we do this because we might be sending out a notification soon and we want the dependency logic to be accurate */
-        for (temp_dependency = get_first_servicedependency_by_dependent_service(temp_service->host_name, temp_service->description, &ptr);
+        for (temp_dependency = get_first_service_dependency_by_dependent_service(temp_service->host_name, temp_service->description, &ptr);
              temp_dependency != NULL;
-             temp_dependency = get_next_servicedependency_by_dependent_service(temp_service->host_name, temp_service->description, &ptr)) {
+             temp_dependency = get_next_service_dependency_by_dependent_service(temp_service->host_name, temp_service->description, &ptr)) {
           if (temp_dependency->dependent_service_ptr == temp_service
               && temp_dependency->master_service_ptr != NULL) {
             master_service = (service*)temp_dependency->master_service_ptr;
@@ -1340,9 +1340,9 @@ unsigned int check_service_dependencies(service* svc, int dependency_type) {
   logger(dbg_functions, basic) << "check_service_dependencies()";
 
   /* check all dependencies... */
-  for (temp_dependency = get_first_servicedependency_by_dependent_service(svc->host_name, svc->description, &ptr);
+  for (temp_dependency = get_first_service_dependency_by_dependent_service(svc->host_name, svc->description, &ptr);
        temp_dependency != NULL;
-       temp_dependency = get_next_servicedependency_by_dependent_service(svc->host_name, svc->description, &ptr)) {
+       temp_dependency = get_next_service_dependency_by_dependent_service(svc->host_name, svc->description, &ptr)) {
 
     /* only check dependencies of the desired type (notification or execution) */
     if (temp_dependency->dependency_type != dependency_type)
@@ -1767,9 +1767,9 @@ unsigned int check_host_dependencies(host* hst, int dependency_type) {
   logger(dbg_functions, basic) << "check_host_dependencies()";
 
   /* check all dependencies... */
-  for (temp_dependency = get_first_hostdependency_by_dependent_host(hst->name, &ptr);
+  for (temp_dependency = get_first_host_dependency_by_dependent_host(hst->name, &ptr);
        temp_dependency != NULL;
-       temp_dependency = get_next_hostdependency_by_dependent_host(hst->name, &ptr)) {
+       temp_dependency = get_next_host_dependency_by_dependent_host(hst->name, &ptr)) {
 
     /* only check dependencies of the desired type (notification or execution) */
     if (temp_dependency->dependency_type != dependency_type)
@@ -2859,9 +2859,9 @@ int process_host_check_result_3x(host* hst,
           logger(dbg_checks, more)
             << "Propagating predictive dependency checks to hosts this one depends on...";
 
-          for (temp_dependency = get_first_hostdependency_by_dependent_host(hst->name, &ptr);
+          for (temp_dependency = get_first_host_dependency_by_dependent_host(hst->name, &ptr);
                temp_dependency != NULL;
-               temp_dependency = get_next_hostdependency_by_dependent_host(hst->name, &ptr)) {
+               temp_dependency = get_next_host_dependency_by_dependent_host(hst->name, &ptr)) {
             if (temp_dependency->dependent_host_ptr == hst
                 && temp_dependency->master_host_ptr != NULL) {
               master_host = (host*)temp_dependency->master_host_ptr;

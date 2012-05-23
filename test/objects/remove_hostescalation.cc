@@ -30,28 +30,28 @@ using namespace com::centreon::engine;
 /**
  *  Check if remove hostescalation works with some hostescalation.
  */
-static void remove_all_hostescalation() {
+static void remove_all_host_escalation() {
   init_object_skiplists();
 
-  add_hostescalation("hostescalation_host_name_1",
-		     0, 0, 0.0,
-		     "hostescalation_escalation_period",
-		     0, 0, 0);
-  add_hostescalation("hostescalation_host_name_2",
-		     0, 0, 0.0,
-		     "hostescalation_escalation_period",
-		     0, 0, 0);
-  add_hostescalation("hostescalation_host_name_3",
-		     0, 0, 0.0,
-		     "hostescalation_escalation_period",
-		     0, 0, 0);
+  add_host_escalation("hostescalation_host_name_1",
+                      0, 0, 0.0,
+                      "hostescalation_escalation_period",
+                      0, 0, 0);
+  add_host_escalation("hostescalation_host_name_2",
+                      0, 0, 0.0,
+                      "hostescalation_escalation_period",
+                      0, 0, 0);
+  add_host_escalation("hostescalation_host_name_3",
+                      0, 0, 0.0,
+                      "hostescalation_escalation_period",
+                      0, 0, 0);
 
-  if (remove_hostescalation_by_id("hostescalation_host_name_2") != 1
-      || remove_hostescalation_by_id("hostescalation_host_name_1") != 1
-      || remove_hostescalation_by_id("hostescalation_host_name_3") != 1
+  if (remove_host_escalation_by_id("hostescalation_host_name_2") != 1
+      || remove_host_escalation_by_id("hostescalation_host_name_1") != 1
+      || remove_host_escalation_by_id("hostescalation_host_name_3") != 1
       || hostescalation_list != NULL
       || hostescalation_list_tail != NULL)
-    throw (engine_error() << "remove all hostescalation failed.");
+    throw (engine_error() << "remove all host escalation failed.");
 
   free_object_skiplists();
 }
@@ -59,13 +59,13 @@ static void remove_all_hostescalation() {
 /**
  *  Check if remove hostescalation works with invalid call.
  */
-static void remove_hostescalation_failed() {
+static void remove_host_escalation_failed() {
   init_object_skiplists();
 
-  if (remove_hostescalation_by_id("") == 1)
-    throw (engine_error() << "hostescalation remove but dosen't exist.");
-  if (remove_hostescalation_by_id(NULL) == 1)
-    throw (engine_error() << "hostescalation remove but pointer is NULL.");
+  if (remove_host_escalation_by_id("") == 1)
+    throw (engine_error() << "host escalation remove but dosen't exist.");
+  if (remove_host_escalation_by_id(NULL) == 1)
+    throw (engine_error() << "host escalation remove but pointer is NULL.");
 
   free_object_skiplists();
 }
@@ -73,21 +73,21 @@ static void remove_hostescalation_failed() {
 /**
  *  check if remove hostescalation works with contactgroups.
  */
-static void remove_hostescalation_with_contactgroups() {
+static void remove_host_escalation_with_contactgroups() {
   init_object_skiplists();
 
-  hostescalation* he = add_hostescalation("hostescalation_host_name_1",
-					  0, 0, 0.0,
-					  "hostescalation_escalation_period",
-					  0, 0, 0);
-  contactgroup* cgroup = add_contactgroup("contactgroup_name", "contactgroup_alias");
-  contactgroupsmember* cgm = add_contactgroup_to_hostescalation(he, "contactgroup_name");
+  hostescalation* he = add_host_escalation("hostescalation_host_name_1",
+                                           0, 0, 0.0,
+                                           "hostescalation_escalation_period",
+                                           0, 0, 0);
+  contactgroup* cgroup = add_contact_group("contactgroup_name", "contactgroup_alias");
+  contactgroupsmember* cgm = add_contact_group_to_hostescalation(he, "contactgroup_name");
   cgm->group_ptr = cgroup;
 
-  if (remove_hostescalation_by_id("hostescalation_host_name_1") != 1
+  if (remove_host_escalation_by_id("hostescalation_host_name_1") != 1
       || hostescalation_list != NULL
       || hostescalation_list_tail != NULL)
-    throw (engine_error() << "remove hostescalation with hostescalation failed.");
+    throw (engine_error() << "remove host escalation with hostescalation failed.");
 
   delete[] cgroup->group_name;
   delete[] cgroup->alias;
@@ -99,22 +99,22 @@ static void remove_hostescalation_with_contactgroups() {
 /**
  *  Check if remove hostescalation works with some contacts.
  */
-static void remove_hostescalation_with_contacts() {
+static void remove_host_escalation_with_contacts() {
   init_object_skiplists();
 
-  hostescalation* he = add_hostescalation("hostescalation_host_name_1",
+  hostescalation* he = add_host_escalation("hostescalation_host_name_1",
 					  0, 0, 0.0,
 					  "hostescalation_escalation_period",
 					  0, 0, 0);
   contact* cntct = add_contact("contact_name", NULL, NULL, NULL, NULL, NULL,
 			       NULL, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
-  contactsmember* cm = add_contact_to_hostescalation(he, "contact_name");
+  contactsmember* cm = add_contact_to_host_escalation(he, "contact_name");
   cm->contact_ptr = cntct;
 
-  if (remove_hostescalation_by_id("hostescalation_host_name_1") != 1
+  if (remove_host_escalation_by_id("hostescalation_host_name_1") != 1
       || hostescalation_list != NULL
       || hostescalation_list_tail != NULL)
-    throw (engine_error() << "remove hostescalation with hostescalation failed.");
+    throw (engine_error() << "remove host escalation with hostescalation failed.");
 
   delete[] cntct->name;
   delete[] cntct->alias;
@@ -129,9 +129,9 @@ static void remove_hostescalation_with_contacts() {
 int main(void) {
   try {
     remove_all_hostescalation();
-    remove_hostescalation_failed();
-    remove_hostescalation_with_contactgroups();
-    remove_hostescalation_with_contacts();
+    remove_host_escalation_failed();
+    remove_host_escalation_with_contactgroups();
+    remove_host_escalation_with_contacts();
   }
   catch (std::exception const& e) {
     qDebug() << "error: " << e.what();

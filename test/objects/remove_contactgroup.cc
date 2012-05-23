@@ -171,7 +171,7 @@ static void remove_contactgroup_with_hostescalation() {
 
   contactgroup* cgroup = add_contactgroup("contactgroup_name", "contactgroup_alias");
 
-  hostescalation* he = add_hostescalation("host_name", 0, 0, 0.0, NULL, 0, 0, 0);
+  hostescalation* he = add_host_escalation("host_name", 0, 0, 0.0, NULL, 0, 0, 0);
   add_contactgroup_to_hostescalation(he, "contactgroup_name");
   he->contact_groups->group_ptr = cgroup;
 
