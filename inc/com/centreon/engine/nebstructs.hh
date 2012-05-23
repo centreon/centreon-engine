@@ -205,6 +205,19 @@ typedef struct   nebstruct_contact_status_struct {
   void*          object_ptr;
 }                nebstruct_contact_status_data;
 
+/* Custom variable structure. */
+typedef struct   nebstruct_custom_variable_struct {
+  int            type;
+  int            flags;
+  int            attr;
+  struct timeval timestamp;
+
+  char*          var_name;
+  char*          var_value;
+
+  void*          object_ptr;
+}                nebstruct_custom_variable_data;
+
 /* Downtime data structure. */
 typedef struct   nebstruct_downtime_struct {
   int            type;
@@ -336,19 +349,6 @@ typedef struct   nebstruct_host_check_struct {
   void*          object_ptr;
 }                nebstruct_host_check_data;
 
-/* Host custom variable structure. */
-typedef struct   nebstruct_host_custom_variable_struct {
-  int            type;
-  int            flags;
-  int            attr;
-  struct timeval timestamp;
-
-  char*          var_name;
-  char*          var_value;
-
-  void*          object_ptr;
-}                nebstruct_host_custom_variable_data;
-
 /* Host status structure. */
 typedef struct   nebstruct_host_status_struct {
   int            type;
@@ -453,6 +453,10 @@ typedef struct   nebstruct_relation_struct {
   service*       svc;
   host*          dep_hst;
   service*       dep_svc;
+  char const*    dependency_period;
+  char const*    execution_failure_options;
+  int            inherits_parent;
+  char const*    notification_failure_options;
 }                nebstruct_relation_data;
 
 /* Retention data structure. */

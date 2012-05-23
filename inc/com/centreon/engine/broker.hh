@@ -544,6 +544,10 @@ void           broker_relation_data(
                  service* svc,
                  host* dep_hst,
                  service* dep_svc,
+                 char const* dependency_period,
+                 char const* execution_failure_options,
+                 int inherits_parent,
+                 char const* notification_failure_options,
                  struct timeval const* timestamp);
 void           broker_retention_data(
                  int type,

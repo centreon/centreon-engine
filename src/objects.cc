@@ -73,6 +73,10 @@ hostsmember* add_child_link_to_host(host* parent, host* child) {
       NULL,
       child,
       NULL,
+      NULL,
+      NULL,
+      0,
+      NULL,
       &tv);
   }
 
