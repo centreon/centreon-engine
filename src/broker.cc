@@ -635,7 +635,7 @@ void broker_custom_variable(
     return ;
 
   // Fill struct with relevant data.
-  nebstruct_host_custom_variable_data ds;
+  nebstruct_custom_variable_data ds;
   ds.type = type;
   ds.flags = flags;
   ds.attr = attr;
@@ -1371,13 +1371,19 @@ void broker_program_status(
 /**
  *  Send relationship data to broker.
  *
- *  @param[in] type      Type.
- *  @param[in] flags     Flags.
- *  @param[in] attr      Attributes.
- *  @param[in] hst       Host.
- *  @param[in] svc       Service (might be null).
- *  @param[in] dep_hst   Dependant host object.
- *  @param[in] dep_svc   Dependant service object (might be null).
+ *  @param[in] type                         Type.
+ *  @param[in] flags                        Flags.
+ *  @param[in] attr                         Attributes.
+ *  @param[in] hst                          Host.
+ *  @param[in] svc                          Service (might be null).
+ *  @param[in] dep_hst                      Dependant host object.
+ *  @param[in] dep_svc                      Dependant service object
+ *                                          (might be null).
+ *  @param[in] dependency_period            Dependency period.
+ *  @param[in] execution_failure_options    Execution failure options.
+ *  @param[in] inherits_parent              Inherits parent ?
+ *  @param[in] notification_failure_options Notification failure
+ *                                          options.
  *  @param[in] timestamp Timestamp.
  */
 void broker_relation_data(
@@ -1388,6 +1394,10 @@ void broker_relation_data(
        service* svc,
        host* dep_hst,
        service* dep_svc,
+       char const* dependency_period,
+       char const* execution_failure_options,
+       int inherits_parent,
+       char const* notification_failure_options,
        struct timeval const* timestamp) {
   // Config check.
   if (!(config.get_event_broker_options() & BROKER_RELATION_DATA))
@@ -1405,6 +1415,10 @@ void broker_relation_data(
   ds.svc = svc;
   ds.dep_hst = dep_hst;
   ds.dep_svc = dep_svc;
+  ds.dependency_period = dependency_period;
+  ds.execution_failure_options = execution_failure_options;
+  ds.inherits_parent = inherits_parent;
+  ds.notification_failure_options = notification_failure_options;
 
   // Make callbacks.
   neb_make_callbacks(NEBCALLBACK_RELATION_DATA, &ds);

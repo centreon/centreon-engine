@@ -83,13 +83,13 @@ handle& handle::operator=(handle const& right) {
 bool handle::operator==(handle const& right) const throw () {
   return ((_args == right._args)
           && (_author == right._author)
-	  && (_copyright == right._copyright)
+          && (_copyright == right._copyright)
           && (_description == right._description)
           && (_filename == right._filename)
-	  && (_license == right._license)
+          && (_license == right._license)
           && (_name == right._name)
           && (_version == right._version)
-	  && (_handle.data() == right._handle.data()));
+          && (_handle.data() == right._handle.data()));
 }
 
 /**
@@ -111,14 +111,14 @@ void handle::close() {
     if (_handle->isLoaded()) {
       typedef int (*func_deinit)(int, int);
       func_deinit deinit = (func_deinit)_handle->resolve("nebmodule_deinit");
-      if (deinit == NULL) {
-	logger(log_info_message, basic)
+      if (!deinit)
+        logger(log_info_message, basic)
           << "Cannot resolve symbole 'nebmodule_deinit' in module '"
           << _filename << "'.";
-      }
-      else {
-	deinit(NEBMODULE_FORCE_UNLOAD, NEBMODULE_NEB_SHUTDOWN);
-      }
+      else
+        deinit(
+          NEBMODULE_FORCE_UNLOAD | NEBMODULE_ENGINE,
+          NEBMODULE_NEB_SHUTDOWN);
       _handle->unload();
     }
     _handle.clear();
@@ -244,9 +244,10 @@ void handle::open() {
     throw (engine_error() << "Cannot resolve symbole nebmodule_init");
   }
 
-  if (init(NEBMODULE_NORMAL_LOAD,
-	   qPrintable(_args),
-	   this) != OK) {
+  if (init(
+        NEBMODULE_NORMAL_LOAD | NEBMODULE_ENGINE,
+        qPrintable(_args),
+        this) != OK) {
     close();
     throw (engine_error() << "Function nebmodule_init returned an error");
   }
