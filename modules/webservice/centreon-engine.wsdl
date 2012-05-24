@@ -1053,9 +1053,9 @@
       <output message="tns:defaultResponse"/>
     </operation>
 
-    <!-- setCheckServiceFreshness -->
-    <operation name="setCheckServiceFreshness">
-      <documentation>Set new value for check service freshness variable.</documentation>
+    <!-- setServiceFreshnessChecksEnabled -->
+    <operation name="setServiceFreshnessChecksEnabled">
+      <documentation>Enable freshness checks of all services on a program-wide basis.</documentation>
       <input message="tns:booleanRequest"/>
       <output message="tns:defaultResponse"/>
     </operation>
@@ -1067,9 +1067,9 @@
       <output message="tns:defaultResponse"/>
     </operation>
 
-    <!-- setCheckHostFreshness -->
-    <operation name="setCheckHostFreshness">
-      <documentation>Set new value for check host freshness variable.</documentation>
+    <!-- setHostFreshnessChecksEnabled -->
+    <operation name="setHostFreshnessChecksEnabled">
+      <documentation>Enable or disable freshness checks of all hosts on a program-wide basis.</documentation>
       <input message="tns:booleanRequest"/>
       <output message="tns:defaultResponse"/>
     </operation>
@@ -1113,34 +1113,6 @@
     <operation name="setHighHostFlapThreshold">
       <documentation>Set new value for high host flap threshold variable.</documentation>
       <input message="tns:floatRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
-
-    <!-- setExecuteServiceChecks -->
-    <operation name="setExecuteServiceChecks">
-      <documentation>Set new value for execute service checks variable.</documentation>
-      <input message="tns:booleanRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
-
-    <!-- setAcceptPassiveServiceChecks -->
-    <operation name="setAcceptPassiveServiceChecks">
-      <documentation>Set new value for accept passive service checks variable.</documentation>
-      <input message="tns:booleanRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
-
-    <!-- setExecuteHostChecks -->
-    <operation name="setExecuteHostChecks">
-      <documentation>Set new value for execute host checks variable.</documentation>
-      <input message="tns:booleanRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
-
-    <!-- setAcceptPassiveHostChecks -->
-    <operation name="setAcceptPassiveHostChecks">
-      <documentation>Set new value for accept passive host checks variable.</documentation>
-      <input message="tns:booleanRequest"/>
       <output message="tns:defaultResponse"/>
     </operation>
 
@@ -1658,7 +1630,7 @@
       <output message="tns:defaultResponse"/>
     </operation>
 
-    <!-- setServicesChecksPassiveEnabled(bool enable) -->
+    <!-- setServicesChecksPassiveEnabled(enable) -->
     <operation name="setServicesChecksPassiveEnabled">
       <documentation>Enable or disable passive service checks globally.</documentation>
       <input message="tns:booleanRequest"/>
@@ -4473,7 +4445,7 @@
       <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
     </operation>
 
-    <operation name="setCheckServiceFreshness">
+    <operation name="setServiceFreshnessChecksEnabled">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
       <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
@@ -4485,7 +4457,7 @@
       <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
     </operation>
 
-    <operation name="setCheckHostFreshness">
+    <operation name="setHostFreshnessChecksEnabled">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
       <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
@@ -4522,30 +4494,6 @@
     </operation>
 
     <operation name="setHighHostFlapThreshold">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
-    <operation name="setExecuteServiceChecks">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
-    <operation name="setAcceptPassiveServiceChecks">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
-    <operation name="setExecuteHostChecks">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
-    <operation name="setAcceptPassiveHostChecks">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
       <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
