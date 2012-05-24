@@ -1023,6 +1023,22 @@ broker_module=${MODULE_PATH} ${MODULE_ARGS}")
     "${TEST_DIR}/running/etc/modules_symbols.cfg")
   add_test("${TEST_NAME}"
     "centengine" "${TEST_DIR}/running/etc/modules_symbols.cfg")
+  # Check that the webservice module can be loaded.
+  if (WITH_WEBSERVICE)
+    set(TEST_NAME "running_engine_broker_modules_webservice")
+    unset(MODULE_ARGS)
+    get_property(MODULE_ARGS
+      TARGET "webservice"
+      PROPERTY LOCATION)
+    set(CFG_CONTENT
+"command_file=/tmp/running_engine_broker_modules_webservice.tmp
+broker_module=${EXTERNAL_COMMAND_PATH}
+broker_module=${MODULE_PATH} ${MODULE_ARGS}")
+    configure_file("${TEST_DIR}/running/etc/minimal.cfg.in"
+      "${TEST_DIR}/running/etc/modules_webservice.cfg")
+    add_test("${TEST_NAME}"
+      "centengine" "${TEST_DIR}/running/etc/modules_webservice.cfg")
+  endif ()
   # Active check of host with no command.
   set(CFG_CONTENT
     "cfg_file=${TEST_DIR}/running/etc/host_with_no_check_cmd_objects.cfg")
