@@ -1,5 +1,5 @@
 /*
-** Copyright 2011 Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -114,6 +114,14 @@ arg_definition::arg_definition() {
   command_type.add(arg_string).set_name("name");
   command_type.add(arg_string).set_name("commandLine")
     .set_help("command_line");
+
+  argument comment_id("ns1__commentIDType", "comment");
+  comment_id.add(arg_ulong64).set_name("comment");
+
+  argument comment("ns1__commentType", "comment");
+  comment.add(arg_string).set_name("author");
+  comment.add(arg_string).set_name("text");
+  comment.add(arg_bool).set_name("persistent");
 
   argument contact_id("ns1__contactIDType", "contact");
   contact_id.add(arg_string).set_name("contact")
@@ -656,6 +664,8 @@ arg_definition::arg_definition() {
   _list.push_back(command_id);
   _list.push_back(resource_id);
   _list.push_back(command_type);
+  _list.push_back(comment_id);
+  _list.push_back(comment);
   _list.push_back(contact_id);
   _list.push_back(contact_type);
   _list.push_back(contactgroup_id);

@@ -267,6 +267,22 @@
         </sequence>
       </complexType>
 
+      <!-- Comment identifier. -->
+      <complexType name="commentIDType">
+        <sequence>
+          <element name="comment" type="xsd:unsignedLong"/>
+        </sequence>
+      </complexType>
+
+      <!-- Comment. -->
+      <complexType name="commentType">
+        <sequence>
+          <element name="author" type="xsd:string"/>
+          <element name="text" type="xsd:string"/>
+          <element name="persistent" type="xsd:boolean"/>
+        </sequence>
+      </complexType>
+
       <!-- Contact identifier. -->
       <complexType name="contactIDType">
         <sequence>
@@ -705,6 +721,32 @@
   </message>
 
   <!--
+	 Comment messages.
+   -->
+
+  <!-- Generic comment request. -->
+  <message name="commentRequest">
+    <part name="comment" type="tns:commentIDType"/>
+  </message>
+
+  <!-- Add a comment related to a host. -->
+  <message name="commentHostRequest">
+    <part name="host" type="tns:hostIDType"/>
+    <part name="comment" type="tns:commentType"/>
+  </message>
+
+  <!-- Add a comment related to a service. -->
+  <message name="commentServiceRequest">
+    <part name="service" type="tns:serviceIDType"/>
+    <part name="comment" type="tns:commentType"/>
+  </message>
+
+  <!-- Returns a comment ID. -->
+  <message name="commentResponse">
+    <part name="commentid" type="tns:commentIDType"/>
+  </message>
+
+  <!--
 	 Contact messages.
    -->
 
@@ -829,48 +871,6 @@
   <message name="hostNotificationRequest">
     <part name="host" type="xsd:string"/>
     <part name="notification" type="tns:notificationType"/>
-  </message>
-
-  <!-- Message send when operating on an ID. -->
-  <message name="IDRequest">
-    <part name="id" type="xsd:long"/>
-  </message>
-
-  <!-- Message returned when a new comment has been created. -->
-  <message name="newCommentResponse">
-    <part name="errorCode" type="xsd:int"/>
-    <part name="errorString" type="xsd:string"/>
-    <part name="commentID" type="xsd:unsignedInt"/>
-  </message>
-
-  <!-- Message sent when creating a new host comment. -->
-  <message name="newHostCommentRequest">
-    <part name="host" type="xsd:string"/>
-    <part name="comment" type="xsd:string"/>
-    <part name="user" type="xsd:string"/>
-    <part name="persistent" type="xsd:boolean"/>
-  </message>
-
-  <!-- Message sent when creating a new service comment. -->
-  <message name="newServiceCommentRequest">
-    <part name="host" type="xsd:string"/>
-    <part name="service" type="xsd:string"/>
-    <part name="comment" type="xsd:string"/>
-    <part name="user" type="xsd:string"/>
-    <part name="persistent" type="xsd:boolean"/>
-  </message>
-
-  <!-- Message sent when scheduling a downtime (except for service target). -->
-  <message name="scheduleDowntimeRequest">
-    <part name="target" type="xsd:string"/>
-    <part name="downtime" type="tns:downtimeType"/>
-  </message>
-
-  <!-- Message sent when scheduling a downtime on a service. -->
-  <message name="scheduleServiceDowntimeRequest">
-    <part name="host" type="xsd:string"/>
-    <part name="service" type="xsd:string"/>
-    <part name="downtime" type="tns:downtimeType"/>
   </message>
 
   <!-- Message sent when setting a feature of a service group. -->
@@ -3607,6 +3607,56 @@
     <operation name="checkServiceScheduleForced">
       <documentation>Schedule a forced service check.</documentation>
       <input message="tns:serviceDateRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+
+    <!--
+
+	 Comments.
+
+     -->
+
+    <!--
+	 Addition.
+     -->
+
+    <!-- commentAddToHost(host, comment) -->
+    <operation name="commentAddToHost">
+      <documentation>Add a comment to a host.</documentation>
+      <input message="tns:commentHostRequest"/>
+      <output message="tns:commentResponse"/>
+    </operation>
+
+    <!-- commentAddToService(service, comment) -->
+    <operation name="commentAddToService">
+      <documentation>Add a comment to a service.</documentation>
+      <input message="tns:commentServiceRequest"/>
+      <output message="tns:commentResponse"/>
+    </operation>
+
+    <!--
+	 Deletion.
+     -->
+
+    <!-- commentDelete(comment) -->
+    <operation name="commentDelete">
+      <documentation>Delete a comment.</documentation>
+      <input message="tns:commentRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- commentDeleteAllOfHost(host) -->
+    <operation name="commentDeleteAllOfHost">
+      <documentation>Delete all comments of a host.</documentation>
+      <input message="tns:hostRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- commentDeleteAllOfService(service) -->
+    <operation name="commentDeleteAllOfService">
+      <documentation>Delete all comments of a service.</documentation>
+      <input message="tns:serviceRequest"/>
       <output message="tns:defaultResponse"/>
     </operation>
 
@@ -6470,6 +6520,42 @@
     </operation>
 
     <operation name="checkServiceScheduleForced">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <!--
+
+         Comments.
+
+     -->
+
+    <operation name="commentAddToHost">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="commentAddToService">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="commentDelete">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="commentDeleteAllOfHost">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="commentDeleteAllOfService">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
       <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>

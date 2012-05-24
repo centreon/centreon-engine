@@ -892,9 +892,10 @@ int centreonengine__setSoftStateDependencies(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonengine__setCheckServiceFreshness(soap* s,
-                                             bool value,
-                                             centreonengine__setCheckServiceFreshnessResponse& res) {
+int centreonengine__setServiceFreshnessChecksEnabled(
+      soap* s,
+      bool value,
+      centreonengine__setServiceFreshnessChecksEnabledResponse& res) {
   (void)res;
 
   try {
@@ -959,9 +960,10 @@ int centreonengine__setServiceFreshnessCheckInterval(soap* s,
  *
  *  @return SOAP_OK on success.
  */
-int centreonengine__setCheckHostFreshness(soap* s,
-                                          bool value,
-                                          centreonengine__setCheckHostFreshnessResponse& res) {
+int centreonengine__setHostFreshnessChecksEnabled(
+      soap* s,
+      bool value,
+      centreonengine__setHostFreshnessChecksEnabledResponse& res) {
   (void)res;
 
   try {
@@ -1246,138 +1248,6 @@ int centreonengine__setHighHostFlapThreshold(soap* s,
       syncro::instance().worker_finish();
       return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
     }
-
-    syncro::instance().worker_finish();
-  }
-  catch (...) {
-    logger(dbg_commands, most)
-      << "Webservice: " << __func__ << " failed. catch all.";
-    syncro::instance().worker_finish();
-    return (soap_receiver_fault(s, "Runtime error.", "catch all"));
-  }
-  return (SOAP_OK);
-}
-
-/**
- *  Set global variable execute_service_checks.
- *
- *  @param[in]  s           Unused.
- *  @param[in]  value       Enable or disable execute_service_checks.
- *  @param[out] res         Unused.
- *
- *  @return SOAP_OK on success.
- */
-int centreonengine__setExecuteServiceChecks(soap* s,
-                                            bool value,
-                                            centreonengine__setExecuteServiceChecksResponse& res) {
-  (void)res;
-
-  try {
-    syncro::instance().waiting_callback();
-
-    logger(dbg_functions, most)
-      << "Webservice: " << __func__ << "(" << value << ")";
-
-    config.set_execute_service_checks(value);
-
-    syncro::instance().worker_finish();
-  }
-  catch (...) {
-    logger(dbg_commands, most)
-      << "Webservice: " << __func__ << " failed. catch all.";
-    syncro::instance().worker_finish();
-    return (soap_receiver_fault(s, "Runtime error.", "catch all"));
-  }
-  return (SOAP_OK);
-}
-
-/**
- *  Set global variable accept_passive_service_checks.
- *
- *  @param[in]  s           Unused.
- *  @param[in]  value       Enable or disable accept_passive_service_checks.
- *  @param[out] res         Unused.
- *
- *  @return SOAP_OK on success.
- */
-int centreonengine__setAcceptPassiveServiceChecks(soap* s,
-                                                  bool value,
-                                                  centreonengine__setAcceptPassiveServiceChecksResponse& res) {
-  (void)res;
-
-  try {
-    syncro::instance().waiting_callback();
-
-    logger(dbg_functions, most)
-      << "Webservice: " << __func__ << "(" << value << ")";
-
-    config.set_accept_passive_service_checks(value);
-
-    syncro::instance().worker_finish();
-  }
-  catch (...) {
-    logger(dbg_commands, most)
-      << "Webservice: " << __func__ << " failed. catch all.";
-    syncro::instance().worker_finish();
-    return (soap_receiver_fault(s, "Runtime error.", "catch all"));
-  }
-  return (SOAP_OK);
-}
-
-/**
- *  Set global variable execute_host_checks.
- *
- *  @param[in]  s           Unused.
- *  @param[in]  value       Enable or disable execute_host_checks.
- *  @param[out] res         Unused.
- *
- *  @return SOAP_OK on success.
- */
-int centreonengine__setExecuteHostChecks(soap* s,
-                                         bool value,
-                                         centreonengine__setExecuteHostChecksResponse& res) {
-  (void)res;
-
-  try {
-    syncro::instance().waiting_callback();
-
-    logger(dbg_functions, most)
-      << "Webservice: " << __func__ << "(" << value << ")";
-
-    config.set_execute_host_checks(value);
-
-    syncro::instance().worker_finish();
-  }
-  catch (...) {
-    logger(dbg_commands, most)
-      << "Webservice: " << __func__ << " failed. catch all.";
-    syncro::instance().worker_finish();
-    return (soap_receiver_fault(s, "Runtime error.", "catch all"));
-  }
-  return (SOAP_OK);
-}
-
-/**
- *  Set global variable accept_passive_host_checks.
- *
- *  @param[in]  s           Unused.
- *  @param[in]  value       Enable or disable accept_passive_host_checks.
- *  @param[out] res         Unused.
- *
- *  @return SOAP_OK on success.
- */
-int centreonengine__setAcceptPassiveHostChecks(soap* s,
-                                               bool value,
-                                               centreonengine__setAcceptPassiveHostChecksResponse& res) {
-  (void)res;
-
-  try {
-    syncro::instance().waiting_callback();
-
-    logger(dbg_functions, most)
-      << "Webservice: " << __func__ << "(" << value << ")";
-
-    config.set_accept_passive_service_checks(value);
 
     syncro::instance().worker_finish();
   }
