@@ -58,6 +58,7 @@ add_library("webservice" SHARED
   ${QT_WS_MOC_FILES}
   # Sources.
   "${SRC_DIR}/commands.cc"
+  "${SRC_DIR}/commands_command.cc"
   "${SRC_DIR}/commands_comment.cc"
   "${SRC_DIR}/commands_configuration.cc"
   "${SRC_DIR}/commands_misc.cc"

@@ -23,6 +23,21 @@
             attributeFormDefault="unqualified">
       <import namespace="http://schemas.xmlsoap.org/soap/encoding/"/>
 
+      <!-- Command identifier. -->
+      <complexType name="commandIDType">
+        <sequence>
+          <element name="command" type="xsd:string"/>
+        </sequence>
+      </complexType>
+
+      <!-- Command type. -->
+      <complexType name="commandType">
+        <sequence>
+          <element name="name" type="xsd:string"/>
+          <element name="commandLine" type="xsd:string"/>
+        </sequence>
+      </complexType>
+
       <!-- Host identifier. -->
       <complexType name="hostIDType">
         <sequence>
@@ -249,21 +264,6 @@
         <sequence>
           <element name="retval" type="xsd:int"/>
           <element name="output" type="xsd:string"/>
-        </sequence>
-      </complexType>
-
-      <!-- Command identifier. -->
-      <complexType name="commandIDType">
-        <sequence>
-          <element name="command" type="xsd:string"/>
-        </sequence>
-      </complexType>
-
-      <!-- Command type. -->
-      <complexType name="commandType">
-        <sequence>
-          <element name="name" type="xsd:string"/>
-          <element name="commandLine" type="xsd:string"/>
         </sequence>
       </complexType>
 
@@ -716,7 +716,7 @@
   </message>
 
   <!-- Command add request. -->
-  <message name="addCommandRequest">
+  <message name="commandFullRequest">
     <part name="command" type="tns:commandType"/>
   </message>
 
@@ -1296,13 +1296,6 @@
 	 Add object operations.
     -->
 
-    <!-- addCommand() -->
-    <operation name="addCommand">
-      <documentation>Add command.</documentation>
-      <input message="tns:addCommandRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
-
     <!-- addContactGroup() -->
     <operation name="addContactGroup">
       <documentation>Add contact group.</documentation>
@@ -1423,13 +1416,6 @@
     <operation name="removeContactGroup">
       <documentation>Remove contact group.</documentation>
       <input message="tns:contactGroupRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
-
-    <!-- removeCommand() -->
-    <operation name="removeCommand">
-      <documentation>Remove command.</documentation>
-      <input message="tns:commandRequest"/>
       <output message="tns:defaultResponse"/>
     </operation>
 
@@ -1714,6 +1700,34 @@
       <input message="tns:processFileRequest"/>
       <output message="tns:defaultResponse"/>
     </operation>
+
+    <!--
+
+         Commands.
+
+     -->
+
+    <!-- commandAdd(command) -->
+    <operation name="commandAdd">
+      <documentation>Add a new command.</documentation>
+      <input message="tns:commandFullRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- commandModify(command) -->
+    <operation name="commandModify">
+      <documentation>Modify an existing command.</documentation>
+      <input message="tns:commandFullRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- commandRemove(command_id) -->
+    <operation name="commandRemove">
+      <documentation>Remove a command.</documentation>
+      <input message="tns:commandRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
 
     <!--
 	                   
@@ -4715,12 +4729,6 @@
          Add object operations.
     -->
 
-    <operation name="addCommand">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
     <operation name="addContactGroup">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
@@ -4822,12 +4830,6 @@
     </operation>
 
     <operation name="removeContactGroup">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
-    <operation name="removeCommand">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
       <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
@@ -5056,6 +5058,31 @@
     </operation>
 
     <operation name="processFile">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+
+    <!--
+
+         Command.
+
+     -->
+
+    <operation name="commandAdd">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="commandModify">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="commandRemove">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
       <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>

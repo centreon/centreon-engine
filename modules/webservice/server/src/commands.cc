@@ -11943,46 +11943,6 @@ int centreonengine__notificationServiceSend(soap* s,
 // }
 
 /**
- *  Add command.
- *
- *  @param[in]  s                 Unused.
- *  @param[in]  command           Command to add.
- *  @param[out] res               Unused.
- *
- *  @return SOAP_OK on success.
- */
-int centreonengine__addCommand(soap* s,
-			       ns1__commandType* command,
-			       centreonengine__addCommandResponse& res) {
-  (void)res;
-
-  try {
-    sync::instance().wait_thread_safeness();
-
-    logger(dbg_functions, most)
-      << "Webservice: " << __func__ << "({" << command->name.c_str()
-      << ", " << command->commandLine.c_str() << "})";
-
-    create_command(*command);
-    sync::instance().worker_finish();
-  }
-  catch (std::exception const& e) {
-    logger(dbg_commands, most)
-           << "Webservice: " << __func__ << " failed: " << e.what() << ".";
-    sync::instance().worker_finish();
-    return (soap_receiver_fault(s, "invalid argument", e.what()));
-  }
-  catch (...) {
-    logger(dbg_commands, most)
-      << "Webservice: " << __func__ << " failed. catch all.";
-    sync::instance().worker_finish();
-    return (soap_receiver_fault(s, "Runtime error.", "catch all"));
-
-  }
-  return (SOAP_OK);
-}
-
-/**
  *  Add contactgroup.
  *
  *  @param[in]  s                 Unused.
@@ -12659,53 +12619,6 @@ int centreonengine__removeContactGroup(soap* s,
     if (!remove_contactgroup_by_id(contactgroup_id->name.c_str())) {
       std::string* error = soap_new_std__string(s, 1);
       *error = "Contact group `" + contactgroup_id->name + "' not found.";
-
-      logger(dbg_commands, most)
-        << "Webservice: " << __func__ << " failed. " << *error;
-
-      sync::instance().worker_finish();
-      return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
-    }
-
-    sync::instance().worker_finish();
-  }
-  catch (...) {
-    logger(dbg_commands, most)
-      << "Webservice: " << __func__ << " failed. catch all.";
-    sync::instance().worker_finish();
-    return (soap_receiver_fault(s, "Runtime error.", "catch all"));
-
-  }
-  return (SOAP_OK);
-}
-
-/**
- *  Remove command.
- *
- *  @param[in]  s                 Unused.
- *  @param[in]  command_id        Command to remove.
- *  @param[out] res               Unused.
- *
- *  @return SOAP_OK on success.
- */
-int centreonengine__removeCommand(soap* s,
-				  ns1__commandIDType* command_id,
-				  centreonengine__removeCommandResponse& res) {
-  (void)res;
-
-  try {
-    sync::instance().wait_thread_safeness();
-
-    logger(dbg_functions, most)
-      << "Webservice: " << __func__ << "(" << command_id->command << ")";
-
-    int ret = remove_command_by_id(command_id->command.c_str());
-    if (ret != 1) {
-      std::string* error = soap_new_std__string(s, 1);
-      if (ret == 0)
-	*error = "Command `" + command_id->command + "' not found.";
-      else
-	*error = "Command `" + command_id->command + "' is currently used.";
 
       logger(dbg_commands, most)
         << "Webservice: " << __func__ << " failed. " << *error;

@@ -161,19 +161,6 @@ static void _extract_object_from_objectgroup(QVector<T*> const& groups,
 }
 
 /**
- *  Create a new command into the engine.
- *
- *  @param[in] cmd The struct with all information to create new command.
- */
-void webservice::create_command(ns1__commandType const& cmd) {
-  command* obj = add_command(cmd.name.c_str(), cmd.commandLine.c_str());
-  if (obj == NULL)
-    throw (engine_error() << "comand '" << cmd.name.c_str()
-           << "' invalid name or command line.");
-  objects::link(obj);
-}
-
-/**
  *  Create a new contactgroup into the engine.
  *
  *  @param[in] cntctgrp The struct with all information to create new contactgroup.

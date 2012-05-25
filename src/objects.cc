@@ -3254,6 +3254,58 @@ int free_object_data() {
   return (OK);
 }
 
+/**************************************
+*                                     *
+*    Object Modification Functions    *
+*                                     *
+**************************************/
+
+/**
+ *  Modify an existing command.
+ *
+ *  @param[in] name  Command name.
+ *  @param[in] value New command line.
+ *
+ *  @return OK on success.
+ */
+int modify_command(char const* name, char const* value) {
+  // Make sure we have the data we need.
+  if (!name || !name[0] || !value || !value[0]) {
+    logger(log_config_error, basic)
+      << "Error: Command name or command line is NULL";
+    return (ERROR);
+  }
+
+  // Find command object.
+  command* this_command(command_list);
+  while (this_command && strcmp(this_command->name, name))
+    this_command = this_command->next;
+  if (!this_command)
+    return (ERROR);
+
+  // Modify command.
+  delete [] this_command->command_line;
+  this_command->command_line = my_strdup(value);
+
+  // Notify event broker.
+  timeval tv(get_broker_timestamp(NULL));
+  broker_command_data(
+    NEBTYPE_COMMAND_UPDATE,
+    NEBFLAG_NONE,
+    NEBATTR_NONE,
+    this_command->name,
+    this_command->command_line,
+    &tv);
+
+  return (OK);
+}
+
+/**************************************
+*                                     *
+*      Object Removal Functions       *
+*                                     *
+**************************************/
+
 /**
  *  Remove a command.
  *
@@ -3330,6 +3382,16 @@ int remove_command_by_id(char const* name) {
     prev_command->next = this_command->next;
   if (!this_command->next)
     command_list_tail = prev_command;
+
+  // Notify event broker.
+  timeval tv(get_broker_timestamp(NULL));
+  broker_command_data(
+    NEBTYPE_COMMAND_DELETE,
+    NEBFLAG_NONE,
+    NEBATTR_NONE,
+    this_command->name,
+    this_command->command_line,
+    &tv);
 
   return (remove_command(this_command));
 }
