@@ -909,6 +909,20 @@
 	Configuration backup.
     -->
 
+    <!-- saveResources -->
+    <operation name="saveResources">
+      <documentation>Save resource objects into a file.</documentation>
+      <input message="tns:stringRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- saveConfiguration -->
+    <operation name="saveConfiguration">
+      <documentation>Save the engine configuration into a file.</documentation>
+      <input message="tns:stringRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
     <!-- saveAllObjects -->
     <operation name="saveAllObjects">
       <documentation>Save all engine objects into a file.</documentation>
@@ -4348,6 +4362,18 @@
     <!--
 	Configuration backup.
     -->
+
+    <operation name="saveResources">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="saveConfiguration">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
 
     <operation name="saveAllObjects">
       <SOAP:operation style="rpc" soapAction=""/>

@@ -17,22 +17,80 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-// #include <exception>
 #include <QCoreApplication>
 #include "com/centreon/engine/error.hh"
-#include "com/centreon/engine/modules/webservice/webservice.hh"
-// #include "com/centreon/engine/globals.hh"
-// #include "com/centreon/engine/logging/engine.hh"
+#include "com/centreon/engine/modules/webservice/configuration/save/resource.hh"
+#include "com/centreon/engine/globals.hh"
 #include "test/unittest.hh"
 
-using namespace com::centreon::engine;
+using namespace com::centreon::engine::modules::webservice;
+
+/**
+ *  Check with null pointer.
+ *
+ *  @return True on success, otherwise false.
+ */
+static bool check_null_resources() {
+  configuration::save::resource save;
+  save.add_resource(NULL);
+  return (save.to_string().empty());
+}
+
+/**
+ *  Check with empty resources.
+ *
+ *  @return True on success, otherwise false.
+ */
+static bool check_empty_resources() {
+  configuration::save::resource save;
+  save.add_resource(macro_user);
+  return (save.to_string().empty());
+}
+
+/**
+ *  Check with some data in resources.
+ *
+ *  @return True on success, otherwise false.
+ */
+static bool check_with_data_resources() {
+  std::ostringstream oss;
+  for (unsigned int i(0); i < MAX_USER_MACROS; i += 2) {
+    oss << "$USER" << (i + 1) << "$=" << __func__ << std::endl;
+    macro_user[i] = const_cast<char*>(__func__);
+  }
+  configuration::save::resource save;
+  save.add_resource(macro_user);
+  return (save.to_string() == oss.str());
+}
+
+/**
+ *  Check full data in resources.
+ *
+ *  @return True on success, otherwise false.
+ */
+static bool check_full_resources() {
+  std::ostringstream oss;
+  for (unsigned int i(0); i < MAX_USER_MACROS; ++i) {
+    oss << "$USER" << (i + 1) << "$=" << __func__ << std::endl;
+    macro_user[i] = const_cast<char*>(__func__);
+  }
+  configuration::save::resource save;
+  save.add_resource(macro_user);
+  return (save.to_string() == oss.str());
+}
 
 /**
  *  Run add_host_comment test.
  */
 static int check_save_resources() {
-  // throw (engine_error() << "add_host_comment failed.");
-
+  if (!check_null_resources())
+    throw (engine_error() << "check_null_resources failed.");
+  if (!check_empty_resources())
+    throw (engine_error() << "check_empty_resources failed.");
+  if (!check_with_data_resources())
+    throw (engine_error() << "check_with_data_resources failed.");
+  if (!check_full_resources())
+    throw (engine_error() << "check_full_resources failed.");
   return (0);
 }
 
@@ -41,7 +99,7 @@ static int check_save_resources() {
  */
 int main(int argc, char** argv) {
   QCoreApplication app(argc, argv);
-  unittest utest(&check_save_resources);
+  com::centreon::engine::unittest utest(&check_save_resources);
   QObject::connect(&utest, SIGNAL(finished()), &app, SLOT(quit()));
   utest.start();
   app.exec();

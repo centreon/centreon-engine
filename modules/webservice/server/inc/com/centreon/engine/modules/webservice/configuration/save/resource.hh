@@ -34,7 +34,7 @@ namespace                configuration {
                          resource(resource const& right);
                          ~resource() throw ();
       resource&          operator=(resource const& right);
-      void               add_resource(char const** resources);
+      void               add_resource(char* const* resources);
       void               backup(std::string const& filename) const;
       void               clear();
       std::string        to_string() const;
