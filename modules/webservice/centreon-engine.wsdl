@@ -854,6 +854,16 @@
     <part name="timeperiod" type="tns:timeperiodType"/>
   </message>
 
+  <!--
+         Misc.
+   -->
+
+  <!-- Process an external command file. -->
+  <message name="processFileRequest">
+    <part name="file" type="xsd:string"/>
+    <part name="delete_once_processed" type="xsd:boolean"/>
+  </message>
+
   <!-- Not validated messages. -->
 
   <!-- Message sent when executing an operation on a contactgroup. -->
@@ -1694,6 +1704,16 @@
       <output message="tns:defaultResponse"/>
     </operation>
 
+    <!--
+	 Misc.
+     -->
+
+    <!-- processFile(file, delete) -->
+    <operation name="processFile">
+      <documentation>Directs Engine to process all external commands that are found in a file.</documentation>
+      <input message="tns:processFileRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
 
     <!--
 	                   
@@ -5030,6 +5050,12 @@
     </operation>
 
     <operation name="stateInformationSave">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="processFile">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
       <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>

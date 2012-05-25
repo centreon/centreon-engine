@@ -31,7 +31,7 @@ extern "C" {
 
 // External command functions
 int check_for_external_commands();                                          // checks for any external commands
-int process_external_commands_from_file(char* fname, int delete_file);      // process external commands in a file
+int process_external_commands_from_file(char const* file, int delete_file); // process external commands in a file
 int process_external_command(char const* cmd);                              // external command processor
 
 // External command implementations
