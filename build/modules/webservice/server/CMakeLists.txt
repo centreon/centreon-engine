@@ -70,6 +70,7 @@ add_library("webservice" SHARED
   "${SRC_DIR}/schedule_object.cc"
   "${SRC_DIR}/ssl.cc"
   "${SRC_DIR}/sync.cc"
+  "${SRC_DIR}/sync_lock.cc"
   "${SRC_DIR}/webservice.cc"
   # Headers.
   "${INC_DIR}/configuration.hh"
@@ -80,6 +81,7 @@ add_library("webservice" SHARED
   "${INC_DIR}/schedule_object.hh"
   "${INC_DIR}/ssl.hh"
   "${INC_DIR}/sync.hh"
+  "${INC_DIR}/sync_lock.hh"
   "${INC_DIR}/webservice.hh"
 )
 
