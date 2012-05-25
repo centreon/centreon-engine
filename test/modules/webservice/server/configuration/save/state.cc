@@ -31,18 +31,22 @@ using namespace com::centreon::engine::modules;
  *  Run add_host_comment test.
  */
 static int check_save_state() {
-  std::ifstream file("./config.cfg", std::ios::binary);
-  std::string ref;
-  while (file.good() && !file.eof()) {
-    char buffer[1024];
-    file.read(buffer, sizeof(buffer));
-    ref.append(buffer, file.gcount());
+  int argc(QCoreApplication::argc());
+  char** argv(QCoreApplication::argv());
+  for (int i(1); i < argc; ++i) {
+    std::ifstream file(argv[i], std::ios::binary);
+    std::string ref;
+    while (file.good() && !file.eof()) {
+      char buffer[1024];
+      file.read(buffer, sizeof(buffer));
+      ref.append(buffer, file.gcount());
+    }
+    config.parse(argv[i]);
+    webservice::configuration::save::state save;
+    save << config;
+    if (save.to_string() != ref)
+      throw (engine_error() << "check_update_condifuration failed.");
   }
-  config.parse("./config.cfg");
-  webservice::configuration::save::state save;
-  save << config;
-  if (save.to_string() != ref)
-    throw (engine_error() << "check_update_condifuration failed.");
   return (0);
 }
 

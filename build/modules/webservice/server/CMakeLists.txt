@@ -133,7 +133,8 @@ if (WITH_TESTING)
   # Test calling configuration_save_state.
   set(TEST_NAME "modules_webservice_configuration_save_state")
   add_executable("${TEST_NAME}"
-    "${TEST_DIR}/configuration/save/state.cc")
+    "${TEST_DIR}/configuration/save/state.cc"
+    "${TEST_DIR}/configuration/save/state_backup.cfg")
   target_link_libraries("${TEST_NAME}" ${QT_LIBRARIES} "cce_core" "webservice")
   add_test("${TEST_NAME}" "${TEST_NAME}")
 
