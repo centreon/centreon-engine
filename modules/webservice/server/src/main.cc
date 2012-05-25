@@ -23,7 +23,7 @@
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/modules/webservice/configuration.hh"
-#include "com/centreon/engine/modules/webservice/syncro.hh"
+#include "com/centreon/engine/modules/webservice/sync.hh"
 #include "com/centreon/engine/modules/webservice/webservice.hh"
 #include "com/centreon/engine/nebcallbacks.hh"
 #include "com/centreon/engine/nebmodules.hh"
@@ -76,7 +76,7 @@ int callback_webservice(int callback_type, void* data) {
     return (0);
 
   try {
-    syncro::instance().wakeup_worker();
+    sync::instance().wakeup_workers();
   }
   catch (...) {
 

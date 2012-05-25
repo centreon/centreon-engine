@@ -19,7 +19,7 @@
 
 #include "com/centreon/engine/comments.hh"
 #include "com/centreon/engine/logging/logger.hh"
-#include "com/centreon/engine/modules/webservice/syncro.hh"
+#include "com/centreon/engine/modules/webservice/sync.hh"
 #include "soapH.h"
 
 using namespace com::centreon::engine::logging;
@@ -46,7 +46,7 @@ int centreonengine__commentAddToHost(
       centreonengine__commentAddToHostResponse& res) {
   try {
     // Wait for thread safeness.
-    syncro::instance().waiting_callback();
+    sync::instance().wait_thread_safeness();
     logger(dbg_functions, most)
       << "Webservice: " << __func__ << "(" << host_id->name << ")";
 
@@ -69,7 +69,7 @@ int centreonengine__commentAddToHost(
       *error = "Could not add comment to host '" + host_id->name + "'";
       logger(log_runtime_error, more)
         << "Webservice: " << __func__ << " failed: " << *error;
-      syncro::instance().worker_finish();
+      sync::instance().worker_finish();
       return (soap_receiver_fault(
                 s,
                 "Invalid parameter",
@@ -81,19 +81,19 @@ int centreonengine__commentAddToHost(
     res.commentid->comment = comment_id;
 
     // Release worker.
-    syncro::instance().worker_finish();
+    sync::instance().worker_finish();
   }
   // Exception handling.
   catch (std::exception const& e) {
     logger(log_runtime_error, more)
       << "Webservice: " << __func__ << " failed: " << e.what();
-    syncro::instance().worker_finish();
+    sync::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error", e.what()));
   }
   catch (...) {
     logger(log_runtime_error, more)
       << "Webservice: " << __func__ << " failed: unknown exception";
-    syncro::instance().worker_finish();
+    sync::instance().worker_finish();
     return (soap_receiver_fault(
               s,
               "Runtime error",
@@ -123,7 +123,7 @@ int centreonengine__commentAddToService(
       centreonengine__commentAddToServiceResponse& res) {
   try {
     // Wait for thread safeness.
-    syncro::instance().waiting_callback();
+    sync::instance().wait_thread_safeness();
     logger(dbg_functions, most)
       << "Webservice: " << __func__ << "(" << service_id->host
       << ", " << service_id->service << ")";
@@ -151,7 +151,7 @@ int centreonengine__commentAddToService(
         + "'";
       logger(log_runtime_error, more)
         << "Webservice: " << __func__ << " failed: " << *error;
-      syncro::instance().worker_finish();
+      sync::instance().worker_finish();
       return (soap_receiver_fault(
                 s,
                 "Invalid parameter",
@@ -163,19 +163,19 @@ int centreonengine__commentAddToService(
     res.commentid->comment = comment_id;
 
     // Release worker.
-    syncro::instance().worker_finish();
+    sync::instance().worker_finish();
   }
   // Exception handling.
   catch (std::exception const& e) {
     logger(log_runtime_error, more)
       << "Webservice: " << __func__ << " failed: " << e.what();
-    syncro::instance().worker_finish();
+    sync::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error", e.what()));
   }
   catch (...) {
     logger(log_runtime_error, more)
       << "Webservice: " << __func__ << " failed: unknown exception";
-    syncro::instance().worker_finish();
+    sync::instance().worker_finish();
     return (soap_receiver_fault(
               s,
               "Runtime error",
@@ -201,7 +201,7 @@ int centreonengine__commentDelete(
 
   try {
     // Wait for thread safeness.
-    syncro::instance().waiting_callback();
+    sync::instance().wait_thread_safeness();
     logger(dbg_functions, most)
       << "Webservice: " << __func__ << "(" << comment_id->comment << ")";
 
@@ -214,13 +214,13 @@ int centreonengine__commentDelete(
   catch (std::exception const& e) {
     logger(log_runtime_error, more)
       << "Webservice: " << __func__ << " failed: " << e.what();
-    syncro::instance().worker_finish();
+    sync::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error", e.what()));
   }
   catch (...) {
     logger(log_runtime_error, more)
       << "Webservice: " << __func__ << " failed: unknown exception";
-    syncro::instance().worker_finish();
+    sync::instance().worker_finish();
     return (soap_receiver_fault(
               s,
               "Runtime error",
@@ -246,7 +246,7 @@ int centreonengine__commentDeleteAllOfHost(
 
   try {
     // Wait for thread safeness.
-    syncro::instance().waiting_callback();
+    sync::instance().wait_thread_safeness();
     logger(dbg_functions, most)
       << "Webservice: " << __func__ << "(" << host_id->name << ")";
 
@@ -257,13 +257,13 @@ int centreonengine__commentDeleteAllOfHost(
   catch (std::exception const& e) {
     logger(log_runtime_error, more)
       << "Webservice: " << __func__ << " failed: " << e.what();
-    syncro::instance().worker_finish();
+    sync::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error", e.what()));
   }
   catch (...) {
     logger(log_runtime_error, more)
       << "Webservice: " << __func__ << " failed: unknown exception";
-    syncro::instance().worker_finish();
+    sync::instance().worker_finish();
     return (soap_receiver_fault(
               s,
               "Runtime error",
@@ -289,7 +289,7 @@ int centreonengine__commentDeleteAllOfService(
 
   try {
     // Wait for thread safeness.
-    syncro::instance().waiting_callback();
+    sync::instance().wait_thread_safeness();
     logger(dbg_functions, most)
       << "Webservice: " << __func__ << "(" << service_id->host->name
       << ", " << service_id->service << ")";
@@ -304,13 +304,13 @@ int centreonengine__commentDeleteAllOfService(
   catch (std::exception const& e) {
     logger(log_runtime_error, more)
       << "Webservice: " << __func__ << " failed: " << e.what();
-    syncro::instance().worker_finish();
+    sync::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error", e.what()));
   }
   catch (...) {
     logger(log_runtime_error, more)
       << "Webservice: " << __func__ << " failed: unknown exception";
-    syncro::instance().worker_finish();
+    sync::instance().worker_finish();
     return (soap_receiver_fault(
               s,
               "Runtime error",

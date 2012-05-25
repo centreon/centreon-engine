@@ -1,5 +1,5 @@
 /*
-** Copyright 2011 Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -17,44 +17,42 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef CCE_MOD_WS_SYNCRO_HH
-#  define CCE_MOD_WS_SYNCRO_HH
+#ifndef CCE_MOD_WS_SYNC_HH
+#  define CCE_MOD_WS_SYNC_HH
 
-#  include <QWaitCondition>
 #  include <QMutex>
+#  include <QWaitCondition>
 #  include "com/centreon/engine/modules/webservice/namespace.hh"
 
 CCE_MOD_WS_BEGIN()
 
 /**
- *  @class syncro syncro.hh
+ *  @class sync sync.hh "com/centreon/engine/modules/webservice/sync.hh"
  *  @brief Synchronize thread and callback.
  *
- *  Syncro class provide system to synchronize thread
- *  and callback processing.
+ *  The sync class provide system to synchronize thread and callback
+ *  processing.
  */
-class            syncro {
+class             sync {
 public:
-  static syncro& instance();
-  void           waiting_callback();
-  void           wakeup_worker();
-  void           worker_finish();
+  static sync&    instance();
+  void            wait_thread_safeness();
+  void            wakeup_workers();
+  void            worker_finish();
 
 private:
-                 syncro();
-                 syncro(syncro const& right);
-                 ~syncro();
-  syncro&        operator=(syncro const& right);
-  bool           _thread_count_is_null() const;
+                  sync();
+                  sync(sync const& right);
+                  ~sync();
+  sync&           operator=(sync const& right);
 
-  bool           _can_run;
-  QWaitCondition _cnd_main;
-  QWaitCondition _cnd_worker;
-  QMutex         _mtx_main;
-  mutable QMutex _mtx_worker;
-  unsigned int   _thread_count;
+  QWaitCondition  _cnd_main;
+  QWaitCondition  _cnd_worker;
+  QMutex          _mtx_main;
+  QMutex          _mtx_worker;
+  unsigned int    _thread_count;
 };
 
 CCE_MOD_WS_END()
 
-#endif // !CCE_MOD_WS_SYNCRO_HH
+#endif // !CCE_MOD_WS_SYNC_HH

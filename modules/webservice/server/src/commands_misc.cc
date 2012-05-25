@@ -20,7 +20,7 @@
 #include "com/centreon/engine/comments.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/modules/external_commands/commands.hh"
-#include "com/centreon/engine/modules/webservice/syncro.hh"
+#include "com/centreon/engine/modules/webservice/sync.hh"
 #include "soapH.h"
 
 using namespace com::centreon::engine::logging;
@@ -51,7 +51,7 @@ int centreonengine__processFile(
 
   try {
     // Wait for thread safeness.
-    syncro::instance().waiting_callback();
+    sync::instance().wait_thread_safeness();
     logger(dbg_functions, most)
       << "Webservice: " << __func__ << "(" << file << ", "
       << (delete_once_processed ? "delete" : "no delete");
@@ -65,13 +65,13 @@ int centreonengine__processFile(
   catch (std::exception const& e) {
     logger(log_runtime_error, more)
       << "Webservice: " << __func__ << " failed: " << e.what();
-    syncro::instance().worker_finish();
+    sync::instance().worker_finish();
     return (soap_receiver_fault(s, "Runtime error", e.what()));
   }
   catch (...) {
     logger(log_runtime_error, more)
       << "Webservice: " << __func__ << " failed: unknown exception";
-    syncro::instance().worker_finish();
+    sync::instance().worker_finish();
     return (soap_receiver_fault(
               s,
               "Runtime error",
