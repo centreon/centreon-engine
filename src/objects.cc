@@ -3566,6 +3566,23 @@ int remove_contact_by_id(char const* name) {
     prev_contact->next = this_contact->next;
   if (!this_contact->next)
     contact_list_tail = prev_contact;
+
+  // Notify event broker.
+  timeval tv(get_broker_timestamp(NULL));
+  broker_adaptive_contact_data(
+    NEBTYPE_CONTACT_DELETE,
+    NEBFLAG_NONE,
+    NEBATTR_NONE,
+    this_contact,
+    CMD_NONE,
+    MODATTR_ALL,
+    MODATTR_ALL,
+    MODATTR_ALL,
+    MODATTR_ALL,
+    MODATTR_ALL,
+    MODATTR_ALL,
+    &tv);
+
   return (remove_contact(this_contact));
 }
 
@@ -3694,6 +3711,15 @@ int remove_contactgroup_by_id(char const* name) {
     prev_contactgroup->next = this_contactgroup->next;
   if (!this_contactgroup->next)
     contactgroup_list_tail = prev_contactgroup;
+
+  // Notify event broker.
+  timeval tv(get_broker_timestamp(NULL));
+  broker_group(
+    NEBTYPE_CONTACTGROUP_DELETE,
+    NEBFLAG_NONE,
+    NEBATTR_NONE,
+    this_contactgroup,
+    &tv);
 
   return (remove_contactgroup(this_contactgroup));
 }

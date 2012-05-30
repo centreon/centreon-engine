@@ -53,22 +53,29 @@ using namespace com::centreon::engine::modules;
  *
  *  @return The options list.
  */
-static QHash<char, bool> get_options(std::string const* opt,
-                                     QString const& pattern,
-                                     char const* default_opt) {
-  QHash<char, bool> res;
+std::map<char, bool> webservice::get_options(
+                                   std::string const* opt,
+                                   std::string const& pattern,
+                                   char const* default_opt) {
+  std::map<char, bool> res;
   QString _opt(opt ? opt->c_str() : default_opt);
   _opt.toLower().trimmed();
-  if (_opt.contains(QRegExp("[^" + pattern + "na, ]", Qt::CaseInsensitive)))
+  if (_opt.contains(QRegExp(
+                      QString("[^") + pattern.c_str() + "na, ]",
+                      Qt::CaseInsensitive)))
     return (res);
 
-  for (QString::const_iterator it = pattern.begin(), end = pattern.end(); it != end; ++it)
+  for (std::string::const_iterator
+         it(pattern.begin()),
+         end(pattern.end());
+       it != end;
+       ++it)
     if (_opt == "n")
-      res[it->toAscii()] = false;
+      res[*it] = false;
     else if (_opt == "a")
-      res[it->toAscii()] = true;
+      res[*it] = true;
     else
-      res[it->toAscii()] = (_opt.indexOf(*it) != -1);
+      res[*it] = (_opt.indexOf(*it) != -1);
   return (res);
 }
 
@@ -79,39 +86,13 @@ static QHash<char, bool> get_options(std::string const* opt,
  *
  *  @return The Qt vector.
  */
-static QVector<QString> std2qt(std::vector<std::string> const& vec) {
+QVector<QString> webservice::std2qt(std::vector<std::string> const& vec) {
   QVector<QString> res;
   res.reserve(vec.size());
   for (std::vector<std::string>::const_iterator it = vec.begin(), end = vec.end();
        it != end;
        ++it)
     res.push_back(QString::fromAscii(it->data(), static_cast<int>(it->size())));
-  return (res);
-}
-
-/**
- *  Find objects by name and create a table of it.
- *
- *  @param[in]  objs        The object to find.
- *  @param[in]  find_object The function to find an object.
- *
- *  @return The object's table, stop when the first object are not found.
- */
-template<class T>
-static QVector<T*> _find(std::vector<std::string> const& objs,
-                         void* (find_object)(char const*)) {
-  QVector<T*> res;
-  res.reserve(objs.size());
-  for (std::vector<std::string>::const_iterator it = objs.begin(),
-	 end = objs.end();
-       it != end;
-       ++it) {
-    // check if the object exist..
-    void* obj = (*find_object)(it->c_str());
-    if (obj == NULL)
-      return (res);
-    res.push_back(static_cast<T*>(obj));
-  }
   return (res);
 }
 
@@ -158,41 +139,6 @@ static void _extract_object_from_objectgroup(QVector<T*> const& groups,
   }
   qSort(objects.begin(), objects.end());
   std::unique(objects.begin(), objects.end());
-}
-
-/**
- *  Create a new contactgroup into the engine.
- *
- *  @param[in] cntctgrp The struct with all information to create new contactgroup.
- */
-void webservice::create_contact_group(ns1__contactGroupType const& cntctgrp) {
-  // create a new contactgroup.
-  contactgroup* group = add_contactgroup(cntctgrp.name.c_str(),
-                                         cntctgrp.alias.c_str());
-  // add all contacts into the contactgroup.
-  QVector<contact*> cntct_members =
-    _find<contact>(cntctgrp.members, (void* (*)(char const*))&find_contact);
-  if (static_cast<int>(cntctgrp.members.size()) != cntct_members.size()) {
-    objects::release(group);
-    throw (engine_error() << "contactgroup '" << cntctgrp.name << "' invalid member.");
-  }
-
-  // add the content of other contactgroups into this contactgroup.
-  QVector<contactgroup*> cntct_groups =
-    _find<contactgroup>(cntctgrp.contactgroupMembers, (void* (*)(char const*))&find_contactgroup);
-  if (static_cast<int>(cntctgrp.contactgroupMembers.size()) != cntct_groups.size()) {
-    objects::release(group);
-    throw (engine_error() << "contactgroup '" << cntctgrp.name << "' invalid group member.");
-  }
-
-  try {
-    objects::link(group, cntct_members, cntct_groups);
-  }
-  catch (std::exception const& e) {
-    (void)e;
-    objects::release(group);
-    throw;
-  }
 }
 
 /**
@@ -258,8 +204,8 @@ void webservice::create_service_group(ns1__serviceGroupType const& svcgrp) {
                                          notes_url,
                                          action_url);
 
-  // add all services into the servicegroup.
-  QVector<service*> svc_members = _find(svcgrp.members);
+  // Add all services into the servicegroup.
+  QVector<service*> svc_members(::_find(svcgrp.members));
   if (static_cast<int>(svcgrp.members.size() / 2) != svc_members.size()) {
     objects::release(group);
     throw (engine_error() << "servicegroup '" << svcgrp.name << "' invalid group member.");
@@ -293,15 +239,15 @@ void webservice::create_host(ns1__hostType const& hst) {
     throw (engine_error() << "host '" << hst.name
            << "' no contact or no contact groups are defined.");
 
-  QHash<char, bool> notif_opt = get_options(hst.notificationOptions, "durfs", "n");
+  std::map<char, bool> notif_opt = get_options(hst.notificationOptions, "durfs", "n");
   if (notif_opt.empty())
     throw (engine_error() << "host '" << hst.name << "' invalid notification options.");
 
-  QHash<char, bool> flap_detection_opt = get_options(hst.flapDetectionOptions, "odu", "n");
+  std::map<char, bool> flap_detection_opt = get_options(hst.flapDetectionOptions, "odu", "n");
   if (flap_detection_opt.empty())
     throw (engine_error() << "host '" << hst.name << "' invalid flap detection options.");
 
-  QHash<char, bool> stalk_opt = get_options(hst.stalkingOptions, "odu", "n");
+  std::map<char, bool> stalk_opt = get_options(hst.stalkingOptions, "odu", "n");
   if (stalk_opt.empty())
     throw (engine_error() << "host '" << hst.name << "' invalid stalking options.");
 
@@ -488,17 +434,17 @@ void webservice::create_service(ns1__serviceType const& svc) {
     throw (engine_error() << "service '" << svc.hostName << "', "
            << svc.serviceDescription << "' no contact or no contact groups are defined.");
 
-  QHash<char, bool> notif_opt = get_options(svc.notificationOptions, "wucrfs", "n");
+  std::map<char, bool> notif_opt = get_options(svc.notificationOptions, "wucrfs", "n");
   if (notif_opt.empty())
     throw (engine_error() << "service '" << svc.hostName << ", "
 	   << svc.serviceDescription << "' invalid notification options.");
 
-  QHash<char, bool> stalk_opt = get_options(svc.stalkingOptions, "owuc", "n");
+  std::map<char, bool> stalk_opt = get_options(svc.stalkingOptions, "owuc", "n");
   if (stalk_opt.empty())
     throw (engine_error() << "service '" << svc.hostName << ", "
 	   << svc.serviceDescription << "' invalid stalking options.");
 
-  QHash<char, bool> flap_detection_opt = get_options(svc.flapDetectionOptions, "owuc", "n");
+  std::map<char, bool> flap_detection_opt = get_options(svc.flapDetectionOptions, "owuc", "n");
   if (flap_detection_opt.empty())
     throw (engine_error() << "service '" << svc.hostName << ", "
 	   << svc.serviceDescription << "' invalid flap detection options.");
@@ -674,115 +620,6 @@ void webservice::create_service(ns1__serviceType const& svc) {
 }
 
 /**
- *  Create a new contact into the engine.
- *
- *  @param[in] cntct The struct with all information to create new contact.
- */
-void webservice::create_contact(ns1__contactType const& cntct) {
-  // check all arguments and set default option for optional options.
-  QHash<char, bool> service_opt = get_options(&cntct.serviceNotificationOptions, "rcwufs", "n");
-  if (service_opt.empty())
-    throw (engine_error() << "contact '" << cntct.name
-           << "' invalid service notification options.");
-
-  QHash<char, bool> host_opt = get_options(&cntct.hostNotificationOptions, "rdufs", "n");
-  if (host_opt.empty())
-    throw (engine_error() << "contact '" << cntct.name
-	   << "' invalid host notification options.");
-
-  timeperiod* host_notification_period = find_timeperiod(cntct.hostNotificationPeriod.c_str());
-  if (host_notification_period == NULL)
-    throw (engine_error() << "contact '" << cntct.name
-	   << "' invalid host notification period '" << cntct.hostNotificationPeriod << "'.");
-
-  timeperiod* service_notification_period = find_timeperiod(cntct.serviceNotificationPeriod.c_str());
-  if (service_notification_period == NULL)
-    throw (engine_error() << "contact '" << cntct.name
-	   << "' invalid service notification period '" << cntct.serviceNotificationPeriod << "'.");
-
-  char const* email = (cntct.email ? cntct.email->c_str() : NULL);
-  char const* pager = (cntct.pager ? cntct.pager->c_str() : NULL);
-  char const* alias = (cntct.alias ? cntct.alias->c_str() : NULL);
-  bool can_submit_commands = (cntct.canSubmitCommands
-			      ? *cntct.canSubmitCommands : true);
-  bool retain_status_information = (cntct.retainStatusInformation
-				    ? *cntct.retainStatusInformation : true);
-  bool retain_nonstatus_information = (cntct.retainNonstatusInformation
-				       ? *cntct.retainNonstatusInformation : true);
-
-  // create a address array.
-  QScopedArrayPointer<char const*> address(new char const*[MAX_CONTACT_ADDRESSES]);
-  memset(&(*address), 0, sizeof(*address) * MAX_CONTACT_ADDRESSES);
-  for (unsigned int i = 0, end = cntct.address.size(); i < end; ++i)
-    address[i] = cntct.address[i].c_str();
-
-  // create a new contact.
-  contact* new_cntct = add_contact(cntct.name.c_str(),
-                                   alias,
-                                   email,
-                                   pager,
-                                   (cntct.address.empty() ? NULL : &(*address)),
-                                   cntct.serviceNotificationPeriod.c_str(),
-                                   cntct.hostNotificationPeriod.c_str(),
-                                   service_opt['r'],
-                                   service_opt['c'],
-                                   service_opt['w'],
-                                   service_opt['u'],
-                                   service_opt['f'],
-                                   service_opt['s'],
-                                   host_opt['r'],
-                                   host_opt['d'],
-                                   host_opt['u'],
-                                   host_opt['f'],
-                                   host_opt['s'],
-                                   cntct.hostNotificationsEnabled,
-                                   cntct.serviceNotificationsEnabled,
-                                   can_submit_commands,
-                                   retain_status_information,
-                                   retain_nonstatus_information);
-
-  QVector<contactgroup*> cntct_contactgroups =
-    _find<contactgroup>(cntct.contactgroups, (void* (*)(char const*))&find_contactgroup);
-  if (static_cast<int>(cntct.contactgroups.size()) != cntct_contactgroups.size()) {
-    objects::release(new_cntct);
-    throw (engine_error() << "contact '" << cntct.name << "' invalid contactgroup.");
-  }
-
-  QVector<command*> cntct_host_notification_commands =
-    _find<command>(cntct.hostNotificationCommands, (void* (*)(char const*))&find_command);
-  if (static_cast<int>(cntct.hostNotificationCommands.size())
-      != cntct_host_notification_commands.size()) {
-    objects::release(new_cntct);
-    throw (engine_error() << "contact '" << cntct.name << "' invalid host notification commands.");
-  }
-
-  QVector<command*> cntct_service_notification_commands =
-    _find<command>(cntct.serviceNotificationCommands, (void* (*)(char const*))&find_command);
-  if (static_cast<int>(cntct.serviceNotificationCommands.size())
-      != cntct_service_notification_commands.size()) {
-    objects::release(new_cntct);
-    throw (engine_error() << "contact '" << cntct.name << "' invalid service notification commands.");
-  }
-
-  QVector<QString> cntct_customvar = std2qt(cntct.customVariables);
-
-  try {
-    objects::link(new_cntct,
-                  host_notification_period,
-                  service_notification_period,
-                  cntct_contactgroups,
-                  cntct_host_notification_commands,
-                  cntct_service_notification_commands,
-                  cntct_customvar);
-  }
-  catch (std::exception const& e) {
-    (void)e;
-    objects::release(new_cntct);
-    throw;
-  }
-}
-
-/**
  *  Create a new host dependency into the engine.
  *
  *  @param[in] hostdependency The struct with all information to create new host dependency.
@@ -802,11 +639,11 @@ void webservice::create_host_dependency(ns1__hostDependencyType const& hstdepend
     throw (engine_error() << "hostdependency have no dependency hosts "
            << "and no dependency host groups define.");
 
-  QHash<char, bool> execution_opt = get_options(hstdependency.executionFailureCriteria, "odup", "n");
+  std::map<char, bool> execution_opt = get_options(hstdependency.executionFailureCriteria, "odup", "n");
   if (execution_opt.empty())
     throw (engine_error() << "hostdependency invalid execution failure criteria.");
 
-  QHash<char, bool> notif_opt = get_options(hstdependency.notificationFailureCriteria, "odup", "n");
+  std::map<char, bool> notif_opt = get_options(hstdependency.notificationFailureCriteria, "odup", "n");
   if (notif_opt.empty())
     throw (engine_error() << "hostdependency invalid notification failure criteria.");
 
@@ -912,7 +749,7 @@ void webservice::create_host_escalation(ns1__hostEscalationType const& hstescala
   if (hstescalation.hostsName.empty() == true && hstescalation.hostgroupsName.empty() == true)
     throw (engine_error() << "hostescalation no host and no host groups are defined.");
 
-  QHash<char, bool> escalation_opt = get_options(hstescalation.escalationOptions, "dur" , "n");
+  std::map<char, bool> escalation_opt = get_options(hstescalation.escalationOptions, "dur" , "n");
   if (escalation_opt.empty())
     throw (engine_error() << "hostescalation invalid escalation options.");
 
@@ -996,11 +833,11 @@ void webservice::create_service_dependency(ns1__serviceDependencyType const& svc
     throw (engine_error() << "serviceependency have no dependency hosts "
            << "and no dependency host groups define.");
 
-  QHash<char, bool> execution_opt = get_options(svcdependency.executionFailureCriteria, "owucp", "n");
+  std::map<char, bool> execution_opt = get_options(svcdependency.executionFailureCriteria, "owucp", "n");
   if (execution_opt.empty())
     throw (engine_error() << "servicedependency invalid execution failure criteria.");
 
-  QHash<char, bool> notif_opt = get_options(svcdependency.notificationFailureCriteria, "owucp", "n");
+  std::map<char, bool> notif_opt = get_options(svcdependency.notificationFailureCriteria, "owucp", "n");
   if (notif_opt.empty())
     throw (engine_error() << "servicedependency invalid notification failure criteria.");
 
@@ -1116,7 +953,7 @@ void webservice::create_service_escalation(ns1__serviceEscalationType const& svc
   if (svcescalation.hostsName.empty() == true && svcescalation.hostgroupsName.empty() == true)
     throw (engine_error() << "serviceescalation no host and no host groups are defined.");
 
-  QHash<char, bool> escalation_opt = get_options(svcescalation.escalationOptions, "wucr" , "n");
+  std::map<char, bool> escalation_opt = get_options(svcescalation.escalationOptions, "wucr" , "n");
   if (escalation_opt.empty())
     throw (engine_error() << "serviceescalation invalid escalation options.");
 

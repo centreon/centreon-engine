@@ -1,5 +1,5 @@
 /*
-** Copyright 2011 Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -20,13 +20,17 @@
 #ifndef CCE_MOD_WS_CREATE_OBJECT_HH
 #  define CCE_MOD_WS_CREATE_OBJECT_HH
 
-#  include "soapH.h"
+#  include <map>
+#  include <QString>
+#  include <QVector>
+#  include <string>
 #  include "com/centreon/engine/modules/webservice/namespace.hh"
+#  include "soapH.h"
 
 CCE_MOD_WS_BEGIN()
 
 void create_contact(ns1__contactType const& contact);
-void create_contact_group(ns1__contactGroupType const& contactgroup);
+void create_contactgroup(ns1__contactgroupType const& contactgroup);
 void create_command(ns1__commandType const& command);
 void create_host(ns1__hostType const& host);
 void create_host_dependency(ns1__hostDependencyType const& hostdependency);
@@ -37,6 +41,41 @@ void create_service_dependency(ns1__serviceDependencyType const& servicedependen
 void create_service_escalation(ns1__serviceEscalationType const& serviceescalation);
 void create_service_group(ns1__serviceGroupType const& servicegroup);
 void create_timeperiod(ns1__timeperiodType const& tperiod);
+std::map<char, bool>
+     get_options(
+       std::string const* opt,
+       std::string const& pattern,
+       char const* default_opt);
+QVector<QString>
+     std2qt(std::vector<std::string> const& vec);
+
+/**
+ *  Find objects by name and create a table of it.
+ *
+ *  @param[in]  objs        The object to find.
+ *  @param[in]  find_object The function to find an object.
+ *
+ *  @return The object's table, stop when the first object are not found.
+ */
+template<class T>
+QVector<T*> _find(
+              std::vector<std::string> const& objs,
+              void* (find_object)(char const*)) {
+  QVector<T*> res;
+  res.reserve(objs.size());
+  for (std::vector<std::string>::const_iterator
+         it(objs.begin()),
+         end = objs.end();
+       it != end;
+       ++it) {
+    // Check if the object exists ...
+    void* obj((*find_object)(it->c_str()));
+    if (!obj)
+      return (res);
+    res.push_back(static_cast<T*>(obj));
+  }
+  return (res);
+}
 
 CCE_MOD_WS_END()
 
