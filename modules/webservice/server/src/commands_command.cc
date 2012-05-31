@@ -20,6 +20,7 @@
 #include "com/centreon/engine/commands/set.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/logging/logger.hh"
+#include "com/centreon/engine/modules/webservice/commands.hh"
 #include "com/centreon/engine/modules/webservice/create_object.hh"
 #include "com/centreon/engine/modules/webservice/sync_lock.hh"
 #include "com/centreon/engine/objects.hh"
@@ -60,30 +61,15 @@ int centreonengine__commandAdd(
       centreonengine__commandAddResponse& res) {
   (void)res;
 
-  try {
-    // Wait for thread safeness.
-    sync_lock thread_safeness;
-    logger(dbg_functions, most)
-      << "Webservice: " << __func__ << "(" << command->name.c_str()
-      << ", " << command->commandLine.c_str() << ")";
+  // Begin try block.
+  COMMAND_BEGIN(command->name << ", " << command->commandLine)
 
-    // Create command.
-    create_command(*command);
-  }
+  // Create command.
+  create_command(*command);
+
   // Exception handling.
-  catch (std::exception const& e) {
-    logger(log_runtime_error, more)
-      << "Webservice: " << __func__ << " failed: " << e.what();
-    return (soap_receiver_fault(s, "Runtime error", e.what()));
-  }
-  catch (...) {
-    logger(log_runtime_error, more)
-      << "Webservice: " << __func__ << " failed: unknown exception";
-    return (soap_receiver_fault(
-              s,
-              "Runtime error",
-              "unknown exception"));
-  }
+  COMMAND_END()
+
   return (SOAP_OK);
 }
 
@@ -102,33 +88,18 @@ int centreonengine__commandModify(
       centreonengine__commandModifyResponse& res) {
   (void)res;
 
-  try {
-    // Wait for thread safeness.
-    sync_lock thread_safeness;
-    logger(dbg_functions, most)
-      << "Webservice: " << __func__ << "(" << cmd->name.c_str()
-      << ", " << cmd->commandLine.c_str() << ")";
+  // Begin try block.
+  COMMAND_BEGIN(cmd->name << ", " << cmd->commandLine)
 
-    // Modify command.
-    QSharedPointer<commands::command>
-      modified_cmd(commands::set::instance().get_command(cmd->name.c_str()));
-    modified_cmd->set_command_line(cmd->commandLine.c_str());
-    modify_command(cmd->name.c_str(), cmd->commandLine.c_str());
-  }
+  // Modify command.
+  QSharedPointer<commands::command>
+    modified_cmd(commands::set::instance().get_command(cmd->name.c_str()));
+  modified_cmd->set_command_line(cmd->commandLine.c_str());
+  modify_command(cmd->name.c_str(), cmd->commandLine.c_str());
+
   // Exception handling.
-  catch (std::exception const& e) {
-    logger(log_runtime_error, more)
-      << "Webservice: " << __func__ << " failed: " << e.what();
-    return (soap_receiver_fault(s, "Runtime error", e.what()));
-  }
-  catch (...) {
-    logger(log_runtime_error, more)
-      << "Webservice: " << __func__ << " failed: unknown exception";
-    return (soap_receiver_fault(
-              s,
-              "Runtime error",
-              "unknown exception"));
-  }
+  COMMAND_END()
+
   return (SOAP_OK);
 }
 
@@ -147,43 +118,29 @@ int centreonengine__commandRemove(
       centreonengine__commandRemoveResponse& res) {
   (void)res;
 
-  try {
-    // Wait for thread safeness.
-    sync_lock thread_safeness;
-    logger(dbg_functions, most) << "Webservice: " << __func__
-      << "(" << command_id->command << ")";
+  // Begin try block.
+  COMMAND_BEGIN(command_id->command)
 
-    // Remove command.
-    int ret(remove_command_by_id(command_id->command.c_str()));
-    if (ret != 1) {
-      std::string* error(soap_new_std__string(s, 1));
-      if (!ret)
-        *error = "Command '" + command_id->command + "' not found";
-      else
-        *error = "Command '"
-                 + command_id->command
-                 + "' is still in use, removal refused";
-      logger(dbg_commands, most)
-        << "Webservice: " << __func__ << " failed: " << *error;
-      return (soap_receiver_fault(
-                s,
-                "Invalid arguments",
-                error->c_str()));
-    }
-  }
-  // Exception handling.
-  catch (std::exception const& e) {
-    logger(log_runtime_error, more)
-      << "Webservice: " << __func__ << " failed: " << e.what();
-    return (soap_receiver_fault(s, "Runtime error", e.what()));
-  }
-  catch (...) {
-    logger(log_runtime_error, more)
-      << "Webservice: " << __func__ << " failed: unknown exception";
+  // Remove command.
+  int ret(remove_command_by_id(command_id->command.c_str()));
+  if (ret != 1) {
+    std::string* error(soap_new_std__string(s, 1));
+    if (!ret)
+      *error = "Command '" + command_id->command + "' not found";
+    else
+      *error = "Command '"
+               + command_id->command
+               + "' is still in use, removal refused";
+    logger(dbg_commands, most)
+      << "Webservice: " << __func__ << " failed: " << *error;
     return (soap_receiver_fault(
               s,
-              "Runtime error",
-              "unknown exception"));
+              "Invalid arguments",
+              error->c_str()));
   }
+
+  // Exception handling.
+  COMMAND_END()
+
   return (SOAP_OK);
 }

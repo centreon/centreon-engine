@@ -19,6 +19,7 @@
 
 #include "com/centreon/engine/comments.hh"
 #include "com/centreon/engine/logging/logger.hh"
+#include "com/centreon/engine/modules/webservice/commands.hh"
 #include "com/centreon/engine/modules/webservice/sync_lock.hh"
 #include "soapH.h"
 
@@ -44,55 +45,41 @@ int centreonengine__commentAddToHost(
       ns1__hostIDType* host_id,
       ns1__commentType* comment,
       centreonengine__commentAddToHostResponse& res) {
-  try {
-    // Wait for thread safeness.
-    sync_lock thread_safeness;
-    logger(dbg_functions, most)
-      << "Webservice: " << __func__ << "(" << host_id->name << ")";
+  // Begin try block.
+  COMMAND_BEGIN(host_id->name)
 
-    // Insert new comment.
-    unsigned long comment_id;
-    if (add_new_comment(
-          HOST_COMMENT,
-          USER_COMMENT,
-          host_id->name.c_str(),
-          NULL,
-          time(NULL),
-          comment->author.c_str(),
-          comment->text.c_str(),
-          comment->persistent,
-          COMMENTSOURCE_EXTERNAL,
-          FALSE,
-          0,
-          &comment_id) < 0) {
-      std::string* error(soap_new_std__string(s, 1));
-      *error = "Could not add comment to host '" + host_id->name + "'";
-      logger(log_runtime_error, more)
-        << "Webservice: " << __func__ << " failed: " << *error;
-      return (soap_receiver_fault(
-                s,
-                "Invalid parameter",
-                error->c_str()));
-    }
-
-    // Return comment ID.
-    res.commentid = soap_new_ns1__commentIDType(s, 1);
-    res.commentid->comment = comment_id;
-  }
-  // Exception handling.
-  catch (std::exception const& e) {
+  // Insert new comment.
+  unsigned long comment_id;
+  if (add_new_comment(
+        HOST_COMMENT,
+        USER_COMMENT,
+        host_id->name.c_str(),
+        NULL,
+        time(NULL),
+        comment->author.c_str(),
+        comment->text.c_str(),
+        comment->persistent,
+        COMMENTSOURCE_EXTERNAL,
+        FALSE,
+        0,
+        &comment_id) < 0) {
+    std::string* error(soap_new_std__string(s, 1));
+    *error = "Could not add comment to host '" + host_id->name + "'";
     logger(log_runtime_error, more)
-      << "Webservice: " << __func__ << " failed: " << e.what();
-    return (soap_receiver_fault(s, "Runtime error", e.what()));
-  }
-  catch (...) {
-    logger(log_runtime_error, more)
-      << "Webservice: " << __func__ << " failed: unknown exception";
+      << "Webservice: " << __func__ << " failed: " << *error;
     return (soap_receiver_fault(
               s,
-              "Runtime error",
-              "unknown exception"));
+              "Invalid parameter",
+              error->c_str()));
   }
+
+  // Return comment ID.
+  res.commentid = soap_new_ns1__commentIDType(s, 1);
+  res.commentid->comment = comment_id;
+
+  // Exception handling.
+  COMMAND_END()
+
   return (SOAP_OK);
 }
 
@@ -115,60 +102,45 @@ int centreonengine__commentAddToService(
       ns1__serviceIDType* service_id,
       ns1__commentType* comment,
       centreonengine__commentAddToServiceResponse& res) {
-  try {
-    // Wait for thread safeness.
-    sync_lock thread_safeness;
-    logger(dbg_functions, most)
-      << "Webservice: " << __func__ << "(" << service_id->host
-      << ", " << service_id->service << ")";
+  // Begin try block.
+  COMMAND_BEGIN(service_id->host << ", " << service_id->service)
 
-    // Insert new comment.
-    unsigned long comment_id;
-    if (add_new_comment(
-          SERVICE_COMMENT,
-          USER_COMMENT,
-          service_id->host->name.c_str(),
-          service_id->service.c_str(),
-          time(NULL),
-          comment->author.c_str(),
-          comment->text.c_str(),
-          comment->persistent,
-          COMMENTSOURCE_EXTERNAL,
-          FALSE,
-          0,
-          &comment_id) < 0) {
-      std::string* error(soap_new_std__string(s, 1));
-      *error = "Could not add comment to service '"
-        + service_id->service
-        + "' of host '"
-        + service_id->host->name
-        + "'";
-      logger(log_runtime_error, more)
-        << "Webservice: " << __func__ << " failed: " << *error;
-      return (soap_receiver_fault(
-                s,
-                "Invalid parameter",
-                error->c_str()));
-    }
-
-    // Return comment ID.
-    res.commentid = soap_new_ns1__commentIDType(s, 1);
-    res.commentid->comment = comment_id;
-  }
-  // Exception handling.
-  catch (std::exception const& e) {
+  // Insert new comment.
+  unsigned long comment_id;
+  if (add_new_comment(
+        SERVICE_COMMENT,
+        USER_COMMENT,
+        service_id->host->name.c_str(),
+        service_id->service.c_str(),
+        time(NULL),
+        comment->author.c_str(),
+        comment->text.c_str(),
+        comment->persistent,
+        COMMENTSOURCE_EXTERNAL,
+        FALSE,
+        0,
+        &comment_id) < 0) {
+    std::string* error(soap_new_std__string(s, 1));
+    *error = "Could not add comment to service '"
+      + service_id->service
+      + "' of host '"
+      + service_id->host->name
+      + "'";
     logger(log_runtime_error, more)
-      << "Webservice: " << __func__ << " failed: " << e.what();
-    return (soap_receiver_fault(s, "Runtime error", e.what()));
-  }
-  catch (...) {
-    logger(log_runtime_error, more)
-      << "Webservice: " << __func__ << " failed: unknown exception";
+      << "Webservice: " << __func__ << " failed: " << *error;
     return (soap_receiver_fault(
               s,
-              "Runtime error",
-              "unknown exception"));
+              "Invalid parameter",
+              error->c_str()));
   }
+
+  // Return comment ID.
+  res.commentid = soap_new_ns1__commentIDType(s, 1);
+  res.commentid->comment = comment_id;
+
+  // Exception handling.
+  COMMAND_END()
+
   return (SOAP_OK);
 }
 
@@ -187,31 +159,17 @@ int centreonengine__commentDelete(
       centreonengine__commentDeleteResponse& res) {
   (void)res;
 
-  try {
-    // Wait for thread safeness.
-    sync_lock thread_safeness;
-    logger(dbg_functions, most)
-      << "Webservice: " << __func__ << "(" << comment_id->comment << ")";
+  // Begin try block.
+  COMMAND_BEGIN(comment_id->comment)
 
-    // Delete comment.
-    // XXX: don't know which one to delete so delete both
-    delete_host_comment(comment_id->comment);
-    delete_service_comment(comment_id->comment);
-  }
+  // Delete comment.
+  // XXX: don't know which one to delete so delete both
+  delete_host_comment(comment_id->comment);
+  delete_service_comment(comment_id->comment);
+
   // Exception handling.
-  catch (std::exception const& e) {
-    logger(log_runtime_error, more)
-      << "Webservice: " << __func__ << " failed: " << e.what();
-    return (soap_receiver_fault(s, "Runtime error", e.what()));
-  }
-  catch (...) {
-    logger(log_runtime_error, more)
-      << "Webservice: " << __func__ << " failed: unknown exception";
-    return (soap_receiver_fault(
-              s,
-              "Runtime error",
-              "unknown exception"));
-  }
+  COMMAND_END()
+
   return (SOAP_OK);
 }
 
@@ -230,29 +188,15 @@ int centreonengine__commentDeleteAllOfHost(
       centreonengine__commentDeleteAllOfHostResponse& res) {
   (void)res;
 
-  try {
-    // Wait for thread safeness.
-    sync_lock thread_safeness;
-    logger(dbg_functions, most)
-      << "Webservice: " << __func__ << "(" << host_id->name << ")";
+  // Begin try block.
+  COMMAND_BEGIN(host_id->name)
 
-    // Delete comments.
-    delete_all_comments(HOST_COMMENT, host_id->name.c_str(), NULL);
-  }
+  // Delete comments.
+  delete_all_comments(HOST_COMMENT, host_id->name.c_str(), NULL);
+
   // Exception handling.
-  catch (std::exception const& e) {
-    logger(log_runtime_error, more)
-      << "Webservice: " << __func__ << " failed: " << e.what();
-    return (soap_receiver_fault(s, "Runtime error", e.what()));
-  }
-  catch (...) {
-    logger(log_runtime_error, more)
-      << "Webservice: " << __func__ << " failed: unknown exception";
-    return (soap_receiver_fault(
-              s,
-              "Runtime error",
-              "unknown exception"));
-  }
+  COMMAND_END()
+
   return (SOAP_OK);
 }
 
@@ -271,32 +215,17 @@ int centreonengine__commentDeleteAllOfService(
       centreonengine__commentDeleteAllOfServiceResponse& res) {
   (void)res;
 
-  try {
-    // Wait for thread safeness.
-    sync_lock thread_safeness;
-    logger(dbg_functions, most)
-      << "Webservice: " << __func__ << "(" << service_id->host->name
-      << ", " << service_id->service << ")";
+  // Begin try block.
+  COMMAND_BEGIN(service_id->host->name << ", " << service_id->service)
 
-    // delete comments.
-    delete_all_comments(
-      SERVICE_COMMENT,
-      service_id->host->name.c_str(),
-      service_id->service.c_str());
-  }
+  // Delete comments.
+  delete_all_comments(
+    SERVICE_COMMENT,
+    service_id->host->name.c_str(),
+    service_id->service.c_str());
+
   // Exception handling.
-  catch (std::exception const& e) {
-    logger(log_runtime_error, more)
-      << "Webservice: " << __func__ << " failed: " << e.what();
-    return (soap_receiver_fault(s, "Runtime error", e.what()));
-  }
-  catch (...) {
-    logger(log_runtime_error, more)
-      << "Webservice: " << __func__ << " failed: unknown exception";
-    return (soap_receiver_fault(
-              s,
-              "Runtime error",
-              "unknown exception"));
-  }
+  COMMAND_END()
+
   return (SOAP_OK);
 }
