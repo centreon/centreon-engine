@@ -174,13 +174,14 @@ arg_definition::arg_definition() {
     .set_is_optional(true);
 
   argument contactgroup_id("ns1__contactgroupIDType", "contactgroup");
-  contactgroup_id.add(arg_string).set_name("contactgroup")
+  contactgroup_id.add(arg_string).set_name("name")
     .set_help("contactgroup_id");
 
   argument contactgroup_type("ns1__contactgroupType", "contactgroup");
   contactgroup_type.add(arg_string).set_name("name");
-  contactgroup_type.add(arg_string).set_name("alias");
-  contactgroup_type.add(arg_vectorstr).set_name("members")
+  contactgroup_type.add(arg_string).set_name("alias")
+    .set_is_optional(true);
+  contactgroup_type.add(arg_vectorstr).set_name("contactMembers")
     .set_is_optional(true)
     .set_is_array(true);
   contactgroup_type.add(arg_vectorstr).set_name("contactgroupMembers")

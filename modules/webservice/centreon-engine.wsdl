@@ -72,7 +72,7 @@
       <!-- Contactgroup identifier. -->
       <complexType name="contactgroupIDType">
         <sequence>
-          <element name="contactgroup" type="xsd:string"/>
+          <element name="name" type="xsd:string"/>
         </sequence>
       </complexType>
 
@@ -80,8 +80,8 @@
       <complexType name="contactgroupType">
         <sequence>
           <element name="name" type="xsd:string"/>
-          <element name="alias" type="xsd:string"/>
-	  <element name="members" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
+          <element name="alias" type="xsd:string" minOccurs="0"/>
+	  <element name="contactMembers" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
 	  <element name="contactgroupMembers" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
         </sequence>
       </complexType>
@@ -559,14 +559,26 @@
 	 Contact Group Messages.
   -->
 
-  <!-- Message sent when executing an operation on a contact group. -->
-  <message name="contactgroupRequest">
+  <!-- Add/remove contact membership. -->
+  <message name="contactgroupContactRequest">
     <part name="contactgroup" type="tns:contactgroupIDType"/>
+    <part name="member" type="tns:contactIDType"/>
+  </message>
+
+  <!-- Add/remove contact group membership. -->
+  <message name="contactgroupContactgroupRequest">
+    <part name="contactgroup" type="tns:contactgroupIDType"/>
+    <part name="member" type="tns:contactgroupIDType"/>
   </message>
 
   <!-- Add/modify contact group request. -->
   <message name="contactgroupFullRequest">
     <part name="contactgroup" type="tns:contactgroupType"/>
+  </message>
+
+  <!-- Message sent when executing an operation on a contact group. -->
+  <message name="contactgroupRequest">
+    <part name="contactgroup" type="tns:contactgroupIDType"/>
   </message>
 
   <!--
@@ -2106,6 +2118,20 @@
       <output message="tns:defaultResponse"/>
     </operation>
 
+    <!-- contactgroupAddContact(contactgroup_id, contact_id) -->
+    <operation name="contactgroupAddContact">
+      <documentation>Add a contact to the contact group.</documentation>
+      <input message="tns:contactgroupContactRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- contactgroupAddContactgroup(contactgroup_id, contactgroup_id) -->
+    <operation name="contactgroupAddContactgroup">
+      <documentation>Add a contact group to the contact group.</documentation>
+      <input message="tns:contactgroupContactgroupRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
     <!-- contactgroupModify(contactgroup) -->
     <operation name="contactgroupModify">
       <documentation>Modify an existing contact group.</documentation>
@@ -2115,8 +2141,15 @@
 
     <!-- contactgroupRemove(contactgroup_id) -->
     <operation name="contactgroupRemove">
-      <documentation>Remove acontact group.</documentation>
+      <documentation>Remove a contact group.</documentation>
       <input message="tns:contactgroupRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- contactgroupRemoveContact(contactgroup_id, contact_id) -->
+    <operation name="contactgroupRemoveContact">
+      <documentation>Remove a contact member.</documentation>
+      <input message="tns:contactgroupContactRequest"/>
       <output message="tns:defaultResponse"/>
     </operation>
 
@@ -5424,6 +5457,18 @@
       <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
     </operation>
 
+    <operation name="contactgroupAddContact">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="contactgroupAddContactgroup">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
     <operation name="contactgroupModify">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
@@ -5431,6 +5476,12 @@
     </operation>
 
     <operation name="contactgroupRemove">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="contactgroupRemoveContact">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
       <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>

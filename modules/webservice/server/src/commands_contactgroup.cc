@@ -17,6 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/modules/webservice/commands.hh"
@@ -26,6 +27,7 @@
 #include "com/centreon/engine/objects/contactgroup.hh"
 #include "soapH.h"
 
+using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;
 using namespace com::centreon::engine::modules;
 using namespace com::centreon::engine::modules::webservice;
@@ -40,14 +42,16 @@ void webservice::create_contactgroup(
   // Create a new contactgroup.
   contactgroup* group(add_contactgroup(
                         cntctgrp.name.c_str(),
-                        cntctgrp.alias.c_str()));
+                        (cntctgrp.alias && !cntctgrp.alias->empty())
+                        ? cntctgrp.alias->c_str()
+                        : cntctgrp.name.c_str()));
 
   // Add all contacts into the contactgroup.
   QVector<contact*>
     cntct_members(_find<contact>(
-                    cntctgrp.members,
+                    cntctgrp.contactMembers,
                     (void* (*)(char const*))&find_contact));
-  if (cntctgrp.members.size()
+  if (cntctgrp.contactMembers.size()
       != static_cast<size_t>(cntct_members.size())) {
     objects::release(group);
     throw (engine_error() << "contactgroup '" << cntctgrp.name
@@ -95,10 +99,108 @@ int centreonengine__contactgroupAdd(
   (void)res;
 
   // Begin try block.
-  COMMAND_BEGIN(cntctgrp->name << ", " << cntctgrp->alias)
+  COMMAND_BEGIN(cntctgrp->name)
 
   // Create contact group.
   create_contactgroup(*cntctgrp);
+
+  // Exception handling.
+  COMMAND_END()
+
+  return (SOAP_OK);
+}
+
+/**
+ *  Add a contact to a contactgroup.
+ *
+ *  @param[in]  s           SOAP object.
+ *  @param[in]  cntctgrp_id Target contact group.
+ *  @param[in]  cntct_id    Target contact.
+ *  @param[out] res         Unused.
+ *
+ *  @return SOAP_OK on success.
+ */
+int centreonengine__contactgroupAddContact(
+      soap* s,
+      ns1__contactgroupIDType* cntctgrp_id,
+      ns1__contactIDType* cntct_id,
+      centreonengine__contactgroupAddContactResponse& res) {
+  (void)res;
+
+  // Begin try block.
+  COMMAND_BEGIN(cntctgrp_id->name << ", " << cntct_id->contact)
+
+  // Find target contact group.
+  contactgroup* cntctgrp(find_contactgroup(cntctgrp_id->name.c_str()));
+  if (!cntctgrp)
+    throw (engine_error() << "cannot link contact '"
+           << cntct_id->contact << "' to non-existent contact group '"
+           << cntctgrp_id->name << "'");
+
+  // Find target contact.
+  contact* cntct(find_contact(cntct_id->contact.c_str()));
+  if (!cntct)
+    throw (engine_error() << "cannot link non-existent contact '"
+           << cntct_id->contact << "' to contact group '"
+           << cntctgrp_id->name << "'");
+
+  // Member array.
+  QVector<contact*> member;
+  member.push_back(cntct);
+
+  // Link contact group to contacts.
+  objects::link(cntctgrp, member, QVector<contactgroup*>());
+
+  // Exception handling.
+  COMMAND_END()
+
+  return (SOAP_OK);
+}
+
+/**
+ *  Add a contactgroup to another contactgroup.
+ *
+ *  @param[in]  s                  SOAP object.
+ *  @param[in]  parent_cntctgrp_id Parent contact group.
+ *  @param[in]  child_cntctgrp_id  Child contact group.
+ *  @param[out] res                Unused.
+ *
+ *  @return SOAP_OK on success.
+ */
+int centreonengine__contactgroupAddContactgroup(
+      soap* s,
+      ns1__contactgroupIDType* parent_cntctgrp_id,
+      ns1__contactgroupIDType* child_cntctgrp_id,
+      centreonengine__contactgroupAddContactgroupResponse& res) {
+  (void)res;
+
+  // Begin try block.
+  COMMAND_BEGIN(parent_cntctgrp_id->name << ", " 
+                << child_cntctgrp_id->name)
+
+  // Find parent contact group.
+  contactgroup*
+    parent_grp(find_contactgroup(parent_cntctgrp_id->name.c_str()));
+  if (!parent_grp)
+    throw (engine_error() << "cannot link contact group '"
+           << child_cntctgrp_id->name
+           << "' to non-existent contact group '"
+           << parent_cntctgrp_id->name << "'");
+
+  // Find child contact group.
+  contactgroup*
+    child_grp(find_contactgroup(child_cntctgrp_id->name.c_str()));
+  if (!child_grp)
+    throw (engine_error() << "cannot link non-existent contact group '"
+           << child_cntctgrp_id->name << "' to contact group '"
+           << parent_cntctgrp_id->name << "'");
+
+  // Member array.
+  QVector<contactgroup*> member;
+  member.push_back(child_grp);
+
+  // Link contact groups.
+  objects::link(parent_grp, QVector<contact*>(), member);
 
   // Exception handling.
   COMMAND_END()
@@ -124,6 +226,19 @@ int centreonengine__contactgroupModify(
   // Begin try block.
   COMMAND_BEGIN(cntctgrp->name)
 
+  // Find target contact group.
+  contactgroup* grp(find_contactgroup(cntctgrp->name.c_str()));
+
+  // Update alias.
+  if (cntctgrp->alias) {
+    delete [] grp->alias;
+    grp->alias = my_strdup(cntctgrp->alias->c_str());
+  }
+
+  // Update contact members.
+  // XXX
+
+  // Update contact group members.
   // XXX
 
   // Exception handling.
@@ -148,14 +263,14 @@ int centreonengine__contactgroupRemove(
   (void)res;
 
   // Begin try block.
-  COMMAND_BEGIN(contactgroup_id->contactgroup)
+  COMMAND_BEGIN(contactgroup_id->name)
 
   // Remove contact group.
   if (!remove_contactgroup_by_id(
-         contactgroup_id->contactgroup.c_str())) {
+         contactgroup_id->name.c_str())) {
     std::string* error(soap_new_std__string(s, 1));
     *error = "contact group '"
-             + contactgroup_id->contactgroup
+             + contactgroup_id->name
              + "' not found";
     logger(log_runtime_error, more)
       << "Webservice: " << __func__ << " failed: " << *error;
@@ -163,6 +278,73 @@ int centreonengine__contactgroupRemove(
               s,
               "Invalid parameter",
               error->c_str()));
+  }
+
+  // Exception handling.
+  COMMAND_END()
+
+  return (SOAP_OK);
+}
+
+/**
+ *  Remove a contact from a contactgroup.
+ *
+ *  @param[in]  s           SOAP object.
+ *  @param[in]  cntctgrp_id Target contact group.
+ *  @param[in]  cntct_id    Target contact.
+ *  @param[out] res         Unused.
+ *
+ *  @return SOAP_OK on success.
+ */
+int centreonengine__contactgroupRemoveContact(
+      soap* s,
+      ns1__contactgroupIDType* cntctgrp_id,
+      ns1__contactIDType* cntct_id,
+      centreonengine__contactgroupRemoveContactResponse& res) {
+  (void)res;
+
+  // Begin try block.
+  COMMAND_BEGIN(cntctgrp_id->name << ", " << cntct_id->contact)
+
+  // Find target contact group.
+  contactgroup* cntctgrp(find_contactgroup(cntctgrp_id->name.c_str()));
+  if (!cntctgrp)
+    throw (engine_error() << "cannot remove contact '"
+           << cntct_id->contact << "' from non-existent contact group '"
+           << cntctgrp_id->name << "'");
+
+  // Find contact member.
+  contactsmember* current;
+  contactsmember* prev;
+  for (current = cntctgrp->members, prev = NULL;
+       current;
+       prev = current, current = current->next)
+    if (!strcmp(current->contact_ptr->name, cntct_id->contact.c_str()))
+      break ;
+  if (current) {
+    // Notify event broker.
+    timeval tv(get_broker_timestamp(NULL));
+    broker_group_member(
+      NEBTYPE_CONTACTGROUPMEMBER_DELETE,
+      NEBFLAG_NONE,
+      NEBATTR_NONE,
+      cntctgrp,
+      current->contact_ptr,
+      &tv);
+
+    // Backup contact.
+    contact* cntct(current->contact_ptr);
+
+    // Remove link from group to contact.
+    if (prev)
+      prev->next = current->next;
+    else
+      cntctgrp->members = NULL;
+    delete [] current->contact_name;
+    delete current;
+
+    // Remove link from contact to group.
+    remove_object_to_objectlist(&cntct->contactgroups_ptr, cntctgrp);
   }
 
   // Exception handling.
