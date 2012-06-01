@@ -1,5 +1,5 @@
 /*
-** Copyright 2011 Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -115,12 +115,20 @@ arg_definition::arg_definition() {
   command_type.add(arg_string).set_name("commandLine")
     .set_help("command_line");
 
+  argument comment_id("ns1__commentIDType", "comment");
+  comment_id.add(arg_ulong64).set_name("comment");
+
+  argument comment("ns1__commentType", "comment");
+  comment.add(arg_string).set_name("author");
+  comment.add(arg_string).set_name("text");
+  comment.add(arg_bool).set_name("persistent");
+
   argument contact_id("ns1__contactIDType", "contact");
-  contact_id.add(arg_string).set_name("contact")
+  contact_id.add(arg_string).set_name("name")
     .set_help("contact_id");
 
   argument contact_type("ns1__contactType", "contact");
-  contact_type.add(arg_string).set_name("name");
+  contact_type.add(contact_id).set_name("id");
   contact_type.add(arg_bool).set_name("hostNotificationsEnabled")
     .set_help("host_notifications_enabled");
   contact_type.add(arg_bool).set_name("serviceNotificationsEnabled")
@@ -165,14 +173,15 @@ arg_definition::arg_definition() {
     .set_help("retain_nonstatus_information")
     .set_is_optional(true);
 
-  argument contactgroup_id("ns1__contactGroupIDType", "contactGroup");
+  argument contactgroup_id("ns1__contactgroupIDType", "contactgroup");
   contactgroup_id.add(arg_string).set_name("name")
     .set_help("contactgroup_id");
 
-  argument contactgroup_type("ns1__contactGroupType", "contactGroup");
+  argument contactgroup_type("ns1__contactgroupType", "contactgroup");
   contactgroup_type.add(arg_string).set_name("name");
-  contactgroup_type.add(arg_string).set_name("alias");
-  contactgroup_type.add(arg_vectorstr).set_name("members")
+  contactgroup_type.add(arg_string).set_name("alias")
+    .set_is_optional(true);
+  contactgroup_type.add(arg_vectorstr).set_name("contactMembers")
     .set_is_optional(true)
     .set_is_array(true);
   contactgroup_type.add(arg_vectorstr).set_name("contactgroupMembers")
@@ -195,6 +204,7 @@ arg_definition::arg_definition() {
   argument host_id("ns1__hostIDType", "host");
   host_id.add(arg_string).set_name("name")
     .set_help("host_id");
+  argument vector_host_id("std::vector<ns1__hostIDType>", "value");
 
   argument host_type("ns1__hostType", "host");
   host_type.add(arg_string).set_name("name");
@@ -375,14 +385,16 @@ arg_definition::arg_definition() {
     .set_help("escalation_options")
     .set_is_optional(true);
 
-  argument hostgroup_id("ns1__hostGroupIDType", "hostGroup");
+  argument hostgroup_id("ns1__hostgroupIDType", "hostgroup");
   hostgroup_id.add(arg_string).set_name("name")
     .set_help("hostgroup_id");
+  argument vector_hostgroup_id("std::vector<ns1__hostgroupIDType>", "value");
 
-  argument hostgroup_type("ns1__hostGroupType", "hostGroup");
-  hostgroup_type.add(arg_string).set_name("name");
-  hostgroup_type.add(arg_string).set_name("alias");
-  hostgroup_type.add(arg_vectorstr).set_name("members")
+  argument hostgroup_type("ns1__hostgroupType", "hostgroup");
+  hostgroup_type.add(hostgroup_id).set_name("id");
+  hostgroup_type.add(arg_string).set_name("alias")
+    .set_is_optional(true);
+  hostgroup_type.add(arg_vectorstr).set_name("hostMembers")
     .set_is_optional(true)
     .set_is_array(true);
   hostgroup_type.add(arg_vectorstr).set_name("hostgroupMembers")
@@ -409,6 +421,7 @@ arg_definition::arg_definition() {
   service_id.add(host_id).set_name("host");
   service_id.add(arg_string).set_name("service")
     .set_help("service_id");
+  argument vector_service_id("std::vector<ns1__serviceIDType>", "value");
 
   argument service_type("ns1__serviceType", "service");
   service_type.add(arg_string).set_name("hostName")
@@ -525,13 +538,15 @@ arg_definition::arg_definition() {
     .set_help("icon_image_alt")
     .set_is_optional(true);
 
-  argument servicegroup_id("ns1__serviceGroupIDType", "serviceGroup");
+  argument servicegroup_id("ns1__servicegroupIDType", "servicegroup");
   servicegroup_id.add(arg_string).set_name("name").set_help("servicegroup_id");
+  argument vector_servicegroup_id("std::vector<ns1__servicegroupIDType>", "value");
 
-  argument servicegroup_type("ns1__serviceGroupType", "serviceGroup");
-  servicegroup_type.add(arg_string).set_name("name");
-  servicegroup_type.add(arg_string).set_name("alias");
-  servicegroup_type.add(arg_vectorstr).set_name("members")
+  argument servicegroup_type("ns1__servicegroupType", "servicegroup");
+  servicegroup_type.add(servicegroup_id).set_name("id");
+  servicegroup_type.add(arg_string).set_name("alias")
+    .set_is_optional(true);
+  servicegroup_type.add(arg_vectorstr).set_name("serviceMembers")
     .set_is_optional(true)
     .set_is_array(true);
   servicegroup_type.add(arg_vectorstr).set_name("servicegroupMembers")
@@ -656,6 +671,8 @@ arg_definition::arg_definition() {
   _list.push_back(command_id);
   _list.push_back(resource_id);
   _list.push_back(command_type);
+  _list.push_back(comment_id);
+  _list.push_back(comment);
   _list.push_back(contact_id);
   _list.push_back(contact_type);
   _list.push_back(contactgroup_id);

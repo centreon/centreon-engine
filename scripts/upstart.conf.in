@@ -9,7 +9,7 @@ stop on runlevel [!2345]
 
 respawn
 
-env HOME=@confdir@
+env HOME=@PREFIX_CONF@
 umask 007
 
 # Default of 5 seconds is too low.
@@ -18,7 +18,6 @@ kill timeout 180
 pre-start script
     # Sanity checks.
     [ -r "$HOME/centengine.cfg" ]
-#    [ -d /var/run/mysqld ] || install -m 755 -o mysql -g root -d /var/run/mysqld
 end script
 
-exec sudo -g @GROUP@ -u @USER@ -- @bindir@/centengine "$HOME/centengine.cfg"
+exec sudo -g @GROUP@ -u @USER@ -- @PREFIX_BIN@/centengine "$HOME/centengine.cfg"

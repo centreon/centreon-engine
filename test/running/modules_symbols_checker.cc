@@ -63,6 +63,9 @@ extern "C" {
     try {
       // Load module with required symbols.
       QLibrary lib(args);
+      lib.setLoadHints(
+            QLibrary::ResolveAllSymbolsHint
+            | QLibrary::ExportExternalSymbolsHint);
       if (lib.load()) {
         exitcode = EXIT_SUCCESS;
       }

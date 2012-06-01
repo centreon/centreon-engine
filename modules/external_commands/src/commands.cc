@@ -104,25 +104,33 @@ int check_for_external_commands(void) {
   return (OK);
 }
 
-/* processes all external commands in a (regular) file */
-int process_external_commands_from_file(char* fname, int delete_file) {
+/**
+ *  Processes all external commands in a (regular) file.
+ *
+ *  @param[in] file        File to process.
+ *  @param[in] delete_file If non-zero, delete file after all commands
+ *                         have been processed.
+ *
+ *  @return OK on success.
+ */
+int process_external_commands_from_file(char const* file, int delete_file) {
   mmapfile* thefile = NULL;
   char* input = NULL;
 
   logger(dbg_functions, basic) << "process_external_commands_from_file()";
 
-  if (fname == NULL)
+  if (!file)
     return (ERROR);
 
   logger(dbg_external_command, more)
-    << "Processing commands from file '" << fname
+    << "Processing commands from file '" << file
     << "'.  File will " << (delete_file == TRUE ? "be" : "NOT be")
     << " deleted after processing.";
 
   /* open the config file for reading */
-  if ((thefile = mmap_fopen(fname)) == NULL) {
+  if ((thefile = mmap_fopen(file)) == NULL) {
     logger(log_info_message, basic)
-      << "Error: Cannot open file '" << fname
+      << "Error: Cannot open file '" << file
       << "' to process external commands!";
     return (ERROR);
   }
@@ -146,7 +154,7 @@ int process_external_commands_from_file(char* fname, int delete_file) {
 
   /* delete the file */
   if (delete_file == TRUE)
-    unlink(fname);
+    unlink(file);
 
   return (OK);
 }

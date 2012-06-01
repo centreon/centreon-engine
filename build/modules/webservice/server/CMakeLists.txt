@@ -58,7 +58,14 @@ add_library("webservice" SHARED
   ${QT_WS_MOC_FILES}
   # Sources.
   "${SRC_DIR}/commands.cc"
+  "${SRC_DIR}/commands_command.cc"
+  "${SRC_DIR}/commands_comment.cc"
   "${SRC_DIR}/commands_configuration.cc"
+  "${SRC_DIR}/commands_contact.cc"
+  "${SRC_DIR}/commands_contactgroup.cc"
+  "${SRC_DIR}/commands_hostgroup.cc"
+  "${SRC_DIR}/commands_misc.cc"
+  "${SRC_DIR}/commands_servicegroup.cc"
   "${SRC_DIR}/configuration.cc"
   "${SRC_DIR}/configuration/save/objects.cc"
   "${SRC_DIR}/configuration/save/resource.cc"
@@ -67,7 +74,8 @@ add_library("webservice" SHARED
   "${SRC_DIR}/main.cc"
   "${SRC_DIR}/schedule_object.cc"
   "${SRC_DIR}/ssl.cc"
-  "${SRC_DIR}/syncro.cc"
+  "${SRC_DIR}/sync.cc"
+  "${SRC_DIR}/sync_lock.cc"
   "${SRC_DIR}/webservice.cc"
   # Headers.
   "${INC_DIR}/configuration.hh"
@@ -77,7 +85,8 @@ add_library("webservice" SHARED
   "${INC_DIR}/create_object.hh"
   "${INC_DIR}/schedule_object.hh"
   "${INC_DIR}/ssl.hh"
-  "${INC_DIR}/syncro.hh"
+  "${INC_DIR}/sync.hh"
+  "${INC_DIR}/sync_lock.hh"
   "${INC_DIR}/webservice.hh"
 )
 

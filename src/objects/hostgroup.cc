@@ -17,6 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
@@ -78,37 +79,65 @@ void release_hostgroup(hostgroup const* obj) {
  *  @param[in]     members The table with hosts member name.
  *  @param[in]     groups  The table with host groups member name.
  */
-void objects::link(hostgroup* obj,
-                   QVector<host*> const& members,
-                   QVector<hostgroup*> const& groups) {
-  // check object contents.
-  if (obj == NULL)
-    throw (engine_error() << "hostgroup is a NULL pointer.");
-  if (obj->group_name == NULL)
-    throw (engine_error() << "hostgroup invalid group name.");
+void objects::link(
+                hostgroup* obj,
+                QVector<host*> const& members,
+                QVector<hostgroup*> const& groups) {
+  // Check object contents.
+  if (!obj)
+    throw (engine_error() << "hostgroup is a NULL pointer");
+  if (!obj->group_name)
+    throw (engine_error() << "hostgroup invalid group name");
 
-  // add all host into the hostgroup.
-  if (members.empty() || add_hosts_to_object(members, &obj->members) == false)
-    throw (engine_error() << "hostgroup '" << obj->group_name << "' invalid member.");
+  // Add all hosts into the hostgroup.
+  if (!add_hosts_to_object(members, &obj->members))
+    throw (engine_error() << "hostgroup '" << obj->group_name
+           << "' invalid member");
 
-  // add the content of other hostgroups into this hostgroup.
-  for (QVector<hostgroup*>::const_iterator it = groups.begin(),
-	 end = groups.end();
+  // Broker timestamp.
+  timeval tv(get_broker_timestamp(NULL));
+
+  // Browse hosts.
+  for (QVector<host*>::const_iterator
+         it(members.begin()),
+         end(members.end());
        it != end;
        ++it) {
-    if (*it == NULL)
-      throw (engine_error() << "hostgroup '" << obj->group_name << "' invalid group member.");
+    // Link host group to host.
+    add_object_to_objectlist(&(*it)->hostgroups_ptr, obj);
 
-    hostsmember* hstmembers = (*it)->members;
-    while (hstmembers) {
-      hostsmember* member = add_host_to_hostgroup(obj, hstmembers->host_name);
-      member->host_ptr = hstmembers->host_ptr;
-      hstmembers = hstmembers->next;
-    }
+    // Notify event broker of new member.
+    broker_group_member(
+      NEBTYPE_HOSTGROUPMEMBER_ADD,
+      NEBFLAG_NONE,
+      NEBATTR_NONE,
+      obj,
+      *it,
+      &tv);
   }
 
-  for (hostsmember const* hm = obj->members; hm != NULL; hm = hm->next)
-    add_object_to_objectlist(&hm->host_ptr->hostgroups_ptr, obj);
+  // Add the content of other hostgroups into this hostgroup.
+  QVector<host*> other_members;
+  for (QVector<hostgroup*>::const_iterator
+         it(groups.begin()),
+         end(groups.end());
+       it != end;
+       ++it) {
+    if (!*it)
+      throw (engine_error() << "hostgroup '" << obj->group_name
+             << "' invalid group member");
+    // Browse members.
+    for (hostsmember* mbr((*it)->members);
+         mbr;
+         mbr = mbr->next)
+      other_members.push_back(mbr->host_ptr);
+  }
+
+  // Recursive call.
+  if (!other_members.isEmpty())
+    objects::link(obj, other_members, QVector<hostgroup*>());
+
+  return ;
 }
 
 /**

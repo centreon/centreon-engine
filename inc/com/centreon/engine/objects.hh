@@ -896,6 +896,11 @@ timerange*             add_timerange_to_timeperiod(
                          unsigned long end_time);
 
 /*
+** Object modification functions.
+*/
+int modify_command(char const* name, char const* value);
+
+/*
 ** Object cleanup functions.
 */
 /* Frees all allocated memory for the object definitions. */

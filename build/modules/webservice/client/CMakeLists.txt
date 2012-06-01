@@ -23,7 +23,8 @@ set(INC_DIR "${MODULE_DIR}/client/inc/com/centreon/engine/modules/webservice")
 
 # Generate webservice header from WSDL.
 add_custom_command(OUTPUT "${MODULE_DIR}/client/centreon-engine-ws.hh"
-  COMMAND "${WSDL2H_PROGRAM}" "-o" "${MODULE_DIR}/client/centreon-engine-ws.hh" "-t${MODULE_DIR}/typemap.dat" "${MODULE_DIR}/centreon-engine.wsdl")
+  COMMAND "${WSDL2H_PROGRAM}" "-o" "${MODULE_DIR}/client/centreon-engine-ws.hh" "-t${MODULE_DIR}/typemap.dat" "${MODULE_DIR}/centreon-engine.wsdl"
+  DEPENDS "${MODULE_DIR}/centreon-engine.wsdl" "${MODULE_DIR}/typemap.dat")
 
 # Generate webservice sources from header.
 add_custom_command(OUTPUT
@@ -40,8 +41,7 @@ add_custom_command(OUTPUT
   "${MODULE_DIR}/client/auto_gen.cc"
   "${MODULE_DIR}/client/auto_gen.hh"
   COMMAND "ws_stub_builder" "${MODULE_DIR}/client/soapStub.h" "${MODULE_DIR}/client/auto_gen.hh" "${MODULE_DIR}/client/auto_gen.cc"
-  DEPENDS "${MODULE_DIR}/client/soapStub.h"
-  "ws_stub_builder")
+  DEPENDS "${MODULE_DIR}/client/soapStub.h" "ws_stub_builder")
 
 # Include directories.
 include_directories("${MODULE_DIR}/client")

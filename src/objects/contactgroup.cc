@@ -17,6 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
@@ -77,36 +78,65 @@ void release_contactgroup(contactgroup const* obj) {
  *  @param[in]     members The table with contacts member name.
  *  @param[in]     groups  The table with contact groups member name.
  */
-void objects::link(contactgroup* obj,
-                   QVector<contact*> const& members,
-                   QVector<contactgroup*> const& groups) {
-  // check object contents.
-  if (obj == NULL)
-    throw (engine_error() << "contactgroup is a NULL pointer.");
-  if (obj->group_name == NULL)
-    throw (engine_error() << "contactgroup invalid group name.");
+void objects::link(
+                contactgroup* obj,
+                QVector<contact*> const& members,
+                QVector<contactgroup*> const& groups) {
+  // Check object contents.
+  if (!obj)
+    throw (engine_error() << "contact group is a NULL pointer");
+  if (!obj->group_name)
+    throw (engine_error() << "contact group invalid group name");
 
-  // add all contacts into the contactgroup.
-  if (add_contacts_to_object(members, &obj->members) == false)
-    throw (engine_error() << "contactgroup '" << obj->group_name << "' invalid member.");
+  // Add all contacts into the contactgroup.
+  if (!add_contacts_to_object(members, &obj->members))
+    throw (engine_error() << "contactgroup '" << obj->group_name
+           << "' invalid member");
 
-  // add the content of other contactgroups into this contactgroup.
-  for (QVector<contactgroup*>::const_iterator it = groups.begin(), end = groups.end();
+  // Broker timestamp.
+  timeval tv(get_broker_timestamp(NULL));
+
+  // Browse contacts.
+  for (QVector<contact*>::const_iterator
+         it(members.begin()),
+         end(members.end());
        it != end;
        ++it) {
-    if (*it == NULL)
-      throw (engine_error() << "contactgroup '" << obj->group_name << "' invalid group member.");
+    // Link contact group to contact.
+    add_object_to_objectlist(&(*it)->contactgroups_ptr, obj);
 
-    contactsmember* cntctmembers = (*it)->members;
-    while (cntctmembers) {
-      contactsmember* member = add_contact_to_contactgroup(obj, cntctmembers->contact_name);
-      member->contact_ptr = cntctmembers->contact_ptr;
-      cntctmembers = cntctmembers->next;
-    }
+    // Notify event broker of new member.
+    broker_group_member(
+      NEBTYPE_CONTACTGROUPMEMBER_ADD,
+      NEBFLAG_NONE,
+      NEBATTR_NONE,
+      obj,
+      *it,
+      &tv);
   }
 
-  for (contactsmember const* cm = obj->members; cm != NULL; cm = cm->next)
-    add_object_to_objectlist(&cm->contact_ptr->contactgroups_ptr, obj);
+  // Add the content of other contactgroups into this contactgroup.
+  QVector<contact*> other_members;
+  for (QVector<contactgroup*>::const_iterator
+         it(groups.begin()),
+         end(groups.end());
+       it != end;
+       ++it) {
+    if (!*it)
+      throw (engine_error() << "contactgroup '" << obj->group_name
+             << "' invalid group member");
+    // Browse members.
+    for (contactsmember* mbr((*it)->members);
+         mbr;
+         mbr = mbr->next)
+      other_members.push_back(mbr->contact_ptr);
+  }
+
+  // Recursive call.
+  if (!other_members.isEmpty())
+    objects::link(obj, other_members, QVector<contactgroup*>());
+
+  return ;
 }
 
 /**
