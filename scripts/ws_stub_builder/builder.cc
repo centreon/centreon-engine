@@ -218,13 +218,16 @@ void builder::_build_source() {
          << "  return (tab);\n"
          << "}\n\n";
 
-
-  stream << "static std::ostream& operator<<(std::ostream& os, "
-         << "std::vector<std::string> const& cls) {\n"
+  stream << "template <typename T>\n"
+         << "static std::ostream& operator<<(\n"
+         << "                       std::ostream& os,\n"
+         << "                       std::vector<T> const& cls) {\n"
          << "  os << \"{\";\n"
-         << "  for (std::vector<std::string>::const_iterator it = cls.begin(), end = cls.end();\n"
-         << "        it != end;\n"
-         << "      ++it) {\n"
+         << "  for (typename std::vector<T>::const_iterator\n"
+         << "         it(cls.begin()),\n"
+         << "         end(cls.end());\n"
+         << "       it != end;\n"
+         << "       ++it) {\n"
          << "    if (it + 1 != end)\n"
          << "      os << *it << \", \";\n"
          << "    else\n"

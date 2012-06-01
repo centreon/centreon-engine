@@ -128,20 +128,20 @@ int centreonengine__contactgroupAddContact(
   (void)res;
 
   // Begin try block.
-  COMMAND_BEGIN(cntctgrp_id->name << ", " << cntct_id->contact)
+  COMMAND_BEGIN(cntctgrp_id->name << ", " << cntct_id->name)
 
   // Find target contact group.
   contactgroup* cntctgrp(find_contactgroup(cntctgrp_id->name.c_str()));
   if (!cntctgrp)
     throw (engine_error() << "cannot link contact '"
-           << cntct_id->contact << "' to non-existent contact group '"
+           << cntct_id->name << "' to non-existent contact group '"
            << cntctgrp_id->name << "'");
 
   // Find target contact.
-  contact* cntct(find_contact(cntct_id->contact.c_str()));
+  contact* cntct(find_contact(cntct_id->name.c_str()));
   if (!cntct)
     throw (engine_error() << "cannot link non-existent contact '"
-           << cntct_id->contact << "' to contact group '"
+           << cntct_id->name << "' to contact group '"
            << cntctgrp_id->name << "'");
 
   // Member array.
@@ -228,6 +228,10 @@ int centreonengine__contactgroupModify(
 
   // Find target contact group.
   contactgroup* grp(find_contactgroup(cntctgrp->name.c_str()));
+  if (!grp)
+    throw (engine_error()
+           << "cannot modify non-existent contact group '"
+           << cntctgrp->name);
 
   // Update alias.
   if (cntctgrp->alias) {
@@ -304,13 +308,13 @@ int centreonengine__contactgroupRemoveContact(
   (void)res;
 
   // Begin try block.
-  COMMAND_BEGIN(cntctgrp_id->name << ", " << cntct_id->contact)
+  COMMAND_BEGIN(cntctgrp_id->name << ", " << cntct_id->name)
 
   // Find target contact group.
   contactgroup* cntctgrp(find_contactgroup(cntctgrp_id->name.c_str()));
   if (!cntctgrp)
     throw (engine_error() << "cannot remove contact '"
-           << cntct_id->contact << "' from non-existent contact group '"
+           << cntct_id->name << "' from non-existent contact group '"
            << cntctgrp_id->name << "'");
 
   // Find contact member.
@@ -319,7 +323,7 @@ int centreonengine__contactgroupRemoveContact(
   for (current = cntctgrp->members, prev = NULL;
        current;
        prev = current, current = current->next)
-    if (!strcmp(current->contact_ptr->name, cntct_id->contact.c_str()))
+    if (!strcmp(current->contact_ptr->name, cntct_id->name.c_str()))
       break ;
   if (current) {
     // Notify event broker.

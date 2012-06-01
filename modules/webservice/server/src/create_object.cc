@@ -103,7 +103,7 @@ QVector<QString> webservice::std2qt(std::vector<std::string> const& vec) {
  *
  *  @return The service's table, stop when the first service are not found.
  */
-static QVector<service*> _find(std::vector<std::string> const& objs) {
+QVector<service*> webservice::_find(std::vector<std::string> const& objs) {
   QVector<service*> res;
   if (objs.size() % 2)
     return (res);
@@ -139,93 +139,6 @@ static void _extract_object_from_objectgroup(QVector<T*> const& groups,
   }
   qSort(objects.begin(), objects.end());
   std::unique(objects.begin(), objects.end());
-}
-
-/**
- *  Add a new hostgroup into the engine.
- *
- *  @param[in] hstgrp The struct with all information to create new hostgroup.
- */
-void webservice::create_host_group(ns1__hostGroupType const& hstgrp) {
-  char const* notes = (hstgrp.notes ? hstgrp.notes->c_str() : NULL);
-  char const* notes_url = (hstgrp.notesUrl ? hstgrp.notesUrl->c_str() : NULL);
-  char const* action_url = (hstgrp.actionUrl ? hstgrp.actionUrl->c_str() : NULL);
-
-  // create a new hostgroup.
-  hostgroup* group = add_hostgroup(hstgrp.name.c_str(),
-                                   hstgrp.alias.c_str(),
-                                   notes,
-                                   notes_url,
-                                   action_url);
-
-  // add all host into the hostgroup.
-  QVector<host*> hst_members = _find<host>(hstgrp.members, (void* (*)(char const*))&find_host);
-  if (hstgrp.members.empty() || static_cast<int>(hstgrp.members.size()) != hst_members.size()) {
-    objects::release(group);
-    throw (engine_error() << "hostgroup '" << hstgrp.name << "' invalid member.");
-  }
-
-  // add the content of other hostgroups into this hostgroup.
-  QVector<hostgroup*> hst_groups =
-    _find<hostgroup>(hstgrp.hostgroupMembers, (void* (*)(char const*))&find_hostgroup);
-  if (static_cast<int>(hstgrp.hostgroupMembers.size()) != hst_groups.size()) {
-    objects::release(group);
-    throw (engine_error() << "hostgroup '" << hstgrp.name << "' invalid group member.");
-  }
-
-  try {
-    objects::link(group, hst_members, hst_groups);
-  }
-  catch (std::exception const& e) {
-    (void)e;
-    objects::release(group);
-    throw;
-  }
-}
-
-/**
- *  Create a new servicegroup into the engine.
- *
- *  @param[in] svcgrp The struct with all information to create new servicegroup.
- */
-void webservice::create_service_group(ns1__serviceGroupType const& svcgrp) {
-  // check if service have host name and service description.
-  if (svcgrp.members.size() % 2)
-    throw (engine_error() << "servicegroup '" << svcgrp.name << "' invalid members.");
-
-  char const* notes = (svcgrp.notes ? svcgrp.notes->c_str() : NULL);
-  char const* notes_url = (svcgrp.notesUrl ? svcgrp.notesUrl->c_str() : NULL);
-  char const* action_url = (svcgrp.actionUrl ? svcgrp.actionUrl->c_str() : NULL);
-
-  // create a new service group.
-  servicegroup* group = add_servicegroup(svcgrp.name.c_str(),
-                                         svcgrp.alias.c_str(),
-                                         notes,
-                                         notes_url,
-                                         action_url);
-
-  // Add all services into the servicegroup.
-  QVector<service*> svc_members(::_find(svcgrp.members));
-  if (static_cast<int>(svcgrp.members.size() / 2) != svc_members.size()) {
-    objects::release(group);
-    throw (engine_error() << "servicegroup '" << svcgrp.name << "' invalid group member.");
-  }
-
-  QVector<servicegroup*> svc_groups =
-    _find<servicegroup>(svcgrp.servicegroupMembers, (void* (*)(char const*))&find_servicegroup);
-  if (static_cast<int>(svcgrp.servicegroupMembers.size()) != svc_groups.size()) {
-    objects::release(group);
-    throw (engine_error() << "servicegroup '" << svcgrp.name << "' invalid group member.");
-  }
-
-  try {
-    objects::link(group, svc_members, svc_groups);
-  }
-  catch (std::exception const& e) {
-    (void)e;
-    objects::release(group);
-    throw;
-  }
 }
 
 /**

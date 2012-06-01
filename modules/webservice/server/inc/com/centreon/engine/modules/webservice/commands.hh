@@ -20,6 +20,10 @@
 #ifndef CCE_MOD_WS_COMMANDS_HH
 #  define CCE_MOD_WS_COMMANDS_HH
 
+#  include <exception>
+#  include "com/centreon/engine/logging/logger.hh"
+#  include "com/centreon/engine/modules/webservice/sync_lock.hh"
+
 #  define COMMAND_BEGIN(arguments) \
   try { \
     sync_lock thread_safeness; \

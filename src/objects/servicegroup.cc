@@ -17,6 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
@@ -77,52 +78,74 @@ void release_servicegroup(servicegroup const* obj) {
  *  @param[in]     members The table with services member name.
  *  @param[in]     groups  The table with service groups member name.
  */
-void objects::link(servicegroup* obj,
-                   QVector<service*> const& members,
-                   QVector<servicegroup*> const& groups) {
-  // check object contents.
-  if (obj == NULL)
-    throw (engine_error() << "servicegroup is a NULL pointer.");
-  if (obj->group_name == NULL)
-    throw (engine_error() << "servicegroup invalid group name.");
+void objects::link(
+                servicegroup* obj,
+                QVector<service*> const& members,
+                QVector<servicegroup*> const& groups) {
+  // Check object contents.
+  if (!obj)
+    throw (engine_error() << "servicegroup is a NULL pointer");
+  if (!obj->group_name)
+    throw (engine_error() << "servicegroup invalid group name");
 
-  // add all services into the servicegroup.
-  for (QVector<service*>::const_iterator it = members.begin(),
-  	 end = members.end();
+  // Broker timestamp.
+  timeval tv(get_broker_timestamp(NULL));
+
+  // Add all services into the servicegroup.
+  for (QVector<service*>::const_iterator
+         it(members.begin()),
+         end(members.end());
        it != end;
        ++it) {
-    if (*it == NULL)
-      throw (engine_error() << "servicegroup '" << obj->group_name << "' invalid member.");
-
-    // create a new servicegroupsmember and add it into the servicegroup list.
-    servicesmember* member = add_service_to_servicegroup(obj,
-							 (*it)->host_name,
-							 (*it)->description);
-    // add service to the servicesmember.
-    member->service_ptr = *it;
-  }
-
-  // add the content of other servicegroups into this servicegroup.
-  for (QVector<servicegroup*>::const_iterator it = groups.begin(),
-	 end = groups.end();
-       it != end;
-       ++it) {
-    if (*it == NULL)
+    if (!*it)
       throw (engine_error() << "servicegroup '" << obj->group_name
-	     << "' invalid group member.");
+             << "' invalid member");
 
-    servicesmember* svcmembers = (*it)->members;
-    while (svcmembers) {
-      servicesmember* member = add_service_to_servicegroup(obj,
-							   svcmembers->host_name,
-							   svcmembers->service_description);
-      member->service_ptr = svcmembers->service_ptr;
-      svcmembers = svcmembers->next;
-    }
+    // Create a new servicegroupsmember and add it
+    // into the servicegroup list.
+    servicesmember* member(add_service_to_servicegroup(
+                             obj,
+                             (*it)->host_name,
+                             (*it)->description));
+
+    // Add service to the servicesmember.
+    member->service_ptr = *it;
+
+    // Link service group to service.
+    add_object_to_objectlist(&(*it)->servicegroups_ptr, obj);
+
+    // Notify event broker of new member.
+    broker_group_member(
+      NEBTYPE_SERVICEGROUPMEMBER_ADD,
+      NEBFLAG_NONE,
+      NEBATTR_NONE,
+      obj,
+      *it,
+      &tv);
   }
 
-  for (servicesmember const* sm = obj->members; sm != NULL; sm = sm->next)
-    add_object_to_objectlist(&sm->service_ptr->servicegroups_ptr, obj);
+  // Add the content of other servicegroups into this servicegroup.
+  QVector<service*> other_members;
+  for (QVector<servicegroup*>::const_iterator
+         it(groups.begin()),
+         end(groups.end());
+       it != end;
+       ++it) {
+    if (!*it)
+      throw (engine_error() << "servicegroup '" << obj->group_name
+             << "' invalid group member");
+    // Browse members.
+    for (servicesmember* mbr((*it)->members);
+         mbr;
+         mbr = mbr->next)
+      other_members.push_back(mbr->service_ptr);
+  }
+
+  // Recursive call.
+  if (!other_members.isEmpty())
+    objects::link(obj, other_members, QVector<servicegroup*>());
+
+  return ;
 }
 
 /**

@@ -41,7 +41,7 @@ using namespace com::centreon::engine::modules::webservice;
 static contact* find_target_contact(char const* name) {
   contact* cntct(find_contact(name));
   if (!cntct)
-    throw (engine_error() << "Contact '" << name << "' not found");
+    throw (engine_error() << "contact '" << name << "' not found");
   return (cntct);
 }
 
@@ -61,7 +61,7 @@ void webservice::create_contact(ns1__contactType const& cntct) {
                                   "rdufs",
                                   "n"));
   if (host_opt.empty())
-    throw (engine_error() << "contact '" << cntct.name
+    throw (engine_error() << "contact '" << cntct.id->name
            << "' has invalid host notification options");
 
   // Service notification options.
@@ -70,14 +70,14 @@ void webservice::create_contact(ns1__contactType const& cntct) {
                                      "rcwufs",
                                      "n"));
   if (service_opt.empty())
-    throw (engine_error() << "contact '" << cntct.name
+    throw (engine_error() << "contact '" << cntct.id->name
            << "' has invalid service notification options");
 
   // Host notification period.
   timeperiod* host_notification_period(
                 find_timeperiod(cntct.hostNotificationPeriod.c_str()));
   if (!host_notification_period)
-    throw (engine_error() << "contact '" << cntct.name
+    throw (engine_error() << "contact '" << cntct.id->name
            << "' has invalid host notification period '"
            << cntct.hostNotificationPeriod << "'");
 
@@ -85,7 +85,7 @@ void webservice::create_contact(ns1__contactType const& cntct) {
   timeperiod* service_notification_period(
                 find_timeperiod(cntct.serviceNotificationPeriod.c_str()));
   if (!service_notification_period)
-    throw (engine_error() << "contact '" << cntct.name
+    throw (engine_error() << "contact '" << cntct.id->name
            << "' has invalid service notification period '"
            << cntct.serviceNotificationPeriod << "'");
 
@@ -113,7 +113,7 @@ void webservice::create_contact(ns1__contactType const& cntct) {
 
   // Create a new contact.
   contact* new_cntct(add_contact(
-                       cntct.name.c_str(),
+                       cntct.id->name.c_str(),
                        alias,
                        email,
                        pager,
@@ -145,7 +145,7 @@ void webservice::create_contact(ns1__contactType const& cntct) {
   if (cntct.contactgroups.size()
       != static_cast<size_t>(cntct_contactgroups.size())) {
     objects::release(new_cntct);
-    throw (engine_error() << "contact '" << cntct.name
+    throw (engine_error() << "contact '" << cntct.id->name
            << "' has invalid contactgroup");
   }
 
@@ -157,7 +157,7 @@ void webservice::create_contact(ns1__contactType const& cntct) {
   if (cntct.hostNotificationCommands.size()
       != static_cast<size_t>(cntct_host_notification_commands.size())) {
     objects::release(new_cntct);
-    throw (engine_error() << "contact '" << cntct.name
+    throw (engine_error() << "contact '" << cntct.id->name
            << "' has invalid host notification commands");
   }
 
@@ -169,7 +169,7 @@ void webservice::create_contact(ns1__contactType const& cntct) {
   if (cntct.serviceNotificationCommands.size()
       != static_cast<size_t>(cntct_service_notification_commands.size())) {
     objects::release(new_cntct);
-    throw (engine_error() << "contact '" << cntct.name
+    throw (engine_error() << "contact '" << cntct.id->name
            << "' has invalid service notification commands");
   }
 
@@ -212,7 +212,7 @@ int centreonengine__contactAdd(
   (void)res;
 
   // Begin try block.
-  COMMAND_BEGIN(contact->name)
+  COMMAND_BEGIN(contact->id->name)
 
   // Create new contact.
   create_contact(*contact);
@@ -237,10 +237,10 @@ int centreonengine__contactGetAlias(
       ns1__contactIDType* contact_id,
       std::string& alias) {
   // Begin try block.
-  COMMAND_BEGIN(contact_id->contact)
+  COMMAND_BEGIN(contact_id->name)
 
   // Find target contact.
-  contact* cntct(find_target_contact(contact_id->contact.c_str()));
+  contact* cntct(find_target_contact(contact_id->name.c_str()));
 
   // Set alias.
   if (cntct->alias)
@@ -268,10 +268,10 @@ int centreonengine__contactGetCanSubmitCommands(
       ns1__contactIDType* contact_id,
       bool& can_submit) {
   // Begin try block.
-  COMMAND_BEGIN(contact_id->contact)
+  COMMAND_BEGIN(contact_id->name)
 
   // Find target contact.
-  contact* cntct(find_target_contact(contact_id->contact.c_str()));
+  contact* cntct(find_target_contact(contact_id->name.c_str()));
 
   // Set value.
   can_submit = cntct->can_submit_commands;
@@ -296,10 +296,10 @@ int centreonengine__contactGetEmail(
       ns1__contactIDType* contact_id,
       std::string& email) {
   // Begin try block.
-  COMMAND_BEGIN(contact_id->contact)
+  COMMAND_BEGIN(contact_id->name)
 
   // Find target contact.
-  contact* cntct(find_target_contact(contact_id->contact.c_str()));
+  contact* cntct(find_target_contact(contact_id->name.c_str()));
 
   // Set email.
   if (cntct->email)
@@ -325,10 +325,10 @@ int centreonengine__contactGetModifiedAttributes(
       ns1__contactIDType* contact_id,
       unsigned int& modattr) {
   // Begin try block.
-  COMMAND_BEGIN(contact_id->contact)
+  COMMAND_BEGIN(contact_id->name)
 
   // Find target contact.
-  contact* cntct(find_target_contact(contact_id->contact.c_str()));
+  contact* cntct(find_target_contact(contact_id->name.c_str()));
 
   // Set modified attributes.
   modattr = cntct->modified_attributes;
@@ -353,10 +353,10 @@ int centreonengine__contactGetModifiedAttributesHost(
       ns1__contactIDType* contact_id,
       unsigned int& modhattr) {
   // Begin try block.
-  COMMAND_BEGIN(contact_id->contact)
+  COMMAND_BEGIN(contact_id->name)
 
   // Find target contact.
-  contact* cntct(find_target_contact(contact_id->contact.c_str()));
+  contact* cntct(find_target_contact(contact_id->name.c_str()));
 
   // Set modified host attributes.
   modhattr = cntct->modified_host_attributes;
@@ -381,10 +381,10 @@ int centreonengine__contactGetModifiedAttributesService(
       ns1__contactIDType* contact_id,
       unsigned int& modsattr) {
   // Begin try block.
-  COMMAND_BEGIN(contact_id->contact)
+  COMMAND_BEGIN(contact_id->name)
 
   // Find target contact.
-  contact* cntct(find_target_contact(contact_id->contact.c_str()));
+  contact* cntct(find_target_contact(contact_id->name.c_str()));
 
   // Set modified service attributes.
   modsattr = cntct->modified_service_attributes;
@@ -409,10 +409,10 @@ int centreonengine__contactGetNotificationsOnHostCommand(
       ns1__contactIDType* contact_id,
       centreonengine__contactGetNotificationsOnHostCommandResponse& cmd) {
   // Begin try block.
-  COMMAND_BEGIN(contact_id->contact)
+  COMMAND_BEGIN(contact_id->name)
 
   // Find target contact.
-  contact* cntct(find_target_contact(contact_id->contact.c_str()));
+  contact* cntct(find_target_contact(contact_id->name.c_str()));
 
   // Set notification command.
   if (cntct->host_notification_commands->cmd) {
@@ -440,10 +440,10 @@ int centreonengine__contactGetNotificationsOnHostDown(
       ns1__contactIDType* contact_id,
       bool& notified) {
   // Begin try block.
-  COMMAND_BEGIN(contact_id->contact)
+  COMMAND_BEGIN(contact_id->name)
 
   // Find target contact.
-  contact* cntct(find_target_contact(contact_id->contact.c_str()));
+  contact* cntct(find_target_contact(contact_id->name.c_str()));
 
   // Set boolean value.
   notified = cntct->notify_on_host_down;
@@ -468,10 +468,10 @@ int centreonengine__contactGetNotificationsOnHostDowntime(
       ns1__contactIDType* contact_id,
       bool& notified) {
   // Begin try block.
-  COMMAND_BEGIN(contact_id->contact)
+  COMMAND_BEGIN(contact_id->name)
 
   // Find target contact.
-  contact* cntct(find_target_contact(contact_id->contact.c_str()));
+  contact* cntct(find_target_contact(contact_id->name.c_str()));
 
   // Set boolean value.
   notified = cntct->notify_on_host_downtime;
@@ -496,10 +496,10 @@ int centreonengine__contactGetNotificationsOnHostEnabled(
       ns1__contactIDType* contact_id,
       bool& notified) {
   // Begin try block.
-  COMMAND_BEGIN(contact_id->contact)
+  COMMAND_BEGIN(contact_id->name)
 
   // Find target contact.
-  contact* cntct(find_target_contact(contact_id->contact.c_str()));
+  contact* cntct(find_target_contact(contact_id->name.c_str()));
 
   // Set boolean value.
   notified = cntct->host_notifications_enabled;
@@ -524,10 +524,10 @@ int centreonengine__contactGetNotificationsOnHostFlapping(
       ns1__contactIDType* contact_id,
       bool& notified) {
   // Begin try block.
-  COMMAND_BEGIN(contact_id->contact)
+  COMMAND_BEGIN(contact_id->name)
 
   // Find target contact.
-  contact* cntct(find_target_contact(contact_id->contact.c_str()));
+  contact* cntct(find_target_contact(contact_id->name.c_str()));
 
   // Set boolean value.
   notified = cntct->notify_on_host_flapping;
@@ -552,10 +552,10 @@ int centreonengine__contactGetNotificationsOnHostLast(
       ns1__contactIDType* contact_id,
       unsigned long& last_time) {
   // Begin try block.
-  COMMAND_BEGIN(contact_id->contact)
+  COMMAND_BEGIN(contact_id->name)
 
   // Find target contact.
-  contact* cntct(find_target_contact(contact_id->contact.c_str()));
+  contact* cntct(find_target_contact(contact_id->name.c_str()));
 
   // Set time.
   last_time = cntct->last_host_notification;
@@ -580,10 +580,10 @@ int centreonengine__contactGetNotificationsOnHostRecovery(
       ns1__contactIDType* contact_id,
       bool& notified) {
   // Begin try block.
-  COMMAND_BEGIN(contact_id->contact)
+  COMMAND_BEGIN(contact_id->name)
 
   // Find target contact.
-  contact* cntct(find_target_contact(contact_id->contact.c_str()));
+  contact* cntct(find_target_contact(contact_id->name.c_str()));
 
   // Set boolean flag.
   notified = cntct->notify_on_host_recovery;
@@ -608,10 +608,10 @@ int centreonengine__contactGetNotificationsOnHostTimeperiod(
       ns1__contactIDType* contact_id,
       centreonengine__contactGetNotificationsOnHostTimeperiodResponse& time_period) {
   // Begin try block.
-  COMMAND_BEGIN(contact_id->contact)
+  COMMAND_BEGIN(contact_id->name)
 
   // Find target contact.
-  contact* cntct(find_target_contact(contact_id->contact.c_str()));
+  contact* cntct(find_target_contact(contact_id->name.c_str()));
 
   // Set timeperiod.
   if (cntct->host_notification_period_ptr->name) {
@@ -640,10 +640,10 @@ int centreonengine__contactGetNotificationsOnHostUnreachable(
       ns1__contactIDType* contact_id,
       bool& notified) {
   // Begin try block.
-  COMMAND_BEGIN(contact_id->contact)
+  COMMAND_BEGIN(contact_id->name)
 
   // Find target contact.
-  contact* cntct(find_target_contact(contact_id->contact.c_str()));
+  contact* cntct(find_target_contact(contact_id->name.c_str()));
 
   // Set boolean value.
   notified = cntct->notify_on_host_unreachable;
@@ -668,10 +668,10 @@ int centreonengine__contactGetNotificationsOnServiceCommand(
       ns1__contactIDType* contact_id,
       centreonengine__contactGetNotificationsOnServiceCommandResponse& cmd) {
   // Begin try block.
-  COMMAND_BEGIN(contact_id->contact)
+  COMMAND_BEGIN(contact_id->name)
 
   // Find target contact.
-  contact* cntct(find_target_contact(contact_id->contact.c_str()));
+  contact* cntct(find_target_contact(contact_id->name.c_str()));
 
   // Set notification command.
   if (cntct->service_notification_commands->cmd) {
@@ -699,10 +699,10 @@ int centreonengine__contactGetNotificationsOnServiceCritical(
       ns1__contactIDType* contact_id,
       bool& notified) {
   // Begin try block.
-  COMMAND_BEGIN(contact_id->contact)
+  COMMAND_BEGIN(contact_id->name)
 
   // Find target contact.
-  contact* cntct(find_target_contact(contact_id->contact.c_str()));
+  contact* cntct(find_target_contact(contact_id->name.c_str()));
 
   // Set boolean value.
   notified = cntct->notify_on_service_critical;
@@ -727,10 +727,10 @@ int centreonengine__contactGetNotificationsOnServiceDowntime(
       ns1__contactIDType* contact_id,
       bool& notified) {
   // Begin try block.
-  COMMAND_BEGIN(contact_id->contact)
+  COMMAND_BEGIN(contact_id->name)
 
   // Find target contact.
-  contact* cntct(find_target_contact(contact_id->contact.c_str()));
+  contact* cntct(find_target_contact(contact_id->name.c_str()));
 
   // Set boolean value.
   notified = cntct->notify_on_service_downtime;
@@ -755,10 +755,10 @@ int centreonengine__contactGetNotificationsOnServiceEnabled(
       ns1__contactIDType* contact_id,
       bool& notified) {
   // Begin try block.
-  COMMAND_BEGIN(contact_id->contact)
+  COMMAND_BEGIN(contact_id->name)
 
   // Find target contact.
-  contact* cntct(find_target_contact(contact_id->contact.c_str()));
+  contact* cntct(find_target_contact(contact_id->name.c_str()));
 
   // Set boolean value.
   notified = cntct->service_notifications_enabled;
@@ -783,10 +783,10 @@ int centreonengine__contactGetNotificationsOnServiceFlapping(
       ns1__contactIDType* contact_id,
       bool& notified) {
   // Begin try block.
-  COMMAND_BEGIN(contact_id->contact)
+  COMMAND_BEGIN(contact_id->name)
 
   // Find target contact.
-  contact* cntct(find_target_contact(contact_id->contact.c_str()));
+  contact* cntct(find_target_contact(contact_id->name.c_str()));
 
   // Set boolean value.
   notified = cntct->notify_on_service_flapping;
@@ -811,10 +811,10 @@ int centreonengine__contactGetNotificationsOnServiceLast(
       ns1__contactIDType* contact_id,
       unsigned long& last_time) {
   // Begin try block.
-  COMMAND_BEGIN(contact_id->contact)
+  COMMAND_BEGIN(contact_id->name)
 
   // Find target contact.
-  contact* cntct(find_target_contact(contact_id->contact.c_str()));
+  contact* cntct(find_target_contact(contact_id->name.c_str()));
 
   // Set requested time.
   last_time = cntct->last_service_notification;
@@ -839,10 +839,10 @@ int centreonengine__contactGetNotificationsOnServiceRecovery(
       ns1__contactIDType* contact_id,
       bool& notified) {
   // Begin try block.
-  COMMAND_BEGIN(contact_id->contact)
+  COMMAND_BEGIN(contact_id->name)
 
   // Find target contact.
-  contact* cntct(find_target_contact(contact_id->contact.c_str()));
+  contact* cntct(find_target_contact(contact_id->name.c_str()));
 
   // Set boolean value.
   notified = cntct->notify_on_service_recovery;
@@ -867,10 +867,10 @@ int centreonengine__contactGetNotificationsOnServiceTimeperiod(
       ns1__contactIDType* contact_id,
       centreonengine__contactGetNotificationsOnServiceTimeperiodResponse& time_period) {
   // Begin try block.
-  COMMAND_BEGIN(contact_id->contact)
+  COMMAND_BEGIN(contact_id->name)
 
   // Find target contact.
-  contact* cntct(find_target_contact(contact_id->contact.c_str()));
+  contact* cntct(find_target_contact(contact_id->name.c_str()));
 
   // Set timeperiod.
   if (cntct->service_notification_period_ptr->name) {
@@ -899,10 +899,10 @@ int centreonengine__contactGetNotificationsOnServiceUnknown(
       ns1__contactIDType* contact_id,
       bool& notified) {
   // Begin try block.
-  COMMAND_BEGIN(contact_id->contact)
+  COMMAND_BEGIN(contact_id->name)
 
   // Find target contact.
-  contact* cntct(find_target_contact(contact_id->contact.c_str()));
+  contact* cntct(find_target_contact(contact_id->name.c_str()));
 
   // Set boolean value.
   notified = cntct->notify_on_service_unknown;
@@ -927,10 +927,10 @@ int centreonengine__contactGetNotificationsOnServiceWarning(
       ns1__contactIDType* contact_id,
       bool& notified) {
   // Begin try block.
-  COMMAND_BEGIN(contact_id->contact)
+  COMMAND_BEGIN(contact_id->name)
 
   // Find target contact.
-  contact* cntct(find_target_contact(contact_id->contact.c_str()));
+  contact* cntct(find_target_contact(contact_id->name.c_str()));
 
   // Set boolean value.
   notified = cntct->notify_on_service_warning;
@@ -955,10 +955,10 @@ int centreonengine__contactGetPager(
       ns1__contactIDType* contact_id,
       std::string& pager) {
   // Begin try block.
-  COMMAND_BEGIN(contact_id->contact)
+  COMMAND_BEGIN(contact_id->name)
 
   // Find target contact.
-  contact* cntct(find_target_contact(contact_id->contact.c_str()));
+  contact* cntct(find_target_contact(contact_id->name.c_str()));
 
   // Set pager.
   if (cntct->pager)
@@ -984,10 +984,10 @@ int centreonengine__contactGetRetainStatusInformation(
       ns1__contactIDType* contact_id,
       bool& retain) {
   // Begin try block.
-  COMMAND_BEGIN(contact_id->contact)
+  COMMAND_BEGIN(contact_id->name)
 
   // Find target contact.
-  contact* cntct(find_target_contact(contact_id->contact.c_str()));
+  contact* cntct(find_target_contact(contact_id->name.c_str()));
 
   // Set boolean value.
   retain = cntct->retain_status_information;
@@ -1012,10 +1012,10 @@ int centreonengine__contactGetRetainStatusNonInformation(
       ns1__contactIDType* contact_id,
       bool& retain) {
   // Begin try block.
-  COMMAND_BEGIN(contact_id->contact)
+  COMMAND_BEGIN(contact_id->name)
 
   // Find target contact.
-  contact* cntct(find_target_contact(contact_id->contact.c_str()));
+  contact* cntct(find_target_contact(contact_id->name.c_str()));
 
   // Set boolean value.
   retain = cntct->retain_nonstatus_information;
@@ -1042,7 +1042,7 @@ int centreonengine__contactModify(
   (void)res;
 
   // Begin try block.
-  COMMAND_BEGIN(cntct->name)
+  COMMAND_BEGIN(cntct->id->name)
 
   // XXX
 
@@ -1068,11 +1068,11 @@ int centreonengine__contactRemove(
   (void)res;
 
   // Begin try block.
-  COMMAND_BEGIN(contact_id->contact)
+  COMMAND_BEGIN(contact_id->name)
 
   // Remove contact.
-  if (!remove_contact_by_id(contact_id->contact.c_str()))
-    throw (engine_error() << "Contact '" << contact_id->contact
+  if (!remove_contact_by_id(contact_id->name.c_str()))
+    throw (engine_error() << "Contact '" << contact_id->name
            << "' not found");
 
   // Exception handling.
@@ -1099,10 +1099,10 @@ int centreonengine__contactSetAlias(
   (void)res;
 
   // Begin try block
-  COMMAND_BEGIN(contact_id->contact << ", " << alias)
+  COMMAND_BEGIN(contact_id->name << ", " << alias)
 
   // Find target contact.
-  contact* cntct(find_target_contact(contact_id->contact.c_str()));
+  contact* cntct(find_target_contact(contact_id->name.c_str()));
 
   // Set new alias.
   delete [] cntct->alias;
@@ -1132,10 +1132,10 @@ int centreonengine__contactSetCanSubmitCommands(
   (void)res;
 
   // Begin try block.
-  COMMAND_BEGIN(contact_id->contact << ", " << enable)
+  COMMAND_BEGIN(contact_id->name << ", " << enable)
 
   // Find target contact.
-  contact* cntct(find_target_contact(contact_id->contact.c_str()));
+  contact* cntct(find_target_contact(contact_id->name.c_str()));
 
   // Set boolean value.
   cntct->can_submit_commands = enable;
@@ -1164,10 +1164,10 @@ int centreonengine__contactSetEmail(
   (void)res;
 
   // Begin try block.
-  COMMAND_BEGIN(contact_id->contact << ", " << email)
+  COMMAND_BEGIN(contact_id->name << ", " << email)
 
   // Find target contact.
-  contact* cntct(find_target_contact(contact_id->contact.c_str()));
+  contact* cntct(find_target_contact(contact_id->name.c_str()));
 
   // Set new email.
   delete [] cntct->email;
@@ -1197,10 +1197,10 @@ int centreonengine__contactSetNotificationsOnHostDown(
   (void)res;
 
   // Begin try block.
-  COMMAND_BEGIN(contact_id->contact << ", " << enable)
+  COMMAND_BEGIN(contact_id->name << ", " << enable)
 
   // Find target contact.
-  contact* cntct(find_target_contact(contact_id->contact.c_str()));
+  contact* cntct(find_target_contact(contact_id->name.c_str()));
 
   // Set boolean value.
   cntct->notify_on_host_down = enable;
@@ -1229,10 +1229,10 @@ int centreonengine__contactSetNotificationsOnHostDowntime(
   (void)res;
 
   // Begin try block.
-  COMMAND_BEGIN(contact_id->contact << ", " << enable)
+  COMMAND_BEGIN(contact_id->name << ", " << enable)
 
   // Find target contact.
-  contact* cntct(find_target_contact(contact_id->contact.c_str()));
+  contact* cntct(find_target_contact(contact_id->name.c_str()));
 
   // Set boolean value.
   cntct->notify_on_host_downtime = enable;
@@ -1261,10 +1261,10 @@ int centreonengine__contactSetNotificationsOnHostEnabled(
   (void)res;
 
   // Begin try block.
-  COMMAND_BEGIN(contact_id->contact << ", " << enable)
+  COMMAND_BEGIN(contact_id->name << ", " << enable)
 
   // Find target contact.
-  contact* cntct(find_target_contact(contact_id->contact.c_str()));
+  contact* cntct(find_target_contact(contact_id->name.c_str()));
 
   // Set boolean value.
   cntct->host_notifications_enabled = enable;
@@ -1293,10 +1293,10 @@ int centreonengine__contactSetNotificationsOnHostFlapping(
   (void)res;
 
   // Begin try block.
-  COMMAND_BEGIN(contact_id->contact << ", " << enable)
+  COMMAND_BEGIN(contact_id->name << ", " << enable)
 
   // Find target contact.
-  contact* cntct(find_target_contact(contact_id->contact.c_str()));
+  contact* cntct(find_target_contact(contact_id->name.c_str()));
 
   // Set boolean value.
   cntct->notify_on_host_flapping = enable;
@@ -1325,10 +1325,10 @@ int centreonengine__contactSetNotificationsOnHostRecovery(
   (void)res;
 
   // Begin try block.
-  COMMAND_BEGIN(contact_id->contact << ", " << enable)
+  COMMAND_BEGIN(contact_id->name << ", " << enable)
 
   // Find target contact.
-  contact* cntct(find_target_contact(contact_id->contact.c_str()));
+  contact* cntct(find_target_contact(contact_id->name.c_str()));
 
   // Set boolean value.
   cntct->notify_on_host_recovery = enable;
@@ -1357,10 +1357,10 @@ int centreonengine__contactSetNotificationsOnHostTimeperiod(
   (void)res;
 
   // Begin try block.
-  COMMAND_BEGIN(contact_id->contact << ", " << timeperiod_id->timeperiod)
+  COMMAND_BEGIN(contact_id->name << ", " << timeperiod_id->timeperiod)
 
   // Find target contact.
-  contact* cntct(find_target_contact(contact_id->contact.c_str()));
+  contact* cntct(find_target_contact(contact_id->name.c_str()));
 
   // Set new timeperiod.
   delete [] cntct->host_notification_period;
@@ -1391,10 +1391,10 @@ int centreonengine__contactSetNotificationsOnHostUnreachable(
   (void)res;
 
   // Begin try block.
-  COMMAND_BEGIN(contact_id->contact << ", " << enable)
+  COMMAND_BEGIN(contact_id->name << ", " << enable)
 
   // Find target contact.
-  contact* cntct(find_target_contact(contact_id->contact.c_str()));
+  contact* cntct(find_target_contact(contact_id->name.c_str()));
 
   // Set boolean value.
   cntct->notify_on_host_unreachable = enable;
@@ -1423,10 +1423,10 @@ int centreonengine__contactSetNotificationsOnServiceCritical(
   (void)res;
 
   // Begin try block.
-  COMMAND_BEGIN(contact_id->contact << ", " << enable)
+  COMMAND_BEGIN(contact_id->name << ", " << enable)
 
   // Find target contact.
-  contact* cntct(find_target_contact(contact_id->contact.c_str()));
+  contact* cntct(find_target_contact(contact_id->name.c_str()));
 
   // Set boolean value.
   cntct->notify_on_service_critical = enable;
@@ -1455,10 +1455,10 @@ int centreonengine__contactSetNotificationsOnServiceDowntime(
   (void)res;
 
   // Begin try block.
-  COMMAND_BEGIN(contact_id->contact)
+  COMMAND_BEGIN(contact_id->name)
 
   // Find target contact.
-  contact* cntct(find_target_contact(contact_id->contact.c_str()));
+  contact* cntct(find_target_contact(contact_id->name.c_str()));
 
   // Set boolean value.
   cntct->notify_on_service_downtime = enable;
@@ -1487,10 +1487,10 @@ int centreonengine__contactSetNotificationsOnServiceEnabled(
   (void)res;
 
   // Begin try block.
-  COMMAND_BEGIN(contact_id->contact << ", " << enable)
+  COMMAND_BEGIN(contact_id->name << ", " << enable)
 
   // Find target contact.
-  contact* cntct(find_target_contact(contact_id->contact.c_str()));
+  contact* cntct(find_target_contact(contact_id->name.c_str()));
 
   // Set boolean value.
   cntct->service_notifications_enabled = enable;
@@ -1519,10 +1519,10 @@ int centreonengine__contactSetNotificationsOnServiceFlapping(
   (void)res;
 
   // Begin try block.
-  COMMAND_BEGIN(contact_id->contact << ", " << enable)
+  COMMAND_BEGIN(contact_id->name << ", " << enable)
 
   // Find target contact.
-  contact* cntct(find_target_contact(contact_id->contact.c_str()));
+  contact* cntct(find_target_contact(contact_id->name.c_str()));
 
   // Set boolean value.
   cntct->notify_on_service_flapping = enable;
@@ -1551,10 +1551,10 @@ int centreonengine__contactSetNotificationsOnServiceRecovery(
   (void)res;
 
   // Begin try block.
-  COMMAND_BEGIN(contact_id->contact << ", " << enable)
+  COMMAND_BEGIN(contact_id->name << ", " << enable)
 
   // Find target contact.
-  contact* cntct(find_target_contact(contact_id->contact.c_str()));
+  contact* cntct(find_target_contact(contact_id->name.c_str()));
 
   // Set boolean value.
   cntct->notify_on_service_recovery = enable;
@@ -1583,10 +1583,10 @@ int centreonengine__contactSetNotificationsOnServiceTimeperiod(
   (void)res;
 
   // Begin try block.
-  COMMAND_BEGIN(contact_id->contact << ", " << timeperiod_id->timeperiod)
+  COMMAND_BEGIN(contact_id->name << ", " << timeperiod_id->timeperiod)
 
   // Find target contact.
-  contact* cntct(find_target_contact(contact_id->contact.c_str()));
+  contact* cntct(find_target_contact(contact_id->name.c_str()));
 
   // Set new timeperiod.
   delete [] cntct->service_notification_period;
@@ -1617,10 +1617,10 @@ int centreonengine__contactSetNotificationsOnServiceUnknown(
   (void)res;
 
   // Begin try block.
-  COMMAND_BEGIN(contact_id->contact << ", " << enable)
+  COMMAND_BEGIN(contact_id->name << ", " << enable)
 
   // Find target contact.
-  contact* cntct(find_target_contact(contact_id->contact.c_str()));
+  contact* cntct(find_target_contact(contact_id->name.c_str()));
 
   // Set boolean value.
   cntct->notify_on_service_unknown = enable;
@@ -1652,7 +1652,7 @@ int centreonengine__contactSetNotificationsOnServiceWarning(
   COMMAND_BEGIN(contact_id << ", " << enable)
 
   // Find target contact.
-  contact* cntct(find_target_contact(contact_id->contact.c_str()));
+  contact* cntct(find_target_contact(contact_id->name.c_str()));
 
   // Set boolean value.
   cntct->notify_on_service_warning = enable;
@@ -1681,10 +1681,10 @@ int centreonengine__contactSetPager(
   (void)res;
 
   // Begin try block.
-  COMMAND_BEGIN(contact_id->contact << ", " << pager)
+  COMMAND_BEGIN(contact_id->name << ", " << pager)
 
   // Find target contact.
-  contact* cntct(find_target_contact(contact_id->contact.c_str()));
+  contact* cntct(find_target_contact(contact_id->name.c_str()));
 
   // Set new pager.
   delete [] cntct->pager;
@@ -1714,10 +1714,10 @@ int centreonengine__contactSetRetainStatusInformation(
   (void)res;
 
   // Begin try block.
-  COMMAND_BEGIN(contact_id->contact << ", " << enable)
+  COMMAND_BEGIN(contact_id->name << ", " << enable)
 
   // Find target contact.
-  contact* cntct(find_target_contact(contact_id->contact.c_str()));
+  contact* cntct(find_target_contact(contact_id->name.c_str()));
 
   // Set boolean vlaue.
   cntct->retain_status_information = enable;
@@ -1746,10 +1746,10 @@ int centreonengine__contactSetRetainStatusNonInformation(
   (void)res;
 
   // Begin try block.
-  COMMAND_BEGIN(contact_id->contact << ", " << enable)
+  COMMAND_BEGIN(contact_id->name << ", " << enable)
 
   // Find target contact.
-  contact* cntct(find_target_contact(contact_id->contact.c_str()));
+  contact* cntct(find_target_contact(contact_id->name.c_str()));
 
   // Set boolean value.
   cntct->retain_nonstatus_information = enable;
@@ -1778,10 +1778,10 @@ int centreonengine__contactSetNotificationsOnHostCommand(
   (void)res;
 
   // Begin try block.
-  COMMAND_BEGIN(contact_id->contact << ", " << command_id->command)
+  COMMAND_BEGIN(contact_id->name << ", " << command_id->command)
 
   // Find target contact.
-  contact* cntct(find_target_contact(contact_id->contact.c_str()));
+  contact* cntct(find_target_contact(contact_id->name.c_str()));
 
   // Set new notification command.
   delete [] cntct->host_notification_commands->cmd;
@@ -1812,10 +1812,10 @@ int centreonengine__contactSetNotificationsOnServiceCommand(
   (void)res;
 
   // Begin try block.
-  COMMAND_BEGIN(contact_id->contact << ", " << command_id->command)
+  COMMAND_BEGIN(contact_id->name << ", " << command_id->command)
 
   // Find target contact.
-  contact* cntct(find_target_contact(contact_id->contact.c_str()));
+  contact* cntct(find_target_contact(contact_id->name.c_str()));
 
   // Set new notification command.
   delete [] cntct->service_notification_commands->cmd;

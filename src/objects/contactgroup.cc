@@ -107,7 +107,7 @@ void objects::link(
 
     // Notify event broker of new member.
     broker_group_member(
-      NEBTYPE_CONTACTGROUP_ADD,
+      NEBTYPE_CONTACTGROUPMEMBER_ADD,
       NEBFLAG_NONE,
       NEBATTR_NONE,
       obj,

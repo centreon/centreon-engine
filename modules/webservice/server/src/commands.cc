@@ -11943,86 +11943,6 @@ int centreonengine__notificationServiceSend(soap* s,
 // }
 
 /**
- *  Add hostgroup.
- *
- *  @param[in]  s                 Unused.
- *  @param[in]  hostGroup         Hostgroup to add.
- *  @param[out] res               Unused.
- *
- *  @return SOAP_OK on success.
- */
-int centreonengine__addHostGroup(soap* s,
-				 ns1__hostGroupType* hostGroup,
-				 centreonengine__addHostGroupResponse& res) {
-  (void)res;
-
-  try {
-    sync::instance().wait_thread_safeness();
-
-    logger(dbg_functions, most)
-      << "Webservice: " << __func__ << "({" << hostGroup->name
-      << ", " << hostGroup->alias << "})";
-
-    create_host_group(*hostGroup);
-
-    sync::instance().worker_finish();
-  }
-  catch (std::exception const& e) {
-    logger(dbg_commands, most)
-           << "Webservice: " << __func__ << " failed: " << e.what() << ".";
-    sync::instance().worker_finish();
-    return (soap_receiver_fault(s, "invalid argument", e.what()));
-  }
-  catch (...) {
-    logger(dbg_commands, most)
-      << "Webservice: " << __func__ << " failed. catch all.";
-    sync::instance().worker_finish();
-    return (soap_receiver_fault(s, "Runtime error.", "catch all"));
-  }
-  return (SOAP_OK);
-}
-
-/**
- *  Add servicegroup.
- *
- *  @param[in]  s                 Unused.
- *  @param[in]  serviceGroup      Servicegroup to add.
- *  @param[out] res               Unused.
- *
- *  @return SOAP_OK on success.
- */
-int centreonengine__addServiceGroup(soap* s,
-				    ns1__serviceGroupType* serviceGroup,
-				    centreonengine__addServiceGroupResponse& res) {
-  (void)res;
-
-  try {
-    sync::instance().wait_thread_safeness();
-
-    logger(dbg_functions, most)
-      << "Webservice: " << __func__ << "({" << serviceGroup->name
-      << ", " << serviceGroup->alias << "})";
-
-    create_service_group(*serviceGroup);
-
-    sync::instance().worker_finish();
-  }
-  catch (std::exception const& e) {
-    logger(dbg_commands, most)
-           << "Webservice: " << __func__ << " failed: " << e.what() << ".";
-    sync::instance().worker_finish();
-    return (soap_receiver_fault(s, "invalid argument", e.what()));
-  }
-  catch (...) {
-    logger(dbg_commands, most)
-      << "Webservice: " << __func__ << " failed. catch all.";
-    sync::instance().worker_finish();
-    return (soap_receiver_fault(s, "Runtime error.", "catch all"));
-  }
-  return (SOAP_OK);
-}
-
-/**
  *  Add host.
  *
  *  @param[in]  s                 Unused.
@@ -12344,49 +12264,6 @@ int centreonengine__removeHost(soap* s,
 }
 
 /**
- *  Remove host group.
- *
- *  @param[in]  s                 Unused.
- *  @param[in]  hostgroup_id      Host group to remove.
- *  @param[out] res               Unused.
- *
- *  @return SOAP_OK on success.
- */
-int centreonengine__removeHostGroup(soap* s,
-				    ns1__hostGroupIDType* hostgroup_id,
-				    centreonengine__removeHostGroupResponse& res) {
-  (void)res;
-
-  try {
-    sync::instance().wait_thread_safeness();
-
-    logger(dbg_functions, most)
-      << "Webservice: " << __func__ << "(" << hostgroup_id->name << ")";
-
-    if (!remove_hostgroup_by_id(hostgroup_id->name.c_str())) {
-      std::string* error = soap_new_std__string(s, 1);
-      *error = "Host `" + hostgroup_id->name + "' not found.";
-
-      logger(dbg_commands, most)
-                     << "Webservice: " << __func__ << " failed. " << *error;
-
-      sync::instance().worker_finish();
-      return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
-    }
-
-    sync::instance().worker_finish();
-  }
-  catch (...) {
-    logger(dbg_commands, most)
-      << "Webservice: " << __func__ << " failed. catch all.";
-    sync::instance().worker_finish();
-    return (soap_receiver_fault(s, "Runtime error.", "catch all"));
-
-  }
-  return (SOAP_OK);
-}
-
-/**
  *  Remove service.
  *
  *  @param[in]  s                 Unused.
@@ -12411,49 +12288,6 @@ int centreonengine__removeService(soap* s,
       std::string* error = soap_new_std__string(s, 1);
       *error = "Service `" + service_id->service
         + "' with Host `" + service_id->host->name + "' not found.";
-
-      logger(dbg_commands, most)
-                     << "Webservice: " << __func__ << " failed. " << *error;
-
-      sync::instance().worker_finish();
-      return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
-    }
-
-    sync::instance().worker_finish();
-  }
-  catch (...) {
-    logger(dbg_commands, most)
-      << "Webservice: " << __func__ << " failed. catch all.";
-    sync::instance().worker_finish();
-    return (soap_receiver_fault(s, "Runtime error.", "catch all"));
-
-  }
-  return (SOAP_OK);
-}
-
-/**
- *  Remove service group.
- *
- *  @param[in]  s                 Unused.
- *  @param[in]  servicegroup_id   Service group to remove.
- *  @param[out] res               Unused.
- *
- *  @return SOAP_OK on success.
- */
-int centreonengine__removeServiceGroup(soap* s,
-				       ns1__serviceGroupIDType* servicegroup_id,
-				       centreonengine__removeServiceGroupResponse& res) {
-  (void)res;
-
-  try {
-    sync::instance().wait_thread_safeness();
-
-    logger(dbg_functions, most)
-      << "Webservice: " << __func__ << "(" << servicegroup_id->name << ")";
-
-    if (!remove_servicegroup_by_id(servicegroup_id->name.c_str())) {
-      std::string* error = soap_new_std__string(s, 1);
-      *error = "Service `" + servicegroup_id->name + "' not found.";
 
       logger(dbg_commands, most)
                      << "Webservice: " << __func__ << " failed. " << *error;

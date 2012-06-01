@@ -25,6 +25,7 @@
 #  include <QVector>
 #  include <string>
 #  include "com/centreon/engine/modules/webservice/namespace.hh"
+#  include "com/centreon/engine/objects.hh"
 #  include "soapH.h"
 
 CCE_MOD_WS_BEGIN()
@@ -35,12 +36,14 @@ void create_command(ns1__commandType const& command);
 void create_host(ns1__hostType const& host);
 void create_host_dependency(ns1__hostDependencyType const& hostdependency);
 void create_host_escalation(ns1__hostEscalationType const& hostescalation);
-void create_host_group(ns1__hostGroupType const& hostgroup);
+void create_hostgroup(ns1__hostgroupType const& hostgroup);
 void create_service(ns1__serviceType const& service);
 void create_service_dependency(ns1__serviceDependencyType const& servicedependency);
 void create_service_escalation(ns1__serviceEscalationType const& serviceescalation);
-void create_service_group(ns1__serviceGroupType const& servicegroup);
+void create_servicegroup(ns1__servicegroupType const& servicegroup);
 void create_timeperiod(ns1__timeperiodType const& tperiod);
+QVector<service*>
+     _find(std::vector<std::string> const& vec);
 std::map<char, bool>
      get_options(
        std::string const* opt,
