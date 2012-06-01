@@ -28,7 +28,7 @@ using namespace com::centreon::engine;
 using namespace com::centreon::engine::modules;
 
 /**
- *  Run add_host_comment test.
+ *  Check the save state configuration.
  */
 static int check_save_state() {
   int argc(QCoreApplication::argc());
@@ -45,7 +45,7 @@ static int check_save_state() {
     webservice::configuration::save::state save;
     save << config;
     if (save.to_string() != ref)
-      throw (engine_error() << "check_update_condifuration failed.");
+      throw (engine_error() << "check_save_state failed.");
   }
   return (0);
 }

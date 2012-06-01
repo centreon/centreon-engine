@@ -80,7 +80,7 @@ static bool check_full_resources() {
 }
 
 /**
- *  Run add_host_comment test.
+ *  Check the save resources configuration.
  */
 static int check_save_resources() {
   if (!check_null_resources())
