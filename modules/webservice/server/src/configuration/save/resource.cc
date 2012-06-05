@@ -63,8 +63,10 @@ resource& resource::operator=(resource const& right) {
  *
  *  @param[in] resources  The array of resources.
  */
-void resource::add_resource(char const** resources) {
-  for (unsigned int i(0); i < MACRO_X_COUNT; ++i)
+void resource::add_resource(char* const* resources) {
+  if (!resources)
+    return;
+  for (unsigned int i(0); i < MAX_USER_MACROS; ++i)
     if (resources[i])
       _stream << "$USER" << i + 1 << "$=" << resources[i] << std::endl;
 }

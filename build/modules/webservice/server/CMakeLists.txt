@@ -134,11 +134,25 @@ if (WITH_TESTING)
   #Set directories.
   set(TEST_DIR "${TEST_DIR}/modules/webservice/server")
 
-  # Test calling enter_standby_mode.
-  set(TEST_NAME "modules_webservice_")
+  # Test calling configuration_save_resource.
+  set(TEST_NAME "modules_webservice_configuration_save_resource")
   add_executable("${TEST_NAME}"
     "${TEST_DIR}/configuration/save/resource.cc")
   target_link_libraries("${TEST_NAME}" ${QT_LIBRARIES} "cce_core" "webservice")
   add_test("${TEST_NAME}" "${TEST_NAME}")
+
+  # Test calling configuration_save_state.
+  set(TEST_NAME "modules_webservice_configuration_save_state")
+  add_executable("${TEST_NAME}"
+    "${TEST_DIR}/configuration/save/state.cc")
+  target_link_libraries("${TEST_NAME}" ${QT_LIBRARIES} "cce_core" "webservice")
+  add_test("${TEST_NAME}" "${TEST_NAME}" "${TEST_DIR}/configuration/save/cfg/state.cfg")
+
+  # # Test calling configuration_save_objects.
+  # set(TEST_NAME "modules_webservice_configuration_save_objects")
+  # add_executable("${TEST_NAME}"
+  #   "${TEST_DIR}/configuration/save/objects.cc")
+  # target_link_libraries("${TEST_NAME}" ${QT_LIBRARIES} "cce_core" "webservice")
+  # add_test("${TEST_NAME}_commands" "${TEST_NAME}" "${TEST_DIR}/configuration/save/cfg/commands.cfg")
 
 endif ()

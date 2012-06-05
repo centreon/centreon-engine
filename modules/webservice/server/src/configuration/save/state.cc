@@ -18,6 +18,8 @@
 */
 
 #include <fstream>
+#include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/modules/webservice/configuration/save/state.hh"
 
 using namespace com::centreon::engine::modules::webservice::configuration::save;
@@ -90,6 +92,23 @@ state& state::operator<<(engine::configuration::state const& obj) {
        ++it)
     _stream << "broker_module=" << it->toStdString() << std::endl;
 
+  int command_check_interval
+    = obj.get_command_check_interval() / obj.get_interval_length();
+
+  static char const* date_format[] = {
+    "us",
+    "euro",
+    "iso8601",
+    "strict-iso8601"
+  };
+
+  static char const* delay_method[] = {
+    "n",
+    "d",
+    "s",
+    "u"
+  };
+
   _stream
     << "accept_passive_host_checks="
     << obj.get_accept_passive_host_checks() << std::endl
@@ -128,11 +147,11 @@ state& state::operator<<(engine::configuration::state const& obj) {
     << "check_service_freshness="
     << obj.get_check_service_freshness() << std::endl
     << "command_check_interval="
-    << obj.get_command_check_interval() << std::endl
+    << command_check_interval << std::endl
     << "command_file="
     << obj.get_command_file().toStdString() << std::endl
     << "date_format="
-    << obj.get_date_format() << std::endl
+    << date_format[obj.get_date_format()] << std::endl
     << "debug_file="
     << obj.get_debug_file().toStdString() << std::endl
     << "debug_level="
@@ -152,9 +171,17 @@ state& state::operator<<(engine::configuration::state const& obj) {
     << "enable_predictive_host_dependency_checks="
     << obj.get_enable_predictive_host_dependency_checks() << std::endl
     << "enable_predictive_service_dependency_checks="
-    << obj.get_enable_predictive_service_dependency_checks() << std::endl
-    << "event_broker_options="
-    << obj.get_event_broker_options() << std::endl
+    << obj.get_enable_predictive_service_dependency_checks() << std::endl;
+
+  _stream << "event_broker_options=";
+  if (obj.get_event_broker_options()
+      == static_cast<unsigned long>(BROKER_EVERYTHING))
+    _stream << "-1";
+  else
+    _stream << obj.get_event_broker_options();
+  _stream << std::endl;
+
+  _stream
     << "event_handler_timeout="
     << obj.get_event_handler_timeout() << std::endl
     << "execute_host_checks="
@@ -176,9 +203,17 @@ state& state::operator<<(engine::configuration::state const& obj) {
     << "host_check_timeout="
     << obj.get_host_check_timeout() << std::endl
     << "host_freshness_check_interval="
-    << obj.get_host_freshness_check_interval() << std::endl
-    << "host_inter_check_delay_method="
-    << obj.get_host_inter_check_delay_method() << std::endl
+    << obj.get_host_freshness_check_interval() << std::endl;
+
+  _stream << "host_inter_check_delay_method=";
+  if (obj.get_host_inter_check_delay_method()
+      == com::centreon::engine::configuration::state::icd_user)
+    _stream << scheduling_info.host_inter_check_delay;
+  else
+    _stream << delay_method[obj.get_host_inter_check_delay_method()];
+  _stream << std::endl;
+
+  _stream
     << "illegal_macro_output_chars="
     << obj.get_illegal_output_chars().toStdString() << std::endl
     << "illegal_object_name_chars="
@@ -258,11 +293,25 @@ state& state::operator<<(engine::configuration::state const& obj) {
     << "service_check_timeout="
     << obj.get_service_check_timeout() << std::endl
     << "service_freshness_check_interval="
-    << obj.get_service_freshness_check_interval() << std::endl
-    << "service_inter_check_delay_method="
-    << obj.get_service_inter_check_delay_method() << std::endl
-    << "service_interleave_factor="
-    << obj.get_service_interleave_factor_method() << std::endl
+    << obj.get_service_freshness_check_interval() << std::endl;
+
+  _stream  << "service_inter_check_delay_method=";
+  if (obj.get_service_inter_check_delay_method()
+      == com::centreon::engine::configuration::state::icd_user)
+    _stream << scheduling_info.service_inter_check_delay;
+  else
+    _stream << delay_method[obj.get_service_inter_check_delay_method()];
+  _stream << std::endl;
+
+  _stream << "service_interleave_factor=";
+  if (obj.get_service_interleave_factor_method()
+      == com::centreon::engine::configuration::state::ilf_user)
+    _stream << scheduling_info.service_interleave_factor;
+  else
+    _stream << "s";
+  _stream << std::endl;
+
+  _stream
     << "service_reaper_frequency="
     << obj.get_check_reaper_interval() << std::endl
     << "sleep_time="
@@ -280,8 +329,6 @@ state& state::operator<<(engine::configuration::state const& obj) {
     << "translate_passive_host_checks="
     << obj.get_translate_passive_host_checks() << std::endl
     << "use_aggressive_host_checking="
-    << obj.get_use_aggressive_host_checking() << std::endl
-    << "use_agressive_host_checking="
     << obj.get_use_aggressive_host_checking() << std::endl
     << "use_large_installation_tweaks="
     << obj.get_use_large_installation_tweaks() << std::endl
