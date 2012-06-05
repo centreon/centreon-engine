@@ -986,9 +986,27 @@ int centreonengine__serviceSetCheckCommand(
                  service_id->host->name.c_str(),
 		 service_id->service.c_str()));
 
-  // Set new check command.
-  delete [] svc->service_check_command;
-  svc->service_check_command = my_strdup(cmd.c_str());
+  // Update check command.
+  if (!cmd.empty()) {
+    // Find target command.
+    command* cmd_ptr(find_command(cmd.c_str()));
+    if (!cmd_ptr)
+      throw (engine_error()
+             << "cannot update check command of service ('"
+             << service_id->host->name << "', '" << service_id->service
+             << "'): command '" << cmd << "' does not exist");
+
+    // Set new check command.
+    delete [] svc->service_check_command;
+    svc->service_check_command = my_strdup(cmd.c_str());
+    svc->check_command_ptr = cmd_ptr;
+  }
+  // Remove check command.
+  else {
+    delete [] svc->service_check_command;
+    svc->service_check_command = NULL;
+    svc->check_command_ptr = NULL;
+  }
 
   // Notify event broker.
   notify_event_broker(svc);
@@ -1155,6 +1173,65 @@ int centreonengine__serviceSetCheckPassiveEnabled(
   // Exception handling.
   COMMAND_END()
   
+  return (SOAP_OK);
+}
+
+/**
+ *  Update or remove check timeperiod.
+ *
+ *  @param[in]  s             SOAP object.
+ *  @param[in]  service_id    Target service.
+ *  @param[in]  timeperiod_id Target timeperiod.
+ *  @param[out] res           Unused.
+ *
+ *  @return SOAP_OK on success.
+ */
+int centreonengine__serviceSetCheckPeriod(
+      soap* s,
+      ns1__serviceIDType* service_id,
+      ns1__timeperiodIDType* timeperiod_id,
+      centreonengine__serviceSetCheckPeriodResponse& res) {
+  (void)res;
+
+  // Begin try block.
+  COMMAND_BEGIN("{" << service_id->host->name
+                << ", " << service_id->service << "}")
+
+  // Find target service.
+  service* svc(find_target_service(
+                 service_id->host->name.c_str(),
+                 service_id->service.c_str()));
+
+  // Update timeperiod.
+  if (!timeperiod_id->timeperiod.empty()) {
+    // Find target timeperiod.
+    timeperiod*
+      tmprd(find_timeperiod(timeperiod_id->timeperiod.c_str()));
+    if (!tmprd)
+      throw (engine_error()
+             << "cannot update check period of service ('"
+             << service_id->host->name << "', '" << service_id->service
+             << "'): timeperiod '" << timeperiod_id->timeperiod
+             << "' does not exist");
+
+    // Set new timeperiod.
+    delete [] svc->check_period;
+    svc->check_period = my_strdup(timeperiod_id->timeperiod.c_str());
+    svc->check_period_ptr = tmprd;
+  }
+  // Remove timeperiod.
+  else {
+    delete [] svc->check_period;
+    svc->check_period = NULL;
+    svc->check_period_ptr = NULL;
+  }
+
+  // Notify event broker.
+  notify_event_broker(svc);
+
+  // Exception handling.
+  COMMAND_END()
+
   return (SOAP_OK);
 }
 
@@ -1377,9 +1454,27 @@ int centreonengine__serviceSetEventHandler(
                  service_id->host->name.c_str(),
 		 service_id->service.c_str()));
 
-  // Set new event handler.
-  delete [] svc->event_handler;
-  svc->event_handler = my_strdup(event_handler.c_str());
+  // Update event handler.
+  if (!event_handler.empty()) {
+    // Find target command.
+    command* cmd(find_command(event_handler.c_str()));
+    if (!cmd)
+      throw (engine_error()
+             << "cannot update event handler of service ('"
+             << service_id->host->name << "', '" << service_id->service
+             << "': command '" << event_handler << "' does not exist");
+
+    // Set new event handler.
+    delete [] svc->event_handler;
+    svc->event_handler = my_strdup(event_handler.c_str());
+    svc->event_handler_ptr = cmd;
+  }
+  // Remove event handler.
+  else {
+    delete [] svc->event_handler;
+    svc->event_handler = NULL;
+    svc->event_handler_ptr = NULL;
+  }
 
   // Notify event broker.
   notify_event_broker(svc);
@@ -3171,6 +3266,66 @@ int centreonengine__serviceSetNotificationsOnWarning(
   // Exception handling.
   COMMAND_END()
   
+  return (SOAP_OK);
+}
+
+/**
+ *  Update or remove notification period.
+ *
+ *  @param[in]  s
+ *  @param[in]  service_id
+ *  @param[in]  timeperiod_id
+ *  @param[out] res
+ *
+ *  @return SOAP_OK on success.
+ */
+int centreonengine__serviceSetNotificationsPeriod(
+      soap* s,
+      ns1__serviceIDType* service_id,
+      ns1__timeperiodIDType* timeperiod_id,
+      centreonengine__serviceSetNotificationsPeriodResponse& res) {
+  (void)res;
+
+  // Begin try block.
+  COMMAND_BEGIN("{" << service_id->host->name
+                << ", " << service_id->service << "}")
+
+  // Find target service.
+  service* svc(find_target_service(
+                 service_id->host->name.c_str(),
+                 service_id->service.c_str()));
+
+  // Update notification period.
+  if (!timeperiod_id->timeperiod.empty()) {
+    // Find target period.
+    timeperiod*
+      tmprd(find_timeperiod(timeperiod_id->timeperiod.c_str()));
+    if (!tmprd)
+      throw (engine_error()
+             << "cannot update notification period of service ('"
+             << service_id->host->name << "', '" << service_id->service
+             << "'): timeperiod '" << timeperiod_id->timeperiod
+             << "' does not exist");
+
+    // Set new timeperiod.
+    delete [] svc->notification_period;
+    svc->notification_period
+      = my_strdup(timeperiod_id->timeperiod.c_str());
+    svc->notification_period_ptr = tmprd;
+  }
+  // Remove notification period.
+  else {
+    delete [] svc->notification_period;
+    svc->notification_period = NULL;
+    svc->notification_period_ptr = NULL;
+  }
+
+  // Notify event broker.
+  notify_event_broker(svc);
+
+  // Exception handling.
+  COMMAND_END()
+
   return (SOAP_OK);
 }
 

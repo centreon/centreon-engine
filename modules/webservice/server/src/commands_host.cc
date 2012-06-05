@@ -1011,9 +1011,26 @@ int centreonengine__hostSetCheckCommand(
   // Find target host.
   host* hst(find_target_host(host_id->name.c_str()));
 
-  // Set new command.
-  delete [] hst->host_check_command;
-  hst->host_check_command = my_strdup(cmd.c_str());
+  // Update check command.
+  if (!cmd.empty()) {
+    // Find target command.
+    command* cmd_ptr(find_command(cmd.c_str()));
+    if (!cmd_ptr)
+      throw (engine_error() << "cannot update check command of host '"
+             << host_id->name << "': command '" << cmd
+             << "' does not exist");
+
+    // Set new command.
+    delete [] hst->host_check_command;
+    hst->host_check_command = my_strdup(cmd.c_str());
+    hst->check_command_ptr = cmd_ptr;
+  }
+  // Remove check command.
+  else {
+    delete [] hst->host_check_command;
+    hst->host_check_command = NULL;
+    hst->check_command_ptr = NULL;
+  }
 
   // Notify event broker.
   notify_event_broker(hst);
@@ -1160,6 +1177,60 @@ int centreonengine__hostSetCheckPassiveEnabled(
 
   // Enable or disable passive checks.
   hst->accept_passive_host_checks = enable;
+
+  // Notify event broker.
+  notify_event_broker(hst);
+
+  // Exception handling.
+  COMMAND_END()
+
+  return (SOAP_OK);
+}
+
+/**
+ *  Update or remove check timeperiod.
+ *
+ *  @param[in]  s             SOAP object.
+ *  @param[in]  host_id       Target host.
+ *  @param[in]  timeperiod_id Target timeperiod.
+ *  @param[out] res           Unused.
+ *
+ *  @return SOAP_OK on success.
+ */
+int centreonengine__hostSetCheckPeriod(
+      soap* s,
+      ns1__hostIDType* host_id,
+      ns1__timeperiodIDType* timeperiod_id,
+      centreonengine__hostSetCheckPeriodResponse& res) {
+  (void)res;
+
+  // Begin try block.
+  COMMAND_BEGIN(host_id->name << ", " << timeperiod_id->timeperiod)
+
+  // Find target host.
+  host* hst(find_target_host(host_id->name.c_str()));
+
+  // Update timeperiod.
+  if (!timeperiod_id->timeperiod.empty()) {
+    // Find target timeperiod.
+    timeperiod*
+      tmprd(find_timeperiod(timeperiod_id->timeperiod.c_str()));
+    if (!tmprd)
+      throw (engine_error() << "cannot update check period of host '"
+             << host_id->name << "': timeperiod '"
+             << timeperiod_id->timeperiod << "' does not exist");
+
+    // Set timeperiod.
+    delete [] hst->check_period;
+    hst->check_period = my_strdup(timeperiod_id->timeperiod.c_str());
+    hst->check_period_ptr = tmprd;
+  }
+  // Remove timeperiod.
+  else {
+    delete [] hst->check_period;
+    hst->check_period = NULL;
+    hst->check_period_ptr = NULL;
+  }
 
   // Notify event broker.
   notify_event_broker(hst);
@@ -1382,9 +1453,26 @@ int centreonengine__hostSetEventHandler(
   // Find target host.
   host* hst(find_target_host(host_id->name.c_str()));
 
-  // Set new event handler.
-  delete [] hst->event_handler;
-  hst->event_handler = my_strdup(event_handler.c_str());
+  // Update event handler.
+  if (!event_handler.empty()) {
+    // Find target command.
+    command* cmd(find_command(event_handler.c_str()));
+    if (!cmd)
+      throw (engine_error() << "cannot update event handler of host '"
+             << host_id->name << "': command '" << event_handler
+             << "' does not exist");
+
+    // Set new event handler.
+    delete [] hst->event_handler;
+    hst->event_handler = my_strdup(event_handler.c_str());
+    hst->event_handler_ptr = cmd;
+  }
+  // Remove event handler.
+  else {
+    delete [] hst->event_handler;
+    hst->event_handler = NULL;
+    hst->event_handler_ptr = NULL;
+  }
 
   // Notify event broker.
   notify_event_broker(hst);
@@ -3085,10 +3173,29 @@ int centreonengine__hostSetNotificationsPeriod(
   // Find target host.
   host* hst(find_target_host(host_id->name.c_str()));
 
-  // Set timeperiod.
-  delete [] hst->notification_period;
-  hst->notification_period
-    = my_strdup(timeperiod_id->timeperiod.c_str());
+  // Update timeperiod.
+  if (!timeperiod_id->timeperiod.empty()) {
+    // Find target timeperiod.
+    timeperiod*
+      tmprd(find_timeperiod(timeperiod_id->timeperiod.c_str()));
+    if (!tmprd)
+      throw (engine_error()
+             << "cannot update notification period of host '"
+             << host_id->name << "': timeperiod '"
+             << timeperiod_id->timeperiod << "' does not exist");
+
+    // Set timeperiod.
+    delete [] hst->notification_period;
+    hst->notification_period
+      = my_strdup(timeperiod_id->timeperiod.c_str());
+    hst->notification_period_ptr = tmprd;
+  }
+  // Remove timeperiod.
+  else {
+    delete [] hst->notification_period;
+    hst->notification_period = NULL;
+    hst->notification_period_ptr = NULL;
+  }
 
   // Notify event broker.
   notify_event_broker(hst);

@@ -613,7 +613,8 @@ int centreonengine__contactGetNotificationsOnHostTimeperiod(
   contact* cntct(find_target_contact(contact_id->name.c_str()));
 
   // Set timeperiod.
-  if (cntct->host_notification_period_ptr->name) {
+  if (cntct->host_notification_period_ptr
+      && cntct->host_notification_period_ptr->name) {
     time_period.val = soap_new_ns1__timeperiodIDType(s, 1);
     time_period.val->timeperiod
       = cntct->host_notification_period_ptr->name;
@@ -872,7 +873,8 @@ int centreonengine__contactGetNotificationsOnServiceTimeperiod(
   contact* cntct(find_target_contact(contact_id->name.c_str()));
 
   // Set timeperiod.
-  if (cntct->service_notification_period_ptr->name) {
+  if (cntct->service_notification_period_ptr
+      && cntct->service_notification_period_ptr->name) {
     time_period.val = soap_new_ns1__timeperiodIDType(s, 1);
     time_period.val->timeperiod
       = cntct->service_notification_period_ptr->name;
@@ -1361,10 +1363,29 @@ int centreonengine__contactSetNotificationsOnHostTimeperiod(
   // Find target contact.
   contact* cntct(find_target_contact(contact_id->name.c_str()));
 
-  // Set new timeperiod.
-  delete [] cntct->host_notification_period;
-  cntct->host_notification_period
-    = my_strdup(timeperiod_id->timeperiod.c_str());
+  // Update timeperiod.
+  if (!timeperiod_id->timeperiod.empty()) {
+    // Find target timeperiod.
+    timeperiod*
+      tmprd(find_timeperiod(timeperiod_id->timeperiod.c_str()));
+    if (!tmprd)
+      throw (engine_error()
+             << "cannot update host notification timeperiod of contact '"
+             << contact_id->name << "': timeperiod '"
+             << timeperiod_id->timeperiod << "' does not exist");
+
+    // Set new timeperiod.
+    delete [] cntct->host_notification_period;
+    cntct->host_notification_period
+      = my_strdup(timeperiod_id->timeperiod.c_str());
+    cntct->host_notification_period_ptr = tmprd;
+  }
+  // Remove timeperiod.
+  else {
+    delete [] cntct->host_notification_period;
+    cntct->host_notification_period = NULL;
+    cntct->host_notification_period_ptr = NULL;
+  }
 
   // Exception handling.
   COMMAND_END()
@@ -1587,10 +1608,29 @@ int centreonengine__contactSetNotificationsOnServiceTimeperiod(
   // Find target contact.
   contact* cntct(find_target_contact(contact_id->name.c_str()));
 
-  // Set new timeperiod.
-  delete [] cntct->service_notification_period;
-  cntct->service_notification_period
-    = my_strdup(timeperiod_id->timeperiod.c_str());
+  // Update timeperiod.
+  if (!timeperiod_id->timeperiod.empty()) {
+    // Find target timeperiod.
+    timeperiod*
+      tmprd(find_timeperiod(timeperiod_id->timeperiod.c_str()));
+    if (!tmprd)
+      throw (engine_error()
+             << "cannot update service notification timeperiod of contact '"
+             << contact_id->name << "': timeperiod '"
+             << timeperiod_id->timeperiod << "' does not exist");
+
+    // Set new timeperiod.
+    delete [] cntct->service_notification_period;
+    cntct->service_notification_period
+      = my_strdup(timeperiod_id->timeperiod.c_str());
+    cntct->service_notification_period_ptr = tmprd;
+  }
+  // Remove timeperiod.
+  else {
+    delete [] cntct->service_notification_period;
+    cntct->service_notification_period = NULL;
+    cntct->service_notification_period_ptr = NULL;
+  }
 
   // Exception handling.
   COMMAND_END()
