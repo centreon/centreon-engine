@@ -207,7 +207,7 @@ arg_definition::arg_definition() {
   argument vector_host_id("std::vector<ns1__hostIDType>", "value");
 
   argument host_type("ns1__hostType", "host");
-  host_type.add(arg_string).set_name("name");
+  host_type.add(host_id).set_name("id");
   host_type.add(arg_string).set_name("alias");
   host_type.add(arg_string).set_name("address");
   host_type.add(arg_uint).set_name("maxCheckAttempts")
@@ -424,10 +424,8 @@ arg_definition::arg_definition() {
   argument vector_service_id("std::vector<ns1__serviceIDType>", "value");
 
   argument service_type("ns1__serviceType", "service");
-  service_type.add(arg_string).set_name("hostName")
-    .set_help("host_name");
-  service_type.add(arg_string).set_name("serviceDescription")
-    .set_help("service_description");
+  service_type.add(service_id).set_name("id")
+    .set_help("service");
   service_type.add(arg_string).set_name("checkCommand")
     .set_help("check_command");
   service_type.add(arg_uint).set_name("maxCheckAttempts")

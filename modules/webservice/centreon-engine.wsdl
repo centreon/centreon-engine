@@ -96,7 +96,7 @@
       <!-- Host type. -->
       <complexType name="hostType">
         <sequence>
-          <element name="name" type="xsd:string"/>
+          <element name="id" type="tns:hostIDType"/>
           <element name="alias" type="xsd:string"/>
           <element name="displayName" type="xsd:string" minOccurs="0"/>
           <element name="address" type="xsd:string"/>
@@ -201,9 +201,8 @@
       <!-- Service type -->
       <complexType name="serviceType">
         <sequence>
-          <element name="hostName" type="xsd:string"/>
+	  <element name="id" type="tns:serviceIDType"/>
           <element name="hostgroupName" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
-          <element name="serviceDescription" type="xsd:string"/>
           <element name="displayName" type="xsd:string" minOccurs="0"/>
           <element name="servicegroups" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
           <element name="isVolatile" type="xsd:boolean" minOccurs="0"/>
@@ -633,7 +632,7 @@
   </message>
 
   <!-- Host add request. -->
-  <message name="addHostRequest">
+  <message name="hostFullRequest">
     <part name="host" type="tns:hostType"/>
   </message>
 
@@ -736,7 +735,7 @@
   </message>
 
   <!-- Service add request. -->
-  <message name="addServiceRequest">
+  <message name="serviceFullRequest">
     <part name="service" type="tns:serviceType"/>
   </message>
 
@@ -1341,20 +1340,6 @@
 	 Add object operations.
     -->
 
-    <!-- addHost() -->
-    <operation name="addHost">
-      <documentation>Add Host.</documentation>
-      <input message="tns:addHostRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
-
-    <!-- addService() -->
-    <operation name="addService">
-      <documentation>Add service.</documentation>
-      <input message="tns:addServiceRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
-
     <!-- addHostDependency() -->
     <operation name="addHostDependency">
       <documentation>Add host dependency.</documentation>
@@ -1393,20 +1378,6 @@
     <!--
 	 Remove object operations.
     -->
-
-    <!-- removeHost() -->
-    <operation name="removeHost">
-      <documentation>Remove host.</documentation>
-      <input message="tns:hostRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
-
-    <!-- removeService() -->
-    <operation name="removeService">
-      <documentation>Remove service.</documentation>
-      <input message="tns:serviceRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
 
     <!-- removeServiceEscalation() -->
     <operation name="removeServiceEscalation">
@@ -2165,10 +2136,35 @@
 
 
     <!--
-	                   
+
 	 Host.
-	                   
+
      -->
+
+    <!--
+         Global.
+     -->
+
+    <!-- hostAdd(host) -->
+    <operation name="hostAdd">
+      <documentation>Create a new host.</documentation>
+      <input message="tns:hostFullRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- hostModify(host) -->
+    <operation name="hostModify">
+      <documentation>Modify an existing host.</documentation>
+      <input message="tns:hostFullRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- hostRemove(host_id) -->
+    <operation name="hostRemove">
+      <documentation>Remove a host.</documentation>
+      <input message="tns:hostRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
 
     <!--
 	 Acknowledgement.
@@ -3097,10 +3093,35 @@
 
 
     <!--
-	                      
-	 Service properties.  
-	                      
+
+	 Service.
+
      -->
+
+    <!--
+         Global.
+     -->
+
+    <!-- serviceAdd(service) -->
+    <operation name="serviceAdd">
+      <documentation>Create a new service.</documentation>
+      <input message="tns:serviceFullRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- serviceModify(service) -->
+    <operation name="serviceModify">
+      <documentation>Modify an existing service.</documentation>
+      <input message="tns:serviceFullRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- serviceRemove(service_id) -->
+    <operation name="serviceRemove">
+      <documentation>Remove a service.</documentation>
+      <input message="tns:serviceRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
 
     <!--
 	 Acknowledgement.
@@ -4863,18 +4884,6 @@
          Add object operations.
     -->
 
-    <operation name="addHost">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
-    <operation name="addService">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
     <operation name="addHostDependency">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
@@ -4908,18 +4917,6 @@
     <!--
          Remove object operations.
     -->
-
-    <operation name="removeHost">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
-    <operation name="removeService">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
 
     <operation name="removeServiceEscalation">
       <SOAP:operation style="rpc" soapAction=""/>
@@ -5550,10 +5547,28 @@
 
 
     <!--
-	                   
-	 Host properties.  
-	                   
+
+	 Host.
+
      -->
+
+    <operation name="hostAdd">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="hostModify">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="hostRemove">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
 
     <operation name="hostGetAcknowledgementIsSet">
       <SOAP:operation style="rpc" soapAction=""/>
@@ -6271,10 +6286,28 @@
 
 
     <!--
-	                      
-	 Service properties.  
-	                      
+
+	 Service.
+
      -->
+
+    <operation name="serviceAdd">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="serviceModify">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="serviceRemove">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
 
     <operation name="serviceGetAcknowledgementIsSet">
       <SOAP:operation style="rpc" soapAction=""/>
