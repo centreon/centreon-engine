@@ -22,7 +22,6 @@
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/modules/webservice/commands.hh"
 #include "com/centreon/engine/modules/webservice/create_object.hh"
-#include "com/centreon/engine/modules/webservice/sync_lock.hh"
 #include "com/centreon/engine/objects.hh"
 #include "com/centreon/engine/objects/contact.hh"
 #include "soapH.h"
@@ -1072,7 +1071,7 @@ int centreonengine__contactRemove(
 
   // Remove contact.
   if (!remove_contact_by_id(contact_id->name.c_str()))
-    throw (engine_error() << "Contact '" << contact_id->name
+    throw (engine_error() << "contact '" << contact_id->name
            << "' not found");
 
   // Exception handling.
