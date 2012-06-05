@@ -66,7 +66,7 @@ objects& objects::operator=(objects const& right) {
  */
 objects& objects::operator<<(command const& obj) {
   _stream << "define command{\n";
-  _add_string("name", obj.name);
+  _add_string("command_name", obj.name);
   _add_string("command_line", obj.command_line);
   _stream << "}\n";
   return (*this);
@@ -416,7 +416,7 @@ objects& objects::operator<<(serviceescalation const& obj) {
 
   _stream << "define serviceescalation{\n";
   _add_string("host_name", obj.host_name);
-  _add_string("description", obj.description);
+  _add_string("service_description", obj.description);
   _add_contacts("contacts", obj.contacts);
   _add_contactgroups("contact_groups", obj.contact_groups);
   _add_line("first_notification", obj.first_notification);
@@ -661,17 +661,21 @@ void objects::_add_timerange(char const* key, timerange const* obj) {
   if (!obj)
     return;
   _stream << "  " << key << " ";
+  std::string output;
   for (timerange const* range(obj); range; range = range->next) {
     unsigned int start_hours(range->range_start / 3600);
     unsigned int start_minutes((range->range_start % 3600) / 60);
     unsigned int end_hours(range->range_end / 3600);
     unsigned int end_minutes((range->range_end % 3600) / 60);
-    _stream << std::setfill('0') << std::setw(2) << start_hours << ":"
-            << std::setfill('0') << std::setw(2) << start_minutes << "-"
-            << std::setfill('0') << std::setw(2) << end_hours << ":"
-            << std::setfill('0') << std::setw(2) << end_minutes
-            << (range->next ? "," : "\n");
+    std::ostringstream oss;
+    oss << std::setfill('0') << std::setw(2) << start_hours << ":"
+        << std::setfill('0') << std::setw(2) << start_minutes << "-"
+        << std::setfill('0') << std::setw(2) << end_hours << ":"
+        << std::setfill('0') << std::setw(2) << end_minutes
+        << (range == obj ? "\n" : ",");
+    output.insert(0, oss.str());
   }
+  _stream << output;
 }
 
 /**
@@ -685,9 +689,18 @@ std::string objects::_build_daterange_calendar_date(daterange const* obj) {
   if (!obj || obj->type != DATERANGE_CALENDAR_DATE)
     return ("");
   std::ostringstream oss;
-  oss << obj->syear << "-" << obj->smon + 1 << "-" << obj->smday << " - "
-      << obj->eyear << "-" << obj->emon + 1 << "-" << obj->emday << " / "
-      << obj->skip_interval;
+  oss << std::setfill('0') << std::setw(2) << obj->syear << "-"
+      << std::setfill('0') << std::setw(2)<< obj->smon + 1 << "-"
+      << std::setfill('0') << std::setw(2)<< obj->smday;
+  if (obj->syear != obj->eyear
+      || obj->smon != obj->emon
+      || obj->smday != obj->emday)
+    oss << " - "
+        << std::setfill('0') << std::setw(2)<< obj->eyear << "-"
+        << std::setfill('0') << std::setw(2)<< obj->emon + 1 << "-"
+        << std::setfill('0') << std::setw(2)<< obj->emday;
+  if (obj->skip_interval)
+    oss << " / " << obj->skip_interval;
   return (oss.str());
 }
 
@@ -702,9 +715,16 @@ std::string objects::_build_daterange_month_date(daterange const* obj) {
   if (!obj || obj->type != DATERANGE_MONTH_DATE)
     return ("");
   std::ostringstream oss;
-  oss << _get_month(obj->smon) << " " << obj->smday << " - "
-      << _get_month(obj->emon) << " " << obj->emday << " / "
-      << obj->skip_interval;
+  char const* smon(_get_month(obj->smon));
+  char const* emon(_get_month(obj->emon));
+  oss << smon << " " << obj->smday;
+  if (smon != emon)
+    oss << " - " << emon << " " << obj->emday;
+  else if (obj->smday != obj->emday)
+    oss << " - " << obj->emday;
+
+  if (obj->skip_interval)
+    oss << " / " << obj->skip_interval;
   return (oss.str());
 }
 
@@ -719,8 +739,11 @@ std::string objects::_build_daterange_month_day(daterange const* obj) {
   if (!obj || obj->type != DATERANGE_MONTH_DAY)
     return ("");
   std::ostringstream oss;
-  oss << "day " << obj->smday << " - day " << obj->emday << " / "
-      << obj->skip_interval;
+  oss << "day " << obj->smday;
+  if (obj->smday != obj->emday)
+    oss << " - " << obj->emday;
+  if (obj->skip_interval)
+    oss << " / " << obj->skip_interval;
   return (oss.str());
 }
 
@@ -738,9 +761,14 @@ std::string objects::_build_daterange_month_week_day(
     return ("");
   std::ostringstream oss;
   oss << _get_weekday(obj->swday) << " " << obj->swday_offset << " "
-      << _get_month(obj->smon) << " - " << _get_weekday(obj->ewday)
-      << " " << obj->ewday_offset << " " << _get_month(obj->emon)
-      << " / " << obj->skip_interval;
+      << _get_month(obj->smon);
+  if (obj->swday != obj->ewday
+      || obj->swday_offset != obj->ewday_offset
+      || obj->smon != obj->emon)
+    oss << " - " << _get_weekday(obj->ewday)
+        << " " << obj->ewday_offset << " " << _get_month(obj->emon);
+  if (obj->skip_interval)
+    oss << " / " << obj->skip_interval;
   return (oss.str());
 }
 
@@ -755,9 +783,13 @@ std::string objects::_build_daterange_week_day(daterange const* obj) {
   if (!obj || obj->type != DATERANGE_WEEK_DAY)
     return ("");
   std::ostringstream oss;
-  oss << _get_weekday(obj->swday) << " " << obj->smday << " - "
-      << _get_weekday(obj->ewday) << " " << obj->emday << " / "
-      << obj->skip_interval;
+  oss << _get_weekday(obj->swday) << " " << obj->swday_offset;
+  if (obj->swday != obj->ewday
+      || obj->swday_offset != obj->ewday_offset)
+    oss << " - " << _get_weekday(obj->ewday)
+        << " " << obj->ewday_offset;
+  if (obj->skip_interval)
+    oss << " / " << obj->skip_interval;
   return (oss.str());
 }
 
