@@ -41,7 +41,6 @@ void create_service(ns1__serviceType const& service);
 void create_service_dependency(ns1__serviceDependencyType const& servicedependency);
 void create_service_escalation(ns1__serviceEscalationType const& serviceescalation);
 void create_servicegroup(ns1__servicegroupType const& servicegroup);
-void create_timeperiod(ns1__timeperiodType const& tperiod);
 QVector<service*>
      _find(std::vector<std::string> const& vec);
 std::map<char, bool>

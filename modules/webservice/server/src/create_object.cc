@@ -539,16 +539,3 @@ void webservice::create_service_escalation(ns1__serviceEscalationType const& svc
     }
   }
 }
-
-/**
- *  Create a new timeperiod into the engine.
- *
- *  @param[in] tperiod The struct with all
- *  information to create new timeperiod.
- */
-void webservice::create_timeperiod(ns1__timeperiodType const& tperiod) {
-  objects::add_timeperiod(tperiod.name.c_str(),
-                          tperiod.alias.c_str(),
-                          std2qt(tperiod.range),
-                          std2qt(tperiod.exclude));
-}

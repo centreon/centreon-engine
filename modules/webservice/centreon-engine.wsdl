@@ -364,14 +364,14 @@
       <!-- Timeperiod identifier. -->
       <complexType name="timeperiodIDType">
 	<sequence>
-	  <element name="timeperiod" type="xsd:string"/>
+	  <element name="name" type="xsd:string"/>
 	</sequence>
       </complexType>
 
-      <!-- Timeperiod identifier. -->
+      <!-- Timeperiod. -->
       <complexType name="timeperiodType">
 	<sequence>
-	  <element name="name" type="xsd:string"/>
+	  <element name="id" type="tns:timeperiodIDType"/>
 	  <element name="alias" type="xsd:string"/>
 	  <element name="range" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
 	  <element name="exclude" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
@@ -879,14 +879,14 @@
          Timeperiod.
   -->
 
-  <!-- Add a timeperiod. -->
-  <message name="timeperiodRequest">
-    <part name="timeperiod" type="tns:timeperiodIDType"/>
+  <!-- Add or modify a timeperiod. -->
+  <message name="timeperiodFullRequest">
+    <part name="timeperiod" type="tns:timeperiodType"/>
   </message>
 
-  <!-- Add a timeperiod. -->
-  <message name="addTimeperiodRequest">
-    <part name="timeperiod" type="tns:timeperiodType"/>
+  <!-- Timeperiod request. -->
+  <message name="timeperiodRequest">
+    <part name="timeperiod" type="tns:timeperiodIDType"/>
   </message>
 
   <!--
@@ -1368,13 +1368,6 @@
       <output message="tns:defaultResponse"/>
     </operation>
 
-    <!-- addTimeperiod() -->
-    <operation name="addTimeperiod">
-      <documentation>Add timeperiod.</documentation>
-      <input message="tns:addTimeperiodRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
-
     <!--
 	 Remove object operations.
     -->
@@ -1392,13 +1385,6 @@
       <input message="tns:serviceDependencyRequest"/>
       <output message="tns:defaultResponse"/>
     </operation>
-
-    <!-- removeTimeperiod() -->
-    <!-- <operation name="removeTimeperiod"> -->
-    <!--   <documentation>Remove timeperiod.</documentation> -->
-    <!--   <input message="tns:timeperiodRequest"/> -->
-    <!--   <output message="tns:defaultResponse"/> -->
-    <!-- </operation> -->
 
     <!--
 	 Features.
@@ -4398,6 +4384,33 @@
     </operation>
 
 
+    <!--
+
+         Timeperiod.
+
+     -->
+
+    <!-- timeperiodAdd(timeperiod) -->
+    <operation name="timeperiodAdd">
+      <documentation>Create a new timeperiod.</documentation>
+      <input message="tns:timeperiodFullRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- timeperiodModify(timeperiod) -->
+    <operation name="timeperiodModify">
+      <documentation>Modify an existing timeperiod.</documentation>
+      <input message="tns:timeperiodFullRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- timeperiodRemove(timeperiod_id) -->
+    <operation name="timeperiodRemove">
+      <documentation>Remove an existing timeperiod.</documentation>
+      <input message="tns:timeperiodRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
     <!-- Not validated commands. -->
 
     <!-- flushPendingCommands() -->
@@ -7291,6 +7304,30 @@
     </operation>
 
     <operation name="servicegroupRemoveService">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <!--
+
+         Timeperiod.
+
+     -->
+
+    <operation name="timeperiodAdd">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="timeperiodModify">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="timeperiodRemove">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
       <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>

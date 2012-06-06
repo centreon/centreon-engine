@@ -68,6 +68,7 @@ add_library("webservice" SHARED
   "${SRC_DIR}/commands_misc.cc"
   "${SRC_DIR}/commands_service.cc"
   "${SRC_DIR}/commands_servicegroup.cc"
+  "${SRC_DIR}/commands_timeperiod.cc"
   "${SRC_DIR}/configuration.cc"
   "${SRC_DIR}/configuration/save/objects.cc"
   "${SRC_DIR}/configuration/save/resource.cc"

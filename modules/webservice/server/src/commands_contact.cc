@@ -678,7 +678,7 @@ int centreonengine__contactGetNotificationsOnHostTimeperiod(
   if (cntct->host_notification_period_ptr
       && cntct->host_notification_period_ptr->name) {
     time_period.val = soap_new_ns1__timeperiodIDType(s, 1);
-    time_period.val->timeperiod
+    time_period.val->name
       = cntct->host_notification_period_ptr->name;
   }
 
@@ -907,7 +907,7 @@ int centreonengine__contactGetNotificationsOnServiceTimeperiod(
   if (cntct->service_notification_period_ptr
       && cntct->service_notification_period_ptr->name) {
     time_period.val = soap_new_ns1__timeperiodIDType(s, 1);
-    time_period.val->timeperiod
+    time_period.val->name
       = cntct->service_notification_period_ptr->name;
   }
 
@@ -1500,26 +1500,26 @@ int centreonengine__contactSetNotificationsOnHostTimeperiod(
   (void)res;
 
   // Begin try block.
-  COMMAND_BEGIN(contact_id->name << ", " << timeperiod_id->timeperiod)
+  COMMAND_BEGIN(contact_id->name << ", " << timeperiod_id->name)
 
   // Find target contact.
   contact* cntct(find_target_contact(contact_id->name.c_str()));
 
   // Update timeperiod.
-  if (!timeperiod_id->timeperiod.empty()) {
+  if (!timeperiod_id->name.empty()) {
     // Find target timeperiod.
     timeperiod*
-      tmprd(find_timeperiod(timeperiod_id->timeperiod.c_str()));
+      tmprd(find_timeperiod(timeperiod_id->name.c_str()));
     if (!tmprd)
       throw (engine_error()
              << "cannot update host notification timeperiod of contact '"
              << contact_id->name << "': timeperiod '"
-             << timeperiod_id->timeperiod << "' does not exist");
+             << timeperiod_id->name << "' does not exist");
 
     // Set new timeperiod.
     delete [] cntct->host_notification_period;
     cntct->host_notification_period
-      = my_strdup(timeperiod_id->timeperiod.c_str());
+      = my_strdup(timeperiod_id->name.c_str());
     cntct->host_notification_period_ptr = tmprd;
   }
   // Remove timeperiod.
@@ -1745,26 +1745,26 @@ int centreonengine__contactSetNotificationsOnServiceTimeperiod(
   (void)res;
 
   // Begin try block.
-  COMMAND_BEGIN(contact_id->name << ", " << timeperiod_id->timeperiod)
+  COMMAND_BEGIN(contact_id->name << ", " << timeperiod_id->name)
 
   // Find target contact.
   contact* cntct(find_target_contact(contact_id->name.c_str()));
 
   // Update timeperiod.
-  if (!timeperiod_id->timeperiod.empty()) {
+  if (!timeperiod_id->name.empty()) {
     // Find target timeperiod.
     timeperiod*
-      tmprd(find_timeperiod(timeperiod_id->timeperiod.c_str()));
+      tmprd(find_timeperiod(timeperiod_id->name.c_str()));
     if (!tmprd)
       throw (engine_error()
              << "cannot update service notification timeperiod of contact '"
              << contact_id->name << "': timeperiod '"
-             << timeperiod_id->timeperiod << "' does not exist");
+             << timeperiod_id->name << "' does not exist");
 
     // Set new timeperiod.
     delete [] cntct->service_notification_period;
     cntct->service_notification_period
-      = my_strdup(timeperiod_id->timeperiod.c_str());
+      = my_strdup(timeperiod_id->name.c_str());
     cntct->service_notification_period_ptr = tmprd;
   }
   // Remove timeperiod.

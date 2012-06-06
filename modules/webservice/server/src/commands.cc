@@ -1964,45 +1964,6 @@ int centreonengine__addServiceEscalation(soap* s,
 }
 
 /**
- *  Add timeperiod.
- *
- *  @param[in]  s                 Unused.
- *  @param[in]  tperiod           Timeperiod to add.
- *  @param[out] res               Unused.
- *
- *  @return SOAP_OK on success.
- */
-int centreonengine__addTimeperiod(soap* s,
-                                  ns1__timeperiodType* tperiod,
-                                  centreonengine__addTimeperiodResponse& res) {
-  (void)res;
-
-  try {
-    sync::instance().wait_thread_safeness();
-
-    logger(dbg_functions, most)
-      << "Webservice: " << __func__ << "(" << tperiod->name << ")";
-
-    create_timeperiod(*tperiod);
-
-    sync::instance().worker_finish();
-  }
-  catch (std::exception const& e) {
-    logger(dbg_commands, most)
-      << "Webservice: " << __func__ << " failed: " << e.what() << ".";
-    sync::instance().worker_finish();
-    return (soap_receiver_fault(s, "invalid argument", e.what()));
-  }
-  catch (...) {
-    logger(dbg_commands, most)
-      << "Webservice: " << __func__ << " failed. catch all.";
-    sync::instance().worker_finish();
-    return (soap_receiver_fault(s, "Runtime error.", "catch all"));
-  }
-  return (SOAP_OK);
-}
-
-/**
  *  Remove service escalation.
  *
  *  @param[in]  s                    Unused.
@@ -2099,49 +2060,6 @@ int centreonengine__removeServiceDependency(soap* s,
   return (SOAP_OK);
 }
 
-/**
- *  Remove timeperiod.
- *
- *  @param[in]  s                 Unused.
- *  @param[in]  timeperiod_id     Timeperiod to remove.
- *  @param[out] res               Unused.
- *
- *  @return SOAP_OK on success.
- *
-int centreonengine__removeTimeperiod(soap* s,
-				     ns1__timeperiodIDType* timeperiod_id,
-				     centreonengine__removeTimeperiodResponse& res) {
-  (void)res;
-
-  try {
-    sync::instance().wait_thread_safeness();
-
-    logger(dbg_functions, most)
-      << "Webservice: " << __func__ << "(" << timeperiod_id->timeperiod.c_str() << ")";
-
-    if (!remove_timeperiod_by_id(timeperiod_id->timeperiod.c_str())) {
-      std::string* error = soap_new_std__string(s, 1);
-      *error = "Host `" + timeperiod_id->timeperiod + "' not found.";
-
-      logger(dbg_commands, most)
-                     << "Webservice: " << __func__ << " failed. " << *error;
-
-      sync::instance().worker_finish();
-      return (soap_receiver_fault(s, "Invalid parameter.", error->c_str()));
-    }
-
-    sync::instance().worker_finish();
-  }
-  catch (...) {
-    logger(dbg_commands, most)
-      << "Webservice: " << __func__ << " failed. catch all.";
-    sync::instance().worker_finish();
-    return (soap_receiver_fault(s, "Runtime error.", "catch all"));
-
-  }
-  return (SOAP_OK);
-}
-*/
 /**
  *  Check if event handlers are enabled globally.
  *

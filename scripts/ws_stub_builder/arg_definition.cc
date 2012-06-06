@@ -561,11 +561,11 @@ arg_definition::arg_definition() {
     .set_is_optional(true);
 
   argument timeperiod_id("ns1__timeperiodIDType", "timeperiod");
-  timeperiod_id.add(arg_string).set_name("timeperiod")
+  timeperiod_id.add(arg_string).set_name("name")
     .set_help("timeperiod_id");
 
   argument timeperiod_type("ns1__timeperiodType", "tperiod");
-  timeperiod_type.add(arg_string).set_name("name");
+  timeperiod_type.add(timeperiod_id).set_name("id");
   timeperiod_type.add(arg_string).set_name("alias");
   timeperiod_type.add(arg_vectorstr).set_name("range")
     .set_is_optional(true)

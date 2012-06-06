@@ -863,7 +863,7 @@ int centreonengine__serviceGetCheckPeriod(
   // Set check period.
   if (svc->check_period) {
     res.val = soap_new_ns1__timeperiodIDType(s, 1);
-    res.val->timeperiod = svc->check_period;
+    res.val->name = svc->check_period;
   }
 
   // Exception handling.
@@ -1215,20 +1215,20 @@ int centreonengine__serviceSetCheckPeriod(
                  service_id->service.c_str()));
 
   // Update timeperiod.
-  if (!timeperiod_id->timeperiod.empty()) {
+  if (!timeperiod_id->name.empty()) {
     // Find target timeperiod.
     timeperiod*
-      tmprd(find_timeperiod(timeperiod_id->timeperiod.c_str()));
+      tmprd(find_timeperiod(timeperiod_id->name.c_str()));
     if (!tmprd)
       throw (engine_error()
              << "cannot update check period of service ('"
              << service_id->host->name << "', '" << service_id->service
-             << "'): timeperiod '" << timeperiod_id->timeperiod
+             << "'): timeperiod '" << timeperiod_id->name
              << "' does not exist");
 
     // Set new timeperiod.
     delete [] svc->check_period;
-    svc->check_period = my_strdup(timeperiod_id->timeperiod.c_str());
+    svc->check_period = my_strdup(timeperiod_id->name.c_str());
     svc->check_period_ptr = tmprd;
   }
   // Remove timeperiod.
@@ -2930,7 +2930,7 @@ int centreonengine__serviceGetNotificationsPeriod(
   // Get notification period.
   if (svc->notification_period) {
     res.val = soap_new_ns1__timeperiodIDType(s, 1);
-    res.val->timeperiod = svc->notification_period;
+    res.val->name = svc->notification_period;
   }
 
   // Exception handling.
@@ -3308,21 +3308,21 @@ int centreonengine__serviceSetNotificationsPeriod(
                  service_id->service.c_str()));
 
   // Update notification period.
-  if (!timeperiod_id->timeperiod.empty()) {
+  if (!timeperiod_id->name.empty()) {
     // Find target period.
     timeperiod*
-      tmprd(find_timeperiod(timeperiod_id->timeperiod.c_str()));
+      tmprd(find_timeperiod(timeperiod_id->name.c_str()));
     if (!tmprd)
       throw (engine_error()
              << "cannot update notification period of service ('"
              << service_id->host->name << "', '" << service_id->service
-             << "'): timeperiod '" << timeperiod_id->timeperiod
+             << "'): timeperiod '" << timeperiod_id->name
              << "' does not exist");
 
     // Set new timeperiod.
     delete [] svc->notification_period;
     svc->notification_period
-      = my_strdup(timeperiod_id->timeperiod.c_str());
+      = my_strdup(timeperiod_id->name.c_str());
     svc->notification_period_ptr = tmprd;
   }
   // Remove notification period.
