@@ -1223,17 +1223,17 @@ arg_definition::arg_definition() {
   // param_131.add().set_name("");
   // _list.push_back(param_131);
 
-  argument param_132("centreonengine__contactGetNotificationsOnHostCommandResponse", "_param_132");
-  param_132.add(command_id).set_name("command");
-  _list.push_back(param_132);
+  // argument param_132("centreonengine__contactGetNotificationsOnHostCommandResponse", "_param_132");
+  // param_132.add(command_id).set_name("command");
+  // _list.push_back(param_132);
 
   argument param_133("centreonengine__contactGetNotificationsOnHostTimeperiodResponse", "_param_133");
   param_133.add(timeperiod_id).set_name("val");
   _list.push_back(param_133);
 
-  argument param_134("centreonengine__contactGetNotificationsOnServiceCommandResponse", "_param_134");
-  param_134.add(command_id).set_name("command");
-  _list.push_back(param_134);
+  // argument param_134("centreonengine__contactGetNotificationsOnServiceCommandResponse", "_param_134");
+  // param_134.add(command_id).set_name("command");
+  // _list.push_back(param_134);
 
   argument param_135("centreonengine__contactGetNotificationsOnServiceTimeperiodResponse", "_param_135");
   param_135.add(timeperiod_id).set_name("val");

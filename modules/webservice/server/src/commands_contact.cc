@@ -18,7 +18,10 @@
 */
 
 #include <map>
+#include <memory>
+#include <stdlib.h>
 #include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/modules/webservice/commands.hh"
 #include "com/centreon/engine/modules/webservice/create_object.hh"
@@ -223,6 +226,96 @@ int centreonengine__contactAdd(
 }
 
 /**
+ *  Add a contact notification command for host events.
+ *
+ *  @param[in]  s          SOAP object.
+ *  @param[in]  contact_id Target contact.
+ *  @param[in]  command_id New host notification command.
+ *  @param[out] res        Unused.
+ *
+ *  @return SOAP_OK on success.
+ */
+int centreonengine__contactAddNotificationsOnHostCommand(
+      soap* s,
+      ns1__contactIDType* contact_id,
+      ns1__commandIDType* command_id,
+      centreonengine__contactAddNotificationsOnHostCommandResponse& res) {
+  (void)res;
+
+  // Begin try block.
+  COMMAND_BEGIN(contact_id->name << ", " << command_id->command)
+
+  // Find target contact.
+  contact* cntct(find_target_contact(contact_id->name.c_str()));
+
+  // Find command.
+  command* cmd(find_command(command_id->command.c_str()));
+  if (!cmd)
+    throw (engine_error()
+           << "cannot add new host notification command '"
+           << command_id->command << "' to contact '"
+           << contact_id->name << "': command does not exist");
+
+  // Add new notification command.
+  std::auto_ptr<commandsmember> mbr(new commandsmember);
+  memset(mbr.get(), 0, sizeof(*mbr));
+  mbr->cmd = my_strdup(command_id->command.c_str());
+  mbr->command_ptr = cmd;
+  mbr->next = cntct->host_notification_commands;
+  cntct->host_notification_commands = mbr.release();
+
+  // Exception handling.
+  COMMAND_END()
+
+  return (SOAP_OK);
+}
+
+/**
+ *  Add a service notification command.
+ *
+ *  @param[in]  s          SOAP object.
+ *  @param[in]  contact_id Target contact.
+ *  @param[in]  command_id New service notification command.
+ *  @param[out] res        Unused.
+ *
+ *  @return SOAP_OK on success.
+ */
+int centreonengine__contactAddNotificationsOnServiceCommand(
+      soap* s,
+      ns1__contactIDType* contact_id,
+      ns1__commandIDType* command_id,
+      centreonengine__contactAddNotificationsOnServiceCommandResponse& res) {
+  (void)res;
+
+  // Begin try block.
+  COMMAND_BEGIN(contact_id->name << ", " << command_id->command)
+
+  // Find target contact.
+  contact* cntct(find_target_contact(contact_id->name.c_str()));
+
+  // Find command.
+  command* cmd(find_command(command_id->command.c_str()));
+  if (!cmd)
+    throw (engine_error()
+           << "cannot add new service notification command '"
+           << command_id->command << "' to contact '"
+           << contact_id->name << "': command does not exist");
+
+  // Add new notification command.
+  std::auto_ptr<commandsmember> mbr(new commandsmember);
+  memset(mbr.get(), 0, sizeof(*mbr));
+  mbr->cmd = my_strdup(command_id->command.c_str());
+  mbr->command_ptr = cmd;
+  mbr->next = cntct->service_notification_commands;
+  cntct->service_notification_commands = mbr.release();
+
+  // Exception handling.
+  COMMAND_END()
+
+  return (SOAP_OK);
+}
+
+/**
  *  Get the contact alias.
  *
  *  @param[in]  s          SOAP object.
@@ -387,37 +480,6 @@ int centreonengine__contactGetModifiedAttributesService(
 
   // Set modified service attributes.
   modsattr = cntct->modified_service_attributes;
-
-  // Exception handling.
-  COMMAND_END()
-
-  return (SOAP_OK);
-}
-
-/**
- *  Get the host notification command of the contact.
- *
- *  @param[in]  s          SOAP object.
- *  @param[in]  contact_id Target contact.
- *  @param[out] cmd        Host notification command.
- *
- *  @return SOAP_OK on success.
- */
-int centreonengine__contactGetNotificationsOnHostCommand(
-      soap* s,
-      ns1__contactIDType* contact_id,
-      centreonengine__contactGetNotificationsOnHostCommandResponse& cmd) {
-  // Begin try block.
-  COMMAND_BEGIN(contact_id->name)
-
-  // Find target contact.
-  contact* cntct(find_target_contact(contact_id->name.c_str()));
-
-  // Set notification command.
-  if (cntct->host_notification_commands->cmd) {
-    cmd.command = soap_new_ns1__commandIDType(s, 1);
-    cmd.command->command = cntct->host_notification_commands->cmd;
-  }
 
   // Exception handling.
   COMMAND_END()
@@ -647,37 +709,6 @@ int centreonengine__contactGetNotificationsOnHostUnreachable(
 
   // Set boolean value.
   notified = cntct->notify_on_host_unreachable;
-
-  // Exception handling.
-  COMMAND_END()
-
-  return (SOAP_OK);
-}
-
-/**
- *  Get the service notification command of the contact.
- *
- *  @param[in]  s          SOAP object.
- *  @param[in]  contact_id Target contact.
- *  @param[out] cmd        Service notification command.
- *
- *  @return SOAP_OK on success.
- */
-int centreonengine__contactGetNotificationsOnServiceCommand(
-      soap* s,
-      ns1__contactIDType* contact_id,
-      centreonengine__contactGetNotificationsOnServiceCommandResponse& cmd) {
-  // Begin try block.
-  COMMAND_BEGIN(contact_id->name)
-
-  // Find target contact.
-  contact* cntct(find_target_contact(contact_id->name.c_str()));
-
-  // Set notification command.
-  if (cntct->service_notification_commands->cmd) {
-    cmd.command = soap_new_ns1__commandIDType(s, 1);
-    cmd.command->command = cntct->service_notification_commands->cmd;
-  }
 
   // Exception handling.
   COMMAND_END()
@@ -1071,10 +1102,121 @@ int centreonengine__contactRemove(
   // Begin try block.
   COMMAND_BEGIN(contact_id->name)
 
-  // Remove contact.
-  if (!remove_contact_by_id(contact_id->name.c_str()))
-    throw (engine_error() << "contact '" << contact_id->name
-           << "' not found");
+  // Find target contact.
+  contact* cntct(find_contact(contact_id->name.c_str()));
+  if (cntct) {
+    // Check group membership.
+    if (cntct->contactgroups_ptr)
+      throw (engine_error() << "cannot remove contact '"
+             << contact_id->name
+             << "': still member of contact group(s)");
+
+    // Check link with hosts.
+    for (host* hst(host_list); hst; hst = hst->next)
+      for (contactsmember* mbr(hst->contacts); mbr; mbr = mbr->next)
+        if (mbr->contact_ptr == cntct)
+          throw (engine_error() << "cannot remove contact '"
+                 << contact_id->name << "': used by at least one host");
+
+    // Check link with services.
+    for (service* svc(service_list); svc; svc = svc->next)
+      for (contactsmember* mbr(svc->contacts); mbr; mbr = mbr->next)
+        if (mbr->contact_ptr == cntct)
+          throw (engine_error() << "cannot remove contact '"
+                 << contact_id->name
+                 << "': used by at least one service");
+
+    // Remove contact.
+    if (!remove_contact_by_id(contact_id->name.c_str()))
+      throw (engine_error() << "contact '" << contact_id->name
+             << "' not found");
+  }
+
+  // Exception handling.
+  COMMAND_END()
+
+  return (SOAP_OK);
+}
+
+/**
+ *  Remove a host notification command from a contact.
+ *
+ *  @param[in]  s          SOAP object.
+ *  @param[in]  contact_id Target contact.
+ *  @param[in]  command_id Target command.
+ *  @param[out] res        Unused.
+ *
+ *  @return SOAP_OK on success.
+ */
+int centreonengine__contactRemoveNotificationsOnHostCommand(
+      soap* s,
+      ns1__contactIDType* contact_id,
+      ns1__commandIDType* command_id,
+      centreonengine__contactRemoveNotificationsOnHostCommandResponse& res) {
+  (void)res;
+
+  // Begin try block.
+  COMMAND_BEGIN(contact_id->name << ", " << command_id->command)
+
+  // Find target contact.
+  contact* cntct(find_target_contact(contact_id->name.c_str()));
+
+  // Browse host notification commands.
+  for (commandsmember
+         *current(cntct->host_notification_commands),
+         **prev(&cntct->host_notification_commands);
+       current;
+       prev = &current->next, current = current->next)
+    if (current->cmd
+        && !strcmp(current->cmd, command_id->command.c_str())) {
+      *prev = current->next;
+      delete [] current->cmd;
+      delete current;
+      break ;
+    }
+
+  // Exception handling.
+  COMMAND_END()
+
+  return (SOAP_OK);
+}
+
+/**
+ *  Remove a service notification command from a contact.
+ *
+ *  @param[in]  s          SOAP object.
+ *  @param[in]  contact_id Target contact.
+ *  @param[in]  command_id Target command.
+ *  @param[out] res        Unused.
+ *
+ *  @return SOAP_OK on success.
+ */
+int centreonengine__contactRemoveNotificationsOnServiceCommand(
+      soap* s,
+      ns1__contactIDType* contact_id,
+      ns1__commandIDType* command_id,
+      centreonengine__contactRemoveNotificationsOnServiceCommandResponse& res) {
+  (void)res;
+
+  // Begin try block.
+  COMMAND_BEGIN(contact_id->name << ", " << command_id->command)
+
+  // Find target contact.
+  contact* cntct(find_target_contact(contact_id->name.c_str()));
+
+  // Browse service notification commands.
+  for (commandsmember
+         *current(cntct->service_notification_commands),
+         **prev(&cntct->service_notification_commands);
+       current;
+       prev = &current->next, current = current->next)
+    if (current->cmd
+        && !strcmp(current->cmd, command_id->command.c_str())) {
+      *prev = current->next;
+      delete [] current->cmd;
+      delete current;
+      break ;
+    }
 
   // Exception handling.
   COMMAND_END()
@@ -1792,74 +1934,6 @@ int centreonengine__contactSetRetainStatusNonInformation(
 
   // Set boolean value.
   cntct->retain_nonstatus_information = enable;
-
-  // Exception handling.
-  COMMAND_END()
-
-  return (SOAP_OK);
-}
-
-/**
- *  Set the contact notification command for host events.
- *
- *  @param[in]  s          SOAP object.
- *  @param[in]  contact_id Target contact.
- *  @param[in]  command_id New host notification command.
- *  @param[out] res        Unused.
- *
- *  @return SOAP_OK on success.
- */
-int centreonengine__contactSetNotificationsOnHostCommand(
-      soap* s,
-      ns1__contactIDType* contact_id,
-      ns1__commandIDType* command_id,
-      centreonengine__contactSetNotificationsOnHostCommandResponse& res) {
-  (void)res;
-
-  // Begin try block.
-  COMMAND_BEGIN(contact_id->name << ", " << command_id->command)
-
-  // Find target contact.
-  contact* cntct(find_target_contact(contact_id->name.c_str()));
-
-  // Set new notification command.
-  delete [] cntct->host_notification_commands->cmd;
-  cntct->host_notification_commands->cmd
-    = my_strdup(command_id->command.c_str());
-
-  // Exception handling.
-  COMMAND_END()
-
-  return (SOAP_OK);
-}
-
-/**
- *  Set the service notification command.
- *
- *  @param[in]  s          SOAP object.
- *  @param[in]  contact_id Target contact.
- *  @param[in]  command_id New service notification command.
- *  @param[out] res        Unused.
- *
- *  @return SOAP_OK on success.
- */
-int centreonengine__contactSetNotificationsOnServiceCommand(
-      soap* s,
-      ns1__contactIDType* contact_id,
-      ns1__commandIDType* command_id,
-      centreonengine__contactSetNotificationsOnServiceCommandResponse& res) {
-  (void)res;
-
-  // Begin try block.
-  COMMAND_BEGIN(contact_id->name << ", " << command_id->command)
-
-  // Find target contact.
-  contact* cntct(find_target_contact(contact_id->name.c_str()));
-
-  // Set new notification command.
-  delete [] cntct->service_notification_commands->cmd;
-  cntct->service_notification_commands->cmd
-    = my_strdup(command_id->command.c_str());
 
   // Exception handling.
   COMMAND_END()

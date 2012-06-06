@@ -1702,6 +1702,20 @@
       <output message="tns:defaultResponse"/>
     </operation>
 
+    <!-- contactAddNotificationsOnHostCommand(contact, command) -->
+    <operation name="contactAddNotificationsOnHostCommand">
+      <documentation>Add a contact notification command for host events.</documentation>
+      <input message="tns:contactCommandRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- contactAddNotificationsOnServiceCommand(contact, command) -->
+    <operation name="contactAddNotificationsOnServiceCommand">
+      <documentation>Add a service notification command.</documentation>
+      <input message="tns:contactCommandRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
     <!-- contactGetAddresses(contact) -->
     <!-- XXX -->
 
@@ -1751,13 +1765,6 @@
       <documentation>Get the contact service modified attributes.</documentation>
       <input message="tns:contactRequest"/>
       <output message="tns:unsignedIntResponse"/>
-    </operation>
-
-    <!-- contactGetNotificationsOnHostCommand(contact) -->
-    <operation name="contactGetNotificationsOnHostCommand">
-      <documentation>Get the host notification command of the contact.</documentation>
-      <input message="tns:contactRequest"/>
-      <output message="tns:commandResponse"/>
     </operation>
 
     <!-- contactGetNotificationsOnHostDown(contact) -->
@@ -1814,13 +1821,6 @@
       <documentation>Check if contact should be notified when hosts are unreachable.</documentation>
       <input message="tns:contactRequest"/>
       <output message="tns:booleanResponse"/>
-    </operation>
-
-    <!-- contactGetNotificationsOnServiceCommand(contact) -->
-    <operation name="contactGetNotificationsOnServiceCommand">
-      <documentation>Get the service notification command of the contact.</documentation>
-      <input message="tns:contactRequest"/>
-      <output message="tns:commandResponse"/>
     </operation>
 
     <!-- contactGetNotificationsOnServiceCritical(contact) -->
@@ -1921,6 +1921,20 @@
       <output message="tns:defaultResponse"/>
     </operation>
 
+    <!-- contactRemoveNotificationsOnHostCommand(contact_id, command_id) -->
+    <operation name="contactRemoveNotificationsOnHostCommand">
+      <documentation>Remove a host notification command on a contact.</documentation>
+      <input message="tns:contactCommandRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
+    <!-- contactRemoveNotificationsOnServiceCommand(contact_id, command_id) -->
+    <operation name="contactRemoveNotificationsOnServiceCommand">
+      <documentation>Remove a service notification command on a contact.</documentation>
+      <input message="tns:contactCommandRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
+
     <!-- contactSetAlias(contact, alias) -->
     <operation name="contactSetAlias">
       <documentation>Set the contact alias.</documentation>
@@ -1942,13 +1956,6 @@
     <operation name="contactSetEmail">
       <documentation>Set the email address of a contact.</documentation>
       <input message="tns:contactStringRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
-
-    <!-- contactSetNotificationsOnHostCommand(contact, command) -->
-    <operation name="contactSetNotificationsOnHostCommand">
-      <documentation>Set the contact notification command for host events.</documentation>
-      <input message="tns:contactCommandRequest"/>
       <output message="tns:defaultResponse"/>
     </operation>
 
@@ -1998,13 +2005,6 @@
     <operation name="contactSetNotificationsOnHostUnreachable">
       <documentation>Enable or disable notifications on host unreachable.</documentation>
       <input message="tns:contactBooleanRequest"/>
-      <output message="tns:defaultResponse"/>
-    </operation>
-
-    <!-- contactSetNotificationsOnServiceCommand(contact, command) -->
-    <operation name="contactSetNotificationsOnServiceCommand">
-      <documentation>Set the service notification command.</documentation>
-      <input message="tns:contactCommandRequest"/>
       <output message="tns:defaultResponse"/>
     </operation>
 
@@ -5184,6 +5184,18 @@
       <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
     </operation>
 
+    <operation name="contactAddNotificationsOnHostCommand">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="contactAddNotificationsOnServiceCommand">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
     <operation name="contactGetAlias">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
@@ -5215,12 +5227,6 @@
     </operation>
 
     <operation name="contactGetModifiedAttributesService">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
-    <operation name="contactGetNotificationsOnHostCommand">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
       <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
@@ -5269,12 +5275,6 @@
     </operation>
 
     <operation name="contactGetNotificationsOnHostUnreachable">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
-    <operation name="contactGetNotificationsOnServiceCommand">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
       <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
@@ -5364,6 +5364,18 @@
       <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
     </operation>
 
+    <operation name="contactRemoveNotificationsOnHostCommand">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="contactRemoveNotificationsOnServiceCommand">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
     <operation name="contactSetAlias">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
@@ -5377,12 +5389,6 @@
     </operation>
 
     <operation name="contactSetEmail">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
-    <operation name="contactSetNotificationsOnHostCommand">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
       <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
@@ -5425,12 +5431,6 @@
     </operation>
 
     <operation name="contactSetNotificationsOnHostUnreachable">
-      <SOAP:operation style="rpc" soapAction=""/>
-      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
-      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
-    </operation>
-
-    <operation name="contactSetNotificationsOnServiceCommand">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
       <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>

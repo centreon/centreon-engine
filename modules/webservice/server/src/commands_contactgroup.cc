@@ -19,6 +19,7 @@
 
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/modules/webservice/commands.hh"
 #include "com/centreon/engine/modules/webservice/create_object.hh"
@@ -269,19 +270,39 @@ int centreonengine__contactgroupRemove(
   // Begin try block.
   COMMAND_BEGIN(contactgroup_id->name)
 
-  // Remove contact group.
-  if (!remove_contactgroup_by_id(
-         contactgroup_id->name.c_str())) {
-    std::string* error(soap_new_std__string(s, 1));
-    *error = "contact group '"
-             + contactgroup_id->name
-             + "' not found";
-    logger(log_runtime_error, more)
-      << "Webservice: " << __func__ << " failed: " << *error;
-    return (soap_receiver_fault(
-              s,
-              "Invalid parameter",
-              error->c_str()));
+  // Find contact group.
+  contactgroup*
+    cntctgrp(find_contactgroup(contactgroup_id->name.c_str()));
+  if (cntctgrp) {
+    // Check link with contacts.
+    if (cntctgrp->members)
+      throw (engine_error() << "cannot remove contact group '"
+             << contactgroup_id->name << "': group has members");
+
+    // Check link with hosts.
+    for (host* hst(host_list); hst; hst = hst->next)
+      for (contactgroupsmember* mbr(hst->contact_groups);
+           mbr;
+           mbr = mbr->next)
+        if (mbr->group_ptr == cntctgrp)
+          throw (engine_error() << "cannot remove contact group '"
+                 << contactgroup_id->name
+                 << "': used by at least one host");
+
+    // Check link with services.
+    for (service* svc(service_list); svc; svc = svc->next)
+      for (contactgroupsmember* mbr(svc->contact_groups);
+           mbr;
+           mbr = mbr->next)
+        if (mbr->group_ptr == cntctgrp)
+          throw (engine_error() << "cannot remove contact group '"
+                 << contactgroup_id->name
+                 << "': used by at least one service");
+
+    // Remove contact group.
+    if (!remove_contactgroup_by_id(contactgroup_id->name.c_str()))
+      throw (engine_error() << "error while removing contact group '"
+             << contactgroup_id->name << "'");
   }
 
   // Exception handling.

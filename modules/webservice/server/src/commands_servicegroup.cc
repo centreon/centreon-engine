@@ -293,11 +293,22 @@ int centreonengine__servicegroupRemove(
   // Begin try block.
   COMMAND_BEGIN(servicegroup_id->name)
 
-  // Remove service group.
-  if (!remove_servicegroup_by_id(servicegroup_id->name.c_str()))
-    throw (engine_error() << "cannot remove service group '"
-           << servicegroup_id->name
-           << "' (still in use ?, inexistent ?)");
+  // Find service group.
+  servicegroup*
+    svcgrp(find_servicegroup(servicegroup_id->name.c_str()));
+  if (svcgrp) {
+    // Check members.
+    if (svcgrp->members)
+      throw (engine_error() << "cannot remove service group '"
+             << servicegroup_id->name
+             << "': used by at least one service");
+
+    // Remove service group.
+    if (!remove_servicegroup_by_id(servicegroup_id->name.c_str()))
+      throw (engine_error() << "cannot remove service group '"
+             << servicegroup_id->name
+             << "' (still in use ?, inexistent ?)");
+  }
 
   // Exception handling.
   COMMAND_END()

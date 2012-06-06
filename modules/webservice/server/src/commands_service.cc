@@ -423,13 +423,25 @@ int centreonengine__serviceRemove(
   COMMAND_BEGIN("{" << service_id->host->name
                 << ", " << service_id->service << "}")
 
-  // Remove service.
-  if (!remove_service_by_id(
-         service_id->host->name.c_str(),
-         service_id->service.c_str()))
-    throw (engine_error() << "error while removing service ('"
-           << service_id->host->name << "', '"
-           << service_id->service << "')");
+  // Find service.
+  service* svc(find_service(
+                 service_id->host->name.c_str(),
+                 service_id->service.c_str()));
+  if (svc) {
+    // Check link for service groups.
+    if (svc->servicegroups_ptr)
+      throw (engine_error() << "cannot remove service ('"
+             << service_id->host->name << "', '" << service_id->service
+             << "'): member of at least one service group");
+
+    // Remove service.
+    if (!remove_service_by_id(
+           service_id->host->name.c_str(),
+           service_id->service.c_str()))
+      throw (engine_error() << "error while removing service ('"
+             << service_id->host->name << "', '"
+             << service_id->service << "')");
+  }
 
   // Exception handling.
   COMMAND_END()

@@ -432,10 +432,34 @@ int centreonengine__hostRemove(
   // Begin try block.
   COMMAND_BEGIN(host_id->name)
 
-  // Remove host.
-  if (!remove_host_by_id(host_id->name.c_str()))
-    throw (engine_error() << "error while removing host '"
-           << host_id->name << "'");
+  // Find host.
+  host* hst(find_host(host_id->name.c_str()));
+  if (hst) {
+    // Check services.
+    if (hst->services)
+      throw (engine_error() << "cannot remove host '" << host_id->name
+             << "': has services");
+
+    // Check parents.
+    if (hst->parent_hosts)
+      throw (engine_error() << "cannot remove host '" << host_id->name
+             << "': host is child of other host(s)");
+
+    // Check children.
+    if (hst->child_hosts)
+      throw (engine_error() << "cannot remove host '" << host_id->name
+             << "': host is parent of other host(s)");
+
+    // Check host groups.
+    if (hst->hostgroups_ptr)
+      throw (engine_error() << "cannot remove host '" << host_id->name
+             << "': used by host group(s)");
+
+    // Remove host.
+    if (!remove_host_by_id(host_id->name.c_str()))
+      throw (engine_error() << "error while removing host '"
+             << host_id->name << "'");
+  }
 
   // Exception handling.
   COMMAND_END()

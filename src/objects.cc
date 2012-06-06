@@ -4315,6 +4315,24 @@ int remove_service_by_id(
   if (!this_service)
     return (0);
 
+  // Remove service from host list.
+  if (this_service->host_ptr) {
+    servicesmember* current;
+    servicesmember** prev;
+    for (current = this_service->host_ptr->services,
+           prev = &this_service->host_ptr->services;
+         current;
+         prev = &current->next, current = current->next)
+      if (current->service_ptr == this_service)
+        break ;
+    if (current) {
+      *prev = current->next;
+      delete [] current->host_name;
+      delete [] current->service_description;
+      delete current;
+    }
+  }
+
   // Update the service list.
   if (!prev_service)
     service_list = this_service->next;

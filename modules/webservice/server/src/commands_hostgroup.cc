@@ -283,10 +283,19 @@ int centreonengine__hostgroupRemove(
   // Begin try block.
   COMMAND_BEGIN(hostgroup_id->name)
 
-  // Remove host group.
-  if (!remove_hostgroup_by_id(hostgroup_id->name.c_str()))
-    throw (engine_error() << "cannot remove host group '"
-           << hostgroup_id->name << "' (still in use ?, inexistent ?)");
+  // Find host group.
+  hostgroup* hstgrp(find_hostgroup(hostgroup_id->name.c_str()));
+  if (hstgrp) {
+    // Check members.
+    if (hstgrp->members)
+      throw (engine_error() << "cannot remove host group '"
+             << hostgroup_id->name << "': has members");
+
+    // Remove host group.
+    if (!remove_hostgroup_by_id(hostgroup_id->name.c_str()))
+      throw (engine_error() << "cannot remove host group '"
+             << hostgroup_id->name << "' (still in use ?, inexistent ?)");
+  }
 
   // Exception handling.
   COMMAND_END()
