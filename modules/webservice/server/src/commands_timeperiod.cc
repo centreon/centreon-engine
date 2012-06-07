@@ -21,6 +21,7 @@
 #include "com/centreon/engine/modules/webservice/commands.hh"
 #include "com/centreon/engine/modules/webservice/create_object.hh"
 #include "com/centreon/engine/objects/timeperiod.hh"
+#include "com/centreon/engine/xodtemplate.hh"
 #include "soapH.h"
 
 using namespace com::centreon::engine;
@@ -48,7 +49,7 @@ int centreonengine__timeperiodAdd(
   // Create timeperiod.
   objects::add_timeperiod(
              tmprd->id->name.c_str(),
-             tmprd->alias.c_str(),
+             (tmprd->alias ? tmprd->alias->c_str() : NULL),
              std2qt(tmprd->range),
              std2qt(tmprd->exclude));
 
@@ -76,7 +77,74 @@ int centreonengine__timeperiodModify(
   // Begin try block.
   COMMAND_BEGIN(tmprd->id->name)
 
-  // XXX
+  // Find existing timeperiod.
+  timeperiod* tperiod(find_timeperiod(tmprd->id->name.c_str()));
+  if (!tperiod)
+    throw (engine_error() << "cannot modify non-existent timeperiod '"
+           << tmprd->id->name << "'");
+
+  // Operate on a template timeperiod.
+  xodtemplate_timeperiod* tmpl(NULL);
+  timeperiod* tp(NULL);
+  try {
+    tmpl = new xodtemplate_timeperiod;
+    memset(tmpl, 0, sizeof(*tmpl));
+    for (std::vector<std::string>::const_iterator
+           it(tmprd->range.begin()),
+           end(tmprd->range.end());
+         it != end;
+         ++it) {
+      // Split directive.
+      size_t first_space(it->find(' '));
+      if (std::string::npos == first_space)
+        throw (engine_error() << "invalid timeperiod directive '"
+               << *it << "'");
+      std::string key(it->substr(0, first_space));
+      std::string
+        value(it->substr(it->find_first_not_of(' ', first_space + 1)));
+      if (xodtemplate_parse_timeperiod_directive(
+            tmpl,
+            key.c_str(),
+            value.c_str()) == ERROR)
+        throw (engine_error()
+               << "error while parsing timeperiod directive '"
+               << *it << "'");
+    }
+
+    // Temporary timeperiod object.
+    tp = new timeperiod;
+    memset(tp, 0, sizeof(*tp));
+    if (xodtemplate_fill_timeperiod(tmpl, tp) == ERROR)
+      throw (engine_error() << "cannot fill timeperiod");
+
+    // Remove old timeperiod members (except name).
+    std::auto_ptr<timeperiod> fake_tp(new timeperiod);
+    memcpy(fake_tp.get(), tperiod, sizeof(tperiod));
+    fake_tp->name = NULL;
+    objects::release(fake_tp.release());
+  }
+  catch (...) {
+    if (tmpl)
+      xodtemplate_free_timeperiod(tmpl);
+    if (tp)
+      objects::release(tp);
+    throw ;
+  }
+
+  // Set new members to timeperiod.
+  tperiod->alias = (tmprd->alias
+                    ? my_strdup(tmprd->alias->c_str())
+                    : NULL);
+  tperiod->exclusions = tperiod->exclusions;
+  memcpy(tperiod->days, tp->days, sizeof(tperiod->days));
+  memcpy(
+    tperiod->exceptions,
+    tp->exceptions,
+    sizeof(tperiod->exceptions));
+
+  // Free resources.
+  xodtemplate_free_timeperiod(tmpl);
+  delete tp;
 
   // Exception handling.
   COMMAND_END()

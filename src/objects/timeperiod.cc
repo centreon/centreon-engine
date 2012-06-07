@@ -100,10 +100,19 @@ void objects::add_timeperiod(QString const& name,
   }
 
   tmpl_tperiod->exclusions = my_strdup(qPrintable(exclude_str));
-  int res = xodtemplate_register_timeperiod(tmpl_tperiod);
+  int res(xodtemplate_register_timeperiod(tmpl_tperiod));
+  if (OK == res) {
+    timeperiod* tmprd(find_timeperiod(tmpl_tperiod->timeperiod_name));
+    if (!tmprd)
+      res = ERROR;
+    else
+      res = xodtemplate_fill_timeperiod(tmpl_tperiod, tmprd);
+  }
   xodtemplate_free_timeperiod(tmpl_tperiod);
   if (res != OK)
-    throw (engine_error() << "timeperiod '" << name << "' create failed.");
+    throw (engine_error() << "timeperiod '" << name << "' create failed");
+
+  return ;
 }
 
 /**

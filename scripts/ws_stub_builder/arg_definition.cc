@@ -566,7 +566,8 @@ arg_definition::arg_definition() {
 
   argument timeperiod_type("ns1__timeperiodType", "tperiod");
   timeperiod_type.add(timeperiod_id).set_name("id");
-  timeperiod_type.add(arg_string).set_name("alias");
+  timeperiod_type.add(arg_string).set_name("alias")
+    .set_is_optional(true);
   timeperiod_type.add(arg_vectorstr).set_name("range")
     .set_is_optional(true)
     .set_is_array(true);

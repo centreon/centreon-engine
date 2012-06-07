@@ -9287,13 +9287,20 @@ int xodtemplate_register_objects(void) {
   xodtemplate_hostescalation* temp_hostescalation = NULL;
   void* ptr = NULL;
 
-  /* register timeperiods */
-  /*for(temp_timeperiod=xodtemplate_timeperiod_list;temp_timeperiod!=NULL;temp_timeperiod=temp_timeperiod->next){ */
+  // Register timeperiods.
   ptr = NULL;
   for (temp_timeperiod = (xodtemplate_timeperiod*)skiplist_get_first(xobject_skiplists[X_TIMEPERIOD_SKIPLIST], &ptr);
-       temp_timeperiod != NULL;
+       temp_timeperiod;
        temp_timeperiod = (xodtemplate_timeperiod*)skiplist_get_next(&ptr)) {
-    if ((result = xodtemplate_register_timeperiod(temp_timeperiod)) == ERROR)
+    // Insert timeperiod object in lists.
+    if (xodtemplate_register_timeperiod(temp_timeperiod) == ERROR)
+      return (ERROR);
+
+    // Retrieve timeperiod object.
+    timeperiod* t(find_timeperiod(temp_timeperiod->timeperiod_name));
+
+    // Fill timeperiod with its content.
+    if (xodtemplate_fill_timeperiod(temp_timeperiod, t) == ERROR)
       return (ERROR);
   }
 
@@ -9411,10 +9418,18 @@ int xodtemplate_register_objects(void) {
   return (OK);
 }
 
-/* registers a timeperiod definition */
-int xodtemplate_register_timeperiod(xodtemplate_timeperiod* this_timeperiod) {
+/**
+ *  Fill timeperiod with its content.
+ *
+ *  @param[in]  this_timeperiod Template timeperiod.
+ *  @param[out] new_timeperiod  Real timeperiod.
+ *
+ *  @return OK on success.
+ */
+int xodtemplate_fill_timeperiod(
+      xodtemplate_timeperiod* this_timeperiod,
+      timeperiod* new_timeperiod) {
   xodtemplate_daterange* temp_daterange = NULL;
-  timeperiod* new_timeperiod = NULL;
   daterange* new_daterange = NULL;
   timerange* new_timerange = NULL;
   timeperiodexclusion* new_timeperiodexclusion = NULL;
@@ -9426,24 +9441,6 @@ int xodtemplate_register_timeperiod(xodtemplate_timeperiod* this_timeperiod) {
   char* temp_ptr = NULL;
   unsigned long range_start_time = 0L;
   unsigned long range_end_time = 0L;
-
-
-  /* bail out if we shouldn't register this object */
-  if (this_timeperiod->register_object == FALSE)
-    return (OK);
-
-  /* add the timeperiod */
-  new_timeperiod = add_timeperiod(this_timeperiod->timeperiod_name,
-				  this_timeperiod->alias);
-
-  /* return with an error if we couldn't add the timeperiod */
-  if (new_timeperiod == NULL) {
-    logger(log_config_error, basic)
-      << "Error: Could not register timeperiod (config file '"
-      << xodtemplate_config_file_name(this_timeperiod->_config_file)
-      << "', starting on line " << this_timeperiod->_start_line << ")";
-    return (ERROR);
-  }
 
   /* add all exceptions to timeperiod */
   for (x = 0; x < DATERANGE_TYPES; x++) {
@@ -9575,6 +9572,41 @@ int xodtemplate_register_timeperiod(xodtemplate_timeperiod* this_timeperiod) {
         return (ERROR);
       }
     }
+  }
+
+  return (OK);
+}
+
+/**
+ *  @brief Registers a timeperiod definition.
+ *
+ *  Timeperiod will be inserted in lists but not filled with its
+ *  content.
+ *
+ *  @param[in] this_timeperiod Template timeperiod object.
+ *
+ *  @return OK on success.
+ *
+ *  @see xodtemplate_fill_timeperiod
+ */
+int xodtemplate_register_timeperiod(
+      xodtemplate_timeperiod* this_timeperiod) {
+  // Bail out if we shouldn't register this object.
+  if (this_timeperiod->register_object == FALSE)
+    return (OK);
+
+  // Add the timeperiod.
+  timeperiod* new_timeperiod(add_timeperiod(
+                               this_timeperiod->timeperiod_name,
+                               this_timeperiod->alias));
+
+  // Return with an error if we couldn't add the timeperiod.
+  if (!new_timeperiod) {
+    logger(log_config_error, basic)
+      << "Error: Could not register timeperiod (config file '"
+      << xodtemplate_config_file_name(this_timeperiod->_config_file)
+      << "', starting on line " << this_timeperiod->_start_line << ")";
+    return (ERROR);
   }
 
   return (OK);

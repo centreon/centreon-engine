@@ -372,7 +372,7 @@
       <complexType name="timeperiodType">
 	<sequence>
 	  <element name="id" type="tns:timeperiodIDType"/>
-	  <element name="alias" type="xsd:string"/>
+	  <element name="alias" type="xsd:string" minOccurs="0"/>
 	  <element name="range" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
 	  <element name="exclude" type="xsd:string" minOccurs="0" maxOccurs="unbounded"/>
 	</sequence>

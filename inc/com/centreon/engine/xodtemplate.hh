@@ -923,6 +923,7 @@ int xodtemplate_get_inherited_string(int *,char **,int *,char **);
 int xodtemplate_clean_additive_string(char **);
 int xodtemplate_clean_additive_strings(void);
 
+int xodtemplate_fill_timeperiod(xodtemplate_timeperiod *, timeperiod *);
 int xodtemplate_register_timeperiod(xodtemplate_timeperiod *);
 int xodtemplate_get_time_ranges(char *,unsigned long *,unsigned long *);
 int xodtemplate_register_command(xodtemplate_command *);
