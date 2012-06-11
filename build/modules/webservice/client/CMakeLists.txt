@@ -68,6 +68,10 @@ add_executable("centenginews"
   "${INC_DIR}/webservice.hh"
 )
 add_dependencies("centenginews" "ws_stub_builder")
+get_property(CENTENGINEWS_BINARY
+  TARGET "centenginews"
+  PROPERTY LOCATION)
+set(CENTENGINEWS_BINARY "${CENTENGINEWS_BINARY}" PARENT_SCOPE)
 
 # Check compiler version supports flags.
 include(CheckCXXCompilerFlag)

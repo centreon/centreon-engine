@@ -39,39 +39,44 @@ using namespace com::centreon::engine::modules::webservice;
 static char const* OPTIONS = "a:c:e:f:hk:lp:s";
 
 /**
- *  This function show the application's usage.
+ *  This function show the application's usage and then quit the
+ *  program.
  *
  *  @param[in] appname The application name.
  */
 static void usage(char const* appname) {
-  std::cout << "usage: " << appname
+  std::cout
+    << "usage: " << appname
 #ifdef WITH_OPENSSL
-	    << " [-a action] [-e end_point] [-h] [-l] [-s [-c cacert] [-k keyfile] [-p password]] [-f] function [arg ...]" << std::endl
+    << " [-a action] [-e end_point] [-h] [-l] [-s [-c cacert] [-k keyfile] [-p password]] [-f] function [arg ...]\n"
 #else
-	    << " [-a action] [-e end_point] [-h] [-l] [-f] function [arg ...]" << std::endl
+    << " [-a action] [-e end_point] [-h] [-l] [-f] function [arg ...]\n"
 #endif // !WITH_OPENSSL
-	    << " -a, --action    override the default SOAP action. " << std::endl
-	    << " -e, --end_point override the default SOAP service location." << std::endl
-	    << " -f, --function  the function name to call." << std::endl
-	    << " -h, --help      this help." << std::endl
-	    << " -l, --list      list all prototype." << std::endl;
+    << " -a, --action    Override the default SOAP action.\n"
+    << " -e, --end_point Override the default SOAP service location.\n"
+    << " -f, --function  The function name to call.\n"
+    << " -h, --help      This help.\n"
+    << " -l, --list      List all prototype."
 #ifdef WITH_OPENSSL
-  std::cout << " -c, --cacert    optional cacert file to store trusted certificates. " << std::endl
-	    << " -d, --dh        DH file name or DH key len bits to generate DH param. " << std::endl
-	    << " -k, --keyfile   required when server must authenticate to clients. " << std::endl
-	    << " -p, --password  password to read the key file. " << std::endl
-	    << " -s, --ssl       enable ssl. " << std::endl;
+    << "\n"
+    << " -c, --cacert    Optional cacert file to authenticate trusted certificates.\n"
+    << " -d, --dh        DH file name or DH key lenght in bits.\n"
+    << " -k, --keyfile   Required when server must authenticate to clients.\n"
+    << " -p, --password  Password to read the key file.\n"
+    << " -s, --ssl       Enable ssl."
 #endif // !WITH_OPENSSL
+    << std::endl;
   exit(EXIT_FAILURE);
+  return ;
 }
 
 /**
- *  This function show all function prototype.
+ *  This function show all function prototypes.
  */
 static void show_prototype() {
-  std::cout << "list all prototype:" << std::endl;
   auto_gen::instance().show_help();
   exit(EXIT_SUCCESS);
+  return ;
 }
 
 /**
@@ -83,28 +88,33 @@ static void show_prototype() {
  *
  *  @return The function arguments.
  */
-static QHash<QString, QString> parse_option(QHash<char, QString>& opt, int argc, char** argv) {
+static QHash<QString, QString> parse_option(
+                                 QHash<char, QString>& opt,
+                                 int argc,
+                                 char** argv) {
 #ifdef HAVE_GETOPT_LONG
   static struct option const long_opt[] = {
     { "action",    required_argument, NULL, 'a' },
     { "end_point", required_argument, NULL, 'e' },
     { "function",  required_argument, NULL, 'f' },
     { "list",      no_argument,       NULL, 'l' },
-# ifdef WITH_OPENSSL
+#  ifdef WITH_OPENSSL
     { "keyfile",   required_argument, NULL, 'k' },
     { "cacert",    required_argument, NULL, 'c' },
     { "password",  required_argument, NULL, 'p' },
     { "ssl",       no_argument,       NULL, 's' },
-# endif // !WITH_OPENSSL
+#  endif // !WITH_OPENSSL
     { NULL,        0,                 NULL, 0 }
   };
-#endif /* !HAVE_GETOPT_LONG */
-  char const* appname = argv[0];
-  char c;
+#endif // !HAVE_GETOPT_LONG
 
+  // By default, connect to localhost on port 4242.
   opt['e'] = "127.0.0.1:4242";
+  // Without SSL.
   opt['s'] = "false";
 
+  // Browse arguments.
+  char c;
 #ifdef HAVE_GETOPT_LONG
   while ((c = getopt_long(argc, argv, OPTIONS, long_opt, NULL)) != -1) {
 #else
@@ -133,38 +143,44 @@ static QHash<QString, QString> parse_option(QHash<char, QString>& opt, int argc,
 #endif // !WITH_OPENSSL
 
     default:
-      usage(appname);
+      usage(argv[0]);
     }
   }
 
+  // Illogical arguments.
   if (optind == argc
       || (opt['s'] == "false"
-	  && (opt['c'] != ""
-	      || opt['d'] != ""
-	      || opt['k'] != ""
-	      || opt['p'] != ""))) {
-    usage(appname);
-  }
+          && (opt['c'] != ""
+              || opt['d'] != ""
+              || opt['k'] != ""
+              || opt['p'] != "")))
+    usage(argv[0]);
 
-  if (opt['f'] == "") {
+  // Function can be set by -f flag or be the first argument.
+  if (opt['f'] == "")
     opt['f'] = argv[optind++];
-  }
 
+  // Process remaining arguments.
   QHash<QString, QString> args;
-  for (int i = optind; i < argc; ++i) {
+  for (int i(optind); i < argc; ++i) {
+    // QString copy of argument.
     QString tmp(argv[i]);
-    int pos = tmp.indexOf('=');
+
+    // Arguments can be provided by 1) key=val or 2) key val.
+    int pos(tmp.indexOf('='));
+    // 1)
     if (pos != -1) {
-      QString key = tmp.left(pos);
-      QString val = tmp.right(tmp.size() - pos - 1);
+      QString key(tmp.left(pos));
+      QString val(tmp.right(tmp.size() - pos - 1));
       args.insert(key, val);
     }
+    // 2)
     else if (i + 1 < argc)
       args.insert(tmp, argv[++i]);
+    // Error.
     else
-      usage(appname);
+      usage(argv[0]);
   }
-
   return (args);
 }
 

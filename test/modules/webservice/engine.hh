@@ -17,11 +17,29 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TEST_PATHS_HH
-#  define TEST_PATHS_HH
+#ifndef TEST_MOD_WS_ENGINE_HH
+#  define TEST_MOD_WS_ENGINE_HH
 
-#  define CENTENGINE_BINARY "@CENTENGINE_BINARY@"
-#  define CENTENGINEWS_BINARY "@CENTENGINEWS_BINARY@"
-#  define TEST_DIR "@PROJECT_SOURCE_DIR@/test"
+#  include <QProcess>
+#  include <string>
 
-#endif // !TEST_PATHS_HH
+/**
+ *  @class engine engine.hh "test/modules/webservice/engine.hh"
+ *  @brief Engine process.
+ *
+ *  Manage launch and shutdown of Centreon Engine for testing purposes.
+ */
+class      engine {
+public:
+           engine();
+           engine(engine const& e);
+           ~engine() throw ();
+  engine&  operator=(engine const& e);
+  void     start(std::string const& cfg_file = "");
+  void     stop();
+
+private:
+  QProcess _centengine;
+};
+
+#endif // !TEST_MOD_WS_ENGINE_HH

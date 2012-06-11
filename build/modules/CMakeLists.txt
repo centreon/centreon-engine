@@ -22,3 +22,4 @@ add_subdirectory("external_commands")
 
 # webservice module is optional.
 add_subdirectory("webservice")
+set(CENTENGINEWS_BINARY "${CENTENGINEWS_BINARY}" PARENT_SCOPE)

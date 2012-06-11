@@ -584,7 +584,7 @@ namespace                   com {
 	  static const unsigned long       DEFAULT_RETAINED_CONTACT_SERVICE_ATTRIBUTE_MASK     = 0L;
 	  static const unsigned long       DEFAULT_CACHED_HOST_CHECK_HORIZON                   = 15;
 	  static const unsigned long       DEFAULT_CACHED_SERVICE_CHECK_HORIZON                = 15;
-	  static const unsigned long       DEFAULT_EVENT_BROKER_OPTIONS                        = 0;
+	  static const unsigned long       DEFAULT_EVENT_BROKER_OPTIONS                        = static_cast<unsigned long>(-1);
 	  static const bool                DEFAULT_USE_SYSLOG                                  = true;
 	  static const bool                DEFAULT_NOTIFICATION_LOGGING                        = true;
 	  static const bool                DEFAULT_LOG_SERVICE_RETRIES                         = false;

@@ -17,11 +17,26 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifndef TEST_PATHS_HH
-#  define TEST_PATHS_HH
+#ifndef TEST_MOD_WS_QUERY_HH
+#  define TEST_MOD_WS_QUERY_HH
 
-#  define CENTENGINE_BINARY "@CENTENGINE_BINARY@"
-#  define CENTENGINEWS_BINARY "@CENTENGINEWS_BINARY@"
-#  define TEST_DIR "@PROJECT_SOURCE_DIR@/test"
+#  include <string>
 
-#endif // !TEST_PATHS_HH
+/**
+ *  @class query query.hh "test/modules/webservice/query.hh"
+ *  @brief Execute a query on Engine webservice.
+ *
+ *  Execute a webservice query on Engine by using the webservice client.
+ */
+class    query {
+public:
+         query();
+         query(query const& q);
+         ~query() throw ();
+  query& operator=(query const& q);
+  int    execute(
+           std::string& output,
+           std::string const& q);
+};
+
+#endif // !TEST_MOD_WS_QUERY_HH
