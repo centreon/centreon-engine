@@ -1329,6 +1329,112 @@ int centreonengine__hostGetCircularPathHas(
 
 /**************************************
 *                                     *
+*           Custom Variable           *
+*                                     *
+**************************************/
+
+/**
+ *  Get a custom variable.
+ *
+ *  @param[in]  s        SOAP object.
+ *  @param[in]  host_id  Target host.
+ *  @param[in]  varname  Custom variable name.
+ *  @param[out] varvalue Custom variable value.
+ *
+ *  @return SOAP_OK on success.
+ */
+int centreonengine__hostGetCustomVariable(
+      soap* s,
+      ns1__hostIDType* host_id,
+      std::string varname,
+      std::string& varvalue) {
+  // Begin try block.
+  COMMAND_BEGIN(host_id->name << ", " << varname)
+
+  // Find target host.
+  host* hst(find_target_host(host_id->name.c_str()));
+
+  // Browse variables.
+  varvalue.clear();
+  for (customvariablesmember* cvar(hst->custom_variables);
+       cvar;
+       cvar = cvar->next)
+    if (cvar->variable_name
+        && !strcmp(cvar->variable_name, varname.c_str())
+        && cvar->variable_value)
+      varvalue = cvar->variable_value;
+
+  // Exception handling.
+  COMMAND_END()
+
+  return (SOAP_OK);
+}
+
+/**
+ *  Set a host custom variable.
+ *
+ *  @param[in]  s        SOAP object.
+ *  @param[in]  host_id  Target host.
+ *  @param[in]  varname  Target variable.
+ *  @param[in]  varvalue New variable value.
+ *  @param[out] res      Unused.
+ *
+ *  @return SOAP_OK on success.
+ */
+int centreonengine__hostSetCustomVariable(
+      soap* s,
+      ns1__hostIDType* host_id,
+      std::string varname,
+      std::string varvalue,
+      centreonengine__hostSetCustomVariableResponse& res) {
+  (void)res;
+
+  // Begin try block.
+  COMMAND_BEGIN(host_id->name << ", " << varname << ", " << varvalue)
+
+  // Find target host.
+  host* hst(find_target_host(host_id->name.c_str()));
+
+  // Find existing custom variable.
+  customvariablesmember** cvar;
+  for (cvar = &hst->custom_variables; *cvar; cvar = &(*cvar)->next)
+    if ((*cvar)->variable_name
+        && !strcmp((*cvar)->variable_name, varname.c_str()))
+      break ;
+
+  // Update variable.
+  if (!varvalue.empty()) {
+    // Create new variable if not existing.
+    if (!*cvar) {
+      *cvar = new customvariablesmember;
+      (*cvar)->next = NULL;
+      (*cvar)->variable_name = my_strdup(varname.c_str());
+    }
+    else {
+      delete [] (*cvar)->variable_value;
+      (*cvar)->variable_value = NULL;
+    }
+
+    // Set new value.
+    (*cvar)->variable_value = my_strdup(varvalue.c_str());
+  }
+  // Delete variable.
+  if (*cvar) {
+    customvariablesmember* to_delete(*cvar);
+    *cvar = (*cvar)->next;
+    delete [] to_delete->variable_name;
+    delete [] to_delete->variable_value;
+    delete to_delete;
+  }
+
+  // Exception handling.
+  COMMAND_END()
+
+  return (SOAP_OK);
+}
+
+/**************************************
+*                                     *
 *              Downtime.              *
 *                                     *
 **************************************/

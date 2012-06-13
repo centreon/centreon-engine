@@ -537,6 +537,13 @@
     <part name="value" type="tns:commandIDType"/>
   </message>
 
+  <!-- Add or modify a custom variable of a contact. -->
+  <message name="contactCustomVariableRequest">
+    <part name="contact" type="tns:contactIDType"/>
+    <part name="varname" type="xsd:string"/>
+    <part name="varvalue" type="xsd:string"/>
+  </message>
+
   <!-- Add or modify contact. -->
   <message name="contactFullRequest">
     <part name="contact" type="tns:contactType"/>
@@ -593,6 +600,13 @@
   <message name="hostBooleanRequest">
     <part name="host" type="tns:hostIDType"/>
     <part name="value" type="xsd:boolean"/>
+  </message>
+
+  <!-- Host custom variable request. -->
+  <message name="hostCustomVariableRequest">
+    <part name="host" type="tns:hostIDType"/>
+    <part name="varname" type="xsd:string"/>
+    <part name="varvalue" type="xsd:string"/>
   </message>
 
   <!-- Host request with a date. -->
@@ -686,6 +700,13 @@
   <message name="serviceBooleanRequest">
     <part name="service" type="tns:serviceIDType"/>
     <part name="value" type="xsd:boolean"/>
+  </message>
+
+  <!-- Service custom variable request. -->
+  <message name="serviceCustomVariableRequest">
+    <part name="service" type="tns:serviceIDType"/>
+    <part name="varname" type="xsd:string"/>
+    <part name="varvalue" type="xsd:string"/>
   </message>
 
   <!-- Service request with a date. -->
@@ -1719,11 +1740,12 @@
       <output message="tns:booleanResponse"/>
     </operation>
 
-    <!-- contactGetCustomVariable(contact, variable) -->
-    <!-- XXX -->
-
-    <!-- contactGetCustomVariables(contact) -->
-    <!-- XXX -->
+    <!-- contactGetCustomVariable(contact_id, variable_name) -->
+    <operation name="contactGetCustomVariable">
+      <documentation>Get some contact custom variable.</documentation>
+      <input message="tns:contactStringRequest"/>
+      <output message="tns:stringResponse"/>
+    </operation>
 
     <!-- contactGetEmail(contact) -->
     <operation name="contactGetEmail">
@@ -1936,7 +1958,11 @@
     </operation>
 
     <!-- contactSetCustomVariable(contact, variable, value) -->
-    <!-- XXX -->
+    <operation name="contactSetCustomVariable">
+      <documentation>Set a custom variable for a contact.</documentation>
+      <input message="tns:contactCustomVariableRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
 
     <!-- contactSetEmail(contact, email) -->
     <operation name="contactSetEmail">
@@ -2354,18 +2380,19 @@
 	 Custom Variable.
      -->
 
-    <!-- hostGetCustomVariable(host) -->
-    <!-- <operation name="hostGetCustomVariable"> -->
-    <!--   <documentation>Get the value of a host custom variable.</documentation> -->
-    <!--   <input message="tns:hostStringRequest"/> -->
-    <!--   <output message="tns:stringResponse"/> -->
-    <!-- </operation> -->
-
-    <!-- hostGetCustomVariables(host) -->
-    <!-- XXX -->
+    <!-- hostGetCustomVariable(host_id, variable_name) -->
+    <operation name="hostGetCustomVariable">
+      <documentation>Get the value of a host custom variable.</documentation>
+      <input message="tns:hostStringRequest"/>
+      <output message="tns:stringResponse"/>
+    </operation>
 
     <!-- hostSetCustomVariable(host, variable, value) -->
-    <!-- XXX -->
+    <operation name="hostSetCustomVariable">
+      <documentation>Set the value of a host custom variable.</documentation>
+      <input message="tns:hostCustomVariableRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
 
     <!--
 	 Downtime.
@@ -3282,11 +3309,12 @@
       <output message="tns:stringResponse"/>
     </operation>
 
-    <!-- serviceGetCustomVariables(service) -->
-    <!-- XXX -->
-
     <!-- serviceSetCustomVariable(service, variable, value) -->
-    <!-- XXX -->
+    <operation name="serviceSetCustomVariable">
+      <documentation>Set the value of a service custom variable.</documentation>
+      <input message="tns:serviceCustomVariableRequest"/>
+      <output message="tns:defaultResponse"/>
+    </operation>
 
     <!--
 	 Downtime.
@@ -5209,6 +5237,12 @@
       <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
     </operation>
 
+    <operation name="contactGetCustomVariable">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
     <operation name="contactGetEmail">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
@@ -5384,6 +5418,12 @@
     </operation>
 
     <operation name="contactSetCanSubmitCommands">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="contactSetCustomVariable">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
       <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
@@ -5727,11 +5767,17 @@
       <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
     </operation>
 
-    <!-- <operation name="hostGetCustomVariable"> -->
-    <!--   <SOAP:operation style="rpc" soapAction=""/> -->
-    <!--   <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input> -->
-    <!--   <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output> -->
-    <!-- </operation> -->
+    <operation name="hostGetCustomVariable">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="hostSetCustomVariable">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
 
     <operation name="hostGetDowntimeDepth">
       <SOAP:operation style="rpc" soapAction=""/>
@@ -6443,6 +6489,12 @@
     </operation>
 
     <operation name="serviceGetCustomVariable">
+      <SOAP:operation style="rpc" soapAction=""/>
+      <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
+      <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>
+    </operation>
+
+    <operation name="serviceSetCustomVariable">
       <SOAP:operation style="rpc" soapAction=""/>
       <input><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></input>
       <output><SOAP:body use="encoded" namespace="urn:centreonengine" encodingStyle="http://schemas.xmlsoap.org/soap/encoding/"/></output>

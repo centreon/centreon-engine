@@ -375,6 +375,45 @@ int centreonengine__contactGetCanSubmitCommands(
 }
 
 /**
+ *  Get a custom variable.
+ *
+ *  @param[in]  s          SOAP object.
+ *  @param[in]  contact_id Target contact.
+ *  @param[in]  varname    Variable name.
+ *  @param[out] varvalue   Custom variable value.
+ *
+ *  @return SOAP_OK on success.
+ */
+int centreonengine__contactGetCustomVariable(
+      soap* s,
+      ns1__contactIDType* contact_id,
+      std::string varname,
+      std::string& varvalue) {
+  // Begin try block.
+  COMMAND_BEGIN(contact_id->name << ", " << varname)
+
+  // Find target contact.
+  contact* cntct(find_target_contact(contact_id->name.c_str()));
+
+  // Reset result.
+  varvalue.clear();
+  for (customvariablesmember* cvar(cntct->custom_variables);
+       cvar;
+       cvar = cvar->next)
+    if (cvar->variable_name
+        && !strcmp(cvar->variable_name, varname.c_str()))
+      if (cvar->variable_value) {
+        varvalue = cvar->variable_value;
+        break ;
+      }
+
+  // Exception handling.
+  COMMAND_END()
+
+  return (SOAP_OK);
+}
+
+/**
  *  Get the contact email.
  *
  *  @param[in]  s          SOAP object.
@@ -1282,6 +1321,69 @@ int centreonengine__contactSetCanSubmitCommands(
 
   // Set boolean value.
   cntct->can_submit_commands = enable;
+
+  // Exception handling.
+  COMMAND_END()
+
+  return (SOAP_OK);
+}
+
+/**
+ *  Set a custom variable of a contact.
+ *
+ *  @param[in]  s          SOAP object.
+ *  @param[in]  contact_id Target contact.
+ *  @param[in]  varname    Target variable.
+ *  @param[in]  varvalue   New variable value.
+ *  @param[out] res        Unused.
+ *
+ *  @return SOAP_OK on success.
+ */
+int centreonengine__contactSetCustomVariable(
+      soap* s,
+      ns1__contactIDType* contact_id,
+      std::string varname,
+      std::string varvalue,
+      centreonengine__contactSetCustomVariableResponse& res) {
+  (void)res;
+
+  // Begin try block.
+  COMMAND_BEGIN(contact_id->name << ", " << varname << ", " << varvalue)
+
+  // Find target contact.
+  contact* cntct(find_target_contact(contact_id->name.c_str()));
+
+  // Find existing custom variable.
+  customvariablesmember** cvar;
+  for (cvar = &cntct->custom_variables; *cvar; cvar = &(*cvar)->next)
+    if ((*cvar)->variable_name
+        && !strcmp((*cvar)->variable_name, varname.c_str()))
+      break ;
+
+  // Update variable.
+  if (!varvalue.empty()) {
+    // Create new variable if not existing.
+    if (!*cvar) {
+      *cvar = new customvariablesmember;
+      (*cvar)->next = NULL;
+      (*cvar)->variable_name = my_strdup(varname.c_str());
+    }
+    else {
+      delete [] (*cvar)->variable_value;
+      (*cvar)->variable_value = NULL;
+    }
+
+    // Set new value.
+    (*cvar)->variable_value = my_strdup(varvalue.c_str());
+  }
+  // Delete variable.
+  if (*cvar) {
+    customvariablesmember* to_delete(*cvar);
+    *cvar = (*cvar)->next;
+    delete [] to_delete->variable_name;
+    delete [] to_delete->variable_value;
+    delete to_delete;
+  }
 
   // Exception handling.
   COMMAND_END()
