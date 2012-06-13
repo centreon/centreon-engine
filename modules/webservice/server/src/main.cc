@@ -76,7 +76,7 @@ int callback_webservice(int callback_type, void* data) {
     return (0);
 
   try {
-    sync::instance().wakeup_workers();
+    com::centreon::engine::modules::webservice::sync::instance().wakeup_workers();
   }
   catch (...) {
 
