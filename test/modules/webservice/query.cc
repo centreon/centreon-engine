@@ -18,6 +18,7 @@
 */
 
 #include <QProcess>
+#include <stdlib.h>
 #include "com/centreon/engine/error.hh"
 #include "test/modules/webservice/query.hh"
 #include "test/paths.hh"
