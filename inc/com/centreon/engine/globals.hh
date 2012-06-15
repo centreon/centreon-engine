@@ -22,8 +22,8 @@
 #ifndef CCE_GLOBALS_HH
 #  define CCE_GLOBALS_HH
 
-#  include <QHash>
-#  include <QString>
+#  include <map>
+#  include <string>
 #  include <stdio.h>
 #  include "com/centreon/engine/checks.hh"
 #  include "com/centreon/engine/circular_buffer.hh"
@@ -97,10 +97,10 @@ extern int                       embedded_perl_initialized;
 
 extern host*                     host_list;
 extern host*                     host_list_tail;
-extern QHash<QString, host_other_properties> host_other_props;
+extern std::map<std::string, host_other_properties> host_other_props;
 extern service*                  service_list;
 extern service*                  service_list_tail;
-extern QHash<QPair<QString, QString>, service_other_properties> service_other_props;
+extern std::map<std::pair<std::string, std::string>, service_other_properties> service_other_props;
 extern contact*                  contact_list;
 extern contact*                  contact_list_tail;
 extern contactgroup*             contactgroup_list;

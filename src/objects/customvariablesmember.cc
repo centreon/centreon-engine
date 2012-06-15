@@ -17,6 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <ctype.h>
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/objects/customvariablesmember.hh"
 
@@ -67,29 +68,48 @@ customvariablesmember const* objects::release(customvariablesmember const* obj) 
  *
  *  @return True if insert sucessfuly, false otherwise.
  */
-bool objects::add_custom_variables_to_object(QVector<QString> const& custom_vars,
-                                             customvariablesmember** list_customvar) {
-  if (list_customvar == NULL)
+bool objects::add_custom_variables_to_object(
+                std::vector<std::string> const& custom_vars,
+                customvariablesmember** list_customvar) {
+  if (!list_customvar)
     return (false);
 
-  for (QVector<QString>::const_iterator it = custom_vars.begin(),
-         end = custom_vars.end();
+  // Process all custom variables.
+  for (std::vector<std::string>::const_iterator
+         it(custom_vars.begin()),
+         end(custom_vars.end());
        it != end;
        ++it) {
-    // split string into custom var name (key) and the custom var value (value).
-    int pos = it->indexOf('=');
-    if (pos == -1)
+    // Split string into custom var name (key)
+    // and the custom var value (value).
+    size_t pos(it->find('='));
+    if (pos == std::string::npos)
       return (false);
 
-    QString key(it->left(pos).trimmed());
-    QString value(it->mid(pos + 1).trimmed());
+    // Retrieve key and value.
+    std::string key(it->substr(0, pos));
+    std::string value(it->substr(pos + 1));
 
-    // add a new custom var into object.
-    if (key.isEmpty() || value.isEmpty() || key[0] != '_'
-	|| add_custom_variable_to_object(list_customvar,
-                                         qPrintable(key),
-                                         qPrintable(value)) == NULL)
+    // Trim it.
+    while (!key.empty() && isspace(key[0]))
+      key.erase(key.begin());
+    while (!key.empty() && isspace(key[key.size() - 1]))
+      key.resize(key.size() - 1);
+    while (!value.empty() && isspace(value[0]))
+      value.erase(value.begin());
+    while (!value.empty() && isspace(value[value.size() - 1]))
+      value.resize(value.size() - 1);
+
+    // Add a new custom var into object.
+    if (key.empty()
+        || value.empty()
+        || key[0] != '_'
+	|| add_custom_variable_to_object(
+             list_customvar,
+             key.c_str(),
+             value.c_str()) == NULL)
       return (false);
   }
+
   return (true);
 }

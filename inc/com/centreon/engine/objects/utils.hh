@@ -20,9 +20,9 @@
 #ifndef CCE_OBJECTS_UTILS_HH
 #  define CCE_OBJECTS_UTILS_HH
 
-#  include <QHash>
-#  include <QString>
-#  include <QVector>
+#  include <map>
+#  include <string>
+#  include <vector>
 #  include "com/centreon/engine/objects.hh"
 
 namespace             com {
@@ -50,15 +50,15 @@ namespace             com {
           }
 
           template<class T>
-          inline QVector<T*> tab2qvec(T** tab) {
-            QVector<T*> vec;
+          inline std::vector<T*> tab2vec(T** tab) {
+            std::vector<T*> vec;
             for (unsigned int i = 0; tab[i] != NULL; ++i)
               vec.push_back(tab[i]);
             return (vec);
           }
 
-          inline QVector<QString> tab2qvec(char** tab) {
-            QVector<QString> vec;
+          inline std::vector<std::string> tab2vec(char** tab) {
+            std::vector<std::string> vec;
             for (unsigned int i = 0; tab[i] != NULL; ++i)
               vec.push_back(tab[i]);
             return (vec);

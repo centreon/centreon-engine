@@ -54,10 +54,10 @@ bool link_service(service* obj,
                   command* cmd_check_command) {
   try {
     objects::link(obj,
-                  tab2qvec(contacts),
-                  tab2qvec(contactgroups),
-                  tab2qvec(servicegroups),
-                  tab2qvec(custom_variables),
+                  tab2vec(contacts),
+                  tab2vec(contactgroups),
+                  tab2vec(servicegroups),
+                  tab2vec(custom_variables),
                   initial_state,
                   check_period,
                   notification_period,
@@ -108,10 +108,10 @@ void release_service(service const* obj) {
  *  @param[in]     cmd_check_command   Set service check command.
  */
 void objects::link(service* obj,
-                   QVector<contact*> const& contacts,
-                   QVector<contactgroup*> const& contactgroups,
-                   QVector<servicegroup*> const& servicegroups,
-                   QVector<QString> const& custom_variables,
+                   std::vector<contact*> const& contacts,
+                   std::vector<contactgroup*> const& contactgroups,
+                   std::vector<servicegroup*> const& servicegroups,
+                   std::vector<std::string> const& custom_variables,
                    int initial_state,
                    timeperiod* check_period,
                    timeperiod* notification_period,
@@ -162,7 +162,7 @@ void objects::link(service* obj,
     throw (engine_error() << "service '" << obj->host_name << ", "
 	   << obj->description << "' invalid contact groups.");
 
-  for (QVector<servicegroup*>::const_iterator it = servicegroups.begin(),
+  for (std::vector<servicegroup*>::const_iterator it = servicegroups.begin(),
          end = servicegroups.end();
        it != end;
        ++it) {

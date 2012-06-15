@@ -39,9 +39,9 @@ namespace         commands {
       quit_query& operator=(quit_query const& right);
       bool        operator==(quit_query const& right) const throw();
       bool        operator!=(quit_query const& right) const throw();
-      QByteArray  build();
+      std::string build();
       request*    clone() const;
-      void        restore(QByteArray const& data);
+      void        restore(std::string const& data);
     };
   }
 }

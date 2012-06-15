@@ -38,7 +38,7 @@ using namespace com::centreon::engine::logging;
  *  @param[in] filename The module filename.
  *  @param[in] args     The module args.
  */
-handle::handle(QString const& filename, QString const& args)
+handle::handle(std::string const& filename, std::string const& args)
   : _args(args), _filename(filename), _name(filename) {
   emit event_create(this);
 }
@@ -131,7 +131,7 @@ void handle::close() {
  *
  *  @return The arguments.
  */
-QString const& handle::get_args() const throw () {
+std::string const& handle::get_args() const throw () {
   return (_args);
 }
 
@@ -140,7 +140,7 @@ QString const& handle::get_args() const throw () {
  *
  *  @return The author name.
  */
-QString const& handle::get_author() const throw () {
+std::string const& handle::get_author() const throw () {
   return (_author);
 }
 
@@ -149,7 +149,7 @@ QString const& handle::get_author() const throw () {
  *
  *  @return The copyright.
  */
-QString const& handle::get_copyright() const throw () {
+std::string const& handle::get_copyright() const throw () {
   return (_copyright);
 }
 
@@ -158,7 +158,7 @@ QString const& handle::get_copyright() const throw () {
  *
  *  @return The description.
  */
-QString const& handle::get_description() const throw () {
+std::string const& handle::get_description() const throw () {
   return (_description);
 }
 
@@ -167,7 +167,7 @@ QString const& handle::get_description() const throw () {
  *
  *  @return The filename.
  */
-QString const& handle::get_filename() const throw () {
+std::string const& handle::get_filename() const throw () {
   return (_filename);
 }
 
@@ -185,7 +185,7 @@ QLibrary* handle::get_handle() const throw () {
  *
  *  @return The license.
  */
-QString const& handle::get_license() const throw () {
+std::string const& handle::get_license() const throw () {
   return (_license);
 }
 
@@ -194,7 +194,7 @@ QString const& handle::get_license() const throw () {
  *
  *  @return The name.
  */
-QString const& handle::get_name() const throw () {
+std::string const& handle::get_name() const throw () {
   return (_name);
 }
 
@@ -203,7 +203,7 @@ QString const& handle::get_name() const throw () {
  *
  *  @return The version.
  */
-QString const& handle::get_version() const throw () {
+std::string const& handle::get_version() const throw () {
   return (_version);
 }
 
@@ -276,7 +276,7 @@ void handle::open(QString const& filename, QString const& args) {
  *
  *  @param[in] The author name.
  */
-void handle::set_author(QString const& author) {
+void handle::set_author(std::string const& author) {
   _author = author;
   emit event_author(this);
 }
@@ -286,7 +286,7 @@ void handle::set_author(QString const& author) {
  *
  *  @param[in] The copyright.
  */
-void handle::set_copyright(QString const& copyright) {
+void handle::set_copyright(std::string const& copyright) {
   _copyright = copyright;
   emit event_copyright(this);
 }
@@ -296,7 +296,7 @@ void handle::set_copyright(QString const& copyright) {
  *
  *  @param[in] The description.
  */
-void handle::set_description(QString const& description) {
+void handle::set_description(std::string const& description) {
   _description = description;
   emit event_description(this);
 }
@@ -306,7 +306,7 @@ void handle::set_description(QString const& description) {
  *
  *  @param[in] The license.
  */
-void handle::set_license(QString const& license) {
+void handle::set_license(std::string const& license) {
   _license = license;
   emit event_license(this);
 }
@@ -316,8 +316,8 @@ void handle::set_license(QString const& license) {
  *
  *  @param[in] The name.
  */
-void handle::set_name(QString const& name) {
-  QString old_name = _name;
+void handle::set_name(std::string const& name) {
+  std::string old_name = _name;
   _name = name;
   emit name_changed(old_name, _name);
   emit event_name(this);
@@ -328,7 +328,7 @@ void handle::set_name(QString const& name) {
  *
  *  @param[in] The version.
  */
-void handle::set_version(QString const& version) {
+void handle::set_version(std::string const& version) {
   _version = version;
   emit event_version(this);
 }

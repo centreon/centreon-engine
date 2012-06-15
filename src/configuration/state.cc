@@ -53,25 +53,25 @@ state::state()
 
   _mac = get_global_macros();
 
-  _lst_method["resource_file"]                               = &cpp_suck<QString const&, &state::_parse_resource_file>::set_generic;;
-  _lst_method["log_file"]                                    = &cpp_suck<QString const&, &state::set_log_file>::set_generic;
+  _lst_method["resource_file"]                               = &cpp_suck<std::string const&, &state::_parse_resource_file>::set_generic;;
+  _lst_method["log_file"]                                    = &cpp_suck<std::string const&, &state::set_log_file>::set_generic;
   _lst_method["max_log_file_size"]                           = &cpp_suck<unsigned long, &state::set_max_log_file_size>::set_generic;
-  _lst_method["broker_module_directory"]                     = &cpp_suck<QString const&, &state::set_broker_module_directory>::set_generic;
+  _lst_method["broker_module_directory"]                     = &cpp_suck<std::string const&, &state::set_broker_module_directory>::set_generic;
   _lst_method["debug_level"]                                 = &cpp_suck_cast<unsigned long, int, &state::set_debug_level>::set_generic_cast;
   _lst_method["debug_verbosity"]                             = &cpp_suck<unsigned int, &state::set_debug_verbosity>::set_generic;
-  _lst_method["debug_file"]                                  = &cpp_suck<QString const&, &state::set_debug_file>::set_generic;
+  _lst_method["debug_file"]                                  = &cpp_suck<std::string const&, &state::set_debug_file>::set_generic;
   _lst_method["max_debug_file_size"]                         = &cpp_suck<unsigned long, &state::set_max_debug_file_size>::set_generic;
-  _lst_method["command_file"]                                = &cpp_suck<QString const&, &state::set_command_file>::set_generic;
-  _lst_method["temp_file"]                                   = &cpp_suck<QString const&, &state::set_temp_file>::set_generic;
-  _lst_method["temp_path"]                                   = &cpp_suck<QString const&, &state::set_temp_path>::set_generic;
-  _lst_method["check_result_path"]                           = &cpp_suck<QString const&, &state::set_check_result_path>::set_generic;
+  _lst_method["command_file"]                                = &cpp_suck<std::string const&, &state::set_command_file>::set_generic;
+  _lst_method["temp_file"]                                   = &cpp_suck<std::string const&, &state::set_temp_file>::set_generic;
+  _lst_method["temp_path"]                                   = &cpp_suck<std::string const&, &state::set_temp_path>::set_generic;
+  _lst_method["check_result_path"]                           = &cpp_suck<std::string const&, &state::set_check_result_path>::set_generic;
   _lst_method["max_check_result_file_age"]                   = &cpp_suck<unsigned long, &state::set_max_check_result_file_age>::set_generic;
-  _lst_method["global_host_event_handler"]                   = &cpp_suck<QString const&, &state::set_global_host_event_handler>::set_generic;
-  _lst_method["global_service_event_handler"]                = &cpp_suck<QString const&, &state::set_global_service_event_handler>::set_generic;
-  _lst_method["ocsp_command"]                                = &cpp_suck<QString const&, &state::set_ocsp_command>::set_generic;
-  _lst_method["ochp_command"]                                = &cpp_suck<QString const&, &state::set_ochp_command>::set_generic;
-  _lst_method["admin_email"]                                 = &cpp_suck<QString const&, &state::_set_admin_email>::set_generic;
-  _lst_method["admin_pager"]                                 = &cpp_suck<QString const&, &state::_set_admin_pager>::set_generic;
+  _lst_method["global_host_event_handler"]                   = &cpp_suck<std::string const&, &state::set_global_host_event_handler>::set_generic;
+  _lst_method["global_service_event_handler"]                = &cpp_suck<std::string const&, &state::set_global_service_event_handler>::set_generic;
+  _lst_method["ocsp_command"]                                = &cpp_suck<std::string const&, &state::set_ocsp_command>::set_generic;
+  _lst_method["ochp_command"]                                = &cpp_suck<std::string const&, &state::set_ochp_command>::set_generic;
+  _lst_method["admin_email"]                                 = &cpp_suck<std::string const&, &state::_set_admin_email>::set_generic;
+  _lst_method["admin_pager"]                                 = &cpp_suck<std::string const&, &state::_set_admin_pager>::set_generic;
   _lst_method["use_syslog"]                                  = &cpp_suck<bool, &state::set_use_syslog>::set_generic;
   _lst_method["log_notifications"]                           = &cpp_suck<bool, &state::set_log_notifications>::set_generic;
   _lst_method["log_service_retries"]                         = &cpp_suck<bool, &state::set_log_service_retries>::set_generic;
@@ -87,9 +87,9 @@ state::state()
   _lst_method["retention_scheduling_horizon"]                = &cpp_suck<unsigned int, &state::set_retention_scheduling_horizon>::set_generic;
   _lst_method["additional_freshness_latency"]                = &cpp_suck<int, &state::set_additional_freshness_latency>::set_generic;
   _lst_method["retained_host_attribute_mask"]                = &cpp_suck<unsigned long, &state::set_retained_host_attribute_mask>::set_generic;
-  _lst_method["retained_service_attribute_mask"]             = &cpp_suck<QString const&, &state::_set_retained_service_attribute_mask>::set_generic;
+  _lst_method["retained_service_attribute_mask"]             = &cpp_suck<std::string const&, &state::_set_retained_service_attribute_mask>::set_generic;
   _lst_method["retained_process_host_attribute_mask"]        = &cpp_suck<unsigned long, &state::set_retained_process_host_attribute_mask>::set_generic;
-  _lst_method["retained_process_service_attribute_mask"]     = &cpp_suck<QString const&, &state::_set_retained_process_service_attribute_mask>::set_generic;
+  _lst_method["retained_process_service_attribute_mask"]     = &cpp_suck<std::string const&, &state::_set_retained_process_service_attribute_mask>::set_generic;
   _lst_method["retained_contact_host_attribute_mask"]        = &cpp_suck<unsigned long, &state::set_retained_contact_host_attribute_mask>::set_generic;
   _lst_method["retained_contact_service_attribute_mask"]     = &cpp_suck<unsigned long, &state::set_retained_contact_service_attribute_mask>::set_generic;
   _lst_method["obsess_over_services"]                        = &cpp_suck<bool, &state::set_obsess_over_services>::set_generic;
@@ -109,19 +109,19 @@ state::state()
   _lst_method["cached_service_check_horizon"]                = &cpp_suck<unsigned long, &state::set_cached_service_check_horizon>::set_generic;
   _lst_method["enable_predictive_service_dependency_checks"] = &cpp_suck<bool, &state::set_enable_predictive_service_dependency_checks>::set_generic;
   _lst_method["soft_state_dependencies"]                     = &cpp_suck<bool, &state::set_soft_state_dependencies>::set_generic;
-  _lst_method["log_rotation_method"]                         = &cpp_suck<QString const&, &state::set_log_rotation_method>::set_generic;
-  _lst_method["log_archive_path"]                            = &cpp_suck<QString const&, &state::set_log_archive_path>::set_generic;
+  _lst_method["log_rotation_method"]                         = &cpp_suck<std::string const&, &state::set_log_rotation_method>::set_generic;
+  _lst_method["log_archive_path"]                            = &cpp_suck<std::string const&, &state::set_log_archive_path>::set_generic;
   _lst_method["enable_event_handlers"]                       = &cpp_suck<bool, &state::set_enable_event_handlers>::set_generic;
   _lst_method["enable_notifications"]                        = &cpp_suck<bool, &state::set_enable_notifications>::set_generic;
   _lst_method["execute_service_checks"]                      = &cpp_suck<bool, &state::set_execute_service_checks>::set_generic;
   _lst_method["accept_passive_service_checks"]               = &cpp_suck<bool, &state::set_accept_passive_service_checks>::set_generic;
   _lst_method["execute_host_checks"]                         = &cpp_suck<bool, &state::set_execute_host_checks>::set_generic;
   _lst_method["accept_passive_host_checks"]                  = &cpp_suck<bool, &state::set_accept_passive_host_checks>::set_generic;
-  _lst_method["service_inter_check_delay_method"]            = &cpp_suck<QString const&, &state::set_service_inter_check_delay_method>::set_generic;
+  _lst_method["service_inter_check_delay_method"]            = &cpp_suck<std::string const&, &state::set_service_inter_check_delay_method>::set_generic;
   _lst_method["max_service_check_spread"]                    = &cpp_suck<unsigned int, &state::set_max_service_check_spread>::set_generic;
-  _lst_method["host_inter_check_delay_method"]               = &cpp_suck<QString const&, &state::set_host_inter_check_delay_method>::set_generic;
+  _lst_method["host_inter_check_delay_method"]               = &cpp_suck<std::string const&, &state::set_host_inter_check_delay_method>::set_generic;
   _lst_method["max_host_check_spread"]                       = &cpp_suck<unsigned int, &state::set_max_host_check_spread>::set_generic;
-  _lst_method["service_interleave_factor"]                   = &cpp_suck<QString const&, &state::set_service_interleave_factor_method>::set_generic;
+  _lst_method["service_interleave_factor"]                   = &cpp_suck<std::string const&, &state::set_service_interleave_factor_method>::set_generic;
   _lst_method["max_concurrent_checks"]                       = &cpp_suck<unsigned int, &state::set_max_parallel_service_checks>::set_generic;
   _lst_method["check_result_reaper_frequency"]               = &cpp_suck<unsigned int, &state::set_check_reaper_interval>::set_generic;
   _lst_method["service_reaper_frequency"]                    = &cpp_suck<unsigned int, &state::set_check_reaper_interval>::set_generic;
@@ -129,7 +129,7 @@ state::state()
   _lst_method["sleep_time"]                                  = &cpp_suck<float, &state::set_sleep_time>::set_generic;
   _lst_method["interval_length"]                             = &cpp_suck<unsigned int, &state::set_interval_length>::set_generic;
   _lst_method["check_external_commands"]                     = &cpp_suck<bool, &state::set_check_external_commands>::set_generic;
-  _lst_method["command_check_interval"]                      = &cpp_suck<QString const&, &state::set_command_check_interval>::set_generic;
+  _lst_method["command_check_interval"]                      = &cpp_suck<std::string const&, &state::set_command_check_interval>::set_generic;
   _lst_method["check_for_orphaned_services"]                 = &cpp_suck<bool, &state::set_check_orphaned_services>::set_generic;
   _lst_method["check_for_orphaned_hosts"]                    = &cpp_suck<bool, &state::set_check_orphaned_hosts>::set_generic;
   _lst_method["check_service_freshness"]                     = &cpp_suck<bool, &state::set_check_service_freshness>::set_generic;
@@ -139,7 +139,7 @@ state::state()
   _lst_method["auto_reschedule_checks"]                      = &cpp_suck<bool, &state::set_auto_reschedule_checks>::set_generic;
   _lst_method["auto_rescheduling_interval"]                  = &cpp_suck<unsigned int, &state::set_auto_rescheduling_interval>::set_generic;
   _lst_method["auto_rescheduling_window"]                    = &cpp_suck<unsigned int, &state::set_auto_rescheduling_window>::set_generic;
-  _lst_method["aggregate_status_updates"]                    = &cpp_suck<QString const&, &state::_set_aggregate_status_updates>::set_generic;
+  _lst_method["aggregate_status_updates"]                    = &cpp_suck<std::string const&, &state::_set_aggregate_status_updates>::set_generic;
   _lst_method["status_update_interval"]                      = &cpp_suck<unsigned int, &state::set_status_update_interval>::set_generic;
   _lst_method["time_change_threshold"]                       = &cpp_suck<unsigned int, &state::set_time_change_threshold>::set_generic;
   _lst_method["process_performance_data"]                    = &cpp_suck<bool, &state::set_process_performance_data>::set_generic;
@@ -149,13 +149,13 @@ state::state()
   _lst_method["high_service_flap_threshold"]                 = &cpp_suck<float, &state::set_high_service_flap_threshold>::set_generic;
   _lst_method["low_host_flap_threshold"]                     = &cpp_suck<float, &state::set_low_host_flap_threshold>::set_generic;
   _lst_method["high_host_flap_threshold"]                    = &cpp_suck<float, &state::set_high_host_flap_threshold>::set_generic;
-  _lst_method["date_format"]                                 = &cpp_suck<QString const&, &state::set_date_format>::set_generic;
-  _lst_method["use_timezone"]                                = &cpp_suck<QString const&, &state::set_use_timezone>::set_generic;
-  _lst_method["p1_file"]                                     = &cpp_suck<QString const&, &state::set_p1_file>::set_generic;
-  _lst_method["event_broker_options"]                        = &cpp_suck<QString const&, &state::set_event_broker_options>::set_generic;
-  _lst_method["illegal_object_name_chars"]                   = &cpp_suck<QString const&, &state::set_illegal_object_chars>::set_generic;
-  _lst_method["illegal_macro_output_chars"]                  = &cpp_suck<QString const&, &state::set_illegal_output_chars>::set_generic;
-  _lst_method["broker_module"]                               = &cpp_suck<QString const&, &state::_set_broker_module>::set_generic;
+  _lst_method["date_format"]                                 = &cpp_suck<std::string const&, &state::set_date_format>::set_generic;
+  _lst_method["use_timezone"]                                = &cpp_suck<std::string const&, &state::set_use_timezone>::set_generic;
+  _lst_method["p1_file"]                                     = &cpp_suck<std::string const&, &state::set_p1_file>::set_generic;
+  _lst_method["event_broker_options"]                        = &cpp_suck<std::string const&, &state::set_event_broker_options>::set_generic;
+  _lst_method["illegal_object_name_chars"]                   = &cpp_suck<std::string const&, &state::set_illegal_object_chars>::set_generic;
+  _lst_method["illegal_macro_output_chars"]                  = &cpp_suck<std::string const&, &state::set_illegal_output_chars>::set_generic;
+  _lst_method["broker_module"]                               = &cpp_suck<std::string const&, &state::_set_broker_module>::set_generic;
   _lst_method["use_regexp_matching"]                         = &cpp_suck<bool, &state::set_use_regexp_matches>::set_generic;
   _lst_method["use_true_regexp_matching"]                    = &cpp_suck<bool, &state::set_use_true_regexp_matching>::set_generic;
   _lst_method["use_large_installation_tweaks"]               = &cpp_suck<bool, &state::set_use_large_installation_tweaks>::set_generic;
@@ -165,27 +165,27 @@ state::state()
   _lst_method["enable_embedded_perl"]                        = &cpp_suck<bool, &state::set_enable_embedded_perl>::set_generic;
   _lst_method["use_embedded_perl_implicitly"]                = &cpp_suck<bool, &state::set_use_embedded_perl_implicitly>::set_generic;
   _lst_method["external_command_buffer_slots"]               = &cpp_suck<int, &state::set_external_command_buffer_slots>::set_generic;
-  _lst_method["auth_file"]                                   = &cpp_suck<QString const&, &state::_set_auth_file>::set_generic;
-  _lst_method["bare_update_check"]                           = &cpp_suck<QString const&, &state::_set_bare_update_check>::set_generic;
-  _lst_method["check_for_updates"]                           = &cpp_suck<QString const&, &state::_set_check_for_updates>::set_generic;
-  _lst_method["comment_file"]                                = &cpp_suck<QString const&, &state::_set_comment_file>::set_generic;
-  _lst_method["xcddefault_comment_file"]                     = &cpp_suck<QString const&, &state::_set_comment_file>::set_generic;
-  _lst_method["daemon_dumps_core"]                           = &cpp_suck<QString const&, &state::_set_daemon_dumps_core>::set_generic;
-  _lst_method["downtime_file"]                               = &cpp_suck<QString const&, &state::_set_downtime_file>::set_generic;
-  _lst_method["xdddefault_downtime_file"]                    = &cpp_suck<QString const&, &state::_set_downtime_file>::set_generic;
+  _lst_method["auth_file"]                                   = &cpp_suck<std::string const&, &state::_set_auth_file>::set_generic;
+  _lst_method["bare_update_check"]                           = &cpp_suck<std::string const&, &state::_set_bare_update_check>::set_generic;
+  _lst_method["check_for_updates"]                           = &cpp_suck<std::string const&, &state::_set_check_for_updates>::set_generic;
+  _lst_method["comment_file"]                                = &cpp_suck<std::string const&, &state::_set_comment_file>::set_generic;
+  _lst_method["xcddefault_comment_file"]                     = &cpp_suck<std::string const&, &state::_set_comment_file>::set_generic;
+  _lst_method["daemon_dumps_core"]                           = &cpp_suck<std::string const&, &state::_set_daemon_dumps_core>::set_generic;
+  _lst_method["downtime_file"]                               = &cpp_suck<std::string const&, &state::_set_downtime_file>::set_generic;
+  _lst_method["xdddefault_downtime_file"]                    = &cpp_suck<std::string const&, &state::_set_downtime_file>::set_generic;
   _lst_method["allow_empty_hostgroup_assignment"]            = &cpp_suck<bool, &state::set_allow_empty_hostgroup_assignment>::set_generic;
-  _lst_method["daemon_dumps_core"]                           = &cpp_suck<QString const&, &state::_set_daemon_dumps_core>::set_generic;
-  _lst_method["nagios_user"]                                 = &cpp_suck<QString const&, &state::_set_user>::set_generic;
-  _lst_method["nagios_group"]                                = &cpp_suck<QString const&, &state::_set_group>::set_generic;
-  _lst_method["lock_file"]                                   = &cpp_suck<QString const&, &state::_set_lock_file>::set_generic;
+  _lst_method["daemon_dumps_core"]                           = &cpp_suck<std::string const&, &state::_set_daemon_dumps_core>::set_generic;
+  _lst_method["nagios_user"]                                 = &cpp_suck<std::string const&, &state::_set_user>::set_generic;
+  _lst_method["nagios_group"]                                = &cpp_suck<std::string const&, &state::_set_group>::set_generic;
+  _lst_method["lock_file"]                                   = &cpp_suck<std::string const&, &state::_set_lock_file>::set_generic;
 
-  _lst_method["status_file"]                                 = &cpp_suck<QString const&, &state::_set_status_file>::set_generic;
+  _lst_method["status_file"]                                 = &cpp_suck<std::string const&, &state::_set_status_file>::set_generic;
   _lst_method["perfdata_timeout"]                            = &cpp_suck<int, &state::_set_perfdata_timeout>::set_generic;
-  _lst_method["cfg_file"]                                    = &cpp_suck<QString const&, &state::_add_cfg_file>::set_generic;
-  _lst_method["cfg_dir"]                                     = &cpp_suck<QString const&, &state::_add_cfg_dir>::set_generic;
-  _lst_method["state_retention_file"]                        = &cpp_suck<QString const&, &state::_set_state_retention_file>::set_generic;
-  _lst_method["object_cache_file"]                           = &cpp_suck<QString const&, &state::_set_object_cache_file>::set_generic;
-  _lst_method["precached_object_file"]                       = &cpp_suck<QString const&, &state::_set_precached_object_file>::set_generic;
+  _lst_method["cfg_file"]                                    = &cpp_suck<std::string const&, &state::_add_cfg_file>::set_generic;
+  _lst_method["cfg_dir"]                                     = &cpp_suck<std::string const&, &state::_add_cfg_dir>::set_generic;
+  _lst_method["state_retention_file"]                        = &cpp_suck<std::string const&, &state::_set_state_retention_file>::set_generic;
+  _lst_method["object_cache_file"]                           = &cpp_suck<std::string const&, &state::_set_object_cache_file>::set_generic;
+  _lst_method["precached_object_file"]                       = &cpp_suck<std::string const&, &state::_set_precached_object_file>::set_generic;
 
   _reset();
 
@@ -284,9 +284,9 @@ void state::reset() {
  *
  *  @param[in] filename configuration file
  */
-void state::parse(QString const& filename) {
+void state::parse(std::string const& filename) {
   std::ifstream ifs;
-  ifs.open(qPrintable(filename), std::ifstream::in);
+  ifs.open(filename.c_str(), std::ifstream::in);
   if (ifs.is_open() == false) {
     throw (engine_error() << "cannot open configuration file: '" << filename << "'");
   }
@@ -337,8 +337,8 @@ void state::parse(QString const& filename) {
     throw (engine_error() << "log_file is not specified anywhere in '" << _filename << "'");
   }
 
-  if (!get_use_timezone().isEmpty()) {
-    set_environment_var("TZ", qPrintable(get_use_timezone()), 1);
+  if (!get_use_timezone().empty()) {
+    set_environment_var("TZ", get_use_timezone().c_str(), 1);
   }
   tzset();
 
@@ -348,14 +348,14 @@ void state::parse(QString const& filename) {
   }
 
   delete[] _mac->x[MACRO_MAINCONFIGFILE];
-  _mac->x[MACRO_MAINCONFIGFILE] = my_strdup(qPrintable(_filename));
+  _mac->x[MACRO_MAINCONFIGFILE] = my_strdup(_filename.c_str());
 }
 
 /**
  *  Get the admin email.
  *  @return The admin email.
  */
-QString const& state::get_admin_email() const throw() {
+std::string const& state::get_admin_email() const throw() {
   return (_tab_string[admin_email]);
 }
 
@@ -363,7 +363,7 @@ QString const& state::get_admin_email() const throw() {
  *  Get the admin pager.
  *  @return The admin pager.
  */
-QString const& state::get_admin_pager() const throw() {
+std::string const& state::get_admin_pager() const throw() {
   return (_tab_string[admin_pager]);
 }
 
@@ -371,7 +371,7 @@ QString const& state::get_admin_pager() const throw() {
  *  Get the logging filename.
  *  @return The logging filename.
  */
-QString const& state::get_log_file() const throw() {
+std::string const& state::get_log_file() const throw() {
   return (_tab_string[log_file]);
 }
 
@@ -379,7 +379,7 @@ QString const& state::get_log_file() const throw() {
  *  Get the broker_module directory.
  *  @return The broker_module directory.
  */
-QString const& state::get_broker_module_directory() const throw() {
+std::string const& state::get_broker_module_directory() const throw() {
   return (_tab_string[broker_module_directory]);
 }
 
@@ -387,7 +387,7 @@ QString const& state::get_broker_module_directory() const throw() {
  *  Get the debug filename.
  *  @return The debug filename.
  */
-QString const& state::get_debug_file() const throw() {
+std::string const& state::get_debug_file() const throw() {
   return (_tab_string[debug_file]);
 }
 
@@ -395,7 +395,7 @@ QString const& state::get_debug_file() const throw() {
  *  Get the command filename.
  *  @return The command filename.
  */
-QString const& state::get_command_file() const throw() {
+std::string const& state::get_command_file() const throw() {
   return (_tab_string[command_file]);
 }
 
@@ -403,7 +403,7 @@ QString const& state::get_command_file() const throw() {
  *  Get the global host event handler.
  *  @return The global host event handler.
  */
-QString const& state::get_global_host_event_handler() const throw() {
+std::string const& state::get_global_host_event_handler() const throw() {
   return (_tab_string[global_host_event_handler]);
 }
 
@@ -411,7 +411,7 @@ QString const& state::get_global_host_event_handler() const throw() {
  *  Get the global service event handler.
  *  @return The global service event handler.
  */
-QString const& state::get_global_service_event_handler() const throw() {
+std::string const& state::get_global_service_event_handler() const throw() {
   return (_tab_string[global_service_event_handler]);
 }
 
@@ -419,7 +419,7 @@ QString const& state::get_global_service_event_handler() const throw() {
  *  Get the ocsp command.
  *  @return The ocsp command.
  */
-QString const& state::get_ocsp_command() const throw() {
+std::string const& state::get_ocsp_command() const throw() {
   return (_tab_string[ocsp_command]);
 }
 
@@ -427,7 +427,7 @@ QString const& state::get_ocsp_command() const throw() {
  *  Get the ochp command.
  *  @return The ochp command.
  */
-QString const& state::get_ochp_command() const throw() {
+std::string const& state::get_ochp_command() const throw() {
   return (_tab_string[ochp_command]);
 }
 
@@ -435,7 +435,7 @@ QString const& state::get_ochp_command() const throw() {
  *  Get the illegal object characters.
  *  @return The illegal object characters.
  */
-QString const& state::get_illegal_object_chars() const throw() {
+std::string const& state::get_illegal_object_chars() const throw() {
   return (_tab_string[illegal_object_chars]);
 }
 
@@ -443,7 +443,7 @@ QString const& state::get_illegal_object_chars() const throw() {
  *  Get the illegal output characters.
  *  @return The illegal output characters.
  */
-QString const& state::get_illegal_output_chars() const throw() {
+std::string const& state::get_illegal_output_chars() const throw() {
   return (_tab_string[illegal_output_chars]);
 }
 
@@ -451,7 +451,7 @@ QString const& state::get_illegal_output_chars() const throw() {
  *  Get the use timezone.
  *  @return The use timezone.
  */
-QString const& state::get_use_timezone() const throw() {
+std::string const& state::get_use_timezone() const throw() {
   return (_tab_string[use_timezone]);
 }
 
@@ -459,7 +459,7 @@ QString const& state::get_use_timezone() const throw() {
  *  Get status file.
  *  @return The status file path.
  */
-QString const& state::get_status_file() const throw() {
+std::string const& state::get_status_file() const throw() {
  return (_tab_string[status_file]);
 }
 
@@ -467,7 +467,7 @@ QString const& state::get_status_file() const throw() {
  *  Get state retention file.
  *  @return The state retention file path.
  */
-QString const& state::get_state_retention_file() const throw() {
+std::string const& state::get_state_retention_file() const throw() {
  return (_tab_string[state_retention_file]);
 }
 
@@ -475,7 +475,7 @@ QString const& state::get_state_retention_file() const throw() {
  *  Get object cache file.
  *  @return The object cache file path.
  */
-QString const& state::get_object_cache_file() const throw() {
+std::string const& state::get_object_cache_file() const throw() {
  return (_tab_string[object_cache_file]);
 }
 
@@ -483,7 +483,7 @@ QString const& state::get_object_cache_file() const throw() {
  *  Get precached object file.
  *  @return The precached object file path.
  */
-QString const& state::get_precached_object_file() const throw() {
+std::string const& state::get_precached_object_file() const throw() {
  return (_tab_string[precached_object_file]);
 }
 
@@ -491,7 +491,7 @@ QString const& state::get_precached_object_file() const throw() {
  *  Get broker module.
  *  @return The list of broker module.
  */
-QList<QString> const& state::get_broker_module() const throw() {
+std::list<std::string> const& state::get_broker_module() const throw() {
  return (_lst_broker_module);
 }
 
@@ -499,7 +499,7 @@ QList<QString> const& state::get_broker_module() const throw() {
  *  Get condifugration dir path.
  *  @return The list of configuration dir path.
  */
-QList<QString> const& state::get_cfg_dir() const throw() {
+std::list<std::string> const& state::get_cfg_dir() const throw() {
  return (_lst_cfg_dir);
 }
 
@@ -507,7 +507,7 @@ QList<QString> const& state::get_cfg_dir() const throw() {
  *  Get configuration file path.
  *  @return The list of configuration file path.
  */
-QList<QString> const& state::get_cfg_file() const throw() {
+std::list<std::string> const& state::get_cfg_file() const throw() {
  return (_lst_cfg_file);
 }
 
@@ -515,7 +515,7 @@ QList<QString> const& state::get_cfg_file() const throw() {
  *  Get resource file path.
  *  @return The list of resource file path.
  */
-QList<QString> const& state::get_resource_file() const throw() {
+std::list<std::string> const& state::get_resource_file() const throw() {
  return (_lst_resource_file);
 }
 
@@ -1195,11 +1195,11 @@ state::e_interleave_factor state::get_service_interleave_factor_method() const t
  *  Set the logging filename.
  *  @param[in] value The filename.
  */
-void state::set_log_file(QString const& value) {
+void state::set_log_file(std::string const& value) {
   _tab_string[log_file] = value;
 
   delete[] _mac->x[MACRO_LOGFILE];
-  _mac->x[MACRO_LOGFILE] = my_strdup(qPrintable(value));
+  _mac->x[MACRO_LOGFILE] = my_strdup(value.c_str());
 
   delete[] ::log_file;
   ::log_file = my_strdup(_mac->x[MACRO_LOGFILE]);
@@ -1209,7 +1209,7 @@ void state::set_log_file(QString const& value) {
  *  Set the broker module directory.
  *  @param[in] value The broker module directory.
  */
-void state::set_broker_module_directory(QString const& value) {
+void state::set_broker_module_directory(std::string const& value) {
   _tab_string[broker_module_directory] = value;
 }
 
@@ -1218,22 +1218,22 @@ void state::set_broker_module_directory(QString const& value) {
  *  Set the debug filename.
  *  @param[in] value The filename
  */
-void state::set_debug_file(QString const& value) {
+void state::set_debug_file(std::string const& value) {
   _tab_string[debug_file] = value;
 
   delete[] ::debug_file;
-  ::debug_file = my_strdup(qPrintable(value));
+  ::debug_file = my_strdup(value.c_str());
 }
 
 /**
  *  Set the command filename.
  *  @param[in] value The filename.
  */
-void state::set_command_file(QString const& value) {
+void state::set_command_file(std::string const& value) {
   _tab_string[command_file] = value;
 
   delete[] _mac->x[MACRO_COMMANDFILE];
-  _mac->x[MACRO_COMMANDFILE] = my_strdup(qPrintable(value));
+  _mac->x[MACRO_COMMANDFILE] = my_strdup(value.c_str());
 
   delete[] ::command_file;
   ::command_file = my_strdup(_mac->x[MACRO_COMMANDFILE]);
@@ -1243,7 +1243,7 @@ void state::set_command_file(QString const& value) {
  *  Set the temporary filename.
  *  @param[in] value The filename.
  */
-void state::set_temp_file(QString const& value) {
+void state::set_temp_file(std::string const& value) {
   (void)value;
   logger(log_config_warning, basic) << "warning: temp_file variable ignored";
 }
@@ -1252,7 +1252,7 @@ void state::set_temp_file(QString const& value) {
  *  Set the temporary path.
  *  @param[in] value Unused.
  */
-void state::set_temp_path(QString const& value) {
+void state::set_temp_path(std::string const& value) {
   (void)value;
   logger(log_config_warning, basic) << "warning: temp_path variable ignored";
 }
@@ -1261,7 +1261,7 @@ void state::set_temp_path(QString const& value) {
  *  Set the check result path.
  *  @param[in] value Unused.
  */
-void state::set_check_result_path(QString const& value) {
+void state::set_check_result_path(std::string const& value) {
   (void)value;
   logger(log_config_warning, basic) << "warning: check_result_path variable ignored";
 }
@@ -1270,51 +1270,51 @@ void state::set_check_result_path(QString const& value) {
  *  Set the global host event handler.
  *  @param[in] value The event handler.
  */
-void state::set_global_host_event_handler(QString const& value) {
+void state::set_global_host_event_handler(std::string const& value) {
   _tab_string[global_host_event_handler] = value;
 
   delete[] ::global_host_event_handler;
-  ::global_host_event_handler = my_strdup(qPrintable(value));
+  ::global_host_event_handler = my_strdup(value.c_str());
 }
 
 /**
  *  Set the service event handler.
  *  @param[in] value The event handler.
  */
-void state::set_global_service_event_handler(QString const& value) {
+void state::set_global_service_event_handler(std::string const& value) {
   _tab_string[global_service_event_handler] = value;
 
   delete[] ::global_service_event_handler;
-  ::global_service_event_handler = my_strdup(qPrintable(value));
+  ::global_service_event_handler = my_strdup(value.c_str());
 }
 
 /**
  *  Set the ocsp command.
  *  @param[in] value The command.
  */
-void state::set_ocsp_command(QString const& value) {
+void state::set_ocsp_command(std::string const& value) {
   _tab_string[ocsp_command] = value;
 
   delete[] ::ocsp_command;
-  ::ocsp_command = my_strdup(qPrintable(value));
+  ::ocsp_command = my_strdup(value.c_str());
 }
 
 /**
  *  Set the ochp command.
  *  @param[in] value The command.
  */
-void state::set_ochp_command(QString const& value) {
+void state::set_ochp_command(std::string const& value) {
   _tab_string[ochp_command] = value;
 
   delete[] ::ochp_command;
-  ::ochp_command = my_strdup(qPrintable(value));
+  ::ochp_command = my_strdup(value.c_str());
 }
 
 /**
  *  Set the logging archive path.
  *  @param[in] value The path.
  */
-void state::set_log_archive_path(QString const& value) {
+void state::set_log_archive_path(std::string const& value) {
   (void)value;
   logger(log_config_warning, basic)
     << "warning: log_archive_path variable ignored";
@@ -1324,7 +1324,7 @@ void state::set_log_archive_path(QString const& value) {
  *  p1 filename ignore.
  *  @param[in] value Unused.
  */
-void state::set_p1_file(QString const& value) {
+void state::set_p1_file(std::string const& value) {
   (void)value;
   logger(log_config_warning, basic)
     << "warning: p1_file variable ignored";
@@ -1334,33 +1334,33 @@ void state::set_p1_file(QString const& value) {
  *  Set the illegal object characters.
  *  @param[in] value The illegal object characters.
  */
-void state::set_illegal_object_chars(QString const& value) {
+void state::set_illegal_object_chars(std::string const& value) {
   _tab_string[illegal_object_chars] = value;
 
   delete[] ::illegal_object_chars;
-  ::illegal_object_chars = my_strdup(qPrintable(value));
+  ::illegal_object_chars = my_strdup(value.c_str());
 }
 
 /**
  *  Set the illegal output characters.
  *  @param[in] value The illegal output characters.
  */
-void state::set_illegal_output_chars(QString const& value) {
+void state::set_illegal_output_chars(std::string const& value) {
   _tab_string[illegal_output_chars] = value;
 
   delete[] ::illegal_output_chars;
-  ::illegal_output_chars = my_strdup(qPrintable(value));
+  ::illegal_output_chars = my_strdup(value.c_str());
 }
 
 /**
  *  Set the use timezone.
  *  @param[in] value The timezone.
  */
-void state::set_use_timezone(QString const& value) {
+void state::set_use_timezone(std::string const& value) {
   _tab_string[use_timezone] = value;
 
   delete[] ::use_timezone;
-  ::use_timezone = my_strdup(qPrintable(value));
+  ::use_timezone = my_strdup(value.c_str());
 }
 
 /**
@@ -1435,8 +1435,8 @@ void state::set_command_check_interval(int value, bool is_second) {
  *  Set the command check interval.
  *  @param[in] value The check interval.
  */
-void state::set_command_check_interval(QString const& value) {
-  std::string val = value.toStdString();
+void state::set_command_check_interval(std::string const& value) {
+  std::string val = value;
   size_t pos = val.find('s');
 
   if (pos == std::string::npos) {
@@ -1800,7 +1800,7 @@ void state::set_event_broker_options(unsigned long value) {
  *  Set the event broker options.
  *  @param[in] value The options.
  */
-void state::set_event_broker_options(QString const& value) {
+void state::set_event_broker_options(std::string const& value) {
   if (value == "-1") {
     _tab_ulong[event_broker_options] = BROKER_EVERYTHING;
     ::event_broker_options = BROKER_EVERYTHING;
@@ -2272,7 +2272,7 @@ void state::set_date_format(e_date_format value) {
  *  Set the data format.
  *  @param[in] value The date format.
  */
-void state::set_date_format(QString const& value) {
+void state::set_date_format(std::string const& value) {
   if (value == "euro") {
     _tab_uint[date_format] = euro;
   }
@@ -2292,7 +2292,7 @@ void state::set_date_format(QString const& value) {
  *  Set the logging rotation method.
  *  @param[in] value The logging rotation method.
  */
-void state::set_log_rotation_method(QString const& value) {
+void state::set_log_rotation_method(std::string const& value) {
   (void)value;
   logger(log_config_warning, basic) << "warning: log_rotation_method "
     "variable ignored: Centreon Engine does not check for updates";
@@ -2311,7 +2311,7 @@ void state::set_service_inter_check_delay_method(e_inter_check_delay value) {
  *  Set the service inter check delay method.
  *  @param[in] value The service inter check delay method.
  */
-void state::set_service_inter_check_delay_method(QString const& value) {
+void state::set_service_inter_check_delay_method(std::string const& value) {
   if (value == "n") {
     _tab_uint[service_inter_check_delay_method] = icd_none;
   }
@@ -2344,7 +2344,7 @@ void state::set_host_inter_check_delay_method(e_inter_check_delay value) {
  *  Set the host inter check delay method.
  *  @param[in] value The host inter check delay method.
  */
-void state::set_host_inter_check_delay_method(QString const& value) {
+void state::set_host_inter_check_delay_method(std::string const& value) {
   if (value == "n") {
     _tab_uint[host_inter_check_delay_method] = icd_none;
   }
@@ -2377,7 +2377,7 @@ void state::set_service_interleave_factor_method(e_interleave_factor value) {
  *  Set the service interleave factor method.
  *  @param[in] value The service interleave factor method.
  */
-void state::set_service_interleave_factor_method(QString const& value) {
+void state::set_service_interleave_factor_method(std::string const& value) {
   if (value == "s") {
     _tab_uint[service_interleave_factor_method] = ilf_smart;
   }
@@ -2584,29 +2584,29 @@ void state::_reset() {
  *  Parse the resource file.
  *  @param[in] value The filename.
  */
-void state::_parse_resource_file(QString const& value) {
+void state::_parse_resource_file(std::string const& value) {
   // Prepend main config file path.
-  QFileInfo qinfo(value);
-  QString resfile;
+  QFileInfo qinfo(value.c_str());
+  std::string resfile;
   if (qinfo.isAbsolute())
     resfile = value;
   else {
-    qinfo.setFile(_filename);
-    resfile = qinfo.path();
+    qinfo.setFile(_filename.c_str());
+    resfile = qinfo.path().toStdString();
     resfile.append("/");
     resfile.append(value);
   }
 
   // Open resource file.
   std::ifstream ifs;
-  ifs.open(qPrintable(resfile));
+  ifs.open(resfile.c_str());
   if (ifs.fail()) {
     throw (engine_error() << "cannot open resource file: '"
                           << resfile << "'");
   }
 
   unsigned int save_cur_line = _cur_line;
-  QString save_filename = _filename;
+  std::string save_filename = _filename;
   _filename = resfile;
 
   for (_cur_line = 1; !ifs.eof(); ++_cur_line) {
@@ -2646,7 +2646,7 @@ void state::_parse_resource_file(QString const& value) {
   ifs.close();
 
   delete[] _mac->x[MACRO_RESOURCEFILE];
-  _mac->x[MACRO_RESOURCEFILE] = my_strdup(qPrintable(resfile));
+  _mac->x[MACRO_RESOURCEFILE] = my_strdup(resfile.c_str());
   _add_resource_file(resfile);
 }
 
@@ -2654,7 +2654,7 @@ void state::_parse_resource_file(QString const& value) {
  *  Set the auth filename.
  *  @param[in] value The filename.
  */
-void state::_set_auth_file(QString const& value) {
+void state::_set_auth_file(std::string const& value) {
   (void)value;
   logger(log_config_warning, basic)
     << "warning: auth_file variable ignored";
@@ -2665,26 +2665,26 @@ void state::_set_auth_file(QString const& value) {
  *  Set the admin email macro.
  *  @param[in] value The admin email.
  */
-void state::_set_admin_email(QString const& value) {
+void state::_set_admin_email(std::string const& value) {
   _tab_string[admin_email] = value;
   delete[] _mac->x[MACRO_ADMINEMAIL];
-  _mac->x[MACRO_ADMINEMAIL] = my_strdup(qPrintable(value));
+  _mac->x[MACRO_ADMINEMAIL] = my_strdup(value.c_str());
 }
 
 /**
  *  Set the admin pager macro.
  *  @param[in] value The admin pager.
  */
-void state::_set_admin_pager(QString const& value) {
+void state::_set_admin_pager(std::string const& value) {
   _tab_string[admin_pager] = value;
   delete[] _mac->x[MACRO_ADMINPAGER];
-  _mac->x[MACRO_ADMINPAGER] = my_strdup(qPrintable(value));
+  _mac->x[MACRO_ADMINPAGER] = my_strdup(value.c_str());
 }
 
 /**
  *  Retained sercice attribute mask ignored.
  */
-void state::_set_retained_service_attribute_mask(QString const& value) {
+void state::_set_retained_service_attribute_mask(std::string const& value) {
   (void)value;
   logger(log_config_warning, basic)
     << "warning: retained_service_attribute_mask variable ignored";
@@ -2694,7 +2694,7 @@ void state::_set_retained_service_attribute_mask(QString const& value) {
 /**
  * Retained process service attribute mask ignored.
  */
-void state::_set_retained_process_service_attribute_mask(QString const& value) {
+void state::_set_retained_process_service_attribute_mask(std::string const& value) {
   (void)value;
   logger(log_config_warning, basic)
     << "warning: retained_process_service_attribute_mask variable ignored";
@@ -2704,7 +2704,7 @@ void state::_set_retained_process_service_attribute_mask(QString const& value) {
 /**
  *  Aggrefate status updates ignored.
  */
-void state::_set_aggregate_status_updates(QString const& value) {
+void state::_set_aggregate_status_updates(std::string const& value) {
   (void)value;
   logger(log_config_warning, basic)
     << "warning: aggregate_status_updates directive ignored: all" \
@@ -2716,9 +2716,9 @@ void state::_set_aggregate_status_updates(QString const& value) {
  *  Set the broker module.
  *  @param[in] value The broker module.
  */
-void state::_set_broker_module(QString const& value) {
+void state::_set_broker_module(std::string const& value) {
   // Copy string.
-  std::string val(value.toStdString());
+  std::string val(value);
 
   // Find delimiter between module and its arguments.
   size_t pos(val.find_first_of(" \n"));
@@ -2742,7 +2742,7 @@ void state::_set_broker_module(QString const& value) {
 /**
  *  Bare update check ignored.
  */
-void state::_set_bare_update_check(QString const& value) {
+void state::_set_bare_update_check(std::string const& value) {
   (void)value;
   logger(log_config_warning, basic) << "warning: bare_update_check " \
     "variable ignored: Centreon Engine does not check for updates";
@@ -2752,7 +2752,7 @@ void state::_set_bare_update_check(QString const& value) {
 /**
  *  Check for updates ignored.
  */
-void state::_set_check_for_updates(QString const& value) {
+void state::_set_check_for_updates(std::string const& value) {
   (void)value;
   logger(log_config_warning, basic) << "warning: check_for_updates " \
     "variable ignored: Centreon Engine does not check for updates";
@@ -2762,7 +2762,7 @@ void state::_set_check_for_updates(QString const& value) {
 /**
  *  Comment file ignored.
  */
-void state::_set_comment_file(QString const& value) {
+void state::_set_comment_file(std::string const& value) {
   (void)value;
   logger(log_config_warning, basic) << "warning: comment_file " \
     "variable ignored: comments are now stored in the status and " \
@@ -2773,7 +2773,7 @@ void state::_set_comment_file(QString const& value) {
 /**
  *  Daemon dumps core ignored.
  */
-void state::_set_daemon_dumps_core(QString const& value) {
+void state::_set_daemon_dumps_core(std::string const& value) {
   (void)value;
   logger(log_config_warning, basic)
     << "warning: daemon_dumps_core variable ignored: core dumping has" \
@@ -2784,7 +2784,7 @@ void state::_set_daemon_dumps_core(QString const& value) {
 /**
  *  Downtime file ignored.
  */
-void state::_set_downtime_file(QString const& value) {
+void state::_set_downtime_file(std::string const& value) {
   (void)value;
   logger(log_config_warning, basic)
     << "warning: downtime_file variable ignored: downtime entries are" \
@@ -2795,7 +2795,7 @@ void state::_set_downtime_file(QString const& value) {
 /**
  *  Lock file ignored.
  */
-void state::_set_lock_file(QString const& value) {
+void state::_set_lock_file(std::string const& value) {
   (void)value;
   logger(log_config_warning, basic) << "warning: lock_file variable " \
     "ignored: daemonization should be handled by startup script";
@@ -2805,7 +2805,7 @@ void state::_set_lock_file(QString const& value) {
 /**
  *  User ignored.
  */
-void state::_set_user(QString const& value) {
+void state::_set_user(std::string const& value) {
   (void)value;
   logger(log_config_warning, basic) << "warning: nagios_user variable" \
     " ignored: priviledge drop should be handled by startup script";
@@ -2815,7 +2815,7 @@ void state::_set_user(QString const& value) {
 /**
  *  Group ignored.
  */
-void state::_set_group(QString const& value) {
+void state::_set_group(std::string const& value) {
   (void)value;
   logger(log_config_warning, basic) << "warning: nagios_group " \
     "variable ignored: priviledge drop should be handled by startup " \
@@ -2827,7 +2827,7 @@ void state::_set_group(QString const& value) {
  *  Set status file.
  *  @param[in] value  The status file path.
  */
-void state::_set_status_file(QString const& value) {
+void state::_set_status_file(std::string const& value) {
   _tab_string[status_file] = value;
   return ;
 }
@@ -2844,7 +2844,7 @@ void state::_set_perfdata_timeout(int value) {
  *  Add configuration directory.
  *  @param[in] value  The configuration directory path.
  */
-void state::_add_cfg_dir(QString const& value) {
+void state::_add_cfg_dir(std::string const& value) {
   _lst_cfg_dir.push_back(value);
 }
 
@@ -2852,7 +2852,7 @@ void state::_add_cfg_dir(QString const& value) {
  *  Add configuration file.
  *  @param[in] value  The configuration file path.
  */
-void state::_add_cfg_file(QString const& value) {
+void state::_add_cfg_file(std::string const& value) {
   _lst_cfg_file.push_back(value);
 }
 
@@ -2860,7 +2860,7 @@ void state::_add_cfg_file(QString const& value) {
  *  Add resource file.
  *  @param[in] value  The resource file path.
  */
-void state::_add_resource_file(QString const& value) {
+void state::_add_resource_file(std::string const& value) {
   _lst_resource_file.push_back(value);
 }
 
@@ -2868,7 +2868,7 @@ void state::_add_resource_file(QString const& value) {
  *  Set state retention file.
  *  @param[in] value  The state retention file path.
  */
-void state::_set_state_retention_file(QString const& value) {
+void state::_set_state_retention_file(std::string const& value) {
   _tab_string[state_retention_file] = value;
 }
 
@@ -2876,7 +2876,7 @@ void state::_set_state_retention_file(QString const& value) {
  *  Set object cache file.
  *  @param[in] value  The object cache file path.
  */
-void state::_set_object_cache_file(QString const& value) {
+void state::_set_object_cache_file(std::string const& value) {
   _tab_string[object_cache_file] = value;
 }
 
@@ -2884,6 +2884,6 @@ void state::_set_object_cache_file(QString const& value) {
  *  Set precached object file.
  *  @param[in] value  The precached object file path.
  */
-void state::_set_precached_object_file(QString const& value) {
+void state::_set_precached_object_file(std::string const& value) {
   _tab_string[precached_object_file] = value;
 }

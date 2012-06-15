@@ -17,6 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <ctype.h>
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
@@ -31,6 +32,22 @@
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;
 using namespace com::centreon::engine::objects::utils;
+
+/**
+ *  Trim a string.
+ *
+ *  @param[in] str Base string.
+ *
+ *  @return Trimmed string.
+ */
+static std::string trim(std::string const& str) {
+  std::string trimmed(str);
+  while (!trimmed.empty() && isspace(trimmed[0]))
+    trimmed.erase(trimmed.begin());
+  while (!trimmed.empty() && isspace(trimmed[trimmed.size() - 1]))
+    trimmed.resize(trimmed.size() - 1);
+  return (trimmed);
+}
 
 /**
  *  Wrapper C
@@ -57,41 +74,49 @@ void release_timeperiod(timeperiod const* obj) {
  *  @param[in] range   The time range of the timeperiod.
  *  @param[in] exclude The time exclution of the timeperiod.
  */
-void objects::add_timeperiod(QString const& name,
-                             QString const& alias,
-                             QVector<QString> const& range,
-                             QVector<QString> const& exclude) {
-  char* name_str = my_strdup(qPrintable(name));
-  if (find_timeperiod(name_str) != NULL) {
-    delete[] name_str;
-    throw (engine_error() << "timeperiod '" << name << "' timeperiod already exist.");
-  }
+void objects::add_timeperiod(
+                std::string const& name,
+                std::string const& alias,
+                std::vector<std::string> const& range,
+                std::vector<std::string> const& exclude) {
+  // Check if timeperiod already exist.
+  if (find_timeperiod(name.c_str()))
+    throw (engine_error() << "timeperiod '" << name << "' timeperiod already exist");
 
-  xodtemplate_timeperiod* tmpl_tperiod = new xodtemplate_timeperiod();
+  // Duplicate timeperiod name.
+  char* name_str(my_strdup(name.c_str()));
+
+  // Create timeperiod template.
+  xodtemplate_timeperiod* tmpl_tperiod(new xodtemplate_timeperiod());
   memset(tmpl_tperiod, 0, sizeof(*tmpl_tperiod));
-
   tmpl_tperiod->timeperiod_name = name_str;
-  tmpl_tperiod->alias = my_strdup(qPrintable(alias));
+  tmpl_tperiod->alias = my_strdup(alias.c_str());
   tmpl_tperiod->register_object = true;
-  for (QVector<QString>::const_iterator it = range.begin(), end = range.end();
+
+  for (std::vector<std::string>::const_iterator
+         it(range.begin()),
+         end(range.end());
        it != end;
        ++it) {
-    QString base(it->trimmed());
+    std::string base(trim(*it));
+    size_t pos(base.find(' '));
+    std::string key(trim(base.substr(0, pos)));
+    std::string value(trim(base.substr(pos + 1)));
 
-    int pos = base.indexOf(' ');
-    QString key(base.left(pos).trimmed());
-    QString value(base.mid(pos + 1).trimmed());
-
-    if (pos == -1 || xodtemplate_parse_timeperiod_directive(tmpl_tperiod,
-                                                            qPrintable(key),
-                                                            qPrintable(value)) == ERROR) {
+    if ((pos == std::string::npos)
+        || xodtemplate_parse_timeperiod_directive(
+             tmpl_tperiod,
+             key.c_str(),
+             value.c_str()) == ERROR) {
       xodtemplate_free_timeperiod(tmpl_tperiod);
-      throw (engine_error() << "timeperiod '" << name << "' invalid exception.");
+      throw (engine_error() << "timeperiod '" << name << "' invalid exception");
     }
   }
 
-  QString exclude_str;
-  for (QVector<QString>::const_iterator it = exclude.begin(), end = exclude.end();
+  std::string exclude_str;
+  for (std::vector<std::string>::const_iterator
+         it(exclude.begin()),
+         end(exclude.end());
        it != end;
        ++it) {
     exclude_str += *it;
@@ -99,7 +124,7 @@ void objects::add_timeperiod(QString const& name,
       exclude_str += ", ";
   }
 
-  tmpl_tperiod->exclusions = my_strdup(qPrintable(exclude_str));
+  tmpl_tperiod->exclusions = my_strdup(exclude_str.c_str());
   int res(xodtemplate_register_timeperiod(tmpl_tperiod));
   if (OK == res) {
     timeperiod* tmprd(find_timeperiod(tmpl_tperiod->timeperiod_name));

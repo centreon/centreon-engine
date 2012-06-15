@@ -58,15 +58,15 @@ loader::~loader() throw () {
  *  @return The new object module.
  */
 QSharedPointer<handle> loader::add_module(
-                                 QString const& filename,
-                                 QString const& args) {
+                                 std::string const& filename,
+                                 std::string const& args) {
   QSharedPointer<handle> module(new handle(filename, args));
   broker::compatibility& compatibility(broker::compatibility::instance());
 
   if (connect(&(*module),
-              SIGNAL(name_changed(QString const&, QString const&)),
-              this,
-              SLOT(module_name_changed(QString const&, QString const&))) == false
+	      SIGNAL(name_changed(std::string const&, std::string const&)),
+	      this,
+	      SLOT(module_name_changed(std::string const&, std::string const&))) == false
       || connect(&(*module),
                  SIGNAL(event_create(broker::handle*)),
                  &compatibility,
@@ -109,7 +109,7 @@ QSharedPointer<handle> loader::add_module(
                  SLOT(unloaded_module(broker::handle*))) == false) {
     throw (engine_error() << "connect module to broker::compatibility failed.");
   }
-  return (_modules.insert(filename, module).value());
+  return (_modules.insert(std::make_pair(filename, module))->second);
 }
 
 /**
@@ -117,8 +117,15 @@ QSharedPointer<handle> loader::add_module(
  *
  *  @param[in] mod Module to remove.
  */
-void loader::del_module(QSharedPointer<handle> const& mod) {
-  _modules.remove(mod->get_name(), mod);
+void loader::del_module(QSharedPointer<handle> const& module) {
+  for (std::multimap<std::string, QSharedPointer<handle> >::iterator
+         it(_modules.find(module->get_name())), end(_modules.end());
+       it != end;
+       ++it)
+    if (it->second == module) {
+      _modules.erase(it);
+      break;
+    }
   return ;
 }
 
@@ -127,8 +134,14 @@ void loader::del_module(QSharedPointer<handle> const& mod) {
  *
  *  @return All modules in a list.
  */
-QList<QSharedPointer<handle> > loader::get_modules() const {
-  return (_modules.values());
+std::list<QSharedPointer<handle> > loader::get_modules() const {
+  std::list<QSharedPointer<handle> > lst;
+  for (std::multimap<std::string, QSharedPointer<handle> >::const_iterator
+         it(_modules.begin()), end(_modules.end());
+       it != end;
+       ++it)
+    lst.push_back(it->second);
+  return (lst);
 }
 
 /**
@@ -156,9 +169,9 @@ void loader::load() {
  *
  *  @return Number of modules loaded.
  */
-unsigned int loader::load_directory(QString const& dir) {
+unsigned int loader::load_directory(std::string const& dir) {
   // Get directory entries.
-  QDir directory(dir);
+  QDir directory(dir.c_str());
   QStringList filters("*.so");
   QFileInfoList files(directory.entryInfoList(filters));
 
@@ -169,12 +182,12 @@ unsigned int loader::load_directory(QString const& dir) {
          end = files.end();
        it != end;
        ++it) {
-    QString config_file(dir + "/" + it->baseName() + ".cfg");
-    if (directory.exists(config_file) == false)
+    std::string config_file(dir + "/" + qPrintable(it->baseName()) + ".cfg");
+    if (directory.exists(config_file.c_str()) == false)
       config_file = "";
     QSharedPointer<handle> module;
     try {
-      module = add_module(dir + "/" + it->fileName(), config_file);
+      module = add_module(dir + "/" + qPrintable(it->fileName()), config_file);
       module->open();
       logger(log_info_message, basic)
         << "Event broker module '" << it->fileName()
@@ -203,16 +216,16 @@ void loader::unload() {
  *  Unload all modules.
  */
 void loader::unload_modules() {
-  for (QMultiHash<QString, QSharedPointer<handle> >::iterator
+  for (std::multimap<std::string, QSharedPointer<handle> >::iterator
          it = _modules.begin(), end = _modules.end();
        it != end;
        ++it) {
     try {
-      it.value()->close();
+      it->second->close();
     }
     catch (...) {}
     logger(dbg_eventbroker, basic)
-      << "Module '" << it.value()->get_filename()
+      << "Module '" << it->second->get_filename()
       << "' unloaded successfully.";
   }
   _modules.clear();
@@ -226,16 +239,16 @@ void loader::unload_modules() {
  *  @param[in] new_name The new name of the module.
  */
 void loader::module_name_changed(
-               QString const& old_name,
-               QString const& new_name) {
-  for (QMultiHash<QString, QSharedPointer<handle> >::iterator
+               std::string const& old_name,
+               std::string const& new_name) {
+  for (std::multimap<std::string, QSharedPointer<handle> >::iterator
          it = _modules.find(old_name), end = _modules.end();
-       it != end && it.key() == old_name;
+       it != end && it->first == old_name;
        ++it) {
-    if (it.value() == this->sender()) {
-      QSharedPointer<handle> module = it.value();
-      _modules.insert(new_name, module);
-      _modules.remove(old_name, module);
+    if (it->second == this->sender()) {
+      QSharedPointer<handle> module = it->second;
+      _modules.insert(std::make_pair(new_name, module));
+      _modules.erase(it);
       return ;
     }
   }

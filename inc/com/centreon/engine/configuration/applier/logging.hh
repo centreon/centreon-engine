@@ -21,66 +21,65 @@
 #  define CCE_CONFIGURATION_APPLIER_LOGGING_HH
 
 #  include <QSharedPointer>
-#  include <QString>
+#  include <string>
 #  include "com/centreon/engine/configuration/applier/base.hh"
 #  include "com/centreon/engine/configuration/state.hh"
 #  include "com/centreon/engine/logging/file.hh"
 #  include "com/centreon/engine/logging/object.hh"
 #  include "com/centreon/engine/logging/standard.hh"
 #  include "com/centreon/engine/logging/syslog.hh"
+#  include "com/centreon/engine/namespace.hh"
 
-namespace                      com {
-  namespace                    centreon {
-    namespace                  engine {
-      namespace                configuration {
-	namespace              applier {
-	/**
-	 *  @class logging logging.hh
-	 *  @brief Simple configuration applier for logging class.
-	 *
-	 *  Simple configuration applier for logging class.
-	 */
-	  class                logging : public base {
-	  public:
-	    void               apply(state const& config);
-            static logging&    instance();
-            static void        load();
-            static void        unload();
+CCB_BEGIN()
 
-	  private:
-	                       logging();
-	                       logging(state const& config);
-	                       logging(logging& right);
-	                       ~logging() throw();
-	    logging&           operator=(logging& right);
-	    void               _add_stdout();
-	    void               _add_stderr();
-	    void               _add_syslog();
-	    void               _add_log_file(state const& config);
-	    void               _add_debug(state const& config);
-	    void               _del_syslog();
-	    void               _del_log_file();
-	    void               _del_debug();
-	    void               _del_stdout();
-	    void               _del_stderr();
+namespace                configuration {
+  namespace              applier {
+    /**
+     *  @class logging logging.hh
+     *  @brief Simple configuration applier for logging class.
+     *
+     *  Simple configuration applier for logging class.
+     */
+    class                logging : public base {
+    public:
+      void               apply(state const& config);
+      static logging&    instance();
+      static void        load();
+      static void        unload();
 
-	    QString            _debug_file;
-	    unsigned long      _debug_id;
-	    unsigned long      _debug_level;
-	    unsigned long      _debug_limit;
-	    unsigned int       _debug_verbosity;
-            static logging*    _instance;
-	    QString            _log_file;
-	    unsigned long      _log_id;
-            unsigned long      _log_limit;
-	    unsigned long      _stderr_id;
-	    unsigned long      _stdout_id;
-	    unsigned long      _syslog_id;
-	  };
-	}
-      }
-    }
+    private:
+                         logging();
+                         logging(state const& config);
+                         logging(logging& right);
+                         ~logging() throw ();
+      logging&           operator=(logging& right);
+      void               _add_stdout();
+      void               _add_stderr();
+      void               _add_syslog();
+      void               _add_log_file(state const& config);
+      void               _add_debug(state const& config);
+      void               _del_syslog();
+      void               _del_log_file();
+      void               _del_debug();
+      void               _del_stdout();
+      void               _del_stderr();
+
+      std::string        _debug_file;
+      unsigned long      _debug_id;
+      unsigned long      _debug_level;
+      unsigned long      _debug_limit;
+      unsigned int       _debug_verbosity;
+      static logging*    _instance;
+      std::string        _log_file;
+      unsigned long      _log_id;
+      unsigned long      _log_limit;
+      unsigned long      _stderr_id;
+      unsigned long      _stdout_id;
+      unsigned long      _syslog_id;
+    };
   }
 }
+
+CCB_END()
 
 #endif // !CCE_CONFIGURATION_APPLIER_LOGGING_HH

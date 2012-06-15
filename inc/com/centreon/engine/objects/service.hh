@@ -48,10 +48,10 @@ namespace       com {
       namespace objects {
         void    link(
                   service* obj,
-                  QVector<contact*> const& contacts,
-                  QVector<contactgroup*> const& contactgroups,
-                  QVector<servicegroup*> const& servicegroups,
-                  QVector<QString> const& custom_variables,
+                  std::vector<contact*> const& contacts,
+                  std::vector<contactgroup*> const& contactgroups,
+                  std::vector<servicegroup*> const& servicegroups,
+                  std::vector<std::string> const& custom_variables,
                   int initial_state,
                   timeperiod* check_period,
                   timeperiod* notification_period,

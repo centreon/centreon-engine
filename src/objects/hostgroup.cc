@@ -41,8 +41,8 @@ bool link_hostgroup(hostgroup* obj,
                     hostgroup** groups) {
   try {
     objects::link(obj,
-                  tab2qvec(members),
-                  tab2qvec(groups));
+                  tab2vec(members),
+                  tab2vec(groups));
   }
   catch (std::exception const& e) {
     logger(log_runtime_error, basic) << e.what();
@@ -81,8 +81,8 @@ void release_hostgroup(hostgroup const* obj) {
  */
 void objects::link(
                 hostgroup* obj,
-                QVector<host*> const& members,
-                QVector<hostgroup*> const& groups) {
+                std::vector<host*> const& members,
+                std::vector<hostgroup*> const& groups) {
   // Check object contents.
   if (!obj)
     throw (engine_error() << "hostgroup is a NULL pointer");
@@ -98,7 +98,7 @@ void objects::link(
   timeval tv(get_broker_timestamp(NULL));
 
   // Browse hosts.
-  for (QVector<host*>::const_iterator
+  for (std::vector<host*>::const_iterator
          it(members.begin()),
          end(members.end());
        it != end;
@@ -117,8 +117,8 @@ void objects::link(
   }
 
   // Add the content of other hostgroups into this hostgroup.
-  QVector<host*> other_members;
-  for (QVector<hostgroup*>::const_iterator
+  std::vector<host*> other_members;
+  for (std::vector<hostgroup*>::const_iterator
          it(groups.begin()),
          end(groups.end());
        it != end;
@@ -134,8 +134,8 @@ void objects::link(
   }
 
   // Recursive call.
-  if (!other_members.isEmpty())
-    objects::link(obj, other_members, QVector<hostgroup*>());
+  if (!other_members.empty())
+    objects::link(obj, other_members, std::vector<hostgroup*>());
 
   return ;
 }

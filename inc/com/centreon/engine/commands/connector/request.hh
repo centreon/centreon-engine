@@ -20,13 +20,13 @@
 #ifndef CCE_COMMANDS_CONNECTOR_REQUEST_HH
 #  define CCE_COMMANDS_CONNECTOR_REQUEST_HH
 
-#  include <QByteArray>
+#  include <string>
 #  include "com/centreon/engine/namespace.hh"
 
 CCE_BEGIN()
 
-namespace                      commands {
-  namespace                    connector {
+namespace                       commands {
+  namespace                     connector {
     /**
      *  @class request commands/connector/request.hh
      *  @brief Request is an abstract object, have to implement
@@ -36,9 +36,9 @@ namespace                      commands {
      *  to communicate between engine and a connector.
      *  You hav to implement clone, build and restore methods.
      */
-    class                      request {
+    class                       request {
     public:
-      enum                     e_type {
+      enum                      e_type {
         version_q = 0,
         version_r,
         execute_q,
@@ -48,25 +48,25 @@ namespace                      commands {
         error_r
       };
 
-                               request(e_type id);
-                               request(request const& right);
-      virtual                  ~request() throw ();
-      request&                 operator=(request const& right);
-      bool                     operator==(
-                                 request const& right) const throw ();
-      bool                     operator!=(
-                                 request const& right) const throw ();
-      virtual QByteArray       build() = 0;
-      virtual request*         clone() const = 0;
-      static QByteArray const& cmd_ending() throw ();
-      virtual e_type           get_id() const throw ();
-      virtual void             restore(QByteArray const& data) = 0;
+                                request(e_type id);
+                                request(request const& right);
+      virtual                   ~request() throw ();
+      request&                  operator=(request const& right);
+      bool                      operator==(
+                                  request const& right) const throw ();
+      bool                      operator!=(
+                                  request const& right) const throw ();
+      virtual std::string       build() = 0;
+      virtual request*          clone() const = 0;
+      static std::string const& cmd_ending() throw ();
+      virtual e_type            get_id() const throw ();
+      virtual void              restore(std::string const& data) = 0;
 
     protected:
-      e_type                   _id;
+      e_type                    _id;
 
     private:
-      void                     _internal_copy(request const& right);
+      void                      _internal_copy(request const& right);
     };
   }
 }

@@ -17,7 +17,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <QStringList>
+#include <sstream>
+#include <vector>
 #include <time.h>
 #include "com/centreon/engine/commands/connector/execute_response.hh"
 #include "com/centreon/engine/error.hh"
@@ -38,8 +39,8 @@ execute_response::execute_response(
                     bool is_executed,
                     int exit_code,
                     QDateTime const& end_time,
-                    QString const& err,
-                    QString const& out)
+                    std::string const& err,
+                    std::string const& out)
   : request(request::execute_r),
     _cmd_id(cmd_id),
     _end_time(end_time),
@@ -114,14 +115,16 @@ bool execute_response::operator!=(
  *
  *  @return The data request.
  */
-QByteArray execute_response::build() {
-  QByteArray query =
-    QByteArray().setNum(_id) + '\0' +
-    QByteArray().setNum(static_cast<qulonglong>(_cmd_id)) + '\0' +
-    QByteArray().setNum(_is_executed) + '\0' +
-    QByteArray().setNum(_exit_code) + '\0';
-  query += _stderr.toAscii() + '\0' + _stdout.toAscii();
-  return (query + cmd_ending());
+std::string execute_response::build() {
+  std::ostringstream oss;
+  oss << _id << '\0'
+      << static_cast<qulonglong>(_cmd_id) << '\0'
+      << _is_executed << '\0'
+      << _exit_code << '\0'
+      << _stderr.c_str() << '\0'
+      << _stdout.c_str();
+  oss.write(cmd_ending().c_str(), cmd_ending().size());
+  return (oss.str());
 }
 
 /**
@@ -174,7 +177,7 @@ bool execute_response::get_is_executed() const throw () {
  *
  *  @return The error string.
  */
-QString const& execute_response::get_stderr() const throw () {
+std::string const& execute_response::get_stderr() const throw () {
  return (_stderr);
 }
 
@@ -183,7 +186,7 @@ QString const& execute_response::get_stderr() const throw () {
  *
  *  @return The output string.
  */
-QString const& execute_response::get_stdout() const throw () {
+std::string const& execute_response::get_stdout() const throw () {
  return (_stdout);
 }
 
@@ -192,31 +195,43 @@ QString const& execute_response::get_stdout() const throw () {
  *
  *  @param[in] data The data of the request information.
  */
-void execute_response::restore(QByteArray const& data) {
-  QList<QByteArray> list = data.split('\0');
+void execute_response::restore(std::string const& data) {
+  std::vector<std::string> list;
+  size_t last(0);
+  size_t pos(data.find('\0', last));
+  while (pos != std::string::npos) {
+    list.push_back(data.substr(last, pos - last));
+    last = pos + 1;
+    pos = data.find('\0', last);
+  }
+  if (last != data.size())
+    list.push_back(data.substr(last));
+
   if (list.size() != 6) {
     throw (engine_error() << "bad request argument.");
   }
 
-  bool ok;
-  int id = list[0].toInt(&ok);
-  if (ok == false || id < 0 || id != _id) {
+  int id(0);
+  std::istringstream iss(list[0]);
+  if ((!(iss >> id) || !iss.eof()) || id < 0 || id != _id)
     throw (engine_error() << "bad request id.");
+
+  {
+    std::istringstream iss(list[1]);
+    if (!(iss >> _cmd_id) || !iss.eof())
+      throw (engine_error() << "bad request argument, invalid cmd_id.");
   }
 
-  _cmd_id = list[1].toULong(&ok);
-  if (ok == false) {
-    throw (engine_error() << "bad request argument, invalid cmd_id.");
+  {
+    std::istringstream iss(list[2]);
+    if (!(iss >> _is_executed) || !iss.eof())
+      throw (engine_error() << "bad request argument, invalid is_executed.");
   }
 
-  _is_executed = list[2].toInt(&ok);
-  if (ok == false) {
-    throw (engine_error() << "bad request argument, invalid is_executed.");
-  }
-
-  _exit_code = list[3].toInt(&ok);
-  if (ok == false) {
-    throw (engine_error() << "bad request argument, invalid exit_code.");
+  {
+    std::istringstream iss(list[3]);
+    if (!(iss >> _exit_code) || !iss.eof())
+      throw (engine_error() << "bad request argument, invalid exit_code.");
   }
 
   _end_time.setTime_t(time(NULL));

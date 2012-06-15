@@ -20,12 +20,11 @@
 #ifndef CCE_COMMANDS_BASIC_PROCESS_HH
 #  define CCE_COMMANDS_BASIC_PROCESS_HH
 
-#  include <QByteArray>
+#  include <list>
 #  include <QIODevice>
 #  include <QProcess>
 #  include <QSocketNotifier>
-#  include <QString>
-#  include <QStringList>
+#  include <string>
 
 namespace                          com {
   namespace                        centreon {
@@ -57,15 +56,15 @@ namespace                          com {
           int                      exitCode() const;
           QProcess::ExitStatus     exitStatus() const;
           bool                     isSequential() const;
-          // QString                  nativeArguments() const;
+          // std::string                  nativeArguments() const;
           Q_PID                    pid() const;
           // ProcessChannelMode       processChannelMode() const;
           // QProcessEnvironment      processEnvironment() const;
-          QByteArray               readAllStandardError();
-          QByteArray               readAllStandardOutput();
+          std::string              readAllStandardError();
+          std::string              readAllStandardOutput();
           QProcess::ProcessChannel readChannel() const;
           // void                     setNativeArguments(
-          //                            QString const& arguments);
+          //                            std::string const& arguments);
           // void                     setProcessChannelMode(
           //                            ProcessChannelMode mode);
           // void                     setProcessEnvironment(
@@ -73,23 +72,23 @@ namespace                          com {
           void                     setReadChannel(
                                      QProcess::ProcessChannel channel);
           // void                     setStandardErrorFile(
-          //                            QString const& fileName,
+          //                            std::string const& fileName,
           //                            OpenMode mode = Truncate);
           // void                     setStandardInputFile(
-          //                            QString const& fileName);
+          //                            std::string const& fileName);
           // void                     setStandardOutputFile(
-          //                            QString const& fileName,
+          //                            std::string const& fileName,
           //                            OpenMode mode = Truncate);
           // void                     setStandardOutputProcess(
           //                            QProcess* destination);
           void                     setWorkingDirectory(
-                                     QString const& dir);
+                                     std::string const& dir);
           void                     start(
-                                     QString const& program,
-                                     QStringList const& arguments,
+                                     std::string const& program,
+                                     std::list<std::string> const& arguments,
                                      OpenMode mode = ReadWrite);
           void                     start(
-                                     QString const& program,
+                                     std::string const& program,
                                      OpenMode mode = ReadWrite);
           QProcess::ProcessState   state() const;
           bool                     waitForBytesWritten(
@@ -97,7 +96,8 @@ namespace                          com {
           bool                     waitForFinished(int msecs = 30000);
           bool                     waitForReadyRead(int msecs = 30000);
           bool                     waitForStarted(int msecs = 30000);
-          QString                  workingDirectory() const;
+          std::string                  workingDirectory() const;
+          qint64                   writeData(std::string const& data);
 
         signals:
           void                     error(QProcess::ProcessError error);
@@ -129,8 +129,8 @@ namespace                          com {
           basic_process&           operator=(
                                      basic_process const& right);
           static char**            _build_args(
-                                     QString const& program,
-                                     QStringList const& arguments);
+                                     std::string const& program,
+                                     std::list<std::string> const& arguments);
           static int               _chdir(char const* wd) throw ();
           static void              _clean_args(char** args) throw ();
           static void              _close(int& fd) throw ();
@@ -141,7 +141,7 @@ namespace                          com {
           void                     _emit_finished();
           void                     _internal_copy(
                                      basic_process const& right);
-          static bool              _read(int fd, QByteArray* str);
+          static bool              _read(int fd, std::string* str);
           static qint64            _read(
                                      int fd,
                                      void* buffer,
@@ -165,15 +165,15 @@ namespace                          com {
           int                      _pipe_err[2];
           int                      _pipe_in[2];
           int                      _pipe_out[2];
-          QString                  _program;
+          std::string              _program;
           QProcess::ProcessState   _pstate;
-          QByteArray               _standard_error;
-          QByteArray               _standard_output;
+          std::string              _standard_error;
+          std::string              _standard_output;
           int                      _status;
           bool                     _want_err;
           bool                     _want_in;
           bool                     _want_out;
-          QString                  _working_directory;
+          std::string              _working_directory;
 
         private slots:
           void                     _notification_dead();

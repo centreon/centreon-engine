@@ -23,8 +23,8 @@
 #  include "com/centreon/engine/objects.hh"
 
 #  ifdef __cplusplus
-#    include <QString>
-#    include <QVector>
+#    include <string>
+#    include <vector>
 extern "C" {
 #  endif // C++
 
@@ -39,7 +39,7 @@ namespace                            com {
     namespace                        engine {
       namespace                      objects {
         bool                         add_custom_variables_to_object(
-                                       QVector<QString> const& custom_vars,
+                                       std::vector<std::string> const& custom_vars,
                                        customvariablesmember** list_customvar);
         customvariablesmember const* release(
                                        customvariablesmember const* obj);

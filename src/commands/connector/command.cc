@@ -45,10 +45,10 @@ using namespace com::centreon::engine::commands;
  *  @param[in] command_name   The command name.
  *  @param[in] command_line   The command line.
  */
-connector::command::command(QString const& connector_name,
-			    QString const& connector_line,
-                            QString const& command_name,
-			    QString const& command_line)
+connector::command::command(std::string const& connector_name,
+			    std::string const& connector_line,
+                            std::string const& command_name,
+			    std::string const& command_line)
   : commands::command(command_name, command_line),
     _connector_name(connector_name),
     _connector_line(connector_line),
@@ -58,10 +58,10 @@ connector::command::command(QString const& connector_name,
     _active_timer(false),
     _is_exiting(false),
     _state_already_change(false) {
-  _req_func.insert(request::version_r, &command::_req_version_r);
-  _req_func.insert(request::execute_r, &command::_req_execute_r);
-  _req_func.insert(request::quit_r, &command::_req_quit_r);
-  _req_func.insert(request::error_r, &command::_req_error_r);
+  _req_func.insert(std::pair<request::e_type, void (command::*)(request*)>(request::version_r, &command::_req_version_r));
+  _req_func.insert(std::pair<request::e_type, void (command::*)(request*)>(request::execute_r, &command::_req_execute_r));
+  _req_func.insert(std::pair<request::e_type, void (command::*)(request*)>(request::quit_r, &command::_req_quit_r));
+  _req_func.insert(std::pair<request::e_type, void (command::*)(request*)>(request::error_r, &command::_req_error_r));
   _start();
 }
 
@@ -125,7 +125,7 @@ commands::command* connector::command::clone() const {
  *
  *  @return The command id.
  */
-unsigned long connector::command::run(QString const& processed_cmd,
+unsigned long connector::command::run(std::string const& processed_cmd,
 				      nagios_macros const& macros,
 				      unsigned int timeout) {
   (void)macros;
@@ -152,9 +152,9 @@ unsigned long connector::command::run(QString const& processed_cmd,
 						  timeout));
   request_info info = { query, now, timeout, false };
 
-  _queries.insert(id, info);
+  _queries.insert(std::pair<unsigned long, request_info>(id, info));
 
-  _process->write(query->build());
+  _process->writeData(query->build());
 
   logger(dbg_commands, basic)
     << "connector \"" << _name << "\" start (id="
@@ -176,7 +176,7 @@ unsigned long connector::command::run(QString const& processed_cmd,
  *  @param[in]  timeout The command timeout.
  *  @param[out] res     The result of the command.
  */
-void connector::command::run(QString const& processed_cmd,
+void connector::command::run(std::string const& processed_cmd,
 			     nagios_macros const& macros,
 			     unsigned int timeout,
 			     result& res) {
@@ -203,9 +203,9 @@ void connector::command::run(QString const& processed_cmd,
 						  now,
 						  timeout));
   request_info info = { query, now, timeout, true };
-  _queries.insert(id, info);
+  _queries.insert(std::pair<unsigned long, request_info>(id, info));
 
-  _process->write(query->build());
+  _process->writeData(query->build());
 
   logger(dbg_commands, basic)
     << "connector \"" << _name << "\" start (id="
@@ -224,9 +224,9 @@ void connector::command::run(QString const& processed_cmd,
     loop.exec();
     locker.relock();
 
-    QHash<unsigned long, result>::iterator it = _results.find(id);
+    std::map<unsigned long, result>::iterator it = _results.find(id);
     if (it != _results.end()) {
-      res = it.value();
+      res = it->second;
       _results.erase(it);
       break;
     }
@@ -238,7 +238,7 @@ void connector::command::run(QString const& processed_cmd,
  *
  *  @return The connector name.
  */
-QString const& connector::command::get_connector_name() const throw() {
+std::string const& connector::command::get_connector_name() const throw() {
   return (_connector_name);
 }
 
@@ -247,7 +247,7 @@ QString const& connector::command::get_connector_name() const throw() {
  *
  *  @return The connector line.
  */
-QString const& connector::command::get_connector_line() const throw() {
+std::string const& connector::command::get_connector_line() const throw() {
   return (_connector_line);
 }
 
@@ -279,12 +279,12 @@ void connector::command::_timeout() {
 
   _active_timer = false;
   QDateTime now = QDateTime::currentDateTime();
-  QHash<unsigned long, request_info>::iterator it = _queries.begin();
+  std::map<unsigned long, request_info>::iterator it = _queries.begin();
   while (it != _queries.end()) {
-    request_info& info = it.value();
+    request_info& info = it->second;
     unsigned int diff_time = now.toTime_t() - info.start_time.toTime_t();
     if (diff_time >= info.timeout) {
-      unsigned long id = it.key();
+      unsigned long id = it->first;
       result res(id,
 		 "",
 		 "(Process Timeout)",
@@ -297,21 +297,24 @@ void connector::command::_timeout() {
 	emit command_executed(res);
       }
       else {
-	_results.insert(id, res);
+	_results.insert(std::pair<unsigned long, result>(id, res));
       }
-      it = _queries.erase(it);
+      std::map<unsigned long, request_info>::iterator tmp(it);
+      ++tmp;
+      _queries.erase(it);
+      it = tmp;
       emit _wait_ending();
       continue;
     }
     break;
   }
 
-  for (QHash<unsigned long, request_info>::const_iterator it
+  for (std::map<unsigned long, request_info>::const_iterator it
          = _queries.begin(), end = _queries.end();
        it != end;
        ++it) {
-    if (it->timeout > 0) {
-      unsigned int diff_time = now.toTime_t() - it->start_time.toTime_t();
+    if (it->second.timeout > 0) {
+      unsigned int diff_time = now.toTime_t() - it->second.start_time.toTime_t();
       _active_timer = true;
       QTimer::singleShot(diff_time > 0 ? diff_time : 1,
                          this,
@@ -347,30 +350,33 @@ void connector::command::_state_change(QProcess::ProcessState new_state) {
  *  Slot notify when process as output data.
  */
 void connector::command::_ready_read() {
-  QList<QByteArray> responses;
+  std::list<std::string> responses;
 
   {
     QMutexLocker locker(&_mutex);
 
     _read_data += _process->readAllStandardOutput();
     while (_read_data.size() > 0) {
+      /*
+        // XXX: todo.
       int pos = _read_data.indexOf(request::cmd_ending());
       if (pos < 0) {
 	break;
       }
       responses.push_back(_read_data.left(pos));
       _read_data.remove(0, pos + request::cmd_ending().size());
+      */
     }
   }
 
   request_builder& req_builder = request_builder::instance();
-  for (QList<QByteArray>::const_iterator it = responses.begin(),
+  for (std::list<std::string>::const_iterator it = responses.begin(),
          end = responses.end();
        it != end;
        ++it) {
     try {
       QSharedPointer<request> req = req_builder.build(*it);
-      QHash<request::e_type, void (command::*)(request*)>::iterator
+      std::map<request::e_type, void (command::*)(request*)>::iterator
 	it = _req_func.find(req->get_id());
       if (it == _req_func.end()) {
 	logger(log_runtime_warning, basic)
@@ -378,7 +384,7 @@ void connector::command::_ready_read() {
 	continue;
       }
 
-      (this->*(it.value()))(&(*req));
+      (this->*(it->second))(&(*req));
     }
     catch (std::exception const& e) {
       logger(log_runtime_warning, basic)
@@ -415,7 +421,7 @@ void connector::command::_start() {
 	  this, SLOT(_state_change(QProcess::ProcessState)));
 
   version_query version;
-  _process->write(version.build());
+  _process->writeData(version.build());
 
   QEventLoop loop;
   connect(this, SIGNAL(_wait_ending()), &loop, SLOT(quit()));
@@ -428,11 +434,11 @@ void connector::command::_start() {
     throw (engine_error() << "bad process version.");
   }
 
-  for (QHash<unsigned long, request_info>::iterator it = _queries.begin(),
+  for (std::map<unsigned long, request_info>::iterator it = _queries.begin(),
          end = _queries.end();
        it != end;
        ++it)
-    _process->write(it->req->build());
+    _process->writeData(it->second.req->build());
 
   logger(log_info_message, basic)
     << "connector \"" << _name << "\" start.";
@@ -462,7 +468,7 @@ void connector::command::_exit() {
   QTimer::singleShot(5000, &loop, SLOT(quit()));
 
   quit_query quit;
-  _process->write(quit.build());
+  _process->writeData(quit.build());
 
   locker.unlock();
   loop.exec();
@@ -523,12 +529,12 @@ void connector::command::_req_execute_r(request* req) {
 
   {
     QMutexLocker locker(&_mutex);
-    QHash<unsigned long, request_info>::iterator
+    std::map<unsigned long, request_info>::iterator
       it = _queries.find(response->get_command_id());
     if (it == _queries.end()) {
       return;
     }
-    info = it.value();
+    info = it->second;
     _queries.erase(it);
     ++_nbr_check;
   }
@@ -576,7 +582,7 @@ void connector::command::_req_execute_r(request* req) {
   }
   else {
     QMutexLocker locker(&_mutex);
-    _results.insert(res.get_command_id(), res);
+    _results.insert(std::pair<unsigned long, result>(res.get_command_id(), res));
   }
   emit _wait_ending();
 }

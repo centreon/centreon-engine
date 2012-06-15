@@ -20,6 +20,7 @@
 #ifndef CCE_CHECKS_CHECKER_HH
 #  define CCE_CHECKS_CHECKER_HH
 
+#  include <map>
 #  include <memory>
 #  include <QHash>
 #  include <QMutex>
@@ -89,7 +90,7 @@ namespace                      com {
 
           static std::auto_ptr<checker>
                                _instance;
-          QHash<unsigned long, check_result>
+          std::map<unsigned long, check_result>
                                _list_id;
           QMutex               _mut_id;
           QMutex               _mut_reap;

@@ -155,7 +155,7 @@ QDateTime const& process::get_start_time() const throw () {
  *
  *  @return The standard error string.
  */
-QString const& process::get_stderr() const throw () {
+std::string const& process::get_stderr() const throw () {
   return (_stderr);
 }
 
@@ -164,7 +164,7 @@ QString const& process::get_stderr() const throw () {
  *
  *  @return The standard output string.
  */
-QString const& process::get_stdout() const throw () {
+std::string const& process::get_stdout() const throw () {
   return (_stdout);
 }
 
@@ -249,7 +249,7 @@ void process::_finished(
   // Handle errors.
   if (error() == QProcess::FailedToStart) {
     _exit_code = STATE_CRITICAL;
-    _stderr = "(" + errorString() + ")";
+    _stderr = "(" + errorString().toStdString() + ")";
     _stdout = "";
     _is_executed = false;
   }

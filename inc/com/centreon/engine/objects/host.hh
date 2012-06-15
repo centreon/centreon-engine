@@ -23,8 +23,8 @@
 #  include "com/centreon/engine/objects.hh"
 
 #  ifdef __cplusplus
-#    include <QString>
-#    include <QVector>
+#    include <string>
+#    include <vector>
 extern "C" {
 #  endif // C++
 
@@ -50,15 +50,15 @@ namespace       com {
     namespace   engine {
       namespace objects {
         bool    add_hosts_to_object(
-                  QVector<host*> const& hosts,
+                  std::vector<host*> const& hosts,
                   hostsmember** list_host);
         void    link(
                   host* obj,
-                  QVector<host*> const& parents,
-                  QVector<contact*> const& contacts,
-                  QVector<contactgroup*> const& contactgroups,
-                  QVector<hostgroup*> const& hostgroups,
-                  QVector<QString> const& custom_variables,
+                  std::vector<host*> const& parents,
+                  std::vector<contact*> const& contacts,
+                  std::vector<contactgroup*> const& contactgroups,
+                  std::vector<hostgroup*> const& hostgroups,
+                  std::vector<std::string> const& custom_variables,
                   int initial_state,
                   timeperiod* check_period,
                   timeperiod* notification_period,

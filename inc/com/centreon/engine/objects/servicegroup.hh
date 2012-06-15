@@ -22,9 +22,9 @@
 
 #  include "com/centreon/engine/objects.hh"
 
-# ifdef __cplusplus
-#    include <QString>
-#    include <QVector>
+#  ifdef __cplusplus
+#    include <string>
+#    include <vector>
 extern "C" {
 #  endif // C++
 
@@ -43,8 +43,8 @@ namespace       com {
       namespace objects {
         void    link(
                   servicegroup* obj,
-                  QVector<service*> const& members,
-                  QVector<servicegroup*> const& groups);
+                  std::vector<service*> const& members,
+                  std::vector<servicegroup*> const& groups);
         void    release(servicegroup const* obj);
       }
     }

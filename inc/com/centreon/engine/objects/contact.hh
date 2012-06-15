@@ -23,8 +23,8 @@
 #  include "com/centreon/engine/objects.hh"
 
 #  ifdef __cplusplus
-#    include <QString>
-#    include <QVector>
+#    include <string>
+#    include <vector>
 extern "C" {
 #  endif // C++
 
@@ -46,16 +46,16 @@ namespace       com {
     namespace   engine {
       namespace objects {
         bool    add_contacts_to_object(
-                  QVector<contact*> const& contacts,
+                  std::vector<contact*> const& contacts,
                   contactsmember** list_contact);
         void    link(
                   contact* obj,
                   timeperiod* host_notification_period,
                   timeperiod* service_notification_period,
-                  QVector<contactgroup*> const& contactgroups,
-                  QVector<command*> const& host_notification_commands,
-                  QVector<command*> const& service_notification_commands,
-                  QVector<QString> const& custom_variables);
+                  std::vector<contactgroup*> const& contactgroups,
+                  std::vector<command*> const& host_notification_commands,
+                  std::vector<command*> const& service_notification_commands,
+                  std::vector<std::string> const& custom_variables);
         void    release(contact const* obj);
       }
     }

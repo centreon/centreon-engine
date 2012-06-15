@@ -23,7 +23,7 @@
 #  include <QLibrary>
 #  include <QObject>
 #  include <QSharedPointer>
-#  include <QString>
+#  include <string>
 
 namespace                          com {
   namespace                        centreon {
@@ -41,8 +41,8 @@ namespace                          com {
 
         public:
                                    handle(
-                                     QString const& filename = "",
-                                     QString const& args = "");
+                                     std::string const& filename = "",
+                                     std::string const& args = "");
                                    handle(handle const& right);
           virtual                  ~handle() throw ();
           handle&                  operator=(handle const& rigth);
@@ -52,27 +52,30 @@ namespace                          com {
                                      handle const& right) const throw ();
           void                     close();
           QLibrary*                get_handle() const throw ();
-          QString const&           get_author() const throw ();
-          QString const&           get_copyright() const throw ();
-          QString const&           get_description() const throw ();
-          QString const&           get_filename() const throw ();
-          QString const&           get_license() const throw ();
-          QString const&           get_name() const throw ();
-          QString const&           get_version() const throw ();
-          QString const&           get_args() const throw ();
+          std::string const&       get_author() const throw ();
+          std::string const&       get_copyright() const throw ();
+          std::string const&       get_description() const throw ();
+          std::string const&       get_filename() const throw ();
+          std::string const&       get_license() const throw ();
+          std::string const&       get_name() const throw ();
+          std::string const&       get_version() const throw ();
+          std::string const&       get_args() const throw ();
           bool                     is_loaded();
           void                     open();
           void                     open(
-                                     QString const& filename,
-                                     QString const& args);
-          void                     set_author(QString const& author);
+                                     std::string const& filename,
+                                     std::string const& args);
+          void                     set_author(
+                                     std::string const& author);
           void                     set_copyright(
-                                     QString const& copyright);
+                                     std::string const& copyright);
           void                     set_description(
-                                     QString const& description);
-          void                     set_license(QString const& license);
-          void                     set_name(QString const& name);
-          void                     set_version(QString const& version);
+                                     std::string const& description);
+          void                     set_license(
+                                     std::tring const& license);
+          void                     set_name(std::tring const& name);
+          void                     set_version(
+                                     std::tring const& version);
 
         signals:
           void                     event_author(broker::handle* module);
@@ -92,21 +95,21 @@ namespace                          com {
           void                     event_version(
                                      broker::handle* module);
           void                     name_changed(
-                                     QString const& old_name,
-                                     QString const& new_name);
+                                     std::string const& old_name,
+                                     std::string const& new_name);
 
         private:
           void                     _internal_copy(handle const& right);
 
-          QString                  _args;
-          QString                  _author;
-          QString                  _copyright;
-          QString                  _description;
-          QString                  _filename;
+          std::string              _args;
+          std::string              _author;
+          std::string              _copyright;
+          std::string              _description;
+          std::string              _filename;
           QSharedPointer<QLibrary> _handle;
-          QString                  _license;
-          QString                  _name;
-          QString                  _version;
+          std::string              _license;
+          std::string              _name;
+          std::string              _version;
         };
       }
     }

@@ -17,7 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <QBuffer>
+#include <sstream>
 #include "com/centreon/engine/commands/connector/error_response.hh"
 #include "com/centreon/engine/commands/connector/execute_query.hh"
 #include "com/centreon/engine/commands/connector/execute_response.hh"
@@ -45,23 +45,19 @@ request_builder& request_builder::instance() {
  *
  *  @return The request object build with data.
  */
-QSharedPointer<request> request_builder::build(QByteArray const& data) const {
-  int pos = data.indexOf('\0');
-  QByteArray tmp = data.left(pos < 0 ? data.size() : pos);
-
-  bool ok;
-  unsigned int req_id = tmp.toUInt(&ok);
-
-  if (ok == false) {
+QSharedPointer<request> request_builder::build(std::string const& data) const {
+  unsigned int req_id(0);
+  std::istringstream iss(data.substr(0, data.find('\0')));
+  if (!(iss >> req_id) || !iss.eof())
     throw (engine_error() << "bad request id.");
-  }
 
-  QHash<unsigned int, QSharedPointer<request> >::const_iterator it = _list.find(req_id);
+  std::map<unsigned int, QSharedPointer<request> >::const_iterator
+    it(_list.find(req_id));
   if (it == _list.end()) {
     throw (engine_error() << "bad request id.");
   }
 
-  QSharedPointer<request> ret((*it)->clone());
+  QSharedPointer<request> ret(it->second->clone());
   ret->restore(data);
   return (ret);
 }
@@ -71,19 +67,19 @@ QSharedPointer<request> request_builder::build(QByteArray const& data) const {
  */
 request_builder::request_builder() {
   QSharedPointer<request> req(new version_query());
-  _list.insert(req->get_id(), req);
+  _list.insert(std::pair<unsigned int, QSharedPointer<request> >(req->get_id(), req));
   req = QSharedPointer<request>(new version_response());
-  _list.insert(req->get_id(), req);
+  _list.insert(std::pair<unsigned int, QSharedPointer<request> >(req->get_id(), req));
   req = QSharedPointer<request>(new execute_query());
-  _list.insert(req->get_id(), req);
+  _list.insert(std::pair<unsigned int, QSharedPointer<request> >(req->get_id(), req));
   req = QSharedPointer<request>(new execute_response());
-  _list.insert(req->get_id(), req);
+  _list.insert(std::pair<unsigned int, QSharedPointer<request> >(req->get_id(), req));
   req = QSharedPointer<request>(new quit_query());
-  _list.insert(req->get_id(), req);
+  _list.insert(std::pair<unsigned int, QSharedPointer<request> >(req->get_id(), req));
   req = QSharedPointer<request>(new quit_response());
-  _list.insert(req->get_id(), req);
+  _list.insert(std::pair<unsigned int, QSharedPointer<request> >(req->get_id(), req));
   req = QSharedPointer<request>(new error_response());
-  _list.insert(req->get_id(), req);
+  _list.insert(std::pair<unsigned int, QSharedPointer<request> >(req->get_id(), req));
 }
 
 /**

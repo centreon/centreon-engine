@@ -17,7 +17,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <QStringList>
+#include <sstream>
+#include <vector>
 #include "com/centreon/engine/commands/connector/quit_query.hh"
 #include "com/centreon/engine/error.hh"
 
@@ -91,8 +92,11 @@ request* quit_query::clone() const {
  *
  *  @return The data request.
  */
-QByteArray quit_query::build() {
-  return (QByteArray().setNum(_id) + cmd_ending());
+std::string quit_query::build() {
+  std::ostringstream oss;
+  oss << _id;
+  oss.write(cmd_ending().c_str(), cmd_ending().size());
+  return (oss.str());
 }
 
 /**
@@ -100,17 +104,25 @@ QByteArray quit_query::build() {
  *
  *  @param[in] data The data of the request information.
  */
-void quit_query::restore(QByteArray const& data) {
-  QList<QByteArray> list = data.split('\0');
-  if (list.size() != 1) {
-    throw (engine_error() << "bad request argument.");
+void quit_query::restore(std::string const& data) {
+  std::vector<std::string> list;
+  size_t last(0);
+  size_t pos(data.find('\0', last));
+  while (pos != std::string::npos) {
+    list.push_back(data.substr(last, pos - last));
+    last = pos + 1;
+    pos = data.find('\0', last);
   }
+  if (last != data.size())
+    list.push_back(data.substr(last));
 
-  bool ok;
-  int id = list[0].toInt(&ok);
-  if (ok == false || id < 0 || id != _id) {
+  if (list.size() != 1)
+    throw (engine_error() << "bad request argument.");
+
+  int id(0);
+  std::istringstream iss(list[0]);
+  if ((!(iss >> id) || !iss.eof()) || id < 0 || id != _id)
     throw (engine_error() << "bad request id.");
-  }
 }
 
 

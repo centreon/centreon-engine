@@ -94,9 +94,9 @@ int neb_load_all_modules(void) {
   int unloaded(0);
   try {
     broker::loader& loader = broker::loader::instance();
-    QList<QSharedPointer<broker::handle> > modules = loader.get_modules();
+    std::list<QSharedPointer<broker::handle> > modules = loader.get_modules();
 
-    for (QList<QSharedPointer<broker::handle> >::const_iterator
+    for (std::list<QSharedPointer<broker::handle> >::const_iterator
            it = modules.begin(), end = modules.end();
          it != end;
          ++it)
@@ -145,9 +145,9 @@ int neb_load_module(void* mod) {
 int neb_unload_all_modules(int flags, int reason) {
   try {
     broker::loader& loader = broker::loader::instance();
-    QList<QSharedPointer<broker::handle> > modules = loader.get_modules();
+    std::list<QSharedPointer<broker::handle> > modules = loader.get_modules();
 
-    for (QList<QSharedPointer<broker::handle> >::const_iterator
+    for (std::list<QSharedPointer<broker::handle> >::const_iterator
            it = modules.begin(), end = modules.end();
          it != end;
          ++it) {

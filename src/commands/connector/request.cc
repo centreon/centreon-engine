@@ -86,8 +86,8 @@ bool request::operator!=(request const& right) const throw () {
  *
  *  @return The data value of the command's ending.
  */
-QByteArray const& request::cmd_ending() throw () {
-  static QByteArray ending(4, '\0');
+std::string const& request::cmd_ending() throw () {
+  static std::string ending(4, '\0');
   return (ending);
 }
 

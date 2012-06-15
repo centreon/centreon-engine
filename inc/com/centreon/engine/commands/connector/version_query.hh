@@ -45,9 +45,9 @@ namespace            commands {
                        version_query const& right) const throw ();
       bool           operator!=(
                        version_query const& right) const throw ();
-      QByteArray     build();
+      std::string    build();
       request*       clone() const;
-      void           restore(QByteArray const& data);
+      void           restore(std::string const& data);
     };
   }
 }

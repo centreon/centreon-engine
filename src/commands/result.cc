@@ -34,8 +34,8 @@ using namespace com::centreon::engine::commands;
  *  @param[in] is_executed    Command run and exit normaly.
  */
 result::result(unsigned long cmd_id,
-	       QString const& stdout,
-	       QString const& stderr,
+	       std::string const& stdout,
+	       std::string const& stderr,
 	       QDateTime const& start_time,
 	       QDateTime const& end_time,
 	       int exit_code,
@@ -186,7 +186,7 @@ timeval const& result::get_end_time() const throw() {
  *
  *  @return The standard output.
  */
-QString const& result::get_stdout() const throw() {
+std::string const& result::get_stdout() const throw() {
   return (_stdout);
 }
 
@@ -195,7 +195,7 @@ QString const& result::get_stdout() const throw() {
  *
  *  @return The error output.
  */
-QString const& result::get_stderr() const throw() {
+std::string const& result::get_stderr() const throw() {
   return (_stderr);
 }
 
@@ -260,7 +260,7 @@ void result::set_end_time(QDateTime const& time) throw() {
  *
  *  @param[in] str The standard output.
  */
-void result::set_stdout(QString const& str) {
+void result::set_stdout(std::string const& str) {
   _stdout = str;
 }
 
@@ -269,7 +269,7 @@ void result::set_stdout(QString const& str) {
  *
  *  @param[in] str The error output.
  */
-void result::set_stderr(QString const& str) {
+void result::set_stderr(std::string const& str) {
   _stderr = str;
 }
 

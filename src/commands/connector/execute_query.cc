@@ -17,6 +17,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <sstream>
+#include <vector>
 #include "com/centreon/engine/commands/connector/execute_query.hh"
 #include "com/centreon/engine/error.hh"
 
@@ -33,7 +35,7 @@ using namespace com::centreon::engine::commands::connector;
  */
 execute_query::execute_query(
                  unsigned long cmd_id,
-                 QString const& cmd,
+                 std::string const& cmd,
                  QDateTime const& start_time,
                  unsigned int timeout)
   : request(request::execute_q),
@@ -105,14 +107,16 @@ bool execute_query::operator!=(
  *
  *  @return The data request.
  */
-QByteArray execute_query::build() {
-  QByteArray query =
-    QByteArray().setNum(_id) + '\0' +
-    QByteArray().setNum(static_cast<qulonglong>(_cmd_id)) + '\0' +
-    QByteArray().setNum(_timeout) + '\0' +
-    QByteArray().setNum(_start_time.toTime_t()) + '\0';
-  query += _cmd.toAscii();
-  return (query + cmd_ending());
+std::string execute_query::build() {
+  std::ostringstream oss;
+
+  oss << _id << '\0'
+      << static_cast<qulonglong>(_cmd_id) << '\0'
+      << _timeout << '\0'
+      << _start_time.toTime_t() << '\0'
+      << _cmd.c_str();
+  oss.write(cmd_ending().c_str(), cmd_ending().size());
+  return (oss.str());
 }
 
 /**
@@ -129,29 +133,37 @@ request* execute_query::clone() const {
  *
  *  @return The argument list.
  */
-QStringList execute_query::get_args() const throw () {
-  static QString sep("\"'\t ");
-  QString line = _cmd.trimmed();
-  QStringList list;
-  QString tmp;
-  QChar c;
+std::list<std::string> execute_query::get_args() const throw () {
+  static std::string sep("\"'\t ");
+  std::string line(_cmd);
+  while (!line.empty() && isspace(line[0]))
+    line.erase(line.begin());
+  while (!line.empty() && isspace(line[line.size() - 1]))
+    line.resize(line.size() - 1);
+  std::list<std::string> list;
+  std::string tmp;
+  char c;
   int escape = 0;
 
-  QString::const_iterator it = line.begin();
-  QString::const_iterator end = line.end();
+  std::string::const_iterator it = line.begin();
+  std::string::const_iterator end = line.end();
 
   if (c == 0 && it + 1 < end) {
-    while (it->isSpace() && ((it + 1)->isSpace() || *(it + 1) == '\'' || *(it + 1) == '"'))
+    while (isspace(*it) && (isspace(*(it + 1))
+                            || (*(it + 1) == '\'')
+                            || (*(it + 1) == '"')))
       ++it;
-    if (!(c = (sep.contains(*it) ? *it : ' ')).isSpace())
+    if (!isspace(c = ((sep.find(*it) != std::string::npos) ? *it : ' ')))
       ++it;
   }
 
   for (; it != end; ++it) {
     if (c == 0 && it + 1 < end) {
-      while (it->isSpace() && ((it + 1)->isSpace() || *(it + 1) == '\'' || *(it + 1) == '"'))
+      while (isspace(*it) && (isspace(*(it + 1))
+                              || (*(it + 1) == '\'')
+                              || (*(it + 1) == '"')))
         ++it;
-      c = (sep.contains(*it) ? *it : ' ');
+      c = ((sep.find(*it) != std::string::npos) ? *it : ' ');
       ++it;
     }
 
@@ -162,16 +174,17 @@ QStringList execute_query::get_args() const throw () {
     }
 
     if (c == *it && escape % 2 == 0) {
-      list << tmp;
+      list.push_back(tmp);
       tmp = "";
-      c = (c.isSpace() && !sep.contains(*(it + 1)) ? ' ' : 0);
+      c = (isspace(c)
+           && ((sep.find(*(it + 1)) == std::string::npos) ? ' ' : 0));
     }
     else
       tmp += *it;
     escape = 0;
   }
   if (tmp != "")
-    list << tmp;
+    list.push_back(tmp);
   return (list);
 }
 
@@ -180,7 +193,7 @@ QStringList execute_query::get_args() const throw () {
  *
  *  @return The command line.
  */
-QString const& execute_query::get_command() const throw () {
+std::string const& execute_query::get_command() const throw () {
   return (_cmd);
 }
 
@@ -216,8 +229,8 @@ unsigned int execute_query::get_timeout() const throw () {
  *
  *  @param[in] data The data of the request information.
  */
-void execute_query::restore(QByteArray const& data) {
-  QList<QByteArray> list = data.split('\0');
+void execute_query::restore(std::string const& data) {
+  std::list<std::string> list = data.split('\0');
   if (list.size() < 5)
     throw (engine_error() << "bad request argument");
 

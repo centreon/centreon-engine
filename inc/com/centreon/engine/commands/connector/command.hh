@@ -20,9 +20,8 @@
 #ifndef CCE_COMMANDS_CONNECTOR_COMMAND_HH
 #  define CCE_COMMANDS_CONNECTOR_COMMAND_HH
 
-#  include <QHash>
+#  include <map>
 #  include <QMutex>
-#  include <QStringList>
 #  include <QTimer>
 #  include "com/centreon/engine/commands/basic_process.hh"
 #  include "com/centreon/engine/commands/command.hh"
@@ -45,10 +44,10 @@ namespace                              com {
 
           public:
                                        command(
-                                         QString const& connector_name,
-                                         QString const& connector_line,
-                                         QString const& command_name,
-                                         QString const& command_line);
+                                         std::string const& connector_name,
+                                         std::string const& connector_line,
+                                         std::string const& command_name,
+                                         std::string const& command_line);
                                        command(command const& right);
                                        ~command() throw();
 
@@ -56,17 +55,19 @@ namespace                              com {
 
             commands::command*         clone() const;
 
-            unsigned long              run(QString const& processed_cmd,
-                                           nagios_macros const& macros,
-                                           unsigned int timeout);
+            unsigned long              run(
+                                         std::string const& processed_cmd,
+                                         nagios_macros const& macros,
+                                         unsigned int timeout);
 
-            void                       run(QString const& processed_cmd,
-                                           nagios_macros const& macros,
-                                           unsigned int timeout,
-                                           result& res);
+            void                       run(
+                                         std::string const& processed_cmd,
+                                         nagios_macros const& macros,
+                                         unsigned int timeout,
+                                         result& res);
 
-            QString const&             get_connector_name() const throw();
-            QString const&             get_connector_line() const throw();
+            std::string const&         get_connector_name() const throw ();
+            std::string const&         get_connector_line() const throw ();
 
             unsigned long              get_max_check_for_restart() throw();
             void                       set_max_check_for_restart(unsigned long value) throw();
@@ -96,17 +97,17 @@ namespace                              com {
             void                       _req_execute_r(request* req);
             void                       _req_error_r(request* req);
 
-            QByteArray                 _read_data;
+            std::string                _read_data;
             QMutex                     _mutex;
-            QString                    _connector_name;
-            QString                    _connector_line;
+            std::string                _connector_name;
+            std::string                _connector_line;
             QSharedPointer<basic_process>
                                        _process;
-            QHash<unsigned long, request_info>
+            std::map<unsigned long, request_info>
                                        _queries;
-            QHash<unsigned long, result>
+            std::map<unsigned long, result>
                                        _results;
-            QHash<request::e_type, void (command::*)(request*)>
+            std::map<request::e_type, void (command::*)(request*)>
                                        _req_func;
             unsigned long              _max_check_for_restart;
             unsigned long              _nbr_check;

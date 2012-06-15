@@ -41,7 +41,7 @@ using namespace com::centreon::engine::commands;
  *  @param[in] name         The command name.
  *  @param[in] command_line The command line.
  */
-raw::raw(QString const& name, QString const& command_line)
+raw::raw(std::string const& name, std::string const& command_line)
   : command(name, command_line) {}
 
 /**
@@ -106,7 +106,7 @@ commands::command* raw::clone() const {
  *  @return The command id.
  */
 unsigned long raw::run(
-                     QString const& processed_cmd,
+                     std::string const& processed_cmd,
                      nagios_macros const& macros,
                      unsigned int timeout) {
   // Debug.
@@ -152,7 +152,7 @@ unsigned long raw::run(
  *  @param[out] res     The result of the command.
  */
 void raw::run(
-            QString const& processed_cmd,
+            std::string const& processed_cmd,
             nagios_macros const& macros,
             unsigned int timeout,
             result& res) {
@@ -202,7 +202,7 @@ void raw::raw_ended() {
   process_info info;
   {
     QMutexLocker lock(&_mutex);
-    QHash<QObject*, process_info>::iterator
+    std::map<QObject*, process_info>::iterator
       it(_processes.find(sender()));
     if (it == _processes.end()) {
       logger(log_runtime_warning, basic) << "sender not found in processes.";

@@ -42,8 +42,8 @@ bool link_hostescalation(hostescalation* obj,
                          timeperiod* escalation_period) {
   try {
     objects::link(obj,
-                  tab2qvec(contacts),
-                  tab2qvec(contactgroups),
+                  tab2vec(contacts),
+                  tab2vec(contactgroups),
                   escalation_period);
   }
   catch (std::exception const& e) {
@@ -84,8 +84,8 @@ void release_hostescalation(hostescalation const* obj) {
  *  @param[in]     escalation_period Set host escalation period.
  */
 void objects::link(hostescalation* obj,
-                   QVector<contact*> const& contacts,
-                   QVector<contactgroup*> const& contactgroups,
+                   std::vector<contact*> const& contacts,
+                   std::vector<contactgroup*> const& contactgroups,
                    timeperiod* escalation_period) {
   // check object contents.
   if (obj == NULL)
@@ -94,7 +94,7 @@ void objects::link(hostescalation* obj,
     throw (engine_error() << "hostescalation invalid host name.");
 
   // check all arguments and set default option for optional options.
-  if (contacts.isEmpty() == true && contactgroups.isEmpty() == true)
+  if (contacts.empty() == true && contactgroups.empty() == true)
     throw (engine_error() << "hostescalation '" << obj->host_name
            << "' no contact or no contact groups are defined.");
 

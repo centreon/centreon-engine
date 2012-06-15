@@ -17,7 +17,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <QStringList>
+#include <sstream>
+#include <vector>
 #include "com/centreon/engine/commands/connector/version_query.hh"
 #include "com/centreon/engine/error.hh"
 
@@ -93,8 +94,10 @@ request* version_query::clone() const {
  *
  *  @return The data request.
  */
-QByteArray version_query::build() {
-  return (QByteArray().setNum(_id) + cmd_ending());
+std::string version_query::build() {
+  std::ostringstream oss;
+  oss << _id << cmd_ending();
+  return (oss.str());
 }
 
 /**
@@ -102,17 +105,25 @@ QByteArray version_query::build() {
  *
  *  @param[in] data The data of the request information.
  */
-void version_query::restore(QByteArray const& data) {
-  QList<QByteArray> list = data.split('\0');
-  if (list.size() != 1) {
-    throw (engine_error() << "bad request argument.");
+void version_query::restore(std::string const& data) {
+  std::vector<std::string> list;
+  size_t last(0);
+  size_t pos(data.find('\0', last));
+  while (pos != std::string::npos) {
+    list.push_back(data.substr(last, pos - last));
+    last = pos + 1;
+    pos = data.find('\0', last);
   }
+  if (last != data.size())
+    list.push_back(data.substr(last));
 
-  bool ok;
-  int id = list[0].toInt(&ok);
-  if (ok == false || id < 0 || id != _id) {
+  if (list.size() != 1)
+    throw (engine_error() << "bad request argument.");
+
+  int id(0);
+  std::istringstream iss(list[0]);
+  if ((!(iss >> id) || !iss.eof()) || id < 0 || id != _id)
     throw (engine_error() << "bad request id.");
-  }
 }
 
 

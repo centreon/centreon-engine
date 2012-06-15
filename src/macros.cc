@@ -841,7 +841,7 @@ char const* clean_macro_chars(char* macro, int options) {
         continue;
 
       /* illegal user-specified characters */
-      if (!config.get_illegal_output_chars().contains(ch))
+      if (config.get_illegal_output_chars().find(ch) == std::string::npos)
         macro[y++] = macro[x];
     }
 

@@ -20,11 +20,11 @@
 #ifndef CCE_MODULES_LOADER_HH
 #  define CCE_MODULES_LOADER_HH
 
+#  include <map>
 #  include <memory>
-#  include <QMultiHash>
 #  include <QObject>
 #  include <QSharedPointer>
-#  include <QString>
+#  include <string>
 #  include "com/centreon/engine/broker/handle.hh"
 
 namespace                        com {
@@ -39,26 +39,25 @@ namespace                        com {
          */
         class                    loader : public QObject {
           Q_OBJECT
-
         public:
           virtual                ~loader() throw ();
           QSharedPointer<handle> add_module(
-                                   QString const& filename = "",
-                                   QString const& args = "");
+                                   std::string const& filename = "",
+                                   std::string const& args = "");
           void                   del_module(
                                    QSharedPointer<handle> const& mod);
-          QList<QSharedPointer<handle> >
+          std::list<QSharedPointer<handle> >
                                  get_modules() const;
           static loader&         instance();
           static void            load();
-          unsigned int           load_directory(QString const& dir);
+          unsigned int           load_directory(std::string const& dir);
           static void            unload();
           void                   unload_modules();
 
         public slots:
           void                   module_name_changed(
-                                   QString const& old_name,
-                                   QString const& new_name);
+                                   std::string const& old_name,
+                                   std::string const& new_name);
 
         private:
                                  loader();
@@ -68,7 +67,7 @@ namespace                        com {
 
           static std::auto_ptr<loader>
                                  _instance;
-          QMultiHash<QString, QSharedPointer<handle> >
+          std::multimap<std::string, QSharedPointer<handle> >
                                  _modules;
         };
       }

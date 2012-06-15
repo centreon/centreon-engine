@@ -20,11 +20,11 @@
 #ifndef CCE_COMMANDS_SET_HH
 #  define CCE_COMMANDS_SET_HH
 
+#  include <map>
 #  include <memory>
-#  include <QHash>
 #  include <QObject>
 #  include <QSharedPointer>
-#  include <QString>
+#  include <string>
 #  include "com/centreon/engine/commands/command.hh"
 
 namespace             com {
@@ -46,16 +46,16 @@ namespace             com {
           void        add_command(command const& cmd);
           void        add_command(QSharedPointer<command> cmd);
           QSharedPointer<command>
-                      get_command(QString const& cmd_name);
+                      get_command(std::string const& cmd_name);
           static set& instance();
           static void load();
-          void        remove_command(QString const& cmd_name);
+          void        remove_command(std::string const& cmd_name);
           static void unload();
 
         public slots:
           void        command_name_changed(
-                        QString const& old_name,
-                        QString const& new_name);
+                        std::string const& old_name,
+                        std::string const& new_name);
 
         private:
                       set();
@@ -65,7 +65,7 @@ namespace             com {
 
           static std::auto_ptr<set>
                       _instance;
-          QHash<QString, QSharedPointer<command> >
+          std::map<std::string, QSharedPointer<command> >
                       _list;
         };
       }

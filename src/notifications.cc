@@ -575,8 +575,7 @@ int check_service_notification_viability(service* svc, unsigned int type, int op
       && svc->current_state != STATE_OK) {
 
     /* get the time at which a notification should have been sent */
-    time_t& initial_notif_time(service_other_props[
-                                                   qMakePair(QString(svc->host_ptr->name), QString(svc->description))].initial_notif_time);
+    time_t& initial_notif_time(service_other_props[std::make_pair(svc->host_ptr->name, svc->description)].initial_notif_time);
 
     /* if not set, set it to now */
     if (!initial_notif_time)

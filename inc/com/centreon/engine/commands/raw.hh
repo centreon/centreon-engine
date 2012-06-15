@@ -20,10 +20,10 @@
 #ifndef CCE_COMMANDS_RAW_HH
 #  define CCE_COMMANDS_RAW_HH
 
-#  include <QHash>
+#  include <map>
 #  include <QMutex>
 #  include <QSharedPointer>
-#  include <QString>
+#  include <string>
 #  include <sys/time.h>
 #  include "com/centreon/engine/commands/command.hh"
 #  include "com/centreon/engine/commands/process.hh"
@@ -43,18 +43,18 @@ namespace                 com {
 
         public:
                           raw(
-                            QString const& name,
-                            QString const& command_line);
+                            std::string const& name,
+                            std::string const& command_line);
                           raw(raw const& right);
                           ~raw() throw ();
           raw&            operator=(raw const& right);
           command*        clone() const;
           unsigned long   run(
-                            QString const& process_cmd,
+                            std::string const& process_cmd,
                             nagios_macros const& macros,
                             unsigned int timeout);
           void            run(
-                            QString const& process_cmd,
+                            std::string const& process_cmd,
                             nagios_macros const& macros,
                             unsigned int timeout,
                             result& res);
@@ -74,7 +74,7 @@ namespace                 com {
           static void     _deletelater_process(process* obj);
 
           QMutex          _mutex;
-          QHash<QObject*, process_info>
+          std::map<QObject*, process_info>
                           _processes;
         };
       }

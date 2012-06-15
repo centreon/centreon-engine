@@ -43,13 +43,15 @@ namespace               commands {
                         version_response(version_response const& right);
                         ~version_response() throw ();
       version_response& operator=(version_response const& right);
-      bool              operator==(version_response const& right) const throw ();
-      bool              operator!=(version_response const& right) const throw ();
-      QByteArray        build();
+      bool              operator==(
+                          version_response const& right) const throw ();
+      bool              operator!=(
+                          version_response const& right) const throw ();
+      std::string       build();
       request*          clone() const;
       unsigned int      get_major() const throw ();
       unsigned int      get_minor() const throw ();
-      void              restore(QByteArray const& data);
+      void              restore(std::string const& data);
 
     private:
       unsigned int      _major;

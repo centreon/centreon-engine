@@ -40,10 +40,10 @@ namespace       com {
     namespace   engine {
       namespace objects {
         void    add_timeperiod(
-                  QString const& name,
-                  QString const& alias,
-                  QVector<QString> const& range,
-                  QVector<QString> const& exclude);
+                  std::string const& name,
+                  std::string const& alias,
+                  std::vector<std::string> const& range,
+                  std::vector<std::string> const& exclude);
         void    release(timeperiod const* obj);
       }
     }

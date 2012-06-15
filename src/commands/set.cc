@@ -59,9 +59,9 @@ void set::add_command(command const& cmd) {
 void set::add_command(QSharedPointer<command> cmd) {
   if (connect(
         &(*cmd),
-        SIGNAL(name_changed(QString const&, QString const&)),
+        SIGNAL(name_changed(std::string const&, std::string const&)),
         this,
-        SLOT(command_name_changed(QString const&, QString const&)),
+        SLOT(command_name_changed(std::string const&, std::string const&)),
         Qt::DirectConnection) == false)
     throw (engine_error() << "connect command to set failed.");
   _list[cmd->get_name()] = cmd;
@@ -77,12 +77,12 @@ void set::add_command(QSharedPointer<command> cmd) {
  *  @return The shared pointer on a command object.
  */
 QSharedPointer<commands::command> set::get_command(
-                                         QString const& cmd_name) {
-  QHash<QString, QSharedPointer<command> >::iterator
+                                         std::string const& cmd_name) {
+  std::map<std::string, QSharedPointer<command> >::iterator
     it(_list.find(cmd_name));
   if (it == _list.end())
     throw (engine_error() << "command '" << cmd_name << "' not found");
-  return (it.value());
+  return (it->second);
 }
 
 /**
@@ -108,8 +108,8 @@ void set::load() {
  *
  *  @param[in] cmd_name The command name.
  */
-void set::remove_command(QString const& cmd_name) {
-  _list.remove(cmd_name);
+void set::remove_command(std::string const& cmd_name) {
+  _list.erase(cmd_name);
   logger(dbg_commands, basic) << "remove command " << cmd_name;
   return ;
 }
@@ -128,8 +128,8 @@ void set::unload() {
  *  @param[in] new_name The new name of the command.
  */
 void set::command_name_changed(
-            QString const& old_name,
-            QString const& new_name) {
+            std::string const& old_name,
+            std::string const& new_name) {
   (void)new_name;
   QSharedPointer<commands::command> cmd(get_command(old_name));
   remove_command(old_name);

@@ -206,7 +206,7 @@ bool basic_process::isSequential() const {
   return (true);
 }
 
-//  QString basic_process::nativeArguments() const {
+//  std::string basic_process::nativeArguments() const {
 //    throw (engine_error() << "basic_process: " << Q_FUNC_INFO << " not implemented yet.");
 //  }
 
@@ -232,8 +232,8 @@ Q_PID basic_process::pid() const {
  *
  *  @return The data.
  */
-QByteArray basic_process::readAllStandardError() {
-  QByteArray error(_standard_error);
+std::string basic_process::readAllStandardError() {
+  std::string error(_standard_error);
   _standard_error.clear();
   return (error);
 }
@@ -243,8 +243,8 @@ QByteArray basic_process::readAllStandardError() {
  *
  *  @return The data.
  */
-QByteArray basic_process::readAllStandardOutput() {
-  QByteArray output(_standard_output);
+std::string basic_process::readAllStandardOutput() {
+  std::string output(_standard_output);
   _standard_output.clear();
   return (output);
 }
@@ -258,7 +258,7 @@ QProcess::ProcessChannel basic_process::readChannel() const {
   return (_channel);
 }
 
-//  void basic_process::setNativeArguments(QString const& arguments) {
+//  void basic_process::setNativeArguments(std::string const& arguments) {
 //    throw (engine_error() << "basic_process: " << Q_FUNC_INFO << " not implemented yet.");
 //  }
 
@@ -280,15 +280,15 @@ void basic_process::setReadChannel(QProcess::ProcessChannel channel) {
   return ;
 }
 
-//  void basic_process::setStandardErrorFile(QString const& fileName, OpenMode mode) {
+//  void basic_process::setStandardErrorFile(std::string const& fileName, OpenMode mode) {
 //    throw (engine_error() << "basic_process: " << Q_FUNC_INFO << " not implemented yet.");
 //  }
 
-//  void basic_process::setStandardInputFile(QString const& fileName) {
+//  void basic_process::setStandardInputFile(std::string const& fileName) {
 //    throw (engine_error() << "basic_process: " << Q_FUNC_INFO << " not implemented yet.");
 //  }
 
-//  void basic_process::setStandardOutputFile(QString const& fileName, OpenMode mode) {
+//  void basic_process::setStandardOutputFile(std::string const& fileName, OpenMode mode) {
 //    throw (engine_error() << "basic_process: " << Q_FUNC_INFO << " not implemented yet.");
 //  }
 
@@ -301,7 +301,7 @@ void basic_process::setReadChannel(QProcess::ProcessChannel channel) {
  *
  *  @param[in] dir The working directory.
  */
-void basic_process::setWorkingDirectory(QString const& dir) {
+void basic_process::setWorkingDirectory(std::string const& dir) {
   _working_directory = dir;
   return ;
 }
@@ -314,8 +314,8 @@ void basic_process::setWorkingDirectory(QString const& dir) {
  *  @param[in] mode      Set the openning mode.
  */
 void basic_process::start(
-                      QString const& program,
-                      QStringList const& arguments,
+                      std::string const& program,
+                      std::list<std::string> const& arguments,
                       OpenMode mode) {
   if (_pstate == QProcess::NotRunning) {
     command_line cmdline(program, arguments);
@@ -331,7 +331,7 @@ void basic_process::start(
  *  @param[in] program The binary name.
  *  @param[in] mode    Set the openning mode.
  */
-void basic_process::start(QString const& program, OpenMode mode) {
+void basic_process::start(std::string const& program, OpenMode mode) {
   if (_pstate == QProcess::NotRunning) {
     command_line cmdline(program);
     _args = cmdline.get_argv();
@@ -447,7 +447,7 @@ bool basic_process::waitForStarted(int msecs) {
  *
  *  @return The working directory path.
  */
-QString basic_process::workingDirectory() const {
+std::string basic_process::workingDirectory() const {
   return (_working_directory);
 }
 
@@ -682,14 +682,14 @@ void basic_process::_internal_copy(basic_process const& right) {
 }
 
 /**
- *  Internal read to fill a QByteArray.
+ *  Internal read to fill a std::string.
  *
  *  @param[in] fd  The file descriptor to read.
  *  @param[in] str The buffer to fill.
  *
  *  @return True if data was read, otherwise false.
  */
-bool basic_process::_read(int fd, QByteArray* str) {
+bool basic_process::_read(int fd, std::string* str) {
   char buffer[1024];
   qint64 size(_read(fd, buffer, sizeof(buffer)));
   if (size <= 0)

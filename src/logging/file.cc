@@ -26,14 +26,14 @@
 
 using namespace com::centreon::engine::logging;
 
-QList<file*>   file::_files;
-QReadWriteLock file::_rwlock;
+std::list<file*> file::_files;
+QReadWriteLock   file::_rwlock;
 
 /**************************************
- *                                     *
- *           Public Methods            *
- *                                     *
- **************************************/
+*                                     *
+*           Public Methods            *
+*                                     *
+**************************************/
 
 /**
  *  Default constructor.
@@ -41,9 +41,9 @@ QReadWriteLock file::_rwlock;
  *  @param[in] file       The file name.
  *  @param[in] size_limit The file's size limit.
  */
-file::file(QString const& file, unsigned long long size_limit)
+file::file(std::string const& file, unsigned long long size_limit)
   : _mutex(new QMutex),
-    _file(new QFile(file)),
+    _file(new QFile(file.c_str())),
     _size_limit(size_limit) {
   _file->open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Append);
   if (_file->QFile::error() != QFile::NoError)
@@ -59,7 +59,7 @@ file::file(QString const& file, unsigned long long size_limit)
  */
 file::~file() throw() {
   _rwlock.lockForWrite();
-  QList<file*>::iterator
+  std::list<file*>::iterator
     it(std::find(_files.begin(), _files.end(), this));
   if (it != _files.end())
     _files.erase(it);
@@ -98,9 +98,9 @@ file& file::operator=(file const& right) {
  *
  *  @return The file name.
  */
-QString file::get_file_name() throw() {
+std::string file::get_file_name() throw() {
   _mutex->lock();
-  QString filename = _file->fileName();
+  std::string filename = qPrintable(_file->fileName());
   _mutex->unlock();
   return (filename);
 }
@@ -139,13 +139,13 @@ void file::log(
   if ((_size_limit > 0)
       && (static_cast<unsigned long long>(_file->size() + strlen(message))
           >= _size_limit)) {
-    QString old_name = _file->fileName();
-    QString new_name = old_name + ".old";
+    std::string old_name = qPrintable(_file->fileName());
+    std::string new_name = old_name + ".old";
 
     _file->close();
-    if ((QFile::exists(new_name) == false || QFile::remove(new_name) == true)
-	&& _file->rename(new_name) == true) {
-    _file->setFileName(old_name);
+    if ((QFile::exists(new_name.c_str()) == false || QFile::remove(new_name.c_str()) == true)
+	&& _file->rename(new_name.c_str()) == true) {
+      _file->setFileName(old_name.c_str());
     }
     _file->open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Append);
   }
@@ -161,7 +161,7 @@ void file::log(
  */
 void file::reopen() {
   _rwlock.lockForWrite();
-  for (QList<file*>::iterator it(_files.begin()), end(_files.end());
+  for (std::list<file*>::iterator it(_files.begin()), end(_files.end());
        it != end;
        ++it) {
     (*it)->_mutex->lock();

@@ -25,43 +25,43 @@
 
 CCE_BEGIN()
 
-namespace               commands {
-  namespace             connector {
+namespace                commands {
+  namespace              connector {
     /**
      *  @class error_response commands/connector/error_response.hh
      *
      *  Error response is the response request, who give the information
      *  on error of connector.
      */
-    class               error_response : public request {
+    class                error_response : public request {
     public:
-      enum              e_code {
+      enum               e_code {
         info = 0,
         warning = 1,
         error = 2
       };
 
-                        error_response(
-                          QString const& message = "",
-                          e_code code = info);
-                        error_response(error_response const& right);
-                        ~error_response() throw ();
-      error_response&   operator=(error_response const& right);
-      bool              operator==(
-                          error_response const& right) const throw ();
-      bool              operator!=(
-                          error_response const& right) const throw ();
-      QByteArray        build();
-      request*          clone() const;
-      e_code            get_code() const throw ();
-      QString const&    get_message() const throw ();
-      void              restore(QByteArray const& data);
+                         error_response(
+                           std::string const& message = "",
+                           e_code code = info);
+                         error_response(error_response const& right);
+                         ~error_response() throw ();
+      error_response&    operator=(error_response const& right);
+      bool               operator==(
+                           error_response const& right) const throw ();
+      bool               operator!=(
+                           error_response const& right) const throw ();
+      std::string        build();
+      request*           clone() const;
+      e_code             get_code() const throw ();
+      std::string const& get_message() const throw ();
+      void               restore(std::string const& data);
 
     private:
-      void              _internal_copy(error_response const& right);
+      void               _internal_copy(error_response const& right);
 
-      e_code            _code;
-      QString           _message;
+      e_code             _code;
+      std::string        _message;
     };
   }
 }

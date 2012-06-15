@@ -17,7 +17,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <QStringList>
+#include <sstream>
+#include <vector>
 #include "com/centreon/engine/commands/connector/error_response.hh"
 #include "com/centreon/engine/error.hh"
 
@@ -35,7 +36,7 @@ using namespace com::centreon::engine::commands::connector;
  *  @param[in] message The error message.
  *  @param[in] code    The exit code value.
  */
-error_response::error_response(QString const& message, e_code code)
+error_response::error_response(std::string const& message, e_code code)
   : request(request::error_r), _code(code), _message(message) {}
 
 /**
@@ -128,7 +129,7 @@ error_response::e_code error_response::get_code() const throw () {
  *
  *  @return The error message.
  */
-QString const& error_response::get_message() const throw () {
+std::string const& error_response::get_message() const throw () {
   return (_message);
 }
 
@@ -137,29 +138,36 @@ QString const& error_response::get_message() const throw () {
  *
  *  @param[in] data The data of the request information.
  */
-void error_response::restore(QByteArray const& data) {
-  QList<QByteArray> list = data.split('\0');
+void error_response::restore(std::string const& data) {
+  std::vector<std::string> list;
+  size_t last(0);
+  size_t pos(data.find('\0', last));
+  while (pos != std::string::npos) {
+    list.push_back(data.substr(last, pos - last));
+    last = pos + 1;
+    pos = data.find('\0', last);
+  }
+  if (last != data.size())
+    list.push_back(data.substr(last));
+
   if (list.size() != 3) {
     throw (engine_error() << "bad request argument.");
   }
 
-  bool ok;
-  int id = list[0].toInt(&ok);
-  if (ok == false || id < 0 || id != _id) {
+  int id(0);
+  std::istringstream iss(list[0]);
+  if ((!(iss >> id) || !iss.eof()) || id < 0 || id != _id)
     throw (engine_error() << "bad request id.");
-  }
 
-  unsigned int code = list[1].toUInt(&ok);
-  if (ok == false || code > error) {
-    throw (engine_error() << "bad request argument, invalid code.");
+  {
+    unsigned int code(0);
+    std::istringstream iss(list[1]);
+    if ((!(iss >> code) || !iss.eof()) || code > error)
+      throw (engine_error() << "bad request argument, invalid code.");
+    _code = static_cast<e_code>(code);
   }
-
-  _code = static_cast<e_code>(code);
 
   _message = list[2];
-  if (ok == false) {
-    throw (engine_error() << "bad request argument, invalid message.");
-  }
 }
 
 /**************************************

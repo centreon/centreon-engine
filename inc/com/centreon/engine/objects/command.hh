@@ -23,6 +23,7 @@
 #  include "com/centreon/engine/objects.hh"
 
 #  ifdef __cplusplus
+#    include <vector>
 extern "C" {
 #  endif // C++
 
@@ -37,7 +38,7 @@ namespace       com {
     namespace   engine {
       namespace objects {
         bool    add_commands_to_object(
-                  QVector<command*> const& commands,
+                  std::vector<command*> const& commands,
                   commandsmember** list_command);
         void    link(command const* obj);
         void    release(command const* obj);
