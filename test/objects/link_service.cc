@@ -19,6 +19,7 @@
 
 #include <exception>
 #include <QDebug>
+#include <sstream>
 #include "com/centreon/engine/commands/set.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/logging/engine.hh"
@@ -47,10 +48,10 @@ static bool create_and_link(bool has_contacts,
   init_object_skiplists();
   host* hst = create_host(1);
   service* obj = create_service(1);
-  QVector<contact*> contacts;
-  QVector<contactgroup*> contactgroups;
-  QVector<servicegroup*> servicegroups;
-  QVector<QString> customvar;
+  std::vector<contact*> contacts;
+  std::vector<contactgroup*> contactgroups;
+  std::vector<servicegroup*> servicegroups;
+  std::vector<std::string> customvar;
   timeperiod* check_period = NULL;
   timeperiod* notification_period = NULL;
   command* cmd_event_handler = NULL;
@@ -64,8 +65,11 @@ static bool create_and_link(bool has_contacts,
       contactgroups.push_back(create_contactgroup(i + 1));
     if (has_servicegroups == true)
       servicegroups.push_back(create_servicegroup(i + 1));
-    if (has_custom_variables == true)
-      customvar.push_back(QString("_VAR%1=%1").arg(i + 1));
+    if (has_custom_variables == true) {
+      std::ostringstream oss;
+      oss << "_VAR" << i + 1 << "=" << i + 1;
+      customvar.push_back(oss.str());
+    }
   }
   if (has_check_period == true)
     check_period = create_timeperiod(1);
@@ -125,10 +129,10 @@ static bool create_and_link(bool has_contacts,
 
 static void link_null_pointer() {
   try {
-    QVector<contact*> contacts;
-    QVector<contactgroup*> contactgroups;
-    QVector<servicegroup*> servicegroups;
-    QVector<QString> customvar;
+    std::vector<contact*> contacts;
+    std::vector<contactgroup*> contactgroups;
+    std::vector<servicegroup*> servicegroups;
+    std::vector<std::string> customvar;
     link(static_cast<service*>(NULL),
          contacts,
          contactgroups,
@@ -150,24 +154,25 @@ static void link_null_name() {
   service* obj = NULL;
   try {
     obj = create_service(1);
-    QVector<contact*> contacts;
-    QVector<contactgroup*> contactgroups;
-    QVector<servicegroup*> servicegroups;
-    QVector<QString> customvar;
+    std::vector<contact*> contacts;
+    std::vector<contactgroup*> contactgroups;
+    std::vector<servicegroup*> servicegroups;
+    std::vector<std::string> customvar;
 
-    delete[] obj->host_name;
+    delete [] obj->host_name;
     obj->host_name = NULL;
 
-    link(static_cast<service*>(NULL),
-         contacts,
-         contactgroups,
-         servicegroups,
-         customvar,
-         0,
-         NULL,
-         NULL,
-         NULL,
-         NULL);
+    link(
+      static_cast<service*>(NULL),
+      contacts,
+      contactgroups,
+      servicegroups,
+      customvar,
+      0,
+      NULL,
+      NULL,
+      NULL,
+      NULL);
   }
   catch (std::exception const& e) {
     (void)e;
@@ -181,24 +186,25 @@ static void link_null_description() {
   service* obj = NULL;
   try {
     obj = create_service(1);
-    QVector<contact*> contacts;
-    QVector<contactgroup*> contactgroups;
-    QVector<servicegroup*> servicegroups;
-    QVector<QString> customvar;
+    std::vector<contact*> contacts;
+    std::vector<contactgroup*> contactgroups;
+    std::vector<servicegroup*> servicegroups;
+    std::vector<std::string> customvar;
 
-    delete[] obj->description;
+    delete [] obj->description;
     obj->description = NULL;
 
-    link(static_cast<service*>(NULL),
-         contacts,
-         contactgroups,
-         servicegroups,
-         customvar,
-         0,
-         NULL,
-         NULL,
-         NULL,
-         NULL);
+    link(
+      static_cast<service*>(NULL),
+      contacts,
+      contactgroups,
+      servicegroups,
+      customvar,
+      0,
+      NULL,
+      NULL,
+      NULL,
+      NULL);
   }
   catch (std::exception const& e) {
     (void)e;
@@ -209,47 +215,47 @@ static void link_null_description() {
 
 static void link_without_contacts() {
   if (create_and_link(false, true, true, true, true, true, true, true) == false)
-    throw (engine_error() << Q_FUNC_INFO << " invalid return.");
+    throw (engine_error() << Q_FUNC_INFO << " invalid return");
 }
 
 static void link_without_contactgroups() {
   if (create_and_link(true, false, true, true, true, true, true, true) == false)
-    throw (engine_error() << Q_FUNC_INFO << " invalid return.");
+    throw (engine_error() << Q_FUNC_INFO << " invalid return");
 }
 
 static void link_without_servicegroups() {
   if (create_and_link(true, true, false, true, true, true, true, true) == false)
-    throw (engine_error() << Q_FUNC_INFO << " invalid return.");
+    throw (engine_error() << Q_FUNC_INFO << " invalid return");
 }
 
 static void link_without_custom_variables() {
   if (create_and_link(true, true, true, false, true, true, true, true) == false)
-    throw (engine_error() << Q_FUNC_INFO << " invalid return.");
+    throw (engine_error() << Q_FUNC_INFO << " invalid return");
 }
 
 static void link_without_check_period() {
   if (create_and_link(true, true, true, true, false, true, true, true) == true)
-    throw (engine_error() << Q_FUNC_INFO << " invalid return.");
+    throw (engine_error() << Q_FUNC_INFO << " invalid return");
 }
 
 static void link_without_notification_period() {
   if (create_and_link(true, true, true, true, true, false, true, true) == true)
-    throw (engine_error() << Q_FUNC_INFO << " invalid return.");
+    throw (engine_error() << Q_FUNC_INFO << " invalid return");
 }
 
 static void link_without_cmd_event_handler() {
   if (create_and_link(true, true, true, true, true, true, false, true) == false)
-    throw (engine_error() << Q_FUNC_INFO << " invalid return.");
+    throw (engine_error() << Q_FUNC_INFO << " invalid return");
 }
 
 static void link_without_cmd_check_command() {
   if (create_and_link(true, true, true, true, true, true, true, false) == false)
-    throw (engine_error() << Q_FUNC_INFO << " invalid return.");
+    throw (engine_error() << Q_FUNC_INFO << " invalid return");
 }
 
 static void link_with_valid_objects() {
   if (create_and_link(true, true, true, true, true, true, true, true) == false)
-    throw (engine_error() << Q_FUNC_INFO << " invalid return.");
+    throw (engine_error() << Q_FUNC_INFO << " invalid return");
 }
 
 int main() {

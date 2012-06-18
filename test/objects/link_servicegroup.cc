@@ -32,8 +32,8 @@ using namespace test::objects;
 static bool create_and_link(bool has_services, bool has_servicegroups) {
   init_object_skiplists();
   servicegroup* obj = create_servicegroup(1);
-  QVector<service*> services;
-  QVector<servicegroup*> servicegroups;
+  std::vector<service*> services;
+  std::vector<servicegroup*> servicegroups;
   bool ret = true;
 
   for (unsigned int i = 0; i < 10; ++i) {
@@ -68,8 +68,8 @@ static bool create_and_link(bool has_services, bool has_servicegroups) {
 
 static void link_null_pointer() {
   try {
-    QVector<servicegroup*> servicegroups;
-    QVector<service*> services;
+    std::vector<servicegroup*> servicegroups;
+    std::vector<service*> services;
     link(static_cast<servicegroup*>(NULL),
          services,
          servicegroups);
@@ -84,8 +84,8 @@ static void link_null_name() {
   servicegroup* obj = NULL;
   try {
     obj = create_servicegroup(1);
-    QVector<servicegroup*> servicegroups;
-    QVector<service*> services;
+    std::vector<servicegroup*> servicegroups;
+    std::vector<service*> services;
 
     delete[] obj->group_name;
     obj->group_name = NULL;
@@ -103,17 +103,17 @@ static void link_null_name() {
 
 static void link_without_services() {
   if (create_and_link(false, true) == false)
-    throw (engine_error() << Q_FUNC_INFO << " invalid return.");
+    throw (engine_error() << Q_FUNC_INFO << " invalid return");
 }
 
 static void link_without_servicegroups() {
   if (create_and_link(true, false) == false)
-    throw (engine_error() << Q_FUNC_INFO << " invalid return.");
+    throw (engine_error() << Q_FUNC_INFO << " invalid return");
 }
 
 static void link_with_valid_objects() {
   if (create_and_link(true, true) == false)
-    throw (engine_error() << Q_FUNC_INFO << " invalid return.");
+    throw (engine_error() << Q_FUNC_INFO << " invalid return");
 }
 
 int main() {

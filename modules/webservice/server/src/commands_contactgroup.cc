@@ -48,7 +48,7 @@ void webservice::create_contactgroup(
                         : cntctgrp.name.c_str()));
 
   // Add all contacts into the contactgroup.
-  QVector<contact*>
+  std::vector<contact*>
     cntct_members(_find<contact>(
                     cntctgrp.contactMembers,
                     (void* (*)(char const*))&find_contact));
@@ -60,7 +60,7 @@ void webservice::create_contactgroup(
   }
 
   // Add the content of other contactgroups into this contactgroup.
-  QVector<contactgroup*>
+  std::vector<contactgroup*>
     cntct_groups(_find<contactgroup>(
                    cntctgrp.contactgroupMembers,
                    (void* (*)(char const*))&find_contactgroup));
@@ -146,11 +146,11 @@ int centreonengine__contactgroupAddContact(
            << cntctgrp_id->name << "'");
 
   // Member array.
-  QVector<contact*> member;
+  std::vector<contact*> member;
   member.push_back(cntct);
 
   // Link contact group to contacts.
-  objects::link(cntctgrp, member, QVector<contactgroup*>());
+  objects::link(cntctgrp, member, std::vector<contactgroup*>());
 
   // Exception handling.
   COMMAND_END()
@@ -197,11 +197,11 @@ int centreonengine__contactgroupAddContactgroup(
            << parent_cntctgrp_id->name << "'");
 
   // Member array.
-  QVector<contactgroup*> member;
+  std::vector<contactgroup*> member;
   member.push_back(child_grp);
 
   // Link contact groups.
-  objects::link(parent_grp, QVector<contact*>(), member);
+  objects::link(parent_grp, std::vector<contact*>(), member);
 
   // Exception handling.
   COMMAND_END()

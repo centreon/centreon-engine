@@ -32,8 +32,8 @@ using namespace test::objects;
 static bool create_and_link(bool has_contacts, bool has_contactgroups) {
   init_object_skiplists();
   contactgroup* obj = create_contactgroup(1);
-  QVector<contact*> contacts;
-  QVector<contactgroup*> contactgroups;
+  std::vector<contact*> contacts;
+  std::vector<contactgroup*> contactgroups;
   bool ret = true;
 
   for (unsigned int i = 0; i < 10; ++i) {
@@ -68,11 +68,12 @@ static bool create_and_link(bool has_contacts, bool has_contactgroups) {
 
 static void link_null_pointer() {
   try {
-    QVector<contactgroup*> contactgroups;
-    QVector<contact*> contacts;
-    link(static_cast<contactgroup*>(NULL),
-         contacts,
-         contactgroups);
+    std::vector<contactgroup*> contactgroups;
+    std::vector<contact*> contacts;
+    link(
+      static_cast<contactgroup*>(NULL),
+      contacts,
+      contactgroups);
   }
   catch (std::exception const& e) {
     (void)e;
@@ -84,10 +85,10 @@ static void link_null_name() {
   contactgroup* obj = NULL;
   try {
     obj = create_contactgroup(1);
-    QVector<contactgroup*> contactgroups;
-    QVector<contact*> contacts;
+    std::vector<contactgroup*> contactgroups;
+    std::vector<contact*> contacts;
 
-    delete[] obj->group_name;
+    delete [] obj->group_name;
     obj->group_name = NULL;
 
     link(obj,
@@ -103,17 +104,17 @@ static void link_null_name() {
 
 static void link_without_contacts() {
   if (create_and_link(false, true) == false)
-    throw (engine_error() << Q_FUNC_INFO << " invalid return.");
+    throw (engine_error() << Q_FUNC_INFO << " invalid return");
 }
 
 static void link_without_contactgroups() {
   if (create_and_link(true, false) == false)
-    throw (engine_error() << Q_FUNC_INFO << " invalid return.");
+    throw (engine_error() << Q_FUNC_INFO << " invalid return");
 }
 
 static void link_with_valid_objects() {
   if (create_and_link(true, true) == false)
-    throw (engine_error() << Q_FUNC_INFO << " invalid return.");
+    throw (engine_error() << Q_FUNC_INFO << " invalid return");
 }
 
 int main() {

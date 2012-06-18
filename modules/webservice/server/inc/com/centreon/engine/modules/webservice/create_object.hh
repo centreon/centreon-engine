@@ -21,9 +21,8 @@
 #  define CCE_MOD_WS_CREATE_OBJECT_HH
 
 #  include <map>
-#  include <QString>
-#  include <QVector>
 #  include <string>
+#  include <vector>
 #  include "com/centreon/engine/modules/webservice/namespace.hh"
 #  include "com/centreon/engine/objects.hh"
 #  include "soapH.h"
@@ -41,15 +40,13 @@ void create_service(ns1__serviceType const& service);
 void create_service_dependency(ns1__serviceDependencyType const& servicedependency);
 void create_service_escalation(ns1__serviceEscalationType const& serviceescalation);
 void create_servicegroup(ns1__servicegroupType const& servicegroup);
-QVector<service*>
+std::vector<service*>
      _find(std::vector<std::string> const& vec);
 std::map<char, bool>
      get_options(
        std::string const* opt,
        std::string const& pattern,
        char const* default_opt);
-QVector<QString>
-     std2qt(std::vector<std::string> const& vec);
 
 /**
  *  Find objects by name and create a table of it.
@@ -60,10 +57,10 @@ QVector<QString>
  *  @return The object's table, stop when the first object are not found.
  */
 template<class T>
-QVector<T*> _find(
-              std::vector<std::string> const& objs,
-              void* (find_object)(char const*)) {
-  QVector<T*> res;
+std::vector<T*> _find(
+                  std::vector<std::string> const& objs,
+                  void* (find_object)(char const*)) {
+  std::vector<T*> res;
   res.reserve(objs.size());
   for (std::vector<std::string>::const_iterator
          it(objs.begin()),

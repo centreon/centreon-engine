@@ -56,19 +56,17 @@ void webservice::create_servicegroup(ns1__servicegroupType const& svcgrp) {
              << "' provide an odd number whereas it should be even");
 
     // Add all services into the servicegroup.
-    QVector<service*> svc_members(::_find(svcgrp.serviceMembers));
-    if (static_cast<int>(svcgrp.serviceMembers.size() / 2)
-        != svc_members.size())
+    std::vector<service*> svc_members(::_find(svcgrp.serviceMembers));
+    if ((svcgrp.serviceMembers.size() / 2) != svc_members.size())
       throw (engine_error() << "servicegroup '" << svcgrp.id->name
              << "' invalid group member");
 
     // Add the content of other servicegroups to this servicegroup.
-    QVector<servicegroup*>
+    std::vector<servicegroup*>
       svc_groups(_find<servicegroup>(
                    svcgrp.servicegroupMembers,
                    (void* (*)(char const*))&find_servicegroup));
-    if (static_cast<int>(svcgrp.servicegroupMembers.size())
-        != svc_groups.size())
+    if (svcgrp.servicegroupMembers.size() != svc_groups.size())
       throw (engine_error() << "servicegroup '" << svcgrp.id->name
              << "' invalid group member");
 
@@ -155,11 +153,11 @@ int centreonengine__servicegroupAddService(
            << "') to service group '" << servicegroup_id->name << "'");
 
   // Member array.
-  QVector<service*> member;
+  std::vector<service*> member;
   member.push_back(svc);
 
   // Link service and service group.
-  objects::link(svcgrp, member, QVector<servicegroup*>());
+  objects::link(svcgrp, member, std::vector<servicegroup*>());
 
   // Exception handling.
   COMMAND_END()
@@ -202,11 +200,11 @@ int centreonengine__servicegroupAddServicegroup(
            << parent_id->name << "'");
 
   // Member array.
-  QVector<servicegroup*> member;
+  std::vector<servicegroup*> member;
   member.push_back(child_grp);
 
   // Link service groups.
-  objects::link(parent_grp, QVector<service*>(), member);
+  objects::link(parent_grp, std::vector<service*>(), member);
 
   // Exception handling.
   COMMAND_END()

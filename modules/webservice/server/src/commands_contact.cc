@@ -140,10 +140,10 @@ void webservice::create_contact(ns1__contactType const& cntct) {
                        retain_nonstatus_information));
 
   // Find contact groups.
-  QVector<contactgroup*> cntct_contactgroups(
-                           _find<contactgroup>(
-                             cntct.contactgroups,
-                             (void* (*)(char const*))&find_contactgroup));
+  std::vector<contactgroup*>
+    cntct_contactgroups(_find<contactgroup>(
+                          cntct.contactgroups,
+                          (void* (*)(char const*))&find_contactgroup));
   if (cntct.contactgroups.size()
       != static_cast<size_t>(cntct_contactgroups.size())) {
     objects::release(new_cntct);
@@ -152,10 +152,10 @@ void webservice::create_contact(ns1__contactType const& cntct) {
   }
 
   // Find host notification commands.
-  QVector<command*> cntct_host_notification_commands(
-                      _find<command>(
-                        cntct.hostNotificationCommands,
-                        (void* (*)(char const*))&find_command));
+  std::vector<command*> cntct_host_notification_commands(
+                          _find<command>(
+                            cntct.hostNotificationCommands,
+                            (void* (*)(char const*))&find_command));
   if (cntct.hostNotificationCommands.size()
       != static_cast<size_t>(cntct_host_notification_commands.size())) {
     objects::release(new_cntct);
@@ -164,19 +164,16 @@ void webservice::create_contact(ns1__contactType const& cntct) {
   }
 
   // Find service notification commands.
-  QVector<command*> cntct_service_notification_commands(
-                      _find<command>(
-                        cntct.serviceNotificationCommands,
-                        (void* (*)(char const*))&find_command));
+  std::vector<command*> cntct_service_notification_commands(
+                          _find<command>(
+                            cntct.serviceNotificationCommands,
+                            (void* (*)(char const*))&find_command));
   if (cntct.serviceNotificationCommands.size()
       != static_cast<size_t>(cntct_service_notification_commands.size())) {
     objects::release(new_cntct);
     throw (engine_error() << "contact '" << cntct.id->name
            << "' has invalid service notification commands");
   }
-
-  // Generate custom variables.
-  std::vector<std::string> cntct_customvar(std2qt(cntct.customVariables));
 
   try {
     // Link object.
@@ -187,7 +184,7 @@ void webservice::create_contact(ns1__contactType const& cntct) {
                cntct_contactgroups,
                cntct_host_notification_commands,
                cntct_service_notification_commands,
-               cntct_customvar);
+               cntct.customVariables);
   }
   catch (std::exception const& e) {
     (void)e;

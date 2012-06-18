@@ -32,8 +32,8 @@ using namespace test::objects;
 static bool create_and_link(bool has_hosts, bool has_hostgroups) {
   init_object_skiplists();
   hostgroup* obj = create_hostgroup(1);
-  QVector<host*> hosts;
-  QVector<hostgroup*> hostgroups;
+  std::vector<host*> hosts;
+  std::vector<hostgroup*> hostgroups;
   bool ret = true;
 
   for (unsigned int i = 0; i < 10; ++i) {
@@ -68,8 +68,8 @@ static bool create_and_link(bool has_hosts, bool has_hostgroups) {
 
 static void link_null_pointer() {
   try {
-    QVector<hostgroup*> hostgroups;
-    QVector<host*> hosts;
+    std::vector<hostgroup*> hostgroups;
+    std::vector<host*> hosts;
     link(static_cast<hostgroup*>(NULL),
          hosts,
          hostgroups);
@@ -84,8 +84,8 @@ static void link_null_name() {
   hostgroup* obj = NULL;
   try {
     obj = create_hostgroup(1);
-    QVector<hostgroup*> hostgroups;
-    QVector<host*> hosts;
+    std::vector<hostgroup*> hostgroups;
+    std::vector<host*> hosts;
 
     delete[] obj->group_name;
     obj->group_name = NULL;
@@ -103,17 +103,17 @@ static void link_null_name() {
 
 static void link_without_hosts() {
   if (create_and_link(false, true) == true)
-    throw (engine_error() << Q_FUNC_INFO << " invalid return.");
+    throw (engine_error() << Q_FUNC_INFO << " invalid return");
 }
 
 static void link_without_hostgroups() {
   if (create_and_link(true, false) == false)
-    throw (engine_error() << Q_FUNC_INFO << " invalid return.");
+    throw (engine_error() << Q_FUNC_INFO << " invalid return");
 }
 
 static void link_with_valid_objects() {
   if (create_and_link(true, true) == false)
-    throw (engine_error() << Q_FUNC_INFO << " invalid return.");
+    throw (engine_error() << Q_FUNC_INFO << " invalid return");
 }
 
 int main() {
