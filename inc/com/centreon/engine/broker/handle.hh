@@ -72,10 +72,10 @@ namespace                          com {
           void                     set_description(
                                      std::string const& description);
           void                     set_license(
-                                     std::tring const& license);
-          void                     set_name(std::tring const& name);
+                                     std::string const& license);
+          void                     set_name(std::string const& name);
           void                     set_version(
-                                     std::tring const& version);
+                                     std::string const& version);
 
         signals:
           void                     event_author(broker::handle* module);

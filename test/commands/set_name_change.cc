@@ -35,7 +35,7 @@ using namespace com::centreon::engine::commands;
  *
  *  @return True if the command exist, false otherwise.
  */
-static bool command_exist(QString const& name) {
+static bool command_exist(std::string const& name) {
   try {
     set::instance().get_command(name);
   }

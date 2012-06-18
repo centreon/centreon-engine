@@ -142,13 +142,13 @@ std::list<std::string> execute_query::get_args() const throw () {
     line.resize(line.size() - 1);
   std::list<std::string> list;
   std::string tmp;
-  char c;
-  int escape = 0;
+  char c(0);
+  int escape(0);
 
   std::string::const_iterator it = line.begin();
   std::string::const_iterator end = line.end();
 
-  if (c == 0 && it + 1 < end) {
+  if (it + 1 < end) {
     while (isspace(*it) && (isspace(*(it + 1))
                             || (*(it + 1) == '\'')
                             || (*(it + 1) == '"')))
@@ -230,31 +230,45 @@ unsigned int execute_query::get_timeout() const throw () {
  *  @param[in] data The data of the request information.
  */
 void execute_query::restore(std::string const& data) {
-  std::list<std::string> list = data.split('\0');
+  // Split arguments.
+  std::vector<std::string> list;
+  size_t prev(0);
+  size_t current;
+  while ((current = data.find('\0', prev)) != std::string::npos) {
+    list.push_back(data.substr(prev, current - prev));
+    prev = current + 1;
+  }
+  list.push_back(data.substr(prev));
   if (list.size() < 5)
     throw (engine_error() << "bad request argument");
 
-  bool ok;
-  int id = list[0].toInt(&ok);
-  if (!ok || id < 0 || id != _id)
+  // Request ID.
+  char* nok;
+  int id(strtol(list[0].c_str(), &nok, 0));
+  if (*nok || (id < 0) || (id != _id))
     throw (engine_error() << "bad request id");
 
-  _cmd_id = list[1].toULong(&ok);
-  if (!ok)
+  // Command ID.
+  _cmd_id = strtoul(list[1].c_str(), &nok, 0);
+  if (*nok)
     throw (engine_error() << "bad request argument, invalid cmd_id");
 
-  _timeout = list[2].toUInt(&ok);
-  if (!ok)
+  // Timeout.
+  _timeout = strtoul(list[2].c_str(), &nok, 0);
+  if (*nok)
     throw (engine_error() << "bad request argument, invalid timeout");
 
-  unsigned int timestamp = list[3].toUInt(&ok);
-  if (!ok)
+  // Start time.
+  unsigned int timestamp(strtoul(list[3].c_str(), &nok, 0));
+  if (*nok)
     throw (engine_error()
            << "bad request argument, invalid start_time");
-
   _start_time.setTime_t(timestamp);
 
+  // Command.
   _cmd = list[4];
+
+  return ;
 }
 
 /**************************************

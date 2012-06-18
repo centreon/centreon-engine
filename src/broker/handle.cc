@@ -223,7 +223,7 @@ void handle::open() {
   if (is_loaded())
     return ;
 
-  _handle = QSharedPointer<QLibrary>(new QLibrary(_filename));
+  _handle = QSharedPointer<QLibrary>(new QLibrary(_filename.c_str()));
   _handle->setLoadHints(QLibrary::ResolveAllSymbolsHint
     | QLibrary::ExportExternalSymbolsHint);
   _handle->load();
@@ -246,7 +246,7 @@ void handle::open() {
 
   if (init(
         NEBMODULE_NORMAL_LOAD | NEBMODULE_ENGINE,
-        qPrintable(_args),
+        _args.c_str(),
         this) != OK) {
     close();
     throw (engine_error() << "Function nebmodule_init returned an error");
@@ -261,7 +261,9 @@ void handle::open() {
  *  @param[in] filename The module filename.
  *  @param[in] args The module arguments.
  */
-void handle::open(QString const& filename, QString const& args) {
+void handle::open(
+               std::string const& filename,
+               std::string const& args) {
   if (is_loaded())
     return ;
 

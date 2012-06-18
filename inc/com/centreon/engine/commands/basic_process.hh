@@ -96,8 +96,7 @@ namespace                          com {
           bool                     waitForFinished(int msecs = 30000);
           bool                     waitForReadyRead(int msecs = 30000);
           bool                     waitForStarted(int msecs = 30000);
-          std::string                  workingDirectory() const;
-          qint64                   writeData(std::string const& data);
+          std::string              workingDirectory() const;
 
         signals:
           void                     error(QProcess::ProcessError error);

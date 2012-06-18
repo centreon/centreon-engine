@@ -19,6 +19,7 @@
 
 #include <exception>
 #include <limits.h>
+#include <list>
 #include <QCoreApplication>
 #include <QDebug>
 #include "com/centreon/engine/broker/loader.hh"
@@ -37,7 +38,7 @@ bool mod_test_load_quit = false;
 void check_load() {
   loader& loader(loader::instance());
   loader.load_directory("./");
-  QList<QSharedPointer<handle> > modules(loader.get_modules());
+  std::list<QSharedPointer<handle> > modules(loader.get_modules());
   if (modules.size() != 2)
     throw (engine_error() << __func__ << ": load modules failed.");
 }
@@ -48,7 +49,7 @@ void check_load() {
 void check_unload() {
   loader& loader(loader::instance());
   loader.unload_modules();
-  QList<QSharedPointer<handle> > modules(loader.get_modules());
+  std::list<QSharedPointer<handle> > modules(loader.get_modules());
   if ((false == mod_test_load_quit) || (modules.size() != 0))
     throw (engine_error() << __func__ << ": unload modules failed.");
 }
@@ -65,11 +66,11 @@ void check_change_name() {
     throw (engine_error() << __func__ << ": add module failed.");
 
   // Change name.
-  QString new_name = "New Name";
+  std::string new_name("New Name");
   module->set_name(new_name);
 
   // Check content.
-  QList<QSharedPointer<handle> > modules(loader.get_modules());
+  std::list<QSharedPointer<handle> > modules(loader.get_modules());
   if (modules.size() != 1)
     throw (engine_error() << __func__ << ": set name failed.");
   if ((*modules.begin())->get_name() != new_name)

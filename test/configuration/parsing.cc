@@ -65,7 +65,7 @@ static void check_exist_file() {
   if (tmp.open() == false) {
     throw (engine_error() << "open temporary file failed.");
   }
-  config.parse(tmp.fileName());
+  config.parse(tmp.fileName().toStdString());
   tmp.close();
 }
 
@@ -73,7 +73,7 @@ static void check_exist_file() {
  *  Check the parsing argument.
  */
 int main_test() {
-  config.set_log_archive_path(QDir::tempPath());
+  config.set_log_archive_path(QDir::tempPath().toStdString());
 
   check_directory();
   check_noexist_file();

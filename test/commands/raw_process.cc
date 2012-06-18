@@ -60,12 +60,12 @@ int main_test() {
 
   // process command.
   raw cmd(__func__, CMD_LINE);
-  QString cmd_processed = cmd.process_cmd(&macros);
+  std::string cmd_processed(cmd.process_cmd(&macros));
 
-  delete[] hst.address;
-  delete[] macro_x_names[MACRO_HOSTADDRESS];
-  delete[] macro_user[0];
-  delete[] macros.argv[0];
+  delete [] hst.address;
+  delete [] macro_x_names[MACRO_HOSTADDRESS];
+  delete [] macro_user[0];
+  delete [] macros.argv[0];
 
   if (cmd_processed != CMD_PROCESSED)
     throw (engine_error() << "command::process failed.");

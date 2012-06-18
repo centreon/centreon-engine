@@ -30,7 +30,7 @@
 #  include "com/centreon/engine/logging/syslog.hh"
 #  include "com/centreon/engine/namespace.hh"
 
-CCB_BEGIN()
+CCE_BEGIN()
 
 namespace                configuration {
   namespace              applier {
@@ -80,6 +80,6 @@ namespace                configuration {
   }
 }
 
-CCB_END()
+CCE_END()
 
 #endif // !CCE_CONFIGURATION_APPLIER_LOGGING_HH

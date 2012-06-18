@@ -21,9 +21,8 @@
 #include <limits.h>
 #include <map>
 #include <QCoreApplication>
-#include <QDebug>
 #include <QDir>
-#include <QFile>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
@@ -61,10 +60,10 @@ static float my_rand(float min, float max) throw() {
  *
  *  @return The value into string.
  */
-template<class T> static QString obj2str(T const& value) {
+template<class T> static std::string obj2str(T const& value) {
   std::ostringstream oss;
   oss << value;
-  return (oss.str().c_str());
+  return (oss.str());
 }
 
 /**
@@ -72,19 +71,19 @@ template<class T> static QString obj2str(T const& value) {
  *
  *  @param[in] resource The resource file name.
  */
-static void build_resource(QString const& resource) {
-  std::ofstream ofs(resource.toStdString().c_str());
+static void build_resource(std::string const& resource) {
+  std::ofstream ofs(resource.c_str());
   for (unsigned int i = 0; i < MAX_USER_MACROS; ++i) {
     if (my_rand(1, 5) == 5) {
       ofs << "# comment !" << std::endl;
     }
 
     ofs << std::string(my_rand(0, 10), ' ')
-    	<< "$USER" + obj2str(i + 1).toStdString() + "$"
+    	<< "$USER" + obj2str(i + 1) + "$"
     	<< std::string(my_rand(0, 10), ' ')
     	<< "="
     	<< std::string(my_rand(0, 10), ' ')
-    	<< "USER" + obj2str(i + 1).toStdString()
+    	<< "USER" + obj2str(i + 1)
     	<< std::string(my_rand(0, 10), ' ')
     	<< std::endl;
   }
@@ -99,20 +98,22 @@ static void build_resource(QString const& resource) {
  *
  *  @return The configuration value.
  */
-static std::map<QString, QString> build_configuration(QString const& mainconf, QString const& resource) {
-  std::map<QString, QString> var;
+static std::map<std::string, std::string> build_configuration(
+                                            std::string const& mainconf,
+                                            std::string const& resource) {
+  std::map<std::string, std::string> var;
 
-  QString date_format[] = { "us", "euro", "iso8601", "strict-iso8601" };
-  QString check_delay[] = { "n", "d", "s", "" };
+  std::string date_format[] = { "us", "euro", "iso8601", "strict-iso8601" };
+  std::string check_delay[] = { "n", "d", "s", "" };
 
   int cmd_check_interval = my_rand(-1, 10000);
   cmd_check_interval = (cmd_check_interval == 0 ? -1 : cmd_check_interval);
 
-  QString scd = check_delay[my_rand(0, 3)];
+  std::string scd = check_delay[my_rand(0, 3)];
   if (scd == "")
     scd = obj2str(my_rand(0.1f, 10000.0f));
 
-  QString hcd = check_delay[my_rand(0, 3)];
+  std::string hcd = check_delay[my_rand(0, 3)];
   if (hcd == "")
     hcd = obj2str(my_rand(0.1f, 10000.0f));
 
@@ -229,18 +230,20 @@ static std::map<QString, QString> build_configuration(QString const& mainconf, Q
   var["xdddefault_downtime_file"] = "downtime_file.tmp";
   var["allow_empty_hostgroup_assignment"] = obj2str(my_rand(0, 1));
 
-  std::ofstream ofs(mainconf.toStdString().c_str());
-  for (std::map<QString, QString>::const_iterator it = var.begin(), end = var.end();
+  std::ofstream ofs(mainconf.c_str());
+  for (std::map<std::string, std::string>::const_iterator
+         it(var.begin()),
+         end(var.end());
        it != end; ++it) {
     if (my_rand(1, 5) == 5) {
       ofs << "# comment !" << std::endl;
     }
     ofs << std::string(my_rand(0, 10), ' ')
-	<< it->first.toStdString()
+	<< it->first
 	<< std::string(my_rand(0, 10), ' ')
 	<< "="
 	<< std::string(my_rand(0, 10), ' ')
-	<< it->second.toStdString()
+	<< it->second
 	<< std::string(my_rand(0, 10), ' ')
 	<< std::endl;
   }
@@ -257,11 +260,13 @@ static std::map<QString, QString> build_configuration(QString const& mainconf, Q
  *  @param[in] filename The configuration file name.
  *  @param[in] my_conf  The configuration value.
  */
-void test_configuration(QString const& filename, std::map<QString, QString>& my_conf) {
+void test_configuration(
+       std::string const& filename,
+       std::map<std::string, std::string>& my_conf) {
   config.parse(filename);
 
-  QString date_format[] = { "us", "euro", "iso8601", "strict-iso8601" };
-  QString check_delay[] = { "n", "d", "s", "" };
+  std::string date_format[] = { "us", "euro", "iso8601", "strict-iso8601" };
+  std::string check_delay[] = { "n", "d", "s", "" };
 
   if (my_conf["date_format"] != date_format[config.get_date_format()]) {
     throw (engine_error() << "date_format: init with '" << my_conf["date_format"] << "'");
@@ -582,25 +587,36 @@ int main_test() {
   srandom(time(NULL));
 
   // Generate temporary file names.
-  QString mainconf_path(QDir::tempPath() + "/centengine.cfg.%1");
-  mainconf_path = mainconf_path.arg(random());
-  QString resource_path(QDir::tempPath() + "/resource.cfg.%1");
-  resource_path = resource_path.arg(random());
+  std::string mainconf_path;
+  {
+    std::ostringstream oss;
+    oss << QDir::tempPath().toStdString()
+        << "/centengine.cfg." << random();
+    mainconf_path = oss.str();
+  }
+  std::string resource_path;
+  {
+    std::ostringstream oss;
+    oss << QDir::tempPath().toStdString()
+        << "/resource.cfg." << random();
+    resource_path = oss.str();
+  }
 
   // Test.
   try {
-    std::map<QString, QString> my_conf = build_configuration(mainconf_path, resource_path);
+    std::map<std::string, std::string>
+      my_conf(build_configuration(mainconf_path, resource_path));
     test_configuration(mainconf_path, my_conf);
   }
 
   // Remove temporary files.
   catch (...) {
-    QFile::remove(mainconf_path);
-    QFile::remove(resource_path);
+    remove(mainconf_path.c_str());
+    remove(resource_path.c_str());
     throw ;
   }
-  QFile::remove(mainconf_path);
-  QFile::remove(resource_path);
+  remove(mainconf_path.c_str());
+  remove(resource_path.c_str());
 
   return (0);
 }

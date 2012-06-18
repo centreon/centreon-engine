@@ -54,8 +54,10 @@ int main_test() {
   if (loader.get_modules().size() != 2)
     throw (engine_error() << __func__ << ": invalid modules size.");
 
-  QList<QSharedPointer<handle> > modules = loader.get_modules();
-  for (QList<QSharedPointer<handle> >::const_iterator it = modules.begin(), end = modules.end();
+  std::list<QSharedPointer<handle> > modules(loader.get_modules());
+  for (std::list<QSharedPointer<handle> >::const_iterator
+         it(modules.begin()),
+         end(modules.end());
        it != end;
        ++it) {
     if ((*it)->get_name() != MOD_TITLE)

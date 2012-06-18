@@ -39,9 +39,9 @@ command_line::command_line() : _argc(0), _argv(NULL), _size(0) {}
  *
  *  @param[in] cmdline  The command line to parse.
  */
-command_line::command_line(QString const& cmdline)
+command_line::command_line(std::string const& cmdline)
   : _argc(0), _argv(NULL), _size(0) {
-  parse(cmdline.toStdString());
+  parse(cmdline);
 }
 
 /**
@@ -51,13 +51,17 @@ command_line::command_line(QString const& cmdline)
  *  @param[in] args     The array arguments.
  */
 command_line::command_line(
-                QString const& appname,
-                QStringList const& args) {
-  std::string cmdline(appname.toStdString());
-  for (QStringList::const_iterator it(args.begin()), end(args.end());
+                std::string const& appname,
+                std::list<std::string> const& args) {
+  std::string cmdline(appname);
+  for (std::list<std::string>::const_iterator
+         it(args.begin()),
+         end(args.end());
        it != end;
-       ++it)
-    cmdline += " " + (*it).toStdString();
+       ++it) {
+    cmdline.append(" ");
+    cmdline.append(*it);
+  }
   parse(cmdline);
 }
 
@@ -97,9 +101,9 @@ command_line& command_line::operator=(command_line const& right) {
  *  @return True if objects are equal, otherwise false.
  */
 bool command_line::operator==(command_line const& right) const throw () {
-  return (_argc == right._argc
-          && _size == right._size
-          && !memcmp(_argv[0], right._argv[0], _size));
+  return ((_argc == right._argc)
+          && (_size == right._size)
+          && (!memcmp(_argv[0], right._argv[0], _size)));
 }
 
 /**

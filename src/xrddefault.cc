@@ -493,7 +493,7 @@ int xrddefault_save_state_information(void) {
 
   // Write retention file.
   std::string data(stream.str());
-  char const* data_ptr(data.c_str()());
+  char const* data_ptr(data.c_str());
   unsigned int size(data.size());
   while (size > 0) {
     ssize_t wb(write(xrddefault_retention_file_fd, data_ptr, size));

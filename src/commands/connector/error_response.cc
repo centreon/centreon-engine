@@ -100,10 +100,23 @@ bool error_response::operator!=(
  *
  *  @return The data request.
  */
-QByteArray error_response::build() {
-  return (QByteArray().setNum(_id) + '\0' +
-          QByteArray().setNum(_code) + '\0' +
-          _message.toAscii() + cmd_ending());
+std::string error_response::build() {
+  std::string ret;
+  {
+    std::ostringstream oss;
+    oss << _id;
+    ret.append(oss.str());
+  }
+  ret.append("", 1);
+  {
+    std::ostringstream oss;
+    oss << _code;
+    ret.append(oss.str());
+  }
+  ret.append("", 1);
+  ret.append(_message);
+  ret.append(cmd_ending());
+  return (ret);
 }
 
 /**

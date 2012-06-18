@@ -154,7 +154,10 @@ unsigned long connector::command::run(std::string const& processed_cmd,
 
   _queries.insert(std::pair<unsigned long, request_info>(id, info));
 
-  _process->writeData(query->build());
+  {
+    std::string q(query->build());
+    _process->write(q.c_str(), q.size());
+  }
 
   logger(dbg_commands, basic)
     << "connector \"" << _name << "\" start (id="
@@ -205,7 +208,10 @@ void connector::command::run(std::string const& processed_cmd,
   request_info info = { query, now, timeout, true };
   _queries.insert(std::pair<unsigned long, request_info>(id, info));
 
-  _process->writeData(query->build());
+  {
+    std::string q(query->build());
+    _process->write(q.c_str(), q.size());
+  }
 
   logger(dbg_commands, basic)
     << "connector \"" << _name << "\" start (id="
@@ -420,8 +426,11 @@ void connector::command::_start() {
   connect(&(*_process), SIGNAL(stateChanged(QProcess::ProcessState)),
 	  this, SLOT(_state_change(QProcess::ProcessState)));
 
-  version_query version;
-  _process->writeData(version.build());
+  {
+    version_query version;
+    std::string v(version.build());
+    _process->write(v.c_str(), v.size());
+  }
 
   QEventLoop loop;
   connect(this, SIGNAL(_wait_ending()), &loop, SLOT(quit()));
@@ -434,11 +443,14 @@ void connector::command::_start() {
     throw (engine_error() << "bad process version.");
   }
 
-  for (std::map<unsigned long, request_info>::iterator it = _queries.begin(),
-         end = _queries.end();
+  for (std::map<unsigned long, request_info>::iterator
+         it(_queries.begin()),
+         end(_queries.end());
        it != end;
-       ++it)
-    _process->writeData(it->second.req->build());
+       ++it) {
+    std::string req(it->second.req->build());
+    _process->write(req.c_str(), req.size());
+  }
 
   logger(log_info_message, basic)
     << "connector \"" << _name << "\" start.";
@@ -467,8 +479,11 @@ void connector::command::_exit() {
   connect(this, SIGNAL(_process_ending()), &loop, SLOT(quit()));
   QTimer::singleShot(5000, &loop, SLOT(quit()));
 
-  quit_query quit;
-  _process->writeData(quit.build());
+  {
+    quit_query quit;
+    std::string q(quit.build());
+    _process->write(q.c_str(), q.size());
+  }
 
   locker.unlock();
   loop.exec();

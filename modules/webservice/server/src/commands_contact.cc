@@ -176,7 +176,7 @@ void webservice::create_contact(ns1__contactType const& cntct) {
   }
 
   // Generate custom variables.
-  QVector<QString> cntct_customvar(std2qt(cntct.customVariables));
+  std::vector<std::string> cntct_customvar(std2qt(cntct.customVariables));
 
   try {
     // Link object.

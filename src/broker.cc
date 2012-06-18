@@ -1354,9 +1354,9 @@ void broker_program_status(
   ds.modified_host_attributes = modified_host_process_attributes;
   ds.modified_service_attributes = modified_service_process_attributes;
   ds.global_host_event_handler
-    = my_strdup(qPrintable(config.get_global_host_event_handler()));
+    = my_strdup(config.get_global_host_event_handler().c_str());
   ds.global_service_event_handler
-    = my_strdup(qPrintable(config.get_global_service_event_handler()));
+    = my_strdup(config.get_global_service_event_handler().c_str());
 
   // Make callbacks.
   neb_make_callbacks(NEBCALLBACK_PROGRAM_STATUS_DATA, &ds);

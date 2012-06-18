@@ -20,7 +20,6 @@
 #include <assert.h>
 #include <errno.h>
 #include <fcntl.h>
-#include <QBuffer>
 #include <QEventLoop>
 #include <QTimer>
 #include <signal.h>
@@ -87,10 +86,10 @@ basic_process::~basic_process() throw () {
  *          data are read, false otherwise.
  */
 bool basic_process::atEnd() const {
-  QByteArray const* buffer((_channel == QProcess::StandardOutput)
-                           ? &_standard_output
-                           : &_standard_error);
-  return (QIODevice::atEnd() && (!isOpen() || buffer->isEmpty()));
+  std::string const* buffer((_channel == QProcess::StandardOutput)
+                            ? &_standard_output
+                            : &_standard_error);
+  return (QIODevice::atEnd() && (!isOpen() || buffer->empty()));
 }
 
 /**
@@ -99,9 +98,9 @@ bool basic_process::atEnd() const {
  *  @return The number of bytes available.
  */
 qint64 basic_process::bytesAvailable() const {
-  QByteArray const* buffer(_channel == QProcess::StandardOutput
-                           ? &_standard_output
-                           : &_standard_error);
+  std::string const* buffer(_channel == QProcess::StandardOutput
+                            ? &_standard_output
+                            : &_standard_error);
   return (QIODevice::bytesAvailable() + buffer->size());
 }
 
@@ -120,11 +119,11 @@ qint64 basic_process::bytesToWrite() const {
  *  @return True if a line is available.
  */
 bool basic_process::canReadLine() const {
-  // XXX : QBuffer might modify our QByteArrays
-  QBuffer buffer(_channel == QProcess::StandardOutput
-                 ? const_cast<QByteArray*>(&_standard_output)
-                 : const_cast<QByteArray*>(&_standard_error));
-  return (buffer.canReadLine() || QIODevice::canReadLine());
+  std::string const* buffer((_channel == QProcess::StandardOutput)
+                            ? &_standard_output
+                            : &_standard_error);
+  return ((buffer->find('\n') != std::string::npos)
+          || QIODevice::canReadLine());
 }
 
 /**
@@ -486,10 +485,13 @@ void basic_process::terminate() {
 qint64 basic_process::readData(char* data, qint64 maxlen) {
   if (_channel != QProcess::StandardOutput)
     return (0);
-  qint64 to_read(qMin((int)maxlen, _standard_output.size()));
+  qint64 to_read((static_cast<size_t>(maxlen)
+                  <= _standard_output.size())
+                 ? maxlen
+                 : _standard_output.size());
   if (to_read > 0) {
-    memcpy(data, _standard_output.constData(), to_read);
-    _standard_output.right(_standard_output.size() - to_read);
+    memcpy(data, _standard_output.c_str(), to_read);
+    _standard_output.erase(0, to_read);
   }
   return (to_read);
 }
@@ -564,16 +566,18 @@ basic_process& basic_process::operator=(basic_process const& right) {
  *
  *  @return Array of arguments.
  */
-char** basic_process::_build_args(QString const& program, QStringList const& arguments) {
+char** basic_process::_build_args(
+                        std::string const& program,
+                        std::list<std::string> const& arguments) {
   char** args(new char*[arguments.size() + 2]);
-  args[0] = qstrdup(qPrintable(program));
+  args[0] = my_strdup(program.c_str());
   unsigned int i(1);
-  for (QStringList::const_iterator
+  for (std::list<std::string>::const_iterator
          it(arguments.begin()),
          end(arguments.end());
        it != end;
        ++it)
-    args[i++] = qstrdup(qPrintable(*it));
+    args[i++] = my_strdup(it->c_str());
   args[i] = NULL;
   return (args);
 }
@@ -772,7 +776,7 @@ void basic_process::_start_process(OpenMode mode) {
     _perror = QProcess::UnknownError;
     _status = 0;
 
-    _chdir(qPrintable(_working_directory));
+    _chdir(_working_directory.c_str());
 
     // Open communication pipes.
     if ((pipe(_pipe_dead) == -1)

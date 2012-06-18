@@ -27,32 +27,34 @@ qt4_wrap_cpp(QT_MOC_FILES "${INC_DIR}/command.hh")
 # cce_connector target.
 add_library("cce_connector"
   STATIC
+  # Sources.
   "${SRC_DIR}/command.cc"
+  "${SRC_DIR}/error_response.cc"
+  "${SRC_DIR}/execute_query.cc"
+  "${SRC_DIR}/execute_response.cc"
+  "${SRC_DIR}/quit_query.cc"
+  "${SRC_DIR}/quit_response.cc"
   "${SRC_DIR}/request.cc"
   "${SRC_DIR}/request_builder.cc"
   "${SRC_DIR}/version_query.cc"
   "${SRC_DIR}/version_response.cc"
-  "${SRC_DIR}/quit_query.cc"
-  "${SRC_DIR}/quit_response.cc"
-  "${SRC_DIR}/execute_query.cc"
-  "${SRC_DIR}/execute_response.cc"
-  "${SRC_DIR}/error_response.cc"
+  # Headers.
   "${INC_DIR}/command.hh"
-  "${INC_DIR}/request_builder.hh"
-  "${INC_DIR}/request.hh"
-  "${INC_DIR}/version_query.hh"
-  "${INC_DIR}/version_response.hh"
-  "${INC_DIR}/quit_query.hh"
-  "${INC_DIR}/quit_response.hh"
+  "${INC_DIR}/error_response.hh"
   "${INC_DIR}/execute_query.hh"
   "${INC_DIR}/execute_response.hh"
-  "${INC_DIR}/error_response.hh"
+  "${INC_DIR}/quit_query.hh"
+  "${INC_DIR}/quit_response.hh"
+  "${INC_DIR}/request.hh"
+  "${INC_DIR}/request_builder.hh"
+  "${INC_DIR}/version_query.hh"
+  "${INC_DIR}/version_response.hh"
   ${QT_MOC_FILES})
 
 # Link target with libraries.
-target_link_libraries("cce_connector" "cce_core" ${QT_LIBRARIES})
+# target_link_libraries("cce_connector" "cce_core" ${QT_LIBRARIES})
 
-if (WITH_TESTING)
+if (WITH_TESTING AND 0)
   # Set directories.
   set(TEST_DIR "${TEST_DIR}/commands/connector")
 

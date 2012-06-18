@@ -61,7 +61,7 @@ raw::~raw() throw () {
     // guaranteed upon destruction. Also, the event loop might not catch
     // signal of process between checking of emptiness and connection of
     // signal.
-    process_info info(_processes.begin().value());
+    process_info info(_processes.begin()->second);
     QEventLoop loop;
     connect(
       this,
@@ -129,7 +129,7 @@ unsigned long raw::run(
   {
     QMutexLocker lock(&_mutex);
     info.cmd_id = get_uniq_id();
-    _processes.insert(&(*info.proc), info);
+    _processes[&(*info.proc)] = info;
   }
 
   // Start process.
@@ -208,7 +208,7 @@ void raw::raw_ended() {
       logger(log_runtime_warning, basic) << "sender not found in processes.";
       return ;
     }
-    info = it.value();
+    info = it->second;
     _processes.erase(it);
   }
 
