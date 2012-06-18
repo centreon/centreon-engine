@@ -1,6 +1,6 @@
 ##
 ## Copyright 1999-2009 Ethan Galstad
-## Copyright 2011      Merethis
+## Copyright 2011-2012 Merethis
 ##
 ## This file is part of Centreon Engine.
 ##
@@ -31,7 +31,7 @@
 #         historical purposes. This should be the first option specified in the
 #         config file!
 
-log_file=@vardir@/centengine.log
+log_file=@VAR_DIR@/centengine.log
 
 
 # var:    cfg_file
@@ -41,36 +41,36 @@ log_file=@vardir@/centengine.log
 #         shown below), or keep them all in a single config file.
 
 # You can specify individual object config files as shown below:
-cfg_file=@confdir@/objects/commands.cfg
-cfg_file=@confdir@/objects/contacts.cfg
-cfg_file=@confdir@/objects/timeperiods.cfg
-cfg_file=@confdir@/objects/templates.cfg
+cfg_file=@PREFIX_CONF@/objects/commands.cfg
+cfg_file=@PREFIX_CONF@/objects/contacts.cfg
+cfg_file=@PREFIX_CONF@/objects/timeperiods.cfg
+cfg_file=@PREFIX_CONF@/objects/templates.cfg
 
 # Definitions for monitoring the local (Linux) host
-cfg_file=@confdir@/objects/localhost.cfg
+cfg_file=@PREFIX_CONF@/objects/localhost.cfg
 
 # Definitions for monitoring a Windows machine
-#cfg_file=@confdir@/objects/windows.cfg
+#cfg_file=@PREFIX_CONF@/objects/windows.cfg
 
 # Definitions for monitoring a router/switch
-#cfg_file=@confdir@/objects/switch.cfg
+#cfg_file=@PREFIX_CONF@/objects/switch.cfg
 
 # Definitions for monitoring a network printer
-#cfg_file=@confdir@/objects/printer.cfg
+#cfg_file=@PREFIX_CONF@/objects/printer.cfg
 
 # You can also tell Nagios to process all config files (with a .cfg extension)
 # in a particular directory by using the cfg_dir directive as shown below.
-#cfg_dir=@confdir@/servers
-#cfg_dir=@confdir@/printers
-#cfg_dir=@confdir@/switches
-#cfg_dir=@confdir@/routers
+#cfg_dir=@PREFIX_CONF@/servers
+#cfg_dir=@PREFIX_CONF@/printers
+#cfg_dir=@PREFIX_CONF@/switches
+#cfg_dir=@PREFIX_CONF@/routers
 
 
 # var:  object_cache_file
 # brief: This option determines where object definitions are cached when
 #        Centreon Engine starts/restarts.
 
-object_cache_file=@vardir@/objects.cache
+object_cache_file=@VAR_DIR@/objects.cache
 
 
 # var:    precached_object_file
@@ -85,7 +85,7 @@ object_cache_file=@vardir@/objects.cache
 #         a large and/or complex configuration. Read the documentation section
 #         on optimizing Centreon Engine to find our more about how this feature works.
 
-precached_object_file=@vardir@/objects.precache
+precached_object_file=@VAR_DIR@/objects.precache
 
 
 # var:    resource_file
@@ -97,7 +97,7 @@ precached_object_file=@vardir@/objects.precache
 #         this file and restrictive permissions (600) can be placed on this
 #         file.
 
-resource_file=@confdir@/resource.cfg
+resource_file=@PREFIX_CONF@/resource.cfg
 
 
 # var:    status_file
@@ -105,7 +105,7 @@ resource_file=@confdir@/resource.cfg
 #         is stored. The contents of the status file are deleted every time
 #         Centreon Engine restarts.
 
-status_file=@vardir@/status.dat
+status_file=@VAR_DIR@/status.dat
 
 
 # var:    status_update_interval
@@ -161,15 +161,6 @@ command_file=@RW_DIR@/centengine.cmd
 #         buffer.
 
 external_command_buffer_slots=4096
-
-
-# var:    temp_file
-# brief:  This is a temporary file that is used as scratch space when Centreon
-#         Engine updates the status log, cleans the comment file, etc. This file
-#         is created, used, and deleted throughout the time that Centreon Engine
-#         is running.
-
-temp_file=@localstatedir@/tempfile
 
 
 # var:    event_broker_options
@@ -544,7 +535,7 @@ retain_state_information=1
 #         network when Centreon Engine is restarted. This file is used only if
 #         the retain_state_information variable is set to 1.
 
-state_retention_file=@vardir@/retention.dat
+state_retention_file=@VAR_DIR@/retention.dat
 
 
 # var:    retention_update_interval
@@ -956,34 +947,6 @@ date_format=us
 #use_timezone=Australia/Brisbane
 
 
-# var:    p1_file
-# brief:  This value determines where the p1.pl perl script (used by the
-#         embedded Perl interpreter) is located. If you didn't compile Centreon
-#         Engine with embedded Perl support, this option has no effect.
-
-p1_file=@bindir@/p1.pl
-
-
-# var:    enable_embedded_perl
-# brief:  This option determines whether or not the embedded Perl interpreter
-#         will be enabled during runtime. This option has no effect if Centreon
-#         Engine has not been compiled with support for embedded Perl.
-# values: 0 = disable interpreter.
-#         1 = enable interpreter.
-
-enable_embedded_perl=1
-
-
-# var:    use_embedded_perl_implicitly
-# brief:  This option determines whether or not Centreon Engine will process
-#         Perl plugins and scripts with the embedded Perl interpreter if the
-#         plugins/scripts do not explicitly indicate whether or not it is okay
-#         to do so. Read the HTML documentation on the embedded Perl interpreter
-#         for more information on how this option works.
-
-use_embedded_perl_implicitly=1
-
-
 # var:    illegal_object_name_chars
 # brief:  This option allows you to specify illegal characters that cannot be
 #         used in host names, service descriptions, or names of other object
@@ -1127,7 +1090,7 @@ debug_verbosity=1
 # brief:  This option determines where Centreon Engine should write debugging
 #         information.
 
-debug_file=@vardir@/centengine.debug
+debug_file=@VAR_DIR@/centengine.debug
 
 
 # var:    max_debug_file_size
