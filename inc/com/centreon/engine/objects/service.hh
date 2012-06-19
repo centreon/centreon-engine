@@ -42,6 +42,9 @@ void release_service(service const* obj);
 #  ifdef __cplusplus
 }
 
+#  include <string>
+#  include <vector>
+
 namespace       com {
   namespace     centreon {
     namespace   engine {

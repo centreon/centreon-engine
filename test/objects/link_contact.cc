@@ -17,8 +17,9 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <cstdlib>
 #include <exception>
-#include <QDebug>
+#include <iostream>
 #include <sstream>
 #include "com/centreon/engine/commands/set.hh"
 #include "com/centreon/engine/error.hh"
@@ -31,6 +32,7 @@
 #include "com/centreon/engine/utils.hh"
 #include "test/objects/create_object.hh"
 
+using namespace com::centreon::engine;
 using namespace com::centreon::engine::objects;
 using namespace test::objects;
 
@@ -185,10 +187,18 @@ static void link_with_valid_objects() {
     throw (engine_error() << Q_FUNC_INFO << " invalid return");
 }
 
+/**
+ *  Check linkage of contact.
+ *
+ *  @return EXIT_SUCCESS on success.
+ */
 int main() {
-  com::centreon::engine::logging::engine::load();
-  com::centreon::engine::commands::set::load();
+  // Initialization.
+  logging::engine::load();
+  commands::set::load();
+
   try {
+    // Tests.
     link_null_pointer();
     link_null_name();
     link_without_host_notification_period();
@@ -200,9 +210,11 @@ int main() {
     link_with_valid_objects();
   }
   catch (std::exception const& e) {
-    qDebug() << "error: " << e.what();
+    // Exception handling.
+    std::cerr << "error: " << e.what() << std::endl;
     free_memory(get_global_macros());
-    return (1);
+    return (EXIT_FAILURE);
   }
-  return (0);
+
+  return (EXIT_SUCCESS);
 }

@@ -17,34 +17,47 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <cstdlib>
 #include <exception>
-#include <QDebug>
+#include <iostream>
 #include "com/centreon/engine/commands/set.hh"
 #include "com/centreon/engine/logging/engine.hh"
 #include "com/centreon/engine/macros.hh"
 #include "test/objects/add_object_to_member.hh"
 #include "test/objects/create_object.hh"
 
-using namespace com::centreon::engine::objects;
+using namespace com::centreon::engine;
 using namespace test::objects;
 
+/**
+ *  Check that command can be added to member.
+ *
+ *  @return EXIT_SUCCESS on success.
+ */
 int main() {
-  com::centreon::engine::logging::engine::load();
-  com::centreon::engine::commands::set::load();
+  // Initialization.
+  logging::engine::load();
+  commands::set::load();
+
   try {
-    add_with_null_member(&add_commands_to_object);
-    add_without_objects(&add_commands_to_object);
-    add_with_objects(&add_commands_to_object,
-                     &create_command,
-                     1);
-    add_with_objects(&add_commands_to_object,
-                     &create_command,
-                     10);
+    // Tests.
+    add_with_null_member(&objects::add_commands_to_object);
+    add_without_objects(&objects::add_commands_to_object);
+    add_with_objects(
+      &objects::add_commands_to_object,
+      &create_command,
+      1);
+    add_with_objects(
+      &objects::add_commands_to_object,
+      &create_command,
+      10);
   }
   catch (std::exception const& e) {
-    qDebug() << "error: " << e.what();
+    // Exception handling.
+    std::cerr << "error: " << e.what() << std::endl;
     free_memory(get_global_macros());
-    return (1);
+    return (EXIT_FAILURE);
   }
-  return (0);
+
+  return (EXIT_SUCCESS);
 }

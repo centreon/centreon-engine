@@ -23,6 +23,8 @@
 #  include "com/centreon/engine/objects.hh"
 
 #  ifdef __cplusplus
+#  include <string>
+#  include <vector>
 extern "C" {
 #  endif // C++
 

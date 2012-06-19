@@ -17,8 +17,9 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <cstdlib>
 #include <exception>
-#include <QDebug>
+#include <iostream>
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/macros.hh"
 #include "com/centreon/engine/objects/customvariablesmember.hh"
@@ -57,17 +58,25 @@ void add_with_objects(unsigned int id) {
   free_object_skiplists();
 }
 
+/**
+ *  Check that custom variable can be added to member.
+ *
+ *  @return EXIT_SUCCESS on success.
+ */
 int main() {
   try {
+    // Tests.
     add_with_null_member();
     add_without_objects();
     add_with_objects(1);
     add_with_objects(10);
   }
   catch (std::exception const& e) {
-    qDebug() << "error: " << e.what();
+    // Exception handling.
+    std::cerr << "error: " << e.what() << std::endl;
     free_memory(get_global_macros());
-    return (1);
+    return (EXIT_FAILURE);
   }
-  return (0);
+
+  return (EXIT_SUCCESS);
 }

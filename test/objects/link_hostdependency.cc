@@ -17,8 +17,9 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <cstdlib>
 #include <exception>
-#include <QDebug>
+#include <iostream>
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/macros.hh"
 #include "com/centreon/engine/objects/hostdependency.hh"
@@ -112,8 +113,14 @@ static void link_with_valid_objects() {
     throw (engine_error() << Q_FUNC_INFO << " invalid return.");
 }
 
+/**
+ *  Check linkage of host dependency.
+ *
+ *  @return EXIT_SUCCESS on success.
+ */
 int main() {
   try {
+    // Tests.
     link_null_pointer();
     link_null_name();
     link_null_dependent_name();
@@ -121,9 +128,11 @@ int main() {
     link_with_valid_objects();
   }
   catch (std::exception const& e) {
-    qDebug() << "error: " << e.what();
+    // Exception handling.
+    std::cerr << "error: " << e.what() << std::endl;
     free_memory(get_global_macros());
-    return (1);
+    return (EXIT_FAILURE);
   }
-  return (0);
+
+  return (EXIT_SUCCESS);
 }

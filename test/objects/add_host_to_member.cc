@@ -17,30 +17,45 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <cstdlib>
 #include <exception>
-#include <QDebug>
+#include <iostream>
+#include "com/centreon/engine/logging/engine.hh"
 #include "com/centreon/engine/macros.hh"
 #include "test/objects/add_object_to_member.hh"
 #include "test/objects/create_object.hh"
 
-using namespace com::centreon::engine::objects;
+using namespace com::centreon::engine;
 using namespace test::objects;
 
+/**
+ *  Check that host can be added to member.
+ *
+ *  @return EXIT_SUCCESS on success.
+ */
 int main() {
+  // Initialization.
+  logging::engine::load();
+
   try {
-    add_with_null_member(&add_hosts_to_object);
-    add_without_objects(&add_hosts_to_object);
-    add_with_objects(&add_hosts_to_object,
-                     &create_host,
-                     1);
-    add_with_objects(&add_hosts_to_object,
-                     &create_host,
-                     10);
+    // Tests.
+    add_with_null_member(&objects::add_hosts_to_object);
+    add_without_objects(&objects::add_hosts_to_object);
+    add_with_objects(
+      &objects::add_hosts_to_object,
+      &create_host,
+      1);
+    add_with_objects(
+      &objects::add_hosts_to_object,
+      &create_host,
+      10);
   }
   catch (std::exception const& e) {
-    qDebug() << "error: " << e.what();
+    // Exception handling.
+    std::cerr << "error: " << e.what() << std::endl;
     free_memory(get_global_macros());
-    return (1);
+    return (EXIT_FAILURE);
   }
-  return (0);
+
+  return (EXIT_SUCCESS);
 }

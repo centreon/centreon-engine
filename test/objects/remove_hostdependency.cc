@@ -17,8 +17,9 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <cstdlib>
 #include <exception>
-#include <QDebug>
+#include <iostream>
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/macros.hh"
@@ -73,17 +74,22 @@ static void remove_host_dependency_failed() {
 }
 
 /**
- *  Check if remove hostdependency works.
+ *  Check if host dependency removal works.
+ *
+ *  @return EXIT_SUCCESS on success.
  */
-int main(void) {
+int main() {
   try {
+    // Tests.
     remove_all_host_dependency();
     remove_host_dependency_failed();
   }
   catch (std::exception const& e) {
-    qDebug() << "error: " << e.what();
+    // Exception handling.
+    std::cerr << "error: " << e.what() << std::endl;
     free_memory(get_global_macros());
-    return (1);
+    return (EXIT_FAILURE);
   }
-  return (0);
+
+  return (EXIT_SUCCESS);
 }
