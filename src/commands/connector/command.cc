@@ -419,9 +419,8 @@ void connector::command::_start() {
 
   _process->closeReadChannel(QProcess::StandardError);
   _process->start(_connector_line);
-  if (_process->waitForStarted(-1) == false) {
-    throw (engine_error() << _process->errorString());
-  }
+  if (_process->waitForStarted(-1) == false)
+    throw (engine_error() << _process->errorString().toStdString());
 
   connect(&(*_process), SIGNAL(stateChanged(QProcess::ProcessState)),
 	  this, SLOT(_state_change(QProcess::ProcessState)));
@@ -440,7 +439,7 @@ void connector::command::_start() {
   locker.relock();
 
   if (_is_good_version == false) {
-    throw (engine_error() << "bad process version.");
+    throw (engine_error() << "bad process version");
   }
 
   for (std::map<unsigned long, request_info>::iterator

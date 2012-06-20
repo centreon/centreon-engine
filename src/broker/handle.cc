@@ -227,9 +227,8 @@ void handle::open() {
   _handle->setLoadHints(QLibrary::ResolveAllSymbolsHint
     | QLibrary::ExportExternalSymbolsHint);
   _handle->load();
-  if (_handle->isLoaded() == false) {
-    throw (engine_error() << _handle->errorString());
-  }
+  if (_handle->isLoaded() == false)
+    throw (engine_error() << _handle->errorString().toStdString());
 
   int* api_version = static_cast<int*>(_handle->resolve("__neb_api_version"));
   if (api_version == NULL || *api_version != CURRENT_NEB_API_VERSION) {

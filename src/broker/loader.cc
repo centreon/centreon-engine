@@ -190,14 +190,15 @@ unsigned int loader::load_directory(std::string const& dir) {
       module = add_module(dir + "/" + qPrintable(it->fileName()), config_file);
       module->open();
       logger(log_info_message, basic)
-        << "Event broker module '" << it->fileName()
+        << "Event broker module '" << it->fileName().toStdString()
         << "' initialized successfully.";
       ++loaded;
     }
     catch (error const& e) {
       del_module(module);
       logger(log_runtime_error, basic)
-        << "Error: Could not load module '" << it->fileName()
+        << "Error: Could not load module '"
+        << it->fileName().toStdString()
         << "' -> " << e.what();
     }
   }

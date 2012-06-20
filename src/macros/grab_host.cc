@@ -19,8 +19,8 @@
 */
 
 #include <map>
-#include <QPair>
 #include <sstream>
+#include <utility>
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/macros/clear_host.hh"
 #include "com/centreon/engine/macros/clear_hostgroup.hh"
@@ -180,7 +180,7 @@ static char* get_host_total_services(host& hst, nagios_macros* mac) {
 
 // Redirection object.
 struct grab_host_redirection {
-  typedef std::map<unsigned int, QPair<char* (*)(host&, nagios_macros*), bool> > entry;
+  typedef std::map<unsigned int, std::pair<char* (*)(host&, nagios_macros*), bool> > entry;
   entry routines;
   grab_host_redirection() {
     // Name.

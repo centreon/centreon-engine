@@ -17,15 +17,15 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <errno.h>
+#include <cerrno>
+#include <cmath>
+#include <cstdio>
+#include <cstring>
 #include <exception>
-#include <math.h>
 #include <QCoreApplication>
 #include <QDebug>
 #include <QDir>
 #include <QFile>
-#include <stdio.h>
-#include <string.h>
 #include "com/centreon/engine/common.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
@@ -43,16 +43,17 @@ using namespace com::centreon::engine::logging;
  *  @param[in] filename The file name.
  *  @param[in] text     The content reference.
  */
-static void check_file(QString const& filename, QString const& text) {
-  QFile file(filename);
+static void check_file(
+              std::string const& filename,
+              std::string const& text) {
+  QFile file(filename.c_str());
   file.open(QIODevice::ReadOnly);
-  if (file.error() != QFile::NoError) {
-    throw (engine_error() << filename << ": " << file.errorString());
-  }
+  if (file.error() != QFile::NoError)
+    throw (engine_error() << filename << ": "
+           << file.errorString().toStdString());
 
-  if (file.readAll() != text) {
-    throw (engine_error() << filename << ": bad content.");
-  }
+  if (file.readAll() != text.c_str())
+    throw (engine_error() << filename << ": bad content");
 
   file.close();
 }
@@ -109,25 +110,23 @@ int main_test() {
   for (QFileInfoList::const_iterator it = files.begin(), end = files.end();
        it != end;
        ++it) {
-    if (it->fileName() == "test_logging_file_size_limit.log") {
-      check_file(it->fileName(), "qwerty");
-    }
-    else if (it->fileName() == "test_logging_file_size_limit.log.old") {
-      check_file(it->fileName(), "0123456789");
-    }
-    else if (it->fileName() == "test_logging_file.log") {
-      check_file(it->fileName(), "0123450123456789qwerty");
-    }
-    else if (it->fileName() == "test_logging_file_reopen.log") {
-      check_file(it->fileName(), "qwerty");
-    }
-    else if (it->fileName() == "test_logging_file_reopen.log.old") {
-      check_file(it->fileName(), "0123450123456789");
-    }
-    else {
-      throw (engine_error() << "bad file name.");
-    }
-    QFile::remove(it->fileName());
+    if (it->fileName() == "test_logging_file_size_limit.log")
+      check_file(it->fileName().toStdString(), "qwerty");
+    else if (it->fileName() == "test_logging_file_size_limit.log.old")
+      check_file(it->fileName().toStdString(), "0123456789");
+    else if (it->fileName() == "test_logging_file.log")
+      check_file(
+        it->fileName().toStdString(),
+        "0123450123456789qwerty");
+    else if (it->fileName() == "test_logging_file_reopen.log")
+      check_file(
+        it->fileName().toStdString(),
+        "qwerty");
+    else if (it->fileName() == "test_logging_file_reopen.log.old")
+      check_file(it->fileName().toStdString(), "0123450123456789");
+    else
+      throw (engine_error() << "bad file name");
+    remove(it->fileName().toStdString().c_str());
   }
 
   return (0);

@@ -21,7 +21,6 @@
 #  define CCE_LOGGING_LOGGER_HH
 
 #  include <iomanip>
-#  include <QString>
 #  include <sstream>
 #  include <string>
 #  include "com/centreon/engine/logging/engine.hh"
@@ -56,7 +55,6 @@ namespace                    com {
 
           logger&            operator=(logger const& right);
           logger&            operator<<(std::string const& obj);
-          logger&            operator<<(QString const& obj);
           logger&            operator<<(char const* obj);
           logger&            operator<<(char obj);
           logger&            operator<<(int obj);
@@ -71,32 +69,31 @@ namespace                    com {
           logger&            operator<<(void const* obj);
 
          private:
-          struct             redirector {
-            logger& (logger::*redirect_qstring)(std::string const&);
-            logger& (logger::*redirect_std_string)(QString const&);
-            logger& (logger::*redirect_string)(char const*);
-            logger& (logger::*redirect_char)(char);
-            logger& (logger::*redirect_int)(int);
-            logger& (logger::*redirect_uint)(unsigned int);
-            logger& (logger::*redirect_long)(long);
-            logger& (logger::*redirect_ulong)(unsigned long);
-            logger& (logger::*redirect_long_long)(long long);
-            logger& (logger::*redirect_ulong_long)(unsigned long long);
-            logger& (logger::*redirect_double)(double);
-            logger& (logger::*redirect_flags)(e_flags);
-            logger& (logger::*redirect_setprecision)(s_setprecision const&);
-            logger& (logger::*redirect_void_ptr)(void const*);
-            void    (logger::*init)();
-            void    (logger::*flush)();
+          struct               redirector {
+            logger& (logger::* redirect_std_string)(std::string const&);
+            logger& (logger::* redirect_string)(char const*);
+            logger& (logger::* redirect_char)(char);
+            logger& (logger::* redirect_int)(int);
+            logger& (logger::* redirect_uint)(unsigned int);
+            logger& (logger::* redirect_long)(long);
+            logger& (logger::* redirect_ulong)(unsigned long);
+            logger& (logger::* redirect_long_long)(long long);
+            logger& (logger::* redirect_ulong_long)(unsigned long long);
+            logger& (logger::* redirect_double)(double);
+            logger& (logger::* redirect_flags)(e_flags);
+            logger& (logger::* redirect_setprecision)(s_setprecision const&);
+            logger& (logger::* redirect_void_ptr)(void const*);
+            void    (logger::* init)();
+            void    (logger::* flush)();
           };
 
-          template<typename T>
+          template      <typename T>
           logger&       _nothing(T obj) {
             (void)obj;
             return (*this);
           }
 
-          template<typename T>
+          template      <typename T>
           logger&       _builder(T obj) {
             _buffer << obj;
             return (*this);
@@ -114,12 +111,6 @@ namespace                    com {
           unsigned long long         _type;
           unsigned int               _verbosity;
         };
-
-        template<>
-        inline logger& logger::_builder(QString const& obj) {
-          _buffer << qPrintable(obj);
-          return (*this);
-        }
 
         template<>
         inline logger& logger::_builder(e_flags obj) {

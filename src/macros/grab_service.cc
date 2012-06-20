@@ -19,8 +19,8 @@
 */
 
 #include <map>
-#include <QPair>
 #include <sstream>
+#include <utility>
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/macros/clear_service.hh"
 #include "com/centreon/engine/macros/clear_servicegroup.hh"
@@ -112,7 +112,7 @@ static char* get_service_state(service& svc, nagios_macros* mac) {
 
 // Redirection object.
 struct grab_service_redirection {
-  typedef std::map<unsigned int, QPair<char* (*)(service&, nagios_macros* mac), bool> > entry;
+  typedef std::map<unsigned int, std::pair<char* (*)(service&, nagios_macros* mac), bool> > entry;
   entry routines;
   grab_service_redirection() {
     // Description.

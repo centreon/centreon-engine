@@ -47,7 +47,8 @@ file::file(std::string const& file, unsigned long long size_limit)
     _size_limit(size_limit) {
   _file->open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Append);
   if (_file->QFile::error() != QFile::NoError)
-    throw (engine_error() << file << ": " << _file->errorString());
+    throw (engine_error() << file << ": "
+           << _file->errorString().toStdString());
 
   _rwlock.lockForWrite();
   _files.push_back(this);

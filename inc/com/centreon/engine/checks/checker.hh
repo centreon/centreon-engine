@@ -22,11 +22,9 @@
 
 #  include <map>
 #  include <memory>
-#  include <QHash>
 #  include <QMutex>
 #  include <QObject>
-#  include <QQueue>
-#  include <QSharedPointer>
+#  include <queue>
 #  include "com/centreon/engine/checks.hh"
 #  include "com/centreon/engine/commands/command.hh"
 #  include "com/centreon/engine/commands/result.hh"
@@ -79,7 +77,8 @@ namespace                      com {
           static void          unload();
 
         private slots:
-          void                 _command_executed(cce_commands_result const& res);
+          void                 _command_executed(
+                                 cce_commands_result const& res);
 
         private:
                                checker();
@@ -94,7 +93,8 @@ namespace                      com {
                                _list_id;
           QMutex               _mut_id;
           QMutex               _mut_reap;
-          QQueue<check_result> _to_reap;
+          std::queue<check_result>
+                               _to_reap;
         };
       }
     }

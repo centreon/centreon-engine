@@ -28,7 +28,7 @@ using namespace com::centreon::engine::modules::webservice;
  *
  *  @param[in] filename The configuration filename.
  */
-configuration::configuration(QString const& filename)
+configuration::configuration(std::string const& filename)
   : _accept_timeout(500),
     _filename(filename),
     _port(80),
@@ -54,7 +54,7 @@ configuration::configuration(QString const& filename)
 /**
  *  Default Destructor.
  */
-configuration::~configuration() throw() {
+configuration::~configuration() throw () {
 
 }
 
@@ -63,7 +63,7 @@ configuration::~configuration() throw() {
  *
  *  @return The timeout in micosecond.
  */
-int configuration::get_accept_timeout() const throw() {
+int configuration::get_accept_timeout() const throw () {
   return (_accept_timeout);
 }
 
@@ -72,7 +72,7 @@ int configuration::get_accept_timeout() const throw() {
  *
  *  @return The configuration filename.
  */
-QString const& configuration::get_filename() const throw() {
+std::string const& configuration::get_filename() const throw () {
   return (_filename);
 }
 
@@ -81,7 +81,7 @@ QString const& configuration::get_filename() const throw() {
  *
  *  @return The host name.
  */
-QString const& configuration::get_host() const throw() {
+std::string const& configuration::get_host() const throw () {
   return (_host);
 }
 
@@ -90,7 +90,7 @@ QString const& configuration::get_host() const throw() {
  *
  *  @return The port.
  */
-int configuration::get_port() const throw() {
+int configuration::get_port() const throw () {
   return (_port);
 }
 
@@ -99,7 +99,7 @@ int configuration::get_port() const throw() {
  *
  *  @return The timeout in second.
  */
-int configuration::get_recv_timeout() const throw() {
+int configuration::get_recv_timeout() const throw () {
   return (_recv_timeout);
 }
 
@@ -108,7 +108,7 @@ int configuration::get_recv_timeout() const throw() {
  *
  *  @return The timeout in second.
  */
-int configuration::get_send_timeout() const throw() {
+int configuration::get_send_timeout() const throw () {
   return (_send_timeout);
 }
 
@@ -117,7 +117,7 @@ int configuration::get_send_timeout() const throw() {
  *
  *  @return The certificate path.
  */
-QString const& configuration::get_ssl_cacert() const throw() {
+std::string const& configuration::get_ssl_cacert() const throw () {
   return (_ssl_cacert);
 }
 
@@ -126,7 +126,7 @@ QString const& configuration::get_ssl_cacert() const throw() {
  *
  *  @return The Diffie-Helman path.
  */
-QString const& configuration::get_ssl_dh() const throw() {
+std::string const& configuration::get_ssl_dh() const throw () {
   return (_ssl_dh);
 }
 
@@ -135,7 +135,7 @@ QString const& configuration::get_ssl_dh() const throw() {
  *
  *  @return true is enable, false otherwise.
  */
-bool configuration::get_ssl_enable() const throw() {
+bool configuration::get_ssl_enable() const throw () {
   return (_ssl_enable);
 }
 
@@ -144,7 +144,7 @@ bool configuration::get_ssl_enable() const throw() {
  *
  *  @return The keyfile path.
  */
-QString const& configuration::get_ssl_keyfile() const throw() {
+std::string const& configuration::get_ssl_keyfile() const throw () {
   return (_ssl_keyfile);
 }
 
@@ -153,7 +153,7 @@ QString const& configuration::get_ssl_keyfile() const throw() {
  *
  *  @return The password.
  */
-QString const& configuration::get_ssl_password() const throw() {
+std::string const& configuration::get_ssl_password() const throw () {
   return (_ssl_password);
 }
 
@@ -162,7 +162,7 @@ QString const& configuration::get_ssl_password() const throw() {
  *
  *  @return The thread count.
  */
-unsigned int configuration::get_thread_count() const throw() {
+unsigned int configuration::get_thread_count() const throw () {
   return (_thread_count);
 }
 
@@ -170,23 +170,22 @@ unsigned int configuration::get_thread_count() const throw() {
  *  Parse configuration file.
  */
 void configuration::parse() {
-  QFile file(_filename);
-  if (file.open(QFile::ReadOnly | QFile::Text) == false) {
-    throw (engine_error() << file.errorString());
-  }
+  QFile file(_filename.c_str());
+  if (file.open(QFile::ReadOnly | QFile::Text) == false)
+    throw (engine_error() << file.errorString().toStdString());
   _reader.setDevice(&file);
 
   while (!_reader.atEnd()) {
     if (_reader.isStartElement()) {
-      _path += "/" + _reader.name().toString();
+      _path.append("/");
+      _path.append(_reader.name().toString().toStdString());
 
-      QHash<QString, void (configuration::*)()>::const_iterator it = _keytab.find(_path);
-      if (it == _keytab.end()) {
+      std::map<std::string, void (configuration::*)()>::const_iterator
+        it(_keytab.find(_path));
+      if (it == _keytab.end())
       	throw (engine_error() << "line " << _reader.lineNumber());
-      }
-      if (it.value() != NULL) {
-      	(this->*it.value())();
-      }
+      if (it->second)
+      	(this->*it->second)();
     }
     if (_reader.isEndElement()) {
       _path = _path.left(_path.lastIndexOf('/'));
@@ -201,8 +200,9 @@ void configuration::parse() {
  *
  *  @param[in] filename The configuration filename.
  */
-void configuration::set_filename(QString const& filename) {
+void configuration::set_filename(std::string const& filename) {
   _filename = filename;
+  return ;
 }
 
 /**
@@ -274,16 +274,16 @@ void configuration::_set_ssl_dh() {
  *  Set if ssl is enable.
  */
 void configuration::_set_ssl_enable() {
-  QString const& value = _reader.readElementText();
+  std::string const& value = _reader.readElementText();
   if (value == "true") {
     _ssl_enable = true;
   }
   else if (value == "false") {
     _ssl_enable = false;
   }
-  else {
+  else
     throw (engine_error() << "line " << _reader.lineNumber());
-  }
+  return ;
 }
 
 /**

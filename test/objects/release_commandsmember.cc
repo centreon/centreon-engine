@@ -17,25 +17,34 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <cstdlib>
 #include <exception>
-#include <QDebug>
+#include <iostream>
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/macros.hh"
+#include "com/centreon/engine/utils.hh"
 #include "test/objects/create_object.hh"
 #include "test/objects/release.hh"
 
 using namespace test::objects;
 
+/**
+ *  Release command member.
+ *
+ *  @return EXIT_SUCCESS on success.
+ */
 int main() {
   try {
+    // Tests.
     release_null_pointer(static_cast<commandsmember const*>(NULL));
     release_objects(&create_commandsmember);
     release_objects(&create_commandsmember, 10);
   }
   catch (std::exception const& e) {
-    qDebug() << "error: " << e.what();
+    std::cerr << "error: " << e.what() << std::endl;
     free_memory(get_global_macros());
-    return (1);
+    return (EXIT_FAILURE);
   }
-  return (0);
+
+  return (EXIT_SUCCESS);
 }

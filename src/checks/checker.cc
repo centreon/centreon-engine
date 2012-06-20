@@ -55,13 +55,10 @@ std::auto_ptr<checker> checker::_instance;
 checker::~checker() throw () {
   try {
     QMutexLocker lock(&_mut_reap);
-    for (QQueue<check_result>::iterator
-           it = _to_reap.begin(),
-           end = _to_reap.end();
-         it != end;
-         ++it)
-      free_check_result(&*it);
-    _to_reap.clear();
+    while (!_to_reap.empty()) {
+      free_check_result(&_to_reap.front());
+      _to_reap.pop();
+    }
   }
   catch (...) {}
 }
@@ -91,7 +88,7 @@ void checker::load() {
  */
 void checker::push_check_result(check_result const& result) {
   QMutexLocker lock(&_mut_reap);
-  _to_reap.enqueue(result);
+  _to_reap.push(result);
   return ;
 }
 
@@ -110,12 +107,13 @@ void checker::reap() {
   unsigned int reaped_checks(0);
   { // Scope to release mutex in all termination cases.
     QMutexLocker lock(&_mut_reap);
-    while (!_to_reap.isEmpty()) {
+    while (!_to_reap.empty()) {
       // Get result host or service check.
       logger(dbg_checks, basic)
         << "Found a check result (#" << ++reaped_checks
         << ") to handle...";
-      check_result result(_to_reap.dequeue());
+      check_result result(_to_reap.front());
+      _to_reap.pop();
       lock.unlock();
 
       // Service check result.
@@ -199,7 +197,7 @@ void checker::reap() {
  */
 bool checker::reaper_is_empty() {
   QMutexLocker lock(&_mut_reap);
-  return (_to_reap.isEmpty());
+  return (_to_reap.empty());
 }
 
 /**
@@ -853,7 +851,7 @@ void checker::_command_executed(cce_commands_result const& res) {
   // Queue check result.
   {
     QMutexLocker lock(&_mut_reap);
-    _to_reap.enqueue(result);
+    _to_reap.push(result);
   }
 
   // Debug message.

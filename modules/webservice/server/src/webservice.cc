@@ -155,15 +155,16 @@ void webservice::_init() {
   }
 #endif // !WITH_OPENSSL
 
-  char const* host = (_config.get_host() != "" ? _config.get_host().toStdString().c_str() : NULL);
-  SOAP_SOCKET m_socket = soap_bind(&_soap_ctx,
-				   host,
-				   _config.get_port(),
-				   100);
-  if (!soap_valid_socket(m_socket)) {
-    throw (engine_error() << "bind with host `" << _config.get_host()
-	   << "' on port `" << _config.get_port() << "' failed.");
-  }
+  char const*
+    host(_config.get_host() != "" ? _config.get_host().c_str() : NULL);
+  SOAP_SOCKET m_socket(soap_bind(
+                         &_soap_ctx,
+                         host,
+                         _config.get_port(),
+                         100));
+  if (!soap_valid_socket(m_socket))
+    throw (engine_error() << "bind with host '" << _config.get_host()
+           << "' on port '" << _config.get_port() << "' failed");
 }
 
 /**
