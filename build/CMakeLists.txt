@@ -1042,7 +1042,20 @@ broker_module=${MODULE_PATH} ${MODULE_ARGS}")
     "centengine" "-v" "${TEST_DIR}/running/etc/service_with_no_check_cmd.cfg")
   set_tests_properties("${TEST_NAME}"
     PROPERTIES WILL_FAIL TRUE)
-
+  # Logs are generated for broker modules.
+  set(TEST_NAME "running_logs_for_modules")
+  add_library("logs_for_modules" SHARED
+    "${TEST_DIR}/running/logs_for_modules.cc")
+  unset(MODULE_PATH)
+  get_property(MODULE_PATH
+    TARGET "logs_for_modules"
+    PROPERTY LOCATION)
+  set(CFG_CONTENT
+    "broker_module=${MODULE_PATH}")
+  configure_file("${TEST_DIR}/running/etc/minimal.cfg.in"
+    "${TEST_DIR}/running/etc/logs_for_modules.cfg")
+  add_test("${TEST_NAME}"
+    "centengine" "${TEST_DIR}/running/etc/logs_for_modules.cfg")
 endif ()
 
 #
