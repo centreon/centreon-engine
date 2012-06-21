@@ -18,9 +18,7 @@
 */
 
 #include <QDateTime>
-#include "com/centreon/engine/logging/broker.hh"
 #include "com/centreon/engine/logging/logger.hh"
-#include "com/centreon/engine/logging.hh"
 
 using namespace com::centreon::engine::logging;
 
@@ -296,35 +294,8 @@ void logger::_flush() {
   // End-of-line.
   _buffer << "\n";
 
-  // Prepare data.
-  std::string str(_buffer.str());
-  char const* ptr(str.c_str());
-
-  // Notify broker.
-  if (_type & (NSLOG_RUNTIME_ERROR
-               | NSLOG_RUNTIME_WARNING
-               | NSLOG_VERIFICATION_ERROR
-               | NSLOG_VERIFICATION_WARNING
-               | NSLOG_CONFIG_ERROR
-               | NSLOG_CONFIG_WARNING
-               | NSLOG_PROCESS_INFO
-               | NSLOG_EVENT_HANDLER
-               | NSLOG_EXTERNAL_COMMAND
-               | NSLOG_HOST_UP
-               | NSLOG_HOST_DOWN
-               | NSLOG_HOST_UNREACHABLE
-               | NSLOG_SERVICE_OK
-               | NSLOG_SERVICE_UNKNOWN
-               | NSLOG_SERVICE_WARNING
-               | NSLOG_SERVICE_CRITICAL
-               | NSLOG_PASSIVE_CHECK
-               | NSLOG_INFO_MESSAGE
-               | NSLOG_HOST_NOTIFICATION
-               | NSLOG_SERVICE_NOTIFICATION))
-    broker().log(ptr, _type, _verbosity);
-
   // Standard logging objects.
-  engine::instance().log(ptr, _type, _verbosity);
+  engine::instance().log(_buffer.str().c_str(), _type, _verbosity);
 
   return ;
 }
@@ -333,6 +304,6 @@ void logger::_flush() {
  *  Do nothing.
  */
 void logger::_nothing() {
-
+  return ;
 }
 
