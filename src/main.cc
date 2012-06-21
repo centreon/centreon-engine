@@ -358,6 +358,12 @@ int main(int argc, char** argv) {
       try {
         config.parse(config_file);
         configuration::applier::logging::instance().apply(config);
+        engine::obj_info obj(
+                           QSharedPointer<logging::broker>(
+                             new logging::broker),
+                           log_all,
+                           basic);
+        engine::instance().add_object(obj);
         result = OK;
       }
       catch(std::exception const &e) {
