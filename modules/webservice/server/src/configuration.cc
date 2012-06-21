@@ -188,7 +188,11 @@ void configuration::parse() {
       	(this->*it->second)();
     }
     if (_reader.isEndElement()) {
-      _path = _path.left(_path.lastIndexOf('/'));
+      size_t last_slash(_path.rfind('/'));
+      if (std::string::npos == last_slash)
+        _path.clear();
+      else
+        _path = _path.substr(0, last_slash);
     }
     _reader.readNext();
   }
@@ -220,7 +224,8 @@ void configuration::_set_accept_timeout() {
  *  Set the server host name.
  */
 void configuration::_set_host() {
-  _host = _reader.readElementText();
+  _host = _reader.readElementText().toStdString();
+  return ;
 }
 
 /**
@@ -260,21 +265,23 @@ void configuration::_set_send_timeout() {
  *  Set the certificate path (for authentication).
  */
 void configuration::_set_ssl_cacert() {
-  _ssl_cacert = _reader.readElementText();
+  _ssl_cacert = _reader.readElementText().toStdString();
+  return ;
 }
 
 /**
  *  Set the Diffie-Helman path (for authentication).
  */
 void configuration::_set_ssl_dh() {
-  _ssl_dh = _reader.readElementText();
+  _ssl_dh = _reader.readElementText().toStdString();
+  return ;
 }
 
 /**
  *  Set if ssl is enable.
  */
 void configuration::_set_ssl_enable() {
-  std::string const& value = _reader.readElementText();
+  std::string const& value(_reader.readElementText().toStdString());
   if (value == "true") {
     _ssl_enable = true;
   }
@@ -290,14 +297,16 @@ void configuration::_set_ssl_enable() {
  *  Set the keyfile path (for authentication).
  */
 void configuration::_set_ssl_keyfile() {
-  _ssl_keyfile = _reader.readElementText();
+  _ssl_keyfile = _reader.readElementText().toStdString();
+  return ;
 }
 
 /**
  *  Set the password (for authentication).
  */
 void configuration::_set_ssl_password() {
-  _ssl_password = _reader.readElementText();
+  _ssl_password = _reader.readElementText().toStdString();
+  return ;
 }
 
 /**

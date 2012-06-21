@@ -1,5 +1,5 @@
 /*
-** Copyright 2011 Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -18,62 +18,60 @@
 */
 
 #ifndef CCE_SCRIPT_ARGUMENT_HH
-# define CCE_SCRIPT_ARGUMENT_HH
+#  define CCE_SCRIPT_ARGUMENT_HH
 
-# include <QString>
-# include <QList>
+#  include <list>
+#  include <string>
+#  include "com/centreon/engine/namespace.hh"
 
-namespace                        com {
-  namespace                      centreon {
-    namespace                    engine {
-      namespace                  script {
-	/**
-	 *  @class argument argument.hh
-	 *  @brief Argument information class.
-	 *
-	 *  Argument provide basic information on variable type.
-	 */
-	class                    argument {
-	public:
-	                         argument(QString const& type = "",
-					  QString const& name = "",
-					  QString const& help = "",
-					  bool is_optional = false,
-					  bool is_array = false);
-	                         argument(argument const& right);
-	                         ~argument() throw();
+CCE_BEGIN()
 
-	  argument&              operator=(argument const& right);
-	  bool                   operator==(argument const& right) const throw();
-	  bool                   operator!=(argument const& right) const throw();
+namespace                  script {
+  /**
+   *  @class argument argument.hh
+   *  @brief Argument information class.
+   *
+   *  Argument provide basic information on variable type.
+   */
+  class                    argument {
+  public:
+                           argument(
+                             std::string const& type = "",
+                             std::string const& name = "",
+                             std::string const& help = "",
+                             bool is_optional = false,
+                             bool is_array = false);
+                           argument(argument const& right);
+                           ~argument() throw ();
+    argument&              operator=(argument const& right);
+    bool                   operator==(
+                             argument const& right) const throw ();
+    bool                   operator!=(
+                             argument const& right) const throw ();
+    argument&              add(argument const& arg);
+    std::list<argument> const&
+                           get_args() const throw ();
+    std::string const&     get_help() const throw ();
+    std::string const&     get_name() const throw ();
+    std::string const&     get_type() const throw ();
+    bool                   is_array() const throw ();
+    bool                   is_optional() const throw ();
+    bool                   is_primitive() const throw ();
+    argument&              set_help(std::string const& help);
+    argument&              set_is_array(bool value) throw ();
+    argument&              set_is_optional(bool value) throw ();
+    argument&              set_name(std::string const& name);
 
-	  QString const&         get_type() const throw();
-	  QString const&         get_name() const throw();
-	  QString const&         get_help() const throw();
-	  bool                   is_optional() const throw();
-	  bool                   is_array() const throw();
-
-	  argument&              set_name(QString const& name);
-	  argument&              set_help(QString const& help);
-	  argument&              set_is_optional(bool value) throw();
-	  argument&              set_is_array(bool value) throw();
-
-	  argument&              add(argument const& arg);
-	  QList<argument> const& get_args() const throw();
-
-	  bool                   is_primitive() const throw();
-
-	private:
-	  QString                _type;
-	  QString                _name;
-	  QString                _help;
-	  QList<argument>        _list;
-	  bool                   _is_optional;
-	  bool                   _is_array;
-	};
-      }
-    }
-  }
+  private:
+    std::string            _help;
+    bool                   _is_array;
+    bool                   _is_optional;
+    std::list<argument>    _list;
+    std::string            _name;
+    std::string            _type;
+  };
 }
+
+CCE_END()
 
 #endif // !CCE_SCRIPT_ARGUMENT_HH

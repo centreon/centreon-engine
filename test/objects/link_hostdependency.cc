@@ -104,13 +104,15 @@ static void link_null_dependent_name() {
 }
 
 static void link_without_dependency_period() {
-  if (create_and_link(false) == true)
-    throw (engine_error() << Q_FUNC_INFO << " invalid return.");
+  if (create_and_link(false))
+    throw (engine_error() << __func__ << " failed: invalid return");
+  return ;
 }
 
 static void link_with_valid_objects() {
-  if (create_and_link(true) == true)
-    throw (engine_error() << Q_FUNC_INFO << " invalid return.");
+  if (create_and_link(true))
+    throw (engine_error() << __func__ << " failed: invalid return");
+  return ;
 }
 
 /**

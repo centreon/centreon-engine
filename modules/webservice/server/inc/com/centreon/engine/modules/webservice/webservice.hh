@@ -21,7 +21,6 @@
 #  define CCE_MOD_WS_WERBSERVICE_HH
 
 #  include <QRunnable>
-#  include <QString>
 #  include <QThread>
 #  include "soapH.h"
 #  include "com/centreon/engine/modules/webservice/configuration.hh"

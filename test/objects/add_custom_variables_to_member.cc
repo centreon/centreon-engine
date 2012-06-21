@@ -32,26 +32,28 @@ using namespace test::objects;
 void add_with_null_member() {
   std::vector<std::string> objs;
   if (add_custom_variables_to_object(objs, NULL) == true)
-    throw (engine_error() << Q_FUNC_INFO << " invalid return");
+    throw (engine_error() << __func__ << " failed: invalid return");
 }
 
 void add_without_objects() {
   customvariablesmember* head = NULL;
   std::vector<std::string> objs;
   if (add_custom_variables_to_object(objs, &head) == false)
-    throw (engine_error() << Q_FUNC_INFO << " invalid return");
+    throw (engine_error() << __func__ << " failed: invalid return");
 }
 
 void add_with_objects(unsigned int id) {
   init_object_skiplists();
   customvariablesmember* head = NULL;
   std::vector<std::string> objs;
-  for (unsigned int i(0); i < id; ++i)
-    objs.push_back(
-           QString("_key%1=value%2").arg(id).arg(id).toStdString());
+  for (unsigned int i(0); i < id; ++i) {
+    std::ostringstream oss;
+    oss << "_key" << id << "=value" << id;
+    objs.push_back(oss.str());
+  }
 
   if (add_custom_variables_to_object(objs, &head) == false)
-    throw (engine_error() << Q_FUNC_INFO << " invalid return.");
+    throw (engine_error() << __func__ << " failed: invalid return");
 
   customvariablesmember const* member = head;
   while ((member = release(member)));
