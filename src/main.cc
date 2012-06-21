@@ -352,6 +352,12 @@ int main(int argc, char** argv) {
       try {
         config.parse(config_file);
         apply_log->apply(config);
+        engine::obj_info obj(
+                           QSharedPointer<logging::broker>(
+                             new logging::broker),
+                           log_all,
+                           basic);
+        engine::instance().add_object(obj);
         result = OK;
       }
       catch(std::exception const &e) {
@@ -377,8 +383,10 @@ int main(int argc, char** argv) {
       try {
         com::centreon::engine::broker::loader& loader(
           com::centreon::engine::broker::loader::instance());
-        loader.set_directory(config.get_broker_module_directory());
-        loader.load();
+        if (!config.get_broker_module_directory().isEmpty()) {
+          loader.set_directory(config.get_broker_module_directory());
+          loader.load();
+        }
       }
       catch (std::exception const& e) {
         logger(log_info_message, basic)
