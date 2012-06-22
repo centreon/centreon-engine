@@ -539,14 +539,19 @@ processing::processing() {
                  &_redirector<&cmd_process_external_commands_from_file>);
 }
 
-processing::~processing() throw() {
+processing::~processing() throw () {}
 
-}
-
-bool processing::execute(QString const& cmd) const {
+bool processing::execute(std::string const& cmd) const {
   logger(dbg_functions, basic) << "processing external command";
 
-  char* command(my_strdup(qPrintable(cmd.trimmed())));
+  // Trim command.
+  char* command(my_strdup(cmd.substr(cmd.find_first_not_of(
+                                           " \t\n\r")).c_str()));
+  {
+    size_t len;
+    while (*command && isspace(command[(len = strlen(command) - 1)]))
+      command[len] = '\0';
+  }
 
   logger(dbg_external_command, most) << "raw command: " << command;
 
@@ -572,10 +577,10 @@ bool processing::execute(QString const& cmd) const {
   char* args(command + pos + 1);
   int command_id(CMD_CUSTOM_COMMAND);
 
-  QHash<QString, command_info>::const_iterator it
-    = _lst_command.find(command_name);
+  std::map<std::string, command_info>::const_iterator
+    it(_lst_command.find(command_name));
   if (it != _lst_command.end())
-    command_id = it.value().id;
+    command_id = it->second.id;
   else if (command_name[0] != '_') {
     logger(log_external_command | log_runtime_warning, basic)
       << "Warning: Unrecognized external command -> " << command_name;
@@ -613,7 +618,7 @@ bool processing::execute(QString const& cmd) const {
                           NULL);
 
   if (it != _lst_command.end())
-    (*it.value().func)(command_id, entry_time, args);
+    (*it->second.func)(command_id, entry_time, args);
 
   // send data to event broker.
   broker_external_command(NEBTYPE_EXTERNALCOMMAND_END,

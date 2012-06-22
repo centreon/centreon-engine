@@ -17,10 +17,10 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <ctime>
 #include <exception>
 #include <QCoreApplication>
-#include <QDateTime>
-#include <QDebug>
+#include <sstream>
 #include "com/centreon/engine/commands/connector/command.hh"
 #include "com/centreon/engine/error.hh"
 #include "test/commands/wait_process.hh"
@@ -36,12 +36,17 @@ using namespace com::centreon::engine::commands;
  */
 static bool restart_with_segfault() {
   nagios_macros macros = nagios_macros();
-  QString command_line = "./bin_connector_test_run --kill="
-    + QString("%1").arg(QDateTime::currentDateTime().toTime_t());
-  connector::command cmd(__func__,
-			 "./bin_connector_test_run",
-                         __func__,
-			 command_line);
+  std::string command_line;
+  {
+    std::ostringstream oss;
+    oss << "./bin_connector_test_run --kill=" << time(NULL);
+    command_line = oss.str();
+  }
+  connector::command cmd(
+                       __func__,
+                       "./bin_connector_test_run",
+                       __func__,
+                       command_line);
 
   wait_process wait_proc(cmd);
 
@@ -67,10 +72,11 @@ static bool restart_with_segfault() {
  */
 static bool restart_with_execution_limit() {
   nagios_macros macros = nagios_macros();
-  connector::command cmd(__func__,
-        		 "./bin_connector_test_run",
-                         __func__,
-        		 "./bin_connector_test_run --timeout=off");
+  connector::command cmd(
+                       __func__,
+                       "./bin_connector_test_run",
+                       __func__,
+                       "./bin_connector_test_run --timeout=off");
 
   cmd.set_max_check_for_restart(2);
   wait_process wait_proc(cmd);

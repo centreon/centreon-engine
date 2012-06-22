@@ -20,15 +20,15 @@
 #ifndef TEST_COMMANDS_CONNECTOR_CHECK_REQUEST_HH
 #  define TEST_COMMANDS_CONNECTOR_CHECK_REQUEST_HH
 
-#  include <QByteArray>
+#  include <string>
 #  include "com/centreon/engine/commands/connector/request.hh"
 
 #  define CMD_END       "\0\0\0\0"
 #  define TOSTR_(x)     #x
 #  define TOSTR(x)      TOSTR_(x)
-#  define REQUEST(data) QByteArray((data), sizeof((data)) - 1)
+#  define REQUEST(data) std::string((data), sizeof((data)) - 1)
 
-const int end_size = com::centreon::engine::commands::connector::request::cmd_ending().size();
+const unsigned int end_size(com::centreon::engine::commands::connector::request::cmd_ending().size());
 
 /**
  *  Check if the request is valid.
@@ -38,13 +38,13 @@ const int end_size = com::centreon::engine::commands::connector::request::cmd_en
  *
  *  @return True if the request are ok, false otherwise.
  */
-static bool check_request_valid(com::centreon::engine::commands::connector::request* req,
-				QByteArray request_data) {
-  QByteArray data = req->build();
-  if (data != request_data) {
+static bool check_request_valid(
+              com::centreon::engine::commands::connector::request* req,
+              std::string request_data) {
+  std::string data(req->build());
+  if (data != request_data)
     return (false);
-  }
-  req->restore(data.remove(data.size() - end_size, end_size));
+  req->restore(data.erase(data.size() - end_size, end_size));
   return (true);
 }
 
@@ -57,8 +57,8 @@ static bool check_request_valid(com::centreon::engine::commands::connector::requ
  */
 static bool check_request_invalid(com::centreon::engine::commands::connector::request* req) {
   try {
-    QByteArray data = REQUEST(".\0\0\0\0");
-    req->restore(data.remove(data.size() - end_size, end_size));
+    std::string data(REQUEST(".\0\0\0\0"));
+    req->restore(data.erase(data.size() - end_size, end_size));
   }
   catch (...) {
     return (true);

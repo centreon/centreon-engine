@@ -20,8 +20,8 @@
 #include <exception>
 #include <QCoreApplication>
 #include <QDebug>
-#include <QString>
 #include <QTemporaryFile>
+#include <string>
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/modules/external_commands/commands.hh"
 #include "com/centreon/engine/globals.hh"
@@ -41,8 +41,10 @@ static int check_process_file() {
   tmp.close();
 
   config.set_enable_notifications(false);
-  QString cmd("[1317196300] PROCESS_FILE;" + tmp.fileName() + ";0\n");
-  process_external_command(qPrintable(cmd));
+  std::string cmd("[1317196300] PROCESS_FILE;");
+  cmd.append(tmp.fileName().toStdString());
+  cmd.append(";0\n");
+  process_external_command(cmd.c_str());
 
   if (!config.get_enable_notifications())
     throw (engine_error() << "process_file failed.");

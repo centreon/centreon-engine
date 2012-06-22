@@ -19,7 +19,6 @@
 
 #include <exception>
 #include <QCoreApplication>
-#include <QDebug>
 #include "com/centreon/engine/commands/connector/execute_query.hh"
 #include "com/centreon/engine/error.hh"
 #include "test/unittest.hh"
@@ -51,19 +50,23 @@ line lines[] = {
 int main_test() {
   for (unsigned int i = 0; lines[i].command != NULL; ++i) {
     execute_query query(0, lines[i].command, QDateTime::currentDateTime(), 0);
-    QStringList list = query.get_args();
+    std::list<std::string> list(query.get_args());
 
-    QString result;
-    for (QStringList::const_iterator it = list.begin(), end = list.end();
+    std::string result;
+    for (std::list<std::string>::const_iterator
+           it(list.begin()),
+           end(list.end());
          it != end;
          ++it) {
       result += *it;
-      if (it + 1 != end) {
+      std::list<std::string>::const_iterator next(it);
+      ++next;
+      if (next != end)
         result += ' ';
-      }
     }
     if (result != lines[i].result)
-      throw (engine_error() << "error: command '" << lines[i].command << "' failed.");
+      throw (engine_error() << "error: command '"
+             << lines[i].command << "' failed");
   }
 
   return (0);

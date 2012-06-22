@@ -20,9 +20,9 @@
 #ifndef CCE_MOD_EXTCMD_PROCESSING_HH
 #  define CCE_MOD_EXTCMD_PROCESSING_HH
 
-#  include <QHash>
+#  include <map>
 #  include <QSharedPointer>
-#  include <QString>
+#  include <string>
 #  include "com/centreon/engine/namespace.hh"
 
 CCE_BEGIN()
@@ -33,7 +33,7 @@ namespace         modules {
     public:
                   processing();
                   ~processing() throw ();
-      bool        execute(QString const& cmd) const;
+      bool        execute(std::string const& cmd) const;
 
     private:
       struct      command_info {
@@ -277,14 +277,14 @@ namespace         modules {
         if (!group)
           return ;
 
-        for (contactsmember* member = group->members;
-             member != NULL;
+        for (contactsmember* member(group->members);
+             member;
              member = member->next)
           if (member->contact_ptr)
             (*fptr)(member->contact_ptr);
       }
 
-      QHash<QString, command_info> _lst_command;
+      std::map<std::string, command_info> _lst_command;
     };
   }
 }

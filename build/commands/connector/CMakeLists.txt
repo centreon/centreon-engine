@@ -54,7 +54,7 @@ add_library("cce_connector"
 # Link target with libraries.
 # target_link_libraries("cce_connector" "cce_core" ${QT_LIBRARIES})
 
-if (WITH_TESTING AND 0)
+if (WITH_TESTING)
   # Set directories.
   set(TEST_DIR "${TEST_DIR}/commands/connector")
 
@@ -64,7 +64,7 @@ if (WITH_TESTING AND 0)
 
   # Test binary.
   add_executable("bin_connector_test_run" "${TEST_DIR}/bin_connector_test_run.cc")
-  target_link_libraries("bin_connector_test_run" "cce_commands" ${QT_LIBRARIES})
+  target_link_libraries("bin_connector_test_run" "cce_commands" "cce_core" ${QT_LIBRARIES})
 
   # Test connector.
   add_executable("connector_ctor" "${TEST_DIR}/connector_ctor.cc")
