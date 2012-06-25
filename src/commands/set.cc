@@ -17,12 +17,14 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <assert.h>
-#include <stdlib.h>
+#include <cassert>
+#include <cstdlib>
 #include "com/centreon/engine/commands/set.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/logging/logger.hh"
+#include "com/centreon/shared_ptr.hh"
 
+using namespace com::centreon;
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;
 using namespace com::centreon::engine::commands;
@@ -47,7 +49,7 @@ set::~set() throw () {}
  *  @param[in] cmd The new command.
  */
 void set::add_command(command const& cmd) {
-  add_command(QSharedPointer<command>(cmd.clone()));
+  add_command(shared_ptr<command>(cmd.clone()));
   return ;
 }
 
@@ -56,7 +58,7 @@ void set::add_command(command const& cmd) {
  *
  *  @param[in] cmd The new command.
  */
-void set::add_command(QSharedPointer<command> cmd) {
+void set::add_command(shared_ptr<command> cmd) {
   if (connect(
         &(*cmd),
         SIGNAL(name_changed(std::string const&, std::string const&)),
@@ -76,9 +78,9 @@ void set::add_command(QSharedPointer<command> cmd) {
  *
  *  @return The shared pointer on a command object.
  */
-QSharedPointer<commands::command> set::get_command(
-                                         std::string const& cmd_name) {
-  std::map<std::string, QSharedPointer<command> >::iterator
+shared_ptr<commands::command> set::get_command(
+                                     std::string const& cmd_name) {
+  std::map<std::string, shared_ptr<command> >::iterator
     it(_list.find(cmd_name));
   if (it == _list.end())
     throw (engine_error() << "command '" << cmd_name << "' not found");
@@ -131,7 +133,7 @@ void set::command_name_changed(
             std::string const& old_name,
             std::string const& new_name) {
   (void)new_name;
-  QSharedPointer<commands::command> cmd(get_command(old_name));
+  shared_ptr<commands::command> cmd(get_command(old_name));
   remove_command(old_name);
   add_command(cmd);
   return ;

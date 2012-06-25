@@ -32,7 +32,9 @@
 #include "com/centreon/engine/macros.hh"
 #include "com/centreon/engine/objects.hh"
 #include "com/centreon/engine/version.hh"
+#include "com/centreon/shared_ptr.hh"
 
+using namespace com::centreon;
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;
 using namespace com::centreon::engine::commands;
@@ -146,10 +148,11 @@ unsigned long connector::command::run(std::string const& processed_cmd,
   unsigned long id = get_uniq_id();
 
   QDateTime now = QDateTime::currentDateTime();
-  QSharedPointer<request> query(new execute_query(id,
-						  processed_cmd,
-						  now,
-						  timeout));
+  shared_ptr<request> query(new execute_query(
+                                  id,
+                                  processed_cmd,
+                                  now,
+                                  timeout));
   request_info info = { query, now, timeout, false };
 
   _queries.insert(std::pair<unsigned long, request_info>(id, info));
@@ -201,10 +204,11 @@ void connector::command::run(std::string const& processed_cmd,
   unsigned long id = get_uniq_id();
 
   QDateTime now = QDateTime::currentDateTime();
-  QSharedPointer<request> query(new execute_query(id,
-						  processed_cmd,
-						  now,
-						  timeout));
+  shared_ptr<request> query(new execute_query(
+                                  id,
+                                  processed_cmd,
+                                  now,
+                                  timeout));
   request_info info = { query, now, timeout, true };
   _queries.insert(std::pair<unsigned long, request_info>(id, info));
 
@@ -358,20 +362,16 @@ void connector::command::_state_change(QProcess::ProcessState new_state) {
 void connector::command::_ready_read() {
   std::list<std::string> responses;
 
+  // Read process output.
   {
     QMutexLocker locker(&_mutex);
-
-    _read_data += _process->readAllStandardOutput();
+    _read_data.append(_process->readAllStandardOutput());
     while (_read_data.size() > 0) {
-      /*
-        // XXX: todo.
-      int pos = _read_data.indexOf(request::cmd_ending());
-      if (pos < 0) {
-	break;
-      }
-      responses.push_back(_read_data.left(pos));
-      _read_data.remove(0, pos + request::cmd_ending().size());
-      */
+      size_t pos(_read_data.find(request::cmd_ending()));
+      if (pos == std::string::npos)
+	break ;
+      responses.push_back(_read_data.substr(0, pos));
+      _read_data.erase(0, pos + request::cmd_ending().size());
     }
   }
 
@@ -381,7 +381,7 @@ void connector::command::_ready_read() {
        it != end;
        ++it) {
     try {
-      QSharedPointer<request> req = req_builder.build(*it);
+      shared_ptr<request> req(req_builder.build(*it));
       std::map<request::e_type, void (command::*)(request*)>::iterator
 	it = _req_func.find(req->get_id());
       if (it == _req_func.end()) {
@@ -406,14 +406,13 @@ void connector::command::_start() {
   QMutexLocker locker(&_mutex);
   _nbr_check = 0;
 
-  if (_process.isNull() == false) {
+  if (_process.get()) {
     disconnect(&(*_process), SIGNAL(readyReadStandardOutput()),
   	       this, SLOT(_ready_read()));
     disconnect(&(*_process), SIGNAL(stateChanged(QProcess::ProcessState)),
   	       this, SLOT(_state_change(QProcess::ProcessState)));
   }
-  _process = QSharedPointer<basic_process>(new basic_process,
-                                           &QObject::deleteLater);
+  _process = shared_ptr<basic_process>(new basic_process);
   connect(&(*_process), SIGNAL(readyReadStandardOutput()),
 	  this, SLOT(_ready_read()));
 
@@ -461,16 +460,14 @@ void connector::command::_start() {
 void connector::command::_exit() {
   QMutexLocker locker(&_mutex);
 
-  if (_process.isNull() == true || _is_exiting == true) {
-    return;
-  }
+  if (!_process.get() || _is_exiting)
+    return ;
 
   disconnect(&(*_process), SIGNAL(stateChanged(QProcess::ProcessState)),
 	     this, SLOT(_state_change(QProcess::ProcessState)));
 
-  if (_process->state() == QProcess::NotRunning) {
-    return;
-  }
+  if (_process->state() == QProcess::NotRunning)
+    return ;
 
   _is_exiting = true;
 

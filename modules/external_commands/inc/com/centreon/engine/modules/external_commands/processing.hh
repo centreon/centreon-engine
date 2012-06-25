@@ -21,7 +21,6 @@
 #  define CCE_MOD_EXTCMD_PROCESSING_HH
 
 #  include <map>
-#  include <QSharedPointer>
 #  include <string>
 #  include "com/centreon/engine/namespace.hh"
 

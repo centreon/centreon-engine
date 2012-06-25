@@ -18,13 +18,13 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <assert.h>
+#include <cassert>
+#include <cstdlib>
+#include <cstring>
 #include <QByteArray>
 #include <QMetaType>
 #include <QMutexLocker>
 #include <sstream>
-#include <stdlib.h>
-#include <string.h>
 #include <sys/time.h>
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/checks.hh"
@@ -36,7 +36,9 @@
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/neberrors.hh"
 #include "com/centreon/engine/shared.hh"
+#include "com/centreon/shared_ptr.hh"
 
+using namespace com::centreon;
 using namespace com::centreon::engine::logging;
 using namespace com::centreon::engine::checks;
 
@@ -345,7 +347,7 @@ void checker::run(
 
   // Get command object.
   commands::set& cmd_set(commands::set::instance());
-  QSharedPointer<commands::command>
+  shared_ptr<commands::command>
     cmd(cmd_set.get_command(hst->check_command_ptr->name));
   std::string processed_cmd(cmd->process_cmd(&macros));
   char* processed_cmd_ptr(my_strdup(processed_cmd.c_str()));
@@ -550,7 +552,7 @@ void checker::run(
 
   // Get command object.
   commands::set& cmd_set(commands::set::instance());
-  QSharedPointer<commands::command>
+  shared_ptr<commands::command>
     cmd(cmd_set.get_command(svc->check_command_ptr->name));
   std::string processed_cmd(cmd->process_cmd(&macros));
   char* processed_cmd_ptr(my_strdup(processed_cmd.c_str()));
@@ -953,7 +955,7 @@ int checker::_execute_sync(host* hst) {
 
   // Get command object.
   commands::set& cmd_set(commands::set::instance());
-  QSharedPointer<commands::command>
+  shared_ptr<commands::command>
     cmd(cmd_set.get_command(hst->check_command_ptr->name));
   std::string processed_cmd(cmd->process_cmd(&macros));
   char* tmp_processed_cmd(my_strdup(processed_cmd.c_str()));

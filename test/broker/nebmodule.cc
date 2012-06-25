@@ -24,6 +24,7 @@
 #include "com/centreon/engine/broker/loader.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/nebmods.hh"
+#include "com/centreon/shared_ptr.hh"
 #include "test/broker/mod_load.hh"
 #include "test/unittest.hh"
 
@@ -54,8 +55,9 @@ int main_test() {
   if (loader.get_modules().size() != 2)
     throw (engine_error() << __func__ << ": invalid modules size.");
 
-  std::list<QSharedPointer<handle> > modules(loader.get_modules());
-  for (std::list<QSharedPointer<handle> >::const_iterator
+  std::list<com::centreon::shared_ptr<handle> >
+    modules(loader.get_modules());
+  for (std::list<com::centreon::shared_ptr<handle> >::const_iterator
          it(modules.begin()),
          end(modules.end());
        it != end;

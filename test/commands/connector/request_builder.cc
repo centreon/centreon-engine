@@ -34,11 +34,10 @@ using namespace com::centreon::engine::commands::connector;
  */
 static bool is_valid() {
   request_builder& builder = request_builder::instance();
-  if (builder.build("0\0\0\0\0").isNull() == true
-      || builder.build("4\0\0\0\0").isNull() == true
-      || builder.build("5\0\0\0\0").isNull() == true) {
+  if (!builder.build("0\0\0\0\0").get()
+      || !builder.build("4\0\0\0\0").get()
+      || !builder.build("5\0\0\0\0").get())
     return (false);
-  }
   return (true);
 }
 

@@ -22,7 +22,6 @@
 #include <list>
 #include <QCoreApplication>
 #include <QDateTime>
-#include <QSharedPointer>
 #include <string>
 #include <unistd.h>
 #include "com/centreon/engine/commands/connector/execute_query.hh"
@@ -32,8 +31,10 @@
 #include "com/centreon/engine/commands/connector/version_response.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/version.hh"
+#include "com/centreon/shared_ptr.hh"
 #include "test/unittest.hh"
 
+using namespace com::centreon;
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::commands;
 
@@ -42,9 +43,9 @@ using namespace com::centreon::engine::commands;
  *
  *  @return The request was send by engine.
  */
-static QSharedPointer<connector::request> wait() {
+static shared_ptr<connector::request> wait() {
   static connector::request_builder& req_builder = connector::request_builder::instance();
-  static std::list<QSharedPointer<connector::request> > requests;
+  static std::list<shared_ptr<connector::request> > requests;
   static std::string data;
 
   while (requests.size() == 0) {
@@ -69,7 +70,7 @@ static QSharedPointer<connector::request> wait() {
     }
   }
 
-  QSharedPointer<connector::request> req(requests.front());
+  shared_ptr<connector::request> req(requests.front());
   requests.pop_front();
   return (req);
 }
@@ -142,7 +143,7 @@ int main(int argc, char** argv) {
   QCoreApplication app(argc, argv);
   try {
     while (true) {
-      QSharedPointer<connector::request> req = wait();
+      shared_ptr<connector::request> req(wait());
 
       switch (req->get_id()) {
       case connector::request::version_q: {

@@ -23,8 +23,10 @@
 #include "com/centreon/engine/commands/raw.hh"
 #include "com/centreon/engine/commands/set.hh"
 #include "com/centreon/engine/error.hh"
+#include "com/centreon/shared_ptr.hh"
 #include "test/unittest.hh"
 
+using namespace com::centreon;
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::commands;
 
@@ -49,32 +51,32 @@ static bool command_exist(std::string const& name) {
  *  Check if the change name system works.
  */
 int main_test() {
-  // get instance.
-  set& cmd_set = set::instance();
+  // Get instance.
+  set& cmd_set(set::instance());
 
-  // add command.
+  // Add command.
   raw raw("raw", "raw argv1 argv2");
   cmd_set.add_command(raw);
 
-  // get command.
-  QSharedPointer<commands::command> cmd = cmd_set.get_command("raw");
+  // Get command.
+  shared_ptr<commands::command> cmd(cmd_set.get_command("raw"));
 
-  // change command name.
+  // Change command name.
   cmd->set_name("cmd");
 
-  // get command with new name.
-  QSharedPointer<commands::command> new_cmd = cmd_set.get_command("cmd");
+  // Get command with new name.
+  shared_ptr<commands::command> new_cmd(cmd_set.get_command("cmd"));
 
-  // check if the old command name is not found.
-  if (command_exist("raw") == true)
-    throw (engine_error() << "error: command name changed failed.");
+  // Check if the old command name is not found.
+  if (command_exist("raw"))
+    throw (engine_error() << "error: command name changed failed");
 
-  // remove new name.
+  // Remove new name.
   cmd_set.remove_command("cmd");
 
-  // check if the old command name is not found.
-  if (command_exist("cmd") == true)
-    throw (engine_error() << "error: command name changed failed.");
+  // Check if the old command name is not found.
+  if (command_exist("cmd"))
+    throw (engine_error() << "error: command name changed failed");
 
   return (0);
 }

@@ -23,6 +23,7 @@
 #include "com/centreon/engine/commands/raw.hh"
 #include "com/centreon/engine/commands/set.hh"
 #include "com/centreon/engine/error.hh"
+#include "com/centreon/shared_ptr.hh"
 #include "test/unittest.hh"
 
 using namespace com::centreon::engine;
@@ -49,38 +50,38 @@ static bool command_exit(std::string const& name) {
  *  Check if the set command works.
  */
 int main_test() {
-  // get instance.
-  set& cmd_set = set::instance();
+  // Get instance.
+  set& cmd_set(set::instance());
 
-  // add commands.
+  // Add commands.
   raw raw1("raw1", "raw1 argv1 argv2");
   cmd_set.add_command(raw1);
-
-  QSharedPointer<commands::command> pcmd2(raw1.clone());
+  com::centreon::shared_ptr<commands::command> pcmd2(raw1.clone());
   cmd_set.add_command(pcmd2);
-
-  QSharedPointer<commands::command> pcmd3(new raw("pcmd3", "pcmd3 argv1 argv2"));
+  com::centreon::shared_ptr<commands::command>
+    pcmd3(new raw("pcmd3", "pcmd3 argv1 argv2"));
   cmd_set.add_command(pcmd3);
 
-  // get commands.
-  if (command_exit("raw1") == false)
-    throw (engine_error() << "error: get_command failed, 'raw1' not found.");
+  // Get commands.
+  if (!command_exit("raw1"))
+    throw (engine_error()
+           << "error: get_command failed, 'raw1' not found");
+  if (!command_exit("pcmd3"))
+    throw (engine_error()
+           << "error: get_command failed, 'pcmd3' not found");
+  if (command_exit("undef"))
+    throw (engine_error()
+           << "error: get_command failed, 'undef' found");
 
-  if (command_exit("pcmd3") == false)
-    throw (engine_error() << "error: get_command failed, 'pcmd3' not found.");
-
-  if (command_exit("undef") == true)
-    throw (engine_error() << "error: get_command failed, 'undef' found.");
-
-  // remove commands.
+  // Remove commands.
   cmd_set.remove_command("pcmd3");
-  if (command_exit("pcmd3") == true)
-    throw (engine_error() << "error: remove_command failed, 'pcmd3' found.");
-
+  if (command_exit("pcmd3"))
+    throw (engine_error()
+           << "error: remove_command failed, 'pcmd3' found");
   cmd_set.remove_command("raw1");
-  if (command_exit("raw1") == true)
-    throw (engine_error() << "error: remove_command failed, 'raw1' found.");
-
+  if (command_exit("raw1"))
+    throw (engine_error()
+           << "error: remove_command failed, 'raw1' found");
   cmd_set.remove_command("undef");
 
   return (0);

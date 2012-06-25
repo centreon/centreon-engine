@@ -23,9 +23,9 @@
 #  include <map>
 #  include <memory>
 #  include <QObject>
-#  include <QSharedPointer>
 #  include <string>
 #  include "com/centreon/engine/commands/command.hh"
+#  include "com/centreon/shared_ptr.hh"
 
 namespace             com {
   namespace           centreon {
@@ -44,8 +44,9 @@ namespace             com {
         public:
                       ~set() throw ();
           void        add_command(command const& cmd);
-          void        add_command(QSharedPointer<command> cmd);
-          QSharedPointer<command>
+          void        add_command(
+                        com::centreon::shared_ptr<command> cmd);
+          com::centreon::shared_ptr<command>
                       get_command(std::string const& cmd_name);
           static set& instance();
           static void load();
@@ -65,7 +66,7 @@ namespace             com {
 
           static std::auto_ptr<set>
                       _instance;
-          std::map<std::string, QSharedPointer<command> >
+          std::map<std::string, com::centreon::shared_ptr<command> >
                       _list;
         };
       }

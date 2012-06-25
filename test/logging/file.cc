@@ -32,6 +32,7 @@
 #include "com/centreon/engine/logging/engine.hh"
 #include "com/centreon/engine/logging/file.hh"
 #include "com/centreon/engine/logging/object.hh"
+#include "com/centreon/shared_ptr.hh"
 #include "test/unittest.hh"
 
 using namespace com::centreon::engine;
@@ -72,17 +73,20 @@ int main_test() {
 
   {
     // Add new object (file) to log into engine and test limit size.
-    QSharedPointer<file> obj1(new file("./test_logging_file_size_limit.log", 10));
+    com::centreon::shared_ptr<object>
+      obj1(new file("./test_logging_file_size_limit.log", 10));
     engine::obj_info info1(obj1, log_all, most);
     id1 = engine.add_object(info1);
 
     // Add new object (file) to log into engine and test no limit size.
-    QSharedPointer<file> obj2(new file("./test_logging_file.log"));
+    com::centreon::shared_ptr<object>
+      obj2(new file("./test_logging_file.log"));
     engine::obj_info info2(obj2, log_all, most);
     id2 = engine.add_object(info2);
 
     // Add new object (file) to log into engine and test reopen.
-    QSharedPointer<file> obj3(new file("./test_logging_file_reopen.log"));
+    com::centreon::shared_ptr<object>
+      obj3(new file("./test_logging_file_reopen.log"));
     engine::obj_info info3(obj3, log_all, most);
     id3 = engine.add_object(info3);
   }

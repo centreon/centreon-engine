@@ -20,7 +20,6 @@
 #include <algorithm>
 #include <map>
 #include <QRegExp>
-#include <QScopedArrayPointer>
 #include <vector>
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
@@ -123,7 +122,7 @@ static void _extract_object_from_objectgroup(
       objects.push_back(member->host_ptr);
     }
   }
-  qSort(objects.begin(), objects.end());
+  std::sort(objects.begin(), objects.end());
   std::unique(objects.begin(), objects.end());
 }
 

@@ -26,6 +26,7 @@
 #  include "com/centreon/engine/commands/basic_process.hh"
 #  include "com/centreon/engine/commands/command.hh"
 #  include "com/centreon/engine/commands/connector/execute_query.hh"
+#  include "com/centreon/shared_ptr.hh"
 
 namespace                              com {
   namespace                            centreon {
@@ -83,7 +84,8 @@ namespace                              com {
 
           private:
             struct                     request_info {
-              QSharedPointer<request>  req;
+              com::centreon::shared_ptr<request>
+                                       req;
               QDateTime                start_time;
               unsigned int             timeout;
               bool                     waiting_result;
@@ -101,7 +103,7 @@ namespace                              com {
             QMutex                     _mutex;
             std::string                _connector_name;
             std::string                _connector_line;
-            QSharedPointer<basic_process>
+            com::centreon::shared_ptr<basic_process>
                                        _process;
             std::map<unsigned long, request_info>
                                        _queries;

@@ -26,6 +26,7 @@
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/objects/command.hh"
 #include "com/centreon/engine/objects/utils.hh"
+#include "com/centreon/shared_ptr.hh"
 
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;
@@ -84,7 +85,8 @@ void objects::link(command const* obj) {
 
   // update command executon system.
   commands::set& cmd_set = commands::set::instance();
-  QSharedPointer<commands::command> new_command(new commands::raw(obj->name, obj->command_line));
+  com::centreon::shared_ptr<commands::command>
+    new_command(new commands::raw(obj->name, obj->command_line));
   QThread* main(QCoreApplication::instance()->thread());
   if (main != QThread::currentThread())
     new_command->moveToThread(main);

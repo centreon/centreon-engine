@@ -17,12 +17,13 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <assert.h>
+#include <cassert>
+#include <cstdlib>
+#include <cstring>
 #include <QReadLocker>
 #include <QWriteLocker>
-#include <stdlib.h>
-#include <string.h>
 #include "com/centreon/engine/logging/engine.hh"
+#include "com/centreon/shared_ptr.hh"
 
 using namespace com::centreon::engine::logging;
 
@@ -48,7 +49,7 @@ engine::obj_info::obj_info() : _id(0), _type(0), _verbosity(0) {}
  *  @param[in] verbosity Verbosity level.
  */
 engine::obj_info::obj_info(
-                    QSharedPointer<object> obj,
+                    com::centreon::shared_ptr<object> obj,
                     unsigned long long type,
                     unsigned int verbosity)
   : _id(0), _obj(obj), _type(type), _verbosity(verbosity) {}

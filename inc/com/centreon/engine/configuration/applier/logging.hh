@@ -20,7 +20,6 @@
 #ifndef CCE_CONFIGURATION_APPLIER_LOGGING_HH
 #  define CCE_CONFIGURATION_APPLIER_LOGGING_HH
 
-#  include <QSharedPointer>
 #  include <string>
 #  include "com/centreon/engine/configuration/applier/base.hh"
 #  include "com/centreon/engine/configuration/state.hh"

@@ -48,10 +48,9 @@ line lines[] = {
  *  Check the execute request.
  */
 int main_test() {
-  for (unsigned int i = 0; lines[i].command != NULL; ++i) {
+  for (unsigned int i(0); lines[i].command != NULL; ++i) {
     execute_query query(0, lines[i].command, QDateTime::currentDateTime(), 0);
     std::list<std::string> list(query.get_args());
-
     std::string result;
     for (std::list<std::string>::const_iterator
            it(list.begin()),

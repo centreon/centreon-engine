@@ -22,6 +22,7 @@
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/nebmodules.hh"
+#include "com/centreon/shared_ptr.hh"
 
 using namespace com::centreon::engine::broker;
 using namespace com::centreon::engine::logging;
@@ -89,7 +90,7 @@ bool handle::operator==(handle const& right) const throw () {
           && (_license == right._license)
           && (_name == right._name)
           && (_version == right._version)
-          && (_handle.data() == right._handle.data()));
+          && (_handle.get() == right._handle.get()));
 }
 
 /**
@@ -107,10 +108,10 @@ bool handle::operator!=(handle const& right) const throw () {
  *  Close and unload module.
  */
 void handle::close() {
-  if (_handle.data() != NULL) {
+  if (_handle.get()) {
     if (_handle->isLoaded()) {
       typedef int (*func_deinit)(int, int);
-      func_deinit deinit = (func_deinit)_handle->resolve("nebmodule_deinit");
+      func_deinit deinit((func_deinit)_handle->resolve("nebmodule_deinit"));
       if (!deinit)
         logger(log_info_message, basic)
           << "Cannot resolve symbole 'nebmodule_deinit' in module '"
@@ -177,7 +178,7 @@ std::string const& handle::get_filename() const throw () {
  *  @return pointer on a QLibrary.
  */
 QLibrary* handle::get_handle() const throw () {
-  return (_handle.data());
+  return (_handle.get());
 }
 
 /**
@@ -213,7 +214,7 @@ std::string const& handle::get_version() const throw () {
  *  @return true if the module is loaded, false otherwise.
  */
 bool handle::is_loaded() {
-  return (_handle.data() != NULL && _handle->isLoaded());
+  return (_handle.get() && _handle->isLoaded());
 }
 
 /**
@@ -223,7 +224,8 @@ void handle::open() {
   if (is_loaded())
     return ;
 
-  _handle = QSharedPointer<QLibrary>(new QLibrary(_filename.c_str()));
+  _handle = com::centreon::shared_ptr<QLibrary>(
+                             new QLibrary(_filename.c_str()));
   _handle->setLoadHints(QLibrary::ResolveAllSymbolsHint
     | QLibrary::ExportExternalSymbolsHint);
   _handle->load();
@@ -237,8 +239,8 @@ void handle::open() {
   }
 
   typedef int (*func_init)(int, char const*, void*);
-  func_init init = (func_init)_handle->resolve("nebmodule_init");
-  if (init == NULL) {
+  func_init init((func_init)_handle->resolve("nebmodule_init"));
+  if (!init) {
     close();
     throw (engine_error() << "Cannot resolve symbole nebmodule_init");
   }

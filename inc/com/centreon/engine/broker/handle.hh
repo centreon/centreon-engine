@@ -22,8 +22,8 @@
 
 #  include <QLibrary>
 #  include <QObject>
-#  include <QSharedPointer>
 #  include <string>
+#  include "com/centreon/shared_ptr.hh"
 
 namespace                          com {
   namespace                        centreon {
@@ -106,7 +106,8 @@ namespace                          com {
           std::string              _copyright;
           std::string              _description;
           std::string              _filename;
-          QSharedPointer<QLibrary> _handle;
+          com::centreon::shared_ptr<QLibrary>
+                                   _handle;
           std::string              _license;
           std::string              _name;
           std::string              _version;

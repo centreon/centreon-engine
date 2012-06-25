@@ -17,15 +17,16 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <climits>
 #include <exception>
-#include <limits.h>
 #include <list>
 #include <QCoreApplication>
-#include <QDebug>
 #include "com/centreon/engine/broker/loader.hh"
 #include "com/centreon/engine/error.hh"
+#include "com/centreon/shared_ptr.hh"
 #include "test/unittest.hh"
 
+using namespace com::centreon;
 using namespace com::centreon::engine::broker;
 
 static const char* MOD_LIB_NAME = "./broker_mod_load.so";
@@ -38,9 +39,9 @@ bool mod_test_load_quit = false;
 void check_load() {
   loader& loader(loader::instance());
   loader.load_directory("./");
-  std::list<QSharedPointer<handle> > modules(loader.get_modules());
+  std::list<shared_ptr<handle> > modules(loader.get_modules());
   if (modules.size() != 2)
-    throw (engine_error() << __func__ << ": load modules failed.");
+    throw (engine_error() << __func__ << ": load modules failed");
 }
 
 /**
@@ -49,9 +50,9 @@ void check_load() {
 void check_unload() {
   loader& loader(loader::instance());
   loader.unload_modules();
-  std::list<QSharedPointer<handle> > modules(loader.get_modules());
+  std::list<shared_ptr<handle> > modules(loader.get_modules());
   if ((false == mod_test_load_quit) || (modules.size() != 0))
-    throw (engine_error() << __func__ << ": unload modules failed.");
+    throw (engine_error() << __func__ << ": unload modules failed");
 }
 
 /**
@@ -60,21 +61,21 @@ void check_unload() {
 void check_change_name() {
   // Load module with initial name.
   loader& loader(loader::instance());
-  QSharedPointer<handle>
+  shared_ptr<handle>
     module(loader.add_module(MOD_LIB_NAME, MOD_LIB_NAME));
   if (loader.get_modules().size() != 1)
-    throw (engine_error() << __func__ << ": add module failed.");
+    throw (engine_error() << __func__ << ": add module failed");
 
   // Change name.
   std::string new_name("New Name");
   module->set_name(new_name);
 
   // Check content.
-  std::list<QSharedPointer<handle> > modules(loader.get_modules());
+  std::list<shared_ptr<handle> > modules(loader.get_modules());
   if (modules.size() != 1)
-    throw (engine_error() << __func__ << ": set name failed.");
+    throw (engine_error() << __func__ << ": set name failed");
   if ((*modules.begin())->get_name() != new_name)
-    throw (engine_error() << __func__ << ": set name failed.");
+    throw (engine_error() << __func__ << ": set name failed");
   loader.del_module(module);
 }
 

@@ -22,11 +22,11 @@
 
 #  include <map>
 #  include <QMutex>
-#  include <QSharedPointer>
 #  include <string>
 #  include <sys/time.h>
 #  include "com/centreon/engine/commands/command.hh"
 #  include "com/centreon/engine/commands/process.hh"
+#  include "com/centreon/shared_ptr.hh"
 
 namespace                 com {
   namespace               centreon {
@@ -68,7 +68,8 @@ namespace                 com {
         private:
           struct                    process_info {
             unsigned long           cmd_id;
-            QSharedPointer<process> proc;
+            com::centreon::shared_ptr<process>
+                                    proc;
           };
 
           static void     _deletelater_process(process* obj);

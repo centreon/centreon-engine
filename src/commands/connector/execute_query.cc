@@ -176,8 +176,9 @@ std::list<std::string> execute_query::get_args() const throw () {
     if (c == *it && escape % 2 == 0) {
       list.push_back(tmp);
       tmp = "";
-      c = (isspace(c)
-           && ((sep.find(*(it + 1)) == std::string::npos) ? ' ' : 0));
+      c = ((isspace(c) && (sep.find(*(it + 1)) == std::string::npos))
+           ? ' '
+           : 0);
     }
     else
       tmp += *it;

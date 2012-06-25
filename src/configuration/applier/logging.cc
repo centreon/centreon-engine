@@ -19,7 +19,9 @@
 
 #include "com/centreon/engine/configuration/applier/logging.hh"
 #include "com/centreon/engine/logging/engine.hh"
+#include "com/centreon/shared_ptr.hh"
 
+using namespace com::centreon;
 using namespace com::centreon::engine::logging;
 using namespace com::centreon::engine::configuration::applier;
 
@@ -190,21 +192,22 @@ logging& logging::operator=(logging& right) {
  */
 void logging::_add_stdout() {
   if (_stdout_id == 0) {
-    QSharedPointer<standard> obj(new com::centreon::engine::logging::standard());
+    shared_ptr<object>
+      obj(new com::centreon::engine::logging::standard());
     unsigned long long type(log_process_info
-      | log_event_handler
-      | log_external_command
-      | log_host_up
-      | log_host_down
-      | log_host_unreachable
-      | log_service_ok
-      | log_service_unknown
-      | log_service_warning
-      | log_service_critical
-      | log_passive_check
-      | log_info_message
-      | log_host_notification
-      | log_service_notification);
+                            | log_event_handler
+                            | log_external_command
+                            | log_host_up
+                            | log_host_down
+                            | log_host_unreachable
+                            | log_service_ok
+                            | log_service_unknown
+                            | log_service_warning
+                            | log_service_critical
+                            | log_passive_check
+                            | log_info_message
+                            | log_host_notification
+                            | log_service_notification);
     ::engine::obj_info info(obj, type, most);
     _stdout_id = ::engine::instance().add_object(info);
   }
@@ -215,13 +218,13 @@ void logging::_add_stdout() {
  */
 void logging::_add_stderr() {
   if (_stderr_id == 0) {
-    QSharedPointer<standard> obj(new standard(false));
+    shared_ptr<object> obj(new standard(false));
     unsigned long long type(log_runtime_error
-      | log_runtime_warning
-      | log_verification_error
-      | log_verification_warning
-      | log_config_error
-      | log_config_warning);
+                            | log_runtime_warning
+                            | log_verification_error
+                            | log_verification_warning
+                            | log_config_error
+                            | log_config_warning);
     ::engine::obj_info info(obj, type, most);
     _stderr_id = ::engine::instance().add_object(info);
   }
@@ -230,7 +233,7 @@ void logging::_add_stderr() {
  *  Add syslog object logging.
  */
 void logging::_add_syslog() {
-  QSharedPointer<syslog> obj(new syslog);
+  shared_ptr<object> obj(new syslog);
   ::engine::obj_info info(obj, log_all, basic);
   _syslog_id = ::engine::instance().add_object(info);
 }
@@ -240,8 +243,9 @@ void logging::_add_syslog() {
  */
 void logging::_add_log_file(state const& config) {
   _del_log_file();
-  QSharedPointer<file> obj(new file(config.get_log_file(),
-                                    config.get_max_log_file_size()));
+  shared_ptr<object> obj(new file(
+                               config.get_log_file(),
+                               config.get_max_log_file_size()));
   ::engine::obj_info info(obj, log_all, most);
   _log_id = ::engine::instance().add_object(info);
 }
@@ -251,9 +255,9 @@ void logging::_add_log_file(state const& config) {
  */
 void logging::_add_debug(state const& config) {
   _del_debug();
-  QSharedPointer<file> obj(new file(
-                                 config.get_debug_file(),
-                                 config.get_max_debug_file_size()));
+  shared_ptr<object> obj(new file(
+                               config.get_debug_file(),
+                               config.get_max_debug_file_size()));
   ::engine::obj_info info(
                        obj,
                        config.get_debug_level(),
@@ -270,6 +274,7 @@ void logging::_del_syslog() {
     ::engine::instance().remove_object(_syslog_id);
     _syslog_id = 0;
   }
+  return ;
 }
 
 /**
@@ -280,6 +285,7 @@ void logging::_del_log_file() {
     ::engine::instance().remove_object(_log_id);
     _log_id = 0;
   }
+  return ;
 }
 
 /**
@@ -290,6 +296,7 @@ void logging::_del_debug() {
     ::engine::instance().remove_object(_debug_id);
     _debug_id = 0;
   }
+  return ;
 }
 
 /**
@@ -300,6 +307,7 @@ void logging::_del_stdout() {
     ::engine::instance().remove_object(_stdout_id);
     _stdout_id = 0;
   }
+  return ;
 }
 
 /**
@@ -310,4 +318,5 @@ void logging::_del_stderr() {
     ::engine::instance().remove_object(_stderr_id);
     _stderr_id = 0;
   }
+  return ;
 }

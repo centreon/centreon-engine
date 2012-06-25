@@ -24,48 +24,49 @@
 #  include <QFile>
 #  include <QMutex>
 #  include <QReadWriteLock>
-#  include <QSharedPointer>
 #  include <string>
 #  include "com/centreon/engine/logging/object.hh"
+#  include "com/centreon/engine/namespace.hh"
+#  include "com/centreon/shared_ptr.hh"
 
-namespace                         com {
-  namespace                       centreon {
-    namespace                     engine {
-      namespace                   logging {
-        /**
-         *  @class file file.hh
-         *  @brief Write logging message into file.
-         *
-         *  Write logging message into file.
-         */
-        class                     file : public object {
-        public:
-                                  file(
-                                    std::string const& file,
-                                    unsigned long long size_limit = 0);
-                                  file(file const& right);
-                                  ~file() throw();
-          file&                   operator=(file const& right);
-          std::string             get_file_name() throw ();
-          unsigned long long      get_size_limit() const throw ();
-          void                    log(
-                                    char const* message,
-                                    unsigned long long type,
-                                    unsigned int verbosity) throw ();
-          static void             reopen();
-          void                    set_size_limit(
-                                    unsigned long long size) throw ();
+CCE_BEGIN()
 
-        private:
-          QSharedPointer<QMutex>  _mutex;
-          QSharedPointer<QFile>   _file;
-          static std::list<file*> _files;
-          static QReadWriteLock   _rwlock;
-          unsigned long long      _size_limit;
-        };
-      }
-    }
-  }
+namespace                   logging {
+  /**
+   *  @class file file.hh
+   *  @brief Write logging message into file.
+   *
+   *  Write logging message into file.
+   */
+  class                     file : public object {
+  public:
+                            file(
+                              std::string const& file,
+                              unsigned long long size_limit = 0);
+                            file(file const& right);
+                            ~file() throw ();
+    file&                   operator=(file const& right);
+    std::string             get_file_name() throw ();
+    unsigned long long      get_size_limit() const throw ();
+    void                    log(
+                              char const* message,
+                              unsigned long long type,
+                              unsigned int verbosity) throw ();
+    static void             reopen();
+    void                    set_size_limit(
+                              unsigned long long size) throw ();
+
+  private:
+    com::centreon::shared_ptr<QMutex>
+                            _mutex;
+    com::centreon::shared_ptr<QFile>
+                            _file;
+    static std::list<file*> _files;
+    static QReadWriteLock   _rwlock;
+    unsigned long long      _size_limit;
+  };
 }
+
+CCE_END()
 
 #endif // !CCE_LOGGING_FILE_HH

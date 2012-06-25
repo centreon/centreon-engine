@@ -58,6 +58,7 @@
 #include "com/centreon/engine/statusdata.hh"
 #include "com/centreon/engine/utils.hh"
 #include "com/centreon/engine/version.hh"
+#include "com/centreon/shared_ptr.hh"
 
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;
@@ -277,9 +278,11 @@ int main(int argc, char** argv) {
     try {
       config.parse(config_file);
       configuration::applier::logging::instance().apply(config);
-      engine::obj_info obj(QSharedPointer<logging::broker>(new logging::broker),
-                           log_all,
-                           basic);
+      engine::obj_info
+        obj(
+          com::centreon::shared_ptr<logging::object>(new logging::broker),
+          log_all,
+          basic);
       engine::instance().add_object(obj);
 
       // Read object config files.

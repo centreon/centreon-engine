@@ -21,10 +21,10 @@
 #  define CCE_COMMANDS_CONNECTOR_REQUEST_BUILDER_HH
 
 #  include <map>
-#  include <QSharedPointer>
 #  include <map>
 #  include "com/centreon/engine/commands/connector/request.hh"
 #  include "com/centreon/engine/namespace.hh"
+#  include "com/centreon/shared_ptr.hh"
 
 CCE_BEGIN()
 
@@ -36,7 +36,8 @@ namespace                     commands {
      */
     class                     request_builder {
     public:
-      QSharedPointer<request> build(std::string const& data) const;
+      com::centreon::shared_ptr<request>
+                              build(std::string const& data) const;
       static request_builder& instance();
 
     private:
@@ -46,7 +47,7 @@ namespace                     commands {
                               ~request_builder() throw ();
       request_builder&        operator=(request_builder const& right);
 
-      std::map<unsigned int, QSharedPointer<request> >
+      std::map<unsigned int, com::centreon::shared_ptr<request> >
                               _list;
     };
   }

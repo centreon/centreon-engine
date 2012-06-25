@@ -28,6 +28,7 @@
 #include "com/centreon/engine/logging/broker.hh"
 #include "com/centreon/engine/logging/engine.hh"
 #include "com/centreon/engine/logging/object.hh"
+#include "com/centreon/shared_ptr.hh"
 #include "test/unittest.hh"
 
 using namespace com::centreon::engine;
@@ -66,21 +67,20 @@ int main_test() {
   logging::engine& engine(logging::engine::instance());
 
   // Add new object (broker) to log into engine.
-  QSharedPointer<logging::broker> obj(new logging::broker);
-  logging::engine::obj_info info(obj,
-                                 logging::log_all,
-                                 logging::most);
-  unsigned int id = engine.add_object(info);
+  com::centreon::shared_ptr<logging::object> obj(new logging::broker);
+  logging::engine::obj_info info(
+                              obj,
+                              logging::log_all,
+                              logging::most);
+  unsigned int id(engine.add_object(info));
 
   // Send message on all different logging type.
-  for (unsigned int i = 0; i < NB_LOG_TYPE; ++i) {
+  for (unsigned int i(0); i < NB_LOG_TYPE; ++i)
     engine.log(LOG_MESSAGE, 1ull << i, 0);
-  }
 
   // Send message on all different debug logging type.
-  for (unsigned int i = 0; i < NB_DBG_TYPE; ++i) {
+  for (unsigned int i(0); i < NB_DBG_TYPE; ++i)
     engine.log(LOG_MESSAGE, 1ull << (i + 32), 0);
-  }
 
   // Remove object (broker).
   engine.remove_object(id);

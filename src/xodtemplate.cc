@@ -40,6 +40,7 @@
 #include "com/centreon/engine/objects.hh"
 #include "com/centreon/engine/skiplist.hh"
 #include "com/centreon/engine/xodtemplate.hh"
+#include "com/centreon/shared_ptr.hh"
 
 using namespace com::centreon::engine::logging;
 
@@ -9676,8 +9677,10 @@ int xodtemplate_register_command(xodtemplate_command* this_command) {
   try {
     using namespace com::centreon::engine;
     if (this_command->connector_name == NULL) {
-      QSharedPointer<commands::command> cmd_set(
-        new commands::raw(this_command->command_name,this_command->command_line));
+      com::centreon::shared_ptr<commands::command>
+        cmd_set(new commands::raw(
+                                this_command->command_name,
+                                this_command->command_line));
       commands::set::instance().add_command(cmd_set);
     }
     else {
@@ -9695,10 +9698,12 @@ int xodtemplate_register_command(xodtemplate_command* this_command) {
           << "', starting on line " << this_command->_start_line << ")";
         return (ERROR);
       }
-      QSharedPointer<commands::command> cmd_set(new commands::connector::command(connector->connector_name,
-                                                                                 connector->connector_line,
-                                                                                 this_command->command_name,
-                                                                                 this_command->command_line));
+      com::centreon::shared_ptr<commands::command>
+        cmd_set(new commands::connector::command(
+                                           connector->connector_name,
+                                           connector->connector_line,
+                                           this_command->command_name,
+                                           this_command->command_line));
       commands::set::instance().add_command(cmd_set);
     }
   }

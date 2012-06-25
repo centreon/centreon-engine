@@ -24,6 +24,7 @@
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
+#include "com/centreon/shared_ptr.hh"
 
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;
@@ -110,20 +111,19 @@ unsigned long raw::run(
                      nagios_macros const& macros,
                      unsigned int timeout) {
   // Debug.
-  logger(dbg_functions, basic) << "start " << Q_FUNC_INFO;
+  logger(dbg_functions, basic) << "start " << __func__;
 
   // Create process.
   process_info info;
-  info.proc = QSharedPointer<process>(
-                new process(macros, timeout),
-                &_deletelater_process);
+  info.proc = com::centreon::shared_ptr<process>(
+                               new process(macros, timeout));
 
   // Connect to process.
   if (!connect(&(*info.proc),
   	      SIGNAL(process_ended()),
   	      this,
   	      SLOT(raw_ended())))
-    throw (engine_error() << "connect process to commands::raw failed.");
+    throw (engine_error() << "connect process to commands::raw failed");
 
   // Store process information.
   {

@@ -17,9 +17,9 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <cstdlib>
 #include <map>
 #include <memory>
-#include <stdlib.h>
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
@@ -27,6 +27,7 @@
 #include "com/centreon/engine/modules/webservice/create_object.hh"
 #include "com/centreon/engine/objects.hh"
 #include "com/centreon/engine/objects/contact.hh"
+#include "com/centreon/unique_array_ptr.hh"
 #include "soapH.h"
 
 using namespace com::centreon::engine::logging;
@@ -107,9 +108,9 @@ void webservice::create_contact(ns1__contactType const& cntct) {
          : true);
 
   // Create address array.
-  QScopedArrayPointer<char const*>
+  com::centreon::unique_array_ptr<char const*>
     address(new char const*[MAX_CONTACT_ADDRESSES]);
-  memset(address.data(), 0, sizeof(*address) * MAX_CONTACT_ADDRESSES);
+  memset(address.get(), 0, sizeof(*address) * MAX_CONTACT_ADDRESSES);
   for (unsigned int i(0), end(cntct.address.size()); i < end; ++i)
     address[i] = cntct.address[i].c_str();
 

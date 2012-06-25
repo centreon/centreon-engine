@@ -23,9 +23,9 @@
 #  include <map>
 #  include <memory>
 #  include <QObject>
-#  include <QSharedPointer>
 #  include <string>
 #  include "com/centreon/engine/broker/handle.hh"
+#  include "com/centreon/shared_ptr.hh"
 
 namespace                        com {
   namespace                      centreon {
@@ -41,12 +41,13 @@ namespace                        com {
           Q_OBJECT
         public:
           virtual                ~loader() throw ();
-          QSharedPointer<handle> add_module(
+          com::centreon::shared_ptr<handle>
+                                 add_module(
                                    std::string const& filename = "",
                                    std::string const& args = "");
           void                   del_module(
-                                   QSharedPointer<handle> const& mod);
-          std::list<QSharedPointer<handle> >
+                                   com::centreon::shared_ptr<handle> const& mod);
+          std::list<com::centreon::shared_ptr<handle> >
                                  get_modules() const;
           static loader&         instance();
           static void            load();
@@ -67,7 +68,7 @@ namespace                        com {
 
           static std::auto_ptr<loader>
                                  _instance;
-          std::multimap<std::string, QSharedPointer<handle> >
+          std::multimap<std::string, com::centreon::shared_ptr<handle> >
                                  _modules;
         };
       }

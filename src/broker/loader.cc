@@ -17,15 +17,17 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <assert.h>
+#include <cassert>
+#include <cstdlib>
 #include <QDir>
 #include <QFile>
-#include <stdlib.h>
 #include "com/centreon/engine/broker/compatibility.hh"
 #include "com/centreon/engine/broker/loader.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/logging/logger.hh"
+#include "com/centreon/shared_ptr.hh"
 
+using namespace com::centreon;
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::broker;
 using namespace com::centreon::engine::logging;
@@ -57,10 +59,10 @@ loader::~loader() throw () {
  *
  *  @return The new object module.
  */
-QSharedPointer<handle> loader::add_module(
-                                 std::string const& filename,
-                                 std::string const& args) {
-  QSharedPointer<handle> module(new handle(filename, args));
+shared_ptr<handle> loader::add_module(
+                             std::string const& filename,
+                             std::string const& args) {
+  shared_ptr<handle> module(new handle(filename, args));
   broker::compatibility& compatibility(broker::compatibility::instance());
 
   if (connect(&(*module),
@@ -117,14 +119,15 @@ QSharedPointer<handle> loader::add_module(
  *
  *  @param[in] mod Module to remove.
  */
-void loader::del_module(QSharedPointer<handle> const& module) {
-  for (std::multimap<std::string, QSharedPointer<handle> >::iterator
-         it(_modules.find(module->get_name())), end(_modules.end());
+void loader::del_module(shared_ptr<handle> const& module) {
+  for (std::multimap<std::string, shared_ptr<handle> >::iterator
+         it(_modules.find(module->get_name())),
+         end(_modules.end());
        it != end;
        ++it)
-    if (it->second == module) {
+    if (it->second.get() == module.get()) {
       _modules.erase(it);
-      break;
+      break ;
     }
   return ;
 }
@@ -134,10 +137,11 @@ void loader::del_module(QSharedPointer<handle> const& module) {
  *
  *  @return All modules in a list.
  */
-std::list<QSharedPointer<handle> > loader::get_modules() const {
-  std::list<QSharedPointer<handle> > lst;
-  for (std::multimap<std::string, QSharedPointer<handle> >::const_iterator
-         it(_modules.begin()), end(_modules.end());
+std::list<shared_ptr<handle> > loader::get_modules() const {
+  std::list<shared_ptr<handle> > lst;
+  for (std::multimap<std::string, shared_ptr<handle> >::const_iterator
+         it(_modules.begin()),
+         end(_modules.end());
        it != end;
        ++it)
     lst.push_back(it->second);
@@ -185,7 +189,7 @@ unsigned int loader::load_directory(std::string const& dir) {
     std::string config_file(dir + "/" + qPrintable(it->baseName()) + ".cfg");
     if (directory.exists(config_file.c_str()) == false)
       config_file = "";
-    QSharedPointer<handle> module;
+    shared_ptr<handle> module;
     try {
       module = add_module(dir + "/" + qPrintable(it->fileName()), config_file);
       module->open();
@@ -217,8 +221,9 @@ void loader::unload() {
  *  Unload all modules.
  */
 void loader::unload_modules() {
-  for (std::multimap<std::string, QSharedPointer<handle> >::iterator
-         it = _modules.begin(), end = _modules.end();
+  for (std::multimap<std::string, shared_ptr<handle> >::iterator
+         it(_modules.begin()),
+         end(_modules.end());
        it != end;
        ++it) {
     try {
@@ -242,12 +247,13 @@ void loader::unload_modules() {
 void loader::module_name_changed(
                std::string const& old_name,
                std::string const& new_name) {
-  for (std::multimap<std::string, QSharedPointer<handle> >::iterator
-         it = _modules.find(old_name), end = _modules.end();
-       it != end && it->first == old_name;
+  for (std::multimap<std::string, shared_ptr<handle> >::iterator
+         it(_modules.find(old_name)),
+         end(_modules.end());
+       (it != end) && (it->first == old_name);
        ++it) {
-    if (it->second == this->sender()) {
-      QSharedPointer<handle> module = it->second;
+    if (it->second.get() == this->sender()) {
+      shared_ptr<handle> module(it->second);
       _modules.insert(std::make_pair(new_name, module));
       _modules.erase(it);
       return ;
@@ -258,10 +264,10 @@ void loader::module_name_changed(
 }
 
 /**************************************
- *                                     *
- *           Private Methods           *
- *                                     *
- **************************************/
+*                                     *
+*           Private Methods           *
+*                                     *
+**************************************/
 
 /**
  *  Default constructor.
