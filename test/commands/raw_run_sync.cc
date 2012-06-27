@@ -17,10 +17,9 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <cstring>
 #include <exception>
 #include <QCoreApplication>
-#include <QDebug>
-#include <string.h>
 #include "com/centreon/engine/commands/raw.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"

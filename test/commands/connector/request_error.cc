@@ -19,7 +19,6 @@
 
 #include <exception>
 #include <QCoreApplication>
-#include <QDebug>
 #include "com/centreon/engine/commands/connector/error_response.hh"
 #include "com/centreon/engine/error.hh"
 #include "test/commands/connector/check_request.hh"

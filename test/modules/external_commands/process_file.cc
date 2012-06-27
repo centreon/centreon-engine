@@ -19,7 +19,6 @@
 
 #include <exception>
 #include <QCoreApplication>
-#include <QDebug>
 #include <QTemporaryFile>
 #include <string>
 #include "com/centreon/engine/error.hh"

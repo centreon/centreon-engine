@@ -19,7 +19,6 @@
 
 #include <exception>
 #include <QCoreApplication>
-#include <QDebug>
 #include "com/centreon/engine/commands/connector/command.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/shared_ptr.hh"

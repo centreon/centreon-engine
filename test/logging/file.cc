@@ -23,7 +23,6 @@
 #include <cstring>
 #include <exception>
 #include <QCoreApplication>
-#include <QDebug>
 #include <QDir>
 #include <QFile>
 #include "com/centreon/engine/common.hh"

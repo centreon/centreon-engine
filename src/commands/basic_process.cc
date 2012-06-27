@@ -17,14 +17,14 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <assert.h>
-#include <errno.h>
+#include <cassert>
+#include <cerrno>
+#include <csignal>
+#include <cstdlib>
+#include <cstring>
 #include <fcntl.h>
 #include <QEventLoop>
 #include <QTimer>
-#include <signal.h>
-#include <stdlib.h>
-#include <string.h>
 #include <sys/wait.h>
 #include <unistd.h>
 #include "com/centreon/engine/commands/basic_process.hh"
@@ -206,7 +206,7 @@ bool basic_process::isSequential() const {
 }
 
 //  std::string basic_process::nativeArguments() const {
-//    throw (engine_error() << "basic_process: " << Q_FUNC_INFO << " not implemented yet.");
+//    throw (engine_error() << "basic_process: " << __func__ << " not implemented yet.");
 //  }
 
 /**
@@ -219,7 +219,7 @@ Q_PID basic_process::pid() const {
 }
 
 //  ProcessChannelMode basic_process::processChannelMode() const {
-//    throw (engine_error() << "basic_process: " << Q_FUNC_INFO << " not implemented yet.");
+//    throw (engine_error() << "basic_process: " << __func__ << " not implemented yet.");
 //  }
 
 // QProcessEnvironment basic_process::processEnvironment() const {
@@ -258,11 +258,11 @@ QProcess::ProcessChannel basic_process::readChannel() const {
 }
 
 //  void basic_process::setNativeArguments(std::string const& arguments) {
-//    throw (engine_error() << "basic_process: " << Q_FUNC_INFO << " not implemented yet.");
+//    throw (engine_error() << "basic_process: " << __func__ << " not implemented yet.");
 //  }
 
 //  void basic_process::setProcessChannelMode(ProcessChannelMode mode) {
-//    throw (engine_error() << "basic_process: " << Q_FUNC_INFO << " not implemented yet.");
+//    throw (engine_error() << "basic_process: " << __func__ << " not implemented yet.");
 //  }
 
 //  void basic_process::setProcessEnvironment(QProcessEnvironment const& environment) {
@@ -280,19 +280,19 @@ void basic_process::setReadChannel(QProcess::ProcessChannel channel) {
 }
 
 //  void basic_process::setStandardErrorFile(std::string const& fileName, OpenMode mode) {
-//    throw (engine_error() << "basic_process: " << Q_FUNC_INFO << " not implemented yet.");
+//    throw (engine_error() << "basic_process: " << __func__ << " not implemented yet.");
 //  }
 
 //  void basic_process::setStandardInputFile(std::string const& fileName) {
-//    throw (engine_error() << "basic_process: " << Q_FUNC_INFO << " not implemented yet.");
+//    throw (engine_error() << "basic_process: " << __func__ << " not implemented yet.");
 //  }
 
 //  void basic_process::setStandardOutputFile(std::string const& fileName, OpenMode mode) {
-//    throw (engine_error() << "basic_process: " << Q_FUNC_INFO << " not implemented yet.");
+//    throw (engine_error() << "basic_process: " << __func__ << " not implemented yet.");
 //  }
 
 //  void basic_process::setStandardOutputProcess(QProcess* destination) {
-//    throw (engine_error() << "basic_process: " << Q_FUNC_INFO << " not implemented yet.");
+//    throw (engine_error() << "basic_process: " << __func__ << " not implemented yet.");
 //  }
 
 /**

@@ -19,7 +19,6 @@
 
 #include <exception>
 #include <QCoreApplication>
-#include <QDebug>
 #include "com/centreon/engine/broker/handle.hh"
 #include "com/centreon/engine/error.hh"
 #include "test/broker/mod_load.hh"

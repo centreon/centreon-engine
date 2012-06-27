@@ -17,10 +17,9 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <climits>
 #include <exception>
-#include <limits.h>
 #include <QCoreApplication>
-#include <QDebug>
 #include "com/centreon/engine/broker/compatibility.hh"
 #include "com/centreon/engine/broker/loader.hh"
 #include "com/centreon/engine/error.hh"

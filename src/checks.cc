@@ -18,12 +18,12 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <errno.h>
+#include <cerrno>
+#include <csignal>
+#include <cstdio>
+#include <cstdlib>
 #include <exception>
-#include <signal.h>
 #include <sstream>
-#include <stdlib.h>
-#include <stdio.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/wait.h>
@@ -2055,7 +2055,7 @@ int run_sync_host_check_3x(host* hst,
 			   int check_options,
 			   int use_cached_result,
 			   unsigned long check_timestamp_horizon) {
-  logger(dbg_functions, basic) << "start " << Q_FUNC_INFO;
+  logger(dbg_functions, basic) << "start " << __func__;
   try {
     checks::checker::instance().run_sync(hst,
 					 check_result_code,
@@ -2068,7 +2068,7 @@ int run_sync_host_check_3x(host* hst,
     return (ERROR);
   }
 
-  logger(dbg_functions, basic) << "end " << Q_FUNC_INFO;
+  logger(dbg_functions, basic) << "end " << __func__;
   return (OK);
 }
 

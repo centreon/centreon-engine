@@ -18,9 +18,8 @@
 */
 
 #include <exception>
-#include <limits.h>
+#include <climits>
 #include <QCoreApplication>
-#include <QDebug>
 #include "com/centreon/engine/broker/loader.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/nebmods.hh"

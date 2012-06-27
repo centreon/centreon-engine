@@ -17,8 +17,9 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <cstdlib>
 #include <exception>
-#include <QDebug>
+#include <iostream>
 #include "com/centreon/engine/commands/set.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/logging/engine.hh"
@@ -28,23 +29,36 @@
 
 using namespace test::objects;
 
+/**
+ *  Check that command can be properly released.
+ *
+ *  @return EXIT_SUCCESS on success.
+ */
 int main() {
+  // Initialization.
   com::centreon::engine::logging::engine::load();
   com::centreon::engine::commands::set::load();
+
+  // Tests.
   try {
     release_null_pointer(static_cast<command const*>(NULL));
-    release_objects(&create_command,
-                   command_list,
-                   command_list_tail);
-    release_objects(&create_command,
-                    command_list,
-                    command_list_tail,
-                    10);
+    release_objects(
+      &create_command,
+      command_list,
+      command_list_tail);
+    release_objects(
+      &create_command,
+      command_list,
+      command_list_tail,
+      10);
   }
+  // Error.
   catch (std::exception const& e) {
-    qDebug() << "error: " << e.what();
+    std::cerr << "error: " << e.what() << std::endl;
     free_memory(get_global_macros());
-    return (1);
+    return (EXIT_FAILURE);
   }
-  return (0);
+
+  // Success.
+  return (EXIT_SUCCESS);
 }

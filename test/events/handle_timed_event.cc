@@ -19,7 +19,6 @@
 
 #include <exception>
 #include <QCoreApplication>
-#include <QDebug>
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/events.hh"
@@ -80,7 +79,7 @@ static void check_event_service_check() {
 
   // check if handle_timed_event call _exec_event_service_check.
   if (svc.next_check == 0)
-    throw (engine_error() << Q_FUNC_INFO);
+    throw (engine_error() << __func__);
 }
 
 /**
@@ -103,7 +102,7 @@ static void check_event_command_check() {
   handle_timed_event(&event);
 
   if (broker_callback(-1, NULL) != NEBTYPE_EXTERNALCOMMAND_CHECK)
-    throw (engine_error() << Q_FUNC_INFO);
+    throw (engine_error() << __func__);
 
   // release callback.
   neb_deregister_module_callbacks(module_id);
@@ -125,7 +124,7 @@ static void check_event_program_shutdown() {
 
   // check if handle_timed_event call _exec_event_program_shutdown.
   if (sigshutdown == false)
-    throw (engine_error() << Q_FUNC_INFO);
+    throw (engine_error() << __func__);
 }
 
 /**
@@ -144,7 +143,7 @@ static void check_event_program_restart() {
 
   // check if handle_timed_event call _exec_event_program_restart.
   if (sigrestart != false)
-    throw (engine_error() << Q_FUNC_INFO);
+    throw (engine_error() << __func__);
 }
 
 /**
@@ -192,7 +191,7 @@ static void check_event_retention_save() {
   handle_timed_event(&event);
 
   if (broker_callback(-1, NULL) != NEBTYPE_RETENTIONDATA_ENDSAVE)
-    throw (engine_error() << Q_FUNC_INFO);
+    throw (engine_error() << __func__);
 
   // release callback.
   neb_deregister_module_callbacks(module_id);
@@ -219,7 +218,7 @@ static void check_event_status_save() {
   handle_timed_event(&event);
 
   if (broker_callback(-1, NULL) != NEBTYPE_AGGREGATEDSTATUS_ENDDUMP)
-    throw (engine_error() << Q_FUNC_INFO);
+    throw (engine_error() << __func__);
 
   // release callback.
   neb_deregister_module_callbacks(module_id);
@@ -239,7 +238,7 @@ static void check_event_scheduled_downtime() {
 
   // check if handle_timed_event call _exec_event_scheduled_downtime.
   if (event.event_data != NULL)
-    throw (engine_error() << Q_FUNC_INFO);
+    throw (engine_error() << __func__);
 }
 
 /**
@@ -283,7 +282,7 @@ static void check_event_expire_downtime() {
 
   // check if handle_timed_event call _exec_event_expire_downtime.
   if (scheduled_downtime_list != NULL)
-    throw (engine_error() << Q_FUNC_INFO);
+    throw (engine_error() << __func__);
 }
 
 /**
@@ -305,7 +304,7 @@ static void check_event_host_check() {
 
   // check if handle_timed_event call _exec_event_host_check.
   if (hst.next_check == 0)
-    throw (engine_error() << Q_FUNC_INFO);
+    throw (engine_error() << __func__);
 }
 
 /**
@@ -362,7 +361,7 @@ static void check_event_expire_comment() {
 
   // check if handle_timed_event call _exec_event_expire_comment.
   if (comment_list != NULL)
-    throw (engine_error() << Q_FUNC_INFO);
+    throw (engine_error() << __func__);
 }
 
 /**
@@ -379,7 +378,7 @@ static void check_event_user_function() {
   handle_timed_event(&event);
 
   if (event.event_args == &event)
-    throw (engine_error() << Q_FUNC_INFO);
+    throw (engine_error() << __func__);
 }
 
 /**

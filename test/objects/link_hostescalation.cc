@@ -124,27 +124,27 @@ static void link_null_name() {
 
 static void link_without_contacts() {
   if (create_and_link(false, true, true) == false)
-    throw (engine_error() << Q_FUNC_INFO << " invalid return");
+    throw (engine_error() << __func__ << " invalid return");
 }
 
 static void link_without_contactgroups() {
   if (create_and_link(true, false, true) == false)
-    throw (engine_error() << Q_FUNC_INFO << " invalid return");
+    throw (engine_error() << __func__ << " invalid return");
 }
 
 static void link_without_contacts_and_contactgroups() {
   if (create_and_link(false, false, true) == true)
-    throw (engine_error() << Q_FUNC_INFO << " invalid return");
+    throw (engine_error() << __func__ << " invalid return");
 }
 
 static void link_without_escalation_period() {
   if (create_and_link(true, true, false) == false)
-    throw (engine_error() << Q_FUNC_INFO << " invalid return");
+    throw (engine_error() << __func__ << " invalid return");
 }
 
 static void link_with_valid_objects() {
   if (create_and_link(true, true, true) == false)
-    throw (engine_error() << Q_FUNC_INFO << " invalid return");
+    throw (engine_error() << __func__ << " invalid return");
 }
 
 /**

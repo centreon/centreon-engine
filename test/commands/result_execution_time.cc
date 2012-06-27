@@ -17,10 +17,9 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <ctime>
 #include <exception>
 #include <QCoreApplication>
-#include <QDebug>
-#include <time.h>
 #include "com/centreon/engine/commands/result.hh"
 #include "com/centreon/engine/error.hh"
 #include "test/unittest.hh"

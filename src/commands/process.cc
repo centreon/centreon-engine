@@ -216,7 +216,7 @@ void process::setupChildProcess() {
  */
 void process::_error(QProcess::ProcessError error) {
   // Debug.
-  logger(dbg_functions, basic) << "start " << Q_FUNC_INFO;
+  logger(dbg_functions, basic) << "start " << __func__;
 
   // Handle error.
   if (QProcess::FailedToStart == error) {
@@ -226,7 +226,7 @@ void process::_error(QProcess::ProcessError error) {
   }
 
   // Debug.
-  logger(dbg_functions, basic) << "end " << Q_FUNC_INFO;
+  logger(dbg_functions, basic) << "end " << __func__;
   return ;
 }
 
@@ -240,7 +240,7 @@ void process::_finished(
                 int exit_code,
                 QProcess::ExitStatus exit_status) {
   // Debug.
-  logger(dbg_functions, basic) << "start " << Q_FUNC_INFO;
+  logger(dbg_functions, basic) << "start " << __func__;
 
   // Set timing information about process.
   _end_time = QDateTime::currentDateTime();
@@ -277,7 +277,7 @@ void process::_finished(
   emit process_ended();
 
   // Debug.
-  logger(dbg_functions, basic) << "end " << Q_FUNC_INFO;
+  logger(dbg_functions, basic) << "end " << __func__;
   return ;
 }
 
@@ -305,7 +305,7 @@ void process::_internal_copy(process const& right) {
  */
 void process::_started() {
   // Debug.
-  logger(dbg_functions, basic) << "start " << Q_FUNC_INFO;
+  logger(dbg_functions, basic) << "start " << __func__;
 
   // Set information.
   _start_time = QDateTime::currentDateTime();
@@ -317,7 +317,7 @@ void process::_started() {
   closeWriteChannel();
 
   // Debug.
-  logger(dbg_functions, basic) << "end " << Q_FUNC_INFO;
+  logger(dbg_functions, basic) << "end " << __func__;
   return ;
 }
 
@@ -326,7 +326,7 @@ void process::_started() {
  */
 void process::_timedout() {
   // Debug.
-  logger(dbg_functions, basic) << "start " << Q_FUNC_INFO;
+  logger(dbg_functions, basic) << "start " << __func__;
 
   // Timeout occurs, kill process.
   if (state() == QProcess::Running) {
@@ -335,6 +335,6 @@ void process::_timedout() {
   }
 
   // Debug.
-  logger(dbg_functions, basic) << "end " << Q_FUNC_INFO;
+  logger(dbg_functions, basic) << "end " << __func__;
   return ;
 }

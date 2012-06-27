@@ -20,7 +20,7 @@
 #ifndef TEST_UNITTEST_HH
 #  define TEST_UNITTEST_HH
 
-#  include <QDebug>
+#  include <iostream>
 #  include <QThread>
 #  include "com/centreon/engine/broker/compatibility.hh"
 #  include "com/centreon/engine/broker/loader.hh"
@@ -59,10 +59,10 @@ namespace     com {
             _deinit();
           }
           catch (std::exception const& e) {
-            qDebug() << "error: " << e.what();
+            std::cerr << "error: " << e.what() << std::endl;
           }
           catch (...) {
-            qDebug() << "error: catch all...";
+            std::cerr << "error: catch all..." << std::endl;
           }
         }
 

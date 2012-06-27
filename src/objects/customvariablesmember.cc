@@ -17,7 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <ctype.h>
+#include <cctype>
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/objects/customvariablesmember.hh"
 
@@ -37,7 +37,7 @@ customvariablesmember const* release_customvariablesmember(customvariablesmember
     logger(log_runtime_error, basic) << e.what();
   }
   catch (...) {
-    logger(log_runtime_error, basic) << Q_FUNC_INFO << " unknow exception.";
+    logger(log_runtime_error, basic) << __func__ << " unknow exception";
   }
   return (NULL);
 }

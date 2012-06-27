@@ -17,9 +17,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <cstring>
 #include <QCoreApplication>
-#include <QDebug>
-#include <string.h>
 #include "com/centreon/engine/nebmods.hh"
 #include "test/broker/mod_load.hh"
 

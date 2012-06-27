@@ -36,7 +36,7 @@ commandsmember const* release_commandsmember(commandsmember const* obj) {
     logger(log_runtime_error, basic) << e.what();
   }
   catch (...) {
-    logger(log_runtime_error, basic) << Q_FUNC_INFO << " unknow exception.";
+    logger(log_runtime_error, basic) << __func__ << " unknow exception";
   }
   return (NULL);
 }

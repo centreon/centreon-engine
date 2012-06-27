@@ -18,7 +18,6 @@
 */
 
 #include <QCoreApplication>
-#include <QDebug>
 #include <exception>
 #include "com/centreon/engine/commands/connector/version_query.hh"
 #include "com/centreon/engine/commands/connector/version_response.hh"

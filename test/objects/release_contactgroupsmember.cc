@@ -17,8 +17,9 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <cstdlib>
 #include <exception>
-#include <QDebug>
+#include <iostream>
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/macros.hh"
 #include "test/objects/create_object.hh"
@@ -26,16 +27,25 @@
 
 using namespace test::objects;
 
+/**
+ *  Check that contactgroupsmember can be properly released.
+ *
+ *  @return EXIT_SUCCESS on success.
+ */
 int main() {
+  // Tests,
   try {
     release_null_pointer(static_cast<contactgroupsmember const*>(NULL));
     release_objects(&create_contactgroupsmember);
     release_objects(&create_contactgroupsmember, 10);
   }
+  // Error.
   catch (std::exception const& e) {
-    qDebug() << "error: " << e.what();
+    std::cerr << "error: " << e.what() << std::endl;
     free_memory(get_global_macros());
-    return (1);
+    return (EXIT_FAILURE);
   }
-  return (0);
+
+  // Success.
+  return (EXIT_SUCCESS);
 }
