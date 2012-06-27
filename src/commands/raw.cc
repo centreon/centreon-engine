@@ -18,8 +18,8 @@
 */
 
 #include <QCoreApplication>
-#include <QMutexLocker>
 #include <QTimer>
+#include "com/centreon/concurrency/locker.hh"
 #include "com/centreon/engine/commands/raw.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
@@ -56,7 +56,7 @@ raw::raw(raw const& right) : command(right) {}
  *  Destructor.
  */
 raw::~raw() throw () {
-  QMutexLocker lock(&_mutex);
+  concurrency::locker lock(&_mutex);
   while (!_processes.empty()) {
     // XXX MK : code below seems broken to me, as vtable is not
     // guaranteed upon destruction. Also, the event loop might not catch
@@ -127,7 +127,7 @@ unsigned long raw::run(
 
   // Store process information.
   {
-    QMutexLocker lock(&_mutex);
+    concurrency::locker lock(&_mutex);
     info.cmd_id = get_uniq_id();
     _processes[&(*info.proc)] = info;
   }
@@ -139,7 +139,7 @@ unsigned long raw::run(
   info.proc->start(processed_cmd);
 
   // Debug.
-  logger(dbg_functions, basic) << "end " << Q_FUNC_INFO;
+  logger(dbg_functions, basic) << "end " << __func__;
   return (info.cmd_id);
 }
 
@@ -157,12 +157,12 @@ void raw::run(
             unsigned int timeout,
             result& res) {
   // Debug.
-  logger(dbg_functions, basic) << "start " << Q_FUNC_INFO;
+  logger(dbg_functions, basic) << "start " << __func__;
 
   // Get process ID.
   unsigned long id;
   {
-    QMutexLocker lock(&_mutex);
+    concurrency::locker lock(&_mutex);
     id = get_uniq_id();
   }
 
@@ -187,7 +187,7 @@ void raw::run(
   res.set_is_executed(proc.get_is_executed());
 
   // Debug.
-  logger(dbg_functions, basic) << "end " << Q_FUNC_INFO;
+  logger(dbg_functions, basic) << "end " << __func__;
   return ;
 }
 
@@ -196,12 +196,12 @@ void raw::run(
  */
 void raw::raw_ended() {
   // Debug.
-  logger(dbg_functions, basic) << "start " << Q_FUNC_INFO;
+  logger(dbg_functions, basic) << "start " << __func__;
 
   // Find process info.
   process_info info;
   {
-    QMutexLocker lock(&_mutex);
+    concurrency::locker lock(&_mutex);
     std::map<QObject*, process_info>::iterator
       it(_processes.find(sender()));
     if (it == _processes.end()) {
@@ -229,7 +229,7 @@ void raw::raw_ended() {
 
   // Command finished executing.
   emit command_executed(res);
-  logger(dbg_functions, basic) << "end " << Q_FUNC_INFO;
+  logger(dbg_functions, basic) << "end " << __func__;
   return ;
 }
 

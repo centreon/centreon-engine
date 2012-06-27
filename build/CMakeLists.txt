@@ -702,6 +702,7 @@ target_link_libraries("cce_core"
   ${PTHREAD_LIBRARIES}
   ${SOCKET_LIBRARIES}
   ${QT_LIBRARIES}
+  ${CLIB_LIBRARIES}
   "cce_configuration_applier"
   "cce_events"
   "cce_logging"

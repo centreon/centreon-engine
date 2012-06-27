@@ -18,12 +18,13 @@
 */
 
 #include <algorithm>
-#include <string.h>
+#include <cstring>
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/file.hh"
 #include "com/centreon/engine/statusdata.hh"
 
+using namespace com::centreon;
 using namespace com::centreon::engine::logging;
 
 std::list<file*> file::_files;
@@ -42,7 +43,7 @@ QReadWriteLock   file::_rwlock;
  *  @param[in] size_limit The file's size limit.
  */
 file::file(std::string const& file, unsigned long long size_limit)
-  : _mutex(new QMutex),
+  : _mutex(new concurrency::mutex),
     _file(new QFile(file.c_str())),
     _size_limit(size_limit) {
   _file->open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Append);

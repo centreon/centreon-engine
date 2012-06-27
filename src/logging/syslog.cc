@@ -18,8 +18,10 @@
 */
 
 #include <syslog.h>
+#include "com/centreon/concurrency/locker.hh"
 #include "com/centreon/engine/logging/syslog.hh"
 
+using namespace com::centreon;
 using namespace com::centreon::engine;
 
 /**************************************
@@ -38,7 +40,7 @@ logging::syslog::syslog() : _facility(LOG_USER) {
 /**
  *  Default destructor.
  */
-logging::syslog::~syslog() throw() {
+logging::syslog::~syslog() throw () {
   closelog();
 }
 
@@ -51,35 +53,36 @@ logging::syslog& logging::syslog::instance() {
 }
 
 /**
- *  Set the syslog facility.
- *
- *  @param[in] facility Used to specify what type of
- *                      program is logging the message.
- */
-void logging::syslog::set_facility(int facility) throw() {
-  _mutex.lock();
-  _facility = facility;
-  closelog();
-  openlog("centreon-engine", LOG_ODELAY, _facility);
-  _mutex.unlock();
-}
-
-/**
  *  Write log into syslog.
  *
  *  @param[in] message   Message to log.
  *  @param[in] type      Logging types.
  *  @param[in] verbosity Verbosity level.
  */
-void logging::syslog::log(char const* message,
-                          unsigned long long type,
-                          unsigned int verbosity) throw() {
+void logging::syslog::log(
+                        char const* message,
+                        unsigned long long type,
+                        unsigned int verbosity) throw () {
   (void)type;
   (void)verbosity;
 
-  if (message != NULL) {
-    _mutex.lock();
+  if (message) {
+    concurrency::locker lock(&_mutex);
     ::syslog(_facility | LOG_INFO, "%s", message);
-    _mutex.unlock();
   }
+  return ;
+}
+
+/**
+ *  Set the syslog facility.
+ *
+ *  @param[in] facility Used to specify what type of
+ *                      program is logging the message.
+ */
+void logging::syslog::set_facility(int facility) throw () {
+  concurrency::locker lock(&_mutex);
+  _facility = facility;
+  closelog();
+  openlog("centreon-engine", LOG_ODELAY, _facility);
+  return ;
 }

@@ -20,9 +20,9 @@
 #ifndef CCE_COMMANDS_COMMAND_HH
 #  define CCE_COMMANDS_COMMAND_HH
 
-#  include <QMutex>
 #  include <QObject>
 #  include <string>
+#  include "com/centreon/concurrency/mutex.hh"
 #  include "com/centreon/engine/commands/result.hh"
 #  include "com/centreon/engine/macros.hh"
 
@@ -86,7 +86,8 @@ namespace                        com {
 
         private:
           static unsigned long   _id;
-          static QMutex          _mtx;
+          static com::centreon::concurrency::mutex
+                                 _mtx;
         };
       }
     }

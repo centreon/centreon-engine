@@ -21,9 +21,9 @@
 #  define CCE_COMMANDS_RAW_HH
 
 #  include <map>
-#  include <QMutex>
 #  include <string>
 #  include <sys/time.h>
+#  include "com/centreon/concurrency/mutex.hh"
 #  include "com/centreon/engine/commands/command.hh"
 #  include "com/centreon/engine/commands/process.hh"
 #  include "com/centreon/shared_ptr.hh"
@@ -74,7 +74,8 @@ namespace                 com {
 
           static void     _deletelater_process(process* obj);
 
-          QMutex          _mutex;
+          com::centreon::concurrency::mutex
+                          _mutex;
           std::map<QObject*, process_info>
                           _processes;
         };

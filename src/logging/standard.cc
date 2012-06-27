@@ -17,9 +17,9 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <QMutexLocker>
-#include <stdio.h>
-#include <string.h>
+#include <cstdio>
+#include <cstring>
+#include "com/centreon/concurrency/locker.hh"
 #include "com/centreon/engine/logging/standard.hh"
 
 using namespace com::centreon::engine::logging;
@@ -80,7 +80,7 @@ void standard::log(
   (void)verbosity;
 
   if (message) {
-    QMutexLocker lock(&_mutex);
+    com::centreon::concurrency::locker lock(&_mutex);
     fwrite(message, strlen(message), 1, _file);
   }
 

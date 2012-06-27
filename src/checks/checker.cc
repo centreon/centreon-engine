@@ -21,11 +21,10 @@
 #include <cassert>
 #include <cstdlib>
 #include <cstring>
-#include <QByteArray>
 #include <QMetaType>
-#include <QMutexLocker>
 #include <sstream>
 #include <sys/time.h>
+#include "com/centreon/concurrency/locker.hh"
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/checks.hh"
 #include "com/centreon/engine/checks/checker.hh"
@@ -56,7 +55,7 @@ std::auto_ptr<checker> checker::_instance;
  */
 checker::~checker() throw () {
   try {
-    QMutexLocker lock(&_mut_reap);
+    concurrency::locker lock(&_mut_reap);
     while (!_to_reap.empty()) {
       free_check_result(&_to_reap.front());
       _to_reap.pop();
@@ -89,7 +88,7 @@ void checker::load() {
  *  @param[in] result The check_result to process later.
  */
 void checker::push_check_result(check_result const& result) {
-  QMutexLocker lock(&_mut_reap);
+  concurrency::locker lock(&_mut_reap);
   _to_reap.push(result);
   return ;
 }
@@ -98,7 +97,7 @@ void checker::push_check_result(check_result const& result) {
  *  Reap and process all result recive by execution process.
  */
 void checker::reap() {
-  logger(dbg_functions, basic) << "start " << Q_FUNC_INFO;
+  logger(dbg_functions, basic) << "start " << __func__;
   logger(dbg_checks, basic) << "Starting to reap check results.";
 
   // Time to start reaping.
@@ -108,7 +107,7 @@ void checker::reap() {
   // Reap check results.
   unsigned int reaped_checks(0);
   { // Scope to release mutex in all termination cases.
-    QMutexLocker lock(&_mut_reap);
+    concurrency::locker lock(&_mut_reap);
     while (!_to_reap.empty()) {
       // Get result host or service check.
       logger(dbg_checks, basic)
@@ -188,7 +187,7 @@ void checker::reap() {
   // Reaping finished.
   logger(dbg_checks, basic)
     << "Finished reaping " << reaped_checks << " check results";
-  logger(dbg_functions, basic) << "end " << Q_FUNC_INFO;
+  logger(dbg_functions, basic) << "end " << __func__;
   return ;
 }
 
@@ -198,7 +197,7 @@ void checker::reap() {
  *  @return True if the reper queue is empty, otherwise false.
  */
 bool checker::reaper_is_empty() {
-  QMutexLocker lock(&_mut_reap);
+  concurrency::locker lock(&_mut_reap);
   return (_to_reap.empty());
 }
 
@@ -224,7 +223,7 @@ void checker::run(
                 int* time_is_valid,
                 time_t* preferred_time) {
   // Preamble.
-  logger(dbg_functions, basic) << "start " << Q_FUNC_INFO;
+  logger(dbg_functions, basic) << "start " << __func__;
   if (!hst)
     throw (engine_error() << "attempt to run check on NULL host");
   if (!hst->check_command_ptr)
@@ -407,13 +406,13 @@ void checker::run(
                           macros,
                           config.get_host_check_timeout()));
   if (id != 0) {
-    QMutexLocker lock(&_mut_id);
+    concurrency::locker lock(&_mut_id);
     _list_id[id] = check_result_info;
   }
 
   // Cleanup.
   clear_volatile_macros_r(&macros);
-  logger(dbg_functions, basic) << "end " << Q_FUNC_INFO;
+  logger(dbg_functions, basic) << "end " << __func__;
   return ;
 }
 
@@ -439,7 +438,7 @@ void checker::run(
                 int* time_is_valid,
                 time_t* preferred_time) {
   // Preamble.
-  logger(dbg_functions, basic) << "start " << Q_FUNC_INFO;
+  logger(dbg_functions, basic) << "start " << __func__;
   if (!svc)
     throw (engine_error() << "attempt to run check on NULL service");
   else if (!svc->host_ptr)
@@ -611,13 +610,13 @@ void checker::run(
                           macros,
                           config.get_service_check_timeout()));
   if (id != 0) {
-    QMutexLocker lock(&_mut_id);
+    concurrency::locker lock(&_mut_id);
     _list_id[id] = check_result_info;
   }
 
   // Cleanup.
   clear_volatile_macros_r(&macros);
-  logger(dbg_functions, basic) << "end " << Q_FUNC_INFO;
+  logger(dbg_functions, basic) << "end " << __func__;
   return ;
 }
 
@@ -637,7 +636,7 @@ void checker::run_sync(
                 int use_cached_result,
                 unsigned long check_timestamp_horizon) {
   // Preamble.
-  logger(dbg_functions, basic) << "start " << Q_FUNC_INFO;
+  logger(dbg_functions, basic) << "start " << __func__;
   if (!hst)
     throw (engine_error() << "host pointer is NULL.");
   logger(dbg_checks, basic)
@@ -793,7 +792,7 @@ void checker::run_sync(
     NULL);
 
   // End.
-  logger(dbg_functions, basic) << "end " << Q_FUNC_INFO;
+  logger(dbg_functions, basic) << "end " << __func__;
   return ;
 }
 
@@ -818,12 +817,12 @@ void checker::unload() {
  */
 void checker::_command_executed(cce_commands_result const& res) {
   // Debug message.
-  logger(dbg_functions, basic) << "start " << Q_FUNC_INFO;
+  logger(dbg_functions, basic) << "start " << __func__;
 
   // Find check result.
   check_result result;
   {
-    QMutexLocker lock(&_mut_id);
+    concurrency::locker lock(&_mut_id);
     std::map<unsigned long, check_result>::iterator
       it(_list_id.find(res.get_command_id()));
     if (_list_id.end() == it) {
@@ -852,19 +851,19 @@ void checker::_command_executed(cce_commands_result const& res) {
 
   // Queue check result.
   {
-    QMutexLocker lock(&_mut_reap);
+    concurrency::locker lock(&_mut_reap);
     _to_reap.push(result);
   }
 
   // Debug message.
-  logger(dbg_functions, basic) << "end " << Q_FUNC_INFO;
+  logger(dbg_functions, basic) << "end " << __func__;
   return ;
 }
 
 /**
  *  Default constructor.
  */
-checker::checker() : _mut_id(QMutex::Recursive) {
+checker::checker() {
   qRegisterMetaType<commands::result>("cce_commands_result");
 }
 
@@ -898,7 +897,7 @@ checker& checker::operator=(checker const& right) {
  */
 int checker::_execute_sync(host* hst) {
   // Preamble.
-  logger(dbg_functions, basic) << "start " << Q_FUNC_INFO;
+  logger(dbg_functions, basic) << "start " << __func__;
   if (!hst)
     throw (engine_error() << "host pointer is NULL.");
   logger(dbg_checks, basic)
@@ -1146,7 +1145,7 @@ int checker::_execute_sync(host* hst) {
   // Termination.
   logger(dbg_checks, basic)
     << "** Sync host check done: state=" << return_result;
-  logger(dbg_functions, basic) << "end " << Q_FUNC_INFO;
+  logger(dbg_functions, basic) << "end " << __func__;
   return (return_result);
 }
 

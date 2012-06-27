@@ -21,8 +21,8 @@
 #  define CCE_COMMANDS_CONNECTOR_COMMAND_HH
 
 #  include <map>
-#  include <QMutex>
 #  include <QTimer>
+#  include "com/centreon/concurrency/mutex.hh"
 #  include "com/centreon/engine/commands/basic_process.hh"
 #  include "com/centreon/engine/commands/command.hh"
 #  include "com/centreon/engine/commands/connector/execute_query.hh"
@@ -100,7 +100,7 @@ namespace                              com {
             void                       _req_error_r(request* req);
 
             std::string                _read_data;
-            QMutex                     _mutex;
+            concurrency::mutex         _mutex;
             std::string                _connector_name;
             std::string                _connector_line;
             com::centreon::shared_ptr<basic_process>

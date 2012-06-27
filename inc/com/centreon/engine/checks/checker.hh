@@ -22,9 +22,9 @@
 
 #  include <map>
 #  include <memory>
-#  include <QMutex>
 #  include <QObject>
 #  include <queue>
+#  include "com/centreon/concurrency/mutex.hh"
 #  include "com/centreon/engine/checks.hh"
 #  include "com/centreon/engine/commands/command.hh"
 #  include "com/centreon/engine/commands/result.hh"
@@ -91,8 +91,8 @@ namespace                      com {
                                _instance;
           std::map<unsigned long, check_result>
                                _list_id;
-          QMutex               _mut_id;
-          QMutex               _mut_reap;
+          concurrency::mutex   _mut_id;
+          concurrency::mutex   _mut_reap;
           std::queue<check_result>
                                _to_reap;
         };

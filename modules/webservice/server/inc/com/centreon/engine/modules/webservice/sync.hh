@@ -20,8 +20,8 @@
 #ifndef CCE_MOD_WS_SYNC_HH
 #  define CCE_MOD_WS_SYNC_HH
 
-#  include <QMutex>
-#  include <QWaitCondition>
+#  include "com/centreon/concurrency/condvar.hh"
+#  include "com/centreon/concurrency/mutex.hh"
 #  include "com/centreon/engine/modules/webservice/namespace.hh"
 
 CCE_MOD_WS_BEGIN()
@@ -43,13 +43,17 @@ public:
 private:
                   sync();
                   sync(sync const& right);
-                  ~sync();
+                  ~sync() throw ();
   sync&           operator=(sync const& right);
 
-  QWaitCondition  _cnd_main;
-  QWaitCondition  _cnd_worker;
-  QMutex          _mtx_main;
-  QMutex          _mtx_worker;
+  com::centreon::concurrency::condvar
+                  _cnd_main;
+  com::centreon::concurrency::condvar
+                  _cnd_worker;
+  com::centreon::concurrency::mutex
+                  _mtx_main;
+  com::centreon::concurrency::mutex
+                  _mtx_worker;
   unsigned int    _thread_count;
 };
 

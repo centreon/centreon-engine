@@ -22,9 +22,9 @@
 
 #  include <list>
 #  include <QFile>
-#  include <QMutex>
 #  include <QReadWriteLock>
 #  include <string>
+#  include "com/centreon/concurrency/mutex.hh"
 #  include "com/centreon/engine/logging/object.hh"
 #  include "com/centreon/engine/namespace.hh"
 #  include "com/centreon/shared_ptr.hh"
@@ -57,7 +57,7 @@ namespace                   logging {
                               unsigned long long size) throw ();
 
   private:
-    com::centreon::shared_ptr<QMutex>
+    com::centreon::shared_ptr<com::centreon::concurrency::mutex>
                             _mutex;
     com::centreon::shared_ptr<QFile>
                             _file;

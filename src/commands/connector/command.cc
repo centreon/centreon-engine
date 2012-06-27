@@ -17,8 +17,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <QMutexLocker>
 #include <QEventLoop>
+#include "com/centreon/concurrency/locker.hh"
 #include "com/centreon/engine/commands/connector/command.hh"
 #include "com/centreon/engine/commands/connector/error_response.hh"
 #include "com/centreon/engine/commands/connector/execute_response.hh"
@@ -132,7 +132,7 @@ unsigned long connector::command::run(std::string const& processed_cmd,
 				      unsigned int timeout) {
   (void)macros;
 
-  QMutexLocker locker(&_mutex);
+  concurrency::locker locker(&_mutex);
 
   if (_nbr_check > _max_check_for_restart) {
     locker.unlock();
@@ -188,7 +188,7 @@ void connector::command::run(std::string const& processed_cmd,
 			     result& res) {
   (void)macros;
 
-  QMutexLocker locker(&_mutex);
+  concurrency::locker locker(&_mutex);
 
   if (_nbr_check > _max_check_for_restart) {
     locker.unlock();
@@ -267,7 +267,7 @@ std::string const& connector::command::get_connector_line() const throw() {
  *  @return The max check for restart process.
  */
 unsigned long connector::command::get_max_check_for_restart() throw() {
-  QMutexLocker locker(&_mutex);
+  concurrency::locker locker(&_mutex);
   return (_max_check_for_restart);
 }
 
@@ -277,7 +277,7 @@ unsigned long connector::command::get_max_check_for_restart() throw() {
  *  @param[in] value The max time for restart process.
  */
 void connector::command::set_max_check_for_restart(unsigned long value) throw() {
-  QMutexLocker locker(&_mutex);
+  concurrency::locker locker(&_mutex);
   _max_check_for_restart = value;
 }
 
@@ -285,7 +285,7 @@ void connector::command::set_max_check_for_restart(unsigned long value) throw() 
  *  Slot notify when timeout occur.
  */
 void connector::command::_timeout() {
-  QMutexLocker locker(&_mutex);
+  concurrency::locker locker(&_mutex);
 
   _active_timer = false;
   QDateTime now = QDateTime::currentDateTime();
@@ -364,7 +364,7 @@ void connector::command::_ready_read() {
 
   // Read process output.
   {
-    QMutexLocker locker(&_mutex);
+    concurrency::locker locker(&_mutex);
     _read_data.append(_process->readAllStandardOutput());
     while (_read_data.size() > 0) {
       size_t pos(_read_data.find(request::cmd_ending()));
@@ -403,7 +403,7 @@ void connector::command::_ready_read() {
  *  Restart the processed command.
  */
 void connector::command::_start() {
-  QMutexLocker locker(&_mutex);
+  concurrency::locker locker(&_mutex);
   _nbr_check = 0;
 
   if (_process.get()) {
@@ -458,7 +458,7 @@ void connector::command::_start() {
  *  Quit properly the current process.
  */
 void connector::command::_exit() {
-  QMutexLocker locker(&_mutex);
+  concurrency::locker locker(&_mutex);
 
   if (!_process.get() || _is_exiting)
     return ;
@@ -515,7 +515,7 @@ void connector::command::_req_quit_r(request* req) {
  *  @param[in] req The request to process.
  */
 void connector::command::_req_version_r(request* req) {
-  QMutexLocker locker(&_mutex);
+  concurrency::locker locker(&_mutex);
   version_response* res = static_cast<version_response*>(req);
 
   if (res->get_major() < CENTREON_ENGINE_VERSION_MAJOR
@@ -539,7 +539,7 @@ void connector::command::_req_execute_r(request* req) {
   request_info info;
 
   {
-    QMutexLocker locker(&_mutex);
+    concurrency::locker locker(&_mutex);
     std::map<unsigned long, request_info>::iterator
       it = _queries.find(response->get_command_id());
     if (it == _queries.end()) {
@@ -592,7 +592,7 @@ void connector::command::_req_execute_r(request* req) {
     emit command_executed(res);
   }
   else {
-    QMutexLocker locker(&_mutex);
+    concurrency::locker locker(&_mutex);
     _results.insert(std::pair<unsigned long, result>(res.get_command_id(), res));
   }
   emit _wait_ending();

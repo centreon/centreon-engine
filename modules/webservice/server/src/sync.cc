@@ -17,9 +17,10 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <QMutexLocker>
+#include "com/centreon/concurrency/locker.hh"
 #include "com/centreon/engine/modules/webservice/sync.hh"
 
+using namespace com::centreon;
 using namespace com::centreon::engine::modules::webservice;
 
 /**************************************
@@ -42,7 +43,7 @@ sync& sync::instance() {
  *  Wait for global thread safeness.
  */
 void sync::wait_thread_safeness() {
-  QMutexLocker lock(&_mtx_worker);
+  concurrency::locker lock(&_mtx_worker);
   ++_thread_count;
   _cnd_worker.wait(&_mtx_worker);
   return ;
@@ -55,10 +56,10 @@ void sync::wait_thread_safeness() {
  *  executing.
  */
 void sync::wakeup_workers() {
-  QMutexLocker main_lock(&_mtx_main);
-  QMutexLocker worker_lock(&_mtx_worker);
+  concurrency::locker main_lock(&_mtx_main);
+  concurrency::locker worker_lock(&_mtx_worker);
   while (_thread_count) {
-    _cnd_worker.wakeOne();
+    _cnd_worker.wake_one();
     worker_lock.unlock();
     _cnd_main.wait(&_mtx_main);
     worker_lock.relock();
@@ -74,8 +75,8 @@ void sync::wakeup_workers() {
  */
 void sync::worker_finish() {
   --_thread_count;
-  QMutexLocker lock(&_mtx_main);
-  _cnd_main.wakeAll();
+  concurrency::locker lock(&_mtx_main);
+  _cnd_main.wake_all();
   return ;
 }
 
@@ -93,4 +94,4 @@ sync::sync() : _thread_count(0) {}
 /**
  *  Destructor,
  */
-sync::~sync() {}
+sync::~sync() throw () {}

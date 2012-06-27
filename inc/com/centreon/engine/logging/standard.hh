@@ -20,8 +20,8 @@
 #ifndef CCE_LOGGING_STANDARD_HH
 #  define CCE_LOGGING_STANDARD_HH
 
-#  include <QMutex>
-#  include <stdio.h>
+#  include <cstdio>
+#  include "com/centreon/concurrency/mutex.hh"
 #  include "com/centreon/engine/logging/object.hh"
 #  include "com/centreon/engine/namespace.hh"
 
@@ -50,7 +50,8 @@ namespace     logging {
     void      _internal_copy(standard const& right);
 
     FILE*     _file;
-    QMutex    _mutex;
+    com::centreon::concurrency::mutex
+              _mutex;
   };
 }
 

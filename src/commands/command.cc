@@ -17,13 +17,14 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <QMutexLocker>
+#include "com/centreon/concurrency/locker.hh"
 #include "com/centreon/engine/commands/command.hh"
 
+using namespace com::centreon;
 using namespace com::centreon::engine;
 
-QMutex        commands::command::_mtx;
-unsigned long commands::command::_id = 0;
+concurrency::mutex commands::command::_mtx;
+unsigned long      commands::command::_id(0);
 
 /**
  *  Default constructor
@@ -35,12 +36,10 @@ commands::command::command(std::string const& name,
 			   std::string const& command_line)
   : QObject(),
     _command_line(command_line),
-    _name(name) {
-
-}
+    _name(name) {}
 
 /**
- *  Default destructor.
+ *  Destructor.
  */
 commands::command::~command() throw () {}
 
@@ -150,6 +149,6 @@ std::string commands::command::process_cmd(nagios_macros* macros) const {
  *  @return The unique command id.
  */
 unsigned long commands::command::get_uniq_id() {
-  QMutexLocker locker(&_mtx);
+  concurrency::locker locker(&_mtx);
   return (++_id);
 }
