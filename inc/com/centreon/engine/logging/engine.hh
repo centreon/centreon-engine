@@ -21,8 +21,8 @@
 #  define CCE_LOGGING_ENGINE_HH
 
 #  include <memory>
-#  include <QReadWriteLock>
 #  include <vector>
+#  include "com/centreon/concurrency/read_write_lock.hh"
 #  include "com/centreon/engine/logging/object.hh"
 #  include "com/centreon/engine/namespace.hh"
 #  include "com/centreon/shared_ptr.hh"
@@ -93,7 +93,8 @@ namespace                    logging {
     static std::auto_ptr<engine>
                              _instance;
     std::vector<obj_info>    _objects;
-    QReadWriteLock           _rwlock;
+    com::centreon::concurrency::read_write_lock
+                             _rwlock;
     unsigned long long       _type[3];
   };
 }

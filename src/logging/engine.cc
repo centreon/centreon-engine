@@ -20,8 +20,8 @@
 #include <cassert>
 #include <cstdlib>
 #include <cstring>
-#include <QReadLocker>
-#include <QWriteLocker>
+#include "com/centreon/concurrency/read_locker.hh"
+#include "com/centreon/concurrency/write_locker.hh"
 #include "com/centreon/engine/logging/engine.hh"
 #include "com/centreon/shared_ptr.hh"
 
@@ -144,10 +144,10 @@ engine::~engine() throw () {}
  *  @return The object ID.
  */
 unsigned long engine::add_object(obj_info& info) {
-  QReadLocker lock(&_rwlock);
+  concurrency::read_locker lock(&_rwlock);
   info._id = ++_id;
   _objects.push_back(info);
-  for (unsigned int i = 0, end = info.verbosity(); i <= end; ++i)
+  for (unsigned int i(0), end(info.verbosity()); i <= end; ++i)
     _type[i] |= info.type();
   return (info._id);
 }
@@ -199,9 +199,10 @@ void engine::log(
                unsigned long long type,
                unsigned int verbosity) throw () {
   if (message != NULL) {
-    QReadLocker lock(&_rwlock);
-    for (std::vector<obj_info>::iterator it = _objects.begin(),
-           end = _objects.end();
+    concurrency::read_locker lock(&_rwlock);
+    for (std::vector<obj_info>::iterator
+           it(_objects.begin()),
+           end(_objects.end());
 	 it != end;
 	 ++it) {
       obj_info& info(*it);
@@ -218,11 +219,12 @@ void engine::log(
  *  @param[in] id The object's ID.
  */
 void engine::remove_object(unsigned long id) throw () {
-  QWriteLocker lock(&_rwlock);
+  concurrency::write_locker lock(&_rwlock);
   memset(_type, 0, sizeof(_type));
   std::vector<obj_info>::iterator it_erase(_objects.end());
-  for (std::vector<obj_info>::iterator it = _objects.begin(),
-         end = _objects.end();
+  for (std::vector<obj_info>::iterator
+         it(_objects.begin()),
+         end(_objects.end());
        it != end;
        ++it) {
     obj_info& obj(*it);
@@ -266,14 +268,16 @@ void engine::unload() {
  *  @param[in] type      Logging types.
  *  @param[in] verbosity Verbosity level.
  */
-void engine::update_object(unsigned long id,
-			   unsigned long long type,
-			   unsigned int verbosity) throw() {
-  QWriteLocker lock(&_rwlock);
+void engine::update_object(
+               unsigned long id,
+               unsigned long long type,
+               unsigned int verbosity) throw () {
+  concurrency::write_locker lock(&_rwlock);
   memset(_type, 0, sizeof(_type));
   std::vector<obj_info>::iterator it_erase(_objects.end());
-  for (std::vector<obj_info>::iterator it = _objects.begin(),
-         end = _objects.end();
+  for (std::vector<obj_info>::iterator
+         it(_objects.begin()),
+         end(_objects.end());
        it != end;
        ++it) {
     obj_info& obj(*it);

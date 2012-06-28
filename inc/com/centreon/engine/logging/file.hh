@@ -22,9 +22,9 @@
 
 #  include <list>
 #  include <QFile>
-#  include <QReadWriteLock>
 #  include <string>
 #  include "com/centreon/concurrency/mutex.hh"
+#  include "com/centreon/concurrency/read_write_lock.hh"
 #  include "com/centreon/engine/logging/object.hh"
 #  include "com/centreon/engine/namespace.hh"
 #  include "com/centreon/shared_ptr.hh"
@@ -46,23 +46,24 @@ namespace                   logging {
                             file(file const& right);
                             ~file() throw ();
     file&                   operator=(file const& right);
-    std::string             get_file_name() throw ();
-    unsigned long long      get_size_limit() const throw ();
+    std::string             get_file_name();
+    unsigned long long      get_size_limit() const;
     void                    log(
                               char const* message,
                               unsigned long long type,
                               unsigned int verbosity) throw ();
     static void             reopen();
     void                    set_size_limit(
-                              unsigned long long size) throw ();
+                              unsigned long long size);
 
   private:
-    com::centreon::shared_ptr<com::centreon::concurrency::mutex>
-                            _mutex;
     com::centreon::shared_ptr<QFile>
                             _file;
     static std::list<file*> _files;
-    static QReadWriteLock   _rwlock;
+    com::centreon::shared_ptr<com::centreon::concurrency::mutex>
+                            _mutex;
+    static com::centreon::concurrency::read_write_lock
+                            _rwlock;
     unsigned long long      _size_limit;
   };
 }
