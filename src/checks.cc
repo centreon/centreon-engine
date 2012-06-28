@@ -694,8 +694,11 @@ int handle_async_service_check_result(service* temp_service, check_result* queue
     temp_service->notified_on_warning = FALSE;
     temp_service->notified_on_critical = FALSE;
     temp_service->no_more_notifications = FALSE;
-    // XXX: todo.
-    // service_other_props[qMakePair(std::string(temp_service->host_ptr->name), std::string(temp_service->description))].initial_notif_time = 0;
+    service_other_props[
+      std::make_pair(
+             std::string(temp_service->host_ptr->name),
+             std::string(temp_service->description))].initial_notif_time
+      = 0;
 
     if (reschedule_check == TRUE)
       next_service_check = (time_t)(temp_service->last_check
