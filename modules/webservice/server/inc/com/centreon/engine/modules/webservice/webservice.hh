@@ -20,56 +20,55 @@
 #ifndef CCE_MOD_WS_WERBSERVICE_HH
 #  define CCE_MOD_WS_WERBSERVICE_HH
 
-#  include <QRunnable>
-#  include <QThread>
 #  include "soapH.h"
+#  include "com/centreon/concurrency/runnable.hh"
+#  include "com/centreon/concurrency/thread.hh"
 #  include "com/centreon/engine/modules/webservice/configuration.hh"
+#  include "com/centreon/engine/namespace.hh"
 
-namespace                         com {
-  namespace                       centreon {
-    namespace                     engine {
-      namespace                   modules {
-        namespace                 webservice {
-          /**
-           *  @class webservice webservice.hh
-           *  @brief Base webservice class.
-           *
-           *  Webservice class provide system to execute commands
-           *  over a network with a Simple Object Access Protocol.
-           */
-          class                   webservice : public QThread {
-            Q_OBJECT
-          public:
-                                  webservice(configuration const& config);
-	                          ~webservice() throw();
+CCE_BEGIN()
 
-          protected:
-            void                  run();
+namespace                   modules {
+  namespace                 webservice {
+    /**
+     *  @class webservice webservice.hh
+     *  @brief Base webservice class.
+     *
+     *  Webservice class provide system to execute commands
+     *  over a network with a Simple Object Access Protocol.
+     */
+    class                   webservice : public com::centreon::concurrency::thread {
+    public:
+                            webservice(configuration const* config);
+                            ~webservice() throw();
 
-          private:
-            class                 query : public QRunnable {
-            public:
-                                  query(soap* s = NULL);
-                                  ~query();
-              void                run();
+    protected:
+      void                  _run();
 
-            private:
-              soap*               _soap;
-            };
+    private:
+      class                 query : public com::centreon::concurrency::runnable {
+      public:
+                            query(soap* s = NULL);
+                            ~query() throw ();
+        void                run();
 
-                                  webservice(webservice const& right);
-                                  webservice& operator=(webservice const& right);
-            void                  _init();
-            static void           _sigpipe_handle(int x);
+      private:
+        soap*               _soap;
+      };
 
-            configuration const&  _config;
-            bool                  _is_end;
-            soap                  _soap_ctx;
-          };
-        }
-      }
-    }
+                            webservice(webservice const& right);
+      webservice&           operator=(webservice const& right);
+      void                  _init();
+      void                  _internal_copy(webservice const& right);
+      static void           _sigpipe_handle(int x);
+
+      configuration const*  _config;
+      volatile bool         _is_end;
+      soap                  _soap_ctx;
+    };
   }
 }
+
+CCE_END()
 
 #endif // !CCE_MOD_WS_WERBSERVICE_HH

@@ -43,10 +43,6 @@ include_directories("${MODULE_DIR}/server")
 include_directories("${MODULE_DIR}/server/inc")
 include_directories("${MODULE_DIR}/../external_commands/inc")
 
-# Qt moc files.
-qt4_wrap_cpp(QT_WS_MOC_FILES
-  "${INC_DIR}/webservice.hh")
-
 # webservice target.
 add_library("webservice" SHARED
   # Auto-generated.
@@ -55,7 +51,6 @@ add_library("webservice" SHARED
   "${MODULE_DIR}/server/soapServer.cpp"
   "${MODULE_DIR}/server/soapH.h"
   "${MODULE_DIR}/server/soapStub.h"
-  ${QT_WS_MOC_FILES}
   # Sources.
   "${SRC_DIR}/commands.cc"
   "${SRC_DIR}/commands_command.cc"

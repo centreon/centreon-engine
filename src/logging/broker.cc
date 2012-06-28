@@ -36,7 +36,9 @@ using namespace com::centreon::engine::logging;
 /**
  *  Default constructor.
  */
-broker::broker() : _thread(NULL) {}
+broker::broker() {
+  memset(&_thread, 0, sizeof(_thread));
+}
 
 /**
  *  Copy constructor.
@@ -85,8 +87,8 @@ void broker::log(
   // Broker is only notified of non-debug log messages.
   if (message && (type & dbg_all) == 0) {
     concurrency::locker lock(&_mutex);
-    if (_thread != QThread::currentThread()) {
-      _thread = QThread::currentThread();
+    if (_thread != concurrency::thread::get_current_id()) {
+      _thread = concurrency::thread::get_current_id();
 
       // Copy message because broker module might modify it.
       unique_array_ptr<char> copy(new char[strlen(message) + 1]);
@@ -102,7 +104,8 @@ void broker::log(
         time(NULL),
         NULL);
 
-      _thread = NULL;
+      // Reset thread.
+      memset(&_thread, 0, sizeof(_thread));
     }
   }
   return ;

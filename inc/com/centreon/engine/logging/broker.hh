@@ -20,8 +20,8 @@
 #ifndef CCE_LOGGING_BROKER_HH
 #  define CCE_LOGGING_BROKER_HH
 
-#  include <QThread>
 #  include "com/centreon/concurrency/mutex.hh"
+#  include "com/centreon/concurrency/thread.hh"
 #  include "com/centreon/engine/logging/object.hh"
 #  include "com/centreon/engine/namespace.hh"
 
@@ -48,7 +48,8 @@ namespace   logging {
   private:
     mutable com::centreon::concurrency::mutex
              _mutex;
-    QThread* _thread;
+    com::centreon::concurrency::thread_id
+             _thread;
   };
 }
 
