@@ -22,6 +22,7 @@
 #include <QCoreApplication>
 #include "com/centreon/engine/commands/result.hh"
 #include "com/centreon/engine/error.hh"
+#include "com/centreon/timestamp.hh"
 #include "test/unittest.hh"
 
 using namespace com::centreon::engine;
@@ -38,46 +39,37 @@ using namespace com::centreon::engine::commands;
  *  Check setter and getter return.
  */
 int main_test() {
-  QDateTime time = QDateTime::currentDateTime();
-
+  // Prepare.
+  com::centreon::timestamp now(com::centreon::timestamp::now());
   result res;
   res.set_command_id(DEFAULT_ID);
   res.set_exit_code(DEFAULT_RETURN);
-  res.set_start_time(time);
-  res.set_end_time(time);
+  res.set_start_time(now);
+  res.set_end_time(now);
   res.set_stdout(DEFAULT_STDOUT);
   res.set_stderr(DEFAULT_STDERR);
   res.set_is_executed(DEFAULT_EXIT_OK);
   res.set_is_timeout(DEFAULT_TIMEOUT);
 
+  // Tests.
   if (res.get_command_id() != DEFAULT_ID)
-    throw (engine_error() << "error: command_id invalid value.");
-
+    throw (engine_error() << "error: command_id invalid value");
   if (res.get_exit_code() != DEFAULT_RETURN)
-    throw (engine_error() << "error: exit_code invalid value.");
-
+    throw (engine_error() << "error: exit_code invalid value");
   if (res.get_execution_time() != 0.0)
-    throw (engine_error() << "error: execution_time invalid value.");
-
-  if (res.get_start_time().tv_sec != static_cast<time_t>(time.toTime_t())
-      || res.get_start_time().tv_usec != 0)
-    throw (engine_error() << "error: start_time invalid value.");
-
-  if (res.get_end_time().tv_sec != static_cast<time_t>(time.toTime_t())
-      || res.get_end_time().tv_usec != 0)
-    throw (engine_error() << "error: end_time invalid value.");
-
+    throw (engine_error() << "error: execution_time invalid value");
+  if (res.get_start_time() != now)
+    throw (engine_error() << "error: start_time invalid value");
+  if (res.get_end_time() != now)
+    throw (engine_error() << "error: end_time invalid value");
   if (res.get_stdout() != DEFAULT_STDOUT)
-    throw (engine_error() << "error: stdout invalid value.");
-
+    throw (engine_error() << "error: stdout invalid value");
   if (res.get_stderr() != DEFAULT_STDERR)
-    throw (engine_error() << "error: stderr invalid value.");
-
+    throw (engine_error() << "error: stderr invalid value");
   if (res.get_is_executed() != DEFAULT_EXIT_OK)
-    throw (engine_error() << "error: is_executed invalid value.");
-
+    throw (engine_error() << "error: is_executed invalid value");
   if (res.get_is_timeout() != DEFAULT_TIMEOUT)
-    throw (engine_error() << "error: timeout invalid value.");
+    throw (engine_error() << "error: timeout invalid value");
 
   return (0);
 }

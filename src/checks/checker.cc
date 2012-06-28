@@ -840,7 +840,9 @@ void checker::_command_executed(cce_commands_result const& res) {
     << "command ID (" << res.get_command_id() << ") executed";
 
   // Update check result.
-  result.finish_time = res.get_end_time();
+  result.finish_time.tv_sec = res.get_end_time().to_seconds();
+  result.finish_time.tv_usec = res.get_end_time().to_useconds()
+                               - result.finish_time.tv_sec * 1000000ull;
   result.early_timeout = res.get_is_timeout();
   result.return_code = res.get_exit_code();
   result.exited_ok = res.get_is_executed();
@@ -1031,12 +1033,20 @@ int checker::_execute_sync(host* hst) {
     output = my_strdup(cmd_result.get_stderr().c_str());
 
   // Send broker event.
+  memset(&start_cmd, 0, sizeof(start_time));
+  start_cmd.tv_sec = cmd_result.get_start_time().to_seconds();
+  start_cmd.tv_usec = cmd_result.get_start_time().to_useconds()
+                      - start_cmd.tv_sec * 1000000ull;
+  memset(&end_cmd, 0, sizeof(end_time));
+  end_cmd.tv_sec = cmd_result.get_end_time().to_seconds();
+  end_cmd.tv_usec = cmd_result.get_end_time().to_useconds()
+                    - end_cmd.tv_sec * 1000000ull;
   broker_system_command(
     NEBTYPE_SYSTEM_COMMAND_END,
     NEBFLAG_NONE,
     NEBATTR_NONE,
-    cmd_result.get_start_time(),
-    cmd_result.get_end_time(),
+    start_cmd,
+    end_cmd,
     cmd_result.get_execution_time(),
     config.get_host_check_timeout(),
     cmd_result.get_is_timeout(),

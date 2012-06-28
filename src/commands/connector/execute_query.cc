@@ -17,6 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <cstdlib>
 #include <sstream>
 #include <vector>
 #include "com/centreon/engine/commands/connector/execute_query.hh"
@@ -36,7 +37,7 @@ using namespace com::centreon::engine::commands::connector;
 execute_query::execute_query(
                  unsigned long cmd_id,
                  std::string const& cmd,
-                 QDateTime const& start_time,
+                 com::centreon::timestamp const& start_time,
                  unsigned int timeout)
   : request(request::execute_q),
     _cmd(cmd),
@@ -111,9 +112,9 @@ std::string execute_query::build() {
   std::ostringstream oss;
 
   oss << _id << '\0'
-      << static_cast<qulonglong>(_cmd_id) << '\0'
+      << _cmd_id << '\0'
       << _timeout << '\0'
-      << _start_time.toTime_t() << '\0'
+      << _start_time.to_seconds() << '\0'
       << _cmd.c_str();
   oss.write(cmd_ending().c_str(), cmd_ending().size());
   return (oss.str());
@@ -212,7 +213,7 @@ unsigned long execute_query::get_command_id() const throw () {
  *
  *  @return The start date time.
  */
-QDateTime const& execute_query::get_start_time() const throw () {
+com::centreon::timestamp const& execute_query::get_start_time() const throw () {
  return (_start_time);
 }
 
@@ -264,7 +265,7 @@ void execute_query::restore(std::string const& data) {
   if (*nok)
     throw (engine_error()
            << "bad request argument, invalid start_time");
-  _start_time.setTime_t(timestamp);
+  _start_time = timestamp;
 
   // Command.
   _cmd = list[4];

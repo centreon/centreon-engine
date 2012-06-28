@@ -20,10 +20,10 @@
 #ifndef CCE_COMMANDS_PROCESS_HH
 #  define CCE_COMMANDS_PROCESS_HH
 
-#  include <QDateTime>
 #  include <string>
 #  include "com/centreon/engine/commands/basic_process.hh"
 #  include "com/centreon/engine/macros.hh"
+#  include "com/centreon/timestamp.hh"
 
 namespace                    com {
   namespace                  centreon {
@@ -46,12 +46,14 @@ namespace                    com {
                              process(process const& right);
                              ~process() throw ();
           process&           operator=(process const& right);
-          QDateTime const&   get_end_time() const throw ();
+          com::centreon::timestamp const&
+                             get_end_time() const throw ();
           unsigned int       get_executed_time() const throw ();
           int                get_exit_code() const throw ();
           bool               get_is_executed() const throw ();
           bool               get_is_timeout() const throw ();
-          QDateTime const&   get_start_time() const throw ();
+          com::centreon::timestamp const&
+                             get_start_time() const throw ();
           std::string const& get_stderr() const throw ();
           std::string const& get_stdout() const throw ();
           unsigned int       get_timeout() const throw ();
@@ -73,13 +75,15 @@ namespace                    com {
           void               _timedout();
 
         private:
-          QDateTime          _end_time;
+          com::centreon::timestamp
+                             _end_time;
           unsigned int       _executed_time;
           int                _exit_code;
           bool               _is_executed;
           bool               _is_timeout;
           nagios_macros      _macros;
-          QDateTime          _start_time;
+          com::centreon::timestamp
+                             _start_time;
           std::string        _stderr;
           std::string        _stdout;
           unsigned int       _timeout;

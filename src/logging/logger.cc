@@ -17,7 +17,6 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <QDateTime>
 #include "com/centreon/engine/logging/logger.hh"
 
 using namespace com::centreon::engine::logging;

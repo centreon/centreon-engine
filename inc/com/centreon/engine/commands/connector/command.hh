@@ -86,7 +86,7 @@ namespace                              com {
             struct                     request_info {
               com::centreon::shared_ptr<request>
                                        req;
-              QDateTime                start_time;
+              com::centreon::timestamp start_time;
               unsigned int             timeout;
               bool                     waiting_result;
             };

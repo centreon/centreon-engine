@@ -20,73 +20,69 @@
 #ifndef CCE_COMMANDS_RESULT_HH
 #  define CCE_COMMANDS_RESULT_HH
 
-#  include <QDateTime>
 #  include <string>
-#  include <sys/time.h>
+#  include "com/centreon/engine/namespace.hh"
+#  include "com/centreon/timestamp.hh"
 
-namespace                    com {
-  namespace                  centreon {
-    namespace                engine {
-      namespace              commands {
-        /**
-         *  @class result result.hh
-         *  @brief Result contain the result of execution process.
-         *
-         *  Result contain the result of execution process (output, retvalue,
-         *  execution time).
-         */
-        class                result {
-        public:
-                             result(
-                               unsigned long cmd_id = 0,
-                               std::string const& stdout = "",
-                               std::string const& stderr = "",
-                               QDateTime const& start_time = QDateTime(),
-                               QDateTime const& end_time = QDateTime(),
-                               int retval = 0,
-                               bool is_timeout = false,
-                               bool exit_ok = true);
-                             result(result const& right);
-                             ~result() throw ();
-          result&            operator=(result const& right);
-          bool               operator==(
-                               result const& right) const throw ();
-          bool               operator!=(
-                               result const& right) const throw ();
-          unsigned long      get_command_id() const throw ();
-          int                get_exit_code() const throw ();
-          unsigned int       get_execution_time() const throw ();
-          timeval const&     get_start_time() const throw ();
-          timeval const&     get_end_time() const throw ();
-          std::string const& get_stdout() const throw ();
-          std::string const& get_stderr() const throw ();
-          bool               get_is_executed() const throw ();
-          bool               get_is_timeout() const throw ();
-          void               set_command_id(unsigned long id) throw ();
-          void               set_exit_code(int retval) throw ();
-          void               set_start_time(
-                               QDateTime const& time) throw ();
-          void               set_end_time(
-                               QDateTime const& time) throw ();
-          void               set_stdout(std::string const& str);
-          void               set_stderr(std::string const& str);
-          void               set_is_executed(bool value) throw ();
-          void               set_is_timeout(bool value) throw ();
+CCE_BEGIN()
 
-        private:
-          std::string        _stdout;
-          std::string        _stderr;
-          timeval            _start_time;
-          timeval            _end_time;
-          unsigned long      _cmd_id;
-          int                _exit_code;
-          bool               _is_timeout;
-          bool               _is_executed;
-        };
-      }
-    }
-  }
+namespace              commands {
+  /**
+   *  @class result result.hh
+   *  @brief Result contain the result of execution process.
+   *
+   *  Result contain the result of execution process (output, retvalue,
+   *  execution time).
+   */
+  class                result {
+  public:
+                       result(
+                         unsigned long cmd_id = 0,
+                         std::string const& stdout = "",
+                         std::string const& stderr = "",
+                         timestamp const& start_time = timestamp(),
+                         timestamp const& end_time = timestamp(),
+                         int retval = 0,
+                         bool is_timeout = false,
+                         bool is_executed = true);
+                       result(result const& right);
+                       ~result() throw ();
+    result&            operator=(result const& right);
+    bool               operator==(result const& right) const throw ();
+    bool               operator!=(result const& right) const throw ();
+    unsigned long      get_command_id() const throw ();
+    timestamp const&   get_end_time() const throw ();
+    unsigned int       get_execution_time() const throw ();
+    int                get_exit_code() const throw ();
+    bool               get_is_executed() const throw ();
+    bool               get_is_timeout() const throw ();
+    timestamp const&   get_start_time() const throw ();
+    std::string const& get_stderr() const throw ();
+    std::string const& get_stdout() const throw ();
+    void               set_command_id(unsigned long id) throw ();
+    void               set_end_time(timestamp const& time) throw ();
+    void               set_exit_code(int retval) throw ();
+    void               set_is_executed(bool value) throw ();
+    void               set_is_timeout(bool value) throw ();
+    void               set_start_time(timestamp const& time) throw ();
+    void               set_stderr(std::string const& str);
+    void               set_stdout(std::string const& str);
+
+  private:
+    void               _internal_copy(result const& right);
+
+    unsigned long      _cmd_id;
+    timestamp          _end_time;
+    int                _exit_code;
+    bool               _is_executed;
+    bool               _is_timeout;
+    timestamp          _start_time;
+    std::string        _stderr;
+    std::string        _stdout;
+  };
 }
+
+CCE_END()
 
 typedef com::centreon::engine::commands::result cce_commands_result;
 

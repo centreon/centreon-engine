@@ -22,6 +22,7 @@
 #include <time.h>
 #include "com/centreon/engine/commands/connector/execute_response.hh"
 #include "com/centreon/engine/error.hh"
+#include "com/centreon/timestamp.hh"
 
 using namespace com::centreon::engine::commands::connector;
 
@@ -38,7 +39,7 @@ execute_response::execute_response(
                     unsigned long cmd_id,
                     bool is_executed,
                     int exit_code,
-                    QDateTime const& end_time,
+                    com::centreon::timestamp const& end_time,
                     std::string const& err,
                     std::string const& out)
   : request(request::execute_r),
@@ -118,7 +119,7 @@ bool execute_response::operator!=(
 std::string execute_response::build() {
   std::ostringstream oss;
   oss << _id << '\0'
-      << static_cast<qulonglong>(_cmd_id) << '\0'
+      << _cmd_id << '\0'
       << _is_executed << '\0'
       << _exit_code << '\0'
       << _stderr.c_str() << '\0'
@@ -150,7 +151,7 @@ unsigned long execute_response::get_command_id() const throw () {
  *
  *  @return The date time.
  */
-QDateTime const& execute_response::get_end_time() const throw () {
+com::centreon::timestamp const& execute_response::get_end_time() const throw () {
  return (_end_time);
 }
 
@@ -234,7 +235,7 @@ void execute_response::restore(std::string const& data) {
       throw (engine_error() << "bad request argument, invalid exit_code.");
   }
 
-  _end_time.setTime_t(time(NULL));
+  _end_time = time(NULL);
   _stderr = list[4];
   _stdout = list[5];
 }

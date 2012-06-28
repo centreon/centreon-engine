@@ -20,10 +20,10 @@
 #ifndef CCE_COMMANDS_CONNECTOR_EXECUTE_RESPONSE_HH
 #  define CCE_COMMANDS_CONNECTOR_EXECUTE_RESPONSE_HH
 
-#  include <QDateTime>
 #  include <string>
 #  include "com/centreon/engine/commands/connector/request.hh"
 #  include "com/centreon/engine/namespace.hh"
+#  include "com/centreon/timestamp.hh"
 
 CCE_BEGIN()
 
@@ -42,7 +42,7 @@ namespace                commands {
                            unsigned long cmd_id = 0,
                            bool is_executed = false,
                            int exit_code = 0,
-                           QDateTime const& end_time = QDateTime(),
+                           timestamp const& end_time = timestamp(),
                            std::string const& stderr = "",
                            std::string const& stdout = "");
                          execute_response(
@@ -56,7 +56,7 @@ namespace                commands {
       std::string        build();
       request*           clone() const;
       unsigned long      get_command_id() const throw ();
-      QDateTime const&   get_end_time() const throw ();
+      timestamp const&   get_end_time() const throw ();
       int                get_exit_code() const throw ();
       bool               get_is_executed() const throw ();
       std::string const& get_stderr() const throw ();
@@ -67,7 +67,7 @@ namespace                commands {
       void               _internal_copy(execute_response const& right);
 
       unsigned long      _cmd_id;
-      QDateTime          _end_time;
+      timestamp          _end_time;
       int                _exit_code;
       bool               _is_executed;
       std::string        _stderr;

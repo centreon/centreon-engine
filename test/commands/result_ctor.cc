@@ -38,6 +38,7 @@ using namespace com::centreon::engine::commands;
  *  Check the constructor and copy object.
  */
 int main_test() {
+  // Default constructor.
   result res1;
   if (res1.get_command_id() != 0
       || res1.get_stdout() != ""
@@ -45,41 +46,41 @@ int main_test() {
       || res1.get_exit_code() != 0
       || res1.get_is_timeout() != false
       || res1.get_is_executed () != true
-      || res1.get_start_time().tv_sec != 0
-      || res1.get_start_time().tv_usec != 0
-      || res1.get_end_time().tv_sec != 0
-      || res1.get_end_time().tv_usec != 0)
-    throw (engine_error() << "error: Default constructor failed.");
+      || res1.get_start_time() != 0
+      || res1.get_end_time() != 0)
+    throw (engine_error() << "error: default constructor failed");
 
-  QDateTime time = QDateTime::currentDateTime();
-
-  result res2(DEFAULT_ID,
-              DEFAULT_STDOUT,
-              DEFAULT_STDERR,
-              time,
-              time,
-              DEFAULT_RETURN,
-              DEFAULT_TIMEOUT,
-              DEFAULT_EXIT_OK);
+  // Constructor.
+  com::centreon::timestamp now(com::centreon::timestamp::now());
+  result res2(
+           DEFAULT_ID,
+           DEFAULT_STDOUT,
+           DEFAULT_STDERR,
+           now,
+           now,
+           DEFAULT_RETURN,
+           DEFAULT_TIMEOUT,
+           DEFAULT_EXIT_OK);
   if (res2.get_command_id() != DEFAULT_ID
       || res2.get_stdout() != DEFAULT_STDOUT
       || res2.get_stderr() != DEFAULT_STDERR
       || res2.get_exit_code() != DEFAULT_RETURN
       || res2.get_is_timeout() != DEFAULT_TIMEOUT
       || res2.get_is_executed() != DEFAULT_EXIT_OK
-      || res2.get_start_time().tv_sec != static_cast<time_t>(time.toTime_t())
-      || res2.get_start_time().tv_usec != 0
-      || res2.get_end_time().tv_sec != static_cast<time_t>(time.toTime_t())
-      || res2.get_end_time().tv_usec != 0)
-    throw (engine_error() << "error: Constructor failed.");
+      || res2.get_start_time() != now
+      || res2.get_end_time() != now)
+    throw (engine_error() << "error: constructor failed");
 
+  // Copy constructor.
   result res3(res2);
   if (res2 != res3)
-    throw (engine_error() << "error: Default copy constructor failed.");
+    throw (engine_error() << "error: copy constructor failed");
 
-  result res4 = res3;
+  // Assignment operator.
+  result res4;
+  res4 = res3;
   if (res2 != res4)
-    throw (engine_error() << "error: Default copy operator failed.");
+    throw (engine_error() << "error: assignment operator failed");
 
   return (0);
 }

@@ -21,10 +21,10 @@
 #  define CCE_COMMANDS_CONNECTOR_EXECUTE_QUERY_HH
 
 #  include <list>
-#  include <QDateTime>
 #  include <string>
 #  include "com/centreon/engine/commands/connector/request.hh"
 #  include "com/centreon/engine/namespace.hh"
+#  include "com/centreon/timestamp.hh"
 
 CCE_BEGIN()
 
@@ -42,7 +42,7 @@ namespace                commands {
                          execute_query(
                            unsigned long cmd_id = 0,
                            std::string const& cmd = "",
-                           QDateTime const& start_time = QDateTime(),
+                           timestamp const& start_time = timestamp(),
                            unsigned int timeout = 0);
                          execute_query(execute_query const& right);
                          ~execute_query() throw ();
@@ -57,7 +57,7 @@ namespace                commands {
                          get_args() const throw ();
       std::string const& get_command() const throw ();
       unsigned long      get_command_id() const throw ();
-      QDateTime const&   get_start_time() const throw ();
+      timestamp const&   get_start_time() const throw ();
       unsigned int       get_timeout() const throw ();
       void               restore(std::string const& data);
 
@@ -66,7 +66,7 @@ namespace                commands {
 
       std::string        _cmd;
       unsigned long      _cmd_id;
-      QDateTime          _start_time;
+      timestamp          _start_time;
       unsigned int       _timeout;
     };
   }

@@ -18,11 +18,19 @@
 */
 
 #include "com/centreon/engine/commands/result.hh"
+#include "com/centreon/timestamp.hh"
 
+using namespace com::centreon;
 using namespace com::centreon::engine::commands;
 
+/**************************************
+*                                     *
+*           Public Methods            *
+*                                     *
+**************************************/
+
 /**
- *  Default constructor.
+ *  Constructor.
  *
  *  @param[in] cmd_id         The command id.
  *  @param[in] stdout         The standard output.
@@ -33,55 +41,40 @@ using namespace com::centreon::engine::commands;
  *  @param[in] timeout        Command run and timeout.
  *  @param[in] is_executed    Command run and exit normaly.
  */
-result::result(unsigned long cmd_id,
-	       std::string const& stdout,
-	       std::string const& stderr,
-	       QDateTime const& start_time,
-	       QDateTime const& end_time,
-	       int exit_code,
-	       bool is_timeout,
-	       bool is_executed)
-  : _stdout(stdout),
-    _stderr(stderr),
-    _start_time(),
-    _end_time(),
-    _cmd_id(cmd_id),
+result::result(
+          unsigned long cmd_id,
+          std::string const& stdout,
+          std::string const& stderr,
+          timestamp const& start_time,
+          timestamp const& end_time,
+          int exit_code,
+          bool is_timeout,
+          bool is_executed)
+  : _cmd_id(cmd_id),
     _exit_code(exit_code),
+    _is_executed(is_executed),
     _is_timeout(is_timeout),
-    _is_executed(is_executed) {
-
-  if (start_time.isNull() == true) {
-    _start_time.tv_sec = 0;
-    _start_time.tv_usec = 0;
-  }
-  else {
+    _stderr(stderr),
+    _stdout(stdout) {
+  if (start_time != 0)
     set_start_time(start_time);
-  }
-
-  if (end_time.isNull() == true) {
-    _end_time.tv_sec = 0;
-    _end_time.tv_usec = 0;
-  }
-  else {
+  if (end_time != 0)
     set_end_time(end_time);
-  }
 }
 
 /**
- *  Default copy constructor.
+ *  Copy constructor.
  *
  *  @param[in] right The copy class.
  */
 result::result(result const& right) {
-  operator=(right);
+  _internal_copy(right);
 }
 
 /**
- *  Default desctructor.
+ *  Destructor.
  */
-result::~result() throw() {
-
-}
+result::~result() throw () {}
 
 /**
  *  Default copy operator.
@@ -91,16 +84,8 @@ result::~result() throw() {
  *  @return This object.
  */
 result& result::operator=(result const& right) {
-  if (this != &right) {
-    _stdout = right._stdout;
-    _stderr = right._stderr;
-    _start_time = right._start_time;
-    _end_time = right._end_time;
-    _cmd_id = right._cmd_id;
-    _exit_code = right._exit_code;
-    _is_executed = right._is_executed;
-    _is_timeout = right._is_timeout;
-  }
+  if (this != &right)
+    _internal_copy(right);
   return (*this);
 }
 
@@ -111,16 +96,15 @@ result& result::operator=(result const& right) {
  *
  *  @return True if object have the same value.
  */
-bool result::operator==(result const& right) const throw() {
-  return (_stdout == right._stdout
-	  && _stderr == right._stderr
-	  && _start_time.tv_sec == right._start_time.tv_sec
-	  && _start_time.tv_usec == right._start_time.tv_usec
-	  && _end_time.tv_sec == right._end_time.tv_sec
-	  && _end_time.tv_usec == right._end_time.tv_usec
-	  && _cmd_id == right._cmd_id
-	  && _exit_code == right._exit_code
-	  && _is_executed == right._is_executed);
+bool result::operator==(result const& right) const throw () {
+  return ((_cmd_id == right._cmd_id)
+          && (_exit_code == right._exit_code)
+          && (_is_executed == right._is_executed)
+          && (_is_timeout == right._is_timeout)
+          && (_end_time == right._end_time)
+          && (_start_time == right._start_time)
+          && (_stderr == right._stderr)
+          && (_stdout == right._stdout));
 }
 
 /**
@@ -130,7 +114,7 @@ bool result::operator==(result const& right) const throw() {
  *
  *  @return True if object have the different value.
  */
-bool result::operator!=(result const& right) const throw() {
+bool result::operator!=(result const& right) const throw () {
   return (!operator==(right));
 }
 
@@ -139,37 +123,8 @@ bool result::operator!=(result const& right) const throw() {
  *
  *  @return The command id.
  */
-unsigned long result::get_command_id() const throw() {
+unsigned long result::get_command_id() const throw () {
   return (_cmd_id);
-}
-
-/**
- *  Get the return value.
- *
- *  @return The return value.
- */
-int result::get_exit_code() const throw() {
-  return (_exit_code);
-}
-
-/**
- *  Get the execution time.
- *
- *  @return The execution time.
- */
-unsigned int result::get_execution_time() const throw() {
-  if (_end_time.tv_sec < _start_time.tv_sec)
-    return (0);
-  return (_end_time.tv_sec - _start_time.tv_sec);
-}
-
-/**
- *  Get the execution start time.
- *
- *  @return The execution start time.
- */
-timeval const& result::get_start_time() const throw() {
-  return (_start_time);
 }
 
 /**
@@ -177,26 +132,28 @@ timeval const& result::get_start_time() const throw() {
  *
  *  @return The execution end time.
  */
-timeval const& result::get_end_time() const throw() {
+timestamp const& result::get_end_time() const throw () {
   return (_end_time);
 }
 
 /**
- *  Get the standard output.
+ *  Get the execution time.
  *
- *  @return The standard output.
+ *  @return The execution time.
  */
-std::string const& result::get_stdout() const throw() {
-  return (_stdout);
+unsigned int result::get_execution_time() const throw () {
+  if (_end_time < _start_time)
+    return (0);
+  return (_end_time.to_seconds() - _start_time.to_seconds());
 }
 
 /**
- *  Get the error output.
+ *  Get the return value.
  *
- *  @return The error output.
+ *  @return The return value.
  */
-std::string const& result::get_stderr() const throw() {
-  return (_stderr);
+int result::get_exit_code() const throw () {
+  return (_exit_code);
 }
 
 /**
@@ -204,7 +161,7 @@ std::string const& result::get_stderr() const throw() {
  *
  *  @return True if the execution success, false otherwise.
  */
-bool result::get_is_executed() const throw() {
+bool result::get_is_executed() const throw () {
   return (_is_executed);
 }
 
@@ -213,8 +170,35 @@ bool result::get_is_executed() const throw() {
  *
  *  @return True if the execution timedout, false otherwise.
  */
-bool result::get_is_timeout() const throw() {
+bool result::get_is_timeout() const throw () {
   return (_is_timeout);
+}
+
+/**
+ *  Get the execution start time.
+ *
+ *  @return The execution start time.
+ */
+timestamp const& result::get_start_time() const throw () {
+  return (_start_time);
+}
+
+/**
+ *  Get the error output.
+ *
+ *  @return The error output.
+ */
+std::string const& result::get_stderr() const throw () {
+  return (_stderr);
+}
+
+/**
+ *  Get the standard output.
+ *
+ *  @return The standard output.
+ */
+std::string const& result::get_stdout() const throw () {
+  return (_stdout);
 }
 
 /**
@@ -222,27 +206,9 @@ bool result::get_is_timeout() const throw() {
  *
  *  @param[in] id The command id.
  */
-void result::set_command_id(unsigned long id) throw() {
+void result::set_command_id(unsigned long id) throw () {
   _cmd_id = id;
-}
-
-/**
- *  Set the return value.
- *
- *  @param[in] exit_code The return value.
- */
-void result::set_exit_code(int exit_code) throw() {
-  _exit_code = exit_code;
-}
-
-/**
- *  Set the start time.
- *
- *  @param[in] tv The start time.
- */
-void result::set_start_time(QDateTime const& time) throw() {
-  _start_time.tv_sec = time.toTime_t();
-  _start_time.tv_usec = 0;
+  return ;
 }
 
 /**
@@ -250,18 +216,49 @@ void result::set_start_time(QDateTime const& time) throw() {
  *
  *  @param[in] tv The end time.
  */
-void result::set_end_time(QDateTime const& time) throw() {
-  _end_time.tv_sec = time.toTime_t();
-  _end_time.tv_usec = 0;
+void result::set_end_time(timestamp const& t) throw () {
+  _end_time = t;
+  return ;
 }
 
 /**
- *  Set the standard output.
+ *  Set the return value.
  *
- *  @param[in] str The standard output.
+ *  @param[in] exit_code The return value.
  */
-void result::set_stdout(std::string const& str) {
-  _stdout = str;
+void result::set_exit_code(int exit_code) throw () {
+  _exit_code = exit_code;
+  return ;
+}
+
+/**
+ *  Set the exited value.
+ *
+ *  @param[in] value The exited value.
+ */
+void result::set_is_executed(bool value) throw () {
+  _is_executed = value;
+  return ;
+}
+
+/**
+ *  Set the timeout value.
+ *
+ *  @param[in] value The timeout value.
+ */
+void result::set_is_timeout(bool value) throw () {
+  _is_timeout = value;
+  return ;
+}
+
+/**
+ *  Set the start time.
+ *
+ *  @param[in] t The start time.
+ */
+void result::set_start_time(timestamp const& t) throw () {
+  _start_time = t;
+  return ;
 }
 
 /**
@@ -271,22 +268,38 @@ void result::set_stdout(std::string const& str) {
  */
 void result::set_stderr(std::string const& str) {
   _stderr = str;
+  return ;
 }
 
 /**
- *  Set the exited value.
+ *  Set the standard output.
  *
- *  @param[in] value The exited value.
+ *  @param[in] str The standard output.
  */
-void result::set_is_executed(bool value) throw() {
-  _is_executed = value;
+void result::set_stdout(std::string const& str) {
+  _stdout = str;
+  return ;
 }
 
+/**************************************
+*                                     *
+*           Private Methods           *
+*                                     *
+**************************************/
+
 /**
- *  Set the timeout value.
+ *  Copy internal data members.
  *
- *  @param[in] value The timeout value.
+ *  @param[in] right Object to copy.
  */
-void result::set_is_timeout(bool value) throw() {
-  _is_timeout = value;
+void result::_internal_copy(result const& right) {
+  _cmd_id = right._cmd_id;
+  _end_time = right._end_time;
+  _exit_code = right._exit_code;
+  _is_executed = right._is_executed;
+  _is_timeout = right._is_timeout;
+  _start_time = right._start_time;
+  _stderr = right._stderr;
+  _stdout = right._stdout;
+  return ;
 }

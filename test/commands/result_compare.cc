@@ -21,6 +21,7 @@
 #include <QCoreApplication>
 #include "com/centreon/engine/commands/result.hh"
 #include "com/centreon/engine/error.hh"
+#include "com/centreon/timestamp.hh"
 #include "test/unittest.hh"
 
 using namespace com::centreon::engine;
@@ -37,20 +38,24 @@ using namespace com::centreon::engine::commands;
  *  Check the comparison operator.
  */
 int main_test() {
-  QDateTime time = QDateTime::currentDateTime();
-  result res(DEFAULT_ID,
-             DEFAULT_STDOUT,
-             DEFAULT_STDERR,
-             time,
-             time,
-             DEFAULT_RETURN,
-             DEFAULT_TIMEOUT,
-             DEFAULT_EXIT_OK);
-  if (!(res == res))
-    throw (engine_error() << "error: operator== failed.");
+  // Prepare.
+  com::centreon::timestamp now(com::centreon::timestamp::now());
+  result res(
+           DEFAULT_ID,
+           DEFAULT_STDOUT,
+           DEFAULT_STDERR,
+           now,
+           now,
+           DEFAULT_RETURN,
+           DEFAULT_TIMEOUT,
+           DEFAULT_EXIT_OK);
 
+  // Tests.
+  if (!(res == res))
+    throw (engine_error() << "error: operator== failed");
   if (res != res)
-    throw (engine_error() << "error: operator!= failed.");
+    throw (engine_error() << "error: operator!= failed");
+
   return (0);
 }
 

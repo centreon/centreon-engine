@@ -21,7 +21,6 @@
 #include <ctime>
 #include <list>
 #include <QCoreApplication>
-#include <QDateTime>
 #include <string>
 #include <unistd.h>
 #include "com/centreon/engine/commands/connector/execute_query.hh"
@@ -32,6 +31,7 @@
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/version.hh"
 #include "com/centreon/shared_ptr.hh"
+#include "com/centreon/timestamp.hh"
 #include "test/unittest.hh"
 
 using namespace com::centreon;
@@ -170,7 +170,7 @@ int main(int argc, char** argv) {
                                       exec_query->get_command_id(),
                                       true,
                                       exit_code,
-                                      QDateTime::currentDateTime(),
+                                      com::centreon::timestamp::now(),
                                       "",
                                       output);
         std::string data(execute.build());

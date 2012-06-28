@@ -22,6 +22,7 @@
 #include "com/centreon/engine/commands/connector/execute_query.hh"
 #include "com/centreon/engine/commands/connector/execute_response.hh"
 #include "com/centreon/engine/error.hh"
+#include "com/centreon/timestamp.hh"
 #include "test/commands/connector/check_request.hh"
 #include "test/unittest.hh"
 
@@ -44,22 +45,31 @@ using namespace com::centreon::engine::commands::connector;
  *  Check the execute request.
  */
 int main_test() {
-  QDateTime time;
-  time.setTime_t(TIMESTAMP);
-  execute_query query(ID, BINARY, time, TIMEOUT);
-  if (check_request_valid(&query, REQUEST(QUERY)) == false)
+  // Timestamp.
+  com::centreon::timestamp now(TIMESTAMP);
+
+  // Request tests.
+  execute_query query(ID, BINARY, now, TIMEOUT);
+  if (!check_request_valid(&query, REQUEST(QUERY)))
     throw (engine_error() << "error: query is valid failed.");
-  if (check_request_invalid(&query) == false)
+  if (!check_request_invalid(&query))
     throw (engine_error() << "error: query is invalid failed.");
-  if (check_request_clone(&query) == false)
+  if (!check_request_clone(&query))
     throw (engine_error() << "error: query clone failed");
 
-  execute_response response(ID, IS_EXECUTED, STATE_OK, time, STDERR, STDOUT);
-  if (check_request_valid(&response, REQUEST(RESPONSE)) == false)
+  // Response tests.
+  execute_response response(
+                     ID,
+                     IS_EXECUTED,
+                     STATE_OK,
+                     now,
+                     STDERR,
+                     STDOUT);
+  if (!check_request_valid(&response, REQUEST(RESPONSE)))
     throw (engine_error() << "error: response is valid failed.");
-  if (check_request_invalid(&response) == false)
+  if (!check_request_invalid(&response))
     throw (engine_error() << "error: response is invalid failed.");
-  if (check_request_clone(&response) == false)
+  if (!check_request_clone(&response))
     throw (engine_error() << "error: response clone failed");
 
   return (0);

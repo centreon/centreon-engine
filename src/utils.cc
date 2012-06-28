@@ -104,21 +104,24 @@ int my_system_r(nagios_macros const* mac,
   commands::result cmd_result;
   raw_cmd.run(cmd, *mac, timeout, cmd_result);
 
-  end_time = cmd_result.get_end_time();
+  end_time.tv_sec = cmd_result.get_end_time().to_seconds();
+  end_time.tv_usec = cmd_result.get_end_time().to_useconds()
+                    - end_time.tv_sec * 1000000ull;
   *exectime = cmd_result.get_execution_time();
   *early_timeout = cmd_result.get_is_timeout();
-  /*
-  // XXX: todo.
-  if (output != NULL && max_output_length > 0) {
-    if (cmd_result.get_stdout() != "") {
-      *output = my_strdup(qPrintable(cmd_result.get_stdout().left(max_output_length - 1)));
-    }
-    else if (cmd_result.get_stderr() != "") {
-      *output = my_strdup(qPrintable(cmd_result.get_stderr().left(max_output_length - 1)));
-    }
+  if (output && max_output_length > 0) {
+    if (!cmd_result.get_stdout().empty())
+      *output = my_strdup(cmd_result.get_stdout().substr(
+                                                    0,
+                                                    max_output_length
+                                                    - 1).c_str());
+    else if (!cmd_result.get_stderr().empty())
+      *output = my_strdup(cmd_result.get_stderr().substr(
+                                                    0,
+                                                    max_output_length
+                                                    - 1).c_str());
   }
-  */
-  int result = cmd_result.get_exit_code();
+  int result(cmd_result.get_exit_code());
 
   logger(dbg_commands, more)
     << fixed << setprecision(3)

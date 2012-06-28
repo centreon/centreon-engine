@@ -22,8 +22,10 @@
 #include <QCoreApplication>
 #include "com/centreon/engine/commands/result.hh"
 #include "com/centreon/engine/error.hh"
+#include "com/centreon/timestamp.hh"
 #include "test/unittest.hh"
 
+using namespace com::centreon;
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::commands;
 
@@ -35,26 +37,28 @@ using namespace com::centreon::engine::commands;
  *
  *  @return The execution time, diff between end and start time.
  */
-static uint execution_time(QDateTime const& start, QDateTime const& end) {
-  if (end.toTime_t() < start.toTime_t())
+static unsigned long execution_time(
+                       timestamp const& start,
+                       timestamp const& end) {
+  if (end < start)
     return (0);
-  return (end.toTime_t() - start.toTime_t());
+  return (end.to_seconds() - start.to_seconds());
 }
 
 /**
  *  Check if the result execution time works.
  */
 int main_test() {
-  QDateTime start = QDateTime::currentDateTime();
+  // Prepare.
+  timestamp start(timestamp::now());
+  timestamp end(start);
+  end.add_seconds(10);
+  end.add_mseconds(20);
 
-  QDateTime end = start;
-  end.addSecs(10);
-  end.addMSecs(20);
-
+  // Tests.
   result res1(0, "", "", start, end);
   if (res1.get_execution_time() != execution_time(start, end))
-    throw (engine_error() << "error: execution_time invalid value.");
-
+    throw (engine_error() << "error: execution_time invalid value");
   result res2(0, "", "", end, start);
   if (res2.get_execution_time() != 0)
     throw (engine_error() << "error: execution_time != 0");

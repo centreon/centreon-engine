@@ -33,6 +33,7 @@
 #include "com/centreon/engine/objects.hh"
 #include "com/centreon/engine/version.hh"
 #include "com/centreon/shared_ptr.hh"
+#include "com/centreon/timestamp.hh"
 
 using namespace com::centreon;
 using namespace com::centreon::engine;
@@ -147,7 +148,7 @@ unsigned long connector::command::run(std::string const& processed_cmd,
 
   unsigned long id = get_uniq_id();
 
-  QDateTime now = QDateTime::currentDateTime();
+  timestamp now(timestamp::now());
   shared_ptr<request> query(new execute_query(
                                   id,
                                   processed_cmd,
@@ -203,7 +204,7 @@ void connector::command::run(std::string const& processed_cmd,
 
   unsigned long id = get_uniq_id();
 
-  QDateTime now = QDateTime::currentDateTime();
+  timestamp now(timestamp::now());
   shared_ptr<request> query(new execute_query(
                                   id,
                                   processed_cmd,
@@ -288,13 +289,14 @@ void connector::command::_timeout() {
   concurrency::locker locker(&_mutex);
 
   _active_timer = false;
-  QDateTime now = QDateTime::currentDateTime();
+  timestamp now(timestamp::now());
   std::map<unsigned long, request_info>::iterator it = _queries.begin();
   while (it != _queries.end()) {
-    request_info& info = it->second;
-    unsigned int diff_time = now.toTime_t() - info.start_time.toTime_t();
+    request_info& info(it->second);
+    unsigned int
+      diff_time(now.to_seconds() - info.start_time.to_seconds());
     if (diff_time >= info.timeout) {
-      unsigned long id = it->first;
+      unsigned long id(it->first);
       result res(id,
 		 "",
 		 "(Process Timeout)",
@@ -303,20 +305,18 @@ void connector::command::_timeout() {
 		 STATE_CRITICAL,
 		 true,
 		 true);
-      if (info.waiting_result == false) {
+      if (!info.waiting_result)
 	emit command_executed(res);
-      }
-      else {
+      else
 	_results.insert(std::pair<unsigned long, result>(id, res));
-      }
       std::map<unsigned long, request_info>::iterator tmp(it);
       ++tmp;
       _queries.erase(it);
       it = tmp;
       emit _wait_ending();
-      continue;
+      continue ;
     }
-    break;
+    break ;
   }
 
   for (std::map<unsigned long, request_info>::const_iterator it
@@ -324,12 +324,14 @@ void connector::command::_timeout() {
        it != end;
        ++it) {
     if (it->second.timeout > 0) {
-      unsigned int diff_time = now.toTime_t() - it->second.start_time.toTime_t();
+      unsigned int diff_time(now.to_seconds()
+                             - it->second.start_time.to_seconds());
       _active_timer = true;
-      QTimer::singleShot(diff_time > 0 ? diff_time : 1,
-                         this,
-                         SLOT(_timeout()));
-      break;
+      QTimer::singleShot(
+                (diff_time > 0 ? diff_time : 1),
+                this,
+                SLOT(_timeout()));
+      break ;
     }
   }
 }
@@ -551,27 +553,27 @@ void connector::command::_req_execute_r(request* req) {
   }
 
   bool is_timeout = false;
-  if (info.timeout > 0) {
-    is_timeout = response->get_end_time().toTime_t()
-      - info.start_time.toTime_t() > info.timeout;
-  }
+  if (info.timeout > 0)
+    is_timeout = (response->get_end_time().to_seconds()
+                  - info.start_time.to_seconds())
+      > info.timeout;
 
-  result res(response->get_command_id(),
-	     "",
-	     "",
-	     info.start_time,
-	     response->get_end_time(),
-	     STATE_CRITICAL,
-	     is_timeout,
-	     true);
+  result res(
+           response->get_command_id(),
+           "",
+           "",
+           info.start_time,
+           response->get_end_time(),
+           STATE_CRITICAL,
+           is_timeout,
+           true);
 
-  if (response->get_is_executed() == false) {
+  if (!response->get_is_executed()) {
     res.set_stderr("(" + response->get_stderr() + ")");
     res.set_is_executed(false);
   }
-  else if (is_timeout == true) {
+  else if (is_timeout)
     res.set_stderr("(Process Timeout)");
-  }
   else {
     if (response->get_exit_code() < -1 || response->get_exit_code() > 3) {
       res.set_exit_code(STATE_UNKNOWN);

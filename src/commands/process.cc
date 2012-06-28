@@ -21,7 +21,9 @@
 #include <QTimer>
 #include "com/centreon/engine/commands/process.hh"
 #include "com/centreon/engine/logging/logger.hh"
+#include "com/centreon/timestamp.hh"
 
+using namespace com::centreon;
 using namespace com::centreon::engine::commands;
 using namespace com::centreon::engine::logging;
 
@@ -101,7 +103,7 @@ process& process::operator=(process const& right) {
  *
  *  @return The time.
  */
-QDateTime const& process::get_end_time() const throw () {
+timestamp const& process::get_end_time() const throw () {
   return (_end_time);
 }
 
@@ -146,7 +148,7 @@ bool process::get_is_timeout() const throw () {
  *
  *  @return The Time.
  */
-QDateTime const& process::get_start_time() const throw () {
+timestamp const& process::get_start_time() const throw () {
   return (_start_time);
 }
 
@@ -220,7 +222,7 @@ void process::_error(QProcess::ProcessError error) {
 
   // Handle error.
   if (QProcess::FailedToStart == error) {
-    _start_time = QDateTime::currentDateTime();
+    _start_time = timestamp::now();
     _is_timeout = false;
     emit finished(exitCode(), exitStatus());
   }
@@ -243,8 +245,8 @@ void process::_finished(
   logger(dbg_functions, basic) << "start " << __func__;
 
   // Set timing information about process.
-  _end_time = QDateTime::currentDateTime();
-  _executed_time = _end_time.toTime_t() - _start_time.toTime_t();
+  _end_time = timestamp::now();
+  _executed_time = _end_time.to_seconds() - _start_time.to_seconds();
 
   // Handle errors.
   if (error() == QProcess::FailedToStart) {
@@ -308,7 +310,7 @@ void process::_started() {
   logger(dbg_functions, basic) << "start " << __func__;
 
   // Set information.
-  _start_time = QDateTime::currentDateTime();
+  _start_time = timestamp::now();
   _is_timeout = false;
   if (_timeout > 0)
     QTimer::singleShot(_timeout, this, SLOT(_timedout()));
