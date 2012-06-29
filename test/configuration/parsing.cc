@@ -20,12 +20,12 @@
 #include <exception>
 #include <QCoreApplication>
 #include <QDir>
-#include <QFile>
-#include <QTemporaryFile>
 #include "com/centreon/engine/configuration/state.hh"
 #include "com/centreon/engine/globals.hh"
+#include "com/centreon/io/file_stream.hh"
 #include "test/unittest.hh"
 
+using namespace com::centreon;
 using namespace com::centreon::engine;
 
 /**
@@ -60,24 +60,26 @@ static void check_noexist_file() {
  *  Check parse with exist file.
  */
 static void check_exist_file() {
-  QTemporaryFile tmp("./centengine_test_exist_file.cfg");
-  if (tmp.open() == false) {
-    throw (engine_error() << "open temporary file failed.");
-  }
-  config.parse(tmp.fileName().toStdString());
-  tmp.close();
+  char* tmp_path(io::file_stream::temp_path());
+  io::file_stream tmp;
+  tmp.open(tmp_path, "r");
+  config.parse(tmp_path);
+  return ;
 }
 
 /**
  *  Check the parsing argument.
  */
 int main_test() {
+  // Initialization.
   config.set_log_archive_path(QDir::tempPath().toStdString());
 
+  // Tests.
   check_directory();
   check_noexist_file();
   check_exist_file();
 
+  // Success.
   return (0);
 }
 

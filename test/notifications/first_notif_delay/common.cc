@@ -17,8 +17,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <cstdio>
 #include <QCoreApplication>
-#include <QFile>
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/objects.hh"
 #include "test/notifications/first_notif_delay/common.hh"
@@ -36,7 +36,7 @@ int com::centreon::engine::first_notif_delay_default_setup() {
   config.set_interval_length(1);
 
   // Remove flag file.
-  QFile::remove(FLAG_FILE);
+  ::remove(FLAG_FILE);
 
   // Return value.
   int retval(0);

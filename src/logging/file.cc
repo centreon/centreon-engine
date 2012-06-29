@@ -18,19 +18,25 @@
 */
 
 #include <algorithm>
+#include <cstdio>
 #include <cstring>
+#include <list>
 #include "com/centreon/concurrency/locker.hh"
+#include "com/centreon/concurrency/read_locker.hh"
+#include "com/centreon/concurrency/read_write_lock.hh"
 #include "com/centreon/concurrency/write_locker.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/file.hh"
 #include "com/centreon/engine/statusdata.hh"
+#include "com/centreon/io/file_stream.hh"
 
 using namespace com::centreon;
 using namespace com::centreon::engine::logging;
 
-std::list<file*>             file::_files;
-concurrency::read_write_lock file::_rwlock;
+// Local objects.
+static std::list<file*>             _files;
+static concurrency::read_write_lock _rwlock;
 
 /**************************************
 *                                     *
@@ -45,18 +51,24 @@ concurrency::read_write_lock file::_rwlock;
  *  @param[in] size_limit The file's size limit.
  */
 file::file(std::string const& file, unsigned long long size_limit)
-  : _file(new QFile(file.c_str())),
-    _mutex(new concurrency::mutex),
+  : _filename(file),
     _size_limit(size_limit) {
   // Open file.
-  _file->open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Append);
-  if (_file->QFile::error() != QFile::NoError)
-    throw (engine_error() << file << ": "
-           << _file->errorString().toStdString());
+  _open();
 
   // Add file to list.
   concurrency::write_locker lock(&_rwlock);
   _files.push_back(this);
+}
+
+/**
+ *  Copy constructor.
+ *
+ *  @param[in] right Object to copy.
+ */
+file::file(file const& right)
+  : object(right), _size_limit(0) {
+  _internal_copy(right);
 }
 
 /**
@@ -74,27 +86,14 @@ file::~file() throw () {
 }
 
 /**
- *  Copy constructor.
- *
- * @param[in] right The class to copy.
- */
-file::file(file const& right)
-  : object(right),
-    _size_limit(0) {
-  operator=(right);
-}
-
-/**
- *  Default copy operator.
+ *  Assignment operator.
  *
  *  @param[in] right The class to copy.
  */
 file& file::operator=(file const& right) {
   if (this != &right) {
-    concurrency::locker lock(right._mutex.get());
-    _file = right._file;
-    _mutex = right._mutex;
-    _size_limit = right._size_limit;
+    _close();
+    _internal_copy(right);
   }
   return (*this);
 }
@@ -104,9 +103,8 @@ file& file::operator=(file const& right) {
  *
  *  @return The file name.
  */
-std::string file::get_file_name() {
-  concurrency::locker lock(_mutex.get());
-  return (_file->fileName().toStdString());
+std::string const& file::get_file_name() const throw () {
+  return (_filename);
 }
 
 /**
@@ -115,7 +113,7 @@ std::string file::get_file_name() {
  *  @return The size limit.
  */
 unsigned long long file::get_size_limit() const {
-  concurrency::locker lock(_mutex.get());
+  concurrency::locker lock(&_mutex);
   return (_size_limit);
 }
 
@@ -136,35 +134,39 @@ void file::log(
   if (!message)
     return ;
 
+  // Message length.
+  size_t msg_len(strlen(message));
+
   // Rotate file if required.
-  concurrency::locker lock(_mutex.get());
+  concurrency::locker lock(&_mutex);
   if ((_size_limit > 0)
-      && (static_cast<unsigned long long>(_file->size()
-                                          + strlen(message))
+      && (static_cast<unsigned long long>(_written + msg_len)
           >= _size_limit)) {
     // Generate new and old file names.
-    std::string old_name(_file->fileName().toStdString());
-    std::string new_name(old_name);
-    new_name.append(".old");
+    std::string old_filename(_filename);
+    old_filename.append(".old");
 
     // Close file.
-    _file->close();
+    _close();
 
     // Remove old (N-2) rotated file.
-    if ((!QFile::exists(new_name.c_str())
-         || QFile::remove(new_name.c_str()))
-	&& _file->rename(new_name.c_str()))
-      _file->setFileName(old_name.c_str());
+    ::remove(old_filename.c_str());
+    ::rename(_filename.c_str(), old_filename.c_str());
 
     // Open new log file.
-    _file->open(QIODevice::WriteOnly
-                | QIODevice::Text
-                | QIODevice::Append);
+    _open();
   }
 
   // Write message to log file.
-  _file->write(message);
-  _file->flush();
+  while (msg_len) {
+    unsigned int wb(_file.write(message, msg_len));
+    _written += wb;
+    msg_len -= wb;
+    message += wb;
+  }
+
+  // Flush file.
+  _file.flush();
 
   return ;
 }
@@ -173,16 +175,13 @@ void file::log(
  *  Close and open all files.
  */
 void file::reopen() {
-  concurrency::write_locker lock(&_rwlock);
+  concurrency::read_locker lock(&_rwlock);
   for (std::list<file*>::iterator it(_files.begin()), end(_files.end());
        it != end;
        ++it) {
-    concurrency::locker lock((*it)->_mutex.get());
-    (*it)->_file->close();
-    (*it)->_file->open(
-                    QIODevice::WriteOnly
-                    | QIODevice::Text
-                    | QIODevice::Append);
+    concurrency::locker lock(&(*it)->_mutex);
+    (*it)->_close();
+    (*it)->_open();
   }
   return ;
 }
@@ -193,7 +192,53 @@ void file::reopen() {
  *  @param[in] The size limit.
  */
 void file::set_size_limit(unsigned long long size) {
-  concurrency::locker lock(_mutex.get());
+  concurrency::locker lock(&_mutex);
   _size_limit = size;
+  return ;
+}
+
+/**************************************
+*                                     *
+*           Private Methods           *
+*                                     *
+**************************************/
+
+/**
+ *  Close log file.
+ */
+void file::_close() {
+  concurrency::locker lock(&_mutex);
+  _file.close();
+  _written = 0;
+  return ;
+}
+
+/**
+ *  Copy internal data members.
+ *
+ *  @param[in] right Object to copy.
+ */
+void file::_internal_copy(file const& right) {
+  // Copy properties.
+  concurrency::locker lock1(&_mutex);
+  {
+    concurrency::locker lock2(&right._mutex);
+    _filename = right._filename;
+    _size_limit = right._size_limit;
+  }
+
+  // Reopen file.
+  _open();
+
+  return ;
+}
+
+/**
+ *  Open log file.
+ */
+void file::_open() {
+  concurrency::locker lock(&_mutex);
+  _file.open(_filename.c_str(), "ab");
+  _written = _file.size();
   return ;
 }

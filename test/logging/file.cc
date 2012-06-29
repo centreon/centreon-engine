@@ -24,13 +24,13 @@
 #include <exception>
 #include <QCoreApplication>
 #include <QDir>
-#include <QFile>
 #include "com/centreon/engine/common.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/engine.hh"
 #include "com/centreon/engine/logging/file.hh"
 #include "com/centreon/engine/logging/object.hh"
+#include "com/centreon/io/file_stream.hh"
 #include "com/centreon/shared_ptr.hh"
 #include "test/unittest.hh"
 
@@ -46,16 +46,27 @@ using namespace com::centreon::engine::logging;
 static void check_file(
               std::string const& filename,
               std::string const& text) {
-  QFile file(filename.c_str());
-  file.open(QIODevice::ReadOnly);
-  if (file.error() != QFile::NoError)
-    throw (engine_error() << filename << ": "
-           << file.errorString().toStdString());
+  // Open file.
+  com::centreon::io::file_stream file;
+  file.open(filename.c_str(), "r");
 
-  if (file.readAll() != text.c_str())
+  // Read file.
+  std::string content;
+  {
+    char buffer[1000];
+    unsigned int rb;
+    while ((rb = file.read(buffer, sizeof(buffer))))
+      content.append(buffer, rb);
+  }
+
+  // Compare contents.
+  if (content != text)
     throw (engine_error() << filename << ": bad content");
 
+  // Close.
   file.close();
+
+  return ;
 }
 
 /**

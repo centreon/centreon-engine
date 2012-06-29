@@ -17,16 +17,18 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <cstdio>
+#include <cstring>
+#include <ctime>
 #include <QCoreApplication>
-#include <QFile>
-#include <string.h>
-#include <time.h>
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/checks.hh"
 #include "com/centreon/engine/globals.hh"
+#include "com/centreon/io/file_stream.hh"
 #include "test/notifications/first_notif_delay/common.hh"
 #include "test/unittest.hh"
 
+using namespace com::centreon;
 using namespace com::centreon::engine;
 
 /**
@@ -71,13 +73,13 @@ int main_test() {
     retval |= handle_async_service_check_result(service_list, &cr);
 
     // Check that FND was not respected.
-    retval |= !QFile::exists(FLAG_FILE);
+    retval |= !io::file_stream::exists(FLAG_FILE);
 
     first_notif_delay_default_cleanup();
   }
 
   // Remove flag file.
-  QFile::remove(FLAG_FILE);
+  io::file_stream::remove(FLAG_FILE);
 
   return (retval);
 }
