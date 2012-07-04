@@ -18,7 +18,6 @@
 */
 
 #include <exception>
-#include <QCoreApplication>
 #include "com/centreon/engine/broker/handle.hh"
 #include "com/centreon/engine/error.hh"
 #include "test/broker/mod_load.hh"
@@ -111,7 +110,10 @@ void check_copy() {
 /**
  *  Check the broker handle working.
  */
-int main_test() {
+int main_test(int argc, char** argv) {
+  (void)argc;
+  (void)argv;
+
   //check_open_noexist_module();
   //check_open_exist_module();
   check_copy();
@@ -122,10 +124,6 @@ int main_test() {
  *  Init the unit test.
  */
 int main(int argc, char** argv) {
-  QCoreApplication app(argc, argv);
-  unittest utest(&main_test);
-  QObject::connect(&utest, SIGNAL(finished()), &app, SLOT(quit()));
-  utest.start();
-  app.exec();
-  return (utest.ret());
+  unittest utest(argc, argv, &main_test);
+  return (utest.run());
 }

@@ -18,7 +18,6 @@
 */
 
 #include <exception>
-#include <QCoreApplication>
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/modules/external_commands/commands.hh"
 #include "com/centreon/engine/globals.hh"
@@ -30,7 +29,10 @@ using namespace com::centreon::engine;
 /**
  *  Run change_global_host_event_handler test.
  */
-static int check_change_global_host_event_handler() {
+static int check_change_global_host_event_handler(int argc, char** argv) {
+  (void)argc;
+  (void)argv;
+
   // Send external command.
   char const* cmd("[1317196300] CHANGE_GLOBAL_HOST_EVENT_HANDLER");
   process_external_command(cmd);
@@ -42,10 +44,6 @@ static int check_change_global_host_event_handler() {
  *  Init unit test.
  */
 int main(int argc, char** argv) {
-  QCoreApplication app(argc, argv);
-  unittest utest(&check_change_global_host_event_handler);
-  QObject::connect(&utest, SIGNAL(finished()), &app, SLOT(quit()));
-  utest.start();
-  app.exec();
-  return (utest.ret());
+  unittest utest(argc, argv, &check_change_global_host_event_handler);
+  return (utest.run());
 }

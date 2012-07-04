@@ -18,7 +18,6 @@
 */
 
 #include <exception>
-#include <QCoreApplication>
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/modules/external_commands/commands.hh"
 #include "com/centreon/engine/globals.hh"
@@ -30,7 +29,10 @@ using namespace com::centreon::engine;
 /**
  *  Run remove_svc_acknowledgement test.
  */
-static int check_remove_svc_acknowledgement() {
+static int check_remove_svc_acknowledgement(int argc, char** argv) {
+  (void)argc;
+  (void)argv;
+
   init_object_skiplists();
 
   host* hst = add_host("name", NULL, NULL, "localhost", NULL, 0, 0.0, 0.0, 42,
@@ -78,10 +80,6 @@ static int check_remove_svc_acknowledgement() {
  *  Init unit test.
  */
 int main(int argc, char** argv) {
-  QCoreApplication app(argc, argv);
-  unittest utest(&check_remove_svc_acknowledgement);
-  QObject::connect(&utest, SIGNAL(finished()), &app, SLOT(quit()));
-  utest.start();
-  app.exec();
-  return (utest.ret());
+  unittest utest(argc, argv, &check_remove_svc_acknowledgement);
+  return (utest.run());
 }

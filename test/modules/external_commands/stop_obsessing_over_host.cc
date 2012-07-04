@@ -18,7 +18,6 @@
 */
 
 #include <exception>
-#include <QCoreApplication>
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/modules/external_commands/commands.hh"
 #include "com/centreon/engine/globals.hh"
@@ -30,7 +29,10 @@ using namespace com::centreon::engine;
 /**
  *  Run stop_obsessing_over_host test.
  */
-static int check_stop_obsessing_over_host() {
+static int check_stop_obsessing_over_host(int argc, char** argv) {
+  (void)argc;
+  (void)argv;
+
   init_object_skiplists();
 
   host* hst = add_host("name", NULL, NULL, "localhost", NULL, 0, 0.0, 0.0, 42,
@@ -63,10 +65,6 @@ static int check_stop_obsessing_over_host() {
  *  Init unit test.
  */
 int main(int argc, char** argv) {
-  QCoreApplication app(argc, argv);
-  unittest utest(&check_stop_obsessing_over_host);
-  QObject::connect(&utest, SIGNAL(finished()), &app, SLOT(quit()));
-  utest.start();
-  app.exec();
-  return (utest.ret());
+  unittest utest(argc, argv, &check_stop_obsessing_over_host);
+  return (utest.run());
 }

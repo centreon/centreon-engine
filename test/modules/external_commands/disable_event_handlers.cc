@@ -18,7 +18,6 @@
 */
 
 #include <exception>
-#include <QCoreApplication>
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/modules/external_commands/commands.hh"
 #include "com/centreon/engine/globals.hh"
@@ -30,7 +29,10 @@ using namespace com::centreon::engine;
 /**
  *  Run disable_event_handlers test.
  */
-static int check_disable_event_handlers() {
+static int check_disable_event_handlers(int argc, char** argv) {
+  (void)argc;
+  (void)argv;
+
   enable_event_handlers = true;
   char const* cmd("[1317196300] DISABLE_EVENT_HANDLERS");
   process_external_command(cmd);
@@ -45,10 +47,6 @@ static int check_disable_event_handlers() {
  *  Init unit test.
  */
 int main(int argc, char** argv) {
-  QCoreApplication app(argc, argv);
-  unittest utest(&check_disable_event_handlers);
-  QObject::connect(&utest, SIGNAL(finished()), &app, SLOT(quit()));
-  utest.start();
-  app.exec();
-  return (utest.ret());
+  unittest utest(argc, argv, &check_disable_event_handlers);
+  return (utest.run());
 }

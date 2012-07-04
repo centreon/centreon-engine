@@ -22,7 +22,6 @@
 #include <cstdio>
 #include <cstring>
 #include <exception>
-#include <QCoreApplication>
 #include <QDir>
 #include <QFile>
 #include "com/centreon/engine/common.hh"
@@ -63,7 +62,10 @@ static void check_file(
  *  - file rotate.
  *  - file truncate.
  */
-int main_test() {
+int main_test(int argc, char** argv) {
+  (void)argc;
+  (void)argv;
+
   // Get instance of logging engine.
   engine& engine = engine::instance();
   unsigned int id1 = 0;
@@ -139,10 +141,6 @@ int main_test() {
  *  Init unit test.
  */
 int main(int argc, char** argv) {
-  QCoreApplication app(argc, argv);
-  unittest utest(&main_test);
-  QObject::connect(&utest, SIGNAL(finished()), &app, SLOT(quit()));
-  utest.start();
-  app.exec();
-  return (utest.ret());
+  unittest utest(argc, argv, &main_test);
+  return (utest.run());
 }

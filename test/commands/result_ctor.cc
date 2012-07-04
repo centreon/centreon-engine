@@ -19,7 +19,6 @@
 
 #include <ctime>
 #include <exception>
-#include <QCoreApplication>
 #include "com/centreon/engine/commands/result.hh"
 #include "com/centreon/engine/error.hh"
 #include "test/unittest.hh"
@@ -37,7 +36,10 @@ using namespace com::centreon::engine::commands;
 /**
  *  Check the constructor and copy object.
  */
-int main_test() {
+int main_test(int argc, char** argv) {
+  (void)argc;
+  (void)argv;
+
   // Default constructor.
   result res1;
   if (res1.get_command_id() != 0
@@ -89,10 +91,6 @@ int main_test() {
  *  Init unit test.
  */
 int main(int argc, char** argv) {
-  QCoreApplication app(argc, argv);
-  unittest utest(&main_test);
-  QObject::connect(&utest, SIGNAL(finished()), &app, SLOT(quit()));
-  utest.start();
-  app.exec();
-  return (utest.ret());
+  unittest utest(argc, argv, &main_test);
+  return (utest.run());
 }

@@ -18,7 +18,6 @@
 */
 
 #include <exception>
-#include <QCoreApplication>
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/modules/external_commands/commands.hh"
 #include "com/centreon/engine/globals.hh"
@@ -30,7 +29,10 @@ using namespace com::centreon::engine;
 /**
  *  Run shutdown_process test.
  */
-static int check_shutdown_process() {
+static int check_shutdown_process(int argc, char** argv) {
+  (void)argc;
+  (void)argv;
+
   char const* cmd("[1317196300] SHUTDOWN_PROCESS");
   process_external_command(cmd);
 
@@ -44,10 +46,6 @@ static int check_shutdown_process() {
  *  Init unit test.
  */
 int main(int argc, char** argv) {
-  QCoreApplication app(argc, argv);
-  unittest utest(&check_shutdown_process);
-  QObject::connect(&utest, SIGNAL(finished()), &app, SLOT(quit()));
-  utest.start();
-  app.exec();
-  return (utest.ret());
+  unittest utest(argc, argv, &check_shutdown_process);
+  return (utest.run());
 }

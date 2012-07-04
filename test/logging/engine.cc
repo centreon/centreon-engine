@@ -18,7 +18,6 @@
 */
 
 #include <exception>
-#include <QCoreApplication>
 #include <time.h>
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/logging/engine.hh"
@@ -49,7 +48,10 @@ static const char*        LOG_MESSAGE  = "~!@#$%^&*()_+09/qwerty \n";
 /**
  *  Check the engine working.
  */
-int main_test() {
+int main_test(int argc, char** argv) {
+  (void)argc;
+  (void)argv;
+
   // Get instance of logging engine.
   engine& engine = engine::instance();
 
@@ -104,10 +106,6 @@ int main_test() {
  *  Init unit test.
  */
 int main(int argc, char** argv) {
-  QCoreApplication app(argc, argv);
-  unittest utest(&main_test);
-  QObject::connect(&utest, SIGNAL(finished()), &app, SLOT(quit()));
-  utest.start();
-  app.exec();
-  return (utest.ret());
+  unittest utest(argc, argv, &main_test);
+  return (utest.run());
 }

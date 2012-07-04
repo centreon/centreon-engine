@@ -18,7 +18,6 @@
 */
 
 #include <exception>
-#include <QCoreApplication>
 #include "com/centreon/engine/commands/connector/command.hh"
 #include "com/centreon/engine/error.hh"
 #include "test/unittest.hh"
@@ -34,7 +33,10 @@ using namespace com::centreon::engine::commands;
 /**
  * Check comparison operator.
  */
-int main_test() {
+int main_test(int argc, char** argv) {
+  (void)argc;
+  (void)argv;
+
   connector::command cmd(CONNECTOR_NAME, CONNECTOR_LINE, CMD_NAME, CMD_LINE);
   if (!(cmd == cmd))
     throw (engine_error() << "error: operator== failed.");
@@ -49,10 +51,9 @@ int main_test() {
  *  Init the unit test.
  */
 int main(int argc, char** argv) {
-  QCoreApplication app(argc, argv);
-  unittest utest(&main_test);
-  QObject::connect(&utest, SIGNAL(finished()), &app, SLOT(quit()));
-  utest.start();
-  app.exec();
-  return (utest.ret());
+  // rewrite basic process to remove QEventLoop.
+  return (1);
+
+  unittest utest(argc, argv, &main_test);
+  return (utest.run());
 }

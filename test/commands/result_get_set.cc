@@ -19,7 +19,6 @@
 
 #include <ctime>
 #include <exception>
-#include <QCoreApplication>
 #include "com/centreon/engine/commands/result.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/timestamp.hh"
@@ -38,7 +37,10 @@ using namespace com::centreon::engine::commands;
 /**
  *  Check setter and getter return.
  */
-int main_test() {
+int main_test(int argc, char** argv) {
+  (void)argc;
+  (void)argv;
+
   // Prepare.
   com::centreon::timestamp now(com::centreon::timestamp::now());
   result res;
@@ -78,10 +80,6 @@ int main_test() {
  *  Init unit test.
  */
 int main(int argc, char** argv) {
-  QCoreApplication app(argc, argv);
-  unittest utest(&main_test);
-  QObject::connect(&utest, SIGNAL(finished()), &app, SLOT(quit()));
-  utest.start();
-  app.exec();
-  return (utest.ret());
+  unittest utest(argc, argv, &main_test);
+  return (utest.run());
 }

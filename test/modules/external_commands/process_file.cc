@@ -18,7 +18,6 @@
 */
 
 #include <exception>
-#include <QCoreApplication>
 #include <QTemporaryFile>
 #include <string>
 #include "com/centreon/engine/error.hh"
@@ -32,7 +31,10 @@ using namespace com::centreon::engine;
 /**
  *  Run process_file test.
  */
-static int check_process_file() {
+static int check_process_file(int argc, char** argv) {
+  (void)argc;
+  (void)argv;
+
   QTemporaryFile tmp("external_commands.cmd");
   if (!tmp.open())
     throw (engine_error() << "impossible to create temporary file.");
@@ -55,10 +57,6 @@ static int check_process_file() {
  *  Init unit test.
  */
 int main(int argc, char** argv) {
-  QCoreApplication app(argc, argv);
-  unittest utest(&check_process_file);
-  QObject::connect(&utest, SIGNAL(finished()), &app, SLOT(quit()));
-  utest.start();
-  app.exec();
-  return (utest.ret());
+  unittest utest(argc, argv, &check_process_file);
+  return (utest.run());
 }

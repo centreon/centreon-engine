@@ -17,7 +17,6 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <QCoreApplication>
 #include <string.h>
 #include "com/centreon/engine/error.hh"
 
@@ -28,8 +27,7 @@ using namespace com::centreon::engine;
  *
  *  @return 0 on success.
  */
-int main(int argc, char** argv) {
-  QCoreApplication app(argc, argv);
+int main() {
   // Insert char arrays.
   error e;
   e << "foo " << "bar" << " baz";

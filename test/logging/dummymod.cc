@@ -19,7 +19,6 @@
 
 #include <cstdlib>
 #include <iostream>
-#include <QCoreApplication>
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/logging/object.hh"

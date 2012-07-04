@@ -17,7 +17,6 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <QCoreApplication>
 #include <QFile>
 #include <string.h>
 #include <time.h>
@@ -34,7 +33,10 @@ using namespace com::centreon::engine;
  *
  *  @return 0 on success.
  */
-int main_test() {
+int main_test(int argc, char** argv) {
+  (void)argc;
+  (void)argv;
+
   // Return value.
   int retval(0);
 
@@ -85,10 +87,9 @@ int main_test() {
  *  Init unit test.
  */
 int main(int argc, char** argv) {
-  QCoreApplication app(argc, argv);
-  unittest utest(&main_test);
-  QObject::connect(&utest, SIGNAL(finished()), &app, SLOT(quit()));
-  utest.start();
-  app.exec();
-  return (utest.ret());
+  // rewrite basic process to remove QEventLoop.
+  return (1);
+
+  unittest utest(argc, argv, &main_test);
+  return (utest.run());
 }

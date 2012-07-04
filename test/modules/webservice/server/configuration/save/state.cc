@@ -18,7 +18,6 @@
 */
 
 #include <fstream>
-#include <QCoreApplication>
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/modules/webservice/configuration/save/state.hh"
 #include "com/centreon/engine/globals.hh"
@@ -30,9 +29,7 @@ using namespace com::centreon::engine::modules;
 /**
  *  Check the save state configuration.
  */
-static int check_save_state() {
-  int argc(QCoreApplication::argc());
-  char** argv(QCoreApplication::argv());
+static int check_save_state(int argc, char** argv) {
   for (int i(1); i < argc; ++i) {
     std::ifstream file(argv[i], std::ios::binary);
     std::string ref;
@@ -54,10 +51,6 @@ static int check_save_state() {
  *  Init unit test.
  */
 int main(int argc, char** argv) {
-  QCoreApplication app(argc, argv);
-  com::centreon::engine::unittest utest(&check_save_state);
-  QObject::connect(&utest, SIGNAL(finished()), &app, SLOT(quit()));
-  utest.start();
-  app.exec();
-  return (utest.ret());
+  com::centreon::engine::unittest utest(argc, argv, &check_save_state);
+  return (utest.run());
 }

@@ -18,7 +18,6 @@
 */
 
 #include <cstring>
-#include <QCoreApplication>
 #include "com/centreon/engine/nebmods.hh"
 #include "test/broker/mod_load.hh"
 

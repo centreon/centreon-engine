@@ -18,7 +18,6 @@
 */
 
 #include <exception>
-#include <QCoreApplication>
 #include "com/centreon/engine/commands/raw.hh"
 #include "com/centreon/engine/error.hh"
 #include "test/unittest.hh"
@@ -32,7 +31,10 @@ using namespace com::centreon::engine::commands;
 /**
  *  Check getter return.
  */
-int main_test() {
+int main_test(int argc, char** argv) {
+  (void)argc;
+  (void)argv;
+
   raw cmd(DEFAULT_CMD_NAME, DEFAULT_CMD_LINE);
 
   if (cmd.get_name() != DEFAULT_CMD_NAME)
@@ -48,10 +50,6 @@ int main_test() {
  *  Init unit test.
  */
 int main(int argc, char** argv) {
-  QCoreApplication app(argc, argv);
-  unittest utest(&main_test);
-  QObject::connect(&utest, SIGNAL(finished()), &app, SLOT(quit()));
-  utest.start();
-  app.exec();
-  return (utest.ret());
+  unittest utest(argc, argv, &main_test);
+  return (utest.run());
 }

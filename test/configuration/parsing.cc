@@ -18,7 +18,6 @@
 */
 
 #include <exception>
-#include <QCoreApplication>
 #include <QDir>
 #include <QFile>
 #include <QTemporaryFile>
@@ -71,7 +70,10 @@ static void check_exist_file() {
 /**
  *  Check the parsing argument.
  */
-int main_test() {
+int main_test(int argc, char** argv) {
+  (void)argc;
+  (void)argv;
+
   config.set_log_archive_path(QDir::tempPath().toStdString());
 
   check_directory();
@@ -85,10 +87,6 @@ int main_test() {
  *  Init unit test.
  */
 int main(int argc, char** argv) {
-  QCoreApplication app(argc, argv);
-  unittest utest(&main_test);
-  QObject::connect(&utest, SIGNAL(finished()), &app, SLOT(quit()));
-  utest.start();
-  app.exec();
-  return (utest.ret());
+  unittest utest(argc, argv, &main_test);
+  return (utest.run());
 }

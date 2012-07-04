@@ -20,7 +20,6 @@
 #include <fstream>
 #include <limits.h>
 #include <map>
-#include <QCoreApplication>
 #include <QDir>
 #include <stdio.h>
 #include <stdlib.h>
@@ -582,7 +581,10 @@ void test_configuration(
 /**
  *  Check the configuration working.
  */
-int main_test() {
+int main_test(int argc, char** argv) {
+  (void)argc;
+  (void)argv;
+
   // Initialize random number generation.
   srandom(time(NULL));
 
@@ -625,11 +627,7 @@ int main_test() {
  *  Init unit test.
  */
 int main(int argc, char** argv) {
-  QCoreApplication app(argc, argv);
-  unittest utest(&main_test);
-  QObject::connect(&utest, SIGNAL(finished()), &app, SLOT(quit()));
-  utest.start();
-  app.exec();
-  return (utest.ret());
+  unittest utest(argc, argv, &main_test);
+  return (utest.run());
 }
 

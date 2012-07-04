@@ -18,7 +18,6 @@
 */
 
 #include <exception>
-#include <QCoreApplication>
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/modules/external_commands/commands.hh"
 #include "com/centreon/engine/globals.hh"
@@ -51,7 +50,10 @@ static void _release_host(host* hst) {
 /**
  *  Run enable_all_notifications_beyond_host test.
  */
-static int check_enable_all_notifications_beyond_host() {
+static int check_enable_all_notifications_beyond_host(int argc, char** argv) {
+  (void)argc;
+  (void)argv;
+
   init_object_skiplists();
 
   host* hst_parent = add_host("parent", NULL, NULL, "localhost", NULL, 0, 0.0, 0.0, 42,
@@ -89,10 +91,6 @@ static int check_enable_all_notifications_beyond_host() {
  *  Init unit test.
  */
 int main(int argc, char** argv) {
-  QCoreApplication app(argc, argv);
-  unittest utest(&check_enable_all_notifications_beyond_host);
-  QObject::connect(&utest, SIGNAL(finished()), &app, SLOT(quit()));
-  utest.start();
-  app.exec();
-  return (utest.ret());
+  unittest utest(argc, argv, &check_enable_all_notifications_beyond_host);
+  return (utest.run());
 }

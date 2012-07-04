@@ -18,7 +18,6 @@
 */
 
 #include <exception>
-#include <QCoreApplication>
 #include "com/centreon/engine/commands/connector/execute_query.hh"
 #include "com/centreon/engine/commands/connector/execute_response.hh"
 #include "com/centreon/engine/error.hh"
@@ -44,7 +43,10 @@ using namespace com::centreon::engine::commands::connector;
 /**
  *  Check the execute request.
  */
-int main_test() {
+int main_test(int argc, char** argv) {
+  (void)argc;
+  (void)argv;
+
   // Timestamp.
   com::centreon::timestamp now(TIMESTAMP);
 
@@ -79,10 +81,6 @@ int main_test() {
  *  Init the unit test.
  */
 int main(int argc, char** argv) {
-  QCoreApplication app(argc, argv);
-  unittest utest(&main_test);
-  QObject::connect(&utest, SIGNAL(finished()), &app, SLOT(quit()));
-  utest.start();
-  app.exec();
-  return (utest.ret());
+  unittest utest(argc, argv, &main_test);
+  return (utest.run());
 }

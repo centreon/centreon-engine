@@ -17,7 +17,6 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <QCoreApplication>
 #include <QFile>
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/objects.hh"

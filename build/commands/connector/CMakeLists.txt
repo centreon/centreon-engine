@@ -68,11 +68,11 @@ if (WITH_TESTING)
 
   # Test connector.
   add_executable("connector_ctor" "${TEST_DIR}/connector_ctor.cc")
-  target_link_libraries("connector_ctor" "cce_core" ${QT_LIBRARIES})
+  target_link_libraries("connector_ctor" "cce_commands" "cce_core" ${QT_LIBRARIES})
   add_test("connector_ctor" "connector_ctor")
 
   add_executable("connector_compare" "${TEST_DIR}/connector_compare.cc")
-  target_link_libraries("connector_compare" "cce_core" ${QT_LIBRARIES})
+  target_link_libraries("connector_compare" "cce_commands" "cce_core" ${QT_LIBRARIES})
   add_test("connector_compare" "connector_compare")
 
   # XXX: compilation failed on clang.
@@ -84,7 +84,7 @@ if (WITH_TESTING)
     "${TEST_DIR}/connector_run_async.cc"
     "${TEST_DIR}/../wait_process.hh"
     ${QT_MOC_FILES})
-  target_link_libraries("connector_run_async" "cce_core" ${QT_LIBRARIES})
+  target_link_libraries("connector_run_async" "cce_commands" "cce_core" ${QT_LIBRARIES})
   add_test("connector_run_async" "connector_run_async")
 
   # XXX: compilation failed on clang.
@@ -96,7 +96,7 @@ if (WITH_TESTING)
     "${TEST_DIR}/connector_restart.cc"
     "${TEST_DIR}/../wait_process.hh"
     ${QT_MOC_FILES})
-  target_link_libraries("connector_restart" "cce_core" ${QT_LIBRARIES})
+  target_link_libraries("connector_restart" "cce_commands" "cce_core" ${QT_LIBRARIES})
   add_test("connector_restart" "connector_restart")
 
   add_executable("request_quit" "${TEST_DIR}/request_quit.cc")

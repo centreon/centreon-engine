@@ -18,7 +18,6 @@
 */
 
 #include <exception>
-#include <QCoreApplication>
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/modules/external_commands/commands.hh"
 #include "com/centreon/engine/globals.hh"
@@ -51,7 +50,10 @@ static void _release_host(host* hst) {
 /**
  *  Run schedule_and_propagate_triggered_host_downtime test.
  */
-static int check_schedule_and_propagate_triggered_host_downtime() {
+static int check_schedule_and_propagate_triggered_host_downtime(int argc, char** argv) {
+  (void)argc;
+  (void)argv;
+
   init_object_skiplists();
 
   host* hst_parent = add_host("parent", NULL, NULL, "localhost", NULL, 0, 0.0, 0.0, 42,
@@ -90,10 +92,6 @@ static int check_schedule_and_propagate_triggered_host_downtime() {
  *  Init unit test.
  */
 int main(int argc, char** argv) {
-  QCoreApplication app(argc, argv);
-  unittest utest(&check_schedule_and_propagate_triggered_host_downtime);
-  QObject::connect(&utest, SIGNAL(finished()), &app, SLOT(quit()));
-  utest.start();
-  app.exec();
-  return (utest.ret());
+  unittest utest(argc, argv, &check_schedule_and_propagate_triggered_host_downtime);
+  return (utest.run());
 }

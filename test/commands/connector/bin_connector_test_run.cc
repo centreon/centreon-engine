@@ -20,7 +20,6 @@
 #include <cstdlib>
 #include <ctime>
 #include <list>
-#include <QCoreApplication>
 #include <string>
 #include <unistd.h>
 #include "com/centreon/engine/commands/connector/execute_query.hh"
@@ -134,13 +133,9 @@ static std::string execute_process(
 /**
  *  Simulate some behavior of connector.
  *
- *  @param[in] argc Argument count.
- *  @param[in] argv Argument values.
- *
  *  @return EXIT_SUCCESS on success.
  */
-int main(int argc, char** argv) {
-  QCoreApplication app(argc, argv);
+int main() {
   try {
     while (true) {
       shared_ptr<connector::request> req(wait());

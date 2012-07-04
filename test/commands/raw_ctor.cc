@@ -18,7 +18,6 @@
 */
 
 #include <exception>
-#include <QCoreApplication>
 #include "com/centreon/engine/commands/raw.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/shared_ptr.hh"
@@ -33,7 +32,10 @@ using namespace com::centreon::engine::commands;
 /**
  *  Check constructor and copy object.
  */
-int main_test() {
+int main_test(int argc, char** argv) {
+  (void)argc;
+  (void)argv;
+
   raw cmd1(CMD_NAME, CMD_LINE);
   if ((cmd1.get_name() != CMD_NAME)
       || (cmd1.get_command_line() != CMD_LINE))
@@ -61,10 +63,6 @@ int main_test() {
  *  Init unit test.
  */
 int main(int argc, char** argv) {
-  QCoreApplication app(argc, argv);
-  unittest utest(&main_test);
-  QObject::connect(&utest, SIGNAL(finished()), &app, SLOT(quit()));
-  utest.start();
-  app.exec();
-  return (utest.ret());
+  unittest utest(argc, argv, &main_test);
+  return (utest.run());
 }

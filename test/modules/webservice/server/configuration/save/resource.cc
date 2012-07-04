@@ -17,7 +17,6 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <QCoreApplication>
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/modules/webservice/configuration/save/resource.hh"
 #include "com/centreon/engine/globals.hh"
@@ -82,7 +81,10 @@ static bool check_full_resources() {
 /**
  *  Check the save resources configuration.
  */
-static int check_save_resources() {
+static int check_save_resources(int argc, char** argv) {
+  (void)argc;
+  (void)argv;
+
   if (!check_null_resources())
     throw (engine_error() << "check_null_resources failed.");
   if (!check_empty_resources())
@@ -98,10 +100,6 @@ static int check_save_resources() {
  *  Init unit test.
  */
 int main(int argc, char** argv) {
-  QCoreApplication app(argc, argv);
-  com::centreon::engine::unittest utest(&check_save_resources);
-  QObject::connect(&utest, SIGNAL(finished()), &app, SLOT(quit()));
-  utest.start();
-  app.exec();
-  return (utest.ret());
+  com::centreon::engine::unittest utest(argc, argv, &check_save_resources);
+  return (utest.run());
 }

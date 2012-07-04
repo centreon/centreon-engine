@@ -19,7 +19,6 @@
 
 #include <ctime>
 #include <exception>
-#include <QCoreApplication>
 #include <sstream>
 #include "com/centreon/engine/commands/connector/command.hh"
 #include "com/centreon/engine/error.hh"
@@ -101,7 +100,10 @@ static bool restart_with_execution_limit() {
 /**
  *  Check the restart of the connector.
  */
-int main_test() {
+int main_test(int argc, char** argv) {
+  (void)argc;
+  (void)argv;
+
   if (restart_with_segfault() == false)
     throw (engine_error() << "error: restart connector after segfault failed.");
 
@@ -115,10 +117,9 @@ int main_test() {
  *  Init the unit test.
  */
 int main(int argc, char** argv) {
-  QCoreApplication app(argc, argv);
-  unittest utest(&main_test);
-  QObject::connect(&utest, SIGNAL(finished()), &app, SLOT(quit()));
-  utest.start();
-  app.exec();
-  return (utest.ret());
+  // rewrite basic process to remove QEventLoop.
+  return (1);
+
+  unittest utest(argc, argv, &main_test);
+  return (utest.run());
 }

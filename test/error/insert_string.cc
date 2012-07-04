@@ -17,7 +17,6 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <QCoreApplication>
 #include <string>
 #include <string.h>
 #include "com/centreon/engine/error.hh"
@@ -29,8 +28,7 @@ using namespace com::centreon::engine;
  *
  *  @return 0 on success.
  */
-int main(int argc, char** argv) {
-  QCoreApplication app(argc, argv);
+int main() {
   // Strings.
   std::string s1("foo");
   std::string s2(" bar baz");

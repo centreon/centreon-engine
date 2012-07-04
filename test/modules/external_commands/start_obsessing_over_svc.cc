@@ -18,7 +18,6 @@
 */
 
 #include <exception>
-#include <QCoreApplication>
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/modules/external_commands/commands.hh"
 #include "com/centreon/engine/globals.hh"
@@ -30,7 +29,10 @@ using namespace com::centreon::engine;
 /**
  *  Run start_obsessing_over_svc test.
  */
-static int check_start_obsessing_over_svc() {
+static int check_start_obsessing_over_svc(int argc, char** argv) {
+  (void)argc;
+  (void)argv;
+
   init_object_skiplists();
 
   service* svc = add_service("name", "description", NULL,
@@ -64,10 +66,6 @@ static int check_start_obsessing_over_svc() {
  *  Init unit test.
  */
 int main(int argc, char** argv) {
-  QCoreApplication app(argc, argv);
-  unittest utest(&check_start_obsessing_over_svc);
-  QObject::connect(&utest, SIGNAL(finished()), &app, SLOT(quit()));
-  utest.start();
-  app.exec();
-  return (utest.ret());
+  unittest utest(argc, argv, &check_start_obsessing_over_svc);
+  return (utest.run());
 }
