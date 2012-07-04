@@ -20,7 +20,6 @@
 #include <map>
 #include <QFile>
 #include <QFileInfo>
-#include <QRegExp>
 #include <QTextStream>
 #include <sstream>
 #include <string>

@@ -77,6 +77,10 @@ namespace                 script {
     void                  _build_help_prototype();
     static std::string    _clean_function_name(std::string const& name);
     std::string           _get_string_method(std::string type) const;
+    static std::string&   _replace(
+                            std::string& str,
+                            std::string const& old_str,
+                            std::string const& new_str);
 
     std::list<arg_info>   _args_info;
     std::string           _data;
