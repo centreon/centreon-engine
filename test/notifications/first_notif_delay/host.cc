@@ -17,7 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <QFile>
+#include <stdio.h>
 #include <string.h>
 #include <time.h>
 #include <unistd.h>
@@ -38,7 +38,7 @@ using namespace com::centreon::engine;
  */
 static int check(check_result& cr) {
   // Remove flag file.
-  QFile::remove(FLAG_FILE);
+  remove(FLAG_FILE);
 
   // Return value.
   int retval(0);
@@ -50,7 +50,7 @@ static int check(check_result& cr) {
     cr.start_time.tv_sec = now;
     cr.finish_time.tv_sec = now;
     retval |= handle_async_host_check_result_3x(host_list, &cr);
-    retval |= QFile::exists(FLAG_FILE);
+    retval |= file_exists(FLAG_FILE);
     sleep(1);
     now = time(NULL);
   }
@@ -62,7 +62,7 @@ static int check(check_result& cr) {
   retval |= handle_async_host_check_result_3x(host_list, &cr);
 
   // Check that file flag exists.
-  retval |= !QFile::exists(FLAG_FILE);
+  retval |= !file_exists(FLAG_FILE);
 
   return (retval);
 }
@@ -114,7 +114,7 @@ int main_test(int argc, char** argv) {
   }
 
   // Remove flag file.
-  QFile::remove(FLAG_FILE);
+  remove(FLAG_FILE);
 
   return (retval);
 }

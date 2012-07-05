@@ -17,7 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <QFile>
+#include <stdio.h>
 #include <string.h>
 #include <time.h>
 #include "com/centreon/engine/error.hh"
@@ -73,13 +73,13 @@ int main_test(int argc, char** argv) {
     retval |= handle_async_service_check_result(service_list, &cr);
 
     // Check that FND was not respected.
-    retval |= !QFile::exists(FLAG_FILE);
+    retval |= !file_exists(FLAG_FILE);
 
     first_notif_delay_default_cleanup();
   }
 
   // Remove flag file.
-  QFile::remove(FLAG_FILE);
+  remove(FLAG_FILE);
 
   return (retval);
 }

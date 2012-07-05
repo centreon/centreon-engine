@@ -18,9 +18,8 @@
 */
 
 #include <exception>
-#include <QDir>
-#include <QFile>
-#include <QTemporaryFile>
+#include <fstream>
+#include <stdio.h>
 #include "com/centreon/engine/configuration/state.hh"
 #include "com/centreon/engine/globals.hh"
 #include "test/unittest.hh"
@@ -59,12 +58,18 @@ static void check_noexist_file() {
  *  Check parse with exist file.
  */
 static void check_exist_file() {
-  QTemporaryFile tmp("./centengine_test_exist_file.cfg");
-  if (tmp.open() == false) {
-    throw (engine_error() << "open temporary file failed.");
+  char const* tmp(tempnam("./", "test_cfg."));
+  if (!tmp)
+    throw (engine_error() << "generate temporary file failed");
+  try {
+    std::ofstream file(tmp, std::ios_base::out | std::ios_base::trunc);
+    config.parse(tmp);
   }
-  config.parse(tmp.fileName().toStdString());
-  tmp.close();
+  catch (...) {
+    remove(tmp);
+    throw;
+  }
+  remove(tmp);
 }
 
 /**
@@ -74,7 +79,7 @@ int main_test(int argc, char** argv) {
   (void)argc;
   (void)argv;
 
-  config.set_log_archive_path(QDir::tempPath().toStdString());
+  config.set_log_archive_path("./");
 
   check_directory();
   check_noexist_file();

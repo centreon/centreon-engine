@@ -20,7 +20,6 @@
 #include <fstream>
 #include <limits.h>
 #include <map>
-#include <QDir>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -589,20 +588,15 @@ int main_test(int argc, char** argv) {
   srandom(time(NULL));
 
   // Generate temporary file names.
-  std::string mainconf_path;
-  {
-    std::ostringstream oss;
-    oss << QDir::tempPath().toStdString()
-        << "/centengine.cfg." << random();
-    mainconf_path = oss.str();
-  }
-  std::string resource_path;
-  {
-    std::ostringstream oss;
-    oss << QDir::tempPath().toStdString()
-        << "/resource.cfg." << random();
-    resource_path = oss.str();
-  }
+  char const* mainconf_path_ptr(tempnam("./", "centengine_cfg."));
+  if (!mainconf_path_ptr)
+    throw (engine_error() << "generate temporary file failed");
+  std::string mainconf_path(mainconf_path_ptr);
+
+  char const* resource_path_ptr(tempnam("./", "centengine_cfg."));
+  if (!resource_path_ptr)
+    throw (engine_error() << "generate temporary file failed");
+  std::string resource_path(resource_path_ptr);
 
   // Test.
   try {
