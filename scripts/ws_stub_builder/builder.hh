@@ -48,6 +48,7 @@ namespace               script {
     void                parse();
 
   private:
+    static std::string  _basename(std::string const& path);
     void                _build_header();
     std::string         _build_ostream_struct(
                            std::string const& base,
