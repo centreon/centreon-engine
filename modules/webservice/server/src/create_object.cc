@@ -19,7 +19,6 @@
 
 #include <algorithm>
 #include <map>
-#include <QRegExp>
 #include <vector>
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
@@ -57,16 +56,17 @@ std::map<char, bool> webservice::get_options(
                                    std::string const& pattern,
                                    char const* default_opt) {
   std::map<char, bool> res;
-  QString _opt(opt ? opt->c_str() : default_opt);
-  _opt.toLower().trimmed();
-  if (_opt.contains(QRegExp(
-                      QString("[^") + pattern.c_str() + "na, ]",
-                      Qt::CaseInsensitive)))
-    return (res);
+  std::string _opt(opt ? *opt : default_opt);
+  for (std::string::const_iterator
+         it(_opt.begin()), end(_opt.end());
+       it != end;
+       ++it)
+    if (pattern.find(*it) == std::string::npos
+        && *it != ',' && *it != 'a' && *it != 'n')
+      return (res);
 
   for (std::string::const_iterator
-         it(pattern.begin()),
-         end(pattern.end());
+         it(pattern.begin()), end(pattern.end());
        it != end;
        ++it)
     if (_opt == "n")
@@ -74,7 +74,7 @@ std::map<char, bool> webservice::get_options(
     else if (_opt == "a")
       res[*it] = true;
     else
-      res[*it] = (_opt.indexOf(*it) != -1);
+      res[*it] = (_opt.find(*it) != std::string::npos);
   return (res);
 }
 

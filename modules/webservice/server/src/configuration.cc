@@ -170,6 +170,9 @@ unsigned int configuration::get_thread_count() const throw () {
  *  Parse configuration file.
  */
 void configuration::parse() {
+  // std::ifstream file(_filename.c_str(), std::ios_base::in);
+  // if (!file.is_open())
+  //   throw (engine_error() << "open file failed: " << _filename);
   QFile file(_filename.c_str());
   if (file.open(QFile::ReadOnly | QFile::Text) == false)
     throw (engine_error() << file.errorString().toStdString());

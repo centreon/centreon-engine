@@ -115,8 +115,7 @@ target_link_libraries("centenginews"
   ${GSOAP_LIBRARIES}
   ${SSL_LIBRARIES}
   ${CRYPTO_LIBRARIES}
-  ${ZLIB_LIBRARIES}
-  ${QT_LIBRARIES})
+  ${ZLIB_LIBRARIES})
 
 # Install rule.
 install(TARGETS "centenginews"
