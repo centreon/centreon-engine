@@ -64,62 +64,62 @@ if (WITH_TESTING)
 
   # Test binary.
   add_executable("bin_connector_test_run" "${TEST_DIR}/bin_connector_test_run.cc")
-  target_link_libraries("bin_connector_test_run" "cce_commands" "cce_core" ${QT_LIBRARIES})
+  target_link_libraries("bin_connector_test_run" "cce_commands" "cce_core")
 
   # Test connector.
   add_executable("connector_ctor" "${TEST_DIR}/connector_ctor.cc")
-  target_link_libraries("connector_ctor" "cce_commands" "cce_core" ${QT_LIBRARIES})
+  target_link_libraries("connector_ctor" "cce_commands" "cce_core")
   add_test("connector_ctor" "connector_ctor")
 
   add_executable("connector_compare" "${TEST_DIR}/connector_compare.cc")
-  target_link_libraries("connector_compare" "cce_commands" "cce_core" ${QT_LIBRARIES})
+  target_link_libraries("connector_compare" "cce_commands" "cce_core")
   add_test("connector_compare" "connector_compare")
 
   # XXX: compilation failed on clang.
   # add_executable("connector_run_sync" "${TEST_DIR}/connector_run_sync.cc")
-  # target_link_libraries("connector_run_sync" "cce_core" ${QT_LIBRARIES})
+  # target_link_libraries("connector_run_sync" "cce_core")
   # add_test("connector_run_sync" "connector_run_sync")
 
   add_executable("connector_run_async"
     "${TEST_DIR}/connector_run_async.cc"
     "${TEST_DIR}/../wait_process.hh"
     ${QT_MOC_FILES})
-  target_link_libraries("connector_run_async" "cce_commands" "cce_core" ${QT_LIBRARIES})
+  target_link_libraries("connector_run_async" "cce_commands" "cce_core")
   add_test("connector_run_async" "connector_run_async")
 
   # XXX: compilation failed on clang.
   # add_executable("connector_get" "${TEST_DIR}/connector_get.cc")
-  # target_link_libraries("connector_get" "cce_core" ${QT_LIBRARIES})
+  # target_link_libraries("connector_get" "cce_core")
   # add_test("connector_get" "connector_get")
 
   add_executable("connector_restart"
     "${TEST_DIR}/connector_restart.cc"
     "${TEST_DIR}/../wait_process.hh"
     ${QT_MOC_FILES})
-  target_link_libraries("connector_restart" "cce_commands" "cce_core" ${QT_LIBRARIES})
+  target_link_libraries("connector_restart" "cce_commands" "cce_core")
   add_test("connector_restart" "connector_restart")
 
   add_executable("request_quit" "${TEST_DIR}/request_quit.cc")
-  target_link_libraries("request_quit" "cce_core" ${QT_LIBRARIES})
+  target_link_libraries("request_quit" "cce_core")
   add_test("request_quit" "request_quit")
 
   add_executable("request_version" "${TEST_DIR}/request_version.cc")
-  target_link_libraries("request_version" "cce_core" ${QT_LIBRARIES})
+  target_link_libraries("request_version" "cce_core")
   add_test("request_version" "request_version")
 
   add_executable("request_error" "${TEST_DIR}/request_error.cc")
-  target_link_libraries("request_error" "cce_core" ${QT_LIBRARIES})
+  target_link_libraries("request_error" "cce_core")
   add_test("request_version" "request_version")
 
   add_executable("request_builder" "${TEST_DIR}/request_builder.cc")
-  target_link_libraries("request_builder" "cce_core" ${QT_LIBRARIES})
+  target_link_libraries("request_builder" "cce_core")
   add_test("request_builder" "request_builder")
 
   add_executable("request_execute" "${TEST_DIR}/request_execute.cc")
-  target_link_libraries("request_execute" "cce_core" ${QT_LIBRARIES})
+  target_link_libraries("request_execute" "cce_core")
   add_test("request_execute" "request_execute")
 
   add_executable("request_execute_get_args" "${TEST_DIR}/request_execute_get_args.cc")
-  target_link_libraries("request_execute_get_args" "cce_core" ${QT_LIBRARIES})
+  target_link_libraries("request_execute_get_args" "cce_core")
   add_test("request_execute_get_args" "request_execute_get_args")
 endif ()
