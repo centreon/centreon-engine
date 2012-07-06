@@ -84,17 +84,6 @@ std::string const& commands::command::get_command_line() const throw() {
 }
 
 /**
- *  Set the command name.
- *
- *  @param[in] name The command name.
- */
-void commands::command::set_name(std::string const& name) {
-  std::string old_name = _name;
-  _name = name;
-  emit name_changed(old_name, _name);
-}
-
-/**
  *  Set the command line.
  *
  *  @param[in] command_line The command line.
