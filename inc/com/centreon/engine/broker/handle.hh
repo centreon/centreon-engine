@@ -20,9 +20,9 @@
 #ifndef CCE_BROKER_HANDLE_HH
 # define CCE_BROKER_HANDLE_HH
 
-#  include <QLibrary>
 #  include <QObject>
 #  include <string>
+#  include "com/centreon/library.hh"
 #  include "com/centreon/shared_ptr.hh"
 
 namespace                          com {
@@ -51,7 +51,7 @@ namespace                          com {
           bool                     operator!=(
                                      handle const& right) const throw ();
           void                     close();
-          QLibrary*                get_handle() const throw ();
+          library*                 get_handle() const throw ();
           std::string const&       get_author() const throw ();
           std::string const&       get_copyright() const throw ();
           std::string const&       get_description() const throw ();
@@ -106,8 +106,7 @@ namespace                          com {
           std::string              _copyright;
           std::string              _description;
           std::string              _filename;
-          com::centreon::shared_ptr<QLibrary>
-                                   _handle;
+          shared_ptr<library>      _handle;
           std::string              _license;
           std::string              _name;
           std::string              _version;

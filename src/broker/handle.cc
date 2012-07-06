@@ -22,7 +22,6 @@
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/nebmodules.hh"
-#include "com/centreon/shared_ptr.hh"
 
 using namespace com::centreon::engine::broker;
 using namespace com::centreon::engine::logging;
@@ -109,7 +108,7 @@ bool handle::operator!=(handle const& right) const throw () {
  */
 void handle::close() {
   if (_handle.get()) {
-    if (_handle->isLoaded()) {
+    if (_handle->is_loaded()) {
       typedef int (*func_deinit)(int, int);
       func_deinit deinit((func_deinit)_handle->resolve("nebmodule_deinit"));
       if (!deinit)
@@ -175,9 +174,9 @@ std::string const& handle::get_filename() const throw () {
 /**
  *  Get the handle of the module.
  *
- *  @return pointer on a QLibrary.
+ *  @return pointer on a library.
  */
-QLibrary* handle::get_handle() const throw () {
+com::centreon::library* handle::get_handle() const throw () {
   return (_handle.get());
 }
 
@@ -214,7 +213,7 @@ std::string const& handle::get_version() const throw () {
  *  @return true if the module is loaded, false otherwise.
  */
 bool handle::is_loaded() {
-  return (_handle.get() && _handle->isLoaded());
+  return (_handle.get() && _handle->is_loaded());
 }
 
 /**
@@ -224,33 +223,29 @@ void handle::open() {
   if (is_loaded())
     return ;
 
-  _handle = com::centreon::shared_ptr<QLibrary>(
-                             new QLibrary(_filename.c_str()));
-  _handle->setLoadHints(QLibrary::ResolveAllSymbolsHint
-    | QLibrary::ExportExternalSymbolsHint);
-  _handle->load();
-  if (_handle->isLoaded() == false)
-    throw (engine_error() << _handle->errorString().toStdString());
+  try {
+    _handle = shared_ptr<library>(new library(_filename));
+    _handle->load();
 
-  int* api_version = static_cast<int*>(_handle->resolve("__neb_api_version"));
-  if (api_version == NULL || *api_version != CURRENT_NEB_API_VERSION) {
-    close();
-    throw (engine_error() << "Module is using an old or unspecified version of the event broker API.");
+    int api_version(*static_cast<int*>(
+          _handle->resolve("__neb_api_version")));
+    if (api_version != CURRENT_NEB_API_VERSION)
+      throw (engine_error() << "Module is using an old or unspecified "
+             "version of the event broker API.");
+
+    typedef int (*func_init)(int, char const*, void*);
+    func_init init((func_init)_handle->resolve("nebmodule_init"));
+
+    if (init(
+          NEBMODULE_NORMAL_LOAD | NEBMODULE_ENGINE,
+          _args.c_str(),
+          this) != OK)
+      throw (engine_error() << "Function nebmodule_init "
+             "returned an error");
   }
-
-  typedef int (*func_init)(int, char const*, void*);
-  func_init init((func_init)_handle->resolve("nebmodule_init"));
-  if (!init) {
+  catch (std::exception const& e) {
     close();
-    throw (engine_error() << "Cannot resolve symbole nebmodule_init");
-  }
-
-  if (init(
-        NEBMODULE_NORMAL_LOAD | NEBMODULE_ENGINE,
-        _args.c_str(),
-        this) != OK) {
-    close();
-    throw (engine_error() << "Function nebmodule_init returned an error");
+    throw;
   }
 
   emit event_loaded(this);
