@@ -21,8 +21,8 @@
 #  define CCE_MOD_WS_CONFIGURATION_HH
 
 #  include <map>
-#  include <QXmlStreamReader>
 #  include <string>
+#  include <xercesc/dom/DOM.hpp>
 #  include "com/centreon/engine/modules/webservice/namespace.hh"
 
 CCE_MOD_WS_BEGIN()
@@ -56,24 +56,26 @@ public:
 private:
                      configuration(configuration const& right);
   configuration&     operator=(configuration const& right);
-  void               _set_accept_timeout();
-  void               _set_host();
-  void               _set_port();
-  void               _set_recv_timeout();
-  void               _set_send_timeout();
-  void               _set_ssl_cacert();
-  void               _set_ssl_dh();
-  void               _set_ssl_enable();
-  void               _set_ssl_keyfile();
-  void               _set_ssl_password();
-  void               _set_thread_count();
+  void               _parse(
+                       std::string const& prefix,
+                       xercesc::DOMNode const* node);
+  void               _set_accept_timeout(std::string const& value);
+  void               _set_host(std::string const& value);
+  void               _set_port(std::string const& value);
+  void               _set_recv_timeout(std::string const& value);
+  void               _set_send_timeout(std::string const& value);
+  void               _set_ssl_cacert(std::string const& value);
+  void               _set_ssl_dh(std::string const& value);
+  void               _set_ssl_enable(std::string const& value);
+  void               _set_ssl_keyfile(std::string const& value);
+  void               _set_ssl_password(std::string const& value);
+  void               _set_thread_count(std::string const& value);
 
   int                _accept_timeout;
   std::string        _filename;
   std::string        _host;
-  std::map<std::string, void (configuration::*)()>
+  std::map<std::string, void (configuration::*)(std::string const&)>
                      _keytab;
-  QXmlStreamReader   _reader;
   std::string        _path;
   int                _port;
   int                _recv_timeout;

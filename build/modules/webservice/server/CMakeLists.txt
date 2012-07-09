@@ -21,6 +21,44 @@
 set(SRC_DIR "${MODULE_DIR}/server/src")
 set(INC_DIR "${MODULE_DIR}/server/inc/com/centreon/engine/modules/webservice")
 
+# Find Xercesc's headers.
+if (WITH_XERCESC_INCLUDE_DIR)
+  find_file(
+    XERCESC_HEADER_FOUND
+    "xercesc/dom/DOM.hpp"
+    PATHS "${WITH_XERCESC_INCLUDE_DIR}"
+    NO_DEFAULT_PATH)
+  if (NOT XERCESC_HEADER_FOUND)
+    message(FATAL_ERROR "Could not find Xercesc's headers in ${WITH_XERCESC_INCLUDE_DIR}.")
+  endif ()
+  include_directories("${WITH_XERCESC_INCLUDE_DIR}")
+else ()
+  find_path(XERCESC_INCLUDE_DIR "xercesc/dom/DOM.hpp")
+  if (NOT XERCESC_INCLUDE_DIR)
+    message(FATAL_ERROR "Could not find Xercesc's headers (try WITH_XERCESC_INCLUDE_DIR).")
+  endif ()
+  include_directories("${XERCESC_INCLUDE_DIR}")
+endif ()
+
+# Find Xercesc's library.
+if (WITH_XERCESC_LIBRARIES)
+  set(XERCESC_LIBRARIES "${WITH_XERCESC_LIBRARIES}")
+elseif (WITH_XERCESC_LIBRARY_DIR)
+  find_library(
+    XERCESC_LIBRARIES
+    "xerces-c"
+    PATHS "${WITH_XERCESC_LIBRARY_DIR}"
+    NO_DEFAULT_PATH)
+  if (NOT XERCESC_LIBRARIES)
+    message(FATAL_ERROR "Could not find Xercesc's library in ${WITH_XERCESC_LIBRARY_DIR}.")
+  endif ()
+else ()
+  find_library(XERCESC_LIBRARIES "xerces-c")
+  if (NOT XERCESC_LIBRARIES)
+    message(FATAL_ERROR "Could not find Xercesc's library (try WITH_XERCESC_LIBRARY_DIR or WITH_XERCESC_LIBRARIES).")
+  endif ()
+endif ()
+
 # Include directories.
 include_directories("${MODULE_DIR}/inc")
 
@@ -118,7 +156,7 @@ target_link_libraries("webservice"
   ${SSL_LIBRARIES}
   ${CRYPTO_LIBRARIES}
   ${ZLIB_LIBRARIES}
-  ${QT_LIBRARIES}
+  ${XERCESC_LIBRARIES}
   "externalcmd")
 
 # Install rule.
