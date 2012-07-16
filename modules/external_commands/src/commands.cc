@@ -47,9 +47,8 @@ using namespace com::centreon::engine::logging;
 /******************************************************************/
 
 /* checks for the existence of the external command file and processes all commands found in it */
-int check_for_external_commands(void) {
-  char* buffer = NULL;
-  int update_status = FALSE;
+int check_for_external_commands() {
+  char* buffer(NULL);
 
   logger(dbg_functions, basic) << "check_for_external_commands()";
 
@@ -62,11 +61,7 @@ int check_for_external_commands(void) {
 
   /* update the status log with new program information */
   /* go easy on the frequency of this if we're checking often - only update program status every 10 seconds.... */
-  if (last_command_check < (last_command_status_update + 10))
-    update_status = FALSE;
-  else
-    update_status = TRUE;
-  if (update_status == TRUE) {
+  if (last_command_check >= (last_command_status_update + 10)) {
     last_command_status_update = last_command_check;
     update_program_status(FALSE);
   }
