@@ -18,7 +18,6 @@
 */
 
 #include <exception>
-#include <QCoreApplication>
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/modules/external_commands/commands.hh"
 #include "com/centreon/engine/globals.hh"
@@ -30,7 +29,10 @@ using namespace com::centreon::engine;
 /**
  *  Run change_contact_modhattr test.
  */
-static int check_change_contact_modhattr() {
+static int check_change_contact_modhattr(int argc, char** argv) {
+  (void)argc;
+  (void)argv;
+
   init_object_skiplists();
 
   contact* cntct = add_contact("name", NULL, NULL, NULL, NULL, NULL, NULL, 0,
@@ -58,10 +60,6 @@ static int check_change_contact_modhattr() {
  *  Init unit test.
  */
 int main(int argc, char** argv) {
-  QCoreApplication app(argc, argv);
-  unittest utest(&check_change_contact_modhattr);
-  QObject::connect(&utest, SIGNAL(finished()), &app, SLOT(quit()));
-  utest.start();
-  app.exec();
-  return (utest.ret());
+  unittest utest(argc, argv, &check_change_contact_modhattr);
+  return (utest.run());
 }

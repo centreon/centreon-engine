@@ -18,7 +18,6 @@
 */
 
 #include <exception>
-#include <QCoreApplication>
 #include "com/centreon/engine/commands/connector/request_builder.hh"
 #include "com/centreon/engine/error.hh"
 #include "test/unittest.hh"
@@ -59,7 +58,10 @@ static bool is_invalid() {
 /**
  *  Check request builder.
  */
-int main_test() {
+int main_test(int argc, char** argv) {
+  (void)argc;
+  (void)argv;
+
   if (is_valid() == false)
     throw (engine_error() << "error: is valid failed.");
 
@@ -73,10 +75,6 @@ int main_test() {
  *  Init the unit test.
  */
 int main(int argc, char** argv) {
-  QCoreApplication app(argc, argv);
-  unittest utest(&main_test);
-  QObject::connect(&utest, SIGNAL(finished()), &app, SLOT(quit()));
-  utest.start();
-  app.exec();
-  return (utest.ret());
+  unittest utest(argc, argv, &main_test);
+  return (utest.run());
 }

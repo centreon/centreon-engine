@@ -53,18 +53,18 @@ if (WITH_TESTING)
     "${TEST_DIR}/engine.cc"
     "${TEST_DIR}/test.cc"
     "${TEST_DIR}/test.hh")
-  target_link_libraries("logging_engine" ${QT_LIBRARIES} "cce_core")
+  target_link_libraries("logging_engine" "cce_core")
   add_test("logging_engine" "logging_engine")
 
   # Test broker.
   add_library("dummymod" SHARED "${TEST_DIR}/dummymod.cc")
   set_target_properties("dummymod" PROPERTIES PREFIX "")
-  add_executable("logging_broker" "${TEST_DIR}/broker.cc" ${QT_MOC_FILES})
-  target_link_libraries("logging_broker" ${QT_LIBRARIES} "cce_core")
+  add_executable("logging_broker" "${TEST_DIR}/broker.cc")
+  target_link_libraries("logging_broker" "cce_core")
   add_test("logging_broker" "logging_broker")
 
   # Test file.
   add_executable("logging_file" "${TEST_DIR}/file.cc")
-  target_link_libraries("logging_file" ${QT_LIBRARIES} "cce_core")
+  target_link_libraries("logging_file" "cce_core")
   add_test("logging_file" "logging_file")
 endif ()

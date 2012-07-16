@@ -18,10 +18,12 @@
 */
 
 #include <iostream>
-#include <QLibrary>
 #include <stdlib.h>
+#include "com/centreon/library.hh"
 #include "common.h"
 #include "nebmodules.h"
+
+using namespace com::centreon;
 
 // Specify the event broker API version.
 NEB_API_VERSION(CURRENT_NEB_API_VERSION)
@@ -59,24 +61,18 @@ extern "C" {
     (void)handle;
 
     // We will exit right after module loading.
-    int exitcode;
+    int exitcode(EXIT_FAILURE);
     try {
       // Load module with required symbols.
-      QLibrary lib(args);
-      lib.setLoadHints(
-            QLibrary::ResolveAllSymbolsHint
-            | QLibrary::ExportExternalSymbolsHint);
-      if (lib.load()) {
-        exitcode = EXIT_SUCCESS;
-      }
-      else {
-        std::cout << lib.errorString().toStdString() << std::endl;
-        exitcode = EXIT_FAILURE;
-      }
+      library lib(args);
+      lib.load();
+      exitcode = EXIT_SUCCESS;
+    }
+    catch (std::exception const& e) {
+      std::cerr << "error: " << e.what() << std::endl;
     }
     catch (...) {
       // Exception means failure.
-      exitcode = EXIT_FAILURE;
     }
     exit(exitcode);
     return (exitcode);

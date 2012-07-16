@@ -21,8 +21,6 @@
 #  define CCE_COMMANDS_SET_HH
 
 #  include <map>
-#  include <memory>
-#  include <QObject>
 #  include <string>
 #  include "com/centreon/engine/commands/command.hh"
 #  include "com/centreon/shared_ptr.hh"
@@ -38,25 +36,18 @@ namespace             com {
          *  Set is a singleton to store all command class and have a simple
          *  access to used it.
          */
-        class         set : public QObject {
-          Q_OBJECT
-
+        class         set {
         public:
                       ~set() throw ();
           void        add_command(command const& cmd);
           void        add_command(
-                        com::centreon::shared_ptr<command> cmd);
-          com::centreon::shared_ptr<command>
+                        shared_ptr<command> cmd);
+          shared_ptr<command>
                       get_command(std::string const& cmd_name);
           static set& instance();
           static void load();
           void        remove_command(std::string const& cmd_name);
           static void unload();
-
-        public slots:
-          void        command_name_changed(
-                        std::string const& old_name,
-                        std::string const& new_name);
 
         private:
                       set();
@@ -64,9 +55,8 @@ namespace             com {
           set&        operator=(set const& right);
           void        _internal_copy(set const& right);
 
-          static std::auto_ptr<set>
-                      _instance;
-          std::map<std::string, com::centreon::shared_ptr<command> >
+          static set* _instance;
+          std::map<std::string, shared_ptr<command> >
                       _list;
         };
       }

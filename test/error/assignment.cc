@@ -17,8 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <QCoreApplication>
-#include <string>
+#include <string.h>
 #include "com/centreon/engine/error.hh"
 
 using namespace com::centreon::engine;
@@ -28,8 +27,7 @@ using namespace com::centreon::engine;
  *
  *  @return 0 on success.
  */
-int main(int argc, char** argv) {
-  QCoreApplication app(argc, argv);
+int main() {
   // Base object.
   error e1;
   e1 << "foo " << "bar" << 42u;

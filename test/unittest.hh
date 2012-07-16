@@ -21,7 +21,6 @@
 #  define TEST_UNITTEST_HH
 
 #  include <iostream>
-#  include <QThread>
 #  include "com/centreon/engine/broker/compatibility.hh"
 #  include "com/centreon/engine/broker/loader.hh"
 #  include "com/centreon/engine/checks/checker.hh"
@@ -38,24 +37,16 @@ namespace     com {
        *  engine needs to make unit test and run
        *  unit test.
        */
-      class   unittest : public QThread {
+      class    unittest {
       public:
-              unittest(int (*func)())
-          : QThread(), _func(func), _ret(1) {}
-
-              ~unittest() throw () {
-          wait();
-        }
-
-        int   ret() const throw () {
-          return (_ret);
-        }
-
-      protected:
-        void  run() {
+               unittest(int argc, char** argv, int (*func)(int, char**))
+                 : _argc(argc), _argv(argv), _func(func) {}
+               ~unittest() throw () {}
+        int    run() {
+          int ret(1);
           try {
             _init();
-            _ret = (*_func)();
+            ret = (*_func)(_argc, _argv);
             _deinit();
           }
           catch (std::exception const& e) {
@@ -64,10 +55,11 @@ namespace     com {
           catch (...) {
             std::cerr << "error: catch all..." << std::endl;
           }
+          return (ret);
         }
 
       private:
-        void  _init() {
+        void   _init() {
           logging::engine::load();
           commands::set::load();
           checks::checker::load();
@@ -76,7 +68,7 @@ namespace     com {
           broker::compatibility::load();
         }
 
-        void  _deinit() {
+        void   _deinit() {
           broker::compatibility::unload();
           broker::loader::unload();
           events::loop::unload();
@@ -85,8 +77,9 @@ namespace     com {
           logging::engine::unload();
         }
 
-        int  (*_func)();
-        int   _ret;
+        int    _argc;
+        char** _argv;
+        int    (*_func)(int, char**);
       };
     }
   }

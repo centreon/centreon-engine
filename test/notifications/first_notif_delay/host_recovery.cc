@@ -20,11 +20,9 @@
 #include <cstdio>
 #include <cstring>
 #include <ctime>
-#include <QCoreApplication>
 #include "com/centreon/engine/checks.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
-#include "com/centreon/io/file_stream.hh"
 #include "test/notifications/first_notif_delay/common.hh"
 #include "test/unittest.hh"
 
@@ -36,7 +34,10 @@ using namespace com::centreon::engine;
  *
  *  @return 0 on success.
  */
-int main_test() {
+int main_test(int argc, char** argv) {
+  (void)argc;
+  (void)argv;
+
   // Return value.
   int retval(0);
 
@@ -72,7 +73,7 @@ int main_test() {
     retval |= handle_async_host_check_result_3x(host_list, &cr);
 
     // Check that FND was not respected.
-    retval |= !io::file_stream::exists(FLAG_FILE);
+    retval |= !file_exists(FLAG_FILE);
 
     first_notif_delay_default_cleanup();
   }
@@ -87,10 +88,9 @@ int main_test() {
  *  Init unit test.
  */
 int main(int argc, char** argv) {
-  QCoreApplication app(argc, argv);
-  unittest utest(&main_test);
-  QObject::connect(&utest, SIGNAL(finished()), &app, SLOT(quit()));
-  utest.start();
-  app.exec();
-  return (utest.ret());
+  // rewrite basic process to remove QEventLoop.
+  return (1);
+
+  unittest utest(argc, argv, &main_test);
+  return (utest.run());
 }

@@ -17,9 +17,11 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <algorithm>
 #include <cctype>
-#include <QRegExp>
+#include <regex.h>
 #include <sstream>
+#include <string.h>
 #include "arg_definition.hh"
 #include "error.hh"
 #include "function.hh"
@@ -89,13 +91,33 @@ function& function::operator=(function const& right) {
  *  Build all (function and prototype).
  */
 void function::build() {
-  QRegExp reg(_pattern);
-  if ((reg.indexIn(_data.c_str()) == -1) || (reg.captureCount() != 2))
-    throw (error("build failed 'invalid string'"));
+  regex_t reg;
+  if (regcomp(&reg, _pattern, REG_EXTENDED) != 0)
+    throw (error("build failed: regcomp failed"));
 
-  _function = reg.cap(1).toStdString();
+  static size_t const match(3);
+  regmatch_t pmatch[match];
+  memset(pmatch, 0, sizeof(pmatch));
+  if (regexec(&reg, _data.c_str(), match, pmatch, 0)
+      || reg.re_nsub != 2) {
+    regfree(&reg);
+    throw (error("build failed: regexec failed"));
+  }
+
+  std::string function(
+                _data,
+                pmatch[1].rm_so,
+                pmatch[1].rm_eo - pmatch[1].rm_so);
+  std::string args(
+                _data,
+                pmatch[2].rm_so,
+                pmatch[2].rm_eo - pmatch[2].rm_so);
+  regfree(&reg);
+
+
+  _function = function;
   _new_function = _clean_function_name(_function);
-  _build_args_info(reg.cap(2).toStdString());
+  _build_args_info(args);
   _build_help_prototype();
   _build_exec_prototype();
   _build_help_function();
@@ -176,8 +198,12 @@ std::string const& function::get_name() const throw () {
  *  @return Return true if data is valid, false otherwise.
  */
 bool function::is_valid(std::string const& data) throw () {
-  static QRegExp check(_pattern);
-  return (check.exactMatch(data.c_str()));
+  regex_t reg;
+  if (regcomp(&reg, _pattern, REG_EXTENDED | REG_NOSUB) != 0)
+    return (false);
+  bool ret(!regexec(&reg, data.c_str(), 0, NULL, 0));
+  regfree(&reg);
+  return (ret);
 }
 
 /**************************************
@@ -456,14 +482,17 @@ std::string function::_build_exec_struct(
               "  }\n");
     }
     else {
-      QString varname(base.c_str());
-      varname.replace(QRegExp("[->\\.]"), "_");
+      std::string varname(base);
+      _replace(varname, "-", "_");
+      _replace(varname, ">", "_");
+      _replace(varname, ".", "_");
+
       std::ostringstream oss;
-      oss << "  " << arg.get_type() << " " << varname.toStdString() << ";\n"
+      oss << "  " << arg.get_type() << " " << varname << ";\n"
           << "  if (args.find(\"" << arg.get_help() << "\") != args.end()) {\n"
-          << "    " << varname.toStdString() << " = " << _get_string_method(arg.get_type())
+          << "    " << varname << " = " << _get_string_method(arg.get_type())
           << "(args[\"" << arg.get_help() << "\"])" << ";\n"
-          << "    " << base << " = &" << varname.toStdString() << ";\n"
+          << "    " << base << " = &" << varname << ";\n"
           << "  }\n";
       return (oss.str());
     }
@@ -527,7 +556,7 @@ void function::_build_help_function() {
   std::ostringstream oss;
   oss << "void help_" << _new_function << "() {\n"
       << "  std::cout << \"" << _new_function << " " << usage << "\" << std::endl;\n"
-      << "}"; 
+      << "}";
   _help_function = oss.str();
 
   return ;
@@ -575,16 +604,21 @@ std::string function::_clean_function_name(std::string const& name) {
  *  @return Return the std::string method name to translate the type.
  */
 std::string function::_get_string_method(std::string type) const {
+  if (type.empty())
+    return ("");
   if (type == "std::vector<std::string>")
     return ("toStdVector");
-  QString t(type.c_str());
-  t.replace("time_t", "long long");
-  t.replace("ULONG64", "unsigned long long");
-  t.replace("bool", "int");
-  t.replace("unsigned", "u").replace("::", " ");
-  t = t.toLower();
-  t = t.left(1).toUpper() + t.mid(1);
-  type = t.toStdString();
+  _replace(type, "time_t", "long long");
+  _replace(type, "ULONG64", "unsigned long long");
+  _replace(type, "bool", "int");
+  _replace(type, "unsigned", "u");
+  _replace(type, "::", " ");
+  std::transform(
+         type.begin(),
+         type.end(),
+         type.begin(),
+         tolower);
+  type[0] = toupper(type[0]);
 
   std::string ret("to");
   for (std::string::const_iterator it(type.begin()), end(type.end());
@@ -596,4 +630,22 @@ std::string function::_get_string_method(std::string type) const {
       ret += *it;
   }
   return (ret);
+}
+
+/**
+ *  Find and replace string.
+ *
+ *  @param[out] str      The string to modify.
+ *  @param[in]  old_str  The string to old string.
+ *  @param[in]  new_str  The string to new string.
+ */
+std::string& function::_replace(
+                         std::string& str,
+                         std::string const& old_str,
+                         std::string const& new_str) {
+  for (size_t pos(0);
+       ((pos = str.find(old_str, pos)) != std::string::npos);
+       ++pos)
+    str.replace(pos, old_str.size(), new_str);
+  return (str);
 }

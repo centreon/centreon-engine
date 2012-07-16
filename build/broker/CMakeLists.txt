@@ -55,22 +55,22 @@ if (WITH_TESTING)
 
   # Test loader.
   add_executable("broker_loader" "${TEST_DIR}/loader.cc")
-  target_link_libraries("broker_loader" ${QT_LIBRARIES} "cce_core")
+  target_link_libraries("broker_loader" "cce_core")
   add_test("broker_loader" "broker_loader")
 
   # Test handle.
   add_executable("broker_handle" "${TEST_DIR}/handle.cc")
-  target_link_libraries("broker_handle" ${QT_LIBRARIES} "cce_core")
+  target_link_libraries("broker_handle" "cce_core")
   add_test("broker_handle" "broker_handle")
 
   # Test nebmodule.
   add_executable("broker_nebmodule" "${TEST_DIR}/nebmodule.cc")
-  target_link_libraries("broker_nebmodule" ${QT_LIBRARIES} "cce_core")
+  target_link_libraries("broker_nebmodule" "cce_core")
   add_test("broker_nebmodule" "broker_nebmodule")
 
   # Test compatibility.
   add_executable("broker_compatibility" "${TEST_DIR}/compatibility.cc")
-  target_link_libraries("broker_compatibility" ${QT_LIBRARIES} "cce_configuration" "cce_core" "cce_configuration")
+  target_link_libraries("broker_compatibility" "cce_configuration" "cce_core" "cce_configuration")
   add_test("broker_compatibility" "broker_compatibility")
 
 endif ()

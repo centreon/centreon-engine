@@ -17,7 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <QString>
+#include <algorithm>
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/modules/webservice/commands.hh"
@@ -71,10 +71,13 @@ void webservice::create_service(ns1__serviceType const& svc) {
 
   // Initial state.
   int initial_state(STATE_OK);
-  QString initial_state_options(svc.initialState
-                                ? svc.initialState->c_str()
-                                : "o");
-  initial_state_options.toLower().trimmed();
+  std::string initial_state_options(
+                svc.initialState ? *svc.initialState : "o");
+  std::transform(
+         initial_state_options.begin(),
+         initial_state_options.end(),
+         initial_state_options.begin(),
+         tolower);
   if ((initial_state_options == "o") || (initial_state_options == "ok"))
     initial_state = STATE_OK;
   else if ((initial_state_options == "w")

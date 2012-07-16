@@ -18,7 +18,6 @@
 */
 
 #include <limits.h>
-#include <QCoreApplication>
 #include <sstream>
 #include <string.h>
 #include "com/centreon/engine/error.hh"
@@ -30,8 +29,7 @@ using namespace com::centreon::engine;
  *
  *  @return 0 on success.
  */
-int main(int argc, char** argv) {
-  QCoreApplication app(argc, argv);
+int main() {
   // Insert long longs.
   error e;
   e << 74654646541515ll << 0ll << -1ll << 5465451141125787ll;

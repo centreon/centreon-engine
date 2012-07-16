@@ -18,7 +18,6 @@
 */
 
 #include <exception>
-#include <QCoreApplication>
 #include "com/centreon/engine/commands/raw.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
@@ -161,7 +160,10 @@ static bool run_with_double_quotes() {
 /**
  *  Check the asynchrone system for the raw command.
  */
-int main_test() {
+int main_test(int argc, char** argv) {
+  (void)argc;
+  (void)argv;
+
   if (!run_without_timeout())
     throw (engine_error() << "raw::run without timeout failed");
   if (!run_with_timeout())
@@ -179,10 +181,9 @@ int main_test() {
  *  Init unit test.
  */
 int main(int argc, char** argv) {
-  QCoreApplication app(argc, argv);
-  unittest utest(&main_test);
-  QObject::connect(&utest, SIGNAL(finished()), &app, SLOT(quit()));
-  utest.start();
-  app.exec();
-  return (utest.ret());
+  // rewrite basic process to remove QEventLoop.
+  return (1);
+
+  unittest utest(argc, argv, &main_test);
+  return (utest.run());
 }

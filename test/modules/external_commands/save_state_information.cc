@@ -18,7 +18,6 @@
 */
 
 #include <exception>
-#include <QCoreApplication>
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/modules/external_commands/commands.hh"
@@ -53,7 +52,10 @@ static int broker_callback(int callback_type, void* data) {
 /**
  *  Run save_state_information test.
  */
-static int check_save_state_information() {
+static int check_save_state_information(int argc, char** argv) {
+  (void)argc;
+  (void)argv;
+
   config.set_retain_state_information(true);
 
   // register broker callback to catch event.
@@ -80,10 +82,6 @@ static int check_save_state_information() {
  *  Init unit test.
  */
 int main(int argc, char** argv) {
-  QCoreApplication app(argc, argv);
-  unittest utest(&check_save_state_information);
-  QObject::connect(&utest, SIGNAL(finished()), &app, SLOT(quit()));
-  utest.start();
-  app.exec();
-  return (utest.ret());
+  unittest utest(argc, argv, &check_save_state_information);
+  return (utest.run());
 }

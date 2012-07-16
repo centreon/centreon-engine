@@ -18,7 +18,6 @@
 */
 
 #include <exception>
-#include <QCoreApplication>
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/modules/external_commands/commands.hh"
 #include "com/centreon/engine/globals.hh"
@@ -30,7 +29,10 @@ using namespace com::centreon::engine;
 /**
  *  Run enable_flap_detection test.
  */
-static int check_enable_flap_detection() {
+static int check_enable_flap_detection(int argc, char** argv) {
+  (void)argc;
+  (void)argv;
+
   config.set_enable_flap_detection(false);
   char const* cmd("[1317196300] ENABLE_FLAP_DETECTION");
   process_external_command(cmd);
@@ -45,10 +47,6 @@ static int check_enable_flap_detection() {
  *  Init unit test.
  */
 int main(int argc, char** argv) {
-  QCoreApplication app(argc, argv);
-  unittest utest(&check_enable_flap_detection);
-  QObject::connect(&utest, SIGNAL(finished()), &app, SLOT(quit()));
-  utest.start();
-  app.exec();
-  return (utest.ret());
+  unittest utest(argc, argv, &check_enable_flap_detection);
+  return (utest.run());
 }

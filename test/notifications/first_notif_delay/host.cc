@@ -20,12 +20,10 @@
 #include <cstdio>
 #include <cstring>
 #include <ctime>
-#include <QCoreApplication>
 #include <unistd.h>
 #include "com/centreon/engine/checks.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
-#include "com/centreon/io/file_stream.hh"
 #include "test/notifications/first_notif_delay/common.hh"
 #include "test/unittest.hh"
 
@@ -53,7 +51,7 @@ static int check(check_result& cr) {
     cr.start_time.tv_sec = now;
     cr.finish_time.tv_sec = now;
     retval |= handle_async_host_check_result_3x(host_list, &cr);
-    retval |= io::file_stream::exists(FLAG_FILE);
+    retval |= file_exists(FLAG_FILE);
     sleep(1);
     now = time(NULL);
   }
@@ -65,7 +63,7 @@ static int check(check_result& cr) {
   retval |= handle_async_host_check_result_3x(host_list, &cr);
 
   // Check that file flag exists.
-  retval |= !io::file_stream::exists(FLAG_FILE);
+  retval |= !file_exists(FLAG_FILE);
 
   return (retval);
 }
@@ -75,7 +73,10 @@ static int check(check_result& cr) {
  *
  *  @return 0 on success.
  */
-int main_test() {
+int main_test(int argc, char** argv) {
+  (void)argc;
+  (void)argv;
+
   // Return value.
   int retval(0);
 
@@ -123,10 +124,9 @@ int main_test() {
  *  Init unit test.
  */
 int main(int argc, char** argv) {
-  QCoreApplication app(argc, argv);
-  unittest utest(&main_test);
-  QObject::connect(&utest, SIGNAL(finished()), &app, SLOT(quit()));
-  utest.start();
-  app.exec();
-  return (utest.ret());
+  // rewrite basic process to remove QEventLoop.
+  return (1);
+
+  unittest utest(argc, argv, &main_test);
+  return (utest.run());
 }

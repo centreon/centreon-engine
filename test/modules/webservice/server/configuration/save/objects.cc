@@ -18,7 +18,6 @@
 */
 
 #include <fstream>
-#include <QCoreApplication>
 #include "com/centreon/engine/config.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/modules/webservice/configuration/save/objects.hh"
@@ -31,10 +30,7 @@ using namespace com::centreon::engine::modules;
 /**
  *  Run add_host_comment test.
  */
-static int check_save_objects() {
-  int argc(QCoreApplication::argc());
-  char** argv(QCoreApplication::argv());
-
+static int check_save_objects(int argc, char** argv) {
   if (argc < 2)
     throw (engine_error()
            << "check_save_object failed: bad arguments.");
@@ -135,10 +131,6 @@ static int check_save_objects() {
  *  Init unit test.
  */
 int main(int argc, char** argv) {
-  QCoreApplication app(argc, argv);
-  com::centreon::engine::unittest utest(&check_save_objects);
-  QObject::connect(&utest, SIGNAL(finished()), &app, SLOT(quit()));
-  utest.start();
-  app.exec();
-  return (utest.ret());
+  unittest utest(argc, argv, &check_save_objects);
+  return (utest.run());
 }

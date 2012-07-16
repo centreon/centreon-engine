@@ -18,7 +18,6 @@
 */
 
 #include <exception>
-#include <QCoreApplication>
 #include "com/centreon/engine/commands/connector/error_response.hh"
 #include "com/centreon/engine/error.hh"
 #include "test/commands/connector/check_request.hh"
@@ -34,7 +33,10 @@ using namespace com::centreon::engine::commands::connector;
 /**
  *  Check the error request.
  */
-int main_test() {
+int main_test(int argc, char** argv) {
+  (void)argc;
+  (void)argv;
+
   error_response response(MESSAGE, static_cast<error_response::e_code>(CODE));
   if (check_request_valid(&response, REQUEST(RESPONSE)) == false)
     throw (engine_error() << "error: response is valid failed.");
@@ -50,10 +52,6 @@ int main_test() {
  *  Init the unit test.
  */
 int main(int argc, char** argv) {
-  QCoreApplication app(argc, argv);
-  unittest utest(&main_test);
-  QObject::connect(&utest, SIGNAL(finished()), &app, SLOT(quit()));
-  utest.start();
-  app.exec();
-  return (utest.ret());
+  unittest utest(argc, argv, &main_test);
+  return (utest.run());
 }

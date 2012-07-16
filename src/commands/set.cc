@@ -30,7 +30,7 @@ using namespace com::centreon::engine::logging;
 using namespace com::centreon::engine::commands;
 
 // Class instance.
-std::auto_ptr<set> set::_instance;
+set* set::_instance = NULL;
 
 /**************************************
 *                                     *
@@ -59,13 +59,6 @@ void set::add_command(command const& cmd) {
  *  @param[in] cmd The new command.
  */
 void set::add_command(shared_ptr<command> cmd) {
-  if (connect(
-        &(*cmd),
-        SIGNAL(name_changed(std::string const&, std::string const&)),
-        this,
-        SLOT(command_name_changed(std::string const&, std::string const&)),
-        Qt::DirectConnection) == false)
-    throw (engine_error() << "connect command to set failed.");
   _list[cmd->get_name()] = cmd;
   logger(dbg_commands, basic) << "added command " << cmd->get_name();
   return ;
@@ -100,8 +93,8 @@ set& set::instance() {
  *  Load singleton.
  */
 void set::load() {
-  if (!_instance.get())
-    _instance.reset(new set);
+  if (!_instance)
+    _instance = new set;
   return ;
 }
 
@@ -120,23 +113,8 @@ void set::remove_command(std::string const& cmd_name) {
  *  Cleanup the set singleton.
  */
 void set::unload() {
-  _instance.reset();
-}
-
-/**
- *  Slot to get notified when the commend name change.
- *
- *  @param[in] old_name The old name of the command.
- *  @param[in] new_name The new name of the command.
- */
-void set::command_name_changed(
-            std::string const& old_name,
-            std::string const& new_name) {
-  (void)new_name;
-  shared_ptr<commands::command> cmd(get_command(old_name));
-  remove_command(old_name);
-  add_command(cmd);
-  return ;
+  delete _instance;
+  _instance = NULL;
 }
 
 /**************************************
@@ -155,7 +133,7 @@ set::set() {}
  *
  *  @param[in] right Object to copy.
  */
-set::set(set const& right) : QObject() {
+set::set(set const& right) {
   _internal_copy(right);
 }
 

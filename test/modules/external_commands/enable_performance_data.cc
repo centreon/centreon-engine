@@ -18,7 +18,6 @@
 */
 
 #include <exception>
-#include <QCoreApplication>
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/modules/external_commands/commands.hh"
 #include "com/centreon/engine/globals.hh"
@@ -30,7 +29,10 @@ using namespace com::centreon::engine;
 /**
  *  Run enable_performance_data test.
  */
-static int check_enable_performance_data() {
+static int check_enable_performance_data(int argc, char** argv) {
+  (void)argc;
+  (void)argv;
+
   process_performance_data = false;
   char const* cmd("[1317196300] ENABLE_PERFORMANCE_DATA");
   process_external_command(cmd);
@@ -45,10 +47,6 @@ static int check_enable_performance_data() {
  *  Init unit test.
  */
 int main(int argc, char** argv) {
-  QCoreApplication app(argc, argv);
-  unittest utest(&check_enable_performance_data);
-  QObject::connect(&utest, SIGNAL(finished()), &app, SLOT(quit()));
-  utest.start();
-  app.exec();
-  return (utest.ret());
+  unittest utest(argc, argv, &check_enable_performance_data);
+  return (utest.run());
 }

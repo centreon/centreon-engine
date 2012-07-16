@@ -17,7 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <QString>
+#include <algorithm>
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/modules/external_commands/commands.hh"
@@ -68,10 +68,13 @@ void webservice::create_host(ns1__hostType const& hst) {
 
   // Initial state.
   int initial_state(HOST_UP);
-  QString initial_state_options(hst.initialState
-                                ? hst.initialState->c_str()
-                                : "o");
-  initial_state_options.toLower().trimmed();
+  std::string initial_state_options(
+                hst.initialState ? *hst.initialState : "o");
+  std::transform(
+         initial_state_options.begin(),
+         initial_state_options.end(),
+         initial_state_options.begin(),
+         tolower);
   if ((initial_state_options == "o") || (initial_state_options == "up"))
     initial_state = HOST_UP;
   else if ((initial_state_options == "d")

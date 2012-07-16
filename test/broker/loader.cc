@@ -20,7 +20,6 @@
 #include <climits>
 #include <exception>
 #include <list>
-#include <QCoreApplication>
 #include "com/centreon/engine/broker/loader.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/shared_ptr.hh"
@@ -82,7 +81,10 @@ void check_change_name() {
 /**
  *  Check the broker loader working.
  */
-int main_test() {
+int main_test(int argc, char** argv) {
+  (void)argc;
+  (void)argv;
+
   check_load();
   check_unload();
   check_change_name();
@@ -93,10 +95,6 @@ int main_test() {
  *  Init the unit test.
  */
 int main(int argc, char** argv) {
-  QCoreApplication app(argc, argv);
-  com::centreon::engine::unittest utest(&main_test);
-  QObject::connect(&utest, SIGNAL(finished()), &app, SLOT(quit()));
-  utest.start();
-  app.exec();
-  return (utest.ret());
+  com::centreon::engine::unittest utest(argc, argv, &main_test);
+  return (utest.run());
 }

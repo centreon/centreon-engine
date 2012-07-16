@@ -29,8 +29,7 @@ qt4_wrap_cpp(QT_MOC_FILES
   "${INC_DIR}/command.hh"
   "${INC_DIR}/process.hh"
   "${INC_DIR}/basic_process.hh"
-  "${INC_DIR}/raw.hh"
-  "${INC_DIR}/set.hh")
+  "${INC_DIR}/raw.hh")
 
 # cce_broker target.
 add_library("cce_commands"
@@ -81,12 +80,8 @@ if (WITH_TESTING)
 
   # Test set.
   add_executable("set_basic" "${TEST_DIR}/set_basic.cc")
-  target_link_libraries("set_basic" "cce_commands" "cce_core" ${QT_LIBRARIES})
+  target_link_libraries("set_basic" "cce_commands" "cce_core")
   add_test("set_basic" "set_basic")
-
-  add_executable("set_name_change" "${TEST_DIR}/set_name_change.cc")
-  target_link_libraries("set_name_change" "cce_commands" "cce_core" ${QT_LIBRARIES})
-  add_test("set_name_change" "set_name_change")
 
   # Test binary.
   add_executable("bin_test_run" "${TEST_DIR}/bin_test_run.cc")
@@ -94,29 +89,29 @@ if (WITH_TESTING)
 
   # Test raw.
   add_executable("raw_ctor" "${TEST_DIR}/raw_ctor.cc")
-  target_link_libraries("raw_ctor" "cce_commands" "cce_core" ${QT_LIBRARIES})
+  target_link_libraries("raw_ctor" "cce_commands" "cce_core")
   add_test("raw_ctor" "raw_ctor")
 
   add_executable("raw_compare" "${TEST_DIR}/raw_compare.cc")
-  target_link_libraries("raw_compare" "cce_commands" "cce_core" ${QT_LIBRARIES})
+  target_link_libraries("raw_compare" "cce_commands" "cce_core")
   add_test("raw_compare" "raw_compare")
 
   add_executable("raw_run_sync" "${TEST_DIR}/raw_run_sync.cc")
-  target_link_libraries("raw_run_sync" "cce_commands" "cce_core" ${QT_LIBRARIES})
+  target_link_libraries("raw_run_sync" "cce_commands" "cce_core")
   add_test("raw_run_sync" "raw_run_sync")
 
   add_executable("raw_run_async"
     "${TEST_DIR}/raw_run_async.cc"
     "${TEST_DIR}/wait_process.hh"
     ${QT_MOC_FILES})
-  target_link_libraries("raw_run_async" "cce_commands" "cce_core" ${QT_LIBRARIES})
+  target_link_libraries("raw_run_async" "cce_commands" "cce_core")
   add_test("raw_run_async" "raw_run_async")
 
   add_executable("raw_process" "${TEST_DIR}/raw_process.cc")
-  target_link_libraries("raw_process" "cce_commands" "cce_core" ${QT_LIBRARIES})
+  target_link_libraries("raw_process" "cce_commands" "cce_core")
   add_test("raw_process" "raw_process")
 
   add_executable("raw_get" "${TEST_DIR}/raw_get.cc")
-  target_link_libraries("raw_get" "cce_commands" "cce_core" ${QT_LIBRARIES})
+  target_link_libraries("raw_get" "cce_commands" "cce_core")
   add_test("raw_get" "raw_get")
 endif ()

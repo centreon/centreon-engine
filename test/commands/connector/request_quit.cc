@@ -18,7 +18,6 @@
 */
 
 #include <exception>
-#include <QCoreApplication>
 #include "com/centreon/engine/commands/connector/quit_query.hh"
 #include "com/centreon/engine/commands/connector/quit_response.hh"
 #include "com/centreon/engine/error.hh"
@@ -34,7 +33,10 @@ using namespace com::centreon::engine::commands::connector;
 /**
  *  Check the quit request.
  */
-int main_test() {
+int main_test(int argc, char** argv) {
+  (void)argc;
+  (void)argv;
+
   quit_query query;
   if (check_request_valid(&query, REQUEST(QUERY)) == false)
     throw (engine_error() << "error: query is valid failed.");
@@ -58,10 +60,6 @@ int main_test() {
  *  Init the unit test.
  */
 int main(int argc, char** argv) {
-  QCoreApplication app(argc, argv);
-  unittest utest(&main_test);
-  QObject::connect(&utest, SIGNAL(finished()), &app, SLOT(quit()));
-  utest.start();
-  app.exec();
-  return (utest.ret());
+  unittest utest(argc, argv, &main_test);
+  return (utest.run());
 }

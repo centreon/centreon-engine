@@ -134,21 +134,21 @@ if (WITH_TESTING)
   set(TEST_NAME "modules_webservice_configuration_save_resource")
   add_executable("${TEST_NAME}"
     "${TEST_DIR}/configuration/save/resource.cc")
-  target_link_libraries("${TEST_NAME}" ${QT_LIBRARIES} "cce_core" "webservice")
+  target_link_libraries("${TEST_NAME}" "cce_core" "webservice")
   add_test("${TEST_NAME}" "${TEST_NAME}")
 
   # Test calling configuration_save_state.
   set(TEST_NAME "modules_webservice_configuration_save_state")
   add_executable("${TEST_NAME}"
     "${TEST_DIR}/configuration/save/state.cc")
-  target_link_libraries("${TEST_NAME}" ${QT_LIBRARIES} "cce_core" "webservice")
+  target_link_libraries("${TEST_NAME}" "cce_core" "webservice")
   add_test("${TEST_NAME}" "${TEST_NAME}" "${TEST_DIR}/configuration/save/cfg/state.cfg")
 
   # Test calling configuration_save_objects.
   set(TEST_NAME "modules_webservice_configuration_save_objects")
   add_executable("${TEST_NAME}"
     "${TEST_DIR}/configuration/save/objects.cc")
-  target_link_libraries("${TEST_NAME}" ${QT_LIBRARIES} "cce_core" "webservice")
+  target_link_libraries("${TEST_NAME}" "cce_core" "webservice")
   add_test(
     "${TEST_NAME}_commands"
     "${TEST_NAME}"

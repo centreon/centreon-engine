@@ -18,7 +18,6 @@
 */
 
 #include <exception>
-#include <QCoreApplication>
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/modules/external_commands/commands.hh"
 #include "com/centreon/engine/globals.hh"
@@ -30,7 +29,10 @@ using namespace com::centreon::engine;
 /**
  *  Run enter_active_mode test.
  */
-static int check_enter_active_mode() {
+static int check_enter_active_mode(int argc, char** argv) {
+  (void)argc;
+  (void)argv;
+
   // Action.
   config.set_enable_notifications(false);
   char const* cmd("[1317196300] ENTER_ACTIVE_MODE");
@@ -48,10 +50,6 @@ static int check_enter_active_mode() {
  *  Init unit test.
  */
 int main(int argc, char** argv) {
-  QCoreApplication app(argc, argv);
-  unittest utest(&check_enter_active_mode);
-  QObject::connect(&utest, SIGNAL(finished()), &app, SLOT(quit()));
-  utest.start();
-  app.exec();
-  return (utest.ret());
+  unittest utest(argc, argv, &check_enter_active_mode);
+  return (utest.run());
 }
