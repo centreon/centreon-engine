@@ -44,19 +44,24 @@ using namespace com::centreon::engine::logging;
 static void check_file(
               std::string const& filename,
               std::string const& text) {
+  // Open file.
   std::ifstream file(filename.c_str(), std::ios_base::in);
   if (!file.is_open())
     throw (engine_error() << "open file failed: " << filename);
 
+  // Read file.
   std::string data;
   while (file.good()) {
-    char buffer[512];
+    char buffer[1000];
     file.read(buffer, sizeof(buffer));
     data.append(buffer, file.gcount());
   }
 
+  // Compare contents.
   if (data != text)
     throw (engine_error() << filename << ": bad content");
+
+  return ;
 }
 
 /**

@@ -17,8 +17,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <stdio.h>
-#include <sys/stat.h>
+#include <cstdio>
+#include <unistd.h>
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/objects.hh"
 #include "test/notifications/first_notif_delay/common.hh"
@@ -33,10 +33,7 @@ using namespace com::centreon::engine;
  *  @return True if the file exists, otherwise false.
  */
 bool com::centreon::engine::file_exists(char const* path) {
-  struct stat sbuf;
-  if (lstat(path, &sbuf))
-    return (false);
-  return (true);
+  return (!access(path, F_OK));
 }
 
 /**
@@ -50,7 +47,7 @@ int com::centreon::engine::first_notif_delay_default_setup() {
   config.set_interval_length(1);
 
   // Remove flag file.
-  remove(FLAG_FILE);
+  ::remove(FLAG_FILE);
 
   // Return value.
   int retval(0);

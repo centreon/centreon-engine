@@ -17,13 +17,15 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <cstdio>
 #include <exception>
 #include <fstream>
-#include <stdio.h>
 #include "com/centreon/engine/configuration/state.hh"
 #include "com/centreon/engine/globals.hh"
+#include "com/centreon/io/file_stream.hh"
 #include "test/unittest.hh"
 
+using namespace com::centreon;
 using namespace com::centreon::engine;
 
 /**
@@ -58,7 +60,7 @@ static void check_noexist_file() {
  *  Check parse with exist file.
  */
 static void check_exist_file() {
-  char const* tmp(tempnam("./", "test_cfg."));
+  char const* tmp(io::file_stream::temp_path());
   if (!tmp)
     throw (engine_error() << "generate temporary file failed");
   try {
@@ -70,21 +72,30 @@ static void check_exist_file() {
     throw;
   }
   remove(tmp);
+  return ;
 }
 
 /**
  *  Check the parsing argument.
+ *
+ *  @param[in] argc Unused.
+ *  @param[in] argv Unused.
+ *
+ *  @return 0 on success.
  */
-int main_test(int argc, char** argv) {
+int main_test(int argc, char* argv[]) {
   (void)argc;
   (void)argv;
 
-  config.set_log_archive_path("./");
+  // Initialization.
+  config.set_log_archive_path(".");
 
+  // Tests.
   check_directory();
   check_noexist_file();
   check_exist_file();
 
+  // Success.
   return (0);
 }
 

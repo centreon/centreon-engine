@@ -20,14 +20,11 @@
 #ifndef CCE_LOGGING_FILE_HH
 #  define CCE_LOGGING_FILE_HH
 
-#  include <list>
-#  include <QFile>
 #  include <string>
 #  include "com/centreon/concurrency/mutex.hh"
-#  include "com/centreon/concurrency/read_write_lock.hh"
 #  include "com/centreon/engine/logging/object.hh"
 #  include "com/centreon/engine/namespace.hh"
-#  include "com/centreon/shared_ptr.hh"
+#  include "com/centreon/io/file_stream.hh"
 
 CCE_BEGIN()
 
@@ -46,7 +43,7 @@ namespace                   logging {
                             file(file const& right);
                             ~file() throw ();
     file&                   operator=(file const& right);
-    std::string             get_file_name();
+    std::string const&      get_file_name() const throw ();
     unsigned long long      get_size_limit() const;
     void                    log(
                               char const* message,
@@ -57,14 +54,16 @@ namespace                   logging {
                               unsigned long long size);
 
   private:
-    com::centreon::shared_ptr<QFile>
-                            _file;
-    static std::list<file*> _files;
-    com::centreon::shared_ptr<com::centreon::concurrency::mutex>
+    void                    _close();
+    void                    _internal_copy(file const& right);
+    void                    _open();
+
+    io::file_stream         _file;
+    std::string             _filename;
+    mutable concurrency::mutex
                             _mutex;
-    static com::centreon::concurrency::read_write_lock
-                            _rwlock;
     unsigned long long      _size_limit;
+    unsigned long long      _written;
   };
 }
 

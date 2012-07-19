@@ -17,15 +17,16 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <stdio.h>
-#include <string.h>
-#include <time.h>
+#include <cstdio>
+#include <cstring>
+#include <ctime>
 #include <unistd.h>
 #include "com/centreon/engine/checks.hh"
 #include "com/centreon/engine/globals.hh"
 #include "test/notifications/first_notif_delay/common.hh"
 #include "test/unittest.hh"
 
+using namespace com::centreon;
 using namespace com::centreon::engine;
 
 /**
@@ -37,7 +38,7 @@ using namespace com::centreon::engine;
  */
 static int check(check_result& cr) {
   // Remove flag file.
-  remove(FLAG_FILE);
+  ::remove(FLAG_FILE);
 
   // Return value.
   int retval(0);
@@ -114,7 +115,7 @@ int main_test(int argc, char** argv) {
   }
 
   // Remove flag file.
-  remove(FLAG_FILE);
+  ::remove(FLAG_FILE);
 
   return (retval);
 }
