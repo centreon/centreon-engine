@@ -18,6 +18,7 @@
 */
 
 #include <algorithm>
+#include <sstream>
 #include <string.h>
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
@@ -135,9 +136,15 @@ void file::log(
     return;
   }
 
+  std::ostringstream oss;
+  oss << "[" << time(NULL) << "] ";
+  std::string const& timestamp(oss.str());
+
   _mutex->lock();
   if ((_size_limit > 0)
-      && (static_cast<unsigned long long>(_file->size() + strlen(message))
+      && (static_cast<unsigned long long>(_file->size()
+                                          + timestamp.size()
+                                          + strlen(message))
           >= _size_limit)) {
     QString old_name = _file->fileName();
     QString new_name = old_name + ".old";
@@ -150,6 +157,7 @@ void file::log(
     _file->open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Append);
   }
 
+  _file->write(timestamp.c_str());
   _file->write(message);
   _file->flush();
 
