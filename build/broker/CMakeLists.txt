@@ -21,12 +21,6 @@
 set(SRC_DIR "${SRC_DIR}/broker")
 set(INC_DIR "${INC_DIR}/com/centreon/engine/broker")
 
-# Produce moc files.
-qt4_wrap_cpp(QT_MOC_FILES
-  "${INC_DIR}/loader.hh"
-  "${INC_DIR}/handle.hh"
-  "${INC_DIR}/compatibility.hh")
-
 # cce_broker target.
 add_library("cce_broker"
   STATIC
@@ -35,11 +29,10 @@ add_library("cce_broker"
   "${SRC_DIR}/handle.cc"
   "${INC_DIR}/compatibility.hh"
   "${INC_DIR}/handle.hh"
-  "${INC_DIR}/loader.hh"
-  ${QT_MOC_FILES})
+  "${INC_DIR}/loader.hh")
 
 # Link target with required libraries.
-target_link_libraries("cce_broker" ${QT_LIBRARIES} "cce_core")
+target_link_libraries("cce_broker" "cce_core")
 
 if (WITH_TESTING)
   # Set directories.

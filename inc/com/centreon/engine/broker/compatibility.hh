@@ -21,7 +21,6 @@
 #  define CCE_BROKER_COMPATIBILITY_HH
 
 #  include <memory>
-#  include <QObject>
 #  include "com/centreon/engine/broker/handle.hh"
 
 namespace                       com {
@@ -34,16 +33,13 @@ namespace                       com {
          *
          *  Use to keep compatibility with old module system API.
          */
-        class                   compatibility : public QObject {
-          Q_OBJECT
-
+        class                   compatibility {
         public:
           virtual               ~compatibility() throw ();
           static compatibility& instance();
           static void           load();
           static void           unload();
 
-        public slots:
           void                  author_module(broker::handle* mod);
           void                  copyright_module(broker::handle* mod);
           void                  create_module(broker::handle* mod);

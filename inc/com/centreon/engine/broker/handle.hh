@@ -20,7 +20,6 @@
 #ifndef CCE_BROKER_HANDLE_HH
 # define CCE_BROKER_HANDLE_HH
 
-#  include <QObject>
 #  include <string>
 #  include "com/centreon/library.hh"
 #  include "com/centreon/shared_ptr.hh"
@@ -36,9 +35,7 @@ namespace                          com {
          *  Handle is a module object, contains information
          *  about module, start and stop module.
          */
-        class                      handle : public QObject {
-          Q_OBJECT
-
+        class                      handle {
         public:
                                    handle(
                                      std::string const& filename = "",
@@ -76,27 +73,6 @@ namespace                          com {
           void                     set_name(std::string const& name);
           void                     set_version(
                                      std::string const& version);
-
-        signals:
-          void                     event_author(broker::handle* module);
-          void                     event_copyright(
-                                     broker::handle* module);
-          void                     event_create(broker::handle* module);
-          void                     event_description(
-                                     broker::handle* module);
-          void                     event_destroy(
-                                     broker::handle* module);
-          void                     event_license(
-                                     broker::handle* module);
-          void                     event_loaded(broker::handle* module);
-          void                     event_name(broker::handle* module);
-          void                     event_unloaded(
-                                     broker::handle* module);
-          void                     event_version(
-                                     broker::handle* module);
-          void                     name_changed(
-                                     std::string const& old_name,
-                                     std::string const& new_name);
 
         private:
           void                     _internal_copy(handle const& right);

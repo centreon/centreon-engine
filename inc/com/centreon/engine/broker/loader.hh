@@ -20,9 +20,9 @@
 #ifndef CCE_MODULES_LOADER_HH
 #  define CCE_MODULES_LOADER_HH
 
+#  include <list>
 #  include <map>
 #  include <memory>
-#  include <QObject>
 #  include <string>
 #  include "com/centreon/engine/broker/handle.hh"
 #  include "com/centreon/shared_ptr.hh"
@@ -37,28 +37,21 @@ namespace                        com {
          *
          *  Loader manage all modules.
          */
-        class                    loader : public QObject {
-          Q_OBJECT
+        class                    loader {
         public:
           virtual                ~loader() throw ();
-          com::centreon::shared_ptr<handle>
-                                 add_module(
+          shared_ptr<handle>     add_module(
                                    std::string const& filename = "",
                                    std::string const& args = "");
           void                   del_module(
-                                   com::centreon::shared_ptr<handle> const& mod);
-          std::list<com::centreon::shared_ptr<handle> >
+                                   shared_ptr<handle> const& mod);
+          std::list<shared_ptr<handle> >
                                  get_modules() const;
           static loader&         instance();
           static void            load();
           unsigned int           load_directory(std::string const& dir);
           static void            unload();
           void                   unload_modules();
-
-        public slots:
-          void                   module_name_changed(
-                                   std::string const& old_name,
-                                   std::string const& new_name);
 
         private:
                                  loader();
@@ -68,7 +61,7 @@ namespace                        com {
 
           static std::auto_ptr<loader>
                                  _instance;
-          std::multimap<std::string, com::centreon::shared_ptr<handle> >
+          std::multimap<std::string, shared_ptr<handle> >
                                  _modules;
         };
       }

@@ -17,6 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "com/centreon/engine/broker/compatibility.hh"
 #include "com/centreon/engine/broker/handle.hh"
 #include "com/centreon/engine/common.hh"
 #include "com/centreon/engine/error.hh"
@@ -40,7 +41,7 @@ using namespace com::centreon::engine::logging;
  */
 handle::handle(std::string const& filename, std::string const& args)
   : _args(args), _filename(filename), _name(filename) {
-  emit event_create(this);
+  broker::compatibility::instance().create_module(this);
 }
 
 /**
@@ -48,16 +49,16 @@ handle::handle(std::string const& filename, std::string const& args)
  *
  *  @param[in] right The object to copy.
  */
-handle::handle(handle const& right) : QObject() {
+handle::handle(handle const& right) {
   _internal_copy(right);
-  emit event_create(this);
+  broker::compatibility::instance().create_module(this);
 }
 
 /**
  *  Destructor.
  */
 handle::~handle() throw () {
-  emit event_destroy(this);
+  broker::compatibility::instance().destroy_module(this);
 }
 
 /**
@@ -123,7 +124,7 @@ void handle::close() {
     }
     _handle.clear();
   }
-  emit event_unloaded(this);
+  broker::compatibility::instance().unloaded_module(this);
 }
 
 /**
@@ -248,7 +249,7 @@ void handle::open() {
     throw;
   }
 
-  emit event_loaded(this);
+  broker::compatibility::instance().loaded_module(this);
 }
 
 /**
@@ -276,7 +277,7 @@ void handle::open(
  */
 void handle::set_author(std::string const& author) {
   _author = author;
-  emit event_author(this);
+  broker::compatibility::instance().author_module(this);
 }
 
 /**
@@ -286,7 +287,7 @@ void handle::set_author(std::string const& author) {
  */
 void handle::set_copyright(std::string const& copyright) {
   _copyright = copyright;
-  emit event_copyright(this);
+  broker::compatibility::instance().copyright_module(this);
 }
 
 /**
@@ -296,7 +297,7 @@ void handle::set_copyright(std::string const& copyright) {
  */
 void handle::set_description(std::string const& description) {
   _description = description;
-  emit event_description(this);
+  broker::compatibility::instance().description_module(this);
 }
 
 /**
@@ -306,7 +307,7 @@ void handle::set_description(std::string const& description) {
  */
 void handle::set_license(std::string const& license) {
   _license = license;
-  emit event_license(this);
+  broker::compatibility::instance().license_module(this);
 }
 
 /**
@@ -315,10 +316,8 @@ void handle::set_license(std::string const& license) {
  *  @param[in] The name.
  */
 void handle::set_name(std::string const& name) {
-  std::string old_name = _name;
   _name = name;
-  emit name_changed(old_name, _name);
-  emit event_name(this);
+  broker::compatibility::instance().name_module(this);
 }
 
 /**
@@ -328,7 +327,7 @@ void handle::set_name(std::string const& name) {
  */
 void handle::set_version(std::string const& version) {
   _version = version;
-  emit event_version(this);
+  broker::compatibility::instance().version_module(this);
 }
 
 /**************************************

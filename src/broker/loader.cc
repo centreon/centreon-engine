@@ -19,7 +19,6 @@
 
 #include <cassert>
 #include <cstdlib>
-#include "com/centreon/engine/broker/compatibility.hh"
 #include "com/centreon/engine/broker/loader.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/logging/logger.hh"
@@ -63,54 +62,6 @@ shared_ptr<broker::handle> loader::add_module(
                                      std::string const& filename,
                                      std::string const& args) {
   shared_ptr<handle> module(new handle(filename, args));
-  broker::compatibility& compatibility(broker::compatibility::instance());
-
-  if (connect(&(*module),
-	      SIGNAL(name_changed(std::string const&, std::string const&)),
-	      this,
-	      SLOT(module_name_changed(std::string const&, std::string const&))) == false
-      || connect(&(*module),
-                 SIGNAL(event_create(broker::handle*)),
-                 &compatibility,
-                 SLOT(create_module(broker::handle*))) == false
-      || connect(&(*module),
-                 SIGNAL(event_destroy(broker::handle*)),
-                 &compatibility,
-                 SLOT(destroy_module(broker::handle*))) == false
-      || connect(&(*module),
-                 SIGNAL(event_name(broker::handle*)),
-                 &compatibility,
-                 SLOT(name_module(broker::handle*))) == false
-      || connect(&(*module),
-                 SIGNAL(event_author(broker::handle*)),
-                 &compatibility,
-                 SLOT(author_module(broker::handle*))) == false
-      || connect(&(*module),
-                 SIGNAL(event_copyright(broker::handle*)),
-                 &compatibility,
-                 SLOT(copyright_module(broker::handle*))) == false
-      || connect(&(*module),
-                 SIGNAL(event_version(broker::handle*)),
-                 &compatibility,
-                 SLOT(version_module(broker::handle*))) == false
-      || connect(&(*module),
-                 SIGNAL(event_license(broker::handle*)),
-                 &compatibility,
-                 SLOT(license_module(broker::handle*))) == false
-      || connect(&(*module),
-                 SIGNAL(event_description(broker::handle*)),
-                 &compatibility,
-                 SLOT(description_module(broker::handle*))) == false
-      || connect(&(*module),
-                 SIGNAL(event_loaded(broker::handle*)),
-                 &compatibility,
-                 SLOT(loaded_module(broker::handle*))) == false
-      || connect(&(*module),
-                 SIGNAL(event_unloaded(broker::handle*)),
-                 &compatibility,
-                 SLOT(unloaded_module(broker::handle*))) == false) {
-    throw (engine_error() << "connect module to broker::compatibility failed.");
-  }
   return (_modules.insert(std::make_pair(filename, module))->second);
 }
 
@@ -235,31 +186,6 @@ void loader::unload_modules() {
   return ;
 }
 
-/**
- *  Slot for notify when module name changed.
- *
- *  @param[in] old_name The old name of the module.
- *  @param[in] new_name The new name of the module.
- */
-void loader::module_name_changed(
-               std::string const& old_name,
-               std::string const& new_name) {
-  for (std::multimap<std::string, shared_ptr<handle> >::iterator
-         it(_modules.find(old_name)),
-         end(_modules.end());
-       (it != end) && (it->first == old_name);
-       ++it) {
-    if (it->second.get() == this->sender()) {
-      shared_ptr<handle> module(it->second);
-      _modules.insert(std::make_pair(new_name, module));
-      _modules.erase(it);
-      return ;
-    }
-  }
-  throw (engine_error() << "Module '" << old_name << "' not found");
-  return ;
-}
-
 /**************************************
 *                                     *
 *           Private Methods           *
@@ -269,14 +195,16 @@ void loader::module_name_changed(
 /**
  *  Default constructor.
  */
-loader::loader() : QObject(0) {}
+loader::loader() {
+
+}
 
 /**
  *  Copy constructor.
  *
  *  @param[in] right Object to copy.
  */
-loader::loader(loader const& right) : QObject(0) {
+loader::loader(loader const& right) {
   _internal_copy(right);
 }
 

@@ -297,7 +297,7 @@ compatibility::compatibility() {}
  *
  *  @param[in] right Object to copy.
  */
-compatibility::compatibility(compatibility const& right) : QObject() {
+compatibility::compatibility(compatibility const& right) {
   _internal_copy(right);
 }
 
