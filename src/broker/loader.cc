@@ -19,12 +19,12 @@
 
 #include <cassert>
 #include <cstdlib>
-#include <QDir>
-#include <QFile>
 #include "com/centreon/engine/broker/compatibility.hh"
 #include "com/centreon/engine/broker/loader.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/logging/logger.hh"
+#include "com/centreon/io/directory_entry.hh"
+#include "com/centreon/io/file_stream.hh"
 #include "com/centreon/shared_ptr.hh"
 
 using namespace com::centreon;
@@ -59,9 +59,9 @@ loader::~loader() throw () {
  *
  *  @return The new object module.
  */
-shared_ptr<handle> loader::add_module(
-                             std::string const& filename,
-                             std::string const& args) {
+shared_ptr<broker::handle> loader::add_module(
+                                     std::string const& filename,
+                                     std::string const& args) {
   shared_ptr<handle> module(new handle(filename, args));
   broker::compatibility& compatibility(broker::compatibility::instance());
 
@@ -137,7 +137,7 @@ void loader::del_module(shared_ptr<handle> const& module) {
  *
  *  @return All modules in a list.
  */
-std::list<shared_ptr<handle> > loader::get_modules() const {
+std::list<shared_ptr<broker::handle> > loader::get_modules() const {
   std::list<shared_ptr<handle> > lst;
   for (std::multimap<std::string, shared_ptr<handle> >::const_iterator
          it(_modules.begin()),
@@ -175,26 +175,24 @@ void loader::load() {
  */
 unsigned int loader::load_directory(std::string const& dir) {
   // Get directory entries.
-  QDir directory(dir.c_str());
-  QStringList filters("*.so");
-  QFileInfoList files(directory.entryInfoList(filters));
+  io::directory_entry directory(dir);
+  std::list<io::file_entry> const& files(directory.entry_list("*.so"));
 
   // Load modules.
   unsigned int loaded(0);
-  for (QFileInfoList::const_iterator
-         it = files.begin(),
-         end = files.end();
+  for (std::list<io::file_entry>::const_iterator
+         it(files.begin()), end(files.end());
        it != end;
        ++it) {
-    std::string config_file(dir + "/" + qPrintable(it->baseName()) + ".cfg");
-    if (directory.exists(config_file.c_str()) == false)
+    std::string config_file(dir + "/" + it->base_name() + ".cfg");
+    if (io::file_stream::exists(config_file.c_str()) == false)
       config_file = "";
     shared_ptr<handle> module;
     try {
-      module = add_module(dir + "/" + qPrintable(it->fileName()), config_file);
+      module = add_module(dir + "/" + it->file_name(), config_file);
       module->open();
       logger(log_info_message, basic)
-        << "Event broker module '" << it->fileName().toStdString()
+        << "Event broker module '" << it->file_name()
         << "' initialized successfully.";
       ++loaded;
     }
@@ -202,8 +200,7 @@ unsigned int loader::load_directory(std::string const& dir) {
       del_module(module);
       logger(log_runtime_error, basic)
         << "Error: Could not load module '"
-        << it->fileName().toStdString()
-        << "' -> " << e.what();
+        << it->file_name() << "' -> " << e.what();
     }
   }
   return (loaded);

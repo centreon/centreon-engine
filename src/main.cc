@@ -27,7 +27,6 @@
 #include <iostream>
 #include <limits.h>
 #include <QCoreApplication>
-#include <QDir>
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -58,6 +57,7 @@
 #include "com/centreon/engine/statusdata.hh"
 #include "com/centreon/engine/utils.hh"
 #include "com/centreon/engine/version.hh"
+#include "com/centreon/io/directory_entry.hh"
 #include "com/centreon/shared_ptr.hh"
 
 using namespace com::centreon::engine;
@@ -206,7 +206,7 @@ int main(int argc, char** argv) {
   // Make sure the config file uses an absolute path.
   if (config_file[0] != '/') {
     // Get absolute path of current working directory.
-    std::string buffer(qPrintable(QDir::currentPath()));
+    std::string buffer(com::centreon::io::directory_entry::current_path());
 
     // Append a forward slash.
     buffer.append("/");

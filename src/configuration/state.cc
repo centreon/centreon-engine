@@ -19,7 +19,6 @@
 
 #include <fstream>
 #include <limits.h>
-#include <QFileInfo>
 #include <string>
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/configuration/state.hh"
@@ -2586,16 +2585,11 @@ void state::_reset() {
  */
 void state::_parse_resource_file(std::string const& value) {
   // Prepend main config file path.
-  QFileInfo qinfo(value.c_str());
   std::string resfile;
-  if (qinfo.isAbsolute())
+  if (!value.empty() && value[0] == '/')
     resfile = value;
-  else {
-    qinfo.setFile(_filename.c_str());
-    resfile = qinfo.path().toStdString();
-    resfile.append("/");
-    resfile.append(value);
-  }
+  else
+    resfile = _filename + "/" + value;
 
   // Open resource file.
   std::ifstream ifs;
