@@ -18,6 +18,7 @@
 */
 
 #include <QMutexLocker>
+#include <sstream>
 #include <stdio.h>
 #include <string.h>
 #include "com/centreon/engine/logging/standard.hh"
@@ -80,7 +81,11 @@ void standard::log(
   (void)verbosity;
 
   if (message) {
+    std::ostringstream oss;
+    oss << "[" << time(NULL) << "] ";
+    std::string const& timestamp(oss.str());
     QMutexLocker lock(&_mutex);
+    fwrite(timestamp.c_str(), timestamp.size(), 1, _file);
     fwrite(message, strlen(message), 1, _file);
   }
 

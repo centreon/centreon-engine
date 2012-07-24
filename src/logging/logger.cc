@@ -284,7 +284,7 @@ logger& logger::operator<<(void const* obj) {
  *  Inisialization of the logger buffer.
  */
 void logger::_init() {
-  _buffer << "[" << time(NULL) << "] ";
+
 }
 
 /**
