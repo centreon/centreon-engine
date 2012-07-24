@@ -23,8 +23,6 @@
 #  define CCE_EVENTS_LOOP_HH
 
 #  include <memory>
-#  include <QCoreApplication>
-#  include <QObject>
 #  include <time.h>
 #  include "com/centreon/engine/events.hh"
 
@@ -39,9 +37,7 @@ namespace                   com {
          *  Events loop is a singleton to create a new thread
          *  and dispatch the Centreon Engine events.
          */
-        class               loop : public QObject {
-          Q_OBJECT
-
+        class               loop {
         public:
                             ~loop() throw ();
           static loop&      instance();
@@ -49,20 +45,13 @@ namespace                   com {
           void              run();
           static void       unload();
 
-        signals:
-          void              restart();
-          void              shutdown();
-
-        private slots:
-          void              _dispatching();
-
         private:
                             loop();
                             loop(loop const& right);
           loop&             operator=(loop const& right);
+          void              _dispatching();
           void              _internal_copy(loop const& right);
 
-          QCoreApplication* _app;
           static std::auto_ptr<loop>
                             _instance;
           time_t            _last_status_update;
