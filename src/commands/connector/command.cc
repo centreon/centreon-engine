@@ -50,9 +50,10 @@ connector::command::command(QString const& connector_name,
                             QString const& command_name,
 			    QString const& command_line)
   : commands::command(command_name, command_line),
+    _mutex(QMutex::Recursive),
     _connector_name(connector_name),
     _connector_line(connector_line),
-    _max_check_for_restart(DEFAULT_MAX_CHECK),
+    _max_check_for_restart(0),
     _nbr_check(0),
     _is_good_version(false),
     _active_timer(false),
@@ -71,7 +72,9 @@ connector::command::command(QString const& connector_name,
  *  @parame[in] right The copy class.
  */
 connector::command::command(command const& right)
-  : commands::command(right), _active_timer(false) {
+  : commands::command(right),
+    _mutex(QMutex::Recursive),
+    _active_timer(false) {
   operator=(right);
 }
 
@@ -132,7 +135,7 @@ unsigned long connector::command::run(QString const& processed_cmd,
 
   QMutexLocker locker(&_mutex);
 
-  if (_nbr_check > _max_check_for_restart) {
+  if (_max_check_for_restart && _nbr_check > _max_check_for_restart) {
     locker.unlock();
     _exit();
     _start();
@@ -184,7 +187,7 @@ void connector::command::run(QString const& processed_cmd,
 
   QMutexLocker locker(&_mutex);
 
-  if (_nbr_check > _max_check_for_restart) {
+  if (_max_check_for_restart && _nbr_check > _max_check_for_restart) {
     locker.unlock();
     _exit();
     _start();

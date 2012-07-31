@@ -114,8 +114,6 @@ namespace                              com {
             bool                       _active_timer;
             bool                       _is_exiting;
             bool                       _state_already_change;
-
-            static const unsigned long DEFAULT_MAX_CHECK = 10000;
           };
         }
       }
