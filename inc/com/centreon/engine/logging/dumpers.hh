@@ -22,54 +22,53 @@
 
 #  include <sstream>
 #  include "com/centreon/engine/logging/logger.hh"
+#  include "com/centreon/engine/namespace.hh"
 #  include "com/centreon/engine/objects.hh"
 
 struct sched_info_struct;
 
-namespace                   com {
-  namespace                 centreon {
-    namespace               engine {
-      namespace             logging {
-        void                dump_object_list();
-        std::ostringstream& operator<<(
-                              std::ostringstream& stream,
-                              host const& hst);
-        std::ostringstream& operator<<(
-                              std::ostringstream& stream,
-                              service const& svc);
-        std::ostringstream& operator<<(
-                              std::ostringstream& stream,
-                              sched_info_struct const& sched);
-        std::ostringstream& operator<<(
-                              std::ostringstream& stream,
-                              command const& cmd);
-        std::ostringstream& operator<<(
-                              std::ostringstream& stream,
-                              contact const& cntct);
-        std::ostringstream& operator<<(
-                              std::ostringstream& stream,
-                              hostgroup const& hstgrp);
-        std::ostringstream& operator<<(
-                              std::ostringstream& stream,
-                              servicegroup const& svcgrp);
-        std::ostringstream& operator<<(
-                              std::ostringstream& stream,
-                              contactgroup const& cntctgrp);
-        std::ostringstream& operator<<(
-                              std::ostringstream& stream,
-                              serviceescalation const& escalation);
-        std::ostringstream& operator<<(
-                              std::ostringstream& stream,
-                              servicedependency const& dependency);
-        std::ostringstream& operator<<(
-                              std::ostringstream& stream,
-                              hostescalation const& escalation);
-        std::ostringstream& operator<<(
-                              std::ostringstream& stream,
-                              hostdependency const& dependency);
-      }
-    }
-  }
+CCE_BEGIN()
+
+namespace             logging {
+  void                dump_object_list();
+  std::ostringstream& operator<<(
+                        std::ostringstream& stream,
+                        host const& hst);
+  std::ostringstream& operator<<(
+                        std::ostringstream& stream,
+                        service const& svc);
+  std::ostringstream& operator<<(
+                        std::ostringstream& stream,
+                        sched_info_struct const& sched);
+  std::ostringstream& operator<<(
+                        std::ostringstream& stream,
+                        command const& cmd);
+  std::ostringstream& operator<<(
+                        std::ostringstream& stream,
+                        contact const& cntct);
+  std::ostringstream& operator<<(
+                        std::ostringstream& stream,
+                        hostgroup const& hstgrp);
+  std::ostringstream& operator<<(
+                        std::ostringstream& stream,
+                        servicegroup const& svcgrp);
+  std::ostringstream& operator<<(
+                        std::ostringstream& stream,
+                        contactgroup const& cntctgrp);
+  std::ostringstream& operator<<(
+                        std::ostringstream& stream,
+                        serviceescalation const& escalation);
+  std::ostringstream& operator<<(
+                        std::ostringstream& stream,
+                        servicedependency const& dependency);
+  std::ostringstream& operator<<(
+                        std::ostringstream& stream,
+                        hostescalation const& escalation);
+  std::ostringstream& operator<<(
+                        std::ostringstream& stream,
+                        hostdependency const& dependency);
 }
+
+CCE_END()
 
 #endif // !CCE_LOGGING_DUMPERS_HH

@@ -20,6 +20,7 @@
 #ifndef CCE_OBJECTS_CONTACTGROUPSMEMBER_HH
 #  define CCE_OBJECTS_CONTACTGROUPSMEMBER_HH
 
+#  include "com/centreon/engine/namespace.hh"
 #  include "com/centreon/engine/objects.hh"
 
 #  ifdef __cplusplus
@@ -32,16 +33,15 @@ contactgroupsmember const* release_contactgroupsmember(
 # ifdef __cplusplus
 }
 
-namespace                          com {
-  namespace                        centreon {
-    namespace                      engine {
-      namespace                    objects {
-        contactgroupsmember const* release(
-                                     contactgroupsmember const* obj);
-      }
-    }
-  }
+CCE_BEGIN()
+
+namespace                    objects {
+  contactgroupsmember const* release(
+                               contactgroupsmember const* obj);
 }
+
+CCE_END()
+
 #  endif // C++
 
 #endif // !CCE_OBJECTS_CONTACTGROUPSMEMBER_HH

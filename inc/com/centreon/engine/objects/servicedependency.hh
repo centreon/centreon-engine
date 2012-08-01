@@ -20,6 +20,7 @@
 #ifndef CCE_OBJECTS_SERVICEDEPENDENCY_HH
 #  define CCE_OBJECTS_SERVICEDEPENDENCY_HH
 
+#  include "com/centreon/engine/namespace.hh"
 #  include "com/centreon/engine/objects.hh"
 
 #  ifdef __cplusplus
@@ -34,18 +35,17 @@ void release_servicedependency(servicedependency const* obj);
 #  ifdef __cplusplus
 }
 
-namespace       com {
-  namespace     centreon {
-    namespace   engine {
-      namespace objects {
-        void    link(
-                  servicedependency* obj,
-                  timeperiod* dependency_period = NULL);
-        void    release(servicedependency const* obj);
-      }
-    }
-  }
+CCE_BEGIN()
+
+namespace objects {
+  void    link(
+            servicedependency* obj,
+            timeperiod* dependency_period = NULL);
+  void    release(servicedependency const* obj);
 }
+
+CCE_END()
+
 #  endif // C++
 
 #endif // !CCE_OBJECTS_SERVICEDEPENDENCY_HH

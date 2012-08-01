@@ -20,7 +20,6 @@
 */
 
 #include <assert.h>
-#include <QTimer>
 #include <stdlib.h>
 #include <time.h>
 #include "com/centreon/engine/broker.hh"

@@ -20,6 +20,7 @@
 #ifndef CCE_OBJECTS_SERVICEESCALATION_HH
 #  define CCE_OBJECTS_SERVICEESCALATION_HH
 
+#  include "com/centreon/engine/namespace.hh"
 #  include "com/centreon/engine/objects.hh"
 
 #  ifdef __cplusplus
@@ -37,20 +38,19 @@ void release_serviceescalation(serviceescalation const* obj);
 #  ifdef __cplusplus
 }
 
-namespace       com {
-  namespace     centreon {
-    namespace   engine {
-      namespace objects {
-        void    link(
-                  serviceescalation* obj,
-                  std::vector<contact*> const& contacts = std::vector<contact*>(),
-                  std::vector<contactgroup*> const& contactgroups = std::vector<contactgroup*>(),
-                  timeperiod* escalation_period = NULL);
-        void    release(serviceescalation const* obj);
-      }
-    }
-  }
+CCE_BEGIN()
+
+namespace objects {
+  void    link(
+            serviceescalation* obj,
+            std::vector<contact*> const& contacts = std::vector<contact*>(),
+            std::vector<contactgroup*> const& contactgroups = std::vector<contactgroup*>(),
+            timeperiod* escalation_period = NULL);
+  void    release(serviceescalation const* obj);
 }
+
+CCE_END()
+
 #  endif // C++
 
 #endif // !CCE_OBJECTS_SERVICEESCALATION_HH

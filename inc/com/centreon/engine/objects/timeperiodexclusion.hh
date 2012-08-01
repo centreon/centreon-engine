@@ -20,6 +20,7 @@
 #ifndef CCE_OBJECTS_TIMEPERIODEXCLUSION_HH
 #  define CCE_OBJECTS_TIMEPERIODEXCLUSION_HH
 
+#  include "com/centreon/engine/namespace.hh"
 #  include "com/centreon/engine/objects.hh"
 
 #  ifdef __cplusplus
@@ -31,15 +32,14 @@ void release_timeperiodexclusion(timeperiodexclusion const* obj);
 #  ifdef __cplusplus
 }
 
-namespace       com {
-  namespace     centreon {
-    namespace   engine {
-      namespace objects {
-        void    release(timeperiodexclusion const* obj);
-      }
-    }
-  }
+CCE_BEGIN()
+
+namespace objects {
+  void    release(timeperiodexclusion const* obj);
 }
+
+CCE_END()
+
 #  endif // C++
 
 #endif // !CCE_OBJECTS_TIMEPERIODEXCLUSION_HH

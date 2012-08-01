@@ -23,50 +23,49 @@
 #  include <map>
 #  include <string>
 #  include <vector>
+#  include "com/centreon/engine/namespace.hh"
 #  include "com/centreon/engine/objects.hh"
 
-namespace             com {
-  namespace           centreon {
-    namespace         engine {
-      namespace       objects {
-        namespace     utils {
-          template <class T>
-          void        remove_object_list(T const* obj, T** head, T** tail) {
-            T* current = *head;
-            T* prev = NULL;
-            while (current != NULL) {
-              if (current == obj) {
-                if (prev == NULL)
-                  *head = current->next;
-                else
-                  prev->next = current->next;
-                if (current->next == NULL)
-                  *tail = prev;
-                break;
-              }
-              prev = current;
-              current = current->next;
-            }
-          }
+CCE_BEGIN()
 
-          template<class T>
-          inline std::vector<T*> tab2vec(T** tab) {
-            std::vector<T*> vec;
-            for (unsigned int i = 0; tab[i] != NULL; ++i)
-              vec.push_back(tab[i]);
-            return (vec);
-          }
-
-          inline std::vector<std::string> tab2vec(char** tab) {
-            std::vector<std::string> vec;
-            for (unsigned int i = 0; tab[i] != NULL; ++i)
-              vec.push_back(tab[i]);
-            return (vec);
-          }
+namespace       objects {
+  namespace     utils {
+    template <class T>
+    void        remove_object_list(T const* obj, T** head, T** tail) {
+      T* current = *head;
+      T* prev = NULL;
+      while (current != NULL) {
+        if (current == obj) {
+          if (prev == NULL)
+            *head = current->next;
+          else
+            prev->next = current->next;
+          if (current->next == NULL)
+            *tail = prev;
+          break;
         }
+        prev = current;
+        current = current->next;
       }
+    }
+
+    template<class T>
+    inline std::vector<T*> tab2vec(T** tab) {
+      std::vector<T*> vec;
+      for (unsigned int i = 0; tab[i] != NULL; ++i)
+        vec.push_back(tab[i]);
+      return (vec);
+    }
+
+    inline std::vector<std::string> tab2vec(char** tab) {
+      std::vector<std::string> vec;
+      for (unsigned int i = 0; tab[i] != NULL; ++i)
+        vec.push_back(tab[i]);
+      return (vec);
     }
   }
 }
+
+CCE_END()
 
 #endif // !CCE_OBJECTS_UTILS_HH

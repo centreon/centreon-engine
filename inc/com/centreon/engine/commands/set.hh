@@ -23,45 +23,44 @@
 #  include <map>
 #  include <string>
 #  include "com/centreon/engine/commands/command.hh"
+#  include "com/centreon/engine/namespace.hh"
 #  include "com/centreon/shared_ptr.hh"
 
-namespace             com {
-  namespace           centreon {
-    namespace         engine {
-      namespace       commands {
-        /**
-         *  @class set set.hh
-         *  @brief Store all command.
-         *
-         *  Set is a singleton to store all command class and have a simple
-         *  access to used it.
-         */
-        class         set {
-        public:
-                      ~set() throw ();
-          void        add_command(command const& cmd);
-          void        add_command(
-                        shared_ptr<command> cmd);
-          shared_ptr<command>
-                      get_command(std::string const& cmd_name);
-          static set& instance();
-          static void load();
-          void        remove_command(std::string const& cmd_name);
-          static void unload();
+CCE_BEGIN()
 
-        private:
-                      set();
-                      set(set const& right);
-          set&        operator=(set const& right);
-          void        _internal_copy(set const& right);
+namespace       commands {
+  /**
+   *  @class set set.hh
+   *  @brief Store all command.
+   *
+   *  Set is a singleton to store all command class and have a simple
+   *  access to used it.
+   */
+  class         set {
+  public:
+                ~set() throw ();
+    void        add_command(command const& cmd);
+    void        add_command(
+                            shared_ptr<command> cmd);
+    shared_ptr<command>
+                get_command(std::string const& cmd_name);
+    static set& instance();
+    static void load();
+    void        remove_command(std::string const& cmd_name);
+    static void unload();
 
-          static set* _instance;
-          std::map<std::string, shared_ptr<command> >
-                      _list;
-        };
-      }
-    }
-  }
+  private:
+                set();
+                set(set const& right);
+    set&        operator=(set const& right);
+    void        _internal_copy(set const& right);
+
+    static set* _instance;
+    std::map<std::string, shared_ptr<command> >
+                _list;
+  };
 }
+
+CCE_END()
 
 #endif // !CCE_COMMANDS_SET_HH

@@ -32,44 +32,43 @@
 #  endif // CPP0X, GNUC4
 
 #  include "com/centreon/engine/events.hh"
+#  include "com/centreon/engine/namespace.hh"
 
-namespace                 com {
-  namespace               centreon {
-    namespace             engine {
-      /**
-       *  @class hash_timed_event hash_timed_event.hh
-       *  @brief Allow to find quickly timed event.
-       *
-       *  This class allow to find timed event with
-       *  it's data very quickly.
-       */
-      class               hash_timed_event {
-      public:
-        enum              priority {
-          low = 0,
-          high = 1
-        };
-        enum              type {
-          service_check = 0,
-          host_check = 1
-        };
+CCE_BEGIN()
 
-                          hash_timed_event();
-                          hash_timed_event(hash_timed_event const& right);
-                          ~hash_timed_event();
-        hash_timed_event& operator=(hash_timed_event const& right);
-        void              clear(priority p);
-        void              clear(priority p, type t);
-        void              erase(priority p, timed_event* event);
-        timed_event*      find(priority p, type t, void* ptr);
-        void              insert(priority p, timed_event* event);
+/**
+ *  @class hash_timed_event hash_timed_event.hh
+ *  @brief Allow to find quickly timed event.
+ *
+ *  This class allow to find timed event with
+ *  it's data very quickly.
+ */
+class               hash_timed_event {
+public:
+  enum              priority {
+    low = 0,
+    high = 1
+  };
+  enum              type {
+    service_check = 0,
+    host_check = 1
+  };
 
-      private:
-        hash_timed_event& _internal_copy(hash_timed_event const& right);
-        htable            _hevent[2][2];
-      };
-    }
-  }
-}
+                    hash_timed_event();
+                    hash_timed_event(hash_timed_event const& right);
+                    ~hash_timed_event();
+  hash_timed_event& operator=(hash_timed_event const& right);
+  void              clear(priority p);
+  void              clear(priority p, type t);
+  void              erase(priority p, timed_event* event);
+  timed_event*      find(priority p, type t, void* ptr);
+  void              insert(priority p, timed_event* event);
+
+private:
+  hash_timed_event& _internal_copy(hash_timed_event const& right);
+  htable            _hevent[2][2];
+};
+
+CCE_END()
 
 #endif // !CCE_HASH_TIMED_EVENT_HH

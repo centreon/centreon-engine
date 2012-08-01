@@ -20,6 +20,7 @@
 #ifndef CCE_OBJECTS_HOSTSMEMBER_HH
 #  define CCE_OBJECTS_HOSTSMEMBER_HH
 
+#  include "com/centreon/engine/namespace.hh"
 #  include "com/centreon/engine/objects.hh"
 
 #  ifdef __cplusplus
@@ -31,15 +32,14 @@ hostsmember const* release_hostsmember(hostsmember const* obj);
 #  ifdef __cplusplus
 }
 
-namespace                  com {
-  namespace                centreon {
-    namespace              engine {
-      namespace            objects {
-        hostsmember const* release(hostsmember const* obj);
-      }
-    }
-  }
+CCE_BEGIN()
+
+namespace            objects {
+  hostsmember const* release(hostsmember const* obj);
 }
+
+CCE_END()
+
 #  endif // C++
 
 #endif // !CCE_OBJECTS_HOSTSMEMBER_HH

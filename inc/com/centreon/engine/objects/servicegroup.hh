@@ -20,6 +20,7 @@
 #ifndef CCE_OBJECTS_SERVICEGROUP_HH
 #  define CCE_OBJECTS_SERVICEGROUP_HH
 
+#  include "com/centreon/engine/namespace.hh"
 #  include "com/centreon/engine/objects.hh"
 
 #  ifdef __cplusplus
@@ -37,19 +38,18 @@ void release_servicegroup(servicegroup const* obj);
 #  ifdef __cplusplus
 }
 
-namespace       com {
-  namespace     centreon {
-    namespace   engine {
-      namespace objects {
-        void    link(
-                  servicegroup* obj,
-                  std::vector<service*> const& members,
-                  std::vector<servicegroup*> const& groups);
-        void    release(servicegroup const* obj);
-      }
-    }
-  }
+CCE_BEGIN()
+
+namespace objects {
+  void    link(
+            servicegroup* obj,
+            std::vector<service*> const& members,
+            std::vector<servicegroup*> const& groups);
+  void    release(servicegroup const* obj);
 }
+
+CCE_END()
+
 #  endif // C++
 
 #endif // !CCE_OBJECTS_SERVICEGROUP_HH

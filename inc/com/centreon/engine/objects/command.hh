@@ -20,6 +20,7 @@
 #ifndef CCE_OBJECTS_COMMAND_HH
 #  define CCE_OBJECTS_COMMAND_HH
 
+#  include "com/centreon/engine/namespace.hh"
 #  include "com/centreon/engine/objects.hh"
 
 #  ifdef __cplusplus
@@ -33,19 +34,18 @@ void release_command(command const* obj);
 #  ifdef __cplusplus
 }
 
-namespace       com {
-  namespace     centreon {
-    namespace   engine {
-      namespace objects {
-        bool    add_commands_to_object(
-                  std::vector<command*> const& commands,
-                  commandsmember** list_command);
-        void    link(command const* obj);
-        void    release(command const* obj);
-      }
-    }
-  }
+CCE_BEGIN()
+
+namespace objects {
+  bool    add_commands_to_object(
+            std::vector<command*> const& commands,
+            commandsmember** list_command);
+  void    link(command const* obj);
+  void    release(command const* obj);
 }
+
+CCE_END()
+
 #  endif // C++
 
 #endif // !CCE_OBJECTS_COMMAND_HH

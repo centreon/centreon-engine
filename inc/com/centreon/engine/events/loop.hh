@@ -25,42 +25,41 @@
 #  include <memory>
 #  include <time.h>
 #  include "com/centreon/engine/events.hh"
+#  include "com/centreon/engine/namespace.hh"
 
-namespace                   com {
-  namespace                 centreon {
-    namespace               engine {
-      namespace             events {
-        /**
-         *  @class loop loop.hh
-         *  @brief Create Centreon Engine event loop on a new thread.
-         *
-         *  Events loop is a singleton to create a new thread
-         *  and dispatch the Centreon Engine events.
-         */
-        class               loop {
-        public:
-                            ~loop() throw ();
-          static loop&      instance();
-          static void       load();
-          void              run();
-          static void       unload();
+CCE_BEGIN()
 
-        private:
-                            loop();
-                            loop(loop const& right);
-          loop&             operator=(loop const& right);
-          void              _dispatching();
-          void              _internal_copy(loop const& right);
+namespace             events {
+  /**
+   *  @class loop loop.hh
+   *  @brief Create Centreon Engine event loop on a new thread.
+   *
+   *  Events loop is a singleton to create a new thread
+   *  and dispatch the Centreon Engine events.
+   */
+  class               loop {
+  public:
+                      ~loop() throw ();
+    static loop&      instance();
+    static void       load();
+    void              run();
+    static void       unload();
 
-          static std::auto_ptr<loop>
-                            _instance;
-          time_t            _last_status_update;
-          time_t            _last_time;
-          timed_event       _sleep_event;
-        };
-      }
-    }
-  }
+  private:
+                      loop();
+                      loop(loop const& right);
+    loop&             operator=(loop const& right);
+    void              _dispatching();
+    void              _internal_copy(loop const& right);
+
+    static std::auto_ptr<loop>
+    _instance;
+    time_t            _last_status_update;
+    time_t            _last_time;
+    timed_event       _sleep_event;
+  };
 }
+
+CCE_END()
 
 #endif // !CCE_EVENTS_LOOP_HH
