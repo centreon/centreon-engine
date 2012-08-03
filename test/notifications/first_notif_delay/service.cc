@@ -20,7 +20,11 @@
 #include <cstdio>
 #include <cstring>
 #include <ctime>
-#include <unistd.h>
+#ifdef _WIN32
+#  include <windows.h>
+#else
+#  include <unistd.h>
+#endif // Win32 or POSIX.
 #include "com/centreon/engine/checks.hh"
 #include "com/centreon/engine/globals.hh"
 #include "test/notifications/first_notif_delay/common.hh"
@@ -51,12 +55,20 @@ static int check(check_result& cr) {
     cr.finish_time.tv_sec = now;
     retval |= handle_async_service_check_result(service_list, &cr);
     retval |= file_exists(FLAG_FILE);
+#ifdef _WIN32
+    Sleep(1000);
+#else
     sleep(1);
+#endif // Win32 or POSIX.
     now = time(NULL);
   }
 
   // FND is reached, process check result to send notification.
+#ifdef _WIN32
+  Sleep(2000);
+#else
   sleep(2);
+#endif // Win32 or POSIX.
   cr.start_time.tv_sec = now;
   cr.finish_time.tv_sec = now;
   retval |= handle_async_service_check_result(service_list, &cr);
@@ -102,14 +114,22 @@ int main_test(int argc, char** argv) {
     retval |= check(cr);
 
     // Recovery.
+#ifdef _WIN32
+    Sleep(1000);
+#else
     sleep(1);
+#endif // Win32 or POSIX.
     cr.return_code = 0;
     cr.start_time.tv_sec = time(NULL);
     cr.finish_time.tv_sec = cr.start_time.tv_sec;
     retval |= handle_async_service_check_result(service_list, &cr);
 
     // Check that FND was reset properly.
+#ifdef _WIN32
+    Sleep(1000);
+#else
     sleep(1);
+#endif // Win32 or POSIX.
     cr.return_code = 2;
     retval |= check(cr);
   }
@@ -124,9 +144,6 @@ int main_test(int argc, char** argv) {
  *  Init unit test.
  */
 int main(int argc, char** argv) {
-  // rewrite basic process to remove QEventLoop.
-  return (1);
-
   unittest utest(argc, argv, &main_test);
   return (utest.run());
 }
