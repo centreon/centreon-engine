@@ -122,14 +122,14 @@ commands::command* connector::command::clone() const {
 /**
  *  Run a command.
  *
- *  @param[in] args    The command arguments.
- *  @param[in] macros  The macros data struct.
- *  @param[in] timeout The command timeout.
+ *  @param[in]     args    The command arguments.
+ *  @param[in,out] macros  The macros data struct.
+ *  @param[in]     timeout The command timeout.
  *
  *  @return The command id.
  */
 unsigned long connector::command::run(std::string const& processed_cmd,
-				      nagios_macros const& macros,
+				      nagios_macros& macros,
 				      unsigned int timeout) {
   (void)macros;
 
@@ -178,13 +178,13 @@ unsigned long connector::command::run(std::string const& processed_cmd,
 /**
  *  Run a command and wait the result.
  *
- *  @param[in]  args    The command arguments.
- *  @param[in]  macros  The macros data struct.
- *  @param[in]  timeout The command timeout.
- *  @param[out] res     The result of the command.
+ *  @param[in]      args    The command arguments.
+ *  @param[in,out]  macros  The macros data struct.
+ *  @param[in]      timeout The command timeout.
+ *  @param[out]     res     The result of the command.
  */
 void connector::command::run(std::string const& processed_cmd,
-			     nagios_macros const& macros,
+			     nagios_macros& macros,
 			     unsigned int timeout,
 			     result& res) {
   (void)macros;

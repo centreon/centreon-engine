@@ -30,7 +30,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>
-#include "com/centreon/engine/commands/connector/command.hh"
+// XXX: #include "com/centreon/engine/commands/connector/command.hh"
 #include "com/centreon/engine/commands/raw.hh"
 #include "com/centreon/engine/commands/set.hh"
 #include "com/centreon/engine/common.hh"
@@ -9684,27 +9684,28 @@ int xodtemplate_register_command(xodtemplate_command* this_command) {
       commands::set::instance().add_command(cmd_set);
     }
     else {
-      xodtemplate_connector temp_connector;
-      temp_connector.connector_name = this_command->connector_name;
-      xodtemplate_connector* connector =
-        (xodtemplate_connector*)skiplist_find_first(
-                                  xobject_skiplists[X_CONNECTOR_SKIPLIST],
-                                  &temp_connector,
-                                  NULL);
-      if (connector == NULL) {
-        logger(log_config_error, basic)
-          << "Error: Could not register command (config file '"
-          << xodtemplate_config_file_name(this_command->_config_file)
-          << "', starting on line " << this_command->_start_line << ")";
-        return (ERROR);
-      }
-      com::centreon::shared_ptr<commands::command>
-        cmd_set(new commands::connector::command(
-                                           connector->connector_name,
-                                           connector->connector_line,
-                                           this_command->command_name,
-                                           this_command->command_line));
-      commands::set::instance().add_command(cmd_set);
+      // XXX: todo
+      // xodtemplate_connector temp_connector;
+      // temp_connector.connector_name = this_command->connector_name;
+      // xodtemplate_connector* connector =
+      //   (xodtemplate_connector*)skiplist_find_first(
+      //                             xobject_skiplists[X_CONNECTOR_SKIPLIST],
+      //                             &temp_connector,
+      //                             NULL);
+      // if (connector == NULL) {
+      //   logger(log_config_error, basic)
+      //     << "Error: Could not register command (config file '"
+      //     << xodtemplate_config_file_name(this_command->_config_file)
+      //     << "', starting on line " << this_command->_start_line << ")";
+      //   return (ERROR);
+      // }
+      // com::centreon::shared_ptr<commands::command>
+      //   cmd_set(new commands::connector::command(
+      //                                      connector->connector_name,
+      //                                      connector->connector_line,
+      //                                      this_command->command_name,
+      //                                      this_command->command_line));
+      // commands::set::instance().add_command(cmd_set);
     }
   }
   catch (std::exception const& e) {

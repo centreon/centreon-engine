@@ -20,68 +20,81 @@
 #ifndef CCE_COMMANDS_RAW_HH
 #  define CCE_COMMANDS_RAW_HH
 
-#  include <map>
+#  include <list>
 #  include <string>
-#  include <sys/time.h>
 #  include "com/centreon/concurrency/mutex.hh"
 #  include "com/centreon/engine/commands/command.hh"
-#  include "com/centreon/engine/commands/process.hh"
-#  include "com/centreon/shared_ptr.hh"
+#  include "com/centreon/engine/namespace.hh"
+#  include "com/centreon/process.hh"
+#  include "com/centreon/process_listener.hh"
+#  include "com/centreon/unordered_hash.hh"
 
-namespace                 com {
-  namespace               centreon {
-    namespace             engine {
-      namespace           commands {
-        /**
-         *  @class raw raw.hh
-         *  @brief Raw is a specific implementation of command.
-         *
-         *  Raw is a specific implementation of command.
-         */
-        class             raw : public command {
-          Q_OBJECT
+CCE_BEGIN()
 
-        public:
-                          raw(
-                            std::string const& name,
-                            std::string const& command_line);
-                          raw(raw const& right);
-                          ~raw() throw ();
-          raw&            operator=(raw const& right);
-          command*        clone() const;
-          unsigned long   run(
-                            std::string const& process_cmd,
-                            nagios_macros const& macros,
-                            unsigned int timeout);
-          void            run(
-                            std::string const& process_cmd,
-                            nagios_macros const& macros,
-                            unsigned int timeout,
-                            result& res);
+namespace               commands {
+  class environment;
 
-        signals:
-          void            _empty_hash();
+  /**
+   *  @class raw raw.hh
+   *  @brief Raw is a specific implementation of command.
+   *
+   *  Raw is a specific implementation of command.
+   */
+  class                 raw
+    : public command,
+      public process_listener {
+  public:
+                        raw(
+                          std::string const& name,
+                          std::string const& command_line);
+                        raw(raw const& right);
+                        ~raw() throw ();
+    raw&                operator=(raw const& right);
+    command*            clone() const;
+    unsigned long       run(
+                          std::string const& process_cmd,
+                          nagios_macros& macros,
+                          unsigned int timeout);
+    void                run(
+                          std::string const& process_cmd,
+                          nagios_macros& macros,
+                          unsigned int timeout,
+                          result& res);
 
-        public slots:
-          void            raw_ended();
+  private:
+    void                data_is_available(process& p) throw ();
+    void                data_is_available_err(process& p) throw ();
+    void                finished(process& p) throw ();
+    static void         _build_argv_macro_environment(
+                          nagios_macros const& macros,
+                          environment& env);
+    static void         _build_contact_address_environment(
+                          nagios_macros const& macros,
+                          environment& env);
+    static void         _build_custom_contact_macro_environment(
+                          nagios_macros& macros,
+                          environment& env);
+    static void         _build_custom_host_macro_environment(
+                          nagios_macros& macros,
+                          environment& env);
+    static void         _build_custom_service_macro_environment(
+                          nagios_macros& macros,
+                          environment& env);
+    static void         _build_environment_macros(
+                          nagios_macros& macros,
+                          environment& env);
+    static void         _build_macrosx_environment(
+                          nagios_macros& macros,
+                          environment& env);
+    process*            _get_free_process();
 
-        private:
-          struct                    process_info {
-            unsigned long           cmd_id;
-            com::centreon::shared_ptr<process>
-                                    proc;
-          };
-
-          static void     _deletelater_process(process* obj);
-
-          com::centreon::concurrency::mutex
-                          _mutex;
-          std::map<QObject*, process_info>
-                          _processes;
-        };
-      }
-    }
-  }
+    concurrency::mutex  _lock;
+    umap<process*, unsigned long>
+                        _processes_busy;
+    std::list<process*> _processes_free;
+  };
 }
+
+CCE_END()
 
 #endif // !CCE_COMMANDS_RAW_HH

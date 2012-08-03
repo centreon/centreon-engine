@@ -48,6 +48,7 @@
 #include "com/centreon/engine/shared.hh"
 #include "com/centreon/engine/utils.hh"
 
+using namespace com::centreon;
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;
 
@@ -56,7 +57,7 @@ using namespace com::centreon::engine::logging;
 /******************************************************************/
 
 /* executes a system command - used for notifications, event handlers, etc. */
-int my_system_r(nagios_macros const* mac,
+int my_system_r(nagios_macros* mac,
 		char* cmd,
 		int timeout,
                 int* early_timeout,
@@ -104,24 +105,18 @@ int my_system_r(nagios_macros const* mac,
   commands::result cmd_result;
   raw_cmd.run(cmd, *mac, timeout, cmd_result);
 
-  end_time.tv_sec = cmd_result.get_end_time().to_seconds();
-  end_time.tv_usec = cmd_result.get_end_time().to_useconds()
+  end_time.tv_sec = cmd_result.end_time.to_seconds();
+  end_time.tv_usec = cmd_result.end_time.to_useconds()
                     - end_time.tv_sec * 1000000ull;
-  *exectime = cmd_result.get_execution_time();
-  *early_timeout = cmd_result.get_is_timeout();
+  *exectime = 0; // XXX: todo cmd_result.get_execution_time();
+  *early_timeout = cmd_result.exit_status == process::timeout;
   if (output && max_output_length > 0) {
-    if (!cmd_result.get_stdout().empty())
-      *output = my_strdup(cmd_result.get_stdout().substr(
-                                                    0,
-                                                    max_output_length
-                                                    - 1).c_str());
-    else if (!cmd_result.get_stderr().empty())
-      *output = my_strdup(cmd_result.get_stderr().substr(
-                                                    0,
-                                                    max_output_length
-                                                    - 1).c_str());
+    *output = my_strdup(cmd_result.stdout.substr(
+                                            0,
+                                            max_output_length
+                                            - 1).c_str());
   }
-  int result(cmd_result.get_exit_code());
+  int result(cmd_result.exit_code);
 
   logger(dbg_commands, more)
     << fixed << setprecision(3)

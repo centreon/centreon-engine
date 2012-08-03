@@ -23,8 +23,8 @@
 using namespace com::centreon;
 using namespace com::centreon::engine;
 
-concurrency::mutex commands::command::_mtx;
-unsigned long      commands::command::_id(0);
+static concurrency::mutex _lock_id;
+static unsigned long      _id = 0;
 
 /**
  *  Default constructor
@@ -32,16 +32,20 @@ unsigned long      commands::command::_id(0);
  *  @param[in] name         The command name.
  *  @param[in] command_line The command line.
  */
-commands::command::command(std::string const& name,
-			   std::string const& command_line)
-  : QObject(),
-    _command_line(command_line),
-    _name(name) {}
+commands::command::command(
+                     std::string const& name,
+                     std::string const& command_line)
+  : _command_line(command_line),
+    _name(name) {
+
+}
 
 /**
  *  Destructor.
  */
-commands::command::~command() throw () {}
+commands::command::~command() throw () {
+
+}
 
 /**
  *  Compare two result.
@@ -97,8 +101,7 @@ void commands::command::set_command_line(std::string const& command_line) {
  *
  *  @param[in] right The copy class.
  */
-commands::command::command(commands::command const& right)
-  : QObject() {
+commands::command::command(commands::command const& right) {
   operator=(right);
 }
 
@@ -138,6 +141,6 @@ std::string commands::command::process_cmd(nagios_macros* macros) const {
  *  @return The unique command id.
  */
 unsigned long commands::command::get_uniq_id() {
-  concurrency::locker locker(&_mtx);
+  concurrency::locker locker(&_lock_id);
   return (++_id);
 }

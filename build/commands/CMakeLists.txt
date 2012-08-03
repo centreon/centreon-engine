@@ -22,36 +22,26 @@ set(SRC_DIR "${SRC_DIR}/commands")
 set(INC_DIR "${INC_DIR}/com/centreon/engine/commands")
 
 # connector command is required.
-add_subdirectory("connector")
-
-# Produce moc files.
-qt4_wrap_cpp(QT_MOC_FILES
-  "${INC_DIR}/command.hh"
-  "${INC_DIR}/process.hh"
-  "${INC_DIR}/basic_process.hh"
-  "${INC_DIR}/raw.hh")
+#add_subdirectory("connector")
 
 # cce_broker target.
 add_library("cce_commands"
   STATIC
   "${SRC_DIR}/command.cc"
-  "${SRC_DIR}/command_line.cc"
-  "${SRC_DIR}/process.cc"
-  "${SRC_DIR}/basic_process.cc"
+  "${SRC_DIR}/environment.cc"
   "${SRC_DIR}/raw.cc"
   "${SRC_DIR}/result.cc"
   "${SRC_DIR}/set.cc"
   "${INC_DIR}/command.hh"
-  "${INC_DIR}/command_line.hh"
-  "${INC_DIR}/process.hh"
-  "${INC_DIR}/basic_process.hh"
+  "${INC_DIR}/environment.hh"
   "${INC_DIR}/raw.hh"
   "${INC_DIR}/result.hh"
   "${INC_DIR}/set.hh"
   ${QT_MOC_FILES})
 
 # Link target with required libraries.
-target_link_libraries("cce_commands" "cce_connector" ${QT_LIBRARIES})
+# XXX: target_link_libraries("cce_commands" "cce_connector" ${QT_LIBRARIES})
+target_link_libraries("cce_commands")
 
 if (WITH_TESTING)
   #Set directories.
@@ -60,6 +50,21 @@ if (WITH_TESTING)
   # Produce moc files.
   qt4_wrap_cpp(QT_MOC_FILES
     "${TEST_DIR}/wait_process.hh")
+
+  # Test environment.
+  add_executable("environment_add" "${TEST_DIR}/environment_add.cc")
+  target_link_libraries("environment_add" "cce_core")
+  add_test("environment_add" "environment_add")
+
+  # Test environment.
+  add_executable("environment_compare" "${TEST_DIR}/environment_compare.cc")
+  target_link_libraries("environment_compare" "cce_core")
+  add_test("environment_compare" "environment_comapre")
+
+  # Test environment.
+  add_executable("environment_ctor" "${TEST_DIR}/environment_ctor.cc")
+  target_link_libraries("environment_ctor" "cce_core")
+  add_test("environment_ctor" "environment_ctor")
 
   # Test result.
   add_executable("result_ctor" "${TEST_DIR}/result_ctor.cc")

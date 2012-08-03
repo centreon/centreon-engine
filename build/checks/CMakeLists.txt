@@ -22,9 +22,6 @@ set(SRC_DIR "${SRC_DIR}/checks")
 set(INC_DIR "${INC_DIR}/com/centreon/engine/checks")
 set(TEST_DIR "${TEST_DIR}/checks")
 
-# Produce moc files.
-qt4_wrap_cpp(QT_MOC_FILES "${INC_DIR}/checker.hh")
-
 # cce_checks target.
 add_library("cce_checks" STATIC
   # Sources.
@@ -32,8 +29,7 @@ add_library("cce_checks" STATIC
   "${SRC_DIR}/stats.cc"
   # Headers.
   "${INC_DIR}/checker.hh"
-  "${INC_DIR}/stats.hh"
-  ${QT_MOC_FILES})
+  "${INC_DIR}/stats.hh")
 
 # Link target with required libraries.
-target_link_libraries("cce_checks" ${QT_LIBRARIES} "cce_commands")
+target_link_libraries("cce_checks" "cce_commands")

@@ -25,72 +25,58 @@
 #  include "com/centreon/concurrency/mutex.hh"
 #  include "com/centreon/engine/commands/result.hh"
 #  include "com/centreon/engine/macros.hh"
+#  include "com/centreon/engine/namespace.hh"
 
-namespace                        com {
-  namespace                      centreon {
-    namespace                    engine {
-      namespace                  commands {
-        /**
-         *  @class command command.hh
-         *  @brief Execute command and send the result.
-         *
-         *  Command execute a command line with their arguments and send the
-         *  result by a signal.
-         */
-        class                    command : public QObject {
-          Q_OBJECT
+CCE_BEGIN()
 
-        public:
-                                 command(
-                                   std::string const& name,
-                                   std::string const& command_line);
-          virtual                ~command() throw ();
-          bool                   operator==(
-                                   command const& right) const throw ();
-          bool                   operator!=(
-                                   command const& right) const throw ();
-          virtual command*       clone() const = 0;
-          virtual std::string const&
-                                 get_command_line() const throw ();
-          virtual std::string const&
-                                 get_name() const throw ();
-          virtual std::string    process_cmd(
-                                   nagios_macros* macros) const;
-          virtual unsigned long  run(
-                                   std::string const& processed_cmd,
-                                   nagios_macros const& macors,
-                                   unsigned int timeout) = 0;
-          virtual void           run(
-                                   std::string const& process_cmd,
-                                   nagios_macros const& macros,
-                                   unsigned int timeout,
-                                   result& res) = 0;
-          virtual void           set_command_line(
-                                   std::string const& command_line);
+namespace                      commands {
+  /**
+   *  @class command command.hh
+   *  @brief Execute command and send the result.
+   *
+   *  Command execute a command line with their arguments and send the
+   *  result by a signal.
+   */
+  class                        command {
+  public:
+                               command(
+                                 std::string const& name,
+                                 std::string const& command_line);
+    virtual                    ~command() throw ();
+    bool                       operator==(
+                                 command const& right) const throw ();
+    bool                       operator!=(
+                                 command const& right) const throw ();
+    virtual command*           clone() const = 0;
+    virtual std::string const& get_command_line() const throw ();
+    virtual std::string const& get_name() const throw ();
+    virtual std::string        process_cmd(nagios_macros* macros) const;
+    virtual unsigned long      run(
+                                 std::string const& processed_cmd,
+                                 nagios_macros& macors,
+                                 unsigned int timeout) = 0;
+    virtual void               run(
+                                 std::string const& process_cmd,
+                                 nagios_macros& macros,
+                                 unsigned int timeout,
+                                 result& res) = 0;
+    virtual void               set_command_line(
+                                 std::string const& command_line);
 
-        signals:
-          void                   command_executed(
-                                   cce_commands_result const& res);
-          void                   name_changed(
-                                   std::string const& old_name,
-                                   std::string const& new_name);
+  signals:
+    void                       command_executed(
+                                 commands::result const& res);
 
-        protected:
-                                 command(command const& right);
-          command&               operator=(command const& right);
-          static unsigned long   get_uniq_id();
+  protected:
+                               command(command const& right);
+    command&                   operator=(command const& right);
+    static unsigned long       get_uniq_id();
 
-          std::string            _command_line;
-          std::string            _name;
-
-        private:
-          static unsigned long   _id;
-          static com::centreon::concurrency::mutex
-                                 _mtx;
-        };
-      }
-    }
-  }
+    std::string                _command_line;
+    std::string                _name;
+  };
 }
+
+CCE_END()
 
 #endif // !CCE_COMMANDS_COMMAND_HH

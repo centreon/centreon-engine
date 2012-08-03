@@ -22,6 +22,7 @@
 
 #  include <string>
 #  include "com/centreon/engine/namespace.hh"
+#  include "com/centreon/process.hh"
 #  include "com/centreon/timestamp.hh"
 
 CCE_BEGIN()
@@ -36,54 +37,25 @@ namespace              commands {
    */
   class                result {
   public:
-                       result(
-                         unsigned long cmd_id = 0,
-                         std::string const& stdout = "",
-                         std::string const& stderr = "",
-                         timestamp const& start_time = timestamp(),
-                         timestamp const& end_time = timestamp(),
-                         int retval = 0,
-                         bool is_timeout = false,
-                         bool is_executed = true);
+                       result();
                        result(result const& right);
                        ~result() throw ();
     result&            operator=(result const& right);
     bool               operator==(result const& right) const throw ();
     bool               operator!=(result const& right) const throw ();
-    unsigned long      get_command_id() const throw ();
-    timestamp const&   get_end_time() const throw ();
-    unsigned int       get_execution_time() const throw ();
-    int                get_exit_code() const throw ();
-    bool               get_is_executed() const throw ();
-    bool               get_is_timeout() const throw ();
-    timestamp const&   get_start_time() const throw ();
-    std::string const& get_stderr() const throw ();
-    std::string const& get_stdout() const throw ();
-    void               set_command_id(unsigned long id) throw ();
-    void               set_end_time(timestamp const& time) throw ();
-    void               set_exit_code(int retval) throw ();
-    void               set_is_executed(bool value) throw ();
-    void               set_is_timeout(bool value) throw ();
-    void               set_start_time(timestamp const& time) throw ();
-    void               set_stderr(std::string const& str);
-    void               set_stdout(std::string const& str);
+    unsigned long      command_id;
+    timestamp          end_time;
+    int                exit_code;
+    process::status    exit_status;
+    timestamp          start_time;
+    std::string        stderr;
+    std::string        stdout;
 
   private:
     void               _internal_copy(result const& right);
-
-    unsigned long      _cmd_id;
-    timestamp          _end_time;
-    int                _exit_code;
-    bool               _is_executed;
-    bool               _is_timeout;
-    timestamp          _start_time;
-    std::string        _stderr;
-    std::string        _stdout;
   };
 }
 
 CCE_END()
-
-typedef com::centreon::engine::commands::result cce_commands_result;
 
 #endif // !CCE_COMMANDS_RESULT_HH

@@ -58,12 +58,12 @@ namespace                              com {
 
             unsigned long              run(
                                          std::string const& processed_cmd,
-                                         nagios_macros const& macros,
+                                         nagios_macros& macros,
                                          unsigned int timeout);
 
             void                       run(
                                          std::string const& processed_cmd,
-                                         nagios_macros const& macros,
+                                         nagios_macros& macros,
                                          unsigned int timeout,
                                          result& res);
 

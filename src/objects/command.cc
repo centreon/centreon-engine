@@ -17,8 +17,6 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <QCoreApplication>
-#include <QThread>
 #include "com/centreon/engine/commands/raw.hh"
 #include "com/centreon/engine/commands/set.hh"
 #include "com/centreon/engine/error.hh"
@@ -87,9 +85,6 @@ void objects::link(command const* obj) {
   commands::set& cmd_set = commands::set::instance();
   com::centreon::shared_ptr<commands::command>
     new_command(new commands::raw(obj->name, obj->command_line));
-  QThread* main(QCoreApplication::instance()->thread());
-  if (main != QThread::currentThread())
-    new_command->moveToThread(main);
   cmd_set.add_command(new_command);
 }
 

@@ -39,7 +39,7 @@ extern "C" {
 #  endif // C++
 
 // Monitoring/Event Handler Functions
-int my_system_r(nagios_macros const* mac, char* cmd,int timeout,int* early_timeout,double* exectime,char** output,unsigned int max_output_length); // thread-safe version of the above
+int my_system_r(nagios_macros* mac, char* cmd,int timeout,int* early_timeout,double* exectime,char** output,unsigned int max_output_length); // thread-safe version of the above
 int my_system(char* cmd,int timeout,int* early_timeout,double* exectime,char** output,int max_output_length);                                // executes a command via popen(), but also protects against timeouts
 char const* my_ctime(time_t const*t); // same like unix ctime without the '\n' at the end of the string.
 // Miscellaneous Functions
