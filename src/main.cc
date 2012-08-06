@@ -35,6 +35,7 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
+#include "com/centreon/clib.hh"
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/broker/compatibility.hh"
 #include "com/centreon/engine/broker/loader.hh"
@@ -108,6 +109,7 @@ int main(int argc, char** argv) {
     error = TRUE;
 
   // Load singletons.
+  com::centreon::clib::load();
   com::centreon::engine::logging::engine::load();
   com::centreon::engine::configuration::applier::logging::load();
   com::centreon::engine::commands::set::load();
@@ -586,6 +588,7 @@ int main(int argc, char** argv) {
   com::centreon::engine::checks::checker::unload();
   com::centreon::engine::commands::set::unload();
   com::centreon::engine::configuration::applier::logging::unload();
+  com::centreon::clib::unload();
 
   return (EXIT_SUCCESS);
 }

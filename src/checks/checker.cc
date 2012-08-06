@@ -848,7 +848,7 @@ void checker::finished(commands::result const& res) throw () {
   result.early_timeout = (res.exit_status == process::timeout);
   result.return_code = res.exit_code;
   result.exited_ok = (res.exit_status == process::normal);
-  result.output = my_strdup(res.stdout.c_str());
+  result.output = my_strdup(res.output.c_str());
 
   // Queue check result.
   {
@@ -881,7 +881,7 @@ int checker::_execute_sync(host* hst) {
   timeval end_time;
   memset(&start_time, 0, sizeof(start_time));
   memset(&end_time, 0, sizeof(end_time));
-  int res(broker_host_check(
+  int ret(broker_host_check(
             NEBTYPE_HOSTCHECK_SYNC_PRECHECK,
             NEBFLAG_NONE,
             NEBATTR_NONE,
@@ -904,8 +904,8 @@ int checker::_execute_sync(host* hst) {
             NULL));
 
   // Host sync check was cancelled or overriden by NEB module.
-  if ((NEBERROR_CALLBACKCANCEL == res)
-      || (NEBERROR_CALLBACKOVERRIDE == res))
+  if ((NEBERROR_CALLBACKCANCEL == ret)
+      || (NEBERROR_CALLBACKOVERRIDE == ret))
     return (hst->current_state);
 
   // Get current host macros.
@@ -989,30 +989,30 @@ int checker::_execute_sync(host* hst) {
     NULL);
 
   // Run command.
-  commands::result cmd_result;
+  commands::result res;
   cmd->run(
          processed_cmd,
          macros,
          config.get_host_check_timeout(),
-         cmd_result);
+         res);
 
   // Get output.
-  char* output(my_strdup(cmd_result.stdout.c_str()));
+  char* output(my_strdup(res.output.c_str()));
 
   unsigned int execution_time(0);
-  if (cmd_result.end_time >= cmd_result.start_time)
+  if (res.end_time >= res.start_time)
     execution_time
-      = cmd_result.end_time.to_seconds() - cmd_result.start_time.to_seconds();
+      = res.end_time.to_seconds() - res.start_time.to_seconds();
 
   // Send broker event.
   memset(&start_cmd, 0, sizeof(start_time));
-  start_cmd.tv_sec = cmd_result.start_time.to_seconds();
-  start_cmd.tv_usec = cmd_result.start_time.to_useconds()
-                      - start_cmd.tv_sec * 1000000ull;
+  start_cmd.tv_sec = res.start_time.to_seconds();
+  start_cmd.tv_usec
+    = res.start_time.to_useconds() - start_cmd.tv_sec * 1000000ull;
   memset(&end_cmd, 0, sizeof(end_time));
-  end_cmd.tv_sec = cmd_result.end_time.to_seconds();
-  end_cmd.tv_usec = cmd_result.end_time.to_useconds()
-                    - end_cmd.tv_sec * 1000000ull;
+  end_cmd.tv_sec = res.end_time.to_seconds();
+  end_cmd.tv_usec =
+    res.end_time.to_useconds() - end_cmd.tv_sec * 1000000ull;
   broker_system_command(
     NEBTYPE_SYSTEM_COMMAND_END,
     NEBFLAG_NONE,
@@ -1021,8 +1021,8 @@ int checker::_execute_sync(host* hst) {
     end_cmd,
     execution_time,
     config.get_host_check_timeout(),
-    cmd_result.exit_status == process::timeout,
-    cmd_result.exit_code,
+    res.exit_status == process::timeout,
+    res.exit_code,
     tmp_processed_cmd,
     output,
     NULL);
@@ -1032,12 +1032,12 @@ int checker::_execute_sync(host* hst) {
   clear_volatile_macros_r(&macros);
 
   // If the command timed out.
-  if (cmd_result.exit_status == process::timeout) {
+  if (res.exit_status == process::timeout) {
     std::ostringstream oss;
     oss << "Host check timed out after "
         << config.get_host_check_timeout()
         << "  seconds";
-    cmd_result.stdout = oss.str();
+    res.output = oss.str();
     logger(log_runtime_warning, basic)
       << "Warning: Host check command '" << processed_cmd
       << "' for host '" << hst->name << "' timed out after "
@@ -1049,7 +1049,7 @@ int checker::_execute_sync(host* hst) {
   hst->check_type = HOST_CHECK_ACTIVE;
 
   // Get plugin output.
-  char* tmp_plugin_output(my_strdup(cmd_result.stdout.c_str()));
+  char* tmp_plugin_output(my_strdup(res.output.c_str()));
 
   // Parse the output: short and long output, and perf data.
   parse_check_output(
@@ -1065,7 +1065,7 @@ int checker::_execute_sync(host* hst) {
   if (!hst->host_check_command) {
     delete [] hst->plugin_output;
     hst->plugin_output = my_strdup("(Host assumed to be UP)");
-    cmd_result.exit_code = STATE_OK;
+    res.exit_code = STATE_OK;
   }
 
   // Make sure we have some data.
@@ -1084,12 +1084,12 @@ int checker::_execute_sync(host* hst) {
   // If we're not doing aggressive host checking, let WARNING
   // states indicate the host is up (fake the result to be STATE_OK).
   if (!config.get_use_aggressive_host_checking()
-      && (cmd_result.exit_code == STATE_WARNING))
-    cmd_result.exit_code = STATE_OK;
+      && (res.exit_code == STATE_WARNING))
+    res.exit_code = STATE_OK;
 
   // Get host state from plugin exit code.
   int return_result(
-        (cmd_result.exit_code == STATE_OK)
+        (res.exit_code == STATE_OK)
         ? HOST_UP
         : HOST_DOWN);
 
@@ -1111,8 +1111,8 @@ int checker::_execute_sync(host* hst) {
     0.0,
     execution_time,
     config.get_host_check_timeout(),
-    cmd_result.exit_status == process::timeout,
-    cmd_result.exit_code,
+    res.exit_status == process::timeout,
+    res.exit_code,
     tmp_processed_cmd,
     hst->plugin_output,
     hst->long_plugin_output,

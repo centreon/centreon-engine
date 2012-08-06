@@ -48,8 +48,7 @@ namespace              commands {
     int                exit_code;
     process::status    exit_status;
     timestamp          start_time;
-    std::string        stderr;
-    std::string        stdout;
+    std::string        output;
 
   private:
     void               _internal_copy(result const& right);
