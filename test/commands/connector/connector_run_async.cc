@@ -106,9 +106,6 @@ int main_test(int argc, char** argv) {
  *  Init the unit test.
  */
 int main(int argc, char** argv) {
-  // rewrite basic process to remove QEventLoop.
-  return (1);
-
   unittest utest(argc, argv, &main_test);
   return (utest.run());
 }

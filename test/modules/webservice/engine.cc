@@ -17,7 +17,11 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <unistd.h>
+#ifdef _WIN32
+#  include <windows.h>
+#else
+#  include <unistd.h>
+#endif // Win32 or POSIX.
 #include "com/centreon/engine/error.hh"
 #include "test/modules/webservice/engine.hh"
 #include "test/paths.hh"
@@ -60,10 +64,12 @@ void engine::start(std::string const& cfg_file) {
     cmd.append(TEST_DIR "/running/etc/webservice.cfg");
   else
     cmd.append(cfg_file);
-  _centengine.start(cmd.c_str());
-  if (!_centengine.waitForStarted())
-    throw (engine_error() << "cannot start centengine");
+  _centengine.exec(cmd);
+#ifdef _WIN32
+  Sleep(1000);
+#else
   sleep(1);
+#endif // Win32 or POSIX.
   return ;
 }
 
@@ -72,9 +78,9 @@ void engine::start(std::string const& cfg_file) {
  */
 void engine::stop() {
   _centengine.terminate();
-  if (!_centengine.waitForFinished()) {
+  if (!_centengine.wait(10000)) {
     _centengine.kill();
-    _centengine.waitForFinished();
+    _centengine.wait();
   }
   return ;
 }

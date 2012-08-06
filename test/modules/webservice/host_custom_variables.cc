@@ -34,9 +34,6 @@ int main(int argc, char** argv) {
   (void)argc;
   (void)argv;
 
-  // rewrite basic process to remove QEventLoop.
-  return (1);
-
   // Return value.
   int retval;
 

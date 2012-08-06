@@ -20,8 +20,8 @@
 #ifndef TEST_MOD_WS_ENGINE_HH
 #  define TEST_MOD_WS_ENGINE_HH
 
-#  include <QProcess>
 #  include <string>
+#  include "com/centreon/process.hh"
 
 /**
  *  @class engine engine.hh "test/modules/webservice/engine.hh"
@@ -39,7 +39,8 @@ public:
   void     stop();
 
 private:
-  QProcess _centengine;
+  com::centreon::process
+           _centengine;
 };
 
 #endif // !TEST_MOD_WS_ENGINE_HH
