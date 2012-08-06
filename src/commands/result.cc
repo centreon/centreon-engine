@@ -79,8 +79,7 @@ bool result::operator==(result const& right) const throw () {
           && exit_status == right.exit_status
           && end_time == right.end_time
           && start_time == right.start_time
-          && stderr == right.stderr
-          && stdout == right.stdout);
+          && output == right.output);
 }
 
 /**
@@ -111,7 +110,6 @@ void result::_internal_copy(result const& right) {
   exit_code = right.exit_code;
   exit_status = right.exit_status;
   start_time = right.start_time;
-  stderr = right.stderr;
-  stdout = right.stdout;
+  output = right.output;
   return ;
 }

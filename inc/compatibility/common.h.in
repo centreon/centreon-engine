@@ -28,7 +28,7 @@
 #  define PROGRAM_NAME "Centreon Engine"
 #  define PROGRAM_NAME_UC "CENTREON ENGINE"
 #  define PROGRAM_NAME_LC "centreon engine"
-#  define PROGRAM_VERSION "@ENGINE_VERSION@"
+#  define PROGRAM_VERSION "@CENTREON_ENGINE_VERSION@"
 #  define PROGRAM_MODIFICATION_DATE "01-01-1970"
 
 #  ifdef __cplusplus

@@ -102,21 +102,21 @@ int my_system_r(nagios_macros* mac,
                         NULL);
 
   commands::raw raw_cmd("system", cmd);
-  commands::result cmd_result;
-  raw_cmd.run(cmd, *mac, timeout, cmd_result);
+  commands::result res;
+  raw_cmd.run(cmd, *mac, timeout, res);
 
-  end_time.tv_sec = cmd_result.end_time.to_seconds();
-  end_time.tv_usec = cmd_result.end_time.to_useconds()
-                    - end_time.tv_sec * 1000000ull;
-  *exectime = 0; // XXX: todo cmd_result.get_execution_time();
-  *early_timeout = cmd_result.exit_status == process::timeout;
+  end_time.tv_sec = res.end_time.to_seconds();
+  end_time.tv_usec
+    = res.end_time.to_useconds() - end_time.tv_sec * 1000000ull;
+  *exectime = (res.end_time - res.start_time).to_seconds();
+  *early_timeout = res.exit_status == process::timeout;
   if (output && max_output_length > 0) {
-    *output = my_strdup(cmd_result.stdout.substr(
-                                            0,
-                                            max_output_length
-                                            - 1).c_str());
+    *output = my_strdup(res.output.substr(
+                                     0,
+                                     max_output_length - 1)
+                        .c_str());
   }
-  int result(cmd_result.exit_code);
+  int result(res.exit_code);
 
   logger(dbg_commands, more)
     << fixed << setprecision(3)

@@ -161,8 +161,7 @@ void raw::run(
   p.wait();
 
   // Get process output.
-  p.read(res.stdout);
-  p.read_err(res.stderr);
+  p.read(res.output);
 
   // Set result informations.
   res.command_id = cmd_id;
@@ -229,8 +228,7 @@ void raw::finished(process& p) throw () {
   result res;
 
   // Get process output.
-  p.read(res.stdout);
-  p.read_err(res.stderr);
+  p.read(res.output);
 
   // Set result informations.
   res.command_id = cmd_id;
@@ -259,9 +257,9 @@ void raw::_build_argv_macro_environment(
             nagios_macros const& macros,
             environment& env) {
   for (unsigned int i(0); i < MAX_COMMAND_ARGUMENTS; ++i) {
+    char const* value(macros.argv[i] ? macros.argv[i] : "");
     std::ostringstream oss;
-    oss << MACRO_ENV_VAR_PREFIX "ARG"
-        << (i + 1) << "=" << macros.argv[i];
+    oss << MACRO_ENV_VAR_PREFIX "ARG" << (i + 1) << "=" << value;
     env.add(oss.str());
   }
   return;
@@ -279,9 +277,11 @@ void raw::_build_contact_address_environment(
   if (!macros.contact_ptr)
     return;
   for (unsigned int i(0); i < MAX_CONTACT_ADDRESSES; ++i) {
+    char const* value(macros.contact_ptr->address[i]);
+    if (!value)
+      value = "";
     std::ostringstream oss;
-    oss << MACRO_ENV_VAR_PREFIX "CONTACTADDRESS"
-        << i << "=" << macros.contact_ptr->address[i];
+    oss << MACRO_ENV_VAR_PREFIX "CONTACTADDRESS" << i << "=" << value;
     env.add(oss.str());
   }
   return;
@@ -301,29 +301,36 @@ void raw::_build_custom_contact_macro_environment(
   if (hst) {
     for (customvariablesmember* customvar(hst->custom_variables);
          customvar;
-         customvar = customvar->next) {
-      std::string name("_CONTACT");
-      name.append(customvar->variable_name);
-      add_custom_variable_to_object(
-        &macros.custom_contact_vars,
-        name.c_str(),
-        customvar->variable_value);
-    }
+         customvar = customvar->next)
+      if (customvar->variable_name) {
+        char const* value(customvar->variable_value);
+        if (!value)
+          value = "";
+        std::string name("_CONTACT");
+        name.append(customvar->variable_name);
+        add_custom_variable_to_object(
+          &macros.custom_contact_vars,
+          name.c_str(),
+          value);
+      }
   }
   // Set custom contact variable into the environement
   for (customvariablesmember* customvar(macros.custom_contact_vars);
        customvar;
-       customvar = customvar->next) {
-    char const* value(clean_macro_chars(
-                        customvar->variable_value,
-                        STRIP_ILLEGAL_MACRO_CHARS | ESCAPE_MACRO_CHARS));
-    std::string line;
-    line.append(MACRO_ENV_VAR_PREFIX);
-    line.append(customvar->variable_name);
-    line.append("=");
-    line.append(value);
-    env.add(line);
-  }
+       customvar = customvar->next)
+    if (customvar->variable_name) {
+      char const* value("");
+      if (customvar->variable_value)
+        value = clean_macro_chars(
+                  customvar->variable_value,
+                  STRIP_ILLEGAL_MACRO_CHARS | ESCAPE_MACRO_CHARS);
+      std::string line;
+      line.append(MACRO_ENV_VAR_PREFIX);
+      line.append(customvar->variable_name);
+      line.append("=");
+      line.append(value);
+      env.add(line);
+    }
   return;
 }
 
@@ -341,29 +348,36 @@ void raw::_build_custom_host_macro_environment(
   if (hst) {
     for (customvariablesmember* customvar(hst->custom_variables);
          customvar;
-         customvar = customvar->next) {
-      std::string name("_HOST");
-      name.append(customvar->variable_name);
-      add_custom_variable_to_object(
-        &macros.custom_host_vars,
-        name.c_str(),
-        customvar->variable_value);
-    }
+         customvar = customvar->next)
+      if (customvar->variable_name) {
+        char const* value("");
+        if (customvar->variable_value)
+          value = customvar->variable_value;
+        std::string name("_HOST");
+        name.append(customvar->variable_name);
+        add_custom_variable_to_object(
+          &macros.custom_host_vars,
+          name.c_str(),
+          value);
+      }
   }
   // Set custom host variable into the environement
   for (customvariablesmember* customvar(macros.custom_host_vars);
        customvar;
-       customvar = customvar->next) {
-    char const* value(clean_macro_chars(
-                        customvar->variable_value,
-                        STRIP_ILLEGAL_MACRO_CHARS | ESCAPE_MACRO_CHARS));
-    std::string line;
-    line.append(MACRO_ENV_VAR_PREFIX);
-    line.append(customvar->variable_name);
-    line.append("=");
-    line.append(value);
-    env.add(line);
-  }
+       customvar = customvar->next)
+    if (customvar->variable_name) {
+      char const* value("");
+      if (customvar->variable_value)
+        value = clean_macro_chars(
+                  customvar->variable_value,
+                  STRIP_ILLEGAL_MACRO_CHARS | ESCAPE_MACRO_CHARS);
+      std::string line;
+      line.append(MACRO_ENV_VAR_PREFIX);
+      line.append(customvar->variable_name);
+      line.append("=");
+      line.append(value);
+      env.add(line);
+    }
   return;
 }
 
@@ -381,29 +395,36 @@ void raw::_build_custom_service_macro_environment(
   if (hst) {
     for (customvariablesmember* customvar(hst->custom_variables);
          customvar;
-         customvar = customvar->next) {
-      std::string name("_SERVICE");
-      name.append(customvar->variable_name);
-      add_custom_variable_to_object(
-        &macros.custom_service_vars,
-        name.c_str(),
-        customvar->variable_value);
-    }
+         customvar = customvar->next)
+      if (customvar->variable_name) {
+        char const* value(customvar->variable_value);
+        if (!value)
+          value = "";
+        std::string name("_SERVICE");
+        name.append(customvar->variable_name);
+        add_custom_variable_to_object(
+          &macros.custom_service_vars,
+          name.c_str(),
+          value);
+      }
   }
   // Set custom service variable into the environement
   for (customvariablesmember* customvar(macros.custom_service_vars);
        customvar;
-       customvar = customvar->next) {
-    char const* value(clean_macro_chars(
-                       customvar->variable_value,
-                       STRIP_ILLEGAL_MACRO_CHARS | ESCAPE_MACRO_CHARS));
-    std::string line;
-    line.append(MACRO_ENV_VAR_PREFIX);
-    line.append(customvar->variable_name);
-    line.append("=");
-    line.append(value);
-    env.add(line);
-  }
+       customvar = customvar->next)
+    if (customvar->variable_name) {
+      char const* value("");
+      if (customvar->variable_value)
+        value = clean_macro_chars(
+                  customvar->variable_value,
+                  STRIP_ILLEGAL_MACRO_CHARS | ESCAPE_MACRO_CHARS);
+      std::string line;
+      line.append(MACRO_ENV_VAR_PREFIX);
+      line.append(customvar->variable_name);
+      line.append("=");
+      line.append(value);
+      env.add(line);
+    }
   return;
 }
 
@@ -456,16 +477,20 @@ void raw::_build_macrosx_environment(
     }
 
     // Add into the environment.
-    std::string line;
-    line.append(MACRO_ENV_VAR_PREFIX);
-    line.append(macro_x_names[i]);
-    line.append("=");
-    line.append(macros.x[i]);
-    env.add(line);
+    if (macro_x_names[i]) {
+      std::string line;
+      line.append(MACRO_ENV_VAR_PREFIX);
+      line.append(macro_x_names[i]);
+      line.append("=");
+      line.append(macros.x[i] ? macros.x[i] : "");
+      env.add(line);
+    }
 
     // Release memory if necessary.
-    if (release_memory)
+    if (release_memory) {
       delete[] macros.x[i];
+      macros.x[i] = NULL;
+    }
   }
   return;
 }
