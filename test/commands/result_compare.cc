@@ -17,12 +17,15 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <cstdlib>
 #include <exception>
 #include "com/centreon/engine/commands/result.hh"
 #include "com/centreon/engine/error.hh"
+#include "com/centreon/process.hh"
 #include "com/centreon/timestamp.hh"
 #include "test/unittest.hh"
 
+using namespace com::centreon;
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::commands;
 
@@ -30,27 +33,30 @@ using namespace com::centreon::engine::commands;
 #define DEFAULT_STDOUT  "stdout string test"
 #define DEFAULT_STDERR  "stderr string test"
 #define DEFAULT_RETURN  0
-#define DEFAULT_TIMEOUT true
-#define DEFAULT_EXIT_OK false
+#define DEFAULT_STATUS  process::normal
 
 /**
  *  Check the comparison operator.
+ *
+ *  @param[in] argc Argument count.
+ *  @param[in] argv Argument values.
+ *
+ *  @return EXIT_SUCCESS on success.
  */
 int main_test(int argc, char** argv) {
   (void)argc;
   (void)argv;
 
   // Prepare.
-  com::centreon::timestamp now(com::centreon::timestamp::now());
-  result res(
-           DEFAULT_ID,
-           DEFAULT_STDOUT,
-           DEFAULT_STDERR,
-           now,
-           now,
-           DEFAULT_RETURN,
-           DEFAULT_TIMEOUT,
-           DEFAULT_EXIT_OK);
+  timestamp now(timestamp::now());
+  result res;
+  res.command_id = DEFAULT_ID;
+  res.stdout = DEFAULT_STDOUT;
+  res.stderr = DEFAULT_STDERR;
+  res.start_time = now;
+  res.end_time = now;
+  res.exit_code = DEFAULT_RETURN;
+  res.exit_status = DEFAULT_STATUS;
 
   // Tests.
   if (!(res == res))
@@ -58,13 +64,20 @@ int main_test(int argc, char** argv) {
   if (res != res)
     throw (engine_error() << "error: operator!= failed");
 
-  return (0);
+  return (EXIT_SUCCESS);
 }
 
 /**
  *  Init unit test.
+ *
+ *  @param[in] argc Argument count.
+ *  @param[in] argv Argument values.
+ *
+ *  @return Return value of main_test().
+ *
+ *  @see main_test
  */
-int main(int argc, char** argv) {
+int main(int argc, char* argv[]) {
   unittest utest(argc, argv, &main_test);
   return (utest.run());
 }

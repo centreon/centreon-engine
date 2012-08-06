@@ -48,10 +48,6 @@ if (WITH_TESTING)
   #Set directories.
   set(TEST_DIR "${TEST_DIR}/commands")
 
-  # Produce moc files.
-  qt4_wrap_cpp(QT_MOC_FILES
-    "${TEST_DIR}/wait_process.hh")
-
   # Test environment.
   add_executable("environment_add" "${TEST_DIR}/environment_add.cc")
   target_link_libraries("environment_add" "cce_core")
@@ -71,14 +67,6 @@ if (WITH_TESTING)
   add_executable("result_ctor" "${TEST_DIR}/result_ctor.cc")
   target_link_libraries("result_ctor" "cce_core")
   add_test("result_ctor" "result_ctor")
-
-  add_executable("result_get_set" "${TEST_DIR}/result_get_set.cc")
-  target_link_libraries("result_get_set" "cce_core")
-  add_test("result_get_set" "result_get_set")
-
-  add_executable("result_execution_time" "${TEST_DIR}/result_execution_time.cc")
-  target_link_libraries("result_execution_time" "cce_core")
-  add_test("result_execution_time" "result_execution_time")
 
   add_executable("result_compare" "${TEST_DIR}/result_compare.cc")
   target_link_libraries("result_compare" "cce_core")
@@ -108,8 +96,7 @@ if (WITH_TESTING)
 
   add_executable("raw_run_async"
     "${TEST_DIR}/raw_run_async.cc"
-    "${TEST_DIR}/wait_process.hh"
-    ${QT_MOC_FILES})
+    "${TEST_DIR}/wait_process.hh")
   target_link_libraries("raw_run_async" "cce_commands" "cce_core")
   add_test("raw_run_async" "raw_run_async")
 

@@ -17,13 +17,16 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <cstdlib>
 #include <exception>
 #include "com/centreon/engine/commands/raw.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
+#include "com/centreon/process.hh"
 #include "test/commands/wait_process.hh"
 #include "test/unittest.hh"
 
+using namespace com::centreon;
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::commands;
 
@@ -35,20 +38,20 @@ using namespace com::centreon::engine::commands;
 static bool run_without_timeout() {
   // Raw command object and its waiter.
   raw cmd(__func__, "./bin_test_run --timeout=off");
-  wait_process wait_proc(cmd);
+  wait_process wait_proc(&cmd);
 
   // Run command and wait for it to exit.
-  unsigned long id(cmd.run(cmd.get_command_line(), nagios_macros(), 0));
+  nagios_macros mac;
+  unsigned long id(cmd.run(cmd.get_command_line(), mac, 0));
   wait_proc.wait();
 
   // Check result.
   result const& cmd_res = wait_proc.get_result();
-  return (!((cmd_res.get_command_id() != id)
-            || (cmd_res.get_exit_code() != STATE_OK)
-            || (cmd_res.get_stdout() != cmd.get_command_line())
-            || (cmd_res.get_stderr() != "")
-            || !cmd_res.get_is_executed()
-            || cmd_res.get_is_timeout()));
+  return (!((cmd_res.command_id != id)
+            || (cmd_res.exit_code != STATE_OK)
+            || (cmd_res.exit_status != process::normal)
+            || (cmd_res.stdout != cmd.get_command_line())
+            || (cmd_res.stderr != "")));
 }
 
 /**
@@ -59,20 +62,20 @@ static bool run_without_timeout() {
 static bool run_with_timeout() {
   // Raw command object and its waiter.
   raw cmd(__func__, "./bin_test_run --timeout=on");
-  wait_process wait_proc(cmd);
+  wait_process wait_proc(&cmd);
 
   // Run command and wait for it to exit.
-  unsigned long id(cmd.run(cmd.get_command_line(), nagios_macros(), 1));
+  nagios_macros mac;
+  unsigned long id(cmd.run(cmd.get_command_line(), mac, 1));
   wait_proc.wait();
 
   // Check result.
   result const& cmd_res = wait_proc.get_result();
-  return (!((cmd_res.get_command_id() != id)
-            || (cmd_res.get_exit_code() != STATE_CRITICAL)
-            || (cmd_res.get_stdout() != "")
-            || (cmd_res.get_stderr() != "(Process Timeout)")
-            || !cmd_res.get_is_executed()
-            || !cmd_res.get_is_timeout()));
+  return (!((cmd_res.command_id != id)
+            || (cmd_res.exit_code != STATE_CRITICAL)
+            || (cmd_res.exit_status != process::normal)
+            || (cmd_res.stdout != "")
+            || (cmd_res.stderr != "(Process Timeout)")));
 }
 
 /**
@@ -92,7 +95,7 @@ static bool run_with_environment_macros() {
 
   // Raw command object and its waiter.
   raw cmd(__func__, "./bin_test_run --check_macros");
-  wait_process wait_proc(cmd);
+  wait_process wait_proc(&cmd);
 
   // Run command and wait for it to exit.
   unsigned long id(cmd.run(cmd.get_command_line(), macros, 0));
@@ -101,12 +104,11 @@ static bool run_with_environment_macros() {
 
   // Check result.
   result const& cmd_res = wait_proc.get_result();
-  return (!((cmd_res.get_command_id() != id)
-            || (cmd_res.get_exit_code() != STATE_OK)
-            || (cmd_res.get_stdout() != cmd.get_command_line())
-            || (cmd_res.get_stderr() != "")
-            || !cmd_res.get_is_executed()
-            || cmd_res.get_is_timeout()));
+  return (!((cmd_res.command_id != id)
+            || (cmd_res.exit_code != STATE_OK)
+            || (cmd_res.exit_status != process::normal)
+            || (cmd_res.stdout != cmd.get_command_line())
+            || (cmd_res.stderr != "")));
 }
 
 /**
@@ -117,20 +119,20 @@ static bool run_with_environment_macros() {
 static bool run_with_single_quotes() {
   // Raw command object and its waiter.
   raw cmd(__func__, "'./bin_test_run' '--timeout'='off'");
-  wait_process wait_proc(cmd);
+  wait_process wait_proc(&cmd);
 
   // Run command and wait for it to exit.
-  unsigned long id(cmd.run(cmd.get_command_line(), nagios_macros(), 0));
+  nagios_macros mac;
+  unsigned long id(cmd.run(cmd.get_command_line(), mac, 0));
   wait_proc.wait();
 
   // Check result.
   result const& cmd_res = wait_proc.get_result();
-  return (!((cmd_res.get_command_id() != id)
-            || (cmd_res.get_exit_code() != STATE_OK)
-            || (cmd_res.get_stdout() != "./bin_test_run --timeout=off")
-            || (cmd_res.get_stderr() != "")
-            || !cmd_res.get_is_executed()
-            || cmd_res.get_is_timeout()));
+  return (!((cmd_res.command_id != id)
+            || (cmd_res.exit_code != STATE_OK)
+            || (cmd_res.exit_status != process::normal)
+            || (cmd_res.stdout != "./bin_test_run --timeout=off")
+            || (cmd_res.stderr != "")));
 }
 
 /**
@@ -141,29 +143,33 @@ static bool run_with_single_quotes() {
 static bool run_with_double_quotes() {
   // Raw command object and its waiter.
   raw cmd(__func__, "\"./bin_test_run\" \"--timeout\"=\"off\"");
-  wait_process wait_proc(cmd);
+  wait_process wait_proc(&cmd);
 
   // Run command and wait for it to exit.
-  unsigned long id(cmd.run(cmd.get_command_line(), nagios_macros(), 0));
+  nagios_macros mac;
+  unsigned long id(cmd.run(cmd.get_command_line(), mac, 0));
   wait_proc.wait();
 
   // Check result.
   result const& cmd_res = wait_proc.get_result();
-  return (!((cmd_res.get_command_id() != id)
-            || (cmd_res.get_exit_code() != STATE_OK)
-            || (cmd_res.get_stdout() != "./bin_test_run --timeout=off")
-            || (cmd_res.get_stderr() != "")
-            || !cmd_res.get_is_executed()
-            || cmd_res.get_is_timeout()));
+  return (!((cmd_res.command_id != id)
+            || (cmd_res.exit_code != STATE_OK)
+            || (cmd_res.exit_status != process::normal)
+            || (cmd_res.stdout != "./bin_test_run --timeout=off")
+            || (cmd_res.stderr != "")));
 }
 
 /**
- *  Check the asynchrone system for the raw command.
+ *  Check the asynchronous system for the raw command.
+ *
+ *  @param[in] argc Argument count.
+ *  @param[in] argv Argument values.
+ *
+ *  @return EXIT_SUCCESS on success.
  */
 int main_test(int argc, char** argv) {
   (void)argc;
   (void)argv;
-
   if (!run_without_timeout())
     throw (engine_error() << "raw::run without timeout failed");
   if (!run_with_timeout())
@@ -174,16 +180,20 @@ int main_test(int argc, char** argv) {
     throw (engine_error() << "raw::run with single quotes failed");
   if (!run_with_double_quotes())
     throw (engine_error() << "raw::run with double quotes failed");
-  return (0);
+  return (EXIT_SUCCESS);
 }
 
 /**
  *  Init unit test.
+ *
+ *  @param[in] argc Argument count.
+ *  @param[in] argc Argument values.
+ *
+ *  @return Same as main_test().
+ *
+ *  @see main_test
  */
-int main(int argc, char** argv) {
-  // rewrite basic process to remove QEventLoop.
-  return (1);
-
+int main(int argc, char* argv[]) {
   unittest utest(argc, argv, &main_test);
   return (utest.run());
 }
