@@ -46,7 +46,8 @@ namespace               commands {
   public:
                         raw(
                           std::string const& name,
-                          std::string const& command_line);
+                          std::string const& command_line,
+                          command_listener* listener = NULL);
                         raw(raw const& right);
                         ~raw() throw ();
     raw&                operator=(raw const& right);

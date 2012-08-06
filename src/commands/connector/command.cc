@@ -48,24 +48,23 @@ using namespace com::centreon::engine::commands;
  *  @param[in] command_name   The command name.
  *  @param[in] command_line   The command line.
  */
-connector::command::command(std::string const& connector_name,
-			    std::string const& connector_line,
-                            std::string const& command_name,
-			    std::string const& command_line)
-  : commands::command(command_name, command_line),
+connector::command::command(
+                      std::string const& connector_name,
+                      std::string const& connector_line,
+                      std::string const& command_name,
+                      std::string const& command_line,
+                      command_listener* listener)
+  : commands::command(command_name, command_line, listener),
     _connector_name(connector_name),
     _connector_line(connector_line),
-    _max_check_for_restart(DEFAULT_MAX_CHECK),
-    _nbr_check(0),
     _is_good_version(false),
     _active_timer(false),
     _is_exiting(false),
     _state_already_change(false) {
-  _req_func.insert(std::pair<request::e_type, void (command::*)(request*)>(request::version_r, &command::_req_version_r));
-  _req_func.insert(std::pair<request::e_type, void (command::*)(request*)>(request::execute_r, &command::_req_execute_r));
-  _req_func.insert(std::pair<request::e_type, void (command::*)(request*)>(request::quit_r, &command::_req_quit_r));
-  _req_func.insert(std::pair<request::e_type, void (command::*)(request*)>(request::error_r, &command::_req_error_r));
-  _start();
+  _req_func[request::version_r] = &command::_req_version_r;
+  _req_func[request::execute_r] = &command::_req_execute_r;
+  _req_func[request::quit_r] = &command::_req_quit_r;
+  _req_func[request::error_r] = &command::_req_error_r;
 }
 
 /**
@@ -74,7 +73,7 @@ connector::command::command(std::string const& connector_name,
  *  @parame[in] right The copy class.
  */
 connector::command::command(command const& right)
-  : commands::command(right), _active_timer(false) {
+  : commands::command(right) {
   operator=(right);
 }
 
@@ -92,15 +91,14 @@ connector::command::~command() throw() {
  *
  *  @return This object.
  */
-connector::command& connector::command::operator=(connector::command const& right) {
+connector::command& connector::command::operator=(
+                                          connector::command const& right) {
   if (this != &right) {
     _exit();
     commands::command::operator=(right);
     _connector_name = right._connector_name;
     _connector_line = right._connector_line;
     _req_func = right._req_func;
-    _max_check_for_restart = right._max_check_for_restart;
-    _nbr_check = right._nbr_check;
     _is_good_version = right._is_good_version;
     _active_timer = right._active_timer;
     _is_exiting = right._is_exiting;
@@ -128,25 +126,18 @@ commands::command* connector::command::clone() const {
  *
  *  @return The command id.
  */
-unsigned long connector::command::run(std::string const& processed_cmd,
-				      nagios_macros& macros,
-				      unsigned int timeout) {
+unsigned long connector::command::run(
+                                    std::string const& processed_cmd,
+                                    nagios_macros& macros,
+                                    unsigned int timeout) {
   (void)macros;
 
+  unsigned long id(get_uniq_id());
+
   concurrency::locker locker(&_mutex);
-
-  if (_nbr_check > _max_check_for_restart) {
-    locker.unlock();
-    _exit();
-    _start();
-    locker.relock();
-  }
-
-  if (_process->state() != QProcess::Running) {
-    throw (engine_error() << "connector \"" << _name << "\" not running.");
-  }
-
-  unsigned long id = get_uniq_id();
+  // XXX: todo this check.
+  // if (_process.state() != QProcess::Running)
+  //   throw (engine_error() << "connector \"" << _name << "\" not running.");
 
   timestamp now(timestamp::now());
   shared_ptr<request> query(new execute_query(
@@ -155,13 +146,10 @@ unsigned long connector::command::run(std::string const& processed_cmd,
                                   now,
                                   timeout));
   request_info info = { query, now, timeout, false };
+  _queries[id] = info;
 
-  _queries.insert(std::pair<unsigned long, request_info>(id, info));
-
-  {
-    std::string q(query->build());
-    _process->write(q.c_str(), q.size());
-  }
+  std::string q(query->build());
+  _process.write(q);
 
   logger(dbg_commands, basic)
     << "connector \"" << _name << "\" start (id="
@@ -169,7 +157,7 @@ unsigned long connector::command::run(std::string const& processed_cmd,
 
   if (_active_timer == false && timeout > 0) {
     _active_timer = true;
-    QTimer::singleShot(timeout * 1000, this, SLOT(_timeout()));
+    // QTimer::singleShot(timeout * 1000, this, SLOT(_timeout()));
   }
 
   return (id);
@@ -183,22 +171,16 @@ unsigned long connector::command::run(std::string const& processed_cmd,
  *  @param[in]      timeout The command timeout.
  *  @param[out]     res     The result of the command.
  */
-void connector::command::run(std::string const& processed_cmd,
-			     nagios_macros& macros,
-			     unsigned int timeout,
-			     result& res) {
+void connector::command::run(
+                           std::string const& processed_cmd,
+                           nagios_macros& macros,
+                           unsigned int timeout,
+                           result& res) {
   (void)macros;
 
   concurrency::locker locker(&_mutex);
 
-  if (_nbr_check > _max_check_for_restart) {
-    locker.unlock();
-    _exit();
-    _start();
-    locker.relock();
-  }
-
-  if (_process->state() != QProcess::Running) {
+  if (_process.state() != QProcess::Running) {
     throw (engine_error() << "connector \"" << _name << "\" not running.");
   }
 
@@ -211,11 +193,11 @@ void connector::command::run(std::string const& processed_cmd,
                                   now,
                                   timeout));
   request_info info = { query, now, timeout, true };
-  _queries.insert(std::pair<unsigned long, request_info>(id, info));
+  _queries[id] = info;
 
   {
     std::string q(query->build());
-    _process->write(q.c_str(), q.size());
+    _process.write(q.c_str(), q.size());
   }
 
   logger(dbg_commands, basic)
@@ -224,7 +206,7 @@ void connector::command::run(std::string const& processed_cmd,
 
   if (_active_timer == false && timeout > 0) {
     _active_timer = true;
-    QTimer::singleShot(timeout * 1000, this, SLOT(_timeout()));
+    // QTimer::singleShot(timeout * 1000, this, SLOT(_timeout()));
   }
 
   while (true) {
@@ -235,7 +217,7 @@ void connector::command::run(std::string const& processed_cmd,
     loop.exec();
     locker.relock();
 
-    std::map<unsigned long, result>::iterator it = _results.find(id);
+    umap<unsigned long, result>::iterator it = _results.find(id);
     if (it != _results.end()) {
       res = it->second;
       _results.erase(it);
@@ -263,26 +245,6 @@ std::string const& connector::command::get_connector_line() const throw() {
 }
 
 /**
- *  Get the max number check before restarting the process.
- *
- *  @return The max check for restart process.
- */
-unsigned long connector::command::get_max_check_for_restart() throw() {
-  concurrency::locker locker(&_mutex);
-  return (_max_check_for_restart);
-}
-
-/**
- *  Set the max time running process before restarting the process.
- *
- *  @param[in] value The max time for restart process.
- */
-void connector::command::set_max_check_for_restart(unsigned long value) throw() {
-  concurrency::locker locker(&_mutex);
-  _max_check_for_restart = value;
-}
-
-/**
  *  Slot notify when timeout occur.
  */
 void connector::command::_timeout() {
@@ -290,7 +252,7 @@ void connector::command::_timeout() {
 
   _active_timer = false;
   timestamp now(timestamp::now());
-  std::map<unsigned long, request_info>::iterator it = _queries.begin();
+  umap<unsigned long, request_info>::iterator it = _queries.begin();
   while (it != _queries.end()) {
     request_info& info(it->second);
     unsigned int
@@ -308,8 +270,8 @@ void connector::command::_timeout() {
       if (!info.waiting_result)
 	emit command_executed(res);
       else
-	_results.insert(std::pair<unsigned long, result>(id, res));
-      std::map<unsigned long, request_info>::iterator tmp(it);
+	_results[id] = res;
+      umap<unsigned long, request_info>::iterator tmp(it);
       ++tmp;
       _queries.erase(it);
       it = tmp;
@@ -319,7 +281,7 @@ void connector::command::_timeout() {
     break ;
   }
 
-  for (std::map<unsigned long, request_info>::const_iterator it
+  for (umap<unsigned long, request_info>::const_iterator it
          = _queries.begin(), end = _queries.end();
        it != end;
        ++it) {
@@ -367,7 +329,7 @@ void connector::command::_ready_read() {
   // Read process output.
   {
     concurrency::locker locker(&_mutex);
-    _read_data.append(_process->readAllStandardOutput());
+    _read_data.append(_process.readAllStandardOutput());
     while (_read_data.size() > 0) {
       size_t pos(_read_data.find(request::cmd_ending()));
       if (pos == std::string::npos)
@@ -384,7 +346,7 @@ void connector::command::_ready_read() {
        ++it) {
     try {
       shared_ptr<request> req(req_builder.build(*it));
-      std::map<request::e_type, void (command::*)(request*)>::iterator
+      umap<request::e_type, void (command::*)(request*)>::iterator
 	it = _req_func.find(req->get_id());
       if (it == _req_func.end()) {
 	logger(log_runtime_warning, basic)
@@ -406,7 +368,6 @@ void connector::command::_ready_read() {
  */
 void connector::command::_start() {
   concurrency::locker locker(&_mutex);
-  _nbr_check = 0;
 
   if (_process.get()) {
     disconnect(&(*_process), SIGNAL(readyReadStandardOutput()),
@@ -418,10 +379,10 @@ void connector::command::_start() {
   connect(&(*_process), SIGNAL(readyReadStandardOutput()),
 	  this, SLOT(_ready_read()));
 
-  _process->closeReadChannel(QProcess::StandardError);
-  _process->start(_connector_line);
-  if (_process->waitForStarted(-1) == false)
-    throw (engine_error() << _process->errorString().toStdString());
+  _process.closeReadChannel(QProcess::StandardError);
+  _process.start(_connector_line);
+  if (_process.waitForStarted(-1) == false)
+    throw (engine_error() << _process.errorString().toStdString());
 
   connect(&(*_process), SIGNAL(stateChanged(QProcess::ProcessState)),
 	  this, SLOT(_state_change(QProcess::ProcessState)));
@@ -429,7 +390,7 @@ void connector::command::_start() {
   {
     version_query version;
     std::string v(version.build());
-    _process->write(v.c_str(), v.size());
+    _process.write(v.c_str(), v.size());
   }
 
   QEventLoop loop;
@@ -443,13 +404,13 @@ void connector::command::_start() {
     throw (engine_error() << "bad process version");
   }
 
-  for (std::map<unsigned long, request_info>::iterator
+  for (umap<unsigned long, request_info>::iterator
          it(_queries.begin()),
          end(_queries.end());
        it != end;
        ++it) {
     std::string req(it->second.req->build());
-    _process->write(req.c_str(), req.size());
+    _process.write(req.c_str(), req.size());
   }
 
   logger(log_info_message, basic)
@@ -468,7 +429,7 @@ void connector::command::_exit() {
   disconnect(&(*_process), SIGNAL(stateChanged(QProcess::ProcessState)),
 	     this, SLOT(_state_change(QProcess::ProcessState)));
 
-  if (_process->state() == QProcess::NotRunning)
+  if (_process.state() == QProcess::NotRunning)
     return ;
 
   _is_exiting = true;
@@ -480,16 +441,16 @@ void connector::command::_exit() {
   {
     quit_query quit;
     std::string q(quit.build());
-    _process->write(q.c_str(), q.size());
+    _process.write(q.c_str(), q.size());
   }
 
   locker.unlock();
   loop.exec();
   locker.relock();
 
-  _process->waitForFinished(1000);
-  if (_process->state() == QProcess::Running) {
-    _process->kill();
+  _process.waitForFinished(1000);
+  if (_process.state() == QProcess::Running) {
+    _process.kill();
     logger(log_info_message, basic)
       << "connector \"" << _name << "\" kill.";
   }
@@ -501,35 +462,35 @@ void connector::command::_exit() {
   _is_exiting = false;
 }
 
-/**
- *  Process quit response request.
- *
- *  @param[in] req The request to process.
- */
-void connector::command::_req_quit_r(request* req) {
-  (void)req;
-  emit _process_ending();
-}
+// /**
+//  *  Process quit response request.
+//  *
+//  *  @param[in] req The request to process.
+//  */
+// void connector::command::_req_quit_r(request* req) {
+//   (void)req;
+//   emit _process_ending();
+// }
 
-/**
- *  Process version response request.
- *
- *  @param[in] req The request to process.
- */
-void connector::command::_req_version_r(request* req) {
-  concurrency::locker locker(&_mutex);
-  version_response* res = static_cast<version_response*>(req);
+// /**
+//  *  Process version response request.
+//  *
+//  *  @param[in] req The request to process.
+//  */
+// void connector::command::_req_version_r(request* req) {
+//   concurrency::locker locker(&_mutex);
+//   version_response* res = static_cast<version_response*>(req);
 
-  if (res->get_major() < CENTREON_ENGINE_VERSION_MAJOR
-      || (res->get_major() == CENTREON_ENGINE_VERSION_MAJOR
-	  && res->get_minor() <= CENTREON_ENGINE_VERSION_MINOR)) {
-    _is_good_version = true;
-  }
-  else {
-    _is_good_version = false;
-  }
-  emit _wait_ending();
-}
+//   if (res->get_major() < CENTREON_ENGINE_VERSION_MAJOR
+//       || (res->get_major() == CENTREON_ENGINE_VERSION_MAJOR
+// 	  && res->get_minor() <= CENTREON_ENGINE_VERSION_MINOR)) {
+//     _is_good_version = true;
+//   }
+//   else {
+//     _is_good_version = false;
+//   }
+//   emit _wait_ending();
+// }
 
 /**
  *  Process execution response request.
@@ -542,14 +503,12 @@ void connector::command::_req_execute_r(request* req) {
 
   {
     concurrency::locker locker(&_mutex);
-    std::map<unsigned long, request_info>::iterator
+    umap<unsigned long, request_info>::iterator
       it = _queries.find(response->get_command_id());
-    if (it == _queries.end()) {
+    if (it == _queries.end())
       return;
-    }
     info = it->second;
     _queries.erase(it);
-    ++_nbr_check;
   }
 
   bool is_timeout = false;
@@ -558,44 +517,40 @@ void connector::command::_req_execute_r(request* req) {
                   - info.start_time.to_seconds())
       > info.timeout;
 
-  result res(
-           response->get_command_id(),
-           "",
-           "",
-           info.start_time,
-           response->get_end_time(),
-           STATE_CRITICAL,
-           is_timeout,
-           true);
+  result res;
+  res.command_id = response->get_command_id();
+  res.end_time = response->get_end_time();
+  res.exit_code = STATE_CRITICAL;
+  res.start_time = info.start_time;
+  res.exit_status = (is_timeout ? process::timeout : process::normal);
 
   if (!response->get_is_executed()) {
-    res.set_stderr("(" + response->get_stderr() + ")");
-    res.set_is_executed(false);
+    res.stderr = "(" + response->get_stderr() + ")";
+    res.exit_status = process::crash;
   }
   else if (is_timeout)
-    res.set_stderr("(Process Timeout)");
+    res.stderr = "(Process Timeout)";
   else {
-    if (response->get_exit_code() < -1 || response->get_exit_code() > 3) {
-      res.set_exit_code(STATE_UNKNOWN);
-    }
-    else {
-      res.set_exit_code(response->get_exit_code());
-    }
+    if (response->get_exit_code() < -1
+        || response->get_exit_code() > 3)
+      res.exit_code = STATE_UNKNOWN;
+    else
+      res.exit_code = response->get_exit_code();
 
-    res.set_stderr(response->get_stderr());
-    res.set_stdout(response->get_stdout());
+    res.stderr = response->get_stderr();
+    res.stdout = response->get_stdout();
   }
 
   logger(dbg_commands, basic)
     << "connector \"" << _name << "\" finished (id="
-    << res.get_command_id() << ").";
+    << res.command_id << ")";
 
   if (info.waiting_result == false) {
     emit command_executed(res);
   }
   else {
     concurrency::locker locker(&_mutex);
-    _results.insert(std::pair<unsigned long, result>(res.get_command_id(), res));
+    _results[res.command_id] = res;
   }
   emit _wait_ending();
 }
@@ -611,17 +566,20 @@ void connector::command::_req_error_r(request* req) {
   switch (response->get_code()) {
   case error_response::info:
     logger(log_info_message, basic)
-      << "connector \"" << _connector_name << "\" " << response->get_message();
+      << "connector \"" << _connector_name << "\" "
+      << response->get_message();
     break;
 
   case error_response::warning:
     logger(log_runtime_warning, basic)
-      << "connector \"" << _connector_name << "\" " << response->get_message();
+      << "connector \"" << _connector_name << "\" "
+      << response->get_message();
     break;
 
   case error_response::error:
     logger(log_runtime_error, basic)
-      << "connector \"" << _connector_name << "\" " << response->get_message();
+      << "connector \"" << _connector_name << "\" "
+      << response->get_message();
     _exit();
     break;
   }

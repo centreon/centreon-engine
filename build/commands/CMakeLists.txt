@@ -21,26 +21,27 @@
 set(SRC_DIR "${SRC_DIR}/commands")
 set(INC_DIR "${INC_DIR}/com/centreon/engine/commands")
 
-# connector command is required.
-#add_subdirectory("connector")
+# Connector command is required.
+# add_subdirectory("connector")
 
 # cce_broker target.
 add_library("cce_commands"
   STATIC
   "${SRC_DIR}/command.cc"
+#  "${SRC_DIR}/connector.cc"
   "${SRC_DIR}/environment.cc"
   "${SRC_DIR}/raw.cc"
   "${SRC_DIR}/result.cc"
   "${SRC_DIR}/set.cc"
   "${INC_DIR}/command.hh"
+  "${INC_DIR}/command_listener.hh"
+#  "${INC_DIR}/connector.hh"
   "${INC_DIR}/environment.hh"
   "${INC_DIR}/raw.hh"
   "${INC_DIR}/result.hh"
-  "${INC_DIR}/set.hh"
-  ${QT_MOC_FILES})
+  "${INC_DIR}/set.hh")
 
 # Link target with required libraries.
-# XXX: target_link_libraries("cce_commands" "cce_connector" ${QT_LIBRARIES})
 target_link_libraries("cce_commands")
 
 if (WITH_TESTING)

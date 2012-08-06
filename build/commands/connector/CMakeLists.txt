@@ -21,9 +21,6 @@
 set(SRC_DIR "${SRC_DIR}/connector")
 set(INC_DIR "${INC_DIR}/connector")
 
-# Produce moc files.
-qt4_wrap_cpp(QT_MOC_FILES "${INC_DIR}/command.hh")
-
 # cce_connector target.
 add_library("cce_connector"
   STATIC
@@ -48,8 +45,7 @@ add_library("cce_connector"
   "${INC_DIR}/request.hh"
   "${INC_DIR}/request_builder.hh"
   "${INC_DIR}/version_query.hh"
-  "${INC_DIR}/version_response.hh"
-  ${QT_MOC_FILES})
+  "${INC_DIR}/version_response.hh")
 
 # Link target with libraries.
 # target_link_libraries("cce_connector" "cce_core" ${QT_LIBRARIES})

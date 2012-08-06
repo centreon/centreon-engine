@@ -20,9 +20,9 @@
 #ifndef CCE_COMMANDS_COMMAND_HH
 #  define CCE_COMMANDS_COMMAND_HH
 
-#  include <QObject>
 #  include <string>
 #  include "com/centreon/concurrency/mutex.hh"
+#  include "com/centreon/engine/commands/command_listener.hh"
 #  include "com/centreon/engine/commands/result.hh"
 #  include "com/centreon/engine/macros.hh"
 #  include "com/centreon/engine/namespace.hh"
@@ -34,14 +34,15 @@ namespace                      commands {
    *  @class command command.hh
    *  @brief Execute command and send the result.
    *
-   *  Command execute a command line with their arguments and send the
-   *  result by a signal.
+   *  Command execute a command line with their arguments and
+   *  notify listener at the end of the command.
    */
   class                        command {
   public:
                                command(
                                  std::string const& name,
-                                 std::string const& command_line);
+                                 std::string const& command_line,
+                                 command_listener* listener = NULL);
     virtual                    ~command() throw ();
     bool                       operator==(
                                  command const& right) const throw ();
@@ -49,6 +50,7 @@ namespace                      commands {
                                  command const& right) const throw ();
     virtual command*           clone() const = 0;
     virtual std::string const& get_command_line() const throw ();
+    command_listener*          get_listener() const throw ();
     virtual std::string const& get_name() const throw ();
     virtual std::string        process_cmd(nagios_macros* macros) const;
     virtual unsigned long      run(
@@ -62,10 +64,8 @@ namespace                      commands {
                                  result& res) = 0;
     virtual void               set_command_line(
                                  std::string const& command_line);
-
-  signals:
-    void                       command_executed(
-                                 commands::result const& res);
+    void                       set_listener(
+                                 command_listener* listener) throw ();
 
   protected:
                                command(command const& right);
@@ -73,6 +73,7 @@ namespace                      commands {
     static unsigned long       get_uniq_id();
 
     std::string                _command_line;
+    command_listener*          _listener;
     std::string                _name;
   };
 }

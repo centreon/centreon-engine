@@ -386,19 +386,6 @@ void checker::run(
     start_time.tv_sec);
   update_check_stats(PARALLEL_HOST_CHECK_STATS, start_time.tv_sec);
 
-  // Change signal connection type.
-  // disconnect(
-  //   &(*cmd),
-  //   SIGNAL(command_executed(cce_commands_result const&)),
-  //   this,
-  //   SLOT(_command_executed(cce_commands_result const&)));
-  // connect(
-  //   &(*cmd),
-  //   SIGNAL(command_executed(cce_commands_result const&)),
-  //   this,
-  //   SLOT(_command_executed(cce_commands_result const&)),
-  //   Qt::QueuedConnection);
-
   // Run command.
   unsigned long id(cmd->run(
                           processed_cmd,
@@ -589,19 +576,6 @@ void checker::run(
     ? ACTIVE_SCHEDULED_SERVICE_CHECK_STATS
     : ACTIVE_ONDEMAND_SERVICE_CHECK_STATS,
     start_time.tv_sec);
-
-  // Change signal connection type.
-  // disconnect(
-  //   &(*cmd),
-  //   SIGNAL(command_executed(cce_commands_result const&)),
-  //   this,
-  //   SLOT(_command_executed(cce_commands_result const&)));
-  // connect(
-  //   &(*cmd),
-  //   SIGNAL(command_executed(cce_commands_result const&)),
-  //   this,
-  //   SLOT(_command_executed(cce_commands_result const&)),
-  //   Qt::QueuedConnection);
 
   // Run command.
   unsigned long id(cmd->run(
@@ -811,11 +785,39 @@ void checker::unload() {
 **************************************/
 
 /**
+ *  Default constructor.
+ */
+checker::checker() {
+
+}
+
+/**
+ *  Copy constructor.
+ *
+ *  @param[in] right Object to copy.
+ */
+checker::checker(checker const& right) {
+  _internal_copy(right);
+}
+
+/**
+ *  Assignment operator.
+ *
+ *  @param[in] right Object to copy.
+ *
+ *  @return This object.
+ */
+checker& checker::operator=(checker const& right) {
+  _internal_copy(right);
+  return (*this);
+}
+
+/**
  *  Slot to catch the result of the execution and add to the reap queue.
  *
  *  @param[in] res The result of the execution.
  */
-void checker::_command_executed(commands::result const& res) {
+void checker::finished(commands::result const& res) throw () {
   // Debug message.
   logger(dbg_functions, basic) << "start " << __func__;
 
@@ -857,34 +859,6 @@ void checker::_command_executed(commands::result const& res) {
   // Debug message.
   logger(dbg_functions, basic) << "end " << __func__;
   return;
-}
-
-/**
- *  Default constructor.
- */
-checker::checker() {
-
-}
-
-/**
- *  Copy constructor.
- *
- *  @param[in] right Object to copy.
- */
-checker::checker(checker const& right) {
-  _internal_copy(right);
-}
-
-/**
- *  Assignment operator.
- *
- *  @param[in] right Object to copy.
- *
- *  @return This object.
- */
-checker& checker::operator=(checker const& right) {
-  _internal_copy(right);
-  return (*this);
 }
 
 /**

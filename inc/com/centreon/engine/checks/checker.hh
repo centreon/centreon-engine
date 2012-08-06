@@ -24,6 +24,7 @@
 #  include "com/centreon/concurrency/mutex.hh"
 #  include "com/centreon/engine/checks.hh"
 #  include "com/centreon/engine/commands/command.hh"
+#  include "com/centreon/engine/commands/command_listener.hh"
 #  include "com/centreon/engine/commands/result.hh"
 #  include "com/centreon/engine/namespace.hh"
 #  include "com/centreon/engine/objects.hh"
@@ -39,7 +40,8 @@ namespace                checks {
    *  Checker is a singleton to run host or service and reap the
    *  result.
    */
-  class                  checker {
+  class                  checker
+    : public commands::command_listener {
   public:
     static checker&      instance();
     static void          load();
@@ -76,12 +78,9 @@ namespace                checks {
                          checker(checker const& right);
                          ~checker() throw ();
     checker&             operator=(checker const& right);
+    void                 finished(commands::result const& res) throw ();
     int                  _execute_sync(host* hst);
     void                 _internal_copy(checker const& right);
-
-    void                 _command_executed(
-                           commands::result const& res);
-
 
     umap<unsigned long, check_result>
                          _list_id;

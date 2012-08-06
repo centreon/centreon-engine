@@ -42,7 +42,7 @@ add_library("cce_logging"
 )
 
 # Link target with necessary libraries.
-target_link_libraries("cce_logging" ${QT_LIBRARIES} "cce_core")
+target_link_libraries("cce_logging" "cce_core")
 
 if (WITH_TESTING)
   # Set directories.

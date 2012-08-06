@@ -40,9 +40,13 @@ using namespace com::centreon::engine::commands;
  *
  *  @param[in] name         The command name.
  *  @param[in] command_line The command line.
+ *  @param[in] listener     The listener who catch events.
  */
-raw::raw(std::string const& name, std::string const& command_line)
-  : command(name, command_line) {
+raw::raw(
+       std::string const& name,
+       std::string const& command_line,
+       command_listener* listener)
+  : command(name, command_line, listener) {
 
 }
 
@@ -235,7 +239,9 @@ void raw::finished(process& p) throw () {
   res.exit_code = p.exit_code();
   res.exit_status = p.exit_status();
 
-  // XXX: todo forward res.
+  // Forward result to the listener.
+  if (_listener)
+    (_listener->finished)(res);
 
   _processes_free.push_back(&p);
 
@@ -470,8 +476,11 @@ void raw::_build_macrosx_environment(
  *  @return A process.
  */
 process* raw::_get_free_process() {
-  if (_processes_free.empty())
-    return (new process(this));
+  if (_processes_free.empty()) {
+    process* p(new process(this));
+    p->enable_stream(process::err, false);
+    return (p);
+  }
   process* p(_processes_free.front());
   _processes_free.pop_front();
   return (p);

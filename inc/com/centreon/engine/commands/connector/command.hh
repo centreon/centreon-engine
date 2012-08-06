@@ -20,110 +20,93 @@
 #ifndef CCE_COMMANDS_CONNECTOR_COMMAND_HH
 #  define CCE_COMMANDS_CONNECTOR_COMMAND_HH
 
-#  include <map>
-#  include <QTimer>
 #  include "com/centreon/concurrency/mutex.hh"
-#  include "com/centreon/engine/commands/basic_process.hh"
 #  include "com/centreon/engine/commands/command.hh"
 #  include "com/centreon/engine/commands/connector/execute_query.hh"
+#  include "com/centreon/engine/namespace.hh"
+#  include "com/centreon/process.hh"
+#  include "com/centreon/process_listener.hh"
 #  include "com/centreon/shared_ptr.hh"
+#  include "com/centreon/unordered_hash.hh"
 
-namespace                              com {
-  namespace                            centreon {
-    namespace                          engine {
-      namespace                        commands {
-        namespace                      connector {
-        /**
-         *  @class command commands/connector/command.hh
-         *  @brief Command is a specific implementation of commands::command.
-         *
-         *  Command is a specific implementation of commands::command who
-         *  provide connector, is more efficiente that a raw command.
-         */
-          class                        command : public commands::command {
-            Q_OBJECT
+CCE_BEGIN()
 
-          public:
-                                       command(
-                                         std::string const& connector_name,
-                                         std::string const& connector_line,
-                                         std::string const& command_name,
-                                         std::string const& command_line);
-                                       command(command const& right);
-                                       ~command() throw();
+namespace                        commands {
+  namespace                      connector {
+    /**
+     *  @class command commands/connector/command.hh
+     *  @brief Command is a specific implementation of commands::command.
+     *
+     *  Command is a specific implementation of commands::command who
+     *  provide connector, is more efficiente that a raw command.
+     */
+    class                        command
+      : public commands::command,
+        public process_listener {
+    public:
+      command(
+              std::string const& connector_name,
+              std::string const& connector_line,
+              std::string const& command_name,
+              std::string const& command_line,
+              command_listener* listener = NULL);
+      command(command const& right);
+      ~command() throw();
+      command&                   operator=(command const& right);
+      commands::command*         clone() const;
+      unsigned long              run(
+                                     std::string const& processed_cmd,
+                                     nagios_macros& macros,
+                                     unsigned int timeout);
+      void                       run(
+                                     std::string const& processed_cmd,
+                                     nagios_macros& macros,
+                                     unsigned int timeout,
+                                     result& res);
+      std::string const&         get_connector_name() const throw ();
+      std::string const&         get_connector_line() const throw ();
 
-            command&                   operator=(command const& right);
+    // signals:
+    //   void                       _wait_ending();
+    //   void                       _process_ending();
 
-            commands::command*         clone() const;
+    // private slots:
+    //   void                       _timeout();
+    //   void                       _state_change(QProcess::ProcessState new_state);
+    //   void                       _ready_read();
 
-            unsigned long              run(
-                                         std::string const& processed_cmd,
-                                         nagios_macros& macros,
-                                         unsigned int timeout);
+    private:
+      struct                     request_info {
+        shared_ptr<request>      req;
+        timestamp                start_time;
+        unsigned int             timeout;
+        bool                     waiting_result;
+      };
 
-            void                       run(
-                                         std::string const& processed_cmd,
-                                         nagios_macros& macros,
-                                         unsigned int timeout,
-                                         result& res);
+      void                       _exit();
+      void                       _start();
 
-            std::string const&         get_connector_name() const throw ();
-            std::string const&         get_connector_line() const throw ();
+      void                       _req_quit_r(request* req);
+      void                       _req_version_r(request* req);
+      void                       _req_execute_r(request* req);
+      void                       _req_error_r(request* req);
 
-            unsigned long              get_max_check_for_restart() throw();
-            void                       set_max_check_for_restart(unsigned long value) throw();
-
-          signals:
-            void                       _wait_ending();
-            void                       _process_ending();
-
-          private slots:
-            void                       _timeout();
-            void                       _state_change(QProcess::ProcessState new_state);
-            void                       _ready_read();
-
-          private:
-            struct                     request_info {
-              com::centreon::shared_ptr<request>
-                                       req;
-              com::centreon::timestamp start_time;
-              unsigned int             timeout;
-              bool                     waiting_result;
-            };
-
-            void                       _exit();
-            void                       _start();
-
-            void                       _req_quit_r(request* req);
-            void                       _req_version_r(request* req);
-            void                       _req_execute_r(request* req);
-            void                       _req_error_r(request* req);
-
-            std::string                _read_data;
-            concurrency::mutex         _mutex;
-            std::string                _connector_name;
-            std::string                _connector_line;
-            com::centreon::shared_ptr<basic_process>
-                                       _process;
-            std::map<unsigned long, request_info>
-                                       _queries;
-            std::map<unsigned long, result>
-                                       _results;
-            std::map<request::e_type, void (command::*)(request*)>
-                                       _req_func;
-            unsigned long              _max_check_for_restart;
-            unsigned long              _nbr_check;
-            bool                       _is_good_version;
-            bool                       _active_timer;
-            bool                       _is_exiting;
-            bool                       _state_already_change;
-
-            static const unsigned long DEFAULT_MAX_CHECK = 10000;
-          };
-        }
-      }
-    }
+      std::string                _read_data;
+      concurrency::mutex         _mutex;
+      std::string                _connector_name;
+      std::string                _connector_line;
+      process                    _process;
+      umap<unsigned long, request_info> _queries;
+      umap<unsigned long, result> _results;
+      umap<request::e_type, void (command::*)(request*)> _req_func;
+      bool                       _is_good_version;
+      bool                       _active_timer;
+      bool                       _is_exiting;
+      bool                       _state_already_change;
+    };
   }
 }
+
+CCE_END()
 
 #endif // !CCE_COMMANDS_CONNECTOR_COMMAND_HH

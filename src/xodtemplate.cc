@@ -31,6 +31,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 // XXX: #include "com/centreon/engine/commands/connector/command.hh"
+#include "com/centreon/engine/checks/checker.hh"
 #include "com/centreon/engine/commands/raw.hh"
 #include "com/centreon/engine/commands/set.hh"
 #include "com/centreon/engine/common.hh"
@@ -9680,7 +9681,8 @@ int xodtemplate_register_command(xodtemplate_command* this_command) {
       com::centreon::shared_ptr<commands::command>
         cmd_set(new commands::raw(
                                 this_command->command_name,
-                                this_command->command_line));
+                                this_command->command_line,
+                                &checks::checker::instance()));
       commands::set::instance().add_command(cmd_set);
     }
     else {
@@ -9704,7 +9706,8 @@ int xodtemplate_register_command(xodtemplate_command* this_command) {
       //                                      connector->connector_name,
       //                                      connector->connector_line,
       //                                      this_command->command_name,
-      //                                      this_command->command_line));
+      //                                      this_command->command_line,
+      //                                      &checks::checker::instance()));
       // commands::set::instance().add_command(cmd_set);
     }
   }

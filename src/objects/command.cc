@@ -17,6 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "com/centreon/engine/checks/checker.hh"
 #include "com/centreon/engine/commands/raw.hh"
 #include "com/centreon/engine/commands/set.hh"
 #include "com/centreon/engine/error.hh"
@@ -84,7 +85,10 @@ void objects::link(command const* obj) {
   // update command executon system.
   commands::set& cmd_set = commands::set::instance();
   com::centreon::shared_ptr<commands::command>
-    new_command(new commands::raw(obj->name, obj->command_line));
+    new_command(new commands::raw(
+                                obj->name,
+                                obj->command_line,
+                                &checks::checker::instance()));
   cmd_set.add_command(new_command);
 }
 

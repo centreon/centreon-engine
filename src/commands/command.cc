@@ -31,11 +31,14 @@ static unsigned long      _id = 0;
  *
  *  @param[in] name         The command name.
  *  @param[in] command_line The command line.
+ *  @param[in] listener     The command listener to catch events.
  */
 commands::command::command(
                      std::string const& name,
-                     std::string const& command_line)
+                     std::string const& command_line,
+                     command_listener* listener)
   : _command_line(command_line),
+    _listener(listener),
     _name(name) {
 
 }
@@ -70,15 +73,6 @@ bool commands::command::operator!=(command const& right) const throw() {
 }
 
 /**
- *  Get the command name.
- *
- *  @return The command name.
- */
-std::string const& commands::command::get_name() const throw() {
-  return (_name);
-}
-
-/**
  *  Get the command line.
  *
  *  @return The command line.
@@ -88,12 +82,40 @@ std::string const& commands::command::get_command_line() const throw() {
 }
 
 /**
+ *  Get the command listener.
+ *
+ *  @return The listener who catch events.
+ */
+commands::command_listener* commands::command::get_listener() const throw() {
+  return (_listener);
+}
+
+/**
+ *  Get the command name.
+ *
+ *  @return The command name.
+ */
+std::string const& commands::command::get_name() const throw() {
+  return (_name);
+}
+
+/**
  *  Set the command line.
  *
  *  @param[in] command_line The command line.
  */
 void commands::command::set_command_line(std::string const& command_line) {
   _command_line = command_line;
+}
+
+/**
+ *  Set the command listener.
+ *
+ *  @param[in] listener  The listener who catch events.
+ */
+void commands::command::set_listener(
+                          commands::command_listener* listener) throw () {
+  _listener = listener;
 }
 
 /**
@@ -114,8 +136,9 @@ commands::command::command(commands::command const& right) {
  */
 commands::command& commands::command::operator=(commands::command const& right) {
   if (this != &right) {
-    _name = right._name;
     _command_line = right._command_line;
+    _listener = right._listener;
+    _name = right._name;
   }
   return (*this);
 }
