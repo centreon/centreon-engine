@@ -30,8 +30,7 @@ using namespace com::centreon::engine;
 using namespace com::centreon::engine::commands;
 
 #define DEFAULT_ID     42
-#define DEFAULT_STDOUT "stdout string test"
-#define DEFAULT_STDERR "stderr string test"
+#define DEFAULT_OUTPUT "output string test"
 #define DEFAULT_RETURN 0
 #define DEFAULT_STATUS process::normal
 
@@ -50,8 +49,7 @@ int main_test(int argc, char** argv) {
   // Default constructor.
   result res1;
   if ((res1.command_id != 0)
-      || (res1.stdout != "")
-      || (res1.stderr != "")
+      || (res1.output != "")
       || (res1.exit_code != 0)
       || (res1.exit_status != process::normal)
       || (res1.start_time != 0)
@@ -62,15 +60,13 @@ int main_test(int argc, char** argv) {
   com::centreon::timestamp now(com::centreon::timestamp::now());
   result res2;
   res2.command_id = DEFAULT_ID;
-  res2.stdout = DEFAULT_STDOUT;
-  res2.stderr = DEFAULT_STDERR;
+  res2.output = DEFAULT_OUTPUT;
   res2.start_time = now;
   res2.end_time = now;
   res2.exit_code = DEFAULT_RETURN;
   res2.exit_status = DEFAULT_STATUS;
   if ((res2.command_id != DEFAULT_ID)
-      || (res2.stdout != DEFAULT_STDOUT)
-      || (res2.stderr != DEFAULT_STDERR)
+      || (res2.output != DEFAULT_OUTPUT)
       || (res2.exit_code != DEFAULT_RETURN)
       || (res2.exit_status != DEFAULT_STATUS)
       || (res2.start_time != now)

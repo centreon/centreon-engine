@@ -48,9 +48,10 @@ if (WITH_TESTING)
   add_test("environment_add" "environment_add")
 
   # Test environment.
-  add_executable("environment_compare" "${TEST_DIR}/environment_compare.cc")
-  target_link_libraries("environment_compare" "cce_core")
-  add_test("environment_compare" "environment_comapre")
+  set(TEST_NAME "environment_compare")
+  add_executable("${TEST_NAME}" "${TEST_DIR}/environment_compare.cc")
+  target_link_libraries("${TEST_NAME}" "cce_core")
+  add_test("${TEST_NAME}" "${TEST_NAME}")
 
   # Test environment.
   add_executable("environment_ctor" "${TEST_DIR}/environment_ctor.cc")

@@ -48,8 +48,7 @@ static bool run_without_timeout() {
   return (!((cmd_res.command_id == 0)
             || (cmd_res.exit_code != STATE_OK)
             || (cmd_res.exit_status != process::normal)
-            || (cmd_res.stdout != cmd.get_command_line())
-            || (cmd_res.stderr != "")));
+            || (cmd_res.output != cmd.get_command_line())));
 }
 
 /**
@@ -70,8 +69,7 @@ static bool run_with_timeout() {
   return (!((cmd_res.command_id == 0)
             || (cmd_res.exit_code != STATE_CRITICAL)
             || (cmd_res.exit_status != process::normal)
-            || (cmd_res.stdout != "")
-            || (cmd_res.stderr != "(Process Timeout)")));
+            || (cmd_res.output != "(Process Timeout)")));
 }
 
 /**
@@ -101,8 +99,7 @@ static bool run_with_environment_macros() {
   return (!((cmd_res.command_id == 0)
             || (cmd_res.exit_code != STATE_OK)
             || (cmd_res.exit_status != process::normal)
-            || (cmd_res.stdout != cmd.get_command_line())
-            || (cmd_res.stderr != "")));
+            || (cmd_res.output != cmd.get_command_line())));
 }
 
 /**
@@ -123,8 +120,7 @@ static bool run_with_single_quotes() {
   return (!((cmd_res.command_id == 0)
             || (cmd_res.exit_code != STATE_OK)
             || (cmd_res.exit_status != process::normal)
-            || (cmd_res.stdout != "./bin_test_run --timeout=off")
-            || (cmd_res.stderr != "")));
+            || (cmd_res.output != "./bin_test_run --timeout=off")));
 }
 
 /**
@@ -145,8 +141,7 @@ static bool run_with_double_quotes() {
   return (!((cmd_res.command_id == 0)
             || (cmd_res.exit_code != STATE_OK)
             || (cmd_res.exit_status != process::normal)
-            || (cmd_res.stdout != "./bin_test_run --timeout=off")
-            || (cmd_res.stderr != "")));
+            || (cmd_res.output != "./bin_test_run --timeout=off")));
 }
 
 /**

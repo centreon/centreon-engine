@@ -30,8 +30,7 @@ using namespace com::centreon::engine;
 using namespace com::centreon::engine::commands;
 
 #define DEFAULT_ID      42
-#define DEFAULT_STDOUT  "stdout string test"
-#define DEFAULT_STDERR  "stderr string test"
+#define DEFAULT_OUTPUT  "output string test"
 #define DEFAULT_RETURN  0
 #define DEFAULT_STATUS  process::normal
 
@@ -51,8 +50,7 @@ int main_test(int argc, char** argv) {
   timestamp now(timestamp::now());
   result res;
   res.command_id = DEFAULT_ID;
-  res.stdout = DEFAULT_STDOUT;
-  res.stderr = DEFAULT_STDERR;
+  res.output = DEFAULT_OUTPUT;
   res.start_time = now;
   res.end_time = now;
   res.exit_code = DEFAULT_RETURN;
