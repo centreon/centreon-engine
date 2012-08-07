@@ -17,13 +17,13 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <climits>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <ctime>
 #include <fstream>
-#include <limits.h>
 #include <map>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <time.h>
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/macros.hh"
@@ -588,12 +588,12 @@ int main_test(int argc, char** argv) {
   srandom(time(NULL));
 
   // Generate temporary file names.
-  char const* mainconf_path_ptr(tempnam("./", "centengine_cfg."));
+  char const* mainconf_path_ptr(tmpnam(NULL));
   if (!mainconf_path_ptr)
     throw (engine_error() << "generate temporary file failed");
   std::string mainconf_path(mainconf_path_ptr);
 
-  char const* resource_path_ptr(tempnam("./", "centengine_cfg."));
+  char const* resource_path_ptr(tmpnam(NULL));
   if (!resource_path_ptr)
     throw (engine_error() << "generate temporary file failed");
   std::string resource_path(resource_path_ptr);

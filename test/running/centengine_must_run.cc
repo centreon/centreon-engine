@@ -37,8 +37,10 @@ using namespace com::centreon::engine;
  */
 int main(int argc, char* argv[]) {
   int retval(EXIT_FAILURE);
-  com::centreon::clib::load();
   try {
+    // Initialization.
+    com::centreon::clib::load();
+
     // Check arguments.
     if (argc < 2)
       throw (engine_error() << "USAGE: "
@@ -83,6 +85,9 @@ int main(int argc, char* argv[]) {
   catch (...) {
     std::cerr << "unknown error" << std::endl;
   }
+
+  // Shutdown.
   com::centreon::clib::unload();
+
   return (retval);
 }

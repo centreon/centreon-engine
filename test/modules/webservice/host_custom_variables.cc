@@ -17,8 +17,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <cstdlib>
 #include <iostream>
-#include <stdlib.h>
 #include "com/centreon/clib.hh"
 #include "com/centreon/engine/error.hh"
 #include "test/modules/webservice/engine.hh"
@@ -38,6 +38,7 @@ int main(int argc, char** argv) {
   // Return value.
   int retval;
 
+  // Initialization.
   com::centreon::clib::load();
 
   // Start Engine.
@@ -68,23 +69,20 @@ int main(int argc, char** argv) {
 
     // XXX
 
-    // Shutdown Engine.
-    e.stop();
-
     // Success.
     retval = EXIT_SUCCESS;
   }
   catch (std::exception const& x) {
     std::cerr << x.what() << std::endl;
     retval = EXIT_FAILURE;
-    e.stop();
   }
   catch (...) {
     std::cerr << "unknown exception" << std::endl;
     retval = EXIT_FAILURE;
-    e.stop();
   }
 
+  // Cleanup.
+  e.stop();
   com::centreon::clib::unload();
 
   return (retval);

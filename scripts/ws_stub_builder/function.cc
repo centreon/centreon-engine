@@ -1,5 +1,5 @@
 /*
-** Copyright 2011 Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -19,9 +19,9 @@
 
 #include <algorithm>
 #include <cctype>
+#include <cstring>
 #include <regex.h>
 #include <sstream>
-#include <string.h>
 #include "arg_definition.hh"
 #include "error.hh"
 #include "function.hh"
@@ -30,11 +30,11 @@ using namespace com::centreon::engine::script;
 
 // Regexp pattern to extract name and arguments of soapStub function.
 char const* com::centreon::engine::script::function::_pattern =
-  "^SOAP_FMAC5 int SOAP_FMAC6 soap_call_centreonengine__(\\w*)\\("
+  "^SOAP_FMAC5 int SOAP_FMAC6 soap_call_centreonengine__([^\\(]*)\\("
   "struct soap \\*soap, "
   "const char \\*soap_endpoint, "
   "const char \\*soap_action, "
-  "(.*)\\);\n$";
+  "([^\\)]*)\\);$";
 
 /**************************************
 *                                     *
