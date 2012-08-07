@@ -20,6 +20,7 @@
 #include <cstdlib>
 #include <ctime>
 #include <iostream>
+#include "com/centreon/clib.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/process.hh"
 #include "test/paths.hh"
@@ -36,6 +37,7 @@ using namespace com::centreon::engine;
  */
 int main(int argc, char* argv[]) {
   int retval(EXIT_FAILURE);
+  com::centreon::clib::load();
   try {
     // Check arguments.
     if (argc < 2)
@@ -81,5 +83,6 @@ int main(int argc, char* argv[]) {
   catch (...) {
     std::cerr << "unknown error" << std::endl;
   }
+  com::centreon::clib::unload();
   return (retval);
 }

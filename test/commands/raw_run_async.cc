@@ -18,6 +18,7 @@
 */
 
 #include <cstdlib>
+#include <cstring>
 #include <exception>
 #include "com/centreon/engine/commands/raw.hh"
 #include "com/centreon/engine/error.hh"
@@ -42,15 +43,16 @@ static bool run_without_timeout() {
 
   // Run command and wait for it to exit.
   nagios_macros mac;
+  memset(&mac, 0, sizeof(mac));
   unsigned long id(cmd.run(cmd.get_command_line(), mac, 0));
   wait_proc.wait();
 
   // Check result.
-  result const& cmd_res = wait_proc.get_result();
-  return (!((cmd_res.command_id != id)
-            || (cmd_res.exit_code != STATE_OK)
-            || (cmd_res.exit_status != process::normal)
-            || (cmd_res.output != cmd.get_command_line())));
+  result const& res = wait_proc.get_result();
+  return (!((res.command_id != id)
+            || (res.exit_code != STATE_OK)
+            || (res.exit_status != process::normal)
+            || (res.output != cmd.get_command_line())));
 }
 
 /**
@@ -65,15 +67,16 @@ static bool run_with_timeout() {
 
   // Run command and wait for it to exit.
   nagios_macros mac;
+  memset(&mac, 0, sizeof(mac));
   unsigned long id(cmd.run(cmd.get_command_line(), mac, 1));
   wait_proc.wait();
 
   // Check result.
-  result const& cmd_res = wait_proc.get_result();
-  return (!((cmd_res.command_id != id)
-            || (cmd_res.exit_code != STATE_CRITICAL)
-            || (cmd_res.exit_status != process::normal)
-            || (cmd_res.output != "(Process Timeout)")));
+  result const& res = wait_proc.get_result();
+  return (!((res.command_id != id)
+            || (res.exit_code != STATE_CRITICAL)
+            || (res.exit_status != process::timeout)
+            || (res.output != "(Process Timeout)")));
 }
 
 /**
@@ -86,26 +89,27 @@ static bool run_with_environment_macros() {
   config.set_enable_environment_macros(true);
 
   // Get environment macros.
-  nagios_macros macros;
+  nagios_macros mac;
+  memset(&mac, 0, sizeof(mac));
   char const* argv = "default_arg";
-  macros.argv[0] = new char[strlen(argv) + 1];
-  strcpy(macros.argv[0], argv);
+  mac.argv[0] = new char[strlen(argv) + 1];
+  strcpy(mac.argv[0], argv);
 
   // Raw command object and its waiter.
   raw cmd(__func__, "./bin_test_run --check_macros");
   wait_process wait_proc(&cmd);
 
   // Run command and wait for it to exit.
-  unsigned long id(cmd.run(cmd.get_command_line(), macros, 0));
+  unsigned long id(cmd.run(cmd.get_command_line(), mac, 0));
   wait_proc.wait();
-  delete [] macros.argv[0];
+  delete [] mac.argv[0];
 
   // Check result.
-  result const& cmd_res = wait_proc.get_result();
-  return (!((cmd_res.command_id != id)
-            || (cmd_res.exit_code != STATE_OK)
-            || (cmd_res.exit_status != process::normal)
-            || (cmd_res.output != cmd.get_command_line())));
+  result const& res = wait_proc.get_result();
+  return (!((res.command_id != id)
+            || (res.exit_code != STATE_OK)
+            || (res.exit_status != process::normal)
+            || (res.output != cmd.get_command_line())));
 }
 
 /**
@@ -120,15 +124,16 @@ static bool run_with_single_quotes() {
 
   // Run command and wait for it to exit.
   nagios_macros mac;
+  memset(&mac, 0, sizeof(mac));
   unsigned long id(cmd.run(cmd.get_command_line(), mac, 0));
   wait_proc.wait();
 
   // Check result.
-  result const& cmd_res = wait_proc.get_result();
-  return (!((cmd_res.command_id != id)
-            || (cmd_res.exit_code != STATE_OK)
-            || (cmd_res.exit_status != process::normal)
-            || (cmd_res.output != "./bin_test_run --timeout=off")));
+  result const& res = wait_proc.get_result();
+  return (!((res.command_id != id)
+            || (res.exit_code != STATE_OK)
+            || (res.exit_status != process::normal)
+            || (res.output != "./bin_test_run --timeout=off")));
 }
 
 /**
@@ -143,15 +148,16 @@ static bool run_with_double_quotes() {
 
   // Run command and wait for it to exit.
   nagios_macros mac;
+  memset(&mac, 0, sizeof(mac));
   unsigned long id(cmd.run(cmd.get_command_line(), mac, 0));
   wait_proc.wait();
 
   // Check result.
-  result const& cmd_res = wait_proc.get_result();
-  return (!((cmd_res.command_id != id)
-            || (cmd_res.exit_code != STATE_OK)
-            || (cmd_res.exit_status != process::normal)
-            || (cmd_res.output != "./bin_test_run --timeout=off")));
+  result const& res = wait_proc.get_result();
+  return (!((res.command_id != id)
+            || (res.exit_code != STATE_OK)
+            || (res.exit_status != process::normal)
+            || (res.output != "./bin_test_run --timeout=off")));
 }
 
 /**

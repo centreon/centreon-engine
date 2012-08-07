@@ -27,6 +27,7 @@
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/macros.hh"
 #include "com/centreon/engine/macros/misc.hh"
+#include "com/centreon/io/file_entry.hh"
 
 using namespace com::centreon::engine::configuration;
 using namespace com::centreon::engine::logging;
@@ -2588,8 +2589,10 @@ void state::_parse_resource_file(std::string const& value) {
   std::string resfile;
   if (!value.empty() && value[0] == '/')
     resfile = value;
-  else
-    resfile = _filename + "/" + value;
+  else {
+    io::file_entry f(_filename);
+    resfile = f.directory_name() + "/" + value;
+  }
 
   // Open resource file.
   std::ifstream ifs;

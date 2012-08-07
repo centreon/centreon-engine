@@ -41,14 +41,15 @@ static bool run_without_timeout() {
 
   // Run command.
   nagios_macros mac;
-  result cmd_res;
-  cmd.run(cmd.get_command_line(), mac, 0, cmd_res);
+  memset(&mac, 0, sizeof(mac));
+  result res;
+  cmd.run(cmd.get_command_line(), mac, 0, res);
 
   // Check result.
-  return (!((cmd_res.command_id == 0)
-            || (cmd_res.exit_code != STATE_OK)
-            || (cmd_res.exit_status != process::normal)
-            || (cmd_res.output != cmd.get_command_line())));
+  return (!((res.command_id == 0)
+            || (res.exit_code != STATE_OK)
+            || (res.exit_status != process::normal)
+            || (res.output != cmd.get_command_line())));
 }
 
 /**
@@ -62,14 +63,15 @@ static bool run_with_timeout() {
 
   // Run command.
   nagios_macros mac;
-  result cmd_res;
-  cmd.run(cmd.get_command_line(), mac, 1, cmd_res);
+  memset(&mac, 0, sizeof(mac));
+  result res;
+  cmd.run(cmd.get_command_line(), mac, 1, res);
 
   // Check result.
-  return (!((cmd_res.command_id == 0)
-            || (cmd_res.exit_code != STATE_CRITICAL)
-            || (cmd_res.exit_status != process::normal)
-            || (cmd_res.output != "(Process Timeout)")));
+  return (!((res.command_id == 0)
+            || (res.exit_code != STATE_CRITICAL)
+            || (res.exit_status != process::timeout)
+            || (res.output != "(Process Timeout)")));
 }
 
 /**
@@ -82,24 +84,25 @@ static bool run_with_environment_macros() {
   config.set_enable_environment_macros(true);
 
   // Get environment macros.
-  nagios_macros macros;
+  nagios_macros mac;
+  memset(&mac, 0, sizeof(mac));
   char const* argv("default_arg");
-  macros.argv[0] = new char[strlen(argv) + 1];
-  strcpy(macros.argv[0], argv);
+  mac.argv[0] = new char[strlen(argv) + 1];
+  strcpy(mac.argv[0], argv);
 
   // Raw command object.
   raw cmd(__func__, "./bin_test_run --check_macros");
 
   // Run command.
-  result cmd_res;
-  cmd.run(cmd.get_command_line(), macros, 0, cmd_res);
-  delete [] macros.argv[0];
+  result res;
+  cmd.run(cmd.get_command_line(), mac, 0, res);
+  delete [] mac.argv[0];
 
   // Check result.
-  return (!((cmd_res.command_id == 0)
-            || (cmd_res.exit_code != STATE_OK)
-            || (cmd_res.exit_status != process::normal)
-            || (cmd_res.output != cmd.get_command_line())));
+  return (!((res.command_id == 0)
+            || (res.exit_code != STATE_OK)
+            || (res.exit_status != process::normal)
+            || (res.output != cmd.get_command_line())));
 }
 
 /**
@@ -113,14 +116,15 @@ static bool run_with_single_quotes() {
 
   // Run command.
   nagios_macros mac;
-  result cmd_res;
-  cmd.run(cmd.get_command_line(), mac, 0, cmd_res);
+  memset(&mac, 0, sizeof(mac));
+  result res;
+  cmd.run(cmd.get_command_line(), mac, 0, res);
 
   // Check result.
-  return (!((cmd_res.command_id == 0)
-            || (cmd_res.exit_code != STATE_OK)
-            || (cmd_res.exit_status != process::normal)
-            || (cmd_res.output != "./bin_test_run --timeout=off")));
+  return (!((res.command_id == 0)
+            || (res.exit_code != STATE_OK)
+            || (res.exit_status != process::normal)
+            || (res.output != "./bin_test_run --timeout=off")));
 }
 
 /**
@@ -134,14 +138,15 @@ static bool run_with_double_quotes() {
 
   // Run command.
   nagios_macros mac;
-  result cmd_res;
-  cmd.run(cmd.get_command_line(), mac, 0, cmd_res);
+  memset(&mac, 0, sizeof(mac));
+  result res;
+  cmd.run(cmd.get_command_line(), mac, 0, res);
 
   // Check result.
-  return (!((cmd_res.command_id == 0)
-            || (cmd_res.exit_code != STATE_OK)
-            || (cmd_res.exit_status != process::normal)
-            || (cmd_res.output != "./bin_test_run --timeout=off")));
+  return (!((res.command_id == 0)
+            || (res.exit_code != STATE_OK)
+            || (res.exit_status != process::normal)
+            || (res.output != "./bin_test_run --timeout=off")));
 }
 
 /**
