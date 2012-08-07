@@ -26,7 +26,6 @@
 #endif // HAVE_GETOPT_H
 #include <iostream>
 #include <limits.h>
-#include <QCoreApplication>
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -75,8 +74,6 @@ using namespace com::centreon::engine::logging;
   "    changed.\n"
 
 int main(int argc, char** argv) {
-  QCoreApplication app(argc, argv);
-
   int error = FALSE;
   int display_license = FALSE;
   int display_help = FALSE;

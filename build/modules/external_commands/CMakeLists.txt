@@ -41,8 +41,6 @@ add_library("externalcmd" SHARED
 )
 # Prettier name.
 set_target_properties("externalcmd" PROPERTIES PREFIX "")
-# Link target with libraries.
-target_link_libraries("externalcmd" ${QT_LIBRARIES})
 
 # Install rule.
 install(TARGETS "externalcmd"

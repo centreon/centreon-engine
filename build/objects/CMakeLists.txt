@@ -72,7 +72,7 @@ add_library("cce_objects"
 )
 
 # Link target with necessary libraries.
-target_link_libraries("cce_objects" ${QT_LIBRARIES} "cce_core")
+target_link_libraries("cce_objects" "cce_core")
 
 if (WITH_TESTING)
   # Set directories.
@@ -83,7 +83,7 @@ if (WITH_TESTING)
     STATIC
     "${TEST_DIR}/create_object.cc"
   )
-#target_link_libraries("cce_objects_test" ${QT_LIBRARIES} "cce_core")
+#target_link_libraries("cce_objects_test" "cce_core")
 
   # add_command_to_member
   set(TEST_SRC "add_command_to_member")
