@@ -30,6 +30,4 @@ add_library("cce_configuration_applier"
   "${INC_DIR}/logging.hh")
 
 # Link target with required libraries.
-target_link_libraries("cce_configuration_applier"
-  ${QT_LIBRARIES}
-  "cce_logging")
+target_link_libraries("cce_configuration_applier" "cce_logging")

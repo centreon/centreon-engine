@@ -74,7 +74,7 @@ if (WITH_TESTING)
 
   # Test binary.
   add_executable("bin_test_run" "${TEST_DIR}/bin_test_run.cc")
-  target_link_libraries("bin_test_run" ${QT_LIBRARIES})
+  target_link_libraries("bin_test_run")
 
   # Test raw.
   add_executable("raw_ctor" "${TEST_DIR}/raw_ctor.cc")

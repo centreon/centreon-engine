@@ -71,10 +71,6 @@ if (NOT CMAKE_USE_PTHREADS_INIT)
 endif ()
 set(PTHREAD_LIBRARIES "${CMAKE_THREAD_LIBS_INIT}")
 
-# Find Qt.
-find_package(Qt4 COMPONENTS QtCore REQUIRED)
-include(${QT_USE_FILE})
-
 # Find Centreon Clib's headers.
 if (WITH_CENTREON_CLIB_INCLUDE_DIR)
   find_file(
@@ -701,7 +697,6 @@ target_link_libraries("cce_core"
   ${MATH_LIBRARIES}
   ${PTHREAD_LIBRARIES}
   ${SOCKET_LIBRARIES}
-  ${QT_LIBRARIES}
   ${CLIB_LIBRARIES}
   "cce_configuration_applier"
   "cce_events"

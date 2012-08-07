@@ -22,6 +22,7 @@
 #include "com/centreon/concurrency/locker.hh"
 #include "com/centreon/engine/commands/connector.hh"
 #include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/version.hh"
 
@@ -58,6 +59,10 @@ connector::connector(
     _process(this) {
   // Disable stderr.
   _process.enable_stream(process::err, false);
+
+  if (config.get_enable_environment_macros())
+    logger(log_runtime_warning, basic)
+      << "**WARNING** Connector dosn't use enable environement macros!";
 }
 
 /**
@@ -75,6 +80,7 @@ connector::connector(connector const& right)
  *  Destructor.
  */
 connector::~connector() throw() {
+  concurrency::locker lock(&_lock);
   // Close connector properly.
   _connector_close();
 }
@@ -133,6 +139,11 @@ unsigned long connector::run(
                            unsigned int timeout) {
   (void)macros;
 
+  logger(dbg_commands, basic)
+    << "connector::run: connector='" << _connector_name
+    << "', cmd='" << processed_cmd << "', timeout=" << timeout;
+
+  // Set query informations.
   unsigned long command_id(get_uniq_id());
   shared_ptr<query_info> info(new query_info);
   info->processed_cmd = processed_cmd;
@@ -140,12 +151,14 @@ unsigned long connector::run(
   info->timeout = timeout;
   info->waiting_result = false;
 
-  {
+  logger(dbg_commands, basic)
+    << "connector::run: id=" << command_id;
+
+  try {
     concurrency::locker lock(&_lock);
 
-    // Check if the connector run and start it if necessary.
-    if (!_is_running)
-      _connector_start();
+    // Connector start if is necessary.
+    _connector_start();
 
     // Send check to the connector.
     _send_query_execute(
@@ -154,11 +167,14 @@ unsigned long connector::run(
       info->start_time,
       info->timeout);
     _queries[command_id] = info;
+    logger(dbg_commands, basic)
+      << "connector::run: start command success: id=" << command_id;
   }
-
-  logger(dbg_commands, basic)
-    << "connector \"" << _connector_name << "\" start (id="
-    << command_id << ") '" << processed_cmd << "'";
+  catch (...) {
+    logger(dbg_commands, basic)
+      << "connector::run: start command failed: id=" << command_id;
+    throw;
+  }
 
   // XXX: todo timeout command!
   return (command_id);
@@ -179,6 +195,11 @@ void connector::run(
                   result& res) {
   (void)macros;
 
+  logger(dbg_commands, basic)
+    << "connector::run: connector='" << _connector_name
+    << "', cmd='" << processed_cmd << "', timeout=" << timeout;
+
+  // Set query informations.
   unsigned long command_id(get_uniq_id());
   shared_ptr<query_info> info(new query_info);
   info->processed_cmd = processed_cmd;
@@ -186,23 +207,30 @@ void connector::run(
   info->timeout = timeout;
   info->waiting_result = true;
 
-  concurrency::locker lock(&_lock);
+  logger(dbg_commands, basic)
+    << "connector::run: id=" << command_id;
 
-  // Check if the connector run and start it if necessary.
-  if (!_is_running)
+  concurrency::locker lock(&_lock);
+  try {
+    // Connector start if is necessary.
     _connector_start();
 
-  // Send check to the connector.
-  _send_query_execute(
-    info->processed_cmd,
-    command_id,
-    info->start_time,
-    info->timeout);
-  _queries[command_id] = info;
+    // Send check to the connector.
+    _send_query_execute(
+       info->processed_cmd,
+       command_id,
+       info->start_time,
+       info->timeout);
+    _queries[command_id] = info;
 
-  logger(dbg_commands, basic)
-    << "connector \"" << _connector_name << "\" start (id="
-    << command_id << ") '" << processed_cmd << "'";
+    logger(dbg_commands, basic)
+      << "connector::run: start command success: id=" << command_id;
+  }
+  catch (...) {
+    logger(dbg_commands, basic)
+      << "connector::run: start command failed: id=" << command_id;
+    throw;
+  }
 
   // XXX: todo timeout command!
 
@@ -239,6 +267,9 @@ void connector::data_is_available(process& p) throw () {
   };
 
   try {
+    logger(dbg_commands, basic)
+      << "connector::data_is_available: process=" << (void*)&p;
+
     // Read process output.
     std::string data;
     p.read(data);
@@ -248,7 +279,8 @@ void connector::data_is_available(process& p) throw () {
     // Split outpout into queries responses.
     std::list<std::string> responses;
     {
-      std::string const& ending(_query_ending());
+      std::string ending(_query_ending());
+      ending.append("\0", 1);
       _data_available.append(data);
       while (_data_available.size() > 0) {
         size_t pos(_data_available.find(ending));
@@ -257,6 +289,9 @@ void connector::data_is_available(process& p) throw () {
         responses.push_back(_data_available.substr(0, pos));
         _data_available.erase(0, pos + ending.size());
       }
+      logger(dbg_commands, basic)
+        << "connector::data_is_available: responses.size="
+        << responses.size();
     }
 
     // Parse queries responses.
@@ -267,13 +302,15 @@ void connector::data_is_available(process& p) throw () {
       char const* data(it->c_str());
       char* endptr(NULL);
       unsigned int id(strtol(data, &endptr, 10));
+      logger(dbg_commands, basic)
+        << "connector::data_is_available: request id=" << id;
       // Invalid query.
       if (data == endptr
           || id >= sizeof(tab_recv_query) / sizeof(*tab_recv_query)
           || !tab_recv_query[id])
         logger(log_runtime_warning, basic)
-          << "connector \"" << _connector_name << "\" bad request id"
-          ": id=" << id;
+          << "connector '" << _connector_name << "' "
+          "receive bad request id: id=" << id;
       // Valid query, so execute it.
       else
         (this->*tab_recv_query[id])(endptr + 1);
@@ -281,7 +318,7 @@ void connector::data_is_available(process& p) throw () {
   }
   catch (std::exception const& e) {
     logger(log_runtime_warning, basic)
-      << "connector \"" << _connector_name << "\" error: " << e.what();
+      << "connector '" << _connector_name << "' error: " << e.what();
   }
   return;
 }
@@ -304,6 +341,8 @@ void connector::data_is_available_err(process& p) throw () {
  */
 void connector::finished(process& p) throw () {
   (void)p;
+  logger(dbg_commands, basic)
+    << "connector::finished: process=" << &p;
 
   concurrency::locker lock(&_lock);
   _is_running = false;
@@ -315,29 +354,34 @@ void connector::finished(process& p) throw () {
  *  Close connection with the process.
  */
 void connector::_connector_close() {
-  {
-    concurrency::locker lock(&_lock);
+  // Exit if connector is not running.
+  if (!_is_running)
+    return;
 
-    // Reset variables.
-    _query_quit_ok = false;
+  logger(dbg_commands, basic)
+    << "connector::_connector_close: process=" << &_process;
 
-    // Ask connector to quit properly.
-    _send_query_quit();
+  // Reset variables.
+  _query_quit_ok = false;
 
-    // Waiting connector quit, or 1 seconds.
-    if (!_cv_query.wait(&_lock, 1000)) {
-      _process.kill();
-      logger(log_runtime_warning, basic)
-        << "connector \"" << _connector_name << "\" "
-        "query quit failed: timeout";
-    }
-    else if (!_query_quit_ok) {
-      _process.kill();
-      logger(log_runtime_warning, basic)
-        << "connector \"" << _connector_name << "\" "
-        "query quit failed: invalid response";
-    }
+  // Ask connector to quit properly.
+  _send_query_quit();
+
+  // Waiting connector quit, or 1 seconds.
+  if (!_cv_query.wait(&_lock, 1000)) {
+    _process.kill();
+    logger(log_runtime_warning, basic)
+      << "connector '" << _connector_name << "' "
+      "query quit failed: timeout";
   }
+  else if (!_query_quit_ok) {
+    _process.kill();
+    logger(log_runtime_warning, basic)
+      << "connector '" << _connector_name << "' "
+      "query quit failed: invalid response";
+  }
+
+  // Waiting the end of the process.
   _process.wait();
   return;
 }
@@ -346,7 +390,12 @@ void connector::_connector_close() {
  *  Start connection with the process.
  */
 void connector::_connector_start() {
-  concurrency::locker lock(&_lock);
+  // Exit if connector is running.
+  if (_is_running)
+    return;
+
+  logger(dbg_commands, basic)
+    << "connector::_connector_start: process=" << &_process;
 
   // Reset variables.
   _query_quit_ok = false;
@@ -371,8 +420,11 @@ void connector::_connector_start() {
   _is_running = true;
 
   logger(log_info_message, basic)
-    << "connector \"" << _connector_name << "\" start";
+    << "connector '" << _connector_name << "' start";
 
+  logger(dbg_commands, basic)
+    << "connector::_connector_start: resend queries: queries.size="
+    << _queries.size();
   // Resend commands.
   for (umap<unsigned long, shared_ptr<query_info> >::iterator
          it(_queries.begin()), end(_queries.end());
@@ -420,13 +472,18 @@ std::string const& connector::_query_ending() const throw () {
 
 /**
  *  Receive an error from the connector.
+ *
+ *  @param[in] data  The query to parse.
  */
 void connector::_recv_query_error(char const* data) {
   try {
+    logger(dbg_commands, basic)
+      << "connector::_recv_query_error";
+
     char* endptr(NULL);
     int code(strtol(data, &endptr, 10));
     if (data == endptr)
-      throw (engine_error() << "invalid query version: "
+      throw (engine_error() << "invalid query error: "
              "invalid number of parameters");
     char const* message(endptr + 1);
 
@@ -434,34 +491,39 @@ void connector::_recv_query_error(char const* data) {
       // Information message.
     case 0:
       logger(log_info_message, basic)
-        << "connector \"" << _connector_name << "\": " << message;
+        << "connector '" << _connector_name << "': " << message;
       break;
 
       // Warning message.
     case 1:
       logger(log_runtime_warning, basic)
-        << "connector \"" << _connector_name << "\": " << message;
+        << "connector '" << _connector_name << "': " << message;
       break;
 
       // Error message.
     case 2:
       logger(log_runtime_error, basic)
-        << "connector \"" << _connector_name << "\": " << message;
+        << "connector '" << _connector_name << "': " << message;
       break;
     }
   }
   catch (std::exception const& e) {
     logger(log_runtime_warning, basic)
-      << "connector \"" << _connector_name << "\": " << e.what();
+      << "connector '" << _connector_name << "': " << e.what();
   }
   return;
 }
 
 /**
  *  Receive response to the query execute.
+ *
+ *  @param[in] data  The query to parse.
  */
 void connector::_recv_query_execute(char const* data) {
   try {
+    logger(dbg_commands, basic)
+      << "connector::_recv_query_execute";
+
     // Get query informations.
     char* endptr(NULL);
     unsigned long command_id(strtol(data, &endptr, 10));
@@ -480,6 +542,9 @@ void connector::_recv_query_execute(char const* data) {
              "invalid exit_code");
     char const* stderr(endptr + 1);
     char const* stdout(stderr + strlen(stderr) + 1);
+
+    logger(dbg_commands, basic)
+      << "connector::_recv_query_execute: id=" << command_id;
 
     // Get query information with the command_id.
     umap<unsigned long, shared_ptr<query_info> >::iterator
@@ -524,8 +589,13 @@ void connector::_recv_query_execute(char const* data) {
     }
 
     logger(dbg_commands, basic)
-      << "connector \"" << _connector_name << "\" finished: "
-      "id=" << command_id;
+      << "connector::_recv_query_execute: "
+      "id=" << command_id << ", "
+      "start_time=" << res.start_time.to_mseconds() << ", "
+      "end_time=" << res.end_time.to_mseconds() << ", "
+      "exit_code=" << res.exit_code << ", "
+      "exit_status=" << res.exit_status << ", "
+      "output='" << res.output << "'";
 
     if (!info->waiting_result) {
       // Forward result to the listener.
@@ -540,7 +610,7 @@ void connector::_recv_query_execute(char const* data) {
   }
   catch (std::exception const& e) {
     logger(log_runtime_warning, basic)
-      << "connector \"" << _connector_name << "\": " << e.what();
+      << "connector '" << _connector_name << "': " << e.what();
   }
   return;
 }
@@ -552,6 +622,9 @@ void connector::_recv_query_execute(char const* data) {
  */
 void connector::_recv_query_quit(char const* data) {
   (void)data;
+  logger(dbg_commands, basic)
+    << "connector::_recv_query_quit";
+
   _query_quit_ok = true;
   _cv_query.wake_all();
   return;
@@ -563,8 +636,13 @@ void connector::_recv_query_quit(char const* data) {
  *  @param[in] data  Has version of engine to use with the connector.
  */
 void connector::_recv_query_version(char const* data) {
+  logger(dbg_commands, basic)
+    << "connector::_recv_query_version";
+
   _query_version_ok = false;
   try {
+    // Parse query version response to get major and minor
+    // engine version supported by the connector.
     int version[2];
     char* endptr(NULL);
     for (unsigned int i(0); i < 2; ++i) {
@@ -575,6 +653,11 @@ void connector::_recv_query_version(char const* data) {
       data = endptr + 1;
     }
 
+    logger(dbg_commands, basic)
+      << "connector::_recv_query_version: "
+      "major=" << version[0] << ", minor=" << version[1];
+
+    // Check the version.
     if (version[0] < CENTREON_ENGINE_VERSION_MAJOR
         || (version[0] == CENTREON_ENGINE_VERSION_MAJOR
             && version[1] <= CENTREON_ENGINE_VERSION_MINOR))
@@ -582,7 +665,7 @@ void connector::_recv_query_version(char const* data) {
   }
   catch (std::exception const& e) {
     logger(log_runtime_warning, basic)
-      << "connector \"" << _connector_name << "\": " << e.what();
+      << "connector '" << _connector_name << "': " << e.what();
   }
   _cv_query.wake_all();
   return;
@@ -601,6 +684,13 @@ void connector::_send_query_execute(
                   unsigned int command_id,
                   timestamp const& start,
                   unsigned int timeout) {
+  logger(dbg_commands, basic)
+    << "connector::_send_query_execute: "
+    "id=" << command_id << ", "
+    "cmd='" << cmdline << "', "
+    "start=" << start.to_seconds() << ", "
+    "timeout=" << timeout;
+
   std::ostringstream oss;
   oss << "2" << '\0'
       << command_id << '\0'
@@ -615,6 +705,9 @@ void connector::_send_query_execute(
  *  Send query quit. To ask connector to quit properly.
  */
 void connector::_send_query_quit() {
+  logger(dbg_commands, basic)
+    << "connector::_send_query_quit";
+
   std::string query("4\0", 2);
   _process.write(query + _query_ending());
 }
@@ -623,6 +716,9 @@ void connector::_send_query_quit() {
  *  Send query verion. To ask connector version.
  */
 void connector::_send_query_version() {
+  logger(dbg_commands, basic)
+    << "connector::_send_query_version";
+
   std::string query("0\0", 2);
   _process.write(query + _query_ending());
 }

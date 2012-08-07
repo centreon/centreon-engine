@@ -20,7 +20,6 @@
 
 #include <iomanip>
 #include <math.h>
-#include <QCoreApplication>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/types.h>
