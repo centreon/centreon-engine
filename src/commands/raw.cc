@@ -102,33 +102,40 @@ unsigned long raw::run(
                      std::string const& processed_cmd,
                      nagios_macros& macros,
                      unsigned int timeout) {
-  logger(dbg_functions, basic) << "start " << __func__;
+  logger(dbg_commands, basic)
+    << "raw::run: cmd='" << processed_cmd << "', timeout=" << timeout;
 
+  // Get process and put into the busy list.
   process* p(NULL);
-  unsigned long id(get_uniq_id());
+  unsigned long command_id(get_uniq_id());
   {
     concurrency::locker lock(&_lock);
     p = _get_free_process();
-    _processes_busy[p] = id;
+    _processes_busy[p] = command_id;
   }
 
+  logger(dbg_commands, basic)
+    << "raw::run: id=" << command_id << ", process=" << p;
+
+  // Setup environement macros if is necessary.
   environment env;
   _build_environment_macros(macros, env);
 
   try {
-    logger(dbg_commands, basic)
-      << "raw command (id=" << id
-      << ") start '" << processed_cmd << "'";
+    // Start process.
     p->exec(processed_cmd.c_str(), env.data(), timeout);
+    logger(dbg_commands, basic)
+      << "raw::run: start process success: id=" << command_id;
   }
   catch (...) {
+    logger(dbg_commands, basic)
+      << "raw::run: start process failed: id=" << command_id;
+
     concurrency::locker lock(&_lock);
     _processes_busy.erase(p);
     throw;
   }
-
-  logger(dbg_functions, basic) << "end " << __func__;
-  return (id);
+  return (command_id);
 }
 
 /**
@@ -144,18 +151,31 @@ void raw::run(
             nagios_macros& macros,
             unsigned int timeout,
             result& res) {
-  logger(dbg_functions, basic) << "start " << __func__;
+  logger(dbg_commands, basic)
+    << "raw::run: cmd='" << processed_cmd << "', timeout=" << timeout;
 
+  // Get process.
   process p;
-  unsigned long cmd_id(get_uniq_id());
+  unsigned long command_id(get_uniq_id());
 
+  logger(dbg_commands, basic)
+    << "raw::run: id=" << command_id << ", process=" << &p;
+
+  // Setup environement macros if is necessary.
   environment env;
   _build_environment_macros(macros, env);
 
-  logger(dbg_commands, basic)
-    << "raw command (id=" << cmd_id
-    << ") start '" << processed_cmd << "'";
-  p.exec(processed_cmd.c_str(), env.data(), timeout);
+  // Start process.
+  try {
+    p.exec(processed_cmd.c_str(), env.data(), timeout);
+    logger(dbg_commands, basic)
+      << "raw::run: start process success: id=" << command_id;
+  }
+  catch (...) {
+    logger(dbg_commands, basic)
+      << "raw::run: start process failed: id=" << command_id;
+    throw;
+  }
 
   // Wait for completion.
   p.wait();
@@ -164,14 +184,21 @@ void raw::run(
   p.read(res.output);
 
   // Set result informations.
-  res.command_id = cmd_id;
+  res.command_id = command_id;
   res.start_time = p.start_time();
   res.end_time = p.end_time();
   res.exit_code = p.exit_code();
   res.exit_status = p.exit_status();
 
-  logger(dbg_functions, basic) << "end " << __func__;
-  return ;
+  logger(dbg_commands, basic)
+    << "raw::run: end process: "
+    "id=" << command_id << ", "
+    "start_time=" << res.start_time.to_mseconds() << ", "
+    "end_time=" << res.end_time.to_mseconds() << ", "
+    "exit_code=" << res.exit_code << ", "
+    "exit_status=" << res.exit_status << ", "
+    "output='" << res.output << "'";
+  return;
 }
 
 /**************************************
@@ -207,43 +234,60 @@ void raw::data_is_available_err(process& p) throw () {
  *  @param[in] p  The process to finished.
  */
 void raw::finished(process& p) throw () {
-  logger(dbg_functions, basic) << "start " << __func__;
+  try {
+    logger(dbg_commands, basic)
+      << "raw::finished: process=" << &p;
 
-  concurrency::locker lock(&_lock);
-  umap<process*, unsigned long>::iterator
-    it(_processes_busy.find(&p));
-  if (it == _processes_busy.end()) {
-    logger(log_runtime_warning, basic)
-      << "invalid process pointer: "
-      "process not found into process busy list";
-    return;
+    concurrency::locker lock(&_lock);
+    // Find process from the busy list.
+    umap<process*, unsigned long>::iterator
+      it(_processes_busy.find(&p));
+    if (it == _processes_busy.end()) {
+      logger(log_runtime_warning, basic)
+        << "invalid process pointer: "
+        "process not found into process busy list";
+      return;
+    }
+    // Get command_id and remove the process from the busy list.
+    unsigned long command_id(it->second);
+    _processes_busy.erase(it);
+
+    logger(dbg_commands, basic)
+      << "raw::finished: id=" << command_id;
+
+    // Build check result.
+    result res;
+
+    // Get process output.
+    p.read(res.output);
+
+    // Set result informations.
+    res.command_id = command_id;
+    res.start_time = p.start_time();
+    res.end_time = p.end_time();
+    res.exit_code = p.exit_code();
+    res.exit_status = p.exit_status();
+
+    logger(dbg_commands, basic)
+      << "raw::finished: "
+      "id=" << command_id << ", "
+      "start_time=" << res.start_time.to_mseconds() << ", "
+      "end_time=" << res.end_time.to_mseconds() << ", "
+      "exit_code=" << res.exit_code << ", "
+      "exit_status=" << res.exit_status << ", "
+      "output='" << res.output << "'";
+
+    // Forward result to the listener.
+    if (_listener)
+      (_listener->finished)(res);
+
+    // Put the process into the free list.
+    _processes_free.push_back(&p);
   }
-  unsigned long cmd_id(it->second);
-  _processes_busy.erase(it);
-
-  logger(dbg_commands, basic)
-    << "raw command (id=" << cmd_id << ") finished.";
-
-  // Build check result.
-  result res;
-
-  // Get process output.
-  p.read(res.output);
-
-  // Set result informations.
-  res.command_id = cmd_id;
-  res.start_time = p.start_time();
-  res.end_time = p.end_time();
-  res.exit_code = p.exit_code();
-  res.exit_status = p.exit_status();
-
-  // Forward result to the listener.
-  if (_listener)
-    (_listener->finished)(res);
-
-  _processes_free.push_back(&p);
-
-  logger(dbg_functions, basic) << "end " << __func__;
+  catch (std::exception const& e) {
+    logger(log_runtime_warning, basic)
+      << "process finish failed: " << e.what();
+  }
   return;
 }
 
@@ -501,11 +545,13 @@ void raw::_build_macrosx_environment(
  *  @return A process.
  */
 process* raw::_get_free_process() {
+  // If any process are available, create new one.
   if (_processes_free.empty()) {
     process* p(new process(this));
     p->enable_stream(process::err, false);
     return (p);
   }
+  // Get a free process.
   process* p(_processes_free.front());
   _processes_free.pop_front();
   return (p);
