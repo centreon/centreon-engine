@@ -17,8 +17,9 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <cstdlib>
 #include <iostream>
-#include <stdlib.h>
+#include "com/centreon/clib.hh"
 #include "com/centreon/engine/error.hh"
 #include "test/modules/webservice/engine.hh"
 #include "test/modules/webservice/query.hh"
@@ -36,6 +37,9 @@ int main(int argc, char** argv) {
 
   // Return value.
   int retval;
+
+  // Initialization.
+  com::centreon::clib::load();
 
   // Start Engine.
   engine e;
@@ -81,6 +85,9 @@ int main(int argc, char** argv) {
     retval = EXIT_FAILURE;
     e.stop();
   }
+
+  // Cleanup.
+  com::centreon::clib::unload();
 
   return (retval);
 }
