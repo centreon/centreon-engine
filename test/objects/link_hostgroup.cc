@@ -105,7 +105,7 @@ static void link_null_name() {
 }
 
 static void link_without_hosts() {
-  if (create_and_link(false, true))
+  if (!create_and_link(false, true))
     throw (engine_error() << __func__ << " failed: invalid return");
   return ;
 }
