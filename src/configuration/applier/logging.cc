@@ -110,7 +110,7 @@ logging::logging()
 }
 
 /**
- *  Construct and aply configuration.
+ *  Construct and apply configuration.
  *
  *  @param[in] config The initial confiuration.
  */

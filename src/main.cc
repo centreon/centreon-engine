@@ -19,19 +19,18 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <errno.h>
+#include <cerrno>
+#include <climits>
+#include <csignal>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 #include <exception>
 #ifdef HAVE_GETOPT_H
 #  include <getopt.h>
 #endif // HAVE_GETOPT_H
 #include <iostream>
-#include <limits.h>
-#include <QCoreApplication>
-#include <signal.h>
-#include <stdio.h>
-#include <stdlib.h>
 #include <string>
-#include <string.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
@@ -65,22 +64,24 @@ using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;
 
 // Error message when configuration parsing fail.
-#define ERROR_CONFIGURATION						\
+#define ERROR_CONFIGURATION \
   "    Check your configuration file(s) to ensure that they contain valid\n" \
-  "    directives and data defintions. If you are upgrading from a\n"	\
+  "    directives and data defintions. If you are upgrading from a\n" \
   "    previous version of Centreon Engine, you should be aware that some\n" \
   "    variables/definitions may have been removed or modified in this\n" \
   "    version. Make sure to read the documentation regarding the config\n" \
-  "    files, as well as the version changelog to find out what has\n"	\
+  "    files, as well as the version changelog to find out what has\n" \
   "    changed.\n"
 
-int main(int argc, char** argv) {
-  QCoreApplication app(argc, argv);
-
-  int error = FALSE;
-  int display_license = FALSE;
-  int display_help = FALSE;
-  int c = 0;
+/**
+ *  Centreon Engine entry point.
+ *
+ *  @param[in] argc Argument count.
+ *  @param[in] argv Argument values.
+ *
+ *  @return EXIT_SUCCESS on success.
+ */
+int main(int argc, char* argv[]) {
   struct tm* tm, tm_s;
   time_t now;
   char datestring[256];
@@ -91,22 +92,27 @@ int main(int argc, char** argv) {
 
 #ifdef HAVE_GETOPT_H
   int option_index = 0;
-  static struct option long_options[] = {
-    {"dont-verify-paths", no_argument, NULL, 'x'},
-    {"help", no_argument, NULL, 'h'},
-    {"license", no_argument, NULL, 'V'},
-    {"precache-objects", no_argument, NULL, 'p'},
-    {"test-scheduling", no_argument, NULL, 's'},
-    {"use-precached-objects", no_argument, NULL, 'u'},
-    {"verify-config", no_argument, NULL, 'v'},
-    {"version", no_argument, NULL, 'V'},
-    {NULL, no_argument, NULL, '\0'}
+  static struct option const long_options[] = {
+    { "dont-verify-paths", no_argument, NULL, 'x' },
+    { "help", no_argument, NULL, 'h' },
+    { "license", no_argument, NULL, 'V' },
+    { "precache-objects", no_argument, NULL, 'p' },
+    { "test-scheduling", no_argument, NULL, 's' },
+    { "use-precached-objects", no_argument, NULL, 'u' },
+    { "verify-config", no_argument, NULL, 'v' },
+    { "version", no_argument, NULL, 'V' },
+    { NULL, no_argument, NULL, '\0' }
   };
 #endif // HAVE_GETOPT_H
 
+  // Options.
+  bool display_help(false);
+  bool display_license(false);
+  bool error(false);
+
   // Make sure we have the correct number of command line arguments.
   if (argc < 2)
-    error = TRUE;
+    error = true;
 
   // Load singletons.
   com::centreon::clib::load();
@@ -119,6 +125,7 @@ int main(int argc, char** argv) {
   com::centreon::engine::broker::compatibility::load();
 
   // Process all command line arguments.
+  int c;
 #ifdef HAVE_GETOPT_H
   while ((c = getopt_long(argc, argv, "+hVvsxpu", long_options, &option_index)) != -1) {
 #else
@@ -127,30 +134,30 @@ int main(int argc, char** argv) {
 
     // Process flag.
     switch (c) {
-     case '?': // Usage.
-     case 'h':
-      display_help = TRUE;
+    case '?': // Usage.
+    case 'h':
+      display_help = true;
       break ;
-     case 'V': // Version.
-      display_license = TRUE;
+    case 'V': // Version.
+      display_license = true;
       break ;
-     case 'v': // Verify config.
+    case 'v': // Verify config.
       verify_config = TRUE;
       break ;
-     case 's': // Scheduling Check.
+    case 's': // Scheduling Check.
       test_scheduling = TRUE;
       break ;
-     case 'x': // Don't verify circular paths.
+    case 'x': // Don't verify circular paths.
       verify_circular_paths = FALSE;
       break ;
-     case 'p': // Precache object config.
+    case 'p': // Precache object config.
       precache_objects = TRUE;
       break ;
-     case 'u': // Use precached object config.
+    case 'u': // Use precached object config.
       use_precached_objects = TRUE;
       break ;
-     default:
-      break ;
+    default:
+      error = true;
     }
   }
 
@@ -158,37 +165,49 @@ int main(int argc, char** argv) {
   if ((TRUE == precache_objects)
       && (FALSE == test_scheduling)
       && (FALSE == verify_config)) {
-    error = TRUE;
-    display_help = TRUE;
+    error = true;
+    display_help = true;
   }
 
   // Just display the license.
-  if (TRUE == display_license) {
+  if (display_license) {
     logger(log_info_message, basic)
-      << "Centreon Engine is free software: you can redistribute it and/or modify\n"
-      << "it under the terms of the GNU General Public License version 2 as\n"
-      << "published by the Free Software Foundation.\n"
+      << "Centreon Engine " << CENTREON_ENGINE_VERSION_STRING << "\n"
       << "\n"
-      << "Centreon Engine is distributed in the hope that it will be useful, but\n"
-      << "WITHOUT ANY WARRANTY; without even the implied warranty of\n"
+      << "Copyright 1999-2009 Ethan Galstad\n"
+      << "Copyright 2009-2010 Nagios Core Development Team and Community Contributors\n"
+      << "Copyright 2011-2012 Merethis\n"
+      << "\n"
+      << "This program is free software: you can redistribute it and/or\n"
+      << "modify it under the terms of the GNU General Public License version 2\n"
+      << "as published by the Free Software Foundation.\n"
+      << "\n"
+      << "Centreon Engine is distributed in the hope that it will be useful,\n"
+      << "but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
       << "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU\n"
       << "General Public License for more details.\n"
       << "\n"
-      << "You should have received a copy of the GNU General Public License along\n"
-      << "with Centreon Engine. If not, see <http://www.gnu.org/licenses/>.\n\n"
-      << "Centreon Engine version: " << CENTREON_ENGINE_VERSION_STRING;
+      << "You should have received a copy of the GNU General Public License\n"
+      << "along with this program. If not, see\n"
+      << "<http://www.gnu.org/licenses/>.";
     exit(EXIT_SUCCESS);
   }
 
   // Make sure we got the main config file on the command line.
   if (optind >= argc)
-    error = TRUE;
+    error = true;
 
-  // If there are no command line options or if an error occured, print usage.
-  if ((TRUE == error) || (TRUE == display_help)) {
+  // If there are no command line options or
+  // if an error occured, print usage.
+  if (error || display_help) {
     logger(log_info_message, basic)
       << "Usage: " << argv[0] << " [options] <main_config_file>\n"
-      << "\nOptions:\n"
+      << "\n"
+      << "Basics:\n"
+      << "  -h, --help                  Print help.\n"
+      << "  -V, --license, --version    Print software version and license.\n"
+      << "\n"
+      << "Configuration:\n"
       << "  -v, --verify-config         Verify all configuration data.\n"
       << "  -s, --test-scheduling       Shows projected/recommended check\n"
       << "                              scheduling and other diagnostic info\n"
@@ -199,7 +218,7 @@ int main(int argc, char** argv) {
       << "  -p, --precache-objects      Precache object configuration - use with\n"
       << "                              -v or -s options.\n"
       << "  -u, --use-precached-objects Use precached object config file.";
-    exit(ERROR);
+    exit(error ? EXIT_FAILURE : EXIT_SUCCESS);
   }
 
   // Config file is last argument specified.
@@ -215,7 +234,8 @@ int main(int argc, char** argv) {
 
     // Append the config file to the path.
     buffer.append(config_file);
-    delete[] config_file;
+    delete [] config_file;
+    config_file = NULL;
     config_file = my_strdup(buffer.c_str());
   }
 
@@ -446,7 +466,7 @@ int main(int argc, char** argv) {
                              NEBATTR_SHUTDOWN_ABNORMAL,
                              NULL);
         cleanup();
-        exit(ERROR);
+        exit(EXIT_FAILURE);
       }
 
       // Handle signals (interrupts).
