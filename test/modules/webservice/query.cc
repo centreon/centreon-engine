@@ -76,7 +76,6 @@ int query::execute(std::string& output, std::string const& q) {
 
   // Execute webservice client.
   com::centreon::process client;
-  //client.setProcessChannelMode(QProcess::MergedChannels);
   client.exec(cmdline);
 
   // Exit code.
