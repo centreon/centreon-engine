@@ -18,12 +18,13 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <errno.h>
+#include <cerrno>
+#include <cstdlib>
+#include <cstdio>
 #ifdef HAVE_GETOPT_H
 #  include <getopt.h>
 #endif // HAVE_GETOPT_H
-#include <stdlib.h>
-#include <stdio.h>
+#include <iostream>
 #include <unistd.h>
 #include "com/centreon/engine/common.hh"
 #include "com/centreon/engine/version.hh"
@@ -199,109 +200,108 @@ int read_nagiostats_file(void);
 
 extern "C" char* my_strdup(char const* str);
 
-int main(int argc, char** argv) {
-  int result;
-  int error = FALSE;
-  int display_license = FALSE;
-  int display_help = FALSE;
-  int c;
-
+/**
+ *  centenginestats entry point.
+ *
+ *  @param[in] argc Argument count.
+ *  @param[in] argv Argument values.
+ *
+ *  @return EXIT_SUCCESS on success.
+ */
+int main(int argc, char* argv[]) {
 #ifdef HAVE_GETOPT_H
   int option_index = 0;
-  static struct option long_options[] = {
-    {"help", no_argument, 0, 'h'},
-    {"version", no_argument, 0, 'V'},
-    {"license", no_argument, 0, 'L'},
-    {"config", required_argument, 0, 'c'},
-    {"statsfile", required_argument, 0, 's'},
-    {0, 0, 0, 0}
+  static struct option const long_options[] = {
+    { "help", no_argument, 0, 'h' },
+    { "version", no_argument, 0, 'V' },
+    { "license", no_argument, 0, 'L' },
+    { "config", required_argument, 0, 'c' },
+    { "statsfile", required_argument, 0, 's' },
+    { 0, 0, 0, 0}
   };
-#endif
+#endif // HAVE_GETOPT_H
 
-  /* defaults */
+  // Defaults.
   main_config_file = my_strdup(DEFAULT_CONFIG_FILE);
   status_file = my_strdup(DEFAULT_STATUS_FILE);
 
-  /* get all command line arguments */
-  while (1) {
+  // Options.
+  bool display_help(false);
+  bool display_license(false);
+  bool error(false);
 
+  // Get all command line arguments.
+  int c;
+  while (1) {
+    // Get next flag.
 #ifdef HAVE_GETOPT_H
     c = getopt_long(argc, argv, "+hVLc:s:", long_options, &option_index);
 #else
     c = getopt(argc, argv, "+hVLc:s:");
-#endif
+#endif // getopt_long() or getopt()
+    if ((c == -1) || (c == EOF))
+      break ;
 
-    if (c == -1 || c == EOF)
-      break;
-
+    // Process flag.
     switch (c) {
     case '?':
     case 'h':
-      display_help = TRUE;
-    break;
-
-    case 'V':
-      display_license = TRUE;
-      break;
-
+      display_help = true;
+      break ;
     case 'L':
-      display_license = TRUE;
-      break;
-
+    case 'V':
+      display_license = true;
+      break ;
     case 'c':
-      if (main_config_file)
-        delete[]main_config_file;
+      delete [] main_config_file;
+      main_config_file = NULL;
       main_config_file = my_strdup(optarg);
-      break;
-
+      break ;
     case 's':
       nagiostats_file = my_strdup(optarg);
-      break;
-
+      break ;
     default:
-      break;
+      error = true;
     }
   }
 
-  printf("\nCentreon Engine Stats %s\n", CENTREON_ENGINE_VERSION_STRING);
-  printf("Copyright 2003-2008 Ethan Galstad\n");
-  printf("Copyright 2011-2012 Merethis\n");
-  printf("License: GPLv2\n\n");
+  // Program header.
+  std::cout << "Centreon Engine Statistics Utility "
+            << CENTREON_ENGINE_VERSION_STRING << "\n\n"
+            << "Copyright 2003-2008 Ethan Galstad\n"
+            << "Copyright 2011-2012 Merethis\n"
+            << "License: GPLv2\n\n";
 
-  /* just display the license */
-  if (display_license == TRUE) {
-    printf("This program is free software; you can redistribute it and/or modify\n");
-    printf("it under the terms of the GNU General Public License version 2 as\n");
-    printf("published by the Free Software Foundation.\n\n");
-    printf("This program is distributed in the hope that it will be useful,\n");
-    printf("but WITHOUT ANY WARRANTY; without even the implied warranty of\n");
-    printf("MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n");
-    printf("GNU General Public License for more details.\n\n");
-    printf("You should have received a copy of the GNU General Public License\n");
-    printf("along with this program; if not, write to the Free Software\n");
-    printf("Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.\n\n");
-
-    exit(OK);
+  // Just display the license.
+  if (display_license) {
+    std::cout << "This program is free software; you can redistribute it and/or\n"
+              << "modify it under the terms of the GNU General Public License version 2\n"
+              << "as published by the Free Software Foundation.\n\n"
+              << "This program is distributed in the hope that it will be useful,\n"
+              << "but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
+              << "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU\n"
+              << "General Public License for more details.\n\n"
+              << "You should have received a copy of the GNU General Public License\n"
+              << "along with this program. If not, see\n"
+              << "<http://www.gnu.org/licenses/>." << std::endl;
+    exit(EXIT_SUCCESS);
+  }
+  // Just display the usage.
+  else if (display_help || error) {
+    std::cout << "Usage: " << argv[0] << " [options]\n\n"
+              << "Startup:\n"
+              << " -V, --version         display program version information and exit.\n"
+              << " -L, --license         display license information and exit.\n"
+              << " -h, --help            display usage information and exit.\n"
+              << "\n"
+              << "Input file:\n"
+              << " -c, --config=FILE     specifies location of main Centreon Engine config file.\n"
+              << " -s, --statsfile=FILE  specifies alternate location of file to read Centreon\n"
+              << "                       Engine performance data from.\n" << std::endl;
+    exit(error ? EXIT_FAILURE : EXIT_SUCCESS);
   }
 
-  /* if there are no command line options (or if we encountered an error), print usage */
-  if (error == TRUE || display_help == TRUE) {
-
-    printf("Usage: %s [options]\n", argv[0]);
-    printf("\n");
-    printf("Startup:\n");
-    printf(" -V, --version      display program version information and exit.\n");
-    printf(" -L, --license      display license information and exit.\n");
-    printf(" -h, --help         display usage information and exit.\n");
-    printf("\n");
-    printf("Input file:\n");
-    printf(" -c, --config=FILE  specifies location of main Centreon Engine config file.\n");
-    printf(" -s, --statsfile=FILE  specifies alternate location of file to read Centreon Engine\n");
-    printf("                       performance data from.\n");
-    printf("\n");
-
-    exit(ERROR);
-  }
+  int result;
 
   /* read pre-processed stats file */
   if (nagiostats_file) {
