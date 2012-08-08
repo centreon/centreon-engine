@@ -386,14 +386,35 @@ void checker::run(
     start_time.tv_sec);
   update_check_stats(PARALLEL_HOST_CHECK_STATS, start_time.tv_sec);
 
-  // Run command.
-  unsigned long id(cmd->run(
-                          processed_cmd,
-                          macros,
-                          config.get_host_check_timeout()));
-  if (id != 0) {
-    concurrency::locker lock(&_mut_id);
-    _list_id[id] = check_result_info;
+  try {
+    // Run command.
+    unsigned long id(cmd->run(
+                            processed_cmd,
+                            macros,
+                            config.get_host_check_timeout()));
+    if (id != 0) {
+      concurrency::locker lock(&_mut_id);
+      _list_id[id] = check_result_info;
+    }
+  }
+  catch (std::exception const& e) {
+    timestamp now(timestamp::now());
+
+    // Update check result.
+    check_result_info.finish_time.tv_sec = now.to_seconds();
+    check_result_info.finish_time.tv_usec = now.to_useconds()
+      - check_result_info.finish_time.tv_sec * 1000000ull;
+    check_result_info.early_timeout = false;
+    check_result_info.return_code = STATE_UNKNOWN;
+    check_result_info.exited_ok = true;
+    check_result_info.output = my_strdup("(Execute command failed)");
+
+    // Queue check result.
+    concurrency::locker lock(&_mut_reap);
+    _to_reap.push(check_result_info);
+
+    logger(log_runtime_warning, basic)
+      << "execute command failed: " << e.what();
   }
 
   // Cleanup.
@@ -577,14 +598,35 @@ void checker::run(
     : ACTIVE_ONDEMAND_SERVICE_CHECK_STATS,
     start_time.tv_sec);
 
-  // Run command.
-  unsigned long id(cmd->run(
-                          processed_cmd,
-                          macros,
-                          config.get_service_check_timeout()));
-  if (id != 0) {
-    concurrency::locker lock(&_mut_id);
-    _list_id[id] = check_result_info;
+  try {
+    // Run command.
+    unsigned long id(cmd->run(
+                            processed_cmd,
+                            macros,
+                            config.get_service_check_timeout()));
+    if (id != 0) {
+      concurrency::locker lock(&_mut_id);
+      _list_id[id] = check_result_info;
+    }
+  }
+  catch (std::exception const& e) {
+    timestamp now(timestamp::now());
+
+    // Update check result.
+    check_result_info.finish_time.tv_sec = now.to_seconds();
+    check_result_info.finish_time.tv_usec = now.to_useconds()
+      - check_result_info.finish_time.tv_sec * 1000000ull;
+    check_result_info.early_timeout = false;
+    check_result_info.return_code = STATE_UNKNOWN;
+    check_result_info.exited_ok = true;
+    check_result_info.output = my_strdup("(Execute command failed)");
+
+    // Queue check result.
+    concurrency::locker lock(&_mut_reap);
+    _to_reap.push(check_result_info);
+
+    logger(log_runtime_warning, basic)
+      << "execute command failed: " << e.what();
   }
 
   // Cleanup.
@@ -990,11 +1032,25 @@ int checker::_execute_sync(host* hst) {
 
   // Run command.
   commands::result res;
-  cmd->run(
-         processed_cmd,
-         macros,
-         config.get_host_check_timeout(),
-         res);
+  try {
+    cmd->run(
+           processed_cmd,
+           macros,
+           config.get_host_check_timeout(),
+           res);
+  }
+  catch (std::exception const& e) {
+    // Update check result.
+    res.command_id = 0;
+    res.end_time = timestamp::now();
+    res.exit_code = STATE_UNKNOWN;
+    res.exit_status = process::normal;
+    res.output = "(Execute command failed)";
+    res.start_time = res.end_time;
+
+    logger(log_runtime_warning, basic)
+      << "execute command failed: " << e.what();
+  }
 
   // Get output.
   char* output(my_strdup(res.output.c_str()));

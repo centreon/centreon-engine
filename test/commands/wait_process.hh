@@ -120,9 +120,9 @@ namespace         commands {
     }
 
     command*      _cmd;
-    mutable com::centreon::concurrency::condvar
+    mutable concurrency::condvar
                   _condvar;
-    mutable com::centreon::concurrency::mutex
+    mutable concurrency::mutex
                   _mtx;
     result        _res;
   };

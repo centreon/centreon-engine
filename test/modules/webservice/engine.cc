@@ -17,11 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#ifdef _WIN32
-#  include <windows.h>
-#else
-#  include <unistd.h>
-#endif // Win32 or POSIX.
+#include "com/centreon/concurrency/thread.hh"
 #include "com/centreon/engine/error.hh"
 #include "test/modules/webservice/engine.hh"
 #include "test/paths.hh"
@@ -65,11 +61,7 @@ void engine::start(std::string const& cfg_file) {
   else
     cmd.append(cfg_file);
   _centengine.exec(cmd);
-#ifdef _WIN32
-  Sleep(1000);
-#else
-  sleep(1);
-#endif // Win32 or POSIX.
+  com::centreon::concurrency::thread::sleep(1);
   return ;
 }
 

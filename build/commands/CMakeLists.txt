@@ -42,6 +42,42 @@ if (WITH_TESTING)
   #Set directories.
   set(TEST_DIR "${TEST_DIR}/commands")
 
+  # Test binary.
+  add_executable("bin_connector_test_run" "${TEST_DIR}/bin_connector_test_run.cc")
+  target_link_libraries("bin_connector_test_run" ${CLIB_LIBRARIES})
+
+  add_executable("bin_test_run" "${TEST_DIR}/bin_test_run.cc")
+  target_link_libraries("bin_test_run" ${CLIB_LIBRARIES})
+
+  # Test connector.
+  add_executable("connector_ctor" "${TEST_DIR}/connector_ctor.cc")
+  target_link_libraries("connector_ctor" "cce_commands" "cce_core")
+  add_test("connector_ctor" "connector_ctor")
+
+  add_executable("connector_compare" "${TEST_DIR}/connector_compare.cc")
+  target_link_libraries("connector_compare" "cce_commands" "cce_core")
+  add_test("connector_compare" "connector_compare")
+
+  add_executable("connector_run_sync" "${TEST_DIR}/connector_run_sync.cc")
+  target_link_libraries("connector_run_sync" "cce_core")
+  add_test("connector_run_sync" "connector_run_sync")
+
+  add_executable("connector_run_async"
+    "${TEST_DIR}/connector_run_async.cc"
+    "${TEST_DIR}/wait_process.hh")
+  target_link_libraries("connector_run_async" "cce_commands" "cce_core")
+  add_test("connector_run_async" "connector_run_async")
+
+  add_executable("connector_get" "${TEST_DIR}/connector_get.cc")
+  target_link_libraries("connector_get" "cce_core")
+  add_test("connector_get" "connector_get")
+
+  add_executable("connector_restart"
+    "${TEST_DIR}/connector_restart.cc"
+    "${TEST_DIR}/wait_process.hh")
+  target_link_libraries("connector_restart" "cce_commands" "cce_core")
+  add_test("connector_restart" "connector_restart")
+
   # Test environment.
   add_executable("environment_add" "${TEST_DIR}/environment_add.cc")
   target_link_libraries("environment_add" "cce_core")
@@ -71,10 +107,6 @@ if (WITH_TESTING)
   add_executable("set_basic" "${TEST_DIR}/set_basic.cc")
   target_link_libraries("set_basic" "cce_commands" "cce_core")
   add_test("set_basic" "set_basic")
-
-  # Test binary.
-  add_executable("bin_test_run" "${TEST_DIR}/bin_test_run.cc")
-  target_link_libraries("bin_test_run")
 
   # Test raw.
   add_executable("raw_ctor" "${TEST_DIR}/raw_ctor.cc")

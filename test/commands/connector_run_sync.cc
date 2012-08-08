@@ -18,10 +18,12 @@
 */
 
 #include <exception>
-#include "com/centreon/engine/commands/connector/command.hh"
+#include "com/centreon/engine/commands/connector.hh"
 #include "com/centreon/engine/error.hh"
+#include "com/centreon/process.hh"
 #include "test/unittest.hh"
 
+using namespace com::centreon;
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::commands;
 
@@ -32,21 +34,20 @@ using namespace com::centreon::engine::commands;
  */
 static bool run_without_timeout() {
   nagios_macros macros = nagios_macros();
-  connector::command cmd(__func__,
-			 "./bin_connector_test_run --timeout=off",
-			 "./bin_connector_test_run");
+  connector cmd(
+              __func__,
+              "./bin_connector_test_run",
+              __func__,
+              "./bin_connector_test_run --timeout=off");
 
-  result cmd_res;
-  cmd.run(cmd.get_command_line(), macros, 0, cmd_res);
+  result res;
+  cmd.run(cmd.get_command_line(), macros, 0, res);
 
-  if (cmd_res.get_command_id() == 0
-      || cmd_res.get_exit_code() != STATE_OK
-      || cmd_res.get_stdout() != cmd.get_command_line()
-      || cmd_res.get_stderr() != ""
-      || cmd_res.get_is_executed() == false
-      || cmd_res.get_is_timeout() == true) {
+  if (res.command_id == 0
+      || res.exit_code != STATE_OK
+      || res.output != cmd.get_command_line()
+      || res.exit_status != process::normal)
     return (false);
-  }
   return (true);
 }
 
@@ -57,21 +58,20 @@ static bool run_without_timeout() {
  */
 static bool run_with_timeout() {
   nagios_macros macros = nagios_macros();
-  connector::command cmd(__func__,
-			 "./bin_connector_test_run --timeout=on",
-			 "./bin_connector_test_run");
+  connector cmd(
+              __func__,
+              "./bin_connector_test_run",
+              __func__,
+              "./bin_connector_test_run --timeout=on");
 
-  result cmd_res;
-  cmd.run(cmd.get_command_line(), macros, 1, cmd_res);
+  result res;
+  cmd.run(cmd.get_command_line(), macros, 1, res);
 
-  if (cmd_res.get_command_id() == 0
-      || cmd_res.get_exit_code() != STATE_CRITICAL
-      || cmd_res.get_stdout() != ""
-      || cmd_res.get_stderr() != "(Process Timeout)"
-      || cmd_res.get_is_executed() == false
-      || cmd_res.get_is_timeout() == false) {
+  if (res.command_id == 0
+      || res.exit_code != STATE_CRITICAL
+      || res.output != "(Process Timeout)"
+      || res.exit_status != process::timeout)
     return (false);
-  }
   return (true);
 }
 

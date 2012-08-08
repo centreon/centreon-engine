@@ -23,6 +23,7 @@
 #  include <string>
 #  include "com/centreon/concurrency/condvar.hh"
 #  include "com/centreon/concurrency/mutex.hh"
+#  include "com/centreon/concurrency/thread.hh"
 #  include "com/centreon/engine/commands/command.hh"
 #  include "com/centreon/engine/namespace.hh"
 #  include "com/centreon/process.hh"
@@ -67,6 +68,18 @@ namespace                commands {
                            result& res);
 
   private:
+    class                restart : public concurrency::thread {
+    public:
+                         restart(connector* c);
+                         ~restart() throw ();
+    private:
+                         restart(restart const& right);
+      restart&           operator=(restart const& right);
+      void               _run();
+
+      connector*         _c;
+    };
+
     struct               query_info {
       std::string        processed_cmd;
       timestamp          start_time;
@@ -106,6 +119,8 @@ namespace                commands {
     process              _process;
     umap<unsigned long, result>
                          _results;
+    restart              _restart;
+    bool                 _try_to_restart;
   };
 }
 

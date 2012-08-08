@@ -20,12 +20,10 @@
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
-#ifdef _WIN32
-#  include <windows.h>
-#else
-#  include <unistd.h>
-#endif // Win32 or POSIX.
+#include "com/centreon/concurrency/thread.hh"
 #include "com/centreon/engine/common.hh"
+
+using namespace com::centreon;
 
 /**
  *  Simulate some behavior of plugin.
@@ -48,11 +46,7 @@ int main(int argc, char* argv[]) {
   // Never return to test the timeout.
   if (!strcmp(argv[1], "--timeout=on"))
     while (true)
-#ifdef _WIN32
-      Sleep(1000);
-#else
-      sleep(1);
-#endif // Win32 or POSIX.
+      concurrency::thread::sleep(1);
 
   // Check a classic return.
   if (!strcmp(argv[1], "--timeout=off"))
