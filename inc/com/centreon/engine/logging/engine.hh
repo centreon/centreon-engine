@@ -21,11 +21,11 @@
 #  define CCE_LOGGING_ENGINE_HH
 
 #  include <memory>
-#  include <QSharedPointer>
-#  include <QReadWriteLock>
 #  include <vector>
+#  include "com/centreon/concurrency/read_write_lock.hh"
 #  include "com/centreon/engine/logging/object.hh"
 #  include "com/centreon/engine/namespace.hh"
+#  include "com/centreon/shared_ptr.hh"
 
 CCE_BEGIN()
 
@@ -44,7 +44,7 @@ namespace                    logging {
     public:
                              obj_info();
                              obj_info(
-                               QSharedPointer<object> obj,
+                               com::centreon::shared_ptr<object> obj,
                                unsigned long long type,
                                unsigned int verbosity);
                              obj_info(obj_info const& right);
@@ -58,7 +58,8 @@ namespace                    logging {
       void                   _internal_copy(obj_info const& right);
 
       unsigned long          _id;
-      QSharedPointer<object> _obj;
+      com::centreon::shared_ptr<object>
+                             _obj;
       unsigned long long     _type;
       unsigned int           _verbosity;
     };
@@ -92,7 +93,8 @@ namespace                    logging {
     static std::auto_ptr<engine>
                              _instance;
     std::vector<obj_info>    _objects;
-    QReadWriteLock           _rwlock;
+    com::centreon::concurrency::read_write_lock
+                             _rwlock;
     unsigned long long       _type[3];
   };
 }

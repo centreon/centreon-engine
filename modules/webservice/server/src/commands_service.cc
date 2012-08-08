@@ -17,6 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <algorithm>
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/modules/webservice/commands.hh"
@@ -70,10 +71,13 @@ void webservice::create_service(ns1__serviceType const& svc) {
 
   // Initial state.
   int initial_state(STATE_OK);
-  QString initial_state_options(svc.initialState
-                                ? svc.initialState->c_str()
-                                : "o");
-  initial_state_options.toLower().trimmed();
+  std::string initial_state_options(
+                svc.initialState ? *svc.initialState : "o");
+  std::transform(
+         initial_state_options.begin(),
+         initial_state_options.end(),
+         initial_state_options.begin(),
+         tolower);
   if ((initial_state_options == "o") || (initial_state_options == "ok"))
     initial_state = STATE_OK;
   else if ((initial_state_options == "w")
@@ -249,38 +253,33 @@ void webservice::create_service(ns1__serviceType const& svc) {
 
   try {
     // Link with contacts.
-    QVector<contact*> svc_contacts(
-                        _find<contact>(
-                          svc.contacts,
-                          (void* (*)(char const*))&find_contact));
-    if (static_cast<int>(svc.contacts.size()) != svc_contacts.size())
+    std::vector<contact*> svc_contacts(
+                            _find<contact>(
+                              svc.contacts,
+                              (void* (*)(char const*))&find_contact));
+    if (svc.contacts.size() != svc_contacts.size())
       throw (engine_error() << "service ('" << svc.id->host->name
              << "', '" << svc.id->service << "') invalid contact");
 
     // Link with contact groups.
-    QVector<contactgroup*> svc_contactgroups(
+    std::vector<contactgroup*> svc_contactgroups(
                              _find<contactgroup>(
                                svc.contactGroups,
                                (void* (*)(char const*))&find_contactgroup));
-    if (static_cast<int>(svc.contactGroups.size())
-        != svc_contactgroups.size())
+    if (svc.contactGroups.size() != svc_contactgroups.size())
       throw (engine_error() << "service ('" << svc.id->host->name
              << "', '" << svc.id->service
              << "') invalid contact group");
 
     // Link with service groups.
-    QVector<servicegroup*> svc_servicegroups(
-                             _find<servicegroup>(
-                               svc.servicegroups,
-                               (void* (*)(char const*))&find_servicegroup));
-    if (static_cast<int>(svc.servicegroups.size())
-        != svc_servicegroups.size())
+    std::vector<servicegroup*>
+      svc_servicegroups(_find<servicegroup>(
+                          svc.servicegroups,
+                          (void* (*)(char const*))&find_servicegroup));
+    if (svc.servicegroups.size() != svc_servicegroups.size())
       throw (engine_error() << "service ('" << svc.id->host->name
              << "', '" << svc.id->service
              << "') invalid service group");
-
-    // Convert custom variables.
-    QVector<QString> svc_customvar(std2qt(svc.customVariables));
 
     // Link objects together.
     objects::link(
@@ -288,7 +287,7 @@ void webservice::create_service(ns1__serviceType const& svc) {
                svc_contacts,
                svc_contactgroups,
                svc_servicegroups,
-               svc_customvar,
+               svc.customVariables,
                initial_state,
                check_period,
                notification_period,

@@ -21,54 +21,48 @@
 #  define CCE_BROKER_COMPATIBILITY_HH
 
 #  include <memory>
-#  include <QObject>
 #  include "com/centreon/engine/broker/handle.hh"
+#  include "com/centreon/engine/namespace.hh"
 
-namespace                       com {
-  namespace                     centreon {
-    namespace                   engine {
-      namespace                 broker {
-        /**
-         *  @class compatibility compatibility.hh
-         *  @brief Simple compatibility class.
-         *
-         *  Use to keep compatibility with old module system API.
-         */
-        class                   compatibility : public QObject {
-          Q_OBJECT
+CCE_BEGIN()
 
-        public:
-          virtual               ~compatibility() throw ();
-          static compatibility& instance();
-          static void           load();
-          static void           unload();
+namespace                 broker {
+  /**
+   *  @class compatibility compatibility.hh
+   *  @brief Simple compatibility class.
+   *
+   *  Use to keep compatibility with old module system API.
+   */
+  class                   compatibility {
+  public:
+    virtual               ~compatibility() throw ();
+    static compatibility& instance();
+    static void           load();
+    static void           unload();
 
-        public slots:
-          void                  author_module(broker::handle* mod);
-          void                  copyright_module(broker::handle* mod);
-          void                  create_module(broker::handle* mod);
-          void                  description_module(broker::handle* mod);
-          void                  destroy_module(broker::handle* mod);
-          void                  license_module(broker::handle* mod);
-          void                  loaded_module(broker::handle* mod);
-          void                  name_module(broker::handle* mod);
-          void                  unloaded_module(broker::handle* mod);
-          void                  version_module(broker::handle* mod);
+    void                  author_module(broker::handle* mod);
+    void                  copyright_module(broker::handle* mod);
+    void                  create_module(broker::handle* mod);
+    void                  description_module(broker::handle* mod);
+    void                  destroy_module(broker::handle* mod);
+    void                  license_module(broker::handle* mod);
+    void                  loaded_module(broker::handle* mod);
+    void                  name_module(broker::handle* mod);
+    void                  unloaded_module(broker::handle* mod);
+    void                  version_module(broker::handle* mod);
 
-        private:
-                                compatibility();
-                                compatibility(
-                                  compatibility const& right);
-          compatibility&        operator=(compatibility const& right);
-          void                  _internal_copy(
-                                  compatibility const& right);
+  private:
+                          compatibility();
+                          compatibility(compatibility const& right);
+    compatibility&        operator=(compatibility const& right);
+    void                  _internal_copy(
+                            compatibility const& right);
 
-          static std::auto_ptr<compatibility>
-                                _instance;
-        };
-      }
-    }
-  }
+    static std::auto_ptr<compatibility>
+                          _instance;
+  };
 }
+
+CCE_END()
 
 #endif // !CCE_BROKER_COMPATIBILITY_HH

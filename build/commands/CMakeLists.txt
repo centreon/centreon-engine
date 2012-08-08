@@ -21,59 +21,83 @@
 set(SRC_DIR "${SRC_DIR}/commands")
 set(INC_DIR "${INC_DIR}/com/centreon/engine/commands")
 
-# connector command is required.
-add_subdirectory("connector")
-
-# Produce moc files.
-qt4_wrap_cpp(QT_MOC_FILES
-  "${INC_DIR}/command.hh"
-  "${INC_DIR}/process.hh"
-  "${INC_DIR}/basic_process.hh"
-  "${INC_DIR}/raw.hh"
-  "${INC_DIR}/set.hh")
-
 # cce_broker target.
 add_library("cce_commands"
   STATIC
   "${SRC_DIR}/command.cc"
-  "${SRC_DIR}/command_line.cc"
-  "${SRC_DIR}/process.cc"
-  "${SRC_DIR}/basic_process.cc"
+  "${SRC_DIR}/connector.cc"
+  "${SRC_DIR}/environment.cc"
   "${SRC_DIR}/raw.cc"
   "${SRC_DIR}/result.cc"
   "${SRC_DIR}/set.cc"
   "${INC_DIR}/command.hh"
-  "${INC_DIR}/command_line.hh"
-  "${INC_DIR}/process.hh"
-  "${INC_DIR}/basic_process.hh"
+  "${INC_DIR}/command_listener.hh"
+  "${INC_DIR}/connector.hh"
+  "${INC_DIR}/environment.hh"
   "${INC_DIR}/raw.hh"
   "${INC_DIR}/result.hh"
-  "${INC_DIR}/set.hh"
-  ${QT_MOC_FILES})
-
-# Link target with required libraries.
-target_link_libraries("cce_commands" "cce_connector" ${QT_LIBRARIES})
+  "${INC_DIR}/set.hh")
 
 if (WITH_TESTING)
   #Set directories.
   set(TEST_DIR "${TEST_DIR}/commands")
 
-  # Produce moc files.
-  qt4_wrap_cpp(QT_MOC_FILES
+  # Test binary.
+  add_executable("bin_connector_test_run" "${TEST_DIR}/bin_connector_test_run.cc")
+  target_link_libraries("bin_connector_test_run" ${CLIB_LIBRARIES})
+
+  add_executable("bin_test_run" "${TEST_DIR}/bin_test_run.cc")
+  target_link_libraries("bin_test_run" ${CLIB_LIBRARIES})
+
+  # Test connector.
+  add_executable("connector_ctor" "${TEST_DIR}/connector_ctor.cc")
+  target_link_libraries("connector_ctor" "cce_commands" "cce_core")
+  add_test("connector_ctor" "connector_ctor")
+
+  add_executable("connector_compare" "${TEST_DIR}/connector_compare.cc")
+  target_link_libraries("connector_compare" "cce_commands" "cce_core")
+  add_test("connector_compare" "connector_compare")
+
+  add_executable("connector_run_sync" "${TEST_DIR}/connector_run_sync.cc")
+  target_link_libraries("connector_run_sync" "cce_core")
+  add_test("connector_run_sync" "connector_run_sync")
+
+  add_executable("connector_run_async"
+    "${TEST_DIR}/connector_run_async.cc"
     "${TEST_DIR}/wait_process.hh")
+  target_link_libraries("connector_run_async" "cce_commands" "cce_core")
+  add_test("connector_run_async" "connector_run_async")
+
+  add_executable("connector_get" "${TEST_DIR}/connector_get.cc")
+  target_link_libraries("connector_get" "cce_core")
+  add_test("connector_get" "connector_get")
+
+  add_executable("connector_restart"
+    "${TEST_DIR}/connector_restart.cc"
+    "${TEST_DIR}/wait_process.hh")
+  target_link_libraries("connector_restart" "cce_commands" "cce_core")
+  add_test("connector_restart" "connector_restart")
+
+  # Test environment.
+  add_executable("environment_add" "${TEST_DIR}/environment_add.cc")
+  target_link_libraries("environment_add" "cce_core")
+  add_test("environment_add" "environment_add")
+
+  # Test environment.
+  set(TEST_NAME "environment_compare")
+  add_executable("${TEST_NAME}" "${TEST_DIR}/environment_compare.cc")
+  target_link_libraries("${TEST_NAME}" "cce_core")
+  add_test("${TEST_NAME}" "${TEST_NAME}")
+
+  # Test environment.
+  add_executable("environment_ctor" "${TEST_DIR}/environment_ctor.cc")
+  target_link_libraries("environment_ctor" "cce_core")
+  add_test("environment_ctor" "environment_ctor")
 
   # Test result.
   add_executable("result_ctor" "${TEST_DIR}/result_ctor.cc")
   target_link_libraries("result_ctor" "cce_core")
   add_test("result_ctor" "result_ctor")
-
-  add_executable("result_get_set" "${TEST_DIR}/result_get_set.cc")
-  target_link_libraries("result_get_set" "cce_core")
-  add_test("result_get_set" "result_get_set")
-
-  add_executable("result_execution_time" "${TEST_DIR}/result_execution_time.cc")
-  target_link_libraries("result_execution_time" "cce_core")
-  add_test("result_execution_time" "result_execution_time")
 
   add_executable("result_compare" "${TEST_DIR}/result_compare.cc")
   target_link_libraries("result_compare" "cce_core")
@@ -81,42 +105,33 @@ if (WITH_TESTING)
 
   # Test set.
   add_executable("set_basic" "${TEST_DIR}/set_basic.cc")
-  target_link_libraries("set_basic" "cce_commands" "cce_core" ${QT_LIBRARIES})
+  target_link_libraries("set_basic" "cce_commands" "cce_core")
   add_test("set_basic" "set_basic")
-
-  add_executable("set_name_change" "${TEST_DIR}/set_name_change.cc")
-  target_link_libraries("set_name_change" "cce_commands" "cce_core" ${QT_LIBRARIES})
-  add_test("set_name_change" "set_name_change")
-
-  # Test binary.
-  add_executable("bin_test_run" "${TEST_DIR}/bin_test_run.cc")
-  target_link_libraries("bin_test_run" ${QT_LIBRARIES})
 
   # Test raw.
   add_executable("raw_ctor" "${TEST_DIR}/raw_ctor.cc")
-  target_link_libraries("raw_ctor" "cce_commands" "cce_core" ${QT_LIBRARIES})
+  target_link_libraries("raw_ctor" "cce_commands" "cce_core")
   add_test("raw_ctor" "raw_ctor")
 
   add_executable("raw_compare" "${TEST_DIR}/raw_compare.cc")
-  target_link_libraries("raw_compare" "cce_commands" "cce_core" ${QT_LIBRARIES})
+  target_link_libraries("raw_compare" "cce_commands" "cce_core")
   add_test("raw_compare" "raw_compare")
 
   add_executable("raw_run_sync" "${TEST_DIR}/raw_run_sync.cc")
-  target_link_libraries("raw_run_sync" "cce_commands" "cce_core" ${QT_LIBRARIES})
+  target_link_libraries("raw_run_sync" "cce_commands" "cce_core")
   add_test("raw_run_sync" "raw_run_sync")
 
   add_executable("raw_run_async"
     "${TEST_DIR}/raw_run_async.cc"
-    "${TEST_DIR}/wait_process.hh"
-    ${QT_MOC_FILES})
-  target_link_libraries("raw_run_async" "cce_commands" "cce_core" ${QT_LIBRARIES})
+    "${TEST_DIR}/wait_process.hh")
+  target_link_libraries("raw_run_async" "cce_commands" "cce_core")
   add_test("raw_run_async" "raw_run_async")
 
   add_executable("raw_process" "${TEST_DIR}/raw_process.cc")
-  target_link_libraries("raw_process" "cce_commands" "cce_core" ${QT_LIBRARIES})
+  target_link_libraries("raw_process" "cce_commands" "cce_core")
   add_test("raw_process" "raw_process")
 
   add_executable("raw_get" "${TEST_DIR}/raw_get.cc")
-  target_link_libraries("raw_get" "cce_commands" "cce_core" ${QT_LIBRARIES})
+  target_link_libraries("raw_get" "cce_commands" "cce_core")
   add_test("raw_get" "raw_get")
 endif ()

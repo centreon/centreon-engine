@@ -17,16 +17,16 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <QCoreApplication>
-#include <QFile>
-#include <string.h>
-#include <time.h>
-#include <unistd.h>
+#include <cstdio>
+#include <cstring>
+#include <ctime>
+#include "com/centreon/concurrency/thread.hh"
 #include "com/centreon/engine/checks.hh"
 #include "com/centreon/engine/globals.hh"
 #include "test/notifications/first_notif_delay/common.hh"
 #include "test/unittest.hh"
 
+using namespace com::centreon;
 using namespace com::centreon::engine;
 
 /**
@@ -38,7 +38,7 @@ using namespace com::centreon::engine;
  */
 static int check(check_result& cr) {
   // Remove flag file.
-  QFile::remove(FLAG_FILE);
+  ::remove(FLAG_FILE);
 
   // Return value.
   int retval(0);
@@ -50,19 +50,19 @@ static int check(check_result& cr) {
     cr.start_time.tv_sec = now;
     cr.finish_time.tv_sec = now;
     retval |= handle_async_service_check_result(service_list, &cr);
-    retval |= QFile::exists(FLAG_FILE);
-    sleep(1);
+    retval |= file_exists(FLAG_FILE);
+    concurrency::thread::sleep(1);
     now = time(NULL);
   }
 
   // FND is reached, process check result to send notification.
-  sleep(2);
+  concurrency::thread::sleep(2);
   cr.start_time.tv_sec = now;
   cr.finish_time.tv_sec = now;
   retval |= handle_async_service_check_result(service_list, &cr);
 
   // Check that file flag exists.
-  retval |= !QFile::exists(FLAG_FILE);
+  retval |= !file_exists(FLAG_FILE);
 
   return (retval);
 }
@@ -72,7 +72,10 @@ static int check(check_result& cr) {
  *
  *  @return 0 on success.
  */
-int main_test() {
+int main_test(int argc, char** argv) {
+  (void)argc;
+  (void)argv;
+
   // Return value.
   int retval(0);
 
@@ -99,20 +102,20 @@ int main_test() {
     retval |= check(cr);
 
     // Recovery.
-    sleep(1);
+    concurrency::thread::sleep(1);
     cr.return_code = 0;
     cr.start_time.tv_sec = time(NULL);
     cr.finish_time.tv_sec = cr.start_time.tv_sec;
     retval |= handle_async_service_check_result(service_list, &cr);
 
     // Check that FND was reset properly.
-    sleep(1);
+    concurrency::thread::sleep(1);
     cr.return_code = 2;
     retval |= check(cr);
   }
 
   // Remove flag file.
-  QFile::remove(FLAG_FILE);
+  ::remove(FLAG_FILE);
 
   return (retval);
 }
@@ -121,10 +124,6 @@ int main_test() {
  *  Init unit test.
  */
 int main(int argc, char** argv) {
-  QCoreApplication app(argc, argv);
-  unittest utest(&main_test);
-  QObject::connect(&utest, SIGNAL(finished()), &app, SLOT(quit()));
-  utest.start();
-  app.exec();
-  return (utest.ret());
+  unittest utest(argc, argv, &main_test);
+  return (utest.run());
 }

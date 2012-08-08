@@ -18,10 +18,9 @@
 */
 
 #include <exception>
-#include <QCoreApplication>
-#include <QDebug>
-#include <QString>
-#include <QTemporaryFile>
+#include <fstream>
+#include <stdio.h>
+#include <string>
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/modules/external_commands/commands.hh"
 #include "com/centreon/engine/globals.hh"
@@ -33,16 +32,24 @@ using namespace com::centreon::engine;
 /**
  *  Run process_file test.
  */
-static int check_process_file() {
-  QTemporaryFile tmp("external_commands.cmd");
-  if (!tmp.open())
+static int check_process_file(int argc, char** argv) {
+  (void)argc;
+  (void)argv;
+
+  char const* tmp(tempnam("./", "extc."));
+  std::ofstream file(tmp, std::ios_base::trunc | std::ios_base::out);
+  if (!file.is_open())
     throw (engine_error() << "impossible to create temporary file.");
-  tmp.write("[1317196300] ENABLE_NOTIFICATIONS\n");
-  tmp.close();
+  file << "[1317196300] ENABLE_NOTIFICATIONS" << std::endl;
+  file.close();
 
   config.set_enable_notifications(false);
-  QString cmd("[1317196300] PROCESS_FILE;" + tmp.fileName() + ";0\n");
-  process_external_command(qPrintable(cmd));
+  std::string cmd("[1317196300] PROCESS_FILE;");
+  cmd.append(tmp);
+  cmd.append(";0\n");
+  process_external_command(cmd.c_str());
+
+  remove(tmp);
 
   if (!config.get_enable_notifications())
     throw (engine_error() << "process_file failed.");
@@ -54,10 +61,6 @@ static int check_process_file() {
  *  Init unit test.
  */
 int main(int argc, char** argv) {
-  QCoreApplication app(argc, argv);
-  unittest utest(&check_process_file);
-  QObject::connect(&utest, SIGNAL(finished()), &app, SLOT(quit()));
-  utest.start();
-  app.exec();
-  return (utest.ret());
+  unittest utest(argc, argv, &check_process_file);
+  return (utest.run());
 }

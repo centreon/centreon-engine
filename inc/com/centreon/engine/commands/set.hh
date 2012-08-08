@@ -20,57 +20,47 @@
 #ifndef CCE_COMMANDS_SET_HH
 #  define CCE_COMMANDS_SET_HH
 
-#  include <memory>
-#  include <QHash>
-#  include <QObject>
-#  include <QSharedPointer>
-#  include <QString>
+#  include <map>
+#  include <string>
 #  include "com/centreon/engine/commands/command.hh"
+#  include "com/centreon/engine/namespace.hh"
+#  include "com/centreon/shared_ptr.hh"
 
-namespace             com {
-  namespace           centreon {
-    namespace         engine {
-      namespace       commands {
-        /**
-         *  @class set set.hh
-         *  @brief Store all command.
-         *
-         *  Set is a singleton to store all command class and have a simple
-         *  access to used it.
-         */
-        class         set : public QObject {
-          Q_OBJECT
+CCE_BEGIN()
 
-        public:
-                      ~set() throw ();
-          void        add_command(command const& cmd);
-          void        add_command(QSharedPointer<command> cmd);
-          QSharedPointer<command>
-                      get_command(QString const& cmd_name);
-          static set& instance();
-          static void load();
-          void        remove_command(QString const& cmd_name);
-          static void unload();
+namespace       commands {
+  /**
+   *  @class set set.hh
+   *  @brief Store all command.
+   *
+   *  Set is a singleton to store all command class and have a simple
+   *  access to used it.
+   */
+  class         set {
+  public:
+                ~set() throw ();
+    void        add_command(command const& cmd);
+    void        add_command(
+                            shared_ptr<command> cmd);
+    shared_ptr<command>
+                get_command(std::string const& cmd_name);
+    static set& instance();
+    static void load();
+    void        remove_command(std::string const& cmd_name);
+    static void unload();
 
-        public slots:
-          void        command_name_changed(
-                        QString const& old_name,
-                        QString const& new_name);
+  private:
+                set();
+                set(set const& right);
+    set&        operator=(set const& right);
+    void        _internal_copy(set const& right);
 
-        private:
-                      set();
-                      set(set const& right);
-          set&        operator=(set const& right);
-          void        _internal_copy(set const& right);
-
-          static std::auto_ptr<set>
-                      _instance;
-          QHash<QString, QSharedPointer<command> >
-                      _list;
-        };
-      }
-    }
-  }
+    static set* _instance;
+    std::map<std::string, shared_ptr<command> >
+                _list;
+  };
 }
+
+CCE_END()
 
 #endif // !CCE_COMMANDS_SET_HH

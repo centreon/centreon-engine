@@ -18,8 +18,6 @@
 */
 
 #include <exception>
-#include <QCoreApplication>
-#include <QDebug>
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/modules/external_commands/commands.hh"
 #include "com/centreon/engine/globals.hh"
@@ -31,7 +29,10 @@ using namespace com::centreon::engine;
 /**
  *  Run flush_pending_commands test.
  */
-static int check_flush_pending_commands() {
+static int check_flush_pending_commands(int argc, char** argv) {
+  (void)argc;
+  (void)argv;
+
   char const* cmd("[1317196300] FLUSH_PENDING_COMMANDS");
   process_external_command(cmd);
   // We have no way to detect whether this worked or not.
@@ -42,10 +43,6 @@ static int check_flush_pending_commands() {
  *  Init unit test.
  */
 int main(int argc, char** argv) {
-  QCoreApplication app(argc, argv);
-  unittest utest(&check_flush_pending_commands);
-  QObject::connect(&utest, SIGNAL(finished()), &app, SLOT(quit()));
-  utest.start();
-  app.exec();
-  return (utest.ret());
+  unittest utest(argc, argv, &check_flush_pending_commands);
+  return (utest.run());
 }

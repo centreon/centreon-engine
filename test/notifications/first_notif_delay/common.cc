@@ -17,13 +17,24 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <QCoreApplication>
-#include <QFile>
+#include <cstdio>
+#include <unistd.h>
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/objects.hh"
 #include "test/notifications/first_notif_delay/common.hh"
 
 using namespace com::centreon::engine;
+
+/**
+ *  Check if a file exists.
+ *
+ *  @param[in] path  The file path to check.
+ *
+ *  @return True if the file exists, otherwise false.
+ */
+bool com::centreon::engine::file_exists(char const* path) {
+  return (!access(path, F_OK));
+}
 
 /**
  *  Create a default setup for use with first_notification_delay unit
@@ -36,7 +47,7 @@ int com::centreon::engine::first_notif_delay_default_setup() {
   config.set_interval_length(1);
 
   // Remove flag file.
-  QFile::remove(FLAG_FILE);
+  ::remove(FLAG_FILE);
 
   // Return value.
   int retval(0);

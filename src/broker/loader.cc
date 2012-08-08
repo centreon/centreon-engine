@@ -17,15 +17,16 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <assert.h>
-#include <QDir>
-#include <QFile>
-#include <stdlib.h>
-#include "com/centreon/engine/broker/compatibility.hh"
+#include <cassert>
+#include <cstdlib>
 #include "com/centreon/engine/broker/loader.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/logging/logger.hh"
+#include "com/centreon/io/directory_entry.hh"
+#include "com/centreon/io/file_stream.hh"
+#include "com/centreon/shared_ptr.hh"
 
+using namespace com::centreon;
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::broker;
 using namespace com::centreon::engine::logging;
@@ -57,59 +58,11 @@ loader::~loader() throw () {
  *
  *  @return The new object module.
  */
-QSharedPointer<handle> loader::add_module(
-                                 QString const& filename,
-                                 QString const& args) {
-  QSharedPointer<handle> module(new handle(filename, args));
-  broker::compatibility& compatibility(broker::compatibility::instance());
-
-  if (connect(&(*module),
-              SIGNAL(name_changed(QString const&, QString const&)),
-              this,
-              SLOT(module_name_changed(QString const&, QString const&))) == false
-      || connect(&(*module),
-                 SIGNAL(event_create(broker::handle*)),
-                 &compatibility,
-                 SLOT(create_module(broker::handle*))) == false
-      || connect(&(*module),
-                 SIGNAL(event_destroy(broker::handle*)),
-                 &compatibility,
-                 SLOT(destroy_module(broker::handle*))) == false
-      || connect(&(*module),
-                 SIGNAL(event_name(broker::handle*)),
-                 &compatibility,
-                 SLOT(name_module(broker::handle*))) == false
-      || connect(&(*module),
-                 SIGNAL(event_author(broker::handle*)),
-                 &compatibility,
-                 SLOT(author_module(broker::handle*))) == false
-      || connect(&(*module),
-                 SIGNAL(event_copyright(broker::handle*)),
-                 &compatibility,
-                 SLOT(copyright_module(broker::handle*))) == false
-      || connect(&(*module),
-                 SIGNAL(event_version(broker::handle*)),
-                 &compatibility,
-                 SLOT(version_module(broker::handle*))) == false
-      || connect(&(*module),
-                 SIGNAL(event_license(broker::handle*)),
-                 &compatibility,
-                 SLOT(license_module(broker::handle*))) == false
-      || connect(&(*module),
-                 SIGNAL(event_description(broker::handle*)),
-                 &compatibility,
-                 SLOT(description_module(broker::handle*))) == false
-      || connect(&(*module),
-                 SIGNAL(event_loaded(broker::handle*)),
-                 &compatibility,
-                 SLOT(loaded_module(broker::handle*))) == false
-      || connect(&(*module),
-                 SIGNAL(event_unloaded(broker::handle*)),
-                 &compatibility,
-                 SLOT(unloaded_module(broker::handle*))) == false) {
-    throw (engine_error() << "connect module to broker::compatibility failed.");
-  }
-  return (_modules.insert(filename, module).value());
+shared_ptr<broker::handle> loader::add_module(
+                                     std::string const& filename,
+                                     std::string const& args) {
+  shared_ptr<handle> module(new handle(filename, args));
+  return (_modules.insert(std::make_pair(filename, module))->second);
 }
 
 /**
@@ -117,8 +70,16 @@ QSharedPointer<handle> loader::add_module(
  *
  *  @param[in] mod Module to remove.
  */
-void loader::del_module(QSharedPointer<handle> const& mod) {
-  _modules.remove(mod->get_name(), mod);
+void loader::del_module(shared_ptr<handle> const& module) {
+  for (std::multimap<std::string, shared_ptr<handle> >::iterator
+         it(_modules.find(module->get_name())),
+         end(_modules.end());
+       it != end;
+       ++it)
+    if (it->second.get() == module.get()) {
+      _modules.erase(it);
+      break ;
+    }
   return ;
 }
 
@@ -127,8 +88,15 @@ void loader::del_module(QSharedPointer<handle> const& mod) {
  *
  *  @return All modules in a list.
  */
-QList<QSharedPointer<handle> > loader::get_modules() const {
-  return (_modules.values());
+std::list<shared_ptr<broker::handle> > loader::get_modules() const {
+  std::list<shared_ptr<handle> > lst;
+  for (std::multimap<std::string, shared_ptr<handle> >::const_iterator
+         it(_modules.begin()),
+         end(_modules.end());
+       it != end;
+       ++it)
+    lst.push_back(it->second);
+  return (lst);
 }
 
 /**
@@ -156,36 +124,34 @@ void loader::load() {
  *
  *  @return Number of modules loaded.
  */
-unsigned int loader::load_directory(QString const& dir) {
+unsigned int loader::load_directory(std::string const& dir) {
   // Get directory entries.
-  QDir directory(dir);
-  QStringList filters("*.so");
-  QFileInfoList files(directory.entryInfoList(filters));
+  io::directory_entry directory(dir);
+  std::list<io::file_entry> const& files(directory.entry_list("*.so"));
 
   // Load modules.
   unsigned int loaded(0);
-  for (QFileInfoList::const_iterator
-         it = files.begin(),
-         end = files.end();
+  for (std::list<io::file_entry>::const_iterator
+         it(files.begin()), end(files.end());
        it != end;
        ++it) {
-    QString config_file(dir + "/" + it->baseName() + ".cfg");
-    if (directory.exists(config_file) == false)
+    std::string config_file(dir + "/" + it->base_name() + ".cfg");
+    if (io::file_stream::exists(config_file.c_str()) == false)
       config_file = "";
-    QSharedPointer<handle> module;
+    shared_ptr<handle> module;
     try {
-      module = add_module(dir + "/" + it->fileName(), config_file);
+      module = add_module(dir + "/" + it->file_name(), config_file);
       module->open();
       logger(log_info_message, basic)
-        << "Event broker module '" << it->fileName()
+        << "Event broker module '" << it->file_name()
         << "' initialized successfully.";
       ++loaded;
     }
     catch (error const& e) {
       del_module(module);
       logger(log_runtime_error, basic)
-        << "Error: Could not load module '" << it->fileName()
-        << "' -> " << e.what();
+        << "Error: Could not load module '"
+        << it->file_name() << "' -> " << e.what();
     }
   }
   return (loaded);
@@ -203,63 +169,42 @@ void loader::unload() {
  *  Unload all modules.
  */
 void loader::unload_modules() {
-  for (QMultiHash<QString, QSharedPointer<handle> >::iterator
-         it = _modules.begin(), end = _modules.end();
+  for (std::multimap<std::string, shared_ptr<handle> >::iterator
+         it(_modules.begin()),
+         end(_modules.end());
        it != end;
        ++it) {
     try {
-      it.value()->close();
+      it->second->close();
     }
     catch (...) {}
     logger(dbg_eventbroker, basic)
-      << "Module '" << it.value()->get_filename()
+      << "Module '" << it->second->get_filename()
       << "' unloaded successfully.";
   }
   _modules.clear();
   return ;
 }
 
-/**
- *  Slot for notify when module name changed.
- *
- *  @param[in] old_name The old name of the module.
- *  @param[in] new_name The new name of the module.
- */
-void loader::module_name_changed(
-               QString const& old_name,
-               QString const& new_name) {
-  for (QMultiHash<QString, QSharedPointer<handle> >::iterator
-         it = _modules.find(old_name), end = _modules.end();
-       it != end && it.key() == old_name;
-       ++it) {
-    if (it.value() == this->sender()) {
-      QSharedPointer<handle> module = it.value();
-      _modules.insert(new_name, module);
-      _modules.remove(old_name, module);
-      return ;
-    }
-  }
-  throw (engine_error() << "Module '" << old_name << "' not found");
-  return ;
-}
-
 /**************************************
- *                                     *
- *           Private Methods           *
- *                                     *
- **************************************/
+*                                     *
+*           Private Methods           *
+*                                     *
+**************************************/
 
 /**
  *  Default constructor.
  */
-loader::loader() : QObject(0) {}
+loader::loader() {
+
+}
 
 /**
  *  Copy constructor.
  *
  *  @param[in] right Object to copy.
  */
-loader::loader(loader const& right) : QObject(0) {
+loader::loader(loader const& right) {
   _internal_copy(right);
 }
 

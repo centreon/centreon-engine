@@ -17,8 +17,9 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <cstdlib>
 #include <exception>
-#include <QDebug>
+#include <iostream>
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/macros.hh"
 #include "com/centreon/engine/objects/customvariablesmember.hh"
@@ -29,44 +30,55 @@ using namespace com::centreon::engine::objects;
 using namespace test::objects;
 
 void add_with_null_member() {
-  QVector<QString> objs;
+  std::vector<std::string> objs;
   if (add_custom_variables_to_object(objs, NULL) == true)
-    throw (engine_error() << Q_FUNC_INFO << " invalid return.");
+    throw (engine_error() << __func__ << " failed: invalid return");
 }
 
 void add_without_objects() {
   customvariablesmember* head = NULL;
-  QVector<QString> objs;
+  std::vector<std::string> objs;
   if (add_custom_variables_to_object(objs, &head) == false)
-    throw (engine_error() << Q_FUNC_INFO << " invalid return.");
+    throw (engine_error() << __func__ << " failed: invalid return");
 }
 
 void add_with_objects(unsigned int id) {
   init_object_skiplists();
   customvariablesmember* head = NULL;
-  QVector<QString> objs;
-  for (unsigned int i = 0; i < id; ++i)
-    objs.push_back(QString("_key%1=value%2").arg(id).arg(id));
+  std::vector<std::string> objs;
+  for (unsigned int i(0); i < id; ++i) {
+    std::ostringstream oss;
+    oss << "_key" << id << "=value" << id;
+    objs.push_back(oss.str());
+  }
 
   if (add_custom_variables_to_object(objs, &head) == false)
-    throw (engine_error() << Q_FUNC_INFO << " invalid return.");
+    throw (engine_error() << __func__ << " failed: invalid return");
 
   customvariablesmember const* member = head;
   while ((member = release(member)));
   free_object_skiplists();
 }
 
+/**
+ *  Check that custom variable can be added to member.
+ *
+ *  @return EXIT_SUCCESS on success.
+ */
 int main() {
   try {
+    // Tests.
     add_with_null_member();
     add_without_objects();
     add_with_objects(1);
     add_with_objects(10);
   }
   catch (std::exception const& e) {
-    qDebug() << "error: " << e.what();
+    // Exception handling.
+    std::cerr << "error: " << e.what() << std::endl;
     free_memory(get_global_macros());
-    return (1);
+    return (EXIT_FAILURE);
   }
-  return (0);
+
+  return (EXIT_SUCCESS);
 }

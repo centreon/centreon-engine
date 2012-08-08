@@ -17,8 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <QCoreApplication>
-#include <QThread>
+#include "com/centreon/engine/checks/checker.hh"
 #include "com/centreon/engine/commands/raw.hh"
 #include "com/centreon/engine/commands/set.hh"
 #include "com/centreon/engine/error.hh"
@@ -26,6 +25,7 @@
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/objects/command.hh"
 #include "com/centreon/engine/objects/utils.hh"
+#include "com/centreon/shared_ptr.hh"
 
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;
@@ -45,7 +45,7 @@ bool link_command(command const* obj) {
     return (false);
   }
   catch (...) {
-    logger(log_runtime_error, basic) << Q_FUNC_INFO << " unknow exception.";
+    logger(log_runtime_error, basic) << __func__ << " unknow exception";
     return (false);
   }
   return (true);
@@ -64,7 +64,7 @@ void release_command(command const* obj) {
     logger(log_runtime_error, basic) << e.what();
   }
   catch (...) {
-    logger(log_runtime_error, basic) << Q_FUNC_INFO << " unknow exception.";
+    logger(log_runtime_error, basic) << __func__ << " unknow exception";
   }
 }
 
@@ -84,10 +84,11 @@ void objects::link(command const* obj) {
 
   // update command executon system.
   commands::set& cmd_set = commands::set::instance();
-  QSharedPointer<commands::command> new_command(new commands::raw(obj->name, obj->command_line));
-  QThread* main(QCoreApplication::instance()->thread());
-  if (main != QThread::currentThread())
-    new_command->moveToThread(main);
+  com::centreon::shared_ptr<commands::command>
+    new_command(new commands::raw(
+                                obj->name,
+                                obj->command_line,
+                                &checks::checker::instance()));
   cmd_set.add_command(new_command);
 }
 
@@ -119,12 +120,12 @@ void objects::release(command const* obj) {
  *
  *  @return True if insert sucessfuly, false otherwise.
  */
-bool objects::add_commands_to_object(QVector<command*> const& commands,
+bool objects::add_commands_to_object(std::vector<command*> const& commands,
                                      commandsmember** list_command) {
   if (list_command == NULL)
     return (false);
 
-  for (QVector<command*>::const_iterator it = commands.begin(),
+  for (std::vector<command*>::const_iterator it = commands.begin(),
 	 end = commands.end();
        it != end;
        ++it) {

@@ -17,35 +17,35 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include "error.hh"
+#include <cassert>
+#include <cstdlib>
 #include "arg_definition.hh"
+#include "error.hh"
 
 using namespace com::centreon::engine::script;
 
-/**
- *  Get instance of arg_definition.
- *
- *  @return Return the uniq instance of arg_definition.
- */
-arg_definition& arg_definition::instance() {
-  static arg_definition instance;
-  return (instance);
-}
+/**************************************
+*                                     *
+*           Public Methods            *
+*                                     *
+**************************************/
 
 /**
  *  Check if an argument type exist.
  *
  *  @param[in] type The type name of argument.
  *
- *  @return Return true if type exist into argument list, false otherwise.
+ *  @return Return true if type exist into argument list, false
+ *          otherwise.
  */
-bool arg_definition::exist_argument(QString const& type) const {
-  for (QList<argument>::const_iterator it = _list.begin(), end = _list.end();
+bool arg_definition::exist_argument(std::string const& type) const {
+  for (std::list<argument>::const_iterator
+         it(_list.begin()),
+         end(_list.end());
        it != end;
        ++it) {
-    if (it->get_type() == type) {
+    if (it->get_type() == type)
       return (true);
-    }
   }
   return (false);
 }
@@ -57,15 +57,17 @@ bool arg_definition::exist_argument(QString const& type) const {
  *
  *  @return Return the argument with the good type name.
  */
-argument const& arg_definition::find_argument(QString const& type) const {
-  for (QList<argument>::const_iterator it = _list.begin(), end = _list.end();
+argument const& arg_definition::find_argument(
+                                  std::string const& type) const {
+  for (std::list<argument>::const_iterator
+         it(_list.begin()),
+         end(_list.end());
        it != end;
        ++it) {
-    if (it->get_type() == type) {
+    if (it->get_type() == type)
       return (*it);
-    }
   }
-  throw (error(qPrintable(type)));
+  throw (error(type.c_str()));
 }
 
 /**
@@ -73,9 +75,25 @@ argument const& arg_definition::find_argument(QString const& type) const {
  *
  *  @return Return the list of all arguments.
  */
-QList<argument> const& arg_definition::get_arguments() const throw() {
+std::list<argument> const& arg_definition::get_arguments() const throw () {
   return (_list);
 }
+
+/**
+ *  Get instance of arg_definition.
+ *
+ *  @return Return the uniq instance of arg_definition.
+ */
+arg_definition& arg_definition::instance() {
+  static arg_definition instance;
+  return (instance);
+}
+
+/**************************************
+*                                     *
+*           Private Methods           *
+*                                     *
+**************************************/
 
 /**
  *  Default constructor.
@@ -91,7 +109,9 @@ arg_definition::arg_definition() {
   argument arg_ulong64("ULONG64", "value");
   argument arg_vectorstr("std::vector<std::string>", "value");
 
-  argument acknowledgement("ns1__acknowledgementType", "acknowledgement");
+  argument acknowledgement(
+             "ns1__acknowledgementType",
+             "acknowledgement");
   acknowledgement.add(arg_string).set_name("author");
   acknowledgement.add(arg_string).set_name("comment");
   acknowledgement.add(arg_bool).set_name("notify");
@@ -1399,8 +1419,31 @@ arg_definition::arg_definition() {
 }
 
 /**
- *  Default destructor.
+ *  Copy constructor.
+ *
+ *  @param[in] right Object to copy.
  */
-arg_definition::~arg_definition() throw() {
+arg_definition::arg_definition(arg_definition const& right) {
+  (void)right;
+  assert(!"argument definition is not copyable");
+  abort();
+}
 
+/**
+ *  Destructor.
+ */
+arg_definition::~arg_definition() throw () {}
+
+/**
+ *  Assignment operator.
+ *
+ *  @param[in] right Object to copy.
+ *
+ *  @return This object.
+ */
+arg_definition& arg_definition::operator=(arg_definition const& right) {
+  (void)right;
+  assert(!"argument definition is not copyable");
+  abort();
+  return (*this);
 }

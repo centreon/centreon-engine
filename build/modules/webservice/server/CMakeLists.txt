@@ -21,6 +21,44 @@
 set(SRC_DIR "${MODULE_DIR}/server/src")
 set(INC_DIR "${MODULE_DIR}/server/inc/com/centreon/engine/modules/webservice")
 
+# Find Xercesc's headers.
+if (WITH_XERCESC_INCLUDE_DIR)
+  find_file(
+    XERCESC_HEADER_FOUND
+    "xercesc/dom/DOM.hpp"
+    PATHS "${WITH_XERCESC_INCLUDE_DIR}"
+    NO_DEFAULT_PATH)
+  if (NOT XERCESC_HEADER_FOUND)
+    message(FATAL_ERROR "Could not find Xercesc's headers in ${WITH_XERCESC_INCLUDE_DIR}.")
+  endif ()
+  include_directories("${WITH_XERCESC_INCLUDE_DIR}")
+else ()
+  find_path(XERCESC_INCLUDE_DIR "xercesc/dom/DOM.hpp")
+  if (NOT XERCESC_INCLUDE_DIR)
+    message(FATAL_ERROR "Could not find Xercesc's headers (try WITH_XERCESC_INCLUDE_DIR).")
+  endif ()
+  include_directories("${XERCESC_INCLUDE_DIR}")
+endif ()
+
+# Find Xercesc's library.
+if (WITH_XERCESC_LIBRARIES)
+  set(XERCESC_LIBRARIES "${WITH_XERCESC_LIBRARIES}")
+elseif (WITH_XERCESC_LIBRARY_DIR)
+  find_library(
+    XERCESC_LIBRARIES
+    "xerces-c"
+    PATHS "${WITH_XERCESC_LIBRARY_DIR}"
+    NO_DEFAULT_PATH)
+  if (NOT XERCESC_LIBRARIES)
+    message(FATAL_ERROR "Could not find Xercesc's library in ${WITH_XERCESC_LIBRARY_DIR}.")
+  endif ()
+else ()
+  find_library(XERCESC_LIBRARIES "xerces-c")
+  if (NOT XERCESC_LIBRARIES)
+    message(FATAL_ERROR "Could not find Xercesc's library (try WITH_XERCESC_LIBRARY_DIR or WITH_XERCESC_LIBRARIES).")
+  endif ()
+endif ()
+
 # Include directories.
 include_directories("${MODULE_DIR}/inc")
 
@@ -43,10 +81,6 @@ include_directories("${MODULE_DIR}/server")
 include_directories("${MODULE_DIR}/server/inc")
 include_directories("${MODULE_DIR}/../external_commands/inc")
 
-# Qt moc files.
-qt4_wrap_cpp(QT_WS_MOC_FILES
-  "${INC_DIR}/webservice.hh")
-
 # webservice target.
 add_library("webservice" SHARED
   # Auto-generated.
@@ -55,7 +89,6 @@ add_library("webservice" SHARED
   "${MODULE_DIR}/server/soapServer.cpp"
   "${MODULE_DIR}/server/soapH.h"
   "${MODULE_DIR}/server/soapStub.h"
-  ${QT_WS_MOC_FILES}
   # Sources.
   "${SRC_DIR}/commands.cc"
   "${SRC_DIR}/commands_command.cc"
@@ -123,7 +156,7 @@ target_link_libraries("webservice"
   ${SSL_LIBRARIES}
   ${CRYPTO_LIBRARIES}
   ${ZLIB_LIBRARIES}
-  ${QT_LIBRARIES}
+  ${XERCESC_LIBRARIES}
   "externalcmd")
 
 # Install rule.
@@ -139,21 +172,21 @@ if (WITH_TESTING)
   set(TEST_NAME "modules_webservice_configuration_save_resource")
   add_executable("${TEST_NAME}"
     "${TEST_DIR}/configuration/save/resource.cc")
-  target_link_libraries("${TEST_NAME}" ${QT_LIBRARIES} "cce_core" "webservice")
+  target_link_libraries("${TEST_NAME}" "cce_core" "webservice")
   add_test("${TEST_NAME}" "${TEST_NAME}")
 
   # Test calling configuration_save_state.
   set(TEST_NAME "modules_webservice_configuration_save_state")
   add_executable("${TEST_NAME}"
     "${TEST_DIR}/configuration/save/state.cc")
-  target_link_libraries("${TEST_NAME}" ${QT_LIBRARIES} "cce_core" "webservice")
+  target_link_libraries("${TEST_NAME}" "cce_core" "webservice")
   add_test("${TEST_NAME}" "${TEST_NAME}" "${TEST_DIR}/configuration/save/cfg/state.cfg")
 
   # Test calling configuration_save_objects.
   set(TEST_NAME "modules_webservice_configuration_save_objects")
   add_executable("${TEST_NAME}"
     "${TEST_DIR}/configuration/save/objects.cc")
-  target_link_libraries("${TEST_NAME}" ${QT_LIBRARIES} "cce_core" "webservice")
+  target_link_libraries("${TEST_NAME}" "cce_core" "webservice")
   add_test(
     "${TEST_NAME}_commands"
     "${TEST_NAME}"

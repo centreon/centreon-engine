@@ -49,22 +49,21 @@ void webservice::create_hostgroup(ns1__hostgroupType const& hstgrp) {
 
   try {
     // Add all hosts into the hostgroup.
-    QVector<host*> hst_members(_find<host>(
-                                 hstgrp.hostMembers,
-                                 (void* (*)(char const*))&find_host));
+    std::vector<host*>
+      hst_members(_find<host>(
+                    hstgrp.hostMembers,
+                    (void* (*)(char const*))&find_host));
     if (hstgrp.hostMembers.empty()
-        || (static_cast<int>(hstgrp.hostMembers.size())
-            != hst_members.size()))
+        || (hstgrp.hostMembers.size() != hst_members.size()))
       throw (engine_error() << "hostgroup '"
              << hstgrp.id->name << "' invalid member");
 
     // Add the content of other hostgroups into this hostgroup.
-    QVector<hostgroup*>
+    std::vector<hostgroup*>
       hst_groups(_find<hostgroup>(
                    hstgrp.hostgroupMembers,
                    (void* (*)(char const*))&find_hostgroup));
-    if (static_cast<int>(hstgrp.hostgroupMembers.size())
-        != hst_groups.size())
+    if (hstgrp.hostgroupMembers.size() != hst_groups.size())
       throw (engine_error() << "hostgroup '" << hstgrp.id->name
              << "' invalid group member");
 
@@ -146,11 +145,11 @@ int centreonengine__hostgroupAddHost(
            << hostgroup_id->name << "'");
 
   // Member array.
-  QVector<host*> member;
+  std::vector<host*> member;
   member.push_back(hst);
 
   // Link host and host group.
-  objects::link(hstgrp, member, QVector<hostgroup*>());
+  objects::link(hstgrp, member, std::vector<hostgroup*>());
 
   // Exception handling.
   COMMAND_END()
@@ -193,11 +192,11 @@ int centreonengine__hostgroupAddHostgroup(
            << "'");
 
   // Member array.
-  QVector<hostgroup*> member;
+  std::vector<hostgroup*> member;
   member.push_back(child_grp);
 
   // Link host groups.
-  objects::link(parent_grp, QVector<host*>(), member);
+  objects::link(parent_grp, std::vector<host*>(), member);
 
   // Exception handling.
   COMMAND_END()

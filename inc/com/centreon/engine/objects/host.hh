@@ -20,11 +20,12 @@
 #ifndef CCE_OBJECTS_HOST_HH
 #  define CCE_OBJECTS_HOST_HH
 
+#  include "com/centreon/engine/namespace.hh"
 #  include "com/centreon/engine/objects.hh"
 
 #  ifdef __cplusplus
-#    include <QString>
-#    include <QVector>
+#    include <string>
+#    include <vector>
 extern "C" {
 #  endif // C++
 
@@ -45,30 +46,29 @@ void release_host(host const* obj);
 #  ifdef __cplusplus
 }
 
-namespace       com {
-  namespace     centreon {
-    namespace   engine {
-      namespace objects {
-        bool    add_hosts_to_object(
-                  QVector<host*> const& hosts,
-                  hostsmember** list_host);
-        void    link(
-                  host* obj,
-                  QVector<host*> const& parents,
-                  QVector<contact*> const& contacts,
-                  QVector<contactgroup*> const& contactgroups,
-                  QVector<hostgroup*> const& hostgroups,
-                  QVector<QString> const& custom_variables,
-                  int initial_state,
-                  timeperiod* check_period,
-                  timeperiod* notification_period,
-                  command* cmd_event_handler = NULL,
-                  command* cmd_check_command = NULL);
-        void    release(host const* obj);
-      }
-    }
-  }
+CCE_BEGIN()
+
+namespace objects {
+  bool    add_hosts_to_object(
+            std::vector<host*> const& hosts,
+            hostsmember** list_host);
+  void    link(
+            host* obj,
+            std::vector<host*> const& parents,
+            std::vector<contact*> const& contacts,
+            std::vector<contactgroup*> const& contactgroups,
+            std::vector<hostgroup*> const& hostgroups,
+            std::vector<std::string> const& custom_variables,
+            int initial_state,
+            timeperiod* check_period,
+            timeperiod* notification_period,
+            command* cmd_event_handler = NULL,
+            command* cmd_check_command = NULL);
+  void    release(host const* obj);
 }
+
+CCE_END()
+
 #  endif // C++
 
 #endif // !CCE_OBJECTS_HOST_HH

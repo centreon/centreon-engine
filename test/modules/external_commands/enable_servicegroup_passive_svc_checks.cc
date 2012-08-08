@@ -18,8 +18,6 @@
 */
 
 #include <exception>
-#include <QCoreApplication>
-#include <QDebug>
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/modules/external_commands/commands.hh"
 #include "com/centreon/engine/globals.hh"
@@ -31,7 +29,10 @@ using namespace com::centreon::engine;
 /**
  *  Run enable_servicegroup_passive_svc_checks test.
  */
-static int check_enable_servicegroup_passive_svc_checks() {
+static int check_enable_servicegroup_passive_svc_checks(int argc, char** argv) {
+  (void)argc;
+  (void)argv;
+
   init_object_skiplists();
 
   service* svc = add_service("name", "description", NULL,
@@ -82,10 +83,6 @@ static int check_enable_servicegroup_passive_svc_checks() {
  *  Init unit test.
  */
 int main(int argc, char** argv) {
-  QCoreApplication app(argc, argv);
-  unittest utest(&check_enable_servicegroup_passive_svc_checks);
-  QObject::connect(&utest, SIGNAL(finished()), &app, SLOT(quit()));
-  utest.start();
-  app.exec();
-  return (utest.ret());
+  unittest utest(argc, argv, &check_enable_servicegroup_passive_svc_checks);
+  return (utest.run());
 }

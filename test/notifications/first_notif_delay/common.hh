@@ -25,6 +25,7 @@
 namespace                  com {
   namespace                centreon {
     namespace              engine {
+      bool                 file_exists(char const* path);
       int                  first_notif_delay_default_setup();
       void                 first_notif_delay_default_cleanup();
     }

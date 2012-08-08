@@ -17,31 +17,19 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <stdio.h>
-#include <string.h>
+#include <cstdio>
+#include <cstring>
 #include "com/centreon/engine/error.hh"
 
 #undef error
 
 using namespace com::centreon::engine;
 
-/**
- *  Insert data in buffer using snprintf.
- *
- *  @param[in] t      Object to stringify.
- *  @param[in] format Format used by snprintf to stringify argument.
- *                    This format must be terminated by a %n.
- */
-template <typename T>
-void error::_insert_with_snprintf(T t, char const* format) {
-  int wc;
-  if (snprintf(_buffer + _current,
-               sizeof(_buffer) / sizeof(*_buffer) - _current,
-               format,
-               t,
-               &wc) > 0)
-    _current += wc;
-}
+/**************************************
+*                                     *
+*           Public Methods            *
+*                                     *
+**************************************/
 
 /**
  *  Default constructor.
@@ -51,7 +39,7 @@ error::error() throw () : _current(0), _fatal(true) {}
 /**
  *  Constructor with debugging informations.
  */
-error::error(char const* file, char const* function, int line) throw()
+error::error(char const* file, char const* function, int line) throw ()
   : _current(0), _fatal(true) {
   *this << "[" << file << ":" << line << "(" << function << ")] ";
 }
@@ -221,17 +209,6 @@ error& error::operator<<(std::string const& str) throw () {
 }
 
 /**
- *  Insertion operator.
- *
- *  @param[in] str String to concatenate to error message.
- *
- *  @return This object.
- */
-error& error::operator<<(QString const& str) throw () {
-  return (operator<<(qPrintable(str)));
-}
-
-/**
  *  Get the error message.
  *
  *  @return Error message.
@@ -239,4 +216,30 @@ error& error::operator<<(QString const& str) throw () {
 char const* error::what() const throw () {
   _buffer[_current] = '\0';
   return (_buffer);
+}
+
+/**************************************
+*                                     *
+*           Private Methods           *
+*                                     *
+**************************************/
+
+/**
+ *  Insert data in buffer using snprintf.
+ *
+ *  @param[in] t      Object to stringify.
+ *  @param[in] format Format used by snprintf to stringify argument.
+ *                    This format must be terminated by a %n.
+ */
+template <typename T>
+void error::_insert_with_snprintf(T t, char const* format) {
+  int wc;
+  if (snprintf(
+        _buffer + _current,
+        sizeof(_buffer) / sizeof(*_buffer) - _current,
+        format,
+        t,
+        &wc) > 0)
+    _current += wc;
+  return ;
 }

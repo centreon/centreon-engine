@@ -17,9 +17,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <QCoreApplication>
-#include <QDebug>
-#include <stdlib.h>
+#include <cstdlib>
+#include <iostream>
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/logging/object.hh"
@@ -77,8 +76,8 @@ int callback(int callback_type, void* data) {
         != (1ull << index++)
       || strcmp(neb_log->data, LOG_MESSAGE)
       || (neb_log->data_type & log_all) == 0) {
-    qDebug() << "error: bad value in module.";
-    exit(1);
+    std::cerr << "error: bad value in module" << std::endl;
+    exit(EXIT_FAILURE);
   }
 
   return (0);
@@ -153,8 +152,8 @@ extern "C" int nebmodule_init(int flags, char const* args, void* handle) {
 			    handle,
 			    0,
 			    callback) != 0) {
-    qDebug() << "register callback failed.";
-    exit(1);
+    std::cerr << "register callback failed" << std::endl;
+    exit(EXIT_FAILURE);
   }
 
   return (0);

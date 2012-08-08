@@ -20,9 +20,12 @@
 #ifndef CCE_OBJECTS_TIMEPERIOD_HH
 #  define CCE_OBJECTS_TIMEPERIOD_HH
 
+#  include "com/centreon/engine/namespace.hh"
 #  include "com/centreon/engine/objects.hh"
 
 #  ifdef __cplusplus
+#  include <string>
+#  include <vector>
 extern "C" {
 #  endif // C++
 
@@ -35,20 +38,19 @@ void release_timeperiod(timeperiod const* obj);
 #  ifdef __cplusplus
 }
 
-namespace       com {
-  namespace     centreon {
-    namespace   engine {
-      namespace objects {
-        void    add_timeperiod(
-                  QString const& name,
-                  QString const& alias,
-                  QVector<QString> const& range,
-                  QVector<QString> const& exclude);
-        void    release(timeperiod const* obj);
-      }
-    }
-  }
+CCE_BEGIN()
+
+namespace objects {
+  void    add_timeperiod(
+            std::string const& name,
+            std::string const& alias,
+            std::vector<std::string> const& range,
+            std::vector<std::string> const& exclude);
+  void    release(timeperiod const* obj);
 }
+
+CCE_END()
+
 #  endif // C++
 
 #endif // !CCE_OBJECTS_TIMEPERIOD_HH

@@ -28,7 +28,9 @@
 #include "com/centreon/engine/neberrors.hh"
 #include "com/centreon/engine/nebmods.hh"
 #include "com/centreon/engine/utils.hh"
+#include "com/centreon/shared_ptr.hh"
 
+using namespace com::centreon;
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;
 
@@ -90,14 +92,15 @@ int neb_free_module_list(void) {
 /****************************************************************************/
 
 /* load all modules */
-int neb_load_all_modules(void) {
+int neb_load_all_modules() {
   int unloaded(0);
   try {
     broker::loader& loader = broker::loader::instance();
-    QList<QSharedPointer<broker::handle> > modules = loader.get_modules();
-
-    for (QList<QSharedPointer<broker::handle> >::const_iterator
-           it = modules.begin(), end = modules.end();
+    std::list<shared_ptr<broker::handle> >
+      modules(loader.get_modules());
+    for (std::list<shared_ptr<broker::handle> >::const_iterator
+           it(modules.begin()),
+           end(modules.end());
          it != end;
          ++it)
       if (neb_load_module(&(*(*it))))
@@ -144,15 +147,15 @@ int neb_load_module(void* mod) {
 /* close (unload) all modules that are currently loaded */
 int neb_unload_all_modules(int flags, int reason) {
   try {
-    broker::loader& loader = broker::loader::instance();
-    QList<QSharedPointer<broker::handle> > modules = loader.get_modules();
-
-    for (QList<QSharedPointer<broker::handle> >::const_iterator
-           it = modules.begin(), end = modules.end();
+    broker::loader& loader(broker::loader::instance());
+    std::list<shared_ptr<broker::handle> >
+      modules(loader.get_modules());
+    for (std::list<shared_ptr<broker::handle> >::const_iterator
+           it(modules.begin()),
+           end(modules.end());
          it != end;
-         ++it) {
+         ++it)
       neb_unload_module(&**it, flags, reason);
-    }
     logger(dbg_eventbroker, basic) << "load all modules success.";
   }
   catch (...) {

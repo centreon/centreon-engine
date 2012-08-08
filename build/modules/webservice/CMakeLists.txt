@@ -115,7 +115,7 @@ if (WITH_WEBSERVICE)
       "${TEST_DIR}/query.hh"
       "${PROJECT_SOURCE_DIR}/inc/com/centreon/engine/error.hh"
     )
-    target_link_libraries("${TEST_LIBRARY}" ${QT_LIBRARIES})
+    target_link_libraries("${TEST_LIBRARY}" ${CLIB_LIBRARIES})
 
     # External command module.
     get_property(EXTERNAL_COMMAND_PATH

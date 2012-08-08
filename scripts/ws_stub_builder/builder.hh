@@ -18,51 +18,50 @@
 */
 
 #ifndef CCE_SCRIPT_BUILDER_HH
-# define CCE_SCRIPT_BUILDER_HH
+#  define CCE_SCRIPT_BUILDER_HH
 
-# include <QString>
-# include "argument.hh"
-# include "function.hh"
+#  include <string>
+#  include "argument.hh"
+#  include "com/centreon/engine/namespace.hh"
+#  include "function.hh"
 
-namespace                 com {
-  namespace               centreon {
-    namespace             engine {
-      namespace           script {
-	/**
-	 *  @class builder builer.hh
-	 *  @brief Class to builder auto_gen header and source code.
-	 *
-	 *  This class create header and source code for the client webservice,
-	 *  with the soapStub information.
-	 */
-	class             builder {
-	public:
-	                  builder(QString const& header_src,
-				  QString const& header_dst,
-				  QString const& source_dst);
-	                  builder(builder const& right);
-	                  ~builder() throw();
+CCE_BEGIN()
 
-	  builder&        operator=(builder const& right);
+namespace               script {
+  /**
+   *  @class builder builer.hh
+   *  @brief Class to builder auto_gen header and source code.
+   *
+   *  This class create header and source code for the client webservice,
+   *  with the soapStub information.
+   */
+  class                 builder {
+  public:
+                        builder(
+                          std::string const& header_src,
+                          std::string const& header_dst,
+                          std::string const& source_dst);
+                        builder(builder const& right);
+                        ~builder() throw ();
+    builder&            operator=(builder const& right);
+    void                build();
+    void                parse();
 
-	  void            parse();
-	  void            build();
+  private:
+    static std::string  _basename(std::string const& path);
+    void                _build_header();
+    std::string         _build_ostream_struct(
+                           std::string const& base,
+                           argument const& arg);
+    void                _build_source();
 
-	private:
-	  void            _build_header();
-	  void            _build_source();
-
-	  QString         _build_ostream_struct(QString const& base,
-						argument const& arg);
-
-	  QList<function> _lst_function;
-	  QString         _header_src;
-	  QString         _header_dst;
-	  QString         _source_dst;
-	};
-      }
-    }
-  }
+    std::list<function> _lst_function;
+    std::string         _header_src;
+    std::string         _header_dst;
+    std::string         _source_dst;
+  };
 }
+
+CCE_END()
 
 #endif // !CCE_SCRIPT_BUILDER_HH

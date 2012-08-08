@@ -20,11 +20,11 @@
 #ifndef CCE_OBJECTS_CONTACTGROUP_HH
 #  define CCE_OBJECTS_CONTACTGROUP_HH
 
+#  include "com/centreon/engine/namespace.hh"
 #  include "com/centreon/engine/objects.hh"
 
 #  ifdef __cplusplus
-#    include <QString>
-#    include <QVector>
+#    include <vector>
 extern "C" {
 #  endif // C++
 
@@ -37,22 +37,21 @@ void release_contactgroup(contactgroup const* obj);
 #  ifdef __cplusplus
 }
 
-namespace       com {
-  namespace     centreon {
-    namespace   engine {
-      namespace objects {
-        bool    add_contactgroups_to_object(
-                  QVector<contactgroup*> const& contactgroups,
-                  contactgroupsmember** list_contactgroup);
-        void    link(
-                  contactgroup* obj,
-                  QVector<contact*> const& members,
-                  QVector<contactgroup*> const& groups);
-        void    release(contactgroup const* obj);
-      }
-    }
-  }
+CCE_BEGIN()
+
+namespace objects {
+  bool    add_contactgroups_to_object(
+            std::vector<contactgroup*> const& contactgroups,
+            contactgroupsmember** list_contactgroup);
+  void    link(
+            contactgroup* obj,
+            std::vector<contact*> const& members,
+            std::vector<contactgroup*> const& groups);
+  void    release(contactgroup const* obj);
 }
+
+CCE_END()
+
 #  endif // C++
 
 #endif // !CCE_OBJECTS_CONTACTGROUP_HH

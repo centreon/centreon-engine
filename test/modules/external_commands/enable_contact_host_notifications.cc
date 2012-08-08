@@ -18,8 +18,6 @@
 */
 
 #include <exception>
-#include <QCoreApplication>
-#include <QDebug>
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/modules/external_commands/commands.hh"
 #include "com/centreon/engine/globals.hh"
@@ -31,7 +29,10 @@ using namespace com::centreon::engine;
 /**
  *  Run enable_contact_host_notifications test.
  */
-static int check_enable_contact_host_notifications() {
+static int check_enable_contact_host_notifications(int argc, char** argv) {
+  (void)argc;
+  (void)argv;
+
   init_object_skiplists();
 
   contact* cntct = add_contact("name", NULL, NULL, NULL, NULL, NULL, NULL, 0,
@@ -59,10 +60,6 @@ static int check_enable_contact_host_notifications() {
  *  Init unit test.
  */
 int main(int argc, char** argv) {
-  QCoreApplication app(argc, argv);
-  unittest utest(&check_enable_contact_host_notifications);
-  QObject::connect(&utest, SIGNAL(finished()), &app, SLOT(quit()));
-  utest.start();
-  app.exec();
-  return (utest.ret());
+  unittest utest(argc, argv, &check_enable_contact_host_notifications);
+  return (utest.run());
 }

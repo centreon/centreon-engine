@@ -17,8 +17,9 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <cstdlib>
 #include <exception>
-#include <QDebug>
+#include <iostream>
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/engine.hh"
@@ -329,11 +330,16 @@ static void remove_timeperiod_with_hostdependencies() {
 
 
 /**
- *  Check if remove command works.
+ *  Check if timeperiod removal work.
+ *
+ *  @return EXIT_SUCCESS on success.
  */
 int main() {
+  // Initialization.
   logging::engine::load();
+
   try {
+    // Tests.
     remove_all_timeperiod();
     remove_timeperiod_failed();
     remove_timeperiod_with_timeranges();
@@ -348,9 +354,11 @@ int main() {
     remove_timeperiod_with_hostdependencies();
   }
   catch (std::exception const& e) {
-    qDebug() << "error: " << e.what();
+    // Exception handling.
+    std::cerr << "error: " << e.what() << std::endl;
     free_memory(get_global_macros());
-    return (1);
+    return (EXIT_FAILURE);
   }
-  return (0);
+
+  return (EXIT_SUCCESS);
 }

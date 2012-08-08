@@ -20,76 +20,93 @@
 #ifndef TEST_UNITTEST_HH
 #  define TEST_UNITTEST_HH
 
-#  include <QDebug>
-#  include <QThread>
+#  include <cstdlib>
+#  include <iostream>
+#  include "com/centreon/clib.hh"
 #  include "com/centreon/engine/broker/compatibility.hh"
 #  include "com/centreon/engine/broker/loader.hh"
 #  include "com/centreon/engine/checks/checker.hh"
 #  include "com/centreon/engine/commands/set.hh"
 #  include "com/centreon/engine/events/loop.hh"
 #  include "com/centreon/engine/logging/engine.hh"
+#  include "com/centreon/engine/namespace.hh"
 
-namespace     com {
-  namespace   centreon {
-    namespace engine {
-      /**
-       *  @class unittest unittest.hh
-       *  @brief Class unittest init and destroy all
-       *  engine needs to make unit test and run
-       *  unit test.
-       */
-      class   unittest : public QThread {
-      public:
-              unittest(int (*func)())
-          : QThread(), _func(func), _ret(1) {}
+CCE_BEGIN()
 
-              ~unittest() throw () {
-          wait();
-        }
+/**
+ *  @class unittest unittest.hh
+ *  @brief Class unittest init and destroy all
+ *  engine needs to make unit test and run
+ *  unit test.
+ */
+class    unittest {
+public:
+  /**
+   *  Constructor.
+   *
+   *  @param[in] argc Argument count.
+   *  @param[in] argv Argument values.
+   *  @param[in] func Unit test routine.
+   *
+   *  @return Return value of func.
+   */
+         unittest(int argc, char** argv, int (* func)(int, char**))
+    : _argc(argc), _argv(argv), _func(func) {}
 
-        int   ret() const throw () {
-          return (_ret);
-        }
+  /**
+   *  Destructor.
+   */
+         ~unittest() throw () {}
 
-      protected:
-        void  run() {
-          try {
-            _init();
-            _ret = (*_func)();
-            _deinit();
-          }
-          catch (std::exception const& e) {
-            qDebug() << "error: " << e.what();
-          }
-          catch (...) {
-            qDebug() << "error: catch all...";
-          }
-        }
-
-      private:
-        void  _init() {
-          logging::engine::load();
-          commands::set::load();
-          checks::checker::load();
-          events::loop::load();
-          broker::loader::load();
-          broker::compatibility::load();
-        }
-
-        void  _deinit() {
-          broker::compatibility::unload();
-          broker::loader::unload();
-          events::loop::unload();
-          checks::checker::unload();
-          commands::set::unload();
-          logging::engine::unload();
-        }
-
-        int  (*_func)();
-        int   _ret;
-      };
+  /**
+   *  Entry point.
+   *
+   *  @return Return value of unit test routine.
+   */
+  int    run() {
+    int ret(EXIT_FAILURE);
+    try {
+      _init();
+      ret = (*_func)(_argc, _argv);
+      _deinit();
     }
+    catch (std::exception const& e) {
+      std::cerr << "error: " << e.what() << std::endl;
+    }
+    catch (...) {
+      std::cerr << "error: unknown exception" << std::endl;
+    }
+    return (ret);
   }
-}
+
+private:
+  void   _init() {
+    com::centreon::clib::load();
+    logging::engine::load();
+    commands::set::load();
+    checks::checker::load();
+    events::loop::load();
+    broker::loader::load();
+    broker::compatibility::load();
+    return ;
+  }
+
+  void   _deinit() {
+    broker::compatibility::unload();
+    broker::loader::unload();
+    events::loop::unload();
+    checks::checker::unload();
+    commands::set::unload();
+    logging::engine::unload();
+    com::centreon::clib::unload();
+    return ;
+  }
+
+  int    _argc;
+  char** _argv;
+  int    (*_func)(int, char**);
+};
+
+CCE_END()
 
 #endif // !TEST_UNITTEST_HH

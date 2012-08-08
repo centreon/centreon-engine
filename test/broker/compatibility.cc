@@ -17,10 +17,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <climits>
 #include <exception>
-#include <limits.h>
-#include <QCoreApplication>
-#include <QDebug>
 #include "com/centreon/engine/broker/compatibility.hh"
 #include "com/centreon/engine/broker/loader.hh"
 #include "com/centreon/engine/error.hh"
@@ -37,7 +35,10 @@ extern nebmodule* neb_module_list;
 /**
  *  Check broker compatibility.
  */
-int main_test() {
+int main_test(int argc, char** argv) {
+  (void)argc;
+  (void)argv;
+
   loader& loader = loader::instance();
 
   loader.add_module(MOD_LIB_COMPT_NAME, MOD_LIB_COMPT_NAME)->open();
@@ -78,10 +79,6 @@ int main_test() {
  *  Init the unit test.
  */
 int main(int argc, char** argv) {
-  QCoreApplication app(argc, argv);
-  com::centreon::engine::unittest utest(&main_test);
-  QObject::connect(&utest, SIGNAL(finished()), &app, SLOT(quit()));
-  utest.start();
-  app.exec();
-  return (utest.ret());
+  com::centreon::engine::unittest utest(argc, argv, &main_test);
+  return (utest.run());
 }

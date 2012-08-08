@@ -17,10 +17,12 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <cstdlib>
 #include <exception>
-#include <QDebug>
+#include <iostream>
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
+#include "com/centreon/engine/logging/engine.hh"
 #include "com/centreon/engine/macros.hh"
 #include "com/centreon/engine/objects.hh"
 #include "com/centreon/engine/utils.hh"
@@ -124,17 +126,25 @@ static void try_to_remove_command() {
 
 /**
  *  Check if remove command works.
+ *
+ *  @return EXIT_SUCCESS on success.
  */
-int main(void) {
+int main() {
+  // Initialization.
+  logging::engine::load();
+
   try {
+    // Tests
     remove_all_commands();
     remove_command_failed();
     try_to_remove_command();
   }
   catch (std::exception const& e) {
-    qDebug() << "error: " << e.what();
+    // Exception handling.
+    std::cerr << "error: " << e.what() << std::endl;
     free_memory(get_global_macros());
-    return (1);
+    return (EXIT_FAILURE);
   }
-  return (0);
+
+  return (EXIT_SUCCESS);
 }

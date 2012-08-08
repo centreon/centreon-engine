@@ -17,18 +17,20 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <assert.h>
-#include <stdlib.h>
+#include <cassert>
+#include <cstdlib>
 #include "com/centreon/engine/commands/set.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/logging/logger.hh"
+#include "com/centreon/shared_ptr.hh"
 
+using namespace com::centreon;
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;
 using namespace com::centreon::engine::commands;
 
 // Class instance.
-std::auto_ptr<set> set::_instance;
+set* set::_instance = NULL;
 
 /**************************************
 *                                     *
@@ -47,7 +49,7 @@ set::~set() throw () {}
  *  @param[in] cmd The new command.
  */
 void set::add_command(command const& cmd) {
-  add_command(QSharedPointer<command>(cmd.clone()));
+  add_command(shared_ptr<command>(cmd.clone()));
   return ;
 }
 
@@ -56,14 +58,7 @@ void set::add_command(command const& cmd) {
  *
  *  @param[in] cmd The new command.
  */
-void set::add_command(QSharedPointer<command> cmd) {
-  if (connect(
-        &(*cmd),
-        SIGNAL(name_changed(QString const&, QString const&)),
-        this,
-        SLOT(command_name_changed(QString const&, QString const&)),
-        Qt::DirectConnection) == false)
-    throw (engine_error() << "connect command to set failed.");
+void set::add_command(shared_ptr<command> cmd) {
   _list[cmd->get_name()] = cmd;
   logger(dbg_commands, basic) << "added command " << cmd->get_name();
   return ;
@@ -76,13 +71,13 @@ void set::add_command(QSharedPointer<command> cmd) {
  *
  *  @return The shared pointer on a command object.
  */
-QSharedPointer<commands::command> set::get_command(
-                                         QString const& cmd_name) {
-  QHash<QString, QSharedPointer<command> >::iterator
+shared_ptr<commands::command> set::get_command(
+                                     std::string const& cmd_name) {
+  std::map<std::string, shared_ptr<command> >::iterator
     it(_list.find(cmd_name));
   if (it == _list.end())
     throw (engine_error() << "command '" << cmd_name << "' not found");
-  return (it.value());
+  return (it->second);
 }
 
 /**
@@ -98,8 +93,8 @@ set& set::instance() {
  *  Load singleton.
  */
 void set::load() {
-  if (!_instance.get())
-    _instance.reset(new set);
+  if (!_instance)
+    _instance = new set;
   return ;
 }
 
@@ -108,8 +103,8 @@ void set::load() {
  *
  *  @param[in] cmd_name The command name.
  */
-void set::remove_command(QString const& cmd_name) {
-  _list.remove(cmd_name);
+void set::remove_command(std::string const& cmd_name) {
+  _list.erase(cmd_name);
   logger(dbg_commands, basic) << "remove command " << cmd_name;
   return ;
 }
@@ -118,23 +113,8 @@ void set::remove_command(QString const& cmd_name) {
  *  Cleanup the set singleton.
  */
 void set::unload() {
-  _instance.reset();
-}
-
-/**
- *  Slot to get notified when the commend name change.
- *
- *  @param[in] old_name The old name of the command.
- *  @param[in] new_name The new name of the command.
- */
-void set::command_name_changed(
-            QString const& old_name,
-            QString const& new_name) {
-  (void)new_name;
-  QSharedPointer<commands::command> cmd(get_command(old_name));
-  remove_command(old_name);
-  add_command(cmd);
-  return ;
+  delete _instance;
+  _instance = NULL;
 }
 
 /**************************************
@@ -153,7 +133,7 @@ set::set() {}
  *
  *  @param[in] right Object to copy.
  */
-set::set(set const& right) : QObject() {
+set::set(set const& right) {
   _internal_copy(right);
 }
 

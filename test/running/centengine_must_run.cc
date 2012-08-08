@@ -17,13 +17,12 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <cstdlib>
+#include <ctime>
 #include <iostream>
-#include <QCoreApplication>
-#include <QProcess>
-#include <QStringList>
-#include <stdlib.h>
-#include <time.h>
+#include "com/centreon/clib.hh"
 #include "com/centreon/engine/error.hh"
+#include "com/centreon/process.hh"
 #include "test/paths.hh"
 
 using namespace com::centreon::engine;
@@ -34,13 +33,13 @@ using namespace com::centreon::engine;
  *  @param[in] argc Argument count.
  *  @param[in] argv Argument values.
  *
- *  @return 0 on success.
+ *  @return EXIT_SUCCESS on success.
  */
 int main(int argc, char* argv[]) {
   int retval(EXIT_FAILURE);
   try {
-    // Qt base object.
-    QCoreApplication app(argc, argv);
+    // Initialization.
+    com::centreon::clib::load();
 
     // Check arguments.
     if (argc < 2)
@@ -52,27 +51,31 @@ int main(int argc, char* argv[]) {
     else
       timeout = 5;
 
-    // Build argument list.
-    QStringList args;
-    args.push_back(argv[1]);
+    // Build command line.
+    std::string cmd(CENTENGINE_BINARY);
+    cmd.append(" '");
+    cmd.append(argv[1]);
+    cmd.append("'");
 
     // Run process.
-    QProcess centengined;
-    centengined.start(CENTENGINE_BINARY, args, QIODevice::NotOpen);
-    if (!centengined.waitForStarted())
-      throw (engine_error() << "could not start " CENTENGINE_BINARY);
-    bool reached_timeout(!centengined.waitForFinished(timeout * 1000));
+    com::centreon::process centengined;
+    centengined.enable_stream(com::centreon::process::in, false);
+    centengined.enable_stream(com::centreon::process::out, false);
+    centengined.enable_stream(com::centreon::process::err, false);
+    centengined.exec(cmd);
+    bool reached_timeout(!centengined.wait(timeout * 1000));
     if (!reached_timeout)
       throw (engine_error() << "timeout has not been reached");
 
     // Terminate process gracefully.
     centengined.terminate();
-    if (!centengined.waitForFinished(5000))
+    if (!centengined.wait(5000))
       centengined.kill();
 
     // Reaching here means success.
-    retval = (((centengined.exitStatus() == QProcess::NormalExit)
-               && (centengined.exitCode() == EXIT_SUCCESS))
+    retval = (((centengined.exit_status()
+                == com::centreon::process::normal)
+               && (centengined.exit_code() == EXIT_SUCCESS))
               ? EXIT_SUCCESS
               : EXIT_FAILURE);
   }
@@ -82,5 +85,9 @@ int main(int argc, char* argv[]) {
   catch (...) {
     std::cerr << "unknown error" << std::endl;
   }
+
+  // Shutdown.
+  com::centreon::clib::unload();
+
   return (retval);
 }

@@ -17,10 +17,10 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <QMutexLocker>
+#include <cstdio>
+#include <cstring>
 #include <sstream>
-#include <stdio.h>
-#include <string.h>
+#include "com/centreon/concurrency/locker.hh"
 #include "com/centreon/engine/logging/standard.hh"
 
 using namespace com::centreon::engine::logging;
@@ -82,11 +82,10 @@ void standard::log(
 
   if (message) {
     std::ostringstream oss;
-    oss << "[" << time(NULL) << "] ";
-    std::string const& timestamp(oss.str());
-    QMutexLocker lock(&_mutex);
-    fwrite(timestamp.c_str(), timestamp.size(), 1, _file);
-    fwrite(message, strlen(message), 1, _file);
+    oss << "[" << time(NULL) << "] " << message;
+    std::string const& data(oss.str());
+    com::centreon::concurrency::locker lock(&_mutex);
+    fwrite(data.c_str(), data.size(), 1, _file);
   }
 
   return ;

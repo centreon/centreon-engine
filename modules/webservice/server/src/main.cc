@@ -17,8 +17,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <cstddef>
 #include <exception>
-#include <stddef.h>
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/logging/logger.hh"
@@ -33,10 +33,10 @@ using namespace com::centreon::engine::logging;
 using namespace com::centreon::engine::modules::webservice;
 
 /**************************************
- *                                     *
- *           Global Objects            *
- *                                     *
- **************************************/
+*                                     *
+*           Global Objects            *
+*                                     *
+**************************************/
 
 // Specify the event broker API version.
 NEB_API_VERSION(CURRENT_NEB_API_VERSION)
@@ -183,8 +183,8 @@ extern "C" int nebmodule_init(int flags, char const* args, void* handle) {
     }
 
     // Initialise webservice.
-    gl_webservice = new webservice(*gl_config);
-    gl_webservice->start();
+    gl_webservice = new webservice(gl_config);
+    gl_webservice->exec();
   }
   catch (std::exception const& e) {
     logger(log_runtime_error, basic)

@@ -21,11 +21,10 @@
 
 #include <errno.h>
 #include <fcntl.h>
-#include <QByteArray>
-#include <QTextStream>
 #include <sstream>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include "com/centreon/engine/comments.hh"
@@ -198,8 +197,8 @@ int xrddefault_save_state_information(void) {
   unsigned long contact_service_attribute_mask = config.get_retained_contact_service_attribute_mask();
   unsigned long contact_attribute_mask = 0L;
 
-  QByteArray data;
-  QTextStream stream(&data);
+  std::ostringstream stream;
+  std::streamsize ss(stream.precision());
 
   /* write version info to status file */
   stream << "##############################################\n"
@@ -234,8 +233,8 @@ int xrddefault_save_state_information(void) {
          << "enable_flap_detection=" << config.get_enable_flap_detection() << "\n"
          << "enable_failure_prediction=" << config.get_enable_failure_prediction() << "\n"
          << "process_performance_data=" << config.get_process_performance_data() << "\n"
-         << "global_host_event_handler=" << qPrintable(config.get_global_host_event_handler()) << "\n"
-         << "global_service_event_handler=" << qPrintable(config.get_global_service_event_handler()) << "\n"
+         << "global_host_event_handler=" << config.get_global_host_event_handler().c_str() << "\n"
+         << "global_service_event_handler=" << config.get_global_service_event_handler().c_str() << "\n"
          << "next_comment_id=" << next_comment_id << "\n"
          << "next_downtime_id=" << next_downtime_id << "\n"
          << "next_event_id=" << next_event_id << "\n"
@@ -256,8 +255,8 @@ int xrddefault_save_state_information(void) {
            << "notification_period=" << (temp_host->notification_period ? temp_host->notification_period : "") << "\n"
            << "event_handler=" << (temp_host->event_handler ? temp_host->event_handler : "") << "\n"
            << "has_been_checked=" << temp_host->has_been_checked << "\n"
-           << "check_execution_time=" << qSetRealNumberPrecision(3) << ::fixed<< temp_host->execution_time << reset << "\n"
-           << "check_latency=" << qSetRealNumberPrecision(3) << ::fixed << temp_host->latency << reset << "\n"
+           << "check_execution_time=" << std::setprecision(3) << std::fixed<< temp_host->execution_time << std::setprecision(ss) << "\n"
+           << "check_latency=" << std::setprecision(3) << std::fixed << temp_host->latency << std::setprecision(ss) << "\n"
            << "check_type=" << temp_host->check_type << "\n"
            << "current_state=" << temp_host->current_state << "\n"
            << "last_state=" << temp_host->last_state << "\n"
@@ -298,7 +297,7 @@ int xrddefault_save_state_information(void) {
            << "process_performance_data=" << temp_host->process_performance_data << "\n"
            << "obsess_over_host=" << temp_host->obsess_over_host << "\n"
            << "is_flapping=" << temp_host->is_flapping << "\n"
-           << "percent_state_change=" << qSetRealNumberPrecision(2) << ::fixed << temp_host->percent_state_change << reset << "\n"
+           << "percent_state_change=" << std::setprecision(2) << std::fixed << temp_host->percent_state_change << std::setprecision(ss) << "\n"
            << "check_flapping_recovery_notification=" << temp_host->check_flapping_recovery_notification << "\n";
     stream << "state_history=";
     for (unsigned int x = 0; x < MAX_STATE_HISTORY_ENTRIES; x++)
@@ -333,8 +332,8 @@ int xrddefault_save_state_information(void) {
            << "notification_period=" << (temp_service->notification_period ? temp_service->notification_period : "") << "\n"
            << "event_handler=" << (temp_service->event_handler ? temp_service->event_handler : "") << "\n"
            << "has_been_checked=" << temp_service->has_been_checked << "\n"
-           << "check_execution_time=" << qSetRealNumberPrecision(3) << ::fixed << temp_service->execution_time << reset << "\n"
-           << "check_latency=" << qSetRealNumberPrecision(3) << ::fixed << temp_service->latency << reset << "\n"
+           << "check_execution_time=" << std::setprecision(3) << std::fixed << temp_service->execution_time << std::setprecision(ss) << "\n"
+           << "check_latency=" << std::setprecision(3) << std::fixed << temp_service->latency << std::setprecision(ss) << "\n"
            << "check_type=" << temp_service->check_type << "\n"
            << "current_state=" << temp_service->current_state << "\n"
            << "last_state=" << temp_service->last_state << "\n"
@@ -377,7 +376,7 @@ int xrddefault_save_state_information(void) {
            << "process_performance_data=" << temp_service->process_performance_data << "\n"
            << "obsess_over_service=" << temp_service->obsess_over_service << "\n"
            << "is_flapping=" << temp_service->is_flapping << "\n"
-           << "percent_state_change=" << qSetRealNumberPrecision(2) << ::fixed << temp_service->percent_state_change << reset << "\n"
+           << "percent_state_change=" << std::setprecision(2) << std::fixed << temp_service->percent_state_change << std::setprecision(ss) << "\n"
            << "check_flapping_recovery_notification=" << temp_service->check_flapping_recovery_notification << "\n";
 
     stream << "state_history=";
@@ -493,7 +492,8 @@ int xrddefault_save_state_information(void) {
   }
 
   // Write retention file.
-  char const* data_ptr(data.constData());
+  std::string data(stream.str());
+  char const* data_ptr(data.c_str());
   unsigned int size(data.size());
   while (size > 0) {
     ssize_t wb(write(xrddefault_retention_file_fd, data_ptr, size));

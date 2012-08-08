@@ -18,13 +18,12 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <assert.h>
-#include <QByteArray>
-#include <QMetaType>
-#include <QMutexLocker>
-#include <stdlib.h>
-#include <string.h>
+#include <cassert>
+#include <cstdlib>
+#include <cstring>
+#include <sstream>
 #include <sys/time.h>
+#include "com/centreon/concurrency/locker.hh"
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/checks.hh"
 #include "com/centreon/engine/checks/checker.hh"
@@ -35,12 +34,14 @@
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/neberrors.hh"
 #include "com/centreon/engine/shared.hh"
+#include "com/centreon/shared_ptr.hh"
 
+using namespace com::centreon;
 using namespace com::centreon::engine::logging;
 using namespace com::centreon::engine::checks;
 
 // Class instance.
-std::auto_ptr<checker> checker::_instance;
+static checker* _instance = NULL;
 
 /**************************************
 *                                     *
@@ -53,14 +54,11 @@ std::auto_ptr<checker> checker::_instance;
  */
 checker::~checker() throw () {
   try {
-    QMutexLocker lock(&_mut_reap);
-    for (QQueue<check_result>::iterator
-           it = _to_reap.begin(),
-           end = _to_reap.end();
-         it != end;
-         ++it)
-      free_check_result(&*it);
-    _to_reap.clear();
+    concurrency::locker lock(&_mut_reap);
+    while (!_to_reap.empty()) {
+      free_check_result(&_to_reap.front());
+      _to_reap.pop();
+    }
   }
   catch (...) {}
 }
@@ -78,9 +76,9 @@ checker& checker::instance() {
  *  Load singleton.
  */
 void checker::load() {
-  if (!_instance.get())
-    _instance.reset(new checker);
-  return ;
+  delete _instance;
+  _instance = new checker;
+  return;
 }
 
 /**
@@ -89,16 +87,16 @@ void checker::load() {
  *  @param[in] result The check_result to process later.
  */
 void checker::push_check_result(check_result const& result) {
-  QMutexLocker lock(&_mut_reap);
-  _to_reap.enqueue(result);
-  return ;
+  concurrency::locker lock(&_mut_reap);
+  _to_reap.push(result);
+  return;
 }
 
 /**
  *  Reap and process all result recive by execution process.
  */
 void checker::reap() {
-  logger(dbg_functions, basic) << "start " << Q_FUNC_INFO;
+  logger(dbg_functions, basic) << "start " << __func__;
   logger(dbg_checks, basic) << "Starting to reap check results.";
 
   // Time to start reaping.
@@ -108,13 +106,14 @@ void checker::reap() {
   // Reap check results.
   unsigned int reaped_checks(0);
   { // Scope to release mutex in all termination cases.
-    QMutexLocker lock(&_mut_reap);
-    while (!_to_reap.isEmpty()) {
+    concurrency::locker lock(&_mut_reap);
+    while (!_to_reap.empty()) {
       // Get result host or service check.
       logger(dbg_checks, basic)
         << "Found a check result (#" << ++reaped_checks
         << ") to handle...";
-      check_result result(_to_reap.dequeue());
+      check_result result(_to_reap.front());
+      _to_reap.pop();
       lock.unlock();
 
       // Service check result.
@@ -187,8 +186,8 @@ void checker::reap() {
   // Reaping finished.
   logger(dbg_checks, basic)
     << "Finished reaping " << reaped_checks << " check results";
-  logger(dbg_functions, basic) << "end " << Q_FUNC_INFO;
-  return ;
+  logger(dbg_functions, basic) << "end " << __func__;
+  return;
 }
 
 /**
@@ -197,8 +196,8 @@ void checker::reap() {
  *  @return True if the reper queue is empty, otherwise false.
  */
 bool checker::reaper_is_empty() {
-  QMutexLocker lock(&_mut_reap);
-  return (_to_reap.isEmpty());
+  concurrency::locker lock(&_mut_reap);
+  return (_to_reap.empty());
 }
 
 /**
@@ -223,7 +222,7 @@ void checker::run(
                 int* time_is_valid,
                 time_t* preferred_time) {
   // Preamble.
-  logger(dbg_functions, basic) << "start " << Q_FUNC_INFO;
+  logger(dbg_functions, basic) << "start " << __func__;
   if (!hst)
     throw (engine_error() << "attempt to run check on NULL host");
   if (!hst->check_command_ptr)
@@ -246,7 +245,7 @@ void checker::run(
     logger(dbg_checks, basic)
       << "A check of this host (" << hst->name
       << ") is already being executed, so we'll pass for the moment...";
-    return ;
+    return;
   }
 
   // Send broker event.
@@ -281,7 +280,7 @@ void checker::run(
     throw (engine_error() << "broker callback cancel");
   // Host check was overriden by NEB module.
   else if (NEBERROR_CALLBACKOVERRIDE == res)
-    return ;
+    return;
 
   // Checking starts.
   logger(dbg_functions, basic)
@@ -346,9 +345,10 @@ void checker::run(
 
   // Get command object.
   commands::set& cmd_set(commands::set::instance());
-  QSharedPointer<commands::command>
+  shared_ptr<commands::command>
     cmd(cmd_set.get_command(hst->check_command_ptr->name));
-  QString processed_cmd(cmd->process_cmd(&macros));
+  std::string processed_cmd(cmd->process_cmd(&macros));
+  char* processed_cmd_ptr(my_strdup(processed_cmd.c_str()));
 
   // Send event broker.
   broker_host_check(
@@ -367,11 +367,13 @@ void checker::run(
     config.get_host_check_timeout(),
     false,
     0,
-    QByteArray(qPrintable(processed_cmd)).data(),
+    processed_cmd_ptr,
     NULL,
     NULL,
     NULL,
     NULL);
+
+  delete[] processed_cmd_ptr;
 
   // Restore latency.
   hst->latency = old_latency;
@@ -384,33 +386,41 @@ void checker::run(
     start_time.tv_sec);
   update_check_stats(PARALLEL_HOST_CHECK_STATS, start_time.tv_sec);
 
-  // Change signal connection type.
-  disconnect(
-    &(*cmd),
-    SIGNAL(command_executed(cce_commands_result const&)),
-    this,
-    SLOT(_command_executed(cce_commands_result const&)));
-  connect(
-    &(*cmd),
-    SIGNAL(command_executed(cce_commands_result const&)),
-    this,
-    SLOT(_command_executed(cce_commands_result const&)),
-    Qt::QueuedConnection);
+  try {
+    // Run command.
+    unsigned long id(cmd->run(
+                            processed_cmd,
+                            macros,
+                            config.get_host_check_timeout()));
+    if (id != 0) {
+      concurrency::locker lock(&_mut_id);
+      _list_id[id] = check_result_info;
+    }
+  }
+  catch (std::exception const& e) {
+    timestamp now(timestamp::now());
 
-  // Run command.
-  unsigned long id(cmd->run(
-                          processed_cmd,
-                          macros,
-                          config.get_host_check_timeout()));
-  if (id != 0) {
-    QMutexLocker lock(&_mut_id);
-    _list_id[id] = check_result_info;
+    // Update check result.
+    check_result_info.finish_time.tv_sec = now.to_seconds();
+    check_result_info.finish_time.tv_usec = now.to_useconds()
+      - check_result_info.finish_time.tv_sec * 1000000ull;
+    check_result_info.early_timeout = false;
+    check_result_info.return_code = STATE_UNKNOWN;
+    check_result_info.exited_ok = true;
+    check_result_info.output = my_strdup("(Execute command failed)");
+
+    // Queue check result.
+    concurrency::locker lock(&_mut_reap);
+    _to_reap.push(check_result_info);
+
+    logger(log_runtime_warning, basic)
+      << "execute command failed: " << e.what();
   }
 
   // Cleanup.
   clear_volatile_macros_r(&macros);
-  logger(dbg_functions, basic) << "end " << Q_FUNC_INFO;
-  return ;
+  logger(dbg_functions, basic) << "end " << __func__;
+  return;
 }
 
 /**
@@ -435,7 +445,7 @@ void checker::run(
                 int* time_is_valid,
                 time_t* preferred_time) {
   // Preamble.
-  logger(dbg_functions, basic) << "start " << Q_FUNC_INFO;
+  logger(dbg_functions, basic) << "start " << __func__;
   if (!svc)
     throw (engine_error() << "attempt to run check on NULL service");
   else if (!svc->host_ptr)
@@ -489,7 +499,7 @@ void checker::run(
   }
   // Service check was override by NEB module.
   else if (NEBERROR_CALLBACKOVERRIDE == res)
-    return ;
+    return;
 
   // Checking starts.
   logger(dbg_checks, basic)
@@ -548,9 +558,10 @@ void checker::run(
 
   // Get command object.
   commands::set& cmd_set(commands::set::instance());
-  QSharedPointer<commands::command>
+  shared_ptr<commands::command>
     cmd(cmd_set.get_command(svc->check_command_ptr->name));
-  QString processed_cmd(cmd->process_cmd(&macros));
+  std::string processed_cmd(cmd->process_cmd(&macros));
+  char* processed_cmd_ptr(my_strdup(processed_cmd.c_str()));
 
   // Send event broker.
   res = broker_service_check(
@@ -567,8 +578,9 @@ void checker::run(
           config.get_service_check_timeout(),
           false,
           0,
-          QByteArray(qPrintable(processed_cmd)).data(),
+          processed_cmd_ptr,
           NULL);
+  delete[] processed_cmd_ptr;
 
   // Restore latency.
   svc->latency = old_latency;
@@ -576,7 +588,7 @@ void checker::run(
   // Service check was override by neb_module.
   if (NEBERROR_CALLBACKOVERRIDE == res) {
     clear_volatile_macros_r(&macros);
-    return ;
+    return;
   }
 
   // Update statistics.
@@ -586,33 +598,41 @@ void checker::run(
     : ACTIVE_ONDEMAND_SERVICE_CHECK_STATS,
     start_time.tv_sec);
 
-  // Change signal connection type.
-  disconnect(
-    &(*cmd),
-    SIGNAL(command_executed(cce_commands_result const&)),
-    this,
-    SLOT(_command_executed(cce_commands_result const&)));
-  connect(
-    &(*cmd),
-    SIGNAL(command_executed(cce_commands_result const&)),
-    this,
-    SLOT(_command_executed(cce_commands_result const&)),
-    Qt::QueuedConnection);
+  try {
+    // Run command.
+    unsigned long id(cmd->run(
+                            processed_cmd,
+                            macros,
+                            config.get_service_check_timeout()));
+    if (id != 0) {
+      concurrency::locker lock(&_mut_id);
+      _list_id[id] = check_result_info;
+    }
+  }
+  catch (std::exception const& e) {
+    timestamp now(timestamp::now());
 
-  // Run command.
-  unsigned long id(cmd->run(
-                          processed_cmd,
-                          macros,
-                          config.get_service_check_timeout()));
-  if (id != 0) {
-    QMutexLocker lock(&_mut_id);
-    _list_id[id] = check_result_info;
+    // Update check result.
+    check_result_info.finish_time.tv_sec = now.to_seconds();
+    check_result_info.finish_time.tv_usec = now.to_useconds()
+      - check_result_info.finish_time.tv_sec * 1000000ull;
+    check_result_info.early_timeout = false;
+    check_result_info.return_code = STATE_UNKNOWN;
+    check_result_info.exited_ok = true;
+    check_result_info.output = my_strdup("(Execute command failed)");
+
+    // Queue check result.
+    concurrency::locker lock(&_mut_reap);
+    _to_reap.push(check_result_info);
+
+    logger(log_runtime_warning, basic)
+      << "execute command failed: " << e.what();
   }
 
   // Cleanup.
   clear_volatile_macros_r(&macros);
-  logger(dbg_functions, basic) << "end " << Q_FUNC_INFO;
-  return ;
+  logger(dbg_functions, basic) << "end " << __func__;
+  return;
 }
 
 /**
@@ -631,7 +651,7 @@ void checker::run_sync(
                 int use_cached_result,
                 unsigned long check_timestamp_horizon) {
   // Preamble.
-  logger(dbg_functions, basic) << "start " << Q_FUNC_INFO;
+  logger(dbg_functions, basic) << "start " << __func__;
   if (!hst)
     throw (engine_error() << "host pointer is NULL.");
   logger(dbg_checks, basic)
@@ -644,7 +664,7 @@ void checker::run_sync(
       *check_result_code = hst->current_state;
     logger(dbg_checks, basic)
       << "Host check is not viable at this time.";
-    return ;
+    return;
   }
 
   // Time to start command.
@@ -671,7 +691,7 @@ void checker::run_sync(
       update_check_stats(
         ACTIVE_CACHED_HOST_CHECK_STATS,
         start_time.tv_sec);
-      return ;
+      return;
     }
   }
 
@@ -787,16 +807,17 @@ void checker::run_sync(
     NULL);
 
   // End.
-  logger(dbg_functions, basic) << "end " << Q_FUNC_INFO;
-  return ;
+  logger(dbg_functions, basic) << "end " << __func__;
+  return;
 }
 
 /**
  *  Unload singleton.
  */
 void checker::unload() {
-  _instance.reset();
-  return ;
+  delete _instance;
+  _instance = NULL;
+  return;
 }
 
 /**************************************
@@ -806,60 +827,10 @@ void checker::unload() {
 **************************************/
 
 /**
- *  Slot to catch the result of the execution and add to the reap queue.
- *
- *  @param[in] res The result of the execution.
- */
-void checker::_command_executed(cce_commands_result const& res) {
-  // Debug message.
-  logger(dbg_functions, basic) << "start " << Q_FUNC_INFO;
-
-  // Find check result.
-  check_result result;
-  {
-    QMutexLocker lock(&_mut_id);
-    QHash<unsigned long, check_result>::iterator
-      it(_list_id.find(res.get_command_id()));
-    if (_list_id.end() == it) {
-      lock.unlock();
-      logger(log_runtime_warning, basic)
-        << "command ID '" << res.get_command_id() << "' not found";
-      return ;
-    }
-
-    // Check result was found.
-    result = it.value();
-    _list_id.erase(it);
-  }
-  logger(dbg_checks, basic)
-    << "command ID (" << res.get_command_id() << ") executed";
-
-  // Update check result.
-  result.finish_time = res.get_end_time();
-  result.early_timeout = res.get_is_timeout();
-  result.return_code = res.get_exit_code();
-  result.exited_ok = res.get_is_executed();
-  if (res.get_is_executed() && !res.get_is_timeout())
-    result.output = my_strdup(qPrintable(res.get_stdout()));
-  else
-    result.output = my_strdup(qPrintable(res.get_stderr()));
-
-  // Queue check result.
-  {
-    QMutexLocker lock(&_mut_reap);
-    _to_reap.enqueue(result);
-  }
-
-  // Debug message.
-  logger(dbg_functions, basic) << "end " << Q_FUNC_INFO;
-  return ;
-}
-
-/**
  *  Default constructor.
  */
-checker::checker() : _mut_id(QMutex::Recursive) {
-  qRegisterMetaType<commands::result>("cce_commands_result");
+checker::checker() {
+
 }
 
 /**
@@ -867,7 +838,7 @@ checker::checker() : _mut_id(QMutex::Recursive) {
  *
  *  @param[in] right Object to copy.
  */
-checker::checker(checker const& right) : QObject() {
+checker::checker(checker const& right) {
   _internal_copy(right);
 }
 
@@ -884,6 +855,55 @@ checker& checker::operator=(checker const& right) {
 }
 
 /**
+ *  Slot to catch the result of the execution and add to the reap queue.
+ *
+ *  @param[in] res The result of the execution.
+ */
+void checker::finished(commands::result const& res) throw () {
+  // Debug message.
+  logger(dbg_functions, basic) << "start " << __func__;
+
+  // Find check result.
+  check_result result;
+  {
+    concurrency::locker lock(&_mut_id);
+    umap<unsigned long, check_result>::iterator
+      it(_list_id.find(res.command_id));
+    if (_list_id.end() == it) {
+      lock.unlock();
+      logger(log_runtime_warning, basic)
+        << "command ID '" << res.command_id << "' not found";
+      return;
+    }
+
+    // Check result was found.
+    result = it->second;
+    _list_id.erase(it);
+  }
+  logger(dbg_checks, basic)
+    << "command ID (" << res.command_id << ") executed";
+
+  // Update check result.
+  result.finish_time.tv_sec = res.end_time.to_seconds();
+  result.finish_time.tv_usec = res.end_time.to_useconds()
+                               - result.finish_time.tv_sec * 1000000ull;
+  result.early_timeout = (res.exit_status == process::timeout);
+  result.return_code = res.exit_code;
+  result.exited_ok = (res.exit_status == process::normal);
+  result.output = my_strdup(res.output.c_str());
+
+  // Queue check result.
+  {
+    concurrency::locker lock(&_mut_reap);
+    _to_reap.push(result);
+  }
+
+  // Debug message.
+  logger(dbg_functions, basic) << "end " << __func__;
+  return;
+}
+
+/**
  *  Run an host check with waiting check result.
  *
  *  @param[in] hst The host to check.
@@ -892,7 +912,7 @@ checker& checker::operator=(checker const& right) {
  */
 int checker::_execute_sync(host* hst) {
   // Preamble.
-  logger(dbg_functions, basic) << "start " << Q_FUNC_INFO;
+  logger(dbg_functions, basic) << "start " << __func__;
   if (!hst)
     throw (engine_error() << "host pointer is NULL.");
   logger(dbg_checks, basic)
@@ -903,7 +923,7 @@ int checker::_execute_sync(host* hst) {
   timeval end_time;
   memset(&start_time, 0, sizeof(start_time));
   memset(&end_time, 0, sizeof(end_time));
-  int res(broker_host_check(
+  int ret(broker_host_check(
             NEBTYPE_HOSTCHECK_SYNC_PRECHECK,
             NEBFLAG_NONE,
             NEBATTR_NONE,
@@ -926,8 +946,8 @@ int checker::_execute_sync(host* hst) {
             NULL));
 
   // Host sync check was cancelled or overriden by NEB module.
-  if ((NEBERROR_CALLBACKCANCEL == res)
-      || (NEBERROR_CALLBACKOVERRIDE == res))
+  if ((NEBERROR_CALLBACKCANCEL == ret)
+      || (NEBERROR_CALLBACKOVERRIDE == ret))
     return (hst->current_state);
 
   // Get current host macros.
@@ -949,10 +969,10 @@ int checker::_execute_sync(host* hst) {
 
   // Get command object.
   commands::set& cmd_set(commands::set::instance());
-  QSharedPointer<commands::command>
+  shared_ptr<commands::command>
     cmd(cmd_set.get_command(hst->check_command_ptr->name));
-  QString processed_cmd(cmd->process_cmd(&macros));
-  char* tmp_processed_cmd(my_strdup(qPrintable(processed_cmd)));
+  std::string processed_cmd(cmd->process_cmd(&macros));
+  char* tmp_processed_cmd(my_strdup(processed_cmd.c_str()));
 
   // Send broker event.
   broker_host_check(
@@ -1011,31 +1031,54 @@ int checker::_execute_sync(host* hst) {
     NULL);
 
   // Run command.
-  commands::result cmd_result;
-  cmd->run(
-         processed_cmd,
-         macros,
-         config.get_host_check_timeout(),
-         cmd_result);
+  commands::result res;
+  try {
+    cmd->run(
+           processed_cmd,
+           macros,
+           config.get_host_check_timeout(),
+           res);
+  }
+  catch (std::exception const& e) {
+    // Update check result.
+    res.command_id = 0;
+    res.end_time = timestamp::now();
+    res.exit_code = STATE_UNKNOWN;
+    res.exit_status = process::normal;
+    res.output = "(Execute command failed)";
+    res.start_time = res.end_time;
+
+    logger(log_runtime_warning, basic)
+      << "execute command failed: " << e.what();
+  }
 
   // Get output.
-  char* output(NULL);
-  if (cmd_result.get_is_executed())
-    output = my_strdup(qPrintable(cmd_result.get_stdout()));
-  else
-    output = my_strdup(qPrintable(cmd_result.get_stderr()));
+  char* output(my_strdup(res.output.c_str()));
+
+  unsigned int execution_time(0);
+  if (res.end_time >= res.start_time)
+    execution_time
+      = res.end_time.to_seconds() - res.start_time.to_seconds();
 
   // Send broker event.
+  memset(&start_cmd, 0, sizeof(start_time));
+  start_cmd.tv_sec = res.start_time.to_seconds();
+  start_cmd.tv_usec
+    = res.start_time.to_useconds() - start_cmd.tv_sec * 1000000ull;
+  memset(&end_cmd, 0, sizeof(end_time));
+  end_cmd.tv_sec = res.end_time.to_seconds();
+  end_cmd.tv_usec =
+    res.end_time.to_useconds() - end_cmd.tv_sec * 1000000ull;
   broker_system_command(
     NEBTYPE_SYSTEM_COMMAND_END,
     NEBFLAG_NONE,
     NEBATTR_NONE,
-    cmd_result.get_start_time(),
-    cmd_result.get_end_time(),
-    cmd_result.get_execution_time(),
+    start_cmd,
+    end_cmd,
+    execution_time,
     config.get_host_check_timeout(),
-    cmd_result.get_is_timeout(),
-    cmd_result.get_exit_code(),
+    res.exit_status == process::timeout,
+    res.exit_code,
     tmp_processed_cmd,
     output,
     NULL);
@@ -1045,10 +1088,12 @@ int checker::_execute_sync(host* hst) {
   clear_volatile_macros_r(&macros);
 
   // If the command timed out.
-  if (cmd_result.get_is_timeout()) {
-    QString output("Host check timed out after %1  seconds");
-    output.arg(config.get_host_check_timeout());
-    cmd_result.set_stdout(output);
+  if (res.exit_status == process::timeout) {
+    std::ostringstream oss;
+    oss << "Host check timed out after "
+        << config.get_host_check_timeout()
+        << "  seconds";
+    res.output = oss.str();
     logger(log_runtime_warning, basic)
       << "Warning: Host check command '" << processed_cmd
       << "' for host '" << hst->name << "' timed out after "
@@ -1056,15 +1101,11 @@ int checker::_execute_sync(host* hst) {
   }
 
   // Update values.
-  hst->execution_time = cmd_result.get_execution_time();
+  hst->execution_time = execution_time;
   hst->check_type = HOST_CHECK_ACTIVE;
 
   // Get plugin output.
-  char* tmp_plugin_output(NULL);
-  if (cmd_result.get_is_executed())
-    tmp_plugin_output = my_strdup(qPrintable(cmd_result.get_stdout()));
-  else
-    tmp_plugin_output = my_strdup(qPrintable(cmd_result.get_stderr()));
+  char* tmp_plugin_output(my_strdup(res.output.c_str()));
 
   // Parse the output: short and long output, and perf data.
   parse_check_output(
@@ -1080,7 +1121,7 @@ int checker::_execute_sync(host* hst) {
   if (!hst->host_check_command) {
     delete [] hst->plugin_output;
     hst->plugin_output = my_strdup("(Host assumed to be UP)");
-    cmd_result.set_exit_code(STATE_OK);
+    res.exit_code = STATE_OK;
   }
 
   // Make sure we have some data.
@@ -1099,12 +1140,12 @@ int checker::_execute_sync(host* hst) {
   // If we're not doing aggressive host checking, let WARNING
   // states indicate the host is up (fake the result to be STATE_OK).
   if (!config.get_use_aggressive_host_checking()
-      && (cmd_result.get_exit_code() == STATE_WARNING))
-    cmd_result.set_exit_code(STATE_OK);
+      && (res.exit_code == STATE_WARNING))
+    res.exit_code = STATE_OK;
 
   // Get host state from plugin exit code.
   int return_result(
-        (cmd_result.get_exit_code() == STATE_OK)
+        (res.exit_code == STATE_OK)
         ? HOST_UP
         : HOST_DOWN);
 
@@ -1124,10 +1165,10 @@ int checker::_execute_sync(host* hst) {
     end_time,
     hst->host_check_command,
     0.0,
-    cmd_result.get_execution_time(),
+    execution_time,
     config.get_host_check_timeout(),
-    cmd_result.get_is_timeout(),
-    cmd_result.get_exit_code(),
+    res.exit_status == process::timeout,
+    res.exit_code,
     tmp_processed_cmd,
     hst->plugin_output,
     hst->long_plugin_output,
@@ -1138,7 +1179,7 @@ int checker::_execute_sync(host* hst) {
   // Termination.
   logger(dbg_checks, basic)
     << "** Sync host check done: state=" << return_result;
-  logger(dbg_functions, basic) << "end " << Q_FUNC_INFO;
+  logger(dbg_functions, basic) << "end " << __func__;
   return (return_result);
 }
 
@@ -1151,5 +1192,5 @@ void checker::_internal_copy(checker const& right) {
   (void)right;
   assert(!"checker is not copyable");
   abort();
-  return ;
+  return;
 }

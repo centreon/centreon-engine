@@ -17,10 +17,14 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <QFile>
+#include <sstream>
+#include <xercesc/parsers/XercesDOMParser.hpp>
+#include <xercesc/util/XMLString.hpp>
+#include <xercesc/util/XMLUni.hpp>
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/modules/webservice/configuration.hh"
 
+using namespace xercesc;
 using namespace com::centreon::engine::modules::webservice;
 
 /**
@@ -28,7 +32,7 @@ using namespace com::centreon::engine::modules::webservice;
  *
  *  @param[in] filename The configuration filename.
  */
-configuration::configuration(QString const& filename)
+configuration::configuration(std::string const& filename)
   : _accept_timeout(500),
     _filename(filename),
     _port(80),
@@ -36,6 +40,17 @@ configuration::configuration(QString const& filename)
     _send_timeout(5),
     _ssl_enable(false),
     _thread_count(1) {
+  try {
+    XMLPlatformUtils::Initialize();
+  }
+  catch (XMLException const& e) {
+    char* err_str(XMLString::transcode(e.getMessage()));
+    std::string err(err_str);
+    XMLString::release(&err_str);
+    throw (engine_error() << "configuration initialize failed: "
+           << err);
+  }
+
   _keytab["/webservice"] = NULL;
   _keytab["/webservice/thread_count"] = &configuration::_set_thread_count;
   _keytab["/webservice/host"] = &configuration::_set_host;
@@ -54,8 +69,13 @@ configuration::configuration(QString const& filename)
 /**
  *  Default Destructor.
  */
-configuration::~configuration() throw() {
-
+configuration::~configuration() throw () {
+  try {
+    XMLPlatformUtils::Terminate();
+  }
+  catch (XMLException const& e) {
+    (void)e;
+  }
 }
 
 /**
@@ -63,7 +83,7 @@ configuration::~configuration() throw() {
  *
  *  @return The timeout in micosecond.
  */
-int configuration::get_accept_timeout() const throw() {
+int configuration::get_accept_timeout() const throw () {
   return (_accept_timeout);
 }
 
@@ -72,7 +92,7 @@ int configuration::get_accept_timeout() const throw() {
  *
  *  @return The configuration filename.
  */
-QString const& configuration::get_filename() const throw() {
+std::string const& configuration::get_filename() const throw () {
   return (_filename);
 }
 
@@ -81,7 +101,7 @@ QString const& configuration::get_filename() const throw() {
  *
  *  @return The host name.
  */
-QString const& configuration::get_host() const throw() {
+std::string const& configuration::get_host() const throw () {
   return (_host);
 }
 
@@ -90,7 +110,7 @@ QString const& configuration::get_host() const throw() {
  *
  *  @return The port.
  */
-int configuration::get_port() const throw() {
+int configuration::get_port() const throw () {
   return (_port);
 }
 
@@ -99,7 +119,7 @@ int configuration::get_port() const throw() {
  *
  *  @return The timeout in second.
  */
-int configuration::get_recv_timeout() const throw() {
+int configuration::get_recv_timeout() const throw () {
   return (_recv_timeout);
 }
 
@@ -108,7 +128,7 @@ int configuration::get_recv_timeout() const throw() {
  *
  *  @return The timeout in second.
  */
-int configuration::get_send_timeout() const throw() {
+int configuration::get_send_timeout() const throw () {
   return (_send_timeout);
 }
 
@@ -117,7 +137,7 @@ int configuration::get_send_timeout() const throw() {
  *
  *  @return The certificate path.
  */
-QString const& configuration::get_ssl_cacert() const throw() {
+std::string const& configuration::get_ssl_cacert() const throw () {
   return (_ssl_cacert);
 }
 
@@ -126,7 +146,7 @@ QString const& configuration::get_ssl_cacert() const throw() {
  *
  *  @return The Diffie-Helman path.
  */
-QString const& configuration::get_ssl_dh() const throw() {
+std::string const& configuration::get_ssl_dh() const throw () {
   return (_ssl_dh);
 }
 
@@ -135,7 +155,7 @@ QString const& configuration::get_ssl_dh() const throw() {
  *
  *  @return true is enable, false otherwise.
  */
-bool configuration::get_ssl_enable() const throw() {
+bool configuration::get_ssl_enable() const throw () {
   return (_ssl_enable);
 }
 
@@ -144,7 +164,7 @@ bool configuration::get_ssl_enable() const throw() {
  *
  *  @return The keyfile path.
  */
-QString const& configuration::get_ssl_keyfile() const throw() {
+std::string const& configuration::get_ssl_keyfile() const throw () {
   return (_ssl_keyfile);
 }
 
@@ -153,7 +173,7 @@ QString const& configuration::get_ssl_keyfile() const throw() {
  *
  *  @return The password.
  */
-QString const& configuration::get_ssl_password() const throw() {
+std::string const& configuration::get_ssl_password() const throw () {
   return (_ssl_password);
 }
 
@@ -162,7 +182,7 @@ QString const& configuration::get_ssl_password() const throw() {
  *
  *  @return The thread count.
  */
-unsigned int configuration::get_thread_count() const throw() {
+unsigned int configuration::get_thread_count() const throw () {
   return (_thread_count);
 }
 
@@ -170,30 +190,34 @@ unsigned int configuration::get_thread_count() const throw() {
  *  Parse configuration file.
  */
 void configuration::parse() {
-  QFile file(_filename);
-  if (file.open(QFile::ReadOnly | QFile::Text) == false) {
-    throw (engine_error() << file.errorString());
-  }
-  _reader.setDevice(&file);
+  try {
+    XercesDOMParser parser;
 
-  while (!_reader.atEnd()) {
-    if (_reader.isStartElement()) {
-      _path += "/" + _reader.name().toString();
+    parser.setValidationScheme(XercesDOMParser::Val_Never);
+    parser.setDoNamespaces(false);
+    parser.setDoSchema(false);
+    parser.setLoadExternalDTD(false);
 
-      QHash<QString, void (configuration::*)()>::const_iterator it = _keytab.find(_path);
-      if (it == _keytab.end()) {
-      	throw (engine_error() << "line " << _reader.lineNumber());
-      }
-      if (it.value() != NULL) {
-      	(this->*it.value())();
-      }
-    }
-    if (_reader.isEndElement()) {
-      _path = _path.left(_path.lastIndexOf('/'));
-    }
-    _reader.readNext();
+    parser.parse(_filename.c_str());
+
+    DOMDocument* doc(parser.getDocument());
+    if (!doc)
+      throw (engine_error() << "parse configuration failed: "
+             "document is empty");
+    DOMElement* root(doc->getDocumentElement());
+    if (!root)
+      throw (engine_error() << "parse configuration failed: "
+             "root is empty");
+    _parse("", root);
   }
-  file.close();
+  catch (XMLException const& e) {
+    char* err_str(XMLString::transcode(e.getMessage()));
+    std::string err(err_str);
+    XMLString::release(&err_str);
+    throw (engine_error() << "parse configuration failed: "
+           << err);
+  }
+
 }
 
 /**
@@ -201,112 +225,174 @@ void configuration::parse() {
  *
  *  @param[in] filename The configuration filename.
  */
-void configuration::set_filename(QString const& filename) {
+void configuration::set_filename(std::string const& filename) {
   _filename = filename;
 }
 
 /**
- *  Set the accept socket timeout.
+ *  Internal parser.
+ *
+ *  @param[in] prefix  The string from the root to the value.
+ *  @param[in] node    The node to parse.
  */
-void configuration::_set_accept_timeout() {
-  bool ok;
-  _accept_timeout = _reader.readElementText().toInt(&ok) * -1000;
-  if (ok == false) {
-    throw (engine_error() << "line " << _reader.lineNumber());
+void configuration::_parse(
+                      std::string const& prefix,
+                      xercesc::DOMNode const* node) {
+  if (!node)
+    return;
+
+  if (node->getNodeType() == DOMNode::ELEMENT_NODE) {
+    XMLCh const* name(node->getNodeName());
+    std::string new_prefix(prefix + "/");
+    if (name) {
+      char* name_str(XMLString::transcode(name));
+      new_prefix += name_str;
+      XMLString::release(&name_str);
+    }
+    for (DOMNode const* child(node->getFirstChild());
+         child;
+         child = child->getNextSibling())
+      _parse(new_prefix, child);
   }
+  else if (node->getNodeType() == DOMNode::TEXT_NODE) {
+    XMLCh const* value_xml(node->getNodeValue());
+    char* value_str(value_xml ? XMLString::transcode(value_xml) : NULL);
+    if (value_str) {
+      XMLString::trim(value_str);
+      std::string value(value_str);
+      XMLString::release(&value_str);
+
+      if (!value.empty()) {
+        typedef void (configuration::*pfunc)(std::string const&);
+        std::map<std::string, pfunc>::const_iterator
+          it(_keytab.find(prefix));
+        if (it == _keytab.end())
+          throw (engine_error() << "parse configuration failed: "
+                 "invalid prefix: " << prefix);
+        if (it->second)
+          (this->*it->second)(value);
+      }
+    }
+  }
+}
+
+/**
+ *  Set the accept socket timeout.
+ *
+ *  @param[in] value  The value to set.
+ */
+void configuration::_set_accept_timeout(std::string const& value) {
+  std::istringstream iss(value);
+  if (!(iss >> _accept_timeout) || !iss.eof())
+    throw (engine_error() << "parse configuration failed: "
+           "invalid accept_timeout");
+  _accept_timeout *= -1000;
 }
 
 /**
  *  Set the server host name.
+ *
+ *  @param[in] value  The value to set.
  */
-void configuration::_set_host() {
-  _host = _reader.readElementText();
+void configuration::_set_host(std::string const& value) {
+  _host = value;
 }
 
 /**
  *  Set the listening port.
+ *
+ *  @param[in] value  The value to set.
  */
-void configuration::_set_port() {
-  bool ok;
-  _port = _reader.readElementText().toInt(&ok);
-  if (ok == false) {
-    throw (engine_error() << "line " << _reader.lineNumber());
-  }
+void configuration::_set_port(std::string const& value) {
+  std::istringstream iss(value);
+  if (!(iss >> _port) || !iss.eof())
+    throw (engine_error() << "parse configuration failed: "
+           "invalid port");
 }
 
 /**
  *  Set the receive socket timeout.
+ *
+ *  @param[in] value  The value to set.
  */
-void configuration::_set_recv_timeout() {
-  bool ok;
-  _recv_timeout = _reader.readElementText().toInt(&ok);
-  if (ok == false) {
-    throw (engine_error() << "line " << _reader.lineNumber());
-  }
+void configuration::_set_recv_timeout(std::string const& value) {
+  std::istringstream iss(value);
+  if (!(iss >> _recv_timeout) || !iss.eof())
+    throw (engine_error() << "parse configuration failed: "
+           "invalid recv_timeout");
 }
 
 /**
  *  Set the send socket timeout.
+ *
+ *  @param[in] value  The value to set.
  */
-void configuration::_set_send_timeout() {
-  bool ok;
-  _send_timeout = _reader.readElementText().toInt(&ok);
-  if (ok == false) {
-    throw (engine_error() << "line " << _reader.lineNumber());
-  }
+void configuration::_set_send_timeout(std::string const& value) {
+  std::istringstream iss(value);
+  if (!(iss >> _send_timeout) || !iss.eof())
+    throw (engine_error() << "parse configuration failed: "
+           "invalid send_timeout");
 }
 
 /**
  *  Set the certificate path (for authentication).
+ *
+ *  @param[in] value  The value to set.
  */
-void configuration::_set_ssl_cacert() {
-  _ssl_cacert = _reader.readElementText();
+void configuration::_set_ssl_cacert(std::string const& value) {
+  _ssl_cacert = value;
 }
 
 /**
  *  Set the Diffie-Helman path (for authentication).
+ *
+ *  @param[in] value  The value to set.
  */
-void configuration::_set_ssl_dh() {
-  _ssl_dh = _reader.readElementText();
+void configuration::_set_ssl_dh(std::string const& value) {
+  _ssl_dh = value;
 }
 
 /**
  *  Set if ssl is enable.
+ *
+ *  @param[in] value  The value to set.
  */
-void configuration::_set_ssl_enable() {
-  QString const& value = _reader.readElementText();
-  if (value == "true") {
+void configuration::_set_ssl_enable(std::string const& value) {
+  if (value == "true")
     _ssl_enable = true;
-  }
-  else if (value == "false") {
+  else if (value == "false")
     _ssl_enable = false;
-  }
-  else {
-    throw (engine_error() << "line " << _reader.lineNumber());
-  }
+  else
+    throw (engine_error() << "parse configuration failed: "
+           "invalid ssl_enable");
 }
 
 /**
  *  Set the keyfile path (for authentication).
+ *
+ *  @param[in] value  The value to set.
  */
-void configuration::_set_ssl_keyfile() {
-  _ssl_keyfile = _reader.readElementText();
+void configuration::_set_ssl_keyfile(std::string const& value) {
+  _ssl_keyfile = value;
 }
 
 /**
  *  Set the password (for authentication).
+ *
+ *  @param[in] value  The value to set.
  */
-void configuration::_set_ssl_password() {
-  _ssl_password = _reader.readElementText();
+void configuration::_set_ssl_password(std::string const& value) {
+  _ssl_password = value;
 }
 
 /**
  *  Set the thread count.
+ *
+ *  @param[in] value  The value to set.
  */
-void configuration::_set_thread_count() {
-  bool ok;
-  _thread_count = _reader.readElementText().toUInt(&ok);
-  if (ok == false || _thread_count == 0) {
-    throw (engine_error() << "line " << _reader.lineNumber());
-  }
+void configuration::_set_thread_count(std::string const& value) {
+  std::istringstream iss(value);
+  if (!(iss >> _thread_count) || !iss.eof() || !_thread_count)
+    throw (engine_error() << "parse configuration failed: "
+           "invalid thread_count");
 }

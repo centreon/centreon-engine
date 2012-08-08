@@ -34,9 +34,9 @@ using namespace com::centreon::engine::modules::webservice;
  */
 webservice::webservice(
               bool ssl_enable,
-              QString const& keyfile,
-              QString const& password,
-              QString const& cacert)
+              std::string const& keyfile,
+              std::string const& password,
+              std::string const& cacert)
   : _gen(auto_gen::instance()),
     _ssl_enable(ssl_enable) {
 #ifndef WITH_OPENSSL
@@ -100,12 +100,14 @@ webservice::~webservice() {
  *
  *  @return Return true if the execution succeed, false otherwise.
  */
-bool webservice::execute(QString const& function, QHash<QString, QString> const& args) {
+bool webservice::execute(
+                   std::string const& function,
+                   std::map<std::string, std::string>& args) {
   return (_gen.execute(
             function,
             &_soap_ctx,
-            _end_point.toStdString().c_str(),
-            _action.toStdString().c_str(),
+            _end_point.c_str(),
+            _action.c_str(),
             args));
 }
 
@@ -114,7 +116,7 @@ bool webservice::execute(QString const& function, QHash<QString, QString> const&
  *
  *  @return The soap action.
  */
-QString const& webservice::get_action() const throw() {
+std::string const& webservice::get_action() const throw () {
   return (_action);
 }
 
@@ -123,7 +125,7 @@ QString const& webservice::get_action() const throw() {
  *
  *  @return The endpoint address.
  */
-QString const& webservice::get_end_point() const throw() {
+std::string const& webservice::get_end_point() const throw () {
   return (_end_point);
 }
 
@@ -132,7 +134,7 @@ QString const& webservice::get_end_point() const throw() {
  *
  *  @return Return true if ssl is enable, false otherwise.
  */
-bool webservice::is_ssl_enable() const throw() {
+bool webservice::is_ssl_enable() const throw () {
   return (_ssl_enable);
 }
 
@@ -141,7 +143,7 @@ bool webservice::is_ssl_enable() const throw() {
  *
  *  @return The soap action.
  */
-void webservice::set_action(QString const& action) {
+void webservice::set_action(std::string const& action) {
   _action = action;
 }
 
@@ -150,7 +152,7 @@ void webservice::set_action(QString const& action) {
  *
  *  @param[in] end_point The endpoint address.
  */
-void webservice::set_end_point(QString const& end_point) {
+void webservice::set_end_point(std::string const& end_point) {
   _end_point = end_point;
 }
 

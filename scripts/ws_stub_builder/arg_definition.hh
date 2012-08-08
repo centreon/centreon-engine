@@ -1,5 +1,5 @@
 /*
-** Copyright 2011 Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -18,41 +18,38 @@
 */
 
 #ifndef CCE_SCRIPT_ARG_DEFINITION_HH
-# define CCE_SCRIPT_ARG_DEFINITION_HH
+#  define CCE_SCRIPT_ARG_DEFINITION_HH
 
-# include "argument.hh"
+#  include <list>
+#  include "argument.hh"
+#  include "com/centreon/engine/namespace.hh"
 
-namespace                        com {
-  namespace                      centreon {
-    namespace                    engine {
-      namespace                  script {
-	/**
-	 *  @class arg_definition arg_definition.hh
-	 *  @brief Singleton to contain all arguments definition.
-	 *
-	 *  This class is a singleton with all arguments definition.
-	 */
-	class                    arg_definition {
-	public:
-	  static arg_definition& instance();
+CCE_BEGIN()
 
+namespace                      script {
+  /**
+   *  @class arg_definition arg_definition.hh
+   *  @brief Singleton to contain all arguments definition.
+   *
+   *  This class is a singleton with all arguments definition.
+   */
+  class                        arg_definition {
+  public:
+    bool                       exist_argument(std::string const& type) const;
+    argument const&            find_argument(std::string const& type) const;
+    std::list<argument> const& get_arguments() const throw ();
+    static arg_definition&     instance();
 
-	  bool                   exist_argument(QString const& type) const;
-	  argument const&        find_argument(QString const& type) const;
-	  QList<argument> const& get_arguments() const throw();
+  private:
+                               arg_definition();
+                               arg_definition(arg_definition const& right);
+                               ~arg_definition() throw ();
+    arg_definition&            operator=(arg_definition const& right);
 
-	private:
-	                         arg_definition();
-	                         arg_definition(arg_definition const& right);
-	                         ~arg_definition() throw();
-
-	  arg_definition&        operator=(arg_definition const& right);
-
-	  QList<argument>        _list;
-	};
-      }
-    }
-  }
+    std::list<argument>        _list;
+  };
 }
+
+CCE_END()
 
 #endif // !CCE_SCRIPT_ARG_DEFINITION_HH

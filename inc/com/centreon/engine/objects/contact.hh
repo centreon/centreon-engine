@@ -20,11 +20,12 @@
 #ifndef CCE_OBJECTS_CONTACT_HH
 #  define CCE_OBJECTS_CONTACT_HH
 
+#  include "com/centreon/engine/namespace.hh"
 #  include "com/centreon/engine/objects.hh"
 
 #  ifdef __cplusplus
-#    include <QString>
-#    include <QVector>
+#    include <string>
+#    include <vector>
 extern "C" {
 #  endif // C++
 
@@ -41,26 +42,25 @@ void release_contact(contact const* obj);
 #  ifdef __cplusplus
 }
 
-namespace       com {
-  namespace     centreon {
-    namespace   engine {
-      namespace objects {
-        bool    add_contacts_to_object(
-                  QVector<contact*> const& contacts,
-                  contactsmember** list_contact);
-        void    link(
-                  contact* obj,
-                  timeperiod* host_notification_period,
-                  timeperiod* service_notification_period,
-                  QVector<contactgroup*> const& contactgroups,
-                  QVector<command*> const& host_notification_commands,
-                  QVector<command*> const& service_notification_commands,
-                  QVector<QString> const& custom_variables);
-        void    release(contact const* obj);
-      }
-    }
-  }
+CCE_BEGIN()
+
+namespace objects {
+  bool    add_contacts_to_object(
+            std::vector<contact*> const& contacts,
+            contactsmember** list_contact);
+  void    link(
+            contact* obj,
+            timeperiod* host_notification_period,
+            timeperiod* service_notification_period,
+            std::vector<contactgroup*> const& contactgroups,
+            std::vector<command*> const& host_notification_commands,
+            std::vector<command*> const& service_notification_commands,
+            std::vector<std::string> const& custom_variables);
+  void    release(contact const* obj);
 }
+
+CCE_END()
+
 #  endif // C++
 
 #endif // !CCE_OBJECTS_CONTACT_HH

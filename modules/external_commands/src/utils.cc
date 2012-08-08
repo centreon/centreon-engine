@@ -57,11 +57,11 @@ int open_command_file(void) {
   umask(S_IWOTH);
 
   /* use existing FIFO if possible */
-  if (!(stat(config.get_command_file().toStdString().c_str(), &st) != -1
+  if (!(stat(config.get_command_file().c_str(), &st) != -1
         && (st.st_mode & S_IFIFO))) {
 
     /* create the external command file as a named pipe (FIFO) */
-    if ((result = mkfifo(config.get_command_file().toStdString().c_str(),
+    if ((result = mkfifo(config.get_command_file().c_str(),
                          S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP)) != 0) {
       logger(log_runtime_error, basic)
         << "Error: Could not create external command file '"
@@ -75,7 +75,7 @@ int open_command_file(void) {
 
   /* open the command file for reading (non-blocked) - O_TRUNC flag cannot be used due to errors on some systems */
   /* NOTE: file must be opened read-write for poll() to work */
-  if ((command_file_fd = open(config.get_command_file().toStdString().c_str(), O_RDWR | O_NONBLOCK)) < 0) {
+  if ((command_file_fd = open(config.get_command_file().c_str(), O_RDWR | O_NONBLOCK)) < 0) {
     logger(log_runtime_error, basic)
       << "Error: Could not open external command file for reading " \
       "via open(): (" << errno << ") -> " << strerror(errno);
@@ -118,7 +118,7 @@ int open_command_file(void) {
     fclose(command_file_fp);
 
     /* delete the named pipe */
-    unlink(config.get_command_file().toStdString().c_str());
+    unlink(config.get_command_file().c_str());
 
     return (ERROR);
   }

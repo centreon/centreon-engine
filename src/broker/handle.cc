@@ -17,6 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include "com/centreon/engine/broker/compatibility.hh"
 #include "com/centreon/engine/broker/handle.hh"
 #include "com/centreon/engine/common.hh"
 #include "com/centreon/engine/error.hh"
@@ -38,9 +39,9 @@ using namespace com::centreon::engine::logging;
  *  @param[in] filename The module filename.
  *  @param[in] args     The module args.
  */
-handle::handle(QString const& filename, QString const& args)
+handle::handle(std::string const& filename, std::string const& args)
   : _args(args), _filename(filename), _name(filename) {
-  emit event_create(this);
+  broker::compatibility::instance().create_module(this);
 }
 
 /**
@@ -48,16 +49,16 @@ handle::handle(QString const& filename, QString const& args)
  *
  *  @param[in] right The object to copy.
  */
-handle::handle(handle const& right) : QObject() {
+handle::handle(handle const& right) {
   _internal_copy(right);
-  emit event_create(this);
+  broker::compatibility::instance().create_module(this);
 }
 
 /**
  *  Destructor.
  */
 handle::~handle() throw () {
-  emit event_destroy(this);
+  broker::compatibility::instance().destroy_module(this);
 }
 
 /**
@@ -89,7 +90,7 @@ bool handle::operator==(handle const& right) const throw () {
           && (_license == right._license)
           && (_name == right._name)
           && (_version == right._version)
-          && (_handle.data() == right._handle.data()));
+          && (_handle.get() == right._handle.get()));
 }
 
 /**
@@ -107,10 +108,10 @@ bool handle::operator!=(handle const& right) const throw () {
  *  Close and unload module.
  */
 void handle::close() {
-  if (_handle.data() != NULL) {
-    if (_handle->isLoaded()) {
+  if (_handle.get()) {
+    if (_handle->is_loaded()) {
       typedef int (*func_deinit)(int, int);
-      func_deinit deinit = (func_deinit)_handle->resolve("nebmodule_deinit");
+      func_deinit deinit((func_deinit)_handle->resolve("nebmodule_deinit"));
       if (!deinit)
         logger(log_info_message, basic)
           << "Cannot resolve symbole 'nebmodule_deinit' in module '"
@@ -123,7 +124,7 @@ void handle::close() {
     }
     _handle.clear();
   }
-  emit event_unloaded(this);
+  broker::compatibility::instance().unloaded_module(this);
 }
 
 /**
@@ -131,7 +132,7 @@ void handle::close() {
  *
  *  @return The arguments.
  */
-QString const& handle::get_args() const throw () {
+std::string const& handle::get_args() const throw () {
   return (_args);
 }
 
@@ -140,7 +141,7 @@ QString const& handle::get_args() const throw () {
  *
  *  @return The author name.
  */
-QString const& handle::get_author() const throw () {
+std::string const& handle::get_author() const throw () {
   return (_author);
 }
 
@@ -149,7 +150,7 @@ QString const& handle::get_author() const throw () {
  *
  *  @return The copyright.
  */
-QString const& handle::get_copyright() const throw () {
+std::string const& handle::get_copyright() const throw () {
   return (_copyright);
 }
 
@@ -158,7 +159,7 @@ QString const& handle::get_copyright() const throw () {
  *
  *  @return The description.
  */
-QString const& handle::get_description() const throw () {
+std::string const& handle::get_description() const throw () {
   return (_description);
 }
 
@@ -167,17 +168,17 @@ QString const& handle::get_description() const throw () {
  *
  *  @return The filename.
  */
-QString const& handle::get_filename() const throw () {
+std::string const& handle::get_filename() const throw () {
   return (_filename);
 }
 
 /**
  *  Get the handle of the module.
  *
- *  @return pointer on a QLibrary.
+ *  @return pointer on a library.
  */
-QLibrary* handle::get_handle() const throw () {
-  return (_handle.data());
+com::centreon::library* handle::get_handle() const throw () {
+  return (_handle.get());
 }
 
 /**
@@ -185,7 +186,7 @@ QLibrary* handle::get_handle() const throw () {
  *
  *  @return The license.
  */
-QString const& handle::get_license() const throw () {
+std::string const& handle::get_license() const throw () {
   return (_license);
 }
 
@@ -194,7 +195,7 @@ QString const& handle::get_license() const throw () {
  *
  *  @return The name.
  */
-QString const& handle::get_name() const throw () {
+std::string const& handle::get_name() const throw () {
   return (_name);
 }
 
@@ -203,7 +204,7 @@ QString const& handle::get_name() const throw () {
  *
  *  @return The version.
  */
-QString const& handle::get_version() const throw () {
+std::string const& handle::get_version() const throw () {
   return (_version);
 }
 
@@ -213,7 +214,7 @@ QString const& handle::get_version() const throw () {
  *  @return true if the module is loaded, false otherwise.
  */
 bool handle::is_loaded() {
-  return (_handle.data() != NULL && _handle->isLoaded());
+  return (_handle.get() && _handle->is_loaded());
 }
 
 /**
@@ -223,36 +224,32 @@ void handle::open() {
   if (is_loaded())
     return ;
 
-  _handle = QSharedPointer<QLibrary>(new QLibrary(_filename));
-  _handle->setLoadHints(QLibrary::ResolveAllSymbolsHint
-    | QLibrary::ExportExternalSymbolsHint);
-  _handle->load();
-  if (_handle->isLoaded() == false) {
-    throw (engine_error() << _handle->errorString());
-  }
+  try {
+    _handle = shared_ptr<library>(new library(_filename));
+    _handle->load();
 
-  int* api_version = static_cast<int*>(_handle->resolve("__neb_api_version"));
-  if (api_version == NULL || *api_version != CURRENT_NEB_API_VERSION) {
+    int api_version(*static_cast<int*>(
+          _handle->resolve("__neb_api_version")));
+    if (api_version != CURRENT_NEB_API_VERSION)
+      throw (engine_error() << "Module is using an old or unspecified "
+             "version of the event broker API.");
+
+    typedef int (*func_init)(int, char const*, void*);
+    func_init init((func_init)_handle->resolve("nebmodule_init"));
+
+    if (init(
+          NEBMODULE_NORMAL_LOAD | NEBMODULE_ENGINE,
+          _args.c_str(),
+          this) != OK)
+      throw (engine_error() << "Function nebmodule_init "
+             "returned an error");
+  }
+  catch (std::exception const& e) {
     close();
-    throw (engine_error() << "Module is using an old or unspecified version of the event broker API.");
+    throw;
   }
 
-  typedef int (*func_init)(int, char const*, void*);
-  func_init init = (func_init)_handle->resolve("nebmodule_init");
-  if (init == NULL) {
-    close();
-    throw (engine_error() << "Cannot resolve symbole nebmodule_init");
-  }
-
-  if (init(
-        NEBMODULE_NORMAL_LOAD | NEBMODULE_ENGINE,
-        qPrintable(_args),
-        this) != OK) {
-    close();
-    throw (engine_error() << "Function nebmodule_init returned an error");
-  }
-
-  emit event_loaded(this);
+  broker::compatibility::instance().loaded_module(this);
 }
 
 /**
@@ -261,7 +258,9 @@ void handle::open() {
  *  @param[in] filename The module filename.
  *  @param[in] args The module arguments.
  */
-void handle::open(QString const& filename, QString const& args) {
+void handle::open(
+               std::string const& filename,
+               std::string const& args) {
   if (is_loaded())
     return ;
 
@@ -276,9 +275,9 @@ void handle::open(QString const& filename, QString const& args) {
  *
  *  @param[in] The author name.
  */
-void handle::set_author(QString const& author) {
+void handle::set_author(std::string const& author) {
   _author = author;
-  emit event_author(this);
+  broker::compatibility::instance().author_module(this);
 }
 
 /**
@@ -286,9 +285,9 @@ void handle::set_author(QString const& author) {
  *
  *  @param[in] The copyright.
  */
-void handle::set_copyright(QString const& copyright) {
+void handle::set_copyright(std::string const& copyright) {
   _copyright = copyright;
-  emit event_copyright(this);
+  broker::compatibility::instance().copyright_module(this);
 }
 
 /**
@@ -296,9 +295,9 @@ void handle::set_copyright(QString const& copyright) {
  *
  *  @param[in] The description.
  */
-void handle::set_description(QString const& description) {
+void handle::set_description(std::string const& description) {
   _description = description;
-  emit event_description(this);
+  broker::compatibility::instance().description_module(this);
 }
 
 /**
@@ -306,9 +305,9 @@ void handle::set_description(QString const& description) {
  *
  *  @param[in] The license.
  */
-void handle::set_license(QString const& license) {
+void handle::set_license(std::string const& license) {
   _license = license;
-  emit event_license(this);
+  broker::compatibility::instance().license_module(this);
 }
 
 /**
@@ -316,11 +315,9 @@ void handle::set_license(QString const& license) {
  *
  *  @param[in] The name.
  */
-void handle::set_name(QString const& name) {
-  QString old_name = _name;
+void handle::set_name(std::string const& name) {
   _name = name;
-  emit name_changed(old_name, _name);
-  emit event_name(this);
+  broker::compatibility::instance().name_module(this);
 }
 
 /**
@@ -328,9 +325,9 @@ void handle::set_name(QString const& name) {
  *
  *  @param[in] The version.
  */
-void handle::set_version(QString const& version) {
+void handle::set_version(std::string const& version) {
   _version = version;
-  emit event_version(this);
+  broker::compatibility::instance().version_module(this);
 }
 
 /**************************************

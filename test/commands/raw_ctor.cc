@@ -18,10 +18,9 @@
 */
 
 #include <exception>
-#include <QCoreApplication>
-#include <QDebug>
 #include "com/centreon/engine/commands/raw.hh"
 #include "com/centreon/engine/error.hh"
+#include "com/centreon/shared_ptr.hh"
 #include "test/unittest.hh"
 
 using namespace com::centreon::engine;
@@ -33,26 +32,29 @@ using namespace com::centreon::engine::commands;
 /**
  *  Check constructor and copy object.
  */
-int main_test() {
+int main_test(int argc, char** argv) {
+  (void)argc;
+  (void)argv;
+
   raw cmd1(CMD_NAME, CMD_LINE);
-  if (cmd1.get_name() != CMD_NAME
-      || cmd1.get_command_line() != CMD_LINE)
-    throw (engine_error() << "error: Constructor failed.");
+  if ((cmd1.get_name() != CMD_NAME)
+      || (cmd1.get_command_line() != CMD_LINE))
+    throw (engine_error() << "error: constructor failed");
 
   raw cmd2(cmd1);
   if (cmd2 != cmd1)
-    throw (engine_error() << "error: Default copy constructor failed.");
+    throw (engine_error() << "error: copy constructor failed");
 
-  raw cmd3 = cmd2;
+  raw cmd3(cmd2);
   if (cmd3 != cmd2)
-    throw (engine_error() << "error: Default copy operator failed.");
+    throw (engine_error() << "error: assignment operator failed");
 
-  QSharedPointer<commands::command> cmd4(cmd3.clone());
-  if (cmd4.isNull() == true)
-    throw (engine_error() << "error: clone failed.");
+  com::centreon::shared_ptr<commands::command> cmd4(cmd3.clone());
+  if (!cmd4.get())
+    throw (engine_error() << "error: clone failed");
 
   if (*cmd4 != cmd3)
-    throw (engine_error() << "error: clone failed.");
+    throw (engine_error() << "error: clone failed");
 
   return (0);
 }
@@ -61,10 +63,6 @@ int main_test() {
  *  Init unit test.
  */
 int main(int argc, char** argv) {
-  QCoreApplication app(argc, argv);
-  unittest utest(&main_test);
-  QObject::connect(&utest, SIGNAL(finished()), &app, SLOT(quit()));
-  utest.start();
-  app.exec();
-  return (utest.ret());
+  unittest utest(argc, argv, &main_test);
+  return (utest.run());
 }

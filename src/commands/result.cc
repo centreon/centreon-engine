@@ -18,70 +18,40 @@
 */
 
 #include "com/centreon/engine/commands/result.hh"
+#include "com/centreon/timestamp.hh"
 
+using namespace com::centreon;
 using namespace com::centreon::engine::commands;
 
+/**************************************
+*                                     *
+*           Public Methods            *
+*                                     *
+**************************************/
+
 /**
- *  Default constructor.
- *
- *  @param[in] cmd_id         The command id.
- *  @param[in] stdout         The standard output.
- *  @param[in] stderr         The error output.
- *  @param[in] start_time     The command start time.
- *  @param[in] end_time       The command end time.
- *  @param[in] exit_code      The return value.
- *  @param[in] timeout        Command run and timeout.
- *  @param[in] is_executed    Command run and exit normaly.
+ *  Constructor.
  */
-result::result(unsigned long cmd_id,
-	       QString const& stdout,
-	       QString const& stderr,
-	       QDateTime const& start_time,
-	       QDateTime const& end_time,
-	       int exit_code,
-	       bool is_timeout,
-	       bool is_executed)
-  : _stdout(stdout),
-    _stderr(stderr),
-    _start_time(),
-    _end_time(),
-    _cmd_id(cmd_id),
-    _exit_code(exit_code),
-    _is_timeout(is_timeout),
-    _is_executed(is_executed) {
+result::result()
+  : command_id(0),
+    exit_code(0),
+    exit_status(process::normal) {
 
-  if (start_time.isNull() == true) {
-    _start_time.tv_sec = 0;
-    _start_time.tv_usec = 0;
-  }
-  else {
-    set_start_time(start_time);
-  }
-
-  if (end_time.isNull() == true) {
-    _end_time.tv_sec = 0;
-    _end_time.tv_usec = 0;
-  }
-  else {
-    set_end_time(end_time);
-  }
 }
 
 /**
- *  Default copy constructor.
+ *  Copy constructor.
  *
  *  @param[in] right The copy class.
  */
 result::result(result const& right) {
-  operator=(right);
+  _internal_copy(right);
 }
 
 /**
- *  Default desctructor.
+ *  Destructor.
  */
-result::~result() throw() {
-
-}
+result::~result() throw () {}
 
 /**
  *  Default copy operator.
@@ -91,16 +61,8 @@ result::~result() throw() {
  *  @return This object.
  */
 result& result::operator=(result const& right) {
-  if (this != &right) {
-    _stdout = right._stdout;
-    _stderr = right._stderr;
-    _start_time = right._start_time;
-    _end_time = right._end_time;
-    _cmd_id = right._cmd_id;
-    _exit_code = right._exit_code;
-    _is_executed = right._is_executed;
-    _is_timeout = right._is_timeout;
-  }
+  if (this != &right)
+    _internal_copy(right);
   return (*this);
 }
 
@@ -111,16 +73,13 @@ result& result::operator=(result const& right) {
  *
  *  @return True if object have the same value.
  */
-bool result::operator==(result const& right) const throw() {
-  return (_stdout == right._stdout
-	  && _stderr == right._stderr
-	  && _start_time.tv_sec == right._start_time.tv_sec
-	  && _start_time.tv_usec == right._start_time.tv_usec
-	  && _end_time.tv_sec == right._end_time.tv_sec
-	  && _end_time.tv_usec == right._end_time.tv_usec
-	  && _cmd_id == right._cmd_id
-	  && _exit_code == right._exit_code
-	  && _is_executed == right._is_executed);
+bool result::operator==(result const& right) const throw () {
+  return (command_id == right.command_id
+          && exit_code == right.exit_code
+          && exit_status == right.exit_status
+          && end_time == right.end_time
+          && start_time == right.start_time
+          && output == right.output);
 }
 
 /**
@@ -130,163 +89,27 @@ bool result::operator==(result const& right) const throw() {
  *
  *  @return True if object have the different value.
  */
-bool result::operator!=(result const& right) const throw() {
+bool result::operator!=(result const& right) const throw () {
   return (!operator==(right));
 }
 
-/**
- *  Get the command id.
- *
- *  @return The command id.
- */
-unsigned long result::get_command_id() const throw() {
-  return (_cmd_id);
-}
+/**************************************
+*                                     *
+*           Private Methods           *
+*                                     *
+**************************************/
 
 /**
- *  Get the return value.
+ *  Copy internal data members.
  *
- *  @return The return value.
+ *  @param[in] right Object to copy.
  */
-int result::get_exit_code() const throw() {
-  return (_exit_code);
-}
-
-/**
- *  Get the execution time.
- *
- *  @return The execution time.
- */
-unsigned int result::get_execution_time() const throw() {
-  if (_end_time.tv_sec < _start_time.tv_sec)
-    return (0);
-  return (_end_time.tv_sec - _start_time.tv_sec);
-}
-
-/**
- *  Get the execution start time.
- *
- *  @return The execution start time.
- */
-timeval const& result::get_start_time() const throw() {
-  return (_start_time);
-}
-
-/**
- *  Get the execution end time.
- *
- *  @return The execution end time.
- */
-timeval const& result::get_end_time() const throw() {
-  return (_end_time);
-}
-
-/**
- *  Get the standard output.
- *
- *  @return The standard output.
- */
-QString const& result::get_stdout() const throw() {
-  return (_stdout);
-}
-
-/**
- *  Get the error output.
- *
- *  @return The error output.
- */
-QString const& result::get_stderr() const throw() {
-  return (_stderr);
-}
-
-/**
- *  Get if the execution failed.
- *
- *  @return True if the execution success, false otherwise.
- */
-bool result::get_is_executed() const throw() {
-  return (_is_executed);
-}
-
-/**
- *  Get if the execution timeout.
- *
- *  @return True if the execution timedout, false otherwise.
- */
-bool result::get_is_timeout() const throw() {
-  return (_is_timeout);
-}
-
-/**
- *  Set the command id.
- *
- *  @param[in] id The command id.
- */
-void result::set_command_id(unsigned long id) throw() {
-  _cmd_id = id;
-}
-
-/**
- *  Set the return value.
- *
- *  @param[in] exit_code The return value.
- */
-void result::set_exit_code(int exit_code) throw() {
-  _exit_code = exit_code;
-}
-
-/**
- *  Set the start time.
- *
- *  @param[in] tv The start time.
- */
-void result::set_start_time(QDateTime const& time) throw() {
-  _start_time.tv_sec = time.toTime_t();
-  _start_time.tv_usec = 0;
-}
-
-/**
- *  Set the end time.
- *
- *  @param[in] tv The end time.
- */
-void result::set_end_time(QDateTime const& time) throw() {
-  _end_time.tv_sec = time.toTime_t();
-  _end_time.tv_usec = 0;
-}
-
-/**
- *  Set the standard output.
- *
- *  @param[in] str The standard output.
- */
-void result::set_stdout(QString const& str) {
-  _stdout = str;
-}
-
-/**
- *  Set the error output.
- *
- *  @param[in] str The error output.
- */
-void result::set_stderr(QString const& str) {
-  _stderr = str;
-}
-
-/**
- *  Set the exited value.
- *
- *  @param[in] value The exited value.
- */
-void result::set_is_executed(bool value) throw() {
-  _is_executed = value;
-}
-
-/**
- *  Set the timeout value.
- *
- *  @param[in] value The timeout value.
- */
-void result::set_is_timeout(bool value) throw() {
-  _is_timeout = value;
+void result::_internal_copy(result const& right) {
+  command_id = right.command_id;
+  end_time = right.end_time;
+  exit_code = right.exit_code;
+  exit_status = right.exit_status;
+  start_time = right.start_time;
+  output = right.output;
+  return ;
 }

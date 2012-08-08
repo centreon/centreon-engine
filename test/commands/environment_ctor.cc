@@ -17,43 +17,49 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <exception>
-#include <QCoreApplication>
-#include <QDebug>
-#include "com/centreon/engine/commands/connector/command.hh"
+#include "com/centreon/engine/commands/environment.hh"
 #include "com/centreon/engine/error.hh"
 #include "test/unittest.hh"
 
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::commands;
 
-#define CMD_NAME       "command_name"
-#define CMD_LINE       "command_name arg1 arg2"
-#define CONNECTOR_NAME "connector_test"
-#define CONNECTOR_LINE "./bin_connector_test_run"
-
 /**
- * Check comparison operator.
+ *  Check environment constructor.
  */
-int main_test() {
-  connector::command cmd(CONNECTOR_NAME, CONNECTOR_LINE, CMD_NAME, CMD_LINE);
-  if (!(cmd == cmd))
-    throw (engine_error() << "error: operator== failed.");
+static int main_test(int argc, char** argv) {
+  (void)argc;
+  (void)argv;
 
-  if (cmd != cmd)
-    throw (engine_error() << "error: operator!= failed.");
+  // Default constructor.
+  {
+    environment env;
+    if (env.data())
+      throw (engine_error() << "invalid default constructor");
+  }
+
+  // Constructor with environ.
+  {
+    environment env(environ);
+    char** new_env(env.data());
+    unsigned int i(0);
+    while (environ[i] && new_env[i]) {
+      if (strcmp(environ[i], new_env[i]))
+        throw (engine_error() << "invalid constructor with env");
+      ++i;
+    }
+    if (environ[i] || new_env[i])
+      throw (engine_error() << "invalid constructor with env");
+  }
 
   return (0);
 }
 
 /**
- *  Init the unit test.
+ *  Init unit test.
  */
 int main(int argc, char** argv) {
-  QCoreApplication app(argc, argv);
-  unittest utest(&main_test);
-  QObject::connect(&utest, SIGNAL(finished()), &app, SLOT(quit()));
-  utest.start();
-  app.exec();
-  return (utest.ret());
+  // unittest utest(argc, argv, &main_test);
+  // return (utest.run());
+  return (main_test(argc, argv));
 }

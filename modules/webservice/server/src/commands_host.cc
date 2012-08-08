@@ -17,6 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <algorithm>
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/modules/external_commands/commands.hh"
@@ -67,10 +68,13 @@ void webservice::create_host(ns1__hostType const& hst) {
 
   // Initial state.
   int initial_state(HOST_UP);
-  QString initial_state_options(hst.initialState
-                                ? hst.initialState->c_str()
-                                : "o");
-  initial_state_options.toLower().trimmed();
+  std::string initial_state_options(
+                hst.initialState ? *hst.initialState : "o");
+  std::transform(
+         initial_state_options.begin(),
+         initial_state_options.end(),
+         initial_state_options.begin(),
+         tolower);
   if ((initial_state_options == "o") || (initial_state_options == "up"))
     initial_state = HOST_UP;
   else if ((initial_state_options == "d")
@@ -255,45 +259,41 @@ void webservice::create_host(ns1__hostType const& hst) {
 
   try {
     // Add parents.
-    QVector<host*> hst_parents(
-                     _find<host>(
-                       hst.parents,
-                       (void* (*)(char const*))&find_host));
-    if (static_cast<int>(hst.parents.size()) != hst_parents.size())
+    std::vector<host*> hst_parents(
+                         _find<host>(
+                           hst.parents,
+                           (void* (*)(char const*))&find_host));
+    if (hst.parents.size() != hst_parents.size())
       throw (engine_error() << "host '" << hst.id->name
              << "' invalid parent");
 
     // Link with contacts.
-    QVector<contact*> hst_contacts(
-                        _find<contact>(
-                          hst.contacts,
-                          (void* (*)(char const*))&find_contact));
-    if (static_cast<int>(hst.contacts.size()) != hst_contacts.size())
+    std::vector<contact*> hst_contacts(
+                            _find<contact>(
+                              hst.contacts,
+                              (void* (*)(char const*))&find_contact));
+    if (hst.contacts.size() != hst_contacts.size())
       throw (engine_error() << "host '" << hst.id->name
              << "' invalid contact");
 
     // Link with contact groups.
-    QVector<contactgroup*>
+    std::vector<contactgroup*>
       hst_contactgroups(_find<contactgroup>(
                           hst.contactGroups,
                           (void* (*)(char const*))&find_contactgroup));
-    if (static_cast<int>(hst.contactGroups.size())
-        != hst_contactgroups.size())
+    if (hst.contactGroups.size() != hst_contactgroups.size())
       throw (engine_error() << "host '" << hst.id->name
              << "' invalid contact group");
 
     // Link with host groups.
-    QVector<hostgroup*> hst_hostgroups(
-                          _find<hostgroup>(
-                            hst.hostgroups,
-                            (void* (*)(char const*))&find_hostgroup));
-    if (static_cast<int>(hst.hostgroups.size())
-        != hst_hostgroups.size())
+    std::vector<hostgroup*>
+      hst_hostgroups(
+        _find<hostgroup>(
+          hst.hostgroups,
+          (void* (*)(char const*))&find_hostgroup));
+    if (hst.hostgroups.size() != hst_hostgroups.size())
       throw (engine_error() << "host '" << hst.id->name
              << "' invalid host group");
-
-    // Convert custom variables.
-    QVector<QString> hst_customvar(std2qt(hst.customVariables));
 
     // Link objects together.
     objects::link(
@@ -302,7 +302,7 @@ void webservice::create_host(ns1__hostType const& hst) {
                hst_contacts,
                hst_contactgroups,
                hst_hostgroups,
-               hst_customvar,
+               hst.customVariables,
                initial_state,
                check_period,
                notification_period,

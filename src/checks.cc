@@ -18,12 +18,12 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <errno.h>
+#include <cerrno>
+#include <csignal>
+#include <cstdio>
+#include <cstdlib>
 #include <exception>
-#include <signal.h>
 #include <sstream>
-#include <stdlib.h>
-#include <stdio.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/wait.h>
@@ -694,7 +694,11 @@ int handle_async_service_check_result(service* temp_service, check_result* queue
     temp_service->notified_on_warning = FALSE;
     temp_service->notified_on_critical = FALSE;
     temp_service->no_more_notifications = FALSE;
-    service_other_props[qMakePair(QString(temp_service->host_ptr->name), QString(temp_service->description))].initial_notif_time = 0;
+    service_other_props[
+      std::make_pair(
+             std::string(temp_service->host_ptr->name),
+             std::string(temp_service->description))].initial_notif_time
+      = 0;
 
     if (reschedule_check == TRUE)
       next_service_check = (time_t)(temp_service->last_check
@@ -2054,7 +2058,7 @@ int run_sync_host_check_3x(host* hst,
 			   int check_options,
 			   int use_cached_result,
 			   unsigned long check_timestamp_horizon) {
-  logger(dbg_functions, basic) << "start " << Q_FUNC_INFO;
+  logger(dbg_functions, basic) << "start " << __func__;
   try {
     checks::checker::instance().run_sync(hst,
 					 check_result_code,
@@ -2067,7 +2071,7 @@ int run_sync_host_check_3x(host* hst,
     return (ERROR);
   }
 
-  logger(dbg_functions, basic) << "end " << Q_FUNC_INFO;
+  logger(dbg_functions, basic) << "end " << __func__;
   return (OK);
 }
 
@@ -2195,6 +2199,7 @@ int handle_async_host_check_result_3x(host* temp_host, check_result* queued_chec
   char* temp_ptr = NULL;
   struct timeval start_time_hires;
   struct timeval end_time_hires;
+  double execution_time(0.0);
 
   logger(dbg_functions, basic) << "handle_async_host_check_result_3x()";
 
@@ -2203,6 +2208,14 @@ int handle_async_host_check_result_3x(host* temp_host, check_result* queued_chec
     return (ERROR);
 
   time(&current_time);
+
+  execution_time = (double)((double)(queued_check_result->finish_time.tv_sec
+                                     - queued_check_result->start_time.tv_sec)
+                            + (double)((queued_check_result->finish_time.tv_usec
+                                        - queued_check_result->start_time.tv_usec)
+                                       / 1000.0) / 1000.0);
+  if (execution_time < 0.0)
+    execution_time = 0.0;
 
   logger(dbg_checks, more)
     << "** Handling async check result for host '" << temp_host->name << "'...";
@@ -2224,14 +2237,14 @@ int handle_async_host_check_result_3x(host* temp_host, check_result* queued_chec
     << (queued_check_result->exited_ok == true ? "Yes" : "No");
   logger(dbg_checks, most)
     << fixed << setprecision(3)
-    << "\tExec Time:          " << temp_host->execution_time;
+    << "\tExec Time:          " << execution_time;
   logger(dbg_checks, most)
     << fixed << setprecision(3)
-    << "\tLatency:            " << temp_host->latency;
+    << "\tLatency:            " << queued_check_result->latency;
   logger(dbg_checks, most)
-    << "\treturn Status:      " <<  queued_check_result->return_code;
+    << "\treturn Status:      " << queued_check_result->return_code;
   logger(dbg_checks, most)
-    << "\tOutput:             " <<  queued_check_result->output;
+    << "\tOutput:             " << queued_check_result->output;
 
   /* decrement the number of host checks still out there... */
   if (queued_check_result->check_type == HOST_CHECK_ACTIVE
@@ -2286,13 +2299,7 @@ int handle_async_host_check_result_3x(host* temp_host, check_result* queued_chec
   temp_host->latency = queued_check_result->latency;
 
   /* update the execution time for this check (millisecond resolution) */
-  temp_host->execution_time = (double)((double)(queued_check_result->finish_time.tv_sec
-						- queued_check_result->start_time.tv_sec)
-				       + (double)((queued_check_result->finish_time.tv_usec
-						   - queued_check_result->start_time.tv_usec)
-						  / 1000.0) / 1000.0);
-  if (temp_host->execution_time < 0.0)
-    temp_host->execution_time = 0.0;
+  temp_host->execution_time = execution_time;
 
   /* set the checked flag */
   temp_host->has_been_checked = TRUE;

@@ -18,8 +18,6 @@
 */
 
 #include <exception>
-#include <QCoreApplication>
-#include <QDebug>
 #include "com/centreon/engine/broker/handle.hh"
 #include "com/centreon/engine/error.hh"
 #include "test/broker/mod_load.hh"
@@ -89,35 +87,36 @@ void check_open_exist_module() {
 }
 
 /**
- *  Check the default copy constructor.
+ *  Check the copy constructor.
  */
 void check_copy() {
   handle hwd(MOD_LIB_NAME, MOD_LIB_NAME);
   hwd.open();
   handle hwd_cpy(hwd);
 
-  if (hwd != hwd_cpy || !(hwd == hwd_cpy)) {
-    throw (engine_error() << __func__ << ": hwd and hwd_cpy are differente.");
-  }
+  if ((hwd != hwd_cpy) || !(hwd == hwd_cpy))
+    throw (engine_error() << __func__ << ": hwd and hwd_cpy are different");
 
   hwd_cpy.close();
-  if (mod_test_load_quit == false) {
-    throw (engine_error() << __func__ << ": close failed.");
-  }
+  if (!mod_test_load_quit)
+    throw (engine_error() << __func__ << ": close failed");
 
-  if (hwd.is_loaded() == true) {
-    throw (engine_error() << __func__ << ": is_loaded is true.");
-  }
+  if (hwd.is_loaded())
+    throw (engine_error() << __func__ << ": is_loaded is true");
+
+  return ;
 }
 
 /**
  *  Check the broker handle working.
  */
-int main_test() {
-  check_open_noexist_module();
-  check_open_exist_module();
-  check_copy();
+int main_test(int argc, char** argv) {
+  (void)argc;
+  (void)argv;
 
+  //check_open_noexist_module();
+  //check_open_exist_module();
+  check_copy();
   return (0);
 }
 
@@ -125,10 +124,6 @@ int main_test() {
  *  Init the unit test.
  */
 int main(int argc, char** argv) {
-  QCoreApplication app(argc, argv);
-  unittest utest(&main_test);
-  QObject::connect(&utest, SIGNAL(finished()), &app, SLOT(quit()));
-  utest.start();
-  app.exec();
-  return (utest.ret());
+  unittest utest(argc, argv, &main_test);
+  return (utest.run());
 }

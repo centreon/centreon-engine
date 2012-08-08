@@ -18,8 +18,6 @@
 */
 
 #include <exception>
-#include <QCoreApplication>
-#include <QDebug>
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/modules/external_commands/commands.hh"
 #include "com/centreon/engine/globals.hh"
@@ -31,7 +29,10 @@ using namespace com::centreon::engine;
 /**
  *  Run delay_svc_notification test.
  */
-static int check_delay_svc_notification() {
+static int check_delay_svc_notification(int argc, char** argv) {
+  (void)argc;
+  (void)argv;
+
   init_object_skiplists();
 
   service* svc = add_service("name", "description", NULL,
@@ -65,10 +66,6 @@ static int check_delay_svc_notification() {
  *  Init unit test.
  */
 int main(int argc, char** argv) {
-  QCoreApplication app(argc, argv);
-  unittest utest(&check_delay_svc_notification);
-  QObject::connect(&utest, SIGNAL(finished()), &app, SLOT(quit()));
-  utest.start();
-  app.exec();
-  return (utest.ret());
+  unittest utest(argc, argv, &check_delay_svc_notification);
+  return (utest.run());
 }

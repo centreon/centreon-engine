@@ -21,7 +21,7 @@
 #  define TEST_OBJECTS_RELEASE_HH
 
 #  include <algorithm>
-#  include <QList>
+#  include <list>
 #  include "com/centreon/engine/error.hh"
 #  include "com/centreon/engine/globals.hh"
 #  include "com/centreon/engine/objects/command.hh"
@@ -47,102 +47,137 @@
 #  include "com/centreon/engine/objects/timeperiodexclusion.hh"
 #  include "com/centreon/engine/objects/timerange.hh"
 
-namespace test {
-  namespace objects {
-    template<class T>
-    void release_null_pointer(T const* obj) {
+namespace    test {
+  namespace  objects {
+    template <class T>
+    void     release_null_pointer(T const* obj) {
       using namespace com::centreon::engine::objects;
 
-      if (obj != NULL)
-        throw (engine_error() << "release null pointer faild obj is not null.");
+      // Release null pointer only.
+      if (obj)
+        throw (engine_error()
+               << __func__ << " failed: pointer is not null");
       release(obj);
+
+      return ;
     }
 
-    template<class T>
-    void release_objects(T* (*create_object)(unsigned int),
-                         T* head,
-                         T* tail,
-                         unsigned int number = 1) {
+    template <class T>
+    void     release_objects(
+               T* (*create_object)(unsigned int),
+               T* head,
+               T* tail,
+               unsigned int number = 1) {
       using namespace com::centreon::engine::objects;
 
+      // Initialization.
       init_object_skiplists();
-      QList<T*> lst_obj;
+      std::list<T*> lst_obj;
 
-      for (unsigned int i = 0; i < number; ++i) {
-        T* obj = create_object(i + 1);
-        if (obj == NULL)
-          throw (engine_error() << Q_FUNC_INFO << " create object failed.");
+      // Create objects.
+      for (unsigned int i(0); i < number; ++i) {
+        T* obj(create_object(i + 1));
+        if (!obj)
+          throw (engine_error()
+                 << __func__ << " failed: cannot create new object");
         lst_obj.push_back(obj);
       }
 
-      for (typename QList<T*>::const_iterator it = lst_obj.begin(),
-             end = lst_obj.end();
+      // Release objects.
+      for (typename std::list<T*>::const_iterator
+             it(lst_obj.begin()),
+             end(lst_obj.end());
            it != end;
            ++it)
         release(*it);
 
-      if (head != NULL)
-        throw (engine_error() << Q_FUNC_INFO << " failed head is not empty.");
+      // Check that release() successfully executed.
+      if (head)
+        throw (engine_error()
+               << __func__ << " failed: list head is not empty");
+      if (tail)
+        throw (engine_error()
+               << __func__ << " failed: list tail is not empty");
 
-      if (tail != NULL)
-        throw (engine_error() << Q_FUNC_INFO << " failed tail is not empty.");
-
+      // Free skiplist.
       free_object_skiplists();
+
+      return ;
     }
 
 
-    template<class T>
-    void release_objects(T* (*create_object)(unsigned int, T**),
-                         unsigned int number = 1) {
+    template <class T>
+    void     release_objects(
+               T* (*create_object)(unsigned int, T**),
+               unsigned int number = 1) {
       using namespace com::centreon::engine::objects;
 
+      // Initialization.
       init_object_skiplists();
-      QList<T*> lst_obj;
-      T* head = NULL;
+      std::list<T*> lst_obj;
+      T* head(NULL);
 
-      for (unsigned int i = 0; i < number; ++i) {
-        T* obj = create_object(i + 1, &head);
-        if (obj == NULL)
-          throw (engine_error() << Q_FUNC_INFO << " create object failed.");
+      // Create objects.
+      for (unsigned int i(0); i < number; ++i) {
+        T* obj(create_object(i + 1, &head));
+        if (!obj)
+          throw (engine_error()
+                 << __func__ << " failed: cannot create new object");
         lst_obj.push_front(obj);
       }
 
-      for (typename QList<T*>::const_iterator it = lst_obj.begin(),
-             end = lst_obj.end();
+      // Release objects.
+      for (typename std::list<T*>::const_iterator
+             it(lst_obj.begin()),
+             end(lst_obj.end());
            it != end;
            ++it) {
-        if (it + 1 != lst_obj.end()) {
-          if (release(*it) != *(it + 1))
-            throw (engine_error() << Q_FUNC_INFO << " failed invalid return.");
+        typename std::list<T*>::const_iterator tmp(it);
+        ++tmp;
+        if (tmp != lst_obj.end()) {
+          if (release(*it) != *tmp)
+            throw (engine_error() << __func__
+                   << " failed: invalid release() return value");
         }
         else if (release(*it) != NULL)
-          throw (engine_error() << Q_FUNC_INFO << " failed invalid return.");
+          throw (engine_error() << __func__
+                 << " failed: invalid release() return value");
       }
 
+      // Free skiplsit.
       free_object_skiplists();
+
+      return ;
     }
 
-    template<class T>
-    void release_objects(T* (*create_object)(unsigned int),
-                         unsigned int number = 1) {
+    template <class T>
+    void     release_objects(
+               T* (*create_object)(unsigned int),
+               unsigned int number = 1) {
       using namespace com::centreon::engine::objects;
 
+      // Initialization.
       init_object_skiplists();
-      QList<T*> lst_obj;
+      std::list<T*> lst_obj;
 
-      for (unsigned int i = 0; i < number; ++i) {
-        T* obj = create_object(i + 1);
-        if (obj == NULL)
-          throw (engine_error() << Q_FUNC_INFO << " create object failed.");
+      // Create objects.
+      for (unsigned int i(0); i < number; ++i) {
+        T* obj(create_object(i + 1));
+        if (!obj)
+          throw (engine_error()
+                 << __func__ << " failed: cannot create new object");
         lst_obj.push_front(obj);
       }
 
-      for (typename QList<T*>::const_iterator it = lst_obj.begin(),
-             end = lst_obj.end();
+      // Release objects.
+      for (typename std::list<T*>::const_iterator
+             it(lst_obj.begin()),
+             end(lst_obj.end());
            it != end;
            ++it)
         release(*it);
 
+      // Free skiplist.
       free_object_skiplists();
     }
   }

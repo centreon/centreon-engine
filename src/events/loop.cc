@@ -20,10 +20,10 @@
 */
 
 #include <assert.h>
-#include <QTimer>
 #include <stdlib.h>
 #include <time.h>
 #include "com/centreon/engine/broker.hh"
+#include "com/centreon/concurrency/thread.hh"
 #include "com/centreon/engine/events/loop.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/file.hh"
@@ -44,7 +44,9 @@ std::auto_ptr<loop> loop::_instance;
 /**
  *  Destructor.
  */
-loop::~loop() throw () {}
+loop::~loop() throw () {
+
+}
 
 /**
  *  Get instance of the events loop singleton.
@@ -88,12 +90,7 @@ void loop::run() {
   _sleep_event.next = NULL;
   _sleep_event.prev = NULL;
 
-  // Connect signals and slots.
-  QObject::connect(this, SIGNAL(shutdown()), _app, SLOT(quit()));
-  QTimer::singleShot(0, this, SLOT(_dispatching()));
-  _app->exec();
-
-  return ;
+  _dispatching();
 }
 
 /**
@@ -118,8 +115,8 @@ void loop::_dispatching() {
   while (!quit) {
     // See if we should exit or restart (a signal was encountered).
     if (sigshutdown) {
-      emit shutdown();
-      return ;
+      quit = true;
+      break;
     }
 
     // If we don't have any events to handle, exit.
@@ -127,17 +124,14 @@ void loop::_dispatching() {
       logger(dbg_events, basic)
         << "There aren't any events that need to be handled! "
         << "Exiting...";
-      emit shutdown();
-      return ;
+      quit = true;
+      break;
     }
 
     if (sighup) {
       file::reopen();
       sighup = false;
     }
-
-    // Process some events.
-    QCoreApplication::processEvents();
 
     // Get the current time.
     time_t current_time;
@@ -376,7 +370,8 @@ void loop::_dispatching() {
       else {
         logger(dbg_events, most)
           << "Did not execute scheduled event. Idling for a bit...";
-        quit = true;
+        concurrency::thread::nsleep(
+                               config.get_sleep_time() * 1000000000l);
       }
     }
     // We don't have anything to do at this moment in time...
@@ -421,30 +416,27 @@ void loop::_dispatching() {
           NEBATTR_NONE,
           &_sleep_event,
           NULL);
-        quit = true;
+
+        // Wait a while so we don't hog the CPU...
+        concurrency::thread::nsleep(
+                               config.get_sleep_time() * 1000000000l);
       }
   }
-
-  // Reschedule dispatching.
-  QTimer::singleShot(
-    config.get_sleep_time() * 1000,
-    this,
-    SLOT(_dispatching()));
-
-  return ;
 }
 
 /**
  *  Default constructor.
  */
-loop::loop() : QObject(), _app(QCoreApplication::instance()) {}
+loop::loop() {
+
+}
 
 /**
  *  Copy constructor.
  *
  *  @param[in] right Object to copy.
  */
-loop::loop(loop const& right) : QObject() {
+loop::loop(loop const& right) {
   _internal_copy(right);
 }
 

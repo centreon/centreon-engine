@@ -50,8 +50,8 @@ int centreonengine__timeperiodAdd(
   objects::add_timeperiod(
              tmprd->id->name.c_str(),
              (tmprd->alias ? tmprd->alias->c_str() : NULL),
-             std2qt(tmprd->range),
-             std2qt(tmprd->exclude));
+             tmprd->range,
+             tmprd->exclude);
 
   // Exception handling.
   COMMAND_END()

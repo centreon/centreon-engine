@@ -20,60 +20,52 @@
 #ifndef CCE_MODULES_LOADER_HH
 #  define CCE_MODULES_LOADER_HH
 
+#  include <list>
+#  include <map>
 #  include <memory>
-#  include <QMultiHash>
-#  include <QObject>
-#  include <QSharedPointer>
-#  include <QString>
+#  include <string>
 #  include "com/centreon/engine/broker/handle.hh"
+#  include "com/centreon/engine/namespace.hh"
+#  include "com/centreon/shared_ptr.hh"
 
-namespace                        com {
-  namespace                      centreon {
-    namespace                    engine {
-      namespace                  broker {
-        /**
-         *  @class loader loader.hh
-         *  @brief Modules loader.
-         *
-         *  Loader manage all modules.
-         */
-        class                    loader : public QObject {
-          Q_OBJECT
+CCE_BEGIN()
 
-        public:
-          virtual                ~loader() throw ();
-          QSharedPointer<handle> add_module(
-                                   QString const& filename = "",
-                                   QString const& args = "");
-          void                   del_module(
-                                   QSharedPointer<handle> const& mod);
-          QList<QSharedPointer<handle> >
-                                 get_modules() const;
-          static loader&         instance();
-          static void            load();
-          unsigned int           load_directory(QString const& dir);
-          static void            unload();
-          void                   unload_modules();
+namespace                  broker {
+  /**
+   *  @class loader loader.hh
+   *  @brief Modules loader.
+   *
+   *  Loader manage all modules.
+   */
+  class                    loader {
+  public:
+    virtual                ~loader() throw ();
+    shared_ptr<handle>     add_module(
+                             std::string const& filename = "",
+                             std::string const& args = "");
+    void                   del_module(
+                             shared_ptr<handle> const& mod);
+    std::list<shared_ptr<handle> >
+                           get_modules() const;
+    static loader&         instance();
+    static void            load();
+    unsigned int           load_directory(std::string const& dir);
+    static void            unload();
+    void                   unload_modules();
 
-        public slots:
-          void                   module_name_changed(
-                                   QString const& old_name,
-                                   QString const& new_name);
+  private:
+                           loader();
+                           loader(loader const& right);
+    loader&                operator=(loader const& right);
+    void                   _internal_copy(loader const& right);
 
-        private:
-                                 loader();
-                                 loader(loader const& right);
-          loader&                operator=(loader const& right);
-          void                   _internal_copy(loader const& right);
-
-          static std::auto_ptr<loader>
-                                 _instance;
-          QMultiHash<QString, QSharedPointer<handle> >
-                                 _modules;
-        };
-      }
-    }
-  }
+    static std::auto_ptr<loader>
+                           _instance;
+    std::multimap<std::string, shared_ptr<handle> >
+                           _modules;
+  };
 }
+
+CCE_END()
 
 #endif // !CCE_MODULES_LOADER_HH

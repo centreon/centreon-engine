@@ -20,6 +20,7 @@
 #ifndef CCE_OBJECTS_SERVICE_HH
 #  define CCE_OBJECTS_SERVICE_HH
 
+#  include "com/centreon/engine/namespace.hh"
 #  include "com/centreon/engine/objects.hh"
 
 #  ifdef __cplusplus
@@ -42,26 +43,28 @@ void release_service(service const* obj);
 #  ifdef __cplusplus
 }
 
-namespace       com {
-  namespace     centreon {
-    namespace   engine {
-      namespace objects {
-        void    link(
-                  service* obj,
-                  QVector<contact*> const& contacts,
-                  QVector<contactgroup*> const& contactgroups,
-                  QVector<servicegroup*> const& servicegroups,
-                  QVector<QString> const& custom_variables,
-                  int initial_state,
-                  timeperiod* check_period,
-                  timeperiod* notification_period,
-                  command* cmd_event_handler = NULL,
-                  command* cmd_check_command = NULL);
-        void    release(service const* obj);
-      }
-    }
-  }
+#  include <string>
+#  include <vector>
+
+CCE_BEGIN()
+
+namespace objects {
+  void    link(
+            service* obj,
+            std::vector<contact*> const& contacts,
+            std::vector<contactgroup*> const& contactgroups,
+            std::vector<servicegroup*> const& servicegroups,
+            std::vector<std::string> const& custom_variables,
+            int initial_state,
+            timeperiod* check_period,
+            timeperiod* notification_period,
+            command* cmd_event_handler = NULL,
+            command* cmd_check_command = NULL);
+  void    release(service const* obj);
 }
+
+CCE_END()
+
 #  endif // C++
 
 #endif // !CCE_OBJECTS_SERVICE_HH

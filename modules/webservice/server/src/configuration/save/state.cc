@@ -64,33 +64,33 @@ state& state::operator=(state const& right) {
  *  @param[in] obj  The configuration to save.
  */
 state& state::operator<<(engine::configuration::state const& obj) {
-  QList<QString> const& lst_dir(obj.get_cfg_dir());
-  for (QList<QString>::const_iterator
+  std::list<std::string> const& lst_dir(obj.get_cfg_dir());
+  for (std::list<std::string>::const_iterator
          it(lst_dir.begin()), end(lst_dir.end());
        it != end;
        ++it)
-    _stream << "cfg_dir=" << it->toStdString() << std::endl;
+    _stream << "cfg_dir=" << *it << std::endl;
 
-  QList<QString> const& lst_file(obj.get_cfg_file());
-  for (QList<QString>::const_iterator
+  std::list<std::string> const& lst_file(obj.get_cfg_file());
+  for (std::list<std::string>::const_iterator
          it(lst_file.begin()), end(lst_file.end());
        it != end;
        ++it)
-    _stream << "cfg_file=" << it->toStdString() << std::endl;
+    _stream << "cfg_file=" << *it << std::endl;
 
-  QList<QString> const& lst_resource(obj.get_resource_file());
-  for (QList<QString>::const_iterator
+  std::list<std::string> const& lst_resource(obj.get_resource_file());
+  for (std::list<std::string>::const_iterator
          it(lst_resource.begin()), end(lst_resource.end());
        it != end;
        ++it)
-    _stream << "resource_file=" << it->toStdString() << std::endl;
+    _stream << "resource_file=" << *it << std::endl;
 
-  QList<QString> const& lst_module(obj.get_broker_module());
-  for (QList<QString>::const_iterator
+  std::list<std::string> const& lst_module(obj.get_broker_module());
+  for (std::list<std::string>::const_iterator
          it(lst_module.begin()), end(lst_module.end());
        it != end;
        ++it)
-    _stream << "broker_module=" << it->toStdString() << std::endl;
+    _stream << "broker_module=" << *it << std::endl;
 
   int command_check_interval
     = obj.get_command_check_interval() / obj.get_interval_length();
@@ -117,9 +117,9 @@ state& state::operator<<(engine::configuration::state const& obj) {
     << "additional_freshness_latency="
     << obj.get_additional_freshness_latency() << std::endl
     << "admin_email="
-    << obj.get_admin_email().toStdString() << std::endl
+    << obj.get_admin_email() << std::endl
     << "admin_pager="
-    << obj.get_admin_pager().toStdString() << std::endl
+    << obj.get_admin_pager() << std::endl
     << "allow_empty_hostgroup_assignment="
     << obj.get_allow_empty_hostgroup_assignment() << std::endl
     << "auto_reschedule_checks="
@@ -129,7 +129,7 @@ state& state::operator<<(engine::configuration::state const& obj) {
     << "auto_rescheduling_window="
     << obj.get_auto_rescheduling_window() << std::endl
     << "broker_module_directory="
-    << obj.get_broker_module_directory().toStdString() << std::endl
+    << obj.get_broker_module_directory() << std::endl
     << "cached_host_check_horizon="
     << obj.get_cached_host_check_horizon() << std::endl
     << "cached_service_check_horizon="
@@ -149,11 +149,11 @@ state& state::operator<<(engine::configuration::state const& obj) {
     << "command_check_interval="
     << command_check_interval << std::endl
     << "command_file="
-    << obj.get_command_file().toStdString() << std::endl
+    << obj.get_command_file() << std::endl
     << "date_format="
     << date_format[obj.get_date_format()] << std::endl
     << "debug_file="
-    << obj.get_debug_file().toStdString() << std::endl
+    << obj.get_debug_file() << std::endl
     << "debug_level="
     << obj.get_debug_level() << std::endl
     << "debug_verbosity="
@@ -193,9 +193,9 @@ state& state::operator<<(engine::configuration::state const& obj) {
     << "free_child_process_memory="
     << obj.get_free_child_process_memory() << std::endl
     << "global_host_event_handler="
-    << obj.get_global_host_event_handler().toStdString() << std::endl
+    << obj.get_global_host_event_handler() << std::endl
     << "global_service_event_handler="
-    << obj.get_global_service_event_handler().toStdString() << std::endl
+    << obj.get_global_service_event_handler() << std::endl
     << "high_host_flap_threshold="
     << obj.get_high_host_flap_threshold() << std::endl
     << "high_service_flap_threshold="
@@ -215,9 +215,9 @@ state& state::operator<<(engine::configuration::state const& obj) {
 
   _stream
     << "illegal_macro_output_chars="
-    << obj.get_illegal_output_chars().toStdString() << std::endl
+    << obj.get_illegal_output_chars() << std::endl
     << "illegal_object_name_chars="
-    << obj.get_illegal_object_chars().toStdString() << std::endl
+    << obj.get_illegal_object_chars() << std::endl
     << "interval_length="
     << obj.get_interval_length() << std::endl
     << "log_event_handlers="
@@ -225,7 +225,7 @@ state& state::operator<<(engine::configuration::state const& obj) {
     << "log_external_commands="
     << obj.get_log_external_commands() << std::endl
     << "log_file="
-    << obj.get_log_file().toStdString() << std::endl
+    << obj.get_log_file() << std::endl
     << "log_host_retries="
     << obj.get_log_host_retries() << std::endl
     << "log_initial_states="
@@ -255,17 +255,17 @@ state& state::operator<<(engine::configuration::state const& obj) {
     << "notification_timeout="
     << obj.get_notification_timeout() << std::endl
     << "object_cache_file="
-    << obj.get_object_cache_file().toStdString() << std::endl
+    << obj.get_object_cache_file() << std::endl
     << "obsess_over_hosts="
     << obj.get_obsess_over_hosts() << std::endl
     << "obsess_over_services="
     << obj.get_obsess_over_services() << std::endl
     << "ochp_command="
-    << obj.get_ochp_command().toStdString() << std::endl
+    << obj.get_ochp_command() << std::endl
     << "ochp_timeout="
     << obj.get_ochp_timeout() << std::endl
     << "ocsp_command="
-    << obj.get_ocsp_command().toStdString() << std::endl
+    << obj.get_ocsp_command() << std::endl
     << "ocsp_timeout="
     << obj.get_ocsp_timeout() << std::endl
     << "passive_host_checks_are_soft="
@@ -273,7 +273,7 @@ state& state::operator<<(engine::configuration::state const& obj) {
     << "perfdata_timeout="
     << obj.get_perfdata_timeout() << std::endl
     << "precached_object_file="
-    << obj.get_precached_object_file().toStdString() << std::endl
+    << obj.get_precached_object_file() << std::endl
     << "process_performance_data="
     << obj.get_process_performance_data() << std::endl
     << "retained_contact_host_attribute_mask="
@@ -319,9 +319,9 @@ state& state::operator<<(engine::configuration::state const& obj) {
     << "soft_state_dependencies="
     << obj.get_soft_state_dependencies() << std::endl
     << "state_retention_file="
-    << obj.get_state_retention_file().toStdString() << std::endl
+    << obj.get_state_retention_file() << std::endl
     << "status_file="
-    << obj.get_status_file().toStdString() << std::endl
+    << obj.get_status_file() << std::endl
     << "status_update_interval="
     << obj.get_status_update_interval() << std::endl
     << "time_change_threshold="
@@ -341,7 +341,7 @@ state& state::operator<<(engine::configuration::state const& obj) {
     << "use_syslog="
     << obj.get_use_syslog() << std::endl
     << "use_timezone="
-    << obj.get_use_timezone().toStdString() << std::endl
+    << obj.get_use_timezone() << std::endl
     << "use_true_regexp_matching="
     << obj.get_use_true_regexp_matching() << std::endl;
   return (*this);

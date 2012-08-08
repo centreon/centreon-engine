@@ -18,14 +18,19 @@
 */
 
 #include <exception>
-#include <QCoreApplication>
-#include <QDebug>
-#include "com/centreon/engine/commands/connector/command.hh"
+#include "com/centreon/engine/commands/connector.hh"
 #include "com/centreon/engine/error.hh"
+#include "com/centreon/process.hh"
+#include "test/commands/wait_process.hh"
 #include "test/unittest.hh"
 
+using namespace com::centreon;
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::commands;
+
+#define DEFAULT_CONNECTOR_NAME __func__
+#define DEFAULT_CONNECTOR_LINE "./bin_connector_test_run"
+#define DEFAULT_CMD_NAME       __FILE__
 
 /**
  *  Check if the connector result are ok without timeout.
@@ -34,21 +39,22 @@ using namespace com::centreon::engine::commands;
  */
 static bool run_without_timeout() {
   nagios_macros macros = nagios_macros();
-  connector::command cmd(__func__,
-			 "./bin_connector_test_run --timeout=off",
-			 "./bin_connector_test_run");
+  connector cmd(
+              DEFAULT_CONNECTOR_NAME,
+              DEFAULT_CONNECTOR_LINE,
+              DEFAULT_CMD_NAME,
+              "./bin_connector_test_run --timeout=off");
+  wait_process wait_proc(&cmd);
 
-  result cmd_res;
-  cmd.run(cmd.get_command_line(), macros, 0, cmd_res);
+  unsigned long id(cmd.run(cmd.get_command_line(), macros, 0));
+  wait_proc.wait();
 
-  if (cmd_res.get_command_id() == 0
-      || cmd_res.get_exit_code() != STATE_OK
-      || cmd_res.get_stdout() != cmd.get_command_line()
-      || cmd_res.get_stderr() != ""
-      || cmd_res.get_is_executed() == false
-      || cmd_res.get_is_timeout() == true) {
+  result const& res(wait_proc.get_result());
+  if (res.command_id != id
+      || res.exit_code != STATE_OK
+      || res.output != cmd.get_command_line()
+      || res.exit_status != process::normal)
     return (false);
-  }
   return (true);
 }
 
@@ -59,21 +65,22 @@ static bool run_without_timeout() {
  */
 static bool run_with_timeout() {
   nagios_macros macros = nagios_macros();
-  connector::command cmd(__func__,
-			 "./bin_connector_test_run --timeout=on",
-			 "./bin_connector_test_run");
+  connector cmd(
+              DEFAULT_CONNECTOR_NAME,
+              DEFAULT_CONNECTOR_LINE,
+              DEFAULT_CMD_NAME,
+              "./bin_connector_test_run --timeout=on");
+  wait_process wait_proc(&cmd);
 
-  result cmd_res;
-  cmd.run(cmd.get_command_line(), macros, 1, cmd_res);
+  unsigned long id(cmd.run(cmd.get_command_line(), macros, 1));
+  wait_proc.wait();
 
-  if (cmd_res.get_command_id() == 0
-      || cmd_res.get_exit_code() != STATE_CRITICAL
-      || cmd_res.get_stdout() != ""
-      || cmd_res.get_stderr() != "(Process Timeout)"
-      || cmd_res.get_is_executed() == false
-      || cmd_res.get_is_timeout() == false) {
+  result const& res(wait_proc.get_result());
+  if (res.command_id != id
+      || res.exit_code != STATE_CRITICAL
+      || res.output != "(Process Timeout)"
+      || res.exit_status != process::timeout)
     return (false);
-  }
   return (true);
 }
 
@@ -82,12 +89,15 @@ static bool run_with_timeout() {
  *
  *  @return true if ok, false otherwise.
  */
-int main_test() {
+int main_test(int argc, char** argv) {
+  (void)argc;
+  (void)argv;
+
   if (run_without_timeout() == false)
-    throw (engine_error() << "error: connector::run without timeout failed.");
+    throw (engine_error() << "error: raw::run without timeout failed.");
 
   if (run_with_timeout() == false)
-    throw (engine_error() << "error: connector::run with timeout failed.");
+    throw (engine_error() << "error: raw::run with timeout failed.");
 
   return (0);
 }
@@ -96,10 +106,6 @@ int main_test() {
  *  Init the unit test.
  */
 int main(int argc, char** argv) {
-  QCoreApplication app(argc, argv);
-  unittest utest(&main_test);
-  QObject::connect(&utest, SIGNAL(finished()), &app, SLOT(quit()));
-  utest.start();
-  app.exec();
-  return (utest.ret());
+  unittest utest(argc, argv, &main_test);
+  return (utest.run());
 }

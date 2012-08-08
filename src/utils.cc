@@ -48,6 +48,7 @@
 #include "com/centreon/engine/shared.hh"
 #include "com/centreon/engine/utils.hh"
 
+using namespace com::centreon;
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;
 
@@ -56,7 +57,7 @@ using namespace com::centreon::engine::logging;
 /******************************************************************/
 
 /* executes a system command - used for notifications, event handlers, etc. */
-int my_system_r(nagios_macros const* mac,
+int my_system_r(nagios_macros* mac,
 		char* cmd,
 		int timeout,
                 int* early_timeout,
@@ -101,22 +102,21 @@ int my_system_r(nagios_macros const* mac,
                         NULL);
 
   commands::raw raw_cmd("system", cmd);
-  commands::result cmd_result;
-  raw_cmd.run(cmd, *mac, timeout, cmd_result);
+  commands::result res;
+  raw_cmd.run(cmd, *mac, timeout, res);
 
-  end_time = cmd_result.get_end_time();
-  *exectime = cmd_result.get_execution_time();
-  *early_timeout = cmd_result.get_is_timeout();
-  if (output != NULL && max_output_length > 0) {
-    if (cmd_result.get_stdout() != "") {
-      *output = my_strdup(qPrintable(cmd_result.get_stdout().left(max_output_length - 1)));
-    }
-    else if (cmd_result.get_stderr() != "") {
-      *output = my_strdup(qPrintable(cmd_result.get_stderr().left(max_output_length - 1)));
-    }
+  end_time.tv_sec = res.end_time.to_seconds();
+  end_time.tv_usec
+    = res.end_time.to_useconds() - end_time.tv_sec * 1000000ull;
+  *exectime = (res.end_time - res.start_time).to_seconds();
+  *early_timeout = res.exit_status == process::timeout;
+  if (output && max_output_length > 0) {
+    *output = my_strdup(res.output.substr(
+                                     0,
+                                     max_output_length - 1)
+                        .c_str());
   }
-
-  int result = cmd_result.get_exit_code();
+  int result(res.exit_code);
 
   logger(dbg_commands, more)
     << fixed << setprecision(3)
@@ -1621,7 +1621,7 @@ int contains_illegal_object_chars(char* name) {
     return (FALSE);
 
   std::string tmp(name);
-  std::string const& illegal_object_chars = config.get_illegal_object_chars().toStdString();
+  std::string const& illegal_object_chars = config.get_illegal_object_chars();
 
   if (tmp.find_first_of(illegal_object_chars) == std::string::npos) {
     return (false);

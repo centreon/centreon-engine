@@ -20,42 +20,41 @@
 #ifndef CCE_LOGGING_SYSLOG_HH
 #  define CCE_LOGGING_SYSLOG_HH
 
-#  include <QMutex>
+#  include "com/centreon/concurrency/mutex.hh"
 #  include "com/centreon/engine/logging/object.hh"
+#  include "com/centreon/engine/namespace.hh"
 
-namespace                com {
-  namespace              centreon {
-    namespace            engine {
-      namespace          logging {
-	/**
-	 *  @class syslog syslog.hh
-	 *  @brief Call syslog for all logging message.
-	 *
-	 *  Call syscall for all logging message.
-	 */
-	class            syslog : public object {
-	public:
-	                 syslog();
-	                 ~syslog() throw();
+CCE_BEGIN()
 
-	  static syslog& instance();
+namespace          logging {
+  /**
+   *  @class syslog syslog.hh
+   *  @brief Call syslog for all logging message.
+   *
+   *  Call syscall for all logging message.
+   */
+  class            syslog : public object {
+  public:
+                   syslog();
+                   ~syslog() throw();
+    static syslog& instance();
+    void           log(
+                     char const* message,
+                     unsigned long long type,
+                     unsigned int verbosity) throw ();
+    void           set_facility(int facility) throw ();
 
-	  void           set_facility(int facility) throw ();
-	  void           log(
-                           char const* message,
-                           unsigned long long type,
-                           unsigned int verbosity) throw ();
+  private:
+	           syslog(syslog const& right);
+    syslog&        operator=(syslog const& right);
+    void           _internal_copy(syslog const& right);
 
-	private:
-	                 syslog(syslog const& right);
-	  syslog&        operator=(syslog const& right);
-
-	  QMutex         _mutex;
-	  int            _facility;
-	};
-      }
-    }
-  }
+    com::centreon::concurrency::mutex
+                   _mutex;
+    int            _facility;
+  };
 }
+
+CCE_END()
 
 #endif // !CCE_LOGGING_SYSLOG_HH

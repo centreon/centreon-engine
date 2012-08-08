@@ -17,47 +17,46 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <cstdlib>
+#include <cstring>
 #include <iostream>
-#include <QCoreApplication>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
+#include "com/centreon/concurrency/thread.hh"
 #include "com/centreon/engine/common.hh"
+
+using namespace com::centreon;
 
 /**
  *  Simulate some behavior of plugin.
+ *
+ *  @param[in] argc Argument count.
+ *  @param[in] argv Argument values.
+ *
+ *  @return STATE_OK on success.
  */
-int main(int argc, char** argv) {
-  QCoreApplication app(argc, argv);
-  for (int i = 0; i < argc; ++i) {
-    std::cout << argv[i];
-    if (i + 1 != argc) {
-      std::cout << " ";
-    }
-  }
+int main(int argc, char* argv[]) {
+  // Output.
+  std::cout << argv[0];
+  for (int i(1); i < argc; ++i)
+    std::cout << " " << argv[i];
 
-  if (argc != 2) {
+  // Not enough or too much argument = warning.
+  if (argc != 2)
     return (STATE_WARNING);
-  }
 
   // Never return to test the timeout.
-  if (!strcmp(argv[1], "--timeout=on")) {
-    while (true) {
-      sleep(1);
-    }
-  }
+  if (!strcmp(argv[1], "--timeout=on"))
+    while (true)
+      concurrency::thread::sleep(1);
 
   // Check a classic return.
-  if (!strcmp(argv[1], "--timeout=off")) {
+  if (!strcmp(argv[1], "--timeout=off"))
     return (STATE_OK);
-  }
 
   // Check macros argument are ok.
   if (!strcmp(argv[1], "--check_macros")) {
     char const* arg = getenv("NAGIOS_ARG1");
-    if (arg != NULL && !strcmp(arg, "default_arg")) {
+    if (arg != NULL && !strcmp(arg, "default_arg"))
       return (STATE_OK);
-    }
     return (STATE_CRITICAL);
   }
 

@@ -17,11 +17,14 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <string.h>
+#include <cstring>
+#include "com/centreon/concurrency/locker.hh"
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/logging/broker.hh"
 #include "com/centreon/engine/logging/object.hh"
+#include "com/centreon/unique_array_ptr.hh"
 
+using namespace com::centreon;
 using namespace com::centreon::engine::logging;
 
 /**************************************
@@ -33,12 +36,40 @@ using namespace com::centreon::engine::logging;
 /**
  *  Default constructor.
  */
-broker::broker() : _mutex(QMutex::Recursive), _thread(NULL) {}
+broker::broker() {
+  memset(&_thread, 0, sizeof(_thread));
+}
 
 /**
- *  Default destructor.
+ *  Copy constructor.
+ *
+ *  @param[in] right Object to copy.
+ */
+broker::broker(broker const& right) : object(right) {
+  concurrency::locker lock(&right._mutex);
+  _thread = right._thread;
+}
+
+/**
+ *  Destructor.
  */
 broker::~broker() throw () {}
+
+/**
+ *  Assignment operator.
+ *
+ *  @param[in] right Object to copy.
+ *
+ *  @return This object.
+ */
+broker& broker::operator=(broker const& right) {
+  if (this != &right) {
+    concurrency::locker lock1(&_mutex);
+    concurrency::locker lock2(&right._mutex);
+    _thread = right._thread;
+  }
+  return (*this);
+}
 
 /**
  *  Send message to broker.
@@ -47,29 +78,35 @@ broker::~broker() throw () {}
  *  @param[in] type      Logging types.
  *  @param[in] verbosity Unused.
  */
-void broker::log(char const* message,
-	  unsigned long long type,
-	  unsigned int verbosity) throw () {
+void broker::log(
+               char const* message,
+               unsigned long long type,
+               unsigned int verbosity) throw () {
   (void)verbosity;
 
-  if (message != NULL && (type & dbg_all) == 0) {
-    _mutex.lock();
-    if (_thread != QThread::currentThread()) {
-      _thread = QThread::currentThread();
-      char* copy = new char[strlen(message) + 1];
-      strcpy(copy, message);
+  // Broker is only notified of non-debug log messages.
+  if (message && (type & dbg_all) == 0) {
+    concurrency::locker lock(&_mutex);
+    if (_thread != concurrency::thread::get_current_id()) {
+      _thread = concurrency::thread::get_current_id();
 
-      broker_log_data(NEBTYPE_LOG_DATA,
-		      NEBFLAG_NONE,
-		      NEBATTR_NONE,
-		      copy,
-		      static_cast<unsigned long>(type),
-		      time(NULL),
-		      NULL);
+      // Copy message because broker module might modify it.
+      unique_array_ptr<char> copy(new char[strlen(message) + 1]);
+      strcpy(copy.get(), message);
 
-      delete[] copy;
-      _thread = NULL;
+      // Event broker callback.
+      broker_log_data(
+        NEBTYPE_LOG_DATA,
+        NEBFLAG_NONE,
+        NEBATTR_NONE,
+        copy.get(),
+        static_cast<unsigned long>(type),
+        time(NULL),
+        NULL);
+
+      // Reset thread.
+      memset(&_thread, 0, sizeof(_thread));
     }
-    _mutex.lock();
   }
+  return ;
 }

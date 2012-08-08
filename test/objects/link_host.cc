@@ -17,8 +17,9 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <cstdlib>
 #include <exception>
-#include <QDebug>
+#include <iostream>
 #include "com/centreon/engine/commands/set.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/logging/engine.hh"
@@ -32,6 +33,7 @@
 #include "com/centreon/engine/utils.hh"
 #include "test/objects/create_object.hh"
 
+using namespace com::centreon::engine;
 using namespace com::centreon::engine::objects;
 using namespace test::objects;
 
@@ -46,11 +48,11 @@ static bool create_and_link(bool has_parents,
                             bool has_cmd_check_command) {
   init_object_skiplists();
   host* obj = create_host(1);
-  QVector<host*> parents;
-  QVector<contact*> contacts;
-  QVector<contactgroup*> contactgroups;
-  QVector<hostgroup*> hostgroups;
-  QVector<QString> customvar;
+  std::vector<host*> parents;
+  std::vector<contact*> contacts;
+  std::vector<contactgroup*> contactgroups;
+  std::vector<hostgroup*> hostgroups;
+  std::vector<std::string> customvar;
   timeperiod* check_period = NULL;
   timeperiod* notification_period = NULL;
   command* cmd_event_handler = NULL;
@@ -66,8 +68,11 @@ static bool create_and_link(bool has_parents,
       contactgroups.push_back(create_contactgroup(i + 1));
     if (has_hostgroups == true)
       hostgroups.push_back(create_hostgroup(i + 1));
-    if (has_custom_variables == true)
-      customvar.push_back(QString("_VAR%1=%1").arg(i + 1));
+    if (has_custom_variables == true) {
+      std::ostringstream oss;
+      oss << "_VAR" << i + 1 << "=" << i + 1;
+      customvar.push_back(oss.str());
+    }
   }
   if (has_check_period == true)
     check_period = create_timeperiod(1);
@@ -131,11 +136,11 @@ static bool create_and_link(bool has_parents,
 
 static void link_null_pointer() {
   try {
-    QVector<host*> parents;
-    QVector<contact*> contacts;
-    QVector<contactgroup*> contactgroups;
-    QVector<hostgroup*> hostgroups;
-    QVector<QString> customvar;
+    std::vector<host*> parents;
+    std::vector<contact*> contacts;
+    std::vector<contactgroup*> contactgroups;
+    std::vector<hostgroup*> hostgroups;
+    std::vector<std::string> customvar;
     link(static_cast<host*>(NULL),
          parents,
          contacts,
@@ -158,26 +163,27 @@ static void link_null_name() {
   host* obj = NULL;
   try {
     obj = create_host(1);
-    QVector<host*> parents;
-    QVector<contact*> contacts;
-    QVector<contactgroup*> contactgroups;
-    QVector<hostgroup*> hostgroups;
-    QVector<QString> customvar;
+    std::vector<host*> parents;
+    std::vector<contact*> contacts;
+    std::vector<contactgroup*> contactgroups;
+    std::vector<hostgroup*> hostgroups;
+    std::vector<std::string> customvar;
 
-    delete[] obj->name;
+    delete [] obj->name;
     obj->name = NULL;
 
-    link(static_cast<host*>(NULL),
-         parents,
-         contacts,
-         contactgroups,
-         hostgroups,
-         customvar,
-         0,
-         NULL,
-         NULL,
-         NULL,
-         NULL);
+    link(
+      static_cast<host*>(NULL),
+      parents,
+      contacts,
+      contactgroups,
+      hostgroups,
+      customvar,
+      0,
+      NULL,
+      NULL,
+      NULL,
+      NULL);
   }
   catch (std::exception const& e) {
     (void)e;
@@ -188,58 +194,66 @@ static void link_null_name() {
 
 static void link_without_parents() {
   if (create_and_link(false, true, true, true, true, true, true, true, true) == false)
-    throw (engine_error() << Q_FUNC_INFO << " invalid return.");
+    throw (engine_error() << __func__ << " invalid return");
 }
 
 static void link_without_contacts() {
   if (create_and_link(true, false, true, true, true, true, true, true, true) == false)
-    throw (engine_error() << Q_FUNC_INFO << " invalid return.");
+    throw (engine_error() << __func__ << " invalid return");
 }
 
 static void link_without_contactgroups() {
   if (create_and_link(true, true, false, true, true, true, true, true, true) == false)
-    throw (engine_error() << Q_FUNC_INFO << " invalid return.");
+    throw (engine_error() << __func__ << " invalid return");
 }
 
 static void link_without_hostgroups() {
   if (create_and_link(true, true, true, false, true, true, true, true, true) == false)
-    throw (engine_error() << Q_FUNC_INFO << " invalid return.");
+    throw (engine_error() << __func__ << " invalid return");
 }
 
 static void link_without_custom_variables() {
   if (create_and_link(true, true, true, true, false, true, true, true, true) == false)
-    throw (engine_error() << Q_FUNC_INFO << " invalid return.");
+    throw (engine_error() << __func__ << " invalid return");
 }
 
 static void link_without_check_period() {
   if (create_and_link(true, true, true, true, true, false, true, true, true) == true)
-    throw (engine_error() << Q_FUNC_INFO << " invalid return.");
+    throw (engine_error() << __func__ << " invalid return");
 }
 
 static void link_without_notification_period() {
   if (create_and_link(true, true, true, true, true, true, false, true, true) == true)
-    throw (engine_error() << Q_FUNC_INFO << " invalid return.");
+    throw (engine_error() << __func__ << " invalid return");
 }
 
 static void link_without_cmd_event_handler() {
   if (create_and_link(true, true, true, true, true, true, true, false, true) == false)
-    throw (engine_error() << Q_FUNC_INFO << " invalid return.");
+    throw (engine_error() << __func__ << " invalid return");
 }
 
 static void link_without_cmd_check_command() {
   if (create_and_link(true, true, true, true, true, true, true, true, false) == false)
-    throw (engine_error() << Q_FUNC_INFO << " invalid return.");
+    throw (engine_error() << __func__ << " invalid return");
 }
 
 static void link_with_valid_objects() {
   if (create_and_link(true, true, true, true, true, true, true, true, true) == false)
-    throw (engine_error() << Q_FUNC_INFO << " invalid return.");
+    throw (engine_error() << __func__ << " invalid return");
 }
 
+/**
+ *  Check linkage of host.
+ *
+ *  @return EXIT_SUCCESS on success.
+ */
 int main() {
-  com::centreon::engine::logging::engine::load();
-  com::centreon::engine::commands::set::load();
+  // Initialization.
+  logging::engine::load();
+  commands::set::load();
+
   try {
+    // Tests.
     link_null_pointer();
     link_null_name();
     link_without_parents();
@@ -254,9 +268,11 @@ int main() {
     link_with_valid_objects();
   }
   catch (std::exception const& e) {
-    qDebug() << "error: " << e.what();
+    // Exception handling.
+    std::cerr << "error: " << e.what() << std::endl;
     free_memory(get_global_macros());
-    return (1);
+    return (EXIT_FAILURE);
   }
-  return (0);
+
+  return (EXIT_SUCCESS);
 }

@@ -17,14 +17,14 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <QCoreApplication>
-#include <QMutexLocker>
-#include <QTimer>
+#include "com/centreon/concurrency/locker.hh"
 #include "com/centreon/engine/commands/raw.hh"
+#include "com/centreon/engine/commands/environment.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
 
+using namespace com::centreon;
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;
 using namespace com::centreon::engine::commands;
@@ -40,38 +40,31 @@ using namespace com::centreon::engine::commands;
  *
  *  @param[in] name         The command name.
  *  @param[in] command_line The command line.
+ *  @param[in] listener     The listener who catch events.
  */
-raw::raw(QString const& name, QString const& command_line)
-  : command(name, command_line) {}
+raw::raw(
+       std::string const& name,
+       std::string const& command_line,
+       command_listener* listener)
+  : command(name, command_line, listener) {
+
+}
 
 /**
  *  Copy constructor
  *
  *  @param[in] right Object to copy.
  */
-raw::raw(raw const& right) : command(right) {}
+raw::raw(raw const& right)
+  : command(right) {
+
+}
 
 /**
  *  Destructor.
  */
 raw::~raw() throw () {
-  QMutexLocker lock(&_mutex);
-  while (!_processes.empty()) {
-    // XXX MK : code below seems broken to me, as vtable is not
-    // guaranteed upon destruction. Also, the event loop might not catch
-    // signal of process between checking of emptiness and connection of
-    // signal.
-    process_info info(_processes.begin().value());
-    QEventLoop loop;
-    connect(
-      this,
-      SIGNAL(command_executed(commands::result const&)),
-      &loop,
-      SLOT(quit()));
-    lock.unlock();
-    loop.exec();
-    lock.relock();
-  }
+
 }
 
 /**
@@ -106,41 +99,43 @@ commands::command* raw::clone() const {
  *  @return The command id.
  */
 unsigned long raw::run(
-                     QString const& processed_cmd,
-                     nagios_macros const& macros,
+                     std::string const& processed_cmd,
+                     nagios_macros& macros,
                      unsigned int timeout) {
-  // Debug.
-  logger(dbg_functions, basic) << "start " << Q_FUNC_INFO;
+  logger(dbg_commands, basic)
+    << "raw::run: cmd='" << processed_cmd << "', timeout=" << timeout;
 
-  // Create process.
-  process_info info;
-  info.proc = QSharedPointer<process>(
-                new process(macros, timeout),
-                &_deletelater_process);
-
-  // Connect to process.
-  if (!connect(&(*info.proc),
-  	      SIGNAL(process_ended()),
-  	      this,
-  	      SLOT(raw_ended())))
-    throw (engine_error() << "connect process to commands::raw failed.");
-
-  // Store process information.
+  // Get process and put into the busy list.
+  process* p(NULL);
+  unsigned long command_id(get_uniq_id());
   {
-    QMutexLocker lock(&_mutex);
-    info.cmd_id = get_uniq_id();
-    _processes.insert(&(*info.proc), info);
+    concurrency::locker lock(&_lock);
+    p = _get_free_process();
+    _processes_busy[p] = command_id;
   }
 
-  // Start process.
   logger(dbg_commands, basic)
-    << "raw command (id=" << info.cmd_id
-    << ") start '" << processed_cmd << "'.";
-  info.proc->start(processed_cmd);
+    << "raw::run: id=" << command_id << ", process=" << p;
 
-  // Debug.
-  logger(dbg_functions, basic) << "end " << Q_FUNC_INFO;
-  return (info.cmd_id);
+  // Setup environement macros if is necessary.
+  environment env;
+  _build_environment_macros(macros, env);
+
+  try {
+    // Start process.
+    p->exec(processed_cmd.c_str(), env.data(), timeout);
+    logger(dbg_commands, basic)
+      << "raw::run: start process success: id=" << command_id;
+  }
+  catch (...) {
+    logger(dbg_commands, basic)
+      << "raw::run: start process failed: id=" << command_id;
+
+    concurrency::locker lock(&_lock);
+    _processes_busy.erase(p);
+    throw;
+  }
+  return (command_id);
 }
 
 /**
@@ -152,85 +147,67 @@ unsigned long raw::run(
  *  @param[out] res     The result of the command.
  */
 void raw::run(
-            QString const& processed_cmd,
-            nagios_macros const& macros,
+            std::string const& processed_cmd,
+            nagios_macros& macros,
             unsigned int timeout,
             result& res) {
-  // Debug.
-  logger(dbg_functions, basic) << "start " << Q_FUNC_INFO;
-
-  // Get process ID.
-  unsigned long id;
-  {
-    QMutexLocker lock(&_mutex);
-    id = get_uniq_id();
-  }
-
-  // Create and run process.
-  process proc(macros, timeout);
   logger(dbg_commands, basic)
-    << "raw command (id=" << id
-    << ") start '" << processed_cmd << "'.";
-  proc.start(processed_cmd);
+    << "raw::run: cmd='" << processed_cmd << "', timeout=" << timeout;
+
+  // Get process.
+  process p;
+  unsigned long command_id(get_uniq_id());
+
+  logger(dbg_commands, basic)
+    << "raw::run: id=" << command_id << ", process=" << &p;
+
+  // Setup environement macros if is necessary.
+  environment env;
+  _build_environment_macros(macros, env);
+
+  // Start process.
+  try {
+    p.exec(processed_cmd.c_str(), env.data(), timeout);
+    logger(dbg_commands, basic)
+      << "raw::run: start process success: id=" << command_id;
+  }
+  catch (...) {
+    logger(dbg_commands, basic)
+      << "raw::run: start process failed: id=" << command_id;
+    throw;
+  }
 
   // Wait for completion.
-  proc.wait();
+  p.wait();
 
-  // Provide result on process execution.
-  res.set_command_id(id);
-  res.set_start_time(proc.get_start_time());
-  res.set_end_time(proc.get_end_time());
-  res.set_exit_code(proc.get_exit_code());
-  res.set_is_timeout(proc.get_is_timeout());
-  res.set_stdout(proc.get_stdout());
-  res.set_stderr(proc.get_stderr());
-  res.set_is_executed(proc.get_is_executed());
+  // Get process output.
+  p.read(res.output);
 
-  // Debug.
-  logger(dbg_functions, basic) << "end " << Q_FUNC_INFO;
-  return ;
-}
+  // Set result informations.
+  res.command_id = command_id;
+  res.start_time = p.start_time();
+  res.end_time = p.end_time();
+  res.exit_code = p.exit_code();
+  res.exit_status = p.exit_status();
 
-/**
- *  Slot to catch the end of processes et send the result by signal.
- */
-void raw::raw_ended() {
-  // Debug.
-  logger(dbg_functions, basic) << "start " << Q_FUNC_INFO;
-
-  // Find process info.
-  process_info info;
-  {
-    QMutexLocker lock(&_mutex);
-    QHash<QObject*, process_info>::iterator
-      it(_processes.find(sender()));
-    if (it == _processes.end()) {
-      logger(log_runtime_warning, basic) << "sender not found in processes.";
-      return ;
-    }
-    info = it.value();
-    _processes.erase(it);
+  if (res.exit_status == process::timeout) {
+    res.exit_code = STATE_CRITICAL;
+    res.output = "(Process Timeout)";
   }
+  else if (res.exit_status == process::crash)
+    res.exit_code = STATE_CRITICAL;
+  else if (res.exit_code < -1 || res.exit_code > 3)
+    res.exit_code = STATE_UNKNOWN;
 
-  // Build check result.
-  result res(
-           info.cmd_id,
-           info.proc->get_stdout(),
-           info.proc->get_stderr(),
-           info.proc->get_start_time(),
-           info.proc->get_end_time(),
-           info.proc->get_exit_code(),
-           info.proc->get_is_timeout(),
-           info.proc->get_is_executed());
-
-  // Debug.
   logger(dbg_commands, basic)
-    << "raw command (id=" << info.cmd_id << ") finished.";
-
-  // Command finished executing.
-  emit command_executed(res);
-  logger(dbg_functions, basic) << "end " << Q_FUNC_INFO;
-  return ;
+    << "raw::run: end process: "
+    "id=" << command_id << ", "
+    "start_time=" << res.start_time.to_mseconds() << ", "
+    "end_time=" << res.end_time.to_mseconds() << ", "
+    "exit_code=" << res.exit_code << ", "
+    "exit_status=" << res.exit_status << ", "
+    "output='" << res.output << "'";
+  return;
 }
 
 /**************************************
@@ -240,11 +217,360 @@ void raw::raw_ended() {
 **************************************/
 
 /**
- *  Set the object to delete later.
+ *  Provide by process_listener interface but not used.
  *
- *  @param[in] obj The object to delete later.
+ *  @param[in] p  Unused.
  */
-void raw::_deletelater_process(process* obj) {
-  obj->deleteLater();
-  return ;
+void raw::data_is_available(process& p) throw () {
+  (void)p;
+  return;
+}
+
+/**
+ *  Provide by process_listener interface but not used.
+ *
+ *  @param[in] p  Unused.
+ */
+void raw::data_is_available_err(process& p) throw () {
+  (void)p;
+  return;
+}
+
+/**
+ *  Provide by process_listener interface. Call at the end
+ *  of the process execution.
+ *
+ *  @param[in] p  The process to finished.
+ */
+void raw::finished(process& p) throw () {
+  try {
+    logger(dbg_commands, basic)
+      << "raw::finished: process=" << &p;
+
+    concurrency::locker lock(&_lock);
+    // Find process from the busy list.
+    umap<process*, unsigned long>::iterator
+      it(_processes_busy.find(&p));
+    if (it == _processes_busy.end()) {
+      logger(log_runtime_warning, basic)
+        << "invalid process pointer: "
+        "process not found into process busy list";
+      return;
+    }
+    // Get command_id and remove the process from the busy list.
+    unsigned long command_id(it->second);
+    _processes_busy.erase(it);
+
+    logger(dbg_commands, basic)
+      << "raw::finished: id=" << command_id;
+
+    // Build check result.
+    result res;
+
+    // Get process output.
+    p.read(res.output);
+
+    // Set result informations.
+    res.command_id = command_id;
+    res.start_time = p.start_time();
+    res.end_time = p.end_time();
+    res.exit_code = p.exit_code();
+    res.exit_status = p.exit_status();
+
+    if (res.exit_status == process::timeout) {
+      res.exit_code = STATE_CRITICAL;
+      res.output = "(Process Timeout)";
+    }
+    else if (res.exit_status == process::crash)
+      res.exit_code = STATE_CRITICAL;
+    else if (res.exit_code < -1 || res.exit_code > 3)
+      res.exit_code = STATE_UNKNOWN;
+
+    logger(dbg_commands, basic)
+      << "raw::finished: "
+      "id=" << command_id << ", "
+      "start_time=" << res.start_time.to_mseconds() << ", "
+      "end_time=" << res.end_time.to_mseconds() << ", "
+      "exit_code=" << res.exit_code << ", "
+      "exit_status=" << res.exit_status << ", "
+      "output='" << res.output << "'";
+
+    // Forward result to the listener.
+    if (_listener)
+      (_listener->finished)(res);
+
+    // Put the process into the free list.
+    _processes_free.push_back(&p);
+  }
+  catch (std::exception const& e) {
+    logger(log_runtime_warning, basic)
+      << "process finish failed: " << e.what();
+  }
+  return;
+}
+
+/**
+ *  Build argv macro environment variables.
+ *
+ *  @param[in]  macros  The macros data struct.
+ *  @param[out] env     The environment to fill.
+ */
+void raw::_build_argv_macro_environment(
+            nagios_macros const& macros,
+            environment& env) {
+  for (unsigned int i(0); i < MAX_COMMAND_ARGUMENTS; ++i) {
+    char const* value(macros.argv[i] ? macros.argv[i] : "");
+    std::ostringstream oss;
+    oss << MACRO_ENV_VAR_PREFIX "ARG" << (i + 1) << "=" << value;
+    env.add(oss.str());
+  }
+  return;
+}
+
+/**
+ *  Build contact address environment variables.
+ *
+ *  @param[in]  macros  The macros data struct.
+ *  @param[out] env     The environment to fill.
+ */
+void raw::_build_contact_address_environment(
+            nagios_macros const& macros,
+            environment& env) {
+  if (!macros.contact_ptr)
+    return;
+  for (unsigned int i(0); i < MAX_CONTACT_ADDRESSES; ++i) {
+    char const* value(macros.contact_ptr->address[i]);
+    if (!value)
+      value = "";
+    std::ostringstream oss;
+    oss << MACRO_ENV_VAR_PREFIX "CONTACTADDRESS" << i << "=" << value;
+    env.add(oss.str());
+  }
+  return;
+}
+
+/**
+ *  Build custom contact macro environment variables.
+ *
+ *  @param[in,out] macros  The macros data struct.
+ *  @param[out]    env     The environment to fill.
+ */
+void raw::_build_custom_contact_macro_environment(
+            nagios_macros& macros,
+            environment& env) {
+  // Build custom contact variable.
+  contact* hst(macros.contact_ptr);
+  if (hst) {
+    for (customvariablesmember* customvar(hst->custom_variables);
+         customvar;
+         customvar = customvar->next)
+      if (customvar->variable_name) {
+        char const* value(customvar->variable_value);
+        if (!value)
+          value = "";
+        std::string name("_CONTACT");
+        name.append(customvar->variable_name);
+        add_custom_variable_to_object(
+          &macros.custom_contact_vars,
+          name.c_str(),
+          value);
+      }
+  }
+  // Set custom contact variable into the environement
+  for (customvariablesmember* customvar(macros.custom_contact_vars);
+       customvar;
+       customvar = customvar->next)
+    if (customvar->variable_name) {
+      char const* value("");
+      if (customvar->variable_value)
+        value = clean_macro_chars(
+                  customvar->variable_value,
+                  STRIP_ILLEGAL_MACRO_CHARS | ESCAPE_MACRO_CHARS);
+      std::string line;
+      line.append(MACRO_ENV_VAR_PREFIX);
+      line.append(customvar->variable_name);
+      line.append("=");
+      line.append(value);
+      env.add(line);
+    }
+  return;
+}
+
+/**
+ *  Build custom host macro environment variables.
+ *
+ *  @param[in,out] macros  The macros data struct.
+ *  @param[out]    env     The environment to fill.
+ */
+void raw::_build_custom_host_macro_environment(
+            nagios_macros& macros,
+            environment& env) {
+  // Build custom host variable.
+  host* hst(macros.host_ptr);
+  if (hst) {
+    for (customvariablesmember* customvar(hst->custom_variables);
+         customvar;
+         customvar = customvar->next)
+      if (customvar->variable_name) {
+        char const* value("");
+        if (customvar->variable_value)
+          value = customvar->variable_value;
+        std::string name("_HOST");
+        name.append(customvar->variable_name);
+        add_custom_variable_to_object(
+          &macros.custom_host_vars,
+          name.c_str(),
+          value);
+      }
+  }
+  // Set custom host variable into the environement
+  for (customvariablesmember* customvar(macros.custom_host_vars);
+       customvar;
+       customvar = customvar->next)
+    if (customvar->variable_name) {
+      char const* value("");
+      if (customvar->variable_value)
+        value = clean_macro_chars(
+                  customvar->variable_value,
+                  STRIP_ILLEGAL_MACRO_CHARS | ESCAPE_MACRO_CHARS);
+      std::string line;
+      line.append(MACRO_ENV_VAR_PREFIX);
+      line.append(customvar->variable_name);
+      line.append("=");
+      line.append(value);
+      env.add(line);
+    }
+  return;
+}
+
+/**
+ *  Build custom service macro environment variables.
+ *
+ *  @param[in,out] macros  The macros data struct.
+ *  @param[out]    env     The environment to fill.
+ */
+void raw::_build_custom_service_macro_environment(
+            nagios_macros& macros,
+            environment& env) {
+  // Build custom service variable.
+  service* hst(macros.service_ptr);
+  if (hst) {
+    for (customvariablesmember* customvar(hst->custom_variables);
+         customvar;
+         customvar = customvar->next)
+      if (customvar->variable_name) {
+        char const* value(customvar->variable_value);
+        if (!value)
+          value = "";
+        std::string name("_SERVICE");
+        name.append(customvar->variable_name);
+        add_custom_variable_to_object(
+          &macros.custom_service_vars,
+          name.c_str(),
+          value);
+      }
+  }
+  // Set custom service variable into the environement
+  for (customvariablesmember* customvar(macros.custom_service_vars);
+       customvar;
+       customvar = customvar->next)
+    if (customvar->variable_name) {
+      char const* value("");
+      if (customvar->variable_value)
+        value = clean_macro_chars(
+                  customvar->variable_value,
+                  STRIP_ILLEGAL_MACRO_CHARS | ESCAPE_MACRO_CHARS);
+      std::string line;
+      line.append(MACRO_ENV_VAR_PREFIX);
+      line.append(customvar->variable_name);
+      line.append("=");
+      line.append(value);
+      env.add(line);
+    }
+  return;
+}
+
+/**
+ *  Build all macro environemnt variable.
+ *
+ *  @param[in,out] macros  The macros data struct.
+ *  @param[out]    env     The environment to fill.
+ */
+void raw::_build_environment_macros(
+            nagios_macros& macros,
+            environment& env) {
+  if (config.get_enable_environment_macros()) {
+    _build_macrosx_environment(macros, env);
+    _build_argv_macro_environment(macros, env);
+    _build_custom_host_macro_environment(macros, env);
+    _build_custom_service_macro_environment(macros, env);
+    _build_custom_contact_macro_environment(macros, env);
+    _build_contact_address_environment(macros, env);
+  }
+  return;
+}
+
+/**
+ *  Build macrox environment variables.
+ *
+ *  @param[in,out] macros  The macros data struct.
+ *  @param[out]    env     The environment to fill.
+ */
+void raw::_build_macrosx_environment(
+            nagios_macros& macros,
+            environment& env) {
+  for (unsigned int i(0); i < MACRO_X_COUNT; ++i) {
+    int release_memory(0);
+
+    // Need to grab macros?
+    if (!macros.x[i]) {
+      // Skip summary macro in lage instalation tweaks.
+      if ((i < MACRO_TOTALHOSTSUP
+           || i > MACRO_TOTALSERVICEPROBLEMSUNHANDLED)
+          && !config.get_use_large_installation_tweaks()) {
+        grab_macrox_value_r(
+          &macros,
+          i,
+          NULL,
+          NULL,
+          &macros.x[i],
+          &release_memory);
+      }
+    }
+
+    // Add into the environment.
+    if (macro_x_names[i]) {
+      std::string line;
+      line.append(MACRO_ENV_VAR_PREFIX);
+      line.append(macro_x_names[i]);
+      line.append("=");
+      line.append(macros.x[i] ? macros.x[i] : "");
+      env.add(line);
+    }
+
+    // Release memory if necessary.
+    if (release_memory) {
+      delete[] macros.x[i];
+      macros.x[i] = NULL;
+    }
+  }
+  return;
+}
+
+/**
+ *  Get one process to execute command.
+ *
+ *  @return A process.
+ */
+process* raw::_get_free_process() {
+  // If any process are available, create new one.
+  if (_processes_free.empty()) {
+    process* p(new process(this));
+    p->enable_stream(process::err, false);
+    return (p);
+  }
+  // Get a free process.
+  process* p(_processes_free.front());
+  _processes_free.pop_front();
+  return (p);
 }

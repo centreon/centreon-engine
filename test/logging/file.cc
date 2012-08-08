@@ -17,21 +17,19 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <errno.h>
+#include <cerrno>
+#include <cmath>
+#include <cstdio>
+#include <cstring>
 #include <exception>
-#include <math.h>
-#include <QCoreApplication>
-#include <QDebug>
-#include <QDir>
-#include <QFile>
-#include <stdio.h>
-#include <string.h>
+#include <fstream>
 #include "com/centreon/engine/common.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/engine.hh"
 #include "com/centreon/engine/logging/file.hh"
 #include "com/centreon/engine/logging/object.hh"
+#include "com/centreon/shared_ptr.hh"
 #include "test/unittest.hh"
 
 using namespace com::centreon::engine;
@@ -43,18 +41,27 @@ using namespace com::centreon::engine::logging;
  *  @param[in] filename The file name.
  *  @param[in] text     The content reference.
  */
-static void check_file(QString const& filename, QString const& text) {
-  QFile file(filename);
-  file.open(QIODevice::ReadOnly);
-  if (file.error() != QFile::NoError) {
-    throw (engine_error() << filename << ": " << file.errorString());
+static void check_file(
+              std::string const& filename,
+              std::string const& text) {
+  // Open file.
+  std::ifstream file(filename.c_str(), std::ios_base::in);
+  if (!file.is_open())
+    throw (engine_error() << "open file failed: " << filename);
+
+  // Read file.
+  std::string data;
+  while (file.good()) {
+    char buffer[1000];
+    file.read(buffer, sizeof(buffer));
+    data.append(buffer, file.gcount());
   }
 
-  if (file.readAll() != text) {
-    throw (engine_error() << filename << ": bad content.");
-  }
+  // Compare contents.
+  if (data != text)
+    throw (engine_error() << filename << ": bad content");
 
-  file.close();
+  return ;
 }
 
 /**
@@ -62,7 +69,10 @@ static void check_file(QString const& filename, QString const& text) {
  *  - file rotate.
  *  - file truncate.
  */
-int main_test() {
+int main_test(int argc, char** argv) {
+  (void)argc;
+  (void)argv;
+
   // Get instance of logging engine.
   engine& engine = engine::instance();
   unsigned int id1 = 0;
@@ -71,17 +81,20 @@ int main_test() {
 
   {
     // Add new object (file) to log into engine and test limit size.
-    QSharedPointer<file> obj1(new file("./test_logging_file_size_limit.log", 10));
+    com::centreon::shared_ptr<object>
+      obj1(new file("./test_logging_file_size_limit.log", 10));
     engine::obj_info info1(obj1, log_all, most);
     id1 = engine.add_object(info1);
 
     // Add new object (file) to log into engine and test no limit size.
-    QSharedPointer<file> obj2(new file("./test_logging_file.log"));
+    com::centreon::shared_ptr<object>
+      obj2(new file("./test_logging_file.log"));
     engine::obj_info info2(obj2, log_all, most);
     id2 = engine.add_object(info2);
 
     // Add new object (file) to log into engine and test reopen.
-    QSharedPointer<file> obj3(new file("./test_logging_file_reopen.log"));
+    com::centreon::shared_ptr<object>
+      obj3(new file("./test_logging_file_reopen.log"));
     engine::obj_info info3(obj3, log_all, most);
     id3 = engine.add_object(info3);
   }
@@ -101,46 +114,36 @@ int main_test() {
   engine.remove_object(id2);
   engine.remove_object(id1);
 
-  QDir dir("./");
-  QStringList filters("test_logging_file*.log*");
-  QFileInfoList files = dir.entryInfoList(filters);
-
-  // Check the content of all file log.
-  for (QFileInfoList::const_iterator it = files.begin(), end = files.end();
-       it != end;
-       ++it) {
-    if (it->fileName() == "test_logging_file_size_limit.log") {
-      check_file(it->fileName(), "qwerty");
-    }
-    else if (it->fileName() == "test_logging_file_size_limit.log.old") {
-      check_file(it->fileName(), "0123456789");
-    }
-    else if (it->fileName() == "test_logging_file.log") {
-      check_file(it->fileName(), "0123450123456789qwerty");
-    }
-    else if (it->fileName() == "test_logging_file_reopen.log") {
-      check_file(it->fileName(), "qwerty");
-    }
-    else if (it->fileName() == "test_logging_file_reopen.log.old") {
-      check_file(it->fileName(), "0123450123456789");
-    }
-    else {
-      throw (engine_error() << "bad file name.");
-    }
-    QFile::remove(it->fileName());
+  int ret(1);
+  try {
+    check_file("test_logging_file_size_limit.log", "qwerty");
+    check_file("test_logging_file_size_limit.log.old", "0123456789");
+    check_file("test_logging_file.log", "0123450123456789qwerty");
+    check_file("test_logging_file_reopen.log", "qwerty");
+    check_file("test_logging_file_reopen.log.old", "0123450123456789");
+    ret = 0;
+  }
+  catch (std::exception const& e) {
+    std::cerr << "error: " << e.what() << std::endl;
+  }
+  catch (...) {
+    std::cerr << "error: catch all..." << std::endl;
   }
 
-  return (0);
+  // remove testing file.
+  remove("test_logging_file_size_limit.log");
+  remove("test_logging_file_size_limit.log.old");
+  remove("test_logging_file.log");
+  remove("test_logging_file_reopen.log");
+  remove("test_logging_file_reopen.log.old");
+
+  return (ret);
 }
 
 /**
  *  Init unit test.
  */
 int main(int argc, char** argv) {
-  QCoreApplication app(argc, argv);
-  unittest utest(&main_test);
-  QObject::connect(&utest, SIGNAL(finished()), &app, SLOT(quit()));
-  utest.start();
-  app.exec();
-  return (utest.ret());
+  unittest utest(argc, argv, &main_test);
+  return (utest.run());
 }

@@ -39,16 +39,17 @@ bool link_servicegroup(servicegroup* obj,
                        service** members,
                        servicegroup** groups) {
   try {
-    objects::link(obj,
-                  tab2qvec(members),
-                  tab2qvec(groups));
+    objects::link(
+               obj,
+               tab2vec(members),
+               tab2vec(groups));
   }
   catch (std::exception const& e) {
     logger(log_runtime_error, basic) << e.what();
     return (false);
   }
   catch (...) {
-    logger(log_runtime_error, basic) << Q_FUNC_INFO << " unknow exception.";
+    logger(log_runtime_error, basic) << __func__ << " unknow exception";
     return (false);
   }
   return (true);
@@ -67,8 +68,9 @@ void release_servicegroup(servicegroup const* obj) {
     logger(log_runtime_error, basic) << e.what();
   }
   catch (...) {
-    logger(log_runtime_error, basic) << Q_FUNC_INFO << " unknow exception.";
+    logger(log_runtime_error, basic) << __func__ << " unknow exception";
   }
+  return ;
 }
 
 /**
@@ -80,8 +82,8 @@ void release_servicegroup(servicegroup const* obj) {
  */
 void objects::link(
                 servicegroup* obj,
-                QVector<service*> const& members,
-                QVector<servicegroup*> const& groups) {
+                std::vector<service*> const& members,
+                std::vector<servicegroup*> const& groups) {
   // Check object contents.
   if (!obj)
     throw (engine_error() << "servicegroup is a NULL pointer");
@@ -92,7 +94,7 @@ void objects::link(
   timeval tv(get_broker_timestamp(NULL));
 
   // Add all services into the servicegroup.
-  for (QVector<service*>::const_iterator
+  for (std::vector<service*>::const_iterator
          it(members.begin()),
          end(members.end());
        it != end;
@@ -125,8 +127,8 @@ void objects::link(
   }
 
   // Add the content of other servicegroups into this servicegroup.
-  QVector<service*> other_members;
-  for (QVector<servicegroup*>::const_iterator
+  std::vector<service*> other_members;
+  for (std::vector<servicegroup*>::const_iterator
          it(groups.begin()),
          end(groups.end());
        it != end;
@@ -142,8 +144,8 @@ void objects::link(
   }
 
   // Recursive call.
-  if (!other_members.isEmpty())
-    objects::link(obj, other_members, QVector<servicegroup*>());
+  if (!other_members.empty())
+    objects::link(obj, other_members, std::vector<servicegroup*>());
 
   return ;
 }

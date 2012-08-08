@@ -20,11 +20,10 @@
 #ifndef CCE_OBJECTS_HOSTDEPENDENCY_HH
 #  define CCE_OBJECTS_HOSTDEPENDENCY_HH
 
+#  include "com/centreon/engine/namespace.hh"
 #  include "com/centreon/engine/objects.hh"
 
 #  ifdef __cplusplus
-#    include <QString>
-#    include <QVector>
 extern "C" {
 #  endif // C++
 
@@ -36,18 +35,17 @@ void release_hostdependency(hostdependency const* obj);
 #  ifdef __cplusplus
 }
 
-namespace       com {
-  namespace     centreon {
-    namespace   engine {
-      namespace objects {
-        void    link(
-                  hostdependency* obj,
-                  timeperiod* dependency_period = NULL);
-        void    release(hostdependency const* obj);
-      }
-    }
-  }
+CCE_BEGIN()
+
+namespace objects {
+  void    link(
+            hostdependency* obj,
+            timeperiod* dependency_period = NULL);
+  void    release(hostdependency const* obj);
 }
+
+CCE_END()
+
 #  endif // C++
 
 #endif // !CCE_OBJECTS_HOSTDEPENDENCY_HH

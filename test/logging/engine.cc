@@ -18,11 +18,10 @@
 */
 
 #include <exception>
-#include <QCoreApplication>
-#include <QDebug>
 #include <time.h>
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/logging/engine.hh"
+#include "com/centreon/shared_ptr.hh"
 #include "test/logging/test.hh"
 #include "test/unittest.hh"
 
@@ -49,53 +48,56 @@ static const char*        LOG_MESSAGE  = "~!@#$%^&*()_+09/qwerty \n";
 /**
  *  Check the engine working.
  */
-int main_test() {
+int main_test(int argc, char** argv) {
+  (void)argc;
+  (void)argv;
+
   // Get instance of logging engine.
   engine& engine = engine::instance();
 
-  // Add new object (test) to log into engine. One object by logging type and level.
+  // Add new object (test) to log into engine.
+  // One object by logging type and level.
   unsigned long id[NB_LOG_TYPE * NB_LOG_LEVEL + NB_DBG_TYPE];
-  for (unsigned int j = 0; j < NB_LOG_LEVEL; ++j) {
-    for (unsigned int i = 0; i < NB_LOG_TYPE; ++i) {
-      if (i == 8) {
-        continue;
-      }
+  for (unsigned int j(0); j < NB_LOG_LEVEL; ++j) {
+    for (unsigned int i(0); i < NB_LOG_TYPE; ++i) {
+      if (i == 8)
+        continue ;
       unsigned long long type(1ull << i);
-      QSharedPointer<test> obj(new test(LOG_MESSAGE, type, j, j + 1));
+      com::centreon::shared_ptr<object>
+        obj(new test(LOG_MESSAGE, type, j, j + 1));
       engine::obj_info info(obj, type, j);
       id[i + j * NB_LOG_TYPE] = engine.add_object(info);
     }
   }
 
-  // Add new object (test) to log into engine. One object by debug logging type.
-  for (unsigned int i = 0; i < NB_DBG_TYPE; ++i) {
+  // Add new object (test) to log into engine.
+  // One object by debug logging type.
+  for (unsigned int i(0); i < NB_DBG_TYPE; ++i) {
     unsigned long long type(1ull << (i + 32));
-    QSharedPointer<test> obj(new test(LOG_MESSAGE, type, 0, 1));
+    com::centreon::shared_ptr<object>
+      obj(new test(LOG_MESSAGE, type, 0, 1));
     engine::obj_info info(obj, type, 0);
     id[NB_LOG_TYPE * NB_LOG_LEVEL + i] = engine.add_object(info);
   }
 
   // Send message on all different debug logging type.
-  for (unsigned int i = 0; i < NB_DBG_TYPE; ++i) {
+  for (unsigned int i(0); i < NB_DBG_TYPE; ++i)
     engine.log(LOG_MESSAGE, 1ull << (i + 32), 0);
-  }
 
   // Send message on all different logging type and level.
-  for (unsigned int j = 0; j < NB_LOG_LEVEL; ++j) {
-    for (unsigned int i = 0; i < NB_LOG_TYPE; ++i) {
+  for (unsigned int j(0); j < NB_LOG_LEVEL; ++j)
+    for (unsigned int i(0); i < NB_LOG_TYPE; ++i)
       engine.log(LOG_MESSAGE, 1ull << i, j);
-    }
-  }
 
   // Remove object (broker).
-  for (unsigned int i = 0; i < NB_LOG_TYPE * NB_LOG_LEVEL + NB_DBG_TYPE; ++i) {
+  for (unsigned int i(0);
+       i < NB_LOG_TYPE * NB_LOG_LEVEL + NB_DBG_TYPE;
+       ++i)
     engine.remove_object(id[i]);
-  }
 
   // Check if all object was remove.
-  if (test::get_nb_instance() != 0) {
-    throw (engine_error() << "remove_object failed.");
-  }
+  if (test::get_nb_instance() != 0)
+    throw (engine_error() << "remove_object failed");
 
   return (0);
 }
@@ -104,10 +106,6 @@ int main_test() {
  *  Init unit test.
  */
 int main(int argc, char** argv) {
-  QCoreApplication app(argc, argv);
-  unittest utest(&main_test);
-  QObject::connect(&utest, SIGNAL(finished()), &app, SLOT(quit()));
-  utest.start();
-  app.exec();
-  return (utest.ret());
+  unittest utest(argc, argv, &main_test);
+  return (utest.run());
 }

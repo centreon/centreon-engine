@@ -46,7 +46,7 @@ add_library("cce_macros"
   "${INC_DIR}/process.hh")
 
 # Link target with necessary libraries.
-target_link_libraries("cce_macros" ${QT_LIBRARIES} "cce_core")
+target_link_libraries("cce_macros" "cce_core")
 
 if (WITH_TESTING)
   # Set directories.

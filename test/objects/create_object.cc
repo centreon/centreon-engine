@@ -17,9 +17,10 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <QString>
-#include <QVector>
+#include <sstream>
+#include <string>
 #include <string.h>
+#include <vector>
 #include "com/centreon/engine/objects/timeperiod.hh"
 #include "test/objects/create_object.hh"
 
@@ -55,15 +56,17 @@ daterange* objects::create_daterange(unsigned int id) {
 }
 
 timeperiodexclusion* objects::create_timeperiodexclusion(unsigned int id) {
-  timeperiodexclusion* obj = new timeperiodexclusion;
+  timeperiodexclusion* obj(new timeperiodexclusion);
   memset(obj, 0, sizeof(*obj));
-  obj->timeperiod_name = my_strdup(qPrintable(QString("name_%1").arg(id)));
+  std::ostringstream oss;
+  oss << "name_" << id;
+  obj->timeperiod_name = my_strdup(oss.str().c_str());
   obj->timeperiod_ptr = NULL;
   return (obj);
 }
 
 timeperiod* objects::create_timeperiod(unsigned int id) {
-  QVector<QString> range;
+  std::vector<std::string> range;
   range.push_back("sunday             00:00-24:00");
   range.push_back("monday             00:00-09:00,17:00-24:00");
   range.push_back("tuesday            00:00-09:00,17:00-24:00");
@@ -74,23 +77,37 @@ timeperiod* objects::create_timeperiod(unsigned int id) {
   range.push_back("july 10 - 15 / 2   00:00-24:00");
   range.push_back("day 1 - 15 / 5     00:00-24:00");
 
-  QVector<QString> exclude;
-  if (id > 1)
-    exclude.push_back(QString("name_%1").arg(id - 1));
-  QString name = QString("name_%1").arg(id);
-  add_timeperiod(name,
-                 QString("alias_%1").arg(id),
-                 range,
-                 exclude);
-  return (find_timeperiod(qPrintable(name)));
+  std::vector<std::string> exclude;
+  if (id > 1) {
+    std::ostringstream oss;
+    oss << "name_" << id - 1;
+    exclude.push_back(oss.str());
+  }
+  std::ostringstream name;
+  name << "name_" << id;
+  std::ostringstream alias;
+  alias << "alias_" << id;
+  add_timeperiod(
+    name.str().c_str(),
+    alias.str().c_str(),
+    range,
+    exclude);
+  return (find_timeperiod(name.str().c_str()));
 }
 
 servicesmember* objects::create_servicesmember(unsigned int id, servicesmember** head) {
   servicesmember* member = new servicesmember;
   memset(member, 0, sizeof(*member));
-
-  member->host_name = my_strdup(qPrintable(QString("name_%1").arg(id)));
-  member->service_description = my_strdup(qPrintable(QString("description_%1").arg(id)));
+  {
+    std::ostringstream oss;
+    oss << "name_" << id;
+    member->host_name = my_strdup(oss.str().c_str());
+  }
+  {
+    std::ostringstream oss;
+    oss << "description_" << id;
+    member->service_description = my_strdup(oss.str().c_str());
+  }
   if (head != NULL) {
     member->next = *head;
     *head = member;
@@ -99,98 +116,123 @@ servicesmember* objects::create_servicesmember(unsigned int id, servicesmember**
 }
 
 servicegroup* objects::create_servicegroup(unsigned int id) {
-  return (add_servicegroup(qPrintable(QString("name_%1").arg(id)),
-                           qPrintable(QString("alias_%1").arg(id)),
-                           "notes",
-                           "notes_url",
-                           "action_url"));
+  std::ostringstream name;
+  name << "name_" << id;
+  std::ostringstream alias;
+  alias << "alias_" << id;
+  return (add_servicegroup(
+            name.str().c_str(),
+            alias.str().c_str(),
+            "notes",
+            "notes_url",
+            "action_url"));
 }
 
 serviceescalation* objects::create_serviceescalation(unsigned int id) {
-  return (add_service_escalation(qPrintable(QString("name_%1").arg(id)),
-                                qPrintable(QString("description_%1").arg(id)),
-                                1,
-                                1,
-                                1.0,
-                                "timeperiod",
-                                true,
-                                true,
-                                true,
-                                true));
+  std::ostringstream name;
+  name << "name_" << id;
+  std::ostringstream description;
+  description << "description_" << id;
+  return (add_service_escalation(
+            name.str().c_str(),
+            description.str().c_str(),
+            1,
+            1,
+            1.0,
+            "timeperiod",
+            true,
+            true,
+            true,
+            true));
 }
 
 servicedependency* objects::create_servicedependency(unsigned int id) {
-  return (add_service_dependency(qPrintable(QString("dep_name_%1").arg(id)),
-                                 qPrintable(QString("dep_description_%1").arg(id)),
-                                 qPrintable(QString("name_%1").arg(id)),
-                                 qPrintable(QString("description_%1").arg(id)),
-                                 EXECUTION_DEPENDENCY,
-                                 true,
-                                 true,
-                                 true,
-                                 true,
-                                 true,
-                                 true,
-                                 "timeperiod"));
+  std::ostringstream dep_name;
+  dep_name << "dep_name_" << id;
+  std::ostringstream dep_description;
+  dep_description << "dep_description_" << id;
+  std::ostringstream name;
+  name << "name_" << id;
+  std::ostringstream description;
+  description << "description_" << id;
+  return (add_service_dependency(
+            dep_name.str().c_str(),
+            dep_description.str().c_str(),
+            name.str().c_str(),
+            description.str().c_str(),
+            EXECUTION_DEPENDENCY,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            "timeperiod"));
 }
 
 service* objects::create_service(unsigned int id) {
-  return (add_service(qPrintable(QString("name_%1").arg(id)),
-                      qPrintable(QString("description_%1").arg(id)),
-                      "display_name",
-                      "timeperiod",
-                      STATE_OK,
-                      1,
-                      true,
-                      true,
-                      5,
-                      5,
-                      5,
-                      60,
-                      "timeperiod",
-                      true,
-                      true,
-                      true,
-                      true,
-                      true,
-                      true,
-                      true,
-                      true,
-                      "event_handler",
-                      true,
-                      "command",
-                      true,
-                      true,
-                      0.0,
-                      0.0,
-                      true,
-                      true,
-                      true,
-                      true,
-                      true,
-                      true,
-                      true,
-                      true,
-                      true,
-                      true,
-                      NULL,
-                      true,
-                      false,
-                      "notes",
-                      "notes_url",
-                      "action_url",
-                      "icon_image",
-                      "icon_image_alt",
-                      true,
-                      true,
-                      true));
+  std::ostringstream name;
+  name << "name_" << id;
+  std::ostringstream description;
+  description << "description_" << id;
+  return (add_service(
+            name.str().c_str(),
+            description.str().c_str(),
+            "display_name",
+            "timeperiod",
+            STATE_OK,
+            1,
+            true,
+            true,
+            5,
+            5,
+            5,
+            60,
+            "timeperiod",
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            "event_handler",
+            true,
+            "command",
+            true,
+            true,
+            0.0,
+            0.0,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            NULL,
+            true,
+            false,
+            "notes",
+            "notes_url",
+            "action_url",
+            "icon_image",
+            "icon_image_alt",
+            true,
+            true,
+            true));
 }
 
 hostsmember* objects::create_hostsmember(unsigned int id, hostsmember** head) {
-  hostsmember* member = new hostsmember;
+  hostsmember* member(new hostsmember);
   memset(member, 0, sizeof(*member));
-
-  member->host_name = my_strdup(qPrintable(QString("name_%1").arg(id)));
+  std::ostringstream name;
+  name << "name_" << id;
+  member->host_name = my_strdup(name.str().c_str());
   if (head != NULL) {
     member->next = *head;
     *head = member;
@@ -199,101 +241,126 @@ hostsmember* objects::create_hostsmember(unsigned int id, hostsmember** head) {
 }
 
 hostgroup* objects::create_hostgroup(unsigned int id) {
-  return (add_hostgroup(qPrintable(QString("name_%1").arg(id)),
-                        qPrintable(QString("alias_%1").arg(id)),
-                        "notes",
-                        "notes_url",
-                        "action_url"));
+  std::ostringstream name;
+  name << "name_" << id;
+  std::ostringstream alias;
+  alias << "alias_" << id;
+  return (add_hostgroup(
+            name.str().c_str(),
+            alias.str().c_str(),
+            "notes",
+            "notes_url",
+            "action_url"));
 }
 
 hostescalation* objects::create_hostescalation(unsigned int id) {
-  return (add_host_escalation(qPrintable(QString("name_%1").arg(id)),
-                             5,
-                             5,
-                             60.0,
-                             "timeperiod",
-                             true,
-                             true,
-                             true));
+  std::ostringstream name;
+  name << "name_" << id;
+  return (add_host_escalation(
+            name.str().c_str(),
+            5,
+            5,
+            60.0,
+            "timeperiod",
+            true,
+            true,
+            true));
 }
 
 hostdependency* objects::create_hostdependency(unsigned int id) {
-  return (add_host_dependency(qPrintable(QString("dep_name_%1").arg(id)),
-                              qPrintable(QString("name_%1").arg(id)),
-                              EXECUTION_DEPENDENCY,
-                              true,
-                              true,
-                              true,
-                              true,
-                              true,
-                              "timeperiod"));
+  std::ostringstream dep_name;
+  dep_name << "dep_name_" << id;
+  std::ostringstream name;
+  name << "name_" << id;
+  return (add_host_dependency(
+            dep_name.str().c_str(),
+            name.str().c_str(),
+            EXECUTION_DEPENDENCY,
+            true,
+            true,
+            true,
+            true,
+            true,
+            "timeperiod"));
 }
 
 host* objects::create_host(unsigned int id) {
-  return (add_host(qPrintable(QString("name_%1").arg(id)),
-                   qPrintable(QString("display_%1").arg(id)),
-                   qPrintable(QString("alias_%1").arg(id)),
-                   qPrintable(QString("address_%1").arg(id)),
-                   "timeperiod",
-                   0,
-                   5,
-                   5,
-                   100,
-                   true,
-                   true,
-                   true,
-                   true,
-                   true,
-                   10,
-                   60,
-                   "timeperiod",
-                   0,
-                   "command",
-                   true,
-                   true,
-                   "event_handler",
-                   true,
-                   true,
-                   0.0,
-                   0.0,
-                   true,
-                   true,
-                   true,
-                   true,
-                   true,
-                   true,
-                   true,
-                   true,
-                   NULL,
-                   false,
-                   false,
-                   "notes",
-                   "notes_url",
-                   "action_url",
-                   "icon_image",
-                   "icon_image_alt",
-                   "vrml_image",
-                   "statusmap_image",
-                   -1,
-                   -1,
-                   false,
-                   0,
-                   0,
-                   0,
-                   false,
-                   true,
-                   true,
-                   true,
-                   true));
+  std::ostringstream name;
+  name << "name_" << id;
+  std::ostringstream display;
+  display << "display_" << id;
+  std::ostringstream alias;
+  alias << "alias_" << id;
+  std::ostringstream address;
+  address << "address_" << id;
+  return (add_host(
+            name.str().c_str(),
+            display.str().c_str(),
+            alias.str().c_str(),
+            address.str().c_str(),
+            "timeperiod",
+            0,
+            5,
+            5,
+            100,
+            true,
+            true,
+            true,
+            true,
+            true,
+            10,
+            60,
+            "timeperiod",
+            0,
+            "command",
+            true,
+            true,
+            "event_handler",
+            true,
+            true,
+            0.0,
+            0.0,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            NULL,
+            false,
+            false,
+            "notes",
+            "notes_url",
+            "action_url",
+            "icon_image",
+            "icon_image_alt",
+            "vrml_image",
+            "statusmap_image",
+            -1,
+            -1,
+            false,
+            0,
+            0,
+            0,
+            false,
+            true,
+            true,
+            true,
+            true));
 }
 
 customvariablesmember* objects::create_customvariablesmember(unsigned int id, customvariablesmember** head) {
-  customvariablesmember* member = new customvariablesmember;
+  customvariablesmember* member(new customvariablesmember);
   memset(member, 0, sizeof(*member));
-
-  member->variable_name = my_strdup(qPrintable(QString("name_%1").arg(id)));
-  member->variable_value = my_strdup(qPrintable(QString("value_%1").arg(id)));
-  if (head != NULL) {
+  std::ostringstream name;
+  name << "name_" << id;
+  std::ostringstream value;
+  value << "value_" << id;
+  member->variable_name = my_strdup(name.str().c_str());
+  member->variable_value = my_strdup(value.str().c_str());
+  if (head) {
     member->next = *head;
     *head = member;
   }
@@ -301,11 +368,12 @@ customvariablesmember* objects::create_customvariablesmember(unsigned int id, cu
 }
 
 contactsmember* objects::create_contactsmember(unsigned int id, contactsmember** head) {
-  contactsmember* member = new contactsmember;
+  contactsmember* member(new contactsmember);
   memset(member, 0, sizeof(*member));
-
-  member->contact_name = my_strdup(qPrintable(QString("name_%1").arg(id)));
-  if (head != NULL) {
+  std::ostringstream name;
+  name << "name_" << id;
+  member->contact_name = my_strdup(name.str().c_str());
+  if (head) {
     member->next = *head;
     *head = member;
   }
@@ -313,11 +381,12 @@ contactsmember* objects::create_contactsmember(unsigned int id, contactsmember**
 }
 
 contactgroupsmember* objects::create_contactgroupsmember(unsigned int id, contactgroupsmember** head) {
-  contactgroupsmember* member = new contactgroupsmember;
+  contactgroupsmember* member(new contactgroupsmember);
   memset(member, 0, sizeof(*member));
-
-  member->group_name = my_strdup(qPrintable(QString("name_%1").arg(id)));
-  if (head != NULL) {
+  std::ostringstream name;
+  name << "name_" << id;
+  member->group_name = my_strdup(name.str().c_str());
+  if (head) {
     member->next = *head;
     *head = member;
   }
@@ -325,42 +394,53 @@ contactgroupsmember* objects::create_contactgroupsmember(unsigned int id, contac
 }
 
 contactgroup* objects::create_contactgroup(unsigned int id) {
-  return (add_contactgroup(qPrintable(QString("name_%1").arg(id)),
-                           qPrintable(QString("alias_%1").arg(id))));
+  std::ostringstream name;
+  name << "name_" << id;
+  std::ostringstream alias;
+  alias << "alias_" << id;
+  return (add_contactgroup(
+            name.str().c_str(),
+            alias.str().c_str()));
 }
 
 contact* objects::create_contact(unsigned int id) {
-  return (add_contact(qPrintable(QString("name_%1").arg(id)),
-                      qPrintable(QString("alias_%1").arg(id)),
-                      "email",
-                      "pager",
-                      NULL, // XXX: (cntct.address.empty() ? NULL : &(*address)),
-                      "service_notification_period",
-                      "host_notification_period",
-                      true,
-                      true,
-                      true,
-                      true,
-                      true,
-                      true,
-                      true,
-                      true,
-                      true,
-                      true,
-                      true,
-                      true,
-                      true,
-                      true,
-                      true,
-                      true));
+  std::ostringstream name;
+  name << "name_" << id;
+  std::ostringstream alias;
+  alias << "alias_" << id;
+  return (add_contact(
+            name.str().c_str(),
+            alias.str().c_str(),
+            "email",
+            "pager",
+            NULL, // XXX: (cntct.address.empty() ? NULL : &(*address)),
+            "service_notification_period",
+            "host_notification_period",
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true));
 }
 
 commandsmember* objects::create_commandsmember(unsigned int id, commandsmember** head) {
-  commandsmember* member = new commandsmember;
+  commandsmember* member(new commandsmember);
   memset(member, 0, sizeof(*member));
-
-  member->cmd = my_strdup(qPrintable(QString("name_%1").arg(id)));
-  if (head != NULL) {
+  std::ostringstream name;
+  name << "name_" << id;
+  member->cmd = my_strdup(name.str().c_str());
+  if (head) {
     member->next = *head;
     *head = member;
   }
@@ -368,6 +448,11 @@ commandsmember* objects::create_commandsmember(unsigned int id, commandsmember**
 }
 
 command* objects::create_command(unsigned int id) {
-  return (add_command(qPrintable(QString("name_%1").arg(id)),
-                      qPrintable(QString("alias_%1").arg(id))));
+  std::ostringstream name;
+  name << "name_" << id;
+  std::ostringstream alias;
+  alias << "alias_" << id;
+  return (add_command(
+            name.str().c_str(),
+            alias.str().c_str()));
 }

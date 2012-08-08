@@ -25,6 +25,7 @@
 #include "com/centreon/engine/modules/webservice/sync_lock.hh"
 #include "com/centreon/engine/objects.hh"
 #include "com/centreon/engine/objects/command.hh"
+#include "com/centreon/shared_ptr.hh"
 #include "soapH.h"
 
 using namespace com::centreon::engine;
@@ -92,7 +93,7 @@ int centreonengine__commandModify(
   COMMAND_BEGIN(cmd->name << ", " << cmd->commandLine)
 
   // Modify command.
-  QSharedPointer<commands::command>
+  com::centreon::shared_ptr<commands::command>
     modified_cmd(commands::set::instance().get_command(cmd->name.c_str()));
   modified_cmd->set_command_line(cmd->commandLine.c_str());
   modify_command(cmd->name.c_str(), cmd->commandLine.c_str());

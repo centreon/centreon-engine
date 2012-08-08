@@ -23,12 +23,12 @@
 #  define HAVE_GETOPT_LONG
 #endif // glibc
 
+#include <cstdlib>
 #include <exception>
 #include <iostream>
-#include <QHash>
-#include <QString>
+#include <map>
 #include <signal.h>
-#include <stdlib.h>
+#include <string>
 #include "soapH.h"
 #include "centreonengine.nsmap" // gSOAP namespaces.
 #include "auto_gen.hh"
@@ -88,10 +88,10 @@ static void show_prototype() {
  *
  *  @return The function arguments.
  */
-static QHash<QString, QString> parse_option(
-                                 QHash<char, QString>& opt,
-                                 int argc,
-                                 char** argv) {
+static std::map<std::string, std::string> parse_option(
+                                            std::map<char, std::string>& opt,
+                                            int argc,
+                                            char** argv) {
 #ifdef HAVE_GETOPT_LONG
   static struct option const long_opt[] = {
     { "action",    required_argument, NULL, 'a' },
@@ -161,22 +161,22 @@ static QHash<QString, QString> parse_option(
     opt['f'] = argv[optind++];
 
   // Process remaining arguments.
-  QHash<QString, QString> args;
+  std::map<std::string, std::string> args;
   for (int i(optind); i < argc; ++i) {
-    // QString copy of argument.
-    QString tmp(argv[i]);
+    // Copy of argument.
+    std::string tmp(argv[i]);
 
     // Arguments can be provided by 1) key=val or 2) key val.
-    int pos(tmp.indexOf('='));
+    size_t pos(tmp.find('='));
     // 1)
-    if (pos != -1) {
-      QString key(tmp.left(pos));
-      QString val(tmp.right(tmp.size() - pos - 1));
-      args.insert(key, val);
+    if (pos != std::string::npos) {
+      std::string key(tmp.substr(0, pos));
+      std::string val(tmp.substr(pos + 1));
+      args[key] = val;
     }
     // 2)
     else if (i + 1 < argc)
-      args.insert(tmp, argv[++i]);
+      args[tmp] = argv[++i];
     // Error.
     else
       usage(argv[0]);
@@ -200,8 +200,9 @@ int main(int argc, char** argv) {
       }
     }
     else {
-      QHash<char, QString> opt;
-      QHash<QString, QString> args = parse_option(opt, argc, argv);
+      std::map<char, std::string> opt;
+      std::map<std::string, std::string>
+        args(parse_option(opt, argc, argv));
 
       webservice ws(opt['s'] == "true", opt['k'], opt['p'], opt['c']);
       ws.set_end_point(opt['e']);

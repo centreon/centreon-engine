@@ -83,10 +83,10 @@ int                       embedded_perl_initialized = false;
 
 host*                     host_list = NULL;
 host*                     host_list_tail = NULL;
-QHash<QString, host_other_properties> host_other_props;
+std::map<std::string, host_other_properties> host_other_props;
 service*                  service_list = NULL;
 service*                  service_list_tail = NULL;
-QHash<QPair<QString, QString>, service_other_properties> service_other_props;
+std::map<std::pair<std::string, std::string>, service_other_properties> service_other_props;
 contact*                  contact_list = NULL;
 contact*                  contact_list_tail = NULL;
 contactgroup*             contactgroup_list = NULL;

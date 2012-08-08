@@ -41,17 +41,18 @@ bool link_serviceescalation(serviceescalation* obj,
                             contactgroup** contactgroups,
                             timeperiod* escalation_period) {
   try {
-    objects::link(obj,
-                  tab2qvec(contacts),
-                  tab2qvec(contactgroups),
-                  escalation_period);
+    objects::link(
+               obj,
+               tab2vec(contacts),
+               tab2vec(contactgroups),
+               escalation_period);
   }
   catch (std::exception const& e) {
     logger(log_runtime_error, basic) << e.what();
     return (false);
   }
   catch (...) {
-    logger(log_runtime_error, basic) << Q_FUNC_INFO << " unknow exception.";
+    logger(log_runtime_error, basic) << __func__ << " unknow exception";
     return (false);
   }
   return (true);
@@ -70,7 +71,7 @@ void release_serviceescalation(serviceescalation const* obj) {
     logger(log_runtime_error, basic) << e.what();
   }
   catch (...) {
-    logger(log_runtime_error, basic) << Q_FUNC_INFO << " unknow exception.";
+    logger(log_runtime_error, basic) << __func__ << " unknow exception";
   }
 }
 
@@ -85,8 +86,8 @@ void release_serviceescalation(serviceescalation const* obj) {
  *  @param[in]     escalation_period Set service escalation escalation period.
  */
 void objects::link(serviceescalation* obj,
-                   QVector<contact*> const& contacts,
-                   QVector<contactgroup*> const& contactgroups,
+                   std::vector<contact*> const& contacts,
+                   std::vector<contactgroup*> const& contactgroups,
                    timeperiod* escalation_period) {
   // check object contents.
   if (obj == NULL)

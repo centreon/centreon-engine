@@ -17,16 +17,16 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <QCoreApplication>
-#include <QFile>
-#include <string.h>
-#include <time.h>
+#include <cstdio>
+#include <cstring>
+#include <ctime>
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/checks.hh"
 #include "com/centreon/engine/globals.hh"
 #include "test/notifications/first_notif_delay/common.hh"
 #include "test/unittest.hh"
 
+using namespace com::centreon;
 using namespace com::centreon::engine;
 
 /**
@@ -34,7 +34,10 @@ using namespace com::centreon::engine;
  *
  *  @return 0 on success.
  */
-int main_test() {
+int main_test(int argc, char** argv) {
+  (void)argc;
+  (void)argv;
+
   // Return value.
   int retval(0);
 
@@ -71,13 +74,13 @@ int main_test() {
     retval |= handle_async_service_check_result(service_list, &cr);
 
     // Check that FND was not respected.
-    retval |= !QFile::exists(FLAG_FILE);
+    retval |= !file_exists(FLAG_FILE);
 
     first_notif_delay_default_cleanup();
   }
 
   // Remove flag file.
-  QFile::remove(FLAG_FILE);
+  ::remove(FLAG_FILE);
 
   return (retval);
 }
@@ -86,10 +89,6 @@ int main_test() {
  *  Init unit test.
  */
 int main(int argc, char** argv) {
-  QCoreApplication app(argc, argv);
-  unittest utest(&main_test);
-  QObject::connect(&utest, SIGNAL(finished()), &app, SLOT(quit()));
-  utest.start();
-  app.exec();
-  return (utest.ret());
+  unittest utest(argc, argv, &main_test);
+  return (utest.run());
 }

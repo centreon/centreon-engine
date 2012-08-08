@@ -20,8 +20,8 @@
 #ifndef CCE_MOD_WS_WEBSERVICE_HH
 #  define CCE_MOD_WS_WEBSERVICE_HH
 
-#  include <QString>
-#  include <QHash>
+#  include <map>
+#  include <string>
 #  include "auto_gen.hh"
 #  include "com/centreon/engine/modules/webservice/namespace.hh"
 #  include "soapH.h"
@@ -35,35 +35,35 @@ CCE_MOD_WS_BEGIN()
  *  Webservice class provide system to execute commands
  *  over a network with a Simple Object Access Protocol.
  */
-class            webservice {
+class                webservice {
 public:
-                 webservice(
-                   bool ssl_enable = false,
-                   QString const& keyfile = "",
-                   QString const& password = "",
-                   QString const& cacert = "");
-                 webservice(webservice const& right);
-                 ~webservice();
-  webservice&    operator=(webservice const& right);
-  bool           execute(
-                   QString const& function,
-                   QHash<QString, QString> const& args);
-  QString const& get_action() const throw();
-  QString const& get_end_point() const throw();
-  bool           is_ssl_enable() const throw();
-  void           set_action(QString const& action);
-  void           set_end_point(QString const& end_point);
+                     webservice(
+                       bool ssl_enable = false,
+                       std::string const& keyfile = "",
+                       std::string const& password = "",
+                       std::string const& cacert = "");
+                     webservice(webservice const& right);
+                     ~webservice();
+  webservice&        operator=(webservice const& right);
+  bool               execute(
+                       std::string const& function,
+                       std::map<std::string, std::string>& args);
+  std::string const& get_action() const throw ();
+  std::string const& get_end_point() const throw ();
+  bool               is_ssl_enable() const throw ();
+  void               set_action(std::string const& action);
+  void               set_end_point(std::string const& end_point);
 
 private:
 #ifdef WITH_OPENSSL
-  static void    _sigpipe_handle(int x);
+  static void        _sigpipe_handle(int x);
 #endif // !WITH_OPENSSL
 
-  QString        _action;
-  QString        _end_point;
-  auto_gen&      _gen;
-  soap           _soap_ctx;
-  bool           _ssl_enable;
+  std::string        _action;
+  std::string        _end_point;
+  auto_gen&          _gen;
+  soap               _soap_ctx;
+  bool               _ssl_enable;
 };
 
 CCE_MOD_WS_END()

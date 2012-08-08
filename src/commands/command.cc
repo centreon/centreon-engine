@@ -17,32 +17,38 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <QMutexLocker>
+#include "com/centreon/concurrency/locker.hh"
 #include "com/centreon/engine/commands/command.hh"
 
+using namespace com::centreon;
 using namespace com::centreon::engine;
 
-QMutex        commands::command::_mtx;
-unsigned long commands::command::_id = 0;
+static concurrency::mutex _lock_id;
+static unsigned long      _id = 0;
 
 /**
  *  Default constructor
  *
  *  @param[in] name         The command name.
  *  @param[in] command_line The command line.
+ *  @param[in] listener     The command listener to catch events.
  */
-commands::command::command(QString const& name,
-			   QString const& command_line)
-  : QObject(),
-    _command_line(command_line),
+commands::command::command(
+                     std::string const& name,
+                     std::string const& command_line,
+                     command_listener* listener)
+  : _command_line(command_line),
+    _listener(listener),
     _name(name) {
 
 }
 
 /**
- *  Default destructor.
+ *  Destructor.
  */
-commands::command::~command() throw () {}
+commands::command::~command() throw () {
+
+}
 
 /**
  *  Compare two result.
@@ -67,32 +73,30 @@ bool commands::command::operator!=(command const& right) const throw() {
 }
 
 /**
- *  Get the command name.
- *
- *  @return The command name.
- */
-QString const& commands::command::get_name() const throw() {
-  return (_name);
-}
-
-/**
  *  Get the command line.
  *
  *  @return The command line.
  */
-QString const& commands::command::get_command_line() const throw() {
+std::string const& commands::command::get_command_line() const throw() {
   return (_command_line);
 }
 
 /**
- *  Set the command name.
+ *  Get the command listener.
  *
- *  @param[in] name The command name.
+ *  @return The listener who catch events.
  */
-void commands::command::set_name(QString const& name) {
-  QString old_name = _name;
-  _name = name;
-  emit name_changed(old_name, _name);
+commands::command_listener* commands::command::get_listener() const throw() {
+  return (_listener);
+}
+
+/**
+ *  Get the command name.
+ *
+ *  @return The command name.
+ */
+std::string const& commands::command::get_name() const throw() {
+  return (_name);
 }
 
 /**
@@ -100,8 +104,18 @@ void commands::command::set_name(QString const& name) {
  *
  *  @param[in] command_line The command line.
  */
-void commands::command::set_command_line(QString const& command_line) {
+void commands::command::set_command_line(std::string const& command_line) {
   _command_line = command_line;
+}
+
+/**
+ *  Set the command listener.
+ *
+ *  @param[in] listener  The listener who catch events.
+ */
+void commands::command::set_listener(
+                          commands::command_listener* listener) throw () {
+  _listener = listener;
 }
 
 /**
@@ -109,8 +123,7 @@ void commands::command::set_command_line(QString const& command_line) {
  *
  *  @param[in] right The copy class.
  */
-commands::command::command(commands::command const& right)
-  : QObject() {
+commands::command::command(commands::command const& right) {
   operator=(right);
 }
 
@@ -123,8 +136,9 @@ commands::command::command(commands::command const& right)
  */
 commands::command& commands::command::operator=(commands::command const& right) {
   if (this != &right) {
-    _name = right._name;
     _command_line = right._command_line;
+    _listener = right._listener;
+    _name = right._name;
   }
   return (*this);
 }
@@ -136,10 +150,10 @@ commands::command& commands::command::operator=(commands::command const& right) 
  *
  *  @return The processed command line.
  */
-QString commands::command::process_cmd(nagios_macros* macros) const {
+std::string commands::command::process_cmd(nagios_macros* macros) const {
   char* command_line = NULL;
-  process_macros_r(macros, qPrintable(_command_line), &command_line, 0);
-  QString processed_cmd(command_line);
+  process_macros_r(macros, _command_line.c_str(), &command_line, 0);
+  std::string processed_cmd(command_line);
   delete[] command_line;
   return (processed_cmd);
 }
@@ -150,6 +164,6 @@ QString commands::command::process_cmd(nagios_macros* macros) const {
  *  @return The unique command id.
  */
 unsigned long commands::command::get_uniq_id() {
-  QMutexLocker locker(&_mtx);
+  concurrency::locker locker(&_lock_id);
   return (++_id);
 }

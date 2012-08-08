@@ -18,10 +18,8 @@
 */
 
 #include <algorithm>
-#include <QHash>
-#include <QRegExp>
-#include <QScopedArrayPointer>
-#include <QVector>
+#include <map>
+#include <vector>
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
@@ -58,16 +56,17 @@ std::map<char, bool> webservice::get_options(
                                    std::string const& pattern,
                                    char const* default_opt) {
   std::map<char, bool> res;
-  QString _opt(opt ? opt->c_str() : default_opt);
-  _opt.toLower().trimmed();
-  if (_opt.contains(QRegExp(
-                      QString("[^") + pattern.c_str() + "na, ]",
-                      Qt::CaseInsensitive)))
-    return (res);
+  std::string _opt(opt ? *opt : default_opt);
+  for (std::string::const_iterator
+         it(_opt.begin()), end(_opt.end());
+       it != end;
+       ++it)
+    if (pattern.find(*it) == std::string::npos
+        && *it != ',' && *it != 'a' && *it != 'n')
+      return (res);
 
   for (std::string::const_iterator
-         it(pattern.begin()),
-         end(pattern.end());
+         it(pattern.begin()), end(pattern.end());
        it != end;
        ++it)
     if (_opt == "n")
@@ -75,24 +74,7 @@ std::map<char, bool> webservice::get_options(
     else if (_opt == "a")
       res[*it] = true;
     else
-      res[*it] = (_opt.indexOf(*it) != -1);
-  return (res);
-}
-
-/**
- *  Create a Qt stirng vector from a std string vector.
- *
- *  @param[in] vec The std vector.
- *
- *  @return The Qt vector.
- */
-QVector<QString> webservice::std2qt(std::vector<std::string> const& vec) {
-  QVector<QString> res;
-  res.reserve(vec.size());
-  for (std::vector<std::string>::const_iterator it = vec.begin(), end = vec.end();
-       it != end;
-       ++it)
-    res.push_back(QString::fromAscii(it->data(), static_cast<int>(it->size())));
+      res[*it] = (_opt.find(*it) != std::string::npos);
   return (res);
 }
 
@@ -103,8 +85,9 @@ QVector<QString> webservice::std2qt(std::vector<std::string> const& vec) {
  *
  *  @return The service's table, stop when the first service are not found.
  */
-QVector<service*> webservice::_find(std::vector<std::string> const& objs) {
-  QVector<service*> res;
+std::vector<service*> webservice::_find(
+                                    std::vector<std::string> const& objs) {
+  std::vector<service*> res;
   if (objs.size() % 2)
     return (res);
 
@@ -125,10 +108,12 @@ QVector<service*> webservice::_find(std::vector<std::string> const& objs) {
 }
 
 template<class T, class U>
-static void _extract_object_from_objectgroup(QVector<T*> const& groups,
-                                             QVector<U*>& objects) {
-  for (typename QVector<T*>::const_iterator it = groups.begin(),
-         end = groups.end();
+static void _extract_object_from_objectgroup(
+              std::vector<T*> const& groups,
+              std::vector<U*>& objects) {
+  for (typename std::vector<T*>::const_iterator
+         it(groups.begin()),
+         end(groups.end());
        it != end;
        ++it) {
     for (hostsmember* member = (*it)->members;
@@ -137,7 +122,7 @@ static void _extract_object_from_objectgroup(QVector<T*> const& groups,
       objects.push_back(member->host_ptr);
     }
   }
-  qSort(objects.begin(), objects.end());
+  std::sort(objects.begin(), objects.end());
   std::unique(objects.begin(), objects.end());
 }
 
@@ -174,28 +159,40 @@ void webservice::create_host_dependency(ns1__hostDependencyType const& hstdepend
   if (hstdependency.dependencyPeriod != NULL) {
     dependency_period = hstdependency.dependencyPeriod->c_str();
     if ((dependency_period_ptr = find_timeperiod(dependency_period)) == NULL)
-      throw (engine_error() << "hostdependency invalid dependency period.");
+      throw (engine_error() << "hostdependency invalid dependency period");
   }
 
-  QVector<host*> hstdep_hosts =
-    _find<host>(hstdependency.hostsName, (void* (*)(char const*))&find_host);
-  if (static_cast<int>(hstdependency.hostsName.size()) != hstdep_hosts.size())
-    throw (engine_error() << "hostdependency invalid hosts name.");
+  std::vector<host*> hstdep_hosts(
+                       _find<host>(
+                         hstdependency.hostsName,
+                         (void* (*)(char const*))&find_host));
+  if (hstdependency.hostsName.size() != hstdep_hosts.size())
+    throw (engine_error() << "hostdependency invalid hosts name");
 
-  QVector<host*> hstdep_dependent_hosts =
-    _find<host>(hstdependency.dependentHostsName, (void* (*)(char const*))&find_host);
-  if (static_cast<int>(hstdependency.dependentHostsName.size()) != hstdep_dependent_hosts.size())
-    throw (engine_error() << "hostdependency invalid dependent hosts name.");
+  std::vector<host*> hstdep_dependent_hosts(
+                       _find<host>(
+                         hstdependency.dependentHostsName,
+                         (void* (*)(char const*))&find_host));
+  if (hstdependency.dependentHostsName.size()
+      != hstdep_dependent_hosts.size())
+    throw (engine_error()
+           << "hostdependency invalid dependent hosts name");
 
-  QVector<hostgroup*> hstdep_hostgroups =
-    _find<hostgroup>(hstdependency.hostgroupsName, (void* (*)(char const*))&find_hostgroup);
-  if (static_cast<int>(hstdependency.hostgroupsName.size()) != hstdep_hostgroups.size())
-    throw (engine_error() << "hostdependency invalid host groups name.");
+  std::vector<hostgroup*> hstdep_hostgroups(
+                            _find<hostgroup>(
+                              hstdependency.hostgroupsName,
+                              (void* (*)(char const*))&find_hostgroup));
+  if (hstdependency.hostgroupsName.size() != hstdep_hostgroups.size())
+    throw (engine_error() << "hostdependency invalid host groups name");
 
-  QVector<hostgroup*> hstdep_dependent_hostgroups =
-    _find<hostgroup>(hstdependency.dependentHostgroupsName, (void* (*)(char const*))&find_hostgroup);
-  if (static_cast<int>(hstdependency.dependentHostgroupsName.size()) != hstdep_dependent_hostgroups.size())
-    throw (engine_error() << "hostdependency invalid dependent host groups name.");
+  std::vector<hostgroup*> hstdep_dependent_hostgroups(
+                            _find<hostgroup>(
+                              hstdependency.dependentHostgroupsName,
+                              (void* (*)(char const*))&find_hostgroup));
+  if (hstdependency.dependentHostgroupsName.size()
+      != hstdep_dependent_hostgroups.size())
+    throw (engine_error()
+           << "hostdependency invalid dependent host groups name");
 
   _extract_object_from_objectgroup(hstdep_dependent_hostgroups, hstdep_dependent_hosts);
   _extract_object_from_objectgroup(hstdep_hostgroups, hstdep_hosts);
@@ -203,25 +200,28 @@ void webservice::create_host_dependency(ns1__hostDependencyType const& hstdepend
   bool inherits_parent = (hstdependency.inheritsParent
                           ? *hstdependency.inheritsParent : true);
 
-  for (QVector<host*>::const_iterator it_dep = hstdep_dependent_hosts.begin(),
-         end = hstdep_dependent_hosts.end();
-       it_dep != end;
+  for (std::vector<host*>::const_iterator
+         it_dep(hstdep_dependent_hosts.begin()),
+         end_dep(hstdep_dependent_hosts.end());
+       it_dep != end_dep;
        ++it_dep) {
-    for (QVector<host*>::const_iterator it = hstdep_hosts.begin(),
-           end = hstdep_hosts.end();
+    for (std::vector<host*>::const_iterator
+           it(hstdep_hosts.begin()),
+           end(hstdep_hosts.end());
          it != end;
          ++it) {
       if (hstdependency.executionFailureCriteria != NULL) {
-        hostdependency* new_hstdependency =
-          add_host_dependency((*it_dep)->name,
-                              (*it)->name,
-                              EXECUTION_DEPENDENCY,
-                              inherits_parent,
-                              execution_opt['o'],
-                              execution_opt['d'],
-                              execution_opt['u'],
-                              execution_opt['p'],
-                              dependency_period);
+        hostdependency* new_hstdependency(
+                          add_host_dependency(
+                            (*it_dep)->name,
+                            (*it)->name,
+                            EXECUTION_DEPENDENCY,
+                            inherits_parent,
+                            execution_opt['o'],
+                            execution_opt['d'],
+                            execution_opt['u'],
+                            execution_opt['p'],
+                            dependency_period));
 
         try {
           objects::link(new_hstdependency, dependency_period_ptr);
@@ -280,33 +280,42 @@ void webservice::create_host_escalation(ns1__hostEscalationType const& hstescala
   if (hstescalation.escalationPeriod != NULL) {
     escalation_period = hstescalation.escalationPeriod->c_str();
     if ((escalation_period_ptr = find_timeperiod(escalation_period)) == NULL)
-      throw (engine_error() << "hostescalation invalid check period.");
+      throw (engine_error() << "hostescalation invalid check period");
   }
 
-  QVector<contact*> hstesc_contacts =
-    _find<contact>(hstescalation.contacts, (void* (*)(char const*))&find_contact);
-  if (static_cast<int>(hstescalation.contacts.size()) != hstesc_contacts.size())
-    throw (engine_error() << "hostescalation invalid contacts.");
+  std::vector<contact*> hstesc_contacts(
+                          _find<contact>(
+                            hstescalation.contacts,
+                            (void* (*)(char const*))&find_contact));
+  if (hstescalation.contacts.size() != hstesc_contacts.size())
+    throw (engine_error() << "hostescalation invalid contacts");
 
-  QVector<contactgroup*> hstesc_contactgroups =
-    _find<contactgroup>(hstescalation.contactGroups, (void* (*)(char const*))&find_contactgroup);
-  if (static_cast<int>(hstescalation.contactGroups.size()) != hstesc_contactgroups.size())
-    throw (engine_error() << "hostescalation invalid contact groups.");
+  std::vector<contactgroup*> hstesc_contactgroups(
+                               _find<contactgroup>(
+                                 hstescalation.contactGroups,
+                                 (void* (*)(char const*))&find_contactgroup));
+  if (hstescalation.contactGroups.size() != hstesc_contactgroups.size())
+    throw (engine_error() << "hostescalation invalid contact groups");
 
-  QVector<hostgroup*> hstesc_hostgroups =
-    _find<hostgroup>(hstescalation.hostgroupsName, (void* (*)(char const*))&find_hostgroup);
-  if (static_cast<int>(hstescalation.hostgroupsName.size()) != hstesc_hostgroups.size())
-    throw (engine_error() << "hostescalation invalid host groups.");
+  std::vector<hostgroup*> hstesc_hostgroups(
+                            _find<hostgroup>(
+                              hstescalation.hostgroupsName,
+                              (void* (*)(char const*))&find_hostgroup));
+  if (hstescalation.hostgroupsName.size() != hstesc_hostgroups.size())
+    throw (engine_error() << "hostescalation invalid host groups");
 
-  QVector<host*> hstesc_hosts =
-    _find<host>(hstescalation.hostsName, (void* (*)(char const*))&find_host);
-  if (static_cast<int>(hstescalation.hostsName.size()) != hstesc_hosts.size())
-    throw (engine_error() << "hostescalation invalid hosts.");
+  std::vector<host*> hstesc_hosts(
+                       _find<host>(
+                         hstescalation.hostsName,
+                         (void* (*)(char const*))&find_host));
+  if (hstescalation.hostsName.size() != hstesc_hosts.size())
+    throw (engine_error() << "hostescalation invalid hosts");
 
   _extract_object_from_objectgroup(hstesc_hostgroups, hstesc_hosts);
 
-  for (QVector<host*>::const_iterator it = hstesc_hosts.begin(),
-         end = hstesc_hosts.end();
+  for (std::vector<host*>::const_iterator
+         it(hstesc_hosts.begin()),
+         end(hstesc_hosts.end());
        it != end;
        ++it) {
     hostescalation* new_hstescalation =
@@ -371,25 +380,38 @@ void webservice::create_service_dependency(ns1__serviceDependencyType const& svc
       throw (engine_error() << "servicedependency invalid dependency period.");
   }
 
-  QVector<host*> svcdep_hosts =
-    _find<host>(svcdependency.hostsName, (void* (*)(char const*))&find_host);
-  if (static_cast<int>(svcdependency.hostsName.size()) != svcdep_hosts.size())
-    throw (engine_error() << "servicedependency invalid hosts name.");
+  std::vector<host*> svcdep_hosts(
+                       _find<host>(
+                         svcdependency.hostsName,
+                         (void* (*)(char const*))&find_host));
+  if (svcdependency.hostsName.size() != svcdep_hosts.size())
+    throw (engine_error() << "servicedependency invalid hosts name");
 
-  QVector<host*> svcdep_dependent_hosts =
-    _find<host>(svcdependency.dependentHostsName, (void* (*)(char const*))&find_host);
-  if (static_cast<int>(svcdependency.dependentHostsName.size()) != svcdep_dependent_hosts.size())
-    throw (engine_error() << "servicedependency invalid dependent hosts name.");
+  std::vector<host*> svcdep_dependent_hosts(
+                       _find<host>(
+                         svcdependency.dependentHostsName,
+                         (void* (*)(char const*))&find_host));
+  if (svcdependency.dependentHostsName.size()
+      != svcdep_dependent_hosts.size())
+    throw (engine_error()
+           << "servicedependency invalid dependent hosts name");
 
-  QVector<hostgroup*> svcdep_hostgroups =
-    _find<hostgroup>(svcdependency.hostgroupsName, (void* (*)(char const*))&find_hostgroup);
-  if (static_cast<int>(svcdependency.hostgroupsName.size()) != svcdep_hostgroups.size())
-    throw (engine_error() << "servicedependency invalid host groups name.");
+  std::vector<hostgroup*> svcdep_hostgroups(
+                            _find<hostgroup>(
+                              svcdependency.hostgroupsName,
+                              (void* (*)(char const*))&find_hostgroup));
+  if (svcdependency.hostgroupsName.size() != svcdep_hostgroups.size())
+    throw (engine_error()
+           << "servicedependency invalid host groups name");
 
-  QVector<hostgroup*> svcdep_dependent_hostgroups =
-    _find<hostgroup>(svcdependency.dependentHostgroupsName, (void* (*)(char const*))&find_hostgroup);
-  if (static_cast<int>(svcdependency.dependentHostgroupsName.size()) != svcdep_dependent_hostgroups.size())
-    throw (engine_error() << "servicedependency invalid dependent host groups name.");
+  std::vector<hostgroup*> svcdep_dependent_hostgroups(
+                            _find<hostgroup>(
+                              svcdependency.dependentHostgroupsName,
+                              (void* (*)(char const*))&find_hostgroup));
+  if (svcdependency.dependentHostgroupsName.size()
+      != svcdep_dependent_hostgroups.size())
+    throw (engine_error()
+           << "servicedependency invalid dependent host groups name");
 
   _extract_object_from_objectgroup(svcdep_dependent_hostgroups, svcdep_dependent_hosts);
   _extract_object_from_objectgroup(svcdep_hostgroups, svcdep_hosts);
@@ -400,12 +422,14 @@ void webservice::create_service_dependency(ns1__serviceDependencyType const& svc
   char const* service_description = svcdependency.serviceDescription.c_str();
   char const* dependent_service_description = svcdependency.dependentServiceDescription.c_str();
 
-  for (QVector<host*>::const_iterator it_dep = svcdep_dependent_hosts.begin(),
-         end = svcdep_dependent_hosts.end();
-       it_dep != end;
+  for (std::vector<host*>::const_iterator
+         it_dep(svcdep_dependent_hosts.begin()),
+         end_dep(svcdep_dependent_hosts.end());
+       it_dep != end_dep;
        ++it_dep) {
-    for (QVector<host*>::const_iterator it = svcdep_hosts.begin(),
-           end = svcdep_hosts.end();
+    for (std::vector<host*>::const_iterator
+           it(svcdep_hosts.begin()),
+           end(svcdep_hosts.end());
          it != end;
          ++it) {
       if (svcdependency.executionFailureCriteria != NULL) {
@@ -487,31 +511,42 @@ void webservice::create_service_escalation(ns1__serviceEscalationType const& svc
       throw (engine_error() << "serviceescalation invalid check period.");
   }
 
-  QVector<contact*> svcesc_contacts =
-    _find<contact>(svcescalation.contacts, (void* (*)(char const*))&find_contact);
-  if (static_cast<int>(svcescalation.contacts.size()) != svcesc_contacts.size())
+  std::vector<contact*> svcesc_contacts(
+                          _find<contact>(
+                            svcescalation.contacts,
+                            (void* (*)(char const*))&find_contact));
+  if (svcescalation.contacts.size() != svcesc_contacts.size())
     throw (engine_error() << "serviceescalation invalid contacts.");
 
-  QVector<contactgroup*> svcesc_contactgroups =
-    _find<contactgroup>(svcescalation.contactGroups, (void* (*)(char const*))&find_contactgroup);
-  if (static_cast<int>(svcescalation.contactGroups.size()) != svcesc_contactgroups.size())
-    throw (engine_error() << "serviceescalation invalid contact groups.");
+  std::vector<contactgroup*>
+    svcesc_contactgroups(
+      _find<contactgroup>(
+        svcescalation.contactGroups,
+        (void* (*)(char const*))&find_contactgroup));
+  if (svcescalation.contactGroups.size() != svcesc_contactgroups.size())
+    throw (engine_error()
+           << "serviceescalation invalid contact groups");
 
-  QVector<hostgroup*> svcesc_hostgroups =
-    _find<hostgroup>(svcescalation.hostgroupsName, (void* (*)(char const*))&find_hostgroup);
-  if (static_cast<int>(svcescalation.hostgroupsName.size()) != svcesc_hostgroups.size())
-    throw (engine_error() << "serviceescalation invalid host groups.");
+  std::vector<hostgroup*> svcesc_hostgroups(
+                            _find<hostgroup>(
+                              svcescalation.hostgroupsName,
+                              (void* (*)(char const*))&find_hostgroup));
+  if (svcescalation.hostgroupsName.size() != svcesc_hostgroups.size())
+    throw (engine_error() << "serviceescalation invalid host groups");
 
-  QVector<host*> svcesc_hosts =
-    _find<host>(svcescalation.hostsName, (void* (*)(char const*))&find_host);
-  if (static_cast<int>(svcescalation.hostsName.size()) != svcesc_hosts.size())
-    throw (engine_error() << "serviceescalation invalid hosts.");
+  std::vector<host*> svcesc_hosts(
+                       _find<host>(
+                         svcescalation.hostsName,
+                         (void* (*)(char const*))&find_host));
+  if (svcescalation.hostsName.size() != svcesc_hosts.size())
+    throw (engine_error() << "serviceescalation invalid hosts");
 
   _extract_object_from_objectgroup(svcesc_hostgroups, svcesc_hosts);
 
   char const* service_description = svcescalation.serviceDescription.c_str();
-  for (QVector<host*>::const_iterator it = svcesc_hosts.begin(),
-         end = svcesc_hosts.end();
+  for (std::vector<host*>::const_iterator
+         it(svcesc_hosts.begin()),
+         end(svcesc_hosts.end());
        it != end;
        ++it) {
     serviceescalation* new_svcescalation =

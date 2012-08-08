@@ -40,14 +40,14 @@ bool link_contactgroup(contactgroup* obj,
                        contact** members,
                        contactgroup** groups) {
   try {
-    objects::link(obj, tab2qvec(members), tab2qvec(groups));
+    objects::link(obj, tab2vec(members), tab2vec(groups));
   }
   catch (std::exception const& e) {
     logger(log_runtime_error, basic) << e.what();
     return (false);
   }
   catch (...) {
-    logger(log_runtime_error, basic) << Q_FUNC_INFO << " unknow exception.";
+    logger(log_runtime_error, basic) << __func__ << " unknow exception";
     return (false);
   }
   return (true);
@@ -67,7 +67,7 @@ void release_contactgroup(contactgroup const* obj) {
     logger(log_runtime_error, basic) << e.what();
   }
   catch (...) {
-    logger(log_runtime_error, basic) << Q_FUNC_INFO << " unknow exception.";
+    logger(log_runtime_error, basic) << __func__ << " unknow exception";
   }
 }
 
@@ -80,8 +80,8 @@ void release_contactgroup(contactgroup const* obj) {
  */
 void objects::link(
                 contactgroup* obj,
-                QVector<contact*> const& members,
-                QVector<contactgroup*> const& groups) {
+                std::vector<contact*> const& members,
+                std::vector<contactgroup*> const& groups) {
   // Check object contents.
   if (!obj)
     throw (engine_error() << "contact group is a NULL pointer");
@@ -97,7 +97,7 @@ void objects::link(
   timeval tv(get_broker_timestamp(NULL));
 
   // Browse contacts.
-  for (QVector<contact*>::const_iterator
+  for (std::vector<contact*>::const_iterator
          it(members.begin()),
          end(members.end());
        it != end;
@@ -116,8 +116,8 @@ void objects::link(
   }
 
   // Add the content of other contactgroups into this contactgroup.
-  QVector<contact*> other_members;
-  for (QVector<contactgroup*>::const_iterator
+  std::vector<contact*> other_members;
+  for (std::vector<contactgroup*>::const_iterator
          it(groups.begin()),
          end(groups.end());
        it != end;
@@ -133,8 +133,8 @@ void objects::link(
   }
 
   // Recursive call.
-  if (!other_members.isEmpty())
-    objects::link(obj, other_members, QVector<contactgroup*>());
+  if (!other_members.empty())
+    objects::link(obj, other_members, std::vector<contactgroup*>());
 
   return ;
 }
@@ -167,12 +167,12 @@ void objects::release(contactgroup const* obj) {
  *
  *  @return True if insert sucessfuly, false otherwise.
  */
-bool objects::add_contactgroups_to_object(QVector<contactgroup*> const& contactgroups,
+bool objects::add_contactgroups_to_object(std::vector<contactgroup*> const& contactgroups,
                                           contactgroupsmember** list_contactgroup) {
   if (list_contactgroup == NULL)
     return (false);
 
-  for (QVector<contactgroup*>::const_iterator it = contactgroups.begin(),
+  for (std::vector<contactgroup*>::const_iterator it = contactgroups.begin(),
          end = contactgroups.end();
        it != end;
        ++it) {

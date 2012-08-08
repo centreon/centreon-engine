@@ -18,8 +18,6 @@
 */
 
 #include <exception>
-#include <QCoreApplication>
-#include <QDebug>
 #include "com/centreon/engine/commands/raw.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
@@ -38,7 +36,10 @@ using namespace com::centreon::engine::commands;
 /**
  *  Check the process command line replacement macros.
  */
-int main_test() {
+int main_test(int argc, char** argv) {
+  (void)argc;
+  (void)argv;
+
   nagios_macros macros = nagios_macros();
 
   // add macros arg1.
@@ -60,12 +61,12 @@ int main_test() {
 
   // process command.
   raw cmd(__func__, CMD_LINE);
-  QString cmd_processed = cmd.process_cmd(&macros);
+  std::string cmd_processed(cmd.process_cmd(&macros));
 
-  delete[] hst.address;
-  delete[] macro_x_names[MACRO_HOSTADDRESS];
-  delete[] macro_user[0];
-  delete[] macros.argv[0];
+  delete [] hst.address;
+  delete [] macro_x_names[MACRO_HOSTADDRESS];
+  delete [] macro_user[0];
+  delete [] macros.argv[0];
 
   if (cmd_processed != CMD_PROCESSED)
     throw (engine_error() << "command::process failed.");
@@ -77,10 +78,6 @@ int main_test() {
  *  Init unit test.
  */
 int main(int argc, char** argv) {
-  QCoreApplication app(argc, argv);
-  unittest utest(&main_test);
-  QObject::connect(&utest, SIGNAL(finished()), &app, SLOT(quit()));
-  utest.start();
-  app.exec();
-  return (utest.ret());
+  unittest utest(argc, argv, &main_test);
+  return (utest.run());
 }

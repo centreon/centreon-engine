@@ -18,12 +18,11 @@
 */
 
 #include <exception>
-#include <limits.h>
-#include <QCoreApplication>
-#include <QDebug>
+#include <climits>
 #include "com/centreon/engine/broker/loader.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/nebmods.hh"
+#include "com/centreon/shared_ptr.hh"
 #include "test/broker/mod_load.hh"
 #include "test/unittest.hh"
 
@@ -38,7 +37,10 @@ bool mod_test_load_quit = false;
 /**
  *  Check nebmodule compatibility.
  */
-int main_test() {
+int main_test(int argc, char** argv) {
+  (void)argc;
+  (void)argv;
+
   loader& loader = loader::instance();
 
   if (neb_init_modules() != 0)
@@ -54,8 +56,11 @@ int main_test() {
   if (loader.get_modules().size() != 2)
     throw (engine_error() << __func__ << ": invalid modules size.");
 
-  QList<QSharedPointer<handle> > modules = loader.get_modules();
-  for (QList<QSharedPointer<handle> >::const_iterator it = modules.begin(), end = modules.end();
+  std::list<com::centreon::shared_ptr<handle> >
+    modules(loader.get_modules());
+  for (std::list<com::centreon::shared_ptr<handle> >::const_iterator
+         it(modules.begin()),
+         end(modules.end());
        it != end;
        ++it) {
     if ((*it)->get_name() != MOD_TITLE)
@@ -99,10 +104,6 @@ int main_test() {
  *  Init the unit test.
  */
 int main(int argc, char** argv) {
-  QCoreApplication app(argc, argv);
-  unittest utest(&main_test);
-  QObject::connect(&utest, SIGNAL(finished()), &app, SLOT(quit()));
-  utest.start();
-  app.exec();
-  return (utest.ret());
+  unittest utest(argc, argv, &main_test);
+  return (utest.run());
 }

@@ -17,8 +17,9 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <cstdlib>
 #include <exception>
-#include <QDebug>
+#include <iostream>
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/macros.hh"
 #include "test/objects/create_object.hh"
@@ -26,16 +27,24 @@
 
 using namespace test::objects;
 
+/**
+ *  Check that host member can be properly released.
+ *
+ *  @return EXIT_SUCCESS on success.
+ */
 int main() {
   try {
+    // Tests.
     release_null_pointer(static_cast<hostsmember const*>(NULL));
     release_objects(&create_hostsmember);
     release_objects(&create_hostsmember, 10);
   }
   catch (std::exception const& e) {
-    qDebug() << "error: " << e.what();
+    // Exception handling.
+    std::cerr << "error: " << e.what() << std::endl;
     free_memory(get_global_macros());
-    return (1);
+    return (EXIT_FAILURE);
   }
-  return (0);
+
+  return (EXIT_SUCCESS);
 }

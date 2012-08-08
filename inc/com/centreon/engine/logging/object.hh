@@ -20,89 +20,89 @@
 #ifndef CCE_LOGGING_OBJECT_HH
 #  define CCE_LOGGING_OBJECT_HH
 
-namespace                 com {
-  namespace               centreon {
-    namespace             engine {
-      namespace           logging {
-        /**
-         *  @enum object::e_type
-         *  Logging types.
-         */
-        enum            e_type {
-          none                     = 0ull,
+#  include "com/centreon/engine/namespace.hh"
 
-          log_runtime_error        = 1ull,
-          log_runtime_warning      = 2ull,
-          log_verification_error   = 4ull,
-          log_verification_warning = 8ull,
-          log_config_error         = 16ull,
-          log_config_warning       = 32ull,
-          log_process_info         = 64ull,
-          log_event_handler        = 128ull,
-          log_external_command     = 512ull,
-          log_host_up              = 1024ull,
-          log_host_down            = 2048ull,
-          log_host_unreachable     = 4096ull,
-          log_service_ok           = 8192ull,
-          log_service_unknown      = 16384ull,
-          log_service_warning      = 32768ull,
-          log_service_critical     = 65536ull,
-          log_passive_check        = 131072ull,
-          log_info_message         = 262144ull,
-          log_host_notification    = 524288ull,
-          log_service_notification = 1048576ull,
-          log_all                  = 2096895ull,
+CCE_BEGIN()
 
-          dbg_functions            = 1ull << 32,
-          dbg_config               = 2ull << 32,
-          dbg_process              = 4ull << 32,
-          dbg_statusdata           = 4ull << 32,
-          dbg_retentiondata        = 4ull << 32,
-          dbg_events               = 8ull << 32,
-          dbg_checks               = 16ull << 32,
-          dbg_ipc                  = 16ull << 32,
-          dbg_flapping             = 16ull << 32,
-          dbg_eventhandlers        = 16ull << 32,
-          dbg_perfdata             = 16ull << 32,
-          dbg_notifications        = 32ull << 32,
-          dbg_eventbroker          = 64ull << 32,
-          dbg_external_command     = 128ull << 32,
-          dbg_commands             = 256ull << 32,
-          dbg_downtime             = 512ull << 32,
-          dbg_comments             = 1024ull << 32,
-          dbg_macros               = 2048ull << 32,
-          dbg_all                  = 4095ull << 32,
+namespace           logging {
+  /**
+   *  @enum object::e_type
+   *  Logging types.
+   */
+  enum            e_type {
+    none                     = 0ull,
 
-          all                      = log_all | dbg_all
-        };
+    log_runtime_error        = 1ull,
+    log_runtime_warning      = 2ull,
+    log_verification_error   = 4ull,
+    log_verification_warning = 8ull,
+    log_config_error         = 16ull,
+    log_config_warning       = 32ull,
+    log_process_info         = 64ull,
+    log_event_handler        = 128ull,
+    log_external_command     = 512ull,
+    log_host_up              = 1024ull,
+    log_host_down            = 2048ull,
+    log_host_unreachable     = 4096ull,
+    log_service_ok           = 8192ull,
+    log_service_unknown      = 16384ull,
+    log_service_warning      = 32768ull,
+    log_service_critical     = 65536ull,
+    log_passive_check        = 131072ull,
+    log_info_message         = 262144ull,
+    log_host_notification    = 524288ull,
+    log_service_notification = 1048576ull,
+    log_all                  = 2096895ull,
 
-        /**
-         *  @enum object::e_verbose
-         *  Logging verbosity.
-         */
-        enum            e_verbosity {
-          basic = 0u,
-          more  = 1u,
-          most  = 2u
-        };
+    dbg_functions            = 1ull << 32,
+    dbg_config               = 2ull << 32,
+    dbg_process              = 4ull << 32,
+    dbg_statusdata           = 4ull << 32,
+    dbg_retentiondata        = 4ull << 32,
+    dbg_events               = 8ull << 32,
+    dbg_checks               = 16ull << 32,
+    dbg_ipc                  = 16ull << 32,
+    dbg_flapping             = 16ull << 32,
+    dbg_eventhandlers        = 16ull << 32,
+    dbg_perfdata             = 16ull << 32,
+    dbg_notifications        = 32ull << 32,
+    dbg_eventbroker          = 64ull << 32,
+    dbg_external_command     = 128ull << 32,
+    dbg_commands             = 256ull << 32,
+    dbg_downtime             = 512ull << 32,
+    dbg_comments             = 1024ull << 32,
+    dbg_macros               = 2048ull << 32,
+    dbg_all                  = 4095ull << 32,
 
-        /**
-         *  @class object object.hh
-         *  @brief Parent class of all logging objects.
-         *
-         *  Parent class of all logging objects.
-         */
-        class             object {
-         public:
-          virtual         ~object() {}
+    all                      = log_all | dbg_all
+  };
 
-          virtual void    log(char const* message,
-                            unsigned long long type,
-                            unsigned int verbosity) throw () = 0;
-        };
-      }
-    }
-  }
+  /**
+   *  @enum object::e_verbose
+   *  Logging verbosity.
+   */
+  enum            e_verbosity {
+    basic = 0u,
+    more  = 1u,
+    most  = 2u
+  };
+
+  /**
+   *  @class object object.hh
+   *  @brief Parent class of all logging objects.
+   *
+   *  Parent class of all logging objects.
+   */
+  class             object {
+  public:
+    virtual         ~object() {}
+
+    virtual void    log(char const* message,
+                        unsigned long long type,
+                        unsigned int verbosity) throw () = 0;
+  };
 }
+
+CCE_END()
 
 #endif // !CCE_LOGGING_OBJECT_HH

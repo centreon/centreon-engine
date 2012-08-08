@@ -20,11 +20,12 @@
 #ifndef CCE_OBJECTS_CUSTOMVARIABLESMEMBER_HH
 #  define CCE_OBJECTS_CUSTOMVARIABLESMEMBER_HH
 
+#  include "com/centreon/engine/namespace.hh"
 #  include "com/centreon/engine/objects.hh"
 
 #  ifdef __cplusplus
-#    include <QString>
-#    include <QVector>
+#    include <string>
+#    include <vector>
 extern "C" {
 #  endif // C++
 
@@ -34,19 +35,17 @@ customvariablesmember const* release_customvariablesmember(
 #  ifdef __cplusplus
 }
 
-namespace                            com {
-  namespace                          centreon {
-    namespace                        engine {
-      namespace                      objects {
-        bool                         add_custom_variables_to_object(
-                                       QVector<QString> const& custom_vars,
-                                       customvariablesmember** list_customvar);
-        customvariablesmember const* release(
-                                       customvariablesmember const* obj);
-      }
-    }
-  }
+CCE_BEGIN()
+
+namespace                      objects {
+  bool                         add_custom_variables_to_object(
+                                 std::vector<std::string> const& custom_vars,
+                                 customvariablesmember** list_customvar);
+  customvariablesmember const* release(customvariablesmember const* obj);
 }
+
+CCE_END()
+
 #  endif // C++
 
 #endif // !CCE_OBJECTS_CUSTOMVARIABLESMEMBER_HH

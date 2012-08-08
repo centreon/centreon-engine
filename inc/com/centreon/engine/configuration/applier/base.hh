@@ -20,33 +20,33 @@
 #ifndef CCE_CONFIGURATION_APPLIER_BASE_HH
 #  define CCE_CONFIGURATION_APPLIER_BASE_HH
 
-namespace                com {
-  namespace              centreon {
-    namespace            engine {
-      namespace          configuration {
-        // Forward declaration.
-        class            state;
+#  include "com/centreon/engine/namespace.hh"
 
-        namespace        applier {
-          /**
-           *  @class base base.hh
-           *  @brief Parent class of all applier objects.
-           *
-           *  Parent class of all applier objects.
-           */
-          class          base {
-           public:
-                         base();
-                         base(base const& b);
-            virtual      ~base() throw ();
-            base&        operator=(base const& b);
+CCE_BEGIN()
 
-            virtual void apply(state const& config) = 0;
-          };
-        }
-      }
-    }
+namespace          configuration {
+  // Forward declaration.
+  class            state;
+
+  namespace        applier {
+    /**
+     *  @class base base.hh
+     *  @brief Parent class of all applier objects.
+     *
+     *  Parent class of all applier objects.
+     */
+    class          base {
+    public:
+                   base();
+                   base(base const& b);
+      virtual      ~base() throw ();
+      base&        operator=(base const& b);
+
+      virtual void apply(state const& config) = 0;
+    };
   }
 }
+
+CCE_END()
 
 #endif // !CCE_CONFIGURATION_APPLIER_BASE_HH

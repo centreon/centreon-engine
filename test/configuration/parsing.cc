@@ -17,16 +17,15 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <cstdio>
 #include <exception>
-#include <QCoreApplication>
-#include <QDebug>
-#include <QDir>
-#include <QFile>
-#include <QTemporaryFile>
+#include <fstream>
 #include "com/centreon/engine/configuration/state.hh"
 #include "com/centreon/engine/globals.hh"
+#include "com/centreon/io/file_stream.hh"
 #include "test/unittest.hh"
 
+using namespace com::centreon;
 using namespace com::centreon::engine;
 
 /**
@@ -61,24 +60,42 @@ static void check_noexist_file() {
  *  Check parse with exist file.
  */
 static void check_exist_file() {
-  QTemporaryFile tmp("./centengine_test_exist_file.cfg");
-  if (tmp.open() == false) {
-    throw (engine_error() << "open temporary file failed.");
+  char const* tmp(io::file_stream::temp_path());
+  if (!tmp)
+    throw (engine_error() << "generate temporary file failed");
+  try {
+    std::ofstream file(tmp, std::ios_base::out | std::ios_base::trunc);
+    config.parse(tmp);
   }
-  config.parse(tmp.fileName());
-  tmp.close();
+  catch (...) {
+    remove(tmp);
+    throw;
+  }
+  remove(tmp);
+  return ;
 }
 
 /**
  *  Check the parsing argument.
+ *
+ *  @param[in] argc Unused.
+ *  @param[in] argv Unused.
+ *
+ *  @return 0 on success.
  */
-int main_test() {
-  config.set_log_archive_path(QDir::tempPath());
+int main_test(int argc, char* argv[]) {
+  (void)argc;
+  (void)argv;
 
+  // Initialization.
+  config.set_log_archive_path(".");
+
+  // Tests.
   check_directory();
   check_noexist_file();
   check_exist_file();
 
+  // Success.
   return (0);
 }
 
@@ -86,10 +103,6 @@ int main_test() {
  *  Init unit test.
  */
 int main(int argc, char** argv) {
-  QCoreApplication app(argc, argv);
-  unittest utest(&main_test);
-  QObject::connect(&utest, SIGNAL(finished()), &app, SLOT(quit()));
-  utest.start();
-  app.exec();
-  return (utest.ret());
+  unittest utest(argc, argv, &main_test);
+  return (utest.run());
 }

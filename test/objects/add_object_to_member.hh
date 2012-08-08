@@ -20,47 +20,56 @@
 #ifndef TEST_OBJECTS_ADD_OBJECT_TO_MEMBER_HH
 #  define TEST_OBJECTS_ADD_OBJECT_TO_MEMBER_HH
 
-#  include <QVector>
+#  include <vector>
 #  include "com/centreon/engine/error.hh"
 #  include "test/objects/release.hh"
 
-namespace test{
-  namespace objects {
-    template<class T, class U>
-    void add_with_null_member(bool (*add)(QVector<T*> const&, U**)) {
-      QVector<T*> objs;
+namespace    test{
+  namespace  objects {
+    template <class T, class U>
+    void     add_with_null_member(
+               bool (*add)(std::vector<T*> const&, U**)) {
+      std::vector<T*> objs;
       if (add(objs, NULL) == true)
-        throw (engine_error() << Q_FUNC_INFO << " invalid return.");
+        throw (engine_error()
+               << "add_with_null_member() invalid return");
+      return ;
     }
 
-    template<class T, class U>
-    void add_without_objects(bool (*add)(QVector<T*> const&, U**)) {
-      U* head = NULL;
-      QVector<T*> objs;
+    template <class T, class U>
+    void     add_without_objects(
+               bool (*add)(std::vector<T*> const&, U**)) {
+      U* head(NULL);
+      std::vector<T*> objs;
       if (add(objs, &head) == false)
-        throw (engine_error() << Q_FUNC_INFO << " invalid return.");
+        throw (engine_error()
+               << "add_without_objects() invalid return");
+      return ;
     }
 
-    template<class T, class U>
-    void add_with_objects(bool (*add)(QVector<T*> const&, U**),
-                          T* (create)(unsigned int),
-                          unsigned int id) {
+    template <class T, class U>
+    void     add_with_objects(
+               bool (*add)(std::vector<T*> const&, U**),
+               T* (create)(unsigned int),
+               unsigned int id) {
       init_object_skiplists();
-      U* head = NULL;
-      QVector<T*> objs;
-      for (unsigned int i = 0; i < id; ++i)
+      U* head(NULL);
+      std::vector<T*> objs;
+      for (unsigned int i(0); i < id; ++i)
         objs.push_back(create(i + 1));
 
       if (add(objs, &head) == false)
-        throw (engine_error() << Q_FUNC_INFO << " invalid return.");
-      for (typename QVector<T*>::const_iterator it = objs.begin(),
-             end = objs.end();
+        throw (engine_error() << "add_with_objects() invalid return");
+      for (typename std::vector<T*>::const_iterator
+             it(objs.begin()),
+             end(objs.end());
            it != end;
            ++it)
-        release(*it);
+        com::centreon::engine::objects::release(*it);
 
-      U const* member = head;
-      while ((member = release(member)));
+      U const* member(head);
+      while ((member = com::centreon::engine::objects::release(member)))
+        ;
       free_object_skiplists();
     }
   }

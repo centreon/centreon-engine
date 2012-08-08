@@ -48,17 +48,17 @@ bool link_contact(contact* obj,
     objects::link(obj,
                   host_notification_period,
                   service_notification_period,
-                  tab2qvec(contactgroups),
-                  tab2qvec(host_notification_commands),
-                  tab2qvec(service_notification_commands),
-                  tab2qvec(custom_variables));
+                  tab2vec(contactgroups),
+                  tab2vec(host_notification_commands),
+                  tab2vec(service_notification_commands),
+                  tab2vec(custom_variables));
   }
   catch (std::exception const& e) {
     logger(log_runtime_error, basic) << e.what();
     return (false);
   }
   catch (...) {
-    logger(log_runtime_error, basic) << Q_FUNC_INFO << " unknow exception.";
+    logger(log_runtime_error, basic) << __func__ << " unknow exception";
     return (false);
   }
   return (true);
@@ -78,7 +78,7 @@ void release_contact(contact const* obj) {
     logger(log_runtime_error, basic) << e.what();
   }
   catch (...) {
-    logger(log_runtime_error, basic) << Q_FUNC_INFO << " unknow exception.";
+    logger(log_runtime_error, basic) << __func__ << " unknow exception";
   }
 }
 
@@ -96,10 +96,10 @@ void release_contact(contact const* obj) {
 void objects::link(contact* obj,
                    timeperiod* host_notification_period,
                    timeperiod* service_notification_period,
-                   QVector<contactgroup*> const& contactgroups,
-                   QVector<command*> const& host_notification_commands,
-                   QVector<command*> const& service_notification_commands,
-                   QVector<QString> const& custom_variables) {
+                   std::vector<contactgroup*> const& contactgroups,
+                   std::vector<command*> const& host_notification_commands,
+                   std::vector<command*> const& service_notification_commands,
+                   std::vector<std::string> const& custom_variables) {
   // check object contents.
   if (obj == NULL)
     throw (engine_error() << "contact is a NULL pointer.");
@@ -112,7 +112,7 @@ void objects::link(contact* obj,
   if ((obj->service_notification_period_ptr = service_notification_period) == NULL)
     throw (engine_error() << "contact '" << obj->name << "' invalid service notification period.");
 
-  for (QVector<contactgroup*>::const_iterator it = contactgroups.begin(),
+  for (std::vector<contactgroup*>::const_iterator it = contactgroups.begin(),
          end = contactgroups.end();
        it != end;
        ++it) {
@@ -178,12 +178,12 @@ void objects::release(contact const* obj) {
  *
  *  @return True if insert sucessfuly, false otherwise.
  */
-bool objects::add_contacts_to_object(QVector<contact*> const& contacts,
+bool objects::add_contacts_to_object(std::vector<contact*> const& contacts,
                                      contactsmember** list_contact) {
   if (list_contact == NULL)
     return (false);
 
-  for (QVector<contact*>::const_iterator it = contacts.begin(), end = contacts.end();
+  for (std::vector<contact*>::const_iterator it = contacts.begin(), end = contacts.end();
        it != end;
        ++it) {
     if (*it == NULL)

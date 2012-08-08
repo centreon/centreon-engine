@@ -17,9 +17,9 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <QProcess>
-#include <stdlib.h>
+#include <cstdlib>
 #include "com/centreon/engine/error.hh"
+#include "com/centreon/process.hh"
 #include "test/modules/webservice/query.hh"
 #include "test/paths.hh"
 
@@ -75,40 +75,32 @@ int query::execute(std::string& output, std::string const& q) {
   cmdline.append(q);
 
   // Execute webservice client.
-  QProcess client;
-  client.setProcessChannelMode(QProcess::MergedChannels);
-  client.start(cmdline.c_str());
+  com::centreon::process client;
+  client.exec(cmdline);
 
   // Exit code.
   int retval(EXIT_FAILURE);
 
   try {
+    // Wait for termination.
+    client.wait();
+
     // Get output.
-    char buffer[1000];
-    qint64 rb;
-    while ((rb = client.read(buffer, sizeof(buffer))) > 0)
-      output.append(buffer, rb);
-
-    // Terminate webservice client (if not terminating on its own).
-    if (!client.waitForFinished()) {
-      client.kill();
-      client.waitForFinished();
-    }
-
-    // Read remaining data.
-    while ((rb = client.read(buffer, sizeof(buffer))) > 0)
-      output.append(buffer, rb);
+    client.read(output);
+    std::string buffer;
+    client.read_err(buffer);
+    output.append(buffer);
 
     // Return value.
-    if (client.exitStatus() != QProcess::NormalExit)
+    if (client.exit_status() != com::centreon::process::normal)
       throw (engine_error() << "centenginews crashed");
-    retval = client.exitCode();
+    retval = client.exit_code();
   }
   catch (...) {
     client.terminate();
-    if (!client.waitForFinished()) {
+    if (!client.wait(10000)) {
       client.kill();
-      client.waitForFinished();
+      client.wait();
     }
     throw ;
   }

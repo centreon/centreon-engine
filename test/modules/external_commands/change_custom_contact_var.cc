@@ -18,8 +18,6 @@
 */
 
 #include <exception>
-#include <QCoreApplication>
-#include <QDebug>
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/modules/external_commands/commands.hh"
 #include "com/centreon/engine/globals.hh"
@@ -31,7 +29,10 @@ using namespace com::centreon::engine;
 /**
  *  Run change_custom_contact_var test.
  */
-static int check_change_custom_contact_var() {
+static int check_change_custom_contact_var(int argc, char** argv) {
+  (void)argc;
+  (void)argv;
+
   init_object_skiplists();
 
   contact* cntct = add_contact("name", NULL, NULL, NULL, NULL, NULL, NULL, 0,
@@ -66,10 +67,6 @@ static int check_change_custom_contact_var() {
  *  Init unit test.
  */
 int main(int argc, char** argv) {
-  QCoreApplication app(argc, argv);
-  unittest utest(&check_change_custom_contact_var);
-  QObject::connect(&utest, SIGNAL(finished()), &app, SLOT(quit()));
-  utest.start();
-  app.exec();
-  return (utest.ret());
+  unittest utest(argc, argv, &check_change_custom_contact_var);
+  return (utest.run());
 }

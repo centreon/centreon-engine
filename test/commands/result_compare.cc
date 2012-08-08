@@ -17,52 +17,65 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <cstdlib>
 #include <exception>
-#include <QCoreApplication>
-#include <QDebug>
 #include "com/centreon/engine/commands/result.hh"
 #include "com/centreon/engine/error.hh"
+#include "com/centreon/process.hh"
+#include "com/centreon/timestamp.hh"
 #include "test/unittest.hh"
 
+using namespace com::centreon;
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::commands;
 
 #define DEFAULT_ID      42
-#define DEFAULT_STDOUT  "stdout string test"
-#define DEFAULT_STDERR  "stderr string test"
+#define DEFAULT_OUTPUT  "output string test"
 #define DEFAULT_RETURN  0
-#define DEFAULT_TIMEOUT true
-#define DEFAULT_EXIT_OK false
+#define DEFAULT_STATUS  process::normal
 
 /**
  *  Check the comparison operator.
+ *
+ *  @param[in] argc Argument count.
+ *  @param[in] argv Argument values.
+ *
+ *  @return EXIT_SUCCESS on success.
  */
-int main_test() {
-  QDateTime time = QDateTime::currentDateTime();
-  result res(DEFAULT_ID,
-             DEFAULT_STDOUT,
-             DEFAULT_STDERR,
-             time,
-             time,
-             DEFAULT_RETURN,
-             DEFAULT_TIMEOUT,
-             DEFAULT_EXIT_OK);
-  if (!(res == res))
-    throw (engine_error() << "error: operator== failed.");
+int main_test(int argc, char** argv) {
+  (void)argc;
+  (void)argv;
 
+  // Prepare.
+  timestamp now(timestamp::now());
+  result res;
+  res.command_id = DEFAULT_ID;
+  res.output = DEFAULT_OUTPUT;
+  res.start_time = now;
+  res.end_time = now;
+  res.exit_code = DEFAULT_RETURN;
+  res.exit_status = DEFAULT_STATUS;
+
+  // Tests.
+  if (!(res == res))
+    throw (engine_error() << "error: operator== failed");
   if (res != res)
-    throw (engine_error() << "error: operator!= failed.");
-  return (0);
+    throw (engine_error() << "error: operator!= failed");
+
+  return (EXIT_SUCCESS);
 }
 
 /**
  *  Init unit test.
+ *
+ *  @param[in] argc Argument count.
+ *  @param[in] argv Argument values.
+ *
+ *  @return Return value of main_test().
+ *
+ *  @see main_test
  */
-int main(int argc, char** argv) {
-  QCoreApplication app(argc, argv);
-  unittest utest(&main_test);
-  QObject::connect(&utest, SIGNAL(finished()), &app, SLOT(quit()));
-  utest.start();
-  app.exec();
-  return (utest.ret());
+int main(int argc, char* argv[]) {
+  unittest utest(argc, argv, &main_test);
+  return (utest.run());
 }

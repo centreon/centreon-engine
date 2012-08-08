@@ -17,12 +17,13 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <QFile>
-#include <QFileInfo>
-#include <QHash>
-#include <QRegExp>
-#include <QString>
-#include <QTextStream>
+#include <fstream>
+#include <libgen.h>
+#include <map>
+#include <sstream>
+#include <stdlib.h>
+#include <string>
+#include <string.h>
 #include "arg_definition.hh"
 #include "builder.hh"
 #include "error.hh"
@@ -56,9 +57,10 @@ static char const* copyright =
  *  @param[in] header_dst Path of auto_gen header.
  *  @param[in] source_dst Path of auto_gen code.
  */
-builder::builder(QString const& header_src,
-                 QString const& header_dst,
-                 QString const& source_dst)
+builder::builder(
+           std::string const& header_src,
+           std::string const& header_dst,
+           std::string const& source_dst)
   : _header_src(header_src),
     _header_dst(header_dst),
     _source_dst(source_dst) {}
@@ -98,22 +100,19 @@ builder& builder::operator=(builder const& right) {
  *  Parse the soapStub.
  */
 void builder::parse() {
-  QFile file(_header_src);
-  if (file.open(QIODevice::ReadOnly | QIODevice::Text) == false) {
-    throw (error(file.errorString().toStdString().c_str()));
-  }
+  std::ifstream file(_header_src.c_str(), std::ios_base::in);
+  if (!file.is_open())
+    throw (error("open file failed"));
 
-  while (file.atEnd() == false) {
-    QString data = file.readLine();
-    if (function::is_valid(data) == false) {
-      continue;
-    }
+  while (file.good()) {
+    std::string data;
+    std::getline(file, data, '\n');
+    if (!function::is_valid(data))
+      continue ;
     function func(data);
     func.build();
     _lst_function.push_back(func);
   }
-
-  file.close();
 }
 
 /**
@@ -125,189 +124,215 @@ void builder::build() {
 }
 
 /**
+ *  Get the filename from a file path.
+ *
+ *  @param[in] path  The file path.
+ *
+ *  @return The filename.
+ */
+std::string builder::_basename(std::string const& path) {
+  char* _path(strdup(path.c_str()));
+  std::string filename(basename(_path));
+  free(_path);
+  return (filename);
+}
+
+/**
  *  Build auto_gen header.
  */
 void builder::_build_header() {
-  QFile file(_header_dst);
-  if (file.open(QIODevice::WriteOnly
-                | QIODevice::Text
-                | QIODevice::Truncate) == false) {
-    throw (error(file.errorString().toStdString().c_str()));
-  }
-  QTextStream stream(&file);
-  stream << copyright << "\n";
+  std::ofstream file(
+                  _header_dst.c_str(),
+                  std::ios_base::out | std::ios_base::trunc);
+  if (!file.is_open())
+    throw (error("open file failed"));
 
-  QFileInfo file_info(_header_src);
-  stream << "#ifndef CCE_MOD_WS_CLIENT_AUTO_GEN_HH\n"
-         << "# define CCE_MOD_WS_CLIENT_AUTO_GEN_HH\n\n"
-         << "# include <QHash>\n"
-         << "# include <QString>\n"
-         << "# include \"" << file_info.fileName() << "\"\n\n"
-         << "class auto_gen {\n"
-         << "public:\n"
-         << "  static auto_gen& instance();\n\n"
-         << "  void show_help() const;\n"
-         << "  void show_help(QString const& name) const;\n"
-         << "  bool execute(QString const& name, soap* s, char const* end_point, char const* action, QHash<QString, QString> const& args) const;\n\n"
-         << "private:\n"
-         << "  auto_gen();\n"
-         << "  auto_gen(auto_gen const& right);\n"
-         << "  ~auto_gen() throw();\n\n"
-         << "  auto_gen& operator=(auto_gen const& right);\n\n"
-         << "  QHash<QString, void (*)()> _help;\n"
-         << "  QHash<QString, bool (*)(soap*, char const*, char const*, QHash<QString, QString> const&)> _exec;\n"
-         << "};\n\n"
-         << "#endif // !CCE_MOD_WS_CLIENT_AUTO_GEN_HH\n";
+  file << copyright << "\n"
+       << "#ifndef CCE_MOD_WS_CLIENT_AUTO_GEN_HH\n"
+       << "# define CCE_MOD_WS_CLIENT_AUTO_GEN_HH\n\n"
+       << "# include <map>\n"
+       << "# include <string>\n"
+       << "# include \"" << _basename(_header_src) << "\"\n\n"
+       << "class auto_gen {\n"
+       << "public:\n"
+       << "  static auto_gen& instance();\n\n"
+       << "  void show_help() const;\n"
+       << "  void show_help(std::string const& name) const;\n"
+       << "  bool execute(std::string const& name, soap* s, char const* end_point, char const* action, std::map<std::string, std::string>& args) const;\n\n"
+       << "private:\n"
+       << "  auto_gen();\n"
+       << "  auto_gen(auto_gen const& right);\n"
+       << "  ~auto_gen() throw();\n\n"
+       << "  auto_gen& operator=(auto_gen const& right);\n\n"
+       << "  std::map<std::string, void (*)()> _help;\n"
+       << "  std::map<std::string, bool (*)(soap*, char const*, char const*, std::map<std::string, std::string>&)> _exec;\n"
+       << "};\n\n"
+       << "#endif // !CCE_MOD_WS_CLIENT_AUTO_GEN_HH\n";
 }
 
 /**
  *  Build auto_gen source code.
  */
 void builder::_build_source() {
-  QFile file(_source_dst);
-  if (file.open(QIODevice::WriteOnly
-                | QIODevice::Text
-                | QIODevice::Truncate) == false) {
-    throw (error(file.errorString().toStdString().c_str()));
-  }
-  QTextStream stream(&file);
-  stream << copyright << "\n";
+  std::ofstream file(
+                  _source_dst.c_str(),
+                  std::ios_base::out | std::ios_base::trunc);
+  if (!file.is_open())
+    throw (error("open file failed"));
 
-  QFileInfo file_info(_header_dst);
-  stream << "#include <QStringList>\n"
-         << "#include <ostream>\n"
-         << "#include \"com/centreon/engine/modules/webservice/error.hh\"\n"
-         << "#include \"" << file_info.fileName() << "\"\n\n"
-         << "using namespace com::centreon::engine::modules::webservice;\n\n";
+  file << copyright << "\n"
+       << "#include <cstdlib>\n"
+       << "#include <list>\n"
+       << "#include <ostream>\n"
+       << "#include <string>\n"
+       << "#include <vector>\n"
+       << "#include \"com/centreon/engine/modules/webservice/error.hh\"\n"
+       << "#include \"" << _basename(_header_dst) << "\"\n\n"
+       << "using namespace com::centreon::engine::modules::webservice;\n\n";
 
-  stream << "static std::string toStdString(QString const& str) {\n"
-         << "  return (str.toStdString());\n"
-         << "}\n\n";
+  file << "static std::string toStdString(std::string const& str) {\n"
+       << "  return (str);\n"
+       << "}\n\n";
 
-  stream << "static double toDouble(QString const& str) {\n"
-         << "  return (str.toDouble());\n"
-         << "}\n\n";
+  file << "static double toDouble(std::string const& str) {\n"
+       << "  return (strtod(str.c_str(), NULL));\n"
+       << "}\n\n";
 
-  stream << "static float toFloat(QString const& str) {\n"
-         << "  return (str.toFloat());\n"
-         << "}\n\n";
+  file << "static float toFloat(std::string const& str) {\n"
+       << "  return (strtof(str.c_str(), NULL));\n"
+       << "}\n\n";
 
-  stream << "static int toInt(QString const& str) {\n"
-         << "  return (str.toInt());\n"
-         << "}\n\n";
+  file << "static int toInt(std::string const& str) {\n"
+       << "  return (strtol(str.c_str(), NULL, 0));\n"
+       << "}\n\n";
 
-  stream << "static long long toLongLong(QString const& str) {\n"
-         << "  return (str.toLongLong());\n"
-         << "}\n\n";
+  file << "static long long toLongLong(std::string const& str) {\n"
+       << "  return (strtoll(str.c_str(), NULL, 0));\n"
+       << "}\n\n";
 
-  stream << "static unsigned int toUInt(QString const& str) {\n"
-         << "  return (str.toUInt());\n"
-         << "}\n\n";
+  file << "static unsigned int toUInt(std::string const& str) {\n"
+       << "  return (strtoul(str.c_str(), NULL, 0));\n"
+       << "}\n\n";
 
-  stream << "static unsigned long long toULongLong(QString const& str) {\n"
-         << "  return (str.toULongLong());\n"
-         << "}\n\n";
+  file << "static unsigned long long toULongLong(std::string const& str) {\n"
+       << "  return (strtoull(str.c_str(), NULL, 0));\n"
+       << "}\n\n";
 
-  stream << "static std::vector<std::string> toStdVector(QString const& str) {\n"
-         << "  QStringList tmp(str.split(','));\n"
-         << "  std::vector<std::string> tab;\n"
-         << "  for (QStringList::const_iterator it = tmp.begin(), end = tmp.end();\n"
-         << "      it != end;\n"
-         << "      ++it)\n"
-         << "    tab.push_back(it->toStdString());\n"
-         << "  return (tab);\n"
-         << "}\n\n";
+  file << "static std::vector<std::string> toStdVector(std::string const& str) {\n"
+       << "  std::list<std::string> tmp;\n"
+       << "  size_t prev(0);\n"
+       << "  size_t current;\n"
+       << "  while ((current = str.find(',', prev)) != std::string::npos) {\n"
+       << "    tmp.push_back(str.substr(prev, current - prev));\n"
+       << "    prev = current + 1;\n"
+       << "  }\n"
+       << "  tmp.push_back(str.substr(prev));\n"
+       << "\n"
+       << "  std::vector<std::string> tab;\n"
+       << "  for (std::list<std::string>::const_iterator\n"
+       << "         it(tmp.begin()),\n"
+       << "         end(tmp.end());\n"
+       << "      it != end;\n"
+       << "      ++it)\n"
+       << "    tab.push_back(*it);\n"
+       << "  return (tab);\n"
+       << "}\n\n";
 
-  stream << "template <typename T>\n"
-         << "static std::ostream& operator<<(\n"
-         << "                       std::ostream& os,\n"
-         << "                       std::vector<T> const& cls) {\n"
-         << "  os << \"{\";\n"
-         << "  for (typename std::vector<T>::const_iterator\n"
-         << "         it(cls.begin()),\n"
-         << "         end(cls.end());\n"
-         << "       it != end;\n"
-         << "       ++it) {\n"
-         << "    if (it + 1 != end)\n"
-         << "      os << *it << \", \";\n"
-         << "    else\n"
-         << "      os << *it;\n"
-         << "  }\n"
-         << "  os << \"}\";\n"
-         << "\n"
-         << "  return (os);\n"
-         << "}\n\n";
+  file << "template <typename T>\n"
+       << "static std::ostream& operator<<(\n"
+       << "                       std::ostream& os,\n"
+       << "                       std::vector<T> const& cls) {\n"
+       << "  os << \"{\";\n"
+       << "  for (typename std::vector<T>::const_iterator\n"
+       << "         it(cls.begin()),\n"
+       << "         end(cls.end());\n"
+       << "       it != end;\n"
+       << "       ++it) {\n"
+       << "    if (it + 1 != end)\n"
+       << "      os << *it << \", \";\n"
+       << "    else\n"
+       << "      os << *it;\n"
+       << "  }\n"
+       << "  os << \"}\";\n"
+       << "\n"
+       << "  return (os);\n"
+       << "}\n\n";
 
-  QList<argument> args = arg_definition::instance().get_arguments();
-  for (QList<argument>::const_iterator it = args.begin(), end = args.end();
+  std::list<argument> args(arg_definition::instance().get_arguments());
+  for (std::list<argument>::const_iterator
+         it(args.begin()),
+         end(args.end());
        it != end;
        ++it) {
-    if (it->is_primitive() == false) {
-      stream << "static std::ostream& operator<<(std::ostream& os, "
-             << it->get_type() << " const& cls) {\n"
-             << _build_ostream_struct("cls.", *it)
-             << "\n"
-             << "  return (os);\n"
-             << "}\n\n";
-    }
+    if (!it->is_primitive())
+      file << "static std::ostream& operator<<(std::ostream& os, "
+           << it->get_type().c_str() << " const& cls) {\n"
+           << _build_ostream_struct("cls.", *it).c_str()
+           << "\n"
+           << "  return (os);\n"
+           << "}\n\n";
   }
 
-  for (QList<function>::const_iterator it = _lst_function.begin(), end = _lst_function.end();
+  for (std::list<function>::const_iterator
+         it(_lst_function.begin()),
+         end(_lst_function.end());
        it != end;
-       ++it) {
-    stream << "static " << it->get_help_function() << "\n\n";
-  }
+       ++it)
+    file << "static " << it->get_help_function().c_str() << "\n\n";
 
-  for (QList<function>::const_iterator it = _lst_function.begin(), end = _lst_function.end();
+  for (std::list<function>::const_iterator
+         it(_lst_function.begin()),
+         end(_lst_function.end());
        it != end;
-       ++it) {
-    stream << "static " << it->get_exec_function() << "\n\n";
-  }
+       ++it)
+    file << "static " << it->get_exec_function().c_str() << "\n\n";
 
-  stream << "auto_gen& auto_gen::instance() {\n"
-         << "  static auto_gen instance;\n"
-         << "  return (instance);\n"
-         << "}\n\n"
-         << "void auto_gen::show_help() const {\n"
-         << "  for (QHash<QString, void(*)()>::const_iterator it = _help.begin(), end = _help.end();\n"
-         << "      it != end;\n"
-         << "      ++it) {\n"
-         << "    it.value()();\n"
-         << "  }\n"
-         << "}\n\n"
-         << "void auto_gen::show_help(QString const& name) const {\n"
-         << "  QHash<QString, void (*)()>::const_iterator it = _help.find(name);\n"
-         << "  if (it == _help.end()) {\n"
-         << "    throw (error(\"function not found.\"));\n"
-         << "  }\n"
-         << "  it.value()();\n"
-         << "}\n\n"
-         << "bool auto_gen::execute(QString const& name, soap* s, char const* end_point, char const* action, QHash<QString, QString> const& args) const {\n"
-         << "  QHash<QString, bool (*)(soap*, char const*, char const*, QHash<QString, QString> const&)>::const_iterator it = _exec.find(name);\n"
-         << "  if (it == _exec.end()) {\n"
-         << "    throw (error(\"function not found.\"));\n"
-         << "  }\n"
-         << "  \n"
-         << "  return (it.value()(s, end_point, action, args));\n"
-         << "}\n\n"
-         << "auto_gen::auto_gen() {\n";
+  file << "auto_gen& auto_gen::instance() {\n"
+       << "  static auto_gen instance;\n"
+       << "  return (instance);\n"
+       << "}\n\n"
+       << "void auto_gen::show_help() const {\n"
+       << "  for (std::map<std::string, void(*)()>::const_iterator it(_help.begin()), end(_help.end());\n"
+       << "      it != end;\n"
+       << "      ++it) {\n"
+       << "    it->second();\n"
+       << "  }\n"
+       << "}\n\n"
+       << "void auto_gen::show_help(std::string const& name) const {\n"
+       << "  std::map<std::string, void (*)()>::const_iterator it(_help.find(name));\n"
+       << "  if (it == _help.end())\n"
+       << "    throw (error(\"function not found\"));\n"
+       << "  it->second();\n"
+       << "}\n\n"
+       << "bool auto_gen::execute(std::string const& name, soap* s, char const* end_point, char const* action, std::map<std::string, std::string>& args) const {\n"
+       << "  std::map<std::string, bool (*)(soap*, char const*, char const*, std::map<std::string, std::string>&)>::const_iterator it = _exec.find(name);\n"
+       << "  if (it == _exec.end())\n"
+       << "    throw (error(\"function not found.\"));\n"
+       << "  \n"
+       << "  return (it->second(s, end_point, action, args));\n"
+       << "}\n\n"
+       << "auto_gen::auto_gen() {\n";
 
-  for (QList<function>::const_iterator it = _lst_function.begin(), end = _lst_function.end();
+  for (std::list<function>::const_iterator
+         it(_lst_function.begin()),
+         end(_lst_function.end());
        it != end;
-       ++it) {
-    stream << "  _help[\"" << it->get_name() << "\"] = &" << it->get_help_name() << ";\n";
-  }
-  stream << "\n";
-  for (QList<function>::const_iterator it = _lst_function.begin(), end = _lst_function.end();
+       ++it)
+    file << "  _help[\"" << it->get_name().c_str()
+         << "\"] = &" << it->get_help_name().c_str() << ";\n";
+  file << "\n";
+  for (std::list<function>::const_iterator
+         it(_lst_function.begin()),
+         end(_lst_function.end());
        it != end;
-       ++it) {
-    stream << "  _exec[\"" << it->get_name() << "\"] = &" << it->get_exec_name() << ";\n";
-  }
+       ++it)
+    file << "  _exec[\"" << it->get_name().c_str()
+         << "\"] = &" << it->get_exec_name().c_str() << ";\n";
 
-  stream << "}\n\n"
-         << "auto_gen::~auto_gen() throw() {\n"
-         << "\n"
-         << "}\n\n";
+  file << "}\n\n"
+       << "auto_gen::~auto_gen() throw () {\n"
+       << "\n"
+       << "}\n\n";
 }
 
 /**
@@ -318,20 +343,28 @@ void builder::_build_source() {
  *
  *  @return Return the overload source code.
  */
-QString builder::_build_ostream_struct(
-                   QString const& base,
-                   argument const& arg) {
-  if (arg.is_primitive() == true) {
-    return ("  os << \"" + arg.get_help() + " = \" << " + base + " << std::endl;\n");
+std::string builder::_build_ostream_struct(
+                       std::string const& base,
+                       argument const& arg) {
+  std::string ret;
+  if (arg.is_primitive()) {
+    std::ostringstream oss;
+    oss << "  os << \"" << arg.get_help() << " = \" << "
+        << base << " << std::endl;\n";
+    ret = oss.str();
   }
-
-  QString ret;
-  QList<argument> const& args = arg.get_args();
-  for (QList<argument>::const_iterator it = args.begin(), end = args.end();
-       it != end;
-       ++it) {
-    char const* accessor = (it->is_primitive() ? "" : "->");
-    ret += _build_ostream_struct(base + it->get_name() + accessor, *it);
+  else {
+    std::list<argument> const& args(arg.get_args());
+    for (std::list<argument>::const_iterator
+           it(args.begin()),
+           end(args.end());
+         it != end;
+         ++it) {
+      char const* accessor(it->is_primitive() ? "" : "->");
+      std::ostringstream arg;
+      arg << base << it->get_name() << accessor;
+      ret.append(_build_ostream_struct(arg.str(), *it));
+    }
   }
   return (ret);
 }

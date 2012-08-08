@@ -18,8 +18,6 @@
 */
 
 #include <exception>
-#include <QCoreApplication>
-#include <QDebug>
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/broker/loader.hh"
 #include "com/centreon/engine/common.hh"
@@ -28,6 +26,7 @@
 #include "com/centreon/engine/logging/broker.hh"
 #include "com/centreon/engine/logging/engine.hh"
 #include "com/centreon/engine/logging/object.hh"
+#include "com/centreon/shared_ptr.hh"
 #include "test/unittest.hh"
 
 using namespace com::centreon::engine;
@@ -51,7 +50,10 @@ static const char*        LOG_MESSAGE  = "~!@#$%^&*()_+09/qwerty \n";
 /**
  *  Check the logging broker working.
  */
-int main_test() {
+int main_test(int argc, char** argv) {
+  (void)argc;
+  (void)argv;
+
   // Add event logged data to broker.
   config.set_event_broker_options(BROKER_LOGGED_DATA);
 
@@ -66,21 +68,20 @@ int main_test() {
   logging::engine& engine(logging::engine::instance());
 
   // Add new object (broker) to log into engine.
-  QSharedPointer<logging::broker> obj(new logging::broker);
-  logging::engine::obj_info info(obj,
-                                 logging::log_all,
-                                 logging::most);
-  unsigned int id = engine.add_object(info);
+  com::centreon::shared_ptr<logging::object> obj(new logging::broker);
+  logging::engine::obj_info info(
+                              obj,
+                              logging::log_all,
+                              logging::most);
+  unsigned int id(engine.add_object(info));
 
   // Send message on all different logging type.
-  for (unsigned int i = 0; i < NB_LOG_TYPE; ++i) {
+  for (unsigned int i(0); i < NB_LOG_TYPE; ++i)
     engine.log(LOG_MESSAGE, 1ull << i, 0);
-  }
 
   // Send message on all different debug logging type.
-  for (unsigned int i = 0; i < NB_DBG_TYPE; ++i) {
+  for (unsigned int i(0); i < NB_DBG_TYPE; ++i)
     engine.log(LOG_MESSAGE, 1ull << (i + 32), 0);
-  }
 
   // Remove object (broker).
   engine.remove_object(id);
@@ -92,10 +93,6 @@ int main_test() {
  *  Init unit test.
  */
 int main(int argc, char** argv) {
-  QCoreApplication app(argc, argv);
-  unittest utest(&main_test);
-  QObject::connect(&utest, SIGNAL(finished()), &app, SLOT(quit()));
-  utest.start();
-  app.exec();
-  return (utest.ret());
+  unittest utest(argc, argv, &main_test);
+  return (utest.run());
 }

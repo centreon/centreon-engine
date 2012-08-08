@@ -20,51 +20,53 @@
 #ifndef CCE_LOGGING_FILE_HH
 #  define CCE_LOGGING_FILE_HH
 
-#  include <QFile>
-#  include <QList>
-#  include <QMutex>
-#  include <QReadWriteLock>
-#  include <QSharedPointer>
-#  include <QString>
+#  include <string>
+#  include "com/centreon/concurrency/mutex.hh"
 #  include "com/centreon/engine/logging/object.hh"
+#  include "com/centreon/engine/namespace.hh"
+#  include "com/centreon/io/file_stream.hh"
 
-namespace                        com {
-  namespace                      centreon {
-    namespace                    engine {
-      namespace                  logging {
-	/**
-         *  @class file file.hh
-         *  @brief Write logging message into file.
-         *
-         *  Write logging message into file.
-         */
-	class                    file : public object {
-	public:
-	                         file(
-                                   QString const& file,
-                                   unsigned long long size_limit = 0);
-	                         file(file const& right);
-	                         ~file() throw();
-	  file&                  operator=(file const& right);
-	  QString                get_file_name() throw();
-	  unsigned long long     get_size_limit() const throw();
-	  void                   log(
-                                   char const* message,
-                                   unsigned long long type,
-                                   unsigned int verbosity) throw();
-          static void            reopen();
-	  void                   set_size_limit(unsigned long long size) throw();
+CCE_BEGIN()
 
-	private:
-	  QSharedPointer<QMutex> _mutex;
-	  QSharedPointer<QFile>  _file;
-          static QList<file*>    _files;
-          static QReadWriteLock  _rwlock;
-	  unsigned long long     _size_limit;
-	};
-      }
-    }
-  }
+namespace                   logging {
+  /**
+   *  @class file file.hh
+   *  @brief Write logging message into file.
+   *
+   *  Write logging message into file.
+   */
+  class                     file : public object {
+  public:
+                            file(
+                              std::string const& file,
+                              unsigned long long size_limit = 0);
+                            file(file const& right);
+                            ~file() throw ();
+    file&                   operator=(file const& right);
+    std::string const&      get_file_name() const throw ();
+    unsigned long long      get_size_limit() const;
+    void                    log(
+                              char const* message,
+                              unsigned long long type,
+                              unsigned int verbosity) throw ();
+    static void             reopen();
+    void                    set_size_limit(
+                              unsigned long long size);
+
+  private:
+    void                    _close();
+    void                    _internal_copy(file const& right);
+    void                    _open();
+
+    io::file_stream         _file;
+    std::string             _filename;
+    mutable concurrency::mutex
+                            _mutex;
+    unsigned long long      _size_limit;
+    unsigned long long      _written;
+  };
 }
+
+CCE_END()
 
 #endif // !CCE_LOGGING_FILE_HH

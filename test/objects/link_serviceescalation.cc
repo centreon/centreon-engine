@@ -17,9 +17,11 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <cstdlib>
 #include <exception>
-#include <QDebug>
+#include <iostream>
 #include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/logging/engine.hh"
 #include "com/centreon/engine/macros.hh"
 #include "com/centreon/engine/objects/contact.hh"
 #include "com/centreon/engine/objects/contactgroup.hh"
@@ -29,6 +31,7 @@
 #include "com/centreon/engine/utils.hh"
 #include "test/objects//create_object.hh"
 
+using namespace com::centreon::engine;
 using namespace com::centreon::engine::objects;
 using namespace test::objects;
 
@@ -38,8 +41,8 @@ static bool create_and_link(bool has_contacts,
   init_object_skiplists();
   service* hst = create_service(1);
   serviceescalation* obj = create_serviceescalation(1);
-  QVector<contact*> contacts;
-  QVector<contactgroup*> contactgroups;
+  std::vector<contact*> contacts;
+  std::vector<contactgroup*> contactgroups;
   timeperiod* escalation_period = NULL;
   bool ret = true;
 
@@ -84,8 +87,8 @@ static bool create_and_link(bool has_contacts,
 
 static void link_null_pointer() {
   try {
-    QVector<contactgroup*> contactgroups;
-    QVector<contact*> contacts;
+    std::vector<contactgroup*> contactgroups;
+    std::vector<contact*> contacts;
     link(static_cast<serviceescalation*>(NULL),
          contacts,
          contactgroups,
@@ -101,8 +104,8 @@ static void link_null_name() {
   serviceescalation* obj = NULL;
   try {
     obj = create_serviceescalation(1);
-    QVector<contact*> contacts;
-    QVector<contactgroup*> contactgroups;
+    std::vector<contact*> contacts;
+    std::vector<contactgroup*> contactgroups;
 
     delete[] obj->host_name;
     obj->host_name = NULL;
@@ -120,32 +123,46 @@ static void link_null_name() {
 }
 
 static void link_without_contacts() {
-  if (create_and_link(false, true, true) == false)
-    throw (engine_error() << Q_FUNC_INFO << " invalid return.");
+  if (!create_and_link(false, true, true))
+    throw (engine_error() << __func__ << " failed: invalid return");
+  return ;
 }
 
 static void link_without_contactgroups() {
-  if (create_and_link(true, false, true) == false)
-    throw (engine_error() << Q_FUNC_INFO << " invalid return.");
+  if (!create_and_link(true, false, true))
+    throw (engine_error() << __func__ << " failed: invalid return");
+  return ;
 }
 
 static void link_without_contacts_and_contactgroups() {
-  if (create_and_link(false, false, true) == true)
-    throw (engine_error() << Q_FUNC_INFO << " invalid return.");
+  if (create_and_link(false, false, true))
+    throw (engine_error() << __func__ << " failed: invalid return");
+  return ;
 }
 
 static void link_without_escalation_period() {
-  if (create_and_link(true, true, false) == false)
-    throw (engine_error() << Q_FUNC_INFO << " invalid return.");
+  if (!create_and_link(true, true, false))
+    throw (engine_error() << __func__ << " failed: invalid return");
+  return ;
 }
 
 static void link_with_valid_objects() {
-  if (create_and_link(true, true, true) == false)
-    throw (engine_error() << Q_FUNC_INFO << " invalid return.");
+  if (!create_and_link(true, true, true))
+    throw (engine_error() << __func__ << " failed: invalid return");
+  return ;
 }
 
+/**
+ *  Check linkage of service escalation.
+ *
+ *  @return EXIT_SUCCESS on success.
+ */
 int main() {
+  // Initialization.
+  logging::engine::load();
+
   try {
+    // Tests.
     link_null_pointer();
     link_null_name();
     link_without_contacts();
@@ -155,9 +172,11 @@ int main() {
     link_with_valid_objects();
   }
   catch (std::exception const& e) {
-    qDebug() << "error: " << e.what();
+    // Exception handling.
+    std::cerr << "error: " << e.what() << std::endl;
     free_memory(get_global_macros());
-    return (1);
+    return (EXIT_FAILURE);
   }
-  return (0);
+
+  return (EXIT_SUCCESS);
 }

@@ -1,5 +1,5 @@
 /*
-** Copyright 2011 Merethis
+** Copyright 2011-2012 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -17,37 +17,42 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <QRegExp>
-#include <QStringList>
-#include <QRegExp>
-
-#include "error.hh"
+#include <algorithm>
+#include <cctype>
+#include <cstring>
+#include <regex.h>
+#include <sstream>
 #include "arg_definition.hh"
+#include "error.hh"
 #include "function.hh"
 
 using namespace com::centreon::engine::script;
 
 // Regexp pattern to extract name and arguments of soapStub function.
 char const* com::centreon::engine::script::function::_pattern =
-  "^SOAP_FMAC5 int SOAP_FMAC6 soap_call_centreonengine__(\\w*)\\("
+  "^SOAP_FMAC5 int SOAP_FMAC6 soap_call_centreonengine__([^\\(]*)\\("
   "struct soap \\*soap, "
   "const char \\*soap_endpoint, "
   "const char \\*soap_action, "
-  "(.*)\\);\n$";
+  "([^\\)]*)\\);$";
+
+/**************************************
+*                                     *
+*           Public Methods            *
+*                                     *
+**************************************/
 
 /**
- *  Default constructor.
+ *  Constructor.
  *
  *  @param[in] data The reference prototype.
  */
-function::function(QString const& data)
-  : _def(arg_definition::instance()),
-    _data(data) {
-
-}
+function::function(std::string const& data)
+  : _data(data),
+    _def(arg_definition::instance()) {}
 
 /**
- *  Default copy constructor.
+ *  Copy constructor.
  *
  *  @param[in] right The object to copy.
  */
@@ -59,9 +64,7 @@ function::function(function const& right)
 /**
  *  Default destructor.
  */
-function::~function() throw() {
-
-}
+function::~function() throw () {}
 
 /**
  *  Default copy operator.
@@ -85,43 +88,50 @@ function& function::operator=(function const& right) {
 }
 
 /**
- *  Check if the reference prototype is valid.
- *
- *  @param[in] data The reference prototype.
- *
- *  @return Return true if data is valid, false otherwise.
- */
-bool function::is_valid(QString const& data) throw() {
-  static QRegExp check(_pattern);
-  return (check.exactMatch(data));
-}
-
-/**
  *  Build all (function and prototype).
  */
 void function::build() {
-  QRegExp reg(_pattern);
-  if (reg.indexIn(_data) == -1 || reg.captureCount() != 2) {
-    throw (error("build failed `invalid string'."));
+  regex_t reg;
+  if (regcomp(&reg, _pattern, REG_EXTENDED) != 0)
+    throw (error("build failed: regcomp failed"));
+
+  static size_t const match(3);
+  regmatch_t pmatch[match];
+  memset(pmatch, 0, sizeof(pmatch));
+  if (regexec(&reg, _data.c_str(), match, pmatch, 0)
+      || reg.re_nsub != 2) {
+    regfree(&reg);
+    throw (error("build failed: regexec failed"));
   }
-  _function = reg.cap(1);
+
+  std::string function(
+                _data,
+                pmatch[1].rm_so,
+                pmatch[1].rm_eo - pmatch[1].rm_so);
+  std::string args(
+                _data,
+                pmatch[2].rm_so,
+                pmatch[2].rm_eo - pmatch[2].rm_so);
+  regfree(&reg);
+
+
+  _function = function;
   _new_function = _clean_function_name(_function);
-  _build_args_info(reg.cap(2));
-
-
+  _build_args_info(args);
   _build_help_prototype();
   _build_exec_prototype();
   _build_help_function();
   _build_exec_function();
+  return ;
 }
 
 /**
- *  Get the basic name of function.
+ *  Get the execute function code.
  *
- *  @return The basic name of function.
+ *  @return The execute function code.
  */
-QString const& function::get_name() const throw() {
-  return (_new_function);
+std::string const& function::get_exec_function() const throw () {
+  return (_exec_function);
 }
 
 /**
@@ -129,26 +139,8 @@ QString const& function::get_name() const throw() {
  *
  *  @return The execute function name.
  */
-QString function::get_exec_name() const throw() {
-  return ("exec_" + _new_function);
-}
-
-/**
- *  Get the help function name.
- *
- *  @return The help function name.
- */
-QString function::get_help_name() const throw() {
-  return ("help_" + _new_function);
-}
-
-/**
- *  Get the help function prototype.
- *
- *  @return The help function prototype.
- */
-QString const& function::get_help_prototype() const throw() {
-  return (_help_prototype);
+std::string function::get_exec_name() const throw () {
+  return (std::string("exec_").append(_new_function));
 }
 
 /**
@@ -156,7 +148,7 @@ QString const& function::get_help_prototype() const throw() {
  *
  *  @return the execute function prototype.
  */
-QString const& function::get_exec_prototype() const throw() {
+std::string const& function::get_exec_prototype() const throw () {
   return (_exec_prototype);
 }
 
@@ -165,257 +157,130 @@ QString const& function::get_exec_prototype() const throw() {
  *
  *  @return The help function code.
  */
-QString const& function::get_help_function() const throw() {
+std::string const& function::get_help_function() const throw () {
   return (_help_function);
 }
 
 /**
- *  Get the execute function code.
+ *  Get the help function name.
  *
- *  @return The execute function code.
+ *  @return The help function name.
  */
-QString const& function::get_exec_function() const throw() {
-  return (_exec_function);
+std::string function::get_help_name() const throw () {
+  std::string ret("help_");
+  ret.append(_new_function);
+  return (ret);
 }
 
 /**
- *  Build the help function prototype.
+ *  Get the help function prototype.
+ *
+ *  @return The help function prototype.
  */
-void function::_build_help_prototype() {
-  QString func("void help_%1()");
-  _help_prototype = func.arg(_new_function);
+std::string const& function::get_help_prototype() const throw () {
+  return (_help_prototype);
 }
 
 /**
- *  Build the execute function prototype.
+ *  Get the basic name of function.
+ *
+ *  @return The basic name of function.
  */
-void function::_build_exec_prototype() {
-  QString func("bool exec_%1(soap* s, char const* end_point, char const* action, QHash<QString, QString> const& args)");
-  _exec_prototype = func.arg(_new_function);
+std::string const& function::get_name() const throw () {
+  return (_new_function);
 }
 
 /**
- *  Build the help function code.
+ *  Check if the reference prototype is valid.
+ *
+ *  @param[in] data The reference prototype.
+ *
+ *  @return Return true if data is valid, false otherwise.
  */
-void function::_build_help_function() {
-  QString func("void help_%1() {\n"
-	       "  std::cout << \"%2\" << std::endl;\n"
-	       "}");
-  QString usage;
-
-  for (QList<arg_info>::const_iterator it = _args_info.begin(), end = _args_info.end();
-       it != end;
-       ++it) {
-    if (it->is_ref == false) {
-      usage += _build_help_args(_def.find_argument(it->type));
-    }
-  }
-
-  _help_function = func.arg(_new_function).arg(_new_function + " " + usage);
+bool function::is_valid(std::string const& data) throw () {
+  regex_t reg;
+  if (regcomp(&reg, _pattern, REG_EXTENDED | REG_NOSUB) != 0)
+    return (false);
+  bool ret(!regexec(&reg, data.c_str(), 0, NULL, 0));
+  regfree(&reg);
+  return (ret);
 }
 
-/**
- *  Build the execute function code.
- */
-void function::_build_exec_function() {
-  QString func("bool exec_%1(soap* s, char const* end_point, char const* action, QHash<QString, QString> const& args) {\n"
-	       "%3\n"
-	       "%4\n"
-	       "  int ret = soap_call_centreonengine__%5(s, end_point, action%6);\n"
-	       "%7\n"
-	       "  if (ret != SOAP_OK) {\n"
-	       "    soap_print_fault(s, stderr);\n"
-	       "    return (false);\n"
-	       "  }\n"
-	       "\n"
-	       "%8\n"
-	       "  return (true);\n"
-	       "}");
-
-  QString var;
-  for (QList<arg_info>::const_iterator it = _args_info.begin(), end = _args_info.end();
-       it != end;
-       ++it) {
-    var += "  " + it->type + " _" + it->name + ";\n";
-  }
-
-  QString alloc_var;
-  QString init_var;
-  QString release_var;
-  _list_pos = 0;
-  for (QList<arg_info>::const_iterator it = _args_info.begin(), end = _args_info.end();
-       it != end;
-       ++it) {
-    if (it->is_ref == false) {
-      argument const& arg = _def.find_argument(it->type);
-      QString base = "_" + it->name + (arg.is_primitive() ? "" : ".");
-      alloc_var += _build_exec_new(base, arg);
-      init_var += _build_exec_struct(base, arg);
-      release_var += _build_exec_delete(base, arg);
-    }
-  }
-
-  if (init_var == "") {
-    init_var = "  (void)args;\n";
-  }
-  else if (alloc_var != "") {
-    init_var = alloc_var + "\n" + init_var;
-  }
-
-  QString args;
-  for (QList<arg_info>::const_iterator it = _args_info.begin(), end = _args_info.end();
-       it != end;
-       ++it) {
-    args += (it->is_pointer ? ", &_" : ", _") + it->name;
-  }
-
-  QString display;
-  for (QList<arg_info>::const_iterator it = _args_info.begin(), end = _args_info.end();
-       it != end;
-       ++it) {
-    if (it->is_ref == true && _def.exist_argument(it->type)) {
-      display += "  std::cout << _" + it->name  + " << std::endl;\n";
-    }
-  }
-
-  _exec_function = func
-    .arg(_new_function)
-    .arg(var)
-    .arg(init_var)
-    .arg(_function)
-    .arg(args)
-    .arg(release_var)
-    .arg(display);
-  _exec_function.replace("\n\n\n", "\n\n");
-}
+/**************************************
+*                                     *
+*           Private Methods           *
+*                                     *
+**************************************/
 
 /**
  *  Build the arguments info list.
  */
-void function::_build_args_info(QString const& args_list) {
-  QStringList list = args_list.split(",").replaceInStrings("struct ", "");
+void function::_build_args_info(std::string const& args_list) {
+  // Split arguments.
+  std::list<std::string> list;
+  size_t prev(0);
+  size_t current;
+  while ((current = args_list.find(',', prev)) != std::string::npos) {
+    list.push_back(args_list.substr(prev, current - prev));
+    prev = current + 1;
+  }
+  list.push_back(args_list.substr(prev));
 
-  for (QStringList::const_iterator it = list.begin(), end = list.end();
+  for (std::list<std::string>::iterator
+         it(list.begin()),
+         end(list.end());
        it != end;
        ++it) {
-    QString arg = it->trimmed();
+    // Remove struct keyword.
+    size_t pos;
+    while ((pos = it->find("struct ")) != std::string::npos)
+      it->erase(pos, 7);
 
+    // Trim argument.
+    while (!it->empty() && isspace((*it)[0]))
+      it->erase(0, 1);
+    while (!it->empty() && isspace((*it)[it->size() - 1]))
+      it->resize(it->size() - 1);
+
+    // Fetch information.
     arg_info info;
-    info.is_ref = (arg.indexOf('&') == -1 ? false : true);
-    info.is_pointer = (arg.indexOf('*') == -1 ? false : true);
+    info.is_ref = ((it->find('&') == std::string::npos) ? false : true);
+    info.is_pointer = ((it->find('*') == std::string::npos)
+                       ? false
+                       : true);
 
-    arg.remove('*');
-    arg.remove('&');
+    // Remove characters.
+    while ((pos = it->find('*')) != std::string::npos)
+      it->erase(pos, 1);
+    while ((pos = it->find('&')) != std::string::npos)
+      it->erase(pos, 1);
 
-    int idx = arg.lastIndexOf(' ');
-    if (idx == -1) {
-      throw (error("invalid argument."));
-    }
-    info.type = arg.left(idx).trimmed();
-    info.name = arg.right(arg.size() - idx).trimmed();
+    // Find last space.
+    size_t idx(it->rfind(' '));
+    if (idx == std::string::npos)
+      throw (error("invalid argument"));
+
+    // Type.
+    info.type = it->substr(0, idx);
+    while (!info.type.empty() && isspace(info.type[0]))
+      info.type.erase(0, 1);
+    while (!info.type.empty()
+           && isspace(info.type[info.type.size() - 1]))
+      info.type.resize(info.type.size() - 1);
+
+    // Name.
+    info.name = it->substr(idx);
+    while (!info.name.empty() && isspace(info.name[0]))
+      info.name.erase(0, 1);
+    while (!info.name.empty()
+           && isspace(info.name[info.name.size() - 1]))
+      info.name.resize(info.name.size() - 1);
+
+    // Push info.
     _args_info.push_back(info);
   }
-}
 
-/**
- *  Build the help arguments for build function prototype.
- *
- *  @param[in] arg The arguments reference.
- *
- *  @return The new arguments.
- */
-QString function::_build_help_args(argument const& arg) const {
-  if (arg.is_primitive() == true) {
-    if (arg.is_optional() == false)
-      return (" " + arg.get_help());
-    return (" [" + arg.get_help() + "]");
-  }
-
-  QString ret;
-  QList<argument> const& args = arg.get_args();
-  for (QList<argument>::const_iterator it = args.begin(), end = args.end();
-       it != end;
-       ++it) {
-    ret += _build_help_args(*it);
-  }
-  return (ret);
-}
-
-/**
- *  Build the initialization allocation.
- *
- *  @param[in] base The variable name of the struct.
- *  @param[in] arg  The argument to build init struct.
- *
- *  @return The allocation struct.
- */
-QString function::_build_exec_new(QString const& base,
-				    argument const& arg) {
-  if (arg.is_primitive() == true) {
-    return ("");
-  }
-
-  QString ret;
-  QList<argument> const& args = arg.get_args();
-  for (QList<argument>::const_iterator it = args.begin(), end = args.end();
-       it != end;
-       ++it) {
-
-    if (it->is_primitive()) {
-      ret += _build_exec_new(base + it->get_name(), *it);
-    }
-    else {
-      ret += "  " + base + it->get_name() + " = new " + it->get_type() + "();\n";
-      ret += _build_exec_new(base + it->get_name() + "->", *it);
-    }
-  }
-  return (ret);
-}
-
-/**
- *  Build the initialization struct.
- *
- *  @param[in] base The variable name of the struct.
- *  @param[in] arg  The argument to build init struct.
- *
- *  @return The initialization struct.
- */
-QString function::_build_exec_struct(QString const& base,
-				     argument const& arg) {
-  if (arg.is_primitive() == true) {
-    if (!arg.is_optional()) {
-      return ("  if (args.find(\"" + arg.get_help() + "\") == args.end())\n"
-              "    throw (error(\"argument \\\"" + arg.get_help() + "\\\" missing.\"));\n"
-              "  " + base + " = " + _get_qstring_methode(arg.get_type())
-	      + "(args[\"" + arg.get_help() + "\"]);\n");
-    }
-    else if (arg.is_array()) {
-      return ("  if (args.find(\"" + arg.get_help() + "\") != args.end()) {\n"
-              "    " + base + " = " + _get_qstring_methode(arg.get_type())
-	      + "(args[\"" + arg.get_help() + "\"]);\n"
-              "  }\n");
-    }
-    else {
-      QString varname(base);
-      varname.replace(QRegExp("[->\\.]"), "_");
-      return ("  " + arg.get_type() + " " + varname + ";\n"
-              "  if (args.find(\"" + arg.get_help() + "\") != args.end()) {\n"
-              "    " + varname + " = " + _get_qstring_methode(arg.get_type())
-	      + "(args[\"" + arg.get_help() + "\"])" + ";\n"
-	      + "    " + base + " = &" + varname + ";\n"
-              "  }\n");
-    }
-  }
-
-  QString ret;
-  QList<argument> const& args = arg.get_args();
-  for (QList<argument>::const_iterator it = args.begin(), end = args.end();
-       it != end;
-       ++it) {
-    char const* accessor = (it->is_primitive() ? "" : "->");
-    ret += _build_exec_struct(base + it->get_name() + accessor, *it);
-  }
-  return (ret);
+  return ;
 }
 
 /**
@@ -426,60 +291,285 @@ QString function::_build_exec_struct(QString const& base,
  *
  *  @return The deallocation struct.
  */
-QString function::_build_exec_delete(QString const& base,
-				     argument const& arg) {
-  if (arg.is_primitive() == true) {
+std::string function::_build_exec_delete(
+                        std::string const& base,
+                        argument const& arg) {
+  if (arg.is_primitive())
     return ("");
-  }
 
-  QString ret;
-  QList<argument> const& args = arg.get_args();
-  for (QList<argument>::const_iterator it = args.begin(), end = args.end();
+  std::string ret;
+  std::list<argument> const& args(arg.get_args());
+  for (std::list<argument>::const_iterator
+         it(args.begin()),
+         end(args.end());
        it != end;
        ++it) {
-
     if (it->is_primitive()) {
-      ret += _build_exec_new(base + it->get_name(), *it);
+      std::string arg(base);
+      arg.append(it->get_name());
+      ret.append(_build_exec_new(arg, *it));
     }
     else {
-      ret += "  delete " + base + it->get_name() + ";\n";
-      ret += _build_exec_new(base + it->get_name() + "->", *it);
+      ret.append("  delete ");
+      ret.append(base);
+      ret.append(it->get_name());
+      ret.append(";\n");
+      std::string arg(base);
+      arg.append(it->get_name());
+      arg.append("->");
+      ret.append(_build_exec_new(arg, *it));
     }
   }
   return (ret);
 }
 
 /**
- *  Change a QString to an other type with appropriate QString methode.
- *
- *  @param[in] type The variable type.
- *
- *  @return Return the QString methode name to translate the type.
+ *  Build the execute function code.
  */
-QString function::_get_qstring_methode(QString type) const {
-  if (type == "std::vector<std::string>") {
-    return ("toStdVector");
-  }
-
-  type.replace("time_t", "long long");
-  type.replace("ULONG64", "unsigned long long");
-  type.replace("bool", "int");
-  type.replace("unsigned", "u").replace("::", " ");
-  type = type.toLower();
-  type = type.left(1).toUpper() + type.mid(1);
-
-  QString ret("to");
-  for (QString::const_iterator it = type.begin(), end = type.end();
+void function::_build_exec_function() {
+  std::string var;
+  for (std::list<arg_info>::const_iterator
+         it(_args_info.begin()),
+         end(_args_info.end());
        it != end;
        ++it) {
-    if (it != type.begin() && *(it - 1) == ' ') {
-      ret += it->toUpper();
+    std::ostringstream oss;
+    oss << "  " << it->type << " _" << it->name << ";\n";
+    var.append(oss.str());
+  }
+
+  std::string alloc_var;
+  std::string init_var;
+  std::string release_var;
+  _list_pos = 0;
+  for (std::list<arg_info>::const_iterator
+         it(_args_info.begin()),
+         end(_args_info.end());
+       it != end;
+       ++it) {
+    if (!it->is_ref) {
+      argument const& arg(_def.find_argument(it->type));
+      std::string base;
+      {
+        std::ostringstream oss;
+        oss << "_" << it->name << (arg.is_primitive() ? "" : ".");
+        base = oss.str();
+      }
+      alloc_var.append(_build_exec_new(base, arg));
+      init_var.append(_build_exec_struct(base, arg));
+      release_var.append(_build_exec_delete(base, arg));
     }
-    else if (*it != ' ') {
-      ret += *it;
+  }
+
+  if (init_var == "")
+    init_var = "  (void)args;\n";
+  else if (alloc_var != "") {
+    std::ostringstream oss;
+    oss << alloc_var << "\n" << init_var;
+    init_var = oss.str();
+  }
+
+  std::string args;
+  for (std::list<arg_info>::const_iterator
+         it(_args_info.begin()),
+         end(_args_info.end());
+       it != end;
+       ++it) {
+    args.append(it->is_pointer ? ", &_" : ", _");
+    args.append(it->name);
+  }
+
+  std::string display;
+  for (std::list<arg_info>::const_iterator
+         it(_args_info.begin()),
+         end(_args_info.end());
+       it != end;
+       ++it) {
+    if (it->is_ref && _def.exist_argument(it->type)) {
+      display.append("  std::cout << _");
+      display.append(it->name);
+      display.append(" << std::endl;\n");
+    }
+  }
+
+  std::ostringstream oss;
+  oss << "bool exec_" << _new_function << "(soap* s, char const* end_point, char const* action, std::map<std::string, std::string>& args) {\n"
+      << var << "\n"
+      << init_var << "\n"
+      << "  int ret(soap_call_centreonengine__" << _function << "(s, end_point, action" << args << "));\n"
+      << release_var << "\n"
+      << "  if (ret != SOAP_OK) {\n"
+      << "    soap_print_fault(s, stderr);\n"
+      << "    return (false);\n"
+      << "  }\n"
+      << "\n"
+      << display << "\n"
+      << "  return (true);\n"
+      << "}";
+  _exec_function = oss.str();
+  //_exec_function.replace("\n\n\n", "\n\n");
+  return ;
+}
+
+/**
+ *  Build the initialization allocation.
+ *
+ *  @param[in] base The variable name of the struct.
+ *  @param[in] arg  The argument to build init struct.
+ *
+ *  @return The allocation struct.
+ */
+std::string function::_build_exec_new(
+                        std::string const& base,
+                        argument const& arg) {
+  if (arg.is_primitive())
+    return ("");
+
+  std::string ret;
+  std::list<argument> const& args(arg.get_args());
+  for (std::list<argument>::const_iterator
+         it(args.begin()),
+         end(args.end());
+       it != end;
+       ++it) {
+    if (it->is_primitive())
+      ret.append(_build_exec_new(base + it->get_name(), *it));
+    else {
+      ret.append("  ");
+      ret.append(base);
+      ret.append(it->get_name());
+      ret.append(" = new ");
+      ret.append(it->get_type());
+      ret.append("();\n");
+      ret.append(_build_exec_new(base + it->get_name() + "->", *it));
     }
   }
   return (ret);
+}
+
+/**
+ *  Build the execute function prototype.
+ */
+void function::_build_exec_prototype() {
+  std::ostringstream oss;
+  oss << "bool exec_" << _new_function << "(soap* s, char const* end_point, char const* action, std::map<std::string, std::string>& args)";
+  _exec_prototype = oss.str();
+  return ;
+}
+
+/**
+ *  Build the initialization struct.
+ *
+ *  @param[in] base The variable name of the struct.
+ *  @param[in] arg  The argument to build init struct.
+ *
+ *  @return The initialization struct.
+ */
+std::string function::_build_exec_struct(
+                        std::string const& base,
+                        argument const& arg) {
+  if (arg.is_primitive()) {
+    if (!arg.is_optional()) {
+      return ("  if (args.find(\"" + arg.get_help() + "\") == args.end())\n"
+              "    throw (error(\"argument \\\"" + arg.get_help() + "\\\" missing.\"));\n"
+              "  " + base + " = " + _get_string_method(arg.get_type())
+	      + "(args[\"" + arg.get_help() + "\"]);\n");
+    }
+    else if (arg.is_array()) {
+      return ("  if (args.find(\"" + arg.get_help() + "\") != args.end()) {\n"
+              "    " + base + " = " + _get_string_method(arg.get_type())
+	      + "(args[\"" + arg.get_help() + "\"]);\n"
+              "  }\n");
+    }
+    else {
+      std::string varname(base);
+      _replace(varname, "-", "_");
+      _replace(varname, ">", "_");
+      _replace(varname, ".", "_");
+
+      std::ostringstream oss;
+      oss << "  " << arg.get_type() << " " << varname << ";\n"
+          << "  if (args.find(\"" << arg.get_help() << "\") != args.end()) {\n"
+          << "    " << varname << " = " << _get_string_method(arg.get_type())
+          << "(args[\"" << arg.get_help() << "\"])" << ";\n"
+          << "    " << base << " = &" << varname << ";\n"
+          << "  }\n";
+      return (oss.str());
+    }
+  }
+
+  std::string ret;
+  std::list<argument> const& args(arg.get_args());
+  for (std::list<argument>::const_iterator
+         it(args.begin()),
+         end(args.end());
+       it != end;
+       ++it) {
+    char const* accessor = (it->is_primitive() ? "" : "->");
+    ret.append(
+          _build_exec_struct(base + it->get_name() + accessor, *it));
+  }
+  return (ret);
+}
+
+/**
+ *  Build the help arguments for build function prototype.
+ *
+ *  @param[in] arg The arguments reference.
+ *
+ *  @return The new arguments.
+ */
+std::string function::_build_help_args(argument const& arg) const {
+  if (arg.is_primitive()) {
+    if (!arg.is_optional())
+      return (" " + arg.get_help());
+    return (" [" + arg.get_help() + "]");
+  }
+
+  std::string ret;
+  std::list<argument> const& args(arg.get_args());
+  for (std::list<argument>::const_iterator
+         it(args.begin()),
+         end(args.end());
+       it != end;
+       ++it)
+    ret.append(_build_help_args(*it));
+  return (ret);
+}
+
+/**
+ *  Build the help function code.
+ */
+void function::_build_help_function() {
+  // Printable usage.
+  std::string usage;
+  for (std::list<arg_info>::const_iterator
+         it(_args_info.begin()),
+         end(_args_info.end());
+       it != end;
+       ++it) {
+    if (!it->is_ref)
+      usage.append(_build_help_args(_def.find_argument(it->type)));
+  }
+
+  // Usage routine.
+  std::ostringstream oss;
+  oss << "void help_" << _new_function << "() {\n"
+      << "  std::cout << \"" << _new_function << " " << usage << "\" << std::endl;\n"
+      << "}";
+  _help_function = oss.str();
+
+  return ;
+}
+
+/**
+ *  Build the help function prototype.
+ */
+void function::_build_help_prototype() {
+  std::ostringstream oss;
+  oss << "void help_" << _new_function << "()";
+  _help_prototype = oss.str();
+  return ;
 }
 
 /**
@@ -490,20 +580,72 @@ QString function::_get_qstring_methode(QString type) const {
  *
  *  @return Return the new function name.
  */
-QString function::_clean_function_name(QString const& name) {
-  QString ret;
-
-  for (QString::const_iterator it = name.begin(), end = name.end();
+std::string function::_clean_function_name(std::string const& name) {
+  std::string ret;
+  for (std::string::const_iterator it(name.begin()), end(name.end());
        it != end;
        ++it) {
-    if (it->isUpper()) {
+    if (isupper(*it)) {
       ret += "_";
-      ret += it->toLower();
+      ret += tolower(*it);
     }
-    else {
+    else
       ret += *it;
-    }
   }
 
   return (ret);
+}
+/**
+ *  Change a std::string to an other type with appropriate std::string
+ *  method.
+ *
+ *  @param[in] type The variable type.
+ *
+ *  @return Return the std::string method name to translate the type.
+ */
+std::string function::_get_string_method(std::string type) const {
+  if (type.empty())
+    return ("");
+  if (type == "std::vector<std::string>")
+    return ("toStdVector");
+  _replace(type, "time_t", "long long");
+  _replace(type, "ULONG64", "unsigned long long");
+  _replace(type, "bool", "int");
+  _replace(type, "unsigned", "u");
+  _replace(type, "::", " ");
+  std::transform(
+         type.begin(),
+         type.end(),
+         type.begin(),
+         tolower);
+  type[0] = toupper(type[0]);
+
+  std::string ret("to");
+  for (std::string::const_iterator it(type.begin()), end(type.end());
+       it != end;
+       ++it) {
+    if ((it != type.begin()) && (*(it - 1) == ' '))
+      ret += toupper(*it);
+    else if (*it != ' ')
+      ret += *it;
+  }
+  return (ret);
+}
+
+/**
+ *  Find and replace string.
+ *
+ *  @param[out] str      The string to modify.
+ *  @param[in]  old_str  The string to old string.
+ *  @param[in]  new_str  The string to new string.
+ */
+std::string& function::_replace(
+                         std::string& str,
+                         std::string const& old_str,
+                         std::string const& new_str) {
+  for (size_t pos(0);
+       ((pos = str.find(old_str, pos)) != std::string::npos);
+       ++pos)
+    str.replace(pos, old_str.size(), new_str);
+  return (str);
 }

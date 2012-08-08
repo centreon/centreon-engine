@@ -17,30 +17,46 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <cstdlib>
 #include <exception>
-#include <QDebug>
+#include <iostream>
 #include "com/centreon/engine/error.hh"
+#include "com/centreon/engine/logging/engine.hh"
 #include "com/centreon/engine/macros.hh"
 #include "test/objects/create_object.hh"
 #include "test/objects/release.hh"
 
+using namespace com::centreon::engine;
 using namespace test::objects;
 
+/**
+ *  Check that host can be properly released.
+ *
+ *  @return EXIT_SUCCESS on success.
+ */
 int main() {
+  // Initialization.
+  logging::engine::load();
+
   try {
+    // Tests.
     release_null_pointer(static_cast<host const*>(NULL));
-    release_objects(&create_host,
-                   host_list,
-                   host_list_tail);
-    release_objects(&create_host,
-                    host_list,
-                    host_list_tail,
-                    10);
+    release_objects(
+      &create_host,
+      host_list,
+      host_list_tail);
+    release_objects(
+      &create_host,
+      host_list,
+      host_list_tail,
+      10);
   }
   catch (std::exception const& e) {
-    qDebug() << "error: " << e.what();
+    // Exception handling.
+    std::cerr << "error: " << e.what() << std::endl;
     free_memory(get_global_macros());
-    return (1);
+    return (EXIT_FAILURE);
   }
-  return (0);
+
+  return (EXIT_SUCCESS);
 }
