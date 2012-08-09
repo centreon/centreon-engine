@@ -18,12 +18,12 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <map>
 #include <stdlib.h>
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/macros/grab_value.hh"
 #include "com/centreon/engine/macros.hh"
+#include "com/centreon/unordered_hash.hh"
 
 using namespace com::centreon::engine::logging;
 
@@ -711,7 +711,7 @@ static int handle_summary_macro(nagios_macros* mac,
 
 // Redirection object.
 struct grab_value_redirection {
-  typedef std::map<unsigned int, int (*)(nagios_macros*, int, char const*, char const*, char**, int*)> entry;
+  typedef umap<unsigned int, int (*)(nagios_macros*, int, char const*, char const*, char**, int*)> entry;
   entry routines;
   grab_value_redirection() {
     // Host macros.

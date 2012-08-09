@@ -68,7 +68,7 @@ void set::add_command(shared_ptr<command> cmd) {
  */
 shared_ptr<commands::command> set::get_command(
                                      std::string const& cmd_name) {
-  std::map<std::string, shared_ptr<command> >::iterator
+  umap<std::string, shared_ptr<command> >::iterator
     it(_list.find(cmd_name));
   if (it == _list.end())
     throw (engine_error() << "command '" << cmd_name << "' not found");

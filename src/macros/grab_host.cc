@@ -18,7 +18,6 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <map>
 #include <sstream>
 #include <utility>
 #include "com/centreon/engine/logging/logger.hh"
@@ -28,6 +27,7 @@
 #include "com/centreon/engine/macros/grab.hh"
 #include "com/centreon/engine/macros/grab_host.hh"
 #include "com/centreon/engine/macros/misc.hh"
+#include "com/centreon/unordered_hash.hh"
 
 using namespace com::centreon::engine::macros;
 using namespace com::centreon::engine::logging;
@@ -180,7 +180,7 @@ static char* get_host_total_services(host& hst, nagios_macros* mac) {
 
 // Redirection object.
 struct grab_host_redirection {
-  typedef std::map<unsigned int, std::pair<char* (*)(host&, nagios_macros*), bool> > entry;
+  typedef umap<unsigned int, std::pair<char* (*)(host&, nagios_macros*), bool> > entry;
   entry routines;
   grab_host_redirection() {
     // Name.

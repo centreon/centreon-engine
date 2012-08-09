@@ -95,7 +95,7 @@ void hash_timed_event::erase(priority p, timed_event* event) {
  *  @param[in] ptr  The event data.
  */
 timed_event* hash_timed_event::find(priority p, type t, void* ptr) {
-  htable::iterator it(_hevent[t][p].find(ptr));
+  umap<void*, timed_event*>::iterator it(_hevent[t][p].find(ptr));
   if (it == _hevent[t][p].end())
     return (NULL);
   return (it->second);

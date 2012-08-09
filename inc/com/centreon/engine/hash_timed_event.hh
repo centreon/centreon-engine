@@ -20,19 +20,9 @@
 #ifndef CCE_HASH_TIMED_EVENT_HH
 #  define CCE_HASH_TIMED_EVENT_HH
 
-#  if defined(__GXX_EXPERIMENTAL_CXX0X__)
-#    include <unordered_map>
-#    define htable std::unordered_map<void*, timed_event*>
-#  elif defined(__GNUC__) && __GNUC__ >= 4
-#    include <tr1/unordered_map>
-#    define htable std::tr1::unordered_map<void*, timed_event*>
-#  else
-#    include <map>
-#    define htable std::map<void*, timed_event*>
-#  endif // CPP0X, GNUC4
-
 #  include "com/centreon/engine/events.hh"
 #  include "com/centreon/engine/namespace.hh"
+#  include "com/centreon/unordered_hash.hh"
 
 CCE_BEGIN()
 
@@ -66,7 +56,8 @@ public:
 
 private:
   hash_timed_event& _internal_copy(hash_timed_event const& right);
-  htable            _hevent[2][2];
+  umap<void*, timed_event*>
+                    _hevent[2][2];
 };
 
 CCE_END()

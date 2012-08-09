@@ -21,11 +21,11 @@
 #  define CCE_CONFIGURATION_STATE_HH
 
 #  include <list>
-#  include <map>
 #  include <sstream>
 #  include <string>
 #  include "com/centreon/engine/error.hh"
 #  include "com/centreon/engine/namespace.hh"
+#  include "com/centreon/unordered_hash.hh"
 
 // Forward declaration.
 struct nagios_macros;
@@ -528,7 +528,7 @@ namespace               configuration {
     }
   };
 
-    typedef std::map<std::string, bool (*)(std::string const&, state& config)> methods;
+    typedef umap<std::string, bool (*)(std::string const&, state& config)> methods;
 
     std::string         _tab_string[max_string];
     unsigned long       _tab_ulong[max_ulong];

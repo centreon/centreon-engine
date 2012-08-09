@@ -20,11 +20,11 @@
 #ifndef CCE_COMMANDS_SET_HH
 #  define CCE_COMMANDS_SET_HH
 
-#  include <map>
 #  include <string>
 #  include "com/centreon/engine/commands/command.hh"
 #  include "com/centreon/engine/namespace.hh"
 #  include "com/centreon/shared_ptr.hh"
+#  include "com/centreon/unordered_hash.hh"
 
 CCE_BEGIN()
 
@@ -55,7 +55,7 @@ namespace       commands {
     set&        operator=(set const& right);
     void        _internal_copy(set const& right);
 
-    std::map<std::string, shared_ptr<command> >
+    umap<std::string, shared_ptr<command> >
                 _list;
   };
 }
