@@ -17,19 +17,18 @@
 */
 
 #ifndef CCE_FIRST_NOTIF_DELAY_COMMON_HH_
-# define CCE_FIRST_NOTIF_DELAY_COMMON_HH_
+#  define CCE_FIRST_NOTIF_DELAY_COMMON_HH_
 
-# define FIRST_NOTIF_DELAY 3
-# define FLAG_FILE "/tmp/centreon_engine_unit_test.tmp"
+#  include <string>
+#  include "com/centreon/engine/namespace.hh"
 
-namespace                  com {
-  namespace                centreon {
-    namespace              engine {
-      bool                 file_exists(char const* path);
-      int                  first_notif_delay_default_setup();
-      void                 first_notif_delay_default_cleanup();
-    }
-  }
-}
+#  define FIRST_NOTIF_DELAY 3
+
+CCE_BEGIN()
+
+int  first_notif_delay_default_setup(std::string const& path);
+void first_notif_delay_default_cleanup();
+
+CCE_END()
 
 #endif /* !CCE_FIRST_NOTIF_DELAY_COMMON_HH_ */

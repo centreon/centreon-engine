@@ -23,6 +23,7 @@
 #include "com/centreon/concurrency/thread.hh"
 #include "com/centreon/engine/checks.hh"
 #include "com/centreon/engine/globals.hh"
+#include "com/centreon/io/file_stream.hh"
 #include "test/notifications/first_notif_delay/common.hh"
 #include "test/unittest.hh"
 
@@ -36,9 +37,9 @@ using namespace com::centreon::engine;
  *
  *  @return 0 on success.
  */
-static int check(check_result& cr) {
+static int check(std::string const& tmpfile, check_result& cr) {
   // Remove flag file.
-  ::remove(FLAG_FILE);
+  io::file_stream::remove(tmpfile);
 
   // Return value.
   int retval(0);
@@ -50,7 +51,7 @@ static int check(check_result& cr) {
     cr.start_time.tv_sec = now;
     cr.finish_time.tv_sec = now;
     retval |= handle_async_service_check_result(service_list, &cr);
-    retval |= file_exists(FLAG_FILE);
+    retval |= io::file_stream::exists(tmpfile);
     concurrency::thread::sleep(1);
     now = time(NULL);
   }
@@ -62,7 +63,7 @@ static int check(check_result& cr) {
   retval |= handle_async_service_check_result(service_list, &cr);
 
   // Check that file flag exists.
-  retval |= !file_exists(FLAG_FILE);
+  retval |= !io::file_stream::exists(tmpfile);
 
   return (retval);
 }
@@ -79,8 +80,11 @@ int main_test(int argc, char** argv) {
   // Return value.
   int retval(0);
 
+  // tmpfile.
+  std::string tmpfile(io::file_stream::temp_path());
+
   // Setup default configuration.
-  retval |= first_notif_delay_default_setup();
+  retval |= first_notif_delay_default_setup(tmpfile);
 
   if (!retval) {
     // Initialize fake check result.
@@ -99,7 +103,7 @@ int main_test(int argc, char** argv) {
     cr.output = output;
 
     // First check.
-    retval |= check(cr);
+    retval |= check(tmpfile, cr);
 
     // Recovery.
     concurrency::thread::sleep(1);
@@ -111,11 +115,11 @@ int main_test(int argc, char** argv) {
     // Check that FND was reset properly.
     concurrency::thread::sleep(1);
     cr.return_code = 2;
-    retval |= check(cr);
+    retval |= check(tmpfile, cr);
   }
 
   // Remove flag file.
-  ::remove(FLAG_FILE);
+  io::file_stream::remove(tmpfile);
 
   return (retval);
 }

@@ -23,6 +23,7 @@
 #include "com/centreon/engine/checks.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/globals.hh"
+#include "com/centreon/io/file_stream.hh"
 #include "test/notifications/first_notif_delay/common.hh"
 #include "test/unittest.hh"
 
@@ -41,8 +42,11 @@ int main_test(int argc, char** argv) {
   // Return value.
   int retval(0);
 
+  // tmpfile.
+  std::string tmpfile(io::file_stream::temp_path());
+
   // Setup default configuration.
-  retval |= first_notif_delay_default_setup();
+  retval |= first_notif_delay_default_setup(tmpfile);
 
   if (!retval) {
     // Adjust default setup.
@@ -73,13 +77,13 @@ int main_test(int argc, char** argv) {
     retval |= handle_async_host_check_result_3x(host_list, &cr);
 
     // Check that FND was not respected.
-    retval |= !file_exists(FLAG_FILE);
+    retval |= !io::file_stream::remove(tmpfile);
 
     first_notif_delay_default_cleanup();
   }
 
   // Remove flag file.
-  ::remove(FLAG_FILE);
+  io::file_stream::remove(tmpfile);
 
   return (retval);
 }

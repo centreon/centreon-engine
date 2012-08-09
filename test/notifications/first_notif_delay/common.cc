@@ -21,20 +21,10 @@
 #include <unistd.h>
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/objects.hh"
+#include "com/centreon/io/file_stream.hh"
 #include "test/notifications/first_notif_delay/common.hh"
 
-using namespace com::centreon::engine;
-
-/**
- *  Check if a file exists.
- *
- *  @param[in] path  The file path to check.
- *
- *  @return True if the file exists, otherwise false.
- */
-bool com::centreon::engine::file_exists(char const* path) {
-  return (!access(path, F_OK));
-}
+using namespace com::centreon;
 
 /**
  *  Create a default setup for use with first_notification_delay unit
@@ -42,12 +32,12 @@ bool com::centreon::engine::file_exists(char const* path) {
  *
  *  @return 0 on success.
  */
-int com::centreon::engine::first_notif_delay_default_setup() {
+int engine::first_notif_delay_default_setup(std::string const& path) {
   // Interval length is 1 second.
   config->set_interval_length(1);
 
   // Remove flag file.
-  ::remove(FLAG_FILE);
+  io::file_stream::remove(path);
 
   // Return value.
   int retval(0);
@@ -205,17 +195,16 @@ int com::centreon::engine::first_notif_delay_default_setup() {
   svc->contacts->contact_ptr = cntct;
 
   // Add command.
-  command* cmd(add_command(
-    const_cast<char*>("mycommand"),
-    const_cast<char*>("touch " FLAG_FILE)));
+  std::string cmd_str("touch " + path);
+  command* cmd(add_command("mycommand", cmd_str.c_str()));
   retval |= (NULL == add_host_notification_command_to_contact(
     cntct,
-    const_cast<char*>("mycommand")));
+    "mycommand"));
   retval |= (NULL == cmd);
   cntct->host_notification_commands->command_ptr = cmd;
   retval |= (NULL == add_service_notification_command_to_contact(
     cntct,
-    const_cast<char*>("mycommand")));
+    "mycommand"));
   cntct->service_notification_commands->command_ptr = cmd;
 
   return (retval);
@@ -225,7 +214,7 @@ int com::centreon::engine::first_notif_delay_default_setup() {
  *  Cleanup a default setup for use with first_notification_delay
  *  unit tests.
  */
-void com::centreon::engine::first_notif_delay_default_cleanup() {
+void engine::first_notif_delay_default_cleanup() {
   delete[] host_list->contacts->contact_name;
   delete host_list->contacts;
   delete[] host_list->name;
