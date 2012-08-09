@@ -73,12 +73,11 @@ namespace               configuration {
       ilf_smart           // smart interleave
     };
 
-                        state();
-                        state(state const& right);
-                        ~state() throw ();
-    state&              operator=(state const& right);
-    void                reset();
+    static state&       instance();
+    static void         load();
     void                parse(std::string const& filename);
+    void                reset();
+    static void         unload();
     std::string const&  get_admin_email() const throw ();
     std::string const&  get_admin_pager() const throw ();
     std::string const&  get_log_file() const throw ();
@@ -453,6 +452,10 @@ namespace               configuration {
       max_bool
     };
 
+                        state();
+                        state(state const& right);
+                        ~state() throw ();
+    state&              operator=(state const& right);
     void                _reset();
     void                _parse_resource_file(std::string const& value);
 

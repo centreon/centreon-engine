@@ -22,7 +22,6 @@
 
 #  include <list>
 #  include <map>
-#  include <memory>
 #  include <string>
 #  include "com/centreon/engine/broker/handle.hh"
 #  include "com/centreon/engine/namespace.hh"
@@ -39,7 +38,6 @@ namespace                  broker {
    */
   class                    loader {
   public:
-    virtual                ~loader() throw ();
     shared_ptr<handle>     add_module(
                              std::string const& filename = "",
                              std::string const& args = "");
@@ -56,11 +54,10 @@ namespace                  broker {
   private:
                            loader();
                            loader(loader const& right);
+    virtual                ~loader() throw ();
     loader&                operator=(loader const& right);
     void                   _internal_copy(loader const& right);
 
-    static std::auto_ptr<loader>
-                           _instance;
     std::multimap<std::string, shared_ptr<handle> >
                            _modules;
   };

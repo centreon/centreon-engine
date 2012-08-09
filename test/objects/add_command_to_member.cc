@@ -26,6 +26,7 @@
 #include "com/centreon/engine/utils.hh"
 #include "test/objects/add_object_to_member.hh"
 #include "test/objects/create_object.hh"
+#include "test/unittest.hh"
 
 using namespace com::centreon::engine;
 using namespace test::objects;
@@ -35,11 +36,9 @@ using namespace test::objects;
  *
  *  @return EXIT_SUCCESS on success.
  */
-int main() {
-  // Initialization.
-  logging::engine::load();
-  commands::set::load();
-
+int main_test(int argc, char** argv) {
+  (void)argc;
+  (void)argv;
   try {
     // Tests.
     add_with_null_member(&objects::add_commands_to_object);
@@ -61,4 +60,12 @@ int main() {
   }
 
   return (EXIT_SUCCESS);
+}
+
+/**
+ *  Init the unit test.
+ */
+int main(int argc, char** argv) {
+  com::centreon::engine::unittest utest(argc, argv, &main_test);
+  return (utest.run());
 }

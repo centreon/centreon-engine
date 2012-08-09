@@ -29,7 +29,9 @@
 #include "com/centreon/shared_ptr.hh"
 #include "test/unittest.hh"
 
+using namespace com::centreon;
 using namespace com::centreon::engine;
+using namespace com::centreon::engine::broker;
 
 /**************************************
 *                                     *
@@ -55,14 +57,14 @@ int main_test(int argc, char** argv) {
   (void)argv;
 
   // Add event logged data to broker.
-  config.set_event_broker_options(BROKER_LOGGED_DATA);
+  config->set_event_broker_options(BROKER_LOGGED_DATA);
 
   // Get instance of the module loader.
   broker::loader& loader(broker::loader::instance());
 
   // Load dummy module.
-  if (loader.load_directory(".") != 1)
-    throw (engine_error() << "module loading failed");
+  shared_ptr<handle> mod(loader.add_module("./dummymod.so"));
+  mod->open();
 
   // Get instance of logging engine.
   logging::engine& engine(logging::engine::instance());

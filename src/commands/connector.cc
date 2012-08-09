@@ -63,7 +63,7 @@ connector::connector(
   // Disable stderr.
   _process.enable_stream(process::err, false);
 
-  if (config.get_enable_environment_macros())
+  if (config->get_enable_environment_macros())
     logger(log_runtime_warning, basic)
       << "**WARNING** Connector dosn't use enable environement macros!";
 }

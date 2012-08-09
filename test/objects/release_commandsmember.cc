@@ -25,6 +25,7 @@
 #include "com/centreon/engine/utils.hh"
 #include "test/objects/create_object.hh"
 #include "test/objects/release.hh"
+#include "test/unittest.hh"
 
 using namespace test::objects;
 
@@ -33,7 +34,9 @@ using namespace test::objects;
  *
  *  @return EXIT_SUCCESS on success.
  */
-int main() {
+int main_test(int argc, char** argv) {
+  (void)argc;
+  (void)argv;
   try {
     // Tests.
     release_null_pointer(static_cast<commandsmember const*>(NULL));
@@ -47,4 +50,12 @@ int main() {
   }
 
   return (EXIT_SUCCESS);
+}
+
+/**
+ *  Init the unit test.
+ */
+int main(int argc, char** argv) {
+  com::centreon::engine::unittest utest(argc, argv, &main_test);
+  return (utest.run());
 }

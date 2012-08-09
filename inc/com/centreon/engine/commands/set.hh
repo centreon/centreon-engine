@@ -38,7 +38,6 @@ namespace       commands {
    */
   class         set {
   public:
-                ~set() throw ();
     void        add_command(command const& cmd);
     void        add_command(
                             shared_ptr<command> cmd);
@@ -52,10 +51,10 @@ namespace       commands {
   private:
                 set();
                 set(set const& right);
+                ~set() throw ();
     set&        operator=(set const& right);
     void        _internal_copy(set const& right);
 
-    static set* _instance;
     std::map<std::string, shared_ptr<command> >
                 _list;
   };

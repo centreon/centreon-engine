@@ -28,7 +28,8 @@
 using namespace com::centreon;
 using namespace com::centreon::engine::broker;
 
-static const char* MOD_LIB_NAME = "./broker_mod_load.so";
+static char const* MOD_LIB_NAME = "./broker_mod_load.so";
+static char const* MOD_LIB_COMPATIBILITY_NAME = "./broker_mod_compatibility.so";
 
 bool mod_test_load_quit = false;
 
@@ -37,7 +38,13 @@ bool mod_test_load_quit = false;
  */
 void check_load() {
   loader& loader(loader::instance());
-  loader.load_directory("./");
+
+  // Load module.
+  shared_ptr<handle> mod1(loader.add_module(MOD_LIB_NAME));
+  mod1->open();
+  shared_ptr<handle> mod2(loader.add_module(MOD_LIB_COMPATIBILITY_NAME));
+  mod2->open();
+
   std::list<shared_ptr<handle> > modules(loader.get_modules());
   if (modules.size() != 2)
     throw (engine_error() << __func__ << ": load modules failed");

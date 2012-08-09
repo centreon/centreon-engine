@@ -27,6 +27,7 @@
 #include "com/centreon/engine/objects/servicegroup.hh"
 #include "com/centreon/engine/utils.hh"
 #include "test/objects/create_object.hh"
+#include "test/unittest.hh"
 
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::objects;
@@ -127,10 +128,9 @@ static void link_with_valid_objects() {
  *
  *  @return EXIT_SUCCESS on success.
  */
-int main() {
-  // Initialization.
-  logging::engine::load();
-
+int main_test(int argc, char** argv) {
+  (void)argc;
+  (void)argv;
   try {
     // Tests.
     link_null_pointer();
@@ -147,4 +147,12 @@ int main() {
   }
 
   return (EXIT_SUCCESS);
+}
+
+/**
+ *  Init the unit test.
+ */
+int main(int argc, char** argv) {
+  com::centreon::engine::unittest utest(argc, argv, &main_test);
+  return (utest.run());
 }

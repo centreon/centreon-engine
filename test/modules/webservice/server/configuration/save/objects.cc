@@ -36,7 +36,7 @@ static int check_save_objects(int argc, char** argv) {
            << "check_save_object failed: bad arguments.");
 
   std::string config_file(argv[2]);
-  config.parse(config_file.c_str());
+  config->parse(config_file.c_str());
   if (read_object_config_data(
         config_file.c_str(),
         READ_ALL_OBJECT_DATA,

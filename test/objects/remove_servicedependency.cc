@@ -25,6 +25,7 @@
 #include "com/centreon/engine/macros.hh"
 #include "com/centreon/engine/objects.hh"
 #include "com/centreon/engine/utils.hh"
+#include "test/unittest.hh"
 
 using namespace com::centreon::engine;
 
@@ -91,7 +92,9 @@ static void remove_service_dependency_failed() {
  *
  *  @return EXIT_SUCCESS on success.
  */
-int main() {
+int main_test(int argc, char** argv) {
+  (void)argc;
+  (void)argv;
   try {
     // Tests.
     remove_all_service_dependency();
@@ -105,4 +108,12 @@ int main() {
   }
 
   return (EXIT_SUCCESS);
+}
+
+/**
+ *  Init the unit test.
+ */
+int main(int argc, char** argv) {
+  com::centreon::engine::unittest utest(argc, argv, &main_test);
+  return (utest.run());
 }

@@ -32,23 +32,13 @@ using namespace com::centreon::engine::broker;
 using namespace com::centreon::engine::logging;
 
 // Class instance.
-std::auto_ptr<loader> loader::_instance;
+static loader* _instance = NULL;
 
 /**************************************
 *                                     *
 *           Public Methods            *
 *                                     *
 **************************************/
-
-/**
- *  Default destructor.
- */
-loader::~loader() throw () {
-  try {
-    unload_modules();
-  }
-  catch (...) {}
-}
 
 /**
  *  Add a new module.
@@ -112,9 +102,9 @@ loader& loader::instance() {
  *  Load class singleton.
  */
 void loader::load() {
-  if (!_instance.get())
-    _instance.reset(new loader);
-  return ;
+  if (!_instance)
+    _instance = new loader;
+  return;
 }
 
 /**
@@ -161,8 +151,9 @@ unsigned int loader::load_directory(std::string const& dir) {
  *  Cleanup the loader singleton.
  */
 void loader::unload() {
-  _instance.reset();
-  return ;
+  delete _instance;
+  _instance = NULL;
+  return;
 }
 
 /**
@@ -206,6 +197,16 @@ loader::loader() {
  */
 loader::loader(loader const& right) {
   _internal_copy(right);
+}
+
+/**
+ *  Default destructor.
+ */
+loader::~loader() throw () {
+  try {
+    unload_modules();
+  }
+  catch (...) {}
 }
 
 /**

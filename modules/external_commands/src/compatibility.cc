@@ -542,11 +542,11 @@ int process_external_command1(char* cmd) {
   if (command_type == CMD_PROCESS_SERVICE_CHECK_RESULT
       || command_type == CMD_PROCESS_HOST_CHECK_RESULT) {
     /* passive checks are logged in checks.c as well, as some my bypass external commands by getting dropped in checkresults dir */
-    if (config.get_log_passive_checks() == true)
+    if (config->get_log_passive_checks() == true)
       logger(log_passive_check, basic) << oss.str();
   }
   else {
-    if (config.get_log_external_commands() == true)
+    if (config->get_log_external_commands() == true)
       logger(log_external_command, basic) << oss.str();
   }
 

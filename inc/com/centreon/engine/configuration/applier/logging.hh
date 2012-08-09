@@ -68,7 +68,6 @@ namespace                configuration {
       unsigned long      _debug_level;
       unsigned long      _debug_limit;
       unsigned int       _debug_verbosity;
-      static logging*    _instance;
       std::string        _log_file;
       unsigned long      _log_id;
       unsigned long      _log_limit;

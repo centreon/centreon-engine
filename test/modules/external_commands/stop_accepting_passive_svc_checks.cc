@@ -33,11 +33,11 @@ static int check_stop_accepting_passive_svc_checks(int argc, char** argv) {
   (void)argc;
   (void)argv;
 
-  config.set_accept_passive_service_checks(true);
+  config->set_accept_passive_service_checks(true);
   char const* cmd("[1317196300] STOP_ACCEPTING_PASSIVE_SVC_CHECKS");
   process_external_command(cmd);
 
-  if (config.get_accept_passive_service_checks())
+  if (config->get_accept_passive_service_checks())
     throw (engine_error() << "stop_accepting_passive_svc_checks failed.");
 
   return (0);

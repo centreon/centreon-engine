@@ -21,7 +21,7 @@
 
 #include "com/centreon/engine/globals.hh"
 
-com::centreon::engine::configuration::state config;
+com::centreon::engine::configuration::state* config = NULL;
 char*                     config_file = NULL;
 
 command*                  global_host_event_handler_ptr = NULL;

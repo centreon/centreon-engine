@@ -38,9 +38,9 @@ static int check_save_state(int argc, char** argv) {
       file.read(buffer, sizeof(buffer));
       ref.append(buffer, file.gcount());
     }
-    config.parse(argv[i]);
+    config->parse(argv[i]);
     webservice::configuration::save::state save;
-    save << config;
+    save << *config;
     if (save.to_string() != ref)
       throw (engine_error() << "check_save_state failed.");
   }

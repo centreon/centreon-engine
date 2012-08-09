@@ -50,20 +50,6 @@ static checker* _instance = NULL;
 **************************************/
 
 /**
- *  Default destructor.
- */
-checker::~checker() throw () {
-  try {
-    concurrency::locker lock(&_mut_reap);
-    while (!_to_reap.empty()) {
-      free_check_result(&_to_reap.front());
-      _to_reap.pop();
-    }
-  }
-  catch (...) {}
-}
-
-/**
  *  Get instance of the checker singleton.
  *
  *  @return This singleton.
@@ -76,8 +62,8 @@ checker& checker::instance() {
  *  Load singleton.
  */
 void checker::load() {
-  delete _instance;
-  _instance = new checker;
+  if (!_instance)
+    _instance = new checker;
   return;
 }
 
@@ -164,7 +150,7 @@ void checker::reap() {
       time_t current_time;
       time(&current_time);
       if ((current_time - reaper_start_time)
-          > static_cast<time_t>(config.get_max_check_reaper_time())) {
+          > static_cast<time_t>(config->get_max_check_reaper_time())) {
         logger(dbg_checks, basic)
           << "Breaking out of check result reaper: "
           << "max reaper time exceeded";
@@ -266,7 +252,7 @@ void checker::run(
             hst->host_check_command,
             hst->latency,
             0.0,
-            config.get_host_check_timeout(),
+            config->get_host_check_timeout(),
             false,
             0,
             NULL,
@@ -364,7 +350,7 @@ void checker::run(
     hst->host_check_command,
     hst->latency,
     0.0,
-    config.get_host_check_timeout(),
+    config->get_host_check_timeout(),
     false,
     0,
     processed_cmd_ptr,
@@ -391,7 +377,7 @@ void checker::run(
     unsigned long id(cmd->run(
                             processed_cmd,
                             macros,
-                            config.get_host_check_timeout()));
+                            config->get_host_check_timeout()));
     if (id != 0) {
       concurrency::locker lock(&_mut_id);
       _list_id[id] = check_result_info;
@@ -494,7 +480,7 @@ void checker::run(
     if (preferred_time != NULL)
       *preferred_time += static_cast<time_t>(
                            svc->check_interval
-                           * config.get_interval_length());
+                           * config->get_interval_length());
     throw (engine_error() << "broker callback cancel");
   }
   // Service check was override by NEB module.
@@ -575,7 +561,7 @@ void checker::run(
           svc->service_check_command,
           svc->latency,
           0.0,
-          config.get_service_check_timeout(),
+          config->get_service_check_timeout(),
           false,
           0,
           processed_cmd_ptr,
@@ -603,7 +589,7 @@ void checker::run(
     unsigned long id(cmd->run(
                             processed_cmd,
                             macros,
-                            config.get_service_check_timeout()));
+                            config->get_service_check_timeout()));
     if (id != 0) {
       concurrency::locker lock(&_mut_id);
       _list_id[id] = check_result_info;
@@ -749,7 +735,7 @@ void checker::run_sync(
     hst->host_check_command,
     hst->latency,
     0.0,
-    config.get_host_check_timeout(),
+    config->get_host_check_timeout(),
     false,
     0,
     NULL,
@@ -797,7 +783,7 @@ void checker::run_sync(
     hst->host_check_command,
     hst->latency,
     hst->execution_time,
-    config.get_host_check_timeout(),
+    config->get_host_check_timeout(),
     false,
     hst->current_state,
     NULL,
@@ -840,6 +826,20 @@ checker::checker() {
  */
 checker::checker(checker const& right) {
   _internal_copy(right);
+}
+
+/**
+ *  Default destructor.
+ */
+checker::~checker() throw () {
+  try {
+    concurrency::locker lock(&_mut_reap);
+    while (!_to_reap.empty()) {
+      free_check_result(&_to_reap.front());
+      _to_reap.pop();
+    }
+  }
+  catch (...) {}
 }
 
 /**
@@ -936,7 +936,7 @@ int checker::_execute_sync(host* hst) {
             hst->host_check_command,
             hst->latency,
             0.0,
-            config.get_host_check_timeout(),
+            config->get_host_check_timeout(),
             false,
             0,
             NULL,
@@ -988,7 +988,7 @@ int checker::_execute_sync(host* hst) {
     hst->host_check_command,
     0.0,
     0.0,
-    config.get_host_check_timeout(),
+    config->get_host_check_timeout(),
     false,
     STATE_OK,
     tmp_processed_cmd,
@@ -1023,7 +1023,7 @@ int checker::_execute_sync(host* hst) {
     start_cmd,
     end_cmd,
     0,
-    config.get_host_check_timeout(),
+    config->get_host_check_timeout(),
     false,
     0,
     tmp_processed_cmd,
@@ -1036,7 +1036,7 @@ int checker::_execute_sync(host* hst) {
     cmd->run(
            processed_cmd,
            macros,
-           config.get_host_check_timeout(),
+           config->get_host_check_timeout(),
            res);
   }
   catch (std::exception const& e) {
@@ -1076,7 +1076,7 @@ int checker::_execute_sync(host* hst) {
     start_cmd,
     end_cmd,
     execution_time,
-    config.get_host_check_timeout(),
+    config->get_host_check_timeout(),
     res.exit_status == process::timeout,
     res.exit_code,
     tmp_processed_cmd,
@@ -1091,13 +1091,13 @@ int checker::_execute_sync(host* hst) {
   if (res.exit_status == process::timeout) {
     std::ostringstream oss;
     oss << "Host check timed out after "
-        << config.get_host_check_timeout()
+        << config->get_host_check_timeout()
         << "  seconds";
     res.output = oss.str();
     logger(log_runtime_warning, basic)
       << "Warning: Host check command '" << processed_cmd
       << "' for host '" << hst->name << "' timed out after "
-      << config.get_host_check_timeout() << " seconds";
+      << config->get_host_check_timeout() << " seconds";
   }
 
   // Update values.
@@ -1139,7 +1139,7 @@ int checker::_execute_sync(host* hst) {
 
   // If we're not doing aggressive host checking, let WARNING
   // states indicate the host is up (fake the result to be STATE_OK).
-  if (!config.get_use_aggressive_host_checking()
+  if (!config->get_use_aggressive_host_checking()
       && (res.exit_code == STATE_WARNING))
     res.exit_code = STATE_OK;
 
@@ -1166,7 +1166,7 @@ int checker::_execute_sync(host* hst) {
     hst->host_check_command,
     0.0,
     execution_time,
-    config.get_host_check_timeout(),
+    config->get_host_check_timeout(),
     res.exit_status == process::timeout,
     res.exit_code,
     tmp_processed_cmd,

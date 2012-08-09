@@ -64,7 +64,18 @@ raw::raw(raw const& right)
  *  Destructor.
  */
 raw::~raw() throw () {
-
+  concurrency::locker lock(&_lock);
+  while (!_processes_busy.empty()) {
+    process* p(_processes_busy.begin()->first);
+    lock.unlock();
+    p->wait();
+    lock.relock();
+  }
+  for (std::list<process*>::const_iterator
+         it(_processes_free.begin()), end(_processes_free.end());
+       it != end;
+       ++it)
+    delete *it;
 }
 
 /**
@@ -499,7 +510,7 @@ void raw::_build_custom_service_macro_environment(
 void raw::_build_environment_macros(
             nagios_macros& macros,
             environment& env) {
-  if (config.get_enable_environment_macros()) {
+  if (config->get_enable_environment_macros()) {
     _build_macrosx_environment(macros, env);
     _build_argv_macro_environment(macros, env);
     _build_custom_host_macro_environment(macros, env);
@@ -527,7 +538,7 @@ void raw::_build_macrosx_environment(
       // Skip summary macro in lage instalation tweaks.
       if ((i < MACRO_TOTALHOSTSUP
            || i > MACRO_TOTALSERVICEPROBLEMSUNHANDLED)
-          && !config.get_use_large_installation_tweaks()) {
+          && !config->get_use_large_installation_tweaks()) {
         grab_macrox_value_r(
           &macros,
           i,

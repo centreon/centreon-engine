@@ -28,7 +28,7 @@
 using namespace com::centreon::engine::logging;
 
 // logging::engine class instance.
-std::auto_ptr<engine> engine::_instance;
+static engine* _instance = NULL;
 
 /**************************************
 *                                     *
@@ -132,11 +132,6 @@ void engine::obj_info::_internal_copy(engine::obj_info const& right) {
 **************************************/
 
 /**
- *  Destructor.
- */
-engine::~engine() throw () {}
-
-/**
  *  Add a new object logging into engine.
  *
  *  @param[in] info The object logging with type and verbosity.
@@ -182,9 +177,9 @@ bool engine::is_logged(
  *  Load engine instance.
  */
 void engine::load() {
-  if (!_instance.get())
-    _instance.reset(new engine);
-  return ;
+  if (!_instance)
+    _instance = new engine;
+  return;
 }
 
 /**
@@ -257,8 +252,9 @@ void engine::remove_object(obj_info& obj) throw () {
  *  Unload engine singleton.
  */
 void engine::unload() {
-  _instance.reset();
-  return ;
+  delete _instance;
+  _instance = NULL;
+  return;
 }
 
 /**
@@ -316,6 +312,13 @@ engine::engine() : _id(0) {
  */
 engine::engine(engine const& right) {
   _internal_copy(right);
+}
+
+/**
+ *  Destructor.
+ */
+engine::~engine() throw () {
+
 }
 
 /**

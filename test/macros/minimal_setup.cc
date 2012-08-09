@@ -28,7 +28,7 @@ using namespace com::centreon::engine;
  */
 void com::centreon::engine::test::minimal_setup() {
     // Interval length is 1 second.
-  config.set_interval_length(1);
+  config->set_interval_length(1);
 
   logging::engine::load();
 
@@ -97,7 +97,7 @@ void com::centreon::engine::test::minimal_setup() {
     throw (error() << "default host creation failed");
   host_list->has_been_checked = 1;
   host_list->last_check = time(NULL);
-  config.set_cached_host_check_horizon(24 * 60 * 60);
+  config->set_cached_host_check_horizon(24 * 60 * 60);
 
   // Add service.
   service* svc(add_service(

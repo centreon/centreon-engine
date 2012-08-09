@@ -20,7 +20,6 @@
 #ifndef CCE_BROKER_COMPATIBILITY_HH
 #  define CCE_BROKER_COMPATIBILITY_HH
 
-#  include <memory>
 #  include "com/centreon/engine/broker/handle.hh"
 #  include "com/centreon/engine/namespace.hh"
 
@@ -35,7 +34,6 @@ namespace                 broker {
    */
   class                   compatibility {
   public:
-    virtual               ~compatibility() throw ();
     static compatibility& instance();
     static void           load();
     static void           unload();
@@ -54,12 +52,10 @@ namespace                 broker {
   private:
                           compatibility();
                           compatibility(compatibility const& right);
+    virtual               ~compatibility() throw ();
     compatibility&        operator=(compatibility const& right);
     void                  _internal_copy(
                             compatibility const& right);
-
-    static std::auto_ptr<compatibility>
-                          _instance;
   };
 }
 

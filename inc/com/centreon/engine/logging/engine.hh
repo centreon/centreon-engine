@@ -20,7 +20,6 @@
 #ifndef CCE_LOGGING_ENGINE_HH
 #  define CCE_LOGGING_ENGINE_HH
 
-#  include <memory>
 #  include <vector>
 #  include "com/centreon/concurrency/read_write_lock.hh"
 #  include "com/centreon/engine/logging/object.hh"
@@ -90,8 +89,6 @@ namespace                    logging {
     void                     _internal_copy(engine const& right);
 
     unsigned long            _id;
-    static std::auto_ptr<engine>
-                             _instance;
     std::vector<obj_info>    _objects;
     com::centreon::concurrency::read_write_lock
                              _rwlock;

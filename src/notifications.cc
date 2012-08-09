@@ -356,7 +356,7 @@ int check_service_notification_viability(service* svc, unsigned int type, int op
   time(&current_time);
 
   /* are notifications enabled? */
-  if (config.get_enable_notifications() == false) {
+  if (config->get_enable_notifications() == false) {
     logger(dbg_notifications, more)
       << "Notifications are disabled, so service notifications will not be sent out.";
     return (ERROR);
@@ -584,7 +584,7 @@ int check_service_notification_viability(service* svc, unsigned int type, int op
     if (current_time
         < (time_t)(initial_notif_time
                    + (time_t)(svc->first_notification_delay
-                              * config.get_interval_length()))) {
+                              * config->get_interval_length()))) {
       logger(dbg_notifications, more)
         << "Not enough time has elapsed since the service changed to a non-OK state, so we should not notify about this problem yet";
       return (ERROR);
@@ -897,7 +897,7 @@ int notify_contact_of_service(nagios_macros* mac,
       << "Processed notification command: " << processed_command;
 
     /* log the notification to program log file */
-    if (config.get_log_notifications() == true) {
+    if (config->get_log_notifications() == true) {
       std::ostringstream oss;
       switch (type) {
       case NOTIFICATION_CUSTOM:
@@ -975,7 +975,7 @@ int notify_contact_of_service(nagios_macros* mac,
     /* run the notification command */
     my_system_r(mac,
                 processed_command,
-                config.get_notification_timeout(),
+                config->get_notification_timeout(),
                 &early_timeout,
                 &exectime,
                 NULL,
@@ -986,7 +986,7 @@ int notify_contact_of_service(nagios_macros* mac,
       logger(log_service_notification | log_runtime_warning, basic)
         << "Warning: Contact '" << cntct->name
         << "' service notification command '" << processed_command
-        << "' timed out after " << config.get_notification_timeout()
+        << "' timed out after " << config->get_notification_timeout()
         << " seconds";
     }
 
@@ -1566,7 +1566,7 @@ int check_host_notification_viability(host* hst,
   time(&current_time);
 
   /* are notifications enabled? */
-  if (config.get_enable_notifications() == false) {
+  if (config->get_enable_notifications() == false) {
     logger(dbg_notifications, more)
       << "Notifications are disabled, so host notifications will not be sent out.";
     return (ERROR);
@@ -1763,7 +1763,7 @@ int check_host_notification_viability(host* hst,
     if (current_time
         < (time_t)(initial_notif_time
                    + (time_t)(hst->first_notification_delay
-                              * config.get_interval_length()))) {
+                              * config->get_interval_length()))) {
       logger(dbg_notifications, more)
         << "Not enough time has elapsed since the host changed to a non-UP state (or since program start), so we shouldn't notify about this problem yet.";
       return (ERROR);
@@ -2047,7 +2047,7 @@ int notify_contact_of_host(nagios_macros* mac,
       << "Processed notification command: " << processed_command;
 
     /* log the notification to program log file */
-    if (config.get_log_notifications() == true) {
+    if (config->get_log_notifications() == true) {
       std::ostringstream oss;
       switch (type) {
       case NOTIFICATION_CUSTOM:
@@ -2125,7 +2125,7 @@ int notify_contact_of_host(nagios_macros* mac,
     /* run the notification command */
     my_system_r(mac,
                 processed_command,
-                config.get_notification_timeout(),
+                config->get_notification_timeout(),
                 &early_timeout,
                 &exectime,
                 NULL,
@@ -2136,7 +2136,7 @@ int notify_contact_of_host(nagios_macros* mac,
       logger(log_host_notification | log_runtime_warning, basic)
         << "Warning: Contact '" << cntct->name
         << "' host notification command '" << processed_command
-        << "' timed out after " << config.get_notification_timeout()
+        << "' timed out after " << config->get_notification_timeout()
         << " seconds";
     }
 
@@ -2463,7 +2463,7 @@ time_t get_next_service_notification_time(service* svc, time_t offset) {
     "notification time: " << interval_to_use;
 
   /* calculate next notification time */
-  next_notification = offset + static_cast<time_t>(interval_to_use * config.get_interval_length());
+  next_notification = offset + static_cast<time_t>(interval_to_use * config->get_interval_length());
 
   return (next_notification);
 }
@@ -2526,7 +2526,7 @@ time_t get_next_host_notification_time(host* hst, time_t offset) {
 
   /* calculate next notification time */
   next_notification = static_cast<time_t>(offset
-                                          + (interval_to_use * config.get_interval_length()));
+                                          + (interval_to_use * config->get_interval_length()));
 
   return (next_notification);
 }

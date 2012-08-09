@@ -39,6 +39,8 @@ const float state::DEFAULT_LOW_HOST_FLAP_THRESHOLD     = 20.0;
 const float state::DEFAULT_HIGH_HOST_FLAP_THRESHOLD    = 30.0;
 const char* const state::DEFAULT_ILLEGAL_OUTPUT_CHARS  = "`~$&|'\"<>";
 
+static state* _instance = NULL;
+
 /**************************************
 *                                     *
 *           Public Methods            *
@@ -46,237 +48,21 @@ const char* const state::DEFAULT_ILLEGAL_OUTPUT_CHARS  = "`~$&|'\"<>";
 **************************************/
 
 /**
- *  Default constructor.
+ *  Get singleton.
  */
-state::state()
-  : _cur_line(0), _command_check_interval_is_seconds(false), _mac(NULL) {
-
-  _mac = get_global_macros();
-
-  _lst_method["resource_file"]                               = &cpp_suck<std::string const&, &state::_parse_resource_file>::set_generic;;
-  _lst_method["log_file"]                                    = &cpp_suck<std::string const&, &state::set_log_file>::set_generic;
-  _lst_method["max_log_file_size"]                           = &cpp_suck<unsigned long, &state::set_max_log_file_size>::set_generic;
-  _lst_method["broker_module_directory"]                     = &cpp_suck<std::string const&, &state::set_broker_module_directory>::set_generic;
-  _lst_method["debug_level"]                                 = &cpp_suck_cast<unsigned long, int, &state::set_debug_level>::set_generic_cast;
-  _lst_method["debug_verbosity"]                             = &cpp_suck<unsigned int, &state::set_debug_verbosity>::set_generic;
-  _lst_method["debug_file"]                                  = &cpp_suck<std::string const&, &state::set_debug_file>::set_generic;
-  _lst_method["max_debug_file_size"]                         = &cpp_suck<unsigned long, &state::set_max_debug_file_size>::set_generic;
-  _lst_method["command_file"]                                = &cpp_suck<std::string const&, &state::set_command_file>::set_generic;
-  _lst_method["temp_file"]                                   = &cpp_suck<std::string const&, &state::set_temp_file>::set_generic;
-  _lst_method["temp_path"]                                   = &cpp_suck<std::string const&, &state::set_temp_path>::set_generic;
-  _lst_method["check_result_path"]                           = &cpp_suck<std::string const&, &state::set_check_result_path>::set_generic;
-  _lst_method["max_check_result_file_age"]                   = &cpp_suck<unsigned long, &state::set_max_check_result_file_age>::set_generic;
-  _lst_method["global_host_event_handler"]                   = &cpp_suck<std::string const&, &state::set_global_host_event_handler>::set_generic;
-  _lst_method["global_service_event_handler"]                = &cpp_suck<std::string const&, &state::set_global_service_event_handler>::set_generic;
-  _lst_method["ocsp_command"]                                = &cpp_suck<std::string const&, &state::set_ocsp_command>::set_generic;
-  _lst_method["ochp_command"]                                = &cpp_suck<std::string const&, &state::set_ochp_command>::set_generic;
-  _lst_method["admin_email"]                                 = &cpp_suck<std::string const&, &state::_set_admin_email>::set_generic;
-  _lst_method["admin_pager"]                                 = &cpp_suck<std::string const&, &state::_set_admin_pager>::set_generic;
-  _lst_method["use_syslog"]                                  = &cpp_suck<bool, &state::set_use_syslog>::set_generic;
-  _lst_method["log_notifications"]                           = &cpp_suck<bool, &state::set_log_notifications>::set_generic;
-  _lst_method["log_service_retries"]                         = &cpp_suck<bool, &state::set_log_service_retries>::set_generic;
-  _lst_method["log_host_retries"]                            = &cpp_suck<bool, &state::set_log_host_retries>::set_generic;
-  _lst_method["log_event_handlers"]                          = &cpp_suck<bool, &state::set_log_event_handlers>::set_generic;
-  _lst_method["log_external_commands"]                       = &cpp_suck<bool, &state::set_log_external_commands>::set_generic;
-  _lst_method["log_passive_checks"]                          = &cpp_suck<bool, &state::set_log_passive_checks>::set_generic;
-  _lst_method["log_initial_states"]                          = &cpp_suck<bool, &state::set_log_initial_state>::set_generic;
-  _lst_method["retain_state_information"]                    = &cpp_suck<bool, &state::set_retain_state_information>::set_generic;
-  _lst_method["retention_update_interval"]                   = &cpp_suck<unsigned int, &state::set_retention_update_interval>::set_generic;
-  _lst_method["use_retained_program_state"]                  = &cpp_suck<bool, &state::set_use_retained_program_state>::set_generic;
-  _lst_method["use_retained_scheduling_info"]                = &cpp_suck<bool, &state::set_use_retained_scheduling_info>::set_generic;
-  _lst_method["retention_scheduling_horizon"]                = &cpp_suck<unsigned int, &state::set_retention_scheduling_horizon>::set_generic;
-  _lst_method["additional_freshness_latency"]                = &cpp_suck<int, &state::set_additional_freshness_latency>::set_generic;
-  _lst_method["retained_host_attribute_mask"]                = &cpp_suck<unsigned long, &state::set_retained_host_attribute_mask>::set_generic;
-  _lst_method["retained_service_attribute_mask"]             = &cpp_suck<std::string const&, &state::_set_retained_service_attribute_mask>::set_generic;
-  _lst_method["retained_process_host_attribute_mask"]        = &cpp_suck<unsigned long, &state::set_retained_process_host_attribute_mask>::set_generic;
-  _lst_method["retained_process_service_attribute_mask"]     = &cpp_suck<std::string const&, &state::_set_retained_process_service_attribute_mask>::set_generic;
-  _lst_method["retained_contact_host_attribute_mask"]        = &cpp_suck<unsigned long, &state::set_retained_contact_host_attribute_mask>::set_generic;
-  _lst_method["retained_contact_service_attribute_mask"]     = &cpp_suck<unsigned long, &state::set_retained_contact_service_attribute_mask>::set_generic;
-  _lst_method["obsess_over_services"]                        = &cpp_suck<bool, &state::set_obsess_over_services>::set_generic;
-  _lst_method["obsess_over_hosts"]                           = &cpp_suck<bool, &state::set_obsess_over_hosts>::set_generic;
-  _lst_method["translate_passive_host_checks"]               = &cpp_suck<bool, &state::set_translate_passive_host_checks>::set_generic;
-  _lst_method["passive_host_checks_are_soft"]                = &cpp_suck<bool, &state::set_passive_host_checks_are_soft>::set_generic;
-  _lst_method["service_check_timeout"]                       = &cpp_suck<unsigned int, &state::set_service_check_timeout>::set_generic;
-  _lst_method["host_check_timeout"]                          = &cpp_suck<unsigned int, &state::set_host_check_timeout>::set_generic;
-  _lst_method["event_handler_timeout"]                       = &cpp_suck<unsigned int, &state::set_event_handler_timeout>::set_generic;
-  _lst_method["notification_timeout"]                        = &cpp_suck<unsigned int, &state::set_notification_timeout>::set_generic;
-  _lst_method["ocsp_timeout"]                                = &cpp_suck<unsigned int, &state::set_ocsp_timeout>::set_generic;
-  _lst_method["ochp_timeout"]                                = &cpp_suck<unsigned int, &state::set_ochp_timeout>::set_generic;
-  _lst_method["use_agressive_host_checking"]                 = &cpp_suck<bool, &state::set_use_aggressive_host_checking>::set_generic;
-  _lst_method["use_aggressive_host_checking"]                = &cpp_suck<bool, &state::set_use_aggressive_host_checking>::set_generic;
-  _lst_method["cached_host_check_horizon"]                   = &cpp_suck<unsigned long, &state::set_cached_host_check_horizon>::set_generic;
-  _lst_method["enable_predictive_host_dependency_checks"]    = &cpp_suck<bool, &state::set_enable_predictive_host_dependency_checks>::set_generic;
-  _lst_method["cached_service_check_horizon"]                = &cpp_suck<unsigned long, &state::set_cached_service_check_horizon>::set_generic;
-  _lst_method["enable_predictive_service_dependency_checks"] = &cpp_suck<bool, &state::set_enable_predictive_service_dependency_checks>::set_generic;
-  _lst_method["soft_state_dependencies"]                     = &cpp_suck<bool, &state::set_soft_state_dependencies>::set_generic;
-  _lst_method["log_rotation_method"]                         = &cpp_suck<std::string const&, &state::set_log_rotation_method>::set_generic;
-  _lst_method["log_archive_path"]                            = &cpp_suck<std::string const&, &state::set_log_archive_path>::set_generic;
-  _lst_method["enable_event_handlers"]                       = &cpp_suck<bool, &state::set_enable_event_handlers>::set_generic;
-  _lst_method["enable_notifications"]                        = &cpp_suck<bool, &state::set_enable_notifications>::set_generic;
-  _lst_method["execute_service_checks"]                      = &cpp_suck<bool, &state::set_execute_service_checks>::set_generic;
-  _lst_method["accept_passive_service_checks"]               = &cpp_suck<bool, &state::set_accept_passive_service_checks>::set_generic;
-  _lst_method["execute_host_checks"]                         = &cpp_suck<bool, &state::set_execute_host_checks>::set_generic;
-  _lst_method["accept_passive_host_checks"]                  = &cpp_suck<bool, &state::set_accept_passive_host_checks>::set_generic;
-  _lst_method["service_inter_check_delay_method"]            = &cpp_suck<std::string const&, &state::set_service_inter_check_delay_method>::set_generic;
-  _lst_method["max_service_check_spread"]                    = &cpp_suck<unsigned int, &state::set_max_service_check_spread>::set_generic;
-  _lst_method["host_inter_check_delay_method"]               = &cpp_suck<std::string const&, &state::set_host_inter_check_delay_method>::set_generic;
-  _lst_method["max_host_check_spread"]                       = &cpp_suck<unsigned int, &state::set_max_host_check_spread>::set_generic;
-  _lst_method["service_interleave_factor"]                   = &cpp_suck<std::string const&, &state::set_service_interleave_factor_method>::set_generic;
-  _lst_method["max_concurrent_checks"]                       = &cpp_suck<unsigned int, &state::set_max_parallel_service_checks>::set_generic;
-  _lst_method["check_result_reaper_frequency"]               = &cpp_suck<unsigned int, &state::set_check_reaper_interval>::set_generic;
-  _lst_method["service_reaper_frequency"]                    = &cpp_suck<unsigned int, &state::set_check_reaper_interval>::set_generic;
-  _lst_method["max_check_result_reaper_time"]                = &cpp_suck<unsigned int, &state::set_max_check_reaper_time>::set_generic;
-  _lst_method["sleep_time"]                                  = &cpp_suck<float, &state::set_sleep_time>::set_generic;
-  _lst_method["interval_length"]                             = &cpp_suck<unsigned int, &state::set_interval_length>::set_generic;
-  _lst_method["check_external_commands"]                     = &cpp_suck<bool, &state::set_check_external_commands>::set_generic;
-  _lst_method["command_check_interval"]                      = &cpp_suck<std::string const&, &state::set_command_check_interval>::set_generic;
-  _lst_method["check_for_orphaned_services"]                 = &cpp_suck<bool, &state::set_check_orphaned_services>::set_generic;
-  _lst_method["check_for_orphaned_hosts"]                    = &cpp_suck<bool, &state::set_check_orphaned_hosts>::set_generic;
-  _lst_method["check_service_freshness"]                     = &cpp_suck<bool, &state::set_check_service_freshness>::set_generic;
-  _lst_method["check_host_freshness"]                        = &cpp_suck<bool, &state::set_check_host_freshness>::set_generic;
-  _lst_method["service_freshness_check_interval"]            = &cpp_suck<unsigned int, &state::set_service_freshness_check_interval>::set_generic;
-  _lst_method["host_freshness_check_interval"]               = &cpp_suck<unsigned int, &state::set_host_freshness_check_interval>::set_generic;
-  _lst_method["auto_reschedule_checks"]                      = &cpp_suck<bool, &state::set_auto_reschedule_checks>::set_generic;
-  _lst_method["auto_rescheduling_interval"]                  = &cpp_suck<unsigned int, &state::set_auto_rescheduling_interval>::set_generic;
-  _lst_method["auto_rescheduling_window"]                    = &cpp_suck<unsigned int, &state::set_auto_rescheduling_window>::set_generic;
-  _lst_method["aggregate_status_updates"]                    = &cpp_suck<std::string const&, &state::_set_aggregate_status_updates>::set_generic;
-  _lst_method["status_update_interval"]                      = &cpp_suck<unsigned int, &state::set_status_update_interval>::set_generic;
-  _lst_method["time_change_threshold"]                       = &cpp_suck<unsigned int, &state::set_time_change_threshold>::set_generic;
-  _lst_method["process_performance_data"]                    = &cpp_suck<bool, &state::set_process_performance_data>::set_generic;
-  _lst_method["enable_flap_detection"]                       = &cpp_suck<bool, &state::set_enable_flap_detection>::set_generic;
-  _lst_method["enable_failure_prediction"]                   = &cpp_suck<bool, &state::set_enable_failure_prediction>::set_generic;
-  _lst_method["low_service_flap_threshold"]                  = &cpp_suck<float, &state::set_low_service_flap_threshold>::set_generic;
-  _lst_method["high_service_flap_threshold"]                 = &cpp_suck<float, &state::set_high_service_flap_threshold>::set_generic;
-  _lst_method["low_host_flap_threshold"]                     = &cpp_suck<float, &state::set_low_host_flap_threshold>::set_generic;
-  _lst_method["high_host_flap_threshold"]                    = &cpp_suck<float, &state::set_high_host_flap_threshold>::set_generic;
-  _lst_method["date_format"]                                 = &cpp_suck<std::string const&, &state::set_date_format>::set_generic;
-  _lst_method["use_timezone"]                                = &cpp_suck<std::string const&, &state::set_use_timezone>::set_generic;
-  _lst_method["p1_file"]                                     = &cpp_suck<std::string const&, &state::set_p1_file>::set_generic;
-  _lst_method["event_broker_options"]                        = &cpp_suck<std::string const&, &state::set_event_broker_options>::set_generic;
-  _lst_method["illegal_object_name_chars"]                   = &cpp_suck<std::string const&, &state::set_illegal_object_chars>::set_generic;
-  _lst_method["illegal_macro_output_chars"]                  = &cpp_suck<std::string const&, &state::set_illegal_output_chars>::set_generic;
-  _lst_method["broker_module"]                               = &cpp_suck<std::string const&, &state::_set_broker_module>::set_generic;
-  _lst_method["use_regexp_matching"]                         = &cpp_suck<bool, &state::set_use_regexp_matches>::set_generic;
-  _lst_method["use_true_regexp_matching"]                    = &cpp_suck<bool, &state::set_use_true_regexp_matching>::set_generic;
-  _lst_method["use_large_installation_tweaks"]               = &cpp_suck<bool, &state::set_use_large_installation_tweaks>::set_generic;
-  _lst_method["enable_environment_macros"]                   = &cpp_suck<bool, &state::set_enable_environment_macros>::set_generic;
-  _lst_method["free_child_process_memory"]                   = &cpp_suck<bool, &state::set_free_child_process_memory>::set_generic;
-  _lst_method["child_processes_fork_twice"]                  = &cpp_suck<bool, &state::set_child_processes_fork_twice>::set_generic;
-  _lst_method["enable_embedded_perl"]                        = &cpp_suck<bool, &state::set_enable_embedded_perl>::set_generic;
-  _lst_method["use_embedded_perl_implicitly"]                = &cpp_suck<bool, &state::set_use_embedded_perl_implicitly>::set_generic;
-  _lst_method["external_command_buffer_slots"]               = &cpp_suck<int, &state::set_external_command_buffer_slots>::set_generic;
-  _lst_method["auth_file"]                                   = &cpp_suck<std::string const&, &state::_set_auth_file>::set_generic;
-  _lst_method["bare_update_check"]                           = &cpp_suck<std::string const&, &state::_set_bare_update_check>::set_generic;
-  _lst_method["check_for_updates"]                           = &cpp_suck<std::string const&, &state::_set_check_for_updates>::set_generic;
-  _lst_method["comment_file"]                                = &cpp_suck<std::string const&, &state::_set_comment_file>::set_generic;
-  _lst_method["xcddefault_comment_file"]                     = &cpp_suck<std::string const&, &state::_set_comment_file>::set_generic;
-  _lst_method["daemon_dumps_core"]                           = &cpp_suck<std::string const&, &state::_set_daemon_dumps_core>::set_generic;
-  _lst_method["downtime_file"]                               = &cpp_suck<std::string const&, &state::_set_downtime_file>::set_generic;
-  _lst_method["xdddefault_downtime_file"]                    = &cpp_suck<std::string const&, &state::_set_downtime_file>::set_generic;
-  _lst_method["allow_empty_hostgroup_assignment"]            = &cpp_suck<bool, &state::set_allow_empty_hostgroup_assignment>::set_generic;
-  _lst_method["daemon_dumps_core"]                           = &cpp_suck<std::string const&, &state::_set_daemon_dumps_core>::set_generic;
-  _lst_method["nagios_user"]                                 = &cpp_suck<std::string const&, &state::_set_user>::set_generic;
-  _lst_method["nagios_group"]                                = &cpp_suck<std::string const&, &state::_set_group>::set_generic;
-  _lst_method["lock_file"]                                   = &cpp_suck<std::string const&, &state::_set_lock_file>::set_generic;
-
-  _lst_method["status_file"]                                 = &cpp_suck<std::string const&, &state::_set_status_file>::set_generic;
-  _lst_method["perfdata_timeout"]                            = &cpp_suck<int, &state::_set_perfdata_timeout>::set_generic;
-  _lst_method["cfg_file"]                                    = &cpp_suck<std::string const&, &state::_add_cfg_file>::set_generic;
-  _lst_method["cfg_dir"]                                     = &cpp_suck<std::string const&, &state::_add_cfg_dir>::set_generic;
-  _lst_method["state_retention_file"]                        = &cpp_suck<std::string const&, &state::_set_state_retention_file>::set_generic;
-  _lst_method["object_cache_file"]                           = &cpp_suck<std::string const&, &state::_set_object_cache_file>::set_generic;
-  _lst_method["precached_object_file"]                       = &cpp_suck<std::string const&, &state::_set_precached_object_file>::set_generic;
-
-  _reset();
-
-  set_accept_passive_host_checks(DEFAULT_ACCEPT_PASSIVE_HOST_CHECKS);
-  set_allow_empty_hostgroup_assignment(DEFAULT_ALLOW_EMPTY_HOSTGROUP_ASSIGNMENT);
-
-  ::log_rotation_method = 0;
-  ::log_archive_path = my_strdup(DEFAULT_LOG_ARCHIVE_PATH);
-
-  // Set macros.
-  delete[] _mac->x[MACRO_TEMPFILE];
-  _mac->x[MACRO_TEMPFILE] = my_strdup("/tmp/centengine.tmp");
-  delete[] _mac->x[MACRO_TEMPPATH];
-  _mac->x[MACRO_TEMPPATH] = my_strdup("/tmp");
+state& state::instance() {
+  return (*_instance);
 }
 
 /**
- *  Copy constructor.
- *
- *  @param[in] right Object to copy.
+ *  Load singleton.
  */
-state::state(state const& right) {
-  operator=(right);
-}
-
-/**
- *  Destructor.
- */
-state::~state() throw() {
-  delete[] _mac->x[MACRO_LOGFILE];
-  delete[] _mac->x[MACRO_TEMPPATH];
-  delete[] _mac->x[MACRO_MAINCONFIGFILE];
-  delete[] _mac->x[MACRO_COMMANDFILE];
-  delete[] _mac->x[MACRO_TEMPFILE];
-  delete[] _mac->x[MACRO_RESOURCEFILE];
-  delete[] _mac->x[MACRO_ADMINEMAIL];
-  delete[] _mac->x[MACRO_ADMINPAGER];
-
-  delete[] ::log_archive_path;
-  delete[] ::log_file;
-  delete[] ::debug_file;
-  delete[] ::command_file;
-  delete[] ::global_host_event_handler;
-  delete[] ::global_service_event_handler;
-  delete[] ::ocsp_command;
-  delete[] ::ochp_command;
-  delete[] ::illegal_object_chars;
-  delete[] ::illegal_output_chars;
-  delete[] ::use_timezone;
-}
-
-/**
- *  Assignment operator.
- *
- *  @param[in] right Object to copy.
- *
- *  @return This object.
- */
-state& state::operator=(state const& right) {
-  if (this != &right) {
-    _filename = right._filename;
-    _cur_line = right._cur_line;
-    _command_check_interval_is_seconds = right._command_check_interval_is_seconds;
-
-    for (unsigned int i = 0; i < max_string; ++i){
-      _tab_string[i] = right._tab_string[i];
-    }
-    for (unsigned int i = 0; i < max_ulong; ++i){
-      _tab_ulong[i] = right._tab_ulong[i];
-    }
-    for (unsigned int i = 0; i < max_float; ++i){
-      _tab_float[i] = right._tab_float[i];
-    }
-    for (unsigned int i = 0; i < max_int; ++i){
-      _tab_int[i] = right._tab_int[i];
-    }
-    for (unsigned int i = 0; i < max_uint; ++i){
-      _tab_uint[i] = right._tab_uint[i];
-    }
-    for (unsigned int i = 0; i < max_bool; ++i){
-      _tab_bool[i] = right._tab_bool[i];
-    }
+void state::load() {
+  if (!_instance) {
+    _instance = new state;
+    config = _instance;
   }
-  return (*this);
-}
-
-/**
- *  Reset variable
- */
-void state::reset() {
-  _reset();
+  return;
 }
 
 /**
@@ -288,7 +74,8 @@ void state::parse(std::string const& filename) {
   std::ifstream ifs;
   ifs.open(filename.c_str(), std::ifstream::in);
   if (ifs.is_open() == false) {
-    throw (engine_error() << "cannot open configuration file: '" << filename << "'");
+    throw (engine_error() << "cannot open configuration file: '"
+           << filename << "'");
   }
 
   _filename = filename;
@@ -349,6 +136,24 @@ void state::parse(std::string const& filename) {
 
   delete[] _mac->x[MACRO_MAINCONFIGFILE];
   _mac->x[MACRO_MAINCONFIGFILE] = my_strdup(_filename.c_str());
+}
+
+/**
+ *  Reset variable
+ */
+void state::reset() {
+  _reset();
+  return;
+}
+
+/**
+ *  Unload Singleton.
+ */
+void state::unload() {
+  delete _instance;
+  _instance = NULL;
+  config = NULL;
+  return;
 }
 
 /**
@@ -2397,6 +2202,242 @@ void state::set_service_interleave_factor_method(std::string const& value) {
  *           Private Methods           *
  *                                     *
  **************************************/
+
+/**
+ *  Default constructor.
+ */
+state::state()
+  : _cur_line(0),
+    _command_check_interval_is_seconds(false),
+    _mac(NULL) {
+
+  _mac = get_global_macros();
+  memset(_mac, 0, sizeof(*_mac));
+  memset(macro_user, 0, sizeof(*macro_user) * MAX_USER_MACROS);
+
+  _lst_method["resource_file"]                               = &cpp_suck<std::string const&, &state::_parse_resource_file>::set_generic;;
+  _lst_method["log_file"]                                    = &cpp_suck<std::string const&, &state::set_log_file>::set_generic;
+  _lst_method["max_log_file_size"]                           = &cpp_suck<unsigned long, &state::set_max_log_file_size>::set_generic;
+  _lst_method["broker_module_directory"]                     = &cpp_suck<std::string const&, &state::set_broker_module_directory>::set_generic;
+  _lst_method["debug_level"]                                 = &cpp_suck_cast<unsigned long, int, &state::set_debug_level>::set_generic_cast;
+  _lst_method["debug_verbosity"]                             = &cpp_suck<unsigned int, &state::set_debug_verbosity>::set_generic;
+  _lst_method["debug_file"]                                  = &cpp_suck<std::string const&, &state::set_debug_file>::set_generic;
+  _lst_method["max_debug_file_size"]                         = &cpp_suck<unsigned long, &state::set_max_debug_file_size>::set_generic;
+  _lst_method["command_file"]                                = &cpp_suck<std::string const&, &state::set_command_file>::set_generic;
+  _lst_method["temp_file"]                                   = &cpp_suck<std::string const&, &state::set_temp_file>::set_generic;
+  _lst_method["temp_path"]                                   = &cpp_suck<std::string const&, &state::set_temp_path>::set_generic;
+  _lst_method["check_result_path"]                           = &cpp_suck<std::string const&, &state::set_check_result_path>::set_generic;
+  _lst_method["max_check_result_file_age"]                   = &cpp_suck<unsigned long, &state::set_max_check_result_file_age>::set_generic;
+  _lst_method["global_host_event_handler"]                   = &cpp_suck<std::string const&, &state::set_global_host_event_handler>::set_generic;
+  _lst_method["global_service_event_handler"]                = &cpp_suck<std::string const&, &state::set_global_service_event_handler>::set_generic;
+  _lst_method["ocsp_command"]                                = &cpp_suck<std::string const&, &state::set_ocsp_command>::set_generic;
+  _lst_method["ochp_command"]                                = &cpp_suck<std::string const&, &state::set_ochp_command>::set_generic;
+  _lst_method["admin_email"]                                 = &cpp_suck<std::string const&, &state::_set_admin_email>::set_generic;
+  _lst_method["admin_pager"]                                 = &cpp_suck<std::string const&, &state::_set_admin_pager>::set_generic;
+  _lst_method["use_syslog"]                                  = &cpp_suck<bool, &state::set_use_syslog>::set_generic;
+  _lst_method["log_notifications"]                           = &cpp_suck<bool, &state::set_log_notifications>::set_generic;
+  _lst_method["log_service_retries"]                         = &cpp_suck<bool, &state::set_log_service_retries>::set_generic;
+  _lst_method["log_host_retries"]                            = &cpp_suck<bool, &state::set_log_host_retries>::set_generic;
+  _lst_method["log_event_handlers"]                          = &cpp_suck<bool, &state::set_log_event_handlers>::set_generic;
+  _lst_method["log_external_commands"]                       = &cpp_suck<bool, &state::set_log_external_commands>::set_generic;
+  _lst_method["log_passive_checks"]                          = &cpp_suck<bool, &state::set_log_passive_checks>::set_generic;
+  _lst_method["log_initial_states"]                          = &cpp_suck<bool, &state::set_log_initial_state>::set_generic;
+  _lst_method["retain_state_information"]                    = &cpp_suck<bool, &state::set_retain_state_information>::set_generic;
+  _lst_method["retention_update_interval"]                   = &cpp_suck<unsigned int, &state::set_retention_update_interval>::set_generic;
+  _lst_method["use_retained_program_state"]                  = &cpp_suck<bool, &state::set_use_retained_program_state>::set_generic;
+  _lst_method["use_retained_scheduling_info"]                = &cpp_suck<bool, &state::set_use_retained_scheduling_info>::set_generic;
+  _lst_method["retention_scheduling_horizon"]                = &cpp_suck<unsigned int, &state::set_retention_scheduling_horizon>::set_generic;
+  _lst_method["additional_freshness_latency"]                = &cpp_suck<int, &state::set_additional_freshness_latency>::set_generic;
+  _lst_method["retained_host_attribute_mask"]                = &cpp_suck<unsigned long, &state::set_retained_host_attribute_mask>::set_generic;
+  _lst_method["retained_service_attribute_mask"]             = &cpp_suck<std::string const&, &state::_set_retained_service_attribute_mask>::set_generic;
+  _lst_method["retained_process_host_attribute_mask"]        = &cpp_suck<unsigned long, &state::set_retained_process_host_attribute_mask>::set_generic;
+  _lst_method["retained_process_service_attribute_mask"]     = &cpp_suck<std::string const&, &state::_set_retained_process_service_attribute_mask>::set_generic;
+  _lst_method["retained_contact_host_attribute_mask"]        = &cpp_suck<unsigned long, &state::set_retained_contact_host_attribute_mask>::set_generic;
+  _lst_method["retained_contact_service_attribute_mask"]     = &cpp_suck<unsigned long, &state::set_retained_contact_service_attribute_mask>::set_generic;
+  _lst_method["obsess_over_services"]                        = &cpp_suck<bool, &state::set_obsess_over_services>::set_generic;
+  _lst_method["obsess_over_hosts"]                           = &cpp_suck<bool, &state::set_obsess_over_hosts>::set_generic;
+  _lst_method["translate_passive_host_checks"]               = &cpp_suck<bool, &state::set_translate_passive_host_checks>::set_generic;
+  _lst_method["passive_host_checks_are_soft"]                = &cpp_suck<bool, &state::set_passive_host_checks_are_soft>::set_generic;
+  _lst_method["service_check_timeout"]                       = &cpp_suck<unsigned int, &state::set_service_check_timeout>::set_generic;
+  _lst_method["host_check_timeout"]                          = &cpp_suck<unsigned int, &state::set_host_check_timeout>::set_generic;
+  _lst_method["event_handler_timeout"]                       = &cpp_suck<unsigned int, &state::set_event_handler_timeout>::set_generic;
+  _lst_method["notification_timeout"]                        = &cpp_suck<unsigned int, &state::set_notification_timeout>::set_generic;
+  _lst_method["ocsp_timeout"]                                = &cpp_suck<unsigned int, &state::set_ocsp_timeout>::set_generic;
+  _lst_method["ochp_timeout"]                                = &cpp_suck<unsigned int, &state::set_ochp_timeout>::set_generic;
+  _lst_method["use_agressive_host_checking"]                 = &cpp_suck<bool, &state::set_use_aggressive_host_checking>::set_generic;
+  _lst_method["use_aggressive_host_checking"]                = &cpp_suck<bool, &state::set_use_aggressive_host_checking>::set_generic;
+  _lst_method["cached_host_check_horizon"]                   = &cpp_suck<unsigned long, &state::set_cached_host_check_horizon>::set_generic;
+  _lst_method["enable_predictive_host_dependency_checks"]    = &cpp_suck<bool, &state::set_enable_predictive_host_dependency_checks>::set_generic;
+  _lst_method["cached_service_check_horizon"]                = &cpp_suck<unsigned long, &state::set_cached_service_check_horizon>::set_generic;
+  _lst_method["enable_predictive_service_dependency_checks"] = &cpp_suck<bool, &state::set_enable_predictive_service_dependency_checks>::set_generic;
+  _lst_method["soft_state_dependencies"]                     = &cpp_suck<bool, &state::set_soft_state_dependencies>::set_generic;
+  _lst_method["log_rotation_method"]                         = &cpp_suck<std::string const&, &state::set_log_rotation_method>::set_generic;
+  _lst_method["log_archive_path"]                            = &cpp_suck<std::string const&, &state::set_log_archive_path>::set_generic;
+  _lst_method["enable_event_handlers"]                       = &cpp_suck<bool, &state::set_enable_event_handlers>::set_generic;
+  _lst_method["enable_notifications"]                        = &cpp_suck<bool, &state::set_enable_notifications>::set_generic;
+  _lst_method["execute_service_checks"]                      = &cpp_suck<bool, &state::set_execute_service_checks>::set_generic;
+  _lst_method["accept_passive_service_checks"]               = &cpp_suck<bool, &state::set_accept_passive_service_checks>::set_generic;
+  _lst_method["execute_host_checks"]                         = &cpp_suck<bool, &state::set_execute_host_checks>::set_generic;
+  _lst_method["accept_passive_host_checks"]                  = &cpp_suck<bool, &state::set_accept_passive_host_checks>::set_generic;
+  _lst_method["service_inter_check_delay_method"]            = &cpp_suck<std::string const&, &state::set_service_inter_check_delay_method>::set_generic;
+  _lst_method["max_service_check_spread"]                    = &cpp_suck<unsigned int, &state::set_max_service_check_spread>::set_generic;
+  _lst_method["host_inter_check_delay_method"]               = &cpp_suck<std::string const&, &state::set_host_inter_check_delay_method>::set_generic;
+  _lst_method["max_host_check_spread"]                       = &cpp_suck<unsigned int, &state::set_max_host_check_spread>::set_generic;
+  _lst_method["service_interleave_factor"]                   = &cpp_suck<std::string const&, &state::set_service_interleave_factor_method>::set_generic;
+  _lst_method["max_concurrent_checks"]                       = &cpp_suck<unsigned int, &state::set_max_parallel_service_checks>::set_generic;
+  _lst_method["check_result_reaper_frequency"]               = &cpp_suck<unsigned int, &state::set_check_reaper_interval>::set_generic;
+  _lst_method["service_reaper_frequency"]                    = &cpp_suck<unsigned int, &state::set_check_reaper_interval>::set_generic;
+  _lst_method["max_check_result_reaper_time"]                = &cpp_suck<unsigned int, &state::set_max_check_reaper_time>::set_generic;
+  _lst_method["sleep_time"]                                  = &cpp_suck<float, &state::set_sleep_time>::set_generic;
+  _lst_method["interval_length"]                             = &cpp_suck<unsigned int, &state::set_interval_length>::set_generic;
+  _lst_method["check_external_commands"]                     = &cpp_suck<bool, &state::set_check_external_commands>::set_generic;
+  _lst_method["command_check_interval"]                      = &cpp_suck<std::string const&, &state::set_command_check_interval>::set_generic;
+  _lst_method["check_for_orphaned_services"]                 = &cpp_suck<bool, &state::set_check_orphaned_services>::set_generic;
+  _lst_method["check_for_orphaned_hosts"]                    = &cpp_suck<bool, &state::set_check_orphaned_hosts>::set_generic;
+  _lst_method["check_service_freshness"]                     = &cpp_suck<bool, &state::set_check_service_freshness>::set_generic;
+  _lst_method["check_host_freshness"]                        = &cpp_suck<bool, &state::set_check_host_freshness>::set_generic;
+  _lst_method["service_freshness_check_interval"]            = &cpp_suck<unsigned int, &state::set_service_freshness_check_interval>::set_generic;
+  _lst_method["host_freshness_check_interval"]               = &cpp_suck<unsigned int, &state::set_host_freshness_check_interval>::set_generic;
+  _lst_method["auto_reschedule_checks"]                      = &cpp_suck<bool, &state::set_auto_reschedule_checks>::set_generic;
+  _lst_method["auto_rescheduling_interval"]                  = &cpp_suck<unsigned int, &state::set_auto_rescheduling_interval>::set_generic;
+  _lst_method["auto_rescheduling_window"]                    = &cpp_suck<unsigned int, &state::set_auto_rescheduling_window>::set_generic;
+  _lst_method["aggregate_status_updates"]                    = &cpp_suck<std::string const&, &state::_set_aggregate_status_updates>::set_generic;
+  _lst_method["status_update_interval"]                      = &cpp_suck<unsigned int, &state::set_status_update_interval>::set_generic;
+  _lst_method["time_change_threshold"]                       = &cpp_suck<unsigned int, &state::set_time_change_threshold>::set_generic;
+  _lst_method["process_performance_data"]                    = &cpp_suck<bool, &state::set_process_performance_data>::set_generic;
+  _lst_method["enable_flap_detection"]                       = &cpp_suck<bool, &state::set_enable_flap_detection>::set_generic;
+  _lst_method["enable_failure_prediction"]                   = &cpp_suck<bool, &state::set_enable_failure_prediction>::set_generic;
+  _lst_method["low_service_flap_threshold"]                  = &cpp_suck<float, &state::set_low_service_flap_threshold>::set_generic;
+  _lst_method["high_service_flap_threshold"]                 = &cpp_suck<float, &state::set_high_service_flap_threshold>::set_generic;
+  _lst_method["low_host_flap_threshold"]                     = &cpp_suck<float, &state::set_low_host_flap_threshold>::set_generic;
+  _lst_method["high_host_flap_threshold"]                    = &cpp_suck<float, &state::set_high_host_flap_threshold>::set_generic;
+  _lst_method["date_format"]                                 = &cpp_suck<std::string const&, &state::set_date_format>::set_generic;
+  _lst_method["use_timezone"]                                = &cpp_suck<std::string const&, &state::set_use_timezone>::set_generic;
+  _lst_method["p1_file"]                                     = &cpp_suck<std::string const&, &state::set_p1_file>::set_generic;
+  _lst_method["event_broker_options"]                        = &cpp_suck<std::string const&, &state::set_event_broker_options>::set_generic;
+  _lst_method["illegal_object_name_chars"]                   = &cpp_suck<std::string const&, &state::set_illegal_object_chars>::set_generic;
+  _lst_method["illegal_macro_output_chars"]                  = &cpp_suck<std::string const&, &state::set_illegal_output_chars>::set_generic;
+  _lst_method["broker_module"]                               = &cpp_suck<std::string const&, &state::_set_broker_module>::set_generic;
+  _lst_method["use_regexp_matching"]                         = &cpp_suck<bool, &state::set_use_regexp_matches>::set_generic;
+  _lst_method["use_true_regexp_matching"]                    = &cpp_suck<bool, &state::set_use_true_regexp_matching>::set_generic;
+  _lst_method["use_large_installation_tweaks"]               = &cpp_suck<bool, &state::set_use_large_installation_tweaks>::set_generic;
+  _lst_method["enable_environment_macros"]                   = &cpp_suck<bool, &state::set_enable_environment_macros>::set_generic;
+  _lst_method["free_child_process_memory"]                   = &cpp_suck<bool, &state::set_free_child_process_memory>::set_generic;
+  _lst_method["child_processes_fork_twice"]                  = &cpp_suck<bool, &state::set_child_processes_fork_twice>::set_generic;
+  _lst_method["enable_embedded_perl"]                        = &cpp_suck<bool, &state::set_enable_embedded_perl>::set_generic;
+  _lst_method["use_embedded_perl_implicitly"]                = &cpp_suck<bool, &state::set_use_embedded_perl_implicitly>::set_generic;
+  _lst_method["external_command_buffer_slots"]               = &cpp_suck<int, &state::set_external_command_buffer_slots>::set_generic;
+  _lst_method["auth_file"]                                   = &cpp_suck<std::string const&, &state::_set_auth_file>::set_generic;
+  _lst_method["bare_update_check"]                           = &cpp_suck<std::string const&, &state::_set_bare_update_check>::set_generic;
+  _lst_method["check_for_updates"]                           = &cpp_suck<std::string const&, &state::_set_check_for_updates>::set_generic;
+  _lst_method["comment_file"]                                = &cpp_suck<std::string const&, &state::_set_comment_file>::set_generic;
+  _lst_method["xcddefault_comment_file"]                     = &cpp_suck<std::string const&, &state::_set_comment_file>::set_generic;
+  _lst_method["daemon_dumps_core"]                           = &cpp_suck<std::string const&, &state::_set_daemon_dumps_core>::set_generic;
+  _lst_method["downtime_file"]                               = &cpp_suck<std::string const&, &state::_set_downtime_file>::set_generic;
+  _lst_method["xdddefault_downtime_file"]                    = &cpp_suck<std::string const&, &state::_set_downtime_file>::set_generic;
+  _lst_method["allow_empty_hostgroup_assignment"]            = &cpp_suck<bool, &state::set_allow_empty_hostgroup_assignment>::set_generic;
+  _lst_method["daemon_dumps_core"]                           = &cpp_suck<std::string const&, &state::_set_daemon_dumps_core>::set_generic;
+  _lst_method["nagios_user"]                                 = &cpp_suck<std::string const&, &state::_set_user>::set_generic;
+  _lst_method["nagios_group"]                                = &cpp_suck<std::string const&, &state::_set_group>::set_generic;
+  _lst_method["lock_file"]                                   = &cpp_suck<std::string const&, &state::_set_lock_file>::set_generic;
+
+  _lst_method["status_file"]                                 = &cpp_suck<std::string const&, &state::_set_status_file>::set_generic;
+  _lst_method["perfdata_timeout"]                            = &cpp_suck<int, &state::_set_perfdata_timeout>::set_generic;
+  _lst_method["cfg_file"]                                    = &cpp_suck<std::string const&, &state::_add_cfg_file>::set_generic;
+  _lst_method["cfg_dir"]                                     = &cpp_suck<std::string const&, &state::_add_cfg_dir>::set_generic;
+  _lst_method["state_retention_file"]                        = &cpp_suck<std::string const&, &state::_set_state_retention_file>::set_generic;
+  _lst_method["object_cache_file"]                           = &cpp_suck<std::string const&, &state::_set_object_cache_file>::set_generic;
+  _lst_method["precached_object_file"]                       = &cpp_suck<std::string const&, &state::_set_precached_object_file>::set_generic;
+
+  _reset();
+
+  set_accept_passive_host_checks(DEFAULT_ACCEPT_PASSIVE_HOST_CHECKS);
+  set_allow_empty_hostgroup_assignment(DEFAULT_ALLOW_EMPTY_HOSTGROUP_ASSIGNMENT);
+
+  ::log_rotation_method = 0;
+  ::log_archive_path = my_strdup(DEFAULT_LOG_ARCHIVE_PATH);
+
+  // Set macros.
+  delete[] _mac->x[MACRO_TEMPFILE];
+  _mac->x[MACRO_TEMPFILE] = my_strdup("/tmp/centengine.tmp");
+  delete[] _mac->x[MACRO_TEMPPATH];
+  _mac->x[MACRO_TEMPPATH] = my_strdup("/tmp");
+}
+
+/**
+ *  Copy constructor.
+ *
+ *  @param[in] right Object to copy.
+ */
+state::state(state const& right) {
+  operator=(right);
+}
+
+/**
+ *  Destructor.
+ */
+state::~state() throw() {
+  delete[] _mac->x[MACRO_LOGFILE];
+  delete[] _mac->x[MACRO_TEMPPATH];
+  delete[] _mac->x[MACRO_MAINCONFIGFILE];
+  delete[] _mac->x[MACRO_COMMANDFILE];
+  delete[] _mac->x[MACRO_TEMPFILE];
+  delete[] _mac->x[MACRO_RESOURCEFILE];
+  delete[] _mac->x[MACRO_ADMINEMAIL];
+  delete[] _mac->x[MACRO_ADMINPAGER];
+
+  delete[] ::log_archive_path;
+  delete[] ::log_file;
+  delete[] ::debug_file;
+  delete[] ::command_file;
+  delete[] ::global_host_event_handler;
+  delete[] ::global_service_event_handler;
+  delete[] ::ocsp_command;
+  delete[] ::ochp_command;
+  delete[] ::illegal_object_chars;
+  delete[] ::illegal_output_chars;
+  delete[] ::use_timezone;
+
+  for (unsigned int i(0); i < MAX_USER_MACROS; ++i) {
+    delete[] macro_user[i];
+    macro_user[i] = NULL;
+  }
+}
+
+/**
+ *  Assignment operator.
+ *
+ *  @param[in] right Object to copy.
+ *
+ *  @return This object.
+ */
+state& state::operator=(state const& right) {
+  if (this != &right) {
+    _filename = right._filename;
+    _cur_line = right._cur_line;
+    _command_check_interval_is_seconds = right._command_check_interval_is_seconds;
+
+    for (unsigned int i = 0; i < max_string; ++i){
+      _tab_string[i] = right._tab_string[i];
+    }
+    for (unsigned int i = 0; i < max_ulong; ++i){
+      _tab_ulong[i] = right._tab_ulong[i];
+    }
+    for (unsigned int i = 0; i < max_float; ++i){
+      _tab_float[i] = right._tab_float[i];
+    }
+    for (unsigned int i = 0; i < max_int; ++i){
+      _tab_int[i] = right._tab_int[i];
+    }
+    for (unsigned int i = 0; i < max_uint; ++i){
+      _tab_uint[i] = right._tab_uint[i];
+    }
+    for (unsigned int i = 0; i < max_bool; ++i){
+      _tab_bool[i] = right._tab_bool[i];
+    }
+  }
+  return (*this);
+}
 
 /**
  *  Get the next entire line from a stream.

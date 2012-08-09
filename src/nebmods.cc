@@ -156,6 +156,7 @@ int neb_unload_all_modules(int flags, int reason) {
          it != end;
          ++it)
       neb_unload_module(&**it, flags, reason);
+    loader.unload_modules();
     logger(dbg_eventbroker, basic) << "load all modules success.";
   }
   catch (...) {

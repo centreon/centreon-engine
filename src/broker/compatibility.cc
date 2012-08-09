@@ -28,7 +28,7 @@
 using namespace com::centreon::engine::broker;
 
 // Class instance.
-std::auto_ptr<compatibility> compatibility::_instance;
+static compatibility* _instance = NULL;
 
 // NEB module list maintained for compatibility.
 extern "C" {
@@ -42,18 +42,6 @@ extern "C" {
 **************************************/
 
 /**
- *  Destructor.
- */
-compatibility::~compatibility() throw () {
-  try {
-    while (neb_module_list)
-      destroy_module(
-        static_cast<broker::handle*>(neb_module_list->module_handle));
-  }
-  catch (...) {}
-}
-
-/**
  *  Get instance of compatibility singleton.
  */
 compatibility& compatibility::instance() {
@@ -64,17 +52,18 @@ compatibility& compatibility::instance() {
  *  Load singleton instance.
  */
 void compatibility::load() {
-  if (!_instance.get())
-    _instance.reset(new compatibility);
-  return ;
+  if (!_instance)
+    _instance = new compatibility;
+  return;
 }
 
 /**
  *  Cleanup instance of compatibility singleton.
  */
 void compatibility::unload() {
-  _instance.reset();
-  return ;
+  delete _instance;
+  _instance = NULL;
+  return;
 }
 
 /**
@@ -290,7 +279,9 @@ void compatibility::version_module(broker::handle* mod) {
 /**
  *  Default constructor.
  */
-compatibility::compatibility() {}
+compatibility::compatibility() {
+
+}
 
 /**
  *  Copy constructor.
@@ -299,6 +290,18 @@ compatibility::compatibility() {}
  */
 compatibility::compatibility(compatibility const& right) {
   _internal_copy(right);
+}
+
+/**
+ *  Destructor.
+ */
+compatibility::~compatibility() throw () {
+  try {
+    while (neb_module_list)
+      destroy_module(
+        static_cast<broker::handle*>(neb_module_list->module_handle));
+  }
+  catch (...) {}
 }
 
 /**

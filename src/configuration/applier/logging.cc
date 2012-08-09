@@ -25,7 +25,7 @@ using namespace com::centreon;
 using namespace com::centreon::engine::logging;
 using namespace com::centreon::engine::configuration::applier;
 
-logging* logging::_instance = NULL;
+static logging* _instance = NULL;
 
 /**
  *  Get the singleton instance of logging applier.

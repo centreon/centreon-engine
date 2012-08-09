@@ -42,6 +42,7 @@
 #include "com/centreon/engine/commands/set.hh"
 #include "com/centreon/engine/comments.hh"
 #include "com/centreon/engine/config.hh"
+#include "com/centreon/engine/configuration/state.hh"
 #include "com/centreon/engine/configuration/applier/logging.hh"
 #include "com/centreon/engine/downtime.hh"
 #include "com/centreon/engine/events/loop.hh"
@@ -116,6 +117,7 @@ int main(int argc, char* argv[]) {
 
   // Load singletons.
   com::centreon::clib::load();
+  com::centreon::engine::configuration::state::load();
   com::centreon::engine::logging::engine::load();
   com::centreon::engine::configuration::applier::logging::load();
   com::centreon::engine::commands::set::load();
@@ -141,7 +143,7 @@ int main(int argc, char* argv[]) {
     case 'V': // Version.
       display_license = true;
       break ;
-    case 'v': // Verify config.
+    case 'v': // Verify config->
       verify_config = TRUE;
       break ;
     case 's': // Scheduling Check.
@@ -150,10 +152,10 @@ int main(int argc, char* argv[]) {
     case 'x': // Don't verify circular paths.
       verify_circular_paths = FALSE;
       break ;
-    case 'p': // Precache object config.
+    case 'p': // Precache object config->
       precache_objects = TRUE;
       break ;
-    case 'u': // Use precached object config.
+    case 'u': // Use precached object config->
       use_precached_objects = TRUE;
       break ;
     default:
@@ -250,7 +252,7 @@ int main(int argc, char* argv[]) {
     try {
       // Read main config file.
       logger(log_info_message, basic) << "reading main config file";
-      config.parse(config_file);
+      config->parse(config_file);
 
       // Read object config files.
       if ((result = read_all_object_data(config_file)) == OK)
@@ -298,8 +300,8 @@ int main(int argc, char* argv[]) {
 
     // Read in the configuration files (main config file and all host config files).
     try {
-      config.parse(config_file);
-      configuration::applier::logging::instance().apply(config);
+      config->parse(config_file);
+      configuration::applier::logging::instance().apply(*config);
       engine::obj_info
         obj(
           com::centreon::shared_ptr<logging::object>(new logging::broker),
@@ -381,8 +383,8 @@ int main(int argc, char* argv[]) {
       // Read in the configuration files (main
       // and resource config files).
       try {
-        config.parse(config_file);
-        configuration::applier::logging::instance().apply(config);
+        config->parse(config_file);
+        configuration::applier::logging::instance().apply(*config);
         engine::obj_info obj(
                            com::centreon::shared_ptr<logging::object>(
                              new logging::broker),
@@ -416,7 +418,7 @@ int main(int argc, char* argv[]) {
       try {
         com::centreon::engine::broker::loader& loader(
           com::centreon::engine::broker::loader::instance());
-        std::string const& mod_dir(config.get_broker_module_directory());
+        std::string const& mod_dir(config->get_broker_module_directory());
         if (!mod_dir.empty())
           loader.load_directory(mod_dir);
       }
@@ -614,6 +616,7 @@ int main(int argc, char* argv[]) {
   com::centreon::engine::checks::checker::unload();
   com::centreon::engine::commands::set::unload();
   com::centreon::engine::configuration::applier::logging::unload();
+  com::centreon::engine::configuration::state::unload();
   com::centreon::clib::unload();
 
   return (EXIT_SUCCESS);

@@ -595,11 +595,11 @@ bool processing::execute(std::string const& cmd) const {
   if (command_id == CMD_PROCESS_SERVICE_CHECK_RESULT
       || command_id == CMD_PROCESS_HOST_CHECK_RESULT) {
     // passive checks are logged in checks.c.
-    if (config.get_log_passive_checks() == true)
+    if (config->get_log_passive_checks() == true)
       logger(log_passive_check, basic)
         << "EXTERNAL COMMAND: " << command_name << ';' << args;
   }
-  else if (config.get_log_external_commands() == true)
+  else if (config->get_log_external_commands() == true)
     logger(log_external_command, basic)
       << "EXTERNAL COMMAND: " << command_name << ';' << args;
 

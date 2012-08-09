@@ -22,7 +22,6 @@
 #ifndef CCE_EVENTS_LOOP_HH
 #  define CCE_EVENTS_LOOP_HH
 
-#  include <memory>
 #  include <time.h>
 #  include "com/centreon/engine/events.hh"
 #  include "com/centreon/engine/namespace.hh"
@@ -39,7 +38,6 @@ namespace             events {
    */
   class               loop {
   public:
-                      ~loop() throw ();
     static loop&      instance();
     static void       load();
     void              run();
@@ -48,12 +46,11 @@ namespace             events {
   private:
                       loop();
                       loop(loop const& right);
+                      ~loop() throw ();
     loop&             operator=(loop const& right);
     void              _dispatching();
     void              _internal_copy(loop const& right);
 
-    static std::auto_ptr<loop>
-    _instance;
     time_t            _last_status_update;
     time_t            _last_time;
     timed_event       _sleep_event;

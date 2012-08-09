@@ -156,7 +156,7 @@ int write_to_syslog(char const* buffer, unsigned long type) {
  *  @return Return true on success.
  */
 int log_service_event(service* svc) {
-  if (svc->state_type == SOFT_STATE && !config.get_log_service_retries()) {
+  if (svc->state_type == SOFT_STATE && !config->get_log_service_retries()) {
     return (OK);
   }
 
@@ -256,7 +256,7 @@ int log_host_event(host* hst) {
 int log_host_states(unsigned int type, time_t* timestamp) {
   (void)timestamp;
 
-  if (type == INITIAL_STATES && config.get_log_initial_state() == false) {
+  if (type == INITIAL_STATES && config->get_log_initial_state() == false) {
     return (OK);
   }
 
@@ -300,7 +300,7 @@ int log_host_states(unsigned int type, time_t* timestamp) {
 int log_service_states(unsigned int type, time_t* timestamp) {
   (void)timestamp;
 
-  if (type == INITIAL_STATES && config.get_log_initial_state() == false) {
+  if (type == INITIAL_STATES && config->get_log_initial_state() == false) {
     return (OK);
   }
 

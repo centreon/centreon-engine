@@ -64,9 +64,13 @@ int main_test(int argc, char** argv) {
   std::string cmd_processed(cmd.process_cmd(&macros));
 
   delete [] hst.address;
+  hst.address = NULL;
   delete [] macro_x_names[MACRO_HOSTADDRESS];
+  macro_x_names[MACRO_HOSTADDRESS] = NULL;
   delete [] macro_user[0];
+  macro_user[0] = NULL;
   delete [] macros.argv[0];
+  macros.argv[0] = NULL;
 
   if (cmd_processed != CMD_PROCESSED)
     throw (engine_error() << "command::process failed.");

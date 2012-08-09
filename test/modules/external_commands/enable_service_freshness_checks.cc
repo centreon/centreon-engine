@@ -33,11 +33,11 @@ static int check_enable_service_freshness_checks(int argc, char** argv) {
   (void)argc;
   (void)argv;
 
-  config.set_check_service_freshness(false);
+  config->set_check_service_freshness(false);
   char const* cmd("[1317196300] ENABLE_SERVICE_FRESHNESS_CHECKS");
   process_external_command(cmd);
 
-  if (!config.get_check_service_freshness())
+  if (!config->get_check_service_freshness())
     throw (engine_error() << "enable_service_freshness_checks failed.");
 
   return (0);

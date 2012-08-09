@@ -33,11 +33,11 @@ static int check_disable_flap_detection(int argc, char** argv) {
   (void)argc;
   (void)argv;
 
-  config.set_enable_flap_detection(true);
+  config->set_enable_flap_detection(true);
   char const* cmd("[1317196300] DISABLE_FLAP_DETECTION");
   process_external_command(cmd);
 
-  if (config.get_enable_flap_detection())
+  if (config->get_enable_flap_detection())
     throw (engine_error() << "disable_flap_detection failed.");
 
   return (0);

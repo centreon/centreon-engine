@@ -33,11 +33,11 @@ static int check_enable_failure_prediction(int argc, char** argv) {
   (void)argc;
   (void)argv;
 
-  config.set_enable_failure_prediction(false);
+  config->set_enable_failure_prediction(false);
   char const* cmd("[1317196300] ENABLE_FAILURE_PREDICTION");
   process_external_command(cmd);
 
-  if (!config.get_enable_failure_prediction())
+  if (!config->get_enable_failure_prediction())
     throw (engine_error() << "enable_failure_prediction failed.");
 
   return (0);

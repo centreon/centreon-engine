@@ -17,6 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <memory>
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/modules/webservice/commands.hh"
 #include "com/centreon/engine/modules/webservice/create_object.hh"

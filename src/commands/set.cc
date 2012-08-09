@@ -30,18 +30,13 @@ using namespace com::centreon::engine::logging;
 using namespace com::centreon::engine::commands;
 
 // Class instance.
-set* set::_instance = NULL;
+static set* _instance = NULL;
 
 /**************************************
 *                                     *
 *           Public Methods            *
 *                                     *
 **************************************/
-
-/**
- *  Destructor.
- */
-set::~set() throw () {}
 
 /**
  *  Add (or replace) a new command.
@@ -126,7 +121,9 @@ void set::unload() {
 /**
  *  Default constructor.
  */
-set::set() {}
+set::set() {
+
+}
 
 /**
  *  Copy constructor.
@@ -135,6 +132,13 @@ set::set() {}
  */
 set::set(set const& right) {
   _internal_copy(right);
+}
+
+/**
+ *  Destructor.
+ */
+set::~set() throw () {
+
 }
 
 /**

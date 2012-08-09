@@ -27,6 +27,7 @@
 #  include "com/centreon/engine/broker/loader.hh"
 #  include "com/centreon/engine/checks/checker.hh"
 #  include "com/centreon/engine/commands/set.hh"
+#  include "com/centreon/engine/configuration/state.hh"
 #  include "com/centreon/engine/events/loop.hh"
 #  include "com/centreon/engine/logging/engine.hh"
 #  include "com/centreon/engine/namespace.hh"
@@ -65,10 +66,10 @@ public:
    */
   int    run() {
     int ret(EXIT_FAILURE);
+    if (!_init())
+      return (ret);
     try {
-      _init();
       ret = (*_func)(_argc, _argv);
-      _deinit();
     }
     catch (std::exception const& e) {
       std::cerr << "error: " << e.what() << std::endl;
@@ -76,30 +77,58 @@ public:
     catch (...) {
       std::cerr << "error: unknown exception" << std::endl;
     }
+    if (!_deinit())
+      ret = EXIT_FAILURE;
     return (ret);
   }
 
 private:
-  void   _init() {
-    com::centreon::clib::load();
-    logging::engine::load();
-    commands::set::load();
-    checks::checker::load();
-    events::loop::load();
-    broker::loader::load();
-    broker::compatibility::load();
-    return ;
+  bool   _init() {
+    try {
+      com::centreon::clib::load();
+      configuration::state::load();
+      logging::engine::load();
+      commands::set::load();
+      checks::checker::load();
+      events::loop::load();
+      broker::loader::load();
+      broker::compatibility::load();
+    }
+    catch (std::exception const& e) {
+      std::cerr << "unit test init failed: "
+                << e.what() << std::endl;
+      return (false);
+    }
+    catch (...) {
+      std::cerr << "unit test init failed: "
+        "unknown exception" << std::endl;
+      return (false);
+    }
+    return (true);
   }
 
-  void   _deinit() {
-    broker::compatibility::unload();
-    broker::loader::unload();
-    events::loop::unload();
-    checks::checker::unload();
-    commands::set::unload();
-    logging::engine::unload();
-    com::centreon::clib::unload();
-    return ;
+  bool   _deinit() {
+    try {
+      broker::compatibility::unload();
+      broker::loader::unload();
+      events::loop::unload();
+      checks::checker::unload();
+      commands::set::unload();
+      logging::engine::unload();
+      configuration::state::unload();
+      com::centreon::clib::unload();
+    }
+    catch (std::exception const& e) {
+      std::cerr << "unit test deinit failed: "
+                << e.what() << std::endl;
+      return (false);
+    }
+    catch (...) {
+      std::cerr << "unit test deinit failed: "
+        "unknown exception" << std::endl;
+      return (false);
+    }
+    return (true);
   }
 
   int    _argc;

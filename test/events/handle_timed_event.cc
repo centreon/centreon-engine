@@ -86,7 +86,7 @@ static void check_event_service_check() {
  */
 static void check_event_command_check() {
   // register broker callback to catch event.
-  config.set_event_broker_options(BROKER_EXTERNALCOMMAND_DATA);
+  config->set_event_broker_options(BROKER_EXTERNALCOMMAND_DATA);
   void* module_id = reinterpret_cast<void*>(0x4242);
   neb_register_callback(NEBCALLBACK_EXTERNAL_COMMAND_DATA,
                         module_id,
@@ -174,8 +174,8 @@ static void check_event_orphan_check() {
  */
 static void check_event_retention_save() {
   // register broker callback to catch event.
-  config.set_event_broker_options(BROKER_RETENTION_DATA);
-  config.set_retain_state_information(true);
+  config->set_event_broker_options(BROKER_RETENTION_DATA);
+  config->set_retain_state_information(true);
   void* module_id = reinterpret_cast<void*>(0x4242);
   neb_register_callback(NEBCALLBACK_RETENTION_DATA,
                         module_id,
@@ -201,8 +201,8 @@ static void check_event_retention_save() {
  */
 static void check_event_status_save() {
   // register broker callback to catch event.
-  config.set_event_broker_options(BROKER_STATUS_DATA);
-  config.set_retain_state_information(true);
+  config->set_event_broker_options(BROKER_STATUS_DATA);
+  config->set_retain_state_information(true);
   void* module_id = reinterpret_cast<void*>(0x4242);
   neb_register_callback(NEBCALLBACK_AGGREGATED_STATUS_DATA,
                         module_id,

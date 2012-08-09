@@ -44,7 +44,7 @@ bool com::centreon::engine::file_exists(char const* path) {
  */
 int com::centreon::engine::first_notif_delay_default_setup() {
   // Interval length is 1 second.
-  config.set_interval_length(1);
+  config->set_interval_length(1);
 
   // Remove flag file.
   ::remove(FLAG_FILE);
@@ -115,7 +115,7 @@ int com::centreon::engine::first_notif_delay_default_setup() {
   retval |= (NULL == hst);
   host_list->has_been_checked = 1;
   host_list->last_check = time(NULL);
-  config.set_cached_host_check_horizon(24 * 60 * 60);
+  config->set_cached_host_check_horizon(24 * 60 * 60);
 
   // Add service.
   service* svc(add_service(

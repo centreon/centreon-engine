@@ -243,13 +243,13 @@ void handle::open() {
           this) != OK)
       throw (engine_error() << "Function nebmodule_init "
              "returned an error");
+
+    broker::compatibility::instance().loaded_module(this);
   }
   catch (std::exception const& e) {
     close();
     throw;
   }
-
-  broker::compatibility::instance().loaded_module(this);
 }
 
 /**

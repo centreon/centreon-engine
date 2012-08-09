@@ -33,11 +33,11 @@ static int check_disable_host_freshness_checks(int argc, char** argv) {
   (void)argc;
   (void)argv;
 
-  config.set_check_host_freshness(true);
+  config->set_check_host_freshness(true);
   char const* cmd("[1317196300] DISABLE_HOST_FRESHNESS_CHECKS");
   process_external_command(cmd);
 
-  if (config.get_check_host_freshness())
+  if (config->get_check_host_freshness())
     throw (engine_error() << "disable_host_freshness_checks failed.");
 
   return (0);

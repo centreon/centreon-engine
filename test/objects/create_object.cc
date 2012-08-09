@@ -23,6 +23,7 @@
 #include <vector>
 #include "com/centreon/engine/objects/timeperiod.hh"
 #include "test/objects/create_object.hh"
+#include "test/unittest.hh"
 
 using namespace com::centreon::engine::objects;
 using namespace test;

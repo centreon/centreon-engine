@@ -43,7 +43,7 @@
 extern "C" {
 #  endif /* C++ */
 
-extern com::centreon::engine::configuration::state config;
+extern com::centreon::engine::configuration::state* config;
 extern char*                     config_file;
 
 extern command*                  global_host_event_handler_ptr;

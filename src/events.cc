@@ -117,9 +117,9 @@ static void _exec_event_orphan_check(timed_event* event) {
   logger(dbg_events, basic) << "** Orphaned Host and Service Check Event";
 
   /* check for orphaned hosts and services */
-  if (config.get_check_orphaned_hosts() == true)
+  if (config->get_check_orphaned_hosts() == true)
     check_for_orphaned_hosts();
-  if (config.get_check_orphaned_services() == true)
+  if (config->get_check_orphaned_services() == true)
     check_for_orphaned_services();
 }
 
@@ -361,7 +361,7 @@ void init_timing_loop(void) {
 
   /* adjust the check interval total to correspond to the interval length */
   scheduling_info.service_check_interval_total =
-    (scheduling_info.service_check_interval_total * config.get_interval_length());
+    (scheduling_info.service_check_interval_total * config->get_interval_length());
 
   /* calculate the average check interval for services */
   if (scheduling_info.total_scheduled_services == 0)
@@ -377,10 +377,10 @@ void init_timing_loop(void) {
   logger(dbg_events, most) << "Determining service scheduling parameters...";
 
   /* default max service check spread (in minutes) */
-  scheduling_info.max_service_check_spread = config.get_max_service_check_spread();
+  scheduling_info.max_service_check_spread = config->get_max_service_check_spread();
 
   /* how should we determine the service inter-check delay to use? */
-  switch (config.get_service_inter_check_delay_method()) {
+  switch (config->get_service_inter_check_delay_method()) {
 
   case configuration::state::icd_none:
     /* don't spread checks out - useful for testing parallelization code */
@@ -434,7 +434,7 @@ void init_timing_loop(void) {
   }
 
   /* how should we determine the service interleave factor? */
-  switch (config.get_service_interleave_factor_method()) {
+  switch (config->get_service_interleave_factor_method()) {
 
   case configuration::state::ilf_user:
     /* the user supplied a value, so don't do any calculation */
@@ -615,10 +615,10 @@ void init_timing_loop(void) {
   scheduling_info.last_host_check = (time_t)0L;
 
   /* default max host check spread (in minutes) */
-  scheduling_info.max_host_check_spread = config.get_max_host_check_spread();
+  scheduling_info.max_host_check_spread = config->get_max_host_check_spread();
 
   /* how should we determine the host inter-check delay to use? */
-  switch (config.get_host_inter_check_delay_method()) {
+  switch (config->get_host_inter_check_delay_method()) {
   case configuration::state::icd_none:
     /* don't spread checks out */
     scheduling_info.host_inter_check_delay = 0.0;
@@ -641,7 +641,7 @@ void init_timing_loop(void) {
 
       /* adjust the check interval total to correspond to the interval length */
       scheduling_info.host_check_interval_total =
-	(scheduling_info.host_check_interval_total * config.get_interval_length());
+	(scheduling_info.host_check_interval_total * config->get_interval_length());
 
       /* calculate the average check interval for hosts */
       scheduling_info.average_host_check_interval =
@@ -778,12 +778,12 @@ void init_timing_loop(void) {
   /******** SCHEDULE MISC EVENTS ********/
 
   /* add a host and service check rescheduling event */
-  if (config.get_auto_reschedule_checks() == true)
+  if (config->get_auto_reschedule_checks() == true)
     schedule_new_event(EVENT_RESCHEDULE_CHECKS,
 		       TRUE,
-                       current_time + config.get_auto_rescheduling_interval(),
+                       current_time + config->get_auto_rescheduling_interval(),
                        TRUE,
-		       config.get_auto_rescheduling_interval(),
+		       config->get_auto_rescheduling_interval(),
 		       NULL,
                        TRUE,
 		       NULL,
@@ -793,9 +793,9 @@ void init_timing_loop(void) {
   /* add a check result reaper event */
   schedule_new_event(EVENT_CHECK_REAPER,
                      TRUE,
-                     current_time + config.get_check_reaper_interval(),
+                     current_time + config->get_check_reaper_interval(),
 		     TRUE,
-                     config.get_check_reaper_interval(),
+                     config->get_check_reaper_interval(),
 		     NULL,
 		     TRUE,
 		     NULL,
@@ -803,8 +803,8 @@ void init_timing_loop(void) {
                      0);
 
   /* add an orphaned check event */
-  if (config.get_check_orphaned_services() == TRUE
-      || config.get_check_orphaned_hosts() == true)
+  if (config->get_check_orphaned_services() == TRUE
+      || config->get_check_orphaned_hosts() == true)
     schedule_new_event(EVENT_ORPHAN_CHECK,
 		       TRUE,
                        current_time + DEFAULT_ORPHAN_CHECK_INTERVAL,
@@ -817,12 +817,12 @@ void init_timing_loop(void) {
                        0);
 
   /* add a service result "freshness" check event */
-  if (config.get_check_service_freshness() == true)
+  if (config->get_check_service_freshness() == true)
     schedule_new_event(EVENT_SFRESHNESS_CHECK,
 		       TRUE,
-                       current_time + config.get_service_freshness_check_interval(),
+                       current_time + config->get_service_freshness_check_interval(),
 		       TRUE,
-                       config.get_service_freshness_check_interval(),
+                       config->get_service_freshness_check_interval(),
 		       NULL,
                        TRUE,
 		       NULL,
@@ -830,12 +830,12 @@ void init_timing_loop(void) {
 		       0);
 
   /* add a host result "freshness" check event */
-  if (config.get_check_host_freshness() == true)
+  if (config->get_check_host_freshness() == true)
     schedule_new_event(EVENT_HFRESHNESS_CHECK,
 		       TRUE,
-                       current_time + config.get_host_freshness_check_interval(),
+                       current_time + config->get_host_freshness_check_interval(),
 		       TRUE,
-                       config.get_host_freshness_check_interval(),
+                       config->get_host_freshness_check_interval(),
 		       NULL,
 		       TRUE,
                        NULL,
@@ -845,9 +845,9 @@ void init_timing_loop(void) {
   /* add a status save event */
   schedule_new_event(EVENT_STATUS_SAVE,
 		     TRUE,
-                     current_time + config.get_status_update_interval(),
+                     current_time + config->get_status_update_interval(),
 		     TRUE,
-                     config.get_status_update_interval(),
+                     config->get_status_update_interval(),
 		     NULL,
 		     TRUE,
 		     NULL,
@@ -855,11 +855,11 @@ void init_timing_loop(void) {
 		     0);
 
   /* add an external command check event if needed */
-  if (config.get_check_external_commands() == true) {
-    if (config.get_command_check_interval() == -1)
+  if (config->get_check_external_commands() == true) {
+    if (config->get_command_check_interval() == -1)
       interval_to_use = (unsigned long)5;
     else
-      interval_to_use = (unsigned long)config.get_command_check_interval();
+      interval_to_use = (unsigned long)config->get_command_check_interval();
     schedule_new_event(EVENT_COMMAND_CHECK,
 		       TRUE,
                        current_time + interval_to_use,
@@ -873,13 +873,13 @@ void init_timing_loop(void) {
   }
 
   /* add a retention data save event if needed */
-  if (config.get_retain_state_information() == true
-      && config.get_retention_update_interval() > 0)
+  if (config->get_retain_state_information() == true
+      && config->get_retention_update_interval() > 0)
     schedule_new_event(EVENT_RETENTION_SAVE,
 		       TRUE,
-                       current_time + (config.get_retention_update_interval() * 60),
+                       current_time + (config->get_retention_update_interval() * 60),
 		       TRUE,
-                       (config.get_retention_update_interval() * 60),
+                       (config->get_retention_update_interval() * 60),
 		       NULL,
                        TRUE,
 		       NULL,
@@ -942,11 +942,11 @@ void display_scheduling_info(void) {
   printf("Total scheduled hosts:           %d\n", scheduling_info.total_scheduled_hosts);
 
   printf("Host inter-check delay method:   ");
-  if (config.get_host_inter_check_delay_method() == configuration::state::icd_none)
+  if (config->get_host_inter_check_delay_method() == configuration::state::icd_none)
     printf("NONE\n");
-  else if (config.get_host_inter_check_delay_method() == configuration::state::icd_dumb)
+  else if (config->get_host_inter_check_delay_method() == configuration::state::icd_dumb)
     printf("DUMB\n");
-  else if (config.get_host_inter_check_delay_method() == configuration::state::icd_smart) {
+  else if (config->get_host_inter_check_delay_method() == configuration::state::icd_smart) {
     printf("SMART\n");
     printf("Average host check interval:     %.2f sec\n",
 	   scheduling_info.average_host_check_interval);
@@ -967,11 +967,11 @@ void display_scheduling_info(void) {
   printf("Total scheduled services:           %d\n", scheduling_info.total_scheduled_services);
 
   printf("Service inter-check delay method:   ");
-  if (config.get_service_inter_check_delay_method() == configuration::state::icd_none)
+  if (config->get_service_inter_check_delay_method() == configuration::state::icd_none)
     printf("NONE\n");
-  else if (config.get_service_inter_check_delay_method() == configuration::state::icd_dumb)
+  else if (config->get_service_inter_check_delay_method() == configuration::state::icd_dumb)
     printf("DUMB\n");
-  else if (config.get_service_inter_check_delay_method() == configuration::state::icd_smart) {
+  else if (config->get_service_inter_check_delay_method() == configuration::state::icd_smart) {
     printf("SMART\n");
     printf("Average service check interval:     %.2f sec\n",
 	   scheduling_info.average_service_check_interval);
@@ -981,9 +981,9 @@ void display_scheduling_info(void) {
   printf("Inter-check delay:                  %.2f sec\n", scheduling_info.service_inter_check_delay);
 
   printf("Interleave factor method:           %s\n",
-         (config.get_service_interleave_factor_method() == configuration::state::ilf_user)
+         (config->get_service_interleave_factor_method() == configuration::state::ilf_user)
 	 ? "USER-SUPPLIED VALUE" : "SMART");
-  if (config.get_service_interleave_factor_method() == configuration::state::ilf_smart)
+  if (config->get_service_interleave_factor_method() == configuration::state::ilf_smart)
     printf("Average services per host:          %.2f\n", scheduling_info.average_services_per_host);
   printf("Service interleave factor:          %d\n", scheduling_info.service_interleave_factor);
 
@@ -994,12 +994,12 @@ void display_scheduling_info(void) {
 
   printf("CHECK PROCESSING INFORMATION\n");
   printf("----------------------------\n");
-  printf("Check result reaper interval:       %d sec\n", config.get_check_reaper_interval());
+  printf("Check result reaper interval:       %d sec\n", config->get_check_reaper_interval());
   printf("Max concurrent service checks:      ");
-  if (config.get_max_parallel_service_checks() == 0)
+  if (config->get_max_parallel_service_checks() == 0)
     printf("Unlimited\n");
   else
-    printf("%d\n", config.get_max_parallel_service_checks());
+    printf("%d\n", config->get_max_parallel_service_checks());
   printf("\n\n");
 
   printf("PERFORMANCE SUGGESTIONS\n");
@@ -1014,12 +1014,12 @@ void display_scheduling_info(void) {
     max_reaper_interval = 2.0;
   if (max_reaper_interval > 30.0)
     max_reaper_interval = 30.0;
-  if (max_reaper_interval < config.get_check_reaper_interval()) {
+  if (max_reaper_interval < config->get_check_reaper_interval()) {
     printf("* Value for 'check_result_reaper_frequency' should be <= %d seconds\n",
 	   (int)max_reaper_interval);
     suggestions++;
   }
-  if (config.get_check_reaper_interval() < 2) {
+  if (config->get_check_reaper_interval() < 2) {
     printf("* Value for 'check_result_reaper_frequency' should be >= 2 seconds\n");
     suggestions++;
   }
@@ -1028,15 +1028,15 @@ void display_scheduling_info(void) {
 
   /* first method (old) - assume a 100% (2x) service check burst for max concurrent checks */
   if (scheduling_info.service_inter_check_delay == 0.0)
-    minimum_concurrent_checks1 = ceil(config.get_check_reaper_interval() * 2.0);
+    minimum_concurrent_checks1 = ceil(config->get_check_reaper_interval() * 2.0);
   else
-    minimum_concurrent_checks1 = ceil((config.get_check_reaper_interval() * 2.0)
+    minimum_concurrent_checks1 = ceil((config->get_check_reaper_interval() * 2.0)
 				      / scheduling_info.service_inter_check_delay);
 
   /* second method (new) - assume a 25% (1.25x) service check burst for max concurrent checks */
   minimum_concurrent_checks2 = ceil((((double)scheduling_info.total_scheduled_services)
 				     / scheduling_info.average_service_check_interval) * 1.25
-				    * config.get_check_reaper_interval()
+				    * config->get_check_reaper_interval()
 				    * scheduling_info.average_service_execution_time);
 
   /* use max of computed values */
@@ -1046,8 +1046,8 @@ void display_scheduling_info(void) {
     minimum_concurrent_checks = minimum_concurrent_checks2;
 
   /* compare with configured value */
-  if ((minimum_concurrent_checks > config.get_max_parallel_service_checks())
-      && config.get_max_parallel_service_checks() != 0) {
+  if ((minimum_concurrent_checks > config->get_max_parallel_service_checks())
+      && config->get_max_parallel_service_checks() != 0) {
     printf("* Value for 'max_concurrent_checks' option should be >= %d\n",
            (int)minimum_concurrent_checks);
     suggestions++;
@@ -1324,7 +1324,7 @@ void adjust_check_scheduling(void) {
   /* determine our adjustment window */
   time(&current_time);
   first_window_time = current_time;
-  last_window_time = first_window_time + config.get_auto_rescheduling_window();
+  last_window_time = first_window_time + config->get_auto_rescheduling_window();
 
   /* get current scheduling data */
   for (temp_event = event_list_low;
@@ -1397,13 +1397,13 @@ void adjust_check_scheduling(void) {
     return;
   }
 
-  if ((unsigned long)total_check_exec_time > config.get_auto_rescheduling_window()) {
+  if ((unsigned long)total_check_exec_time > config->get_auto_rescheduling_window()) {
     inter_check_delay = 0.0;
-    exec_time_factor = (double)((double)config.get_auto_rescheduling_window()
+    exec_time_factor = (double)((double)config->get_auto_rescheduling_window()
 				/ total_check_exec_time);
   }
   else {
-    inter_check_delay = (double)((((double)config.get_auto_rescheduling_window())
+    inter_check_delay = (double)((((double)config->get_auto_rescheduling_window())
 				  - total_check_exec_time) / (double)(total_checks * 1.0));
     exec_time_factor = 1.0;
   }

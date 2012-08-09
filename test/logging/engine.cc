@@ -58,10 +58,11 @@ int main_test(int argc, char** argv) {
   // Add new object (test) to log into engine.
   // One object by logging type and level.
   unsigned long id[NB_LOG_TYPE * NB_LOG_LEVEL + NB_DBG_TYPE];
+  memset(id, 0, sizeof(id));
   for (unsigned int j(0); j < NB_LOG_LEVEL; ++j) {
     for (unsigned int i(0); i < NB_LOG_TYPE; ++i) {
       if (i == 8)
-        continue ;
+        continue;
       unsigned long long type(1ull << i);
       com::centreon::shared_ptr<object>
         obj(new test(LOG_MESSAGE, type, j, j + 1));

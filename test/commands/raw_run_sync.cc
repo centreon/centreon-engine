@@ -81,7 +81,7 @@ static bool run_with_timeout() {
  */
 static bool run_with_environment_macros() {
   // Enable environment macros in configuration.
-  config.set_enable_environment_macros(true);
+  config->set_enable_environment_macros(true);
 
   // Get environment macros.
   nagios_macros mac;
