@@ -195,6 +195,10 @@ void logging::_add_stdout() {
     shared_ptr<object>
       obj(new com::centreon::engine::logging::standard());
     unsigned long long type(log_process_info
+                            | log_verification_error
+                            | log_verification_warning
+                            | log_config_error
+                            | log_config_warning
                             | log_event_handler
                             | log_external_command
                             | log_host_up
@@ -220,11 +224,8 @@ void logging::_add_stderr() {
   if (_stderr_id == 0) {
     shared_ptr<object> obj(new standard(false));
     unsigned long long type(log_runtime_error
-                            | log_runtime_warning
-                            | log_verification_error
-                            | log_verification_warning
-                            | log_config_error
-                            | log_config_warning);
+                            | log_runtime_warning);
+
     ::engine::obj_info info(obj, type, most);
     _stderr_id = ::engine::instance().add_object(info);
   }

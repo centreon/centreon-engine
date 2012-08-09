@@ -65,7 +65,7 @@ connector::connector(
 
   if (config->get_enable_environment_macros())
     logger(log_runtime_warning, basic)
-      << "**WARNING** Connector dosn't use enable environement macros!";
+      << "warning: Connector dosn't use enable environement macros!";
 }
 
 /**
