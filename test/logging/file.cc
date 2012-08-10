@@ -57,6 +57,15 @@ static void check_file(
     data.append(buffer, file.gcount());
   }
 
+  std::istringstream iss(data);
+  data.clear();
+  while (iss.good()) {
+    std::string tmp;
+    iss >> tmp;
+    if (!tmp.empty() && tmp[0] != '[')
+      data += tmp;
+  }
+
   // Compare contents.
   if (data != text)
     throw (engine_error() << filename << ": bad content");
@@ -100,14 +109,14 @@ int main_test(int argc, char** argv) {
   }
 
   // Send message to all object.
-  engine.log("012345", log_info_message, basic);
-  engine.log("0123456789", log_info_message, basic);
+  engine.log("012345\n", log_info_message, basic);
+  engine.log("0123456789\n", log_info_message, basic);
   // Reopen files.
   if (rename("./test_logging_file_reopen.log", "./test_logging_file_reopen.log.old"))
     throw (engine_error() << "rename failed: " << strerror(errno));
   file::reopen();
   // Send message to all object.
-  engine.log("qwerty", log_info_message, basic);
+  engine.log("qwerty\n", log_info_message, basic);
 
   // Cleanup.
   engine.remove_object(id3);
