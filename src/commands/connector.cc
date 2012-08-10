@@ -52,6 +52,7 @@ connector::connector(
              std::string const& command_line,
              command_listener* listener)
   : command(command_name, command_line, listener),
+    process_listener(),
     _connector_line(connector_line),
     _connector_name(connector_name),
     _is_running(false),

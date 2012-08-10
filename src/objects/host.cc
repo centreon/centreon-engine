@@ -309,24 +309,28 @@ static void _update_schedule_info(host const* hst) {
   if (hst->next_check > scheduling_info.last_host_check)
     scheduling_info.last_host_check = hst->next_check;
 
-  scheduling_info.host_check_interval_total += hst->check_interval * config->get_interval_length();
-  scheduling_info.average_services_per_host =
-    (double)scheduling_info.total_services / (double)scheduling_info.total_hosts;
-  scheduling_info.average_scheduled_services_per_host =
-    (double)scheduling_info.total_scheduled_services / (double)scheduling_info.total_hosts;
+  scheduling_info.host_check_interval_total
+    += (unsigned long)(hst->check_interval * config->get_interval_length());
+  scheduling_info.average_services_per_host
+    = (double)scheduling_info.total_services
+    / (double)scheduling_info.total_hosts;
+  scheduling_info.average_scheduled_services_per_host
+    = (double)scheduling_info.total_scheduled_services
+    / (double)scheduling_info.total_hosts;
 
-  scheduling_info.max_host_check_spread = config->get_max_host_check_spread();
+  scheduling_info.max_host_check_spread
+    = config->get_max_host_check_spread();
 
   // we determine the host inter-check delay.
   if (config->get_host_inter_check_delay_method() == configuration::state::icd_smart
       && scheduling_info.host_check_interval_total > 0) {
 
-    scheduling_info.average_host_check_interval =
-      (double)scheduling_info.host_check_interval_total
+    scheduling_info.average_host_check_interval
+      = (double)scheduling_info.host_check_interval_total
       / (double)scheduling_info.total_scheduled_hosts;
 
-    scheduling_info.average_host_inter_check_delay =
-      (double)scheduling_info.average_host_check_interval
+    scheduling_info.average_host_inter_check_delay
+      = (double)scheduling_info.average_host_check_interval
       / (double)scheduling_info.total_scheduled_hosts;
 
     scheduling_info.host_inter_check_delay = scheduling_info.average_host_inter_check_delay;

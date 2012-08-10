@@ -268,24 +268,28 @@ static void _update_schedule_info(service const* svc) {
   if (svc->next_check > scheduling_info.last_service_check)
     scheduling_info.last_service_check = svc->next_check;
 
-  scheduling_info.service_check_interval_total += svc->check_interval * config->get_interval_length();
-  scheduling_info.average_service_check_interval =
-    (double)scheduling_info.service_check_interval_total
+  scheduling_info.service_check_interval_total
+    += (unsigned long)(svc->check_interval * config->get_interval_length());
+  scheduling_info.average_service_check_interval
+    = (double)scheduling_info.service_check_interval_total
     / (double)scheduling_info.total_scheduled_services;
 
-  scheduling_info.average_service_execution_time =
-    (double)((scheduling_info.average_service_execution_time
-              * (scheduling_info.total_scheduled_services - 1))
-             + svc->execution_time)
+  scheduling_info.average_service_execution_time
+    = (double)((scheduling_info.average_service_execution_time
+                * (scheduling_info.total_scheduled_services - 1))
+               + svc->execution_time)
     / (double)scheduling_info.total_scheduled_services;
 
 
-  scheduling_info.average_services_per_host =
-    (double)scheduling_info.total_services / (double)scheduling_info.total_hosts;
-  scheduling_info.average_scheduled_services_per_host =
-    (double)scheduling_info.total_scheduled_services / (double)scheduling_info.total_hosts;
+  scheduling_info.average_services_per_host
+    = (double)scheduling_info.total_services
+    / (double)scheduling_info.total_hosts;
+  scheduling_info.average_scheduled_services_per_host
+    = (double)scheduling_info.total_scheduled_services
+    / (double)scheduling_info.total_hosts;
 
-  scheduling_info.max_service_check_spread = config->get_max_service_check_spread();
+  scheduling_info.max_service_check_spread
+    = config->get_max_service_check_spread();
 
   // we determine the service inter-check delay.
   if (config->get_service_inter_check_delay_method() == configuration::state::icd_smart

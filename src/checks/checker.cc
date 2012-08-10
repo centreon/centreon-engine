@@ -815,7 +815,8 @@ void checker::unload() {
 /**
  *  Default constructor.
  */
-checker::checker() {
+checker::checker()
+  : commands::command_listener() {
 
 }
 
@@ -824,7 +825,8 @@ checker::checker() {
  *
  *  @param[in] right Object to copy.
  */
-checker::checker(checker const& right) {
+checker::checker(checker const& right)
+  : commands::command_listener(right) {
   _internal_copy(right);
 }
 

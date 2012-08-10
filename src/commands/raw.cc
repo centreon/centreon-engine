@@ -46,7 +46,8 @@ raw::raw(
        std::string const& name,
        std::string const& command_line,
        command_listener* listener)
-  : command(name, command_line, listener) {
+  : command(name, command_line, listener),
+    process_listener() {
 
 }
 
@@ -56,7 +57,8 @@ raw::raw(
  *  @param[in] right Object to copy.
  */
 raw::raw(raw const& right)
-  : command(right) {
+  : command(right),
+    process_listener(right) {
 
 }
 

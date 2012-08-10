@@ -372,7 +372,7 @@ void loop::_dispatching() {
         logger(dbg_events, most)
           << "Did not execute scheduled event. Idling for a bit...";
         concurrency::thread::nsleep(
-                               config->get_sleep_time() * 1000000000l);
+          (unsigned long)(config->get_sleep_time() * 1000000000l));
       }
     }
     // We don't have anything to do at this moment in time...
@@ -420,7 +420,7 @@ void loop::_dispatching() {
 
         // Wait a while so we don't hog the CPU...
         concurrency::thread::nsleep(
-                               config->get_sleep_time() * 1000000000l);
+          (unsigned long)(config->get_sleep_time() * 1000000000l));
       }
   }
 }
