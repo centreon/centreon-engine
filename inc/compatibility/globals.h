@@ -23,6 +23,10 @@
 #  include "com/centreon/engine/checks.hh"
 #  include "com/centreon/engine/circular_buffer.hh"
 
+// Log rotation.
+extern char* log_archive_path;
+extern unsigned int log_rotation_method;
+
 // Features now handled by startup script.
 extern int daemon_dumps_core;
 extern char* lock_file;

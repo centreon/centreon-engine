@@ -21,6 +21,10 @@
 #include <stddef.h>
 #include "globals.h"
 
+// Log rotation.
+char* log_archive_path(NULL);
+unsigned int log_rotation_method(0);
+
 // Features now handled by startup script.
 int daemon_dumps_core(0);
 char* lock_file(NULL);

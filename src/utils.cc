@@ -1316,11 +1316,6 @@ time_t calculate_time_from_weekday_of_month(int year,
   return (midnight);
 }
 
-/* get the next time to schedule a log rotation */
-time_t get_next_log_rotation_time(void) {
-  return (0);
-}
-
 /******************************************************************/
 /******************** SIGNAL HANDLER FUNCTIONS ********************/
 /******************************************************************/

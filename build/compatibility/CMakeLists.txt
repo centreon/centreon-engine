@@ -34,6 +34,7 @@ add_library("cce_compatibility" STATIC
   "${SRC_DIR}/globals.cc"
   "${SRC_DIR}/logging.cc"
   "${SRC_DIR}/sighandlers.cc"
+  "${SRC_DIR}/utils.cc"
   # Headers.
   "${INC_DIR}/broker.h"
   "${INC_DIR}/check_result.h"

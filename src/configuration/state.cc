@@ -2354,9 +2354,6 @@ state::state()
   set_accept_passive_host_checks(DEFAULT_ACCEPT_PASSIVE_HOST_CHECKS);
   set_allow_empty_hostgroup_assignment(DEFAULT_ALLOW_EMPTY_HOSTGROUP_ASSIGNMENT);
 
-  ::log_rotation_method = 0;
-  ::log_archive_path = my_strdup(DEFAULT_LOG_ARCHIVE_PATH);
-
   // Set macros.
   delete[] _mac->x[MACRO_TEMPFILE];
   _mac->x[MACRO_TEMPFILE] = my_strdup("/tmp/centengine.tmp");
@@ -2386,7 +2383,6 @@ state::~state() throw() {
   delete[] _mac->x[MACRO_ADMINEMAIL];
   delete[] _mac->x[MACRO_ADMINPAGER];
 
-  delete[] ::log_archive_path;
   delete[] ::log_file;
   delete[] ::debug_file;
   delete[] ::command_file;

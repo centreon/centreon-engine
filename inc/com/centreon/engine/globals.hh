@@ -206,8 +206,6 @@ extern unsigned int enable_predictive_host_dependency_checks;
 extern unsigned long cached_service_check_horizon;
 extern unsigned int enable_predictive_service_dependency_checks;
 extern unsigned int soft_state_dependencies;
-extern unsigned int log_rotation_method;
-extern char* log_archive_path;
 extern unsigned int enable_event_handlers;
 extern unsigned int enable_notifications;
 extern unsigned int execute_service_checks;

@@ -196,8 +196,6 @@ unsigned int enable_predictive_host_dependency_checks;
 unsigned long cached_service_check_horizon;
 unsigned int enable_predictive_service_dependency_checks;
 unsigned int soft_state_dependencies;
-unsigned int log_rotation_method;
-char* log_archive_path = NULL;
 unsigned int enable_event_handlers;
 unsigned int enable_notifications;
 unsigned int execute_service_checks;
