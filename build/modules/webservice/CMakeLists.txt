@@ -18,7 +18,7 @@
 ##
 
 # Should we build webservice.
-option(WITH_WEBSERVICE "Enable or disable webservice module compilation." ON)
+option(WITH_WEBSERVICE "Enable or disable webservice module compilation." OFF)
 if (WITH_WEBSERVICE)
 
   # Set directories.
