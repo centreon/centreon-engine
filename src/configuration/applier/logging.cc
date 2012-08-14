@@ -22,32 +22,31 @@
 #include "com/centreon/shared_ptr.hh"
 
 using namespace com::centreon;
-using namespace com::centreon::engine::logging;
-using namespace com::centreon::engine::configuration::applier;
+using namespace com::centreon::engine::configuration;
 
-static logging* _instance = NULL;
+static applier::logging* _instance = NULL;
 
 /**
  *  Get the singleton instance of logging applier.
  *
  *  @return Singleton instance.
  */
-logging& logging::instance() {
+applier::logging& applier::logging::instance() {
   return (*_instance);
 }
 
 /**
  *  Load logging applier singleton.
  */
-void logging::load() {
+void applier::logging::load() {
   if (!_instance)
-    _instance = new logging;
+    _instance = new applier::logging;
 }
 
 /**
  *  Unload logging applier singleton.
  */
-void logging::unload() {
+void applier::logging::unload() {
   delete _instance;
   _instance = NULL;
 }
@@ -57,7 +56,7 @@ void logging::unload() {
  *
  *  @param[in] config The new configuration.
  */
-void logging::apply(state const& config) {
+void applier::logging::apply(state const& config) {
   // Syslog.
   if (config.get_use_syslog() == true && _syslog_id == 0)
     _add_syslog();
@@ -95,7 +94,7 @@ void logging::apply(state const& config) {
 /**
  *  Default constructor.
  */
-logging::logging()
+applier::logging::logging()
   : _debug_id(0),
     _debug_level(0),
     _debug_limit(0),
@@ -114,7 +113,7 @@ logging::logging()
  *
  *  @param[in] config The initial confiuration.
  */
-logging::logging(state const& config)
+applier::logging::logging(state const& config)
   : _debug_id(0),
     _debug_level(0),
     _debug_limit(0),
@@ -134,7 +133,7 @@ logging::logging(state const& config)
  *
  *  @param[in,out] right The class to copy.
  */
-logging::logging(logging& right)
+applier::logging::logging(applier::logging& right)
   : base(right),
     _debug_id(0),
     _debug_level(0),
@@ -151,7 +150,7 @@ logging::logging(logging& right)
 /**
  *  Default destructor.
  */
-logging::~logging() throw() {
+applier::logging::~logging() throw() {
   _del_stdout();
   _del_stderr();
   _del_syslog();
@@ -164,7 +163,7 @@ logging::~logging() throw() {
  *
  *  @param[in,out] right The class to copy.
  */
-logging& logging::operator=(logging& right) {
+applier::logging& applier::logging::operator=(applier::logging& right) {
   if (this != &right) {
     _debug_file = right._debug_file;
     _debug_id = right._debug_id;
@@ -190,89 +189,107 @@ logging& logging::operator=(logging& right) {
 /**
  *  Add stdout object logging.
  */
-void logging::_add_stdout() {
+void applier::logging::_add_stdout() {
   if (_stdout_id == 0) {
-    shared_ptr<object>
-      obj(new com::centreon::engine::logging::standard());
-    unsigned long long type(log_process_info
-                            | log_verification_error
-                            | log_verification_warning
-                            | log_config_error
-                            | log_config_warning
-                            | log_event_handler
-                            | log_external_command
-                            | log_host_up
-                            | log_host_down
-                            | log_host_unreachable
-                            | log_service_ok
-                            | log_service_unknown
-                            | log_service_warning
-                            | log_service_critical
-                            | log_passive_check
-                            | log_info_message
-                            | log_host_notification
-                            | log_service_notification);
-    ::engine::obj_info info(obj, type, most);
-    _stdout_id = ::engine::instance().add_object(info);
+    shared_ptr<engine::logging::object>
+      obj(new engine::logging::standard());
+    unsigned long long type(
+                         engine::logging::log_process_info
+                         | engine::logging::log_verification_error
+                         | engine::logging::log_verification_warning
+                         | engine::logging::log_config_error
+                         | engine::logging::log_config_warning
+                         | engine::logging::log_event_handler
+                         | engine::logging::log_external_command
+                         | engine::logging::log_host_up
+                         | engine::logging::log_host_down
+                         | engine::logging::log_host_unreachable
+                         | engine::logging::log_service_ok
+                         | engine::logging::log_service_unknown
+                         | engine::logging::log_service_warning
+                         | engine::logging::log_service_critical
+                         | engine::logging::log_passive_check
+                         | engine::logging::log_info_message
+                         | engine::logging::log_host_notification
+                         | engine::logging::log_service_notification);
+    engine::logging::engine::obj_info info(
+                                        obj,
+                                        type,
+                                        engine::logging::most);
+    _stdout_id = engine::logging::engine::instance().add_object(info);
   }
 }
 
 /**
  *  Add stderr object logging.
  */
-void logging::_add_stderr() {
+void applier::logging::_add_stderr() {
   if (_stderr_id == 0) {
-    shared_ptr<object> obj(new standard(false));
-    unsigned long long type(log_runtime_error
-                            | log_runtime_warning);
+    shared_ptr<engine::logging::object>
+      obj(new engine::logging::standard(false));
+    unsigned long long type(
+                         engine::logging::log_runtime_error
+                         | engine::logging::log_runtime_warning);
 
-    ::engine::obj_info info(obj, type, most);
-    _stderr_id = ::engine::instance().add_object(info);
+    engine::logging::engine::obj_info info(
+                                        obj,
+                                        type,
+                                        engine::logging::most);
+    _stderr_id = engine::logging::engine::instance().add_object(info);
   }
 }
 /**
  *  Add syslog object logging.
  */
-void logging::_add_syslog() {
-  shared_ptr<object> obj(new syslog);
-  ::engine::obj_info info(obj, log_all, basic);
-  _syslog_id = ::engine::instance().add_object(info);
+void applier::logging::_add_syslog() {
+  shared_ptr<engine::logging::object>
+    obj(new engine::logging::syslog);
+  engine::logging::engine::obj_info info(
+                                       obj,
+                                       engine::logging::log_all,
+                                       engine::logging::basic);
+  _syslog_id = engine::logging::engine::instance().add_object(info);
 }
 
 /**
  *  Add file object logging.
  */
-void logging::_add_log_file(state const& config) {
+void applier::logging::_add_log_file(state const& config) {
   _del_log_file();
-  shared_ptr<object> obj(new file(
+  shared_ptr<engine::logging::object>
+    obj(new engine::logging::file(
                                config.get_log_file(),
                                config.get_max_log_file_size()));
-  ::engine::obj_info info(obj, log_all, most);
-  _log_id = ::engine::instance().add_object(info);
+  engine::logging::engine::obj_info info(
+                                      obj,
+                                      engine::logging::log_all,
+                                      engine::logging::most);
+  _log_id = engine::logging::engine::instance().add_object(info);
 }
 
 /**
  *  Add debug object logging.
  */
-void logging::_add_debug(state const& config) {
+void applier::logging::_add_debug(state const& config) {
   _del_debug();
-  shared_ptr<object> obj(new file(
+  shared_ptr<engine::logging::object>
+    obj(new engine::logging::file(
                                config.get_debug_file(),
                                config.get_max_debug_file_size()));
-  ::engine::obj_info info(
-                       obj,
-                       config.get_debug_level(),
-                       config.get_debug_verbosity());
-  _debug_id = ::engine::instance().add_object(info);
+  engine::logging::engine::obj_info info(
+                                      obj,
+                                      config.get_debug_level(),
+                                      config.get_debug_verbosity());
+  _debug_id = engine::logging::engine::instance().add_object(info);
   return ;
 }
 
 /**
  *  Remove syslog object logging.
  */
-void logging::_del_syslog() {
+void applier::logging::_del_syslog() {
   if (_syslog_id != 0) {
-    ::engine::instance().remove_object(_syslog_id);
+    engine::logging::engine::instance().remove_object(_syslog_id);
     _syslog_id = 0;
   }
   return ;
@@ -281,9 +298,9 @@ void logging::_del_syslog() {
 /**
  *  Remove file object logging.
  */
-void logging::_del_log_file() {
+void applier::logging::_del_log_file() {
   if (_log_id != 0) {
-    ::engine::instance().remove_object(_log_id);
+    engine::logging::engine::instance().remove_object(_log_id);
     _log_id = 0;
   }
   return ;
@@ -292,9 +309,9 @@ void logging::_del_log_file() {
 /**
  *  Remove debug object logging.
  */
-void logging::_del_debug() {
+void applier::logging::_del_debug() {
   if (_debug_id != 0) {
-    ::engine::instance().remove_object(_debug_id);
+    engine::logging::engine::instance().remove_object(_debug_id);
     _debug_id = 0;
   }
   return ;
@@ -303,9 +320,9 @@ void logging::_del_debug() {
 /**
  *  Remove stdout object logging.
  */
-void logging::_del_stdout() {
+void applier::logging::_del_stdout() {
   if (_stdout_id != 0) {
-    ::engine::instance().remove_object(_stdout_id);
+    engine::logging::engine::instance().remove_object(_stdout_id);
     _stdout_id = 0;
   }
   return ;
@@ -314,9 +331,9 @@ void logging::_del_stdout() {
 /**
  *  Remove stderr object logging.
  */
-void logging::_del_stderr() {
+void applier::logging::_del_stderr() {
   if (_stderr_id != 0) {
-    ::engine::instance().remove_object(_stderr_id);
+    engine::logging::engine::instance().remove_object(_stderr_id);
     _stderr_id = 0;
   }
   return ;
