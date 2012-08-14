@@ -605,8 +605,11 @@ int main(int argc, char* argv[]) {
 
     // Free misc memory.
     delete [] config_file;
+    delete [] mac->x[MACRO_OBJECTCACHEFILE];
     delete [] mac->x[MACRO_PROCESSSTARTTIME];
     delete [] mac->x[MACRO_EVENTSTARTTIME];
+    delete [] mac->x[MACRO_RETENTIONDATAFILE];
+    delete [] mac->x[MACRO_STATUSDATAFILE];
   }
 
   // Unload singletons (except logging).
@@ -617,6 +620,7 @@ int main(int argc, char* argv[]) {
   com::centreon::engine::commands::set::unload();
   com::centreon::engine::configuration::applier::logging::unload();
   com::centreon::engine::configuration::state::unload();
+  com::centreon::engine::logging::engine::unload();
   com::centreon::clib::unload();
 
   return (EXIT_SUCCESS);
