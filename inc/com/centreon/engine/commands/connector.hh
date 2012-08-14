@@ -72,6 +72,8 @@ namespace                commands {
     public:
                          restart(connector* c);
                          ~restart() throw ();
+      void               clear();
+
     private:
                          restart(restart const& right);
       restart&           operator=(restart const& right);

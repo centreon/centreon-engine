@@ -87,6 +87,8 @@ connector::connector(connector const& right)
 connector::~connector() throw() {
   // Close connector properly.
   _connector_close();
+  // Clear restart thread.
+  _restart.clear();
 }
 
 /**
@@ -737,16 +739,19 @@ void connector::_send_query_version() {
  *
  *  @param[in] c  The connector to restart.
  */
-connector::restart::restart(connector* c)
-  : _c(c) {
-
-}
+connector::restart::restart(connector* c) : _c(c) {}
 
 /**
  *  Destructor.
  */
-connector::restart::~restart() throw () {
+connector::restart::~restart() throw () {}
+
+/**
+ *  Clear thread.
+ */
+void connector::restart::clear() {
   wait();
+  return ;
 }
 
 /**
@@ -755,7 +760,7 @@ connector::restart::~restart() throw () {
 void connector::restart::_run() {
   // Check viability.
   if (!_c)
-    return;
+    return ;
 
   concurrency::locker lock(&_c->_lock);
   try {
