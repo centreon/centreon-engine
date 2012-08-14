@@ -28,6 +28,7 @@
 #include <unistd.h>
 #include "com/centreon/engine/common.hh"
 #include "com/centreon/engine/version.hh"
+#include "com/centreon/exceptions/basic.hh"
 
 #define STATUS_NO_DATA             0
 #define STATUS_INFO_DATA           1
@@ -35,9 +36,10 @@
 #define STATUS_HOST_DATA           3
 #define STATUS_SERVICE_DATA        4
 
-char* main_config_file = NULL;
-char* status_file = NULL;
-char* nagiostats_file = NULL;
+// Files to be processed.
+static char* main_config_file(NULL);
+static char* stats_file(NULL);
+static char* status_file(NULL);
 
 time_t status_creation_date = 0L;
 char* status_version = NULL;
@@ -191,12 +193,13 @@ int total_external_command_buffer_slots = 0;
 int used_external_command_buffer_slots = 0;
 int high_external_command_buffer_slots = 0;
 
-int display_stats(void);
-int read_config_file(void);
-int read_status_file(void);
-void strip(char*);
+// Forward declarations.
+int display_stats();
 void get_time_breakdown(unsigned long, int*, int*, int*, int*);
-int read_nagiostats_file(void);
+int read_config_file();
+int read_stats_file();
+int read_status_file();
+void strip(char*);
 
 extern "C" char* my_strdup(char const* str);
 
@@ -210,7 +213,6 @@ extern "C" char* my_strdup(char const* str);
  */
 int main(int argc, char* argv[]) {
 #ifdef HAVE_GETOPT_H
-  int option_index = 0;
   static struct option const long_options[] = {
     { "help", no_argument, 0, 'h' },
     { "version", no_argument, 0, 'V' },
@@ -221,129 +223,145 @@ int main(int argc, char* argv[]) {
   };
 #endif // HAVE_GETOPT_H
 
-  // Defaults.
-  main_config_file = my_strdup(DEFAULT_CONFIG_FILE);
-  status_file = my_strdup(DEFAULT_STATUS_FILE);
+  // Return value.
+  int retval(EXIT_FAILURE);
+  try {
+    // Defaults.
+    main_config_file = my_strdup(DEFAULT_CONFIG_FILE);
+    status_file = my_strdup(DEFAULT_STATUS_FILE);
 
-  // Options.
-  bool display_help(false);
-  bool display_license(false);
-  bool error(false);
+    // Options.
+    bool display_help(false);
+    bool display_license(false);
+    bool error(false);
 
-  // Get all command line arguments.
-  int c;
-  while (1) {
-    // Get next flag.
+    // Get all command line arguments.
+    int c;
+    while (!error) {
+      // Get next flag.
 #ifdef HAVE_GETOPT_H
-    c = getopt_long(argc, argv, "+hVLc:s:", long_options, &option_index);
+      c = getopt_long(
+            argc,
+            argv,
+            "+hVLc:s:",
+            long_options,
+            NULL);
 #else
-    c = getopt(argc, argv, "+hVLc:s:");
+      c = getopt(argc, argv, "+hVLc:s:");
 #endif // getopt_long() or getopt()
-    if ((c == -1) || (c == EOF))
-      break ;
+      if (c == -1)
+        break ;
 
-    // Process flag.
-    switch (c) {
-    case '?':
-    case 'h':
-      display_help = true;
-      break ;
-    case 'L':
-    case 'V':
-      display_license = true;
-      break ;
-    case 'c':
-      delete [] main_config_file;
-      main_config_file = NULL;
-      main_config_file = my_strdup(optarg);
-      break ;
-    case 's':
-      nagiostats_file = my_strdup(optarg);
-      break ;
-    default:
-      error = true;
+      // Process flag.
+      switch (c) {
+      case 'h':
+        display_help = true;
+        break ;
+      case 'L':
+      case 'V':
+        display_license = true;
+        break ;
+      case 'c':
+        delete [] main_config_file;
+        main_config_file = NULL;
+        main_config_file = my_strdup(optarg);
+        break ;
+      case 's':
+        delete [] stats_file;
+        stats_file = NULL;
+        stats_file = my_strdup(optarg);
+        break ;
+      default:
+        error = true;
+      }
     }
-  }
 
-  // Program header.
-  std::cout << "Centreon Engine Statistics Utility "
-            << CENTREON_ENGINE_VERSION_STRING << "\n"
-            << "\n"
-            << "Copyright 2003-2008 Ethan Galstad\n"
-            << "Copyright 2011-2012 Merethis\n"
-            << "License: GPLv2\n\n";
-
-  // Just display the license.
-  if (display_license) {
-    std::cout << "This program is free software; you can redistribute it and/or\n"
-              << "modify it under the terms of the GNU General Public License version 2\n"
-              << "as published by the Free Software Foundation.\n"
+    // Program header.
+    std::cout << "Centreon Engine Statistics Utility "
+              << CENTREON_ENGINE_VERSION_STRING << "\n"
               << "\n"
-              << "This program is distributed in the hope that it will be useful,\n"
-              << "but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
-              << "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU\n"
-              << "General Public License for more details.\n"
-              << "\n"
-              << "You should have received a copy of the GNU General Public License\n"
-              << "along with this program. If not, see\n"
-              << "<http://www.gnu.org/licenses/>." << std::endl;
-    exit(EXIT_SUCCESS);
-  }
-  // Just display the usage.
-  else if (display_help || error) {
-    std::cout << "Usage: " << argv[0] << " [options]\n\n"
-              << "Startup:\n"
-              << "  -V, --version        display program version information and exit.\n"
-              << "  -L, --license        display license information and exit.\n"
-              << "  -h, --help           display usage information and exit.\n"
-              << "\n"
-              << "Input file:\n"
-              << "  -c, --config=FILE    specifies location of main Centreon Engine config file.\n"
-              << "  -s, --statsfile=FILE specifies alternate location of file to read Centreon\n"
-              << "                       Engine performance data from.\n" << std::endl;
-    exit(error ? EXIT_FAILURE : EXIT_SUCCESS);
-  }
+              << "Copyright 2003-2008 Ethan Galstad\n"
+              << "Copyright 2011-2012 Merethis\n"
+              << "License: GPLv2\n\n";
 
-  int result;
+    // Just display the license.
+    if (display_license) {
+      std::cout << "This program is free software; you can redistribute it and/or\n"
+                << "modify it under the terms of the GNU General Public License version 2\n"
+                << "as published by the Free Software Foundation.\n"
+                << "\n"
+                << "This program is distributed in the hope that it will be useful,\n"
+                << "but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
+                << "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU\n"
+                << "General Public License for more details.\n"
+                << "\n"
+                << "You should have received a copy of the GNU General Public License\n"
+                << "along with this program. If not, see\n"
+                << "<http://www.gnu.org/licenses/>." << std::endl;
+      retval = EXIT_SUCCESS;
+    }
+    // Just display the usage.
+    else if (display_help || error) {
+      std::cout << "Usage: " << argv[0] << " [options]\n\n"
+                << "Startup:\n"
+                << "  -V, --version        display program version information and exit.\n"
+                << "  -L, --license        display license information and exit.\n"
+                << "  -h, --help           display usage information and exit.\n"
+                << "\n"
+                << "Input file:\n"
+                << "  -c, --config=FILE    specifies location of main Centreon Engine config file.\n"
+                << "  -s, --statsfile=FILE specifies alternate location of file to read Centreon\n"
+                << "                       Engine performance data from.\n" << std::endl;
+      retval = (error ? EXIT_FAILURE : EXIT_SUCCESS);
+    }
+    // Full processing.
+    else {
+      // Read pre-processed stats file.
+      if (stats_file) {
+        if (read_stats_file() == ERROR) {
+          char const* msg(strerror(errno));
+          throw (basic_error() << "Error reading stats file '"
+                 << stats_file << "': " << msg);
+        }
+      }
+      // Else read the normal status file.
+      else {
+        // Read main config file.
+        if (read_config_file() == ERROR)
+          throw (basic_error() << "Error processing config file '"
+                 << main_config_file);
 
-  /* read pre-processed stats file */
-  if (nagiostats_file) {
-    result = read_nagiostats_file();
-    if (result == ERROR) {
-      printf("Error reading stats file '%s': %s\n", nagiostats_file, strerror(errno));
-      return (ERROR);
+        // Read status file.
+        if (read_status_file() == ERROR) {
+          char const* msg(strerror(errno));
+          throw (basic_error() <<"Error reading status file '"
+                 << status_file << "': " << msg);
+        }
+      }
+
+      // Display stats.
+      display_stats();
+
+      // Successful execution.
+      retval = EXIT_SUCCESS;
     }
   }
-
-  /* else read the normal status file */
-  else {
-    /* read main config file */
-    result = read_config_file();
-    if (result == ERROR) {
-      printf("Error processing config file '%s'\n", main_config_file);
-      return (ERROR);
-    }
-
-    /* read status file */
-    result = read_status_file();
-    if (result == ERROR) {
-      printf("Error reading status file '%s': %s\n", status_file, strerror(errno));
-      return (ERROR);
-    }
+  catch (std::exception const& e) {
+    std::cout << e.what() << std::endl;
+  }
+  catch (...) {
+    std::cout << "unknown exception" << std::endl;
   }
 
-  /* display stats */
-  display_stats();
+  // Cleanup.
+  delete [] main_config_file;
+  main_config_file = NULL;
+  delete [] stats_file;
+  stats_file = NULL;
+  delete [] status_file;
+  status_file = NULL;
 
-  delete[] nagiostats_file;
-  delete[] main_config_file;
-  delete[] status_file;
-
-  /* Return based on error. */
-  if (result == ERROR)
-    return (ERROR);
-  else
-    return (OK);
+  return (retval);
 }
 
 int display_stats(void) {
@@ -359,7 +377,7 @@ int display_stats(void) {
   printf("CURRENT STATUS DATA\n");
   printf("------------------------------------------------------\n");
   printf("Status File:                            %s\n",
-         (nagiostats_file != NULL) ? nagiostats_file : status_file);
+         (stats_file != NULL) ? stats_file : status_file);
   time_difference = (current_time - status_creation_date);
   get_time_breakdown(time_difference, &days, &hours, &minutes, &seconds);
   printf("Status File Age:                        %dd %dh %dm %ds\n", days, hours, minutes, seconds);
@@ -1064,7 +1082,7 @@ int read_status_file(void) {
   return (OK);
 }
 
-int read_nagiostats_file(void) {
+int read_stats_file(void) {
   char temp_buffer[MAX_INPUT_BUFFER];
   FILE* fp = NULL;
   char* var = NULL;
@@ -1074,7 +1092,7 @@ int read_nagiostats_file(void) {
 
   time(&current_time);
 
-  fp = fopen(nagiostats_file, "r");
+  fp = fopen(stats_file, "r");
   if (fp == NULL)
     return (ERROR);
 

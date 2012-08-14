@@ -729,6 +729,7 @@ target_link_libraries("centengine"
 # centenginestats target.
 add_executable("centenginestats"
   "${SRC_DIR}/centenginestats.cc")
+target_link_libraries("centenginestats" ${CLIB_LIBRARIES})
 
 #
 # Install stuff.
