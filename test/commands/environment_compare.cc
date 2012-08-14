@@ -24,6 +24,9 @@
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::commands;
 
+// External environment array.
+extern "C" char** environ;
+
 /**
  *  Check environment constructor.
  */
