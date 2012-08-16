@@ -126,493 +126,490 @@ int main(int argc, char* argv[]) {
   com::centreon::engine::broker::loader::load();
   com::centreon::engine::broker::compatibility::load();
 
-  // Process all command line arguments.
-  int c;
+  try {
+    // Process all command line arguments.
+    int c;
 #ifdef HAVE_GETOPT_H
-  while ((c = getopt_long(argc, argv, "+hVvsxpu", long_options, &option_index)) != -1) {
+    while ((c = getopt_long(argc, argv, "+hVvsxpu", long_options, &option_index)) != -1) {
 #else
-  while ((c = getopt(argc, argv, "+hVvsxpu")) != -1) {
+    while ((c = getopt(argc, argv, "+hVvsxpu")) != -1) {
 #endif // HAVE_GETOPT_H
 
-    // Process flag.
-    switch (c) {
-    case '?': // Usage.
-    case 'h':
-      display_help = true;
-      break ;
-    case 'V': // Version.
-      display_license = true;
-      break ;
-    case 'v': // Verify config->
-      verify_config = TRUE;
-      break ;
-    case 's': // Scheduling Check.
-      test_scheduling = TRUE;
-      break ;
-    case 'x': // Don't verify circular paths.
-      verify_circular_paths = FALSE;
-      break ;
-    case 'p': // Precache object config->
-      precache_objects = TRUE;
-      break ;
-    case 'u': // Use precached object config->
-      use_precached_objects = TRUE;
-      break ;
-    default:
+      // Process flag.
+      switch (c) {
+      case '?': // Usage.
+      case 'h':
+        display_help = true;
+        break ;
+      case 'V': // Version.
+        display_license = true;
+        break ;
+      case 'v': // Verify config->
+        verify_config = TRUE;
+        break ;
+      case 's': // Scheduling Check.
+        test_scheduling = TRUE;
+        break ;
+      case 'x': // Don't verify circular paths.
+        verify_circular_paths = FALSE;
+        break ;
+      case 'p': // Precache object config->
+        precache_objects = TRUE;
+        break ;
+      case 'u': // Use precached object config->
+        use_precached_objects = TRUE;
+        break ;
+      default:
+        error = true;
+      }
+    }
+
+    // Make sure we have the right combination of arguments.
+    if ((TRUE == precache_objects)
+        && (FALSE == test_scheduling)
+        && (FALSE == verify_config)) {
       error = true;
-    }
-  }
-
-  // Make sure we have the right combination of arguments.
-  if ((TRUE == precache_objects)
-      && (FALSE == test_scheduling)
-      && (FALSE == verify_config)) {
-    error = true;
-    display_help = true;
-  }
-
-  // Just display the license.
-  if (display_license) {
-    logger(log_info_message, basic)
-      << "Centreon Engine " << CENTREON_ENGINE_VERSION_STRING << "\n"
-      << "\n"
-      << "Copyright 1999-2009 Ethan Galstad\n"
-      << "Copyright 2009-2010 Nagios Core Development Team and Community Contributors\n"
-      << "Copyright 2011-2012 Merethis\n"
-      << "\n"
-      << "This program is free software: you can redistribute it and/or\n"
-      << "modify it under the terms of the GNU General Public License version 2\n"
-      << "as published by the Free Software Foundation.\n"
-      << "\n"
-      << "Centreon Engine is distributed in the hope that it will be useful,\n"
-      << "but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
-      << "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU\n"
-      << "General Public License for more details.\n"
-      << "\n"
-      << "You should have received a copy of the GNU General Public License\n"
-      << "along with this program. If not, see\n"
-      << "<http://www.gnu.org/licenses/>.";
-    exit(EXIT_SUCCESS);
-  }
-
-  // Make sure we got the main config file on the command line.
-  if (optind >= argc)
-    error = true;
-
-  // If there are no command line options or
-  // if an error occured, print usage.
-  if (error || display_help) {
-    logger(log_info_message, basic)
-      << "Usage: " << argv[0] << " [options] <main_config_file>\n"
-      << "\n"
-      << "Basics:\n"
-      << "  -h, --help                  Print help.\n"
-      << "  -V, --license, --version    Print software version and license.\n"
-      << "\n"
-      << "Configuration:\n"
-      << "  -v, --verify-config         Verify all configuration data.\n"
-      << "  -s, --test-scheduling       Shows projected/recommended check\n"
-      << "                              scheduling and other diagnostic info\n"
-      << "                              based on the current configuration\n"
-      << "                              files.\n"
-      << "  -x, --dont-verify-paths     Don't check for circular object paths -\n"
-      << "                              USE WITH CAUTION !\n"
-      << "  -p, --precache-objects      Precache object configuration - use with\n"
-      << "                              -v or -s options.\n"
-      << "  -u, --use-precached-objects Use precached object config file.";
-    exit(error ? EXIT_FAILURE : EXIT_SUCCESS);
-  }
-
-  // Config file is last argument specified.
-  config_file = my_strdup(argv[optind]);
-
-  // Make sure the config file uses an absolute path.
-  if (config_file[0] != '/') {
-    // Get absolute path of current working directory.
-    std::string buffer(com::centreon::io::directory_entry::current_path());
-
-    // Append a forward slash.
-    buffer.append("/");
-
-    // Append the config file to the path.
-    buffer.append(config_file);
-    delete [] config_file;
-    config_file = NULL;
-    config_file = my_strdup(buffer.c_str());
-  }
-
-  // We're just verifying the configuration.
-  int result = ERROR;
-  if (TRUE == verify_config) {
-    // Reset program variables.
-    reset_variables();
-
-    // Read in the configuration files (main config file,
-    // resource and object config files).
-    try {
-      // Read main config file.
-      logger(log_info_message, basic) << "reading main config file";
-      config->parse(config_file);
-
-      // Read object config files.
-      if ((result = read_all_object_data(config_file)) == OK)
-        result = OK;
-      else
-        result = ERROR;
-    }
-    catch(std::exception const &e) {
-      logger(log_config_error, basic)
-        << "error while processing a config file: " << e.what();
-      result = ERROR;
+      display_help = true;
     }
 
-    // There was a problem reading the config files.
-    if (result != OK)
-      logger(log_config_error, basic)
-        << "\n    One or more problems occurred while processing the config files.\n\n"
-        << ERROR_CONFIGURATION;
-    // The config files were okay, so run the pre-flight check.
-    else {
+    // Just display the license.
+    if (display_license) {
       logger(log_info_message, basic)
-        << "running pre-flight check on configuration data";
-      result = pre_flight_check();
-      if (result != OK)
-        logger(log_config_error, basic)
-          << "\n    One or more problem occurred during the pre-flight check.\n\n"
-          << ERROR_CONFIGURATION;
+        << "Centreon Engine " << CENTREON_ENGINE_VERSION_STRING << "\n"
+        << "\n"
+        << "Copyright 1999-2009 Ethan Galstad\n"
+        << "Copyright 2009-2010 Nagios Core Development Team and Community Contributors\n"
+        << "Copyright 2011-2012 Merethis\n"
+        << "\n"
+        << "This program is free software: you can redistribute it and/or\n"
+        << "modify it under the terms of the GNU General Public License version 2\n"
+        << "as published by the Free Software Foundation.\n"
+        << "\n"
+        << "Centreon Engine is distributed in the hope that it will be useful,\n"
+        << "but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
+        << "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU\n"
+        << "General Public License for more details.\n"
+        << "\n"
+        << "You should have received a copy of the GNU General Public License\n"
+        << "along with this program. If not, see\n"
+        << "<http://www.gnu.org/licenses/>.";
+      exit(EXIT_SUCCESS);
     }
 
-    // Clean up after ourselves.
-    cleanup();
+    // Make sure we got the main config file on the command line.
+    if (optind >= argc)
+      error = true;
 
-    // Free config_file.
-    delete[] config_file;
-
-    // Exit.
-    exit(result ? EXIT_FAILURE : EXIT_SUCCESS);
-  }
-
-  // We're just testing scheduling.
-  else if (TRUE == test_scheduling) {
-
-    // Reset program variables.
-    reset_variables();
-
-    // Read in the configuration files (main config file and all host config files).
-    try {
-      config->parse(config_file);
-      configuration::applier::logging::instance().apply(*config);
-      engine::obj_info
-        obj(
-          com::centreon::shared_ptr<logging::object>(new logging::broker),
-          log_all,
-          basic);
-      engine::instance().add_object(obj);
-
-      // Read object config files.
-      result = read_all_object_data(config_file);
-    }
-    catch(std::exception const &e) {
-      logger(log_config_error, basic)
-        << "error while processing a config file: " << e.what();
+    // If there are no command line options or
+    // if an error occured, print usage.
+    if (error || display_help) {
+      logger(log_info_message, basic)
+        << "Usage: " << argv[0] << " [options] <main_config_file>\n"
+        << "\n"
+        << "Basics:\n"
+        << "  -h, --help                  Print help.\n"
+        << "  -V, --license, --version    Print software version and license.\n"
+        << "\n"
+        << "Configuration:\n"
+        << "  -v, --verify-config         Verify all configuration data.\n"
+        << "  -s, --test-scheduling       Shows projected/recommended check\n"
+        << "                              scheduling and other diagnostic info\n"
+        << "                              based on the current configuration\n"
+        << "                              files.\n"
+        << "  -x, --dont-verify-paths     Don't check for circular object paths -\n"
+        << "                              USE WITH CAUTION !\n"
+        << "  -p, --precache-objects      Precache object configuration - use with\n"
+        << "                              -v or -s options.\n"
+        << "  -u, --use-precached-objects Use precached object config file.";
+      exit(error ? EXIT_FAILURE : EXIT_SUCCESS);
     }
 
-    // Read initial service and host state information.
-    if (result == OK) {
-      initialize_retention_data(config_file);
-      read_initial_state_information();
+    // Config file is last argument specified.
+    config_file = my_strdup(argv[optind]);
+
+    // Make sure the config file uses an absolute path.
+    if (config_file[0] != '/') {
+      // Get absolute path of current working directory.
+      std::string buffer(com::centreon::io::directory_entry::current_path());
+
+      // Append a forward slash.
+      buffer.append("/");
+
+      // Append the config file to the path.
+      buffer.append(config_file);
+      delete [] config_file;
+      config_file = NULL;
+      config_file = my_strdup(buffer.c_str());
     }
 
-    if (result != OK) {
-      logger(log_config_error, basic)
-        << "\n    One or more problems occurred while processing the config files.\n";
-    }
-
-    // Run the pre-flight check to make sure everything looks okay.
-    if ((OK == result) && ((result = pre_flight_check()) != OK)) {
-      logger(log_config_error, basic)
-        << "\n    One or more problems occurred during the pre-flight check.\n";
-    }
-
-    if (OK == result) {
-      // Initialize the event timing loop.
-      init_timing_loop();
-
-      // Display scheduling information.
-      display_scheduling_info();
-
-      if (precache_objects == TRUE)
-        logger(log_info_message, basic)
-          << "\n"
-          << "OBJECT PRECACHING\n"
-          << "-----------------\n"
-          << "Object config files were precached.";
-    }
-
-#undef TEST_TIMEPERIODS
-#ifdef TEST_TIMEPERIODS
-    /* DO SOME TIMEPERIOD TESTING - ADDED 08/11/2009 */
-    time_t now, pref_time, valid_time;
-    timeperiod* tp;
-    tp = find_timeperiod("247_exclusion");
-    time(&now);
-    pref_time = now;
-    get_next_valid_time(pref_time, &valid_time, tp);
-    printf("=====\n");
-    printf("CURRENT:   %lu = %s", (unsigned long)now, ctime(&now));
-    printf("PREFERRED: %lu = %s", (unsigned long)pref_time, ctime(&pref_time));
-    printf("NEXT:      %lu = %s", (unsigned long)valid_time, ctime(&valid_time));
-    printf("=====\n");
-#endif
-
-    // Clean up after ourselves.
-    cleanup();
-
-    // Exit.
-    exit(result ? EXIT_FAILURE : EXIT_SUCCESS);
-  }
-
-  // Else start to monitor things.
-  else {
-    char* buffer(NULL);
-    // Keep monitoring things until we get a shutdown command.
-    do {
+    // We're just verifying the configuration.
+    int result = ERROR;
+    if (TRUE == verify_config) {
       // Reset program variables.
       reset_variables();
 
-      // Read in the configuration files (main
-      // and resource config files).
+      // Read in the configuration files (main config file,
+      // resource and object config files).
+      try {
+        // Read main config file.
+        logger(log_info_message, basic) << "reading main config file";
+        config->parse(config_file);
+
+        // Read object config files.
+        if ((result = read_all_object_data(config_file)) == OK)
+          result = OK;
+        else
+          result = ERROR;
+      }
+      catch(std::exception const &e) {
+        logger(log_config_error, basic)
+          << "error while processing a config file: " << e.what();
+        result = ERROR;
+      }
+
+      // There was a problem reading the config files.
+      if (result != OK)
+        logger(log_config_error, basic)
+          << "\n    One or more problems occurred while processing the config files.\n\n"
+          << ERROR_CONFIGURATION;
+      // The config files were okay, so run the pre-flight check.
+      else {
+        logger(log_info_message, basic)
+          << "running pre-flight check on configuration data";
+        result = pre_flight_check();
+        if (result != OK)
+          logger(log_config_error, basic)
+            << "\n    One or more problem occurred during the pre-flight check.\n\n"
+            << ERROR_CONFIGURATION;
+      }
+
+      // Clean up after ourselves.
+      cleanup();
+
+      // Free config_file.
+      delete [] config_file;
+
+      // Exit.
+      exit(result ? EXIT_FAILURE : EXIT_SUCCESS);
+    }
+
+    // We're just testing scheduling.
+    else if (TRUE == test_scheduling) {
+
+      // Reset program variables.
+      reset_variables();
+
+      // Read in the configuration files (main config file and all host config files).
       try {
         config->parse(config_file);
         configuration::applier::logging::instance().apply(*config);
-        engine::obj_info obj(
-                           com::centreon::shared_ptr<logging::object>(
-                             new logging::broker),
-                           log_all,
-                           basic);
+        engine::obj_info
+          obj(
+            com::centreon::shared_ptr<logging::object>(new logging::broker),
+            log_all,
+            basic);
         engine::instance().add_object(obj);
-        result = OK;
+
+        // Read object config files.
+        result = read_all_object_data(config_file);
       }
       catch(std::exception const &e) {
         logger(log_config_error, basic)
           << "error while processing a config file: " << e.what();
       }
 
-      // Get program (re)start time and save as macro. Needs to be done
-      // after we read config files, as user may have overridden
-      // timezone offset.
-      program_start = time(NULL);
-      delete [] mac->x[MACRO_PROCESSSTARTTIME];
-      try {
-        mac->x[MACRO_PROCESSSTARTTIME]
-          = obj2pchar<unsigned long>(program_start);
-      }
-      catch (...) {
-        cleanup();
-        throw ;
-      }
-
-      // Initialize modules.
-      neb_init_modules();
-      neb_init_callback_list();
-      try {
-        com::centreon::engine::broker::loader& loader(
-          com::centreon::engine::broker::loader::instance());
-        std::string const& mod_dir(config->get_broker_module_directory());
-        if (!mod_dir.empty())
-          loader.load_directory(mod_dir);
-      }
-      catch (std::exception const& e) {
-        logger(log_info_message, basic)
-          << "event broker module initialization failed";
-        result = ERROR;
-      }
-
-      // This must be logged after we read config data, as user may have changed location of main log file.
-      logger(log_process_info, basic) << "Centreon Engine "
-        << CENTREON_ENGINE_VERSION_STRING << " starting ... (PID="
-        << getpid() << ")";
-
-      // Log the local time - may be different than clock time due to timezone offset.
-      now = time(NULL);
-      tm = localtime_r(&now, &tm_s);
-      strftime(datestring, sizeof(datestring), "%a %b %d %H:%M:%S %Z %Y", tm);
-      logger(log_process_info, basic) << "Local time is " << datestring;
-
-      // Write log version/info.
-      logger(log_process_info, basic) <<  "LOG VERSION: " << LOG_VERSION_2;
-
-      // Load modules.
-      neb_load_all_modules();
-
-      // Send program data to broker.
-      broker_program_state(NEBTYPE_PROCESS_PRELAUNCH,
-                           NEBFLAG_NONE,
-                           NEBATTR_NONE,
-                           NULL);
-
-      // Read in all object config data.
-      if (result == OK)
-        result = read_all_object_data(config_file);
-
-      // There was a problem reading the config files.
-      if (result != OK)
-        logger(log_process_info | log_runtime_error | log_config_error, basic)
-          << "Bailing out due to one or more errors encountered in the configuration files. "
-          << "Run Centreon Engine from the command line with the -v option to verify your config before restarting. (PID=" << getpid() << ")";
-      // Run the pre-flight check to make sure everything looks okay.
-      else if ((result = pre_flight_check()) != OK)
-        logger(log_process_info | log_runtime_error | log_verification_error, basic)
-          << "Bailing out due to errors encountered while running the pre-flight check.  "
-          << "Run Centreon Engine from the command line with the -v option to verify your config before restarting. (PID=" << getpid() << ")";
-
-      // An error occurred that prevented us from (re)starting.
-      if (result != OK) {
-        // Send program data to broker.
-        broker_program_state(NEBTYPE_PROCESS_SHUTDOWN,
-                             NEBFLAG_PROCESS_INITIATED,
-                             NEBATTR_SHUTDOWN_ABNORMAL,
-                             NULL);
-        cleanup();
-        exit(EXIT_FAILURE);
-      }
-
-      // Handle signals (interrupts).
-      setup_sighandler();
-
-      // Send program data to broker.
-      broker_program_state(NEBTYPE_PROCESS_START,
-                           NEBFLAG_NONE,
-                           NEBATTR_NONE,
-                           NULL);
-
-      // Initialize status data.
-      initialize_status_data(config_file);
-
       // Read initial service and host state information.
-      initialize_retention_data(config_file);
-      read_initial_state_information();
-
-      // Initialize comment data.
-      initialize_comment_data(config_file);
-
-      // Initialize scheduled downtime data.
-      initialize_downtime_data(config_file);
-
-      // Initialize performance data.
-      initialize_performance_data(config_file);
-
-      // Initialize the event timing loop.
-      init_timing_loop();
-
-      // Initialize check statistics.
-      init_check_stats();
-
-      // Update all status data (with retained information).
-      update_all_status_data();
-
-      // Log initial host and service state.
-      log_host_states(INITIAL_STATES, NULL);
-      log_service_states(INITIAL_STATES, NULL);
-
-      // Send program data to broker.
-      broker_program_state(NEBTYPE_PROCESS_EVENTLOOPSTART,
-                           NEBFLAG_NONE,
-                           NEBATTR_NONE,
-                           NULL);
-
-      // Get event start time and save as macro.
-      event_start = time(NULL);
-      delete [] mac->x[MACRO_EVENTSTARTTIME];
-      try {
-        mac->x[MACRO_EVENTSTARTTIME]
-          = obj2pchar<unsigned long>(event_start);
-      }
-      catch (...) {
-        // Send program data to broker.
-        broker_program_state(
-          NEBTYPE_PROCESS_SHUTDOWN,
-          NEBFLAG_PROCESS_INITIATED,
-          NEBATTR_SHUTDOWN_ABNORMAL,
-          NULL);
-        cleanup();
+      if (result == OK) {
+        initialize_retention_data(config_file);
+        read_initial_state_information();
       }
 
-      /***** Start monitoring all services. *****/
-      // (doesn't return until a restart or shutdown signal is encountered).
-      events::loop& loop(events::loop::instance());
-      loop.run();
-
-      /* 03/01/2007 EG Moved from sighandler() to prevent FUTEX locking problems under NPTL */
-      // Did we catch a signal ?
-      if (sigshutdown == TRUE) {
-        try {
-          std::ostringstream oss;
-          oss << "Caught SIG" << sigs[sig_id] << ", shutting down ...";
-          buffer = my_strdup(oss.str().c_str());
-        }
-        catch(...) {
-          // Send program data to broker.
-          broker_program_state(NEBTYPE_PROCESS_SHUTDOWN,
-                               NEBFLAG_PROCESS_INITIATED,
-                               NEBATTR_SHUTDOWN_ABNORMAL,
-                               NULL);
-          cleanup();
-        }
-
-        logger(log_process_info, basic) << buffer;
-        delete[] buffer;
+      if (result != OK) {
+        logger(log_config_error, basic)
+          << "\n    One or more problems occurred while processing the config files.\n";
       }
 
-      // Send program data to broker.
-      broker_program_state(NEBTYPE_PROCESS_EVENTLOOPEND,
-                           NEBFLAG_NONE,
-                           NEBATTR_NONE,
-                           NULL);
-      if (sigshutdown == TRUE)
-        broker_program_state(NEBTYPE_PROCESS_SHUTDOWN,
-                             NEBFLAG_USER_INITIATED,
-                             NEBATTR_SHUTDOWN_NORMAL,
-                             NULL);
+      // Run the pre-flight check to make sure everything looks okay.
+      if ((OK == result) && ((result = pre_flight_check()) != OK)) {
+        logger(log_config_error, basic)
+          << "\n    One or more problems occurred during the pre-flight check.\n";
+      }
 
-      // Save service and host state information.
-      save_state_information(FALSE);
-      cleanup_retention_data(config_file);
+      if (OK == result) {
+        // Initialize the event timing loop.
+        init_timing_loop();
 
-      // Clean up performance data.
-      cleanup_performance_data(config_file);
+        // Display scheduling information.
+        display_scheduling_info();
 
-      // Clean up the scheduled downtime data.
-      cleanup_downtime_data(config_file);
-
-      // Clean up the comment data.
-      cleanup_comment_data(config_file);
-
-      // Clean up the status data.
-      cleanup_status_data(config_file, TRUE);
-
-      // Shutdown stuff.
-      if (sigshutdown == TRUE) {
-        // Log a shutdown message.
-        logger(log_process_info, basic)
-          << "Successfully shutdown ... (PID=" << getpid() << ")";
+        if (precache_objects == TRUE)
+          logger(log_info_message, basic)
+            << "\n"
+            << "OBJECT PRECACHING\n"
+            << "-----------------\n"
+            << "Object config files were precached.";
       }
 
       // Clean up after ourselves.
       cleanup();
 
-    } while (sigshutdown == FALSE);
+      // Exit.
+      exit(result ? EXIT_FAILURE : EXIT_SUCCESS);
+    }
 
-    // Free misc memory.
-    delete [] config_file;
-    delete [] mac->x[MACRO_OBJECTCACHEFILE];
-    delete [] mac->x[MACRO_PROCESSSTARTTIME];
-    delete [] mac->x[MACRO_EVENTSTARTTIME];
-    delete [] mac->x[MACRO_RETENTIONDATAFILE];
-    delete [] mac->x[MACRO_STATUSDATAFILE];
+    // Else start to monitor things.
+    else {
+      char* buffer(NULL);
+      // Keep monitoring things until we get a shutdown command.
+      do {
+        // Reset program variables.
+        reset_variables();
+
+        // Read in the configuration files (main
+        // and resource config files).
+        try {
+          config->parse(config_file);
+          configuration::applier::logging::instance().apply(*config);
+          engine::obj_info obj(
+                             com::centreon::shared_ptr<logging::object>(
+                               new logging::broker),
+                             log_all,
+                             basic);
+          engine::instance().add_object(obj);
+          result = OK;
+        }
+        catch(std::exception const &e) {
+          logger(log_config_error, basic)
+            << "error while processing a config file: " << e.what();
+        }
+
+        // Get program (re)start time and save as macro. Needs to be done
+        // after we read config files, as user may have overridden
+        // timezone offset.
+        program_start = time(NULL);
+        delete [] mac->x[MACRO_PROCESSSTARTTIME];
+        try {
+          mac->x[MACRO_PROCESSSTARTTIME]
+            = obj2pchar<unsigned long>(program_start);
+        }
+        catch (...) {
+          cleanup();
+          throw ;
+        }
+
+        // Initialize modules.
+        neb_init_modules();
+        neb_init_callback_list();
+        try {
+          com::centreon::engine::broker::loader& loader(
+            com::centreon::engine::broker::loader::instance());
+          std::string const& mod_dir(config->get_broker_module_directory());
+          if (!mod_dir.empty())
+            loader.load_directory(mod_dir);
+        }
+        catch (std::exception const& e) {
+          logger(log_info_message, basic)
+            << "event broker module initialization failed";
+          result = ERROR;
+        }
+
+        // This must be logged after we read config data, as user may have changed location of main log file.
+        logger(log_process_info, basic) << "Centreon Engine "
+          << CENTREON_ENGINE_VERSION_STRING << " starting ... (PID="
+          << getpid() << ")";
+
+        // Log the local time - may be different than clock time due to timezone offset.
+        now = time(NULL);
+        tm = localtime_r(&now, &tm_s);
+        strftime(datestring, sizeof(datestring), "%a %b %d %H:%M:%S %Z %Y", tm);
+        logger(log_process_info, basic) << "Local time is " << datestring;
+
+        // Write log version/info.
+        logger(log_process_info, basic) <<  "LOG VERSION: " << LOG_VERSION_2;
+
+        // Load modules.
+        neb_load_all_modules();
+
+        // Send program data to broker.
+        broker_program_state(
+          NEBTYPE_PROCESS_PRELAUNCH,
+          NEBFLAG_NONE,
+          NEBATTR_NONE,
+          NULL);
+
+        // Read in all object config data.
+        if (result == OK)
+          result = read_all_object_data(config_file);
+
+        // There was a problem reading the config files.
+        if (result != OK)
+          logger(log_process_info | log_runtime_error | log_config_error, basic)
+            << "Bailing out due to one or more errors encountered in the configuration files. "
+            << "Run Centreon Engine from the command line with the -v option to verify your config before restarting. (PID=" << getpid() << ")";
+        // Run the pre-flight check to make sure everything looks okay.
+        else if ((result = pre_flight_check()) != OK)
+          logger(log_process_info | log_runtime_error | log_verification_error, basic)
+            << "Bailing out due to errors encountered while running the pre-flight check.  "
+            << "Run Centreon Engine from the command line with the -v option to verify your config before restarting. (PID=" << getpid() << ")";
+
+        // An error occurred that prevented us from (re)starting.
+        if (result != OK) {
+          // Send program data to broker.
+          broker_program_state(
+            NEBTYPE_PROCESS_SHUTDOWN,
+            NEBFLAG_PROCESS_INITIATED,
+            NEBATTR_SHUTDOWN_ABNORMAL,
+            NULL);
+          cleanup();
+          exit(EXIT_FAILURE);
+        }
+
+        // Handle signals (interrupts).
+        setup_sighandler();
+
+        // Send program data to broker.
+        broker_program_state(
+          NEBTYPE_PROCESS_START,
+          NEBFLAG_NONE,
+          NEBATTR_NONE,
+          NULL);
+
+        // Initialize status data.
+        initialize_status_data(config_file);
+
+        // Read initial service and host state information.
+        initialize_retention_data(config_file);
+        read_initial_state_information();
+
+        // Initialize comment data.
+        initialize_comment_data(config_file);
+
+        // Initialize scheduled downtime data.
+        initialize_downtime_data(config_file);
+
+        // Initialize performance data.
+        initialize_performance_data(config_file);
+
+        // Initialize the event timing loop.
+        init_timing_loop();
+
+        // Initialize check statistics.
+        init_check_stats();
+
+        // Update all status data (with retained information).
+        update_all_status_data();
+
+        // Log initial host and service state.
+        log_host_states(INITIAL_STATES, NULL);
+        log_service_states(INITIAL_STATES, NULL);
+
+        // Send program data to broker.
+        broker_program_state(
+          NEBTYPE_PROCESS_EVENTLOOPSTART,
+          NEBFLAG_NONE,
+          NEBATTR_NONE,
+          NULL);
+
+        // Get event start time and save as macro.
+        event_start = time(NULL);
+        delete [] mac->x[MACRO_EVENTSTARTTIME];
+        try {
+          mac->x[MACRO_EVENTSTARTTIME]
+            = obj2pchar<unsigned long>(event_start);
+        }
+        catch (...) {
+          // Send program data to broker.
+          broker_program_state(
+            NEBTYPE_PROCESS_SHUTDOWN,
+            NEBFLAG_PROCESS_INITIATED,
+            NEBATTR_SHUTDOWN_ABNORMAL,
+            NULL);
+          cleanup();
+        }
+
+        /***** Start monitoring all services. *****/
+        // (doesn't return until a restart or shutdown signal is encountered).
+        events::loop& loop(events::loop::instance());
+        loop.run();
+
+        /* 03/01/2007 EG Moved from sighandler() to prevent FUTEX locking problems under NPTL */
+        // Did we catch a signal ?
+        if (sigshutdown == TRUE) {
+          try {
+            std::ostringstream oss;
+            oss << "Caught SIG" << sigs[sig_id] << ", shutting down ...";
+            buffer = my_strdup(oss.str().c_str());
+          }
+          catch(...) {
+            // Send program data to broker.
+            broker_program_state(
+              NEBTYPE_PROCESS_SHUTDOWN,
+              NEBFLAG_PROCESS_INITIATED,
+              NEBATTR_SHUTDOWN_ABNORMAL,
+              NULL);
+            cleanup();
+          }
+
+          logger(log_process_info, basic) << buffer;
+          delete [] buffer;
+        }
+
+        // Send program data to broker.
+        broker_program_state(
+          NEBTYPE_PROCESS_EVENTLOOPEND,
+          NEBFLAG_NONE,
+          NEBATTR_NONE,
+          NULL);
+        if (sigshutdown == TRUE)
+          broker_program_state(
+            NEBTYPE_PROCESS_SHUTDOWN,
+            NEBFLAG_USER_INITIATED,
+            NEBATTR_SHUTDOWN_NORMAL,
+            NULL);
+
+        // Save service and host state information.
+        save_state_information(FALSE);
+        cleanup_retention_data(config_file);
+
+        // Clean up performance data.
+        cleanup_performance_data(config_file);
+
+        // Clean up the scheduled downtime data.
+        cleanup_downtime_data(config_file);
+
+        // Clean up the comment data.
+        cleanup_comment_data(config_file);
+
+        // Clean up the status data.
+        cleanup_status_data(config_file, TRUE);
+
+        // Shutdown stuff.
+        if (sigshutdown == TRUE) {
+          // Log a shutdown message.
+          logger(log_process_info, basic)
+            << "Successfully shutdown ... (PID=" << getpid() << ")";
+        }
+
+        // Clean up after ourselves.
+        cleanup();
+
+      } while (sigshutdown == FALSE);
+
+      // Free misc memory.
+      delete [] config_file;
+      delete [] mac->x[MACRO_OBJECTCACHEFILE];
+      delete [] mac->x[MACRO_PROCESSSTARTTIME];
+      delete [] mac->x[MACRO_EVENTSTARTTIME];
+      delete [] mac->x[MACRO_RETENTIONDATAFILE];
+      delete [] mac->x[MACRO_STATUSDATAFILE];
+    }
+  }
+  catch (std::exception const& e) {
+    logger(log_runtime_error, basic) << e.what();
   }
 
-  // Unload singletons (except logging).
+  // Memory cleanup.
+  cleanup();
   com::centreon::engine::broker::compatibility::unload();
   com::centreon::engine::broker::loader::unload();
   com::centreon::engine::events::loop::unload();
