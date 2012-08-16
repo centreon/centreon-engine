@@ -935,6 +935,12 @@ if (WITH_TESTING)
   add_executable("${CENTENGINE_RUNNER}"
     "${TEST_DIR}/running/centengine_must_run.cc")
   target_link_libraries("${CENTENGINE_RUNNER}" "cce_core")
+  # Help flag.
+  add_test("running_engine_help"
+    "centengine" "-h")
+  # License flag.
+  add_test("running_engine_license"
+    "centengine" "-V")
   # Without any service.
   add_test("running_engine_no_service"
     "centengine" "-v" "${TEST_DIR}/running/etc/no_service.cfg")
