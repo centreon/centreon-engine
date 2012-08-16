@@ -106,15 +106,6 @@ int main(int argc, char* argv[]) {
   };
 #endif // HAVE_GETOPT_H
 
-  // Options.
-  bool display_help(false);
-  bool display_license(false);
-  bool error(false);
-
-  // Make sure we have the correct number of command line arguments.
-  if (argc < 2)
-    error = true;
-
   // Load singletons.
   com::centreon::clib::load();
   com::centreon::engine::configuration::state::load();
@@ -126,7 +117,13 @@ int main(int argc, char* argv[]) {
   com::centreon::engine::broker::loader::load();
   com::centreon::engine::broker::compatibility::load();
 
+  int retval(EXIT_FAILURE);
   try {
+    // Options.
+    bool display_help(false);
+    bool display_license(false);
+    bool error(false);
+
     // Process all command line arguments.
     int c;
 #ifdef HAVE_GETOPT_H
@@ -164,12 +161,28 @@ int main(int argc, char* argv[]) {
       }
     }
 
-    // Make sure we have the right combination of arguments.
-    if ((TRUE == precache_objects)
-        && (FALSE == test_scheduling)
-        && (FALSE == verify_config)) {
+    // Invalid argument count.
+    if ((argc < 2)
+        // Invalid argument combination.
+        || (precache_objects && !test_scheduling && !verify_config)
+        // Main configuration file not on command line.
+        || (optind >= argc))
       error = true;
-      display_help = true;
+    else {
+      // Config file is last argument specified.
+      config_file = my_strdup(argv[optind]);
+
+      // Make sure the config file uses an absolute path.
+      if (config_file[0] != '/') {
+        // Get absolute path of current working directory.
+        std::string
+          buffer(com::centreon::io::directory_entry::current_path());
+        buffer.append("/");
+        buffer.append(config_file);
+        delete [] config_file;
+        config_file = NULL;
+        config_file = my_strdup(buffer.c_str());
+      }
     }
 
     // Just display the license.
@@ -193,16 +206,10 @@ int main(int argc, char* argv[]) {
         << "You should have received a copy of the GNU General Public License\n"
         << "along with this program. If not, see\n"
         << "<http://www.gnu.org/licenses/>.";
-      exit(EXIT_SUCCESS);
+      retval = EXIT_SUCCESS;
     }
-
-    // Make sure we got the main config file on the command line.
-    if (optind >= argc)
-      error = true;
-
-    // If there are no command line options or
-    // if an error occured, print usage.
-    if (error || display_help) {
+    // If requested or if an error occured, print usage.
+    else if (error || display_help) {
       logger(log_info_message, basic)
         << "Usage: " << argv[0] << " [options] <main_config_file>\n"
         << "\n"
@@ -221,30 +228,12 @@ int main(int argc, char* argv[]) {
         << "  -p, --precache-objects      Precache object configuration - use with\n"
         << "                              -v or -s options.\n"
         << "  -u, --use-precached-objects Use precached object config file.";
-      exit(error ? EXIT_FAILURE : EXIT_SUCCESS);
+      retval = (display_help ? EXIT_SUCCESS : EXIT_FAILURE);
     }
-
-    // Config file is last argument specified.
-    config_file = my_strdup(argv[optind]);
-
-    // Make sure the config file uses an absolute path.
-    if (config_file[0] != '/') {
-      // Get absolute path of current working directory.
-      std::string buffer(com::centreon::io::directory_entry::current_path());
-
-      // Append a forward slash.
-      buffer.append("/");
-
-      // Append the config file to the path.
-      buffer.append(config_file);
-      delete [] config_file;
-      config_file = NULL;
-      config_file = my_strdup(buffer.c_str());
-    }
-
     // We're just verifying the configuration.
-    int result = ERROR;
-    if (TRUE == verify_config) {
+    else if (verify_config) {
+      int result(ERROR);
+
       // Reset program variables.
       reset_variables();
 
@@ -261,7 +250,7 @@ int main(int argc, char* argv[]) {
         else
           result = ERROR;
       }
-      catch(std::exception const &e) {
+      catch (std::exception const &e) {
         logger(log_config_error, basic)
           << "error while processing a config file: " << e.what();
         result = ERROR;
@@ -283,18 +272,12 @@ int main(int argc, char* argv[]) {
             << ERROR_CONFIGURATION;
       }
 
-      // Clean up after ourselves.
-      cleanup();
-
-      // Free config_file.
-      delete [] config_file;
-
-      // Exit.
-      exit(result ? EXIT_FAILURE : EXIT_SUCCESS);
+      // Return value.
+      retval = (result ? EXIT_FAILURE : EXIT_SUCCESS);
     }
-
     // We're just testing scheduling.
-    else if (TRUE == test_scheduling) {
+    else if (test_scheduling) {
+      int result(ERROR);
 
       // Reset program variables.
       reset_variables();
@@ -350,16 +333,14 @@ int main(int argc, char* argv[]) {
             << "Object config files were precached.";
       }
 
-      // Clean up after ourselves.
-      cleanup();
-
-      // Exit.
-      exit(result ? EXIT_FAILURE : EXIT_SUCCESS);
+      // Return value.
+      retval = (result ? EXIT_FAILURE : EXIT_SUCCESS);
     }
-
     // Else start to monitor things.
     else {
       char* buffer(NULL);
+      int result(ERROR);
+
       // Keep monitoring things until we get a shutdown command.
       do {
         // Reset program variables.
@@ -372,13 +353,13 @@ int main(int argc, char* argv[]) {
           configuration::applier::logging::instance().apply(*config);
           engine::obj_info obj(
                              com::centreon::shared_ptr<logging::object>(
-                               new logging::broker),
+                                              new logging::broker),
                              log_all,
                              basic);
           engine::instance().add_object(obj);
           result = OK;
         }
-        catch(std::exception const &e) {
+        catch (std::exception const &e) {
           logger(log_config_error, basic)
             << "error while processing a config file: " << e.what();
         }
@@ -388,14 +369,8 @@ int main(int argc, char* argv[]) {
         // timezone offset.
         program_start = time(NULL);
         delete [] mac->x[MACRO_PROCESSSTARTTIME];
-        try {
-          mac->x[MACRO_PROCESSSTARTTIME]
-            = obj2pchar<unsigned long>(program_start);
-        }
-        catch (...) {
-          cleanup();
-          throw ;
-        }
+        mac->x[MACRO_PROCESSSTARTTIME]
+          = obj2pchar<unsigned long>(program_start);
 
         // Initialize modules.
         neb_init_modules();
@@ -421,11 +396,17 @@ int main(int argc, char* argv[]) {
         // Log the local time - may be different than clock time due to timezone offset.
         now = time(NULL);
         tm = localtime_r(&now, &tm_s);
-        strftime(datestring, sizeof(datestring), "%a %b %d %H:%M:%S %Z %Y", tm);
-        logger(log_process_info, basic) << "Local time is " << datestring;
+        strftime(
+          datestring,
+          sizeof(datestring),
+          "%a %b %d %H:%M:%S %Z %Y",
+          tm);
+        logger(log_process_info, basic)
+          << "Local time is " << datestring;
 
         // Write log version/info.
-        logger(log_process_info, basic) <<  "LOG VERSION: " << LOG_VERSION_2;
+        logger(log_process_info, basic)
+          <<  "LOG VERSION: " << LOG_VERSION_2;
 
         // Load modules.
         neb_load_all_modules();
@@ -460,8 +441,8 @@ int main(int argc, char* argv[]) {
             NEBFLAG_PROCESS_INITIATED,
             NEBATTR_SHUTDOWN_ABNORMAL,
             NULL);
-          cleanup();
-          exit(EXIT_FAILURE);
+          throw (engine_error ()
+                 << "Shutting down because of an early failure");
         }
 
         // Handle signals (interrupts).
@@ -524,7 +505,6 @@ int main(int argc, char* argv[]) {
             NEBFLAG_PROCESS_INITIATED,
             NEBATTR_SHUTDOWN_ABNORMAL,
             NULL);
-          cleanup();
         }
 
         /***** Start monitoring all services. *****/
@@ -540,14 +520,13 @@ int main(int argc, char* argv[]) {
             oss << "Caught SIG" << sigs[sig_id] << ", shutting down ...";
             buffer = my_strdup(oss.str().c_str());
           }
-          catch(...) {
+          catch (...) {
             // Send program data to broker.
             broker_program_state(
               NEBTYPE_PROCESS_SHUTDOWN,
               NEBFLAG_PROCESS_INITIATED,
               NEBATTR_SHUTDOWN_ABNORMAL,
               NULL);
-            cleanup();
           }
 
           logger(log_process_info, basic) << buffer;
@@ -602,6 +581,9 @@ int main(int argc, char* argv[]) {
       delete [] mac->x[MACRO_EVENTSTARTTIME];
       delete [] mac->x[MACRO_RETENTIONDATAFILE];
       delete [] mac->x[MACRO_STATUSDATAFILE];
+
+      // Successful execution.
+      retval = EXIT_SUCCESS;
     }
   }
   catch (std::exception const& e) {
@@ -620,5 +602,5 @@ int main(int argc, char* argv[]) {
   com::centreon::engine::logging::engine::unload();
   com::centreon::clib::unload();
 
-  return (EXIT_SUCCESS);
+  return (retval);
 }
