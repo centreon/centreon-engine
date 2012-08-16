@@ -144,26 +144,43 @@ int neb_load_module(void* mod) {
   return (OK);
 }
 
-/* close (unload) all modules that are currently loaded */
+/**
+ *  Close (unload) all modules that are currently loaded.
+ *
+ *  @param[in] flags  Unload flags.
+ *  @param[in] reason Unload reason (reload, shutdown, ...).
+ *
+ *  @return OK on success.
+ */
 int neb_unload_all_modules(int flags, int reason) {
+  int retval;
   try {
-    broker::loader& loader(broker::loader::instance());
-    std::list<shared_ptr<broker::handle> >
-      modules(loader.get_modules());
-    for (std::list<shared_ptr<broker::handle> >::const_iterator
-           it(modules.begin()),
-           end(modules.end());
-         it != end;
-         ++it)
-      neb_unload_module(&**it, flags, reason);
-    loader.unload_modules();
-    logger(dbg_eventbroker, basic) << "load all modules success.";
+    broker::loader* loader(&broker::loader::instance());
+    if (loader) {
+      std::list<shared_ptr<broker::handle> >
+        modules(loader->get_modules());
+      for (std::list<shared_ptr<broker::handle> >::const_iterator
+             it(modules.begin()),
+             end(modules.end());
+           it != end;
+           ++it)
+        neb_unload_module(&**it, flags, reason);
+      loader->unload_modules();
+      logger(dbg_eventbroker, basic)
+        << "all modules got successfully unloaded";
+    }
+    retval = OK;
+  }
+  catch (std::exception const& e) {
+    logger(log_runtime_error, basic)
+      << "module unloaded failed: " << e.what();
+    retval = ERROR;
   }
   catch (...) {
     logger(dbg_eventbroker, basic) << "load all modules failed.";
-    return (ERROR);
+    retval = ERROR;
   }
-  return (OK);
+  return (retval);
 }
 
 /* close (unload) a particular module */
