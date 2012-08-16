@@ -17,6 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <cstdlib>
 #include <exception>
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/modules/external_commands/commands.hh"
@@ -27,71 +28,68 @@
 using namespace com::centreon::engine;
 
 /**
- *  Cleanup host memory.
- */
-static void _release_host(host* hst) {
-  if (hst->parent_hosts) {
-    delete[] hst->parent_hosts->host_name;
-    delete hst->parent_hosts;
-  }
-
-  if (hst->child_hosts) {
-    delete[] hst->child_hosts->host_name;
-    delete hst->child_hosts;
-  }
-
-  delete[] hst->name;
-  delete[] hst->display_name;
-  delete[] hst->alias;
-  delete[] hst->address;
-  delete hst;
-}
-
-/**
  *  Run schedule_and_propagate_triggered_host_downtime test.
+ *
+ *  @param[in] argc Argument count.
+ *  @param[in] argv Argument values.
+ *
+ *  @return EXIT_SUCCESS on success.
  */
-static int check_schedule_and_propagate_triggered_host_downtime(int argc, char** argv) {
+static int check_schedule_and_propagate_triggered_host_downtime(
+             int argc,
+             char** argv) {
   (void)argc;
   (void)argv;
 
+  // Initialization.
   init_object_skiplists();
 
-  host* hst_parent = add_host("parent", NULL, NULL, "localhost", NULL, 0, 0.0, 0.0, 42,
-                              0, 0, 0, 0, 0, 0.0, 0.0, NULL, 0, NULL, 0, 0, NULL, 0,
-                              0, 0.0, 0.0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 0, 0, NULL,
-                              NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0.0, 0.0,
-                              0.0, 0, 0, 0, 0, 0);
-  host* hst_child = add_host("child", NULL, NULL, "localhost", NULL, 0, 0.0, 0.0, 42,
-                             0, 0, 0, 0, 0, 0.0, 0.0, NULL, 0, NULL, 0, 0, NULL, 0,
-                             0, 0.0, 0.0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 0, 0, NULL,
-                             NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0.0, 0.0,
-                             0.0, 0, 0, 0, 0, 0);
-
+  // Create target hosts.
+  host* hst_parent(add_host("parent", NULL, NULL, "localhost", NULL, 0,
+                            0.0, 0.0, 42, 0, 0, 0, 0, 0, 0.0, 0.0, NULL,
+                            0, NULL, 0, 0, NULL, 0, 0, 0.0, 0.0, 0, 0,
+                            0, 0, 0, 0, 0, 0, NULL, 0, 0, NULL, NULL,
+                            NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0.0,
+                            0.0, 0.0, 0, 0, 0, 0, 0));
+  host* hst_child(add_host("child", NULL, NULL, "localhost", NULL, 0,
+                           0.0, 0.0, 42, 0, 0, 0, 0, 0, 0.0, 0.0, NULL,
+                           0, NULL, 0, 0, NULL, 0, 0, 0.0, 0.0, 0, 0, 0,
+                           0, 0, 0, 0, 0, NULL, 0, 0, NULL, NULL, NULL,
+                           NULL, NULL, NULL, NULL, 0, 0, 0, 0.0, 0.0,
+                           0.0, 0, 0, 0, 0, 0));
   if (!hst_parent || !hst_child)
-    throw (engine_error() << "create host failed.");
-
+    throw (engine_error() << "hosts creation failed");
   add_parent_host_to_host(hst_child, "parent");
   add_child_link_to_host(hst_parent, hst_child);
 
-  scheduled_downtime_list = NULL;
-  char const* cmd("[1317196300] SCHEDULE_AND_PROPAGATE_TRIGGERED_HOST_DOWNTIME;parent;1317196300;2000000000;0;0;7200;user;comment");
+  // Send external command.
+  char const*
+    cmd("[1317196300] SCHEDULE_AND_PROPAGATE_TRIGGERED_HOST_DOWNTIME;parent;1317196300;2000000000;0;0;7200;user;comment");
   process_external_command(cmd);
 
+  // Check.
   if (!scheduled_downtime_list)
-    throw (engine_error() << "schedule_and_propagate_triggered_host_downtime failed.");
+    throw (engine_error()
+           << "schedule_and_propagate_triggered_host_downtime failed");
 
-  _release_host(hst_parent);
-  _release_host(hst_child);
+  // Cleanup.
+  cleanup();
 
-  free_object_skiplists();
-
-  return (0);
+  return (EXIT_SUCCESS);
 }
 
 /**
  *  Init unit test.
+ *
+ *  @param[in] argc Argument count.
+ *  @param[in] argv Argument values.
+ *
+ *  @return EXIT_SUCCESS on success.
  */
 int main(int argc, char** argv) {
-  unittest utest(argc, argv, &check_schedule_and_propagate_triggered_host_downtime);
+  unittest utest(
+             argc,
+             argv,
+             &check_schedule_and_propagate_triggered_host_downtime);
   return (utest.run());
 }

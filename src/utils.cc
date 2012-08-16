@@ -1931,62 +1931,56 @@ void cleanup() {
   return ;
 }
 
-/* free the memory allocated to the linked lists */
+/**
+ *  Free the memory allocated to the linked lists.
+ *
+ *  @param[in,out] mac Macros.
+ */
 void free_memory(nagios_macros* mac) {
   timed_event* this_event = NULL;
   timed_event* next_event = NULL;
 
-  /* free all allocated memory for the object definitions */
+  // Free all allocated memory for the object definitions.
   free_object_data();
 
-  /* free memory allocated to comments */
+  // Free memory allocated to comments.
   free_comment_data();
 
-  /* free check result list */
-  // free_check_result_list(); // XXX: keep for compatibility layer.
+  // Free memory allocated to downtimes.
+  free_downtime_data();
 
-  /* free memory for the high priority event list */
-  this_event = event_list_high;
-  while (this_event != NULL) {
-    next_event = this_event->next;
+  // Free memory for the high priority event list.
+  for (timed_event* this_event(event_list_high); this_event;) {
+    timed_event* next_event(this_event->next);
     delete this_event;
     this_event = next_event;
   }
-
-  /* reset the event pointer */
   event_list_high = NULL;
   quick_timed_event.clear(hash_timed_event::high);
 
-  /* free memory for the low priority event list */
-  this_event = event_list_low;
-  while (this_event != NULL) {
-    next_event = this_event->next;
+  // Free memory for the low priority event list.
+  for (timed_event* this_event(event_list_low); this_event;) {
+    timed_event* next_event(this_event->next);
     delete this_event;
     this_event = next_event;
   }
-
-  /* reset the event pointer */
   event_list_low = NULL;
   quick_timed_event.clear(hash_timed_event::low);
 
-  /* free any notification list that may have been overlooked */
+  // Free any notification list that may have been overlooked.
   free_notification_list();
 
   /*
-   * free memory associated with macros.
-   * It's ok to only free the volatile ones, as the non-volatile
-   * are always free()'d before assignment if they're set.
-   * Doing a full free of them here means we'll wipe the constant
-   * macros when we get a reload or restart request through the
-   * command pipe, or when we receive a SIGHUP.
-   */
+  ** Free memory associated with macros. It's ok to only free the
+  ** volatile ones, as the non-volatile are always free()'d before
+  ** assignment if they're set. Doing a full free of them here means
+  ** we'll wipe the constant macros when we get a reload or restart
+  ** request through the command pipe, or when we receive a SIGHUP.
+  */
   clear_volatile_macros_r(mac);
-
   free_macrox_names();
 
-  /* free illegal char strings */
-  // my_free(illegal_object_chars);
-  // my_free(illegal_output_chars);
+  return ;
 }
 
 /* free a notification list that was created */

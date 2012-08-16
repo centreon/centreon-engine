@@ -17,6 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <cstdlib>
 #include <exception>
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/modules/external_commands/commands.hh"
@@ -28,62 +29,64 @@ using namespace com::centreon::engine;
 
 /**
  *  Run schedule_host_svc_downtime test.
+ *
+ *  @param[in] argc Argument count.
+ *  @param[in] argv Argument values.
+ *
+ *  @return EXIT_SUCCESS on success.
  */
 static int check_schedule_host_svc_downtime(int argc, char** argv) {
   (void)argc;
   (void)argv;
 
+  // Initialization.
   init_object_skiplists();
 
-  host* hst = add_host("name", NULL, NULL, "localhost", NULL, 0, 0.0, 0.0, 42,
-                       0, 0, 0, 0, 0, 0.0, 0.0, NULL, 0, NULL, 0, 0, NULL, 0,
-                       0, 0.0, 0.0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 0, 0, NULL,
-                       NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 0, 0.0, 0.0,
-                       0.0, 0, 0, 0, 0, 0);
+  // Create target host.
+  host* hst(add_host("name", NULL, NULL, "localhost", NULL, 0, 0.0, 0.0,
+                     42, 0, 0, 0, 0, 0, 0.0, 0.0, NULL, 0, NULL, 0, 0,
+                     NULL, 0, 0, 0.0, 0.0, 0, 0, 0, 0, 0, 0, 0, 0, NULL,
+                     0, 0, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0,
+                     0, 0, 0.0, 0.0, 0.0, 0, 0, 0, 0, 0));
   if (!hst)
-    throw (engine_error() << "create host failed.");
+    throw (engine_error() << "host creation failed");
 
-  service* svc = add_service("name", "description", NULL,
-                             NULL, 0, 42, 0, 0, 0, 42.0, 0.0, 0.0, NULL,
-                             0, 0, 0, 0, 0, 0, 0, 0, NULL, 0, "command", 0, 0,
-                             0.0, 0.0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, NULL,
-                             0, 0, NULL, NULL, NULL, NULL, NULL,
-                             0, 0, 0);
+  // Create target service.
+  service* svc(add_service("name", "description", NULL, NULL, 0, 42, 0,
+                           0, 0, 42.0, 0.0, 0.0, NULL, 0, 0, 0, 0, 0, 0,
+                           0, 0, NULL, 0, "command", 0, 0, 0.0, 0.0, 0,
+                           0, 0, 0, 0, 0, 0, 0, 0, 0, NULL, 0, 0, NULL,
+                           NULL, NULL, NULL, NULL, 0, 0, 0));
   if (!svc)
-    throw (engine_error() << "create service failed.");
+    throw (engine_error() << "service creation failed");
 
-  servicesmember* member = add_service_link_to_host(hst, svc);
+  // Create host/service link.
+  servicesmember* member(add_service_link_to_host(hst, svc));
   if (!member)
-    throw (engine_error() << "service link to host failed.");
+    throw (engine_error() << "could not link service to host");
 
-  scheduled_downtime_list = NULL;
-  char const* cmd("[1317196300] SCHEDULE_HOST_SVC_DOWNTIME;name;1317196300;2000000000;0;0;7200;user;comment");
+  // Send external command.
+  char const*
+    cmd("[1317196300] SCHEDULE_HOST_SVC_DOWNTIME;name;1317196300;2000000000;0;0;7200;user;comment");
   process_external_command(cmd);
 
+  // Check.
   if (!scheduled_downtime_list)
     throw (engine_error() << "schedule_host_svc_downtime failed.");
 
-  delete member;
+  // Cleanup.
+  cleanup();
 
-  delete[] hst->name;
-  delete[] hst->display_name;
-  delete[] hst->alias;
-  delete[] hst->address;
-  delete hst;
-
-  delete[] svc->host_name;
-  delete[] svc->description;
-  delete[] svc->service_check_command;
-  delete[] svc->display_name;
-  delete svc;
-
-  free_object_skiplists();
-
-  return (0);
+  return (EXIT_SUCCESS);
 }
 
 /**
  *  Init unit test.
+ *
+ *  @param[in] argc Argument count.
+ *  @param[in] argv Argument values.
+ *
+ *  @return EXIT_SUCCESS on success.
  */
 int main(int argc, char** argv) {
   unittest utest(argc, argv, &check_schedule_host_svc_downtime);
