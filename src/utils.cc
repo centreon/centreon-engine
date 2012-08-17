@@ -1937,9 +1937,6 @@ void cleanup() {
  *  @param[in,out] mac Macros.
  */
 void free_memory(nagios_macros* mac) {
-  timed_event* this_event = NULL;
-  timed_event* next_event = NULL;
-
   // Free all allocated memory for the object definitions.
   free_object_data();
 
