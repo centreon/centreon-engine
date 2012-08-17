@@ -1937,9 +1937,6 @@ void cleanup() {
  *  @param[in,out] mac Macros.
  */
 void free_memory(nagios_macros* mac) {
-  timed_event* this_event = NULL;
-  timed_event* next_event = NULL;
-
   // Free all allocated memory for the object definitions.
   free_object_data();
 
@@ -1952,6 +1949,10 @@ void free_memory(nagios_macros* mac) {
   // Free memory for the high priority event list.
   for (timed_event* this_event(event_list_high); this_event;) {
     timed_event* next_event(this_event->next);
+    if (this_event->event_type == EVENT_SCHEDULED_DOWNTIME) {
+      delete static_cast<unsigned long*>(this_event->event_data);
+      this_event->event_data = NULL;
+    }
     delete this_event;
     this_event = next_event;
   }
@@ -1961,6 +1962,10 @@ void free_memory(nagios_macros* mac) {
   // Free memory for the low priority event list.
   for (timed_event* this_event(event_list_low); this_event;) {
     timed_event* next_event(this_event->next);
+    if (this_event->event_type == EVENT_SCHEDULED_DOWNTIME) {
+      delete static_cast<unsigned long*>(this_event->event_data);
+      this_event->event_data = NULL;
+    }
     delete this_event;
     this_event = next_event;
   }
