@@ -111,7 +111,8 @@ void handle::close() {
   if (_handle.get()) {
     if (_handle->is_loaded()) {
       typedef int (*func_deinit)(int, int);
-      func_deinit deinit((func_deinit)_handle->resolve("nebmodule_deinit"));
+      func_deinit
+        deinit((func_deinit)_handle->resolve_proc("nebmodule_deinit"));
       if (!deinit)
         logger(log_info_message, basic)
           << "Cannot resolve symbole 'nebmodule_deinit' in module '"
@@ -235,7 +236,7 @@ void handle::open() {
              "version of the event broker API.");
 
     typedef int (*func_init)(int, char const*, void*);
-    func_init init((func_init)_handle->resolve("nebmodule_init"));
+    func_init init((func_init)_handle->resolve_proc("nebmodule_init"));
 
     if (init(
           NEBMODULE_NORMAL_LOAD | NEBMODULE_ENGINE,

@@ -551,8 +551,8 @@ void connector::_recv_query_execute(char const* data) {
     if (data == endptr)
       throw (engine_error() << "invalid query execute: "
              "invalid exit_code");
-    char const* stderr(endptr + 1);
-    char const* stdout(stderr + strlen(stderr) + 1);
+    char const* std_err(endptr + 1);
+    char const* std_out(std_err + strlen(std_err) + 1);
 
     logger(dbg_commands, basic)
       << "connector::_recv_query_execute: id=" << command_id;
@@ -588,7 +588,7 @@ void connector::_recv_query_execute(char const* data) {
     // If the check was not executed correctly.
     else if (!is_executed) {
       res.exit_status = process::crash;
-      res.output = stderr;
+      res.output = std_err;
     }
     // If the check was executed correctly.
     else {
@@ -596,7 +596,7 @@ void connector::_recv_query_execute(char const* data) {
         res.exit_code = STATE_UNKNOWN;
       else
         res.exit_code = exit_code;
-      res.output = stdout;
+      res.output = std_out;
     }
 
     logger(dbg_commands, basic)

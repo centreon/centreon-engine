@@ -130,7 +130,7 @@ int neb_load_module(void* mod) {
       << "Event broker module '" << module->get_filename()
       << "' initialized successfully.";
   }
-  catch (error const& e) {
+  catch (std::exception const& e) {
     logger(log_runtime_error, basic)
       << "Error: Could not load module '"
       << module->get_filename() << "' -> " << e.what();

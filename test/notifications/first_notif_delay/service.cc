@@ -121,6 +121,9 @@ int main_test(int argc, char** argv) {
   // Remove flag file.
   io::file_stream::remove(tmpfile);
 
+  // Cleanup.
+  cleanup();
+
   return (retval);
 }
 

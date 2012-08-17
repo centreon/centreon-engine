@@ -17,6 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <cctype>
 #include <cerrno>
 #include <cstdlib>
 #include <cstring>
@@ -104,11 +105,13 @@ static void query_execute(char const* q) {
     throw (basic_error() << "invalid query execute: "
            "invalid is_executed");
   startptr = endptr + 1;
-  strtol(startptr, &endptr, 10);
-  if (startptr == endptr)
+  char const* cendptr(startptr);
+  while (isdigit(*cendptr))
+    ++cendptr;
+  if (startptr == cendptr)
     throw (basic_error() << "invalid query execute: "
            "invalid exit_code");
-  char const* cmd(endptr + 1);
+  char const* cmd(cendptr + 1);
 
   misc::command_line cmdline(cmd);
   int exit_code(STATE_OK);

@@ -574,14 +574,6 @@ int main(int argc, char* argv[]) {
 
       } while (sigshutdown == FALSE);
 
-      // Free misc memory.
-      delete [] config_file;
-      delete [] mac->x[MACRO_OBJECTCACHEFILE];
-      delete [] mac->x[MACRO_PROCESSSTARTTIME];
-      delete [] mac->x[MACRO_EVENTSTARTTIME];
-      delete [] mac->x[MACRO_RETENTIONDATAFILE];
-      delete [] mac->x[MACRO_STATUSDATAFILE];
-
       // Successful execution.
       retval = EXIT_SUCCESS;
     }
@@ -592,6 +584,12 @@ int main(int argc, char* argv[]) {
 
   // Memory cleanup.
   cleanup();
+  delete [] config_file;
+  delete [] mac->x[MACRO_OBJECTCACHEFILE];
+  delete [] mac->x[MACRO_PROCESSSTARTTIME];
+  delete [] mac->x[MACRO_EVENTSTARTTIME];
+  delete [] mac->x[MACRO_RETENTIONDATAFILE];
+  delete [] mac->x[MACRO_STATUSDATAFILE];
   com::centreon::engine::broker::compatibility::unload();
   com::centreon::engine::broker::loader::unload();
   com::centreon::engine::events::loop::unload();
