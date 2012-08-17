@@ -17,10 +17,10 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <cstdarg>
+#include <cstdio>
 #include <string>
 #include <unistd.h>
-#include <stdarg.h>
-#include <stdio.h>
 #include <sys/time.h>
 #include "com/centreon/engine/common.hh"
 #include "com/centreon/engine/globals.hh"

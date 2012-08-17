@@ -18,10 +18,10 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <cmath>
+#include <cstdio>
+#include <cstdlib>
 #include <iomanip>
-#include <math.h>
-#include <stdio.h>
-#include <stdlib.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include "com/centreon/engine/broker.hh"

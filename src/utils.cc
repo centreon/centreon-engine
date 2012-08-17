@@ -18,19 +18,19 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <cerrno>
+#include <cmath>
+#include <csignal>
+#include <cstdio>
+#include <cstdlib>
+#include <ctime>
 #include <dirent.h>
-#include <errno.h>
 #include <fcntl.h>
 #include <iomanip>
-#include <math.h>
-#include <signal.h>
 #include <sstream>
-#include <stdio.h>
-#include <stdlib.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/wait.h>
-#include <time.h>
 #include <unistd.h>
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/broker/compatibility.hh"

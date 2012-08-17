@@ -19,9 +19,9 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <assert.h>
-#include <stdlib.h>
-#include <time.h>
+#include <cassert>
+#include <cstdlib>
+#include <ctime>
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/concurrency/thread.hh"
 #include "com/centreon/engine/events/loop.hh"

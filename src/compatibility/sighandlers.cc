@@ -17,7 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
+#include <cstdlib>
 #include <unistd.h>
 #include "common.h"
 #include "sighandlers.h"
