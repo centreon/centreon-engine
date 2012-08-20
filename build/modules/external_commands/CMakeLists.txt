@@ -43,9 +43,11 @@ add_library("externalcmd" SHARED
 set_target_properties("externalcmd" PROPERTIES PREFIX "")
 
 # Install rule.
-install(TARGETS "externalcmd"
-  DESTINATION "${PREFIX_LIB}"
-  COMPONENT "runtime")
+if (INSTALL_FILES)
+  install(TARGETS "externalcmd"
+    DESTINATION "${PREFIX_LIB}"
+    COMPONENT "runtime")
+endif ()
 
 if (WITH_TESTING)
   #Set directories.

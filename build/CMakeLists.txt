@@ -91,7 +91,10 @@ elseif (CLIB_FOUND) # Was Centreon Clib detected with pkg-config ?
 else ()
   find_path(CLIB_INCLUDE_DIR "com/centreon/clib/version.hh")
   if (NOT CLIB_INCLUDE_DIR)
-    message(FATAL_ERROR "Could not find Centreon Clib's headers (try WITH_CENTREON_CLIB_INCLUDE_DIR).")
+    find_path(CLIB_INCLUDE_DIR "centreon-clib/com/centreon/clib/version.hh")
+    if (NOT CLIB_INCLUDE_DIR)
+      message(FATAL_ERROR "Could not find Centreon Clib's headers (try WITH_CENTREON_CLIB_INCLUDE_DIR).")
+    endif ()
   endif ()
   include_directories("${CLIB_INCLUDE_DIR}")
 endif ()
@@ -386,9 +389,19 @@ endif ()
 # Options.
 #
 
+# Enable or disable installation.
+option(WITH_INSTALL "Install centreon-engine files." ON)
+set(INSTALL_FILES "${WITH_INSTALL}")
+
+if (WITH_DESTDIR)
+  set(DESTDIR "${WITH_DESTDIR}/")
+else ()
+  set(DESTDIR "")
+endif ()
+
 # Main directory.
 if (WITH_PREFIX)
-  set(CMAKE_INSTALL_PREFIX "${WITH_PREFIX}")
+  set(CMAKE_INSTALL_PREFIX "${DESTDIR}${WITH_PREFIX}")
 endif ()
 
 # Executable directory.
@@ -435,10 +448,11 @@ if (WITH_PKGCONFIG_SCRIPT)
   endif ()
 
   # Install rule.
-  install(FILES "${SCRIPT_DIR}/centengine.pc"
-    DESTINATION "${PKGCONFIG_DIR}"
-    COMPONENT "runtime")
-
+  if (INSTALL_FILES)
+    install(FILES "${SCRIPT_DIR}/centengine.pc"
+      DESTINATION "${PKGCONFIG_DIR}"
+      COMPONENT "runtime")
+  endif ()
 endif ()
 
 # var directory.
@@ -525,10 +539,12 @@ if (WITH_STARTUP_SCRIPT STREQUAL "upstart")
   endif ()
 
   # Script install rule.
-  install(FILES "${SCRIPT_DIR}/upstart.conf"
-    DESTINATION "${STARTUP_DIR}"
-    COMPONENT "runtime"
-    RENAME "centengine.conf")
+  if (INSTALL_FILES)
+    install(FILES "${SCRIPT_DIR}/upstart.conf"
+      DESTINATION "${STARTUP_DIR}"
+      COMPONENT "runtime"
+      RENAME "centengine.conf")
+  endif ()
 
   # String printed in summary.
   set(STARTUP_SCRIPT "Upstart configuration file")
@@ -564,10 +580,12 @@ elseif (WITH_STARTUP_SCRIPT STREQUAL "sysv")
   endif ()
 
   # Script install rule.
-  install(PROGRAMS "${SCRIPT_DIR}/centengine.sh"
-    DESTINATION "${STARTUP_DIR}"
-    COMPONENT "runtime"
-    RENAME "centengine")
+  if (INSTALL_FILES)
+    install(PROGRAMS "${SCRIPT_DIR}/centengine.sh"
+      DESTINATION "${STARTUP_DIR}"
+      COMPONENT "runtime"
+      RENAME "centengine")
+  endif ()
 
   # String printed in summary.
   set(STARTUP_SCRIPT "SysV-style script")
@@ -736,12 +754,13 @@ target_link_libraries("centenginestats" ${CLIB_LIBRARIES})
 #
 
 # Install rules.
-install(TARGETS "centengine" "centenginestats"
-  DESTINATION "${PREFIX_BIN}"
-  COMPONENT "runtime")
+if (INSTALL_FILES)
+  install(TARGETS "centengine" "centenginestats"
+    DESTINATION "${PREFIX_BIN}"
+    COMPONENT "runtime")
 
-# Create directories.
-install(CODE "
+  # Create directories.
+  install(CODE "
   function(mkdir_chown user group path)
     if (APPLE OR (UNIX AND NOT CYGWIN))
       if (NOT EXISTS \"\${path}\")
@@ -789,12 +808,13 @@ install(CODE "
   touch_chown(\"${USER}\" \"${GROUP}\" \"${VAR_DIR}/objects.precache\")
 ")
 
-# Install header files for development.
-install(DIRECTORY "${INC_DIR}/"
-  DESTINATION "${PREFIX_INC}"
-  COMPONENT "development"
-  FILES_MATCHING PATTERN "*.hh"
-  PATTERN "${INC_DIR}/compatibility/" EXCLUDE)
+  # Install header files for development.
+  install(DIRECTORY "${INC_DIR}/"
+    DESTINATION "${PREFIX_INC}"
+    COMPONENT "development"
+    FILES_MATCHING PATTERN "*.hh"
+    PATTERN "${INC_DIR}/compatibility/" EXCLUDE)
+endif ()
 
 #
 # Packaging.

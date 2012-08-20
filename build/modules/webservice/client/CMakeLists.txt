@@ -118,6 +118,8 @@ target_link_libraries("centenginews"
   ${ZLIB_LIBRARIES})
 
 # Install rule.
-install(TARGETS "centenginews"
-  DESTINATION "${PREFIX_BIN}/"
-  COMPONENT "runtime")
+if (INSTALL_FILES)
+  install(TARGETS "centenginews"
+    DESTINATION "${PREFIX_BIN}/"
+    COMPONENT "runtime")
+endif ()

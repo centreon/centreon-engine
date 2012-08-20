@@ -160,9 +160,11 @@ target_link_libraries("webservice"
   "externalcmd")
 
 # Install rule.
-install(TARGETS "webservice"
-  DESTINATION "${PREFIX_LIB}/"
-  COMPONENT "runtime")
+if (INSTALL_FILES)
+  install(TARGETS "webservice"
+    DESTINATION "${PREFIX_LIB}/"
+    COMPONENT "runtime")
+endif ()
 
 if (WITH_TESTING)
   #Set directories.
