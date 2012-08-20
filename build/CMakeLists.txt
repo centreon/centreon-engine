@@ -392,8 +392,8 @@ endif ()
 #
 
 # Enable or disable installation.
-option(WITH_INSTALL "Install centreon-engine files." ON)
-set(INSTALL_FILES "${WITH_INSTALL}")
+option(WITH_CREATE_FILES "Create centreon-engine files." ON)
+set(CREATE_FILES "${WITH_CREATE_FILES}")
 
 # Main directory.
 if (WITH_PREFIX)
@@ -446,11 +446,9 @@ if (WITH_PKGCONFIG_SCRIPT)
   endif ()
 
   # Install rule.
-  if (INSTALL_FILES)
-    install(FILES "${SCRIPT_DIR}/centengine.pc"
-      DESTINATION "${PKGCONFIG_DIR}"
-      COMPONENT "runtime")
-  endif ()
+  install(FILES "${SCRIPT_DIR}/centengine.pc"
+    DESTINATION "${PKGCONFIG_DIR}"
+    COMPONENT "runtime")
 endif ()
 
 # var directory.
@@ -537,12 +535,10 @@ if (WITH_STARTUP_SCRIPT STREQUAL "upstart")
   endif ()
 
   # Script install rule.
-  if (INSTALL_FILES)
-    install(FILES "${SCRIPT_DIR}/upstart.conf"
-      DESTINATION "${STARTUP_DIR}"
-      COMPONENT "runtime"
-      RENAME "centengine.conf")
-  endif ()
+  install(FILES "${SCRIPT_DIR}/upstart.conf"
+    DESTINATION "${STARTUP_DIR}"
+    COMPONENT "runtime"
+    RENAME "centengine.conf")
 
   # String printed in summary.
   set(STARTUP_SCRIPT "Upstart configuration file")
@@ -578,12 +574,10 @@ elseif (WITH_STARTUP_SCRIPT STREQUAL "sysv")
   endif ()
 
   # Script install rule.
-  if (INSTALL_FILES)
-    install(PROGRAMS "${SCRIPT_DIR}/centengine.sh"
-      DESTINATION "${STARTUP_DIR}"
-      COMPONENT "runtime"
-      RENAME "centengine")
-  endif ()
+  install(PROGRAMS "${SCRIPT_DIR}/centengine.sh"
+    DESTINATION "${STARTUP_DIR}"
+    COMPONENT "runtime"
+    RENAME "centengine")
 
   # String printed in summary.
   set(STARTUP_SCRIPT "SysV-style script")
@@ -752,12 +746,12 @@ target_link_libraries("centenginestats" ${CLIB_LIBRARIES})
 #
 
 # Install rules.
-if (INSTALL_FILES)
-  install(TARGETS "centengine" "centenginestats"
-    DESTINATION "${PREFIX_BIN}"
-    COMPONENT "runtime")
+install(TARGETS "centengine" "centenginestats"
+  DESTINATION "${PREFIX_BIN}"
+  COMPONENT "runtime")
 
-  # Create directories.
+# Create directories.
+if (CREATE_FILES)
   install(CODE "
   function(mkdir_chown user group path)
     if (APPLE OR (UNIX AND NOT CYGWIN))
@@ -805,14 +799,14 @@ if (INSTALL_FILES)
   touch_chown(\"${USER}\" \"${GROUP}\" \"${VAR_DIR}/objects.cache\")
   touch_chown(\"${USER}\" \"${GROUP}\" \"${VAR_DIR}/objects.precache\")
 ")
-
-  # Install header files for development.
-  install(DIRECTORY "${INC_DIR}/"
-    DESTINATION "${PREFIX_INC}"
-    COMPONENT "development"
-    FILES_MATCHING PATTERN "*.hh"
-    PATTERN "${INC_DIR}/compatibility/" EXCLUDE)
 endif ()
+
+# Install header files for development.
+install(DIRECTORY "${INC_DIR}/"
+  DESTINATION "${PREFIX_INC}"
+  COMPONENT "development"
+  FILES_MATCHING PATTERN "*.hh"
+  PATTERN "${INC_DIR}/compatibility/" EXCLUDE)
 
 #
 # Packaging.

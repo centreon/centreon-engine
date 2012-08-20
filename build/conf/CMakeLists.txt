@@ -44,7 +44,7 @@ configure_file("${SRC_DIR}/objects/windows.cfg.in"
 
 # Install files if necessary.
 option(WITH_SAMPLE_CONFIG "Install sample configuration files." ON)
-if (WITH_SAMPLE_CONFIG AND INSTALL_FILES)
+if (WITH_SAMPLE_CONFIG)
   install(DIRECTORY "${SRC_DIR}/"
     DESTINATION "${PREFIX_CONF}"
     COMPONENT "runtime"

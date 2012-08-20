@@ -73,9 +73,7 @@ add_library("cce_compatibility" STATIC
 target_link_libraries("cce_compatibility" "cce_core")
 
 # Install header files for development.
-if (INSTALL_FILES)
-  install(DIRECTORY "${INC_DIR}"
-    DESTINATION "${PREFIX_INC}"
-    COMPONENT "development"
-    FILES_MATCHING PATTERN "*.h")
-endif ()
+install(DIRECTORY "${INC_DIR}"
+  DESTINATION "${PREFIX_INC}"
+  COMPONENT "development"
+  FILES_MATCHING PATTERN "*.h")
