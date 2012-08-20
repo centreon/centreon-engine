@@ -18,10 +18,10 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <cstdio>
+#include <cstdlib>
 #include <dirent.h>
 #include <fcntl.h>
-#include <stdio.h>
-#include <stdlib.h>
 #include <string>
 #include <sys/stat.h>
 #include <unistd.h>

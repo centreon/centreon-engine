@@ -17,10 +17,10 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <assert.h>
+#include <cassert>
+#include <cstdlib>
+#include <cstring>
 #include <memory>
-#include <stdlib.h>
-#include <string.h>
 #include "com/centreon/engine/broker/compatibility.hh"
 #include "com/centreon/engine/nebmodules.hh"
 #include "com/centreon/engine/shared.hh"

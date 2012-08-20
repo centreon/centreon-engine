@@ -18,10 +18,10 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <cstdio>
+#include <cstdlib>
 #include <iomanip>
 #include <sstream>
-#include <stdio.h>
-#include <stdlib.h>
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/engine/macros.hh"

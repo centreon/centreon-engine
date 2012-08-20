@@ -18,8 +18,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <cstdio>
 #include <fcntl.h>
-#include <stdio.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
 #include <sys/types.h>

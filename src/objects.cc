@@ -18,9 +18,9 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <cstdio>
+#include <cstring>
 #include <memory>
-#include <stdio.h>
-#include <string.h>
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"

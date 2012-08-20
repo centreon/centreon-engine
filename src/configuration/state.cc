@@ -17,8 +17,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <climits>
 #include <fstream>
-#include <limits.h>
 #include <string>
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/configuration/state.hh"

@@ -18,8 +18,8 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <stdlib.h>
-#include <string.h>
+#include <cstdlib>
+#include <cstring>
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/comments.hh"
 #include "com/centreon/engine/downtime.hh"

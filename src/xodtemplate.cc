@@ -18,15 +18,15 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <ctype.h>
+#include <cctype>
+#include <cerrno>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 #include <dirent.h>
-#include <errno.h>
 #include <libgen.h>
 #include <regex.h>
 #include <sstream>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h>

@@ -18,19 +18,19 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
+#include <cerrno>
+#include <cmath>
+#include <csignal>
+#include <cstdio>
+#include <cstdlib>
+#include <ctime>
 #include <dirent.h>
-#include <errno.h>
 #include <fcntl.h>
 #include <iomanip>
-#include <math.h>
-#include <signal.h>
 #include <sstream>
-#include <stdio.h>
-#include <stdlib.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/wait.h>
-#include <time.h>
 #include <unistd.h>
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/broker/compatibility.hh"
@@ -1949,6 +1949,10 @@ void free_memory(nagios_macros* mac) {
   // Free memory for the high priority event list.
   for (timed_event* this_event(event_list_high); this_event;) {
     timed_event* next_event(this_event->next);
+    if (this_event->event_type == EVENT_SCHEDULED_DOWNTIME) {
+      delete static_cast<unsigned long*>(this_event->event_data);
+      this_event->event_data = NULL;
+    }
     delete this_event;
     this_event = next_event;
   }
@@ -1958,6 +1962,10 @@ void free_memory(nagios_macros* mac) {
   // Free memory for the low priority event list.
   for (timed_event* this_event(event_list_low); this_event;) {
     timed_event* next_event(this_event->next);
+    if (this_event->event_type == EVENT_SCHEDULED_DOWNTIME) {
+      delete static_cast<unsigned long*>(this_event->event_data);
+      this_event->event_data = NULL;
+    }
     delete this_event;
     this_event = next_event;
   }

@@ -17,7 +17,7 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <stddef.h>
+#include <cstddef>
 #include "com/centreon/engine/hash_timed_event.hh"
 
 using namespace com::centreon::engine;

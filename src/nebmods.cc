@@ -18,9 +18,9 @@
 ** <http://www.gnu.org/licenses/>.
 */
 
-#include <errno.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include <cerrno>
+#include <cstdio>
+#include <cstdlib>
 #include "com/centreon/engine/broker/handle.hh"
 #include "com/centreon/engine/broker/loader.hh"
 #include "com/centreon/engine/globals.hh"
