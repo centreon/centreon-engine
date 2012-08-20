@@ -798,7 +798,7 @@ if (CREATE_FILES)
   touch_chown(\"${USER}\" \"${GROUP}\" \"${RW_DIR}/centengine.cmd\")
   touch_chown(\"${USER}\" \"${GROUP}\" \"${VAR_DIR}/objects.cache\")
   touch_chown(\"${USER}\" \"${GROUP}\" \"${VAR_DIR}/objects.precache\")
-")
+  ")
 endif ()
 
 # Install header files for development.

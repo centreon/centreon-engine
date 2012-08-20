@@ -33,7 +33,7 @@
  *  @return out.
  */
 std::ostream& operator<<(std::ostream& out, void (* ptr)()) {
-  return (out << (void*)ptr);
+  return (out << *(void**)ptr);
 }
 
 extern "C" {

@@ -150,10 +150,10 @@ void webservice::create_host(ns1__hostType const& hst) {
   // Remaining properties.
   unsigned int check_interval(hst.checkInterval
                               ? *hst.checkInterval
-                              : 5.0);
+                              : 5);
   unsigned int retry_interval(hst.retryInterval
                               ? *hst.retryInterval
-                              : 1.0);
+                              : 1);
   bool active_checks_enabled(hst.activeChecksEnabled
                              ? *hst.activeChecksEnabled
                              : true);

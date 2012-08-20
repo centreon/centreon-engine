@@ -248,6 +248,7 @@ void handle::open() {
     broker::compatibility::instance().loaded_module(this);
   }
   catch (std::exception const& e) {
+    (void)e;
     close();
     throw;
   }

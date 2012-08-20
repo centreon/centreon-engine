@@ -50,10 +50,12 @@ if (WITH_SAMPLE_CONFIG)
     COMPONENT "runtime"
     FILES_MATCHING PATTERN "*.cfg")
 
-  install(CODE "
+  if (CREATE_FILES)
+    install(CODE "
     file(GLOB_RECURSE cfg_files RELATIVE \"${SRC_DIR}\" \"${SRC_DIR}/*.cfg\")
     foreach (cfg_file IN LISTS cfg_files)
       execute_process(COMMAND \"chown\" \"${USER}:${GROUP}\" \"${PREFIX_CONF}/\${cfg_file}\")
     endforeach ()
-")
+    ")
+  endif ()
 endif ()
