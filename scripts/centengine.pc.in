@@ -17,11 +17,13 @@
 ## <http://www.gnu.org/licenses/>.
 ##
 
-libdir=@libdir@
-includedir=@incdir@
+prefix=@CMAKE_INSTALL_PREFIX@
+exec_prefix=@PREFIX_BIN@
+libdir=@PREFIX_LIB@
+includedir=@PREFIX_INC@
 
 Name: Centreon Engine
 Description: Centreon Engine monitors your IT infrastructure.
-Version: @ENGINE_VERSION@
-URL: http://www.centreon.com/
+Version: @CENTREON_ENGINE_VERSION@
+URL: http://forge.centreon.com/projects/centreon-engine
 Cflags: -I${includedir}

@@ -395,15 +395,9 @@ endif ()
 option(WITH_INSTALL "Install centreon-engine files." ON)
 set(INSTALL_FILES "${WITH_INSTALL}")
 
-if (WITH_DESTDIR)
-  set(DESTDIR "${WITH_DESTDIR}/")
-else ()
-  set(DESTDIR "")
-endif ()
-
 # Main directory.
 if (WITH_PREFIX)
-  set(CMAKE_INSTALL_PREFIX "${DESTDIR}${WITH_PREFIX}")
+  set(CMAKE_INSTALL_PREFIX "${WITH_PREFIX}")
 endif ()
 
 # Executable directory.
@@ -439,8 +433,10 @@ option(WITH_PKGCONFIG_SCRIPT "Generate and install pkg-config script." ON)
 if (WITH_PKGCONFIG_SCRIPT)
   # Generate pkg-config file.
   message(STATUS "Generating pkg-config file.")
-  configure_file("${SCRIPT_DIR}/centengine.pc.in"
-    "${SCRIPT_DIR}/centengine.pc")
+  configure_file(
+    "${SCRIPT_DIR}/centengine.pc.in"
+    "${SCRIPT_DIR}/centengine.pc"
+    @ONLY)
 
   # pkg-config file install directory.
   if (WITH_PKGCONFIG_DIR)
