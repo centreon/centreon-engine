@@ -1,0 +1,25 @@
+@VAR_DIR@/centengine.log {
+  compress
+  copytruncate
+  create 640 @USER@ @GROUP@
+  daily
+  delaycompress
+  missingok
+  notifempty
+  olddir @LOG_ARCHIVE_DIR@
+  rotate 30
+  size   100M
+}
+
+@VAR_DIR@/centengine.debug {
+  compress
+  copytruncate
+  create 640 @USER@ @GROUP@
+  daily
+  delaycompress
+  missingok
+  notifempty
+  olddir @LOG_ARCHIVE_DIR@
+  rotate 5
+  size   1G
+}
