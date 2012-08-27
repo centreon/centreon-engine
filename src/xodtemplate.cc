@@ -9700,10 +9700,21 @@ int xodtemplate_register_command(xodtemplate_command* this_command) {
           << "', starting on line " << this_command->_start_line << ")";
         return (ERROR);
       }
+
+      nagios_macros* macros(get_global_macros());
+      char* command_line(NULL);
+      process_macros_r(
+        macros,
+        connector->connector_line,
+        &command_line,
+        0);
+      std::string processed_cmd(command_line);
+      delete[] command_line;
+
       com::centreon::shared_ptr<commands::command>
         cmd_set(new commands::connector(
                                 connector->connector_name,
-                                connector->connector_line,
+                                processed_cmd,
                                 this_command->command_name,
                                 this_command->command_line,
                                 &checks::checker::instance()));
