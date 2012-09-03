@@ -42,11 +42,15 @@ extern "C" {
   extern int accept_passive_service_checks;
   extern int check_external_commands;
   extern int check_host_freshness;
+  extern check_result check_result_info;
+  extern check_result* check_result_list;
   extern int check_service_freshness;
   extern command* command_list;
   extern char* config_file;
   extern contact* contact_list;
   extern contactgroup* contactgroup_list;
+  extern int currently_running_host_checks;
+  extern int currently_running_service_checks;
   extern int enable_event_handlers;
   extern int enable_flap_detection;
   extern int enable_notifications;
@@ -59,6 +63,7 @@ extern "C" {
   extern int external_command_buffer_slots;
   extern char* global_host_event_handler;
   extern char* global_service_event_handler;
+  extern unsigned int host_check_timeout;
   extern host* host_list;
   extern hostdependency* hostdependency_list;
   extern hostescalation* hostescalation_list;
@@ -76,6 +81,7 @@ extern "C" {
   extern int process_performance_data;
   extern time_t program_start;
   extern sched_info* scheduling_info;
+  extern int service_check_timeout;
   extern service* service_list;
   extern servicedependency* servicedependency_list;
   extern serviceescalation* serviceescalation_list;
@@ -319,6 +325,59 @@ extern "C" {
       << (void (*)())schedule_new_event << "\n"
       << "strip: "
       << (void (*)())strip << "\n"
+      << "write_to_all_logs: "
+      << (void (*)())write_to_all_logs << "\n"
+      << std::endl;
+
+    // mod_gearman 1.3.8
+    std::cout
+      << "mod_gearman 1.3.8\n"
+      << "adjust_host_check_attempt_3x: "
+      << (void (*)())adjust_host_check_attempt_3x << "\n"
+      << "check_result_info: "
+      << &check_result_info << "\n"
+      << "check_result_list: "
+      << check_result_list << "\n"
+      << "clear_volatile_macros: "
+      << (void (*)())clear_volatile_macros << "\n"
+      << "currently_running_host_checks: "
+      << currently_running_host_checks << "\n"
+      << "currently_running_service_checks: "
+      << currently_running_service_checks << "\n"
+      << "event_broker_options: "
+      << event_broker_options << "\n"
+      << "find_host: "
+      << (void (*)())find_host << "\n"
+      << "find_hostgroup: "
+      << (void (*)())find_hostgroup << "\n"
+      << "find_service: "
+      << (void (*)())find_service << "\n"
+      << "find_servicegroup: "
+      << (void (*)())find_servicegroup << "\n"
+      << "grab_host_macros: "
+      << (void (*)())grab_host_macros << "\n"
+      << "grab_service_macros: "
+      << (void (*)())grab_service_macros << "\n"
+      << "host_check_timeout: "
+      << host_check_timeout << "\n"
+      << "init_check_result: "
+      << (void (*)())init_check_result << "\n"
+      << "is_host_member_of_hostgroup: "
+      << (void (*)())is_host_member_of_hostgroup << "\n"
+      << "is_service_member_of_servicegroup: "
+      << (void (*)())is_service_member_of_servicegroup << "\n"
+      << "neb_deregister_callback: "
+      << (void (*)())neb_deregister_callback << "\n"
+      << "neb_register_callback: "
+      << (void (*)())neb_register_callback << "\n"
+      << "neb_set_module_info: "
+      << (void (*)())neb_set_module_info << "\n"
+      << "process_macros: "
+      << (void (*)())process_macros << "\n"
+      << "process_performance_data: "
+      << process_performance_data << "\n"
+      << "service_check_timeout: "
+      << service_check_timeout << "\n"
       << "write_to_all_logs: "
       << (void (*)())write_to_all_logs << "\n"
       << std::endl;
