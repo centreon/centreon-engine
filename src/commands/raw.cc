@@ -256,11 +256,11 @@ void raw::data_is_available_err(process& p) throw () {
  *  @param[in] p  The process to finished.
  */
 void raw::finished(process& p) throw () {
+  concurrency::locker lock(&_lock);
   try {
     logger(dbg_commands, basic)
       << "raw::finished: process=" << &p;
 
-    concurrency::locker lock(&_lock);
     // Find process from the busy list.
     umap<process*, unsigned long>::iterator
       it(_processes_busy.find(&p));
@@ -268,6 +268,9 @@ void raw::finished(process& p) throw () {
       logger(log_runtime_warning, basic)
         << "invalid process pointer: "
         "process not found into process busy list";
+
+      // Put the process into the free list.
+      _processes_free.push_back(&p);
       return;
     }
     // Get command_id and remove the process from the busy list.
@@ -311,14 +314,14 @@ void raw::finished(process& p) throw () {
     // Forward result to the listener.
     if (_listener)
       (_listener->finished)(res);
-
-    // Put the process into the free list.
-    _processes_free.push_back(&p);
   }
   catch (std::exception const& e) {
     logger(log_runtime_warning, basic)
       << "process finish failed: " << e.what();
   }
+
+  // Put the process into the free list.
+  _processes_free.push_back(&p);
   return;
 }
 
