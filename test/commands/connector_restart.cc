@@ -21,6 +21,7 @@
 #include <exception>
 #include <sstream>
 #include "com/centreon/engine/commands/connector.hh"
+#include "com/centreon/engine/commands/forward.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/process.hh"
 #include "test/commands/wait_process.hh"
@@ -47,20 +48,22 @@ static bool restart_with_segfault() {
     oss << "./bin_connector_test_run --kill=" << time(NULL);
     command_line = oss.str();
   }
-  connector cmd(
+  connector cmd_connector(
               DEFAULT_CONNECTOR_NAME,
-              DEFAULT_CONNECTOR_LINE,
+              DEFAULT_CONNECTOR_LINE);
+  forward cmd_forward(
               DEFAULT_CMD_NAME,
-              command_line);
-  wait_process wait_proc(&cmd);
+              command_line,
+              cmd_connector);
+  wait_process wait_proc(&cmd_connector);
 
-  unsigned long id(cmd.run(cmd.get_command_line(), macros, 0));
+  unsigned long id(cmd_forward.run(cmd_forward.get_command_line(), macros, 0));
   wait_proc.wait();
 
   result const& res(wait_proc.get_result());
   if (res.command_id != id
       || res.exit_code != STATE_OK
-      || res.output != cmd.get_command_line()
+      || res.output != cmd_forward.get_command_line()
       || res.exit_status == process::timeout)
     return (false);
   return (true);

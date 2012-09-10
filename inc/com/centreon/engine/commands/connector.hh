@@ -48,15 +48,11 @@ namespace                commands {
                          connector(
                            std::string const& connector_name,
                            std::string const& connector_line,
-                           std::string const& command_name,
-                           std::string const& command_line,
                            command_listener* listener = NULL);
                          connector(connector const& right);
                          ~connector() throw();
     connector&           operator=(connector const& right);
     commands::command*   clone() const;
-    std::string const&   connector_line() const throw ();
-    std::string const&   connector_name() const throw ();
     unsigned long        run(
                            std::string const& processed_cmd,
                            nagios_macros& macros,
@@ -109,8 +105,6 @@ namespace                commands {
     void                 _send_query_version();
 
     concurrency::condvar _cv_query;
-    std::string          _connector_line;
-    std::string          _connector_name;
     std::string          _data_available;
     bool                 _is_running;
     umap<unsigned long, shared_ptr<query_info> >

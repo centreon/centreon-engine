@@ -32,6 +32,7 @@
 #include <unistd.h>
 #include "com/centreon/engine/checks/checker.hh"
 #include "com/centreon/engine/commands/connector.hh"
+#include "com/centreon/engine/commands/forward.hh"
 #include "com/centreon/engine/commands/raw.hh"
 #include "com/centreon/engine/commands/set.hh"
 #include "com/centreon/engine/common.hh"
@@ -9274,23 +9275,12 @@ xodtemplate_service* xodtemplate_find_real_service(char* host_name,
 
 /* registers object definitions */
 int xodtemplate_register_objects(void) {
-  int result = OK;
-  xodtemplate_timeperiod* temp_timeperiod = NULL;
-  xodtemplate_command* temp_command = NULL;
-  xodtemplate_contactgroup* temp_contactgroup = NULL;
-  xodtemplate_hostgroup* temp_hostgroup = NULL;
-  xodtemplate_servicegroup* temp_servicegroup = NULL;
-  xodtemplate_contact* temp_contact = NULL;
-  xodtemplate_host* temp_host = NULL;
-  xodtemplate_service* temp_service = NULL;
-  xodtemplate_servicedependency* temp_servicedependency = NULL;
-  xodtemplate_serviceescalation* temp_serviceescalation = NULL;
-  xodtemplate_hostdependency* temp_hostdependency = NULL;
-  xodtemplate_hostescalation* temp_hostescalation = NULL;
-  void* ptr = NULL;
+  int result(OK);
+  void* ptr(NULL);
 
   // Register timeperiods.
   ptr = NULL;
+  xodtemplate_timeperiod* temp_timeperiod = NULL;
   for (temp_timeperiod = (xodtemplate_timeperiod*)skiplist_get_first(xobject_skiplists[X_TIMEPERIOD_SKIPLIST], &ptr);
        temp_timeperiod;
        temp_timeperiod = (xodtemplate_timeperiod*)skiplist_get_next(&ptr)) {
@@ -9306,71 +9296,81 @@ int xodtemplate_register_objects(void) {
       return (ERROR);
   }
 
-  /* register commands */
-  /*for(temp_command=xodtemplate_command_list;temp_command!=NULL;temp_command=temp_command->next){ */
+  /* register connectors */
   ptr = NULL;
+  xodtemplate_connector* temp_connector(NULL);
+  for (temp_connector = (xodtemplate_connector*)skiplist_get_first(xobject_skiplists[X_CONNECTOR_SKIPLIST], &ptr);
+       temp_connector;
+       temp_connector = (xodtemplate_connector*)skiplist_get_next(&ptr)) {
+    if ((result = xodtemplate_register_connector(temp_connector)) == ERROR)
+      return (ERROR);
+  }
+
+  /* register commands */
+  ptr = NULL;
+  xodtemplate_command* temp_command(NULL);
   for (temp_command = (xodtemplate_command*)skiplist_get_first(xobject_skiplists[X_COMMAND_SKIPLIST], &ptr);
-       temp_command != NULL;
-       temp_command = (xodtemplate_command*) skiplist_get_next(&ptr)) {
+       temp_command;
+       temp_command = (xodtemplate_command*)skiplist_get_next(&ptr)) {
     if ((result = xodtemplate_register_command(temp_command)) == ERROR)
       return (ERROR);
   }
 
   /* register contactgroups */
-  /*for(temp_contactgroup=xodtemplate_contactgroup_list;temp_contactgroup!=NULL;temp_contactgroup=temp_contactgroup->next){ */
   ptr = NULL;
+  xodtemplate_contactgroup* temp_contactgroup(NULL);
   for (temp_contactgroup = (xodtemplate_contactgroup*)skiplist_get_first(xobject_skiplists[X_CONTACTGROUP_SKIPLIST], &ptr);
-       temp_contactgroup != NULL;
+       temp_contactgroup;
        temp_contactgroup = (xodtemplate_contactgroup*)skiplist_get_next(&ptr)) {
     if ((result = xodtemplate_register_contactgroup(temp_contactgroup)) == ERROR)
       return (ERROR);
   }
 
   /* register hostgroups */
-  /*for(temp_hostgroup=xodtemplate_hostgroup_list;temp_hostgroup!=NULL;temp_hostgroup=temp_hostgroup->next){ */
   ptr = NULL;
+  xodtemplate_hostgroup* temp_hostgroup(NULL);
   for (temp_hostgroup = (xodtemplate_hostgroup*)skiplist_get_first(xobject_skiplists[X_HOSTGROUP_SKIPLIST], &ptr);
-       temp_hostgroup != NULL;
+       temp_hostgroup;
        temp_hostgroup = (xodtemplate_hostgroup*)skiplist_get_next(&ptr)) {
     if ((result = xodtemplate_register_hostgroup(temp_hostgroup)) == ERROR)
       return (ERROR);
   }
 
   /* register servicegroups */
-  /*for(temp_servicegroup=xodtemplate_servicegroup_list;temp_servicegroup!=NULL;temp_servicegroup=temp_servicegroup->next){ */
   ptr = NULL;
+  xodtemplate_servicegroup* temp_servicegroup(NULL);
   for (temp_servicegroup = (xodtemplate_servicegroup*)skiplist_get_first(xobject_skiplists[X_SERVICEGROUP_SKIPLIST], &ptr);
-       temp_servicegroup != NULL;
+       temp_servicegroup;
        temp_servicegroup = (xodtemplate_servicegroup*)skiplist_get_next(&ptr)) {
     if ((result = xodtemplate_register_servicegroup(temp_servicegroup)) == ERROR)
       return (ERROR);
   }
 
   /* register contacts */
-  /*for(temp_contact=xodtemplate_contact_list;temp_contact!=NULL;temp_contact=temp_contact->next){ */
   ptr = NULL;
+  xodtemplate_contact* temp_contact(NULL);
   for (temp_contact = (xodtemplate_contact*)skiplist_get_first(xobject_skiplists[X_CONTACT_SKIPLIST], &ptr);
-       temp_contact != NULL;
+       temp_contact;
        temp_contact = (xodtemplate_contact*)skiplist_get_next(&ptr)) {
     if ((result = xodtemplate_register_contact(temp_contact)) == ERROR)
       return (ERROR);
   }
 
   /* register hosts */
-  /*for(temp_host=xodtemplate_host_list;temp_host!=NULL;temp_host=temp_host->next){ */
   ptr = NULL;
+  xodtemplate_host* temp_host(NULL);
   for (temp_host = (xodtemplate_host*)skiplist_get_first(xobject_skiplists[X_HOST_SKIPLIST], &ptr);
-       temp_host != NULL;
+       temp_host;
        temp_host = (xodtemplate_host*)skiplist_get_next(&ptr)) {
     if ((result = xodtemplate_register_host(temp_host)) == ERROR)
       return (ERROR);
   }
 
   /* register services */
-  /*for(temp_service=xodtemplate_service_list;temp_service!=NULL;temp_service=temp_service->next){ */
   ptr = NULL;
+  xodtemplate_service* temp_service(NULL);
   for (temp_service = (xodtemplate_service*)skiplist_get_first(xobject_skiplists[X_SERVICE_SKIPLIST], &ptr);
-       temp_service != NULL;
+       temp_service;
        temp_service = (xodtemplate_service*)skiplist_get_next(&ptr)) {
 
     if ((result = xodtemplate_register_service(temp_service)) == ERROR)
@@ -9378,40 +9378,40 @@ int xodtemplate_register_objects(void) {
   }
 
   /* register service dependencies */
-  /*for(temp_servicedependency=xodtemplate_servicedependency_list;temp_servicedependency!=NULL;temp_servicedependency=temp_servicedependency->next){ */
   ptr = NULL;
+  xodtemplate_servicedependency* temp_servicedependency(NULL);
   for (temp_servicedependency = (xodtemplate_servicedependency*)skiplist_get_first(xobject_skiplists[X_SERVICEDEPENDENCY_SKIPLIST], &ptr);
-       temp_servicedependency != NULL;
-       temp_servicedependency = (xodtemplate_servicedependency*) skiplist_get_next(&ptr)) {
+       temp_servicedependency;
+       temp_servicedependency = (xodtemplate_servicedependency*)skiplist_get_next(&ptr)) {
     if ((result = xodtemplate_register_servicedependency(temp_servicedependency)) == ERROR)
       return (ERROR);
   }
 
   /* register service escalations */
-  /*for(temp_serviceescalation=xodtemplate_serviceescalation_list;temp_serviceescalation!=NULL;temp_serviceescalation=temp_serviceescalation->next){ */
   ptr = NULL;
+  xodtemplate_serviceescalation* temp_serviceescalation(NULL);
   for (temp_serviceescalation = (xodtemplate_serviceescalation*)skiplist_get_first(xobject_skiplists[X_SERVICEESCALATION_SKIPLIST], &ptr);
-       temp_serviceescalation != NULL;
+       temp_serviceescalation;
        temp_serviceescalation = (xodtemplate_serviceescalation*)skiplist_get_next(&ptr)) {
     if ((result = xodtemplate_register_serviceescalation(temp_serviceescalation)) == ERROR)
       return (ERROR);
   }
 
   /* register host dependencies */
-  /*for(temp_hostdependency=xodtemplate_hostdependency_list;temp_hostdependency!=NULL;temp_hostdependency=temp_hostdependency->next){ */
   ptr = NULL;
+  xodtemplate_hostdependency* temp_hostdependency(NULL);
   for (temp_hostdependency = (xodtemplate_hostdependency*)skiplist_get_first(xobject_skiplists[X_HOSTDEPENDENCY_SKIPLIST], &ptr);
-       temp_hostdependency != NULL;
+       temp_hostdependency;
        temp_hostdependency = (xodtemplate_hostdependency*)skiplist_get_next(&ptr)) {
     if ((result = xodtemplate_register_hostdependency(temp_hostdependency)) == ERROR)
       return (ERROR);
   }
 
   /* register host escalations */
-  /*for(temp_hostescalation=xodtemplate_hostescalation_list;temp_hostescalation!=NULL;temp_hostescalation=temp_hostescalation->next){ */
   ptr = NULL;
+  xodtemplate_hostescalation* temp_hostescalation(NULL);
   for (temp_hostescalation = (xodtemplate_hostescalation*)skiplist_get_first(xobject_skiplists[X_HOSTESCALATION_SKIPLIST], &ptr);
-       temp_hostescalation != NULL;
+       temp_hostescalation;
        temp_hostescalation = (xodtemplate_hostescalation*)skiplist_get_next(&ptr)) {
     if ((result = xodtemplate_register_hostescalation(temp_hostescalation)) == ERROR)
       return (ERROR);
@@ -9668,8 +9668,6 @@ int xodtemplate_get_time_ranges(char* buf, unsigned long* range_start, unsigned 
 
 /* registers a command definition */
 int xodtemplate_register_command(xodtemplate_command* this_command) {
-  command* new_command = NULL;
-
   /* bail out if we shouldn't register this object */
   if (this_command->register_object == FALSE)
     return (OK);
@@ -9677,48 +9675,25 @@ int xodtemplate_register_command(xodtemplate_command* this_command) {
   // Initialize command executon system.
   try {
     using namespace com::centreon::engine;
+    commands::set& cmd_set(commands::set::instance());
     if (this_command->connector_name == NULL) {
       com::centreon::shared_ptr<commands::command>
-        cmd_set(new commands::raw(
-                                this_command->command_name,
-                                this_command->command_line,
-                                &checks::checker::instance()));
-      commands::set::instance().add_command(cmd_set);
+        cmd(new commands::raw(
+                            this_command->command_name,
+                            this_command->command_line,
+                            &checks::checker::instance()));
+      cmd_set.add_command(cmd);
     }
     else {
-      xodtemplate_connector temp_connector;
-      temp_connector.connector_name = this_command->connector_name;
-      xodtemplate_connector* connector =
-        (xodtemplate_connector*)skiplist_find_first(
-                                  xobject_skiplists[X_CONNECTOR_SKIPLIST],
-                                  &temp_connector,
-                                  NULL);
-      if (connector == NULL) {
-        logger(log_config_error, basic)
-          << "Error: Could not register command (config file '"
-          << xodtemplate_config_file_name(this_command->_config_file)
-          << "', starting on line " << this_command->_start_line << ")";
-        return (ERROR);
-      }
-
-      nagios_macros* macros(get_global_macros());
-      char* command_line(NULL);
-      process_macros_r(
-        macros,
-        connector->connector_line,
-        &command_line,
-        0);
-      std::string processed_cmd(command_line);
-      delete[] command_line;
+      com::centreon::shared_ptr<commands::command>
+        cmd_forward(cmd_set.get_command(this_command->connector_name));
 
       com::centreon::shared_ptr<commands::command>
-        cmd_set(new commands::connector(
-                                connector->connector_name,
-                                processed_cmd,
-                                this_command->command_name,
-                                this_command->command_line,
-                                &checks::checker::instance()));
-      commands::set::instance().add_command(cmd_set);
+        cmd(new commands::forward(
+                            this_command->command_name,
+                            this_command->command_line,
+                            *cmd_forward));
+      cmd_set.add_command(cmd);
     }
   }
   catch (std::exception const& e) {
@@ -9731,7 +9706,9 @@ int xodtemplate_register_command(xodtemplate_command* this_command) {
   }
 
   /* add the command */
-  new_command = add_command(this_command->command_name, this_command->command_line);
+  command* new_command(add_command(
+                         this_command->command_name,
+                         this_command->command_line));
 
   /* return with an error if we couldn't add the command */
   if (new_command == NULL) {
@@ -9739,6 +9716,45 @@ int xodtemplate_register_command(xodtemplate_command* this_command) {
       << "Error: Could not register command (config file '"
       << xodtemplate_config_file_name(this_command->_config_file)
       << "', starting on line " << this_command->_start_line << ")";
+    return (ERROR);
+  }
+
+  return (OK);
+}
+
+/* registers a connector definition */
+int xodtemplate_register_connector(xodtemplate_connector* this_connector) {
+  /* bail out if we shouldn't register this object */
+  if (this_connector->register_object == FALSE)
+    return (OK);
+
+  // Initialize command executon system.
+  try {
+    using namespace com::centreon::engine;
+
+    nagios_macros* macros(get_global_macros());
+    char* command_line(NULL);
+    process_macros_r(
+      macros,
+      this_connector->connector_line,
+      &command_line,
+      0);
+    std::string processed_cmd(command_line);
+    delete[] command_line;
+
+    com::centreon::shared_ptr<commands::command>
+      cmd(new commands::connector(
+                          this_connector->connector_name,
+                          processed_cmd,
+                          &checks::checker::instance()));
+    commands::set::instance().add_command(cmd);
+  }
+  catch (std::exception const& e) {
+    logger(log_config_error, basic)
+      << "Error: Could not register connector (config file '"
+      << xodtemplate_config_file_name(this_connector->_config_file)
+      << "', starting on line " << this_connector->_start_line << "): "
+      << e.what();
     return (ERROR);
   }
 

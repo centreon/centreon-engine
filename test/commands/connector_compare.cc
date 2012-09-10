@@ -27,8 +27,6 @@ using namespace com::centreon::engine::commands;
 
 #define DEFAULT_CONNECTOR_NAME __func__
 #define DEFAULT_CONNECTOR_LINE "./bin_connector_test_run"
-#define DEFAULT_CMD_NAME       __FILE__
-#define DEFAULT_CMD_LINE       "ls -la /tmp"
 
 /**
  * Check comparison operator.
@@ -39,9 +37,7 @@ int main_test(int argc, char** argv) {
 
   connector cmd(
               DEFAULT_CONNECTOR_NAME,
-              DEFAULT_CONNECTOR_LINE,
-              DEFAULT_CMD_NAME,
-              DEFAULT_CMD_LINE);
+              DEFAULT_CONNECTOR_LINE);
 
   if (!(cmd == cmd))
     throw (engine_error() << "error: operator== failed.");

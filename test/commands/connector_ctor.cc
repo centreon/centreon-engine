@@ -29,8 +29,6 @@ using namespace com::centreon::engine::commands;
 
 #define DEFAULT_CONNECTOR_NAME __func__
 #define DEFAULT_CONNECTOR_LINE "./bin_connector_test_run"
-#define DEFAULT_CMD_NAME       __FILE__
-#define DEFAULT_CMD_LINE       "ls -la /tmp"
 
 /**
  *  Check constructor and copy object.
@@ -41,14 +39,10 @@ int main_test(int argc, char** argv) {
 
   connector cmd1(
               DEFAULT_CONNECTOR_NAME,
-              DEFAULT_CONNECTOR_LINE,
-              DEFAULT_CMD_NAME,
-              DEFAULT_CMD_LINE);
+              DEFAULT_CONNECTOR_LINE);
 
-  if ((cmd1.get_name() != DEFAULT_CMD_NAME)
-      || (cmd1.connector_name() != DEFAULT_CONNECTOR_NAME)
-      || (cmd1.get_command_line() != DEFAULT_CMD_LINE)
-      || (cmd1.connector_line() != DEFAULT_CONNECTOR_LINE))
+  if ((cmd1.get_name() != DEFAULT_CONNECTOR_NAME)
+      || (cmd1.get_command_line() != DEFAULT_CONNECTOR_LINE))
     throw (engine_error() << "error: constructor failed");
 
   connector cmd2(cmd1);

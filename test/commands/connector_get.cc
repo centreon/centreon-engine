@@ -27,8 +27,6 @@ using namespace com::centreon::engine::commands;
 
 #define DEFAULT_CONNECTOR_NAME __func__
 #define DEFAULT_CONNECTOR_LINE "./bin_connector_test_run"
-#define DEFAULT_CMD_NAME       __FILE__
-#define DEFAULT_CMD_LINE       "ls -la /tmp"
 
 /**
  *  Check getter return.
@@ -39,21 +37,13 @@ int main_test(int argc, char** argv) {
 
   connector cmd(
               DEFAULT_CONNECTOR_NAME,
-              DEFAULT_CONNECTOR_LINE,
-              DEFAULT_CMD_NAME,
-              DEFAULT_CMD_LINE);
+              DEFAULT_CONNECTOR_LINE);
 
-  if (cmd.get_name() != DEFAULT_CMD_NAME)
+  if (cmd.get_name() != DEFAULT_CONNECTOR_NAME)
     throw (engine_error() << "error: name invalid value.");
 
-  if (cmd.get_command_line() != DEFAULT_CMD_LINE)
+  if (cmd.get_command_line() != DEFAULT_CONNECTOR_LINE)
     throw (engine_error() << "error: command_line invalid value.");
-
-  if (cmd.connector_name() != DEFAULT_CONNECTOR_NAME)
-    throw (engine_error() << "error: connector_name invalid value.");
-
-  if (cmd.connector_line() != DEFAULT_CONNECTOR_LINE)
-    throw (engine_error() << "error: connector_line invalid value.");
 
   return (0);
 }

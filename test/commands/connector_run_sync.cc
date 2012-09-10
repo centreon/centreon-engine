@@ -19,6 +19,7 @@
 
 #include <exception>
 #include "com/centreon/engine/commands/connector.hh"
+#include "com/centreon/engine/commands/forward.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/process.hh"
 #include "test/unittest.hh"
@@ -34,18 +35,20 @@ using namespace com::centreon::engine::commands;
  */
 static bool run_without_timeout() {
   nagios_macros macros = nagios_macros();
-  connector cmd(
+  connector cmd_connector(
               __func__,
-              "./bin_connector_test_run",
-              __func__,
-              "./bin_connector_test_run --timeout=off");
+              "./bin_connector_test_run");
+  forward cmd_forward(
+            __func__,
+            "./bin_connector_test_run --timeout=off",
+            cmd_connector);
 
   result res;
-  cmd.run(cmd.get_command_line(), macros, 0, res);
+  cmd_forward.run(cmd_forward.get_command_line(), macros, 0, res);
 
   if (res.command_id == 0
       || res.exit_code != STATE_OK
-      || res.output != cmd.get_command_line()
+      || res.output != cmd_forward.get_command_line()
       || res.exit_status != process::normal)
     return (false);
   return (true);
@@ -58,14 +61,16 @@ static bool run_without_timeout() {
  */
 static bool run_with_timeout() {
   nagios_macros macros = nagios_macros();
-  connector cmd(
+  connector cmd_connector(
               __func__,
-              "./bin_connector_test_run",
-              __func__,
-              "./bin_connector_test_run --timeout=on");
+              "./bin_connector_test_run");
+  forward cmd_forward(
+            __func__,
+            "./bin_connector_test_run --timeout=on",
+            cmd_connector);
 
   result res;
-  cmd.run(cmd.get_command_line(), macros, 1, res);
+  cmd_forward.run(cmd_forward.get_command_line(), macros, 1, res);
 
   if (res.command_id == 0
       || res.exit_code != STATE_CRITICAL
