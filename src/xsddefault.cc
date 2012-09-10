@@ -147,7 +147,7 @@ int xsddefault_initialize_status_data(char* config_file) {
   if (xsddefault_status_log_fd == -1) {
     if ((xsddefault_status_log_fd = open(xsddefault_status_log,
                                          O_WRONLY | O_CREAT,
-                                         S_IRUSR | S_IWUSR)) == -1) {
+                                         S_IRUSR | S_IWUSR | S_IRGRP)) == -1) {
       logger(log_runtime_error, basic)
         << "Error: Unable to open status data file '"
         << xsddefault_status_log << "': " << strerror(errno);
