@@ -434,6 +434,32 @@ else ()
   set(GROUP "root")
 endif ()
 
+# logrotate directory.
+option(WITH_LOGROTATE_SCRIPT "Generate and install logrotate script." OFF)
+if (WITH_LOGROTATE_SCRIPT)
+  # Generate logrotate file.
+  message(STATUS "Generating logrorate file.")
+  configure_file(
+    "${SCRIPT_DIR}/logrotate.conf.in"
+    "${SCRIPT_DIR}/logrotate.conf"
+    @ONLY)
+
+  # logrotate file install directory.
+  if (WITH_LOGROTATE_DIR)
+    set(LOGROTATE_DIR "${WITH_LOGROTATE_DIR}")
+  else ()
+    set(LOGROTATE_DIR "/etc/logrotate.d")
+  endif ()
+
+  # Install rule.
+  install(
+    FILES "${SCRIPT_DIR}/logrotate.conf"
+    DESTINATION "${LOGROTATE_DIR}"
+    COMPONENT "runtime"
+    RENAME "centengine"
+  )
+endif ()
+
 # Check OS distributor.
 if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
   message(STATUS "Attempting to determine OS distributor.")
@@ -1088,6 +1114,11 @@ if (WITH_PKGCONFIG_SCRIPT)
   message(STATUS "    - pkg-config script          enabled")
 else ()
   message(STATUS "    - pkg-config script          disabled")
+endif ()
+if (WITH_LOGROTATE_SCRIPT)
+  message(STATUS "    - logrotate script           enabled")
+else ()
+  message(STATUS "    - logrotate script           disabled")
 endif ()
 message(STATUS "    - Startup script             ${STARTUP_SCRIPT}")
 message(STATUS "")
