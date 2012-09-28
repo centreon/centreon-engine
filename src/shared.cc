@@ -368,14 +368,14 @@ void strip(char* buffer) {
 
 /* dual hash function */
 int hashfunc(char const* name1, char const* name2, int hashslots) {
-  unsigned int result = 0;
+  unsigned int result(0);
 
   if (name1)
-    for (unsigned int i = 0; i < strlen(name1); i++)
+    for (unsigned int i(0), end(strlen(name1)); i < end; ++i)
       result += name1[i];
 
   if (name2)
-    for (unsigned int i = 0; i < strlen(name2); i++)
+    for (unsigned int i(0), end(strlen(name2)); i < end; ++i)
       result += name2[i];
 
   return (result % hashslots);
