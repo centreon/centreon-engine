@@ -33,8 +33,9 @@ using namespace com::centreon::engine::objects::utils;
  *
  *  @see com::centreon::engine::objects::link
  */
-bool link_servicedependency(servicedependency* obj,
-                            timeperiod* dependency_period) {
+bool link_servicedependency(
+       servicedependency* obj,
+       timeperiod* dependency_period) {
   try {
     objects::link(obj, dependency_period);
   }
@@ -43,7 +44,8 @@ bool link_servicedependency(servicedependency* obj,
     return (false);
   }
   catch (...) {
-    logger(log_runtime_error, basic) << __func__ << " unknow exception";
+    logger(log_runtime_error, basic)
+      << __func__ << " unknow exception";
     return (false);
   }
   return (true);
@@ -62,8 +64,10 @@ void release_servicedependency(servicedependency const* obj) {
     logger(log_runtime_error, basic) << e.what();
   }
   catch (...) {
-    logger(log_runtime_error, basic) << __func__ << " unknow exception";
+    logger(log_runtime_error, basic)
+      << __func__ << " unknow exception";
   }
+  return;
 }
 
 /**
@@ -73,36 +77,46 @@ void release_servicedependency(servicedependency const* obj) {
  *  @param[in, out] obj                  Object to link with a correct name.
  *  @param[in]      dependency_period    Set servicedependency timeperiod.
  */
-void objects::link(servicedependency* obj,
-                   timeperiod* dependency_period) {
+void objects::link(
+                servicedependency* obj,
+                timeperiod* dependency_period) {
   // check object contents.
   if (obj == NULL)
     throw (engine_error() << "servicedependency is a NULL pointer.");
   if (obj->host_name == NULL)
     throw (engine_error() << "servicedependency invalid host name.");
   if (obj->dependent_host_name == NULL)
-    throw (engine_error() << "servicedependency invalid dependent host name.");
+    throw (engine_error()
+           << "servicedependency invalid dependent host name.");
   if (obj->service_description == NULL)
-    throw (engine_error() << "servicedependency invalid service description.");
+    throw (engine_error()
+           << "servicedependency invalid service description.");
   if (obj->dependent_service_description == NULL)
-    throw (engine_error() << "servicedependency invalid dependent service description.");
+    throw (engine_error()
+           << "servicedependency invalid dependent service description.");
 
-  if ((obj->master_service_ptr = find_service(obj->host_name, obj->service_description)) == NULL)
-    throw (engine_error() << "servicedependency '" << obj->dependent_host_name
+  if ((obj->master_service_ptr = find_service(
+                                   obj->host_name,
+                                   obj->service_description)) == NULL)
+    throw (engine_error()
+           << "servicedependency '" << obj->dependent_host_name
            << ", " << obj->dependent_service_description
 	   << ", " << obj->host_name
            << ", " << obj->service_description
 	   << "' invalid host name.");
 
-  if ((obj->dependent_service_ptr = find_service(obj->dependent_host_name,
-                                                 obj->dependent_service_description)) == NULL)
-    throw (engine_error() << "servicedependency '" << obj->dependent_host_name
+  if ((obj->dependent_service_ptr = find_service(
+                                      obj->dependent_host_name,
+                                      obj->dependent_service_description)) == NULL)
+    throw (engine_error()
+           << "servicedependency '" << obj->dependent_host_name
            << ", " << obj->dependent_service_description
 	   << ", " << obj->host_name
            << ", " << obj->service_description
            << "' invalid dependent host name.");
 
   obj->dependency_period_ptr = dependency_period;
+  return;
 }
 
 /**
@@ -115,7 +129,10 @@ void objects::release(servicedependency const* obj) {
     return;
 
   skiplist_delete(object_skiplists[SERVICEDEPENDENCY_SKIPLIST], obj);
-  remove_object_list(obj, &servicedependency_list, &servicedependency_list_tail);
+  remove_object_list(
+    obj,
+    &servicedependency_list,
+    &servicedependency_list_tail);
 
   delete[] obj->dependent_host_name;
   delete[] obj->dependent_service_description;
@@ -123,4 +140,5 @@ void objects::release(servicedependency const* obj) {
   delete[] obj->service_description;
   delete[] obj->dependency_period;
   delete obj;
+  return;
 }

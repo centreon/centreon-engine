@@ -36,9 +36,10 @@ using namespace com::centreon::engine::objects::utils;
  *
  *  @see com::centreon::engine::objects::link
  */
-bool link_contactgroup(contactgroup* obj,
-                       contact** members,
-                       contactgroup** groups) {
+bool link_contactgroup(
+       contactgroup* obj,
+       contact** members,
+       contactgroup** groups) {
   try {
     objects::link(obj, tab2vec(members), tab2vec(groups));
   }
@@ -47,7 +48,8 @@ bool link_contactgroup(contactgroup* obj,
     return (false);
   }
   catch (...) {
-    logger(log_runtime_error, basic) << __func__ << " unknow exception";
+    logger(log_runtime_error, basic)
+      << __func__ << " unknow exception";
     return (false);
   }
   return (true);
@@ -67,8 +69,10 @@ void release_contactgroup(contactgroup const* obj) {
     logger(log_runtime_error, basic) << e.what();
   }
   catch (...) {
-    logger(log_runtime_error, basic) << __func__ << " unknow exception";
+    logger(log_runtime_error, basic)
+      << __func__ << " unknow exception";
   }
+  return;
 }
 
 /**
@@ -98,8 +102,7 @@ void objects::link(
 
   // Browse contacts.
   for (std::vector<contact*>::const_iterator
-         it(members.begin()),
-         end(members.end());
+         it(members.begin()), end(members.end());
        it != end;
        ++it) {
     // Link contact group to contact.
@@ -118,8 +121,7 @@ void objects::link(
   // Add the content of other contactgroups into this contactgroup.
   std::vector<contact*> other_members;
   for (std::vector<contactgroup*>::const_iterator
-         it(groups.begin()),
-         end(groups.end());
+         it(groups.begin()), end(groups.end());
        it != end;
        ++it) {
     if (!*it)
@@ -135,8 +137,7 @@ void objects::link(
   // Recursive call.
   if (!other_members.empty())
     objects::link(obj, other_members, std::vector<contactgroup*>());
-
-  return ;
+  return;
 }
 
 /**
@@ -157,6 +158,7 @@ void objects::release(contactgroup const* obj) {
   delete[] obj->group_name;
   delete[] obj->alias;
   delete obj;
+  return;
 }
 
 /**
@@ -167,13 +169,14 @@ void objects::release(contactgroup const* obj) {
  *
  *  @return True if insert sucessfuly, false otherwise.
  */
-bool objects::add_contactgroups_to_object(std::vector<contactgroup*> const& contactgroups,
-                                          contactgroupsmember** list_contactgroup) {
+bool objects::add_contactgroups_to_object(
+                std::vector<contactgroup*> const& contactgroups,
+                contactgroupsmember** list_contactgroup) {
   if (list_contactgroup == NULL)
     return (false);
 
-  for (std::vector<contactgroup*>::const_iterator it = contactgroups.begin(),
-         end = contactgroups.end();
+  for (std::vector<contactgroup*>::const_iterator
+         it = contactgroups.begin(), end = contactgroups.end();
        it != end;
        ++it) {
     if (*it == NULL)

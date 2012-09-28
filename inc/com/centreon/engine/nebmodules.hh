@@ -25,28 +25,28 @@
 
 /* Module version information. */
 #  define NEB_API_VERSION(x) int __neb_api_version = x;
-#  define CURRENT_NEB_API_VERSION 3
+#  define CURRENT_NEB_API_VERSION     3
 
 /* Module information. */
-#  define NEBMODULE_MODINFO_NUMITEMS 6
-#  define NEBMODULE_MODINFO_TITLE 0
-#  define NEBMODULE_MODINFO_AUTHOR 1
+#  define NEBMODULE_MODINFO_NUMITEMS  6
+#  define NEBMODULE_MODINFO_TITLE     0
+#  define NEBMODULE_MODINFO_AUTHOR    1
 #  define NEBMODULE_MODINFO_COPYRIGHT 2
-#  define NEBMODULE_MODINFO_VERSION 3
-#  define NEBMODULE_MODINFO_LICENSE 4
-#  define NEBMODULE_MODINFO_DESC 5
+#  define NEBMODULE_MODINFO_VERSION   3
+#  define NEBMODULE_MODINFO_LICENSE   4
+#  define NEBMODULE_MODINFO_DESC      5
 
 /* Module load/unload flags. */
-#  define NEBMODULE_NORMAL_LOAD    0
-#  define NEBMODULE_ENGINE         (1 << 12)
-#  define NEBMODULE_REQUEST_UNLOAD 0
-#  define NEBMODULE_FORCE_UNLOAD   (1 << 0)
+#  define NEBMODULE_NORMAL_LOAD       0
+#  define NEBMODULE_ENGINE            (1 << 12)
+#  define NEBMODULE_REQUEST_UNLOAD    0
+#  define NEBMODULE_FORCE_UNLOAD      (1 << 0)
 
 /* Modules unload reasons. */
-#  define NEBMODULE_NEB_SHUTDOWN 1
-#  define NEBMODULE_NEB_RESTART 2
-#  define NEBMODULE_ERROR_NO_INIT 3
-#  define NEBMODULE_ERROR_BAD_INIT 4
+#  define NEBMODULE_NEB_SHUTDOWN      1
+#  define NEBMODULE_NEB_RESTART       2
+#  define NEBMODULE_ERROR_NO_INIT     3
+#  define NEBMODULE_ERROR_BAD_INIT    4
 #  define NEBMODULE_ERROR_API_VERSION 5
 
 #  ifdef __cplusplus

@@ -49,11 +49,16 @@ int read_all_object_data(char* main_config_file) {
 
   /* precache object definitions */
   if (precache_objects == TRUE
-      && (verify_config == TRUE || test_scheduling == TRUE))
+      && (verify_config == TRUE
+          || test_scheduling == TRUE))
     precache = TRUE;
 
   /* read in all host configuration data from external sources */
-  result = read_object_config_data(main_config_file, options, cache, precache);
+  result = read_object_config_data(
+             main_config_file,
+             options,
+             cache,
+             precache);
   if (result != OK)
     return (ERROR);
 
@@ -93,7 +98,10 @@ int read_resource_file(char* resource_file) {
     current_line = thefile->current_line;
 
     /* skip blank lines and comments */
-    if (input[0] == '#' || input[0] == '\x0' || input[0] == '\n' || input[0] == '\r')
+    if (input[0] == '#'
+        || input[0] == '\x0'
+        || input[0] == '\n'
+        || input[0] == '\r')
       continue;
 
     strip(input);
@@ -122,9 +130,9 @@ int read_resource_file(char* resource_file) {
 
     /* check for macro declarations */
     if (variable[0] == '$' && variable[strlen(variable) - 1] == '$') {
-
       /* $USERx$ macro declarations */
-      if (strstr(variable, "$USER") == variable && strlen(variable) > 5) {
+      if (strstr(variable, "$USER") == variable
+          && strlen(variable) > 5) {
         user_index = atoi(variable + 5) - 1;
         if (user_index < MAX_USER_MACROS) {
           delete[] macro_user[user_index];
@@ -153,7 +161,7 @@ int read_resource_file(char* resource_file) {
 /****************************************************************/
 
 /* do a pre-flight check to make sure object relationships, etc. make sense */
-int pre_flight_check(void) {
+int pre_flight_check() {
   host* temp_host = NULL;
   char* buf = NULL;
   service* temp_service = NULL;
@@ -285,7 +293,8 @@ int pre_flight_check(void) {
        temp_service = temp_service->next) {
     if ((temp_host = find_host(temp_service->host_name))) {
       temp_host->total_services++;
-      temp_host->total_service_check_interval += static_cast<unsigned long>(temp_service->check_interval);
+      temp_host->total_service_check_interval
+        += static_cast<unsigned long>(temp_service->check_interval);
     }
   }
 
@@ -300,15 +309,18 @@ int pre_flight_check(void) {
 
   if (test_scheduling == TRUE) {
 
-    runtime[0] = (double)((double)(tv[1].tv_sec - tv[0].tv_sec)
-			  + (double)((tv[1].tv_usec - tv[0].tv_usec) / 1000.0) / 1000.0);
+    runtime[0]
+      = (double)((double)(tv[1].tv_sec - tv[0].tv_sec)
+                 + (double)((tv[1].tv_usec - tv[0].tv_usec) / 1000.0) / 1000.0);
     if (verify_circular_paths == TRUE)
-      runtime[1] = (double)((double)(tv[2].tv_sec - tv[1].tv_sec)
-			    + (double)((tv[2].tv_usec - tv[1].tv_usec) / 1000.0) / 1000.0);
+      runtime[1]
+        = (double)((double)(tv[2].tv_sec - tv[1].tv_sec)
+                   + (double)((tv[2].tv_usec - tv[1].tv_usec) / 1000.0) / 1000.0);
     else
       runtime[1] = 0.0;
-    runtime[2] = (double)((double)(tv[3].tv_sec - tv[2].tv_sec)
-			  + (double)((tv[3].tv_usec - tv[2].tv_usec) / 1000.0) / 1000.0);
+    runtime[2]
+      = (double)((double)(tv[3].tv_sec - tv[2].tv_sec)
+                 + (double)((tv[3].tv_usec - tv[2].tv_usec) / 1000.0) / 1000.0);
     runtime[3] = runtime[0] + runtime[1] + runtime[2];
 
     printf("Timing information on configuration verification is listed below.\n\n");
@@ -319,8 +331,11 @@ int pre_flight_check(void) {
     printf("Circular Paths:       %.6f sec  *\n", runtime[1]);
     printf("Misc:                 %.6f sec\n", runtime[2]);
     printf("                      ============\n");
-    printf("TOTAL:                %.6f sec  * = %.6f sec (%.1f%%) estimated savings\n",
-	   runtime[3], runtime[1], (runtime[1] / runtime[3]) * 100.0);
+    printf(
+      "TOTAL:                %.6f sec  * = %.6f sec (%.1f%%) estimated savings\n",
+      runtime[3],
+      runtime[1],
+      (runtime[1] / runtime[3]) * 100.0);
     printf("\n\n");
   }
 
@@ -362,16 +377,25 @@ int pre_flight_object_check(int* w, int* e) {
   for (temp_se = get_first_serviceescalation_by_service(buf1, buf2, &ptr);
        temp_se != NULL;
        temp_se = get_next_serviceescalation_by_service(buf1, buf2, &ptr)) {
-    printf("FOUND ESCALATION FOR SVC '%s'/'%s': %d-%d/%.3f, PTR=%p\n", buf1,
-           buf2, temp_se->first_notification, temp_se->last_notification,
-           temp_se->notification_interval, ptr);
+    printf(
+      "FOUND ESCALATION FOR SVC '%s'/'%s': %d-%d/%.3f, PTR=%p\n",
+      buf1,
+      buf2,
+      temp_se->first_notification,
+      temp_se->last_notification,
+      temp_se->notification_interval,
+      ptr);
   }
   for (temp_he = get_first_host_escalation_by_host(buf1, &ptr);
        temp_he != NULL;
        temp_he = get_next_host_escalation_by_host(buf1, &ptr)) {
-    printf("FOUND ESCALATION FOR HOST '%s': %d-%d/%d, PTR=%p\n", buf1,
-           temp_he->first_notification, temp_he->last_notification,
-           temp_he->notification_interval, ptr);
+    printf(
+      "FOUND ESCALATION FOR HOST '%s': %d-%d/%d, PTR=%p\n",
+      buf1,
+      temp_he->first_notification,
+      temp_he->last_notification,
+      temp_he->notification_interval,
+      ptr);
   }
 #endif
 
@@ -407,7 +431,9 @@ int pre_flight_object_check(int* w, int* e) {
   // }
 
   total_objects = 0;
-  for (temp_host = host_list; temp_host != NULL; temp_host = temp_host->next) {
+  for (temp_host = host_list;
+       temp_host != NULL;
+       temp_host = temp_host->next) {
     total_objects++;
     check_host(temp_host, &warnings, &errors);
   }
@@ -440,7 +466,9 @@ int pre_flight_object_check(int* w, int* e) {
 
       /* save a pointer to this hostgroup for faster host/group membership lookups later */
       else
-        add_object_to_objectlist(&temp_host->hostgroups_ptr, (void*)temp_hostgroup);
+        add_object_to_objectlist(
+          &temp_host->hostgroups_ptr,
+          (void*)temp_hostgroup);
 
       /* save host pointer for later */
       temp_hostsmember->host_ptr = temp_host;
@@ -450,7 +478,8 @@ int pre_flight_object_check(int* w, int* e) {
     if (use_precached_objects == FALSE) {
       if (contains_illegal_object_chars(temp_hostgroup->group_name) == TRUE) {
         logger(log_verification_error, basic)
-          << "Error: The name of hostgroup '" << temp_hostgroup->group_name
+          << "Error: The name of hostgroup '"
+          << temp_hostgroup->group_name
           << "' contains one or more illegal characters.";
         errors++;
       }
@@ -474,20 +503,25 @@ int pre_flight_object_check(int* w, int* e) {
          temp_servicesmember != NULL;
          temp_servicesmember = temp_servicesmember->next) {
 
-      temp_service = find_service(temp_servicesmember->host_name,
-				  temp_servicesmember->service_description);
+      temp_service = find_service(
+                       temp_servicesmember->host_name,
+                       temp_servicesmember->service_description);
       if (temp_service == NULL) {
         logger(log_verification_error, basic)
-          << "Error: Service '" << temp_servicesmember->service_description
+          << "Error: Service '"
+          << temp_servicesmember->service_description
           << "' on host '" << temp_servicesmember->host_name
-          << "' specified in service group '" << temp_servicegroup->group_name
+          << "' specified in service group '"
+          << temp_servicegroup->group_name
           << "' is not defined anywhere!";
         errors++;
       }
 
       /* save a pointer to this servicegroup for faster service/group membership lookups later */
       else
-        add_object_to_objectlist(&temp_service->servicegroups_ptr, (void*)temp_servicegroup);
+        add_object_to_objectlist(
+          &temp_service->servicegroups_ptr,
+          (void*)temp_servicegroup);
 
       /* save service pointer for later */
       temp_servicesmember->service_ptr = temp_service;
@@ -497,7 +531,8 @@ int pre_flight_object_check(int* w, int* e) {
     if (use_precached_objects == FALSE) {
       if (contains_illegal_object_chars(temp_servicegroup->group_name) == TRUE) {
         logger(log_verification_error, basic)
-          << "Error: The name of servicegroup '" << temp_servicegroup->group_name
+          << "Error: The name of servicegroup '"
+          << temp_servicegroup->group_name
           << "' contains one or more illegal characters.";
         errors++;
       }
@@ -543,14 +578,17 @@ int pre_flight_object_check(int* w, int* e) {
       if (temp_contact == NULL) {
         logger(log_verification_error, basic)
           << "Error: Contact '" << temp_contactsmember->contact_name
-          << "' specified in contact group '" << temp_contactgroup->group_name
+          << "' specified in contact group '"
+          << temp_contactgroup->group_name
           << "' is not defined anywhere!";
         errors++;
       }
 
       /* save a pointer to this contactgroup for faster contact/group membership lookups later */
       else
-        add_object_to_objectlist(&temp_contact->contactgroups_ptr, (void*)temp_contactgroup);
+        add_object_to_objectlist(
+          &temp_contact->contactgroups_ptr,
+          (void*)temp_contactgroup);
 
       /* save the contact pointer for later */
       temp_contactsmember->contact_ptr = temp_contact;
@@ -560,7 +598,8 @@ int pre_flight_object_check(int* w, int* e) {
     if (use_precached_objects == FALSE) {
       if (contains_illegal_object_chars(temp_contactgroup->group_name) == TRUE) {
         logger(log_verification_error, basic)
-          << "Error: The name of contact group '" << temp_contactgroup->group_name
+          << "Error: The name of contact group '"
+          << temp_contactgroup->group_name
           << "' contains one or more illegal characters.";
         errors++;
       }
@@ -581,7 +620,9 @@ int pre_flight_object_check(int* w, int* e) {
        temp_se = temp_se->next, total_objects++) {
 
     /* find the service */
-    temp_service = find_service(temp_se->host_name, temp_se->description);
+    temp_service = find_service(
+                     temp_se->host_name,
+                     temp_se->description);
     if (temp_service == NULL) {
       logger(log_verification_error, basic)
         << "Error: Service '" << temp_se->description
@@ -634,11 +675,13 @@ int pre_flight_object_check(int* w, int* e) {
          temp_contactgroupsmember != NULL;
          temp_contactgroupsmember = temp_contactgroupsmember->next) {
 
-      temp_contactgroup = find_contactgroup(temp_contactgroupsmember->group_name);
+      temp_contactgroup
+        = find_contactgroup(temp_contactgroupsmember->group_name);
 
       if (temp_contactgroup == NULL) {
         logger(log_verification_error, basic)
-          << "Error: Contact group '" << temp_contactgroupsmember->group_name
+          << "Error: Contact group '"
+          << temp_contactgroupsmember->group_name
           << "' specified in service escalation for service '"
           << temp_se->description << "' on host '" << temp_se->host_name
           << "' is not defined anywhere!";
@@ -664,15 +707,17 @@ int pre_flight_object_check(int* w, int* e) {
        temp_sd = temp_sd->next, total_objects++) {
 
     /* find the dependent service */
-    temp_service = find_service(temp_sd->dependent_host_name,
-				temp_sd->dependent_service_description);
+    temp_service = find_service(
+                     temp_sd->dependent_host_name,
+                     temp_sd->dependent_service_description);
     if (temp_service == NULL) {
       logger(log_verification_error, basic)
-        << "Error: Dependent service '" << temp_sd->dependent_service_description
+        << "Error: Dependent service '"
+        << temp_sd->dependent_service_description
         << "' on host '" << temp_sd->dependent_host_name
         << "' specified in service dependency for service '"
-        << temp_sd->service_description << "' on host '" << temp_sd->host_name
-        << "' is not defined anywhere!";
+        << temp_sd->service_description << "' on host '"
+        << temp_sd->host_name << "' is not defined anywhere!";
       errors++;
     }
 
@@ -680,7 +725,9 @@ int pre_flight_object_check(int* w, int* e) {
     temp_sd->dependent_service_ptr = temp_service;
 
     /* find the service we're depending on */
-    temp_service2 = find_service(temp_sd->host_name, temp_sd->service_description);
+    temp_service2 = find_service(
+                      temp_sd->host_name,
+                      temp_sd->service_description);
     if (temp_service2 == NULL) {
       logger(log_verification_error, basic)
         << "Error: Service '" << temp_sd->service_description << "' on host '"
@@ -751,8 +798,8 @@ int pre_flight_object_check(int* w, int* e) {
       if (temp_timeperiod == NULL) {
         logger(log_verification_error, basic)
           << "Error: Escalation period '" << temp_he->escalation_period
-          << "' specified in host escalation for host '" << temp_he->host_name
-          << "' is not defined anywhere!";
+          << "' specified in host escalation for host '"
+          << temp_he->host_name << "' is not defined anywhere!";
         errors++;
       }
 
@@ -784,11 +831,13 @@ int pre_flight_object_check(int* w, int* e) {
          temp_contactgroupsmember != NULL;
          temp_contactgroupsmember = temp_contactgroupsmember->next) {
 
-      temp_contactgroup = find_contactgroup(temp_contactgroupsmember->group_name);
+      temp_contactgroup
+        = find_contactgroup(temp_contactgroupsmember->group_name);
 
       if (temp_contactgroup == NULL) {
         logger(log_verification_error, basic)
-          << "Error: Contact group '" << temp_contactgroupsmember->group_name
+          << "Error: Contact group '"
+          << temp_contactgroupsmember->group_name
           << "' specified in host escalation for host '"
           << temp_he->host_name << "' is not defined anywhere!";
         errors++;
@@ -816,8 +865,9 @@ int pre_flight_object_check(int* w, int* e) {
     temp_host = find_host(temp_hd->dependent_host_name);
     if (temp_host == NULL) {
       logger(log_verification_error, basic)
-        << "Error: Dependent host specified in host dependency for host '"
-        << temp_hd->dependent_host_name << "' is not defined anywhere!";
+        << "Error: Dependent host specified in host dependency for "
+        "host '" << temp_hd->dependent_host_name
+        << "' is not defined anywhere!";
       errors++;
     }
 
@@ -852,7 +902,8 @@ int pre_flight_object_check(int* w, int* e) {
         logger(log_verification_error, basic)
           << "Error: Dependency period '" << temp_hd->dependency_period
           << "' specified in host dependency for host '"
-          << temp_hd->dependent_host_name << "' is not defined anywhere!";
+          << temp_hd->dependent_host_name
+          << "' is not defined anywhere!";
         errors++;
       }
 
@@ -913,7 +964,8 @@ int pre_flight_object_check(int* w, int* e) {
          temp_timeperiodexclusion != NULL;
          temp_timeperiodexclusion = temp_timeperiodexclusion->next) {
 
-      temp_timeperiod2 = find_timeperiod(temp_timeperiodexclusion->timeperiod_name);
+      temp_timeperiod2
+        = find_timeperiod(temp_timeperiodexclusion->timeperiod_name);
       if (temp_timeperiod2 == NULL) {
         logger(log_verification_error, basic)
           << "Error: Excluded time period '"
@@ -1027,16 +1079,22 @@ int pre_flight_circular_check(int* w, int* e) {
   found = FALSE;
 
   /* We clean the dsf status from previous check */
-  for (temp_host = host_list; temp_host != NULL; temp_host = temp_host->next) {
+  for (temp_host = host_list;
+       temp_host != NULL;
+       temp_host = temp_host->next) {
     dfs_set_status(temp_host, DFS_UNCHECKED);
   }
 
-  for (temp_host = host_list; temp_host != NULL; temp_host = temp_host->next) {
+  for (temp_host = host_list;
+       temp_host != NULL;
+       temp_host = temp_host->next) {
     if (dfs_host_path(temp_host) == DFS_LOOPY)
       errors = 1;
   }
 
-  for (temp_host = host_list; temp_host != NULL; temp_host = temp_host->next) {
+  for (temp_host = host_list;
+       temp_host != NULL;
+       temp_host = temp_host->next) {
     if (dfs_get_status(temp_host) == DFS_LOOPY)
       logger(log_verification_error, basic)
         << "Error: The host '" << temp_host->name
@@ -1062,12 +1120,16 @@ int pre_flight_circular_check(int* w, int* e) {
          temp_sd2 = temp_sd2->next)
       temp_sd2->circular_path_checked = FALSE;
 
-    found = check_for_circular_servicedependency_path(temp_sd, temp_sd, EXECUTION_DEPENDENCY);
+    found = check_for_circular_servicedependency_path(
+              temp_sd,
+              temp_sd,
+              EXECUTION_DEPENDENCY);
     if (found == TRUE) {
       logger(log_verification_error, basic)
-        << "Error: A circular execution dependency (which could result in a " \
-        "deadlock) exists for service '" << temp_sd->service_description
-        << "' on host '" << temp_sd->host_name << "'!";
+        << "Error: A circular execution dependency (which could result "
+        "in a deadlock) exists for service '"
+        << temp_sd->service_description << "' on host '"
+        << temp_sd->host_name << "'!";
       errors++;
     }
   }
@@ -1083,18 +1145,24 @@ int pre_flight_circular_check(int* w, int* e) {
          temp_sd2 = temp_sd2->next)
       temp_sd2->circular_path_checked = FALSE;
 
-    found = check_for_circular_servicedependency_path(temp_sd, temp_sd, NOTIFICATION_DEPENDENCY);
+    found = check_for_circular_servicedependency_path(
+              temp_sd,
+              temp_sd,
+              NOTIFICATION_DEPENDENCY);
     if (found == TRUE) {
       logger(log_verification_error, basic)
-        << "Error: A circular notification dependency (which could result in a " \
-        "deadlock) exists for service '" << temp_sd->service_description
-        << "' on host '" << temp_sd->host_name << "'!";
+        << "Error: A circular notification dependency (which could "
+        "result in a deadlock) exists for service '"
+        << temp_sd->service_description << "' on host '"
+        << temp_sd->host_name << "'!";
       errors++;
     }
   }
 
   /* check execution dependencies between all hosts */
-  for (temp_hd = hostdependency_list; temp_hd != NULL; temp_hd = temp_hd->next) {
+  for (temp_hd = hostdependency_list;
+       temp_hd != NULL;
+       temp_hd = temp_hd->next) {
 
     /* clear checked flag for all dependencies */
     for (temp_hd2 = hostdependency_list;
@@ -1102,17 +1170,23 @@ int pre_flight_circular_check(int* w, int* e) {
          temp_hd2 = temp_hd2->next)
       temp_hd2->circular_path_checked = FALSE;
 
-    found = check_for_circular_hostdependency_path(temp_hd, temp_hd, EXECUTION_DEPENDENCY);
+    found = check_for_circular_hostdependency_path(
+              temp_hd,
+              temp_hd,
+              EXECUTION_DEPENDENCY);
     if (found == TRUE) {
       logger(log_verification_error, basic)
-        << "Error: A circular execution dependency (which could result in a " \
-        "deadlock) exists for host '" << temp_hd->host_name << "'!";
+        << "Error: A circular execution dependency (which could "
+        "result in a deadlock) exists for host '"
+        << temp_hd->host_name << "'!";
       errors++;
     }
   }
 
   /* check notification dependencies between all hosts */
-  for (temp_hd = hostdependency_list; temp_hd != NULL; temp_hd = temp_hd->next) {
+  for (temp_hd = hostdependency_list;
+       temp_hd != NULL;
+       temp_hd = temp_hd->next) {
 
     /* clear checked flag for all dependencies */
     for (temp_hd2 = hostdependency_list;
@@ -1120,11 +1194,15 @@ int pre_flight_circular_check(int* w, int* e) {
          temp_hd2 = temp_hd2->next)
       temp_hd2->circular_path_checked = FALSE;
 
-    found = check_for_circular_hostdependency_path(temp_hd, temp_hd, NOTIFICATION_DEPENDENCY);
+    found = check_for_circular_hostdependency_path(
+              temp_hd,
+              temp_hd,
+              NOTIFICATION_DEPENDENCY);
     if (found == TRUE) {
       logger(log_verification_error, basic)
-        << "Error: A circular notification dependency (which could result in a " \
-        "deadlock) exists for host '" << temp_hd->host_name << "'!";
+        << "Error: A circular notification dependency (which could "
+        "result in a deadlock) exists for host '"
+        << temp_hd->host_name << "'!";
       errors++;
     }
   }
@@ -1149,7 +1227,7 @@ int check_service(service* svc, int* w, int* e) {
 
   if (!temp_host) {
     logger(log_verification_error, basic)
-      << "Error: Host '" << svc->host_name << "' specified in service " \
+      << "Error: Host '" << svc->host_name << "' specified in service "
       "'" << svc->description << "' not defined anywhere!";
     errors++;
   }
@@ -1211,7 +1289,7 @@ int check_service(service* svc, int* w, int* e) {
     logger(log_verification_error, basic)
       << "Warning: Recovery notification option in service '"
       << svc->description << "' for host '" << svc->host_name
-      << "' doesn't make any sense - specify warning and/or critical " \
+      << "' doesn't make any sense - specify warning and/or critical "
       "options as well";
     warnings++;
   }
@@ -1226,7 +1304,7 @@ int check_service(service* svc, int* w, int* e) {
     if (temp_contact == NULL) {
       logger(log_verification_error, basic)
         << "Error: Contact '" << temp_contactsmember->contact_name
-        << "' specified in service '" << svc->description << "' for " \
+        << "' specified in service '" << svc->description << "' for "
         "host '" << svc->host_name << "' is not defined anywhere!";
       errors++;
     }
@@ -1240,12 +1318,13 @@ int check_service(service* svc, int* w, int* e) {
        temp_contactgroupsmember != NULL;
        temp_contactgroupsmember = temp_contactgroupsmember->next) {
 
-    contactgroup* temp_contactgroup = find_contactgroup(temp_contactgroupsmember->group_name);
+    contactgroup* temp_contactgroup
+      = find_contactgroup(temp_contactgroupsmember->group_name);
 
     if (temp_contactgroup == NULL) {
       logger(log_verification_error, basic)
         << "Error: Contact group '" << temp_contactgroupsmember->group_name
-        << "' specified in service '" << svc->description << "' for " \
+        << "' specified in service '" << svc->description << "' for "
         "host '" << svc->host_name << "' is not defined anywhere!";
       errors++;
     }
@@ -1258,7 +1337,7 @@ int check_service(service* svc, int* w, int* e) {
   if (svc->contacts == NULL && svc->contact_groups == NULL) {
     logger(log_verification_error, basic)
       << "Warning: Service '" << svc->description << "' on host '"
-      << svc->host_name << "' has no default contacts or " \
+      << svc->host_name << "' has no default contacts or "
       "contactgroups defined!";
     warnings++;
   }
@@ -1276,7 +1355,8 @@ int check_service(service* svc, int* w, int* e) {
       logger(log_verification_error, basic)
         << "Error: Check period '" << svc->check_period
         << "' specified for service '" << svc->description
-        << "' on host '" << svc->host_name << "' is not defined anywhere!";
+        << "' on host '" << svc->host_name
+        << "' is not defined anywhere!";
       errors++;
     }
 
@@ -1287,17 +1367,19 @@ int check_service(service* svc, int* w, int* e) {
   /* check service notification timeperiod */
   if (svc->notification_period == NULL) {
     logger(log_verification_error, basic)
-      << "Warning: Service '" << svc->description << "' on host " \
-      "'" << svc->host_name << "' has no notification time period defined!";
+      << "Warning: Service '" << svc->description << "' on host "
+      "'" << svc->host_name << "' has no notification time period "
+      "defined!";
     warnings++;
   }
 
   else {
-    timeperiod* temp_timeperiod = find_timeperiod(svc->notification_period);
+    timeperiod* temp_timeperiod
+      = find_timeperiod(svc->notification_period);
     if (temp_timeperiod == NULL) {
       logger(log_verification_error, basic)
         << "Error: Notification period '" << svc->notification_period
-        << "' specified for service '" << svc->description << "' on " \
+        << "' specified for service '" << svc->description << "' on "
         "host '" << svc->host_name << "' is not defined anywhere!";
       errors++;
     }
@@ -1311,9 +1393,9 @@ int check_service(service* svc, int* w, int* e) {
       && svc->notification_interval != 0) {
     logger(log_verification_error, basic)
       << "Warning: Service '" << svc->description << "' on host '"
-      << svc->host_name << "'  has a notification interval less than " \
-      "its check interval!  Notifications are only re-sent after " \
-      "checks are made, so the effective notification interval will " \
+      << svc->host_name << "'  has a notification interval less than "
+      "its check interval!  Notifications are only re-sent after "
+      "checks are made, so the effective notification interval will "
       "be that of the check interval.";
     warnings++;
   }
@@ -1432,7 +1514,8 @@ int check_host(host* hst, int* w, int* e) {
        temp_contactsmember != NULL;
        temp_contactsmember = temp_contactsmember->next) {
 
-    contact* temp_contact = find_contact(temp_contactsmember->contact_name);
+    contact* temp_contact
+      = find_contact(temp_contactsmember->contact_name);
 
     if (temp_contact == NULL) {
       logger(log_verification_error, basic)
@@ -1451,12 +1534,15 @@ int check_host(host* hst, int* w, int* e) {
        temp_contactgroupsmember != NULL;
        temp_contactgroupsmember = temp_contactgroupsmember->next) {
 
-    contactgroup* temp_contactgroup = find_contactgroup(temp_contactgroupsmember->group_name);
+    contactgroup* temp_contactgroup
+      = find_contactgroup(temp_contactgroupsmember->group_name);
 
     if (temp_contactgroup == NULL) {
       logger(log_verification_error, basic)
-        << "Error: Contact group '" << temp_contactgroupsmember->group_name
-        << "' specified in host '" << hst->name << "' is not defined anywhere!";
+        << "Error: Contact group '"
+        << temp_contactgroupsmember->group_name
+        << "' specified in host '" << hst->name
+        << "' is not defined anywhere!";
       errors++;
     }
 
@@ -1467,7 +1553,7 @@ int check_host(host* hst, int* w, int* e) {
   /* check to see if there is at least one contact/group */
   if (hst->contacts == NULL && hst->contact_groups == NULL) {
     logger(log_verification_error, basic)
-      << "Warning: Host '" << hst->name << "' has no default contacts " \
+      << "Warning: Host '" << hst->name << "' has no default contacts "
       "or contactgroups defined!";
     warnings++;
   }
@@ -1478,7 +1564,8 @@ int check_host(host* hst, int* w, int* e) {
     if (temp_timeperiod == NULL) {
       logger(log_verification_error, basic)
         << "Error: Notification period '" << hst->notification_period
-        << "' specified for host '" << hst->name << "' is not defined anywhere!";
+        << "' specified for host '" << hst->name
+        << "' is not defined anywhere!";
       errors++;
     }
 
@@ -1494,7 +1581,7 @@ int check_host(host* hst, int* w, int* e) {
     host* hst2 = NULL;
     if ((hst2 = find_host(temp_hostsmember->host_name)) == NULL) {
       logger(log_verification_error, basic)
-        << "Error: '" << temp_hostsmember->host_name << "' is not a " \
+        << "Error: '" << temp_hostsmember->host_name << "' is not a "
         "valid parent for host '" << hst->name << "'!";
       errors++;
     }
@@ -1512,7 +1599,7 @@ int check_host(host* hst, int* w, int* e) {
       && hst->notify_on_unreachable == FALSE) {
     logger(log_verification_error, basic)
       << "Warning: Recovery notification option in host '" << hst->name
-      << "' definition doesn't make any sense - specify down and/or " \
+      << "' definition doesn't make any sense - specify down and/or "
       "unreachable options as well";
     warnings++;
   }
@@ -1541,7 +1628,7 @@ int check_contact(contact* cntct, int* w, int* e) {
   /* check service notification commands */
   if (cntct->service_notification_commands == NULL) {
     logger(log_verification_error, basic)
-      << "Error: Contact '" << cntct->name << "' has no service " \
+      << "Error: Contact '" << cntct->name << "' has no service "
       "notification commands defined!";
     errors++;
   }
@@ -1574,7 +1661,7 @@ int check_contact(contact* cntct, int* w, int* e) {
   /* check host notification commands */
   if (cntct->host_notification_commands == NULL) {
     logger(log_verification_error, basic)
-      << "Error: Contact '" << cntct->name << "' has no host " \
+      << "Error: Contact '" << cntct->name << "' has no host "
       "notification commands defined!";
     errors++;
   }
@@ -1607,18 +1694,20 @@ int check_contact(contact* cntct, int* w, int* e) {
   /* check service notification timeperiod */
   if (cntct->service_notification_period == NULL) {
     logger(log_verification_error, basic)
-      << "Warning: Contact '" << cntct->name << "' has no service " \
+      << "Warning: Contact '" << cntct->name << "' has no service "
       "notification time period defined!";
     warnings++;
   }
 
   else {
-    timeperiod* temp_timeperiod = find_timeperiod(cntct->service_notification_period);
+    timeperiod* temp_timeperiod
+      = find_timeperiod(cntct->service_notification_period);
     if (temp_timeperiod == NULL) {
       logger(log_verification_error, basic)
         << "Error: Service notification period '"
-        << cntct->service_notification_period << "' specified for contact '"
-        << cntct->name << "' is not defined anywhere!";
+        << cntct->service_notification_period
+        << "' specified for contact '" << cntct->name
+        << "' is not defined anywhere!";
       errors++;
     }
 
@@ -1629,17 +1718,20 @@ int check_contact(contact* cntct, int* w, int* e) {
   /* check host notification timeperiod */
   if (cntct->host_notification_period == NULL) {
     logger(log_verification_error, basic)
-      << "Warning: Contact '" << cntct->name << "' has no host " \
+      << "Warning: Contact '" << cntct->name << "' has no host "
       "notification time period defined!";
     warnings++;
   }
 
   else {
-    timeperiod* temp_timeperiod = find_timeperiod(cntct->host_notification_period);
+    timeperiod* temp_timeperiod
+      = find_timeperiod(cntct->host_notification_period);
     if (temp_timeperiod == NULL) {
       logger(log_verification_error, basic)
-        << "Error: Host notification period '" << cntct->host_notification_period
-        << "' specified for contact '" << cntct->name << "' is not defined anywhere!";
+        << "Error: Host notification period '"
+        << cntct->host_notification_period
+        << "' specified for contact '" << cntct->name
+        << "' is not defined anywhere!";
       errors++;
     }
 
@@ -1653,7 +1745,7 @@ int check_contact(contact* cntct, int* w, int* e) {
       && cntct->notify_on_host_unreachable == FALSE) {
     logger(log_verification_error, basic)
       << "Warning: Host recovery notification option for contact '"
-      << cntct->name << "' doesn't make any sense - specify down " \
+      << cntct->name << "' doesn't make any sense - specify down "
       "and/or unreachable options as well";
     warnings++;
   }
@@ -1664,7 +1756,7 @@ int check_contact(contact* cntct, int* w, int* e) {
       && cntct->notify_on_service_warning == FALSE) {
     logger(log_verification_error, basic)
       << "Warning: Service recovery notification option for contact '"
-      << cntct->name << "' doesn't make any sense - specify critical " \
+      << cntct->name << "' doesn't make any sense - specify critical "
       "and/or warning options as well";
     warnings++;
   }

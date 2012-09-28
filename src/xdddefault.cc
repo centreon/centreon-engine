@@ -55,7 +55,7 @@ int xdddefault_initialize_downtime_data(char const* main_config_file) {
 }
 
 /* removes invalid and old downtime entries from the downtime file */
-int xdddefault_validate_downtime_data(void) {
+int xdddefault_validate_downtime_data() {
   scheduled_downtime* temp_downtime;
   scheduled_downtime* next_downtime;
   int update_file = FALSE;
@@ -75,7 +75,9 @@ int xdddefault_validate_downtime_data(void) {
 
     /* delete downtimes with invalid service descriptions */
     if (temp_downtime->type == SERVICE_DOWNTIME
-        && find_service(temp_downtime->host_name, temp_downtime->service_description) == NULL)
+        && find_service(
+             temp_downtime->host_name,
+             temp_downtime->service_description) == NULL)
       save = FALSE;
 
     /* delete downtimes that have expired */
@@ -130,31 +132,33 @@ int xdddefault_cleanup_downtime_data(char const* main_config_file) {
 /******************************************************************/
 
 /* adds a new scheduled host downtime entry */
-int xdddefault_add_new_host_downtime(char const* host_name,
-				     time_t entry_time,
-                                     char const* author,
-				     char const* comment,
-                                     time_t start_time,
-				     time_t end_time,
-                                     int fixed,
-                                     unsigned long triggered_by,
-                                     unsigned long duration,
-                                     unsigned long* downtime_id) {
+int xdddefault_add_new_host_downtime(
+      char const* host_name,
+      time_t entry_time,
+      char const* author,
+      char const* comment,
+      time_t start_time,
+      time_t end_time,
+      int fixed,
+      unsigned long triggered_by,
+      unsigned long duration,
+      unsigned long* downtime_id) {
   /* find the next valid downtime id */
   while (find_host_downtime(next_downtime_id) != NULL)
     next_downtime_id++;
 
   /* add downtime to list in memory */
-  add_host_downtime(host_name,
-		    entry_time,
-		    author,
-		    comment,
-		    start_time,
-                    end_time,
-		    fixed,
-		    triggered_by,
-		    duration,
-                    next_downtime_id);
+  add_host_downtime(
+    host_name,
+    entry_time,
+    author,
+    comment,
+    start_time,
+    end_time,
+    fixed,
+    triggered_by,
+    duration,
+    next_downtime_id);
 
   /* update downtime file */
   xdddefault_save_downtime_data();
@@ -169,33 +173,35 @@ int xdddefault_add_new_host_downtime(char const* host_name,
 }
 
 /* adds a new scheduled service downtime entry */
-int xdddefault_add_new_service_downtime(char const* host_name,
-                                        char const* service_description,
-                                        time_t entry_time,
-					char const* author,
-                                        char const* comment,
-                                        time_t start_time,
-                                        time_t end_time,
-					int fixed,
-                                        unsigned long triggered_by,
-                                        unsigned long duration,
-                                        unsigned long* downtime_id) {
+int xdddefault_add_new_service_downtime(
+      char const* host_name,
+      char const* service_description,
+      time_t entry_time,
+      char const* author,
+      char const* comment,
+      time_t start_time,
+      time_t end_time,
+      int fixed,
+      unsigned long triggered_by,
+      unsigned long duration,
+      unsigned long* downtime_id) {
   /* find the next valid downtime id */
   while (find_service_downtime(next_downtime_id) != NULL)
     next_downtime_id++;
 
   /* add downtime to list in memory */
-  add_service_downtime(host_name,
-		       service_description,
-		       entry_time,
-                       author,
-		       comment,
-		       start_time,
-		       end_time,
-		       fixed,
-                       triggered_by,
-		       duration,
-		       next_downtime_id);
+  add_service_downtime(
+    host_name,
+    service_description,
+    entry_time,
+    author,
+    comment,
+    start_time,
+    end_time,
+    fixed,
+    triggered_by,
+    duration,
+    next_downtime_id);
 
   /* update downtime file */
   xdddefault_save_downtime_data();
@@ -215,7 +221,7 @@ int xdddefault_add_new_service_downtime(char const* host_name,
 
 /* deletes a scheduled host downtime entry */
 int xdddefault_delete_host_downtime(unsigned long downtime_id) {
-  return ( xdddefault_delete_downtime(HOST_DOWNTIME, downtime_id));
+  return (xdddefault_delete_downtime(HOST_DOWNTIME, downtime_id));
 }
 
 /* deletes a scheduled service downtime entry */
@@ -238,7 +244,7 @@ int xdddefault_delete_downtime(int type, unsigned long downtime_id) {
 /******************************************************************/
 
 /* writes downtime data to file */
-int xdddefault_save_downtime_data(void) {
+int xdddefault_save_downtime_data() {
   /* don't update the status file now (too inefficent), let aggregated status updates do it */
   return (OK);
 }

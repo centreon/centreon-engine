@@ -194,7 +194,7 @@ bool error::is_fatal() const throw () {
  */
 void error::set_fatal(bool fatal) throw () {
   _fatal = fatal;
-  return ;
+  return;
 }
 
 /**
@@ -241,5 +241,5 @@ void error::_insert_with_snprintf(T t, char const* format) {
         t,
         &wc) > 0)
     _current += wc;
-  return ;
+  return;
 }

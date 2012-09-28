@@ -712,6 +712,7 @@ void connector::_send_query_execute(
       << cmdline << '\0'
       << _query_ending();
   _process.write(oss.str());
+  return;
 }
 
 /**
@@ -723,6 +724,7 @@ void connector::_send_query_quit() {
 
   std::string query("4\0", 2);
   _process.write(query + _query_ending());
+  return;
 }
 
 /**
@@ -734,6 +736,7 @@ void connector::_send_query_version() {
 
   std::string query("0\0", 2);
   _process.write(query + _query_ending());
+  return;
 }
 
 /**
@@ -741,19 +744,24 @@ void connector::_send_query_version() {
  *
  *  @param[in] c  The connector to restart.
  */
-connector::restart::restart(connector* c) : _c(c) {}
+connector::restart::restart(connector* c)
+  : _c(c) {
+
+}
 
 /**
  *  Destructor.
  */
-connector::restart::~restart() throw () {}
+connector::restart::~restart() throw () {
+
+}
 
 /**
  *  Clear thread.
  */
 void connector::restart::clear() {
   wait();
-  return ;
+  return;
 }
 
 /**
@@ -762,7 +770,7 @@ void connector::restart::clear() {
 void connector::restart::_run() {
   // Check viability.
   if (!_c)
-    return ;
+    return;
 
   concurrency::locker lock(&_c->_lock);
   try {

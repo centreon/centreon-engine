@@ -42,34 +42,37 @@ static void _schedule(service* svc);
  *
  *  @see com::centreon::engine::objects::link
  */
-bool link_service(service* obj,
-                  contact** contacts,
-                  contactgroup** contactgroups,
-                  servicegroup** servicegroups,
-                  char** custom_variables,
-                  int initial_state,
-                  timeperiod* check_period,
-                  timeperiod* notification_period,
-                  command* cmd_event_handler,
-                  command* cmd_check_command) {
+bool link_service(
+       service* obj,
+       contact** contacts,
+       contactgroup** contactgroups,
+       servicegroup** servicegroups,
+       char** custom_variables,
+       int initial_state,
+       timeperiod* check_period,
+       timeperiod* notification_period,
+       command* cmd_event_handler,
+       command* cmd_check_command) {
   try {
-    objects::link(obj,
-                  tab2vec(contacts),
-                  tab2vec(contactgroups),
-                  tab2vec(servicegroups),
-                  tab2vec(custom_variables),
-                  initial_state,
-                  check_period,
-                  notification_period,
-                  cmd_event_handler,
-                  cmd_check_command);
+    objects::link(
+      obj,
+      tab2vec(contacts),
+      tab2vec(contactgroups),
+      tab2vec(servicegroups),
+      tab2vec(custom_variables),
+      initial_state,
+      check_period,
+      notification_period,
+      cmd_event_handler,
+      cmd_check_command);
   }
   catch (std::exception const& e) {
     logger(log_runtime_error, basic) << e.what();
     return (false);
   }
   catch (...) {
-    logger(log_runtime_error, basic) << __func__ << " unknow exception";
+    logger(log_runtime_error, basic)
+      << __func__ << " unknow exception";
     return (false);
   }
   return (true);
@@ -88,8 +91,10 @@ void release_service(service const* obj) {
     logger(log_runtime_error, basic) << e.what();
   }
   catch (...) {
-    logger(log_runtime_error, basic) << __func__ << " unknow exception";
+    logger(log_runtime_error, basic)
+      << __func__ << " unknow exception";
   }
+  return;
 }
 
 /**
@@ -107,16 +112,17 @@ void release_service(service const* obj) {
  *  @param[in]     cmd_event_handler   Set service event handler command.
  *  @param[in]     cmd_check_command   Set service check command.
  */
-void objects::link(service* obj,
-                   std::vector<contact*> const& contacts,
-                   std::vector<contactgroup*> const& contactgroups,
-                   std::vector<servicegroup*> const& servicegroups,
-                   std::vector<std::string> const& custom_variables,
-                   int initial_state,
-                   timeperiod* check_period,
-                   timeperiod* notification_period,
-                   command* cmd_event_handler,
-                   command* cmd_check_command) {
+void objects::link(
+       service* obj,
+       std::vector<contact*> const& contacts,
+       std::vector<contactgroup*> const& contactgroups,
+       std::vector<servicegroup*> const& servicegroups,
+       std::vector<std::string> const& custom_variables,
+       int initial_state,
+       timeperiod* check_period,
+       timeperiod* notification_period,
+       command* cmd_event_handler,
+       command* cmd_check_command) {
   // check object contents.
   if (obj == NULL)
     throw (engine_error() << "service is a NULL pointer.");
@@ -149,8 +155,9 @@ void objects::link(service* obj,
   // update command pointer.
   obj->check_command_ptr = cmd_check_command;
 
-  if (add_custom_variables_to_object(custom_variables,
-                                     &obj->custom_variables) == false)
+  if (add_custom_variables_to_object(
+       custom_variables,
+       &obj->custom_variables) == false)
     throw (engine_error() << "service '" << obj->host_name << ", "
 	   << obj->description << "' invalid custom variable.");
 
@@ -158,12 +165,14 @@ void objects::link(service* obj,
     throw (engine_error() << "service '" << obj->host_name << ", "
 	   << obj->description << "' invalid contact.");
 
-  if (add_contactgroups_to_object(contactgroups, &obj->contact_groups) == false)
+  if (add_contactgroups_to_object(
+        contactgroups,
+        &obj->contact_groups) == false)
     throw (engine_error() << "service '" << obj->host_name << ", "
 	   << obj->description << "' invalid contact groups.");
 
-  for (std::vector<servicegroup*>::const_iterator it = servicegroups.begin(),
-         end = servicegroups.end();
+  for (std::vector<servicegroup*>::const_iterator
+         it = servicegroups.begin(), end = servicegroups.end();
        it != end;
        ++it) {
     if (*it == NULL)
@@ -176,9 +185,11 @@ void objects::link(service* obj,
   add_service_link_to_host(obj->host_ptr, obj);
 
   ++obj->host_ptr->total_services;
-  obj->host_ptr->total_service_check_interval += static_cast<unsigned long>(obj->check_interval);
+  obj->host_ptr->total_service_check_interval
+    += static_cast<unsigned long>(obj->check_interval);
 
   _schedule(obj);
+  return;
 }
 
 /**
@@ -251,10 +262,12 @@ void objects::release(service const* obj) {
   // notification_period_ptr not free.
 
   delete obj;
+  return;
 }
 
 static void _update_schedule_info(service const* svc) {
-  logger(dbg_events, most) << "Determining service scheduling parameters.";
+  logger(dbg_events, most)
+    << "Determining service scheduling parameters.";
 
   if (svc == NULL)
     return;
@@ -295,15 +308,16 @@ static void _update_schedule_info(service const* svc) {
   if (config->get_service_inter_check_delay_method() == configuration::state::icd_smart
       && scheduling_info.service_check_interval_total > 0) {
 
-    scheduling_info.average_service_inter_check_delay =
-      (double)scheduling_info.average_service_check_interval
+    scheduling_info.average_service_inter_check_delay
+      = (double)scheduling_info.average_service_check_interval
       / (double)scheduling_info.total_scheduled_services;
 
-    scheduling_info.service_inter_check_delay = scheduling_info.average_service_inter_check_delay;
+    scheduling_info.service_inter_check_delay
+      = scheduling_info.average_service_inter_check_delay;
 
     // calculate max inter check delay and see if we should use that instead.
-    double max_inter_check_delay =
-      (double)(scheduling_info.max_service_check_spread * 60.0)
+    double max_inter_check_delay
+      = (double)(scheduling_info.max_service_check_spread * 60.0)
       / (double)scheduling_info.total_scheduled_services;
     if (scheduling_info.service_inter_check_delay > max_inter_check_delay)
       scheduling_info.service_inter_check_delay = max_inter_check_delay;
@@ -319,8 +333,8 @@ static void _update_schedule_info(service const* svc) {
 
   // we determine the service interleave factor.
   if (config->get_service_interleave_factor_method() == configuration::state::ilf_smart) {
-    scheduling_info.service_interleave_factor =
-      (int)(ceil(scheduling_info.average_scheduled_services_per_host));
+    scheduling_info.service_interleave_factor
+      = (int)(ceil(scheduling_info.average_scheduled_services_per_host));
 
     logger(dbg_events, most)
       << "Total scheduled service checks: " << scheduling_info.total_scheduled_services << "\n"
@@ -332,26 +346,31 @@ static void _update_schedule_info(service const* svc) {
     << "Total scheduled services:        " << scheduling_info.total_scheduled_services << "\n"
     << "Service Interleave factor:       " << scheduling_info.service_interleave_factor << "\n"
     << "Service inter-check delay:       " << scheduling_info.service_inter_check_delay;
+  return;
 }
 
 static void _schedule(service* svc) {
   if (svc == NULL) {
-    logger(dbg_events, most) << "Scheduling service. Service pointer is NULL.";
+    logger(dbg_events, most)
+      << "Scheduling service. Service pointer is NULL.";
     return;
   }
 
   logger(dbg_events, most)
-    << "Scheduling Service '" << svc->description << "' on host '" << svc->host_name << "'.";
+    << "Scheduling Service '" << svc->description
+    << "' on host '" << svc->host_name << "'.";
 
   // skip serivce that shouldn't be scheduled.
   if (svc->should_be_scheduled == false) {
-    logger(dbg_events, most) << "Service check should not be scheduled.";
+    logger(dbg_events, most)
+      << "Service check should not be scheduled.";
     return;
   }
 
   // skip service are already scheduled.
   if (svc->next_check != 0) {
-    logger(dbg_events, most) << "Service is already scheduled.";
+    logger(dbg_events, most)
+      << "Service is already scheduled.";
     return;
   }
 
@@ -359,17 +378,24 @@ static void _schedule(service* svc) {
   svc->next_check = time(NULL);
 
   logger(dbg_events, most)
-    << "Preferred Check Time: " << svc->next_check << " --> " << ctime(&svc->next_check);
+    << "Preferred Check Time: " << svc->next_check
+    << " --> " << ctime(&svc->next_check);
 
   // check if current time is ok.
-  if (check_time_against_period(svc->next_check, svc->check_period_ptr) == ERROR) {
+  if (check_time_against_period(
+        svc->next_check,
+        svc->check_period_ptr) == ERROR) {
     time_t valid_time = 0L;
-    get_next_valid_time(svc->next_check, &valid_time, svc->check_period_ptr);
+    get_next_valid_time(
+      svc->next_check,
+      &valid_time,
+      svc->check_period_ptr);
     svc->next_check = valid_time;
   }
 
   logger(dbg_events, most)
-    << "Actual Check Time: " << svc->next_check << " --> " << ctime(&svc->next_check);
+    << "Actual Check Time: " << svc->next_check
+    << " --> " << ctime(&svc->next_check);
 
   // update scheduling info.
   _update_schedule_info(svc);
@@ -385,14 +411,16 @@ static void _schedule(service* svc) {
     return;
 
   // add scheduled service checks to event queue.
-  schedule_new_event(EVENT_SERVICE_CHECK,
-                     false,
-                     svc->next_check,
-                     false,
-                     0,
-                     NULL,
-                     true,
-                     (void*)svc,
-                     NULL,
-                     svc->check_options);
+  schedule_new_event(
+    EVENT_SERVICE_CHECK,
+    false,
+    svc->next_check,
+    false,
+    0,
+    NULL,
+    true,
+    (void*)svc,
+    NULL,
+    svc->check_options);
+  return;
 }

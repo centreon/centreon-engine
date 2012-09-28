@@ -48,18 +48,20 @@ int save_state_information(int autosave) {
     return (OK);
 
   /* send data to event broker */
-  broker_retention_data(NEBTYPE_RETENTIONDATA_STARTSAVE,
-			NEBFLAG_NONE,
-                        NEBATTR_NONE,
-			NULL);
+  broker_retention_data(
+    NEBTYPE_RETENTIONDATA_STARTSAVE,
+    NEBFLAG_NONE,
+    NEBATTR_NONE,
+    NULL);
 
   result = xrddefault_save_state_information();
 
   /* send data to event broker */
-  broker_retention_data(NEBTYPE_RETENTIONDATA_ENDSAVE,
-			NEBFLAG_NONE,
-                        NEBATTR_NONE,
-			NULL);
+  broker_retention_data(
+    NEBTYPE_RETENTIONDATA_ENDSAVE,
+    NEBFLAG_NONE,
+    NEBATTR_NONE,
+    NULL);
 
   if (result == ERROR)
     return (ERROR);
@@ -72,25 +74,27 @@ int save_state_information(int autosave) {
 }
 
 /* reads in initial host and state information */
-int read_initial_state_information(void) {
+int read_initial_state_information() {
   int result = OK;
 
   if (config->get_retain_state_information() == false)
     return (OK);
 
   /* send data to event broker */
-  broker_retention_data(NEBTYPE_RETENTIONDATA_STARTLOAD,
-			NEBFLAG_NONE,
-                        NEBATTR_NONE,
-			NULL);
+  broker_retention_data(
+    NEBTYPE_RETENTIONDATA_STARTLOAD,
+    NEBFLAG_NONE,
+    NEBATTR_NONE,
+    NULL);
 
   result = xrddefault_read_state_information();
 
   /* send data to event broker */
-  broker_retention_data(NEBTYPE_RETENTIONDATA_ENDLOAD,
-			NEBFLAG_NONE,
-                        NEBATTR_NONE,
-			NULL);
+  broker_retention_data(
+    NEBTYPE_RETENTIONDATA_ENDLOAD,
+    NEBFLAG_NONE,
+    NEBATTR_NONE,
+    NULL);
 
   if (result == ERROR)
     return (ERROR);

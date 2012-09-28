@@ -36,22 +36,25 @@ using namespace com::centreon::engine::objects::utils;
  *
  *  @see com::centreon::engine::objects::link
  */
-bool link_hostescalation(hostescalation* obj,
-                         contact** contacts,
-                         contactgroup** contactgroups,
-                         timeperiod* escalation_period) {
+bool link_hostescalation(
+       hostescalation* obj,
+       contact** contacts,
+       contactgroup** contactgroups,
+       timeperiod* escalation_period) {
   try {
-    objects::link(obj,
-                  tab2vec(contacts),
-                  tab2vec(contactgroups),
-                  escalation_period);
+    objects::link(
+               obj,
+               tab2vec(contacts),
+               tab2vec(contactgroups),
+               escalation_period);
   }
   catch (std::exception const& e) {
     logger(log_runtime_error, basic) << e.what();
     return (false);
   }
   catch (...) {
-    logger(log_runtime_error, basic) << __func__ << " unknow exception";
+    logger(log_runtime_error, basic)
+      << __func__ << " unknow exception";
     return (false);
   }
   return (true);
@@ -70,8 +73,10 @@ void release_hostescalation(hostescalation const* obj) {
     logger(log_runtime_error, basic) << e.what();
   }
   catch (...) {
-    logger(log_runtime_error, basic) << __func__ << " unknow exception";
+    logger(log_runtime_error, basic)
+      << __func__ << " unknow exception";
   }
+  return;
 }
 
 /**
@@ -83,10 +88,11 @@ void release_hostescalation(hostescalation const* obj) {
  *  @param[in]     contactgroups     Set host contactgroups.
  *  @param[in]     escalation_period Set host escalation period.
  */
-void objects::link(hostescalation* obj,
-                   std::vector<contact*> const& contacts,
-                   std::vector<contactgroup*> const& contactgroups,
-                   timeperiod* escalation_period) {
+void objects::link(
+                hostescalation* obj,
+                std::vector<contact*> const& contacts,
+                std::vector<contactgroup*> const& contactgroups,
+                timeperiod* escalation_period) {
   // check object contents.
   if (obj == NULL)
     throw (engine_error() << "hostescalation is a NULL pointer.");
@@ -99,15 +105,24 @@ void objects::link(hostescalation* obj,
            << "' no contact or no contact groups are defined.");
 
   if ((obj->host_ptr = find_host(obj->host_name)) == NULL)
-    throw (engine_error() << "hostescalation '" << obj->host_name << "' invalid host.");
+    throw (engine_error()
+           << "hostescalation '" << obj->host_name
+           << "' invalid host.");
 
-  if (add_contactgroups_to_object(contactgroups, &obj->contact_groups) == false)
-    throw (engine_error() << "hostescalation '" << obj->host_name << "' invalid contactgroups.");
+  if (add_contactgroups_to_object(
+        contactgroups,
+        &obj->contact_groups) == false)
+    throw (engine_error()
+           << "hostescalation '" << obj->host_name
+           << "' invalid contactgroups.");
 
   if (add_contacts_to_object(contacts, &obj->contacts) == false)
-    throw (engine_error() << "hostescalation '" << obj->host_name << "' invalid contacts.");
+    throw (engine_error()
+           << "hostescalation '" << obj->host_name
+           << "' invalid contacts.");
 
   obj->escalation_period_ptr = escalation_period;
+  return;
 }
 
 /**
@@ -126,7 +141,10 @@ void objects::release(hostescalation const* obj) {
   while ((cntctmember = release(cntctmember)));
 
   skiplist_delete(object_skiplists[HOSTESCALATION_SKIPLIST], obj);
-  remove_object_list(obj, &hostescalation_list, &hostescalation_list_tail);
+  remove_object_list(
+    obj,
+    &hostescalation_list,
+    &hostescalation_list_tail);
 
   // host_ptr not free.
   // escalation_period_ptr not free.
@@ -134,4 +152,5 @@ void objects::release(hostescalation const* obj) {
   delete[] obj->host_name;
   delete[] obj->escalation_period;
   delete obj;
+  return;
 }

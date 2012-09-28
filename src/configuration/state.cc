@@ -130,12 +130,13 @@ void state::parse(std::string const& filename) {
   tzset();
 
   // adjust tweaks
-  if(_tab_int[free_child_process_memory] == -1) {
+  if (_tab_int[free_child_process_memory] == -1) {
     _tab_int[free_child_process_memory] = !_tab_bool[use_large_installation_tweaks];
   }
 
   delete[] _mac->x[MACRO_MAINCONFIGFILE];
   _mac->x[MACRO_MAINCONFIGFILE] = my_strdup(_filename.c_str());
+  return;
 }
 
 /**
@@ -1008,6 +1009,7 @@ void state::set_log_file(std::string const& value) {
 
   delete[] ::log_file;
   ::log_file = my_strdup(_mac->x[MACRO_LOGFILE]);
+  return;
 }
 
 /**
@@ -1016,8 +1018,8 @@ void state::set_log_file(std::string const& value) {
  */
 void state::set_broker_module_directory(std::string const& value) {
   _tab_string[broker_module_directory] = value;
+  return;
 }
-
 
 /**
  *  Set the debug filename.
@@ -1028,6 +1030,7 @@ void state::set_debug_file(std::string const& value) {
 
   delete[] ::debug_file;
   ::debug_file = my_strdup(value.c_str());
+  return;
 }
 
 /**
@@ -1042,6 +1045,7 @@ void state::set_command_file(std::string const& value) {
 
   delete[] ::command_file;
   ::command_file = my_strdup(_mac->x[MACRO_COMMANDFILE]);
+  return;
 }
 
 /**
@@ -1050,7 +1054,9 @@ void state::set_command_file(std::string const& value) {
  */
 void state::set_temp_file(std::string const& value) {
   (void)value;
-  logger(log_config_warning, basic) << "warning: temp_file variable ignored";
+  logger(log_config_warning, basic)
+    << "warning: temp_file variable ignored";
+  return;
 }
 
 /**
@@ -1059,7 +1065,9 @@ void state::set_temp_file(std::string const& value) {
  */
 void state::set_temp_path(std::string const& value) {
   (void)value;
-  logger(log_config_warning, basic) << "warning: temp_path variable ignored";
+  logger(log_config_warning, basic)
+    << "warning: temp_path variable ignored";
+  return;
 }
 
 /**
@@ -1068,7 +1076,9 @@ void state::set_temp_path(std::string const& value) {
  */
 void state::set_check_result_path(std::string const& value) {
   (void)value;
-  logger(log_config_warning, basic) << "warning: check_result_path variable ignored";
+  logger(log_config_warning, basic)
+    << "warning: check_result_path variable ignored";
+  return;
 }
 
 /**
@@ -1080,6 +1090,7 @@ void state::set_global_host_event_handler(std::string const& value) {
 
   delete[] ::global_host_event_handler;
   ::global_host_event_handler = my_strdup(value.c_str());
+  return;
 }
 
 /**
@@ -1091,6 +1102,7 @@ void state::set_global_service_event_handler(std::string const& value) {
 
   delete[] ::global_service_event_handler;
   ::global_service_event_handler = my_strdup(value.c_str());
+  return;
 }
 
 /**
@@ -1102,6 +1114,7 @@ void state::set_ocsp_command(std::string const& value) {
 
   delete[] ::ocsp_command;
   ::ocsp_command = my_strdup(value.c_str());
+  return;
 }
 
 /**
@@ -1113,6 +1126,7 @@ void state::set_ochp_command(std::string const& value) {
 
   delete[] ::ochp_command;
   ::ochp_command = my_strdup(value.c_str());
+  return;
 }
 
 /**
@@ -1123,6 +1137,7 @@ void state::set_log_archive_path(std::string const& value) {
   (void)value;
   logger(log_config_warning, basic)
     << "warning: log_archive_path variable ignored";
+  return;
 }
 
 /**
@@ -1133,6 +1148,7 @@ void state::set_p1_file(std::string const& value) {
   (void)value;
   logger(log_config_warning, basic)
     << "warning: p1_file variable ignored";
+  return;
 }
 
 /**
@@ -1144,6 +1160,7 @@ void state::set_illegal_object_chars(std::string const& value) {
 
   delete[] ::illegal_object_chars;
   ::illegal_object_chars = my_strdup(value.c_str());
+  return;
 }
 
 /**
@@ -1155,6 +1172,7 @@ void state::set_illegal_output_chars(std::string const& value) {
 
   delete[] ::illegal_output_chars;
   ::illegal_output_chars = my_strdup(value.c_str());
+  return;
 }
 
 /**
@@ -1166,6 +1184,7 @@ void state::set_use_timezone(std::string const& value) {
 
   delete[] ::use_timezone;
   ::use_timezone = my_strdup(value.c_str());
+  return;
 }
 
 /**
@@ -1175,6 +1194,7 @@ void state::set_use_timezone(std::string const& value) {
 void state::set_additional_freshness_latency(int value) {
   _tab_int[additional_freshness_latency] = value;
   ::additional_freshness_latency = value;
+  return;
 }
 
 /**
@@ -1189,6 +1209,7 @@ void state::set_debug_level(unsigned long value) {
     _tab_ulong[debug_level] = value;
   }
   ::debug_level = _tab_ulong[debug_level];
+  return;
 }
 
 /**
@@ -1203,6 +1224,7 @@ void state::set_debug_verbosity(unsigned int value) {
     _tab_uint[debug_verbosity] = value;
   }
   ::debug_verbosity = _tab_uint[debug_verbosity];
+  return;
 }
 
 /**
@@ -1223,6 +1245,7 @@ void state::set_command_check_interval(int value) {
       _tab_int[command_check_interval] != -1) {
     _tab_int[command_check_interval] *= _tab_uint[interval_length];
   }
+  return;
 }
 
 /**
@@ -1234,6 +1257,7 @@ void state::set_command_check_interval(int value) {
 void state::set_command_check_interval(int value, bool is_second) {
   _command_check_interval_is_seconds = is_second;
   set_command_check_interval(value);
+  return;
 }
 
 /**
@@ -1253,6 +1277,7 @@ void state::set_command_check_interval(std::string const& value) {
   }
 
   cpp_suck<int, &state::set_command_check_interval>::set_generic(val.c_str(), *this);
+  return;
 }
 
 /**
@@ -1262,6 +1287,7 @@ void state::set_command_check_interval(std::string const& value) {
 void state::set_external_command_buffer_slots(int value) {
   _tab_int[external_command_buffer_slots] = value;
   ::external_command_buffer_slots = value;
+  return;
 }
 
 /**
@@ -1274,6 +1300,7 @@ void state::set_max_service_check_spread(unsigned int value) {
   }
   _tab_uint[max_service_check_spread] = value;
   ::max_service_check_spread = value;
+  return;
 }
 
 /**
@@ -1286,6 +1313,7 @@ void state::set_max_host_check_spread(unsigned int value) {
   }
   _tab_uint[max_host_check_spread] = value;
   ::max_host_check_spread = value;
+  return;
 }
 
 /**
@@ -1295,6 +1323,7 @@ void state::set_max_host_check_spread(unsigned int value) {
 void state::set_max_parallel_service_checks(unsigned int value) {
   _tab_uint[max_parallel_service_checks] = value;
   ::max_parallel_service_checks = value;
+  return;
 }
 
 /**
@@ -1307,6 +1336,7 @@ void state::set_check_reaper_interval(unsigned int value) {
   }
   _tab_uint[check_reaper_interval] = value;
   ::check_reaper_interval = value;
+  return;
 }
 
 /**
@@ -1319,6 +1349,7 @@ void state::set_max_check_reaper_time(unsigned int value) {
   }
   _tab_uint[max_check_reaper_time] = value;
   ::max_check_reaper_time = value;
+  return;
 }
 
 /**
@@ -1340,6 +1371,7 @@ void state::set_interval_length(unsigned int value) {
     _tab_uint[interval_length] = value;
   }
   ::interval_length = value;
+  return;
 }
 
 /**
@@ -1348,10 +1380,12 @@ void state::set_interval_length(unsigned int value) {
  */
 void state::set_service_freshness_check_interval(unsigned int value) {
   if (value == 0) {
-    throw (engine_error() << "service_freshness_check_interval: invalid value");
+    throw (engine_error()
+           << "service_freshness_check_interval: invalid value");
   }
   _tab_uint[service_freshness_check_interval] = value;
   ::service_freshness_check_interval = value;
+  return;
 }
 
 /**
@@ -1360,10 +1394,12 @@ void state::set_service_freshness_check_interval(unsigned int value) {
  */
 void state::set_host_freshness_check_interval(unsigned int value) {
   if (value == 0) {
-    throw (engine_error() << "host_freshness_check_interval: invalid value");
+    throw (engine_error()
+           << "host_freshness_check_interval: invalid value");
   }
   _tab_uint[host_freshness_check_interval] = value;
   ::host_freshness_check_interval = value;
+  return;
 }
 
 /**
@@ -1372,10 +1408,12 @@ void state::set_host_freshness_check_interval(unsigned int value) {
  */
 void state::set_auto_rescheduling_interval(unsigned int value) {
   if (value == 0) {
-    throw (engine_error() << "auto_rescheduling_interval: invalid value");
+    throw (engine_error()
+           << "auto_rescheduling_interval: invalid value");
   }
   _tab_uint[auto_rescheduling_interval] = value;
   ::auto_rescheduling_interval = value;
+  return;
 }
 
 /**
@@ -1384,10 +1422,12 @@ void state::set_auto_rescheduling_interval(unsigned int value) {
  */
 void state::set_auto_rescheduling_window(unsigned int value) {
   if (value == 0) {
-    throw (engine_error() << "auto_rescheduling_window: invalid value");
+    throw (engine_error()
+           << "auto_rescheduling_window: invalid value");
   }
   _tab_uint[auto_rescheduling_window] = value;
   ::auto_rescheduling_window = value;
+  return;
 }
 
 /**
@@ -1396,10 +1436,12 @@ void state::set_auto_rescheduling_window(unsigned int value) {
  */
 void state::set_status_update_interval(unsigned int value) {
   if (value < 2) {
-    throw (engine_error() << "status_update_interval: invalid value");
+    throw (engine_error()
+           << "status_update_interval: invalid value");
   }
   _tab_uint[status_update_interval] = value;
   ::status_update_interval = value;
+  return;
 }
 
 /**
@@ -1408,10 +1450,12 @@ void state::set_status_update_interval(unsigned int value) {
  */
 void state::set_time_change_threshold(unsigned int value) {
   if (value < 6) {
-    throw (engine_error() << "time_change_threshold: invalid value");
+    throw (engine_error()
+           << "time_change_threshold: invalid value");
   }
   _tab_uint[time_change_threshold] = value;
   ::time_change_threshold = value;
+  return;
 }
 
 /**
@@ -1420,10 +1464,12 @@ void state::set_time_change_threshold(unsigned int value) {
  */
 void state::set_retention_update_interval(unsigned int value) {
   if (value == 0) {
-    throw (engine_error() << "retention_update_interval: invalid value");
+    throw (engine_error()
+           << "retention_update_interval: invalid value");
   }
   _tab_uint[retention_update_interval] = value;
   ::retention_update_interval = value;
+  return;
 }
 
 /**
@@ -1432,10 +1478,12 @@ void state::set_retention_update_interval(unsigned int value) {
  */
 void state::set_retention_scheduling_horizon(unsigned int value) {
   if (value == 0) {
-    throw (engine_error() << "retention_scheduling_horizon: invalid value");
+    throw (engine_error()
+           << "retention_scheduling_horizon: invalid value");
   }
   _tab_uint[retention_scheduling_horizon] = value;
   ::retention_scheduling_horizon = value;
+  return;
 }
 
 /**
@@ -1444,10 +1492,12 @@ void state::set_retention_scheduling_horizon(unsigned int value) {
  */
 void state::set_service_check_timeout(unsigned int value) {
   if (value == 0) {
-    throw (engine_error() << "service_check_timeout: invalid value");
+    throw (engine_error()
+           << "service_check_timeout: invalid value");
   }
   _tab_uint[service_check_timeout] = value;
   ::service_check_timeout = value;
+  return;
 }
 
 /**
@@ -1456,10 +1506,12 @@ void state::set_service_check_timeout(unsigned int value) {
  */
 void state::set_host_check_timeout(unsigned int value) {
   if (value == 0) {
-    throw (engine_error() << "host_check_timeout: invalid value");
+    throw (engine_error()
+           << "host_check_timeout: invalid value");
   }
   _tab_uint[host_check_timeout] = value;
   ::host_check_timeout = value;
+  return;
 }
 
 /**
@@ -1468,10 +1520,12 @@ void state::set_host_check_timeout(unsigned int value) {
  */
 void state::set_event_handler_timeout(unsigned int value) {
   if (value == 0) {
-    throw (engine_error() << "event_handler_timeout: invalid value");
+    throw (engine_error()
+           << "event_handler_timeout: invalid value");
   }
   _tab_uint[event_handler_timeout] = value;
   ::event_handler_timeout = value;
+  return;
 }
 
 /**
@@ -1480,10 +1534,12 @@ void state::set_event_handler_timeout(unsigned int value) {
  */
 void state::set_notification_timeout(unsigned int value) {
   if (value == 0) {
-    throw (engine_error() << "notification_timeout: invalid value");
+    throw (engine_error()
+           << "notification_timeout: invalid value");
   }
   _tab_uint[notification_timeout] = value;
   ::notification_timeout = value;
+  return;
 }
 
 /**
@@ -1492,10 +1548,12 @@ void state::set_notification_timeout(unsigned int value) {
  */
 void state::set_ocsp_timeout(unsigned int value) {
   if (value == 0) {
-    throw (engine_error() << "ocsp_timeout: invalid value");
+    throw (engine_error()
+           << "ocsp_timeout: invalid value");
   }
   _tab_uint[ocsp_timeout] = value;
   ::ocsp_timeout = value;
+  return;
 }
 
 /**
@@ -1504,10 +1562,12 @@ void state::set_ocsp_timeout(unsigned int value) {
  */
 void state::set_ochp_timeout(unsigned int value) {
   if (value == 0) {
-    throw (engine_error() << "ochp_timeout: invalid value");
+    throw (engine_error()
+           << "ochp_timeout: invalid value");
   }
   _tab_uint[ochp_timeout] = value;
   ::ochp_timeout = value;
+  return;
 }
 
 /**
@@ -1517,6 +1577,7 @@ void state::set_ochp_timeout(unsigned int value) {
 void state::set_max_debug_file_size(unsigned long value) {
   _tab_ulong[max_debug_file_size] = value;
   ::max_debug_file_size = value;
+  return;
 }
 
 /**
@@ -1525,6 +1586,7 @@ void state::set_max_debug_file_size(unsigned long value) {
  */
 void state::set_max_log_file_size(unsigned long value) {
   _tab_ulong[max_log_file_size] = value;
+  return;
 }
 
 /**
@@ -1535,6 +1597,7 @@ void state::set_max_check_result_file_age(unsigned long value) {
   (void)value;
   logger(log_config_warning, basic)
     << "warning: max_check_result_file_age variable ignored";
+  return;
 }
 
 /**
@@ -1544,6 +1607,7 @@ void state::set_max_check_result_file_age(unsigned long value) {
 void state::set_retained_host_attribute_mask(unsigned long value) {
   _tab_ulong[retained_host_attribute_mask] = value;
   ::retained_host_attribute_mask = value;
+  return;
 }
 
 /**
@@ -1552,8 +1616,8 @@ void state::set_retained_host_attribute_mask(unsigned long value) {
  */
 void state::set_retained_process_host_attribute_mask(unsigned long value) {
   _tab_ulong[retained_process_host_attribute_mask] = value;
-
   ::retained_process_host_attribute_mask = value;
+  return;
 }
 
 /**
@@ -1563,6 +1627,7 @@ void state::set_retained_process_host_attribute_mask(unsigned long value) {
 void state::set_retained_contact_host_attribute_mask(unsigned long value) {
   _tab_ulong[retained_contact_host_attribute_mask] = value;
   ::retained_contact_host_attribute_mask = value;
+  return;
 }
 
 /**
@@ -1572,6 +1637,7 @@ void state::set_retained_contact_host_attribute_mask(unsigned long value) {
 void state::set_retained_contact_service_attribute_mask(unsigned long value) {
   _tab_ulong[retained_contact_service_attribute_mask] = value;
   ::retained_contact_service_attribute_mask = value;
+  return;
 }
 
 /**
@@ -1581,6 +1647,7 @@ void state::set_retained_contact_service_attribute_mask(unsigned long value) {
 void state::set_cached_host_check_horizon(unsigned long value) {
   _tab_ulong[cached_host_check_horizon] = value;
   ::cached_host_check_horizon = value;
+  return;
 }
 
 /**
@@ -1590,6 +1657,7 @@ void state::set_cached_host_check_horizon(unsigned long value) {
 void state::set_cached_service_check_horizon(unsigned long value) {
   _tab_ulong[cached_service_check_horizon] = value;
   ::cached_service_check_horizon = value;
+  return;
 }
 
 /**
@@ -1599,6 +1667,7 @@ void state::set_cached_service_check_horizon(unsigned long value) {
 void state::set_event_broker_options(unsigned long value) {
   _tab_ulong[event_broker_options] = value;
   ::event_broker_options = value;
+  return;
 }
 
 /**
@@ -1612,6 +1681,7 @@ void state::set_event_broker_options(std::string const& value) {
   }
   else
     cpp_suck<unsigned long, &state::set_event_broker_options>::set_generic(value, *this);
+  return;
 }
 
 /**
@@ -1621,6 +1691,7 @@ void state::set_event_broker_options(std::string const& value) {
 void state::set_use_syslog(bool value) {
   _tab_bool[use_syslog] = value;
   ::use_syslog = value;
+  return;
 }
 
 /**
@@ -1630,6 +1701,7 @@ void state::set_use_syslog(bool value) {
 void state::set_log_notifications(bool value) {
   _tab_bool[log_notifications] = value;
   ::log_notifications = value;
+  return;
 }
 
 /**
@@ -1639,6 +1711,7 @@ void state::set_log_notifications(bool value) {
 void state::set_log_service_retries(bool value) {
   _tab_bool[log_service_retries] = value;
   ::log_service_retries = value;
+  return;
 }
 
 /**
@@ -1648,6 +1721,7 @@ void state::set_log_service_retries(bool value) {
 void state::set_log_host_retries(bool value) {
   _tab_bool[log_host_retries] = value;
   ::log_host_retries = value;
+  return;
 }
 
 /**
@@ -1657,6 +1731,7 @@ void state::set_log_host_retries(bool value) {
 void state::set_log_event_handlers(bool value) {
   _tab_bool[log_event_handlers] = value;
   ::log_event_handlers = value;
+  return;
 }
 
 /**
@@ -1666,6 +1741,7 @@ void state::set_log_event_handlers(bool value) {
 void state::set_log_external_commands(bool value) {
   _tab_bool[log_external_commands] = value;
   ::log_external_commands = value;
+  return;
 }
 
 /**
@@ -1675,6 +1751,7 @@ void state::set_log_external_commands(bool value) {
 void state::set_log_passive_checks(bool value) {
   _tab_bool[log_passive_checks] = value;
   ::log_passive_checks = value;
+  return;
 }
 
 /**
@@ -1684,6 +1761,7 @@ void state::set_log_passive_checks(bool value) {
 void state::set_log_initial_state(bool value) {
   _tab_bool[log_initial_state] = value;
   ::log_initial_states = value;
+  return;
 }
 
 /**
@@ -1693,6 +1771,7 @@ void state::set_log_initial_state(bool value) {
 void state::set_retain_state_information(bool value) {
   _tab_bool[retain_state_information] = value;
   ::retain_state_information = value;
+  return;
 }
 
 /**
@@ -1702,6 +1781,7 @@ void state::set_retain_state_information(bool value) {
 void state::set_use_retained_program_state(bool value) {
   _tab_bool[use_retained_program_state] = value;
   ::use_retained_program_state = value;
+  return;
 }
 
 /**
@@ -1711,6 +1791,7 @@ void state::set_use_retained_program_state(bool value) {
 void state::set_use_retained_scheduling_info(bool value) {
   _tab_bool[use_retained_scheduling_info] = value;
   ::use_retained_scheduling_info = value;
+  return;
 }
 
 /**
@@ -1720,6 +1801,7 @@ void state::set_use_retained_scheduling_info(bool value) {
 void state::set_obsess_over_services(bool value) {
   _tab_bool[obsess_over_services] = value;
   ::obsess_over_services = value;
+  return;
 }
 
 /**
@@ -1729,6 +1811,7 @@ void state::set_obsess_over_services(bool value) {
 void state::set_obsess_over_hosts(bool value) {
   _tab_bool[obsess_over_hosts] = value;
   ::obsess_over_hosts = value;
+  return;
 }
 
 /**
@@ -1738,6 +1821,7 @@ void state::set_obsess_over_hosts(bool value) {
 void state::set_translate_passive_host_checks(bool value) {
   _tab_bool[translate_passive_host_checks] = value;
   ::translate_passive_host_checks = value;
+  return;
 }
 
 /**
@@ -1747,6 +1831,7 @@ void state::set_translate_passive_host_checks(bool value) {
 void state::set_passive_host_checks_are_soft(bool value) {
   _tab_bool[passive_host_checks_are_soft] = value;
   ::passive_host_checks_are_soft = value;
+  return;
 }
 
 /**
@@ -1756,6 +1841,7 @@ void state::set_passive_host_checks_are_soft(bool value) {
 void state::set_use_aggressive_host_checking(bool value) {
   _tab_bool[use_aggressive_host_checking] = value;
   ::use_aggressive_host_checking = value;
+  return;
 }
 
 /**
@@ -1765,6 +1851,7 @@ void state::set_use_aggressive_host_checking(bool value) {
 void state::set_enable_predictive_host_dependency_checks(bool value) {
   _tab_bool[enable_predictive_host_dependency_checks] = value;
   ::enable_predictive_host_dependency_checks = value;
+  return;
 }
 
 /**
@@ -1774,6 +1861,7 @@ void state::set_enable_predictive_host_dependency_checks(bool value) {
 void state::set_enable_predictive_service_dependency_checks(bool value) {
   _tab_bool[enable_predictive_service_dependency_checks] = value;
   ::enable_predictive_service_dependency_checks = value;
+  return;
 }
 
 /**
@@ -1783,6 +1871,7 @@ void state::set_enable_predictive_service_dependency_checks(bool value) {
 void state::set_soft_state_dependencies(bool value) {
   _tab_bool[soft_state_dependencies] = value;
   ::soft_state_dependencies = value;
+  return;
 }
 
 /**
@@ -1792,6 +1881,7 @@ void state::set_soft_state_dependencies(bool value) {
 void state::set_enable_event_handlers(bool value) {
   _tab_bool[enable_event_handlers] = value;
   ::enable_event_handlers = value;
+  return;
 }
 
 /**
@@ -1801,6 +1891,7 @@ void state::set_enable_event_handlers(bool value) {
 void state::set_enable_notifications(bool value) {
   _tab_bool[enable_notifications] = value;
   ::enable_notifications = value;
+  return;
 }
 
 /**
@@ -1810,6 +1901,7 @@ void state::set_enable_notifications(bool value) {
 void state::set_execute_service_checks(bool value) {
   _tab_bool[execute_service_checks] = value;
   ::execute_service_checks = value;
+  return;
 }
 
 /**
@@ -1819,6 +1911,7 @@ void state::set_execute_service_checks(bool value) {
 void state::set_accept_passive_service_checks(bool value) {
   _tab_bool[accept_passive_service_checks] = value;
   ::accept_passive_service_checks = value;
+  return;
 }
 
 /**
@@ -1828,6 +1921,7 @@ void state::set_accept_passive_service_checks(bool value) {
 void state::set_execute_host_checks(bool value) {
   _tab_bool[execute_host_checks] = value;
   ::execute_host_checks = value;
+  return;
 }
 
 /**
@@ -1837,6 +1931,7 @@ void state::set_execute_host_checks(bool value) {
 void state::set_accept_passive_host_checks(bool value) {
   _tab_bool[accept_passive_host_checks] = value;
   ::accept_passive_host_checks = value;
+  return;
 }
 
 /**
@@ -1846,6 +1941,7 @@ void state::set_accept_passive_host_checks(bool value) {
 void state::set_check_external_commands(bool value) {
   _tab_bool[check_external_commands] = value;
   ::check_external_commands = value;
+  return;
 }
 
 /**
@@ -1855,6 +1951,7 @@ void state::set_check_external_commands(bool value) {
 void state::set_check_orphaned_services(bool value) {
   _tab_bool[check_orphaned_services] = value;
   ::check_orphaned_services = value;
+  return;
 }
 
 /**
@@ -1864,6 +1961,7 @@ void state::set_check_orphaned_services(bool value) {
 void state::set_check_orphaned_hosts(bool value) {
   _tab_bool[check_orphaned_hosts] = value;
   ::check_orphaned_hosts = value;
+  return;
 }
 
 /**
@@ -1873,6 +1971,7 @@ void state::set_check_orphaned_hosts(bool value) {
 void state::set_check_service_freshness(bool value) {
   _tab_bool[check_service_freshness] = value;
   ::check_service_freshness = value;
+  return;
 }
 
 /**
@@ -1882,6 +1981,7 @@ void state::set_check_service_freshness(bool value) {
 void state::set_check_host_freshness(bool value) {
   _tab_bool[check_host_freshness] = value;
   ::check_host_freshness = value;
+  return;
 }
 
 /**
@@ -1891,6 +1991,7 @@ void state::set_check_host_freshness(bool value) {
 void state::set_auto_reschedule_checks(bool value) {
   _tab_bool[auto_reschedule_checks] = value;
   ::auto_reschedule_checks = value;
+  return;
 }
 
 /**
@@ -1900,6 +2001,7 @@ void state::set_auto_reschedule_checks(bool value) {
 void state::set_process_performance_data(bool value) {
   _tab_bool[process_performance_data] = value;
   ::process_performance_data = value;
+  return;
 }
 
 /**
@@ -1909,6 +2011,7 @@ void state::set_process_performance_data(bool value) {
 void state::set_enable_flap_detection(bool value) {
   _tab_bool[enable_flap_detection] = value;
   ::enable_flap_detection = value;
+  return;
 }
 
 /**
@@ -1918,6 +2021,7 @@ void state::set_enable_flap_detection(bool value) {
 void state::set_enable_failure_prediction(bool value) {
   _tab_bool[enable_failure_prediction] = value;
   ::enable_failure_prediction = value;
+  return;
 }
 
 /**
@@ -1927,6 +2031,7 @@ void state::set_enable_failure_prediction(bool value) {
 void state::set_use_regexp_matches(bool value) {
   _tab_bool[use_regexp_matches] = value;
   ::use_regexp_matches = value;
+  return;
 }
 
 /**
@@ -1936,6 +2041,7 @@ void state::set_use_regexp_matches(bool value) {
 void state::set_use_true_regexp_matching(bool value) {
   _tab_bool[use_true_regexp_matching] = value;
   ::use_true_regexp_matching = value;
+  return;
 }
 
 /**
@@ -1945,6 +2051,7 @@ void state::set_use_true_regexp_matching(bool value) {
 void state::set_use_large_installation_tweaks(bool value) {
   _tab_bool[use_large_installation_tweaks] = value;
   ::use_large_installation_tweaks = value;
+  return;
 }
 
 /**
@@ -1954,6 +2061,7 @@ void state::set_use_large_installation_tweaks(bool value) {
 void state::set_enable_environment_macros(bool value) {
   _tab_bool[enable_environment_macros] = value;
   ::enable_environment_macros = value;
+  return;
 }
 
 /**
@@ -1963,6 +2071,7 @@ void state::set_enable_environment_macros(bool value) {
 void state::set_free_child_process_memory(bool value) {
   _tab_int[free_child_process_memory] = value;
   ::free_child_process_memory = value;
+  return;
 }
 
 /**
@@ -1973,6 +2082,7 @@ void state::set_child_processes_fork_twice(bool value) {
   (void)value;
   logger(log_config_warning, basic)
     << "warning: child_processes_fork_twice variable ignored";
+  return;
 }
 
 /**
@@ -1983,6 +2093,7 @@ void state::set_enable_embedded_perl(bool value) {
   (void)value;
   logger(log_config_warning, basic)
     << "warning: enable_embedded_perl variable ignored";
+  return;
 }
 
 /**
@@ -1993,6 +2104,7 @@ void state::set_use_embedded_perl_implicitly(bool value) {
   (void)value;
   logger(log_config_warning, basic)
     << "warning: use_embedded_perl_implicitly variable ignored";
+  return;
 }
 
 /**
@@ -2002,6 +2114,7 @@ void state::set_use_embedded_perl_implicitly(bool value) {
 void state::set_allow_empty_hostgroup_assignment(bool value) {
   _tab_bool[allow_empty_hostgroup_assignment] = value;
   ::allow_empty_hostgroup_assignment = value;
+  return;
 }
 
 /**
@@ -2014,6 +2127,7 @@ void state::set_sleep_time(float value) {
   }
   _tab_float[sleep_time] = value;
   ::sleep_time = value;
+  return;
 }
 
 /**
@@ -2022,10 +2136,12 @@ void state::set_sleep_time(float value) {
  */
 void state::set_low_service_flap_threshold(float value) {
   if (value <= 0.0 || value >= 100.0) {
-    throw (engine_error() << "low_service_flap_threshold: invalid value.");
+    throw (engine_error()
+           << "low_service_flap_threshold: invalid value.");
   }
   _tab_float[low_service_flap_threshold] = value;
   ::low_service_flap_threshold = value;
+  return;
 }
 
 /**
@@ -2034,10 +2150,12 @@ void state::set_low_service_flap_threshold(float value) {
  */
 void state::set_high_service_flap_threshold(float value) {
   if (value <= 0.0 || value >= 100.0) {
-    throw (engine_error() << "high_service_flap_threshold: invalid value.");
+    throw (engine_error()
+           << "high_service_flap_threshold: invalid value.");
   }
   _tab_float[high_service_flap_threshold] = value;
   ::high_service_flap_threshold = value;
+  return;
 }
 
 /**
@@ -2046,10 +2164,12 @@ void state::set_high_service_flap_threshold(float value) {
  */
 void state::set_low_host_flap_threshold(float value) {
   if (value <= 0.0 || value >= 100.0) {
-    throw (engine_error() << "low_host_flap_threshold: invalid value.");
+    throw (engine_error()
+           << "low_host_flap_threshold: invalid value.");
   }
   _tab_float[low_host_flap_threshold] = value;
   ::low_host_flap_threshold = value;
+  return;
 }
 
 /**
@@ -2058,10 +2178,12 @@ void state::set_low_host_flap_threshold(float value) {
  */
 void state::set_high_host_flap_threshold(float value) {
   if (value <= 0.0 || value >= 100.0) {
-    throw (engine_error() << "high_host_flap_threshold: invalid value.");
+    throw (engine_error()
+           << "high_host_flap_threshold: invalid value.");
   }
   _tab_float[high_host_flap_threshold] = value;
   ::high_host_flap_threshold = value;
+  return;
 }
 
 /**
@@ -2071,6 +2193,7 @@ void state::set_high_host_flap_threshold(float value) {
 void state::set_date_format(e_date_format value) {
   _tab_uint[date_format] = value;
   ::date_format = value;
+  return;
 }
 
 /**
@@ -2091,6 +2214,7 @@ void state::set_date_format(std::string const& value) {
     _tab_uint[date_format] = us;
   }
   ::date_format = _tab_uint[date_format];
+  return;
 }
 
 /**
@@ -2099,8 +2223,10 @@ void state::set_date_format(std::string const& value) {
  */
 void state::set_log_rotation_method(std::string const& value) {
   (void)value;
-  logger(log_config_warning, basic) << "warning: log_rotation_method "
+  logger(log_config_warning, basic)
+    << "warning: log_rotation_method "
     "variable ignored: Centreon Engine does not check for updates";
+  return;
 }
 
 /**
@@ -2110,6 +2236,7 @@ void state::set_log_rotation_method(std::string const& value) {
 void state::set_service_inter_check_delay_method(e_inter_check_delay value) {
   _tab_uint[service_inter_check_delay_method] = value;
   ::service_inter_check_delay_method = value;
+  return;
 }
 
 /**
@@ -2134,6 +2261,7 @@ void state::set_service_inter_check_delay_method(std::string const& value) {
     }
   }
   ::service_inter_check_delay_method = _tab_uint[service_inter_check_delay_method];
+  return;
 }
 
 /**
@@ -2143,6 +2271,7 @@ void state::set_service_inter_check_delay_method(std::string const& value) {
 void state::set_host_inter_check_delay_method(e_inter_check_delay value) {
   _tab_uint[host_inter_check_delay_method] = value;
   ::host_inter_check_delay_method = value;
+  return;
 }
 
 /**
@@ -2163,10 +2292,12 @@ void state::set_host_inter_check_delay_method(std::string const& value) {
     _tab_uint[host_inter_check_delay_method] = icd_user;
     if (_str2obj<double>(value, &scheduling_info.host_inter_check_delay) == false
 	|| scheduling_info.host_inter_check_delay <= 0.0) {
-      throw (engine_error() << "host_inter_check_delay_method: invalid value.");
+      throw (engine_error()
+             << "host_inter_check_delay_method: invalid value.");
     }
   }
   ::host_inter_check_delay_method = _tab_uint[host_inter_check_delay_method];
+  return;
 }
 
 /**
@@ -2176,6 +2307,7 @@ void state::set_host_inter_check_delay_method(std::string const& value) {
 void state::set_service_interleave_factor_method(e_interleave_factor value) {
   _tab_uint[service_interleave_factor_method] = value;
   ::service_interleave_factor_method = value;
+  return;
 }
 
 /**
@@ -2195,6 +2327,7 @@ void state::set_service_interleave_factor_method(std::string const& value) {
   }
 
   ::service_interleave_factor_method = _tab_uint[service_interleave_factor_method];
+  return;
 }
 
 /**************************************
@@ -2614,6 +2747,7 @@ void state::_reset() {
   _lst_cfg_dir.clear();
   _lst_cfg_file.clear();
   _lst_resource_file.clear();
+  return;
 }
 
 /**
@@ -2634,8 +2768,8 @@ void state::_parse_resource_file(std::string const& value) {
   std::ifstream ifs;
   ifs.open(resfile.c_str());
   if (ifs.fail()) {
-    throw (engine_error() << "cannot open resource file: '"
-                          << resfile << "'");
+    throw (engine_error()
+           << "cannot open resource file: '" << resfile << "'");
   }
 
   unsigned int save_cur_line = _cur_line;
@@ -2659,8 +2793,9 @@ void state::_parse_resource_file(std::string const& value) {
       key = key.substr(5, key.size() - 6);
       if (_str2obj<unsigned int>(key.c_str(), &user_index) == false
 	  || user_index > MAX_USER_MACROS || user_index == 0) {
-	logger(log_config_warning, basic) << "warning: [" << _filename
-          << ":" << _cur_line << "] bad variable name '" << key << "'";
+	logger(log_config_warning, basic)
+          << "warning: [" << _filename << ":" << _cur_line
+          << "] bad variable name '" << key << "'";
 	continue;
       }
 
@@ -2669,8 +2804,9 @@ void state::_parse_resource_file(std::string const& value) {
       macro_user[user_index - 1] = my_strdup(_trim(value).c_str());
     }
     else
-      logger(log_config_warning, basic) << "warning: [" << _filename
-        << ":" << _cur_line << "] bad variable name '" << key << "'";
+      logger(log_config_warning, basic)
+        << "warning: [" << _filename << ":" << _cur_line
+        << "] bad variable name '" << key << "'";
   }
 
   _cur_line = save_cur_line;
@@ -2681,6 +2817,7 @@ void state::_parse_resource_file(std::string const& value) {
   delete[] _mac->x[MACRO_RESOURCEFILE];
   _mac->x[MACRO_RESOURCEFILE] = my_strdup(resfile.c_str());
   _add_resource_file(resfile);
+  return;
 }
 
 /**
@@ -2691,7 +2828,7 @@ void state::_set_auth_file(std::string const& value) {
   (void)value;
   logger(log_config_warning, basic)
     << "warning: auth_file variable ignored";
-  return ;
+  return;
 }
 
 /**
@@ -2702,6 +2839,7 @@ void state::_set_admin_email(std::string const& value) {
   _tab_string[admin_email] = value;
   delete[] _mac->x[MACRO_ADMINEMAIL];
   _mac->x[MACRO_ADMINEMAIL] = my_strdup(value.c_str());
+  return;
 }
 
 /**
@@ -2712,6 +2850,7 @@ void state::_set_admin_pager(std::string const& value) {
   _tab_string[admin_pager] = value;
   delete[] _mac->x[MACRO_ADMINPAGER];
   _mac->x[MACRO_ADMINPAGER] = my_strdup(value.c_str());
+  return;
 }
 
 /**
@@ -2721,7 +2860,7 @@ void state::_set_retained_service_attribute_mask(std::string const& value) {
   (void)value;
   logger(log_config_warning, basic)
     << "warning: retained_service_attribute_mask variable ignored";
-  return ;
+  return;
 }
 
 /**
@@ -2731,7 +2870,7 @@ void state::_set_retained_process_service_attribute_mask(std::string const& valu
   (void)value;
   logger(log_config_warning, basic)
     << "warning: retained_process_service_attribute_mask variable ignored";
-  return ;
+  return;
 }
 
 /**
@@ -2742,7 +2881,7 @@ void state::_set_aggregate_status_updates(std::string const& value) {
   logger(log_config_warning, basic)
     << "warning: aggregate_status_updates directive ignored: all" \
        " status file updates are now aggregated";
-  return ;
+  return;
 }
 
 /**
@@ -2768,8 +2907,7 @@ void state::_set_broker_module(std::string const& value) {
   // Add module.
   neb_add_module(val.c_str(), args.c_str(), TRUE);
   _lst_broker_module.push_back(val.c_str());
-
-  return ;
+  return;
 }
 
 /**
@@ -2777,9 +2915,10 @@ void state::_set_broker_module(std::string const& value) {
  */
 void state::_set_bare_update_check(std::string const& value) {
   (void)value;
-  logger(log_config_warning, basic) << "warning: bare_update_check " \
-    "variable ignored: Centreon Engine does not check for updates";
-  return ;
+  logger(log_config_warning, basic)
+    << "warning: bare_update_check variable ignored: "
+    "Centreon Engine does not check for updates";
+  return;
 }
 
 /**
@@ -2787,9 +2926,10 @@ void state::_set_bare_update_check(std::string const& value) {
  */
 void state::_set_check_for_updates(std::string const& value) {
   (void)value;
-  logger(log_config_warning, basic) << "warning: check_for_updates " \
-    "variable ignored: Centreon Engine does not check for updates";
-  return ;
+  logger(log_config_warning, basic)
+    << "warning: check_for_updates variable ignored: "
+    "Centreon Engine does not check for updates";
+  return;
 }
 
 /**
@@ -2797,10 +2937,10 @@ void state::_set_check_for_updates(std::string const& value) {
  */
 void state::_set_comment_file(std::string const& value) {
   (void)value;
-  logger(log_config_warning, basic) << "warning: comment_file " \
-    "variable ignored: comments are now stored in the status and " \
-    "retention files";
-  return ;
+  logger(log_config_warning, basic)
+    << "warning: comment_file variable ignored: "
+    "comments are now stored in the status and retention files";
+  return;
 }
 
 /**
@@ -2809,9 +2949,9 @@ void state::_set_comment_file(std::string const& value) {
 void state::_set_daemon_dumps_core(std::string const& value) {
   (void)value;
   logger(log_config_warning, basic)
-    << "warning: daemon_dumps_core variable ignored: core dumping has" \
-       " to be handled by Centreon Engine user";
-  return ;
+    << "warning: daemon_dumps_core variable ignored: "
+    "core dumping has to be handled by Centreon Engine user";
+  return;
 }
 
 /**
@@ -2820,9 +2960,9 @@ void state::_set_daemon_dumps_core(std::string const& value) {
 void state::_set_downtime_file(std::string const& value) {
   (void)value;
   logger(log_config_warning, basic)
-    << "warning: downtime_file variable ignored: downtime entries are" \
-       " now stored in the status and retention files";
-  return ;
+    << "warning: downtime_file variable ignored: "
+    "downtime entries are now stored in the status and retention files";
+  return;
 }
 
 /**
@@ -2830,9 +2970,10 @@ void state::_set_downtime_file(std::string const& value) {
  */
 void state::_set_lock_file(std::string const& value) {
   (void)value;
-  logger(log_config_warning, basic) << "warning: lock_file variable " \
-    "ignored: daemonization should be handled by startup script";
-  return ;
+  logger(log_config_warning, basic)
+    << "warning: lock_file variable ignored: "
+    "daemonization should be handled by startup script";
+  return;
 }
 
 /**
@@ -2840,9 +2981,10 @@ void state::_set_lock_file(std::string const& value) {
  */
 void state::_set_user(std::string const& value) {
   (void)value;
-  logger(log_config_warning, basic) << "warning: nagios_user variable" \
-    " ignored: priviledge drop should be handled by startup script";
-  return ;
+  logger(log_config_warning, basic)
+    << "warning: nagios_user variable ignored: "
+    "priviledge drop should be handled by startup script";
+  return;
 }
 
 /**
@@ -2850,10 +2992,10 @@ void state::_set_user(std::string const& value) {
  */
 void state::_set_group(std::string const& value) {
   (void)value;
-  logger(log_config_warning, basic) << "warning: nagios_group " \
-    "variable ignored: priviledge drop should be handled by startup " \
-    "script";
-  return ;
+  logger(log_config_warning, basic)
+    << "warning: nagios_group variable ignored: "
+    "priviledge drop should be handled by startup script";
+  return;
 }
 
 /**
@@ -2862,7 +3004,7 @@ void state::_set_group(std::string const& value) {
  */
 void state::_set_status_file(std::string const& value) {
   _tab_string[status_file] = value;
-  return ;
+  return;
 }
 
 /**
@@ -2871,6 +3013,7 @@ void state::_set_status_file(std::string const& value) {
  */
 void state::_set_perfdata_timeout(int value) {
   _tab_int[perfdata_timeout] = value;
+  return;
 }
 
 /**
@@ -2879,6 +3022,7 @@ void state::_set_perfdata_timeout(int value) {
  */
 void state::_add_cfg_dir(std::string const& value) {
   _lst_cfg_dir.push_back(value);
+  return;
 }
 
 /**
@@ -2887,6 +3031,7 @@ void state::_add_cfg_dir(std::string const& value) {
  */
 void state::_add_cfg_file(std::string const& value) {
   _lst_cfg_file.push_back(value);
+  return;
 }
 
 /**
@@ -2895,6 +3040,7 @@ void state::_add_cfg_file(std::string const& value) {
  */
 void state::_add_resource_file(std::string const& value) {
   _lst_resource_file.push_back(value);
+  return;
 }
 
 /**
@@ -2903,6 +3049,7 @@ void state::_add_resource_file(std::string const& value) {
  */
 void state::_set_state_retention_file(std::string const& value) {
   _tab_string[state_retention_file] = value;
+  return;
 }
 
 /**
@@ -2911,6 +3058,7 @@ void state::_set_state_retention_file(std::string const& value) {
  */
 void state::_set_object_cache_file(std::string const& value) {
   _tab_string[object_cache_file] = value;
+  return;
 }
 
 /**
@@ -2919,4 +3067,5 @@ void state::_set_object_cache_file(std::string const& value) {
  */
 void state::_set_precached_object_file(std::string const& value) {
   _tab_string[precached_object_file] = value;
+  return;
 }

@@ -49,24 +49,92 @@ typedef struct                      scheduled_downtime_struct {
 extern "C" {
 #  endif // C++
 
-int initialize_downtime_data(char const* config_file); // initializes scheduled downtime data
-int cleanup_downtime_data(char const* config_file);    // cleans up scheduled downtime data
-int schedule_downtime(int type, char const* host_name, char const* service_description, time_t entry_time, char const* author, char const* comment_data, time_t start_time, time_t end_time, int fixed, unsigned long triggered_by, unsigned long duration, unsigned long* new_downtime_id);
-int unschedule_downtime(int type,unsigned long downtime_id);
+// initializes scheduled downtime data
+int initialize_downtime_data(char const* config_file);
+// cleans up scheduled downtime data
+int cleanup_downtime_data(char const* config_file);
+int schedule_downtime(
+      int type,
+      char const* host_name,
+      char const* service_description,
+      time_t entry_time,
+      char const* author,
+      char const* comment_data,
+      time_t start_time,
+      time_t end_time,
+      int fixed,
+      unsigned long triggered_by,
+      unsigned long duration,
+      unsigned long* new_downtime_id);
+int unschedule_downtime(int type, unsigned long downtime_id);
 int register_downtime(int type, unsigned long downtime_id);
 int handle_scheduled_downtime_by_id(unsigned long downtime_id);
 int handle_scheduled_downtime(scheduled_downtime* temp_downtime);
 int check_pending_flex_host_downtime(host* hst);
 int check_pending_flex_service_downtime(service* svc);
-int check_for_expired_downtime(void);
-int add_new_downtime(int type, char const* host_name, char const* service_description, time_t entry_time, char const* author, char const* comment_data, time_t start_time, time_t end_time, int fixed, unsigned long triggered_by, unsigned long duration, unsigned long* downtime_id);
-int add_new_host_downtime(char const* host_name, time_t entry_time, char const* author, char const* comment_data, time_t start_time, time_t end_time, int fixed, unsigned long triggered_by, unsigned long duration, unsigned long* downtime_id);
-int add_new_service_downtime(char const* host_name, char const* service_description, time_t entry_time, char const* author, char const* comment_data, time_t start_time, time_t end_time, int fixed, unsigned long triggered_by, unsigned long duration, unsigned long* downtime_id);
-int delete_downtime(int type,unsigned long downtime_id);
+int check_for_expired_downtime();
+int add_new_downtime(
+      int type,
+      char const* host_name,
+      char const* service_description,
+      time_t entry_time,
+      char const* author,
+      char const* comment_data,
+      time_t start_time,
+      time_t end_time,
+      int fixed,
+      unsigned long triggered_by,
+      unsigned long duration,
+      unsigned long* downtime_id);
+int add_new_host_downtime(
+      char const* host_name,
+      time_t entry_time,
+      char const* author,
+      char const* comment_data,
+      time_t start_time,
+      time_t end_time,
+      int fixed,
+      unsigned long triggered_by,
+      unsigned long duration,
+      unsigned long* downtime_id);
+int add_new_service_downtime(
+      char const* host_name,
+      char const* service_description,
+      time_t entry_time,
+      char const* author,
+      char const* comment_data,
+      time_t start_time,
+      time_t end_time,
+      int fixed,
+      unsigned long triggered_by,
+      unsigned long duration,
+      unsigned long* downtime_id);
+int delete_downtime(int type, unsigned long downtime_id);
 int delete_host_downtime(unsigned long downtime_id);
 int delete_service_downtime(unsigned long downtime_id);
-int add_host_downtime(char const* host_name, time_t entry_time, char const* author, char const* comment_data, time_t start_time, time_t end_time, int fixed, unsigned long triggered_by, unsigned long duration, unsigned long downtime_id);
-int add_service_downtime(char const* host_name, char const* svc_description, time_t entry_time, char const* author, char const* comment_data, time_t start_time, time_t end_time, int fixed, unsigned long triggered_by, unsigned long duration, unsigned long downtime_id);
+int add_host_downtime(
+      char const* host_name,
+      time_t entry_time,
+      char const* author,
+      char const* comment_data,
+      time_t start_time,
+      time_t end_time,
+      int fixed,
+      unsigned long triggered_by,
+      unsigned long duration,
+      unsigned long downtime_id);
+int add_service_downtime(
+      char const* host_name,
+      char const* svc_description,
+      time_t entry_time,
+      char const* author,
+      char const* comment_data,
+      time_t start_time,
+      time_t end_time,
+      int fixed,
+      unsigned long triggered_by,
+      unsigned long duration,
+      unsigned long downtime_id);
 
 /*
 ** If you are going to be adding a lot of downtime in sequence, set
@@ -76,14 +144,30 @@ int add_service_downtime(char const* host_name, char const* svc_description, tim
 ** extern int defer_downtime_sorting;
 */
 
-int add_downtime(int downtime_type, char const* host_name, char const* svc_description, time_t entry_time, char const* author, char const* comment_data, time_t start_time, time_t end_time, int fixed, unsigned long triggered_by, unsigned long duration, unsigned long downtime_id);
-int sort_downtime(void);
+int add_downtime(
+      int downtime_type,
+      char const* host_name,
+      char const* svc_description,
+      time_t entry_time,
+      char const* author,
+      char const* comment_data,
+      time_t start_time,
+      time_t end_time,
+      int fixed,
+      unsigned long triggered_by,
+      unsigned long duration,
+      unsigned long downtime_id);
+int sort_downtime();
 scheduled_downtime* find_downtime(int type, unsigned long downtime_id);
 scheduled_downtime* find_host_downtime(unsigned long downtime_id);
 scheduled_downtime* find_service_downtime(unsigned long downtime_id);
-void free_downtime_data(void); // frees memory allocated to scheduled downtime list
+// frees memory allocated to scheduled downtime list
+void free_downtime_data();
 
-int delete_downtime_by_hostname_service_description_start_time_comment(char const*, char const*, time_t, char const*);
+int delete_downtime_by_hostname_service_description_start_time_comment(
+      char const*,
+      char const*,
+      time_t, char const*);
 
 #  ifdef __cplusplus
 }

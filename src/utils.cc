@@ -57,15 +57,17 @@ using namespace com::centreon::engine::logging;
 /******************************************************************/
 
 /* executes a system command - used for notifications, event handlers, etc. */
-int my_system_r(nagios_macros* mac,
-		char* cmd,
-		int timeout,
-                int* early_timeout,
-		double* exectime,
-		char** output,
-                unsigned int max_output_length) {
+int my_system_r(
+      nagios_macros* mac,
+      char* cmd,
+      int timeout,
+      int* early_timeout,
+      double* exectime,
+      char** output,
+      unsigned int max_output_length) {
 
-  logger(dbg_functions, basic) << "my_system_r()";
+  logger(dbg_functions, basic)
+    << "my_system_r()";
 
   // initialize return variables.
   if (output != NULL) {
@@ -79,7 +81,8 @@ int my_system_r(nagios_macros* mac,
     return (STATE_OK);
   }
 
-  logger(dbg_commands, more) << "Running command '" << cmd << "'...";
+  logger(dbg_commands, more)
+    << "Running command '" << cmd << "'...";
 
   timeval start_time = timeval();
   timeval end_time = timeval();
@@ -88,18 +91,19 @@ int my_system_r(nagios_macros* mac,
   gettimeofday(&start_time, NULL);
 
   // send event broker.
-  broker_system_command(NEBTYPE_SYSTEM_COMMAND_START,
-			NEBFLAG_NONE,
-                        NEBATTR_NONE,
-			start_time,
-			end_time,
-			*exectime,
-                        timeout,
-			*early_timeout,
-			STATE_OK,
-			cmd,
-			NULL,
-                        NULL);
+  broker_system_command(
+    NEBTYPE_SYSTEM_COMMAND_START,
+    NEBFLAG_NONE,
+    NEBATTR_NONE,
+    start_time,
+    end_time,
+    *exectime,
+    timeout,
+    *early_timeout,
+    STATE_OK,
+    cmd,
+    NULL,
+    NULL);
 
   commands::raw raw_cmd("system", cmd);
   commands::result res;
@@ -126,18 +130,19 @@ int my_system_r(nagios_macros* mac,
     << (output == NULL ? "(null)" : *output);
 
   // send event broker.
-  broker_system_command(NEBTYPE_SYSTEM_COMMAND_END,
-			NEBFLAG_NONE,
-			NEBATTR_NONE,
-			start_time,
-			end_time,
-			*exectime,
-			timeout,
-			*early_timeout,
-			result,
-			cmd,
-			(output == NULL ? NULL : *output),
-			NULL);
+  broker_system_command(
+    NEBTYPE_SYSTEM_COMMAND_END,
+    NEBFLAG_NONE,
+    NEBATTR_NONE,
+    start_time,
+    end_time,
+    *exectime,
+    timeout,
+    *early_timeout,
+    result,
+    cmd,
+    (output == NULL ? NULL : *output),
+    NULL);
 
   return (result);
 }
@@ -147,19 +152,21 @@ int my_system_r(nagios_macros* mac,
  * signature doesn't include the Centreon Engine_macros variable.
  * NDOUtils uses this. Possibly other modules as well.
  */
-int my_system(char* cmd,
-	      int timeout,
-	      int* early_timeout,
-              double* exectime,
-	      char** output,
-	      int max_output_length) {
-  return (my_system_r(get_global_macros(),
-		      cmd,
-		      timeout,
-		      early_timeout,
-		      exectime,
-		      output,
-		      max_output_length));
+int my_system(
+      char* cmd,
+      int timeout,
+      int* early_timeout,
+      double* exectime,
+      char** output,
+      int max_output_length) {
+  return (my_system_r(
+            get_global_macros(),
+            cmd,
+            timeout,
+            early_timeout,
+            exectime,
+            output,
+            max_output_length));
 }
 
 // same like unix ctime without the '\n' at the end of the string.
@@ -171,11 +178,12 @@ char const* my_ctime(time_t const* t) {
 }
 
 /* given a "raw" command, return the "expanded" or "whole" command line */
-int get_raw_command_line_r(nagios_macros* mac,
-			   command* cmd_ptr,
-                           char const* cmd,
-			   char** full_command,
-                           int macro_options) {
+int get_raw_command_line_r(
+      nagios_macros* mac,
+      command* cmd_ptr,
+      char const* cmd,
+      char** full_command,
+      int macro_options) {
   char temp_arg[MAX_COMMAND_BUFFER] = "";
   char* arg_buffer = NULL;
   unsigned int x = 0;
@@ -183,7 +191,8 @@ int get_raw_command_line_r(nagios_macros* mac,
   int arg_index = 0;
   int escaped = FALSE;
 
-  logger(dbg_functions, basic) << "get_raw_command_line_r()";
+  logger(dbg_functions, basic)
+    << "get_raw_command_line_r()";
 
   /* clear the argv macros */
   clear_argv_macros_r(mac);
@@ -198,7 +207,8 @@ int get_raw_command_line_r(nagios_macros* mac,
 
   /* get the full command line */
   if (full_command != NULL) {
-    *full_command = my_strdup(cmd_ptr->command_line == NULL ? "" : cmd_ptr->command_line);
+    *full_command
+      = my_strdup(cmd_ptr->command_line ? cmd_ptr->command_line : "");
   }
 
   /* XXX: Crazy indent */
@@ -227,7 +237,9 @@ int get_raw_command_line_r(nagios_macros* mac,
         }
 
         /* end of argument */
-        if ((cmd[arg_index] == '!' && escaped == FALSE) || cmd[arg_index] == '\x0')
+        if ((cmd[arg_index] == '!'
+             && escaped == FALSE)
+            || cmd[arg_index] == '\x0')
           break;
 
         /* normal of escaped char */
@@ -259,14 +271,18 @@ int get_raw_command_line_r(nagios_macros* mac,
  * This function modifies the global macro struct and is thus not
  * threadsafe
  */
-int get_raw_command_line(command* cmd_ptr,
-			 char* cmd,
-                         char** full_command,
-			 int macro_options) {
-  nagios_macros *mac;
-
-  mac = get_global_macros();
-  return (get_raw_command_line_r(mac, cmd_ptr, cmd, full_command, macro_options));
+int get_raw_command_line(
+      command* cmd_ptr,
+      char* cmd,
+      char** full_command,
+      int macro_options) {
+  nagios_macros *mac = get_global_macros();
+  return (get_raw_command_line_r(
+            mac,
+            cmd_ptr,
+            cmd,
+            full_command,
+            macro_options));
 }
 
 /******************************************************************/
@@ -350,7 +366,8 @@ int check_time_against_period(time_t test_time, timeperiod* tperiod) {
   int year = 0;
   int shift;
 
-  logger(dbg_functions, basic) << "check_time_against_period()";
+  logger(dbg_functions, basic)
+    << "check_time_against_period()";
 
   /* if no period was specified, assume the time is good */
   if (tperiod == NULL)
@@ -363,7 +380,9 @@ int check_time_against_period(time_t test_time, timeperiod* tperiod) {
   for (temp_timeperiodexclusion = first_timeperiodexclusion;
        temp_timeperiodexclusion != NULL;
        temp_timeperiodexclusion = temp_timeperiodexclusion->next) {
-    if (check_time_against_period(test_time, temp_timeperiodexclusion->timeperiod_ptr) == OK) {
+    if (check_time_against_period(
+          test_time,
+          temp_timeperiodexclusion->timeperiod_ptr) == OK) {
       tperiod->exclusions = first_timeperiodexclusion;
       return (ERROR);
     }
@@ -394,8 +413,14 @@ int check_time_against_period(time_t test_time, timeperiod* tperiod) {
 
 #ifdef TEST_TIMEPERIODS_A
       printf("TYPE: %d\n", daterange_type);
-      printf("TEST:     %lu = %s", (unsigned long)test_time, ctime(&test_time));
-      printf("MIDNIGHT: %lu = %s", (unsigned long)midnight, ctime(&midnight));
+      printf(
+        "TEST:     %lu = %s",
+        (unsigned long)test_time,
+        ctime(&test_time));
+      printf(
+        "MIDNIGHT: %lu = %s",
+        (unsigned long)midnight,
+        ctime(&midnight));
 #endif
 
       /* get the start time */
@@ -413,29 +438,33 @@ int check_time_against_period(time_t test_time, timeperiod* tperiod) {
         break;
 
       case DATERANGE_MONTH_DATE:
-        start_time = calculate_time_from_day_of_month(test_time_year,
-						      temp_daterange->smon,
-						      temp_daterange->smday);
+        start_time = calculate_time_from_day_of_month(
+                       test_time_year,
+                       temp_daterange->smon,
+                       temp_daterange->smday);
         break;
 
       case DATERANGE_MONTH_DAY:
-        start_time = calculate_time_from_day_of_month(test_time_year,
-						      test_time_mon,
-						      temp_daterange->smday);
+        start_time = calculate_time_from_day_of_month(
+                       test_time_year,
+                       test_time_mon,
+                       temp_daterange->smday);
         break;
 
       case DATERANGE_MONTH_WEEK_DAY:
-        start_time = calculate_time_from_weekday_of_month(test_time_year,
-							  temp_daterange->smon,
-							  temp_daterange->swday,
-							  temp_daterange->swday_offset);
+        start_time = calculate_time_from_weekday_of_month(
+                       test_time_year,
+                       temp_daterange->smon,
+                       temp_daterange->swday,
+                       temp_daterange->swday_offset);
         break;
 
       case DATERANGE_WEEK_DAY:
-        start_time = calculate_time_from_weekday_of_month(test_time_year,
-							  test_time_mon,
-							  temp_daterange->swday,
-							  temp_daterange->swday_offset);
+        start_time = calculate_time_from_weekday_of_month(
+                       test_time_year,
+                       test_time_mon,
+                       temp_daterange->swday,
+                       temp_daterange->swday_offset);
         break;
 
       default:
@@ -458,45 +487,51 @@ int check_time_against_period(time_t test_time, timeperiod* tperiod) {
 
       case DATERANGE_MONTH_DATE:
         year = test_time_year;
-        end_time = calculate_time_from_day_of_month(year,
-						    temp_daterange->emon,
-						    temp_daterange->emday);
+        end_time = calculate_time_from_day_of_month(
+                     year,
+                     temp_daterange->emon,
+                     temp_daterange->emday);
         /* advance a year if necessary: august 2 - february 5 */
         if (end_time < start_time) {
           year++;
-          end_time = calculate_time_from_day_of_month(year,
-						      temp_daterange->emon,
-						      temp_daterange->emday);
+          end_time = calculate_time_from_day_of_month(
+                       year,
+                       temp_daterange->emon,
+                       temp_daterange->emday);
         }
         break;
 
       case DATERANGE_MONTH_DAY:
-        end_time = calculate_time_from_day_of_month(test_time_year,
-						    test_time_mon,
-						    temp_daterange->emday);
+        end_time = calculate_time_from_day_of_month(
+                     test_time_year,
+                     test_time_mon,
+                     temp_daterange->emday);
         break;
 
       case DATERANGE_MONTH_WEEK_DAY:
         year = test_time_year;
-        end_time = calculate_time_from_weekday_of_month(year,
-							temp_daterange->emon,
-							temp_daterange->ewday,
-							temp_daterange->ewday_offset);
+        end_time = calculate_time_from_weekday_of_month(
+                     year,
+                     temp_daterange->emon,
+                     temp_daterange->ewday,
+                     temp_daterange->ewday_offset);
         /* advance a year if necessary: thursday 2 august - monday 3 february */
         if (end_time < start_time) {
           year++;
-          end_time = calculate_time_from_weekday_of_month(year,
-							  temp_daterange->emon,
-							  temp_daterange->ewday,
-							  temp_daterange->ewday_offset);
+          end_time = calculate_time_from_weekday_of_month(
+                       year,
+                       temp_daterange->emon,
+                       temp_daterange->ewday,
+                       temp_daterange->ewday_offset);
         }
         break;
 
       case DATERANGE_WEEK_DAY:
-        end_time = calculate_time_from_weekday_of_month(test_time_year,
-							test_time_mon,
-							temp_daterange->ewday,
-							temp_daterange->ewday_offset);
+        end_time = calculate_time_from_weekday_of_month(
+                     test_time_year,
+                     test_time_mon,
+                     temp_daterange->ewday,
+                     temp_daterange->ewday_offset);
         break;
 
       default:
@@ -504,8 +539,14 @@ int check_time_against_period(time_t test_time, timeperiod* tperiod) {
       }
 
 #ifdef TEST_TIMEPERIODS_A
-      printf("START:    %lu = %s", (unsigned long)start_time, ctime(&start_time));
-      printf("END:      %lu = %s", (unsigned long)end_time, ctime(&end_time));
+      printf(
+        "START:    %lu = %s",
+        (unsigned long)start_time,
+        ctime(&start_time));
+      printf(
+        "END:      %lu = %s",
+        (unsigned long)end_time,
+        ctime(&end_time));
 #endif
 
       /* start date was bad, so skip this date range */
@@ -526,7 +567,10 @@ int check_time_against_period(time_t test_time, timeperiod* tperiod) {
 
           /* else end date slipped past end of month, so use last day of month as end date */
           /* use same year calculated above */
-          end_time = calculate_time_from_day_of_month(year, temp_daterange->emon, -1);
+          end_time = calculate_time_from_day_of_month(
+                       year,
+                       temp_daterange->emon,
+                       -1);
           break;
 
         case DATERANGE_MONTH_DAY:
@@ -535,7 +579,10 @@ int check_time_against_period(time_t test_time, timeperiod* tperiod) {
             continue;
 
           /* else end date slipped past end of month, so use last day of month as end date */
-          end_time = calculate_time_from_day_of_month(test_time_year, test_time_mon, -1);
+          end_time = calculate_time_from_day_of_month(
+                       test_time_year,
+                       test_time_mon,
+                       -1);
           break;
 
         case DATERANGE_MONTH_WEEK_DAY:
@@ -545,7 +592,10 @@ int check_time_against_period(time_t test_time, timeperiod* tperiod) {
 
           /* else end date slipped past end of month, so use last day of month as end date */
           /* use same year calculated above */
-          end_time = calculate_time_from_day_of_month(year, test_time_mon, -1);
+          end_time = calculate_time_from_day_of_month(
+                       year,
+                       test_time_mon,
+                       -1);
           break;
 
         case DATERANGE_WEEK_DAY:
@@ -554,7 +604,10 @@ int check_time_against_period(time_t test_time, timeperiod* tperiod) {
             continue;
 
           /* else end date slipped past end of month, so use last day of month as end date */
-          end_time = calculate_time_from_day_of_month(test_time_year, test_time_mon, -1);
+          end_time = calculate_time_from_day_of_month(
+                       test_time_year,
+                       test_time_mon,
+                       -1);
           break;
 
         default:
@@ -573,7 +626,8 @@ int check_time_against_period(time_t test_time, timeperiod* tperiod) {
         shift = get_dst_shift(&start_time, &midnight);
 
         /* how many days have passed between skip start date and test time? */
-        days = (shift + (unsigned long)midnight - (unsigned long)start_time) / (3600 * 24);
+        days = (shift + (unsigned long)midnight
+                - (unsigned long)start_time) / (3600 * 24);
 
         /* if test date doesn't fall on a skip interval day, bail out early */
         if ((days % temp_daterange->skip_interval) != 0)
@@ -590,8 +644,14 @@ int check_time_against_period(time_t test_time, timeperiod* tperiod) {
       }
 
 #ifdef TEST_TIMEPERIODS_A
-      printf("NEW START:    %lu = %s", (unsigned long)start_time, ctime(&start_time));
-      printf("NEW END:      %lu = %s", (unsigned long)end_time, ctime(&end_time));
+      printf(
+        "NEW START:    %lu = %s",
+        (unsigned long)start_time,
+        ctime(&start_time));
+      printf(
+        "NEW END:      %lu = %s",
+        (unsigned long)end_time,
+        ctime(&end_time));
       printf("%d DAYS PASSED\n", days);
       printf("DLST SHIFT: %d", shift);
 #endif
@@ -616,17 +676,22 @@ int check_time_against_period(time_t test_time, timeperiod* tperiod) {
             continue;
           }
 
-          day_range_start = (time_t)(midnight + temp_timerange->range_start);
-          day_range_end = (time_t)(midnight + temp_timerange->range_end);
+          day_range_start
+            = (time_t)(midnight + temp_timerange->range_start);
+          day_range_end
+            = (time_t)(midnight + temp_timerange->range_end);
 
 #ifdef TEST_TIMEPERIODS_A
-          printf("  RANGE START: %lu (%lu) = %s",
-		 temp_timerange->range_start,
-                 (unsigned long)day_range_start,
-                 ctime(&day_range_start));
-          printf("  RANGE END:   %lu (%lu) = %s",
-                 temp_timerange->range_end,
-                 (unsigned long)day_range_end, ctime(&day_range_end));
+          printf(
+            "  RANGE START: %lu (%lu) = %s",
+            temp_timerange->range_start,
+            (unsigned long)day_range_start,
+            ctime(&day_range_start));
+          printf(
+            "  RANGE END:   %lu (%lu) = %s",
+            temp_timerange->range_end,
+            (unsigned long)day_range_end,
+            ctime(&day_range_end));
 #endif
 
           /* if the user-specified time falls in this range, return with a positive result */
@@ -662,10 +727,11 @@ int check_time_against_period(time_t test_time, timeperiod* tperiod) {
 /*#define TEST_TIMEPERIODS_B 1*/
 
 /* Separate this out from public get_next_valid_time for testing, so we can mock current_time */
-static void _get_next_valid_time(time_t pref_time,
-				 time_t current_time,
-                                 time_t* valid_time,
-                                 timeperiod* tperiod) {
+static void _get_next_valid_time(
+              time_t pref_time,
+              time_t current_time,
+              time_t* valid_time,
+              timeperiod* tperiod) {
   time_t preferred_time = (time_t)0L;
   timerange* temp_timerange;
   daterange* temp_daterange;
@@ -703,7 +769,8 @@ static void _get_next_valid_time(time_t pref_time,
   int shift;
 
   /* preferred time must be now or in the future */
-  preferred_time = (pref_time < current_time) ? current_time : pref_time;
+  preferred_time
+    = (pref_time < current_time ? current_time : pref_time);
 
   /* if no timeperiod, go with preferred time */
   if (tperiod == NULL) {
@@ -747,14 +814,32 @@ static void _get_next_valid_time(time_t pref_time,
 #endif
 
 #ifdef TEST_TIMEPERIODS_B
-  printf("PREF TIME:    %lu = %s", (unsigned long)preferred_time, ctime(&preferred_time));
-  printf("CURRENT TIME: %lu = %s", (unsigned long)current_time, ctime(&current_time));
-  printf("PREF YEAR:    %d, MON: %d, MDAY: %d, WDAY: %d\n", pref_time_year, pref_time_mon, pref_time_mday, pref_time_wday);
-  printf("CURRENT YEAR: %d, MON: %d, MDAY: %d, WDAY: %d\n", current_time_year, current_time_mon, current_time_mday, current_time_wday);
+  printf(
+    "PREF TIME:    %lu = %s",
+    (unsigned long)preferred_time,
+    ctime(&preferred_time));
+  printf(
+    "CURRENT TIME: %lu = %s",
+    (unsigned long)current_time,
+    ctime(&current_time));
+  printf(
+    "PREF YEAR:    %d, MON: %d, MDAY: %d, WDAY: %d\n",
+    pref_time_year,
+    pref_time_mon,
+    pref_time_mday,
+    pref_time_wday);
+  printf(
+    "CURRENT YEAR: %d, MON: %d, MDAY: %d, WDAY: %d\n",
+    current_time_year,
+    current_time_mon,
+    current_time_mday,
+    current_time_wday);
 #endif
 
   /**** check exceptions (in this timeperiod definition) first ****/
-  for (daterange_type = 0; daterange_type < DATERANGE_TYPES; daterange_type++) {
+  for (daterange_type = 0;
+       daterange_type < DATERANGE_TYPES;
+       daterange_type++) {
 
 #ifdef TEST_TIMEPERIODS_B
     printf("TYPE: %d\n", daterange_type);
@@ -779,20 +864,25 @@ static void _get_next_valid_time(time_t pref_time,
 
       case DATERANGE_MONTH_DATE:       /* january 1 */
         /* what year should we use? */
-        year = (pref_time_year < current_time_year) ? current_time_year : pref_time_year;
+        year = (pref_time_year < current_time_year
+                ? current_time_year
+                : pref_time_year);
         /* advance an additional year if we already passed the end month date */
         if ((temp_daterange->emon < current_time_mon)
             || ((temp_daterange->emon == current_time_mon)
                 && temp_daterange->emday < current_time_mday))
           year++;
-        start_time = calculate_time_from_day_of_month(year,
-						      temp_daterange->smon,
-						      temp_daterange->smday);
+        start_time = calculate_time_from_day_of_month(
+                       year,
+                       temp_daterange->smon,
+                       temp_daterange->smday);
         break;
 
       case DATERANGE_MONTH_DAY:        /* day 3 */
         /* what year should we use? */
-        year = (pref_time_year < current_time_year) ? current_time_year : pref_time_year;
+        year = (pref_time_year < current_time_year
+                ? current_time_year
+                : pref_time_year);
         /* use current month */
         month = current_time_mon;
         /* advance an additional month (and possibly the year) if we already passed the end day of month */
@@ -805,37 +895,45 @@ static void _get_next_valid_time(time_t pref_time,
           else
             month++;
         }
-        start_time = calculate_time_from_day_of_month(year,
-						      month,
-						      temp_daterange->smday);
+        start_time = calculate_time_from_day_of_month(
+                       year,
+                       month,
+                       temp_daterange->smday);
         break;
 
       case DATERANGE_MONTH_WEEK_DAY:   /* thursday 2 april */
         /* what year should we use? */
-        year = (pref_time_year < current_time_year) ? current_time_year : pref_time_year;
+        year = (pref_time_year < current_time_year
+                ? current_time_year
+                : pref_time_year);
         /* calculate time of specified weekday of specific month */
-        start_time = calculate_time_from_weekday_of_month(year,
-							  temp_daterange->smon,
-							  temp_daterange->swday,
-							  temp_daterange->swday_offset);
+        start_time = calculate_time_from_weekday_of_month(
+                       year,
+                       temp_daterange->smon,
+                       temp_daterange->swday,
+                       temp_daterange->swday_offset);
         /* advance to next year if we've passed this month weekday already this year */
         if (start_time < preferred_time) {
           year++;
-          start_time = calculate_time_from_weekday_of_month(year,
-							    temp_daterange->smon,
-							    temp_daterange->swday,
-							    temp_daterange->swday_offset);
+          start_time = calculate_time_from_weekday_of_month(
+                         year,
+                         temp_daterange->smon,
+                         temp_daterange->swday,
+                         temp_daterange->swday_offset);
         }
         break;
 
       case DATERANGE_WEEK_DAY: /* wednesday 1 */
         /* what year should we use? */
-        year = (pref_time_year < current_time_year) ? current_time_year : pref_time_year;
+        year = (pref_time_year < current_time_year
+                ? current_time_year
+                : pref_time_year);
         /* calculate time of specified weekday of month */
-        start_time = calculate_time_from_weekday_of_month(year,
-							  pref_time_mon,
-							  temp_daterange->swday,
-							  temp_daterange->swday_offset);
+        start_time = calculate_time_from_weekday_of_month(
+                       year,
+                       pref_time_mon,
+                       temp_daterange->swday,
+                       temp_daterange->swday_offset);
         /* advance to next month (or year) if we've passed this weekday of this month already */
         if (start_time < preferred_time) {
           month = pref_time_mon;
@@ -845,10 +943,11 @@ static void _get_next_valid_time(time_t pref_time,
           }
           else
             month++;
-          start_time = calculate_time_from_weekday_of_month(year,
-							    month,
-							    temp_daterange->swday,
-							    temp_daterange->swday_offset);
+          start_time = calculate_time_from_weekday_of_month(
+                         year,
+                         month,
+                         temp_daterange->swday,
+                         temp_daterange->swday_offset);
         }
         break;
 
@@ -875,47 +974,53 @@ static void _get_next_valid_time(time_t pref_time,
 
       case DATERANGE_MONTH_DATE:
         /* use same year as was calculated for start time above */
-        end_time = calculate_time_from_day_of_month(year,
-						    temp_daterange->emon,
-						    temp_daterange->emday);
+        end_time = calculate_time_from_day_of_month(
+                     year,
+                     temp_daterange->emon,
+                     temp_daterange->emday);
         /* advance a year if necessary: august 5 - feburary 2 */
         if (end_time < start_time) {
           year++;
-          end_time = calculate_time_from_day_of_month(year,
-						      temp_daterange->emon,
-						      temp_daterange->emday);
+          end_time = calculate_time_from_day_of_month(
+                       year,
+                       temp_daterange->emon,
+                       temp_daterange->emday);
         }
         break;
 
       case DATERANGE_MONTH_DAY:
         /* use same year and month as was calculated for start time above */
-        end_time = calculate_time_from_day_of_month(year,
-						    month,
-						    temp_daterange->emday);
+        end_time = calculate_time_from_day_of_month(
+                     year,
+                     month,
+                     temp_daterange->emday);
         break;
 
       case DATERANGE_MONTH_WEEK_DAY:
         /* use same year as was calculated for start time above */
-        end_time = calculate_time_from_weekday_of_month(year,
-							temp_daterange->emon,
-							temp_daterange->ewday,
-							temp_daterange->ewday_offset);
+        end_time = calculate_time_from_weekday_of_month(
+                     year,
+                     temp_daterange->emon,
+                     temp_daterange->ewday,
+                     temp_daterange->ewday_offset);
         /* advance a year if necessary: thursday 2 august - monday 3 february */
         if (end_time < start_time) {
           year++;
-          end_time = calculate_time_from_weekday_of_month(year,
-							  temp_daterange->emon,
-							  temp_daterange->ewday,
-							  temp_daterange->ewday_offset);
+          end_time = calculate_time_from_weekday_of_month(
+                       year,
+                       temp_daterange->emon,
+                       temp_daterange->ewday,
+                       temp_daterange->ewday_offset);
         }
         break;
 
       case DATERANGE_WEEK_DAY:
         /* use same year and month as was calculated for start time above */
-        end_time = calculate_time_from_weekday_of_month(year,
-							month,
-							temp_daterange->ewday,
-							temp_daterange->ewday_offset);
+        end_time = calculate_time_from_weekday_of_month(
+                     year,
+                     month,
+                     temp_daterange->ewday,
+                     temp_daterange->ewday_offset);
         break;
 
       default:
@@ -923,8 +1028,14 @@ static void _get_next_valid_time(time_t pref_time,
       }
 
 #ifdef TEST_TIMEPERIODS_B
-      printf("STARTTIME: %lu = %s", (unsigned long)start_time, ctime(&start_time));
-      printf("ENDTIME1: %lu = %s", (unsigned long)end_time, ctime(&end_time));
+      printf(
+        "STARTTIME: %lu = %s",
+        (unsigned long)start_time,
+        ctime(&start_time));
+      printf(
+        "ENDTIME1: %lu = %s",
+        (unsigned long)end_time,
+        ctime(&end_time));
 #endif
 
       /* start date was bad, so skip this date range */
@@ -943,7 +1054,10 @@ static void _get_next_valid_time(time_t pref_time,
             continue;
 
           /* else end date slipped past end of month, so use last day of month as end date */
-          end_time = calculate_time_from_day_of_month(year, temp_daterange->emon, -1);
+          end_time = calculate_time_from_day_of_month(
+                       year,
+                       temp_daterange->emon,
+                       -1);
           break;
 
         case DATERANGE_MONTH_DAY:
@@ -961,7 +1075,10 @@ static void _get_next_valid_time(time_t pref_time,
             continue;
 
           /* else end date slipped past end of month, so use last day of month as end date */
-          end_time = calculate_time_from_day_of_month(year, pref_time_mon, -1);
+          end_time = calculate_time_from_day_of_month(
+                       year,
+                       pref_time_mon,
+                       -1);
           break;
 
         case DATERANGE_WEEK_DAY:
@@ -979,7 +1096,10 @@ static void _get_next_valid_time(time_t pref_time,
       }
 
 #ifdef TEST_TIMEPERIODS_B
-      printf("ENDTIME2: %lu = %s", (unsigned long)end_time, ctime(&end_time));
+      printf(
+        "ENDTIME2: %lu = %s",
+        (unsigned long)end_time,
+        ctime(&end_time));
 #endif
 
       /* if skipping days... */
@@ -992,13 +1112,21 @@ static void _get_next_valid_time(time_t pref_time,
           shift = get_dst_shift(&start_time, &midnight);
 
           /* how many days have passed between skip start date and preferred time? */
-          days = (shift + (unsigned long)midnight - (unsigned long)start_time) / (3600 * 24);
+          days = (shift + (unsigned long)midnight
+                  - (unsigned long)start_time) / (3600 * 24);
 
 #ifdef TEST_TIMEPERIODS_B
-          printf("MIDNIGHT: %lu = %s", (unsigned long)midnight, ctime(&midnight));
-          printf("%lu SECONDS PASSED\n", (unsigned long)(midnight - start_time));
+          printf(
+            "MIDNIGHT: %lu = %s",
+            (unsigned long)midnight,
+            ctime(&midnight));
+          printf(
+            "%lu SECONDS PASSED\n",
+            (unsigned long)(midnight - start_time));
           printf("%d DAYS PASSED\n", days);
-          printf("REMAINDER: %d\n", (days % temp_daterange->skip_interval));
+          printf(
+            "REMAINDER: %d\n",
+            days % temp_daterange->skip_interval);
           printf("SKIP INTERVAL: %d\n", temp_daterange->skip_interval);
           printf("DLST SHIFT: %d", shift);
 #endif
@@ -1018,10 +1146,22 @@ static void _get_next_valid_time(time_t pref_time,
       }
 
 #ifdef TEST_TIMEPERIODS_B
-      printf("\nSTART:     %lu = %s", (unsigned long)start_time, ctime(&start_time));
-      printf("END:       %lu = %s", (unsigned long)end_time, ctime(&end_time));
-      printf("PREFERRED: %lu = %s", (unsigned long)preferred_time, ctime(&preferred_time));
-      printf("CURRENT:   %lu = %s", (unsigned long)current_time, ctime(&current_time));
+      printf(
+        "\nSTART:     %lu = %s",
+        (unsigned long)start_time,
+        ctime(&start_time));
+      printf(
+        "END:       %lu = %s",
+        (unsigned long)end_time,
+        ctime(&end_time));
+      printf(
+        "PREFERRED: %lu = %s",
+        (unsigned long)preferred_time,
+        ctime(&preferred_time));
+      printf(
+        "CURRENT:   %lu = %s",
+        (unsigned long)current_time,
+        ctime(&current_time));
 #endif
 
       /* skip this date range its out of bounds with what we want */
@@ -1048,20 +1188,26 @@ static void _get_next_valid_time(time_t pref_time,
              temp_timerange = temp_timerange->next) {
 
           /* ranges with start/end of zero mean exlude this day */
-          if (temp_timerange->range_start == 0 && temp_timerange->range_end == 0)
+          if (temp_timerange->range_start == 0
+              && temp_timerange->range_end == 0)
             continue;
 
-          day_range_start = (time_t)(day_start + temp_timerange->range_start);
-          day_range_end = (time_t)(day_start + temp_timerange->range_end);
+          day_range_start
+            = (time_t)(day_start + temp_timerange->range_start);
+          day_range_end
+            = (time_t)(day_start + temp_timerange->range_end);
 
 #ifdef TEST_TIMEPERIODS_B
-          printf("  RANGE START: %lu (%lu) = %s",
-                 temp_timerange->range_start,
-                 (unsigned long)day_range_start,
-                 ctime(&day_range_start));
-          printf("  RANGE END:   %lu (%lu) = %s",
-                 temp_timerange->range_end,
-                 (unsigned long)day_range_end, ctime(&day_range_end));
+          printf(
+            "  RANGE START: %lu (%lu) = %s",
+            temp_timerange->range_start,
+            (unsigned long)day_range_start,
+            ctime(&day_range_start));
+          printf(
+            "  RANGE END:   %lu (%lu) = %s",
+            temp_timerange->range_end,
+            (unsigned long)day_range_end,
+            ctime(&day_range_end));
 #endif
 
           /* range is out of bounds */
@@ -1076,12 +1222,16 @@ static void _get_next_valid_time(time_t pref_time,
             potential_time = preferred_time;
 
           /* is this the earliest time found thus far? */
-          if (have_earliest_time == FALSE || potential_time < earliest_time) {
+          if (have_earliest_time == FALSE
+              || potential_time < earliest_time) {
             have_earliest_time = TRUE;
             earliest_time = potential_time;
             earliest_day = day_start;
 #ifdef TEST_TIMEPERIODS_B
-            printf("    EARLIEST TIME: %lu = %s", (unsigned long)earliest_time, ctime(&earliest_time));
+            printf(
+              "    EARLIEST TIME: %lu = %s",
+              (unsigned long)earliest_time,
+              ctime(&earliest_time));
 #endif
           }
         }
@@ -1093,7 +1243,9 @@ static void _get_next_valid_time(time_t pref_time,
 
   /* check a one week rotation of time */
   has_looped = FALSE;
-  for (weekday = pref_time_wday, days_into_the_future = 0; ; weekday++, days_into_the_future++) {
+  for (weekday = pref_time_wday, days_into_the_future = 0;
+       ;
+       weekday++, days_into_the_future++) {
     /* break out of the loop if we have checked an entire week already */
     if (has_looped == TRUE && weekday >= pref_time_wday)
       break;
@@ -1116,7 +1268,8 @@ static void _get_next_valid_time(time_t pref_time,
          temp_timerange = temp_timerange->next) {
 
       /* calculate the time for the start of this time range */
-      day_range_start = (time_t)(day_start + temp_timerange->range_start);
+      day_range_start
+        = (time_t)(day_start + temp_timerange->range_start);
 
       if ((have_earliest_time == FALSE
            || day_range_start < earliest_time)
@@ -1134,18 +1287,24 @@ static void _get_next_valid_time(time_t pref_time,
   /* else use the calculated time */
   else
     *valid_time = earliest_time;
+  return;
 }
 
 /* given a preferred time, get the next valid time within a time period */
-void get_next_valid_time(time_t pref_time, time_t* valid_time, timeperiod* tperiod) {
+void get_next_valid_time(
+       time_t pref_time,
+       time_t* valid_time,
+       timeperiod* tperiod) {
   time_t current_time = (time_t)0L;
 
-  logger(dbg_functions, basic) << "get_next_valid_time()";
+  logger(dbg_functions, basic)
+    << "get_next_valid_time()";
 
   /* get time right now, preferred time must be now or in the future */
   time(&current_time);
 
   _get_next_valid_time(pref_time, current_time, valid_time, tperiod);
+  return;
 }
 
 /* tests if a date range covers just a single day */
@@ -1168,7 +1327,10 @@ int is_daterange_single_day(daterange* dr) {
 }
 
 /* returns a time (midnight) of particular (3rd, last) day in a given month */
-time_t calculate_time_from_day_of_month(int year, int month, int monthday) {
+time_t calculate_time_from_day_of_month(
+         int year,
+         int month,
+         int monthday) {
   time_t midnight;
   int day = 0;
   struct tm t;
@@ -1235,10 +1397,11 @@ time_t calculate_time_from_day_of_month(int year, int month, int monthday) {
 }
 
 /* returns a time (midnight) of particular (3rd, last) weekday in a given month */
-time_t calculate_time_from_weekday_of_month(int year,
-					    int month,
-                                            int weekday,
-                                            int weekday_offset) {
+time_t calculate_time_from_weekday_of_month(
+         int year,
+         int month,
+         int weekday,
+         int weekday_offset) {
   time_t midnight;
   int days = 0;
   int weeks = 0;
@@ -1321,7 +1484,7 @@ time_t calculate_time_from_weekday_of_month(int year,
 /******************************************************************/
 
 /* trap signals so we can exit gracefully */
-void setup_sighandler(void) {
+void setup_sighandler() {
   /* reset the shutdown flag */
   sigshutdown = FALSE;
 
@@ -1335,15 +1498,17 @@ void setup_sighandler(void) {
   signal(SIGQUIT, sighandler);
   signal(SIGTERM, sighandler);
   signal(SIGHUP, sighandler);
+  return;
 }
 
 /* reset signal handling... */
-void reset_sighandler(void) {
+void reset_sighandler() {
   /* set signal handling to default actions */
   signal(SIGQUIT, SIG_DFL);
   signal(SIGTERM, SIG_DFL);
   signal(SIGHUP, SIG_DFL);
   signal(SIGPIPE, SIG_DFL);
+  return;
 }
 
 /* handle signals */
@@ -1365,6 +1530,7 @@ void sighandler(int sig) {
   /* else begin shutting down... */
   else if (sig < 16)
     sigshutdown = true;
+  return;
 }
 
 /******************************************************************/
@@ -1385,12 +1551,13 @@ int free_check_result(check_result* info) {
 }
 
 /* parse raw plugin output and return: short and long output, perf data */
-int parse_check_output(char* buf,
-		       char** short_output,
-                       char** long_output,
-		       char** perf_data,
-                       int escape_newlines_please,
-                       int newlines_are_escaped) {
+int parse_check_output(
+      char* buf,
+      char** short_output,
+      char** long_output,
+      char** perf_data,
+      int escape_newlines_please,
+      int newlines_are_escaped) {
   int current_line = 0;
   int found_newline = FALSE;
   int eof = FALSE;
@@ -1527,7 +1694,10 @@ int parse_check_output(char* buf,
       tempbuf = NULL;
 
       /* shift data back to front of buffer and adjust counters */
-      memmove((void*)&buf[0], (void*)&buf[x + 1], (size_t)((int)used_buf - x - 1));
+      memmove(
+        (void*)&buf[0],
+        (void*)&buf[x + 1],
+        (size_t)((int)used_buf - x - 1));
       used_buf -= (x + 1);
       buf[used_buf] = '\x0';
       x = -1;
@@ -1584,7 +1754,10 @@ int parse_check_output(char* buf,
 /******************************************************************/
 
 /* gets the next string from a buffer in memory - strings are terminated by newlines, which are removed */
-char* get_next_string_from_buf(char* buf, int* start_index, int bufsize) {
+char* get_next_string_from_buf(
+        char* buf,
+        int* start_index,
+        int bufsize) {
   char* sptr = NULL;
   char const* nl = "\n";
   int x;
@@ -1616,7 +1789,8 @@ int contains_illegal_object_chars(char* name) {
     return (FALSE);
 
   std::string tmp(name);
-  std::string const& illegal_object_chars = config->get_illegal_object_chars();
+  std::string const& illegal_object_chars
+    = config->get_illegal_object_chars();
 
   if (tmp.find_first_of(illegal_object_chars) == std::string::npos) {
     return (false);
@@ -1754,7 +1928,7 @@ int my_fdcopy(char const* source, char const* dest, int dest_fd) {
   try {
     buf = new char[buf_size];
   }
-  catch(...) {
+  catch (...) {
     close(source_fd);
     throw;
   }
@@ -1818,7 +1992,10 @@ int my_fcopy(char const* source, char const* dest) {
   unlink(dest);
 
   /* open destination file for writing */
-  if ((dest_fd = open(dest, O_WRONLY | O_TRUNC | O_CREAT | O_APPEND, 0644)) < 0) {
+  if ((dest_fd = open(
+                   dest,
+                   O_WRONLY | O_TRUNC | O_CREAT | O_APPEND,
+                   0644)) < 0) {
     logger(log_runtime_error, basic)
       << "Error: Unable to open file '" << dest
       << "' for writing: " << strerror(errno);
@@ -1877,7 +2054,9 @@ int dbuf_strcat(dbuf* db, char const* buf) {
   /* we need more memory */
   if (db->allocated_size < new_size) {
 
-    memory_needed = static_cast<unsigned long>((ceil(new_size / db->chunk_size) + 1) * db->chunk_size);
+    memory_needed
+      = static_cast<unsigned long>((ceil(new_size / db->chunk_size) + 1)
+                                   * db->chunk_size);
 
     /* allocate memory to store old and new string */
     db->buf = resize_string(db->buf, memory_needed);
@@ -1927,8 +2106,7 @@ void cleanup() {
   events::loop::unload();
   checks::checker::unload();
   commands::set::unload();
-
-  return ;
+  return;
 }
 
 /**
@@ -1984,12 +2162,11 @@ void free_memory(nagios_macros* mac) {
   */
   clear_volatile_macros_r(mac);
   free_macrox_names();
-
-  return ;
+  return;
 }
 
 /* free a notification list that was created */
-void free_notification_list(void) {
+void free_notification_list() {
   notification* temp_notification = NULL;
   notification* next_notification = NULL;
 
@@ -2002,10 +2179,11 @@ void free_notification_list(void) {
 
   /* reset notification list pointer */
   notification_list = NULL;
+  return;
 }
 
 /* reset all system-wide variables, so when we've receive a SIGHUP we can restart cleanly */
-int reset_variables(void) {
+int reset_variables() {
   config->reset();
 
   logging_options =
@@ -2053,6 +2231,5 @@ int reset_variables(void) {
 
   /* reset umask */
   umask(S_IWGRP | S_IWOTH);
-
   return (OK);
 }

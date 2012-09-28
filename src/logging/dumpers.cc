@@ -70,6 +70,7 @@ void logging::dump_object_list() {
     stream << *obj;
 
   logger(dbg_functions, basic) << stream.str();
+  return;
 }
 
 std::ostringstream& logging::operator<<(std::ostringstream& stream, host const& obj) {

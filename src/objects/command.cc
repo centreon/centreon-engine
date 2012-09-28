@@ -45,7 +45,8 @@ bool link_command(command const* obj) {
     return (false);
   }
   catch (...) {
-    logger(log_runtime_error, basic) << __func__ << " unknow exception";
+    logger(log_runtime_error, basic)
+      << __func__ << " unknow exception";
     return (false);
   }
   return (true);
@@ -64,8 +65,10 @@ void release_command(command const* obj) {
     logger(log_runtime_error, basic) << e.what();
   }
   catch (...) {
-    logger(log_runtime_error, basic) << __func__ << " unknow exception";
+    logger(log_runtime_error, basic)
+      << __func__ << " unknow exception";
   }
+  return;
 }
 
 /**
@@ -90,6 +93,7 @@ void objects::link(command const* obj) {
                                 obj->command_line,
                                 &checks::checker::instance()));
   cmd_set.add_command(new_command);
+  return;
 }
 
 /**
@@ -110,6 +114,7 @@ void objects::release(command const* obj) {
   delete[] obj->name;
   delete[] obj->command_line;
   delete obj;
+  return;
 }
 
 /**
@@ -120,13 +125,14 @@ void objects::release(command const* obj) {
  *
  *  @return True if insert sucessfuly, false otherwise.
  */
-bool objects::add_commands_to_object(std::vector<command*> const& commands,
-                                     commandsmember** list_command) {
+bool objects::add_commands_to_object(
+                std::vector<command*> const& commands,
+                commandsmember** list_command) {
   if (list_command == NULL)
     return (false);
 
-  for (std::vector<command*>::const_iterator it = commands.begin(),
-	 end = commands.end();
+  for (std::vector<command*>::const_iterator
+         it = commands.begin(), end = commands.end();
        it != end;
        ++it) {
     if (*it == NULL)

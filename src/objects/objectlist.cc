@@ -36,8 +36,10 @@ void release_objectlist(objectlist const* obj) {
     logger(log_runtime_error, basic) << e.what();
   }
   catch (...) {
-    logger(log_runtime_error, basic) << __func__ << " unknow exception";
+    logger(log_runtime_error, basic)
+      << __func__ << " unknow exception";
   }
+  return;
 }
 
 /**
@@ -54,4 +56,5 @@ void objects::release(objectlist const* obj) {
     delete obj;
     obj = tmp;
   }
+  return;
 }

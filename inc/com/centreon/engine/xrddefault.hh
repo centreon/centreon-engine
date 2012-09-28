@@ -40,8 +40,10 @@ int xrddefault_initialize_retention_data(char* config_file);
 int xrddefault_cleanup_retention_data(char* config_file);
 int xrddefault_grab_config_info(char* main_config_file);
 int xrddefault_grab_config_directives(char* input);
-int xrddefault_save_state_information(); // saves all host and service state information
-int xrddefault_read_state_information(); // reads in initial host and service state information
+// saves all host and service state information
+int xrddefault_save_state_information();
+// reads in initial host and service state information
+int xrddefault_read_state_information();
 
 #  ifdef __cplusplus
 }

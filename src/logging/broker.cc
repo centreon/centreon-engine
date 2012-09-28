@@ -108,5 +108,5 @@ void broker::log(
       memset(&_thread, 0, sizeof(_thread));
     }
   }
-  return ;
+  return;
 }

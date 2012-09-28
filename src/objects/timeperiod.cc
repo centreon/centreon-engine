@@ -62,9 +62,10 @@ void release_timeperiod(timeperiod const* obj) {
     logger(log_runtime_error, basic) << e.what();
   }
   catch (...) {
-    logger(log_runtime_error, basic) << __func__ << " unknow exception";
+    logger(log_runtime_error, basic)
+      << __func__ << " unknow exception";
   }
-  return ;
+  return;
 }
 
 /**
@@ -82,7 +83,8 @@ void objects::add_timeperiod(
                 std::vector<std::string> const& exclude) {
   // Check if timeperiod already exist.
   if (find_timeperiod(name.c_str()))
-    throw (engine_error() << "timeperiod '" << name << "' timeperiod already exist");
+    throw (engine_error() << "timeperiod '"
+           << name << "' timeperiod already exist");
 
   // Duplicate timeperiod name.
   char* name_str(my_strdup(name.c_str()));
@@ -95,8 +97,7 @@ void objects::add_timeperiod(
   tmpl_tperiod->register_object = true;
 
   for (std::vector<std::string>::const_iterator
-         it(range.begin()),
-         end(range.end());
+         it(range.begin()), end(range.end());
        it != end;
        ++it) {
     std::string base(trim(*it));
@@ -110,14 +111,14 @@ void objects::add_timeperiod(
              key.c_str(),
              value.c_str()) == ERROR) {
       xodtemplate_free_timeperiod(tmpl_tperiod);
-      throw (engine_error() << "timeperiod '" << name << "' invalid exception");
+      throw (engine_error() << "timeperiod '"
+             << name << "' invalid exception");
     }
   }
 
   std::string exclude_str;
   for (std::vector<std::string>::const_iterator
-         it(exclude.begin()),
-         end(exclude.end());
+         it(exclude.begin()), end(exclude.end());
        it != end;
        ++it) {
     exclude_str += *it;
@@ -136,9 +137,9 @@ void objects::add_timeperiod(
   }
   xodtemplate_free_timeperiod(tmpl_tperiod);
   if (res != OK)
-    throw (engine_error() << "timeperiod '" << name << "' create failed");
-
-  return ;
+    throw (engine_error() << "timeperiod '"
+           << name << "' create failed");
+  return;
 }
 
 /**
@@ -162,4 +163,5 @@ void objects::release(timeperiod const* obj) {
   delete[] obj->name;
   delete[] obj->alias;
   delete obj;
+  return;
 }

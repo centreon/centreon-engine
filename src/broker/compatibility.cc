@@ -75,12 +75,12 @@ void compatibility::author_module(broker::handle* mod) {
   if (mod) {
     for (nebmodule* tmp = neb_module_list; tmp; tmp = tmp->next)
       if (tmp->module_handle == mod) {
-        delete [] tmp->info[NEBMODULE_MODINFO_AUTHOR];
+        delete[] tmp->info[NEBMODULE_MODINFO_AUTHOR];
         tmp->info[NEBMODULE_MODINFO_AUTHOR]
           = my_strdup(mod->get_author().c_str());
       }
   }
-  return ;
+  return;
 }
 
 /**
@@ -92,7 +92,7 @@ void compatibility::copyright_module(broker::handle* mod) {
   if (mod) {
     for (nebmodule* tmp = neb_module_list; tmp; tmp = tmp->next)
       if (tmp->module_handle == mod) {
-        delete [] tmp->info[NEBMODULE_MODINFO_COPYRIGHT];
+        delete[] tmp->info[NEBMODULE_MODINFO_COPYRIGHT];
         tmp->info[NEBMODULE_MODINFO_COPYRIGHT]
           = my_strdup(mod->get_copyright().c_str());
       }
@@ -139,7 +139,7 @@ void compatibility::create_module(broker::handle* mod) {
     new_module->next = neb_module_list;
     neb_module_list = new_module.release();
   }
-  return ;
+  return;
 }
 
 /**
@@ -151,12 +151,12 @@ void compatibility::description_module(broker::handle* mod) {
   if (mod) {
     for (nebmodule* tmp = neb_module_list; tmp; tmp = tmp->next)
       if (tmp->module_handle == mod) {
-        delete [] tmp->info[NEBMODULE_MODINFO_DESC];
+        delete[] tmp->info[NEBMODULE_MODINFO_DESC];
         tmp->info[NEBMODULE_MODINFO_DESC]
           = my_strdup(mod->get_description().c_str());
       }
   }
-  return ;
+  return;
 }
 
 /**
@@ -171,10 +171,10 @@ void compatibility::destroy_module(broker::handle* mod) {
     while (tmp) {
       if (tmp->module_handle == mod) {
         nebmodule* next(tmp->next);
-        delete [] tmp->filename;
-        delete [] tmp->args;
+        delete[] tmp->filename;
+        delete[] tmp->args;
         for (unsigned int x = 0; x < NEBMODULE_MODINFO_NUMITEMS; ++x)
-          delete [] tmp->info[x];
+          delete[] tmp->info[x];
         delete tmp;
         tmp = next;
         if (last)
@@ -188,7 +188,7 @@ void compatibility::destroy_module(broker::handle* mod) {
       }
     }
   }
-  return ;
+  return;
 }
 
 /**
@@ -219,7 +219,7 @@ void compatibility::loaded_module(broker::handle* mod) {
       if (tmp->module_handle == mod)
         tmp->is_currently_loaded = mod->is_loaded();
   }
-  return ;
+  return;
 }
 
 /**
@@ -231,12 +231,12 @@ void compatibility::name_module(broker::handle* mod) {
   if (mod) {
     for (nebmodule* tmp = neb_module_list; tmp; tmp = tmp->next)
       if (tmp->module_handle == mod) {
-        delete [] tmp->info[NEBMODULE_MODINFO_TITLE];
+        delete[] tmp->info[NEBMODULE_MODINFO_TITLE];
         tmp->info[NEBMODULE_MODINFO_TITLE]
           = my_strdup(mod->get_name().c_str());
       }
   }
-  return ;
+  return;
 }
 
 /**
@@ -250,7 +250,7 @@ void compatibility::unloaded_module(broker::handle* mod) {
       if (tmp->module_handle == mod)
         tmp->is_currently_loaded = mod->is_loaded();
   }
-  return ;
+  return;
 }
 
 /**
@@ -262,12 +262,12 @@ void compatibility::version_module(broker::handle* mod) {
   if (mod) {
     for (nebmodule* tmp = neb_module_list; tmp; tmp = tmp->next)
       if (tmp->module_handle == mod) {
-        delete [] tmp->info[NEBMODULE_MODINFO_VERSION];
+        delete[] tmp->info[NEBMODULE_MODINFO_VERSION];
         tmp->info[NEBMODULE_MODINFO_VERSION]
           = my_strdup(mod->get_version().c_str());
       }
   }
-  return ;
+  return;
 }
 
 /**************************************
@@ -325,5 +325,5 @@ void compatibility::_internal_copy(compatibility const& right) {
   (void)right;
   assert(!"broker compatibility layer is not copyable");
   abort();
-  return ;
+  return;
 }

@@ -36,9 +36,10 @@ void release_timeperiodexclusion(timeperiodexclusion const* obj) {
     logger(log_runtime_error, basic) << e.what();
   }
   catch (...) {
-    logger(log_runtime_error, basic) << __func__ << " unknow exception";
+    logger(log_runtime_error, basic)
+      << __func__ << " unknow exception";
   }
-  return ;
+  return;
 }
 
 /**
@@ -52,4 +53,5 @@ void objects::release(timeperiodexclusion const* obj) {
 
   delete[] obj->timeperiod_name;
   delete obj;
+  return;
 }

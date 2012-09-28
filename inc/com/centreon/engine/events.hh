@@ -63,20 +63,61 @@ extern "C" {
 #  endif // C++
 
 // Setup Functions
-void init_timing_loop();        // setup the initial scheduling queue
-void display_scheduling_info(); // displays service check scheduling information
+
+// setup the initial scheduling queue
+void init_timing_loop();
+// displays service check scheduling information
+void display_scheduling_info();
 
 // Event Queue Functions
-void schedule_new_event(int event_type, int high_priority, time_t run_time, int recurring, unsigned long event_interval, void* timing_func, int compensate_for_time_change, void* event_data, void* event_args, int event_options); // schedules a new timed event
-void reschedule_event(timed_event* event, timed_event** event_list, timed_event** event_list_tail); // reschedules an event
-void add_event(timed_event* event, timed_event** event_list, timed_event** event_list_tail);        // adds an event to the execution queue
-void remove_event(timed_event* event, timed_event** event_list, timed_event** event_list_tail);     // remove an event from the execution queue
-int event_execution_loop(void);                                                                     // main monitoring/event handler loop
-int handle_timed_event(timed_event* event);                                                         // top level handler for timed events
-void adjust_check_scheduling(void);                                                                 // auto-adjusts scheduling of host and service checks
-void compensate_for_system_time_change(unsigned long last_time, unsigned long current_time);        // attempts to compensate for a change in the system time
-void resort_event_list(timed_event** event_list, timed_event** event_list_tail);                    // resorts event list by event run time for system time changes
-void adjust_timestamp_for_time_change(time_t last_time, time_t current_time, unsigned long time_difference, time_t* ts); // adjusts a timestamp variable for a system time change
+
+// schedules a new timed event
+void schedule_new_event(
+       int event_type,
+       int high_priority,
+       time_t run_time,
+       int recurring,
+       unsigned long event_interval,
+       void* timing_func,
+       int compensate_for_time_change,
+       void* event_data,
+       void* event_args,
+       int event_options);
+// reschedules an event
+void reschedule_event(
+       timed_event* event,
+       timed_event** event_list,
+       timed_event** event_list_tail);
+// adds an event to the execution queue
+void add_event(
+       timed_event* event,
+       timed_event** event_list,
+       timed_event** event_list_tail);
+// remove an event from the execution queue
+void remove_event(
+       timed_event* event,
+       timed_event** event_list,
+       timed_event** event_list_tail);
+// main monitoring/event handler loop
+int event_execution_loop();
+// top level handler for timed events
+int handle_timed_event(timed_event* event);
+// auto-adjusts scheduling of host and service checks
+void adjust_check_scheduling();
+// attempts to compensate for a change in the system time
+void compensate_for_system_time_change(
+       unsigned long last_time,
+       unsigned long current_time);
+// resorts event list by event run time for system time changes
+void resort_event_list(
+       timed_event** event_list,
+       timed_event** event_list_tail);
+// adjusts a timestamp variable for a system time change
+void adjust_timestamp_for_time_change(
+       time_t last_time,
+       time_t current_time,
+       unsigned long time_difference,
+       time_t* ts);
 
 #  ifdef __cplusplus
 }

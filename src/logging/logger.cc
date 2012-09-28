@@ -282,14 +282,13 @@ void logger::_flush() {
 
   // Standard logging objects.
   engine::instance().log(_buffer.str().c_str(), _type, _verbosity);
-
-  return ;
+  return;
 }
 
 /**
  *  Do nothing.
  */
 void logger::_nothing() {
-  return ;
+  return;
 }
 

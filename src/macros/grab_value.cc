@@ -46,12 +46,13 @@ using namespace com::centreon::engine::logging;
  *
  *  @return OK on success.
  */
-static int handle_host_macro(nagios_macros* mac,
-                             int macro_type,
-                             char const* arg1,
-                             char const* arg2,
-                             char** output,
-                             int* free_macro) {
+static int handle_host_macro(
+             nagios_macros* mac,
+             int macro_type,
+             char const* arg1,
+             char const* arg2,
+             char** output,
+             int* free_macro) {
   int retval;
   if (arg2 == NULL) {
     // Find the host for on-demand macros
@@ -59,7 +60,8 @@ static int handle_host_macro(nagios_macros* mac,
     host* hst(arg1 ? find_host(arg1) : mac->host_ptr);
     if (hst)
       // Get the host macro value.
-      retval = grab_standard_host_macro_r(mac,
+      retval = grab_standard_host_macro_r(
+                 mac,
                  macro_type,
                  hst,
                  output,
@@ -82,7 +84,8 @@ static int handle_host_macro(nagios_macros* mac,
           // Get the macro value for this host.
           char* buffer(NULL);
           int free_sub_macro(FALSE);
-          grab_standard_host_macro_r(mac,
+          grab_standard_host_macro_r(
+            mac,
             macro_type,
             hst,
             &buffer,
@@ -92,13 +95,15 @@ static int handle_host_macro(nagios_macros* mac,
             if (*output == NULL)
               *output = my_strdup(buffer);
             else {
-              *output = resize_string(*output,
-                strlen(*output) + strlen(buffer) + delimiter_len + 1);
+              *output
+                = resize_string(
+                    *output,
+                    strlen(*output) + strlen(buffer) + delimiter_len + 1);
               strcat(*output, arg2);
               strcat(*output, buffer);
             }
             if (free_sub_macro == TRUE)
-              delete [] buffer;
+              delete[] buffer;
             *free_macro = true;
           }
         }
@@ -124,12 +129,13 @@ static int handle_host_macro(nagios_macros* mac,
  *
  *  @return OK on success.
  */
-static int handle_hostgroup_macro(nagios_macros* mac,
-                                  int macro_type,
-                                  char const* arg1,
-                                  char const* arg2,
-                                  char** output,
-                                  int* free_macro) {
+static int handle_hostgroup_macro(
+             nagios_macros* mac,
+             int macro_type,
+             char const* arg1,
+             char const* arg2,
+             char** output,
+             int* free_macro) {
   (void)arg2;
 
   // Return value.
@@ -140,7 +146,8 @@ static int handle_hostgroup_macro(nagios_macros* mac,
   hostgroup* hg(arg1 ? find_hostgroup(arg1) : mac->hostgroup_ptr);
   if (hg) {
     // Get the hostgroup macro value.
-    retval = grab_standard_hostgroup_macro_r(mac,
+    retval = grab_standard_hostgroup_macro_r(
+               mac,
                macro_type,
                hg,
                output);
@@ -164,12 +171,13 @@ static int handle_hostgroup_macro(nagios_macros* mac,
  *
  *  @return OK on success.
  */
-static int handle_service_macro(nagios_macros* mac,
-                                int macro_type,
-                                char const* arg1,
-                                char const* arg2,
-                                char** output,
-                                int* free_macro) {
+static int handle_service_macro(
+             nagios_macros* mac,
+             int macro_type,
+             char const* arg1,
+             char const* arg2,
+             char** output,
+             int* free_macro) {
   // Return value.
   int retval;
 
@@ -178,7 +186,8 @@ static int handle_service_macro(nagios_macros* mac,
     if (!mac->service_ptr)
       retval = ERROR;
     else
-      retval = grab_standard_service_macro_r(mac,
+      retval = grab_standard_service_macro_r(
+                 mac,
                  macro_type,
                  mac->service_ptr,
                  output,
@@ -196,7 +205,8 @@ static int handle_service_macro(nagios_macros* mac,
           retval = ERROR;
         else
           // Get the service macro value.
-          retval = grab_standard_service_macro_r(mac,
+          retval = grab_standard_service_macro_r(
+                     mac,
                      macro_type,
                      svc,
                      output,
@@ -210,7 +220,8 @@ static int handle_service_macro(nagios_macros* mac,
       service* svc(find_service(arg1, arg2));
       if (svc)
         // Get the service macro value.
-        retval = grab_standard_service_macro_r(mac,
+        retval = grab_standard_service_macro_r(
+                   mac,
                    macro_type,
                    svc,
                    output,
@@ -233,7 +244,8 @@ static int handle_service_macro(nagios_macros* mac,
               // Get the macro value for this service.
               char* buffer(NULL);
               int free_sub_macro(FALSE);
-              grab_standard_service_macro_r(mac,
+              grab_standard_service_macro_r(
+                mac,
                 macro_type,
                 svc,
                 &buffer,
@@ -243,7 +255,8 @@ static int handle_service_macro(nagios_macros* mac,
                 if (*output == NULL)
                   *output = my_strdup(buffer);
                 else {
-                  *output = resize_string(*output,
+                  *output = resize_string(
+                              *output,
                               strlen(*output)
                               + strlen(buffer)
                               + delimiter_len
@@ -252,7 +265,7 @@ static int handle_service_macro(nagios_macros* mac,
                   strcat(*output, buffer);
                 }
                 if (free_sub_macro != FALSE) {
-                  delete [] buffer;
+                  delete[] buffer;
                   buffer = NULL;
                 }
               }
@@ -282,12 +295,13 @@ static int handle_service_macro(nagios_macros* mac,
  *
  *  @return OK on success.
  */
-static int handle_servicegroup_macro(nagios_macros* mac,
-                                     int macro_type,
-                                     char const* arg1,
-                                     char const* arg2,
-                                     char** output,
-                                     int* free_macro) {
+static int handle_servicegroup_macro(
+             nagios_macros* mac,
+             int macro_type,
+             char const* arg1,
+             char const* arg2,
+             char** output,
+             int* free_macro) {
   (void)arg2;
 
   // Return value.
@@ -300,7 +314,8 @@ static int handle_servicegroup_macro(nagios_macros* mac,
     retval = ERROR;
   else {
     // Get the servicegroup macro value.
-    retval = grab_standard_servicegroup_macro_r(mac,
+    retval = grab_standard_servicegroup_macro_r(
+               mac,
                macro_type,
                sg,
                output);
@@ -324,12 +339,13 @@ static int handle_servicegroup_macro(nagios_macros* mac,
  *
  *  @return OK on success.
  */
-static int handle_contact_macro(nagios_macros* mac,
-                                int macro_type,
-                                char const* arg1,
-                                char const* arg2,
-                                char** output,
-                                int* free_macro) {
+static int handle_contact_macro(
+             nagios_macros* mac,
+             int macro_type,
+             char const* arg1,
+             char const* arg2,
+             char** output,
+             int* free_macro) {
   // Return value.
   int retval;
 
@@ -341,7 +357,8 @@ static int handle_contact_macro(nagios_macros* mac,
       retval = ERROR;
     else {
       // Get the contact macro value.
-      retval = grab_standard_contact_macro_r(mac,
+      retval = grab_standard_contact_macro_r(
+                 mac,
                  macro_type,
                  cntct,
                  output);
@@ -365,7 +382,8 @@ static int handle_contact_macro(nagios_macros* mac,
         if (cntct) {
           // Get the macro value for this contact.
           char* buffer(NULL);
-          grab_standard_contact_macro_r(mac,
+          grab_standard_contact_macro_r(
+            mac,
             macro_type,
             cntct,
             &buffer);
@@ -374,7 +392,8 @@ static int handle_contact_macro(nagios_macros* mac,
             if (*output == NULL)
               *output = my_strdup(buffer);
             else {
-              *output = resize_string(*output,
+              *output = resize_string(
+                          *output,
                           strlen(*output)
                           + strlen(buffer)
                           + delimiter_len
@@ -382,7 +401,7 @@ static int handle_contact_macro(nagios_macros* mac,
               strcat(*output, arg2);
               strcat(*output, buffer);
             }
-            delete [] buffer;
+            delete[] buffer;
             buffer = NULL;
           }
         }
@@ -409,12 +428,13 @@ static int handle_contact_macro(nagios_macros* mac,
  *
  *  @return OK on success.
  */
-static int handle_contactgroup_macro(nagios_macros* mac,
-                                     int macro_type,
-                                     char const* arg1,
-                                     char const* arg2,
-                                     char** output,
-                                     int* free_macro) {
+static int handle_contactgroup_macro(
+             nagios_macros* mac,
+             int macro_type,
+             char const* arg1,
+             char const* arg2,
+             char** output,
+             int* free_macro) {
   (void)arg2;
 
   // Return value.
@@ -447,12 +467,13 @@ static int handle_contactgroup_macro(nagios_macros* mac,
  *
  *  @return OK on success.
  */
-static int handle_notification_macro(nagios_macros* mac,
-                                     int macro_type,
-                                     char const* arg1,
-                                     char const* arg2,
-                                     char** output,
-                                     int* free_macro) {
+static int handle_notification_macro(
+             nagios_macros* mac,
+             int macro_type,
+             char const* arg1,
+             char const* arg2,
+             char** output,
+             int* free_macro) {
   (void)arg1;
   (void)arg2;
 
@@ -476,14 +497,16 @@ static int handle_notification_macro(nagios_macros* mac,
  *
  *  @return OK on success.
  */
-static int handle_datetime_macro(nagios_macros* mac,
-                                 int macro_type,
-                                 char const* arg1,
-                                 char const* arg2,
-                                 char** output,
-                                 int* free_macro) {
+static int handle_datetime_macro(
+             nagios_macros* mac,
+             int macro_type,
+             char const* arg1,
+             char const* arg2,
+             char** output,
+             int* free_macro) {
   // Calculate macros.
-  int retval(grab_datetime_macro_r(mac,
+  int retval(grab_datetime_macro_r(
+               mac,
                macro_type,
                arg1,
                arg2,
@@ -505,12 +528,13 @@ static int handle_datetime_macro(nagios_macros* mac,
  *
  *  @return OK on success.
  */
-static int handle_static_macro(nagios_macros* mac,
-                               int macro_type,
-                               char const* arg1,
-                               char const* arg2,
-                               char** output,
-                               int* free_macro) {
+static int handle_static_macro(
+             nagios_macros* mac,
+             int macro_type,
+             char const* arg1,
+             char const* arg2,
+             char** output,
+             int* free_macro) {
   (void)mac;
   (void)arg1;
   (void)arg2;
@@ -534,12 +558,13 @@ static int handle_static_macro(nagios_macros* mac,
  *
  *  @return OK on success.
  */
-static int handle_summary_macro(nagios_macros* mac,
-                                int macro_type,
-                                char const* arg1,
-                                char const* arg2,
-                                char** output,
-                                int* free_macro) {
+static int handle_summary_macro(
+             nagios_macros* mac,
+             int macro_type,
+             char const* arg1,
+             char const* arg2,
+             char** output,
+             int* free_macro) {
   (void)arg1;
   (void)arg2;
 
@@ -557,9 +582,10 @@ static int handle_summary_macro(nagios_macros* mac,
          temp_host != NULL;
          temp_host = temp_host->next) {
       // Filter totals based on contact if necessary.
-      bool authorized(mac->contact_ptr
-                      ? is_contact_for_host(temp_host, mac->contact_ptr)
-                      : true);
+      bool authorized(
+             mac->contact_ptr
+             ? is_contact_for_host(temp_host, mac->contact_ptr)
+             : true);
       if (authorized) {
         bool problem(true);
         if ((temp_host->current_state == HOST_UP)
@@ -590,7 +616,8 @@ static int handle_summary_macro(nagios_macros* mac,
       }
     }
     host_problems = hosts_down + hosts_unreachable;
-    host_problems_unhandled = hosts_down_unhandled + hosts_unreachable_unhandled;
+    host_problems_unhandled
+      = hosts_down_unhandled + hosts_unreachable_unhandled;
 
     // Get service totals.
     unsigned int service_problems(0);
@@ -606,10 +633,12 @@ static int handle_summary_macro(nagios_macros* mac,
          temp_service != NULL;
          temp_service = temp_service->next) {
       // Filter totals based on contact if necessary.
-      bool authorized(mac->contact_ptr
-                      ? is_contact_for_service(temp_service,
-                          mac->contact_ptr)
-                      : true);
+      bool authorized(
+             mac->contact_ptr
+             ? is_contact_for_service(
+                 temp_service,
+                 mac->contact_ptr)
+             : true);
       if (authorized) {
         bool problem(true);
         if (temp_service->current_state == STATE_OK
@@ -665,15 +694,19 @@ static int handle_summary_macro(nagios_macros* mac,
         }
       }
     }
-    service_problems = services_warning + services_critical + services_unknown;
-    service_problems_unhandled = services_warning_unhandled + services_critical_unhandled + services_unknown_unhandled;
+    service_problems
+      = services_warning + services_critical + services_unknown;
+    service_problems_unhandled
+      = services_warning_unhandled
+      + services_critical_unhandled
+      + services_unknown_unhandled;
 
     // These macros are time-intensive to compute, and will likely be
     // used together, so save them all for future use.
     for (unsigned int x = MACRO_TOTALHOSTSUP;
          x <= MACRO_TOTALSERVICEPROBLEMSUNHANDLED;
          x++) {
-      delete [] mac->x[x];
+      delete[] mac->x[x];
       mac->x[x] = NULL;
     }
     mac->x[MACRO_TOTALHOSTSUP] = obj2pchar(hosts_up);
@@ -958,11 +991,12 @@ struct grab_value_redirection {
 extern "C" {
 
 /* this is the big one */
-int grab_macro_value_r(nagios_macros* mac,
-                       char* macro_buffer,
-                       char** output,
-                       int* clean_options,
-                       int* free_macro) {
+int grab_macro_value_r(
+      nagios_macros* mac,
+      char* macro_buffer,
+      char** output,
+      int* clean_options,
+      int* free_macro) {
   char* buf = NULL;
   char* ptr = NULL;
   char* macro_name = NULL;
@@ -1024,7 +1058,13 @@ int grab_macro_value_r(nagios_macros* mac,
         << "  macros[" << x << "] (" << macro_x_names[x] << ") match.";
 
       /* get the macro value */
-      result = grab_macrox_value_r(mac, x, arg[0], arg[1], output, free_macro);
+      result = grab_macrox_value_r(
+                 mac,
+                 x,
+                 arg[0],
+                 arg[1],
+                 output,
+                 free_macro);
 
       /* post-processing */
       /* host/service output/perfdata and author/comment macros should get cleaned */
@@ -1124,7 +1164,8 @@ int grab_macro_value_r(nagios_macros* mac,
           if (*output == NULL)
             *output = my_strdup(temp_buffer);
           else {
-            *output = resize_string(*output,
+            *output = resize_string(
+                        *output,
                         strlen(*output)
                         + strlen(temp_buffer)
                         + delimiter_len
@@ -1152,12 +1193,18 @@ int grab_macro_value_r(nagios_macros* mac,
   /***** CUSTOM VARIABLE MACROS *****/
   else if (macro_name[0] == '_') {
     /* get the macro value */
-    result = grab_custom_macro_value_r(mac, macro_name, arg[0], arg[1], output);
+    result = grab_custom_macro_value_r(
+               mac,
+               macro_name,
+               arg[0],
+               arg[1],
+               output);
   }
   /* no macro matched... */
   else {
     logger(dbg_macros, basic)
-      << " WARNING: Could not find a macro matching '" << macro_name << "'!";
+      << " WARNING: Could not find a macro matching '"
+      << macro_name << "'!";
     result = ERROR;
   }
 
@@ -1166,11 +1213,13 @@ int grab_macro_value_r(nagios_macros* mac,
   return (result);
 }
 
-int grab_macro_value(char* macro_buffer,
+int grab_macro_value(
+      char* macro_buffer,
       char** output,
       int* clean_options,
       int* free_macro) {
-  return (grab_macro_value_r(get_global_macros(),
+  return (grab_macro_value_r(
+            get_global_macros(),
             macro_buffer,
             output,
             clean_options,
@@ -1190,12 +1239,13 @@ int grab_macro_value(char* macro_buffer,
  *
  *  @return OK on success.
  */
-int grab_macrox_value_r(nagios_macros* mac,
-                        int macro_type,
-                        char const* arg1,
-                        char const* arg2,
-                        char** output,
-                        int* free_macro) {
+int grab_macrox_value_r(
+      nagios_macros* mac,
+      int macro_type,
+      char const* arg1,
+      char const* arg2,
+      char** output,
+      int* free_macro) {
   int retval;
   if (!mac || !output || !free_macro)
     retval = ERROR;
@@ -1208,7 +1258,13 @@ int grab_macrox_value_r(nagios_macros* mac,
         << "UNHANDLED MACRO #" << macro_type << "! THIS IS A BUG!";
     }
     else
-      retval = (*it->second)(mac, macro_type, arg1, arg2, output, free_macro);
+      retval = (*it->second)(
+                 mac,
+                 macro_type,
+                 arg1,
+                 arg2,
+                 output,
+                 free_macro);
   }
   return (retval);
 }
@@ -1227,12 +1283,14 @@ int grab_macrox_value_r(nagios_macros* mac,
  *
  *  @see grab_macrox_value_r
  */
-int grab_macrox_value(int macro_type,
-                      char const* arg1,
-                      char const* arg2,
-                      char** output,
-                      int* free_macro) {
-  return (grab_macrox_value_r(get_global_macros(),
+int grab_macrox_value(
+      int macro_type,
+      char const* arg1,
+      char const* arg2,
+      char** output,
+      int* free_macro) {
+  return (grab_macrox_value_r(
+            get_global_macros(),
             macro_type,
             arg1,
             arg2,

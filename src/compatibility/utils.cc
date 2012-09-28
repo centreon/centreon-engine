@@ -21,7 +21,7 @@
 #include "utils.h"
 
 /* get the next time to schedule a log rotation */
-time_t get_next_log_rotation_time(void) {
+time_t get_next_log_rotation_time() {
   return (0);
 }
 

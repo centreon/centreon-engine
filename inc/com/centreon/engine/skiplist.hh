@@ -46,7 +46,12 @@ typedef struct  skiplist_struct {
 extern "C" {
 #  endif // C++
 
-skiplist* skiplist_new(int max_levels, float level_probability, int allow_duplicates, int append_duplicates, int (*compare_function)(void const*, void const*));
+skiplist* skiplist_new(
+            int max_levels,
+            float level_probability,
+            int allow_duplicates,
+            int append_duplicates,
+            int (*compare_function)(void const*, void const*));
 int skiplist_insert(skiplist* list, void* data);
 skiplistnode* skiplist_new_node(skiplist* list, int node_levels);
 int skiplist_random_level(skiplist* list);

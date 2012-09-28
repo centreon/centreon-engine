@@ -43,7 +43,7 @@ int clear_hostgroup_macros_r(nagios_macros* mac) {
   for (unsigned int i = 0;
        i < sizeof(to_free) / sizeof(*to_free);
        ++i) {
-    delete [] mac->x[i];
+    delete[] mac->x[i];
     mac->x[i] = NULL;
   }
 

@@ -39,7 +39,12 @@ static engine* _instance = NULL;
 /**
  *  Default constructor.
  */
-engine::obj_info::obj_info() : _id(0), _type(0), _verbosity(0) {}
+engine::obj_info::obj_info()
+  : _id(0),
+    _type(0),
+    _verbosity(0) {
+
+}
 
 /**
  *  Constructor.
@@ -122,7 +127,7 @@ void engine::obj_info::_internal_copy(engine::obj_info const& right) {
   _obj = right._obj;
   _type = right._type;
   _verbosity = right._verbosity;
-  return ;
+  return;
 }
 
 /**************************************
@@ -196,8 +201,7 @@ void engine::log(
   if (message != NULL) {
     concurrency::read_locker lock(&_rwlock);
     for (std::vector<obj_info>::iterator
-           it(_objects.begin()),
-           end(_objects.end());
+           it(_objects.begin()), end(_objects.end());
 	 it != end;
 	 ++it) {
       obj_info& info(*it);
@@ -205,7 +209,7 @@ void engine::log(
 	info._obj->log(message, type, verbosity);
     }
   }
-  return ;
+  return;
 }
 
 /**
@@ -218,8 +222,7 @@ void engine::remove_object(unsigned long id) throw () {
   memset(_type, 0, sizeof(_type));
   std::vector<obj_info>::iterator it_erase(_objects.end());
   for (std::vector<obj_info>::iterator
-         it(_objects.begin()),
-         end(_objects.end());
+         it(_objects.begin()), end(_objects.end());
        it != end;
        ++it) {
     obj_info& obj(*it);
@@ -234,7 +237,7 @@ void engine::remove_object(unsigned long id) throw () {
       --_id;
     _objects.erase(it_erase);
   }
-  return ;
+  return;
 }
 
 /**
@@ -245,7 +248,7 @@ void engine::remove_object(unsigned long id) throw () {
 void engine::remove_object(obj_info& obj) throw () {
   remove_object(obj.id());
   obj._id = 0;
-  return ;
+  return;
 }
 
 /**
@@ -272,8 +275,7 @@ void engine::update_object(
   memset(_type, 0, sizeof(_type));
   std::vector<obj_info>::iterator it_erase(_objects.end());
   for (std::vector<obj_info>::iterator
-         it(_objects.begin()),
-         end(_objects.end());
+         it(_objects.begin()), end(_objects.end());
        it != end;
        ++it) {
     obj_info& obj(*it);
@@ -289,7 +291,7 @@ void engine::update_object(
     info._verbosity = verbosity;
     _type[verbosity] |= type;
   }
-  return ;
+  return;
 }
 
 /**************************************
@@ -342,5 +344,5 @@ void engine::_internal_copy(engine const& right) {
   (void)right;
   assert(!"logging engine is not copyable");
   abort();
-  return ;
+  return;
 }

@@ -58,7 +58,7 @@ void broker_acknowledgement_data(
        struct timeval const* timestamp) {
   // Config check.
   if (!(config->get_event_broker_options() & BROKER_ACKNOWLEDGEMENT_DATA))
-    return ;
+    return;
 
   // Fill struct with relevant data.
   host* temp_host(NULL);
@@ -90,8 +90,7 @@ void broker_acknowledgement_data(
 
   // Make callbacks.
   neb_make_callbacks(NEBCALLBACK_ACKNOWLEDGEMENT_DATA, &ds);
-
-  return ;
+  return;
 }
 
 /**
@@ -125,7 +124,7 @@ void broker_adaptive_contact_data(
        struct timeval const* timestamp) {
   // Config check.
   if (!(config->get_event_broker_options() & BROKER_ADAPTIVE_DATA))
-    return ;
+    return;
 
   // Fill struct with relevant data.
   nebstruct_adaptive_contact_data ds;
@@ -144,8 +143,7 @@ void broker_adaptive_contact_data(
 
   // Make callbacks.
   neb_make_callbacks(NEBCALLBACK_ADAPTIVE_CONTACT_DATA, &ds);
-
-  return ;
+  return;
 }
 
 /**
@@ -171,7 +169,7 @@ void broker_adaptive_host_data(
        struct timeval const* timestamp) {
   // Config check.
   if (!(config->get_event_broker_options() & BROKER_ADAPTIVE_DATA))
-    return ;
+    return;
 
   // Fill struct with relevant data.
   nebstruct_adaptive_host_data ds;
@@ -186,8 +184,7 @@ void broker_adaptive_host_data(
 
   // Make callbacks.
   neb_make_callbacks(NEBCALLBACK_ADAPTIVE_HOST_DATA, &ds);
-
-  return ;
+  return;
 }
 
 /**
@@ -215,7 +212,7 @@ void broker_adaptive_program_data(
        struct timeval const* timestamp) {
   // Config check.
   if (!(config->get_event_broker_options() & BROKER_ADAPTIVE_DATA))
-    return ;
+    return;
 
   // Fill struct with relevant data.
   nebstruct_adaptive_program_data ds;
@@ -231,8 +228,7 @@ void broker_adaptive_program_data(
 
   // Make callbacks.
   neb_make_callbacks(NEBCALLBACK_ADAPTIVE_PROGRAM_DATA, &ds);
-
-  return ;
+  return;
 }
 
 /**
@@ -258,7 +254,7 @@ void broker_adaptive_service_data(
        struct timeval const* timestamp) {
   // Config check.
   if (!(config->get_event_broker_options() & BROKER_ADAPTIVE_DATA))
-    return ;
+    return;
 
   // Fill struct with relevant data.
   nebstruct_adaptive_service_data ds;
@@ -273,8 +269,7 @@ void broker_adaptive_service_data(
 
   // Make callbacks.
   neb_make_callbacks(NEBCALLBACK_ADAPTIVE_SERVICE_DATA, &ds);
-
-  return ;
+  return;
 }
 
 /**
@@ -292,7 +287,7 @@ void broker_aggregated_status_data(
        struct timeval const* timestamp) {
   // Config check.
   if (!(config->get_event_broker_options() & BROKER_STATUS_DATA))
-    return ;
+    return;
 
   // Fill struct with relevant data.
   nebstruct_aggregated_status_data ds;
@@ -304,7 +299,7 @@ void broker_aggregated_status_data(
   // Make callbacks.
   neb_make_callbacks(NEBCALLBACK_AGGREGATED_STATUS_DATA, &ds);
 
-  return ;
+  return;
 }
 
 /**
@@ -326,7 +321,7 @@ void broker_command_data(
        struct timeval const* timestamp) {
   // Config check.
   if (!(config->get_event_broker_options() & BROKER_COMMAND_DATA))
-    return ;
+    return;
 
   // Fill struct with relevant data.
   nebstruct_command_data ds;
@@ -339,8 +334,7 @@ void broker_command_data(
 
   // Make callback.
   neb_make_callbacks(NEBCALLBACK_COMMAND_DATA, &ds);
-
-  return ;
+  return;
 }
 
 /**
@@ -381,7 +375,7 @@ void broker_comment_data(
        struct timeval const* timestamp) {
   // Config check.
   if (!(config->get_event_broker_options() & BROKER_COMMENT_DATA))
-    return ;
+    return;
 
   // Fill struct with relevant data.
   nebstruct_comment_data ds;
@@ -405,8 +399,7 @@ void broker_comment_data(
 
   // Make callbacks.
   neb_make_callbacks(NEBCALLBACK_COMMENT_DATA, &ds);
-
-  return ;
+  return;
 }
 
 /**
@@ -574,7 +567,7 @@ int broker_contact_notification_method_data(
                   &ds);
 
   // Free memory.
-  delete [] command_buf;
+  delete[] command_buf;
 
   return (return_code);
 }
@@ -596,7 +589,7 @@ void broker_contact_status(
        struct timeval const* timestamp) {
   // Config check.
   if (!(config->get_event_broker_options() & BROKER_STATUS_DATA))
-    return ;
+    return;
 
   // Fill struct with relevant data.
   nebstruct_service_status_data ds;
@@ -608,8 +601,7 @@ void broker_contact_status(
 
   // Make callbacks.
   neb_make_callbacks(NEBCALLBACK_CONTACT_STATUS_DATA, &ds);
-
-  return ;
+  return;
 }
 
 /**
@@ -632,7 +624,7 @@ void broker_custom_variable(
        struct timeval const* timestamp) {
   // Config check.
   if (!(config->get_event_broker_options() & BROKER_CUSTOMVARIABLE_DATA))
-    return ;
+    return;
 
   // Fill struct with relevant data.
   nebstruct_custom_variable_data ds;
@@ -648,10 +640,9 @@ void broker_custom_variable(
   neb_make_callbacks(NEBCALLBACK_CUSTOM_VARIABLE_DATA, &ds);
 
   // Free memory.
-  delete [] ds.var_name;
-  delete [] ds.var_value;
-
-  return ;
+  delete[] ds.var_name;
+  delete[] ds.var_value;
+  return;
 }
 
 /**
@@ -693,7 +684,7 @@ void broker_downtime_data(
        struct timeval const* timestamp) {
   // Config check.
   if (!(config->get_event_broker_options() & BROKER_DOWNTIME_DATA))
-    return ;
+    return;
 
   // Fill struct with relevant data.
   nebstruct_downtime_data ds;
@@ -717,8 +708,7 @@ void broker_downtime_data(
 
   // Make callbacks.
   neb_make_callbacks(NEBCALLBACK_DOWNTIME_DATA, &ds);
-
-  return ;
+  return;
 }
 
 /**
@@ -817,8 +807,7 @@ int broker_event_handler(
   return_code = neb_make_callbacks(NEBCALLBACK_EVENT_HANDLER_DATA, &ds);
 
   // Free memory.
-  delete [] command_buf;
-
+  delete[] command_buf;
   return (return_code);
 }
 
@@ -845,7 +834,7 @@ void broker_external_command(
        struct timeval const* timestamp) {
   // Config check.
   if (!(config->get_event_broker_options() & BROKER_EXTERNALCOMMAND_DATA))
-    return ;
+    return;
 
   // Fill struct with relevant data.
   nebstruct_external_command_data ds;
@@ -861,7 +850,7 @@ void broker_external_command(
   // Make callbacks.
   neb_make_callbacks(NEBCALLBACK_EXTERNAL_COMMAND_DATA, &ds);
 
-  return ;
+  return;
 }
 
 /**
@@ -889,9 +878,9 @@ void broker_flapping_data(
        struct timeval const* timestamp) {
   // Config check.
   if (!(config->get_event_broker_options() & BROKER_FLAPPING_DATA))
-    return ;
+    return;
   if (!data)
-    return ;
+    return;
 
   // Fill struct with relevant data.
   nebstruct_flapping_data ds;
@@ -921,8 +910,7 @@ void broker_flapping_data(
 
   // Make callbacks.
   neb_make_callbacks(NEBCALLBACK_FLAPPING_DATA, &ds);
-
-  return ;
+  return;
 }
 
 /**
@@ -942,7 +930,7 @@ void broker_group(
        struct timeval const* timestamp) {
   // Config check.
   if (!(config->get_event_broker_options() & BROKER_GROUP_DATA))
-    return ;
+    return;
 
   // Fill struct with relevant data.
   nebstruct_group_data ds;
@@ -955,7 +943,7 @@ void broker_group(
   // Make callbacks.
   neb_make_callbacks(NEBCALLBACK_GROUP_DATA, &ds);
 
-  return ;
+  return;
 }
 
 /**
@@ -977,7 +965,7 @@ void broker_group_member(
        struct timeval const* timestamp) {
   // Config check.
   if (!(config->get_event_broker_options() & BROKER_GROUP_MEMBER_DATA))
-    return ;
+    return;
 
   // Fill struct will relevant data.
   nebstruct_group_member_data ds;
@@ -991,7 +979,7 @@ void broker_group_member(
   // Make callbacks.
   neb_make_callbacks(NEBCALLBACK_GROUP_MEMBER_DATA, &ds);
 
-  return ;
+  return;
 }
 
 /**
@@ -1089,8 +1077,7 @@ int broker_host_check(
   return_code = neb_make_callbacks(NEBCALLBACK_HOST_CHECK_DATA, &ds);
 
   // Free data.
-  delete [] command_buf;
-
+  delete[] command_buf;
   return (return_code);
 }
 
@@ -1111,7 +1098,7 @@ void broker_host_status(
        struct timeval const* timestamp) {
   // Config check.
   if (!(config->get_event_broker_options() & BROKER_STATUS_DATA))
-    return ;
+    return;
 
   // Fill struct with relevant data.
   nebstruct_host_status_data ds;
@@ -1123,8 +1110,7 @@ void broker_host_status(
 
   // Make callbacks.
   neb_make_callbacks(NEBCALLBACK_HOST_STATUS_DATA, &ds);
-
-  return ;
+  return;
 }
 
 /**
@@ -1148,7 +1134,7 @@ void broker_log_data(
        struct timeval const* timestamp) {
   // Config check.
   if (!(config->get_event_broker_options() & BROKER_LOGGED_DATA))
-    return ;
+    return;
 
   // Fill struct with relevant data.
   nebstruct_log_data ds;
@@ -1162,8 +1148,7 @@ void broker_log_data(
 
   // Make callbacks.
   neb_make_callbacks(NEBCALLBACK_LOG_DATA, &ds);
-
-  return ;
+  return;
 }
 
 /**
@@ -1185,7 +1170,7 @@ void broker_module_data(
        struct timeval const* timestamp) {
   // Config check.
   if (!(config->get_event_broker_options() & BROKER_MODULE_DATA))
-    return ;
+    return;
 
   // Fill struct with relevant data.
   nebstruct_module_data ds;
@@ -1200,10 +1185,9 @@ void broker_module_data(
   neb_make_callbacks(NEBCALLBACK_MODULE_DATA, &ds);
 
   // Free memory.
-  delete [] ds.module;
-  delete [] ds.args;
-
-  return ;
+  delete[] ds.module;
+  delete[] ds.args;
+  return;
 }
 
 /**
@@ -1294,7 +1278,7 @@ void broker_program_state(
        struct timeval const* timestamp) {
   // Config check.
   if (!(config->get_event_broker_options() & BROKER_PROGRAM_STATE))
-    return ;
+    return;
 
   // Fill struct with relevant data.
   nebstruct_process_data ds;
@@ -1305,8 +1289,7 @@ void broker_program_state(
 
   // Make callbacks.
   neb_make_callbacks(NEBCALLBACK_PROCESS_DATA, &ds);
-
-  return ;
+  return;
 }
 
 /**
@@ -1324,7 +1307,7 @@ void broker_program_status(
        struct timeval const* timestamp) {
   // Config check.
   if (!(config->get_event_broker_options() & BROKER_STATUS_DATA))
-    return ;
+    return;
 
   // Fill struct with relevant data.
   nebstruct_program_status_data ds;
@@ -1362,10 +1345,9 @@ void broker_program_status(
   neb_make_callbacks(NEBCALLBACK_PROGRAM_STATUS_DATA, &ds);
 
   // Free memory.
-  delete [] ds.global_host_event_handler;
-  delete [] ds.global_service_event_handler;
-
-  return ;
+  delete[] ds.global_host_event_handler;
+  delete[] ds.global_service_event_handler;
+  return;
 }
 
 /**
@@ -1401,9 +1383,9 @@ void broker_relation_data(
        struct timeval const* timestamp) {
   // Config check.
   if (!(config->get_event_broker_options() & BROKER_RELATION_DATA))
-    return ;
+    return;
   if (!hst || !dep_hst)
-    return ;
+    return;
 
   // Fill struct with relevant data.
   nebstruct_relation_data ds;
@@ -1422,8 +1404,7 @@ void broker_relation_data(
 
   // Make callbacks.
   neb_make_callbacks(NEBCALLBACK_RELATION_DATA, &ds);
-
-  return ;
+  return;
 }
 
 /**
@@ -1441,7 +1422,7 @@ void broker_retention_data(
        struct timeval const* timestamp) {
   // Config check.
   if (!(config->get_event_broker_options() & BROKER_RETENTION_DATA))
-    return ;
+    return;
 
   // Fill struct with relevant data.
   nebstruct_retention_data ds;
@@ -1452,8 +1433,7 @@ void broker_retention_data(
 
   // Make callbacks.
   neb_make_callbacks(NEBCALLBACK_RETENTION_DATA, &ds);
-
-  return ;
+  return;
 }
 
 /**
@@ -1544,8 +1524,7 @@ int broker_service_check(
                   &ds);
 
   // Free data.
-  delete [] command_buf;
-
+  delete[] command_buf;
   return (return_code);
 }
 
@@ -1566,7 +1545,7 @@ void broker_service_status(
        struct timeval const* timestamp) {
   // Config check.
   if (!(config->get_event_broker_options() & BROKER_STATUS_DATA))
-    return ;
+    return;
 
   // Fill struct with relevant data.
   nebstruct_service_status_data ds;
@@ -1578,8 +1557,7 @@ void broker_service_status(
 
   // Make callbacks.
   neb_make_callbacks(NEBCALLBACK_SERVICE_STATUS_DATA, &ds);
-
-  return ;
+  return;
 }
 
 /**
@@ -1609,7 +1587,7 @@ void broker_statechange_data(
        struct timeval const* timestamp) {
   // Config check.
   if (!(config->get_event_broker_options() & BROKER_STATECHANGE_DATA))
-    return ;
+    return;
 
   // Fill struct with relevant data.
   nebstruct_statechange_data ds;
@@ -1640,8 +1618,7 @@ void broker_statechange_data(
 
   // Make callbacks.
   neb_make_callbacks(NEBCALLBACK_STATE_CHANGE_DATA, &ds);
-
-  return ;
+  return;
 }
 
 /**
@@ -1675,9 +1652,9 @@ void broker_system_command(
        struct timeval const* timestamp) {
   // Config check.
   if (!(config->get_event_broker_options() & BROKER_SYSTEM_COMMANDS))
-    return ;
+    return;
   if (!cmd)
-    return ;
+    return;
 
   // Fill struct with relevant data.
   nebstruct_system_command_data ds;
@@ -1696,8 +1673,7 @@ void broker_system_command(
 
   // Make callbacks.
   neb_make_callbacks(NEBCALLBACK_SYSTEM_COMMAND_DATA, &ds);
-
-  return ;
+  return;
 }
 
 /**
@@ -1717,9 +1693,9 @@ void broker_timed_event(
        struct timeval const* timestamp) {
   // Config check.
   if (!(config->get_event_broker_options() & BROKER_TIMED_EVENTS))
-    return ;
+    return;
   if (!event)
-    return ;
+    return;
 
   // Fill struct with relevant data.
   nebstruct_timed_event_data ds;
@@ -1735,8 +1711,7 @@ void broker_timed_event(
 
   // Make callbacks.
   neb_make_callbacks(NEBCALLBACK_TIMED_EVENT_DATA, &ds);
-
-  return ;
+  return;
 }
 
 /**

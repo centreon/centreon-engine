@@ -63,20 +63,72 @@ typedef struct           comment_struct {
 extern "C" {
 #  endif // C++
 
-int initialize_comment_data(char const* config_file);                            // initializes comment data
-int cleanup_comment_data(char const* config_file);                               // cleans up comment data
-int add_new_comment(unsigned int type, int entry_type, char const* host_name, char const* svc_description, time_t entry_time, char const* author_name, char const* comment_data, int persistent, int source, int expires, time_t expire_time, unsigned long* comment_id);                      // adds a new host or service comment
-int add_new_host_comment(int entry_type, char const* host_name, time_t entry_time, char const* author_name, char const* comment_data, int persistent, int source, int expires, time_t expire_time, unsigned long* comment_id); // adds a new host comment
-int add_new_service_comment(int entry_type, char const* host_name, char const* svc_description, time_t entry_time, char const* author_name, char const* comment_data, int persistent, int source, int expires, time_t expire_time, unsigned long* comment_id);                                  // adds a new service comment
-int delete_comment(unsigned int type, unsigned long comment_id);           // deletes a host or service comment
-int delete_host_comment(unsigned long comment_id);                         // deletes a host comment
-int delete_service_comment(unsigned long comment_id);                      // deletes a service comment
-int delete_all_comments(unsigned int type, char const* host_name, char const* svc_description); // deletes all comments for a particular host or service
-int delete_all_host_comments(char const* host_name);                             // deletes all comments for a specific host
-int delete_host_acknowledgement_comments(host* hst);                       // deletes all non-persistent ack comments for a specific host
-int delete_all_service_comments(char const* host_name, char const* svc_description);   // deletes all comments for a specific service
-int delete_service_acknowledgement_comments(service* svc);                 // deletes all non-persistent ack comments for a specific service
-int check_for_expired_comment(unsigned long comment_id);                   // expires a comment
+// initializes comment data
+int initialize_comment_data(char const* config_file);
+// cleans up comment data
+int cleanup_comment_data(char const* config_file);
+// adds a new host or service comment
+int add_new_comment(
+      unsigned int type,
+      int entry_type,
+      char const* host_name,
+      char const* svc_description,
+      time_t entry_time,
+      char const* author_name,
+      char const* comment_data,
+      int persistent,
+      int source,
+      int expires,
+      time_t expire_time,
+      unsigned long* comment_id);
+// adds a new host comment
+int add_new_host_comment(
+      int entry_type,
+      char const* host_name,
+      time_t entry_time,
+      char const* author_name,
+      char const* comment_data,
+      int persistent,
+      int source,
+      int expires,
+      time_t expire_time,
+      unsigned long* comment_id);
+// adds a new service comment
+int add_new_service_comment(
+      int entry_type,
+      char const* host_name,
+      char const* svc_description,
+      time_t entry_time,
+      char const* author_name,
+      char const* comment_data,
+      int persistent,
+      int source,
+      int expires,
+      time_t expire_time,
+      unsigned long* comment_id);
+// deletes a host or service comment
+int delete_comment(unsigned int type, unsigned long comment_id);
+// deletes a host comment
+int delete_host_comment(unsigned long comment_id);
+// deletes a service comment
+int delete_service_comment(unsigned long comment_id);
+// deletes all comments for a particular host or service
+int delete_all_comments(
+      unsigned int type,
+      char const* host_name,
+      char const* svc_description);
+// deletes all comments for a specific host
+int delete_all_host_comments(char const* host_name);
+// deletes all non-persistent ack comments for a specific host
+int delete_host_acknowledgement_comments(host* hst);
+// deletes all comments for a specific service
+int delete_all_service_comments(
+      char const* host_name,
+      char const* svc_description);
+// deletes all non-persistent ack comments for a specific service
+int delete_service_acknowledgement_comments(service* svc);
+// expires a comment
+int check_for_expired_comment(unsigned long comment_id);
 
 /*
 ** If you are going to be adding a lot of comments in sequence, set
@@ -87,18 +139,66 @@ int check_for_expired_comment(unsigned long comment_id);                   // ex
 */
 
 int add_comment_to_hashlist(comment* new_comment);
-int add_host_comment(int entry_type, char const* host_name, time_t entry_time, char const* author, char const* comment_data, unsigned long comment_id, int persistent, int expires, time_t expire_time, int source); // adds a host comment
-int add_service_comment(int entry_type, char const* host_name, char const* svc_description, time_t entry_time, char const* author, char const* comment_data, unsigned long comment_id, int persistent, int expires, time_t expire_time, int source); // adds a service comment
-int add_comment(unsigned int comment_type, int entry_type, char const* host_name, char const* svc_description, time_t entry_time, char const* author, char const* comment_data, unsigned long comment_id, int persistent, int expires, time_t expire_time, int source); // adds a comment (host or service)
-int sort_comments(void);
-void free_comment_data(void);                                               // frees memory allocated to the comment list
-int number_of_host_comments(char const* host_name);                               // returns the number comments associated with a particular host
-int number_of_service_comments(char const* host_name, char const* svc_description);     // returns the number of comments associated with a particular service
+// adds a host comment
+int add_host_comment(
+      int entry_type,
+      char const* host_name,
+      time_t entry_time,
+      char const* author,
+      char const* comment_data,
+      unsigned long comment_id,
+      int persistent,
+      int expires,
+      time_t expire_time,
+      int source);
+// adds a service comment
+int add_service_comment(
+      int entry_type,
+      char const* host_name,
+      char const* svc_description,
+      time_t entry_time,
+      char const* author,
+      char const* comment_data,
+      unsigned long comment_id,
+      int persistent,
+      int expires,
+      time_t expire_time,
+      int source);
+// adds a comment (host or service)
+int add_comment(
+      unsigned int comment_type,
+      int entry_type,
+      char const* host_name,
+      char const* svc_description,
+      time_t entry_time,
+      char const* author,
+      char const* comment_data,
+      unsigned long comment_id,
+      int persistent,
+      int expires,
+      time_t expire_time,
+      int source);
+int sort_comments();
+// frees memory allocated to the comment list
+void free_comment_data();
+// returns the number comments associated with a particular host
+int number_of_host_comments(char const* host_name);
+// returns the number of comments associated with a particular service
+int number_of_service_comments(
+      char const* host_name,
+      char const* svc_description);
 comment* get_first_comment_by_host(char const* host_name);
-comment* get_next_comment_by_host(char const* host_name, comment* start);
-comment* find_service_comment(unsigned long comment_id);                    // finds a specific service comment
-comment* find_host_comment(unsigned long comment_id);                       // finds a specific host comment
-comment* find_comment(unsigned long comment_id, unsigned int comment_type); // finds a specific comment
+comment* get_next_comment_by_host(
+           char const* host_name,
+           comment* start);
+// finds a specific service comment
+comment* find_service_comment(unsigned long comment_id);
+// finds a specific host comment
+comment* find_host_comment(unsigned long comment_id);
+// finds a specific comment
+comment* find_comment(
+           unsigned long comment_id,
+           unsigned int comment_type);
 
 #  ifdef __cplusplus
 }

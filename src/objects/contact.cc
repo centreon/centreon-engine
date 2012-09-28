@@ -37,28 +37,31 @@ using namespace com::centreon::engine::objects::utils;
  *
  *  @see com::centreon::engine::objects::link
  */
-bool link_contact(contact* obj,
-                  timeperiod* host_notification_period,
-                  timeperiod* service_notification_period,
-                  contactgroup** contactgroups,
-                  command** host_notification_commands,
-                  command** service_notification_commands,
-                  char** custom_variables) {
+bool link_contact(
+       contact* obj,
+       timeperiod* host_notification_period,
+       timeperiod* service_notification_period,
+       contactgroup** contactgroups,
+       command** host_notification_commands,
+       command** service_notification_commands,
+       char** custom_variables) {
   try {
-    objects::link(obj,
-                  host_notification_period,
-                  service_notification_period,
-                  tab2vec(contactgroups),
-                  tab2vec(host_notification_commands),
-                  tab2vec(service_notification_commands),
-                  tab2vec(custom_variables));
+    objects::link(
+               obj,
+               host_notification_period,
+               service_notification_period,
+               tab2vec(contactgroups),
+               tab2vec(host_notification_commands),
+               tab2vec(service_notification_commands),
+               tab2vec(custom_variables));
   }
   catch (std::exception const& e) {
     logger(log_runtime_error, basic) << e.what();
     return (false);
   }
   catch (...) {
-    logger(log_runtime_error, basic) << __func__ << " unknow exception";
+    logger(log_runtime_error, basic)
+      << __func__ << " unknow exception";
     return (false);
   }
   return (true);
@@ -78,8 +81,10 @@ void release_contact(contact const* obj) {
     logger(log_runtime_error, basic) << e.what();
   }
   catch (...) {
-    logger(log_runtime_error, basic) << __func__ << " unknow exception";
+    logger(log_runtime_error, basic)
+      << __func__ << " unknow exception";
   }
+  return;
 }
 
 /**
@@ -93,13 +98,14 @@ void release_contact(contact const* obj) {
  *  @param[in]     service_notification_commands Table with service notification commands name.
  *  @param[in]     custom_variables              Table with custom variables.
  */
-void objects::link(contact* obj,
-                   timeperiod* host_notification_period,
-                   timeperiod* service_notification_period,
-                   std::vector<contactgroup*> const& contactgroups,
-                   std::vector<command*> const& host_notification_commands,
-                   std::vector<command*> const& service_notification_commands,
-                   std::vector<std::string> const& custom_variables) {
+void objects::link(
+                contact* obj,
+                timeperiod* host_notification_period,
+                timeperiod* service_notification_period,
+                std::vector<contactgroup*> const& contactgroups,
+                std::vector<command*> const& host_notification_commands,
+                std::vector<command*> const& service_notification_commands,
+                std::vector<std::string> const& custom_variables) {
   // check object contents.
   if (obj == NULL)
     throw (engine_error() << "contact is a NULL pointer.");
@@ -107,31 +113,41 @@ void objects::link(contact* obj,
     throw (engine_error() << "contact invalid name.");
 
   if ((obj->host_notification_period_ptr = host_notification_period) == NULL)
-    throw (engine_error() << "contact '" << obj->name << "' invalid host notification period.");
+    throw (engine_error() << "contact '" << obj->name
+           << "' invalid host notification period.");
 
   if ((obj->service_notification_period_ptr = service_notification_period) == NULL)
-    throw (engine_error() << "contact '" << obj->name << "' invalid service notification period.");
+    throw (engine_error() << "contact '" << obj->name
+           << "' invalid service notification period.");
 
-  for (std::vector<contactgroup*>::const_iterator it = contactgroups.begin(),
-         end = contactgroups.end();
+  for (std::vector<contactgroup*>::const_iterator
+         it = contactgroups.begin(), end = contactgroups.end();
        it != end;
        ++it) {
     if (*it == NULL)
-      throw (engine_error() << "contact '" << obj->name << "' invalid contactgroup.");
+      throw (engine_error() << "contact '" << obj->name
+             << "' invalid contactgroup.");
     add_object_to_objectlist(&obj->contactgroups_ptr, *it);
   }
 
-  if (add_commands_to_object(host_notification_commands,
-                             &obj->host_notification_commands) == false)
-    throw (engine_error() << "contact '" << obj->name << "' invalid host notification commands.");
+  if (add_commands_to_object(
+        host_notification_commands,
+        &obj->host_notification_commands) == false)
+    throw (engine_error() << "contact '" << obj->name
+           << "' invalid host notification commands.");
 
-  if (add_commands_to_object(service_notification_commands,
-                             &obj->service_notification_commands) == false)
-    throw (engine_error() << "contact '" << obj->name << "' invalid service notification commands.");
+  if (add_commands_to_object(
+        service_notification_commands,
+        &obj->service_notification_commands) == false)
+    throw (engine_error() << "contact '" << obj->name
+           << "' invalid service notification commands.");
 
-  if (add_custom_variables_to_object(custom_variables,
-                                     &obj->custom_variables) == false)
-    throw (engine_error() << "contact '" << obj->name << "' invalid custom variable.");
+  if (add_custom_variables_to_object(
+        custom_variables,
+        &obj->custom_variables) == false)
+    throw (engine_error() << "contact '" << obj->name
+           << "' invalid custom variable.");
+  return;
 }
 
 /**
@@ -168,6 +184,7 @@ void objects::release(contact const* obj) {
   delete[] obj->host_notification_period;
   delete[] obj->service_notification_period;
   delete obj;
+  return;
 }
 
 /**
@@ -178,19 +195,23 @@ void objects::release(contact const* obj) {
  *
  *  @return True if insert sucessfuly, false otherwise.
  */
-bool objects::add_contacts_to_object(std::vector<contact*> const& contacts,
-                                     contactsmember** list_contact) {
+bool objects::add_contacts_to_object(
+                std::vector<contact*> const& contacts,
+                contactsmember** list_contact) {
   if (list_contact == NULL)
     return (false);
 
-  for (std::vector<contact*>::const_iterator it = contacts.begin(), end = contacts.end();
+  for (std::vector<contact*>::const_iterator
+         it = contacts.begin(), end = contacts.end();
        it != end;
        ++it) {
     if (*it == NULL)
       return (false);
 
     // create contactsmember and add it into the contact list.
-    contactsmember* member = add_contact_to_object(list_contact, (*it)->name);
+    contactsmember* member = add_contact_to_object(
+                               list_contact,
+                               (*it)->name);
     if (member == NULL)
       return (false);
 

@@ -146,7 +146,13 @@ mmapfile* mmap_fopen(char const* filename) {
   /* only mmap() if we have a file greater than 0 bytes */
   if (file_size > 0) {
     /* mmap() the file - allocate one extra byte for processing zero-byte files */
-    if ((mmap_buf = (void*)mmap(0, file_size, PROT_READ, MAP_PRIVATE, fd, 0)) == MAP_FAILED) {
+    if ((mmap_buf = (void*)mmap(
+                             0,
+                             file_size,
+                             PROT_READ,
+                             MAP_PRIVATE,
+                             fd,
+                             0)) == MAP_FAILED) {
       close(fd);
       return (NULL);
     }
@@ -219,7 +225,10 @@ char* mmap_fgets(mmapfile* temp_mmapfile) {
   buf = new char[len + 1];
 
   /* copy string to newly allocated memory and terminate the string */
-  memcpy(buf, ((char*)(temp_mmapfile->mmap_buf) + temp_mmapfile->current_position), len);
+  memcpy(
+    buf,
+    ((char*)(temp_mmapfile->mmap_buf) + temp_mmapfile->current_position),
+    len);
   buf[len] = '\x0';
 
   /* update the current position */
@@ -243,7 +252,6 @@ char* mmap_fgets_multiline(mmapfile* temp_mmapfile) {
     return (NULL);
 
   while (1) {
-
     delete[] tempbuf;
 
     if ((tempbuf = mmap_fgets(temp_mmapfile)) == NULL)
@@ -351,6 +359,7 @@ void strip(char* buffer) {
       buffer[z - x] = buffer[z];
     buffer[len - x] = '\x0';
   }
+  return;
 }
 
 /**************************************************
@@ -359,26 +368,25 @@ void strip(char* buffer) {
 
 /* dual hash function */
 int hashfunc(char const* name1, char const* name2, int hashslots) {
-  unsigned int i, result;
-
-  result = 0;
+  unsigned int result = 0;
 
   if (name1)
-    for (i = 0; i < strlen(name1); i++)
+    for (unsigned int i = 0; i < strlen(name1); i++)
       result += name1[i];
 
   if (name2)
-    for (i = 0; i < strlen(name2); i++)
+    for (unsigned int i = 0; i < strlen(name2); i++)
       result += name2[i];
 
   return (result % hashslots);
 }
 
 /* dual hash data comparison */
-int compare_hashdata(char const* val1a,
-		     char const* val1b,
-                     char const* val2a,
-		     char const* val2b) {
+int compare_hashdata(
+      char const* val1a,
+      char const* val1b,
+      char const* val2a,
+      char const* val2b) {
   int result = 0;
 
   /* NOTE: If hash calculation changes, update the compare_strings() function! */
@@ -412,10 +420,11 @@ int compare_hashdata(char const* val1a,
  * given a date/time in time_t format, produce a corresponding
  * date/time string, including timezone
  */
-void get_datetime_string(time_t const* raw_time,
-			 char* buffer,
-                         int buffer_length,
-			 int type) {
+void get_datetime_string(
+       time_t const* raw_time,
+       char* buffer,
+       int buffer_length,
+       int type) {
   time_t t;
   struct tm* tm_ptr, tm_s;
   int hour;
@@ -453,62 +462,122 @@ void get_datetime_string(time_t const* raw_time,
 
   /* ctime() style date/time */
   if (type == LONG_DATE_TIME)
-    snprintf(buffer, buffer_length, "%s %s %d %02d:%02d:%02d %s %d",
-             weekdays[tm_ptr->tm_wday], months[tm_ptr->tm_mon], day,
-             hour, minute, second, tzone, year);
+    snprintf(
+      buffer,
+      buffer_length,
+      "%s %s %d %02d:%02d:%02d %s %d",
+      weekdays[tm_ptr->tm_wday],
+      months[tm_ptr->tm_mon],
+      day,
+      hour,
+      minute,
+      second,
+      tzone,
+      year);
 
   /* short date/time */
   else if (type == SHORT_DATE_TIME) {
     if (config->get_date_format() == DATE_FORMAT_EURO)
-      snprintf(buffer, buffer_length,
-               "%02d-%02d-%04d %02d:%02d:%02d", day, month,
-               year, hour, minute, second);
+      snprintf(
+        buffer,
+        buffer_length,
+        "%02d-%02d-%04d %02d:%02d:%02d",
+        day,
+        month,
+        year,
+        hour,
+        minute,
+        second);
     else if (config->get_date_format() == DATE_FORMAT_ISO8601
              || config->get_date_format() == DATE_FORMAT_STRICT_ISO8601)
-      snprintf(buffer, buffer_length,
-               "%04d-%02d-%02d%c%02d:%02d:%02d", year, month,
-               day, (config->get_date_format() == DATE_FORMAT_STRICT_ISO8601) ? 'T' : ' ',
-	       hour, minute, second);
+      snprintf(
+        buffer,
+        buffer_length,
+        "%04d-%02d-%02d%c%02d:%02d:%02d",
+        year,
+        month,
+        day,
+        (config->get_date_format() == DATE_FORMAT_STRICT_ISO8601) ? 'T' : ' ',
+        hour,
+        minute,
+        second);
     else
-      snprintf(buffer, buffer_length,
-               "%02d-%02d-%04d %02d:%02d:%02d", month, day,
-               year, hour, minute, second);
+      snprintf(
+        buffer,
+        buffer_length,
+        "%02d-%02d-%04d %02d:%02d:%02d",
+        month,
+        day,
+        year,
+        hour,
+        minute,
+        second);
   }
 
   /* short date */
   else if (type == SHORT_DATE) {
     if (config->get_date_format() == DATE_FORMAT_EURO)
-      snprintf(buffer, buffer_length, "%02d-%02d-%04d", day,
-               month, year);
+      snprintf(
+        buffer,
+        buffer_length,
+        "%02d-%02d-%04d",
+        day,
+        month,
+        year);
     else if (config->get_date_format() == DATE_FORMAT_ISO8601
              || config->get_date_format() == DATE_FORMAT_STRICT_ISO8601)
-      snprintf(buffer, buffer_length, "%04d-%02d-%02d", year,
-               month, day);
+      snprintf(
+        buffer,
+        buffer_length,
+        "%04d-%02d-%02d",
+        year,
+        month,
+        day);
     else
-      snprintf(buffer, buffer_length, "%02d-%02d-%04d", month,
-               day, year);
+      snprintf(
+        buffer,
+        buffer_length,
+        "%02d-%02d-%04d",
+        month,
+        day,
+        year);
   }
 
   /* expiration date/time for HTTP headers */
   else if (type == HTTP_DATE_TIME)
-    snprintf(buffer, buffer_length,
-             "%s, %02d %s %d %02d:%02d:%02d GMT",
-             weekdays[tm_ptr->tm_wday], day, months[tm_ptr->tm_mon],
-             year, hour, minute, second);
+    snprintf(
+      buffer,
+      buffer_length,
+      "%s, %02d %s %d %02d:%02d:%02d GMT",
+      weekdays[tm_ptr->tm_wday],
+      day,
+      months[tm_ptr->tm_mon],
+      year,
+      hour,
+      minute,
+      second);
 
   /* short time */
   else
-    snprintf(buffer, buffer_length, "%02d:%02d:%02d", hour, minute, second);
+    snprintf(
+      buffer,
+      buffer_length,
+      "%02d:%02d:%02d",
+      hour,
+      minute,
+      second);
 
   buffer[buffer_length - 1] = '\x0';
+  return;
 }
 
 /* get days, hours, minutes, and seconds from a raw time_t format or total seconds */
-void get_time_breakdown(unsigned long raw_time,
-			int* days,
-			int* hours,
-                        int* minutes,
-			int* seconds) {
+void get_time_breakdown(
+       unsigned long raw_time,
+       int* days,
+       int* hours,
+       int* minutes,
+       int* seconds) {
   unsigned long temp_time;
   int temp_days;
   int temp_hours;
@@ -529,6 +598,7 @@ void get_time_breakdown(unsigned long raw_time,
   *hours = temp_hours;
   *minutes = temp_minutes;
   *seconds = temp_seconds;
+  return;
 }
 
 char* resize_string(char* str, size_t size) {

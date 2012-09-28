@@ -64,7 +64,7 @@ extern "C" {
           int this_bucket(
                 (x + CHECK_STATS_BUCKETS + 1) % CHECK_STATS_BUCKETS);
           if (this_bucket == new_current_bucket)
-            break ;
+            break;
 
           // Clear old bucket value.
           check_statistics[check_type].bucket[this_bucket] = 0;
@@ -217,7 +217,7 @@ extern "C" {
         this_bucket
           = (x + CHECK_STATS_BUCKETS + 1) % CHECK_STATS_BUCKETS;
         if (this_bucket == new_current_bucket)
-          break ;
+          break;
 
         // Clear old bucket value.
         check_statistics[check_type].bucket[this_bucket] = 0;

@@ -73,7 +73,7 @@ int clear_service_macros_r(nagios_macros* mac) {
   for (unsigned int i = 0;
        i < sizeof(to_free) / sizeof(*to_free);
        ++i) {
-    delete [] mac->x[i];
+    delete[] mac->x[i];
     mac->x[i] = NULL;
   }
 
@@ -83,8 +83,8 @@ int clear_service_macros_r(nagios_macros* mac) {
        it != NULL;
        it = next) {
     next = it->next;
-    delete [] it->variable_name;
-    delete [] it->variable_value;
+    delete[] it->variable_name;
+    delete[] it->variable_value;
     delete it;
   }
 

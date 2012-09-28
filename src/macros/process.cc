@@ -28,10 +28,11 @@ using namespace com::centreon::engine::logging;
  * replace macros in notification commands with their values,
  * the thread-safe version
  */
-int process_macros_r(nagios_macros* mac,
-		     char const* input_buffer,
-                     char** output_buffer,
-		     int options) {
+int process_macros_r(
+      nagios_macros* mac,
+      char const* input_buffer,
+      char** output_buffer,
+      int options) {
   char* temp_buffer = NULL;
   char* save_buffer = NULL;
   char* buf_ptr = NULL;
@@ -46,7 +47,8 @@ int process_macros_r(nagios_macros* mac,
   int free_macro = FALSE;
   int macro_options = 0;
 
-  logger(dbg_functions, basic) << "process_macros_r()";
+  logger(dbg_functions, basic)
+    << "process_macros_r()";
 
   if (output_buffer == NULL)
     return (ERROR);
@@ -58,8 +60,9 @@ int process_macros_r(nagios_macros* mac,
 
   in_macro = FALSE;
 
-  logger(dbg_macros, more) << "**** BEGIN MACRO PROCESSING ***********";
-  logger(dbg_macros, more) << "Processing: '" << input_buffer << "'";
+  logger(dbg_macros, more)
+    << "**** BEGIN MACRO PROCESSING ***********\n"
+    "Processing: '" << input_buffer << "'";
 
   /* use a duplicate of original buffer, so we don't modify the original */
   save_buffer = buf_ptr = (input_buffer ? my_strdup(input_buffer) : NULL);
@@ -77,7 +80,8 @@ int process_macros_r(nagios_macros* mac,
     else
       buf_ptr = NULL;
 
-    logger(dbg_macros, most) << "  Processing part: '" << temp_buffer << "'";
+    logger(dbg_macros, most)
+      << "  Processing part: '" << temp_buffer << "'";
 
     selected_macro = NULL;
     clean_macro = FALSE;
@@ -86,8 +90,11 @@ int process_macros_r(nagios_macros* mac,
     if (in_macro == FALSE) {
 
       /* add the plain text to the end of the already processed buffer */
-      *output_buffer = resize_string(*output_buffer,
-				     strlen(*output_buffer) + strlen(temp_buffer) + 1);
+      *output_buffer = resize_string(
+                         *output_buffer,
+                         strlen(*output_buffer)
+                         + strlen(temp_buffer)
+                         + 1);
       strcat(*output_buffer, temp_buffer);
 
       logger(dbg_macros, most)
@@ -102,7 +109,8 @@ int process_macros_r(nagios_macros* mac,
       clean_options = 0;
 
       /* grab the macro value */
-      result = grab_macro_value_r(mac,
+      result = grab_macro_value_r(
+                 mac,
                  temp_buffer,
                  &selected_macro,
                  &clean_options,
@@ -129,9 +137,11 @@ int process_macros_r(nagios_macros* mac,
       /* an escaped $ is done by specifying two $$ next to each other */
       else if (!strcmp(temp_buffer, "")) {
         logger(dbg_macros, most)
-          << "  Escaped $.  Running output (" <<strlen(*output_buffer)
+          << "  Escaped $.  Running output (" << strlen(*output_buffer)
           << "): '" << *output_buffer << "'";
-        *output_buffer = resize_string(*output_buffer, strlen(*output_buffer) + 2);
+        *output_buffer = resize_string(
+                           *output_buffer,
+                           strlen(*output_buffer) + 2);
         strcat(*output_buffer, "$");
       }
       /* a non-macro, just some user-defined string between two $s */
@@ -182,27 +192,37 @@ int process_macros_r(nagios_macros* mac,
 
           /* add the (cleaned) processed macro to the end of the already processed buffer */
           if (selected_macro != NULL
-              && (cleaned_macro = clean_macro_chars(selected_macro, macro_options)) != NULL) {
-            *output_buffer = resize_string(*output_buffer,
-					   strlen(*output_buffer) + strlen(cleaned_macro) + 1);
+              && (cleaned_macro = clean_macro_chars(
+                                    selected_macro,
+                                    macro_options)) != NULL) {
+            *output_buffer = resize_string(
+                               *output_buffer,
+                               strlen(*output_buffer)
+                               + strlen(cleaned_macro)
+                               + 1);
             strcat(*output_buffer, cleaned_macro);
 
             logger(dbg_macros, basic)
-              << "  Cleaned macro.  Running output (" << strlen(*output_buffer)
-              << "): '" << *output_buffer << "'";
+              << "  Cleaned macro.  Running output ("
+              << strlen(*output_buffer) << "): '"
+              << *output_buffer << "'";
           }
         }
         /* others are not cleaned */
         else {
           /* add the processed macro to the end of the already processed buffer */
           if (selected_macro != NULL) {
-            *output_buffer = resize_string(*output_buffer,
-					   strlen(*output_buffer) + strlen(selected_macro) + 1);
+            *output_buffer = resize_string(
+                               *output_buffer,
+                               strlen(*output_buffer)
+                               + strlen(selected_macro)
+                               + 1);
             strcat(*output_buffer, selected_macro);
 
             logger(dbg_macros, basic)
-              << "  Uncleaned macro.  Running output (" << strlen(*output_buffer)
-              << "): '" << *output_buffer << "'";
+              << "  Uncleaned macro.  Running output ("
+              << strlen(*output_buffer) << "): '"
+              << *output_buffer << "'";
           }
         }
 
@@ -212,8 +232,9 @@ int process_macros_r(nagios_macros* mac,
           selected_macro = NULL;
         }
         logger(dbg_macros, basic)
-          << "  Just finished macro.  Running output (" << strlen(*output_buffer)
-          << "): '" << *output_buffer << "'";
+          << "  Just finished macro.  Running output ("
+          << strlen(*output_buffer) << "): '"
+          << *output_buffer << "'";
       }
 
       in_macro = FALSE;
@@ -223,11 +244,20 @@ int process_macros_r(nagios_macros* mac,
   /* free copy of input buffer */
   delete[] save_buffer;
 
-  logger(dbg_macros, more) << "  Done.  Final output: '" << *output_buffer << "'";
-  logger(dbg_macros, more) << "**** END MACRO PROCESSING *************";
+  logger(dbg_macros, more)
+    << "  Done.  Final output: '" << *output_buffer << "'";
+  logger(dbg_macros, more)
+    << "**** END MACRO PROCESSING *************";
   return (OK);
 }
 
-int process_macros(char const* input_buffer, char** output_buffer, int options) {
-  return (process_macros_r(get_global_macros(), input_buffer, output_buffer, options));
+int process_macros(
+      char const* input_buffer,
+      char** output_buffer,
+      int options) {
+  return (process_macros_r(
+            get_global_macros(),
+            input_buffer,
+            output_buffer,
+            options));
 }

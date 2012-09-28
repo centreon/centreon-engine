@@ -22,11 +22,12 @@
 #include "com/centreon/engine/common.hh"
 #include "com/centreon/engine/skiplist.hh"
 
-skiplist* skiplist_new(int max_levels,
-		       float level_probability,
-                       int allow_duplicates,
-		       int append_duplicates,
-                       int (*compare_function)(void const*, void const*)) {
+skiplist* skiplist_new(
+            int max_levels,
+            float level_probability,
+            int allow_duplicates,
+            int append_duplicates,
+            int (*compare_function)(void const*, void const*)) {
   skiplist* newlist = NULL;
 
   /* alloc memory for new list structure */
@@ -376,7 +377,8 @@ int skiplist_delete_first(skiplist* list, void const* data) {
   }
 
   /* we found a match! */
-  if (nextnode != NULL && list->compare_function(nextnode->data, data) == 0) {
+  if (nextnode != NULL
+      && list->compare_function(nextnode->data, data) == 0) {
 
     /* adjust level pointers to bypass (soon to be) removed node */
     for (level = 0; level <= top_level; level++) {
@@ -462,7 +464,9 @@ int skiplist_delete_node(skiplist* list, void const* node_ptr) {
   }
 
   /* we found a match! (value + pointers match) */
-  if (nextnode && list->compare_function(nextnode->data, data) == 0 && nextnode == thenode) {
+  if (nextnode
+      && list->compare_function(nextnode->data, data) == 0
+      && nextnode == thenode) {
 
     /* adjust level pointers to bypass (soon to be) removed node */
     for (level = 0; level <= top_level; level++) {

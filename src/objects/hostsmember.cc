@@ -36,7 +36,8 @@ hostsmember const* release_hostsmember(hostsmember const* obj) {
     logger(log_runtime_error, basic) << e.what();
   }
   catch (...) {
-    logger(log_runtime_error, basic) << __func__ << " unknow exception";
+    logger(log_runtime_error, basic)
+      << __func__ << " unknow exception";
   }
   return (NULL);
 }

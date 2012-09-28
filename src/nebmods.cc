@@ -41,17 +41,20 @@ using namespace com::centreon::engine::logging;
 /****************************************************************************/
 
 /* initialize module routines */
-int neb_init_modules(void) {
+int neb_init_modules() {
   return (OK);
 }
 
 /* deinitialize module routines */
-int neb_deinit_modules(void) {
+int neb_deinit_modules() {
   return (OK);
 }
 
 /* add a new module to module list */
-int neb_add_module(char const* filename, char const* args, int should_be_loaded) {
+int neb_add_module(
+      char const* filename,
+      char const* args,
+      int should_be_loaded) {
   (void)should_be_loaded;
 
   if (filename == NULL)
@@ -73,13 +76,15 @@ int neb_add_module(char const* filename, char const* args, int should_be_loaded)
 }
 
 /* free memory allocated to module list */
-int neb_free_module_list(void) {
+int neb_free_module_list() {
   try {
     broker::loader::instance().unload();
-    logger(dbg_eventbroker, basic) << "unload all modules success.";
+    logger(dbg_eventbroker, basic)
+      << "unload all modules success.";
   }
   catch (...) {
-    logger(dbg_eventbroker, basic) << "unload all modules failed.";
+    logger(dbg_eventbroker, basic)
+      << "unload all modules failed.";
     return (ERROR);
   }
   return (OK);
@@ -99,15 +104,15 @@ int neb_load_all_modules() {
     std::list<shared_ptr<broker::handle> >
       modules(loader.get_modules());
     for (std::list<shared_ptr<broker::handle> >::const_iterator
-           it(modules.begin()),
-           end(modules.end());
+           it(modules.begin()), end(modules.end());
          it != end;
          ++it)
       if (neb_load_module(&(*(*it))))
         ++unloaded;
   }
   catch (...) {
-    logger(dbg_eventbroker, basic) << "Counld not load all modules";
+    logger(dbg_eventbroker, basic)
+      << "Counld not load all modules";
     return (-1);
   }
   return (unloaded);
@@ -138,7 +143,8 @@ int neb_load_module(void* mod) {
   }
   catch (...) {
     logger(log_runtime_error, basic)
-      << "Error: Could not load module '" << module->get_filename() << "'";
+      << "Error: Could not load module '"
+      << module->get_filename() << "'";
     return (ERROR);
   }
   return (OK);
@@ -160,8 +166,7 @@ int neb_unload_all_modules(int flags, int reason) {
       std::list<shared_ptr<broker::handle> >
         modules(loader->get_modules());
       for (std::list<shared_ptr<broker::handle> >::const_iterator
-             it(modules.begin()),
-             end(modules.end());
+             it(modules.begin()), end(modules.end());
            it != end;
            ++it)
         neb_unload_module(&**it, flags, reason);
@@ -177,7 +182,8 @@ int neb_unload_all_modules(int flags, int reason) {
     retval = ERROR;
   }
   catch (...) {
-    logger(dbg_eventbroker, basic) << "load all modules failed.";
+    logger(dbg_eventbroker, basic)
+      << "load all modules failed.";
     retval = ERROR;
   }
   return (retval);
@@ -264,7 +270,8 @@ int neb_set_module_info(void* handle, int type, char const* data) {
       << module->get_filename() << "', type='" << type << "'";
   }
   catch (...) {
-    logger(dbg_eventbroker, basic) << "Counld not set module info.";
+    logger(dbg_eventbroker, basic)
+      << "Counld not set module info.";
     return (ERROR);
   }
 
@@ -278,10 +285,11 @@ int neb_set_module_info(void* handle, int type, char const* data) {
 /****************************************************************************/
 
 /* allows a module to register a callback function */
-int neb_register_callback(int callback_type,
-                          void* mod_handle,
-                          int priority,
-                          int (*callback_func) (int, void*)) {
+int neb_register_callback(
+      int callback_type,
+      void* mod_handle,
+      int priority,
+      int (*callback_func) (int, void*)) {
   nebcallback* new_callback = NULL;
   nebcallback* temp_callback = NULL;
   nebcallback* last_callback = NULL;
@@ -340,21 +348,26 @@ int neb_deregister_module_callbacks(void* mod) {
   if (mod == NULL)
     return (NEBERROR_NOMODULE);
 
-  for (callback_type = 0; callback_type < NEBCALLBACK_NUMITEMS; callback_type++) {
+  for (callback_type = 0;
+       callback_type < NEBCALLBACK_NUMITEMS;
+       callback_type++) {
     for (temp_callback = neb_callback_list[callback_type];
          temp_callback != NULL;
          temp_callback = next_callback) {
       next_callback = temp_callback->next;
       if ((void*)temp_callback->module_handle == (void*)mod)
-        neb_deregister_callback(callback_type,
-                                (int (*)(int, void*))temp_callback->callback_func);
+        neb_deregister_callback(
+          callback_type,
+          (int (*)(int, void*))temp_callback->callback_func);
     }
   }
   return (OK);
 }
 
 /* allows a module to deregister a callback function */
-int neb_deregister_callback(int callback_type, int (*callback_func)(int, void*)) {
+int neb_deregister_callback(
+      int callback_type,
+      int (*callback_func)(int, void*)) {
   nebcallback* temp_callback = NULL;
   nebcallback* last_callback = NULL;
   nebcallback* next_callback = NULL;
@@ -433,27 +446,24 @@ int neb_make_callbacks(int callback_type, void* data) {
     /* not sure if we should bail out here just because one module wants to override things - what about other modules? EG 12/11/2006 */
     else if (cbresult == NEBERROR_CALLBACKOVERRIDE)
       break;
-  } return (cbresult);
+  }
+  return (cbresult);
 }
 
 /* initialize callback list */
-int neb_init_callback_list(void) {
-  int x = 0;
-
+int neb_init_callback_list() {
   /* initialize list pointers */
-  for (x = 0; x < NEBCALLBACK_NUMITEMS; x++)
+  for (int x = 0; x < NEBCALLBACK_NUMITEMS; x++)
     neb_callback_list[x] = NULL;
-
   return (OK);
 }
 
 /* free memory allocated to callback list */
-int neb_free_callback_list(void) {
+int neb_free_callback_list() {
   nebcallback* temp_callback = NULL;
   nebcallback* next_callback = NULL;
-  int x = 0;
 
-  for (x = 0; x < NEBCALLBACK_NUMITEMS; x++) {
+  for (int x = 0; x < NEBCALLBACK_NUMITEMS; x++) {
     for (temp_callback = neb_callback_list[x];
          temp_callback != NULL;
          temp_callback = next_callback) {
