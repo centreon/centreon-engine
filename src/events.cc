@@ -59,31 +59,38 @@ static void _exec_event_service_check(timed_event* event) {
 
   /* run the service check */
   run_scheduled_service_check(svc, event->event_options, latency);
+  return;
 }
 
 static void _exec_event_command_check(timed_event* event) {
   (void)event;
-  logger(dbg_events, basic) << "** External Command Check Event";
+  logger(dbg_events, basic)
+    << "** External Command Check Event";
 
   /* send data to event broker */
-  broker_external_command(NEBTYPE_EXTERNALCOMMAND_CHECK,
-                          NEBFLAG_NONE,
-                          NEBATTR_NONE,
-                          CMD_NONE,
-                          time(NULL),
-                          NULL,
-                          NULL,
-                          NULL);
+  broker_external_command(
+    NEBTYPE_EXTERNALCOMMAND_CHECK,
+    NEBFLAG_NONE,
+    NEBATTR_NONE,
+    CMD_NONE,
+    time(NULL),
+    NULL,
+    NULL,
+    NULL);
+  return;
 }
 
 static void _exec_event_log_rotation(timed_event* event) {
   (void)event;
-  // logger(dbg_events, basic) << "** Log File Rotation Event";
+  // logger(dbg_events, basic)
+  //   << "** Log File Rotation Event";
+  return;
 }
 
 static void _exec_event_program_shutdown(timed_event* event) {
   (void)event;
-  logger(dbg_events, basic) << "** Program Shutdown Event";
+  logger(dbg_events, basic)
+    << "** Program Shutdown Event";
 
   /* set the shutdown flag */
   sigshutdown = TRUE;
@@ -91,56 +98,68 @@ static void _exec_event_program_shutdown(timed_event* event) {
   /* log the shutdown */
   logger(log_process_info, basic)
     << "PROGRAM_SHUTDOWN event encountered, shutting down...";
+  return;
 }
 
 static void _exec_event_program_restart(timed_event* event) {
   (void)event;
-  logger(dbg_events, basic) << "** Program Restart Event";
+  logger(dbg_events, basic)
+    << "** Program Restart Event";
 
   // XXX todo: do the same think when receive SIGHUP.
 
   /* log the restart */
   logger(log_process_info, basic)
     << "PROGRAM_RESTART event encountered, restarting...";
+  return;
 }
 
 static void _exec_event_check_reaper(timed_event* event) {
   (void)event;
-  logger(dbg_events, basic) << "** Check Result Reaper";
+  logger(dbg_events, basic)
+    << "** Check Result Reaper";
 
   /* reap host and service check results */
   reap_check_results();
+  return;
 }
 
 static void _exec_event_orphan_check(timed_event* event) {
   (void)event;
-  logger(dbg_events, basic) << "** Orphaned Host and Service Check Event";
+  logger(dbg_events, basic)
+    << "** Orphaned Host and Service Check Event";
 
   /* check for orphaned hosts and services */
   if (config->get_check_orphaned_hosts() == true)
     check_for_orphaned_hosts();
   if (config->get_check_orphaned_services() == true)
     check_for_orphaned_services();
+  return;
 }
 
 static void _exec_event_retention_save(timed_event* event) {
   (void)event;
-  logger(dbg_events, basic) << "** Retention Data Save Event";
+  logger(dbg_events, basic)
+    << "** Retention Data Save Event";
 
   /* save state retention data */
   save_state_information(TRUE);
+  return;
 }
 
 static void _exec_event_status_save(timed_event* event) {
   (void)event;
-  logger(dbg_events, basic) << "** Status Data Save Event";
+  logger(dbg_events, basic)
+    << "** Status Data Save Event";
 
   /* save all status data (program, host, and service) */
   update_all_status_data();
+  return;
 }
 
 static void _exec_event_scheduled_downtime(timed_event* event) {
-  logger(dbg_events, basic) << "** Scheduled Downtime Event";
+  logger(dbg_events, basic)
+    << "** Scheduled Downtime Event";
 
   /* process scheduled downtime info */
   if (event->event_data) {
@@ -148,22 +167,27 @@ static void _exec_event_scheduled_downtime(timed_event* event) {
     delete static_cast<unsigned long*>(event->event_data);
     event->event_data = NULL;
   }
+  return;
 }
 
 static void _exec_event_sfreshness_check(timed_event* event) {
   (void)event;
-  logger(dbg_events, basic) << "** Service Result Freshness Check Event";
+  logger(dbg_events, basic)
+    << "** Service Result Freshness Check Event";
 
   /* check service result freshness */
   check_service_result_freshness();
+  return;
 }
 
 static void _exec_event_expire_downtime(timed_event* event) {
   (void)event;
-  logger(dbg_events, basic) << "** Expire Downtime Event";
+  logger(dbg_events, basic)
+    << "** Expire Downtime Event";
 
   /* check for expired scheduled downtime entries */
   check_for_expired_downtime();
+  return;
 }
 
 static void _exec_event_host_check(timed_event* event) {
@@ -182,33 +206,41 @@ static void _exec_event_host_check(timed_event* event) {
 
   /* run the host check */
   perform_scheduled_host_check(hst, event->event_options, latency);
+  return;
 }
 
 static void _exec_event_hfreshness_check(timed_event* event) {
   (void)event;
-  logger(dbg_events, basic) << "** Host Result Freshness Check Event";
+  logger(dbg_events, basic)
+    << "** Host Result Freshness Check Event";
 
   /* check host result freshness */
   check_host_result_freshness();
+  return;
 }
 
 static void _exec_event_reschedule_checks(timed_event* event) {
   (void)event;
-  logger(dbg_events, basic) << "** Reschedule Checks Event";
+  logger(dbg_events, basic)
+    << "** Reschedule Checks Event";
 
   /* adjust scheduling of host and service checks */
   adjust_check_scheduling();
+  return;
 }
 
 static void _exec_event_expire_comment(timed_event* event) {
-  logger(dbg_events, basic) << "** Expire Comment Event";
+  logger(dbg_events, basic)
+    << "** Expire Comment Event";
 
   /* check for expired comment */
   check_for_expired_comment((unsigned long)event->event_data);
+  return;
 }
 
 static void _exec_event_user_function(timed_event* event) {
-  logger(dbg_events, basic) << "** User Function Event";
+  logger(dbg_events, basic)
+    << "** User Function Event";
 
   /* run a user-defined function */
   if (event->event_data != NULL) {
@@ -216,10 +248,11 @@ static void _exec_event_user_function(timed_event* event) {
     *(void**)(&userfunc) = event->event_data;
     (*userfunc)(event->event_args);
   }
+  return;
 }
 
 /* initialize the event timing loop before we start monitoring */
-void init_timing_loop(void) {
+void init_timing_loop() {
   host* temp_host = NULL;
   service* temp_service = NULL;
   time_t current_time = 0L;
@@ -235,7 +268,8 @@ void init_timing_loop(void) {
   struct timeval tv[9];
   double runtime[9];
 
-  logger(dbg_functions, basic) << "init_timing_loop()";
+  logger(dbg_functions, basic)
+    << "init_timing_loop()";
 
   /* get the time right now */
   time(&current_time);
@@ -273,9 +307,14 @@ void init_timing_loop(void) {
       schedule_check = FALSE;
 
     /* are there any valid times this service can be checked? */
-    is_valid_time = check_time_against_period(current_time, temp_service->check_period_ptr);
+    is_valid_time = check_time_against_period(
+                      current_time,
+                      temp_service->check_period_ptr);
     if (is_valid_time == ERROR) {
-      get_next_valid_time(current_time, &next_valid_time, temp_service->check_period_ptr);
+      get_next_valid_time(
+        current_time,
+        &next_valid_time,
+        temp_service->check_period_ptr);
       if (current_time == next_valid_time)
         schedule_check = FALSE;
     }
@@ -284,14 +323,15 @@ void init_timing_loop(void) {
       scheduling_info.total_scheduled_services++;
 
       /* used later in inter-check delay calculations */
-      scheduling_info.service_check_interval_total += static_cast<unsigned long>(temp_service->check_interval);
+      scheduling_info.service_check_interval_total
+        += static_cast<unsigned long>(temp_service->check_interval);
 
       /* calculate rolling average execution time (available from retained state information) */
-      scheduling_info.average_service_execution_time =
-        (double)(((scheduling_info.average_service_execution_time
-                   * (scheduling_info.total_scheduled_services - 1))
-                  + temp_service->execution_time)
-		 / (double)scheduling_info.total_scheduled_services);
+      scheduling_info.average_service_execution_time
+        = (double)(((scheduling_info.average_service_execution_time
+                     * (scheduling_info.total_scheduled_services - 1))
+                    + temp_service->execution_time)
+                   / (double)scheduling_info.total_scheduled_services);
     }
     else {
       temp_service->should_be_scheduled = FALSE;
@@ -309,7 +349,9 @@ void init_timing_loop(void) {
     gettimeofday(&tv[1], NULL);
 
   /* get info on host checks to be scheduled */
-  for (temp_host = host_list; temp_host != NULL; temp_host = temp_host->next) {
+  for (temp_host = host_list;
+       temp_host != NULL;
+       temp_host = temp_host->next) {
 
     schedule_check = TRUE;
 
@@ -322,9 +364,14 @@ void init_timing_loop(void) {
       schedule_check = FALSE;
 
     /* are there any valid times this host can be checked? */
-    is_valid_time = check_time_against_period(current_time, temp_host->check_period_ptr);
+    is_valid_time = check_time_against_period(
+                      current_time,
+                      temp_host->check_period_ptr);
     if (is_valid_time == ERROR) {
-      get_next_valid_time(current_time, &next_valid_time, temp_host->check_period_ptr);
+      get_next_valid_time(
+        current_time,
+        &next_valid_time,
+        temp_host->check_period_ptr);
       if (current_time == next_valid_time)
         schedule_check = FALSE;
     }
@@ -333,7 +380,8 @@ void init_timing_loop(void) {
       scheduling_info.total_scheduled_hosts++;
 
       /* this is used later in inter-check delay calculations */
-      scheduling_info.host_check_interval_total += static_cast<unsigned long>(temp_host->check_interval);
+      scheduling_info.host_check_interval_total
+        += static_cast<unsigned long>(temp_host->check_interval);
     }
     else {
       temp_host->should_be_scheduled = FALSE;
@@ -353,31 +401,36 @@ void init_timing_loop(void) {
     scheduling_info.average_scheduled_services_per_host = 0;
   }
   else {
-    scheduling_info.average_services_per_host =
-      (double)((double)scheduling_info.total_services / (double)scheduling_info.total_hosts);
-    scheduling_info.average_scheduled_services_per_host =
-      (double)((double)scheduling_info.total_scheduled_services / (double)scheduling_info.total_hosts);
+    scheduling_info.average_services_per_host
+      = (double)((double)scheduling_info.total_services
+                 / (double)scheduling_info.total_hosts);
+    scheduling_info.average_scheduled_services_per_host
+      = (double)((double)scheduling_info.total_scheduled_services
+                 / (double)scheduling_info.total_hosts);
   }
 
   /* adjust the check interval total to correspond to the interval length */
-  scheduling_info.service_check_interval_total =
-    (scheduling_info.service_check_interval_total * config->get_interval_length());
+  scheduling_info.service_check_interval_total
+    = scheduling_info.service_check_interval_total
+    * config->get_interval_length();
 
   /* calculate the average check interval for services */
   if (scheduling_info.total_scheduled_services == 0)
     scheduling_info.average_service_check_interval = 0;
   else {
-    scheduling_info.average_service_check_interval =
-      (double)((double)scheduling_info.service_check_interval_total
-               / (double)scheduling_info.total_scheduled_services);
+    scheduling_info.average_service_check_interval
+      = (double)((double)scheduling_info.service_check_interval_total
+                 / (double)scheduling_info.total_scheduled_services);
   }
 
   /******** DETERMINE SERVICE SCHEDULING PARAMS  ********/
 
-  logger(dbg_events, most) << "Determining service scheduling parameters...";
+  logger(dbg_events, most)
+    << "Determining service scheduling parameters...";
 
   /* default max service check spread (in minutes) */
-  scheduling_info.max_service_check_spread = config->get_max_service_check_spread();
+  scheduling_info.max_service_check_spread
+    = config->get_max_service_check_spread();
 
   /* how should we determine the service inter-check delay to use? */
   switch (config->get_service_inter_check_delay_method()) {
@@ -403,17 +456,18 @@ void init_timing_loop(void) {
         && scheduling_info.service_check_interval_total > 0) {
 
       /* calculate the average inter check delay (in seconds) needed to evenly space the service checks out */
-      scheduling_info.average_service_inter_check_delay =
-        (double)(scheduling_info.average_service_check_interval
-                 / (double)scheduling_info.total_scheduled_services);
+      scheduling_info.average_service_inter_check_delay
+        = (double)(scheduling_info.average_service_check_interval
+                   / (double)scheduling_info.total_scheduled_services);
 
       /* set the global inter check delay value */
-      scheduling_info.service_inter_check_delay = scheduling_info.average_service_inter_check_delay;
+      scheduling_info.service_inter_check_delay
+        = scheduling_info.average_service_inter_check_delay;
 
       /* calculate max inter check delay and see if we should use that instead */
-      max_inter_check_delay =
-        (double)((scheduling_info.max_service_check_spread * 60.0)
-                 / (double)scheduling_info.total_scheduled_services);
+      max_inter_check_delay
+        = (double)((scheduling_info.max_service_check_spread * 60.0)
+                   / (double)scheduling_info.total_scheduled_services);
       if (scheduling_info.service_inter_check_delay > max_inter_check_delay)
         scheduling_info.service_inter_check_delay = max_inter_check_delay;
     }
@@ -442,8 +496,8 @@ void init_timing_loop(void) {
 
   case configuration::state::ilf_smart:
   default:
-    scheduling_info.service_interleave_factor =
-      (int)(ceil(scheduling_info.average_scheduled_services_per_host));
+    scheduling_info.service_interleave_factor
+      = (int)(ceil(scheduling_info.average_scheduled_services_per_host));
 
     logger(dbg_events, more)
       << "Total scheduled service checks: "
@@ -460,9 +514,9 @@ void init_timing_loop(void) {
   if (scheduling_info.service_interleave_factor == 0)
     total_interleave_blocks = scheduling_info.total_scheduled_services;
   else
-    total_interleave_blocks =
-      (int)ceil((double)scheduling_info.total_scheduled_services
-                / (double)scheduling_info.service_interleave_factor);
+    total_interleave_blocks
+      = (int)ceil((double)scheduling_info.total_scheduled_services
+                  / (double)scheduling_info.service_interleave_factor);
 
   scheduling_info.first_service_check = (time_t) 0L;
   scheduling_info.last_service_check = (time_t) 0L;
@@ -486,18 +540,22 @@ void init_timing_loop(void) {
 
   /******** SCHEDULE SERVICE CHECKS  ********/
 
-  logger(dbg_events, most) << "Scheduling service checks...";
+  logger(dbg_events, most)
+    << "Scheduling service checks...";
 
   /* determine check times for service checks (with interleaving to minimize remote load) */
   current_interleave_block = 0;
   for (temp_service = service_list;
-       temp_service != NULL && scheduling_info.service_interleave_factor > 0;) {
+       temp_service != NULL
+         && scheduling_info.service_interleave_factor > 0;
+       ) {
 
     logger(dbg_events, most)
       << "Current Interleave Block: " << current_interleave_block;
 
     for (interleave_block_index = 0;
-         interleave_block_index < scheduling_info.service_interleave_factor && temp_service != NULL;
+         interleave_block_index < scheduling_info.service_interleave_factor
+           && temp_service != NULL;
 	 temp_service = temp_service->next) {
 
       logger(dbg_events, most)
@@ -506,15 +564,16 @@ void init_timing_loop(void) {
 
       /* skip this service if it shouldn't be scheduled */
       if (temp_service->should_be_scheduled == FALSE) {
-        logger(dbg_events, most) << "Service check should not be scheduled.";
+        logger(dbg_events, most)
+          << "Service check should not be scheduled.";
         continue;
       }
 
       /* skip services that are already scheduled for the future (from retention data), but reschedule ones that were supposed to happen while we weren't running... */
       if (temp_service->next_check > current_time) {
         logger(dbg_events, most)
-          << "Service is already scheduled to be checked in the future: "
-          << my_ctime(&temp_service->next_check);
+          << "Service is already scheduled to be checked in "
+          "the future: " << my_ctime(&temp_service->next_check);
         continue;
       }
 
@@ -522,7 +581,9 @@ void init_timing_loop(void) {
       /* moved from for() loop 11/05/05 EG */
       interleave_block_index++;
 
-      mult_factor = current_interleave_block + (interleave_block_index * total_interleave_blocks);
+      mult_factor
+        = current_interleave_block
+        + (interleave_block_index * total_interleave_blocks);
 
       logger(dbg_events, most)
         << "CIB: " << current_interleave_block
@@ -530,19 +591,23 @@ void init_timing_loop(void) {
         << ", TIB: " << total_interleave_blocks
         << ", SIF: " << scheduling_info.service_interleave_factor;
 
-      logger(dbg_events, most) << "Mult factor: " << mult_factor;
+      logger(dbg_events, most)
+        << "Mult factor: " << mult_factor;
 
       /* set the preferred next check time for the service */
-      temp_service->next_check =
-	(time_t)(current_time + (mult_factor * scheduling_info.service_inter_check_delay));
+      temp_service->next_check
+	= (time_t)(current_time
+                   + (mult_factor
+                      * scheduling_info.service_inter_check_delay));
 
       logger(dbg_events, most)
         << "Preferred Check Time: " << temp_service->next_check
         << " --> " << my_ctime(&temp_service->next_check);
 
       /* make sure the service can actually be scheduled when we want */
-      is_valid_time = check_time_against_period(temp_service->next_check,
-						temp_service->check_period_ptr);
+      is_valid_time = check_time_against_period(
+                        temp_service->next_check,
+                        temp_service->check_period_ptr);
       if (is_valid_time == ERROR) {
         logger(dbg_events, most)
           << "Preferred Time is Invalid In Timeperiod '"
@@ -550,8 +615,9 @@ void init_timing_loop(void) {
           << "': " << temp_service->next_check
           << " --> " << my_ctime(&temp_service->next_check);
 
-        get_next_valid_time(temp_service->next_check, &next_valid_time,
-			    temp_service->check_period_ptr);
+        get_next_valid_time(
+          temp_service->next_check, &next_valid_time,
+          temp_service->check_period_ptr);
         temp_service->next_check = next_valid_time;
       }
 
@@ -592,16 +658,17 @@ void init_timing_loop(void) {
     }
 
     /* create a new service check event */
-    schedule_new_event(EVENT_SERVICE_CHECK,
-		       FALSE,
-		       temp_service->next_check,
-                       FALSE,
-		       0,
-		       NULL,
-		       TRUE,
-		       (void*)temp_service,
-		       NULL,
-                       temp_service->check_options);
+    schedule_new_event(
+      EVENT_SERVICE_CHECK,
+      FALSE,
+      temp_service->next_check,
+      FALSE,
+      0,
+      NULL,
+      TRUE,
+      (void*)temp_service,
+      NULL,
+      temp_service->check_options);
   }
 
   if (test_scheduling == TRUE)
@@ -609,13 +676,15 @@ void init_timing_loop(void) {
 
   /******** DETERMINE HOST SCHEDULING PARAMS  ********/
 
-  logger(dbg_events, most) << "Determining host scheduling parameters...";
+  logger(dbg_events, most)
+    << "Determining host scheduling parameters...";
 
   scheduling_info.first_host_check = (time_t)0L;
   scheduling_info.last_host_check = (time_t)0L;
 
   /* default max host check spread (in minutes) */
-  scheduling_info.max_host_check_spread = config->get_max_host_check_spread();
+  scheduling_info.max_host_check_spread
+    = config->get_max_host_check_spread();
 
   /* how should we determine the host inter-check delay to use? */
   switch (config->get_host_inter_check_delay_method()) {
@@ -640,25 +709,27 @@ void init_timing_loop(void) {
         && scheduling_info.host_check_interval_total > 0) {
 
       /* adjust the check interval total to correspond to the interval length */
-      scheduling_info.host_check_interval_total =
-	(scheduling_info.host_check_interval_total * config->get_interval_length());
+      scheduling_info.host_check_interval_total
+	= scheduling_info.host_check_interval_total * config->get_interval_length();
 
       /* calculate the average check interval for hosts */
-      scheduling_info.average_host_check_interval =
-        (double)((double)scheduling_info.host_check_interval_total
-                 / (double)scheduling_info.total_scheduled_hosts);
+      scheduling_info.average_host_check_interval
+        = (double)((double)scheduling_info.host_check_interval_total
+                   / (double)scheduling_info.total_scheduled_hosts);
 
       /* calculate the average inter check delay (in seconds) needed to evenly space the host checks out */
-      scheduling_info.average_host_inter_check_delay =
-	(double)(scheduling_info.average_host_check_interval
-                 / (double)scheduling_info.total_scheduled_hosts);
+      scheduling_info.average_host_inter_check_delay
+	= (double)(scheduling_info.average_host_check_interval
+                   / (double)scheduling_info.total_scheduled_hosts);
 
       /* set the global inter check delay value */
-      scheduling_info.host_inter_check_delay = scheduling_info.average_host_inter_check_delay;
+      scheduling_info.host_inter_check_delay
+        = scheduling_info.average_host_inter_check_delay;
 
       /* calculate max inter check delay and see if we should use that instead */
-      max_inter_check_delay = (double)((scheduling_info.max_host_check_spread * 60.0)
-				       / (double)scheduling_info.total_scheduled_hosts);
+      max_inter_check_delay
+        = (double)((scheduling_info.max_host_check_spread * 60.0)
+                   / (double)scheduling_info.total_scheduled_hosts);
       if (scheduling_info.host_inter_check_delay > max_inter_check_delay)
         scheduling_info.host_inter_check_delay = max_inter_check_delay;
     }
@@ -686,17 +757,22 @@ void init_timing_loop(void) {
 
   /******** SCHEDULE HOST CHECKS  ********/
 
-  logger(dbg_events, most) << "Scheduling host checks...";
+  logger(dbg_events, most)
+    << "Scheduling host checks...";
 
   /* determine check times for host checks */
   mult_factor = 0;
-  for (temp_host = host_list; temp_host != NULL; temp_host = temp_host->next) {
+  for (temp_host = host_list;
+       temp_host != NULL;
+       temp_host = temp_host->next) {
 
-    logger(dbg_events, most) << "Host '" <<  temp_host->name << "'";
+    logger(dbg_events, most)
+      << "Host '" <<  temp_host->name << "'";
 
     /* skip hosts that shouldn't be scheduled */
     if (temp_host->should_be_scheduled == FALSE) {
-      logger(dbg_events, most) << "Host check should not be scheduled.";
+      logger(dbg_events, most)
+        << "Host check should not be scheduled.";
       continue;
     }
 
@@ -709,20 +785,24 @@ void init_timing_loop(void) {
     }
 
     /* calculate preferred host check time */
-    temp_host->next_check = (time_t)(current_time
-				     + (mult_factor * scheduling_info.host_inter_check_delay));
+    temp_host->next_check
+      = (time_t)(current_time
+                 + (mult_factor
+                    * scheduling_info.host_inter_check_delay));
 
     logger(dbg_events, most)
       << "Preferred Check Time: " << temp_host->next_check
       << " --> " << my_ctime(&temp_host->next_check);
 
     /* make sure the host can actually be scheduled at this time */
-    is_valid_time = check_time_against_period(temp_host->next_check,
-					      temp_host->check_period_ptr);
+    is_valid_time = check_time_against_period(
+                      temp_host->next_check,
+                      temp_host->check_period_ptr);
     if (is_valid_time == ERROR) {
-      get_next_valid_time(temp_host->next_check,
-			  &next_valid_time,
-                          temp_host->check_period_ptr);
+      get_next_valid_time(
+        temp_host->next_check,
+        &next_valid_time,
+        temp_host->check_period_ptr);
       temp_host->next_check = next_valid_time;
     }
 
@@ -743,7 +823,9 @@ void init_timing_loop(void) {
     gettimeofday(&tv[7], NULL);
 
   /* add scheduled host checks to event queue */
-  for (temp_host = host_list; temp_host != NULL; temp_host = temp_host->next) {
+  for (temp_host = host_list;
+       temp_host != NULL;
+       temp_host = temp_host->next) {
 
     /* Nagios XI/NDOUtils Mod */
     /* update status of all hosts (scheduled or not) */
@@ -760,16 +842,17 @@ void init_timing_loop(void) {
     }
 
     /* schedule a new host check event */
-    schedule_new_event(EVENT_HOST_CHECK,
-		       FALSE,
-		       temp_host->next_check,
-		       FALSE,
-		       0,
-                       NULL,
-		       TRUE,
-		       (void*)temp_host,
-		       NULL,
-                       temp_host->check_options);
+    schedule_new_event(
+      EVENT_HOST_CHECK,
+      FALSE,
+      temp_host->next_check,
+      FALSE,
+      0,
+      NULL,
+      TRUE,
+      (void*)temp_host,
+      NULL,
+      temp_host->check_options);
   }
 
   if (test_scheduling == TRUE)
@@ -779,80 +862,86 @@ void init_timing_loop(void) {
 
   /* add a host and service check rescheduling event */
   if (config->get_auto_reschedule_checks() == true)
-    schedule_new_event(EVENT_RESCHEDULE_CHECKS,
-		       TRUE,
-                       current_time + config->get_auto_rescheduling_interval(),
-                       TRUE,
-		       config->get_auto_rescheduling_interval(),
-		       NULL,
-                       TRUE,
-		       NULL,
-		       NULL,
-		       0);
+    schedule_new_event(
+      EVENT_RESCHEDULE_CHECKS,
+      TRUE,
+      current_time + config->get_auto_rescheduling_interval(),
+      TRUE,
+      config->get_auto_rescheduling_interval(),
+      NULL,
+      TRUE,
+      NULL,
+      NULL,
+      0);
 
   /* add a check result reaper event */
-  schedule_new_event(EVENT_CHECK_REAPER,
-                     TRUE,
-                     current_time + config->get_check_reaper_interval(),
-		     TRUE,
-                     config->get_check_reaper_interval(),
-		     NULL,
-		     TRUE,
-		     NULL,
-		     NULL,
-                     0);
+  schedule_new_event(
+    EVENT_CHECK_REAPER,
+    TRUE,
+    current_time + config->get_check_reaper_interval(),
+    TRUE,
+    config->get_check_reaper_interval(),
+    NULL,
+    TRUE,
+    NULL,
+    NULL,
+    0);
 
   /* add an orphaned check event */
   if (config->get_check_orphaned_services() == TRUE
       || config->get_check_orphaned_hosts() == true)
-    schedule_new_event(EVENT_ORPHAN_CHECK,
-		       TRUE,
-                       current_time + DEFAULT_ORPHAN_CHECK_INTERVAL,
-		       TRUE,
-                       DEFAULT_ORPHAN_CHECK_INTERVAL,
-		       NULL,
-		       TRUE,
-		       NULL,
-		       NULL,
-                       0);
+    schedule_new_event(
+      EVENT_ORPHAN_CHECK,
+      TRUE,
+      current_time + DEFAULT_ORPHAN_CHECK_INTERVAL,
+      TRUE,
+      DEFAULT_ORPHAN_CHECK_INTERVAL,
+      NULL,
+      TRUE,
+      NULL,
+      NULL,
+      0);
 
   /* add a service result "freshness" check event */
   if (config->get_check_service_freshness() == true)
-    schedule_new_event(EVENT_SFRESHNESS_CHECK,
-		       TRUE,
-                       current_time + config->get_service_freshness_check_interval(),
-		       TRUE,
-                       config->get_service_freshness_check_interval(),
-		       NULL,
-                       TRUE,
-		       NULL,
-		       NULL,
-		       0);
+    schedule_new_event(
+      EVENT_SFRESHNESS_CHECK,
+      TRUE,
+      current_time + config->get_service_freshness_check_interval(),
+      TRUE,
+      config->get_service_freshness_check_interval(),
+      NULL,
+      TRUE,
+      NULL,
+      NULL,
+      0);
 
   /* add a host result "freshness" check event */
   if (config->get_check_host_freshness() == true)
-    schedule_new_event(EVENT_HFRESHNESS_CHECK,
-		       TRUE,
-                       current_time + config->get_host_freshness_check_interval(),
-		       TRUE,
-                       config->get_host_freshness_check_interval(),
-		       NULL,
-		       TRUE,
-                       NULL,
-		       NULL,
-		       0);
+    schedule_new_event(
+      EVENT_HFRESHNESS_CHECK,
+      TRUE,
+      current_time + config->get_host_freshness_check_interval(),
+      TRUE,
+      config->get_host_freshness_check_interval(),
+      NULL,
+      TRUE,
+      NULL,
+      NULL,
+      0);
 
   /* add a status save event */
-  schedule_new_event(EVENT_STATUS_SAVE,
-		     TRUE,
-                     current_time + config->get_status_update_interval(),
-		     TRUE,
-                     config->get_status_update_interval(),
-		     NULL,
-		     TRUE,
-		     NULL,
-                     NULL,
-		     0);
+  schedule_new_event(
+    EVENT_STATUS_SAVE,
+    TRUE,
+    current_time + config->get_status_update_interval(),
+    TRUE,
+    config->get_status_update_interval(),
+    NULL,
+    TRUE,
+    NULL,
+    NULL,
+    0);
 
   /* add an external command check event if needed */
   if (config->get_check_external_commands() == true) {
@@ -860,51 +949,62 @@ void init_timing_loop(void) {
       interval_to_use = (unsigned long)5;
     else
       interval_to_use = (unsigned long)config->get_command_check_interval();
-    schedule_new_event(EVENT_COMMAND_CHECK,
-		       TRUE,
-                       current_time + interval_to_use,
-		       TRUE,
-		       interval_to_use,
-                       NULL,
-		       TRUE,
-		       NULL,
-		       NULL,
-		       0);
+    schedule_new_event(
+      EVENT_COMMAND_CHECK,
+      TRUE,
+      current_time + interval_to_use,
+      TRUE,
+      interval_to_use,
+      NULL,
+      TRUE,
+      NULL,
+      NULL,
+      0);
   }
 
   /* add a retention data save event if needed */
   if (config->get_retain_state_information() == true
       && config->get_retention_update_interval() > 0)
-    schedule_new_event(EVENT_RETENTION_SAVE,
-		       TRUE,
-                       current_time + (config->get_retention_update_interval() * 60),
-		       TRUE,
-                       (config->get_retention_update_interval() * 60),
-		       NULL,
-                       TRUE,
-		       NULL,
-		       NULL,
-		       0);
+    schedule_new_event(
+      EVENT_RETENTION_SAVE,
+      TRUE,
+      current_time + (config->get_retention_update_interval() * 60),
+      TRUE,
+      (config->get_retention_update_interval() * 60),
+      NULL,
+      TRUE,
+      NULL,
+      NULL,
+      0);
 
   if (test_scheduling == TRUE) {
-    runtime[0] = (double)((double)(tv[1].tv_sec - tv[0].tv_sec)
-			  + (double)((tv[1].tv_usec - tv[0].tv_usec) / 1000.0) / 1000.0);
-    runtime[1] = (double)((double)(tv[2].tv_sec - tv[1].tv_sec)
-			  + (double)((tv[2].tv_usec - tv[1].tv_usec) / 1000.0) / 1000.0);
-    runtime[2] = (double)((double)(tv[3].tv_sec - tv[2].tv_sec)
-			  + (double)((tv[3].tv_usec - tv[2].tv_usec) / 1000.0) / 1000.0);
-    runtime[3] = (double)((double)(tv[4].tv_sec - tv[3].tv_sec)
-			  + (double)((tv[4].tv_usec - tv[3].tv_usec) / 1000.0) / 1000.0);
-    runtime[4] = (double)((double)(tv[5].tv_sec - tv[4].tv_sec)
-			  + (double)((tv[5].tv_usec - tv[4].tv_usec) / 1000.0) / 1000.0);
-    runtime[5] = (double)((double)(tv[6].tv_sec - tv[5].tv_sec)
-			  + (double)((tv[6].tv_usec - tv[5].tv_usec) / 1000.0) / 1000.0);
-    runtime[6] = (double)((double)(tv[7].tv_sec - tv[6].tv_sec)
-			  + (double)((tv[7].tv_usec - tv[6].tv_usec) / 1000.0) / 1000.0);
-    runtime[7] = (double)((double)(tv[8].tv_sec - tv[7].tv_sec)
-			  + (double)((tv[8].tv_usec - tv[7].tv_usec) / 1000.0) / 1000.0);
-    runtime[8] = (double)((double)(tv[8].tv_sec - tv[0].tv_sec)
-			  + (double)((tv[8].tv_usec - tv[0].tv_usec) / 1000.0) / 1000.0);
+    runtime[0]
+      = (double)((double)(tv[1].tv_sec - tv[0].tv_sec)
+                 + (double)((tv[1].tv_usec - tv[0].tv_usec) / 1000.0) / 1000.0);
+    runtime[1]
+      = (double)((double)(tv[2].tv_sec - tv[1].tv_sec)
+                 + (double)((tv[2].tv_usec - tv[1].tv_usec) / 1000.0) / 1000.0);
+    runtime[2]
+      = (double)((double)(tv[3].tv_sec - tv[2].tv_sec)
+                 + (double)((tv[3].tv_usec - tv[2].tv_usec) / 1000.0) / 1000.0);
+    runtime[3]
+      = (double)((double)(tv[4].tv_sec - tv[3].tv_sec)
+                 + (double)((tv[4].tv_usec - tv[3].tv_usec) / 1000.0) / 1000.0);
+    runtime[4]
+      = (double)((double)(tv[5].tv_sec - tv[4].tv_sec)
+                 + (double)((tv[5].tv_usec - tv[4].tv_usec) / 1000.0) / 1000.0);
+    runtime[5]
+      = (double)((double)(tv[6].tv_sec - tv[5].tv_sec)
+                 + (double)((tv[6].tv_usec - tv[5].tv_usec) / 1000.0) / 1000.0);
+    runtime[6]
+      = (double)((double)(tv[7].tv_sec - tv[6].tv_sec)
+                 + (double)((tv[7].tv_usec - tv[6].tv_usec) / 1000.0) / 1000.0);
+    runtime[7]
+      = (double)((double)(tv[8].tv_sec - tv[7].tv_sec)
+                 + (double)((tv[8].tv_usec - tv[7].tv_usec) / 1000.0) / 1000.0);
+    runtime[8]
+      = (double)((double)(tv[8].tv_sec - tv[0].tv_sec)
+                 + (double)((tv[8].tv_usec - tv[0].tv_usec) / 1000.0) / 1000.0);
 
     printf("EVENT SCHEDULING TIMES\n");
     printf("-------------------------------------\n");
@@ -921,25 +1021,35 @@ void init_timing_loop(void) {
     printf("\n\n");
   }
 
-  logger(dbg_functions, basic) << "init_timing_loop()";
+  logger(dbg_functions, basic)
+    << "init_timing_loop()";
+  return;
 }
 
 /* displays service check scheduling information */
-void display_scheduling_info(void) {
+void display_scheduling_info() {
   float minimum_concurrent_checks1 = 0.0;
   float minimum_concurrent_checks2 = 0.0;
   float minimum_concurrent_checks = 0.0;
   float max_reaper_interval = 0.0;
   int suggestions = 0;
 
-  printf("Projected scheduling information for host and service checks\n");
-  printf("is listed below.  This information assumes that you are going\n");
-  printf("to start running Centreon Engine with your current config files.\n\n");
+  printf(
+    "Projected scheduling information for host and service "
+    "checks\n"
+    "is listed below.  This information assumes that you are "
+    "going\n"
+    "to start running Centreon Engine with your current config "
+    "files.\n\n");
 
-  printf("HOST SCHEDULING INFORMATION\n");
-  printf("---------------------------\n");
-  printf("Total hosts:                     %d\n", scheduling_info.total_hosts);
-  printf("Total scheduled hosts:           %d\n", scheduling_info.total_scheduled_hosts);
+  printf(
+    "HOST SCHEDULING INFORMATION\n"
+    "---------------------------\n"
+    "Total hosts:                     %d\n",
+    scheduling_info.total_hosts);
+  printf(
+    "Total scheduled hosts:           %d\n",
+    scheduling_info.total_scheduled_hosts);
 
   printf("Host inter-check delay method:   ");
   if (config->get_host_inter_check_delay_method() == configuration::state::icd_none)
@@ -948,23 +1058,37 @@ void display_scheduling_info(void) {
     printf("DUMB\n");
   else if (config->get_host_inter_check_delay_method() == configuration::state::icd_smart) {
     printf("SMART\n");
-    printf("Average host check interval:     %.2f sec\n",
-	   scheduling_info.average_host_check_interval);
+    printf(
+      "Average host check interval:     %.2f sec\n",
+      scheduling_info.average_host_check_interval);
   }
   else
     printf("USER-SUPPLIED VALUE\n");
-  printf("Host inter-check delay:          %.2f sec\n", scheduling_info.host_inter_check_delay);
-  printf("Max host check spread:           %d min\n", scheduling_info.max_host_check_spread);
-  printf("First scheduled check:           %s", (scheduling_info.total_scheduled_hosts == 0)
-	 ? "N/A\n" : ctime(&scheduling_info.first_host_check));
-  printf("Last scheduled check:            %s", (scheduling_info.total_scheduled_hosts == 0)
-	 ? "N/A\n" : ctime(&scheduling_info.last_host_check));
+  printf(
+    "Host inter-check delay:          %.2f sec\n",
+    scheduling_info.host_inter_check_delay);
+  printf(
+    "Max host check spread:           %d min\n",
+    scheduling_info.max_host_check_spread);
+  printf(
+    "First scheduled check:           %s",
+    (scheduling_info.total_scheduled_hosts == 0)
+    ? "N/A\n" : ctime(&scheduling_info.first_host_check));
+  printf(
+    "Last scheduled check:            %s",
+    (scheduling_info.total_scheduled_hosts == 0)
+    ? "N/A\n" : ctime(&scheduling_info.last_host_check));
   printf("\n\n");
 
-  printf("SERVICE SCHEDULING INFORMATION\n");
-  printf("-------------------------------\n");
-  printf("Total services:                     %d\n", scheduling_info.total_services);
-  printf("Total scheduled services:           %d\n", scheduling_info.total_scheduled_services);
+  printf(
+    "SERVICE SCHEDULING INFORMATION\n"
+    "-------------------------------\n");
+  printf(
+    "Total services:                     %d\n",
+    scheduling_info.total_services);
+  printf(
+    "Total scheduled services:           %d\n",
+    scheduling_info.total_scheduled_services);
 
   printf("Service inter-check delay method:   ");
   if (config->get_service_inter_check_delay_method() == configuration::state::icd_none)
@@ -973,28 +1097,45 @@ void display_scheduling_info(void) {
     printf("DUMB\n");
   else if (config->get_service_inter_check_delay_method() == configuration::state::icd_smart) {
     printf("SMART\n");
-    printf("Average service check interval:     %.2f sec\n",
-	   scheduling_info.average_service_check_interval);
+    printf(
+      "Average service check interval:     %.2f sec\n",
+      scheduling_info.average_service_check_interval);
   }
   else
     printf("USER-SUPPLIED VALUE\n");
-  printf("Inter-check delay:                  %.2f sec\n", scheduling_info.service_inter_check_delay);
+  printf(
+    "Inter-check delay:                  %.2f sec\n",
+    scheduling_info.service_inter_check_delay);
 
-  printf("Interleave factor method:           %s\n",
-         (config->get_service_interleave_factor_method() == configuration::state::ilf_user)
-	 ? "USER-SUPPLIED VALUE" : "SMART");
+  printf(
+    "Interleave factor method:           %s\n",
+    (config->get_service_interleave_factor_method() == configuration::state::ilf_user)
+    ? "USER-SUPPLIED VALUE" : "SMART");
   if (config->get_service_interleave_factor_method() == configuration::state::ilf_smart)
-    printf("Average services per host:          %.2f\n", scheduling_info.average_services_per_host);
-  printf("Service interleave factor:          %d\n", scheduling_info.service_interleave_factor);
+    printf(
+      "Average services per host:          %.2f\n",
+      scheduling_info.average_services_per_host);
+  printf(
+    "Service interleave factor:          %d\n",
+    scheduling_info.service_interleave_factor);
 
-  printf("Max service check spread:           %d min\n", scheduling_info.max_service_check_spread);
-  printf("First scheduled check:              %s", ctime(&scheduling_info.first_service_check));
-  printf("Last scheduled check:               %s", ctime(&scheduling_info.last_service_check));
+  printf(
+   "Max service check spread:           %d min\n",
+   scheduling_info.max_service_check_spread);
+  printf(
+    "First scheduled check:              %s",
+    ctime(&scheduling_info.first_service_check));
+  printf(
+    "Last scheduled check:               %s",
+    ctime(&scheduling_info.last_service_check));
   printf("\n\n");
 
-  printf("CHECK PROCESSING INFORMATION\n");
-  printf("----------------------------\n");
-  printf("Check result reaper interval:       %d sec\n", config->get_check_reaper_interval());
+  printf(
+    "CHECK PROCESSING INFORMATION\n"
+    "----------------------------\n");
+  printf(
+    "Check result reaper interval:       %d sec\n",
+    config->get_check_reaper_interval());
   printf("Max concurrent service checks:      ");
   if (config->get_max_parallel_service_checks() == 0)
     printf("Unlimited\n");
@@ -1009,18 +1150,22 @@ void display_scheduling_info(void) {
 
   /* assume a 100% (2x) check burst for check reaper */
   /* assume we want a max of 2k files in the result queue at any given time */
-  max_reaper_interval = floor(2000 * scheduling_info.service_inter_check_delay);
+  max_reaper_interval
+    = floor(2000 * scheduling_info.service_inter_check_delay);
   if (max_reaper_interval < 2.0)
     max_reaper_interval = 2.0;
   if (max_reaper_interval > 30.0)
     max_reaper_interval = 30.0;
   if (max_reaper_interval < config->get_check_reaper_interval()) {
-    printf("* Value for 'check_result_reaper_frequency' should be <= %d seconds\n",
-	   (int)max_reaper_interval);
+    printf(
+      "* Value for 'check_result_reaper_frequency' should be <= %d "
+      "seconds\n", (int)max_reaper_interval);
     suggestions++;
   }
   if (config->get_check_reaper_interval() < 2) {
-    printf("* Value for 'check_result_reaper_frequency' should be >= 2 seconds\n");
+    printf(
+      "* Value for 'check_result_reaper_frequency' should be >= 2 "
+      "seconds\n");
     suggestions++;
   }
 
@@ -1028,16 +1173,19 @@ void display_scheduling_info(void) {
 
   /* first method (old) - assume a 100% (2x) service check burst for max concurrent checks */
   if (scheduling_info.service_inter_check_delay == 0.0)
-    minimum_concurrent_checks1 = ceil(config->get_check_reaper_interval() * 2.0);
+    minimum_concurrent_checks1
+      = ceil(config->get_check_reaper_interval() * 2.0);
   else
-    minimum_concurrent_checks1 = ceil((config->get_check_reaper_interval() * 2.0)
-				      / scheduling_info.service_inter_check_delay);
+    minimum_concurrent_checks1
+      = ceil((config->get_check_reaper_interval() * 2.0)
+             / scheduling_info.service_inter_check_delay);
 
   /* second method (new) - assume a 25% (1.25x) service check burst for max concurrent checks */
-  minimum_concurrent_checks2 = ceil((((double)scheduling_info.total_scheduled_services)
-				     / scheduling_info.average_service_check_interval) * 1.25
-				    * config->get_check_reaper_interval()
-				    * scheduling_info.average_service_execution_time);
+  minimum_concurrent_checks2
+    = ceil((((double)scheduling_info.total_scheduled_services)
+            / scheduling_info.average_service_check_interval) * 1.25
+           * config->get_check_reaper_interval()
+           * scheduling_info.average_service_execution_time);
 
   /* use max of computed values */
   if (minimum_concurrent_checks1 > minimum_concurrent_checks2)
@@ -1048,32 +1196,36 @@ void display_scheduling_info(void) {
   /* compare with configured value */
   if ((minimum_concurrent_checks > config->get_max_parallel_service_checks())
       && config->get_max_parallel_service_checks() != 0) {
-    printf("* Value for 'max_concurrent_checks' option should be >= %d\n",
-           (int)minimum_concurrent_checks);
+    printf(
+      "* Value for 'max_concurrent_checks' option should be >= %d\n",
+      (int)minimum_concurrent_checks);
     suggestions++;
   }
 
   if (suggestions == 0)
     printf("I have no suggestions - things look okay.\n");
   printf("\n");
+  return;
 }
 
 /* schedule a new timed event */
-void schedule_new_event(int event_type,
-			int high_priority,
-			time_t run_time,
-                        int recurring,
-			unsigned long event_interval,
-                        void* timing_func,
-			int compensate_for_time_change,
-                        void* event_data,
-			void* event_args,
-			int event_options) {
+void schedule_new_event(
+       int event_type,
+       int high_priority,
+       time_t run_time,
+       int recurring,
+       unsigned long event_interval,
+       void* timing_func,
+       int compensate_for_time_change,
+       void* event_data,
+       void* event_args,
+       int event_options) {
   timed_event** event_list = NULL;
   timed_event** event_list_tail = NULL;
   timed_event* new_event = NULL;
 
-  logger(dbg_functions, basic) << "schedule_new_event()";
+  logger(dbg_functions, basic)
+    << "schedule_new_event()";
 
   if (high_priority == TRUE) {
     event_list = &event_list_high;
@@ -1098,16 +1250,19 @@ void schedule_new_event(int event_type,
 
   /* add the event to the event list */
   add_event(new_event, event_list, event_list_tail);
+  return;
 }
 
 /* reschedule an event in order of execution time */
-void reschedule_event(timed_event* event,
-		      timed_event** event_list,
-                      timed_event** event_list_tail) {
+void reschedule_event(
+       timed_event* event,
+       timed_event** event_list,
+       timed_event** event_list_tail) {
   time_t current_time = 0L;
   time_t (*timingfunc)(void);
 
-  logger(dbg_functions, basic) << "reschedule_event()";
+  logger(dbg_functions, basic)
+    << "reschedule_event()";
 
   /* reschedule recurring events... */
   if (event->recurring == TRUE) {
@@ -1129,16 +1284,19 @@ void reschedule_event(timed_event* event,
 
   /* add the event to the event list */
   add_event(event, event_list, event_list_tail);
+  return;
 }
 
 /* add an event to list ordered by execution time */
-void add_event(timed_event* event,
-	       timed_event** event_list,
-               timed_event** event_list_tail) {
+void add_event(
+       timed_event* event,
+       timed_event** event_list,
+       timed_event** event_list_tail) {
   timed_event* temp_event = NULL;
   timed_event* first_event = NULL;
 
-  logger(dbg_functions, basic) << "add_event()";
+  logger(dbg_functions, basic)
+    << "add_event()";
 
   event->next = NULL;
   event->prev = NULL;
@@ -1191,27 +1349,32 @@ void add_event(timed_event* event,
   }
 
   /* send event data to broker */
-  broker_timed_event(NEBTYPE_TIMEDEVENT_ADD,
-		     NEBFLAG_NONE,
-		     NEBATTR_NONE,
-		     event,
-                     NULL);
+  broker_timed_event(
+    NEBTYPE_TIMEDEVENT_ADD,
+    NEBFLAG_NONE,
+    NEBATTR_NONE,
+    event,
+    NULL);
+  return;
 }
 
 /* remove an event from the queue */
-void remove_event(timed_event* event,
-		  timed_event** event_list,
-                  timed_event** event_list_tail) {
+void remove_event(
+       timed_event* event,
+       timed_event** event_list,
+       timed_event** event_list_tail) {
   timed_event* temp_event = NULL;
 
-  logger(dbg_functions, basic) << "remove_event()";
+  logger(dbg_functions, basic)
+    << "remove_event()";
 
   /* send event data to broker */
-  broker_timed_event(NEBTYPE_TIMEDEVENT_REMOVE,
-		     NEBFLAG_NONE,
-		     NEBATTR_NONE,
-                     event,
-		     NULL);
+  broker_timed_event(
+    NEBTYPE_TIMEDEVENT_REMOVE,
+    NEBFLAG_NONE,
+    NEBATTR_NONE,
+    event,
+    NULL);
 
   if (*event_list == NULL || event == NULL)
     return;
@@ -1229,8 +1392,9 @@ void remove_event(timed_event* event,
   }
 
   else {
-
-    for (temp_event = *event_list; temp_event != NULL; temp_event = temp_event->next) {
+    for (temp_event = *event_list;
+         temp_event != NULL;
+         temp_event = temp_event->next) {
       if (temp_event->next == event) {
         temp_event->next = temp_event->next->next;
         if (temp_event->next == NULL)
@@ -1243,6 +1407,7 @@ void remove_event(timed_event* event,
       }
     }
   }
+  return;
 }
 
 /* handles a timed event */
@@ -1268,14 +1433,16 @@ int handle_timed_event(timed_event* event) {
     NULL
   };
 
-  logger(dbg_functions, basic) << "handle_timed_event()";
+  logger(dbg_functions, basic)
+    << "handle_timed_event()";
 
   /* send event data to broker */
-  broker_timed_event(NEBTYPE_TIMEDEVENT_EXECUTE,
-                     NEBFLAG_NONE,
-                     NEBATTR_NONE,
-                     event,
-                     NULL);
+  broker_timed_event(
+    NEBTYPE_TIMEDEVENT_EXECUTE,
+    NEBFLAG_NONE,
+    NEBATTR_NONE,
+    event,
+    NULL);
 
   logger(dbg_events, basic)
     << "** Timed Event ** Type: " << event->event_type
@@ -1291,7 +1458,7 @@ int handle_timed_event(timed_event* event) {
 }
 
 /* adjusts scheduling of host and service checks */
-void adjust_check_scheduling(void) {
+void adjust_check_scheduling() {
   timed_event* temp_event = NULL;
   service* temp_service = NULL;
   host* temp_host = NULL;
@@ -1314,7 +1481,8 @@ void adjust_check_scheduling(void) {
   double current_exec_time_offset = 0.0;
   double new_run_time_offset = 0.0;
 
-  logger(dbg_functions, basic) << "adjust_check_scheduling()";
+  logger(dbg_functions, basic)
+    << "adjust_check_scheduling()";
 
   /* TODO:
      - Track host check overhead on a per-host basis
@@ -1324,7 +1492,8 @@ void adjust_check_scheduling(void) {
   /* determine our adjustment window */
   time(&current_time);
   first_window_time = current_time;
-  last_window_time = first_window_time + config->get_auto_rescheduling_window();
+  last_window_time
+    = first_window_time + config->get_auto_rescheduling_window();
 
   /* get current scheduling data */
   for (temp_event = event_list_low;
@@ -1399,12 +1568,14 @@ void adjust_check_scheduling(void) {
 
   if ((unsigned long)total_check_exec_time > config->get_auto_rescheduling_window()) {
     inter_check_delay = 0.0;
-    exec_time_factor = (double)((double)config->get_auto_rescheduling_window()
-				/ total_check_exec_time);
+    exec_time_factor
+      = (double)((double)config->get_auto_rescheduling_window()
+                 / total_check_exec_time);
   }
   else {
-    inter_check_delay = (double)((((double)config->get_auto_rescheduling_window())
-				  - total_check_exec_time) / (double)(total_checks * 1.0));
+    inter_check_delay
+      = (double)((((double)config->get_auto_rescheduling_window())
+                  - total_check_exec_time) / (double)(total_checks * 1.0));
     exec_time_factor = 1.0;
   }
 
@@ -1438,9 +1609,10 @@ void adjust_check_scheduling(void) {
       if (temp_host->check_options & CHECK_OPTION_FORCE_EXECUTION)
         continue;
 
-      current_exec_time = ((temp_host->execution_time
-			    + projected_host_check_overhead)
-			   * exec_time_factor);
+      current_exec_time
+        = ((temp_host->execution_time
+            + projected_host_check_overhead)
+           * exec_time_factor);
     }
     else if (temp_event->event_type == EVENT_SERVICE_CHECK) {
       if ((temp_service = (service*)temp_event->event_data) == NULL)
@@ -1451,14 +1623,17 @@ void adjust_check_scheduling(void) {
         continue;
 
       /* NOTE: service check execution time is not taken into account, as service checks are run in parallel */
-      current_exec_time = (projected_service_check_overhead * exec_time_factor);
+      current_exec_time
+        = (projected_service_check_overhead * exec_time_factor);
     }
     else
       continue;
 
     current_check++;
     new_run_time_offset = current_exec_time_offset + current_icd_offset;
-    new_run_time = (time_t)(first_window_time + (unsigned long)new_run_time_offset);
+    new_run_time
+      = (time_t)(first_window_time
+                 + (unsigned long)new_run_time_offset);
 
     /*
       printf("  CURRENT CHECK #:      %d\n",current_check);
@@ -1485,10 +1660,13 @@ void adjust_check_scheduling(void) {
 
   /* resort event list (some events may be out of order at this point) */
   resort_event_list(&event_list_low, &event_list_low_tail);
+  return;
 }
 
 /* attempts to compensate for a change in the system time */
-void compensate_for_system_time_change(unsigned long last_time, unsigned long current_time) {
+void compensate_for_system_time_change(
+       unsigned long last_time,
+       unsigned long current_time) {
   unsigned long time_difference = 0L;
   timed_event* temp_event = NULL;
   service* temp_service = NULL;
@@ -1499,12 +1677,18 @@ void compensate_for_system_time_change(unsigned long last_time, unsigned long cu
   int seconds = 0;
   time_t (*timingfunc)(void);
 
-  logger(dbg_functions, basic) << "compensate_for_system_time_change()";
+  logger(dbg_functions, basic)
+    << "compensate_for_system_time_change()";
 
   /* we moved back in time... */
   if (last_time > current_time) {
     time_difference = last_time - current_time;
-    get_time_breakdown(time_difference, &days, &hours, &minutes, &seconds);
+    get_time_breakdown(
+      time_difference,
+      &days,
+      &hours,
+      &minutes,
+      &seconds);
     logger(dbg_events, basic)
       << "Detected a backwards time change of " << days << "d "
       << hours << "h " << minutes << "m " << seconds << "s.";
@@ -1512,7 +1696,12 @@ void compensate_for_system_time_change(unsigned long last_time, unsigned long cu
   /* we moved into the future... */
   else {
     time_difference = current_time - last_time;
-    get_time_breakdown(time_difference, &days, &hours, &minutes, &seconds);
+    get_time_breakdown(
+      time_difference,
+      &days,
+      &hours,
+      &minutes,
+      &seconds);
     logger(dbg_events, basic)
       << "Detected a forwards time change of " << days << "d "
       << hours << "h " << minutes << "m " << seconds << "s.";
@@ -1520,8 +1709,8 @@ void compensate_for_system_time_change(unsigned long last_time, unsigned long cu
 
   /* log the time change */
   logger(log_process_info | log_runtime_warning, basic)
-    << "Warning: A system time change of " << days << "d " << hours << "h "
-    << minutes << "m " << seconds << "s ("
+    << "Warning: A system time change of " << days << "d "
+    << hours << "h " << minutes << "m " << seconds << "s ("
     << (last_time > current_time ? "backwards" : "forwards")
     << " in time) has been detected.  Compensating...";
 
@@ -1542,17 +1731,20 @@ void compensate_for_system_time_change(unsigned long last_time, unsigned long cu
 
     /* else use standard adjustment */
     else
-      adjust_timestamp_for_time_change(last_time,
-				       current_time,
-				       time_difference,
-                                       &temp_event->run_time);
+      adjust_timestamp_for_time_change(
+        last_time,
+        current_time,
+        time_difference,
+        &temp_event->run_time);
   }
 
   /* resort event list (some events may be out of order at this point) */
   resort_event_list(&event_list_high, &event_list_high_tail);
 
   /* adjust the next run time for all low priority timed events */
-  for (temp_event = event_list_low; temp_event != NULL; temp_event = temp_event->next) {
+  for (temp_event = event_list_low;
+       temp_event != NULL;
+       temp_event = temp_event->next) {
 
     /* skip special events that occur at specific times... */
     if (temp_event->compensate_for_time_change == FALSE)
@@ -1566,10 +1758,11 @@ void compensate_for_system_time_change(unsigned long last_time, unsigned long cu
 
     /* else use standard adjustment */
     else
-      adjust_timestamp_for_time_change(last_time,
-				       current_time,
-				       time_difference,
-                                       &temp_event->run_time);
+      adjust_timestamp_for_time_change(
+        last_time,
+        current_time,
+        time_difference,
+        &temp_event->run_time);
   }
 
   /* resort event list (some events may be out of order at this point) */
@@ -1580,95 +1773,119 @@ void compensate_for_system_time_change(unsigned long last_time, unsigned long cu
        temp_service != NULL;
        temp_service = temp_service->next) {
 
-    adjust_timestamp_for_time_change(last_time,
-				     current_time,
-				     time_difference,
-                                     &temp_service->last_notification);
-    adjust_timestamp_for_time_change(last_time,
-				     current_time,
-				     time_difference,
-                                     &temp_service->last_check);
-    adjust_timestamp_for_time_change(last_time,
-				     current_time,
-				     time_difference,
-                                     &temp_service->next_check);
-    adjust_timestamp_for_time_change(last_time,
-				     current_time,
-				     time_difference,
-                                     &temp_service->last_state_change);
-    adjust_timestamp_for_time_change(last_time,
-				     current_time,
-				     time_difference,
-                                     &temp_service->last_hard_state_change);
+    adjust_timestamp_for_time_change(
+      last_time,
+      current_time,
+      time_difference,
+      &temp_service->last_notification);
+    adjust_timestamp_for_time_change(
+      last_time,
+      current_time,
+      time_difference,
+      &temp_service->last_check);
+    adjust_timestamp_for_time_change(
+      last_time,
+      current_time,
+      time_difference,
+      &temp_service->next_check);
+    adjust_timestamp_for_time_change(
+      last_time,
+      current_time,
+      time_difference,
+      &temp_service->last_state_change);
+    adjust_timestamp_for_time_change(
+      last_time,
+      current_time,
+      time_difference,
+      &temp_service->last_hard_state_change);
 
     /* recalculate next re-notification time */
-    temp_service->next_notification = get_next_service_notification_time(temp_service,
-									 temp_service->last_notification);
+    temp_service->next_notification
+      = get_next_service_notification_time(
+          temp_service,
+          temp_service->last_notification);
 
     /* update the status data */
     update_service_status(temp_service, FALSE);
   }
 
   /* adjust host timestamps */
-  for (temp_host = host_list; temp_host != NULL; temp_host = temp_host->next) {
-    adjust_timestamp_for_time_change(last_time,
-				     current_time,
-				     time_difference,
-                                     &temp_host->last_host_notification);
-    adjust_timestamp_for_time_change(last_time,
-				     current_time,
-				     time_difference,
-                                     &temp_host->last_check);
-    adjust_timestamp_for_time_change(last_time,
-				     current_time,
-				     time_difference,
-                                     &temp_host->next_check);
-    adjust_timestamp_for_time_change(last_time,
-				     current_time,
-				     time_difference,
-                                     &temp_host->last_state_change);
-    adjust_timestamp_for_time_change(last_time,
-				     current_time,
-				     time_difference,
-                                     &temp_host->last_hard_state_change);
-    adjust_timestamp_for_time_change(last_time,
-				     current_time,
-				     time_difference,
-                                     &temp_host->last_state_history_update);
+  for (temp_host = host_list;
+       temp_host != NULL;
+       temp_host = temp_host->next) {
+    adjust_timestamp_for_time_change(
+      last_time,
+      current_time,
+      time_difference,
+      &temp_host->last_host_notification);
+    adjust_timestamp_for_time_change(
+      last_time,
+      current_time,
+      time_difference,
+      &temp_host->last_check);
+    adjust_timestamp_for_time_change(
+      last_time,
+      current_time,
+      time_difference,
+      &temp_host->next_check);
+    adjust_timestamp_for_time_change(
+      last_time,
+      current_time,
+      time_difference,
+      &temp_host->last_state_change);
+    adjust_timestamp_for_time_change(
+      last_time,
+      current_time,
+      time_difference,
+      &temp_host->last_hard_state_change);
+    adjust_timestamp_for_time_change(
+      last_time,
+      current_time,
+      time_difference,
+      &temp_host->last_state_history_update);
 
     /* recalculate next re-notification time */
-    temp_host->next_host_notification = get_next_host_notification_time(temp_host,
-									temp_host->last_host_notification);
+    temp_host->next_host_notification
+      = get_next_host_notification_time(
+          temp_host,
+          temp_host->last_host_notification);
 
     /* update the status data */
     update_host_status(temp_host, FALSE);
   }
 
   /* adjust program timestamps */
-  adjust_timestamp_for_time_change(last_time,
-				   current_time,
-				   time_difference,
-                                   &program_start);
-  adjust_timestamp_for_time_change(last_time,
-				   current_time,
-				   time_difference,
-                                   &event_start);
-  adjust_timestamp_for_time_change(last_time,
-				   current_time,
-				   time_difference,
-                                   &last_command_check);
+  adjust_timestamp_for_time_change(
+    last_time,
+    current_time,
+    time_difference,
+    &program_start);
+  adjust_timestamp_for_time_change(
+    last_time,
+    current_time,
+    time_difference,
+    &event_start);
+  adjust_timestamp_for_time_change(
+    last_time,
+    current_time,
+    time_difference,
+    &last_command_check);
 
   /* update the status data */
   update_program_status(FALSE);
+  return;
 }
 
 /* resorts an event list by event execution time - needed when compensating for system time changes */
-void resort_event_list(timed_event** event_list, timed_event** event_list_tail) {
+void resort_event_list(
+       timed_event** event_list,
+       timed_event** event_list_tail) {
   timed_event* temp_event_list = NULL;
   timed_event* temp_event = NULL;
   timed_event* next_event = NULL;
 
-  logger(dbg_functions, basic) << "resort_event_list()";
+  logger(dbg_functions, basic)
+    << "resort_event_list()";
 
   /* move current event list to temp list */
   if (*event_list == event_list_low)
@@ -1679,7 +1896,9 @@ void resort_event_list(timed_event** event_list, timed_event** event_list_tail) 
   *event_list = NULL;
 
   /* move all events to the new event list */
-  for (temp_event = temp_event_list; temp_event != NULL; temp_event = next_event) {
+  for (temp_event = temp_event_list;
+       temp_event != NULL;
+       temp_event = next_event) {
     next_event = temp_event->next;
 
     /* add the event to the newly created event list so it will be resorted */
@@ -1687,14 +1906,17 @@ void resort_event_list(timed_event** event_list, timed_event** event_list_tail) 
     temp_event->prev = NULL;
     add_event(temp_event, event_list, event_list_tail);
   }
+  return;
 }
 
 /* adjusts a timestamp variable in accordance with a system time change */
-void adjust_timestamp_for_time_change(time_t last_time,
-				      time_t current_time,
-                                      unsigned long time_difference,
-                                      time_t * ts) {
-  logger(dbg_functions, basic) << "adjust_timestamp_for_time_change()";
+void adjust_timestamp_for_time_change(
+       time_t last_time,
+       time_t current_time,
+       unsigned long time_difference,
+       time_t * ts) {
+  logger(dbg_functions, basic)
+    << "adjust_timestamp_for_time_change()";
 
   /* we shouldn't do anything with epoch values */
   if (*ts == (time_t)0)
@@ -1713,4 +1935,5 @@ void adjust_timestamp_for_time_change(time_t last_time,
   /* we moved into the future... */
   else
     *ts = (time_t)(*ts + time_difference);
+  return;
 }

@@ -73,50 +73,54 @@ int obsessive_compulsive_service_check_processor(service* svc) {
   grab_service_macros_r(&mac, svc);
 
   /* get the raw command line */
-  get_raw_command_line_r(&mac,
-			 ocsp_command_ptr,
-                         config->get_ocsp_command().c_str(),
-                         &raw_command, macro_options);
+  get_raw_command_line_r(
+    &mac,
+    ocsp_command_ptr,
+    config->get_ocsp_command().c_str(),
+    &raw_command, macro_options);
   if (raw_command == NULL) {
     clear_volatile_macros_r(&mac);
     return (ERROR);
   }
 
   logger(dbg_checks, most)
-    << "Raw obsessive compulsive service processor "    \
+    << "Raw obsessive compulsive service processor "
     "command line: " << raw_command;
 
   /* process any macros in the raw command line */
-  process_macros_r(&mac,
-		   raw_command,
-		   &processed_command,
-                   macro_options);
+  process_macros_r(
+    &mac,
+    raw_command,
+    &processed_command,
+    macro_options);
   if (processed_command == NULL) {
     clear_volatile_macros_r(&mac);
     return (ERROR);
   }
 
   logger(dbg_checks, most)
-    << "Processed obsessive compulsive service " \
+    << "Processed obsessive compulsive service "
     "processor command line: " << processed_command;
 
   /* run the command */
-  my_system_r(&mac,
-	      processed_command,
-	      config->get_ocsp_timeout(),
-              &early_timeout,
-	      &exectime,
-	      NULL,
-	      0);
+  my_system_r(
+    &mac,
+    processed_command,
+    config->get_ocsp_timeout(),
+    &early_timeout,
+    &exectime,
+    NULL,
+    0);
 
   clear_volatile_macros_r(&mac);
 
   /* check to see if the command timed out */
   if (early_timeout == TRUE)
     logger(log_runtime_warning, basic)
-      << "Warning: OCSP command '" << processed_command << "' for service '"
-      << svc->description << "' on host '" << svc->host_name
-      << "' timed out after " << config->get_ocsp_timeout() << " seconds";
+      << "Warning: OCSP command '" << processed_command
+      << "' for service '" << svc->description << "' on host '"
+      << svc->host_name << "' timed out after "
+      << config->get_ocsp_timeout() << " seconds";
 
   /* free memory */
   delete[] raw_command;
@@ -134,7 +138,8 @@ int obsessive_compulsive_host_check_processor(host* hst) {
   int macro_options = STRIP_ILLEGAL_MACRO_CHARS | ESCAPE_MACRO_CHARS;
   nagios_macros mac;
 
-  logger(dbg_functions, basic) << "obsessive_compulsive_host_check_processor()";
+  logger(dbg_functions, basic)
+    << "obsessive_compulsive_host_check_processor()";
 
   if (hst == NULL)
     return (ERROR);
@@ -154,48 +159,52 @@ int obsessive_compulsive_host_check_processor(host* hst) {
   grab_host_macros_r(&mac, hst);
 
   /* get the raw command line */
-  get_raw_command_line_r(&mac,
-			 ochp_command_ptr,
-                         config->get_ochp_command().c_str(),
-                         &raw_command, macro_options);
+  get_raw_command_line_r(
+    &mac,
+    ochp_command_ptr,
+    config->get_ochp_command().c_str(),
+    &raw_command, macro_options);
   if (raw_command == NULL) {
     clear_volatile_macros_r(&mac);
     return (ERROR);
   }
 
   logger(dbg_checks, most)
-    << "Raw obsessive compulsive host processor command line: " << raw_command;
+    << "Raw obsessive compulsive host processor command line: "
+    << raw_command;
 
   /* process any macros in the raw command line */
-  process_macros_r(&mac,
-		   raw_command,
-		   &processed_command,
-                   macro_options);
+  process_macros_r(
+    &mac,
+    raw_command,
+    &processed_command,
+    macro_options);
   if (processed_command == NULL) {
     clear_volatile_macros_r(&mac);
     return (ERROR);
   }
 
   logger(dbg_checks, most)
-    << "Processed obsessive compulsive host processor " \
+    << "Processed obsessive compulsive host processor "
     "command line: " << processed_command;
 
   /* run the command */
-  my_system_r(&mac,
-	      processed_command,
-	      config->get_ochp_timeout(),
-              &early_timeout,
-	      &exectime,
-	      NULL,
-	      0);
+  my_system_r(
+    &mac,
+    processed_command,
+    config->get_ochp_timeout(),
+    &early_timeout,
+    &exectime,
+    NULL,
+    0);
   clear_volatile_macros_r(&mac);
 
   /* check to see if the command timed out */
   if (early_timeout == TRUE)
     logger(log_runtime_warning, basic)
-      << "Warning: OCHP command '" << processed_command << "' for host '"
-      << hst->name << "' timed out after " << config->get_ochp_timeout()
-      << " seconds";
+      << "Warning: OCHP command '" << processed_command
+      << "' for host '" << hst->name << "' timed out after "
+      << config->get_ochp_timeout() << " seconds";
 
   /* free memory */
   delete[] raw_command;
@@ -213,22 +222,24 @@ int handle_service_event(service* svc) {
   host* temp_host = NULL;
   nagios_macros mac;
 
-  logger(dbg_functions, basic) << "handle_service_event()";
+  logger(dbg_functions, basic)
+    << "handle_service_event()";
 
   if (svc == NULL)
     return (ERROR);
 
   /* send event data to broker */
-  broker_statechange_data(NEBTYPE_STATECHANGE_END,
-			  NEBFLAG_NONE,
-                          NEBATTR_NONE,
-			  SERVICE_STATECHANGE,
-                          (void*)svc,
-			  svc->current_state,
-                          svc->state_type,
-			  svc->current_attempt,
-                          svc->max_attempts,
-			  NULL);
+  broker_statechange_data(
+    NEBTYPE_STATECHANGE_END,
+    NEBFLAG_NONE,
+    NEBATTR_NONE,
+    SERVICE_STATECHANGE,
+    (void*)svc,
+    svc->current_state,
+    svc->state_type,
+    svc->current_attempt,
+    svc->max_attempts,
+    NULL);
 
   /* bail out if we shouldn't be running event handlers */
   if (config->get_enable_event_handlers() == false)
@@ -254,14 +265,15 @@ int handle_service_event(service* svc) {
   clear_volatile_macros_r(&mac);
 
   /* send data to event broker */
-  broker_external_command(NEBTYPE_EXTERNALCOMMAND_CHECK,
-			  NEBFLAG_NONE,
-			  NEBATTR_NONE,
-			  CMD_NONE,
-			  time(NULL),
-			  NULL,
-			  NULL,
-			  NULL);
+  broker_external_command(
+    NEBTYPE_EXTERNALCOMMAND_CHECK,
+    NEBFLAG_NONE,
+    NEBATTR_NONE,
+    CMD_NONE,
+    time(NULL),
+    NULL,
+    NULL,
+    NULL);
 
   return (OK);
 }
@@ -280,7 +292,8 @@ int run_global_service_event_handler(nagios_macros* mac, service* svc) {
   int neb_result = OK;
   int macro_options = STRIP_ILLEGAL_MACRO_CHARS | ESCAPE_MACRO_CHARS;
 
-  logger(dbg_functions, basic) << "run_global_service_event_handler()";
+  logger(dbg_functions, basic)
+    << "run_global_service_event_handler()";
 
   if (svc == NULL)
     return (ERROR);
@@ -301,11 +314,12 @@ int run_global_service_event_handler(nagios_macros* mac, service* svc) {
   gettimeofday(&start_time, NULL);
 
   /* get the raw command line */
-  get_raw_command_line_r(mac,
-			 global_service_event_handler_ptr,
-                         config->get_global_service_event_handler().c_str(),
-			 &raw_command,
-			 macro_options);
+  get_raw_command_line_r(
+    mac,
+    global_service_event_handler_ptr,
+    config->get_global_service_event_handler().c_str(),
+    &raw_command,
+    macro_options);
   if (raw_command == NULL) {
     return (ERROR);
   }
@@ -319,38 +333,45 @@ int run_global_service_event_handler(nagios_macros* mac, service* svc) {
     return (ERROR);
 
   logger(dbg_eventhandlers, most)
-    << "Processed global service event handler "        \
+    << "Processed global service event handler "
     "command line: " << processed_command;
 
   if (config->get_log_event_handlers() == true) {
     std::ostringstream oss;
     oss << "GLOBAL SERVICE EVENT HANDLER: " << svc->host_name << ';'
-	<< svc->description << ";$SERVICESTATE$;$SERVICESTATETYPE$;$SERVICEATTEMPT$;"
-        << config->get_global_service_event_handler().c_str() << std::endl;
-    process_macros_r(mac, oss.str().c_str(), &processed_logentry, macro_options);
-    logger(log_event_handler, basic) << processed_logentry;
+	<< svc->description
+        << ";$SERVICESTATE$;$SERVICESTATETYPE$;$SERVICEATTEMPT$;"
+        << config->get_global_service_event_handler() << std::endl;
+    process_macros_r(
+      mac,
+      oss.str().c_str(),
+      &processed_logentry,
+      macro_options);
+    logger(log_event_handler, basic)
+      << processed_logentry;
   }
 
   /* send event data to broker */
   end_time.tv_sec = 0L;
   end_time.tv_usec = 0L;
-  neb_result = broker_event_handler(NEBTYPE_EVENTHANDLER_START,
-				    NEBFLAG_NONE,
-				    NEBATTR_NONE,
-				    GLOBAL_SERVICE_EVENTHANDLER,
-				    (void*)svc,
-				    svc->current_state,
-				    svc->state_type,
-				    start_time,
-				    end_time,
-				    exectime,
-				    config->get_event_handler_timeout(),
-				    early_timeout,
-				    result,
-				    config->get_global_service_event_handler().c_str(),
-				    processed_command,
-				    NULL,
-				    NULL);
+  neb_result = broker_event_handler(
+    NEBTYPE_EVENTHANDLER_START,
+    NEBFLAG_NONE,
+    NEBATTR_NONE,
+    GLOBAL_SERVICE_EVENTHANDLER,
+    (void*)svc,
+    svc->current_state,
+    svc->state_type,
+    start_time,
+    end_time,
+    exectime,
+    config->get_event_handler_timeout(),
+    early_timeout,
+    result,
+    config->get_global_service_event_handler().c_str(),
+    processed_command,
+    NULL,
+    NULL);
 
   /* neb module wants to override (or cancel) the event handler - perhaps it will run the eventhandler itself */
   if ((neb_result == NEBERROR_CALLBACKCANCEL)
@@ -362,13 +383,14 @@ int run_global_service_event_handler(nagios_macros* mac, service* svc) {
   }
 
   /* run the command */
-  result = my_system_r(mac,
-		       processed_command,
-		       config->get_event_handler_timeout(),
-		       &early_timeout,
-		       &exectime,
-		       &command_output,
-		       0);
+  result = my_system_r(
+             mac,
+             processed_command,
+             config->get_event_handler_timeout(),
+             &early_timeout,
+             &exectime,
+             &command_output,
+             0);
 
   /* check to see if the event handler timed out */
   if (early_timeout == TRUE)
@@ -381,23 +403,24 @@ int run_global_service_event_handler(nagios_macros* mac, service* svc) {
   gettimeofday(&end_time, NULL);
 
   /* send event data to broker */
-  broker_event_handler(NEBTYPE_EVENTHANDLER_END,
-		       NEBFLAG_NONE,
-                       NEBATTR_NONE,
-		       GLOBAL_SERVICE_EVENTHANDLER,
-                       (void*)svc,
-		       svc->current_state,
-		       svc->state_type,
-                       start_time,
-		       end_time,
-		       exectime,
-                       config->get_event_handler_timeout(),
-                       early_timeout,
-		       result,
-                       config->get_global_service_event_handler().c_str(),
-		       processed_command,
-		       command_output,
-                       NULL);
+  broker_event_handler(
+    NEBTYPE_EVENTHANDLER_END,
+    NEBFLAG_NONE,
+    NEBATTR_NONE,
+    GLOBAL_SERVICE_EVENTHANDLER,
+    (void*)svc,
+    svc->current_state,
+    svc->state_type,
+    start_time,
+    end_time,
+    exectime,
+    config->get_event_handler_timeout(),
+    early_timeout,
+    result,
+    config->get_global_service_event_handler().c_str(),
+    processed_command,
+    command_output,
+    NULL);
 
   /* free memory */
   delete[] command_output;
@@ -423,7 +446,8 @@ int run_service_event_handler(nagios_macros* mac, service* svc) {
   int macro_options = STRIP_ILLEGAL_MACRO_CHARS | ESCAPE_MACRO_CHARS;
 
 
-  logger(dbg_functions, basic) << "run_service_event_handler()";
+  logger(dbg_functions, basic)
+    << "run_service_event_handler()";
 
   if (svc == NULL)
     return (ERROR);
@@ -440,11 +464,12 @@ int run_service_event_handler(nagios_macros* mac, service* svc) {
   gettimeofday(&start_time, NULL);
 
   /* get the raw command line */
-  get_raw_command_line_r(mac,
-			 svc->event_handler_ptr,
-                         svc->event_handler,
-			 &raw_command,
-                         macro_options);
+  get_raw_command_line_r(
+    mac,
+    svc->event_handler_ptr,
+    svc->event_handler,
+    &raw_command,
+    macro_options);
   if (raw_command == NULL)
     return (ERROR);
 
@@ -452,12 +477,17 @@ int run_service_event_handler(nagios_macros* mac, service* svc) {
     << "Raw service event handler command line: " << raw_command;
 
   /* process any macros in the raw command line */
-  process_macros_r(mac, raw_command, &processed_command, macro_options);
+  process_macros_r(
+    mac,
+    raw_command,
+    &processed_command,
+    macro_options);
   if (processed_command == NULL)
     return (ERROR);
 
   logger(dbg_eventhandlers, most)
-    << "Processed service event handler command line: " << processed_command;
+    << "Processed service event handler command line: "
+    << processed_command;
 
   if (config->get_log_event_handlers() == true) {
     std::ostringstream oss;
@@ -465,30 +495,36 @@ int run_service_event_handler(nagios_macros* mac, service* svc) {
 	<< svc->description
 	<< ";$SERVICESTATE$;$SERVICESTATETYPE$;$SERVICEATTEMPT$;"
 	<< svc->event_handler << std::endl;
-    process_macros_r(mac, oss.str().c_str(), &processed_logentry, macro_options);
-    logger(log_event_handler, basic) << processed_logentry;
+    process_macros_r(
+      mac,
+      oss.str().c_str(),
+      &processed_logentry,
+      macro_options);
+    logger(log_event_handler, basic)
+      << processed_logentry;
   }
 
   /* send event data to broker */
   end_time.tv_sec = 0L;
   end_time.tv_usec = 0L;
-  neb_result = broker_event_handler(NEBTYPE_EVENTHANDLER_START,
-				    NEBFLAG_NONE,
-				    NEBATTR_NONE,
-				    SERVICE_EVENTHANDLER,
-				    (void*)svc,
-				    svc->current_state,
-				    svc->state_type,
-				    start_time,
-				    end_time,
-				    exectime,
-				    config->get_event_handler_timeout(),
-				    early_timeout,
-				    result,
-				    svc->event_handler,
-				    processed_command,
-				    NULL,
-				    NULL);
+  neb_result = broker_event_handler(
+                 NEBTYPE_EVENTHANDLER_START,
+                 NEBFLAG_NONE,
+                 NEBATTR_NONE,
+                 SERVICE_EVENTHANDLER,
+                 (void*)svc,
+                 svc->current_state,
+                 svc->state_type,
+                 start_time,
+                 end_time,
+                 exectime,
+                 config->get_event_handler_timeout(),
+                 early_timeout,
+                 result,
+                 svc->event_handler,
+                 processed_command,
+                 NULL,
+                 NULL);
 
   /* neb module wants to override (or cancel) the event handler - perhaps it will run the eventhandler itself */
   if ((neb_result == NEBERROR_CALLBACKCANCEL)
@@ -500,13 +536,14 @@ int run_service_event_handler(nagios_macros* mac, service* svc) {
   }
 
   /* run the command */
-  result = my_system_r(mac,
-		       processed_command,
-		       config->get_event_handler_timeout(),
-		       &early_timeout,
-		       &exectime,
-		       &command_output,
-		       0);
+  result = my_system_r(
+             mac,
+             processed_command,
+             config->get_event_handler_timeout(),
+             &early_timeout,
+             &exectime,
+             &command_output,
+             0);
 
   /* check to see if the event handler timed out */
   if (early_timeout == TRUE)
@@ -519,23 +556,24 @@ int run_service_event_handler(nagios_macros* mac, service* svc) {
   gettimeofday(&end_time, NULL);
 
   /* send event data to broker */
-  broker_event_handler(NEBTYPE_EVENTHANDLER_END,
-		       NEBFLAG_NONE,
-                       NEBATTR_NONE,
-		       SERVICE_EVENTHANDLER,
-		       (void*)svc,
-                       svc->current_state,
-		       svc->state_type,
-		       start_time,
-                       end_time,
-		       exectime,
-                       config->get_event_handler_timeout(),
-                       early_timeout,
-		       result,
-		       svc->event_handler,
-                       processed_command,
-		       command_output,
-		       NULL);
+  broker_event_handler(
+    NEBTYPE_EVENTHANDLER_END,
+    NEBFLAG_NONE,
+    NEBATTR_NONE,
+    SERVICE_EVENTHANDLER,
+    (void*)svc,
+    svc->current_state,
+    svc->state_type,
+    start_time,
+    end_time,
+    exectime,
+    config->get_event_handler_timeout(),
+    early_timeout,
+    result,
+    svc->event_handler,
+    processed_command,
+    command_output,
+    NULL);
 
   /* free memory */
   delete[] command_output;
@@ -554,22 +592,24 @@ int run_service_event_handler(nagios_macros* mac, service* svc) {
 int handle_host_event(host* hst) {
   nagios_macros mac;
 
-  logger(dbg_functions, basic) << "handle_host_event()";
+  logger(dbg_functions, basic)
+    << "handle_host_event()";
 
   if (hst == NULL)
     return (ERROR);
 
   /* send event data to broker */
-  broker_statechange_data(NEBTYPE_STATECHANGE_END,
-			  NEBFLAG_NONE,
-                          NEBATTR_NONE,
-			  HOST_STATECHANGE,
-			  (void*)hst,
-                          hst->current_state,
-			  hst->state_type,
-                          hst->current_attempt,
-			  hst->max_attempts,
-                          NULL);
+  broker_statechange_data(
+    NEBTYPE_STATECHANGE_END,
+    NEBFLAG_NONE,
+    NEBATTR_NONE,
+    HOST_STATECHANGE,
+    (void*)hst,
+    hst->current_state,
+    hst->state_type,
+    hst->current_attempt,
+    hst->max_attempts,
+    NULL);
 
   /* bail out if we shouldn't be running event handlers */
   if (config->get_enable_event_handlers() == false)
@@ -589,14 +629,15 @@ int handle_host_event(host* hst) {
     run_host_event_handler(&mac, hst);
 
   /* send data to event broker */
-  broker_external_command(NEBTYPE_EXTERNALCOMMAND_CHECK,
-			  NEBFLAG_NONE,
-			  NEBATTR_NONE,
-			  CMD_NONE,
-			  time(NULL),
-			  NULL,
-			  NULL,
-			  NULL);
+  broker_external_command(
+    NEBTYPE_EXTERNALCOMMAND_CHECK,
+    NEBFLAG_NONE,
+    NEBATTR_NONE,
+    CMD_NONE,
+    time(NULL),
+    NULL,
+    NULL,
+    NULL);
 
   return (OK);
 }
@@ -615,7 +656,8 @@ int run_global_host_event_handler(nagios_macros* mac, host* hst) {
   int neb_result = OK;
   int macro_options = STRIP_ILLEGAL_MACRO_CHARS | ESCAPE_MACRO_CHARS;
 
-  logger(dbg_functions, basic) << "run_global_host_event_handler()";
+  logger(dbg_functions, basic)
+    << "run_global_host_event_handler()";
 
   if (hst == NULL)
     return (ERROR);
@@ -635,11 +677,12 @@ int run_global_host_event_handler(nagios_macros* mac, host* hst) {
   gettimeofday(&start_time, NULL);
 
   /* get the raw command line */
-  get_raw_command_line_r(mac,
-			 global_host_event_handler_ptr,
-                         config->get_global_host_event_handler().c_str(),
-                         &raw_command,
-			 macro_options);
+  get_raw_command_line_r(
+    mac,
+    global_host_event_handler_ptr,
+    config->get_global_host_event_handler().c_str(),
+    &raw_command,
+    macro_options);
   if (raw_command == NULL)
     return (ERROR);
 
@@ -647,42 +690,52 @@ int run_global_host_event_handler(nagios_macros* mac, host* hst) {
     << "Raw global host event handler command line: " << raw_command;
 
   /* process any macros in the raw command line */
-  process_macros_r(mac, raw_command, &processed_command, macro_options);
+  process_macros_r(
+    mac,
+    raw_command,
+    &processed_command,
+    macro_options);
   if (processed_command == NULL)
     return (ERROR);
 
   logger(dbg_eventhandlers, most)
-    << "Processed global host event handler " \
+    << "Processed global host event handler "
     "command line: " << processed_command;
 
   if (config->get_log_event_handlers() == true) {
     std::ostringstream oss;
     oss << "GLOBAL HOST EVENT HANDLER: " << hst->name
 	<< "$HOSTSTATE$;$HOSTSTATETYPE$;$HOSTATTEMPT$;"
-	<< config->get_global_host_event_handler().c_str() << std::endl;
-    process_macros_r(mac, oss.str().c_str(), &processed_logentry, macro_options);
-    logger(log_event_handler, basic) << processed_logentry;
+	<< config->get_global_host_event_handler() << std::endl;
+    process_macros_r(
+      mac,
+      oss.str().c_str(),
+      &processed_logentry,
+      macro_options);
+    logger(log_event_handler, basic)
+      << processed_logentry;
   }
 
   /* send event data to broker */
   end_time.tv_sec = 0L;
   end_time.tv_usec = 0L;
-  neb_result = broker_event_handler(NEBTYPE_EVENTHANDLER_START,
-				    NEBFLAG_NONE,
-				    NEBATTR_NONE,
-				    GLOBAL_HOST_EVENTHANDLER,
-				    (void*)hst,
-				    hst->current_state,
-				    hst->state_type,
-				    start_time,
-				    end_time,
-				    exectime,
-				    config->get_event_handler_timeout(),
-				    early_timeout, result,
-				    config->get_global_host_event_handler().c_str(),
-				    processed_command,
-				    NULL,
-				    NULL);
+  neb_result = broker_event_handler(
+                 NEBTYPE_EVENTHANDLER_START,
+                 NEBFLAG_NONE,
+                 NEBATTR_NONE,
+                 GLOBAL_HOST_EVENTHANDLER,
+                 (void*)hst,
+                 hst->current_state,
+                 hst->state_type,
+                 start_time,
+                 end_time,
+                 exectime,
+                 config->get_event_handler_timeout(),
+                 early_timeout, result,
+                 config->get_global_host_event_handler().c_str(),
+                 processed_command,
+                 NULL,
+                 NULL);
 
   /* neb module wants to override (or cancel) the event handler - perhaps it will run the eventhandler itself */
   if ((neb_result == NEBERROR_CALLBACKCANCEL)
@@ -694,13 +747,14 @@ int run_global_host_event_handler(nagios_macros* mac, host* hst) {
   }
 
   /* run the command */
-  result = my_system_r(mac,
-		       processed_command,
-		       config->get_event_handler_timeout(),
-		       &early_timeout,
-		       &exectime,
-		       &command_output,
-		       0);
+  result = my_system_r(
+             mac,
+             processed_command,
+             config->get_event_handler_timeout(),
+             &early_timeout,
+             &exectime,
+             &command_output,
+             0);
 
   /* check for a timeout in the execution of the event handler command */
   if (early_timeout == TRUE)
@@ -713,23 +767,24 @@ int run_global_host_event_handler(nagios_macros* mac, host* hst) {
   gettimeofday(&end_time, NULL);
 
   /* send event data to broker */
-  broker_event_handler(NEBTYPE_EVENTHANDLER_END,
-		       NEBFLAG_NONE,
-                       NEBATTR_NONE,
-		       GLOBAL_HOST_EVENTHANDLER,
-                       (void*)hst,
-		       hst->current_state,
-		       hst->state_type,
-                       start_time,
-		       end_time,
-		       exectime,
-                       config->get_event_handler_timeout(),
-                       early_timeout,
-		       result,
-                       config->get_global_host_event_handler().c_str(),
-                       processed_command,
-		       command_output,
-		       NULL);
+  broker_event_handler(
+    NEBTYPE_EVENTHANDLER_END,
+    NEBFLAG_NONE,
+    NEBATTR_NONE,
+    GLOBAL_HOST_EVENTHANDLER,
+    (void*)hst,
+    hst->current_state,
+    hst->state_type,
+    start_time,
+    end_time,
+    exectime,
+    config->get_event_handler_timeout(),
+    early_timeout,
+    result,
+    config->get_global_host_event_handler().c_str(),
+    processed_command,
+    command_output,
+    NULL);
 
   /* free memory */
   delete[] command_output;
@@ -754,7 +809,8 @@ int run_host_event_handler(nagios_macros* mac, host* hst) {
   int neb_result = OK;
   int macro_options = STRIP_ILLEGAL_MACRO_CHARS | ESCAPE_MACRO_CHARS;
 
-  logger(dbg_functions, basic) << "run_host_event_handler()";
+  logger(dbg_functions, basic)
+    << "run_host_event_handler()";
 
   if (hst == NULL)
     return (ERROR);
@@ -770,11 +826,12 @@ int run_host_event_handler(nagios_macros* mac, host* hst) {
   gettimeofday(&start_time, NULL);
 
   /* get the raw command line */
-  get_raw_command_line_r(mac,
-			 hst->event_handler_ptr,
-                         hst->event_handler,
-			 &raw_command,
-                         macro_options);
+  get_raw_command_line_r(
+    mac,
+    hst->event_handler_ptr,
+    hst->event_handler,
+    &raw_command,
+    macro_options);
   if (raw_command == NULL)
     return (ERROR);
 
@@ -782,42 +839,53 @@ int run_host_event_handler(nagios_macros* mac, host* hst) {
     << "Raw host event handler command line: " << raw_command;
 
   /* process any macros in the raw command line */
-  process_macros_r(mac, raw_command, &processed_command, macro_options);
+  process_macros_r(
+    mac,
+    raw_command,
+    &processed_command,
+    macro_options);
   if (processed_command == NULL)
     return (ERROR);
 
   logger(dbg_eventhandlers, most)
-    << "Processed host event handler command line: " << processed_command;
+    << "Processed host event handler command line: "
+    << processed_command;
 
   if (config->get_log_event_handlers() == true) {
     std::ostringstream oss;
     oss << "HOST EVENT HANDLER: " << hst->name
 	<< ";$HOSTSTATE$;$HOSTSTATETYPE$;$HOSTATTEMPT$;"
 	<< hst->event_handler << std::endl;
-    process_macros_r(mac, oss.str().c_str(), &processed_logentry, macro_options);
-    logger(log_event_handler, basic) << processed_logentry;
+    process_macros_r(
+      mac,
+      oss.str().c_str(),
+      &processed_logentry,
+      macro_options);
+    logger(log_event_handler, basic)
+      << processed_logentry;
   }
 
   /* send event data to broker */
   end_time.tv_sec = 0L;
   end_time.tv_usec = 0L;
-  neb_result = broker_event_handler(NEBTYPE_EVENTHANDLER_START,
-				    NEBFLAG_NONE,
-				    NEBATTR_NONE,
-				    HOST_EVENTHANDLER,
-				    (void*)hst,
-				    hst->current_state,
-				    hst->state_type,
-				    start_time,
-				    end_time,
-				    exectime,
-				    config->get_event_handler_timeout(),
-				    early_timeout,
-				    result,
-				    hst->event_handler,
-				    processed_command,
-				    NULL,
-				    NULL);
+  neb_result = broker_event_handler(
+                 NEBTYPE_EVENTHANDLER_START,
+                 NEBFLAG_NONE,
+                 NEBATTR_NONE,
+                 HOST_EVENTHANDLER,
+                 (void*)hst,
+                 hst->current_state,
+                 hst->state_type,
+                 start_time,
+                 end_time,
+                 exectime,
+                 config->get_event_handler_timeout(),
+                 early_timeout,
+                 result,
+                 hst->event_handler,
+                 processed_command,
+                 NULL,
+                 NULL);
 
   /* neb module wants to override (or cancel) the event handler - perhaps it will run the eventhandler itself */
   if ((neb_result == NEBERROR_CALLBACKCANCEL)
@@ -829,13 +897,14 @@ int run_host_event_handler(nagios_macros* mac, host* hst) {
   }
 
   /* run the command */
-  result = my_system_r(mac,
-		       processed_command,
-		       config->get_event_handler_timeout(),
-		       &early_timeout,
-		       &exectime,
-		       &command_output,
-		       0);
+  result = my_system_r(
+             mac,
+             processed_command,
+             config->get_event_handler_timeout(),
+             &early_timeout,
+             &exectime,
+             &command_output,
+             0);
 
   /* check to see if the event handler timed out */
   if (early_timeout == TRUE)
@@ -848,23 +917,24 @@ int run_host_event_handler(nagios_macros* mac, host* hst) {
   gettimeofday(&end_time, NULL);
 
   /* send event data to broker */
-  broker_event_handler(NEBTYPE_EVENTHANDLER_END,
-		       NEBFLAG_NONE,
-                       NEBATTR_NONE,
-		       HOST_EVENTHANDLER,
-		       (void*)hst,
-                       hst->current_state,
-		       hst->state_type,
-		       start_time,
-                       end_time,
-		       exectime,
-                       config->get_event_handler_timeout(),
-                       early_timeout,
-		       result,
-		       hst->event_handler,
-                       processed_command,
-		       command_output,
-		       NULL);
+  broker_event_handler(
+    NEBTYPE_EVENTHANDLER_END,
+    NEBFLAG_NONE,
+    NEBATTR_NONE,
+    HOST_EVENTHANDLER,
+    (void*)hst,
+    hst->current_state,
+    hst->state_type,
+    start_time,
+    end_time,
+    exectime,
+    config->get_event_handler_timeout(),
+    early_timeout,
+    result,
+    hst->event_handler,
+    processed_command,
+    command_output,
+    NULL);
 
   /* free memory */
   delete[] command_output;
@@ -884,7 +954,8 @@ int handle_host_state(host* hst) {
   int state_change = FALSE;
   time_t current_time = 0L;
 
-  logger(dbg_functions, basic) << "handle_host_state()";
+  logger(dbg_functions, basic)
+    << "handle_host_state()";
 
   /* get current time */
   time(&current_time);
@@ -967,8 +1038,8 @@ int handle_host_state(host* hst) {
     }
 
     /* reset the next and last notification times */
-    hst->last_host_notification = (time_t) 0;
-    hst->next_host_notification = (time_t) 0;
+    hst->last_host_notification = (time_t)0;
+    hst->next_host_notification = (time_t)0;
 
     /* reset notification suppression option */
     hst->no_more_notifications = FALSE;
@@ -986,7 +1057,12 @@ int handle_host_state(host* hst) {
 
     /* notify contacts about the recovery or problem if its a "hard" state */
     if (hst->state_type == HARD_STATE)
-      host_notification(hst, NOTIFICATION_NORMAL, NULL, NULL, NOTIFICATION_OPTION_NONE);
+      host_notification(
+        hst,
+        NOTIFICATION_NORMAL,
+        NULL,
+        NULL,
+        NOTIFICATION_OPTION_NONE);
 
     /* handle the host state change */
     handle_host_event(hst);
@@ -1008,12 +1084,14 @@ int handle_host_state(host* hst) {
   else {
 
     /* notify contacts if host is still down or unreachable */
-    if (hst->current_state != HOST_UP && hst->state_type == HARD_STATE)
-      host_notification(hst,
-			NOTIFICATION_NORMAL,
-			NULL,
-			NULL,
-                        NOTIFICATION_OPTION_NONE);
+    if (hst->current_state != HOST_UP
+        && hst->state_type == HARD_STATE)
+      host_notification(
+        hst,
+        NOTIFICATION_NORMAL,
+        NULL,
+        NULL,
+        NOTIFICATION_OPTION_NONE);
 
     /* if we're in a soft state and we should log host retries, do so now... */
     if (hst->state_type == SOFT_STATE

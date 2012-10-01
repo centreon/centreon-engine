@@ -171,7 +171,7 @@ void file::log(
 
   // Flush file.
   _file.flush();
-  return ;
+  return;
 }
 
 /**
@@ -186,7 +186,7 @@ void file::reopen() {
     (*it)->_close();
     (*it)->_open();
   }
-  return ;
+  return;
 }
 
 /**
@@ -197,7 +197,7 @@ void file::reopen() {
 void file::set_size_limit(unsigned long long size) {
   concurrency::locker lock(&_mutex);
   _size_limit = size;
-  return ;
+  return;
 }
 
 /**************************************
@@ -213,7 +213,7 @@ void file::_close() {
   concurrency::locker lock(&_mutex);
   _file.close();
   _written = 0;
-  return ;
+  return;
 }
 
 /**
@@ -232,8 +232,7 @@ void file::_internal_copy(file const& right) {
 
   // Reopen file.
   _open();
-
-  return ;
+  return;
 }
 
 /**
@@ -243,5 +242,5 @@ void file::_open() {
   concurrency::locker lock(&_mutex);
   _file.open(_filename.c_str(), "ab");
   _written = _file.size();
-  return ;
+  return;
 }

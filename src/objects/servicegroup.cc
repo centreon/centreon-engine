@@ -35,9 +35,10 @@ using namespace com::centreon::engine::objects::utils;
  *
  *  @see com::centreon::engine::objects::link
  */
-bool link_servicegroup(servicegroup* obj,
-                       service** members,
-                       servicegroup** groups) {
+bool link_servicegroup(
+       servicegroup* obj,
+       service** members,
+       servicegroup** groups) {
   try {
     objects::link(
                obj,
@@ -49,7 +50,8 @@ bool link_servicegroup(servicegroup* obj,
     return (false);
   }
   catch (...) {
-    logger(log_runtime_error, basic) << __func__ << " unknow exception";
+    logger(log_runtime_error, basic)
+      << __func__ << " unknow exception";
     return (false);
   }
   return (true);
@@ -68,9 +70,10 @@ void release_servicegroup(servicegroup const* obj) {
     logger(log_runtime_error, basic) << e.what();
   }
   catch (...) {
-    logger(log_runtime_error, basic) << __func__ << " unknow exception";
+    logger(log_runtime_error, basic)
+      << __func__ << " unknow exception";
   }
-  return ;
+  return;
 }
 
 /**
@@ -95,8 +98,7 @@ void objects::link(
 
   // Add all services into the servicegroup.
   for (std::vector<service*>::const_iterator
-         it(members.begin()),
-         end(members.end());
+         it(members.begin()), end(members.end());
        it != end;
        ++it) {
     if (!*it)
@@ -129,8 +131,7 @@ void objects::link(
   // Add the content of other servicegroups into this servicegroup.
   std::vector<service*> other_members;
   for (std::vector<servicegroup*>::const_iterator
-         it(groups.begin()),
-         end(groups.end());
+         it(groups.begin()), end(groups.end());
        it != end;
        ++it) {
     if (!*it)
@@ -146,8 +147,7 @@ void objects::link(
   // Recursive call.
   if (!other_members.empty())
     objects::link(obj, other_members, std::vector<servicegroup*>());
-
-  return ;
+  return;
 }
 
 /**
@@ -171,4 +171,5 @@ void objects::release(servicegroup const* obj) {
   delete[] obj->notes_url;
   delete[] obj->action_url;
   delete obj;
+  return;
 }

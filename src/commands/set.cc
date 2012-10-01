@@ -45,7 +45,7 @@ static set* _instance = NULL;
  */
 void set::add_command(command const& cmd) {
   add_command(shared_ptr<command>(cmd.clone()));
-  return ;
+  return;
 }
 
 /**
@@ -55,8 +55,9 @@ void set::add_command(command const& cmd) {
  */
 void set::add_command(shared_ptr<command> cmd) {
   _list[cmd->get_name()] = cmd;
-  logger(dbg_commands, basic) << "added command " << cmd->get_name();
-  return ;
+  logger(dbg_commands, basic)
+    << "added command " << cmd->get_name();
+  return;
 }
 
 /**
@@ -90,7 +91,7 @@ set& set::instance() {
 void set::load() {
   if (!_instance)
     _instance = new set;
-  return ;
+  return;
 }
 
 /**
@@ -100,8 +101,9 @@ void set::load() {
  */
 void set::remove_command(std::string const& cmd_name) {
   _list.erase(cmd_name);
-  logger(dbg_commands, basic) << "remove command " << cmd_name;
-  return ;
+  logger(dbg_commands, basic)
+    << "remove command " << cmd_name;
+  return;
 }
 
 /**
@@ -110,6 +112,7 @@ void set::remove_command(std::string const& cmd_name) {
 void set::unload() {
   delete _instance;
   _instance = NULL;
+  return;
 }
 
 /**************************************
@@ -162,5 +165,5 @@ void set::_internal_copy(set const& right) {
   (void)right;
   assert(!"command set is not copyable");
   abort();
-  return ;
+  return;
 }

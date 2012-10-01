@@ -111,5 +111,5 @@ void result::_internal_copy(result const& right) {
   exit_status = right.exit_status;
   start_time = right.start_time;
   output = right.output;
-  return ;
+  return;
 }

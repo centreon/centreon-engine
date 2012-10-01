@@ -70,7 +70,7 @@ void logging::syslog::log(
     concurrency::locker lock(&_mutex);
     ::syslog(_facility | LOG_INFO, "%s", message);
   }
-  return ;
+  return;
 }
 
 /**
@@ -84,5 +84,5 @@ void logging::syslog::set_facility(int facility) throw () {
   _facility = facility;
   closelog();
   openlog("centreon-engine", LOG_ODELAY, _facility);
-  return ;
+  return;
 }

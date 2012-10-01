@@ -196,7 +196,7 @@ extern "C" {
         << "' to check results queue.";
 
     // Free memory.
-    delete [] output_file;
+    delete[] output_file;
 
     return (OK);
   }
@@ -235,15 +235,15 @@ extern "C" {
     char* val(NULL);
     while (1) {
       // Free memory.
-      delete [] input;
+      delete[] input;
 
       // Read the next line.
       if ((input = mmap_fgets_multiline(thefile)) == NULL)
-        break ;
+        break;
 
       // Skip comments.
       if (input[0] == '#')
-        continue ;
+        continue;
 
       // Empty line indicates end of record.
       else if (input[0] == '\n') {
@@ -266,9 +266,9 @@ extern "C" {
         }
       }
       if ((var = my_strtok(input, "=")) == NULL)
-        continue ;
+        continue;
       if ((val = my_strtok(NULL, "\n")) == NULL)
-        continue ;
+        continue;
 
       // Allocate new check result if necessary.
       if (!new_cr) {
@@ -296,17 +296,17 @@ extern "C" {
         new_cr->latency = strtod(val, NULL);
       else if (!strcmp(var, "start_time")) {
         if ((v1 = strtok(val, ".")) == NULL)
-          continue ;
+          continue;
         if ((v2 = strtok(NULL, "\n")) == NULL)
-          continue ;
+          continue;
         new_cr->start_time.tv_sec = strtoul(v1, NULL, 0);
         new_cr->start_time.tv_usec = strtoul(v2, NULL, 0);
       }
       else if (!strcmp(var, "finish_time")) {
         if ((v1 = strtok(val, ".")) == NULL)
-          continue ;
+          continue;
         if ((v2 = strtok(NULL, "\n")) == NULL)
-          continue ;
+          continue;
         new_cr->finish_time.tv_sec = strtoul(v1, NULL, 0);
         new_cr->finish_time.tv_usec = strtoul(v2, NULL, 0);
       }
@@ -340,7 +340,7 @@ extern "C" {
     }
 
     // Free memory and close file.
-    delete [] input;
+    delete[] input;
     mmap_fclose(thefile);
 
     // Delete the file (as well its ok-to-go file) if it's too old.
@@ -397,18 +397,18 @@ extern "C" {
           logging::logger(logging::log_runtime_warning, logging::basic)
             << "Warning: Could not stat() check result file '"
             << file << "'.";
-          continue ;
+          continue;
         }
 
         switch (stat_buf.st_mode & S_IFMT) {
         case S_IFREG:
           // Don't process symlinked files.
           if (!S_ISREG(stat_buf.st_mode))
-            continue ;
-          break ;
+            continue;
+          break;
         default:
           // Everything else we ignore.
-          continue ;
+          continue;
         }
 
         // At this point we have a regular file...
@@ -418,14 +418,14 @@ extern "C" {
         temp_buffer.append(".ok");
         result = stat(temp_buffer.c_str(), &ok_stat_buf);
         if (result == -1)
-          continue ;
+          continue;
 
         // Process the file.
         result = process_check_result_file(file);
 
         // Break out if we encountered an error.
         if (result == ERROR)
-          break ;
+          break;
       }
     }
     closedir(dirp);

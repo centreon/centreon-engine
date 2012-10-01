@@ -60,6 +60,7 @@ hash_timed_event& hash_timed_event::operator=(hash_timed_event const& right) {
 void hash_timed_event::clear(priority p) {
   _hevent[service_check][p].clear();
   _hevent[host_check][p].clear();
+  return;
 }
 
 /**
@@ -70,6 +71,7 @@ void hash_timed_event::clear(priority p) {
  */
 void hash_timed_event::clear(priority p, type t) {
   _hevent[t][p].clear();
+  return;
 }
 
 /**
@@ -85,6 +87,7 @@ void hash_timed_event::erase(priority p, timed_event* event) {
     _hevent[service_check][p].erase(event->event_data);
   else if (event->event_type == EVENT_HOST_CHECK)
     _hevent[host_check][p].erase(event->event_data);
+  return;
 }
 
 /**
@@ -114,6 +117,7 @@ void hash_timed_event::insert(priority p, timed_event* event) {
     _hevent[service_check][p][event->event_data] = event;
   else if (event->event_type == EVENT_HOST_CHECK)
     _hevent[host_check][p][event->event_data] = event;
+  return;
 }
 
 /**

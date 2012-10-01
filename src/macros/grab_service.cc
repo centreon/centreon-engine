@@ -49,9 +49,10 @@ using namespace com::centreon::engine::logging;
  */
 static char* get_service_check_type(service& svc, nagios_macros* mac) {
   (void)mac;
-  return (my_strdup((SERVICE_CHECK_PASSIVE == svc.check_type)
-                    ? "PASSIVE"
-                    : "ACTIVE"));
+  return (my_strdup(
+            (SERVICE_CHECK_PASSIVE == svc.check_type
+             ? "PASSIVE"
+             : "ACTIVE")));
 }
 
 /**
@@ -260,11 +261,12 @@ extern "C" {
  *
  *  @return OK on success.
  */
-int grab_standard_service_macro_r(nagios_macros* mac,
-                                  int macro_type,
-                                  service* svc,
-                                  char** output,
-                                  int* free_macro) {
+int grab_standard_service_macro_r(
+      nagios_macros* mac,
+      int macro_type,
+      service* svc,
+      char** output,
+      int* free_macro) {
   // Check that function was called with valid arguments.
   int retval;
   if (svc && output && free_macro) {
@@ -284,7 +286,8 @@ int grab_standard_service_macro_r(nagios_macros* mac,
     // Non-existent macro.
     else {
       logger(dbg_macros, basic)
-        << "UNHANDLED SERVICE MACRO #" << macro_type << "! THIS IS A BUG!";
+        << "UNHANDLED SERVICE MACRO #" << macro_type
+        << "! THIS IS A BUG!";
       retval = ERROR;
     }
   }
@@ -307,11 +310,13 @@ int grab_standard_service_macro_r(nagios_macros* mac,
  *
  *  @see grab_standard_service_macro_r
  */
-int grab_standard_service_macro(int macro_type,
-                                service* svc,
-                                char** output,
-                                int* free_macro) {
-  return (grab_standard_service_macro_r(get_global_macros(),
+int grab_standard_service_macro(
+      int macro_type,
+      service* svc,
+      char** output,
+      int* free_macro) {
+  return (grab_standard_service_macro_r(
+            get_global_macros(),
             macro_type,
             svc,
             output,

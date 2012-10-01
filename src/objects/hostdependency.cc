@@ -33,8 +33,9 @@ using namespace com::centreon::engine::objects::utils;
  *
  *  @see com::centreon::engine::objects::link
  */
-bool link_hostdependency(hostdependency* obj,
-                         timeperiod* dependency_period) {
+bool link_hostdependency(
+       hostdependency* obj,
+       timeperiod* dependency_period) {
   try {
     objects::link(obj, dependency_period);
   }
@@ -43,7 +44,8 @@ bool link_hostdependency(hostdependency* obj,
     return (false);
   }
   catch (...) {
-    logger(log_runtime_error, basic) << __func__ << " unknow exception";
+    logger(log_runtime_error, basic)
+      << __func__ << " unknow exception";
     return (false);
   }
   return (true);
@@ -62,8 +64,10 @@ void release_hostdependency(hostdependency const* obj) {
     logger(log_runtime_error, basic) << e.what();
   }
   catch (...) {
-    logger(log_runtime_error, basic) << __func__ << " unknow exception";
+    logger(log_runtime_error, basic)
+      << __func__ << " unknow exception";
   }
+  return;
 }
 
 /**
@@ -80,17 +84,21 @@ void objects::link(hostdependency* obj, timeperiod* dependency_period) {
   if (obj->host_name == NULL)
     throw (engine_error() << "hostdependency invalid host name.");
   if (obj->dependent_host_name == NULL)
-    throw (engine_error() << "hostdependency invalid dependent host name.");
+    throw (engine_error()
+           << "hostdependency invalid dependent host name.");
 
   if ((obj->master_host_ptr = find_host(obj->host_name)) == NULL)
-    throw (engine_error() << "hostdependency '" << obj->dependent_host_name << ", "
-	   << obj->host_name << "' invalid host name.");
+    throw (engine_error()
+           << "hostdependency '" << obj->dependent_host_name
+           << ", " << obj->host_name << "' invalid host name.");
 
   if ((obj->dependent_host_ptr = find_host(obj->dependent_host_name)) == NULL)
-    throw (engine_error() << "hostdependency '" << obj->dependent_host_name << ", "
-	   << obj->host_name << "' invalid dependent host name.");
+    throw (engine_error()
+           << "hostdependency '" << obj->dependent_host_name << ", "
+           << obj->host_name << "' invalid dependent host name.");
 
   obj->dependency_period_ptr = dependency_period;
+  return;
 }
 
 /**
@@ -103,11 +111,14 @@ void objects::release(hostdependency const* obj) {
     return;
 
   skiplist_delete(object_skiplists[HOSTDEPENDENCY_SKIPLIST], obj);
-  remove_object_list(obj, &hostdependency_list, &hostdependency_list_tail);
+  remove_object_list(
+    obj,
+    &hostdependency_list,
+    &hostdependency_list_tail);
 
   delete[] obj->dependent_host_name;
   delete[] obj->host_name;
   delete[] obj->dependency_period;
-
   delete obj;
+  return;
 }

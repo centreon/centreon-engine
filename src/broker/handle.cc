@@ -126,6 +126,7 @@ void handle::close() {
     _handle.clear();
   }
   broker::compatibility::instance().unloaded_module(this);
+  return;
 }
 
 /**
@@ -223,7 +224,7 @@ bool handle::is_loaded() {
  */
 void handle::open() {
   if (is_loaded())
-    return ;
+    return;
 
   try {
     _handle = shared_ptr<library>(new library(_filename));
@@ -252,6 +253,7 @@ void handle::open() {
     close();
     throw;
   }
+  return;
 }
 
 /**
@@ -264,12 +266,13 @@ void handle::open(
                std::string const& filename,
                std::string const& args) {
   if (is_loaded())
-    return ;
+    return;
 
   close();
   _filename = filename;
   _args = args;
   open();
+  return;
 }
 
 /**
@@ -280,6 +283,7 @@ void handle::open(
 void handle::set_author(std::string const& author) {
   _author = author;
   broker::compatibility::instance().author_module(this);
+  return;
 }
 
 /**
@@ -290,6 +294,7 @@ void handle::set_author(std::string const& author) {
 void handle::set_copyright(std::string const& copyright) {
   _copyright = copyright;
   broker::compatibility::instance().copyright_module(this);
+  return;
 }
 
 /**
@@ -300,6 +305,7 @@ void handle::set_copyright(std::string const& copyright) {
 void handle::set_description(std::string const& description) {
   _description = description;
   broker::compatibility::instance().description_module(this);
+  return;
 }
 
 /**
@@ -310,6 +316,7 @@ void handle::set_description(std::string const& description) {
 void handle::set_license(std::string const& license) {
   _license = license;
   broker::compatibility::instance().license_module(this);
+  return;
 }
 
 /**
@@ -320,6 +327,7 @@ void handle::set_license(std::string const& license) {
 void handle::set_name(std::string const& name) {
   _name = name;
   broker::compatibility::instance().name_module(this);
+  return;
 }
 
 /**
@@ -330,6 +338,7 @@ void handle::set_name(std::string const& name) {
 void handle::set_version(std::string const& version) {
   _version = version;
   broker::compatibility::instance().version_module(this);
+  return;
 }
 
 /**************************************
@@ -353,5 +362,5 @@ void handle::_internal_copy(handle const& right) {
   _license = right._license;
   _name = right._name;
   _version = right._version;
-  return ;
+  return;
 }

@@ -29,7 +29,8 @@ using namespace com::centreon::engine::logging;
  *
  *  @see com::centreon::engine::objects::release
  */
-customvariablesmember const* release_customvariablesmember(customvariablesmember const* obj) {
+customvariablesmember const* release_customvariablesmember(
+                               customvariablesmember const* obj) {
   try {
     return (objects::release(obj));
   }
@@ -37,7 +38,8 @@ customvariablesmember const* release_customvariablesmember(customvariablesmember
     logger(log_runtime_error, basic) << e.what();
   }
   catch (...) {
-    logger(log_runtime_error, basic) << __func__ << " unknow exception";
+    logger(log_runtime_error, basic)
+      << __func__ << " unknow exception";
   }
   return (NULL);
 }
@@ -49,7 +51,8 @@ customvariablesmember const* release_customvariablesmember(customvariablesmember
  *
  *  @return The next customvariablesmember.
  */
-customvariablesmember const* objects::release(customvariablesmember const* obj) {
+customvariablesmember const* objects::release(
+                                        customvariablesmember const* obj) {
   if (obj == NULL)
     return (NULL);
 
@@ -76,8 +79,7 @@ bool objects::add_custom_variables_to_object(
 
   // Process all custom variables.
   for (std::vector<std::string>::const_iterator
-         it(custom_vars.begin()),
-         end(custom_vars.end());
+         it(custom_vars.begin()), end(custom_vars.end());
        it != end;
        ++it) {
     // Split string into custom var name (key)

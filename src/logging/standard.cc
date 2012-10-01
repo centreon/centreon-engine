@@ -87,8 +87,7 @@ void standard::log(
     com::centreon::concurrency::locker lock(&_mutex);
     fwrite(data.c_str(), data.size(), 1, _file);
   }
-
-  return ;
+  return;
 }
 
 /**************************************
@@ -104,5 +103,5 @@ void standard::log(
  */
 void standard::_internal_copy(standard const& right) {
   _file = right._file;
-  return ;
+  return;
 }

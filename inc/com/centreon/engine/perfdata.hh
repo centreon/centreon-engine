@@ -27,10 +27,14 @@
 extern "C" {
 #  endif // C++
 
-int initialize_performance_data(char* config_file); // initializes performance data
-int cleanup_performance_data(char* config_file);    // cleans up performance data
-int update_service_performance_data(service* svc);  // updates service performance data
-int update_host_performance_data(host* hst);        // updates host performance data
+// initializes performance data
+int initialize_performance_data(char* config_file);
+// cleans up performance data
+int cleanup_performance_data(char* config_file);
+// updates service performance data
+int update_service_performance_data(service* svc);
+// updates host performance data
+int update_host_performance_data(host* hst);
 
 #  ifdef __cplusplus
 }

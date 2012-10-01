@@ -62,15 +62,14 @@ shared_ptr<broker::handle> loader::add_module(
  */
 void loader::del_module(shared_ptr<handle> const& module) {
   for (std::multimap<std::string, shared_ptr<handle> >::iterator
-         it(_modules.find(module->get_name())),
-         end(_modules.end());
+         it(_modules.find(module->get_name())), end(_modules.end());
        it != end;
        ++it)
     if (it->second.get() == module.get()) {
       _modules.erase(it);
-      break ;
+      break;
     }
-  return ;
+  return;
 }
 
 /**
@@ -81,8 +80,7 @@ void loader::del_module(shared_ptr<handle> const& module) {
 std::list<shared_ptr<broker::handle> > loader::get_modules() const {
   std::list<shared_ptr<handle> > lst;
   for (std::multimap<std::string, shared_ptr<handle> >::const_iterator
-         it(_modules.begin()),
-         end(_modules.end());
+         it(_modules.begin()), end(_modules.end());
        it != end;
        ++it)
     lst.push_back(it->second);
@@ -161,8 +159,7 @@ void loader::unload() {
  */
 void loader::unload_modules() {
   for (std::multimap<std::string, shared_ptr<handle> >::iterator
-         it(_modules.begin()),
-         end(_modules.end());
+         it(_modules.begin()), end(_modules.end());
        it != end;
        ++it) {
     try {
@@ -174,7 +171,7 @@ void loader::unload_modules() {
       << "' unloaded successfully.";
   }
   _modules.clear();
-  return ;
+  return;
 }
 
 /**************************************
@@ -230,5 +227,5 @@ void loader::_internal_copy(loader const& right) {
   (void)right;
   assert(!"broker module loader is not copyable");
   abort();
-  return ;
+  return;
 }

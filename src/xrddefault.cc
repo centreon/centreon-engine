@@ -144,9 +144,10 @@ int xrddefault_initialize_retention_data(char* config_file) {
     return (ERROR);
 
   if (xrddefault_retention_file_fd == -1) {
-    if ((xrddefault_retention_file_fd = open(xrddefault_retention_file,
-                                             O_WRONLY | O_CREAT,
-                                             S_IRUSR | S_IWUSR)) == -1) {
+    if ((xrddefault_retention_file_fd = open(
+                                          xrddefault_retention_file,
+                                          O_WRONLY | O_CREAT,
+                                          S_IRUSR | S_IWUSR)) == -1) {
       logger(log_runtime_error, basic)
         << "Error: Unable to open retention file '"
         << xrddefault_retention_file << "': " << strerror(errno);
@@ -177,13 +178,16 @@ int xrddefault_cleanup_retention_data(char* config_file) {
 /**************** DEFAULT STATE OUTPUT FUNCTION *******************/
 /******************************************************************/
 
-int xrddefault_save_state_information(void) {
-  logger(dbg_functions, basic) << "xrddefault_save_state_information()";
+int xrddefault_save_state_information() {
+  logger(dbg_functions, basic)
+    << "xrddefault_save_state_information()";
 
   /* make sure we have everything */
-  if (xrddefault_retention_file == NULL || xrddefault_retention_file_fd == -1) {
+  if (xrddefault_retention_file == NULL
+      || xrddefault_retention_file_fd == -1) {
     logger(log_runtime_error, basic)
-      << "Error: We don't have the required file names to store retention data!";
+      << "Error: We don't have the required file names to store "
+      "retention data!";
     return (ERROR);
   }
 
@@ -515,7 +519,7 @@ int xrddefault_save_state_information(void) {
 /***************** DEFAULT STATE INPUT FUNCTION *******************/
 /******************************************************************/
 
-int xrddefault_read_state_information(void) {
+int xrddefault_read_state_information() {
   char* input = NULL;
   char* inputbuf = NULL;
   char* temp_ptr = NULL;
@@ -569,7 +573,8 @@ int xrddefault_read_state_information(void) {
   double runtime[2];
   int found_directive = FALSE;
 
-  logger(dbg_functions, basic) << "xrddefault_read_state_information()";
+  logger(dbg_functions, basic)
+    << "xrddefault_read_state_information()";
 
   /* make sure we have what we need */
   if (xrddefault_retention_file == NULL) {
@@ -734,8 +739,10 @@ int xrddefault_read_state_information(void) {
           /* calculate next possible notification time */
           if (temp_service->current_state != STATE_OK
               && temp_service->last_notification != (time_t)0)
-            temp_service->next_notification = get_next_service_notification_time(temp_service,
-										 temp_service->last_notification);
+            temp_service->next_notification
+              = get_next_service_notification_time(
+                  temp_service,
+                  temp_service->last_notification);
 
           /* fix old vars */
           if (temp_service->has_been_checked == FALSE
@@ -885,32 +892,37 @@ int xrddefault_read_state_information(void) {
       case XRDDEFAULT_SERVICEDOWNTIME_DATA:
         /* add the downtime */
         if (data_type == XRDDEFAULT_HOSTDOWNTIME_DATA)
-          add_host_downtime(host_name,
-			    entry_time,
-			    author,
-			    comment_data,
-                            start_time,
-			    end_time,
-			    fixed,
-			    triggered_by,
-                            duration,
-			    downtime_id);
+          add_host_downtime(
+            host_name,
+            entry_time,
+            author,
+            comment_data,
+            start_time,
+            end_time,
+            fixed,
+            triggered_by,
+            duration,
+            downtime_id);
         else
-          add_service_downtime(host_name,
-			       service_description,
-                               entry_time,
-			       author,
-			       comment_data,
-                               start_time,
-			       end_time,
-			       fixed,
-                               triggered_by,
-			       duration,
-			       downtime_id);
+          add_service_downtime(
+            host_name,
+            service_description,
+            entry_time,
+            author,
+            comment_data,
+            start_time,
+            end_time,
+            fixed,
+            triggered_by,
+            duration,
+            downtime_id);
 
         /* must register the downtime with Centreon Engine so it can schedule it, add comments, etc. */
-        register_downtime((data_type == XRDDEFAULT_HOSTDOWNTIME_DATA)
-			  ? HOST_DOWNTIME : SERVICE_DOWNTIME, downtime_id);
+        register_downtime(
+          (data_type == XRDDEFAULT_HOSTDOWNTIME_DATA
+           ? HOST_DOWNTIME
+           : SERVICE_DOWNTIME),
+          downtime_id);
 
         /* free temp memory */
         delete[] host_name;

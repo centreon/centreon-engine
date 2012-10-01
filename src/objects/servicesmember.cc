@@ -28,7 +28,8 @@ using namespace com::centreon::engine::logging;
  *
  *  @see com::centreon::engine::objects::release
  */
-servicesmember const* release_servicesmember(servicesmember const* obj) {
+servicesmember const* release_servicesmember(
+                        servicesmember const* obj) {
   try {
     return (objects::release(obj));
   }
@@ -36,7 +37,8 @@ servicesmember const* release_servicesmember(servicesmember const* obj) {
     logger(log_runtime_error, basic) << e.what();
   }
   catch (...) {
-    logger(log_runtime_error, basic) << __func__ << " unknow exception";
+    logger(log_runtime_error, basic)
+      << __func__ << " unknow exception";
   }
   return (NULL);
 }

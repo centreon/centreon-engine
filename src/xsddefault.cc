@@ -117,7 +117,8 @@ int xsddefault_grab_config_directives(char* input) {
   varvalue = my_strdup(temp_ptr);
 
   /* status log definition */
-  if (!strcmp(varname, "status_file") || !strcmp(varname, "xsddefault_status_log"))
+  if (!strcmp(varname, "status_file")
+      || !strcmp(varname, "xsddefault_status_log"))
     xsddefault_status_log = my_strdup(temp_ptr);
 
   /* free memory */
@@ -145,9 +146,10 @@ int xsddefault_initialize_status_data(char* config_file) {
     unlink(xsddefault_status_log);
 
   if (xsddefault_status_log_fd == -1) {
-    if ((xsddefault_status_log_fd = open(xsddefault_status_log,
-                                         O_WRONLY | O_CREAT,
-                                         S_IRUSR | S_IWUSR | S_IRGRP)) == -1) {
+    if ((xsddefault_status_log_fd = open(
+                                      xsddefault_status_log,
+                                      O_WRONLY | O_CREAT,
+                                      S_IRUSR | S_IWUSR | S_IRGRP)) == -1) {
       logger(log_runtime_error, basic)
         << "Error: Unable to open status data file '"
         << xsddefault_status_log << "': " << strerror(errno);
@@ -159,7 +161,9 @@ int xsddefault_initialize_status_data(char* config_file) {
 }
 
 /* cleanup status data before terminating */
-int xsddefault_cleanup_status_data(char* config_file, int delete_status_data) {
+int xsddefault_cleanup_status_data(
+      char* config_file,
+      int delete_status_data) {
   (void)config_file;
 
   /* delete the status log */
@@ -185,11 +189,12 @@ int xsddefault_cleanup_status_data(char* config_file, int delete_status_data) {
 /******************************************************************/
 
 /* write all status data to file */
-int xsddefault_save_status_data(void) {
+int xsddefault_save_status_data() {
   int used_external_command_buffer_slots = 0;
   int high_external_command_buffer_slots = 0;
 
-  logger(dbg_functions, basic) << "save_status_data()";
+  logger(dbg_functions, basic)
+    << "save_status_data()";
 
   /* get number of items in the command buffer */
   if (config->get_check_external_commands() == true) {
@@ -357,7 +362,7 @@ int xsddefault_save_status_data(void) {
            << "\tscheduled_downtime_depth=" << temp_host->scheduled_downtime_depth << "\n";
     /*
       fprintf(fp,"\tstate_history=");
-      for(x=0;x<MAX_STATE_HISTORY_ENTRIES;x++)
+      for (x = 0; x < MAX_STATE_HISTORY_ENTRIES; x++)
       fprintf(fp,"%s%d",(x>0)?",":"",temp_host->state_history[(x+temp_host->state_history_index)%MAX_STATE_HISTORY_ENTRIES]);
       fprintf(fp,"\n");
     */
@@ -435,7 +440,7 @@ int xsddefault_save_status_data(void) {
            << "\tscheduled_downtime_depth=" << temp_service->scheduled_downtime_depth << "\n";
     /*
       fprintf(fp,"\tstate_history=");
-      for(x=0;x<MAX_STATE_HISTORY_ENTRIES;x++)
+      for (x = 0; x < MAX_STATE_HISTORY_ENTRIES; x++)
       fprintf(fp,"%s%d",(x>0)?",":"",temp_service->state_history[(x+temp_service->state_history_index)%MAX_STATE_HISTORY_ENTRIES]);
       fprintf(fp,"\n");
     */

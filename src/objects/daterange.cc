@@ -37,8 +37,10 @@ void release_daterange(daterange const* obj) {
     logger(log_runtime_error, basic) << e.what();
   }
   catch (...) {
-    logger(log_runtime_error, basic) << __func__ << " unknow exception";
+    logger(log_runtime_error, basic)
+      << __func__ << " unknow exception";
   }
+  return;
 }
 
 /**
@@ -52,4 +54,5 @@ void objects::release(daterange const* obj) {
 
   release(obj->times);
   delete obj;
+  return;
 }

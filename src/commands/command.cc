@@ -104,8 +104,10 @@ std::string const& commands::command::get_name() const throw() {
  *
  *  @param[in] command_line The command line.
  */
-void commands::command::set_command_line(std::string const& command_line) {
+void commands::command::set_command_line(
+                          std::string const& command_line) {
   _command_line = command_line;
+  return;
 }
 
 /**
@@ -116,6 +118,7 @@ void commands::command::set_command_line(std::string const& command_line) {
 void commands::command::set_listener(
                           commands::command_listener* listener) throw () {
   _listener = listener;
+  return;
 }
 
 /**

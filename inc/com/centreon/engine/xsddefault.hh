@@ -26,8 +26,10 @@ extern "C" {
 #  endif // C++
 
 int xsddefault_initialize_status_data(char* config_file);
-int xsddefault_cleanup_status_data(char* config_file, int delete_status_data);
-int xsddefault_save_status_data(void);
+int xsddefault_cleanup_status_data(
+      char* config_file,
+      int delete_status_data);
+int xsddefault_save_status_data();
 
 int xsddefault_grab_config_info(char* config_file);
 int xsddefault_grab_config_directives(char* input);

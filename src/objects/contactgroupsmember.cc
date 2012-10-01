@@ -28,7 +28,8 @@ using namespace com::centreon::engine::logging;
  *
  *  @see com::centreon::engine::objects::release
  */
-contactgroupsmember const* release_contactgroupsmember(contactgroupsmember const* obj) {
+contactgroupsmember const* release_contactgroupsmember(
+                             contactgroupsmember const* obj) {
   try {
     return (objects::release(obj));
   }
@@ -36,7 +37,8 @@ contactgroupsmember const* release_contactgroupsmember(contactgroupsmember const
     logger(log_runtime_error, basic) << e.what();
   }
   catch (...) {
-    logger(log_runtime_error, basic) << __func__ << " unknow exception";
+    logger(log_runtime_error, basic)
+      << __func__ << " unknow exception";
   }
   return (NULL);
 }
@@ -48,7 +50,8 @@ contactgroupsmember const* release_contactgroupsmember(contactgroupsmember const
  *
  *  @return The next contactgroupsmember.
  */
-contactgroupsmember const* objects::release(contactgroupsmember const* obj) {
+contactgroupsmember const* objects::release(
+                                      contactgroupsmember const* obj) {
   if (obj == NULL)
     return (NULL);
 

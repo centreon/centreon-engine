@@ -44,8 +44,9 @@ using namespace com::centreon::engine::logging;
  *  @param[in]  hst    Host object.
  *  @param[out] mac    Macro array.
  */
-static void generate_host_total_services(host& hst,
-                                         nagios_macros* mac) {
+static void generate_host_total_services(
+              host& hst,
+              nagios_macros* mac) {
   // Generate host service summary macros
   // (if they haven't already been computed).
   if (!mac->x[MACRO_TOTALHOSTSERVICES]) {
@@ -79,19 +80,18 @@ static void generate_host_total_services(host& hst,
 
     // These macros are time-intensive to compute, and will likely be
     // used together, so save them all for future use.
-    delete [] mac->x[MACRO_TOTALHOSTSERVICES];
-    delete [] mac->x[MACRO_TOTALHOSTSERVICESOK];
-    delete [] mac->x[MACRO_TOTALHOSTSERVICESWARNING];
-    delete [] mac->x[MACRO_TOTALHOSTSERVICESUNKNOWN];
-    delete [] mac->x[MACRO_TOTALHOSTSERVICESCRITICAL];
+    delete[] mac->x[MACRO_TOTALHOSTSERVICES];
+    delete[] mac->x[MACRO_TOTALHOSTSERVICESOK];
+    delete[] mac->x[MACRO_TOTALHOSTSERVICESWARNING];
+    delete[] mac->x[MACRO_TOTALHOSTSERVICESUNKNOWN];
+    delete[] mac->x[MACRO_TOTALHOSTSERVICESCRITICAL];
     mac->x[MACRO_TOTALHOSTSERVICES] = obj2pchar(total_host_services);
     mac->x[MACRO_TOTALHOSTSERVICESOK] = obj2pchar(total_host_services_ok);
     mac->x[MACRO_TOTALHOSTSERVICESWARNING] = obj2pchar(total_host_services_warning);
     mac->x[MACRO_TOTALHOSTSERVICESUNKNOWN] = obj2pchar(total_host_services_unknown);
     mac->x[MACRO_TOTALHOSTSERVICESCRITICAL] = obj2pchar(total_host_services_critical);
   }
-
-  return ;
+  return;
 }
 
 /**
@@ -105,9 +105,10 @@ static void generate_host_total_services(host& hst,
  */
 static char* get_host_check_type(host& hst, nagios_macros* mac) {
   (void)mac;
-  return (my_strdup((HOST_CHECK_PASSIVE == hst.check_type)
-                    ? "PASSIVE"
-                    : "ACTIVE"));
+  return (my_strdup(
+           (HOST_CHECK_PASSIVE == hst.check_type
+            ? "PASSIVE"
+            : "ACTIVE")));
 }
 
 /**
@@ -343,11 +344,12 @@ extern "C" {
  *
  *  @return OK on success.
  */
-int grab_standard_host_macro_r(nagios_macros* mac,
-                               int macro_type,
-                               host* hst,
-                               char** output,
-                               int* free_macro) {
+int grab_standard_host_macro_r(
+      nagios_macros* mac,
+      int macro_type,
+      host* hst,
+      char** output,
+      int* free_macro) {
   // Check that function was called with valid arguments.
   int retval;
   if (hst && output && free_macro) {
@@ -390,11 +392,13 @@ int grab_standard_host_macro_r(nagios_macros* mac,
  *
  *  @see grab_standard_host_macro_r
  */
-int grab_standard_host_macro(int macro_type,
-                             host* hst,
-                             char** output,
-                             int* free_macro) {
-  return (grab_standard_host_macro_r(get_global_macros(),
+int grab_standard_host_macro(
+      int macro_type,
+      host* hst,
+      char** output,
+      int* free_macro) {
+  return (grab_standard_host_macro_r(
+            get_global_macros(),
             macro_type,
             hst,
             output,

@@ -127,7 +127,12 @@ int main(int argc, char* argv[]) {
     // Process all command line arguments.
     int c;
 #ifdef HAVE_GETOPT_H
-    while ((c = getopt_long(argc, argv, "+hVvsxpu", long_options, &option_index)) != -1) {
+    while ((c = getopt_long(
+                  argc,
+                  argv,
+                  "+hVvsxpu",
+                  long_options,
+                  &option_index)) != -1) {
 #else
     while ((c = getopt(argc, argv, "+hVvsxpu")) != -1) {
 #endif // HAVE_GETOPT_H
@@ -137,25 +142,25 @@ int main(int argc, char* argv[]) {
       case '?': // Usage.
       case 'h':
         display_help = true;
-        break ;
+        break;
       case 'V': // Version.
         display_license = true;
-        break ;
+        break;
       case 'v': // Verify config->
         verify_config = TRUE;
-        break ;
+        break;
       case 's': // Scheduling Check.
         test_scheduling = TRUE;
-        break ;
+        break;
       case 'x': // Don't verify circular paths.
         verify_circular_paths = FALSE;
-        break ;
+        break;
       case 'p': // Precache object config->
         precache_objects = TRUE;
-        break ;
+        break;
       case 'u': // Use precached object config->
         use_precached_objects = TRUE;
-        break ;
+        break;
       default:
         error = true;
       }
@@ -179,7 +184,7 @@ int main(int argc, char* argv[]) {
           buffer(com::centreon::io::directory_entry::current_path());
         buffer.append("/");
         buffer.append(config_file);
-        delete [] config_file;
+        delete[] config_file;
         config_file = NULL;
         config_file = my_strdup(buffer.c_str());
       }
@@ -241,7 +246,8 @@ int main(int argc, char* argv[]) {
       // resource and object config files).
       try {
         // Read main config file.
-        logger(log_info_message, basic) << "reading main config file";
+        logger(log_info_message, basic)
+          << "reading main config file";
         config->parse(config_file);
 
         // Read object config files.
@@ -296,7 +302,7 @@ int main(int argc, char* argv[]) {
         // Read object config files.
         result = read_all_object_data(config_file);
       }
-      catch(std::exception const &e) {
+      catch (std::exception const &e) {
         logger(log_config_error, basic)
           << "error while processing a config file: " << e.what();
       }
@@ -368,7 +374,7 @@ int main(int argc, char* argv[]) {
         // after we read config files, as user may have overridden
         // timezone offset.
         program_start = time(NULL);
-        delete [] mac->x[MACRO_PROCESSSTARTTIME];
+        delete[] mac->x[MACRO_PROCESSSTARTTIME];
         mac->x[MACRO_PROCESSSTARTTIME]
           = obj2pchar<unsigned long>(program_start);
 
@@ -390,9 +396,9 @@ int main(int argc, char* argv[]) {
         }
 
         // This must be logged after we read config data, as user may have changed location of main log file.
-        logger(log_process_info, basic) << "Centreon Engine "
-          << CENTREON_ENGINE_VERSION_STRING << " starting ... (PID="
-          << getpid() << ")";
+        logger(log_process_info, basic)
+          << "Centreon Engine " << CENTREON_ENGINE_VERSION_STRING
+          << " starting ... (PID=" << getpid() << ")";
 
         // Log the local time - may be different than clock time due to timezone offset.
         now = time(NULL);
@@ -494,7 +500,7 @@ int main(int argc, char* argv[]) {
 
         // Get event start time and save as macro.
         event_start = time(NULL);
-        delete [] mac->x[MACRO_EVENTSTARTTIME];
+        delete[] mac->x[MACRO_EVENTSTARTTIME];
         try {
           mac->x[MACRO_EVENTSTARTTIME]
             = obj2pchar<unsigned long>(event_start);
@@ -530,8 +536,9 @@ int main(int argc, char* argv[]) {
               NULL);
           }
 
-          logger(log_process_info, basic) << buffer;
-          delete [] buffer;
+          logger(log_process_info, basic)
+            << buffer;
+          delete[] buffer;
         }
 
         // Send program data to broker.
@@ -580,17 +587,18 @@ int main(int argc, char* argv[]) {
     }
   }
   catch (std::exception const& e) {
-    logger(log_runtime_error, basic) << e.what();
+    logger(log_runtime_error, basic)
+      << "error: " << e.what();
   }
 
   // Memory cleanup.
   cleanup();
-  delete [] config_file;
-  delete [] mac->x[MACRO_OBJECTCACHEFILE];
-  delete [] mac->x[MACRO_PROCESSSTARTTIME];
-  delete [] mac->x[MACRO_EVENTSTARTTIME];
-  delete [] mac->x[MACRO_RETENTIONDATAFILE];
-  delete [] mac->x[MACRO_STATUSDATAFILE];
+  delete[] config_file;
+  delete[] mac->x[MACRO_OBJECTCACHEFILE];
+  delete[] mac->x[MACRO_PROCESSSTARTTIME];
+  delete[] mac->x[MACRO_EVENTSTARTTIME];
+  delete[] mac->x[MACRO_RETENTIONDATAFILE];
+  delete[] mac->x[MACRO_STATUSDATAFILE];
   com::centreon::engine::broker::compatibility::unload();
   com::centreon::engine::broker::loader::unload();
   com::centreon::engine::events::loop::unload();

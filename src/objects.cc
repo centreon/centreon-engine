@@ -117,21 +117,21 @@ command* add_command(char const* name, char const* value) {
     logger(log_config_error, basic)
       << "Error: Command '" << name << "' has already been defined";
     result = ERROR;
-    break ;
+    break;
   case SKIPLIST_OK:
     result = OK;
-    break ;
+    break;
   default:
     logger(log_config_error, basic)
       << "Error: Could not add command '" << name << "' to skiplist";
     result = ERROR;
-    break ;
+    break;
   }
 
   // Handle errors.
   if (result == ERROR) {
-    delete [] new_command->command_line;
-    delete [] new_command->name;
+    delete[] new_command->command_line;
+    delete[] new_command->name;
     return (NULL);
   }
 
@@ -231,7 +231,8 @@ contact* add_contact(
            int retain_nonstatus_information) {
   // Make sure we have the data we need.
   if (!name || !name[0]) {
-    logger(log_config_error, basic) << "Error: Contact name is NULL";
+    logger(log_config_error, basic)
+      << "Error: Contact name is NULL";
     return (NULL);
   }
 
@@ -310,27 +311,27 @@ contact* add_contact(
     logger(log_config_error, basic)
       << "Error: Contact '" << name << "' has already been defined";
     result = ERROR;
-    break ;
+    break;
   case SKIPLIST_OK:
     result = OK;
-    break ;
+    break;
   default:
     logger(log_config_error, basic)
       << "Error: Could not add contact '" << name << "' to skiplist";
     result = ERROR;
-    break ;
+    break;
   }
 
   // Handle errors.
   if (result == ERROR) {
     for (unsigned x(0); x < MAX_CONTACT_ADDRESSES; ++x)
-      delete [] new_contact->address[x];
-    delete [] new_contact->name;
-    delete [] new_contact->alias;
-    delete [] new_contact->email;
-    delete [] new_contact->pager;
-    delete [] new_contact->service_notification_period;
-    delete [] new_contact->host_notification_period;
+      delete[] new_contact->address[x];
+    delete[] new_contact->name;
+    delete[] new_contact->alias;
+    delete[] new_contact->email;
+    delete[] new_contact->pager;
+    delete[] new_contact->service_notification_period;
+    delete[] new_contact->host_notification_period;
     return (NULL);
   }
 
@@ -503,7 +504,8 @@ contactsmember* add_contact_to_serviceescalation(
 contactgroup* add_contactgroup(char const* name, char const* alias) {
   // Make sure we have the data we need.
   if (!name || !name[0]) {
-    logger(log_config_error, basic) << "Error: Contactgroup name is NULL";
+    logger(log_config_error, basic)
+      << "Error: Contactgroup name is NULL";
     return (NULL);
   }
 
@@ -525,21 +527,21 @@ contactgroup* add_contactgroup(char const* name, char const* alias) {
     logger(log_config_error, basic)
       << "Error: Contactgroup '" << name << "' has already been defined";
     result = ERROR;
-    break ;
+    break;
   case SKIPLIST_OK:
     result = OK;
-    break ;
+    break;
   default:
     logger(log_config_error, basic)
       << "Error: Could not add contactgroup '" << name << "' to skiplist";
     result = ERROR;
-    break ;
+    break;
   }
 
   // Handle errors.
   if (result == ERROR) {
-    delete [] new_contactgroup->alias;
-    delete [] new_contactgroup->group_name;
+    delete[] new_contactgroup->alias;
+    delete[] new_contactgroup->group_name;
     return (NULL);
   }
 
@@ -1283,38 +1285,38 @@ host* add_host(
     logger(log_config_error, basic)
       << "Error: Host '" << name << "' has already been defined";
     result = ERROR;
-    break ;
+    break;
   case SKIPLIST_OK:
     result = OK;
-    break ;
+    break;
   default:
     logger(log_config_error, basic)
       << "Error: Could not add host '" << name << "' to skiplist";
     result = ERROR;
-    break ;
+    break;
   }
 
   // Handle errors.
   if (result == ERROR) {
-    delete [] new_host->plugin_output;
-    delete [] new_host->long_plugin_output;
-    delete [] new_host->perf_data;
-    delete [] new_host->statusmap_image;
-    delete [] new_host->vrml_image;
-    delete [] new_host->icon_image_alt;
-    delete [] new_host->icon_image;
-    delete [] new_host->action_url;
-    delete [] new_host->notes_url;
-    delete [] new_host->notes;
-    delete [] new_host->failure_prediction_options;
-    delete [] new_host->event_handler;
-    delete [] new_host->host_check_command;
-    delete [] new_host->notification_period;
-    delete [] new_host->check_period;
-    delete [] new_host->address;
-    delete [] new_host->alias;
-    delete [] new_host->display_name;
-    delete [] new_host->name;
+    delete[] new_host->plugin_output;
+    delete[] new_host->long_plugin_output;
+    delete[] new_host->perf_data;
+    delete[] new_host->statusmap_image;
+    delete[] new_host->vrml_image;
+    delete[] new_host->icon_image_alt;
+    delete[] new_host->icon_image;
+    delete[] new_host->action_url;
+    delete[] new_host->notes_url;
+    delete[] new_host->notes;
+    delete[] new_host->failure_prediction_options;
+    delete[] new_host->event_handler;
+    delete[] new_host->host_check_command;
+    delete[] new_host->notification_period;
+    delete[] new_host->check_period;
+    delete[] new_host->address;
+    delete[] new_host->alias;
+    delete[] new_host->display_name;
+    delete[] new_host->name;
     return (NULL);
   }
 
@@ -1412,18 +1414,18 @@ hostdependency* add_host_dependency(
   switch (result) {
   case SKIPLIST_OK:
     result = OK;
-    break ;
+    break;
   default:
     logger(log_config_error, basic)
       << "Error: Could not add host dependency to skiplist";
     result = ERROR;
-    break ;
+    break;
   }
 
   // Handle errors.
   if (result == ERROR) {
-    delete [] new_hostdependency->host_name;
-    delete [] new_hostdependency->dependent_host_name;
+    delete[] new_hostdependency->host_name;
+    delete[] new_hostdependency->dependent_host_name;
     return (NULL);
   }
 
@@ -1516,7 +1518,7 @@ hostsmember* add_host_to_hostgroup(
         temp_hostgroup->members = new_member.get();
       else
         last_member->next = new_member.get();
-      break ;
+      break;
     }
     else
       last_member = temp_member;
@@ -1594,19 +1596,19 @@ hostescalation* add_host_escalation(
   switch (result) {
   case SKIPLIST_OK:
     result = OK;
-    break ;
+    break;
   default:
     logger(log_config_error, basic)
       << "Error: Could not add hostescalation '"
       << host_name << "' to skiplist";
     result = ERROR;
-    break ;
+    break;
   }
 
   // Handle errors.
   if (result == ERROR) {
-    delete [] new_hostescalation->host_name;
-    delete [] new_hostescalation->escalation_period;
+    delete[] new_hostescalation->host_name;
+    delete[] new_hostescalation->escalation_period;
     return (NULL);
   }
 
@@ -1675,21 +1677,21 @@ hostgroup* add_hostgroup(
     logger(log_config_error, basic)
       << "Error: Hostgroup '" << name << "' has already been defined";
     result = ERROR;
-    break ;
+    break;
   case SKIPLIST_OK:
     result = OK;
-    break ;
+    break;
   default:
     logger(log_config_error, basic)
       << "Error: Could not add hostgroup '" << name << "' to skiplist";
     result = ERROR;
-    break ;
+    break;
   }
 
   // Handle errors.
   if (result == ERROR) {
-    delete [] new_hostgroup->alias;
-    delete [] new_hostgroup->group_name;
+    delete[] new_hostgroup->alias;
+    delete[] new_hostgroup->group_name;
     return (NULL);
   }
 
@@ -1894,7 +1896,8 @@ service* add_service(
     return (NULL);
   }
   else if (!host_name || !host_name[0]) {
-    logger(log_config_error, basic) << "error: host name of service '"
+    logger(log_config_error, basic)
+      << "error: host name of service '"
       << description << "' is not set";
     return (NULL);
   }
@@ -2064,30 +2067,30 @@ service* add_service(
       << "Error: Service '" << description << "' on host '"
       << host_name << "' has already been defined";
     result = ERROR;
-    break ;
+    break;
   case SKIPLIST_OK:
     result = OK;
-    break ;
+    break;
   default:
     logger(log_config_error, basic)
       << "Error: Could not add service '" << description
       << "' on host '" << host_name << "' to skiplist";
     result = ERROR;
-    break ;
+    break;
   }
 
   // Handle errors.
   if (result == ERROR) {
-    delete [] new_service->perf_data;
-    delete [] new_service->plugin_output;
-    delete [] new_service->long_plugin_output;
-    delete [] new_service->failure_prediction_options;
-    delete [] new_service->notification_period;
-    delete [] new_service->event_handler;
-    delete [] new_service->service_check_command;
-    delete [] new_service->display_name;
-    delete [] new_service->description;
-    delete [] new_service->host_name;
+    delete[] new_service->perf_data;
+    delete[] new_service->plugin_output;
+    delete[] new_service->long_plugin_output;
+    delete[] new_service->failure_prediction_options;
+    delete[] new_service->notification_period;
+    delete[] new_service->event_handler;
+    delete[] new_service->service_check_command;
+    delete[] new_service->display_name;
+    delete[] new_service->description;
+    delete[] new_service->host_name;
     return (NULL);
   }
 
@@ -2219,20 +2222,20 @@ servicedependency* add_service_dependency(
   switch (result) {
   case SKIPLIST_OK:
     result = OK;
-    break ;
+    break;
   default:
     logger(log_config_error, basic)
       << "Error: Could not add service dependency to skiplist";
     result = ERROR;
-    break ;
+    break;
   }
 
   // Handle errors.
   if (result == ERROR) {
-    delete [] new_servicedependency->host_name;
-    delete [] new_servicedependency->service_description;
-    delete [] new_servicedependency->dependent_host_name;
-    delete [] new_servicedependency->dependent_service_description;
+    delete[] new_servicedependency->host_name;
+    delete[] new_servicedependency->service_description;
+    delete[] new_servicedependency->dependent_host_name;
+    delete[] new_servicedependency->dependent_service_description;
     return (NULL);
   }
 
@@ -2363,7 +2366,7 @@ servicesmember* add_service_to_servicegroup(
         temp_servicegroup->members = new_member.get();
       else
         last_member->next = new_member.get();
-      break ;
+      break;
     }
     else if (!strcmp(new_member->host_name, temp_member->host_name)
              && (strcmp(
@@ -2374,7 +2377,7 @@ servicesmember* add_service_to_servicegroup(
         temp_servicegroup->members = new_member.get();
       else
         last_member->next = new_member.get();
-      break ;
+      break;
     }
     else
       last_member = temp_member;
@@ -2466,20 +2469,20 @@ serviceescalation* add_service_escalation(
   switch (result) {
   case SKIPLIST_OK:
     result = OK;
-    break ;
+    break;
   default:
     logger(log_config_error, basic)
       << "Error: Could not add escalation for service '" << description
       << "' on host '" << host_name << "' to skiplist";
     result = ERROR;
-    break ;
+    break;
   }
 
   // Handle errors.
   if (result == ERROR) {
-    delete [] new_serviceescalation->host_name;
-    delete [] new_serviceescalation->description;
-    delete [] new_serviceescalation->escalation_period;
+    delete[] new_serviceescalation->host_name;
+    delete[] new_serviceescalation->description;
+    delete[] new_serviceescalation->escalation_period;
     return (NULL);
   }
 
@@ -2548,21 +2551,21 @@ servicegroup* add_servicegroup(
     logger(log_config_error, basic)
       << "Error: Servicegroup '" << name << "' has already been defined";
     result = ERROR;
-    break ;
+    break;
   case SKIPLIST_OK:
     result = OK;
-    break ;
+    break;
   default:
     logger(log_config_error, basic)
       << "Error: Could not add servicegroup '" << name << "' to skiplist";
     result = ERROR;
-    break ;
+    break;
   }
 
   // Handle errors.
   if (result == ERROR) {
-    delete [] new_servicegroup->alias;
-    delete [] new_servicegroup->group_name;
+    delete[] new_servicegroup->alias;
+    delete[] new_servicegroup->group_name;
     return (NULL);
   }
 
@@ -2623,21 +2626,21 @@ timeperiod* add_timeperiod(char const* name, char const* alias) {
     logger(log_config_error, basic)
       << "Error: Timeperiod '" << name << "' has already been defined";
     result = ERROR;
-    break ;
+    break;
   case SKIPLIST_OK:
     result = OK;
-    break ;
+    break;
   default:
     logger(log_config_error, basic)
       << "Error: Could not add timeperiod '" << name << "' to skiplist";
     result = ERROR;
-    break ;
+    break;
   }
 
   // Handle errors.
   if (result == ERROR) {
-    delete [] new_timeperiod->alias;
-    delete [] new_timeperiod->name;
+    delete[] new_timeperiod->alias;
+    delete[] new_timeperiod->name;
     return (NULL);
   }
 
@@ -2727,13 +2730,15 @@ timerange* add_timerange_to_daterange(
   if (!drange)
     return (NULL);
   if (start_time > 86400) {
-    logger(log_config_error, basic) << "Error: Start time "
-      << start_time << " is not valid for timeperiod";
+    logger(log_config_error, basic)
+      << "Error: Start time " << start_time
+      << " is not valid for timeperiod";
     return (NULL);
   }
   if (end_time > 86400) {
-    logger(log_config_error, basic) << "Error: End time "
-      << end_time << " is not value for timeperiod";
+    logger(log_config_error, basic)
+      << "Error: End time " << end_time
+      << " is not value for timeperiod";
     return (NULL);
   }
 
@@ -2808,7 +2813,7 @@ int free_object_data() {
          this_timeperiodexclusion;
          this_timeperiodexclusion = next_timeperiodexclusion) {
       next_timeperiodexclusion = this_timeperiodexclusion->next;
-      delete [] this_timeperiodexclusion->timeperiod_name;
+      delete[] this_timeperiodexclusion->timeperiod_name;
       delete this_timeperiodexclusion;
     }
 
@@ -2816,8 +2821,8 @@ int free_object_data() {
     next_timeperiod = this_timeperiod->next;
 
     // Free current timeperiod.
-    delete [] this_timeperiod->name;
-    delete [] this_timeperiod->alias;
+    delete[] this_timeperiod->name;
+    delete[] this_timeperiod->alias;
     delete this_timeperiod;
   }
   timeperiod_list = NULL;
@@ -2833,7 +2838,7 @@ int free_object_data() {
          this_hostsmember;
          this_hostsmember = next_hostsmember) {
       next_hostsmember = this_hostsmember->next;
-      delete [] this_hostsmember->host_name;
+      delete[] this_hostsmember->host_name;
       delete this_hostsmember;
     }
 
@@ -2844,7 +2849,7 @@ int free_object_data() {
          this_hostsmember;
          this_hostsmember = next_hostsmember) {
       next_hostsmember = this_hostsmember->next;
-      delete [] this_hostsmember->host_name;
+      delete[] this_hostsmember->host_name;
       delete this_hostsmember;
     }
 
@@ -2855,8 +2860,8 @@ int free_object_data() {
          this_servicesmember;
          this_servicesmember = next_servicesmember) {
       next_servicesmember = this_servicesmember->next;
-      delete [] this_servicesmember->host_name;
-      delete [] this_servicesmember->service_description;
+      delete[] this_servicesmember->host_name;
+      delete[] this_servicesmember->service_description;
       delete this_servicesmember;
     }
 
@@ -2867,7 +2872,7 @@ int free_object_data() {
          this_contactgroupsmember;
          this_contactgroupsmember = next_contactgroupsmember) {
       next_contactgroupsmember = this_contactgroupsmember->next;
-      delete [] this_contactgroupsmember->group_name;
+      delete[] this_contactgroupsmember->group_name;
       delete this_contactgroupsmember;
     }
 
@@ -2878,7 +2883,7 @@ int free_object_data() {
          this_contactsmember;
          this_contactsmember = next_contactsmember) {
       next_contactsmember = this_contactsmember->next;
-      delete [] this_contactsmember->contact_name;
+      delete[] this_contactsmember->contact_name;
       delete this_contactsmember;
     }
 
@@ -2889,8 +2894,8 @@ int free_object_data() {
          this_customvariablesmember;
          this_customvariablesmember = next_customvariablesmember) {
       next_customvariablesmember = this_customvariablesmember->next;
-      delete [] this_customvariablesmember->variable_name;
-      delete [] this_customvariablesmember->variable_value;
+      delete[] this_customvariablesmember->variable_name;
+      delete[] this_customvariablesmember->variable_value;
       delete this_customvariablesmember;
     }
 
@@ -2898,26 +2903,26 @@ int free_object_data() {
     next_host = this_host->next;
 
     // Free current host.
-    delete [] this_host->name;
-    delete [] this_host->display_name;
-    delete [] this_host->alias;
-    delete [] this_host->address;
-    delete [] this_host->plugin_output;
-    delete [] this_host->long_plugin_output;
-    delete [] this_host->perf_data;
+    delete[] this_host->name;
+    delete[] this_host->display_name;
+    delete[] this_host->alias;
+    delete[] this_host->address;
+    delete[] this_host->plugin_output;
+    delete[] this_host->long_plugin_output;
+    delete[] this_host->perf_data;
     free_objectlist(&this_host->hostgroups_ptr);
-    delete [] this_host->check_period;
-    delete [] this_host->host_check_command;
-    delete [] this_host->event_handler;
-    delete [] this_host->failure_prediction_options;
-    delete [] this_host->notification_period;
-    delete [] this_host->notes;
-    delete [] this_host->notes_url;
-    delete [] this_host->action_url;
-    delete [] this_host->icon_image;
-    delete [] this_host->icon_image_alt;
-    delete [] this_host->vrml_image;
-    delete [] this_host->statusmap_image;
+    delete[] this_host->check_period;
+    delete[] this_host->host_check_command;
+    delete[] this_host->event_handler;
+    delete[] this_host->failure_prediction_options;
+    delete[] this_host->notification_period;
+    delete[] this_host->notes;
+    delete[] this_host->notes_url;
+    delete[] this_host->action_url;
+    delete[] this_host->icon_image;
+    delete[] this_host->icon_image_alt;
+    delete[] this_host->vrml_image;
+    delete[] this_host->statusmap_image;
     delete this_host;
   }
   host_list = NULL;
@@ -2933,7 +2938,7 @@ int free_object_data() {
          this_hostsmember;
          this_hostsmember = next_hostsmember) {
       next_hostsmember = this_hostsmember->next;
-      delete [] this_hostsmember->host_name;
+      delete[] this_hostsmember->host_name;
       delete this_hostsmember;
     }
 
@@ -2941,11 +2946,11 @@ int free_object_data() {
     next_hostgroup = this_hostgroup->next;
 
     // Free current host group.
-    delete [] this_hostgroup->group_name;
-    delete [] this_hostgroup->alias;
-    delete [] this_hostgroup->notes;
-    delete [] this_hostgroup->notes_url;
-    delete [] this_hostgroup->action_url;
+    delete[] this_hostgroup->group_name;
+    delete[] this_hostgroup->alias;
+    delete[] this_hostgroup->notes;
+    delete[] this_hostgroup->notes_url;
+    delete[] this_hostgroup->action_url;
     delete this_hostgroup;
   }
   hostgroup_list = NULL;
@@ -2963,8 +2968,8 @@ int free_object_data() {
          this_servicesmember;
          this_servicesmember = next_servicesmember) {
       next_servicesmember = this_servicesmember->next;
-      delete [] this_servicesmember->host_name;
-      delete [] this_servicesmember->service_description;
+      delete[] this_servicesmember->host_name;
+      delete[] this_servicesmember->service_description;
       delete this_servicesmember;
     }
 
@@ -2972,11 +2977,11 @@ int free_object_data() {
     next_servicegroup = this_servicegroup->next;
 
     // Free current service group.
-    delete [] this_servicegroup->group_name;
-    delete [] this_servicegroup->alias;
-    delete [] this_servicegroup->notes;
-    delete [] this_servicegroup->notes_url;
-    delete [] this_servicegroup->action_url;
+    delete[] this_servicegroup->group_name;
+    delete[] this_servicegroup->alias;
+    delete[] this_servicegroup->notes;
+    delete[] this_servicegroup->notes_url;
+    delete[] this_servicegroup->action_url;
     delete this_servicegroup;
   }
   servicegroup_list = NULL;
@@ -2993,7 +2998,7 @@ int free_object_data() {
          this_commandsmember = next_commandsmember) {
       next_commandsmember = this_commandsmember->next;
       if (this_commandsmember->cmd)
-        delete [] this_commandsmember->cmd;
+        delete[] this_commandsmember->cmd;
       delete this_commandsmember;
     }
 
@@ -3005,7 +3010,7 @@ int free_object_data() {
          this_commandsmember = next_commandsmember) {
       next_commandsmember = this_commandsmember->next;
       if (this_commandsmember->cmd)
-        delete [] this_commandsmember->cmd;
+        delete[] this_commandsmember->cmd;
       delete this_commandsmember;
     }
 
@@ -3016,8 +3021,8 @@ int free_object_data() {
          this_customvariablesmember;
          this_customvariablesmember = next_customvariablesmember) {
       next_customvariablesmember = this_customvariablesmember->next;
-      delete [] this_customvariablesmember->variable_name;
-      delete [] this_customvariablesmember->variable_value;
+      delete[] this_customvariablesmember->variable_name;
+      delete[] this_customvariablesmember->variable_value;
       delete this_customvariablesmember;
     }
 
@@ -3025,14 +3030,14 @@ int free_object_data() {
     next_contact = this_contact->next;
 
     // Free current contact.
-    delete [] this_contact->name;
-    delete [] this_contact->alias;
-    delete [] this_contact->email;
-    delete [] this_contact->pager;
+    delete[] this_contact->name;
+    delete[] this_contact->alias;
+    delete[] this_contact->email;
+    delete[] this_contact->pager;
     for (unsigned int i(0); i < MAX_CONTACT_ADDRESSES; ++i)
-      delete [] this_contact->address[i];
-    delete [] this_contact->host_notification_period;
-    delete [] this_contact->service_notification_period;
+      delete[] this_contact->address[i];
+    delete[] this_contact->host_notification_period;
+    delete[] this_contact->service_notification_period;
     free_objectlist(&this_contact->contactgroups_ptr);
     delete this_contact;
   }
@@ -3051,7 +3056,7 @@ int free_object_data() {
          this_contactsmember;
          this_contactsmember = next_contactsmember) {
       next_contactsmember = this_contactsmember->next;
-      delete [] this_contactsmember->contact_name;
+      delete[] this_contactsmember->contact_name;
       delete this_contactsmember;
     }
 
@@ -3059,8 +3064,8 @@ int free_object_data() {
     next_contactgroup = this_contactgroup->next;
 
     // Free current contact group.
-    delete [] this_contactgroup->group_name;
-    delete [] this_contactgroup->alias;
+    delete[] this_contactgroup->group_name;
+    delete[] this_contactgroup->alias;
     delete this_contactgroup;
   }
   contactgroup_list = NULL;
@@ -3076,7 +3081,7 @@ int free_object_data() {
          this_contactgroupsmember;
          this_contactgroupsmember = next_contactgroupsmember) {
       next_contactgroupsmember = this_contactgroupsmember->next;
-      delete [] this_contactgroupsmember->group_name;
+      delete[] this_contactgroupsmember->group_name;
       delete this_contactgroupsmember;
     }
 
@@ -3087,7 +3092,7 @@ int free_object_data() {
          this_contactsmember;
          this_contactsmember = next_contactsmember) {
       next_contactsmember = this_contactsmember->next;
-      delete [] this_contactsmember->contact_name;
+      delete[] this_contactsmember->contact_name;
       delete this_contactsmember;
     }
 
@@ -3098,8 +3103,8 @@ int free_object_data() {
          this_customvariablesmember;
          this_customvariablesmember = next_customvariablesmember) {
       next_customvariablesmember = this_customvariablesmember->next;
-      delete [] this_customvariablesmember->variable_name;
-      delete [] this_customvariablesmember->variable_value;
+      delete[] this_customvariablesmember->variable_name;
+      delete[] this_customvariablesmember->variable_value;
       delete this_customvariablesmember;
     }
 
@@ -3107,25 +3112,25 @@ int free_object_data() {
     next_service = this_service->next;
 
     // Free current service.
-    delete [] this_service->host_name;
-    delete [] this_service->description;
-    delete [] this_service->display_name;
-    delete [] this_service->service_check_command;
-    delete [] this_service->plugin_output;
-    delete [] this_service->long_plugin_output;
-    delete [] this_service->perf_data;
-    delete [] this_service->event_handler_args;
-    delete [] this_service->check_command_args;
+    delete[] this_service->host_name;
+    delete[] this_service->description;
+    delete[] this_service->display_name;
+    delete[] this_service->service_check_command;
+    delete[] this_service->plugin_output;
+    delete[] this_service->long_plugin_output;
+    delete[] this_service->perf_data;
+    delete[] this_service->event_handler_args;
+    delete[] this_service->check_command_args;
     free_objectlist(&this_service->servicegroups_ptr);
-    delete [] this_service->notification_period;
-    delete [] this_service->check_period;
-    delete [] this_service->event_handler;
-    delete [] this_service->failure_prediction_options;
-    delete [] this_service->notes;
-    delete [] this_service->notes_url;
-    delete [] this_service->action_url;
-    delete [] this_service->icon_image;
-    delete [] this_service->icon_image_alt;
+    delete[] this_service->notification_period;
+    delete[] this_service->check_period;
+    delete[] this_service->event_handler;
+    delete[] this_service->failure_prediction_options;
+    delete[] this_service->notes;
+    delete[] this_service->notes_url;
+    delete[] this_service->action_url;
+    delete[] this_service->icon_image;
+    delete[] this_service->icon_image_alt;
     delete this_service;
   }
   service_list = NULL;
@@ -3135,8 +3140,8 @@ int free_object_data() {
        this_command;
        this_command = next_command) {
     next_command = this_command->next;
-    delete [] this_command->name;
-    delete [] this_command->command_line;
+    delete[] this_command->name;
+    delete[] this_command->command_line;
     delete this_command;
   }
   command_list = NULL;
@@ -3154,7 +3159,7 @@ int free_object_data() {
          this_contactgroupsmember;
          this_contactgroupsmember = next_contactgroupsmember) {
       next_contactgroupsmember = this_contactgroupsmember->next;
-      delete [] this_contactgroupsmember->group_name;
+      delete[] this_contactgroupsmember->group_name;
       delete this_contactgroupsmember;
     }
 
@@ -3165,7 +3170,7 @@ int free_object_data() {
          this_contactsmember;
          this_contactsmember = next_contactsmember) {
       next_contactsmember = this_contactsmember->next;
-      delete [] this_contactsmember->contact_name;
+      delete[] this_contactsmember->contact_name;
       delete this_contactsmember;
     }
 
@@ -3173,9 +3178,9 @@ int free_object_data() {
     next_serviceescalation = this_serviceescalation->next;
 
     // Free current service escalation.
-    delete [] this_serviceescalation->host_name;
-    delete [] this_serviceescalation->description;
-    delete [] this_serviceescalation->escalation_period;
+    delete[] this_serviceescalation->host_name;
+    delete[] this_serviceescalation->description;
+    delete[] this_serviceescalation->escalation_period;
     delete this_serviceescalation;
   }
   serviceescalation_list = NULL;
@@ -3187,11 +3192,11 @@ int free_object_data() {
        this_servicedependency;
        this_servicedependency = next_servicedependency) {
     next_servicedependency = this_servicedependency->next;
-    delete [] this_servicedependency->dependency_period;
-    delete [] this_servicedependency->dependent_host_name;
-    delete [] this_servicedependency->dependent_service_description;
-    delete [] this_servicedependency->host_name;
-    delete [] this_servicedependency->service_description;
+    delete[] this_servicedependency->dependency_period;
+    delete[] this_servicedependency->dependent_host_name;
+    delete[] this_servicedependency->dependent_service_description;
+    delete[] this_servicedependency->host_name;
+    delete[] this_servicedependency->service_description;
     delete this_servicedependency;
   }
   servicedependency_list = NULL;
@@ -3203,9 +3208,9 @@ int free_object_data() {
        this_hostdependency;
        this_hostdependency = next_hostdependency) {
     next_hostdependency = this_hostdependency->next;
-    delete [] this_hostdependency->dependency_period;
-    delete [] this_hostdependency->dependent_host_name;
-    delete [] this_hostdependency->host_name;
+    delete[] this_hostdependency->dependency_period;
+    delete[] this_hostdependency->dependent_host_name;
+    delete[] this_hostdependency->host_name;
     delete this_hostdependency;
   }
   hostdependency_list = NULL;
@@ -3223,7 +3228,7 @@ int free_object_data() {
          this_contactgroupsmember;
          this_contactgroupsmember = next_contactgroupsmember) {
       next_contactgroupsmember = this_contactgroupsmember->next;
-      delete [] this_contactgroupsmember->group_name;
+      delete[] this_contactgroupsmember->group_name;
       delete this_contactgroupsmember;
     }
 
@@ -3234,7 +3239,7 @@ int free_object_data() {
          this_contactsmember;
          this_contactsmember = next_contactsmember) {
       next_contactsmember = this_contactsmember->next;
-      delete [] this_contactsmember->contact_name;
+      delete[] this_contactsmember->contact_name;
       delete this_contactsmember;
     }
 
@@ -3242,8 +3247,8 @@ int free_object_data() {
     next_hostescalation = this_hostescalation->next;
 
     // Free current host escalation.
-    delete [] this_hostescalation->host_name;
-    delete [] this_hostescalation->escalation_period;
+    delete[] this_hostescalation->host_name;
+    delete[] this_hostescalation->escalation_period;
     delete this_hostescalation;
   }
   hostescalation_list = NULL;
@@ -3284,7 +3289,7 @@ int modify_command(char const* name, char const* value) {
     return (ERROR);
 
   // Modify command.
-  delete [] this_command->command_line;
+  delete[] this_command->command_line;
   this_command->command_line = my_strdup(value);
 
   // Notify event broker.
@@ -3320,8 +3325,8 @@ static int remove_command(command* this_command) {
     this_command);
 
   // Delete command.
-  delete [] this_command->name;
-  delete [] this_command->command_line;
+  delete[] this_command->name;
+  delete[] this_command->command_line;
   delete this_command;
 
   return (1);
@@ -3426,7 +3431,7 @@ static int remove_contact_to_contactsmember(
     prev_item->next = this_item->next;
 
   // Remove contact member.
-  delete [] this_item->contact_name;
+  delete[] this_item->contact_name;
   delete this_item;
 
   return (1);
@@ -3488,7 +3493,7 @@ static int remove_contact(contact* this_contact) {
        this_commandsmember = next_commandsmember) {
     next_commandsmember = this_commandsmember->next;
     if (this_commandsmember->cmd)
-      delete [] this_commandsmember->cmd;
+      delete[] this_commandsmember->cmd;
     delete this_commandsmember;
   }
 
@@ -3500,7 +3505,7 @@ static int remove_contact(contact* this_contact) {
        this_commandsmember = next_commandsmember) {
     next_commandsmember = this_commandsmember->next;
     if (this_commandsmember->cmd)
-      delete [] this_commandsmember->cmd;
+      delete[] this_commandsmember->cmd;
     delete this_commandsmember;
   }
 
@@ -3511,8 +3516,8 @@ static int remove_contact(contact* this_contact) {
        this_customvariablesmember;
        this_customvariablesmember = next_customvariablesmember) {
     next_customvariablesmember = this_customvariablesmember->next;
-    delete [] this_customvariablesmember->variable_name;
-    delete [] this_customvariablesmember->variable_value;
+    delete[] this_customvariablesmember->variable_name;
+    delete[] this_customvariablesmember->variable_value;
     delete this_customvariablesmember;
   }
 
@@ -3524,13 +3529,13 @@ static int remove_contact(contact* this_contact) {
 
   // Free remaining properties.
   for (unsigned int i(0); i < MAX_CONTACT_ADDRESSES; ++i)
-    delete [] this_contact->address[i];
-  delete [] this_contact->name;
-  delete [] this_contact->alias;
-  delete [] this_contact->email;
-  delete [] this_contact->pager;
-  delete [] this_contact->host_notification_period;
-  delete [] this_contact->service_notification_period;
+    delete[] this_contact->address[i];
+  delete[] this_contact->name;
+  delete[] this_contact->alias;
+  delete[] this_contact->email;
+  delete[] this_contact->pager;
+  delete[] this_contact->host_notification_period;
+  delete[] this_contact->service_notification_period;
   delete this_contact;
 
   return (1);
@@ -3616,7 +3621,7 @@ static int remove_contactgroup_to_contactgroupsmember(
     prev_item->next = this_item->next;
 
   // Remove member.
-  delete [] this_item->group_name;
+  delete[] this_item->group_name;
   delete this_item;
 
   return (1);
@@ -3672,8 +3677,8 @@ static int remove_contactgroup(contactgroup* this_contactgroup) {
     this_contactgroup);
 
   // Free remaining contact group properties.
-  delete [] this_contactgroup->group_name;
-  delete [] this_contactgroup->alias;
+  delete[] this_contactgroup->group_name;
+  delete[] this_contactgroup->alias;
   delete this_contactgroup;
 
   return (1);
@@ -3743,7 +3748,7 @@ static int remove_host(host* this_host) {
     if (temp_event->event_data == this_host) {
       remove_event(temp_event, &event_list_low, &event_list_low_tail);
       delete temp_event;
-      break ;
+      break;
     }
 
   // Update the event list high.
@@ -3753,7 +3758,7 @@ static int remove_host(host* this_host) {
     if (temp_event->event_data == this_host) {
       remove_event(temp_event, &event_list_high, &event_list_high_tail);
       delete temp_event;
-      break ;
+      break;
     }
 
   // Update the hostdependency list.
@@ -3769,11 +3774,11 @@ static int remove_host(host* this_host) {
 	prev->next = dep->next;
       if (!dep->next)
 	hostdependency_list_tail = prev;
-      delete [] dep->dependent_host_name;
-      delete [] dep->host_name;
-      delete [] dep->dependency_period;
+      delete[] dep->dependent_host_name;
+      delete[] dep->host_name;
+      delete[] dep->dependency_period;
       delete dep;
-      break ;
+      break;
     }
     prev = dep;
   }
@@ -3792,10 +3797,10 @@ static int remove_host(host* this_host) {
 	prev->next = escalation->next;
       if (!escalation->next)
 	hostescalation_list_tail = prev;
-      delete [] escalation->host_name;
-      delete [] escalation->escalation_period;
+      delete[] escalation->host_name;
+      delete[] escalation->escalation_period;
       delete escalation;
-      break ;
+      break;
     }
   }
 
@@ -3809,7 +3814,7 @@ static int remove_host(host* this_host) {
        this_hostsmember;
        this_hostsmember = next_hostsmember) {
     next_hostsmember = this_hostsmember->next;
-    delete [] this_hostsmember->host_name;
+    delete[] this_hostsmember->host_name;
     delete this_hostsmember;
   }
 
@@ -3820,7 +3825,7 @@ static int remove_host(host* this_host) {
        this_hostsmember;
        this_hostsmember = next_hostsmember) {
     next_hostsmember = this_hostsmember->next;
-    delete [] this_hostsmember->host_name;
+    delete[] this_hostsmember->host_name;
     delete this_hostsmember;
   }
 
@@ -3832,8 +3837,8 @@ static int remove_host(host* this_host) {
        this_servicesmember = next_servicesmember) {
     next_servicesmember = this_servicesmember->next;
     service* svc(this_servicesmember->service_ptr);
-    delete [] this_servicesmember->host_name;
-    delete [] this_servicesmember->service_description;
+    delete[] this_servicesmember->host_name;
+    delete[] this_servicesmember->service_description;
     delete this_servicesmember;
     remove_service_by_id(svc->host_name, svc->description);
   }
@@ -3845,7 +3850,7 @@ static int remove_host(host* this_host) {
        this_contactgroupsmember;
        this_contactgroupsmember = next_contactgroupsmember) {
     next_contactgroupsmember = this_contactgroupsmember->next;
-    delete [] this_contactgroupsmember->group_name;
+    delete[] this_contactgroupsmember->group_name;
     delete this_contactgroupsmember;
   }
 
@@ -3856,7 +3861,7 @@ static int remove_host(host* this_host) {
        this_contactsmember;
        this_contactsmember = next_contactsmember) {
     next_contactsmember = this_contactsmember->next;
-    delete [] this_contactsmember->contact_name;
+    delete[] this_contactsmember->contact_name;
     delete this_contactsmember;
   }
 
@@ -3867,32 +3872,32 @@ static int remove_host(host* this_host) {
        this_customvariablesmember;
        this_customvariablesmember = next_customvariablesmember) {
     next_customvariablesmember = this_customvariablesmember->next;
-    delete [] this_customvariablesmember->variable_name;
-    delete [] this_customvariablesmember->variable_value;
+    delete[] this_customvariablesmember->variable_name;
+    delete[] this_customvariablesmember->variable_value;
     delete this_customvariablesmember;
   }
 
   // Free remaining host properties.
-  delete [] this_host->name;
-  delete [] this_host->display_name;
-  delete [] this_host->alias;
-  delete [] this_host->address;
-  delete [] this_host->plugin_output;
-  delete [] this_host->long_plugin_output;
-  delete [] this_host->perf_data;
+  delete[] this_host->name;
+  delete[] this_host->display_name;
+  delete[] this_host->alias;
+  delete[] this_host->address;
+  delete[] this_host->plugin_output;
+  delete[] this_host->long_plugin_output;
+  delete[] this_host->perf_data;
   free_objectlist(&this_host->hostgroups_ptr);
-  delete [] this_host->check_period;
-  delete [] this_host->host_check_command;
-  delete [] this_host->event_handler;
-  delete [] this_host->failure_prediction_options;
-  delete [] this_host->notification_period;
-  delete [] this_host->notes;
-  delete [] this_host->notes_url;
-  delete [] this_host->action_url;
-  delete [] this_host->icon_image;
-  delete [] this_host->icon_image_alt;
-  delete [] this_host->vrml_image;
-  delete [] this_host->statusmap_image;
+  delete[] this_host->check_period;
+  delete[] this_host->host_check_command;
+  delete[] this_host->event_handler;
+  delete[] this_host->failure_prediction_options;
+  delete[] this_host->notification_period;
+  delete[] this_host->notes;
+  delete[] this_host->notes_url;
+  delete[] this_host->action_url;
+  delete[] this_host->icon_image;
+  delete[] this_host->icon_image_alt;
+  delete[] this_host->vrml_image;
+  delete[] this_host->statusmap_image;
   delete this_host;
 
   return (1);
@@ -3976,9 +3981,9 @@ int remove_host_dependency_by_id(
     this_hostdependency);
 
   // Free dependency.
-  delete [] this_hostdependency->dependent_host_name;
-  delete [] this_hostdependency->host_name;
-  delete [] this_hostdependency->dependency_period;
+  delete[] this_hostdependency->dependent_host_name;
+  delete[] this_hostdependency->host_name;
+  delete[] this_hostdependency->dependency_period;
   delete this_hostdependency;
 
   return (1);
@@ -4022,7 +4027,7 @@ int remove_host_escalation_by_id(char const* host_name) {
        this_contactgroupsmembers;
        this_contactgroupsmembers = next_contactgroupsmembers) {
     next_contactgroupsmembers = this_contactgroupsmembers->next;
-    delete [] this_contactgroupsmembers->group_name;
+    delete[] this_contactgroupsmembers->group_name;
     delete this_contactgroupsmembers;
   }
 
@@ -4032,7 +4037,7 @@ int remove_host_escalation_by_id(char const* host_name) {
        this_contactsmember;
        this_contactsmember = next_contactsmember) {
     next_contactsmember = this_contactsmember->next;
-    delete [] this_contactsmember->contact_name;
+    delete[] this_contactsmember->contact_name;
     delete this_contactsmember;
   }
 
@@ -4041,8 +4046,8 @@ int remove_host_escalation_by_id(char const* host_name) {
     object_skiplists[HOSTESCALATION_SKIPLIST],
     this_hostescalation);
 
-  delete [] this_hostescalation->host_name;
-  delete [] this_hostescalation->escalation_period;
+  delete[] this_hostescalation->host_name;
+  delete[] this_hostescalation->escalation_period;
   delete this_hostescalation;
 
   return (1);
@@ -4067,7 +4072,7 @@ static int remove_host_group(hostgroup* this_hostgroup) {
        this_hostsmember;
        this_hostsmember = next_hostsmember) {
     next_hostsmember = this_hostsmember->next;
-    delete [] this_hostsmember->host_name;
+    delete[] this_hostsmember->host_name;
     delete this_hostsmember;
   }
 
@@ -4076,11 +4081,11 @@ static int remove_host_group(hostgroup* this_hostgroup) {
     object_skiplists[HOSTGROUP_SKIPLIST],
     this_hostgroup);
 
-  delete [] this_hostgroup->group_name;
-  delete [] this_hostgroup->alias;
-  delete [] this_hostgroup->notes;
-  delete [] this_hostgroup->notes_url;
-  delete [] this_hostgroup->action_url;
+  delete[] this_hostgroup->group_name;
+  delete[] this_hostgroup->alias;
+  delete[] this_hostgroup->notes;
+  delete[] this_hostgroup->notes_url;
+  delete[] this_hostgroup->action_url;
   delete this_hostgroup;
 
   return (1);
@@ -4143,10 +4148,10 @@ static int remove_service(service* this_service) {
 	  hst->services = svcmbr->next;
 	else
 	  prev->next = svcmbr->next;
-	delete [] svcmbr->host_name;
-	delete [] svcmbr->service_description;
+	delete[] svcmbr->host_name;
+	delete[] svcmbr->service_description;
 	delete svcmbr;
-	break ;
+	break;
       }
       prev = svcmbr;
     }
@@ -4159,7 +4164,7 @@ static int remove_service(service* this_service) {
     if (temp_event->event_data == this_service) {
       remove_event(temp_event, &event_list_low, &event_list_low_tail);
       delete temp_event;
-      break ;
+      break;
     }
 
   // Update the event list high.
@@ -4169,7 +4174,7 @@ static int remove_service(service* this_service) {
     if (temp_event->event_data == this_service) {
       remove_event(temp_event, &event_list_high, &event_list_high_tail);
       delete temp_event;
-      break ;
+      break;
     }
 
   // Update the servicedependency list.
@@ -4189,13 +4194,13 @@ static int remove_service(service* this_service) {
 	prev->next = dep->next;
       if (!dep->next)
 	servicedependency_list_tail = prev;
-      delete [] dep->dependent_host_name;
-      delete [] dep->dependent_service_description;
-      delete [] dep->host_name;
-      delete [] dep->service_description;
-      delete [] dep->dependency_period;
+      delete[] dep->dependent_host_name;
+      delete[] dep->dependent_service_description;
+      delete[] dep->host_name;
+      delete[] dep->service_description;
+      delete[] dep->dependency_period;
       delete dep;
-      break ;
+      break;
     }
     prev = dep;
   }
@@ -4216,11 +4221,11 @@ static int remove_service(service* this_service) {
 	prev->next = escalation->next;
       if (!escalation->next)
 	serviceescalation_list_tail = prev;
-      delete [] escalation->host_name;
-      delete [] escalation->description;
-      delete [] escalation->escalation_period;
+      delete[] escalation->host_name;
+      delete[] escalation->description;
+      delete[] escalation->escalation_period;
       delete escalation;
-      break ;
+      break;
     }
   }
 
@@ -4234,7 +4239,7 @@ static int remove_service(service* this_service) {
        this_contactgroupsmember;
        this_contactgroupsmember = next_contactgroupsmember) {
     next_contactgroupsmember = this_contactgroupsmember->next;
-    delete [] this_contactgroupsmember->group_name;
+    delete[] this_contactgroupsmember->group_name;
     delete this_contactgroupsmember;
   }
 
@@ -4245,7 +4250,7 @@ static int remove_service(service* this_service) {
        this_contactsmember;
        this_contactsmember = next_contactsmember) {
     next_contactsmember = this_contactsmember->next;
-    delete [] this_contactsmember->contact_name;
+    delete[] this_contactsmember->contact_name;
     delete this_contactsmember;
   }
 
@@ -4256,31 +4261,31 @@ static int remove_service(service* this_service) {
        this_customvariablesmember;
        this_customvariablesmember = next_customvariablesmember) {
     next_customvariablesmember = this_customvariablesmember->next;
-    delete [] this_customvariablesmember->variable_name;
-    delete [] this_customvariablesmember->variable_value;
+    delete[] this_customvariablesmember->variable_name;
+    delete[] this_customvariablesmember->variable_value;
     delete this_customvariablesmember;
   }
 
   // Cleanup memory.
-  delete [] this_service->host_name;
-  delete [] this_service->description;
-  delete [] this_service->display_name;
-  delete [] this_service->service_check_command;
-  delete [] this_service->plugin_output;
-  delete [] this_service->long_plugin_output;
-  delete [] this_service->perf_data;
-  delete [] this_service->event_handler_args;
-  delete [] this_service->check_command_args;
+  delete[] this_service->host_name;
+  delete[] this_service->description;
+  delete[] this_service->display_name;
+  delete[] this_service->service_check_command;
+  delete[] this_service->plugin_output;
+  delete[] this_service->long_plugin_output;
+  delete[] this_service->perf_data;
+  delete[] this_service->event_handler_args;
+  delete[] this_service->check_command_args;
   free_objectlist(&this_service->servicegroups_ptr);
-  delete [] this_service->notification_period;
-  delete [] this_service->check_period;
-  delete [] this_service->event_handler;
-  delete [] this_service->failure_prediction_options;
-  delete [] this_service->notes;
-  delete [] this_service->notes_url;
-  delete [] this_service->action_url;
-  delete [] this_service->icon_image;
-  delete [] this_service->icon_image_alt;
+  delete[] this_service->notification_period;
+  delete[] this_service->check_period;
+  delete[] this_service->event_handler;
+  delete[] this_service->failure_prediction_options;
+  delete[] this_service->notes;
+  delete[] this_service->notes_url;
+  delete[] this_service->action_url;
+  delete[] this_service->icon_image;
+  delete[] this_service->icon_image_alt;
   delete this_service;
 
   return (1);
@@ -4306,7 +4311,7 @@ int remove_service_by_id(
   while (this_service) {
     if (!strcmp(this_service->host_name, host_name)
 	&& !strcmp(this_service->description, description))
-      break ;
+      break;
     prev_service = this_service;
     this_service = this_service->next;
   }
@@ -4324,11 +4329,11 @@ int remove_service_by_id(
          current;
          prev = &current->next, current = current->next)
       if (current->service_ptr == this_service)
-        break ;
+        break;
     if (current) {
       *prev = current->next;
-      delete [] current->host_name;
-      delete [] current->service_description;
+      delete[] current->host_name;
+      delete[] current->service_description;
       delete current;
     }
   }
@@ -4402,11 +4407,11 @@ int remove_service_dependency_by_id(
     this_servicedependency);
 
   // Free service dependency.
-  delete [] this_servicedependency->dependent_host_name;
-  delete [] this_servicedependency->dependent_service_description;
-  delete [] this_servicedependency->host_name;
-  delete [] this_servicedependency->service_description;
-  delete [] this_servicedependency->dependency_period;
+  delete[] this_servicedependency->dependent_host_name;
+  delete[] this_servicedependency->dependent_service_description;
+  delete[] this_servicedependency->host_name;
+  delete[] this_servicedependency->service_description;
+  delete[] this_servicedependency->dependency_period;
   delete this_servicedependency;
 
   return (1);
@@ -4457,7 +4462,7 @@ int remove_service_escalation_by_id(
        this_contactgroupsmembers;
        this_contactgroupsmembers = next_contactgroupsmembers) {
     next_contactgroupsmembers = this_contactgroupsmembers->next;
-    delete [] this_contactgroupsmembers->group_name;
+    delete[] this_contactgroupsmembers->group_name;
     delete this_contactgroupsmembers;
   }
 
@@ -4468,7 +4473,7 @@ int remove_service_escalation_by_id(
        this_contactsmember;
        this_contactsmember = next_contactsmember) {
     next_contactsmember = this_contactsmember->next;
-    delete [] this_contactsmember->contact_name;
+    delete[] this_contactsmember->contact_name;
     delete this_contactsmember;
   }
 
@@ -4478,9 +4483,9 @@ int remove_service_escalation_by_id(
     this_serviceescalation);
 
   // Free service escalation.
-  delete [] this_serviceescalation->host_name;
-  delete [] this_serviceescalation->description;
-  delete [] this_serviceescalation->escalation_period;
+  delete[] this_serviceescalation->host_name;
+  delete[] this_serviceescalation->description;
+  delete[] this_serviceescalation->escalation_period;
   delete this_serviceescalation;
 
   return (1);
@@ -4507,8 +4512,8 @@ static int remove_service_group(servicegroup* this_servicegroup) {
        this_servicesmember;
        this_servicesmember = next_servicesmember) {
     next_servicesmember = this_servicesmember->next;
-    delete [] this_servicesmember->host_name;
-    delete [] this_servicesmember->service_description;
+    delete[] this_servicesmember->host_name;
+    delete[] this_servicesmember->service_description;
     delete this_servicesmember;
   }
 
@@ -4518,11 +4523,11 @@ static int remove_service_group(servicegroup* this_servicegroup) {
     this_servicegroup);
 
   // Delete service group.
-  delete [] this_servicegroup->group_name;
-  delete [] this_servicegroup->alias;
-  delete [] this_servicegroup->notes;
-  delete [] this_servicegroup->notes_url;
-  delete [] this_servicegroup->action_url;
+  delete[] this_servicegroup->group_name;
+  delete[] this_servicegroup->alias;
+  delete[] this_servicegroup->notes;
+  delete[] this_servicegroup->notes_url;
+  delete[] this_servicegroup->action_url;
   delete this_servicegroup;
 
   return (1);
@@ -4607,7 +4612,7 @@ static int remove_timeperiodexclusions(
              timeperiodexclusion* this_timeperiodexclusion) {
   while (this_timeperiodexclusion) {
     timeperiodexclusion* tmp(this_timeperiodexclusion->next);
-    delete [] this_timeperiodexclusion->timeperiod_name;
+    delete[] this_timeperiodexclusion->timeperiod_name;
     delete this_timeperiodexclusion;
     this_timeperiodexclusion = tmp;
   }
@@ -4694,8 +4699,8 @@ static int remove_timeperiod(timeperiod* this_timeperiod) {
     this_timeperiod);
 
   // Remove timeperiod properties.
-  delete [] this_timeperiod->name;
-  delete [] this_timeperiod->alias;
+  delete[] this_timeperiod->name;
+  delete[] this_timeperiod->alias;
   delete this_timeperiod;
 
   return (1);
@@ -5253,7 +5258,7 @@ int is_contact_for_host(host* hst, contact* cntct) {
        temp_contactsmember = temp_contactsmember->next) {
     contact* temp_contact(temp_contactsmember->contact_ptr);
     if (!temp_contact)
-      continue ;
+      continue;
     if (temp_contact == cntct)
       return (TRUE);
   }
@@ -5266,7 +5271,7 @@ int is_contact_for_host(host* hst, contact* cntct) {
     contactgroup*
       temp_contactgroup(temp_contactgroupsmember->group_ptr);
     if (!temp_contactgroup)
-      continue ;
+      continue;
     if (is_contact_member_of_contactgroup(temp_contactgroup, cntct))
       return (TRUE);
   }
@@ -5303,7 +5308,7 @@ int is_contact_for_service(service* svc, contact* cntct) {
     contactgroup*
       temp_contactgroup(temp_contactgroupsmember->group_ptr);
     if (!temp_contactgroup)
-      continue ;
+      continue;
     if (is_contact_member_of_contactgroup(temp_contactgroup, cntct))
       return (TRUE);
   }
@@ -5336,7 +5341,7 @@ int is_contact_member_of_contactgroup(
        member = member->next) {
     contact* temp_contact(member->contact_ptr);
     if (!temp_contact)
-      continue ;
+      continue;
     if (temp_contact == cntct)
       return (TRUE);
   }
@@ -5368,7 +5373,7 @@ int is_escalated_contact_for_host(host* hst, contact* cntct) {
          temp_contactsmember = temp_contactsmember->next) {
       contact* temp_contact(temp_contactsmember->contact_ptr);
       if (!temp_contact)
-        continue ;
+        continue;
       if (temp_contact == cntct)
         return (TRUE);
     }
@@ -5381,7 +5386,7 @@ int is_escalated_contact_for_host(host* hst, contact* cntct) {
       contactgroup*
         temp_contactgroup(temp_contactgroupsmember->group_ptr);
       if (!temp_contactgroup)
-        continue ;
+        continue;
       if (is_contact_member_of_contactgroup(temp_contactgroup, cntct))
         return (TRUE);
     }
@@ -5419,7 +5424,7 @@ int is_escalated_contact_for_service(service* svc, contact* cntct) {
          temp_contactsmember = temp_contactsmember->next) {
       contact* temp_contact(temp_contactsmember->contact_ptr);
       if (!temp_contact)
-        continue ;
+        continue;
       if (temp_contact == cntct)
         return (TRUE);
     }
@@ -5432,7 +5437,7 @@ int is_escalated_contact_for_service(service* svc, contact* cntct) {
       contactgroup*
         temp_contactgroup(temp_contactgroupsmember->group_ptr);
       if (!temp_contactgroup)
-        continue ;
+        continue;
       if (is_contact_member_of_contactgroup(temp_contactgroup, cntct))
         return (TRUE);
     }
@@ -5622,7 +5627,7 @@ int check_for_circular_hostdependency_path(
        temp_hd = temp_hd->next) {
     // Only check parent dependencies.
     if (dep->master_host_ptr != temp_hd->dependent_host_ptr)
-      continue ;
+      continue;
 
     if (check_for_circular_hostdependency_path(
           root_dep,
@@ -5690,7 +5695,7 @@ int check_for_circular_servicedependency_path(
        temp_sd = temp_sd->next) {
     // Only check parent dependencies.
     if (dep->master_service_ptr != temp_sd->dependent_service_ptr)
-      continue ;
+      continue;
 
     if (check_for_circular_servicedependency_path(
           root_dep,
@@ -6094,7 +6099,7 @@ int add_object_to_objectlist(objectlist** list, void* object_ptr) {
   objectlist* temp_item;
   for (temp_item = *list; temp_item; temp_item = temp_item->next)
     if (temp_item->object_ptr == object_ptr)
-      break ;
+      break;
   if (temp_item)
     return (OK);
 

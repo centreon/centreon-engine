@@ -64,7 +64,8 @@ void loop::load() {
  */
 void loop::run() {
   // Debug message.
-  logger(dbg_functions, basic) << "events::loop::run()";
+  logger(dbg_functions, basic)
+    << "events::loop::run()";
 
   // Initialize some time members.
   time(&_last_time);
@@ -84,6 +85,7 @@ void loop::run() {
   _sleep_event.prev = NULL;
 
   _dispatching();
+  return;
 }
 
 /**
@@ -155,7 +157,8 @@ void loop::_dispatching() {
     _last_time = current_time;
 
     // Log messages about event lists.
-    logger(dbg_events, more) << "** Event Check Loop";
+    logger(dbg_events, more)
+      << "** Event Check Loop";
     if (event_list_high)
       logger(dbg_events, more)
         << "Next High Priority Event Time: "
@@ -354,7 +357,8 @@ void loop::_dispatching() {
         quick_timed_event.erase(hash_timed_event::low, temp_event);
 
         // Handle the event.
-        logger(dbg_events, more) << "Running event...";
+        logger(dbg_events, more)
+          << "Running event...";
         handle_timed_event(temp_event);
 
         // Reschedule the event if necessary.
@@ -423,6 +427,7 @@ void loop::_dispatching() {
           (unsigned long)(config->get_sleep_time() * 1000000000l));
       }
   }
+  return;
 }
 
 /**
@@ -462,5 +467,5 @@ void loop::_internal_copy(loop const& right) {
   (void)right;
   assert(!"event loop is not copyable");
   abort();
-  return ;
+  return;
 }

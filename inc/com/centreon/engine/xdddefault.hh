@@ -33,12 +33,33 @@ extern "C" {
 #  endif // C++
 
 int xdddefault_initialize_downtime_data(char const* main_config_file);
-int xdddefault_validate_downtime_data(void);
+int xdddefault_validate_downtime_data();
 int xdddefault_cleanup_downtime_data(char const* main_config_file);
 
-int xdddefault_save_downtime_data(void);
-int xdddefault_add_new_host_downtime(char const* host_name, time_t entry_time, char const* author, char const* comment, time_t start_time, time_t end_time, int fixed, unsigned long triggered_by, unsigned long duration, unsigned long* downtime_id);
-int xdddefault_add_new_service_downtime(char const* host_name, char const* service_description, time_t entry_time, char const* author, char const* comment, time_t start_time, time_t end_time, int fixed, unsigned long triggered_by, unsigned long duration, unsigned long* downtime_id);
+int xdddefault_save_downtime_data();
+int xdddefault_add_new_host_downtime(
+      char const* host_name,
+      time_t entry_time,
+      char const* author,
+      char const* comment,
+      time_t start_time,
+      time_t end_time,
+      int fixed,
+      unsigned long triggered_by,
+      unsigned long duration,
+      unsigned long* downtime_id);
+int xdddefault_add_new_service_downtime(
+      char const* host_name,
+      char const* service_description,
+      time_t entry_time,
+      char const* author,
+      char const* comment,
+      time_t start_time,
+      time_t end_time,
+      int fixed,
+      unsigned long triggered_by,
+      unsigned long duration,
+      unsigned long* downtime_id);
 
 int xdddefault_delete_host_downtime(unsigned long downtime_id);
 int xdddefault_delete_service_downtime(unsigned long downtime_id);

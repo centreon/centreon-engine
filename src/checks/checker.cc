@@ -82,8 +82,10 @@ void checker::push_check_result(check_result const& result) {
  *  Reap and process all result recive by execution process.
  */
 void checker::reap() {
-  logger(dbg_functions, basic) << "start " << __func__;
-  logger(dbg_checks, basic) << "Starting to reap check results.";
+  logger(dbg_functions, basic)
+    << "start " << __func__;
+  logger(dbg_checks, basic)
+    << "Starting to reap check results.";
 
   // Time to start reaping.
   time_t reaper_start_time;
@@ -154,14 +156,14 @@ void checker::reap() {
         logger(dbg_checks, basic)
           << "Breaking out of check result reaper: "
           << "max reaper time exceeded";
-        break ;
+        break;
       }
 
       // Caught signal, need to break.
       if (sigshutdown) {
         logger(dbg_checks, basic)
           << "Breaking out of check result reaper: signal encountered";
-        break ;
+        break;
       }
 
       // Mutex needed to access list.
@@ -172,7 +174,8 @@ void checker::reap() {
   // Reaping finished.
   logger(dbg_checks, basic)
     << "Finished reaping " << reaped_checks << " check results";
-  logger(dbg_functions, basic) << "end " << __func__;
+  logger(dbg_functions, basic)
+    << "end " << __func__;
   return;
 }
 
@@ -208,7 +211,8 @@ void checker::run(
                 int* time_is_valid,
                 time_t* preferred_time) {
   // Preamble.
-  logger(dbg_functions, basic) << "start " << __func__;
+  logger(dbg_functions, basic)
+    << "start " << __func__;
   if (!hst)
     throw (engine_error() << "attempt to run check on NULL host");
   if (!hst->check_command_ptr)
@@ -405,7 +409,8 @@ void checker::run(
 
   // Cleanup.
   clear_volatile_macros_r(&macros);
-  logger(dbg_functions, basic) << "end " << __func__;
+  logger(dbg_functions, basic)
+    << "end " << __func__;
   return;
 }
 
@@ -431,7 +436,8 @@ void checker::run(
                 int* time_is_valid,
                 time_t* preferred_time) {
   // Preamble.
-  logger(dbg_functions, basic) << "start " << __func__;
+  logger(dbg_functions, basic)
+    << "start " << __func__;
   if (!svc)
     throw (engine_error() << "attempt to run check on NULL service");
   else if (!svc->host_ptr)
@@ -617,7 +623,8 @@ void checker::run(
 
   // Cleanup.
   clear_volatile_macros_r(&macros);
-  logger(dbg_functions, basic) << "end " << __func__;
+  logger(dbg_functions, basic)
+    << "end " << __func__;
   return;
 }
 
@@ -637,7 +644,8 @@ void checker::run_sync(
                 int use_cached_result,
                 unsigned long check_timestamp_horizon) {
   // Preamble.
-  logger(dbg_functions, basic) << "start " << __func__;
+  logger(dbg_functions, basic)
+    << "start " << __func__;
   if (!hst)
     throw (engine_error() << "host pointer is NULL.");
   logger(dbg_checks, basic)
@@ -760,7 +768,7 @@ void checker::run_sync(
     *check_result_code = hst->current_state;
 
   // Cleanup.
-  delete [] old_plugin_output;
+  delete[] old_plugin_output;
 
   // Synchronous check is done.
   logger(dbg_checks, more)
@@ -793,7 +801,8 @@ void checker::run_sync(
     NULL);
 
   // End.
-  logger(dbg_functions, basic) << "end " << __func__;
+  logger(dbg_functions, basic)
+    << "end " << __func__;
   return;
 }
 
@@ -863,7 +872,8 @@ checker& checker::operator=(checker const& right) {
  */
 void checker::finished(commands::result const& res) throw () {
   // Debug message.
-  logger(dbg_functions, basic) << "start " << __func__;
+  logger(dbg_functions, basic)
+    << "start " << __func__;
 
   // Find check result.
   check_result result;
@@ -901,7 +911,8 @@ void checker::finished(commands::result const& res) throw () {
   }
 
   // Debug message.
-  logger(dbg_functions, basic) << "end " << __func__;
+  logger(dbg_functions, basic)
+    << "end " << __func__;
   return;
 }
 
@@ -914,7 +925,8 @@ void checker::finished(commands::result const& res) throw () {
  */
 int checker::_execute_sync(host* hst) {
   // Preamble.
-  logger(dbg_functions, basic) << "start " << __func__;
+  logger(dbg_functions, basic)
+    << "start " << __func__;
   if (!hst)
     throw (engine_error() << "host pointer is NULL.");
   logger(dbg_checks, basic)
@@ -1006,9 +1018,9 @@ int checker::_execute_sync(host* hst) {
     << "Processed host check ommand: " << processed_cmd;
 
   // Cleanup.
-  delete [] hst->plugin_output;
-  delete [] hst->long_plugin_output;
-  delete [] hst->perf_data;
+  delete[] hst->plugin_output;
+  delete[] hst->long_plugin_output;
+  delete[] hst->perf_data;
   hst->plugin_output = NULL;
   hst->long_plugin_output = NULL;
   hst->perf_data = NULL;
@@ -1086,7 +1098,7 @@ int checker::_execute_sync(host* hst) {
     NULL);
 
   // Cleanup.
-  delete [] output;
+  delete[] output;
   clear_volatile_macros_r(&macros);
 
   // If the command timed out.
@@ -1117,18 +1129,18 @@ int checker::_execute_sync(host* hst) {
     &hst->perf_data,
     true,
     true);
-  delete [] tmp_plugin_output;
+  delete[] tmp_plugin_output;
 
   // A NULL host check command means we should assume the host is UP.
   if (!hst->host_check_command) {
-    delete [] hst->plugin_output;
+    delete[] hst->plugin_output;
     hst->plugin_output = my_strdup("(Host assumed to be UP)");
     res.exit_code = STATE_OK;
   }
 
   // Make sure we have some data.
   if (!hst->plugin_output || !strcmp(hst->plugin_output, "")) {
-    delete [] hst->plugin_output;
+    delete[] hst->plugin_output;
     hst->plugin_output
       = my_strdup("(No output returned from host check)");
   }
@@ -1176,12 +1188,13 @@ int checker::_execute_sync(host* hst) {
     hst->long_plugin_output,
     hst->perf_data,
     NULL);
-  delete [] tmp_processed_cmd;
+  delete[] tmp_processed_cmd;
 
   // Termination.
   logger(dbg_checks, basic)
     << "** Sync host check done: state=" << return_result;
-  logger(dbg_functions, basic) << "end " << __func__;
+  logger(dbg_functions, basic)
+    << "end " << __func__;
   return (return_result);
 }
 

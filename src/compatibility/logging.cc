@@ -57,6 +57,7 @@ void logit(int type, int display, char const* fmt, ...) {
     logger(type, basic) << buffer;
   }
   va_end(ap);
+  return;
 }
 
 /**
@@ -70,7 +71,11 @@ void logit(int type, int display, char const* fmt, ...) {
  *
  *  @return Return true.
  */
-int log_debug_info(int type, unsigned int verbosity, char const* fmt, ...) {
+int log_debug_info(
+      int type,
+      unsigned int verbosity,
+      char const* fmt,
+      ...) {
   char buffer[BUFFER_SIZE];
   va_list ap;
 
@@ -92,7 +97,6 @@ int log_debug_info(int type, unsigned int verbosity, char const* fmt, ...) {
       << "[pid=" << getpid() << "] " << buffer;
   }
   va_end(ap);
-
   return (OK);
 }
 
@@ -122,7 +126,10 @@ int write_to_all_logs(char const* buffer, unsigned long type) {
  *
  *  @return Return true.
  */
-int write_to_log(char const* buffer, unsigned long type, time_t* timestamp) {
+int write_to_log(
+      char const* buffer,
+      unsigned long type,
+      time_t* timestamp) {
   (void)timestamp;
 
   if (buffer != NULL) {
@@ -156,7 +163,8 @@ int write_to_syslog(char const* buffer, unsigned long type) {
  *  @return Return true on success.
  */
 int log_service_event(service* svc) {
-  if (svc->state_type == SOFT_STATE && !config->get_log_service_retries()) {
+  if (svc->state_type == SOFT_STATE
+      && !config->get_log_service_retries()) {
     return (OK);
   }
 
@@ -196,7 +204,6 @@ int log_service_event(service* svc) {
   logger(log_options, basic) << processed_buffer;
 
   delete[] processed_buffer;
-
   return (OK);
 }
 
@@ -240,7 +247,6 @@ int log_host_event(host* hst) {
 
   clear_host_macros_r(&mac);
   delete[] processed_buffer;
-
   return (OK);
 }
 
@@ -256,7 +262,8 @@ int log_host_event(host* hst) {
 int log_host_states(unsigned int type, time_t* timestamp) {
   (void)timestamp;
 
-  if (type == INITIAL_STATES && config->get_log_initial_state() == false) {
+  if (type == INITIAL_STATES
+      && config->get_log_initial_state() == false) {
     return (OK);
   }
 
@@ -284,7 +291,6 @@ int log_host_states(unsigned int type, time_t* timestamp) {
     clear_host_macros_r(&mac);
     delete[] processed_buffer;
   }
-
   return (OK);
 }
 
@@ -334,7 +340,6 @@ int log_service_states(unsigned int type, time_t* timestamp) {
     clear_service_macros_r(&mac);
     delete[] processed_buffer;
   }
-
   return (OK);
 }
 
@@ -373,7 +378,7 @@ int write_log_file_info(time_t* timestamp) {
  *
  *  @return Return true on success.
  */
-int open_debug_log(void) {
+int open_debug_log() {
   return (OK);
 }
 
@@ -383,7 +388,7 @@ int open_debug_log(void) {
  *
  *  @return Return true on success.
  */
-int close_debug_log(void) {
+int close_debug_log() {
   return (OK);
 }
 

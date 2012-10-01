@@ -250,27 +250,27 @@ int main(int argc, char* argv[]) {
       c = getopt(argc, argv, "+hVLc:s:");
 #endif // getopt_long() or getopt()
       if (c == -1)
-        break ;
+        break;
 
       // Process flag.
       switch (c) {
       case 'h':
         display_help = true;
-        break ;
+        break;
       case 'L':
       case 'V':
         display_license = true;
-        break ;
+        break;
       case 'c':
-        delete [] main_config_file;
+        delete[] main_config_file;
         main_config_file = NULL;
         main_config_file = my_strdup(optarg);
-        break ;
+        break;
       case 's':
-        delete [] stats_file;
+        delete[] stats_file;
         stats_file = NULL;
         stats_file = my_strdup(optarg);
-        break ;
+        break;
       default:
         error = true;
       }
@@ -354,17 +354,17 @@ int main(int argc, char* argv[]) {
   }
 
   // Cleanup.
-  delete [] main_config_file;
+  delete[] main_config_file;
   main_config_file = NULL;
-  delete [] stats_file;
+  delete[] stats_file;
   stats_file = NULL;
-  delete [] status_file;
+  delete[] status_file;
   status_file = NULL;
 
   return (retval);
 }
 
-int display_stats(void) {
+int display_stats() {
   time_t current_time;
   unsigned long time_difference;
   int days;
@@ -542,7 +542,7 @@ int display_stats(void) {
   return (OK);
 }
 
-int read_config_file(void) {
+int read_config_file() {
   char temp_buffer[MAX_INPUT_BUFFER];
   FILE* fp;
   char* var;
@@ -578,7 +578,7 @@ int read_config_file(void) {
   return (OK);
 }
 
-int read_status_file(void) {
+int read_status_file() {
   char temp_buffer[MAX_INPUT_BUFFER];
   FILE* fp = NULL;
   int data_type = STATUS_NO_DATA;
@@ -1082,7 +1082,7 @@ int read_status_file(void) {
   return (OK);
 }
 
-int read_stats_file(void) {
+int read_stats_file() {
   char temp_buffer[MAX_INPUT_BUFFER];
   FILE* fp = NULL;
   char* var = NULL;
@@ -1447,14 +1447,16 @@ void strip(char* buffer) {
       buffer[z - x] = buffer[z];
     buffer[y - x] = '\x0';
   }
+  return;
 }
 
 /* get days, hours, minutes, and seconds from a raw time_t format or total seconds */
-void get_time_breakdown(unsigned long raw_time,
-			int* days,
-			int* hours,
-                        int* minutes,
-			int* seconds) {
+void get_time_breakdown(
+       unsigned long raw_time,
+       int* days,
+       int* hours,
+       int* minutes,
+       int* seconds) {
   unsigned long temp_time;
   int temp_days;
   int temp_hours;
@@ -1475,6 +1477,7 @@ void get_time_breakdown(unsigned long raw_time,
   *hours = temp_hours;
   *minutes = temp_minutes;
   *seconds = temp_seconds;
+  return;
 }
 
 char* my_strdup(char const* str) {

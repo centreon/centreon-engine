@@ -41,6 +41,7 @@ applier::logging& applier::logging::instance() {
 void applier::logging::load() {
   if (!_instance)
     _instance = new applier::logging;
+  return;
 }
 
 /**
@@ -49,6 +50,7 @@ void applier::logging::load() {
 void applier::logging::unload() {
   delete _instance;
   _instance = NULL;
+  return;
 }
 
 /**
@@ -87,8 +89,7 @@ void applier::logging::apply(state const& config) {
            || (config.get_debug_level() != _debug_level)
            || (config.get_debug_verbosity() != _debug_verbosity))
     _add_debug(config);
-
-  return ;
+  return;
 }
 
 /**
@@ -218,6 +219,7 @@ void applier::logging::_add_stdout() {
                                         engine::logging::most);
     _stdout_id = engine::logging::engine::instance().add_object(info);
   }
+  return;
 }
 
 /**
@@ -237,6 +239,7 @@ void applier::logging::_add_stderr() {
                                         engine::logging::most);
     _stderr_id = engine::logging::engine::instance().add_object(info);
   }
+  return;
 }
 /**
  *  Add syslog object logging.
@@ -249,6 +252,7 @@ void applier::logging::_add_syslog() {
                                        engine::logging::log_all,
                                        engine::logging::basic);
   _syslog_id = engine::logging::engine::instance().add_object(info);
+  return;
 }
 
 /**
@@ -265,6 +269,7 @@ void applier::logging::_add_log_file(state const& config) {
                                       engine::logging::log_all,
                                       engine::logging::most);
   _log_id = engine::logging::engine::instance().add_object(info);
+  return;
 }
 
 /**
@@ -281,7 +286,7 @@ void applier::logging::_add_debug(state const& config) {
                                       config.get_debug_level(),
                                       config.get_debug_verbosity());
   _debug_id = engine::logging::engine::instance().add_object(info);
-  return ;
+  return;
 }
 
 /**
@@ -292,7 +297,7 @@ void applier::logging::_del_syslog() {
     engine::logging::engine::instance().remove_object(_syslog_id);
     _syslog_id = 0;
   }
-  return ;
+  return;
 }
 
 /**
@@ -303,7 +308,7 @@ void applier::logging::_del_log_file() {
     engine::logging::engine::instance().remove_object(_log_id);
     _log_id = 0;
   }
-  return ;
+  return;
 }
 
 /**
@@ -314,7 +319,7 @@ void applier::logging::_del_debug() {
     engine::logging::engine::instance().remove_object(_debug_id);
     _debug_id = 0;
   }
-  return ;
+  return;
 }
 
 /**
@@ -325,7 +330,7 @@ void applier::logging::_del_stdout() {
     engine::logging::engine::instance().remove_object(_stdout_id);
     _stdout_id = 0;
   }
-  return ;
+  return;
 }
 
 /**
@@ -336,5 +341,5 @@ void applier::logging::_del_stderr() {
     engine::logging::engine::instance().remove_object(_stderr_id);
     _stderr_id = 0;
   }
-  return ;
+  return;
 }

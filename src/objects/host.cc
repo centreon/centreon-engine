@@ -44,36 +44,39 @@ static void _schedule_host(host* hst);
  *
  *  @see com::centreon::engine::objects::link
  */
-bool link_host(host* obj,
-               host** parents,
-               contact** contacts,
-               contactgroup** contactgroups,
-               hostgroup** hostgroups,
-               char** custom_variables,
-               int initial_state,
-               timeperiod* check_period,
-               timeperiod* notification_period,
-               command* cmd_event_handler,
-               command* cmd_check_command) {
+bool link_host(
+       host* obj,
+       host** parents,
+       contact** contacts,
+       contactgroup** contactgroups,
+       hostgroup** hostgroups,
+       char** custom_variables,
+       int initial_state,
+       timeperiod* check_period,
+       timeperiod* notification_period,
+       command* cmd_event_handler,
+       command* cmd_check_command) {
   try {
-    objects::link(obj,
-                  tab2vec(parents),
-                  tab2vec(contacts),
-                  tab2vec(contactgroups),
-                  tab2vec(hostgroups),
-                  tab2vec(custom_variables),
-                  initial_state,
-                  check_period,
-                  notification_period,
-                  cmd_event_handler,
-                  cmd_check_command);
+    objects::link(
+               obj,
+               tab2vec(parents),
+               tab2vec(contacts),
+               tab2vec(contactgroups),
+               tab2vec(hostgroups),
+               tab2vec(custom_variables),
+               initial_state,
+               check_period,
+               notification_period,
+               cmd_event_handler,
+               cmd_check_command);
   }
   catch (std::exception const& e) {
     logger(log_runtime_error, basic) << e.what();
     return (false);
   }
   catch (...) {
-    logger(log_runtime_error, basic) << __func__ << " unknow exception";
+    logger(log_runtime_error, basic)
+      << __func__ << " unknow exception";
     return (false);
   }
   return (true);
@@ -92,8 +95,10 @@ void release_host(host const* obj) {
     logger(log_runtime_error, basic) << e.what();
   }
   catch (...) {
-    logger(log_runtime_error, basic) << __func__ << " unknow exception";
+    logger(log_runtime_error, basic)
+      << __func__ << " unknow exception";
   }
+  return;
 }
 
 /**
@@ -112,17 +117,18 @@ void release_host(host const* obj) {
  *  @param[in]     cmd_event_handler   Set host event handler command.
  *  @param[in]     cmd_check_command   Set host check command.
  */
-void objects::link(host* obj,
-                   std::vector<host*> const& parents,
-                   std::vector<contact*> const& contacts,
-                   std::vector<contactgroup*> const& contactgroups,
-                   std::vector<hostgroup*> const& hostgroups,
-                   std::vector<std::string> const& custom_variables,
-                   int initial_state,
-                   timeperiod* check_period,
-                   timeperiod* notification_period,
-                   command* cmd_event_handler,
-                   command* cmd_check_command) {
+void objects::link(
+                host* obj,
+                std::vector<host*> const& parents,
+                std::vector<contact*> const& contacts,
+                std::vector<contactgroup*> const& contactgroups,
+                std::vector<hostgroup*> const& hostgroups,
+                std::vector<std::string> const& custom_variables,
+                int initial_state,
+                timeperiod* check_period,
+                timeperiod* notification_period,
+                command* cmd_event_handler,
+                command* cmd_check_command) {
   // check object contents.
   if (obj == NULL)
     throw (engine_error() << "host is a NULL pointer.");
@@ -134,11 +140,14 @@ void objects::link(host* obj,
 
   // update timeperiod pointer.
   if ((obj->check_period_ptr = check_period) == NULL)
-    throw (engine_error() << "host '" << obj->name << "' invalid check period.");
+    throw (engine_error()
+           << "host '" << obj->name << "' invalid check period.");
 
   // update timeperiod pointer.
   if ((obj->notification_period_ptr = notification_period) == NULL)
-    throw (engine_error() << "host '" << obj->name << "' invalid notification period.");
+    throw (engine_error()
+           << "host '" << obj->name
+           << "' invalid notification period.");
 
   // update command pointer.
   obj->event_handler_ptr = cmd_event_handler;
@@ -148,28 +157,38 @@ void objects::link(host* obj,
 
   // add host parents.
   if (add_hosts_to_object(parents, &obj->parent_hosts) == false)
-    throw (engine_error() << "host '" << obj->name << "' invalid parent.");
+    throw (engine_error()
+           << "host '" << obj->name << "' invalid parent.");
 
   // add host childs.
-  for (hostsmember* member = obj->parent_hosts; member != NULL; member = member->next)
+  for (hostsmember* member = obj->parent_hosts;
+       member != NULL;
+       member = member->next)
     add_child_link_to_host(member->host_ptr, obj);
 
-  if (add_custom_variables_to_object(custom_variables,
-                                     &obj->custom_variables) == false)
-    throw (engine_error() << "host '" << obj->name << "' invalid custom variable.");
+  if (add_custom_variables_to_object(
+        custom_variables,
+        &obj->custom_variables) == false)
+    throw (engine_error()
+           << "host '" << obj->name << "' invalid custom variable.");
 
   if (add_contacts_to_object(contacts, &obj->contacts) == false)
-    throw (engine_error() << "host '" << obj->name << "' invalid contact.");
+    throw (engine_error()
+           << "host '" << obj->name << "' invalid contact.");
 
-  if (add_contactgroups_to_object(contactgroups, &obj->contact_groups) == false)
-    throw (engine_error() << "host '" << obj->name << "' invalid contact groups.");
+  if (add_contactgroups_to_object(
+        contactgroups,
+        &obj->contact_groups) == false)
+    throw (engine_error()
+           << "host '" << obj->name << "' invalid contact groups.");
 
-  for (std::vector<hostgroup*>::const_iterator it = hostgroups.begin(),
-         end = hostgroups.end();
+  for (std::vector<hostgroup*>::const_iterator
+         it = hostgroups.begin(), end = hostgroups.end();
        it != end;
        ++it) {
     if (*it == NULL)
-      throw (engine_error() << "host '" << obj->name << "' invalid hostgroup.");
+      throw (engine_error()
+             << "host '" << obj->name << "' invalid hostgroup.");
     add_object_to_objectlist(&obj->hostgroups_ptr, *it);
   }
 
@@ -177,6 +196,7 @@ void objects::link(host* obj,
   _schedule_host(obj);
 
   // host services are update by add service.
+  return;
 }
 
 /**
@@ -258,6 +278,7 @@ void objects::release(host const* obj) {
   // notification_period_ptr not free.
 
   delete obj;
+  return;
 }
 
 /**
@@ -268,13 +289,14 @@ void objects::release(host const* obj) {
  *
  *  @return True if insert sucessfuly, false otherwise.
  */
-bool objects::add_hosts_to_object(std::vector<host*> const& hosts,
-                                  hostsmember** list_host) {
+bool objects::add_hosts_to_object(
+                std::vector<host*> const& hosts,
+                hostsmember** list_host) {
   if (list_host == NULL)
     return (false);
 
-  for (std::vector<host*>::const_iterator it = hosts.begin(),
-         end = hosts.end();
+  for (std::vector<host*>::const_iterator
+         it = hosts.begin(), end = hosts.end();
        it != end;
        ++it) {
     if (*it == NULL)
@@ -295,7 +317,8 @@ bool objects::add_hosts_to_object(std::vector<host*> const& hosts,
 }
 
 static void _update_schedule_info(host const* hst) {
-  logger(dbg_events, most) << "Determining host scheduling parameters.";
+  logger(dbg_events, most)
+    << "Determining host scheduling parameters.";
 
   if (hst == NULL)
     return;
@@ -310,7 +333,8 @@ static void _update_schedule_info(host const* hst) {
     scheduling_info.last_host_check = hst->next_check;
 
   scheduling_info.host_check_interval_total
-    += (unsigned long)(hst->check_interval * config->get_interval_length());
+    += (unsigned long)(hst->check_interval
+                       * config->get_interval_length());
   scheduling_info.average_services_per_host
     = (double)scheduling_info.total_services
     / (double)scheduling_info.total_hosts;
@@ -333,11 +357,12 @@ static void _update_schedule_info(host const* hst) {
       = (double)scheduling_info.average_host_check_interval
       / (double)scheduling_info.total_scheduled_hosts;
 
-    scheduling_info.host_inter_check_delay = scheduling_info.average_host_inter_check_delay;
+    scheduling_info.host_inter_check_delay
+      = scheduling_info.average_host_inter_check_delay;
 
     // calculate max inter check delay and see if we should use that instead.
-    double max_inter_check_delay =
-      (double)(scheduling_info.max_host_check_spread * 60.0)
+    double max_inter_check_delay
+      = (double)(scheduling_info.max_host_check_spread * 60.0)
       / (double)scheduling_info.total_scheduled_hosts;
     if (scheduling_info.host_inter_check_delay > max_inter_check_delay)
       scheduling_info.host_inter_check_delay = max_inter_check_delay;
@@ -348,25 +373,30 @@ static void _update_schedule_info(host const* hst) {
       << "Average host check interval: " << scheduling_info.average_host_check_interval << " sec\n"
       << "Host inter-check delay:      " << scheduling_info.host_inter_check_delay << " sec";
   }
+  return;
 }
 
 static void _schedule_host(host* hst) {
   if (hst == NULL) {
-    logger(dbg_events, most) << "Scheduling host. Host pointer is NULL.";
+    logger(dbg_events, most)
+      << "Scheduling host. Host pointer is NULL.";
     return;
   }
 
-  logger(dbg_events, most) << "Scheduling host '" << hst->name << "'.";
+  logger(dbg_events, most)
+    << "Scheduling host '" << hst->name << "'.";
 
   // skip host that shouldn't be scheduled.
   if (hst->should_be_scheduled == false) {
-    logger(dbg_events, most) << "Host check should not be scheduled.";
+    logger(dbg_events, most)
+      << "Host check should not be scheduled.";
     return;
   }
 
   // skip host are already scheduled.
   if (hst->next_check != 0) {
-    logger(dbg_events, most) << "Host is already scheduled.";
+    logger(dbg_events, most)
+      << "Host is already scheduled.";
     return;
   }
 
@@ -374,17 +404,24 @@ static void _schedule_host(host* hst) {
   hst->next_check = time(NULL);
 
   logger(dbg_events, most)
-    << "Preferred check time: " << hst->next_check << " --> " << ctime(&hst->next_check);
+    << "Preferred check time: " << hst->next_check
+    << " --> " << ctime(&hst->next_check);
 
   // check if the current time is ok.
-  if (check_time_against_period(hst->next_check, hst->check_period_ptr) == ERROR) {
+  if (check_time_against_period(
+        hst->next_check,
+        hst->check_period_ptr) == ERROR) {
     time_t valid_time = 0L;
-    get_next_valid_time(hst->next_check, &valid_time, hst->check_period_ptr);
+    get_next_valid_time(
+      hst->next_check,
+      &valid_time,
+      hst->check_period_ptr);
     hst->next_check = valid_time;
   }
 
   logger(dbg_events, most)
-    << "Actual check time: " << hst->next_check << " --> " << ctime(&hst->next_check);
+    << "Actual check time: " << hst->next_check
+    << " --> " << ctime(&hst->next_check);
 
   // update scheduling info.
   _update_schedule_info(hst);
@@ -400,14 +437,16 @@ static void _schedule_host(host* hst) {
     return;
 
   // add scheduled host checks to event queue.
-  schedule_new_event(EVENT_HOST_CHECK,
-                     false,
-                     hst->next_check,
-                     false,
-                     0,
-                     NULL,
-                     true,
-                     (void*)hst,
-                     NULL,
-                     hst->check_options);
+  schedule_new_event(
+    EVENT_HOST_CHECK,
+    false,
+    hst->next_check,
+    false,
+    0,
+    NULL,
+    true,
+    (void*)hst,
+    NULL,
+    hst->check_options);
+  return;
 }
