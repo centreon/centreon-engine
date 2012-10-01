@@ -623,10 +623,6 @@ if (WITH_TESTING)
 endif ()
 
 # Configure files.
-configure_file("${PROJECT_SOURCE_DIR}/build/doc/Doxyfile.in"
-  "${PROJECT_SOURCE_DIR}/build/doc/Doxyfile")
-configure_file("${PROJECT_SOURCE_DIR}/build/doc/header.tex.in"
-  "${PROJECT_SOURCE_DIR}/build/doc/header.tex")
 configure_file("${INC_DIR}/compatibility/common.h.in"
   "${INC_DIR}/compatibility/common.h")
 
@@ -720,7 +716,6 @@ add_subdirectory("conf")
 add_subdirectory("configuration")
 add_subdirectory("commands")
 add_subdirectory("compatibility")
-add_subdirectory("doc")
 add_subdirectory("events")
 add_subdirectory("logging")
 add_subdirectory("macros")
