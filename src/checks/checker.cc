@@ -378,14 +378,13 @@ void checker::run(
 
   try {
     // Run command.
+    concurrency::locker lock(&_mut_id);
     unsigned long id(cmd->run(
                             processed_cmd,
                             macros,
                             config->get_host_check_timeout()));
-    if (id != 0) {
-      concurrency::locker lock(&_mut_id);
+    if (id != 0)
       _list_id[id] = check_result_info;
-    }
   }
   catch (std::exception const& e) {
     timestamp now(timestamp::now());
@@ -592,14 +591,13 @@ void checker::run(
 
   try {
     // Run command.
+    concurrency::locker lock(&_mut_id);
     unsigned long id(cmd->run(
                             processed_cmd,
                             macros,
                             config->get_service_check_timeout()));
-    if (id != 0) {
-      concurrency::locker lock(&_mut_id);
+    if (id != 0)
       _list_id[id] = check_result_info;
-    }
   }
   catch (std::exception const& e) {
     timestamp now(timestamp::now());
