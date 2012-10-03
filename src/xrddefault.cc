@@ -27,6 +27,7 @@
 #include <string>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <unistd.h>
 #include "com/centreon/engine/comments.hh"
 #include "com/centreon/engine/common.hh"
 #include "com/centreon/engine/downtime.hh"
