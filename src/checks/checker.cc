@@ -83,7 +83,7 @@ void checker::push_check_result(check_result const& result) {
  */
 void checker::reap() {
   logger(dbg_functions, basic)
-    << "checker::reap"
+    << "checker::reap";
   logger(dbg_checks, basic)
     << "Starting to reap check results.";
 
