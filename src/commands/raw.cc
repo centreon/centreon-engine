@@ -260,6 +260,7 @@ void raw::finished(process& p) throw () {
     logger(dbg_commands, basic)
       << "raw::finished: process=" << &p;
 
+    unsigned long command_id(0);
     {
       concurrency::locker lock(&_lock);
       // Find process from the busy list.
@@ -276,7 +277,7 @@ void raw::finished(process& p) throw () {
         return;
       }
       // Get command_id and remove the process from the busy list.
-      unsigned long command_id(it->second);
+      command_id = it->second;
       _processes_busy.erase(it);
     }
 
