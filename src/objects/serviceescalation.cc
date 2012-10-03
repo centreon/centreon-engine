@@ -54,7 +54,7 @@ bool link_serviceescalation(
   }
   catch (...) {
     logger(log_runtime_error, basic)
-      << __func__ << " unknow exception";
+      << "link_serviceescalation: unknow exception";
     return (false);
   }
   return (true);
@@ -74,7 +74,7 @@ void release_serviceescalation(serviceescalation const* obj) {
   }
   catch (...) {
     logger(log_runtime_error, basic)
-      << __func__ << " unknow exception";
+      << "release_serviceescalation: unknow exception";
   }
   return;
 }

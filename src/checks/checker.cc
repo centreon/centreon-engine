@@ -83,7 +83,7 @@ void checker::push_check_result(check_result const& result) {
  */
 void checker::reap() {
   logger(dbg_functions, basic)
-    << "start " << __func__;
+    << "checker::reap"
   logger(dbg_checks, basic)
     << "Starting to reap check results.";
 
@@ -174,8 +174,6 @@ void checker::reap() {
   // Reaping finished.
   logger(dbg_checks, basic)
     << "Finished reaping " << reaped_checks << " check results";
-  logger(dbg_functions, basic)
-    << "end " << __func__;
   return;
 }
 
@@ -210,9 +208,14 @@ void checker::run(
                 bool reschedule_check,
                 int* time_is_valid,
                 time_t* preferred_time) {
-  // Preamble.
   logger(dbg_functions, basic)
-    << "start " << __func__;
+    << "checker::run: hst=" << hst
+    << ", check_options=" << check_options
+    << ", latency=" << latency
+    << ", scheduled_check=" << scheduled_check
+    << ", reschedule_check=" << reschedule_check;
+
+  // Preamble.
   if (!hst)
     throw (engine_error() << "attempt to run check on NULL host");
   if (!hst->check_command_ptr)
@@ -408,8 +411,6 @@ void checker::run(
 
   // Cleanup.
   clear_volatile_macros_r(&macros);
-  logger(dbg_functions, basic)
-    << "end " << __func__;
   return;
 }
 
@@ -434,9 +435,14 @@ void checker::run(
                 bool reschedule_check,
                 int* time_is_valid,
                 time_t* preferred_time) {
-  // Preamble.
   logger(dbg_functions, basic)
-    << "start " << __func__;
+    << "checker::run: svc=" << svc
+    << ", check_options=" << check_options
+    << ", latency=" << latency
+    << ", scheduled_check=" << scheduled_check
+    << ", reschedule_check=" << reschedule_check;
+
+  // Preamble.
   if (!svc)
     throw (engine_error() << "attempt to run check on NULL service");
   else if (!svc->host_ptr)
@@ -621,8 +627,6 @@ void checker::run(
 
   // Cleanup.
   clear_volatile_macros_r(&macros);
-  logger(dbg_functions, basic)
-    << "end " << __func__;
   return;
 }
 
@@ -641,9 +645,13 @@ void checker::run_sync(
                 int check_options,
                 int use_cached_result,
                 unsigned long check_timestamp_horizon) {
-  // Preamble.
   logger(dbg_functions, basic)
-    << "start " << __func__;
+    << "checker::run: hst=" << hst
+    << ", check_options=" << check_options
+    << ", use_cached_result=" << use_cached_result
+    << ", check_timestamp_horizon=" << check_timestamp_horizon;
+
+  // Preamble.
   if (!hst)
     throw (engine_error() << "host pointer is NULL.");
   logger(dbg_checks, basic)
@@ -799,8 +807,6 @@ void checker::run_sync(
     NULL);
 
   // End.
-  logger(dbg_functions, basic)
-    << "end " << __func__;
   return;
 }
 
@@ -871,7 +877,7 @@ checker& checker::operator=(checker const& right) {
 void checker::finished(commands::result const& res) throw () {
   // Debug message.
   logger(dbg_functions, basic)
-    << "start " << __func__;
+    << "checker::finished: res=" << &res;
 
   // Find check result.
   check_result result;
@@ -903,14 +909,8 @@ void checker::finished(commands::result const& res) throw () {
   result.output = my_strdup(res.output.c_str());
 
   // Queue check result.
-  {
-    concurrency::locker lock(&_mut_reap);
-    _to_reap.push(result);
-  }
-
-  // Debug message.
-  logger(dbg_functions, basic)
-    << "end " << __func__;
+  concurrency::locker lock(&_mut_reap);
+  _to_reap.push(result);
   return;
 }
 
@@ -922,9 +922,10 @@ void checker::finished(commands::result const& res) throw () {
  *  @result Return if the host is up (HOST_UP) or host down (HOST_DOWN).
  */
 int checker::_execute_sync(host* hst) {
-  // Preamble.
   logger(dbg_functions, basic)
-    << "start " << __func__;
+    << "checker::_execute_sync: hst=" << hst;
+
+  // Preamble.
   if (!hst)
     throw (engine_error() << "host pointer is NULL.");
   logger(dbg_checks, basic)
@@ -1191,8 +1192,6 @@ int checker::_execute_sync(host* hst) {
   // Termination.
   logger(dbg_checks, basic)
     << "** Sync host check done: state=" << return_result;
-  logger(dbg_functions, basic)
-    << "end " << __func__;
   return (return_result);
 }
 

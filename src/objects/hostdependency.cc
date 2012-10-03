@@ -45,7 +45,7 @@ bool link_hostdependency(
   }
   catch (...) {
     logger(log_runtime_error, basic)
-      << __func__ << " unknow exception";
+      << "link_hostdependency: unknow exception";
     return (false);
   }
   return (true);
@@ -65,7 +65,7 @@ void release_hostdependency(hostdependency const* obj) {
   }
   catch (...) {
     logger(log_runtime_error, basic)
-      << __func__ << " unknow exception";
+      << "release_hostdependency: unknow exception";
   }
   return;
 }

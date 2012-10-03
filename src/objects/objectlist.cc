@@ -37,7 +37,7 @@ void release_objectlist(objectlist const* obj) {
   }
   catch (...) {
     logger(log_runtime_error, basic)
-      << __func__ << " unknow exception";
+      << "release_objectlist: unknow exception";
   }
   return;
 }

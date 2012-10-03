@@ -54,7 +54,7 @@ bool link_hostescalation(
   }
   catch (...) {
     logger(log_runtime_error, basic)
-      << __func__ << " unknow exception";
+      << "link_hostescalation: unknow exception";
     return (false);
   }
   return (true);
@@ -74,7 +74,7 @@ void release_hostescalation(hostescalation const* obj) {
   }
   catch (...) {
     logger(log_runtime_error, basic)
-      << __func__ << " unknow exception";
+      << "release_hostescalation: unknow exception";
   }
   return;
 }

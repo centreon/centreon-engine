@@ -38,7 +38,7 @@ contactsmember const* release_contactsmember(
   }
   catch (...) {
     logger(log_runtime_error, basic)
-      << __func__ << " unknow exception";
+      << "release_contactsmember: unknow exception";
   }
   return (NULL);
 }

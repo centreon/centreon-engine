@@ -137,18 +137,20 @@ unsigned long connector::run(
     << "connector::run: id=" << command_id;
 
   try {
-    concurrency::locker lock(&_lock);
-
     // Connector start if is necessary.
     _connector_start();
 
-    // Send check to the connector.
-    _send_query_execute(
-      info->processed_cmd,
-      command_id,
-      info->start_time,
-      info->timeout);
-    _queries[command_id] = info;
+    {
+      concurrency::locker lock(&_lock);
+      // Send check to the connector.
+      _send_query_execute(
+        info->processed_cmd,
+        command_id,
+        info->start_time,
+        info->timeout);
+      _queries[command_id] = info;
+    }
+
     logger(dbg_commands, basic)
       << "connector::run: start command success: id=" << command_id;
   }
@@ -190,18 +192,20 @@ void connector::run(
   logger(dbg_commands, basic)
     << "connector::run: id=" << command_id;
 
-  concurrency::locker lock(&_lock);
   try {
     // Connector start if is necessary.
     _connector_start();
 
-    // Send check to the connector.
-    _send_query_execute(
-      info->processed_cmd,
-      command_id,
-      info->start_time,
-      info->timeout);
-    _queries[command_id] = info;
+    {
+      concurrency::locker lock(&_lock);
+      // Send check to the connector.
+      _send_query_execute(
+        info->processed_cmd,
+        command_id,
+        info->start_time,
+        info->timeout);
+      _queries[command_id] = info;
+    }
 
     logger(dbg_commands, basic)
       << "connector::run: start command success: id=" << command_id;
@@ -213,8 +217,8 @@ void connector::run(
   }
 
   // Waiting result.
+  concurrency::locker lock(&_lock);
   while (true) {
-    _cv_query.wait(&_lock);
     umap<unsigned long, result>::iterator
       it(_results.find(command_id));
     if (it != _results.end()) {
@@ -222,6 +226,7 @@ void connector::run(
       _results.erase(it);
       break;
     }
+    _cv_query.wait(&_lock);
   }
   return;
 }
@@ -252,21 +257,26 @@ void connector::data_is_available(process& p) throw () {
     std::string data;
     p.read(data);
 
-    concurrency::locker lock(&_lock);
+    // concurrency::locker lock(&_lock);
 
     // Split outpout into queries responses.
     std::list<std::string> responses;
     {
       std::string ending(_query_ending());
       ending.append("\0", 1);
-      _data_available.append(data);
-      while (_data_available.size() > 0) {
-        size_t pos(_data_available.find(ending));
-        if (pos == std::string::npos)
-          break;
-        responses.push_back(_data_available.substr(0, pos));
-        _data_available.erase(0, pos + ending.size());
+
+      {
+        concurrency::locker lock(&_lock);
+        _data_available.append(data);
+        while (_data_available.size() > 0) {
+          size_t pos(_data_available.find(ending));
+          if (pos == std::string::npos)
+            break;
+          responses.push_back(_data_available.substr(0, pos));
+          _data_available.erase(0, pos + ending.size());
+        }
       }
+
       logger(dbg_commands, basic)
         << "connector::data_is_available: responses.size="
         << responses.size();
@@ -318,7 +328,6 @@ void connector::data_is_available_err(process& p) throw () {
  *  @param[in] p  The process to finished.
  */
 void connector::finished(process& p) throw () {
-  (void)p;
   logger(dbg_commands, basic)
     << "connector::finished: process=" << &p;
 
@@ -342,9 +351,13 @@ void connector::_connector_close() {
     // Exit if connector is not running.
     if (!_is_running)
       return;
+  }
 
-    logger(dbg_commands, basic)
-      << "connector::_connector_close: process=" << &_process;
+  logger(dbg_commands, basic)
+    << "connector::_connector_close: process=" << &_process;
+
+  {
+    concurrency::locker lock(&_lock);
 
     // Set variable to dosn't restart connector.
     _try_to_restart = false;
@@ -374,55 +387,70 @@ void connector::_connector_close() {
  *  Start connection with the process.
  */
 void connector::_connector_start() {
-  // Exit if connector is running.
-  if (_is_running)
-    return;
+  {
+    concurrency::locker lock(&_lock);
 
-  if (!_try_to_restart)
-    throw (engine_error() << "restart failed");
+    // Exit if connector is running.
+    if (_is_running)
+      return;
+
+    if (!_try_to_restart)
+      throw (engine_error() << "restart failed");
+  }
 
   logger(dbg_commands, basic)
     << "connector::_connector_start: process=" << &_process;
 
-  // Reset variables.
-  _query_quit_ok = false;
-  _query_version_ok = false;
-  _is_running = false;
+  {
+    concurrency::locker lock(&_lock);
+
+    // Reset variables.
+    _query_quit_ok = false;
+    _query_version_ok = false;
+    _is_running = false;
+  }
 
   // Start connector execution.
   _process.exec(_command_line);
 
-  // Ask connector version.
-  _send_query_version();
+  {
+    concurrency::locker lock(&_lock);
 
-  // Waiting connector version, or 1 seconds.
-  bool is_timeout(!_cv_query.wait(&_lock, 1000));
-  if (is_timeout || !_query_version_ok) {
-    _process.kill();
-    _try_to_restart = false;
-    throw (engine_error() << "query version failed");
+    // Ask connector version.
+    _send_query_version();
+
+    // Waiting connector version, or 1 seconds.
+    bool is_timeout(!_cv_query.wait(&_lock, 1000));
+    if (is_timeout || !_query_version_ok) {
+      _process.kill();
+      _try_to_restart = false;
+      throw (engine_error() << "query version failed");
+    }
+    _is_running = true;
   }
-  _is_running = true;
 
   logger(log_info_message, basic)
     << "connector '" << _name << "' start";
 
-  logger(dbg_commands, basic)
-    << "connector::_connector_start: resend queries: queries.size="
-    << _queries.size();
+  {
+    concurrency::locker lock(&_lock);
+    logger(dbg_commands, basic)
+      << "connector::_connector_start: resend queries: queries.size="
+      << _queries.size();
 
-  // Resend commands.
-  for (umap<unsigned long, shared_ptr<query_info> >::iterator
-         it(_queries.begin()), end(_queries.end());
-       it != end;
-       ++it) {
-    unsigned long command_id(it->first);
-    shared_ptr<query_info> info(it->second);
-    _send_query_execute(
-      info->processed_cmd,
-      command_id,
-      info->start_time,
-      info->timeout);
+    // Resend commands.
+    for (umap<unsigned long, shared_ptr<query_info> >::iterator
+           it(_queries.begin()), end(_queries.end());
+         it != end;
+         ++it) {
+      unsigned long command_id(it->first);
+      shared_ptr<query_info> info(it->second);
+      _send_query_execute(
+        info->processed_cmd,
+        command_id,
+        info->start_time,
+        info->timeout);
+    }
   }
   return;
 }
@@ -532,19 +560,24 @@ void connector::_recv_query_execute(char const* data) {
     logger(dbg_commands, basic)
       << "connector::_recv_query_execute: id=" << command_id;
 
-    // Get query information with the command_id.
-    umap<unsigned long, shared_ptr<query_info> >::iterator
-      it(_queries.find(command_id));
-    if (it == _queries.end()) {
-      logger(dbg_commands, basic)
-        << "recv query failed: command_id(" << command_id << ") "
-        "not found into queries";
-      return;
+    shared_ptr<query_info> info;
+    {
+      concurrency::locker lock(&_lock);
+
+      // Get query information with the command_id.
+      umap<unsigned long, shared_ptr<query_info> >::iterator
+        it(_queries.find(command_id));
+      if (it == _queries.end()) {
+        logger(dbg_commands, basic)
+          << "recv query failed: command_id(" << command_id << ") "
+          "not found into queries";
+        return;
+      }
+      // Get data.
+      info = it->second;
+      // Remove query from queries.
+      _queries.erase(it);
     }
-    // Get data.
-    shared_ptr<query_info> info(it->second);
-    // Remove query from queries.
-    _queries.erase(it);
 
     // Initialize result.
     result res;
@@ -591,6 +624,7 @@ void connector::_recv_query_execute(char const* data) {
         (_listener->finished)(res);
     }
     else {
+      concurrency::locker lock(&_lock);
       // Push result into list of results.
       _results[command_id] = res;
       _cv_query.wake_all();
@@ -613,6 +647,7 @@ void connector::_recv_query_quit(char const* data) {
   logger(dbg_commands, basic)
     << "connector::_recv_query_quit";
 
+  concurrency::locker lock(&_lock);
   _query_quit_ok = true;
   _cv_query.wake_all();
   return;
@@ -627,7 +662,7 @@ void connector::_recv_query_version(char const* data) {
   logger(dbg_commands, basic)
     << "connector::_recv_query_version";
 
-  _query_version_ok = false;
+  bool version_ok(false);
   try {
     // Parse query version response to get major and minor
     // engine version supported by the connector.
@@ -649,12 +684,15 @@ void connector::_recv_query_version(char const* data) {
     if (version[0] < CENTREON_ENGINE_VERSION_MAJOR
         || (version[0] == CENTREON_ENGINE_VERSION_MAJOR
             && version[1] <= CENTREON_ENGINE_VERSION_MINOR))
-      _query_version_ok = true;
+      version_ok = true;
   }
   catch (std::exception const& e) {
     logger(log_runtime_warning, basic)
       << "connector '" << _name << "': " << e.what();
   }
+
+  concurrency::locker lock(&_lock);
+  _query_version_ok = version_ok;
   _cv_query.wake_all();
   return;
 }
@@ -747,17 +785,24 @@ void connector::restart::_run() {
   if (!_c)
     return;
 
-  concurrency::locker lock(&_c->_lock);
   try {
     _c->_connector_start();
   }
   catch (std::exception const& e) {
     logger(log_runtime_warning, basic)
       << "connector '" << _c->_name << "' error: " << e.what();
-    _c->_try_to_restart = false;
+
+    umap<unsigned long, shared_ptr<query_info> > tmp_queries;
+    {
+      concurrency::locker lock(&_c->_lock);
+      _c->_try_to_restart = false;
+      tmp_queries = _c->_queries;
+      _c->_queries.clear();
+    }
+
     // Resend commands.
     for (umap<unsigned long, shared_ptr<query_info> >::iterator
-           it(_c->_queries.begin()), end(_c->_queries.end());
+           it(tmp_queries.begin()), end(tmp_queries.end());
          it != end;
          ++it) {
       unsigned long command_id(it->first);
@@ -787,12 +832,12 @@ void connector::restart::_run() {
           (_c->_listener->finished)(res);
       }
       else {
+        concurrency::locker lock(&_c->_lock);
         // Push result into list of results.
         _c->_results[command_id] = res;
         _c->_cv_query.wake_all();
       }
     }
-    _c->_queries.clear();
   }
   return;
 }

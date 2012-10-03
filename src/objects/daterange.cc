@@ -38,7 +38,7 @@ void release_daterange(daterange const* obj) {
   }
   catch (...) {
     logger(log_runtime_error, basic)
-      << __func__ << " unknow exception";
+      << "release_daterange: unknow exception";
   }
   return;
 }

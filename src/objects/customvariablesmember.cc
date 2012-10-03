@@ -39,7 +39,7 @@ customvariablesmember const* release_customvariablesmember(
   }
   catch (...) {
     logger(log_runtime_error, basic)
-      << __func__ << " unknow exception";
+      << "release_customvariablesmember: unknow exception";
   }
   return (NULL);
 }

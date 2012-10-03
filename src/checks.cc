@@ -2242,7 +2242,11 @@ int run_sync_host_check_3x(
       int use_cached_result,
       unsigned long check_timestamp_horizon) {
   logger(dbg_functions, basic)
-    << "start " << __func__;
+    << "run_sync_host_check_3x: hst=" << hst
+    << ", check_options=" << check_options
+    << ", use_cached_result=" << use_cached_result
+    << ", check_timestamp_horizon=" << check_timestamp_horizon;
+
   try {
     checks::checker::instance().run_sync(
                                   hst,
@@ -2256,9 +2260,6 @@ int run_sync_host_check_3x(
       << "error: " << e.what();
     return (ERROR);
   }
-
-  logger(dbg_functions, basic)
-    << "end " << __func__;
   return (OK);
 }
 

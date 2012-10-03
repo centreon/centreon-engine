@@ -51,7 +51,7 @@ bool link_servicegroup(
   }
   catch (...) {
     logger(log_runtime_error, basic)
-      << __func__ << " unknow exception";
+      << "link_servicegroup: unknow exception";
     return (false);
   }
   return (true);
@@ -71,7 +71,7 @@ void release_servicegroup(servicegroup const* obj) {
   }
   catch (...) {
     logger(log_runtime_error, basic)
-      << __func__ << " unknow exception";
+      << "release_servicegroup: unknow exception";
   }
   return;
 }

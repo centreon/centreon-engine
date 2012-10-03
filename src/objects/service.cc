@@ -72,7 +72,7 @@ bool link_service(
   }
   catch (...) {
     logger(log_runtime_error, basic)
-      << __func__ << " unknow exception";
+      << "link_service: unknow exception";
     return (false);
   }
   return (true);
@@ -92,7 +92,7 @@ void release_service(service const* obj) {
   }
   catch (...) {
     logger(log_runtime_error, basic)
-      << __func__ << " unknow exception";
+      << "release_service: unknow exception";
   }
   return;
 }

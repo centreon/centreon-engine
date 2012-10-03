@@ -76,7 +76,7 @@ bool link_host(
   }
   catch (...) {
     logger(log_runtime_error, basic)
-      << __func__ << " unknow exception";
+      << "link_host: unknow exception";
     return (false);
   }
   return (true);
@@ -96,7 +96,7 @@ void release_host(host const* obj) {
   }
   catch (...) {
     logger(log_runtime_error, basic)
-      << __func__ << " unknow exception";
+      << "release_host: unknow exception";
   }
   return;
 }

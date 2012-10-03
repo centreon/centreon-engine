@@ -38,7 +38,7 @@ servicesmember const* release_servicesmember(
   }
   catch (...) {
     logger(log_runtime_error, basic)
-      << __func__ << " unknow exception";
+      << "release_servicesmember: unknow exception";
   }
   return (NULL);
 }
