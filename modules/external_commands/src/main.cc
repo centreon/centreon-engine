@@ -19,6 +19,8 @@
 
 #include <exception>
 #include <stddef.h>
+#include <sys/types.h>
+#include <unistd.h>
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/error.hh"
 #include "com/centreon/engine/logging/logger.hh"
