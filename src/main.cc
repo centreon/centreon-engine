@@ -448,7 +448,7 @@ int main(int argc, char* argv[]) {
             NEBFLAG_PROCESS_INITIATED,
             NEBATTR_SHUTDOWN_ABNORMAL,
             NULL);
-          throw (engine_error ()
+          throw (engine_error()
                  << "Shutting down because of an early failure");
         }
 

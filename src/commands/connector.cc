@@ -369,12 +369,15 @@ void connector::_connector_close() {
     _send_query_quit();
 
     // Waiting connector quit, or 1 seconds.
-    bool is_timeout(!_cv_query.wait(&_lock, 1000));
+    bool is_timeout(!_cv_query.wait(
+                       &_lock,
+                       config->get_service_check_timeout()) * 1000);
     if (is_timeout || !_query_quit_ok) {
       _process.kill();
       logger(log_runtime_error, basic)
-        << "connector '" << _name << "' "
-        "query quit failed";
+        << "error: connector '" << _name
+        << "' connector close failed: "
+        << (is_timeout ? "timeout" : "bad query");
     }
   }
 
@@ -420,11 +423,15 @@ void connector::_connector_start() {
     _send_query_version();
 
     // Waiting connector version, or 1 seconds.
-    bool is_timeout(!_cv_query.wait(&_lock, 1000));
+    bool is_timeout(!_cv_query.wait(
+                       &_lock
+                       config->get_service_check_timeout()) * 1000);
     if (is_timeout || !_query_version_ok) {
       _process.kill();
       _try_to_restart = false;
-      throw (engine_error() << "query version failed");
+      if (is_timeout)
+        throw (engine_error() << "connector start failed: timeout");
+      throw (engine_error() << "connector start failed: bad version");
     }
     _is_running = true;
   }
