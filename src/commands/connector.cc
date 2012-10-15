@@ -371,7 +371,7 @@ void connector::_connector_close() {
     // Waiting connector quit, or 1 seconds.
     bool is_timeout(!_cv_query.wait(
                        &_lock,
-                       config->get_service_check_timeout()) * 1000);
+                       config->get_service_check_timeout() * 1000));
     if (is_timeout || !_query_quit_ok) {
       _process.kill();
       logger(log_runtime_error, basic)
@@ -424,8 +424,8 @@ void connector::_connector_start() {
 
     // Waiting connector version, or 1 seconds.
     bool is_timeout(!_cv_query.wait(
-                       &_lock
-                       config->get_service_check_timeout()) * 1000);
+                       &_lock,
+                       config->get_service_check_timeout() * 1000));
     if (is_timeout || !_query_version_ok) {
       _process.kill();
       _try_to_restart = false;
