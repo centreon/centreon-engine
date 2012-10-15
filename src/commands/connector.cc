@@ -306,7 +306,7 @@ void connector::data_is_available(process& p) throw () {
   }
   catch (std::exception const& e) {
     logger(log_runtime_warning, basic)
-      << "connector '" << _name << "' error: " << e.what();
+      << "warning: connector '" << _name << "' error: " << e.what();
   }
   return;
 }
@@ -505,25 +505,25 @@ void connector::_recv_query_error(char const* data) {
       // Information message.
     case 0:
       logger(log_info_message, basic)
-        << "connector '" << _name << "': " << message;
+        << "info: connector '" << _name << "': " << message;
       break;
 
       // Warning message.
     case 1:
       logger(log_runtime_warning, basic)
-        << "connector '" << _name << "': " << message;
+        << "warning: connector '" << _name << "': " << message;
       break;
 
       // Error message.
     case 2:
       logger(log_runtime_error, basic)
-        << "connector '" << _name << "': " << message;
+        << "error: connector '" << _name << "': " << message;
       break;
     }
   }
   catch (std::exception const& e) {
     logger(log_runtime_warning, basic)
-      << "connector '" << _name << "': " << e.what();
+      << "warning: connector '" << _name << "': " << e.what();
   }
   return;
 }
@@ -632,7 +632,7 @@ void connector::_recv_query_execute(char const* data) {
   }
   catch (std::exception const& e) {
     logger(log_runtime_warning, basic)
-      << "connector '" << _name << "': " << e.what();
+      << "warning: connector '" << _name << "': " << e.what();
   }
   return;
 }
@@ -688,7 +688,7 @@ void connector::_recv_query_version(char const* data) {
   }
   catch (std::exception const& e) {
     logger(log_runtime_warning, basic)
-      << "connector '" << _name << "': " << e.what();
+      << "warning: connector '" << _name << "': " << e.what();
   }
 
   concurrency::locker lock(&_lock);
@@ -790,7 +790,7 @@ void connector::restart::_run() {
   }
   catch (std::exception const& e) {
     logger(log_runtime_warning, basic)
-      << "connector '" << _c->_name << "' error: " << e.what();
+      << "warning: connector '" << _c->_name << "': " << e.what();
 
     umap<unsigned long, shared_ptr<query_info> > tmp_queries;
     {

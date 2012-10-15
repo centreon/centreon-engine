@@ -390,7 +390,7 @@ int main(int argc, char* argv[]) {
         }
         catch (std::exception const& e) {
           logger(log_info_message, basic)
-            << "event broker module initialization failed: "
+            << "error: event broker module initialization failed: "
             << e.what();
           result = ERROR;
         }

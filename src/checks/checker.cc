@@ -406,7 +406,7 @@ void checker::run(
     _to_reap.push(check_result_info);
 
     logger(log_runtime_warning, basic)
-      << "execute command failed: " << e.what();
+      << "error: execute command failed: " << e.what();
   }
 
   // Cleanup.
@@ -622,7 +622,7 @@ void checker::run(
     _to_reap.push(check_result_info);
 
     logger(log_runtime_warning, basic)
-      << "execute command failed: " << e.what();
+      << "error: execute command failed: " << e.what();
   }
 
   // Cleanup.
@@ -1062,7 +1062,7 @@ int checker::_execute_sync(host* hst) {
     res.start_time = res.end_time;
 
     logger(log_runtime_warning, basic)
-      << "execute command failed: " << e.what();
+      << "error: execute command failed: " << e.what();
   }
 
   // Get output.

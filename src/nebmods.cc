@@ -178,12 +178,12 @@ int neb_unload_all_modules(int flags, int reason) {
   }
   catch (std::exception const& e) {
     logger(log_runtime_error, basic)
-      << "module unloaded failed: " << e.what();
+      << "error: module unloaded failed: " << e.what();
     retval = ERROR;
   }
   catch (...) {
     logger(dbg_eventbroker, basic)
-      << "load all modules failed.";
+      << "error: load all modules failed.";
     retval = ERROR;
   }
   return (retval);

@@ -37,7 +37,7 @@ void release_timerange(timerange const* obj) {
   }
   catch (...) {
     logger(log_runtime_error, basic)
-      << "release_timerange: unknow exception";
+      << "error: release_timerange: unknow exception";
   }
   return;
 }

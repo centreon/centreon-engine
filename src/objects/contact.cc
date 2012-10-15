@@ -56,12 +56,12 @@ bool link_contact(
                tab2vec(custom_variables));
   }
   catch (std::exception const& e) {
-    logger(log_runtime_error, basic) << e.what();
+    logger(log_runtime_error, basic) << "error: " << e.what();
     return (false);
   }
   catch (...) {
     logger(log_runtime_error, basic)
-      << "link_contact: unknow exception";
+      << "error: link_contact: unknow exception";
     return (false);
   }
   return (true);
@@ -78,11 +78,11 @@ void release_contact(contact const* obj) {
     objects::release(obj);
   }
   catch (std::exception const& e) {
-    logger(log_runtime_error, basic) << e.what();
+    logger(log_runtime_error, basic) << "error: " << e.what();
   }
   catch (...) {
     logger(log_runtime_error, basic)
-      << "release_contact: unknow exception";
+      << "error: release_contact: unknow exception";
   }
   return;
 }

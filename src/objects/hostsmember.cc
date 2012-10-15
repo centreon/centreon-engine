@@ -33,11 +33,11 @@ hostsmember const* release_hostsmember(hostsmember const* obj) {
     return (objects::release(obj));
   }
   catch (std::exception const& e) {
-    logger(log_runtime_error, basic) << e.what();
+    logger(log_runtime_error, basic) << "error: " << e.what();
   }
   catch (...) {
     logger(log_runtime_error, basic)
-      << "release_hostsmember: unknow exception";
+      << "error: release_hostsmember: unknow exception";
   }
   return (NULL);
 }

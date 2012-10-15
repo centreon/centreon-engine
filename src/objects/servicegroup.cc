@@ -46,12 +46,12 @@ bool link_servicegroup(
                tab2vec(groups));
   }
   catch (std::exception const& e) {
-    logger(log_runtime_error, basic) << e.what();
+    logger(log_runtime_error, basic) << "error: " << e.what();
     return (false);
   }
   catch (...) {
     logger(log_runtime_error, basic)
-      << "link_servicegroup: unknow exception";
+      << "error: link_servicegroup: unknow exception";
     return (false);
   }
   return (true);
@@ -67,11 +67,11 @@ void release_servicegroup(servicegroup const* obj) {
     objects::release(obj);
   }
   catch (std::exception const& e) {
-    logger(log_runtime_error, basic) << e.what();
+    logger(log_runtime_error, basic) << "error: " << e.what();
   }
   catch (...) {
     logger(log_runtime_error, basic)
-      << "release_servicegroup: unknow exception";
+      << "error: release_servicegroup: unknow exception";
   }
   return;
 }

@@ -34,11 +34,11 @@ contactgroupsmember const* release_contactgroupsmember(
     return (objects::release(obj));
   }
   catch (std::exception const& e) {
-    logger(log_runtime_error, basic) << e.what();
+    logger(log_runtime_error, basic) << "error: " << e.what();
   }
   catch (...) {
     logger(log_runtime_error, basic)
-      << "release_contactgroupsmember: unknow exception";
+      << "error: release_contactgroupsmember: unknow exception";
   }
   return (NULL);
 }

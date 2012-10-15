@@ -34,11 +34,11 @@ contactsmember const* release_contactsmember(
     return (objects::release(obj));
   }
   catch (std::exception const& e) {
-    logger(log_runtime_error, basic) << e.what();
+    logger(log_runtime_error, basic) << "error: " << e.what();
   }
   catch (...) {
     logger(log_runtime_error, basic)
-      << "release_contactsmember: unknow exception";
+      << "error: release_contactsmember: unknow exception";
   }
   return (NULL);
 }

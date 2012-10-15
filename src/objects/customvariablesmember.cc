@@ -35,11 +35,11 @@ customvariablesmember const* release_customvariablesmember(
     return (objects::release(obj));
   }
   catch (std::exception const& e) {
-    logger(log_runtime_error, basic) << e.what();
+    logger(log_runtime_error, basic) << "error: " << e.what();
   }
   catch (...) {
     logger(log_runtime_error, basic)
-      << "release_customvariablesmember: unknow exception";
+      << "error: release_customvariablesmember: unknow exception";
   }
   return (NULL);
 }

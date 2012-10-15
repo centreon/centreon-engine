@@ -71,12 +71,12 @@ bool link_host(
                cmd_check_command);
   }
   catch (std::exception const& e) {
-    logger(log_runtime_error, basic) << e.what();
+    logger(log_runtime_error, basic) << "error: " << e.what();
     return (false);
   }
   catch (...) {
     logger(log_runtime_error, basic)
-      << "link_host: unknow exception";
+      << "error: link_host: unknow exception";
     return (false);
   }
   return (true);
@@ -92,11 +92,11 @@ void release_host(host const* obj) {
     objects::release(obj);
   }
   catch (std::exception const& e) {
-    logger(log_runtime_error, basic) << e.what();
+    logger(log_runtime_error, basic) << "error: " << e.what();
   }
   catch (...) {
     logger(log_runtime_error, basic)
-      << "release_host: unknow exception";
+      << "error: release_host: unknow exception";
   }
   return;
 }

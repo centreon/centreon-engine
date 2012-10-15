@@ -37,7 +37,7 @@ void release_timeperiodexclusion(timeperiodexclusion const* obj) {
   }
   catch (...) {
     logger(log_runtime_error, basic)
-      << "release_timeperiodexclusion: unknow exception";
+      << "error: release_timeperiodexclusion: unknow exception";
   }
   return;
 }

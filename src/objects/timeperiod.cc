@@ -63,7 +63,7 @@ void release_timeperiod(timeperiod const* obj) {
   }
   catch (...) {
     logger(log_runtime_error, basic)
-      << "release_timeperiod: unknow exception";
+      << "error: release_timeperiod: unknow exception";
   }
   return;
 }

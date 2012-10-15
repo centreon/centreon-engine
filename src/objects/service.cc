@@ -67,12 +67,12 @@ bool link_service(
       cmd_check_command);
   }
   catch (std::exception const& e) {
-    logger(log_runtime_error, basic) << e.what();
+    logger(log_runtime_error, basic) << "error: " << e.what();
     return (false);
   }
   catch (...) {
     logger(log_runtime_error, basic)
-      << "link_service: unknow exception";
+      << "error: link_service: unknow exception";
     return (false);
   }
   return (true);
@@ -88,11 +88,11 @@ void release_service(service const* obj) {
     objects::release(obj);
   }
   catch (std::exception const& e) {
-    logger(log_runtime_error, basic) << e.what();
+    logger(log_runtime_error, basic) << "error: " << e.what();
   }
   catch (...) {
     logger(log_runtime_error, basic)
-      << "release_service: unknow exception";
+      << "error: release_service: unknow exception";
   }
   return;
 }

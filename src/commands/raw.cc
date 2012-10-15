@@ -321,7 +321,7 @@ void raw::finished(process& p) throw () {
   }
   catch (std::exception const& e) {
     logger(log_runtime_warning, basic)
-      << "process finish failed: " << e.what();
+      << "error: process finish failed: " << e.what();
   }
 
   // Put the process into the free list.

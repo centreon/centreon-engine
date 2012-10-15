@@ -41,12 +41,12 @@ bool link_command(command const* obj) {
     objects::link(obj);
   }
   catch (std::exception const& e) {
-    logger(log_runtime_error, basic) << e.what();
+    logger(log_runtime_error, basic) << "error: " << e.what();
     return (false);
   }
   catch (...) {
     logger(log_runtime_error, basic)
-      << "link_command: unknow exception";
+      << "error: link_command: unknow exception";
     return (false);
   }
   return (true);
@@ -62,11 +62,11 @@ void release_command(command const* obj) {
     objects::release(obj);
   }
   catch (std::exception const& e) {
-    logger(log_runtime_error, basic) << e.what();
+    logger(log_runtime_error, basic) << "error: " << e.what();
   }
   catch (...) {
     logger(log_runtime_error, basic)
-      << "release_command: unknow exception";
+      << "error: release_command: unknow exception";
   }
   return;
 }

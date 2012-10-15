@@ -49,12 +49,12 @@ bool link_hostescalation(
                escalation_period);
   }
   catch (std::exception const& e) {
-    logger(log_runtime_error, basic) << e.what();
+    logger(log_runtime_error, basic) << "error: " << e.what();
     return (false);
   }
   catch (...) {
     logger(log_runtime_error, basic)
-      << "link_hostescalation: unknow exception";
+      << "error: link_hostescalation: unknow exception";
     return (false);
   }
   return (true);
@@ -70,11 +70,11 @@ void release_hostescalation(hostescalation const* obj) {
     objects::release(obj);
   }
   catch (std::exception const& e) {
-    logger(log_runtime_error, basic) << e.what();
+    logger(log_runtime_error, basic) << "error: " << e.what();
   }
   catch (...) {
     logger(log_runtime_error, basic)
-      << "release_hostescalation: unknow exception";
+      << "error: release_hostescalation: unknow exception";
   }
   return;
 }

@@ -347,10 +347,10 @@ int main(int argc, char* argv[]) {
     }
   }
   catch (std::exception const& e) {
-    std::cout << e.what() << std::endl;
+    std::cout << "error: " << e.what() << std::endl;
   }
   catch (...) {
-    std::cout << "unknown exception" << std::endl;
+    std::cout << "error: unknown exception" << std::endl;
   }
 
   // Cleanup.

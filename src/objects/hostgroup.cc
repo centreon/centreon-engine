@@ -47,12 +47,12 @@ bool link_hostgroup(
                tab2vec(groups));
   }
   catch (std::exception const& e) {
-    logger(log_runtime_error, basic) << e.what();
+    logger(log_runtime_error, basic) << "error: " << e.what();
     return (false);
   }
   catch (...) {
     logger(log_runtime_error, basic)
-      << "link_hostgroup: unknow exception";
+      << "error: link_hostgroup: unknow exception";
     return (false);
   }
   return (true);
@@ -68,11 +68,11 @@ void release_hostgroup(hostgroup const* obj) {
     objects::release(obj);
   }
   catch (std::exception const& e) {
-    logger(log_runtime_error, basic) << e.what();
+    logger(log_runtime_error, basic) << "error: " << e.what();
   }
   catch (...) {
     logger(log_runtime_error, basic)
-      << "release_hostgroup: unknow exception";
+      << "error: release_hostgroup: unknow exception";
   }
   return;
 }

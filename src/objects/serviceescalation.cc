@@ -49,7 +49,7 @@ bool link_serviceescalation(
                escalation_period);
   }
   catch (std::exception const& e) {
-    logger(log_runtime_error, basic) << e.what();
+    logger(log_runtime_error, basic) << "error: " << e.what();
     return (false);
   }
   catch (...) {
@@ -70,11 +70,11 @@ void release_serviceescalation(serviceescalation const* obj) {
     objects::release(obj);
   }
   catch (std::exception const& e) {
-    logger(log_runtime_error, basic) << e.what();
+    logger(log_runtime_error, basic) << "error: " << e.what();
   }
   catch (...) {
     logger(log_runtime_error, basic)
-      << "release_serviceescalation: unknow exception";
+      << "error: release_serviceescalation: unknow exception";
   }
   return;
 }
