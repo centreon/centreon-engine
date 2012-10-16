@@ -137,18 +137,25 @@ unsigned long connector::run(
     << "connector::run: id=" << command_id;
 
   try {
-    // Connector start if is necessary.
-    _connector_start();
-
     {
       concurrency::locker lock(&_lock);
-      // Send check to the connector.
-      _send_query_execute(
-        info->processed_cmd,
-        command_id,
-        info->start_time,
-        info->timeout);
-      _queries[command_id] = info;
+
+      // Start connector if is not running.
+      if (!_is_running) {
+        if (!_try_to_restart)
+          throw (engine_error() << "restart failed");
+        _queries[command_id] = info;
+        _restart.exec();
+      }
+      else {
+        // Send check to the connector.
+        _send_query_execute(
+          info->processed_cmd,
+          command_id,
+          info->start_time,
+          info->timeout);
+        _queries[command_id] = info;
+      }
     }
 
     logger(dbg_commands, basic)
@@ -193,11 +200,18 @@ void connector::run(
     << "connector::run: id=" << command_id;
 
   try {
-    // Connector start if is necessary.
-    _connector_start();
-
     {
       concurrency::locker lock(&_lock);
+
+      // Start connector if is not running.
+      if (!_is_running) {
+        if (!_try_to_restart)
+          throw (engine_error() << "restart failed");
+        lock.unlock();
+        _connector_start();
+        lock.relock();
+      }
+
       // Send check to the connector.
       _send_query_execute(
         info->processed_cmd,
@@ -390,17 +404,6 @@ void connector::_connector_close() {
  *  Start connection with the process.
  */
 void connector::_connector_start() {
-  {
-    concurrency::locker lock(&_lock);
-
-    // Exit if connector is running.
-    if (_is_running)
-      return;
-
-    if (!_try_to_restart)
-      throw (engine_error() << "restart failed");
-  }
-
   logger(dbg_commands, basic)
     << "connector::_connector_start: process=" << &_process;
 
