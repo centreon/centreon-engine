@@ -66,18 +66,23 @@ raw::raw(raw const& right)
  *  Destructor.
  */
 raw::~raw() throw () {
-  concurrency::locker lock(&_lock);
-  while (!_processes_busy.empty()) {
-    process* p(_processes_busy.begin()->first);
-    lock.unlock();
-    p->wait();
-    lock.relock();
+  try {
+    concurrency::locker lock(&_lock);
+    while (!_processes_busy.empty()) {
+      process* p(_processes_busy.begin()->first);
+      lock.unlock();
+      p->wait();
+      lock.relock();
+    }
+    for (std::list<process*>::const_iterator
+           it(_processes_free.begin()), end(_processes_free.end());
+         it != end;
+         ++it)
+      delete *it;
   }
-  for (std::list<process*>::const_iterator
-         it(_processes_free.begin()), end(_processes_free.end());
-       it != end;
-       ++it)
-    delete *it;
+  catch (std::exception const& e) {
+    logger() << "error: raw destructor failed: " << e.what();
+  }
 }
 
 /**

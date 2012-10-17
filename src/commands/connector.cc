@@ -145,7 +145,12 @@ unsigned long connector::run(
         if (!_try_to_restart)
           throw (engine_error() << "restart failed");
         _queries[command_id] = info;
-        _restart.exec();
+        try {
+          _restart.exec();
+        }
+        catch (std::exception const& e) {
+          (void)e;
+        }
       }
       else {
         // Send check to the connector.
@@ -342,16 +347,29 @@ void connector::data_is_available_err(process& p) throw () {
  *  @param[in] p  The process to finished.
  */
 void connector::finished(process& p) throw () {
-  logger(dbg_commands, basic)
-    << "connector::finished: process=" << &p;
+  try {
+    logger(dbg_commands, basic)
+      << "connector::finished: process=" << &p;
 
-  concurrency::locker lock(&_lock);
-  _is_running = false;
-  _data_available.clear();
+    concurrency::locker lock(&_lock);
+    _is_running = false;
+    _data_available.clear();
 
-  // The connector is stop, restart it if necessary.
-  if (_try_to_restart)
-    _restart.exec();
+    // The connector is stop, restart it if necessary.
+    if (_try_to_restart) {
+      try {
+        _restart.exec();
+      }
+      catch (std::exception const& e) {
+        (void)e;
+      }
+    }
+  }
+  catch (std::exception const& e) {
+    logger(log_runtime_error, basic)
+      << "error: connector '" << _name
+      << "' connector finish failed: " << e.what();
+  }
   return;
 }
 
@@ -388,8 +406,8 @@ void connector::_connector_close() {
                        config->get_service_check_timeout() * 1000));
     if (is_timeout || !_query_quit_ok) {
       _process.kill();
-      logger(log_runtime_error, basic)
-        << "error: connector '" << _name
+      logger(log_runtime_warning, basic)
+        << "warning: connector '" << _name
         << "' connector close failed: "
         << (is_timeout ? "timeout" : "bad query");
     }
