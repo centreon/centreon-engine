@@ -81,7 +81,8 @@ raw::~raw() throw () {
       delete *it;
   }
   catch (std::exception const& e) {
-    logger() << "error: raw destructor failed: " << e.what();
+    logger(log_runtime_error, basic)
+      << "error: raw destructor failed: " << e.what();
   }
 }
 
