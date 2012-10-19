@@ -48,19 +48,19 @@ Using sources
 To build Centreon Engine, you will need the following external
 dependencies:
 
-* a C++ compilation environment.
-* CMake **(>= 2.8)**, a cross-platform build system.
-* Centreon Clib, The centreon Core library.
+  * a C++ compilation environment.
+  * CMake **(>= 2.8)**, a cross-platform build system.
+  * Centreon Clib, The centreon Core library.
 
 To build the optional web service module, you will need the following
 external dependencies:
 
-* gSOAP **(>= 2.7)** toolkit for SOAP Web Services and XML-Based
-  Applications.
-* zlib used for data compression.
-* SSL toolkit implementing SSL v2/v3 and TLS protocols with
-  full-strength cryptography world-wide.
-* xerces-c toolkit to parse XML configuration files.
+  * gSOAP **(>= 2.7)** toolkit for SOAP Web Services and XML-Based
+    Applications.
+  * zlib used for data compression.
+  * SSL toolkit implementing SSL v2/v3 and TLS protocols with
+    full-strength cryptography world-wide.
+  * xerces-c toolkit to parse XML configuration files.
 
 
 This program is compatible only with Unix-like platforms (Linux,
