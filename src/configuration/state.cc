@@ -89,7 +89,7 @@ void state::parse(std::string const& filename) {
       size_t pos = line.find_first_of('=');
       if (pos == std::string::npos) {
               throw (engine_error() << "[" << _filename << ":" << _cur_line
-               << "] bad variable name: '" << _filename << "'");
+               << "] bad variable name: '" << line << "'");
       }
       std::string key = line.substr(0, pos);
       methods::const_iterator it = _lst_method.find(_trim(key).c_str());
